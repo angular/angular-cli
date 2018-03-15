@@ -7,8 +7,7 @@ import { stripIndents } from 'common-tags';
 import { updateJsonFile } from '../../../utils/project';
 
 export default function () {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
-  return;
+  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
   const extensions = ['css', 'scss', 'less', 'styl'];
   let promise: Promise<any> = Promise.resolve()

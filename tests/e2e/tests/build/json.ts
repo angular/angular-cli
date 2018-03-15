@@ -5,8 +5,7 @@ import {getGlobalVariable} from '../../utils/env';
 
 
 export default function() {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
-  return;
+  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
   // Skip this in ejected tests.
   if (getGlobalVariable('argv').eject) {

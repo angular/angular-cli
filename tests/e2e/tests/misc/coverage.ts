@@ -5,7 +5,8 @@ import {ng} from '../../utils/process';
 
 
 export default function () {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): This test is broken in devkit/build-webpack, istanbul and
+  // istanbul-instrumenter-loader are missing from the dependencies.
   return;
 
   return ng('test', '--watch=false', '--code-coverage')

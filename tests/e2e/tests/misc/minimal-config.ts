@@ -3,7 +3,7 @@ import { ng } from '../../utils/process';
 
 
 export default function () {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): Figure out what a minimal config is for architect apps.
   return;
 
   return Promise.resolve()

@@ -101,6 +101,7 @@ const expectedWorkspace = {
           },
           'configurations': {
             'production': {
+              'optimizationLevel': 1,
               'outputHashing': 'all',
               'sourceMap': false,
               'extractCss': true,
@@ -182,6 +183,7 @@ const expectedWorkspace = {
           },
           'configurations': {
             'production': {
+              'optimizationLevel': 1,
               'outputHashing': 'all',
               'sourceMap': false,
               'extractCss': true,

@@ -2,7 +2,8 @@ import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 export default function () {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): This is giving odd errors in devkit/build-webpack.
+  // TypeError: Assignment to constant variable.
   return;
 
   return updateJsonFile('tsconfig.json', configJson => {

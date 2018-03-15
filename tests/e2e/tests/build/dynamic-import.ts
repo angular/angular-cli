@@ -5,7 +5,7 @@ import { updateJsonFile } from '../../utils/project';
 
 
 export default async function() {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): lazyModules is not yet handled by the compat layer.
   return;
 
   // Add a lazy module

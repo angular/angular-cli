@@ -1,12 +1,11 @@
-import {ng} from '../../../utils/process';
-import {expectFileToMatch, writeFile, createDir, appendToFile, readFile} from '../../../utils/fs';
-import {expectToFail} from '../../../utils/utils';
-import {Version} from '../../../../../packages/@angular/cli/upgrade/version';
-import {SemVer} from 'semver';
+import { ng } from '../../../utils/process';
+import { expectFileToMatch, writeFile, createDir, appendToFile, readFile } from '../../../utils/fs';
+import { expectToFail } from '../../../utils/utils';
+import { Version } from '../../../../../packages/@angular/cli/upgrade/version';
+import { SemVer } from 'semver';
 
-export default function() {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
-  return;
+export default function () {
+  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
   return Promise.resolve()
     .then(() => createDir('src/locale'))
@@ -25,7 +24,7 @@ export default function() {
         </xliff>`))
     .then(() => appendToFile('src/app/app.component.html',
       '<h1 i18n="An introduction header for this sample">Hello i18n!</h1>'))
-    .then(() => ng('build', '--aot', '--i18n-file', 'src/locale/messages.fr.xlf', '--i18n-format',
+    .then(() => ng('build', '--aot', '--i18n-file', 'locale/messages.fr.xlf', '--i18n-format',
       'xlf', '--i18n-locale', 'fr'))
     .then(() => expectFileToMatch('dist/main.js', /Bonjour i18n!/))
     .then(() => ng('build', '--aot'))
@@ -33,29 +32,9 @@ export default function() {
     .then(() => expectFileToMatch('dist/main.js', /Hello i18n!/))
     .then(() => appendToFile('src/app/app.component.html',
       '<p i18n>Other content</p>'))
-    .then(() => readFile('node_modules/@angular/compiler-cli/package.json')
-      .then((compilerCliPackage): any => {
-        const version = new Version(JSON.parse(compilerCliPackage).version);
-        if (version.major === 2) {
-          return expectToFail(() => ng('build', '--aot', '--i18nFile', 'src/locale/messages.fr.xlf',
-            '--i18nFormat', 'xlf', '--i18n-locale', 'fr', '--i18n-missing-translation', 'ignore'));
-        } else {
-          return ng('build', '--aot', '--i18nFile', 'src/locale/messages.fr.xlf', '--i18nFormat',
-            'xlf', '--i18n-locale', 'fr', '--i18n-missing-translation', 'ignore')
-            .then(() => expectFileToMatch('dist/main.js', /Other content/));
-        }
-      })
-    )
-    .then(() => readFile('node_modules/@angular/compiler-cli/package.json')
-      .then((compilerCliPackage): any => {
-        const version = new Version(JSON.parse(compilerCliPackage).version);
-        if (version.isGreaterThanOrEqualTo(new SemVer('4.2.0-beta.0')) || version.major === 2) {
-          return expectToFail(() => ng('build', '--aot', '--i18nFile', 'src/locale/messages.fr.xlf',
-            '--i18nFormat', 'xlf', '--i18n-locale', 'fr', '--i18n-missing-translation', 'error'));
-        } else {
-          return ng('build', '--aot', '--i18nFile', 'src/locale/messages.fr.xlf',
-            '--i18nFormat', 'xlf', '--i18n-locale', 'fr', '--i18n-missing-translation', 'error');
-        }
-      })
-    );
+    .then(() => ng('build', '--aot', '--i18nFile', 'locale/messages.fr.xlf', '--i18nFormat',
+      'xlf', '--i18n-locale', 'fr', '--i18n-missing-translation', 'ignore'))
+    .then(() => expectFileToMatch('dist/main.js', /Other content/))
+    .then(() => expectToFail(() => ng('build', '--aot', '--i18nFile', 'locale/messages.fr.xlf',
+      '--i18nFormat', 'xlf', '--i18n-locale', 'fr', '--i18n-missing-translation', 'error')));
 }

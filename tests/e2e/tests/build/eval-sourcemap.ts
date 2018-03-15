@@ -3,7 +3,7 @@ import {getGlobalVariable} from '../../utils/env';
 
 
 export default function() {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): Dev-server does not yet do this. Fix, reenable, validate, then delete this test.
   return;
 
   // Skip this in ejected tests.

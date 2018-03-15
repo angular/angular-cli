@@ -5,8 +5,7 @@ import {oneLineTrim} from 'common-tags';
 
 
 export default function() {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
-  return;
+    // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
   return Promise.resolve()
     .then(() => silentNpm('install', 'bootstrap@4.0.0-beta.3'))
@@ -29,9 +28,10 @@ export default function() {
     `))
     .then(() => ng(
       'build',
-      '--optimization-level', '1',
+      '--optimization-level=1',
       '--extract-css',
-      '--output-hashing=none'
+      '--output-hashing=none',
+      '--vendor-chunk=false',
     ))
     .then(() => expectFileToMatch('dist/scripts.js', 'jQuery'))
     .then(() => expectFileToMatch('dist/styles.css', '* Bootstrap'))

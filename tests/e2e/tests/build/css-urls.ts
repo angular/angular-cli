@@ -15,8 +15,7 @@ const imgSvg = `
 `;
 
 export default function () {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
-  return;
+  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
   return Promise.resolve()
     // Verify absolute/relative paths in global/component css.
@@ -41,16 +40,16 @@ export default function () {
     .then(() => expectFileToMatch('dist/styles.css',
       /url\('\/assets\/global-img-absolute\.svg'\)/))
     .then(() => expectFileToMatch('dist/styles.css',
-      /global-img-relative\.[0-9a-f]{20}\.png/))
+      /global-img-relative\.png/))
     .then(() => expectFileToMatch('dist/main.js',
       '/assets/component-img-absolute.svg'))
     .then(() => expectFileToMatch('dist/main.js',
-      /component-img-relative\.[0-9a-f]{20}\.png/))
+      /component-img-relative\.png/))
     // Check files are correctly created.
     .then(() => expectToFail(() => expectFileToExist('dist/global-img-absolute.svg')))
     .then(() => expectToFail(() => expectFileToExist('dist/component-img-absolute.svg')))
-    .then(() => expectFileMatchToExist('./dist', /global-img-relative\.[0-9a-f]{20}\.png/))
-    .then(() => expectFileMatchToExist('./dist', /component-img-relative\.[0-9a-f]{20}\.png/))
+    .then(() => expectFileMatchToExist('./dist', /global-img-relative\.png/))
+    .then(() => expectFileMatchToExist('./dist', /component-img-relative\.png/))
     // Check urls with deploy-url scheme are used as is.
     .then(() => ng('build', '--base-href=/base/', '--deploy-url=http://deploy.url/',
       '--extract-css'))
@@ -78,31 +77,31 @@ export default function () {
     .then(() => expectFileToMatch('dist/styles.css',
       '/base/deploy/assets/global-img-absolute.svg'))
     .then(() => expectFileToMatch('dist/styles.css',
-      /global-img-relative\.[0-9a-f]{20}\.png/))
+      /global-img-relative\.png/))
     .then(() => expectFileToMatch('dist/main.js',
       '/base/deploy/assets/component-img-absolute.svg'))
     .then(() => expectFileToMatch('dist/main.js',
-      /deploy\/component-img-relative\.[0-9a-f]{20}\.png/))
+      /deploy\/component-img-relative\.png/))
     // Check with identical base-href and deploy-url flags.
     .then(() => ng('build', '--base-href=/base/', '--deploy-url=/base/',
       '--extract-css', '--aot'))
     .then(() => expectFileToMatch('dist/styles.css',
       '/base/assets/global-img-absolute.svg'))
     .then(() => expectFileToMatch('dist/styles.css',
-      /global-img-relative\.[0-9a-f]{20}\.png/))
+      /global-img-relative\.png/))
     .then(() => expectFileToMatch('dist/main.js',
       '/base/assets/component-img-absolute.svg'))
     .then(() => expectFileToMatch('dist/main.js',
-      /\/base\/component-img-relative\.[0-9a-f]{20}\.png/))
+      /\/base\/component-img-relative\.png/))
     // Check with only base-href flag.
     .then(() => ng('build', '--base-href=/base/',
       '--extract-css', '--aot'))
     .then(() => expectFileToMatch('dist/styles.css',
       '/base/assets/global-img-absolute.svg'))
     .then(() => expectFileToMatch('dist/styles.css',
-      /global-img-relative\.[0-9a-f]{20}\.png/))
+      /global-img-relative\.png/))
     .then(() => expectFileToMatch('dist/main.js',
       '/base/assets/component-img-absolute.svg'))
     .then(() => expectFileToMatch('dist/main.js',
-      /component-img-relative\.[0-9a-f]{20}\.png/));
+      /component-img-relative\.png/));
 }
