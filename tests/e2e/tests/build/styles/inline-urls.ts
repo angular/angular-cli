@@ -16,8 +16,7 @@ const imgSvg = `
 `;
 
 export default function () {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
-  return;
+  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
   return Promise.resolve()
     .then(() => silentNpm('install', 'font-awesome@4.7.0'))
@@ -50,17 +49,17 @@ export default function () {
     })
     // Check paths are correctly generated.
     .then(() => expectFileToMatch('dist/styles.css',
-      /url\(['"]?large\.[0-9a-f]{20}\.png['"]?\),\s+linear-gradient\(to bottom, #0e40fa 25%, #0654f4 75%\);/))
+      /url\(['"]?large\.png['"]?\),\s+linear-gradient\(to bottom, #0e40fa 25%, #0654f4 75%\);/))
     .then(() => expectFileToMatch('dist/styles.css',
       /url\(\\?['"]data:image\/svg\+xml/))
     .then(() => expectFileToMatch('dist/styles.css',
-      /url\(['"]?small-id\.[0-9a-f]{20}\.svg#testID['"]?\)/))
+      /url\(['"]?small-id\.svg#testID['"]?\)/))
     .then(() => expectFileToMatch('dist/main.js',
       /url\(\\?['"]data:image\/svg\+xml/))
     .then(() => expectFileToMatch('dist/main.js',
-      /url\((?:['"]|\\')?large\.[0-9a-f]{20}\.png(?:['"]|\\')?\)/))
+      /url\((?:['"]|\\')?large\.png(?:['"]|\\')?\)/))
     // Check files are correctly created.
     .then(() => expectToFail(() => expectFileToExist('dist/small.svg')))
-    .then(() => expectFileMatchToExist('./dist', /large\.[0-9a-f]{20}\.png/))
-    .then(() => expectFileMatchToExist('./dist', /small-id\.[0-9a-f]{20}\.svg/));
+    .then(() => expectFileMatchToExist('./dist', /large\.png/))
+    .then(() => expectFileMatchToExist('./dist', /small-id\.svg/));
 }

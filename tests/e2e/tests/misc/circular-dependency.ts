@@ -3,19 +3,12 @@ import { ng } from '../../utils/process';
 
 
 export default async function () {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
-  return;
+  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
   await prependToFile('src/app/app.component.ts',
     `import { AppModule } from './app.module'; console.log(AppModule);`);
   let output = await ng('build', '--show-circular-dependencies');
   if (!output.stdout.match(/WARNING in Circular dependency detected/)) {
     throw new Error('Expected to have circular dependency warning in output.');
-  }
-
-  await ng('config', 'defaults.build.showCircularDependencies', 'false');
-  output = await ng('build');
-  if (output.stdout.match(/WARNING in Circular dependency detected/)) {
-    throw new Error('Expected to not have circular dependency warning in output.');
   }
 }

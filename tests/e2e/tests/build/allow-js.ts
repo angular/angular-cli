@@ -3,8 +3,7 @@ import { updateTsConfig } from '../../utils/project';
 import { appendToFile, writeFile } from '../../utils/fs';
 
 export default async function() {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
-  return;
+  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
   await writeFile('src/my-js-file.js', 'console.log(1); export const a = 2;');
   await appendToFile('src/main.ts', `

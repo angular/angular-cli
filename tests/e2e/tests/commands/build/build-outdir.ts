@@ -3,7 +3,7 @@ import {updateJsonFile} from '../../../utils/project';
 import {expectToFail} from '../../../utils/utils';
 
 export default function() {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): This isn't working correctly in devkit/build-webpack, due to module resolution.
   return;
 
   return Promise.resolve()

@@ -2,7 +2,7 @@ import { ng } from '../../utils/process';
 import { oneLine } from 'common-tags';
 
 export default function () {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): Figure out how this test should look like post devkit/build-webpack.
   return;
 
   return Promise.resolve()

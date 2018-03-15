@@ -3,14 +3,14 @@ import {
   waitForAnyProcessOutputToMatch,
   execAndWaitForOutputToMatch,
 } from '../../utils/process';
-import { appendToFile, writeMultipleFiles, replaceInFile } from '../../utils/fs';
-import { request } from '../../utils/http';
+import { appendToFile, writeMultipleFiles, replaceInFile, expectFileToMatch } from '../../utils/fs';
 import { getGlobalVariable } from '../../utils/env';
 
 const validBundleRegEx = /: Compiled successfully./;
 
 export default function () {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): This test is behaving oddly both here and in devkit/build-webpack.
+  // It seems to be because of file watchers.
   return;
 
   if (process.platform.startsWith('win')) {
@@ -26,7 +26,7 @@ export default function () {
     return Promise.resolve();
   }
 
-  return execAndWaitForOutputToMatch('ng', ['serve', '--aot'], validBundleRegEx)
+  return execAndWaitForOutputToMatch('ng', ['build', '--watch', '--aot'], validBundleRegEx)
     .then(() => writeMultipleFiles({
       'src/app/app.component.css': `
         @import './imported-styles.css';
@@ -49,53 +49,24 @@ export default function () {
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
       appendToFile('src/app/app.component.html', '<p>HTML_REBUILD_STRING<p>')
     ]))
-    .then(() => request('http://localhost:4200/main.js'))
-    .then((body) => {
-      if (!body.match(/HTML_REBUILD_STRING/)) {
-        throw new Error('Expected HTML_REBUILD_STRING but it wasn\'t in bundle.');
-      }
-    })
+    .then(() => expectFileToMatch('dist/main.js', 'HTML_REBUILD_STRING'))
     // Check if css changes are built.
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
       appendToFile('src/app/app.component.css', 'CSS_REBUILD_STRING {color: #f00;}')
     ]))
-    .then(() => request('http://localhost:4200/main.js'))
-    .then((body) => {
-      if (!body.match(/CSS_REBUILD_STRING/)) {
-        throw new Error('Expected CSS_REBUILD_STRING but it wasn\'t in bundle.');
-      }
-    })
+    .then(() => expectFileToMatch('dist/main.js', 'CSS_REBUILD_STRING'))
     // Check if css dependency changes are built.
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
       appendToFile('src/app/imported-styles.css', 'CSS_DEP_REBUILD_STRING {color: #f00;}')
     ]))
-    .then(() => request('http://localhost:4200/main.js'))
-    .then((body) => {
-      if (!body.match(/CSS_DEP_REBUILD_STRING/)) {
-        throw new Error('Expected CSS_DEP_REBUILD_STRING but it wasn\'t in bundle.');
-      }
-    })
-    .then(() => {
-      // Skip this part of the test in Angular 2/4.
-      if (getGlobalVariable('argv').ng2 || getGlobalVariable('argv').ng4) {
-        return Promise.resolve();
-      }
-
-      // Check if component metadata changes are built.
-      return Promise.resolve()
-        .then(() => Promise.all([
-          waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
-          replaceInFile('src/app/app.component.ts', 'app-root', 'app-root-FACTORY_REBUILD_STRING')
-        ]))
-        .then(() => request('http://localhost:4200/main.js'))
-        .then((body) => {
-          if (!body.match(/FACTORY_REBUILD_STRING/)) {
-            throw new Error('Expected FACTORY_REBUILD_STRING but it wasn\'t in bundle.');
-          }
-        });
-    })
+    .then(() => expectFileToMatch('dist/main.js', 'CSS_DEP_REBUILD_STRING'))
+    .then(() => Promise.all([
+      waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
+      replaceInFile('src/app/app.component.ts', 'app-root', 'app-root-FACTORY_REBUILD_STRING')
+    ]))
+    .then(() => expectFileToMatch('dist/main.js', 'FACTORY_REBUILD_STRING'))
     .then(() => killAllProcesses(), (err: any) => {
       killAllProcesses();
       throw err;

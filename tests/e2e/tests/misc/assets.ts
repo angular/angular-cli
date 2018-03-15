@@ -5,8 +5,7 @@ import {expectToFail} from '../../utils/utils';
 
 
 export default function() {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
-  return;
+  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
   return writeFile('src/assets/.file', '')
     .then(() => writeFile('src/assets/test.abc', 'hello world'))

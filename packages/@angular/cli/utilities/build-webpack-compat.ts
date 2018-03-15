@@ -43,6 +43,7 @@ export function createArchitectWorkspace(cliConfig: any): any {
       options: browserOptions,
       configurations: {
         production: {
+          optimizationLevel: 1,
           outputHashing: 'all',
           sourceMap: false,
           extractCss: true,

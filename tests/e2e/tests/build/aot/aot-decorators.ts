@@ -4,12 +4,8 @@ import {expectToFail} from '../../../utils/utils';
 import {ngVersionMatches} from '../../../utils/version';
 
 export default function() {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): This behaviour seems to have changed in devkit/build-webpack. Figure out why.
   return;
-
-  if (!ngVersionMatches('^4.0.0')) {
-    return Promise.resolve();
-  }
 
   return ng('generate', 'component', 'test-component', '--module', 'app.module.ts')
     .then(() => prependToFile('src/app/test-component/test-component.component.ts', `

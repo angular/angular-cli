@@ -7,15 +7,14 @@ import {getGlobalVariable} from '../../utils/env';
 
 
 export default function() {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
-  return;
+  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
   // Skip this in ejected tests.
   const ejected = getGlobalVariable('argv').eject;
 
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
-  return ng('build', '--optimization-level', '1')
+  return ng('build', '--prod')
     .then(() => expectFileToExist(join(process.cwd(), 'dist')))
     // Check for cache busting hash script src
     .then(() => expectFileToMatch('dist/index.html', /main\.[0-9a-f]{20}\.js/))

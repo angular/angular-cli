@@ -4,8 +4,7 @@ import {expectFileToMatch} from '../../utils/fs';
 
 
 export default function() {
-  // TODO(architect): reenable, validate, then delete this test. It is now in devkit/build-webpack.
-  return;
+  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
   return Promise.resolve()
     .then(() => silentNpm('install', 'material-design-icons@3.0.1'))
