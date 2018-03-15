@@ -164,7 +164,8 @@ export default class GenerateCommand extends Command {
         force: options.force,
         workingDir: cwd,
         collectionName,
-        schematicName
+        schematicName,
+        logger: this.logger
       });
   }
 

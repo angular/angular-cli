@@ -1,3 +1,4 @@
+import { logging } from '@angular-devkit/core';
 import {
   DryRunEvent,
   DryRunSink,
@@ -29,6 +30,7 @@ export interface SchematicRunOptions {
   collectionName: string;
   schematicName: string;
   allowPrivate?: boolean;
+  logger: logging.Logger;
 }
 
 export interface SchematicOptions {
@@ -54,7 +56,8 @@ export default Task.extend({
       workingDir,
       emptyHost,
       collectionName,
-      schematicName
+      schematicName,
+      logger,
     } = options;
 
     const ui = this.ui;
@@ -134,7 +137,7 @@ export default Task.extend({
       }
     });
 
-    return schematic.call(opts, host).pipe(
+    return schematic.call(opts, host, { logger }).pipe(
       map((tree: Tree) => Tree.optimize(tree)),
       concatMap((tree: Tree) => {
         return dryRunSink.commit(tree).pipe(
