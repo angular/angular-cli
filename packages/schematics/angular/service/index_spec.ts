@@ -8,11 +8,11 @@
 import { Tree, VirtualTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
 import * as path from 'path';
-import { createAppModule, getFileContent } from '../utility/test';
+import { createAppModule } from '../utility/test';
 import { Schema as ServiceOptions } from './schema';
 
 
-describe('Pipe Schematic', () => {
+describe('Service Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
     path.join(__dirname, '../collection.json'),
@@ -42,20 +42,21 @@ describe('Pipe Schematic', () => {
     expect(files.indexOf('/src/app/foo/foo.service.ts')).toBeGreaterThanOrEqual(0);
   });
 
-  it('should not be provided by default', () => {
-    const options = { ...defaultOptions };
+  it('service should be tree-shakeable', () => {
+    const options = { ...defaultOptions};
 
     const tree = schematicRunner.runSchematic('service', options, appTree);
-    const content = getFileContent(tree, '/src/app/app.module.ts');
-    expect(content).not.toMatch(/import { FooService } from '.\/foo\/foo.service'/);
+    const content = tree.readContent('/src/app/foo/foo.service.ts');
+    expect(content).toMatch(/providedIn: 'root',/);
   });
 
-  it('should import into a specified module', () => {
+  it('should import a specified module', () => {
     const options = { ...defaultOptions, module: 'app.module.ts' };
 
     const tree = schematicRunner.runSchematic('service', options, appTree);
-    const content = getFileContent(tree, '/src/app/app.module.ts');
-    expect(content).toMatch(/import { FooService } from '.\/foo\/foo.service'/);
+    const content = tree.readContent('/src/app/foo/foo.service.ts');
+    expect(content).toMatch(/import { AppModule } from '..\/app.module'/);
+    expect(content).toMatch(/providedIn: AppModule,/);
   });
 
   it('should fail if specified module does not exist', () => {
