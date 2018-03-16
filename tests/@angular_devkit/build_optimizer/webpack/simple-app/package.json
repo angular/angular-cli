@@ -9,7 +9,7 @@
     "serve": "lite-server",
     "pree2e": "npm run build -- --devtool=source-map",
     "e2e": "concurrently \"npm run serve\" \"npm run protractor\" --kill-others --success first",
-    "preprotractor": "webdriver-manager update",
+    "preprotractor": "webdriver-manager update --standalone false --gecko false --versions.chrome 2.33",
     "protractor": "protractor protractor.config.js",
     "benchmark": "npm run build && npm run build-no-ngo && node benchmark.js",
     "reinstall-bo": "rimraf node_modules/@angular-devkit/build-optimizer && npm i -q ../../../../../dist/@angular-devkit_build-optimizer.tgz"

@@ -118,6 +118,10 @@ export const protractorWorkspaceTarget: WorkspaceTarget<Partial<ProtractorBuilde
   options: {
     protractorConfig: '../protractor.conf.js',
     devServerTarget: 'app:devServer',
+    // Webdriver is updated with a specific version on devkit install.
+    // This is preferable to updating each time because it can download a new version of
+    // chromedriver that is incompatible with the Chrome version on CI.
+    webdriverUpdate: false,
   },
 };
 
