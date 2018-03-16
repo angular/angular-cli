@@ -62,10 +62,12 @@ export class SchematicTestRunner {
     this._engineHost.registerTaskExecutor(BuiltinTaskExecutor.NodePackage);
     this._engineHost.registerTaskExecutor(BuiltinTaskExecutor.RepositoryInitializer);
     this._engineHost.registerTaskExecutor(BuiltinTaskExecutor.RunSchematic);
+    this._engineHost.registerTaskExecutor(BuiltinTaskExecutor.TslintFix);
 
     this._collection = this._engine.createCollection(this._collectionName);
   }
 
+  get engine() { return this._engine; }
   get logger(): logging.Logger { return this._logger; }
   get tasks(): TaskConfiguration[] { return [...this._engineHost.tasks]; }
 

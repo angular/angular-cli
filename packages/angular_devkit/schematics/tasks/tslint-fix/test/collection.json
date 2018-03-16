@@ -1,0 +1,8 @@
+{
+  "schematics": {
+    "run-task": {
+      "description": ".",
+      "factory": "./run-task"
+    }
+  }
+}

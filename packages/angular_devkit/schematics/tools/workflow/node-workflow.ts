@@ -66,6 +66,7 @@ export class NodeWorkflow implements workflow.Workflow {
       },
     );
     this._engineHost.registerTaskExecutor(BuiltinTaskExecutor.RunSchematic);
+    this._engineHost.registerTaskExecutor(BuiltinTaskExecutor.TslintFix);
 
     this._context = [];
   }

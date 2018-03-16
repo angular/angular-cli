@@ -12,6 +12,7 @@ import {
   RepositoryInitializerTaskFactoryOptions,
  } from '../repo-init/options';
 import { RunSchematicName } from '../run-schematic/options';
+import { TslintFixName } from '../tslint-fix/options';
 
 export class BuiltinTaskExecutor {
   static readonly NodePackage: TaskExecutorFactory<NodePackageTaskFactoryOptions> = {
@@ -26,5 +27,9 @@ export class BuiltinTaskExecutor {
   static readonly RunSchematic: TaskExecutorFactory<{}> = {
     name: RunSchematicName,
     create: () => import('../run-schematic/executor').then(mod => mod.default()),
+  };
+  static readonly TslintFix: TaskExecutorFactory<{}> = {
+    name: TslintFixName,
+    create: () => import('../tslint-fix/executor').then(mod => mod.default()),
   };
 }
