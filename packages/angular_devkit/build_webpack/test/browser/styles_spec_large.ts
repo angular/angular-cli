@@ -370,7 +370,7 @@ describe('Browser Builder styles', () => {
         expect(content).toContain(tags.stripIndents`
           /* normal-comment */
           /*! important-comment */
-          div { -webkit-box-flex: 1; -ms-flex: 1; flex: 1 }`);
+          div { -ms-flex: 1; flex: 1 }`);
       }),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -391,7 +391,7 @@ describe('Browser Builder styles', () => {
         const fileName = 'dist/styles.css';
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toContain(
-          '/*! important-comment */div{-webkit-box-flex:1;-ms-flex:1;flex:1}');
+          '/*! important-comment */div{-ms-flex:1;flex:1}');
       }),
     ).subscribe(undefined, done.fail, done);
   }, 45000);
