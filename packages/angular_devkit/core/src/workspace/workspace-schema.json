@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "AngularDevkitWorkspaceSchema",
+  "title": "Angular Devkit Workspace Schema for validating workspace JSON.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Link to schema."
+    },
+    "version": {
+      "type": "number",
+      "description": "Workspace Schema version."
+    },
+    "newProjectRoot": {
+      "type": "string",
+      "description": "New project root.",
+      "default": "./"
+    },
+    "cli": {
+      "$ref": "#/definitions/tool",
+      "default": {}
+    },
+    "schematics": {
+      "$ref": "#/definitions/tool",
+      "default": {}
+    },
+    "architect": {
+      "$ref": "#/definitions/tool",
+      "default": {}
+    },
+    "projects": {
+      "type": "object",
+      "description": "A map of project names to project options.",
+      "additionalProperties": {
+        "$ref": "#/definitions/project"
+      },
+      "default": {}
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "projects"
+  ],
+  "definitions": {
+    "project": {
+      "type": "object",
+      "description": "Project options.",
+      "properties": {
+        "projectType": {
+          "type": "string",
+          "description": "Project type.",
+          "enum": [
+            "application",
+            "library"
+          ]
+        },
+        "root": {
+          "type": "string",
+          "description": "Root of the project sourcefiles."
+        },
+        "cli": {
+          "$ref": "#/definitions/tool",
+          "default": {}
+        },
+        "schematics": {
+          "$ref": "#/definitions/tool",
+          "default": {}
+        },
+        "architect": {
+          "$ref": "#/definitions/tool",
+          "default": {}
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "root",
+        "projectType"
+      ]
+    },
+    "tool": {
+      "type": "object",
+      "description": "Tool options.",
+      "properties": {
+        "$schema": {
+          "type": "string",
+          "description": "Link to schema."
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}
