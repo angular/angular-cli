@@ -294,6 +294,9 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
               // PURE comments work best with 3 passes.
               // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
               passes: buildOptions.buildOptimizer ? 3 : 1,
+              // Workaround known uglify-es issue
+              // See https://github.com/mishoo/UglifyJS2/issues/2949#issuecomment-368070307
+              inline: wco.supportES2015 ? 1 : 3,
             },
             output: {
               ascii_only: true,
