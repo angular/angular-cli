@@ -10,7 +10,7 @@ import { platformDynamicServer } from '@angular/platform-server';
 import { DOCUMENT } from '@angular/common';
 import { ResourceLoader } from '@angular/compiler';
 
-import { REQUEST, ORIGIN_URL } from './tokens';
+import { REQUEST, ORIGIN_URL } from '../tokens';
 import { FileLoader } from './file-loader';
 import { IEngineOptions } from './interfaces/engine-options';
 import { IEngineRenderResult } from './interfaces/engine-render-result';

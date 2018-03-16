@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.lib.json",
+  "files": [
+    "./index.ts",
+    "./tokens.ts"
+  ]
+}

@@ -6,4 +6,3 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export { ngExpressEngine, NgSetupOptions, RenderOptions } from './src/main';
-export { RESPONSE, REQUEST } from './src/tokens';
