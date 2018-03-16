@@ -90,7 +90,7 @@ export default Task.extend({
     })
     .catch((err: Error) => {
       if (err) {
-        this.ui.writeError('\nAn error occured during the build:\n' + ((err && err.stack) || err));
+        this.ui.writeError('\nAn error occurred during the build:\n' + ((err && err.stack) || err));
       }
       throw err;
     });
