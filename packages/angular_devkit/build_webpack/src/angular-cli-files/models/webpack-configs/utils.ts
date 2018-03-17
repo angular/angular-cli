@@ -69,7 +69,7 @@ export function extraEntryParser(
       if (extraEntry.output) {
         extraEntry.entry = extraEntry.output.replace(/\.(js|css)$/i, '');
       } else if (extraEntry.lazy) {
-        extraEntry.entry = extraEntry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '');
+        extraEntry.entry = path.basename(extraEntry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, ''));
       } else {
         extraEntry.entry = defaultEntry;
       }

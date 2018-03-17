@@ -13,8 +13,7 @@ import {
   BuilderContext,
   BuilderDescription,
 } from '@angular-devkit/architect';
-import { getSystemPath, tags } from '@angular-devkit/core';
-import { resolve } from 'path';
+import { Path, getSystemPath, normalize, resolve, tags } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { of } from 'rxjs/observable/of';
@@ -41,15 +40,17 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
 
   constructor(public context: BuilderContext) { }
 
-  run(target: BuilderConfiguration<ProtractorBuilderOptions>): Observable<BuildEvent> {
+  run(builderConfig: BuilderConfiguration<ProtractorBuilderOptions>): Observable<BuildEvent> {
 
-    const root = getSystemPath(target.root);
-    const options = target.options;
+    const options = builderConfig.options;
+    const root = this.context.workspace.root;
+    const projectRoot = resolve(root, builderConfig.root);
+    // const projectSystemRoot = getSystemPath(projectRoot);
 
     // TODO: verify using of(null) to kickstart things is a pattern.
     return of(null).pipe(
       concatMap(() => options.devServerTarget ? this._startDevServer(options) : of(null)),
-      concatMap(() => options.webdriverUpdate ? this._updateWebdriver(root) : of(null)),
+      concatMap(() => options.webdriverUpdate ? this._updateWebdriver(projectRoot) : of(null)),
       concatMap(() => this._runProtractor(root, options)),
       take(1),
     );
@@ -99,19 +100,19 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
     );
   }
 
-  private _updateWebdriver(root: string) {
+  private _updateWebdriver(projectRoot: Path) {
     // The webdriver-manager update command can only be accessed via a deep import.
     const webdriverDeepImport = 'webdriver-manager/built/lib/cmds/update';
     let webdriverUpdate: any; // tslint:disable-line:no-any
 
     try {
       // When using npm, webdriver is within protractor/node_modules.
-      webdriverUpdate = requireProjectModule(root,
+      webdriverUpdate = requireProjectModule(getSystemPath(projectRoot),
         `protractor/node_modules/${webdriverDeepImport}`);
     } catch (e) {
       try {
         // When using yarn, webdriver is found as a root module.
-        webdriverUpdate = requireProjectModule(root, webdriverDeepImport);
+        webdriverUpdate = requireProjectModule(getSystemPath(projectRoot), webdriverDeepImport);
       } catch (e) {
         throw new Error(tags.stripIndents`
           Cannot automatically find webdriver-manager to update.
@@ -129,7 +130,7 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
     }));
   }
 
-  private _runProtractor(root: string, options: ProtractorBuilderOptions): Observable<BuildEvent> {
+  private _runProtractor(root: Path, options: ProtractorBuilderOptions): Observable<BuildEvent> {
     const additionalProtractorConfig = {
       elementExplorer: options.elementExplorer,
       baseUrl: options.baseUrl,
@@ -144,7 +145,10 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
       root,
       'protractor/built/launcher',
       'init',
-      [resolve(root, options.protractorConfig), additionalProtractorConfig],
+      [
+        getSystemPath(resolve(root, normalize(options.protractorConfig))),
+        additionalProtractorConfig,
+      ],
     );
   }
 }

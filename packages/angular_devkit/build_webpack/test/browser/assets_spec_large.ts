@@ -35,7 +35,7 @@ describe('Browser Builder assets', () => {
       assets: [
         { glob: 'glob-asset.txt' },
         { glob: 'output-asset.txt', output: 'output-folder' },
-        { glob: '**/*', input: 'folder', output: 'folder' },
+        { glob: '**/*', input: 'src/folder', output: 'folder' },
       ],
     };
 

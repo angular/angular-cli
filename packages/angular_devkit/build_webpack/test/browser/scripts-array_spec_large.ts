@@ -27,16 +27,16 @@ describe('Browser Builder scripts array', () => {
     'src/pre-rename-lazy-script.js': 'console.log(\'pre-rename-lazy-script\');',
   };
   const getScriptsOption = () => [
-    { input: 'input-script.js' },
-    { input: 'zinput-script.js' },
-    { input: 'finput-script.js' },
-    { input: 'uinput-script.js' },
-    { input: 'binput-script.js' },
-    { input: 'ainput-script.js' },
-    { input: 'cinput-script.js' },
-    { input: 'lazy-script.js', lazy: true },
-    { input: 'pre-rename-script.js', output: 'renamed-script' },
-    { input: 'pre-rename-lazy-script.js', output: 'renamed-lazy-script', lazy: true },
+    { input: 'src/input-script.js' },
+    { input: 'src/zinput-script.js' },
+    { input: 'src/finput-script.js' },
+    { input: 'src/uinput-script.js' },
+    { input: 'src/binput-script.js' },
+    { input: 'src/ainput-script.js' },
+    { input: 'src/cinput-script.js' },
+    { input: 'src/lazy-script.js', lazy: true },
+    { input: 'src/pre-rename-script.js', output: 'renamed-script' },
+    { input: 'src/pre-rename-lazy-script.js', output: 'renamed-lazy-script', lazy: true },
   ];
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));

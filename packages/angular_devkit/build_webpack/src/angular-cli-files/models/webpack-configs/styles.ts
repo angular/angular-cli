@@ -38,9 +38,9 @@ interface PostcssUrlAsset {
 }
 
 export function getStylesConfig(wco: WebpackConfigOptions) {
-  const { projectRoot, buildOptions, appConfig } = wco;
+  const { root, projectRoot, buildOptions, appConfig } = wco;
 
-  const appRoot = path.resolve(projectRoot, appConfig.root);
+  // const appRoot = path.resolve(projectRoot, appConfig.root);
   const entryPoints: { [key: string]: string[] } = {};
   const globalStylePaths: string[] = [];
   const extraPlugins: any[] = [];
@@ -158,7 +158,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     && appConfig.stylePreprocessorOptions.includePaths.length > 0
   ) {
     appConfig.stylePreprocessorOptions.includePaths.forEach((includePath: string) =>
-      includePaths.push(path.resolve(appRoot, includePath)));
+      includePaths.push(path.resolve(root, includePath)));
     lessPathOptions = {
       paths: includePaths,
     };
@@ -166,7 +166,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // process global styles
   if (appConfig.styles.length > 0) {
-    const globalStyles = extraEntryParser(appConfig.styles, appRoot, 'styles');
+    const globalStyles = extraEntryParser(appConfig.styles, root, 'styles');
     // add style entry points
     globalStyles.forEach(style =>
       entryPoints[style.entry as any]

@@ -39,7 +39,7 @@ describe('Karma Builder code coverage', () => {
     const overrides: Partial<KarmaBuilderOptions> = {
       codeCoverage: true,
       codeCoverageExclude: [
-        'polyfills.ts',
+        'src/polyfills.ts',
         '**/test.ts',
       ],
     };

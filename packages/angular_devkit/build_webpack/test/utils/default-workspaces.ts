@@ -49,18 +49,18 @@ export function makeWorkspace(WorkspaceTargets: Target[] ): experimental.workspa
 export const browserWorkspaceTarget: Target<Partial<BrowserBuilderOptions>> = {
   builder: 'browser',
   options: {
-    outputPath: '../dist',
-    index: 'index.html',
-    main: 'main.ts',
-    polyfills: 'polyfills.ts',
-    tsConfig: 'tsconfig.app.json',
+    outputPath: 'dist',
+    index: 'src/index.html',
+    main: 'src/main.ts',
+    polyfills: 'src/polyfills.ts',
+    tsConfig: 'src/tsconfig.app.json',
     progress: false,
     aot: false,
-    styles: [{ input: 'styles.css', lazy: false }],
+    styles: [{ input: 'src/styles.css', lazy: false }],
     scripts: [],
     assets: [
-      { glob: 'favicon.ico', input: './', output: './', allowOutsideOutDir: false },
-      { glob: '**/*', input: 'assets', output: 'assets', allowOutsideOutDir: false },
+      { glob: 'favicon.ico', input: 'src/', output: './', allowOutsideOutDir: false },
+      { glob: '**/*', input: 'src/assets', output: 'assets', allowOutsideOutDir: false },
     ],
   },
 };
@@ -83,18 +83,18 @@ export const extractI18nWorkspaceTarget: Target<Partial<ExtractI18nBuilderOption
 export const karmaWorkspaceTarget: Target<Partial<KarmaBuilderOptions>> = {
   builder: 'karma',
   options: {
-    main: 'test.ts',
-    polyfills: 'polyfills.ts',
+    main: 'src/test.ts',
+    polyfills: 'src/polyfills.ts',
     // Use Chrome Headless for CI envs.
     browsers: 'ChromeHeadless',
-    tsConfig: 'tsconfig.spec.json',
-    karmaConfig: '../karma.conf.js',
+    tsConfig: 'src/tsconfig.spec.json',
+    karmaConfig: 'karma.conf.js',
     progress: false,
-    styles: [{ input: 'styles.css', lazy: false }],
+    styles: [{ input: 'src/styles.css', lazy: false }],
     scripts: [],
     assets: [
-      { glob: 'favicon.ico', input: './', output: './', allowOutsideOutDir: false },
-      { glob: '**/*', input: 'assets', output: 'assets', allowOutsideOutDir: false },
+      { glob: 'favicon.ico', input: 'src/', output: './', allowOutsideOutDir: false },
+      { glob: '**/*', input: 'src/assets', output: 'assets', allowOutsideOutDir: false },
     ],
   },
 };
@@ -102,8 +102,8 @@ export const karmaWorkspaceTarget: Target<Partial<KarmaBuilderOptions>> = {
 export const protractorWorkspaceTarget: Target<Partial<ProtractorBuilderOptions>> = {
   builder: 'protractor',
   options: {
-    protractorConfig: '../protractor.conf.js',
-    devServerTarget: 'app:devServer',
+    protractorConfig: 'protractor.conf.js',
+    devServerTarget: 'app:dev-server',
     // Webdriver is updated with a specific version on devkit install.
     // This is preferable to updating each time because it can download a new version of
     // chromedriver that is incompatible with the Chrome version on CI.
@@ -114,7 +114,7 @@ export const protractorWorkspaceTarget: Target<Partial<ProtractorBuilderOptions>
 export const tslintWorkspaceTarget: Target<Partial<TslintBuilderOptions>> = {
   builder: 'tslint',
   options: {
-    tsConfig: 'tsconfig.app.json',
+    tsConfig: 'src/tsconfig.app.json',
     exclude: ['**/node_modules/**'],
   },
 };

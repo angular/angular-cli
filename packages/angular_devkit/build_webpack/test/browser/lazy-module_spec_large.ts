@@ -201,7 +201,7 @@ describe('Browser Builder lazy modules', () => {
     });
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
-    const overrides: Partial<BrowserBuilderOptions> = { lazyModules: ['app/lazy/lazy.module'] };
+    const overrides: Partial<BrowserBuilderOptions> = { lazyModules: ['src/app/lazy/lazy.module'] };
 
     runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),

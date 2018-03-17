@@ -20,8 +20,7 @@ const webpackLoader: string = g['angularCliIsLocal']
 
 
 function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = true) {
-  const { appConfig, projectRoot, buildOptions } = wco;
-  const appRoot = path.resolve(projectRoot, appConfig.root);
+  const { appConfig, root, buildOptions } = wco;
   options.compilerOptions = options.compilerOptions || {};
 
   if (wco.buildOptions.preserveSymlinks) {
@@ -71,27 +70,26 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = tru
     const envFile = appConfig.environments[buildOptions.environment as any];
 
     hostReplacementPaths = {
-      [path.resolve(appRoot, sourcePath)]: path.resolve(appRoot, envFile)
+      [path.resolve(root, sourcePath)]: path.resolve(root, envFile)
     };
   }
 
   let i18nInFile = buildOptions.i18nFile
-    ? path.resolve(appRoot, buildOptions.i18nFile)
+    ? path.resolve(root, buildOptions.i18nFile)
     : undefined;
 
   const additionalLazyModules: { [module: string]: string } = {};
   if (appConfig.lazyModules) {
     for (const lazyModule of appConfig.lazyModules) {
       additionalLazyModules[lazyModule] = path.resolve(
-        projectRoot,
-        appConfig.root,
+        root,
         lazyModule,
       );
     }
   }
 
   const pluginOptions: AngularCompilerPluginOptions = {
-    mainPath: useMain ? path.join(projectRoot, appConfig.root, appConfig.main) : undefined,
+    mainPath: useMain ? path.join(root, appConfig.main) : undefined,
     i18nInFile: i18nInFile,
     i18nInFormat: buildOptions.i18nFormat,
     i18nOutFile: buildOptions.i18nOutFile,
@@ -110,8 +108,8 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = tru
 }
 
 export function getNonAotConfig(wco: WebpackConfigOptions) {
-  const { appConfig, projectRoot } = wco;
-  const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsConfig);
+  const { appConfig, root } = wco;
+  const tsConfigPath = path.resolve(root, appConfig.tsConfig);
 
   return {
     module: { rules: [{ test: /\.ts$/, loader: webpackLoader }] },
@@ -120,8 +118,8 @@ export function getNonAotConfig(wco: WebpackConfigOptions) {
 }
 
 export function getAotConfig(wco: WebpackConfigOptions) {
-  const { projectRoot, buildOptions, appConfig } = wco;
-  const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsConfig);
+  const { root, buildOptions, appConfig } = wco;
+  const tsConfigPath = path.resolve(root, appConfig.tsConfig);
 
   const loaders: any[] = [webpackLoader];
   if (buildOptions.buildOptimizer) {
@@ -140,15 +138,15 @@ export function getAotConfig(wco: WebpackConfigOptions) {
 }
 
 export function getNonAotTestConfig(wco: WebpackConfigOptions) {
-  const { projectRoot, appConfig } = wco;
-  const tsConfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsConfig);
+  const { root, appConfig } = wco;
+  const tsConfigPath = path.resolve(root, appConfig.tsConfig);
 
   let pluginOptions: any = { tsConfigPath, skipCodeGeneration: true };
 
   if (appConfig.polyfills) {
     // TODO: remove singleFileIncludes for 2.0, this is just to support old projects that did not
     // include 'polyfills.ts' in `tsconfig.spec.json'.
-    const polyfillsPath = path.resolve(projectRoot, appConfig.root, appConfig.polyfills);
+    const polyfillsPath = path.resolve(root, appConfig.polyfills);
     pluginOptions.singleFileIncludes = [polyfillsPath];
   }
 

@@ -46,7 +46,7 @@ describe('Dev Server Builder proxy', () => {
       'proxy.config.json': `{ "/api/*": { "target": "${proxyServerUrl}" } }`,
     });
 
-    const overrides: Partial<DevServerBuilderOptions> = { proxyConfig: '../proxy.config.json' };
+    const overrides: Partial<DevServerBuilderOptions> = { proxyConfig: 'proxy.config.json' };
 
     runTargetSpec(host, [browserWorkspaceTarget, devServerWorkspaceTarget], overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),

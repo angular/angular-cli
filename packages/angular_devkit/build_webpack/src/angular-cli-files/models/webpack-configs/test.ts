@@ -18,7 +18,7 @@ import { WebpackConfigOptions, WebpackTestOptions } from '../build-options';
 
 
 export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
-  const { projectRoot, buildOptions, appConfig } = wco;
+  const { root, buildOptions, appConfig } = wco;
 
   const extraRules: any[] = [];
   const extraPlugins: any[] = [];
@@ -34,7 +34,7 @@ export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
     if (codeCoverageExclude) {
       codeCoverageExclude.forEach((excludeGlob: string) => {
         const excludeFiles = glob
-          .sync(path.join(projectRoot, excludeGlob), { nodir: true })
+          .sync(path.join(root, excludeGlob), { nodir: true })
           .map(file => path.normalize(file));
         exclude.push(...excludeFiles);
       });
@@ -57,7 +57,7 @@ export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
     },
     devtool: buildOptions.sourceMap ? 'inline-source-map' : 'eval',
     entry: {
-      main: path.resolve(projectRoot, appConfig.root, appConfig.main)
+      main: path.resolve(root, appConfig.main)
     },
     module: {
       rules: [].concat(extraRules as any)

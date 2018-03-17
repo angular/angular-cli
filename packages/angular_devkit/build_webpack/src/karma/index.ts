@@ -12,8 +12,7 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
-import { getSystemPath } from '@angular-devkit/core';
-import * as path from 'path';
+import { Path, getSystemPath, normalize, resolve } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import {
@@ -70,14 +69,16 @@ export interface KarmaBuilderOptions {
 export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
   constructor(public context: BuilderContext) { }
 
-  run(target: BuilderConfiguration<KarmaBuilderOptions>): Observable<BuildEvent> {
+  run(builderConfig: BuilderConfiguration<KarmaBuilderOptions>): Observable<BuildEvent> {
 
-    const root = getSystemPath(target.root);
-    const options = target.options;
+    // const root = getSystemPath(builderConfig.root);
+    const options = builderConfig.options;
+    const root = this.context.workspace.root;
+    const projectRoot = resolve(root, builderConfig.root);
 
     return new Observable(obs => {
-      const karma = requireProjectModule(root, 'karma');
-      const karmaConfig = path.resolve(root, options.karmaConfig);
+      const karma = requireProjectModule(getSystemPath(projectRoot), 'karma');
+      const karmaConfig = getSystemPath(resolve(root, normalize(options.karmaConfig)));
 
       // TODO: adjust options to account for not passing them blindly to karma.
       // const karmaOptions: any = Object.assign({}, options);
@@ -91,9 +92,11 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
         karmaOptions.browsers = options.browsers.split(',');
       }
 
-      karmaOptions.webpackBuildFacade = {
+      karmaOptions.buildWebpack = {
+        root: getSystemPath(root),
+        projectRoot: getSystemPath(projectRoot),
         options: options,
-        webpackConfig: this._buildWebpackConfig(root, options),
+        webpackConfig: this._buildWebpackConfig(root, projectRoot, options),
         // Pass onto Karma to emit BuildEvents.
         successCb: () => obs.next({ success: true }),
         failureCb: () => obs.next({ success: false }),
@@ -101,7 +104,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
 
       // TODO: inside the configs, always use the project root and not the workspace root.
       // Until then we pretend the app root is relative (``) but the same as `projectRoot`.
-      (karmaOptions.webpackBuildFacade.options as any).root = ''; // tslint:disable-line:no-any
+      (karmaOptions.buildWebpack.options as any).root = ''; // tslint:disable-line:no-any
 
       // Assign additional karmaConfig options to the local ngapp config
       karmaOptions.configFile = karmaConfig;
@@ -121,14 +124,14 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
     });
   }
 
-  private _buildWebpackConfig(projectRoot: string, options: KarmaBuilderOptions) {
+  private _buildWebpackConfig(root: Path, projectRoot: Path, options: KarmaBuilderOptions) {
     // tslint:disable-next-line:no-any
     let wco: any;
 
-    const tsconfigPath = path.resolve(projectRoot, options.tsConfig as string);
+    const tsconfigPath = getSystemPath(resolve(root, normalize(options.tsConfig as string)));
     const tsConfig = readTsconfig(tsconfigPath);
 
-    const projectTs = requireProjectModule(projectRoot, 'typescript') as typeof ts;
+    const projectTs = requireProjectModule(getSystemPath(projectRoot), 'typescript') as typeof ts;
 
     const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
       && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
@@ -143,7 +146,8 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
     };
 
     wco = {
-      projectRoot,
+      root: getSystemPath(root),
+      projectRoot: getSystemPath(projectRoot),
       // TODO: use only this.options, it contains all flags and configs items already.
       buildOptions: compatOptions,
       appConfig: compatOptions,

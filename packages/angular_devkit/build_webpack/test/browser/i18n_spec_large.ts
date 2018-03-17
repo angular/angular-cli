@@ -49,7 +49,7 @@ describe('Browser Builder i18n', () => {
 
     const overrides = {
       aot: true,
-      i18nFile: 'locale/messages.fr.xlf',
+      i18nFile: 'src/locale/messages.fr.xlf',
       i18nFormat: 'true',
       i18nLocale: 'fr',
     };
@@ -67,7 +67,7 @@ describe('Browser Builder i18n', () => {
   it('ignores missing translations', (done) => {
     const overrides = {
       aot: true,
-      i18nFile: 'locale/messages.fr.xlf',
+      i18nFile: 'src/locale/messages.fr.xlf',
       i18nFormat: 'true',
       i18nLocale: 'fr',
       i18nMissingTranslation: 'ignore',
@@ -89,7 +89,7 @@ describe('Browser Builder i18n', () => {
   it('reports errors for missing translations', (done) => {
     const overrides = {
       aot: true,
-      i18nFile: 'locale/messages.fr.xlf',
+      i18nFile: 'src/locale/messages.fr.xlf',
       i18nFormat: 'true',
       i18nLocale: 'fr',
       i18nMissingTranslation: 'error',

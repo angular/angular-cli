@@ -58,7 +58,7 @@ export class WorkspaceNotYetLoadedException extends BaseException {
 export interface WorkspaceJson {
   version: number;
   // TODO: figure out if newProjectRoot should stay here.
-  newProjectRoot: string;
+  newProjectRoot: Path;
   cli: WorkspaceTool;
   schematics: WorkspaceTool;
   architect: WorkspaceTool;
@@ -67,7 +67,7 @@ export interface WorkspaceJson {
 
 export interface WorkspaceProject {
   projectType: 'application' | 'library';
-  root: string;
+  root: Path;
   cli: WorkspaceTool;
   schematics: WorkspaceTool;
   architect: WorkspaceTool;

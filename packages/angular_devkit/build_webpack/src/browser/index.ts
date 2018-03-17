@@ -111,6 +111,7 @@ export interface ExtraEntryPoint {
 }
 
 export interface WebpackConfigOptions {
+  root: string;
   projectRoot: string;
   buildOptions: BrowserBuilderOptions;
   appConfig: BrowserBuilderOptions;
@@ -122,13 +123,15 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
 
   constructor(public context: BuilderContext) { }
 
-  run(target: BuilderConfiguration<BrowserBuilderOptions>): Observable<BuildEvent> {
-    const options = target.options;
+  run(builderConfig: BuilderConfiguration<BrowserBuilderOptions>): Observable<BuildEvent> {
+    const options = builderConfig.options;
+    const root = this.context.workspace.root;
+    const projectRoot = resolve(root, builderConfig.root);
 
     // TODO: verify using of(null) to kickstart things is a pattern.
     return of(null).pipe(
       concatMap(() => options.deleteOutputPath
-        ? this._deleteOutputDir(target.root, normalize(options.outputPath))
+        ? this._deleteOutputDir(root, normalize(options.outputPath))
         : of(null)),
       concatMap(() => new Observable(obs => {
         // Ensure Build Optimizer is only used with AOT.
@@ -138,7 +141,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
 
         let webpackConfig;
         try {
-          webpackConfig = this.buildWebpackConfig(target.root, options);
+          webpackConfig = this.buildWebpackConfig(root, projectRoot, options);
         } catch (e) {
           // TODO: why do I have to catch this error? I thought throwing inside an observable
           // always got converted into an error.
@@ -205,8 +208,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
     );
   }
 
-  buildWebpackConfig(root: Path, options: BrowserBuilderOptions) {
-    const systemRoot = getSystemPath(root);
+  buildWebpackConfig(root: Path, projectRoot: Path, options: BrowserBuilderOptions) {
     let wco: WebpackConfigOptions;
 
     // TODO: make target defaults into configurations instead
@@ -215,7 +217,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
     const tsconfigPath = normalize(resolve(root, normalize(options.tsConfig as string)));
     const tsConfig = readTsconfig(getSystemPath(tsconfigPath));
 
-    const projectTs = requireProjectModule(systemRoot, 'typescript') as typeof ts;
+    const projectTs = requireProjectModule(getSystemPath(projectRoot), 'typescript') as typeof ts;
 
     const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
       && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
@@ -226,7 +228,8 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
     (options as any).root = ''; // tslint:disable-line:no-any
 
     wco = {
-      projectRoot: systemRoot,
+      root: getSystemPath(root),
+      projectRoot: getSystemPath(projectRoot),
       // TODO: use only this.options, it contains all flags and configs items already.
       buildOptions: options,
       appConfig: options,

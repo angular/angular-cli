@@ -18,7 +18,6 @@ import {
   logging,
   normalize,
   parseJson,
-  resolve,
   virtualFs,
 } from '@angular-devkit/core';
 import { resolve as nodeResolve } from '@angular-devkit/core/node';
@@ -163,7 +162,7 @@ export class Architect {
         }
 
         const builderConfiguration: BuilderConfiguration<OptionsT> = {
-          root: resolve(this._workspace.root, normalize(project.root)),
+          root: project.root,
           projectType: project.projectType,
           builder: target.builder,
           options: {
@@ -186,6 +185,7 @@ export class Architect {
       logger: new logging.NullLogger(),
       architect: this,
       host: this._workspace.host,
+      workspace: this._workspace,
       ...partialContext,
     };
 

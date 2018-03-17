@@ -13,8 +13,8 @@ import {
   ProjectNotFoundException,
   SchemaValidationException,
   Workspace,
-  WorkspaceJson,
   WorkspaceNotYetLoadedException,
+  WorkspaceProject,
 } from './workspace';
 
 
@@ -23,7 +23,7 @@ describe('Workspace', () => {
   const root = normalize(__dirname);
   // The content of this JSON object should be kept in sync with the path below:
   // tests/@angular_devkit/workspace/angular-workspace.json
-  const workspaceJson: WorkspaceJson = {
+  const workspaceJson = {
     version: 1,
     newProjectRoot: './projects',
     cli: {
@@ -166,7 +166,7 @@ describe('Workspace', () => {
         cli: {},
         schematics: {},
         architect: {},
-      })),
+      } as {} as WorkspaceProject)),
     ).subscribe(undefined, done.fail, done);
   });
 

@@ -49,10 +49,10 @@ function addKarmaFiles(files: any[], newFiles: any[], prepend = false) {
 }
 
 const init: any = (config: any, emitter: any, customFileHandlers: any) => {
-  const options: any = config.webpackBuildFacade.options;
-  const appRoot = path.join(config.basePath, options.root);
-  successCb = config.webpackBuildFacade.successCb;
-  failureCb = config.webpackBuildFacade.failureCb;
+  const options = config.buildWebpack.options;
+  const projectRoot = config.buildWebpack.projectRoot;
+  successCb = config.buildWebpack.successCb;
+  failureCb = config.buildWebpack.failureCb;
 
   config.reporters.unshift('@angular-devkit/build-webpack--event-reporter');
   // Add a reporter that fixes sourcemap urls.
@@ -78,8 +78,8 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
       // Convert all string patterns to Pattern type.
       pattern = typeof pattern === 'string' ? { glob: pattern } : pattern;
       // Add defaults.
-      // Input is always resolved relative to the appRoot.
-      pattern.input = path.resolve(appRoot, pattern.input || '');
+      // Input is always resolved relative to the projectRoot.
+      pattern.input = path.resolve(projectRoot, pattern.input || '');
       pattern.output = pattern.output || '';
       pattern.glob = pattern.glob || '';
 
@@ -107,7 +107,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   }
 
   // Add webpack config.
-  const webpackConfig = config.webpackBuildFacade.webpackConfig;
+  const webpackConfig = config.buildWebpack.webpackConfig;
   const webpackMiddlewareConfig = {
     noInfo: true, // Hide webpack output because its noisy.
     watchOptions: { poll: options.poll },

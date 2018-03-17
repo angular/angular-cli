@@ -12,7 +12,7 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
-import { getSystemPath, tags } from '@angular-devkit/core';
+import { Path, getSystemPath, resolve, tags } from '@angular-devkit/core';
 import { existsSync, readFileSync } from 'fs';
 import * as path from 'path';
 import { Observable } from 'rxjs/Observable';
@@ -83,9 +83,10 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
 
   constructor(public context: BuilderContext) { }
 
-  run(target: BuilderConfiguration<DevServerBuilderOptions>): Observable<BuildEvent> {
-    const root = getSystemPath(target.root);
-    const options = target.options;
+  run(builderConfig: BuilderConfiguration<DevServerBuilderOptions>): Observable<BuildEvent> {
+    const options = builderConfig.options;
+    const root = this.context.workspace.root;
+    const projectRoot = resolve(root, builderConfig.root);
 
     return checkPort(options.port, options.host).pipe(
       concatMap((port) => {
@@ -95,13 +96,14 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
       }),
       concatMap((browserOptions) => new Observable(obs => {
         const browserBuilder = new BrowserBuilder(this.context);
-        const webpackConfig = browserBuilder.buildWebpackConfig(target.root, browserOptions);
+        const webpackConfig = browserBuilder.buildWebpackConfig(root, projectRoot, browserOptions);
         const webpackCompiler = webpack(webpackConfig);
         const statsConfig = getWebpackStatsConfig(browserOptions.verbose);
 
         let webpackDevServerConfig: WebpackDevServerConfigurationOptions;
         try {
-          webpackDevServerConfig = this._buildServerConfig(root, options, browserOptions);
+          webpackDevServerConfig = this._buildServerConfig(
+            root, projectRoot, options, browserOptions);
         } catch (err) {
           obs.error(err);
 
@@ -213,10 +215,12 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
   }
 
   private _buildServerConfig(
-    root: string,
+    root: Path,
+    projectRoot: Path,
     options: DevServerBuilderOptions,
     browserOptions: BrowserBuilderOptions,
   ) {
+    const systemRoot = getSystemPath(root);
     if (options.disableHostCheck) {
       this.context.logger.warn(tags.oneLine`
         WARNING: Running a server with --disable-host-check is a security risk.
@@ -230,7 +234,9 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     const config: WebpackDevServerConfigurationOptions = {
       headers: { 'Access-Control-Allow-Origin': '*' },
       historyApiFallback: {
-        index: `${servePath}/${browserOptions.index}`,
+        index: `${servePath}/${
+            path.relative(projectRoot, path.resolve(root, browserOptions.index))
+          }`,
         disableDotRule: true,
         htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
       },
@@ -252,11 +258,11 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     };
 
     if (options.ssl) {
-      this._addSslConfig(root, options, config);
+      this._addSslConfig(systemRoot, options, config);
     }
 
     if (options.proxyConfig) {
-      this._addProxyConfig(root, options, config);
+      this._addProxyConfig(systemRoot, options, config);
     }
 
     return config;
@@ -422,7 +428,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
         concatMap(browserDescription =>
           this.context.architect.validateBuilderOptions(builderConfig, browserDescription)),
         map(browserConfig => browserConfig.options),
-      );
+    );
   }
 }
 

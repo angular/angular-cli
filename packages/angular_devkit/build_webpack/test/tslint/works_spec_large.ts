@@ -116,7 +116,7 @@ describe('Tslint Target', () => {
         }
       `,
     });
-    const overrides: Partial<TslintBuilderOptions> = { tslintConfig: '../tslint.json' };
+    const overrides: Partial<TslintBuilderOptions> = { tslintConfig: 'tslint.json' };
 
     runTargetSpec(host, tslintWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
@@ -126,7 +126,7 @@ describe('Tslint Target', () => {
   it('supports using files with no project', (done) => {
     const overrides: Partial<TslintBuilderOptions> = {
       tsConfig: undefined,
-      files: ['app/**/*.ts'],
+      files: ['src/app/**/*.ts'],
     };
 
     runTargetSpec(host, tslintWorkspaceTarget, overrides).pipe(

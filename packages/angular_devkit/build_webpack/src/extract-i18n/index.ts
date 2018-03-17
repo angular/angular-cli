@@ -12,6 +12,7 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
+import { resolve } from '@angular-devkit/core';
 import * as path from 'path';
 import { Observable } from 'rxjs/Observable';
 import { concatMap, map, tap } from 'rxjs/operators';
@@ -34,8 +35,10 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
 
   constructor(public context: BuilderContext) { }
 
-  run(target: BuilderConfiguration<ExtractI18nBuilderOptions>): Observable<BuildEvent> {
-    const options = target.options;
+  run(builderConfig: BuilderConfiguration<ExtractI18nBuilderOptions>): Observable<BuildEvent> {
+    const options = builderConfig.options;
+    const root = this.context.workspace.root;
+    const projectRoot = resolve(root, builderConfig.root);
     const [project, targetName, configuration] = options.browserTarget.split(':');
     // Override browser build watch setting.
     const overrides = { watch: false };
@@ -62,7 +65,7 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
           }
 
           // Extracting i18n uses the browser target webpack config with some specific options.
-          const webpackConfig = browserBuilder.buildWebpackConfig(target.root, {
+          const webpackConfig = browserBuilder.buildWebpackConfig(root, projectRoot, {
             ...browserOptions,
             optimizationLevel: 0,
             i18nLocale: options.i18nLocale,

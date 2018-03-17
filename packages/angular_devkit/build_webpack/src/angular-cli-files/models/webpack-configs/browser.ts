@@ -20,23 +20,22 @@ import { WebpackConfigOptions } from '../build-options';
 + */
 
 export function getBrowserConfig(wco: WebpackConfigOptions) {
-  const { projectRoot, buildOptions, appConfig } = wco;
+  const { root, projectRoot, buildOptions, appConfig } = wco;
 
-  const appRoot = path.resolve(projectRoot, appConfig.root);
 
   let extraPlugins: any[] = [];
 
   // figure out which are the lazy loaded entry points
   const lazyChunks = lazyChunksFilter([
-    ...extraEntryParser(appConfig.scripts, appRoot, 'scripts'),
-    ...extraEntryParser(appConfig.styles, appRoot, 'styles')
+    ...extraEntryParser(appConfig.scripts, root, 'scripts'),
+    ...extraEntryParser(appConfig.styles, root, 'styles')
   ]);
 
   // TODO: Enable this once HtmlWebpackPlugin supports Webpack 4
   const generateIndexHtml = false;
   if (generateIndexHtml) {
     extraPlugins.push(new HtmlWebpackPlugin({
-      template: path.resolve(appRoot, appConfig.index),
+      template: path.resolve(root, appConfig.index),
       filename: path.resolve(buildOptions.outputPath, appConfig.index),
       chunksSortMode: packageChunkSort(appConfig),
       excludeChunks: lazyChunks,
@@ -87,7 +86,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }));
   }
 
-  const globalStylesEntries = extraEntryParser(appConfig.styles, appRoot, 'styles')
+  const globalStylesEntries = extraEntryParser(appConfig.styles, root, 'styles')
     .map(style => style.entry);
 
   return {
@@ -121,8 +120,8 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     },
     plugins: extraPlugins.concat([
       new IndexHtmlWebpackPlugin({
-        input: path.resolve(appRoot, appConfig.index),
-        output: appConfig.index,
+        input: path.resolve(root, appConfig.index),
+        output: path.relative(projectRoot, path.resolve(root, appConfig.index)),
         baseHref: buildOptions.baseHref,
         entrypoints: generateEntryPoints(appConfig),
         deployUrl: buildOptions.deployUrl,

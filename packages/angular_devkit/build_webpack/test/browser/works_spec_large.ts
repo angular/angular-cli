@@ -16,7 +16,7 @@ describe('Browser Builder', () => {
   const outputPath = normalize('dist');
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  // afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
   it('works', (done) => {
     runTargetSpec(host, browserWorkspaceTarget).pipe(

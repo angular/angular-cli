@@ -40,6 +40,7 @@ export interface BuildOptions {
 }
 
 export interface WebpackConfigOptions<T extends BuildOptions = BuildOptions> {
+  root: string;
   projectRoot: string;
   buildOptions: T;
   appConfig: any;

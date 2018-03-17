@@ -33,10 +33,10 @@ describe('Browser Builder styles', () => {
       'src/pre-rename-lazy-style.css': '.pre-rename-lazy-style { color: red }',
     };
     const getStylesOption = () => [
-      { input: 'input-style.css' },
-      { input: 'lazy-style.css', lazy: true },
-      { input: 'pre-rename-style.css', output: 'renamed-style' },
-      { input: 'pre-rename-lazy-style.css', output: 'renamed-lazy-style', lazy: true },
+      { input: 'src/input-style.css' },
+      { input: 'src/lazy-style.css', lazy: true },
+      { input: 'src/pre-rename-style.css', output: 'renamed-style' },
+      { input: 'src/pre-rename-lazy-style.css', output: 'renamed-lazy-style', lazy: true },
     ];
     const cssMatches: { [path: string]: string } = {
       './dist/styles.css': '.input-style',
@@ -167,7 +167,7 @@ describe('Browser Builder styles', () => {
       const overrides = {
         extractCss: true,
         sourceMap: true,
-        styles: [{ input: `styles.${ext}` }],
+        styles: [{ input: `src/styles.${ext}` }],
       };
 
       host.replaceInFile('src/app/app.component.ts', './app.component.css',
@@ -200,7 +200,7 @@ describe('Browser Builder styles', () => {
 
       const overrides = {
         extractCss: true,
-        styles: [{ input: `styles.${ext}` }],
+        styles: [{ input: `src/styles.${ext}` }],
       };
 
       runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
@@ -214,7 +214,7 @@ describe('Browser Builder styles', () => {
       extractCss: true,
       optimizationLevel: 1,
       styles: [
-        { input: '../../../../../node_modules/material-design-icons/iconfont/material-icons.css' },
+        { input: '../../../../node_modules/material-design-icons/iconfont/material-icons.css' },
       ],
     };
 
@@ -261,9 +261,9 @@ describe('Browser Builder styles', () => {
 
       const overrides = {
         extractCss: true,
-        styles: [{ input: `styles.${ext}` }],
+        styles: [{ input: `src/styles.${ext}` }],
         stylePreprocessorOptions: {
-          includePaths: ['style-paths'],
+          includePaths: ['src/style-paths'],
         },
       };
 
@@ -297,7 +297,7 @@ describe('Browser Builder styles', () => {
     const overrides = {
       aot: true,
       extractCss: true,
-      styles: [{ input: `styles.scss` }],
+      styles: [{ input: `src/styles.scss` }],
     };
 
     runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
@@ -341,7 +341,7 @@ describe('Browser Builder styles', () => {
       `,
     });
 
-    const overrides = { extractCss: true, styles: [{ input: `styles.scss` }] };
+    const overrides = { extractCss: true, styles: [{ input: `src/styles.scss` }] };
 
     runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
@@ -502,8 +502,8 @@ describe('Browser Builder styles', () => {
   it(`supports bootstrap@4`, (done) => {
     const overrides = {
       extractCss: true,
-      styles: [{ input: '../../../../../node_modules/bootstrap/dist/css/bootstrap.css' }],
-      scripts: [{ input: '../../../../../node_modules/bootstrap/dist/js/bootstrap.js' }],
+      styles: [{ input: '../../../../node_modules/bootstrap/dist/css/bootstrap.css' }],
+      scripts: [{ input: '../../../../node_modules/bootstrap/dist/js/bootstrap.js' }],
     };
 
     runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(

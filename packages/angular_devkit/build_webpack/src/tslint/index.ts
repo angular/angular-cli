@@ -12,7 +12,7 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
-import { getSystemPath } from '@angular-devkit/core';
+import { getSystemPath, resolve } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
 import * as glob from 'glob';
 import { Minimatch } from 'minimatch';
@@ -40,29 +40,32 @@ export class TslintBuilder implements Builder<TslintBuilderOptions> {
 
   constructor(public context: BuilderContext) { }
 
-  run(target: BuilderConfiguration<TslintBuilderOptions>): Observable<BuildEvent> {
+  run(builderConfig: BuilderConfiguration<TslintBuilderOptions>): Observable<BuildEvent> {
 
-    const root = getSystemPath(target.root);
-    const options = target.options;
+    const root = this.context.workspace.root;
+    const systemRoot = getSystemPath(root);
+    const projectRoot = resolve(root, builderConfig.root);
+    const options = builderConfig.options;
 
     if (!options.tsConfig && options.typeCheck) {
       throw new Error('A "project" must be specified to enable type checking.');
     }
 
     return new Observable(obs => {
-      const projectTslint = requireProjectModule(root, 'tslint') as typeof tslint;
+      const projectTslint = requireProjectModule(
+        getSystemPath(projectRoot), 'tslint') as typeof tslint;
       const tslintConfigPath = options.tslintConfig
-        ? path.resolve(root, options.tslintConfig)
+        ? path.resolve(systemRoot, options.tslintConfig)
         : null;
       const Linter = projectTslint.Linter;
       const Configuration = projectTslint.Configuration;
 
       let program: ts.Program | undefined = undefined;
       if (options.tsConfig) {
-        program = Linter.createProgram(path.resolve(root, options.tsConfig));
+        program = Linter.createProgram(path.resolve(systemRoot, options.tsConfig));
       }
 
-      const files = getFilesToLint(root, options, Linter, program);
+      const files = getFilesToLint(systemRoot, options, Linter, program);
       const lintOptions = {
         fix: options.fix,
         formatter: options.format,

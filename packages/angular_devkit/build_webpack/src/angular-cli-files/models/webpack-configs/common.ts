@@ -33,9 +33,8 @@ const resolve = require('resolve');
  */
 
 export function getCommonConfig(wco: WebpackConfigOptions) {
-  const { projectRoot, buildOptions, appConfig } = wco;
+  const { root, projectRoot, buildOptions, appConfig } = wco;
 
-  const appRoot = path.resolve(projectRoot, appConfig.root);
   const nodeModules = findUp('node_modules', projectRoot);
   if (!nodeModules) {
     throw new Error('Cannot locate node_modules directory.')
@@ -45,11 +44,11 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   let entryPoints: { [key: string]: string[] } = {};
 
   if (appConfig.main) {
-    entryPoints['main'] = [path.resolve(appRoot, appConfig.main)];
+    entryPoints['main'] = [path.resolve(root, appConfig.main)];
   }
 
   if (appConfig.polyfills) {
-    entryPoints['polyfills'] = [path.resolve(appRoot, appConfig.polyfills)];
+    entryPoints['polyfills'] = [path.resolve(root, appConfig.polyfills)];
   }
 
   // determine hashing format
@@ -57,7 +56,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   // process global scripts
   if (appConfig.scripts.length > 0) {
-    const globalScripts = extraEntryParser(appConfig.scripts, appRoot, 'scripts');
+    const globalScripts = extraEntryParser(appConfig.scripts, root, 'scripts');
     const globalScriptsByEntry = globalScripts
       .reduce((prev: { entry: string, paths: string[], lazy: boolean }[], curr) => {
 
@@ -83,7 +82,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       extraPlugins.push(new ScriptsWebpackPlugin({
         name: script.entry,
         sourceMap: buildOptions.sourceMap,
-        filename: `${script.entry}${hash}.js`,
+        filename: `${path.basename(script.entry)}${hash}.js`,
         scripts: script.paths,
         basePath: projectRoot,
       }));
@@ -96,8 +95,9 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       // Convert all string assets to object notation.
       asset = typeof asset === 'string' ? { glob: asset } : asset;
       // Add defaults.
-      // Input is always resolved relative to the appRoot.
-      asset.input = path.resolve(appRoot, asset.input || '').replace(/\\/g, '/');
+      // Input is always resolved relative to the projectRoot.
+      // TODO: add smart defaults to schema to use project root as default.
+      asset.input = path.resolve(root, asset.input || projectRoot).replace(/\\/g, '/');
       asset.output = asset.output || '';
       asset.glob = asset.glob || '';
 
@@ -152,6 +152,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         }
       };
     });
+
     const copyWebpackPluginOptions = { ignore: ['.gitkeep', '**/.DS_Store', '**/Thumbs.db'] };
 
     const copyWebpackPluginInstance = new CopyWebpackPlugin(copyWebpackPluginPatterns,
@@ -223,7 +224,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     resolve: {
       extensions: ['.ts', '.js'],
       symlinks: !buildOptions.preserveSymlinks,
-      modules: [appRoot, 'node_modules'],
+      modules: [projectRoot, 'node_modules'],
       alias
     },
     resolveLoader: {
@@ -232,7 +233,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     context: projectRoot,
     entry: entryPoints,
     output: {
-      path: path.resolve(projectRoot, buildOptions.outputPath as string),
+      path: path.resolve(root, buildOptions.outputPath as string),
       publicPath: buildOptions.deployUrl,
       filename: `[name]${hashFormat.chunk}.js`,
     },
