@@ -66,7 +66,7 @@ export const browserWorkspaceTarget: Target<Partial<BrowserBuilderOptions>> = {
 };
 
 export const devServerWorkspaceTarget: Target<Partial<DevServerBuilderOptions>> = {
-  builder: 'devServer',
+  builder: 'dev-server',
   options: {
     browserTarget: 'app:browser',
     watch: false,
@@ -74,7 +74,7 @@ export const devServerWorkspaceTarget: Target<Partial<DevServerBuilderOptions>> 
 };
 
 export const extractI18nWorkspaceTarget: Target<Partial<ExtractI18nBuilderOptions>> = {
-  builder: 'extractI18n',
+  builder: 'extract-i18n',
   options: {
     browserTarget: 'app:browser',
   },

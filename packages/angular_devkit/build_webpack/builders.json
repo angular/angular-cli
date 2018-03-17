@@ -6,12 +6,12 @@
       "schema": "./src/browser/schema.json",
       "description": "Build a browser app."
     },
-    "devServer": {
+    "dev-server": {
       "class": "./src/dev-server",
       "schema": "./src/dev-server/schema.json",
       "description": "Serve a browser app."
     },
-    "extractI18n": {
+    "extract-i18n": {
       "class": "./src/extract-i18n",
       "schema": "./src/extract-i18n/schema.json",
       "description": "Extract i18n strings from a browser app."
