@@ -6,54 +6,10 @@
   "apps": [
     {
       "root": "<%= sourceDir %>",
-      "outDir": "dist",
-      "assets": [
-        "assets",
-        "favicon.ico"
-      ],
-      "index": "index.html",
-      "main": "main.ts",
-      "polyfills": "polyfills.ts",
-      "test": "test.ts",
-      "tsconfig": "tsconfig.app.json",
-      "testTsconfig": "tsconfig.spec.json",
       "prefix": "<%= prefix %>",
-      "styles": [
-        "styles.<%= style %>"
-      ],
-      "scripts": [],
-      "environmentSource": "environments/environment.ts",
-      "environments": {
-        "dev": "environments/environment.ts",
-        "prod": "environments/environment.prod.ts"
-      }<% if (serviceWorker) { %>,
-      "serviceWorker": true<% } %>
+      "main": "main.ts"
     }
   ],
-  "e2e": {
-    "protractor": {
-      "config": "./protractor.conf.js"
-    }
-  },
-  "lint": [
-    {
-      "project": "<%= sourceDir %>/tsconfig.app.json",
-      "exclude": "**/node_modules/**"
-    },
-    {
-      "project": "<%= sourceDir %>/tsconfig.spec.json",
-      "exclude": "**/node_modules/**"
-    },
-    {
-      "project": "e2e/tsconfig.e2e.json",
-      "exclude": "**/node_modules/**"
-    }
-  ],
-  "test": {
-    "karma": {
-      "config": "./karma.conf.js"
-    }
-  },
   "defaults": {
     "styleExt": "<%= style %>",<% if (minimal || skipTests) { %>
     "class": {

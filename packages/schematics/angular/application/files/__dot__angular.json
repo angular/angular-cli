@@ -1,0 +1,145 @@
+{
+  "$schema": "./node_modules/@angular-devkit/core/src/workspace/workspace-schema.json",
+  "version": 1,
+  "newProjectRoot": "./projects",
+  "cli": {},
+  "schematics": {},
+  "architect": {},
+  "projects": {
+    "app": {
+      "root": "<%= sourceDir %>",
+      "projectType": "application",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-webpack:browser",
+          "options": {
+            "outputPath": "dist",
+            "index": "<%= sourceDir %>/index.html",
+            "main": "<%= sourceDir %>/main.ts",
+            "polyfills": "<%= sourceDir %>/polyfills.ts",
+            "tsConfig": "<%= sourceDir %>/tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "favicon.ico",
+                "input": "<%= sourceDir %>/",
+                "output": "./"
+              },
+              {
+                "glob": "**/*",
+                "input": "<%= sourceDir %>/assets",
+                "output": "assets"
+              }
+            ],
+            "styles": [
+              {
+                "input": "<%= sourceDir %>/styles.<%= style %>"
+              }
+            ],
+            "scripts": []
+            <% if (serviceWorker) { %>,
+              "serviceWorker": true<%
+            } %>
+          },
+          "configurations": {
+            "production": {
+              "optimizationLevel": 1,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-webpack:dev-server",
+          "options": {
+            "browserTarget": "app:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "app:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-webpack:extract-i18n",
+          "options": {
+            "browserTarget": "app:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-webpack:karma",
+          "options": {
+            "main": "<%= sourceDir %>/test.ts",
+            "polyfills": "<%= sourceDir %>/polyfills.ts",
+            "tsConfig": "<%= sourceDir %>/tsconfig.spec.json",
+            "karmaConfig": "karma.conf.js",
+            "styles": [
+              {
+                "input": "<%= sourceDir %>/styles.<%= style %>"
+              }
+            ],
+            "scripts": [],
+            "assets": [
+              {
+                "glob": "favicon.ico",
+                "input": "<%= sourceDir %>/",
+                "output": "./"
+              },
+              {
+                "glob": "**/*",
+                "input": "<%= sourceDir %>/assets",
+                "output": "assets"
+              }
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-webpack:tslint",
+          "options": {
+            "tsConfig": "<%= sourceDir %>/tsconfig.app.json",
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        },
+        "lint-test": {
+          "builder": "@angular-devkit/build-webpack:tslint",
+          "options": {
+            "tsConfig": "<%= sourceDir %>/tsconfig.spec.json",
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "app-e2e": {
+      "root": "e2e",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-webpack:protractor",
+          "options": {
+            "protractorConfig": "protractor.conf.js",
+            "devServerTarget": "app:dev-server"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-webpack:tslint",
+          "options": {
+            "tsConfig": "e2e/tsconfig.e2e.json",
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
