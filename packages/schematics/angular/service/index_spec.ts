@@ -5,13 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Tree, VirtualTree } from '@angular-devkit/schematics';
-import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
+import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import * as path from 'path';
-import { createAppModule } from '../utility/test';
+import { Schema as ApplicationOptions } from '../application/schema';
+import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as ServiceOptions } from './schema';
 
-
+// tslint:disable:max-line-length
 describe('Service Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
@@ -19,17 +19,30 @@ describe('Service Schematic', () => {
   );
   const defaultOptions: ServiceOptions = {
     name: 'foo',
-    path: 'src/app',
     spec: true,
     module: undefined,
     flat: false,
   };
 
-  let appTree: Tree;
+  const workspaceOptions: WorkspaceOptions = {
+    name: 'workspace',
+    newProjectRoot: 'projects',
+    version: '6.0.0',
+  };
 
+  const appOptions: ApplicationOptions = {
+    name: 'bar',
+    inlineStyle: false,
+    inlineTemplate: false,
+    viewEncapsulation: 'Emulated',
+    routing: false,
+    style: 'css',
+    skipTests: false,
+  };
+  let appTree: UnitTestTree;
   beforeEach(() => {
-    appTree = new VirtualTree();
-    appTree = createAppModule(appTree);
+    appTree = schematicRunner.runSchematic('workspace', workspaceOptions);
+    appTree = schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
   it('should create a service', () => {
@@ -37,15 +50,15 @@ describe('Service Schematic', () => {
 
     const tree = schematicRunner.runSchematic('service', options, appTree);
     const files = tree.files;
-    expect(files.indexOf('/src/app/foo/foo.service.spec.ts')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/src/app/foo/foo.service.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/bar/src/app/foo/foo.service.spec.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/bar/src/app/foo/foo.service.ts')).toBeGreaterThanOrEqual(0);
   });
 
   it('service should be tree-shakeable', () => {
     const options = { ...defaultOptions};
 
     const tree = schematicRunner.runSchematic('service', options, appTree);
-    const content = tree.readContent('/src/app/foo/foo.service.ts');
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.service.ts');
     expect(content).toMatch(/providedIn: 'root',/);
   });
 
@@ -53,13 +66,13 @@ describe('Service Schematic', () => {
     const options = { ...defaultOptions, module: 'app.module.ts' };
 
     const tree = schematicRunner.runSchematic('service', options, appTree);
-    const content = tree.readContent('/src/app/foo/foo.service.ts');
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.service.ts');
     expect(content).toMatch(/import { AppModule } from '..\/app.module'/);
     expect(content).toMatch(/providedIn: AppModule,/);
   });
 
   it('should fail if specified module does not exist', () => {
-    const options = { ...defaultOptions, module: '/src/app/app.moduleXXX.ts' };
+    const options = { ...defaultOptions, module: '/projects/bar/src/app/app.moduleXXX.ts' };
     let thrownError: Error | null = null;
     try {
       schematicRunner.runSchematic('service', options, appTree);
@@ -74,7 +87,7 @@ describe('Service Schematic', () => {
 
     const tree = schematicRunner.runSchematic('service', options, appTree);
     const files = tree.files;
-    expect(files.indexOf('/src/app/foo/foo.service.ts')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/src/app/foo/foo.service.spec.ts')).toEqual(-1);
+    expect(files.indexOf('/projects/bar/src/app/foo/foo.service.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/bar/src/app/foo/foo.service.spec.ts')).toEqual(-1);
   });
 });

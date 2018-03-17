@@ -2,11 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 <% if (routing) { %>
 import { AppRoutingModule } from './app-routing.module';<% } %>
-<% if (serviceWorker) { %>
-import { ServiceWorkerModule } from '@angular/service-worker';<% } %>
 import { AppComponent } from './app.component';
-<% if (serviceWorker) { %>
-import { environment } from '../environments/environment';<% } %>
 
 @NgModule({
   declarations: [
@@ -14,8 +10,7 @@ import { environment } from '../environments/environment';<% } %>
   ],
   imports: [
     BrowserModule<% if (routing) { %>,
-    AppRoutingModule<% } %><% if (serviceWorker) { %>,
-    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })<% } %>
+    AppRoutingModule<% } %>
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -5,10 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Tree } from '@angular-devkit/schematics';
+import { UnitTestTree } from '@angular-devkit/schematics/testing';
 
 
-export function createAppModule(tree: Tree, path?: string): Tree {
+export function createAppModule(tree: UnitTestTree, path?: string): UnitTestTree {
   tree.create(path || '/src/app/app.module.ts', `
     import { BrowserModule } from '@angular/platform-browser';
     import { NgModule } from '@angular/core';

@@ -12,24 +12,23 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^5.2.0",
-    "@angular/common": "^5.2.0",
-    "@angular/compiler": "^5.2.0",
-    "@angular/core": "^5.2.0",
-    "@angular/forms": "^5.2.0",
-    "@angular/http": "^5.2.0",
-    "@angular/platform-browser": "^5.2.0",
-    "@angular/platform-browser-dynamic": "^5.2.0",
-    "@angular/router": "^5.2.0",<% if (serviceWorker) { %>
-    "@angular/service-worker": "^5.2.0",<% } %>
+    "@angular/animations": ">= 6.0.0-beta <6.1.0",
+    "@angular/common": ">= 6.0.0-beta <6.1.0",
+    "@angular/compiler": ">= 6.0.0-beta <6.1.0",
+    "@angular/core": ">= 6.0.0-beta <6.1.0",
+    "@angular/forms": ">= 6.0.0-beta <6.1.0",
+    "@angular/http": ">= 6.0.0-beta <6.1.0",
+    "@angular/platform-browser": ">= 6.0.0-beta <6.1.0",
+    "@angular/platform-browser-dynamic": ">= 6.0.0-beta <6.1.0",
+    "@angular/router": ">= 6.0.0-beta <6.1.0",
     "core-js": "^2.4.1",
     "rxjs": "^5.5.6",
     "zone.js": "^0.8.19"
   },
   "devDependencies": {
     "@angular/cli": "~<%= version %>",
-    "@angular/compiler-cli": "^5.2.0",
-    "@angular/language-service": "^5.2.0",<% if (!minimal) { %>
+    "@angular/compiler-cli": ">= 6.0.0-beta <6.1.0",
+    "@angular/language-service": ">= 6.0.0-beta <6.1.0",
     "@types/jasmine": "~2.8.6",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
@@ -43,7 +42,7 @@
     "karma-jasmine-html-reporter": "^0.2.2",
     "protractor": "~5.3.0",
     "ts-node": "~5.0.0",
-    "tslint": "~5.9.1",<% } %>
-    "typescript": "~2.5.3"
+    "tslint": "~5.9.1",
+    "typescript": "~2.7.2"
   }
 }

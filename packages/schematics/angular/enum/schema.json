@@ -6,7 +6,11 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name of the enum."
+      "description": "The name of the enum.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
     },
     "path": {
       "type": "string",
@@ -20,7 +24,5 @@
       "visible": false
     }
   },
-  "required": [
-    "name"
-  ]
+  "required": []
 }

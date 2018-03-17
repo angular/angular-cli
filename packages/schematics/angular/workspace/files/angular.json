@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "newProjectRoot": "<%= newProjectRoot %>",
+  "cli": {},
+  "schematics": {
+    "@schematics/angular": {}
+  },
+  "architect": {},
+  "projects": {}
+}

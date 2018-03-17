@@ -6,7 +6,11 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name of the service."
+      "description": "The name of the service.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
     },
     "path": {
       "type": "string",
@@ -36,7 +40,5 @@
       "alias": "m"
     }
   },
-  "required": [
-    "name"
-  ]
+  "required": []
 }

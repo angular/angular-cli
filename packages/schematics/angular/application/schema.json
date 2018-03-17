@@ -4,27 +4,6 @@
   "title": "Angular Application Options Schema",
   "type": "object",
   "properties": {
-    "directory": {
-      "type": "string",
-      "format": "path",
-      "description": "The directory name to create the app in.",
-      "default": ""
-    },
-    "path": {
-      "type": "string",
-      "format": "path",
-      "description": "The path of the application.",
-      "default": "app",
-      "visible": false
-    },
-    "sourceDir": {
-      "type": "string",
-      "format": "path",
-      "description": "The path of the source directory.",
-      "default": "src",
-      "alias": "D",
-      "visible": false
-    },
     "name": {
       "description": "The name of the application.",
       "type": "string",
@@ -51,11 +30,6 @@
       "enum": ["Emulated", "Native", "None"],
       "type": "string"
     },
-    "version": {
-      "type": "string",
-      "description": "The version of the Angular CLI to use.",
-      "visible": false
-    },
     "routing": {
       "type": "boolean",
       "description": "Generates a routing module.",
@@ -78,61 +52,9 @@
       "type": "boolean",
       "default": false,
       "alias": "S"
-    },
-    "skipInstall": {
-      "description": "Skip installing dependency packages.",
-      "type": "boolean",
-      "default": false
-    },
-    "linkCli": {
-      "description": "Link CLI to global version (internal development only).",
-      "type": "boolean",
-      "default": false,
-      "visible": false
-    },
-    "skipGit": {
-      "description": "Skip initializing a git repository.",
-      "type": "boolean",
-      "default": false,
-      "alias": "g"
-    },
-    "commit": {
-      "description": "Initial repository commit information.",
-      "default": null,
-      "oneOf": [
-        { "type": "null" },
-        {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "email": {
-              "type": "string",
-              "format": "email"
-            },
-            "message": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "name",
-            "email"
-          ]
-        }
-      ]
-    },
-    "minimal": {
-      "description": "Create a minimal app (no test structure, inline styles/templates).",
-      "type": "boolean",
-      "default": false
-    },
-    "serviceWorker": {
-      "description": "Installs the @angular/service-worker.",
-      "type": "boolean",
-      "default": false
     }
   },
   "required": [
+    "name"
   ]
 }

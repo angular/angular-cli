@@ -1,7 +1,7 @@
 {
-  "extends": "<%= sourcedir.split('/').map(x => '..').join('/') %>/tsconfig.json",
+  "extends": "<%= appDir.split('/').map(x => '..').join('/') %>/tsconfig.json",
   "compilerOptions": {
-    "outDir": "<%= sourcedir.split('/').map(x => '..').join('/') %>/out-tsc/spec",
+    "outDir": "<%= appDir.split('/').map(x => '..').join('/') %>/out-tsc/spec",
     "baseUrl": "./",
     "module": "commonjs",
     "types": [

@@ -8,24 +8,19 @@
 import { strings, tags } from '@angular-devkit/core';
 import { experimental } from '@angular-devkit/core';
 import {
-  MergeStrategy,
   Rule,
   SchematicContext,
   SchematicsException,
   Tree,
   apply,
   chain,
-  filter,
   mergeWith,
   move,
-  noop,
-  schematic,
   template,
   url,
 } from '@angular-devkit/schematics';
-import { Schema as E2eOptions } from '../e2e/schema';
 import { getWorkspace, getWorkspacePath } from '../utility/config';
-import { Schema as ApplicationOptions } from './schema';
+import { Schema as E2eOptions } from './schema';
 
 type WorkspaceSchema = experimental.workspace.WorkspaceSchema;
 
@@ -53,7 +48,7 @@ type WorkspaceSchema = experimental.workspace.WorkspaceSchema;
 //   );
 // }
 
-function addAppToWorkspaceFile(options: ApplicationOptions, workspace: WorkspaceSchema): Rule {
+function addAppToWorkspaceFile(options: E2eOptions, workspace: WorkspaceSchema): Rule {
   return (host: Tree, context: SchematicContext) => {
     context.logger.info(`Updating workspace file`);
     // TODO: use JsonAST
@@ -74,98 +69,17 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
       cli: {},
       schematics: {},
       architect: {
-        build: {
-          builder: '@angular-devkit/build-webpack:browser',
+        e2e: {
+          builder: '@angular-devkit/build-webpack:protractor',
           options: {
-            outputPath: `dist/${options.name}`,
-            index: `${projectRoot}/index.html`,
-            main: `${projectRoot}/main.ts`,
-            polyfills: `${projectRoot}/polyfills.ts`,
-            tsConfig: `${projectRoot}/tsconfig.app.json`,
-            assets: [
-              {
-                glob: 'favicon.ico',
-                input: `${projectRoot}`,
-                output: './',
-              },
-              {
-                glob: '**/*',
-                input: `${projectRoot}/assets>`,
-                output: 'assets',
-              },
-            ],
-            styles: [
-              {
-                input: `${projectRoot}/styles.${options.style}`,
-              },
-            ],
-            scripts: [],
-          },
-          configurations: {
-            production: {
-              optimization: true,
-              outputHashing: 'all',
-              sourceMap: false,
-              extractCss: true,
-              namedChunks: false,
-              aot: true,
-              extractLicenses: true,
-              vendorChunk: false,
-              buildOptimizer: true,
-            },
-          },
-        },
-        serve: {
-          builder: '@angular-devkit/build-webpack:dev-server',
-          options: {
-            browserTarget: `${options.name}:build`,
-          },
-          configurations: {
-            production: {
-              browserTarget: `${options.name}:build:production`,
-            },
-          },
-        },
-        'extract-i18n': {
-          builder: '@angular-devkit/build-webpack:extract-i18n',
-          options: {
-            browserTarget: `${options.name}:build`,
-          },
-        },
-        test: {
-          builder: '@angular-devkit/build-webpack:karma',
-          options: {
-            main: `${projectRoot}/test.ts`,
-            polyfills: `${projectRoot}/polyfills.ts`,
-            tsConfig: `${projectRoot}/tsconfig.spec.json`,
-            karmaConfig: `${projectRoot}/karma.conf.js`,
-            styles: [
-              {
-                input: `${projectRoot}/styles.${options.style}`,
-              },
-            ],
-            scripts: [],
-            assets: [
-              {
-                glob: 'favicon.ico',
-                input: `${projectRoot}/`,
-                output: './',
-              },
-              {
-                glob: '**/*',
-                input: `${projectRoot}/assets`,
-                output: 'assets',
-              },
-            ],
+            protractorConfig: `projects/${options.name}/protractor.conf.js`,
+            devServerTarget: `${options.relatedAppName}:serve`,
           },
         },
         lint: {
           builder: '@angular-devkit/build-webpack:tslint',
           options: {
-            tsConfig: [
-              `${projectRoot}/tsconfig.app.json`,
-              `${projectRoot}/tsconfig.spec.json`,
-            ],
+            tsConfig: `projects/${options.name}/tsconfig.e2e.json`,
             exclude: [
               '**/node_modules/**',
             ],
@@ -223,27 +137,13 @@ function validateProjectName(projectName: string) {
 
 }
 
-export default function (options: ApplicationOptions): Rule {
+export default function (options: E2eOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     validateProjectName(options.name);
-    const appRootSelector = `${options.prefix || 'app'}-root`;
-    const componentOptions = {
-      inlineStyle: options.inlineStyle,
-      inlineTemplate: options.inlineTemplate,
-      spec: !options.skipTests,
-      styleext: options.style,
-    };
 
     const workspace = getWorkspace(host);
     const newProjectRoot = workspace.newProjectRoot;
     const appDir = `${newProjectRoot}/${options.name}`;
-    const sourceDir = `${appDir}/src/app`;
-
-    const e2eOptions: E2eOptions = {
-      name: `${options.name}-e2e`,
-      relatedAppName: options.name,
-      rootSelector: appRootSelector,
-    };
 
     return chain([
       addAppToWorkspaceFile(options, workspace),
@@ -257,36 +157,6 @@ export default function (options: ApplicationOptions): Rule {
           }),
           move(appDir),
         ])),
-      schematic('module', {
-        name: 'app',
-        commonModule: false,
-        flat: true,
-        routing: options.routing,
-        routingScope: 'Root',
-        path: sourceDir,
-        spec: false,
-      }),
-      schematic('component', {
-        name: 'app',
-        selector: appRootSelector,
-        flat: true,
-        path: sourceDir,
-        skipImport: true,
-        ...componentOptions,
-      }),
-      mergeWith(
-        apply(url('./other-files'), [
-          componentOptions.inlineTemplate ? filter(path => !path.endsWith('.html')) : noop(),
-          !componentOptions.spec ? filter(path => !path.endsWith('.spec.ts')) : noop(),
-          template({
-            utils: strings,
-            ...options as any,  // tslint:disable-line:no-any
-            selector: appRootSelector,
-            ...componentOptions,
-          }),
-          move(sourceDir),
-        ]), MergeStrategy.Overwrite),
-      schematic('e2e', e2eOptions),
     ])(host, context);
   };
 }

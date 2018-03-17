@@ -21,6 +21,7 @@ import {
 } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
 import { getFirstNgModuleName } from '../utility/ast-utils';
+import { getWorkspace } from '../utility/config';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
 import { Schema as ServiceOptions } from './schema';
@@ -53,12 +54,15 @@ export default function (options: ServiceOptions): Rule {
     let providedByModule = '';
     let providedInPath = '';
 
-    if (options.path === undefined) {
-      // TODO: read this default value from the config file
-      options.path = 'src/app';
+    const workspace = getWorkspace(host);
+    if (!options.project) {
+      options.project = Object.keys(workspace.projects)[0];
     }
-    const parsedPath = parseName(options.path, options.name);
-    options.name = parsedPath.name;
+    const project = workspace.projects[options.project];
+
+    if (options.path === undefined) {
+      options.path = `/${project.root}/src/app`;
+    }
 
     if (options.module) {
       const modulePath = findModuleFromOptions(host, options);
@@ -71,13 +75,17 @@ export default function (options: ServiceOptions): Rule {
         throw new SchematicsException(`module option did not point to an @NgModule.`);
       }
 
-      const servicePath = `/${options.sourceDir}/${options.path}/`
+      const servicePath = `/${options.path}/`
         + (options.flat ? '' : strings.dasherize(options.name) + '/')
         + strings.dasherize(options.name)
         + '.service';
 
       providedInPath = stripTsExtension(buildRelativePath(servicePath, modulePath));
     }
+
+    const parsedPath = parseName(options.path, options.name);
+    options.name = parsedPath.name;
+    options.path = parsedPath.path;
 
     const templateSource = apply(url('./files'), [
       options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),

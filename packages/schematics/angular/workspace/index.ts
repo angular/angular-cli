@@ -1,0 +1,31 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import { strings } from '@angular-devkit/core';
+import {
+  Rule,
+  SchematicContext,
+  Tree,
+  apply,
+  mergeWith,
+  template,
+  url,
+} from '@angular-devkit/schematics';
+import { Schema as WorkspaceOptions } from './schema';
+
+export default function (options: WorkspaceOptions): Rule {
+  return (host: Tree, context: SchematicContext) => {
+
+    return mergeWith(apply(url('./files'), [
+      template({
+        utils: strings,
+        ...options,
+        'dot': '.',
+      }),
+    ]))(host, context);
+  };
+}

@@ -32,17 +32,18 @@ export class InvalidInputOptions extends BaseException {
 
 // tslint:disable-next-line:no-any
 function _deepCopy<T extends {[key: string]: any}>(object: T): T {
-  const copy = {} as T;
-  for (const key of Object.keys(object)) {
-    if (typeof object[key] == 'object') {
-      copy[key] = _deepCopy(object[key]);
-      break;
-    } else {
-        copy[key] = object[key];
-    }
-  }
+  return JSON.parse(JSON.stringify(object));
+  // const copy = {} as T;
+  // for (const key of Object.keys(object)) {
+  //   if (typeof object[key] == 'object') {
+  //     copy[key] = _deepCopy(object[key]);
+  //     break;
+  //   } else {
+  //       copy[key] = object[key];
+  //   }
+  // }
 
-  return copy;
+  // return copy;
 }
 
 

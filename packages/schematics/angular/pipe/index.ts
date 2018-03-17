@@ -24,6 +24,7 @@ import {
 import * as ts from 'typescript';
 import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
+import { getWorkspace } from '../utility/config';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
 import { Schema as PipeOptions } from './schema';
@@ -86,12 +87,19 @@ function addDeclarationToNgModule(options: PipeOptions): Rule {
 
 export default function (options: PipeOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
-    if (options.path === undefined) {
-      // TODO: read this default value from the config file
-      options.path = 'src/app';
+    const workspace = getWorkspace(host);
+    if (!options.project) {
+      options.project = Object.keys(workspace.projects)[0];
     }
+    const project = workspace.projects[options.project];
+
+    if (options.path === undefined) {
+      options.path = `/${project.root}/src/app`;
+    }
+
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
+    options.path = parsedPath.path;
 
     options.module = findModuleFromOptions(host, options);
 

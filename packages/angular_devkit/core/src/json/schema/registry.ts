@@ -285,7 +285,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           );
 
           return function() {
-            return true;
+            return <ajv.Thenable<boolean>> Promise.resolve(true);
           };
         },
       });
@@ -342,7 +342,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
         }
       }
 
-      if (parent && parentProperty) {
+      if (parent && parentProperty && parent[parentProperty] === undefined) {
         parent[parentProperty] = value;
       }
     }

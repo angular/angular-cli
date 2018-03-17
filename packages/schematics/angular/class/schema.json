@@ -6,7 +6,11 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name of the class."
+      "description": "The name of the class.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
     },
     "path": {
       "type": "string",
@@ -30,7 +34,5 @@
       "default": ""
     }
   },
-  "required": [
-    "name"
-  ]
+  "required": []
 }

@@ -8,6 +8,8 @@
 import { strings } from '@angular-devkit/core';
 import {
   Rule,
+  SchematicContext,
+  Tree,
   apply,
   branchAndMerge,
   filter,
@@ -17,28 +19,37 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import { getWorkspace } from '../utility/config';
 import { parseName } from '../utility/parse-name';
 import { Schema as ClassOptions } from './schema';
 
-
 export default function (options: ClassOptions): Rule {
-  options.type = !!options.type ? `.${options.type}` : '';
+  return (host: Tree, context: SchematicContext) => {
+    const workspace = getWorkspace(host);
+    if (!options.project) {
+      options.project = Object.keys(workspace.projects)[0];
+    }
+    const project = workspace.projects[options.project];
 
-  if (options.path === undefined) {
-    // TODO: read this default value from the config file
-    options.path = 'src/app';
-  }
-  const parsedPath = parseName(options.path, options.name);
-  options.name = parsedPath.name;
+    if (options.path === undefined) {
+      options.path = `/${project.root}/src`;
+    }
 
-  const templateSource = apply(url('./files'), [
-    options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
-    template({
-      ...strings,
-      ...options,
-    }),
-    move(parsedPath.path),
-  ]);
+    options.type = !!options.type ? `.${options.type}` : '';
 
-  return branchAndMerge(mergeWith(templateSource));
+    const parsedPath = parseName(options.path, options.name);
+    options.name = parsedPath.name;
+    options.path = parsedPath.path;
+
+    const templateSource = apply(url('./files'), [
+      options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
+      template({
+        ...strings,
+        ...options,
+      }),
+      move(parsedPath.path),
+    ]);
+
+    return branchAndMerge(mergeWith(templateSource))(host, context);
+  };
 }

@@ -6,7 +6,11 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name of the interface."
+      "description": "The name of the interface.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
     },
     "path": {
       "type": "string",
@@ -27,10 +31,11 @@
     "type": {
       "type": "string",
       "description": "Specifies the type of interface.",
-      "default": ""
+      "$default": {
+        "$source": "argv",
+        "index": 1
+      }
     }
   },
-  "required": [
-    "name"
-  ]
+  "required": []
 }

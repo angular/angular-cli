@@ -24,6 +24,7 @@ import {
 import * as ts from 'typescript';
 import { addProviderToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
+import { getWorkspace } from '../utility/config';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
 import { Schema as GuardOptions } from './schema';
@@ -66,15 +67,23 @@ function addDeclarationToNgModule(options: GuardOptions): Rule {
 
 export default function (options: GuardOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
-    if (options.path === undefined) {
-      // TODO: read this default value from the config file
-      options.path = 'src/app';
+    const workspace = getWorkspace(host);
+    if (!options.project) {
+      options.project = Object.keys(workspace.projects)[0];
     }
-    const parsedPath = parseName(options.path, options.name);
-    options.name = parsedPath.name;
+    const project = workspace.projects[options.project];
+
+    if (options.path === undefined) {
+      options.path = `/${project.root}/src/app`;
+    }
+
     if (options.module) {
       options.module = findModuleFromOptions(host, options);
     }
+
+    const parsedPath = parseName(options.path, options.name);
+    options.name = parsedPath.name;
+    options.path = parsedPath.path;
 
     const templateSource = apply(url('./files'), [
       options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),

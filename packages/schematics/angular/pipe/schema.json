@@ -6,7 +6,11 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name of the pipe."
+      "description": "The name of the pipe.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
     },
     "path": {
       "type": "string",
@@ -46,7 +50,5 @@
       "description": "Specifies if declaring module exports the pipe."
     }
   },
-  "required": [
-    "name"
-  ]
+  "required": []
 }

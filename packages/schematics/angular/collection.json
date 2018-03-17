@@ -1,9 +1,27 @@
 {
   "schematics": {
+    "ng-new": {
+      "factory": "./ng-new",
+      "schema": "./ng-new/schema.json",
+      "description": "Create an Angular workspace.",
+      "hidden": true
+    },
+    "workspace": {
+      "factory": "./workspace",
+      "schema": "./workspace/schema.json",
+      "description": "Create an Angular workspace.",
+      "hidden": true
+    },
     "application": {
       "factory": "./application",
       "schema": "./application/schema.json",
       "description": "Create an Angular application."
+    },
+    "e2e": {
+      "factory": "./e2e",
+      "schema": "./e2e/schema.json",
+      "description": "Create an Angular e2e application.",
+      "hidden": true
     },
     "class": {
       "aliases": [ "cl" ],

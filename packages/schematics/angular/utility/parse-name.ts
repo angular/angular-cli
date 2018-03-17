@@ -7,21 +7,19 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // import { relative, Path } from "../../../angular_devkit/core/src/virtual-fs";
-import { Path, basename, normalize, split } from '@angular-devkit/core';
+import { Path, basename, dirname, normalize } from '@angular-devkit/core';
 
 export interface Location {
   name: string;
   path: Path;
 }
 
-export function parseName(path: string | Path, name: string): Location {
-  const splitName = split(name as Path);
+export function parseName(path: string, name: string): Location {
   const nameWithoutPath = basename(name as Path);
-  const namePath = splitName.join('/');
-  const fullPath = normalize('/' + path + '/' + namePath);
+  const namePath = dirname((path + '/' + name) as Path);
 
   return {
     name: nameWithoutPath,
-    path: fullPath,
+    path: normalize('/' + namePath),
   };
 }
