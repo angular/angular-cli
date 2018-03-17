@@ -7,7 +7,7 @@
  */
 
 import { Observable } from 'rxjs/Observable';
-import { BuildEvent, Builder, Target } from '../../src';
+import { BuildEvent, Builder, BuilderConfiguration } from '../../src';
 
 
 const successBuildEvent: BuildEvent = {
@@ -20,13 +20,11 @@ const failBuildEvent: BuildEvent = {
 
 export interface BrowserTargetOptions {
   browserOption: number;
-  optimizationLevel: number;
+  optionalBrowserOption: boolean;
 }
 
 export default class BrowserTarget implements Builder<BrowserTargetOptions> {
-  // constructor(public context: BuilderContext) { }
-
-  run(_info: Target<Partial<BrowserTargetOptions>>): Observable<BuildEvent> {
+  run(_browserConfig: BuilderConfiguration<Partial<BrowserTargetOptions>>): Observable<BuildEvent> {
     return new Observable(obs => {
       obs.next(successBuildEvent);
       obs.next(failBuildEvent);

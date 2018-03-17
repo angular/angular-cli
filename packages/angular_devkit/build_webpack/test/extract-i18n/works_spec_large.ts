@@ -6,22 +6,20 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { concatMap, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import {
   TestLogger,
   TestProjectHost,
   browserWorkspaceTarget,
   extractI18nWorkspaceTarget,
-  makeWorkspace,
+  runTargetSpec,
   workspaceRoot,
 } from '../utils';
 
 
 describe('Extract i18n Target', () => {
   const host = new TestProjectHost(workspaceRoot);
-  const architect = new Architect(normalize(workspaceRoot), host);
   const extractionFile = join(normalize('src'), 'messages.xlf');
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
@@ -30,11 +28,7 @@ describe('Extract i18n Target', () => {
   it('works', (done) => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
 
-    architect.loadWorkspaceFromJson(makeWorkspace([
-      browserWorkspaceTarget,
-      extractI18nWorkspaceTarget,
-    ])).pipe(
-      concatMap(() => architect.run(architect.getTarget())),
+    runTargetSpec(host, [browserWorkspaceTarget, extractI18nWorkspaceTarget]).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.asSync().exists((extractionFile))).toBe(true);
@@ -49,11 +43,7 @@ describe('Extract i18n Target', () => {
     host.appendToFile('src/app/app.component.html',
       '<p i18n>Hello world <span i18n>inner</span></p>');
 
-    architect.loadWorkspaceFromJson(makeWorkspace([
-      browserWorkspaceTarget,
-      extractI18nWorkspaceTarget,
-    ])).pipe(
-      concatMap(() => architect.run(architect.getTarget(), { logger })),
+    runTargetSpec(host, [browserWorkspaceTarget, extractI18nWorkspaceTarget], {}, logger).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
         const msg = 'Could not mark an element as translatable inside a translatable section';
@@ -66,11 +56,7 @@ describe('Extract i18n Target', () => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
     const overrides = { i18nLocale: 'fr' };
 
-    architect.loadWorkspaceFromJson(makeWorkspace([
-      browserWorkspaceTarget,
-      extractI18nWorkspaceTarget,
-    ])).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, [browserWorkspaceTarget, extractI18nWorkspaceTarget], overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.asSync().exists((extractionFile))).toBe(true);
@@ -86,11 +72,7 @@ describe('Extract i18n Target', () => {
     const extractionFile = join(normalize('src'), outFile);
     const overrides = { outFile };
 
-    architect.loadWorkspaceFromJson(makeWorkspace([
-      browserWorkspaceTarget,
-      extractI18nWorkspaceTarget,
-    ])).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, [browserWorkspaceTarget, extractI18nWorkspaceTarget], overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.asSync().exists(extractionFile)).toBe(true);
@@ -107,11 +89,7 @@ describe('Extract i18n Target', () => {
     const extractionFile = join(normalize('src'), outputPath, 'messages.xlf');
     const overrides = { outputPath };
 
-    architect.loadWorkspaceFromJson(makeWorkspace([
-      browserWorkspaceTarget,
-      extractI18nWorkspaceTarget,
-    ])).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, [browserWorkspaceTarget, extractI18nWorkspaceTarget], overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.asSync().exists(extractionFile)).toBe(true);
@@ -126,11 +104,7 @@ describe('Extract i18n Target', () => {
     const extractionFile = join(normalize('src'), 'messages.xmb');
     const overrides = { i18nFormat: 'xmb' };
 
-    architect.loadWorkspaceFromJson(makeWorkspace([
-      browserWorkspaceTarget,
-      extractI18nWorkspaceTarget,
-    ])).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, [browserWorkspaceTarget, extractI18nWorkspaceTarget], overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.asSync().exists(extractionFile)).toBe(true);

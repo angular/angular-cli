@@ -8,4 +8,3 @@
 
 export * from './architect';
 export * from './builder';
-export * from './workspace';

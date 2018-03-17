@@ -6,8 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect';
-import { normalize } from '@angular-devkit/core';
 import * as express from 'express'; // tslint:disable-line:no-implicit-dependencies
 import * as http from 'http';
 import { fromPromise } from 'rxjs/observable/fromPromise';
@@ -17,15 +15,14 @@ import {
   TestProjectHost,
   browserWorkspaceTarget,
   devServerWorkspaceTarget,
-  makeWorkspace,
   request,
+  runTargetSpec,
   workspaceRoot,
 } from '../utils';
 
 
 describe('Dev Server Builder proxy', () => {
   const host = new TestProjectHost(workspaceRoot);
-  const architect = new Architect(normalize(workspaceRoot), host);
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
@@ -51,11 +48,7 @@ describe('Dev Server Builder proxy', () => {
 
     const overrides: Partial<DevServerBuilderOptions> = { proxyConfig: '../proxy.config.json' };
 
-    architect.loadWorkspaceFromJson(makeWorkspace([
-      browserWorkspaceTarget,
-      devServerWorkspaceTarget,
-    ])).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, [browserWorkspaceTarget, devServerWorkspaceTarget], overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => fromPromise(request('http://localhost:4200/api/test'))),
       tap(response => {
@@ -69,11 +62,7 @@ describe('Dev Server Builder proxy', () => {
   it('errors out with a missing proxy file', (done) => {
     const overrides: Partial<DevServerBuilderOptions> = { proxyConfig: '../proxy.config.json' };
 
-    architect.loadWorkspaceFromJson(makeWorkspace([
-      browserWorkspaceTarget,
-      devServerWorkspaceTarget,
-    ])).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
-    ).subscribe(undefined, done, done.fail);
+    runTargetSpec(host, [browserWorkspaceTarget, devServerWorkspaceTarget], overrides)
+      .subscribe(undefined, done, done.fail);
   }, 30000);
 });

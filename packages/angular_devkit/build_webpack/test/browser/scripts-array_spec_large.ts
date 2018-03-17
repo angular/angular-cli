@@ -6,15 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect';
 import { PathFragment, join, normalize, virtualFs } from '@angular-devkit/core';
-import { concatMap, tap } from 'rxjs/operators';
-import { TestProjectHost, browserWorkspaceTarget, makeWorkspace, workspaceRoot } from '../utils';
+import { tap } from 'rxjs/operators';
+import { TestProjectHost, browserWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
 
 
 describe('Browser Builder scripts array', () => {
   const host = new TestProjectHost(workspaceRoot);
-  const architect = new Architect(normalize(workspaceRoot), host);
   const outputPath = normalize('dist');
   const scripts: { [path: string]: string } = {
     'src/input-script.js': 'console.log(\'input-script\'); var number = 1+1;',
@@ -68,8 +66,7 @@ describe('Browser Builder scripts array', () => {
       scripts: getScriptsOption(),
     };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => Object.keys(matches).forEach(fileName => {
         const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
@@ -88,8 +85,7 @@ describe('Browser Builder scripts array', () => {
       scripts: getScriptsOption(),
     };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const scriptsBundle = host.fileMatchExists(outputPath, /scripts\.[0-9a-f]{20}\.js/);
@@ -118,8 +114,7 @@ describe('Browser Builder scripts array', () => {
 
     const overrides = { scripts: getScriptsOption() };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const re = new RegExp(

@@ -6,33 +6,30 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect';
 import { normalize } from '@angular-devkit/core';
-import { concatMap, retry } from 'rxjs/operators';
+import { retry } from 'rxjs/operators';
 import {
   TestProjectHost,
   browserWorkspaceTarget,
   devServerWorkspaceTarget,
-  makeWorkspace,
   protractorWorkspaceTarget,
+  runTargetSpec,
   workspaceRoot,
 } from '../utils';
 
 
 describe('Protractor Builder', () => {
   const host = new TestProjectHost(workspaceRoot);
-  const architect = new Architect(normalize(workspaceRoot), host);
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
   it('works', (done) => {
-    architect.loadWorkspaceFromJson(makeWorkspace([
+    runTargetSpec(host, [
       browserWorkspaceTarget,
       devServerWorkspaceTarget,
       protractorWorkspaceTarget,
-    ])).pipe(
-      concatMap(() => architect.run(architect.getTarget())),
+    ]).pipe(
       retry(3),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -40,8 +37,7 @@ describe('Protractor Builder', () => {
   it('works with no devServerTarget', (done) => {
     const overrides = { devServerTarget: undefined };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(protractorWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, protractorWorkspaceTarget, overrides).pipe(
       // This should fail because no server is available for connection.
     ).subscribe(undefined, done, done.fail);
   }, 30000);
@@ -49,14 +45,12 @@ describe('Protractor Builder', () => {
   it('picks up changed port in devServer', (done) => {
     const modifiedDevServerTarget = devServerWorkspaceTarget;
     modifiedDevServerTarget.options.port = 4400;
-    const workspace = makeWorkspace([
+
+    runTargetSpec(host, [
       browserWorkspaceTarget,
       modifiedDevServerTarget,
       protractorWorkspaceTarget,
-    ]);
-
-    architect.loadWorkspaceFromJson(workspace).pipe(
-      concatMap(() => architect.run(architect.getTarget())),
+    ]).pipe(
       retry(3),
     ).subscribe(undefined, done.fail, done);
   }, 60000);
@@ -67,12 +61,11 @@ describe('Protractor Builder', () => {
 
     const overrides = { specs: ['./e2e/renamed-app.e2e-spec.ts'] };
 
-    architect.loadWorkspaceFromJson(makeWorkspace([
+    runTargetSpec(host, [
       browserWorkspaceTarget,
       devServerWorkspaceTarget,
       protractorWorkspaceTarget,
-    ])).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    ], overrides).pipe(
       retry(3),
     ).subscribe(undefined, done.fail, done);
   }, 60000);
@@ -91,12 +84,11 @@ describe('Protractor Builder', () => {
 
     const overrides = { suite: 'app' };
 
-    architect.loadWorkspaceFromJson(makeWorkspace([
+    runTargetSpec(host, [
       browserWorkspaceTarget,
       devServerWorkspaceTarget,
       protractorWorkspaceTarget,
-    ])).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    ], overrides).pipe(
       retry(3),
     ).subscribe(undefined, done.fail, done);
   }, 60000);

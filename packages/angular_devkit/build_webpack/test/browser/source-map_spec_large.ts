@@ -6,15 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { concatMap, tap } from 'rxjs/operators';
-import { TestProjectHost, browserWorkspaceTarget, makeWorkspace, workspaceRoot } from '../utils';
+import { tap } from 'rxjs/operators';
+import { TestProjectHost, browserWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
 
 
 describe('Browser Builder source map', () => {
   const host = new TestProjectHost(workspaceRoot);
-  const architect = new Architect(normalize(workspaceRoot), host);
   const outputPath = normalize('dist');
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
@@ -23,8 +21,7 @@ describe('Browser Builder source map', () => {
   it('works', (done) => {
     const overrides = { sourceMap: true };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js.map');
@@ -36,8 +33,7 @@ describe('Browser Builder source map', () => {
   it('does not output source map when disabled', (done) => {
     const overrides = { sourceMap: false };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js.map');
@@ -49,8 +45,7 @@ describe('Browser Builder source map', () => {
   it('supports eval source map', (done) => {
     const overrides = { sourceMap: true, evalSourceMap: true };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.asSync().exists(join(outputPath, 'main.js.map'))).toBe(false);

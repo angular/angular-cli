@@ -6,7 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuildEvent, Builder, BuilderContext, Target } from '@angular-devkit/architect';
+import {
+  BuildEvent,
+  Builder,
+  BuilderConfiguration,
+  BuilderContext,
+} from '@angular-devkit/architect';
 import { getSystemPath } from '@angular-devkit/core';
 import * as path from 'path';
 import { Observable } from 'rxjs/Observable';
@@ -65,7 +70,7 @@ export interface KarmaBuilderOptions {
 export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
   constructor(public context: BuilderContext) { }
 
-  run(target: Target<KarmaBuilderOptions>): Observable<BuildEvent> {
+  run(target: BuilderConfiguration<KarmaBuilderOptions>): Observable<BuildEvent> {
 
     const root = getSystemPath(target.root);
     const options = target.options;

@@ -6,15 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect';
-import { normalize } from '@angular-devkit/core';
-import { concatMap } from 'rxjs/operators';
-import { TestProjectHost, karmaWorkspaceTarget, makeWorkspace, workspaceRoot } from '../utils';
+import { TestProjectHost, karmaWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
 
 
 describe('Karma Builder assets', () => {
   const host = new TestProjectHost(workspaceRoot);
-  const architect = new Architect(normalize(workspaceRoot), host);
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
@@ -98,8 +94,7 @@ describe('Karma Builder assets', () => {
       ],
     };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(karmaWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, karmaWorkspaceTarget, overrides).pipe(
     ).subscribe(undefined, done.fail, done);
   }, 45000);
 });

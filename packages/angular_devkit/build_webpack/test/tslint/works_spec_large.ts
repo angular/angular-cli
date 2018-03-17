@@ -6,14 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect';
 import { normalize, virtualFs } from '@angular-devkit/core';
-import { concatMap, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { TslintBuilderOptions } from '../../src';
 import {
   TestLogger,
   TestProjectHost,
-  makeWorkspace,
+  runTargetSpec,
   tslintWorkspaceTarget,
   workspaceRoot,
 } from '../utils';
@@ -21,22 +20,13 @@ import {
 
 describe('Tslint Target', () => {
   const host = new TestProjectHost(workspaceRoot);
-  const architect = new Architect(normalize(workspaceRoot), host);
   const filesWithErrors = { 'src/foo.ts': 'const foo = "";\n' };
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
   it('works', (done) => {
-    architect.loadWorkspaceFromJson(makeWorkspace(tslintWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget())),
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
-  }, 30000);
-
-  it('works', (done) => {
-    architect.loadWorkspaceFromJson(makeWorkspace(tslintWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget())),
+    runTargetSpec(host, tslintWorkspaceTarget).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -45,8 +35,7 @@ describe('Tslint Target', () => {
     host.writeMultipleFiles(filesWithErrors);
     const overrides: Partial<TslintBuilderOptions> = { exclude: ['**/foo.ts'] };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(tslintWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, tslintWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -55,8 +44,7 @@ describe('Tslint Target', () => {
     host.writeMultipleFiles(filesWithErrors);
     const overrides: Partial<TslintBuilderOptions> = { fix: true };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(tslintWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, tslintWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = normalize('src/foo.ts');
@@ -71,8 +59,7 @@ describe('Tslint Target', () => {
     const logger = new TestLogger('lint-force');
     const overrides: Partial<TslintBuilderOptions> = { force: true };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(tslintWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }), { logger })),
+    runTargetSpec(host, tslintWorkspaceTarget, overrides, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(logger.includes(`" should be '`)).toBe(true);
@@ -86,8 +73,7 @@ describe('Tslint Target', () => {
     const logger = new TestLogger('lint-format');
     const overrides: Partial<TslintBuilderOptions> = { format: 'stylish' };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(tslintWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }), { logger })),
+    runTargetSpec(host, tslintWorkspaceTarget, overrides, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
       tap(() => {
         expect(logger.includes(`quotemark`)).toBe(true);
@@ -111,8 +97,7 @@ describe('Tslint Target', () => {
     });
     const overrides: Partial<TslintBuilderOptions> = { tslintConfig: undefined };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(tslintWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, tslintWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -133,8 +118,7 @@ describe('Tslint Target', () => {
     });
     const overrides: Partial<TslintBuilderOptions> = { tslintConfig: '../tslint.json' };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(tslintWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, tslintWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -145,8 +129,7 @@ describe('Tslint Target', () => {
       files: ['app/**/*.ts'],
     };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(tslintWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, tslintWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -157,8 +140,7 @@ describe('Tslint Target', () => {
       typeCheck: true,
     };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(tslintWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, tslintWorkspaceTarget, overrides).pipe(
     ).subscribe(undefined, done, done.fail);
   }, 30000);
 });

@@ -6,16 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect';
 import { normalize } from '@angular-devkit/core';
 import { concatMap, tap } from 'rxjs/operators';
-import { TestProjectHost, browserWorkspaceTarget, makeWorkspace, workspaceRoot } from '../utils';
+import { TestProjectHost, browserWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
 import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_large';
 
 
 describe('Browser Builder output hashing', () => {
   const host = new TestProjectHost(workspaceRoot);
-  const architect = new Architect(normalize(workspaceRoot), host);
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
@@ -64,8 +62,7 @@ describe('Browser Builder output hashing', () => {
 
     // We must do several builds instead of a single one in watch mode, so that the output
     // path is deleted on each run and only contains the most recent files.
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
       tap(() => {
         // Save the current hashes.
         oldHashes = generateFileHashMap();
@@ -73,7 +70,7 @@ describe('Browser Builder output hashing', () => {
         host.writeMultipleFiles(lazyModuleImport);
       }),
       // Lazy chunk hash should have changed without modifying main bundle.
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+      concatMap(() => runTargetSpec(host, browserWorkspaceTarget, overrides)),
       tap(() => {
         newHashes = generateFileHashMap();
         validateHashes(oldHashes, newHashes, []);
@@ -81,7 +78,7 @@ describe('Browser Builder output hashing', () => {
         host.writeMultipleFiles({ 'src/styles.css': 'body { background: blue; }' });
       }),
       // Style hash should change.
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+      concatMap(() => runTargetSpec(host, browserWorkspaceTarget, overrides)),
       tap(() => {
         newHashes = generateFileHashMap();
         validateHashes(oldHashes, newHashes, ['styles']);
@@ -89,7 +86,7 @@ describe('Browser Builder output hashing', () => {
         host.writeMultipleFiles({ 'src/app/app.component.css': 'h1 { margin: 10px; }' });
       }),
       // Main hash should change, since inline styles go in the main bundle.
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+      concatMap(() => runTargetSpec(host, browserWorkspaceTarget, overrides)),
       tap(() => {
         newHashes = generateFileHashMap();
         validateHashes(oldHashes, newHashes, ['main']);
@@ -97,7 +94,7 @@ describe('Browser Builder output hashing', () => {
         host.appendToFile('src/app/lazy/lazy.module.ts', `console.log(1);`);
       }),
       // Lazy loaded bundle should change, and so should inline.
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+      concatMap(() => runTargetSpec(host, browserWorkspaceTarget, overrides)),
       tap(() => {
         newHashes = generateFileHashMap();
         validateHashes(oldHashes, newHashes, ['lazy.module']);
@@ -105,7 +102,7 @@ describe('Browser Builder output hashing', () => {
         host.appendToFile('src/main.ts', '');
       }),
       // Nothing should have changed.
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+      concatMap(() => runTargetSpec(host, browserWorkspaceTarget, overrides)),
       tap(() => {
         newHashes = generateFileHashMap();
         validateHashes(oldHashes, newHashes, []);
@@ -120,11 +117,8 @@ describe('Browser Builder output hashing', () => {
 
     // We must do several builds instead of a single one in watch mode, so that the output
     // path is deleted on each run and only contains the most recent files.
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      // 'all' should hash everything.
-      concatMap(() => architect.run(architect.getTarget(
-        { overrides: { outputHashing: 'all', extractCss: true } },
-      ))),
+    // 'all' should hash everything.
+    runTargetSpec(host, browserWorkspaceTarget, { outputHashing: 'all', extractCss: true }).pipe(
       tap(() => {
         expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeTruthy();
         expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeTruthy();
@@ -134,9 +128,8 @@ describe('Browser Builder output hashing', () => {
         expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeTruthy();
       }),
       // 'none' should hash nothing.
-      concatMap(() => architect.run(architect.getTarget(
-        { overrides: { outputHashing: 'none', extractCss: true } },
-      ))),
+      concatMap(() => runTargetSpec(host, browserWorkspaceTarget,
+        { outputHashing: 'none', extractCss: true })),
       tap(() => {
         expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeFalsy();
         expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeFalsy();
@@ -146,9 +139,8 @@ describe('Browser Builder output hashing', () => {
         expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeFalsy();
       }),
       // 'media' should hash css resources only.
-      concatMap(() => architect.run(architect.getTarget(
-        { overrides: { outputHashing: 'media', extractCss: true } },
-      ))),
+      concatMap(() => runTargetSpec(host, browserWorkspaceTarget,
+        { outputHashing: 'media', extractCss: true })),
       tap(() => {
         expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeFalsy();
         expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeFalsy();
@@ -158,9 +150,8 @@ describe('Browser Builder output hashing', () => {
         expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeTruthy();
       }),
       // 'bundles' should hash bundles only.
-      concatMap(() => architect.run(architect.getTarget(
-        { overrides: { outputHashing: 'bundles', extractCss: true } },
-      ))),
+      concatMap(() => runTargetSpec(host, browserWorkspaceTarget,
+        { outputHashing: 'bundles', extractCss: true })),
       tap(() => {
         expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeTruthy();
         expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeTruthy();

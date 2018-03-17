@@ -219,7 +219,7 @@ export class Workspace {
       concatMap(validator => validator(contentJsonCopy)),
       concatMap(validatorResult => {
         if (validatorResult.success) {
-          return of(contentJson as T);
+          return of(contentJsonCopy as T);
         } else {
           return _throw(new SchemaValidationException(validatorResult.errors as string[]));
         }

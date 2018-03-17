@@ -9,7 +9,7 @@
       "type": "number",
       "description": "A required option"
     },
-    "optimize": {
+    "optionalBrowserOption": {
       "type": "boolean",
       "description": "A non-required option with a default",
       "default": false

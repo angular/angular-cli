@@ -6,16 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect';
 import { normalize, virtualFs } from '@angular-devkit/core';
-import { concatMap, debounceTime, tap } from 'rxjs/operators';
+import { debounceTime, tap } from 'rxjs/operators';
 import { KarmaBuilderOptions } from '../../src';
-import { TestProjectHost, karmaWorkspaceTarget, makeWorkspace, workspaceRoot } from '../utils';
+import { TestProjectHost, karmaWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
 
 
 describe('Karma Builder code coverage', () => {
   const host = new TestProjectHost(workspaceRoot);
-  const architect = new Architect(normalize(workspaceRoot), host);
   const coverageFilePath = normalize('coverage/lcov.info');
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
@@ -24,8 +22,7 @@ describe('Karma Builder code coverage', () => {
   it('works', (done) => {
     const overrides: Partial<KarmaBuilderOptions> = { codeCoverage: true };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(karmaWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, karmaWorkspaceTarget, overrides).pipe(
       // It seems like the coverage files take a while being written to disk, so we wait 500ms here.
       debounceTime(500),
       tap(buildEvent => {
@@ -47,8 +44,7 @@ describe('Karma Builder code coverage', () => {
       ],
     };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(karmaWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, karmaWorkspaceTarget, overrides).pipe(
       // It seems like the coverage files take a while being written to disk, so we wait 500ms here.
       debounceTime(500),
       tap(buildEvent => {

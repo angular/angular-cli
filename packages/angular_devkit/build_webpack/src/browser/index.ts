@@ -6,7 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuildEvent, Builder, BuilderContext, Target } from '@angular-devkit/architect';
+import {
+  BuildEvent,
+  Builder,
+  BuilderConfiguration,
+  BuilderContext,
+} from '@angular-devkit/architect';
 import { Path, getSystemPath, normalize, resolve } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
@@ -117,7 +122,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
 
   constructor(public context: BuilderContext) { }
 
-  run(target: Target<BrowserBuilderOptions>): Observable<BuildEvent> {
+  run(target: BuilderConfiguration<BrowserBuilderOptions>): Observable<BuildEvent> {
     const options = target.options;
 
     // TODO: verify using of(null) to kickstart things is a pattern.

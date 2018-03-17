@@ -9,16 +9,16 @@
 import {
   BuildEvent,
   Builder,
+  BuilderConfiguration,
   BuilderContext,
   BuilderDescription,
-  Target,
 } from '@angular-devkit/architect';
 import { getSystemPath, tags } from '@angular-devkit/core';
 import { resolve } from 'path';
 import { Observable } from 'rxjs/Observable';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { of } from 'rxjs/observable/of';
-import { concatMap, take } from 'rxjs/operators';
+import { concatMap, take, tap } from 'rxjs/operators';
 import * as url from 'url';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { DevServerBuilderOptions } from '../dev-server';
@@ -41,7 +41,7 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
 
   constructor(public context: BuilderContext) { }
 
-  run(target: Target<ProtractorBuilderOptions>): Observable<BuildEvent> {
+  run(target: BuilderConfiguration<ProtractorBuilderOptions>): Observable<BuildEvent> {
 
     const root = getSystemPath(target.root);
     const options = target.options;
@@ -60,43 +60,42 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
     // Override browser build watch setting.
     const overrides = { watch: false, host: options.host, port: options.port };
     const browserTargetOptions = { project, target: targetName, configuration, overrides };
-    const devServerTarget = this.context.architect
-      .getTarget<DevServerBuilderOptions>(browserTargetOptions);
+    let devServerBuilderConfig: BuilderConfiguration<DevServerBuilderOptions>;
     let devServerDescription: BuilderDescription;
     let baseUrl: string;
 
-    return this.context.architect.getBuilderDescription(devServerTarget).pipe(
-      concatMap(description => {
-        devServerDescription = description;
-
-        return this.context.architect.validateBuilderOptions(devServerTarget,
-          devServerDescription);
-      }),
-      concatMap(() => {
-        // Compute baseUrl from devServerOptions.
-        if (options.devServerTarget && devServerTarget.options.publicHost) {
-          let publicHost = devServerTarget.options.publicHost;
-          if (!/^\w+:\/\//.test(publicHost)) {
-            publicHost = `${devServerTarget.options.ssl
-              ? 'https'
-              : 'http'}://${publicHost}`;
+    return this.context.architect
+      .getBuilderConfiguration<DevServerBuilderOptions>(browserTargetOptions).pipe(
+        tap(cfg => devServerBuilderConfig = cfg),
+        concatMap(builderConfig => this.context.architect.getBuilderDescription(builderConfig)),
+        tap(description => devServerDescription = description),
+        concatMap(devServerDescription => this.context.architect.validateBuilderOptions(
+          devServerBuilderConfig, devServerDescription)),
+        concatMap(() => {
+          // Compute baseUrl from devServerOptions.
+          if (options.devServerTarget && devServerBuilderConfig.options.publicHost) {
+            let publicHost = devServerBuilderConfig.options.publicHost;
+            if (!/^\w+:\/\//.test(publicHost)) {
+              publicHost = `${devServerBuilderConfig.options.ssl
+                ? 'https'
+                : 'http'}://${publicHost}`;
+            }
+            const clientUrl = url.parse(publicHost);
+            baseUrl = url.format(clientUrl);
+          } else if (options.devServerTarget) {
+            baseUrl = url.format({
+              protocol: devServerBuilderConfig.options.ssl ? 'https' : 'http',
+              hostname: options.host,
+              port: devServerBuilderConfig.options.port.toString(),
+            });
           }
-          const clientUrl = url.parse(publicHost);
-          baseUrl = url.format(clientUrl);
-        } else if (options.devServerTarget) {
-          baseUrl = url.format({
-            protocol: devServerTarget.options.ssl ? 'https' : 'http',
-            hostname: options.host,
-            port: devServerTarget.options.port.toString(),
-          });
-        }
 
-        // Save the computed baseUrl back so that Protractor can use it.
-        options.baseUrl = baseUrl;
+          // Save the computed baseUrl back so that Protractor can use it.
+          options.baseUrl = baseUrl;
 
-        return of(this.context.architect.getBuilder(devServerDescription, this.context));
-      }),
-      concatMap(builder => builder.run(devServerTarget)),
+          return of(this.context.architect.getBuilder(devServerDescription, this.context));
+        }),
+        concatMap(builder => builder.run(devServerBuilderConfig)),
     );
   }
 

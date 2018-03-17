@@ -6,15 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect';
-import { normalize } from '@angular-devkit/core';
-import { concatMap, debounceTime, take, tap } from 'rxjs/operators';
-import { TestProjectHost, browserWorkspaceTarget, makeWorkspace, workspaceRoot } from '../utils';
+import { debounceTime, take, tap } from 'rxjs/operators';
+import { TestProjectHost, browserWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
 
 
 describe('Browser Builder poll', () => {
   const host = new TestProjectHost(workspaceRoot);
-  const architect = new Architect(normalize(workspaceRoot), host);
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
@@ -23,8 +20,7 @@ describe('Browser Builder poll', () => {
     const overrides = { watch: true, poll: 1000 };
     let msAvg = 1000;
     let lastTime: number;
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
       // Debounce 1s, otherwise changes are too close together and polling doesn't work.
       debounceTime(1000),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),

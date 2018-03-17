@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect';
-import { normalize, tags } from '@angular-devkit/core';
+import { tags } from '@angular-devkit/core';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { concatMap, take, tap } from 'rxjs/operators';
 import { DevServerBuilderOptions } from '../../src';
@@ -15,15 +14,14 @@ import {
   TestProjectHost,
   browserWorkspaceTarget,
   devServerWorkspaceTarget,
-  makeWorkspace,
   request,
+  runTargetSpec,
   workspaceRoot,
 } from '../utils';
 
 
 describe('Dev Server Builder ssl', () => {
   const host = new TestProjectHost(workspaceRoot);
-  const architect = new Architect(normalize(workspaceRoot), host);
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
@@ -31,11 +29,7 @@ describe('Dev Server Builder ssl', () => {
   it('works', (done) => {
     const overrides: Partial<DevServerBuilderOptions> = { ssl: true };
 
-    architect.loadWorkspaceFromJson(makeWorkspace([
-      browserWorkspaceTarget,
-      devServerWorkspaceTarget,
-    ])).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, [browserWorkspaceTarget, devServerWorkspaceTarget], overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => fromPromise(request('https://localhost:4200/index.html'))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),
@@ -107,11 +101,7 @@ describe('Dev Server Builder ssl', () => {
       sslCert: '../ssl/server.crt',
     };
 
-    architect.loadWorkspaceFromJson(makeWorkspace([
-      browserWorkspaceTarget,
-      devServerWorkspaceTarget,
-    ])).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, [browserWorkspaceTarget, devServerWorkspaceTarget], overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => fromPromise(request('https://localhost:4200/index.html'))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),

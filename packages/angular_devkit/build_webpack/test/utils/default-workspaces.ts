@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Workspace, WorkspaceTarget } from '@angular-devkit/architect';
-import { getSystemPath, join, normalize, relative } from '@angular-devkit/core';
+import { Target } from '@angular-devkit/architect';
+import { experimental, getSystemPath, join, normalize, relative } from '@angular-devkit/core';
 import {
   BrowserBuilderOptions,
   DevServerBuilderOptions,
@@ -24,43 +24,29 @@ export const workspaceRoot = join(devkitRoot,
 const builderPath = join(devkitRoot, 'packages/angular_devkit/build_webpack');
 const relativeBuilderPath = relative(workspaceRoot, builderPath);
 
-
-// Workspace and options need to be created from functions because JSON Schema validation
-// will mutate change the objects.
-export function makeWorkspace(
-  WorkspaceTargets: WorkspaceTarget<{}> | WorkspaceTarget<{}>[],
-): Workspace {
-  if (!Array.isArray(WorkspaceTargets)) {
-    WorkspaceTargets = [WorkspaceTargets];
-  }
-
-  const workspace: Workspace = {
-    name: 'spec',
+export function makeWorkspace(WorkspaceTargets: Target[] ): experimental.workspace.WorkspaceJson {
+  const workspace = {
     version: 1,
-    root: '',
-    defaultProject: 'app',
     projects: {
       app: {
         root: 'src',
         projectType: 'application',
-        targets: {},
+        architect: {} as { [k: string]: Target },
       },
     },
   };
 
   WorkspaceTargets.forEach(WorkspaceTarget => {
-    workspace.projects.app.targets[WorkspaceTarget.builder] = {
+    workspace.projects.app.architect[WorkspaceTarget.builder] = {
       builder: `${getSystemPath(relativeBuilderPath)}:${WorkspaceTarget.builder}`,
       options: WorkspaceTarget.options,
-    } as WorkspaceTarget;
-    // Last spec target is the default.
-    workspace.projects.app.defaultTarget = WorkspaceTarget.builder;
+    } as Target;
   });
 
-  return workspace;
+  return workspace as {} as experimental.workspace.WorkspaceJson;
 }
 
-export const browserWorkspaceTarget: WorkspaceTarget<Partial<BrowserBuilderOptions>> = {
+export const browserWorkspaceTarget: Target<Partial<BrowserBuilderOptions>> = {
   builder: 'browser',
   options: {
     outputPath: '../dist',
@@ -79,7 +65,7 @@ export const browserWorkspaceTarget: WorkspaceTarget<Partial<BrowserBuilderOptio
   },
 };
 
-export const devServerWorkspaceTarget: WorkspaceTarget<Partial<DevServerBuilderOptions>> = {
+export const devServerWorkspaceTarget: Target<Partial<DevServerBuilderOptions>> = {
   builder: 'devServer',
   options: {
     browserTarget: 'app:browser',
@@ -87,14 +73,14 @@ export const devServerWorkspaceTarget: WorkspaceTarget<Partial<DevServerBuilderO
   },
 };
 
-export const extractI18nWorkspaceTarget: WorkspaceTarget<Partial<ExtractI18nBuilderOptions>> = {
+export const extractI18nWorkspaceTarget: Target<Partial<ExtractI18nBuilderOptions>> = {
   builder: 'extractI18n',
   options: {
     browserTarget: 'app:browser',
   },
 };
 
-export const karmaWorkspaceTarget: WorkspaceTarget<Partial<KarmaBuilderOptions>> = {
+export const karmaWorkspaceTarget: Target<Partial<KarmaBuilderOptions>> = {
   builder: 'karma',
   options: {
     main: 'test.ts',
@@ -113,7 +99,7 @@ export const karmaWorkspaceTarget: WorkspaceTarget<Partial<KarmaBuilderOptions>>
   },
 };
 
-export const protractorWorkspaceTarget: WorkspaceTarget<Partial<ProtractorBuilderOptions>> = {
+export const protractorWorkspaceTarget: Target<Partial<ProtractorBuilderOptions>> = {
   builder: 'protractor',
   options: {
     protractorConfig: '../protractor.conf.js',
@@ -125,7 +111,7 @@ export const protractorWorkspaceTarget: WorkspaceTarget<Partial<ProtractorBuilde
   },
 };
 
-export const tslintWorkspaceTarget: WorkspaceTarget<Partial<TslintBuilderOptions>> = {
+export const tslintWorkspaceTarget: Target<Partial<TslintBuilderOptions>> = {
   builder: 'tslint',
   options: {
     tsConfig: 'tsconfig.app.json',

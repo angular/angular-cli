@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { join, normalize } from '@angular-devkit/core';
+import { experimental, join, normalize } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { concatMap, tap, toArray } from 'rxjs/operators';
 import { BrowserTargetOptions } from '../test/browser';
@@ -14,27 +14,23 @@ import {
   Architect,
   BuilderCannotBeResolvedException,
   ConfigurationNotFoundException,
-  ProjectNotFoundException,
-  Target,
   TargetNotFoundException,
 } from './architect';
-import { Workspace } from './workspace';
 
 
 describe('Architect', () => {
   const host = new NodeJsSyncHost();
   const root = normalize(__dirname);
-  const workspace: Workspace = {
-    name: 'spec',
+  const workspace = new experimental.workspace.Workspace(root, host);
+  let architect: Architect;
+  const workspaceJson = {
     version: 1,
-    root: 'src',
-    defaultProject: 'app',
+    newProjectRoot: 'src',
     projects: {
       app: {
         root: 'app',
         projectType: 'application',
-        defaultTarget: 'browser',
-        targets: {
+        architect: {
           browser: {
             builder: '../test:browser',
             options: {
@@ -42,8 +38,14 @@ describe('Architect', () => {
             },
             configurations: {
               prod: {
-                optimizationLevel: 1,
+                optionalBrowserOption: false,
               },
+            },
+          },
+          badBrowser: {
+            builder: '../test:browser',
+            options: {
+              badBrowserOption: 1,
             },
           },
           karma: {
@@ -55,94 +57,46 @@ describe('Architect', () => {
     },
   };
 
+  beforeAll((done) => workspace.loadWorkspaceFromJson(workspaceJson).pipe(
+    concatMap(ws => new Architect(ws).loadArchitect()),
+    tap(arch => architect = arch),
+  ).subscribe(undefined, done.fail, done));
+
   it('works', (done) => {
-    const architect = new Architect(root, host);
-    architect.loadWorkspaceFromJson(workspace).subscribe({
-      complete: () => {
-        const target = architect.getTarget<BrowserTargetOptions>();
-        const options = target.options;
-
-        // Check options were composed properly.
-        expect(target.root).toBe(join(root, 'app'));
-        expect(target.projectType).toBe('application');
-        expect(target.builder).toBe('../test:browser');
-        expect(options.browserOption).toBe(1);
-
-        done();
-      },
-      error: done.fail,
-    });
+    const targetSpec = { project: 'app', target: 'browser', configuration: 'prod' };
+    architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec).pipe(
+      tap(builderConfig => {
+        expect(builderConfig.root).toBe(join(root, 'app'));
+        expect(builderConfig.projectType).toBe('application');
+        expect(builderConfig.builder).toBe('../test:browser');
+        expect(builderConfig.options.browserOption).toBe(1);
+        expect(builderConfig.options.optionalBrowserOption).toBe(false);
+      }),
+    ).subscribe(undefined, done.fail, done);
   });
 
-  it('composes project with target and configuration', (done) => {
-    const architect = new Architect(root, host);
-    const targetOptions = {
-      project: 'app',
-      target: 'browser',
-      configuration: 'prod',
-    };
-    architect.loadWorkspaceFromJson(workspace).subscribe({
-      complete: () => {
-        const target = architect.getTarget<BrowserTargetOptions>(targetOptions);
-        const options = target.options;
-
-        // Check options were composed properly.
-        expect(target.root).toBe(join(root, 'app'));
-        expect(target.projectType).toBe('application');
-        expect(target.builder).toBe('../test:browser');
-        expect(options.browserOption).toBe(1);
-        expect(options.optimizationLevel).toBe(1);
-
+  it('errors when missing target is used', (done) => {
+    const targetSpec = { project: 'app', target: 'missing', configuration: 'prod' };
+    architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec)
+      .subscribe(undefined, (err: Error) => {
+        expect(err).toEqual(jasmine.any(TargetNotFoundException));
         done();
-      },
-      error: done.fail,
-    });
-  });
-
-  it('throws when missing project is used', (done) => {
-    const architect = new Architect(root, host);
-    const targetOptions = { project: 'missing' };
-    architect.loadWorkspaceFromJson(workspace).subscribe({
-      complete: () => {
-        const err = new ProjectNotFoundException('missing');
-        expect(() => architect.getTarget(targetOptions)).toThrow(err);
-        done();
-      },
-      error: done.fail,
-    });
-  });
-
-  it('throws when missing target is used', (done) => {
-    const architect = new Architect(root, host);
-    const targetOptions = { target: 'missing' };
-    architect.loadWorkspaceFromJson(workspace).subscribe({
-      complete: () => {
-        const err = new TargetNotFoundException('missing');
-        expect(() => architect.getTarget(targetOptions)).toThrow(err);
-        done();
-      },
-      error: done.fail,
-    });
+      }, done.fail);
   });
 
   it('throws when missing configuration is used', (done) => {
-    const architect = new Architect(root, host);
-    const targetOptions = { configuration: 'missing' };
-    architect.loadWorkspaceFromJson(workspace).subscribe({
-      complete: () => {
-        const err = new ConfigurationNotFoundException('missing');
-        expect(() => architect.getTarget(targetOptions)).toThrow(err);
+    const targetSpec = { project: 'app', target: 'browser', configuration: 'missing' };
+    architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec)
+      .subscribe(undefined, (err: Error) => {
+        expect(err).toEqual(jasmine.any(ConfigurationNotFoundException));
         done();
-      },
-      error: done.fail,
-    });
+      }, done.fail);
   });
 
   it('runs targets', (done) => {
-    const architect = new Architect(root, host);
-    const targetOptions = { project: 'app', target: 'browser' };
-    architect.loadWorkspaceFromJson(workspace).pipe(
-      concatMap((architect) => architect.run(architect.getTarget(targetOptions))),
+    const targetSpec = { project: 'app', target: 'browser', configuration: 'prod' };
+    architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec).pipe(
+      concatMap((builderConfig) => architect.run(builderConfig)),
       toArray(),
       tap(events => {
         expect(events.length).toBe(3);
@@ -150,24 +104,26 @@ describe('Architect', () => {
         expect(events[1].success).toBe(false);
         expect(events[2].success).toBe(true);
       }),
-    ).subscribe(done, done.fail);
-
+    ).subscribe(undefined, done.fail, done);
   });
 
-  it('throws when invalid target is used', (done) => {
-    let target: Target;
-    const architect = new Architect(root, host);
-    const targetOptions = { project: 'app', target: 'karma' };
-    architect.loadWorkspaceFromJson(workspace).pipe(
-      concatMap((architect) => {
-        target = architect.getTarget(targetOptions);
-
-        return architect.run(target);
-      }),
-    ).subscribe(() => done.fail(), (err: Error) => {
-      const expectedErr = new BuilderCannotBeResolvedException(target.builder);
-      expect(err.message).toEqual(expectedErr.message);
+  it('errors when builder cannot be resolved', (done) => {
+    const targetSpec = { project: 'app', target: 'karma' };
+    architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec).pipe(
+      concatMap((builderConfig) => architect.run(builderConfig)),
+    ).subscribe(undefined, (err: Error) => {
+      expect(err).toEqual(jasmine.any(BuilderCannotBeResolvedException));
       done();
-    });
+    }, done.fail);
+  });
+
+  it('errors when builder options fail validation', (done) => {
+    const targetSpec = { project: 'app', target: 'badBrowser' };
+    architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec).pipe(
+      concatMap((builderConfig) => architect.run(builderConfig)),
+    ).subscribe(undefined, (err: Error) => {
+      expect(err).toEqual(jasmine.any(experimental.workspace.SchemaValidationException));
+      done();
+    }, done.fail);
   });
 });

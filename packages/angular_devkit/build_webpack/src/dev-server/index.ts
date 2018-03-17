@@ -6,12 +6,17 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuildEvent, Builder, BuilderContext, Target } from '@angular-devkit/architect';
+import {
+  BuildEvent,
+  Builder,
+  BuilderConfiguration,
+  BuilderContext,
+} from '@angular-devkit/architect';
 import { getSystemPath, tags } from '@angular-devkit/core';
 import { existsSync, readFileSync } from 'fs';
 import * as path from 'path';
 import { Observable } from 'rxjs/Observable';
-import { concatMap } from 'rxjs/operators';
+import { concatMap, map, tap } from 'rxjs/operators';
 import * as url from 'url';
 import * as webpack from 'webpack';
 import { getWebpackStatsConfig } from '../angular-cli-files/models/webpack-configs/utils';
@@ -78,7 +83,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
 
   constructor(public context: BuilderContext) { }
 
-  run(target: Target<DevServerBuilderOptions>): Observable<BuildEvent> {
+  run(target: BuilderConfiguration<DevServerBuilderOptions>): Observable<BuildEvent> {
     const root = getSystemPath(target.root);
     const options = target.options;
 
@@ -407,15 +412,17 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     const [project, target, configuration] = options.browserTarget.split(':');
     // Override browser build watch setting.
     const overrides = { watch: options.watch };
-    let browserTarget: Target<BrowserBuilderOptions>;
+    const browserTargetSpec = { project, target, configuration, overrides };
+    let builderConfig: BuilderConfiguration<BrowserBuilderOptions>;
 
-    const browserTargetOptions = { project, target, configuration, overrides };
-    browserTarget = this.context.architect.getTarget<BrowserBuilderOptions>(browserTargetOptions);
-
-    return this.context.architect.getBuilderDescription(browserTarget).pipe(
-      concatMap(browserDescription =>
-        this.context.architect.validateBuilderOptions(browserTarget, browserDescription)),
-    );
+    return this.context.architect.getBuilderConfiguration<BrowserBuilderOptions>(browserTargetSpec)
+      .pipe(
+        tap(cfg => builderConfig = cfg),
+        concatMap(builderConfig => this.context.architect.getBuilderDescription(builderConfig)),
+        concatMap(browserDescription =>
+          this.context.architect.validateBuilderOptions(builderConfig, browserDescription)),
+        map(browserConfig => browserConfig.options),
+      );
   }
 }
 

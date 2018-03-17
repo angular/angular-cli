@@ -6,7 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuildEvent, Builder, BuilderContext, Target } from '@angular-devkit/architect';
+import {
+  BuildEvent,
+  Builder,
+  BuilderConfiguration,
+  BuilderContext,
+} from '@angular-devkit/architect';
 import { getSystemPath } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
 import * as glob from 'glob';
@@ -35,7 +40,7 @@ export class TslintBuilder implements Builder<TslintBuilderOptions> {
 
   constructor(public context: BuilderContext) { }
 
-  run(target: Target<TslintBuilderOptions>): Observable<BuildEvent> {
+  run(target: BuilderConfiguration<TslintBuilderOptions>): Observable<BuildEvent> {
 
     const root = getSystemPath(target.root);
     const options = target.options;

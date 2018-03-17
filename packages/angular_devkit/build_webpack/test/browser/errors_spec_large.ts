@@ -6,21 +6,18 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect';
-import { normalize } from '@angular-devkit/core';
-import { concatMap, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import {
   TestLogger,
   TestProjectHost,
   browserWorkspaceTarget,
-  makeWorkspace,
+  runTargetSpec,
   workspaceRoot,
 } from '../utils';
 
 
 describe('Browser Builder errors', () => {
   const host = new TestProjectHost(workspaceRoot);
-  const architect = new Architect(normalize(workspaceRoot), host);
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
@@ -32,8 +29,7 @@ describe('Browser Builder errors', () => {
     `);
     const logger = new TestLogger('errors-compilation');
 
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget(), { logger })),
+    runTargetSpec(host, browserWorkspaceTarget, undefined, logger).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
         expect(logger.includes('polyfills.ts is missing from the TypeScript')).toBe(true);
@@ -45,8 +41,7 @@ describe('Browser Builder errors', () => {
     host.appendToFile('src/app/app.component.ts', ']]]');
     const logger = new TestLogger('errors-syntax');
 
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget(), { logger })),
+    runTargetSpec(host, browserWorkspaceTarget, undefined, logger).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
         expect(logger.includes('Declaration or statement expected.')).toBe(true);
@@ -58,8 +53,7 @@ describe('Browser Builder errors', () => {
     host.replaceInFile('src/app/app.component.ts', `'app-root'`, `(() => 'app-root')()`);
     const logger = new TestLogger('errors-static');
 
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides: { aot: true } }), { logger })),
+    runTargetSpec(host, browserWorkspaceTarget, { aot: true }, logger).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
         expect(logger.includes('Function expressions are not supported in')).toBe(true);

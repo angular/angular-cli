@@ -7,8 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect, Workspace } from '@angular-devkit/architect';
-import { dirname, normalize, tags } from '@angular-devkit/core';
+import { Architect } from '@angular-devkit/architect';
+import { dirname, experimental, normalize, tags } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import { existsSync, readFileSync } from 'fs';
 import * as minimist from 'minimist';
@@ -81,7 +81,7 @@ if (targetStr) {
 
 // Load workspace configuration file.
 const currentPath = process.cwd();
-const configFileName = '.architect.json';
+const configFileName = '.workspace.json';
 const configFilePath = findUp([configFileName], currentPath);
 
 if (!configFilePath) {
@@ -91,25 +91,33 @@ if (!configFilePath) {
   throw 3;  // TypeScript doesn't know that process.exit() never returns.
 }
 
-const workspacePath = dirname(normalize(configFilePath));
+const root = dirname(normalize(configFilePath));
 const configContent = readFileSync(configFilePath, 'utf-8');
-const configJson = JSON.parse(configContent) as Workspace;
+const workspaceJson = JSON.parse(configContent);
 
 const host = new NodeJsSyncHost();
-const architect = new Architect(workspacePath, host);
-architect.loadWorkspaceFromJson(configJson).pipe(
-  concatMap(() => {
+const workspace = new experimental.workspace.Workspace(root, host);
+let architect: Architect;
+
+workspace.loadWorkspaceFromJson(workspaceJson).pipe(
+  concatMap(ws => new Architect(ws).loadArchitect()),
+  concatMap(arch => {
+    architect = arch;
+
     const overrides = { ...argv };
     delete overrides['help'];
     delete overrides['_'];
 
-    const targetOptions = {
+    const targetSpec = {
       project,
       target: targetName,
       configuration,
       overrides,
     };
-    const target = architect.getTarget(targetOptions);
+
+    return architect.getBuilderConfiguration(targetSpec);
+  }),
+  concatMap(builderConfig => {
 
     // TODO: better logging of what's happening.
     if (argv.help) {
@@ -117,7 +125,7 @@ architect.loadWorkspaceFromJson(configJson).pipe(
       return _throw('Target help NYI.');
       // architect.help(targetOptions, logger);
     } else {
-      return architect.run(target, { logger });
+      return architect.run(builderConfig, { logger });
     }
   }),
 ).subscribe({

@@ -6,15 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { concatMap, tap } from 'rxjs/operators';
-import { TestProjectHost, browserWorkspaceTarget, makeWorkspace, workspaceRoot } from '../utils';
+import { tap } from 'rxjs/operators';
+import { TestProjectHost, browserWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
 
 
 describe('Browser Builder i18n', () => {
   const host = new TestProjectHost(workspaceRoot);
-  const architect = new Architect(normalize(workspaceRoot), host);
   const outputPath = normalize('dist');
   const emptyTranslationFile = `
       <?xml version="1.0" encoding="UTF-8" ?>
@@ -56,8 +54,7 @@ describe('Browser Builder i18n', () => {
       i18nLocale: 'fr',
     };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js');
@@ -79,8 +76,7 @@ describe('Browser Builder i18n', () => {
     host.writeMultipleFiles({ 'src/locale/messages.fr.xlf': emptyTranslationFile });
     host.appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
 
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js');
@@ -102,8 +98,7 @@ describe('Browser Builder i18n', () => {
     host.writeMultipleFiles({ 'src/locale/messages.fr.xlf': emptyTranslationFile });
     host.appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
 
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -111,8 +106,7 @@ describe('Browser Builder i18n', () => {
   it('register locales', (done) => {
     const overrides = { aot: true, i18nLocale: 'fr_FR' };
 
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js');

@@ -6,10 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect';
-import { normalize } from '@angular-devkit/core';
-import { concatMap, debounceTime, take, tap } from 'rxjs/operators';
-import { TestProjectHost, karmaWorkspaceTarget, makeWorkspace, workspaceRoot } from '../utils';
+import { debounceTime, take, tap } from 'rxjs/operators';
+import { TestProjectHost, karmaWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
 
 
 // Karma watch mode is currently bugged:
@@ -18,15 +16,13 @@ import { TestProjectHost, karmaWorkspaceTarget, makeWorkspace, workspaceRoot } f
 // TODO: fix these before 6.0 final.
 xdescribe('Karma Builder watch mode', () => {
   const host = new TestProjectHost(workspaceRoot);
-  const architect = new Architect(normalize(workspaceRoot), host);
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
   it('works', (done) => {
     const overrides = { watch: true };
-    architect.loadWorkspaceFromJson(makeWorkspace(karmaWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, karmaWorkspaceTarget, overrides).pipe(
       debounceTime(500),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       take(1),
@@ -37,8 +33,7 @@ xdescribe('Karma Builder watch mode', () => {
     const overrides = { watch: true };
     let buildNumber = 0;
 
-    architect.loadWorkspaceFromJson(makeWorkspace(karmaWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }))),
+    runTargetSpec(host, karmaWorkspaceTarget, overrides).pipe(
       debounceTime(500),
       tap((buildEvent) => {
         buildNumber += 1;

@@ -6,21 +6,18 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect';
-import { normalize } from '@angular-devkit/core';
-import { concatMap, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import {
   TestLogger,
   TestProjectHost,
   browserWorkspaceTarget,
-  makeWorkspace,
+  runTargetSpec,
   workspaceRoot,
 } from '../utils';
 
 
 describe('Browser Builder circular dependency detection', () => {
   const host = new TestProjectHost(workspaceRoot);
-  const architect = new Architect(normalize(workspaceRoot), host);
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
@@ -32,8 +29,7 @@ describe('Browser Builder circular dependency detection', () => {
     const overrides = { baseHref: '/myUrl' };
     const logger = new TestLogger('circular-dependencies');
 
-    architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
-      concatMap(() => architect.run(architect.getTarget({ overrides }), { logger })),
+    runTargetSpec(host, browserWorkspaceTarget, overrides, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(logger.includes('Circular dependency detected')).toBe(true)),
     ).subscribe(undefined, done.fail, done);

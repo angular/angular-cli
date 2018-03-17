@@ -12,13 +12,13 @@ import {
   JsonParseMode,
   Path,
   dirname,
+  experimental,
   getSystemPath,
   join,
   logging,
   normalize,
   parseJson,
   resolve,
-  schema,
   virtualFs,
 } from '@angular-devkit/core';
 import { resolve as nodeResolve } from '@angular-devkit/core/node';
@@ -26,7 +26,7 @@ import { Observable } from 'rxjs/Observable';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { of } from 'rxjs/observable/of';
 import { _throw } from 'rxjs/observable/throw';
-import { concatMap, map } from 'rxjs/operators';
+import { concatMap, map, tap } from 'rxjs/operators';
 import {
   BuildEvent,
   Builder,
@@ -36,15 +36,6 @@ import {
   BuilderPaths,
   BuilderPathsMap,
 } from './builder';
-import { Workspace } from './workspace';
-
-
-export class ProjectNotFoundException extends BaseException {
-  constructor(name?: string) {
-    const nameOrDefault = name ? `Project '${name}'` : `Default project`;
-    super(`${nameOrDefault} could not be found in workspace.`);
-  }
-}
 
 export class TargetNotFoundException extends BaseException {
   constructor(name?: string) {
@@ -59,12 +50,6 @@ export class ConfigurationNotFoundException extends BaseException {
   }
 }
 
-export class SchemaValidationException extends BaseException {
-  constructor(errors: string[]) {
-    super(`Schema validation failed with the following errors:\n  ${errors.join('\n  ')}`);
-  }
-}
-
 // TODO: break this exception apart into more granular ones.
 export class BuilderCannotBeResolvedException extends BaseException {
   constructor(builder: string) {
@@ -72,8 +57,8 @@ export class BuilderCannotBeResolvedException extends BaseException {
   }
 }
 
-export class WorkspaceNotYetLoadedException extends BaseException {
-  constructor() { super(`Workspace needs to be loaded before Architect is used.`); }
+export class ArchitectNotYetLoadedException extends BaseException {
+  constructor() { super(`Architect needs to be loaded before Architect is used.`); }
 }
 
 export class BuilderNotFoundException extends BaseException {
@@ -82,155 +67,151 @@ export class BuilderNotFoundException extends BaseException {
   }
 }
 
-export interface Target<OptionsT = {}> {
+export interface BuilderConfiguration<OptionsT = {}> {
   root: Path;
   projectType: string;
   builder: string;
   options: OptionsT;
 }
 
-export interface TargetOptions<OptionsT = {}> {
-  project?: string;
-  target?: string;
+export interface TargetSpecifier<OptionsT = {}> {
+  project: string;
+  target: string;
   configuration?: string;
   overrides?: Partial<OptionsT>;
 }
+
+export interface TargetsMap {
+  [k: string]: Target;
+}
+
+export declare type TargetOptions<T = JsonObject> = T;
+export declare type TargetConfiguration<T = JsonObject> = Partial<T>;
+
+export interface Target<T = JsonObject> {
+  builder: string;
+  options: TargetOptions<T>;
+  configurations?: { [k: string]: TargetConfiguration<T> };
+}
+
 export class Architect {
-  private readonly _workspaceSchemaPath = join(normalize(__dirname), 'workspace-schema.json');
+  private readonly _targetsSchemaPath = join(normalize(__dirname), 'targets-schema.json');
   private readonly _buildersSchemaPath = join(normalize(__dirname), 'builders-schema.json');
-  private _workspaceSchema: JsonObject;
+  private _targetsSchema: JsonObject;
   private _buildersSchema: JsonObject;
   private _architectSchemasLoaded = false;
   private _builderPathsMap = new Map<string, BuilderPaths>();
   private _builderDescriptionMap = new Map<string, BuilderDescription>();
   private _builderConstructorMap = new Map<string, BuilderConstructor<{}>>();
-  private _workspace: Workspace;
 
-  constructor(private _root: Path, private _host: virtualFs.Host<{}>) { }
+  constructor(private _workspace: experimental.workspace.Workspace) { }
 
-  loadWorkspaceFromHost(workspacePath: Path) {
-    return this._loadArchitectSchemas().pipe(
-      concatMap(() => this._loadJsonFile(join(this._root, workspacePath))),
-      concatMap(json => this.loadWorkspaceFromJson(json as {} as Workspace)),
-    );
-  }
-
-  loadWorkspaceFromJson(json: Workspace) {
-    return this._loadArchitectSchemas().pipe(
-      concatMap(() => this._validateAgainstSchema(json, this._workspaceSchema)),
-      concatMap((validatedWorkspace: Workspace) => {
-        this._workspace = validatedWorkspace;
-
-        return of(this);
-      }),
-    );
-  }
-
-  private _loadArchitectSchemas() {
+  loadArchitect() {
     if (this._architectSchemasLoaded) {
-      return of(null);
+      return of(this);
     } else {
       return forkJoin(
-        this._loadJsonFile(this._workspaceSchemaPath),
+        this._loadJsonFile(this._targetsSchemaPath),
         this._loadJsonFile(this._buildersSchemaPath),
       ).pipe(
         concatMap(([workspaceSchema, buildersSchema]) => {
-          this._workspaceSchema = workspaceSchema;
+          this._targetsSchema = workspaceSchema;
           this._buildersSchema = buildersSchema;
+          this._architectSchemasLoaded = true;
 
-          return of(null);
+          return of(this);
         }),
       );
     }
   }
 
-  getTarget<OptionsT>(options: TargetOptions = {}): Target<OptionsT> {
-    let { project, target: targetName } = options;
-    const { configuration, overrides } = options;
+  getBuilderConfiguration<OptionsT>(
+    targetSpec: TargetSpecifier,
+  ): Observable<BuilderConfiguration<OptionsT>> {
+    const {
+      project: projectName,
+      target: targetName,
+      configuration: configurationName,
+      overrides,
+    } = targetSpec;
 
-    if (!this._workspace) {
-      throw new WorkspaceNotYetLoadedException();
-    }
+    const project = this._workspace.getProject(projectName);
+    const targets = this._workspace.getProjectArchitect(projectName);
+    let configuration: TargetConfiguration = {};
+    let target: Target, options: TargetOptions;
 
-    project = project || this._workspace.defaultProject as string;
-    const workspaceProject = this._workspace.projects[project];
+    return this._workspace.validateAgainstSchema<TargetsMap>(targets, this._targetsSchema).pipe(
+      concatMap((validatedWorkspaceTargets) => {
+        target = validatedWorkspaceTargets[targetName];
 
-    if (!workspaceProject) {
-      throw new ProjectNotFoundException(project);
-    }
+        if (!target) {
+          return _throw(new TargetNotFoundException(targetName));
+        }
 
-    targetName = targetName || workspaceProject.defaultTarget as string;
-    const workspaceTarget = workspaceProject.targets[targetName];
+        options = target.options;
 
-    if (!workspaceTarget) {
-      throw new TargetNotFoundException(targetName);
-    }
+        if (configurationName) {
+          if (!target.configurations) {
+            return _throw(new ConfigurationNotFoundException(configurationName));
+          }
 
-    const workspaceTargetOptions = workspaceTarget.options;
-    let workspaceConfiguration;
+          configuration = target.configurations[configurationName];
 
-    if (configuration) {
-      workspaceConfiguration = workspaceTarget.configurations
-        && workspaceTarget.configurations[configuration];
+          if (!configuration) {
+            return _throw(new ConfigurationNotFoundException(configurationName));
+          }
+        }
 
-      if (!workspaceConfiguration) {
-        throw new ConfigurationNotFoundException(configuration);
-      }
-    }
+        const builderConfiguration: BuilderConfiguration<OptionsT> = {
+          root: resolve(this._workspace.root, normalize(project.root)),
+          projectType: project.projectType,
+          builder: target.builder,
+          options: {
+            ...options,
+            ...configuration,
+            ...overrides as {},
+          } as OptionsT,
+        };
 
-    // Resolve root for the target.
-    // TODO: add Path format to JSON schemas
-    const target: Target<OptionsT> = {
-      root: resolve(this._root, normalize(workspaceProject.root)),
-      projectType: workspaceProject.projectType,
-      builder: workspaceTarget.builder,
-      options: {
-        ...workspaceTargetOptions,
-        ...workspaceConfiguration,
-        ...overrides as {},
-      } as OptionsT,
-    };
-
-    // Return a copy of the target object, JSON validation changes objects and we don't
-    // want the original properties to be modified.
-    return JSON.parse(JSON.stringify(target));
+        return of(builderConfiguration);
+      }),
+    );
   }
 
-  // Will run the target using the target.
   run<OptionsT>(
-    target: Target<OptionsT>,
+    builderConfig: BuilderConfiguration<OptionsT>,
     partialContext: Partial<BuilderContext> = {},
   ): Observable<BuildEvent> {
     const context: BuilderContext = {
       logger: new logging.NullLogger(),
       architect: this,
-      host: this._host,
+      host: this._workspace.host,
       ...partialContext,
     };
 
     let builderDescription: BuilderDescription;
 
-    return this.getBuilderDescription(target).pipe(
-      concatMap(description => {
-        builderDescription = description;
-
-        return this.validateBuilderOptions(target, builderDescription);
-      }),
+    return this.getBuilderDescription(builderConfig).pipe(
+      tap(description => builderDescription = description),
+      concatMap(() => this.validateBuilderOptions(builderConfig, builderDescription)),
+      tap(validatedBuilderConfig => builderConfig = validatedBuilderConfig),
       map(() => this.getBuilder(builderDescription, context)),
-      concatMap(builder => builder.run(target)),
+      concatMap(builder => builder.run(builderConfig)),
     );
   }
 
-  getBuilderDescription<OptionsT>(target: Target<OptionsT>): Observable<BuilderDescription> {
+  getBuilderDescription<OptionsT>(
+    builderConfig: BuilderConfiguration<OptionsT>,
+  ): Observable<BuilderDescription> {
     // Check cache for this builder description.
-    if (this._builderDescriptionMap.has(target.builder)) {
-      return of(this._builderDescriptionMap.get(target.builder) as BuilderDescription);
+    if (this._builderDescriptionMap.has(builderConfig.builder)) {
+      return of(this._builderDescriptionMap.get(builderConfig.builder) as BuilderDescription);
     }
 
     return new Observable((obs) => {
       // TODO: this probably needs to be more like NodeModulesEngineHost.
-      const basedir = getSystemPath(this._root);
-      const [pkg, builderName] = target.builder.split(':');
+      const basedir = getSystemPath(this._workspace.root);
+      const [pkg, builderName] = builderConfig.builder.split(':');
       const pkgJsonPath = nodeResolve(pkg, { basedir, resolvePackageJson: true });
       let buildersJsonPath: Path;
       let builderPaths: BuilderPaths;
@@ -240,7 +221,7 @@ export class Architect {
         concatMap((pkgJson: JsonObject) => {
           const pkgJsonBuildersentry = pkgJson['builders'] as string;
           if (!pkgJsonBuildersentry) {
-            throw new BuilderCannotBeResolvedException(target.builder);
+            return _throw(new BuilderCannotBeResolvedException(builderConfig.builder));
           }
 
           buildersJsonPath = join(dirname(normalize(pkgJsonPath)), pkgJsonBuildersentry);
@@ -248,13 +229,13 @@ export class Architect {
           return this._loadJsonFile(buildersJsonPath);
         }),
         // Validate builders json.
-        concatMap((builderPathsMap) =>
-          this._validateAgainstSchema<BuilderPathsMap>(builderPathsMap, this._buildersSchema)),
+        concatMap((builderPathsMap) => this._workspace.validateAgainstSchema<BuilderPathsMap>(
+          builderPathsMap, this._buildersSchema)),
         concatMap((builderPathsMap) => {
           builderPaths = builderPathsMap.builders[builderName];
 
           if (!builderPaths) {
-            throw new BuilderCannotBeResolvedException(target.builder);
+            return _throw(new BuilderCannotBeResolvedException(builderConfig.builder));
           }
 
           // Resolve paths in the builder paths.
@@ -263,14 +244,14 @@ export class Architect {
           builderPaths.class = join(builderJsonDir, builderPaths.class);
 
           // Save the builder paths so that we can lazily load the builder.
-          this._builderPathsMap.set(target.builder, builderPaths);
+          this._builderPathsMap.set(builderConfig.builder, builderPaths);
 
           // Load the schema.
           return this._loadJsonFile(builderPaths.schema);
         }),
         map(builderSchema => {
           const builderDescription = {
-            name: target.builder,
+            name: builderConfig.builder,
             schema: builderSchema,
             description: builderPaths.description,
           };
@@ -285,9 +266,17 @@ export class Architect {
   }
 
   validateBuilderOptions<OptionsT>(
-    target: Target<OptionsT>, builderDescription: BuilderDescription,
-  ): Observable<OptionsT> {
-    return this._validateAgainstSchema<OptionsT>(target.options, builderDescription.schema);
+    builderConfig: BuilderConfiguration<OptionsT>, builderDescription: BuilderDescription,
+  ): Observable<BuilderConfiguration<OptionsT>> {
+    return this._workspace.validateAgainstSchema<OptionsT>(
+      builderConfig.options, builderDescription.schema,
+    ).pipe(
+      map(validatedOptions => {
+        builderConfig.options = validatedOptions;
+
+        return builderConfig;
+      }),
+    );
   }
 
   getBuilder<OptionsT>(
@@ -319,25 +308,8 @@ export class Architect {
     return builder;
   }
 
-  // Warning: this method changes contentJson in place.
-  // TODO: add transforms to resolve paths.
-  private _validateAgainstSchema<T = {}>(contentJson: {}, schemaJson: JsonObject): Observable<T> {
-    const registry = new schema.CoreSchemaRegistry();
-
-    return registry.compile(schemaJson).pipe(
-      concatMap(validator => validator(contentJson)),
-      concatMap(validatorResult => {
-        if (validatorResult.success) {
-          return of(contentJson as T);
-        } else {
-          return _throw(new SchemaValidationException(validatorResult.errors as string[]));
-        }
-      }),
-    );
-  }
-
   private _loadJsonFile(path: Path): Observable<JsonObject> {
-    return this._host.read(normalize(path)).pipe(
+    return this._workspace.host.read(normalize(path)).pipe(
       map(buffer => virtualFs.fileBufferToString(buffer)),
       map(str => parseJson(str, JsonParseMode.Loose) as {} as JsonObject),
     );
