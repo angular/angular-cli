@@ -7,12 +7,10 @@
  */
 
 import { tap } from 'rxjs/operators';
-import { TestProjectHost, browserWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
+import { browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder allow js', () => {
-  const host = new TestProjectHost(workspaceRoot);
-
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
@@ -25,7 +23,7 @@ describe('Browser Builder allow js', () => {
     // TODO: this test originally edited tsconfig to have `"allowJs": true` but works without it.
     // Investigate.
 
-    runTargetSpec(host, browserWorkspaceTarget).pipe(
+    runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -38,7 +36,7 @@ describe('Browser Builder allow js', () => {
 
     const overrides = { aot: true };
 
-    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);

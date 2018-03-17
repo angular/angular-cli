@@ -7,12 +7,10 @@
  */
 
 import { tap } from 'rxjs/operators';
-import { TestProjectHost, browserWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
+import { browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder tsconfig paths', () => {
-  const host = new TestProjectHost(workspaceRoot);
-
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
@@ -33,7 +31,7 @@ describe('Browser Builder tsconfig paths', () => {
       },
     `);
 
-    runTargetSpec(host, browserWorkspaceTarget).pipe(
+    runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -75,7 +73,7 @@ describe('Browser Builder tsconfig paths', () => {
       console.log(meaning5)
     `);
 
-    runTargetSpec(host, browserWorkspaceTarget).pipe(
+    runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);

@@ -9,18 +9,10 @@
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { concatMap, take, tap } from 'rxjs/operators';
 import { DevServerBuilderOptions } from '../../src';
-import {
-  TestProjectHost,
-  browserWorkspaceTarget,
-  devServerWorkspaceTarget,
-  request,
-  runTargetSpec,
-  workspaceRoot,
-} from '../utils';
+import { devServerTargetSpec, host, request, runTargetSpec } from '../utils';
 
 
 describe('Dev Server Builder public host', () => {
-  const host = new TestProjectHost(workspaceRoot);
   // We have to spoof the host to a non-numeric one because Webpack Dev Server does not
   // check the hosts anymore when requests come from numeric IP addresses.
   const headers = { host: 'http://spoofy.mcspoofface' };
@@ -29,7 +21,7 @@ describe('Dev Server Builder public host', () => {
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
   it('works', (done) => {
-    runTargetSpec(host, [browserWorkspaceTarget, devServerWorkspaceTarget]).pipe(
+    runTargetSpec(host, devServerTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => fromPromise(request('http://localhost:4200/', headers))),
       tap(response => expect(response).toContain('Invalid Host header')),
@@ -40,7 +32,7 @@ describe('Dev Server Builder public host', () => {
   it('works', (done) => {
     const overrides: Partial<DevServerBuilderOptions> = { publicHost: headers.host };
 
-    runTargetSpec(host, [browserWorkspaceTarget, devServerWorkspaceTarget], overrides).pipe(
+    runTargetSpec(host, devServerTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => fromPromise(request('http://localhost:4200/', headers))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),
@@ -51,7 +43,7 @@ describe('Dev Server Builder public host', () => {
   it('works', (done) => {
     const overrides: Partial<DevServerBuilderOptions> = { disableHostCheck: true };
 
-    runTargetSpec(host, [browserWorkspaceTarget, devServerWorkspaceTarget], overrides).pipe(
+    runTargetSpec(host, devServerTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => fromPromise(request('http://localhost:4200/', headers))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),

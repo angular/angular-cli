@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-export * from './default-workspaces';
 export * from './request';
 export * from './test-project-host';
 export * from './test-logger';

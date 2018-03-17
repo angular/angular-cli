@@ -9,12 +9,12 @@
 // import { Architect } from '@angular-devkit/architect';
 // import { join, normalize, virtualFs } from '@angular-devkit/core';
 // import { concatMap, tap } from 'rxjs/operators';
-// import { TestProjectHost, browserWorkspaceTarget, makeWorkspace, workspaceRoot } from '../utils';
+// import { host, browserTargetSpec, makeWorkspace } from '../utils';
 
 
 // TODO: re-enable this test when the functionality is implemented, wether by option or via VFS.
 // describe('Browser Builder file replacements', () => {
-//   const host = new TestProjectHost(workspaceRoot);
+//
 //   const architect = new Architect(normalize(workspaceRoot), host);
 //   const outputPath = normalize('dist');
 
@@ -28,7 +28,7 @@
 //       ],
 //     };
 
-//     architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
+//     architect.loadWorkspaceFromJson(makeWorkspace(browserTargetSpec)).pipe(
 //       concatMap(() => architect.run(architect.getTarget({ overrides }))),
 //       tap(() => {
 //         const fileName = join(outputPath, 'main.js');
@@ -48,7 +48,7 @@
 //       ],
 //     };
 
-//     architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
+//     architect.loadWorkspaceFromJson(makeWorkspace(browserTargetSpec)).pipe(
 //       concatMap(() => architect.run(architect.getTarget({ overrides }))),
 //       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
 //     ).subscribe(undefined, done.fail, done);
@@ -64,7 +64,7 @@
 //       ],
 //     };
 
-//     architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
+//     architect.loadWorkspaceFromJson(makeWorkspace(browserTargetSpec)).pipe(
 //       concatMap(() => architect.run(architect.getTarget({ overrides }))),
 //       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
 //     ).subscribe(undefined, done.fail, done);

@@ -7,12 +7,10 @@
  */
 
 import { tap } from 'rxjs/operators';
-import { TestProjectHost, browserWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
+import { browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder no entry module', () => {
-  const host = new TestProjectHost(workspaceRoot);
-
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
@@ -23,7 +21,7 @@ describe('Browser Builder no entry module', () => {
 
     const overrides = { baseHref: '/myUrl' };
 
-    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);

@@ -6,30 +6,38 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect, BuildEvent, Target } from '@angular-devkit/architect';
-import { experimental, logging } from '@angular-devkit/core';
+import { Architect, BuildEvent, TargetSpecifier } from '@angular-devkit/architect';
+import { experimental, join, logging, normalize } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
 import { concatMap, tap } from 'rxjs/operators';
-import { TestProjectHost, workspaceRoot } from '../utils';
-import { makeWorkspace } from './default-workspaces';
+import { TestProjectHost } from '../utils/test-project-host';
 
+
+const workspaceFile = normalize('.angular.json');
+const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
+
+export const workspaceRoot = join(devkitRoot,
+  'tests/@angular_devkit/build_webpack/hello-world-app/');
+export const host = new TestProjectHost(workspaceRoot);
+export const outputPath = normalize('dist');
+export const browserTargetSpec = { project: 'app', target: 'build' };
+export const devServerTargetSpec = { project: 'app', target: 'serve' };
+export const extractI18nTargetSpec = { project: 'app', target: 'extract-i18n' };
+export const karmaTargetSpec = { project: 'app', target: 'test' };
+export const tslintTargetSpec = { project: 'app', target: 'lint' };
+export const protractorTargetSpec = { project: 'app-e2e', target: 'e2e' };
 
 export function runTargetSpec(
   host: TestProjectHost,
-  targets: Target<{}> | Target<{}>[],
+  targetSpec: TargetSpecifier,
   overrides = {},
   logger: logging.Logger = new logging.NullLogger(),
 ): Observable<BuildEvent> {
-  if (!Array.isArray(targets)) {
-    targets = [targets];
-  }
-
-  const targetName = targets[targets.length - 1].builder;
-  const targetSpec = { project: 'app', target: targetName, overrides };
+  targetSpec = { ...targetSpec, overrides };
   const workspace = new experimental.workspace.Workspace(workspaceRoot, host);
   let architect: Architect;
 
-  return workspace.loadWorkspaceFromJson(makeWorkspace(targets)).pipe(
+  return workspace.loadWorkspaceFromHost(workspaceFile).pipe(
     concatMap(ws => new Architect(ws).loadArchitect()),
     tap(arch => architect = arch),
     concatMap(() => architect.getBuilderConfiguration(targetSpec)),

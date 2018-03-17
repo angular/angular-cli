@@ -8,12 +8,10 @@
 
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { TestProjectHost, browserWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
+import { browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder assets', () => {
-  const host = new TestProjectHost(workspaceRoot);
-
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
@@ -39,7 +37,7 @@ describe('Browser Builder assets', () => {
       ],
     };
 
-    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         // Assets we expect should be there.
@@ -68,7 +66,7 @@ describe('Browser Builder assets', () => {
   //     ],
   //   };
 
-  //   architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
+  //   architect.loadWorkspaceFromJson(makeWorkspace(browserTargetSpec)).pipe(
   //     concatMap(() => architect.run(architect.getTarget({ overrides }))),
   //   ).subscribe(undefined, (err) => {
   //     expect(err.message)
@@ -92,7 +90,7 @@ describe('Browser Builder assets', () => {
       ],
     };
 
-    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);

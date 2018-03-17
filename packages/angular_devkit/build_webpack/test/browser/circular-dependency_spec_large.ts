@@ -7,18 +7,10 @@
  */
 
 import { tap } from 'rxjs/operators';
-import {
-  TestLogger,
-  TestProjectHost,
-  browserWorkspaceTarget,
-  runTargetSpec,
-  workspaceRoot,
-} from '../utils';
+import { TestLogger, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder circular dependency detection', () => {
-  const host = new TestProjectHost(workspaceRoot);
-
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
@@ -29,7 +21,7 @@ describe('Browser Builder circular dependency detection', () => {
     const overrides = { baseHref: '/myUrl' };
     const logger = new TestLogger('circular-dependencies');
 
-    runTargetSpec(host, browserWorkspaceTarget, overrides, logger).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(logger.includes('Circular dependency detected')).toBe(true)),
     ).subscribe(undefined, done.fail, done);

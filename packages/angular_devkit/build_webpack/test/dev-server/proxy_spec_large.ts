@@ -11,19 +11,10 @@ import * as http from 'http';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { concatMap, take, tap } from 'rxjs/operators';
 import { DevServerBuilderOptions } from '../../src';
-import {
-  TestProjectHost,
-  browserWorkspaceTarget,
-  devServerWorkspaceTarget,
-  request,
-  runTargetSpec,
-  workspaceRoot,
-} from '../utils';
+import { devServerTargetSpec, host, request, runTargetSpec } from '../utils';
 
 
 describe('Dev Server Builder proxy', () => {
-  const host = new TestProjectHost(workspaceRoot);
-
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
@@ -48,7 +39,7 @@ describe('Dev Server Builder proxy', () => {
 
     const overrides: Partial<DevServerBuilderOptions> = { proxyConfig: 'proxy.config.json' };
 
-    runTargetSpec(host, [browserWorkspaceTarget, devServerWorkspaceTarget], overrides).pipe(
+    runTargetSpec(host, devServerTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => fromPromise(request('http://localhost:4200/api/test'))),
       tap(response => {
@@ -62,7 +53,7 @@ describe('Dev Server Builder proxy', () => {
   it('errors out with a missing proxy file', (done) => {
     const overrides: Partial<DevServerBuilderOptions> = { proxyConfig: '../proxy.config.json' };
 
-    runTargetSpec(host, [browserWorkspaceTarget, devServerWorkspaceTarget], overrides)
+    runTargetSpec(host, devServerTargetSpec, overrides)
       .subscribe(undefined, done, done.fail);
   }, 30000);
 });

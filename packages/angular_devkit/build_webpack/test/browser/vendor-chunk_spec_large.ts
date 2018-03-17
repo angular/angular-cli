@@ -8,11 +8,10 @@
 
 import { join, normalize } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { TestProjectHost, browserWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
+import { browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder vendor chunk', () => {
-  const host = new TestProjectHost(workspaceRoot);
   const outputPath = normalize('dist');
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
@@ -21,7 +20,7 @@ describe('Browser Builder vendor chunk', () => {
   it('works', (done) => {
     const overrides = { vendorChunk: true };
 
-    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'vendor.js');

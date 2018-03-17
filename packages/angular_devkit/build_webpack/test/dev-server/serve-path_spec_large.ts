@@ -9,19 +9,10 @@
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { concatMap, take, tap } from 'rxjs/operators';
 import { DevServerBuilderOptions } from '../../src';
-import {
-  TestProjectHost,
-  browserWorkspaceTarget,
-  devServerWorkspaceTarget,
-  request,
-  runTargetSpec,
-  workspaceRoot,
-} from '../utils';
+import { devServerTargetSpec, host, request, runTargetSpec } from '../utils';
 
 
 describe('Dev Server Builder serve path', () => {
-  const host = new TestProjectHost(workspaceRoot);
-
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
@@ -29,7 +20,7 @@ describe('Dev Server Builder serve path', () => {
   it('works', (done) => {
     const overrides: Partial<DevServerBuilderOptions> = { servePath: 'test/' };
 
-    runTargetSpec(host, [browserWorkspaceTarget, devServerWorkspaceTarget], overrides).pipe(
+    runTargetSpec(host, devServerTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => fromPromise(request('http://localhost:4200/test/'))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),

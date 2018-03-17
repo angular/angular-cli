@@ -8,11 +8,10 @@
 
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { TestProjectHost, browserWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
+import { browserTargetSpec, host, runTargetSpec, workspaceRoot } from '../utils';
 
 
 describe('Browser Builder output path', () => {
-  const host = new TestProjectHost(workspaceRoot);
   const outputPath = normalize('dist');
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
@@ -25,7 +24,7 @@ describe('Browser Builder output path', () => {
     // Failed compilations still delete files, but don't output any.
     host.asSync().delete(join(workspaceRoot, 'src', 'app', 'app.component.ts'));
 
-    runTargetSpec(host, browserWorkspaceTarget).pipe(
+    runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
         expect(host.asSync().exists(outputPath)).toBe(false);
@@ -36,6 +35,6 @@ describe('Browser Builder output path', () => {
   it('does not allow output path to be project root', (done) => {
     const overrides = { outputPath: './' };
 
-    runTargetSpec(host, browserWorkspaceTarget, overrides).subscribe(undefined, done, done.fail);
+    runTargetSpec(host, browserTargetSpec, overrides).subscribe(undefined, done, done.fail);
   }, 30000);
 });

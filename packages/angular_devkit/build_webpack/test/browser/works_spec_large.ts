@@ -8,18 +8,17 @@
 
 import { join, normalize } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { TestProjectHost, browserWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
+import { browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder', () => {
-  const host = new TestProjectHost(workspaceRoot);
   const outputPath = normalize('dist');
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  // afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
   it('works', (done) => {
-    runTargetSpec(host, browserWorkspaceTarget).pipe(
+    runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         // Default files should be in outputPath.

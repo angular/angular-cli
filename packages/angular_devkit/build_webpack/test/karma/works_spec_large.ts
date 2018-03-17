@@ -7,17 +7,15 @@
  */
 
 import { tap } from 'rxjs/operators';
-import { TestProjectHost, karmaWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
+import { host, karmaTargetSpec, runTargetSpec } from '../utils';
 
 
 describe('Karma Builder', () => {
-  const host = new TestProjectHost(workspaceRoot);
-
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
   it('runs', (done) => {
-    runTargetSpec(host, karmaWorkspaceTarget).pipe(
+    runTargetSpec(host, karmaTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -26,7 +24,7 @@ describe('Karma Builder', () => {
     host.writeMultipleFiles({
       'src/app/app.component.spec.ts': '<p> definitely not typescript </p>',
     });
-    runTargetSpec(host, karmaWorkspaceTarget).pipe(
+    runTargetSpec(host, karmaTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -35,7 +33,7 @@ describe('Karma Builder', () => {
   // Need to investigate why. Might be TS 2.7.
   xit('supports ES2015 target', (done) => {
     host.replaceInFile('tsconfig.json', '"target": "es5"', '"target": "es2015"');
-    runTargetSpec(host, karmaWorkspaceTarget).pipe(
+    runTargetSpec(host, karmaTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);

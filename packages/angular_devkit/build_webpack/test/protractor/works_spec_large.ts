@@ -8,28 +8,15 @@
 
 import { normalize } from '@angular-devkit/core';
 import { retry } from 'rxjs/operators';
-import {
-  TestProjectHost,
-  browserWorkspaceTarget,
-  devServerWorkspaceTarget,
-  protractorWorkspaceTarget,
-  runTargetSpec,
-  workspaceRoot,
-} from '../utils';
+import { host, protractorTargetSpec, runTargetSpec } from '../utils';
 
 
 describe('Protractor Builder', () => {
-  const host = new TestProjectHost(workspaceRoot);
-
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
   it('works', (done) => {
-    runTargetSpec(host, [
-      browserWorkspaceTarget,
-      devServerWorkspaceTarget,
-      protractorWorkspaceTarget,
-    ]).pipe(
+    runTargetSpec(host, protractorTargetSpec).pipe(
       retry(3),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -37,23 +24,10 @@ describe('Protractor Builder', () => {
   it('works with no devServerTarget', (done) => {
     const overrides = { devServerTarget: undefined };
 
-    runTargetSpec(host, protractorWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, protractorTargetSpec, overrides).pipe(
       // This should fail because no server is available for connection.
     ).subscribe(undefined, done, done.fail);
   }, 30000);
-
-  it('picks up changed port in devServer', (done) => {
-    const modifiedDevServerTarget = devServerWorkspaceTarget;
-    modifiedDevServerTarget.options.port = 4400;
-
-    runTargetSpec(host, [
-      browserWorkspaceTarget,
-      modifiedDevServerTarget,
-      protractorWorkspaceTarget,
-    ]).pipe(
-      retry(3),
-    ).subscribe(undefined, done.fail, done);
-  }, 60000);
 
   it('overrides protractor specs', (done) => {
     host.asSync().rename(normalize('./e2e/app.e2e-spec.ts'),
@@ -61,11 +35,7 @@ describe('Protractor Builder', () => {
 
     const overrides = { specs: ['./e2e/renamed-app.e2e-spec.ts'] };
 
-    runTargetSpec(host, [
-      browserWorkspaceTarget,
-      devServerWorkspaceTarget,
-      protractorWorkspaceTarget,
-    ], overrides).pipe(
+    runTargetSpec(host, protractorTargetSpec, overrides).pipe(
       retry(3),
     ).subscribe(undefined, done.fail, done);
   }, 60000);
@@ -84,11 +54,7 @@ describe('Protractor Builder', () => {
 
     const overrides = { suite: 'app' };
 
-    runTargetSpec(host, [
-      browserWorkspaceTarget,
-      devServerWorkspaceTarget,
-      protractorWorkspaceTarget,
-    ], overrides).pipe(
+    runTargetSpec(host, protractorTargetSpec, overrides).pipe(
       retry(3),
     ).subscribe(undefined, done.fail, done);
   }, 60000);

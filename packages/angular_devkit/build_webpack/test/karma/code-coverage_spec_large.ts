@@ -9,11 +9,10 @@
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, tap } from 'rxjs/operators';
 import { KarmaBuilderOptions } from '../../src';
-import { TestProjectHost, karmaWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
+import { host, karmaTargetSpec, runTargetSpec } from '../utils';
 
 
 describe('Karma Builder code coverage', () => {
-  const host = new TestProjectHost(workspaceRoot);
   const coverageFilePath = normalize('coverage/lcov.info');
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
@@ -22,7 +21,7 @@ describe('Karma Builder code coverage', () => {
   it('works', (done) => {
     const overrides: Partial<KarmaBuilderOptions> = { codeCoverage: true };
 
-    runTargetSpec(host, karmaWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
       // It seems like the coverage files take a while being written to disk, so we wait 500ms here.
       debounceTime(500),
       tap(buildEvent => {
@@ -44,7 +43,7 @@ describe('Karma Builder code coverage', () => {
       ],
     };
 
-    runTargetSpec(host, karmaWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
       // It seems like the coverage files take a while being written to disk, so we wait 500ms here.
       debounceTime(500),
       tap(buildEvent => {

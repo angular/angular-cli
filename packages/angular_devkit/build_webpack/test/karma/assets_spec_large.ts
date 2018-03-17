@@ -6,12 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { TestProjectHost, karmaWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
+import { host, karmaTargetSpec, runTargetSpec } from '../utils';
 
 
 describe('Karma Builder assets', () => {
-  const host = new TestProjectHost(workspaceRoot);
-
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
@@ -94,7 +92,7 @@ describe('Karma Builder assets', () => {
       ],
     };
 
-    runTargetSpec(host, karmaWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
     ).subscribe(undefined, done.fail, done);
   }, 45000);
 });

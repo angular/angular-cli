@@ -8,11 +8,11 @@
 
 import { PathFragment, join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { TestProjectHost, browserWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
+import { browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder scripts array', () => {
-  const host = new TestProjectHost(workspaceRoot);
+
   const outputPath = normalize('dist');
   const scripts: { [path: string]: string } = {
     'src/input-script.js': 'console.log(\'input-script\'); var number = 1+1;',
@@ -66,7 +66,7 @@ describe('Browser Builder scripts array', () => {
       scripts: getScriptsOption(),
     };
 
-    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => Object.keys(matches).forEach(fileName => {
         const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
@@ -85,7 +85,7 @@ describe('Browser Builder scripts array', () => {
       scripts: getScriptsOption(),
     };
 
-    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const scriptsBundle = host.fileMatchExists(outputPath, /scripts\.[0-9a-f]{20}\.js/);
@@ -114,7 +114,7 @@ describe('Browser Builder scripts array', () => {
 
     const overrides = { scripts: getScriptsOption() };
 
-    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const re = new RegExp(

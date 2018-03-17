@@ -9,24 +9,17 @@
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
 import { TslintBuilderOptions } from '../../src';
-import {
-  TestLogger,
-  TestProjectHost,
-  runTargetSpec,
-  tslintWorkspaceTarget,
-  workspaceRoot,
-} from '../utils';
+import { TestLogger, host, runTargetSpec, tslintTargetSpec } from '../utils';
 
 
 describe('Tslint Target', () => {
-  const host = new TestProjectHost(workspaceRoot);
   const filesWithErrors = { 'src/foo.ts': 'const foo = "";\n' };
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
   it('works', (done) => {
-    runTargetSpec(host, tslintWorkspaceTarget).pipe(
+    runTargetSpec(host, tslintTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -35,7 +28,7 @@ describe('Tslint Target', () => {
     host.writeMultipleFiles(filesWithErrors);
     const overrides: Partial<TslintBuilderOptions> = { exclude: ['**/foo.ts'] };
 
-    runTargetSpec(host, tslintWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -44,7 +37,7 @@ describe('Tslint Target', () => {
     host.writeMultipleFiles(filesWithErrors);
     const overrides: Partial<TslintBuilderOptions> = { fix: true };
 
-    runTargetSpec(host, tslintWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = normalize('src/foo.ts');
@@ -59,7 +52,7 @@ describe('Tslint Target', () => {
     const logger = new TestLogger('lint-force');
     const overrides: Partial<TslintBuilderOptions> = { force: true };
 
-    runTargetSpec(host, tslintWorkspaceTarget, overrides, logger).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(logger.includes(`" should be '`)).toBe(true);
@@ -73,7 +66,7 @@ describe('Tslint Target', () => {
     const logger = new TestLogger('lint-format');
     const overrides: Partial<TslintBuilderOptions> = { format: 'stylish' };
 
-    runTargetSpec(host, tslintWorkspaceTarget, overrides, logger).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
       tap(() => {
         expect(logger.includes(`quotemark`)).toBe(true);
@@ -97,7 +90,7 @@ describe('Tslint Target', () => {
     });
     const overrides: Partial<TslintBuilderOptions> = { tslintConfig: undefined };
 
-    runTargetSpec(host, tslintWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -118,7 +111,7 @@ describe('Tslint Target', () => {
     });
     const overrides: Partial<TslintBuilderOptions> = { tslintConfig: 'tslint.json' };
 
-    runTargetSpec(host, tslintWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -129,7 +122,7 @@ describe('Tslint Target', () => {
       files: ['src/app/**/*.ts'],
     };
 
-    runTargetSpec(host, tslintWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -140,7 +133,7 @@ describe('Tslint Target', () => {
       typeCheck: true,
     };
 
-    runTargetSpec(host, tslintWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
     ).subscribe(undefined, done, done.fail);
   }, 30000);
 });

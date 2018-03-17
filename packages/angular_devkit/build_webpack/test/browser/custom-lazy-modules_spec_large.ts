@@ -9,14 +9,14 @@
 // import { Architect } from '@angular-devkit/architect';
 // import { join, normalize } from '@angular-devkit/core';
 // import { concatMap, tap, toArray } from 'rxjs/operators';
-// import { TestProjectHost, browserWorkspaceTarget, makeWorkspace, workspaceRoot } from '../utils';
+// import { host, browserTargetSpec, makeWorkspace } from '../utils';
 // import { lazyModuleFiles, lazyModuleImport } from './rebuild_spec_large';
 
 
 // TODO: re-enable this test when the custom lazy module changes have been ported over to
 // webpack-builder from the CLI.
 // describe('Browser Builder custom lazy modules', () => {
-//   const host = new TestProjectHost(workspaceRoot);
+//
 //   const architect = new Architect(normalize(workspaceRoot), host);
 //   const outputPath = normalize('dist');
 
@@ -47,7 +47,7 @@
 
 //     const overrides = { lazyModules: ['app/lazy/lazy.module'] };
 
-//     architect.loadWorkspaceFromJson(makeWorkspace(browserWorkspaceTarget)).pipe(
+//     architect.loadWorkspaceFromJson(makeWorkspace(browserTargetSpec)).pipe(
 //       concatMap(() => architect.run(architect.getTarget({ overrides }))),
 //       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
 //       tap(() =>

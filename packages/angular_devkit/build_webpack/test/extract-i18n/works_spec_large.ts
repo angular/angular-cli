@@ -8,18 +8,10 @@
 
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import {
-  TestLogger,
-  TestProjectHost,
-  browserWorkspaceTarget,
-  extractI18nWorkspaceTarget,
-  runTargetSpec,
-  workspaceRoot,
-} from '../utils';
+import { TestLogger, extractI18nTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Extract i18n Target', () => {
-  const host = new TestProjectHost(workspaceRoot);
   const extractionFile = join(normalize('src'), 'messages.xlf');
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
@@ -28,7 +20,7 @@ describe('Extract i18n Target', () => {
   it('works', (done) => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
 
-    runTargetSpec(host, [browserWorkspaceTarget, extractI18nWorkspaceTarget]).pipe(
+    runTargetSpec(host, extractI18nTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.asSync().exists((extractionFile))).toBe(true);
@@ -43,7 +35,7 @@ describe('Extract i18n Target', () => {
     host.appendToFile('src/app/app.component.html',
       '<p i18n>Hello world <span i18n>inner</span></p>');
 
-    runTargetSpec(host, [browserWorkspaceTarget, extractI18nWorkspaceTarget], {}, logger).pipe(
+    runTargetSpec(host, extractI18nTargetSpec, {}, logger).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
         const msg = 'Could not mark an element as translatable inside a translatable section';
@@ -56,7 +48,7 @@ describe('Extract i18n Target', () => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
     const overrides = { i18nLocale: 'fr' };
 
-    runTargetSpec(host, [browserWorkspaceTarget, extractI18nWorkspaceTarget], overrides).pipe(
+    runTargetSpec(host, extractI18nTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.asSync().exists((extractionFile))).toBe(true);
@@ -72,7 +64,7 @@ describe('Extract i18n Target', () => {
     const extractionFile = join(normalize('src'), outFile);
     const overrides = { outFile };
 
-    runTargetSpec(host, [browserWorkspaceTarget, extractI18nWorkspaceTarget], overrides).pipe(
+    runTargetSpec(host, extractI18nTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.asSync().exists(extractionFile)).toBe(true);
@@ -89,7 +81,7 @@ describe('Extract i18n Target', () => {
     const extractionFile = join(normalize('src'), outputPath, 'messages.xlf');
     const overrides = { outputPath };
 
-    runTargetSpec(host, [browserWorkspaceTarget, extractI18nWorkspaceTarget], overrides).pipe(
+    runTargetSpec(host, extractI18nTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.asSync().exists(extractionFile)).toBe(true);
@@ -104,7 +96,7 @@ describe('Extract i18n Target', () => {
     const extractionFile = join(normalize('src'), 'messages.xmb');
     const overrides = { i18nFormat: 'xmb' };
 
-    runTargetSpec(host, [browserWorkspaceTarget, extractI18nWorkspaceTarget], overrides).pipe(
+    runTargetSpec(host, extractI18nTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.asSync().exists(extractionFile)).toBe(true);

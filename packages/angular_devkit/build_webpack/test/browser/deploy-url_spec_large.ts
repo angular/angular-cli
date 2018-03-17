@@ -8,11 +8,10 @@
 
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { concatMap, tap } from 'rxjs/operators';
-import { TestProjectHost, browserWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
+import { browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder deploy url', () => {
-  const host = new TestProjectHost(workspaceRoot);
   const outputPath = normalize('dist');
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
@@ -21,14 +20,14 @@ describe('Browser Builder deploy url', () => {
   it('uses deploy url for bundles urls', (done) => {
     const overrides = { deployUrl: 'deployUrl/' };
 
-    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'index.html');
         const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
         expect(content).toContain('deployUrl/main.js');
       }),
-      concatMap(() => runTargetSpec(host, browserWorkspaceTarget,
+      concatMap(() => runTargetSpec(host, browserTargetSpec,
         { deployUrl: 'http://example.com/some/path/' })),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
@@ -42,7 +41,7 @@ describe('Browser Builder deploy url', () => {
   it('uses deploy url for in webpack runtime', (done) => {
     const overrides = { deployUrl: 'deployUrl/' };
 
-    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'runtime.js');

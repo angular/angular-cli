@@ -8,13 +8,11 @@
 
 import { normalize } from '@angular-devkit/core';
 import { concatMap, tap } from 'rxjs/operators';
-import { TestProjectHost, browserWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
+import { browserTargetSpec, host, runTargetSpec } from '../utils';
 import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_large';
 
 
 describe('Browser Builder output hashing', () => {
-  const host = new TestProjectHost(workspaceRoot);
-
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
@@ -62,7 +60,7 @@ describe('Browser Builder output hashing', () => {
 
     // We must do several builds instead of a single one in watch mode, so that the output
     // path is deleted on each run and only contains the most recent files.
-    runTargetSpec(host, browserWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap(() => {
         // Save the current hashes.
         oldHashes = generateFileHashMap();
@@ -70,7 +68,7 @@ describe('Browser Builder output hashing', () => {
         host.writeMultipleFiles(lazyModuleImport);
       }),
       // Lazy chunk hash should have changed without modifying main bundle.
-      concatMap(() => runTargetSpec(host, browserWorkspaceTarget, overrides)),
+      concatMap(() => runTargetSpec(host, browserTargetSpec, overrides)),
       tap(() => {
         newHashes = generateFileHashMap();
         validateHashes(oldHashes, newHashes, []);
@@ -78,7 +76,7 @@ describe('Browser Builder output hashing', () => {
         host.writeMultipleFiles({ 'src/styles.css': 'body { background: blue; }' });
       }),
       // Style hash should change.
-      concatMap(() => runTargetSpec(host, browserWorkspaceTarget, overrides)),
+      concatMap(() => runTargetSpec(host, browserTargetSpec, overrides)),
       tap(() => {
         newHashes = generateFileHashMap();
         validateHashes(oldHashes, newHashes, ['styles']);
@@ -86,7 +84,7 @@ describe('Browser Builder output hashing', () => {
         host.writeMultipleFiles({ 'src/app/app.component.css': 'h1 { margin: 10px; }' });
       }),
       // Main hash should change, since inline styles go in the main bundle.
-      concatMap(() => runTargetSpec(host, browserWorkspaceTarget, overrides)),
+      concatMap(() => runTargetSpec(host, browserTargetSpec, overrides)),
       tap(() => {
         newHashes = generateFileHashMap();
         validateHashes(oldHashes, newHashes, ['main']);
@@ -94,7 +92,7 @@ describe('Browser Builder output hashing', () => {
         host.appendToFile('src/app/lazy/lazy.module.ts', `console.log(1);`);
       }),
       // Lazy loaded bundle should change, and so should inline.
-      concatMap(() => runTargetSpec(host, browserWorkspaceTarget, overrides)),
+      concatMap(() => runTargetSpec(host, browserTargetSpec, overrides)),
       tap(() => {
         newHashes = generateFileHashMap();
         validateHashes(oldHashes, newHashes, ['lazy.module']);
@@ -102,7 +100,7 @@ describe('Browser Builder output hashing', () => {
         host.appendToFile('src/main.ts', '');
       }),
       // Nothing should have changed.
-      concatMap(() => runTargetSpec(host, browserWorkspaceTarget, overrides)),
+      concatMap(() => runTargetSpec(host, browserTargetSpec, overrides)),
       tap(() => {
         newHashes = generateFileHashMap();
         validateHashes(oldHashes, newHashes, []);
@@ -118,7 +116,7 @@ describe('Browser Builder output hashing', () => {
     // We must do several builds instead of a single one in watch mode, so that the output
     // path is deleted on each run and only contains the most recent files.
     // 'all' should hash everything.
-    runTargetSpec(host, browserWorkspaceTarget, { outputHashing: 'all', extractCss: true }).pipe(
+    runTargetSpec(host, browserTargetSpec, { outputHashing: 'all', extractCss: true }).pipe(
       tap(() => {
         expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeTruthy();
         expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeTruthy();
@@ -128,7 +126,7 @@ describe('Browser Builder output hashing', () => {
         expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeTruthy();
       }),
       // 'none' should hash nothing.
-      concatMap(() => runTargetSpec(host, browserWorkspaceTarget,
+      concatMap(() => runTargetSpec(host, browserTargetSpec,
         { outputHashing: 'none', extractCss: true })),
       tap(() => {
         expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeFalsy();
@@ -139,7 +137,7 @@ describe('Browser Builder output hashing', () => {
         expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeFalsy();
       }),
       // 'media' should hash css resources only.
-      concatMap(() => runTargetSpec(host, browserWorkspaceTarget,
+      concatMap(() => runTargetSpec(host, browserTargetSpec,
         { outputHashing: 'media', extractCss: true })),
       tap(() => {
         expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeFalsy();
@@ -150,7 +148,7 @@ describe('Browser Builder output hashing', () => {
         expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeTruthy();
       }),
       // 'bundles' should hash bundles only.
-      concatMap(() => runTargetSpec(host, browserWorkspaceTarget,
+      concatMap(() => runTargetSpec(host, browserTargetSpec,
         { outputHashing: 'bundles', extractCss: true })),
       tap(() => {
         expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeTruthy();

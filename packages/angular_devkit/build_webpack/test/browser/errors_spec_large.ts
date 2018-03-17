@@ -7,18 +7,10 @@
  */
 
 import { tap } from 'rxjs/operators';
-import {
-  TestLogger,
-  TestProjectHost,
-  browserWorkspaceTarget,
-  runTargetSpec,
-  workspaceRoot,
-} from '../utils';
+import { TestLogger, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder errors', () => {
-  const host = new TestProjectHost(workspaceRoot);
-
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
@@ -29,7 +21,7 @@ describe('Browser Builder errors', () => {
     `);
     const logger = new TestLogger('errors-compilation');
 
-    runTargetSpec(host, browserWorkspaceTarget, undefined, logger).pipe(
+    runTargetSpec(host, browserTargetSpec, undefined, logger).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
         expect(logger.includes('polyfills.ts is missing from the TypeScript')).toBe(true);
@@ -41,7 +33,7 @@ describe('Browser Builder errors', () => {
     host.appendToFile('src/app/app.component.ts', ']]]');
     const logger = new TestLogger('errors-syntax');
 
-    runTargetSpec(host, browserWorkspaceTarget, undefined, logger).pipe(
+    runTargetSpec(host, browserTargetSpec, undefined, logger).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
         expect(logger.includes('Declaration or statement expected.')).toBe(true);
@@ -53,7 +45,7 @@ describe('Browser Builder errors', () => {
     host.replaceInFile('src/app/app.component.ts', `'app-root'`, `(() => 'app-root')()`);
     const logger = new TestLogger('errors-static');
 
-    runTargetSpec(host, browserWorkspaceTarget, { aot: true }, logger).pipe(
+    runTargetSpec(host, browserTargetSpec, { aot: true }, logger).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
         expect(logger.includes('Function expressions are not supported in')).toBe(true);

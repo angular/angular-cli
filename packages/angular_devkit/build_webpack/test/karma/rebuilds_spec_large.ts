@@ -7,7 +7,7 @@
  */
 
 import { debounceTime, take, tap } from 'rxjs/operators';
-import { TestProjectHost, karmaWorkspaceTarget, runTargetSpec, workspaceRoot } from '../utils';
+import { host, karmaTargetSpec, runTargetSpec } from '../utils';
 
 
 // Karma watch mode is currently bugged:
@@ -15,14 +15,12 @@ import { TestProjectHost, karmaWorkspaceTarget, runTargetSpec, workspaceRoot } f
 // - karma does not have a way to close the server gracefully.
 // TODO: fix these before 6.0 final.
 xdescribe('Karma Builder watch mode', () => {
-  const host = new TestProjectHost(workspaceRoot);
-
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
   it('works', (done) => {
     const overrides = { watch: true };
-    runTargetSpec(host, karmaWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
       debounceTime(500),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       take(1),
@@ -33,7 +31,7 @@ xdescribe('Karma Builder watch mode', () => {
     const overrides = { watch: true };
     let buildNumber = 0;
 
-    runTargetSpec(host, karmaWorkspaceTarget, overrides).pipe(
+    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
       debounceTime(500),
       tap((buildEvent) => {
         buildNumber += 1;
