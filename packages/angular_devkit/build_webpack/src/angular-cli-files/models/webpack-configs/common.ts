@@ -91,9 +91,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   // process asset entries
   if (appConfig.assets) {
-    const copyWebpackPluginPatterns = appConfig.assets.map((asset: string | AssetPattern) => {
-      // Convert all string assets to object notation.
-      asset = typeof asset === 'string' ? { glob: asset } : asset;
+    const copyWebpackPluginPatterns = appConfig.assets.map((asset: AssetPattern) => {
       // Add defaults.
       // Input is always resolved relative to the projectRoot.
       // TODO: add smart defaults to schema to use project root as default.

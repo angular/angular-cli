@@ -122,8 +122,7 @@
         },
         "input": {
           "type": "string",
-          "description": "The input path dir in which to apply 'glob'.",
-          "default": "./"
+          "description": "The input path dir in which to apply 'glob'."
         },
         "output": {
           "type": "string",

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { tap } from 'rxjs/operators';
 import { host, karmaTargetSpec, runTargetSpec } from '../utils';
 
 
@@ -88,11 +89,12 @@ describe('Karma Builder assets', () => {
       assets: [
         { glob: 'glob-asset.txt' },
         { glob: 'output-asset.txt', output: 'output-folder' },
-        { glob: '**/*', input: 'folder', output: 'folder' },
+        { glob: '**/*', input: 'src/folder', output: 'folder' },
       ],
     };
 
     runTargetSpec(host, karmaTargetSpec, overrides).pipe(
+      tap(buildEvent => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 45000);
 });

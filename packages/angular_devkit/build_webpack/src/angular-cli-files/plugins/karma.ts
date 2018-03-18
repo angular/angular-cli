@@ -8,7 +8,6 @@ import * as webpack from 'webpack';
 const webpackDevMiddleware = require('webpack-dev-middleware');
 
 import { AssetPattern } from '../models/webpack-configs/utils';
-import { isDirectory } from '../utilities/is-directory';
 import { KarmaWebpackFailureCb } from './karma-webpack-failure-cb';
 
 /**
@@ -50,7 +49,7 @@ function addKarmaFiles(files: any[], newFiles: any[], prepend = false) {
 
 const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   const options = config.buildWebpack.options;
-  const projectRoot = config.buildWebpack.projectRoot;
+  const projectRoot = config.buildWebpack.projectRoot as string;
   successCb = config.buildWebpack.successCb;
   failureCb = config.buildWebpack.failureCb;
 
@@ -71,38 +70,26 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     ], true);
   }
 
-  // Add assets. This logic is mimics the one present in GlobCopyWebpackPlugin.
+  // Add assets. This logic is mimics the one present in GlobCopyWebpackPlugin, but proxies
+  // asset requests to the Webpack server.
   if (options.assets) {
     config.proxies = config.proxies || {};
     options.assets.forEach((pattern: AssetPattern) => {
-      // Convert all string patterns to Pattern type.
-      pattern = typeof pattern === 'string' ? { glob: pattern } : pattern;
-      // Add defaults.
-      // Input is always resolved relative to the projectRoot.
-      pattern.input = path.resolve(projectRoot, pattern.input || '');
-      pattern.output = pattern.output || '';
-      pattern.glob = pattern.glob || '';
+      // TODO: use smart defaults in schema to do this instead.
+      // Default input to be projectRoot.
+      pattern.input = pattern.input || projectRoot;
 
-      // Build karma file pattern.
-      const assetPath = path.join(pattern.input, pattern.glob);
-      const filePattern = isDirectory(assetPath) ? assetPath + '/**' : assetPath;
-      addKarmaFiles(config.files, [{ pattern: filePattern, included: false }]);
-
-      // The `files` entry serves the file from `/base/{asset.input}/{asset.glob}`.
-      // We need to add a URL rewrite that exposes the asset as `/{asset.output}/{asset.glob}`.
-      let relativePath: string, proxyPath: string;
-      if (fs.existsSync(assetPath)) {
-        relativePath = path.relative(config.basePath, assetPath);
+      // Determine Karma proxy path.
+      let proxyPath: string;
+      if (fs.existsSync(path.join(pattern.input, pattern.glob))) {
         proxyPath = path.join(pattern.output, pattern.glob);
       } else {
         // For globs (paths that don't exist), proxy pattern.output to pattern.input.
-        relativePath = path.relative(config.basePath, pattern.input);
         proxyPath = path.join(pattern.output);
-
       }
       // Proxy paths must have only forward slashes.
       proxyPath = proxyPath.replace(/\\/g, '/');
-      config.proxies['/' + proxyPath] = '/base/' + relativePath;
+      config.proxies['/' + proxyPath] = '/_karma_webpack_/' + proxyPath;
     });
   }
 
