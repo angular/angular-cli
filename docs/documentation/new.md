@@ -149,7 +149,7 @@ Default applications are created in a directory of the same name, with an initia
       <li>scss</li>
       <li>less</li>
       <li>sass</li>
-      <li>styl (<code>stylus</code>)<li>
+      <li>styl (<code>stylus</code>)</li>
     </ul>
   </div>
   <p>
