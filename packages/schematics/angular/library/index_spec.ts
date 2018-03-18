@@ -117,7 +117,7 @@ describe('Library Schematic', () => {
         devDependencies: {
           typescript: '~2.5.0',
         },
-      })));
+      }))).subscribe();
       mockTree = new HostTree(memoryfs);
     });
 

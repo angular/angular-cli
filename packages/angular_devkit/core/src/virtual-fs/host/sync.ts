@@ -25,7 +25,7 @@ export class SynchronousDelegateExpectedException extends BaseException {
 /**
  * Implement a synchronous-only host interface (remove the Observable parts).
  */
-export class SyncDelegateHost<T extends object> {
+export class SyncDelegateHost<T extends object = {}> {
   constructor(protected _delegate: Host<T>) {
     if (!_delegate.capabilities.synchronous) {
       throw new SynchronousDelegateExpectedException();
@@ -91,7 +91,7 @@ export class SyncDelegateHost<T extends object> {
   }
 
   // Some hosts may not support stat.
-  stats(path: Path): Stats<T> | null {
+  stat(path: Path): Stats<T> | null {
     const result: Observable<Stats<T>> | null = this._delegate.stat(path);
 
     if (result) {

@@ -64,7 +64,7 @@ export class TestProjectHost extends NodeJsSyncHost {
   }
 
   // Some hosts may not support stat.
-  stat(path: Path): Observable<virtualFs.Stats<Stats>> | null {
+  stat(path: Path): Observable<virtualFs.Stats<Stats>> {
     return super.stat(resolve(this._root, path));
   }
 
