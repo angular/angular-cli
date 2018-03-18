@@ -24,7 +24,7 @@ export const enum HostWatchEventType {
   Renamed = 3,  // Applied to the original file path.
 }
 
-export type Stats<T extends object> = T & {
+export type Stats<T extends object = {}> = T & {
   isFile(): boolean;
   isDirectory(): boolean;
 
