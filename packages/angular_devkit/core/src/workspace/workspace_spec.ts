@@ -157,6 +157,13 @@ describe('Workspace', () => {
     ).subscribe(undefined, done.fail, done);
   });
 
+  it('lists project names', (done) => {
+    const workspace = new Workspace(root, host);
+    workspace.loadWorkspaceFromJson(workspaceJson).pipe(
+      tap((ws) => expect(ws.listProjectNames()).toEqual(['app'])),
+    ).subscribe(undefined, done.fail, done);
+  });
+
   it('gets project by name', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(

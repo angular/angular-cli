@@ -136,6 +136,10 @@ export class Workspace {
     return this._workspace.newProjectRoot;
   }
 
+  listProjectNames(): string[] {
+    return Object.keys(this._workspace.projects);
+  }
+
   getProject(projectName: string): WorkspaceProject {
     this._assertLoaded();
 
