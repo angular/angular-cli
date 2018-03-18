@@ -33,7 +33,7 @@ export default function() {
 
   return Promise.resolve()
     .then(() => writeFile(proxyConfigFile, JSON.stringify(proxyConfig, null, 2)))
-    .then(() => ngServe('--proxy-config', '../' + proxyConfigFile))
+    .then(() => ngServe('--proxy-config', proxyConfigFile))
     .then(() => request('http://localhost:4200/api/test'))
     .then(body => {
       if (!body.match(/TEST_API_RETURN/)) {

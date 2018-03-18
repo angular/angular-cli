@@ -37,9 +37,11 @@ export default function () {
       'src/assets/small-id.svg': imgSvg
     }))
     .then(() => copyProjectAsset('images/spectrum.png', './assets/large.png'))
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['styles'] = ['styles.scss'];
+    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+      const appArchitect = workspaceJson.projects.app.architect;
+      appArchitect.build.options.styles = [
+        { input: 'src/styles.scss' }
+      ];
     }))
     .then(() => ng('build', '--extract-css', '--aot'))
     .then(({ stdout }) => {

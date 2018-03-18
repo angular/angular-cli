@@ -8,9 +8,11 @@ export default function() {
 
   return Promise.resolve()
     .then(() => silentNpm('install', 'material-design-icons@3.0.1'))
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['styles'].push('../node_modules/material-design-icons/iconfont/material-icons.css');
+    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+      const appArchitect = workspaceJson.projects.app.architect;
+      appArchitect.build.options.styles = [
+        { input: 'node_modules/material-design-icons/iconfont/material-icons.css' }
+      ];
     }))
     .then(() => ng('build', '--extract-css'))
     .then(() => expectFileToMatch('dist/styles.css', 'Material Icons'))

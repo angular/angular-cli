@@ -14,13 +14,13 @@ export default function() {
     return Promise.resolve();
   }
 
-  return ng('build', '--output-path', '../build-output')
+  return ng('build', '--output-path', 'build-output')
     .then(() => expectFileToExist('./build-output/index.html'))
     .then(() => expectFileToExist('./build-output/main.js'))
     .then(() => expectToFail(expectGitToBeClean))
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['outDir'] = 'config-build-output';
+    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+      const appArchitect = workspaceJson.projects.app.architect;
+      appArchitect.build.options.outputPath = 'config-build-output';
     }))
     .then(() => ng('build'))
     .then(() => expectFileToExist('./config-build-output/index.html'))

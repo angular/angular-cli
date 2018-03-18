@@ -1,29 +1,28 @@
-import { Command, CommandScope, Option } from '../models/command';
+import { CommandScope, Option } from '../models/command';
+import { ArchitectCommand } from '../models/architect-command';
 
-export interface Xi18nOptions {
-  outputPath?: string;
-  verbose?: boolean;
-  i18nFormat?: string;
-  locale?: string;
-  outFile?: string;
+export interface Options {
+  project?: string;
+  configuration?: string;
 }
 
-export default class Xi18nCommand extends Command {
-  public readonly name = 'xi18n';
+export default class Xi18nCommand extends ArchitectCommand {
+  public readonly name = 'xi81n';
+  public readonly target = 'extract-i18n';
   public readonly description = 'Extracts i18n messages from source code.';
-  public static aliases: string[] = [];
   public readonly scope = CommandScope.inProject;
-  public readonly arguments: string[] = [];
-  public readonly options: Option[] = [];
+  public readonly options: Option[] = [
+    this.configurationOption
+  ];
 
-  public async run(options: any) {
-    const {Extracti18nTask} = require('../tasks/extract-i18n');
-
-    const xi18nTask = new Extracti18nTask({
-      ui: this.ui,
-      project: this.project
+  public async run(options: Options) {
+    const overrides = { ...options };
+    delete overrides.project;
+    return this.runArchitectTarget({
+      project: options.project,
+      target: this.target,
+      configuration: options.configuration,
+      overrides
     });
-
-    return await xi18nTask.run(options);
   }
 }

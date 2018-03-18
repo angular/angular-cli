@@ -1,14 +1,28 @@
-import { normalize } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import { Architect, Target } from '@angular-devkit/architect';
+import { experimental } from '@angular-devkit/core';
+import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
+import { Architect, TargetSpecifier } from '@angular-devkit/architect';
 import { Command, Option } from './command';
-import { run, RunOptions } from '../utilities/architect';
-import { concatMap, map } from 'rxjs/operators';
-import { createArchitectWorkspace } from '../utilities/build-webpack-compat';
-import { CliConfig } from './config';
+import { from } from 'rxjs/observable/from';
+import { concatMap, map, tap, toArray } from 'rxjs/operators';
+import { WorkspaceLoader } from '../models/workspace-loader';
+import { of } from 'rxjs/observable/of';
 const stringUtils = require('ember-cli-string-utils');
 
+// TODO: consider making this a local project dependency instead.
+// We assume the default build-webpack package, so we need to add it here for the dep checker.
+// require('@angular-devkit/build-webpack')
+
+export interface GenericTargetTargetSpecifier {
+  target: string;
+  configuration?: string;
+}
+
 export abstract class ArchitectCommand extends Command {
+  private _host = new NodeJsSyncHost();
+  private _architect: Architect;
+  private _workspace: experimental.workspace.Workspace;
+  private _logger = createConsoleLogger();
+
   readonly Options: Option[] = [{
     name: 'configuration',
     description: 'The configuration',
@@ -18,36 +32,60 @@ export abstract class ArchitectCommand extends Command {
 
   readonly arguments = ['project'];
 
-  abstract target: string;
+  target: string | undefined;
 
   public async initialize(options: any) {
-    const targetOptions = {
-      project: options.project || '$$proj0',
-      target: this.target,
-      configuration: options.configuration,
-      // Don't add overrides because they are not in the correct option format yet
-      // overrides: convertOverrides
-    };
-
-    let architectTarget: Target;
-    const host = new NodeJsSyncHost();
-    const architect = new Architect(normalize(this.project.root), host);
-    const cliConfig = CliConfig.fromProject().config;
-    const workspaceConfig = createArchitectWorkspace(cliConfig);
-    return architect.loadWorkspaceFromJson(workspaceConfig).pipe(
+    return this._loadWorkspaceAndArchitect().pipe(
       concatMap(() => {
-        // Get the target without overrides to get the builder description.
-        architectTarget = architect.getTarget(targetOptions);
+        let targetSpec: TargetSpecifier;
+        if (options.project) {
+          targetSpec = {
+            project: options.project,
+            target: this.target
+          };
+        } else if (options.target) {
+          const [project, target] = options.target.split(':');
+          targetSpec = { project, target };
+        } else if (this.target) {
+          const projects = this.getAllProjectsForTargetName(this.target);
 
-        // Load the description.
-        return architect.getBuilderDescription(architectTarget);
-      }),
-      map(builderDescription => {
-        return builderDescription.schema;
-      }))
-      .toPromise()
-      .then((schema) => this.mapArchitectOptions(schema))
-      .then(() => { });
+          if (projects.length === 1) {
+            // If there is a single target, use it to parse overrides.
+            targetSpec = {
+              project: projects[0],
+              target: this.target
+            };
+          } else {
+            // Multiple targets can have different, incompatible options.
+            // We only lookup options for single targets.
+            return of(null);
+          }
+        } else {
+          throw new Error('Cannot determine project or target for Architect command.');
+        }
+
+        const builderConfig = this._architect.getBuilderConfiguration(targetSpec);
+
+        return this._architect.getBuilderDescription(builderConfig).pipe(
+          tap((builderDesc) => this.mapArchitectOptions(builderDesc.schema))
+        );
+      })
+    ).toPromise();
+  }
+
+  public validate(options: any) {
+    if (!options.project && this.target) {
+      const projectNames = this.getAllProjectsForTargetName(this.target);
+      const overrides = { ...options };
+      delete overrides.project;
+      delete overrides.configuration;
+      delete overrides.prod;
+      if (projectNames.length > 1 && Object.keys(overrides).length > 0) {
+        throw new Error('Architect commands with multiple targets cannot specify overrides.'
+          + `'${this.target}' would be run on the following projects: ${projectNames.join()}`);
+      }
+    }
+    return true;
   }
 
   protected mapArchitectOptions(schema: any) {
@@ -111,20 +149,37 @@ export abstract class ArchitectCommand extends Command {
     aliases: ['c']
   };
 
-  protected async runArchitect(options: RunArchitectOptions): Promise<number> {
-    const runOptions: RunOptions = {
-      target: this.target,
-      root: this.project.root,
-      ...options
-    };
-    const buildResult = await run(runOptions).toPromise();
+  protected async runArchitectTarget(targetSpec: TargetSpecifier): Promise<number> {
+    const runSingleTarget = (targetSpec: TargetSpecifier) => this._architect.run(
+      this._architect.getBuilderConfiguration(targetSpec), { logger: this._logger }
+    ).pipe(
+      map(buildEvent => buildEvent.success ? 0 : 1)
+    );
 
-    return buildResult.success ? 0 : 1;
+    if (!targetSpec.project && this.target) {
+      // This runs each target sequentially. Running them in parallel would jumble the log messages.
+      return from(this.getAllProjectsForTargetName(this.target)).pipe(
+        concatMap(project => runSingleTarget({ ...targetSpec, project })),
+        toArray(),
+      ).toPromise().then(results => results.every(res => res === 0) ? 0 : 1);
+    } else {
+      return runSingleTarget(targetSpec).toPromise();
+    }
   }
-}
 
-export interface RunArchitectOptions {
-  app: string;
-  configuration?: string;
-  overrides?: object;
+  private getAllProjectsForTargetName(targetName: string) {
+    return this._workspace.listProjectNames().map(projectName =>
+      this._architect.listProjectTargets(projectName).includes(targetName) ? projectName : null
+    ).filter(x => !!x);
+  }
+
+  private _loadWorkspaceAndArchitect() {
+    const workspaceLoader = new WorkspaceLoader(this._host);
+
+    return workspaceLoader.loadWorkspace().pipe(
+      tap(workspace => this._workspace = workspace),
+      concatMap(workspace => new Architect(workspace).loadArchitect()),
+      tap(architect => this._architect = architect),
+    );
+  }
 }

@@ -37,16 +37,19 @@ export default function () {
       `
     }))
     // Test failure condition (no assets in .angular-cli.json)
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['assets'] = [];
+    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+      const appArchitect = workspaceJson.projects.app.architect;
+      appArchitect.build.options.assets = [];
     }))
     .then(() => expectToFail(() => ng('test', '--watch=false'),
       'Should fail because the assets to serve were not in the Angular CLI config'))
     // Test passing condition (assets are included)
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['assets'] = ['assets', 'file.txt'];
+    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+      const appArchitect = workspaceJson.projects.app.architect;
+      appArchitect.build.options.assets = [
+        { 'glob': '**/*', 'input': 'src/assets' },
+        { 'glob': 'file.txt' },
+      ];
     }))
     .then(() => ng('test', '--watch=false'));
 }

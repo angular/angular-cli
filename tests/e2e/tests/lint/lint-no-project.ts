@@ -9,8 +9,11 @@ export default function () {
   return;
 
   return Promise.resolve()
-    .then(() => updateJsonFile('.angular-cli.json', (json) => json.lint[0].project = ''))
-    .then(() => ng('lint', '--type-check'))
+    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+      const appArchitect = workspaceJson.projects.app.architect;
+      appArchitect.lint.options.tsConfig = undefined;
+    }))
+    .then(() => ng('lint', 'app', '--type-check'))
     .then(({ stdout }) => {
       if (!stdout.match(/A "project" must be specified to enable type checking./)) {
         throw new Error(oneLine`
@@ -24,7 +27,7 @@ export default function () {
     .then(() => ng('config', 'lint.0.files', '"**/baz.ts"'))
     .then(() => writeFile('src/app/foo.ts', 'const foo = "";\n'))
     .then(() => writeFile('src/app/baz.ts', 'const baz = \'\';\n'))
-    .then(() => ng('lint'))
+    .then(() => ng('lint', 'app'))
     .then(() => ng('config', 'lint.0.files', '"**/foo.ts"'))
-    .then(() => expectToFail(() => ng('lint')));
+    .then(() => expectToFail(() => ng('lint', 'app')));
 }

@@ -27,21 +27,21 @@ export default function () {
     'src/pre-rename-lazy-script.js': 'console.log(\'pre-rename-lazy-script\');'
   })
     .then(() => appendToFile('src/main.ts', 'import \'./string-script.js\';'))
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['scripts'] = [
-        'string-script.js',
-        'zstring-script.js',
-        'fstring-script.js',
-        'ustring-script.js',
-        'bstring-script.js',
-        'astring-script.js',
-        'cstring-script.js',
-        { input: 'input-script.js' },
-        { input: 'lazy-script.js', lazy: true },
-        { input: 'pre-rename-script.js', output: 'renamed-script' },
-        { input: 'pre-rename-lazy-script.js', output: 'renamed-lazy-script', lazy: true }
-      ];
+    .then(() => updateJsonFile('.angular.json', configJson => {
+      const appArchitect = configJson.projects.app.architect;
+      appArchitect.build.options.scripts = [
+        { input: 'src/string-script.js' },
+        { input: 'src/zstring-script.js' },
+        { input: 'src/fstring-script.js' },
+        { input: 'src/ustring-script.js' },
+        { input: 'src/bstring-script.js' },
+        { input: 'src/astring-script.js' },
+        { input: 'src/cstring-script.js' },
+        { input: 'src/input-script.js' },
+        { input: 'src/lazy-script.js', lazy: true },
+        { input: 'src/pre-rename-script.js', output: 'renamed-script' },
+        { input: 'src/pre-rename-lazy-script.js', output: 'renamed-lazy-script', lazy: true }
+      ];;
     }))
     .then(() => ng('build', '--extract-css'))
     // files were created successfully

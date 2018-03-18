@@ -85,14 +85,16 @@ export default function () {
     // .then(() => expectToFail(() => ng('build')))
 
     // Add asset config in .angular-cli.json.
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['assets'] = [
-        { 'glob': '**/*', 'input': 'folder', 'output': 'folder' },
+    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+      const assets = [
+        { 'glob': '**/*', 'input': 'src/folder', 'output': 'folder' },
         { 'glob': 'glob-asset.txt' },
         { 'glob': 'output-asset.txt', 'output': 'output-folder' },
-        { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': 'package-folder' }
+        { 'glob': '**/*', 'input': 'node_modules/some-package/', 'output': 'package-folder' }
       ];
+      const appArchitect = workspaceJson.projects.app.architect;
+      appArchitect.build.options.assets = assets;
+      appArchitect.test.options.assets = assets;
     }))
     // Test files are present on build output.
     .then(() => ng('build'))
@@ -186,5 +188,5 @@ export default function () {
         });`,
     }))
     .then(() => !ejected && ng('test', '--watch=false'))
-    .then(() => !ejected && ng('e2e'));
+    .then(() => !ejected && ng('e2e', 'app-e2e'));
 }

@@ -8,8 +8,8 @@ export default function(skipCleaning: () => void) {
   return Promise.resolve()
     .then(() => createProjectFromAsset('webpack/test-app-ng5'))
     .then(() => exec(normalize('node_modules/.bin/webpack-cli')))
-    .then(() => expectFileSizeToBeUnder('dist/app.main.js', 360000))
-    .then(() => expectFileSizeToBeUnder('dist/0.app.main.js', 20000))
+    .then(() => expectFileSizeToBeUnder('dist/app.main.js', 375000))
+    .then(() => expectFileSizeToBeUnder('dist/0.app.main.js', 25000))
     .then(() => expectFileSizeToBeUnder('dist/1.app.main.js', 2000))
     // test resource urls without ./
     .then(() => replaceInFile('app/app.component.ts',

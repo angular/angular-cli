@@ -10,7 +10,7 @@ export default function () {
 
   return Promise.resolve()
     .then(() => writeFile(fileName, 'const foo = "";\n'))
-    .then(() => ng('lint', '--format=stylish', '--force'))
+    .then(() => ng('lint', 'app', '--format=stylish', '--force'))
     .then(({ stdout }) => {
       if (!stdout.match(/1:13  quotemark  " should be '/)) {
         throw new Error(oneLine`

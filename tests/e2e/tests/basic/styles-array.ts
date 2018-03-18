@@ -16,14 +16,14 @@ export default function () {
     'src/pre-rename-style.css': '.pre-rename-style { color: red }',
     'src/pre-rename-lazy-style.css': '.pre-rename-lazy-style { color: red }'
   })
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['styles'] = [
-        'string-style.css',
-        { input: 'input-style.css' },
-        { input: 'lazy-style.css', lazy: true },
-        { input: 'pre-rename-style.css', output: 'renamed-style' },
-        { input: 'pre-rename-lazy-style.css', output: 'renamed-lazy-style', lazy: true }
+    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+      const appArchitect = workspaceJson.projects.app.architect;
+      appArchitect.build.options.styles = [
+        { input: 'src/string-style.css' },
+        { input: 'src/input-style.css' },
+        { input: 'src/lazy-style.css', lazy: true },
+        { input: 'src/pre-rename-style.css', output: 'renamed-style' },
+        { input: 'src/pre-rename-lazy-style.css', output: 'renamed-lazy-style', lazy: true }
       ];
     }))
     .then(() => ng('build', '--extract-css'))
