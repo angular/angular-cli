@@ -132,6 +132,13 @@
       "hash": "ebdb3ec1ec15ef5c91a7f46f93df6137",
       "snapshotRepo": "angular/angular-devkit-schematics-cli-builds"
     },
+    "@ngtools/webpack": {
+      "name": "Webpack Angular Plugin",
+      "version": "6.0.0",
+      "section": "Misc",
+      "hash": "",
+      "snapshotRepo": "angular/ngtools-webpack-builds"
+    },
     "@schematics/angular": {
       "name": "Angular Schematics",
       "section": "Schematics",
