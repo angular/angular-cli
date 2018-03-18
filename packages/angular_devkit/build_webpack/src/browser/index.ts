@@ -12,10 +12,12 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
-import { Path, getSystemPath, normalize, resolve } from '@angular-devkit/core';
+import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
+import * as fs from 'fs';
 import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
-import { concat, concatMap } from 'rxjs/operators';
+import { concat as concatObservable } from 'rxjs/observable/concat';
+import { empty } from 'rxjs/observable/empty';
+import { ignoreElements, switchMap } from 'rxjs/operators';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import * as webpack from 'webpack';
 import {
@@ -33,6 +35,7 @@ import {
   statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
+import { WebpackFileSystemHostAdapter } from '../utils/webpack-file-system-host-adapter';
 const webpackMerge = require('webpack-merge');
 
 
@@ -128,12 +131,11 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
 
-    // TODO: verify using of(null) to kickstart things is a pattern.
-    return of(null).pipe(
-      concatMap(() => options.deleteOutputPath
+    return concatObservable(
+      options.deleteOutputPath
         ? this._deleteOutputDir(root, normalize(options.outputPath))
-        : of(null)),
-      concatMap(() => new Observable(obs => {
+        : empty<BuildEvent>(),
+      new Observable(obs => {
         // Ensure Build Optimizer is only used with AOT.
         if (options.buildOptimizer && !options.aot) {
           throw new Error('The `--build-optimizer` option cannot be used without `--aot`.');
@@ -150,6 +152,12 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
           return;
         }
         const webpackCompiler = webpack(webpackConfig);
+
+        // TODO: fix webpack typings.
+        // tslint:disable-next-line:no-any
+        (webpackCompiler as any).inputFileSystem = new WebpackFileSystemHostAdapter(
+          this.context.host as virtualFs.Host<fs.Stats>,
+        );
         const statsConfig = getWebpackStatsConfig(options.verbose);
 
         const callback: webpack.compiler.CompilerCallback = (err, stats) => {
@@ -204,7 +212,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
           }
           throw err;
         }
-      })),
+      }),
     );
   }
 
@@ -277,18 +285,21 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
     return webpackMerge(webpackConfigs);
   }
 
-  private _deleteOutputDir(root: Path, outputPath: Path) {
+  private _deleteOutputDir(root: Path, outputPath: Path): Observable<void> {
     const resolvedOutputPath = resolve(root, outputPath);
     if (resolvedOutputPath === root) {
       throw new Error('Output path MUST not be project root directory!');
     }
 
     return this.context.host.exists(resolvedOutputPath).pipe(
-      concatMap(exists => exists
-        // TODO: remove this concat once host ops emit an event.
-        ? this.context.host.delete(resolvedOutputPath).pipe(concat(of(null)))
-        // ? of(null)
-        : of(null)),
+      switchMap(exists => {
+        if (exists) {
+          return this.context.host.delete(resolvedOutputPath);
+        } else {
+          return empty<void>();
+        }
+      }),
+      ignoreElements(),
     );
   }
 }
