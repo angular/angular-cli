@@ -49,6 +49,7 @@ export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
   }
 
   return {
+    mode: 'development',
     resolve: {
       mainFields: [
         ...(wco.supportES2015 ? ['es2015'] : []),
