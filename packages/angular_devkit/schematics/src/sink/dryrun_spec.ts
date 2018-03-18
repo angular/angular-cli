@@ -62,7 +62,7 @@ describe('DryRunSink', () => {
 
     // Need to create this file on the filesystem, otherwise the commit phase will fail.
     const outputHost = new virtualFs.SimpleMemoryHost();
-    outputHost.write(normalize('/hello'), virtualFs.stringToFileBuffer(''));
+    outputHost.write(normalize('/hello'), virtualFs.stringToFileBuffer('')).subscribe();
 
     const sink = new DryRunSink(outputHost);
     sink.reporter.pipe(toArray())
