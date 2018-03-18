@@ -18,8 +18,26 @@ def ng_module(tsconfig = None, node_modules = None, **kwargs):
 def ng_package(globals = None, **kwargs):
   if not globals:
     globals = {
-      "rxjs/operators/filter": "Rx.Observable.prototype",
-      "rxjs/operators/take": "Rx.Observable.prototype",
-      "rxjs/operators/tap": "Rx.Observable.prototype",
+      "@angular/animations": "ng.animations",
+      "@angular/core": "ng.core",
+      "@angular/common": "ng.common",
+      "@angular/common/http": "ng.common.http",
+      "@angular/compiler": "ng.compiler",
+      "@angular/http": "ng.http",
+      "@angular/platform-browser": "ng.platformBrowser",
+      "@angular/platform-server": "ng.platformServer",
+      "@angular/platform-browser-dynamic": "ng.platformBrowserDynamic",
+      "@nguniversal/aspnetcore-engine/tokens": "nguniversal.aspnetcoreEngine.tokens",
+      "@nguniversal/express-engine/tokens": "nguniversal.expressEngine.tokens",
+      "@nguniversal/hapi-engine/tokens": "nguniversal.hapiEngine.tokens",
+      "rxjs/Observable": "Rx",
+      "rxjs/operators/filter": "Rx.operators",
+      "rxjs/operators/map": "Rx.operators",
+      "rxjs/operators/take": "Rx.operators",
+      "rxjs/operators/tap": "Rx.operators",
+      "rxjs/observable/of": "Rx.Observable",
+      "fs": "fs",
+      "express": "express",
+      "hapi": "hapi"
     }
   _ng_package(globals = globals, **kwargs)
