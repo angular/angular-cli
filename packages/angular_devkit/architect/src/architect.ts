@@ -37,9 +37,8 @@ import {
 } from './builder';
 
 export class TargetNotFoundException extends BaseException {
-  constructor(name?: string) {
-    const nameOrDefault = name ? `Target '${name}'` : `Default target`;
-    super(`${nameOrDefault} could not be found in workspace.`);
+  constructor(name: string) {
+    super(`Target '${name}' could not be found in workspace.`);
   }
 }
 
