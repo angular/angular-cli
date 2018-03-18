@@ -27,9 +27,8 @@ import { BaseException } from '../exception/exception';
 
 
 export class ProjectNotFoundException extends BaseException {
-  constructor(name?: string) {
-    const nameOrDefault = name ? `Project '${name}'` : `Default project`;
-    super(`${nameOrDefault} could not be found in workspace.`);
+  constructor(name: string) {
+    super(`Project '${name}' could not be found in workspace.`);
   }
 }
 
