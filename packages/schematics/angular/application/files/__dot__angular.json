@@ -127,7 +127,7 @@
           "builder": "@angular-devkit/build-webpack:protractor",
           "options": {
             "protractorConfig": "protractor.conf.js",
-            "devServerTarget": "app:dev-server"
+            "devServerTarget": "app:serve"
           }
         },
         "lint": {
