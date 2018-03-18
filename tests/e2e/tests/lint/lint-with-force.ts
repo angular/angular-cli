@@ -10,7 +10,7 @@ export default function () {
 
   return Promise.resolve()
     .then(() => writeFile(fileName, 'const foo = "";\n'))
-    .then(() => ng('lint', '--force'))
+    .then(() => ng('lint', 'app', '--force'))
     .then(({ stdout }) => {
       if (!stdout.match(/" should be '/)) {
         throw new Error(`Expected to match "" should be '" in ${stdout}.`);

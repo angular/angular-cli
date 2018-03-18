@@ -9,7 +9,7 @@ export default function () {
 
   return Promise.resolve()
     .then(() => writeFile(fileName, 'const foo = "";\n'))
-    .then(() => ng('lint', '--fix', '--force'))
+    .then(() => ng('lint', 'app', '--fix', '--force'))
     .then(() => readFile(fileName))
     .then(content => {
       if (!content.match(/const foo = '';/)) {

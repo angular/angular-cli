@@ -7,7 +7,7 @@ export default function () {
 
   return Promise.resolve()
     .then(() => ng('config', 'lint', '[]'))
-    .then(() => ng('lint'))
+    .then(() => ng('lint', 'app'))
     .then(({ stdout }) => {
       if (!stdout.match(/No lint configuration\(s\) found\./)) {
         throw new Error(oneLine`

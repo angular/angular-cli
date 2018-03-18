@@ -13,12 +13,5 @@ export default function() {
     .then(() => expectFileToExist('dist/favicon.ico'))
     .then(() => expectFileToExist('dist/assets/.file'))
     .then(() => expectFileToMatch('dist/assets/test.abc', 'hello world'))
-    .then(() => expectToFail(() => expectFileToExist('dist/assets/.gitkeep')))
-    // doesn't break beta.16 projects
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['assets'] = 'assets';
-    }))
-    .then(() => expectFileToExist('dist/assets/.file'))
-    .then(() => expectFileToMatch('dist/assets/test.abc', 'hello world'));
+    .then(() => expectToFail(() => expectFileToExist('dist/assets/.gitkeep')));
 }

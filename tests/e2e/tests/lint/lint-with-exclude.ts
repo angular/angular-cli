@@ -11,7 +11,7 @@ export default function () {
   return Promise.resolve()
     .then(() => ng('config', 'lint.0.exclude', '"**/foo.ts"'))
     .then(() => writeFile(fileName, 'const foo = "";\n'))
-    .then(() => ng('lint'))
+    .then(() => ng('lint', 'app'))
     .then(({ stdout }) => {
       if (!stdout.match(/All files pass linting\./)) {
         throw new Error(oneLine`

@@ -39,5 +39,5 @@ function check(val: any, fxState: any) {
 
   return Promise.resolve()
     .then(() => writeFile(fileName, fileContents))
-    .then(() => expectToFail(() => ng('lint', '--fix', '--type-check')));
+    .then(() => expectToFail(() => ng('lint', 'app', '--fix', '--type-check')));
 }

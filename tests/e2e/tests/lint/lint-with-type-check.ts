@@ -38,8 +38,8 @@ function check(val: any, fxState: any) {
 
   return Promise.resolve()
     .then(() => writeFile(fileName, fileContents))
-    .then(() => ng('lint', '--fix'))
-    .then(() => ng('lint'))
+    .then(() => ng('lint', 'app', '--fix'))
+    .then(() => ng('lint', 'app'))
     .then(({ stdout }) => {
       if (!stdout.match(/All files pass linting./)) {
         throw new Error('All files pass linting.');

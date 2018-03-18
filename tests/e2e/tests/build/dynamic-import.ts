@@ -5,15 +5,12 @@ import { updateJsonFile } from '../../utils/project';
 
 
 export default async function() {
-  // TODO(architect): lazyModules is not yet handled by the compat layer.
-  return;
-
   // Add a lazy module
   await ng('generate', 'module', 'lazy');
-  await updateJsonFile('.angular-cli.json', configJson => {
-    const app = configJson['apps'][0];
-    app['lazyModules'] = [
-      'app/lazy/lazy.module'
+  await updateJsonFile('.angular.json', workspaceJson => {
+    const appArchitect = workspaceJson.projects.app.architect;
+    appArchitect.build.options.lazyModules = [
+      'src/app/lazy/lazy.module'
     ];
   });
 
@@ -39,7 +36,7 @@ export default async function() {
   // Build and look for the split lazy module
   await ng('build');
   for (const file of fs.readdirSync('./dist')) {
-    if (file === 'app-lazy-lazy-module.js') {
+    if (file === 'src-app-lazy-lazy-module.js') {
       // Lazy module chunk was found and succesfully split
       return;
     }

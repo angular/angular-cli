@@ -23,5 +23,5 @@ export default function () {
     .then(() => createDir('src/app/foo'))
     .then(() => writeFile(fileName, 'const foo = \'\';\n'))
     .then(() => writeFile('src/app/foo/tslint.json', nestedConfigContent))
-    .then(() => expectToFail(() => ng('lint')));
+    .then(() => expectToFail(() => ng('lint', 'app')));
 }

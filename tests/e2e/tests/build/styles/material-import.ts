@@ -24,9 +24,11 @@ export default function () {
         `,
         })
         // change files to use preprocessor
-        .then(() => updateJsonFile('.angular-cli.json', configJson => {
-          const app = configJson['apps'][0];
-          app['styles'] = [`styles.${ext}`];
+        .then(() => updateJsonFile('.angular.json', workspaceJson => {
+          const appArchitect = workspaceJson.projects.app.architect;
+          appArchitect.build.options.styles = [
+            { input: `src/styles.${ext}` }
+          ];
         }))
         .then(() => replaceInFile('src/app/app.component.ts',
           './app.component.css', `./app.component.${ext}`))

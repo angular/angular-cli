@@ -9,12 +9,14 @@ export default function() {
 
   return Promise.resolve()
     .then(() => silentNpm('install', 'bootstrap@4.0.0-beta.3'))
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['styles'].push('../node_modules/bootstrap/dist/css/bootstrap.css');
-      app['scripts'].push(
-        '../node_modules/bootstrap/dist/js/bootstrap.js'
-      );
+    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+      const appArchitect = workspaceJson.projects.app.architect;
+      appArchitect.build.options.styles = [
+        { input: 'node_modules/bootstrap/dist/css/bootstrap.css' }
+      ];
+      appArchitect.build.options.scripts = [
+        { input: 'node_modules/bootstrap/dist/js/bootstrap.js' }
+      ];
     }))
     .then(() => ng('build', '--extract-css'))
     .then(() => expectFileToMatch('dist/scripts.js', '* Bootstrap'))

@@ -46,16 +46,16 @@ export default function () {
     }))
     .then(() => replaceInFile('src/app/app.component.ts', `'./app.component.css\'`,
       `'./app.component.scss', './app.component.styl', './app.component.less'`))
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['styles'] = [
-        'styles.scss',
-        'styles.styl',
-        'styles.less'
+    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+      const appArchitect = workspaceJson.projects.app.architect;
+      appArchitect.build.options.styles = [
+        { input: 'src/styles.scss' },
+        { input: 'src/styles.styl' },
+        { input: 'src/styles.less' },
       ];
-      app['stylePreprocessorOptions'] = {
+      appArchitect.build.options.stylePreprocessorOptions = {
         includePaths: [
-          'style-paths'
+          'src/style-paths'
         ]
       };
     }))

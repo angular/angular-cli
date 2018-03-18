@@ -28,9 +28,11 @@ export default function () {
         }
       `})
     .then(() => deleteFile('src/app/app.component.css'))
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const app = configJson['apps'][0];
-      app['styles'] = ['styles.less'];
+    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+      const appArchitect = workspaceJson.projects.app.architect;
+      appArchitect.build.options.styles = [
+        { input: 'src/styles.less' }
+      ];
     }))
     .then(() => replaceInFile('src/app/app.component.ts',
       './app.component.css', './app.component.less'))

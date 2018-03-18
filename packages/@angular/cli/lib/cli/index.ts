@@ -26,6 +26,7 @@ function loadCommands() {
     'doc': require('../../commands/doc').default,
     'xi18n': require('../../commands/xi18n').default,
     'update': require('../../commands/update').default,
+    'run': require('../../commands/run').default,
 
     // Easter eggs.
     'make-this-awesome': require('../../commands/easter-egg').default,
