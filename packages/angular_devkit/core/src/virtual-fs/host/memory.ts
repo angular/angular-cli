@@ -7,9 +7,6 @@
  */
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-import { empty } from 'rxjs/observable/empty';
-import { of as observableOf } from 'rxjs/observable/of';
-import { _throw } from 'rxjs/observable/throw';
 import {
   FileAlreadyExistException,
   FileDoesNotExistException,
@@ -37,27 +34,49 @@ import {
   Stats,
 } from './interface';
 
+export interface SimpleMemoryHostStats {
+  readonly content: FileBuffer | null;
+}
 
 export class SimpleMemoryHost implements Host<{}> {
-  private _cache = new Map<Path, FileBuffer>();
+  private _cache = new Map<Path, Stats<SimpleMemoryHostStats>>();
   private _watchers = new Map<Path, [HostWatchOptions, Subject<HostWatchEvent>][]>();
+
+  protected _newDirStats() {
+    return {
+      isFile() { return false; },
+      isDirectory() { return true; },
+      size: 0,
+
+      atime: new Date(),
+      ctime: new Date(),
+      mtime: new Date(),
+      birthtime: new Date(),
+
+      content: null,
+    };
+  }
+  protected _newFileStats(content: FileBuffer, oldStats?: Stats<SimpleMemoryHostStats>) {
+    return {
+      isFile() { return true; },
+      isDirectory() { return false; },
+      size: content.byteLength,
+
+      atime: oldStats ? oldStats.atime : new Date(),
+      ctime: new Date(),
+      mtime: new Date(),
+      birthtime: oldStats ? oldStats.birthtime : new Date(),
+
+      content,
+    };
+  }
+
+  constructor() {
+    this._cache.set(normalize('/'), this._newDirStats());
+  }
 
   protected _toAbsolute(path: Path) {
     return isAbsolute(path) ? path : normalize('/' + path);
-  }
-
-  protected _isDir(path: Path) {
-    if (path === '/') {
-      return true;
-    }
-
-    for (const p of this._cache.keys()) {
-      if (p.startsWith(path + NormalizedSep)) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   protected _updateWatchers(path: Path, type: HostWatchEventType) {
@@ -109,33 +128,53 @@ export class SimpleMemoryHost implements Host<{}> {
     return { synchronous: true };
   }
 
-  write(path: Path, content: FileBuffer): Observable<void> {
+  /**
+   * List of protected methods that give direct access outside the observables to the cache
+   * and internal states.
+   */
+  protected _write(path: Path, content: FileBuffer): void {
     path = this._toAbsolute(path);
-    if (this._isDir(path)) {
-      return _throw(new PathIsDirectoryException(path));
+    const old = this._cache.get(path);
+    if (old && old.isDirectory()) {
+      throw new PathIsDirectoryException(path);
     }
 
-    const existed = this._cache.has(path);
-    this._cache.set(path, content);
-    this._updateWatchers(path, existed ? HostWatchEventType.Changed : HostWatchEventType.Created);
+    // Update all directories. If we find a file we know it's an invalid write.
+    const fragments = split(path);
+    let curr: Path = normalize('/');
+    for (const fr of fragments) {
+      curr = join(curr, fr);
+      const maybeStats = this._cache.get(fr);
+      if (maybeStats) {
+        if (maybeStats.isFile()) {
+          throw new PathIsFileException(curr);
+        }
+      } else {
+        this._cache.set(curr, this._newDirStats());
+      }
+    }
 
-    return empty<void>();
+    // Create the stats.
+    const stats: Stats<SimpleMemoryHostStats> = this._newFileStats(content, old);
+    this._cache.set(path, stats);
+    this._updateWatchers(path, old ? HostWatchEventType.Changed : HostWatchEventType.Created);
   }
-  read(path: Path): Observable<FileBuffer> {
+  _read(path: Path): FileBuffer {
     path = this._toAbsolute(path);
-    if (this._isDir(path)) {
-      return _throw(new PathIsDirectoryException(path));
-    }
-    const maybeBuffer = this._cache.get(path);
-    if (!maybeBuffer) {
-      return _throw(new FileDoesNotExistException(path));
+    const maybeStats = this._cache.get(path);
+    if (!maybeStats) {
+      throw new FileDoesNotExistException(path);
+    } else if (maybeStats.isDirectory()) {
+      throw new PathIsDirectoryException(path);
+    } else if (!maybeStats.content) {
+      throw new PathIsDirectoryException(path);
     } else {
-      return observableOf(maybeBuffer);
+      return maybeStats.content;
     }
   }
-  delete(path: Path): Observable<void> {
+  _delete(path: Path): void {
     path = this._toAbsolute(path);
-    if (this._isDir(path)) {
+    if (this._isDirectory(path)) {
       for (const [cachePath, _] of this._cache.entries()) {
         if (path.startsWith(cachePath + NormalizedSep)) {
           this._cache.delete(cachePath);
@@ -145,22 +184,22 @@ export class SimpleMemoryHost implements Host<{}> {
       this._cache.delete(path);
     }
     this._updateWatchers(path, HostWatchEventType.Deleted);
-
-    return empty();
   }
-  rename(from: Path, to: Path): Observable<void> {
+  _rename(from: Path, to: Path): void {
     from = this._toAbsolute(from);
     to = this._toAbsolute(to);
     if (!this._cache.has(from)) {
-      return _throw(new FileDoesNotExistException(from));
+      throw new FileDoesNotExistException(from);
     } else if (this._cache.has(to)) {
-      return _throw(new FileAlreadyExistException(from));
+      throw new FileAlreadyExistException(to);
     }
-    if (this._isDir(from)) {
+
+    if (this._isDirectory(from)) {
       for (const path of this._cache.keys()) {
         if (path.startsWith(from + NormalizedSep)) {
           const content = this._cache.get(path);
           if (content) {
+            // We don't need to clone or extract the content, since we're moving files.
             this._cache.set(join(to, NormalizedSep, path.slice(from.length)), content);
           }
         }
@@ -174,15 +213,14 @@ export class SimpleMemoryHost implements Host<{}> {
     }
 
     this._updateWatchers(from, HostWatchEventType.Renamed);
-
-    return empty();
   }
 
-  list(path: Path): Observable<PathFragment[]> {
+  _list(path: Path): PathFragment[] {
     path = this._toAbsolute(path);
-    if (this._cache.has(path)) {
-      return _throw(new PathIsFileException(path));
+    if (this._isFile(path)) {
+      throw new PathIsFileException(path);
     }
+
     const fragments = split(path);
     const result = new Set<PathFragment>();
     if (path !== NormalizedRoot) {
@@ -193,29 +231,105 @@ export class SimpleMemoryHost implements Host<{}> {
       }
     } else {
       for (const p of this._cache.keys()) {
-        if (p.startsWith(NormalizedSep)) {
+        if (p.startsWith(NormalizedSep) && p !== NormalizedRoot) {
           result.add(split(p)[1]);
         }
       }
     }
 
-    return observableOf([...result]);
+    return [...result];
+  }
+
+  _exists(path: Path): boolean {
+    return !!this._cache.get(this._toAbsolute(path));
+  }
+  _isDirectory(path: Path): boolean {
+    const maybeStats = this._cache.get(this._toAbsolute(path));
+
+    return maybeStats ? maybeStats.isDirectory() : false;
+  }
+  _isFile(path: Path): boolean {
+    const maybeStats = this._cache.get(this._toAbsolute(path));
+
+    return maybeStats ? maybeStats.isFile() : false;
+  }
+
+  _stat(path: Path): Stats<SimpleMemoryHostStats> {
+    const maybeStats = this._cache.get(this._toAbsolute(path));
+
+    if (!maybeStats) {
+      throw new FileDoesNotExistException(path);
+    } else {
+      return maybeStats;
+    }
+  }
+
+  write(path: Path, content: FileBuffer): Observable<void> {
+    return new Observable<void>(obs => {
+      this._write(path, content);
+      obs.next();
+      obs.complete();
+    });
+  }
+
+  read(path: Path): Observable<FileBuffer> {
+    return new Observable<FileBuffer>(obs => {
+      const content = this._read(path);
+      obs.next(content);
+      obs.complete();
+    });
+  }
+
+  delete(path: Path): Observable<void> {
+    return new Observable<void>(obs => {
+      this._delete(path);
+      obs.next();
+      obs.complete();
+    });
+  }
+
+  rename(from: Path, to: Path): Observable<void> {
+    return new Observable<void>(obs => {
+      this._rename(from, to);
+      obs.next();
+      obs.complete();
+    });
+  }
+
+  list(path: Path): Observable<PathFragment[]> {
+    return new Observable<PathFragment[]>(obs => {
+      obs.next(this._list(path));
+      obs.complete();
+    });
   }
 
   exists(path: Path): Observable<boolean> {
-    path = this._toAbsolute(path);
-
-    return observableOf(this._cache.has(path) || this._isDir(path));
+    return new Observable<boolean>(obs => {
+      obs.next(this._exists(path));
+      obs.complete();
+    });
   }
+
   isDirectory(path: Path): Observable<boolean> {
-    return observableOf(this._isDir(this._toAbsolute(path)));
-  }
-  isFile(path: Path): Observable<boolean> {
-    return observableOf(this._cache.has(this._toAbsolute(path)));
+    return new Observable<boolean>(obs => {
+      obs.next(this._isDirectory(path));
+      obs.complete();
+    });
   }
 
-  stat(_path: Path): Observable<Stats<{}>> | null {
-    return null;
+  isFile(path: Path): Observable<boolean> {
+    return new Observable<boolean>(obs => {
+      obs.next(this._isFile(path));
+      obs.complete();
+    });
+  }
+
+  // Some hosts may not support stat.
+  stat(path: Path): Observable<Stats<{}>> {
+    return new Observable<Stats<{}>>(obs => {
+      obs.next(this._stat(path));
+      obs.complete();
+    });
   }
 
   watch(path: Path, options?: HostWatchOptions): Observable<HostWatchEvent> | null {
