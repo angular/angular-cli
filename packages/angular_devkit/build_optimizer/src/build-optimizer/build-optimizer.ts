@@ -37,11 +37,14 @@ const whitelistedAngularModules = [
   /[\\/]node_modules[\\/]@angular[\\/]cdk[\\/]/,
 ];
 
+// TODO: this code is very fragile and should be reworked.
+//       See: https://github.com/angular/devkit/issues/523
 const es5AngularModules = [
   // Angular 4 packaging format has .es5.js as the extension.
   /\.es5\.js$/, // Angular 4
   // Angular 5 has esm5 folders.
-  /[\\/]node_modules[\\/]@angular[\\/][^\\/]+[\\/]esm5[\\/]/,
+  // Angular 6 has fesm5 folders.
+  /[\\/]node_modules[\\/]@angular[\\/][^\\/]+[\\/]f?esm5[\\/]/,
   // All Angular versions have UMD with es5.
   /\.umd\.js$/,
 ];
