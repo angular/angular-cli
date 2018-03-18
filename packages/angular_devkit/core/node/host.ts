@@ -170,8 +170,8 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
     );
   }
 
-  // Some hosts may not support stats.
-  stats(path: Path): Observable<virtualFs.Stats<fs.Stats>> | null {
+  // Some hosts may not support stat.
+  stat(path: Path): Observable<virtualFs.Stats<fs.Stats>> | null {
     return _callFs(fs.stat, getSystemPath(path));
   }
 
@@ -280,15 +280,15 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
 
   isDirectory(path: Path): Observable<boolean> {
     // tslint:disable-next-line:non-null-operator
-    return this.stats(path) !.pipe(map(stat => stat.isDirectory()));
+    return this.stat(path) !.pipe(map(stat => stat.isDirectory()));
   }
   isFile(path: Path): Observable<boolean> {
     // tslint:disable-next-line:non-null-operator
-    return this.stats(path) !.pipe(map(stat => stat.isFile()));
+    return this.stat(path) !.pipe(map(stat => stat.isFile()));
   }
 
-  // Some hosts may not support stats.
-  stats(path: Path): Observable<virtualFs.Stats<fs.Stats>> | null {
+  // Some hosts may not support stat.
+  stat(path: Path): Observable<virtualFs.Stats<fs.Stats>> | null {
     return observableOf(fs.statSync(getSystemPath(path)));
   }
 

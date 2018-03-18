@@ -214,7 +214,7 @@ export class SimpleMemoryHost implements Host<{}> {
     return observableOf(this._cache.has(this._toAbsolute(path)));
   }
 
-  stats(_path: Path): Observable<Stats<{}>> | null {
+  stat(_path: Path): Observable<Stats<{}>> | null {
     return null;
   }
 

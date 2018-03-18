@@ -48,9 +48,9 @@ export class ScopedHost<T extends object> implements Host<T> {
     return this._delegate.isFile(join(this._root, path));
   }
 
-  // Some hosts may not support stats.
-  stats(path: Path): Observable<Stats<T>> | null {
-    return this._delegate.stats(join(this._root, path));
+  // Some hosts may not support stat.
+  stat(path: Path): Observable<Stats<T>> | null {
+    return this._delegate.stat(join(this._root, path));
   }
 
   // Some hosts may not support watching.
