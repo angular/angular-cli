@@ -96,18 +96,9 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   // Add webpack config.
   const webpackConfig = config.buildWebpack.webpackConfig;
   const webpackMiddlewareConfig = {
-    noInfo: true, // Hide webpack output because its noisy.
+    logLevel: 'error', // Hide webpack output because its noisy.
     watchOptions: { poll: options.poll },
     publicPath: '/_karma_webpack_/',
-    stats: { // Also prevent chunk and module display output, cleaner look. Only emit errors.
-      assets: false,
-      colors: true,
-      version: false,
-      hash: false,
-      timings: false,
-      chunks: false,
-      chunkModules: false
-    }
   };
 
   // Finish Karma run early in case of compilation error.
