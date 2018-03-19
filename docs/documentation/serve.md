@@ -74,7 +74,7 @@ All the build Options are available in serve, below are the additional options.
     <code>--port</code> (aliases: <code>-p</code>) <em>default value: 4200</em>
   </p>
   <p>
-    Port to listen to for serving.
+    Port to listen to for serving. <code>--port 0</code> will get a free port
   </p>
 </details>
 
