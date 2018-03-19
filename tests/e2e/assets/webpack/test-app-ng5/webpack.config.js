@@ -2,6 +2,7 @@ const ngToolsWebpack = require('@ngtools/webpack');
 const path = require('path');
 
 module.exports = {
+  mode: 'production',
   resolve: {
     extensions: ['.ts', '.js']
   },
