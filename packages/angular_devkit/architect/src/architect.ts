@@ -36,15 +36,21 @@ import {
   BuilderPathsMap,
 } from './builder';
 
+export class ProjectNotFoundException extends BaseException {
+  constructor(projectName: string) {
+    super(`Project '${projectName}' could not be found in Workspace.`);
+  }
+}
+
 export class TargetNotFoundException extends BaseException {
-  constructor(name: string) {
-    super(`Target '${name}' could not be found in workspace.`);
+  constructor(projectName: string, targetName: string) {
+    super(`Target '${targetName}' could not be found in project '${projectName}'.`);
   }
 }
 
 export class ConfigurationNotFoundException extends BaseException {
-  constructor(name: string) {
-    super(`Configuration '${name}' could not be found in project.`);
+  constructor(projectName: string, configurationName: string) {
+    super(`Configuration '${configurationName}' could not be found in project '${projectName}'.`);
   }
 }
 
@@ -79,7 +85,7 @@ export interface TargetSpecifier<OptionsT = {}> {
   overrides?: Partial<OptionsT>;
 }
 
-export interface TargetsMap {
+export interface TargetMap {
   [k: string]: Target;
 }
 
@@ -98,6 +104,7 @@ export class Architect {
   private _targetsSchema: JsonObject;
   private _buildersSchema: JsonObject;
   private _architectSchemasLoaded = false;
+  private _targetMapMap = new Map<string, TargetMap>();
   private _builderPathsMap = new Map<string, BuilderPaths>();
   private _builderDescriptionMap = new Map<string, BuilderDescription>();
   private _builderConstructorMap = new Map<string, BuilderConstructor<{}>>();
@@ -112,20 +119,53 @@ export class Architect {
         this._loadJsonFile(this._targetsSchemaPath),
         this._loadJsonFile(this._buildersSchemaPath),
       ).pipe(
-        concatMap(([workspaceSchema, buildersSchema]) => {
-          this._targetsSchema = workspaceSchema;
+        concatMap(([targetsSchema, buildersSchema]) => {
+          this._targetsSchema = targetsSchema;
           this._buildersSchema = buildersSchema;
           this._architectSchemasLoaded = true;
 
-          return of(this);
+          // Validate and cache all project target maps.
+          return forkJoin(
+            ...this._workspace.listProjectNames().map(projectName => {
+              const unvalidatedTargetMap = this._workspace.getProjectArchitect(projectName);
+
+              return this._workspace.validateAgainstSchema<TargetMap>(
+                unvalidatedTargetMap, this._targetsSchema).pipe(
+                  tap(targetMap => this._targetMapMap.set(projectName, targetMap)),
+              );
+            }),
+          );
         }),
+        map(() => this),
       );
     }
   }
 
-  getBuilderConfiguration<OptionsT>(
-    targetSpec: TargetSpecifier,
-  ): Observable<BuilderConfiguration<OptionsT>> {
+  listProjectTargets(projectName: string): string[] {
+    return Object.keys(this._getProjectTargetMap(projectName));
+  }
+
+  private _getProjectTargetMap(projectName: string): TargetMap {
+    if (!this._targetMapMap.has(projectName)) {
+      throw new ProjectNotFoundException(projectName);
+    }
+
+    return this._targetMapMap.get(projectName) as TargetMap;
+  }
+
+  private _getProjectTarget<T = {}>(projectName: string, targetName: string): Target<T> {
+    const targetMap = this._getProjectTargetMap(projectName);
+
+    const target = targetMap[targetName] as {} as Target<T>;
+
+    if (!target) {
+      throw new TargetNotFoundException(projectName, targetName);
+    }
+
+    return target;
+  }
+
+  getBuilderConfiguration<OptionsT>(targetSpec: TargetSpecifier): BuilderConfiguration<OptionsT> {
     const {
       project: projectName,
       target: targetName,
@@ -134,46 +174,34 @@ export class Architect {
     } = targetSpec;
 
     const project = this._workspace.getProject(projectName);
-    const targets = this._workspace.getProjectArchitect(projectName);
+    const target = this._getProjectTarget(projectName, targetName);
+    const options = target.options;
     let configuration: TargetConfiguration = {};
-    let target: Target, options: TargetOptions;
 
-    return this._workspace.validateAgainstSchema<TargetsMap>(targets, this._targetsSchema).pipe(
-      concatMap((validatedWorkspaceTargets) => {
-        target = validatedWorkspaceTargets[targetName];
+    if (configurationName) {
+      if (!target.configurations) {
+        throw new ConfigurationNotFoundException(projectName, configurationName);
+      }
 
-        if (!target) {
-          return _throw(new TargetNotFoundException(targetName));
-        }
+      configuration = target.configurations[configurationName];
 
-        options = target.options;
+      if (!configuration) {
+        throw new ConfigurationNotFoundException(projectName, configurationName);
+      }
+    }
 
-        if (configurationName) {
-          if (!target.configurations) {
-            return _throw(new ConfigurationNotFoundException(configurationName));
-          }
+    const builderConfiguration: BuilderConfiguration<OptionsT> = {
+      root: project.root,
+      projectType: project.projectType,
+      builder: target.builder,
+      options: {
+        ...options,
+        ...configuration,
+        ...overrides as {},
+      } as OptionsT,
+    };
 
-          configuration = target.configurations[configurationName];
-
-          if (!configuration) {
-            return _throw(new ConfigurationNotFoundException(configurationName));
-          }
-        }
-
-        const builderConfiguration: BuilderConfiguration<OptionsT> = {
-          root: project.root,
-          projectType: project.projectType,
-          builder: target.builder,
-          options: {
-            ...options,
-            ...configuration,
-            ...overrides as {},
-          } as OptionsT,
-        };
-
-        return of(builderConfiguration);
-      }),
-    );
+    return builderConfiguration;
   }
 
   run<OptionsT>(

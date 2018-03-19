@@ -62,41 +62,36 @@ describe('Architect', () => {
     tap(arch => architect = arch),
   ).subscribe(undefined, done.fail, done));
 
-  it('works', (done) => {
+  it('works', () => {
     const targetSpec = { project: 'app', target: 'browser', configuration: 'prod' };
-    architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec).pipe(
-      tap(builderConfig => {
-        expect(builderConfig.root).toBe('app');
-        expect(builderConfig.projectType).toBe('application');
-        expect(builderConfig.builder).toBe('../test:browser');
-        expect(builderConfig.options.browserOption).toBe(1);
-        expect(builderConfig.options.optionalBrowserOption).toBe(false);
-      }),
-    ).subscribe(undefined, done.fail, done);
+    const builderConfig = architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec);
+    expect(builderConfig.root).toBe('app');
+    expect(builderConfig.projectType).toBe('application');
+    expect(builderConfig.builder).toBe('../test:browser');
+    expect(builderConfig.options.browserOption).toBe(1);
+    expect(builderConfig.options.optionalBrowserOption).toBe(false);
   });
 
-  it('errors when missing target is used', (done) => {
+  it('lists targets by name', () => {
+    expect(architect.listProjectTargets('app')).toEqual(['browser', 'badBrowser', 'karma']);
+  });
+
+  it('errors when missing target is used', () => {
     const targetSpec = { project: 'app', target: 'missing', configuration: 'prod' };
-    architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec)
-      .subscribe(undefined, (err: Error) => {
-        expect(err).toEqual(jasmine.any(TargetNotFoundException));
-        done();
-      }, done.fail);
+    expect(() => architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec))
+      .toThrow(new TargetNotFoundException(targetSpec.project, targetSpec.target));
   });
 
-  it('throws when missing configuration is used', (done) => {
+  it('throws when missing configuration is used', () => {
     const targetSpec = { project: 'app', target: 'browser', configuration: 'missing' };
-    architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec)
-      .subscribe(undefined, (err: Error) => {
-        expect(err).toEqual(jasmine.any(ConfigurationNotFoundException));
-        done();
-      }, done.fail);
+    expect(() => architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec))
+      .toThrow(new ConfigurationNotFoundException(targetSpec.project, targetSpec.configuration));
   });
 
   it('runs targets', (done) => {
     const targetSpec = { project: 'app', target: 'browser', configuration: 'prod' };
-    architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec).pipe(
-      concatMap((builderConfig) => architect.run(builderConfig)),
+    const builderConfig = architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec);
+    architect.run(builderConfig).pipe(
       toArray(),
       tap(events => {
         expect(events.length).toBe(3);
@@ -109,9 +104,8 @@ describe('Architect', () => {
 
   it('errors when builder cannot be resolved', (done) => {
     const targetSpec = { project: 'app', target: 'karma' };
-    architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec).pipe(
-      concatMap((builderConfig) => architect.run(builderConfig)),
-    ).subscribe(undefined, (err: Error) => {
+    const builderConfig = architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec);
+    architect.run(builderConfig).subscribe(undefined, (err: Error) => {
       expect(err).toEqual(jasmine.any(BuilderCannotBeResolvedException));
       done();
     }, done.fail);
@@ -119,9 +113,8 @@ describe('Architect', () => {
 
   it('errors when builder options fail validation', (done) => {
     const targetSpec = { project: 'app', target: 'badBrowser' };
-    architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec).pipe(
-      concatMap((builderConfig) => architect.run(builderConfig)),
-    ).subscribe(undefined, (err: Error) => {
+    const builderConfig = architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec);
+    architect.run(builderConfig).subscribe(undefined, (err: Error) => {
       expect(err).toEqual(jasmine.any(experimental.workspace.SchemaValidationException));
       done();
     }, done.fail);
