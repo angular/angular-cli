@@ -1,30 +1,36 @@
-// @ignoreDep typescript
-import * as ts from 'typescript';
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import chalk from 'chalk';
+import * as ts from 'typescript';
+import { time, timeEnd } from './benchmark';
+import { WebpackCompilerHost } from './compiler_host';
+import { CancellationToken, gatherDiagnostics } from './gather_diagnostics';
 import {
-  Program,
-  CompilerOptions,
   CompilerHost,
-  createProgram,
+  CompilerOptions,
+  Program,
   createCompilerHost,
+  createProgram,
   formatDiagnostics,
 } from './ngtools_api';
-import { WebpackCompilerHost } from './compiler_host';
-import { time, timeEnd } from './benchmark';
-import { CancellationToken, gatherDiagnostics } from './gather_diagnostics';
 
 
 // This file should run in a child process with the AUTO_START_ARG argument
 
 // Force basic color support on terminals with no color support.
 // Chalk typings don't have the correct constructor parameters.
-const chalkCtx = new (chalk.constructor as any)(chalk.supportsColor ? {} : { level: 1 });
+const chalkCtx = new (chalk.constructor)(chalk.supportsColor ? {} : { level: 1 });
 const { bold, red, yellow } = chalkCtx;
 
 
 export enum MESSAGE_KIND {
   Init,
-  Update
+  Update,
 }
 
 export abstract class TypeCheckerMessage {
@@ -70,7 +76,7 @@ export class TypeChecker {
     // for these resources.
     this._compilerHost = createCompilerHost({
       options: this._compilerOptions,
-      tsHost: compilerHost
+      tsHost: compilerHost,
     }) as CompilerHost & WebpackCompilerHost;
     timeEnd('TypeChecker.constructor');
   }
@@ -92,7 +98,7 @@ export class TypeChecker {
         this._rootNames,
         this._compilerOptions,
         this._compilerHost,
-        this._program as ts.Program
+        this._program as ts.Program,
       ) as ts.Program;
       timeEnd('TypeChecker._createOrUpdateProgram.ts.createProgram');
     } else {
@@ -102,7 +108,7 @@ export class TypeChecker {
         rootNames: this._rootNames,
         options: this._compilerOptions,
         host: this._compilerHost,
-        oldProgram: this._program as Program
+        oldProgram: this._program as Program,
       }) as Program;
       timeEnd('TypeChecker._createOrUpdateProgram.ng.createProgram');
     }
@@ -133,10 +139,9 @@ export class TypeChecker {
   }
 
   public update(rootNames: string[], changedCompilationFiles: string[],
-    cancellationToken: CancellationToken) {
+                cancellationToken: CancellationToken) {
     this._update(rootNames, changedCompilationFiles);
     this._createOrUpdateProgram();
     this._diagnose(cancellationToken);
   }
 }
-

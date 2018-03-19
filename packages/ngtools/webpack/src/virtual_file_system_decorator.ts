@@ -1,7 +1,13 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import { Stats } from 'fs';
-
-import { InputFileSystem, NodeWatchFileSystemInterface, Callback } from './webpack';
 import { WebpackCompilerHost } from './compiler_host';
+import { Callback, InputFileSystem, NodeWatchFileSystemInterface } from './webpack';
 
 export const NodeWatchFileSystem: NodeWatchFileSystemInterface = require(
   'webpack/lib/node/NodeWatchFileSystem');
@@ -9,13 +15,13 @@ export const NodeWatchFileSystem: NodeWatchFileSystemInterface = require(
 export class VirtualFileSystemDecorator implements InputFileSystem {
   constructor(
     private _inputFileSystem: InputFileSystem,
-    private _webpackCompilerHost: WebpackCompilerHost
+    private _webpackCompilerHost: WebpackCompilerHost,
   ) { }
 
   // We only need to intercept calls to individual files that are present in WebpackCompilerHost.
   private _readFileSync(path: string): string | null {
     if (this._webpackCompilerHost.fileExists(path, false)) {
-      return this._webpackCompilerHost.readFile(path);
+      return this._webpackCompilerHost.readFile(path) || null;
     }
 
     return null;
@@ -33,7 +39,7 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
     return this._webpackCompilerHost.getNgFactoryPaths();
   }
 
-  stat(path: string, callback: Callback<any>): void {
+  stat(path: string, callback: Callback<Stats>): void {
     const result = this._statSync(path);
     if (result) {
       callback(null, result);
@@ -42,11 +48,11 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
     }
   }
 
-  readdir(path: string, callback: Callback<any>): void {
+  readdir(path: string, callback: Callback<string[]>): void {
     this._inputFileSystem.readdir(path, callback);
   }
 
-  readFile(path: string, callback: Callback<any>): void {
+  readFile(path: string, callback: Callback<string>): void {
     const result = this._readFileSync(path);
     if (result) {
       callback(null, result);
@@ -55,16 +61,17 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
     }
   }
 
-  readJson(path: string, callback: Callback<any>): void {
+  readJson(path: string, callback: Callback<{}>): void {
     this._inputFileSystem.readJson(path, callback);
   }
 
-  readlink(path: string, callback: Callback<any>): void {
+  readlink(path: string, callback: Callback<string>): void {
     this._inputFileSystem.readlink(path, callback);
   }
 
   statSync(path: string): Stats {
     const result = this._statSync(path);
+
     return result || this._inputFileSystem.statSync(path);
   }
 
@@ -74,6 +81,7 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
 
   readFileSync(path: string): string {
     const result = this._readFileSync(path);
+
     return result || this._inputFileSystem.readFileSync(path);
   }
 
@@ -102,20 +110,34 @@ export class VirtualWatchFileSystemDecorator extends NodeWatchFileSystem {
     super(_virtualInputFileSystem);
   }
 
-  watch(files: any, dirs: any, missing: any, startTime: any, options: any, callback: any,
-    callbackUndelayed: any) {
-    const newCallback = (err: any, filesModified: any, contextModified: any, missingModified: any,
-      fileTimestamps: { [k: string]: number }, contextTimestamps: { [k: string]: number }) => {
+  watch(
+    files: any,  // tslint:disable-line:no-any
+    dirs: any,  // tslint:disable-line:no-any
+    missing: any,  // tslint:disable-line:no-any
+    startTime: any,  // tslint:disable-line:no-any
+    options: any,  // tslint:disable-line:no-any
+    callback: any,  // tslint:disable-line:no-any
+    callbackUndelayed: any,  // tslint:disable-line:no-any
+  ) {
+    const newCallback = (
+      err: any,  // tslint:disable-line:no-any
+      filesModified: any,  // tslint:disable-line:no-any
+      contextModified: any,  // tslint:disable-line:no-any
+      missingModified: any,  // tslint:disable-line:no-any
+      fileTimestamps: { [k: string]: number },
+      contextTimestamps: { [k: string]: number },
+    ) => {
       // Update fileTimestamps with timestamps from virtual files.
       const virtualFilesStats = this._virtualInputFileSystem.getVirtualFilesPaths()
         .map((fileName) => ({
           path: fileName,
-          mtime: +this._virtualInputFileSystem.statSync(fileName).mtime
+          mtime: +this._virtualInputFileSystem.statSync(fileName).mtime,
         }));
       virtualFilesStats.forEach(stats => fileTimestamps[stats.path] = +stats.mtime);
       callback(err, filesModified, contextModified, missingModified, fileTimestamps,
         contextTimestamps);
     };
+
     return super.watch(files, dirs, missing, startTime, options, newCallback, callbackUndelayed);
   }
 }

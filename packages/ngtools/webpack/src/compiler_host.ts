@@ -1,8 +1,14 @@
-// @ignoreDep typescript
-import * as ts from 'typescript';
-import {basename, dirname, join, sep} from 'path';
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as fs from 'fs';
-import {WebpackResourceLoader} from './resource_loader';
+import { basename, dirname, join, sep } from 'path';
+import * as ts from 'typescript';
+import { WebpackResourceLoader } from './resource_loader';
 
 
 export interface OnErrorFn {
@@ -174,42 +180,60 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   invalidate(fileName: string): void {
-    fileName = this.resolve(fileName);
-    if (fileName in this._files) {
-      this._files[fileName] = null;
+    const fullPath = this.resolve(fileName);
+
+    if (fullPath in this._files) {
+      this._files[fullPath] = null;
+    } else {
+      for (const file in this._files) {
+        if (file.startsWith(fullPath + '/')) {
+          this._files[file] = null;
+        }
+      }
     }
-    this._changedFiles[fileName] = true;
+    if (this.fileExists(fullPath)) {
+      this._changedFiles[fullPath] = true;
+    }
   }
 
   fileExists(fileName: string, delegate = true): boolean {
     fileName = this.resolve(fileName);
+
     return this._files[fileName] != null || (delegate && this._delegate.fileExists(fileName));
   }
 
-  readFile(fileName: string): string {
+  readFile(fileName: string): string | undefined {
     fileName = this.resolve(fileName);
 
     const stats = this._files[fileName];
-    if (stats == null) {
+    if (!stats) {
       const result = this._delegate.readFile(fileName);
-      if (result !== undefined && this._cache) {
-        this._setFileContent(fileName, result);
-        return result;
-      } else {
-        return result;
+      if (result !== undefined) {
+        if (this._cache) {
+          this._setFileContent(fileName, result);
+        }
       }
+
+      return result;
     }
+
     return stats.content;
   }
 
   // Does not delegate, use with `fileExists/directoryExists()`.
   stat(path: string): VirtualStats {
     path = this.resolve(path);
-    return this._files[path] || this._directories[path];
+    const stats = this._files[path] || this._directories[path];
+    if (!stats) {
+      throw new Error(`File not found: ${JSON.stringify(path)}`);
+    }
+
+    return stats;
   }
 
   directoryExists(directoryName: string, delegate = true): boolean {
     directoryName = this.resolve(directoryName);
+
     return (this._directories[directoryName] != null)
             || (delegate
                 && this._delegate.directoryExists != undefined
@@ -218,6 +242,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
   getFiles(path: string): string[] {
     path = this.resolve(path);
+
     return Object.keys(this._files)
       .filter(fileName => dirname(fileName) == path)
       .map(path => basename(path));
@@ -235,31 +260,35 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     } catch (e) {
       delegated = [];
     }
+
     return delegated.concat(subdirs);
   }
 
   getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, _onError?: OnErrorFn) {
     fileName = this.resolve(fileName);
 
-    const stats = this._files[fileName];
-    if (stats == null) {
+    let stats = this._files[fileName];
+    if (!stats) {
       const content = this.readFile(fileName);
 
-      if (!this._cache) {
+      if (!this._cache && content) {
         return ts.createSourceFile(fileName, content, languageVersion, this._setParentNodes);
-      } else if (!this._files[fileName]) {
-        // If cache is turned on and the file exists, the readFile call will have populated stats.
-        // Empty stats at this point mean the file doesn't exist at and so we should return
-        // undefined.
-        return undefined;
+      } else {
+        stats = this._files[fileName];
+        if (!stats) {
+          // If cache is turned on and the file exists, the readFile call will have populated stats.
+          // Empty stats at this point mean the file doesn't exist at and so we should return
+          // undefined.
+          return undefined;
+        }
       }
     }
 
-    return this._files[fileName]!.getSourceFile(languageVersion, this._setParentNodes);
+    return stats.getSourceFile(languageVersion, this._setParentNodes);
   }
 
-  getCancellationToken() {
-    return this._delegate.getCancellationToken!();
+  get getCancellationToken() {
+    return this._delegate.getCancellationToken;
   }
 
   getDefaultLibFileName(options: ts.CompilerOptions) {
@@ -269,9 +298,12 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   // This is due to typescript CompilerHost interface being weird on writeFile. This shuts down
   // typings in WebStorm.
   get writeFile() {
-    return (fileName: string, data: string, _writeByteOrderMark: boolean,
-            _onError?: (message: string) => void, _sourceFiles?: ts.SourceFile[]): void => {
-
+    return (
+      fileName: string,
+      data: string, _writeByteOrderMark: boolean,
+      _onError?: (message: string) => void,
+      _sourceFiles?: ReadonlyArray<ts.SourceFile>,
+    ): void => {
       fileName = this.resolve(fileName);
       this._setFileContent(fileName, data);
     };
@@ -283,6 +315,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
   getCanonicalFileName(fileName: string): string {
     fileName = this.resolve(fileName);
+
     return this._delegate.getCanonicalFileName(fileName);
   }
 
@@ -302,6 +335,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     if (this._resourceLoader) {
       // These paths are meant to be used by the loader so we must denormalize them.
       const denormalizedFileName = this.denormalizePath(fileName);
+
       return this._resourceLoader.get(denormalizedFileName);
     } else {
       return this.readFile(fileName);

@@ -1,3 +1,13 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+// TODO: fix typings.
+// tslint:disable-next-line:no-global-tslint-disable
+// tslint:disable:no-any
 import * as path from 'path';
 import { loader } from 'webpack';
 import { AngularCompilerPlugin } from './angular_compiler_plugin';
@@ -10,6 +20,11 @@ export function ngcLoader(this: loader.LoaderContext) {
   const cb = this.async();
   const sourceFileName: string = this.resourcePath;
   const timeLabel = `ngcLoader+${sourceFileName}+`;
+
+  if (!cb) {
+    throw new Error('This loader needs to support asynchronous webpack compilations.');
+  }
+
   time(timeLabel);
 
   const plugin = this._compilation._ngToolsWebpackPluginInstance;
@@ -20,10 +35,10 @@ export function ngcLoader(this: loader.LoaderContext) {
 
   // We must verify that the plugin is an instance of the right class.
   // Throw an error if it isn't, that often means multiple @ngtools/webpack installs.
-  if (!(plugin instanceof AngularCompilerPlugin)) {
+  if (!(plugin instanceof AngularCompilerPlugin) || !plugin.done) {
     throw new Error('Angular Compiler was detected but it was an instance of the wrong class.\n'
       + 'This likely means you have several @ngtools/webpack packages installed. '
-      + 'You can check this with `npm ls @ngtools/webpack`, and then remove the extra copies.'
+      + 'You can check this with `npm ls @ngtools/webpack`, and then remove the extra copies.',
     );
   }
 

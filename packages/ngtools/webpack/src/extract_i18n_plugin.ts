@@ -1,10 +1,19 @@
-import * as ts from 'typescript';
-import * as path from 'path';
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+// TODO: fix typings.
+// tslint:disable-next-line:no-global-tslint-disable
+// tslint:disable:no-any
 import * as fs from 'fs';
-
-import {__NGTOOLS_PRIVATE_API_2, VERSION} from './ngtools_api';
-import {Tapable} from './webpack';
-import {WebpackResourceLoader} from './resource_loader';
+import * as path from 'path';
+import * as ts from 'typescript';
+import { VERSION, __NGTOOLS_PRIVATE_API_2 } from './ngtools_api';
+import { WebpackResourceLoader } from './resource_loader';
+import { Tapable } from './webpack';
 
 export interface ExtractI18nPluginOptions {
   tsConfigPath: string;
@@ -64,7 +73,7 @@ export class ExtractI18nPlugin implements Tapable {
 
     let fileNames = tsConfig.fileNames;
     if (options.hasOwnProperty('exclude')) {
-      let exclude: string[] = typeof options.exclude == 'string'
+      const exclude: string[] = typeof options.exclude == 'string'
         ? [options.exclude as string] : (options.exclude as string[]);
 
       exclude.forEach((pattern: string) => {
@@ -103,7 +112,7 @@ export class ExtractI18nPlugin implements Tapable {
       { genDir },
       this._compilerOptions,
       tsConfig.raw['angularCompilerOptions'],
-      { basePath, outDir: genDir }
+      { basePath, outDir: genDir },
     );
 
     this._basePath = basePath;
@@ -137,7 +146,7 @@ export class ExtractI18nPlugin implements Tapable {
   apply(compiler: any) {
     compiler.hooks.make.tapAsync(
       'extract-i8n',
-      (compilation: any, cb: any) => this._make(compilation, cb)
+      (compilation: any, cb: any) => this._make(compilation, cb),
     );
 
     compiler.hooks.afterEmit.tapAsync('extract-i8n', (compilation: any, cb: any) => {
@@ -172,7 +181,7 @@ export class ExtractI18nPlugin implements Tapable {
           locale: this._locale,
           outFile: this._outFile,
 
-          readResource: (path: string) => this._resourceLoader.get(path)
+          readResource: (path: string) => this._resourceLoader.get(path),
         });
       })
       .then(() => cb(), (err: any) => {

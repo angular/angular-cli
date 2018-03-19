@@ -1,15 +1,21 @@
-import * as ts from 'typescript';
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import { satisfies } from 'semver';
-
+import * as ts from 'typescript';
+import { elideImports } from './elide_imports';
 import {
+  AddNodeOperation,
   OPERATION_KIND,
+  RemoveNodeOperation,
+  ReplaceNodeOperation,
   StandardTransform,
   TransformOperation,
-  RemoveNodeOperation,
-  AddNodeOperation,
-  ReplaceNodeOperation,
 } from './interfaces';
-import { elideImports } from './elide_imports';
 
 
 // Typescript below 2.5.0 needs a workaround.
@@ -64,7 +70,7 @@ export function makeTransform(
           modifiedNodes = [
             ...add.filter((op) => op.before).map(((op) => op.before)),
             ...modifiedNodes,
-            ...add.filter((op) => op.after).map(((op) => op.after))
+            ...add.filter((op) => op.after).map(((op) => op.after)),
           ];
           modified = true;
         }
@@ -110,7 +116,7 @@ export function makeTransform(
  * @param statements
  */
 function visitEachChildWorkaround(node: ts.Node, visitor: ts.Visitor,
-  context: ts.TransformationContext) {
+                                  context: ts.TransformationContext) {
 
   if (node.kind === ts.SyntaxKind.SourceFile) {
     const sf = node as ts.SourceFile;
@@ -123,6 +129,7 @@ function visitEachChildWorkaround(node: ts.Node, visitor: ts.Visitor,
     // as otherwise TS fails when resolving types for decorators.
     const sfClone = ts.getMutableClone(sf);
     sfClone.statements = statements;
+
     return sfClone;
   }
 

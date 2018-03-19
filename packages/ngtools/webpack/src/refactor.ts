@@ -1,4 +1,10 @@
-// @ignoreDep typescript
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as path from 'path';
 import * as ts from 'typescript';
 
@@ -18,7 +24,7 @@ export function findAstNodes<T extends ts.Node>(
   sourceFile: ts.SourceFile,
   kind: ts.SyntaxKind,
   recursive = false,
-  max = Infinity
+  max = Infinity,
 ): T[] {
   // TODO: refactor operations that only need `refactor.findAstNodes()` to use this instead.
   if (max == 0) {
@@ -28,7 +34,7 @@ export function findAstNodes<T extends ts.Node>(
     node = sourceFile;
   }
 
-  let arr: T[] = [];
+  const arr: T[] = [];
   if (node.kind === kind) {
     // If we're not recursively looking for children, stop here.
     if (!recursive) {
@@ -54,13 +60,14 @@ export function findAstNodes<T extends ts.Node>(
       }
     }
   }
+
   return arr;
 }
 
 export function resolve(
   filePath: string,
   _host: ts.CompilerHost,
-  compilerOptions: ts.CompilerOptions
+  compilerOptions: ts.CompilerOptions,
 ): string {
   if (path.isAbsolute(filePath)) {
     return filePath;
@@ -69,6 +76,7 @@ export function resolve(
   if (!basePath) {
     throw new Error(`Trying to resolve '${filePath}' without a basePath.`);
   }
+
   return path.join(basePath, filePath);
 }
 
@@ -84,19 +92,34 @@ export class TypeScriptFileRefactor {
               _host: ts.CompilerHost,
               _program?: ts.Program,
               source?: string | null) {
-    fileName = resolve(fileName, _host, _program!.getCompilerOptions()).replace(/\\/g, '/');
-    this._fileName = fileName;
+    let sourceFile: ts.SourceFile | null = null;
+
     if (_program) {
+      fileName = resolve(fileName, _host, _program.getCompilerOptions()).replace(/\\/g, '/');
+      this._fileName = fileName;
+
       if (source) {
-        this._sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true);
+        sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true);
       } else {
-        this._sourceFile = _program.getSourceFile(fileName);
+        sourceFile = _program.getSourceFile(fileName) || null;
       }
     }
-    if (!this._sourceFile) {
-      this._sourceFile = ts.createSourceFile(fileName, source || _host.readFile(fileName),
-        ts.ScriptTarget.Latest, true);
+    if (!sourceFile) {
+      const maybeContent = source || _host.readFile(fileName);
+      if (maybeContent) {
+        sourceFile = ts.createSourceFile(
+          fileName,
+          maybeContent,
+          ts.ScriptTarget.Latest,
+          true,
+        );
+      }
     }
+    if (!sourceFile) {
+      throw new Error('Must have a source file to refactor.');
+    }
+
+    this._sourceFile = sourceFile;
   }
 
   /**

@@ -1,18 +1,23 @@
-// @ignoreDep typescript
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as ts from 'typescript';
-
 import { collectDeepNodes, getFirstNode } from './ast_helpers';
-import { makeTransform } from './make_transform';
 import {
-  StandardTransform,
   AddNodeOperation,
   ReplaceNodeOperation,
-  TransformOperation
+  StandardTransform,
+  TransformOperation,
 } from './interfaces';
+import { makeTransform } from './make_transform';
 
 
 export function replaceResources(
-  shouldTransform: (fileName: string) => boolean
+  shouldTransform: (fileName: string) => boolean,
 ): ts.TransformerFactory<ts.SourceFile> {
   const standardTransform: StandardTransform = function (sourceFile: ts.SourceFile) {
     const ops: TransformOperation[] = [];
@@ -35,19 +40,22 @@ export function replaceResources(
       const nodeRequireInterface = ts.createInterfaceDeclaration([], [], 'NodeRequire', [], [], [
         ts.createCallSignature([], [
           ts.createParameter([], [], undefined, 'id', undefined,
-            ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
-          )
-        ], ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword))
+            ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+          ),
+        ], ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)),
       ]);
 
       // declare var require: NodeRequire;
       const varRequire = ts.createVariableStatement(
         [ts.createToken(ts.SyntaxKind.DeclareKeyword)],
-        [ts.createVariableDeclaration('require', ts.createTypeReferenceNode('NodeRequire', []))]
+        [ts.createVariableDeclaration('require', ts.createTypeReferenceNode('NodeRequire', []))],
       );
 
-      ops.push(new AddNodeOperation(sourceFile, getFirstNode(sourceFile), nodeRequireInterface));
-      ops.push(new AddNodeOperation(sourceFile, getFirstNode(sourceFile), varRequire));
+      const firstNode = getFirstNode(sourceFile);
+      if (firstNode) {
+        ops.push(new AddNodeOperation(sourceFile, firstNode, nodeRequireInterface));
+        ops.push(new AddNodeOperation(sourceFile, firstNode, varRequire));
+      }
     }
 
     return ops;
@@ -77,6 +85,7 @@ export function findResources(sourceFile: ts.SourceFile): ResourceReplacement[] 
         // key is an expression, can't do anything.
         return false;
       }
+
       return key == 'templateUrl' || key == 'styleUrls';
     })
     // Replace templateUrl/styleUrls key with template/styles, and and paths with require('path').
@@ -89,7 +98,7 @@ export function findResources(sourceFile: ts.SourceFile): ResourceReplacement[] 
         const propAssign = ts.createPropertyAssignment('template', requireCall);
         replacements.push({
           resourcePaths: [resourcePath],
-          replaceNodeOperation: new ReplaceNodeOperation(sourceFile, node, propAssign)
+          replaceNodeOperation: new ReplaceNodeOperation(sourceFile, node, propAssign),
         });
       } else if (key == 'styleUrls') {
         const arr = collectDeepNodes<ts.ArrayLiteralExpression>(node,
@@ -103,13 +112,13 @@ export function findResources(sourceFile: ts.SourceFile): ResourceReplacement[] 
         });
 
         const requireArray = ts.createArrayLiteral(
-          stylePaths.map((path) => _createRequireCall(path))
+          stylePaths.map((path) => _createRequireCall(path)),
         );
 
         const propAssign = ts.createPropertyAssignment('styles', requireArray);
         replacements.push({
           resourcePaths: stylePaths,
-          replaceNodeOperation: new ReplaceNodeOperation(sourceFile, node, propAssign)
+          replaceNodeOperation: new ReplaceNodeOperation(sourceFile, node, propAssign),
         });
       }
     });
@@ -136,6 +145,7 @@ function _getResourceRequest(element: ts.Expression, sourceFile: ts.SourceFile) 
     element.kind === ts.SyntaxKind.NoSubstitutionTemplateLiteral
   ) {
     const url = (element as ts.StringLiteral).text;
+
     // If the URL does not start with ./ or ../, prepends ./ to it.
     return `${/^\.?\.\//.test(url) ? '' : './'}${url}`;
   } else {
@@ -148,6 +158,6 @@ function _createRequireCall(path: string) {
   return ts.createCall(
     ts.createIdentifier('require'),
     [],
-    [ts.createLiteral(path)]
+    [ts.createLiteral(path)],
   );
 }

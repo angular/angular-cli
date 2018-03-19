@@ -1,16 +1,21 @@
-// @ignoreDep typescript
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as ts from 'typescript';
-
 import { collectDeepNodes, getFirstNode } from './ast_helpers';
-import { StandardTransform, AddNodeOperation, TransformOperation } from './interfaces';
 import { insertStarImport } from './insert_import';
+import { AddNodeOperation, StandardTransform, TransformOperation } from './interfaces';
 import { makeTransform } from './make_transform';
 
 
 export function registerLocaleData(
   shouldTransform: (fileName: string) => boolean,
-  getEntryModule: () => { path: string, className: string },
-  locale: string
+  getEntryModule: () => { path: string, className: string } | undefined,
+  locale: string,
 ): ts.TransformerFactory<ts.SourceFile> {
 
   const standardTransform: StandardTransform = function (sourceFile: ts.SourceFile) {
@@ -56,17 +61,21 @@ export function registerLocaleData(
 
       const firstNode = getFirstNode(sourceFile);
 
+      if (!firstNode) {
+        return;
+      }
+
       // Create the import node for the locale.
       const localeNamespaceId = ts.createUniqueName('__NgCli_locale_');
       ops.push(...insertStarImport(
-        sourceFile, localeNamespaceId, `@angular/common/locales/${locale}`, firstNode, true
+        sourceFile, localeNamespaceId, `@angular/common/locales/${locale}`, firstNode, true,
       ));
 
       // Create the import node for the registerLocaleData function.
       const regIdentifier = ts.createIdentifier(`registerLocaleData`);
       const regNamespaceId = ts.createUniqueName('__NgCli_locale_');
       ops.push(
-        ...insertStarImport(sourceFile, regNamespaceId, '@angular/common', firstNode, true)
+        ...insertStarImport(sourceFile, regNamespaceId, '@angular/common', firstNode, true),
       );
 
       // Create the register function call

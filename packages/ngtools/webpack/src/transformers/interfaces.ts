@@ -1,9 +1,16 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as ts from 'typescript';
 
 export enum OPERATION_KIND {
   Remove,
   Add,
-  Replace
+  Replace,
 }
 
 export interface StandardTransform {
@@ -14,7 +21,7 @@ export abstract class TransformOperation {
   constructor(
     public kind: OPERATION_KIND,
     public sourceFile: ts.SourceFile,
-    public target: ts.Node
+    public target: ts.Node,
   ) { }
 }
 
@@ -26,7 +33,7 @@ export class RemoveNodeOperation extends TransformOperation {
 
 export class AddNodeOperation extends TransformOperation {
   constructor(sourceFile: ts.SourceFile, target: ts.Node,
-    public before?: ts.Node, public after?: ts.Node) {
+              public before?: ts.Node, public after?: ts.Node) {
     super(OPERATION_KIND.Add, sourceFile, target);
   }
 }

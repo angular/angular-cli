@@ -1,11 +1,18 @@
-import { oneLine, stripIndent } from 'common-tags';
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import { tags } from '@angular-devkit/core';  // tslint:disable-line:no-implicit-dependencies
 import { createTypescriptContext, transformTypescript } from './ast_helpers';
 import { replaceServerBootstrap } from './replace_server_bootstrap';
 
 describe('@ngtools/webpack transformers', () => {
   describe('replace_server_bootstrap', () => {
     it('should replace bootstrap', () => {
-      const input = stripIndent`
+      const input = tags.stripIndent`
         import { enableProdMode } from '@angular/core';
         import { platformDynamicServer } from '@angular/platform-server';
 
@@ -20,7 +27,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       // tslint:disable:max-line-length
-      const output = stripIndent`
+      const output = tags.stripIndent`
         import { enableProdMode } from '@angular/core';
         import { environment } from './environments/environment';
 
@@ -42,11 +49,11 @@ describe('@ngtools/webpack transformers', () => {
       );
       const result = transformTypescript(undefined, [transformer], program, compilerHost);
 
-      expect(oneLine`${result}`).toEqual(oneLine`${output}`);
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
     it('should replace renderModule', () => {
-      const input = stripIndent`
+      const input = tags.stripIndent`
         import { enableProdMode } from '@angular/core';
         import { renderModule } from '@angular/platform-server';
 
@@ -64,7 +71,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       // tslint:disable:max-line-length
-      const output = stripIndent`
+      const output = tags.stripIndent`
         import { enableProdMode } from '@angular/core';
         import { environment } from './environments/environment';
 
@@ -89,11 +96,11 @@ describe('@ngtools/webpack transformers', () => {
       );
       const result = transformTypescript(undefined, [transformer], program, compilerHost);
 
-      expect(oneLine`${result}`).toEqual(oneLine`${output}`);
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
     it('should replace when the module is used in a config object', () => {
-      const input = stripIndent`
+      const input = tags.stripIndent`
         import * as express from 'express';
 
         import { enableProdMode } from '@angular/core';
@@ -113,7 +120,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       // tslint:disable:max-line-length
-      const output = stripIndent`
+      const output = tags.stripIndent`
         import * as express from 'express';
 
         import { enableProdMode } from '@angular/core';
@@ -142,11 +149,11 @@ describe('@ngtools/webpack transformers', () => {
       );
       const result = transformTypescript(undefined, [transformer], program, compilerHost);
 
-      expect(oneLine`${result}`).toEqual(oneLine`${output}`);
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
     it('should replace bootstrap when barrel files are used', () => {
-      const input = stripIndent`
+      const input = tags.stripIndent`
         import { enableProdMode } from '@angular/core';
         import { platformDynamicServer } from '@angular/platform-browser-dynamic';
 
@@ -161,7 +168,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       // tslint:disable:max-line-length
-      const output = stripIndent`
+      const output = tags.stripIndent`
         import { enableProdMode } from '@angular/core';
         import { environment } from './environments/environment';
 
@@ -183,11 +190,11 @@ describe('@ngtools/webpack transformers', () => {
       );
       const result = transformTypescript(undefined, [transformer], program, compilerHost);
 
-      expect(oneLine`${result}`).toEqual(oneLine`${output}`);
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
     it('should not replace bootstrap when there is no entry module', () => {
-      const input = stripIndent`
+      const input = tags.stripIndent`
         import { enableProdMode } from '@angular/core';
         import { platformDynamicServer } from '@angular/platform-browser-dynamic';
 
@@ -209,7 +216,7 @@ describe('@ngtools/webpack transformers', () => {
       );
       const result = transformTypescript(undefined, [transformer], program, compilerHost);
 
-      expect(oneLine`${result}`).toEqual(oneLine`${input}`);
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${input}`);
     });
   });
 });

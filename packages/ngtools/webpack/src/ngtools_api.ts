@@ -1,14 +1,23 @@
-// @ignoreDep @angular/compiler-cli
-// @ignoreDep typescript
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+// We disable implicit dependenccies because those are only for typings and don't have a runtime
+// equivalent.
+// tslint:disable-next-line:no-global-tslint-disable
+// tslint:disable:no-implicit-dependencies
 /**
  * This is a copy of types in @compiler-cli/src/ngtools_api.d.ts file,
  * together with safe imports for private apis for cases where @angular/compiler-cli isn't
  * available or is below version 5.
  */
-import * as path from 'path';
-import * as ts from 'typescript';
 import * as ngc from '@angular/compiler-cli';
 import * as ngtools from '@angular/compiler-cli/ngtools2';
+import * as path from 'path';
+import * as ts from 'typescript';
 
 export const DEFAULT_ERROR_CODE = 100;
 export const UNKNOWN_ERROR_CODE = 500;
@@ -50,7 +59,7 @@ export function CompilerCliIsSupported() {
 
 // These imports do not exist on a global install for Angular CLI, so we cannot use a static ES6
 // import.
-let compilerCli: typeof ngc;
+let compilerCli: typeof ngc | null = null;
 try {
   compilerCli = require('@angular/compiler-cli');
 } catch {
@@ -59,15 +68,15 @@ try {
   // plugin cannot be used.
 }
 
-export const VERSION: typeof ngc.VERSION = compilerCli && compilerCli.VERSION;
-export const __NGTOOLS_PRIVATE_API_2: typeof ngc.__NGTOOLS_PRIVATE_API_2 =
+export const VERSION: typeof ngc.VERSION | null = compilerCli && compilerCli.VERSION;
+export const __NGTOOLS_PRIVATE_API_2: typeof ngc.__NGTOOLS_PRIVATE_API_2 | null =
   compilerCli && compilerCli.__NGTOOLS_PRIVATE_API_2;
-export const readConfiguration: typeof ngc.readConfiguration =
+export const readConfiguration: typeof ngc.readConfiguration | null =
   compilerCli && compilerCli.readConfiguration;
 
 // These imports do not exist on Angular versions lower than 5, so we cannot use a static ES6
 // import.
-let ngtools2: typeof ngtools;
+let ngtools2: typeof ngtools | null = null;
 try {
   ngtools2 = require('@angular/compiler-cli/ngtools2');
 } catch {
@@ -76,9 +85,10 @@ try {
   // plugin cannot be used.
 }
 
-export const createProgram: typeof ngtools.createProgram = ngtools2 && ngtools2.createProgram;
-export const createCompilerHost: typeof ngtools.createCompilerHost =
+export const createProgram: typeof ngtools.createProgram | null =
+  ngtools2 && ngtools2.createProgram;
+export const createCompilerHost: typeof ngtools.createCompilerHost | null =
   ngtools2 && ngtools2.createCompilerHost;
-export const formatDiagnostics: typeof ngtools.formatDiagnostics =
+export const formatDiagnostics: typeof ngtools.formatDiagnostics | null =
   ngtools2 && ngtools2.formatDiagnostics;
-export const EmitFlags: typeof ngtools.EmitFlags = ngtools2 && ngtools2.EmitFlags;
+export const EmitFlags: typeof ngtools.EmitFlags | null = ngtools2 && ngtools2.EmitFlags;

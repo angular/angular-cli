@@ -1,4 +1,10 @@
-// @ignoreDep typescript
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as ts from 'typescript';
 import { WebpackCompilerHost } from '../compiler_host';
 
@@ -21,6 +27,7 @@ export function getFirstNode(sourceFile: ts.SourceFile): ts.Node | null {
   if (sourceFile.statements.length > 0) {
     return sourceFile.statements[0] || null;
   }
+
   return null;
 }
 
@@ -28,6 +35,7 @@ export function getLastNode(sourceFile: ts.SourceFile): ts.Node | null {
   if (sourceFile.statements.length > 0) {
     return sourceFile.statements[sourceFile.statements.length - 1] || null;
   }
+
   return null;
 }
 
@@ -45,7 +53,7 @@ export function createTypescriptContext(content: string) {
     target: ts.ScriptTarget.ESNext,
     skipLibCheck: true,
     sourceMap: false,
-    importHelpers: true
+    importHelpers: true,
   };
 
   // Create compiler host.
@@ -56,6 +64,7 @@ export function createTypescriptContext(content: string) {
 
   // Create the TypeScript program.
   const program = ts.createProgram([fileName], compilerOptions, compilerHost);
+
   return { compilerHost, program };
 }
 
@@ -63,7 +72,7 @@ export function transformTypescript(
   content: string | undefined,
   transformers: ts.TransformerFactory<ts.SourceFile>[],
   program?: ts.Program,
-  compilerHost?: WebpackCompilerHost
+  compilerHost?: WebpackCompilerHost,
 ) {
 
   // Use given context or create a new one.
@@ -77,12 +86,13 @@ export function transformTypescript(
 
   // Emit.
   const { emitSkipped, diagnostics } = program.emit(
-    undefined, undefined, undefined, undefined, { before: transformers }
+    undefined, undefined, undefined, undefined, { before: transformers },
   );
 
   // Log diagnostics if emit wasn't successfull.
   if (emitSkipped) {
     console.log(diagnostics);
+
     return null;
   }
 

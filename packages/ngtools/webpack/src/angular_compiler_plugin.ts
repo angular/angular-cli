@@ -1,52 +1,61 @@
-// @ignoreDep typescript
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+// TODO: fix webpack typings.
+// tslint:disable-next-line:no-global-tslint-disable
+// tslint:disable:no-any
+import { ChildProcess, ForkOptions, fork } from 'child_process';
 import * as fs from 'fs';
-import { fork, ForkOptions, ChildProcess } from 'child_process';
 import * as path from 'path';
 import * as ts from 'typescript';
-
-const ContextElementDependency = require('webpack/lib/dependencies/ContextElementDependency');
-const treeKill = require('tree-kill');
-
-import { WebpackResourceLoader } from './resource_loader';
-import { WebpackCompilerHost } from './compiler_host';
-import { resolveWithPaths } from './paths-plugin';
-import { findLazyRoutes, LazyRouteMap } from './lazy_routes';
-import {
-  VirtualFileSystemDecorator,
-  VirtualWatchFileSystemDecorator
-} from './virtual_file_system_decorator';
-import { resolveEntryModuleFromMain } from './entry_resolver';
-import {
-  replaceBootstrap,
-  replaceServerBootstrap,
-  exportNgFactory,
-  exportLazyModuleMap,
-  removeDecorators,
-  registerLocaleData,
-  findResources,
-  replaceResources,
-} from './transformers';
 import { time, timeEnd } from './benchmark';
-import { InitMessage, UpdateMessage, AUTO_START_ARG } from './type_checker';
+import { WebpackCompilerHost } from './compiler_host';
+import { resolveEntryModuleFromMain } from './entry_resolver';
 import { gatherDiagnostics, hasErrors } from './gather_diagnostics';
+import { LazyRouteMap, findLazyRoutes } from './lazy_routes';
 import {
   CompilerCliIsSupported,
-  __NGTOOLS_PRIVATE_API_2,
-  VERSION,
-  DEFAULT_ERROR_CODE,
-  UNKNOWN_ERROR_CODE,
-  SOURCE,
-  Program,
-  CompilerOptions,
   CompilerHost,
+  CompilerOptions,
+  DEFAULT_ERROR_CODE,
   Diagnostic,
   EmitFlags,
-  createProgram,
+  Program,
+  SOURCE,
+  UNKNOWN_ERROR_CODE,
+  VERSION,
+  __NGTOOLS_PRIVATE_API_2,
   createCompilerHost,
+  createProgram,
   formatDiagnostics,
   readConfiguration,
 } from './ngtools_api';
+import { resolveWithPaths } from './paths-plugin';
+import { WebpackResourceLoader } from './resource_loader';
+import {
+  exportLazyModuleMap,
+  exportNgFactory,
+  findResources,
+  registerLocaleData,
+  removeDecorators,
+  replaceBootstrap,
+  replaceResources,
+  replaceServerBootstrap,
+} from './transformers';
 import { collectDeepNodes } from './transformers/ast_helpers';
+import { AUTO_START_ARG, InitMessage, UpdateMessage } from './type_checker';
+import {
+  VirtualFileSystemDecorator,
+  VirtualWatchFileSystemDecorator,
+} from './virtual_file_system_decorator';
+
+
+const ContextElementDependency = require('webpack/lib/dependencies/ContextElementDependency');
+const treeKill = require('tree-kill');
 
 
 /**
@@ -82,7 +91,7 @@ export interface AngularCompilerPluginOptions {
 
 export enum PLATFORM {
   Browser,
-  Server
+  Server,
 }
 
 export class AngularCompilerPlugin {
@@ -117,7 +126,7 @@ export class AngularCompilerPlugin {
 
   // TypeChecker process.
   private _forkTypeChecker = true;
-  private _typeCheckerProcess: ChildProcess;
+  private _typeCheckerProcess: ChildProcess | null;
   private _forkedTypeCheckerInitialized = false;
 
   private get _ngCompilerSupportsNewApi() {
@@ -138,11 +147,12 @@ export class AngularCompilerPlugin {
   get done() { return this._donePromise; }
   get entryModule() {
     if (!this._entryModule) {
-      return undefined;
+      return null;
     }
     const splitted = this._entryModule.split(/(#[a-zA-Z_]([\w]+))$/);
     const path = splitted[0];
     const className = !!splitted[1] ? splitted[1].substring(1) : 'default';
+
     return { path, className };
   }
 
@@ -165,7 +175,7 @@ export class AngularCompilerPlugin {
     if (fs.statSync(maybeBasePath).isFile()) {
       basePath = path.dirname(basePath);
     }
-    if (options.hasOwnProperty('basePath')) {
+    if (options.basePath !== undefined) {
       basePath = path.resolve(process.cwd(), options.basePath);
     }
 
@@ -181,7 +191,7 @@ export class AngularCompilerPlugin {
 
     this._rootNames = config.rootNames.concat(...this._singleFileIncludes);
     this._compilerOptions = { ...config.options, ...options.compilerOptions };
-    this._basePath = config.options.basePath;
+    this._basePath = config.options.basePath || '';
 
     // Overwrite outDir so we can find generated files next to their .ts origin in compilerHost.
     this._compilerOptions.outDir = '';
@@ -258,7 +268,7 @@ export class AngularCompilerPlugin {
     // Use the WebpackCompilerHost with a resource loader to create an AngularCompilerHost.
     this._compilerHost = createCompilerHost({
       options: this._compilerOptions,
-      tsHost: webpackCompilerHost
+      tsHost: webpackCompilerHost,
     }) as CompilerHost & WebpackCompilerHost;
 
     // Override some files in the FileSystem with paths from the actual file system.
@@ -266,7 +276,9 @@ export class AngularCompilerPlugin {
       for (const filePath of Object.keys(this._options.hostReplacementPaths)) {
         const replacementFilePath = this._options.hostReplacementPaths[filePath];
         const content = this._compilerHost.readFile(replacementFilePath);
-        this._compilerHost.writeFile(filePath, content, false);
+        if (content) {
+          this._compilerHost.writeFile(filePath, content, false);
+        }
       }
     }
 
@@ -317,6 +329,7 @@ export class AngularCompilerPlugin {
             return true;
           }
         }
+
         return false;
       });
   }
@@ -346,7 +359,7 @@ export class AngularCompilerPlugin {
             this._rootNames,
             this._compilerOptions,
             this._compilerHost,
-            this._program as ts.Program
+            this._program as ts.Program,
           );
           timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
 
@@ -358,11 +371,12 @@ export class AngularCompilerPlugin {
             rootNames: this._rootNames,
             options: this._compilerOptions,
             host: this._compilerHost,
-            oldProgram: this._program as Program
+            oldProgram: this._program as Program,
           });
           timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
 
           time('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
+
           return this._program.loadNgStructureAsync()
             .then(() => {
               timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
@@ -388,11 +402,12 @@ export class AngularCompilerPlugin {
         host: this._compilerHost,
         angularCompilerOptions: Object.assign({}, this._compilerOptions, {
           // genDir seems to still be needed in @angular\compiler-cli\src\compiler_host.js:226.
-          genDir: ''
+          genDir: '',
         }),
-        entryModule: this._entryModule
+        entryModule: this._entryModule,
       });
       timeEnd('AngularCompilerPlugin._getLazyRoutesFromNgtools');
+
       return result;
     } catch (err) {
       // We silence the error that the @angular/router could not be found. In that case, there is
@@ -417,6 +432,7 @@ export class AngularCompilerPlugin {
       }
     }
     timeEnd('AngularCompilerPlugin._findLazyRoutesInAst');
+
     return result;
   }
 
@@ -436,13 +452,14 @@ export class AngularCompilerPlugin {
             + `Duplicated path in loadChildren detected: "${ref}" is used in 2 loadChildren, `
             + `but they point to different modules "(${acc[ref]} and `
             + `"${curr.referencedModule.filePath}"). Webpack cannot distinguish on context and `
-            + 'would fail to load the proper one.'
+            + 'would fail to load the proper one.',
           );
         }
         acc[ref] = curr.referencedModule.filePath;
+
         return acc;
       },
-      {} as LazyRouteMap
+      {} as LazyRouteMap,
     );
   }
 
@@ -477,7 +494,7 @@ export class AngularCompilerPlugin {
             this._warnings.push(
               new Error(`Duplicated path in loadChildren detected during a rebuild. `
                 + `We will take the latest version detected and override it to save rebuild time. `
-                + `You should perform a full build to validate that your routes don't overlap.`)
+                + `You should perform a full build to validate that your routes don't overlap.`),
             );
           }
         } else {
@@ -489,7 +506,7 @@ export class AngularCompilerPlugin {
 
   private _createForkedTypeChecker() {
     // Bootstrap type checker is using local CLI.
-    const g: any = global;
+    const g: any = global;  // tslint:disable-line:no-any
     const typeCheckerFile: string = g['angularCliIsLocal']
       ? './type_checker_bootstrap.js'
       : './type_checker_worker.js';
@@ -513,7 +530,7 @@ export class AngularCompilerPlugin {
 
     // Handle child process exit.
     this._typeCheckerProcess.once('exit', (_, signal) => {
-      this._typeCheckerProcess = undefined;
+      this._typeCheckerProcess = null;
 
       // If process exited not because of SIGTERM (see _killForkedTypeChecker), than something
       // went wrong and it should fallback to type checking on the main thread.
@@ -529,20 +546,23 @@ export class AngularCompilerPlugin {
   private _killForkedTypeChecker() {
     if (this._typeCheckerProcess && this._typeCheckerProcess.pid) {
       treeKill(this._typeCheckerProcess.pid, 'SIGTERM');
-      this._typeCheckerProcess = undefined;
+      this._typeCheckerProcess = null;
     }
   }
 
   private _updateForkedTypeChecker(rootNames: string[], changedCompilationFiles: string[]) {
-    if (!this._forkedTypeCheckerInitialized) {
-      this._typeCheckerProcess.send(new InitMessage(this._compilerOptions, this._basePath,
-        this._JitMode, this._rootNames));
-      this._forkedTypeCheckerInitialized = true;
+    if (this._typeCheckerProcess) {
+      if (!this._forkedTypeCheckerInitialized) {
+        this._typeCheckerProcess.send(new InitMessage(this._compilerOptions, this._basePath,
+          this._JitMode, this._rootNames));
+        this._forkedTypeCheckerInitialized = true;
+      }
+      this._typeCheckerProcess.send(new UpdateMessage(rootNames, changedCompilationFiles));
     }
-    this._typeCheckerProcess.send(new UpdateMessage(rootNames, changedCompilationFiles));
   }
 
   // Registration hook for webpack plugin.
+  // tslint:disable-next-line:no-any
   apply(compiler: any) {
     // Decorate inputFileSystem to serve contents of CompilerHost.
     // Use decorated inputFileSystem in watchFileSystem.
@@ -566,29 +586,34 @@ export class AngularCompilerPlugin {
       const angularCoreDirname = fs.realpathSync(path.dirname(angularCorePackagePath));
 
       cmf.hooks.afterResolve.tapAsync('angular-compiler',
-      (result: any, callback: (err?: any, request?: any) => void) => {
+      // tslint:disable-next-line:no-any
+      (result: any, callback: (err?: Error, request?: any) => void) => {
         if (!result) {
           return callback();
         }
 
         // Alter only request from Angular.
         if (!result.resource.startsWith(angularCoreDirname)) {
-          return callback(null, result);
+          return callback(undefined, result);
+        }
+        if (!this.done) {
+          return callback(undefined, result);
         }
 
-        this.done!.then(() => {
+        this.done.then(() => {
           // This folder does not exist, but we need to give webpack a resource.
           // TODO: check if we can't just leave it as is (angularCoreModuleDir).
           result.resource = path.join(this._basePath, '$$_lazy_route_resource');
           result.dependencies.forEach((d: any) => d.critical = false);
           result.resolveDependencies = (_fs: any, resourceOrOptions: any, recursiveOrCallback: any,
-            _regExp: RegExp, cb: any) => {
+                                        _regExp: RegExp, cb: any) => {
             const dependencies = Object.keys(this._lazyRoutes)
               .map((key) => {
                 const modulePath = this._lazyRoutes[key];
                 const importPath = key.split('#')[0];
                 if (modulePath !== null) {
                   const name = importPath.replace(/(\.ngfactory)?\.(js|ts)$/, '');
+
                   return new ContextElementDependency(modulePath, name);
                 } else {
                   return null;
@@ -604,8 +629,9 @@ export class AngularCompilerPlugin {
             }
             cb(null, dependencies);
           };
-          return callback(null, result);
-        }, () => callback(null))
+
+          return callback(undefined, result);
+        }, () => callback())
           .catch(err => callback(err));
       });
     });
@@ -699,11 +725,10 @@ export class AngularCompilerPlugin {
   }
 
   private _makeTransformers() {
-
     const isAppPath = (fileName: string) =>
       !fileName.endsWith('.ngfactory.ts') && !fileName.endsWith('.ngstyle.ts');
     const isMainPath = (fileName: string) => fileName === this._mainPath;
-    const getEntryModule = () => this.entryModule;
+    const getEntryModule = () => this._entryModule;
     const getLazyRoutes = () => this._lazyRoutes;
     const getTypeChecker = () => this._getTsProgram().getTypeChecker();
 
@@ -742,7 +767,7 @@ export class AngularCompilerPlugin {
     time('AngularCompilerPlugin._update');
     // We only want to update on TS and template changes, but all kinds of files are on this
     // list, like package.json and .ngsummary.json files.
-    let changedFiles = this._getChangedCompilationFiles();
+    const changedFiles = this._getChangedCompilationFiles();
 
     // If nothing we care about changed and it isn't the first run, don't do anything.
     if (changedFiles.length === 0 && !this._firstRun) {
@@ -785,7 +810,7 @@ export class AngularCompilerPlugin {
           // So we ignore missing source files files here.
           // hostReplacementPaths needs to be fixed anyway to take care of the following issue.
           // https://github.com/angular/angular-cli/issues/7305#issuecomment-332150230
-          .filter((x) => !!x);
+          .filter((x) => !!x) as ts.SourceFile[];
 
         // Emit files.
         time('AngularCompilerPlugin._update._emit');
@@ -829,25 +854,28 @@ export class AngularCompilerPlugin {
     }
 
     // Write the extracted messages to disk.
-    const i18nOutFilePath = path.resolve(this._basePath, this._compilerOptions.i18nOutFile);
-    const i18nOutFileContent = this._compilerHost.readFile(i18nOutFilePath);
-    if (i18nOutFileContent) {
-      _recursiveMkDir(path.dirname(i18nOutFilePath))
-        .then(() => fs.writeFileSync(i18nOutFilePath, i18nOutFileContent));
+    if (this._compilerOptions.i18nOutFile) {
+      const i18nOutFilePath = path.resolve(this._basePath, this._compilerOptions.i18nOutFile);
+      const i18nOutFileContent = this._compilerHost.readFile(i18nOutFilePath);
+      if (i18nOutFileContent) {
+        _recursiveMkDir(path.dirname(i18nOutFilePath))
+          .then(() => fs.writeFileSync(i18nOutFilePath, i18nOutFileContent));
+      }
     }
   }
 
   getCompiledFile(fileName: string) {
     const outputFile = fileName.replace(/.ts$/, '.js');
     let outputText: string;
-    let sourceMap: string;
+    let sourceMap: string | undefined;
     let errorDependencies: string[] = [];
 
     if (this._emitSkipped) {
-      if (this._compilerHost.fileExists(outputFile, false)) {
+      const text = this._compilerHost.readFile(outputFile);
+      if (text) {
         // If the compilation didn't emit files this time, try to return the cached files from the
         // last compilation and let the compilation errors show what's wrong.
-        outputText = this._compilerHost.readFile(outputFile);
+        outputText = text;
         sourceMap = this._compilerHost.readFile(outputFile + '.map');
       } else {
         // There's nothing we can serve. Return an empty string to prevent lenghty webpack errors,
@@ -876,9 +904,10 @@ export class AngularCompilerPlugin {
         throw new Error(msg);
       }
 
-      outputText = this._compilerHost.readFile(outputFile);
+      outputText = this._compilerHost.readFile(outputFile) || '';
       sourceMap = this._compilerHost.readFile(outputFile + '.map');
     }
+
     return { outputText, sourceMap, errorDependencies };
   }
 
@@ -916,10 +945,11 @@ export class AngularCompilerPlugin {
     const uniqueDependencies =  new Set([
       ...esImports,
       ...resourceImports,
-      ...this.getResourceDependencies(resolvedFileName)
-    ].map((p) => this._compilerHost.denormalizePath(p)));
+      ...this.getResourceDependencies(resolvedFileName),
+    ].map((p) => p && this._compilerHost.denormalizePath(p)));
 
-    return [...uniqueDependencies];
+    return [...uniqueDependencies]
+      .filter(x => !!x) as string[];
   }
 
   getResourceDependencies(fileName: string): string[] {
@@ -956,7 +986,7 @@ export class AngularCompilerPlugin {
             const timeLabel = `AngularCompilerPlugin._emit.ts+${sf.fileName}+.emit`;
             time(timeLabel);
             emitResult = tsProgram.emit(sf, undefined, undefined, undefined,
-              { before: this._transformers }
+              { before: this._transformers },
             );
             allDiagnostics.push(...emitResult.diagnostics);
             timeEnd(timeLabel);
@@ -993,8 +1023,8 @@ export class AngularCompilerPlugin {
           const emitFlags = extractI18n ? EmitFlags.I18nBundle : EmitFlags.Default;
           emitResult = angularProgram.emit({
             emitFlags, customTransformers: {
-              beforeTs: this._transformers
-            }
+              beforeTs: this._transformers,
+            },
           });
           allDiagnostics.push(...emitResult.diagnostics);
           if (extractI18n) {
@@ -1008,7 +1038,7 @@ export class AngularCompilerPlugin {
       // This function is available in the import below, but this way we avoid the dependency.
       // import { isSyntaxError } from '@angular/compiler';
       function isSyntaxError(error: Error): boolean {
-        return (error as any)['ngSyntaxError'];
+        return (error as any)['ngSyntaxError'];  // tslint:disable-line:no-any
       }
 
       let errMsg: string;
@@ -1020,7 +1050,7 @@ export class AngularCompilerPlugin {
       } else {
         errMsg = e.stack;
         // It is not a syntax error we might have a program with unknown state, discard it.
-        this._program = undefined;
+        this._program = null;
         code = UNKNOWN_ERROR_CODE;
       }
       allDiagnostics.push(
@@ -1028,6 +1058,7 @@ export class AngularCompilerPlugin {
       timeEnd('AngularCompilerPlugin._emit.catch');
     }
     timeEnd('AngularCompilerPlugin._emit');
+
     return { program, emitResult, diagnostics: allDiagnostics };
   }
 
@@ -1062,6 +1093,7 @@ export class AngularCompilerPlugin {
             `"@angular/common/locales/${locale}", ` +
             `please check that "${locale}" is a valid locale id.
             If needed, you can use "registerLocaleData" manually.`);
+
           return null;
         }
       }

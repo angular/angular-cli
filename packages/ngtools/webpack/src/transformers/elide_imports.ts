@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as ts from 'typescript';
 import { RemoveNodeOperation, TransformOperation } from './interfaces';
 
@@ -24,7 +31,7 @@ export function elideImports(
   // Collect all imports and used identifiers
   const specialCaseNames = new Set<string>();
   const usedSymbols = new Set<ts.Symbol>();
-  const imports = new Array<ts.ImportDeclaration>();
+  const imports = [] as ts.ImportDeclaration[];
   ts.forEachChild(sourceFile, function visit(node) {
     // Skip removed nodes
     if (removedNodes.includes(node)) {
@@ -34,15 +41,20 @@ export function elideImports(
     // Record import and skip
     if (ts.isImportDeclaration(node)) {
       imports.push(node);
+
       return;
     }
 
     if (ts.isIdentifier(node)) {
-      usedSymbols.add(typeChecker.getSymbolAtLocation(node));
+      const symbol = typeChecker.getSymbolAtLocation(node);
+      if (symbol) {
+        usedSymbols.add(symbol);
+      }
     } else if (ts.isExportSpecifier(node)) {
       // Export specifiers return the non-local symbol from the above
       // so check the name string instead
       specialCaseNames.add((node.propertyName || node.name).text);
+
       return;
     } else if (ts.isShorthandPropertyAssignment(node)) {
       // Shorthand property assignments return the object property's symbol not the import's
@@ -77,12 +89,14 @@ export function elideImports(
       if (isUnused(node.importClause.name)) {
         ops.push(new RemoveNodeOperation(sourceFile, node));
       }
-    } else if (ts.isNamespaceImport(node.importClause.namedBindings)) {
+    } else if (node.importClause.namedBindings
+               && ts.isNamespaceImport(node.importClause.namedBindings)) {
       // "import * as XYZ from 'abc';"
       if (isUnused(node.importClause.namedBindings.name)) {
         ops.push(new RemoveNodeOperation(sourceFile, node));
       }
-    } else if (ts.isNamedImports(node.importClause.namedBindings)) {
+    } else if (node.importClause.namedBindings
+               && ts.isNamedImports(node.importClause.namedBindings)) {
       // "import { XYZ, ... } from 'abc';"
       const specifierOps = [];
       for (const specifier of node.importClause.namedBindings.elements) {

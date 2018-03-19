@@ -1,16 +1,21 @@
-// @ignoreDep typescript
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import { dirname, relative } from 'path';
 import * as ts from 'typescript';
-import { relative, dirname } from 'path';
-
 import { collectDeepNodes } from './ast_helpers';
 import { insertStarImport } from './insert_import';
-import { StandardTransform, ReplaceNodeOperation, TransformOperation } from './interfaces';
+import { ReplaceNodeOperation, StandardTransform, TransformOperation } from './interfaces';
 import { makeTransform } from './make_transform';
 
 
 export function replaceBootstrap(
   shouldTransform: (fileName: string) => boolean,
-  getEntryModule: () => { path: string, className: string },
+  getEntryModule: () => { path: string, className: string } | undefined,
   getTypeChecker: () => ts.TypeChecker,
 ): ts.TransformerFactory<ts.SourceFile> {
 

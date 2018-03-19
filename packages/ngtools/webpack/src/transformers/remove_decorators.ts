@@ -1,7 +1,13 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as ts from 'typescript';
-
 import { collectDeepNodes } from './ast_helpers';
-import { StandardTransform, TransformOperation, RemoveNodeOperation } from './interfaces';
+import { RemoveNodeOperation, StandardTransform, TransformOperation } from './interfaces';
 import { makeTransform } from './make_transform';
 
 
@@ -44,7 +50,7 @@ interface DecoratorOrigin {
 
 function getDecoratorOrigin(
   decorator: ts.Decorator,
-  typeChecker: ts.TypeChecker
+  typeChecker: ts.TypeChecker,
 ): DecoratorOrigin | null {
   if (!ts.isCallExpression(decorator.expression)) {
     return null;

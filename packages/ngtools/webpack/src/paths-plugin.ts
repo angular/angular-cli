@@ -1,4 +1,10 @@
-// @ignoreDep typescript
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as path from 'path';
 import * as ts from 'typescript';
 import {
@@ -16,12 +22,14 @@ export function resolveWithPaths(
 ) {
   if (!request || !request.request || !compilerOptions.paths) {
     callback(null, request);
+
     return;
   }
 
   // Only work on Javascript/TypeScript issuers.
   if (!request.contextInfo.issuer || !request.contextInfo.issuer.match(/\.[jt]s$/)) {
     callback(null, request);
+
     return;
   }
 
@@ -30,6 +38,7 @@ export function resolveWithPaths(
   // Relative requests are not mapped
   if (originalRequest.startsWith('.') || originalRequest.startsWith('/')) {
     callback(null, request);
+
     return;
   }
 
@@ -42,7 +51,7 @@ export function resolveWithPaths(
         if (pattern === originalRequest) {
           pathMapOptions.push({
             partial: '',
-            potentials: compilerOptions.paths[pattern]
+            potentials: compilerOptions.paths[pattern],
           });
         }
       } else if (starIndex === 0 && pattern.length === 1) {
@@ -54,7 +63,7 @@ export function resolveWithPaths(
         if (originalRequest.startsWith(pattern.slice(0, -1))) {
           pathMapOptions.push({
             partial: originalRequest.slice(pattern.length - 1),
-            potentials: compilerOptions.paths[pattern]
+            potentials: compilerOptions.paths[pattern],
           });
         }
       } else {
@@ -62,7 +71,7 @@ export function resolveWithPaths(
         if (originalRequest.startsWith(prefix) && originalRequest.endsWith(suffix)) {
           pathMapOptions.push({
             partial: originalRequest.slice(prefix.length).slice(0, -suffix.length),
-            potentials: compilerOptions.paths[pattern]
+            potentials: compilerOptions.paths[pattern],
           });
         }
       }
@@ -70,6 +79,7 @@ export function resolveWithPaths(
 
   if (pathMapOptions.length === 0) {
     callback(null, request);
+
     return;
   }
 
@@ -86,8 +96,9 @@ export function resolveWithPaths(
       replacement = prefix + pathMapOptions[0].partial + suffix;
     }
 
-    request.request = path.resolve(compilerOptions.baseUrl, replacement);
+    request.request = path.resolve(compilerOptions.baseUrl || '', replacement);
     callback(null, request);
+
     return;
   }
 
@@ -96,7 +107,7 @@ export function resolveWithPaths(
     request.contextInfo.issuer,
     compilerOptions,
     host,
-    cache
+    cache,
   );
 
   const moduleFilePath = moduleResolver.resolvedModule
@@ -105,6 +116,7 @@ export function resolveWithPaths(
   // If there is no result, let webpack try to resolve
   if (!moduleFilePath) {
     callback(null, request);
+
     return;
   }
 
@@ -121,6 +133,7 @@ export function resolveWithPaths(
     }
 
     callback(null, request);
+
     return;
   }
 

@@ -1,15 +1,20 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as process from 'process';
-
 import { time, timeEnd } from './benchmark';
 import { CancellationToken } from './gather_diagnostics';
-
 import {
   AUTO_START_ARG,
-  TypeCheckerMessage,
   InitMessage,
   MESSAGE_KIND,
+  TypeChecker,
+  TypeCheckerMessage,
   UpdateMessage,
-  TypeChecker
 } from './type_checker';
 
 let typeChecker: TypeChecker;
@@ -49,5 +54,3 @@ if (process.argv.indexOf(AUTO_START_ARG) >= 0) {
     timeEnd('TypeChecker.message');
   });
 }
-
-

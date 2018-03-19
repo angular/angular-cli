@@ -1,4 +1,11 @@
-import {dirname, join} from 'path';
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import { dirname, join } from 'path';
 import * as ts from 'typescript';
 import { findAstNodes, resolve } from './refactor';
 
@@ -23,37 +30,41 @@ export function findLazyRoutes(
   filePath: string,
   host: ts.CompilerHost,
   program?: ts.Program,
-  compilerOptions?: ts.CompilerOptions
+  compilerOptions?: ts.CompilerOptions,
 ): LazyRouteMap {
-  if (!compilerOptions && program) {
+  if (!compilerOptions) {
+    if (!program) {
+      throw new Error('Must pass either program or compilerOptions to findLazyRoutes.');
+    }
     compilerOptions = program.getCompilerOptions();
   }
   const fileName = resolve(filePath, host, compilerOptions).replace(/\\/g, '/');
-  let sourceFile: ts.SourceFile;
+  let sourceFile: ts.SourceFile | undefined;
   if (program) {
     sourceFile = program.getSourceFile(fileName);
   }
+
   if (!sourceFile) {
-    sourceFile = ts.createSourceFile(
-      fileName,
-      host.readFile(fileName),
-      ts.ScriptTarget.Latest,
-      true,
-    );
+    const content = host.readFile(fileName);
+    if (content) {
+      sourceFile = ts.createSourceFile(fileName, content, ts.ScriptTarget.Latest, true);
+    }
   }
+
   if (!sourceFile) {
     throw new Error(`Source file not found: '${fileName}'.`);
   }
+  const sf: ts.SourceFile = sourceFile;
 
   return findAstNodes(null, sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
     // Get all their property assignments.
     .map((node: ts.ObjectLiteralExpression) => {
-      return findAstNodes(node, sourceFile, ts.SyntaxKind.PropertyAssignment, false);
+      return findAstNodes(node, sf, ts.SyntaxKind.PropertyAssignment, false);
     })
     // Take all `loadChildren` elements.
     .reduce((acc: ts.PropertyAssignment[], props: ts.PropertyAssignment[]) => {
       return acc.concat(props.filter(literal => {
-        return _getContentOfKeyLiteral(sourceFile, literal.name) == 'loadChildren';
+        return _getContentOfKeyLiteral(sf, literal.name) == 'loadChildren';
       }));
     }, [])
     // Get only string values.
@@ -64,11 +75,11 @@ export function findLazyRoutes(
     // does not exist.
     .map((routePath: string) => {
       const moduleName = routePath.split('#')[0];
-      const compOptions = program ? program.getCompilerOptions() : compilerOptions;
+      const compOptions = (program && program.getCompilerOptions()) || compilerOptions || {};
       const resolvedModuleName: ts.ResolvedModuleWithFailedLookupLocations = moduleName[0] == '.'
         ? ({
-            resolvedModule: { resolvedFileName: join(dirname(filePath), moduleName) + '.ts' }
-          } as any)
+            resolvedModule: { resolvedFileName: join(dirname(filePath), moduleName) + '.ts' },
+          } as ts.ResolvedModuleWithFailedLookupLocations)
         : ts.resolveModuleName(moduleName, filePath, compOptions, host);
       if (resolvedModuleName.resolvedModule
           && resolvedModuleName.resolvedModule.resolvedFileName
@@ -81,6 +92,7 @@ export function findLazyRoutes(
     // Reduce to the LazyRouteMap map.
     .reduce((acc: LazyRouteMap, [routePath, resolvedModuleName]: [string, string | null]) => {
       acc[routePath] = resolvedModuleName;
+
       return acc;
     }, {});
 }

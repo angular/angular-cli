@@ -1,10 +1,15 @@
-// @ignoreDep typescript
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as path from 'path';
 import * as ts from 'typescript';
-
 import { LazyRouteMap } from '../lazy_routes';
-import { getLastNode, getFirstNode } from './ast_helpers';
-import { StandardTransform, TransformOperation, AddNodeOperation } from './interfaces';
+import { getFirstNode, getLastNode } from './ast_helpers';
+import { AddNodeOperation, StandardTransform, TransformOperation } from './interfaces';
 import { makeTransform } from './make_transform';
 
 export function exportLazyModuleMap(
@@ -31,23 +36,27 @@ export function exportLazyModuleMap(
         return {
           modulePath,
           moduleName,
-          loadChildrenString
+          loadChildrenString,
         };
       });
 
     modules.forEach((module, index) => {
-      const relativePath = path.relative(dirName, module.modulePath!).replace(/\\/g, '/');
+      const modulePath = module.modulePath;
+      if (!modulePath) {
+        return;
+      }
+
+      const relativePath = path.relative(dirName, modulePath).replace(/\\/g, '/');
       // Create the new namespace import node.
       const namespaceImport = ts.createNamespaceImport(ts.createIdentifier(`__lazy_${index}__`));
       const importClause = ts.createImportClause(undefined, namespaceImport);
       const newImport = ts.createImportDeclaration(undefined, undefined, importClause,
         ts.createLiteral(relativePath));
 
-      ops.push(new AddNodeOperation(
-        sourceFile,
-        getFirstNode(sourceFile),
-        newImport
-      ));
+      const firstNode = getFirstNode(sourceFile);
+      if (firstNode) {
+        ops.push(new AddNodeOperation(sourceFile, firstNode, newImport));
+      }
     });
 
     const lazyModuleObjectLiteral = ts.createObjectLiteral(
@@ -61,20 +70,18 @@ export function exportLazyModuleMap(
         return ts.createPropertyAssignment(
           ts.createLiteral(`${modulePath}#${moduleName}`),
           ts.createPropertyAccess(ts.createIdentifier(`__lazy_${idx}__`), mod.moduleName));
-      })
+      }),
     );
 
     const lazyModuleVariableStmt = ts.createVariableStatement(
       [ts.createToken(ts.SyntaxKind.ExportKeyword)],
-      [ts.createVariableDeclaration('LAZY_MODULE_MAP', undefined, lazyModuleObjectLiteral)]
+      [ts.createVariableDeclaration('LAZY_MODULE_MAP', undefined, lazyModuleObjectLiteral)],
     );
 
-    ops.push(new AddNodeOperation(
-      sourceFile,
-      getLastNode(sourceFile),
-      undefined,
-      lazyModuleVariableStmt
-    ));
+    const lastNode = getLastNode(sourceFile);
+    if (lastNode) {
+      ops.push(new AddNodeOperation(sourceFile, lastNode, undefined, lazyModuleVariableStmt));
+    }
 
     return ops;
   };

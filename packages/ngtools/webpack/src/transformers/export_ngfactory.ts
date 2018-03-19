@@ -1,9 +1,14 @@
-// @ignoreDep typescript
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import { dirname, relative } from 'path';
 import * as ts from 'typescript';
-import { relative, dirname } from 'path';
-
 import { collectDeepNodes, getFirstNode } from './ast_helpers';
-import { StandardTransform, TransformOperation, AddNodeOperation } from './interfaces';
+import { AddNodeOperation, StandardTransform, TransformOperation } from './interfaces';
 import { makeTransform } from './make_transform';
 
 export function exportNgFactory(
@@ -57,7 +62,7 @@ export function exportNgFactory(
       ops.push(new AddNodeOperation(
         sourceFile,
         getFirstNode(sourceFile),
-        newImport
+        newImport,
       ));
     });
 

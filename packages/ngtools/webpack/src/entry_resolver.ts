@@ -1,9 +1,14 @@
-// @ignoreDep typescript
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as fs from 'fs';
-import {join} from 'path';
+import { join } from 'path';
 import * as ts from 'typescript';
-
-import {TypeScriptFileRefactor} from './refactor';
+import { TypeScriptFileRefactor } from './refactor';
 
 
 function _recursiveSymbolExportLookup(refactor: TypeScriptFileRefactor,
@@ -124,6 +129,7 @@ function _symbolImportLookup(refactor: TypeScriptFileRefactor,
       }
     }
   }
+
   return null;
 }
 
@@ -137,6 +143,7 @@ export function resolveEntryModuleFromMain(mainPath: string,
     .map(node => node as ts.CallExpression)
     .filter(call => {
       const access = call.expression as ts.PropertyAccessExpression;
+
       return access.kind == ts.SyntaxKind.PropertyAccessExpression
           && access.name.kind == ts.SyntaxKind.Identifier
           && (access.name.text == 'bootstrapModule'

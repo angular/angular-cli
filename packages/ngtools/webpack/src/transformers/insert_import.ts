@@ -1,6 +1,11 @@
-// @ignoreDep typescript
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as ts from 'typescript';
-
 import { collectDeepNodes, getFirstNode } from './ast_helpers';
 import { AddNodeOperation, TransformOperation } from './interfaces';
 
@@ -28,7 +33,7 @@ export function insertStarImport(
       sourceFile,
       target,
       before ? newImport : undefined,
-      before ? undefined : newImport
+      before ? undefined : newImport,
     ));
   } else if (allImports.length > 0) {
     // Find the last import and insert after.
@@ -36,15 +41,19 @@ export function insertStarImport(
       sourceFile,
       allImports[allImports.length - 1],
       undefined,
-      newImport
+      newImport,
     ));
   } else {
-    // Insert before the first node.
-    ops.push(new AddNodeOperation(
-      sourceFile,
-      getFirstNode(sourceFile),
-      newImport
-    ));
+    const firstNode = getFirstNode(sourceFile);
+
+    if (firstNode) {
+      // Insert before the first node.
+      ops.push(new AddNodeOperation(
+        sourceFile,
+        firstNode,
+        newImport,
+      ));
+    }
   }
 
   return ops;
@@ -54,7 +63,7 @@ export function insertStarImport(
 export function insertImport(
   sourceFile: ts.SourceFile,
   symbolName: string,
-  modulePath: string
+  modulePath: string,
 ): TransformOperation[] {
   const ops: TransformOperation[] = [];
   // Find all imports.
@@ -71,6 +80,7 @@ export function insertImport(
       if (!clause || clause.name || !clause.namedBindings) {
         return false;
       }
+
       return clause.namedBindings.kind == ts.SyntaxKind.NamedImports;
     })
     .map((node: ts.ImportDeclaration) => {
@@ -95,7 +105,7 @@ export function insertImport(
       sourceFile,
       maybeImports[0].elements[maybeImports[0].elements.length - 1],
       undefined,
-      ts.createImportSpecifier(undefined, ts.createIdentifier(symbolName))
+      ts.createImportSpecifier(undefined, ts.createIdentifier(symbolName)),
     ));
   } else {
     // Create the new import node.
@@ -111,16 +121,21 @@ export function insertImport(
         sourceFile,
         allImports[allImports.length - 1],
         undefined,
-        newImport
+        newImport,
       ));
     } else {
-      // Insert before the first node.
-      ops.push(new AddNodeOperation(
-        sourceFile,
-        getFirstNode(sourceFile),
-        newImport
-      ));
+      const firstNode = getFirstNode(sourceFile);
+
+      if (firstNode) {
+        // Insert before the first node.
+        ops.push(new AddNodeOperation(
+          sourceFile,
+          firstNode,
+          newImport,
+        ));
+      }
     }
   }
+
   return ops;
 }

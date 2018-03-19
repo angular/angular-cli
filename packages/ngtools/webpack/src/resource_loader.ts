@@ -1,5 +1,15 @@
-import * as vm from 'vm';
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+// TODO: fix typings.
+// tslint:disable-next-line:no-global-tslint-disable
+// tslint:disable:no-any
 import * as path from 'path';
+import * as vm from 'vm';
 import { RawSource } from 'webpack-sources';
 
 const NodeTemplatePlugin = require('webpack/lib/node/NodeTemplatePlugin');
@@ -56,6 +66,7 @@ export class WebpackResourceLoader {
       (callback: (err?: Error) => void) => {
         if (this._cachedResources.has(compilation.fullHash)) {
           callback();
+
           return;
         }
 

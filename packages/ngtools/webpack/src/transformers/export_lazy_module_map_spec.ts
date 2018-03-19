@@ -1,15 +1,22 @@
-import { oneLine, stripIndent } from 'common-tags';
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import { tags } from '@angular-devkit/core';  // tslint:disable-line:no-implicit-dependencies
 import { transformTypescript } from './ast_helpers';
 import { exportLazyModuleMap } from './export_lazy_module_map';
 
 describe('@ngtools/webpack transformers', () => {
   describe('export_lazy_module_map', () => {
     it('should create module map for JIT', () => {
-      const input = stripIndent`
+      const input = tags.stripIndent`
         export { AppModule } from './app/app.module';
       `;
       // tslint:disable:max-line-length
-      const output = stripIndent`
+      const output = tags.stripIndent`
         import * as __lazy_0__ from "app/lazy/lazy.module.ts";
         import * as __lazy_1__ from "app/lazy2/lazy2.module.ts";
         export { AppModule } from './app/app.module';
@@ -26,15 +33,15 @@ describe('@ngtools/webpack transformers', () => {
       );
       const result = transformTypescript(input, [transformer]);
 
-      expect(oneLine`${result}`).toEqual(oneLine`${output}`);
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
     it('should create module map for AOT', () => {
-      const input = stripIndent`
+      const input = tags.stripIndent`
       export { AppModule } from './app/app.module';
     `;
       // tslint:disable:max-line-length
-      const expected = stripIndent`
+      const expected = tags.stripIndent`
       import * as __lazy_0__ from "app/lazy/lazy.module.ngfactory.ts";
       import * as __lazy_1__ from "app/lazy2/lazy2.module.ngfactory.ts";
       export { AppModule } from './app/app.module';
@@ -53,12 +60,12 @@ describe('@ngtools/webpack transformers', () => {
       );
       const result = transformTypescript(input, [transformer]);
 
-      expect(oneLine`${result}`).toEqual(oneLine`${expected}`);
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${expected}`);
     });
   });
 
   it('should not do anything if shouldTransform returns false', () => {
-    const input = stripIndent`
+    const input = tags.stripIndent`
         export { AppModule } from './app/app.module';
       `;
 
@@ -71,6 +78,6 @@ describe('@ngtools/webpack transformers', () => {
     );
     const result = transformTypescript(input, [transformer]);
 
-    expect(oneLine`${result}`).toEqual(oneLine`${input}`);
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${input}`);
   });
 });
