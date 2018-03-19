@@ -4,7 +4,7 @@ import {expectFileToExist} from '../../utils/fs';
 
 
 export default function() {
-  const interfaceDir = join('src', 'app');
+  const interfaceDir = join('projects', 'test-project', 'src', 'app');
 
   return ng('generate', 'interface', 'test-interface', 'model')
     .then(() => expectFileToExist(interfaceDir))

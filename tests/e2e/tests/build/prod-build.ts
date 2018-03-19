@@ -17,13 +17,13 @@ export default function() {
   return ng('build', '--prod')
     .then(() => expectFileToExist(join(process.cwd(), 'dist')))
     // Check for cache busting hash script src
-    .then(() => expectFileToMatch('dist/index.html', /main\.[0-9a-f]{20}\.js/))
-    .then(() => expectFileToMatch('dist/index.html', /styles\.[0-9a-f]{20}\.css/))
-    .then(() => expectFileToMatch('dist/3rdpartylicenses.txt', /MIT/))
+    .then(() => expectFileToMatch('dist/test-project/index.html', /main\.[0-9a-f]{20}\.js/))
+    .then(() => expectFileToMatch('dist/test-project/index.html', /styles\.[0-9a-f]{20}\.css/))
+    .then(() => expectFileToMatch('dist/test-project/3rdpartylicenses.txt', /MIT/))
     // Defaults to AoT
     .then(() => {
-      const main = readdirSync('./dist').find(name => !!name.match(/main.[a-z0-9]+\.js/));
-      expectFileToMatch(`dist/${main}`, /bootstrapModuleFactory\(/);
+      const main = readdirSync('./dist/test-project').find(name => !!name.match(/main.[a-z0-9]+\.js/));
+      expectFileToMatch(`dist/test-project/${main}`, /bootstrapModuleFactory\(/);
     })
     // Check that the process didn't change local files.
     .then(() => !ejected && expectGitToBeClean());

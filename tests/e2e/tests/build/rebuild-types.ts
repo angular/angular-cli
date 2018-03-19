@@ -20,15 +20,15 @@ export default async function() {
     return;
   }
 
-  await writeFile('src/app/type.ts', `export type MyType = number;`);
-  await prependToFile('src/app/app.component.ts', 'import { MyType } from "./type";\n');
+  await writeFile('projects/test-project/src/app/type.ts', `export type MyType = number;`);
+  await prependToFile('projects/test-project/src/app/app.component.ts', 'import { MyType } from "./type";\n');
 
   try {
     await execAndWaitForOutputToMatch('ng', ['serve'], successRe);
 
     await Promise.all([
       waitForAnyProcessOutputToMatch(successRe, 20000),
-      writeFile('src/app/type.ts', `export type MyType = string;`),
+      writeFile('projects/test-project/src/app/type.ts', `export type MyType = string;`),
     ]);
   } finally {
     killAllProcesses();

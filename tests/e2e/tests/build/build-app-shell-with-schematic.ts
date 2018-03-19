@@ -7,9 +7,6 @@ import { readNgVersion } from '../../utils/version';
 
 
 export default function () {
-  // TODO(architect): re-enable after build-webpack supports this functionality.
-  return;
-
   // Skip this in ejected tests.
   if (getGlobalVariable('argv').eject) {
     return Promise.resolve();
@@ -31,15 +28,15 @@ export default function () {
     .then(() => expectToFail(() => {
       return ng('generate', 'appShell', '--universal-app', 'universal');
     })
-    .then(() => appendToFile('src/app/app.component.html', '<router-outlet></router-outlet>'))
+    .then(() => appendToFile('projects/test-project/src/app/app.component.html', '<router-outlet></router-outlet>'))
     .then(() => ng('generate', 'appShell', '--universal-app', 'universal'))
     .then(() => updateJsonFile('package.json', packageJson => {
       const dependencies = packageJson['dependencies'];
       dependencies['@angular/platform-server'] = platformServerVersion;
     })
     .then(() => npm('install'))
-    .then(() => ng('build', '--optimization-level', '1'))
-    .then(() => expectFileToMatch('dist/index.html', /app-shell works!/))
-    .then(() => ng('build', '--optimization-level', '1', '--skip-app-shell'))
-    .then(() => expectToFail(() => expectFileToMatch('dist/index.html', /app-shell works!/)));
+    .then(() => ng('build', '--optimization'))
+    .then(() => expectFileToMatch('dist/test-project/index.html', /app-shell works!/))
+    .then(() => ng('build', '--optimization', '--skip-app-shell'))
+    .then(() => expectToFail(() => expectFileToMatch('dist/test-project/index.html', /app-shell works!/)));
 }

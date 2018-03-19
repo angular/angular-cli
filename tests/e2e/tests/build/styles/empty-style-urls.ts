@@ -8,7 +8,7 @@ export default function () {
   return Promise.resolve()
     // Write assets.
     .then(_ => writeMultipleFiles({
-      './src/app/app.component.ts': `
+      './projects/test-project/src/app/app.component.ts': `
         import { Component } from '@angular/core';
 
         @Component({

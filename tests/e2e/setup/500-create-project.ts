@@ -2,13 +2,13 @@ import {join} from 'path';
 import {git, ng, silentNpm} from '../utils/process';
 import {expectFileToExist} from '../utils/fs';
 import {
-  updateTsConfig,
   useSha,
   useNgVersion,
   useCIChrome,
   useCIDefaults,
   useBuiltPackages,
   useDevKit,
+  updateJsonFile,
 } from '../utils/project';
 import {gitClean, gitCommit} from '../utils/git';
 import {getGlobalVariable} from '../utils/env';
@@ -41,7 +41,7 @@ export default async function() {
     .then(() => silentNpm('install'))
     .then(() => ng('version'))
     // Force sourcemaps to be from the root of the filesystem.
-    .then(() => updateTsConfig(json => {
+    .then(() => updateJsonFile('tsconfig.json', json => {
       json['compilerOptions']['sourceRoot'] = '/';
     }))
     .then(() => git('config', 'user.email', 'angular-core+e2e@google.com'))

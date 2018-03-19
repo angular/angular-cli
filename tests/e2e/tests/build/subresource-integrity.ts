@@ -12,7 +12,7 @@ export default async function() {
 
   return ng('build')
     .then(() => expectToFail(() =>
-      expectFileToMatch('dist/index.html', integrityRe)))
+      expectFileToMatch('dist/test-project/index.html', integrityRe)))
     .then(() => ng('build', '--sri'))
-    .then(() => expectFileToMatch('dist/index.html', integrityRe));
+    .then(() => expectFileToMatch('dist/test-project/index.html', integrityRe));
 }

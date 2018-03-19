@@ -1,4 +1,3 @@
-import {join} from 'path';
 import {ng} from '../../../utils/process';
 import {expectGitToBeClean} from '../../../utils/git';
 

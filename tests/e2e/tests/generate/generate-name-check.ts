@@ -5,7 +5,7 @@ import {updateJsonFile} from '../../utils/project';
 
 
 export default function() {
-  const compDir = join('src', 'app', 'test-component');
+  const compDir = join('projects', 'test-project', 'src', 'app', 'test-component');
 
   return Promise.resolve()
     .then(() => updateJsonFile('package.json', configJson => {

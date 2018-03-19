@@ -13,6 +13,6 @@ export default function() {
   }
 
   return ng('build', '--stats-json')
-    .then(() => expectFileToExist('./dist/stats.json'))
+    .then(() => expectFileToExist('./dist/test-project/stats.json'))
     .then(() => expectGitToBeClean());
 }

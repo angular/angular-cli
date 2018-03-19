@@ -8,9 +8,6 @@ import { stripIndent } from 'common-tags';
 
 
 export default function () {
-  // TODO(architect): re-enable after build-webpack supports this functionality.
-  return;
-
   // Skip this in ejected tests.
   if (getGlobalVariable('argv').eject) {
     return Promise.resolve();
@@ -28,7 +25,7 @@ export default function () {
   }
 
   return Promise.resolve()
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    .then(() => updateJsonFile('angular.json', configJson => {
       const app = configJson['apps'][0];
       app['appShell'] = {
         app: '1',
@@ -59,7 +56,7 @@ export default function () {
         }
       });
     }))
-    .then(() => writeFile('src/app/app.module.ts', stripIndent`
+    .then(() => writeFile('projects/test-project/src/app/app.module.ts', stripIndent`
       import { BrowserModule } from '@angular/platform-browser';
       import { NgModule } from '@angular/core';
       import { RouterModule } from '@angular/router';
@@ -76,11 +73,11 @@ export default function () {
       })
       export class AppModule { }
     `))
-    .then(() => writeFile('src/app/app.component.html', stripIndent`
+    .then(() => writeFile('projects/test-project/src/app/app.component.html', stripIndent`
       Hello World
       <router-outlet></router-outlet>
     `))
-    .then(() => writeFile('src/tsconfig.server.json', stripIndent`
+    .then(() => writeFile('projects/test-project/src/tsconfig.server.json', stripIndent`
       {
         "extends": "../tsconfig.json",
         "compilerOptions": {
@@ -98,10 +95,10 @@ export default function () {
         }
       }
     `))
-    .then(() => writeFile('src/main.server.ts', stripIndent`
+    .then(() => writeFile('projects/test-project/src/main.server.ts', stripIndent`
       export {AppServerModule} from './app/app.server.module';
     `))
-    .then(() => writeFile('src/app/app.server.module.ts', stripIndent`
+    .then(() => writeFile('projects/test-project/src/app/app.server.module.ts', stripIndent`
       import {NgModule} from '@angular/core';
       import {ServerModule} from '@angular/platform-server';
       import { Routes, RouterModule } from '@angular/router';
@@ -129,7 +126,7 @@ export default function () {
       })
       export class AppServerModule {}
     `))
-    .then(() => writeFile('src/app/shell.component.ts', stripIndent`
+    .then(() => writeFile('projects/test-project/src/app/shell.component.ts', stripIndent`
       import { Component } from '@angular/core';
       @Component({
         selector: 'app-shell',
@@ -143,8 +140,8 @@ export default function () {
       dependencies['@angular/platform-server'] = platformServerVersion;
     })
     .then(() => npm('install')))
-    .then(() => ng('build', '--optimization-level', '1'))
-    .then(() => expectFileToMatch('dist/index.html', /shell Works!/))
-    .then(() => ng('build', '--optimization-level', '1', '--skip-app-shell'))
-    .then(() => expectToFail(() => expectFileToMatch('dist/index.html', /shell Works!/)));
+    .then(() => ng('build', '--optimization'))
+    .then(() => expectFileToMatch('dist/test-project/index.html', /shell Works!/))
+    .then(() => ng('build', '--optimization', '--skip-app-shell'))
+    .then(() => expectToFail(() => expectFileToMatch('dist/test-project/index.html', /shell Works!/)));
 }

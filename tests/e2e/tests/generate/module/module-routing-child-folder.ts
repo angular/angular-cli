@@ -1,4 +1,3 @@
-import * as fs from 'fs-extra';
 import { join } from 'path';
 import { ng } from '../../../utils/process';
 import { expectFileToExist } from '../../../utils/fs';
@@ -7,10 +6,9 @@ import { expectToFail } from '../../../utils/utils';
 
 export default function () {
   const root = process.cwd();
-  const testPath = join(root, 'src', 'app');
+  const testPath = join(root, 'projects', 'test-project', 'src', 'app');
 
   process.chdir(testPath);
-  fs.mkdirSync('./sub-dir');
 
   return Promise.resolve()
     .then(() =>

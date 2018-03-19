@@ -10,27 +10,27 @@ export default function () {
 
   return Promise.resolve()
     .then(() => writeMultipleFiles({
-      'src/styles.css': 'div { background: url("./assets/more.png"); }',
+      'projects/test-project/src/styles.css': 'div { background: url("./assets/more.png"); }',
     }))
     // use image with file size >10KB to prevent inlining
     .then(() => copyProjectAsset('images/spectrum.png', './assets/more.png'))
     .then(() => ng('build', '--deploy-url=deployUrl/', '--extract-css'))
-    .then(() => expectFileToMatch('dist/index.html', 'deployUrl/main.js'))
+    .then(() => expectFileToMatch('dist/test-project/index.html', 'deployUrl/main.js'))
     // verify --deploy-url isn't applied to extracted css urls
-    .then(() => expectFileToMatch('dist/styles.css',
+    .then(() => expectFileToMatch('dist/test-project/styles.css',
       /url\(['"]?more\.png['"]?\)/))
     .then(() => ng('build', '--deploy-url=http://example.com/some/path/', '--extract-css'))
-    .then(() => expectFileToMatch('dist/index.html', 'http://example.com/some/path/main.js'))
+    .then(() => expectFileToMatch('dist/test-project/index.html', 'http://example.com/some/path/main.js'))
     // verify --deploy-url is applied to non-extracted css urls
     .then(() => ng('build', '--deploy-url=deployUrl/', '--extract-css=false'))
-    .then(() => expectFileToMatch('dist/styles.js',
+    .then(() => expectFileToMatch('dist/test-project/tyles.js',
       /\(['"]?deployUrl\/more\.png['"]?\)/))
-    .then(() => expectFileToMatch('dist/runtime.js',
-      /__webpack_require__\.p = "deployUrl\/";/))
+    .then(() => expectFileToMatch('dist/test-project/runtime.js',
+      /__webpack_require__\.p = "deployUrl\/";/));
     // // verify slash is appended to the end of --deploy-url if missing
     // .then(() => ng('build', '--deploy-url=deployUrl', '--extract-css=false'))
     // // skip this in ejected tests
     // .then(() => getGlobalVariable('argv').eject
     //   ? Promise.resolve()
-    //   : expectFileToMatch('dist/runtime.js', /__webpack_require__\.p = "deployUrl\/";/));
+    //   : expectFileToMatch('dist/test-project/untime.js', /__webpack_require__\.p = "deployUrl\/";/));
 }
