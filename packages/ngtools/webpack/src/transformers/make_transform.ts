@@ -30,7 +30,6 @@ export function makeTransform(
 
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
     const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
-
       const ops: TransformOperation[] = standardTransform(sf);
       const removeOps = ops
         .filter((op) => op.kind === OPERATION_KIND.Remove) as RemoveNodeOperation[];
@@ -71,7 +70,7 @@ export function makeTransform(
             ...add.filter((op) => op.before).map(((op) => op.before)),
             ...modifiedNodes,
             ...add.filter((op) => op.after).map(((op) => op.after)),
-          ];
+          ] as ts.Node[];
           modified = true;
         }
 
@@ -111,12 +110,12 @@ export function makeTransform(
  * https://github.com/Microsoft/TypeScript/pull/20314 and released in TS 2.7.0) and
  * https://github.com/Microsoft/TypeScript/issues/17551 (fixed by
  * https://github.com/Microsoft/TypeScript/pull/18051 and released on TS 2.5.0).
- *
- * @param sf
- * @param statements
  */
-function visitEachChildWorkaround(node: ts.Node, visitor: ts.Visitor,
-                                  context: ts.TransformationContext) {
+function visitEachChildWorkaround(
+  node: ts.Node,
+  visitor: ts.Visitor,
+  context: ts.TransformationContext,
+) {
 
   if (node.kind === ts.SyntaxKind.SourceFile) {
     const sf = node as ts.SourceFile;

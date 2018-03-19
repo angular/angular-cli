@@ -14,7 +14,7 @@ import { makeTransform } from './make_transform';
 
 export function registerLocaleData(
   shouldTransform: (fileName: string) => boolean,
-  getEntryModule: () => { path: string, className: string } | undefined,
+  getEntryModule: () => { path: string, className: string } | null,
   locale: string,
 ): ts.TransformerFactory<ts.SourceFile> {
 
@@ -68,7 +68,11 @@ export function registerLocaleData(
       // Create the import node for the locale.
       const localeNamespaceId = ts.createUniqueName('__NgCli_locale_');
       ops.push(...insertStarImport(
-        sourceFile, localeNamespaceId, `@angular/common/locales/${locale}`, firstNode, true,
+        sourceFile,
+        localeNamespaceId,
+        `@angular/common/locales/${locale}`,
+        firstNode,
+        true,
       ));
 
       // Create the import node for the registerLocaleData function.

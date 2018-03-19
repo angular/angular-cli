@@ -51,11 +51,8 @@ export function replaceResources(
         [ts.createVariableDeclaration('require', ts.createTypeReferenceNode('NodeRequire', []))],
       );
 
-      const firstNode = getFirstNode(sourceFile);
-      if (firstNode) {
-        ops.push(new AddNodeOperation(sourceFile, firstNode, nodeRequireInterface));
-        ops.push(new AddNodeOperation(sourceFile, firstNode, varRequire));
-      }
+      ops.push(new AddNodeOperation(sourceFile, getFirstNode(sourceFile), nodeRequireInterface));
+      ops.push(new AddNodeOperation(sourceFile, getFirstNode(sourceFile), varRequire));
     }
 
     return ops;

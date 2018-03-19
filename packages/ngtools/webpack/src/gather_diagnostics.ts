@@ -56,29 +56,29 @@ export function gatherDiagnostics(
     const tsProgram = program as ts.Program;
     // Check syntactic diagnostics.
     time(`${benchmarkLabel}.gatherDiagnostics.ts.getSyntacticDiagnostics`);
-    checkDiagnostics(tsProgram.getSyntacticDiagnostics);
+    checkDiagnostics(tsProgram.getSyntacticDiagnostics.bind(tsProgram));
     timeEnd(`${benchmarkLabel}.gatherDiagnostics.ts.getSyntacticDiagnostics`);
 
     // Check semantic diagnostics.
     time(`${benchmarkLabel}.gatherDiagnostics.ts.getSemanticDiagnostics`);
-    checkDiagnostics(tsProgram.getSemanticDiagnostics);
+    checkDiagnostics(tsProgram.getSemanticDiagnostics.bind(tsProgram));
     timeEnd(`${benchmarkLabel}.gatherDiagnostics.ts.getSemanticDiagnostics`);
   } else {
     const angularProgram = program as Program;
 
     // Check TypeScript syntactic diagnostics.
     time(`${benchmarkLabel}.gatherDiagnostics.ng.getTsSyntacticDiagnostics`);
-    checkDiagnostics(angularProgram.getTsSyntacticDiagnostics);
+    checkDiagnostics(angularProgram.getTsSyntacticDiagnostics.bind(angularProgram));
     timeEnd(`${benchmarkLabel}.gatherDiagnostics.ng.getTsSyntacticDiagnostics`);
 
     // Check TypeScript semantic and Angular structure diagnostics.
     time(`${benchmarkLabel}.gatherDiagnostics.ng.getTsSemanticDiagnostics`);
-    checkDiagnostics(angularProgram.getTsSemanticDiagnostics);
+    checkDiagnostics(angularProgram.getTsSemanticDiagnostics.bind(angularProgram));
     timeEnd(`${benchmarkLabel}.gatherDiagnostics.ng.getTsSemanticDiagnostics`);
 
     // Check Angular semantic diagnostics
     time(`${benchmarkLabel}.gatherDiagnostics.ng.getNgSemanticDiagnostics`);
-    checkDiagnostics(angularProgram.getNgSemanticDiagnostics);
+    checkDiagnostics(angularProgram.getNgSemanticDiagnostics.bind(angularProgram));
     timeEnd(`${benchmarkLabel}.gatherDiagnostics.ng.getNgSemanticDiagnostics`);
   }
 

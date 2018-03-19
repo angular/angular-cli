@@ -49,7 +49,7 @@ describe('@ngtools/webpack transformers', () => {
     });
 
     it('should replace resources with backticks', () => {
-      const input = tags.stripIndent`
+      const input = `
         import { Component } from '@angular/core';
 
         @Component({
@@ -61,7 +61,7 @@ describe('@ngtools/webpack transformers', () => {
           title = 'app';
         }
       `;
-      const output = tags.stripIndent`
+      const output = `
         import * as tslib_1 from "tslib";
         import { Component } from '@angular/core';
         let AppComponent = class AppComponent {

@@ -39,7 +39,7 @@ export function removeDecorators(
 function shouldRemove(decorator: ts.Decorator, typeChecker: ts.TypeChecker): boolean {
   const origin = getDecoratorOrigin(decorator, typeChecker);
 
-  return origin && origin.module === '@angular/core';
+  return origin ? origin.module === '@angular/core' : false;
 }
 
 // Decorator helpers.
@@ -57,7 +57,7 @@ function getDecoratorOrigin(
   }
 
   let identifier: ts.Node;
-  let name: string;
+  let name: string | undefined = undefined;
   if (ts.isPropertyAccessExpression(decorator.expression.expression)) {
     identifier = decorator.expression.expression.expression;
     name = decorator.expression.expression.name.text;
@@ -71,21 +71,27 @@ function getDecoratorOrigin(
   const symbol = typeChecker.getSymbolAtLocation(identifier);
   if (symbol && symbol.declarations && symbol.declarations.length > 0) {
     const declaration = symbol.declarations[0];
-    let module: string;
+    let module: string | undefined = undefined;
     if (ts.isImportSpecifier(declaration)) {
       name = (declaration.propertyName || declaration.name).text;
-      module = (declaration.parent.parent.parent.moduleSpecifier as ts.StringLiteral).text;
+      module = declaration.parent
+        && declaration.parent.parent
+        && declaration.parent.parent.parent
+        && (declaration.parent.parent.parent.moduleSpecifier as ts.StringLiteral).text
+        || '';
     } else if (ts.isNamespaceImport(declaration)) {
       // Use the name from the decorator namespace property access
-      module = (declaration.parent.parent.moduleSpecifier as ts.StringLiteral).text;
+      module = declaration.parent
+        && declaration.parent.parent
+        && (declaration.parent.parent.moduleSpecifier as ts.StringLiteral).text;
     } else if (ts.isImportClause(declaration)) {
-      name = declaration.name.text;
-      module = (declaration.parent.moduleSpecifier as ts.StringLiteral).text;
+      name = declaration.name && declaration.name.text;
+      module = declaration.parent && (declaration.parent.moduleSpecifier as ts.StringLiteral).text;
     } else {
       return null;
     }
 
-    return { name, module };
+    return { name: name || '', module: module || '' };
   }
 
   return null;

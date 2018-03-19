@@ -14,7 +14,7 @@ import { makeTransform } from './make_transform';
 
 export function replaceServerBootstrap(
   shouldTransform: (fileName: string) => boolean,
-  getEntryModule: () => { path: string, className: string },
+  getEntryModule: () => { path: string, className: string } | null,
   getTypeChecker: () => ts.TypeChecker,
 ): ts.TransformerFactory<ts.SourceFile> {
 

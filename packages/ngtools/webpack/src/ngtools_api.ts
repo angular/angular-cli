@@ -29,6 +29,10 @@ export type Program = ngtools.Program;
 export type Diagnostic = ngtools.Diagnostic;
 export type Diagnostics = ReadonlyArray<ts.Diagnostic | Diagnostic>;
 
+function _error(api: string, fn: string): never {
+  throw new Error('Could not find API ' + api + ', function ' + fn);
+}
+
 // Manually check for Compiler CLI availability and supported version.
 // This is needed because @ngtools/webpack does not depend directly on @angular/compiler-cli, since
 // it is installed as part of global Angular CLI installs and compiler-cli is not of its
@@ -68,11 +72,19 @@ try {
   // plugin cannot be used.
 }
 
-export const VERSION: typeof ngc.VERSION | null = compilerCli && compilerCli.VERSION;
-export const __NGTOOLS_PRIVATE_API_2: typeof ngc.__NGTOOLS_PRIVATE_API_2 | null =
-  compilerCli && compilerCli.__NGTOOLS_PRIVATE_API_2;
-export const readConfiguration: typeof ngc.readConfiguration | null =
-  compilerCli && compilerCli.readConfiguration;
+export const VERSION: typeof ngc.VERSION =
+  compilerCli
+  && compilerCli.VERSION
+  || _error('compiler-cli', 'VERSION');
+export const __NGTOOLS_PRIVATE_API_2: typeof ngc.__NGTOOLS_PRIVATE_API_2 =
+  compilerCli
+  && compilerCli.__NGTOOLS_PRIVATE_API_2
+  || _error('compiler-cli', '__NGTOOLS_PRIVATE_API_2');
+export const readConfiguration: typeof ngc.readConfiguration =
+  compilerCli
+  && compilerCli.readConfiguration
+  || _error('compiler-cli', 'readConfiguration');
+
 
 // These imports do not exist on Angular versions lower than 5, so we cannot use a static ES6
 // import.
@@ -85,10 +97,11 @@ try {
   // plugin cannot be used.
 }
 
-export const createProgram: typeof ngtools.createProgram | null =
-  ngtools2 && ngtools2.createProgram;
-export const createCompilerHost: typeof ngtools.createCompilerHost | null =
-  ngtools2 && ngtools2.createCompilerHost;
-export const formatDiagnostics: typeof ngtools.formatDiagnostics | null =
-  ngtools2 && ngtools2.formatDiagnostics;
-export const EmitFlags: typeof ngtools.EmitFlags | null = ngtools2 && ngtools2.EmitFlags;
+export const createProgram: typeof ngtools.createProgram =
+  ngtools2 && ngtools2.createProgram || _error('ngtools2', 'createProgram');
+export const createCompilerHost: typeof ngtools.createCompilerHost =
+  ngtools2 && ngtools2.createCompilerHost || _error('ngtools2', 'createCompilerHost');
+export const formatDiagnostics: typeof ngtools.formatDiagnostics =
+  ngtools2 && ngtools2.formatDiagnostics || _error('ngtools2', 'formatDiagnostics');
+export const EmitFlags: typeof ngtools.EmitFlags =
+  ngtools2 && ngtools2.EmitFlags || _error('ngtools', 'EmitFlags');

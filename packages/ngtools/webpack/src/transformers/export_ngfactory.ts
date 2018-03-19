@@ -13,7 +13,7 @@ import { makeTransform } from './make_transform';
 
 export function exportNgFactory(
   shouldTransform: (fileName: string) => boolean,
-  getEntryModule: () => { path: string, className: string },
+  getEntryModule: () => { path: string, className: string } | null,
 ): ts.TransformerFactory<ts.SourceFile> {
 
   const standardTransform: StandardTransform = function (sourceFile: ts.SourceFile) {
@@ -39,14 +39,17 @@ export function exportNgFactory(
 
     // Get the module path from the import.
     entryModuleIdentifiers.forEach((entryModuleIdentifier) => {
-      if (entryModuleIdentifier.parent.kind !== ts.SyntaxKind.ExportSpecifier) {
+      if (!entryModuleIdentifier.parent
+          || entryModuleIdentifier.parent.kind !== ts.SyntaxKind.ExportSpecifier) {
         return;
       }
 
       const exportSpec = entryModuleIdentifier.parent as ts.ExportSpecifier;
-      const moduleSpecifier = exportSpec.parent.parent.moduleSpecifier;
+      const moduleSpecifier = exportSpec.parent
+        && exportSpec.parent.parent
+        && exportSpec.parent.parent.moduleSpecifier;
 
-      if (moduleSpecifier.kind !== ts.SyntaxKind.StringLiteral) {
+      if (!moduleSpecifier || moduleSpecifier.kind !== ts.SyntaxKind.StringLiteral) {
         return;
       }
 
@@ -59,11 +62,14 @@ export function exportNgFactory(
       const newImport = ts.createExportDeclaration(undefined, undefined, namedExports,
         ts.createLiteral(factoryModulePath));
 
-      ops.push(new AddNodeOperation(
-        sourceFile,
-        getFirstNode(sourceFile),
-        newImport,
-      ));
+      const firstNode = getFirstNode(sourceFile);
+      if (firstNode) {
+        ops.push(new AddNodeOperation(
+          sourceFile,
+          firstNode,
+          newImport,
+        ));
+      }
     });
 
     return ops;

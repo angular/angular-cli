@@ -68,7 +68,7 @@ describe('@ngtools/webpack transformers', () => {
         platformBrowserDynamic().bootstrapModule(AppModule);
       `;
 
-      const transformer = registerLocaleData(() => true, () => undefined, 'fr');
+      const transformer = registerLocaleData(() => true, () => null, 'fr');
       const result = transformTypescript(input, [transformer]);
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${input}`);

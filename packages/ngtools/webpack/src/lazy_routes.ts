@@ -22,7 +22,7 @@ function _getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string 
 
 
 export interface LazyRouteMap {
-  [path: string]: string | null;
+  [path: string]: string;
 }
 
 
@@ -91,7 +91,9 @@ export function findLazyRoutes(
     })
     // Reduce to the LazyRouteMap map.
     .reduce((acc: LazyRouteMap, [routePath, resolvedModuleName]: [string, string | null]) => {
-      acc[routePath] = resolvedModuleName;
+      if (resolvedModuleName) {
+        acc[routePath] = resolvedModuleName;
+      }
 
       return acc;
     }, {});

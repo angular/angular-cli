@@ -211,7 +211,7 @@ describe('@ngtools/webpack transformers', () => {
       const { program, compilerHost } = createTypescriptContext(input);
       const transformer = replaceServerBootstrap(
         () => true,
-        () => undefined,
+        () => null,
         () => program.getTypeChecker(),
       );
       const result = transformTypescript(undefined, [transformer], program, compilerHost);

@@ -106,11 +106,9 @@ export class WebpackResourceLoader {
           this._resourceDependencies.set(filePath, childCompilation.fileDependencies);
 
           const compilationHash = childCompilation.fullHash;
-          if (this._cachedResources.has(compilationHash)) {
-            resolve({
-              outputName: filePath,
-              source: this._cachedResources.get(compilationHash),
-            });
+          const maybeSource = this._cachedResources.get(compilationHash);
+          if (maybeSource) {
+            resolve({ outputName: filePath, source: maybeSource });
           } else {
             const source = childCompilation.assets[filePath].source();
             this._cachedResources.set(compilationHash, source);

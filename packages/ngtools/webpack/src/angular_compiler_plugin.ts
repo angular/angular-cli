@@ -101,7 +101,7 @@ export class AngularCompilerPlugin {
   private _compilerOptions: CompilerOptions;
   private _rootNames: string[];
   private _singleFileIncludes: string[] = [];
-  private _program: (ts.Program | Program);
+  private _program: (ts.Program | Program) | null;
   private _compilerHost: WebpackCompilerHost & CompilerHost;
   private _moduleResolutionCache: ts.ModuleResolutionCache;
   private _resourceLoader: WebpackResourceLoader;
@@ -404,7 +404,9 @@ export class AngularCompilerPlugin {
           // genDir seems to still be needed in @angular\compiler-cli\src\compiler_host.js:226.
           genDir: '',
         }),
-        entryModule: this._entryModule,
+        // TODO: fix compiler-cli typings; entryModule should not be string, but also optional.
+        // tslint:disable-next-line:non-null-operator
+        entryModule: this._entryModule !,
       });
       timeEnd('AngularCompilerPlugin._getLazyRoutesFromNgtools');
 
@@ -467,7 +469,7 @@ export class AngularCompilerPlugin {
   // TODO: find a way to remove lazy routes that don't exist anymore.
   // This will require a registry of known references to a lazy route, removing it when no
   // module references it anymore.
-  private _processLazyRoutes(discoveredLazyRoutes: { [route: string]: string; }) {
+  private _processLazyRoutes(discoveredLazyRoutes: LazyRouteMap) {
     Object.keys(discoveredLazyRoutes)
       .forEach(lazyRouteKey => {
         const [lazyRouteModule, moduleName] = lazyRouteKey.split('#');
@@ -728,7 +730,7 @@ export class AngularCompilerPlugin {
     const isAppPath = (fileName: string) =>
       !fileName.endsWith('.ngfactory.ts') && !fileName.endsWith('.ngstyle.ts');
     const isMainPath = (fileName: string) => fileName === this._mainPath;
-    const getEntryModule = () => this._entryModule;
+    const getEntryModule = () => this.entryModule;
     const getLazyRoutes = () => this._lazyRoutes;
     const getTypeChecker = () => this._getTsProgram().getTypeChecker();
 
@@ -976,7 +978,7 @@ export class AngularCompilerPlugin {
           timeEnd('AngularCompilerPlugin._emit.ts.getOptionsDiagnostics');
         }
 
-        if (this._firstRun || !this._forkTypeChecker) {
+        if ((this._firstRun || !this._forkTypeChecker) && this._program) {
           allDiagnostics.push(...gatherDiagnostics(this._program, this._JitMode,
             'AngularCompilerPlugin._emit.ts'));
         }
@@ -1012,7 +1014,7 @@ export class AngularCompilerPlugin {
           timeEnd('AngularCompilerPlugin._emit.ng.getNgOptionDiagnostics');
         }
 
-        if (this._firstRun || !this._forkTypeChecker) {
+        if ((this._firstRun || !this._forkTypeChecker) && this._program) {
           allDiagnostics.push(...gatherDiagnostics(this._program, this._JitMode,
             'AngularCompilerPlugin._emit.ng'));
         }

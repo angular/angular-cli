@@ -23,12 +23,12 @@ export function collectDeepNodes<T extends ts.Node>(node: ts.Node, kind: ts.Synt
   return nodes;
 }
 
-export function getFirstNode(sourceFile: ts.SourceFile): ts.Node | null {
+export function getFirstNode(sourceFile: ts.SourceFile): ts.Node {
   if (sourceFile.statements.length > 0) {
-    return sourceFile.statements[0] || null;
+    return sourceFile.statements[0];
   }
 
-  return null;
+  return sourceFile.getChildAt(0);
 }
 
 export function getLastNode(sourceFile: ts.SourceFile): ts.Node | null {

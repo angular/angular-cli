@@ -59,7 +59,7 @@ export class ExtractI18nPlugin implements Tapable {
       basePath = path.dirname(basePath);
     }
     if (options.hasOwnProperty('basePath')) {
-      basePath = path.resolve(process.cwd(), options.basePath);
+      basePath = path.resolve(process.cwd(), options.basePath || '');
     }
 
     let tsConfigJson: any = null;
@@ -102,7 +102,7 @@ export class ExtractI18nPlugin implements Tapable {
     // By default messages will be generated in basePath
     let genDir = basePath;
 
-    if (options.hasOwnProperty('genDir')) {
+    if (options.genDir) {
       genDir = path.resolve(process.cwd(), options.genDir);
     }
 

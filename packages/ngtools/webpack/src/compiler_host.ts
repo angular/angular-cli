@@ -284,7 +284,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       }
     }
 
-    return stats.getSourceFile(languageVersion, this._setParentNodes);
+    return stats && stats.getSourceFile(languageVersion, this._setParentNodes);
   }
 
   get getCancellationToken() {
