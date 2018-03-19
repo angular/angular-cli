@@ -56,47 +56,46 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
     );
   }
 
+  // Note: this method mutates the options argument.
   private _startDevServer(options: ProtractorBuilderOptions) {
+    const architect = this.context.architect;
     const [project, targetName, configuration] = (options.devServerTarget as string).split(':');
     // Override browser build watch setting.
     const overrides = { watch: false, host: options.host, port: options.port };
-    const browserTargetOptions = { project, target: targetName, configuration, overrides };
-    let devServerBuilderConfig: BuilderConfiguration<DevServerBuilderOptions>;
+    const targetSpec = { project, target: targetName, configuration, overrides };
+    const builderConfig = architect.getBuilderConfiguration<DevServerBuilderOptions>(targetSpec);
     let devServerDescription: BuilderDescription;
     let baseUrl: string;
 
-    return this.context.architect
-      .getBuilderConfiguration<DevServerBuilderOptions>(browserTargetOptions).pipe(
-        tap(cfg => devServerBuilderConfig = cfg),
-        concatMap(builderConfig => this.context.architect.getBuilderDescription(builderConfig)),
-        tap(description => devServerDescription = description),
-        concatMap(devServerDescription => this.context.architect.validateBuilderOptions(
-          devServerBuilderConfig, devServerDescription)),
-        concatMap(() => {
-          // Compute baseUrl from devServerOptions.
-          if (options.devServerTarget && devServerBuilderConfig.options.publicHost) {
-            let publicHost = devServerBuilderConfig.options.publicHost;
-            if (!/^\w+:\/\//.test(publicHost)) {
-              publicHost = `${devServerBuilderConfig.options.ssl
-                ? 'https'
-                : 'http'}://${publicHost}`;
-            }
-            const clientUrl = url.parse(publicHost);
-            baseUrl = url.format(clientUrl);
-          } else if (options.devServerTarget) {
-            baseUrl = url.format({
-              protocol: devServerBuilderConfig.options.ssl ? 'https' : 'http',
-              hostname: options.host,
-              port: devServerBuilderConfig.options.port.toString(),
-            });
+    return architect.getBuilderDescription(builderConfig).pipe(
+      tap(description => devServerDescription = description),
+      concatMap(devServerDescription => architect.validateBuilderOptions(
+        builderConfig, devServerDescription)),
+      concatMap(() => {
+        // Compute baseUrl from devServerOptions.
+        if (options.devServerTarget && builderConfig.options.publicHost) {
+          let publicHost = builderConfig.options.publicHost;
+          if (!/^\w+:\/\//.test(publicHost)) {
+            publicHost = `${builderConfig.options.ssl
+              ? 'https'
+              : 'http'}://${publicHost}`;
           }
+          const clientUrl = url.parse(publicHost);
+          baseUrl = url.format(clientUrl);
+        } else if (options.devServerTarget) {
+          baseUrl = url.format({
+            protocol: builderConfig.options.ssl ? 'https' : 'http',
+            hostname: options.host,
+            port: builderConfig.options.port.toString(),
+          });
+        }
 
-          // Save the computed baseUrl back so that Protractor can use it.
-          options.baseUrl = baseUrl;
+        // Save the computed baseUrl back so that Protractor can use it.
+        options.baseUrl = baseUrl;
 
-          return of(this.context.architect.getBuilder(devServerDescription, this.context));
-        }),
-        concatMap(builder => builder.run(devServerBuilderConfig)),
+        return of(this.context.architect.getBuilder(devServerDescription, this.context));
+      }),
+      concatMap(builder => builder.run(builderConfig)),
     );
   }
 

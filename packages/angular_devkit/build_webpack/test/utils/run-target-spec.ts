@@ -9,7 +9,7 @@
 import { Architect, BuildEvent, TargetSpecifier } from '@angular-devkit/architect';
 import { experimental, join, logging, normalize } from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
-import { concatMap, tap } from 'rxjs/operators';
+import { concatMap } from 'rxjs/operators';
 import { TestProjectHost } from '../utils/test-project-host';
 
 
@@ -35,12 +35,9 @@ export function runTargetSpec(
 ): Observable<BuildEvent> {
   targetSpec = { ...targetSpec, overrides };
   const workspace = new experimental.workspace.Workspace(workspaceRoot, host);
-  let architect: Architect;
 
   return workspace.loadWorkspaceFromHost(workspaceFile).pipe(
     concatMap(ws => new Architect(ws).loadArchitect()),
-    tap(arch => architect = arch),
-    concatMap(() => architect.getBuilderConfiguration(targetSpec)),
-    concatMap(cfg => architect.run(cfg, { logger })),
+    concatMap(arch => arch.run(arch.getBuilderConfiguration(targetSpec), { logger })),
   );
 }

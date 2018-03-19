@@ -16,7 +16,7 @@ import { Path, getSystemPath, resolve, tags } from '@angular-devkit/core';
 import { existsSync, readFileSync } from 'fs';
 import * as path from 'path';
 import { Observable } from 'rxjs/Observable';
-import { concatMap, map, tap } from 'rxjs/operators';
+import { concatMap, map } from 'rxjs/operators';
 import * as url from 'url';
 import * as webpack from 'webpack';
 import { getWebpackStatsConfig } from '../angular-cli-files/models/webpack-configs/utils';
@@ -235,7 +235,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
       headers: { 'Access-Control-Allow-Origin': '*' },
       historyApiFallback: {
         index: `${servePath}/${
-            path.relative(projectRoot, path.resolve(root, browserOptions.index))
+          path.relative(projectRoot, path.resolve(root, browserOptions.index))
           }`,
         disableDotRule: true,
         htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
@@ -415,19 +415,18 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
   }
 
   private _getBrowserOptions(options: DevServerBuilderOptions) {
+    const architect = this.context.architect;
     const [project, target, configuration] = options.browserTarget.split(':');
     // Override browser build watch setting.
     const overrides = { watch: options.watch };
     const browserTargetSpec = { project, target, configuration, overrides };
-    let builderConfig: BuilderConfiguration<BrowserBuilderOptions>;
+    const builderConfig = architect.getBuilderConfiguration<BrowserBuilderOptions>(
+      browserTargetSpec);
 
-    return this.context.architect.getBuilderConfiguration<BrowserBuilderOptions>(browserTargetSpec)
-      .pipe(
-        tap(cfg => builderConfig = cfg),
-        concatMap(builderConfig => this.context.architect.getBuilderDescription(builderConfig)),
-        concatMap(browserDescription =>
-          this.context.architect.validateBuilderOptions(builderConfig, browserDescription)),
-        map(browserConfig => browserConfig.options),
+    return architect.getBuilderDescription(builderConfig).pipe(
+      concatMap(browserDescription =>
+        architect.validateBuilderOptions(builderConfig, browserDescription)),
+      map(browserConfig => browserConfig.options),
     );
   }
 }
