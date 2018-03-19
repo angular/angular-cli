@@ -32,6 +32,9 @@ export default function buildOptimizerLoader
     inputFilePath,
     outputFilePath,
     emitSourceMap: options.sourceMap,
+    isSideEffectFree: this._module
+                      && this._module.factoryMeta
+                      && this._module.factoryMeta.sideEffectFree,
   });
 
   if (boOutput.emitSkipped || boOutput.content === null) {
