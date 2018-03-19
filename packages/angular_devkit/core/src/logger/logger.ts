@@ -77,7 +77,7 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
     }
     this._metadata = { name, path };
     this._observable = this._subject.asObservable();
-    if (this.parent) {
+    if (this.parent && this.parent._subject) {
       // When the parent completes, complete us as well.
       this.parent._subject.subscribe(undefined, undefined, () => this.complete());
     }
