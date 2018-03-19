@@ -79,7 +79,7 @@ function updateTsConfig(npmPackageName: string, entryFilePath: string) {
   };
 }
 
-function addDependenciesAndScriptsToPackageJson(name: string, sourceDir: string) {
+function addDependenciesAndScriptsToPackageJson() {
 
   return (host: Tree) => {
     if (!host.exists('package.json')) { return host; }
@@ -92,19 +92,13 @@ function addDependenciesAndScriptsToPackageJson(name: string, sourceDir: string)
       json.devDependencies = {
         '@angular/compiler': '^5.0.0',
         '@angular/compiler-cli': '^5.0.0',
-        'ng-packagr': '^2.1.0',
+        'ng-packagr': '^2.2.0',
         'tsickle': '>=0.25.5',
         'tslib': '^1.7.1',
         'typescript': '>=2.4.2',
         // de-structure last keeps existing user dependencies
         ...json.devDependencies,
       };
-
-      // Add package.json script
-      if (!json.scripts) {
-        json.scripts = {};
-      }
-      json.scripts[`libs:${name}:build`] = `ng-packagr -p ${sourceDir}/package.json`;
     });
   };
 }
@@ -138,10 +132,8 @@ export default function (options: GenerateLibraryOptions): Rule {
       branchAndMerge(chain([
         mergeWith(templateSource),
       ])),
-      options.skipPackageJson ? noop() : addDependenciesAndScriptsToPackageJson(name,
-        forwardSlashes(sourceDir)),
-      options.skipTsConfig ? noop() : updateTsConfig(name,
-        forwardSlashes(entryFilePath)),
+      options.skipPackageJson ? noop() : addDependenciesAndScriptsToPackageJson(),
+      options.skipTsConfig ? noop() : updateTsConfig(name, forwardSlashes(entryFilePath)),
     ])(host, context);
   };
 }

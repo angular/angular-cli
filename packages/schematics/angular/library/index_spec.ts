@@ -125,16 +125,8 @@ describe('Library Schematic', () => {
       const tree = schematicRunner.runSchematic('library', defaultOptions, mockTree);
 
       const packageJson = getJsonFileContent(tree, 'package.json');
-      expect(packageJson.devDependencies['ng-packagr']).toEqual('^2.1.0');
+      expect(packageJson.devDependencies['ng-packagr']).toEqual('^2.2.0');
       // TODO ...
-    });
-
-    it(`should add a script for ng-packagr`, () => {
-      const tree = schematicRunner.runSchematic('library', defaultOptions, mockTree);
-
-      const packageJson = getJsonFileContent(tree, 'package.json');
-      expect(packageJson.scripts['libs:foo:build'])
-        .toEqual('ng-packagr -p my-libs/foo/package.json');
     });
 
     it(`should not override existing users dependencies`, () => {
