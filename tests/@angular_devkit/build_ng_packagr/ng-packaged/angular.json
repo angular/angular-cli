@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../../packages/angular_devkit/core/src/workspace/workspace-schema.json",
+  "version": 1,
+  "projects": {
+    "lib": {
+      "root": "projects/lib",
+      "projectType": "library",
+      "architect": {
+        "build": {
+          "builder": "../../../../packages/angular_devkit/build_ng_packagr:build",
+          "options": {
+            "project": "projects/lib/package.json"
+          }
+        }
+      }
+    }
+  }
+}

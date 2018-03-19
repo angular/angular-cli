@@ -6,15 +6,21 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuildEvent, Builder, BuilderContext, Target } from '@angular-devkit/architect';
-import { getSystemPath } from '@angular-devkit/core';
+import {
+  BuildEvent,
+  Builder,
+  BuilderConfiguration,
+  BuilderContext,
+} from '@angular-devkit/architect';
+import { getSystemPath, normalize, resolve } from '@angular-devkit/core';
 import * as ngPackagr from 'ng-packagr';
-import { resolve as resolvePath } from 'path';
 import { Observable } from 'rxjs/Observable';
 
-// XX: blatantly copy-pasted from 'require-project-module.ts'
-const resolve = require('resolve');
+// TODO move this function to architect or somewhere else where it can be imported from.
+// Blatantly copy-pasted from 'require-project-module.ts'.
 function requireProjectModule(root: string, moduleName: string) {
+  const resolve = require('resolve');
+
   return require(resolve.sync(moduleName, { basedir: root }));
 }
 
@@ -27,22 +33,26 @@ export class NgPackagrBuilder implements Builder<NgPackagrBuilderOptions> {
 
   constructor(public context: BuilderContext) { }
 
-  run(target: Target<NgPackagrBuilderOptions>): Observable<BuildEvent> {
-    const root = getSystemPath(target.root);
-    const options = target.options;
+  run(builderConfig: BuilderConfiguration<NgPackagrBuilderOptions>): Observable<BuildEvent> {
+    const root = this.context.workspace.root;
+    const options = builderConfig.options;
 
     if (!options.project) {
       throw new Error('A "project" must be specified to build a library\'s npm package.');
     }
 
     return new Observable(obs => {
-      const projectNgPackagr = requireProjectModule(root, 'ng-packagr') as typeof ngPackagr;
-      const packageJsonPath = resolvePath(root, options.project);
+      const projectNgPackagr = requireProjectModule(
+        getSystemPath(root), 'ng-packagr') as typeof ngPackagr;
+      const packageJsonPath = getSystemPath(resolve(root, normalize(options.project)));
 
       projectNgPackagr.ngPackagr()
         .forProject(packageJsonPath)
         .build()
-        .then(() => obs.complete())
+        .then(() => {
+          obs.next({ success: true });
+          obs.complete();
+        })
         .catch((e) => obs.error(e));
     });
   }
