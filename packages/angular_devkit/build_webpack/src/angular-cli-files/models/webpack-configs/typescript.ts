@@ -1,6 +1,7 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
-
+import { virtualFs } from '@angular-devkit/core';
+import { Stats } from 'fs';
 import * as path from 'path';
 import { stripIndent } from 'common-tags';
 import {
@@ -19,7 +20,12 @@ const webpackLoader: string = g['angularCliIsLocal']
   : '@ngtools/webpack';
 
 
-function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = true) {
+function _createAotPlugin(
+  wco: WebpackConfigOptions,
+  options: any,
+  host: virtualFs.Host<Stats>,
+  useMain = true,
+) {
   const { appConfig, root, buildOptions } = wco;
   options.compilerOptions = options.compilerOptions || {};
 
@@ -102,22 +108,23 @@ function _createAotPlugin(wco: WebpackConfigOptions, options: any, useMain = tru
     additionalLazyModules,
     nameLazyFiles: buildOptions.namedChunks,
     forkTypeChecker: buildOptions.forkTypeChecker,
-    ...options
+    ...options,
+    host,
   };
   return new AngularCompilerPlugin(pluginOptions);
 }
 
-export function getNonAotConfig(wco: WebpackConfigOptions) {
+export function getNonAotConfig(wco: WebpackConfigOptions, host: virtualFs.Host<Stats>) {
   const { appConfig, root } = wco;
   const tsConfigPath = path.resolve(root, appConfig.tsConfig);
 
   return {
     module: { rules: [{ test: /\.ts$/, loader: webpackLoader }] },
-    plugins: [_createAotPlugin(wco, { tsConfigPath, skipCodeGeneration: true })]
+    plugins: [_createAotPlugin(wco, { tsConfigPath, skipCodeGeneration: true }, host)]
   };
 }
 
-export function getAotConfig(wco: WebpackConfigOptions) {
+export function getAotConfig(wco: WebpackConfigOptions, host: virtualFs.Host<Stats>) {
   const { root, buildOptions, appConfig } = wco;
   const tsConfigPath = path.resolve(root, appConfig.tsConfig);
 
@@ -133,11 +140,11 @@ export function getAotConfig(wco: WebpackConfigOptions) {
 
   return {
     module: { rules: [{ test, use: loaders }] },
-    plugins: [_createAotPlugin(wco, { tsConfigPath })]
+    plugins: [_createAotPlugin(wco, { tsConfigPath }, host)]
   };
 }
 
-export function getNonAotTestConfig(wco: WebpackConfigOptions) {
+export function getNonAotTestConfig(wco: WebpackConfigOptions, host: virtualFs.Host<Stats>) {
   const { root, appConfig } = wco;
   const tsConfigPath = path.resolve(root, appConfig.tsConfig);
 
@@ -152,6 +159,6 @@ export function getNonAotTestConfig(wco: WebpackConfigOptions) {
 
   return {
     module: { rules: [{ test: /\.ts$/, loader: webpackLoader }] },
-    plugins: [_createAotPlugin(wco, pluginOptions, false)]
+    plugins: [_createAotPlugin(wco, pluginOptions, host, false)]
   };
 }

@@ -5,8 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { Path, getSystemPath, join as _join, normalize, virtualFs } from '@angular-devkit/core';
+import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
-import { basename, dirname, join, sep } from 'path';
+import { basename, dirname, join } from 'path';
 import * as ts from 'typescript';
 import { WebpackResourceLoader } from './resource_loader';
 
@@ -104,7 +106,7 @@ export class VirtualFileStats extends VirtualStats {
 
 
 export class WebpackCompilerHost implements ts.CompilerHost {
-  private _delegate: ts.CompilerHost;
+  private _syncHost: virtualFs.SyncDelegateHost;
   private _files: {[path: string]: VirtualFileStats | null} = Object.create(null);
   private _directories: {[path: string]: VirtualDirStats | null} = Object.create(null);
 
@@ -117,32 +119,36 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   private _cache = false;
   private _resourceLoader?: WebpackResourceLoader | undefined;
 
-  constructor(private _options: ts.CompilerOptions, basePath: string) {
+  constructor(
+    private _options: ts.CompilerOptions,
+    basePath: string,
+    private _host: virtualFs.Host<fs.Stats> = new NodeJsSyncHost(),
+  ) {
+    this._syncHost = new virtualFs.SyncDelegateHost(_host);
     this._setParentNodes = true;
-    this._delegate = ts.createCompilerHost(this._options, this._setParentNodes);
     this._basePath = this._normalizePath(basePath);
   }
 
-  private _normalizePath(path: string) {
-    return path.replace(/\\/g, '/');
+  private _normalizePath(path: string): Path {
+    return normalize(path);
   }
 
   denormalizePath(path: string) {
-    return path.replace(/\//g, sep);
+    return getSystemPath(normalize(path));
   }
 
-  resolve(path: string) {
-    path = this._normalizePath(path);
-    if (path[0] == '.') {
-      return this._normalizePath(join(this.getCurrentDirectory(), path));
-    } else if (path[0] == '/' || path.match(/^\w:\//)) {
-      return path;
+  resolve(path: string): Path {
+    const p = this._normalizePath(path);
+    if (p[0] == '.') {
+      return this._normalizePath(join(this.getCurrentDirectory(), p));
+    } else if (p[0] == '/' || p.match(/^\w:\//)) {
+      return p;
     } else {
-      return this._normalizePath(join(this._basePath, path));
+      return this._normalizePath(join(this._basePath, p));
     }
   }
 
-  private _setFileContent(fileName: string, content: string) {
+  private _setFileContent(fileName: Path, content: string) {
     this._files[fileName] = new VirtualFileStats(fileName, content);
 
     let p = dirname(fileName);
@@ -176,7 +182,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     return Object.keys(this._files)
       .filter(fileName => fileName.endsWith('.ngfactory.js') || fileName.endsWith('.ngstyle.js'))
       // These paths are used by the virtual file system decorator so we must denormalize them.
-      .map((path) => this.denormalizePath(path));
+      .map(path => this.denormalizePath(path as Path));
   }
 
   invalidate(fileName: string): void {
@@ -197,24 +203,29 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   fileExists(fileName: string, delegate = true): boolean {
-    fileName = this.resolve(fileName);
+    const p = this.resolve(fileName);
 
-    return this._files[fileName] != null || (delegate && this._delegate.fileExists(fileName));
+    return this._files[p] != null
+      || (delegate && this._syncHost.exists(normalize(p)));
   }
 
   readFile(fileName: string): string | undefined {
-    fileName = this.resolve(fileName);
+    const p = this.resolve(fileName);
 
-    const stats = this._files[fileName];
+    const stats = this._files[p];
     if (!stats) {
-      const result = this._delegate.readFile(fileName);
-      if (result !== undefined) {
-        if (this._cache) {
-          this._setFileContent(fileName, result);
+      try {
+        const result = virtualFs.fileBufferToString(this._syncHost.read(p));
+        if (result !== undefined) {
+          if (this._cache) {
+            this._setFileContent(p, result);
+          }
         }
-      }
 
-      return result;
+        return result;
+      } catch (e) {
+        return undefined;
+      }
     }
 
     return stats.content;
@@ -222,41 +233,61 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
   // Does not delegate, use with `fileExists/directoryExists()`.
   stat(path: string): VirtualStats {
-    path = this.resolve(path);
-    const stats = this._files[path] || this._directories[path];
+    const p = this.resolve(path);
+    const stats = this._files[p] || this._directories[p];
     if (!stats) {
-      throw new Error(`File not found: ${JSON.stringify(path)}`);
+      throw new Error(`File not found: ${JSON.stringify(p)}`);
     }
 
     return stats;
   }
 
   directoryExists(directoryName: string, delegate = true): boolean {
-    directoryName = this.resolve(directoryName);
+    const p = this.resolve(directoryName);
 
-    return (this._directories[directoryName] != null)
-            || (delegate
-                && this._delegate.directoryExists != undefined
-                && this._delegate.directoryExists(directoryName));
+    return (this._directories[p] != null)
+            || (delegate && this._syncHost.exists(p) && this._syncHost.isDirectory(p));
   }
 
   getFiles(path: string): string[] {
-    path = this.resolve(path);
+    const p = this.resolve(path);
 
-    return Object.keys(this._files)
-      .filter(fileName => dirname(fileName) == path)
-      .map(path => basename(path));
+    const subfiles = Object.keys(this._files)
+      .filter(fileName => dirname(fileName) == p)
+      .map(p => basename(p));
+
+
+    let delegated: string[];
+    try {
+      delegated = this._syncHost.list(p).filter((x: string) => {
+        try {
+          return this._syncHost.isFile(_join(p, x));
+        } catch (e) {
+          return false;
+        }
+      });
+    } catch (e) {
+      delegated = [];
+    }
+
+    return delegated.concat(subfiles);
   }
 
   getDirectories(path: string): string[] {
-    path = this.resolve(path);
+    const p = this.resolve(path);
     const subdirs = Object.keys(this._directories)
-      .filter(fileName => dirname(fileName) == path)
+      .filter(fileName => dirname(fileName) == p)
       .map(path => basename(path));
 
     let delegated: string[];
     try {
-      delegated = this._delegate.getDirectories(path);
+      delegated = this._syncHost.list(p).filter((x: string) => {
+        try {
+          return this._syncHost.isDirectory(_join(p, x));
+        } catch (e) {
+          return false;
+        }
+      });
     } catch (e) {
       delegated = [];
     }
@@ -288,11 +319,13 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   get getCancellationToken() {
-    return this._delegate.getCancellationToken;
+    // return this._delegate.getCancellationToken;
+    // TODO: consider implementing a cancellation token.
+    return undefined;
   }
 
   getDefaultLibFileName(options: ts.CompilerOptions) {
-    return this._delegate.getDefaultLibFileName(options);
+    return ts.createCompilerHost(options, false).getDefaultLibFileName(options);
   }
 
   // This is due to typescript CompilerHost interface being weird on writeFile. This shuts down
@@ -300,31 +333,30 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   get writeFile() {
     return (
       fileName: string,
-      data: string, _writeByteOrderMark: boolean,
+      data: string,
+      _writeByteOrderMark: boolean,
       _onError?: (message: string) => void,
       _sourceFiles?: ReadonlyArray<ts.SourceFile>,
     ): void => {
-      fileName = this.resolve(fileName);
-      this._setFileContent(fileName, data);
+      const p = this.resolve(fileName);
+      this._setFileContent(p, data);
     };
   }
 
   getCurrentDirectory(): string {
-    return this._basePath !== null ? this._basePath : this._delegate.getCurrentDirectory();
+    return this._basePath !== null ? this._basePath : '/';
   }
 
   getCanonicalFileName(fileName: string): string {
-    fileName = this.resolve(fileName);
-
-    return this._delegate.getCanonicalFileName(fileName);
+    return this.resolve(fileName);
   }
 
   useCaseSensitiveFileNames(): boolean {
-    return this._delegate.useCaseSensitiveFileNames();
+    return !process.platform.startsWith('win32');
   }
 
   getNewLine(): string {
-    return this._delegate.getNewLine();
+    return '\n';
   }
 
   setResourceLoader(resourceLoader: WebpackResourceLoader) {
@@ -334,7 +366,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   readResource(fileName: string) {
     if (this._resourceLoader) {
       // These paths are meant to be used by the loader so we must denormalize them.
-      const denormalizedFileName = this.denormalizePath(fileName);
+      const denormalizedFileName = this.denormalizePath(normalize(fileName));
 
       return this._resourceLoader.get(denormalizedFileName);
     } else {

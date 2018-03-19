@@ -35,7 +35,6 @@ import {
   statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
-import { WebpackFileSystemHostAdapter } from '../utils/webpack-file-system-host-adapter';
 const webpackMerge = require('webpack-merge');
 
 
@@ -152,12 +151,6 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
           return;
         }
         const webpackCompiler = webpack(webpackConfig);
-
-        // TODO: fix webpack typings.
-        // tslint:disable-next-line:no-any
-        (webpackCompiler as any).inputFileSystem = new WebpackFileSystemHostAdapter(
-          this.context.host as virtualFs.Host<fs.Stats>,
-        );
         const statsConfig = getWebpackStatsConfig(options.verbose);
 
         const callback: webpack.compiler.CompilerCallback = (err, stats) => {
@@ -277,8 +270,8 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
 
     if (wco.appConfig.main || wco.appConfig.polyfills) {
       const typescriptConfigPartial = wco.buildOptions.aot
-        ? getAotConfig(wco)
-        : getNonAotConfig(wco);
+        ? getAotConfig(wco, this.context.host as virtualFs.Host<fs.Stats>)
+        : getNonAotConfig(wco, this.context.host as virtualFs.Host<fs.Stats>);
       webpackConfigs.push(typescriptConfigPartial);
     }
 

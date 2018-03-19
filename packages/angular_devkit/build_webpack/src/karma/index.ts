@@ -12,7 +12,8 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
-import { Path, getSystemPath, normalize, resolve } from '@angular-devkit/core';
+import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
+import * as fs from 'fs';
 import { Observable } from 'rxjs/Observable';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import {
@@ -158,7 +159,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
     const webpackConfigs: {}[] = [
       getCommonConfig(wco),
       getStylesConfig(wco),
-      getNonAotTestConfig(wco),
+      getNonAotTestConfig(wco, this.context.host as virtualFs.Host<fs.Stats>),
       getTestConfig(wco),
     ];
 

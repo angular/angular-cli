@@ -8,6 +8,7 @@
 // TODO: fix webpack typings.
 // tslint:disable-next-line:no-global-tslint-disable
 // tslint:disable:no-any
+import { virtualFs } from '@angular-devkit/core';
 import { ChildProcess, ForkOptions, fork } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -87,6 +88,8 @@ export interface AngularCompilerPluginOptions {
 
   // Use tsconfig to include path globs.
   compilerOptions?: ts.CompilerOptions;
+
+  host: virtualFs.Host<fs.Stats>;
 }
 
 export enum PLATFORM {
@@ -258,7 +261,11 @@ export class AngularCompilerPlugin {
     }
 
     // Create the webpack compiler host.
-    const webpackCompilerHost = new WebpackCompilerHost(this._compilerOptions, this._basePath);
+    const webpackCompilerHost = new WebpackCompilerHost(
+      this._compilerOptions,
+      this._basePath,
+      this._options.host,
+    );
     webpackCompilerHost.enableCaching();
 
     // Create and set a new WebpackResourceLoader.
