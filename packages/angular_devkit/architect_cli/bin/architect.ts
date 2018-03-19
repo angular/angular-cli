@@ -115,16 +115,14 @@ workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       overrides,
     };
 
-    return architect.getBuilderConfiguration(targetSpec);
-  }),
-  concatMap(builderConfig => {
-
     // TODO: better logging of what's happening.
     if (argv.help) {
       // TODO: add target help
       return _throw('Target help NYI.');
       // architect.help(targetOptions, logger);
     } else {
+      const builderConfig = architect.getBuilderConfiguration(targetSpec);
+
       return architect.run(builderConfig, { logger });
     }
   }),
