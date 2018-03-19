@@ -1,7 +1,6 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
-import * as webpack from 'webpack';
 import * as path from 'path';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
@@ -51,23 +50,15 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }));
   }
 
+  let sourcemaps: string | false = false;
   if (buildOptions.sourceMap) {
-    // TODO: see if this is still needed with webpack 4 'mode'.
     // See https://webpack.js.org/configuration/devtool/ for sourcemap types.
     if (buildOptions.evalSourceMap && buildOptions.optimizationLevel === 0) {
       // Produce eval sourcemaps for development with serve, which are faster.
-      extraPlugins.push(new webpack.EvalSourceMapDevToolPlugin({
-        moduleFilenameTemplate: '[resource-path]',
-        sourceRoot: 'webpack:///'
-      }));
+      sourcemaps = 'eval';
     } else {
       // Produce full separate sourcemaps for production.
-      extraPlugins.push(new webpack.SourceMapDevToolPlugin({
-        filename: '[file].map[query]',
-        moduleFilenameTemplate: '[resource-path]',
-        fallbackModuleFilenameTemplate: '[resource-path]?[hash]',
-        sourceRoot: 'webpack:///'
-      }));
+      sourcemaps = 'source-map';
     }
   }
 
@@ -90,6 +81,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     .map(style => style.entry);
 
   return {
+    devtool: sourcemaps,
     resolve: {
       mainFields: [
         ...(wco.supportES2015 ? ['es2015'] : []),
