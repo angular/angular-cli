@@ -8,21 +8,21 @@ export default function() {
   return;
 
   return ng('generate', 'component', 'test-component', '--module', 'app.module.ts')
-    .then(() => prependToFile('src/app/test-component/test-component.component.ts', `
+    .then(() => prependToFile('projects/test-project/src/app/test-component/test-component.component.ts', `
       import { Optional, SkipSelf } from '@angular/core';
     `))
-    .then(() => replaceInFile('src/app/test-component/test-component.component.ts',
+    .then(() => replaceInFile('projects/test-project/src/app/test-component/test-component.component.ts',
       /constructor.*/, `
         constructor(@Optional() @SkipSelf() public test: TestComponentComponent) {
           console.log(test);
         }
       `))
-    .then(() => appendToFile('src/app/app.component.html', `
+    .then(() => appendToFile('projects/test-project/src/app/app.component.html', `
       <app-test-component></app-test-component>
     `))
     .then(() => ng('build', '--aot'))
-    .then(() => expectToFail(() => expectFileToMatch('dist/main.js', /\bComponent\b/)))
+    .then(() => expectToFail(() => expectFileToMatch('dist/test-project/main.js', /\bComponent\b/)))
     // Check that the decorators are still kept.
-    .then(() => expectFileToMatch('dist/main.js', /ctorParameters.*Optional.*SkipSelf/))
-    .then(() => expectToFail(() => expectFileToMatch('dist/main.js', /\bNgModule\b/)));
+    .then(() => expectFileToMatch('dist/test-project/main.js', /ctorParameters.*Optional.*SkipSelf/))
+    .then(() => expectToFail(() => expectFileToMatch('dist/test-project/main.js', /\bNgModule\b/)));
 }

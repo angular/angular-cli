@@ -7,7 +7,7 @@ export default function() {
   // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
   return ng('build')
-    .then(() => expectFileToExist('dist/vendor.js'))
+    .then(() => expectFileToExist('dist/test-project/vendor.js'))
     .then(() => ng('build', '--vendor-chunk=false'))
-    .then(() => expectToFail(() => expectFileToExist('dist/vendor.js')));
+    .then(() => expectToFail(() => expectFileToExist('dist/test-project/vendor.js')));
 }

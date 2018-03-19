@@ -8,7 +8,7 @@ export default function() {
     .then(() => moveFile('node_modules', '../node_modules'))
     .then(() => symlinkFile('../node_modules', 'node_modules', 'dir'))
     .then(() => ng('build'))
-    .then(() => expectFileToExist('dist/vendor.js'))
+    .then(() => expectFileToExist('dist/test-project/vendor.js'))
     // Cleanup
     .then(() => {
       return deleteFile('node_modules')

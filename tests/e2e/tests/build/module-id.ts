@@ -4,7 +4,7 @@ import { replaceInFile } from '../../utils/fs';
 
 export default function() {
   return Promise.resolve()
-    .then(() => replaceInFile('src/app/app.component.ts',
+    .then(() => replaceInFile('projects/test-project/src/app/app.component.ts',
       '@Component({',
       '@Component({ moduleId: module.id,'))
     .then(() => ng('build'));

@@ -20,7 +20,7 @@ export default function () {
   return Promise.resolve()
 
     // setup a double-quote tslint config
-    .then(() => writeFile('src/app/tslint.json', nestedConfigContent))
+    .then(() => writeFile('projects/test-project/src/app/tslint.json', nestedConfigContent))
 
     // Generate a fixed new component but don't fix rest of app
     .then(() => ng('generate', 'component', 'test-component1', '--lint-fix'))

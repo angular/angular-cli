@@ -16,29 +16,29 @@ export default function () {
   extensions.forEach(ext => {
     promise = promise.then(() => {
       return writeMultipleFiles({
-        [`src/styles.${ext}`]: stripIndents`
+        [`projects/test-project/src/styles.${ext}`]: stripIndents`
           @import "~@angular/material/prebuilt-themes/indigo-pink.css";
         `,
-        [`src/app/app.component.${ext}`]: stripIndents`
+        [`projects/test-project/src/app/app.component.${ext}`]: stripIndents`
           @import "~@angular/material/prebuilt-themes/indigo-pink.css";
         `,
         })
         // change files to use preprocessor
-        .then(() => updateJsonFile('.angular.json', workspaceJson => {
-          const appArchitect = workspaceJson.projects.app.architect;
+        .then(() => updateJsonFile('angular.json', workspaceJson => {
+          const appArchitect = workspaceJson.projects['test-project'].architect;
           appArchitect.build.options.styles = [
-            { input: `src/styles.${ext}` }
+            { input: `projects/test-project/src/styles.${ext}` }
           ];
         }))
-        .then(() => replaceInFile('src/app/app.component.ts',
+        .then(() => replaceInFile('projects/test-project/src/app/app.component.ts',
           './app.component.css', `./app.component.${ext}`))
         // run build app
         .then(() => ng('build', '--extract-css', '--source-map'))
         .then(() => writeMultipleFiles({
-          [`src/styles.${ext}`]: stripIndents`
+          [`projects/test-project/src/styles.${ext}`]: stripIndents`
             @import "@angular/material/prebuilt-themes/indigo-pink.css";
           `,
-          [`src/app/app.component.${ext}`]: stripIndents`
+          [`projects/test-project/src/app/app.component.${ext}`]: stripIndents`
             @import "@angular/material/prebuilt-themes/indigo-pink.css";
           `,
         }))

@@ -42,7 +42,7 @@ export default function() {
     })
     .then(() => killAllProcesses(), (err) => { killAllProcesses(); throw err; })
 
-    // .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    // .then(() => updateJsonFile('angular.json', configJson => {
     //   const app = configJson.defaults;
     //   app.serve = {
     //     proxyConfig: proxyConfigFile
@@ -61,7 +61,7 @@ export default function() {
 
     // // A non-existing proxy file should error.
     // .then(() => expectToFail(() => ng('serve', '--proxy-config', 'proxy.non-existent.json')))
-    // .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    // .then(() => updateJsonFile('angular.json', configJson => {
     //   const app = configJson.defaults;
     //   app.serve = {
     //     proxyConfig: 'proxy.non-existent.json'

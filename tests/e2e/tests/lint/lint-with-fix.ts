@@ -5,7 +5,7 @@ export default function () {
   // TODO(architect): Figure out how this test should look like post devkit/build-webpack.
   return;
 
-  const fileName = 'src/app/foo.ts';
+  const fileName = 'projects/test-project/src/app/foo.ts';
 
   return Promise.resolve()
     .then(() => writeFile(fileName, 'const foo = "";\n'))

@@ -1,17 +1,16 @@
 import {writeFile, expectFileToExist, expectFileToMatch} from '../../utils/fs';
 import {ng} from '../../utils/process';
-import {updateJsonFile} from '../../utils/project';
 import {expectToFail} from '../../utils/utils';
 
 
 export default function() {
   // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
-  return writeFile('src/assets/.file', '')
-    .then(() => writeFile('src/assets/test.abc', 'hello world'))
+  return writeFile('projects/test-project/src/assets/.file', '')
+    .then(() => writeFile('projects/test-project/src/assets/test.abc', 'hello world'))
     .then(() => ng('build'))
-    .then(() => expectFileToExist('dist/favicon.ico'))
-    .then(() => expectFileToExist('dist/assets/.file'))
-    .then(() => expectFileToMatch('dist/assets/test.abc', 'hello world'))
-    .then(() => expectToFail(() => expectFileToExist('dist/assets/.gitkeep')));
+    .then(() => expectFileToExist('dist/test-project/favicon.ico'))
+    .then(() => expectFileToExist('dist/test-project/assets/.file'))
+    .then(() => expectFileToMatch('dist/test-project/assets/test.abc', 'hello world'))
+    .then(() => expectToFail(() => expectFileToExist('dist/test-project/assets/.gitkeep')));
 }

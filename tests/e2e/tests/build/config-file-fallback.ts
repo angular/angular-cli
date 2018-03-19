@@ -5,6 +5,6 @@ import {moveFile} from '../../utils/fs';
 export default function() {
   return Promise.resolve()
     .then(() => ng('build'))
-    .then(() => moveFile('.angular-cli.json', 'angular-cli.json'))
+    .then(() => moveFile('angular.json', '.angular.json'))
     .then(() => ng('build'));
 }

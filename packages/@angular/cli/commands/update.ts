@@ -1,18 +1,20 @@
-import { Command, CommandScope } from '../models/command';
-import SchematicRunTask from '../tasks/schematic-run';
+import { CommandScope, Option } from '../models/command';
+import { SchematicCommand, CoreSchematicOptions } from '../models/schematic-command';
 
-export interface UpdateOptions {
+export interface UpdateOptions extends CoreSchematicOptions {
+  next: boolean;
   schematic?: boolean;
 }
 
 
-export default class UpdateCommand extends Command {
+export default class UpdateCommand extends SchematicCommand {
   public readonly name = 'update';
   public readonly description = 'Updates your application.';
   public static aliases: string[] = [];
   public readonly scope = CommandScope.inProject;
   public readonly arguments: string[] = [];
-  public readonly options = [
+  public readonly options: Option[] = [
+    ...this.coreOptions,
     {
       name: 'dry-run',
       type: Boolean,
@@ -28,25 +30,22 @@ export default class UpdateCommand extends Command {
     }
   ];
 
-  public async run(options: any) {
+  public async run(options: UpdateOptions) {
     const collectionName = '@schematics/package-update';
     const schematicName = 'all';
 
-    const schematicRunTask = new SchematicRunTask({
-      ui: this.ui,
-      project: this.project
-    });
 
     const schematicRunOptions = {
-      taskOptions: {
-        dryRun: options.dryRun,
+      collectionName,
+      schematicName,
+      schematicOptions: {
         version: options.next ? 'next' : undefined
       },
+      dryRun: options.dryRun,
+      force: options.force,
       workingDir: this.project.root,
-      collectionName,
-      schematicName
     };
 
-    return schematicRunTask.run(schematicRunOptions);
+    return this.runSchematic(schematicRunOptions);
   }
 }

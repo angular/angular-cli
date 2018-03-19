@@ -13,6 +13,11 @@ export enum CommandScope {
   outsideProject
 }
 
+export enum ArgumentStrategy {
+  MapToOptions,
+  Nothing
+}
+
 export abstract class Command {
   protected _rawArgs: string[];
 
@@ -71,6 +76,7 @@ export abstract class Command {
   abstract readonly description: string;
   abstract readonly arguments: string[];
   abstract readonly options: Option[];
+  public argStrategy = ArgumentStrategy.MapToOptions;
   public hidden = false;
   public unknown = false;
   public scope = CommandScope.everywhere;

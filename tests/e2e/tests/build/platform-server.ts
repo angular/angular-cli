@@ -14,9 +14,6 @@ import { readNgVersion } from '../../utils/version';
 import { expectToFail } from '../../utils/utils';
 
 export default function () {
-  // TODO(architect): re-enable after build-webpack supports this functionality.
-  return;
-
   // Skip this for ejected tests.
   if (getGlobalVariable('argv').eject) {
     return Promise.resolve();
@@ -34,7 +31,7 @@ export default function () {
   }
 
   return Promise.resolve()
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    .then(() => updateJsonFile('angular.json', configJson => {
       const app = configJson['apps'][0];
       delete app['polyfills'];
       delete app['styles'];
@@ -58,35 +55,35 @@ export default function () {
     .then(() => silentNpm('install'))
     .then(() => ng('build', '--aot=false'))
     // files were created successfully
-    .then(() => expectFileToMatch('dist/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main.js',
       /exports.*AppModule/))
     .then(() => writeFile('./index.js', `
       require('zone.js/dist/zone-node');
       require('reflect-metadata');
       const fs = require('fs');
-      const \{ AppModule \} = require('./dist/main');
+      const \{ AppModule \} = require('./dist/test-project/main');
       const \{ renderModule \} = require('@angular/platform-server');
 
       renderModule(AppModule, \{
         url: '/',
         document: '<app-root></app-root>'
       \}).then(html => \{
-        fs.writeFileSync('dist/index.html', html);
+        fs.writeFileSync('dist/test-project/index.html', html);
       \});
     `))
     .then(() => exec(normalize('node'), 'index.js'))
-    .then(() => expectFileToMatch('dist/index.html',
+    .then(() => expectFileToMatch('dist/test-project/index.html',
       new RegExp('<h2 _ngcontent-c0="">Here are some links to help you start: </h2>')))
     .then(() => ng('build', '--aot'))
     // files were created successfully
-    .then(() => expectFileToMatch('dist/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main.js',
       /exports.*AppModuleNgFactory/))
     .then(() => replaceInFile('./index.js', /AppModule/g, 'AppModuleNgFactory'))
     .then(() => replaceInFile('./index.js', /renderModule/g, 'renderModuleFactory'))
     .then(() => exec(normalize('node'), 'index.js'))
-    .then(() => expectFileToMatch('dist/index.html',
+    .then(() => expectFileToMatch('dist/test-project/index.html',
       new RegExp('<h2 _ngcontent-c0="">Here are some links to help you start: </h2>')))
-    .then(() => expectFileToMatch('./dist/main.js',
+    .then(() => expectFileToMatch('./dist/test-project/main.js',
       /require\(["']@angular\/[^"']*["']\)/))
 
     // Check externals.
@@ -102,11 +99,11 @@ export default function () {
         url: '/',
         document: '<app-root></app-root>'
       \}).then(html => \{
-        fs.writeFileSync('dist/index.html', html);
+        fs.writeFileSync('dist/test-project/index.html', html);
       \});
     `)))
     .then(() => ng('build', '--bundle-dependencies=all', '--aot=false'))
-    .then(() => expectToFail(() => expectFileToMatch('./dist/main.js',
+    .then(() => expectToFail(() => expectFileToMatch('./dist/test-project/main.js',
       /require\(["']@angular\/[^"']*["']\)/)))
-    .then(() => exec(normalize('node'), 'dist/main.js'));
+    .then(() => exec(normalize('node'), 'dist/test-project/main.js'));
 }
