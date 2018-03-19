@@ -41,7 +41,7 @@ export default async function() {
     .then(() => silentNpm('install'))
     .then(() => ng('version'))
     // Force sourcemaps to be from the root of the filesystem.
-    .then(() => updateTsConfig(json => {
+    .then(() => updateJsonFile('tsconfig.json', json => {
       json['compilerOptions']['sourceRoot'] = '/';
     }))
     .then(() => git('config', 'user.email', 'angular-core+e2e@google.com'))

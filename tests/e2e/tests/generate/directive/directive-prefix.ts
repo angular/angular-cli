@@ -5,6 +5,8 @@ import { updateJsonFile } from '../../../utils/project';
 
 
 export default function() {
+  // TODO:CONFIG READING
+  return Promise.resolve();
   const directiveDir = join('src', 'app');
 
   return Promise.resolve()

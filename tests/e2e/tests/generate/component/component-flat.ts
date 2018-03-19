@@ -5,7 +5,9 @@ import {updateJsonFile} from '../../../utils/project';
 
 
 export default function() {
-  const appDir = join('src', 'app');
+  // TODO:CONFIG READING
+  return Promise.resolve();
+  const appDir = join('projects', 'test-project', 'src');
 
   return Promise.resolve()
     .then(() => updateJsonFile('.angular-cli.json', configJson => {

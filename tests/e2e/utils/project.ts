@@ -45,10 +45,10 @@ export function createProject(name: string, ...args: string[]) {
     .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
     .then(() => argv['ng4'] ? useNg4() : Promise.resolve())
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
-    // TODO(architect): remove the changes to karma config when schematics are in
-    .then(() => replaceInFile('karma.conf.js', /@angular\/cli/g, '@angular-devkit/build-webpack'))
-    .then(() => replaceInFile('karma.conf.js', 'reports',
-      `dir: require('path').join(__dirname, 'coverage'), reports`))
+// TODO(architect): remove the changes to karma config when schematics are in
+// .then(() => replaceInFile('karma.conf.js', /@angular\/cli/g, '@angular-devkit/build-webpack'))
+// .then(() => replaceInFile('karma.conf.js', 'reports',
+//   `dir: require('path').join(__dirname, 'coverage'), reports`))
     .then(() => console.log(`Project ${name} created... Installing npm.`))
     .then(() => silentNpm('install'));
 }
@@ -166,7 +166,7 @@ export function useNgVersion(version: string) {
 }
 
 export function useCIDefaults() {
-  return updateJsonFile('.angular.json', workspaceJson => {
+  return updateJsonFile('angular.json', workspaceJson => {
     // Disable progress reporting on CI to reduce spam.
     const appArchitect = workspaceJson.projects.app.architect;
     appArchitect.build.options.progress = false;
