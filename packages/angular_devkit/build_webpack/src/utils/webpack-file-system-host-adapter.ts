@@ -50,7 +50,7 @@ export class WebpackFileSystemHostAdapter implements InputFileSystem {
     }
   }
 
-  stat(path: string, callback: Callback<virtualFs.Stats>): void {
+  stat(path: string, callback: Callback<Stats>): void {
     const p = normalize('/' + path);
     const result = this._host.stat(p);
 
@@ -94,9 +94,9 @@ export class WebpackFileSystemHostAdapter implements InputFileSystem {
     return this._doHostCall(this._host.list(normalize('/' + path)), callback);
   }
 
-  readFile(path: string, callback: Callback<Buffer>): void {
+  readFile(path: string, callback: Callback<string>): void {
     const o = this._host.read(normalize('/' + path)).pipe(
-      map(content => new Buffer(content)),
+      map(content => virtualFs.fileBufferToString(content)),
     );
 
     return this._doHostCall(o, callback);

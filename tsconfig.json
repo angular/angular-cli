@@ -46,6 +46,7 @@
       "@angular-devkit/build-optimizer": [ "./packages/angular_devkit/build_optimizer/src/index" ],
       "@angular-devkit/architect": [ "./packages/angular_devkit/architect/src/index" ],
       "@ngtools/webpack": [ "./packages/ngtools/webpack/src/index" ],
+      "@ngtools/webpack/*": [ "./packages/ngtools/webpack/*" ],
       "@schematics/angular": [ "./packages/schematics/angular/index" ]
     }
   },

@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@angular-devkit/build-optimizer": "0.0.0",
-    "@ngtools/webpack": "6.0.0-beta.6",
+    "@ngtools/webpack": "0.0.0",
     "autoprefixer": "^7.2.3",
     "cache-loader": "^1.2.2",
     "chalk": "~2.2.2",
