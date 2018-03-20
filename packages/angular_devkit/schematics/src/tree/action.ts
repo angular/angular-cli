@@ -53,56 +53,74 @@ export class ActionList implements Iterable<Action> {
 
 
   optimize() {
-    let changed = false;
-    const actions = this._actions;
-    const deleted = new Set<string>();
-    this._actions = [];
+    const toCreate = new Map<Path, Buffer>();
+    const toRename = new Map<Path, Path>();
+    const toOverwrite = new Map<Path, Buffer>();
+    const toDelete = new Set<Path>();
 
-    // Handles files we create.
-    for (let i = 0; i < actions.length; i++) {
-      const iAction = actions[i];
-      if (iAction.kind == 'c') {
-        let path = iAction.path;
-        let content = iAction.content;
-        let toDelete = false;
-        deleted.delete(path);
+    for (const action of this._actions) {
+      switch (action.kind) {
+        case 'c':
+          toCreate.set(action.path, action.content);
+          break;
 
-        for (let j = i + 1; j < actions.length; j++) {
-          const action = actions[j];
-          if (path == action.path) {
-            changed = true;
-            switch (action.kind) {
-              case 'c': content = action.content; actions.splice(j--, 1); break;
-              case 'o': content = action.content; actions.splice(j--, 1); break;
-              case 'r': path = action.to; actions.splice(j--, 1); break;
-              case 'd': toDelete = true; actions.splice(j--, 1); break;
+        case 'o':
+          if (toCreate.has(action.path)) {
+            toCreate.set(action.path, action.content);
+          } else {
+            toOverwrite.set(action.path, action.content);
+          }
+          break;
+
+        case 'd':
+          toDelete.add(action.path);
+          break;
+
+        case 'r':
+          const maybeCreate = toCreate.get(action.path);
+          const maybeOverwrite = toOverwrite.get(action.path);
+          if (maybeCreate) {
+            toCreate.delete(action.path);
+            toCreate.set(action.to, maybeCreate);
+          }
+          if (maybeOverwrite) {
+            toOverwrite.delete(action.path);
+            toOverwrite.set(action.to, maybeOverwrite);
+          }
+
+          let maybeRename: Path | undefined = undefined;
+          for (const [from, to] of toRename.entries()) {
+            if (to == action.path) {
+              maybeRename = from;
+              break;
             }
           }
-          if (toDelete) {
-            break;
-          }
-        }
 
-        if (!toDelete) {
-          this.create(path, content);
-        } else {
-          deleted.add(path);
-        }
-      } else if (deleted.has(iAction.path)) {
-        // DoNothing
-      } else {
-        switch (iAction.kind) {
-          case 'o': this.overwrite(iAction.path, iAction.content); break;
-          case 'r': this.rename(iAction.path, iAction.to); break;
-          case 'd': this.delete(iAction.path); break;
-        }
+          if (maybeRename) {
+            toRename.set(maybeRename, action.to);
+          }
+
+          if (!maybeCreate && !maybeOverwrite && !maybeRename) {
+            toRename.set(action.path, action.to);
+          }
+          break;
       }
     }
 
-    // TODO: fix the optimization and remove this recursivity.
-    if (changed) {
-      this.optimize();
-    }
+    this._actions = [
+      ...[...toDelete.values()].map(x => {
+        return { kind: 'd', path: x } as DeleteFileAction;
+      }),
+      ...[...toRename.entries()].map(([from, to]) => {
+        return { kind: 'r', path: from, to } as RenameFileAction;
+      }),
+      ...[...toCreate.entries()].map(([path, content]) => {
+        return { kind: 'c', path, content } as CreateFileAction;
+      }),
+      ...[...toOverwrite.entries()].map(([path, content]) => {
+        return { kind: 'o', path, content } as OverwriteFileAction;
+      }),
+    ];
   }
 
   push(action: Action) { this._actions.push(action); }

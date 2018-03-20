@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { normalize } from '@angular-devkit/core';
-import { ActionList } from './action';
+import { Action, ActionList } from './action';
 
 
 describe('Action', () => {
@@ -74,6 +74,40 @@ describe('Action', () => {
       expect(actions2.length).toBe(4);
       actions2.optimize();
       expect(actions2.length).toBe(2);
+    });
+
+    it('handles edge cases (2)', () => {
+      const actions = new ActionList;
+
+      actions.create(normalize('/test'), new Buffer('1'));
+      actions.rename(normalize('/test'), normalize('/test1'));
+      actions.overwrite(normalize('/test1'), new Buffer('2'));
+      actions.rename(normalize('/test1'), normalize('/test2'));
+
+      actions.optimize();
+      expect(actions.length).toBe(1);
+      expect(actions.get(0)).toEqual(
+        jasmine.objectContaining<Action>({ kind: 'c', path: normalize('/test2') }),
+      );
+    });
+
+    it('handles edge cases (3)', () => {
+      const actions = new ActionList;
+
+      actions.rename(normalize('/test'), normalize('/test1'));
+      actions.overwrite(normalize('/test1'), new Buffer('2'));
+      actions.rename(normalize('/test1'), normalize('/test2'));
+
+      actions.optimize();
+      expect(actions.length).toBe(2);
+      expect(actions.get(0)).toEqual(
+        jasmine.objectContaining<Action>({
+          kind: 'r', path: normalize('/test'), to: normalize('/test2'),
+        }),
+      );
+      expect(actions.get(1)).toEqual(
+        jasmine.objectContaining<Action>({ kind: 'o', path: normalize('/test2') }),
+      );
     });
   });
 });
