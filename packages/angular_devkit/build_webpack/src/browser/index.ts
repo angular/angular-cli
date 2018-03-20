@@ -28,6 +28,7 @@ import {
 import { getWebpackStatsConfig } from '../angular-cli-files/models/webpack-configs/utils';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
+import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
 import {
   statsErrorsToString,
   statsToString,
@@ -164,20 +165,33 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
             this.context.logger.error(statsErrorsToString(json, statsConfig));
           }
 
-          obs.next({ success: !stats.hasErrors() });
-
           if (options.watch) {
+            obs.next({ success: !stats.hasErrors() });
+
             // Never complete on watch mode.
             return;
           } else {
-            // if (!!app.serviceWorker && runTaskOptions.target === 'production' &&
-            //   usesServiceWorker(this.project.root) && runTaskOptions.serviceWorker !== false) {
-            //   const appRoot = path.resolve(this.project.root, app.root);
-            //   augmentAppWithServiceWorker(this.project.root, appRoot, path.resolve(outputPath),
-            //     runTaskOptions.baseHref || '/')
-            //     .then(() => resolve(), (err: any) => reject(err));
-            // }
-            obs.complete();
+            if (builderConfig.options.serviceWorker) {
+              augmentAppWithServiceWorker(
+                this.context.host,
+                root,
+                projectRoot,
+                resolve(root, normalize(options.outputPath)),
+                options.baseHref || '/',
+              ).then(
+                () => {
+                  obs.next({ success: !stats.hasErrors() });
+                  obs.complete();
+                },
+                (err: Error) => {
+                  // We error out here because we're not in watch mode anyway (see above).
+                  obs.error(err);
+                },
+              );
+            } else {
+              obs.next({ success: !stats.hasErrors() });
+              obs.complete();
+            }
           }
         };
 

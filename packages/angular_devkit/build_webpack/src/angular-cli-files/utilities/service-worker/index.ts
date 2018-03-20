@@ -1,56 +1,51 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
-
+import { Path, join, normalize, virtualFs, dirname, getSystemPath } from '@angular-devkit/core';
 import { Filesystem } from '@angular/service-worker/config';
 import { oneLine, stripIndent } from 'common-tags';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import * as path from 'path';
 import * as semver from 'semver';
 
 import { resolveProjectModule } from '../require-project-module';
+import { map, reduce, switchMap } from "rxjs/operators";
+import { Observable } from "rxjs";
+import { merge } from "rxjs/observable/merge";
+import { of } from "rxjs/observable/of";
+
 
 export const NEW_SW_VERSION = '5.0.0-rc.0';
 
+
 class CliFilesystem implements Filesystem {
-  constructor(private base: string) { }
+  constructor(private _host: virtualFs.Host, private base: string) { }
 
-  list(_path: string): Promise<string[]> {
-    return Promise.resolve(this.syncList(_path));
+  list(path: string): Promise<string[]> {
+    return this._host.list(this._resolve(path)).toPromise().then(x => x, _err => []);
   }
 
-  private syncList(_path: string): string[] {
-    const dir = this.canonical(_path);
-    const entries = fs.readdirSync(dir).map(
-      (entry: string) => ({ entry, stats: fs.statSync(path.posix.join(dir, entry)) }));
-    const files = entries.filter((entry: any) => !entry.stats.isDirectory())
-      .map((entry: any) => path.posix.join(_path, entry.entry));
-
-    return entries.filter((entry: any) => entry.stats.isDirectory())
-      .map((entry: any) => path.posix.join(_path, entry.entry))
-      .reduce((list: string[], subdir: string) => list.concat(this.syncList(subdir)), files);
+  read(path: string): Promise<string> {
+    return this._host.read(this._resolve(path))
+      .toPromise()
+      .then(content => virtualFs.fileBufferToString(content));
   }
 
-  read(_path: string): Promise<string> {
-    const file = this.canonical(_path);
-    return Promise.resolve(fs.readFileSync(file).toString());
-  }
-
-  hash(_path: string): Promise<string> {
+  hash(path: string): Promise<string> {
     const sha1 = crypto.createHash('sha1');
-    const file = this.canonical(_path);
-    const contents: Buffer = fs.readFileSync(file);
-    sha1.update(contents);
-    return Promise.resolve(sha1.digest('hex'));
+
+    return this.read(path)
+      .then(content => sha1.update(content))
+      .then(() => sha1.digest('hex'));
   }
 
-  write(_path: string, contents: string): Promise<void> {
-    const file = this.canonical(_path);
-    fs.writeFileSync(file, contents);
-    return Promise.resolve();
+  write(path: string, content: string): Promise<void> {
+    return this._host.write(this._resolve(path), virtualFs.stringToFileBuffer(content))
+      .toPromise();
   }
 
-  private canonical(_path: string): string { return path.posix.join(this.base, _path); }
+  private _resolve(path: string): Path {
+    return join(normalize(this.base), path);
+  }
 }
 
 export function usesServiceWorker(projectRoot: string): boolean {
@@ -81,38 +76,75 @@ export function usesServiceWorker(projectRoot: string): boolean {
   return true;
 }
 
-export function augmentAppWithServiceWorker(projectRoot: string, appRoot: string,
-  outputPath: string, baseHref: string): Promise<void> {
+export function augmentAppWithServiceWorker(
+  host: virtualFs.Host,
+  projectRoot: Path,
+  appRoot: Path,
+  outputPath: Path,
+  baseHref: string,
+): Promise<void> {
   // Path to the worker script itself.
-  const workerPath = resolveProjectModule(projectRoot, '@angular/service-worker/ngsw-worker.js');
-  const safetyPath = path.join(path.dirname(workerPath), 'safety-worker.js');
-  const configPath = path.resolve(appRoot, 'ngsw-config.json');
+  const distPath = normalize(outputPath);
+  const workerPath = normalize(
+    resolveProjectModule(getSystemPath(projectRoot), '@angular/service-worker/ngsw-worker.js'),
+  );
+  const swConfigPath = resolveProjectModule(
+    getSystemPath(projectRoot),
+    '@angular/service-worker/config',
+  );
+  const safetyPath = join(dirname(workerPath), 'safety-worker.js');
+  const configPath = join(appRoot, 'ngsw-config.json');
 
-  if (!fs.existsSync(configPath)) {
-    return Promise.reject(new Error(oneLine`
-      Error: Expected to find an ngsw-config.json configuration
-      file in the ${appRoot} folder. Either provide one or disable Service Worker
-      in .angular-cli.json.`,
-    ));
-  }
-  const config = fs.readFileSync(configPath, 'utf8');
-
-  const Generator = require('@angular/service-worker/config').Generator;
-  const gen = new Generator(new CliFilesystem(outputPath), baseHref);
-  return gen
-    .process(JSON.parse(config))
-    .then((output: Object) => {
-      const manifest = JSON.stringify(output, null, 2);
-      fs.writeFileSync(path.resolve(outputPath, 'ngsw.json'), manifest);
-      // Copy worker script to dist directory.
-      const workerCode = fs.readFileSync(workerPath);
-      fs.writeFileSync(path.resolve(outputPath, 'ngsw-worker.js'), workerCode);
-
-      // If @angular/service-worker has the safety script, copy it into two locations.
-      if (fs.existsSync(safetyPath)) {
-        const safetyCode = fs.readFileSync(safetyPath);
-        fs.writeFileSync(path.resolve(outputPath, 'worker-basic.min.js'), safetyCode);
-        fs.writeFileSync(path.resolve(outputPath, 'safety-worker.js'), safetyCode);
+  return host.exists(configPath).pipe(
+    switchMap(exists => {
+      if (!exists) {
+        throw new Error(oneLine`
+          Error: Expected to find an ngsw-config.json configuration
+          file in the ${appRoot} folder. Either provide one or disable Service Worker
+          in your angular.json configuration file.`,
+        );
       }
-    });
+
+      return host.read(configPath) as Observable<virtualFs.FileBuffer>;
+    }),
+    map(content => JSON.parse(virtualFs.fileBufferToString(content))),
+    switchMap(configJson => {
+      const Generator = require(swConfigPath).Generator;
+      const gen = new Generator(new CliFilesystem(host, outputPath), baseHref);
+
+      return gen.process(configJson);
+    }),
+
+    switchMap(output => {
+      const manifest = JSON.stringify(output, null, 2);
+      return host.read(workerPath).pipe(
+        switchMap(workerCode => {
+          return merge(
+            host.write(join(distPath, 'ngsw.json'), virtualFs.stringToFileBuffer(manifest)),
+            host.write(join(distPath, 'ngsw-worker.js'), workerCode),
+          ) as Observable<void>;
+        }),
+      );
+    }),
+
+    switchMap(() => host.exists(safetyPath)),
+    // If @angular/service-worker has the safety script, copy it into two locations.
+    switchMap(exists => {
+      if (!exists) {
+        return of<void>(undefined);
+      }
+
+      return host.read(safetyPath).pipe(
+        switchMap(safetyCode => {
+          return merge(
+            host.write(join(distPath, 'worker-basic.min.js'), safetyCode),
+            host.write(join(distPath, 'safety-worker.js'), safetyCode),
+          ) as Observable<void>;
+        }),
+      );
+    }),
+
+    // Remove all elements, reduce them to a single emit.
+    reduce(() => {}),
+  ).toPromise();
 }
