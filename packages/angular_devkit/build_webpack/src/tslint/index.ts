@@ -26,7 +26,7 @@ import { stripBom } from '../angular-cli-files/utilities/strip-bom';
 
 export interface TslintBuilderOptions {
   tslintConfig?: string;
-  tsConfig?: string;
+  tsConfig?: string | string[];
   fix: boolean;
   typeCheck: boolean;
   force: boolean;
@@ -58,39 +58,32 @@ export class TslintBuilder implements Builder<TslintBuilderOptions> {
         ? path.resolve(systemRoot, options.tslintConfig)
         : null;
       const Linter = projectTslint.Linter;
-      const Configuration = projectTslint.Configuration;
 
-      let program: ts.Program | undefined = undefined;
+      let result;
       if (options.tsConfig) {
-        program = Linter.createProgram(path.resolve(systemRoot, options.tsConfig));
+        const tsConfigs = Array.isArray(options.tsConfig) ? options.tsConfig : [options.tsConfig];
+
+        for (const tsConfig of tsConfigs) {
+          const program = Linter.createProgram(path.resolve(systemRoot, tsConfig));
+          const partial = lint(projectTslint, systemRoot, tslintConfigPath, options, program);
+          if (result == undefined) {
+            result = partial;
+          } else {
+            result.errorCount += partial.errorCount;
+            result.warningCount += partial.warningCount;
+            result.failures = result.failures.concat(partial.failures);
+            if (partial.fixes) {
+              result.fixes = result.fixes ? result.fixes.concat(partial.fixes) : partial.fixes;
+            }
+          }
+        }
+      } else {
+        result = lint(projectTslint, systemRoot, tslintConfigPath, options);
       }
 
-      const files = getFilesToLint(systemRoot, options, Linter, program);
-      const lintOptions = {
-        fix: options.fix,
-        formatter: options.format,
-      };
-
-      const linter = new Linter(lintOptions, program);
-
-      let lastDirectory;
-      let configLoad;
-      for (const file of files) {
-        const contents = getFileContents(file, options, program);
-
-        // Only check for a new tslint config if the path changes.
-        const currentDirectory = path.dirname(file);
-        if (currentDirectory !== lastDirectory) {
-          configLoad = Configuration.findConfiguration(tslintConfigPath, file);
-          lastDirectory = currentDirectory;
-        }
-
-        if (contents && configLoad) {
-          linter.lint(file, contents, configLoad.results);
-        }
+      if (result == undefined) {
+        throw new Error('Invalid lint configuration. Nothing to lint.');
       }
-
-      const result = linter.getResult();
 
       if (!options.silent) {
         const Formatter = projectTslint.findFormatter(options.format);
@@ -128,6 +121,44 @@ export class TslintBuilder implements Builder<TslintBuilderOptions> {
       return obs.complete();
     });
   }
+}
+
+function lint(
+  projectTslint: typeof tslint,
+  systemRoot: string,
+  tslintConfigPath: string | null,
+  options: TslintBuilderOptions,
+  program?: ts.Program,
+) {
+  const Linter = projectTslint.Linter;
+  const Configuration = projectTslint.Configuration;
+
+  const files = getFilesToLint(systemRoot, options, Linter, program);
+  const lintOptions = {
+    fix: options.fix,
+    formatter: options.format,
+  };
+
+  const linter = new Linter(lintOptions, program);
+
+  let lastDirectory;
+  let configLoad;
+  for (const file of files) {
+    const contents = getFileContents(file, options, program);
+
+    // Only check for a new tslint config if the path changes.
+    const currentDirectory = path.dirname(file);
+    if (currentDirectory !== lastDirectory) {
+      configLoad = Configuration.findConfiguration(tslintConfigPath, file);
+      lastDirectory = currentDirectory;
+    }
+
+    if (contents && configLoad) {
+      linter.lint(file, contents, configLoad.results);
+    }
+  }
+
+  return linter.getResult();
 }
 
 function getFilesToLint(

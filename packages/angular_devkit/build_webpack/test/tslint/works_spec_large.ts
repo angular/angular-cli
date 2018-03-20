@@ -127,6 +127,36 @@ describe('Tslint Target', () => {
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
+  it('supports using one project as a string', (done) => {
+    const overrides: Partial<TslintBuilderOptions> = {
+      tsConfig: 'src/tsconfig.app.json',
+    };
+
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+    ).subscribe(undefined, done.fail, done);
+  }, 30000);
+
+  it('supports using one project as an array', (done) => {
+    const overrides: Partial<TslintBuilderOptions> = {
+      tsConfig: ['src/tsconfig.app.json'],
+    };
+
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+    ).subscribe(undefined, done.fail, done);
+  }, 30000);
+
+  it('supports using two projects', (done) => {
+    const overrides: Partial<TslintBuilderOptions> = {
+      tsConfig: ['src/tsconfig.app.json', 'src/tsconfig.spec.json'],
+    };
+
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+    ).subscribe(undefined, done.fail, done);
+  }, 30000);
+
   it('errors when type checking is used without a project', (done) => {
     const overrides: Partial<TslintBuilderOptions> = {
       tsConfig: undefined,
