@@ -1,12 +1,10 @@
 import {join} from 'path';
 import {git, ng, silentNpm} from '../utils/process';
-import {expectFileToExist, replaceInFile} from '../utils/fs';
+import {expectFileToExist} from '../utils/fs';
 import {
   updateTsConfig,
-  updateJsonFile,
-  useNg2,
-  useNg4,
   useSha,
+  useNgVersion,
   useCIChrome,
   useCIDefaults,
   useBuiltPackages,
@@ -16,40 +14,32 @@ import {gitClean, gitCommit} from '../utils/git';
 import {getGlobalVariable} from '../utils/env';
 
 
-let packages = require('../../../lib/packages').packages;
-
-
-export default function() {
+export default async function() {
   const argv = getGlobalVariable('argv');
-  let createProject = null;
 
-  // This is a dangerous flag, but is useful for testing packages only.
   if (argv.noproject) {
-    return Promise.resolve();
-  } else if (argv.reuse) {
-    // If we're set to reuse an existing project, just chdir to it and clean it.
-    createProject = Promise.resolve()
-      .then(() => process.chdir(argv.reuse))
-      .then(() => gitClean());
+    return;
+  }
+
+  if (argv.reuse) {
+    process.chdir(argv.reuse);
+    await gitClean();
   } else {
-    // Otherwise create a project from scratch.
-    createProject = Promise.resolve()
-      .then(() => ng('new', 'test-project', '--skip-install'))
-      .then(() => expectFileToExist(join(process.cwd(), 'test-project')))
-      .then(() => process.chdir('./test-project'));
+    await ng('new', 'test-project', '--skip-install');
+    await expectFileToExist(join(process.cwd(), 'test-project'));
+    process.chdir('./test-project');
   }
 
   return Promise.resolve()
-    .then(() => createProject)
     .then(() => useBuiltPackages())
     .then(() => argv.devkit && useDevKit(argv.devkit))
     .then(() => useCIChrome())
     .then(() => useCIDefaults())
-    .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
-    .then(() => argv['ng4'] ? useNg4() : Promise.resolve())
+    .then(() => argv['ng-version'] ? useNgVersion(argv['ng-version']) : Promise.resolve())
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
     // npm link on Circle CI is very noisy.
     .then(() => silentNpm('install'))
+    .then(() => ng('version'))
     // Force sourcemaps to be from the root of the filesystem.
     .then(() => updateTsConfig(json => {
       json['compilerOptions']['sourceRoot'] = '/';

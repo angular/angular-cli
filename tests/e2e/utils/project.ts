@@ -132,6 +132,37 @@ export function useSha() {
   }
 }
 
+export function useNgVersion(version: string) {
+  return updateJsonFile('package.json', json => {
+    // Install over the project with nightly builds.
+    Object.keys(json['dependencies'] || {})
+      .filter(name => name.match(/^@angular\//))
+      .forEach(name => {
+        const pkgName = name.split(/\//)[1];
+        if (pkgName == 'cli') {
+          return;
+        }
+        json['dependencies'][`@angular/${pkgName}`] = version;
+      });
+
+    Object.keys(json['devDependencies'] || {})
+      .filter(name => name.match(/^@angular\//))
+      .forEach(name => {
+        const pkgName = name.split(/\//)[1];
+        if (pkgName == 'cli') {
+          return;
+        }
+        json['devDependencies'][`@angular/${pkgName}`] = version;
+      });
+    // TODO: determine the appropriate version for the Angular version
+    if (version.startsWith('^5')) {
+      json['devDependencies']['typescript'] = '~2.6.0';
+    } else {
+      json['devDependencies']['typescript'] = '~2.7.0';
+    }
+  });
+}
+
 export function useCIDefaults() {
   return updateJsonFile('.angular.json', workspaceJson => {
     // Disable progress reporting on CI to reduce spam.
