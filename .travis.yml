@@ -36,20 +36,25 @@ matrix:
       env: test
     - node_js: "8"
       os: linux
-      script: node tests/run_e2e.js --nb-shards=4 --shard=0 --nosilent
+      script: node tests/run_e2e.js --nb-shards=4 --shard=0 --nosilent --ng-version="6.0.0-beta.8"
       env: e2e-0
     - node_js: "8"
       os: linux
-      script: node tests/run_e2e.js --nb-shards=4 --shard=1 --nosilent
+      script: node tests/run_e2e.js --nb-shards=4 --shard=1 --nosilent --ng-version="6.0.0-beta.8"
       env: e2e-1
     - node_js: "8"
       os: linux
-      script: node tests/run_e2e.js --nb-shards=4 --shard=2 --nosilent
+      script: node tests/run_e2e.js --nb-shards=4 --shard=2 --nosilent --ng-version="6.0.0-beta.8"
       env: e2e-2
     - node_js: "8"
       os: linux
-      script: node tests/run_e2e.js --nb-shards=4 --shard=3 --nosilent
+      script: node tests/run_e2e.js --nb-shards=4 --shard=3 --nosilent --ng-version="6.0.0-beta.8"
       env: e2e-3
+    - node_js: "8"
+      os: linux
+      script: node tests/run_e2e.js --ng-version="^5.0.0" "--glob=tests/{basic,build}/**"
+      env: ng5-subset
+
     # WEBPACK4_DISABLED - eject temporarily disabled for webpack 4 integration
     # - node_js: "8"
     #   os: linux
