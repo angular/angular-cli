@@ -20,7 +20,6 @@
     },
     "tsConfig": {
       "type": "string",
-      "default": "tsconfig.app.json",
       "description": "The name of the TypeScript configuration file."
     },
     "scripts": {

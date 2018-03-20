@@ -9,12 +9,10 @@
     },
     "tsConfig": {
       "type": "string",
-      "default": "tsconfig.app.json",
       "description": "The name of the TypeScript configuration file."
     },
     "karmaConfig": {
       "type": "string",
-      "default": "tsconfig.app.json",
       "description": "The name of the TypeScript configuration file."
     },
     "polyfills": {
