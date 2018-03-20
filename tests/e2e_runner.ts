@@ -54,7 +54,7 @@ const argv = minimist(process.argv.slice(2), {
     'noproject',
     'verbose',
   ],
-  'string': ['devkit', 'glob', 'ignore', 'reuse', 'ng-sha', 'tmpdir'],
+  'string': ['devkit', 'glob', 'ignore', 'reuse', 'ng-sha', 'tmpdir', 'ng-version'],
   'number': ['nb-shards', 'shard']
 });
 
