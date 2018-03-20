@@ -16,7 +16,7 @@ const SilentError = require('silent-error');
 
 const g: any = typeof global !== 'undefined' ? global : {};
 const webpackLoader: string = g['_DevKitIsLocal']
-  ? require('lib/packages').packages['@ngtool/webpack'].main
+  ? require.resolve('@ngtools/webpack')
   : '@ngtools/webpack';
 
 
