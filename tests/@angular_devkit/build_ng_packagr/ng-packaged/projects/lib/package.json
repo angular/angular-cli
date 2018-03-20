@@ -1,9 +1,8 @@
 {
-  "$schema": "../../../../../../node_modules/ng-packagr/package.schema.json",
-  "name": "ng-packaged-one",
-  "ngPackage": {
-    "lib": {
-      "entryFile": "index.ts"
-    }
+  "name": "lib",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^5.2.0",
+    "@angular/core": "^5.2.0"
   }
 }

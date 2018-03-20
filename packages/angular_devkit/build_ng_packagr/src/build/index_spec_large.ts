@@ -13,16 +13,17 @@ import { concatMap, tap } from 'rxjs/operators';
 
 
 describe('NgPackagr Builder', () => {
-  it('works', (done) => {
-    const workspaceFile = normalize('angular.json');
-    const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
-    const workspaceRoot = join(devkitRoot,
-      'tests/@angular_devkit/build_ng_packagr/ng-packaged/');
+  const workspaceFile = normalize('angular.json');
+  const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
+  const workspaceRoot = join(devkitRoot,
+    'tests/@angular_devkit/build_ng_packagr/ng-packaged/');
 
-    // TODO: move TestProjectHost from build-webpack to architect, or somewhere else, where it
-    // can be imported from.
-    const host = new NodeJsSyncHost();
-    const workspace = new experimental.workspace.Workspace(workspaceRoot, host);
+  // TODO: move TestProjectHost from build-webpack to architect, or somewhere else, where it
+  // can be imported from.
+  const host = new NodeJsSyncHost();
+  const workspace = new experimental.workspace.Workspace(workspaceRoot, host);
+
+  it('works', (done) => {
     const targetSpec: TargetSpecifier = { project: 'lib', target: 'build' };
 
     return workspace.loadWorkspaceFromHost(workspaceFile).pipe(
@@ -33,15 +34,6 @@ describe('NgPackagr Builder', () => {
   }, 30000);
 
   it('tests works', (done) => {
-    const workspaceFile = normalize('angular.json');
-    const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
-    const workspaceRoot = join(devkitRoot,
-      'tests/@angular_devkit/build_ng_packagr/ng-packaged/');
-
-    // TODO: move TestProjectHost from build-webpack to architect, or somewhere else, where it
-    // can be imported from.
-    const host = new NodeJsSyncHost();
-    const workspace = new experimental.workspace.Workspace(workspaceRoot, host);
     const targetSpec: TargetSpecifier = { project: 'lib', target: 'test' };
 
     return workspace.loadWorkspaceFromHost(workspaceFile).pipe(
