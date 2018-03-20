@@ -669,6 +669,11 @@
           "description": "Show a warning when deploy-url/base-href use unsupported serve path values.",
           "type": "boolean",
           "default": true
+        },
+        "cliDependency": {
+          "description": "Show a warning when @angular/cli is not in devDependencies.",
+          "type": "boolean",
+          "default": true
         }
       }
     }
