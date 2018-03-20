@@ -150,13 +150,6 @@ export function getNonAotTestConfig(wco: WebpackConfigOptions, host: virtualFs.H
 
   let pluginOptions: any = { tsConfigPath, skipCodeGeneration: true };
 
-  if (appConfig.polyfills) {
-    // TODO: remove singleFileIncludes for 2.0, this is just to support old projects that did not
-    // include 'polyfills.ts' in `tsconfig.spec.json'.
-    const polyfillsPath = path.resolve(root, appConfig.polyfills);
-    pluginOptions.singleFileIncludes = [polyfillsPath];
-  }
-
   return {
     module: { rules: [{ test: /\.ts$/, loader: webpackLoader }] },
     plugins: [_createAotPlugin(wco, pluginOptions, host, false)]
