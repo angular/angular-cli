@@ -1,10 +1,8 @@
 {
-  "name": "<%= name %>",
-  "version": "1.0.0",
-  "peerDependencies": {},
-  "ngPackage": {
-    "lib": {
-      "entryFile": "<%= entryFile %>.ts"
-    }
+  "name": "<%= dasherize(name) %>",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^5.2.0",
+    "@angular/core": "^5.2.0"
   }
 }

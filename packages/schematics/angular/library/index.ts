@@ -17,31 +17,23 @@ import {
   mergeWith,
   move,
   noop,
+  schematic,
   template,
   url,
 } from '@angular-devkit/schematics';
 import * as path from 'path';
 import { Schema as GenerateLibraryOptions } from './schema';
 
-function forwardSlashes(value: string): string {
-  return value.replace(/\\/g, '/');
-}
 
 type PackageJsonPartialType = {
   scripts: {
     [key: string]: string;
   },
-  devDependencies: {
+  dependencies: {
     [key: string]: string;
   },
-};
-
-type TsConfigPartialType = {
-  compilerOptions: {
-    baseUrl: string,
-    paths: {
-      [key: string]: string[];
-    },
+  devDependencies: {
+    [key: string]: string;
   },
 };
 
@@ -61,42 +53,35 @@ function updateJsonFile<T>(host: Tree, path: string, callback: UpdateJsonFn<T>):
   return host;
 }
 
-function updateTsConfig(npmPackageName: string, entryFilePath: string) {
-
-  return (host: Tree) => {
-    if (!host.exists('tsconfig.json')) { return host; }
-
-    return updateJsonFile(host, 'tsconfig.json', (tsconfig: TsConfigPartialType) => {
-      tsconfig.compilerOptions.baseUrl = '.';
-      if (!tsconfig.compilerOptions.paths) {
-        tsconfig.compilerOptions.paths = {};
-      }
-      if (!tsconfig.compilerOptions.paths[npmPackageName]) {
-        tsconfig.compilerOptions.paths[npmPackageName] = [];
-      }
-      tsconfig.compilerOptions.paths[npmPackageName].push(entryFilePath);
-    });
-  };
-}
-
 function addDependenciesAndScriptsToPackageJson() {
 
   return (host: Tree) => {
     if (!host.exists('package.json')) { return host; }
 
     return updateJsonFile(host, 'package.json', (json: PackageJsonPartialType) => {
+      if (!json['dependencies']) {
+        json['dependencies'] = {};
+      }
+
+      json.dependencies = {
+        '@angular/common': '^5.2.0',
+        '@angular/core': '^5.2.0',
+        '@angular/compiler': '^5.0.0',
+        // De-structure last keeps existing user dependencies.
+        ...json.dependencies,
+      };
+
       if (!json['devDependencies']) {
         json['devDependencies'] = {};
       }
 
       json.devDependencies = {
-        '@angular/compiler': '^5.0.0',
         '@angular/compiler-cli': '^5.0.0',
         'ng-packagr': '^2.2.0',
         'tsickle': '>=0.25.5',
         'tslib': '^1.7.1',
         'typescript': '>=2.4.2',
-        // de-structure last keeps existing user dependencies
+        // De-structure last keeps existing user dependencies.
         ...json.devDependencies,
       };
     });
@@ -113,7 +98,6 @@ export default function (options: GenerateLibraryOptions): Rule {
     entryFile = entryFile.substring(0, entryFile.length - 3);
   }
   const sourceDir = path.join(options.baseDir, options.name);
-  const entryFilePath = path.join(sourceDir, entryFile) + '.ts';
 
   return (host: Tree, context: SchematicContext) => {
     const templateSource = apply(url('./files'), [
@@ -133,7 +117,29 @@ export default function (options: GenerateLibraryOptions): Rule {
         mergeWith(templateSource),
       ])),
       options.skipPackageJson ? noop() : addDependenciesAndScriptsToPackageJson(),
-      options.skipTsConfig ? noop() : updateTsConfig(name, forwardSlashes(entryFilePath)),
+      schematic('module', {
+        name: name,
+        commonModule: false,
+        flat: true,
+        path: `/${name}/src`,
+        sourceDir: options.baseDir,
+        spec: false,
+      }),
+      schematic('component', {
+        name: name,
+        sourceDir: options.baseDir,
+        inlineStyle: true,
+        inlineTemplate: true,
+        flat: true,
+        path: `/${name}/src`,
+      }),
+      schematic('service', {
+        name: name,
+        sourceDir: options.baseDir,
+        flat: true,
+        path: `/${name}/src`,
+        module: `${name}.module.ts`,
+      }),
     ])(host, context);
   };
 }

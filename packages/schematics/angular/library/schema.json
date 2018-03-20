@@ -25,11 +25,6 @@
       "type": "boolean",
       "default": false,
       "description": "Do not add dependencies to package.json (e.g., --skipPackageJson)"
-    },
-    "skipTsConfig": {
-      "type": "boolean",
-      "default": false,
-      "description": "Do not update tsconfig.json for development experience (e.g., --skipTsConfig)"
     }
   },
   "required": [
