@@ -1,43 +1,16 @@
 {
-  "title": "Webpack browser schema for Build Facade.",
-  "description": "Browser target options",
+  "$schema": "http://json-schema.org/schema",
+  "id": "BuildAngularWebpackServerSchema",
+  "title": "Angular Webpack Architect Builder Schema",
   "properties": {
-    "assets": {
-      "type": "array",
-      "description": "List of static application assets.",
-      "default": [],
-      "items": {
-        "$ref": "#/definitions/assetPattern"
-      }
-    },
     "main": {
       "type": "string",
       "description": "The name of the main entry-point file."
-    },
-    "polyfills": {
-      "type": "string",
-      "description": "The name of the polyfills file."
     },
     "tsConfig": {
       "type": "string",
       "default": "tsconfig.app.json",
       "description": "The name of the TypeScript configuration file."
-    },
-    "scripts": {
-      "description": "Global scripts to be included in the build.",
-      "type": "array",
-      "default": [],
-      "items": {
-        "$ref": "#/definitions/extraEntryPoint"
-      }
-    },
-    "styles": {
-      "description": "Global styles to be included in the build.",
-      "type": "array",
-      "default": [],
-      "items": {
-        "$ref": "#/definitions/extraEntryPoint"
-      }
     },
     "stylePreprocessorOptions": {
       "description": "Options to pass to style preprocessors",
@@ -67,11 +40,6 @@
       "type": "string",
       "description": "Path where output will be placed."
     },
-    "aot": {
-      "type": "boolean",
-      "description": "Build using Ahead of Time compilation.",
-      "default": false
-    },
     "sourceMap": {
       "type": "boolean",
       "description": "Output sourcemaps.",
@@ -91,14 +59,6 @@
       "type": "boolean",
       "description": "Use a separate bundle containing code used across multiple bundles.",
       "default": true
-    },
-    "baseHref": {
-      "type": "string",
-      "description": "Base url for the application being built."
-    },
-    "deployUrl": {
-      "type": "string",
-      "description": "URL where files will be deployed."
     },
     "verbose": {
       "type": "boolean",
@@ -126,16 +86,6 @@
       "type": "string",
       "description": "How to handle missing translations for i18n."
     },
-    "extractCss": {
-      "type": "boolean",
-      "description": "Extract css from global styles onto css files instead of js ones.",
-      "default": false
-    },
-    "watch": {
-      "type": "boolean",
-      "description": "Run build when files change.",
-      "default": false
-    },
     "outputHashing": {
       "type": "string",
       "description": "Define the output filename cache-busting hashing mode.",
@@ -146,10 +96,6 @@
         "media",
         "bundles"
       ]
-    },
-    "poll": {
-      "type": "number",
-      "description": "Enable and define the file watching poll time period in milliseconds."
     },
     "deleteOutputPath": {
       "type": "boolean",
@@ -171,34 +117,19 @@
       "description": "Show circular dependency warnings on builds.",
       "default": true
     },
-    "buildOptimizer": {
-      "type": "boolean",
-      "description": "Enables @angular-devkit/build-optimizer optimizations when using the 'aot' option.",
-      "default": false
-    },
     "namedChunks": {
       "type": "boolean",
       "description": "Use file name for lazy loaded chunks.",
       "default": true
     },
-    "subresourceIntegrity": {
-      "type": "boolean",
-      "description": "Enables the use of subresource integrity validation.",
-      "default": false
-    },
-    "serviceWorker": {
-      "type": "boolean",
-      "description": "Generates a service worker config for production builds.",
-      "default": false
-    },
-    "skipAppShell": {
-      "type": "boolean",
-      "description": "Flag to prevent building an app shell.",
-      "default": false
-    },
-    "index": {
+    "bundleDependencies": {
       "type": "string",
-      "description": "The name of the index HTML file."
+      "description": "Available on server platform only. Which external dependencies to bundle into the module. By default, all of node_modules will be kept as requires.",
+      "default": "none",
+      "enum": [
+        "none",
+        "all"
+      ]
     },
     "statsJson": {
       "type": "boolean",
@@ -222,56 +153,7 @@
   "additionalProperties": false,
   "required": [
     "outputPath",
-    "index",
     "main",
     "tsConfig"
-  ],
-  "definitions": {
-    "assetPattern": {
-      "type": "object",
-      "properties": {
-        "glob": {
-          "type": "string",
-          "description": "The pattern to match."
-        },
-        "input": {
-          "type": "string",
-          "description": "The input path dir in which to apply 'glob'."
-        },
-        "output": {
-          "type": "string",
-          "description": "The output path, relative to 'outputPath'.",
-          "default": "./"
-        },
-        "allowOutsideOutDir": {
-          "type": "boolean",
-          "description": "Allow assets to be copied outside the outDir.",
-          "default": false
-        }
-      },
-      "additionalProperties": false
-    },
-    "extraEntryPoint": {
-      "type": "object",
-      "properties": {
-        "input": {
-          "type": "string",
-          "description": "The file to include."
-        },
-        "output": {
-          "type": "string",
-          "description": "The output path and filename, relative to 'outputPath'."
-        },
-        "lazy": {
-          "type": "boolean",
-          "description": "Allow assets to be copied outside the outDir.",
-          "default": false
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "input"
-      ]
-    }
-  }
+  ]
 }

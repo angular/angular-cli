@@ -53,6 +53,7 @@
   "homepage": "https://github.com/angular/devkit",
   "dependencies": {
     "@angular-devkit/build-optimizer": "^0.4.2",
+    "@angular/animations": "^5.2.7",
     "@angular/common": "^5.2.7",
     "@angular/compiler": "^5.2.7",
     "@angular/compiler-cli": "^5.2.7",
@@ -61,6 +62,7 @@
     "@angular/material": "^5.2.3",
     "@angular/platform-browser": "^5.2.7",
     "@angular/platform-browser-dynamic": "^5.2.7",
+    "@angular/platform-server": "^5.2.7",
     "@angular/router": "^5.2.6",
     "@angular/service-worker": "^5.2.7",
     "@ngtools/json-schema": "^1.0.9",

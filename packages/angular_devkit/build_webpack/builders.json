@@ -30,6 +30,11 @@
       "class": "./src/tslint",
       "schema": "./src/tslint/schema.json",
       "description": "Run tslint over a TS project."
+    },
+    "server": {
+      "class": "./src/server",
+      "schema": "./src/server/schema.json",
+      "description": "Build a server Angular application."
     }
   }
 }

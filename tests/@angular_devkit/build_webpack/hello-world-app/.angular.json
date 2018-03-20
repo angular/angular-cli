@@ -53,6 +53,14 @@
             }
           }
         },
+        "server": {
+          "builder": "../../../../packages/angular_devkit/build_webpack:server",
+          "options": {
+            "outputPath": "dist",
+            "main": "src/main.server.ts",
+            "tsConfig": "src/tsconfig.server.json"
+          }
+        },
         "serve": {
           "builder": "../../../../packages/angular_devkit/build_webpack:dev-server",
           "options": {

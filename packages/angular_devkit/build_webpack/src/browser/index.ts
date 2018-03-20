@@ -51,7 +51,6 @@ export interface BrowserBuilderOptions {
   verbose: boolean;
   progress: boolean;
   extractCss: boolean;
-  bundleDependencies: 'none' | 'all';
   watch: boolean;
   outputHashing: 'none' | 'all' | 'media' | 'bundles';
   deleteOutputPath: boolean;
@@ -90,7 +89,6 @@ export interface BrowserBuilderOptions {
   scripts: ExtraEntryPoint[];
   styles: ExtraEntryPoint[];
   stylePreprocessorOptions: { includePaths: string[] };
-  platform: 'browser' | 'server';
 
   // Some options are not needed anymore.
   // app?: string; // apps aren't used with build facade
