@@ -57,7 +57,7 @@ describe('Browser Builder i18n', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js');
-        const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(/Bonjour i18n!/);
       }),
     ).subscribe(undefined, done.fail, done);
@@ -79,7 +79,7 @@ describe('Browser Builder i18n', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js');
-        const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(/Other content/);
       }),
     ).subscribe(undefined, done.fail, done);
@@ -109,7 +109,7 @@ describe('Browser Builder i18n', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js');
-        const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(/registerLocaleData/);
         expect(content).toMatch(/angular_common_locales_fr/);
       }),

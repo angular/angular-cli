@@ -24,7 +24,7 @@ describe('Browser Builder deploy url', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'index.html');
-        const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toContain('deployUrl/main.js');
       }),
       concatMap(() => runTargetSpec(host, browserTargetSpec,
@@ -32,7 +32,7 @@ describe('Browser Builder deploy url', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'index.html');
-        const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toContain('http://example.com/some/path/main.js');
       }),
     ).subscribe(undefined, done.fail, done);
@@ -45,7 +45,7 @@ describe('Browser Builder deploy url', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'runtime.js');
-        const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toContain('deployUrl/');
       }),
     ).subscribe(undefined, done.fail, done);

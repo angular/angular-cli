@@ -19,15 +19,17 @@ describe('Browser Builder output path', () => {
 
   it('deletes output path', (done) => {
     // Write a file to the output path to later verify it was deleted.
-    host.asSync().write(join(outputPath, 'file.txt'), virtualFs.stringToFileBuffer('file'));
+    host.scopedSync().write(join(outputPath, 'file.txt'), virtualFs.stringToFileBuffer('file'));
     // Delete an app file to force a failed compilation.
     // Failed compilations still delete files, but don't output any.
-    host.asSync().delete(join(workspaceRoot, 'src', 'app', 'app.component.ts'));
+    host.delete(join(workspaceRoot, 'src', 'app', 'app.component.ts')).subscribe({
+      error: done.fail,
+    });
 
     runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
-        expect(host.asSync().exists(outputPath)).toBe(false);
+        expect(host.scopedSync().exists(outputPath)).toBe(false);
       }),
     ).subscribe(undefined, done.fail, done);
   }, 30000);

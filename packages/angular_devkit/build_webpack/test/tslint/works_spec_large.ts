@@ -41,7 +41,7 @@ describe('Tslint Target', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = normalize('src/foo.ts');
-        const content = virtualFs.fileBufferToString(host.asSync().read(fileName));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
         expect(content).toContain(`const foo = '';`);
       }),
     ).subscribe(undefined, done.fail, done);

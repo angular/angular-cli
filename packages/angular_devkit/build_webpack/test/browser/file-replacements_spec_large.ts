@@ -32,7 +32,7 @@
 //       concatMap(() => architect.run(architect.getTarget({ overrides }))),
 //       tap(() => {
 //         const fileName = join(outputPath, 'main.js');
-//         const content = virtualFs.fileBufferToString(host.asSync().read(fileName));
+//         const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
 //         expect(content).toContain('production: true');
 //       }),
 //     ).subscribe(undefined, done.fail, done);

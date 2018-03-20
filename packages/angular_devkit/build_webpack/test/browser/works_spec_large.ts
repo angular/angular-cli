@@ -22,13 +22,13 @@ describe('Browser Builder', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         // Default files should be in outputPath.
-        expect(host.asSync().exists(join(outputPath, 'runtime.js'))).toBe(true);
-        expect(host.asSync().exists(join(outputPath, 'main.js'))).toBe(true);
-        expect(host.asSync().exists(join(outputPath, 'polyfills.js'))).toBe(true);
-        expect(host.asSync().exists(join(outputPath, 'styles.js'))).toBe(true);
-        expect(host.asSync().exists(join(outputPath, 'vendor.js'))).toBe(true);
-        expect(host.asSync().exists(join(outputPath, 'favicon.ico'))).toBe(true);
-        expect(host.asSync().exists(join(outputPath, 'index.html'))).toBe(true);
+        expect(host.scopedSync().exists(join(outputPath, 'runtime.js'))).toBe(true);
+        expect(host.scopedSync().exists(join(outputPath, 'main.js'))).toBe(true);
+        expect(host.scopedSync().exists(join(outputPath, 'polyfills.js'))).toBe(true);
+        expect(host.scopedSync().exists(join(outputPath, 'styles.js'))).toBe(true);
+        expect(host.scopedSync().exists(join(outputPath, 'vendor.js'))).toBe(true);
+        expect(host.scopedSync().exists(join(outputPath, 'favicon.ico'))).toBe(true);
+        expect(host.scopedSync().exists(join(outputPath, 'index.html'))).toBe(true);
       }),
     ).subscribe(undefined, done.fail, done);
   }, 30000);

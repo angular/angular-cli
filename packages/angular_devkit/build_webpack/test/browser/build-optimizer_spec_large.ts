@@ -23,7 +23,7 @@ describe('Browser Builder build optimizer', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js');
-        const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).not.toMatch(/\.decorators =/);
       }),
     ).subscribe(undefined, done.fail, done);

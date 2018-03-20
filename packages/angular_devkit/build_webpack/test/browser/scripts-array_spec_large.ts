@@ -69,7 +69,7 @@ describe('Browser Builder scripts array', () => {
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => Object.keys(matches).forEach(fileName => {
-        const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(matches[fileName]);
       })),
     ).subscribe(undefined, done.fail, done);
@@ -91,7 +91,7 @@ describe('Browser Builder scripts array', () => {
         const scriptsBundle = host.fileMatchExists(outputPath, /scripts\.[0-9a-f]{20}\.js/);
         expect(scriptsBundle).toBeTruthy();
         const fileName = join(outputPath, scriptsBundle as PathFragment);
-        const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch('var number=2;');
         expect(host.fileMatchExists(outputPath, /scripts\.[0-9a-f]{20}\.js\.map/))
           .toBeTruthy();
@@ -100,10 +100,10 @@ describe('Browser Builder scripts array', () => {
         expect(host.fileMatchExists(outputPath, /renamed-script\.[0-9a-f]{20}\.js\.map/))
           .toBeTruthy();
         expect(host.fileMatchExists(outputPath, /scripts\.[0-9a-f]{20}\.js/)).toBeTruthy();
-        expect(host.asSync().exists(normalize('dist/lazy-script.js'))).toBe(true);
-        expect(host.asSync().exists(normalize('dist/lazy-script.js.map'))).toBe(true);
-        expect(host.asSync().exists(normalize('dist/renamed-lazy-script.js'))).toBe(true);
-        expect(host.asSync().exists(normalize('dist/renamed-lazy-script.js.map')))
+        expect(host.scopedSync().exists(normalize('dist/lazy-script.js'))).toBe(true);
+        expect(host.scopedSync().exists(normalize('dist/lazy-script.js.map'))).toBe(true);
+        expect(host.scopedSync().exists(normalize('dist/renamed-lazy-script.js'))).toBe(true);
+        expect(host.scopedSync().exists(normalize('dist/renamed-lazy-script.js.map')))
           .toBe(true);
       }),
     ).subscribe(undefined, done.fail, done);
@@ -127,7 +127,7 @@ describe('Browser Builder scripts array', () => {
           + /['"]cinput-script['"]/.source,
         );
         const fileName = './dist/scripts.js';
-        const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(re);
       }),
     ).subscribe(undefined, done.fail, done);

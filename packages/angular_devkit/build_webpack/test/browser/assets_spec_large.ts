@@ -42,11 +42,11 @@ describe('Browser Builder assets', () => {
       tap(() => {
         // Assets we expect should be there.
         Object.keys(matches).forEach(fileName => {
-          const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+          const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
           expect(content).toMatch(matches[fileName]);
         });
         // .gitkeep should not be there.
-        expect(host.asSync().exists(normalize('./dist/folder/.gitkeep'))).toBe(false);
+        expect(host.scopedSync().exists(normalize('./dist/folder/.gitkeep'))).toBe(false);
       }),
     ).subscribe(undefined, done.fail, done);
   }, 30000);

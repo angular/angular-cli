@@ -24,7 +24,7 @@ describe('Browser Builder', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js');
-        const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(/platformBrowser.*bootstrapModuleFactory.*AppModuleNgFactory/);
       }),
     ).subscribe(undefined, done.fail, done);

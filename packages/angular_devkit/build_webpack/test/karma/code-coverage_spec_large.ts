@@ -26,8 +26,8 @@ describe('Karma Builder code coverage', () => {
       debounceTime(500),
       tap(buildEvent => {
         expect(buildEvent.success).toBe(true);
-        expect(host.asSync().exists(coverageFilePath)).toBe(true);
-        const content = virtualFs.fileBufferToString(host.asSync().read(coverageFilePath));
+        expect(host.scopedSync().exists(coverageFilePath)).toBe(true);
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(coverageFilePath));
         expect(content).toContain('polyfills.ts');
         expect(content).toContain('test.ts');
       }),
@@ -48,8 +48,8 @@ describe('Karma Builder code coverage', () => {
       debounceTime(500),
       tap(buildEvent => {
         expect(buildEvent.success).toBe(true);
-        expect(host.asSync().exists(coverageFilePath)).toBe(true);
-        const content = virtualFs.fileBufferToString(host.asSync().read(coverageFilePath));
+        expect(host.scopedSync().exists(coverageFilePath)).toBe(true);
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(coverageFilePath));
         expect(content).not.toContain('polyfills.ts');
         expect(content).not.toContain('test.ts');
       }),

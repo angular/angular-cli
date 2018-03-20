@@ -8,10 +8,8 @@
 
 import {
   Path,
-  PathFragment,
   getSystemPath,
   normalize,
-  resolve,
   virtualFs,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
@@ -28,55 +26,15 @@ interface ProcessOutput {
 }
 
 export class TestProjectHost extends NodeJsSyncHost {
-  private _syncHost: virtualFs.SyncDelegateHost<Stats>;
+  private _scopedSyncHost: virtualFs.SyncDelegateHost<Stats>;
 
   constructor(protected _root: Path) {
     super();
-    this._syncHost = new virtualFs.SyncDelegateHost(this);
+    this._scopedSyncHost = new virtualFs.SyncDelegateHost(new virtualFs.ScopedHost(this, _root));
   }
 
-  // When a path is relative, resolve it relative to root, otherwise use it as absolute.
-  write(path: Path, content: virtualFs.FileBuffer): Observable<void> {
-    return super.write(resolve(this._root, path), content);
-  }
-  read(path: Path): Observable<virtualFs.FileBuffer> {
-    return super.read(resolve(this._root, path));
-  }
-  delete(path: Path): Observable<void> {
-    return super.delete(resolve(this._root, path));
-  }
-  rename(from: Path, to: Path): Observable<void> {
-    return super.rename(resolve(this._root, from), resolve(this._root, to));
-  }
-
-  list(path: Path): Observable<PathFragment[]> {
-    return super.list(resolve(this._root, path));
-  }
-
-  exists(path: Path): Observable<boolean> {
-    return super.exists(resolve(this._root, path));
-  }
-  isDirectory(path: Path): Observable<boolean> {
-    return super.isDirectory(resolve(this._root, path));
-  }
-  isFile(path: Path): Observable<boolean> {
-    return super.isFile(resolve(this._root, path));
-  }
-
-  // Some hosts may not support stat.
-  stat(path: Path): Observable<virtualFs.Stats<Stats>> {
-    return super.stat(resolve(this._root, path));
-  }
-
-  // Some hosts may not support watching.
-  watch(
-    path: Path, options?: virtualFs.HostWatchOptions,
-  ): Observable<virtualFs.HostWatchEvent> | null {
-    return super.watch(resolve(this._root, path), options);
-  }
-
-  asSync() {
-    return this._syncHost;
+  scopedSync() {
+    return this._scopedSyncHost;
   }
 
   initialize(): Observable<void> {
@@ -141,30 +99,33 @@ export class TestProjectHost extends NodeJsSyncHost {
 
   writeMultipleFiles(files: { [path: string]: string }): void {
     Object.keys(files).map(fileName =>
-      this.asSync().write(normalize(fileName), virtualFs.stringToFileBuffer(files[fileName])),
+      this.scopedSync().write(
+        normalize(fileName),
+        virtualFs.stringToFileBuffer(files[fileName]),
+      ),
     );
   }
 
   replaceInFile(path: string, match: RegExp | string, replacement: string) {
-    const content = virtualFs.fileBufferToString(this.asSync().read(normalize(path)));
-    this.asSync().write(normalize(path),
+    const content = virtualFs.fileBufferToString(this.scopedSync().read(normalize(path)));
+    this.scopedSync().write(normalize(path),
       virtualFs.stringToFileBuffer(content.replace(match, replacement)));
   }
 
   appendToFile(path: string, str: string) {
-    const content = virtualFs.fileBufferToString(this.asSync().read(normalize(path)));
-    this.asSync().write(normalize(path),
+    const content = virtualFs.fileBufferToString(this.scopedSync().read(normalize(path)));
+    this.scopedSync().write(normalize(path),
       virtualFs.stringToFileBuffer(content.concat(str)));
   }
 
   fileMatchExists(dir: string, regex: RegExp) {
-    const [fileName] = this.asSync().list(normalize(dir)).filter(name => name.match(regex));
+    const [fileName] = this.scopedSync().list(normalize(dir)).filter(name => name.match(regex));
 
     return fileName || undefined;
   }
 
   copyFile(from: string, to: string) {
-    const content = this.asSync().read(normalize(from));
-    this.asSync().write(normalize(to), content);
+    const content = this.scopedSync().read(normalize(from));
+    this.scopedSync().write(normalize(to), content);
   }
 }

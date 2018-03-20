@@ -8,6 +8,7 @@
 
 import { Architect, BuildEvent, TargetSpecifier } from '@angular-devkit/architect';
 import { experimental, join, logging, normalize } from '@angular-devkit/core';
+import { createConsoleLogger } from '@angular-devkit/core/node';
 import { Observable } from 'rxjs/Observable';
 import { concatMap } from 'rxjs/operators';
 import { TestProjectHost } from '../utils/test-project-host';
@@ -31,7 +32,7 @@ export function runTargetSpec(
   host: TestProjectHost,
   targetSpec: TargetSpecifier,
   overrides = {},
-  logger: logging.Logger = new logging.NullLogger(),
+  logger: logging.Logger = createConsoleLogger(),
 ): Observable<BuildEvent> {
   targetSpec = { ...targetSpec, overrides };
   const workspace = new experimental.workspace.Workspace(workspaceRoot, host);

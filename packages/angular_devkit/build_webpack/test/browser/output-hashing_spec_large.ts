@@ -22,7 +22,7 @@ describe('Browser Builder output hashing', () => {
     function generateFileHashMap(): Map<string, string> {
       const hashes = new Map<string, string>();
 
-      host.asSync().list(normalize('./dist')).forEach(name => {
+      host.scopedSync().list(normalize('./dist')).forEach(name => {
         const matches = name.match(OUTPUT_RE);
         if (matches) {
           const [, module, hash] = matches;

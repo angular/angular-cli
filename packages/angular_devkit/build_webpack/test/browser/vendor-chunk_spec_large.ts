@@ -24,7 +24,7 @@ describe('Browser Builder vendor chunk', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'vendor.js');
-        expect(host.asSync().exists(fileName)).toBe(true);
+        expect(host.scopedSync().exists(fileName)).toBe(true);
       }),
     ).subscribe(undefined, done.fail, done);
   }, 30000);

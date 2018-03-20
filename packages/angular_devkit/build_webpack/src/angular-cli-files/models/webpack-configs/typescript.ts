@@ -14,9 +14,9 @@ import { WebpackConfigOptions } from '../build-options';
 const SilentError = require('silent-error');
 
 
-const g: any = global;
-const webpackLoader: string = g['angularCliIsLocal']
-  ? g.angularCliPackages['@ngtools/webpack'].main
+const g: any = typeof global !== 'undefined' ? global : {};
+const webpackLoader: string = g['_DevKitIsLocal']
+  ? require('lib/packages').packages['@ngtool/webpack'].main
   : '@ngtools/webpack';
 
 

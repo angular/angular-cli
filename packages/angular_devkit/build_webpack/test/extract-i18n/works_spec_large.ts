@@ -23,8 +23,8 @@ describe('Extract i18n Target', () => {
     runTargetSpec(host, extractI18nTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        expect(host.asSync().exists((extractionFile))).toBe(true);
-        expect(virtualFs.fileBufferToString(host.asSync().read(extractionFile)))
+        expect(host.scopedSync().exists((extractionFile))).toBe(true);
+        expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
           .toMatch(/i18n test/);
       }),
     ).subscribe(undefined, done.fail, done);
@@ -51,8 +51,8 @@ describe('Extract i18n Target', () => {
     runTargetSpec(host, extractI18nTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        expect(host.asSync().exists((extractionFile))).toBe(true);
-        expect(virtualFs.fileBufferToString(host.asSync().read(extractionFile)))
+        expect(host.scopedSync().exists((extractionFile))).toBe(true);
+        expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
           .toContain('source-language="fr"');
       }),
     ).subscribe(undefined, done.fail, done);
@@ -67,8 +67,8 @@ describe('Extract i18n Target', () => {
     runTargetSpec(host, extractI18nTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        expect(host.asSync().exists(extractionFile)).toBe(true);
-        expect(virtualFs.fileBufferToString(host.asSync().read(extractionFile)))
+        expect(host.scopedSync().exists(extractionFile)).toBe(true);
+        expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
           .toMatch(/i18n test/);
       }),
     ).subscribe(undefined, done.fail, done);
@@ -84,8 +84,8 @@ describe('Extract i18n Target', () => {
     runTargetSpec(host, extractI18nTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        expect(host.asSync().exists(extractionFile)).toBe(true);
-        expect(virtualFs.fileBufferToString(host.asSync().read(extractionFile)))
+        expect(host.scopedSync().exists(extractionFile)).toBe(true);
+        expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
           .toMatch(/i18n test/);
       }),
     ).subscribe(undefined, done.fail, done);
@@ -99,8 +99,8 @@ describe('Extract i18n Target', () => {
     runTargetSpec(host, extractI18nTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        expect(host.asSync().exists(extractionFile)).toBe(true);
-        expect(virtualFs.fileBufferToString(host.asSync().read(extractionFile)))
+        expect(host.scopedSync().exists(extractionFile)).toBe(true);
+        expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
           .toMatch(/i18n test/);
       }),
     ).subscribe(undefined, done.fail, done);

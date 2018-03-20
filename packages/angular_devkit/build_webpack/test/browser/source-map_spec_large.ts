@@ -24,7 +24,7 @@ describe('Browser Builder source map', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js.map');
-        expect(host.asSync().exists(fileName)).toBe(true);
+        expect(host.scopedSync().exists(fileName)).toBe(true);
       }),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -36,7 +36,7 @@ describe('Browser Builder source map', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js.map');
-        expect(host.asSync().exists(fileName)).toBe(false);
+        expect(host.scopedSync().exists(fileName)).toBe(false);
       }),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
@@ -47,9 +47,9 @@ describe('Browser Builder source map', () => {
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        expect(host.asSync().exists(join(outputPath, 'main.js.map'))).toBe(false);
+        expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBe(false);
         const fileName = join(outputPath, 'main.js');
-        const content = virtualFs.fileBufferToString(host.asSync().read(fileName));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
         expect(content).toContain('eval("function webpackEmptyAsyncContext');
       }),
     ).subscribe(undefined, done.fail, done);

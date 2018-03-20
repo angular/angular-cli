@@ -24,7 +24,7 @@ describe('Browser Builder optimization level', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js');
-        const content = virtualFs.fileBufferToString(host.asSync().read(fileName));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
         // Bundle contents should be uglified, which includes variable mangling.
         expect(content).not.toContain('AppComponent');
       }),
@@ -40,7 +40,7 @@ describe('Browser Builder optimization level', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'vendor.js');
-        const content = virtualFs.fileBufferToString(host.asSync().read(fileName));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
         expect(content).toMatch(/class \w{constructor\(\){/);
       }),
     ).subscribe(undefined, done.fail, done);

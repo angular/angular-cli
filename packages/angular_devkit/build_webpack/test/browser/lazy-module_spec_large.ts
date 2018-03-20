@@ -82,7 +82,9 @@ describe('Browser Builder lazy modules', () => {
 
     runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, 'lazy-lazy-module.js'))).toBe(true)),
+      tap(() => {
+        expect(host.scopedSync().exists(join(outputPath, 'lazy-lazy-module.js'))).toBe(true);
+      }),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
@@ -96,7 +98,7 @@ describe('Browser Builder lazy modules', () => {
 
     runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, '0.js'))).toBe(true)),
+      tap(() => expect(host.scopedSync().exists(join(outputPath, '0.js'))).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
@@ -112,7 +114,7 @@ describe('Browser Builder lazy modules', () => {
 
     runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, 'lazy-module.js'))).toBe(true)),
+      tap(() => expect(host.scopedSync().exists(join(outputPath, 'lazy-module.js'))).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
@@ -124,7 +126,7 @@ describe('Browser Builder lazy modules', () => {
 
     runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, '0.js'))).toBe(true)),
+      tap(() => expect(host.scopedSync().exists(join(outputPath, '0.js'))).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
@@ -139,7 +141,7 @@ describe('Browser Builder lazy modules', () => {
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, '0.js'))).toBe(true)),
+      tap(() => expect(host.scopedSync().exists(join(outputPath, '0.js'))).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
@@ -153,10 +155,10 @@ describe('Browser Builder lazy modules', () => {
 
     runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, '0.js'))).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, '1.js'))).toBe(true)),
+      tap(() => expect(host.scopedSync().exists(join(outputPath, '0.js'))).toBe(true)),
+      tap(() => expect(host.scopedSync().exists(join(outputPath, '1.js'))).toBe(true)),
       // TODO: the chunk with common modules used to be called `common`, see why that changed.
-      tap(() => expect(host.asSync().exists(join(outputPath, '2.js'))).toBe(true)),
+      tap(() => expect(host.scopedSync().exists(join(outputPath, '2.js'))).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
@@ -172,9 +174,9 @@ describe('Browser Builder lazy modules', () => {
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, '0.js'))).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, '1.js'))).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, '2.js'))).toBe(false)),
+      tap(() => expect(host.scopedSync().exists(join(outputPath, '0.js'))).toBe(true)),
+      tap(() => expect(host.scopedSync().exists(join(outputPath, '1.js'))).toBe(true)),
+      tap(() => expect(host.scopedSync().exists(join(outputPath, '2.js'))).toBe(false)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
@@ -205,7 +207,7 @@ describe('Browser Builder lazy modules', () => {
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.asSync().exists(join(outputPath, 'lazy-lazy-module.js')))
+      tap(() => expect(host.scopedSync().exists(join(outputPath, 'lazy-lazy-module.js')))
         .toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);

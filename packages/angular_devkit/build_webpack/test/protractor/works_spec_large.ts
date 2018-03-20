@@ -30,7 +30,7 @@ describe('Protractor Builder', () => {
   }, 30000);
 
   it('overrides protractor specs', (done) => {
-    host.asSync().rename(normalize('./e2e/app.e2e-spec.ts'),
+    host.scopedSync().rename(normalize('./e2e/app.e2e-spec.ts'),
       normalize('./e2e/renamed-app.e2e-spec.ts'));
 
     const overrides = { specs: ['./e2e/renamed-app.e2e-spec.ts'] };
@@ -41,7 +41,7 @@ describe('Protractor Builder', () => {
   }, 60000);
 
   it('overrides protractor suites', (done) => {
-    host.asSync().rename(normalize('./e2e/app.e2e-spec.ts'),
+    host.scopedSync().rename(normalize('./e2e/app.e2e-spec.ts'),
       normalize('./e2e/renamed-app.e2e-spec.ts'));
 
     // Suites block need to be added in the protractor.conf.js file to test suites

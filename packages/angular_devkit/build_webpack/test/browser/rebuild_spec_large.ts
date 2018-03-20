@@ -82,7 +82,7 @@ describe('Browser Builder', () => {
         switch (buildNumber) {
           case 1:
             // No lazy chunk should exist.
-            expect(host.asSync().exists(join(outputPath, 'lazy-module.js'))).toBe(false);
+            expect(host.scopedSync().exists(join(outputPath, 'lazy-module.js'))).toBe(false);
             // Write the lazy chunk files. Order matters when writing these, because of imports.
             host.writeMultipleFiles(lazyModuleFiles);
             host.writeMultipleFiles(lazyModuleImport);
@@ -90,7 +90,7 @@ describe('Browser Builder', () => {
 
           case 2:
             // A lazy chunk should have been with the filename.
-            expect(host.asSync().exists(join(outputPath, 'lazy-lazy-module.js'))).toBe(true);
+            expect(host.scopedSync().exists(join(outputPath, 'lazy-lazy-module.js'))).toBe(true);
             host.writeMultipleFiles(goldenValueFiles);
             break;
 
@@ -102,7 +102,9 @@ describe('Browser Builder', () => {
               + /\$\$_E2E_GOLDEN_VALUE_3/.source,
             );
             const fileName = './dist/main.js';
-            const content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+            const content = virtualFs.fileBufferToString(
+              host.scopedSync().read(normalize(fileName)),
+            );
             expect(content).toMatch(re);
             break;
 
@@ -204,7 +206,7 @@ describe('Browser Builder', () => {
   xit('rebuilds after errors in AOT', (done) => {
     // Save the original contents of `./src/app/app.component.ts`.
     const origContent = virtualFs.fileBufferToString(
-      host.asSync().read(normalize('src/app/app.component.ts')));
+      host.scopedSync().read(normalize('src/app/app.component.ts')));
     // Add a major static analysis error on a non-main file to the initial build.
     host.replaceInFile('./src/app/app.component.ts', `'app-root'`, `(() => 'app-root')()`);
 
@@ -311,7 +313,7 @@ describe('Browser Builder', () => {
           case 4:
             // Check if html changes are added to factories.
             expect(buildEvent.success).toBe(true);
-            content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+            content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
             expect(content).toContain('HTML_REBUILD_STRING');
             // Change the component css.
             host.appendToFile('src/app/app.component.css', 'CSS_REBUILD_STRING {color: #f00;}');
@@ -320,7 +322,7 @@ describe('Browser Builder', () => {
           case 5:
             // Check if css changes are added to factories.
             expect(buildEvent.success).toBe(true);
-            content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+            content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
             expect(content).toContain('CSS_REBUILD_STRING');
             // Change the component css import.
             host.appendToFile('src/app/app.component.css', 'CSS_DEP_REBUILD_STRING {color: #f00;}');
@@ -329,7 +331,7 @@ describe('Browser Builder', () => {
           case 6:
             // Check if css import changes are added to factories.
             expect(buildEvent.success).toBe(true);
-            content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+            content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
             expect(content).toContain('CSS_DEP_REBUILD_STRING');
             // Change the component itself.
             host.replaceInFile('src/app/app.component.ts', 'app-root',
@@ -339,7 +341,7 @@ describe('Browser Builder', () => {
           case 7:
             // Check if component changes are added to factories.
             expect(buildEvent.success).toBe(true);
-            content = virtualFs.fileBufferToString(host.asSync().read(normalize(fileName)));
+            content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
             expect(content).toContain('FACTORY_REBUILD_STRING');
             break;
         }

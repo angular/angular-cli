@@ -30,7 +30,7 @@ describe('Browser Builder subresource integrity', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'index.html');
-        const content = virtualFs.fileBufferToString(host.asSync().read(fileName));
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
         expect(content).toMatch(/integrity="\w+-[A-Za-z0-9\/\+=]+"/);
       }),
     ).subscribe(undefined, done.fail, done);

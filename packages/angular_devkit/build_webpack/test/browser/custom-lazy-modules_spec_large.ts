@@ -51,7 +51,7 @@
 //       concatMap(() => architect.run(architect.getTarget({ overrides }))),
 //       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
 //       tap(() =>
-//         expect(host.asSync().exists(join(outputPath, 'lazy.module.js'))).toBe(true)),
+//         expect(host.scopedSync().exists(join(outputPath, 'lazy.module.js'))).toBe(true)),
 //     ).subscribe(undefined, done.fail, done);
 //   }, 30000);
 // });
