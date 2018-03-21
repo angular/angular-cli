@@ -78,9 +78,9 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
           builder: '@angular-devkit/build-webpack:browser',
           options: {
             outputPath: `dist/${options.name}`,
-            index: `${projectRoot}/index.html`,
-            main: `${projectRoot}/main.ts`,
-            polyfills: `${projectRoot}/polyfills.ts`,
+            index: `${projectRoot}/src/index.html`,
+            main: `${projectRoot}/src/main.ts`,
+            polyfills: `${projectRoot}/src/polyfills.ts`,
             tsConfig: `${projectRoot}/tsconfig.app.json`,
             assets: [
               {
@@ -96,7 +96,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
             ],
             styles: [
               {
-                input: `${projectRoot}/styles.${options.style}`,
+                input: `${projectRoot}/src/styles.${options.style}`,
               },
             ],
             scripts: [],
@@ -135,8 +135,8 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
         test: {
           builder: '@angular-devkit/build-webpack:karma',
           options: {
-            main: `${projectRoot}/test.ts`,
-            polyfills: `${projectRoot}/polyfills.ts`,
+            main: `${projectRoot}/src/test.ts`,
+            polyfills: `${projectRoot}/src/polyfills.ts`,
             tsConfig: `${projectRoot}/tsconfig.spec.json`,
             karmaConfig: `${projectRoot}/karma.conf.js`,
             styles: [

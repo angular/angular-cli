@@ -47,8 +47,8 @@ describe('Class Schematic', () => {
 
   it('should create just the class file', () => {
     const tree = schematicRunner.runSchematic('class', defaultOptions, appTree);
-    expect(tree.files.indexOf('/projects/bar/src/foo.ts')).toBeGreaterThanOrEqual(0);
-    expect(tree.files.indexOf('/projects/bar/src/foo.spec.ts')).toBeLessThan(0);
+    expect(tree.files.indexOf('/projects/bar/src/app/foo.ts')).toBeGreaterThanOrEqual(0);
+    expect(tree.files.indexOf('/projects/bar/src/app/foo.spec.ts')).toBeLessThan(0);
   });
 
   it('should create the class and spec file', () => {
@@ -57,13 +57,13 @@ describe('Class Schematic', () => {
       spec: true,
     };
     const tree = schematicRunner.runSchematic('class', options, appTree);
-    expect(tree.files.indexOf('/projects/bar/src/foo.ts')).toBeGreaterThanOrEqual(0);
-    expect(tree.files.indexOf('/projects/bar/src/foo.spec.ts')).toBeGreaterThanOrEqual(0);
+    expect(tree.files.indexOf('/projects/bar/src/app/foo.ts')).toBeGreaterThanOrEqual(0);
+    expect(tree.files.indexOf('/projects/bar/src/app/foo.spec.ts')).toBeGreaterThanOrEqual(0);
   });
 
   it('should create an class named "Foo"', () => {
     const tree = schematicRunner.runSchematic('class', defaultOptions, appTree);
-    const fileContent = tree.readContent('/projects/bar/src/foo.ts');
+    const fileContent = tree.readContent('/projects/bar/src/app/foo.ts');
     expect(fileContent).toMatch(/export class Foo/);
   });
 
@@ -71,13 +71,13 @@ describe('Class Schematic', () => {
     const options = { ...defaultOptions, type: 'model' };
 
     const tree = schematicRunner.runSchematic('class', options, appTree);
-    expect(tree.files.indexOf('/projects/bar/src/foo.model.ts')).toBeGreaterThanOrEqual(0);
+    expect(tree.files.indexOf('/projects/bar/src/app/foo.model.ts')).toBeGreaterThanOrEqual(0);
   });
 
   it('should split the name to name & type with split on "."', () => {
     const options = {...defaultOptions, name: 'foo.model' };
     const tree = schematicRunner.runSchematic('class', options, appTree);
-    const classPath = '/projects/bar/src/foo.model.ts';
+    const classPath = '/projects/bar/src/app/foo.model.ts';
     const content = tree.readContent(classPath);
     expect(content).toMatch(/export class Foo/);
   });

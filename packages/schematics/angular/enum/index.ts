@@ -32,7 +32,7 @@ export default function (options: EnumOptions): Rule {
     const project = workspace.projects[options.project];
 
     if (options.path === undefined) {
-      options.path = `/${project.root}/src`;
+      options.path = `/${project.root}/src/app`;
     }
 
     const parsedPath = parseName(options.path, options.name);

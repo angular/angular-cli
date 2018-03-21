@@ -45,11 +45,11 @@ describe('Enum Schematic', () => {
   it('should create an enumeration', () => {
     const tree = schematicRunner.runSchematic('enum', defaultOptions, appTree);
     const files = tree.files;
-    expect(files.indexOf('/projects/bar/src/foo.enum.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/bar/src/app/foo.enum.ts')).toBeGreaterThanOrEqual(0);
   });
   it('should create an enumeration', () => {
     const tree = schematicRunner.runSchematic('enum', defaultOptions, appTree);
-    const content = tree.readContent('/projects/bar/src/foo.enum.ts');
+    const content = tree.readContent('/projects/bar/src/app/foo.enum.ts');
     expect(content).toMatch('export enum Foo {');
   });
 

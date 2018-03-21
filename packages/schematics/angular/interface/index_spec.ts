@@ -46,12 +46,12 @@ describe('Interface Schematic', () => {
 
   it('should create one file', () => {
     const tree = schematicRunner.runSchematic('interface', defaultOptions, appTree);
-    expect(tree.files.indexOf('/projects/bar/src/foo.ts')).toBeGreaterThanOrEqual(0);
+    expect(tree.files.indexOf('/projects/bar/src/app/foo.ts')).toBeGreaterThanOrEqual(0);
   });
 
   it('should create an interface named "Foo"', () => {
     const tree = schematicRunner.runSchematic('interface', defaultOptions, appTree);
-    const fileContent = tree.readContent('/projects/bar/src/foo.ts');
+    const fileContent = tree.readContent('/projects/bar/src/app/foo.ts');
     expect(fileContent).toMatch(/export interface Foo/);
   });
 
@@ -59,7 +59,7 @@ describe('Interface Schematic', () => {
     const options = { ...defaultOptions, type: 'model' };
 
     const tree = schematicRunner.runSchematic('interface', options, appTree);
-    expect(tree.files.indexOf('/projects/bar/src/foo.model.ts')).toBeGreaterThanOrEqual(0);
+    expect(tree.files.indexOf('/projects/bar/src/app/foo.model.ts')).toBeGreaterThanOrEqual(0);
   });
 
 });
