@@ -27,7 +27,7 @@ export function testPrefixClasses(content: string) {
       exportVarSetter, multiLineComment,
       /\(/, multiLineComment,
       /\s*function \(_super\) {/, newLine,
-      /\w*__extends\(\w+, _super\);/,
+      /\w*\.?__extends\(\w+, _super\);/,
     ],
   ].map(arr => new RegExp(arr.map(x => x.source).join(''), 'm'));
 
@@ -179,19 +179,24 @@ function isDownleveledClass(node: ts.Node): boolean {
     return false;
   }
 
-  if (functionStatements.length < 3) {
+  if (functionStatements.length < 3 || !ts.isExpressionStatement(firstStatement)) {
     return false;
   }
 
-  if (!ts.isExpressionStatement(firstStatement)
-      || !ts.isCallExpression(firstStatement.expression)) {
+  if (!ts.isCallExpression(firstStatement.expression)) {
     return false;
   }
 
   const extendCallExpression = firstStatement.expression;
 
-  if (!ts.isIdentifier(extendCallExpression.expression)
-      || !extendCallExpression.expression.text.endsWith(extendsHelperName)) {
+  let functionName;
+  if (ts.isIdentifier(extendCallExpression.expression)) {
+    functionName = extendCallExpression.expression.text;
+  } else if (ts.isPropertyAccessExpression(extendCallExpression.expression)) {
+    functionName = extendCallExpression.expression.name.text;
+  }
+
+  if (!functionName || !functionName.endsWith(extendsHelperName)) {
     return false;
   }
 

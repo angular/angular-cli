@@ -218,6 +218,30 @@ describe('prefix-classes', () => {
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
+  it('works with tslib namespace import', () => {
+    const input = tags.stripIndent`
+      var BufferSubscriber = /** @class */ (function (_super) {
+        tslib_1.__extends(BufferSubscriber, _super);
+        function BufferSubscriber() {
+          return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return BufferSubscriber;
+      }(OuterSubscriber));
+    `;
+    const output = tags.stripIndent`
+      var BufferSubscriber = /*@__PURE__*/ (function (_super) {
+        tslib_1.__extends(BufferSubscriber, _super);
+        function BufferSubscriber() {
+          return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return BufferSubscriber;
+      }(OuterSubscriber));
+    `;
+
+    expect(testPrefixClasses(input)).toBeTruthy();
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
+
   it('fixes the RxJS use case (issue #214)', () => {
     const input = `
       var ExtendedClass = /*@__PURE__*/ (/*@__PURE__*/ function (_super) {
