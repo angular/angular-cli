@@ -28,6 +28,7 @@ export default function () {
       updateVersions(obj.devDependencies);
       obj.devDependencies['@angular/cli'] = '1.6.5';
       obj.devDependencies['typescript'] = '2.0.2';
+      obj.dependencies['rxjs'] = '5.0.0-beta.12';
     }))
     .then(() => ng('update'))
     .then(() => readFile('package.json'))
