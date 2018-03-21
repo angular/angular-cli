@@ -75,7 +75,7 @@ describe('Browser Builder', () => {
       // We must debounce on watch mode because file watchers are not very accurate.
       // Changes from just before a process runs can be picked up and cause rebuilds.
       // In this case, cleanup from the test right before this one causes a few rebuilds.
-      debounceTime(500),
+      debounceTime(1000),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         buildNumber += 1;
@@ -143,7 +143,7 @@ describe('Browser Builder', () => {
     let buildNumber = 0;
 
     runTargetSpec(host, browserTargetSpec, overrides, logger).pipe(
-      debounceTime(500),
+      debounceTime(1000),
       tap((buildEvent) => {
         buildNumber += 1;
         switch (buildNumber) {
@@ -193,7 +193,7 @@ describe('Browser Builder', () => {
     const overrides = { watch: true };
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      debounceTime(500),
+      debounceTime(1000),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => host.writeMultipleFiles({ 'src/type.ts': `export type MyType = string;` })),
       take(2),
