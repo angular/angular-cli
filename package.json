@@ -84,7 +84,7 @@
     "cache-loader": "^1.2.2",
     "chalk": "~2.2.2",
     "chokidar": "^1.7.0",
-    "circular-dependency-plugin": "^4.4.0",
+    "circular-dependency-plugin": "^5.0.0",
     "clean-css": "^4.1.11",
     "codelyzer": "^4.0.2",
     "common-tags": "^1.5.1",
