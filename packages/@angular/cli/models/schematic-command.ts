@@ -96,6 +96,8 @@ export abstract class SchematicCommand extends Command {
     const workingDir = cwd.replace(this.project.root, '');
     const pathOptions = this.setPathOptions(schematicOptions, workingDir);
     schematicOptions = { ...schematicOptions, ...pathOptions };
+    const defaultOptions = this.readDefaults(collectionName, schematicName, schematicOptions);
+    schematicOptions = { ...schematicOptions, ...defaultOptions };
 
     // Pass the rest of the arguments as the smart default "argv". Then delete it.
     // Removing the first item which is the schematic name.
@@ -298,5 +300,60 @@ export abstract class SchematicCommand extends Command {
     return workspaceLoader.loadWorkspace().pipe(
       tap(workspace => this._workspace = workspace),
     );
+  }
+
+  private readDefaults(collectionName: string, schematicName: string, options: any): any {
+    let defaults: any = {};
+
+    if (!this._workspace) {
+      return {};
+    }
+
+    // read and set workspace defaults
+    const wsSchematics = this._workspace.getSchematics();
+    if (wsSchematics) {
+      let key = collectionName;
+      if (wsSchematics[collectionName] && typeof wsSchematics[key] === 'object') {
+        defaults = {...defaults, ...<object> wsSchematics[key]};
+      }
+      key = collectionName + ':' + schematicName;
+      if (wsSchematics[collectionName] && typeof wsSchematics[key] === 'object') {
+        defaults = {...defaults, ...<object> wsSchematics[key]};
+      }
+    }
+
+    // read and set project defaults
+    let projectName = options.project;
+    if (!projectName) {
+      projectName = this._workspace.listProjectNames()[0];
+    }
+    if (projectName) {
+      const project = this._workspace.getProject(projectName);
+      const prjSchematics = project.schematics;
+      if (prjSchematics) {
+        let key = collectionName;
+        if (prjSchematics[collectionName] && typeof prjSchematics[key] === 'object') {
+          defaults = {...defaults, ...<object> prjSchematics[key]};
+        }
+        key = collectionName + ':' + schematicName;
+        if (prjSchematics[collectionName] && typeof prjSchematics[key] === 'object') {
+          defaults = {...defaults, ...<object> prjSchematics[key]};
+        }
+      }
+    }
+
+    // Get list of all undefined options.
+    const undefinedOptions = this.options
+      .filter(o => options[o.name] === undefined)
+      .map(o => o.name);
+
+    // Delete any default that is not undefined.
+    Object.keys(defaults)
+      .filter(key => !undefinedOptions.indexOf(key))
+      .forEach(key => {
+        delete defaults[key];
+      });
+
+    return defaults;
   }
 }

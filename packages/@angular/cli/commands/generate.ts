@@ -22,6 +22,7 @@ export default class GenerateCommand extends SchematicCommand {
 
   private initialized = false;
   public async initialize(options: any): Promise<void> {
+    await super.initialize(options);
     if (this.initialized) {
       return Promise.resolve();
     }

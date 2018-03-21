@@ -6,13 +6,17 @@ import {updateJsonFile} from '../../../utils/project';
 
 export default function() {
   // TODO:CONFIG READING
-  return Promise.resolve();
+  // return Promise.resolve();
   const appDir = join('projects', 'test-project', 'src');
 
   return Promise.resolve()
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const comp = configJson.defaults.component;
-      comp.flat = true;
+    // .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    //   const comp = configJson.defaults.component;
+    //   comp.flat = true;
+    // }))
+    .then(() => updateJsonFile('angular.json', j => {
+      j.projects['test-project']
+        .schematics['@schematics/angular:component'] = { flat: true };
     }))
     .then(() => ng('generate', 'component', 'test-component'))
     .then(() => expectFileToExist(appDir))
@@ -22,5 +26,5 @@ export default function() {
     .then(() => expectFileToExist(join(appDir, 'test-component.component.css')))
 
     // Try to run the unit tests.
-    .then(() => ng('test', '--watch=false'));
+    // .then(() => ng('test', '--watch=false'));
 }
