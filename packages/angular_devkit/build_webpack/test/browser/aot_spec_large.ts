@@ -11,7 +11,7 @@ import { tap } from 'rxjs/operators';
 import { browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
-describe('Browser Builder', () => {
+describe('Browser Builder AOT', () => {
   const outputPath = normalize('dist');
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
