@@ -1,6 +1,7 @@
 import { readFile, writeFile, replaceInFile } from './fs';
 import { execAndWaitForOutputToMatch, silentNpm, ng } from './process';
 import { getGlobalVariable } from './env';
+import { intersects } from 'semver';
 
 const packages = require('../../../lib/packages').packages;
 
@@ -156,9 +157,10 @@ export function useNgVersion(version: string) {
       });
     // TODO: determine the appropriate version for the Angular version
     if (version.startsWith('^5')) {
-      json['devDependencies']['typescript'] = '~2.6.0';
+      json['devDependencies']['typescript'] = '~2.5.0';
     } else {
       json['devDependencies']['typescript'] = '~2.7.0';
+      json['dependencies']['rxjs'] = '6.0.0-beta.0';
     }
   });
 }
