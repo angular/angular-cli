@@ -39,7 +39,7 @@ export default function () {
     })
     .then(() => npm('install'))
     .then(() => ng('build', '--optimization-level', '1'))
-    .then(() => expectFileToMatch('dist/index.html', /app-shell works!/))
+    .then(() => expectFileToMatch('dist/test-project/index.html', /app-shell works!/))
     .then(() => ng('build', '--optimization-level', '1', '--skip-app-shell'))
-    .then(() => expectToFail(() => expectFileToMatch('dist/index.html', /app-shell works!/)));
+    .then(() => expectToFail(() => expectFileToMatch('dist/test-project/index.html', /app-shell works!/)));
 }

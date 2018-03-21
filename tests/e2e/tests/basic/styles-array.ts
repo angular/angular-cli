@@ -16,7 +16,7 @@ export default function () {
     'src/pre-rename-style.css': '.pre-rename-style { color: red }',
     'src/pre-rename-lazy-style.css': '.pre-rename-lazy-style { color: red }'
   })
-    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+    .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects.app.architect;
       appArchitect.build.options.styles = [
         { input: 'src/string-style.css' },
@@ -28,17 +28,17 @@ export default function () {
     }))
     .then(() => ng('build', '--extract-css'))
     // files were created successfully
-    .then(() => expectFileToMatch('dist/styles.css', '.string-style'))
-    .then(() => expectFileToMatch('dist/styles.css', '.input-style'))
-    .then(() => expectFileToMatch('dist/lazy-style.css', '.lazy-style'))
-    .then(() => expectFileToMatch('dist/renamed-style.css', '.pre-rename-style'))
-    .then(() => expectFileToMatch('dist/renamed-lazy-style.css', '.pre-rename-lazy-style'))
+    .then(() => expectFileToMatch('dist/test-project/styles.css', '.string-style'))
+    .then(() => expectFileToMatch('dist/test-project/styles.css', '.input-style'))
+    .then(() => expectFileToMatch('dist/test-project/lazy-style.css', '.lazy-style'))
+    .then(() => expectFileToMatch('dist/test-project/renamed-style.css', '.pre-rename-style'))
+    .then(() => expectFileToMatch('dist/test-project/renamed-lazy-style.css', '.pre-rename-lazy-style'))
     // index.html lists the right bundles
-    .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
+    .then(() => expectFileToMatch('dist/test-project/index.html', oneLineTrim`
       <link rel="stylesheet" href="styles.css">
       <link rel="stylesheet" href="renamed-style.css">
     `))
-    .then(() => expectFileToMatch('dist/index.html', oneLineTrim`
+    .then(() => expectFileToMatch('dist/test-project/index.html', oneLineTrim`
       <script type="text/javascript" src="runtime.js"></script>
       <script type="text/javascript" src="polyfills.js"></script>
       <script type="text/javascript" src="vendor.js"></script>

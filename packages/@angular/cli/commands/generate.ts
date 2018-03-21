@@ -21,10 +21,9 @@ export default class GenerateCommand extends SchematicCommand {
   ];
 
   private initialized = false;
-  public async initialize(options: any): Promise<void> {
-    await super.initialize(options);
+  public async initialize(options: any) {
     if (this.initialized) {
-      return Promise.resolve();
+      return;
     }
     this.initialized = true;
 
@@ -65,7 +64,7 @@ export default class GenerateCommand extends SchematicCommand {
       debug: options.debug,
       dryRun: options.dryRun,
       force: options.force,
-    });
+    }).then((x) => {console.log('done running', x); return x; });
   }
 
   private parseSchematicInfo(options: any) {

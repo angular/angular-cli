@@ -42,7 +42,7 @@ export default function() {
     .then(() => expectFileToExist(join(process.cwd(), 'dist/ngsw.json')))
     .then(() => ng('build', '--optimization-level', '1', '--base-href=/foo/bar'))
     .then(() => expectFileToExist(join(process.cwd(), 'dist/ngsw.json')))
-    .then(() => expectFileToMatch('dist/ngsw.json', /"\/foo\/bar\/index.html"/))
+    .then(() => expectFileToMatch('dist/test-project/ngsw.json', /"\/foo\/bar\/index.html"/))
     .then(() => ng('build', '--optimization-level', '1', '--service-worker=false'))
     .then(() => expectFileNotToExist('dist/ngsw.json'))
     .then(() => writeFile('node_modules/@angular/service-worker/safety-worker.js', 'false'))

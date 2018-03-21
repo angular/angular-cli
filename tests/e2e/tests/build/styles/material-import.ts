@@ -24,7 +24,7 @@ export default function () {
         `,
         })
         // change files to use preprocessor
-        .then(() => updateJsonFile('.angular.json', workspaceJson => {
+        .then(() => updateJsonFile('angular.json', workspaceJson => {
           const appArchitect = workspaceJson.projects.app.architect;
           appArchitect.build.options.styles = [
             { input: `src/styles.${ext}` }

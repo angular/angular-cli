@@ -28,7 +28,7 @@ export default function () {
         }
       `})
     .then(() => deleteFile('src/app/app.component.css'))
-    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+    .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects.app.architect;
       appArchitect.build.options.styles = [
         { input: 'src/styles.less' }
@@ -37,10 +37,10 @@ export default function () {
     .then(() => replaceInFile('src/app/app.component.ts',
       './app.component.css', './app.component.less'))
     .then(() => ng('build', '--extract-css', '--source-map'))
-    .then(() => expectFileToMatch('dist/styles.css',
+    .then(() => expectFileToMatch('dist/test-project/styles.css',
       /body\s*{\s*background-color: blue;\s*}/))
-    .then(() => expectFileToMatch('dist/styles.css',
+    .then(() => expectFileToMatch('dist/test-project/styles.css',
       /p\s*{\s*background-color: red;\s*}/))
-    .then(() => expectToFail(() => expectFileToMatch('dist/styles.css', '"mappings":""')))
-    .then(() => expectFileToMatch('dist/main.js', /.outer.*.inner.*background:\s*#[fF]+/));
+    .then(() => expectToFail(() => expectFileToMatch('dist/test-project/styles.css', '"mappings":""')))
+    .then(() => expectFileToMatch('dist/test-project/main.js', /.outer.*.inner.*background:\s*#[fF]+/));
 }

@@ -58,7 +58,7 @@ export default function () {
     .then(() => silentNpm('install'))
     .then(() => ng('build', '--aot=false'))
     // files were created successfully
-    .then(() => expectFileToMatch('dist/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main.js',
       /exports.*AppModule/))
     .then(() => writeFile('./index.js', `
       require('zone.js/dist/zone-node');
@@ -75,16 +75,16 @@ export default function () {
       \});
     `))
     .then(() => exec(normalize('node'), 'index.js'))
-    .then(() => expectFileToMatch('dist/index.html',
+    .then(() => expectFileToMatch('dist/test-project/index.html',
       new RegExp('<h2 _ngcontent-c0="">Here are some links to help you start: </h2>')))
     .then(() => ng('build', '--aot'))
     // files were created successfully
-    .then(() => expectFileToMatch('dist/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main.js',
       /exports.*AppModuleNgFactory/))
     .then(() => replaceInFile('./index.js', /AppModule/g, 'AppModuleNgFactory'))
     .then(() => replaceInFile('./index.js', /renderModule/g, 'renderModuleFactory'))
     .then(() => exec(normalize('node'), 'index.js'))
-    .then(() => expectFileToMatch('dist/index.html',
+    .then(() => expectFileToMatch('dist/test-project/index.html',
       new RegExp('<h2 _ngcontent-c0="">Here are some links to help you start: </h2>')))
     .then(() => expectFileToMatch('./dist/main.js',
       /require\(["']@angular\/[^"']*["']\)/))

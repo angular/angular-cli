@@ -13,7 +13,7 @@ export default function () {
     `)
     // uses autoprefixer plugin for all builds
     .then(() => ng('build', '--extract-css'))
-    .then(() => expectFileToMatch('dist/styles.css', stripIndents`
+    .then(() => expectFileToMatch('dist/test-project/styles.css', stripIndents`
       /* normal-comment */
       /*! important-comment */
       div { -webkit-box-flex: 1; -ms-flex: 1; flex: 1 }

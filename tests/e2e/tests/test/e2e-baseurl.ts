@@ -10,7 +10,7 @@ export default function () {
 
   return Promise.resolve()
     .then(() => expectToFail(() => ng('e2e', 'app-e2e', '--devServerTarget=')))
-    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+    .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects.app.architect;
       appArchitect.serve.options.port = 4400;
     }))

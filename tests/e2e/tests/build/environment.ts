@@ -14,7 +14,7 @@ export default function() {
 
   // Try a prod build.
   return ng('build', '--environment=prod')
-    .then(() => expectFileToMatch('dist/main.js', 'production: true'))
+    .then(() => expectFileToMatch('dist/test-project/main.js', 'production: true'))
     // If this is an ejected test, the eject will create files so git will not be clean.
     .then(() => !ejected && expectGitToBeClean())
 

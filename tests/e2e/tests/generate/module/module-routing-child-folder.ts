@@ -6,7 +6,7 @@ import { expectToFail } from '../../../utils/utils';
 
 export default function () {
   const root = process.cwd();
-  const testPath = join(root, 'projects', 'test-project', 'src');
+  const testPath = join(root, 'projects', 'test-project', 'src', 'app');
 
   process.chdir(testPath);
 

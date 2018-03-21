@@ -12,6 +12,6 @@ export default function() {
     .then(() => ng('build'))
     .then(() => expectFileToExist('dist/favicon.ico'))
     .then(() => expectFileToExist('dist/assets/.file'))
-    .then(() => expectFileToMatch('dist/assets/test.abc', 'hello world'))
+    .then(() => expectFileToMatch('dist/test-project/assets/test.abc', 'hello world'))
     .then(() => expectToFail(() => expectFileToExist('dist/assets/.gitkeep')));
 }

@@ -19,5 +19,5 @@ export default function () {
     }))
     .then(() => ng('build', '--optimization-level', '1', '--output-hashing=none', '--vendor-chunk'))
     // Check class constructors are present in the vendor output.
-    .then(() => expectFileToMatch('dist/vendor.js', /class \w{constructor\(\){/));
+    .then(() => expectFileToMatch('dist/test-project/vendor.js', /class \w{constructor\(\){/));
 }

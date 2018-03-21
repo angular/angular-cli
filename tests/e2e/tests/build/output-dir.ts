@@ -18,7 +18,7 @@ export default function() {
     .then(() => expectFileToExist('./build-output/index.html'))
     .then(() => expectFileToExist('./build-output/main.js'))
     .then(() => expectToFail(expectGitToBeClean))
-    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+    .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects.app.architect;
       appArchitect.build.options.outputPath = 'config-build-output';
     }))

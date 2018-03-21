@@ -7,7 +7,7 @@ import { updateJsonFile } from '../../utils/project';
 export default async function() {
   // Add a lazy module
   await ng('generate', 'module', 'lazy');
-  await updateJsonFile('.angular.json', workspaceJson => {
+  await updateJsonFile('angular.json', workspaceJson => {
     const appArchitect = workspaceJson.projects.app.architect;
     appArchitect.build.options.lazyModules = [
       'src/app/lazy/lazy.module'

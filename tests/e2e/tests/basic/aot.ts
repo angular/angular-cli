@@ -3,6 +3,6 @@ import {expectFileToMatch} from '../../utils/fs';
 
 export default function() {
   return ng('build', '--aot=true')
-    .then(() => expectFileToMatch('dist/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main.js',
       /platformBrowser.*bootstrapModuleFactory.*AppModuleNgFactory/));
 }

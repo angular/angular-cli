@@ -28,7 +28,7 @@ export default function () {
         }
       `})
     .then(() => deleteFile('src/app/app.component.css'))
-    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+    .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects.app.architect;
       appArchitect.build.options.styles = [
         { input: 'src/styles.scss' }
@@ -37,7 +37,7 @@ export default function () {
     .then(() => replaceInFile('src/app/app.component.ts',
       './app.component.css', './app.component.scss'))
     .then(() => ng('build'))
-    .then(() => expectToFail(() => expectFileToMatch('dist/styles.css', /exports/)))
-    .then(() => expectToFail(() => expectFileToMatch('dist/main.js',
+    .then(() => expectToFail(() => expectFileToMatch('dist/test-project/styles.css', /exports/)))
+    .then(() => expectToFail(() => expectFileToMatch('dist/test-project/main.js',
       /".*module\.exports.*\.outer.*background:/)));
 }

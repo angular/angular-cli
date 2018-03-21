@@ -12,16 +12,16 @@ export default function (skipCleaning: () => void) {
   return Promise.resolve()
     .then(() => createProjectFromAsset('webpack/test-server-app-ng5'))
     .then(() => exec(normalize('node_modules/.bin/webpack-cli')))
-    .then(() => expectFileToMatch('dist/app.main.js',
+    .then(() => expectFileToMatch('dist/test-project/app.main.js',
       new RegExp('MyInjectable.ctorParameters = .*'
       + 'type: undefined, decorators.*Inject.*args: .*DOCUMENT.*')))
-    .then(() => expectFileToMatch('dist/app.main.js',
+    .then(() => expectFileToMatch('dist/test-project/app.main.js',
       new RegExp('AppComponent.ctorParameters = .*MyInjectable')))
-    .then(() => expectFileToMatch('dist/app.main.js',
+    .then(() => expectFileToMatch('dist/test-project/app.main.js',
       /AppModule \*\/\].*\.testProp = \'testing\'/))
-    .then(() => expectFileToMatch('dist/app.main.js',
+    .then(() => expectFileToMatch('dist/test-project/app.main.js',
       /platformServer \*\/\]\)\(\)\.bootstrapModuleFactory\(.*\/\* AppModuleNgFactory \*\/\]/))
-    .then(() => expectFileToMatch('dist/app.main.js',
+    .then(() => expectFileToMatch('dist/test-project/app.main.js',
       /renderModuleFactory \*\/\].*\/\* AppModuleNgFactory \*\/\]/))
     .then(() => skipCleaning());
 }

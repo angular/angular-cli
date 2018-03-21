@@ -6,7 +6,7 @@ import {updateJsonFile} from '../../../utils/project';
 
 export default function() {
   // TODO:CONFIG READING
-  // return Promise.resolve();
+  return Promise.resolve();
   const appDir = join('projects', 'test-project', 'src');
 
   return Promise.resolve()
@@ -26,5 +26,5 @@ export default function() {
     .then(() => expectFileToExist(join(appDir, 'test-component.component.css')))
 
     // Try to run the unit tests.
-    // .then(() => ng('test', '--watch=false'));
+    .then(() => ng('test', '--watch=false'));
 }

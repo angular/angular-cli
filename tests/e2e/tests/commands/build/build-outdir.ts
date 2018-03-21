@@ -7,7 +7,7 @@ export default function() {
   return;
 
   return Promise.resolve()
-    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+    .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects.app.architect;
       appArchitect.build.options.outputPath = './';
     }))

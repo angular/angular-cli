@@ -6,5 +6,5 @@ export default function() {
   // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
   return ng('build', '--base-href', '/myUrl')
-    .then(() => expectFileToMatch('dist/index.html', /<base href="\/myUrl">/));
+    .then(() => expectFileToMatch('dist/test-project/index.html', /<base href="\/myUrl">/));
 }

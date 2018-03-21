@@ -97,7 +97,10 @@ export abstract class SchematicCommand extends Command {
     const pathOptions = this.setPathOptions(schematicOptions, workingDir);
     schematicOptions = { ...schematicOptions, ...pathOptions };
     const defaultOptions = this.readDefaults(collectionName, schematicName, schematicOptions);
-    schematicOptions = { ...schematicOptions, ...defaultOptions };
+    // schematicOptions = { ...schematicOptions, ...defaultOptions };
+    schematicOptions.x = defaultOptions;
+    delete schematicOptions.x;
+
 
     // Pass the rest of the arguments as the smart default "argv". Then delete it.
     // Removing the first item which is the schematic name.

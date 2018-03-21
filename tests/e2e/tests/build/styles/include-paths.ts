@@ -46,7 +46,7 @@ export default function () {
     }))
     .then(() => replaceInFile('src/app/app.component.ts', `'./app.component.css\'`,
       `'./app.component.scss', './app.component.styl', './app.component.less'`))
-    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+    .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects.app.architect;
       appArchitect.build.options.styles = [
         { input: 'src/styles.scss' },
@@ -61,17 +61,17 @@ export default function () {
     }))
     // files were created successfully
     .then(() => ng('build', '--extract-css'))
-    .then(() => expectFileToMatch('dist/styles.css', /h1\s*{\s*color: red;\s*}/))
-    .then(() => expectFileToMatch('dist/main.js', /h2.*{.*color: red;.*}/))
-    .then(() => expectFileToMatch('dist/styles.css', /h3\s*{\s*color: #008000;\s*}/))
-    .then(() => expectFileToMatch('dist/main.js', /h4.*{.*color: #008000;.*}/))
-    .then(() => expectFileToMatch('dist/styles.css', /h5\s*{\s*color: #ADDADD;\s*}/))
-    .then(() => expectFileToMatch('dist/main.js', /h6.*{.*color: #ADDADD;.*}/))
+    .then(() => expectFileToMatch('dist/test-project/styles.css', /h1\s*{\s*color: red;\s*}/))
+    .then(() => expectFileToMatch('dist/test-project/main.js', /h2.*{.*color: red;.*}/))
+    .then(() => expectFileToMatch('dist/test-project/styles.css', /h3\s*{\s*color: #008000;\s*}/))
+    .then(() => expectFileToMatch('dist/test-project/main.js', /h4.*{.*color: #008000;.*}/))
+    .then(() => expectFileToMatch('dist/test-project/styles.css', /h5\s*{\s*color: #ADDADD;\s*}/))
+    .then(() => expectFileToMatch('dist/test-project/main.js', /h6.*{.*color: #ADDADD;.*}/))
     .then(() => ng('build', '--extract-css', '--aot'))
-    .then(() => expectFileToMatch('dist/styles.css', /h1\s*{\s*color: red;\s*}/))
-    .then(() => expectFileToMatch('dist/main.js', /h2.*{.*color: red;.*}/))
-    .then(() => expectFileToMatch('dist/styles.css', /h3\s*{\s*color: #008000;\s*}/))
-    .then(() => expectFileToMatch('dist/main.js', /h4.*{.*color: #008000;.*}/))
-    .then(() => expectFileToMatch('dist/styles.css', /h5\s*{\s*color: #ADDADD;\s*}/))
-    .then(() => expectFileToMatch('dist/main.js', /h6.*{.*color: #ADDADD;.*}/));
+    .then(() => expectFileToMatch('dist/test-project/styles.css', /h1\s*{\s*color: red;\s*}/))
+    .then(() => expectFileToMatch('dist/test-project/main.js', /h2.*{.*color: red;.*}/))
+    .then(() => expectFileToMatch('dist/test-project/styles.css', /h3\s*{\s*color: #008000;\s*}/))
+    .then(() => expectFileToMatch('dist/test-project/main.js', /h4.*{.*color: #008000;.*}/))
+    .then(() => expectFileToMatch('dist/test-project/styles.css', /h5\s*{\s*color: #ADDADD;\s*}/))
+    .then(() => expectFileToMatch('dist/test-project/main.js', /h6.*{.*color: #ADDADD;.*}/));
 }

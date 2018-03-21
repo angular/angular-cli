@@ -20,7 +20,7 @@ export default function () {
     .then(() => killAllProcesses(), (err) => { killAllProcesses(); throw err; })
     // should correctly fallback to a changed index
     .then(() => moveFile('src/index.html', 'src/not-index.html'))
-    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+    .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects.app.architect;
       appArchitect.build.options.index = 'src/not-index.html';
     }))

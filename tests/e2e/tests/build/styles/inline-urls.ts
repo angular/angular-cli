@@ -37,7 +37,7 @@ export default function () {
       'src/assets/small-id.svg': imgSvg
     }))
     .then(() => copyProjectAsset('images/spectrum.png', './assets/large.png'))
-    .then(() => updateJsonFile('.angular.json', workspaceJson => {
+    .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects.app.architect;
       appArchitect.build.options.styles = [
         { input: 'src/styles.scss' }
@@ -50,18 +50,18 @@ export default function () {
       }
     })
     // Check paths are correctly generated.
-    .then(() => expectFileToMatch('dist/styles.css',
+    .then(() => expectFileToMatch('dist/test-project/styles.css',
       /url\(['"]?large\.png['"]?\),\s+linear-gradient\(to bottom, #0e40fa 25%, #0654f4 75%\);/))
-    .then(() => expectFileToMatch('dist/styles.css',
+    .then(() => expectFileToMatch('dist/test-project/styles.css',
       /url\(\\?['"]data:image\/svg\+xml/))
-    .then(() => expectFileToMatch('dist/styles.css',
+    .then(() => expectFileToMatch('dist/test-project/styles.css',
       /url\(['"]?small-id\.svg#testID['"]?\)/))
-    .then(() => expectFileToMatch('dist/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main.js',
       /url\(\\?['"]data:image\/svg\+xml/))
-    .then(() => expectFileToMatch('dist/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main.js',
       /url\((?:['"]|\\')?large\.png(?:['"]|\\')?\)/))
     // Check files are correctly created.
-    .then(() => expectToFail(() => expectFileToExist('dist/small.svg')))
-    .then(() => expectFileMatchToExist('./dist', /large\.png/))
-    .then(() => expectFileMatchToExist('./dist', /small-id\.svg/));
+    .then(() => expectToFail(() => expectFileToExist('dist/test-project/small.svg')))
+    .then(() => expectFileMatchToExist('./dist/test-project', /large\.png/))
+    .then(() => expectFileMatchToExist('./dist/test-project', /small-id\.svg/));
 }
