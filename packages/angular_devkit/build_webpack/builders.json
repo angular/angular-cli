@@ -1,6 +1,11 @@
 {
   "$schema": "../architect/src/builders-schema.json",
   "builders": {
+    "app-shell": {
+      "class": "./src/app-shell",
+      "schema": "./src/app-shell/schema.json",
+      "description": "Build a server app and a browser app, then render the index.html and use it for the browser output."
+    },
     "browser": {
       "class": "./src/browser",
       "schema": "./src/browser/schema.json",
