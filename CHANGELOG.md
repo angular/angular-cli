@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.0-beta.7"></a>
+# 5.0.0-beta.7 (2018-03-21)
+
+
+### build
+
+* re-introduce build.sh ([#930](https://github.com/angular/universal/issues/930)) ([7704d56](https://github.com/angular/universal/commit/7704d56))
+
+
+### Features
+
+* **common:** introduce StateTransferInitializerModule ([#916](https://github.com/angular/universal/issues/916)) ([5aef476](https://github.com/angular/universal/commit/5aef476))
+
+
 <a name="5.0.0-beta.6"></a>
 # 5.0.0-beta.6 (2018-02-28)
 
