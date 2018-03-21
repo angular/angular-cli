@@ -1,8 +1,0 @@
-{
-  "$schema": "<%= baseDir.split('/').map(x => '..').join('/') %>/../node_modules/ng-packagr/package.schema.json",
-  "ngPackage": {
-    "lib": {
-      "entryFile": "src/<%= entryFile %>.ts"
-    }
-  }
-}

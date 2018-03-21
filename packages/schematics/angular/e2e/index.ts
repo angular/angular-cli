@@ -95,6 +95,7 @@ function addAppToWorkspaceFile(options: E2eOptions, workspace: WorkspaceSchema):
     //   (<any> workspaceAst.value).projects = projects;
     // }
 
+    // TODO: throw if the project already exist.
     workspace.projects[options.name] = project;
     host.overwrite(getWorkspacePath(host), JSON.stringify(workspace, null, 2));
   };

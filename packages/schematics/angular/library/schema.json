@@ -12,14 +12,7 @@
       "type": "string",
       "format": "path",
       "description": "The path to create the library's public API file.",
-      "default": "public_api.ts"
-    },
-    "baseDir": {
-      "type": "string",
-      "format": "path",
-      "description": "The base path where the library sources will be created.",
-      "default": "lib",
-      "visible": false
+      "default": "public_api"
     },
     "skipPackageJson": {
       "type": "boolean",

@@ -1,7 +1,7 @@
 {
-  "extends": "<%= baseDir.split('/').map(x => '..').join('/') %>/../tsconfig.json",
+  "extends": "<%= projectRoot.split('/').map(x => '..').join('/') %>/tsconfig.json",
   "compilerOptions": {
-    "outDir": "<%= baseDir.split('/').map(x => '..').join('/') %>/../out-tsc/spec",
+    "outDir": "<%= projectRoot.split('/').map(x => '..').join('/') %>/out-tsc/spec",
     "baseUrl": "./",
     "types": [
       "jasmine",

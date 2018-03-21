@@ -9,20 +9,18 @@ import { strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
-  SchematicsException,
   Tree,
   apply,
   branchAndMerge,
   chain,
   mergeWith,
-  move,
   noop,
   schematic,
   template,
   url,
 } from '@angular-devkit/schematics';
-import * as path from 'path';
-import { Schema as GenerateLibraryOptions } from './schema';
+import { WorkspaceSchema, getWorkspace, getWorkspacePath } from '../utility/config';
+import { Schema as LibraryOptions } from './schema';
 
 
 type PackageJsonPartialType = {
@@ -88,56 +86,80 @@ function addDependenciesAndScriptsToPackageJson() {
   };
 }
 
-export default function (options: GenerateLibraryOptions): Rule {
-  if (!options.name) {
-    throw new SchematicsException(`name option is required.`);
-  }
-  const name = options.name;
-  let entryFile = options.entryFile ? options.entryFile : 'public_api';
-  if (entryFile.endsWith('.ts')) {
-    entryFile = entryFile.substring(0, entryFile.length - 3);
-  }
-  const sourceDir = path.join(options.baseDir, options.name);
-
+function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSchema): Rule {
   return (host: Tree, context: SchematicContext) => {
+    context.logger.info(`Updating workspace file`);
+
+    const projectRoot = `${workspace.newProjectRoot}/${options.name}`;
+    // tslint:disable-next-line:no-any
+    const project: any = {
+      root: `${projectRoot}`,
+      projectType: 'library',
+      architect: {
+        build: {
+          builder: '@angular-devkit/build-ng-packagr:build',
+          options: {
+            project: `${projectRoot}/ng-package.json`,
+          },
+        },
+        test: {
+          builder: '@angular-devkit/build-webpack:karma',
+          options: {
+            main: `${projectRoot}/src/test.ts`,
+            tsConfig: `${projectRoot}/tsconfig.spec.json`,
+            karmaConfig: `${projectRoot}/karma.conf.js`,
+          },
+        },
+      },
+    };
+
+    workspace.projects[options.name] = project;
+    host.overwrite(getWorkspacePath(host), JSON.stringify(workspace, null, 2));
+  };
+}
+
+export default function (options: LibraryOptions): Rule {
+  return (host: Tree, context: SchematicContext) => {
+    const name = options.name;
+
+    const workspace = getWorkspace(host);
+    const newProjectRoot = workspace.newProjectRoot;
+    const projectRoot = `${newProjectRoot}/${options.name}`;
+    const sourceDir = `${projectRoot}/src/lib`;
+
     const templateSource = apply(url('./files'), [
       template({
         ...strings,
         ...options,
-        ...{
-          entryFile,
-          name,
-        },
+        projectRoot,
       }),
-      move(sourceDir),
+      // TODO: Moving inside `branchAndMerge` should work but is bugged right now.
+      // The __projectRoot__ is being used meanwhile.
+      // move(projectRoot),
     ]);
 
     return chain([
-      branchAndMerge(chain([
-        mergeWith(templateSource),
-      ])),
+      branchAndMerge(mergeWith(templateSource)),
+      addAppToWorkspaceFile(options, workspace),
       options.skipPackageJson ? noop() : addDependenciesAndScriptsToPackageJson(),
       schematic('module', {
         name: name,
         commonModule: false,
         flat: true,
-        path: `/${name}/src`,
-        sourceDir: options.baseDir,
+        path: sourceDir,
         spec: false,
       }),
       schematic('component', {
         name: name,
-        sourceDir: options.baseDir,
         inlineStyle: true,
         inlineTemplate: true,
         flat: true,
-        path: `/${name}/src`,
+        path: sourceDir,
       }),
       schematic('service', {
         name: name,
-        sourceDir: options.baseDir,
         flat: true,
-        path: `/${name}/src`,
+        path: sourceDir,
         module: `${name}.module.ts`,
       }),
     ])(host, context);
