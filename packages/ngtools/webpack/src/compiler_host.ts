@@ -89,8 +89,9 @@ export class VirtualFileStats extends VirtualStats {
   }
   getSourceFile(languageVersion: ts.ScriptTarget, setParentNodes: boolean) {
     if (!this._sourceFile) {
+      // console.log(this._path)
       this._sourceFile = ts.createSourceFile(
-        this._path,
+        workaroundResolve(this._path),
         this._content,
         languageVersion,
         setParentNodes);
@@ -303,7 +304,12 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       const content = this.readFile(fileName);
 
       if (!this._cache && content) {
-        return ts.createSourceFile(fileName, content, languageVersion, this._setParentNodes);
+        return ts.createSourceFile(
+          workaroundResolve(fileName),
+          content,
+          languageVersion,
+          this._setParentNodes,
+        );
       } else {
         stats = this._files[fileName];
         if (!stats) {
@@ -373,4 +379,13 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       return this.readFile(fileName);
     }
   }
+}
+
+
+// `TsCompilerAotCompilerTypeCheckHostAdapter` in @angular/compiler-cli seems to resolve module
+// names directly via `resolveModuleName`, which prevents full Path usage.
+// To work around this we must provide the same path format as TS internally uses in
+// the SourceFile paths.
+export function workaroundResolve(path: Path | string) {
+  return getSystemPath(normalize(path)).replace(/\\/g, '/');
 }

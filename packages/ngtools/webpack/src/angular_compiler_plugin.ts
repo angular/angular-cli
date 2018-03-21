@@ -14,7 +14,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
 import { time, timeEnd } from './benchmark';
-import { WebpackCompilerHost } from './compiler_host';
+import { WebpackCompilerHost, workaroundResolve } from './compiler_host';
 import { resolveEntryModuleFromMain } from './entry_resolver';
 import { gatherDiagnostics, hasErrors } from './gather_diagnostics';
 import { LazyRouteMap, findLazyRoutes } from './lazy_routes';
@@ -497,6 +497,8 @@ export class AngularCompilerPlugin {
           moduleKey = `${lazyRouteModule}.ngfactory${factoryModuleName}`;
         }
 
+        modulePath = workaroundResolve(modulePath);
+
         if (moduleKey in this._lazyRoutes) {
           if (this._lazyRoutes[moduleKey] !== modulePath) {
             // Found a duplicate, this is an error.
@@ -736,8 +738,12 @@ export class AngularCompilerPlugin {
   private _makeTransformers() {
     const isAppPath = (fileName: string) =>
       !fileName.endsWith('.ngfactory.ts') && !fileName.endsWith('.ngstyle.ts');
-    const isMainPath = (fileName: string) => fileName === this._mainPath;
-    const getEntryModule = () => this.entryModule;
+    const isMainPath = (fileName: string) => fileName === (
+      this._mainPath ? workaroundResolve(this._mainPath) : this._mainPath
+    );
+    const getEntryModule = () => this.entryModule
+      ? { path: workaroundResolve(this.entryModule.path), className: this.entryModule.className }
+      : this.entryModule;
     const getLazyRoutes = () => this._lazyRoutes;
     const getTypeChecker = () => this._getTsProgram().getTypeChecker();
 
