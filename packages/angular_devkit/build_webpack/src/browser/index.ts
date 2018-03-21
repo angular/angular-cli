@@ -81,7 +81,7 @@ export interface BrowserBuilderOptions {
   // A couple of options have different names.
   sourceMap: boolean; // previously 'sourcemaps'.
   evalSourceMap: boolean; // previously 'evalSourcemaps'.
-  optimizationLevel: number; // previously 'target'.
+  optimization: boolean; // previously 'target'.
   i18nLocale?: string; // previously 'locale'.
   i18nMissingTranslation?: string; // previously 'missingTranslation'.
 

@@ -18,7 +18,7 @@ describe('Browser Builder optimization level', () => {
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
   it('works', (done) => {
-    const overrides = { optimizationLevel: 1 };
+    const overrides = { optimization: true };
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
@@ -34,7 +34,7 @@ describe('Browser Builder optimization level', () => {
   it('tsconfig target changes optimizations to use ES2015', (done) => {
     host.replaceInFile('tsconfig.json', '"target": "es5"', '"target": "es2015"');
 
-    const overrides = { optimizationLevel: 1 };
+    const overrides = { optimization: true };
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),

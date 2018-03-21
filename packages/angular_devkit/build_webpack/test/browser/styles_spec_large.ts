@@ -211,7 +211,7 @@ describe('Browser Builder styles', () => {
   it(`supports material icons`, (done) => {
     const overrides = {
       extractCss: true,
-      optimizationLevel: 1,
+      optimization: true,
       styles: [
         { input: '../../../../node_modules/material-design-icons/iconfont/material-icons.css' },
       ],
@@ -360,7 +360,7 @@ describe('Browser Builder styles', () => {
         div { flex: 1 }`,
     });
 
-    const overrides = { extractCss: true, optimizationLevel: 0 };
+    const overrides = { extractCss: true, optimization: false };
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
@@ -383,7 +383,7 @@ describe('Browser Builder styles', () => {
         div { flex: 1 }`,
     });
 
-    const overrides = { extractCss: true, optimizationLevel: 1 };
+    const overrides = { extractCss: true, optimization: true };
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),

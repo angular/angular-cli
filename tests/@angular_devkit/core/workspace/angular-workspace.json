@@ -56,7 +56,7 @@
           },
           "configurations": {
             "production": {
-              "optimizationLevel": 1,
+              "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
               "extractCss": true,

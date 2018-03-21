@@ -21,7 +21,7 @@ describe('Browser Builder license extraction', () => {
   // TODO: fix VFS use in webpack and the test host, and reenable this test.
   xit('works', (done) => {
     // TODO: make license extraction independent from optimization level.
-    const overrides = { extractLicenses: true, optimizationLevel: 1 };
+    const overrides = { extractLicenses: true, optimization: true };
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),

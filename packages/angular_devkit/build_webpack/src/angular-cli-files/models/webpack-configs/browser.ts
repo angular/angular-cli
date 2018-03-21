@@ -39,7 +39,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
       chunksSortMode: packageChunkSort(appConfig),
       excludeChunks: lazyChunks,
       xhtml: true,
-      minify: buildOptions.optimizationLevel === 1 ? {
+      minify: buildOptions.optimization ? {
         caseSensitive: true,
         collapseWhitespace: true,
         keepClosingSlash: true
@@ -53,7 +53,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   let sourcemaps: string | false = false;
   if (buildOptions.sourceMap) {
     // See https://webpack.js.org/configuration/devtool/ for sourcemap types.
-    if (buildOptions.evalSourceMap && buildOptions.optimizationLevel === 0) {
+    if (buildOptions.evalSourceMap && !buildOptions.optimization) {
       // Produce eval sourcemaps for development with serve, which are faster.
       sourcemaps = 'eval';
     } else {

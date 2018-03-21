@@ -217,7 +217,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   } catch (e) { }
 
   return {
-    mode: buildOptions.optimizationLevel === 0 ? 'development' : 'production',
+    mode: buildOptions.optimization ? 'production': 'development',
     devtool: false,
     resolve: {
       extensions: ['.ts', '.js'],

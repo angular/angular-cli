@@ -81,7 +81,7 @@ describe('Workspace', () => {
             },
             configurations: {
               production: {
-                optimizationLevel: 1,
+                optimize: true,
                 outputHashing: 'all',
                 sourceMap: false,
                 extractCss: true,

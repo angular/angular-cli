@@ -79,7 +79,7 @@ describe('Browser Builder scripts array', () => {
     host.writeMultipleFiles(scripts);
 
     const overrides = {
-      optimizationLevel: 1,
+      optimization: true,
       sourceMap: true,
       outputHashing: 'all',
       scripts: getScriptsOption(),

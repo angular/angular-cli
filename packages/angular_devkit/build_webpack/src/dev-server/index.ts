@@ -149,7 +149,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
           });
         }
 
-        if (browserOptions.optimizationLevel > 0) {
+        if (browserOptions.optimization) {
           this.context.logger.error(tags.stripIndents`
             ****************************************************************************************
             This is a simple server for use in testing or debugging Angular applications locally.
@@ -241,13 +241,13 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
         htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
       },
       stats: browserOptions.verbose ? getWebpackStatsConfig(browserOptions.verbose) : false,
-      compress: browserOptions.optimizationLevel > 0,
+      compress: browserOptions.optimization,
       watchOptions: {
         poll: browserOptions.poll,
       },
       https: options.ssl,
       overlay: {
-        errors: browserOptions.optimizationLevel === 0,
+        errors: !browserOptions.optimization,
         warnings: false,
       },
       contentBase: false,

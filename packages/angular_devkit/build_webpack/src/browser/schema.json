@@ -63,10 +63,10 @@
       },
       "additionalProperties": false
     },
-    "optimizationLevel": {
-      "type": "number",
+    "optimization": {
+      "type": "boolean",
       "description": "Defines the optimization level of the build.",
-      "default": 0
+      "default": false
     },
     "environment": {
       "type": "string",
