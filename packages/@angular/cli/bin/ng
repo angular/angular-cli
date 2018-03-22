@@ -16,6 +16,7 @@ const resolve = require('resolve');
 const stripIndents = require('common-tags').stripIndents;
 const yellow = require('chalk').yellow;
 const SemVer = require('semver').SemVer;
+const semver = require('semver');
 const events = require('events');
 
 
@@ -65,68 +66,18 @@ if (process.env['NG_CLI_PROFILING']) {
 }
 
 
-// Show the warnings due to package and version deprecation.
+// Show the warnings/errors due to package and version deprecation.
 const version = new SemVer(process.version);
-if (version.compare(new SemVer('6.9.0')) < 0
-    && CliConfig.fromGlobal().get('warnings.nodeDeprecation')) {
+if (version.compare(new SemVer('8.9.0')) < 0
+  && CliConfig.fromGlobal().get('warnings.nodeDeprecation')) {
   process.stderr.write(yellow(stripIndents`
-    You are running version ${version.version} of Node, which will not be supported in future
-    versions of the CLI. The official Node version that will be supported is 6.9 and greater.
+    You are running version ${version.version} of Node, which is not supported by Angular CLI v6.
+    The official Node version that is supported is 8.9 and greater.
 
-    To disable this warning use "ng set --global warnings.nodeDeprecation=false".
+    Please visit https://nodejs.org/en/ to find instructions on how to update Node.
   `));
-}
 
-
-if (require('../package.json')['name'] == 'angular-cli'
-  && CliConfig.fromGlobal().get('warnings.packageDeprecation')) {
-  process.stderr.write(yellow(stripIndents`
-    As a forewarning, we are moving the CLI npm package to "@angular/cli" with the next release,
-    which will only support Node 6.9 and greater. This package will be officially deprecated
-    shortly after.
-
-    To disable this warning use "ng set --global warnings.packageDeprecation=false".
-  `));
-}
-
-const packageJsonProjectPath = findUp('package.json', process.cwd(), true);
-if (packageJsonProjectPath && fs.existsSync(packageJsonProjectPath)) {
-  const packageJsonProject = require(packageJsonProjectPath);
-  const deps = packageJsonProject['dependencies'] || {};
-  const devDeps = packageJsonProject['devDependencies'] || {};
-  const hasOldDep = !!deps['angular-cli'];
-  const hasDep = !!deps['@angular/cli'];
-  const hasOldDevDep = !!devDeps['angular-cli'];
-  const hasDevDep = !!devDeps['@angular/cli'];
-
-  if (hasOldDep || hasOldDevDep || !(hasDevDep || hasDep)) {
-    const warnings = [
-      'Unable to find "@angular/cli" in devDependencies.',
-      ''
-    ];
-
-    if (hasOldDep || hasOldDevDep) {
-      warnings.push(
-        'The package "angular-cli" has been deprecated and renamed to "@angular/cli".',
-        '');
-    }
-
-    warnings.push('Please take the following steps to avoid issues:');
-
-    if (hasOldDep) {
-      warnings.push('"npm uninstall --save angular-cli"');
-    }
-    if (hasOldDevDep) {
-      warnings.push('"npm uninstall --save-dev angular-cli"');
-    }
-    if (hasDep) {
-      warnings.push('"npm uninstall --save @angular/cli"')
-    }
-    if (!hasDevDep) {
-      warnings.push('"npm install --save-dev @angular/cli@latest"');
-    }
-    process.stderr.write(yellow(warnings.join('\n'), '\n\n'));
-  }
+  process.exit(3);
 }
 
 resolve('@angular/cli', { basedir: process.cwd() },
@@ -139,9 +90,6 @@ resolve('@angular/cli', { basedir: process.cwd() },
       // npm package). Most common cause for hitting this is `ng new`
       cli = require('../lib/cli');
     } else {
-      // Verify that package's version.
-      Version.assertPostWebpackVersion();
-
       // This was run from a global, check local version.
       const globalVersion = new SemVer(packageJson['version']);
       let localVersion;
