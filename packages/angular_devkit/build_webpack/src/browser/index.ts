@@ -5,14 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
 import {
   BuildEvent,
   Builder,
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
-import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
+import { Path, getSystemPath, join, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable } from 'rxjs/Observable';
 import { concat as concatObservable } from 'rxjs/observable/concat';
@@ -90,11 +89,7 @@ export interface BrowserBuilderOptions {
   styles: ExtraEntryPoint[];
   stylePreprocessorOptions: { includePaths: string[] };
 
-  // Some options are not needed anymore.
-  // app?: string; // apps aren't used with build facade
-
-  // TODO: figure out what to do about these.
-  environment?: string; // Maybe replace with 'fileReplacement' object?
+  fileReplacements: { from: string; to: string; }[];
 }
 
 export interface AssetPattern {
@@ -130,7 +125,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
 
     return concatObservable(
       options.deleteOutputPath
-        ? this._deleteOutputDir(root, normalize(options.outputPath))
+        ? this._deleteOutputDir(root, normalize(options.outputPath), this.context.host)
         : empty<BuildEvent>(),
       new Observable(obs => {
         // Ensure Build Optimizer is only used with AOT.
@@ -207,8 +202,21 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
     );
   }
 
-  buildWebpackConfig(root: Path, projectRoot: Path, options: BrowserBuilderOptions) {
+  buildWebpackConfig(
+    root: Path,
+    projectRoot: Path,
+    options: BrowserBuilderOptions,
+  ) {
     let wco: WebpackConfigOptions;
+
+    const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
+
+    options.fileReplacements.forEach(({from, to}) => {
+      host.aliases.set(
+        join(root, normalize(from)),
+        join(root, normalize(to)),
+      );
+    });
 
     // TODO: make target defaults into configurations instead
     // options = this.addTargetDefaults(options);
@@ -268,24 +276,24 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
 
     if (wco.appConfig.main || wco.appConfig.polyfills) {
       const typescriptConfigPartial = wco.buildOptions.aot
-        ? getAotConfig(wco, this.context.host as virtualFs.Host<fs.Stats>)
-        : getNonAotConfig(wco, this.context.host as virtualFs.Host<fs.Stats>);
+        ? getAotConfig(wco, host)
+        : getNonAotConfig(wco, host);
       webpackConfigs.push(typescriptConfigPartial);
     }
 
     return webpackMerge(webpackConfigs);
   }
 
-  private _deleteOutputDir(root: Path, outputPath: Path): Observable<void> {
+  private _deleteOutputDir(root: Path, outputPath: Path, host: virtualFs.Host): Observable<void> {
     const resolvedOutputPath = resolve(root, outputPath);
     if (resolvedOutputPath === root) {
       throw new Error('Output path MUST not be project root directory!');
     }
 
-    return this.context.host.exists(resolvedOutputPath).pipe(
+    return host.exists(resolvedOutputPath).pipe(
       switchMap(exists => {
         if (exists) {
-          return this.context.host.delete(resolvedOutputPath);
+          return host.delete(resolvedOutputPath);
         } else {
           return empty<void>();
         }

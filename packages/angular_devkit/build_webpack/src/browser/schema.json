@@ -58,9 +58,21 @@
       "description": "Defines the optimization level of the build.",
       "default": false
     },
-    "environment": {
-      "type": "string",
-      "description": "Defines the build environment."
+    "fileReplacements": {
+      "description": "Replace files with other files in the build.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          }
+        }
+      },
+      "default": []
     },
     "outputPath": {
       "type": "string",

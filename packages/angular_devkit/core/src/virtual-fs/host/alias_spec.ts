@@ -43,7 +43,7 @@ describe('AliasHost', () => {
     const aHost = new AliasHost(host);
     aHost.read(normalize('/some/folder/file'))
         .subscribe(x => expect(x).toBe(content));
-    aHost.aliases.set(normalize('/some'), normalize('/other');
+    aHost.aliases.set(normalize('/some'), normalize('/other'));
 
     // This file will not exist because /other/path does not exist.
     try {
