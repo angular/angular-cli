@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+export * from './alias';
 export * from './buffer';
 export * from './interface';
 export * from './memory';
