@@ -2,7 +2,7 @@
   "name": "<%= dasherize(name) %>",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/common": "^5.2.0",
-    "@angular/core": "^5.2.0"
+    "@angular/common": "^6.0.0-rc.0 || ^6.0.0",
+    "@angular/core": "^6.0.0-rc.0 || ^6.0.0"
   }
 }
