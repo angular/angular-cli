@@ -9,6 +9,7 @@ import {
   useCIDefaults,
   useBuiltPackages,
   useDevKit,
+  updateJsonFile,
 } from '../utils/project';
 import {gitClean, gitCommit} from '../utils/git';
 import {getGlobalVariable} from '../utils/env';

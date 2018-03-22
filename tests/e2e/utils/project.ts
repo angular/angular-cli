@@ -168,7 +168,7 @@ export function useNgVersion(version: string) {
 export function useCIDefaults() {
   return updateJsonFile('angular.json', workspaceJson => {
     // Disable progress reporting on CI to reduce spam.
-    const appArchitect = workspaceJson.projects.app.architect;
+    const appArchitect = workspaceJson.projects['test-project'].architect;
     appArchitect.build.options.progress = false;
     appArchitect.test.options.progress = false;
   });
