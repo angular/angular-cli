@@ -113,7 +113,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     plugins: extraPlugins.concat([
       new IndexHtmlWebpackPlugin({
         input: path.resolve(root, appConfig.index),
-        output: path.relative(projectRoot, path.resolve(root, appConfig.index)),
+        output: path.basename(appConfig.index),
         baseHref: buildOptions.baseHref,
         entrypoints: generateEntryPoints(appConfig),
         deployUrl: buildOptions.deployUrl,
