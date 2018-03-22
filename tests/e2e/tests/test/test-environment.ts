@@ -6,7 +6,7 @@ export default function () {
   return;
 
   // Tests run in 'dev' environment by default.
-  return writeFile('src/app/environment.spec.ts', `
+  return writeFile('projects/test-project/src/app/environment.spec.ts', `
       import { environment } from '../environments/environment';
 
       describe('Test environment', () => {
@@ -18,7 +18,7 @@ export default function () {
     .then(() => ng('test', '--watch=false'))
 
     // Tests can run in different environment.
-    .then(() => writeFile('src/app/environment.spec.ts', `
+    .then(() => writeFile('projects/test-project/src/app/environment.spec.ts', `
       import { environment } from '../environments/environment';
 
       describe('Test environment', () => {

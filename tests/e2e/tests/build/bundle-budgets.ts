@@ -34,7 +34,7 @@ export default function () {
   const promiseFactories = budgetConfigs.map(cfg => {
     if (cfg.expectation === 'error') {
       return () => {
-        return updateJsonFile('.angular-cli.json', (json) => { json.apps[0].budgets = [cfg.budget]; })
+        return updateJsonFile('angular.json', (json) => { json.apps[0].budgets = [cfg.budget]; })
           .then(() => expectToFail(() => ng('build', '--optimization-level', '1')))
           .then(errorMessage => {
             if (!/ERROR in budgets/.test(errorMessage)) {
@@ -44,7 +44,7 @@ export default function () {
       };
     } else if (cfg.expectation === 'warning') {
       return () => {
-        return updateJsonFile('.angular-cli.json', (json) => { json.apps[0].budgets = [cfg.budget]; })
+        return updateJsonFile('angular.json', (json) => { json.apps[0].budgets = [cfg.budget]; })
           .then(() => ng('build', '--optimization-level', '1'))
           .then(({ stdout }) => {
             if (!/WARNING in budgets/.test(stdout)) {
@@ -54,7 +54,7 @@ export default function () {
       };
     } else { // pass
       return () => {
-        return updateJsonFile('.angular-cli.json', (json) => { json.apps[0].budgets = [cfg.budget]; })
+        return updateJsonFile('angular.json', (json) => { json.apps[0].budgets = [cfg.budget]; })
           .then(() => ng('build', '--optimization-level', '1'))
           .then(({ stdout }) => {
             if (/(WARNING|ERROR)/.test(stdout)) {

@@ -6,7 +6,7 @@ export default async function () {
   // Investigate and re-enable afterwards.
 
   // Disable the strict TS version check for nightly
-  await updateJsonFile('src/tsconfig.app.json', configJson => {
+  await updateJsonFile('projects/test-project/src/tsconfig.app.json', configJson => {
     configJson.angularCompilerOptions = {
       ...configJson.angularCompilerOptions,
       disableTypeScriptVersionCheck: true,

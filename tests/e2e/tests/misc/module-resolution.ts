@@ -10,7 +10,7 @@ export default async function () {
   // Might be https://github.com/npm/npm/issues/19747 or https://github.com/npm/npm/issues/11973.
   return;
 
-  await updateJsonFile('src/tsconfig.app.json', tsconfig => {
+  await updateJsonFile('projects/test-project/src/tsconfig.app.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
       '*': ['../node_modules/*'],
     };
@@ -25,19 +25,19 @@ export default async function () {
 
   await expectToFail(() => ng('build'));
 
-  await updateJsonFile('src/tsconfig.app.json', tsconfig => {
+  await updateJsonFile('projects/test-project/src/tsconfig.app.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
       '@angular/common': [ '../xyz/common' ],
     };
   });
   await ng('build');
 
-  await updateJsonFile('src/tsconfig.app.json', tsconfig => {
+  await updateJsonFile('projects/test-project/src/tsconfig.app.json', tsconfig => {
     delete tsconfig.compilerOptions.paths;
   });
 
-  await prependToFile('src/app/app.module.ts', 'import * as firebase from \'firebase\';');
-  await appendToFile('src/app/app.module.ts', 'firebase.initializeApp({});');
+  await prependToFile('projects/test-project/src/app/app.module.ts', 'import * as firebase from \'firebase\';');
+  await appendToFile('projects/test-project/src/app/app.module.ts', 'firebase.initializeApp({});');
 
   await silentNpm('install', 'firebase@3.7.8');
   await ng('build', '--aot');
@@ -47,12 +47,12 @@ export default async function () {
   await ng('build', '--aot');
   await ng('test', '--watch=false');
 
-  await updateJsonFile('src/tsconfig.app.json', tsconfig => {
+  await updateJsonFile('projects/test-project/src/tsconfig.app.json', tsconfig => {
     tsconfig.compilerOptions.paths = {};
   });
   await ng('build');
 
-  await updateJsonFile('src/tsconfig.app.json', tsconfig => {
+  await updateJsonFile('projects/test-project/src/tsconfig.app.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
       '@app/*': ['*'],
       '@lib/*/test': ['*/test'],
@@ -60,14 +60,14 @@ export default async function () {
   });
   await ng('build');
 
-  await updateJsonFile('src/tsconfig.app.json', tsconfig => {
+  await updateJsonFile('projects/test-project/src/tsconfig.app.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
       '@firebase/polyfill': ['@firebase/polyfill/index.ts'],
     };
   });
   await expectToFail(() => ng('build'));
 
-  await updateJsonFile('src/tsconfig.app.json', tsconfig => {
+  await updateJsonFile('projects/test-project/src/tsconfig.app.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
       '@firebase/polyfill*': ['@firebase/polyfill/index.ts'],
     };

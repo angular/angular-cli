@@ -8,5 +8,5 @@ export default function() {
 
   return ng('build', '--prod', '--extract-licenses=false')
     .then(() => expectFileToExist(join(process.cwd(), 'dist')))
-    .then(() => expectToFail(() => expectFileToExist('dist/3rdpartylicenses.txt')));
+    .then(() => expectToFail(() => expectFileToExist('dist/test-project/3rdpartylicenses.txt')));
 }

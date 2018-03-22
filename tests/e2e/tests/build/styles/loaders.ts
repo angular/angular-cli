@@ -31,7 +31,7 @@ export default function () {
     .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.styles = [
-        { input: 'project/test-project/src/styles.scss' }
+        { input: 'projects/test-project/src/styles.scss' }
       ];
     }))
     .then(() => replaceInFile('projects/test-project/src/app/app.component.ts',

@@ -5,7 +5,7 @@ import { writeMultipleFiles, expectFileToMatch, expectFileMatchToExist } from '.
 
 function verifyMedia(css: RegExp, content: RegExp) {
   return expectFileMatchToExist('./dist', css)
-    .then(fileName => expectFileToMatch(`dist/${fileName}`, content));
+    .then(fileName => expectFileToMatch(`dist/test-project/${fileName}`, content));
 }
 
 export default function() {

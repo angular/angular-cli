@@ -19,6 +19,6 @@ export default function(skipCleaning: () => void) {
     // test the inclusion of metadata
     // This build also test resource URLs without ./
     .then(() => exec(normalize('node_modules/.bin/webpack-cli'), '--mode=development'))
-    .then(() => expectFileToMatch('dist/test-project/app.main.js', 'AppModuleNgFactory'))
+    .then(() => expectFileToMatch('dist/app.main.js', 'AppModuleNgFactory'))
     .then(() => skipCleaning());
 }

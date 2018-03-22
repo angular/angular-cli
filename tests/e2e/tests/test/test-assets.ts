@@ -11,10 +11,10 @@ export default function () {
 
   return Promise.resolve()
     .then(() => writeMultipleFiles({
-      'src/assets/file.txt': 'assets-folder-content',
-      'src/file.txt': 'file-content',
+      'projects/test-project/src/assets/file.txt': 'assets-folder-content',
+      'projects/test-project/src/file.txt': 'file-content',
       // Not using `async()` in tests as it seemed to swallow `fetch()` errors
-      'src/app/app.component.spec.ts': stripIndent`
+      'projects/test-project/src/app/app.component.spec.ts': stripIndent`
         describe('Test Runner', () => {
           const fetch = global['fetch'];
           it('should serve files in assets folder', (done) => {
@@ -36,7 +36,7 @@ export default function () {
         });
       `
     }))
-    // Test failure condition (no assets in .angular-cli.json)
+    // Test failure condition (no assets in angular.json)
     .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.assets = [];
@@ -47,7 +47,7 @@ export default function () {
     .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.assets = [
-        { 'glob': '**/*', 'input': 'src/assets' },
+        { 'glob': '**/*', 'input': 'projects/test-project/src/assets' },
         { 'glob': 'file.txt' },
       ];
     }))

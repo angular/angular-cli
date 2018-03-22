@@ -7,7 +7,7 @@ export default function () {
   return;
 
   return Promise.resolve()
-    .then(() => writeFile('.angular-cli.json', JSON.stringify({
+    .then(() => writeFile('angular.json', JSON.stringify({
       apps: [{
         root: 'src',
         main: 'main.ts',
@@ -35,7 +35,7 @@ export default function () {
           });
         });
       `,
-      '.angular-cli.json': JSON.stringify({
+      'angular.json': JSON.stringify({
         apps: [{
           root: 'src',
           scripts: ['./script.js']

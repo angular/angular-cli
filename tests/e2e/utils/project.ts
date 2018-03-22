@@ -1,7 +1,6 @@
 import { readFile, writeFile, replaceInFile } from './fs';
 import { execAndWaitForOutputToMatch, silentNpm, ng } from './process';
 import { getGlobalVariable } from './env';
-import { intersects } from 'semver';
 
 const packages = require('../../../lib/packages').packages;
 

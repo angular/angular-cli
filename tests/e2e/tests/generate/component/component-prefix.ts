@@ -8,7 +8,7 @@ export default function() {
   const componentDir = join('src', 'app', 'test-component');
 
   return Promise.resolve()
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    .then(() => updateJsonFile('angular.json', configJson => {
       const app = configJson['apps'][0];
       app['prefix'] = 'pre';
     }))

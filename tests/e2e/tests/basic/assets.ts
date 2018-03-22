@@ -34,8 +34,8 @@ export default function () {
       './node_modules/some-package/node_modules-asset.txt': 'node_modules-asset.txt',
     }))
     // TODO(architect): Review allowOutsideOutDir logic inside build-webpack.
-    // // Add invalid asset config in .angular-cli.json.
-    // .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    // // Add invalid asset config in angular.json.
+    // .then(() => updateJsonFile('angular.json', configJson => {
     //   const app = configJson['apps'][0];
     //   app['assets'] = [
     //     { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': '../temp' }
@@ -43,8 +43,8 @@ export default function () {
     // }))
     // .then(() => expectToFail(() => ng('build')))
 
-    // // Set an exception for the invalid asset config in .angular-cli.json.
-    // .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    // // Set an exception for the invalid asset config in angular.json.
+    // .then(() => updateJsonFile('angular.json', configJson => {
     //   const app = configJson['apps'][0];
     //   app['assets'] = [
     //     { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': '../temp',
@@ -54,7 +54,7 @@ export default function () {
     // .then(() => ng('build'))
 
     // // This asset should fail even with the exception above.
-    // .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    // .then(() => updateJsonFile('angular.json', configJson => {
     //   const app = configJson['apps'][0];
     //   app['assets'] = [
     //     { 'glob': '**/*', 'input': '../node_modules/some-package/', 'output': '../../temp',
@@ -64,7 +64,7 @@ export default function () {
     // .then(() => expectToFail(() => ng('build')))
 
     // // This asset will not fail with the exception above.
-    // .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    // .then(() => updateJsonFile('angular.json', configJson => {
     //   const app = configJson['apps'][0];
     //   app['outDir'] = tempDir;
     //   app['assets'] = [
@@ -73,13 +73,13 @@ export default function () {
     //   ];
     // }))
     // .then(() => ng('build'))
-    // .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    // .then(() => updateJsonFile('angular.json', configJson => {
     //   const app = configJson['apps'][0];
     //   app['outDir'] = 'dist';
     // })
 
     // // This asset should also fail from reading from outside the project.
-    // .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    // .then(() => updateJsonFile('angular.json', configJson => {
     //   const app = configJson['apps'][0];
     //   app['assets'] = [
     //     { 'glob': '**/*', 'input': '/temp-folder/outside/of/project', 'output': 'temp' }
@@ -87,10 +87,10 @@ export default function () {
     // }))
     // .then(() => expectToFail(() => ng('build')))
 
-    // Add asset config in .angular-cli.json.
+    // Add asset config in angular.json.
     .then(() => updateJsonFile('angular.json', workspaceJson => {
       const assets = [
-        { 'glob': '**/*', 'input': 'src/folder', 'output': 'folder' },
+        { 'glob': '**/*', 'input': 'projects/test-project/src/folder', 'output': 'folder' },
         { 'glob': 'glob-asset.txt' },
         { 'glob': 'output-asset.txt', 'output': 'output-folder' },
         { 'glob': '**/*', 'input': 'node_modules/some-package/', 'output': 'package-folder' }
@@ -111,7 +111,7 @@ export default function () {
     .then(() => expectToFail(() => expectFileToExist('dist/assets/.gitkeep')))
     // Update app to test assets are present.
     .then(_ => !ejected && writeMultipleFiles({
-      'src/app/app.module.ts': `
+      'projects/test-project/src/app/app.module.ts': `
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
         import { FormsModule } from '@angular/forms';
@@ -132,7 +132,7 @@ export default function () {
         })
         export class AppModule { }
       `,
-      'src/app/app.component.ts': `
+      'projects/test-project/src/app/app.component.ts': `
         import { Component } from '@angular/core';
         import { Http, Response } from '@angular/http';
 
@@ -152,7 +152,7 @@ export default function () {
               .subscribe(res => asset.content = res['_body']));
           }
         }`,
-      'src/app/app.component.spec.ts': `
+      'projects/test-project/src/app/app.component.spec.ts': `
         import { TestBed, async } from '@angular/core/testing';
         import { HttpModule } from '@angular/http';
         import { AppComponent } from './app.component';

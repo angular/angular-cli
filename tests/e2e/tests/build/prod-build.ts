@@ -22,8 +22,8 @@ export default function() {
     .then(() => expectFileToMatch('dist/test-project/3rdpartylicenses.txt', /MIT/))
     // Defaults to AoT
     .then(() => {
-      const main = readdirSync('./dist').find(name => !!name.match(/main.[a-z0-9]+\.js/));
-      expectFileToMatch(`dist/${main}`, /bootstrapModuleFactory\(/);
+      const main = readdirSync('./dist/test-project').find(name => !!name.match(/main.[a-z0-9]+\.js/));
+      expectFileToMatch(`dist/test-project/${main}`, /bootstrapModuleFactory\(/);
     })
     // Check that the process didn't change local files.
     .then(() => !ejected && expectGitToBeClean());
