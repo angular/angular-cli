@@ -155,6 +155,7 @@ export default function (options: LibraryOptions): Rule {
         inlineTemplate: true,
         flat: true,
         path: sourceDir,
+        export: true,
       }),
       schematic('service', {
         name: name,

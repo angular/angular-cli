@@ -78,6 +78,12 @@ describe('Library Schematic', () => {
     expect(workspace.projects.foo).toBeDefined();
   });
 
+  it('should export the component in the NgModule', () => {
+    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+    const fileContent = getFileContent(tree, '/projects/foo/src/lib/foo.module.ts');
+    expect(fileContent).toContain('exports: [FooComponent]');
+  });
+
   describe(`update package.json`, () => {
     it(`should add ng-packagr to devDependencies`, () => {
       const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
