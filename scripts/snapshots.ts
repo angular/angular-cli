@@ -92,6 +92,8 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
     _exec('git', ['clone', url], { cwd: root }, publishLogger);
 
     const destPath = path.join(root, path.basename(pkg.snapshotRepo));
+    // Clear snapshot directory before publishing to remove deleted build files.
+    _exec('git', ['rm', '-rf', './'], { cwd: destPath }, publishLogger);
     _copy(pkg.dist, destPath);
 
     if (githubToken) {
