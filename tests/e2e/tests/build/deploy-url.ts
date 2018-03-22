@@ -10,7 +10,7 @@ export default function () {
 
   return Promise.resolve()
     .then(() => writeMultipleFiles({
-      'src/styles.css': 'div { background: url("./assets/more.png"); }',
+      'projects/test-project/src/styles.css': 'div { background: url("./assets/more.png"); }',
     }))
     // use image with file size >10KB to prevent inlining
     .then(() => copyProjectAsset('images/spectrum.png', './assets/more.png'))
@@ -26,7 +26,7 @@ export default function () {
     .then(() => expectFileToMatch('dist/test-project/tyles.js',
       /\(['"]?deployUrl\/more\.png['"]?\)/))
     .then(() => expectFileToMatch('dist/test-project/runtime.js',
-      /__webpack_require__\.p = "deployUrl\/";/))
+      /__webpack_require__\.p = "deployUrl\/";/));
     // // verify slash is appended to the end of --deploy-url if missing
     // .then(() => ng('build', '--deploy-url=deployUrl', '--extract-css=false'))
     // // skip this in ejected tests

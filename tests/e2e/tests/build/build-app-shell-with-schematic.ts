@@ -7,9 +7,6 @@ import { readNgVersion } from '../../utils/version';
 
 
 export default function () {
-  // TODO(architect): re-enable after build-webpack supports this functionality.
-  return;
-
   // Skip this in ejected tests.
   if (getGlobalVariable('argv').eject) {
     return Promise.resolve();

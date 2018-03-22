@@ -5,8 +5,6 @@ import {updateJsonFile} from '../../../utils/project';
 
 
 export default function() {
-  // TODO:CONFIG READING
-  return Promise.resolve();
   const appDir = join('projects', 'test-project', 'src');
 
   return Promise.resolve()

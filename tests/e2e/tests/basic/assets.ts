@@ -192,5 +192,5 @@ export default function () {
         });`,
     }))
     .then(() => !ejected && ng('test', '--watch=false'))
-    .then(() => !ejected && ng('e2e', 'app-e2e'));
+    .then(() => !ejected && ng('e2e', 'test-project-e2e'));
 }

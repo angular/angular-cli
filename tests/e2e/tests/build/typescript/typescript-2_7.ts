@@ -4,7 +4,6 @@ import { updateJsonFile } from '../../../utils/project';
 export default async function () {
   // TODO(architect): this test fails with weird fsevents install errors.
   // Investigate and re-enable afterwards.
-  return;
 
   // Disable the strict TS version check for nightly
   await updateJsonFile('src/tsconfig.app.json', configJson => {

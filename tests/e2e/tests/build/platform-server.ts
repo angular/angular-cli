@@ -14,9 +14,6 @@ import { readNgVersion } from '../../utils/version';
 import { expectToFail } from '../../utils/utils';
 
 export default function () {
-  // TODO(architect): re-enable after build-webpack supports this functionality.
-  return;
-
   // Skip this for ejected tests.
   if (getGlobalVariable('argv').eject) {
     return Promise.resolve();

@@ -2,7 +2,6 @@ import {join} from 'path';
 import {git, ng, silentNpm} from '../utils/process';
 import {expectFileToExist} from '../utils/fs';
 import {
-  updateTsConfig,
   useSha,
   useNgVersion,
   useCIChrome,

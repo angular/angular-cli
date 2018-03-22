@@ -6,7 +6,7 @@ import { intersects } from 'semver';
 const packages = require('../../../lib/packages').packages;
 
 
-const tsConfigPath = 'src/tsconfig.app.json';
+const tsConfigPath = 'projects/test-project/tsconfig.app.json';
 
 
 export function updateJsonFile(filePath: string, fn: (json: any) => any | void) {

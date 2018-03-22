@@ -13,9 +13,6 @@ import { expectToFail } from '../../utils/utils';
 
 // tslint:disable:max-line-length
 export default function () {
-  // TODO(architect): re-enable after build-webpack supports this functionality.
-  return;
-
   const budgetConfigs = [
     {
       expectation: 'pass',
