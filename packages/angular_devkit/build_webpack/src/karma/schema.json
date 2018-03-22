@@ -102,6 +102,22 @@
         "type": "string"
       },
       "default": []
+    },
+    "fileReplacements": {
+      "description": "Replace files with other files in the build.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          }
+        }
+      },
+      "default": []
     }
   },
   "additionalProperties": false,

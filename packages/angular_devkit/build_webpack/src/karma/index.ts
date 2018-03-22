@@ -12,7 +12,7 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
-import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
+import { Path, getSystemPath, join,  normalize, resolve, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable } from 'rxjs/Observable';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
@@ -63,8 +63,7 @@ export interface KarmaBuilderOptions {
   // logLevel?: string; // same as above
   // reporters?: string; // same as above
 
-  // TODO: figure out what to do about these.
-  environment?: string; // Maybe replace with 'fileReplacement' object?
+  fileReplacements: { from: string; to: string; }[];
 }
 
 export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
@@ -129,6 +128,15 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
     // tslint:disable-next-line:no-any
     let wco: any;
 
+    const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
+
+    options.fileReplacements.forEach(({ from, to }) => {
+      host.aliases.set(
+        join(root, normalize(from)),
+        join(root, normalize(to)),
+      );
+    });
+
     const tsconfigPath = getSystemPath(resolve(root, normalize(options.tsConfig as string)));
     const tsConfig = readTsconfig(tsconfigPath);
 
@@ -159,7 +167,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
     const webpackConfigs: {}[] = [
       getCommonConfig(wco),
       getStylesConfig(wco),
-      getNonAotTestConfig(wco, this.context.host as virtualFs.Host<fs.Stats>),
+      getNonAotTestConfig(wco, host),
       getTestConfig(wco),
     ];
 
