@@ -27,7 +27,7 @@ export default class AddCommand extends SchematicCommand {
   }
 
   validate(options: any) {
-    const collectionName = options.argv[0];
+    const collectionName = options._[0];
 
     if (!collectionName) {
       throw new SilentError(
@@ -40,7 +40,7 @@ export default class AddCommand extends SchematicCommand {
   }
 
   async run(options: any) {
-    const collectionName = options.collection;
+    const collectionName = options._[0];
 
     if (!collectionName) {
       throw new SilentError(
