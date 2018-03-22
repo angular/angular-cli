@@ -5,10 +5,10 @@ import {updateJsonFile} from '../../../utils/project';
 
 
 export default function() {
-  const componentDir = join('src', 'app', 'test-component');
+  const componentDir = join('projects', 'test-project', 'src', 'app', 'test-component');
 
   return Promise.resolve()
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
+    .then(() => updateJsonFile('angular.json', configJson => {
       const comp = configJson.defaults.component;
       comp.flat = false;
     }))

@@ -1,14 +1,15 @@
 import { ng } from '../../../utils/process';
-import { expectToFail } from "../../../utils/utils";
+import { expectToFail } from '../../../utils/utils';
 import { oneLine } from 'common-tags';
 
 export default function () {
   return ng('generate', 'component', 'test-component')
     .then((output) => {
-      if (!output.stdout.match(/update src[\\|\/]app[\\|\/]app.module.ts/)) {
+      // tslint:disable-next-line:max-line-length
+      if (!output.stdout.match(/UPDATE projects[\\|\/]test-project[\\|\/]src[\\|\/]app[\\|\/]app.module.ts/)) {
         throw new Error(oneLine`
           Expected to match
-          "update src/app/app.module.ts"
+          "UPDATE projects/test-project/src/app.module.ts"
           in ${output.stdout}.`);
       }
     })

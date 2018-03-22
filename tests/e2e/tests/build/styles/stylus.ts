@@ -13,34 +13,34 @@ export default function () {
   // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
   return writeMultipleFiles({
-    'src/styles.styl': stripIndents`
+    'projects/test-project/src/styles.styl': stripIndents`
       @import './imported-styles.styl';
       body { background-color: blue; }
     `,
-    'src/imported-styles.styl': stripIndents`
+    'projects/test-project/src/imported-styles.styl': stripIndents`
       p { background-color: red; }
     `,
-    'src/app/app.component.styl': stripIndents`
+    'projects/test-project/src/app/app.component.styl': stripIndents`
         .outer {
           .inner {
             background: #fff;
           }
         }
       `})
-    .then(() => deleteFile('src/app/app.component.css'))
-    .then(() => updateJsonFile('.angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects.app.architect;
+    .then(() => deleteFile('projects/test-project/src/app/app.component.css'))
+    .then(() => updateJsonFile('angular.json', workspaceJson => {
+      const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.styles = [
-        { input: 'src/styles.styl' }
+        { input: 'projects/test-project/src/styles.styl' }
       ];
     }))
-    .then(() => replaceInFile('src/app/app.component.ts',
+    .then(() => replaceInFile('projects/test-project/src/app/app.component.ts',
       './app.component.css', './app.component.styl'))
     .then(() => ng('build', '--extract-css', '--source-map'))
-    .then(() => expectFileToMatch('dist/styles.css',
+    .then(() => expectFileToMatch('dist/test-project/styles.css',
       /body\s*{\s*background-color: #00f;\s*}/))
-    .then(() => expectFileToMatch('dist/styles.css',
+    .then(() => expectFileToMatch('dist/test-project/styles.css',
       /p\s*{\s*background-color: #f00;\s*}/))
-    .then(() => expectToFail(() => expectFileToMatch('dist/styles.css', '"mappings":""')))
-    .then(() => expectFileToMatch('dist/main.js', /.outer.*.inner.*background:\s*#[fF]+/));
+    .then(() => expectToFail(() => expectFileToMatch('dist/test-project/styles.css', '"mappings":""')))
+    .then(() => expectFileToMatch('dist/test-project/main.js', /.outer.*.inner.*background:\s*#[fF]+/));
 }

@@ -1,13 +1,14 @@
 import chalk from 'chalk';
-import { Command, CommandScope, Option } from '../models/command';
+import { CommandScope, Option } from '../models/command';
 import { parseOptions } from '../models/command-runner';
 import { CliConfig } from '../models/config';
-import { SchematicAvailableOptions } from '../tasks/schematic-get-options';
+import { SchematicCommand } from '../models/schematic-command';
+import { NpmInstall } from '../tasks/npm-install';
 
 const SilentError = require('silent-error');
 
 
-export default class AddCommand extends Command {
+export default class AddCommand extends SchematicCommand {
   readonly name = 'add';
   readonly description = 'Add support for a library to your project.';
   scope = CommandScope.inProject;
@@ -15,25 +16,18 @@ export default class AddCommand extends Command {
   options: Option[] = [];
 
   private async _parseSchematicOptions(collectionName: string): Promise<any> {
-    const SchematicGetOptionsTask = require('../tasks/schematic-get-options').default;
-
-    const getOptionsTask = new SchematicGetOptionsTask({
-      ui: this.ui,
-      project: this.project
-    });
-
-    const availableOptions: SchematicAvailableOptions[] = await getOptionsTask.run({
+    const availableOptions: Option[] = await this.getOptions({
       schematicName: 'ng-add',
       collectionName,
     });
 
     const options = this.options.concat(availableOptions || []);
 
-    return parseOptions(this._rawArgs, options, []);
+    return parseOptions(this._rawArgs, options, [], this.argStrategy);
   }
 
   validate(options: any) {
-    const collectionName = options.collection;
+    const collectionName = options._[0];
 
     if (!collectionName) {
       throw new SilentError(
@@ -45,8 +39,8 @@ export default class AddCommand extends Command {
     return true;
   }
 
-  async run(commandOptions: any) {
-    const collectionName = commandOptions.collection;
+  async run(options: any) {
+    const collectionName = options._[0];
 
     if (!collectionName) {
       throw new SilentError(
@@ -57,8 +51,7 @@ export default class AddCommand extends Command {
 
     const packageManager = CliConfig.fromGlobal().get('packageManager');
 
-    const NpmInstall = require('../tasks/npm-install').default;
-    const SchematicRunTask = require('../tasks/schematic-run').default;
+    const npmInstall: NpmInstall = require('../tasks/npm-install').default;
 
     const packageName = collectionName.startsWith('@')
       ? collectionName.split('/', 2).join('/')
@@ -66,32 +59,26 @@ export default class AddCommand extends Command {
 
     // We don't actually add the package to package.json, that would be the work of the package
     // itself.
-    let npmInstall = new NpmInstall({
-      ui: this.ui,
-      project: this.project,
-      packageManager,
+    await npmInstall(
       packageName,
-      save: false,
-    });
-
-    const schematicRunTask = new SchematicRunTask({
-      ui: this.ui,
-      project: this.project
-    });
-
-    await npmInstall.run();
+      this.logger,
+      packageManager,
+      this.project.root,
+      false);
 
     // Reparse the options with the new schematic accessible.
-    commandOptions = await this._parseSchematicOptions(collectionName);
+    options = await this._parseSchematicOptions(collectionName);
 
     const runOptions = {
-      taskOptions: commandOptions,
+      schematicOptions: options,
       workingDir: this.project.root,
       collectionName,
       schematicName: 'ng-add',
       allowPrivate: true,
+      dryRun: false,
+      force: false,
     };
 
-    await schematicRunTask.run(runOptions);
+    await this.runSchematic(runOptions);
   }
 }

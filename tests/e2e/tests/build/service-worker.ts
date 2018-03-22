@@ -23,9 +23,6 @@ const MANIFEST = {
 };
 
 export default function() {
-  // TODO(architect): re-enable after build-webpack supports this functionality.
-  return;
-
   // Skip this in ejected tests.
   if (getGlobalVariable('argv').eject) {
     return Promise.resolve();
@@ -36,19 +33,19 @@ export default function() {
   return silentNpm('remove', '@angular/service-worker')
     .then(() => silentNpm('install', '@angular/service-worker'))
     .then(() => ng('config', 'apps.0.serviceWorker', 'true'))
-    .then(() => writeFile('src/ngsw-config.json', JSON.stringify(MANIFEST, null, 2)))
-    .then(() => ng('build', '--optimization-level', '1'))
+    .then(() => writeFile('projects/test-project/src/ngsw-config.json', JSON.stringify(MANIFEST, null, 2)))
+    .then(() => ng('build', '--optimization'))
     .then(() => expectFileToExist(join(process.cwd(), 'dist')))
-    .then(() => expectFileToExist(join(process.cwd(), 'dist/ngsw.json')))
-    .then(() => ng('build', '--optimization-level', '1', '--base-href=/foo/bar'))
-    .then(() => expectFileToExist(join(process.cwd(), 'dist/ngsw.json')))
-    .then(() => expectFileToMatch('dist/ngsw.json', /"\/foo\/bar\/index.html"/))
-    .then(() => ng('build', '--optimization-level', '1', '--service-worker=false'))
-    .then(() => expectFileNotToExist('dist/ngsw.json'))
+    .then(() => expectFileToExist(join(process.cwd(), 'dist/test-project/ngsw.json')))
+    .then(() => ng('build', '--optimization', '--base-href=/foo/bar'))
+    .then(() => expectFileToExist(join(process.cwd(), 'dist/test-project/ngsw.json')))
+    .then(() => expectFileToMatch('dist/test-project/ngsw.json', /"\/foo\/bar\/index.html"/))
+    .then(() => ng('build', '--optimization', '--service-worker=false'))
+    .then(() => expectFileNotToExist('dist/test-project/ngsw.json'))
     .then(() => writeFile('node_modules/@angular/service-worker/safety-worker.js', 'false'))
-    .then(() => ng('build', '--optimization-level', '1'))
-    .then(() => expectFileToExist('dist/safety-worker.js'))
-    .then(() => expectFileToExist('dist/worker-basic.min.js'));
+    .then(() => ng('build', '--optimization'))
+    .then(() => expectFileToExist('dist/test-project/safety-worker.js'))
+    .then(() => expectFileToExist('dist/test-project/worker-basic.min.js'));
     // WEBPACK4_DISABLED - eject temporarily disabled for webpack 4 integration
     // .then(() => ng('eject', '--prod'))
     // .then(() => silentNpm('install'))

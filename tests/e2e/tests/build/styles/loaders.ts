@@ -13,31 +13,31 @@ export default function () {
   // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
   return writeMultipleFiles({
-    'src/styles.scss': stripIndents`
+    'projects/test-project/src/styles.scss': stripIndents`
       @import './imported-styles.scss';
       body { background-color: blue; }
     `,
-    'src/imported-styles.scss': stripIndents`
+    'projects/test-project/src/imported-styles.scss': stripIndents`
       p { background-color: red; }
     `,
-    'src/app/app.component.scss': stripIndents`
+    'projects/test-project/src/app/app.component.scss': stripIndents`
         .outer {
           .inner {
             background: #fff;
           }
         }
       `})
-    .then(() => deleteFile('src/app/app.component.css'))
-    .then(() => updateJsonFile('.angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects.app.architect;
+    .then(() => deleteFile('projects/test-project/src/app/app.component.css'))
+    .then(() => updateJsonFile('angular.json', workspaceJson => {
+      const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.styles = [
-        { input: 'src/styles.scss' }
+        { input: 'projects/test-project/src/styles.scss' }
       ];
     }))
-    .then(() => replaceInFile('src/app/app.component.ts',
+    .then(() => replaceInFile('projects/test-project/src/app/app.component.ts',
       './app.component.css', './app.component.scss'))
     .then(() => ng('build'))
-    .then(() => expectToFail(() => expectFileToMatch('dist/styles.css', /exports/)))
-    .then(() => expectToFail(() => expectFileToMatch('dist/main.js',
+    .then(() => expectToFail(() => expectFileToMatch('dist/test-project/styles.css', /exports/)))
+    .then(() => expectToFail(() => expectFileToMatch('dist/test-project/main.js',
       /".*module\.exports.*\.outer.*background:/)));
 }

@@ -58,14 +58,14 @@ export default function () {
     // Fix the error, should trigger a successful rebuild.
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(successRe, 20000),
-      writeFile('src/app/app.component.ts', origContent)
+      writeFile('projects/test-project/src/app/app.component.ts', origContent)
     ]))
     .then(() => wait(2000))
     // Add an syntax error to a non-main file.
     // Build should still be successfull and error reported on forked type checker.
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(errorRe, 20000),
-      writeFile('src/app/app.component.ts', origContent + '\n]]]]]')
+      writeFile('projects/test-project/src/app/app.component.ts', origContent + '\n]]]]]')
     ]))
     .then((results) => {
       const stderr = results[0].stderr;
@@ -81,7 +81,7 @@ export default function () {
     // have an error message in 5s.
     .then(() => Promise.all([
       expectToFail(() => waitForAnyProcessOutputToMatch(errorRe, 5000)),
-      writeFile('src/app/app.component.ts', origContent)
+      writeFile('projects/test-project/src/app/app.component.ts', origContent)
     ]))
     .then(() => wait(2000))
     // Add a major static analysis error on a rebuild.
@@ -103,7 +103,7 @@ export default function () {
     // Fix the error, should trigger a successful rebuild.
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(successRe, 20000),
-      writeFile('src/app/app.component.ts', origContent)
+      writeFile('projects/test-project/src/app/app.component.ts', origContent)
     ]))
     .then(() => killAllProcesses(), (err: any) => {
       killAllProcesses();

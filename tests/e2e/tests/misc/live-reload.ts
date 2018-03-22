@@ -50,7 +50,7 @@ export default function temporarilyDisabledTest() { return Promise.resolve(); }
 
 //   return Promise.resolve()
 //     .then(_ => writeMultipleFiles({
-//       'src/app/app.module.ts': `
+//       'projects/test-project/src/app/app.module.ts': `
 //         import { BrowserModule } from '@angular/platform-browser';
 //         import { NgModule } from '@angular/core';
 //         import { FormsModule } from '@angular/forms';
@@ -104,7 +104,7 @@ export default function temporarilyDisabledTest() { return Promise.resolve(); }
 //     ))
 //     // Let app run.
 //     .then(_ => wait(2000))
-//     .then(_ => appendToFile('src/main.ts', 'console.log(1);'))
+//     .then(_ => appendToFile('projects/test-project/src/main.ts', 'console.log(1);'))
 //     .then(_ => waitForAnyProcessOutputToMatch(webpackGoodRegEx, 10000))
 //     .then(_ => wait(2000))
 //     .then(_ => {
@@ -123,7 +123,7 @@ export default function temporarilyDisabledTest() { return Promise.resolve(); }
 //       protractorGoodRegEx
 //     ))
 //     .then(_ => wait(2000))
-//     .then(_ => appendToFile('src/main.ts', 'console.log(1);'))
+//     .then(_ => appendToFile('projects/test-project/src/main.ts', 'console.log(1);'))
 //     .then(_ => waitForAnyProcessOutputToMatch(webpackGoodRegEx, 10000))
 //     .then(_ => wait(2000))
 //     .then(_ => {
@@ -157,7 +157,7 @@ export default function temporarilyDisabledTest() { return Promise.resolve(); }
 //       protractorGoodRegEx
 //     ))
 //     .then(_ => wait(2000))
-//     .then(_ => appendToFile('src/main.ts', 'console.log(1);'))
+//     .then(_ => appendToFile('projects/test-project/src/main.ts', 'console.log(1);'))
 //     .then(_ => waitForAnyProcessOutputToMatch(webpackGoodRegEx, 10000))
 //     .then(_ => wait(2000))
 //     .then(_ => {

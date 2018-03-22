@@ -5,12 +5,16 @@ import {updateJsonFile} from '../../../utils/project';
 
 
 export default function() {
-  const appDir = join('src', 'app');
+  const appDir = join('projects', 'test-project', 'src');
 
   return Promise.resolve()
-    .then(() => updateJsonFile('.angular-cli.json', configJson => {
-      const comp = configJson.defaults.component;
-      comp.flat = true;
+    // .then(() => updateJsonFile('angular.json', configJson => {
+    //   const comp = configJson.defaults.component;
+    //   comp.flat = true;
+    // }))
+    .then(() => updateJsonFile('angular.json', j => {
+      j.projects['test-project']
+        .schematics['@schematics/angular:component'] = { flat: true };
     }))
     .then(() => ng('generate', 'component', 'test-component'))
     .then(() => expectFileToExist(appDir))

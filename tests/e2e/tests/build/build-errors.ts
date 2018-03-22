@@ -4,6 +4,7 @@ import { writeFile, appendToFile, readFile, replaceInFile } from '../../utils/fs
 import { getGlobalVariable } from '../../utils/env';
 import { expectToFail } from '../../utils/utils';
 
+// tslint:disable:max-line-length
 
 const extraErrors = [
   `Final loader didn't return a Buffer or String`,
@@ -32,12 +33,12 @@ export default function () {
 
   return Promise.resolve()
     // Save the original contents of `./src/app/app.component.ts`.
-    .then(() => readFile('./src/app/app.component.ts'))
+    .then(() => readFile('./projects/test-project/src/app/app.component.ts'))
     .then((contents) => origContent = contents)
     // Check `part of the TypeScript compilation` errors.
     // These should show an error only for the missing file.
-    .then(() => updateJsonFile('./src/tsconfig.app.json', configJson => {
-      configJson.files = ['main.ts'];
+    .then(() => updateJsonFile('./projects/test-project/tsconfig.app.json', configJson => {
+      configJson.files = ['src/main.ts'];
     }))
     .then(() => expectToFail(() => ng('build')))
     .then(({ message }) => {
@@ -48,12 +49,12 @@ export default function () {
         throw new Error(`Did not expect extra errors but got:\n${message}`);
       }
     })
-    .then(() => updateJsonFile('./src/tsconfig.app.json', configJson => {
+    .then(() => updateJsonFile('./projects/test-project/tsconfig.app.json', configJson => {
       configJson.files = undefined;
     }))
     // Check simple single syntax errors.
     // These shouldn't skip emit and just show a TS error.
-    .then(() => appendToFile('./src/app/app.component.ts', ']]]'))
+    .then(() => appendToFile('./projects/test-project/src/app/app.component.ts', ']]]'))
     .then(() => expectToFail(() => ng('build')))
     .then(({ message }) => {
       if (!message.includes('Declaration or statement expected.')) {
@@ -63,9 +64,9 @@ export default function () {
         throw new Error(`Did not expect extra errors but got:\n${message}`);
       }
     })
-    .then(() => writeFile('./src/app/app.component.ts', origContent))
+    .then(() => writeFile('./projects/test-project/src/app/app.component.ts', origContent))
     // Check errors when files were not emitted due to static analysis errors.
-    .then(() => replaceInFile('./src/app/app.component.ts', `'app-root'`, `(() => 'app-root')()`))
+    .then(() => replaceInFile('./projects/test-project/src/app/app.component.ts', `'app-root'`, `(() => 'app-root')()`))
     .then(() => expectToFail(() => ng('build', '--aot')))
     .then(({ message }) => {
       if (!message.includes('Function calls are not supported')
@@ -76,5 +77,5 @@ export default function () {
         throw new Error(`Did not expect extra errors but got:\n${message}`);
       }
     })
-    .then(() => writeFile('./src/app/app.component.ts', origContent));
+    .then(() => writeFile('./projects/test-project/src/app/app.component.ts', origContent));
 }

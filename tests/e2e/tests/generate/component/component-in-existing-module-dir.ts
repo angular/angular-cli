@@ -3,7 +3,7 @@ import { ng } from '../../../utils/process';
 import { expectFileToMatch } from '../../../utils/fs';
 
 export default function () {
-  const modulePath = join('src', 'app', 'foo', 'foo.module.ts');
+  const modulePath = join('projects', 'test-project', 'src', 'app', 'foo', 'foo.module.ts');
 
   return Promise.resolve()
     .then(() => ng('generate', 'module', 'foo'))

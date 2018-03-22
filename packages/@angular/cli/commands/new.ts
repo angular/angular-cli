@@ -1,33 +1,16 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import chalk from 'chalk';
-
-import { Command, CommandScope } from '../models/command';
+import { CommandScope, Option } from '../models/command';
 import { CliConfig } from '../models/config';
-import { validateProjectName } from '../utilities/validate-project-name';
-import { oneLine } from 'common-tags';
-import { SchematicAvailableOptions } from '../tasks/schematic-get-options';
+import { SchematicCommand } from '../models/schematic-command';
 
-const SilentError = require('silent-error');
 
-export default class NewCommand extends Command {
+export default class NewCommand extends SchematicCommand {
   public readonly name = 'new';
   public readonly description =
-    'Creates a new directory and a new Angular app eg. "ng new [name]".';
+    'Creates a new directory and a new Angular app.';
   public static aliases = ['n'];
   public scope = CommandScope.outsideProject;
-  public arguments = ['name'];
-  public options = [
-    {
-      name: 'dry-run',
-      type: Boolean,
-      default: false,
-      aliases: ['d'],
-      description: oneLine`
-        Run through without making any changes.
-        Will list all files that would have been created when running "ng new".
-      `
-    },
+  public options: Option[] = [
+    ...this.coreOptions,
     {
       name: 'verbose',
       type: Boolean,
@@ -53,70 +36,50 @@ export default class NewCommand extends Command {
     const collectionName = this.parseCollectionName(options);
     const schematicName = CliConfig.fromGlobal().get('defaults.schematics.newApp');
 
-    const SchematicGetOptionsTask = require('../tasks/schematic-get-options').default;
-
-    const getOptionsTask = new SchematicGetOptionsTask({
-      ui: this.ui,
-      project: this.project
-    });
-
-    return getOptionsTask.run({
+    return this.getOptions({
         schematicName,
         collectionName
       })
-      .then((availableOptions: SchematicAvailableOptions[]) => {
-        if (availableOptions) {
-          availableOptions = availableOptions.filter(opt => opt.name !== 'name');
-        }
+      .then((availableOptions: Option[]) => {
+        // if (availableOptions) {
+        //   availableOptions = availableOptions.filter(opt => opt.name !== 'name');
+        // }
 
         this.options = this.options.concat( availableOptions || []);
       });
   }
 
   public async run(options: any) {
-    if (!options.name) {
-      return Promise.reject(new SilentError(
-        `The "ng ${options.name}" command requires a name argument to be specified eg. ` +
-        chalk.yellow('ng new [name] ') +
-        `For more details, use "ng help".`));
-    }
-
-    validateProjectName(options.name);
-    options.name = options.name;
     if (options.dryRun) {
       options.skipGit = true;
     }
 
-    options.directory = options.directory || options.name;
-    const directoryName = path.join(process.cwd(), options.directory);
-
-    if (fs.existsSync(directoryName) && this.isProject(directoryName)) {
-      throw new SilentError(oneLine`
-        Directory ${directoryName} exists and is already an Angular CLI project.
-      `);
-    }
-
+    let collectionName: string;
     if (options.collection) {
-      options.collectionName = options.collection;
+      collectionName = options.collection;
     } else {
-      options.collectionName = this.parseCollectionName(options);
+      collectionName = this.parseCollectionName(options);
     }
 
-    const InitTask = require('../tasks/init').default;
+    const pathOptions = this.setPathOptions(options, '/');
+    options = { ...options, ...pathOptions };
 
-    const initTask = new InitTask({
-      project: this.project,
-      ui: this.ui,
-    });
+    const packageJson = require('../package.json');
+    options.version = packageJson.version;
 
     // Ensure skipGit has a boolean value.
     options.skipGit = options.skipGit === undefined ? false : options.skipGit;
 
-    return await initTask.run(options);
-  }
+    options = this.removeLocalOptions(options);
 
-  private isProject(projectPath: string): boolean {
-    return CliConfig.fromProject(projectPath) !== null;
+    return this.runSchematic({
+      collectionName: collectionName,
+      schematicName: 'ng-new',
+      schematicOptions: options,
+      debug: options.debug,
+      dryRun: options.dryRun,
+      force: options.force
+    });
   }
 
   private parseCollectionName(options: any): string {
@@ -126,5 +89,12 @@ export default class NewCommand extends Command {
       CliConfig.getValue('defaults.schematics.collection');
 
     return collectionName;
+  }
+
+  private removeLocalOptions(options: any): any {
+    const opts = Object.assign({}, options);
+    delete opts.verbose;
+    delete opts.collection;
+    return opts;
   }
 }

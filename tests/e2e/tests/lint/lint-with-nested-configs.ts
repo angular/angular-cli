@@ -7,7 +7,7 @@ export default function () {
   // TODO(architect): Figure out how this test should look like post devkit/build-webpack.
   return;
 
-  const fileName = 'src/app/foo/foo.ts';
+  const fileName = 'projects/test-project/src/app/foo/foo.ts';
   const nestedConfigContent = `
   {
     "rules": {
@@ -20,8 +20,8 @@ export default function () {
   }`;
 
   return Promise.resolve()
-    .then(() => createDir('src/app/foo'))
+    .then(() => createDir('projects/test-project/src/app/foo'))
     .then(() => writeFile(fileName, 'const foo = \'\';\n'))
-    .then(() => writeFile('src/app/foo/tslint.json', nestedConfigContent))
+    .then(() => writeFile('projects/test-project/src/app/foo/tslint.json', nestedConfigContent))
     .then(() => expectToFail(() => ng('lint', 'app')));
 }

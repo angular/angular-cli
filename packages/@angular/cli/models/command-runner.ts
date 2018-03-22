@@ -3,7 +3,8 @@ import {
   CommandContext,
   Command,
   CommandConstructor,
-  CommandScope
+  CommandScope,
+  ArgumentStrategy
 } from '../models/command';
 import { oneLine } from 'common-tags';
 import { logging } from '@angular-devkit/core';
@@ -33,6 +34,7 @@ export async function runCommand(commandMap: CommandMap,
   }
   const rawOptions = yargsParser(args, { alias: { help: ['h'] }, boolean: [ 'help' ] });
   let commandName = rawOptions._[0];
+
   // remove the command name
   rawOptions._ = rawOptions._.slice(1);
   const executionScope = context.project.isEmberCLIProject()
@@ -61,9 +63,9 @@ export async function runCommand(commandMap: CommandMap,
   const command = new Cmd(context, logger);
 
   args = await command.initializeRaw(args);
-  let options = parseOptions(args, command.options, command.arguments);
+  let options = parseOptions(args, command.options, command.arguments, command.argStrategy);
   await command.initialize(options);
-  options = parseOptions(args, command.options, command.arguments);
+  options = parseOptions(args, command.options, command.arguments, command.argStrategy);
   if (commandName === 'help') {
     options.commandMap = commandMap;
   }
@@ -82,6 +84,7 @@ export function parseOptions<T = any>(
   args: string[],
   cmdOpts: Option[],
   commandArguments: string[],
+  argStrategy: ArgumentStrategy,
 ): T {
   const parser = yargsParser;
 
@@ -114,8 +117,6 @@ export function parseOptions<T = any>(
   };
 
   const parsedOptions = parser(args, yargsOptions);
-  // remove the command name
-  parsedOptions._ = parsedOptions._.slice(1);
 
   // Remove aliases.
   cmdOpts
@@ -139,15 +140,21 @@ export function parseOptions<T = any>(
     .filter(key => key.indexOf('-') !== -1)
     .forEach(key => delete parsedOptions[key]);
 
-  parsedOptions._.forEach((value: string, index: number) => {
-    // Remove the starting "<" and trailing ">".
-    const arg = commandArguments[index];
-    if (arg) {
-      parsedOptions[arg] = value;
-    }
-  });
+  // remove the command name
+  parsedOptions._ = parsedOptions._.slice(1);
 
-  delete parsedOptions._;
+  switch (argStrategy) {
+    case ArgumentStrategy.MapToOptions:
+      parsedOptions._.forEach((value: string, index: number) => {
+        const arg = commandArguments[index];
+        if (arg) {
+          parsedOptions[arg] = value;
+        }
+      });
+
+      delete parsedOptions._;
+      break;
+  }
 
   return parsedOptions;
 }

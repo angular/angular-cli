@@ -25,18 +25,18 @@ export default function() {
 
   return Promise.resolve()
     // Create and import files.
-    .then(() => writeFile('src/funky2.ts', `
+    .then(() => writeFile('projects/test-project/src/funky2.ts', `
       export function funky2(value: string): string {
         return value + 'hello';
       }
     `))
-    .then(() => writeFile('src/funky.ts', `
+    .then(() => writeFile('projects/test-project/src/funky.ts', `
       export * from './funky2';
     `))
-    .then(() => prependToFile('src/main.ts', `
+    .then(() => prependToFile('projects/test-project/src/main.ts', `
       import { funky2 } from './funky';
     `))
-    .then(() => appendToFile('src/main.ts', `
+    .then(() => appendToFile('projects/test-project/src/main.ts', `
       console.log(funky2('town'));
     `))
     // Should trigger a rebuild, no error expected.
@@ -45,7 +45,7 @@ export default function() {
     // Should trigger a rebuild, this time an error is expected.
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(errorRe, 20000),
-      writeFile('src/funky2.ts', `
+      writeFile('projects/test-project/src/funky2.ts', `
         export function funky2(value: number): number {
           return value + 1;
         }
@@ -61,7 +61,7 @@ export default function() {
     // Should trigger a rebuild, this time an error is also expected.
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(errorRe, 20000),
-      appendToFile('src/app/app.module.ts', `
+      appendToFile('projects/test-project/src/app/app.module.ts', `
         function anything(): number { return 1; }
       `)
     ]))
@@ -74,7 +74,7 @@ export default function() {
     // Fix the error!
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(doneRe, 20000),
-      writeFile('src/funky2.ts', `
+      writeFile('projects/test-project/src/funky2.ts', `
         export function funky2(value: string): string {
           return value + 'hello';
         }

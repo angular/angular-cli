@@ -15,10 +15,10 @@ export default function () {
     // Verify code coverage exclude work
     .then(() => expectFileToMatch('coverage/lcov.info', 'polyfills.ts'))
     .then(() => expectFileToMatch('coverage/lcov.info', 'test.ts'))
-    .then(() => updateJsonFile('.angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects.app.architect;
+    .then(() => updateJsonFile('angular.json', workspaceJson => {
+      const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.test.options.codeCoverageExclude = [
-        'src/polyfills.ts',
+        'projects/test-project/src/polyfills.ts',
         '**/test.ts'
       ];
     }))

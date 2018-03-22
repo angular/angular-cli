@@ -13,6 +13,11 @@ export enum CommandScope {
   outsideProject
 }
 
+export enum ArgumentStrategy {
+  MapToOptions,
+  Nothing
+}
+
 export abstract class Command {
   protected _rawArgs: string[];
 
@@ -71,6 +76,7 @@ export abstract class Command {
   abstract readonly description: string;
   abstract readonly arguments: string[];
   abstract readonly options: Option[];
+  public argStrategy = ArgumentStrategy.MapToOptions;
   public hidden = false;
   public unknown = false;
   public scope = CommandScope.everywhere;
@@ -94,8 +100,9 @@ export abstract class Option {
   abstract readonly description: string;
   readonly default?: string | number | boolean;
   readonly required?: boolean;
-  abstract readonly aliases?: string[]; // (string | { [key: string]: string })[];
+  abstract readonly aliases?: string[];
   abstract readonly type: any;
+  readonly format?: string;
   readonly values?: any[];
   readonly hidden?: boolean = false;
 }

@@ -5,7 +5,7 @@ import {expectFileToExist} from '../../../utils/fs';
 
 export default function() {
   // Create the pipe in the same directory.
-  const pipeDir = join('src', 'app');
+  const pipeDir = join('projects', 'test-project', 'src', 'app');
 
   return ng('generate', 'pipe', 'test-pipe')
     .then(() => expectFileToExist(pipeDir))
