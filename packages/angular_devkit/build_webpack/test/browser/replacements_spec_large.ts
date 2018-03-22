@@ -17,18 +17,18 @@ describe('Browser Builder file replacements', () => {
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
-  it('allows file replacements', (done) => {
-    host.writeMultipleFiles({
-      'src/meaning-too.ts': 'export var meaning = 42;',
-      'src/meaning.ts': `export var meaning = 10;`,
+  beforeEach(() => host.writeMultipleFiles({
+    'src/meaning-too.ts': 'export var meaning = 42;',
+    'src/meaning.ts': `export var meaning = 10;`,
 
-      'src/main.ts': `
+    'src/main.ts': `
         import { meaning } from './meaning';
 
         console.log(meaning);
       `,
-    });
+  }));
 
+  it('allows file replacements', (done) => {
     const overrides = {
       fileReplacements: [
         {
@@ -47,6 +47,21 @@ describe('Browser Builder file replacements', () => {
         expect(virtualFs.fileBufferToString(host.scopedSync().read(fileName)))
           .not.toMatch(/meaning\s*=\s*10/);
       }),
+    ).subscribe(undefined, done.fail, done);
+  }, 30000);
+
+  it(`fails compilation with missing 'to' file`, (done) => {
+    const overrides = {
+      fileReplacements: [
+        {
+          from: normalize('/src/meaning.ts'),
+          to: normalize('/src/meaning-three.ts'),
+        },
+      ],
+    };
+
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(false)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 });
