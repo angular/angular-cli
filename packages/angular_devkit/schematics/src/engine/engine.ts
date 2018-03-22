@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BaseException, logging } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
-import { from as observableFrom } from 'rxjs/observable/from';
+import { Observable, from as observableFrom } from 'rxjs';
 import { concatMap } from 'rxjs/operators';
 import { Url } from 'url';
 import { MergeStrategy } from '../tree/interface';

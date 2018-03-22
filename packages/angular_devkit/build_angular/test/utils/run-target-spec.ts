@@ -8,7 +8,7 @@
 
 import { Architect, BuildEvent, TargetSpecifier } from '@angular-devkit/architect';
 import { experimental, join, logging, normalize } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { concatMap } from 'rxjs/operators';
 import { TestProjectHost } from '../utils/test-project-host';
 

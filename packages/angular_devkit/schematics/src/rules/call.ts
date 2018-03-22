@@ -5,20 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BaseException } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
-import { of as observableOf } from 'rxjs/observable/of';
-import { _throw } from 'rxjs/observable/throw';
-import { last } from 'rxjs/operators/last';
-import { mergeMap } from 'rxjs/operators/mergeMap';
-import { tap } from 'rxjs/operators/tap';
+import { BaseException, isObservable } from '@angular-devkit/core';
+import { Observable, of as observableOf, throwError } from 'rxjs';
+import { last, mergeMap, tap } from 'rxjs/operators';
 import { Rule, SchematicContext, Source } from '../engine/interface';
 import { Tree, TreeSymbol } from '../tree/interface';
-
-
-declare const Symbol: Symbol & {
-  readonly observable: symbol;
-};
 
 
 function _getTypeOfResult(value?: {}): string {
@@ -63,10 +54,10 @@ export function callSource(source: Source, context: SchematicContext): Observabl
   const result = source(context) as object;
 
   if (result === undefined) {
-    return _throw(new InvalidSourceResultException(result));
+    return throwError(new InvalidSourceResultException(result));
   } else if (TreeSymbol in result) {
     return observableOf(result as Tree);
-  } else if (Symbol.observable in result) {
+  } else if (isObservable(result)) {
     // Only return the last Tree, and make sure it's a Tree.
     return (result as Observable<Tree>).pipe(
       last(),
@@ -77,7 +68,7 @@ export function callSource(source: Source, context: SchematicContext): Observabl
       }),
     );
   } else {
-    return _throw(new InvalidSourceResultException(result));
+    return throwError(new InvalidSourceResultException(result));
   }
 }
 
@@ -92,7 +83,7 @@ export function callRule(rule: Rule,
       return observableOf(inputTree);
     } else if (TreeSymbol in result) {
       return observableOf(result as Tree);
-    } else if (Symbol.observable in result) {
+    } else if (isObservable(result)) {
       const obs = result as Observable<Tree>;
 
       // Only return the last Tree, and make sure it's a Tree.
@@ -107,7 +98,7 @@ export function callRule(rule: Rule,
     } else if (result === undefined) {
       return observableOf(inputTree);
     } else {
-      return _throw(new InvalidRuleResultException(result));
+      return throwError(new InvalidRuleResultException(result));
     }
   }));
 }

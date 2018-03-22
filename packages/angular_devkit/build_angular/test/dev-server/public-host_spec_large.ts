@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { fromPromise } from 'rxjs/observable/fromPromise';
+import { from } from 'rxjs';
 import { concatMap, take, tap } from 'rxjs/operators';
 import { DevServerBuilderOptions } from '../../src';
 import { devServerTargetSpec, host, request, runTargetSpec } from '../utils';
@@ -23,7 +23,7 @@ describe('Dev Server Builder public host', () => {
   it('works', (done) => {
     runTargetSpec(host, devServerTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      concatMap(() => fromPromise(request('http://localhost:4200/', headers))),
+      concatMap(() => from(request('http://localhost:4200/', headers))),
       tap(response => expect(response).toContain('Invalid Host header')),
       take(1),
     ).subscribe(undefined, done.fail, done);
@@ -34,7 +34,7 @@ describe('Dev Server Builder public host', () => {
 
     runTargetSpec(host, devServerTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      concatMap(() => fromPromise(request('http://localhost:4200/', headers))),
+      concatMap(() => from(request('http://localhost:4200/', headers))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),
       take(1),
     ).subscribe(undefined, done.fail, done);
@@ -45,7 +45,7 @@ describe('Dev Server Builder public host', () => {
 
     runTargetSpec(host, devServerTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      concatMap(() => fromPromise(request('http://localhost:4200/', headers))),
+      concatMap(() => from(request('http://localhost:4200/', headers))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),
       take(1),
     ).subscribe(undefined, done.fail, done);

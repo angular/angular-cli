@@ -16,12 +16,8 @@ import {
   formats,
   workflow,
 } from '@angular-devkit/schematics';  // tslint:disable-line:no-implicit-dependencies
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
-import { empty } from 'rxjs/observable/empty';
-import { of } from 'rxjs/observable/of';
-import { _throw } from 'rxjs/observable/throw';
-import { concat, concatMap, ignoreElements, map, reduce } from 'rxjs/operators';
+import { EMPTY, Observable, Subject, concat, of, throwError } from 'rxjs';
+import { concatMap, ignoreElements, map } from 'rxjs/operators';
 import { NodeModulesEngineHost, validateOptionsWithSchema } from '..';
 import { DryRunEvent } from '../../src/sink/dryrun';
 import { BuiltinTaskExecutor } from '../../tasks/node';
@@ -106,27 +102,31 @@ export class NodeWorkflow implements workflow.Workflow {
     };
     this._context.push(context);
 
-    return schematic.call(options.options, of(new HostTree(this._host)), {
-      logger: context.logger,
-    }).pipe(
-      map(tree => Tree.optimize(tree)),
-      concatMap((tree: Tree) => {
-        return dryRunSink.commit(tree).pipe(
-          ignoreElements(),
-          concat(of(tree)),
-        );
-      }),
-      concatMap((tree: Tree) => {
-        dryRunSubscriber.unsubscribe();
-        if (error) {
-          return _throw(new UnsuccessfulWorkflowExecution());
-        }
-        if (this._options.dryRun) {
-          return empty<void>();
-        }
+    return concat(
+      schematic.call(options.options, of(new HostTree(this._host)), {
+        logger: context.logger,
+      }).pipe(
+        map(tree => Tree.optimize(tree)),
+        concatMap((tree: Tree) => {
+          return concat(
+            dryRunSink.commit(tree).pipe(
+              ignoreElements(),
+            ),
+            of(tree),
+          );
+        }),
+        concatMap((tree: Tree) => {
+          dryRunSubscriber.unsubscribe();
+          if (error) {
+            return throwError(new UnsuccessfulWorkflowExecution());
+          }
+          if (this._options.dryRun) {
+            return EMPTY;
+          }
 
-        return fsSink.commit(tree);
-      }),
+          return fsSink.commit(tree);
+        }),
+      ),
       concat(new Observable<void>(obs => {
         if (!this._options.dryRun) {
           this._engine.executePostTasks().subscribe(obs);
@@ -138,7 +138,6 @@ export class NodeWorkflow implements workflow.Workflow {
         this._context.pop();
         obs.complete();
       })),
-      reduce(() => {}),
-    );
+    ).pipe(ignoreElements());
   }
 }

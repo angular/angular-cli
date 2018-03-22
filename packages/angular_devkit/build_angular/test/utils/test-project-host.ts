@@ -15,8 +15,7 @@ import {
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { SpawnOptions, spawn } from 'child_process';
 import { Stats } from 'fs';
-import { Observable } from 'rxjs/Observable';
-import { empty } from 'rxjs/observable/empty';
+import { EMPTY, Observable } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
 
 
@@ -39,7 +38,7 @@ export class TestProjectHost extends NodeJsSyncHost {
 
   initialize(): Observable<void> {
     return this.exists(normalize('.git')).pipe(
-      concatMap(exists => !exists ? this._gitInit() : empty<void>()),
+      concatMap(exists => !exists ? this._gitInit() : EMPTY),
     );
   }
 

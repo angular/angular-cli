@@ -12,12 +12,7 @@ import {
   BuilderContext,
 } from '@angular-devkit/architect';
 import { Path, getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
-import { forkJoin } from 'rxjs/observable/forkJoin';
-import { fromPromise } from 'rxjs/observable/fromPromise';
-import { merge } from 'rxjs/observable/merge';
-import { of } from 'rxjs/observable/of';
-import { _throw } from 'rxjs/observable/throw';
+import { Observable, forkJoin, from, merge, of, throwError } from 'rxjs';
 import { concatMap, map, switchMap } from 'rxjs/operators';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { BuildWebpackServerSchema } from '../server/schema';
@@ -102,7 +97,7 @@ export class AppShellBuilder implements Builder<BuildWebpackAppShellSchema> {
                 const maybeMain = files.filter(x => re.test(x))[0];
 
                 if (!maybeMain) {
-                  return _throw(new Error('Could not find the main bundle.'));
+                  return throwError(new Error('Could not find the main bundle.'));
                 } else {
                   return of(join(outputPath, maybeMain));
                 }
@@ -159,7 +154,7 @@ export class AppShellBuilder implements Builder<BuildWebpackAppShellSchema> {
         const outputPath = join(root, options.outputIndexPath || browserIndexOutputPath);
 
         // Render to HTML and overwrite the client index file.
-        return fromPromise(
+        return from(
           renderModuleFactory(AppServerModuleNgFactory, {
             document: indexHtml,
             url: options.route,

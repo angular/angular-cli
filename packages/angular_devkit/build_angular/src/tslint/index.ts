@@ -17,7 +17,7 @@ import { readFileSync } from 'fs';
 import * as glob from 'glob';
 import { Minimatch } from 'minimatch';
 import * as path from 'path';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import * as tslint from 'tslint'; // tslint:disable-line:no-implicit-dependencies
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';

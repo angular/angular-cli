@@ -8,8 +8,7 @@
 import { FileDoesNotExistException, JsonObject, normalize, virtualFs } from '@angular-devkit/core';
 import { Callback, InputFileSystem } from '@ngtools/webpack/src/webpack';
 import { Stats } from 'fs';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { Observable, of } from 'rxjs';
 import { map, mergeMap, switchMap } from 'rxjs/operators';
 
 

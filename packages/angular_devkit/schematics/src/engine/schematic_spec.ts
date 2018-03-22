@@ -7,7 +7,7 @@
  */
 // tslint:disable:non-null-operator
 import { logging } from '@angular-devkit/core';
-import { of as observableOf } from 'rxjs/observable/of';
+import { of as observableOf } from 'rxjs';
 import { MergeStrategy, Tree } from '../tree/interface';
 import { branch, empty } from '../tree/static';
 import { CollectionDescription, Engine, Rule, Schematic, SchematicDescription } from './interface';

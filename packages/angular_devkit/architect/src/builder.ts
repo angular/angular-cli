@@ -7,7 +7,7 @@
  */
 
 import { JsonObject, Path, experimental, logging, virtualFs } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Architect, BuilderConfiguration } from './architect';
 
 

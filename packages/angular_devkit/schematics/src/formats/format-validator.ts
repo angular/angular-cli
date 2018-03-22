@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { JsonObject, JsonValue, schema } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
 

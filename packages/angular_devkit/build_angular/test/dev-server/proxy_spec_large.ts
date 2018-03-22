@@ -8,7 +8,7 @@
 
 import * as express from 'express'; // tslint:disable-line:no-implicit-dependencies
 import * as http from 'http';
-import { fromPromise } from 'rxjs/observable/fromPromise';
+import { from } from 'rxjs';
 import { concatMap, take, tap } from 'rxjs/operators';
 import { DevServerBuilderOptions } from '../../src';
 import { devServerTargetSpec, host, request, runTargetSpec } from '../utils';
@@ -41,7 +41,7 @@ describe('Dev Server Builder proxy', () => {
 
     runTargetSpec(host, devServerTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      concatMap(() => fromPromise(request('http://localhost:4200/api/test'))),
+      concatMap(() => from(request('http://localhost:4200/api/test'))),
       tap(response => {
         expect(response).toContain('TEST_API_RETURN');
         server.close();

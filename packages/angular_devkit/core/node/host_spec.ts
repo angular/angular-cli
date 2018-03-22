@@ -11,8 +11,7 @@
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { NodeJsAsyncHost, NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { Observable, Subscription } from 'rxjs';
 
 const temp = require('temp');
 

@@ -6,9 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
-import { _throw } from 'rxjs/observable/throw';
+import { Observable, of, throwError } from 'rxjs';
 import { concatMap, map, tap } from 'rxjs/operators';
 import {
   JsonObject,
@@ -224,7 +222,7 @@ export class Workspace {
         if (validatorResult.success) {
           return of(contentJsonCopy as T);
         } else {
-          return _throw(new SchemaValidationException(validatorResult.errors as string[]));
+          return throwError(new SchemaValidationException(validatorResult.errors as string[]));
         }
       }),
     );

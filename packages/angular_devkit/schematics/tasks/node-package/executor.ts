@@ -8,7 +8,7 @@
 import { BaseException } from '@angular-devkit/core';
 import { SpawnOptions, spawn } from 'child_process';
 import * as path from 'path';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { TaskExecutor } from '../../src';
 import { NodePackageTaskFactoryOptions, NodePackageTaskOptions } from './options';
 

@@ -8,7 +8,7 @@
 import { BuildEvent } from '@angular-devkit/architect';
 import { ForkOptions, fork } from 'child_process';
 import { resolve } from 'path';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 const treeKill = require('tree-kill');
 
 

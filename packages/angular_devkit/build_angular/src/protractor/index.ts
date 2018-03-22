@@ -14,9 +14,7 @@ import {
   BuilderDescription,
 } from '@angular-devkit/architect';
 import { Path, getSystemPath, normalize, resolve, tags } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
-import { fromPromise } from 'rxjs/observable/fromPromise';
-import { of } from 'rxjs/observable/of';
+import { Observable, from, of } from 'rxjs';
 import { concatMap, take, tap } from 'rxjs/operators';
 import * as url from 'url';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
@@ -122,7 +120,7 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
 
     // run `webdriver-manager update --standalone false --gecko false --quiet`
     // if you change this, update the command comment in prev line, and in `eject` task
-    return fromPromise(webdriverUpdate.program.run({
+    return from(webdriverUpdate.program.run({
       standalone: false,
       gecko: false,
       quiet: true,

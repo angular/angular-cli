@@ -15,7 +15,7 @@ import {
 import { Path, getSystemPath, resolve, tags } from '@angular-devkit/core';
 import { existsSync, readFileSync } from 'fs';
 import * as path from 'path';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
 import * as url from 'url';
 import * as webpack from 'webpack';

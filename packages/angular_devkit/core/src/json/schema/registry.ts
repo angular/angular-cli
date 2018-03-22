@@ -7,12 +7,9 @@
  */
 import * as ajv from 'ajv';
 import * as http from 'http';
-import { Observable } from 'rxjs/Observable';
-import { fromPromise } from 'rxjs/observable/fromPromise';
-import { of as observableOf } from 'rxjs/observable/of';
-import { concat, concatMap, ignoreElements, map, switchMap } from 'rxjs/operators';
-import { observable } from 'rxjs/symbol/observable';
-import { PartiallyOrderedSet } from '../../utils';
+import { Observable, from, of as observableOf } from 'rxjs';
+import { concatMap, map, switchMap } from 'rxjs/operators';
+import { PartiallyOrderedSet, isObservable } from '../../utils';
 import { JsonObject, JsonValue } from '../interface';
 import {
   SchemaFormat,
@@ -182,7 +179,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
               return typeof result == 'boolean'
                 ? observableOf([updatedData, result])
-                : fromPromise((result as PromiseLike<boolean>)
+                : from((result as PromiseLike<boolean>)
                   .then(result => [updatedData, result]));
             }),
             switchMap(([data, valid]) => {
@@ -360,7 +357,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       }
 
       let value = source(schema);
-      if (typeof value != 'object' || !(observable in value)) {
+      if (!isObservable(value)) {
         value = observableOf(value);
       }
 
@@ -369,9 +366,8 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           map(x => _set(data, fragments, x)),
         )),
       );
-    }, observableOf<void>(undefined)).pipe(
-      ignoreElements(),
-      concat(observableOf(data)),
+    },
+      observableOf(data),
     );
   }
 }

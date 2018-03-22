@@ -5,14 +5,17 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BaseException, JsonObject, normalize, virtualFs } from '@angular-devkit/core';
+import {
+  BaseException,
+  JsonObject,
+  isObservable,
+  normalize,
+  virtualFs,
+} from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { dirname, isAbsolute, join, resolve } from 'path';
-import { Observable } from 'rxjs/Observable';
-import { from as observableFrom } from 'rxjs/observable/from';
-import { of as observableOf } from 'rxjs/observable/of';
-import { _throw } from 'rxjs/observable/throw';
-import { mergeMap } from 'rxjs/operators/mergeMap';
+import { Observable, from as observableFrom, of as observableOf, throwError } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
 import { Url } from 'url';
 import {
   EngineHost,
@@ -32,11 +35,6 @@ import {
   FileSystemSchematicDescription,
 } from './description';
 import { readJsonFile } from './file-system-utility';
-
-
-declare const Symbol: Symbol & {
-  readonly observable: symbol;
-};
 
 
 export declare type OptionTransform<T extends object, R extends object>
@@ -268,7 +266,7 @@ export abstract class FileSystemEngineHostBase implements
       .pipe(
         ...this._transforms.map(tFn => mergeMap(opt => {
           const newOptions = tFn(schematic, opt);
-          if (Symbol.observable in newOptions) {
+          if (isObservable(newOptions)) {
             return newOptions;
           } else {
             return observableOf(newOptions);
@@ -297,7 +295,7 @@ export abstract class FileSystemEngineHostBase implements
       return factory();
     }
 
-    return _throw(new UnregisteredTaskException(name));
+    return throwError(new UnregisteredTaskException(name));
   }
 
   hasTaskExecutor(name: string): boolean {

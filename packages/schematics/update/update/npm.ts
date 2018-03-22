@@ -7,8 +7,7 @@
  */
 import { logging } from '@angular-devkit/core';
 import * as http from 'http';
-import { Observable } from 'rxjs/Observable';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
+import { Observable, ReplaySubject } from 'rxjs';
 import { NpmRepositoryPackageJson } from './npm-package-json';
 
 

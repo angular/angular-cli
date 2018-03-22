@@ -6,11 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BaseException } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
-import { of as observableOf } from 'rxjs/observable/of';
-import { concatMap } from 'rxjs/operators/concatMap';
-import { first } from 'rxjs/operators/first';
-import { map } from 'rxjs/operators/map';
+import { Observable, of as observableOf } from 'rxjs';
+import { concatMap, first, map } from 'rxjs/operators';
 import { callRule } from '../rules/call';
 import { Tree } from '../tree/interface';
 import {

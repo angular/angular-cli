@@ -14,9 +14,8 @@ import {
 } from '@angular-devkit/architect';
 import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import { Stats } from 'fs';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
-import { concat, concatMap } from 'rxjs/operators';
+import { Observable, concat, of } from 'rxjs';
+import { concatMap, last } from 'rxjs/operators';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import * as webpack from 'webpack';
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
@@ -168,7 +167,7 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
     return this.context.host.exists(resolvedOutputPath).pipe(
       concatMap(exists => exists
         // TODO: remove this concat once host ops emit an event.
-        ? this.context.host.delete(resolvedOutputPath).pipe(concat(of(null)))
+        ? concat(this.context.host.delete(resolvedOutputPath), of(null)).pipe(last())
         // ? of(null)
         : of(null)),
     );

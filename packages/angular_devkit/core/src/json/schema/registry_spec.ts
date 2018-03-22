@@ -7,7 +7,7 @@
  */
 // tslint:disable:no-any
 // tslint:disable:non-null-operator
-import { of as observableOf } from 'rxjs/observable/of';
+import { of as observableOf } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import { CoreSchemaRegistry } from './registry';
 

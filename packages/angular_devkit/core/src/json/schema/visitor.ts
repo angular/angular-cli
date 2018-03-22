@@ -5,12 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Observable } from 'rxjs/Observable';
-import { from } from 'rxjs/observable/from';
-import { of as observableOf } from 'rxjs/observable/of';
-import { concat, concatMap, ignoreElements, mergeMap, tap } from 'rxjs/operators';
-import { observable } from 'rxjs/symbol/observable';
+import { Observable, concat, from, of as observableOf } from 'rxjs';
+import { concatMap, ignoreElements, mergeMap, tap } from 'rxjs/operators';
 import { JsonArray, JsonObject, JsonValue } from '..';
+import { isObservable } from '../../utils';
 import { JsonPointer } from './interface';
 import { buildJsonPointer, joinJsonPointer } from './pointer';
 
@@ -85,43 +83,46 @@ function _visitJsonRecursive<ContextT>(
 
   const value = visitor(json, ptr, schema, root);
 
-  return (
-    (typeof value == 'object' && value != null && observable in value)
+  return (isObservable(value)
       ? value as Observable<JsonValue | undefined>
       : observableOf(value as JsonValue | undefined)
   ).pipe(
     concatMap((value: JsonValue | undefined) => {
       if (Array.isArray(value)) {
-        return from(value).pipe(
-          mergeMap((item, i) => {
-            return _visitJsonRecursive(
-              item,
-              visitor,
-              joinJsonPointer(ptr, '' + i),
-              _getObjectSubSchema(schema, '' + i),
-              refResolver,
-              context,
-              root || value,
-            ).pipe(tap<JsonValue>(x => value[i] = x));
-          }),
-          ignoreElements(),
-          concat(observableOf(value)),
+        return concat(
+          from(value).pipe(
+            mergeMap((item, i) => {
+              return _visitJsonRecursive(
+                item,
+                visitor,
+                joinJsonPointer(ptr, '' + i),
+                _getObjectSubSchema(schema, '' + i),
+                refResolver,
+                context,
+                root || value,
+              ).pipe(tap<JsonValue>(x => value[i] = x));
+            }),
+            ignoreElements(),
+          ),
+          observableOf(value),
         );
       } else if (typeof value == 'object' && value !== null) {
-        return from(Object.getOwnPropertyNames(value)).pipe(
-          mergeMap(key => {
-            return _visitJsonRecursive(
-              value[key],
-              visitor,
-              joinJsonPointer(ptr, key),
-              _getObjectSubSchema(schema, key),
-              refResolver,
-              context,
-              root || value,
-            ).pipe(tap<JsonValue>(x => value[key] = x));
-          }),
-          ignoreElements(),
-          concat(observableOf(value)),
+        return concat(
+          from(Object.getOwnPropertyNames(value)).pipe(
+            mergeMap(key => {
+              return _visitJsonRecursive(
+                value[key],
+                visitor,
+                joinJsonPointer(ptr, key),
+                _getObjectSubSchema(schema, key),
+                refResolver,
+                context,
+                root || value,
+              ).pipe(tap<JsonValue>(x => value[key] = x));
+            }),
+            ignoreElements(),
+           ),
+           observableOf(value),
         );
       } else {
         return observableOf(value);

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BaseException, PriorityQueue } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { SchematicContext } from './interface';
 
 export class UnknownTaskDependencyException extends BaseException {

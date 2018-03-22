@@ -9,11 +9,8 @@ import {
   BaseException,
   schema,
 } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
-import { of as observableOf } from 'rxjs/observable/of';
-import { first } from 'rxjs/operators/first';
-import { map } from 'rxjs/operators/map';
-import { mergeMap } from 'rxjs/operators/mergeMap';
+import { Observable, of as observableOf } from 'rxjs';
+import { first, map, mergeMap } from 'rxjs/operators';
 import { SchematicDescription } from '../src';
 import { FileSystemCollectionDescription, FileSystemSchematicDescription } from './description';
 

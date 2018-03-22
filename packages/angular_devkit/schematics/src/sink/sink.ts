@@ -5,18 +5,18 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Observable } from 'rxjs/Observable';
-import { defer as deferObservable } from 'rxjs/observable/defer';
-import { empty } from 'rxjs/observable/empty';
-import { from as observableFrom } from 'rxjs/observable/from';
-import { of as observableOf } from 'rxjs/observable/of';
 import {
+  Observable,
   concat,
+  defer as deferObservable,
+  from as observableFrom,
+  of as observableOf,
+} from 'rxjs';
+import {
   concatMap,
   ignoreElements,
   map,
   mergeMap,
-  reduce,
 } from 'rxjs/operators';
 import { FileAlreadyExistException, FileDoesNotExistException } from '../exception/exception';
 import {
@@ -98,11 +98,9 @@ export abstract class SimpleSinkBase implements Sink {
   }
 
   commitSingleAction(action: Action): Observable<void> {
-    return empty<void>().pipe(
-      concat(new Observable<void>(observer => {
-        return this.validateSingleAction(action).subscribe(observer);
-      })),
-      concat(new Observable<void>(observer => {
+    return concat(
+      this.validateSingleAction(action),
+      new Observable<void>(observer => {
         let committed = null;
         switch (action.kind) {
           case 'o': committed = this._overwriteFile(action.path, action.content); break;
@@ -116,33 +114,36 @@ export abstract class SimpleSinkBase implements Sink {
         } else {
           observer.complete();
         }
-      })));
+      }),
+    ).pipe(ignoreElements());
   }
 
   commit(tree: Tree): Observable<void> {
     const actions = observableFrom(tree.actions);
 
-    return (this.preCommit() || empty<void>()).pipe(
-      concat(deferObservable(() => actions)),
-      concatMap((action: Action) => {
-        const maybeAction = this.preCommitAction(action);
-        if (!maybeAction) {
-          return observableOf(action);
-        } else if (isAction(maybeAction)) {
-          return observableOf(maybeAction);
-        } else {
-          return maybeAction;
-        }
-      }),
-      concatMap((action: Action) => {
-        return this.commitSingleAction(action).pipe(
-          ignoreElements(),
-          concat([action]));
-      }),
-      concatMap((action: Action) => this.postCommitAction(action) || empty<void>()),
-      concat(deferObservable(() => this._done())),
-      concat(deferObservable(() => this.postCommit() || empty<void>())),
-      reduce(() => {}),
-    );
+    return concat(
+      (this.preCommit() || observableOf(null)),
+      deferObservable(() => actions).pipe(
+        concatMap(action => {
+          const maybeAction = this.preCommitAction(action);
+          if (!maybeAction) {
+            return observableOf(action);
+          } else if (isAction(maybeAction)) {
+            return observableOf(maybeAction);
+          } else {
+            return maybeAction;
+          }
+        }),
+        concatMap(action => {
+          return concat(
+            this.commitSingleAction(action).pipe(ignoreElements()),
+            observableOf(action),
+          );
+        }),
+        concatMap(action => this.postCommitAction(action) || observableOf(null)),
+      ),
+      deferObservable(() => this._done()),
+      deferObservable(() => this.postCommit() || observableOf(null)),
+    ).pipe(ignoreElements());
   }
 }

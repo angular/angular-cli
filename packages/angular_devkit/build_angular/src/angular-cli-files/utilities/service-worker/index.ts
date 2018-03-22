@@ -8,9 +8,7 @@ import * as semver from 'semver';
 
 import { resolveProjectModule } from '../require-project-module';
 import { map, reduce, switchMap } from "rxjs/operators";
-import { Observable } from "rxjs";
-import { merge } from "rxjs/observable/merge";
-import { of } from "rxjs/observable/of";
+import { Observable, merge, of } from "rxjs";
 
 
 export const NEW_SW_VERSION = '5.0.0-rc.0';

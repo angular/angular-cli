@@ -5,8 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Observable } from 'rxjs/Observable';
-import { of as observableOf } from 'rxjs/observable/of';
+import { Observable, of as observableOf } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
 import { FileOperator, Rule, SchematicContext, Source } from '../engine/interface';
 import { FilteredTree } from '../tree/filtered';

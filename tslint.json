@@ -11,10 +11,6 @@
 
 
     "no-implicit-dependencies": true,
-    "import-blacklist": [
-      true,
-      "rxjs"
-    ],
     "no-import-side-effect": [true, {"ignore-module": "^(?!rxjs\/)"}],
     "align": [
       true,

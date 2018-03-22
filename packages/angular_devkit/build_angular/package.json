@@ -43,7 +43,7 @@
     "raw-loader": "^0.5.1",
     "request": "^2.83.0",
     "resolve": "^1.5.0",
-    "rxjs": "^5.5.8",
+    "rxjs": "^6.0.0-beta.3",
     "sass-loader": "^6.0.7",
     "silent-error": "^1.1.0",
     "source-map-support": "^0.5.0",

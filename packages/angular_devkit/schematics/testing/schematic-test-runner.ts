@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { logging, schema } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
-import { of as observableOf } from 'rxjs/observable/of';
+import { Observable, of as observableOf } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
   Collection,
@@ -91,11 +90,16 @@ export class SchematicTestRunner {
     const schematic = this._collection.createSchematic(schematicName, true);
 
     let result: UnitTestTree | null = null;
+    let error;
     const host = observableOf(tree || new VirtualTree);
     this._engineHost.clearTasks();
 
     schematic.call(opts || {}, host, { logger: this._logger })
-      .subscribe(t => result = new UnitTestTree(t));
+      .subscribe(t => result = new UnitTestTree(t), e => error = e);
+
+    if (error) {
+      throw error;
+    }
 
     if (result === null) {
       throw new Error('Schematic is async, please use runSchematicAsync');

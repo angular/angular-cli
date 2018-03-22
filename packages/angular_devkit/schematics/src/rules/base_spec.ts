@@ -13,7 +13,7 @@ import {
   MergeStrategy,
   partitionApplyMerge,
 } from '@angular-devkit/schematics';
-import { of as observableOf } from 'rxjs/observable/of';
+import { of as observableOf } from 'rxjs';
 import { Rule, SchematicContext, Source } from '../engine/interface';
 import { Tree } from '../tree/interface';
 import { empty } from '../tree/static';

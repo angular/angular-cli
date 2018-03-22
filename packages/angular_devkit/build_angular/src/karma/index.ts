@@ -14,7 +14,7 @@ import {
 } from '@angular-devkit/architect';
 import { Path, getSystemPath, join,  normalize, resolve, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import {
   getCommonConfig,

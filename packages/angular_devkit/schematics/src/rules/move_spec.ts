@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:non-null-operator
-import { of as observableOf } from 'rxjs/observable/of';
+import { of as observableOf } from 'rxjs';
 import { SchematicContext } from '../engine/interface';
 import { VirtualTree } from '../tree/virtual';
 import { callRule } from './call';

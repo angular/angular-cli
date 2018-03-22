@@ -25,6 +25,6 @@
     "@angular-devkit/schematics": "0.0.0",
     "@schematics/schematics": "0.0.0",
     "minimist": "^1.2.0",
-    "rxjs": "^5.5.8"
+    "rxjs": "^6.0.0-beta.3"
   }
 }

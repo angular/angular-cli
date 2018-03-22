@@ -15,12 +15,15 @@ import {
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as http from 'http';
-import { Observable } from 'rxjs/Observable';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
-import { empty } from 'rxjs/observable/empty';
-import { from as observableFrom } from 'rxjs/observable/from';
-import { of as observableOf } from 'rxjs/observable/of';
-import { concat, ignoreElements, map, mergeMap } from 'rxjs/operators';
+import {
+  EMPTY,
+  Observable,
+  ReplaySubject,
+  concat,
+  from as observableFrom,
+  of as observableOf,
+} from 'rxjs';
+import { ignoreElements, map, mergeMap } from 'rxjs/operators';
 import * as semver from 'semver';
 
 const semverIntersect = require('semver-intersect');
@@ -136,29 +139,29 @@ function _getRecursiveVersions(
             .filter(x => !!x),
         );
       } else {
-        return empty();
+        return EMPTY;
       }
     }),
     mergeMap(([depName, depVersion]: [string, string]) => {
       if (!packages[depName] || packages[depName] === depVersion) {
-        return empty();
+        return EMPTY;
       }
       if (allVersions[depName] && semver.intersects(allVersions[depName], depVersion)) {
         allVersions[depName] = semverIntersect.intersect(allVersions[depName], depVersion);
 
-        return empty();
+        return EMPTY;
       }
 
       return _getNpmPackageJson(depName, logger).pipe(
-        map(json => [packages[depName], depName, depVersion, json]),
+        map(json => ({ version: packages[depName], depName, depVersion, npmPackageJson: json })),
       );
     }),
-    mergeMap(([version, depName, depVersion, npmPackageJson]) => {
+    mergeMap(({version, depName, depVersion, npmPackageJson}) => {
       const updateVersion = _getVersionFromNpmPackage(npmPackageJson, version, loose);
       const npmPackageVersions = Object.keys(npmPackageJson['versions'] as JsonObject);
       const match = semver.maxSatisfying(npmPackageVersions, updateVersion);
       if (!match) {
-        return empty();
+        return EMPTY;
       }
       if (semver.lt(
         semverIntersect.parseRange(updateVersion).version,
@@ -236,10 +239,11 @@ export function updatePackageJson(
         packages[name] = version;
       }
 
-      return _getRecursiveVersions(packageJson, packages, allVersions, context.logger, loose).pipe(
-        ignoreElements(),
-        concat(observableOf(tree)),
-        map(_ => tree),  // Just to get the TypeScript typesystem fixed.
+      return concat(
+        _getRecursiveVersions(packageJson, packages, allVersions, context.logger, loose).pipe(
+          ignoreElements(),
+        ),
+        observableOf(tree),
       );
     },
     (tree: Tree) => {

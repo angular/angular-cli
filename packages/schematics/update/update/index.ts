@@ -8,9 +8,7 @@
 import { logging } from '@angular-devkit/core';
 import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
-import { Observable } from 'rxjs/Observable';
-import { from as observableFrom } from 'rxjs/observable/from';
-import { of } from 'rxjs/observable/of';
+import { Observable, from as observableFrom, of } from 'rxjs';
 import { map, mergeMap, reduce, switchMap } from 'rxjs/operators';
 import * as semver from 'semver';
 import { getNpmPackageJson } from './npm';

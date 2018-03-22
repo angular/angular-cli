@@ -11,7 +11,7 @@ import { normalize, virtualFs } from '@angular-devkit/core';
 import { FileSystemTree, HostSink, SchematicEngine } from '@angular-devkit/schematics';
 import { FileSystemEngineHost } from '@angular-devkit/schematics/tools';
 import * as path from 'path';
-import { of as observableOf } from 'rxjs/observable/of';
+import { of as observableOf } from 'rxjs';
 
 
 describe('FileSystemEngineHost', () => {

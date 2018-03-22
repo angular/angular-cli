@@ -14,7 +14,7 @@ import {
 } from '@angular-devkit/architect';
 import { resolve } from '@angular-devkit/core';
 import * as path from 'path';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
 import * as webpack from 'webpack';
 import { getWebpackStatsConfig } from '../angular-cli-files/models/webpack-configs/utils';

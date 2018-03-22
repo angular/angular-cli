@@ -21,10 +21,7 @@ import {
   virtualFs,
 } from '@angular-devkit/core';
 import { resolve as nodeResolve } from '@angular-devkit/core/node';
-import { Observable } from 'rxjs/Observable';
-import { forkJoin } from 'rxjs/observable/forkJoin';
-import { of } from 'rxjs/observable/of';
-import { _throw } from 'rxjs/observable/throw';
+import { Observable, forkJoin, of, throwError } from 'rxjs';
 import { concatMap, map, tap } from 'rxjs/operators';
 import {
   BuildEvent,
@@ -248,7 +245,7 @@ export class Architect {
         concatMap((pkgJson: JsonObject) => {
           const pkgJsonBuildersentry = pkgJson['builders'] as string;
           if (!pkgJsonBuildersentry) {
-            return _throw(new BuilderCannotBeResolvedException(builderConfig.builder));
+            return throwError(new BuilderCannotBeResolvedException(builderConfig.builder));
           }
 
           buildersJsonPath = join(dirname(normalize(pkgJsonPath)), pkgJsonBuildersentry);
@@ -262,7 +259,7 @@ export class Architect {
           builderPaths = builderPathsMap.builders[builderName];
 
           if (!builderPaths) {
-            return _throw(new BuilderCannotBeResolvedException(builderConfig.builder));
+            return throwError(new BuilderCannotBeResolvedException(builderConfig.builder));
           }
 
           // Resolve paths in the builder paths.

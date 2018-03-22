@@ -14,7 +14,7 @@ import {
 } from '@angular-devkit/architect';
 import { getSystemPath, normalize, resolve } from '@angular-devkit/core';
 import * as ngPackagr from 'ng-packagr';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 // TODO move this function to architect or somewhere else where it can be imported from.
 // Blatantly copy-pasted from 'require-project-module.ts'.

@@ -7,9 +7,7 @@
  */
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
-import { of } from 'rxjs/observable/of';
+import { Observable, Subject, of } from 'rxjs';
 import { HostSink } from './host';
 
 

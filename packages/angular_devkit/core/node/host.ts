@@ -6,16 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as fs from 'fs';
-import { Observable } from 'rxjs/Observable';
-import { empty } from 'rxjs/observable/empty';
-import { from as observableFrom } from 'rxjs/observable/from';
-import { concat } from 'rxjs/operators/concat';
-import { concatMap } from 'rxjs/operators/concatMap';
-import { ignoreElements } from 'rxjs/operators/ignoreElements';
-import { map } from 'rxjs/operators/map';
-import { mergeMap } from 'rxjs/operators/mergeMap';
-import { publish } from 'rxjs/operators/publish';
-import { refCount } from 'rxjs/operators/refCount';
+import { EMPTY, Observable, concat, from as observableFrom } from 'rxjs';
+import {
+  concatMap,
+  ignoreElements,
+  map,
+  mergeMap,
+  publish,
+  refCount,
+} from 'rxjs/operators';
 import {
   Path,
   PathFragment,
@@ -122,15 +121,16 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
           };
           _recurseList(path);
 
-          return observableFrom(allFiles)
-            .pipe(
+          return concat(
+            observableFrom(allFiles).pipe(
               mergeMap(p => _callFs(fs.unlink, getSystemPath(p))),
               ignoreElements(),
-              concat(observableFrom(allDirs).pipe(
-                concatMap(p => _callFs(fs.rmdir, getSystemPath(p))),
-              )),
+            ),
+            observableFrom(allDirs).pipe(
+              concatMap(p => _callFs(fs.rmdir, getSystemPath(p))),
               map(() => {}),
-            );
+            ),
+          );
         } else {
           return _callFs(fs.unlink, getSystemPath(path));
         }
@@ -262,7 +262,7 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
           fs.unlinkSync(getSystemPath(path));
         }
 
-        return empty();
+        return EMPTY;
       }),
     );
   }

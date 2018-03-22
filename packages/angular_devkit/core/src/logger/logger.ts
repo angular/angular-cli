@@ -5,11 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Observable } from 'rxjs/Observable';
-import { PartialObserver } from 'rxjs/Observer';
-import { Operator } from 'rxjs/Operator';
-import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
+import { Observable, Operator, PartialObserver, Subject, Subscription } from 'rxjs';
 import { JsonObject } from '../json/interface';
 
 
