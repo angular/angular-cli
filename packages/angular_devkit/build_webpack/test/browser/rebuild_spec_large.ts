@@ -12,7 +12,7 @@ import { TestLogger, browserTargetSpec, host, runTargetSpec } from '../utils';
 import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_large';
 
 
-describe('Browser Builder', () => {
+describe('Browser Builder rebuilds', () => {
   const outputPath = normalize('dist');
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
