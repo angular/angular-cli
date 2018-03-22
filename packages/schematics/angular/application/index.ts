@@ -90,7 +90,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
               },
               {
                 glob: '**/*',
-                input: `${projectRoot}/assets>`,
+                input: `${projectRoot}/assets`,
                 output: 'assets',
               },
             ],
