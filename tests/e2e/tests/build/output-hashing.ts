@@ -13,11 +13,11 @@ export default function() {
 
   return Promise.resolve()
     .then(() => writeMultipleFiles({
-      'src/styles.css': 'body { background-image: url("./assets/image.png"); }'
+      'projects/test-project/src/styles.css': 'body { background-image: url("./assets/image.png"); }'
     }))
     // use image with file size >10KB to prevent inlining
-    .then(() => copyProjectAsset('images/spectrum.png', './assets/image.png'))
-    .then(() => ng('build', '--optimization-level', '0', '--output-hashing=all'))
+    .then(() => copyProjectAsset('images/spectrum.png', '.projects/test-project/src/assets/image.png'))
+    .then(() => ng('build', '--optimization', '--output-hashing=all'))
     .then(() => expectFileToMatch('dist/test-project/index.html', /runtime\.[0-9a-f]{20}\.js/))
     .then(() => expectFileToMatch('dist/test-project/index.html', /main\.[0-9a-f]{20}\.js/))
     .then(() => expectFileToMatch('dist/test-project/index.html', /styles\.[0-9a-f]{20}\.(css|js)/))

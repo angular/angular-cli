@@ -95,7 +95,7 @@ const allSetups = glob.sync(path.join(e2eRoot, 'setup/**/*.ts'), { nodir: true }
   .sort();
 const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: argv.ignore })
   .map(name => path.relative(e2eRoot, name))
-  // TODO: ARCHITECT
+  // TODO: UPDATE TESTS
   .filter(name => !name.endsWith('/basic/build.ts'))
   .filter(name => !name.endsWith('/basic/e2e.ts'))
   .filter(name => !name.endsWith('/build-app-shell-with-schematic.ts'))
@@ -106,6 +106,7 @@ const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: 
   .filter(name => !name.endsWith('/service-worker.ts'))
   .filter(name => !name.endsWith('/typescript-2_4.ts'))
   .filter(name => !name.endsWith('/typescript-2_7.ts'))
+  .filter(name => !name.endsWith('/output-hashing.ts'))
   .filter(name => !name.endsWith('/new-minimal.ts'))
   .filter(name => !name.endsWith('/loaders-resolution.ts'))
   .filter(name => !name.endsWith('/module-resolution.ts'))
@@ -115,6 +116,8 @@ const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: 
   .filter(name => !name.endsWith('/different-file-format.ts'))
   .filter(name => !name.endsWith('/loaders.ts'))
   .filter(name => !name.endsWith('/misc/lazy-module.ts'))
+  // IS this test still valid? \/
+  .filter(name => !name.endsWith('/module-id.ts'))
   // index.html in wrong dir in dist (currently in src)
   .filter(name => !name.endsWith('/scripts-array.ts'))
   .filter(name => !name.endsWith('/styles-array.ts'))
@@ -122,6 +125,10 @@ const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: 
   .filter(name => !name.endsWith('/third-party/bootstrap'))
   .filter(name => !name.endsWith('/extract-css.ts'))
   .filter(name => !name.endsWith('/fallback.ts'))
+  .filter(name => !name.endsWith('/no-angular-router.ts'))
+  .filter(name => !name.endsWith('/build/output-dir.ts'))
+  .filter(name => !name.endsWith('/build/polyfills.ts'))
+  .filter(name => !name.endsWith('/build/prod-build.ts'))
   // favicon not moving
   .filter(name => !name.endsWith('/inline-urls.ts'))
   // .filter(name => !name.endsWith('/misc/assets.ts'))
@@ -132,6 +139,8 @@ const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: 
   .filter(name => !name.endsWith('/directive-prefix.ts'))
   // CONFIG COMMAND
   .filter(name => !name.startsWith('tests/commands/config'))
+  // NEW COMMAND
+  .filter(name => !name.startsWith('tests/commands/new'))
   // NEEDS devkit change
   .filter(name => !name.endsWith('/existing-directory.ts'))
   .sort();
