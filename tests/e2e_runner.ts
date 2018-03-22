@@ -166,7 +166,6 @@ const shardedTests = tests
   .filter((name, i) => (shardId === null || (i % nbShards) == shardId));
 const testsToRun = allSetups.concat(shardedTests);
 
-console.log(testsToRun.join('\n'));
 /**
  * Load all the files from the e2e, filter and sort them and build a promise of their default
  * export.
