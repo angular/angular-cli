@@ -15,6 +15,7 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import { latestVersions } from '../utility/latest-versions';
 import { Schema as WorkspaceOptions } from './schema';
 
 export default function (options: WorkspaceOptions): Rule {
@@ -25,6 +26,7 @@ export default function (options: WorkspaceOptions): Rule {
         utils: strings,
         ...options,
         'dot': '.',
+        latestVersions,
       }),
     ]))(host, context);
   };

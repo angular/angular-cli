@@ -20,6 +20,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { WorkspaceSchema, getWorkspace, getWorkspacePath } from '../utility/config';
+import { latestVersions } from '../utility/latest-versions';
 import { Schema as LibraryOptions } from './schema';
 
 
@@ -57,14 +58,16 @@ function addDependenciesAndScriptsToPackageJson() {
     if (!host.exists('package.json')) { return host; }
 
     return updateJsonFile(host, 'package.json', (json: PackageJsonPartialType) => {
+
+
       if (!json['dependencies']) {
         json['dependencies'] = {};
       }
 
       json.dependencies = {
-        '@angular/common': '^5.2.0',
-        '@angular/core': '^5.2.0',
-        '@angular/compiler': '^5.0.0',
+        '@angular/common': latestVersions.Angular,
+        '@angular/core': latestVersions.Angular,
+        '@angular/compiler': latestVersions.Angular,
         // De-structure last keeps existing user dependencies.
         ...json.dependencies,
       };
@@ -74,11 +77,11 @@ function addDependenciesAndScriptsToPackageJson() {
       }
 
       json.devDependencies = {
-        '@angular/compiler-cli': '^5.0.0',
+        '@angular/compiler-cli': latestVersions.Angular,
         'ng-packagr': '^2.2.0',
         'tsickle': '>=0.25.5',
         'tslib': '^1.7.1',
-        'typescript': '>=2.4.2',
+        'typescript': latestVersions.TypeScript,
         // De-structure last keeps existing user dependencies.
         ...json.devDependencies,
       };

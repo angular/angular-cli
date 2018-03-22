@@ -8,6 +8,7 @@
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import * as path from 'path';
 import { getFileContent } from '../../angular/utility/test';
+import { latestVersions } from '../utility/latest-versions';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as GenerateLibrarySchema } from './schema';
 
@@ -92,11 +93,23 @@ describe('Library Schematic', () => {
       expect(packageJson.devDependencies['ng-packagr']).toEqual('^2.2.0');
     });
 
-    it(`should not override existing users dependencies`, () => {
+    it('should use the latest known versions in package.json', () => {
       const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+      const pkg = JSON.parse(tree.readContent('/package.json'));
+      expect(pkg.devDependencies['@angular/compiler-cli']).toEqual(latestVersions.Angular);
+      expect(pkg.devDependencies['typescript']).toEqual(latestVersions.TypeScript);
+    });
 
+    it(`should not override existing users dependencies`, () => {
+      const oldPackageJson = workspaceTree.readContent('package.json');
+      workspaceTree.overwrite('package.json', oldPackageJson.replace(
+        `"typescript": "${latestVersions.TypeScript}"`,
+        `"typescript": "~2.5.2"`,
+      ));
+
+      const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
       const packageJson = getJsonFileContent(tree, 'package.json');
-      expect(packageJson.devDependencies.typescript).toEqual('~2.7.2');
+      expect(packageJson.devDependencies.typescript).toEqual('~2.5.2');
     });
 
     it(`should not modify the file when --skipPackageJson`, () => {

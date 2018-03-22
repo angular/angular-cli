@@ -7,6 +7,7 @@
  */
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
 import * as path from 'path';
+import { latestVersions } from '../utility/latest-versions';
 import { Schema as WorkspaceOptions } from './schema';
 
 
@@ -44,5 +45,14 @@ describe('Workspace Schematic', () => {
     const tree = schematicRunner.runSchematic('workspace', defaultOptions);
     const pkg = JSON.parse(tree.readContent('/package.json'));
     expect(pkg.devDependencies['@angular/cli']).toMatch('6.0.0');
+  });
+
+  it('should use the latest known versions in package.json', () => {
+    const tree = schematicRunner.runSchematic('workspace', defaultOptions);
+    const pkg = JSON.parse(tree.readContent('/package.json'));
+    expect(pkg.dependencies['@angular/core']).toEqual(latestVersions.Angular);
+    expect(pkg.dependencies['rxjs']).toEqual(latestVersions.RxJs);
+    expect(pkg.dependencies['zone.js']).toEqual(latestVersions.ZoneJs);
+    expect(pkg.devDependencies['typescript']).toEqual(latestVersions.TypeScript);
   });
 });
