@@ -4,7 +4,7 @@ import { oneLine } from 'common-tags';
 export default function () {
   // TODO(architect): Delete this test. It is now in devkit/build-webpack.
 
-  return ng('lint', 'app')
+  return ng('lint', 'test-project')
     .then(({ stdout }) => {
       if (!stdout.match(/All files pass linting\./)) {
         throw new Error(oneLine`

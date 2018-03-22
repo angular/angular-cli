@@ -64,7 +64,7 @@ export default class GenerateCommand extends SchematicCommand {
       debug: options.debug,
       dryRun: options.dryRun,
       force: options.force,
-    }).then((x) => {console.log('done running', x); return x; });
+    });
   }
 
   private parseSchematicInfo(options: any) {

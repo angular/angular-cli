@@ -13,16 +13,16 @@ export default function() {
     .then(() => oldNumberOfFiles = readdirSync('dist').length)
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
     .then(() => ng('generate', 'module', 'too/lazy', '--routing'))
-    .then(() => prependToFile('src/app/app.module.ts', `
+    .then(() => prependToFile('projects/test-project/src/app/app.module.ts', `
       import { RouterModule } from '@angular/router';
     `))
-    .then(() => replaceInFile('src/app/app.module.ts', 'imports: [', `imports: [
+    .then(() => replaceInFile('projects/test-project/src/app/app.module.ts', 'imports: [', `imports: [
       RouterModule.forRoot([{ path: "lazy", loadChildren: "app/lazy/lazy.module#LazyModule" }]),
       RouterModule.forRoot([{ path: "lazy1", loadChildren: "./lazy/lazy.module#LazyModule" }]),
       RouterModule.forRoot([{ path: "lazy2", loadChildren: "./too/lazy/lazy.module#LazyModule" }]),
     `))
     .then(() => ng('build', '--named-chunks'))
-    .then(() => readdirSync('dist'))
+    .then(() => readdirSync('dist/test-project'))
     .then((distFiles) => {
       const currentNumberOfDistFiles = distFiles.length;
       if (oldNumberOfFiles >= currentNumberOfDistFiles) {
@@ -38,15 +38,15 @@ export default function() {
       }
     })
     // verify System.import still works
-    .then(() => writeFile('src/app/lazy-file.ts', ''))
-    .then(() => appendToFile('src/app/app.component.ts', `
+    .then(() => writeFile('projects/test-project/src/app/lazy-file.ts', ''))
+    .then(() => appendToFile('projects/test-project/src/app/app.component.ts', `
       // verify other System.import still work
       declare var System: any;
       const lazyFile = 'file';
       System.import(/*webpackChunkName: '[request]'*/'./lazy-' + lazyFile);
     `))
     .then(() => ng('build', '--named-chunks'))
-    .then(() => readdirSync('dist'))
+    .then(() => readdirSync('dist/test-project'))
     .then((distFiles) => {
       const currentNumberOfDistFiles = distFiles.length;
       if (oldNumberOfFiles >= currentNumberOfDistFiles) {
@@ -59,19 +59,19 @@ export default function() {
     })
     // verify 'import *' syntax doesn't break lazy modules
     .then(() => silentNpm('install', 'moment'))
-    .then(() => appendToFile('src/app/app.component.ts', `
+    .then(() => appendToFile('projects/test-project/src/app/app.component.ts', `
       import * as moment from 'moment';
       console.log(moment);
     `))
     .then(() => ng('build'))
-    .then(() => readdirSync('dist').length)
+    .then(() => readdirSync('dist/test-project').length)
     .then(currentNumberOfDistFiles => {
       if (oldNumberOfFiles != currentNumberOfDistFiles) {
         throw new Error('Bundles were not created after adding \'import *\'.');
       }
     })
     .then(() => ng('build', '--no-named-chunks'))
-    .then(() => readdirSync('dist'))
+    .then(() => readdirSync('dist/test-project'))
     .then((distFiles) => {
       if (distFiles.includes('lazy-lazy-module.js')
         || distFiles.includes('too-lazy-lazy-module.js')
@@ -81,7 +81,7 @@ export default function() {
     })
     // Check for AoT and lazy routes.
     .then(() => ng('build', '--aot'))
-    .then(() => readdirSync('dist').length)
+    .then(() => readdirSync('dist/test-project').length)
     .then(currentNumberOfDistFiles => {
       if (oldNumberOfFiles != currentNumberOfDistFiles) {
         throw new Error('AoT build contains a different number of files.');

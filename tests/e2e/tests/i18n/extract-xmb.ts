@@ -11,9 +11,9 @@ export default function() {
 
   return ng('generate', 'component', 'i18n-test')
     .then(() => writeFile(
-      join('src/app/i18n-test', 'i18n-test.component.html'),
+      join('projects/test-project/src/app/i18n-test', 'i18n-test.component.html'),
       '<p i18n>Hello world</p>'))
     .then(() => ng('xi18n', '--i18n-format', 'xmb'))
-    .then(() => expectFileToExist(join('src', 'messages.xmb')))
-    .then(() => expectFileToMatch(join('src', 'messages.xmb'), /Hello world/));
+    .then(() => expectFileToExist('projects/test-project/messages.xmb'))
+    .then(() => expectFileToMatch('projects/test-project/messages.xmb', /Hello world/));
 }
