@@ -62,9 +62,16 @@
         "server": {
           "builder": "../../../../packages/angular_devkit/build_webpack:server",
           "options": {
-            "outputPath": "dist",
+            "outputPath": "dist-server",
             "main": "src/main.server.ts",
             "tsConfig": "src/tsconfig.server.json"
+          }
+        },
+        "app-shell": {
+          "builder": "../../../../packages/angular_devkit/build_webpack:app-shell",
+          "options": {
+            "browserTarget": "app:build",
+            "serverTarget": "app:server"
           }
         },
         "serve": {

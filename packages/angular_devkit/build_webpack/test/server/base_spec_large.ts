@@ -12,7 +12,7 @@ import { host, runTargetSpec } from '../utils';
 
 
 describe('Server Builder', () => {
-  const outputPath = normalize('dist');
+  const outputPath = normalize('dist-server');
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
