@@ -121,6 +121,10 @@ const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: 
   .filter(name => !name.includes('tests/commands/new/'))
   // NEEDS devkit change
   .filter(name => !name.endsWith('/existing-directory.ts'))
+  // ngtools/webpack is now in devkit and needs to be tested there
+  .filter(name => !name.endsWith('/packages/webpack/server-ng5.ts'))
+  .filter(name => !name.endsWith('/packages/webpack/test-ng5.ts'))
+  .filter(name => !name.endsWith('/packages/webpack/weird-ng5.ts'))
   .sort();
 
 const shardId = ('shard' in argv) ? argv['shard'] : null;
