@@ -52,6 +52,14 @@ export default function (options: NgNewOptions): Rule {
   };
 
   return chain([
+    mergeWith(
+      apply(empty(), [
+        schematic('workspace', workspaceOptions),
+        schematic('application', applicationOptions),
+        move(options.directory || options.name),
+        tree => Tree.optimize(tree),
+      ]),
+    ),
     (host: Tree, context: SchematicContext) => {
       let packageTask;
       if (!options.skipInstall) {
@@ -64,22 +72,18 @@ export default function (options: NgNewOptions): Rule {
         }
       }
       if (!options.skipGit) {
+        const commit = typeof options.commit == 'object'
+          ? options.commit
+          : (!!options.commit ? {} : false);
+
         context.addTask(
           new RepositoryInitializerTask(
             options.directory,
-            options.commit,
+            commit,
           ),
           packageTask ? [packageTask] : [],
         );
       }
     },
-    mergeWith(
-      apply(empty(), [
-        schematic('workspace', workspaceOptions),
-        schematic('application', applicationOptions),
-        move(options.directory || options.name),
-        tree => Tree.optimize(tree),
-      ]),
-    ),
   ]);
 }

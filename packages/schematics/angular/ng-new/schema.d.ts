@@ -30,7 +30,7 @@ export interface Schema {
   /**
    * Initial repository commit information.
    */
-  commit?: { name: string, email: string, message?: string };
+  commit?: { name: string, email: string, message?: string } | boolean;
   /**
    * The path where new projects will be created.
    */

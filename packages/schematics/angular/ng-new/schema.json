@@ -39,7 +39,7 @@
     "commit": {
       "description": "Initial repository commit information.",
       "oneOf": [
-        { "type": "null" },
+        { "type": "boolean" },
         {
           "type": "object",
           "properties": {
@@ -59,7 +59,8 @@
             "email"
           ]
         }
-      ]
+      ],
+      "default": true
     },
     "newProjectRoot": {
       "description": "The path where new projects will be created.",
