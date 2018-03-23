@@ -4,6 +4,7 @@ import { ArchitectCommand } from '../models/architect-command';
 export interface Options {
   project?: string;
   configuration?: string;
+  prod: boolean;
 }
 
 export default class TestCommand extends ArchitectCommand {
@@ -18,12 +19,20 @@ export default class TestCommand extends ArchitectCommand {
   ];
 
   public async run(options: Options) {
+    let configuration = options.configuration;
+    if (!configuration && options.prod) {
+      configuration = 'production';
+    }
+
     const overrides = { ...options };
     delete overrides.project;
+    delete overrides.configuration;
+    delete overrides.prod;
+
     return this.runArchitectTarget({
       project: options.project,
       target: this.target,
-      configuration: options.configuration,
+      configuration,
       overrides
     });
   }

@@ -6,14 +6,12 @@ import { getGlobalVariable } from '../../utils/env';
 
 
 export default function () {
-  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
-
   return Promise.resolve()
     .then(() => writeMultipleFiles({
       'projects/test-project/src/styles.css': 'div { background: url("./assets/more.png"); }',
     }))
     // use image with file size >10KB to prevent inlining
-    .then(() => copyProjectAsset('images/spectrum.png', './assets/more.png'))
+    .then(() => copyProjectAsset('images/spectrum.png', './projects/test-project/src/assets/more.png'))
     .then(() => ng('build', '--deploy-url=deployUrl/', '--extract-css'))
     .then(() => expectFileToMatch('dist/test-project/index.html', 'deployUrl/main.js'))
     // verify --deploy-url isn't applied to extracted css urls
@@ -23,7 +21,7 @@ export default function () {
     .then(() => expectFileToMatch('dist/test-project/index.html', 'http://example.com/some/path/main.js'))
     // verify --deploy-url is applied to non-extracted css urls
     .then(() => ng('build', '--deploy-url=deployUrl/', '--extract-css=false'))
-    .then(() => expectFileToMatch('dist/test-project/tyles.js',
+    .then(() => expectFileToMatch('dist/test-project/styles.js',
       /\(['"]?deployUrl\/more\.png['"]?\)/))
     .then(() => expectFileToMatch('dist/test-project/runtime.js',
       /__webpack_require__\.p = "deployUrl\/";/));

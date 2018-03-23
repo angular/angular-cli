@@ -25,31 +25,34 @@ export default function () {
     // These should work.
     .then(() => ng('e2e', 'test-project-e2e'))
     .then(() => ng('e2e', 'test-project-e2e', '--devServerTarget=test-project:serve:production'))
-    // TODO(architect): disabled until arg coercion is added.
-    // Should use port in baseUrl
-    // .then(() => ng('e2e', 'test-project-e2e', '--port', '4400'))
     // Should accept different config file
-    .then(() => moveFile('./protractor.conf.js', './renamed-protractor.conf.js'))
-    .then(() => ng('e2e', 'test-project-e2e', '--protractorConfig=renamed-protractor.conf.js'))
-    .then(() => moveFile('./renamed-protractor.conf.js', './protractor.conf.js'))
-    // TODO(architect): disabled until arg coercion is added.
+    .then(() => moveFile('./projects/test-project-e2e/protractor.conf.js',
+      './projects/test-project-e2e/renamed-protractor.conf.js'))
+    .then(() => ng('e2e', 'test-project-e2e',
+      '--protractorConfig=projects/test-project-e2e/renamed-protractor.conf.js'))
+    .then(() => moveFile('./projects/test-project-e2e/renamed-protractor.conf.js', './projects/test-project-e2e/protractor.conf.js'))
     // Should accept different multiple spec files
-    // .then(() => moveFile('./e2e/app.e2e-spec.ts', './e2e/renamed-app.e2e-spec.ts'))
-    // .then(() => copyFile('./e2e/renamed-app.e2e-spec.ts', './e2e/another-app.e2e-spec.ts'))
-    // .then(() => ng('e2e', 'test-project-e2e', '--specs', './e2e/renamed-app.e2e-spec.ts',
-    //   '--specs', './e2e/another-app.e2e-spec.ts'))
+    .then(() => moveFile('./projects/test-project-e2e/src/app.e2e-spec.ts',
+      './projects/test-project-e2e/src/renamed-app.e2e-spec.ts'))
+    .then(() => copyFile('./projects/test-project-e2e/src/renamed-app.e2e-spec.ts',
+      './projects/test-project-e2e/src/another-app.e2e-spec.ts'))
+    .then(() => ng('e2e', 'test-project-e2e', '--specs', './e2e/renamed-app.e2e-spec.ts',
+      '--specs', './e2e/another-app.e2e-spec.ts'))
+    // Rename the spec back to how it was.
+    .then(() => moveFile('./projects/test-project-e2e/src/renamed-app.e2e-spec.ts',
+      './projects/test-project-e2e/src/app.e2e-spec.ts'))
     // Suites block need to be added in the protractor.conf.js file to test suites
-    .then(() => replaceInFile('protractor.conf.js', `allScriptsTimeout: 11000,`,
+    .then(() => replaceInFile('projects/test-project-e2e/protractor.conf.js', `allScriptsTimeout: 11000,`,
       `allScriptsTimeout: 11000,
           suites: {
-            app: './e2e/app.e2e-spec.ts'
+            app: './projects/test-project-e2e/src/app.e2e-spec.ts'
           },
     `))
     .then(() => ng('e2e', 'test-project-e2e', '--suite=app'))
-    // remove suites block from protractor.conf.js file after testing suites
-    .then(() => replaceInFile('projects/test/project-e2e/protractor.conf.js', `allScriptsTimeout: 11000,
+    // Remove suites block from protractor.conf.js file after testing suites
+    .then(() => replaceInFile('projects/test-project-e2e/protractor.conf.js', `allScriptsTimeout: 11000,
           suites: {
-            app: './e2e/app.e2e-spec.ts'
+            app: './projects/test-project-e2e/src/app.e2e-spec.ts'
           },
     `, `allScriptsTimeout: 11000,`
     ))

@@ -31,12 +31,13 @@ export default class ServeCommand extends ArchitectCommand {
 
   public async run(options: Options) {
     let configuration = options.configuration;
-    if (options.prod) {
+    if (!configuration && options.prod) {
       configuration = 'production';
     }
 
     const overrides = { ...options };
     delete overrides.project;
+    delete overrides.configuration;
     delete overrides.prod;
 
     return this.runArchitectTarget({

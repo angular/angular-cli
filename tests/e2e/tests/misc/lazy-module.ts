@@ -5,8 +5,6 @@ import {appendToFile, writeFile, prependToFile, replaceInFile} from '../../utils
 
 
 export default function() {
-  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
-
   let oldNumberOfFiles = 0;
   return Promise.resolve()
     .then(() => ng('build'))
@@ -17,7 +15,7 @@ export default function() {
       import { RouterModule } from '@angular/router';
     `))
     .then(() => replaceInFile('projects/test-project/src/app/app.module.ts', 'imports: [', `imports: [
-      RouterModule.forRoot([{ path: "lazy", loadChildren: "app/lazy/lazy.module#LazyModule" }]),
+      RouterModule.forRoot([{ path: "lazy", loadChildren: "projects/test-project/src/app/lazy/lazy.module#LazyModule" }]),
       RouterModule.forRoot([{ path: "lazy1", loadChildren: "./lazy/lazy.module#LazyModule" }]),
       RouterModule.forRoot([{ path: "lazy2", loadChildren: "./too/lazy/lazy.module#LazyModule" }]),
     `))
