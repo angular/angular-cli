@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.0-beta.8"></a>
+# 5.0.0-beta.8 (2018-03-23)
+
+
+### build
+
+* fix secondary entrypoints and bundle with APF v5 ([#940](https://github.com/angular/universal/issues/940)) ([ce1baff](https://github.com/angular/universal/commit/ce1baff))
+
+
 <a name="5.0.0-beta.7"></a>
 # 5.0.0-beta.7 (2018-03-21)
 
