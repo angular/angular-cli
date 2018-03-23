@@ -1,5 +1,5 @@
 import { CommandScope, Option } from '../models/command';
-import { CliConfig } from '../models/config';
+import { getDefaultSchematicCollection } from '../utilities/config';
 import { SchematicCommand } from '../models/schematic-command';
 
 
@@ -34,7 +34,7 @@ export default class NewCommand extends SchematicCommand {
     this.initialized = true;
 
     const collectionName = this.parseCollectionName(options);
-    const schematicName = CliConfig.fromGlobal().get('defaults.schematics.newApp');
+    const schematicName = 'application';
 
     return this.getOptions({
         schematicName,
@@ -83,10 +83,7 @@ export default class NewCommand extends SchematicCommand {
   }
 
   private parseCollectionName(options: any): string {
-    let collectionName: string =
-      options.collection ||
-      options.c ||
-      CliConfig.getValue('defaults.schematics.collection');
+    const collectionName = options.collection || options.c || getDefaultSchematicCollection();
 
     return collectionName;
   }

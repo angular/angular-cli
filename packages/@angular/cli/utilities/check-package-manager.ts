@@ -1,10 +1,10 @@
 import chalk from 'chalk';
-import {exec} from 'child_process';
+import { exec } from 'child_process';
 import { promisify } from 'util';
-import {CliConfig} from '../models/config';
+import { getPackageManager } from './config';
 
 const execPromise = promisify(exec);
-const packageManager = CliConfig.fromGlobal().get('packageManager');
+const packageManager = getPackageManager();
 
 
 export function checkYarnOrCNPM() {

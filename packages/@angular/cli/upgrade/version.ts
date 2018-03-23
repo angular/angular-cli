@@ -1,26 +1,14 @@
 import { SemVer, satisfies } from 'semver';
 import chalk from 'chalk';
 import { stripIndents, stripIndent } from 'common-tags';
-import { readFileSync, existsSync } from 'fs';
 import * as path from 'path';
-
-import { CliConfig } from '../models/config';
-import { findUp } from '../utilities/find-up';
+import { isWarningEnabled } from '../utilities/config';
 import { requireProjectModule } from '../utilities/require-project-module';
 
 const resolve = require('resolve');
 
 
 const { bold, red, yellow } = chalk;
-
-function _hasOldCliBuildFile() {
-  return existsSync(findUp('angular-cli-build.js', process.cwd()))
-    || existsSync(findUp('angular-cli-build.ts', process.cwd()))
-    || existsSync(findUp('ember-cli-build.js', process.cwd()))
-    || existsSync(findUp('angular-cli-build.js', __dirname))
-    || existsSync(findUp('angular-cli-build.ts', __dirname))
-    || existsSync(findUp('ember-cli-build.js', __dirname));
-}
 
 
 export class Version {
@@ -60,27 +48,11 @@ export class Version {
       if (angularCliPath && packageJson) {
         try {
           return new Version(packageJson.version);
-        } catch (e) {
+        } catch {
           return new Version(null);
         }
       }
-    } catch (e) {
-      // Fallback to reading config.
-    }
-
-
-    const configPath = CliConfig.configFilePath();
-
-    if (configPath === null) {
-      return new Version(null);
-    }
-
-    const configJson = readFileSync(configPath, 'utf8');
-
-    try {
-      const json = JSON.parse(configJson);
-      return new Version(json.project);
-    } catch (e) {
+    } catch {
       return new Version(null);
     }
   }
@@ -91,7 +63,7 @@ export class Version {
     try {
       angularPkgJson = requireProjectModule(projectRoot, '@angular/core/package.json');
       rxjsPkgJson = requireProjectModule(projectRoot, 'rxjs/package.json');
-    } catch (_) {
+    } catch {
       console.error(bold(red(stripIndents`
         You seem to not be depending on "@angular/core" and/or "rxjs". This is an error.
       `)));
@@ -149,15 +121,14 @@ export class Version {
   }
 
   static assertTypescriptVersion(projectRoot: string) {
-    const config = CliConfig.fromProject() || CliConfig.fromGlobal();
-    if (!config.get('warnings.typescriptMismatch')) {
+    if (!isWarningEnabled('typescriptMismatch')) {
       return;
     }
     let compilerVersion: string, tsVersion: string;
     try {
       compilerVersion = requireProjectModule(projectRoot, '@angular/compiler-cli').VERSION.full;
       tsVersion = requireProjectModule(projectRoot, 'typescript').version;
-    } catch (_) {
+    } catch {
       console.error(bold(red(stripIndents`
         Versions of @angular/compiler-cli and typescript could not be determined.
         The most common reason for this is a broken npm install.
@@ -171,10 +142,10 @@ export class Version {
 
     const versionCombos = [
       { compiler: '>=2.3.1 <3.0.0', typescript: '>=2.0.2 <2.3.0' },
-      { compiler: '>=4.0.0 <5.0.0', typescript: '>=2.1.0 <2.4.0' },
-      { compiler: '>=5.0.0 <5.1.0', typescript: '>=2.4.2 <2.5.0' },
-      { compiler: '>=5.1.0 <5.2.0', typescript: '>=2.4.2 <2.6.0' },
-      { compiler: '>=5.2.0 <6.0.0', typescript: '>=2.4.2 <2.7.0' },
+      { compiler: '>=4.0.0-beta.0 <5.0.0', typescript: '>=2.1.0 <2.4.0' },
+      { compiler: '>=5.0.0-beta.0 <5.1.0', typescript: '>=2.4.2 <2.5.0' },
+      { compiler: '>=5.1.0-beta.0 <5.2.0', typescript: '>=2.4.2 <2.6.0' },
+      { compiler: '>=5.2.0-beta.0 <6.0.0', typescript: '>=2.4.2 <2.7.0' },
       { compiler: '>=6.0.0-beta.0 <7.0.0', typescript: '>=2.7.0 <2.8.0' },
     ];
 
@@ -196,26 +167,4 @@ export class Version {
     }
   }
 
-  static isPreWebpack(): boolean {
-    // CliConfig is a bit stricter with the schema, so we need to be a little looser with it.
-    const version = Version.fromProject();
-
-    if (version && version.isKnown()) {
-      if (version.major == 0) {
-        return true;
-      } else if (version.major > 1 || version.minor != 0) {
-        return false;
-      } else if (version.isBeta() && !version.toString().match(/webpack/)) {
-        const betaVersion = version.extra;
-
-        if (parseInt(betaVersion) < 12) {
-          return true;
-        }
-      }
-    } else {
-      return _hasOldCliBuildFile();
-    }
-
-    return false;
-  }
 }

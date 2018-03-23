@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import { CommandScope, Option } from '../models/command';
 import { parseOptions } from '../models/command-runner';
-import { CliConfig } from '../models/config';
+import { getPackageManager } from '../utilities/config';
 import { SchematicCommand } from '../models/schematic-command';
 import { NpmInstall } from '../tasks/npm-install';
 
@@ -49,7 +49,7 @@ export default class AddCommand extends SchematicCommand {
       );
     }
 
-    const packageManager = CliConfig.fromGlobal().get('packageManager');
+    const packageManager = getPackageManager();
 
     const npmInstall: NpmInstall = require('../tasks/npm-install').default;
 
