@@ -179,7 +179,8 @@ export function useCIChrome() {
   // --no-sandbox is needed for Circle CI.
   // Travis can use headless chrome, but not appveyor.
   return Promise.resolve()
-    .then(() => replaceInFile('protractor.conf.js', `'browserName': 'chrome'`,
+    .then(() => replaceInFile('projects/test-project-e2e/protractor.conf.js',
+      `'browserName': 'chrome'`,
       `'browserName': 'chrome',
         chromeOptions: {
           args: [

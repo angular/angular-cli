@@ -36,7 +36,7 @@ export default function () {
       'projects/test-project/src/assets/small.svg': imgSvg,
       'projects/test-project/src/assets/small-id.svg': imgSvg
     }))
-    .then(() => copyProjectAsset('images/spectrum.png', './projects/test-project/assets/large.png'))
+    .then(() => copyProjectAsset('images/spectrum.png', './projects/test-project/src/assets/large.png'))
     .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.styles = [

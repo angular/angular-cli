@@ -1,10 +1,8 @@
 import { ng } from '../../utils/process';
 import { writeFile } from '../../utils/fs';
+import { updateJsonFile } from '../../utils/project';
 
 export default function () {
-  // TODO(architect): re-enable after build-webpack supports this functionality.
-  return;
-
   // Tests run in 'dev' environment by default.
   return writeFile('projects/test-project/src/app/environment.spec.ts', `
       import { environment } from '../environments/environment';
@@ -16,6 +14,19 @@ export default function () {
       });
     `)
     .then(() => ng('test', '--watch=false'))
+    .then(() => updateJsonFile('angular.json', configJson => {
+      const appArchitect = configJson.projects['test-project'].architect;
+      appArchitect.test.configurations = {
+        production: {
+          fileReplacements: [
+            {
+              from: 'projects/test-project/src/environments/environment.ts',
+              to: 'projects/test-project/src/environments/environment.prod.ts'
+            }
+          ],
+        }
+      };
+    }))
 
     // Tests can run in different environment.
     .then(() => writeFile('projects/test-project/src/app/environment.spec.ts', `
@@ -27,5 +38,5 @@ export default function () {
         });
       });
     `))
-    .then(() => ng('test', '-e', 'prod', '--watch=false'));
+    .then(() => ng('test', '--prod', '--watch=false'));
 }

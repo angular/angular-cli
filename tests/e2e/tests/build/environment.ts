@@ -1,23 +1,22 @@
 import {ng} from '../../utils/process';
 import {expectFileToMatch} from '../../utils/fs';
-import {expectGitToBeClean} from '../../utils/git';
-import {expectToFail} from '../../utils/utils';
-import {getGlobalVariable} from '../../utils/env';
+import { updateJsonFile } from '../../utils/project';
 
 
 export default function() {
-  // Disable parts of it in webpack tests.
-  const ejected = getGlobalVariable('argv').eject;
-
   // Try a prod build.
-  return ng('build', '--environment=prod')
-    .then(() => expectFileToMatch('dist/test-project/main.js', 'production: true'))
-    // If this is an ejected test, the eject will create files so git will not be clean.
-    .then(() => !ejected && expectGitToBeClean())
-
-    // Build fails on invalid build target
-    .then(() => expectToFail(() => ng('build', '--target=potato')))
-
-    // This is a valid target.
-    .then(() => ng('build', '--target=production'));
+  return Promise.resolve()
+    .then(() => updateJsonFile('angular.json', configJson => {
+      const appArchitect = configJson.projects['test-project'].architect;
+      appArchitect.build.configurations['prod-env'] = {
+        fileReplacements: [
+          {
+            from: 'projects/test-project/src/environments/environment.ts',
+            to: 'projects/test-project/src/environments/environment.prod.ts'
+          }
+        ],
+      };
+    }))
+    .then(() => ng('build', '--configuration=prod-env'))
+    .then(() => expectFileToMatch('dist/test-project/main.js', 'production: true'));
 }

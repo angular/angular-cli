@@ -16,12 +16,12 @@ export default function () {
     .then(() => expectFileToMatch('dist/test-project/styles.css', stripIndents`
       /* normal-comment */
       /*! important-comment */
-      div { -webkit-box-flex: 1; -ms-flex: 1; flex: 1 }
+      div { -ms-flex: 1; flex: 1 }
     `))
     // uses postcss-discard-comments plugin for prod
     .then(() => ng('build', '--prod'))
     .then(() => glob.sync('dist/test-project/styles.*.css').find(file => !!file))
     .then((stylesBundle) => expectFileToMatch(stylesBundle, stripIndents`
-      /*! important-comment */div{-webkit-box-flex:1;-ms-flex:1;flex:1}
+      /*! important-comment */div{-ms-flex:1;flex:1}
     `));
 }

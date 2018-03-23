@@ -15,8 +15,6 @@ const imgSvg = `
 `;
 
 export default function () {
-  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
-
   return Promise.resolve()
     // Verify absolute/relative paths in global/component css.
     .then(() => writeMultipleFiles({
@@ -32,11 +30,11 @@ export default function () {
       'projects/test-project/src/assets/component-img-absolute.svg': imgSvg
     }))
     // use image with file size >10KB to prevent inlining
-    .then(() => copyProjectAsset('images/spectrum.png', './projects/test-project/assets/global-img-relative.png'))
-    .then(() => copyProjectAsset('images/spectrum.png', './projects/test-project/assets/component-img-relative.png'))
+    .then(() => copyProjectAsset('images/spectrum.png', './projects/test-project/src/assets/global-img-relative.png'))
+    .then(() => copyProjectAsset('images/spectrum.png', './projects/test-project/src/assets/component-img-relative.png'))
     .then(() => ng('build', '--extract-css', '--aot'))
     // Check paths are correctly generated.
-    .then(() => expectFileToMatch('dist/test-project/styles.css', 'projects/test-project/assets/global-img-absolute.svg'))
+    .then(() => expectFileToMatch('dist/test-project/styles.css', 'assets/global-img-absolute.svg'))
     .then(() => expectFileToMatch('dist/test-project/styles.css',
       /url\('\/assets\/global-img-absolute\.svg'\)/))
     .then(() => expectFileToMatch('dist/test-project/styles.css',

@@ -5,14 +5,9 @@ import { expectToFail } from '../../utils/utils';
 
 
 export default async function () {
-  // TODO(architect): this test fails with weird fsevents install errors.
-  // Investigate and re-enable afterwards.
-  // Might be https://github.com/npm/npm/issues/19747 or https://github.com/npm/npm/issues/11973.
-  return;
-
-  await updateJsonFile('projects/test-project/src/tsconfig.app.json', tsconfig => {
+  await updateJsonFile('tsconfig.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
-      '*': ['../node_modules/*'],
+      '*': ['./node_modules/*'],
     };
   });
   await ng('build');
@@ -25,14 +20,14 @@ export default async function () {
 
   await expectToFail(() => ng('build'));
 
-  await updateJsonFile('projects/test-project/src/tsconfig.app.json', tsconfig => {
+  await updateJsonFile('tsconfig.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
-      '@angular/common': [ '../xyz/common' ],
+      '@angular/common': [ './xyz/common' ],
     };
   });
   await ng('build');
 
-  await updateJsonFile('projects/test-project/src/tsconfig.app.json', tsconfig => {
+  await updateJsonFile('tsconfig.json', tsconfig => {
     delete tsconfig.compilerOptions.paths;
   });
 
@@ -47,12 +42,12 @@ export default async function () {
   await ng('build', '--aot');
   await ng('test', '--watch=false');
 
-  await updateJsonFile('projects/test-project/src/tsconfig.app.json', tsconfig => {
+  await updateJsonFile('tsconfig.json', tsconfig => {
     tsconfig.compilerOptions.paths = {};
   });
   await ng('build');
 
-  await updateJsonFile('projects/test-project/src/tsconfig.app.json', tsconfig => {
+  await updateJsonFile('tsconfig.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
       '@app/*': ['*'],
       '@lib/*/test': ['*/test'],
@@ -60,14 +55,14 @@ export default async function () {
   });
   await ng('build');
 
-  await updateJsonFile('projects/test-project/src/tsconfig.app.json', tsconfig => {
+  await updateJsonFile('tsconfig.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
       '@firebase/polyfill': ['@firebase/polyfill/index.ts'],
     };
   });
   await expectToFail(() => ng('build'));
 
-  await updateJsonFile('projects/test-project/src/tsconfig.app.json', tsconfig => {
+  await updateJsonFile('tsconfig.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
       '@firebase/polyfill*': ['@firebase/polyfill/index.ts'],
     };

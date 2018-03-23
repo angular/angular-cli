@@ -34,6 +34,7 @@ export default class BuildCommand extends ArchitectCommand {
 
     const overrides = { ...options };
     delete overrides.project;
+    delete overrides.configuration;
     delete overrides.prod;
 
     return this.runArchitectTarget({
