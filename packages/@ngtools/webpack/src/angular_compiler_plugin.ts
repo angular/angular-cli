@@ -60,6 +60,7 @@ export interface AngularCompilerPluginOptions {
   entryModule?: string;
   mainPath?: string;
   skipCodeGeneration?: boolean;
+  skipRemoveDecorators?: boolean;
   hostReplacementPaths?: { [path: string]: string };
   // TODO: remove singleFileIncludes for 2.0, this is just to support old projects that did not
   // include 'polyfills.ts' in `tsconfig.spec.json'.
@@ -685,7 +686,9 @@ export class AngularCompilerPlugin implements Tapable {
       this._transformers.push(replaceResources(isAppPath));
     } else {
       // Remove unneeded angular decorators.
-      this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
+      if(!this._options.skipRemoveDecorators) {
+        this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
+      }
     }
 
     if (this._platform === PLATFORM.Browser) {
