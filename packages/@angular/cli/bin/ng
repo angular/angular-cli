@@ -5,7 +5,7 @@
 // Due to an obscure Mac bug, do not start this title with any symbol.
 process.title = 'ng';
 
-const CliConfig = require('../models/config').CliConfig;
+const isWarningEnabled = require('../utilities/config').isWarningEnabled;
 const Version = require('../upgrade/version').Version;
 
 const fs = require('fs');
@@ -68,8 +68,7 @@ if (process.env['NG_CLI_PROFILING']) {
 
 // Show the warnings/errors due to package and version deprecation.
 const version = new SemVer(process.version);
-if (version.compare(new SemVer('8.9.0')) < 0
-  && CliConfig.fromGlobal().get('warnings.nodeDeprecation')) {
+if (version.compare(new SemVer('8.9.0')) < 0 && isWarningEnabled('nodeDeprecation')) {
   process.stderr.write(yellow(stripIndents`
     You are running version ${version.version} of Node, which is not supported by Angular CLI v6.
     The official Node version that is supported is 8.9 and greater.
@@ -104,7 +103,7 @@ resolve('@angular/cli', { basedir: process.cwd() },
         shouldWarn = true;
       }
 
-      if (shouldWarn && CliConfig.fromGlobal().get('warnings.versionMismatch')) {
+      if (shouldWarn && isWarningEnabled('versionMismatch')) {
         let warning = yellow(stripIndents`
         Your global Angular CLI version (${globalVersion}) is greater than your local
         version (${localVersion}). The local Angular CLI version is used.

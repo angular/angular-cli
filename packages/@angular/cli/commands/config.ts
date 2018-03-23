@@ -1,7 +1,15 @@
-import { Command } from '../models/command';
-import * as fs from 'fs';
-import { CliConfig } from '../models/config';
-import { oneLine } from 'common-tags';
+import { writeFileSync } from 'fs';
+import { Command, Option } from '../models/command';
+import { getWorkspace, getWorkspaceRaw, validateWorkspace } from '../utilities/config';
+import {
+  JsonValue,
+  JsonArray,
+  JsonObject,
+  JsonParseMode,
+  experimental,
+  parseJson,
+} from '@angular-devkit/core';
+import { WorkspaceJson } from '@angular-devkit/core/src/workspace';
 
 const SilentError = require('silent-error');
 
@@ -12,41 +20,133 @@ export interface ConfigOptions {
   global?: boolean;
 }
 
+/**
+ * Splits a JSON path string into fragments. Fragments can be used to get the value referenced
+ * by the path. For example, a path of "a[3].foo.bar[2]" would give you a fragment array of
+ * ["a", 3, "foo", "bar", 2].
+ * @param path The JSON string to parse.
+ * @returns {string[]} The fragments for the string.
+ * @private
+ */
+function parseJsonPath(path: string): string[] {
+  const fragments = (path || '').split(/\./g);
+  const result: string[] = [];
+
+  while (fragments.length > 0) {
+    const fragment = fragments.shift();
+
+    const match = fragment.match(/([^\[]+)((\[.*\])*)/);
+    if (!match) {
+      throw new Error('Invalid JSON path.');
+    }
+
+    result.push(match[1]);
+    if (match[2]) {
+      const indices = match[2].slice(1, -1).split('][');
+      result.push(...indices);
+    }
+  }
+
+  return result.filter(fragment => !!fragment);
+}
+
+function getValueFromPath<T extends JsonArray | JsonObject>(
+  root: T,
+  path: string,
+): JsonValue | undefined {
+  const fragments = parseJsonPath(path);
+
+  try {
+    return fragments.reduce((value: JsonValue, current: string | number) => {
+      if (value == undefined || typeof value != 'object') {
+        return undefined;
+      } else if (typeof current == 'string' && !Array.isArray(value)) {
+        return value[current];
+      } else if (typeof current == 'number' && Array.isArray(value)) {
+        return value[current];
+      } else {
+        return undefined;
+      }
+    }, root);
+  } catch {
+    return undefined;
+  }
+}
+
+function setValueFromPath<T extends JsonArray | JsonObject>(
+  root: T,
+  path: string,
+  newValue: JsonValue,
+): JsonValue | undefined {
+  const fragments = parseJsonPath(path);
+
+  try {
+    return fragments.reduce((value: JsonValue, current: string | number, index: number) => {
+      if (value == undefined || typeof value != 'object') {
+        return undefined;
+      } else if (typeof current == 'string' && !Array.isArray(value)) {
+        if (index === fragments.length - 1) {
+          value[current] = newValue;
+        } else if (value[current] == undefined) {
+          if (typeof fragments[index + 1] == 'number') {
+            value[current] = [];
+          } else if (typeof fragments[index + 1] == 'string') {
+            value[current] = {};
+          }
+        }
+        return value[current];
+      } else if (typeof current == 'number' && Array.isArray(value)) {
+        if (index === fragments.length - 1) {
+          value[current] = newValue;
+        } else if (value[current] == undefined) {
+          if (typeof fragments[index + 1] == 'number') {
+            value[current] = [];
+          } else if (typeof fragments[index + 1] == 'string') {
+            value[current] = {};
+          }
+        }
+        return value[current];
+      } else {
+        return undefined;
+      }
+    }, root);
+  } catch {
+    return undefined;
+  }
+}
+
 export default class ConfigCommand extends Command {
   public readonly name = 'config';
   public readonly description = 'Get/set configuration values.';
   public readonly arguments = ['jsonPath', 'value'];
-  public readonly options = [
-    {
-      name: 'global',
-      type: Boolean,
-      'default': false,
-      aliases: ['g'],
-      description: 'Get/set the value in the global configuration (in your home directory).'
-    }
+  public readonly options: Option[] = [
+    // {
+    //   name: 'global',
+    //   type: Boolean,
+    //   'default': false,
+    //   aliases: ['g'],
+    //   description: 'Get/set the value in the global configuration (in your home directory).'
+    // }
   ];
 
   public run(options: ConfigOptions) {
-    const config = options.global ? CliConfig.fromGlobal() : CliConfig.fromProject();
+    const config = (getWorkspace() as {} as { _workspace: WorkspaceJson});
 
-    if (config === null) {
-      throw new SilentError('No config found. If you want to use global configuration, '
-        + 'you need the --global argument.');
+    if (!config) {
+      throw new SilentError('No config found.');
     }
 
-    const action = !!options.value ? 'set' : 'get';
-
-    if (action === 'get') {
-      this.get(config, options);
+    if (options.value == undefined) {
+      this.get(config._workspace, options);
     } else {
-      this.set(config, options);
+      this.set(options);
     }
   }
 
-  private get(config: CliConfig, options: ConfigOptions) {
-    const value = config.get(options.jsonPath);
+  private get(config: experimental.workspace.WorkspaceJson, options: ConfigOptions) {
+    const value = options.jsonPath ? getValueFromPath(config as any, options.jsonPath) : config;
 
-    if (value === null || value === undefined) {
+    if (value === undefined) {
       throw new SilentError('Value cannot be found.');
     } else if (typeof value == 'object') {
       this.logger.info(JSON.stringify(value, null, 2));
@@ -55,80 +155,28 @@ export default class ConfigCommand extends Command {
     }
   }
 
-  private set(config: CliConfig, options: ConfigOptions) {
-    const type = config.typeOf(options.jsonPath);
-      let value: any = options.value;
-      switch (type) {
-        case 'boolean': value = this.asBoolean(options.value); break;
-        case 'number': value = this.asNumber(options.value); break;
-        case 'string': value = options.value; break;
+  private set(options: ConfigOptions) {
+    const [config, configPath] = getWorkspaceRaw();
 
-        default: value = this.parseValue(options.value, options.jsonPath);
-      }
+    // TODO: Modify & save without destroying comments
+    const configValue = config.value;
 
-      if (options.jsonPath.endsWith('.prefix')) {
-        // update tslint if prefix is updated
-        this.updateLintForPrefix(this.project.root + '/tslint.json', value);
-      }
+    const value = parseJson(options.value, JsonParseMode.Loose);
+    const result = setValueFromPath(configValue, options.jsonPath, value);
 
-      try {
-        config.set(options.jsonPath, value);
-        config.save();
-      } catch (error) {
-        throw new SilentError(error.message);
-      }
-  }
-
-  private asBoolean(raw: string): boolean {
-    if (raw == 'true' || raw == '1') {
-      return true;
-    } else if (raw == 'false' || raw == '' || raw == '0') {
-      return false;
-    } else {
-      throw new SilentError(`Invalid boolean value: "${raw}"`);
+    if (result === undefined) {
+      throw new SilentError('Value cannot be found.');
     }
-  }
 
-  private asNumber(raw: string): number {
-    const val = Number(raw);
-    if (Number.isNaN(val)) {
-      throw new SilentError(`Invalid number value: "${raw}"`);
-    }
-    return val;
-  }
-
-  private parseValue(rawValue: string, path: string) {
     try {
-      return JSON.parse(rawValue);
+      validateWorkspace(configValue);
     } catch (error) {
-      throw new SilentError(`No node found at path ${path}`);
+      this.logger.error(error.message);
+      throw new SilentError();
     }
+
+    const output = JSON.stringify(configValue);
+    writeFileSync(configPath, output);
   }
 
-  private updateLintForPrefix(filePath: string, prefix: string): void {
-    if (!fs.existsSync(filePath)) {
-      return;
-    }
-
-    const tsLint = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-
-    if (Array.isArray(tsLint.rules['component-selector'][2])) {
-      tsLint.rules['component-selector'][2].push(prefix);
-    } else {
-      tsLint.rules['component-selector'][2] = prefix;
-    }
-
-    if (Array.isArray(tsLint.rules['directive-selector'][2])) {
-      tsLint.rules['directive-selector'][2].push(prefix);
-    } else {
-      tsLint.rules['directive-selector'][2] = prefix;
-    }
-
-    fs.writeFileSync(filePath, JSON.stringify(tsLint, null, 2));
-
-    this.logger.warn(oneLine`
-      tslint configuration updated to match new prefix,
-      you may need to fix any linting errors.
-    `);
-  }
 }

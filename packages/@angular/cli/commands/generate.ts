@@ -1,6 +1,6 @@
 import { CommandScope, Option } from '../models/command';
 import chalk from 'chalk';
-import { CliConfig } from '../models/config';
+import { getDefaultSchematicCollection } from '../utilities/config';
 import {
   getCollection,
   getEngineHost
@@ -68,7 +68,7 @@ export default class GenerateCommand extends SchematicCommand {
   }
 
   private parseSchematicInfo(options: any) {
-    let collectionName: string = CliConfig.getValue('defaults.schematics.collection');
+    let collectionName = getDefaultSchematicCollection();
 
     let schematicName = options._[0];
 
