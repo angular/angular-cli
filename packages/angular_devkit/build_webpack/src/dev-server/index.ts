@@ -234,9 +234,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     const config: WebpackDevServerConfigurationOptions = {
       headers: { 'Access-Control-Allow-Origin': '*' },
       historyApiFallback: {
-        index: `${servePath}/${
-          path.relative(projectRoot, path.resolve(root, browserOptions.index))
-          }`,
+        index: `${servePath}/${path.basename(browserOptions.index)}`,
         disableDotRule: true,
         htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
       },
