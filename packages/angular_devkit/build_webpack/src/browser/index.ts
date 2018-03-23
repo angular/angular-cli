@@ -14,9 +14,8 @@ import {
 import { Path, getSystemPath, join, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable } from 'rxjs/Observable';
-import { concat as concatObservable } from 'rxjs/observable/concat';
-import { empty } from 'rxjs/observable/empty';
-import { ignoreElements, switchMap } from 'rxjs/operators';
+import { of } from 'rxjs/observable/of';
+import { concat, concatMap } from 'rxjs/operators';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import * as webpack from 'webpack';
 import {
@@ -123,11 +122,11 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
 
-    return concatObservable(
-      options.deleteOutputPath
+    return of(null).pipe(
+      concatMap(() => options.deleteOutputPath
         ? this._deleteOutputDir(root, normalize(options.outputPath), this.context.host)
-        : empty<BuildEvent>(),
-      new Observable(obs => {
+        : of(null)),
+      concatMap(() => new Observable(obs => {
         // Ensure Build Optimizer is only used with AOT.
         if (options.buildOptimizer && !options.aot) {
           throw new Error('The `--build-optimizer` option cannot be used without `--aot`.');
@@ -198,7 +197,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
           }
           throw err;
         }
-      }),
+      })),
     );
   }
 
@@ -211,7 +210,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
 
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
 
-    options.fileReplacements.forEach(({from, to}) => {
+    options.fileReplacements.forEach(({ from, to }) => {
       host.aliases.set(
         join(root, normalize(from)),
         join(root, normalize(to)),
@@ -284,21 +283,18 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
     return webpackMerge(webpackConfigs);
   }
 
-  private _deleteOutputDir(root: Path, outputPath: Path, host: virtualFs.Host): Observable<void> {
+  private _deleteOutputDir(root: Path, outputPath: Path, host: virtualFs.Host) {
     const resolvedOutputPath = resolve(root, outputPath);
     if (resolvedOutputPath === root) {
       throw new Error('Output path MUST not be project root directory!');
     }
 
     return host.exists(resolvedOutputPath).pipe(
-      switchMap(exists => {
-        if (exists) {
-          return host.delete(resolvedOutputPath);
-        } else {
-          return empty<void>();
-        }
-      }),
-      ignoreElements(),
+      concatMap(exists => exists
+        // TODO: remove this concat once host ops emit an event.
+        ? host.delete(resolvedOutputPath).pipe(concat(of(null)))
+        // ? of(null)
+        : of(null)),
     );
   }
 }
