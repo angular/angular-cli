@@ -81,11 +81,17 @@ if (targetStr) {
 
 // Load workspace configuration file.
 const currentPath = process.cwd();
-const configFileName = '.workspace.json';
-const configFilePath = findUp([configFileName], currentPath);
+const configFileNames = [
+  'angular.json',
+  '.angular.json',
+  'workspace.json',
+  '.workspace.json',
+];
+
+const configFilePath = findUp(configFileNames, currentPath);
 
 if (!configFilePath) {
-  logger.fatal(`Workspace configuration file (${configFileName}) cannot be found in `
+  logger.fatal(`Workspace configuration file (${configFileNames.join(', ')}) cannot be found in `
     + `'${currentPath}' or in parent directories.`);
   process.exit(3);
   throw 3;  // TypeScript doesn't know that process.exit() never returns.
