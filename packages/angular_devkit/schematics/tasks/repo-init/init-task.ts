@@ -10,8 +10,8 @@ import { RepositoryInitializerName, RepositoryInitializerTaskOptions } from './o
 
 export interface CommitOptions {
   message?: string;
-  name: string;
-  email: string;
+  name?: string;
+  email?: string;
 }
 
 export class RepositoryInitializerTask
