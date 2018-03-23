@@ -17,7 +17,7 @@ import {
 } from '@angular/platform-server';
 
 import { FileLoader } from './file-loader';
-import { REQUEST, RESPONSE } from '../tokens';
+import { REQUEST, RESPONSE } from '@nguniversal/express-engine/tokens';
 
 /**
  * These are the allowed options for the engine

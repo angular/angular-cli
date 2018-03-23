@@ -25,7 +25,7 @@ const buildLicense = `/**
  */`;
 
 /** The namespace for the packages. Instead of @angular, we use @nguniversal */
-const namespace = '@nguniversal';
+const namespace = 'nguniversal';
 
 /** The library entrypoints that are built under the namespace */
 const libNames = [
@@ -40,7 +40,7 @@ module.exports = {
   projectVersion: buildVersion,
   angularVersion: angularVersion,
   projectDir: __dirname,
-  packagesDir: join(__dirname, 'src'),
+  packagesDir: join(__dirname, 'modules'),
   outputDir: join(__dirname, 'dist'),
   licenseBanner: buildLicense,
   namespace,

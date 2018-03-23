@@ -21,16 +21,20 @@
     "lib": ["es2015", "dom"],
     "skipLibCheck": true,
     "types": ["node"],
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@nguniversal/aspnetcore-engine/*": ["../../dist/packages/aspnetcore-engine/*"]
+    }
   },
   "files": [
-    "./public-api.ts"
+    "public-api.ts"
   ],
   "angularCompilerOptions": {
     "annotateForClosureCompiler": true,
-    "strictMetadataEmit": true,
-    "skipTemplateCodegen": true,
+    "strictMetadataEmit": false, // Workaround for Angular #22210
     "flatModuleOutFile": "index.js",
-    "flatModuleId": "@nguniversal/aspnetcore-engine"
+    "flatModuleId": "@nguniversal/aspnetcore-engine",
+    "skipTemplateCodegen": true,
+    "fullTemplateTypeCheck": true
   }
 }

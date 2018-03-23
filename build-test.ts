@@ -1,13 +1,19 @@
-import {buildConfig, buildLib} from './tools/package-tools';
+import {buildConfig, BuildPackage, packages} from './tools/package-tools';
 
 declare var require: any;
 
 const rimraf = require('rimraf');
 
+const buildPkg = async (pkg: BuildPackage) => {
+  pkg.dependencies.forEach(buildPkg);
+  await pkg.compileTests();
+};
+
+
 rimraf(buildConfig.outputDir, async () => {
-  for (const lib of buildConfig.libNames) {
-    const exitCode = await buildLib(lib, true);
-    console.log(exitCode === 0 ? `Build succeeded for ${lib}` : `Build failed for ${lib}`);
-    console.log();
+  for (const pkg of packages) {
+    console.log(`Building package to test: ${pkg.name}`);
+    await buildPkg(pkg);
+    console.log(`Finished building: ${pkg.name}`);
   }
 });

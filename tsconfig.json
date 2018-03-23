@@ -23,7 +23,14 @@
     ],
     "noStrictGenericChecks": true,
     "baseUrl": "./",
-    "rootDir": "./"
+    "rootDir": "./",
+    "paths": {
+      "@nguniversal/common/*": ["./modules/common/*"],
+      "@nguniversal/aspnetcore-engine/*": ["./modules/aspnetcore-engine/*"],
+      "@nguniversal/express-engine/*": ["./modules/express-engine/*"],
+      "@nguniversal/hapi-engine/*": ["./modules/hapi-engine/*"],
+      "@nguniversal/module-map-ngfactory-loader/*": ["./modules/module-map-ngfactory-loader/*"]
+    }
   },
   "exclude": [
     "bazel-out",

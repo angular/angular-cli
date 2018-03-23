@@ -1,6 +1,6 @@
 {
   "name": "@nguniversal/common",
-  "version": "5.0.0-beta.6",
+  "version": "0.0.0-PLACEHOLDER",
   "description": "Angular Universal common utilities",
   "main": "./bundles/common.umd.js",
   "module": "./esm5/common.es5.js",
@@ -12,8 +12,8 @@
     "universal"
   ],
   "peerDependencies": {
-    "@angular/common": "^5.0.0",
-    "@angular/core": "^5.0.0"
+    "@angular/common": "0.0.0-NG",
+    "@angular/core": "0.0.0-NG"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,6 @@
 {
   "name": "@nguniversal/express-engine",
-  "version": "5.0.0-beta.6",
+  "version": "0.0.0-PLACEHOLDER",
   "description": "Express Engine for running Server Angular Apps",
   "main": "./bundles/express-engine.umd.js",
   "module": "./esm5/express-engine.es5.js",
@@ -13,9 +13,9 @@
     "universal"
   ],
   "peerDependencies": {
-    "@angular/common": "^5.0.0",
-    "@angular/core": "^5.0.0",
-    "@angular/platform-server": "^5.0.0",
+    "@angular/common": "0.0.0-NG",
+    "@angular/core": "0.0.0-NG",
+    "@angular/platform-server": "0.0.0-NG",
     "express": "^4.15.2"
   },
   "repository": {

@@ -5,12 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Type, NgModuleFactory, CompilerFactory, Compiler } from '@angular/core';
+import {Type, NgModuleFactory, CompilerFactory, Compiler, StaticProvider} from '@angular/core';
 import { platformDynamicServer } from '@angular/platform-server';
 import { DOCUMENT } from '@angular/common';
 import { ResourceLoader } from '@angular/compiler';
 
-import { REQUEST, ORIGIN_URL } from '../tokens';
+import { REQUEST, ORIGIN_URL } from '@nguniversal/aspnetcore-engine/tokens';
 import { FileLoader } from './file-loader';
 import { IEngineOptions } from './interfaces/engine-options';
 import { IEngineRenderResult } from './interfaces/engine-render-result';
@@ -121,16 +121,8 @@ export function ngAspnetCoreEngine(options: IEngineOptions): Promise<IEngineRend
 
       options.providers = options.providers || [];
 
-      const extraProviders = options.providers.concat(
-        [{
-          provide: ORIGIN_URL,
-          useValue: options.request.origin
-        }, {
-          provide: REQUEST,
-          useValue: options.request.data.request
-        }
-        ]
-      );
+      const extraProviders = options.providers.concat(getReqResProviders(options.request.origin,
+        options.request.data.request));
 
       getFactory(moduleOrFactory, compiler)
         .then(factory => {
@@ -165,6 +157,23 @@ export function ngAspnetCoreEngine(options: IEngineOptions): Promise<IEngineRend
 
   });
 
+}
+
+/**
+ * Get providers of the request and response
+ */
+function getReqResProviders(origin: string, request: string): StaticProvider[] {
+  const providers: StaticProvider[] = [
+    {
+      provide: ORIGIN_URL,
+      useValue: origin
+    },
+    {
+      provide: REQUEST,
+      useValue: request
+    }
+  ];
+  return providers;
 }
 
 /* @internal */

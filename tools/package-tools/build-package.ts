@@ -1,184 +1,109 @@
-import {existsSync, readFileSync, writeFileSync, mkdirSync} from 'fs';
-import {join, dirname} from 'path';
-
+import {join} from 'path';
+import {red} from 'chalk';
+import {PackageBundler} from './build-bundles';
 import {buildConfig} from './build-config';
-import {rollupGlobals} from './rollup-globals';
+import {getSecondaryEntryPointsForPackage} from './secondary-entry-points';
+import {compileEntryPoint, renamePrivateReExportsToBeUnique} from './compile-entry-point';
+import {ngcCompile} from './ngc-compile';
 
-const glob = require('glob');
-const camelCase = require('camelcase');
-const ngc = require('@angular/compiler-cli/src/main').main;
-const rollup = require('rollup');
-const uglify = require('rollup-plugin-uglify');
-const sourcemaps = require('rollup-plugin-sourcemaps');
-const nodeResolve = require('rollup-plugin-node-resolve');
+const {packagesDir, outputDir} = buildConfig;
 
-const packagesFolder = join(buildConfig.outputDir, 'packages');
-const releasesFolder = join(buildConfig.outputDir, 'releases');
+/** Name of the tsconfig file that is responsible for building an ES2015 package. */
+const buildTsconfigName = 'tsconfig.lib.json';
 
-export async function buildLib(libName: string, test: boolean = false) {
-  const srcFolder = join(buildConfig.projectDir, 'modules', libName);
-  const libPackageFolder = join(packagesFolder, libName);
-  const libReleaseFolder = join(releasesFolder, libName);
-  const libBundlesFolder = join(libReleaseFolder, 'bundles');
-  const es5DistFolder = join(libReleaseFolder, 'esm5');
-  const es2015DistFolder = join(libReleaseFolder, 'esm2015');
-  const es5OutputFolder = join(libPackageFolder, 'lib-es5');
-  const es2015OutputFolder = libPackageFolder;
-  const tsConfig = test ? 'tsconfig.spec.json' : 'tsconfig.lib.json';
+/** Name of the tsconfig file that is responsible for building the tests. */
+const testsTsconfigName = 'tsconfig.spec.json';
 
-  console.log(`#### BUILDING ${libName} ${test ? 'W/ TESTS ' : ''}####`);
+export class BuildPackage {
+  /** Path to the package sources. */
+  sourceDir: string;
 
-  // Compile to ES2015.
-  let exitCode = ngc(['-p', join(srcFolder, tsConfig)]);
-  if (exitCode !== 0) {
-    return exitCode;
+  /** Path to the ES2015 package output. */
+  outputDir: string;
+
+  /** Path to the ES5 package output. */
+  esm5OutputDir: string;
+
+  /** Whether this package will re-export its secondary-entry points at the root module. */
+  exportsSecondaryEntryPointsAtRoot = false;
+
+  /** Path to the entry file of the package in the output directory. */
+  readonly entryFilePath: string;
+
+  /** Package bundler instance. */
+  private bundler = new PackageBundler(this);
+
+  /** Secondary entry-points partitioned by their build depth. */
+  private get secondaryEntryPointsByDepth(): string[][] {
+    this.cacheSecondaryEntryPoints();
+    return this._secondaryEntryPointsByDepth;
+  }
+  private _secondaryEntryPointsByDepth: string[][];
+
+  /** Secondary entry points for the package. */
+  get secondaryEntryPoints(): string[] {
+    this.cacheSecondaryEntryPoints();
+    return this._secondaryEntryPoints;
+  }
+  private _secondaryEntryPoints: string[];
+
+  constructor(readonly name: string, readonly dependencies: BuildPackage[] = []) {
+    this.sourceDir = join(packagesDir, name);
+    this.outputDir = join(outputDir, 'packages', name);
+    this.esm5OutputDir = join(outputDir, 'packages', name, 'esm5');
+    this.entryFilePath = join(this.outputDir, 'index.js');
   }
 
-  console.log('ES2015 compilation succeeded.');
+  /** Compiles the package sources with all secondary entry points. */
+  async compile() {
+    // Compile all secondary entry-points with the same depth in parallel, and each separate depth
+    // group in sequence. This will look something like:
+    // Depth 0: coercion, platform, keycodes, bidi
+    // Depth 1: a11y, scrolling
+    // Depth 2: overlay
+    for (const entryPointGroup of this.secondaryEntryPointsByDepth) {
+      await Promise.all(entryPointGroup.map(p => this._compileBothTargets(p)));
+    }
 
-  if (test) {
-    return 0;
+    // Compile the primary entry-point.
+    await this._compileBothTargets();
   }
 
-  // Compile to ES5.
-  exitCode = ngc([
-    '-p',
-    join(srcFolder, 'tsconfig.lib.json'),
-    '--outDir',
-    es5OutputFolder,
-    '--target',
-    'ES5'
-  ]);
-  if (exitCode !== 0) {
-    return exitCode;
+  /** Compiles the TypeScript test source files for the package. */
+  async compileTests() {
+    await this._compileTestEntryPoint(testsTsconfigName);
   }
 
-  console.log('ES5 compilation succeeded.');
+  /** Creates all bundles for the package and all associated entry points. */
+  async createBundles() {
+    await this.bundler.createBundles();
+  }
 
-  // Copy typings and metadata to `dist/` folder.
-  await _relativeCopy('**/*.+(d.ts|metadata.json)', es2015OutputFolder,
-    join(libReleaseFolder, 'typings'));
+  /** Compiles TS into both ES2015 and ES5, then updates exports. */
+  private async _compileBothTargets(p = '') {
+    return compileEntryPoint(this, buildTsconfigName, p)
+      .then(() => compileEntryPoint(this, buildTsconfigName, p, this.esm5OutputDir))
+      .then(() => renamePrivateReExportsToBeUnique(this, p));
+  }
 
-  _metaDataReExport(libReleaseFolder, `./typings/index`, libName, libName);
-  _typingsReExport(libReleaseFolder, `./typings/index`, libName);
+  /** Compiles the TypeScript sources of a primary or secondary entry point. */
+  private _compileTestEntryPoint(tsconfigName: string, secondaryEntryPoint = ''): Promise<any> {
+    const entryPointPath = join(this.sourceDir, secondaryEntryPoint);
+    const entryPointTsconfigPath = join(entryPointPath, tsconfigName);
 
-  console.log('Typings and metadata copy succeeded.');
-
-  // Bundle lib.
-  const es5Entry = join(es5OutputFolder, `index.js`);
-  const es2015Entry = join(es2015OutputFolder, `index.js`);
-
-  // Base configuration.
-  const rollupBaseConfig = {
-    moduleName: 'nguniversal.' + camelCase(libName),
-    sourceMap: true,
-    // ATTENTION:
-    // Add any dependency or peer dependency your library to `globals` and `external`.
-    // This is required for UMD bundle users.
-    globals: rollupGlobals,
-    external: Object.keys(rollupGlobals),
-    plugins: [
-      sourcemaps(),
-      nodeResolve()
-    ]
-  };
-
-  // UMD bundle.
-  const umdConfig = Object.assign({}, rollupBaseConfig, {
-    entry: es5Entry,
-    dest: join(libBundlesFolder, `${libName}.umd.js`),
-    format: 'umd',
-  });
-
-  // Minified UMD bundle.
-  const minifiedUmdConfig = Object.assign({}, rollupBaseConfig, {
-    entry: es5Entry,
-    dest: join(libBundlesFolder, `${libName}.umd.min.js`),
-    format: 'umd',
-    plugins: rollupBaseConfig.plugins.concat([uglify({})])
-  });
-
-  // ESM+ES5 flat module bundle.
-  const fesm5config = Object.assign({}, rollupBaseConfig, {
-    entry: es5Entry,
-    dest: join(es5DistFolder, `${libName}.es5.js`),
-    format: 'es'
-  });
-
-  // ESM+ES2015 flat module bundle.
-  const fesm2015config = Object.assign({}, rollupBaseConfig, {
-    entry: es2015Entry,
-    dest: join(es2015DistFolder, `${libName}.js`),
-    format: 'es'
-  });
-
-  const allBundles = [
-    umdConfig,
-    minifiedUmdConfig,
-    fesm5config,
-    fesm2015config
-  ].map(cfg => rollup.rollup(cfg).then(bundle => bundle.write(cfg)));
-
-  await Promise.all(allBundles)
-    .then(() => console.log('All bundles generated successfully.'));
-
-  // Copy package files
-  await _relativeCopy('LICENSE', buildConfig.projectDir, libReleaseFolder);
-  await _relativeCopy('package.json', srcFolder, libReleaseFolder);
-  await _relativeCopy('README.md', srcFolder, libReleaseFolder);
-
-  console.log('Package files copy succeeded.');
-
-  return 0;
-}
-
-// Copy files maintaining relative paths.
-function _relativeCopy(fileGlob: string, from: string, to: string) {
-  return new Promise((resolve, reject) => {
-    glob(fileGlob, { cwd: from, nodir: true }, (err: string, files: string[]) => {
-      if (err) {
-        reject(err);
-      }
-      files.forEach((file: string) => {
-        const origin = join(from, file);
-        const dest = join(to, file);
-        const data = readFileSync(origin, 'utf-8');
-        _recursiveMkDir(dirname(dest));
-        writeFileSync(dest, data);
-      });
-      resolve();
+    return ngcCompile(['-p', entryPointTsconfigPath]).catch(() => {
+      const error = red(`Failed to compile ${secondaryEntryPoint} using ${entryPointTsconfigPath}`);
+      console.error(error);
+      return Promise.reject(error);
     });
-  });
-}
-
-// Recursively create a dir.
-function _recursiveMkDir(dir: string) {
-  if (!existsSync(dir)) {
-    _recursiveMkDir(dirname(dir));
-    mkdirSync(dir);
   }
-}
 
-function _typingsReExport(outDir: string, from: string, fileName: string) {
-  writeFileSync(join(outDir, `${fileName}.d.ts`),
-    `export * from '${from}';\n`,
-    'utf-8');
-}
-
-function _metaDataReExport(destDir: string,
-                           from: string|string[],
-                           entryPointName: string,
-                           importAsName: string) {
-  from = Array.isArray(from) ? from : [from];
-
-  const metadataJsonContent = JSON.stringify({
-    __symbolic: 'module',
-    version: 3,
-    metadata: {},
-    exports: from.map(f => ({from: f})),
-    flatModuleIndexRedirect: true,
-    importAs: `${buildConfig.namespace}/${importAsName}`
-  }, null, 2);
-
-  writeFileSync(join(destDir, `${entryPointName}.metadata.json`), metadataJsonContent, 'utf-8');
+  /** Stores the secondary entry-points for this package if they haven't been computed already. */
+  private cacheSecondaryEntryPoints() {
+    if (!this._secondaryEntryPoints) {
+      this._secondaryEntryPointsByDepth = getSecondaryEntryPointsForPackage(this);
+      this._secondaryEntryPoints =
+        this._secondaryEntryPointsByDepth.reduce((list, p) => list.concat(p), []);
+    }
+  }
 }

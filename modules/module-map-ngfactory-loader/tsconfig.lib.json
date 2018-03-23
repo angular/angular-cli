@@ -24,13 +24,14 @@
     "baseUrl": "."
   },
   "files": [
-    "./public-api.ts"
+    "public-api.ts"
   ],
   "angularCompilerOptions": {
     "annotateForClosureCompiler": true,
-    "strictMetadataEmit": true,
-    "skipTemplateCodegen": true,
+    "strictMetadataEmit": false, // Workaround for Angular #22210
     "flatModuleOutFile": "index.js",
-    "flatModuleId": "@nguniversal/module-map-ngfactory-loader"
+    "flatModuleId": "@nguniversal/module-map-ngfactory-loader",
+    "skipTemplateCodegen": true,
+    "fullTemplateTypeCheck": true
   }
 }
