@@ -107,20 +107,22 @@ export class ActionList implements Iterable<Action> {
       }
     }
 
-    this._actions = [
-      ...[...toDelete.values()].map(x => {
-        return { kind: 'd', path: x } as DeleteFileAction;
-      }),
-      ...[...toRename.entries()].map(([from, to]) => {
-        return { kind: 'r', path: from, to } as RenameFileAction;
-      }),
-      ...[...toCreate.entries()].map(([path, content]) => {
-        return { kind: 'c', path, content } as CreateFileAction;
-      }),
-      ...[...toOverwrite.entries()].map(([path, content]) => {
-        return { kind: 'o', path, content } as OverwriteFileAction;
-      }),
-    ];
+    this._actions = [];
+    toDelete.forEach(x => {
+      this.delete(x);
+    });
+
+    toRename.forEach((to, from) => {
+      this.rename(from, to);
+    });
+
+    toCreate.forEach((content, path) => {
+      this.create(path, content);
+    });
+
+    toOverwrite.forEach((content, path) => {
+      this.overwrite(path, content);
+    });
   }
 
   push(action: Action) { this._actions.push(action); }
