@@ -6,6 +6,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
+import 'symbol-observable';
+// symbol polyfill must go first
+// tslint:disable-next-line:ordered-imports import-groups
 import {
   JsonObject,
   normalize,

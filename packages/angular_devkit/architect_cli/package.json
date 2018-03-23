@@ -18,6 +18,7 @@
     "@angular-devkit/core": "0.0.0",
     "@angular-devkit/architect": "0.0.0",
     "minimist": "^1.2.0",
+    "symbol-observable": "^1.2.0",
     "rxjs": "^6.0.0-beta.3"
   }
 }

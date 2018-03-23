@@ -23,5 +23,13 @@ export function isPromise(obj: any): obj is Promise<any> {
  */
 // tslint:disable-next-line:no-any
 export function isObservable(obj: any | Observable<any>): obj is Observable<any> {
-  return !!obj && (Symbol.observable in obj || typeof obj.subscribe === 'function');
+  if (!obj || typeof obj !== 'object') {
+    return false;
+  }
+
+  if (Symbol.observable && Symbol.observable in obj) {
+    return true;
+  }
+
+  return typeof obj.subscribe === 'function';
 }

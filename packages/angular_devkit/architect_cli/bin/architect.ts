@@ -7,6 +7,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import 'symbol-observable';
+// symbol polyfill must go first
+// tslint:disable-next-line:ordered-imports import-groups
 import { Architect } from '@angular-devkit/architect';
 import { dirname, experimental, normalize, tags } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';

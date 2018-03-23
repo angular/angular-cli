@@ -143,6 +143,7 @@
     "style-loader": "^0.20.2",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
+    "symbol-observable": "^1.2.0",
     "tar": "^3.1.5",
     "temp": "^0.8.3",
     "tree-kill": "^1.2.0",
