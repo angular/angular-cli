@@ -59,6 +59,7 @@ export interface AngularCompilerPluginOptions {
   entryModule?: string;
   mainPath?: string;
   skipCodeGeneration?: boolean;
+  // Allows to disable the decorators in AOT production as an option.
   skipRemoveDecorators?: boolean;
   hostReplacementPaths?: { [path: string]: string };
   forkTypeChecker?: boolean;
@@ -712,7 +713,7 @@ export class AngularCompilerPlugin {
       // Replace resources in JIT.
       this._transformers.push(replaceResources(isAppPath));
     } else if (!this._options.skipRemoveDecorators) {
-      // Remove unneeded angular decorators.
+      // Remove unneeded angular decorators if options.skipRemoveDecorators is not true.
       this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
     }
 
