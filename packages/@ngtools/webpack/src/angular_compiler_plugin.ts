@@ -59,6 +59,7 @@ export interface AngularCompilerPluginOptions {
   entryModule?: string;
   mainPath?: string;
   skipCodeGeneration?: boolean;
+  skipRemoveDecorators?: boolean;
   hostReplacementPaths?: { [path: string]: string };
   forkTypeChecker?: boolean;
   // TODO: remove singleFileIncludes for 2.0, this is just to support old projects that did not
@@ -710,7 +711,7 @@ export class AngularCompilerPlugin {
     if (this._JitMode) {
       // Replace resources in JIT.
       this._transformers.push(replaceResources(isAppPath));
-    } else {
+    } else if(!this._options.skipRemoveDecorators) {
       // Remove unneeded angular decorators.
       this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
     }
