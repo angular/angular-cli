@@ -1,21 +1,21 @@
 // @ignoreDep typescript
 import * as fs from 'fs';
-import { fork, ForkOptions, ChildProcess } from 'child_process';
+import {fork, ForkOptions, ChildProcess} from 'child_process';
 import * as path from 'path';
 import * as ts from 'typescript';
 
 const ContextElementDependency = require('webpack/lib/dependencies/ContextElementDependency');
 const treeKill = require('tree-kill');
 
-import { WebpackResourceLoader } from './resource_loader';
-import { WebpackCompilerHost } from './compiler_host';
-import { resolveWithPaths } from './paths-plugin';
-import { findLazyRoutes, LazyRouteMap } from './lazy_routes';
+import {WebpackResourceLoader} from './resource_loader';
+import {WebpackCompilerHost} from './compiler_host';
+import {resolveWithPaths} from './paths-plugin';
+import {findLazyRoutes, LazyRouteMap} from './lazy_routes';
 import {
   VirtualFileSystemDecorator,
   VirtualWatchFileSystemDecorator
 } from './virtual_file_system_decorator';
-import { resolveEntryModuleFromMain } from './entry_resolver';
+import {resolveEntryModuleFromMain} from './entry_resolver';
 import {
   replaceBootstrap,
   replaceServerBootstrap,
@@ -26,9 +26,9 @@ import {
   findResources,
   replaceResources,
 } from './transformers';
-import { time, timeEnd } from './benchmark';
-import { InitMessage, UpdateMessage, AUTO_START_ARG } from './type_checker';
-import { gatherDiagnostics, hasErrors } from './gather_diagnostics';
+import {time, timeEnd} from './benchmark';
+import {InitMessage, UpdateMessage, AUTO_START_ARG} from './type_checker';
+import {gatherDiagnostics, hasErrors} from './gather_diagnostics';
 import {
   CompilerCliIsSupported,
   __NGTOOLS_PRIVATE_API_2,
@@ -46,7 +46,7 @@ import {
   formatDiagnostics,
   readConfiguration,
 } from './ngtools_api';
-import { collectDeepNodes } from './transformers/ast_helpers';
+import {collectDeepNodes} from './transformers/ast_helpers';
 
 
 /**
@@ -59,6 +59,7 @@ export interface AngularCompilerPluginOptions {
   entryModule?: string;
   mainPath?: string;
   skipCodeGeneration?: boolean;
+  skipRemoveDecorators?: boolean;
   hostReplacementPaths?: { [path: string]: string };
   forkTypeChecker?: boolean;
   // TODO: remove singleFileIncludes for 2.0, this is just to support old projects that did not
@@ -134,8 +135,14 @@ export class AngularCompilerPlugin {
     this._setupOptions(this._options);
   }
 
-  get options() { return this._options; }
-  get done() { return this._donePromise; }
+  get options() {
+    return this._options;
+  }
+
+  get done() {
+    return this._donePromise;
+  }
+
   get entryModule() {
     if (!this._entryModule) {
       return undefined;
@@ -143,7 +150,7 @@ export class AngularCompilerPlugin {
     const splitted = this._entryModule.split(/(#[a-zA-Z_]([\w]+))$/);
     const path = splitted[0];
     const className = !!splitted[1] ? splitted[1].substring(1) : 'default';
-    return { path, className };
+    return {path, className};
   }
 
   static isSupported() {
@@ -180,7 +187,7 @@ export class AngularCompilerPlugin {
     }
 
     this._rootNames = config.rootNames.concat(...this._singleFileIncludes);
-    this._compilerOptions = { ...config.options, ...options.compilerOptions };
+    this._compilerOptions = {...config.options, ...options.compilerOptions};
     this._basePath = config.options.basePath;
 
     // Overwrite outDir so we can find generated files next to their .ts origin in compilerHost.
@@ -336,7 +343,7 @@ export class AngularCompilerPlugin {
           this._updateForkedTypeChecker(this._rootNames, this._getChangedCompilationFiles());
         }
 
-         // Use an identity function as all our paths are absolute already.
+        // Use an identity function as all our paths are absolute already.
         this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
 
         if (this._JitMode) {
@@ -433,7 +440,7 @@ export class AngularCompilerPlugin {
         const ref = curr.route;
         if (ref in acc && acc[ref] !== curr.referencedModule.filePath) {
           throw new Error(
-            + `Duplicated path in loadChildren detected: "${ref}" is used in 2 loadChildren, `
+            +`Duplicated path in loadChildren detected: "${ref}" is used in 2 loadChildren, `
             + `but they point to different modules "(${acc[ref]} and `
             + `"${curr.referencedModule.filePath}"). Webpack cannot distinguish on context and `
             + 'would fail to load the proper one.'
@@ -504,7 +511,7 @@ export class AngularCompilerPlugin {
     // Signal the process to start listening for messages
     // Solves https://github.com/angular/angular-cli/issues/9071
     const forkArgs = [AUTO_START_ARG];
-    const forkOptions: ForkOptions = { execArgv };
+    const forkOptions: ForkOptions = {execArgv};
 
     this._typeCheckerProcess = fork(
       path.resolve(__dirname, typeCheckerFile),
@@ -566,48 +573,48 @@ export class AngularCompilerPlugin {
       const angularCoreDirname = fs.realpathSync(path.dirname(angularCorePackagePath));
 
       cmf.hooks.afterResolve.tapAsync('angular-compiler',
-      (result: any, callback: (err?: any, request?: any) => void) => {
-        if (!result) {
-          return callback();
-        }
+        (result: any, callback: (err?: any, request?: any) => void) => {
+          if (!result) {
+            return callback();
+          }
 
-        // Alter only request from Angular.
-        if (!result.resource.startsWith(angularCoreDirname)) {
-          return callback(null, result);
-        }
+          // Alter only request from Angular.
+          if (!result.resource.startsWith(angularCoreDirname)) {
+            return callback(null, result);
+          }
 
-        this.done!.then(() => {
-          // This folder does not exist, but we need to give webpack a resource.
-          // TODO: check if we can't just leave it as is (angularCoreModuleDir).
-          result.resource = path.join(this._basePath, '$$_lazy_route_resource');
-          result.dependencies.forEach((d: any) => d.critical = false);
-          result.resolveDependencies = (_fs: any, resourceOrOptions: any, recursiveOrCallback: any,
-            _regExp: RegExp, cb: any) => {
-            const dependencies = Object.keys(this._lazyRoutes)
-              .map((key) => {
-                const modulePath = this._lazyRoutes[key];
-                const importPath = key.split('#')[0];
-                if (modulePath !== null) {
-                  const name = importPath.replace(/(\.ngfactory)?\.(js|ts)$/, '');
-                  return new ContextElementDependency(modulePath, name);
-                } else {
-                  return null;
+          this.done!.then(() => {
+            // This folder does not exist, but we need to give webpack a resource.
+            // TODO: check if we can't just leave it as is (angularCoreModuleDir).
+            result.resource = path.join(this._basePath, '$$_lazy_route_resource');
+            result.dependencies.forEach((d: any) => d.critical = false);
+            result.resolveDependencies = (_fs: any, resourceOrOptions: any, recursiveOrCallback: any,
+                                          _regExp: RegExp, cb: any) => {
+              const dependencies = Object.keys(this._lazyRoutes)
+                .map((key) => {
+                  const modulePath = this._lazyRoutes[key];
+                  const importPath = key.split('#')[0];
+                  if (modulePath !== null) {
+                    const name = importPath.replace(/(\.ngfactory)?\.(js|ts)$/, '');
+                    return new ContextElementDependency(modulePath, name);
+                  } else {
+                    return null;
+                  }
+                })
+                .filter(x => !!x);
+              if (typeof cb !== 'function' && typeof recursiveOrCallback === 'function') {
+                // Webpack 4 only has 3 parameters
+                cb = recursiveOrCallback;
+                if (this._options.nameLazyFiles) {
+                  resourceOrOptions.chunkName = '[request]';
                 }
-              })
-              .filter(x => !!x);
-            if (typeof cb !== 'function' && typeof recursiveOrCallback === 'function') {
-              // Webpack 4 only has 3 parameters
-              cb = recursiveOrCallback;
-              if (this._options.nameLazyFiles) {
-                resourceOrOptions.chunkName = '[request]';
               }
-            }
-            cb(null, dependencies);
-          };
-          return callback(null, result);
-        }, () => callback(null))
-          .catch(err => callback(err));
-      });
+              cb(null, dependencies);
+            };
+            return callback(null, result);
+          }, () => callback(null))
+            .catch(err => callback(err));
+        });
     });
 
     // Create and destroy forked type checker on watch mode.
@@ -710,7 +717,7 @@ export class AngularCompilerPlugin {
     if (this._JitMode) {
       // Replace resources in JIT.
       this._transformers.push(replaceResources(isAppPath));
-    } else {
+    } else if (!this._options.skipRemoveDecorators) {
       // Remove unneeded angular decorators.
       this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
     }
@@ -750,7 +757,7 @@ export class AngularCompilerPlugin {
     }
 
     return Promise.resolve()
-      // Make a new program and load the Angular structure.
+    // Make a new program and load the Angular structure.
       .then(() => this._createOrUpdateProgram())
       .then(() => {
         if (this.entryModule) {
@@ -789,7 +796,7 @@ export class AngularCompilerPlugin {
 
         // Emit files.
         time('AngularCompilerPlugin._update._emit');
-        const { emitResult, diagnostics } = this._emit(sourceFiles);
+        const {emitResult, diagnostics} = this._emit(sourceFiles);
         timeEnd('AngularCompilerPlugin._update._emit');
 
         // Report diagnostics.
@@ -856,7 +863,7 @@ export class AngularCompilerPlugin {
         // will be watched and trigger a rebuild next time.
         outputText = '';
         errorDependencies = this._getChangedCompilationFiles()
-          // These paths are used by the loader so we must denormalize them.
+        // These paths are used by the loader so we must denormalize them.
           .map((p) => this._compilerHost.denormalizePath(p));
       }
     } else {
@@ -879,7 +886,7 @@ export class AngularCompilerPlugin {
       outputText = this._compilerHost.readFile(outputFile);
       sourceMap = this._compilerHost.readFile(outputFile + '.map');
     }
-    return { outputText, sourceMap, errorDependencies };
+    return {outputText, sourceMap, errorDependencies};
   }
 
   getDependencies(fileName: string): string[] {
@@ -913,7 +920,7 @@ export class AngularCompilerPlugin {
       .map((resourcePath) => path.resolve(path.dirname(resolvedFileName), resourcePath));
 
     // These paths are meant to be used by the loader so we must denormalize them.
-    const uniqueDependencies =  new Set([
+    const uniqueDependencies = new Set([
       ...esImports,
       ...resourceImports,
       ...this.getResourceDependencies(resolvedFileName)
@@ -956,7 +963,7 @@ export class AngularCompilerPlugin {
             const timeLabel = `AngularCompilerPlugin._emit.ts+${sf.fileName}+.emit`;
             time(timeLabel);
             emitResult = tsProgram.emit(sf, undefined, undefined, undefined,
-              { before: this._transformers }
+              {before: this._transformers}
             );
             allDiagnostics.push(...emitResult.diagnostics);
             timeEnd(timeLabel);
@@ -1024,11 +1031,11 @@ export class AngularCompilerPlugin {
         code = UNKNOWN_ERROR_CODE;
       }
       allDiagnostics.push(
-        { category: ts.DiagnosticCategory.Error, messageText: errMsg, code, source: SOURCE });
+        {category: ts.DiagnosticCategory.Error, messageText: errMsg, code, source: SOURCE});
       timeEnd('AngularCompilerPlugin._emit.catch');
     }
     timeEnd('AngularCompilerPlugin._emit');
-    return { program, emitResult, diagnostics: allDiagnostics };
+    return {program, emitResult, diagnostics: allDiagnostics};
   }
 
   private _validateLocale(locale: string): string | null {
