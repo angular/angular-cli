@@ -113,6 +113,18 @@ function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSche
             karmaConfig: `${projectRoot}/karma.conf.js`,
           },
         },
+        lint: {
+          builder: '@angular-devkit/build-webpack:lint',
+          options: {
+            tsConfig: [
+              'projects/lib/tsconfig.lint.json',
+              'projects/lib/tsconfig.spec.json',
+            ],
+            exclude: [
+              '**/node_modules/**',
+            ],
+          },
+        },
       },
     };
 

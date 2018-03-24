@@ -22,6 +22,18 @@
             "progress": false,
             "watch": false
           }
+        },
+        "lint": {
+          "builder": "../../../../packages/angular_devkit/build_webpack:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/lib/tsconfig.lint.json",
+              "projects/lib/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
         }
       }
     }

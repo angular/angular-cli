@@ -1,0 +1,12 @@
+{
+  "extends": "<%= projectRoot.split('/').map(x => '..').join('/') %>/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "<%= projectRoot.split('/').map(x => '..').join('/') %>/out-tsc/spec",
+    "module": "es2015",
+    "types": []
+  },
+  "exclude": [
+    "src/test.ts",
+    "**/*.spec.ts"
+  ]
+}

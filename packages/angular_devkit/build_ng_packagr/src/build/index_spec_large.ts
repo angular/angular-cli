@@ -42,4 +42,14 @@ describe('NgPackagr Builder', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
+
+  it('lint works', (done) => {
+    const targetSpec: TargetSpecifier = { project: 'lib', target: 'lint' };
+
+    return workspace.loadWorkspaceFromHost(workspaceFile).pipe(
+      concatMap(ws => new Architect(ws).loadArchitect()),
+      concatMap(arch => arch.run(arch.getBuilderConfiguration(targetSpec))),
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+    ).subscribe(undefined, done.fail, done);
+  }, 30000);
 });
