@@ -717,11 +717,9 @@ export class AngularCompilerPlugin {
     if (this._JitMode) {
       // Replace resources in JIT.
       this._transformers.push(replaceResources(isAppPath));
-    } else {
+    } else if (!this._options.skipRemoveDecorators) {
       // Remove unneeded angular decorators.
-      if (!this._options.skipRemoveDecorators) {
-        this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
-      }
+      this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
     }
 
     if (this._platform === PLATFORM.Browser) {
