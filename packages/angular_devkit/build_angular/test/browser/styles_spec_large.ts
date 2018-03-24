@@ -519,7 +519,7 @@ describe('Browser Builder styles', () => {
         expect(main).toContain(`url('/base/assets/component-img-absolute.svg')`);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 60000);
+  }, 90000);
 
   it(`supports bootstrap@4`, (done) => {
     const overrides = {
