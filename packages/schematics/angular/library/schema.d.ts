@@ -19,4 +19,8 @@ export interface Schema {
    * Do not add dependencies to package.json (e.g., --skipPackageJson)
    */
   skipPackageJson: boolean;
+  /**
+   * Do not update tsconfig.json for development experience (e.g., --skipTsConfig)
+   */
+  skipTsConfig: boolean;
 }

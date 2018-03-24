@@ -40,6 +40,15 @@ interface UpdateJsonFn<T> {
   (obj: T): T | void;
 }
 
+type TsConfigPartialType = {
+  compilerOptions: {
+    baseUrl: string,
+    paths: {
+      [key: string]: string[];
+    },
+  },
+};
+
 function updateJsonFile<T>(host: Tree, path: string, callback: UpdateJsonFn<T>): Tree {
   const source = host.read(path);
   if (source) {
@@ -50,6 +59,23 @@ function updateJsonFile<T>(host: Tree, path: string, callback: UpdateJsonFn<T>):
   }
 
   return host;
+}
+
+function updateTsConfig(npmPackageName: string) {
+
+  return (host: Tree) => {
+    if (!host.exists('tsconfig.json')) { return host; }
+
+    return updateJsonFile(host, 'tsconfig.json', (tsconfig: TsConfigPartialType) => {
+      if (!tsconfig.compilerOptions.paths) {
+        tsconfig.compilerOptions.paths = {};
+      }
+      if (!tsconfig.compilerOptions.paths[npmPackageName]) {
+        tsconfig.compilerOptions.paths[npmPackageName] = [];
+      }
+      tsconfig.compilerOptions.paths[npmPackageName].push(`dist/${npmPackageName}`);
+    });
+  };
 }
 
 function addDependenciesAndScriptsToPackageJson() {
@@ -104,6 +130,11 @@ function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSche
           options: {
             project: `${projectRoot}/ng-package.json`,
           },
+          configurations: {
+            production: {
+              project: `${projectRoot}/ng-package.prod.json`,
+            },
+          },
         },
         test: {
           builder: '@angular-devkit/build-webpack:karma',
@@ -157,6 +188,7 @@ export default function (options: LibraryOptions): Rule {
       branchAndMerge(mergeWith(templateSource)),
       addAppToWorkspaceFile(options, workspace),
       options.skipPackageJson ? noop() : addDependenciesAndScriptsToPackageJson(),
+      options.skipTsConfig ? noop() : updateTsConfig(name),
       schematic('module', {
         name: name,
         commonModule: false,

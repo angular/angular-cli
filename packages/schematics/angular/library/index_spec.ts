@@ -25,6 +25,7 @@ describe('Library Schematic', () => {
     name: 'foo',
     entryFile: 'my_index',
     skipPackageJson: false,
+    skipTsConfig: false,
   };
   const workspaceOptions: WorkspaceOptions = {
     name: 'workspace',
@@ -120,6 +121,44 @@ describe('Library Schematic', () => {
 
       const packageJson = getJsonFileContent(tree, 'package.json');
       expect(packageJson.devDependencies['ng-packagr']).toBeUndefined();
+    });
+  });
+
+  describe(`update tsconfig.json`, () => {
+    it(`should add paths mapping to empty tsconfig`, () => {
+      const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+
+      const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
+      expect(tsConfigJson.compilerOptions.paths.foo).toBeTruthy();
+      expect(tsConfigJson.compilerOptions.paths.foo.length).toEqual(1);
+      expect(tsConfigJson.compilerOptions.paths.foo[0]).toEqual('dist/foo');
+    });
+
+    it(`should append to existing paths mappings`, () => {
+      workspaceTree.overwrite('tsconfig.json', JSON.stringify({
+        compilerOptions: {
+          paths: {
+            'unrelated': ['./something/else.ts'],
+            'foo': ['libs/*'],
+          },
+        },
+      }));
+      const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+
+      const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
+      expect(tsConfigJson.compilerOptions.paths.foo).toBeTruthy();
+      expect(tsConfigJson.compilerOptions.paths.foo.length).toEqual(2);
+      expect(tsConfigJson.compilerOptions.paths.foo[1]).toEqual('dist/foo');
+    });
+
+    it(`should not modify the file when --skipTsConfig`, () => {
+      const tree = schematicRunner.runSchematic('library', {
+        name: 'foo',
+        skipTsConfig: true,
+      }, workspaceTree);
+
+      const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
+      expect(tsConfigJson.compilerOptions.paths).toBeUndefined();
     });
   });
 });
