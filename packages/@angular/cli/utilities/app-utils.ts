@@ -14,11 +14,13 @@ export function getAppFromConfig(nameOrIndex?: String) {
     if (nameOrIndex.match(/^[0-9]+$/)) {
       const index = parseInt(nameOrIndex.toString(), 10);
       if (apps[index]) {
+        process.title = `ng - app ${index}`;
         return apps[index];
       }
     } else {
       const filtered = apps.filter((currentApp: any) => currentApp.name === nameOrIndex);
       if (filtered.length > 0) {
+        process.title = `ng - ${filtered[0].name}`;
         return filtered[0];
       }
     }
