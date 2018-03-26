@@ -31,67 +31,121 @@ export default function () {
   }
 
   return Promise.resolve()
-    .then(() => updateJsonFile('angular.json', configJson => {
-      const app = configJson['apps'][0];
-      delete app['polyfills'];
-      delete app['styles'];
-      app['platform'] = 'server';
-    }))
     .then(() => updateJsonFile('package.json', packageJson => {
       const dependencies = packageJson['dependencies'];
       dependencies['@angular/platform-server'] = platformServerVersion;
     }))
-    .then(() => updateTsConfig(tsConfig => {
-      tsConfig.compilerOptions.types = ['node'];
-      tsConfig['angularCompilerOptions'] = {
-        entryModule: 'app/app.module#AppModule'
+    .then(() => updateJsonFile('angular.json', workspaceJson => {
+      const appArchitect = workspaceJson.projects['test-project'].architect;
+      appArchitect['server'] = {
+        builder: '@angular-devkit/build-webpack:server',
+        options: {
+          outputPath: 'dist/test-project-server',
+          main: 'projects/test-project/src/main.server.ts',
+          tsConfig: 'projects/test-project/tsconfig.server.json'
+        }
       };
     }))
-    .then(() => writeFile('./src/main.ts', 'export { AppModule } from \'./app/app.module\';'))
-    .then(() => prependToFile('./src/app/app.module.ts',
-      'import { ServerModule } from \'@angular/platform-server\';'))
-    .then(() => replaceInFile('./src/app/app.module.ts', /\[\s*BrowserModule/g,
-      `[BrowserModule.withServerTransition(\{ appId: 'app' \}), ServerModule`))
+    .then(() => writeFile('./projects/test-project/tsconfig.server.json', `
+      {
+        "extends": "../../tsconfig.json",
+        "compilerOptions": {
+          "outDir": "../dist-server",
+          "baseUrl": "./",
+          "module": "commonjs",
+          "types": []
+        },
+        "exclude": [
+          "test.ts",
+          "**/*.spec.ts"
+        ],
+        "angularCompilerOptions": {
+          "entryModule": "src/app/app.server.module#AppServerModule"
+        }
+      }
+    `))
+    .then(() => writeFile('./projects/test-project/src/main.server.ts', `
+      import { enableProdMode } from '@angular/core';
+
+      import { environment } from './environments/environment';
+
+      if (environment.production) {
+        enableProdMode();
+      }
+
+      export { AppServerModule } from './app/app.server.module';
+    `))
+    .then(() => writeFile('./projects/test-project/src/app/app.server.module.ts', `
+      import { NgModule } from '@angular/core';
+      import { BrowserModule } from '@angular/platform-browser';
+      import { ServerModule } from '@angular/platform-server';
+
+      import { AppModule } from './app.module';
+      import { AppComponent } from './app.component';
+
+      @NgModule({
+        imports: [
+          AppModule,
+          BrowserModule.withServerTransition(\{ appId: 'app' \}),
+          ServerModule,
+        ],
+        bootstrap: [AppComponent],
+      })
+      export class AppServerModule {}
+    `))
     .then(() => silentNpm('install'))
-    .then(() => ng('build', '--aot=false'))
+    // This part of the test requires a non-aot build, which isn't available anymore.
+    // .then(() => ng('run', 'test-project:server'))
+    // // files were created successfully
+    // .then(() => expectFileToMatch('dist/test-project-server/main.js',
+    //   /exports.*AppServerModule/))
+    // .then(() => writeFile('./index.js', `
+    //   require('zone.js/dist/zone-node');
+    //   require('reflect-metadata');
+    //   const fs = require('fs');
+    //   const \{ AppServerModule \} = require('./dist/test-project-server/main');
+    //   const \{ renderModule \} = require('@angular/platform-server');
+
+    //   renderModule(AppServerModule, \{
+    //     url: '/',
+    //     document: '<app-root></app-root>'
+    //   \}).then(html => \{
+    //     fs.writeFileSync('dist/test-project-server/index.html', html);
+    //   \});
+    // `))
+    // .then(() => exec(normalize('node'), 'index.js'))
+    // .then(() => expectFileToMatch('dist/test-project-server/index.html',
+    //   new RegExp('<h2 _ngcontent-c0="">Here are some links to help you start: </h2>')))
+    .then(() => ng('run', 'test-project:server'))
     // files were created successfully
-    .then(() => expectFileToMatch('dist/test-project/main.js',
-      /exports.*AppModule/))
+    .then(() => expectFileToMatch('dist/test-project-server/main.js',
+      /exports.*AppServerModuleNgFactory/))
     .then(() => writeFile('./index.js', `
       require('zone.js/dist/zone-node');
       require('reflect-metadata');
       const fs = require('fs');
-      const \{ AppModule \} = require('./dist/test-project/main');
-      const \{ renderModule \} = require('@angular/platform-server');
+      const \{ AppServerModuleNgFactory \} = require('./dist/test-project-server/main');
+      const \{ renderModuleFactory \} = require('@angular/platform-server');
 
-      renderModule(AppModule, \{
+      renderModuleFactory(AppServerModuleNgFactory, \{
         url: '/',
         document: '<app-root></app-root>'
       \}).then(html => \{
-        fs.writeFileSync('dist/test-project/index.html', html);
+        fs.writeFileSync('dist/test-project-server/index.html', html);
       \});
     `))
     .then(() => exec(normalize('node'), 'index.js'))
-    .then(() => expectFileToMatch('dist/test-project/index.html',
+    .then(() => expectFileToMatch('dist/test-project-server/index.html',
       new RegExp('<h2 _ngcontent-c0="">Here are some links to help you start: </h2>')))
-    .then(() => ng('build', '--aot'))
-    // files were created successfully
-    .then(() => expectFileToMatch('dist/test-project/main.js',
-      /exports.*AppModuleNgFactory/))
-    .then(() => replaceInFile('./index.js', /AppModule/g, 'AppModuleNgFactory'))
-    .then(() => replaceInFile('./index.js', /renderModule/g, 'renderModuleFactory'))
-    .then(() => exec(normalize('node'), 'index.js'))
-    .then(() => expectFileToMatch('dist/test-project/index.html',
-      new RegExp('<h2 _ngcontent-c0="">Here are some links to help you start: </h2>')))
-    .then(() => expectFileToMatch('./dist/test-project/main.js',
+    .then(() => expectFileToMatch('./dist/test-project-server/main.js',
       /require\(["']@angular\/[^"']*["']\)/))
 
     // Check externals.
-    .then(() => prependToFile('./src/app/app.module.ts', `
+    .then(() => prependToFile('./projects/test-project/src/app/app.server.module.ts', `
       import 'zone.js/dist/zone-node';
       import 'reflect-metadata';
     `)
-    .then(() => appendToFile('./src/app/app.module.ts', `
+      .then(() => appendToFile('./projects/test-project/src/app/app.server.module.ts', `
       import * as fs from 'fs';
       import { renderModule } from '@angular/platform-server';
 
@@ -99,11 +153,12 @@ export default function () {
         url: '/',
         document: '<app-root></app-root>'
       \}).then(html => \{
-        fs.writeFileSync('dist/test-project/index.html', html);
+        fs.writeFileSync('dist/test-project-server/index.html', html);
       \});
     `)))
-    .then(() => ng('build', '--bundle-dependencies=all', '--aot=false'))
-    .then(() => expectToFail(() => expectFileToMatch('./dist/test-project/main.js',
-      /require\(["']@angular\/[^"']*["']\)/)))
-    .then(() => exec(normalize('node'), 'dist/test-project/main.js'));
+    // This part of the test requires a non-aot build, which isn't available anymore.
+    // .then(() => ng('run', 'test-project:server', '--bundle-dependencies=all'))
+    // .then(() => expectToFail(() => expectFileToMatch('./dist/test-project-server/main.js',
+    //   /require\(["']@angular\/[^"']*["']\)/)))
+    // .then(() => exec(normalize('node'), 'dist/test-project-server/main.js'));
 }
