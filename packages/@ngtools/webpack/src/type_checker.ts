@@ -51,13 +51,12 @@ export class UpdateMessage extends TypeCheckerMessage {
 export const AUTO_START_ARG = '9d93e901-158a-4cf9-ba1b-2f0582ffcfeb';
 
 export class TypeChecker {
-  private _program: ts.Program | Program;
+  private _program: Program;
   private _compilerHost: WebpackCompilerHost & CompilerHost;
 
   constructor(
     private _compilerOptions: CompilerOptions,
     _basePath: string,
-    private _JitMode: boolean,
     private _rootNames: string[],
   ) {
     time('TypeChecker.constructor');
@@ -85,32 +84,20 @@ export class TypeChecker {
   }
 
   private _createOrUpdateProgram() {
-    if (this._JitMode) {
-      // Create the TypeScript program.
-      time('TypeChecker._createOrUpdateProgram.ts.createProgram');
-      this._program = ts.createProgram(
-        this._rootNames,
-        this._compilerOptions,
-        this._compilerHost,
-        this._program as ts.Program
-      ) as ts.Program;
-      timeEnd('TypeChecker._createOrUpdateProgram.ts.createProgram');
-    } else {
       time('TypeChecker._createOrUpdateProgram.ng.createProgram');
       // Create the Angular program.
       this._program = createProgram({
         rootNames: this._rootNames,
         options: this._compilerOptions,
         host: this._compilerHost,
-        oldProgram: this._program as Program
-      }) as Program;
+        oldProgram: this._program,
+      });
       timeEnd('TypeChecker._createOrUpdateProgram.ng.createProgram');
-    }
   }
 
   private _diagnose(cancellationToken: CancellationToken) {
     const allDiagnostics = gatherDiagnostics(
-      this._program, this._JitMode, 'TypeChecker', cancellationToken);
+      this._program, 'TypeChecker', cancellationToken);
 
     // Report diagnostics.
     if (!cancellationToken.isCancellationRequested()) {

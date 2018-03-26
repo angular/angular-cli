@@ -25,7 +25,6 @@ if (process.argv.indexOf(AUTO_START_ARG) >= 0) {
         typeChecker = new TypeChecker(
           initMessage.compilerOptions,
           initMessage.basePath,
-          initMessage.jitMode,
           initMessage.rootNames,
         );
         break;
