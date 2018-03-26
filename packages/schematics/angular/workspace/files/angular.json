@@ -1,10 +1,6 @@
 {
+  "$schema": "./node_modules/@angular-devkit/core/src/workspace/workspace-schema.json",
   "version": 1,
   "newProjectRoot": "<%= newProjectRoot %>",
-  "cli": {},
-  "schematics": {
-    "@schematics/angular": {}
-  },
-  "architect": {},
   "projects": {}
 }

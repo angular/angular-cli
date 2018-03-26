@@ -71,8 +71,6 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
     const project: any = {
       root: projectRoot,
       projectType: 'application',
-      cli: {},
-      schematics: {},
       architect: {
         build: {
           builder: '@angular-devkit/build-webpack:browser',

@@ -66,8 +66,6 @@ function addAppToWorkspaceFile(options: E2eOptions, workspace: WorkspaceSchema):
     const project: any = {
       root: projectRoot,
       projectType: 'application',
-      cli: {},
-      schematics: {},
       architect: {
         e2e: {
           builder: '@angular-devkit/build-webpack:protractor',
