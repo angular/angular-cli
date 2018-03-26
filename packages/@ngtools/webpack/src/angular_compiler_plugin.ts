@@ -59,6 +59,8 @@ export interface AngularCompilerPluginOptions {
   entryModule?: string;
   mainPath?: string;
   skipCodeGeneration?: boolean;
+  // Allows to disable the decorators in AOT production as an option.
+  skipRemoveDecorators?: boolean;
   hostReplacementPaths?: { [path: string]: string };
   forkTypeChecker?: boolean;
   // TODO: remove singleFileIncludes for 2.0, this is just to support old projects that did not
@@ -710,8 +712,8 @@ export class AngularCompilerPlugin {
     if (this._JitMode) {
       // Replace resources in JIT.
       this._transformers.push(replaceResources(isAppPath));
-    } else {
-      // Remove unneeded angular decorators.
+    } else if (!this._options.skipRemoveDecorators) {
+      // Remove unneeded angular decorators if options.skipRemoveDecorators is not true.
       this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
     }
 
