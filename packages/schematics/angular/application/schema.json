@@ -54,7 +54,5 @@
       "alias": "S"
     }
   },
-  "required": [
-    "name"
-  ]
+  "required": []
 }

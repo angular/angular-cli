@@ -9,6 +9,7 @@ import { strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
+  SchematicsException,
   Tree,
   apply,
   branchAndMerge,
@@ -166,6 +167,9 @@ function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSche
 
 export default function (options: LibraryOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
+    if (!options.name) {
+      throw new SchematicsException(`Invalid options, "name" is required.`);
+    }
     const name = options.name;
 
     const workspace = getWorkspace(host);

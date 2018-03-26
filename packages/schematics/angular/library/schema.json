@@ -6,7 +6,11 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name of the library."
+      "description": "The name of the library.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
     },
     "entryFile": {
       "type": "string",
@@ -25,7 +29,5 @@
       "description": "Do not update tsconfig.json for development experience (e.g., --skipTsConfig)"
     }
   },
-  "required": [
-    "name"
-  ]
+  "required": []
 }

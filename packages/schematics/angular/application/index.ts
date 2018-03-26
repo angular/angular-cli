@@ -227,6 +227,9 @@ function validateProjectName(projectName: string) {
 
 export default function (options: ApplicationOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
+    if (!options.name) {
+      throw new SchematicsException(`Invalid options, "name" is required.`);
+    }
     validateProjectName(options.name);
     const appRootSelector = `${options.prefix || 'app'}-root`;
     const componentOptions = {
