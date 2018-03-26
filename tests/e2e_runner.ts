@@ -96,6 +96,8 @@ const allSetups = glob.sync(path.join(e2eRoot, 'setup/**/*.ts'), { nodir: true }
 const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: argv.ignore })
   .map(name => path.relative(e2eRoot, name))
   // TODO: UPDATE TESTS
+  // Replace windows slashes.
+  .map(name => name.replace(/\\/g, '/'))
   .filter(name => !name.endsWith('/build-app-shell-with-schematic.ts'))
   .filter(name => !name.endsWith('/build-app-shell.ts'))
   .filter(name => !name.endsWith('/bundle-budgets.ts'))
@@ -114,9 +116,9 @@ const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: 
   .filter(name => !name.endsWith('/component-prefix.ts'))
   .filter(name => !name.endsWith('/directive-prefix.ts'))
   // CONFIG COMMAND
-  .filter(name => !name.startsWith('tests/commands/config'))
+  .filter(name => !name.includes('tests/commands/config/'))
   // NEW COMMAND
-  .filter(name => !name.startsWith('tests/commands/new'))
+  .filter(name => !name.includes('tests/commands/new/'))
   // NEEDS devkit change
   .filter(name => !name.endsWith('/existing-directory.ts'))
   .sort();

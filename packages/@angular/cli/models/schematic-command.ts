@@ -93,7 +93,7 @@ export abstract class SchematicCommand extends Command {
     const workflow = new NodeWorkflow(fsHost, { force, dryRun });
 
     const cwd = process.env.PWD;
-    const workingDir = cwd.replace(this.project.root, '');
+    const workingDir = cwd.replace(this.project.root, '').replace(/\\/g, '/');
     const pathOptions = this.setPathOptions(schematicOptions, workingDir);
     schematicOptions = { ...schematicOptions, ...pathOptions };
     const defaultOptions = this.readDefaults(collectionName, schematicName, schematicOptions);
