@@ -62,8 +62,10 @@ describe('Library Schematic', () => {
   it('should create a ng-package.json with ngPackage conf', () => {
     const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
     const fileContent = getJsonFileContent(tree, '/projects/foo/ng-package.json');
-    expect(fileContent.ngPackage).toBeDefined();
-    expect(fileContent.ngPackage.lib.entryFile).toEqual('src/my_index.ts');
+    expect(fileContent.lib).toBeDefined();
+    expect(fileContent.lib.entryFile).toEqual('src/my_index.ts');
+    expect(fileContent.deleteDestPath).toEqual(false);
+    expect(fileContent.dest).toEqual('../../dist/foo');
   });
 
   it('should use default value for baseDir and entryFile', () => {
@@ -91,7 +93,7 @@ describe('Library Schematic', () => {
       const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
       const packageJson = getJsonFileContent(tree, 'package.json');
-      expect(packageJson.devDependencies['ng-packagr']).toEqual('^2.2.0');
+      expect(packageJson.devDependencies['ng-packagr']).toEqual('^2.4.1');
     });
 
     it('should use the latest known versions in package.json', () => {
