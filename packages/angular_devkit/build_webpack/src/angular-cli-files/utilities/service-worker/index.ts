@@ -89,9 +89,11 @@ export function augmentAppWithServiceWorker(projectRoot: string, appRoot: string
   const configPath = path.resolve(appRoot, 'ngsw-config.json');
 
   if (!fs.existsSync(configPath)) {
-    throw new Error(oneLine`Error: Expected to find an ngsw-config.json configuration
+    return Promise.reject(new Error(oneLine`
+      Error: Expected to find an ngsw-config.json configuration
       file in the ${appRoot} folder. Either provide one or disable Service Worker
-      in .angular-cli.json.`);
+      in .angular-cli.json.`,
+    ));
   }
   const config = fs.readFileSync(configPath, 'utf8');
 
