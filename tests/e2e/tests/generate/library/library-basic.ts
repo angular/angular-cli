@@ -1,13 +1,12 @@
-import {ng} from '../../../utils/process';
+import { ng, silentNpm } from '../../../utils/process';
 import { expectFileToMatch } from '../../../utils/fs';
+import { useCIChrome } from '../../../utils/project';
 
-
-export default function() {
+export default function () {
   return ng('generate', 'library', 'my-lib')
-    .then(() => expectFileToMatch('angular.json', /\"my-lib\":/));
-
-    // TODO: enable once generating Angular v6 projects
-    // this is due to the service using `providedIn`
-    // .then(() => useCIChrome())
-    // .then(() => ng('test', 'my-lib', '--watch=false'));
+    .then(() => expectFileToMatch('angular.json', /\"my-lib\":/))
+    .then(() => useCIChrome('my-lib'))
+    .then(() => silentNpm('install'))
+    .then(() => ng('build', 'my-lib'))
+    .then(() => ng('test', 'my-lib', '--watch=false'));
 }
