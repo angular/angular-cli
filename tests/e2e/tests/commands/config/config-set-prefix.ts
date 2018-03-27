@@ -3,6 +3,8 @@ import {expectToFail} from '../../../utils/utils';
 import * as fs from 'fs';
 
 export default function() {
+  return;
+
   return Promise.resolve()
     .then(() => expectToFail(() => ng('config', 'apps.zzz.prefix')))
     .then(() => ng('config', 'apps.0.prefix' , 'new-prefix'))
