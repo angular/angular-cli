@@ -105,6 +105,7 @@ function addDependenciesAndScriptsToPackageJson() {
 
       json.devDependencies = {
         '@angular/compiler-cli': latestVersions.Angular,
+        '@angular-devkit/build-ng-packagr': 'latest',
         'ng-packagr': '^2.4.1',
         'tsickle': '>=0.25.5',
         'tslib': '^1.7.1',
