@@ -99,7 +99,6 @@ const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: 
   // Replace windows slashes.
   .map(name => name.replace(/\\/g, '/'))
   .filter(name => !name.endsWith('/build-app-shell-with-schematic.ts'))
-  .filter(name => !name.endsWith('/build-app-shell.ts'))
   .filter(name => !name.endsWith('/bundle-budgets.ts'))
   .filter(name => !name.endsWith('/service-worker.ts'))
   .filter(name => !name.endsWith('/new-minimal.ts'))
