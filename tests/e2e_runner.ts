@@ -113,8 +113,6 @@ const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: 
   .filter(name => !name.endsWith('/component-not-flat.ts'))
   .filter(name => !name.endsWith('/component-prefix.ts'))
   .filter(name => !name.endsWith('/directive-prefix.ts'))
-  // CONFIG COMMAND
-  .filter(name => !name.includes('tests/commands/config/'))
   // NEW COMMAND
   .filter(name => !name.includes('tests/commands/new/'))
   // NEEDS devkit change
