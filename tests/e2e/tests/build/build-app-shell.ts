@@ -25,37 +25,58 @@ export default function () {
   }
 
   return Promise.resolve()
-    .then(() => updateJsonFile('angular.json', configJson => {
-      const app = configJson['apps'][0];
-      app['appShell'] = {
-        app: '1',
-        route: 'shell'
-      };
-      configJson['apps'].push({
-        platform: 'server',
-        root: 'src',
-        outDir: 'dist-server',
-        assets: [
-          'assets',
-          'favicon.ico'
-        ],
-        index: 'index.html',
-        main: 'main.server.ts',
-        test: 'test.ts',
-        tsconfig: 'tsconfig.server.json',
-        testTsconfig: 'tsconfig.spec.json',
-        prefix: 'app',
-        styles: [
-          'styles.css'
-        ],
-        scripts: [],
-        environmentSource: 'environments/environment.ts',
-        environments: {
-          dev: 'environments/environment.ts',
-          prod: 'environments/environment.prod.ts'
+    .then(() => updateJsonFile('angular.json', workspaceJson => {
+      const appArchitect = workspaceJson.projects['test-project'].architect;
+      appArchitect['server'] = {
+        builder: '@angular-devkit/build-webpack:server',
+        options: {
+          outputPath: 'dist/test-project-server',
+          main: 'projects/test-project/src/main.server.ts',
+          tsConfig: 'projects/test-project/tsconfig.server.json'
         }
-      });
+      };
+      appArchitect['app-shell'] = {
+        builder: '@angular-devkit/build-webpack:app-shell',
+        options: {
+          browserTarget: 'test-project:build:production',
+          serverTarget: 'test-project:server',
+          route: '/shell'
+        }
+      };
     }))
+    .then(() => writeFile('./projects/test-project/tsconfig.server.json', `
+      {
+        "extends": "../../tsconfig.json",
+        "compilerOptions": {
+          "outDir": "../dist-server",
+          "baseUrl": "./",
+          "module": "commonjs",
+          "types": []
+        },
+        "exclude": [
+          "test.ts",
+          "**/*.spec.ts"
+        ],
+        "angularCompilerOptions": {
+          "entryModule": "src/app/app.server.module#AppServerModule"
+        }
+      }
+    `))
+    .then(() => writeFile('./projects/test-project/src/main.server.ts', `
+      import { enableProdMode } from '@angular/core';
+
+      import { environment } from './environments/environment';
+
+      if (environment.production) {
+        enableProdMode();
+      }
+
+      export { AppServerModule } from './app/app.server.module';
+    `))
+    .then(() => writeFile('projects/test-project/src/app/app.component.html', stripIndent`
+      Hello World
+      <router-outlet></router-outlet>
+    `))
     .then(() => writeFile('projects/test-project/src/app/app.module.ts', stripIndent`
       import { BrowserModule } from '@angular/platform-browser';
       import { NgModule } from '@angular/core';
@@ -72,31 +93,6 @@ export default function () {
         bootstrap: [AppComponent]
       })
       export class AppModule { }
-    `))
-    .then(() => writeFile('projects/test-project/src/app/app.component.html', stripIndent`
-      Hello World
-      <router-outlet></router-outlet>
-    `))
-    .then(() => writeFile('projects/test-project/src/tsconfig.server.json', stripIndent`
-      {
-        "extends": "../tsconfig.json",
-        "compilerOptions": {
-          "outDir": "../out-tsc/app",
-          "baseUrl": "./",
-          "module": "commonjs",
-          "types": []
-        },
-        "exclude": [
-          "test.ts",
-          "**/*.spec.ts"
-        ],
-        "angularCompilerOptions": {
-          "entryModule": "app/app.server.module#AppServerModule"
-        }
-      }
-    `))
-    .then(() => writeFile('projects/test-project/src/main.server.ts', stripIndent`
-      export {AppServerModule} from './app/app.server.module';
     `))
     .then(() => writeFile('projects/test-project/src/app/app.server.module.ts', stripIndent`
       import {NgModule} from '@angular/core';
@@ -140,8 +136,6 @@ export default function () {
       dependencies['@angular/platform-server'] = platformServerVersion;
     })
     .then(() => npm('install')))
-    .then(() => ng('build', '--optimization'))
-    .then(() => expectFileToMatch('dist/test-project/index.html', /shell Works!/))
-    .then(() => ng('build', '--optimization', '--skip-app-shell'))
-    .then(() => expectToFail(() => expectFileToMatch('dist/test-project/index.html', /shell Works!/)));
+    .then(() => ng('run', 'test-project:app-shell'))
+    .then(() => expectFileToMatch('dist/test-project/index.html', /shell Works!/));
 }
