@@ -33,7 +33,7 @@
     "@angular-devkit/schematics": "0.4.7",
     "@ngtools/json-schema": "1.2.0",
     "@schematics/angular": "0.4.7",
-    "@schematics/package-update": "0.4.7",
+    "@schematics/update": "0.4.7",
     "ajv": "^6.1.1",
     "chalk": "~2.2.0",
     "common-tags": "^1.3.1",

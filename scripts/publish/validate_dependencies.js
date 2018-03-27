@@ -17,7 +17,7 @@ const ANGULAR_PACKAGES = [
   '@angular/compiler',
   '@angular/compiler-cli',
   '@angular/core',
-  '@schematics/package-update'
+  '@schematics/update'
 ];
 const OPTIONAL_PACKAGES = [
   '@angular/service-worker',
