@@ -1,5 +1,5 @@
 import {join} from 'path';
-import {git, ng, silentNpm} from '../utils/process';
+import {git, ng, npm, silentNpm} from '../utils/process';
 import {expectFileToExist} from '../utils/fs';
 import {
   useSha,
@@ -37,8 +37,34 @@ export default async function() {
     .then(() => useCIDefaults())
     .then(() => argv['ng-version'] ? useNgVersion(argv['ng-version']) : Promise.resolve())
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
-    // npm link on Circle CI is very noisy.
+    // Force rxjs 5.5.8, so that devkit packages use it.
+    .then(() => updateJsonFile('package.json', json => {
+      json.dependencies['rxjs'] = '5.5.8';
+    }))
     .then(() => silentNpm('install'))
+    // Then force rxjs 5.6.0-forward-compat.2, which can't be used by devkit packages.
+    .then(() => npm('install', 'rxjs@5.6.0-forward-compat.2', '--save-exact'))
+    // Verify we have multiple rxjs, and the versions we expect.
+    // For some reason `npm list` doesn't show the right version. That's just peachy.
+    // .then(() => npm('list', 'rxjs'))
+    .then(() => updateJsonFile('node_modules/rxjs/package.json', json => {
+      console.log('top level rxjs version', json.version)
+    }))
+    .then(() => updateJsonFile('node_modules/@angular-devkit/core/node_modules/rxjs/package.json', json => {
+      console.log('devkit/core rxjs version', json.version)
+    }))
+    .then(() => updateJsonFile('node_modules/@angular-devkit/architect/node_modules/rxjs/package.json', json => {
+      console.log('devkit/architect rxjs version', json.version)
+    }))
+    .then(() => updateJsonFile('node_modules/@angular-devkit/schematics/node_modules/rxjs/package.json', json => {
+      console.log('devkit/schematics rxjs version', json.version)
+    }))
+    .then(() => updateJsonFile('node_modules/@angular-devkit/build-webpack/node_modules/rxjs/package.json', json => {
+      console.log('devkit/build-webpack rxjs version', json.version)
+    }))
+    .then(() => updateJsonFile('node_modules/@schematics/angular/node_modules/rxjs/package.json', json => {
+      console.log('schematics/angular rxjs version', json.version)
+    }))
     .then(() => ng('version'))
     // Force sourcemaps to be from the root of the filesystem.
     .then(() => updateJsonFile('tsconfig.json', json => {
