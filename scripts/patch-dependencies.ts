@@ -12,7 +12,6 @@ const PATCH_LOCK = 'node_modules/rxjs/.patched';
 
 export default function () {
   if (!existsSync(PATCH_LOCK)) {
-    execSync('patch -p0 -i scripts/patches/rxjs-ts27.patch');
     execSync('patch -p0 -i scripts/patches/rxjs-typings.patch');
     writeFileSync(PATCH_LOCK, '');
   }

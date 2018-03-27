@@ -8,7 +8,7 @@
 
 export const latestVersions = {
   Angular: '^5.2.9',
-  RxJs: '^5.5.7',
+  RxJs: '^5.5.8',
   ZoneJs: '^0.8.20',
   TypeScript: '~2.6.2',
 };
