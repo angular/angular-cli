@@ -159,7 +159,7 @@ export function useNgVersion(version: string) {
       json['devDependencies']['typescript'] = '~2.5.0';
     } else {
       json['devDependencies']['typescript'] = '~2.7.0';
-      json['dependencies']['rxjs'] = '6.0.0-beta.0';
+      json['dependencies']['rxjs'] = '6.0.0-beta.3';
     }
   });
 }
