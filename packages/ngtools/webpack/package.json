@@ -32,7 +32,7 @@
   },
   "peerDependencies": {
     "@angular-devkit/core": "0.0.0",
-    "typescript": "~2.5.0 | ~2.6.0 | ~2.7.0",
+    "typescript": "~2.5.0 || ~2.6.0 || ~2.7.0",
     "webpack": "^4.0.0"
   }
 }
