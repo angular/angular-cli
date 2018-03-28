@@ -2,7 +2,7 @@
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
 import chalk from 'chalk';
-import { stripIndents } from 'common-tags';
+import { tags } from '@angular-devkit/core';
 
 
 // Force basic color support on terminals with no color support.
@@ -47,13 +47,13 @@ export function statsToString(json: any, statsConfig: any) {
   const unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
 
   if (unchangedChunkNumber > 0) {
-    return rs(stripIndents`
+    return rs(tags.stripIndents`
       Date: ${w(new Date().toISOString())} - Hash: ${w(json.hash)} - Time: ${w('' + json.time)}ms
       ${unchangedChunkNumber} unchanged chunks
       ${changedChunksStats.join('\n')}
       `);
   } else {
-    return rs(stripIndents`
+    return rs(tags.stripIndents`
       Date: ${w(new Date().toISOString())}
       Hash: ${w(json.hash)}
       Time: ${w('' + json.time)}ms

@@ -1,9 +1,8 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
-import { virtualFs } from '@angular-devkit/core';
+import { tags, virtualFs } from '@angular-devkit/core';
 import { Stats } from 'fs';
 import * as path from 'path';
-import { stripIndent } from 'common-tags';
 import {
   AngularCompilerPlugin,
   AngularCompilerPluginOptions,
@@ -40,7 +39,7 @@ function _createAotPlugin(
     if (!appConfig.environmentSource) {
       let migrationMessage = '';
       if ('source' in appConfig.environments) {
-        migrationMessage = '\n\n' + stripIndent`
+        migrationMessage = '\n\n' + tags.stripIndent`
           A new environmentSource entry replaces the previous source entry inside environments.
 
           To migrate angular-cli.json follow the example below:

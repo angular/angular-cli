@@ -1,7 +1,7 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
-import {oneLineTrim} from 'common-tags';
+import { tags } from '@angular-devkit/core';
 import {BaseHrefWebpackPlugin} from './base-href-webpack-plugin';
 
 
@@ -22,7 +22,7 @@ function mockCompiler(indexHtml: string, callback: Function) {
 }
 
 describe('base href webpack plugin', () => {
-  const html = oneLineTrim`
+  const html = tags.oneLine`
     <html>
       <head></head>
       <body></body>
@@ -41,7 +41,7 @@ describe('base href webpack plugin', () => {
   it('should insert base tag when not exist', function () {
     const plugin = new BaseHrefWebpackPlugin({ baseHref: '/' });
     const compiler = mockCompiler(html, (_x: any, htmlPluginData: any) => {
-        expect(htmlPluginData.html).toEqual(oneLineTrim`
+        expect(htmlPluginData.html).toEqual(tags.oneLine`
           <html>
             <head><base href="/"></head>
             <body></body>
@@ -55,11 +55,11 @@ describe('base href webpack plugin', () => {
   it('should replace href attribute when base tag already exists', function () {
     const plugin = new BaseHrefWebpackPlugin({ baseHref: '/myUrl/' });
 
-    const compiler = mockCompiler(oneLineTrim`
+    const compiler = mockCompiler(tags.oneLine`
           <head><base href="/" target="_blank"></head>
           <body></body>
         `, (_x: any, htmlPluginData: any) => {
-      expect(htmlPluginData.html).toEqual(oneLineTrim`
+      expect(htmlPluginData.html).toEqual(tags.oneLine`
           <head><base href="/myUrl/" target="_blank"></head>
           <body></body>
         `);
@@ -70,11 +70,11 @@ describe('base href webpack plugin', () => {
   it('should replace href attribute when baseHref is empty', function () {
     const plugin = new BaseHrefWebpackPlugin({ baseHref: '' });
 
-    const compiler = mockCompiler(oneLineTrim`
+    const compiler = mockCompiler(tags.oneLine`
           <head><base href="/" target="_blank"></head>
           <body></body>
         `, (_x: any, htmlPluginData: any) => {
-      expect(htmlPluginData.html).toEqual(oneLineTrim`
+      expect(htmlPluginData.html).toEqual(tags.oneLine`
           <head><base href="" target="_blank"></head>
           <body></body>
         `);

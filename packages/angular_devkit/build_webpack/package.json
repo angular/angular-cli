@@ -18,7 +18,6 @@
     "chalk": "~2.2.2",
     "circular-dependency-plugin": "^5.0.0",
     "clean-css": "^4.1.11",
-    "common-tags": "^1.5.1",
     "copy-webpack-plugin": "^4.5.0",
     "file-loader": "^1.1.11",
     "glob": "^7.0.3",
