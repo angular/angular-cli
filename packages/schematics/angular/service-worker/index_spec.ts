@@ -39,6 +39,7 @@ describe('Service Worker Schematic', () => {
     routing: false,
     style: 'css',
     skipTests: false,
+    skipPackageJson: false,
   };
 
   beforeEach(() => {
