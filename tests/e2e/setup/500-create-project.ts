@@ -37,10 +37,6 @@ export default async function() {
     .then(() => useCIDefaults())
     .then(() => argv['ng-version'] ? useNgVersion(argv['ng-version']) : Promise.resolve())
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
-    // TODO: remove this when schematics are updated
-    .then(() => updateJsonFile('package.json', json => {
-      json['devDependencies']['@angular-devkit/build-webpack'] = '0.0.8';
-    }))
     // npm link on Circle CI is very noisy.
     .then(() => silentNpm('install'))
     .then(() => ng('version'))
