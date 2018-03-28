@@ -95,7 +95,8 @@
         }
       ],
       "version": "0.0.2",
-      "hash": "5b9d0ea3a961a7c58ba5312f689cf137"
+      "hash": "5b9d0ea3a961a7c58ba5312f689cf137",
+      "snapshotRepo": "angular/angular-devkit-build-ng-packagr-builds"
     },
     "@angular-devkit/build-webpack": {
       "name": "Build Webpack",
@@ -157,7 +158,8 @@
       "name": "Schematics Schematics",
       "version": "0.4.6",
       "section": "Schematics",
-      "hash": "85f50de4da92597ef8adb1d484107825"
+      "hash": "85f50de4da92597ef8adb1d484107825",
+      "snapshotRepo": "angular/schematics-schematics-builds"
     },
     "@schematics/package-update": {
       "name": "Package JSON Update Schematics",
@@ -171,7 +173,7 @@
       "version": "0.4.7",
       "section": "Schematics",
       "hash": "adef93c50dbfc2a2bffa797b12c29141",
-      "snapshotRepo": ""
+      "snapshotRepo": "angular/schematics-update-builds"
     }
   }
 }
