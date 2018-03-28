@@ -106,7 +106,7 @@ function addDependenciesToPackageJson() {
       json.devDependencies = {
         '@angular/compiler-cli': latestVersions.Angular,
         '@angular-devkit/build-ng-packagr': latestVersions.DevkitBuildNgPackagr,
-        '@angular-devkit/build-webpack': latestVersions.DevkitBuildNgPackagr,
+        '@angular-devkit/build-angular': latestVersions.DevkitBuildNgPackagr,
         'ng-packagr': '^2.4.1',
         'tsickle': '>=0.25.5',
         'tslib': '^1.7.1',
@@ -139,7 +139,7 @@ function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSche
           },
         },
         test: {
-          builder: '@angular-devkit/build-webpack:karma',
+          builder: '@angular-devkit/build-angular:karma',
           options: {
             main: `${projectRoot}/src/test.ts`,
             tsConfig: `${projectRoot}/tsconfig.spec.json`,
@@ -147,7 +147,7 @@ function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSche
           },
         },
         lint: {
-          builder: '@angular-devkit/build-webpack:lint',
+          builder: '@angular-devkit/build-angular:lint',
           options: {
             tsConfig: [
               'projects/lib/tsconfig.lint.json',

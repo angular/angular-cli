@@ -18,7 +18,7 @@ describe('NgPackagr Builder', () => {
   const workspaceRoot = join(devkitRoot,
     'tests/@angular_devkit/build_ng_packagr/ng-packaged/');
 
-  // TODO: move TestProjectHost from build-webpack to architect, or somewhere else, where it
+  // TODO: move TestProjectHost from build-angular to architect, or somewhere else, where it
   // can be imported from.
   const host = new NodeJsSyncHost();
   const workspace = new experimental.workspace.Workspace(workspaceRoot, host);

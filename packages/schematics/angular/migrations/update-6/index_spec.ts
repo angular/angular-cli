@@ -488,7 +488,7 @@ describe('Migration to v6', () => {
         tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
         tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
         const build = getConfig(tree).projects.foo.architect.build;
-        expect(build.builder).toEqual('@angular-devkit/build-webpack:browser');
+        expect(build.builder).toEqual('@angular-devkit/build-angular:browser');
         expect(build.options.scripts).toEqual([]);
         expect(build.options.styles).toEqual([{ input: 'src/styles.css' }]);
         expect(build.options.assets).toEqual([{ glob: 'src/assets' }, { glob: 'src/favicon.ico' }]);
@@ -507,7 +507,7 @@ describe('Migration to v6', () => {
         tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
         tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
         const serve = getConfig(tree).projects.foo.architect.serve;
-        expect(serve.builder).toEqual('@angular-devkit/build-webpack:dev-server');
+        expect(serve.builder).toEqual('@angular-devkit/build-angular:dev-server');
         expect(serve.options).toEqual({ browserTarget: 'foo:build' });
         const prodConfig = serve.configurations.production;
         expect(prodConfig.browserTarget).toEqual('foo:build');
@@ -517,7 +517,7 @@ describe('Migration to v6', () => {
         tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
         tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
         const test = getConfig(tree).projects.foo.architect['test'];
-        expect(test.builder).toEqual('@angular-devkit/build-webpack:karma');
+        expect(test.builder).toEqual('@angular-devkit/build-angular:karma');
         expect(test.options.main).toEqual('src/test.ts');
         expect(test.options.polyfills).toEqual('src/polyfills.ts');
         expect(test.options.tsConfig).toEqual('src/tsconfig.spec.json');
@@ -531,7 +531,7 @@ describe('Migration to v6', () => {
         tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
         tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
         const serve = getConfig(tree).projects.foo.architect.serve;
-        expect(serve.builder).toEqual('@angular-devkit/build-webpack:dev-server');
+        expect(serve.builder).toEqual('@angular-devkit/build-angular:dev-server');
         expect(serve.options).toEqual({ browserTarget: 'foo:build' });
         const prodConfig = serve.configurations.production;
         expect(prodConfig.browserTarget).toEqual('foo:build');
@@ -541,7 +541,7 @@ describe('Migration to v6', () => {
         tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
         tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
         const extract = getConfig(tree).projects.foo.architect['extract-i18n'];
-        expect(extract.builder).toEqual('@angular-devkit/build-webpack:extract-i18n');
+        expect(extract.builder).toEqual('@angular-devkit/build-angular:extract-i18n');
         expect(extract.options).toBeDefined();
         expect(extract.options.browserTarget).toEqual(`foo:build` );
       });
@@ -550,7 +550,7 @@ describe('Migration to v6', () => {
         tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
         tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
         const tslint = getConfig(tree).projects.foo.architect['lint'];
-        expect(tslint.builder).toEqual('@angular-devkit/build-webpack:tslint');
+        expect(tslint.builder).toEqual('@angular-devkit/build-angular:tslint');
         expect(tslint.options).toBeDefined();
         expect(tslint.options.tsConfig).toEqual(['src/tsconfig.app.json', 'src/tsconfig.spec.json']);
         expect(tslint.options.exclude).toEqual([ '**/node_modules/**' ]);
@@ -562,7 +562,7 @@ describe('Migration to v6', () => {
         tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
         tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
         const e2e = getConfig(tree).projects['foo-e2e'].architect.e2e;
-        expect(e2e.builder).toEqual('@angular-devkit/build-webpack:protractor');
+        expect(e2e.builder).toEqual('@angular-devkit/build-angular:protractor');
         const options = e2e.options;
         expect(options.protractorConfig).toEqual('./protractor.conf.js');
         expect(options.devServerTarget).toEqual('foo:serve');
@@ -572,7 +572,7 @@ describe('Migration to v6', () => {
         tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
         tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
         const tslint = getConfig(tree).projects['foo-e2e'].architect.lint;
-        expect(tslint.builder).toEqual('@angular-devkit/build-webpack:tslint');
+        expect(tslint.builder).toEqual('@angular-devkit/build-angular:tslint');
         expect(tslint.options).toBeDefined();
         expect(tslint.options.tsConfig).toEqual(['e2e/tsconfig.e2e.json']);
         expect(tslint.options.exclude).toEqual([ '**/node_modules/**' ]);
@@ -594,7 +594,7 @@ describe('Migration to v6', () => {
       tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
       const content = tree.readContent(karmaPath);
       expect(content).not.toContain('@angular/cli');
-      expect(content).toContain('@angular-devkit/build-webpack');
+      expect(content).toContain('@angular-devkit/build-angular');
     });
 
     it('should replace references to "reports"', () => {
@@ -641,12 +641,12 @@ describe('Migration to v6', () => {
   });
 
   describe('package.json', () => {
-    it('should add a dev dependency to @angular-devkit/build-webpack', () => {
+    it('should add a dev dependency to @angular-devkit/build-angular', () => {
       tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
       tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
       const content = tree.readContent('/package.json');
       const pkg = JSON.parse(content);
-      expect(pkg.devDependencies['@angular-devkit/build-webpack']).toBeDefined();
+      expect(pkg.devDependencies['@angular-devkit/build-angular']).toBeDefined();
     });
   });
 });

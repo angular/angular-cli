@@ -125,7 +125,7 @@ describe('Library Schematic', () => {
 
       const packageJson = getJsonFileContent(tree, 'package.json');
       expect(packageJson.devDependencies['ng-packagr']).toBeUndefined();
-      expect(packageJson.devDependencies['@angular-devkit/build-webpack']).toBeUndefined();
+      expect(packageJson.devDependencies['@angular-devkit/build-angular']).toBeUndefined();
     });
   });
 

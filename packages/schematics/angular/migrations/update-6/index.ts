@@ -52,7 +52,7 @@ function migrateKarmaConfiguration(config: CliConfig): Rule {
       const buffer = host.read(karmaPath);
       if (buffer !== null) {
         let content = buffer.toString();
-        content = content.replace( /@angular\/cli/g, '@angular-devkit/build-webpack');
+        content = content.replace( /@angular\/cli/g, '@angular-devkit/build-angular');
         content = content.replace('reports',
           `dir: require('path').join(__dirname, 'coverage'), reports`);
         host.overwrite(karmaPath, content);
@@ -161,7 +161,7 @@ function extractArchitectConfig(_config: CliConfig): JsonObject | null {
 }
 
 function extractProjectsConfig(config: CliConfig): JsonObject {
-  const builderPackage = '@angular-devkit/build-webpack';
+  const builderPackage = '@angular-devkit/build-angular';
   let defaultAppNamePrefix = 'app';
   if (config.project && config.project.name) {
     defaultAppNamePrefix = config.project.name;
@@ -403,7 +403,7 @@ function updatePackageJson() {
       pkg.devDependencies = {};
     }
 
-    pkg.devDependencies['@angular-devkit/build-webpack'] = latestVersions.DevkitBuildWebpack;
+    pkg.devDependencies['@angular-devkit/build-angular'] = latestVersions.DevkitBuildWebpack;
 
     host.overwrite(pkgPath, JSON.stringify(pkg, null, 2));
 

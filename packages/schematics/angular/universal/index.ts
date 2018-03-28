@@ -60,7 +60,7 @@ function updateConfigFile(options: UniversalOptions): Rule {
       tsConfig: `projects/${options.clientProject}/tsconfig.server.json`,
     };
     const serverTarget: JsonObject = {
-      builder: '@angular-devkit/build-webpack:server',
+      builder: '@angular-devkit/build-angular:server',
       options: builderOptions,
     };
     const workspace = getWorkspace(host);

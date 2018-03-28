@@ -67,14 +67,14 @@ function addAppToWorkspaceFile(options: E2eOptions, workspace: WorkspaceSchema):
       projectType: 'application',
       architect: {
         e2e: {
-          builder: '@angular-devkit/build-webpack:protractor',
+          builder: '@angular-devkit/build-angular:protractor',
           options: {
             protractorConfig: `projects/${options.name}/protractor.conf.js`,
             devServerTarget: `${options.relatedAppName}:serve`,
           },
         },
         lint: {
-          builder: '@angular-devkit/build-webpack:tslint',
+          builder: '@angular-devkit/build-angular:tslint',
           options: {
             tsConfig: `projects/${options.name}/tsconfig.e2e.json`,
             exclude: [

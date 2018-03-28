@@ -106,11 +106,11 @@ describe('Application Schematic', () => {
   });
 
   describe(`update package.json`, () => {
-    it(`should add build-webpack to devDependencies`, () => {
+    it(`should add build-angular to devDependencies`, () => {
       const tree = schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
 
       const packageJson = JSON.parse(tree.readContent('package.json'));
-      expect(packageJson.devDependencies['@angular-devkit/build-webpack'])
+      expect(packageJson.devDependencies['@angular-devkit/build-angular'])
         .toEqual(latestVersions.DevkitBuildWebpack);
     });
 
@@ -140,7 +140,7 @@ describe('Application Schematic', () => {
       }, workspaceTree);
 
       const packageJson = JSON.parse(tree.readContent('package.json'));
-      expect(packageJson.devDependencies['@angular-devkit/build-webpack']).toBeUndefined();
+      expect(packageJson.devDependencies['@angular-devkit/build-angular']).toBeUndefined();
     });
   });
 });

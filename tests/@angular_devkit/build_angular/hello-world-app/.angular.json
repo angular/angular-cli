@@ -12,7 +12,7 @@
       "schematics": {},
       "architect": {
         "build": {
-          "builder": "../../../../packages/angular_devkit/build_webpack:browser",
+          "builder": "../../../../packages/angular_devkit/build_angular:browser",
           "options": {
             "outputPath": "dist",
             "index": "src/index.html",
@@ -60,7 +60,7 @@
           }
         },
         "server": {
-          "builder": "../../../../packages/angular_devkit/build_webpack:server",
+          "builder": "../../../../packages/angular_devkit/build_angular:server",
           "options": {
             "outputPath": "dist-server",
             "main": "src/main.server.ts",
@@ -68,14 +68,14 @@
           }
         },
         "app-shell": {
-          "builder": "../../../../packages/angular_devkit/build_webpack:app-shell",
+          "builder": "../../../../packages/angular_devkit/build_angular:app-shell",
           "options": {
             "browserTarget": "app:build",
             "serverTarget": "app:server"
           }
         },
         "serve": {
-          "builder": "../../../../packages/angular_devkit/build_webpack:dev-server",
+          "builder": "../../../../packages/angular_devkit/build_angular:dev-server",
           "options": {
             "browserTarget": "app:build",
             "watch": false
@@ -87,13 +87,13 @@
           }
         },
         "extract-i18n": {
-          "builder": "../../../../packages/angular_devkit/build_webpack:extract-i18n",
+          "builder": "../../../../packages/angular_devkit/build_angular:extract-i18n",
           "options": {
             "browserTarget": "app:build"
           }
         },
         "test": {
-          "builder": "../../../../packages/angular_devkit/build_webpack:karma",
+          "builder": "../../../../packages/angular_devkit/build_angular:karma",
           "options": {
             "main": "src/test.ts",
             "polyfills": "src/polyfills.ts",
@@ -123,7 +123,7 @@
           }
         },
         "lint": {
-          "builder": "../../../../packages/angular_devkit/build_webpack:tslint",
+          "builder": "../../../../packages/angular_devkit/build_angular:tslint",
           "options": {
             "tsConfig": "src/tsconfig.app.json",
             "exclude": [
@@ -132,7 +132,7 @@
           }
         },
         "lint-test": {
-          "builder": "../../../../packages/angular_devkit/build_webpack:tslint",
+          "builder": "../../../../packages/angular_devkit/build_angular:tslint",
           "options": {
             "tsConfig": "src/tsconfig.spec.json",
             "exclude": [
@@ -147,7 +147,7 @@
       "projectType": "application",
       "architect": {
         "e2e": {
-          "builder": "../../../../packages/angular_devkit/build_webpack:protractor",
+          "builder": "../../../../packages/angular_devkit/build_angular:protractor",
           "options": {
             "protractorConfig": "protractor.conf.js",
             "devServerTarget": "app:serve",
@@ -155,7 +155,7 @@
           }
         },
         "lint": {
-          "builder": "../../../../packages/angular_devkit/build_webpack:tslint",
+          "builder": "../../../../packages/angular_devkit/build_angular:tslint",
           "options": {
             "tsConfig": "e2e/tsconfig.e2e.json",
             "exclude": [

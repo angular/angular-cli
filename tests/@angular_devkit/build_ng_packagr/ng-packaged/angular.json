@@ -13,7 +13,7 @@
           }
         },
         "test": {
-          "builder": "../../../../packages/angular_devkit/build_webpack:karma",
+          "builder": "../../../../packages/angular_devkit/build_angular:karma",
           "options": {
             "main": "projects/lib/src/test.ts",
             "tsConfig": "projects/lib/tsconfig.spec.json",
@@ -24,7 +24,7 @@
           }
         },
         "lint": {
-          "builder": "../../../../packages/angular_devkit/build_webpack:tslint",
+          "builder": "../../../../packages/angular_devkit/build_angular:tslint",
           "options": {
             "tsConfig": [
               "projects/lib/tsconfig.lint.json",

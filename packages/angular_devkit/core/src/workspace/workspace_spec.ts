@@ -61,7 +61,7 @@ describe('Workspace', () => {
         },
         architect: {
           build: {
-            builder: '@angular-devkit/build-webpack:browser',
+            builder: '@angular-devkit/build-angular:browser',
             transforms: [
               {
                 plugin: '@angular-devkit/architect-transforms:replacement',

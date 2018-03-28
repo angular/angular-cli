@@ -1,5 +1,5 @@
 {
-  "name": "@angular-devkit/build-webpack",
+  "name": "@angular-devkit/build-angular",
   "version": "0.0.0",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",

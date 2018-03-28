@@ -17,7 +17,7 @@ const workspaceFile = normalize('.angular.json');
 const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
 
 export const workspaceRoot = join(devkitRoot,
-  'tests/@angular_devkit/build_webpack/hello-world-app/');
+  'tests/@angular_devkit/build_angular/hello-world-app/');
 export const host = new TestProjectHost(workspaceRoot);
 export const outputPath = normalize('dist');
 export const browserTargetSpec = { project: 'app', target: 'build' };

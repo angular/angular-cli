@@ -98,17 +98,17 @@
       "hash": "5b9d0ea3a961a7c58ba5312f689cf137",
       "snapshotRepo": "angular/angular-devkit-build-ng-packagr-builds"
     },
-    "@angular-devkit/build-webpack": {
-      "name": "Build Webpack",
+    "@angular-devkit/build-angular": {
+      "name": "Build Angular",
       "links": [
         {
           "label": "README",
-          "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_webpack/README.md"
+          "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_angular/README.md"
         }
       ],
       "version": "0.0.8",
       "hash": "cb56150be7e0ec5ad40d0851029ed271",
-      "snapshotRepo": "angular/angular-devkit-build-webpack-builds"
+      "snapshotRepo": "angular/angular-devkit-build-angular-builds"
     },
     "@angular-devkit/core": {
       "name": "Core",

@@ -72,7 +72,7 @@ function addDependenciesToPackageJson() {
 
     json.devDependencies = {
       '@angular/compiler-cli': latestVersions.Angular,
-      '@angular-devkit/build-webpack': latestVersions.DevkitBuildWebpack,
+      '@angular-devkit/build-angular': latestVersions.DevkitBuildWebpack,
       'typescript': latestVersions.TypeScript,
       // De-structure last keeps existing user dependencies.
       ...json.devDependencies,
@@ -103,7 +103,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
       projectType: 'application',
       architect: {
         build: {
-          builder: '@angular-devkit/build-webpack:browser',
+          builder: '@angular-devkit/build-angular:browser',
           options: {
             outputPath: `dist/${options.name}`,
             index: `${projectRoot}/src/index.html`,
@@ -148,7 +148,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
           },
         },
         serve: {
-          builder: '@angular-devkit/build-webpack:dev-server',
+          builder: '@angular-devkit/build-angular:dev-server',
           options: {
             browserTarget: `${options.name}:build`,
           },
@@ -159,13 +159,13 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
           },
         },
         'extract-i18n': {
-          builder: '@angular-devkit/build-webpack:extract-i18n',
+          builder: '@angular-devkit/build-angular:extract-i18n',
           options: {
             browserTarget: `${options.name}:build`,
           },
         },
         test: {
-          builder: '@angular-devkit/build-webpack:karma',
+          builder: '@angular-devkit/build-angular:karma',
           options: {
             main: `${projectRoot}/src/test.ts`,
             polyfills: `${projectRoot}/src/polyfills.ts`,
@@ -192,7 +192,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
           },
         },
         lint: {
-          builder: '@angular-devkit/build-webpack:tslint',
+          builder: '@angular-devkit/build-angular:tslint',
           options: {
             tsConfig: [
               `${projectRoot}/tsconfig.app.json`,

@@ -53,10 +53,10 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   successCb = config.buildWebpack.successCb;
   failureCb = config.buildWebpack.failureCb;
 
-  config.reporters.unshift('@angular-devkit/build-webpack--event-reporter');
+  config.reporters.unshift('@angular-devkit/build-angular--event-reporter');
   // Add a reporter that fixes sourcemap urls.
   if (options.sourceMap) {
-    config.reporters.unshift('@angular-devkit/build-webpack--sourcemap-reporter');
+    config.reporters.unshift('@angular-devkit/build-angular--sourcemap-reporter');
 
     // Code taken from https://github.com/tschaub/karma-source-map-support.
     // We can't use it directly because we need to add it conditionally in this file, and karma
@@ -122,7 +122,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
 
   // Add the request blocker.
   config.beforeMiddleware = config.beforeMiddleware || [];
-  config.beforeMiddleware.push('@angular-devkit/build-webpack--blocker');
+  config.beforeMiddleware.push('@angular-devkit/build-angular--blocker');
 
   // Delete global styles entry, we don't want to load them.
   delete webpackConfig.entry.styles;
@@ -267,8 +267,8 @@ const sourceMapReporter: any = function (this: any, baseReporterDecorator: any, 
 sourceMapReporter.$inject = ['baseReporterDecorator', 'config'];
 
 module.exports = {
-  'framework:@angular-devkit/build-webpack': ['factory', init],
-  'reporter:@angular-devkit/build-webpack--sourcemap-reporter': ['type', sourceMapReporter],
-  'reporter:@angular-devkit/build-webpack--event-reporter': ['type', eventReporter],
-  'middleware:@angular-devkit/build-webpack--blocker': ['factory', requestBlocker]
+  'framework:@angular-devkit/build-angular': ['factory', init],
+  'reporter:@angular-devkit/build-angular--sourcemap-reporter': ['type', sourceMapReporter],
+  'reporter:@angular-devkit/build-angular--event-reporter': ['type', eventReporter],
+  'middleware:@angular-devkit/build-angular--blocker': ['factory', requestBlocker]
 };
