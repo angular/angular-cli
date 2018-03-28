@@ -60,6 +60,7 @@
     "@angular/core": "5.2.9",
     "@angular/http": "5.2.9",
     "@angular/material": "5.2.4",
+    "@angular/cdk": "5.2.4",
     "@angular/platform-browser": "5.2.9",
     "@angular/platform-browser-dynamic": "5.2.9",
     "@angular/platform-server": "5.2.9",
