@@ -33,10 +33,15 @@ function _copy(from: string, to: string) {
 
 
 function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
-  const { status, error } = spawnSync(command, args, { ...opts });
+  const { status, error, stderr } = spawnSync(command, args, { ...opts });
 
   if (status != 0) {
-    logger.fatal(error.message);
+    logger.error(`Command failed: ${command} ${args.map(x => JSON.stringify(x)).join(', ')}`);
+    if (error) {
+      logger.error('Error: ' + (error ? error.message : 'undefined'));
+    } else {
+      logger.error(`STDERR:\n${stderr}`);
+    }
     throw error;
   }
 }
@@ -93,7 +98,11 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
 
     const destPath = path.join(root, path.basename(pkg.snapshotRepo));
     // Clear snapshot directory before publishing to remove deleted build files.
-    _exec('git', ['rm', '-rf', './'], { cwd: destPath }, publishLogger);
+    try {
+      _exec('git', ['rm', '-rf', './'], {cwd: destPath}, publishLogger);
+    } catch (e) {
+      // Ignore errors on delete. :shrug:
+    }
     _copy(pkg.dist, destPath);
 
     if (githubToken) {
