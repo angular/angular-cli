@@ -1,18 +1,20 @@
-import { ModuleNotFoundException, resolve } from '@angular-devkit/core/node';
-
 import chalk from 'chalk';
 import { spawn } from 'child_process';
-import { logging } from '@angular-devkit/core';
+
+// devkit/local bridge types and imports.
+import { logging as loggingT } from '@angular-devkit/core';
+import { coreNode } from '../utilities/devkit-local-bridge';
+const { ModuleNotFoundException, resolve } = coreNode;
 
 
 export type NpmInstall = (packageName: string,
-                          logger: logging.Logger,
+                          logger: loggingT.Logger,
                           packageManager: string,
                           projectRoot: string,
                           save: boolean) => void;
 
 export default async function (packageName: string,
-                               logger: logging.Logger,
+                               logger: loggingT.Logger,
                                packageManager: string,
                                projectRoot: string,
                                save: boolean) {

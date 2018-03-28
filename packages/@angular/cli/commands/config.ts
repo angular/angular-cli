@@ -1,17 +1,18 @@
 import { writeFileSync } from 'fs';
 import { Command, Option } from '../models/command';
 import { getWorkspace, getWorkspaceRaw, validateWorkspace } from '../utilities/config';
-import {
-  JsonValue,
-  JsonArray,
-  JsonObject,
-  JsonParseMode,
-  experimental,
-  parseJson,
-} from '@angular-devkit/core';
-import { WorkspaceJson } from '@angular-devkit/core/src/workspace';
 
 const SilentError = require('silent-error');
+
+// devkit/local bridge types and imports.
+import {
+  JsonValue as JsonValueT,
+  JsonArray as JsonArrayT,
+  JsonObject as JsonObjectT,
+} from '@angular-devkit/core';
+import { experimental as experimentalT } from '@angular-devkit/core';
+import { core } from '../utilities/devkit-local-bridge';
+const { JsonParseMode, parseJson } = core;
 
 
 export interface ConfigOptions {
@@ -50,14 +51,14 @@ function parseJsonPath(path: string): string[] {
   return result.filter(fragment => !!fragment);
 }
 
-function getValueFromPath<T extends JsonArray | JsonObject>(
+function getValueFromPath<T extends JsonArrayT | JsonObjectT>(
   root: T,
   path: string,
-): JsonValue | undefined {
+): JsonValueT | undefined {
   const fragments = parseJsonPath(path);
 
   try {
-    return fragments.reduce((value: JsonValue, current: string | number) => {
+    return fragments.reduce((value: JsonValueT, current: string | number) => {
       if (value == undefined || typeof value != 'object') {
         return undefined;
       } else if (typeof current == 'string' && !Array.isArray(value)) {
@@ -73,15 +74,15 @@ function getValueFromPath<T extends JsonArray | JsonObject>(
   }
 }
 
-function setValueFromPath<T extends JsonArray | JsonObject>(
+function setValueFromPath<T extends JsonArrayT | JsonObjectT>(
   root: T,
   path: string,
-  newValue: JsonValue,
-): JsonValue | undefined {
+  newValue: JsonValueT,
+): JsonValueT | undefined {
   const fragments = parseJsonPath(path);
 
   try {
-    return fragments.reduce((value: JsonValue, current: string | number, index: number) => {
+    return fragments.reduce((value: JsonValueT, current: string | number, index: number) => {
       if (value == undefined || typeof value != 'object') {
         return undefined;
       } else if (typeof current == 'string' && !Array.isArray(value)) {
@@ -130,7 +131,7 @@ export default class ConfigCommand extends Command {
   ];
 
   public run(options: ConfigOptions) {
-    const config = (getWorkspace() as {} as { _workspace: WorkspaceJson});
+    const config = (getWorkspace() as {} as { _workspace: experimentalT.workspace.WorkspaceJson});
 
     if (!config) {
       throw new SilentError('No config found.');
@@ -143,7 +144,7 @@ export default class ConfigCommand extends Command {
     }
   }
 
-  private get(config: experimental.workspace.WorkspaceJson, options: ConfigOptions) {
+  private get(config: experimentalT.workspace.WorkspaceJson, options: ConfigOptions) {
     const value = options.jsonPath ? getValueFromPath(config as any, options.jsonPath) : config;
 
     if (value === undefined) {

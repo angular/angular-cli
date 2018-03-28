@@ -1,13 +1,22 @@
-import { experimental, JsonObject } from '@angular-devkit/core';
-import { normalize, strings, tags, terminal, virtualFs } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
+
 import { ArgumentStrategy, Command, Option } from './command';
-import { NodeWorkflow } from '@angular-devkit/schematics/tools';
-import { DryRunEvent, UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
 import { getCollection, getSchematic } from '../utilities/schematics';
 import { tap } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
 import chalk from 'chalk';
+
+// devkit/local bridge types and imports.
+import { DryRunEvent as DryRunEventT } from '@angular-devkit/schematics';
+import {
+  JsonObject as JsonObjectT,
+  experimental as experimentalT,
+} from '@angular-devkit/core';
+// TODO: schematics/tools needs to be a secondary entry point.
+import { NodeWorkflow } from '@angular-devkit/schematics/tools';
+import { core, coreNode, schematics } from '../utilities/devkit-local-bridge';
+const { normalize, strings, tags, terminal, virtualFs } = core;
+const { NodeJsSyncHost } = coreNode;
+const { UnsuccessfulWorkflowExecution } = schematics;
 
 export interface CoreSchematicOptions {
   dryRun: boolean;
@@ -45,7 +54,7 @@ const hiddenOptions = [
 export abstract class SchematicCommand extends Command {
   readonly options: Option[] = [];
   private _host = new NodeJsSyncHost();
-  private _workspace: experimental.workspace.Workspace;
+  private _workspace: experimentalT.workspace.Workspace;
   argStrategy = ArgumentStrategy.Nothing;
 
   protected readonly coreOptions: Option[] = [
@@ -105,7 +114,7 @@ export abstract class SchematicCommand extends Command {
     // Pass the rest of the arguments as the smart default "argv". Then delete it.
     // Removing the first item which is the schematic name.
     const rawArgs = schematicOptions._;
-    workflow.registry.addSmartDefaultProvider('argv', (schema: JsonObject) => {
+    workflow.registry.addSmartDefaultProvider('argv', (schema: JsonObjectT) => {
       if ('index' in schema) {
         return rawArgs[Number(schema['index'])];
       } else {
@@ -114,7 +123,7 @@ export abstract class SchematicCommand extends Command {
     });
     delete schematicOptions._;
 
-    workflow.reporter.subscribe((event: DryRunEvent) => {
+    workflow.reporter.subscribe((event: DryRunEventT) => {
       nothingDone = false;
 
       // Strip leading slash to prevent confusion.

@@ -1,8 +1,10 @@
-import { logging } from '@angular-devkit/core';
 const { cyan } = require('chalk');
 
+// devkit/local bridge types and imports.
+import { logging as loggingT } from '@angular-devkit/core';
+
 export interface CommandConstructor {
-  new(context: CommandContext, logger: logging.Logger): Command;
+  new(context: CommandContext, logger: loggingT.Logger): Command;
   aliases: string[];
   scope: CommandScope.everywhere;
 }
@@ -21,7 +23,7 @@ export enum ArgumentStrategy {
 export abstract class Command {
   protected _rawArgs: string[];
 
-  constructor(context: CommandContext, logger: logging.Logger) {
+  constructor(context: CommandContext, logger: loggingT.Logger) {
     this.logger = logger;
     if (context) {
       this.project = context.project;
@@ -80,7 +82,7 @@ export abstract class Command {
   public hidden = false;
   public unknown = false;
   public scope = CommandScope.everywhere;
-  protected readonly logger: logging.Logger;
+  protected readonly logger: loggingT.Logger;
   protected readonly project: any;
   protected readonly ui: Ui;
 }

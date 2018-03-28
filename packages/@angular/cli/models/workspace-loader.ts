@@ -1,12 +1,3 @@
-import {
-  Path,
-  basename,
-  experimental,
-  dirname,
-  join,
-  normalize,
-  virtualFs
-} from '@angular-devkit/core';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { concatMap, tap } from 'rxjs/operators';
@@ -14,31 +5,40 @@ import * as fs from 'fs';
 import { homedir } from 'os';
 import { findUp } from '../utilities/find-up';
 
+// devkit/local bridge types and imports.
+import {
+  Path as PathT,
+  experimental as experimentalT,
+  virtualFs as virtualFsT
+} from '@angular-devkit/core';
+import { core } from '../utilities/devkit-local-bridge';
+const { basename, experimental, dirname, join, normalize } = core;
+
 
 // TODO: error out instead of returning null when workspace cannot be found.
 export class WorkspaceLoader {
-  private _workspaceCacheMap = new Map<string, experimental.workspace.Workspace>();
+  private _workspaceCacheMap = new Map<string, experimentalT.workspace.Workspace>();
   // TODO: add remaining fallbacks.
   private _configFileNames = [
     normalize('.angular.json'),
     normalize('angular.json'),
   ];
-  constructor(private _host: virtualFs.Host) { }
+  constructor(private _host: virtualFsT.Host) { }
 
-  loadGlobalWorkspace(): Observable<experimental.workspace.Workspace | null> {
+  loadGlobalWorkspace(): Observable<experimentalT.workspace.Workspace | null> {
     return this._getGlobalWorkspaceFilePath().pipe(
       concatMap(globalWorkspacePath => this._loadWorkspaceFromPath(globalWorkspacePath))
     );
   }
 
-  loadWorkspace(): Observable<experimental.workspace.Workspace | null> {
+  loadWorkspace(): Observable<experimentalT.workspace.Workspace | null> {
     return this._getProjectWorkspaceFilePath().pipe(
       concatMap(globalWorkspacePath => this._loadWorkspaceFromPath(globalWorkspacePath))
     );
   }
 
   // TODO: do this with the host instead of fs.
-  private _getProjectWorkspaceFilePath(projectPath?: string): Observable<Path | null> {
+  private _getProjectWorkspaceFilePath(projectPath?: string): Observable<PathT | null> {
     // Find the workspace file, either where specified, in the Angular CLI project
     // (if it's in node_modules) or from the current process.
     const workspaceFilePath = (projectPath && findUp(this._configFileNames, projectPath))
@@ -53,7 +53,7 @@ export class WorkspaceLoader {
   }
 
   // TODO: do this with the host instead of fs.
-  private _getGlobalWorkspaceFilePath(): Observable<Path | null> {
+  private _getGlobalWorkspaceFilePath(): Observable<PathT | null> {
     for (const fileName of this._configFileNames) {
       const workspaceFilePath = join(normalize(homedir()), fileName);
 
@@ -65,7 +65,7 @@ export class WorkspaceLoader {
     return of(null);
   }
 
-  private _loadWorkspaceFromPath(workspacePath: Path) {
+  private _loadWorkspaceFromPath(workspacePath: PathT) {
     if (!workspacePath) {
       return of(null);
     }
