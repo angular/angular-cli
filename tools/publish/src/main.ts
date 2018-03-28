@@ -1,5 +1,3 @@
-import 'reflect-metadata';
-
 import {IndentLogger, LogEntry} from '@ngtools/logger';
 import chalk from 'chalk';
 import * as minimist from 'minimist';
