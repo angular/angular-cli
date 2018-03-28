@@ -5,26 +5,29 @@
  * require('@schematics/angular')
  */
 
-import { schema } from '@angular-devkit/core';
+import { SchemaClassFactory } from '@ngtools/json-schema';
+
+// devkit/local bridge types and imports.
 import {
-  Collection,
-  Engine,
-  Schematic,
-  SchematicEngine,
-  formats,
+  Collection as CollectionT,
+  Engine as EngineT,
+  Schematic as SchematicT,
 } from '@angular-devkit/schematics';
+// TODO: schematics/tools needs to be a secondary entry point.
 import {
   FileSystemCollectionDesc,
   FileSystemSchematicDesc,
   NodeModulesEngineHost,
   validateOptionsWithSchema
 } from '@angular-devkit/schematics/tools';
-import { SchemaClassFactory } from '@ngtools/json-schema';
+import { core, schematics } from '../utilities/devkit-local-bridge';
+const { schema } = core;
+const { SchematicEngine, formats } = schematics;
 
 const SilentError = require('silent-error');
 
 const engineHost = new NodeModulesEngineHost();
-const engine: Engine<FileSystemCollectionDesc, FileSystemSchematicDesc>
+const engine: EngineT<FileSystemCollectionDesc, FileSystemSchematicDesc>
   = new SchematicEngine(engineHost);
 
 // Add support for schemaJson.
@@ -35,12 +38,12 @@ engineHost.registerOptionsTransform(validateOptionsWithSchema(registry));
 export function getEngineHost() {
   return engineHost;
 }
-export function getEngine(): Engine<FileSystemCollectionDesc, FileSystemSchematicDesc> {
+export function getEngine(): EngineT<FileSystemCollectionDesc, FileSystemSchematicDesc> {
   return engine;
 }
 
 
-export function getCollection(collectionName: string): Collection<any, any> {
+export function getCollection(collectionName: string): CollectionT<any, any> {
   const engineHost = getEngineHost();
   const engine = getEngine();
 
@@ -62,8 +65,8 @@ export function getCollection(collectionName: string): Collection<any, any> {
   return collection;
 }
 
-export function getSchematic(collection: Collection<any, any>,
-                             schematicName: string,
-                             allowPrivate?: boolean): Schematic<any, any> {
+export function getSchematic(collection: CollectionT<any, any>,
+  schematicName: string,
+  allowPrivate?: boolean): SchematicT<any, any> {
   return collection.createSchematic(schematicName, allowPrivate);
 }

@@ -1,15 +1,16 @@
 import * as path from 'path';
-import {
-  JsonAstObject,
-  JsonParseMode,
-  JsonValue,
-  experimental,
-  normalize,
-  parseJsonAst,
-  virtualFs,
-} from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { findUp } from './find-up';
+
+// devkit/local bridge types and imports.
+import {
+  JsonAstObject as JsonAstObjectT,
+  JsonValue as JsonValueT,
+  experimental as experimentalT,
+} from '@angular-devkit/core';
+import { core, coreNode } from '../utilities/devkit-local-bridge';
+const { NodeJsSyncHost } = coreNode;
+const { JsonParseMode, experimental, normalize, parseJsonAst, virtualFs } = core;
+
 
 function getSchemaLocation(): string {
   const packagePath = require.resolve('@angular-devkit/core/package.json');
@@ -28,8 +29,8 @@ function configFilePath(projectPath?: string): string | null {
       || findUp(configNames, __dirname);
 }
 
-let cachedWorkspace: experimental.workspace.Workspace | null | undefined = undefined;
-export function getWorkspace(): experimental.workspace.Workspace | null {
+let cachedWorkspace: experimentalT.workspace.Workspace | null | undefined = undefined;
+export function getWorkspace(): experimentalT.workspace.Workspace | null {
   if (cachedWorkspace != undefined) {
     return cachedWorkspace;
   }
@@ -52,7 +53,7 @@ export function getWorkspace(): experimental.workspace.Workspace | null {
   return workspace;
 }
 
-export function getWorkspaceRaw(): [JsonAstObject | null, string] {
+export function getWorkspaceRaw(): [JsonAstObjectT | null, string] {
   const configPath = configFilePath();
 
   if (!configPath) {
@@ -68,10 +69,10 @@ export function getWorkspaceRaw(): [JsonAstObject | null, string] {
   if (ast.kind != 'object') {
     throw new Error('Invalid JSON');
   }
-  return [ast as JsonAstObject, configPath];
+  return [ast as JsonAstObjectT, configPath];
 }
 
-export function validateWorkspace(json: JsonValue) {
+export function validateWorkspace(json: JsonValueT) {
   const workspace = new experimental.workspace.Workspace(
     normalize('.'),
     new NodeJsSyncHost(),

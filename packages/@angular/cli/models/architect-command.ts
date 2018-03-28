@@ -1,11 +1,20 @@
-import { experimental } from '@angular-devkit/core';
-import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
-import { Architect, TargetSpecifier } from '@angular-devkit/architect';
 import { Command, Option } from './command';
 import { from } from 'rxjs/observable/from';
 import { concatMap, map, tap, toArray } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
 import { of } from 'rxjs/observable/of';
+
+// devkit/local bridge types and imports.
+import {
+  Architect as ArchitectT,
+  TargetSpecifier as TargetSpecifierT
+} from '@angular-devkit/architect';
+import { experimental as experimentalT } from '@angular-devkit/core';
+import { architect, coreNode } from '../utilities/devkit-local-bridge';
+const { NodeJsSyncHost, createConsoleLogger } = coreNode;
+const { Architect } = architect;
+
+
 const stringUtils = require('ember-cli-string-utils');
 
 
@@ -16,8 +25,8 @@ export interface GenericTargetTargetSpecifier {
 
 export abstract class ArchitectCommand extends Command {
   private _host = new NodeJsSyncHost();
-  private _architect: Architect;
-  private _workspace: experimental.workspace.Workspace;
+  private _architect: ArchitectT;
+  private _workspace: experimentalT.workspace.Workspace;
   private _logger = createConsoleLogger();
 
   readonly Options: Option[] = [{
@@ -34,7 +43,7 @@ export abstract class ArchitectCommand extends Command {
   public async initialize(options: any) {
     return this._loadWorkspaceAndArchitect().pipe(
       concatMap(() => {
-        let targetSpec: TargetSpecifier;
+        let targetSpec: TargetSpecifierT;
         if (options.project) {
           targetSpec = {
             project: options.project,
@@ -146,8 +155,8 @@ export abstract class ArchitectCommand extends Command {
     aliases: ['c']
   };
 
-  protected async runArchitectTarget(targetSpec: TargetSpecifier): Promise<number> {
-    const runSingleTarget = (targetSpec: TargetSpecifier) => this._architect.run(
+  protected async runArchitectTarget(targetSpec: TargetSpecifierT): Promise<number> {
+    const runSingleTarget = (targetSpec: TargetSpecifierT) => this._architect.run(
       this._architect.getBuilderConfiguration(targetSpec), { logger: this._logger }
     ).pipe(
       map(buildEvent => buildEvent.success ? 0 : 1)

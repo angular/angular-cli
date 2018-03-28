@@ -7,10 +7,13 @@ import {
   ArgumentStrategy
 } from '../models/command';
 import { oneLine } from 'common-tags';
-import { logging } from '@angular-devkit/core';
-import { camelize } from '@angular-devkit/core/src/utils/strings';
 
 import * as yargsParser from 'yargs-parser';
+
+// devkit/local bridge types and imports.
+import { logging as loggingT } from '@angular-devkit/core';
+// TODO: core/utils needs to be a secondary entry point.
+import { camelize } from '@angular-devkit/core/src/utils/strings';
 
 export interface CommandMap {
   [key: string]: CommandConstructor;
@@ -25,7 +28,7 @@ export interface CommandMap {
  */
 export async function runCommand(commandMap: CommandMap,
                                  args: string[],
-                                 logger: logging.Logger,
+  logger: loggingT.Logger,
                                  context: CommandContext): Promise<any> {
 
   // if not args supplied, just run the help command.
