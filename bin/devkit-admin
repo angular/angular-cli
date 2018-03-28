@@ -50,13 +50,6 @@ try {
 
       output.write(color(entry.message) + '\n');
     });
-
-  logger
-    .pipe(filter(entry => entry.level === 'fatal'))
-    .subscribe(() => {
-      process.stderr.write('A fatal error happened. See details above.\n');
-      process.exit(100);
-    });
 } catch (e) {
   console.error(red(`Reverting to manual console logging.\nReason: ${e.message}.`));
   logger = {
