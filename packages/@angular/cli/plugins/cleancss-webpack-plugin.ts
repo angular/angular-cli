@@ -37,7 +37,9 @@ export class CleanCssWebpackPlugin {
 
         const cleancss = new CleanCSS({
           compatibility: 'ie9',
-          level: 2,
+          // use a safer optimization level
+          // see: https://github.com/jakubpawlowicz/clean-css#optimization-levels
+          level: 1,
           inline: false,
           returnPromise: true,
           sourceMap: this._options.sourceMap,
