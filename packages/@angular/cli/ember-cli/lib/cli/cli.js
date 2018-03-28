@@ -92,15 +92,19 @@ class CLI {
       const maybeExitCode = await runCommand(environment.commands, environment.cliArgs, logger, context);
       return Number.isInteger(maybeExitCode) ? maybeExitCode : 0;
     } catch (err) {
-      if (err) {
-        const msg = typeof err === 'string' ? err : err.message;
-        const stack = typeof err === 'string' ? undefined : err.stack;
-        logger.error(msg);
-        if (stack) {
-          logger.error(stack);
-        }
+      if (typeof err === 'object') {
+        logger.fatal(err.message);
+        logger.fatal(err.stack);
+      } else if (typeof err === 'string') {
+        logger.fatal(err);
+      } else if (typeof err === 'number') {
+        // Log nothing.
+      } else {
+        logger.fatal('An unexpected error occured: ' + JSON.stringify(err));
       }
+
       if (this.testing) {
+        debugger;
         throw err;
       }
       loggingSubscription.unsubscribe();
