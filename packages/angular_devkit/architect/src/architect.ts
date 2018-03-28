@@ -239,7 +239,7 @@ export class Architect {
       // TODO: this probably needs to be more like NodeModulesEngineHost.
       const basedir = getSystemPath(this._workspace.root);
       const [pkg, builderName] = builderConfig.builder.split(':');
-      const pkgJsonPath = nodeResolve(pkg, { basedir, resolvePackageJson: true });
+      const pkgJsonPath = nodeResolve(pkg, { basedir, resolvePackageJson: true, checkLocal: true });
       let buildersJsonPath: Path;
       let builderPaths: BuilderPaths;
 
