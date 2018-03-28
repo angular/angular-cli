@@ -187,7 +187,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
             }),
             switchMap(([data, valid]) => {
               if (valid) {
-                let dataObs = observableOf(data);
+                let dataObs = this._applySmartDefaults(data);
                 this._post.forEach(visitor =>
                   dataObs = dataObs.pipe(
                     concatMap(data => {
@@ -203,8 +203,6 @@ export class CoreSchemaRegistry implements SchemaRegistry {
                 );
 
                 return dataObs.pipe(
-                  // Apply smart defaults.
-                  concatMap(data => this._applySmartDefaults(data)),
                   map(data => [data, valid]),
                 );
               } else {
@@ -280,7 +278,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           // We cheat, heavily.
           this._smartDefaultRecord.set(
             // tslint:disable-next-line:no-any
-            JSON.stringify((it as any).dataPathArr.slice(1) as string[]),
+            JSON.stringify((it as any).dataPathArr.slice(1, (it as any).dataLevel + 1) as string[]),
             schema,
           );
 
@@ -334,8 +332,14 @@ export class CoreSchemaRegistry implements SchemaRegistry {
             .replace(/\\r/g, '\r')
             .replace(/\\f/g, '\f')
             .replace(/\\t/g, '\t');
+
+          // We know we need an object because the fragment is a property key.
+          if (!data && parent !== null && parentProperty) {
+            data = parent[parentProperty] = {};
+          }
           parent = data;
           parentProperty = property;
+
           data = data[property];
         } else {
           return;

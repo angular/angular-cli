@@ -273,6 +273,9 @@ describe('CoreSchemaRegistry', () => {
 
       return schema['blue'];
     });
+    registry.addSmartDefaultProvider('test3', (schema) => {
+      return [ 1, 2, 3 ];
+    });
 
     registry
       .compile({
@@ -285,6 +288,20 @@ describe('CoreSchemaRegistry', () => {
               properties: {
                 'test': {
                   $ref: '#/definitions/other',
+                },
+              },
+            },
+          },
+          arr2: {
+            $ref: '#/definitions/test3',
+          },
+          obj: {
+            properties: {
+              deep: {
+                properties: {
+                  arr: {
+                    $ref: '#/definitions/test3',
+                  },
                 },
               },
             },
@@ -304,6 +321,12 @@ describe('CoreSchemaRegistry', () => {
               blue: 'yep',
             },
           },
+          test3: {
+            type: 'array',
+            $default: {
+              $source: 'test3',
+            },
+          },
         },
       })
       .pipe(
@@ -312,6 +335,8 @@ describe('CoreSchemaRegistry', () => {
           expect(result.success).toBe(true);
           expect(data.bool).toBe(true);
           expect(data.arr[0].test).toBe('yep');
+          expect(data.arr2).toEqual([1, 2, 3]);
+          expect(data.obj.deep.arr).toEqual([1, 2, 3]);
         }),
       )
       .subscribe(done, done.fail);
