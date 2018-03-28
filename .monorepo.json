@@ -53,8 +53,7 @@
       "name": "Angular PWA Schematics",
       "section": "Schematics",
       "version": "0.0.0",
-      "hash": "f2f1253db8e7a01eb0e5a945dd08979c",
-      "snapshotRepo": "angular/pwa"
+      "hash": "f2f1253db8e7a01eb0e5a945dd08979c"
     },
     "@angular-devkit/architect": {
       "name": "Architect",
