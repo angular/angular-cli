@@ -5,7 +5,7 @@ import { ArgumentStrategy, Command, Option } from './command';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import { DryRunEvent, UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
 import { getCollection, getSchematic } from '../utilities/schematics';
-import { tap } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
 import chalk from 'chalk';
 
@@ -46,6 +46,7 @@ export abstract class SchematicCommand extends Command {
   readonly options: Option[] = [];
   private _host = new NodeJsSyncHost();
   private _workspace: experimental.workspace.Workspace;
+  private _deAliasedName: string;
   argStrategy = ArgumentStrategy.Nothing;
 
   protected readonly coreOptions: Option[] = [
@@ -97,10 +98,7 @@ export abstract class SchematicCommand extends Command {
     const pathOptions = this.setPathOptions(schematicOptions, workingDir);
     schematicOptions = { ...schematicOptions, ...pathOptions };
     const defaultOptions = this.readDefaults(collectionName, schematicName, schematicOptions);
-    // schematicOptions = { ...schematicOptions, ...defaultOptions };
-    schematicOptions.x = defaultOptions;
-    delete schematicOptions.x;
-
+    schematicOptions = { ...schematicOptions, ...defaultOptions };
 
     // Pass the rest of the arguments as the smart default "argv". Then delete it.
     // Removing the first item which is the schematic name.
@@ -194,6 +192,7 @@ export abstract class SchematicCommand extends Command {
     const collection = getCollection(collectionName);
 
     const schematic = getSchematic(collection, options.schematicName);
+    this._deAliasedName = schematic.description.name;
 
     if (!schematic.description.schemaJson) {
       return Promise.resolve(null);
@@ -300,9 +299,8 @@ export abstract class SchematicCommand extends Command {
     }
     const workspaceLoader = new WorkspaceLoader(this._host);
 
-    return workspaceLoader.loadWorkspace().pipe(
-      tap(workspace => this._workspace = workspace),
-    );
+    workspaceLoader.loadWorkspace().pipe(take(1))
+      .subscribe(workspace => this._workspace = workspace);
   }
 
   private readDefaults(collectionName: string, schematicName: string, options: any): any {
@@ -312,15 +310,19 @@ export abstract class SchematicCommand extends Command {
       return {};
     }
 
+    if (this._deAliasedName) {
+      schematicName = this._deAliasedName;
+    }
+
     // read and set workspace defaults
     const wsSchematics = this._workspace.getSchematics();
     if (wsSchematics) {
       let key = collectionName;
-      if (wsSchematics[collectionName] && typeof wsSchematics[key] === 'object') {
+      if (wsSchematics[key] && typeof wsSchematics[key] === 'object') {
         defaults = {...defaults, ...<object> wsSchematics[key]};
       }
       key = collectionName + ':' + schematicName;
-      if (wsSchematics[collectionName] && typeof wsSchematics[key] === 'object') {
+      if (wsSchematics[key] && typeof wsSchematics[key] === 'object') {
         defaults = {...defaults, ...<object> wsSchematics[key]};
       }
     }
@@ -331,15 +333,14 @@ export abstract class SchematicCommand extends Command {
       projectName = this._workspace.listProjectNames()[0];
     }
     if (projectName) {
-      const project = this._workspace.getProject(projectName);
-      const prjSchematics = project.schematics;
+      const prjSchematics = this._workspace.getProjectSchematics(projectName);
       if (prjSchematics) {
         let key = collectionName;
-        if (prjSchematics[collectionName] && typeof prjSchematics[key] === 'object') {
+        if (prjSchematics[key] && typeof prjSchematics[key] === 'object') {
           defaults = {...defaults, ...<object> prjSchematics[key]};
         }
         key = collectionName + ':' + schematicName;
-        if (prjSchematics[collectionName] && typeof prjSchematics[key] === 'object') {
+        if (prjSchematics[key] && typeof prjSchematics[key] === 'object') {
           defaults = {...defaults, ...<object> prjSchematics[key]};
         }
       }

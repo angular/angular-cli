@@ -31,6 +31,7 @@ export default class NewCommand extends SchematicCommand {
     if (this.initialized) {
       return Promise.resolve();
     }
+    super.initialize(options);
     this.initialized = true;
 
     const collectionName = this.parseCollectionName(options);
