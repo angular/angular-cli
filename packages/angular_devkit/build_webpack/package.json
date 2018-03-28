@@ -22,6 +22,8 @@
     "file-loader": "^1.1.11",
     "glob": "^7.0.3",
     "html-webpack-plugin": "^3.0.6",
+    "istanbul": "^0.4.5",
+    "istanbul-instrumenter-loader": "^3.0.0",
     "karma-source-map-support": "^1.2.0",
     "less": "^3.0.1",
     "less-loader": "^4.1.0",
