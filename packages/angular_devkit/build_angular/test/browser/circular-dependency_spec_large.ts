@@ -7,7 +7,7 @@
  */
 
 import { tap } from 'rxjs/operators';
-import { TestLogger, browserTargetSpec, host, runTargetSpec } from '../utils';
+import { TestLogger, Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder circular dependency detection', () => {
@@ -25,5 +25,5 @@ describe('Browser Builder circular dependency detection', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(logger.includes('Circular dependency detected')).toBe(true)),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 });

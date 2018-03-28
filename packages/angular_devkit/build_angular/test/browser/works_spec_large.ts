@@ -8,7 +8,7 @@
 
 import { join, normalize } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder basic test', () => {
@@ -31,5 +31,5 @@ describe('Browser Builder basic test', () => {
         expect(host.scopedSync().exists(join(outputPath, 'index.html'))).toBe(true);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 });

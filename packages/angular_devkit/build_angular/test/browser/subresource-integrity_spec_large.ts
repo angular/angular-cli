@@ -8,7 +8,7 @@
 
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder subresource integrity', () => {
@@ -34,5 +34,5 @@ describe('Browser Builder subresource integrity', () => {
         expect(content).toMatch(/integrity="\w+-[A-Za-z0-9\/\+=]+"/);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 });

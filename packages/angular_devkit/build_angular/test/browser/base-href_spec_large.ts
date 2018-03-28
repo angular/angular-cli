@@ -8,7 +8,7 @@
 
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder base href', () => {
@@ -33,5 +33,5 @@ describe('Browser Builder base href', () => {
         expect(content).toMatch(/<base href="\/myUrl">/);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 });

@@ -8,7 +8,7 @@
 
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host, runTargetSpec, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host, runTargetSpec, workspaceRoot } from '../utils';
 
 
 describe('Browser Builder output path', () => {
@@ -32,11 +32,11 @@ describe('Browser Builder output path', () => {
         expect(host.scopedSync().exists(outputPath)).toBe(false);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 
   it('does not allow output path to be project root', (done) => {
     const overrides = { outputPath: './' };
 
     runTargetSpec(host, browserTargetSpec, overrides).subscribe(undefined, done, done.fail);
-  }, 30000);
+  }, Timeout.Basic);
 });

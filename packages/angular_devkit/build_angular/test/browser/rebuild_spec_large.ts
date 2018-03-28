@@ -8,7 +8,7 @@
 
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, take, tap } from 'rxjs/operators';
-import { TestLogger, browserTargetSpec, host, runTargetSpec } from '../utils';
+import { TestLogger, Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_large';
 
 
@@ -114,7 +114,7 @@ describe('Browser Builder rebuilds', () => {
       }),
       take(3),
     ).subscribe(undefined, done.fail, done);
-  }, 60000);
+  }, Timeout.Massive);
 
   it('rebuilds on CSS changes', (done) => {
     const overrides = { watch: true };
@@ -125,7 +125,7 @@ describe('Browser Builder rebuilds', () => {
       tap(() => host.appendToFile('src/app/app.component.css', ':host { color: blue; }')),
       take(2),
     ).subscribe(undefined, done.fail, done);
-  }, 60000);
+  }, Timeout.Complex);
 
   it('type checks on rebuilds', (done) => {
     host.writeMultipleFiles({
@@ -184,7 +184,7 @@ describe('Browser Builder rebuilds', () => {
       }),
       take(4),
     ).subscribe(undefined, done.fail, done);
-  }, 120000);
+  }, Timeout.Massive);
 
   it('rebuilds on type changes', (done) => {
     host.writeMultipleFiles({ 'src/type.ts': `export type MyType = number;` });
@@ -198,7 +198,7 @@ describe('Browser Builder rebuilds', () => {
       tap(() => host.writeMultipleFiles({ 'src/type.ts': `export type MyType = string;` })),
       take(2),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 
 
   // TODO: writing back the original content in build 4 doesn't seem to trigger a rebuild
@@ -262,7 +262,7 @@ describe('Browser Builder rebuilds', () => {
       }),
       take(5),
     ).subscribe(undefined, done.fail, done);
-  }, 60000);
+  }, Timeout.Complex);
 
 
   xit('rebuilds AOT factories', (done) => {
@@ -348,5 +348,5 @@ describe('Browser Builder rebuilds', () => {
       }),
       take(7),
     ).subscribe(undefined, done.fail, done);
-  }, 60000);
+  }, Timeout.Complex);
 });

@@ -7,7 +7,7 @@
  */
 
 import { debounceTime, take, tap } from 'rxjs/operators';
-import { browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder poll', () => {
@@ -38,5 +38,5 @@ describe('Browser Builder poll', () => {
       expect(msAvg).toBeLessThan(2750);
       done();
     });
-  }, 30000);
+  }, Timeout.Basic);
 });

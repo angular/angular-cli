@@ -7,7 +7,7 @@
  */
 
 import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder allow js', () => {
@@ -26,7 +26,7 @@ describe('Browser Builder allow js', () => {
     runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 
   it('works with aot', (done) => {
     host.writeMultipleFiles({
@@ -39,5 +39,5 @@ describe('Browser Builder allow js', () => {
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 });

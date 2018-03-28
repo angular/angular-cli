@@ -8,7 +8,7 @@
 
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder source map', () => {
@@ -27,7 +27,7 @@ describe('Browser Builder source map', () => {
         expect(host.scopedSync().exists(fileName)).toBe(true);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 
   it('does not output source map when disabled', (done) => {
     const overrides = { sourceMap: false };
@@ -39,7 +39,7 @@ describe('Browser Builder source map', () => {
         expect(host.scopedSync().exists(fileName)).toBe(false);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 
   it('supports eval source map', (done) => {
     const overrides = { sourceMap: true, evalSourceMap: true };
@@ -53,5 +53,5 @@ describe('Browser Builder source map', () => {
         expect(content).toContain('eval("function webpackEmptyAsyncContext');
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 });

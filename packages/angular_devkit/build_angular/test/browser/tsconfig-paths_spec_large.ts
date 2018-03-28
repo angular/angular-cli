@@ -7,7 +7,7 @@
  */
 
 import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder tsconfig paths', () => {
@@ -28,7 +28,7 @@ describe('Browser Builder tsconfig paths', () => {
     runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 
   it('works', (done) => {
     host.writeMultipleFiles({
@@ -70,5 +70,5 @@ describe('Browser Builder tsconfig paths', () => {
     runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 });

@@ -8,7 +8,7 @@
 
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { concatMap, tap } from 'rxjs/operators';
-import { browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder deploy url', () => {
@@ -36,7 +36,7 @@ describe('Browser Builder deploy url', () => {
         expect(content).toContain('http://example.com/some/path/main.js');
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 
   it('uses deploy url for in webpack runtime', (done) => {
     const overrides = { deployUrl: 'deployUrl/' };
@@ -49,6 +49,6 @@ describe('Browser Builder deploy url', () => {
         expect(content).toContain('deployUrl/');
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 
 });

@@ -8,7 +8,7 @@
 
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder assets', () => {
@@ -49,7 +49,7 @@ describe('Browser Builder assets', () => {
         expect(host.scopedSync().exists(normalize('./dist/folder/.gitkeep'))).toBe(false);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 
   it('fails with non-absolute output path', (done) => {
     const assets: { [path: string]: string } = {
@@ -63,5 +63,5 @@ describe('Browser Builder assets', () => {
     };
 
     runTargetSpec(host, browserTargetSpec, overrides).subscribe(undefined, done, done.fail);
-  }, 30000);
+  }, Timeout.Basic);
 });

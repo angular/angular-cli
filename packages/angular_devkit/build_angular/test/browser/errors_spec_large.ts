@@ -7,7 +7,7 @@
  */
 
 import { tap } from 'rxjs/operators';
-import { TestLogger, browserTargetSpec, host, runTargetSpec } from '../utils';
+import { TestLogger, Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder errors', () => {
@@ -27,7 +27,7 @@ describe('Browser Builder errors', () => {
         expect(logger.includes('polyfills.ts is missing from the TypeScript')).toBe(true);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 
   it('shows TS syntax errors', (done) => {
     host.appendToFile('src/app/app.component.ts', ']]]');
@@ -39,7 +39,7 @@ describe('Browser Builder errors', () => {
         expect(logger.includes('Declaration or statement expected.')).toBe(true);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 
   it('shows static analysis errors', (done) => {
     host.replaceInFile('src/app/app.component.ts', `'app-root'`, `(() => 'app-root')()`);
@@ -51,6 +51,6 @@ describe('Browser Builder errors', () => {
         expect(logger.includes('Function expressions are not supported in')).toBe(true);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 
 });

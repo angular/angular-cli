@@ -8,7 +8,7 @@
 
 import { PathFragment, join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder scripts array', () => {
@@ -73,7 +73,7 @@ describe('Browser Builder scripts array', () => {
         expect(content).toMatch(matches[fileName]);
       })),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 
   it('uglifies, uses sourcemaps, and adds hashes', (done) => {
     host.writeMultipleFiles(scripts);
@@ -107,7 +107,7 @@ describe('Browser Builder scripts array', () => {
           .toBe(true);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 45000);
+  }, Timeout.Complex);
 
   it('preserves script order', (done) => {
     host.writeMultipleFiles(scripts);
@@ -131,5 +131,5 @@ describe('Browser Builder scripts array', () => {
         expect(content).toMatch(re);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 });

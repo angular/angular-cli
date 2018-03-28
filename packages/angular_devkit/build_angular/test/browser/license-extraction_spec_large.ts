@@ -8,7 +8,7 @@
 
 import { join, normalize } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder license extraction', () => {
@@ -30,5 +30,5 @@ describe('Browser Builder license extraction', () => {
         expect(host.scopedSync().exists(fileName)).toBe(true);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 45000);
+  }, Timeout.Standard);
 });

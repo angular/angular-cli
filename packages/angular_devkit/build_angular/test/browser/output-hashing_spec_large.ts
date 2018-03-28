@@ -8,7 +8,7 @@
 
 import { normalize } from '@angular-devkit/core';
 import { concatMap, tap } from 'rxjs/operators';
-import { browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_large';
 
 
@@ -106,7 +106,7 @@ describe('Browser Builder output hashing', () => {
         validateHashes(oldHashes, newHashes, []);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 60000);
+  }, Timeout.Massive);
 
   it('supports options', (done) => {
     host.writeMultipleFiles({ 'src/styles.css': `h1 { background: url('./spectrum.png')}` });
@@ -159,5 +159,5 @@ describe('Browser Builder output hashing', () => {
         expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeFalsy();
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 60000);
+  }, Timeout.Complex);
 });

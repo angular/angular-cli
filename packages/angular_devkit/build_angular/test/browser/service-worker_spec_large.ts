@@ -8,7 +8,7 @@
 
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder', () => {
@@ -48,7 +48,7 @@ describe('Browser Builder', () => {
       .subscribe(event => {
         expect(event.success).toBe(false);
       }, done, done.fail);
-  }, 30000);
+  }, Timeout.Basic);
 
   it('works with service worker', (done) => {
     host.writeMultipleFiles({
@@ -62,7 +62,7 @@ describe('Browser Builder', () => {
         expect(host.scopedSync().exists(normalize('dist/ngsw.json')));
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 
   it('works with service worker and baseHref', (done) => {
     host.writeMultipleFiles({
@@ -79,5 +79,5 @@ describe('Browser Builder', () => {
         )).toMatch(/"\/foo\/bar\/index.html"/);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Basic);
 });

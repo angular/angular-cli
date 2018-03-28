@@ -7,7 +7,7 @@
  */
 
 import { tap } from 'rxjs/operators';
-import { TestLogger, browserTargetSpec, host, runTargetSpec } from '../utils';
+import { TestLogger, Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder bundle budgets', () => {
@@ -27,7 +27,7 @@ describe('Browser Builder bundle budgets', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(logger.includes('WARNING')).toBe(false)),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Complex);
 
   it('shows errors', (done) => {
     const overrides = {
@@ -38,7 +38,7 @@ describe('Browser Builder bundle budgets', () => {
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Standard);
 
   it('shows warnings', (done) => {
     const overrides = {
@@ -52,5 +52,5 @@ describe('Browser Builder bundle budgets', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(logger.includes('WARNING')).toBe(true)),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Standard);
 });

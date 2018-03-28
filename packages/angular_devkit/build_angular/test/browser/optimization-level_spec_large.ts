@@ -8,7 +8,7 @@
 
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder optimization level', () => {
@@ -29,7 +29,7 @@ describe('Browser Builder optimization level', () => {
         expect(content).not.toContain('AppComponent');
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 45000);
+  }, Timeout.Complex);
 
   it('tsconfig target changes optimizations to use ES2015', (done) => {
     host.replaceInFile('tsconfig.json', '"target": "es5"', '"target": "es2015"');
@@ -44,5 +44,5 @@ describe('Browser Builder optimization level', () => {
         expect(content).toMatch(/class \w{constructor\(\){/);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 45000);
+  }, Timeout.Complex);
 });

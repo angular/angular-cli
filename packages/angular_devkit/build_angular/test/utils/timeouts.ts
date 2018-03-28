@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-export * from './request';
-export * from './test-project-host';
-export * from './test-logger';
-export * from './timeouts';
-export * from './run-target-spec';
+export enum Timeout {
+  Basic = 30000,
+  Standard = Basic * 1.5,
+  Complex = Basic * 2,
+  Massive = Basic * 4,
+}
