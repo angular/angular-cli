@@ -44,10 +44,10 @@ export function createProject(name: string, ...args: string[]) {
     .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
     .then(() => argv['ng4'] ? useNg4() : Promise.resolve())
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
-// TODO(architect): remove the changes to karma config when schematics are in
-// .then(() => replaceInFile('karma.conf.js', /@angular\/cli/g, '@angular-devkit/build-webpack'))
-// .then(() => replaceInFile('karma.conf.js', 'reports',
-//   `dir: require('path').join(__dirname, 'coverage'), reports`))
+    // TODO: remove this when schematics are updated
+    .then(() => updateJsonFile('package.json', json => {
+      json['devDependencies']['@angular-devkit/build-webpack'] = '0.0.8';
+    }))
     .then(() => console.log(`Project ${name} created... Installing npm.`))
     .then(() => silentNpm('install'));
 }
