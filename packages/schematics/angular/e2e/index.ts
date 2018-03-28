@@ -50,7 +50,6 @@ type WorkspaceSchema = experimental.workspace.WorkspaceSchema;
 
 function addAppToWorkspaceFile(options: E2eOptions, workspace: WorkspaceSchema): Rule {
   return (host: Tree, context: SchematicContext) => {
-    context.logger.info(`Updating workspace file`);
     // TODO: use JsonAST
     // const workspacePath = '/angular.json';
     // const workspaceBuffer = host.read(workspacePath);

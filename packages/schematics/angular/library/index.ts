@@ -120,7 +120,6 @@ function addDependenciesToPackageJson() {
 
 function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSchema): Rule {
   return (host: Tree, context: SchematicContext) => {
-    context.logger.info(`Updating workspace file`);
 
     const projectRoot = `${workspace.newProjectRoot}/${options.name}`;
     // tslint:disable-next-line:no-any

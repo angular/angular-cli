@@ -86,7 +86,6 @@ function addDependenciesToPackageJson() {
 
 function addAppToWorkspaceFile(options: ApplicationOptions, workspace: WorkspaceSchema): Rule {
   return (host: Tree, context: SchematicContext) => {
-    context.logger.info(`Updating workspace file`);
     // TODO: use JsonAST
     // const workspacePath = '/angular.json';
     // const workspaceBuffer = host.read(workspacePath);
