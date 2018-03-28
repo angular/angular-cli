@@ -28,7 +28,6 @@
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
     "@angular-devkit/architect": "0.0.8",
-    "@angular-devkit/build-webpack": "0.0.8",
     "@angular-devkit/core": "0.4.7",
     "@angular-devkit/schematics": "0.4.7",
     "@ngtools/json-schema": "1.2.0",

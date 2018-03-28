@@ -13,17 +13,8 @@ const IMPORT_RE = /(^|\n)\s*import\b(?:.|\n)*?\'[^\']*\'/g;
 const REQUIRE_RE = /\brequire\('[^)]+?'\)/g;
 const IGNORE_RE = /\s+@ignoreDep\s+\S+/g;
 const NODE_PACKAGES = Object.keys(process.binding('natives'));
-const ANGULAR_PACKAGES = [
-  '@angular/compiler',
-  '@angular/compiler-cli',
-  '@angular/core',
-  '@schematics/update'
-];
-const OPTIONAL_PACKAGES = [
-  '@angular/service-worker',
-];
-const PEERDEP_HACK_PACKAGES = [
-  'typescript',
+const DYNAMIC_DEVKIT_PACKAGES = [
+  '@schematics/update',
 ];
 
 
@@ -134,13 +125,12 @@ for (const packageName of Object.keys(packages)) {
     .concat(Object.keys(packageJson['devDependencies'] || {}))
     .concat(Object.keys(packageJson['peerDependencies'] || {}));
 
-  const missingDeps = dependencies
-    .filter(d => allDeps.indexOf(d) == -1)
-    .filter(d => OPTIONAL_PACKAGES.indexOf(d) == -1);
+  const missingDeps = dependencies.filter(d => allDeps.indexOf(d) == -1)
+    .filter(x => DYNAMIC_DEVKIT_PACKAGES.indexOf(x) == -1);
   reportMissingDependencies(missingDeps);
 
   const overDeps = allDeps.filter(d => dependencies.indexOf(d) == -1)
-    .filter(x => ANGULAR_PACKAGES.indexOf(x) == -1);
+    .filter(x => DYNAMIC_DEVKIT_PACKAGES.indexOf(x) == -1);
   reportExcessiveDependencies(overDeps);
 
   console.log('');
@@ -158,12 +148,11 @@ const allRootDeps = []
 const internalPackages = Object.keys(packages);
 const missingRootDeps = overallDeps.filter(d => allRootDeps.indexOf(d) == -1)
   .filter(d => internalPackages.indexOf(d) == -1)
-  .filter(x => OPTIONAL_PACKAGES.indexOf(x) == -1);
+  .filter(x => DYNAMIC_DEVKIT_PACKAGES.indexOf(x) == -1);
 reportMissingDependencies(missingRootDeps);
 
 const overRootDeps = allRootDeps.filter(d => overallDeps.indexOf(d) == -1)
-  .filter(x => ANGULAR_PACKAGES.indexOf(x) == -1)
-  .filter(x => PEERDEP_HACK_PACKAGES.indexOf(x) == -1);
+  .filter(x => DYNAMIC_DEVKIT_PACKAGES.indexOf(x) == -1);
 reportExcessiveDependencies(overRootDeps);
 
 process.exit(exitCode);
