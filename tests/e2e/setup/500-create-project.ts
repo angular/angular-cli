@@ -37,6 +37,9 @@ export default async function() {
     .then(() => useCIDefaults())
     .then(() => argv['ng-version'] ? useNgVersion(argv['ng-version']) : Promise.resolve())
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
+    .then(() => updateJsonFile('package.json', json => {
+      json['devDependencies']['@angular-devkit/local'] = 'filipesilva/angular-devkit-local-builds#011626a';
+    }))
     // npm link on Circle CI is very noisy.
     .then(() => silentNpm('install'))
     .then(() => ng('version'))

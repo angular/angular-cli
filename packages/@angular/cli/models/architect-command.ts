@@ -8,9 +8,6 @@ import { WorkspaceLoader } from '../models/workspace-loader';
 import { of } from 'rxjs/observable/of';
 const stringUtils = require('ember-cli-string-utils');
 
-// TODO: consider making this a local project dependency instead.
-// We assume the default build-webpack package, so we need to add it here for the dep checker.
-// require('@angular-devkit/build-webpack')
 
 export interface GenericTargetTargetSpecifier {
   target: string;
