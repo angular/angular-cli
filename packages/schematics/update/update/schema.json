@@ -6,20 +6,13 @@
   "properties": {
     "packages": {
       "description": "The packages to get.",
-      "oneOf": [
-        {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "$default": {
-            "$source": "argv"
-          }
-        },
-        {
-          "type": "string"
-        }
-      ]
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "$default": {
+        "$source": "argv"
+      }
     },
     "force": {
       "description": "If false, will error out if installed packages are incompatible with the update.",

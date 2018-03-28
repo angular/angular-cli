@@ -374,7 +374,7 @@ function _buildPackageInfo(
     );
   }
 
-  const installedPackageJson = npmPackageJson.versions[installedVersion];
+  const installedPackageJson = npmPackageJson.versions[installedVersion] || packageContent;
   if (!installedPackageJson) {
     throw new SchematicsException(
       `An unexpected error happened; package ${name} has no version ${installedVersion}.`,
