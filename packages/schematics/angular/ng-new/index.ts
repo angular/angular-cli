@@ -49,6 +49,7 @@ export default function (options: NgNewOptions): Rule {
     routing: options.routing,
     style: options.style,
     skipTests: options.skipTests,
+    skipPackageJson: false,
   };
 
   return chain([

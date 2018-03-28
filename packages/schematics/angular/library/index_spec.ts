@@ -94,6 +94,8 @@ describe('Library Schematic', () => {
 
       const packageJson = getJsonFileContent(tree, 'package.json');
       expect(packageJson.devDependencies['ng-packagr']).toEqual('^2.4.1');
+      expect(packageJson.devDependencies['@angular-devkit/build-ng-packagr'])
+        .toEqual(latestVersions.DevkitBuildNgPackagr);
     });
 
     it('should use the latest known versions in package.json', () => {
@@ -123,6 +125,7 @@ describe('Library Schematic', () => {
 
       const packageJson = getJsonFileContent(tree, 'package.json');
       expect(packageJson.devDependencies['ng-packagr']).toBeUndefined();
+      expect(packageJson.devDependencies['@angular-devkit/build-webpack']).toBeUndefined();
     });
   });
 

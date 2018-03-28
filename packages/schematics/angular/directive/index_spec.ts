@@ -40,6 +40,7 @@ describe('Directive Schematic', () => {
     routing: false,
     style: 'css',
     skipTests: false,
+    skipPackageJson: false,
   };
   let appTree: UnitTestTree;
   beforeEach(() => {

@@ -25,6 +25,7 @@ import {
 } from '@angular-devkit/schematics';
 import { Schema as E2eOptions } from '../e2e/schema';
 import { getWorkspace, getWorkspacePath } from '../utility/config';
+import { latestVersions } from '../utility/latest-versions';
 import { Schema as ApplicationOptions } from './schema';
 
 type WorkspaceSchema = experimental.workspace.WorkspaceSchema;
@@ -52,6 +53,36 @@ type WorkspaceSchema = experimental.workspace.WorkspaceSchema;
 //     + indentStr.slice(0, -2),
 //   );
 // }
+
+function addDependenciesToPackageJson() {
+  return (host: Tree) => {
+    const packageJsonPath = 'package.json';
+
+    if (!host.exists('package.json')) { return host; }
+
+    const source = host.read('package.json');
+    if (!source) { return host; }
+
+    const sourceText = source.toString('utf-8');
+    const json = JSON.parse(sourceText);
+
+    if (!json['devDependencies']) {
+      json['devDependencies'] = {};
+    }
+
+    json.devDependencies = {
+      '@angular/compiler-cli': latestVersions.Angular,
+      '@angular-devkit/build-webpack': latestVersions.DevkitBuildWebpack,
+      'typescript': latestVersions.TypeScript,
+      // De-structure last keeps existing user dependencies.
+      ...json.devDependencies,
+    };
+
+    host.overwrite(packageJsonPath, JSON.stringify(json, null, 2));
+
+    return host;
+  };
+}
 
 function addAppToWorkspaceFile(options: ApplicationOptions, workspace: WorkspaceSchema): Rule {
   return (host: Tree, context: SchematicContext) => {
@@ -252,6 +283,7 @@ export default function (options: ApplicationOptions): Rule {
 
     return chain([
       addAppToWorkspaceFile(options, workspace),
+      options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
       mergeWith(
         apply(url('./files'), [
           template({

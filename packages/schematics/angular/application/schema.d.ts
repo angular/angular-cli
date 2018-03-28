@@ -39,4 +39,8 @@ export interface Schema {
      * Skip creating spec files.
      */
     skipTests?: boolean;
+    /**
+    * Do not add dependencies to package.json (e.g., --skipPackageJson)
+    */
+    skipPackageJson: boolean;
 }

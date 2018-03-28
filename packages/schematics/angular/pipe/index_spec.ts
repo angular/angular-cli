@@ -40,6 +40,7 @@ describe('Pipe Schematic', () => {
     routing: false,
     style: 'css',
     skipTests: false,
+    skipPackageJson: false,
   };
   let appTree: UnitTestTree;
   beforeEach(() => {
