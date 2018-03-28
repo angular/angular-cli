@@ -4,6 +4,11 @@ import { updateJsonFile } from '../../utils/project';
 
 
 export default function () {
+  // Disable this e2e as it takes about 10 minutes on a good computer and is flaky.
+  if (!process.env['E2E_UPDATE']) {
+    return Promise.resolve();
+  }
+
   let origPackageJson: string;
   let origCoreVersion: string;
   let origCliVersion: string;
@@ -24,19 +29,14 @@ export default function () {
       origCoreVersion = obj.dependencies['@angular/core'];
       origCliVersion = obj.devDependencies['@angular/cli'];
       origTypeScriptVersion = obj.devDependencies['typescript'];
-      updateVersions(obj.dependencies);
-      updateVersions(obj.devDependencies);
       obj.devDependencies['@angular/cli'] = '1.6.5';
       obj.devDependencies['typescript'] = '2.0.2';
       obj.dependencies['rxjs'] = '5.0.0-beta.12';
     }))
-    .then(() => ng('update'))
+    .then(() => ng('update', '@angular/cli', 'typescript'))
     .then(() => readFile('package.json'))
     .then(s => {
       const obj = JSON.parse(s);
-      if (origCoreVersion === obj.dependencies['@angular/core']) {
-        throw new Error('Angular Core version not updated');
-      }
       if (origCliVersion === obj.devDependencies['@angular/cli']) {
         throw new Error('CLI version not updated');
       }
