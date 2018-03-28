@@ -27,6 +27,49 @@ describe('Config', () => {
     expect(config.numberKey).toEqual(33);
   });
 
+  describe('fromConfigPath', () => {
+    const TEST_CONFIG_NAME = 'test-config.json';
+    let configContent: string;
+
+    beforeEach(() => {
+      spyOn(fs, 'existsSync').and.returnValue(true);
+      spyOn(fs, 'readFileSync').and.callFake((fileName: string) => {
+        if (fileName === TEST_CONFIG_NAME) {
+          return configContent;
+        } else {
+          return JSON.stringify(schema);
+        }
+      });
+    });
+
+    function callFromConfigPath(content: string) {
+      configContent = content;
+      (fs.readFileSync as jasmine.Spy).calls.reset();
+      const config = CliConfig.fromConfigPath<ConfigInterface>(TEST_CONFIG_NAME);
+      expect(fs.readFileSync).toHaveBeenCalledTimes(2);
+      return config;
+    }
+
+    it('tolerates comments in JSON', () => {
+      const config = callFromConfigPath(`{
+        // comment
+        "requiredKey" /* comment */ : 2 // comment
+        /* comment */
+      } // and here`);
+      expect(config.get('requiredKey')).toEqual(2);
+    });
+
+    it('tolerates unquoted keys in JSON', () => {
+      const config = callFromConfigPath(`{ requiredKey: 3 }`);
+      expect(config.get('requiredKey')).toEqual(3);
+    });
+
+    it('tolerates trailing commas in JSON', () => {
+      const config = callFromConfigPath(`{ "requiredKey": 2, }`);
+      expect(config.get('requiredKey')).toEqual(2);
+    });
+  });
+
   describe('Get', () => {
     it('works', () => {
       const config = new CliConfig(null, schema, <ConfigInterface>{

@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { stripIndent } from 'common-tags';
 
+import { parseJson, JsonParseMode } from '@angular-devkit/core';
 import {SchemaClass, SchemaClassFactory} from '@ngtools/json-schema';
 
 import { stripBom } from '../../utilities/strip-bom';
@@ -80,7 +81,10 @@ export class CliConfig<JsonType> {
     return new CliConfig<ConfigType>(null, schema, content, global);
   }
 
-  static fromConfigPath<T>(configPath: string, otherPath: string[] = []): CliConfig<T> {
+  static fromConfigPath<T extends object>(
+    configPath: string,
+    otherPath: string[] = []
+  ): CliConfig<T> {
     const schemaContent = fs.readFileSync(DEFAULT_CONFIG_SCHEMA_PATH, 'utf-8');
     let configContent = '{}';
     if (fs.existsSync(configPath)) {
@@ -105,7 +109,7 @@ export class CliConfig<JsonType> {
     let others: T[];
 
     try {
-      content = JSON.parse(configContent);
+      content = this.parseLooseJsonObject(configContent) as T;
     } catch (err) {
       throw new InvalidConfigError(stripIndent`
         Parsing '${configPath}' failed. Ensure the file is valid JSON.
@@ -115,7 +119,7 @@ export class CliConfig<JsonType> {
 
     others = otherContents.map(otherContent => {
       try {
-        return JSON.parse(otherContent);
+        return this.parseLooseJsonObject(otherContent) as T;
       } catch (err) {
         throw new InvalidConfigError(stripIndent`
           Parsing '${configPath}' failed. Ensure the file is valid JSON.
@@ -133,5 +137,13 @@ export class CliConfig<JsonType> {
     }
 
     return new CliConfig<T>(configPath, schema, content, others);
+  }
+
+  private static parseLooseJsonObject(json: string): object {
+    const result = parseJson(json, JsonParseMode.Loose);
+    if (result === null || typeof result !== 'object' || Array.isArray(result)) {
+      throw new Error('JSON is not an object');
+    }
+    return result;
   }
 }
