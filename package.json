@@ -98,7 +98,7 @@
     "html-webpack-plugin": "^3.0.6",
     "husky": "^0.14.3",
     "istanbul": "^0.4.5",
-    "istanbul-instrumenter-loader": "^3.0.0",
+    "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine": "^2.6.0",
     "jasmine-spec-reporter": "^3.2.0",
     "jquery": "^3.3.1",
