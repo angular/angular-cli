@@ -5,12 +5,13 @@ import { updateJsonFile } from '../../../utils/project';
 
 
 export default function() {
-  const directiveDir = join('src', 'app');
+  const directiveDir = join('projects', 'test-project', 'src', 'app');
 
   return Promise.resolve()
     .then(() => updateJsonFile('angular.json', configJson => {
-      const app = configJson['apps'][0];
-      app['prefix'] = 'pre';
+      configJson.projects['test-project'].schematics = {
+        '@schematics/angular:directive': { prefix: 'pre' }
+      };
     }))
     .then(() => ng('generate', 'directive', 'test-directive'))
     .then(() => expectFileToMatch(join(directiveDir, 'test-directive.directive.ts'),

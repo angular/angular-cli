@@ -9,8 +9,9 @@ export default function() {
 
   return Promise.resolve()
     .then(() => updateJsonFile('angular.json', configJson => {
-      const comp = configJson.defaults.component;
-      comp.flat = false;
+      configJson.projects['test-project'].schematics = {
+        '@schematics/angular:component': { flat: false }
+      };
     }))
     .then(() => ng('generate', 'component', 'test-component'))
     .then(() => expectFileToExist(componentDir))

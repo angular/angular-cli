@@ -25,6 +25,7 @@ export default class GenerateCommand extends SchematicCommand {
     if (this.initialized) {
       return;
     }
+    super.initialize(options);
     this.initialized = true;
 
     const [collectionName, schematicName] = this.parseSchematicInfo(options);

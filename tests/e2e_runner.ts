@@ -108,11 +108,6 @@ const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: 
   .filter(name => !name.endsWith('different-file-format.ts'))
   // Not sure what this test is meant to test, but with depedency changes it is not valid anymore.
   .filter(name => !name.endsWith('loaders-resolution.ts'))
-  // TODO:CONFIG READING
-  .filter(name => !name.endsWith('/component-flat.ts'))
-  .filter(name => !name.endsWith('/component-not-flat.ts'))
-  .filter(name => !name.endsWith('/component-prefix.ts'))
-  .filter(name => !name.endsWith('/directive-prefix.ts'))
   // NEW COMMAND
   .filter(name => !name.includes('tests/commands/new/'))
   // NEEDS devkit change
