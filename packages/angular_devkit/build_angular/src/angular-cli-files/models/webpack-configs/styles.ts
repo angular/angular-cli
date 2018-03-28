@@ -21,10 +21,8 @@ const PostcssCliResources = require('../../plugins/webpack').PostcssCliResources
  * Enumerate loaders and their dependencies from this file to let the dependency validator
  * know they are used.
  *
- * require('exports-loader')
  * require('style-loader')
  * require('postcss-loader')
- * require('css-loader')
  * require('stylus')
  * require('stylus-loader')
  * require('less')
@@ -272,7 +270,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   if (buildOptions.extractCss) {
     // extract global css from js files into own css file
     extraPlugins.push(
-      new MiniCssExtractPlugin({ filename: `[name]${hashFormat.script}.css` }));
+      new MiniCssExtractPlugin({ filename: `[name]${hashFormat.extract}.css` }));
     // suppress empty .js files in css only entry points
     extraPlugins.push(new SuppressExtractedTextChunksWebpackPlugin());
   }
