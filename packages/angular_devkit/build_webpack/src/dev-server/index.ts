@@ -169,6 +169,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
 
         const server = new WebpackDevServer(webpackCompiler, webpackDevServerConfig);
 
+        let first = true;
         // tslint:disable-next-line:no-any
         (webpackCompiler as any).hooks.done.tap('angular-cli', (stats: webpack.Stats) => {
           if (!browserOptions.verbose) {
@@ -183,7 +184,8 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
           }
           obs.next({ success: true });
 
-          if (options.open) {
+          if (first && options.open) {
+            first = false;
             opn(serverAddress + webpackDevServerConfig.publicPath);
           }
         });
