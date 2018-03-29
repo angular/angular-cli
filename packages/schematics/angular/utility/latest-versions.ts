@@ -11,6 +11,6 @@ export const latestVersions = {
   RxJs: '^5.5.8',
   ZoneJs: '^0.8.20',
   TypeScript: '~2.6.2',
-  DevkitBuildWebpack: '~0.0.8',
-  DevkitBuildNgPackagr: '~0.0.2',
+  DevkitBuildWebpack: '~0.0.9',
+  DevkitBuildNgPackagr: '~0.0.3',
 };
