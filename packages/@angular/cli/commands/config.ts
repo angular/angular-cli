@@ -120,17 +120,18 @@ export default class ConfigCommand extends Command {
   public readonly description = 'Get/set configuration values.';
   public readonly arguments = ['jsonPath', 'value'];
   public readonly options: Option[] = [
-    // {
-    //   name: 'global',
-    //   type: Boolean,
-    //   'default': false,
-    //   aliases: ['g'],
-    //   description: 'Get/set the value in the global configuration (in your home directory).'
-    // }
+    {
+      name: 'global',
+      type: Boolean,
+      'default': false,
+      aliases: ['g'],
+      description: 'Get/set the value in the global configuration (in your home directory).'
+    }
   ];
 
   public run(options: ConfigOptions) {
-    const config = (getWorkspace() as {} as { _workspace: WorkspaceJson});
+    const level = options.global ? 'global' : 'local';
+    const config = (getWorkspace(level) as {} as { _workspace: WorkspaceJson});
 
     if (!config) {
       throw new SilentError('No config found.');
@@ -156,7 +157,7 @@ export default class ConfigCommand extends Command {
   }
 
   private set(options: ConfigOptions) {
-    const [config, configPath] = getWorkspaceRaw();
+    const [config, configPath] = getWorkspaceRaw(options.global ? 'global' : 'local');
 
     // TODO: Modify & save without destroying comments
     const configValue = config.value;
