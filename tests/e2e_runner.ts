@@ -67,7 +67,7 @@ const argv = minimist(process.argv.slice(2), {
 process.exitCode = 255;
 
 
- - 1const logger = createConsoleLogger(argv.verbose);
+const logger = createConsoleLogger(argv.verbose);
 const logStack = [logger];
 function lastLogger() {
   return logStack[logStack.length - 1];
