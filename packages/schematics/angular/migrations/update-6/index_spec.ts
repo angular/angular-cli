@@ -90,6 +90,13 @@ describe('Migration to v6', () => {
       devDependencies: {},
     };
     tree.create('/package.json', JSON.stringify(packageJson, null, 2));
+
+    // Create a prod environment.
+    tree.create('/src/environments/environment.prod.ts', `
+      export const environment = {
+        production: true
+      };
+    `);
   });
 
   describe('file creation/deletion', () => {
@@ -491,7 +498,10 @@ describe('Migration to v6', () => {
         expect(build.builder).toEqual('@angular-devkit/build-angular:browser');
         expect(build.options.scripts).toEqual([]);
         expect(build.options.styles).toEqual([{ input: 'src/styles.css' }]);
-        expect(build.options.assets).toEqual([{ glob: 'src/assets' }, { glob: 'src/favicon.ico' }]);
+        expect(build.options.assets).toEqual([
+          { glob: 'assets', input: '/src', output: '/' },
+          { glob: 'favicon.ico', input: '/src', output: '/' },
+        ]);
         const prodConfig = build.configurations.production;
         expect(prodConfig.outputHashing).toEqual('all');
         expect(prodConfig.sourceMap).toEqual(false);
@@ -510,7 +520,7 @@ describe('Migration to v6', () => {
         expect(serve.builder).toEqual('@angular-devkit/build-angular:dev-server');
         expect(serve.options).toEqual({ browserTarget: 'foo:build' });
         const prodConfig = serve.configurations.production;
-        expect(prodConfig.browserTarget).toEqual('foo:build');
+        expect(prodConfig.browserTarget).toEqual('foo:build:production');
       });
 
       it('should set the test target', () => {
@@ -524,17 +534,10 @@ describe('Migration to v6', () => {
         expect(test.options.karmaConfig).toEqual('./karma.conf.js');
         expect(test.options.scripts).toEqual([]);
         expect(test.options.styles).toEqual([{ input: 'src/styles.css' }]);
-        expect(test.options.assets).toEqual([{ glob: 'src/assets' }, { glob: 'src/favicon.ico' }]);
-      });
-
-      it('should set the serve target', () => {
-        tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
-        tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
-        const serve = getConfig(tree).projects.foo.architect.serve;
-        expect(serve.builder).toEqual('@angular-devkit/build-angular:dev-server');
-        expect(serve.options).toEqual({ browserTarget: 'foo:build' });
-        const prodConfig = serve.configurations.production;
-        expect(prodConfig.browserTarget).toEqual('foo:build');
+        expect(test.options.assets).toEqual([
+          { glob: 'assets', input: '/src', output: '/' },
+          { glob: 'favicon.ico', input: '/src', output: '/' },
+        ]);
       });
 
       it('should set the extract i18n target', () => {

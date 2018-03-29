@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, Path, join, normalize } from '@angular-devkit/core';
+import { JsonObject, Path, basename, join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -71,7 +71,7 @@ function migrateConfiguration(oldConfig: CliConfig): Rule {
     const config: JsonObject = {
       version: 1,
       newProjectRoot: 'projects',
-      projects: extractProjectsConfig(oldConfig),
+      projects: extractProjectsConfig(oldConfig, host),
     };
     const cliConfig = extractCliConfig(oldConfig);
     if (cliConfig !== null) {
@@ -160,7 +160,7 @@ function extractArchitectConfig(_config: CliConfig): JsonObject | null {
   return null;
 }
 
-function extractProjectsConfig(config: CliConfig): JsonObject {
+function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
   const builderPackage = '@angular-devkit/build-angular';
   let defaultAppNamePrefix = 'app';
   if (config.project && config.project.name) {
@@ -176,23 +176,122 @@ function extractProjectsConfig(config: CliConfig): JsonObject {
       const outDir = app.outDir || defaults.outDir;
       const appRoot = app.root || defaults.appRoot;
 
+      function _mapAssets(asset: string | JsonObject) {
+        if (typeof asset === 'string') {
+          return { glob: asset, input: normalize('/' + appRoot + '/'), output: '/' };
+        } else {
+          if (asset.output) {
+            return {
+              glob: asset.glob,
+              input: normalize('/' + appRoot + '/' + asset.input),
+              output: normalize('/'
+                + (asset.output as string).startsWith(outDir)
+                ? (asset.output as string).slice(outDir.length)
+                : (asset.output as string),
+              ),
+            };
+          } else {
+            return {
+              glob: asset.glob,
+              input: normalize('/' + appRoot + '/' + asset.input),
+              output: '/',
+            };
+          }
+        }
+      }
+
+      function _buildConfigurations(): JsonObject {
+        const source = app.environmentSource;
+        const environments = app.environments;
+
+        if (!environments) {
+          return {};
+        }
+
+        return Object.keys(environments).reduce((acc, environment) => {
+          let isProduction = false;
+
+          const environmentContent = tree.read(app.root + '/' + environments[environment]);
+          if (environmentContent) {
+            isProduction = !!environmentContent.toString('utf-8')
+              // Allow for `production: true` or `production = true`. Best we can do to guess.
+              .match(/production['"]?\s*[:=]\s*true/);
+          }
+
+          // We used to use `prod` by default as the key, instead we now use the full word.
+          // Try not to override the production key if it's there.
+          if (environment == 'prod' && !environments['production'] && isProduction) {
+            environment = 'production';
+          }
+
+          acc[environment] = {
+            ...(isProduction
+              ? {
+                optimization: true,
+                outputHashing: 'all',
+                sourceMap: false,
+                extractCss: true,
+                namedChunks: false,
+                aot: true,
+                extractLicenses: true,
+                vendorChunk: false,
+                buildOptimizer: true,
+              }
+              : {}
+            ),
+            fileReplacements: [
+              { from: `${app.root}/${source}`, to: `${outDir}/${environments[environment]}` },
+            ],
+          };
+
+          return acc;
+        }, {} as JsonObject);
+      }
+
+      function _serveConfigurations(): JsonObject {
+        const environments = app.environments;
+
+        if (!environments) {
+          return {};
+        }
+        if (!architect) {
+          throw new Error();
+        }
+
+        const configurations = (architect.build as JsonObject).configurations as JsonObject;
+
+        return Object.keys(configurations).reduce((acc, environment) => {
+          acc[environment] = { browserTarget: `${name}:build:${environment}` };
+
+          return acc;
+        }, {} as JsonObject);
+      }
+
+      function _extraEntryMapper(extraEntry: string | JsonObject) {
+        let entry: JsonObject;
+        if (typeof extraEntry === 'string') {
+          entry = { input: join(app.root as Path, extraEntry) };
+        } else {
+          const input = join(app.root as Path, extraEntry.input as string || '');
+          const lazy = !!extraEntry.lazy;
+          entry = { input };
+
+          if (!extraEntry.output && lazy) {
+            entry.lazy = true;
+            entry.bundleName = basename(
+              normalize(input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
+            );
+          } else if (extraEntry.output) {
+            entry.bundleName = extraEntry.output;
+          }
+        }
+
+        return entry;
+      }
+
       const project: JsonObject = {
         root: '',
         projectType: 'application',
-        cli: {},
-        schematics: {},
-      };
-
-      const extraEntryMapper = (extraEntry: string | JsonObject) => {
-        let entry: JsonObject;
-        if (typeof extraEntry === 'string') {
-          entry = { input: extraEntry };
-        } else {
-          entry = extraEntry;
-        }
-        entry.input = join(app.root as Path, <string> entry.input || '');
-
-        return entry;
       };
 
       const architect: JsonObject = {};
@@ -208,28 +307,13 @@ function extractProjectsConfig(config: CliConfig): JsonObject {
         tsConfig: appRoot + '/' + app.tsconfig || defaults.tsConfig,
       };
 
-      buildOptions.assets = (app.assets || []).map((asset: string | JsonObject) =>
-        typeof asset === 'string'
-          ? { glob: appRoot + '/' + asset }
-          : appRoot + '/' + asset);
-      buildOptions.styles = (app.styles || []).map(extraEntryMapper);
-      buildOptions.scripts = (app.scripts || []).map(extraEntryMapper);
+      buildOptions.assets = (app.assets || []).map(_mapAssets);
+      buildOptions.styles = (app.styles || []).map(_extraEntryMapper);
+      buildOptions.scripts = (app.scripts || []).map(_extraEntryMapper);
       architect.build = {
         builder: `${builderPackage}:browser`,
         options: buildOptions,
-        configurations: {
-          production: {
-            optimization: true,
-            outputHashing: 'all',
-            sourceMap: false,
-            extractCss: true,
-            namedChunks: false,
-            aot: true,
-            extractLicenses: true,
-            vendorChunk: false,
-            buildOptimizer: true,
-          },
-        },
+        configurations: _buildConfigurations(),
       };
 
       // Serve target
@@ -239,11 +323,7 @@ function extractProjectsConfig(config: CliConfig): JsonObject {
       architect.serve = {
         builder: `${builderPackage}:dev-server`,
         options: serveOptions,
-        configurations: {
-          production: {
-            browserTarget: `${name}:build`,
-          },
-        },
+        configurations: _serveConfigurations(),
       };
 
       // Extract target
@@ -266,12 +346,9 @@ function extractProjectsConfig(config: CliConfig): JsonObject {
       if (app.testTsconfig) {
           testOptions.tsConfig = appRoot + '/' + app.testTsconfig;
         }
-      testOptions.scripts = (app.scripts || []).map(extraEntryMapper);
-      testOptions.styles = (app.styles || []).map(extraEntryMapper);
-      testOptions.assets = (app.assets || []).map((asset: string | JsonObject) =>
-          typeof asset === 'string'
-          ? { glob: appRoot + '/' + asset }
-          : appRoot + '/' + asset);
+      testOptions.scripts = (app.scripts || []).map(_extraEntryMapper);
+      testOptions.styles = (app.styles || []).map(_extraEntryMapper);
+      testOptions.assets = (app.assets || []).map(_mapAssets);
 
       if (karmaConfig) {
         architect.test = {
