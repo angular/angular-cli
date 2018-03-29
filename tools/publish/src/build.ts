@@ -1,4 +1,4 @@
-import {Logger} from '@ngtools/logger';
+import { logging } from '@angular-devkit/core';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { promisify } from 'util';
@@ -59,7 +59,7 @@ function getDeps(pkg: any): any {
 
 export default function build(packagesToBuild: string[],
                               opts: { local: boolean, devkit: string },
-                              logger: Logger): Promise<void> {
+                              logger: logging.Logger): Promise<void> {
   const { packages, tools } = require('../../../lib/packages');
 
   const willBuildEverything = packagesToBuild.length == 0;
@@ -83,7 +83,7 @@ export default function build(packagesToBuild: string[],
     })
     .then(() => logger.info('Compiling packages...'))
     .then(() => {
-      const packagesLogger = new Logger('packages', logger);
+      const packagesLogger = new logging.Logger('packages', logger);
       // Order packages in order of dependency.
       // We use bubble sort because we need a full topological sort but adding another dependency
       // or implementing a full topo sort would be too much work and I'm lazy. We don't anticipate
@@ -125,7 +125,7 @@ export default function build(packagesToBuild: string[],
     })
     .then(() => logger.info('Compiling tools...'))
     .then(() => {
-      const toolsLogger = new Logger('packages', logger);
+      const toolsLogger = new logging.Logger('packages', logger);
 
       return Object.keys(tools)
         .filter(toolName => packagesToBuild.indexOf(toolName) != -1)
@@ -221,7 +221,7 @@ export default function build(packagesToBuild: string[],
       // Copy LICENSE into all the packages
       logger.info('Copying LICENSE...');
 
-      const licenseLogger = new Logger('license', logger);
+      const licenseLogger = new logging.Logger('license', logger);
       return Promise.all(Object.keys(packages).map(pkgName => {
         const pkg = packages[pkgName];
         licenseLogger.info(pkgName);
@@ -277,7 +277,7 @@ export default function build(packagesToBuild: string[],
     .then(() => {
       logger.info('Tarring all packages...');
 
-      const tarLogger = new Logger('license', logger);
+      const tarLogger = new logging.Logger('license', logger);
       return Promise.all(Object.keys(packages).map(pkgName => {
         const pkg = packages[pkgName];
         tarLogger.info(`${pkgName} => ${pkg.tar}`);

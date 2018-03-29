@@ -19,7 +19,6 @@ import {
   NodeModulesEngineHost,
   validateOptionsWithSchema
 } from '@angular-devkit/schematics/tools';
-import { SchemaClassFactory } from '@ngtools/json-schema';
 
 const SilentError = require('silent-error');
 
@@ -39,21 +38,8 @@ export function getEngine(): Engine<FileSystemCollectionDesc, FileSystemSchemati
   return engine;
 }
 
-
 export function getCollection(collectionName: string): Collection<any, any> {
-  const engineHost = getEngineHost();
   const engine = getEngine();
-
-  // Add support for schemaJson.
-  engineHost.registerOptionsTransform((schematic: FileSystemSchematicDesc, options: any) => {
-    if (schematic.schema) {
-      const SchemaMetaClass = SchemaClassFactory<any>(schematic.schemaJson!);
-      const schemaClass = new SchemaMetaClass(options);
-      return schemaClass.$$root();
-    }
-    return options;
-  });
-
   const collection = engine.createCollection(collectionName);
 
   if (collection === null) {
