@@ -4,7 +4,7 @@ import {expectToFail} from '../../../utils/utils';
 
 export default function() {
   return Promise.resolve()
-    .then(() => expectToFail(() => ng('config', 'schematics.@schematics/angular.component.inlineStyle'))
+    .then(() => expectToFail(() => ng('config', 'schematics.@schematics/angular.component.inlineStyle')))
     .then(() => ng('config', 'schematics.@schematics/angular.component.inlineStyle', 'false'))
     .then(() => ng('config', 'schematics.@schematics/angular.component.inlineStyle'))
     .then(({ stdout }) => {

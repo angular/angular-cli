@@ -1,3 +1,5 @@
+import { existsSync, writeFileSync } from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import {
   JsonAstObject,
@@ -19,8 +21,9 @@ function getSchemaLocation(): string {
 
 export const workspaceSchemaPath = getSchemaLocation();
 
-function configFilePath(projectPath?: string): string | null {
-  const configNames = [ 'angular.json', '.angular.json' ];
+const configNames = [ 'angular.json', '.angular.json' ];
+
+function projectFilePath(projectPath?: string): string | null {
   // Find the configuration, either where specified, in the Angular CLI project
   // (if it's in node_modules) or from the current process.
   return (projectPath && findUp(configNames, projectPath))
@@ -28,35 +31,78 @@ function configFilePath(projectPath?: string): string | null {
       || findUp(configNames, __dirname);
 }
 
-let cachedWorkspace: experimental.workspace.Workspace | null | undefined = undefined;
-export function getWorkspace(): experimental.workspace.Workspace | null {
-  if (cachedWorkspace != undefined) {
-    return cachedWorkspace;
-  }
-
-  const configPath = configFilePath();
-
-  if (!configPath) {
-    cachedWorkspace = null;
+function globalFilePath(): string | null {
+  const home = os.homedir();
+  if (!home) {
     return null;
   }
 
-  const root = path.dirname(configPath);
+  for (const name of configNames) {
+    const p = path.join(home, name);
+    if (existsSync(p)) {
+      return p;
+    }
+  }
+
+  return null;
+}
+
+const cachedWorkspaces = new Map<string, experimental.workspace.Workspace | null>();
+
+export function getWorkspace(
+  level: 'local' | 'global' = 'local',
+): experimental.workspace.Workspace | null {
+  const cached = cachedWorkspaces.get(level);
+  if (cached != undefined) {
+    return cached;
+  }
+
+  let configPath = level === 'local' ? projectFilePath() : globalFilePath();
+
+  if (!configPath) {
+    if (level === 'global') {
+      configPath = createGlobalSettings();
+    } else {
+      cachedWorkspaces.set(level, null);
+      return null;
+    }
+  }
+
+  const root = normalize(path.dirname(configPath));
+  const file = normalize(path.basename(configPath));
   const workspace = new experimental.workspace.Workspace(
-    normalize(root),
+    root,
     new NodeJsSyncHost(),
   );
 
-  workspace.loadWorkspaceFromHost(normalize(path.basename(configPath))).subscribe();
-  cachedWorkspace = workspace;
+  workspace.loadWorkspaceFromHost(file).subscribe();
+  cachedWorkspaces.set(level, workspace);
   return workspace;
 }
 
-export function getWorkspaceRaw(): [JsonAstObject | null, string] {
-  const configPath = configFilePath();
+function createGlobalSettings(): string {
+  const home = os.homedir();
+  if (!home) {
+    throw new Error('No home directory found.');
+  }
+
+  const globalPath = path.join(home, configNames[1]);
+  writeFileSync(globalPath, JSON.stringify({ version: 1 }));
+
+  return globalPath;
+}
+
+export function getWorkspaceRaw(
+  level: 'local' | 'global' = 'local',
+): [JsonAstObject | null, string | null] {
+  let configPath = level === 'local' ? projectFilePath() : globalFilePath();
 
   if (!configPath) {
-    return null;
+    if (level === 'global') {
+      configPath = createGlobalSettings();
+    } else {
+      return [null, null];
+    }
   }
 
   let content;
@@ -89,19 +135,60 @@ export function validateWorkspace(json: JsonValue) {
   return true;
 }
 
+export function getProjectByCwd(_workspace: experimental.workspace.Workspace): string | null {
+  // const cwd = process.cwd();
+  // TOOD: Implement project location logic
+  return null;
+}
+
 export function getPackageManager(): string {
-  const workspace = getWorkspace();
+  let workspace = getWorkspace();
+
+  if (workspace) {
+    const project = getProjectByCwd(workspace);
+    if (project && workspace.getProject(project).cli) {
+      const value = workspace.getProject(project).cli['packageManager'];
+      if (typeof value == 'string') {
+        return value;
+      }
+    } else if (workspace.getCli()) {
+      const value = workspace.getCli()['packageManager'];
+      if (typeof value == 'string') {
+        return value;
+      }
+    }
+  }
+
+  workspace = getWorkspace('global');
   if (workspace && workspace.getCli()) {
     const value = workspace.getCli()['packageManager'];
     if (typeof value == 'string') {
       return value;
     }
   }
+
   return 'npm';
 }
 
 export function getDefaultSchematicCollection(): string {
-  const workspace = getWorkspace();
+  let workspace = getWorkspace('local');
+
+  if (workspace) {
+    const project = getProjectByCwd(workspace);
+    if (project && workspace.getProject(project).schematics) {
+      const value = workspace.getProject(project).schematics['defaultCollection'];
+      if (typeof value == 'string') {
+        return value;
+      }
+    } else if (workspace.getSchematics()) {
+      const value = workspace.getSchematics()['defaultCollection'];
+      if (typeof value == 'string') {
+        return value;
+      }
+    }
+  }
+
+  workspace = getWorkspace('global');
   if (workspace && workspace.getSchematics()) {
     const value = workspace.getSchematics()['defaultCollection'];
     if (typeof value == 'string') {
@@ -113,13 +200,36 @@ export function getDefaultSchematicCollection(): string {
 }
 
 export function isWarningEnabled(warning: string): boolean {
-  const workspace = getWorkspace();
+  let workspace = getWorkspace('local');
+
+  if (workspace) {
+    const project = getProjectByCwd(workspace);
+    if (project && workspace.getProject(project).cli) {
+      const warnings = workspace.getProject(project).cli['warnings'];
+      if (typeof warnings == 'object' && !Array.isArray(warnings)) {
+        const value = warnings[warning];
+        if (typeof value == 'boolean') {
+          return value;
+        }
+      }
+    } else if (workspace.getCli()) {
+      const warnings = workspace.getCli()['warnings'];
+      if (typeof warnings == 'object' && !Array.isArray(warnings)) {
+        const value = warnings[warning];
+        if (typeof value == 'boolean') {
+          return value;
+        }
+      }
+    }
+  }
+
+  workspace = getWorkspace('global');
   if (workspace && workspace.getCli()) {
     const warnings = workspace.getCli()['warnings'];
     if (typeof warnings == 'object' && !Array.isArray(warnings)) {
       const value = warnings[warning];
-      if (value === false) {
-        return false;
+      if (typeof value == 'boolean') {
+        return value;
       }
     }
   }
