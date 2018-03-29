@@ -6,7 +6,7 @@ import { SemVer } from 'semver';
 
 // tslint:disable:max-line-length
 export default function () {
-  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   return Promise.resolve()
     .then(() => createDir('projects/test-project/src/locale'))

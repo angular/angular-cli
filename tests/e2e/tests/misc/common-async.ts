@@ -7,7 +7,7 @@ import {expectToFail} from '../../utils/utils';
 
 
 export default function() {
-  // TODO(architect): The common chunk seems to have a different name in devkit/build-webpack.
+  // TODO(architect): The common chunk seems to have a different name in devkit/build-angular.
   // Investigate, validate, then delete this test.
   return;
 

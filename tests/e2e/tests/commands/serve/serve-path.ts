@@ -3,7 +3,7 @@ import { killAllProcesses } from '../../../utils/process';
 import { ngServe } from '../../../utils/project';
 
 export default function () {
-  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   return Promise.resolve()
     .then(() => ngServe('--serve-path', 'test/'))

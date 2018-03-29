@@ -4,7 +4,7 @@ import { ng } from '../../../utils/process';
 import { stripIndents } from 'common-tags';
 
 export default function () {
-    // TODO(architect): Delete this test. It is now in devkit/build-webpack.
+    // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   return writeFile('projects/test-project/src/styles.css', stripIndents`
       /* normal-comment */
