@@ -222,7 +222,10 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     resolve: {
       extensions: ['.ts', '.js'],
       symlinks: !buildOptions.preserveSymlinks,
-      modules: [projectRoot, 'node_modules'],
+      modules: [
+        wco.tsConfig.baseUrl || projectRoot,
+        'node_modules',
+      ],
       alias
     },
     resolveLoader: {
