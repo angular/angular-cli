@@ -22,6 +22,11 @@ ts_library(
     module_root = "src",
     deps = [
         # @deps: rxjs
+        # @typings: es2015.core
+        # @typings: es2015.symbol.wellknown
+        # @typings: ajv
+        # @typings: node
+        # @typings: source-map
     ],
 )
 
