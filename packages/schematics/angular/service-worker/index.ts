@@ -11,7 +11,12 @@ import {
   SchematicsException,
   Tree,
   UpdateRecorder,
+  apply,
   chain,
+  mergeWith,
+  move,
+  template,
+  url,
 } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
 import { addSymbolToNgModuleMetadata, isImported } from '../utility/ast-utils';
@@ -158,7 +163,19 @@ function getTsSourceFile(host: Tree, path: string): ts.SourceFile {
 
 export default function (options: ServiceWorkerOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
+    const workspace = getWorkspace(host);
+    const project = workspace.projects[options.project];
+    if (!project) {
+      throw new SchematicsException(`Invalid project name (${options.project})`);
+    }
+
+    const templateSource = apply(url('./files'), [
+      template({...options}),
+      move(project.root),
+    ]);
+
     return chain([
+      mergeWith(templateSource),
       updateConfigFile(options),
       addDependencies(),
       updateAppModule(options),

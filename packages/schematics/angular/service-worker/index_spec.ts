@@ -90,6 +90,11 @@ describe('Service Worker Schematic', () => {
     // tslint:disable-next-line:max-line-length
     const regex = /ServiceWorkerModule\.register\('\/ngsw-worker.js\', { enabled: environment.production }\)/;
     expect(pkgText).toMatch(regex);
+  });
 
+  it('should put the ngsw-config.json file in the project root', () => {
+    const tree = schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
+    const path = '/projects/bar/ngsw-config.json';
+    expect(tree.exists(path)).toEqual(true);
   });
 });
