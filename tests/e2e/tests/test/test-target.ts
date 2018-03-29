@@ -2,7 +2,7 @@ import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 export default function () {
-  // TODO(architect): This is giving odd errors in devkit/build-webpack.
+  // TODO(architect): This is giving odd errors in devkit/build-angular.
   // TypeError: Assignment to constant variable.
   return;
 

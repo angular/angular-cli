@@ -2,7 +2,7 @@ import { ng } from '../../utils/process';
 import { readFile, writeFile } from '../../utils/fs';
 
 export default function () {
-  // TODO(architect): Figure out how this test should look like post devkit/build-webpack.
+  // TODO(architect): Figure out how this test should look like post devkit/build-angular.
   return;
 
   const fileName = 'projects/test-project/src/app/foo.ts';

@@ -4,7 +4,7 @@ import { expectToFail } from '../../utils/utils';
 
 
 export default function () {
-  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   return ng('build', '--aot', '--build-optimizer')
     .then(() => expectToFail(() => expectFileToMatch('dist/test-project/main.js', /\.decorators =/)))

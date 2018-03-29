@@ -5,7 +5,7 @@ import { oneLine } from 'common-tags';
 import { updateJsonFile } from '../../utils/project';
 
 export default function () {
-  // TODO(architect): Figure out how this test should look like post devkit/build-webpack.
+  // TODO(architect): Figure out how this test should look like post devkit/build-angular.
   return;
 
   return Promise.resolve()
