@@ -3,7 +3,7 @@ import { ng } from '../../utils/process';
 
 
 export default async function () {
-  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   await writeMultipleFiles({
     './projects/test-project/src/app/foo.ts': `

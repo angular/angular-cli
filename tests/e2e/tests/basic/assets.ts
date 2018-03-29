@@ -33,7 +33,7 @@ export default function () {
       './src/output-asset.txt': 'output-asset.txt',
       './node_modules/some-package/node_modules-asset.txt': 'node_modules-asset.txt',
     }))
-    // TODO(architect): Review allowOutsideOutDir logic inside build-webpack.
+    // TODO(architect): Review allowOutsideOutDir logic inside build-angular.
     // // Add invalid asset config in angular.json.
     // .then(() => updateJsonFile('angular.json', configJson => {
     //   const app = configJson['apps'][0];

@@ -4,7 +4,7 @@ import { writeFile, expectFileToMatch } from '../../utils/fs';
 
 
 export default function() {
-  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   return ng('generate', 'component', 'i18n-test')
     .then(() => writeFile(

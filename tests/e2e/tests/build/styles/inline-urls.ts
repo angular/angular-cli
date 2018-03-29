@@ -16,7 +16,7 @@ const imgSvg = `
 `;
 
 export default function () {
-  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   return Promise.resolve()
     .then(() => silentNpm('install', 'font-awesome@4.7.0'))

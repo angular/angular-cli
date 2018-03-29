@@ -4,7 +4,7 @@ import { getGlobalVariable } from '../../utils/env';
 
 
 export default function () {
-  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   // Skip this test in Angular 2/4.
   if (getGlobalVariable('argv').ng2 || getGlobalVariable('argv').ng4) {

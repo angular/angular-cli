@@ -38,7 +38,7 @@ export default function () {
     .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect['server'] = {
-        builder: '@angular-devkit/build-webpack:server',
+        builder: '@angular-devkit/build-angular:server',
         options: {
           outputPath: 'dist/test-project-server',
           main: 'projects/test-project/src/main.server.ts',

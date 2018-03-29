@@ -5,7 +5,7 @@ import {ng} from '../../utils/process';
 
 
 export default function () {
-  // TODO(architect): This test is broken in devkit/build-webpack, istanbul and
+  // TODO(architect): This test is broken in devkit/build-angular, istanbul and
   // istanbul-instrumenter-loader are missing from the dependencies.
   return;
 
