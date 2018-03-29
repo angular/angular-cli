@@ -112,7 +112,6 @@ const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: 
   .map(name => name.replace(/\\/g, '/'))
   .filter(name => !name.endsWith('/build-app-shell-with-schematic.ts'))
   .filter(name => !name.endsWith('/bundle-budgets.ts'))
-  .filter(name => !name.endsWith('/service-worker.ts'))
   .filter(name => !name.endsWith('/new-minimal.ts'))
   // IS this test still valid? \/
   .filter(name => !name.endsWith('/module-id.ts'))
