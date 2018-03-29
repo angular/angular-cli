@@ -25,6 +25,7 @@ export default function() {
         throw new Error(`Expected "true", received "${JSON.stringify(stdout)}".`);
       }
     })
-    .then(() => ng('config', '--global', 'schematics.@schematics/angular.component.inlineStyle', 'false'))
+    .then(() => expectToFail(() => ng('config', '--global', 'cli.warnings.notreal', 'true')))
+    .then(() => ng('config', '--global', 'cli.warnings.versionMismatch', 'false'))
     .then(() => expectFileToExist(path.join(homedir(), '.angular.json')));
 }
