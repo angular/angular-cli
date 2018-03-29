@@ -1,9 +1,9 @@
 import * as fs from 'fs';
-import {SchemaClassFactory} from '@ngtools/json-schema';
-import {Logger} from '@ngtools/logger';
+import { logging } from '@angular-devkit/core';
+import { SchemaClassFactory } from '@ngtools/json-schema';
 
 
-export function buildSchema(inFile: string, _logger: Logger): string {
+export function buildSchema(inFile: string, _logger: logging.Logger): string {
   const jsonSchema = JSON.parse(fs.readFileSync(inFile, 'utf-8'));
   const SchemaClass = SchemaClassFactory(jsonSchema);
   const schemaInstance = new SchemaClass({});
@@ -12,7 +12,7 @@ export function buildSchema(inFile: string, _logger: Logger): string {
 }
 
 
-export function build(args: string[], _opts: any, logger: Logger): void {
+export function build(args: string[], _opts: any, logger: logging.Logger): void {
   const inFile = args[1] as string;
   const outFile = args[2] as string;
   if (!inFile) {

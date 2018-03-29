@@ -3,7 +3,8 @@ require('../lib/bootstrap-local');
 const path = require('path');
 const chalk = require('chalk');
 const spdxSatisfies = require('spdx-satisfies');
-const Logger = require('@ngtools/logger').Logger;
+const { logging } = require('@angular-devkit/core');
+const Logger = logging.Logger;
 const filter = require('rxjs/operators').filter;
 
 // Configure logger
@@ -23,7 +24,7 @@ logger.subscribe((entry) => {
 });
 
 logger
-  .pipe(filter((entry) => entry.level == 'fatal'))
+  .pipe(filter((entry) => entry.level === 'fatal'))
   .subscribe(() => {
     process.stderr.write('A fatal error happened. See details above.');
     process.exit(1);
