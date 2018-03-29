@@ -146,8 +146,8 @@ export function getPackageManager(): string {
 
   if (workspace) {
     const project = getProjectByCwd(workspace);
-    if (project && workspace.getProject(project).cli) {
-      const value = workspace.getProject(project).cli['packageManager'];
+    if (project && workspace.getProjectCli(project)) {
+      const value = workspace.getProjectCli(project)['packageManager'];
       if (typeof value == 'string') {
         return value;
       }
@@ -175,13 +175,13 @@ export function getDefaultSchematicCollection(): string {
 
   if (workspace) {
     const project = getProjectByCwd(workspace);
-    if (project && workspace.getProject(project).schematics) {
-      const value = workspace.getProject(project).schematics['defaultCollection'];
+    if (project && workspace.getProjectCli(project)) {
+      const value = workspace.getProjectCli(project)['defaultCollection'];
       if (typeof value == 'string') {
         return value;
       }
-    } else if (workspace.getSchematics()) {
-      const value = workspace.getSchematics()['defaultCollection'];
+    } else if (workspace.getCli()) {
+      const value = workspace.getCli()['defaultCollection'];
       if (typeof value == 'string') {
         return value;
       }
@@ -189,8 +189,8 @@ export function getDefaultSchematicCollection(): string {
   }
 
   workspace = getWorkspace('global');
-  if (workspace && workspace.getSchematics()) {
-    const value = workspace.getSchematics()['defaultCollection'];
+  if (workspace && workspace.getCli()) {
+    const value = workspace.getCli()['defaultCollection'];
     if (typeof value == 'string') {
       return value;
     }
@@ -199,13 +199,46 @@ export function getDefaultSchematicCollection(): string {
   return '@schematics/angular';
 }
 
+export function getSchematicDefaults(collection: string, schematic: string, project?: string): {} {
+  let result = {};
+
+  let workspace = getWorkspace('global');
+  if (workspace && workspace.getSchematics()) {
+    const collectionObject = workspace.getSchematics()[collection];
+    if (typeof collectionObject == 'object' && !Array.isArray(collectionObject)) {
+      result = collectionObject[schematic] || {};
+    }
+  }
+
+  workspace = getWorkspace('local');
+
+  if (workspace) {
+    if (workspace.getSchematics()) {
+      const collectionObject = workspace.getSchematics()[collection];
+      if (typeof collectionObject == 'object' && !Array.isArray(collectionObject)) {
+        result = { ...result, ...(collectionObject[schematic] as {}) };
+      }
+    }
+
+    project = project || getProjectByCwd(workspace);
+    if (project && workspace.getProjectSchematics(project)) {
+      const collectionObject = workspace.getProjectSchematics(project)[collection];
+      if (typeof collectionObject == 'object' && !Array.isArray(collectionObject)) {
+        result = { ...result, ...(collectionObject[schematic] as {}) };
+      }
+    }
+  }
+
+  return result;
+}
+
 export function isWarningEnabled(warning: string): boolean {
   let workspace = getWorkspace('local');
 
   if (workspace) {
     const project = getProjectByCwd(workspace);
-    if (project && workspace.getProject(project).cli) {
-      const warnings = workspace.getProject(project).cli['warnings'];
+    if (project && workspace.getProjectCli(project)) {
+      const warnings = workspace.getProjectCli(project)['warnings'];
       if (typeof warnings == 'object' && !Array.isArray(warnings)) {
         const value = warnings[warning];
         if (typeof value == 'boolean') {
