@@ -8,7 +8,7 @@
  * see:
  * https://github.com/conventional-changelog/conventional-changelog/blob/v0.2.1/presets/angular.js
  */
-import {Logger} from '@ngtools/logger';
+import { logging } from '@angular-devkit/core';
 import * as fs from 'fs';
 
 const cl = require('conventional-changelog');
@@ -30,7 +30,7 @@ function prependDelta() {
 }
 
 
-export default function changelog(args: string[], _opts: any, logger: Logger): void {
+export default function changelog(args: string[], _opts: any, logger: logging.Logger): void {
   if (args.length == 0) {
     logger.fatal('publish changelog <start-tag>');
     return;

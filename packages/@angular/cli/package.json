@@ -30,7 +30,6 @@
     "@angular-devkit/architect": "angular/angular-devkit-architect-builds#779e8fc",
     "@angular-devkit/core": "angular/angular-devkit-core-builds#779e8fc",
     "@angular-devkit/schematics": "angular/angular-devkit-schematics-builds#779e8fc",
-    "@ngtools/json-schema": "1.2.0",
     "@schematics/angular": "angular/schematics-angular-builds#779e8fc",
     "@schematics/update": "angular/schematics-update-builds#779e8fc",
     "ajv": "^6.1.1",

@@ -1,11 +1,7 @@
 // This may seem awkward but we're using Logger in our e2e. At this point the unit tests
 // have run already so it should be "safe", teehee.
-import {
-  ConsoleLoggerStack,
-  LogEntry,
-  IndentLogger,
-  NullLogger
-} from '../packages/@ngtools/logger/src/index';
+import { logging } from '@angular-devkit/core';
+import { createConsoleLogger } from "@angular-devkit/core/node";
 import {blue, bold, green, red, yellow, white} from 'chalk';
 import {gitClean} from './e2e/utils/git';
 import * as glob from 'glob';
@@ -63,7 +59,7 @@ const argv = minimist(process.argv.slice(2), {
  * Set the error code of the process to 255.  This is to ensure that if something forces node
  * to exit without finishing properly, the error code will be 255. Right now that code is not used.
  *
- * When tests succeed we already call `process.exit(0)`, so this doesn't change any correct
+ * - 1 When tests succeed we already call `process.exit(0)`, so this doesn't change any correct
  * behaviour.
  *
  * One such case that would force node <= v6 to exit with code 0, is a Promise that doesn't resolve.
@@ -71,20 +67,36 @@ const argv = minimist(process.argv.slice(2), {
 process.exitCode = 255;
 
 
-ConsoleLoggerStack.start(new IndentLogger('name'))
-  .pipe(filter((entry: LogEntry) => (entry.level != 'debug' || argv.verbose)))
-  .subscribe((entry: LogEntry) => {
-    let color: (s: string) => string = white;
-    let output = process.stdout;
-    switch (entry.level) {
-      case 'info': color = white; break;
-      case 'warn': color = yellow; break;
-      case 'error': color = red; output = process.stderr; break;
-      case 'fatal': color = (x: string) => bold(red(x)); output = process.stderr; break;
-    }
+ - 1const logger = createConsoleLogger(argv.verbose);
+const logStack = [logger];
+function lastLogger() {
+  return logStack[logStack.length - 1];
+}
 
-    output.write(color(entry.message) + '\n');
-  });
+(console as any).debug = (msg: string, ...args: any[]) => {
+  const logger = lastLogger();
+  if (logger) {
+    logger.debug(msg, { args });
+  }
+};
+console.log = (msg: string, ...args: any[]) => {
+  const logger = lastLogger();
+  if (logger) {
+    logger.info(msg, { args });
+  }
+};
+console.warn = (msg: string, ...args: any[]) => {
+  const logger = lastLogger();
+  if (logger) {
+    logger.warn(msg, { args });
+  }
+};
+console.error = (msg: string, ...args: any[]) => {
+  const logger = lastLogger();
+  if (logger) {
+    logger.error(msg, { args });
+  }
+};
 
 const testGlob = argv.glob || 'tests/**/*.ts';
 let currentFileName = null;
@@ -174,9 +186,9 @@ testsToRun.reduce((previous, relativeName, testIndex) => {
     return Promise.resolve()
       .then(() => printHeader(currentFileName, testIndex))
       .then(() => previousDir = process.cwd())
-      .then(() => ConsoleLoggerStack.push(currentFileName))
+      .then(() => logStack.push(lastLogger().createChild(currentFileName)))
       .then(() => fn(() => clean = false))
-      .then(() => ConsoleLoggerStack.pop(), (err: any) => { ConsoleLoggerStack.pop(); throw err; })
+      .then(() => logStack.pop(), (err: any) => { logStack.pop(); throw err; })
       .then(() => console.log('----'))
       .then(() => {
         // If we're not in a setup, change the directory back to where it was before the test.
@@ -189,10 +201,10 @@ testsToRun.reduce((previous, relativeName, testIndex) => {
         // Only clean after a real test, not a setup step. Also skip cleaning if the test
         // requested an exception.
         if (allSetups.indexOf(relativeName) == -1 && clean) {
-          ConsoleLoggerStack.push(NullLogger);
+          logStack.push(new logging.NullLogger());
           return gitClean()
-            .then(() => ConsoleLoggerStack.pop(), (err: any) => {
-              ConsoleLoggerStack.pop();
+            .then(() => logStack.pop(), (err: any) => {
+              logStack.pop();
               throw err;
             });
         }

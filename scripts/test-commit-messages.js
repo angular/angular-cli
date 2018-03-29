@@ -5,7 +5,8 @@ require('../lib/bootstrap-local');
 const validateCommitMessage = require('./validate-commit-message');
 const execSync = require('child_process').execSync;
 const chalk = require('chalk');
-const Logger = require('@ngtools/logger').Logger;
+const { logging } = require('@angular-devkit/core');
+const Logger = logging.Logger;
 const filter = require('rxjs/operators').filter;
 
 // Configure logger
