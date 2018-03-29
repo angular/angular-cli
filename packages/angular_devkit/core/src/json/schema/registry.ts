@@ -93,7 +93,8 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     this._ajv = ajv({
       useDefaults: true,
       formats: formatsObj,
-      loadSchema: (uri: string) => this._fetch(uri) as ajv.Thenable<object>,
+      loadSchema: (uri: string) => this._fetch(uri),
+      schemaId: 'auto',
     });
 
     this._ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'));
@@ -308,7 +309,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           );
 
           return function() {
-            return <ajv.Thenable<boolean>> Promise.resolve(true);
+            return Promise.resolve(true);
           };
         },
       });
