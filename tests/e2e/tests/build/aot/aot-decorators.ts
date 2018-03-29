@@ -4,7 +4,7 @@ import {expectToFail} from '../../../utils/utils';
 import {ngVersionMatches} from '../../../utils/version';
 
 export default function() {
-  // TODO(architect): This behaviour seems to have changed in devkit/build-webpack. Figure out why.
+  // TODO(architect): This behaviour seems to have changed in devkit/build-angular. Figure out why.
   return;
 
   return ng('generate', 'component', 'test-component', '--module', 'app.module.ts')

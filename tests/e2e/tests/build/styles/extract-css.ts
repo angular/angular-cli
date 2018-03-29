@@ -9,7 +9,7 @@ import { expectToFail } from '../../../utils/utils';
 import { oneLineTrim } from 'common-tags';
 
 export default function () {
-  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   return Promise.resolve()
     .then(() => writeMultipleFiles({

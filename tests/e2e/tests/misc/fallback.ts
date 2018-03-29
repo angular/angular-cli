@@ -6,7 +6,7 @@ import { moveFile } from '../../utils/fs';
 
 
 export default function () {
-  // TODO(architect): Delete this test. It is now in devkit/build-webpack.
+  // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   // should fallback to config.app[0].index (index.html by default)
   return Promise.resolve()
