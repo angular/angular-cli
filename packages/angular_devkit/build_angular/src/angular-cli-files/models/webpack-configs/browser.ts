@@ -19,22 +19,22 @@ import { WebpackConfigOptions } from '../build-options';
 + */
 
 export function getBrowserConfig(wco: WebpackConfigOptions) {
-  const { root, projectRoot, buildOptions, appConfig } = wco;
+  const { root, projectRoot, buildOptions } = wco;
 
 
   let extraPlugins: any[] = [];
 
   // Figure out which are the lazy loaded bundle names.
-  const lazyChunkBundleNames = ([...appConfig.styles, ...appConfig.scripts] as ExtraEntryPoint[])
+  const lazyChunkBundleNames = ([...buildOptions.styles, ...buildOptions.scripts] as ExtraEntryPoint[])
     .filter(entry => entry.lazy)
     .map(entry => entry.bundleName);
 
   const generateIndexHtml = false;
   if (generateIndexHtml) {
     extraPlugins.push(new HtmlWebpackPlugin({
-      template: path.resolve(root, appConfig.index),
-      filename: path.resolve(buildOptions.outputPath, appConfig.index),
-      chunksSortMode: packageChunkSort(appConfig),
+      template: path.resolve(root, buildOptions.index),
+      filename: path.resolve(buildOptions.outputPath, buildOptions.index),
+      chunksSortMode: packageChunkSort(buildOptions),
       excludeChunks: lazyChunkBundleNames,
       xhtml: true,
       minify: buildOptions.optimization ? {
@@ -75,7 +75,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }));
   }
 
-  const globalStylesBundleNames = (appConfig.styles as ExtraEntryPoint[])
+  const globalStylesBundleNames = (buildOptions.styles as ExtraEntryPoint[])
     .map(style => style.bundleName);
 
   return {
@@ -110,10 +110,10 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     },
     plugins: extraPlugins.concat([
       new IndexHtmlWebpackPlugin({
-        input: path.resolve(root, appConfig.index),
-        output: path.basename(appConfig.index),
+        input: path.resolve(root, buildOptions.index),
+        output: path.basename(buildOptions.index),
         baseHref: buildOptions.baseHref,
-        entrypoints: generateEntryPoints(appConfig),
+        entrypoints: generateEntryPoints(buildOptions),
         deployUrl: buildOptions.deployUrl,
       }),
     ]),

@@ -1,5 +1,16 @@
-// tslint:disable
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+
 // TODO: cleanup this file, it's copied as is from Angular CLI.
+
+// tslint:disable-next-line:no-implicit-dependencies
+import * as ts from 'typescript';
+import { Budget } from '../utilities/bundle-calculator';
 
 export interface BuildOptions {
   optimization: boolean;
@@ -37,18 +48,42 @@ export interface BuildOptions {
   skipAppShell?: boolean;
   statsJson: boolean;
   forkTypeChecker: boolean;
+
+  main: string;
+  index: string;
+  polyfills?: string;
+  budgets: Budget[];
+  assets: AssetPattern[];
+  scripts: ExtraEntryPoint[];
+  styles: ExtraEntryPoint[];
+  stylePreprocessorOptions: { includePaths: string[] };
+  lazyModules: string[];
+  platform?: 'browser' | 'server';
+}
+
+export interface AssetPattern {
+  glob: string;
+  input: string;
+  output: string;
+  allowOutsideOutDir?: boolean;
+}
+
+export interface ExtraEntryPoint {
+  input: string;
+  output?: string;
+  lazy: boolean;
 }
 
 export interface WebpackConfigOptions<T extends BuildOptions = BuildOptions> {
   root: string;
   projectRoot: string;
   buildOptions: T;
-  appConfig: any;
-  tsConfig: any;
+  tsConfig: ts.ParsedCommandLine;
+  tsConfigPath: string;
   supportES2015: boolean;
 }
 
 export interface WebpackTestOptions extends BuildOptions {
   codeCoverage?: boolean;
-  codeCoverageExclude: string[];
+  codeCoverageExclude?: string[];
 }

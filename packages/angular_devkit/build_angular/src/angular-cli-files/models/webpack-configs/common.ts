@@ -34,7 +34,7 @@ const resolve = require('resolve');
  */
 
 export function getCommonConfig(wco: WebpackConfigOptions) {
-  const { root, projectRoot, buildOptions, appConfig } = wco;
+  const { root, projectRoot, buildOptions } = wco;
 
   const nodeModules = findUp('node_modules', projectRoot);
   if (!nodeModules) {
@@ -44,20 +44,20 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   let extraPlugins: any[] = [];
   let entryPoints: { [key: string]: string[] } = {};
 
-  if (appConfig.main) {
-    entryPoints['main'] = [path.resolve(root, appConfig.main)];
+  if (buildOptions.main) {
+    entryPoints['main'] = [path.resolve(root, buildOptions.main)];
   }
 
-  if (appConfig.polyfills) {
-    entryPoints['polyfills'] = [path.resolve(root, appConfig.polyfills)];
+  if (buildOptions.polyfills) {
+    entryPoints['polyfills'] = [path.resolve(root, buildOptions.polyfills)];
   }
 
   // determine hashing format
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing as any);
 
   // process global scripts
-  if (appConfig.scripts.length > 0) {
-    const globalScriptsByBundleName = (appConfig.scripts as ExtraEntryPoint[])
+  if (buildOptions.scripts.length > 0) {
+    const globalScriptsByBundleName = (buildOptions.scripts as ExtraEntryPoint[])
       .reduce((prev: { bundleName: string, paths: string[], lazy: boolean }[], curr) => {
 
         const resolvedPath = path.resolve(root, curr.input);
@@ -96,8 +96,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   }
 
   // process asset entries
-  if (appConfig.assets) {
-    const copyWebpackPluginPatterns = appConfig.assets.map((asset: AssetPattern) => {
+  if (buildOptions.assets) {
+    const copyWebpackPluginPatterns = buildOptions.assets.map((asset: AssetPattern) => {
 
       // Resolve input paths relative to workspace root and add slash at the end.
       asset.input = path.resolve(root, asset.input).replace(/\\/g, '/');
@@ -196,7 +196,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       extensions: ['.ts', '.js'],
       symlinks: !buildOptions.preserveSymlinks,
       modules: [
-        wco.tsConfig.baseUrl || projectRoot,
+        wco.tsConfig.options.baseUrl || projectRoot,
         'node_modules',
       ],
       alias
@@ -250,7 +250,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       minimizer: [
         new HashedModuleIdsPlugin(),
         // TODO: check with Mike what this feature needs.
-        new BundleBudgetPlugin({ budgets: appConfig.budgets }),
+        new BundleBudgetPlugin({ budgets: buildOptions.budgets }),
         new CleanCssWebpackPlugin({
           sourceMap: buildOptions.sourceMap,
           // component styles retain their original file name

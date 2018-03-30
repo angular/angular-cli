@@ -18,7 +18,7 @@ import { WebpackConfigOptions, WebpackTestOptions } from '../build-options';
 
 
 export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
-  const { root, buildOptions, appConfig } = wco;
+  const { root, buildOptions } = wco;
 
   const extraRules: any[] = [];
   const extraPlugins: any[] = [];
@@ -58,7 +58,7 @@ export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
     },
     devtool: buildOptions.sourceMap ? 'inline-source-map' : 'eval',
     entry: {
-      main: path.resolve(root, appConfig.main)
+      main: path.resolve(root, buildOptions.main)
     },
     module: {
       rules: [].concat(extraRules as any)

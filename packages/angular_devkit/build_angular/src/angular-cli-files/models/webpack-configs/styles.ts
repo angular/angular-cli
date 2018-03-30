@@ -39,7 +39,7 @@ interface PostcssUrlAsset {
 }
 
 export function getStylesConfig(wco: WebpackConfigOptions) {
-  const { root, projectRoot, buildOptions, appConfig } = wco;
+  const { root, projectRoot, buildOptions } = wco;
 
   // const appRoot = path.resolve(projectRoot, appConfig.root);
   const entryPoints: { [key: string]: string[] } = {};
@@ -154,11 +154,11 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const includePaths: string[] = [];
   let lessPathOptions: { paths: string[] } = { paths: [] };
 
-  if (appConfig.stylePreprocessorOptions
-    && appConfig.stylePreprocessorOptions.includePaths
-    && appConfig.stylePreprocessorOptions.includePaths.length > 0
+  if (buildOptions.stylePreprocessorOptions
+    && buildOptions.stylePreprocessorOptions.includePaths
+    && buildOptions.stylePreprocessorOptions.includePaths.length > 0
   ) {
-    appConfig.stylePreprocessorOptions.includePaths.forEach((includePath: string) =>
+    buildOptions.stylePreprocessorOptions.includePaths.forEach((includePath: string) =>
       includePaths.push(path.resolve(root, includePath)));
     lessPathOptions = {
       paths: includePaths,
@@ -166,8 +166,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   }
 
   // Process global styles.
-  if (appConfig.styles.length > 0) {
-    (appConfig.styles as ExtraEntryPoint[]).forEach(style => {
+  if (buildOptions.styles.length > 0) {
+    (buildOptions.styles as ExtraEntryPoint[]).forEach(style => {
 
       const resolvedPath = path.resolve(root, style.input);
 

@@ -109,36 +109,31 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
     // TODO: make target defaults into configurations instead
     // options = this.addTargetDefaults(options);
 
-    const tsconfigPath = normalize(resolve(root, normalize(options.tsConfig as string)));
-    const tsConfig = readTsconfig(getSystemPath(tsconfigPath));
+    const tsConfigPath = getSystemPath(normalize(resolve(root, normalize(options.tsConfig))));
+    const tsConfig = readTsconfig(tsConfigPath);
 
     const projectTs = requireProjectModule(getSystemPath(projectRoot), 'typescript') as typeof ts;
 
     const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
       && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
 
-
-    // TODO: inside the configs, always use the project root and not the workspace root.
-    // Until then we have to pretend the app root is relative (``) but the same as `projectRoot`.
-    (options as any).root = ''; // tslint:disable-line:no-any
-
     const buildOptions: typeof wco['buildOptions'] = {
       ...options as {} as typeof wco['buildOptions'],
-      aot: true,
     };
 
     wco = {
       root: getSystemPath(root),
       projectRoot: getSystemPath(projectRoot),
       // TODO: use only this.options, it contains all flags and configs items already.
-      buildOptions,
-      appConfig: {
-        ...options,
+      buildOptions: {
+        ...buildOptions,
+        aot: true,
         platform: 'server',
         scripts: [],
         styles: [],
       },
       tsConfig,
+      tsConfigPath,
       supportES2015,
     };
 
@@ -148,7 +143,7 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
       getStylesConfig(wco),
     ];
 
-    if (wco.appConfig.main || wco.appConfig.polyfills) {
+    if (wco.buildOptions.main || wco.buildOptions.polyfills) {
       const typescriptConfigPartial = wco.buildOptions.aot
         ? getAotConfig(wco, this.context.host as virtualFs.Host<Stats>)
         : getNonAotConfig(wco, this.context.host as virtualFs.Host<Stats>);

@@ -16,6 +16,7 @@ import { Path, getSystemPath, join,  normalize, resolve, virtualFs } from '@angu
 import * as fs from 'fs';
 import { Observable } from 'rxjs';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
+import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import {
   getCommonConfig,
   getNonAotTestConfig,
@@ -125,8 +126,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
   }
 
   private _buildWebpackConfig(root: Path, projectRoot: Path, options: KarmaBuilderOptions) {
-    // tslint:disable-next-line:no-any
-    let wco: any;
+    let wco: WebpackConfigOptions;
 
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
 
@@ -137,19 +137,16 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
       );
     });
 
-    const tsconfigPath = getSystemPath(resolve(root, normalize(options.tsConfig as string)));
-    const tsConfig = readTsconfig(tsconfigPath);
+    const tsConfigPath = getSystemPath(resolve(root, normalize(options.tsConfig as string)));
+    const tsConfig = readTsconfig(tsConfigPath);
 
     const projectTs = requireProjectModule(getSystemPath(projectRoot), 'typescript') as typeof ts;
 
     const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
       && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
 
-    const compatOptions = {
-      ...options,
-      // TODO: inside the configs, always use the project root and not the workspace root.
-      // Until then we have to pretend the app root is relative (``) but the same as `projectRoot`.
-      root: '',
+    const compatOptions: typeof wco['buildOptions'] = {
+      ...options as {} as typeof wco['buildOptions'],
       // Some asset logic inside getCommonConfig needs outputPath to be set.
       outputPath: '',
     };
@@ -159,8 +156,8 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
       projectRoot: getSystemPath(projectRoot),
       // TODO: use only this.options, it contains all flags and configs items already.
       buildOptions: compatOptions,
-      appConfig: compatOptions,
       tsConfig,
+      tsConfigPath,
       supportES2015,
     };
 
