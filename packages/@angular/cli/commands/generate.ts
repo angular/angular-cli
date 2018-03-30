@@ -31,11 +31,12 @@ export default class GenerateCommand extends SchematicCommand {
     const [collectionName, schematicName] = this.parseSchematicInfo(options);
 
     if (!!schematicName) {
-      const availableOptions: Option[] = await this.getOptions({
+      const schematicOptions = await this.getOptions({
         schematicName,
         collectionName,
       });
-      this.options = this.options.concat( availableOptions || []);
+      this.options = this.options.concat(schematicOptions.options);
+      this.arguments = this.arguments.concat(schematicOptions.arguments.map(a => a.name));
     }
   }
 
@@ -83,8 +84,16 @@ export default class GenerateCommand extends SchematicCommand {
   }
 
   public printHelp(options: any) {
-    if (options.schematic) {
-      super.printHelp(options);
+    const schematicName = options._[0];
+    if (schematicName) {
+      const argDisplay = this.arguments && this.arguments.length > 0
+        ? ' ' + this.arguments.filter(a => a !== 'schematic').map(a => `<${a}>`).join(' ')
+        : '';
+      const optionsDisplay = this.options && this.options.length > 0
+        ? ' [options]'
+        : '';
+      this.logger.info(`usage: ng generate ${schematicName}${argDisplay}${optionsDisplay}`);
+      this.printHelpOptions(options);
     } else {
       this.printHelpUsage(this.name, this.arguments, this.options);
       const engineHost = getEngineHost();

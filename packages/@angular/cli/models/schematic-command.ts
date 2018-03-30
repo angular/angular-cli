@@ -7,7 +7,6 @@ import { DryRunEvent, UnsuccessfulWorkflowExecution } from '@angular-devkit/sche
 import { getCollection, getSchematic } from '../utilities/schematics';
 import { take } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
-import chalk from 'chalk';
 
 export interface CoreSchematicOptions {
   dryRun: boolean;
@@ -28,19 +27,10 @@ export interface GetOptionsOptions {
   schematicName: string;
 }
 
-export interface GetHelpOutputOptions {
-  collectionName: string;
-  schematicName: string;
-  nonSchematicOptions: any[];
+export interface GetOptionsResult {
+  options: Option[];
+  arguments: Option[];
 }
-
-const hiddenOptions = [
-  'name',
-  'path',
-  'source-dir',
-  'app-root',
-  'link-cli',
-];
 
 export abstract class SchematicCommand extends Command {
   readonly options: Option[] = [];
@@ -185,7 +175,7 @@ export abstract class SchematicCommand extends Command {
     return opts;
   }
 
-  protected getOptions(options: GetOptionsOptions): Promise<Option[] | null> {
+  protected getOptions(options: GetOptionsOptions): Promise<GetOptionsResult> {
     // TODO: get default collectionName
     const collectionName = options.collectionName || '@schematics/angular';
 
@@ -195,7 +185,10 @@ export abstract class SchematicCommand extends Command {
     this._deAliasedName = schematic.description.name;
 
     if (!schematic.description.schemaJson) {
-      return Promise.resolve(null);
+      return Promise.resolve({
+        options: [],
+        arguments: []
+      });
     }
 
     const properties = schematic.description.schemaJson.properties;
@@ -228,7 +221,6 @@ export abstract class SchematicCommand extends Command {
         if (opt.aliases) {
           aliases = [...aliases, ...opt.aliases];
         }
-
         const schematicDefault = opt.default;
 
         return {
@@ -243,54 +235,31 @@ export abstract class SchematicCommand extends Command {
       })
       .filter(x => x);
 
-    return Promise.resolve(availableOptions);
-  }
+    const schematicOptions = availableOptions
+      .filter(opt => opt.$default === undefined || opt.$default.$source !== 'argv');
 
-  protected getHelpOutput(
-    { schematicName, collectionName, nonSchematicOptions }: GetHelpOutputOptions):
-    Promise<string[]> {
-
-    const SchematicGetOptionsTask = require('./schematic-get-options').default;
-    const getOptionsTask = new SchematicGetOptionsTask({
-      ui: this.ui,
-      project: this.project
-    });
-    return Promise.all([getOptionsTask.run({
-      schematicName: schematicName,
-      collectionName: collectionName,
-    }), nonSchematicOptions])
-      .then(([availableOptions, nonSchematicOptions]: [Option[], any[]]) => {
-        const output: string[] = [];
-        [...(nonSchematicOptions || []), ...availableOptions || []]
-          .filter(opt => hiddenOptions.indexOf(opt.name) === -1)
-          .forEach(opt => {
-            let text = chalk.cyan(`    --${opt.name}`);
-            if (opt.schematicType) {
-              text += chalk.cyan(` (${opt.schematicType})`);
-            }
-            if (opt.schematicDefault) {
-              text += chalk.cyan(` (Default: ${opt.schematicDefault})`);
-            }
-            if (opt.description) {
-              text += ` ${opt.description}`;
-            }
-            output.push(text);
-            if (opt.aliases && opt.aliases.length > 0) {
-              const aliasText = opt.aliases.reduce(
-                (acc: string, curr: string) => {
-                  return acc + ` -${curr}`;
-                },
-                '');
-              output.push(chalk.grey(`      aliases: ${aliasText}`));
-            }
-          });
-        if (availableOptions === null) {
-          output.push(chalk.green('This schematic accept additional options, but did not provide '
-            + 'documentation.'));
+    const schematicArguments = availableOptions
+      .filter(opt => opt.$default !== undefined && opt.$default.$source === 'argv')
+      .sort((a, b) => {
+        if (a.$default.index === undefined) {
+          return 1;
         }
-
-        return output;
+        if (b.$default.index === undefined) {
+          return -1;
+        }
+        if (a.$default.index == b.$default.index) {
+          return 0;
+        } else if (a.$default.index > b.$default.index) {
+          return 1;
+        } else {
+          return -1;
+        }
       });
+
+    return Promise.resolve({
+      options: schematicOptions,
+      arguments: schematicArguments
+    });
   }
 
   private _loadWorkspace() {
