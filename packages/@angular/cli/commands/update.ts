@@ -12,7 +12,7 @@ export default class UpdateCommand extends SchematicCommand {
   public readonly description = 'Updates your application and its dependencies.';
   public static aliases: string[] = [];
   public readonly scope = CommandScope.inProject;
-  public readonly arguments: string[] = [ 'packages' ];
+  public arguments: string[] = [ 'packages' ];
   public options: Option[] = [
     ...this.coreOptions,
   ];
@@ -29,11 +29,12 @@ export default class UpdateCommand extends SchematicCommand {
     super.initialize(options);
     this.initialized = true;
 
-    const availableOptions: Option[] = await this.getOptions({
+    const schematicOptions = await this.getOptions({
       schematicName: this.schematicName,
       collectionName: this.collectionName,
     });
-    this.options = this.options.concat( availableOptions || []);
+    this.options = this.options.concat(schematicOptions.options);
+    this.arguments = this.arguments.concat(schematicOptions.arguments.map(a => a.name));
   }
 
   public async run(options: UpdateOptions) {

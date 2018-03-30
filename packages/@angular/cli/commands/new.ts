@@ -9,6 +9,7 @@ export default class NewCommand extends SchematicCommand {
     'Creates a new directory and a new Angular app.';
   public static aliases = ['n'];
   public scope = CommandScope.outsideProject;
+  public arguments: string[] = [];
   public options: Option[] = [
     ...this.coreOptions,
     {
@@ -41,12 +42,10 @@ export default class NewCommand extends SchematicCommand {
         schematicName,
         collectionName
       })
-      .then((availableOptions: Option[]) => {
-        // if (availableOptions) {
-        //   availableOptions = availableOptions.filter(opt => opt.name !== 'name');
-        // }
-
-        this.options = this.options.concat( availableOptions || []);
+      .then((schematicOptions) => {
+        this.options = this.options.concat(schematicOptions.options);
+        const args = schematicOptions.arguments.map(arg => arg.name);
+        this.arguments = this.arguments.concat(args);
       });
   }
 
