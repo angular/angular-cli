@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { strings, tags } from '@angular-devkit/core';
+import { normalize, relative, strings, tags } from '@angular-devkit/core';
 import { experimental } from '@angular-devkit/core';
 import {
   MergeStrategy,
@@ -96,7 +96,16 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
     // if (workspaceJson.value === null) {
     //   throw new SchematicsException(`Unable to parse configuration file (${workspacePath}).`);
     // }
-    const projectRoot = `${workspace.newProjectRoot}/${options.name}`;
+    let projectRoot = options.projectRoot !== undefined
+      ? options.projectRoot
+      : `${workspace.newProjectRoot}/${options.name}`;
+    if (projectRoot !== '' && !projectRoot.endsWith('/')) {
+      projectRoot += '/';
+    }
+    const rootFilesRoot = options.projectRoot === undefined
+      ? projectRoot
+      : projectRoot + 'src/';
+
     // tslint:disable-next-line:no-any
     const project: any = {
       root: projectRoot,
@@ -106,25 +115,25 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
           builder: '@angular-devkit/build-angular:browser',
           options: {
             outputPath: `dist/${options.name}`,
-            index: `${projectRoot}/src/index.html`,
-            main: `${projectRoot}/src/main.ts`,
-            polyfills: `${projectRoot}/src/polyfills.ts`,
-            tsConfig: `${projectRoot}/tsconfig.app.json`,
+            index: `${projectRoot}src/index.html`,
+            main: `${projectRoot}src/main.ts`,
+            polyfills: `${projectRoot}src/polyfills.ts`,
+            tsConfig: `${rootFilesRoot}tsconfig.app.json`,
             assets: [
               {
                 glob: 'favicon.ico',
-                input: `${projectRoot}/src`,
+                input: `${projectRoot}src`,
                 output: '/',
               },
               {
                 glob: '**/*',
-                input: `${projectRoot}/src/assets`,
+                input: `${projectRoot}src/assets`,
                 output: '/assets',
               },
             ],
             styles: [
               {
-                input: `${projectRoot}/src/styles.${options.style}`,
+                input: `${projectRoot}src/styles.${options.style}`,
               },
             ],
             scripts: [],
@@ -132,8 +141,8 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
           configurations: {
             production: {
               fileReplacements: [{
-                src: `${projectRoot}/src/environments/environment.ts`,
-                replaceWith: `${projectRoot}/src/environments/environment.prod.ts`,
+                src: `${projectRoot}src/environments/environment.ts`,
+                replaceWith: `${projectRoot}src/environments/environment.prod.ts`,
               }],
               optimization: true,
               outputHashing: 'all',
@@ -167,25 +176,25 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
         test: {
           builder: '@angular-devkit/build-angular:karma',
           options: {
-            main: `${projectRoot}/src/test.ts`,
-            polyfills: `${projectRoot}/src/polyfills.ts`,
-            tsConfig: `${projectRoot}/tsconfig.spec.json`,
-            karmaConfig: `${projectRoot}/karma.conf.js`,
+            main: `${projectRoot}src/test.ts`,
+            polyfills: `${projectRoot}src/polyfills.ts`,
+            tsConfig: `${rootFilesRoot}tsconfig.spec.json`,
+            karmaConfig: `${rootFilesRoot}karma.conf.js`,
             styles: [
               {
-                input: `${projectRoot}/styles.${options.style}`,
+                input: `${projectRoot}styles.${options.style}`,
               },
             ],
             scripts: [],
             assets: [
               {
                 glob: 'favicon.ico',
-                input: `${projectRoot}/src/`,
+                input: `${projectRoot}src/`,
                 output: '/',
               },
               {
                 glob: '**/*',
-                input: `${projectRoot}/src/assets`,
+                input: `${projectRoot}src/assets`,
                 output: '/assets',
               },
             ],
@@ -195,8 +204,8 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
           builder: '@angular-devkit/build-angular:tslint',
           options: {
             tsConfig: [
-              `${projectRoot}/tsconfig.app.json`,
-              `${projectRoot}/tsconfig.spec.json`,
+              `${projectRoot}tsconfig.app.json`,
+              `${projectRoot}tsconfig.spec.json`,
             ],
             exclude: [
               '**/node_modules/**',
@@ -267,29 +276,57 @@ export default function (options: ApplicationOptions): Rule {
       inlineTemplate: options.inlineTemplate,
       spec: !options.skipTests,
       styleext: options.style,
+      viewEncapsulation: options.viewEncapsulation,
     };
 
     const workspace = getWorkspace(host);
-    const newProjectRoot = workspace.newProjectRoot;
-    const appDir = `${newProjectRoot}/${options.name}`;
-    const sourceDir = `${appDir}/src/app`;
+    let newProjectRoot = workspace.newProjectRoot;
+    let appDir = `${newProjectRoot}/${options.name}`;
+    let sourceRoot = `${appDir}/src`;
+    let sourceDir = `${sourceRoot}/app`;
+    let relativeTsConfigPath = appDir.split('/').map(x => '..').join('/');
+    const rootInSrc = options.projectRoot !== undefined;
+    if (options.projectRoot !== undefined) {
+      newProjectRoot = options.projectRoot;
+      appDir = `${newProjectRoot}/src`;
+      sourceRoot = appDir;
+      sourceDir = `${sourceRoot}/app`;
+      relativeTsConfigPath = relative(normalize('/' + sourceRoot), normalize('/'));
+      if (relativeTsConfigPath === '') {
+        relativeTsConfigPath = '.';
+      }
+    }
 
     const e2eOptions: E2eOptions = {
       name: `${options.name}-e2e`,
       relatedAppName: options.name,
       rootSelector: appRootSelector,
     };
+    if (options.projectRoot !== undefined) {
+      e2eOptions.projectRoot = 'e2e';
+    }
 
     return chain([
       addAppToWorkspaceFile(options, workspace),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
       mergeWith(
-        apply(url('./files'), [
+        apply(url('./files/src'), [
           template({
             utils: strings,
             ...options,
             'dot': '.',
-            appDir,
+            relativeTsConfigPath,
+          }),
+          move(sourceRoot),
+        ])),
+      mergeWith(
+        apply(url('./files/root'), [
+          template({
+            utils: strings,
+            ...options,
+            'dot': '.',
+            relativeTsConfigPath,
+            rootInSrc,
           }),
           move(appDir),
         ])),

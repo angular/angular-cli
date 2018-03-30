@@ -34,8 +34,8 @@ describe('Ng New Schematic', () => {
 
     const tree = schematicRunner.runSchematic('ng-new', options);
     const files = tree.files;
-    expect(files.indexOf('/bar/projects/foo/tsconfig.app.json')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/bar/projects/foo/src/main.ts')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/bar/projects/foo/src/app/app.module.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/bar/src/tsconfig.app.json')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/bar/src/main.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/bar/src/app/app.module.ts')).toBeGreaterThanOrEqual(0);
   });
 });

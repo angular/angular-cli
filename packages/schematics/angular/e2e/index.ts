@@ -60,7 +60,12 @@ function addAppToWorkspaceFile(options: E2eOptions, workspace: WorkspaceSchema):
     // if (workspaceJson.value === null) {
     //   throw new SchematicsException(`Unable to parse configuration file (${workspacePath}).`);
     // }
-    const projectRoot = `${workspace.newProjectRoot}/${options.name}`;
+    let projectRoot = options.projectRoot !== undefined
+      ? options.projectRoot
+      : `${workspace.newProjectRoot}/${options.name}`;
+    if (projectRoot !== '' && !projectRoot.endsWith('/')) {
+      projectRoot += '/';
+    }
     // tslint:disable-next-line:no-any
     const project: any = {
       root: projectRoot,
@@ -69,14 +74,14 @@ function addAppToWorkspaceFile(options: E2eOptions, workspace: WorkspaceSchema):
         e2e: {
           builder: '@angular-devkit/build-angular:protractor',
           options: {
-            protractorConfig: `projects/${options.name}/protractor.conf.js`,
+            protractorConfig: `${projectRoot}protractor.conf.js`,
             devServerTarget: `${options.relatedAppName}:serve`,
           },
         },
         lint: {
           builder: '@angular-devkit/build-angular:tslint',
           options: {
-            tsConfig: `projects/${options.name}/tsconfig.e2e.json`,
+            tsConfig: `${projectRoot}tsconfig.e2e.json`,
             exclude: [
               '**/node_modules/**',
             ],
@@ -140,8 +145,14 @@ export default function (options: E2eOptions): Rule {
     validateProjectName(options.name);
 
     const workspace = getWorkspace(host);
-    const newProjectRoot = workspace.newProjectRoot;
-    const appDir = `${newProjectRoot}/${options.name}`;
+    let newProjectRoot = workspace.newProjectRoot;
+    let appDir = `${newProjectRoot}/${options.name}`;
+
+
+    if (options.projectRoot !== undefined) {
+      newProjectRoot = options.projectRoot;
+      appDir = newProjectRoot;
+    }
 
     return chain([
       addAppToWorkspaceFile(options, workspace),

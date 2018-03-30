@@ -42,6 +42,14 @@ describe('Application Schematic', () => {
     expect(files.indexOf('/projects/foo/src/app.po.ts')).toBeGreaterThanOrEqual(0);
   });
 
+  it('should create all files of an e2e application', () => {
+    const options = {...defaultOptions, projectRoot: 'e2e'};
+    const tree = schematicRunner.runSchematic('e2e', options, workspaceTree);
+    const files = tree.files;
+    expect(files.indexOf('/projects/foo/protractor.conf.js')).toEqual(-1);
+    expect(files.indexOf('/e2e/protractor.conf.js')).toBeGreaterThanOrEqual(0);
+  });
+
   it('should set the rootSelector in the app.po.ts', () => {
     const tree = schematicRunner.runSchematic('e2e', defaultOptions, workspaceTree);
     const content = tree.readContent('/projects/foo/src/app.po.ts');

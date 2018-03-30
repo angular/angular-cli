@@ -33,7 +33,6 @@ describe('App Shell Schematic', () => {
     name: 'bar',
     inlineStyle: false,
     inlineTemplate: false,
-    viewEncapsulation: 'Emulated',
     routing: true,
     style: 'css',
     skipTests: false,

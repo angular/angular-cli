@@ -37,7 +37,6 @@ describe('PWA Schematic', () => {
     name: 'bar',
     inlineStyle: false,
     inlineTemplate: false,
-    viewEncapsulation: 'Emulated',
     routing: false,
     style: 'css',
     skipTests: false,

@@ -28,7 +28,6 @@ describe('Application Schematic', () => {
     name: 'foo',
     inlineStyle: false,
     inlineTemplate: false,
-    viewEncapsulation: 'Emulated',
     routing: false,
     style: 'css',
     skipTests: false,
@@ -57,6 +56,9 @@ describe('Application Schematic', () => {
     expect(files.indexOf('/projects/foo/src/styles.css')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/projects/foo/src/test.ts')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/projects/foo/src/app/app.module.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/foo/src/app/app.component.css')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/foo/src/app/app.component.html')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/foo/src/app/app.component.spec.ts')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/projects/foo/src/app/app.component.ts')).toBeGreaterThanOrEqual(0);
   });
 
@@ -103,6 +105,8 @@ describe('Application Schematic', () => {
     path = '/projects/foo/tsconfig.spec.json';
     content = tree.readContent(path);
     expect(content).toMatch('../../tsconfig.json');
+    const specTsConfig = JSON.parse(content);
+    expect(specTsConfig.files).toEqual(['src/test.ts', 'src/polyfills.ts']);
   });
 
   describe(`update package.json`, () => {
@@ -141,6 +145,56 @@ describe('Application Schematic', () => {
 
       const packageJson = JSON.parse(tree.readContent('package.json'));
       expect(packageJson.devDependencies['@angular-devkit/build-angular']).toBeUndefined();
+    });
+  });
+
+  describe('custom projectRoot', () => {
+    it('should put app files in the right spot', () => {
+      const options = { ...defaultOptions, projectRoot: '' };
+
+      const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+      const files = tree.files;
+      expect(files.indexOf('/src/karma.conf.js')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/src/tsconfig.app.json')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/src/tsconfig.spec.json')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/src/environments/environment.ts')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/src/environments/environment.prod.ts')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/src/favicon.ico')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/src/index.html')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/src/main.ts')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/src/polyfills.ts')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/src/styles.css')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/src/test.ts')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/src/app/app.module.ts')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/src/app/app.component.css')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/src/app/app.component.html')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/src/app/app.component.spec.ts')).toBeGreaterThanOrEqual(0);
+      expect(files.indexOf('/src/app/app.component.ts')).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should set values in angular.json correctly', () => {
+      const options = { ...defaultOptions, projectRoot: '' };
+
+      const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+      const config = JSON.parse(tree.readContent('/angular.json'));
+      const prj = config.projects.foo;
+      expect(prj.root).toEqual('');
+      const buildOpt = prj.architect.build.options;
+      expect(buildOpt.index).toEqual('src/index.html');
+      expect(buildOpt.main).toEqual('src/main.ts');
+      expect(buildOpt.polyfills).toEqual('src/polyfills.ts');
+      expect(buildOpt.tsConfig).toEqual('src/tsconfig.app.json');
+    });
+
+    it('should set the relative tsconfig paths', () => {
+      const options = { ...defaultOptions, projectRoot: '' };
+
+      const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+      const appTsConfig = JSON.parse(tree.readContent('/src/tsconfig.app.json'));
+      expect(appTsConfig.extends).toEqual('../tsconfig.json');
+      const specTsConfig = JSON.parse(tree.readContent('/src/tsconfig.spec.json'));
+      expect(specTsConfig.extends).toEqual('../tsconfig.json');
+      expect(specTsConfig.files).toEqual(['test.ts', 'polyfills.ts']);
     });
   });
 });
