@@ -72,10 +72,10 @@ export default class GenerateCommand extends SchematicCommand {
   private parseSchematicInfo(options: any) {
     let collectionName = getDefaultSchematicCollection();
 
-    let schematicName = options._[0];
+    let schematicName: string = options._[0];
 
     if (schematicName) {
-      if (schematicName.match(/:/)) {
+      if (schematicName.includes(':')) {
         [collectionName, schematicName] = schematicName.split(':', 2);
       }
     }
