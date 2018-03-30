@@ -46,5 +46,8 @@
     "semver": "^5.1.0",
     "silent-error": "^1.0.0",
     "yargs-parser": "^9.0.2"
+  },
+  "ng-update": {
+    "migrations": "@schematics/angular/migrations/migration-collection.json"
   }
 }
