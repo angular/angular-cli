@@ -90,7 +90,7 @@ export interface BrowserBuilderOptions {
   styles: ExtraEntryPoint[];
   stylePreprocessorOptions: { includePaths: string[] };
 
-  fileReplacements: { from: string; to: string; }[];
+  fileReplacements: { src: string; replaceWith: string; }[];
 }
 
 export interface AssetPattern {
@@ -222,10 +222,10 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
 
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
 
-    options.fileReplacements.forEach(({ from, to }) => {
+    options.fileReplacements.forEach(({ src, replaceWith }) => {
       host.aliases.set(
-        join(root, normalize(from)),
-        join(root, normalize(to)),
+        join(root, normalize(src)),
+        join(root, normalize(replaceWith)),
       );
     });
 

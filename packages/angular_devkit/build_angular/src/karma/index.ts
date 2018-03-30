@@ -63,7 +63,7 @@ export interface KarmaBuilderOptions {
   // logLevel?: string; // same as above
   // reporters?: string; // same as above
 
-  fileReplacements: { from: string; to: string; }[];
+  fileReplacements: { src: string; replaceWith: string; }[];
 }
 
 export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
@@ -130,10 +130,10 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
 
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
 
-    options.fileReplacements.forEach(({ from, to }) => {
+    options.fileReplacements.forEach(({ src, replaceWith }) => {
       host.aliases.set(
-        join(root, normalize(from)),
-        join(root, normalize(to)),
+        join(root, normalize(src)),
+        join(root, normalize(replaceWith)),
       );
     });
 

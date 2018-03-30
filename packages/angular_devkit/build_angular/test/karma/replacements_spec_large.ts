@@ -33,8 +33,8 @@ describe('Karma Builder file replacements', () => {
 
     const overrides = {
       fileReplacements: [{
-        from: normalize('/src/meaning.ts'),
-        to: normalize('/src/meaning-too.ts'),
+        src: normalize('/src/meaning.ts'),
+        replaceWith: normalize('/src/meaning-too.ts'),
       }],
     };
 

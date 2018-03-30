@@ -64,10 +64,10 @@
       "items": {
         "type": "object",
         "properties": {
-          "from": {
+          "src": {
             "type": "string"
           },
-          "to": {
+          "replaceWith": {
             "type": "string"
           }
         }
