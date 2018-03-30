@@ -8,7 +8,7 @@ import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 import { generateEntryPoints, packageChunkSort } from '../../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
 import { IndexHtmlWebpackPlugin } from '../../plugins/index-html-webpack-plugin';
-import { extraEntryParser, lazyChunksFilter } from './utils';
+import { ExtraEntryPoint } from '../../../browser';
 import { WebpackConfigOptions } from '../build-options';
 
 /**
@@ -24,20 +24,18 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
 
   let extraPlugins: any[] = [];
 
-  // figure out which are the lazy loaded entry points
-  const lazyChunks = lazyChunksFilter([
-    ...extraEntryParser(appConfig.scripts, root, 'scripts'),
-    ...extraEntryParser(appConfig.styles, root, 'styles')
-  ]);
+  // Figure out which are the lazy loaded bundle names.
+  const lazyChunkBundleNames = ([...appConfig.styles, ...appConfig.scripts] as ExtraEntryPoint[])
+    .filter(entry => entry.lazy)
+    .map(entry => entry.bundleName);
 
-  // TODO: Enable this once HtmlWebpackPlugin supports Webpack 4
   const generateIndexHtml = false;
   if (generateIndexHtml) {
     extraPlugins.push(new HtmlWebpackPlugin({
       template: path.resolve(root, appConfig.index),
       filename: path.resolve(buildOptions.outputPath, appConfig.index),
       chunksSortMode: packageChunkSort(appConfig),
-      excludeChunks: lazyChunks,
+      excludeChunks: lazyChunkBundleNames,
       xhtml: true,
       minify: buildOptions.optimization ? {
         caseSensitive: true,
@@ -77,8 +75,8 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }));
   }
 
-  const globalStylesEntries = extraEntryParser(appConfig.styles, root, 'styles')
-    .map(style => style.entry);
+  const globalStylesBundleNames = (appConfig.styles as ExtraEntryPoint[])
+    .map(style => style.bundleName);
 
   return {
     devtool: sourcemaps,
@@ -104,7 +102,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
               const moduleName = module.nameForCondition ? module.nameForCondition() : '';
               return /[\\/]node_modules[\\/]/.test(moduleName)
                 && !chunks.some(({ name }) => name === 'polyfills'
-                  || globalStylesEntries.includes(name));
+                  || globalStylesBundleNames.includes(name));
             },
           },
         }

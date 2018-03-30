@@ -40,43 +40,6 @@ export function getWebpackStatsConfig(verbose = false) {
     : webpackOutputOptions;
 }
 
-export interface ExtraEntry {
-  input: string;
-  output?: string;
-  lazy?: boolean;
-  path?: string;
-  entry?: string;
-}
-
-// Filter extra entries out of a arran of extraEntries
-export function lazyChunksFilter(extraEntries: ExtraEntry[]) {
-  return extraEntries
-    .filter(extraEntry => extraEntry.lazy)
-    .map(extraEntry => extraEntry.entry);
-}
-
-// convert all extra entries into the object representation, fill in defaults
-export function extraEntryParser(
-  extraEntries: (string | ExtraEntry)[],
-  appRoot: string,
-  defaultEntry: string
-): ExtraEntry[] {
-  return extraEntries
-    .map((extraEntry: string | ExtraEntry) =>
-      typeof extraEntry === 'string' ? { input: extraEntry } : extraEntry)
-    .map((extraEntry: ExtraEntry) => {
-      extraEntry.path = path.resolve(appRoot, extraEntry.input);
-      if (extraEntry.output) {
-        extraEntry.entry = extraEntry.output.replace(/\.(js|css)$/i, '');
-      } else if (extraEntry.lazy) {
-        extraEntry.entry = path.basename(extraEntry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, ''));
-      } else {
-        extraEntry.entry = defaultEntry;
-      }
-      return extraEntry;
-    });
-}
-
 export interface HashFormat {
   chunk: string;
   extract: string;

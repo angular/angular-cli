@@ -34,9 +34,9 @@ describe('Browser Builder scripts array', () => {
     { input: 'src/binput-script.js' },
     { input: 'src/ainput-script.js' },
     { input: 'src/cinput-script.js' },
-    { input: 'src/lazy-script.js', lazy: true },
-    { input: 'src/pre-rename-script.js', output: 'renamed-script' },
-    { input: 'src/pre-rename-lazy-script.js', output: 'renamed-lazy-script', lazy: true },
+    { input: 'src/lazy-script.js', bundleName: 'lazy-script', lazy: true },
+    { input: 'src/pre-rename-script.js', bundleName: 'renamed-script' },
+    { input: 'src/pre-rename-lazy-script.js', bundleName: 'renamed-lazy-script', lazy: true },
   ];
 
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));

@@ -4,7 +4,7 @@
 import * as path from 'path';
 import { HashedModuleIdsPlugin } from 'webpack';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
-import { extraEntryParser, getOutputHashFormat } from './utils';
+import { getOutputHashFormat } from './utils';
 import { isDirectory } from '../../utilities/is-directory';
 import { requireProjectModule } from '../../utilities/require-project-module';
 import { WebpackConfigOptions } from '../build-options';
@@ -12,7 +12,7 @@ import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 import { findUp } from '../../utilities/find-up';
-import { AssetPattern } from '../../../browser';
+import { AssetPattern, ExtraEntryPoint } from '../../../browser';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
@@ -57,19 +57,24 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   // process global scripts
   if (appConfig.scripts.length > 0) {
-    const globalScripts = extraEntryParser(appConfig.scripts, root, 'scripts');
-    const globalScriptsByEntry = globalScripts
-      .reduce((prev: { entry: string, paths: string[], lazy: boolean }[], curr) => {
+    const globalScriptsByBundleName = (appConfig.scripts as ExtraEntryPoint[])
+      .reduce((prev: { bundleName: string, paths: string[], lazy: boolean }[], curr) => {
 
-        let existingEntry = prev.find((el) => el.entry === curr.entry);
+        const resolvedPath = path.resolve(root, curr.input);
+        let existingEntry = prev.find((el) => el.bundleName === curr.bundleName);
         if (existingEntry) {
-          existingEntry.paths.push(curr.path as string);
-          // All entries have to be lazy for the bundle to be lazy.
-          (existingEntry as any).lazy = existingEntry.lazy && curr.lazy;
+          if (existingEntry.lazy && !curr.lazy) {
+            // All entries have to be lazy for the bundle to be lazy.
+            throw new Error(`The ${curr.bundleName} bundle is mixing lazy and non-lazy scripts.`);
+          }
+
+          existingEntry.paths.push(resolvedPath);
+
         } else {
           prev.push({
-            entry: curr.entry as string, paths: [curr.path as string],
-            lazy: curr.lazy as boolean
+            bundleName: curr.bundleName,
+            paths: [resolvedPath],
+            lazy: curr.lazy
           });
         }
         return prev;
@@ -77,13 +82,13 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
 
     // Add a new asset for each entry.
-    globalScriptsByEntry.forEach((script) => {
+    globalScriptsByBundleName.forEach((script) => {
       // Lazy scripts don't get a hash, otherwise they can't be loaded by name.
       const hash = script.lazy ? '' : hashFormat.script;
       extraPlugins.push(new ScriptsWebpackPlugin({
-        name: script.entry,
+        name: script.bundleName,
         sourceMap: buildOptions.sourceMap,
-        filename: `${path.basename(script.entry)}${hash}.js`,
+        filename: `${path.basename(script.bundleName)}${hash}.js`,
         scripts: script.paths,
         basePath: projectRoot,
       }));

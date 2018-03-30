@@ -33,9 +33,9 @@ describe('Browser Builder styles', () => {
     };
     const getStylesOption = () => [
       { input: 'src/input-style.css' },
-      { input: 'src/lazy-style.css', lazy: true },
-      { input: 'src/pre-rename-style.css', output: 'renamed-style' },
-      { input: 'src/pre-rename-lazy-style.css', output: 'renamed-lazy-style', lazy: true },
+      { input: 'src/lazy-style.css', bundleName: 'lazy-style', lazy: true },
+      { input: 'src/pre-rename-style.css', bundleName: 'renamed-style' },
+      { input: 'src/pre-rename-lazy-style.css', bundleName: 'renamed-lazy-style', lazy: true },
     ];
     const cssMatches: { [path: string]: string } = {
       './dist/styles.css': '.input-style',

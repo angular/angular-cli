@@ -4,10 +4,11 @@
 import * as webpack from 'webpack';
 import * as path from 'path';
 import { SuppressExtractedTextChunksWebpackPlugin } from '../../plugins/webpack';
-import { extraEntryParser, getOutputHashFormat } from './utils';
+import { getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../build-options';
 import { findUp } from '../../utilities/find-up';
 import { RawCssLoader } from '../../plugins/webpack';
+import { ExtraEntryPoint } from '../../../browser';
 
 const postcssUrl = require('postcss-url');
 const autoprefixer = require('autoprefixer');
@@ -164,17 +165,22 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     };
   }
 
-  // process global styles
+  // Process global styles.
   if (appConfig.styles.length > 0) {
-    const globalStyles = extraEntryParser(appConfig.styles, root, 'styles');
-    // add style entry points
-    globalStyles.forEach(style =>
-      entryPoints[style.entry as any]
-        ? entryPoints[style.entry as any].push(style.path as string)
-        : entryPoints[style.entry as any] = [style.path as any]
-    );
-    // add global css paths
-    globalStylePaths.push(...globalStyles.map((style) => style.path as any));
+    (appConfig.styles as ExtraEntryPoint[]).forEach(style => {
+
+      const resolvedPath = path.resolve(root, style.input);
+
+      // Add style entry points.
+      if (entryPoints[style.bundleName]) {
+        entryPoints[style.bundleName].push(resolvedPath)
+      } else {
+        entryPoints[style.bundleName] = [resolvedPath]
+      }
+
+      // Add global css paths.
+      globalStylePaths.push(resolvedPath);
+    });
   }
 
   // set base rules to derive final rules from
