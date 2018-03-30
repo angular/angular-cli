@@ -6,6 +6,7 @@ import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import { DryRunEvent, UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
 import { getPackageManager, getDefaultSchematicCollection } from '../utilities/config';
 import { getCollection, getSchematic } from '../utilities/schematics';
+import { getSchematicDefaults } from '../utilities/config';
 import { take } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
 
@@ -323,48 +324,23 @@ export abstract class SchematicCommand extends Command {
     }
   }
 
-  private readDefaults(collectionName: string, schematicName: string, options: any): any {
-    let defaults: any = {};
+  private _cleanDefaults<T, K extends keyof T>(defaults: T, undefinedOptions: string[]): T {
+    (Object.keys(defaults) as K[])
+      .filter(key => !undefinedOptions.includes(key))
+      .forEach(key => {
+        delete defaults[key];
+      });
 
-    if (!this._workspace) {
-      return {};
-    }
+    return defaults;
+  }
 
+  private readDefaults(collectionName: string, schematicName: string, options: any): {} {
     if (this._deAliasedName) {
       schematicName = this._deAliasedName;
     }
 
-    // read and set workspace defaults
-    const wsSchematics = this._workspace.getSchematics();
-    if (wsSchematics) {
-      let key = collectionName;
-      if (wsSchematics[key] && typeof wsSchematics[key] === 'object') {
-        defaults = {...defaults, ...<object> wsSchematics[key]};
-      }
-      key = collectionName + ':' + schematicName;
-      if (wsSchematics[key] && typeof wsSchematics[key] === 'object') {
-        defaults = {...defaults, ...<object> wsSchematics[key]};
-      }
-    }
-
-    // read and set project defaults
-    let projectName = options.project;
-    if (!projectName) {
-      projectName = this._workspace.listProjectNames()[0];
-    }
-    if (projectName) {
-      const prjSchematics = this._workspace.getProjectSchematics(projectName);
-      if (prjSchematics) {
-        let key = collectionName;
-        if (prjSchematics[key] && typeof prjSchematics[key] === 'object') {
-          defaults = {...defaults, ...<object> prjSchematics[key]};
-        }
-        key = collectionName + ':' + schematicName;
-        if (prjSchematics[key] && typeof prjSchematics[key] === 'object') {
-          defaults = {...defaults, ...<object> prjSchematics[key]};
-        }
-      }
-    }
+    const projectName = options.project;
+    const defaults = getSchematicDefaults(collectionName, schematicName, projectName);
 
     // Get list of all undefined options.
     const undefinedOptions = this.options
@@ -372,11 +348,7 @@ export abstract class SchematicCommand extends Command {
       .map(o => o.name);
 
     // Delete any default that is not undefined.
-    Object.keys(defaults)
-      .filter(key => !undefinedOptions.indexOf(key))
-      .forEach(key => {
-        delete defaults[key];
-      });
+    this._cleanDefaults(defaults, undefinedOptions);
 
     return defaults;
   }
