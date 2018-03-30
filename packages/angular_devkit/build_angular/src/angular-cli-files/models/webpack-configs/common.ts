@@ -4,7 +4,7 @@
 import * as path from 'path';
 import { HashedModuleIdsPlugin } from 'webpack';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
-import { extraEntryParser, getOutputHashFormat, AssetPattern } from './utils';
+import { extraEntryParser, getOutputHashFormat } from './utils';
 import { isDirectory } from '../../utilities/is-directory';
 import { requireProjectModule } from '../../utilities/require-project-module';
 import { WebpackConfigOptions } from '../build-options';
@@ -12,6 +12,7 @@ import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 import { findUp } from '../../utilities/find-up';
+import { AssetPattern } from '../../../browser';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
@@ -92,54 +93,21 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   // process asset entries
   if (appConfig.assets) {
     const copyWebpackPluginPatterns = appConfig.assets.map((asset: AssetPattern) => {
-      // Add defaults.
-      // Input is always resolved relative to the projectRoot.
-      // TODO: add smart defaults to schema to use project root as default.
-      asset.input = path.resolve(root, asset.input || projectRoot).replace(/\\/g, '/');
-      asset.output = asset.output || '';
-      asset.glob = asset.glob || '';
 
-      // Prevent asset configurations from writing outside of the output path, except if the user
-      // specify a configuration flag.
-      // Also prevent writing outside the project path. That is not overridable.
-      const absoluteOutputPath = path.resolve(projectRoot, buildOptions.outputPath as string);
-      const absoluteAssetOutput = path.resolve(absoluteOutputPath, asset.output);
-      const outputRelativeOutput = path.relative(absoluteOutputPath, absoluteAssetOutput);
+      // Resolve input paths relative to workspace root and add slash at the end.
+      asset.input = path.resolve(root, asset.input).replace(/\\/g, '/');
+      asset.input = asset.input.endsWith('/') ? asset.input : asset.input + '/';
+      asset.output = asset.output.endsWith('/') ? asset.output : asset.output + '/';
 
-      if (outputRelativeOutput.startsWith('..') || path.isAbsolute(outputRelativeOutput)) {
-
-        // TODO: This check doesn't make a lot of sense anymore with multiple project. Review it.
-        // const projectRelativeOutput = path.relative(projectRoot, absoluteAssetOutput);
-        // if (projectRelativeOutput.startsWith('..') || path.isAbsolute(projectRelativeOutput)) {
-        //   const message = 'An asset cannot be written to a location outside the project.';
-        //   throw new SilentError(message);
-        // }
-
-        if (!asset.allowOutsideOutDir) {
-          const message = 'An asset cannot be written to a location outside of the output path. '
-            + 'You can override this message by setting the `allowOutsideOutDir` '
-            + 'property on the asset to true in the CLI configuration.';
-          throw new SilentError(message);
-        }
+      if (!asset.output.startsWith('/')) {
+        const message = 'An asset cannot be written to a location outside of the . '
+          + 'You can override this message by setting the `allowOutsideOutDir` '
+          + 'property on the asset to true in the CLI configuration.';
+        throw new Error(message);
       }
 
-      // TODO: This check doesn't make a lot of sense anymore with multiple project. Review it.
-      // Prevent asset configurations from reading files outside of the project.
-      // const projectRelativeInput = path.relative(projectRoot, asset.input);
-      // if (projectRelativeInput.startsWith('..') || path.isAbsolute(projectRelativeInput)) {
-      //   const message = 'An asset cannot be read from a location outside the project.';
-      //   throw new SilentError(message);
-      // }
-
-      // Ensure trailing slash.
-      if (isDirectory(path.resolve(asset.input))) {
-        asset.input += '/';
-      }
-
-      // Convert dir patterns to globs.
-      if (isDirectory(path.resolve(asset.input, asset.glob))) {
-        asset.glob = asset.glob + '/**/*';
-      }
+      // Now we remove starting slash to make Webpack place it from the output root.
+      asset.output = asset.output.slice(1);
 
       return {
         context: asset.input,
@@ -217,7 +185,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   } catch (e) { }
 
   return {
-    mode: buildOptions.optimization ? 'production': 'development',
+    mode: buildOptions.optimization ? 'production' : 'development',
     devtool: false,
     resolve: {
       extensions: ['.ts', '.js'],

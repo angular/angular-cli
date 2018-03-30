@@ -95,10 +95,3 @@ export function getOutputHashFormat(option: string, length = 20): HashFormat {
   /* tslint:enable:max-line-length */
   return hashFormats[option] || hashFormats['none'];
 }
-
-export interface AssetPattern {
-  glob: string;
-  input?: string;
-  output: string;
-  allowOutsideOutDir: boolean;
-}

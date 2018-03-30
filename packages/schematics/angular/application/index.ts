@@ -114,12 +114,12 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
               {
                 glob: 'favicon.ico',
                 input: `${projectRoot}/src`,
-                output: './',
+                output: '/',
               },
               {
                 glob: '**/*',
                 input: `${projectRoot}/src/assets`,
-                output: 'assets',
+                output: '/assets',
               },
             ],
             styles: [
@@ -181,12 +181,12 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
               {
                 glob: 'favicon.ico',
                 input: `${projectRoot}/src/`,
-                output: './',
+                output: '/',
               },
               {
                 glob: '**/*',
                 input: `${projectRoot}/src/assets`,
-                output: 'assets',
+                output: '/assets',
               },
             ],
           },

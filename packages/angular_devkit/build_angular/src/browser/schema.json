@@ -255,20 +255,19 @@
         },
         "input": {
           "type": "string",
-          "description": "The input path dir in which to apply 'glob'."
+          "description": "The input path dir in which to apply 'glob'. Defaults to the project root."
         },
         "output": {
           "type": "string",
-          "description": "The output path, relative to 'outputPath'.",
-          "default": "./"
-        },
-        "allowOutsideOutDir": {
-          "type": "boolean",
-          "description": "Allow assets to be copied outside the outDir.",
-          "default": false
+          "description": "Absolute path within the output."
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "glob",
+        "input",
+        "output"
+      ]
     },
     "extraEntryPoint": {
       "type": "object",

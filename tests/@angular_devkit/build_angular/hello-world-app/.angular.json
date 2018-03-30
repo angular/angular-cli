@@ -24,12 +24,12 @@
               {
                 "glob": "favicon.ico",
                 "input": "src/",
-                "output": "./"
+                "output": "/"
               },
               {
                 "glob": "**/*",
                 "input": "src/assets",
-                "output": "assets"
+                "output": "/assets"
               }
             ],
             "styles": [
@@ -112,12 +112,12 @@
               {
                 "glob": "favicon.ico",
                 "input": "src/",
-                "output": "./"
+                "output": "/"
               },
               {
                 "glob": "**/*",
                 "input": "src/assets",
-                "output": "assets"
+                "output": "/assets"
               }
             ]
           }

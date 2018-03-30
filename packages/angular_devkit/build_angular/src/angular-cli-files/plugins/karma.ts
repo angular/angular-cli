@@ -7,7 +7,7 @@ import * as glob from 'glob';
 import * as webpack from 'webpack';
 const webpackDevMiddleware = require('webpack-dev-middleware');
 
-import { AssetPattern } from '../models/webpack-configs/utils';
+import { AssetPattern } from '../../browser';
 import { KarmaWebpackFailureCb } from './karma-webpack-failure-cb';
 
 /**
@@ -21,6 +21,7 @@ import { KarmaWebpackFailureCb } from './karma-webpack-failure-cb';
 
 let blocked: any[] = [];
 let isBlocked = false;
+let webpackMiddleware: any;
 let successCb: () => void;
 let failureCb: () => void;
 
@@ -70,33 +71,10 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     ], true);
   }
 
-  // Add assets. This logic is mimics the one present in GlobCopyWebpackPlugin, but proxies
-  // asset requests to the Webpack server.
-  if (options.assets) {
-    config.proxies = config.proxies || {};
-    options.assets.forEach((pattern: AssetPattern) => {
-      // TODO: use smart defaults in schema to do this instead.
-      // Default input to be projectRoot.
-      pattern.input = pattern.input || projectRoot;
-
-      // Determine Karma proxy path.
-      let proxyPath: string;
-      if (fs.existsSync(path.join(pattern.input, pattern.glob))) {
-        proxyPath = path.join(pattern.output, pattern.glob);
-      } else {
-        // For globs (paths that don't exist), proxy pattern.output to pattern.input.
-        proxyPath = path.join(pattern.output);
-      }
-      // Proxy paths must have only forward slashes.
-      proxyPath = proxyPath.replace(/\\/g, '/');
-      config.proxies['/' + proxyPath] = '/_karma_webpack_/' + proxyPath;
-    });
-  }
-
   // Add webpack config.
   const webpackConfig = config.buildWebpack.webpackConfig;
   const webpackMiddlewareConfig = {
-    logLevel: 'error', // Hide webpack output because its noisy.
+    // logLevel: 'error', // Hide webpack output because its noisy.
     watchOptions: { poll: options.poll },
     publicPath: '/_karma_webpack_/',
   };
@@ -120,9 +98,11 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   config.customContextFile = `${__dirname}/karma-context.html`;
   config.customDebugFile = `${__dirname}/karma-debug.html`;
 
-  // Add the request blocker.
+  // Add the request blocker and the webpack server fallback.
   config.beforeMiddleware = config.beforeMiddleware || [];
   config.beforeMiddleware.push('@angular-devkit/build-angular--blocker');
+  config.middleware = config.middleware || [];
+  config.middleware.push('@angular-devkit/build-angular--fallback');
 
   // Delete global styles entry, we don't want to load them.
   delete webpackConfig.entry.styles;
@@ -175,13 +155,13 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     }
   });
 
-  const middleware = new webpackDevMiddleware(compiler, webpackMiddlewareConfig);
+  webpackMiddleware = new webpackDevMiddleware(compiler, webpackMiddlewareConfig);
 
   // Forward requests to webpack server.
   customFileHandlers.push({
     urlRegex: /^\/_karma_webpack_\/.*/,
     handler: function handler(req: any, res: any) {
-      middleware(req, res, function () {
+      webpackMiddleware(req, res, function () {
         // Ensure script and style bundles are served.
         // They are mentioned in the custom karma context page and we don't want them to 404.
         const alwaysServe = [
@@ -202,7 +182,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   });
 
   emitter.on('exit', (done: any) => {
-    middleware.close();
+    webpackMiddleware.close();
     done();
   });
 };
@@ -266,9 +246,23 @@ const sourceMapReporter: any = function (this: any, baseReporterDecorator: any, 
 
 sourceMapReporter.$inject = ['baseReporterDecorator', 'config'];
 
+// When a request is not found in the karma server, try looking for it from the webpack server root.
+function fallbackMiddleware() {
+  return function (req: any, res: any, next: () => void) {
+    if (webpackMiddleware) {
+      const webpackUrl = '/_karma_webpack_' + req.url;
+      const webpackReq = { ...req, url: webpackUrl }
+      webpackMiddleware(webpackReq, res, next);
+    } else {
+      next();
+    }
+  };
+}
+
 module.exports = {
   'framework:@angular-devkit/build-angular': ['factory', init],
   'reporter:@angular-devkit/build-angular--sourcemap-reporter': ['type', sourceMapReporter],
   'reporter:@angular-devkit/build-angular--event-reporter': ['type', eventReporter],
-  'middleware:@angular-devkit/build-angular--blocker': ['factory', requestBlocker]
+  'middleware:@angular-devkit/build-angular--blocker': ['factory', requestBlocker],
+  'middleware:@angular-devkit/build-angular--fallback': ['factory', fallbackMiddleware]
 };

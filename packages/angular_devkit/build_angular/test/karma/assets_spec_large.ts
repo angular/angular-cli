@@ -87,9 +87,9 @@ describe('Karma Builder assets', () => {
 
     const overrides = {
       assets: [
-        { glob: 'glob-asset.txt' },
-        { glob: 'output-asset.txt', output: 'output-folder' },
-        { glob: '**/*', input: 'src/folder', output: 'folder' },
+        { glob: 'glob-asset.txt', input: 'src/', output: '/' },
+        { glob: 'output-asset.txt', input: 'src/', output: '/output-folder' },
+        { glob: '**/*', input: 'src/folder', output: '/folder' },
       ],
     };
 
