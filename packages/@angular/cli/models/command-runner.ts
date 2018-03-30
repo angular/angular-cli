@@ -11,6 +11,8 @@ import { logging } from '@angular-devkit/core';
 import { camelize } from '@angular-devkit/core/src/utils/strings';
 
 import * as yargsParser from 'yargs-parser';
+import * as fs from 'fs';
+import { join } from 'path';
 
 export interface CommandMap {
   [key: string]: CommandConstructor;
@@ -74,6 +76,7 @@ export async function runCommand(commandMap: CommandMap,
     return await runHelp(command, options);
   } else {
     verifyCommandInScope(command, executionScope);
+    verifyWorkspace(command, executionScope, context.project.root);
     delete options.h;
     delete options.help;
     return await validateAndRunCommand(command, options);
@@ -201,6 +204,21 @@ function verifyCommandInScope(command: Command, scope = CommandScope.everywhere)
       }
       throw new Error(errorMessage);
     }
+  }
+}
+
+function verifyWorkspace(command: Command, executionScope: CommandScope, root: string): void {
+  if (command.scope === CommandScope.everywhere) {
+    return;
+  }
+  if (executionScope === CommandScope.inProject) {
+    if (fs.existsSync(join(root, 'angular.json'))) {
+      return;
+    }
+    if (fs.existsSync(join(root, '.angular.json'))) {
+      return;
+    }
+    throw new Error('Invalid project: missing workspace file.');
   }
 }
 
