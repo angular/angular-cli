@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.0"></a>
+# [5.0.0](https://github.com/angular/universal/compare/5.0.0-beta.8...5.0.0) (2018-04-02)
+
+
+
 <a name="5.0.0-beta.8"></a>
 # 5.0.0-beta.8 (2018-03-23)
 
