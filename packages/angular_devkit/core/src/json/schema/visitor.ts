@@ -23,11 +23,11 @@ export interface JsonSchemaVisitor {
 
 export interface JsonVisitor {
   (
-    value: JsonValue | undefined,
+    value: JsonValue,
     pointer: JsonPointer,
     schema?: JsonObject,
     root?: JsonObject | JsonArray,
-  ): Observable<JsonValue | undefined> | JsonValue | undefined;
+  ): Observable<JsonValue> | JsonValue;
 }
 
 
@@ -72,7 +72,7 @@ function _visitJsonRecursive<ContextT>(
   refResolver?: ReferenceResolver<ContextT>,
   context?: ContextT,  // tslint:disable-line:no-any
   root?: JsonObject | JsonArray,
-): Observable<JsonValue | undefined> {
+): Observable<JsonValue> {
   if (schema && schema.hasOwnProperty('$ref') && typeof schema['$ref'] == 'string') {
     if (refResolver) {
       const resolved = refResolver(schema['$ref'] as string, context);
@@ -84,10 +84,10 @@ function _visitJsonRecursive<ContextT>(
   const value = visitor(json, ptr, schema, root);
 
   return (isObservable(value)
-      ? value as Observable<JsonValue | undefined>
-      : observableOf(value as JsonValue | undefined)
+      ? value as Observable<JsonValue>
+      : observableOf(value as JsonValue)
   ).pipe(
-    concatMap((value: JsonValue | undefined) => {
+    concatMap((value: JsonValue) => {
       if (Array.isArray(value)) {
         return concat(
           from(value).pipe(
@@ -152,7 +152,7 @@ export function visitJson<ContextT>(
   schema?: JsonObject,
   refResolver?: ReferenceResolver<ContextT>,
   context?: ContextT,  // tslint:disable-line:no-any
-): Observable<JsonValue | undefined> {
+): Observable<JsonValue> {
   return _visitJsonRecursive(json, visitor, buildJsonPointer([]), schema, refResolver, context);
 }
 

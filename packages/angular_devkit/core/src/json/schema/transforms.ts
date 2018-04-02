@@ -14,7 +14,7 @@ export function addUndefinedDefaults(
   _pointer: JsonPointer,
   schema?: JsonObject,
   _root?: JsonObject | JsonArray,
-): JsonValue | undefined {
+): JsonValue {
   if (value === undefined && schema) {
     if (schema.items || schema.type == 'array') {
       return [];
@@ -38,5 +38,5 @@ export function addUndefinedDefaults(
     }
   }
 
-  return value;
+  return value as JsonValue;
 }
