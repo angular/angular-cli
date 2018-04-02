@@ -10,21 +10,15 @@ http_archive(
 
 http_archive(
     name = "build_bazel_rules_nodejs",
-    url = "https://github.com/bazelbuild/rules_nodejs/archive/0.5.1.zip",
-    strip_prefix = "rules_nodejs-0.5.1",
-    sha256 = "dabd1a596a6f00939875762dcb1de93b5ada0515069244198aa6792bc37bb92a",
+    url = "https://github.com/bazelbuild/rules_nodejs/archive/25bb70fb67bddcc257b869f434ccc0fd130ec3bd.zip",
+    strip_prefix = "rules_nodejs-25bb70fb67bddcc257b869f434ccc0fd130ec3bd",
+    sha256 = "11c0d73bdcb4b2608abbe5967be5a910bdaebf848eb13e4e7f8413bbdeb940b8",
 )
 
 load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories", "yarn_install")
 node_repositories(package_json = ["//:package.json"])
 
 
-# http_archive(
-#     name = "build_bazel_rules_typescript",
-#     url = "https://github.com/bazelbuild/rules_typescript/archive/0.11.1.zip",
-#     strip_prefix = "rules_typescript-0.11.1",
-#     sha256 = "7406bea7954e1c906f075115dfa176551a881119f6820b126ea1eacb09f34a1a",
-#)
 local_repository(
     name = "build_bazel_rules_typescript",
     path = "node_modules/@bazel/typescript",

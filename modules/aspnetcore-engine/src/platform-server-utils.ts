@@ -28,8 +28,7 @@ import {
   INITIAL_CONFIG,
   PlatformState
 } from '@angular/platform-server';
-import {filter} from 'rxjs/operators/filter';
-import {take} from 'rxjs/operators/take';
+import {filter, take} from 'rxjs/operators';
 
 interface PlatformOptions {
   document?: string;

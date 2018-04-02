@@ -16,11 +16,8 @@ import {
 } from '@angular/common/http';
 import {ApplicationRef, Injectable, NgModule} from '@angular/core';
 import {BrowserTransferStateModule, TransferState, makeStateKey} from '@angular/platform-browser';
-import {Observable} from 'rxjs/Observable';
-import {of as observableOf} from 'rxjs/observable/of';
-import {filter} from 'rxjs/operators/filter';
-import {tap} from 'rxjs/operators/tap';
-import {take} from 'rxjs/operators/take';
+import {Observable, of as observableOf} from 'rxjs';
+import {tap, take, filter} from 'rxjs/operators';
 
 export interface TransferHttpResponse {
   body?: any | null;
