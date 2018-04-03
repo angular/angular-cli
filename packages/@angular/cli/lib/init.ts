@@ -6,20 +6,17 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // @ignoreDep v8-profiler
+import 'symbol-observable';
 const isWarningEnabled = require('../utilities/config').isWarningEnabled;
-const Version = require('../upgrade/version').Version;
 
 const fs = require('fs');
-const findUp = require('../utilities/find-up').findUp;
 const packageJson = require('../package.json');
 const path = require('path');
 const resolve = require('resolve');
 const stripIndents = require('common-tags').stripIndents;
 const yellow = require('chalk').yellow;
 const SemVer = require('semver').SemVer;
-const semver = require('semver');
 const events = require('events');
-
 
 function _fromPackageJson(cwd?: string) {
   cwd = cwd || process.cwd();

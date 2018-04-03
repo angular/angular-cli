@@ -41,12 +41,12 @@ export default function () {
         builder: '@angular-devkit/build-angular:server',
         options: {
           outputPath: 'dist/test-project-server',
-          main: 'projects/test-project/src/main.server.ts',
-          tsConfig: 'projects/test-project/tsconfig.server.json'
+          main: 'src/main.server.ts',
+          tsConfig: 'tsconfig.server.json'
         }
       };
     }))
-    .then(() => writeFile('./projects/test-project/tsconfig.server.json', `
+    .then(() => writeFile('./tsconfig.server.json', `
       {
         "extends": "../../tsconfig.json",
         "compilerOptions": {
@@ -64,7 +64,7 @@ export default function () {
         }
       }
     `))
-    .then(() => writeFile('./projects/test-project/src/main.server.ts', `
+    .then(() => writeFile('./src/main.server.ts', `
       import { enableProdMode } from '@angular/core';
 
       import { environment } from './environments/environment';
@@ -75,7 +75,7 @@ export default function () {
 
       export { AppServerModule } from './app/app.server.module';
     `))
-    .then(() => writeFile('./projects/test-project/src/app/app.server.module.ts', `
+    .then(() => writeFile('./src/app/app.server.module.ts', `
       import { NgModule } from '@angular/core';
       import { BrowserModule } from '@angular/platform-browser';
       import { ServerModule } from '@angular/platform-server';
@@ -141,11 +141,11 @@ export default function () {
       /require\(["']@angular\/[^"']*["']\)/))
 
     // Check externals.
-    .then(() => prependToFile('./projects/test-project/src/app/app.server.module.ts', `
+    .then(() => prependToFile('./src/app/app.server.module.ts', `
       import 'zone.js/dist/zone-node';
       import 'reflect-metadata';
     `)
-      .then(() => appendToFile('./projects/test-project/src/app/app.server.module.ts', `
+      .then(() => appendToFile('./src/app/app.server.module.ts', `
       import * as fs from 'fs';
       import { renderModule } from '@angular/platform-server';
 

@@ -6,7 +6,7 @@ export default function () {
   // TODO(architect): Figure out how this test should look like post devkit/build-angular.
   return;
 
-  const fileName = 'projects/test-project/src/app/foo.ts';
+  const fileName = 'src/app/foo.ts';
   const fileContents = `
 const ANIMATION_CSS_VALUE_REGEX = 'asda';
 const a = ["asda", 'asda', 'asdasd', "ASDASDAS"];

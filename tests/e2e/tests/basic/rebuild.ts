@@ -30,7 +30,7 @@ export default function() {
     // the file, otherwise rebuilds can be too fast and fail CI.
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
-      writeFile('projects/test-project/src/app/app.module.ts', `
+      writeFile('src/app/app.module.ts', `
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
         import { FormsModule } from '@angular/forms';
@@ -68,7 +68,7 @@ export default function() {
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
       writeMultipleFiles({
-        'projects/test-project/src/app/app.module.ts': `
+        'src/app/app.module.ts': `
           import { BrowserModule } from '@angular/platform-browser';
           import { NgModule } from '@angular/core';
 
@@ -89,7 +89,7 @@ export default function() {
           console.log('$$_E2E_GOLDEN_VALUE_1');
           export let X = '$$_E2E_GOLDEN_VALUE_2';
         `,
-          'projects/test-project/src/main.ts': `
+          'src/main.ts': `
           import { enableProdMode } from '@angular/core';
           import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 

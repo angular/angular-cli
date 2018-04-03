@@ -28,7 +28,7 @@ export default function () {
     .then(() => expectToFail(() => {
       return ng('generate', 'appShell', '--universal-app', 'universal');
     })
-    .then(() => appendToFile('projects/test-project/src/app/app.component.html', '<router-outlet></router-outlet>'))
+    .then(() => appendToFile('src/app/app.component.html', '<router-outlet></router-outlet>'))
     .then(() => ng('generate', 'appShell', '--universal-app', 'universal'))
     .then(() => updateJsonFile('package.json', packageJson => {
       const dependencies = packageJson['dependencies'];

@@ -31,8 +31,8 @@ export default async function () {
     delete tsconfig.compilerOptions.paths;
   });
 
-  await prependToFile('projects/test-project/src/app/app.module.ts', 'import * as firebase from \'firebase\';');
-  await appendToFile('projects/test-project/src/app/app.module.ts', 'firebase.initializeApp({});');
+  await prependToFile('src/app/app.module.ts', 'import * as firebase from \'firebase\';');
+  await appendToFile('src/app/app.module.ts', 'firebase.initializeApp({});');
 
   await silentNpm('install', 'firebase@3.7.8');
   await ng('build', '--aot');

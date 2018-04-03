@@ -5,8 +5,8 @@ import { appendToFile, writeFile } from '../../utils/fs';
 export default async function() {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
-  await writeFile('projects/test-project/src/my-js-file.js', 'console.log(1); export const a = 2;');
-  await appendToFile('projects/test-project/src/main.ts', `
+  await writeFile('src/my-js-file.js', 'console.log(1); export const a = 2;');
+  await appendToFile('src/main.ts', `
     import { a } from './my-js-file';
     console.log(a);
   `);

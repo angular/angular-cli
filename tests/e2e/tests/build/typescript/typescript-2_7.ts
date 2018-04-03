@@ -3,7 +3,7 @@ import { updateJsonFile } from '../../../utils/project';
 
 export default async function () {
   // Disable the strict TS version check for nightly
-  await updateJsonFile('projects/test-project/tsconfig.app.json', configJson => {
+  await updateJsonFile('src/tsconfig.app.json', configJson => {
     configJson.angularCompilerOptions = {
       ...configJson.angularCompilerOptions,
       disableTypeScriptVersionCheck: true,

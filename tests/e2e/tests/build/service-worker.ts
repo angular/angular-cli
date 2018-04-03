@@ -33,7 +33,7 @@ export default function() {
   return silentNpm('remove', '@angular/service-worker')
     .then(() => silentNpm('install', '@angular/service-worker'))
     .then(() => ng('config', 'projects.test-project.architect.build.options.serviceWorker', 'true'))
-    .then(() => writeFile('projects/test-project/ngsw-config.json', JSON.stringify(MANIFEST, null, 2)))
+    .then(() => writeFile('src/ngsw-config.json', JSON.stringify(MANIFEST, null, 2)))
     .then(() => ng('build', '--optimization'))
     .then(() => expectFileToExist(join(process.cwd(), 'dist')))
     .then(() => expectFileToExist(join(process.cwd(), 'dist/test-project/ngsw.json')))

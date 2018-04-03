@@ -21,7 +21,7 @@ export default function () {
   return Promise.resolve()
     .then(() => silentNpm('install', 'font-awesome@4.7.0'))
     .then(() => writeMultipleFiles({
-      'projects/test-project/src/styles.scss': `
+      'src/styles.scss': `
         $fa-font-path: "~font-awesome/fonts";
         @import "~font-awesome/scss/font-awesome";
         h1 { background: url('./assets/large.png'),
@@ -29,18 +29,18 @@ export default function () {
         h2 { background: url('./assets/small.svg'); }
         p  { background: url(./assets/small-id.svg#testID); }
       `,
-      'projects/test-project/src/app/app.component.css': `
+      'src/app/app.component.css': `
         h3 { background: url('../assets/small.svg'); }
         h4 { background: url("../assets/large.png"); }
       `,
-      'projects/test-project/src/assets/small.svg': imgSvg,
-      'projects/test-project/src/assets/small-id.svg': imgSvg
+      'src/assets/small.svg': imgSvg,
+      'src/assets/small-id.svg': imgSvg
     }))
-    .then(() => copyProjectAsset('images/spectrum.png', './projects/test-project/src/assets/large.png'))
+    .then(() => copyProjectAsset('images/spectrum.png', './src/assets/large.png'))
     .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.styles = [
-        { input: 'projects/test-project/src/styles.scss' }
+        { input: 'src/styles.scss' }
       ];
     }))
     .then(() => ng('build', '--extract-css', '--aot'))

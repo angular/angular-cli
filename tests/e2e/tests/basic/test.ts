@@ -5,7 +5,7 @@ import { moveFile } from '../../utils/fs';
 export default function () {
   // make sure both --watch=false work
   return ng('test', '--watch=false')
-    .then(() => moveFile('./projects/test-project/karma.conf.js',
-      './projects/test-project/karma.conf.bis.js'))
-    .then(() => ng('test', '--watch=false', '--karmaConfig=projects/test-project/karma.conf.bis.js'));
+    .then(() => moveFile('./src/karma.conf.js',
+      './src/karma.conf.bis.js'))
+    .then(() => ng('test', '--watch=false', '--karmaConfig=src/karma.conf.bis.js'));
 }

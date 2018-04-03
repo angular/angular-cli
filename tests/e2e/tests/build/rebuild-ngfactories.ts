@@ -28,43 +28,43 @@ export default function () {
 
   return execAndWaitForOutputToMatch('ng', ['build', '--watch', '--aot'], validBundleRegEx)
     .then(() => writeMultipleFiles({
-      'projects/test-project/src/app/app.component.css': `
+      'src/app/app.component.css': `
         @import './imported-styles.css';
         body {background-color: #00f;}
       `,
-      'projects/test-project/src/app/imported-styles.css': 'p {color: #f00;}',
+      'src/app/imported-styles.css': 'p {color: #f00;}',
     }))
     // Trigger a few rebuilds first.
     // The AOT compiler is still optimizing rebuilds on the first rebuild.
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
-      appendToFile('projects/test-project/src/main.ts', 'console.log(1)\n')
+      appendToFile('src/main.ts', 'console.log(1)\n')
     ]))
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
-      appendToFile('projects/test-project/src/main.ts', 'console.log(1)\n')
+      appendToFile('src/main.ts', 'console.log(1)\n')
     ]))
     // Check if html changes are built.
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
-      appendToFile('projects/test-project/src/app/app.component.html', '<p>HTML_REBUILD_STRING<p>')
+      appendToFile('src/app/app.component.html', '<p>HTML_REBUILD_STRING<p>')
     ]))
     .then(() => expectFileToMatch('dist/test-project/main.js', 'HTML_REBUILD_STRING'))
     // Check if css changes are built.
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
-      appendToFile('projects/test-project/src/app/app.component.css', 'CSS_REBUILD_STRING {color: #f00;}')
+      appendToFile('src/app/app.component.css', 'CSS_REBUILD_STRING {color: #f00;}')
     ]))
     .then(() => expectFileToMatch('dist/test-project/main.js', 'CSS_REBUILD_STRING'))
     // Check if css dependency changes are built.
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
-      appendToFile('projects/test-project/src/app/imported-styles.css', 'CSS_DEP_REBUILD_STRING {color: #f00;}')
+      appendToFile('src/app/imported-styles.css', 'CSS_DEP_REBUILD_STRING {color: #f00;}')
     ]))
     .then(() => expectFileToMatch('dist/test-project/main.js', 'CSS_DEP_REBUILD_STRING'))
     .then(() => Promise.all([
       waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
-      replaceInFile('projects/test-project/src/app/app.component.ts', 'app-root', 'app-root-FACTORY_REBUILD_STRING')
+      replaceInFile('src/app/app.component.ts', 'app-root', 'app-root-FACTORY_REBUILD_STRING')
     ]))
     .then(() => expectFileToMatch('dist/test-project/main.js', 'FACTORY_REBUILD_STRING'))
     .then(() => killAllProcesses(), (err: any) => {
