@@ -87,4 +87,70 @@ describe('@schematics/update', () => {
       }),
     ).subscribe(undefined, done.fail, done);
   });
+
+  it('can migrate only', done => {
+    // Add the basic migration package.
+    const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
+    const packageJson = JSON.parse(content);
+    packageJson['dependencies']['@angular-devkit-tests/update-migrations'] = '1.0.0';
+    host.sync.write(
+      normalize('/package.json'),
+      virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
+    );
+
+    schematicRunner.runSchematicAsync('update', {
+      packages: ['@angular-devkit-tests/update-migrations'],
+      migrateOnly: true,
+    }, appTree).pipe(
+      map(tree => {
+        const packageJson = JSON.parse(tree.readContent('/package.json'));
+        expect(packageJson['dependencies']['@angular-devkit-tests/update-base']).toBe('1.0.0');
+        expect(packageJson['dependencies']['@angular-devkit-tests/update-migrations'])
+          .toBe('1.0.0');
+
+        // Check install task.
+        expect(schematicRunner.tasks).toEqual([
+          {
+            name: 'run-schematic',
+            options: jasmine.objectContaining({
+              name: 'migrate',
+            }),
+          },
+        ]);
+      }),
+    ).subscribe(undefined, done.fail, done);
+  });
+
+  it('can migrate from only', done => {
+    // Add the basic migration package.
+    const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
+    const packageJson = JSON.parse(content);
+    packageJson['dependencies']['@angular-devkit-tests/update-migrations'] = '1.0.0';
+    host.sync.write(
+      normalize('/package.json'),
+      virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
+    );
+
+    schematicRunner.runSchematicAsync('update', {
+      packages: ['@angular-devkit-tests/update-migrations'],
+      migrateOnly: true,
+      from: '0.1.2',
+    }, appTree).pipe(
+      map(tree => {
+        const packageJson = JSON.parse(tree.readContent('/package.json'));
+        expect(packageJson['dependencies']['@angular-devkit-tests/update-migrations'])
+          .toBe('1.0.0');
+
+        // Check install task.
+        expect(schematicRunner.tasks).toEqual([
+          {
+            name: 'run-schematic',
+            options: jasmine.objectContaining({
+              name: 'migrate',
+            }),
+          },
+        ]);
+      }),
+    ).subscribe(undefined, done.fail, done);
+  });
 });

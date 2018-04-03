@@ -18,9 +18,9 @@ You can specify more than one package. Each package follows the convention of `[
 | `--all` | `boolean` | If true, implies that all dependencies should be updated. Defaults is false, using dependencies from the command line instead. |
 | `--force` | `boolean` | If true, skip the verification step and perform the update even if some peer dependencies would be invalidated. Peer dependencies errors will still be shown as warning. Defaults to false. |
 | `--next` | `boolean` | If true, allows version discovery to include Beta and RC. Defaults to false. |
-| `--migration-only` | `boolean` | If true, don't change the `package.json` file, only apply migration scripts. |
+| `--migrate-only` | `boolean` | If true, don't change the `package.json` file, only apply migration scripts. |
 | `--from` | `version` | Apply migrations from a certain version number. |
-| `--to` | `version` | Apply migrations up to a certain version number (inclusive). By default will update to the tag selected. |
+| `--to` | `version` | Apply migrations up to a certain version number (inclusive). By default will update to the installed version. |
 
 ## Details
 

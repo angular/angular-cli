@@ -13,6 +13,7 @@ import {
   Tree,
   chain,
 } from '@angular-devkit/schematics';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { AppConfig, CliConfig } from '../../utility/config';
 import { latestVersions } from '../../utility/latest-versions';
 
@@ -483,6 +484,7 @@ function updatePackageJson() {
     pkg.devDependencies['@angular-devkit/build-angular'] = latestVersions.DevkitBuildWebpack;
 
     host.overwrite(pkgPath, JSON.stringify(pkg, null, 2));
+    context.addTask(new NodePackageInstallTask());
 
     return host;
   };

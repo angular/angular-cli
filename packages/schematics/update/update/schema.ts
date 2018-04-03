@@ -10,4 +10,7 @@ export interface UpdateSchema {
   force: boolean;
   all: boolean;
   next: boolean;
+  migrateOnly: boolean;
+  from?: string;
+  to?: string;
 }
