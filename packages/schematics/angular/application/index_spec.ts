@@ -115,7 +115,7 @@ describe('Application Schematic', () => {
 
       const packageJson = JSON.parse(tree.readContent('package.json'));
       expect(packageJson.devDependencies['@angular-devkit/build-angular'])
-        .toEqual(latestVersions.DevkitBuildWebpack);
+        .toEqual(latestVersions.DevkitBuildAngular);
     });
 
     it('should use the latest known versions in package.json', () => {

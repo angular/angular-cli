@@ -481,7 +481,7 @@ function updatePackageJson() {
       pkg.devDependencies = {};
     }
 
-    pkg.devDependencies['@angular-devkit/build-angular'] = latestVersions.DevkitBuildWebpack;
+    pkg.devDependencies['@angular-devkit/build-angular'] = latestVersions.DevkitBuildAngular;
 
     host.overwrite(pkgPath, JSON.stringify(pkg, null, 2));
     context.addTask(new NodePackageInstallTask());

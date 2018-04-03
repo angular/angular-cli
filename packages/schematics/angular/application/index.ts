@@ -72,7 +72,7 @@ function addDependenciesToPackageJson() {
 
     json.devDependencies = {
       '@angular/compiler-cli': latestVersions.Angular,
-      '@angular-devkit/build-angular': latestVersions.DevkitBuildWebpack,
+      '@angular-devkit/build-angular': latestVersions.DevkitBuildAngular,
       'typescript': latestVersions.TypeScript,
       // De-structure last keeps existing user dependencies.
       ...json.devDependencies,
