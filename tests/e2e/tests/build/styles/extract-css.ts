@@ -25,8 +25,8 @@ export default function () {
         { input: 'src/string-style.css' },
         { input: 'src/input-style.css' },
         { input: 'src/lazy-style.css', lazy: true },
-        { input: 'src/pre-rename-style.css', output: 'renamed-style' },
-        { input: 'src/pre-rename-lazy-style.css', output: 'renamed-lazy-style', lazy: true }
+        { input: 'src/pre-rename-style.css', bundleName: 'renamed-style' },
+        { input: 'src/pre-rename-lazy-style.css', bundleName: 'renamed-lazy-style', lazy: true }
       ];
     }))
     .then(() => ng('build', '--extract-css'))
