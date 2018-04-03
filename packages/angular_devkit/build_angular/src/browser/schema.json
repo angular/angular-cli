@@ -278,8 +278,7 @@
         },
         "bundleName": {
           "type": "string",
-          "description": "The bundle name for this extra entry point.",
-          "default": "styles"
+          "description": "The bundle name for this extra entry point."
         },
         "lazy": {
           "type": "boolean",
@@ -301,8 +300,7 @@
         },
         "bundleName": {
           "type": "string",
-          "description": "The bundle name for this extra entry point.",
-          "default": "scripts"
+          "description": "The bundle name for this extra entry point. Default is the basename of the input."
         },
         "lazy": {
           "type": "boolean",

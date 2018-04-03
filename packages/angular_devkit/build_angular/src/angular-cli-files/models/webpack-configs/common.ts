@@ -1,6 +1,7 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
+import { basename, normalize } from '@angular-devkit/core';
 import * as path from 'path';
 import { HashedModuleIdsPlugin } from 'webpack';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
@@ -59,9 +60,20 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   if (buildOptions.scripts.length > 0) {
     const globalScriptsByBundleName = (buildOptions.scripts as ExtraEntryPoint[])
       .reduce((prev: { bundleName: string, paths: string[], lazy: boolean }[], curr) => {
+        let bundleName = curr.bundleName;
+        if (!bundleName) {
+          if (curr.lazy) {
+            bundleName = basename(
+              normalize(curr.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
+            );
+          }
+          else {
+            bundleName = 'scripts';
+          }
+        }
 
         const resolvedPath = path.resolve(root, curr.input);
-        let existingEntry = prev.find((el) => el.bundleName === curr.bundleName);
+        let existingEntry = prev.find((el) => el.bundleName === bundleName);
         if (existingEntry) {
           if (existingEntry.lazy && !curr.lazy) {
             // All entries have to be lazy for the bundle to be lazy.
@@ -72,7 +84,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
         } else {
           prev.push({
-            bundleName: curr.bundleName,
+            bundleName,
             paths: [resolvedPath],
             lazy: curr.lazy
           });
@@ -85,10 +97,12 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     globalScriptsByBundleName.forEach((script) => {
       // Lazy scripts don't get a hash, otherwise they can't be loaded by name.
       const hash = script.lazy ? '' : hashFormat.script;
+      const bundleName = script.bundleName;
+
       extraPlugins.push(new ScriptsWebpackPlugin({
-        name: script.bundleName,
+        name: bundleName,
         sourceMap: buildOptions.sourceMap,
-        filename: `${path.basename(script.bundleName)}${hash}.js`,
+        filename: `${path.basename(bundleName)}${hash}.js`,
         scripts: script.paths,
         basePath: projectRoot,
       }));

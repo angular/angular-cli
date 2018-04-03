@@ -1,6 +1,7 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
+import { basename, normalize } from '@angular-devkit/core';
 import * as path from 'path';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
@@ -27,7 +28,15 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   // Figure out which are the lazy loaded bundle names.
   const lazyChunkBundleNames = ([...buildOptions.styles, ...buildOptions.scripts] as ExtraEntryPoint[])
     .filter(entry => entry.lazy)
-    .map(entry => entry.bundleName);
+    .map(entry => {
+      if (!entry.bundleName) {
+        return basename(
+          normalize(entry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
+        );
+      } else {
+        return entry.bundleName;
+      }
+    });
 
   const generateIndexHtml = false;
   if (generateIndexHtml) {
@@ -76,7 +85,17 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   }
 
   const globalStylesBundleNames = (buildOptions.styles as ExtraEntryPoint[])
-    .map(style => style.bundleName);
+    .map(style => {
+      if (style.bundleName) {
+        return style.bundleName;
+      } else if (style.lazy) {
+        return basename(
+          normalize(style.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
+        );
+      } else {
+        return 'styles';
+      }
+    });
 
   return {
     devtool: sourcemaps,

@@ -7,14 +7,18 @@ export function generateEntryPoints(appConfig: any) {
   let entryPoints = ['polyfills', 'sw-register'];
 
   // Add all styles/scripts, except lazy-loaded ones.
-  const lazyChunkBundleNames = ([...appConfig.styles, ...appConfig.scripts] as ExtraEntryPoint[])
-    .filter(entry => !entry.lazy)
-    .map(entry => entry.bundleName)
-    .forEach(bundleName => {
-      if (entryPoints.indexOf(bundleName) === -1) {
-        entryPoints.push(bundleName);
-      }
-    });
+  [
+    ...(appConfig.styles as ExtraEntryPoint[])
+      .filter(entry => !entry.lazy)
+      .map(entry => entry.bundleName || 'styles'),
+    ...(appConfig.scripts as ExtraEntryPoint[])
+      .filter(entry => !entry.lazy)
+      .map(entry => entry.bundleName || 'scripts'),
+  ].forEach(bundleName => {
+    if (entryPoints.indexOf(bundleName) === -1) {
+      entryPoints.push(bundleName);
+    }
+  });
 
   entryPoints.push('main');
 
