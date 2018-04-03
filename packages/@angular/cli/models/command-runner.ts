@@ -76,7 +76,9 @@ export async function runCommand(commandMap: CommandMap,
     return await runHelp(command, options);
   } else {
     verifyCommandInScope(command, executionScope);
-    verifyWorkspace(command, executionScope, context.project.root);
+    if (!command.allowMissingWorkspace) {
+      verifyWorkspace(command, executionScope, context.project.root);
+    }
     delete options.h;
     delete options.help;
     return await validateAndRunCommand(command, options);

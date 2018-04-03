@@ -20,6 +20,7 @@ export enum ArgumentStrategy {
 
 export abstract class Command {
   protected _rawArgs: string[];
+  public allowMissingWorkspace = false;
 
   constructor(context: CommandContext, logger: logging.Logger) {
     this.logger = logger;
