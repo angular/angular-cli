@@ -16,6 +16,7 @@ export default class UpdateCommand extends SchematicCommand {
   public readonly options: Option[] = [
     ...this.coreOptions,
   ];
+  public readonly allowMissingWorkspace = true;
 
   public async run(options: UpdateOptions) {
     const collectionName = '@schematics/update';

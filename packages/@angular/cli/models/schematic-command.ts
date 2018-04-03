@@ -299,8 +299,23 @@ export abstract class SchematicCommand extends Command {
     }
     const workspaceLoader = new WorkspaceLoader(this._host);
 
-    workspaceLoader.loadWorkspace().pipe(take(1))
-      .subscribe((workspace: experimental.workspace.Workspace) => this._workspace = workspace);
+    try {
+      workspaceLoader.loadWorkspace().pipe(take(1))
+        .subscribe(
+          (workspace: experimental.workspace.Workspace) => this._workspace = workspace,
+          (err: Error) => {
+            if (!this.allowMissingWorkspace) {
+              // Ignore missing workspace
+              throw err;
+            }
+          }
+        );
+    } catch (err) {
+      if (!this.allowMissingWorkspace) {
+        // Ignore missing workspace
+        throw err;
+      }
+    }
   }
 
   private readDefaults(collectionName: string, schematicName: string, options: any): any {
