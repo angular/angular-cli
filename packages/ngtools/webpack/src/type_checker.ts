@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import chalk from 'chalk';
+import { terminal } from '@angular-devkit/core';
 import * as ts from 'typescript';
 import { time, timeEnd } from './benchmark';
 import { WebpackCompilerHost } from './compiler_host';
@@ -21,11 +21,6 @@ import {
 
 
 // This file should run in a child process with the AUTO_START_ARG argument
-
-// Force basic color support on terminals with no color support.
-// Chalk typings don't have the correct constructor parameters.
-const chalkCtx = new (chalk.constructor)(chalk.supportsColor ? {} : { level: 1 });
-const { bold, red, yellow } = chalkCtx;
 
 
 export enum MESSAGE_KIND {
@@ -125,7 +120,7 @@ export class TypeChecker {
 
       if (errors.length > 0) {
         const message = formatDiagnostics(errors);
-        console.error(bold(red('ERROR in ' + message)));
+        console.error(terminal.bold(terminal.red('ERROR in ' + message)));
       } else {
         // Reset the changed file tracker only if there are no errors.
         this._compilerHost.resetChangedFileTracker();
@@ -133,7 +128,7 @@ export class TypeChecker {
 
       if (warnings.length > 0) {
         const message = formatDiagnostics(warnings);
-        console.log(bold(yellow('WARNING in ' + message)));
+        console.log(terminal.bold(terminal.yellow('WARNING in ' + message)));
       }
     }
   }

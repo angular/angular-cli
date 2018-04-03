@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { satisfies } from 'semver';
 import * as ts from 'typescript';
 import { elideImports } from './elide_imports';
 import {
@@ -18,10 +17,11 @@ import {
 } from './interfaces';
 
 
-// Typescript below 2.5.0 needs a workaround.
-const visitEachChild = satisfies(ts.version, '^2.5.0')
-  ? ts.visitEachChild
-  : visitEachChildWorkaround;
+// Typescript below 2.7.0 needs a workaround.
+const tsVersionParts = ts.version.split('.').map(p => Number(p));
+const visitEachChild = tsVersionParts[0] <= 2 && tsVersionParts[1] < 7
+  ? visitEachChildWorkaround
+  : ts.visitEachChild;
 
 export function makeTransform(
   standardTransform: StandardTransform,
