@@ -84,7 +84,7 @@ You can access them by @Inject
 
 ```ts
 import { Request } from 'express';
-import { REQUEST } from '@nguniversal/express-engine';
+import { REQUEST } from '@nguniversal/express-engine/tokens';
 
 @Injectable()
 export class RequestService {

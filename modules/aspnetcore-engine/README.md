@@ -361,9 +361,9 @@ Don't forget that the server needs Absolute URLs for paths when doing Http reque
 As for the REQUEST object, you'll find Cookies, Headers, and Host (from .NET that we passed down in our HomeController. They'll all be accessible from that Injection Token as well.
 
 ```typescript
-  import { REQUEST } from '@nguniversal/aspnetcore-engine';
+  import { REQUEST } from '@nguniversal/aspnetcore-engine/tokens';
 
-  constructor(@Inject(REQUEST) private request) { 
+  constructor(@Inject(REQUEST) private request) {
     // this.request.cookies
     // this.request.headers
     // etc
