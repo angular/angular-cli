@@ -11,6 +11,7 @@ import { Observable, of } from 'rxjs';
 import { concatMap, tap } from 'rxjs/operators';
 import * as fs from 'fs';
 import { homedir } from 'os';
+import { stripIndent } from 'common-tags';
 import { findUp } from '../utilities/find-up';
 
 
@@ -38,6 +39,7 @@ export class WorkspaceLoader {
 
   // TODO: do this with the host instead of fs.
   private _getProjectWorkspaceFilePath(projectPath?: string): Observable<Path | null> {
+    this._assertUpdatedWorkspace(projectPath);
     // Find the workspace file, either where specified, in the Angular CLI project
     // (if it's in node_modules) or from the current process.
     const workspaceFilePath = (projectPath && findUp(this._configFileNames, projectPath))
@@ -80,5 +82,27 @@ export class WorkspaceLoader {
     return workspace.loadWorkspaceFromHost(workspaceFileName).pipe(
       tap(workspace => this._workspaceCacheMap.set(workspacePath, workspace))
     );
+  }
+
+  private _assertUpdatedWorkspace(projectPath?: string) {
+    const oldConfigFileNames = [
+      normalize('.angular-cli.json'),
+      normalize('angular-cli.json'),
+    ];
+
+    const oldConfigFilePath = (projectPath && findUp(oldConfigFileNames, projectPath))
+      || findUp(oldConfigFileNames, process.cwd())
+      || findUp(oldConfigFileNames, __dirname);
+
+    if (oldConfigFilePath) {
+      throw new Error(stripIndent`
+        An old project has been detected, which needs to be updated to Angular CLI 6.
+
+        Please run the following commands to update this project.
+
+          ng update @angular/cli --migrate-only --from=1.7.1
+          npm i
+      `);
+    }
   }
 }
