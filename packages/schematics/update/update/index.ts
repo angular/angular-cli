@@ -202,7 +202,7 @@ function _performUpdate(
   });
 
   const newContent = JSON.stringify(packageJson, null, 2);
-  if (packageJsonContent.toString() != newContent) {
+  if (packageJsonContent.toString() != newContent || migrateOnly) {
     let installTask: TaskId[] = [];
     if (!migrateOnly) {
       // If something changed, also hook up the task.
@@ -239,7 +239,7 @@ function _performUpdate(
   return of<void>(undefined);
 }
 
-function _migrate(
+function _migrateOnly(
   info: PackageInfo | undefined,
   context: SchematicContext,
   from: string,
@@ -248,7 +248,8 @@ function _migrate(
   if (!info) {
     return of<void>();
   }
-  const target = info.target;
+
+  const target = info.installed;
   if (!target || !target.updateMetadata.migrations) {
     return of<void>(undefined);
   }
@@ -661,7 +662,12 @@ export default function(options: UpdateSchema): Rule {
         // Now that we have all the information, check the flags.
         if (packages.size > 0) {
           if (options.migrateOnly && options.from && options.packages) {
-            return _migrate(infoMap.get(options.packages[0]), context, options.from, options.to);
+            return _migrateOnly(
+              infoMap.get(options.packages[0]),
+              context,
+              options.from,
+              options.to,
+            );
           }
 
           const sublog = new logging.LevelCapLogger(

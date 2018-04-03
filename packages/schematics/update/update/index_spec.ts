@@ -125,7 +125,7 @@ describe('@schematics/update', () => {
     // Add the basic migration package.
     const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
     const packageJson = JSON.parse(content);
-    packageJson['dependencies']['@angular-devkit-tests/update-migrations'] = '1.0.0';
+    packageJson['dependencies']['@angular-devkit-tests/update-migrations'] = '1.6.0';
     host.sync.write(
       normalize('/package.json'),
       virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
@@ -139,7 +139,7 @@ describe('@schematics/update', () => {
       map(tree => {
         const packageJson = JSON.parse(tree.readContent('/package.json'));
         expect(packageJson['dependencies']['@angular-devkit-tests/update-migrations'])
-          .toBe('1.0.0');
+          .toBe('1.6.0');
 
         // Check install task.
         expect(schematicRunner.tasks).toEqual([
