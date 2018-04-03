@@ -22,8 +22,8 @@ export default function () {
         { input: 'src/string-style.css' },
         { input: 'src/input-style.css' },
         { input: 'src/lazy-style.css', lazy: true },
-        { input: 'src/pre-rename-style.css', output: 'renamed-style' },
-        { input: 'src/pre-rename-lazy-style.css', output: 'renamed-lazy-style', lazy: true }
+        { input: 'src/pre-rename-style.css', bundleName: 'renamed-style' },
+        { input: 'src/pre-rename-lazy-style.css', bundleName: 'renamed-lazy-style', lazy: true }
       ];
     }))
     .then(() => ng('build', '--extract-css'))
@@ -32,7 +32,10 @@ export default function () {
     .then(() => expectFileToMatch('dist/test-project/styles.css', '.input-style'))
     .then(() => expectFileToMatch('dist/test-project/lazy-style.css', '.lazy-style'))
     .then(() => expectFileToMatch('dist/test-project/renamed-style.css', '.pre-rename-style'))
-    .then(() => expectFileToMatch('dist/test-project/renamed-lazy-style.css', '.pre-rename-lazy-style'))
+    .then(() => expectFileToMatch(
+      'dist/test-project/renamed-lazy-style.css',
+      '.pre-rename-lazy-style',
+    ))
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/test-project/index.html', oneLineTrim`
       <link rel="stylesheet" href="styles.css">

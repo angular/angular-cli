@@ -7,8 +7,7 @@ import {
   normalize,
   virtualFs
 } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { Observable, of } from 'rxjs';
 import { concatMap, tap } from 'rxjs/operators';
 import * as fs from 'fs';
 import { homedir } from 'os';

@@ -1,9 +1,10 @@
 import * as child_process from 'child_process';
 import {blue, yellow} from 'chalk';
-import {Subject, Observable} from 'rxjs';
+import {Observable, concat, defer, EMPTY, from} from 'rxjs';
+import {repeat, takeLast} from 'rxjs/operators';
 import {getGlobalVariable} from './env';
 import {rimraf} from './fs';
-import {wait} from './utils';
+import {catchError} from "rxjs/internal/operators";
 const treeKill = require('tree-kill');
 
 
@@ -152,16 +153,17 @@ export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: 
     // happened just before the build (e.g. `git clean`).
     // This seems to be due to host file system differences, see
     // https://nodejs.org/docs/latest/api/fs.html#fs_caveats
-    return Observable.fromPromise(_exec({ waitForMatch: match }, cmd, args))
-      .concat(
-        Observable.defer(() =>
-          Observable.fromPromise(waitForAnyProcessOutputToMatch(match, 2500))
-            .repeat(20)
-            .catch(_x => Observable.empty())
-        )
-      )
-      .takeLast(1)
-      .toPromise();
+    return concat(
+      from(
+        _exec({ waitForMatch: match }, cmd, args)
+      ),
+      defer(() => waitForAnyProcessOutputToMatch(match, 2500)).pipe(
+        repeat(20),
+        catchError(() => EMPTY),
+      ),
+    ).pipe(
+      takeLast(1),
+    ).toPromise();
   } else {
     return _exec({ waitForMatch: match }, cmd, args);
   }

@@ -1,11 +1,14 @@
 import { experimental } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
-import { Architect, TargetSpecifier } from '@angular-devkit/architect';
+import {
+  Architect, BuilderDescription, BuildEvent,
+  TargetSpecifier
+} from '@angular-devkit/architect';
 import { Command, Option } from './command';
-import { from } from 'rxjs/observable/from';
+import { of } from 'rxjs';
+import { from } from 'rxjs';
 import { concatMap, map, tap, toArray } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
-import { of } from 'rxjs/observable/of';
 const stringUtils = require('ember-cli-string-utils');
 
 
@@ -31,7 +34,7 @@ export abstract class ArchitectCommand extends Command {
 
   target: string | undefined;
 
-  public async initialize(options: any) {
+  public async initialize(options: any): Promise<void> {
     return this._loadWorkspaceAndArchitect().pipe(
       concatMap(() => {
         let targetSpec: TargetSpecifier;
@@ -64,10 +67,11 @@ export abstract class ArchitectCommand extends Command {
         const builderConfig = this._architect.getBuilderConfiguration(targetSpec);
 
         return this._architect.getBuilderDescription(builderConfig).pipe(
-          tap((builderDesc) => this.mapArchitectOptions(builderDesc.schema))
+          tap<BuilderDescription>(builderDesc => { this.mapArchitectOptions(builderDesc.schema); })
         );
       })
-    ).toPromise();
+    ).toPromise()
+      .then(() => {});
   }
 
   public validate(options: any) {
@@ -148,9 +152,10 @@ export abstract class ArchitectCommand extends Command {
 
   protected async runArchitectTarget(targetSpec: TargetSpecifier): Promise<number> {
     const runSingleTarget = (targetSpec: TargetSpecifier) => this._architect.run(
-      this._architect.getBuilderConfiguration(targetSpec), { logger: this._logger }
+      this._architect.getBuilderConfiguration(targetSpec),
+      { logger: this._logger }
     ).pipe(
-      map(buildEvent => buildEvent.success ? 0 : 1)
+      map((buildEvent: BuildEvent) => buildEvent.success ? 0 : 1)
     );
 
     if (!targetSpec.project && this.target) {
@@ -174,9 +179,11 @@ export abstract class ArchitectCommand extends Command {
     const workspaceLoader = new WorkspaceLoader(this._host);
 
     return workspaceLoader.loadWorkspace().pipe(
-      tap(workspace => this._workspace = workspace),
-      concatMap(workspace => new Architect(workspace).loadArchitect()),
-      tap(architect => this._architect = architect),
+      tap((workspace: experimental.workspace.Workspace) => this._workspace = workspace),
+      concatMap((workspace: experimental.workspace.Workspace) => {
+        return new Architect(workspace).loadArchitect();
+      }),
+      tap((architect: Architect) => this._architect = architect),
     );
   }
 }
