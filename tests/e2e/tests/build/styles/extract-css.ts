@@ -13,20 +13,20 @@ export default function () {
 
   return Promise.resolve()
     .then(() => writeMultipleFiles({
-      'projects/test-project/src/string-style.css': '.string-style { color: red }',
-      'projects/test-project/src/input-style.css': '.input-style { color: red }',
-      'projects/test-project/src/lazy-style.css': '.lazy-style { color: red }',
-      'projects/test-project/src/pre-rename-style.css': '.pre-rename-style { color: red }',
-      'projects/test-project/src/pre-rename-lazy-style.css': '.pre-rename-lazy-style { color: red }'
+      'src/string-style.css': '.string-style { color: red }',
+      'src/input-style.css': '.input-style { color: red }',
+      'src/lazy-style.css': '.lazy-style { color: red }',
+      'src/pre-rename-style.css': '.pre-rename-style { color: red }',
+      'src/pre-rename-lazy-style.css': '.pre-rename-lazy-style { color: red }'
     }))
     .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.styles = [
-        { input: 'projects/test-project/src/string-style.css' },
-        { input: 'projects/test-project/src/input-style.css' },
-        { input: 'projects/test-project/src/lazy-style.css', lazy: true },
-        { input: 'projects/test-project/src/pre-rename-style.css', output: 'renamed-style' },
-        { input: 'projects/test-project/src/pre-rename-lazy-style.css', output: 'renamed-lazy-style', lazy: true }
+        { input: 'src/string-style.css' },
+        { input: 'src/input-style.css' },
+        { input: 'src/lazy-style.css', lazy: true },
+        { input: 'src/pre-rename-style.css', output: 'renamed-style' },
+        { input: 'src/pre-rename-lazy-style.css', output: 'renamed-lazy-style', lazy: true }
       ];
     }))
     .then(() => ng('build', '--extract-css'))

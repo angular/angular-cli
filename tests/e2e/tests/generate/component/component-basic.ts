@@ -4,7 +4,7 @@ import {expectFileToExist, expectFileToMatch} from '../../../utils/fs';
 
 
 export default function() {
-  const projectDir = join('projects', 'test-project', 'src', 'app');
+  const projectDir = join('src', 'app');
   const componentDir = join(projectDir, 'test-component');
 
   const importCheck =

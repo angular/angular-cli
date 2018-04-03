@@ -17,10 +17,10 @@ export default function() {
     .then(() => oldNumberOfFiles = readdirSync('dist/test-project').length)
     .then(() => ng('generate', 'module', 'lazyA', '--routing'))
     .then(() => ng('generate', 'module', 'lazyB', '--routing'))
-    .then(() => prependToFile('projects/test-project/src/app/app.module.ts', `
+    .then(() => prependToFile('src/app/app.module.ts', `
       import { RouterModule } from '@angular/router';
     `))
-    .then(() => replaceInFile('projects/test-project/src/app/app.module.ts', 'imports: [', `imports: [
+    .then(() => replaceInFile('src/app/app.module.ts', 'imports: [', `imports: [
       RouterModule.forRoot([{ path: "lazyA", loadChildren: "./lazy-a/lazy-a.module#LazyAModule" }]),
       RouterModule.forRoot([{ path: "lazyB", loadChildren: "./lazy-b/lazy-b.module#LazyBModule" }]),
     `))
@@ -33,7 +33,7 @@ export default function() {
       oldNumberOfFiles = currentNumberOfDistFiles;
     })
     .then(() => silentNpm('install', 'moment'))
-    .then(() => appendToFile('projects/test-project/src/app/lazy-a/lazy-a.module.ts', `
+    .then(() => appendToFile('src/app/lazy-a/lazy-a.module.ts', `
       import * as moment from 'moment';
       console.log(moment);
     `))
@@ -44,7 +44,7 @@ export default function() {
         throw new Error('The build contains a different number of files.');
       }
     })
-    .then(() => appendToFile('projects/test-project/src/app/lazy-b/lazy-b.module.ts', `
+    .then(() => appendToFile('src/app/lazy-b/lazy-b.module.ts', `
       import * as moment from 'moment';
       console.log(moment);
     `))

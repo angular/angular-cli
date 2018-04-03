@@ -50,11 +50,11 @@ export default function() {
   // First, collect the hashes.
   return Promise.resolve()
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
-    .then(() => prependToFile('projects/test-project/src/app/app.module.ts', `
+    .then(() => prependToFile('src/app/app.module.ts', `
       import { RouterModule } from '@angular/router';
       import { ReactiveFormsModule } from '@angular/forms';
     `))
-    .then(() => replaceInFile('projects/test-project/src/app/app.module.ts', 'imports: [', `imports: [
+    .then(() => replaceInFile('src/app/app.module.ts', 'imports: [', `imports: [
       RouterModule.forRoot([{ path: "lazy", loadChildren: "./lazy/lazy.module#LazyModule" }]),
       ReactiveFormsModule,
     `))
@@ -70,7 +70,7 @@ export default function() {
       validateHashes(oldHashes, newHashes, []);
       oldHashes = newHashes;
     })
-    .then(() => writeFile('projects/test-project/src/styles.css', 'body { background: blue; }'))
+    .then(() => writeFile('src/styles.css', 'body { background: blue; }'))
     .then(() => ng('build', '--output-hashing=all'))
     .then(() => {
       newHashes = generateFileHashMap();
@@ -79,7 +79,7 @@ export default function() {
       validateHashes(oldHashes, newHashes, ['styles']);
       oldHashes = newHashes;
     })
-    .then(() => writeFile('projects/test-project/src/app/app.component.css', 'h1 { margin: 10px; }'))
+    .then(() => writeFile('src/app/app.component.css', 'h1 { margin: 10px; }'))
     .then(() => ng('build', '--output-hashing=all'))
     .then(() => {
       newHashes = generateFileHashMap();
@@ -88,10 +88,10 @@ export default function() {
       validateHashes(oldHashes, newHashes, ['main']);
       oldHashes = newHashes;
     })
-    .then(() => prependToFile('projects/test-project/src/app/lazy/lazy.module.ts', `
+    .then(() => prependToFile('src/app/lazy/lazy.module.ts', `
       import { ReactiveFormsModule } from '@angular/forms';
     `))
-    .then(() => replaceInFile('projects/test-project/src/app/lazy/lazy.module.ts', 'imports: [', `
+    .then(() => replaceInFile('src/app/lazy/lazy.module.ts', 'imports: [', `
       imports: [
          ReactiveFormsModule,
     `))

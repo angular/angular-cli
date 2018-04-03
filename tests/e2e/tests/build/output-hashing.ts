@@ -11,10 +11,10 @@ function verifyMedia(fileNameRe: RegExp, content: RegExp) {
 export default function() {
   return Promise.resolve()
     .then(() => writeMultipleFiles({
-      'projects/test-project/src/styles.css': 'body { background-image: url("./assets/image.png"); }'
+      'src/styles.css': 'body { background-image: url("./assets/image.png"); }'
     }))
     // use image with file size >10KB to prevent inlining
-    .then(() => copyProjectAsset('images/spectrum.png', './projects/test-project/src/assets/image.png'))
+    .then(() => copyProjectAsset('images/spectrum.png', './src/assets/image.png'))
     .then(() => ng('build', '--output-hashing=all'))
     .then(() => expectFileToMatch('dist/test-project/index.html', /runtime\.[0-9a-f]{20}\.js/))
     .then(() => expectFileToMatch('dist/test-project/index.html', /main\.[0-9a-f]{20}\.js/))

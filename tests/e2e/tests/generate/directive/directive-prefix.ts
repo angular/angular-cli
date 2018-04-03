@@ -5,7 +5,7 @@ import { updateJsonFile } from '../../../utils/project';
 
 
 export default function() {
-  const directiveDir = join('projects', 'test-project', 'src', 'app');
+  const directiveDir = join('src', 'app');
 
   return Promise.resolve()
     .then(() => updateJsonFile('angular.json', configJson => {

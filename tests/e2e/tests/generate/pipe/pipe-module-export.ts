@@ -4,7 +4,7 @@ import {expectFileToMatch} from '../../../utils/fs';
 
 
 export default function() {
-  const modulePath = join('projects', 'test-project', 'src', 'app', 'app.module.ts');
+  const modulePath = join('src', 'app', 'app.module.ts');
 
   return ng('generate', 'pipe', 'test-pipe', '--export')
     .then(() => expectFileToMatch(modulePath, 'exports: [TestPipePipe]'))

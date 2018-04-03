@@ -18,20 +18,20 @@ export default function () {
   return Promise.resolve()
     // Verify absolute/relative paths in global/component css.
     .then(() => writeMultipleFiles({
-      'projects/test-project/src/styles.css': `
+      'src/styles.css': `
         h1 { background: url('/assets/global-img-absolute.svg'); }
         h2 { background: url('./assets/global-img-relative.png'); }
       `,
-      'projects/test-project/src/app/app.component.css': `
+      'src/app/app.component.css': `
         h3 { background: url('/assets/component-img-absolute.svg'); }
         h4 { background: url('../assets/component-img-relative.png'); }
       `,
-      'projects/test-project/src/assets/global-img-absolute.svg': imgSvg,
-      'projects/test-project/src/assets/component-img-absolute.svg': imgSvg
+      'src/assets/global-img-absolute.svg': imgSvg,
+      'src/assets/component-img-absolute.svg': imgSvg
     }))
     // use image with file size >10KB to prevent inlining
-    .then(() => copyProjectAsset('images/spectrum.png', './projects/test-project/src/assets/global-img-relative.png'))
-    .then(() => copyProjectAsset('images/spectrum.png', './projects/test-project/src/assets/component-img-relative.png'))
+    .then(() => copyProjectAsset('images/spectrum.png', './src/assets/global-img-relative.png'))
+    .then(() => copyProjectAsset('images/spectrum.png', './src/assets/component-img-relative.png'))
     .then(() => ng('build', '--extract-css', '--aot'))
     // Check paths are correctly generated.
     .then(() => expectFileToMatch('dist/test-project/styles.css', 'assets/global-img-absolute.svg'))

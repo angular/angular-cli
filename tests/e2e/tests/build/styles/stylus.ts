@@ -13,28 +13,28 @@ export default function () {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   return writeMultipleFiles({
-    'projects/test-project/src/styles.styl': stripIndents`
+    'src/styles.styl': stripIndents`
       @import './imported-styles.styl';
       body { background-color: blue; }
     `,
-    'projects/test-project/src/imported-styles.styl': stripIndents`
+    'src/imported-styles.styl': stripIndents`
       p { background-color: red; }
     `,
-    'projects/test-project/src/app/app.component.styl': stripIndents`
+    'src/app/app.component.styl': stripIndents`
         .outer {
           .inner {
             background: #fff;
           }
         }
       `})
-    .then(() => deleteFile('projects/test-project/src/app/app.component.css'))
+    .then(() => deleteFile('src/app/app.component.css'))
     .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.styles = [
-        { input: 'projects/test-project/src/styles.styl' }
+        { input: 'src/styles.styl' }
       ];
     }))
-    .then(() => replaceInFile('projects/test-project/src/app/app.component.ts',
+    .then(() => replaceInFile('src/app/app.component.ts',
       './app.component.css', './app.component.styl'))
     .then(() => ng('build', '--extract-css', '--source-map'))
     .then(() => expectFileToMatch('dist/test-project/styles.css',

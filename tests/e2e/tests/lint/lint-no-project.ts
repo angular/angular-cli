@@ -25,8 +25,8 @@ export default function () {
       return stdout;
     })
     .then(() => ng('config', 'lint.0.files', '"**/baz.ts"'))
-    .then(() => writeFile('projects/test-project/src/app/foo.ts', 'const foo = "";\n'))
-    .then(() => writeFile('projects/test-project/src/app/baz.ts', 'const baz = \'\';\n'))
+    .then(() => writeFile('src/app/foo.ts', 'const foo = "";\n'))
+    .then(() => writeFile('src/app/baz.ts', 'const baz = \'\';\n'))
     .then(() => ng('lint', 'app'))
     .then(() => ng('config', 'lint.0.files', '"**/foo.ts"'))
     .then(() => expectToFail(() => ng('lint', 'app')));

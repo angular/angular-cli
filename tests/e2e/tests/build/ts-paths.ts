@@ -21,13 +21,13 @@ export default function() {
       ]
     };
   })
-  .then(() => createDir('projects/test-project/src/app/shared'))
+  .then(() => createDir('src/app/shared'))
   .then(() => writeMultipleFiles({
-    'projects/test-project/src/meaning-too.ts': 'export var meaning = 42;',
-    'projects/test-project/src/app/shared/meaning.ts': 'export var meaning = 42;',
-    'projects/test-project/src/app/shared/index.ts': `export * from './meaning'`,
+    'src/meaning-too.ts': 'export var meaning = 42;',
+    'src/app/shared/meaning.ts': 'export var meaning = 42;',
+    'src/app/shared/index.ts': `export * from './meaning'`,
   }))
-  .then(() => replaceInFile('projects/test-project/src/app/app.module.ts', './app.component', '@root/app/app.component'))
+  .then(() => replaceInFile('src/app/app.module.ts', './app.component', '@root/app/app.component'))
   .then(() => ng('build'))
   .then(() => updateTsConfig(json => {
     json['compilerOptions']['paths']['*'] = [
@@ -35,7 +35,7 @@ export default function() {
       'app/shared/*'
     ];
   }))
-  .then(() => appendToFile('projects/test-project/src/app/app.component.ts', stripIndents`
+  .then(() => appendToFile('src/app/app.component.ts', stripIndents`
     import { meaning } from 'app/shared/meaning';
     import { meaning as meaning2 } from '@shared';
     import { meaning as meaning3 } from '@shared/meaning';
