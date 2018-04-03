@@ -104,15 +104,17 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       asset.input = asset.input.endsWith('/') ? asset.input : asset.input + '/';
       asset.output = asset.output.endsWith('/') ? asset.output : asset.output + '/';
 
-      if (!asset.output.startsWith('/')) {
+      if (asset.output.startsWith('..')) {
         const message = 'An asset cannot be written to a location outside of the . '
           + 'You can override this message by setting the `allowOutsideOutDir` '
           + 'property on the asset to true in the CLI configuration.';
         throw new Error(message);
       }
 
-      // Now we remove starting slash to make Webpack place it from the output root.
-      asset.output = asset.output.slice(1);
+      if (asset.output.startsWith('/')) {
+        // Now we remove starting slash to make Webpack place it from the output root.
+        asset.output = asset.output.slice(1);
+      }
 
       return {
         context: asset.input,
