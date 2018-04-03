@@ -7,12 +7,15 @@ import {
   ArgumentStrategy
 } from '../models/command';
 import { oneLine } from 'common-tags';
-import { logging } from '@angular-devkit/core';
+import { logging, normalize, tags } from '@angular-devkit/core';
 import { camelize } from '@angular-devkit/core/src/utils/strings';
+import { findUp } from '../utilities/find-up';
 
 import * as yargsParser from 'yargs-parser';
 import * as fs from 'fs';
 import { join } from 'path';
+
+const SilentError = require('silent-error');
 
 export interface CommandMap {
   [key: string]: CommandConstructor;
@@ -204,7 +207,7 @@ function verifyCommandInScope(command: Command, scope = CommandScope.everywhere)
       } else {
         errorMessage = `This command can not be run inside of a CLI project.`;
       }
-      throw new Error(errorMessage);
+      throw new SilentError(errorMessage);
     }
   }
 }
@@ -220,7 +223,30 @@ function verifyWorkspace(command: Command, executionScope: CommandScope, root: s
     if (fs.existsSync(join(root, '.angular.json'))) {
       return;
     }
-    throw new Error('Invalid project: missing workspace file.');
+
+    // Check if there's an old config file meaning that the project has not been updated
+    const oldConfigFileNames = [
+      normalize('.angular-cli.json'),
+      normalize('angular-cli.json'),
+    ];
+    const oldConfigFilePath = (root && findUp(oldConfigFileNames, root, true))
+      || findUp(oldConfigFileNames, process.cwd(), true)
+      || findUp(oldConfigFileNames, __dirname, true);
+
+    // If an old configuration file is found, throw an exception.
+    if (oldConfigFilePath) {
+      throw new SilentError(tags.stripIndent`
+        An old project has been detected, which needs to be updated to Angular CLI 6.
+
+        Please run the following commands to update this project.
+
+          ng update @angular/cli --migrate-only --from=1.7.1
+          npm i
+      `);
+    }
+
+    // If no configuration file is found (old or new), throw an exception.
+    throw new SilentError('Invalid project: missing workspace file.');
   }
 }
 
@@ -233,7 +259,7 @@ async function runHelp(command: Command, options: any): Promise<void> {
 async function validateAndRunCommand(command: Command, options: any): Promise<any> {
   const isValid = await command.validate(options);
   if (isValid !== undefined && !isValid) {
-    throw new Error(`Validation error. Invalid command`);
+    throw new SilentError(`Validation error. Invalid command`);
   }
   return await command.run(options);
 }
