@@ -20,8 +20,8 @@ export default function () {
         production: {
           fileReplacements: [
             {
-              from: 'src/environments/environment.ts',
-              to: 'src/environments/environment.prod.ts'
+              src: 'src/environments/environment.ts',
+              replaceWith: 'src/environments/environment.prod.ts'
             }
           ],
         }
