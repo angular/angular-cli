@@ -12,50 +12,50 @@ export default function () {
   return;
 
   return Promise.resolve()
-    .then(() => createDir('projects/test-project/src/style-paths'))
+    .then(() => createDir('src/style-paths'))
     .then(() => writeMultipleFiles({
-      'projects/test-project/src/style-paths/_variables.scss': '$primary-color: red;',
-      'projects/test-project/src/styles.scss': `
+      'src/style-paths/_variables.scss': '$primary-color: red;',
+      'src/styles.scss': `
       @import 'variables';
       h1 { color: $primary-color; }
     `,
-      'projects/test-project/src/app/app.component.scss': `
+      'src/app/app.component.scss': `
       @import 'variables';
       h2 { background-color: $primary-color; }
     `,
-      'projects/test-project/src/style-paths/variables.styl': '$primary-color = green',
-      'projects/test-project/src/styles.styl': `
+      'src/style-paths/variables.styl': '$primary-color = green',
+      'src/styles.styl': `
       @import 'variables'
       h3
         color: $primary-color
     `,
-      'projects/test-project/src/app/app.component.styl': `
+      'src/app/app.component.styl': `
       @import 'variables'
       h4
         background-color: $primary-color
     `,
-      'projects/test-project/src/style-paths/variables.less': '@primary-color: #ADDADD;',
-      'projects/test-project/src/styles.less': `
+      'src/style-paths/variables.less': '@primary-color: #ADDADD;',
+      'src/styles.less': `
       @import 'variables';
       h5 { color: @primary-color; }
     `,
-      'projects/test-project/src/app/app.component.less': `
+      'src/app/app.component.less': `
       @import 'variables';
       h6 { color: @primary-color; }
     `
     }))
-    .then(() => replaceInFile('projects/test-project/src/app/app.component.ts', `'./app.component.css\'`,
+    .then(() => replaceInFile('src/app/app.component.ts', `'./app.component.css\'`,
       `'./app.component.scss', './app.component.styl', './app.component.less'`))
     .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.styles = [
-        { input: 'projects/test-project/src/styles.scss' },
-        { input: 'projects/test-project/src/styles.styl' },
-        { input: 'projects/test-project/src/styles.less' },
+        { input: 'src/styles.scss' },
+        { input: 'src/styles.styl' },
+        { input: 'src/styles.less' },
       ];
       appArchitect.build.options.stylePreprocessorOptions = {
         includePaths: [
-          'projects/test-project/src/style-paths'
+          'src/style-paths'
         ]
       };
     }))

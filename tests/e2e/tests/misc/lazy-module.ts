@@ -11,11 +11,11 @@ export default function() {
     .then(() => oldNumberOfFiles = readdirSync('dist').length)
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
     .then(() => ng('generate', 'module', 'too/lazy', '--routing'))
-    .then(() => prependToFile('projects/test-project/src/app/app.module.ts', `
+    .then(() => prependToFile('src/app/app.module.ts', `
       import { RouterModule } from '@angular/router';
     `))
-    .then(() => replaceInFile('projects/test-project/src/app/app.module.ts', 'imports: [', `imports: [
-      RouterModule.forRoot([{ path: "lazy", loadChildren: "projects/test-project/src/app/lazy/lazy.module#LazyModule" }]),
+    .then(() => replaceInFile('src/app/app.module.ts', 'imports: [', `imports: [
+      RouterModule.forRoot([{ path: "lazy", loadChildren: "src/app/lazy/lazy.module#LazyModule" }]),
       RouterModule.forRoot([{ path: "lazy1", loadChildren: "./lazy/lazy.module#LazyModule" }]),
       RouterModule.forRoot([{ path: "lazy2", loadChildren: "./too/lazy/lazy.module#LazyModule" }]),
     `))
@@ -36,8 +36,8 @@ export default function() {
       }
     })
     // verify System.import still works
-    .then(() => writeFile('projects/test-project/src/app/lazy-file.ts', ''))
-    .then(() => appendToFile('projects/test-project/src/app/app.component.ts', `
+    .then(() => writeFile('src/app/lazy-file.ts', ''))
+    .then(() => appendToFile('src/app/app.component.ts', `
       // verify other System.import still work
       declare var System: any;
       const lazyFile = 'file';
@@ -57,7 +57,7 @@ export default function() {
     })
     // verify 'import *' syntax doesn't break lazy modules
     .then(() => silentNpm('install', 'moment'))
-    .then(() => appendToFile('projects/test-project/src/app/app.component.ts', `
+    .then(() => appendToFile('src/app/app.component.ts', `
       import * as moment from 'moment';
       console.log(moment);
     `))

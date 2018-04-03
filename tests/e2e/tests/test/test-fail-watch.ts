@@ -17,13 +17,13 @@ export default function () {
 
   let originalSpec: string;
   return execAndWaitForOutputToMatch('ng', ['test'], karmaGoodRegEx)
-    .then(() => readFile('projects/test-project/src/app/app.component.spec.ts'))
+    .then(() => readFile('src/app/app.component.spec.ts'))
     .then((data) => originalSpec = data)
     // Trigger a failed rebuild, which shouldn't run tests again.
-    .then(() => writeFile('projects/test-project/src/app/app.component.spec.ts', '<p> definitely not typescript </p>'))
+    .then(() => writeFile('src/app/app.component.spec.ts', '<p> definitely not typescript </p>'))
     .then(() => expectToFail(() => waitForAnyProcessOutputToMatch(karmaGoodRegEx, 10000)))
     // Restore working spec.
-    .then(() => writeFile('projects/test-project/src/app/app.component.spec.ts', originalSpec))
+    .then(() => writeFile('src/app/app.component.spec.ts', originalSpec))
     .then(() => waitForAnyProcessOutputToMatch(karmaGoodRegEx, 20000))
     .then(() => killAllProcesses(), (err: any) => {
       killAllProcesses();

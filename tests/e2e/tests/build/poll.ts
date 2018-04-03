@@ -27,10 +27,10 @@ export default function() {
     // Wait before editing a file.
     // Editing too soon seems to trigger a rebuild and throw polling out of whack.
     .then(() => wait(3000))
-    .then(() => appendToFile('projects/test-project/src/main.ts', 'console.log(1);'))
+    .then(() => appendToFile('src/main.ts', 'console.log(1);'))
     // We have to wait poll time + rebuild build time for the regex match.
     .then(() => waitForAnyProcessOutputToMatch(webpackGoodRegEx, 14000))
-    .then(() => appendToFile('projects/test-project/src/main.ts', 'console.log(1);'))
+    .then(() => appendToFile('src/main.ts', 'console.log(1);'))
     // No rebuilds should occur for a while
     .then(() => expectToFail(() => waitForAnyProcessOutputToMatch(webpackGoodRegEx, 7000)))
     // But a rebuild should happen roughly within the 10 second window.

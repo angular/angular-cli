@@ -6,8 +6,8 @@ import {expectToFail} from '../../utils/utils';
 export default function() {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
-  return writeFile('projects/test-project/src/assets/.file', '')
-    .then(() => writeFile('projects/test-project/src/assets/test.abc', 'hello world'))
+  return writeFile('src/assets/.file', '')
+    .then(() => writeFile('src/assets/test.abc', 'hello world'))
     .then(() => ng('build'))
     .then(() => expectFileToExist('dist/test-project/favicon.ico'))
     .then(() => expectFileToExist('dist/test-project/assets/.file'))

@@ -6,10 +6,10 @@ export default function () {
   return ng('generate', 'component', 'test-component')
     .then((output) => {
       // tslint:disable-next-line:max-line-length
-      if (!output.stdout.match(/UPDATE projects[\\|\/]test-project[\\|\/]src[\\|\/]app[\\|\/]app.module.ts/)) {
+      if (!output.stdout.match(/UPDATE src[\\|\/]app[\\|\/]app.module.ts/)) {
         throw new Error(oneLine`
           Expected to match
-          "UPDATE projects/test-project/src/app.module.ts"
+          "UPDATE src/app.module.ts"
           in ${output.stdout}.`);
       }
     })

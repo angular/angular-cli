@@ -90,7 +90,7 @@ export default function () {
     // Add asset config in angular.json.
     .then(() => updateJsonFile('angular.json', workspaceJson => {
       const assets = [
-        { 'glob': '**/*', 'input': 'projects/test-project/src/folder', 'output': 'folder' },
+        { 'glob': '**/*', 'input': 'src/folder', 'output': 'folder' },
         { 'glob': 'glob-asset.txt' },
         { 'glob': 'output-asset.txt', 'output': 'output-folder' },
         { 'glob': '**/*', 'input': 'node_modules/some-package/', 'output': 'package-folder' }
@@ -111,7 +111,7 @@ export default function () {
     .then(() => expectToFail(() => expectFileToExist('dist/assets/.gitkeep')))
     // Update app to test assets are present.
     .then(_ => !ejected && writeMultipleFiles({
-      'projects/test-project/src/app/app.module.ts': `
+      'src/app/app.module.ts': `
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
         import { FormsModule } from '@angular/forms';
@@ -132,7 +132,7 @@ export default function () {
         })
         export class AppModule { }
       `,
-      'projects/test-project/src/app/app.component.ts': `
+      'src/app/app.component.ts': `
         import { Component } from '@angular/core';
         import { Http, Response } from '@angular/http';
 
@@ -152,7 +152,7 @@ export default function () {
               .subscribe(res => asset.content = res['_body']));
           }
         }`,
-      'projects/test-project/src/app/app.component.spec.ts': `
+      'src/app/app.component.spec.ts': `
         import { TestBed, async } from '@angular/core/testing';
         import { HttpModule } from '@angular/http';
         import { AppComponent } from './app.component';

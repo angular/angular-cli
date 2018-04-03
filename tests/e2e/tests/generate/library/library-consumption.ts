@@ -5,7 +5,7 @@ export default function () {
   return ng('generate', 'library', 'my-lib')
     .then(() => silentNpm('install'))
     .then(() => ng('build', 'my-lib'))
-    .then(() => writeFile('./projects/test-project/src/app/app.module.ts', `
+    .then(() => writeFile('./src/app/app.module.ts', `
       import { BrowserModule } from '@angular/platform-browser';
       import { NgModule } from '@angular/core';
       import { MyLibModule } from 'my-lib';
@@ -25,7 +25,7 @@ export default function () {
       })
       export class AppModule { }
     `))
-    .then(() => writeFile('./projects/test-project/src/app/app.component.ts', `
+    .then(() => writeFile('./src/app/app.component.ts', `
       import { Component } from '@angular/core';
       import { MyLibService } from 'my-lib';
 

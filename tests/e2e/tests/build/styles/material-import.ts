@@ -16,10 +16,10 @@ export default function () {
   extensions.forEach(ext => {
     promise = promise.then(() => {
       return writeMultipleFiles({
-        [`projects/test-project/src/styles.${ext}`]: stripIndents`
+        [`src/styles.${ext}`]: stripIndents`
           @import "~@angular/material/prebuilt-themes/indigo-pink.css";
         `,
-        [`projects/test-project/src/app/app.component.${ext}`]: stripIndents`
+        [`src/app/app.component.${ext}`]: stripIndents`
           @import "~@angular/material/prebuilt-themes/indigo-pink.css";
         `,
         })
@@ -27,18 +27,18 @@ export default function () {
         .then(() => updateJsonFile('angular.json', workspaceJson => {
           const appArchitect = workspaceJson.projects['test-project'].architect;
           appArchitect.build.options.styles = [
-            { input: `projects/test-project/src/styles.${ext}` }
+            { input: `src/styles.${ext}` }
           ];
         }))
-        .then(() => replaceInFile('projects/test-project/src/app/app.component.ts',
+        .then(() => replaceInFile('src/app/app.component.ts',
           './app.component.css', `./app.component.${ext}`))
         // run build app
         .then(() => ng('build', '--extract-css', '--source-map'))
         .then(() => writeMultipleFiles({
-          [`projects/test-project/src/styles.${ext}`]: stripIndents`
+          [`src/styles.${ext}`]: stripIndents`
             @import "@angular/material/prebuilt-themes/indigo-pink.css";
           `,
-          [`projects/test-project/src/app/app.component.${ext}`]: stripIndents`
+          [`src/app/app.component.${ext}`]: stripIndents`
             @import "@angular/material/prebuilt-themes/indigo-pink.css";
           `,
         }))

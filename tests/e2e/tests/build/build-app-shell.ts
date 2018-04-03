@@ -31,8 +31,8 @@ export default function () {
         builder: '@angular-devkit/build-angular:server',
         options: {
           outputPath: 'dist/test-project-server',
-          main: 'projects/test-project/src/main.server.ts',
-          tsConfig: 'projects/test-project/tsconfig.server.json'
+          main: 'src/main.server.ts',
+          tsConfig: 'src/tsconfig.server.json'
         }
       };
       appArchitect['app-shell'] = {
@@ -44,9 +44,9 @@ export default function () {
         }
       };
     }))
-    .then(() => writeFile('./projects/test-project/tsconfig.server.json', `
+    .then(() => writeFile('./src/tsconfig.server.json', `
       {
-        "extends": "../../tsconfig.json",
+        "extends": "../tsconfig.json",
         "compilerOptions": {
           "outDir": "../dist-server",
           "baseUrl": "./",
@@ -58,11 +58,11 @@ export default function () {
           "**/*.spec.ts"
         ],
         "angularCompilerOptions": {
-          "entryModule": "src/app/app.server.module#AppServerModule"
+          "entryModule": "app/app.server.module#AppServerModule"
         }
       }
     `))
-    .then(() => writeFile('./projects/test-project/src/main.server.ts', `
+    .then(() => writeFile('./src/main.server.ts', `
       import { enableProdMode } from '@angular/core';
 
       import { environment } from './environments/environment';
@@ -73,11 +73,11 @@ export default function () {
 
       export { AppServerModule } from './app/app.server.module';
     `))
-    .then(() => writeFile('projects/test-project/src/app/app.component.html', stripIndent`
+    .then(() => writeFile('./src/app/app.component.html', stripIndent`
       Hello World
       <router-outlet></router-outlet>
     `))
-    .then(() => writeFile('projects/test-project/src/app/app.module.ts', stripIndent`
+    .then(() => writeFile('./src/app/app.module.ts', stripIndent`
       import { BrowserModule } from '@angular/platform-browser';
       import { NgModule } from '@angular/core';
       import { RouterModule } from '@angular/router';
@@ -94,7 +94,7 @@ export default function () {
       })
       export class AppModule { }
     `))
-    .then(() => writeFile('projects/test-project/src/app/app.server.module.ts', stripIndent`
+    .then(() => writeFile('./src/app/app.server.module.ts', stripIndent`
       import {NgModule} from '@angular/core';
       import {ServerModule} from '@angular/platform-server';
       import { Routes, RouterModule } from '@angular/router';
@@ -122,7 +122,7 @@ export default function () {
       })
       export class AppServerModule {}
     `))
-    .then(() => writeFile('projects/test-project/src/app/shell.component.ts', stripIndent`
+    .then(() => writeFile('./src/app/shell.component.ts', stripIndent`
       import { Component } from '@angular/core';
       @Component({
         selector: 'app-shell',

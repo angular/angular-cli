@@ -5,7 +5,7 @@ import {updateJsonFile} from '../../../utils/project';
 
 
 export default function() {
-  const appDir = join('projects', 'test-project', 'src', 'app');
+  const appDir = join('src', 'app');
   return Promise.resolve()
     .then(() => updateJsonFile('angular.json', configJson => {
       configJson.projects['test-project'].schematics = {

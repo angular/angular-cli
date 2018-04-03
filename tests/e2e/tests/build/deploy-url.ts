@@ -8,10 +8,10 @@ import { getGlobalVariable } from '../../utils/env';
 export default function () {
   return Promise.resolve()
     .then(() => writeMultipleFiles({
-      'projects/test-project/src/styles.css': 'div { background: url("./assets/more.png"); }',
+      'src/styles.css': 'div { background: url("./assets/more.png"); }',
     }))
     // use image with file size >10KB to prevent inlining
-    .then(() => copyProjectAsset('images/spectrum.png', './projects/test-project/src/assets/more.png'))
+    .then(() => copyProjectAsset('images/spectrum.png', './src/assets/more.png'))
     .then(() => ng('build', '--deploy-url=deployUrl/', '--extract-css'))
     .then(() => expectFileToMatch('dist/test-project/index.html', 'deployUrl/main.js'))
     // verify --deploy-url isn't applied to extracted css urls

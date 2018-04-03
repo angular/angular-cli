@@ -18,7 +18,7 @@ export default function () {
     .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.test.options.codeCoverageExclude = [
-        'projects/test-project/src/polyfills.ts',
+        'src/polyfills.ts',
         '**/test.ts'
       ];
     }))

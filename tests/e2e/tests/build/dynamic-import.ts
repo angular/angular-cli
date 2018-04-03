@@ -10,12 +10,12 @@ export default async function() {
   await updateJsonFile('angular.json', workspaceJson => {
     const appArchitect = workspaceJson.projects['test-project'].architect;
     appArchitect.build.options.lazyModules = [
-      'projects/test-project/src/app/lazy/lazy.module'
+      'src/app/lazy/lazy.module'
     ];
   });
 
   // Update the app component to use the lazy module
-  await writeFile('projects/test-project/src/app/app.component.ts', `
+  await writeFile('src/app/app.component.ts', `
     import { Component, SystemJsNgModuleLoader } from '@angular/core';
 
     @Component({
@@ -36,7 +36,7 @@ export default async function() {
   // Build and look for the split lazy module
   await ng('build');
   for (const file of fs.readdirSync('./dist/test-project')) {
-    if (file === 'projects-test-project-src-app-lazy-lazy-module.js') {
+    if (file === 'src-app-lazy-lazy-module.js') {
       // Lazy module chunk was found and succesfully split
       return;
     }

@@ -13,7 +13,7 @@ export default function() {
 
   return ng('build')
     // This is supposed to fail since there's a missing file
-    .then(() => deleteFile('projects/test-project/src/app/app.component.ts'))
+    .then(() => deleteFile('src/app/app.component.ts'))
     // The build fails but we don't delete the output of the previous build.
     .then(() => expectToFail(() => ng('build', '--delete-output-path=false')))
     .then(() => expectFileToExist('dist'))

@@ -5,7 +5,7 @@ import {expectFileToExist} from '../../../utils/fs';
 
 export default function() {
   // Does not create a sub directory.
-  const serviceDir = join('projects', 'test-project', 'src', 'app');
+  const serviceDir = join('src', 'app');
 
   return ng('generate', 'service', 'test-service')
     .then(() => expectFileToExist(serviceDir))

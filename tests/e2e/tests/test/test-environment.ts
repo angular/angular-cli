@@ -4,7 +4,7 @@ import { updateJsonFile } from '../../utils/project';
 
 export default function () {
   // Tests run in 'dev' environment by default.
-  return writeFile('projects/test-project/src/app/environment.spec.ts', `
+  return writeFile('src/app/environment.spec.ts', `
       import { environment } from '../environments/environment';
 
       describe('Test environment', () => {
@@ -20,8 +20,8 @@ export default function () {
         production: {
           fileReplacements: [
             {
-              from: 'projects/test-project/src/environments/environment.ts',
-              to: 'projects/test-project/src/environments/environment.prod.ts'
+              from: 'src/environments/environment.ts',
+              to: 'src/environments/environment.prod.ts'
             }
           ],
         }
@@ -29,7 +29,7 @@ export default function () {
     }))
 
     // Tests can run in different environment.
-    .then(() => writeFile('projects/test-project/src/app/environment.spec.ts', `
+    .then(() => writeFile('src/app/environment.spec.ts', `
       import { environment } from '../environments/environment';
 
       describe('Test environment', () => {

@@ -5,7 +5,7 @@ import {expectFileToMatch} from '../../../utils/fs';
 
 export default function() {
   const root = process.cwd();
-  const modulePath = join(root, 'projects', 'test-project', 'src', 'app',
+  const modulePath = join(root, 'src', 'app',
     'admin', 'module', 'module.module.ts');
 
   return Promise.resolve()

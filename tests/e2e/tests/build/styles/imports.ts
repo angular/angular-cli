@@ -21,14 +21,14 @@ export default function () {
   extensions.forEach(ext => {
     promise = promise.then(() => {
       return writeMultipleFiles({
-        [`projects/test-project/src/styles.${ext}`]: stripIndents`
+        [`src/styles.${ext}`]: stripIndents`
           @import './imported-styles.${ext}';
           body { background-color: #00f; }
         `,
-        [`projects/test-project/src/imported-styles.${ext}`]: stripIndents`
+        [`src/imported-styles.${ext}`]: stripIndents`
           p { background-color: #f00; }
         `,
-        [`projects/test-project/src/app/app.component.${ext}`]: stripIndents`
+        [`src/app/app.component.${ext}`]: stripIndents`
           @import './imported-component-styles.${ext}';
           .outer {
             .inner {
@@ -36,17 +36,17 @@ export default function () {
             }
           }
         `,
-        [`projects/test-project/src/app/imported-component-styles.${ext}`]: stripIndents`
+        [`src/app/imported-component-styles.${ext}`]: stripIndents`
           h1 { background: #000; }
         `})
         // change files to use preprocessor
         .then(() => updateJsonFile('angular.json', workspaceJson => {
           const appArchitect = workspaceJson.projects['test-project'].architect;
           appArchitect.build.options.styles = [
-            { input: `projects/test-project/src/styles.${ext}` }
+            { input: `src/styles.${ext}` }
           ];
         }))
-        .then(() => replaceInFile('projects/test-project/src/app/app.component.ts',
+        .then(() => replaceInFile('src/app/app.component.ts',
           './app.component.css', `./app.component.${ext}`))
         // run build app
         .then(() => ng('build', '--extract-css', '--source-map'))
@@ -68,10 +68,10 @@ export default function () {
         .then(() => updateJsonFile('angular.json', workspaceJson => {
           const appArchitect = workspaceJson.projects['test-project'].architect;
           appArchitect.build.options.styles = [
-            { input: `projects/test-project/src/styles.css` }
+            { input: `src/styles.css` }
           ];
         }))
-        .then(() => replaceInFile('projects/test-project/src/app/app.component.ts',
+        .then(() => replaceInFile('src/app/app.component.ts',
           `./app.component.${ext}`, './app.component.css'));
     });
   });
