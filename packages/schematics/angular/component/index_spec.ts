@@ -264,4 +264,11 @@ describe('Component Schematic', () => {
       // tslint:disable-next-line:max-line-length
       /import { TestComponentComponent } from '..\/..\/other\/test-component\/test-component.component'/);
   });
+
+  it('should create the right selector with a path in the name', () => {
+    const options = { ...defaultOptions, name: 'sub/test' };
+    appTree = schematicRunner.runSchematic('component', options, appTree);
+    const content = appTree.readContent('/projects/bar/src/app/sub/test/test.component.ts');
+    expect(content).toMatch(/selector: 'app-test'/);
+  });
 });

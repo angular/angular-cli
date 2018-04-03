@@ -14,3 +14,14 @@ export function validateName(name: string): void {
         can not start with a digit.`);
   }
 }
+
+// Must start with a letter, and must contain only alphanumeric characters or dashes.
+// When adding a dash the segment after the dash must also start with a letter.
+export const htmlSelectorRe = /^[a-zA-Z][.0-9a-zA-Z]*(:?-[a-zA-Z][.0-9a-zA-Z]*)*$/;
+
+export function validateHtmlSelector(selector: string): void {
+  if (selector && !htmlSelectorRe.test(selector)) {
+    throw new SchematicsException(tags.oneLine`Selector (${selector})
+        is invalid.`);
+  }
+}

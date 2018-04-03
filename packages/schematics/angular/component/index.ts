@@ -27,7 +27,7 @@ import { InsertChange } from '../utility/change';
 import { getWorkspace } from '../utility/config';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
-import { validateName } from '../utility/validation';
+import { validateHtmlSelector, validateName } from '../utility/validation';
 import { Schema as ComponentOptions } from './schema';
 
 
@@ -114,14 +114,15 @@ export default function(options: ComponentOptions): Rule {
       options.path = `/${project.root}/src/app`;
     }
 
-    options.selector = options.selector || buildSelector(options);
     options.module = findModuleFromOptions(host, options);
 
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
+    options.selector = options.selector || buildSelector(options);
 
     validateName(options.name);
+    validateHtmlSelector(options.selector);
 
     const templateSource = apply(url('./files'), [
       options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),

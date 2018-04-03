@@ -121,4 +121,12 @@ describe('Directive Schematic', () => {
     const content = tree.readContent('/projects/bar/src/app/my-dir.directive.ts');
     expect(content).toMatch(/selector: '\[appMyDir\]'/);
   });
+
+  it('should create the right selector with a path in the name', () => {
+    const options = { ...defaultOptions, name: 'sub/test' };
+    appTree = schematicRunner.runSchematic('directive', options, appTree);
+
+    const content = appTree.readContent('/projects/bar/src/app/sub/test.directive.ts');
+    expect(content).toMatch(/selector: '\[appTest\]'/);
+  });
 });

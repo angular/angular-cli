@@ -7,7 +7,6 @@
     "name": {
       "type": "string",
       "description": "The name of the directive.",
-      "format": "html-selector",
       "$default": {
         "$source": "argv",
         "index": 0
