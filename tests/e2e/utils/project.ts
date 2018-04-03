@@ -39,7 +39,8 @@ export function createProject(name: string, ...args: string[]) {
     .then(() => ng('new', name, '--skip-install', ...args))
     .then(() => process.chdir(name))
     .then(() => useBuiltPackages())
-    .then(() => useCIChrome())
+    .then(() => useCIChrome('e2e'))
+    .then(() => useCIChrome('src'))
     .then(() => useCIDefaults())
     .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
     .then(() => argv['ng4'] ? useNg4() : Promise.resolve())
@@ -169,13 +170,13 @@ export function useCIDefaults() {
   });
 }
 
-export function useCIChrome(projectDir = 'test-project') {
+export function useCIChrome(projectDir: string) {
   // There's a race condition happening in Chrome. Enabling logging in chrome used by
   // protractor actually fixes it. Logging is piped to a file so it doesn't affect our setup.
   // --no-sandbox is needed for Circle CI.
   // Travis can use headless chrome, but not appveyor.
   return Promise.resolve()
-    .then(() => replaceInFile(`projects/${projectDir}-e2e/protractor.conf.js`,
+    .then(() => replaceInFile(`${projectDir}/protractor.conf.js`,
       `'browserName': 'chrome'`,
       `'browserName': 'chrome',
         chromeOptions: {
@@ -188,7 +189,7 @@ export function useCIChrome(projectDir = 'test-project') {
     `))
     // Not a problem if the file can't be found.
     .catch(() => null)
-    .then(() => replaceInFile(`projects/${projectDir}/karma.conf.js`, `browsers: ['Chrome'],`,
+    .then(() => replaceInFile(`${projectDir}/karma.conf.js`, `browsers: ['Chrome'],`,
       `browsers: ['ChromeCI'],
       customLaunchers: {
         ChromeCI: {
