@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { existsSync } from 'fs';
 
-export function findUp(names: string | string[], from: string, stopOnNodeModules = false) {
+export function findUp(names: string | string[], from: string, stopOnPackageJson = false) {
   if (!Array.isArray(names)) {
     names = [names];
   }
@@ -16,9 +16,9 @@ export function findUp(names: string | string[], from: string, stopOnNodeModules
       }
     }
 
-    if (stopOnNodeModules) {
-      const nodeModuleP = path.join(currentDir, 'node_modules');
-      if (existsSync(nodeModuleP)) {
+    if (stopOnPackageJson) {
+      const packageJsonPth = path.join(currentDir, 'package.json');
+      if (existsSync(packageJsonPth)) {
         return null;
       }
     }
