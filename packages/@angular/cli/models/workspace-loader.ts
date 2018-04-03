@@ -47,7 +47,7 @@ export class WorkspaceLoader {
     if (workspaceFilePath) {
       return of(normalize(workspaceFilePath));
     } else {
-      return of(null);
+      throw new Error(`Local workspace file ('angular.json') could not be found.`);
     }
   }
 
