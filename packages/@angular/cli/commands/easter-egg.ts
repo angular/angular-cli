@@ -8,6 +8,7 @@ function pickOne(of: string[]): string {
 export default class AwesomeCommand extends Command {
   public readonly name = 'make-this-awesome';
   public readonly description = '';
+  public readonly hidden = true;
   readonly arguments: string[] = [];
   readonly options: Option[] = [];
 
