@@ -300,7 +300,7 @@ export abstract class SchematicCommand extends Command {
     const workspaceLoader = new WorkspaceLoader(this._host);
 
     workspaceLoader.loadWorkspace().pipe(take(1))
-      .subscribe(workspace => this._workspace = workspace);
+      .subscribe((workspace: experimental.workspace.Workspace) => this._workspace = workspace);
   }
 
   private readDefaults(collectionName: string, schematicName: string, options: any): any {

@@ -73,30 +73,31 @@ function lastLogger() {
   return logStack[logStack.length - 1];
 }
 
-(console as any).debug = (msg: string, ...args: any[]) => {
-  const logger = lastLogger();
-  if (logger) {
-    logger.debug(msg, { args });
-  }
-};
-console.log = (msg: string, ...args: any[]) => {
-  const logger = lastLogger();
-  if (logger) {
-    logger.info(msg, { args });
-  }
-};
-console.warn = (msg: string, ...args: any[]) => {
-  const logger = lastLogger();
-  if (logger) {
-    logger.warn(msg, { args });
-  }
-};
-console.error = (msg: string, ...args: any[]) => {
-  const logger = lastLogger();
-  if (logger) {
-    logger.error(msg, { args });
-  }
-};
+// This code doesn't work and I have no idea why and no intention to investigate at this point.
+// (console as any).debug = (msg: string, ...args: any[]) => {
+//   const logger = lastLogger();
+//   if (logger) {
+//     logger.debug(msg, { args });
+//   }
+// };
+// console.log = (msg: string, ...args: any[]) => {
+//   const logger = lastLogger();
+//   if (logger) {
+//     logger.info(msg, { args });
+//   }
+// };
+// console.warn = (msg: string, ...args: any[]) => {
+//   const logger = lastLogger();
+//   if (logger) {
+//     logger.warn(msg, { args });
+//   }
+// };
+// console.error = (msg: string, ...args: any[]) => {
+//   const logger = lastLogger();
+//   if (logger) {
+//     logger.error(msg, { args });
+//   }
+// };
 
 const testGlob = argv.glob || 'tests/**/*.ts';
 let currentFileName = null;

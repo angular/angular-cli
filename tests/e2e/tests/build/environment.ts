@@ -11,8 +11,8 @@ export default function() {
       appArchitect.build.configurations['prod-env'] = {
         fileReplacements: [
           {
-            from: 'src/environments/environment.ts',
-            to: 'src/environments/environment.prod.ts'
+            src: 'src/environments/environment.ts',
+            replaceWith: 'src/environments/environment.prod.ts'
           }
         ],
       };

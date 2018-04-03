@@ -40,8 +40,8 @@ export default function () {
         { input: 'src/cstring-script.js' },
         { input: 'src/input-script.js' },
         { input: 'src/lazy-script.js', lazy: true },
-        { input: 'src/pre-rename-script.js', output: 'renamed-script' },
-        { input: 'src/pre-rename-lazy-script.js', output: 'renamed-lazy-script', lazy: true }
+        { input: 'src/pre-rename-script.js', bundleName: 'renamed-script' },
+        { input: 'src/pre-rename-lazy-script.js', bundleName: 'renamed-lazy-script', lazy: true }
       ];
     }))
     .then(() => ng('build', '--extract-css'))

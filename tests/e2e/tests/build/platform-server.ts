@@ -42,13 +42,13 @@ export default function () {
         options: {
           outputPath: 'dist/test-project-server',
           main: 'src/main.server.ts',
-          tsConfig: 'tsconfig.server.json'
+          tsConfig: 'src/tsconfig.server.json'
         }
       };
     }))
-    .then(() => writeFile('./tsconfig.server.json', `
+    .then(() => writeFile('./src/tsconfig.server.json', `
       {
-        "extends": "../../tsconfig.json",
+        "extends": "../tsconfig.json",
         "compilerOptions": {
           "outDir": "../dist-server",
           "baseUrl": "./",
@@ -60,7 +60,7 @@ export default function () {
           "**/*.spec.ts"
         ],
         "angularCompilerOptions": {
-          "entryModule": "src/app/app.server.module#AppServerModule"
+          "entryModule": "app/app.server.module#AppServerModule"
         }
       }
     `))
