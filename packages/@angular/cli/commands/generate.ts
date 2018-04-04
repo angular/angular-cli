@@ -5,7 +5,7 @@ import {
   getCollection,
   getEngineHost
 } from '../utilities/schematics';
-import { oneLine } from 'common-tags';
+import { tags } from '@angular-devkit/core';
 import { SchematicCommand } from '../models/schematic-command';
 
 const { cyan } = chalk;
@@ -41,7 +41,7 @@ export default class GenerateCommand extends SchematicCommand {
 
   validate(options: any): boolean | Promise<boolean> {
     if (!options._[0]) {
-      this.logger.error(oneLine`
+      this.logger.error(tags.oneLine`
         The "ng generate" command requires a
         schematic name to be specified.
         For more details, use "ng help".`);

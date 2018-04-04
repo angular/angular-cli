@@ -1,5 +1,5 @@
 import { Command, Option } from '../models/command';
-import { stripIndents } from 'common-tags';
+import { tags } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as child_process from 'child_process';
@@ -66,7 +66,7 @@ export default class VersionCommand extends Command {
                |___/
     `;
 
-    this.logger.info(stripIndents`
+    this.logger.info(tags.stripIndents`
     ${chalk.red(asciiArt)}
     Angular CLI: ${ngCliVersion}
     Node: ${process.versions.node}

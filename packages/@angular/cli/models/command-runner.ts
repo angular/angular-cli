@@ -6,7 +6,6 @@ import {
   CommandScope,
   ArgumentStrategy
 } from '../models/command';
-import { oneLine } from 'common-tags';
 import { logging, normalize, tags } from '@angular-devkit/core';
 import { camelize } from '@angular-devkit/core/src/utils/strings';
 import { findUp } from '../utilities/find-up';
@@ -60,7 +59,7 @@ export async function runCommand(commandMap: CommandMap,
   }
 
   if (!Cmd) {
-    logger.error(oneLine`The specified command (${commandName}) is invalid.
+    logger.error(tags.oneLine`The specified command (${commandName}) is invalid.
     For a list of available options, run \`ng help\`.`);
     throw '';
   }
