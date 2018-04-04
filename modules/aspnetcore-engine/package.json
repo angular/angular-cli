@@ -2,10 +2,6 @@
   "name": "@nguniversal/aspnetcore-engine",
   "version": "0.0.0-PLACEHOLDER",
   "description": "ASP.NET Core Engine for running Server Angular Apps",
-  "main": "./bundles/aspnetcore-engine.umd.js",
-  "module": "./esm5/aspnetcore-engine.es5.js",
-  "es2015": "./esm2015/aspnetcore-engine.js",
-  "typings": "./aspnetcore-engine.d.ts",
   "author": {
     "name": "MarkPieszak",
     "email": "mpieszak84@gmail.com",
@@ -21,9 +17,12 @@
     "universal"
   ],
   "peerDependencies": {
-    "@angular/common": "0.0.0-NG",
-    "@angular/core": "0.0.0-NG",
-    "rxjs": "^6.0.0-beta.1"
+    "@angular/common": "NG_VERSION",
+    "@angular/core": "NG_VERSION",
+    "rxjs": "RXJS_VERSION"
+  },
+  "ng-update": {
+    "packageGroup": "NG_UPDATE_PACKAGE_GROUP"
   },
   "repository": {
     "type": "git",

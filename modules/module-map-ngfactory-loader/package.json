@@ -2,10 +2,6 @@
   "name": "@nguniversal/module-map-ngfactory-loader",
   "version": "0.0.0-PLACEHOLDER",
   "description": "NgFactoryLoader which uses a Map to load ngfactories without lazy loading",
-  "main": "./bundles/module-map-ngfactory-loader.umd.js",
-  "module": "./esm5/module-map-ngfactory-loader.es5.js",
-  "es2015": "./esm2015/module-map-ngfactory-loader.js",
-  "typings": "./module-map-ngfactory-loader.d.ts",
   "license": "MIT",
   "keywords": [
     "ngfactory",
@@ -14,9 +10,12 @@
     "universal"
   ],
   "peerDependencies": {
-    "@angular/common": "0.0.0-NG",
-    "@angular/core": "0.0.0-NG",
-    "@angular/platform-server": "0.0.0-NG"
+    "@angular/common": "NG_VERSION",
+    "@angular/core": "NG_VERSION",
+    "@angular/platform-server": "NG_VERSION"
+  },
+  "ng-update": {
+    "packageGroup": "NG_UPDATE_PACKAGE_GROUP"
   },
   "repository": {
     "type": "git",

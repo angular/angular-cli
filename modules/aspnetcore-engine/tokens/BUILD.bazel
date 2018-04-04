@@ -1,0 +1,13 @@
+package(default_visibility = ["//visibility:public"])
+
+load("//tools:defaults.bzl", "ts_library", "ng_module", "ng_package")
+
+exports_files(["package.json"])
+
+ng_module(
+    name = "tokens",
+    srcs = glob([
+        "*.ts",
+    ]),
+    module_name = "@nguniversal/aspnetcore-engine/tokens",
+)

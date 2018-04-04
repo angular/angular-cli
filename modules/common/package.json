@@ -2,18 +2,17 @@
   "name": "@nguniversal/common",
   "version": "0.0.0-PLACEHOLDER",
   "description": "Angular Universal common utilities",
-  "main": "./bundles/common.umd.js",
-  "module": "./esm5/common.es5.js",
-  "es2015": "./esm2015/common.js",
-  "typings": "./common.d.ts",
   "license": "MIT",
   "keywords": [
     "ssr",
     "universal"
   ],
   "peerDependencies": {
-    "@angular/common": "0.0.0-NG",
-    "@angular/core": "0.0.0-NG"
+    "@angular/common": "NG_VERSION",
+    "@angular/core": "NG_VERSION"
+  },
+  "ng-update": {
+    "packageGroup": "NG_UPDATE_PACKAGE_GROUP"
   },
   "repository": {
     "type": "git",

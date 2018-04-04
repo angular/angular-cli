@@ -16,6 +16,7 @@
     "typeRoots": [
       "node_modules/@types"
     ],
+    "types": ["tslib", "jasmine", "node"],
     "lib": [
       "dom",
       "es6",
