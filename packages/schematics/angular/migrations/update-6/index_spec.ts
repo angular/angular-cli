@@ -507,19 +507,23 @@ describe('Migration to v6', () => {
           { glob: '**/*', input: 'src/assets', output: '/assets' },
           { glob: 'favicon.ico', input: 'src', output: '/' },
         ]);
-        const prodConfig = build.configurations.production;
-        expect(prodConfig.outputHashing).toEqual('all');
-        expect(prodConfig.sourceMap).toEqual(false);
-        expect(prodConfig.extractCss).toEqual(true);
-        expect(prodConfig.namedChunks).toEqual(false);
-        expect(prodConfig.aot).toEqual(true);
-        expect(prodConfig.extractLicenses).toEqual(true);
-        expect(prodConfig.vendorChunk).toEqual(false);
-        expect(prodConfig.buildOptimizer).toEqual(true);
-        expect(prodConfig.fileReplacements).toEqual([{
-          src: 'src/environments/environment.ts',
-          replaceWith: 'src/environments/environment.prod.ts',
-        }]);
+        expect(build.configurations).toEqual({
+          production: {
+            optimization: true,
+            outputHashing: 'all',
+            sourceMap: false,
+            extractCss: true,
+            namedChunks: false,
+            aot: true,
+            extractLicenses: true,
+            vendorChunk: false,
+            buildOptimizer: true,
+            fileReplacements: [{
+              src: 'src/environments/environment.ts',
+              replaceWith: 'src/environments/environment.prod.ts',
+            }],
+          },
+        });
       });
 
       it('should set the serve target', () => {

@@ -213,6 +213,10 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
         }
 
         return Object.keys(environments).reduce((acc, environment) => {
+          if (source === environments[environment]) {
+            return acc;
+          }
+
           let isProduction = false;
 
           const environmentContent = tree.read(app.root + '/' + environments[environment]);
