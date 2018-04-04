@@ -79,7 +79,8 @@ export class NodeWorkflow implements workflow.Workflow {
     /** Create the collection and the schematic. */
     const collection = this._engine.createCollection(options.collection);
     // Only allow private schematics if called from the same collection.
-    const allowPrivate = parentContext && parentContext.collection === options.collection;
+    const allowPrivate = options.allowPrivate
+                         || (parentContext && parentContext.collection === options.collection);
     const schematic = collection.createSchematic(options.schematic, allowPrivate);
 
     // We need two sinks if we want to output what will happen, and actually do the work.
