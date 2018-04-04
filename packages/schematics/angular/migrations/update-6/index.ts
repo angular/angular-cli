@@ -504,7 +504,7 @@ function updateSpecTsConfig(config: CliConfig): Rule {
   };
 }
 
-function updatePackageJson() {
+function updatePackageJson(packageManager?: string) {
   return (host: Tree, context: SchematicContext) => {
     const pkgPath = '/package.json';
     const buffer = host.read(pkgPath);
@@ -524,7 +524,11 @@ function updatePackageJson() {
     pkg.devDependencies['@angular-devkit/build-angular'] = latestVersions.DevkitBuildAngular;
 
     host.overwrite(pkgPath, JSON.stringify(pkg, null, 2));
-    context.addTask(new NodePackageInstallTask());
+
+    if (packageManager && !['npm', 'yarn', 'cnpm'].includes(packageManager)) {
+      packageManager = undefined;
+    }
+    context.addTask(new NodePackageInstallTask({ packageManager }));
 
     return host;
   };
@@ -543,7 +547,7 @@ export default function (): Rule {
       migrateKarmaConfiguration(config),
       migrateConfiguration(config),
       updateSpecTsConfig(config),
-      updatePackageJson(),
+      updatePackageJson(config.packageManager),
     ])(host, context);
   };
 }
