@@ -222,13 +222,16 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
               .match(/production['"]?\s*[:=]\s*true/);
           }
 
+          let configurationName;
           // We used to use `prod` by default as the key, instead we now use the full word.
           // Try not to override the production key if it's there.
           if (environment == 'prod' && !environments['production'] && isProduction) {
-            environment = 'production';
+            configurationName = 'production';
+          } else {
+            configurationName = environment;
           }
 
-          acc[environment] = {
+          acc[configurationName] = {
             ...(isProduction
               ? {
                 optimization: true,
@@ -244,7 +247,10 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
               : {}
             ),
             fileReplacements: [
-              { from: `${app.root}/${source}`, to: `${outDir}/${environments[environment]}` },
+              {
+                src: `${app.root}/${source}`,
+                replaceWith: `${app.root}/${environments[environment]}`,
+              },
             ],
           };
 

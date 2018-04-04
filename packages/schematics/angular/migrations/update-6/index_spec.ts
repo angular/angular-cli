@@ -516,6 +516,10 @@ describe('Migration to v6', () => {
         expect(prodConfig.extractLicenses).toEqual(true);
         expect(prodConfig.vendorChunk).toEqual(false);
         expect(prodConfig.buildOptimizer).toEqual(true);
+        expect(prodConfig.fileReplacements).toEqual([{
+          src: 'src/environments/environment.ts',
+          replaceWith: 'src/environments/environment.prod.ts',
+        }]);
       });
 
       it('should set the serve target', () => {
