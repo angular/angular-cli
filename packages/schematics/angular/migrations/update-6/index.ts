@@ -179,22 +179,25 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
 
       function _mapAssets(asset: string | JsonObject) {
         if (typeof asset === 'string') {
-          return { glob: asset, input: normalize('/' + appRoot + '/'), output: '/' };
+          if (tree.exists(app.root + '/' + asset)) {
+            // If it exists in the tree, then it is a file.
+            return { glob: asset, input: normalize(appRoot + '/'), output: '/' };
+          } else {
+            // If it does not exist, it is either a folder or something we can't statically know.
+            // Folders must get a recursive star glob.
+            return { glob: '**/*', input: normalize(appRoot + '/' + asset), output: '/' + asset };
+          }
         } else {
           if (asset.output) {
             return {
               glob: asset.glob,
-              input: normalize('/' + appRoot + '/' + asset.input),
-              output: normalize('/'
-                + ((asset.output as string).startsWith(outDir)
-                ? (asset.output as string).slice(outDir.length)
-                : (asset.output as string)),
-              ),
+              input: normalize(appRoot + '/' + asset.input),
+              output: normalize('/' + asset.output as string),
             };
           } else {
             return {
               glob: asset.glob,
-              input: normalize('/' + appRoot + '/' + asset.input),
+              input: normalize(appRoot + '/' + asset.input),
               output: '/',
             };
           }

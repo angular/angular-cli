@@ -38,6 +38,8 @@ describe('Migration to v6', () => {
           assets: [
             'assets',
             'favicon.ico',
+            { glob: '**/*', input: './assets/', output: './assets/' },
+            { glob: 'favicon.ico', input: './', output: './' },
           ],
           index: 'index.html',
           main: 'main.ts',
@@ -97,6 +99,7 @@ describe('Migration to v6', () => {
         production: true
       };
     `);
+    tree.create('/src/favicon.ico', '');
   });
 
   describe('file creation/deletion', () => {
@@ -499,8 +502,10 @@ describe('Migration to v6', () => {
         expect(build.options.scripts).toEqual([]);
         expect(build.options.styles).toEqual([{ input: 'src/styles.css' }]);
         expect(build.options.assets).toEqual([
-          { glob: 'assets', input: '/src', output: '/' },
-          { glob: 'favicon.ico', input: '/src', output: '/' },
+          { glob: '**/*', input: 'src/assets', output: '/assets' },
+          { glob: 'favicon.ico', input: 'src', output: '/' },
+          { glob: '**/*', input: 'src/assets', output: '/assets' },
+          { glob: 'favicon.ico', input: 'src', output: '/' },
         ]);
         const prodConfig = build.configurations.production;
         expect(prodConfig.outputHashing).toEqual('all');
@@ -535,8 +540,10 @@ describe('Migration to v6', () => {
         expect(test.options.scripts).toEqual([]);
         expect(test.options.styles).toEqual([{ input: 'src/styles.css' }]);
         expect(test.options.assets).toEqual([
-          { glob: 'assets', input: '/src', output: '/' },
-          { glob: 'favicon.ico', input: '/src', output: '/' },
+          { glob: '**/*', input: 'src/assets', output: '/assets' },
+          { glob: 'favicon.ico', input: 'src', output: '/' },
+          { glob: '**/*', input: 'src/assets', output: '/assets' },
+          { glob: 'favicon.ico', input: 'src', output: '/' },
         ]);
       });
 
