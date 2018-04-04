@@ -168,6 +168,31 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
     defaultAppNamePrefix = config.project.name;
   }
 
+  const buildDefaults: JsonObject = config.defaults && config.defaults.build
+    ? {
+      sourceMap: config.defaults.build.sourcemaps,
+      progress: config.defaults.build.progress,
+      poll: config.defaults.build.poll,
+      deleteOutputPath: config.defaults.build.deleteOutputPath,
+      preserveSymlinks: config.defaults.build.preserveSymlinks,
+      showCircularDependencies: config.defaults.build.showCircularDependencies,
+      commonChunk: config.defaults.build.commonChunk,
+      namedChunks: config.defaults.build.namedChunks,
+    } as JsonObject
+    : {};
+
+  const serveDefaults: JsonObject = config.defaults && config.defaults.serve
+    ? {
+      port: config.defaults.serve.port,
+      host: config.defaults.serve.host,
+      ssl: config.defaults.serve.ssl,
+      sslKey: config.defaults.serve.sslKey,
+      sslCert: config.defaults.serve.sslCert,
+      proxyConfig: config.defaults.serve.proxyConfig,
+    } as JsonObject
+    : {};
+
+
   const apps = config.apps || [];
   // convert the apps to projects
   const projectMap = apps
@@ -319,6 +344,7 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
         main: appRoot + '/' + app.main || defaults.main,
         polyfills: appRoot + '/' + app.polyfills || defaults.polyfills,
         tsConfig: appRoot + '/' + app.tsconfig || defaults.tsConfig,
+        ...buildDefaults,
       };
 
       buildOptions.assets = (app.assets || []).map(_mapAssets);
@@ -333,6 +359,7 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
       // Serve target
       const serveOptions: JsonObject = {
         browserTarget: `${name}:build`,
+        ...serveDefaults,
       };
       architect.serve = {
         builder: `${builderPackage}:dev-server`,

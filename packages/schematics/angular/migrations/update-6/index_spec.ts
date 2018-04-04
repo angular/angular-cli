@@ -85,6 +85,12 @@ describe('Migration to v6', () => {
       },
       defaults: {
         styleExt: 'css',
+        build: {
+          namedChunks: true,
+        },
+        serve: {
+          port: 8080,
+        },
       },
     };
     tree = new UnitTestTree(new EmptyTree());
@@ -507,6 +513,7 @@ describe('Migration to v6', () => {
           { glob: '**/*', input: 'src/assets', output: '/assets' },
           { glob: 'favicon.ico', input: 'src', output: '/' },
         ]);
+        expect(build.options.namedChunks).toEqual(true);
         expect(build.configurations).toEqual({
           production: {
             optimization: true,
@@ -531,7 +538,10 @@ describe('Migration to v6', () => {
         tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
         const serve = getConfig(tree).projects.foo.architect.serve;
         expect(serve.builder).toEqual('@angular-devkit/build-angular:dev-server');
-        expect(serve.options).toEqual({ browserTarget: 'foo:build' });
+        expect(serve.options).toEqual({
+          browserTarget: 'foo:build',
+          port: 8080,
+        });
         const prodConfig = serve.configurations.production;
         expect(prodConfig.browserTarget).toEqual('foo:build:production');
       });
