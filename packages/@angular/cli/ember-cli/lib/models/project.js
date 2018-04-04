@@ -239,7 +239,6 @@ class Project {
   static closest(pathName, _ui, _cli) {
     let ui = ensureUI(_ui);
 
-    ui.writeDeprecateLine('`Project.closest` is a private method that will be removed, please use `Project.closestSync` instead.');
 
     return closestPackageJSON(pathName).then(result => {
       if (result.pkg && result.pkg.name === 'ember-cli') {
@@ -344,17 +343,6 @@ function ensureInstrumentation(cli, ui) {
 
 function ensureUI(_ui) {
   let ui = _ui;
-
-  if (!ui) {
-    // TODO: one UI (lib/cli/index.js also has one for now...)
-    const UI = require('../ui');
-    ui = new UI({
-      inputStream: process.stdin,
-      outputStream: process.stdout,
-      ci: process.env.CI || (/^(dumb|emacs)$/).test(process.env.TERM),
-      writeLevel: (process.argv.indexOf('--silent') !== -1) ? 'ERROR' : undefined,
-    });
-  }
 
   return ui;
 }

@@ -14,42 +14,23 @@ process.setMaxListeners(1000);
 
 // Options: Array cliArgs, Stream inputStream, Stream outputStream
 module.exports = function(options) {
-  let UI = options.UI || require('../ui');
   const CLI = require('./cli');
   const Project = require('../models/project');
 
-  // TODO: one UI (lib/models/project.js also has one for now...)
-  let ui = new UI({
-    inputStream: options.inputStream,
-    outputStream: options.outputStream,
-    errorStream: options.errorStream || process.stderr,
-    errorLog: options.errorLog || [],
-    ci: process.env.CI || (/^(dumb|emacs)$/).test(process.env.TERM),
-    writeLevel: (process.argv.indexOf('--silent') !== -1) ? 'ERROR' : undefined,
-  });
-
-
-  let defaultUpdateCheckerOptions = {
-    // checkForUpdates: false,
-  };
-
   let cli = new CLI({
-    ui,
     testing: options.testing,
     name: options.cli ? options.cli.name : 'ember',
-    disableDependencyChecker: options.disableDependencyChecker,
     root: options.cli ? options.cli.root : path.resolve(__dirname, '..', '..'),
     npmPackage: options.cli ? options.cli.npmPackage : 'ember-cli',
   });
 
-  let project = Project.projectOrnullProject(ui, cli);
+  let project = Project.projectOrnullProject(undefined, cli);
 
   let environment = {
     tasks: options.tasks || {},
     cliArgs: options.cliArgs,
     commands: options.commands || {},
     project,
-    settings: defaultUpdateCheckerOptions,
   };
 
   return cli.run(environment);
