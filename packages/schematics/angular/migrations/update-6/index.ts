@@ -186,9 +186,9 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
               glob: asset.glob,
               input: normalize('/' + appRoot + '/' + asset.input),
               output: normalize('/'
-                + (asset.output as string).startsWith(outDir)
+                + ((asset.output as string).startsWith(outDir)
                 ? (asset.output as string).slice(outDir.length)
-                : (asset.output as string),
+                : (asset.output as string)),
               ),
             };
           } else {
