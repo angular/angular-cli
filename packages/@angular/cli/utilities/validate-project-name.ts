@@ -1,4 +1,4 @@
-import {oneLine, stripIndent} from 'common-tags';
+import { tags } from '@angular-devkit/core';
 
 const SilentError = require('silent-error');
 
@@ -22,12 +22,12 @@ function getRegExpFailPosition(str: string): number | null {
 export function validateProjectName(projectName: string) {
   const errorIndex = getRegExpFailPosition(projectName);
   if (errorIndex !== null) {
-    const firstMessage = oneLine`
+    const firstMessage = tags.oneLine`
       Project name "${projectName}" is not valid. New project names must
       start with a letter, and must contain only alphanumeric characters or dashes.
       When adding a dash the segment after the dash must also start with a letter.
     `;
-    const msg = stripIndent`
+    const msg = tags.stripIndent`
       ${firstMessage}
       ${projectName}
       ${Array(errorIndex + 1).join(' ') + '^'}
