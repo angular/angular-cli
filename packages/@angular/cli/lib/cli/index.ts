@@ -1,7 +1,6 @@
 import * as path from 'path';
 
 const cli = require('../../ember-cli/lib/cli');
-const UI = require('../../ember-cli/lib/ui');
 
 
 function loadCommands() {
@@ -30,10 +29,6 @@ function loadCommands() {
 }
 
 export default function(options: any) {
-
-  // patch UI to not print Ember-CLI warnings (which don't apply to Angular CLI)
-  UI.prototype.writeWarnLine = function () { };
-
   options.cli = {
     name: 'ng',
     root: path.join(__dirname, '..', '..'),
