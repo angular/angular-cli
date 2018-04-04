@@ -74,7 +74,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   // Add webpack config.
   const webpackConfig = config.buildWebpack.webpackConfig;
   const webpackMiddlewareConfig = {
-    // logLevel: 'error', // Hide webpack output because its noisy.
+    logLevel: 'error', // Hide webpack output because its noisy.
     watchOptions: { poll: options.poll },
     publicPath: '/_karma_webpack_/',
   };
