@@ -204,8 +204,8 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
           builder: '@angular-devkit/build-angular:tslint',
           options: {
             tsConfig: [
-              `${projectRoot}tsconfig.app.json`,
-              `${projectRoot}tsconfig.spec.json`,
+              `${rootFilesRoot}tsconfig.app.json`,
+              `${rootFilesRoot}tsconfig.spec.json`,
             ],
             exclude: [
               '**/node_modules/**',
