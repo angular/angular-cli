@@ -2,6 +2,7 @@
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
 import { ExtraEntryPoint } from '../../browser';
+import { computeBundleName } from '../models/webpack-configs/utils';
 
 export function generateEntryPoints(appConfig: any) {
   let entryPoints = ['polyfills', 'sw-register'];
@@ -10,10 +11,10 @@ export function generateEntryPoints(appConfig: any) {
   [
     ...(appConfig.styles as ExtraEntryPoint[])
       .filter(entry => !entry.lazy)
-      .map(entry => entry.bundleName || 'styles'),
+      .map(entry => computeBundleName(entry, 'styles')),
     ...(appConfig.scripts as ExtraEntryPoint[])
       .filter(entry => !entry.lazy)
-      .map(entry => entry.bundleName || 'scripts'),
+      .map(entry => computeBundleName(entry, 'scripts')),
   ].forEach(bundleName => {
     if (entryPoints.indexOf(bundleName) === -1) {
       entryPoints.push(bundleName);

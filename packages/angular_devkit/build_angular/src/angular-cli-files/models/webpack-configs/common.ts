@@ -1,7 +1,6 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
-import { basename, normalize } from '@angular-devkit/core';
 import * as path from 'path';
 import { HashedModuleIdsPlugin } from 'webpack';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
@@ -14,6 +13,7 @@ import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 import { findUp } from '../../utilities/find-up';
 import { AssetPattern, ExtraEntryPoint } from '../../../browser';
+import { computeBundleName } from './utils';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
@@ -60,18 +60,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   if (buildOptions.scripts.length > 0) {
     const globalScriptsByBundleName = (buildOptions.scripts as ExtraEntryPoint[])
       .reduce((prev: { bundleName: string, paths: string[], lazy: boolean }[], curr) => {
-        let bundleName = curr.bundleName;
-        if (!bundleName) {
-          if (curr.lazy) {
-            bundleName = basename(
-              normalize(curr.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
-            );
-          }
-          else {
-            bundleName = 'scripts';
-          }
-        }
-
+        const bundleName = computeBundleName(curr, 'scripts');
         const resolvedPath = path.resolve(root, curr.input);
         let existingEntry = prev.find((el) => el.bundleName === bundleName);
         if (existingEntry) {

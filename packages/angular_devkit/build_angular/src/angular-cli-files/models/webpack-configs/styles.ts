@@ -1,7 +1,6 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
-import { basename, normalize } from '@angular-devkit/core';
 import * as webpack from 'webpack';
 import * as path from 'path';
 import { SuppressExtractedTextChunksWebpackPlugin } from '../../plugins/webpack';
@@ -10,6 +9,7 @@ import { WebpackConfigOptions } from '../build-options';
 import { findUp } from '../../utilities/find-up';
 import { RawCssLoader } from '../../plugins/webpack';
 import { ExtraEntryPoint } from '../../../browser';
+import { computeBundleName } from './utils';
 
 const postcssUrl = require('postcss-url');
 const autoprefixer = require('autoprefixer');
@@ -169,18 +169,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   // Process global styles.
   if (buildOptions.styles.length > 0) {
     (buildOptions.styles as ExtraEntryPoint[]).forEach(style => {
-      let bundleName = style.bundleName;
-      if (!bundleName) {
-        if (style.lazy) {
-          bundleName = basename(
-            normalize(style.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
-          );
-        }
-        else {
-          bundleName = 'styles';
-        }
-      }
-
+      const bundleName = computeBundleName(style, 'styles');;
       const resolvedPath = path.resolve(root, style.input);
 
       // Add style entry points.

@@ -101,7 +101,7 @@ export interface AssetPattern {
 
 export interface ExtraEntryPoint {
   input: string;
-  bundleName: string;
+  bundleName?: string;
   lazy: boolean;
 }
 

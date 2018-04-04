@@ -1,7 +1,6 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
-import { basename, normalize } from '@angular-devkit/core';
 import * as path from 'path';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
@@ -11,6 +10,7 @@ import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
 import { IndexHtmlWebpackPlugin } from '../../plugins/index-html-webpack-plugin';
 import { ExtraEntryPoint } from '../../../browser';
 import { WebpackConfigOptions } from '../build-options';
+import { computeBundleName } from './utils';
 
 /**
 + * license-webpack-plugin has a peer dependency on webpack-sources, list it in a comment to
@@ -28,15 +28,8 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   // Figure out which are the lazy loaded bundle names.
   const lazyChunkBundleNames = ([...buildOptions.styles, ...buildOptions.scripts] as ExtraEntryPoint[])
     .filter(entry => entry.lazy)
-    .map(entry => {
-      if (!entry.bundleName) {
-        return basename(
-          normalize(entry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
-        );
-      } else {
-        return entry.bundleName;
-      }
-    });
+    // We don't really need a default name because we pre-filtered by lazy only entries.
+    .map(style => computeBundleName(style, 'not-lazy'));
 
   const generateIndexHtml = false;
   if (generateIndexHtml) {
@@ -85,17 +78,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   }
 
   const globalStylesBundleNames = (buildOptions.styles as ExtraEntryPoint[])
-    .map(style => {
-      if (style.bundleName) {
-        return style.bundleName;
-      } else if (style.lazy) {
-        return basename(
-          normalize(style.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
-        );
-      } else {
-        return 'styles';
-      }
-    });
+    .map(style => computeBundleName(style, 'styles'));
 
   return {
     devtool: sourcemaps,

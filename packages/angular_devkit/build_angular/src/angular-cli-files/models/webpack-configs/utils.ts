@@ -2,6 +2,8 @@
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
 import * as path from 'path';
+import { basename, normalize } from '@angular-devkit/core';
+import { ExtraEntryPoint } from '../../../browser';
 
 export const ngAppResolve = (resolvePath: string): string => {
   return path.resolve(process.cwd(), resolvePath);
@@ -57,4 +59,16 @@ export function getOutputHashFormat(option: string, length = 20): HashFormat {
   };
   /* tslint:enable:max-line-length */
   return hashFormats[option] || hashFormats['none'];
+}
+
+export function computeBundleName(entry: ExtraEntryPoint, defaultName: string){
+  if (entry.bundleName) {
+    return entry.bundleName;
+  } else if (entry.lazy) {
+      return basename(
+        normalize(entry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
+        );
+    } else {
+    return defaultName;
+  }
 }
