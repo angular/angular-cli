@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { logging, schema, virtualFs } from '@angular-devkit/core';
+import { Path, logging, schema, virtualFs } from '@angular-devkit/core';
 import {
   DryRunSink,
   HostSink,
@@ -36,6 +36,8 @@ export class NodeWorkflow implements workflow.Workflow {
     protected _options: {
       force?: boolean;
       dryRun?: boolean;
+      root?: Path,
+      packageManager?: string;
     },
   ) {
     /**
@@ -49,8 +51,20 @@ export class NodeWorkflow implements workflow.Workflow {
     this._registry = new schema.CoreSchemaRegistry(formats.standardFormats);
     this._engineHost.registerOptionsTransform(validateOptionsWithSchema(this._registry));
 
-    this._engineHost.registerTaskExecutor(BuiltinTaskExecutor.NodePackage);
-    this._engineHost.registerTaskExecutor(BuiltinTaskExecutor.RepositoryInitializer);
+    this._engineHost.registerTaskExecutor(
+      BuiltinTaskExecutor.NodePackage,
+      {
+        allowPackageManagerOverride: true,
+        packageManager: this._options.packageManager,
+        rootDirectory: this._options.root,
+      },
+    );
+    this._engineHost.registerTaskExecutor(
+      BuiltinTaskExecutor.RepositoryInitializer,
+      {
+        rootDirectory: this._options.root,
+      },
+    );
     this._engineHost.registerTaskExecutor(BuiltinTaskExecutor.RunSchematic);
 
     this._context = [];

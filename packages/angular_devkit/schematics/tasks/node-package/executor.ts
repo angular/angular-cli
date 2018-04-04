@@ -44,6 +44,16 @@ export default function(
   const rootDirectory = factoryOptions.rootDirectory || process.cwd();
 
   return (options: NodePackageTaskOptions) => {
+    let taskPackageManagerProfile = packageManagerProfile;
+    let taskPackageManagerName = packageManagerName;
+    if (factoryOptions.allowPackageManagerOverride && options.packageManager) {
+      taskPackageManagerProfile = packageManagers[options.packageManager];
+      if (!taskPackageManagerProfile) {
+        throw new UnknownPackageManagerException(options.packageManager);
+      }
+      taskPackageManagerName = options.packageManager;
+    }
+
     const outputStream = process.stdout;
     const errorStream = process.stderr;
     const spawnOptions: SpawnOptions = {
@@ -57,12 +67,12 @@ export default function(
       args.push(options.packageName);
     }
 
-    if (options.quiet && packageManagerProfile.quietArgument) {
-      args.push(packageManagerProfile.quietArgument);
+    if (options.quiet && taskPackageManagerProfile.quietArgument) {
+      args.push(taskPackageManagerProfile.quietArgument);
     }
 
     return new Observable(obs => {
-      spawn(packageManagerName, args, spawnOptions)
+      spawn(taskPackageManagerName, args, spawnOptions)
         .on('close', (code: number) => {
           if (code === 0) {
             obs.next();

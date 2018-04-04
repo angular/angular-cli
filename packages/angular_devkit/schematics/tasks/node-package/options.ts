@@ -10,6 +10,7 @@ export const NodePackageName = 'node-package';
 export interface NodePackageTaskFactoryOptions {
   rootDirectory?: string;
   packageManager?: string;
+  allowPackageManagerOverride?: boolean;
 }
 
 export interface NodePackageTaskOptions {
@@ -17,4 +18,5 @@ export interface NodePackageTaskOptions {
   quiet?: boolean;
   workingDirectory?: string;
   packageName?: string;
+  packageManager?: string;
 }
