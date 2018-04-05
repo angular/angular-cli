@@ -9,6 +9,7 @@ export default class NewCommand extends SchematicCommand {
     'Creates a new directory and a new Angular app.';
   public static aliases = ['n'];
   public scope = CommandScope.outsideProject;
+  public readonly allowMissingWorkspace = true;
   public arguments: string[] = [];
   public options: Option[] = [
     ...this.coreOptions,
