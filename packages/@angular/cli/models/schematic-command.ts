@@ -34,6 +34,7 @@ export interface GetOptionsResult {
 
 export abstract class SchematicCommand extends Command {
   readonly options: Option[] = [];
+  readonly allowPrivateSchematics: boolean = false;
   private _host = new NodeJsSyncHost();
   private _workspace: experimental.workspace.Workspace;
   private _deAliasedName: string;
@@ -140,6 +141,7 @@ export abstract class SchematicCommand extends Command {
         options: schematicOptions,
         debug: debug,
         logger: this.logger,
+        allowPrivate: this.allowPrivateSchematics,
       })
         .subscribe({
           error: (err: Error) => {
