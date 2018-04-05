@@ -96,7 +96,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
 
         if (deployUrl) {
           if (deployUrl.startsWith('/')) {
-            outputUrl = deployUrl + outputUrl;
+            outputUrl = deployUrl.replace(/\/$/, '') + '/' + outputUrl;
           } else {
             outputUrl = url.resolve(deployUrl, outputUrl);
           }
