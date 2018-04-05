@@ -38,6 +38,7 @@
       "@_/benchmark": [ "./packages/_/benchmark/src/index" ],
       "@angular-devkit/core": [ "./packages/angular_devkit/core/src/index" ],
       "@angular-devkit/core/node": [ "./packages/angular_devkit/core/node/index" ],
+      "@angular-devkit/core/node/testing": [ "./packages/angular_devkit/core/node/testing/index" ],
       "@angular-devkit/schematics": [ "./packages/angular_devkit/schematics/src/index" ],
       "@angular-devkit/schematics/tasks": [ "./packages/angular_devkit/schematics/tasks/index" ],
       "@angular-devkit/schematics/tasks/node": [ "./packages/angular_devkit/schematics/tasks/node/index" ],
