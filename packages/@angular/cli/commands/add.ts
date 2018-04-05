@@ -11,6 +11,7 @@ const SilentError = require('silent-error');
 export default class AddCommand extends SchematicCommand {
   readonly name = 'add';
   readonly description = 'Add support for a library to your project.';
+  readonly allowPrivateSchematics = true;
   scope = CommandScope.inProject;
   arguments = ['collection'];
   options: Option[] = [];
