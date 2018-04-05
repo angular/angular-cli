@@ -17,6 +17,7 @@ import {
   workflow,
 } from '@angular-devkit/schematics';  // tslint:disable-line:no-implicit-dependencies
 import { EMPTY, Observable, Subject, concat, of, throwError } from 'rxjs';
+import { reduce, tap } from 'rxjs/internal/operators';
 import { concatMap, ignoreElements, map } from 'rxjs/operators';
 import { NodeModulesEngineHost, validateOptionsWithSchema } from '..';
 import { DryRunEvent } from '../../src/sink/dryrun';
@@ -28,6 +29,7 @@ export class NodeWorkflow implements workflow.Workflow {
   protected _registry: schema.CoreSchemaRegistry;
 
   protected _reporter: Subject<DryRunEvent> = new Subject();
+  protected _lifeCycle: Subject<workflow.LifeCycleEvent> = new Subject();
 
   protected _context: workflow.WorkflowExecutionContext[];
 
@@ -85,11 +87,18 @@ export class NodeWorkflow implements workflow.Workflow {
   get reporter(): Observable<DryRunEvent> {
     return this._reporter.asObservable();
   }
+  get lifeCycle(): Observable<workflow.LifeCycleEvent> {
+    return this._lifeCycle.asObservable();
+  }
 
   execute(
     options: Partial<workflow.WorkflowExecutionContext> & workflow.RequiredWorkflowExecutionContext,
   ): Observable<void> {
     const parentContext = this._context[this._context.length - 1];
+
+    if (!parentContext) {
+      this._lifeCycle.next({ kind: 'start' });
+    }
 
     /** Create the collection and the schematic. */
     const collection = this._engine.createCollection(options.collection);
@@ -109,6 +118,8 @@ export class NodeWorkflow implements workflow.Workflow {
       this._reporter.next(event);
       error = error || (event.kind == 'error');
     });
+
+    this._lifeCycle.next({ kind: 'workflow-start' });
 
     const context = {
       ...options,
@@ -145,15 +156,28 @@ export class NodeWorkflow implements workflow.Workflow {
       ),
       concat(new Observable<void>(obs => {
         if (!this._options.dryRun) {
-          this._engine.executePostTasks().subscribe(obs);
+          this._lifeCycle.next({ kind: 'post-tasks-start' });
+          this._engine.executePostTasks()
+            .pipe(
+              reduce(() => {}),
+              tap(() => this._lifeCycle.next({ kind: 'post-tasks-end' })),
+            )
+            .subscribe(obs);
         } else {
           obs.complete();
         }
       })),
       concat(new Observable(obs => {
+        this._lifeCycle.next({ kind: 'workflow-end' });
         this._context.pop();
+
+        if (this._context.length == 0) {
+          this._lifeCycle.next({ kind: 'end' });
+        }
+
         obs.complete();
       })),
-    ).pipe(ignoreElements());
+      reduce(() => {}),
+    );
   }
 }

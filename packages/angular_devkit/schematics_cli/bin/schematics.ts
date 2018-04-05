@@ -138,6 +138,7 @@ let nothingDone = true;
 // Logging queue that receives all the messages to show the users. This only get shown when no
 // errors happened.
 const loggingQueue: string[] = [];
+let error = false;
 
 /**
  * Logs out dry run events.
@@ -154,6 +155,8 @@ workflow.reporter.subscribe((event: DryRunEvent) => {
 
   switch (event.kind) {
     case 'error':
+      error = true;
+
       const desc = event.description == 'alreadyExist' ? 'already exists' : 'does not exist.';
       logger.warn(`ERROR! ${event.path} ${desc}.`);
       break;
@@ -173,6 +176,21 @@ workflow.reporter.subscribe((event: DryRunEvent) => {
     case 'rename':
       loggingQueue.push(`${terminal.blue('RENAME')} ${event.path} => ${event.to}`);
       break;
+  }
+});
+
+
+/**
+ * Listen to lifecycle events of the workflow to flush the logs between each phases.
+ */
+workflow.lifeCycle.subscribe(event => {
+  if (event.kind == 'workflow-end' || event.kind == 'post-tasks-start') {
+    if (!error) {
+      // Flush the log queue and clean the error state.
+      loggingQueue.forEach(log => logger.info(log));
+    }
+
+    error = false;
   }
 });
 
@@ -235,9 +253,6 @@ workflow.execute({
     process.exit(1);
   },
   complete() {
-    // Output the logging queue, no error happened.
-    loggingQueue.forEach(log => logger.info(log));
-
     if (nothingDone) {
       logger.info('Nothing to be done.');
     }
