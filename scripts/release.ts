@@ -26,7 +26,7 @@ function _showVersions(logger: logging.Logger) {
     const diff = pkg.dirty ? '!' : '';
 
     const pad1 = '                                  '.slice(pkgName.length);
-    const pad2 = '          '.slice(version.length);
+    const pad2 = '                 '.slice(version.length);
     const message = `${pkgName} ${pad1}v${version}${pad2}${hash} ${diff}`;
     if (pkg.private) {
       logger.debug(message);
