@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, normalize, parseJson, strings } from '@angular-devkit/core';
+import { JsonObject, experimental, normalize, parseJson, strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -19,12 +19,6 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
-import { getWorkspacePath } from '../../../angular/pwa/utility/config';
-import {
-  Architect,
-  Project,
-  WorkspaceSchema,
-} from '../../../angular_devkit/core/src/workspace/workspace-schema';
 import { findNode, getDecoratorMetadata } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { getWorkspace } from '../utility/config';
@@ -32,7 +26,13 @@ import { findBootstrapModuleCall, findBootstrapModulePath } from '../utility/ng-
 import { Schema as UniversalOptions } from './schema';
 
 
-function getClientProject(host: Tree, options: UniversalOptions): Project {
+function getWorkspacePath(host: Tree): string {
+  const possibleFiles = [ '/angular.json', '/.angular.json' ];
+
+  return possibleFiles.filter(path => host.exists(path))[0];
+}
+
+function getClientProject(host: Tree, options: UniversalOptions): experimental.workspace.Project {
   const workspace = getWorkspace(host);
   const clientProject = workspace.projects[options.clientProject];
   if (!clientProject) {
@@ -42,7 +42,10 @@ function getClientProject(host: Tree, options: UniversalOptions): Project {
   return clientProject;
 }
 
-function getClientArchitect(host: Tree, options: UniversalOptions): Architect {
+function getClientArchitect(
+  host: Tree,
+  options: UniversalOptions,
+): experimental.workspace.Architect {
   const clientArchitect = getClientProject(host, options).architect;
 
   if (!clientArchitect) {
@@ -171,7 +174,7 @@ function addDependencies(): Rule {
   };
 }
 
-function getTsConfigOutDir(host: Tree, architect: Architect): string {
+function getTsConfigOutDir(host: Tree, architect: experimental.workspace.Architect): string {
   const tsConfigPath = architect.build.options.tsConfig;
   const tsConfigBuffer = host.read(tsConfigPath);
   if (!tsConfigBuffer) {
