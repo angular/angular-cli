@@ -12,7 +12,7 @@
     "preinstall": "echo DO NOT INSTALL THIS PROJECT, ONLY THE ROOT PROJECT. && exit 1"
   },
   "schematics": "./collection.json",
-  "peerDependencies": {
+  "dependencies": {
     "@angular-devkit/core": "0.0.0",
     "@angular-devkit/schematics": "0.0.0"
   }

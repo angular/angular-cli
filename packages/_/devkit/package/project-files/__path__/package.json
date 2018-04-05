@@ -11,8 +11,6 @@
   ],
   "license": "MIT",
   "dependencies": {
-  },
-  "peerDependencies": {
     "@angular-devkit/core": "0.0.0"
   }
 }

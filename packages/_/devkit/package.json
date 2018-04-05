@@ -7,7 +7,7 @@
   },
   "schematics": "./collection.json",
   "private": true,
-  "peerDependencies": {
+  "dependencies": {
     "@angular-devkit/core": "0.0.0",
     "@angular-devkit/schematics": "0.0.0"
   }

@@ -12,10 +12,8 @@
   },
   "schematics": "./collection.json",
   "dependencies": {
-    "typescript": "~2.6.2"
-  },
-  "peerDependencies": {
     "@angular-devkit/core": "0.0.0",
-    "@angular-devkit/schematics": "0.0.0"
+    "@angular-devkit/schematics": "0.0.0",
+    "typescript": "~2.6.2"
   }
 }
