@@ -37,9 +37,11 @@ export class CleanCssWebpackPlugin {
 
         const cleancss = new CleanCSS({
           compatibility: 'ie9',
-          // use a safer optimization level
-          // see: https://github.com/jakubpawlowicz/clean-css#optimization-levels
-          level: 1,
+          // disables mergeIntoShorthands due to issue with merged style ordering
+          // see: https://github.com/jakubpawlowicz/clean-css/issues/1022
+          level: {
+            2: { mergeIntoShorthands: false }
+          },
           inline: false,
           returnPromise: true,
           sourceMap: this._options.sourceMap,
