@@ -4,6 +4,7 @@ import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { ArgumentStrategy, Command, Option } from './command';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import { DryRunEvent, UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
+import { getPackageManager } from '../utilities/config';
 import { getCollection, getSchematic } from '../utilities/schematics';
 import { take } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
@@ -83,7 +84,15 @@ export abstract class SchematicCommand extends Command {
     let nothingDone = true;
     const loggingQueue: string[] = [];
     const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(this.project.root));
-    const workflow = new NodeWorkflow(fsHost, { force, dryRun });
+    const workflow = new NodeWorkflow(
+      fsHost,
+      {
+        force,
+        dryRun,
+        packageManager: getPackageManager(),
+        root: normalize(this.project.root),
+       },
+    );
 
     const cwd = process.env.PWD;
     const workingDir = cwd.replace(this.project.root, '').replace(/\\/g, '/');
