@@ -70,4 +70,65 @@ describe('TsLintTaskExecutor', () => {
     ).subscribe(undefined, done.fail, done);
   });
 
+  it('supports custom rules in the project (pass)', done => {
+    const testRunner = new SchematicTestRunner(
+      '@_/test',
+      path.join(__dirname, 'test/collection.json'),
+    );
+
+    const host = new TempScopedNodeJsSyncHost();
+    host.write(normalize('/file.ts'), virtualFs.stringToFileBuffer(`
+      console.log('hello world');
+    `)).subscribe();
+    const tree = new UnitTestTree(new HostTree(host));
+
+    const messages: string[] = [];
+
+    concat(
+      testRunner.runSchematicAsync('custom-rule', { shouldPass: true }, tree),
+      new Observable<void>(obs => {
+        process.chdir(getSystemPath(host.root));
+        testRunner.logger.subscribe(x => messages.push(x.message));
+        testRunner.engine.executePostTasks().subscribe(obs);
+      }),
+    ).subscribe(undefined, done.fail, done);
+  });
+
+  it('supports custom rules in the project (fail)', done => {
+    const testRunner = new SchematicTestRunner(
+      '@_/test',
+      path.join(__dirname, 'test/collection.json'),
+    );
+
+    const host = new TempScopedNodeJsSyncHost();
+    host.write(normalize('/file.ts'), virtualFs.stringToFileBuffer(`
+      console.log('hello world');
+    `)).subscribe();
+    const tree = new UnitTestTree(new HostTree(host));
+
+    const messages: string[] = [];
+    let error = false;
+
+    concat(
+      testRunner.runSchematicAsync('custom-rule', { shouldPass: false }, tree),
+      new Observable<void>(obs => {
+        process.chdir(getSystemPath(host.root));
+        testRunner.logger.subscribe(x => messages.push(x.message));
+        testRunner.engine.executePostTasks().subscribe(obs);
+      }).pipe(
+        catchError(() => {
+          error = true;
+
+          return [];
+        }),
+      ),
+      new Observable<void>(obs => {
+        expect(messages.find(msg => /\bcustom-rule fail\b/.test(msg))).not.toBeUndefined();
+        expect(error).toBe(true);
+
+        obs.complete();
+      }),
+    ).subscribe(undefined, done.fail, done);
+  });
+
 });
