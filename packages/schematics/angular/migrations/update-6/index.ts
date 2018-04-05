@@ -342,10 +342,13 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
         outputPath: outDir,
         index: appRoot + '/' + app.index || defaults.index,
         main: appRoot + '/' + app.main || defaults.main,
-        polyfills: appRoot + '/' + app.polyfills || defaults.polyfills,
         tsConfig: appRoot + '/' + app.tsconfig || defaults.tsConfig,
         ...buildDefaults,
       };
+
+      if (app.polyfills) {
+        buildOptions.polyfills = appRoot + '/' + app.polyfills;
+      }
 
       buildOptions.assets = (app.assets || []).map(_mapAssets);
       buildOptions.styles = (app.styles || []).map(_extraEntryMapper);
@@ -380,10 +383,14 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
         // Test target
       const testOptions: JsonObject = {
           main: appRoot + '/' + app.test || defaults.test,
-          polyfills: appRoot + '/' + app.polyfills || defaults.polyfills,
           // Make karmaConfig relative to root.
           karmaConfig,
         };
+
+      if (app.polyfills) {
+        testOptions.polyfills = appRoot + '/' + app.polyfills;
+      }
+
       if (app.testTsconfig) {
           testOptions.tsConfig = appRoot + '/' + app.testTsconfig;
         }
