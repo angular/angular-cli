@@ -14,7 +14,8 @@ export default class UpdateCommand extends SchematicCommand {
   public readonly scope = CommandScope.inProject;
   public arguments: string[] = [ 'packages' ];
   public options: Option[] = [
-    ...this.coreOptions,
+    // Remove the --force flag.
+    ...this.coreOptions.filter(option => option.name !== 'force'),
   ];
   public readonly allowMissingWorkspace = true;
 
@@ -44,7 +45,7 @@ export default class UpdateCommand extends SchematicCommand {
       schematicName: this.schematicName,
       schematicOptions: options,
       dryRun: options.dryRun,
-      force: options.force,
+      force: false,
       workingDir: this.project.root,
     };
 
