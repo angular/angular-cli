@@ -9,6 +9,15 @@ Default applications are created in a directory of the same name, with an initia
 
 ## Options
 <details>
+  <summary>collection</summary>
+  <p>
+    <code>--collection</code> (alias: <code>-c</code>) <em>default value: @schematics/angular</em>
+  </p>
+  <p>
+    Schematics collection to use
+  </p>
+</details>
+<details>
   <summary>directory</summary>
   <p>
     <code>--directory</code> (alias: <code>-d</code>) <em>default value: dir</em>
