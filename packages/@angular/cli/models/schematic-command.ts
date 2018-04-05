@@ -37,6 +37,7 @@ export abstract class SchematicCommand extends Command {
   private _host = new NodeJsSyncHost();
   private _workspace: experimental.workspace.Workspace;
   private _deAliasedName: string;
+  private _originalOptions: Option[];
   argStrategy = ArgumentStrategy.Nothing;
 
   protected readonly coreOptions: Option[] = [
@@ -169,13 +170,22 @@ export abstract class SchematicCommand extends Command {
 
   protected removeCoreOptions(options: any): any {
     const opts = Object.assign({}, options);
-    delete opts.dryRun;
-    delete opts.force;
-    delete opts.debug;
+    if (this._originalOptions.find(option => option.name == 'dryRun')) {
+      delete opts.dryRun;
+    }
+    if (this._originalOptions.find(option => option.name == 'force')) {
+      delete opts.force;
+    }
+    if (this._originalOptions.find(option => option.name == 'debug')) {
+      delete opts.debug;
+    }
     return opts;
   }
 
   protected getOptions(options: GetOptionsOptions): Promise<GetOptionsResult> {
+    // Make a copy.
+    this._originalOptions = [...this.options];
+
     // TODO: get default collectionName
     const collectionName = options.collectionName || '@schematics/angular';
 
