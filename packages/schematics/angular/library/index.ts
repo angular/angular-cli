@@ -172,17 +172,21 @@ export default function (options: LibraryOptions): Rule {
       throw new SchematicsException(`Invalid options, "name" is required.`);
     }
     const name = options.name;
+    const prefix = options.prefix || 'lib';
 
     const workspace = getWorkspace(host);
     const newProjectRoot = workspace.newProjectRoot;
     const projectRoot = `${newProjectRoot}/${options.name}`;
     const sourceDir = `${projectRoot}/src/lib`;
+    const relativeTsLintPath = projectRoot.split('/').map(x => '..').join('/');
 
     const templateSource = apply(url('./files'), [
       template({
         ...strings,
         ...options,
         projectRoot,
+        relativeTsLintPath,
+        prefix,
       }),
       // TODO: Moving inside `branchAndMerge` should work but is bugged right now.
       // The __projectRoot__ is being used meanwhile.
@@ -203,6 +207,7 @@ export default function (options: LibraryOptions): Rule {
       }),
       schematic('component', {
         name: name,
+        selector: `${prefix}-${name}`,
         inlineStyle: true,
         inlineTemplate: true,
         flat: true,

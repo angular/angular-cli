@@ -44,6 +44,7 @@ describe('Library Schematic', () => {
     expect(files.indexOf('/projects/foo/karma.conf.js')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/projects/foo/ng-package.json')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/projects/foo/package.json')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/foo/tslint.json')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/projects/foo/src/test.ts')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/projects/foo/src/my_index.ts')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/projects/foo/src/lib/foo.module.ts')).toBeGreaterThanOrEqual(0);
@@ -86,6 +87,15 @@ describe('Library Schematic', () => {
     const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
     const fileContent = getFileContent(tree, '/projects/foo/src/lib/foo.module.ts');
     expect(fileContent).toContain('exports: [FooComponent]');
+  });
+
+  it('should set the right path and prefix in the tslint file', () => {
+    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+    const path = '/projects/foo/tslint.json';
+    const content = JSON.parse(tree.readContent(path));
+    expect(content.extends).toMatch('../../tslint.json');
+    expect(content.rules['directive-selector'][2]).toMatch('lib');
+    expect(content.rules['component-selector'][2]).toMatch('lib');
   });
 
   describe(`update package.json`, () => {

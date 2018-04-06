@@ -270,7 +270,8 @@ export default function (options: ApplicationOptions): Rule {
       throw new SchematicsException(`Invalid options, "name" is required.`);
     }
     validateProjectName(options.name);
-    const appRootSelector = `${options.prefix || 'app'}-root`;
+    const prefix = options.prefix || 'app';
+    const appRootSelector = `${prefix}-root`;
     const componentOptions = {
       inlineStyle: options.inlineStyle,
       inlineTemplate: options.inlineTemplate,
@@ -285,6 +286,7 @@ export default function (options: ApplicationOptions): Rule {
     let sourceRoot = `${appDir}/src`;
     let sourceDir = `${sourceRoot}/app`;
     let relativeTsConfigPath = appDir.split('/').map(x => '..').join('/');
+    let relativeTsLintPath = appDir.split('/').map(x => '..').join('/');
     const rootInSrc = options.projectRoot !== undefined;
     if (options.projectRoot !== undefined) {
       newProjectRoot = options.projectRoot;
@@ -295,7 +297,12 @@ export default function (options: ApplicationOptions): Rule {
       if (relativeTsConfigPath === '') {
         relativeTsConfigPath = '.';
       }
+      relativeTsLintPath = relative(normalize('/' + sourceRoot), normalize('/'));
+      if (relativeTsLintPath === '') {
+        relativeTsLintPath = '.';
+      }
     }
+    const tsLintRoot = appDir;
 
     const e2eOptions: E2eOptions = {
       name: `${options.name}-e2e`,
@@ -329,6 +336,20 @@ export default function (options: ApplicationOptions): Rule {
             rootInSrc,
           }),
           move(appDir),
+        ])),
+      mergeWith(
+        apply(url('./files/lint'), [
+          template({
+            utils: strings,
+            ...options,
+            tsLintRoot,
+            relativeTsLintPath,
+            prefix,
+          }),
+          // TODO: Moving should work but is bugged right now.
+          // The __tsLintRoot__ is being used meanwhile.
+          // Otherwise the tslint.json file could be inside of the root folder and
+          // this block and the lint folder could be removed.
         ])),
       schematic('module', {
         name: 'app',

@@ -16,6 +16,10 @@ export interface Schema {
    */
   entryFile: string;
   /**
+   * The prefix to apply to generated selectors.
+   */
+  prefix?: string;
+  /**
    * Do not add dependencies to package.json (e.g., --skipPackageJson)
    */
   skipPackageJson: boolean;

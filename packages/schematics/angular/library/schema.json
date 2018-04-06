@@ -18,6 +18,13 @@
       "description": "The path to create the library's public API file.",
       "default": "public_api"
     },
+    "prefix": {
+      "type": "string",
+      "format": "html-selector",
+      "description": "The prefix to apply to generated selectors.",
+      "default": "lib",
+      "alias": "p"
+    },
     "skipPackageJson": {
       "type": "boolean",
       "default": false,
