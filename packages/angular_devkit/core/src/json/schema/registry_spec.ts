@@ -128,6 +128,29 @@ describe('CoreSchemaRegistry', () => {
       .subscribe(done, done.fail);
   });
 
+  it('fails on invalid additionalProperties async', done => {
+    const registry = new CoreSchemaRegistry();
+    const data = { notNum: 'foo' };
+
+    registry
+      .compile({
+        $async: true,
+        properties: {
+          num: { type: 'number' },
+        },
+        additionalProperties: false,
+      }).pipe(
+        mergeMap(validator => validator(data)),
+        map(result => {
+          expect(result.success).toBe(false);
+          expect(result.errors).toContain(
+            'Data path "" should NOT have additional properties (notNum).');
+        }),
+      )
+      .subscribe(done, done.fail);
+  });
+
+
   // Synchronous failure is only used internally.
   // If it's meant to be used externally then this test should change to truly be synchronous
   // (i.e. not relyign on the observable).

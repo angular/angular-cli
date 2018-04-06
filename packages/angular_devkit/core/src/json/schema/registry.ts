@@ -23,6 +23,14 @@ import { addUndefinedDefaults } from './transforms';
 import { JsonVisitor, visitJson } from './visitor';
 
 
+// This interface should be exported from ajv, but they only export the class and not the type.
+interface AjvValidationError {
+  message: string;
+  errors: Array<ajv.ErrorObject>;
+  ajv: true;
+  validation: true;
+}
+
 export class CoreSchemaRegistry implements SchemaRegistry {
   private _ajv: ajv.Ajv;
   private _uriCache = new Map<string, JsonObject>();
@@ -173,8 +181,17 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
               return typeof result == 'boolean'
                 ? observableOf([updatedData, result])
-                : from((result as PromiseLike<boolean>)
-                  .then(r => [updatedData, r]));
+                : from((result as Promise<boolean>)
+                  .then(r => [updatedData, true])
+                  .catch((err: Error | AjvValidationError) => {
+                    if ((err as AjvValidationError).ajv) {
+                      validate.errors = (err as AjvValidationError).errors;
+
+                      return Promise.resolve([updatedData, false]);
+                    }
+
+                    return Promise.reject(err);
+                  }));
             }),
             switchMap(([data, valid]) => {
               if (valid) {
