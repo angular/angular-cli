@@ -4,7 +4,7 @@ version: 2
 anchor_1: &defaults
   working_directory: ~/angular-cli
   docker:
-    - image: angular/ngcontainer:0.0.5
+    - image: angular/ngcontainer:0.1.1
 
 # Restore cache based on package-lock.json checksum for branch.
 anchor_2: &restore_cache_defaults
@@ -14,7 +14,7 @@ anchor_2: &restore_cache_defaults
 # - dist/ : built cli
 # - angular-cli-e2e-default/ : initialized e2e test project
 anchor_3: &attach_workspace_defaults
-    at: /workspace
+    at: /home/circleci/workspace
 
 jobs:
   build:
@@ -55,13 +55,13 @@ jobs:
       - checkout
       - restore_cache:
           <<: *restore_cache_defaults
-      - run: mkdir /workspace
-      - run: mkdir /workspace/angular-cli-e2e-default
+      - run: mkdir /home/circleci/workspace
+      - run: mkdir /home/circleci/workspace/angular-cli-e2e-default
       # Ignore all tests, we just want the setup step to persist it to the workspace.
-      - run: node tests/run_e2e.js --tmpdir=/workspace/angular-cli-e2e-default --ignore=**/*
-      - run: mv dist /workspace/
+      - run: node tests/run_e2e.js --tmpdir=/home/circleci/workspace/angular-cli-e2e-default --ignore=**/*
+      - run: mv dist /home/circleci/workspace/
       - persist_to_workspace:
-          root: /workspace
+          root: /home/circleci/workspace
           paths:
             - dist/
             - angular-cli-e2e-default/
@@ -74,8 +74,8 @@ jobs:
           <<: *restore_cache_defaults
       - attach_workspace:
           <<: *attach_workspace_defaults
-      - run: cp -r /workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=0 --nosilent --ng-version="6.0.0-rc.2"
+      - run: cp -r /home/circleci/workspace/dist/ ./
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=0 --nosilent --ng-version="6.0.0-rc.2"
 
   e2e-1:
     <<: *defaults
@@ -85,8 +85,8 @@ jobs:
           <<: *restore_cache_defaults
       - attach_workspace:
           <<: *attach_workspace_defaults
-      - run: cp -r /workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=1 --nosilent --ng-version="6.0.0-rc.2"
+      - run: cp -r /home/circleci/workspace/dist/ ./
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=1 --nosilent --ng-version="6.0.0-rc.2"
 
   e2e-2:
     <<: *defaults
@@ -96,8 +96,8 @@ jobs:
           <<: *restore_cache_defaults
       - attach_workspace:
           <<: *attach_workspace_defaults
-      - run: cp -r /workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=2 --nosilent --ng-version="6.0.0-rc.2"
+      - run: cp -r /home/circleci/workspace/dist/ ./
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=2 --nosilent --ng-version="6.0.0-rc.2"
 
   e2e-3:
     <<: *defaults
@@ -107,8 +107,8 @@ jobs:
           <<: *restore_cache_defaults
       - attach_workspace:
           <<: *attach_workspace_defaults
-      - run: cp -r /workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=3 --nosilent --ng-version="6.0.0-rc.2"
+      - run: cp -r /home/circleci/workspace/dist/ ./
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=3 --nosilent --ng-version="6.0.0-rc.2"
 
   # Master only E2E.
   nightly-e2e:
