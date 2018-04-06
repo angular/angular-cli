@@ -4,7 +4,7 @@ import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { ArgumentStrategy, Command, Option } from './command';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import { DryRunEvent, UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
-import { getPackageManager } from '../utilities/config';
+import { getPackageManager, getDefaultSchematicCollection } from '../utilities/config';
 import { getCollection, getSchematic } from '../utilities/schematics';
 import { take } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
@@ -197,8 +197,7 @@ export abstract class SchematicCommand extends Command {
     // Make a copy.
     this._originalOptions = [...this.options];
 
-    // TODO: get default collectionName
-    const collectionName = options.collectionName || '@schematics/angular';
+    const collectionName = options.collectionName || getDefaultSchematicCollection();
 
     const collection = getCollection(collectionName);
 
