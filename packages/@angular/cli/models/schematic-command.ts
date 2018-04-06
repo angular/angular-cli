@@ -201,7 +201,7 @@ export abstract class SchematicCommand extends Command {
 
     const collection = getCollection(collectionName);
 
-    const schematic = getSchematic(collection, options.schematicName);
+    const schematic = getSchematic(collection, options.schematicName, this.allowPrivateSchematics);
     this._deAliasedName = schematic.description.name;
 
     if (!schematic.description.schemaJson) {
