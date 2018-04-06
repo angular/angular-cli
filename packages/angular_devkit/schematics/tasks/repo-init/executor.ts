@@ -32,6 +32,7 @@ export default function(
         shell: true,
         cwd: path.join(rootDirectory, options.workingDirectory || ''),
         env: {
+          ...process.env,
           ...(authorName
             ? { GIT_AUTHOR_NAME: authorName, GIT_COMMITTER_NAME: authorName }
             : {}
