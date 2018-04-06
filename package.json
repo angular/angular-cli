@@ -1,6 +1,6 @@
 {
   "name": "@angular/cli",
-  "version": "6.0.0-rc.1",
+  "version": "6.0.0-rc.2",
   "description": "CLI tool for Angular",
   "main": "packages/@angular/cli/lib/cli/index.js",
   "trackingCode": "UA-8594346-19",

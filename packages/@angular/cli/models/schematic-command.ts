@@ -85,7 +85,7 @@ export abstract class SchematicCommand extends Command {
     const loggingQueue: string[] = [];
     const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(this.project.root));
     const workflow = new NodeWorkflow(
-      fsHost,
+      fsHost as any,
       {
         force,
         dryRun,
@@ -149,7 +149,7 @@ export abstract class SchematicCommand extends Command {
         schematic: schematicName,
         options: schematicOptions,
         debug: debug,
-        logger: this.logger,
+        logger: this.logger as any,
         allowPrivate: this.allowPrivateSchematics,
       })
         .subscribe({
