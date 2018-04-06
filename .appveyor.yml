@@ -15,7 +15,7 @@ test_script:
   - npm --version
   - npm run test:packages
   - npm run test:cli
-  - node tests\run_e2e.js --appveyor "--glob=tests/{basic,commands,generate,build/styles}/**" --ng-version="6.0.0-rc.0"
+  - node tests\run_e2e.js --appveyor "--glob=tests/{basic,commands,generate,build/styles}/**" --ng-version="6.0.0-rc.2"
 
 build: off
 
