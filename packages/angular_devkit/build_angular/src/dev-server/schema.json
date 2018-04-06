@@ -37,7 +37,8 @@
     "open": {
       "type": "boolean",
       "description": "Opens the url in default browser.",
-      "default": false
+      "default": false,
+      "alias": "o"
     },
     "liveReload": {
       "type": "boolean",
