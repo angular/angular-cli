@@ -20,6 +20,8 @@ export default function () {
   })
     .then(() => npm('run', 'wd:clean'))
     .then(() => expectToFail(() => ng('e2e', 'test-project-e2e', '--no-webdriver-update', '--devServerTarget=')))
+    // Add back the pre-defined version of webdriver. This script is defined when making projects.
+    .then(() => npm('run', 'webdriver-update'))
     // Should fail without serving
     .then(() => expectToFail(() => ng('e2e', 'test-project-e2e', '--devServerTarget=')))
     // These should work.

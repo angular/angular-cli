@@ -1,5 +1,5 @@
 import { readFile, writeFile, replaceInFile } from './fs';
-import { execAndWaitForOutputToMatch, silentNpm, ng } from './process';
+import { execAndWaitForOutputToMatch, npm, silentNpm, ng } from './process';
 import { getGlobalVariable } from './env';
 
 const packages = require('../../../lib/packages').packages;
@@ -41,12 +41,12 @@ export function createProject(name: string, ...args: string[]) {
     .then(() => useBuiltPackages())
     .then(() => useCIChrome('e2e'))
     .then(() => useCIChrome('src'))
-    .then(() => useCIDefaults())
     .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
     .then(() => argv['ng4'] ? useNg4() : Promise.resolve())
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
     .then(() => console.log(`Project ${name} created... Installing npm.`))
-    .then(() => silentNpm('install'));
+    .then(() => silentNpm('install'))
+    .then(() => useCIDefaults());
 }
 
 
@@ -167,7 +167,24 @@ export function useCIDefaults() {
     const appArchitect = workspaceJson.projects['test-project'].architect;
     appArchitect.build.options.progress = false;
     appArchitect.test.options.progress = false;
-  });
+    // Disable auto-updating webdriver in e2e.
+    const e2eArchitect = workspaceJson.projects['test-project-e2e'].architect;
+    e2eArchitect.e2e.options.webdriverUpdate = false;
+  })
+  .then(() => updateJsonFile('package.json', json => {
+    // We want to always use the same version of webdriver but can only do so on CircleCI.
+    // Appveyor and Travis will use latest Chrome stable.
+    // CircleCI (via ngcontainer:0.1.1) uses Chrome 63.0.3239.84.
+    // Appveyor (via chocolatey) cannot use older versions of Chrome at all:
+    // https://github.com/chocolatey/chocolatey-coreteampackages/tree/master/automatic/googlechrome
+    // webdriver 2.33 matches Chrome 63.0.3239.84.
+    // webdriver 2.37 matches Chrome 65.0.3325.18100 (latest stable).
+    // The webdriver versions for latest stable will need to be manually updated.
+    const webdriverVersion = process.env['CIRCLECI'] ? '2.33' : '2.37';
+    json['scripts']['webdriver-update'] = 'webdriver-manager update' +
+      ` --standalone false --gecko false --versions.chrome ${webdriverVersion}`;
+  }))
+  .then(() => npm('run', 'webdriver-update'));
 }
 
 export function useCIChrome(projectDir: string) {
