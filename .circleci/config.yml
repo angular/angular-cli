@@ -3,6 +3,8 @@ version: 2
 # Settings common to each job.
 anchor_1: &defaults
   working_directory: ~/angular-cli
+  environment:
+    BASH_ENV: ~/.profile
   docker:
     - image: angular/ngcontainer:0.1.1
 
