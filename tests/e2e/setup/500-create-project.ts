@@ -35,7 +35,6 @@ export default async function() {
     .then(() => argv.devkit && useDevKit(argv.devkit))
     .then(() => useCIChrome('e2e'))
     .then(() => useCIChrome('src'))
-    .then(() => useCIDefaults())
     .then(() => argv['ng-version'] ? useNgVersion(argv['ng-version']) : Promise.resolve())
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
     // npm link on Circle CI is very noisy.
@@ -48,5 +47,6 @@ export default async function() {
     .then(() => git('config', 'user.email', 'angular-core+e2e@google.com'))
     .then(() => git('config', 'user.name', 'Angular CLI E2e'))
     .then(() => git('config', 'commit.gpgSign', 'false'))
+    .then(() => useCIDefaults())
     .then(() => gitCommit('tsconfig-e2e-update'));
 }
