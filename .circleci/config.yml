@@ -75,7 +75,7 @@ jobs:
       - attach_workspace:
           <<: *attach_workspace_defaults
       - run: cp -r /workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=0 --nosilent
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=0 --nosilent --ng-version="6.0.0-rc.2"
 
   e2e-1:
     <<: *defaults
@@ -86,7 +86,7 @@ jobs:
       - attach_workspace:
           <<: *attach_workspace_defaults
       - run: cp -r /workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=1 --nosilent
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=1 --nosilent --ng-version="6.0.0-rc.2"
 
   e2e-2:
     <<: *defaults
@@ -97,7 +97,7 @@ jobs:
       - attach_workspace:
           <<: *attach_workspace_defaults
       - run: cp -r /workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=2 --nosilent
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=2 --nosilent --ng-version="6.0.0-rc.2"
 
   e2e-3:
     <<: *defaults
@@ -108,7 +108,7 @@ jobs:
       - attach_workspace:
           <<: *attach_workspace_defaults
       - run: cp -r /workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=3 --nosilent
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=3 --nosilent --ng-version="6.0.0-rc.2"
 
   # Master only E2E.
   nightly-e2e:
