@@ -10,7 +10,6 @@ const { blue, green, gray } = require('chalk');
 const path = require('path');
 const glob = require('glob');
 const cliBuilds = 'https://github.com/angular/cli-builds.git';
-const ngToolsWebpackBuilds = 'https://github.com/angular/ngtools-webpack-builds.git';
 
 
 class Executor {
@@ -78,12 +77,6 @@ class Executor {
     packageJson.version = `${packageJson.version}-${hash}`;
     this.write('package.json', JSON.stringify(packageJson, null, 2));
   }
-
-  updateDependencies(hash) {
-    const packageJson = JSON.parse(this.read('package.json'));
-    packageJson.dependencies['@ngtools/webpack'] = ngToolsWebpackBuilds + '#' + hash;
-    this.write('package.json', JSON.stringify(packageJson, null, 2));
-  }
 }
 
 
@@ -97,34 +90,16 @@ function main() {
 
   console.log(green('Cloning builds repos...\n'));
   tempExec.git('clone', cliBuilds);
-  tempExec.git('clone', ngToolsWebpackBuilds);
 
   console.log(green('Building...'));
 
   const cliBuildsRoot = path.join(tempRoot, 'cli-builds');
   const cliBuildsExec = new Executor(cliBuildsRoot);
-  const ngToolsWebpackBuildsRoot = path.join(tempRoot, 'ngtools-webpack-builds');
-  const ngToolsWebpackBuildsExec = new Executor(ngToolsWebpackBuildsRoot);
 
   cliExec.npm('run', 'build');
 
   const message = cliExec.git('log', '--format=%h %s', '-n', '1');
   const hash = message.split(' ')[0];
-
-  console.log(green('Copying ng-tools-webpack-builds dist'));
-  ngToolsWebpackBuildsExec.git('checkout', '-B', branchName);
-  ngToolsWebpackBuildsExec.rm('-rf', ...ngToolsWebpackBuildsExec.glob('*'));
-  cliExec.cp('dist/@ngtools/webpack', ngToolsWebpackBuildsRoot);
-  console.log(green('Updating package.json version'));
-  ngToolsWebpackBuildsExec.updateVersion(hash);
-  ngToolsWebpackBuildsExec.git('add', '-A');
-  ngToolsWebpackBuildsExec.git('commit', '-m', message);
-  ngToolsWebpackBuildsExec.git('tag', hash);
-
-  ngToolsWebpackBuildsExec.git('config', 'credential.helper', 'store --file=.git/credentials');
-  ngToolsWebpackBuildsExec.write('.git/credentials',
-      `https://${process.env['GITHUB_ACCESS_TOKEN']}@github.com`);
-
 
   console.log(green('Copying cli-builds dist'));
   cliBuildsExec.git('checkout', '-B', branchName);
@@ -133,7 +108,6 @@ function main() {
 
   console.log(green('Updating package.json version'));
   cliBuildsExec.updateVersion(hash);
-  cliBuildsExec.updateDependencies(hash);
 
   cliBuildsExec.git('add', '-A');
   cliBuildsExec.git('commit', '-m', message);
@@ -144,8 +118,6 @@ function main() {
     `https://${process.env['GITHUB_ACCESS_TOKEN']}@github.com`);
 
   console.log(green('Done. Pushing...'));
-  ngToolsWebpackBuildsExec.git('push', '-f', 'origin', branchName);
-  ngToolsWebpackBuildsExec.git('push', '--tags', 'origin', branchName);
   cliBuildsExec.git('push', '-f', 'origin', branchName);
   cliBuildsExec.git('push', '--tags', 'origin', branchName);
 }
