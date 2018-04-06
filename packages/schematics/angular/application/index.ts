@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, normalize, relative, strings, tags } from '@angular-devkit/core';
+import { JsonObject, normalize, relative, strings } from '@angular-devkit/core';
 import {
   MergeStrategy,
   Rule,
@@ -30,6 +30,7 @@ import {
   getWorkspace,
 } from '../utility/config';
 import { latestVersions } from '../utility/latest-versions';
+import { validateProjectName } from '../utility/validation';
 import { Schema as ApplicationOptions } from './schema';
 
 
@@ -248,43 +249,6 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
   // }
 
   return addProjectToWorkspace(workspace, options.name, project);
-}
-const projectNameRegexp = /^[a-zA-Z][.0-9a-zA-Z]*(-[.0-9a-zA-Z]*)*$/;
-const unsupportedProjectNames = ['test', 'ember', 'ember-cli', 'vendor', 'app'];
-
-function getRegExpFailPosition(str: string): number | null {
-  const parts = str.indexOf('-') >= 0 ? str.split('-') : [str];
-  const matched: string[] = [];
-
-  parts.forEach(part => {
-    if (part.match(projectNameRegexp)) {
-      matched.push(part);
-    }
-  });
-
-  const compare = matched.join('-');
-
-  return (str !== compare) ? compare.length : null;
-}
-
-function validateProjectName(projectName: string) {
-  const errorIndex = getRegExpFailPosition(projectName);
-  if (errorIndex !== null) {
-    const firstMessage = tags.oneLine`
-      Project name "${projectName}" is not valid. New project names must
-      start with a letter, and must contain only alphanumeric characters or dashes.
-      When adding a dash the segment after the dash must also start with a letter.
-    `;
-    const msg = tags.stripIndent`
-      ${firstMessage}
-      ${projectName}
-      ${Array(errorIndex + 1).join(' ') + '^'}
-    `;
-    throw new SchematicsException(msg);
-  } else if (unsupportedProjectNames.indexOf(projectName) !== -1) {
-    throw new SchematicsException(`Project name "${projectName}" is not a supported name.`);
-  }
-
 }
 
 export default function (options: ApplicationOptions): Rule {

@@ -25,3 +25,49 @@ export function validateHtmlSelector(selector: string): void {
         is invalid.`);
   }
 }
+
+
+export function validateProjectName(projectName: string) {
+  const errorIndex = getRegExpFailPosition(projectName);
+  const unsupportedProjectNames = ['test', 'ember', 'ember-cli', 'vendor', 'app'];
+  if (errorIndex !== null) {
+    const firstMessage = tags.oneLine`
+    Project name "${projectName}" is not valid. New project names must
+    start with a letter, and must contain only alphanumeric characters or dashes.
+    When adding a dash the segment after the dash must also start with a letter.
+    `;
+    const msg = tags.stripIndent`
+    ${firstMessage}
+    ${projectName}
+    ${Array(errorIndex + 1).join(' ') + '^'}
+    `;
+    throw new SchematicsException(msg);
+  } else if (unsupportedProjectNames.indexOf(projectName) !== -1) {
+    throw new SchematicsException(`Project name "${projectName}" is not a supported name.`);
+  }
+}
+
+function getRegExpFailPosition(str: string): number | null {
+  const isScope = /^@.*\/.*/.test(str);
+  if (isScope) {
+    // Remove starting @
+    str = str.replace(/^@/, '');
+    // Change / to - for validation
+    str = str.replace(/\//g, '-');
+  }
+
+  const parts = str.indexOf('-') >= 0 ? str.split('-') : [str];
+  const matched: string[] = [];
+
+  const projectNameRegexp = /^[a-zA-Z][.0-9a-zA-Z]*(-[.0-9a-zA-Z]*)*$/;
+
+  parts.forEach(part => {
+    if (part.match(projectNameRegexp)) {
+      matched.push(part);
+    }
+  });
+
+  const compare = matched.join('-');
+
+  return (str !== compare) ? compare.length : null;
+}

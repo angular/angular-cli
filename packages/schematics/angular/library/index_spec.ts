@@ -215,4 +215,43 @@ describe('Library Schematic', () => {
     tree = schematicRunner.runSchematic('component', componentOptions, tree);
     expect(tree.exists('/projects/foo/src/lib/comp/comp.component.ts')).toBe(true);
   });
+
+  it(`should support creating scoped libraries`, () => {
+    const scopedName = '@myscope/mylib';
+    const options = { ...defaultOptions, name: scopedName };
+    const tree = schematicRunner.runSchematic('library', options, workspaceTree);
+
+    const pkgJsonPath = '/projects/myscope/mylib/package.json';
+    expect(tree.files).toContain(pkgJsonPath);
+    expect(tree.files).toContain('/projects/myscope/mylib/src/lib/mylib.module.ts');
+    expect(tree.files).toContain('/projects/myscope/mylib/src/lib/mylib.component.ts');
+
+    const pkgJson = JSON.parse(tree.readContent(pkgJsonPath));
+    expect(pkgJson.name).toEqual(scopedName);
+
+    const tsConfigJson = JSON.parse(tree.readContent('/projects/myscope/mylib/tsconfig.spec.json'));
+    expect(tsConfigJson.extends).toEqual('../../../tsconfig.json');
+
+    const cfg = JSON.parse(tree.readContent('/angular.json'));
+    expect(cfg.projects['@myscope/mylib']).toBeDefined();
+  });
+
+  it(`should dasherize scoped libraries`, () => {
+    const scopedName = '@myScope/myLib';
+    const expectedScopeName = '@my-scope/my-lib';
+    const options = { ...defaultOptions, name: scopedName };
+    const tree = schematicRunner.runSchematic('library', options, workspaceTree);
+
+    const pkgJsonPath = '/projects/my-scope/my-lib/package.json';
+    expect(tree.readContent(pkgJsonPath)).toContain(expectedScopeName);
+
+    const ngPkgJsonPath = '/projects/my-scope/my-lib/ng-package.json';
+    expect(tree.readContent(ngPkgJsonPath)).toContain(expectedScopeName);
+
+    const pkgJson = JSON.parse(tree.readContent(pkgJsonPath));
+    expect(pkgJson.name).toEqual(expectedScopeName);
+
+    const cfg = JSON.parse(tree.readContent('/angular.json'));
+    expect(cfg.projects['@myScope/myLib']).toBeDefined();
+  });
 });

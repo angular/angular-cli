@@ -28,6 +28,7 @@ import {
   getWorkspace,
 } from '../utility/config';
 import { latestVersions } from '../utility/latest-versions';
+import { validateProjectName } from '../utility/validation';
 import { Schema as LibraryOptions } from './schema';
 
 
@@ -125,7 +126,7 @@ function addDependenciesToPackageJson() {
 }
 
 function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSchema,
-                               projectRoot: string): Rule {
+                               projectRoot: string, packageName: string): Rule {
 
   const project: WorkspaceProject = {
     root: `${projectRoot}`,
@@ -166,7 +167,7 @@ function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSche
     },
   };
 
-  return addProjectToWorkspace(workspace, options.name, project);
+  return addProjectToWorkspace(workspace, packageName, project);
 }
 
 export default function (options: LibraryOptions): Rule {
@@ -174,12 +175,27 @@ export default function (options: LibraryOptions): Rule {
     if (!options.name) {
       throw new SchematicsException(`Invalid options, "name" is required.`);
     }
-    const name = options.name;
     const prefix = options.prefix || 'lib';
+
+    validateProjectName(options.name);
+
+    // If scoped project (i.e. "@foo/bar"), convert projectDir to "foo/bar".
+    const packageName = options.name;
+    let scopeName = '';
+    if (/^@.*\/.*/.test(options.name)) {
+      const [scope, name] = options.name.split('/');
+      scopeName = scope.replace(/^@/, '');
+      options.name = name;
+    }
 
     const workspace = getWorkspace(host);
     const newProjectRoot = workspace.newProjectRoot;
-    const projectRoot = `${newProjectRoot}/${strings.dasherize(options.name)}`;
+    let projectRoot = `${newProjectRoot}/${strings.dasherize(options.name)}`;
+    if (scopeName) {
+      projectRoot =
+        `${newProjectRoot}/${strings.dasherize(scopeName)}/${strings.dasherize(options.name)}`;
+    }
+
     const sourceDir = `${projectRoot}/src/lib`;
     const relativeTsLintPath = projectRoot.split('/').map(x => '..').join('/');
 
@@ -187,6 +203,7 @@ export default function (options: LibraryOptions): Rule {
       template({
         ...strings,
         ...options,
+        packageName,
         projectRoot,
         relativeTsLintPath,
         prefix,
@@ -198,19 +215,19 @@ export default function (options: LibraryOptions): Rule {
 
     return chain([
       branchAndMerge(mergeWith(templateSource)),
-      addAppToWorkspaceFile(options, workspace, projectRoot),
+      addAppToWorkspaceFile(options, workspace, projectRoot, packageName),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
-      options.skipTsConfig ? noop() : updateTsConfig(name),
+      options.skipTsConfig ? noop() : updateTsConfig(options.name),
       schematic('module', {
-        name: name,
+        name: options.name,
         commonModule: false,
         flat: true,
         path: sourceDir,
         spec: false,
       }),
       schematic('component', {
-        name: name,
-        selector: `${prefix}-${name}`,
+        name: options.name,
+        selector: `${prefix}-${options.name}`,
         inlineStyle: true,
         inlineTemplate: true,
         flat: true,
@@ -218,7 +235,7 @@ export default function (options: LibraryOptions): Rule {
         export: true,
       }),
       schematic('service', {
-        name: name,
+        name: options.name,
         flat: true,
         path: sourceDir,
       }),
