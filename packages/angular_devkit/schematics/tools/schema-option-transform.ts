@@ -7,6 +7,7 @@
  */
 import {
   BaseException,
+  deepCopy,
   schema,
 } from '@angular-devkit/core';
 import { Observable, of as observableOf } from 'rxjs';
@@ -26,29 +27,11 @@ export class InvalidInputOptions extends BaseException {
   }
 }
 
-
-// tslint:disable-next-line:no-any
-function _deepCopy<T extends {[key: string]: any}>(object: T): T {
-  return JSON.parse(JSON.stringify(object));
-  // const copy = {} as T;
-  // for (const key of Object.keys(object)) {
-  //   if (typeof object[key] == 'object') {
-  //     copy[key] = _deepCopy(object[key]);
-  //     break;
-  //   } else {
-  //       copy[key] = object[key];
-  //   }
-  // }
-
-  // return copy;
-}
-
-
 // This can only be used in NodeJS.
 export function validateOptionsWithSchema(registry: schema.SchemaRegistry) {
   return <T extends {}>(schematic: SchematicDesc, options: T): Observable<T> => {
     // Prevent a schematic from changing the options object by making a copy of it.
-    options = _deepCopy(options);
+    options = deepCopy(options);
 
     if (schematic.schema && schematic.schemaJson) {
       // Make a deep copy of options.
