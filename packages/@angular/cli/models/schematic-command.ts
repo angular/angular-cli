@@ -90,7 +90,7 @@ export abstract class SchematicCommand extends Command {
         force,
         dryRun,
         packageManager: getPackageManager(),
-        root: normalize(this.project.root),
+        root: this.project.root,
        },
     );
 
