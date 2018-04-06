@@ -1,6 +1,7 @@
 import {join} from 'path';
-import {ng} from '../../utils/process';
+import {ng, ProcessOutput} from '../../utils/process';
 import {writeMultipleFiles, createDir} from '../../utils/fs';
+import { updateJsonFile } from '../../utils/project';
 
 
 export default function() {
@@ -72,10 +73,22 @@ export default function() {
     ))
     .then(() => ng('generate', 'fake-schematics:fake', '--help'))
     .then(({stdout}) => {
-      console.warn('stdout start');
-      console.error(stdout);
-      console.warn('stdout end');
       if (!/ng generate fake-schematics:fake <a> <b> \[options\]/.test(stdout)) {
+        throw new Error('Help signature is wrong.');
+      }
+      if (!/opt-a[\s\S]*opt-b[\s\S]*opt-c/.test(stdout)) {
+        throw new Error('Help signature options are incorrect.');
+      }
+    })
+    // set up default collection.
+    .then(() => updateJsonFile('angular.json', json => {
+      json.cli = json.cli || {} as any;
+      json.cli.defaultCollection = 'fake-schematics';
+    }))
+    .then(() => ng('generate', 'fake', '--help'))
+    // verify same output
+    .then(({stdout}) => {
+      if (!/ng generate fake <a> <b> \[options\]/.test(stdout)) {
         throw new Error('Help signature is wrong.');
       }
       if (!/opt-a[\s\S]*opt-b[\s\S]*opt-c/.test(stdout)) {
