@@ -14,9 +14,7 @@ const SilentError = require('silent-error');
 
 
 const g: any = typeof global !== 'undefined' ? global : {};
-const webpackLoader: string = g['_DevKitIsLocal']
-  ? require.resolve('@ngtools/webpack')
-  : '@ngtools/webpack';
+const webpackLoader: string = require.resolve('@ngtools/webpack');
 
 
 function _createAotPlugin(
