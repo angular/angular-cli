@@ -128,7 +128,6 @@ const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: 
   .filter(name => !name.endsWith('/packages/webpack/test-ng5.ts'))
   .filter(name => !name.endsWith('/packages/webpack/weird-ng5.ts'))
   // Disabled on rc.0 due to needed sync with devkit for changes.
-  .filter(name => !name.includes('tests/lint/'))
   .filter(name => !name.endsWith('/service-worker.ts'))
   .sort();
 
