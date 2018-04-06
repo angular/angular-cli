@@ -2,6 +2,10 @@ import { ng, npm } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
 
 export default async function () {
+  // This test should only be active when the current version of Angular supports multiple
+  // TypeScript minor versions.
+  return;
+
   // Disable the strict TS version check for nightly
   await updateJsonFile('src/tsconfig.app.json', configJson => {
     configJson.angularCompilerOptions = {
