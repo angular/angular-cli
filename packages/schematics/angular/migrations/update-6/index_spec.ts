@@ -11,7 +11,6 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import * as path from 'path';
 
 
-// tslint:disable:max-line-length
 describe('Migration to v6', () => {
   const schematicRunner = new SchematicTestRunner(
     'migrations',
@@ -533,6 +532,17 @@ describe('Migration to v6', () => {
         });
       });
 
+      it('should add serviceWorker to production configuration', () => {
+        baseConfig.apps[0].serviceWorker = true;
+        tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+        tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+        const config = getConfig(tree);
+        expect(config.projects.foo.architect.build.options.serviceWorker).toBeUndefined();
+        expect(
+          config.projects.foo.architect.build.configurations.production.serviceWorker,
+        ).toBe(true);
+      });
+
       it('should set the serve target', () => {
         tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
         tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
@@ -580,7 +590,8 @@ describe('Migration to v6', () => {
         const tslint = getConfig(tree).projects.foo.architect['lint'];
         expect(tslint.builder).toEqual('@angular-devkit/build-angular:tslint');
         expect(tslint.options).toBeDefined();
-        expect(tslint.options.tsConfig).toEqual(['src/tsconfig.app.json', 'src/tsconfig.spec.json']);
+        expect(tslint.options.tsConfig)
+          .toEqual(['src/tsconfig.app.json', 'src/tsconfig.spec.json']);
         expect(tslint.options.exclude).toEqual([ '**/node_modules/**' ]);
       });
     });

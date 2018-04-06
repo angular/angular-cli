@@ -232,6 +232,7 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
       function _buildConfigurations(): JsonObject {
         const source = app.environmentSource;
         const environments = app.environments;
+        const serviceWorker = app.serviceWorker;
 
         if (!environments) {
           return {};
@@ -275,6 +276,7 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
               }
               : {}
             ),
+            ...(isProduction && serviceWorker ? { serviceWorker: true } : {}),
             fileReplacements: [
               {
                 src: `${app.root}/${source}`,
@@ -340,9 +342,9 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
       const buildOptions: JsonObject = {
         // Make outputPath relative to root.
         outputPath: outDir,
-        index: appRoot + '/' + app.index || defaults.index,
-        main: appRoot + '/' + app.main || defaults.main,
-        tsConfig: appRoot + '/' + app.tsconfig || defaults.tsConfig,
+        index: `${appRoot}/${app.index || defaults.index}`,
+        main: `${appRoot}/${app.main || defaults.main}`,
+        tsConfig: `${appRoot}/${app.tsconfig || defaults.tsConfig}`,
         ...buildDefaults,
       };
 
