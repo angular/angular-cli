@@ -49,11 +49,12 @@ of your application stay within boundries which you set.
 ## Specifying sizes
 
 Available formats:
-123 - size in bytes
-123b - size in bytes
-123kb - size in kilobytes
-123mb - size in megabytes
-12% - percentage
+
+- `123` - size in bytes
+- `123b` - size in bytes
+- `123kb` - size in kilobytes
+- `123mb` - size in megabytes
+- `12%` - percentage
 
 ## NOTES
 
