@@ -30,7 +30,7 @@ export interface CommandMap {
 export async function runCommand(commandMap: CommandMap,
                                  args: string[],
                                  logger: logging.Logger,
-                                 context: CommandContext): Promise<any> {
+                                 context: CommandContext): Promise<number | void> {
 
   // if not args supplied, just run the help command.
   if (!args || args.length === 0) {
@@ -105,12 +105,14 @@ export async function runCommand(commandMap: CommandMap,
       return commandsDistance[a] - commandsDistance[b];
     });
 
-    throw new SilentError(tags.stripIndent`
+    logger.error(tags.stripIndent`
         The specified command ("${commandName}") is invalid. For a list of available options,
         run "ng help".
 
         Did you mean "${allCommands[0]}"?
     `);
+
+    return 1;
   }
 
   const command = new Cmd(context, logger);
@@ -312,12 +314,12 @@ function verifyWorkspace(command: Command, executionScope: CommandScope, root: s
 }
 
 // Execute a command's `printHelp`.
-async function runHelp(command: Command, options: any): Promise<void> {
+async function runHelp<T>(command: Command<T>, options: T): Promise<void> {
   return await command.printHelp(options);
 }
 
 // Validate and run a command.
-async function validateAndRunCommand(command: Command, options: any): Promise<any> {
+async function validateAndRunCommand<T>(command: Command<T>, options: T): Promise<number | void> {
   const isValid = await command.validate(options);
   if (isValid !== undefined && !isValid) {
     throw new SilentError(`Validation error. Invalid command`);

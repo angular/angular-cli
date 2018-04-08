@@ -81,6 +81,6 @@ export default class AddCommand extends SchematicCommand {
       force: false,
     };
 
-    await this.runSchematic(runOptions);
+    return await this.runSchematic(runOptions);
   }
 }
