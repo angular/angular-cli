@@ -8,7 +8,6 @@ const findUp = require('../../../utilities/find-up').findUp;
 const { promisify } = require('util');
 let resolve = promisify(require('resolve'));
 const fs = require('fs-extra');
-const _ = require('lodash');
 const nodeModulesPath = require('node-modules-path');
 
 let processCwd = process.cwd();
@@ -129,7 +128,8 @@ class Project {
 
     return this.addons.reduce((config, addon) => {
       if (addon.config) {
-        _.merge(config, addon.config(env, config));
+        // No addon support
+        // _.merge(config, addon.config(env, config));
       }
 
       return config;
@@ -208,7 +208,7 @@ class Project {
       devDependencies = {};
     }
 
-    return _.assign({}, devDependencies, pkg['dependencies']);
+    return Object.assign({}, devDependencies, pkg['dependencies']);
   }
 
   /**

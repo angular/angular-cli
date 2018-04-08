@@ -1,4 +1,4 @@
-import { experimental } from '@angular-devkit/core';
+import { experimental, strings } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import {
   Architect, BuilderDescription, BuildEvent,
@@ -9,7 +9,6 @@ import { of } from 'rxjs';
 import { from } from 'rxjs';
 import { concatMap, map, tap, toArray } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
-const stringUtils = require('ember-cli-string-utils');
 
 
 export interface GenericTargetTargetSpecifier {
@@ -93,7 +92,7 @@ export abstract class ArchitectCommand extends Command {
     const properties = schema.properties;
     const keys = Object.keys(properties);
     keys
-      .map(key => ({ ...properties[key], ...{ name: stringUtils.dasherize(key) } }))
+      .map(key => ({ ...properties[key], ...{ name: strings.dasherize(key) } }))
       .map(opt => {
         let type;
         const schematicType = opt.type;
