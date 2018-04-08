@@ -18,7 +18,7 @@ export enum ArgumentStrategy {
   Nothing
 }
 
-export abstract class Command {
+export abstract class Command<T = any> {
   protected _rawArgs: string[];
   public allowMissingWorkspace = false;
 
@@ -26,7 +26,6 @@ export abstract class Command {
     this.logger = logger;
     if (context) {
       this.project = context.project;
-      this.ui = context.ui;
     }
   }
 
@@ -38,11 +37,11 @@ export abstract class Command {
     return;
   }
 
-  validate(_options: any): boolean | Promise<boolean> {
+  validate(_options: T): boolean | Promise<boolean> {
     return true;
   }
 
-  printHelp(_options: any): void {
+  printHelp(_options: T): void {
     this.printHelpUsage(this.name, this.arguments, this.options);
     this.printHelpOptions(this.options);
   }
@@ -73,7 +72,7 @@ export abstract class Command {
     }
   }
 
-  abstract run(options: any): any | Promise<any>;
+  abstract run(options: T): number | void | Promise<number | void>;
   abstract readonly name: string;
   abstract readonly description: string;
   abstract readonly arguments: string[];
@@ -84,17 +83,10 @@ export abstract class Command {
   public scope = CommandScope.everywhere;
   protected readonly logger: logging.Logger;
   protected readonly project: any;
-  protected readonly ui: Ui;
 }
 
 export interface CommandContext {
-  ui: Ui;
   project: any;
-}
-
-export interface Ui {
-  writeLine: (message: string) => void;
-  errorLog: (message: string) => void;
 }
 
 export abstract class Option {
