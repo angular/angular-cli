@@ -42,6 +42,6 @@ export default class ServeCommand extends ArchitectCommand {
       target: this.target,
       configuration,
       overrides
-    });
+    }, options);
   }
 }

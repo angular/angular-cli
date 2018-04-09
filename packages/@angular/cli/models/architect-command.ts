@@ -1,4 +1,4 @@
-import { experimental, strings } from '@angular-devkit/core';
+import { experimental, schema, strings } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import {
   Architect, BuilderDescription, BuildEvent,
@@ -16,7 +16,7 @@ export interface GenericTargetTargetSpecifier {
   configuration?: string;
 }
 
-export abstract class ArchitectCommand extends Command {
+export abstract class ArchitectCommand<T = any> extends Command<T> {
   private _host = new NodeJsSyncHost();
   private _architect: Architect;
   private _workspace: experimental.workspace.Workspace;
@@ -149,7 +149,10 @@ export abstract class ArchitectCommand extends Command {
     aliases: ['c']
   };
 
-  protected async runArchitectTarget(targetSpec: TargetSpecifier): Promise<number> {
+  protected async runArchitectTarget(
+    targetSpec: TargetSpecifier,
+    commandOptions: T,
+  ): Promise<number> {
     const runSingleTarget = (targetSpec: TargetSpecifier) => this._architect.run(
       this._architect.getBuilderConfiguration(targetSpec),
       { logger: this._logger }
@@ -157,14 +160,40 @@ export abstract class ArchitectCommand extends Command {
       map((buildEvent: BuildEvent) => buildEvent.success ? 0 : 1)
     );
 
-    if (!targetSpec.project && this.target) {
-      // This runs each target sequentially. Running them in parallel would jumble the log messages.
-      return from(this.getAllProjectsForTargetName(this.target)).pipe(
-        concatMap(project => runSingleTarget({ ...targetSpec, project })),
-        toArray(),
-      ).toPromise().then(results => results.every(res => res === 0) ? 0 : 1);
-    } else {
-      return runSingleTarget(targetSpec).toPromise();
+    try {
+      if (!targetSpec.project && this.target) {
+        // This runs each target sequentially.
+        // Running them in parallel would jumble the log messages.
+        return await from(this.getAllProjectsForTargetName(this.target)).pipe(
+          concatMap(project => runSingleTarget({ ...targetSpec, project })),
+          toArray(),
+        ).toPromise().then(results => results.every(res => res === 0) ? 0 : 1);
+      } else {
+        return await runSingleTarget(targetSpec).toPromise();
+      }
+    } catch (e) {
+      if (e instanceof schema.SchemaValidationException) {
+        const newErrors: schema.SchemaValidatorError[] = [];
+        e.errors.forEach(schemaError => {
+          if (schemaError.keyword === 'additionalProperties') {
+            const unknownProperty = schemaError.params.additionalProperty;
+            if (unknownProperty in commandOptions) {
+              const dashes = unknownProperty.length === 1 ? '-' : '--';
+              this.logger.fatal(`Unknown option: '${dashes}${unknownProperty}'`);
+
+              return 1;
+            }
+          }
+          newErrors.push(schemaError);
+        });
+
+        if (newErrors.length > 0) {
+          this.logger.error(new schema.SchemaValidationException(newErrors).message);
+          return 1;
+        }
+      } else {
+        throw e;
+      }
     }
   }
 
