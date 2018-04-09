@@ -59,7 +59,7 @@ describe('Service Schematic', () => {
 
     const tree = schematicRunner.runSchematic('service', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.service.ts');
-    expect(content).toMatch(/providedIn: 'root',/);
+    expect(content).toMatch(/providedIn: 'root'/);
   });
 
   it('should import a specified module', () => {
@@ -68,7 +68,7 @@ describe('Service Schematic', () => {
     const tree = schematicRunner.runSchematic('service', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.service.ts');
     expect(content).toMatch(/import { AppModule } from '..\/app.module'/);
-    expect(content).toMatch(/providedIn: AppModule,/);
+    expect(content).toMatch(/providedIn: AppModule/);
   });
 
   it('should fail if specified module does not exist', () => {
