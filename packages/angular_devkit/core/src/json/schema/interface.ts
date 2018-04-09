@@ -12,10 +12,49 @@ export type JsonPointer = string & {
   __PRIVATE_DEVKIT_JSON_POINTER: void;
 };
 
+export type SchemaValidatorError =
+  RefValidatorError |
+  LimitValidatorError |
+  AdditionalPropertiesValidatorError |
+  FormatValidatorError |
+  RequiredValidatorError;
+
+export interface SchemaValidatorErrorBase {
+  keyword: string;
+  dataPath: string;
+  message?: string;
+  data?: JsonValue;
+}
+
+export interface RefValidatorError extends SchemaValidatorErrorBase {
+  keyword: '$ref';
+  params: { ref: string };
+}
+
+export interface LimitValidatorError extends SchemaValidatorErrorBase {
+  keyword: 'maxItems' | 'minItems' | 'maxLength' | 'minLength' | 'maxProperties' | 'minProperties';
+  params: { limit: number };
+}
+
+export interface AdditionalPropertiesValidatorError extends SchemaValidatorErrorBase {
+  keyword: 'additionalProperties';
+  params: { additionalProperty: string };
+}
+
+export interface FormatValidatorError extends SchemaValidatorErrorBase {
+  keyword: 'format';
+  params: { format: string };
+}
+
+export interface RequiredValidatorError extends SchemaValidatorErrorBase {
+  keyword: 'required';
+  params: { missingProperty: string };
+}
+
 export interface SchemaValidatorResult {
   data: JsonValue;
   success: boolean;
-  errors?: string[];
+  errors?: SchemaValidatorError[];
 }
 
 export interface SchemaValidator {

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { experimental, normalize } from '@angular-devkit/core';
+import { experimental, normalize, schema } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { concatMap, tap, toArray } from 'rxjs/operators';
 import { BrowserTargetOptions } from '../test/browser';
@@ -115,7 +115,7 @@ describe('Architect', () => {
     const targetSpec = { project: 'app', target: 'badBrowser' };
     const builderConfig = architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec);
     architect.run(builderConfig).subscribe(undefined, (err: Error) => {
-      expect(err).toEqual(jasmine.any(experimental.workspace.SchemaValidationException));
+      expect(err).toEqual(jasmine.any(schema.SchemaValidationException));
       done();
     }, done.fail);
   });

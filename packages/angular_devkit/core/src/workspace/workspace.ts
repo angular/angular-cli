@@ -42,12 +42,6 @@ export class ProjectToolNotFoundException extends BaseException {
   }
 }
 
-export class SchemaValidationException extends BaseException {
-  constructor(errors: string[]) {
-    super(`Schema validation failed with the following errors:\n  ${errors.join('\n  ')}`);
-  }
-}
-
 export class WorkspaceNotYetLoadedException extends BaseException {
   constructor() { super(`Workspace needs to be loaded before it is used.`); }
 }
@@ -222,7 +216,7 @@ export class Workspace {
         if (validatorResult.success) {
           return of(contentJsonCopy as T);
         } else {
-          return throwError(new SchemaValidationException(validatorResult.errors as string[]));
+          return throwError(new schema.SchemaValidationException(validatorResult.errors));
         }
       }),
     );

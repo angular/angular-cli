@@ -20,9 +20,9 @@ export type SchematicDesc =
 
 export class InvalidInputOptions extends BaseException {
   // tslint:disable-next-line:no-any
-  constructor(options: any, errors: string[]) {
+  constructor(options: any, public readonly errors: schema.SchemaValidatorError[]) {
     super(`Schematic input does not validate against the Schema: ${JSON.stringify(options)}\n`
-        + `Errors:\n  ${errors.join('\n  ')}`);
+        + `Errors:\n  ${schema.SchemaValidationException.createMessages(errors).join('\n  ')}`);
   }
 }
 
@@ -59,7 +59,7 @@ export function validateOptionsWithSchema(registry: schema.SchemaRegistry) {
           first(),
           map(result => {
             if (!result.success) {
-              throw new InvalidInputOptions(options, result.errors || ['Unknown reason.']);
+              throw new InvalidInputOptions(options, result.errors || []);
             }
 
             return options;

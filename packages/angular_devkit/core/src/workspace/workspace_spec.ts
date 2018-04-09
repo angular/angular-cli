@@ -7,11 +7,11 @@
  */
 
 import { tap } from 'rxjs/operators';
+import { schema } from '..';
 import { NodeJsSyncHost } from '../../node';
 import { join, normalize } from '../virtual-fs';
 import {
   ProjectNotFoundException,
-  SchemaValidationException,
   Workspace,
   WorkspaceNotYetLoadedException,
   WorkspaceProject,
@@ -118,7 +118,7 @@ describe('Workspace', () => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson({ foo: 'bar' })
       .subscribe(undefined, (err) => {
-        expect(err).toEqual(jasmine.any(SchemaValidationException));
+        expect(err).toEqual(jasmine.any(schema.SchemaValidationException));
         done();
       }, done.fail);
   });
