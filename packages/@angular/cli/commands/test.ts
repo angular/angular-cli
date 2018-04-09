@@ -34,6 +34,6 @@ export default class TestCommand extends ArchitectCommand {
       target: this.target,
       configuration,
       overrides
-    });
+    }, options);
   }
 }

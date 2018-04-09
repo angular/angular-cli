@@ -43,6 +43,6 @@ export default class BuildCommand extends ArchitectCommand {
       target: this.target,
       configuration,
       overrides
-    });
+    }, options);
   }
 }

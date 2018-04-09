@@ -24,7 +24,7 @@ export default class RunCommand extends ArchitectCommand {
         target,
         configuration,
         overrides
-      });
+      }, options);
     } else {
       throw new Error('Invalid architect target.');
     }

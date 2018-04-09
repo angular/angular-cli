@@ -24,6 +24,6 @@ export default class LintCommand extends ArchitectCommand {
       target: this.target,
       configuration: options.configuration,
       overrides
-    });
+    }, options);
   }
 }

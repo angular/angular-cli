@@ -33,6 +33,6 @@ export default class E2eCommand extends ArchitectCommand {
       target: this.target,
       configuration,
       overrides
-    });
+    }, options);
   }
 }

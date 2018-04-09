@@ -23,6 +23,6 @@ export default class Xi18nCommand extends ArchitectCommand {
       target: this.target,
       configuration: options.configuration,
       overrides
-    });
+    }, options);
   }
 }
