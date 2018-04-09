@@ -10,6 +10,7 @@ import { NodePackageName, NodePackageTaskOptions } from './options';
 
 export class NodePackageInstallTaskOptions {
   packageManager: string;
+  packageName: string;
   workingDirectory: string;
   quiet: boolean;
 }
@@ -18,6 +19,7 @@ export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePa
   quiet = true;
   workingDirectory?: string;
   packageManager?: string;
+  packageName?: string;
 
   constructor(workingDirectory?: string);
   constructor(options: Partial<NodePackageInstallTaskOptions>);
@@ -34,6 +36,9 @@ export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePa
       if (options.packageManager != undefined) {
         this.packageManager = options.packageManager;
       }
+      if (options.packageName != undefined) {
+        this.packageName = options.packageName;
+      }
     }
   }
 
@@ -45,6 +50,7 @@ export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePa
         quiet: this.quiet,
         workingDirectory: this.workingDirectory,
         packageManager: this.packageManager,
+        packageName: this.packageName,
       },
     };
   }
