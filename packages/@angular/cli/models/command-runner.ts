@@ -59,9 +59,58 @@ export async function runCommand(commandMap: CommandMap,
   }
 
   if (!Cmd) {
-    logger.error(tags.oneLine`The specified command (${commandName}) is invalid.
-    For a list of available options, run \`ng help\`.`);
-    throw '';
+    function levenshtein(a: string, b: string): number {
+      if (a.length === 0) {
+        return b.length;
+      }
+      if (b.length === 0) {
+        return a.length;
+      }
+
+      if (a.length > b.length) {
+        let tmp = a;
+        a = b;
+        b = tmp;
+      }
+
+      const row = Array(a.length);
+      for (let i = 0; i <= a.length; i++) {
+        row[i] = i;
+      }
+
+      let result: number;
+      for (let i = 1; i <= b.length; i++) {
+        result = i;
+
+        for (let j = 1; j <= a.length; j++) {
+          let tmp = row[j - 1];
+          row[j - 1] = result;
+          result = b[i - 1] === a[j - 1]
+            ? tmp
+            : Math.min(tmp + 1, Math.min(result + 1, row[j] + 1));
+        }
+      }
+
+      return result;
+    }
+
+    const commandsDistance = {} as { [name: string]: number };
+    const allCommands = listAllCommandNames(commandMap).sort((a, b) => {
+      if (!(a in commandsDistance)) {
+        commandsDistance[a] = levenshtein(a, commandName);
+      }
+      if (!(b in commandsDistance)) {
+        commandsDistance[b] = levenshtein(b, commandName);
+      }
+      return commandsDistance[a] - commandsDistance[b];
+    });
+
+    throw new SilentError(tags.stripIndent`
+        The specified command ("${commandName}") is invalid. For a list of available options,
+        run "ng help".
+
+        Did you mean "${allCommands[0]}"?
+    `);
   }
 
   const command = new Cmd(context, logger);
@@ -167,8 +216,7 @@ export function parseOptions<T = any>(
 }
 
 // Find a command.
-function findCommand(
-  map: CommandMap, name: string): CommandConstructor | null {
+function findCommand(map: CommandMap, name: string): CommandConstructor | null {
   let Cmd: CommandConstructor = map[name];
 
   if (!Cmd) {
@@ -193,6 +241,20 @@ function findCommand(
   }
   return Cmd;
 }
+
+function listAllCommandNames(map: CommandMap): string[] {
+  return Object.keys(map).concat(
+    Object.keys(map)
+      .reduce((acc, key) => {
+        if (!map[key].aliases) {
+          return acc;
+        }
+
+        return acc.concat(map[key].aliases);
+      }, [] as string[]),
+  );
+}
+
 
 function verifyCommandInScope(command: Command, scope = CommandScope.everywhere): void {
   if (!command) {
