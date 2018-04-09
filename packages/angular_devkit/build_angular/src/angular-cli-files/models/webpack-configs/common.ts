@@ -34,6 +34,11 @@ const resolve = require('resolve');
  * require('@angular-devkit/build-optimizer')
  */
 
+const g: any = typeof global !== 'undefined' ? global : {};
+export const buildOptimizerLoader: string = g['_DevKitIsLocal']
+  ? require.resolve('@angular-devkit/build-optimizer/src/build-optimizer/webpack-loader')
+  : '@angular-devkit/build-optimizer/webpack-loader';
+
 export function getCommonConfig(wco: WebpackConfigOptions) {
   const { root, projectRoot, buildOptions } = wco;
 
@@ -158,8 +163,9 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   let buildOptimizerUseRule;
   if (buildOptions.buildOptimizer) {
     // Set the cache directory to the Build Optimizer dir, so that package updates will delete it.
-    const buildOptimizerDir = path.dirname(
-      resolve.sync('@angular-devkit/build-optimizer', { basedir: projectRoot }));
+    const buildOptimizerDir = g['_DevKitIsLocal']
+     ? nodeModules
+     : path.dirname(resolve.sync('@angular-devkit/build-optimizer', { basedir: projectRoot }));
     const cacheDirectory = path.resolve(buildOptimizerDir, './.cache/');
 
     buildOptimizerUseRule = {
@@ -169,7 +175,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
           options: { cacheDirectory }
         },
         {
-          loader: '@angular-devkit/build-optimizer/webpack-loader',
+          loader: buildOptimizerLoader,
           options: { sourceMap: buildOptions.sourceMap }
         },
       ],

@@ -52,7 +52,6 @@
   },
   "homepage": "https://github.com/angular/devkit",
   "dependencies": {
-    "@angular-devkit/build-optimizer": "^0.4.2",
     "@angular/animations": "^6.0.0-rc.0",
     "@angular/common": "^6.0.0-rc.0",
     "@angular/compiler": "^6.0.0-rc.0",

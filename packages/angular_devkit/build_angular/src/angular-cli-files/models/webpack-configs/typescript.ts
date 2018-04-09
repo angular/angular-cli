@@ -8,6 +8,7 @@ import {
   AngularCompilerPluginOptions,
   PLATFORM
 } from '@ngtools/webpack';
+import { buildOptimizerLoader } from './common';
 import { WebpackConfigOptions } from '../build-options';
 
 const SilentError = require('silent-error');
@@ -80,7 +81,7 @@ export function getAotConfig(wco: WebpackConfigOptions, host: virtualFs.Host<Sta
   const loaders: any[] = [webpackLoader];
   if (buildOptions.buildOptimizer) {
     loaders.unshift({
-      loader: '@angular-devkit/build-optimizer/webpack-loader',
+      loader: buildOptimizerLoader,
       options: { sourceMap: buildOptions.sourceMap }
     });
   }
