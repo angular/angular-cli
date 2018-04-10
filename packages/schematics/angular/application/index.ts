@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { normalize, relative, strings, tags } from '@angular-devkit/core';
+import { JsonObject, normalize, relative, strings, tags } from '@angular-devkit/core';
 import { experimental } from '@angular-devkit/core';
 import {
   MergeStrategy,
@@ -224,6 +224,35 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
     // }
 
     workspace.projects[options.name] = project;
+
+    const schematics: JsonObject = {};
+
+    if (options.inlineTemplate === true
+        || options.inlineStyle === true
+        || options.style !== undefined) {
+      schematics['@schematics/angular:component'] = {};
+      if (options.inlineTemplate === true) {
+        (schematics['@schematics/angular:component'] as JsonObject).inlineTemplate = true;
+      }
+      if (options.inlineStyle === true) {
+        (schematics['@schematics/angular:component'] as JsonObject).inlineStyle = true;
+      }
+      if (options.style !== undefined) {
+        (schematics['@schematics/angular:component'] as JsonObject).styleext = options.style;
+      }
+    }
+
+    if (options.skipTests === true) {
+      ['class', 'component', 'directive', 'guard', 'module', 'pipe', 'service'].forEach((type) => {
+        if (!(`@schematics/angular:${type}` in schematics)) {
+          schematics[`@schematics/angular:${type}`] = {};
+        }
+        (schematics[`@schematics/angular:${type}`] as JsonObject).spec = false;
+      });
+    }
+
+    workspace.schematics = schematics;
+
     host.overwrite(getWorkspacePath(host), JSON.stringify(workspace, null, 2));
   };
 }
