@@ -4,5 +4,10 @@ import {expectGitToBeClean} from '../../../utils/git';
 
 export default function() {
   return ng('generate', 'service', 'test-service', '--module', 'app.module.ts', '--dry-run')
+    .then(({stdout}) => {
+      if (!/NOTE: Run with "dry run" no changes were made/.test(stdout)) {
+        throw 'Dry run warning not shown.';
+      }
+    })
     .then(() => expectGitToBeClean());
 }
