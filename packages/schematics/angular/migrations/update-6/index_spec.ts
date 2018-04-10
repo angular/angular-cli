@@ -107,6 +107,11 @@ describe('Migration to v6', () => {
     tree.create('/src/favicon.ico', '');
   });
 
+  // tslint:disable-next-line:no-any
+  function getConfig(tree: UnitTestTree): any {
+    return JSON.parse(tree.readContent(configPath));
+  }
+
   describe('file creation/deletion', () => {
     it('should delete the old config file', () => {
       tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
@@ -123,11 +128,6 @@ describe('Migration to v6', () => {
   });
 
   describe('config file contents', () => {
-    // tslint:disable-next-line:no-any
-    function getConfig(tree: UnitTestTree): any {
-      return JSON.parse(tree.readContent(configPath));
-    }
-
     it('should set root values', () => {
       tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
       tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
@@ -718,6 +718,57 @@ describe('Migration to v6', () => {
       const tslint = JSON.parse(tree.readContent(tslintPath));
       const blacklist = tslint.rules['import-blacklist'];
       expect(blacklist).toEqual([]);
+    });
+  });
+
+  describe('server/universal apps', () => {
+    let serverApp;
+    beforeEach(() => {
+      serverApp = {
+        platform: 'server',
+        root: 'src',
+        outDir: 'dist/server',
+        assets: [
+          'assets',
+          'favicon.ico',
+        ],
+        index: 'index.html',
+        main: 'main.server.ts',
+        test: 'test.ts',
+        tsconfig: 'tsconfig.server.json',
+        testTsconfig: 'tsconfig.spec.json',
+        prefix: 'app',
+        styles: [
+          'styles.css',
+        ],
+        scripts: [],
+        environmentSource: 'environments/environment.ts',
+        environments: {
+          dev: 'environments/environment.ts',
+          prod: 'environments/environment.prod.ts',
+        },
+      };
+      baseConfig.apps.push(serverApp);
+    });
+
+    it('should not create a separate app for server apps', () => {
+      tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+      tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+      const config = getConfig(tree);
+      const appCount = Object.keys(config.projects).length;
+      expect(appCount).toEqual(2);
+    });
+
+    it('should create a server target', () => {
+      tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+      tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+      const config = getConfig(tree);
+      const target = config.projects.foo.architect.server;
+      expect(target).toBeDefined();
+      expect(target.builder).toEqual('@angular-devkit/build-angular:server');
+      expect(target.options.outputPath).toEqual('dist/server');
+      expect(target.options.main).toEqual('main.server.ts');
+      expect(target.options.tsConfig).toEqual('tsconfig.server.json');
     });
   });
 });

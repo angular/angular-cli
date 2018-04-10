@@ -28,6 +28,9 @@ const defaults = {
   karma: 'karma.conf.js',
   protractor: 'protractor.conf.js',
   testTsConfig: 'tsconfig.spec.json',
+  serverOutDir: 'dist-server',
+  serverMain: 'main.server.ts',
+  serverTsConfig: 'tsconfig.server.json',
 };
 
 function getConfigPath(tree: Tree): Path {
@@ -195,8 +198,11 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
 
   const apps = config.apps || [];
   // convert the apps to projects
-  const projectMap = apps
-    .map((app: AppConfig, idx: number) => {
+  const browserApps = apps.filter(app => app.platform !== 'server');
+  const serverApps = apps.filter(app => app.platform === 'server');
+
+  const projectMap = browserApps
+    .map((app, idx) => {
       const defaultAppName = idx === 0 ? defaultAppNamePrefix : `${defaultAppNamePrefix}${idx}`;
       const name = app.name || defaultAppName;
       const outDir = app.outDir || defaults.outDir;
@@ -440,6 +446,22 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
           options: lintOptions,
         };
 
+      // server target
+      const serverApp = serverApps
+        .filter(serverApp => app.root === serverApp.root && app.index === serverApp.index)[0];
+
+      if (serverApp) {
+        const serverOptions: JsonObject = {
+          outputPath: serverApp.outDir || defaults.serverOutDir,
+          main: serverApp.main || defaults.serverMain,
+          tsConfig: serverApp.tsconfig || defaults.serverTsConfig,
+        };
+        const serverTarget: JsonObject = {
+          builder: '@angular-devkit/build-angular:server',
+          options: serverOptions,
+        };
+        architect.server = serverTarget;
+      }
       const e2eProject: JsonObject = {
         root: project.root,
         projectType: 'application',
