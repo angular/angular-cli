@@ -47,13 +47,13 @@ export function statsToString(json: any, statsConfig: any) {
   const unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
 
   if (unchangedChunkNumber > 0) {
-    return rs(tags.stripIndents`
+    return '\n' + rs(tags.stripIndents`
       Date: ${w(new Date().toISOString())} - Hash: ${w(json.hash)} - Time: ${w('' + json.time)}ms
       ${unchangedChunkNumber} unchanged chunks
       ${changedChunksStats.join('\n')}
       `);
   } else {
-    return rs(tags.stripIndents`
+    return '\n' + rs(tags.stripIndents`
       Date: ${w(new Date().toISOString())}
       Hash: ${w(json.hash)}
       Time: ${w('' + json.time)}ms
