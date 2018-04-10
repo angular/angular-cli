@@ -32,6 +32,28 @@ describe('Browser Builder file replacements', () => {
     const overrides = {
       fileReplacements: [
         {
+          replace: normalize('/src/meaning.ts'),
+          with: normalize('/src/meaning-too.ts'),
+        },
+      ],
+    };
+
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        const fileName = join(outputPath, 'main.js');
+        expect(virtualFs.fileBufferToString(host.scopedSync().read(fileName)))
+          .toMatch(/meaning\s*=\s*42/);
+        expect(virtualFs.fileBufferToString(host.scopedSync().read(fileName)))
+          .not.toMatch(/meaning\s*=\s*10/);
+      }),
+    ).subscribe(undefined, done.fail, done);
+  }, Timeout.Basic);
+
+  it(`allows file replacements with deprecated format`, (done) => {
+    const overrides = {
+      fileReplacements: [
+        {
           src: normalize('/src/meaning.ts'),
           replaceWith: normalize('/src/meaning-too.ts'),
         },
@@ -50,18 +72,29 @@ describe('Browser Builder file replacements', () => {
     ).subscribe(undefined, done.fail, done);
   }, Timeout.Basic);
 
-  it(`fails compilation with missing 'to' file`, (done) => {
+  it(`fails compilation with missing 'replace' file`, (done) => {
     const overrides = {
       fileReplacements: [
         {
-          src: normalize('/src/meaning.ts'),
-          replaceWith: normalize('/src/meaning-three.ts'),
+          replace: normalize('/src/meaning.ts'),
+          with: normalize('/src/meaning-three.ts'),
         },
       ],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(false)),
-    ).subscribe(undefined, done.fail, done);
+    runTargetSpec(host, browserTargetSpec, overrides).subscribe(undefined, done, done.fail);
+  }, Timeout.Basic);
+
+  it(`fails compilation with missing 'with' file`, (done) => {
+    const overrides = {
+      fileReplacements: [
+        {
+          replace: normalize('/src/meaning-three.ts'),
+          with: normalize('/src/meaning-too.ts'),
+        },
+      ],
+    };
+
+    runTargetSpec(host, browserTargetSpec, overrides).subscribe(undefined, done, done.fail);
   }, Timeout.Basic);
 });

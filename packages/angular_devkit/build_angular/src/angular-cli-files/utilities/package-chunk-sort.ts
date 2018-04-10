@@ -1,20 +1,20 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
-import { ExtraEntryPoint } from '../../browser';
-import { computeBundleName } from '../models/webpack-configs/utils';
+import { ExtraEntryPoint } from '../../browser/schema';
+import { normalizeExtraEntryPoints } from '../models/webpack-configs/utils';
 
 export function generateEntryPoints(appConfig: any) {
   let entryPoints = ['polyfills', 'sw-register'];
 
   // Add all styles/scripts, except lazy-loaded ones.
   [
-    ...(appConfig.styles as ExtraEntryPoint[])
+    ...normalizeExtraEntryPoints(appConfig.styles as ExtraEntryPoint[], 'styles')
       .filter(entry => !entry.lazy)
-      .map(entry => computeBundleName(entry, 'styles')),
-    ...(appConfig.scripts as ExtraEntryPoint[])
+      .map(entry => entry.bundleName),
+    ...normalizeExtraEntryPoints(appConfig.scripts as ExtraEntryPoint[], 'scripts')
       .filter(entry => !entry.lazy)
-      .map(entry => computeBundleName(entry, 'scripts')),
+      .map(entry => entry.bundleName),
   ].forEach(bundleName => {
     if (entryPoints.indexOf(bundleName) === -1) {
       entryPoints.push(bundleName);

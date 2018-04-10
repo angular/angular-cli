@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, Path, basename, join, normalize } from '@angular-devkit/core';
+import { JsonObject, Path, join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -291,8 +291,8 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
             ...(isProduction && serviceWorker ? { serviceWorker: true } : {}),
             fileReplacements: [
               {
-                src: `${app.root}/${source}`,
-                replaceWith: `${app.root}/${environments[environment]}`,
+                replace: `${app.root}/${source}`,
+                with: `${app.root}/${environments[environment]}`,
               },
             ],
           };
@@ -321,20 +321,14 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
       }
 
       function _extraEntryMapper(extraEntry: string | JsonObject) {
-        let entry: JsonObject;
+        let entry: string | JsonObject;
         if (typeof extraEntry === 'string') {
-          entry = { input: join(app.root as Path, extraEntry) };
+          entry = join(app.root as Path, extraEntry);
         } else {
           const input = join(app.root as Path, extraEntry.input as string || '');
-          const lazy = !!extraEntry.lazy;
-          entry = { input };
+          entry = { input, lazy: extraEntry.lazy };
 
-          if (!extraEntry.output && lazy) {
-            entry.lazy = true;
-            entry.bundleName = basename(
-              normalize(input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
-            );
-          } else if (extraEntry.output) {
+          if (extraEntry.output) {
             entry.bundleName = extraEntry.output;
           }
         }

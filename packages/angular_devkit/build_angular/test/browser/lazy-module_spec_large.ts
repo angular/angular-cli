@@ -8,7 +8,7 @@
 
 import { join, normalize } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { BrowserBuilderOptions } from '../../src';
+import { BrowserBuilderSchema } from '../../src';
 import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
@@ -137,7 +137,7 @@ describe('Browser Builder lazy modules', () => {
     });
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
-    const overrides: Partial<BrowserBuilderOptions> = { namedChunks: false };
+    const overrides: Partial<BrowserBuilderSchema> = { namedChunks: false };
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
@@ -170,7 +170,7 @@ describe('Browser Builder lazy modules', () => {
     });
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
-    const overrides: Partial<BrowserBuilderOptions> = { commonChunk: false };
+    const overrides: Partial<BrowserBuilderSchema> = { commonChunk: false };
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
@@ -203,7 +203,7 @@ describe('Browser Builder lazy modules', () => {
     });
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
-    const overrides: Partial<BrowserBuilderOptions> = { lazyModules: ['src/app/lazy/lazy.module'] };
+    const overrides: Partial<BrowserBuilderSchema> = { lazyModules: ['src/app/lazy/lazy.module'] };
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),

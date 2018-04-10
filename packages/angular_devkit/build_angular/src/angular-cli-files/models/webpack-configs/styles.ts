@@ -8,8 +8,8 @@ import { getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../build-options';
 import { findUp } from '../../utilities/find-up';
 import { RawCssLoader } from '../../plugins/webpack';
-import { ExtraEntryPoint } from '../../../browser';
-import { computeBundleName } from './utils';
+import { ExtraEntryPoint } from '../../../browser/schema';
+import { normalizeExtraEntryPoints } from './utils';
 
 const postcssUrl = require('postcss-url');
 const autoprefixer = require('autoprefixer');
@@ -166,15 +166,14 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // Process global styles.
   if (buildOptions.styles.length > 0) {
-    (buildOptions.styles as ExtraEntryPoint[]).forEach(style => {
-      const bundleName = computeBundleName(style, 'styles');;
+    normalizeExtraEntryPoints(buildOptions.styles, 'styles').forEach(style => {
       const resolvedPath = path.resolve(root, style.input);
 
       // Add style entry points.
-      if (entryPoints[bundleName]) {
-        entryPoints[bundleName].push(resolvedPath)
+      if (entryPoints[style.bundleName]) {
+        entryPoints[style.bundleName].push(resolvedPath)
       } else {
-        entryPoints[bundleName] = [resolvedPath]
+        entryPoints[style.bundleName] = [resolvedPath]
       }
 
       // Add global css paths.

@@ -12,8 +12,8 @@ import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 import { findUp } from '../../utilities/find-up';
-import { AssetPattern, ExtraEntryPoint } from '../../../browser';
-import { computeBundleName } from './utils';
+import { AssetPattern, ExtraEntryPoint } from '../../../browser/schema';
+import { normalizeExtraEntryPoints } from './utils';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
@@ -63,9 +63,9 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   // process global scripts
   if (buildOptions.scripts.length > 0) {
-    const globalScriptsByBundleName = (buildOptions.scripts as ExtraEntryPoint[])
+    const globalScriptsByBundleName = normalizeExtraEntryPoints(buildOptions.scripts, 'scripts')
       .reduce((prev: { bundleName: string, paths: string[], lazy: boolean }[], curr) => {
-        const bundleName = computeBundleName(curr, 'scripts');
+        const bundleName = curr.bundleName;
         const resolvedPath = path.resolve(root, curr.input);
         let existingEntry = prev.find((el) => el.bundleName === bundleName);
         if (existingEntry) {

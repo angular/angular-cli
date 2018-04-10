@@ -7,3 +7,4 @@
  */
 
 export * from './run-module-as-observable-fork';
+export * from './add-file-replacements';

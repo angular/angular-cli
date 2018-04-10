@@ -12,11 +12,12 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
-import { Path, getSystemPath, resolve, tags } from '@angular-devkit/core';
+import { Path, getSystemPath, resolve, tags, virtualFs } from '@angular-devkit/core';
 import { existsSync, readFileSync } from 'fs';
+import * as fs from 'fs';
 import * as path from 'path';
 import { Observable } from 'rxjs';
-import { concatMap, map } from 'rxjs/operators';
+import { concatMap, map, tap } from 'rxjs/operators';
 import * as url from 'url';
 import * as webpack from 'webpack';
 import { getWebpackStatsConfig } from '../angular-cli-files/models/webpack-configs/utils';
@@ -26,10 +27,9 @@ import {
   statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
-import {
-  BrowserBuilder,
-  BrowserBuilderOptions,
-} from '../browser/';
+import { BrowserBuilder } from '../browser/';
+import { BrowserBuilderSchema } from '../browser/schema';
+import { addFileReplacements } from '../utils';
 const opn = require('opn');
 const WebpackDevServer = require('webpack-dev-server');
 
@@ -87,16 +87,18 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     const options = builderConfig.options;
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
+    const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
+    let browserOptions: BrowserBuilderSchema;
 
     return checkPort(options.port, options.host).pipe(
-      concatMap((port) => {
-        options.port = port;
-
-        return this._getBrowserOptions(options);
-      }),
-      concatMap((browserOptions) => new Observable(obs => {
+      tap((port) => options.port = port),
+      concatMap(() => this._getBrowserOptions(options)),
+      tap((opts) => browserOptions = opts),
+      concatMap(() => addFileReplacements(root, host, browserOptions.fileReplacements)),
+      concatMap(() => new Observable(obs => {
         const browserBuilder = new BrowserBuilder(this.context);
-        const webpackConfig = browserBuilder.buildWebpackConfig(root, projectRoot, browserOptions);
+        const webpackConfig = browserBuilder.buildWebpackConfig(
+          root, projectRoot, host, browserOptions);
         const webpackCompiler = webpack(webpackConfig);
         const statsConfig = getWebpackStatsConfig(browserOptions.verbose);
 
@@ -220,7 +222,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     root: Path,
     projectRoot: Path,
     options: DevServerBuilderOptions,
-    browserOptions: BrowserBuilderOptions,
+    browserOptions: BrowserBuilderSchema,
   ) {
     const systemRoot = getSystemPath(root);
     if (options.disableHostCheck) {
@@ -270,7 +272,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
 
   private _addLiveReload(
     options: DevServerBuilderOptions,
-    browserOptions: BrowserBuilderOptions,
+    browserOptions: BrowserBuilderSchema,
     webpackConfig: any, // tslint:disable-line:no-any
     clientAddress: string,
   ) {
@@ -355,7 +357,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     config.proxy = proxyConfig;
   }
 
-  private _buildServePath(options: DevServerBuilderOptions, browserOptions: BrowserBuilderOptions) {
+  private _buildServePath(options: DevServerBuilderOptions, browserOptions: BrowserBuilderSchema) {
     let servePath = options.servePath;
     if (!servePath && servePath !== '') {
       const defaultServePath =
@@ -420,7 +422,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     // Override browser build watch setting.
     const overrides = { watch: options.watch };
     const browserTargetSpec = { project, target, configuration, overrides };
-    const builderConfig = architect.getBuilderConfiguration<BrowserBuilderOptions>(
+    const builderConfig = architect.getBuilderConfiguration<BrowserBuilderSchema>(
       browserTargetSpec);
 
     return architect.getBuilderDescription(builderConfig).pipe(

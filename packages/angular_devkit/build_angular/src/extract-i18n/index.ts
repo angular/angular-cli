@@ -5,22 +5,30 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
 import {
   BuildEvent,
   Builder,
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
-import { resolve } from '@angular-devkit/core';
+import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
+import * as fs from 'fs';
 import * as path from 'path';
 import { Observable } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
 import * as webpack from 'webpack';
+import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
+import {
+  getAotConfig,
+  getCommonConfig,
+  getStylesConfig,
+} from '../angular-cli-files/models/webpack-configs';
 import { getWebpackStatsConfig } from '../angular-cli-files/models/webpack-configs/utils';
+import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { statsErrorsToString, statsWarningsToString } from '../angular-cli-files/utilities/stats';
-import { BrowserBuilder, BrowserBuilderOptions } from '../browser';
+import { BrowserBuilderSchema } from '../browser/schema';
 const MemoryFS = require('memory-fs');
+const webpackMerge = require('webpack-merge');
 
 
 export interface ExtractI18nBuilderOptions {
@@ -45,7 +53,7 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
     const overrides = { watch: false };
 
     const browserTargetSpec = { project, target: targetName, configuration, overrides };
-    const browserBuilderConfig = architect.getBuilderConfiguration<BrowserBuilderOptions>(
+    const browserBuilderConfig = architect.getBuilderConfiguration<BrowserBuilderSchema>(
       browserTargetSpec);
 
     return architect.getBuilderDescription(browserBuilderConfig).pipe(
@@ -54,7 +62,6 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
       map(browserBuilderConfig => browserBuilderConfig.options),
       concatMap((validatedBrowserOptions) => new Observable(obs => {
         const browserOptions = validatedBrowserOptions;
-        const browserBuilder = new BrowserBuilder(this.context);
 
         // We need to determine the outFile name so that AngularCompiler can retrieve it.
         let outFile = options.outFile || getI18nOutfile(options.i18nFormat);
@@ -64,13 +71,16 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
         }
 
         // Extracting i18n uses the browser target webpack config with some specific options.
-        const webpackConfig = browserBuilder.buildWebpackConfig(root, projectRoot, {
+        const webpackConfig = this.buildWebpackConfig(root, projectRoot, {
           ...browserOptions,
           optimization: false,
           i18nLocale: options.i18nLocale,
-          i18nOutFormat: options.i18nFormat,
-          i18nOutFile: outFile,
+          i18nFormat: options.i18nFormat,
+          i18nFile: outFile,
           aot: true,
+          assets: [],
+          scripts: [],
+          styles: [],
         });
 
         const webpackCompiler = webpack(webpackConfig);
@@ -107,6 +117,37 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
         }
       })),
     );
+  }
+
+  buildWebpackConfig(
+    root: Path,
+    projectRoot: Path,
+    options: BrowserBuilderSchema,
+  ) {
+    let wco: WebpackConfigOptions;
+
+    const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
+
+    const tsConfigPath = getSystemPath(normalize(resolve(root, normalize(options.tsConfig))));
+    const tsConfig = readTsconfig(tsConfigPath);
+
+    wco = {
+      root: getSystemPath(root),
+      projectRoot: getSystemPath(projectRoot),
+      // TODO: use only this.options, it contains all flags and configs items already.
+      buildOptions: options,
+      tsConfig,
+      tsConfigPath,
+      supportES2015: false,
+    };
+
+    const webpackConfigs: {}[] = [
+      getCommonConfig(wco),
+      getAotConfig(wco, host, true),
+      getStylesConfig(wco),
+    ];
+
+    return webpackMerge(webpackConfigs);
   }
 }
 

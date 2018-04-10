@@ -7,7 +7,7 @@ import * as glob from 'glob';
 import * as webpack from 'webpack';
 const webpackDevMiddleware = require('webpack-dev-middleware');
 
-import { AssetPattern } from '../../browser';
+import { AssetPattern } from '../../browser/schema';
 import { KarmaWebpackFailureCb } from './karma-webpack-failure-cb';
 
 /**

@@ -9,7 +9,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Budget, Size, calculateBytes, calculateSizes } from '../utilities/bundle-calculator';
+import { Size, calculateBytes, calculateSizes } from '../utilities/bundle-calculator';
+import { Budget } from '../../browser/schema';
 import { formatSize } from '../utilities/stats';
 
 interface Thresholds {

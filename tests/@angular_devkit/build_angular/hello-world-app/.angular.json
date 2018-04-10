@@ -33,9 +33,7 @@
               }
             ],
             "styles": [
-              {
-                "input": "src/styles.css"
-              }
+              "src/styles.css"
             ],
             "scripts": []
           },
@@ -43,8 +41,8 @@
             "production": {
               "fileReplacements": [
                 {
-                  "src": "src/environments/environments.ts",
-                  "replaceWith": "src/environments/environments.prod.ts"
+                  "replace": "src/environments/environments.ts",
+                  "with": "src/environments/environments.prod.ts"
                 }
               ],
               "optimization": true,

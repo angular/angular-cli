@@ -3,7 +3,7 @@
 
 import * as path from 'path';
 import { basename, normalize } from '@angular-devkit/core';
-import { ExtraEntryPoint } from '../../../browser';
+import { ExtraEntryPoint, ExtraEntryPointObject } from '../../../browser/schema';
 
 export const ngAppResolve = (resolvePath: string): string => {
   return path.resolve(process.cwd(), resolvePath);
@@ -61,14 +61,34 @@ export function getOutputHashFormat(option: string, length = 20): HashFormat {
   return hashFormats[option] || hashFormats['none'];
 }
 
-export function computeBundleName(entry: ExtraEntryPoint, defaultName: string){
-  if (entry.bundleName) {
-    return entry.bundleName;
-  } else if (entry.lazy) {
-      return basename(
-        normalize(entry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
-        );
+export type NormalizedEntryPoint = ExtraEntryPointObject & { bundleName: string };
+
+export function normalizeExtraEntryPoints(
+  extraEntryPoints: ExtraEntryPoint[],
+  defaultBundleName: string
+): NormalizedEntryPoint[] {
+  return extraEntryPoints.map(entry => {
+    let normalizedEntry;
+
+    if (typeof entry === 'string') {
+      normalizedEntry = { input: entry, lazy: false, bundleName: defaultBundleName };
     } else {
-    return defaultName;
-  }
+      let bundleName;
+
+      if (entry.bundleName) {
+        bundleName = entry.bundleName;
+      } else if (entry.lazy) {
+        // Lazy entry points use the file name as bundle name.
+        bundleName = basename(
+          normalize(entry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
+        );
+      } else {
+        bundleName = defaultBundleName;
+      }
+
+      normalizedEntry = {...entry, bundleName};
+    }
+
+    return normalizedEntry;
+  })
 }

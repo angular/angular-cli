@@ -13,7 +13,7 @@
     },
     "karmaConfig": {
       "type": "string",
-      "description": "The name of the TypeScript configuration file."
+      "description": "The name of the Karma configuration file."
     },
     "polyfills": {
       "type": "string",
@@ -32,7 +32,7 @@
       "type": "array",
       "default": [],
       "items": {
-        "$ref": "#/definitions/scriptEntryPoint"
+        "$ref": "#/definitions/extraEntryPoint"
       }
     },
     "styles": {
@@ -40,7 +40,7 @@
       "type": "array",
       "default": [],
       "items": {
-        "$ref": "#/definitions/styleEntryPoint"
+        "$ref": "#/definitions/extraEntryPoint"
       }
     },
     "stylePreprocessorOptions": {
@@ -107,15 +107,40 @@
       "description": "Replace files with other files in the build.",
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "src": {
-            "type": "string"
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "src": {
+                "type": "string"
+              },
+              "replaceWith": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "src",
+              "replaceWith"
+            ]
           },
-          "replaceWith": {
-            "type": "string"
+          {
+            "type": "object",
+            "properties": {
+              "replace": {
+                "type": "string"
+              },
+              "with": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "replace",
+              "with"
+            ]
           }
-        }
+        ]
       },
       "default": []
     }
@@ -150,50 +175,34 @@
         "output"
       ]
     },
-    "styleEntryPoint": {
-      "type": "object",
-      "properties": {
-        "input": {
+    "extraEntryPoint": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "input": {
+              "type": "string",
+              "description": "The file to include."
+            },
+            "bundleName": {
+              "type": "string",
+              "description": "The bundle name for this extra entry point."
+            },
+            "lazy": {
+              "type": "boolean",
+              "description": "If the bundle will be lazy loaded.",
+              "default": false
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "input"
+          ]
+        },
+        {
           "type": "string",
           "description": "The file to include."
-        },
-        "bundleName": {
-          "type": "string",
-          "description": "The bundle name for this extra entry point.",
-          "default": "styles"
-        },
-        "lazy": {
-          "type": "boolean",
-          "description": "If the bundle will be lazy loaded later.",
-          "default": false
         }
-      },
-      "additionalProperties": false,
-      "required": [
-        "input"
-      ]
-    },
-    "scriptEntryPoint": {
-      "type": "object",
-      "properties": {
-        "input": {
-          "type": "string",
-          "description": "The file to include."
-        },
-        "bundleName": {
-          "type": "string",
-          "description": "The bundle name for this extra entry point.",
-          "default": "scripts"
-        },
-        "lazy": {
-          "type": "boolean",
-          "description": "If the bundle will be lazy loaded later.",
-          "default": false
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "input"
       ]
     }
   }

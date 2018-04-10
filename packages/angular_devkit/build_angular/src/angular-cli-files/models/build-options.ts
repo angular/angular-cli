@@ -10,7 +10,7 @@
 
 // tslint:disable-next-line:no-implicit-dependencies
 import * as ts from 'typescript';
-import { Budget } from '../utilities/bundle-calculator';
+import { AssetPattern, Budget, ExtraEntryPoint } from '../../browser/schema';
 
 export interface BuildOptions {
   optimization: boolean;
@@ -27,8 +27,6 @@ export interface BuildOptions {
   progress?: boolean;
   i18nFile?: string;
   i18nFormat?: string;
-  i18nOutFile?: string;
-  i18nOutFormat?: string;
   i18nLocale?: string;
   i18nMissingTranslation?: string;
   extractCss?: boolean;
@@ -56,34 +54,21 @@ export interface BuildOptions {
   assets: AssetPattern[];
   scripts: ExtraEntryPoint[];
   styles: ExtraEntryPoint[];
-  stylePreprocessorOptions: { includePaths: string[] };
+  stylePreprocessorOptions?: { includePaths: string[] };
   lazyModules: string[];
   platform?: 'browser' | 'server';
 }
 
-export interface AssetPattern {
-  glob: string;
-  input: string;
-  output: string;
-  allowOutsideOutDir?: boolean;
+export interface WebpackTestOptions extends BuildOptions {
+  codeCoverage?: boolean;
+  codeCoverageExclude?: string[];
 }
 
-export interface ExtraEntryPoint {
-  input: string;
-  output?: string;
-  lazy: boolean;
-}
-
-export interface WebpackConfigOptions<T extends BuildOptions = BuildOptions> {
+export interface WebpackConfigOptions<T = BuildOptions> {
   root: string;
   projectRoot: string;
   buildOptions: T;
   tsConfig: ts.ParsedCommandLine;
   tsConfigPath: string;
   supportES2015: boolean;
-}
-
-export interface WebpackTestOptions extends BuildOptions {
-  codeCoverage?: boolean;
-  codeCoverageExclude?: string[];
 }

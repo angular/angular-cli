@@ -141,8 +141,8 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
           configurations: {
             production: {
               fileReplacements: [{
-                src: `${projectRoot}src/environments/environment.ts`,
-                replaceWith: `${projectRoot}src/environments/environment.prod.ts`,
+                replace: `${projectRoot}src/environments/environment.ts`,
+                with: `${projectRoot}src/environments/environment.prod.ts`,
               }],
               optimization: true,
               outputHashing: 'all',

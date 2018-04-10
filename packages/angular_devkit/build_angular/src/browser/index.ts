@@ -11,7 +11,7 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
-import { Path, getSystemPath, join, normalize, resolve, virtualFs } from '@angular-devkit/core';
+import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable, concat, of } from 'rxjs';
 import { concatMap, last } from 'rxjs/operators';
@@ -25,7 +25,6 @@ import {
   getStylesConfig,
 } from '../angular-cli-files/models/webpack-configs';
 import { getWebpackStatsConfig } from '../angular-cli-files/models/webpack-configs/utils';
-import { Budget } from '../angular-cli-files/utilities/bundle-calculator';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
@@ -34,99 +33,35 @@ import {
   statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
+import { addFileReplacements } from '../utils';
+import { BrowserBuilderSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
-
-// TODO: Use quicktype to build our TypeScript interfaces from the JSON Schema itself, in
-// the build system.
-export interface BrowserBuilderOptions {
-  outputPath: string;
-  index: string;
-  main: string;
-  tsConfig: string; // previously 'tsconfig'.
-  aot: boolean;
-  vendorChunk: boolean;
-  commonChunk: boolean;
-  verbose: boolean;
-  progress: boolean;
-  extractCss: boolean;
-  watch: boolean;
-  outputHashing: 'none' | 'all' | 'media' | 'bundles';
-  deleteOutputPath: boolean;
-  preserveSymlinks: boolean;
-  extractLicenses: boolean;
-  showCircularDependencies: boolean;
-  buildOptimizer: boolean;
-  namedChunks: boolean;
-  subresourceIntegrity: boolean;
-  serviceWorker: boolean;
-  skipAppShell: boolean;
-  forkTypeChecker: boolean;
-  statsJson: boolean;
-  lazyModules: string[];
-  budgets: Budget[];
-
-  // Options with no defaults.
-  // TODO: reconsider this list.
-  polyfills?: string;
-  baseHref?: string;
-  deployUrl?: string;
-  i18nFile?: string;
-  i18nFormat?: string;
-  i18nOutFile?: string;
-  i18nOutFormat?: string;
-  poll?: number;
-
-  // A couple of options have different names.
-  sourceMap: boolean; // previously 'sourcemaps'.
-  evalSourceMap: boolean; // previously 'evalSourcemaps'.
-  optimization: boolean; // previously 'target'.
-  i18nLocale?: string; // previously 'locale'.
-  i18nMissingTranslation?: string; // previously 'missingTranslation'.
-
-  // These options were not available as flags.
-  assets: AssetPattern[];
-  scripts: ExtraEntryPoint[];
-  styles: ExtraEntryPoint[];
-  stylePreprocessorOptions: { includePaths: string[] };
-
-  fileReplacements: { src: string; replaceWith: string; }[];
-}
-
-export interface AssetPattern {
-  glob: string;
-  input: string;
-  output: string;
-}
-
-export interface ExtraEntryPoint {
-  input: string;
-  bundleName?: string;
-  lazy: boolean;
-}
 
 export interface WebpackConfigOptions {
   root: string;
   projectRoot: string;
-  buildOptions: BrowserBuilderOptions;
+  buildOptions: BrowserBuilderSchema;
   tsConfig: ts.ParsedCommandLine;
   tsConfigPath: string;
   supportES2015: boolean;
 }
 
-export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
+export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
 
   constructor(public context: BuilderContext) { }
 
-  run(builderConfig: BuilderConfiguration<BrowserBuilderOptions>): Observable<BuildEvent> {
+  run(builderConfig: BuilderConfiguration<BrowserBuilderSchema>): Observable<BuildEvent> {
     const options = builderConfig.options;
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
+    const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
 
     return of(null).pipe(
       concatMap(() => options.deleteOutputPath
         ? this._deleteOutputDir(root, normalize(options.outputPath), this.context.host)
         : of(null)),
+      concatMap(() => addFileReplacements(root, host, options.fileReplacements)),
       concatMap(() => new Observable(obs => {
         // Ensure Build Optimizer is only used with AOT.
         if (options.buildOptimizer && !options.aot) {
@@ -135,7 +70,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
 
         let webpackConfig;
         try {
-          webpackConfig = this.buildWebpackConfig(root, projectRoot, options);
+          webpackConfig = this.buildWebpackConfig(root, projectRoot, host, options);
         } catch (e) {
           obs.error(e);
 
@@ -216,21 +151,10 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
   buildWebpackConfig(
     root: Path,
     projectRoot: Path,
-    options: BrowserBuilderOptions,
+    host: virtualFs.Host<fs.Stats>,
+    options: BrowserBuilderSchema,
   ) {
     let wco: WebpackConfigOptions;
-
-    const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
-
-    options.fileReplacements.forEach(({ src, replaceWith }) => {
-      host.aliases.set(
-        join(root, normalize(src)),
-        join(root, normalize(replaceWith)),
-      );
-    });
-
-    // TODO: make target defaults into configurations instead
-    // options = this.addTargetDefaults(options);
 
     const tsConfigPath = getSystemPath(normalize(resolve(root, normalize(options.tsConfig))));
     const tsConfig = readTsconfig(tsConfigPath);
@@ -243,36 +167,11 @@ export class BrowserBuilder implements Builder<BrowserBuilderOptions> {
     wco = {
       root: getSystemPath(root),
       projectRoot: getSystemPath(projectRoot),
-      // TODO: use only this.options, it contains all flags and configs items already.
       buildOptions: options,
       tsConfig,
       tsConfigPath,
       supportES2015,
     };
-
-
-    // TODO: add the old dev options as the default, and the prod one as a configuration:
-    // development: {
-    //   environment: 'dev',
-    //   outputHashing: 'media',
-    //   sourcemaps: true,
-    //   extractCss: false,
-    //   namedChunks: true,
-    //   aot: false,
-    //   vendorChunk: true,
-    //   buildOptimizer: false,
-    // },
-    // production: {
-    //   environment: 'prod',
-    //   outputHashing: 'all',
-    //   sourcemaps: false,
-    //   extractCss: true,
-    //   namedChunks: false,
-    //   aot: true,
-    //   extractLicenses: true,
-    //   vendorChunk: false,
-    //   buildOptimizer: buildOptions.aot !== false,
-    // }
 
     const webpackConfigs: {}[] = [
       getCommonConfig(wco),

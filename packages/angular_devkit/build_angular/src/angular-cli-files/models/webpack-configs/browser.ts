@@ -8,9 +8,10 @@ import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 import { generateEntryPoints, packageChunkSort } from '../../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
 import { IndexHtmlWebpackPlugin } from '../../plugins/index-html-webpack-plugin';
-import { ExtraEntryPoint } from '../../../browser';
+import { ExtraEntryPoint } from '../../../browser/schema';
+import { BrowserBuilderSchema } from '../../../browser/schema';
 import { WebpackConfigOptions } from '../build-options';
-import { computeBundleName } from './utils';
+import { normalizeExtraEntryPoints } from './utils';
 
 /**
 + * license-webpack-plugin has a peer dependency on webpack-sources, list it in a comment to
@@ -26,10 +27,11 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   let extraPlugins: any[] = [];
 
   // Figure out which are the lazy loaded bundle names.
-  const lazyChunkBundleNames = ([...buildOptions.styles, ...buildOptions.scripts] as ExtraEntryPoint[])
-    .filter(entry => entry.lazy)
+  const lazyChunkBundleNames = normalizeExtraEntryPoints(
     // We don't really need a default name because we pre-filtered by lazy only entries.
-    .map(style => computeBundleName(style, 'not-lazy'));
+    [...buildOptions.styles, ...buildOptions.scripts], 'not-lazy')
+    .filter(entry => entry.lazy)
+    .map(entry => entry.bundleName)
 
   const generateIndexHtml = false;
   if (generateIndexHtml) {
@@ -77,8 +79,8 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }));
   }
 
-  const globalStylesBundleNames = (buildOptions.styles as ExtraEntryPoint[])
-    .map(style => computeBundleName(style, 'styles'));
+  const globalStylesBundleNames = normalizeExtraEntryPoints(buildOptions.styles, 'styles')
+    .map(style => style.bundleName);
 
   return {
     devtool: sourcemaps,

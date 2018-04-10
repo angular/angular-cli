@@ -505,7 +505,7 @@ describe('Migration to v6', () => {
         const build = getConfig(tree).projects.foo.architect.build;
         expect(build.builder).toEqual('@angular-devkit/build-angular:browser');
         expect(build.options.scripts).toEqual([]);
-        expect(build.options.styles).toEqual([{ input: 'src/styles.css' }]);
+        expect(build.options.styles).toEqual(['src/styles.css']);
         expect(build.options.assets).toEqual([
           { glob: '**/*', input: 'src/assets', output: '/assets' },
           { glob: 'favicon.ico', input: 'src', output: '/' },
@@ -525,8 +525,8 @@ describe('Migration to v6', () => {
             vendorChunk: false,
             buildOptimizer: true,
             fileReplacements: [{
-              src: 'src/environments/environment.ts',
-              replaceWith: 'src/environments/environment.prod.ts',
+              replace: 'src/environments/environment.ts',
+              with: 'src/environments/environment.prod.ts',
             }],
           },
         });
@@ -566,7 +566,7 @@ describe('Migration to v6', () => {
         expect(test.options.tsConfig).toEqual('src/tsconfig.spec.json');
         expect(test.options.karmaConfig).toEqual('./karma.conf.js');
         expect(test.options.scripts).toEqual([]);
-        expect(test.options.styles).toEqual([{ input: 'src/styles.css' }]);
+        expect(test.options.styles).toEqual(['src/styles.css']);
         expect(test.options.assets).toEqual([
           { glob: '**/*', input: 'src/assets', output: '/assets' },
           { glob: 'favicon.ico', input: 'src', output: '/' },
