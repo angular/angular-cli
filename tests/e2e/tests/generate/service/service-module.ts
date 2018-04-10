@@ -16,9 +16,6 @@ export default function() {
     .then(() => ng('generate', 'service', 'test-service2', '--module', 'app.module.ts'))
     .then(() => process.chdir('../..'))
     .then(() => expectFileToMatch(service2Path, /import { AppModule } from '.\/app.module'/))
-    .then(() => expectFileToMatch(service2Path, /providedIn: AppModule,/));
-
-    // Try to run the unit tests.
-    // TODO: re-enable when updated to Angular v6
-    // .then(() => ng('build'));
+    .then(() => expectFileToMatch(service2Path, /providedIn: AppModule/))
+    .then(() => ng('build'));
 }
