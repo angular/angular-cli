@@ -347,6 +347,9 @@ function _usageMessage(
     })
     .filter(([name, info, version, target]) => {
       return (target && semver.compare(info.installed.version, version) < 0);
+    })
+    .filter(([, , , target]) => {
+      return target['ng-update'];
     });
 
   if (packagesToUpdate.length == 0) {
