@@ -960,7 +960,7 @@ export class AngularCompilerPlugin {
     const uniqueDependencies =  new Set([
       ...esImports,
       ...resourceImports,
-      ...this.getResourceDependencies(resolvedFileName),
+      ...this.getResourceDependencies(this._compilerHost.denormalizePath(resolvedFileName)),
     ].map((p) => p && this._compilerHost.denormalizePath(p)));
 
     return [...uniqueDependencies]
