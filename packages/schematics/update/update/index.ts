@@ -331,6 +331,30 @@ function _usageMessage(
   infoMap: Map<string, PackageInfo>,
   logger: logging.LoggerApi,
 ) {
+  const packagesToUpdate = [...infoMap.entries()]
+    .sort()
+    .map(([name, info]) => {
+      const tag = options.next ? 'next' : 'latest';
+      const version = info.npmPackageJson['dist-tags'][tag];
+      const target = info.npmPackageJson.versions[version];
+
+      return [
+        name,
+        info,
+        version,
+        target,
+      ] as [string, PackageInfo, string, JsonSchemaForNpmPackageJsonFiles];
+    })
+    .filter(([name, info, version, target]) => {
+      return (target && semver.compare(info.installed.version, version) < 0);
+    });
+
+  if (packagesToUpdate.length == 0) {
+    logger.info('We analyzed your package.json and everything seems to be in order. Good work!');
+
+    return of<void>(undefined);
+  }
+
   logger.info(
     'We analyzed your package.json, there are some packages to update:\n',
   );
@@ -349,26 +373,20 @@ function _usageMessage(
   );
   logger.info(' ' + '-'.repeat(namePad * 2 + 35));
 
-  [...infoMap.entries()].sort().forEach(([name, info]) => {
-    const tag = options.next ? 'next' : 'latest';
-    const version = info.npmPackageJson['dist-tags'][tag];
-    const target = info.npmPackageJson.versions[version];
-
-    if (target && semver.compare(info.installed.version, version) < 0) {
-      let command = `npm install ${name}`;
-      if (target && target['ng-update']) {
-        // Show the ng command only when migrations are supported, otherwise it's a fancy
-        // npm install, really.
-        command = `ng update ${name}`;
-      }
-
-      logger.info(
-        '  '
-        + name.padEnd(namePad)
-        + `${info.installed.version} -> ${version}`.padEnd(25)
-        + '  ' + command,
-      );
+  packagesToUpdate.forEach(([name, info, version, target]) => {
+    let command = `npm install ${name}`;
+    if (target && target['ng-update']) {
+      // Show the ng command only when migrations are supported, otherwise it's a fancy
+      // npm install, really.
+      command = `ng update ${name}`;
     }
+
+    logger.info(
+      '  '
+      + name.padEnd(namePad)
+      + `${info.installed.version} -> ${version}`.padEnd(25)
+      + '  ' + command,
+    );
   });
 
   logger.info('\n');
