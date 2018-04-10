@@ -9,14 +9,27 @@ import { TaskConfiguration, TaskConfigurationGenerator } from '../../src';
 import { RunSchematicName, RunSchematicTaskOptions } from './options';
 
 
-export class RunSchematicTask implements TaskConfigurationGenerator<RunSchematicTaskOptions> {
-  constructor(
-    protected _collection: string,
-    protected _schematic: string,
-    protected _options: object,
-  ) {}
+export class RunSchematicTask<T> implements TaskConfigurationGenerator<RunSchematicTaskOptions<T>> {
+  protected _collection: string | null;
+  protected _schematic: string;
+  protected _options: T;
 
-  toConfiguration(): TaskConfiguration<RunSchematicTaskOptions> {
+  constructor(s: string, o: T);
+  constructor(c: string, s: string, o: T);
+
+  constructor(c: string | null, s: string | T, o?: T) {
+    if (arguments.length == 2 || typeof s !== 'string') {
+      o = s as T;
+      s = c as string;
+      c = null;
+    }
+
+    this._collection = c;
+    this._schematic = s as string;
+    this._options = o as T;
+  }
+
+  toConfiguration(): TaskConfiguration<RunSchematicTaskOptions<T>> {
     return {
       name: RunSchematicName,
       options: {

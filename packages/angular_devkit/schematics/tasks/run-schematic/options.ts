@@ -7,8 +7,8 @@
  */
 export const RunSchematicName = 'run-schematic';
 
-export interface RunSchematicTaskOptions {
-  collection: string;
+export interface RunSchematicTaskOptions<T> {
+  collection: string | null;
   name: string;
-  options: object;
+  options: T;
 }
