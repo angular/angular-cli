@@ -39,16 +39,13 @@ export default class UpdateCommand extends SchematicCommand {
   }
 
   public async run(options: UpdateOptions) {
-
-    const schematicRunOptions = {
+    return this.runSchematic({
       collectionName: this.collectionName,
       schematicName: this.schematicName,
       schematicOptions: options,
       dryRun: options.dryRun,
       force: false,
-      workingDir: this.project.root,
-    };
-
-    return this.runSchematic(schematicRunOptions);
+      showNothingDone: false,
+    });
   }
 }
