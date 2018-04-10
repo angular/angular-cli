@@ -26,8 +26,9 @@ interface CompilationOutput {
 export class WebpackResourceLoader {
   private _parentCompilation: any;
   private _context: string;
-  private _resourceDependencies = new Map<string, string[]>();
-  private _cachedResources = new Map<string, string>();
+  private _fileDependencies = new Map<string, string[]>();
+  private _cachedSources = new Map<string, string>();
+  private _cachedEvaluatedSources = new Map<string, RawSource>();
 
   constructor() {}
 
@@ -37,7 +38,7 @@ export class WebpackResourceLoader {
   }
 
   getResourceDependencies(filePath: string) {
-    return this._resourceDependencies.get(filePath) || [];
+    return this._fileDependencies.get(filePath) || [];
   }
 
   private _compile(filePath: string): Promise<CompilationOutput> {
@@ -64,7 +65,9 @@ export class WebpackResourceLoader {
     childCompiler.hooks.thisCompilation.tap('ngtools-webpack', (compilation: any) => {
       compilation.hooks.additionalAssets.tapAsync('ngtools-webpack',
       (callback: (err?: Error) => void) => {
-        if (this._cachedResources.has(compilation.fullHash)) {
+        if (this._cachedEvaluatedSources.has(compilation.fullHash)) {
+          const cachedEvaluatedSource = this._cachedEvaluatedSources.get(compilation.fullHash);
+          compilation.assets[filePath] = cachedEvaluatedSource;
           callback();
 
           return;
@@ -74,7 +77,9 @@ export class WebpackResourceLoader {
         if (asset) {
           this._evaluate({ outputName: filePath, source: asset.source() })
             .then(output => {
-              compilation.assets[filePath] = new RawSource(output);
+              const evaluatedSource = new RawSource(output);
+              this._cachedEvaluatedSources.set(compilation.fullHash, evaluatedSource);
+              compilation.assets[filePath] = evaluatedSource;
               callback();
             })
             .catch(err => callback(err));
@@ -103,15 +108,16 @@ export class WebpackResourceLoader {
           });
 
           // Save the dependencies for this resource.
-          this._resourceDependencies.set(filePath, childCompilation.fileDependencies);
+          this._fileDependencies.set(filePath, childCompilation.fileDependencies);
 
           const compilationHash = childCompilation.fullHash;
-          const maybeSource = this._cachedResources.get(compilationHash);
+          const maybeSource = this._cachedSources.get(compilationHash);
           if (maybeSource) {
             resolve({ outputName: filePath, source: maybeSource });
           } else {
             const source = childCompilation.assets[filePath].source();
-            this._cachedResources.set(compilationHash, source);
+            this._cachedSources.set(compilationHash, source);
+
             resolve({ outputName: filePath, source });
           }
         }
