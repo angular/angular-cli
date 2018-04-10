@@ -543,6 +543,28 @@ function updatePackageJson(packageManager?: string) {
   };
 }
 
+function updateTsLintConfig(): Rule {
+  return (host: Tree, context: SchematicContext) => {
+    const tsLintPath = '/tslint.json';
+    const buffer = host.read(tsLintPath);
+    if (!buffer) {
+      return;
+    }
+    const tsCfg = JSON.parse(buffer.toString());
+
+    if (tsCfg.rules && tsCfg.rules['import-blacklist'] &&
+        tsCfg.rules['import-blacklist'].indexOf('rxjs') !== -1) {
+
+      tsCfg.rules['import-blacklist'] = tsCfg.rules['import-blacklist']
+        .filter((rule: string | boolean) => rule !== 'rxjs');
+
+      host.overwrite(tsLintPath, JSON.stringify(tsCfg, null, 2));
+    }
+
+    return host;
+  };
+}
+
 export default function (): Rule {
   return (host: Tree, context: SchematicContext) => {
     const configPath = getConfigPath(host);
@@ -557,6 +579,7 @@ export default function (): Rule {
       migrateConfiguration(config),
       updateSpecTsConfig(config),
       updatePackageJson(config.packageManager),
+      updateTsLintConfig(),
     ])(host, context);
   };
 }

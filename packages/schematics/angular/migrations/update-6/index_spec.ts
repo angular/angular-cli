@@ -688,4 +688,36 @@ describe('Migration to v6', () => {
       expect(pkg.devDependencies['@angular-devkit/build-angular']).toBeDefined();
     });
   });
+
+  describe('tslint.json', () => {
+    const tslintPath = '/tslint.json';
+    // tslint:disable-next-line:no-any
+    let tslintConfig: any;
+    beforeEach(() => {
+      tslintConfig = {
+        rules: {
+          'import-blacklist': ['rxjs'],
+        },
+      };
+    });
+
+    it('should remove "rxjs" from the "import-blacklist" rule', () => {
+      tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+      tree.create(tslintPath, JSON.stringify(tslintConfig, null, 2));
+      tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+      const tslint = JSON.parse(tree.readContent(tslintPath));
+      const blacklist = tslint.rules['import-blacklist'];
+      expect(blacklist).toEqual([]);
+    });
+
+    it('should work if "rxjs" is not in the "import-blacklist" rule', () => {
+      tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+      tslintConfig.rules['import-blacklist'] = [];
+      tree.create(tslintPath, JSON.stringify(tslintConfig, null, 2));
+      tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+      const tslint = JSON.parse(tree.readContent(tslintPath));
+      const blacklist = tslint.rules['import-blacklist'];
+      expect(blacklist).toEqual([]);
+    });
+  });
 });
