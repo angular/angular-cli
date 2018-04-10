@@ -152,30 +152,33 @@ export abstract class SchematicCommand extends Command {
         logger: this.logger as any,
         allowPrivate: this.allowPrivateSchematics,
       })
-        .subscribe({
-          error: (err: Error) => {
-            // In case the workflow was not successful, show an appropriate error message.
-            if (err instanceof UnsuccessfulWorkflowExecution) {
-              // "See above" because we already printed the error.
-              this.logger.fatal('The Schematic workflow failed. See above.');
-            } else if (debug) {
-              this.logger.fatal(`An error occured:\n${err.message}\n${err.stack}`);
-            } else {
-              this.logger.fatal(err.message);
-            }
+      .subscribe({
+        error: (err: Error) => {
+          // In case the workflow was not successful, show an appropriate error message.
+          if (err instanceof UnsuccessfulWorkflowExecution) {
+            // "See above" because we already printed the error.
+            this.logger.fatal('The Schematic workflow failed. See above.');
+          } else if (debug) {
+            this.logger.fatal(`An error occured:\n${err.message}\n${err.stack}`);
+          } else {
+            this.logger.fatal(err.message);
+          }
 
-            reject(1);
-          },
-          complete: () => {
-            // Output the logging queue, no error happened.
-            loggingQueue.forEach(log => this.logger.info(log));
+          reject(1);
+        },
+        complete: () => {
+          // Output the logging queue, no error happened.
+          loggingQueue.forEach(log => this.logger.info(log));
 
-            if (nothingDone) {
-              this.logger.info('Nothing to be done.');
-            }
-            resolve();
-          },
-        });
+          if (nothingDone) {
+            this.logger.info('Nothing to be done.');
+          }
+          if (dryRun) {
+            this.logger.warn(`\nNOTE: Run with "dry run" no changes were made.`);
+          }
+          resolve();
+        },
+      });
     });
   }
 
