@@ -8,7 +8,7 @@
 // TODO: fix webpack typings.
 // tslint:disable-next-line:no-global-tslint-disable
 // tslint:disable:no-any
-import { virtualFs } from '@angular-devkit/core';
+import { dirname, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import { ChildProcess, ForkOptions, fork } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -954,7 +954,7 @@ export class AngularCompilerPlugin {
     const resourceImports = findResources(sourceFile)
       .map((resourceReplacement) => resourceReplacement.resourcePaths)
       .reduce((prev, curr) => prev.concat(curr), [])
-      .map((resourcePath) => path.resolve(path.dirname(resolvedFileName), resourcePath));
+      .map((resourcePath) => resolve(dirname(resolvedFileName), normalize(resourcePath)));
 
     // These paths are meant to be used by the loader so we must denormalize them.
     const uniqueDependencies =  new Set([
