@@ -332,8 +332,7 @@ describe('Browser Builder styles', () => {
     ).subscribe(undefined, done.fail, done);
   }, Timeout.Basic);
 
-  // Disables a test that relies on node_modules.
-  xit(`supports font-awesome imports`, (done) => {
+  it(`supports font-awesome imports`, (done) => {
     host.writeMultipleFiles({
       'src/styles.scss': `
         $fa-font-path: "~font-awesome/fonts";
@@ -345,10 +344,6 @@ describe('Browser Builder styles', () => {
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      // TODO: find a way to check logger/output for warnings.
-      // if (stdout.match(/postcss-url: \.+: Can't read file '\.+', ignoring/)) {
-      //   throw new Error('Expected no postcss-url file read warnings.');
-      // }
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 

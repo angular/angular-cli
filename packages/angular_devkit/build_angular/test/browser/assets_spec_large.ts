@@ -63,5 +63,9 @@ describe('Browser Builder assets', () => {
     };
 
     runTargetSpec(host, browserTargetSpec, overrides).subscribe(undefined, done, done.fail);
+
+    // The node_modules folder must be deleted, otherwise code that tries to find the
+    // node_modules folder will hit this one and can fail.
+    host.scopedSync().delete(normalize('./node_modules'));
   }, Timeout.Basic);
 });
