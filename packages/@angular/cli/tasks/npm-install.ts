@@ -4,6 +4,8 @@ import chalk from 'chalk';
 import { spawn } from 'child_process';
 import { logging } from '@angular-devkit/core';
 
+const SilentError = require('silent-error');
+
 
 export type NpmInstall = (packageName: string,
                           logger: logging.Logger,
@@ -22,10 +24,21 @@ export default async function (packageName: string,
 
   logger.info(chalk.green(`Installing packages for tooling via ${packageManager}.`));
 
-  const installArgs = ['install'];
-  if (packageManager === 'npm') {
-    installArgs.push('--quiet');
+  const installArgs: string[] = [];
+  switch (packageManager) {
+    case 'cnpm':
+    case 'npm':
+      installArgs.push('install', '--quiet');
+      break;
+
+    case 'yarn':
+      installArgs.push('add');
+      break;
+
+    default:
+      throw new SilentError(`Invalid package manager: ${JSON.stringify(packageManager)}.`);
   }
+
   if (packageName) {
     try {
       // Verify if we need to install the package (it might already be there).
