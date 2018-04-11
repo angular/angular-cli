@@ -218,7 +218,6 @@ export default function (options: LibraryOptions): Rule {
         name: name,
         flat: true,
         path: sourceDir,
-        module: `${name}.module.ts`,
       }),
     ])(host, context);
   };
