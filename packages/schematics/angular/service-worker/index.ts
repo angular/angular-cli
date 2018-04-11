@@ -70,7 +70,7 @@ function updateConfigFile(options: ServiceWorkerOptions): Rule {
 
 function addDependencies(): Rule {
   return (host: Tree, context: SchematicContext) => {
-    const packageName = '@angular/platform-server';
+    const packageName = '@angular/service-worker';
     context.logger.debug(`adding dependency (${packageName})`);
     const buffer = host.read(packageJsonPath);
     if (buffer === null) {

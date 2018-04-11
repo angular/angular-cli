@@ -68,7 +68,7 @@ describe('Service Worker Schematic', () => {
     const pkgText = tree.readContent('/package.json');
     const pkg = JSON.parse(pkgText);
     const version = pkg.dependencies['@angular/core'];
-    expect(pkg.dependencies['@angular/platform-server']).toEqual(version);
+    expect(pkg.dependencies['@angular/service-worker']).toEqual(version);
   });
 
   it('should import ServiceWorkerModule', () => {
