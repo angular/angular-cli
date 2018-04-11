@@ -118,10 +118,10 @@ function addDependenciesToPackageJson() {
   };
 }
 
-function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSchema): Rule {
+function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSchema,
+                               projectRoot: string): Rule {
   return (host: Tree, context: SchematicContext) => {
 
-    const projectRoot = `${workspace.newProjectRoot}/${options.name}`;
     // tslint:disable-next-line:no-any
     const project: any = {
       root: `${projectRoot}`,
@@ -176,7 +176,7 @@ export default function (options: LibraryOptions): Rule {
 
     const workspace = getWorkspace(host);
     const newProjectRoot = workspace.newProjectRoot;
-    const projectRoot = `${newProjectRoot}/${options.name}`;
+    const projectRoot = `${newProjectRoot}/${strings.dasherize(options.name)}`;
     const sourceDir = `${projectRoot}/src/lib`;
     const relativeTsLintPath = projectRoot.split('/').map(x => '..').join('/');
 
@@ -195,7 +195,7 @@ export default function (options: LibraryOptions): Rule {
 
     return chain([
       branchAndMerge(mergeWith(templateSource)),
-      addAppToWorkspaceFile(options, workspace),
+      addAppToWorkspaceFile(options, workspace, projectRoot),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
       options.skipTsConfig ? noop() : updateTsConfig(name),
       schematic('module', {

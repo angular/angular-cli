@@ -16,6 +16,7 @@ function getJsonFileContent(tree: UnitTestTree, path: string) {
   return JSON.parse(tree.readContent(path));
 }
 
+// tslint:disable:max-line-length
 describe('Library Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/ng_packagr',
@@ -81,6 +82,17 @@ describe('Library Schematic', () => {
 
     const workspace = getJsonFileContent(tree, '/angular.json');
     expect(workspace.projects.foo).toBeDefined();
+  });
+
+  it('should handle a pascalCasedName', () => {
+    const options = {...defaultOptions, name: 'pascalCasedName'};
+    const tree = schematicRunner.runSchematic('library', options, workspaceTree);
+    const config = getJsonFileContent(tree, '/angular.json');
+    const project = config.projects.pascalCasedName;
+    expect(project).toBeDefined();
+    expect(project.root).toEqual('projects/pascal-cased-name');
+    const svcContent = tree.readContent('/projects/pascal-cased-name/src/lib/pascal-cased-name.service.ts');
+    expect(svcContent).toMatch(/providedIn: 'root'/);
   });
 
   it('should export the component in the NgModule', () => {
