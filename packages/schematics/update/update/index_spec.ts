@@ -147,6 +147,47 @@ describe('@schematics/update', () => {
             name: 'run-schematic',
             options: jasmine.objectContaining({
               name: 'migrate',
+              options: jasmine.objectContaining({
+                from: '0.1.2',
+                to: '1.6.0',
+              }),
+            }),
+          },
+        ]);
+      }),
+    ).subscribe(undefined, done.fail, done);
+  });
+
+  it('can install and migrate with --from (short version number)', done => {
+    // Add the basic migration package.
+    const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
+    const packageJson = JSON.parse(content);
+    packageJson['dependencies']['@angular-devkit-tests/update-migrations'] = '1.6.0';
+    host.sync.write(
+      normalize('/package.json'),
+      virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
+    );
+
+    schematicRunner.runSchematicAsync('update', {
+      packages: ['@angular-devkit-tests/update-migrations'],
+      migrateOnly: true,
+      from: '0',
+    }, appTree).pipe(
+      map(tree => {
+        const packageJson = JSON.parse(tree.readContent('/package.json'));
+        expect(packageJson['dependencies']['@angular-devkit-tests/update-migrations'])
+          .toBe('1.6.0');
+
+        // Check install task.
+        expect(schematicRunner.tasks).toEqual([
+          {
+            name: 'run-schematic',
+            options: jasmine.objectContaining({
+              name: 'migrate',
+              options: jasmine.objectContaining({
+                from: '0.0.0',
+                to: '1.6.0',
+              }),
             }),
           },
         ]);

@@ -628,6 +628,25 @@ function _getAllDependencies(tree: Tree): Map<string, VersionRange> {
   ] as [string, VersionRange][]);
 }
 
+function _formatVersion(version: string | undefined) {
+  if (version === undefined) {
+    return undefined;
+  }
+
+  if (!version.match(/^\d{1,30}\.\d{1,30}\.\d{1,30}/)) {
+    version += '.0';
+  }
+  if (!version.match(/^\d{1,30}\.\d{1,30}\.\d{1,30}/)) {
+    version += '.0';
+  }
+  if (!semver.valid(version)) {
+    throw new SchematicsException(`Invalid migration version: ${JSON.stringify(version)}`);
+  }
+
+  return version;
+}
+
+
 export default function(options: UpdateSchema): Rule {
   if (!options.packages) {
     // We cannot just return this because we need to fetch the packages from NPM still for the
@@ -643,6 +662,9 @@ export default function(options: UpdateSchema): Rule {
       throw new SchematicsException('--from requires that only a single package be passed.');
     }
   }
+
+  options.from = _formatVersion(options.from);
+  options.to = _formatVersion(options.to);
 
   return (tree: Tree, context: SchematicContext) => {
     const logger = context.logger;
