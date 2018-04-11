@@ -83,7 +83,8 @@ export abstract class SchematicCommand extends Command {
     const { collectionName, schematicName, debug, force, dryRun } = options;
     let schematicOptions = this.removeCoreOptions(options.schematicOptions);
     let nothingDone = true;
-    const loggingQueue: string[] = [];
+    let loggingQueue: string[] = [];
+    let error = false;
     const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(this.project.root));
     const workflow = new NodeWorkflow(
       fsHost as any,
@@ -122,6 +123,7 @@ export abstract class SchematicCommand extends Command {
 
       switch (event.kind) {
         case 'error':
+          error = true;
           const desc = event.description == 'alreadyExist' ? 'already exists' : 'does not exist.';
           this.logger.warn(`ERROR! ${eventPath} ${desc}.`);
           break;
@@ -141,6 +143,18 @@ export abstract class SchematicCommand extends Command {
         case 'rename':
           loggingQueue.push(`${terminal.blue('RENAME')} ${eventPath} => ${event.to}`);
           break;
+      }
+    });
+
+    workflow.lifeCycle.subscribe(event => {
+      if (event.kind == 'end' || event.kind == 'workflow-end') {
+        if (!error) {
+          // Output the logging queue, no error happened.
+          loggingQueue.forEach(log => this.logger.info(log));
+        }
+
+        loggingQueue = [];
+        error = false;
       }
     });
 
@@ -168,9 +182,6 @@ export abstract class SchematicCommand extends Command {
           resolve(1);
         },
         complete: () => {
-          // Output the logging queue, no error happened.
-          loggingQueue.forEach(log => this.logger.info(log));
-
           const showNothingDone = !(options.showNothingDone === false);
           if (nothingDone && showNothingDone) {
             this.logger.info('Nothing to be done.');
