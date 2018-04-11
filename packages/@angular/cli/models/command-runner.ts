@@ -298,13 +298,14 @@ function verifyWorkspace(command: Command, executionScope: CommandScope, root: s
 
     // If an old configuration file is found, throw an exception.
     if (oldConfigFilePath) {
+      // ------------------------------------------------------------------------------------------
+      // If changing this message, please update the same message in
+      // `packages/@angular/cli/bin/ng-update-message.js`
       throw new SilentError(tags.stripIndent`
-        An old project has been detected, which needs to be updated to Angular CLI 6.
+        An old CLI configuration has been detected, which needs to be updated to the latest version.
 
-        Please run the following commands to update this project.
-
-          ng update @angular/cli --migrate-only --from=1.7.1
-          npm i
+        Please run the following command to update this workspace:
+          ng update @angular/cli --migrate-only --from=1
       `);
     }
 
