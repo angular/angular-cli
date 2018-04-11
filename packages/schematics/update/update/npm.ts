@@ -7,7 +7,9 @@
  */
 import { logging } from '@angular-devkit/core';
 import * as http from 'http';
+import * as https from 'https';
 import { Observable, ReplaySubject } from 'rxjs';
+import * as url from 'url';
 import { NpmRepositoryPackageJson } from './npm-package-json';
 
 
@@ -17,24 +19,35 @@ const npmPackageJsonCache = new Map<string, Observable<NpmRepositoryPackageJson>
 /**
  * Get the NPM repository's package.json for a package. This is p
  * @param {string} packageName The package name to fetch.
+ * @param {string} registryUrl The NPM Registry URL to use.
  * @param {LoggerApi} logger A logger instance to log debug information.
  * @returns An observable that will put the pacakge.json content.
  * @private
  */
 export function getNpmPackageJson(
   packageName: string,
+  registryUrl: string,
   logger: logging.LoggerApi,
 ): Observable<NpmRepositoryPackageJson> {
-  const url = `http://registry.npmjs.org/${packageName.replace(/\//g, '%2F')}`;
+  let fullUrl = new url.URL(`http://${registryUrl}/${packageName.replace(/\//g, '%2F')}`);
+  try {
+    const registry = new url.URL(registryUrl);
+    registry.pathname = (registry.pathname || '')
+        .replace(/\/?$/, '/' + packageName.replace(/\//g, '%2F'));
+    fullUrl = new url.URL(url.format(registry));
+  } catch (_) {
+  }
+
   logger.debug(
-    `Getting package.json from ${JSON.stringify(packageName)} (url: ${JSON.stringify(url)})...`,
+    `Getting package.json from ${JSON.stringify(packageName)} (url: ${JSON.stringify(fullUrl)})...`,
   );
 
-  let maybeRequest = npmPackageJsonCache.get(url);
+  let maybeRequest = npmPackageJsonCache.get(fullUrl.toString());
   if (!maybeRequest) {
     const subject = new ReplaySubject<NpmRepositoryPackageJson>(1);
 
-    const request = http.request(url, response => {
+    const protocolPackage = (fullUrl.protocol == 'https' ? https : http) as typeof http;
+    const request = protocolPackage.request(fullUrl, response => {
       let data = '';
       response.on('data', chunk => data += chunk);
       response.on('end', () => {
@@ -51,7 +64,7 @@ export function getNpmPackageJson(
     request.end();
 
     maybeRequest = subject.asObservable();
-    npmPackageJsonCache.set(url, maybeRequest);
+    npmPackageJsonCache.set(fullUrl.toString(), maybeRequest);
   }
 
   return maybeRequest;

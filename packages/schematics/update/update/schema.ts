@@ -13,4 +13,5 @@ export interface UpdateSchema {
   migrateOnly: boolean;
   from?: string;
   to?: string;
+  registry: string;
 }

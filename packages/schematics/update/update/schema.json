@@ -41,6 +41,19 @@
     "to": {
       "description": "Version up to which to apply migrations. Only available with a single package being updated, and only on migrations only. Requires from to be specified. Default to the installed version detected.",
       "type": "string"
+    },
+    "registry": {
+      "description": "The NPM registry to use. If you have an NPM proxy, you need to use this flag and set it to point to the proxy.",
+      "type": "string",
+      "oneOf": [
+        {
+          "format": "uri"
+        },
+        {
+          "format": "hostname"
+        }
+      ],
+      "default": "http://registry.npmjs.org/"
     }
   }
 }
