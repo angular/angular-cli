@@ -95,11 +95,13 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
       runtimeChunk: 'single',
       splitChunks: {
         chunks: buildOptions.commonChunk ? 'all' : 'initial',
+        maxAsyncRequests: Infinity,
         cacheGroups: {
           vendors: false,
           vendor: buildOptions.vendorChunk && {
             name: 'vendor',
             chunks: 'initial',
+            enforce: true,
             test: (module: any, chunks: Array<{ name: string }>) => {
               const moduleName = module.nameForCondition ? module.nameForCondition() : '';
               return /[\\/]node_modules[\\/]/.test(moduleName)
