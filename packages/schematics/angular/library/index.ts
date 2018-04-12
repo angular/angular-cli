@@ -20,6 +20,7 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { WorkspaceSchema, getWorkspace, getWorkspacePath } from '../utility/config';
 import { latestVersions } from '../utility/latest-versions';
 import { Schema as LibraryOptions } from './schema';
@@ -219,6 +220,9 @@ export default function (options: LibraryOptions): Rule {
         flat: true,
         path: sourceDir,
       }),
+      (_tree: Tree, context: SchematicContext) => {
+        context.addTask(new NodePackageInstallTask());
+      },
     ])(host, context);
   };
 }
