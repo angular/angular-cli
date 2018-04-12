@@ -8,26 +8,32 @@ const Project = require('../../ember-cli/lib/models/project');
 
 function loadCommands() {
   return {
+    // Schematics commands.
     'add': require('../../commands/add').default,
-    'build': require('../../commands/build').default,
-    'serve': require('../../commands/serve').default,
     'new': require('../../commands/new').default,
     'generate': require('../../commands/generate').default,
+    'update': require('../../commands/update').default,
+
+    // Architect commands.
+    'build': require('../../commands/build').default,
+    'serve': require('../../commands/serve').default,
     'test': require('../../commands/test').default,
     'e2e': require('../../commands/e2e').default,
-    'help': require('../../commands/help').default,
     'lint': require('../../commands/lint').default,
-    'version': require('../../commands/version').default,
-    'doc': require('../../commands/doc').default,
     'xi18n': require('../../commands/xi18n').default,
-    'update': require('../../commands/update').default,
     'run': require('../../commands/run').default,
+
+    // Disabled commands.
+    'eject': require('../../commands/eject').default,
 
     // Easter eggs.
     'make-this-awesome': require('../../commands/easter-egg').default,
 
-    // Configuration.
+    // Other.
     'config': require('../../commands/config').default,
+    'help': require('../../commands/help').default,
+    'version': require('../../commands/version').default,
+    'doc': require('../../commands/doc').default,
   };
 }
 
