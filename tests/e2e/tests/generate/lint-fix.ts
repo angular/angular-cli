@@ -34,7 +34,7 @@ export default function () {
     // Enable default option and generate all other module related blueprints
     .then(() => ng('config', 'defaults.lintFix', 'true'))
     .then(() => ng('generate', 'directive', 'test-directive'))
-    .then(() => ng('generate', 'service', 'test-service', '--module', 'app.module.ts'))
+    .then(() => ng('generate', 'service', 'test-service'))
     .then(() => ng('generate', 'pipe', 'test-pipe'))
     .then(() => ng('generate', 'guard', 'test-guard', '--module', 'app.module.ts'))
     .then(() => ng('lint'));
