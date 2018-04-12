@@ -82,13 +82,13 @@ jobs:
       - restore_cache: *_root_package_lock_key
       - run: npm run admin -- build
 
-  build-bazel:
-    <<: *defaults
-    steps:
-      - checkout: *post_checkout
-      - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
-      - run: bazel run @nodejs//:npm install
-      - run: bazel build //packages/...
+  #  build-bazel:
+  #    <<: *defaults
+  #    steps:
+  #      - checkout: *post_checkout
+  #      - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
+  #      - run: bazel run @nodejs//:npm install
+  #      - run: bazel build //packages/...
 
   snapshot_publish:
     <<: *defaults
@@ -133,10 +133,10 @@ workflows:
           requires:
             - lint
             - validate
-      - build-bazel:
-          requires:
-            - lint
-            - validate
+      #      - build-bazel:
+      #          requires:
+      #            - lint
+      #            - validate
       - test:
           requires:
             - build
