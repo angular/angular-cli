@@ -99,8 +99,13 @@ function migrateConfiguration(oldConfig: CliConfig): Rule {
   };
 }
 
-function extractCliConfig(_config: CliConfig): JsonObject | null {
-  return null;
+function extractCliConfig(config: CliConfig): JsonObject | null {
+  const newConfig: JsonObject = {};
+  if (config.packageManager && config.packageManager !== 'default') {
+    newConfig['packageManager'] = config.packageManager;
+  }
+
+  return newConfig;
 }
 
 function extractSchematicsConfig(config: CliConfig): JsonObject | null {
