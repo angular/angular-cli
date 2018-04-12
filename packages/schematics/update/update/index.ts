@@ -656,7 +656,29 @@ export default function(options: UpdateSchema): Rule {
 
       // Build a map of all dependencies and their packageJson.
       reduce<NpmRepositoryPackageJson, Map<string, NpmRepositoryPackageJson>>(
-        (acc, npmPackageJson) => acc.set(npmPackageJson.name, npmPackageJson),
+        (acc, npmPackageJson) => {
+          // If the package was not found on the registry. It could be private, so we will just
+          // ignore. If the package was part of the list, we will error out, but will simply ignore
+          // if it's either not requested (so just part of package.json. silently) or if it's a
+          // `--all` situation. There is an edge case here where a public package peer depends on a
+          // private one, but it's rare enough.
+          if (!npmPackageJson.name) {
+            if (packages.has(npmPackageJson.requestedName)) {
+              if (options.all) {
+                logger.warn(`Package ${JSON.stringify(npmPackageJson.requestedName)} was not `
+                  + 'found on the registry. Skipping.');
+              } else {
+                throw new SchematicsException(
+                  `Package ${JSON.stringify(npmPackageJson.requestedName)} was not found on the `
+                  + 'registry. Cannot continue as this may be an error.');
+              }
+            }
+          } else {
+            acc.set(npmPackageJson.name, npmPackageJson);
+          }
+
+          return acc;
+        },
         new Map<string, NpmRepositoryPackageJson>(),
       ),
 

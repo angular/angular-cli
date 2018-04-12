@@ -28,7 +28,7 @@ export function getNpmPackageJson(
   packageName: string,
   registryUrl: string,
   logger: logging.LoggerApi,
-): Observable<NpmRepositoryPackageJson> {
+): Observable<Partial<NpmRepositoryPackageJson>> {
   let fullUrl = new url.URL(`http://${registryUrl}/${packageName.replace(/\//g, '%2F')}`);
   try {
     const registry = new url.URL(registryUrl);
@@ -53,6 +53,7 @@ export function getNpmPackageJson(
       response.on('end', () => {
         try {
           const json = JSON.parse(data);
+          json.requestedName = packageName;
           subject.next(json as NpmRepositoryPackageJson);
           subject.complete();
         } catch (err) {
