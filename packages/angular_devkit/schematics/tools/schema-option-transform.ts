@@ -5,11 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {
-  BaseException,
-  deepCopy,
-  schema,
-} from '@angular-devkit/core';
+import { deepCopy, schema } from '@angular-devkit/core';
 import { Observable, of as observableOf } from 'rxjs';
 import { first, map, mergeMap } from 'rxjs/operators';
 import { SchematicDescription } from '../src';
@@ -19,11 +15,12 @@ export type SchematicDesc =
   SchematicDescription<FileSystemCollectionDescription, FileSystemSchematicDescription>;
 
 
-export class InvalidInputOptions extends BaseException {
-  // tslint:disable-next-line:no-any
-  constructor(options: any, public readonly errors: schema.SchemaValidatorError[]) {
-    super(`Schematic input does not validate against the Schema: ${JSON.stringify(options)}\n`
-        + `Errors:\n  ${schema.SchemaValidationException.createMessages(errors).join('\n  ')}`);
+export class InvalidInputOptions<T = {}> extends schema.SchemaValidationException {
+  constructor(options: T, errors: schema.SchemaValidatorError[]) {
+    super(
+      errors,
+      `Schematic input does not validate against the Schema: ${JSON.stringify(options)}\nErrors:\n`,
+    );
   }
 }
 

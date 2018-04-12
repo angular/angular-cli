@@ -36,7 +36,10 @@ interface AjvValidationError {
 export class SchemaValidationException extends BaseException {
   public readonly errors: SchemaValidatorError[];
 
-  constructor(errors?: SchemaValidatorError[]) {
+  constructor(
+    errors?: SchemaValidatorError[],
+    baseMessage = 'Schema validation failed with the following errors:',
+  ) {
     if (!errors || errors.length === 0) {
       super('Schema validation failed.');
 
@@ -44,7 +47,7 @@ export class SchemaValidationException extends BaseException {
     }
 
     const messages = SchemaValidationException.createMessages(errors);
-    super(`Schema validation failed with the following errors:\n  ${messages.join('\n  ')}`);
+    super(`${baseMessage}\n  ${messages.join('\n  ')}`);
     this.errors = errors;
   }
 
