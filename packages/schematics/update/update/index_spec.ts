@@ -50,7 +50,7 @@ describe('@schematics/update', () => {
         ]);
       }),
     ).subscribe(undefined, done.fail, done);
-  });
+  }, 45000);
 
   it('calls migration tasks', done => {
     // Add the basic migration package.
@@ -86,7 +86,7 @@ describe('@schematics/update', () => {
         ]);
       }),
     ).subscribe(undefined, done.fail, done);
-  });
+  }, 45000);
 
   it('can migrate only', done => {
     // Add the basic migration package.
@@ -119,7 +119,7 @@ describe('@schematics/update', () => {
         ]);
       }),
     ).subscribe(undefined, done.fail, done);
-  });
+  }, 45000);
 
   it('can migrate from only', done => {
     // Add the basic migration package.
@@ -156,7 +156,7 @@ describe('@schematics/update', () => {
         ]);
       }),
     ).subscribe(undefined, done.fail, done);
-  });
+  }, 45000);
 
   it('can install and migrate with --from (short version number)', done => {
     // Add the basic migration package.
@@ -193,5 +193,5 @@ describe('@schematics/update', () => {
         ]);
       }),
     ).subscribe(undefined, done.fail, done);
-  });
+  }, 45000);
 });

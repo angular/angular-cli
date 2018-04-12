@@ -6,15 +6,40 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { logging } from '@angular-devkit/core';
-import * as http from 'http';
-import * as https from 'https';
-import { Observable, ReplaySubject } from 'rxjs';
+import { exec } from 'child_process';
+import { Observable, ReplaySubject, concat, of } from 'rxjs';
+import { concatMap, first, map, toArray } from 'rxjs/operators';
 import * as url from 'url';
 import { NpmRepositoryPackageJson } from './npm-package-json';
 
+const RegistryClient = require('npm-registry-client');
 
 const npmPackageJsonCache = new Map<string, Observable<NpmRepositoryPackageJson>>();
 
+
+function getNpmConfigOption(option: string) {
+  return new Observable<string | undefined>(obs => {
+    try {
+      exec(`npm get ${option}`, (error, data) => {
+        if (error) {
+          obs.next();
+        } else {
+          data = data.trim();
+          if (!data || data === 'undefined' || data === 'null') {
+            obs.next();
+          } else {
+            obs.next(data);
+          }
+        }
+
+        obs.complete();
+      });
+    } catch {
+      obs.next();
+      obs.complete();
+    }
+  });
+}
 
 /**
  * Get the NPM repository's package.json for a package. This is p
@@ -26,47 +51,75 @@ const npmPackageJsonCache = new Map<string, Observable<NpmRepositoryPackageJson>
  */
 export function getNpmPackageJson(
   packageName: string,
-  registryUrl: string,
+  registryUrl: string | undefined,
   logger: logging.LoggerApi,
 ): Observable<Partial<NpmRepositoryPackageJson>> {
-  let fullUrl = new url.URL(`http://${registryUrl}/${packageName.replace(/\//g, '%2F')}`);
-  try {
-    const registry = new url.URL(registryUrl);
-    registry.pathname = (registry.pathname || '')
-        .replace(/\/?$/, '/' + packageName.replace(/\//g, '%2F'));
-    fullUrl = new url.URL(url.format(registry));
-  } catch (_) {
-  }
 
-  logger.debug(
-    `Getting package.json from ${JSON.stringify(packageName)} (url: ${JSON.stringify(fullUrl)})...`,
+  return (registryUrl ? of(registryUrl) : getNpmConfigOption('registry')).pipe(
+    first(),
+    map(partialUrl => {
+      if (!partialUrl) {
+        partialUrl = 'https://registry.npmjs.org/';
+      }
+      const partial = url.parse(partialUrl);
+      let fullUrl = new url.URL(`http://${partial.host}/${packageName.replace(/\//g, '%2F')}`);
+      try {
+        const registry = new url.URL(partialUrl);
+        registry.pathname = (registry.pathname || '')
+            .replace(/\/?$/, '/' + packageName.replace(/\//g, '%2F'));
+        fullUrl = new url.URL(url.format(registry));
+      } catch {}
+
+      logger.debug(
+        `Getting package.json from '${packageName}' (url: ${JSON.stringify(fullUrl)})...`,
+      );
+
+      return fullUrl.toString();
+    }),
+    concatMap(fullUrl => {
+      let maybeRequest = npmPackageJsonCache.get(fullUrl);
+      if (maybeRequest) {
+        return maybeRequest;
+      }
+
+      return concat(
+        getNpmConfigOption('proxy'),
+        getNpmConfigOption('https-proxy'),
+      ).pipe(
+        toArray(),
+        concatMap(options => {
+          const subject = new ReplaySubject<NpmRepositoryPackageJson>(1);
+
+          const client = new RegistryClient({
+            proxy: {
+              http: options[0],
+              https: options[1],
+            },
+          });
+          client.log.level = 'silent';
+          const params = {
+            timeout: 30000,
+          };
+
+          client.get(
+            fullUrl,
+            params,
+            (error: object, data: NpmRepositoryPackageJson) => {
+            if (error) {
+              subject.error(error);
+            }
+
+            subject.next(data);
+            subject.complete();
+          });
+
+          maybeRequest = subject.asObservable();
+          npmPackageJsonCache.set(fullUrl.toString(), maybeRequest);
+
+          return maybeRequest;
+        }),
+      );
+    }),
   );
 
-  let maybeRequest = npmPackageJsonCache.get(fullUrl.toString());
-  if (!maybeRequest) {
-    const subject = new ReplaySubject<NpmRepositoryPackageJson>(1);
-
-    const protocolPackage = (fullUrl.protocol == 'https' ? https : http) as typeof http;
-    const request = protocolPackage.request(fullUrl, response => {
-      let data = '';
-      response.on('data', chunk => data += chunk);
-      response.on('end', () => {
-        try {
-          const json = JSON.parse(data);
-          json.requestedName = packageName;
-          subject.next(json as NpmRepositoryPackageJson);
-          subject.complete();
-        } catch (err) {
-          subject.error(err);
-        }
-      });
-      response.on('error', err => subject.error(err));
-    });
-    request.end();
-
-    maybeRequest = subject.asObservable();
-    npmPackageJsonCache.set(fullUrl.toString(), maybeRequest);
-  }
-
-  return maybeRequest;
 }

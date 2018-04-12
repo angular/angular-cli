@@ -120,6 +120,7 @@
     "minimist": "^1.2.0",
     "ng-packagr": "^2.4.1",
     "node-sass": "^4.7.2",
+    "npm-registry-client": "^8.5.1",
     "opn": "^5.1.0",
     "parse5": "^4.0.0",
     "popper.js": "^1.14.1",
