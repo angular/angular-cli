@@ -1,6 +1,9 @@
 import * as path from 'path';
+import { filter } from 'rxjs/operators';
+import { logging, terminal } from '@angular-devkit/core';
+import { runCommand } from '../../models/command-runner';
 
-const cli = require('../../ember-cli/lib/cli');
+const Project = require('../../ember-cli/lib/models/project');
 
 
 function loadCommands() {
@@ -28,18 +31,77 @@ function loadCommands() {
   };
 }
 
-export default function(options: any) {
-  options.cli = {
-    name: 'ng',
-    root: path.join(__dirname, '..', '..'),
-    npmPackage: '@angular/cli'
-  };
-
-  options.commands = loadCommands();
-
+export default async function(options: any) {
   // ensure the environemnt variable for dynamic paths
   process.env.PWD = path.normalize(process.env.PWD || process.cwd());
   process.env.CLI_ROOT = process.env.CLI_ROOT || path.resolve(__dirname, '..', '..');
 
-  return cli(options);
+  const commands = loadCommands();
+
+  const logger = new logging.IndentLogger('cling');
+  let loggingSubscription;
+  if (!options.testing) {
+    loggingSubscription = initializeLogging(logger);
+  }
+  const context = {
+    project: Project.projectOrnullProject(undefined, undefined),
+  };
+
+  try {
+    const maybeExitCode = await runCommand(commands, options.cliArgs, logger, context);
+    if (typeof maybeExitCode === 'number') {
+      console.assert(Number.isInteger(maybeExitCode));
+
+      return maybeExitCode;
+    }
+
+    return 0;
+  } catch (err) {
+    if (err instanceof Error) {
+      logger.fatal(err.message);
+      logger.fatal(err.stack);
+    } else if (typeof err === 'string') {
+      logger.fatal(err);
+    } else if (typeof err === 'number') {
+      // Log nothing.
+    } else {
+      logger.fatal('An unexpected error occured: ' + JSON.stringify(err));
+    }
+
+    if (options.testing) {
+      debugger;
+      throw err;
+    }
+
+    loggingSubscription.unsubscribe();
+    return 1;
+  }
+}
+
+// Initialize logging.
+function initializeLogging(logger: logging.Logger) {
+  return logger
+    .pipe(filter(entry => (entry.level != 'debug')))
+    .subscribe(entry => {
+      let color = (x: string) => terminal.dim(terminal.white(x));
+      let output = process.stdout;
+      switch (entry.level) {
+        case 'info':
+          color = terminal.white;
+          break;
+        case 'warn':
+          color = terminal.yellow;
+          break;
+        case 'error':
+          color = terminal.red;
+          output = process.stderr;
+          break;
+        case 'fatal':
+          color = (x) => terminal.bold(terminal.red(x));
+          output = process.stderr;
+          break;
+      }
+
+      output.write(color(entry.message) + '\n');
+    });
 }
