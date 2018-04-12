@@ -96,13 +96,23 @@ export class TestProjectHost extends NodeJsSyncHost {
     });
   }
 
-  writeMultipleFiles(files: { [path: string]: string }): void {
-    Object.keys(files).map(fileName =>
+  writeMultipleFiles(files: { [path: string]: string | ArrayBufferLike | Buffer }): void {
+    Object.keys(files).map(fileName => {
+      let content = files[fileName];
+      if (typeof content == 'string') {
+        content = virtualFs.stringToFileBuffer(content);
+      } else if (content instanceof Buffer) {
+        content = content.buffer.slice(
+          content.byteOffset,
+          content.byteOffset + content.byteLength,
+        );
+      }
+
       this.scopedSync().write(
         normalize(fileName),
-        virtualFs.stringToFileBuffer(files[fileName]),
-      ),
-    );
+        content,
+      );
+    });
   }
 
   replaceInFile(path: string, match: RegExp | string, replacement: string) {

@@ -29,7 +29,17 @@ function readFile(filename: string, compilation: any): Promise<string> {
         return;
       }
 
-      const content = data.toString();
+      let content;
+      if (data.length >= 3 && data[0] === 0xEF && data[1] === 0xBB && data[2] === 0xBF) {
+        // Strip UTF-8 BOM
+        content = data.toString('utf8', 3);
+      } else if (data.length >= 2 && data[0] === 0xFF && data[1] === 0xFE) {
+        // Strip UTF-16 LE BOM
+        content = data.toString('utf16le', 2);
+      } else {
+        content = data.toString();
+      }
+
       resolve(content);
     });
   });
