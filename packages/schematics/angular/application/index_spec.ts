@@ -71,6 +71,22 @@ describe('Application Schematic', () => {
     expect(workspace.projects.foo).toBeDefined();
   });
 
+  it('should set the prefix to app if none is set', () => {
+    const options = { ...defaultOptions };
+
+    const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+    const workspace = JSON.parse(tree.readContent('/angular.json'));
+    expect(workspace.projects.foo.prefix).toEqual('app');
+  });
+
+  it('should set the prefix correctly', () => {
+    const options = { ...defaultOptions, prefix: 'pre' };
+
+    const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+    const workspace = JSON.parse(tree.readContent('/angular.json'));
+    expect(workspace.projects.foo.prefix).toEqual('pre');
+  });
+
   it('should handle the routing flag', () => {
     const options = { ...defaultOptions, routing: true };
 

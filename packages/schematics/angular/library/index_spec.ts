@@ -84,6 +84,21 @@ describe('Library Schematic', () => {
     expect(workspace.projects.foo).toBeDefined();
   });
 
+  it('should set the prefix to lib if none is set', () => {
+    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+
+    const workspace = JSON.parse(tree.readContent('/angular.json'));
+    expect(workspace.projects.foo.prefix).toEqual('lib');
+  });
+
+  it('should set the prefix correctly', () => {
+    const options = { ...defaultOptions, prefix: 'pre' };
+    const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+
+    const workspace = JSON.parse(tree.readContent('/angular.json'));
+    expect(workspace.projects.foo.prefix).toEqual('pre');
+  });
+
   it('should handle a pascalCasedName', () => {
     const options = {...defaultOptions, name: 'pascalCasedName'};
     const tree = schematicRunner.runSchematic('library', options, workspaceTree);

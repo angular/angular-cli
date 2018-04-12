@@ -28,7 +28,6 @@ describe('Component Schematic', () => {
     spec: true,
     module: undefined,
     export: false,
-    prefix: 'app',
   };
 
 
@@ -197,12 +196,12 @@ describe('Component Schematic', () => {
     expect(content).toMatch(/selector: 'pre-foo'/);
   });
 
-  it('should not use a prefix if none is passed', () => {
+  it('should use the default project prefix if none is passed', () => {
     const options = { ...defaultOptions, prefix: undefined };
 
     const tree = schematicRunner.runSchematic('component', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
-    expect(content).toMatch(/selector: 'foo'/);
+    expect(content).toMatch(/selector: 'app-foo'/);
   });
 
   it('should respect the inlineTemplate option', () => {

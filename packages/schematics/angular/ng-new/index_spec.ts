@@ -38,4 +38,12 @@ describe('Ng New Schematic', () => {
     expect(files.indexOf('/bar/src/main.ts')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/bar/src/app/app.module.ts')).toBeGreaterThanOrEqual(0);
   });
+
+  it('should should set the prefix in angular.json and in app.component.ts', () => {
+    const options = { ...defaultOptions, prefix: 'pre' };
+
+    const tree = schematicRunner.runSchematic('ng-new', options);
+    const content = tree.readContent('/bar/angular.json');
+    expect(content).toMatch(/"prefix": "pre"/);
+  });
 });

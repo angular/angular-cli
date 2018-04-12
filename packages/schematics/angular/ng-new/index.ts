@@ -46,6 +46,7 @@ export default function (options: NgNewOptions): Rule {
     name: options.name,
     inlineStyle: options.inlineStyle,
     inlineTemplate: options.inlineTemplate,
+    prefix: options.prefix,
     viewEncapsulation: options.viewEncapsulation,
     routing: options.routing,
     style: options.style,

@@ -51,6 +51,7 @@ describe('Workspace', () => {
       app: {
         root: 'projects/app',
         projectType: 'application',
+        prefix: 'app',
         cli: {},
         schematics: {
           '@schematics/angular': {

@@ -9,6 +9,7 @@
     "app": {
       "root": "src",
       "projectType": "application",
+      "prefix": "app",
       "schematics": {},
       "architect": {
         "build": {

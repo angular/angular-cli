@@ -69,6 +69,10 @@ export interface Project {
    */
   root: string;
   /**
+   * The prefix to apply to generated selectors."
+   */
+  prefix: string;
+  /**
    * Tool options.
    */
   cli?: {

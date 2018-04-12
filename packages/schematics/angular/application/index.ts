@@ -110,6 +110,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
     const project: any = {
       root: projectRoot,
       projectType: 'application',
+      prefix: options.prefix || 'app',
       architect: {
         build: {
           builder: '@angular-devkit/build-angular:browser',

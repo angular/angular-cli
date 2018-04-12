@@ -90,10 +90,12 @@ function addDeclarationToNgModule(options: DirectiveOptions): Rule {
 }
 
 
-function buildSelector(options: DirectiveOptions) {
+function buildSelector(options: DirectiveOptions, projectPrefix: string) {
   let selector = options.name;
   if (options.prefix) {
     selector = `${options.prefix}-${selector}`;
+  } else if (projectPrefix) {
+    selector = `${projectPrefix}-${selector}`;
   }
 
   return strings.camelize(selector);
@@ -116,7 +118,7 @@ export default function (options: DirectiveOptions): Rule {
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
-    options.selector = options.selector || buildSelector(options);
+    options.selector = options.selector || buildSelector(options, project.prefix);
 
     validateHtmlSelector(options.selector);
 

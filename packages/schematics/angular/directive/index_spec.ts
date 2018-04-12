@@ -129,4 +129,20 @@ describe('Directive Schematic', () => {
     const content = appTree.readContent('/projects/bar/src/app/sub/test.directive.ts');
     expect(content).toMatch(/selector: '\[appTest\]'/);
   });
+
+  it('should use the prefix', () => {
+    const options = { ...defaultOptions, prefix: 'pre' };
+    const tree = schematicRunner.runSchematic('directive', options, appTree);
+
+    const content = tree.readContent('/projects/bar/src/app/foo.directive.ts');
+    expect(content).toMatch(/selector: '\[preFoo\]'/);
+  });
+
+  it('should use the default project prefix if none is passed', () => {
+    const options = { ...defaultOptions, prefix: undefined };
+    const tree = schematicRunner.runSchematic('directive', options, appTree);
+
+    const content = tree.readContent('/projects/bar/src/app/foo.directive.ts');
+    expect(content).toMatch(/selector: '\[appFoo\]'/);
+  });
 });

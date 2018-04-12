@@ -60,6 +60,10 @@
           "type": "string",
           "description": "Root of the project sourcefiles."
         },
+        "prefix": {
+          "type": "string",
+          "description": "The prefix to apply to generated selectors."
+        },
         "cli": {
           "$ref": "#/definitions/tool",
           "default": {}
