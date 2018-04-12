@@ -313,9 +313,9 @@ function verifyWorkspace(command: Command, executionScope: CommandScope, root: s
       // If changing this message, please update the same message in
       // `packages/@angular/cli/bin/ng-update-message.js`
       throw new SilentError(tags.stripIndent`
-        An old CLI configuration has been detected, which needs to be updated to the latest version.
+        The Angular CLI configuration format has been changed, and your existing configuration can
+        be updated automatically by running the following command:
 
-        Please run the following command to update this workspace:
           ng update @angular/cli --migrate-only --from=1
       `);
     }
