@@ -11,17 +11,24 @@ import { retry } from 'rxjs/operators';
 import { host, protractorTargetSpec, runTargetSpec } from '../utils';
 
 
+// TODO: replace this with an "it()" macro that's reusable globally.
+let linuxOnlyIt: typeof it = it;
+if (process.platform.startsWith('win')) {
+  linuxOnlyIt = xit;
+}
+
+
 describe('Protractor Builder', () => {
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
-  it('works', (done) => {
+  linuxOnlyIt('works', (done) => {
     runTargetSpec(host, protractorTargetSpec).pipe(
       retry(3),
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
-  it('works with no devServerTarget', (done) => {
+  linuxOnlyIt('works with no devServerTarget', (done) => {
     const overrides = { devServerTarget: undefined };
 
     runTargetSpec(host, protractorTargetSpec, overrides).pipe(
@@ -29,7 +36,7 @@ describe('Protractor Builder', () => {
     ).subscribe(undefined, done, done.fail);
   }, 30000);
 
-  it('overrides protractor specs', (done) => {
+  linuxOnlyIt('overrides protractor specs', (done) => {
     host.scopedSync().rename(normalize('./e2e/app.e2e-spec.ts'),
       normalize('./e2e/renamed-app.e2e-spec.ts'));
 
@@ -40,7 +47,7 @@ describe('Protractor Builder', () => {
     ).subscribe(undefined, done.fail, done);
   }, 60000);
 
-  it('overrides protractor suites', (done) => {
+  linuxOnlyIt('overrides protractor suites', (done) => {
     host.scopedSync().rename(normalize('./e2e/app.e2e-spec.ts'),
       normalize('./e2e/renamed-app.e2e-spec.ts'));
 

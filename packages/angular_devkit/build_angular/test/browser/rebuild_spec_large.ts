@@ -12,6 +12,13 @@ import { TestLogger, Timeout, browserTargetSpec, host, runTargetSpec } from '../
 import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_large';
 
 
+// TODO: replace this with an "it()" macro that's reusable globally.
+let linuxOnlyIt: typeof it = it;
+if (process.platform.startsWith('win')) {
+  linuxOnlyIt = xit;
+}
+
+
 describe('Browser Builder rebuilds', () => {
   const outputPath = normalize('dist');
 
@@ -201,7 +208,7 @@ describe('Browser Builder rebuilds', () => {
   }, Timeout.Basic);
 
 
-  it('rebuilds after errors in AOT', (done) => {
+  linuxOnlyIt('rebuilds after errors in AOT', (done) => {
     // Save the original contents of `./src/app/app.component.ts`.
     const origContent = virtualFs.fileBufferToString(
       host.scopedSync().read(normalize('src/app/app.component.ts')));
@@ -263,7 +270,7 @@ describe('Browser Builder rebuilds', () => {
   }, Timeout.Complex);
 
 
-  it('rebuilds AOT factories', (done) => {
+  linuxOnlyIt('rebuilds AOT factories', (done) => {
 
     host.writeMultipleFiles({
       'src/app/app.component.css': `

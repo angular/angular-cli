@@ -16,6 +16,13 @@ import { Observable, Subscription } from 'rxjs';
 const temp = require('temp');
 
 
+// TODO: replace this with an "it()" macro that's reusable globally.
+let linuxOnlyIt: typeof it = it;
+if (process.platform.startsWith('win') || process.platform.startsWith('darwin')) {
+  linuxOnlyIt = xit;
+}
+
+
 describe('NodeJsAsyncHost', () => {
   let root: string;
   let host: virtualFs.Host<fs.Stats>;
@@ -29,7 +36,7 @@ describe('NodeJsAsyncHost', () => {
       .subscribe({ complete() { done(); } });
   });
 
-  it('can watch', done => {
+  linuxOnlyIt('can watch', done => {
     let obs: Observable<virtualFs.HostWatchEvent>;
     let subscription: Subscription;
     const content = virtualFs.stringToFileBuffer('hello world');
@@ -56,7 +63,7 @@ describe('NodeJsAsyncHost', () => {
         subscription.unsubscribe();
       })
       .then(done, done.fail);
-  }, 10000000);
+  }, 30000);
 });
 
 
@@ -73,7 +80,7 @@ describe('NodeJsSyncHost', () => {
     host.delete(normalize('/'));
   });
 
-  it('can watch', done => {
+  linuxOnlyIt('can watch', done => {
     let obs: Observable<virtualFs.HostWatchEvent>;
     let subscription: Subscription;
     const content = virtualFs.stringToFileBuffer('hello world');
@@ -102,6 +109,6 @@ describe('NodeJsSyncHost', () => {
         subscription.unsubscribe();
       })
       .then(done, done.fail);
-  }, 10000000);
+  }, 30000);
 
 });

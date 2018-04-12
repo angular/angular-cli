@@ -12,6 +12,13 @@ import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { concatMap, tap } from 'rxjs/operators';
 
 
+// TODO: replace this with an "it()" macro that's reusable globally.
+let linuxOnlyIt: typeof it = it;
+if (process.platform.startsWith('win')) {
+  linuxOnlyIt = xit;
+}
+
+
 describe('NgPackagr Builder', () => {
   const workspaceFile = normalize('angular.json');
   const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
@@ -33,7 +40,7 @@ describe('NgPackagr Builder', () => {
     ).subscribe(undefined, done.fail, done);
   }, 30000);
 
-  it('tests works', (done) => {
+  linuxOnlyIt('tests works', (done) => {
     const targetSpec: TargetSpecifier = { project: 'lib', target: 'test' };
 
     return workspace.loadWorkspaceFromHost(workspaceFile).pipe(
