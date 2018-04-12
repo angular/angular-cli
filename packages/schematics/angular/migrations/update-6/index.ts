@@ -73,6 +73,7 @@ function migrateConfiguration(oldConfig: CliConfig): Rule {
     const configPath = normalize('angular.json');
     context.logger.info(`Updating configuration`);
     const config: JsonObject = {
+      '$schema': './node_modules/@angular-devkit/core/src/workspace/workspace-schema.json',
       version: 1,
       newProjectRoot: 'projects',
       projects: extractProjectsConfig(oldConfig, host),
