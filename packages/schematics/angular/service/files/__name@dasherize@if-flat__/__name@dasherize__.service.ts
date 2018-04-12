@@ -1,8 +1,7 @@
-import { Injectable } from '@angular/core';<% if (providedIn) { %>
-import { <%= providedIn %> } from '<%= providedInPath %>';<% } %>
+import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: <%= providedIn || "'root'" %>
+  providedIn: 'root'
 })
 export class <%= classify(name) %>Service {
 

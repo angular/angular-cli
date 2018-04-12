@@ -27,8 +27,4 @@ export interface Schema {
      * Specifies if a spec file is generated.
      */
     spec?: boolean;
-    /**
-     * Allows specification of the providing module.
-     */
-    module?: string;
 }
