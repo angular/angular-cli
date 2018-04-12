@@ -34,9 +34,9 @@ if (found) {
   // eslint-disable-next-line no-console
   console.error(`\u001b[31m
     ${'='.repeat(80)}
-    An old CLI configuration has been detected, which needs to be updated to the latest version.
+    The Angular CLI configuration format has been changed, and your existing configuration can
+    be updated automatically by running the following command:
 
-    Please run the following command to update this workspace:
       ng update @angular/cli --migrate-only --from=1
     ${'='.repeat(80)}
     \u001b[39m`.replace(/^ {4}/gm, ''));
