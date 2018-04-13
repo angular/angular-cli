@@ -70,6 +70,7 @@ describe('path', () => {
     expect(normalize('\\a\\b\\c')).toBe('/a/b/c');
     expect(normalize('.\\a\\b\\c')).toBe('a/b/c');
     expect(normalize('C:\\a\\b\\c')).toBe('/C/a/b/c');
+    expect(normalize('c:\\a\\b\\c')).toBe('/c/a/b/c');
     expect(normalize('A:\\a\\b\\c')).toBe('/A/a/b/c');
     expect(() => normalize('A:\\..\\..'))
       .toThrow(new InvalidPathException('A:\\..\\..'));

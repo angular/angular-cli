@@ -204,7 +204,7 @@ export function normalize(path: string): Path {
 
   // Match absolute windows path.
   const original = path;
-  if (path.match(/^[A-Z]:[\/\\]/)) {
+  if (path.match(/^[A-Z]:[\/\\]/i)) {
     path = '\\' + path[0] + '\\' + path.substr(3);
   }
 
