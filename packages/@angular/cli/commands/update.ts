@@ -1,41 +1,24 @@
-const Command = require('../ember-cli/lib/models/command');
-import { UpdateTask } from '../tasks/update';
+import { stripIndent } from 'common-tags';
 
-export interface UpdateOptions {
-  schematic?: boolean;
-}
+const chalk = require('chalk');
+const Command = require('../ember-cli/lib/models/command');
 
 const UpdateCommand = Command.extend({
   name: 'update',
   description: 'Updates your application.',
   works: 'everywhere',
-  availableOptions: [
-    {
-      name: 'dry-run',
-      type: Boolean,
-      default: false,
-      aliases: ['d'],
-      description: 'Run through without making any changes.'
-    },
-    {
-      name: 'next',
-      type: Boolean,
-      default: false,
-      description: 'Install the next version, instead of the latest.'
-    }
-  ],
-
+  availableOptions: [],
   anonymousOptions: [],
 
-  run: function(commandOptions: any) {
-    const schematic = '@schematics/package-update:all';
+  run: function(_commandOptions: any) {
+    console.log(chalk.red(stripIndent`
+      CLI 1.7 does not support an automatic v6 update. Manually install @angular/cli via your
+      package manager, then run the update migration schematic to finish the process.
 
-    const updateTask = new UpdateTask({
-      ui: this.ui,
-      project: this.project
-    });
 
-    return updateTask.run(schematic, commandOptions);
+        npm install @angular/cli@^6.0.0
+        ng update @angular/cli --migrate-only --from=1
+    ` + '\n\n'));
   }
 });
 
