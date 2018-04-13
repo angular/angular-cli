@@ -589,6 +589,12 @@ function updateTsLintConfig(): Rule {
 
 export default function (): Rule {
   return (host: Tree, context: SchematicContext) => {
+    if (host.exists('/.angular.json') || host.exists('/angular.json')) {
+      context.logger.info('Found a modern configuration file. Nothing to be done.');
+
+      return host;
+    }
+
     const configPath = getConfigPath(host);
     const configBuffer = host.read(normalize(configPath));
     if (configBuffer == null) {
