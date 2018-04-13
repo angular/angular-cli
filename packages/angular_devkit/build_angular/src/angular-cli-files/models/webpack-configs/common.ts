@@ -251,10 +251,10 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
           }
         },
         {
-          test: /[\/\\]@angular[\/\\].+\.js$/,
-          sideEffects: false,
+          // Mark files inside `@angular/core` as using SystemJS style dynamic imports.
+          // Removing this will cause deprecation warnings to appear.
+          test: /[\/\\]@angular[\/\\]core[\/\\].+\.js$/,
           parser: { system: true },
-          ...buildOptimizerUseRule,
         },
         {
           test: /\.js$/,
