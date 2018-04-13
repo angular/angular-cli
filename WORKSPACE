@@ -1,21 +1,28 @@
 workspace(name = "nguniversal")
 
+# This commit matches the version of buildifier in angular/ngcontainer
+# If you change this, also check if it matches the version in the angular/ngcontainer
+# version in /.circleci/config.yml
+BAZEL_BUILDTOOLS_VERSION = "70bc7843bb9950fece2bc014ed16de03419e36e2"
+
 http_archive(
     name = "com_github_bazelbuild_buildtools",
-    # Note, this commit matches the version of buildifier in angular/ngcontainer
-    url = "https://github.com/bazelbuild/buildtools/archive/b3b620e8bcff18ed3378cd3f35ebeb7016d71f71.zip",
-    strip_prefix = "buildtools-b3b620e8bcff18ed3378cd3f35ebeb7016d71f71",
-    sha256 = "dad19224258ed67cbdbae9b7befb785c3b966e5a33b04b3ce58ddb7824b97d73",
+    url = "https://github.com/bazelbuild/buildtools/archive/%s.zip" % BAZEL_BUILDTOOLS_VERSION,
+    strip_prefix = "buildtools-%s" % BAZEL_BUILDTOOLS_VERSION,
+    sha256 = "367c23a5fe7fc2a7cb57863d3718b4149f0e57426c48c8ad54c45348a0b53cc1",
 )
 
 http_archive(
     name = "build_bazel_rules_nodejs",
-    url = "https://github.com/bazelbuild/rules_nodejs/archive/25bb70fb67bddcc257b869f434ccc0fd130ec3bd.zip",
-    strip_prefix = "rules_nodejs-25bb70fb67bddcc257b869f434ccc0fd130ec3bd",
-    sha256 = "11c0d73bdcb4b2608abbe5967be5a910bdaebf848eb13e4e7f8413bbdeb940b8",
+    url = "https://github.com/bazelbuild/rules_nodejs/archive/1931156c232a08356dfda02e9c8b0275c2e63c00.zip",
+    strip_prefix = "rules_nodejs-1931156c232a08356dfda02e9c8b0275c2e63c00",
+    sha256 = "9cfe33276a6ac0076ee9ee159c4a2576f9851c0f437435b5ac19b2e592493078",
 )
 
-load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories", "yarn_install")
+
+load("@build_bazel_rules_nodejs//:defs.bzl", "check_bazel_version", "node_repositories", "yarn_install")
+
+check_bazel_version("0.11.1")
 node_repositories(package_json = ["//:package.json"])
 
 
@@ -31,8 +38,8 @@ ts_setup_workspace()
 # Bazel doesn't support transitive WORKSPACE deps, so we must repeat them here.
 http_archive(
     name = "io_bazel_rules_go",
-    url = "https://github.com/bazelbuild/rules_go/releases/download/0.9.0/rules_go-0.9.0.tar.gz",
-    sha256 = "4d8d6244320dd751590f9100cf39fd7a4b75cd901e1f3ffdfd6f048328883695",
+    url = "https://github.com/bazelbuild/rules_go/releases/download/0.10.3/rules_go-0.10.3.tar.gz",
+    sha256 = "feba3278c13cde8d67e341a837f69a029f698d7a27ddbb2a202be7a10b22142a",
 )
 
 load("@io_bazel_rules_go//go:def.bzl", "go_rules_dependencies", "go_register_toolchains")

@@ -4,7 +4,7 @@
 # We use a docker image as the basis for our build, so that all the toolchains we use
 # are already installed and the build can start running right away. It also guarantees
 # the environment is portable and reproducible on your local machine.
-var_1: &docker_image angular/ngcontainer:0.1.0
+var_1: &docker_image angular/ngcontainer:0.2.0
 
 # CircleCI lets us pick the key for storing one or more caches, to speed up subsequent builds.
 # We can use this to avoid re-fetching our dependencies from npm on every build.
@@ -13,7 +13,7 @@ var_1: &docker_image angular/ngcontainer:0.1.0
 # - the branch we are on, which really shouldn't be needed since the yarn lock file should be hermetic
 # - the docker image tag, working around an issue we saw where changing docker images causes permission
 #   errors when restoring the cache, like when the user we run as changes
-var_2: &cache_key angular-{{ .Branch }}-{{ checksum "yarn.lock" }}-0.1.0
+var_2: &cache_key angular-{{ .Branch }}-{{ checksum "yarn.lock" }}-0.2.0
 
 # Each job will inherit these defaults
 anchor_1: &job_defaults
@@ -33,7 +33,7 @@ version: 2
 
 # These jobs will run in parallel, and report separate statuses to GitHub PRs
 jobs:
-  lint:
+  bazel-lint:
     <<: *job_defaults
     steps:
       - checkout:
@@ -43,6 +43,15 @@ jobs:
       # buildifier locally on your change.
       - run: 'buildifier -mode=check $(find . -type f \( -name BUILD.bazel -or -name BUILD \)) ||
               (echo "BUILD files not formatted. Please run ''yarn buildifier''" ; exit 1)'
+
+  lint:
+    <<: *job_defaults
+    steps:
+      - checkout:
+          <<: *post_checkout
+      # TODO: Don't do this
+      - run: yarn install --frozen-lockfile
+      - run: yarn lint
 
   build:
     <<: *job_defaults
@@ -68,24 +77,24 @@ jobs:
       - run: bazel test //...
 
       - store_artifacts:
-          path: dist/bin/modules/aspnetcore-engine/@nguniversal/aspnetcore-engine/esm2015/aspnetcore-engine.js
+          path: dist/bin/modules/aspnetcore-engine/npm_package/fesm2015/aspnetcore-engine.js
           destination: aspnetcore-engine.js
 
       - store_artifacts:
-          path: dist/bin/modules/common/@nguniversal/common/esm2015/common.js
+          path: dist/bin/modules/common/npm_package/fesm2015/common.js
           destination: common.js
 
       - store_artifacts:
-          path: dist/bin/modules/express-engine/@nguniversal/express-engine/esm2015/express-engine.js
+          path: dist/bin/modules/express-engine/npm_package/fesm2015/express-engine.js
           destination: express-engine.js
 
       - store_artifacts:
-          path: dist/bin/modules/hapi-engine/@nguniversal/hapi-engine/esm2015/hapi-engine.js
+          path: dist/bin/modules/hapi-engine/npm_package/fesm2015/hapi-engine.js
           destination: hapi-engine.js
 
       - store_artifacts:
-          path: dist/bin/modules/module-mapngfactory-loader/@nguniversal/module-mapngfactory-loader/esm2015/module-mapngfactory-loader.js
-          destination: module-mapngfactory-loader.js
+          path: dist/bin/modules/module-map-ngfactory-loader/npm_package/fesm2015/module-map-ngfactory-loader.js
+          destination: module-map-ngfactory-loader.js
 
       # If we get this far, save the node_modules directory for use next time.
       - save_cache:
@@ -98,4 +107,5 @@ workflows:
   default_workflow:
     jobs:
       - build
+      - bazel-lint
       - lint
