@@ -9,7 +9,8 @@ import { Observable } from 'rxjs';
 import { Path, PathFragment } from '../path';
 
 
-export declare type FileBuffer = ArrayBuffer;
+export type FileBuffer = ArrayBuffer;
+export type FileBufferLike = ArrayBufferLike;
 
 export interface HostWatchOptions {
   readonly persistent?: boolean;
@@ -49,7 +50,7 @@ export interface HostCapabilities {
 export interface Host<StatsT extends object = {}> {
   readonly capabilities: HostCapabilities;
 
-  write(path: Path, content: FileBuffer): Observable<void>;
+  write(path: Path, content: FileBufferLike): Observable<void>;
   read(path: Path): Observable<FileBuffer>;
   delete(path: Path): Observable<void>;
   rename(from: Path, to: Path): Observable<void>;

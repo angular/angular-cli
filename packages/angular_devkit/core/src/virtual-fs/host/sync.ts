@@ -10,6 +10,7 @@ import { BaseException } from '../../exception/exception';
 import { Path, PathFragment } from '../path';
 import {
   FileBuffer,
+  FileBufferLike,
   Host,
   HostCapabilities,
   HostWatchEvent,
@@ -63,7 +64,7 @@ export class SyncDelegateHost<T extends object = {}> {
     return this._delegate;
   }
 
-  write(path: Path, content: FileBuffer): void {
+  write(path: Path, content: FileBufferLike): void {
     return this._doSyncCall(this._delegate.write(path, content));
   }
   read(path: Path): FileBuffer {
