@@ -165,13 +165,24 @@ export function parseOptions<T = any>(
       return defaults;
     }, {});
 
+  const strings = cmdOpts
+    .filter(o => o.type === String)
+    .map(o => o.name);
+
+  const numbers = cmdOpts
+    .filter(o => o.type === Number)
+    .map(o => o.name);
+
+
   aliases.help = ['h'];
   booleans.push('help');
 
   const yargsOptions = {
     alias: aliases,
     boolean: booleans,
-    default: defaults
+    default: defaults,
+    string: strings,
+    number: numbers
   };
 
   const parsedOptions = parser(args, yargsOptions);
