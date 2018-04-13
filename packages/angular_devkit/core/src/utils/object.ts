@@ -15,23 +15,31 @@ export function mapObject<T, V>(obj: {[k: string]: T},
   }, {});
 }
 
+
+const copySymbol = Symbol();
+
 // tslint:disable-next-line:no-any
-export function deepCopy<T extends any> (object: T): T {
-  if (Array.isArray(object)) {
-    // tslint:disable-next-line:no-any
-    return object.map((o: any) => deepCopy(o));
-  } else if (typeof object === 'object') {
-    if (object['toJSON']) {
-      return JSON.parse((object['toJSON'] as () => string)());
+export function deepCopy<T extends any> (value: T): T {
+  if (Array.isArray(value)) {
+    return value.map((o: T) => deepCopy(o));
+  } else if (value && typeof value === 'object') {
+    if (value[copySymbol]) {
+      // This is a circular dependency. Just return the cloned value.
+      return value[copySymbol];
+    }
+    if (value['toJSON']) {
+      return JSON.parse((value['toJSON'] as () => string)());
     }
 
-    const copy = {} as T;
-    for (const key of Object.keys(object)) {
-      copy[key] = deepCopy(object[key]);
+    const copy = new (Object.getPrototypeOf(value).constructor)();
+    value[copySymbol] = copy;
+    for (const key of Object.getOwnPropertyNames(value)) {
+      copy[key] = deepCopy(value[key]);
     }
+    value[copySymbol] = undefined;
 
     return copy;
   } else {
-    return object;
+    return value;
   }
 }
