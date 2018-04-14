@@ -7,7 +7,7 @@ export interface Options {
 }
 
 export default class Xi18nCommand extends ArchitectCommand {
-  public readonly name = 'xi81n';
+  public readonly name = 'xi18n';
   public readonly target = 'extract-i18n';
   public readonly description = 'Extracts i18n messages from source code.';
   public readonly scope = CommandScope.inProject;
