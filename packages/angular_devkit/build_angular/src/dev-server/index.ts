@@ -99,7 +99,6 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
         const browserBuilder = new BrowserBuilder(this.context);
         const webpackConfig = browserBuilder.buildWebpackConfig(
           root, projectRoot, host, browserOptions);
-        const webpackCompiler = webpack(webpackConfig);
         const statsConfig = getWebpackStatsConfig(browserOptions.verbose);
 
         let webpackDevServerConfig: WebpackDevServerConfigurationOptions;
@@ -169,6 +168,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
           **
         `);
 
+        const webpackCompiler = webpack(webpackConfig);
         const server = new WebpackDevServer(webpackCompiler, webpackDevServerConfig);
 
         let first = true;
