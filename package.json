@@ -59,9 +59,6 @@
   "scripts": {
     "lint": "tslint -c tslint.json '+(modules|tools)/**/*.ts' --exclude '**/node_modules/**/*'",
     "build": "ts-node --project ./tools/tsconfig.json build.ts",
-    "test:watch": "ts-node --project ./tools/tsconfig.json build-test.ts && karma start karma.conf.js",
-    "test:browser": "ts-node --project ./tools/tsconfig.json build-test.ts && ts-node test/test-browser.ts",
-    "test:server": "ts-node --project ./tools/tsconfig.json build-test.ts && ts-node test/test-server.ts",
     "upver": "standard-version",
     "upver:beta": "standard-version --prerelease beta",
     "upver:rc": "standard-version --prerelease rc",
@@ -69,9 +66,9 @@
     "prebuildifier": "bazel build --noshow_progress @com_github_bazelbuild_buildtools//buildifier",
     "buildifier": "find . -type f \\( -name BUILD -or -name BUILD.bazel \\) ! -path \"*/node_modules/*\" | xargs $(bazel info bazel-bin)/external/com_github_bazelbuild_buildtools/buildifier/*/buildifier",
     "bazel:build": "bazel build //...",
-    "bazel:test": "bazel test //...",
-    "bazel:build:watch": "ibazel build //...",
-    "bazel:test:watch": "ibazel test //..."
+    "test": "bazel test //...",
+    "build:watch": "ibazel build //...",
+    "test:watch": "ibazel test //..."
   },
   "devDependencies": {
     "@angular/animations": "6.0.0-rc.4",

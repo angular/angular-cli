@@ -15,8 +15,6 @@ branches:
 jobs:
   include:
     - env: "MODE=build"
-    - env: "MODE=karma"
-    - env: "MODE=jasmine"
 
 install:
   - yarn install --frozen-lockfile
