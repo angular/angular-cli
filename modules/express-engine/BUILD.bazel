@@ -36,6 +36,7 @@ ts_library(
     ]),
     deps = [
         ":express-engine",
+        "//modules/express-engine/tokens",
     ],
 )
 

@@ -88,6 +88,8 @@ export const rollupGlobals = {
   'express': 'express',
   'hapi': 'hapi',
 
+  'zone.js': 'zonejs',
+
   '@nguniversal/aspnetcore-engine': 'nguniversal.aspnetcoreEngine',
   '@nguniversal/common': 'nguniversal.common',
   '@nguniversal/express-engine': 'nguniversal.expressEngine',

@@ -27,7 +27,6 @@
     "no-shadowed-variable": true,
     "no-unused-expression": true,
     "no-var-keyword": true,
-    "member-access": [true, "no-public"],
     "no-debugger": true,
     "no-unused-variable": true,
     "one-line": [
