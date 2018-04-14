@@ -24,7 +24,7 @@
     "baseUrl": "."
   },
   "files": [
-    "public-api.ts"
+    "public_api.ts"
   ],
   "angularCompilerOptions": {
     "annotateForClosureCompiler": true,

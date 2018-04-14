@@ -12,14 +12,10 @@ branches:
   only:
   - master
 
-jobs:
-  include:
-    - env: "MODE=build"
-
 install:
   - yarn install --frozen-lockfile
 
 script:
-  - ./scripts/ci/travis-script.sh
+  - yarn build
 
 cache: yarn
