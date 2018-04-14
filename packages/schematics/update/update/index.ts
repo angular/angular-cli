@@ -331,26 +331,53 @@ function _usageMessage(
   infoMap: Map<string, PackageInfo>,
   logger: logging.LoggerApi,
 ) {
+  const packageGroups = new Map<string, string>();
   const packagesToUpdate = [...infoMap.entries()]
-    .sort()
     .map(([name, info]) => {
       const tag = options.next ? 'next' : 'latest';
       const version = info.npmPackageJson['dist-tags'][tag];
       const target = info.npmPackageJson.versions[version];
 
-      return [
+      return {
         name,
         info,
         version,
+        tag,
         target,
-      ] as [string, PackageInfo, string, JsonSchemaForNpmPackageJsonFiles];
+      };
     })
-    .filter(([name, info, version, target]) => {
+    .filter(({ name, info, version, target }) => {
       return (target && semver.compare(info.installed.version, version) < 0);
     })
-    .filter(([, , , target]) => {
+    .filter(({ target }) => {
       return target['ng-update'];
-    });
+    })
+    .map(({ name, info, version, tag, target }) => {
+      // Look for packageGroup.
+      if (target['ng-update'] && target['ng-update']['packageGroup']) {
+        const packageGroup = target['ng-update']['packageGroup'];
+        const packageGroupName = target['ng-update']['packageGroupName']
+                              || target['ng-update']['packageGroup'][0];
+        if (packageGroupName) {
+          if (packageGroups.has(name)) {
+            return null;
+          }
+
+          packageGroup.forEach((x: string) => packageGroups.set(x, packageGroupName));
+          packageGroups.set(packageGroupName, packageGroupName);
+          name = packageGroupName;
+        }
+      }
+
+      let command = `ng update ${name}`;
+      if (tag == 'next') {
+        command += ' --next';
+      }
+
+      return [name, `${info.installed.version} -> ${version}`, command];
+    })
+    .filter(x => x !== null)
+    .sort((a, b) => a && b ? a[0].localeCompare(b[0]) : 0);
 
   if (packagesToUpdate.length == 0) {
     logger.info('We analyzed your package.json and everything seems to be in order. Good work!');
@@ -367,29 +394,20 @@ function _usageMessage(
   if (!Number.isFinite(namePad)) {
     namePad = 30;
   }
+  const pads = [namePad, 25, 0];
 
   logger.info(
     '  '
-    + 'Name'.padEnd(namePad)
-    + 'Version'.padEnd(25)
-    + '  Command to update',
+    + ['Name', 'Version', 'Command to update'].map((x, i) => x.padEnd(pads[i])).join(''),
   );
-  logger.info(' ' + '-'.repeat(namePad * 2 + 35));
+  logger.info(' ' + '-'.repeat(pads.reduce((s, x) => s += x, 0) + 20));
 
-  packagesToUpdate.forEach(([name, info, version, target]) => {
-    let command = `npm install ${name}`;
-    if (target && target['ng-update']) {
-      // Show the ng command only when migrations are supported, otherwise it's a fancy
-      // npm install, really.
-      command = `ng update ${name}`;
+  packagesToUpdate.forEach(fields => {
+    if (!fields) {
+      return;
     }
 
-    logger.info(
-      '  '
-      + name.padEnd(namePad)
-      + `${info.installed.version} -> ${version}`.padEnd(25)
-      + '  ' + command,
-    );
+    logger.info('  ' + fields.map((x, i) => x.padEnd(pads[i])).join(''));
   });
 
   logger.info('\n');

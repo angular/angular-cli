@@ -75,7 +75,8 @@ In order to implement migrations in a library, the author must add the `ng-updat
 |---|---|---|
 | `requirements` | `{ [packageName: string]: VersionRange }` | A map of package names to version to check for minimal requirement. If one of the libraries listed here does not match the version range specified in `requirements`, an error will be shown to the user to manually update those libraries. For example, `@angular/core` does not support updates from versions earlier than 5, so this field would be `{ '@angular/core': '>= 5' }`.
 | `migrations` | `string` | A relative path (or resolved using Node module resolution) to a Schematics collection definition. |
-| `packageGroup` | `string[]` | A list of npm packages that are to be grouped together. When running
+| `packageGroup` | `string[]` | A list of npm packages that are to be grouped together. When running the update schematic it will automatically include all packages as part of the packageGroup in the update (if the user also installed them). |
+| `packageGroupName` | `string` | The name of the packageGroup to use. By default, uses the first package in the packageGroup. The packageGroupName needs to be part of the packageGroup and should be a valid package name. |
 
 #### Example given:
 Library my-lib wants to have 2 steps to update from version 4 -> 4.5 and 4.5 to 5. It would add this information in its `package.json`:
