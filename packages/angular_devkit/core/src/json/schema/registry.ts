@@ -98,6 +98,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     });
 
     this._ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'));
+    this._ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-06.json'));
 
     this.addPostTransform(addUndefinedDefaults);
   }
