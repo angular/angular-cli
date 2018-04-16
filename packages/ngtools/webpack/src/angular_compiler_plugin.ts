@@ -89,7 +89,7 @@ export interface AngularCompilerPluginOptions {
   // Use tsconfig to include path globs.
   compilerOptions?: ts.CompilerOptions;
 
-  host: virtualFs.Host<fs.Stats>;
+  host?: virtualFs.Host<fs.Stats>;
 }
 
 export enum PLATFORM {
