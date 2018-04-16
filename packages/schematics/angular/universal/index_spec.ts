@@ -62,7 +62,16 @@ describe('Universal Schematic', () => {
     const filePath = '/projects/bar/tsconfig.server.json';
     expect(tree.exists(filePath)).toEqual(true);
     const contents = tree.readContent(filePath);
-    expect(contents).toMatch('../../out-tsc/app-server');
+    expect(JSON.parse(contents)).toEqual({
+      extends: './tsconfig.app.json',
+      compilerOptions: {
+        outDir: '../../out-tsc/app-server',
+        module: 'commonjs',
+      },
+      angularCompilerOptions: {
+        entryModule: 'src/app/app.server.module#AppServerModule',
+      },
+    });
   });
 
   it('should add dependency: @angular/platform-server', () => {

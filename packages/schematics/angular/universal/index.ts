@@ -5,7 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, experimental, normalize, parseJson, strings } from '@angular-devkit/core';
+import {
+  JsonObject,
+  basename,
+  experimental,
+  normalize,
+  parseJson,
+  strings,
+} from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -197,12 +204,14 @@ export default function (options: UniversalOptions): Rule {
     const clientProject = getClientProject(host, options);
     const clientArchitect = getClientArchitect(host, options);
     const outDir = getTsConfigOutDir(host, clientArchitect);
+    const tsConfigExtends = basename(clientArchitect.build.options.tsConfig);
     const templateSource = apply(url('./files'), [
       template({
         ...strings,
         ...options as object,
         stripTsExtension: (s: string) => { return s.replace(/\.ts$/, ''); },
         outDir,
+        tsConfigExtends,
       }),
       move(clientProject.root),
     ]);

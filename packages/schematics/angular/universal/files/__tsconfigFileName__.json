@@ -1,15 +1,9 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": "./<%= tsConfigExtends %>",
   "compilerOptions": {
     "outDir": "<%= outDir %>-server",
-    "baseUrl": "./",
-    "module": "commonjs",
-    "types": []
+    "module": "commonjs"
   },
-  "exclude": [
-    "test.ts",
-    "**/*.spec.ts"
-  ],
   "angularCompilerOptions": {
     "entryModule": "<%= appDir %>/<%= stripTsExtension(rootModuleFileName) %>#<%= rootModuleClassName %>"
   }
