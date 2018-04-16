@@ -133,9 +133,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
               },
             ],
             styles: [
-              {
-                input: `${projectRoot}src/styles.${options.style}`,
-              },
+             `${projectRoot}src/styles.${options.style}`,
             ],
             scripts: [],
           },
