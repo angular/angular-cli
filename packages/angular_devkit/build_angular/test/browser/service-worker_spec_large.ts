@@ -53,6 +53,7 @@ describe('Browser Builder', () => {
   it('works with service worker', (done) => {
     host.writeMultipleFiles({
       'src/ngsw-config.json': JSON.stringify(manifest),
+      'src/assets/folder-asset.txt': 'folder-asset.txt',
     });
 
     const overrides = { serviceWorker: true };
@@ -60,6 +61,40 @@ describe('Browser Builder', () => {
       tap(buildEvent => {
         expect(buildEvent.success).toBe(true);
         expect(host.scopedSync().exists(normalize('dist/ngsw.json')));
+        const ngswJson = JSON.parse(virtualFs.fileBufferToString(
+          host.scopedSync().read(normalize('dist/ngsw.json'))));
+        // Verify index and assets are there.
+        expect(ngswJson).toEqual({
+          configVersion: 1,
+          index: '/index.html',
+          assetGroups: [
+            {
+              name: 'app',
+              installMode: 'prefetch',
+              updateMode: 'prefetch',
+              urls: [
+                '/favicon.ico',
+                '/index.html',
+              ],
+              patterns: [],
+            },
+            {
+              name: 'assets',
+              installMode: 'lazy',
+              updateMode: 'prefetch',
+              urls: [
+                '/assets/folder-asset.txt',
+              ],
+              patterns: [],
+            },
+          ],
+          dataGroups: [],
+          hashTable: {
+            '/favicon.ico': '460fcbd48b20fcc32b184388606af1238c890dba',
+            '/assets/folder-asset.txt': '617f202968a6a81050aa617c2e28e1dca11ce8d4',
+            '/index.html': '3e659d6e536916b7d178d02a2e6e5492f868bf68',
+          },
+        });
       }),
     ).subscribe(undefined, done.fail, done);
   }, Timeout.Basic);
@@ -67,6 +102,7 @@ describe('Browser Builder', () => {
   it('works with service worker and baseHref', (done) => {
     host.writeMultipleFiles({
       'src/ngsw-config.json': JSON.stringify(manifest),
+      'src/assets/folder-asset.txt': 'folder-asset.txt',
     });
 
     const overrides = { serviceWorker: true, baseHref: '/foo/bar' };
@@ -74,9 +110,40 @@ describe('Browser Builder', () => {
       tap(buildEvent => {
         expect(buildEvent.success).toBe(true);
         expect(host.scopedSync().exists(normalize('dist/ngsw.json')));
-        expect(virtualFs.fileBufferToString(
-          host.scopedSync().read(normalize('dist/ngsw.json')),
-        )).toMatch(/"\/foo\/bar\/index.html"/);
+        const ngswJson = JSON.parse(virtualFs.fileBufferToString(
+          host.scopedSync().read(normalize('dist/ngsw.json'))));
+        // Verify index and assets include the base href.
+        expect(ngswJson).toEqual({
+          configVersion: 1,
+          index: '/foo/bar/index.html',
+          assetGroups: [
+            {
+              name: 'app',
+              installMode: 'prefetch',
+              updateMode: 'prefetch',
+              urls: [
+                '/foo/bar/favicon.ico',
+                '/foo/bar/index.html',
+              ],
+              patterns: [],
+            },
+            {
+              name: 'assets',
+              installMode: 'lazy',
+              updateMode: 'prefetch',
+              urls: [
+                '/foo/bar/assets/folder-asset.txt',
+              ],
+              patterns: [],
+            },
+          ],
+          dataGroups: [],
+          hashTable: {
+            '/foo/bar/favicon.ico': '460fcbd48b20fcc32b184388606af1238c890dba',
+            '/foo/bar/assets/folder-asset.txt': '617f202968a6a81050aa617c2e28e1dca11ce8d4',
+            '/foo/bar/index.html': '5b53fa9e07e4111b8ef84613fb989a56fee502b0',
+          },
+        });
       }),
     ).subscribe(undefined, done.fail, done);
   }, Timeout.Basic);

@@ -1,14 +1,14 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
-import { Path, join, normalize, virtualFs, dirname, getSystemPath, tags } from '@angular-devkit/core';
+import { Path, join, normalize, virtualFs, dirname, getSystemPath, tags, fragment } from '@angular-devkit/core';
 import { Filesystem } from '@angular/service-worker/config';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as semver from 'semver';
 
 import { resolveProjectModule } from '../require-project-module';
-import { map, reduce, switchMap } from "rxjs/operators";
-import { Observable, merge, of } from "rxjs";
+import { map, reduce, switchMap, concatMap, mergeMap, toArray, tap } from "rxjs/operators";
+import { Observable, merge, of, from } from "rxjs";
 
 
 export const NEW_SW_VERSION = '5.0.0-rc.0';
@@ -18,7 +18,22 @@ class CliFilesystem implements Filesystem {
   constructor(private _host: virtualFs.Host, private base: string) { }
 
   list(path: string): Promise<string[]> {
-    return this._host.list(this._resolve(path)).toPromise().then(x => x, _err => []);
+    const recursiveList = (path: Path): Observable<Path> => this._host.list(path).pipe(
+      // Emit each fragment individually.
+      concatMap(fragments => from(fragments)),
+      // Join the path with fragment.
+      map(fragment => join(path, fragment)),
+      // Emit directory content paths instead of the directory path.
+      mergeMap(path => this._host.isDirectory(path).pipe(
+          concatMap(isDir => isDir ? recursiveList(path) : of(path))
+        )
+      ),
+    );
+
+    return recursiveList(this._resolve(path)).pipe(
+      map(path => path.replace(this.base, '')),
+      toArray(),
+    ).toPromise().then(x => x, _err => []);
   }
 
   read(path: string): Promise<string> {
