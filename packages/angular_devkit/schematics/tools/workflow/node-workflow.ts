@@ -177,7 +177,6 @@ export class NodeWorkflow implements workflow.Workflow {
 
         obs.complete();
       })),
-      reduce(() => {}),
-    );
+    ).pipe(reduce(() => { }));
   }
 }
