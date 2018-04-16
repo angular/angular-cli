@@ -9,7 +9,7 @@ const collectionPath = path.join(__dirname, '../collection.json');
 describe('<%= dasherize(name) %>', () => {
   it('works', () => {
     const runner = new SchematicTestRunner('schematics', collectionPath);
-    const tree = runner.runSchematic('my-schematic', {}, Tree.empty());
+    const tree = runner.runSchematic('<%= dasherize(name) %>', {}, Tree.empty());
 
     expect(tree.files).toEqual([]);
   });
