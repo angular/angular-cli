@@ -17,6 +17,7 @@ import {
 import {
   Rule,
   SchematicContext,
+  SchematicsException,
   Tree,
   UpdateRecorder,
   apply,
@@ -93,6 +94,10 @@ export default function (options: Schema): Rule {
 
   // Verify if we need to create a full project, or just add a new schematic.
   return (tree: Tree, context: SchematicContext) => {
+    if (!options.name) {
+      throw new SchematicsException('name option is required.');
+    }
+
     let collectionPath: Path | undefined;
     try {
       const packageJsonContent = tree.read('/package.json');
