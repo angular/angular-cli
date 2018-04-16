@@ -32,9 +32,13 @@
       "description": "Defines the optimization level of the build.",
       "default": false
     },
-    "environment": {
-      "type": "string",
-      "description": "Defines the build environment."
+    "fileReplacements": {
+      "description": "Replace files with other files in the build.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/fileReplacement"
+      },
+      "default": []
     },
     "outputPath": {
       "type": "string",
@@ -155,5 +159,44 @@
     "outputPath",
     "main",
     "tsConfig"
-  ]
+  ],
+  "definitions": {
+    "fileReplacement": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "src": {
+              "type": "string"
+            },
+            "replaceWith": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "src",
+            "replaceWith"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "replace": {
+              "type": "string"
+            },
+            "with": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "replace",
+            "with"
+          ]
+        }
+      ]
+    }
+    
+  }
 }

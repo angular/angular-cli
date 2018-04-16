@@ -34,6 +34,7 @@ import {
   statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
+import { addFileReplacements } from '../utils';
 import { BuildWebpackServerSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
@@ -46,17 +47,19 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
     const options = builderConfig.options;
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
+    const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<Stats>);
 
     // TODO: verify using of(null) to kickstart things is a pattern.
     return of(null).pipe(
       concatMap(() => options.deleteOutputPath
-        ? this._deleteOutputDir(root, normalize(options.outputPath))
+        ? this._deleteOutputDir(root, normalize(options.outputPath), this.context.host)
         : of(null)),
-      concatMap(() => new Observable(obs => {
+        concatMap(() => addFileReplacements(root, host, options.fileReplacements)),
+        concatMap(() => new Observable(obs => {
         // Ensure Build Optimizer is only used with AOT.
         let webpackConfig;
         try {
-          webpackConfig = this.buildWebpackConfig(root, projectRoot, options);
+          webpackConfig = this.buildWebpackConfig(root, projectRoot, host, options);
         } catch (e) {
           // TODO: why do I have to catch this error? I thought throwing inside an observable
           // always got converted into an error.
@@ -103,7 +106,9 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
     );
   }
 
-  buildWebpackConfig(root: Path, projectRoot: Path, options: BuildWebpackServerSchema) {
+  buildWebpackConfig(root: Path, projectRoot: Path,
+                     host: virtualFs.Host<Stats>,
+                     options: BuildWebpackServerSchema) {
     let wco: WebpackConfigOptions;
 
     // TODO: make target defaults into configurations instead
@@ -145,24 +150,24 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
 
     if (wco.buildOptions.main || wco.buildOptions.polyfills) {
       const typescriptConfigPartial = wco.buildOptions.aot
-        ? getAotConfig(wco, this.context.host as virtualFs.Host<Stats>)
-        : getNonAotConfig(wco, this.context.host as virtualFs.Host<Stats>);
+        ? getAotConfig(wco, host as virtualFs.Host<Stats>)
+        : getNonAotConfig(wco, host as virtualFs.Host<Stats>);
       webpackConfigs.push(typescriptConfigPartial);
     }
 
     return webpackMerge(webpackConfigs);
   }
 
-  private _deleteOutputDir(root: Path, outputPath: Path) {
+  private _deleteOutputDir(root: Path, outputPath: Path, host: virtualFs.Host) {
     const resolvedOutputPath = resolve(root, outputPath);
     if (resolvedOutputPath === root) {
       throw new Error('Output path MUST not be project root directory!');
     }
 
-    return this.context.host.exists(resolvedOutputPath).pipe(
+    return host.exists(resolvedOutputPath).pipe(
       concatMap(exists => exists
         // TODO: remove this concat once host ops emit an event.
-        ? concat(this.context.host.delete(resolvedOutputPath), of(null)).pipe(last())
+        ? concat(host.delete(resolvedOutputPath), of(null)).pipe(last())
         // ? of(null)
         : of(null)),
     );

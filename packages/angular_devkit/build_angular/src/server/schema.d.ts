@@ -70,9 +70,9 @@ export interface BuildWebpackServerSchema {
    */
   lazyModules?: string[];
   /**
-   * Defines the build environment.
+   * Replace files with other files in the build.
    */
-  environment?: string;
+  fileReplacements: FileReplacements[];
   /**
    * Define the output filename cache-busting hashing mode.
    */
