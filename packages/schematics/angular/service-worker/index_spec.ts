@@ -101,7 +101,7 @@ describe('Service Worker Schematic', () => {
     const tree = schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
     const content = tree.readContent('projects/bar/src/index.html');
 
-    expect(content).toMatch(/<link rel="manifest" href="\.\/manifest.json">/);
+    expect(content).toMatch(/<link rel="manifest" href="assets\/manifest.json">/);
     expect(content).toMatch(/<meta name="Description" content="Angular Application">/);
     expect(content).toMatch(/<meta name="theme-color" content="#FFFFFF">/);
   });
