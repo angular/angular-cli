@@ -14,6 +14,7 @@ import {
   branch,
   empty as staticEmpty,
   merge as staticMerge,
+  optimize as staticOptimize,
   partition as staticPartition,
 } from '../tree/static';
 import { VirtualTree } from '../tree/virtual';
@@ -53,7 +54,22 @@ export function chain(rules: Rule[]): Rule {
  */
 export function apply(source: Source, rules: Rule[]): Source {
   return (context: SchematicContext) => {
-    return callRule(chain(rules), callSource(source, context), context);
+    return callRule(chain([
+      ...rules,
+      // Optimize the tree. Since this is a source tree, there's not much harm here and this might
+      // avoid further issues.
+      tree => {
+        if (tree instanceof VirtualTree) {
+          tree.optimize();
+
+          return tree;
+        } else if (tree.actions.length != 0) {
+          return staticOptimize(tree);
+        } else {
+          return tree;
+        }
+      },
+    ]), callSource(source, context), context);
   };
 }
 

@@ -60,7 +60,6 @@ export default function (options: NgNewOptions): Rule {
         schematic('workspace', workspaceOptions),
         schematic('application', applicationOptions),
         move(options.directory || options.name),
-        tree => Tree.optimize(tree),
       ]),
     ),
     (host: Tree, context: SchematicContext) => {
