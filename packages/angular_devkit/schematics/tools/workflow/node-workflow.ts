@@ -16,9 +16,8 @@ import {
   formats,
   workflow,
 } from '@angular-devkit/schematics';  // tslint:disable-line:no-implicit-dependencies
-import { EMPTY, Observable, Subject, concat, of, throwError } from 'rxjs';
-import { reduce, tap } from 'rxjs/internal/operators';
-import { concatMap, ignoreElements, map } from 'rxjs/operators';
+import { Observable, Subject, concat, of, throwError } from 'rxjs';
+import { concatMap, defaultIfEmpty, ignoreElements, last, map, tap } from 'rxjs/operators';
 import { NodeModulesEngineHost, validateOptionsWithSchema } from '..';
 import { DryRunEvent } from '../../src/sink/dryrun';
 import { BuiltinTaskExecutor } from '../../tasks/node';
@@ -129,54 +128,52 @@ export class NodeWorkflow implements workflow.Workflow {
     };
     this._context.push(context);
 
-    return concat(
-      schematic.call(options.options, of(new HostTree(this._host)), {
-        logger: context.logger,
-      }).pipe(
-        map(tree => Tree.optimize(tree)),
-        concatMap((tree: Tree) => {
-          return concat(
-            dryRunSink.commit(tree).pipe(
-              ignoreElements(),
-            ),
-            of(tree),
-          );
-        }),
-        concatMap((tree: Tree) => {
-          dryRunSubscriber.unsubscribe();
-          if (error) {
-            return throwError(new UnsuccessfulWorkflowExecution());
-          }
-          if (this._options.dryRun) {
-            return EMPTY;
-          }
-
-          return fsSink.commit(tree);
-        }),
-      ),
-      concat(new Observable<void>(obs => {
-        if (!this._options.dryRun) {
-          this._lifeCycle.next({ kind: 'post-tasks-start' });
-          this._engine.executePostTasks()
-            .pipe(
-              reduce(() => {}),
-              tap(() => this._lifeCycle.next({ kind: 'post-tasks-end' })),
-            )
-            .subscribe(obs);
-        } else {
-          obs.complete();
+    return schematic.call(
+      options.options,
+      of(new HostTree(this._host)),
+      { logger: context.logger },
+    ).pipe(
+      map(tree => Tree.optimize(tree)),
+      concatMap((tree: Tree) => {
+        return concat(
+          dryRunSink.commit(tree).pipe(ignoreElements()),
+          of(tree),
+        );
+      }),
+      concatMap((tree: Tree) => {
+        dryRunSubscriber.unsubscribe();
+        if (error) {
+          return throwError(new UnsuccessfulWorkflowExecution());
         }
-      })),
-      concat(new Observable(obs => {
+
+        if (this._options.dryRun) {
+          return of();
+        }
+
+        return fsSink.commit(tree).pipe(last(), defaultIfEmpty());
+      }),
+      concatMap(() => {
+        if (this._options.dryRun) {
+          return of();
+        }
+
+        this._lifeCycle.next({ kind: 'post-tasks-start' });
+
+        return this._engine.executePostTasks()
+          .pipe(
+            tap({ complete: () => this._lifeCycle.next({ kind: 'post-tasks-end' }) }),
+            last(),
+            defaultIfEmpty(),
+          );
+      }),
+      tap({ complete: () => {
         this._lifeCycle.next({ kind: 'workflow-end' });
         this._context.pop();
 
         if (this._context.length == 0) {
           this._lifeCycle.next({ kind: 'end' });
         }
-
-        obs.complete();
-      })),
-    ).pipe(reduce(() => { }));
+      }}),
+    );
   }
 }
