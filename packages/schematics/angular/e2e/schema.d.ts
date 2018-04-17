@@ -23,4 +23,8 @@ export interface Schema {
      * The name of the app being tested.
      */
     relatedAppName: string;
+    /**
+     * The prefix to apply.
+     */
+    prefix?: string;
 }
