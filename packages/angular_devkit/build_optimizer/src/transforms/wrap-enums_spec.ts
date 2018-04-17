@@ -58,6 +58,30 @@ describe('wrap-enums', () => {
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
+  it('wraps ts 2.3 - 2.6 enums in IIFE, even if they have funny numbers', () => {
+    const input = tags.stripIndent`
+      export var AnimatorControlState;
+      (function (AnimatorControlState) {
+          AnimatorControlState[AnimatorControlState["INITIALIZED"] = 1] = "INITIALIZED";
+          AnimatorControlState[AnimatorControlState["STARTED"] = 2] = "STARTED";
+          AnimatorControlState[AnimatorControlState["FINISHED"] = 3] = "FINISHED";
+          AnimatorControlState[AnimatorControlState["DESTROYED"] = 4] = "DESTROYED";
+      })(AnimatorControlState || (AnimatorControlState = {}));
+    `;
+    const output = tags.stripIndent`
+      export var AnimatorControlState = /*@__PURE__*/ (function (AnimatorControlState) {
+          AnimatorControlState[AnimatorControlState["INITIALIZED"] = 1] = "INITIALIZED";
+          AnimatorControlState[AnimatorControlState["STARTED"] = 2] = "STARTED";
+          AnimatorControlState[AnimatorControlState["FINISHED"] = 3] = "FINISHED";
+          AnimatorControlState[AnimatorControlState["DESTROYED"] = 4] = "DESTROYED";
+          return AnimatorControlState;
+      })({});
+    `;
+
+    expect(testWrapEnums(input)).toBeTruthy();
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
+
   it('wraps tsickle enums in IIFE', () => {
     const input = tags.stripIndent`
       /** @enum {number} */
