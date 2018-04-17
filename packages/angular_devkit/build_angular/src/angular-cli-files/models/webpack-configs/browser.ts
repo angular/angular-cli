@@ -96,9 +96,14 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     optimization: {
       runtimeChunk: 'single',
       splitChunks: {
-        chunks: buildOptions.commonChunk ? 'all' : 'initial',
         maxAsyncRequests: Infinity,
         cacheGroups: {
+          default: buildOptions.commonChunk && {
+            chunks: 'async',
+            minChunks: 2,
+            reuseExistingChunk: true,
+            priority: 10,
+          },
           vendors: false,
           vendor: buildOptions.vendorChunk && {
             name: 'vendor',
