@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 // Pulled all interfaces out of `navigation.service.ts` because of this:
 // https://github.com/angular/angular-cli/issues/2034
 // Then re-export them from `navigation.service.ts`
