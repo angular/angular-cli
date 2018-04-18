@@ -66,9 +66,9 @@ describe('App Shell Schematic', () => {
     const content = tree.readContent(filePath);
     const workspace = JSON.parse(content);
     const target = workspace.projects.bar.architect['app-shell'];
-    expect(target.browserTarget).toEqual('bar:build');
-    expect(target.serverTarget).toEqual('bar:server');
-    expect(target.route).toEqual('shell');
+    expect(target.options.browserTarget).toEqual('bar:build');
+    expect(target.options.serverTarget).toEqual('bar:server');
+    expect(target.options.route).toEqual('shell');
   });
 
   it('should add router module to client app module', () => {

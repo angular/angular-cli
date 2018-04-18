@@ -187,9 +187,12 @@ function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
     const workspacePath = getWorkspacePath(host);
 
     const appShellTarget: JsonObject = {
-      browserTarget: `${options.clientProject}:build`,
-      serverTarget: `${options.clientProject}:server`,
-      route: options.route,
+      builder: '@angular-devkit/build-angular:app-shell',
+      options: {
+        browserTarget: `${options.clientProject}:build`,
+        serverTarget: `${options.clientProject}:server`,
+        route: options.route,
+      },
     };
 
     if (!workspace.projects[options.clientProject]) {
