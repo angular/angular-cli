@@ -129,9 +129,12 @@ export async function runCommand(commandMap: CommandMap,
     return await runHelp(command, options);
   } else {
     verifyCommandInScope(command, executionScope);
-    if (!command.allowMissingWorkspace) {
-      verifyWorkspace(command, executionScope, context.project.root);
-    }
+    verifyWorkspace(
+      command,
+      executionScope,
+      context.project.root,
+      command.allowMissingWorkspace ? logger : null,
+    );
     delete options.h;
     delete options.help;
     return await validateAndRunCommand(command, options);
@@ -286,7 +289,12 @@ function verifyCommandInScope(command: Command, scope = CommandScope.everywhere)
   }
 }
 
-function verifyWorkspace(command: Command, executionScope: CommandScope, root: string): void {
+function verifyWorkspace(
+  command: Command,
+  executionScope: CommandScope,
+  root: string,
+  logger: logging.Logger | null = null,
+): void {
   if (command.scope === CommandScope.everywhere) {
     return;
   }
@@ -312,12 +320,19 @@ function verifyWorkspace(command: Command, executionScope: CommandScope, root: s
       // ------------------------------------------------------------------------------------------
       // If changing this message, please update the same message in
       // `packages/@angular/cli/bin/ng-update-message.js`
-      throw new SilentError(tags.stripIndent`
+      const message = tags.stripIndent`
         The Angular CLI configuration format has been changed, and your existing configuration can
         be updated automatically by running the following command:
 
           ng update @angular/cli --migrate-only --from=1
-      `);
+      `;
+
+      if (!logger) {
+        throw new SilentError(message);
+      } else {
+        logger.warn(message);
+        return;
+      }
     }
 
     // If no configuration file is found (old or new), throw an exception.
