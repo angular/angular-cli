@@ -48,7 +48,7 @@ describe('NgPackagr Builder', () => {
       concatMap(arch => arch.run(arch.getBuilderConfiguration(targetSpec))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, 45000);
 
   it('lint works', (done) => {
     const targetSpec: TargetSpecifier = { project: 'lib', target: 'lint' };

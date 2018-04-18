@@ -132,7 +132,7 @@ describe('Browser Builder rebuilds', () => {
       tap(() => host.appendToFile('src/app/app.component.css', ':host { color: blue; }')),
       take(2),
     ).subscribe(undefined, done.fail, done);
-  }, Timeout.Complex);
+  }, Timeout.Massive);
 
   it('type checks on rebuilds', (done) => {
     host.writeMultipleFiles({

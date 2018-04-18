@@ -8,7 +8,7 @@
 
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { host, runTargetSpec } from '../utils';
+import { Timeout, host, runTargetSpec } from '../utils';
 
 
 describe('Server Builder', () => {
@@ -29,5 +29,5 @@ describe('Server Builder', () => {
         expect(content).toMatch(/AppServerModuleNgFactory/);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, Timeout.Standard);
 });
