@@ -51,6 +51,15 @@ export interface DevServerBuilderOptions {
   watch: boolean;
   hmrWarning: boolean;
   servePathDefaultWarning: boolean;
+
+  optimization?: boolean;
+  aot?: boolean;
+  sourceMap?: boolean;
+  evalSourceMap?: boolean;
+  vendorChunk?: boolean;
+  commonChunk?: boolean;
+  baseHref?: string;
+  progress?: boolean;
 }
 
 interface WebpackDevServerConfigurationOptions {
@@ -424,6 +433,20 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     const browserTargetSpec = { project, target, configuration, overrides };
     const builderConfig = architect.getBuilderConfiguration<BrowserBuilderSchema>(
       browserTargetSpec);
+
+    // Update the browser options with the same options we support in serve, if defined.
+    builderConfig.options = {
+      ...(options.optimization !== undefined ? { optimization: options.optimization } : {}),
+      ...(options.aot !== undefined ? { aot: options.aot } : {}),
+      ...(options.sourceMap !== undefined ? { sourceMap: options.sourceMap } : {}),
+      ...(options.evalSourceMap !== undefined ? { evalSourceMap: options.evalSourceMap } : {}),
+      ...(options.vendorChunk !== undefined ? { vendorChunk: options.vendorChunk } : {}),
+      ...(options.commonChunk !== undefined ? { commonChunk: options.commonChunk } : {}),
+      ...(options.baseHref !== undefined ? { baseHref: options.baseHref } : {}),
+      ...(options.progress !== undefined ? { progress: options.progress } : {}),
+
+      ...builderConfig.options,
+    };
 
     return architect.getBuilderDescription(builderConfig).pipe(
       concatMap(browserDescription =>

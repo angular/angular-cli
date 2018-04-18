@@ -77,6 +77,46 @@
       "type": "boolean",
       "description": "Show a warning when deploy-url/base-href use unsupported serve path values.",
       "default": true
+    },
+    "optimization": {
+      "type": "boolean",
+      "description": "Defines the optimization level of the build."
+    },
+    "aot": {
+      "type": "boolean",
+      "description": "Build using Ahead of Time compilation."
+    },
+    "sourceMap": {
+      "type": "boolean",
+      "description": "Output sourcemaps."
+    },
+    "evalSourceMap": {
+      "type": "boolean",
+      "description": "Output in-file eval sourcemaps."
+    },
+    "vendorChunk": {
+      "type": "boolean",
+      "description": "Use a separate bundle containing only vendor libraries."
+    },
+    "commonChunk": {
+      "type": "boolean",
+      "description": "Use a separate bundle containing code used across multiple bundles."
+    },
+    "baseHref": {
+      "type": "string",
+      "description": "Base url for the application being built."
+    },
+    "deployUrl": {
+      "type": "string",
+      "description": "URL where files will be deployed."
+    },
+    "verbose": {
+      "type": "boolean",
+      "description": "Adds more details to output logging."
+    },
+    "progress": {
+      "type": "boolean",
+      "description": "Log progress to the console while building."
     }
   },
   "additionalProperties": false,
