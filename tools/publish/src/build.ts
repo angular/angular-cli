@@ -2,7 +2,7 @@ import { logging } from '@angular-devkit/core';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { promisify } from 'util';
-import {buildSchema} from './build-schema';
+// import {buildSchema} from './build-schema';
 
 const glob = promisify(require('glob'));
 const tar = require('tar');
@@ -75,12 +75,12 @@ export default function build(packagesToBuild: string[],
         return fs.remove(dist);
       }
     })
-    .then(() => logger.info('Creating schema.d.ts...'))
-    .then(() => {
-      const input = path.join(root, 'packages/@angular/cli/lib/config/schema.json');
-      const output = path.join(root, 'packages/@angular/cli/lib/config/schema.d.ts');
-      fs.writeFileSync(output, buildSchema(input, logger), { encoding: 'utf-8' });
-    })
+    // .then(() => logger.info('Creating schema.d.ts...'))
+    // .then(() => {
+    //   const input = path.join(root, 'packages/@angular/cli/lib/config/schema.json');
+    //   const output = path.join(root, 'packages/@angular/cli/lib/config/schema.d.ts');
+    //   fs.writeFileSync(output, buildSchema(input, logger), { encoding: 'utf-8' });
+    // })
     .then(() => logger.info('Compiling packages...'))
     .then(() => {
       const packagesLogger = new logging.Logger('packages', logger);
