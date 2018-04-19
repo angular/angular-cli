@@ -236,7 +236,12 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     rules.push(...baseRules.map(({ test, use }) => {
       const extractTextPlugin = {
         use: [
-          { loader: RawCssLoader },
+          // style-loader still has issues with relative url()'s with sourcemaps enabled;
+          // even with the convertToAbsoluteUrls options as it uses 'document.location'
+          // which breaks when used with routing.
+          // Once style-loader 1.0 is released the following conditional won't be necessary
+          // due to this 1.0 PR: https://github.com/webpack-contrib/style-loader/pull/219
+          { loader: buildOptions.extractCss ? RawCssLoader : 'raw-loader' },
           {
             loader: 'postcss-loader',
             options: {
