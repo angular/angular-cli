@@ -532,141 +532,155 @@ export default Task.extend({
     const serializer = new JsonWebpackSerializer(process.cwd(), outputPath, appConfig.root);
     const output = serializer.serialize(webpackConfig);
     const webpackConfigStr = `${serializer.generateVariables()}\n\nmodule.exports = ${output};\n`;
+    const webpackConfigFile = runTaskOptions.config || 'webpack.config.js';
+    const configOnly = runTaskOptions.config !== undefined;
 
-    return Promise.resolve()
-      .then(() => exists('webpack.config.js'))
+    let result = Promise.resolve()
+      .then(() => exists(webpackConfigFile))
       .then(webpackConfigExists => {
         if (webpackConfigExists && !force) {
-          throw new SilentError('The webpack.config.js file already exists.');
+          throw new SilentError(`The ${webpackConfigFile} file already exists.`);
         }
-      })
+      });
+
+    if (!configOnly) {
       // Read the package.json and update it to include npm scripts. We do this first so that if
       // an error already exists
-      .then(() => stripBom(fs.readFileSync('package.json', 'utf-8')))
-      .then((packageJson: string) => JSON.parse(packageJson))
-      .then((packageJson: any) => {
-        const scripts = packageJson['scripts'];
-        if (!force) {
-          if (scripts['build']
-              && scripts['build'] != 'ng build'
-              && scripts['build'] != 'ng build --prod') {
-            throw new SilentError(oneLine`
-              Your package.json scripts must not contain a build script as it will be overwritten.
-            `);
+      result = result
+        .then(() => stripBom(fs.readFileSync('package.json', 'utf-8')))
+        .then((packageJson: string) => JSON.parse(packageJson))
+        .then((packageJson: any) => {
+          const scripts = packageJson['scripts'];
+          if (!force) {
+            if (scripts['build']
+                && scripts['build'] != 'ng build'
+                && scripts['build'] != 'ng build --prod') {
+              throw new SilentError(oneLine`
+                Your package.json scripts must not contain a build script as it will be overwritten.
+              `);
+            }
+            if (scripts['start'] && scripts['start'] !== 'ng serve') {
+              throw new SilentError(oneLine`
+                Your package.json scripts must not contain a start script as it will be overwritten.
+              `);
+            }
+            if (scripts['pree2e'] && scripts['pree2e'] !== pree2eNpmScript) {
+              throw new SilentError(oneLine`
+                Your package.json scripts must not contain a pree2e script as it will be
+                overwritten.
+              `);
+            }
+            if (scripts['e2e'] && scripts['e2e'] !== 'ng e2e') {
+              throw new SilentError(oneLine`
+                Your package.json scripts must not contain a e2e script as it will be overwritten.
+              `);
+            }
+            if (scripts['test'] && scripts['test'] !== 'ng test') {
+              throw new SilentError(oneLine`
+                Your package.json scripts must not contain a test script as it will be overwritten.
+              `);
+            }
           }
-          if (scripts['start'] && scripts['start'] !== 'ng serve') {
-            throw new SilentError(oneLine`
-              Your package.json scripts must not contain a start script as it will be overwritten.
-            `);
+
+          packageJson['scripts']['build'] = 'webpack';
+          packageJson['scripts']['start'] = 'webpack-dev-server --port=4200';
+          packageJson['scripts']['test'] = 'karma start ./karma.conf.js';
+          packageJson['scripts']['pree2e'] = pree2eNpmScript;
+          packageJson['scripts']['e2e'] = 'protractor ./protractor.conf.js';
+
+          if (!!appConfig.serviceWorker && runTaskOptions.target === 'production' &&
+              usesServiceWorker(project.root) && !!runTaskOptions.serviceWorker) {
+            packageJson['scripts']['build'] += ' && npm run sw-config && npm run sw-copy';
+            packageJson['scripts']['sw-config'] = `ngsw-config ${outputPath} src/ngsw-config.json`;
+            packageJson['scripts']['sw-copy'] =
+                `cpx node_modules/@angular/service-worker/ngsw-worker.js ${outputPath}`;
+
+            packageJson['devDependencies']['cpx'] = '^1.5.0';
           }
-          if (scripts['pree2e'] && scripts['pree2e'] !== pree2eNpmScript) {
-            throw new SilentError(oneLine`
-              Your package.json scripts must not contain a pree2e script as it will be
-              overwritten.
-            `);
+
+          // Add new dependencies based on our dependencies.
+          const ourPackageJson = require('../package.json');
+          if (!packageJson['devDependencies']) {
+            packageJson['devDependencies'] = {};
           }
-          if (scripts['e2e'] && scripts['e2e'] !== 'ng e2e') {
-            throw new SilentError(oneLine`
-              Your package.json scripts must not contain a e2e script as it will be overwritten.
-            `);
+          packageJson['devDependencies']['webpack-dev-server']
+              = ourPackageJson['dependencies']['webpack-dev-server'];
+
+          // Update all loaders from webpack, plus postcss plugins.
+          [
+            '@angular-devkit/core',
+            '@ngtools/webpack',
+            'webpack',
+            'autoprefixer',
+            'css-loader',
+            'exports-loader',
+            'file-loader',
+            'html-webpack-plugin',
+            'json-loader',
+            'karma-cli',
+            'karma-sourcemap-loader',
+            'less-loader',
+            'postcss-import',
+            'postcss-loader',
+            'postcss-url',
+            'raw-loader',
+            'sass-loader',
+            'istanbul-instrumenter-loader',
+            'style-loader',
+            'stylus-loader',
+            'url-loader',
+            'circular-dependency-plugin',
+            'copy-webpack-plugin',
+            'uglifyjs-webpack-plugin',
+          ].forEach((packageName: string) => {
+            packageJson['devDependencies'][packageName]
+                = ourPackageJson['dependencies'][packageName];
+          });
+
+          return writeFile('package.json', JSON.stringify(packageJson, null, 2) + '\n');
+        })
+        .then(() => JSON.parse(stripBom(fs.readFileSync(tsConfigPath, 'utf-8'))))
+        .then((tsConfigJson: any) => {
+          if (!tsConfigJson.exclude || force) {
+            // Make sure we now include tests.  Do not touch otherwise.
+            tsConfigJson.exclude = [
+              'test.ts',
+              '**/*.spec.ts'
+            ];
           }
-          if (scripts['test'] && scripts['test'] !== 'ng test') {
-            throw new SilentError(oneLine`
-              Your package.json scripts must not contain a test script as it will be overwritten.
-            `);
-          }
-        }
-
-        packageJson['scripts']['build'] = 'webpack';
-        packageJson['scripts']['start'] = 'webpack-dev-server --port=4200';
-        packageJson['scripts']['test'] = 'karma start ./karma.conf.js';
-        packageJson['scripts']['pree2e'] = pree2eNpmScript;
-        packageJson['scripts']['e2e'] = 'protractor ./protractor.conf.js';
-
-        if (!!appConfig.serviceWorker && runTaskOptions.target === 'production' &&
-            usesServiceWorker(project.root) && !!runTaskOptions.serviceWorker) {
-          packageJson['scripts']['build'] += ' && npm run sw-config && npm run sw-copy';
-          packageJson['scripts']['sw-config'] = `ngsw-config ${outputPath} src/ngsw-config.json`;
-          packageJson['scripts']['sw-copy'] =
-              `cpx node_modules/@angular/service-worker/ngsw-worker.js ${outputPath}`;
-
-          packageJson['devDependencies']['cpx'] = '^1.5.0';
-        }
-
-        // Add new dependencies based on our dependencies.
-        const ourPackageJson = require('../package.json');
-        if (!packageJson['devDependencies']) {
-          packageJson['devDependencies'] = {};
-        }
-        packageJson['devDependencies']['webpack-dev-server']
-            = ourPackageJson['dependencies']['webpack-dev-server'];
-
-        // Update all loaders from webpack, plus postcss plugins.
-        [
-          '@angular-devkit/core',
-          '@ngtools/webpack',
-          'webpack',
-          'autoprefixer',
-          'css-loader',
-          'exports-loader',
-          'file-loader',
-          'html-webpack-plugin',
-          'json-loader',
-          'karma-cli',
-          'karma-sourcemap-loader',
-          'less-loader',
-          'postcss-import',
-          'postcss-loader',
-          'postcss-url',
-          'raw-loader',
-          'sass-loader',
-          'istanbul-instrumenter-loader',
-          'style-loader',
-          'stylus-loader',
-          'url-loader',
-          'circular-dependency-plugin',
-          'copy-webpack-plugin',
-          'uglifyjs-webpack-plugin',
-        ].forEach((packageName: string) => {
-          packageJson['devDependencies'][packageName] = ourPackageJson['dependencies'][packageName];
+          return writeFile(tsConfigPath, JSON.stringify(tsConfigJson, null, 2) + '\n');
         });
+      }
 
-        return writeFile('package.json', JSON.stringify(packageJson, null, 2) + '\n');
-      })
-      .then(() => JSON.parse(stripBom(fs.readFileSync(tsConfigPath, 'utf-8'))))
-      .then((tsConfigJson: any) => {
-        if (!tsConfigJson.exclude || force) {
-          // Make sure we now include tests.  Do not touch otherwise.
-          tsConfigJson.exclude = [
-            'test.ts',
-            '**/*.spec.ts'
-          ];
-        }
-        return writeFile(tsConfigPath, JSON.stringify(tsConfigJson, null, 2) + '\n');
-      })
       // Output the webpack.config.js.
-      .then(() => writeFile('webpack.config.js', webpackConfigStr))
-      .then(() => {
-        // Update the CLI Config.
-        config.project.ejected = true;
-        cliConfig.save();
-      })
-      .then(() => {
-        console.log(yellow(stripIndent`
-          ==========================================================================================
-          Ejection was successful.
+      result = result.then(() => writeFile(webpackConfigFile, webpackConfigStr));
 
-          To run your builds, you now need to do the following commands:
-             - "npm run build" to build.
-             - "npm test" to run unit tests.
-             - "npm start" to serve the app using webpack-dev-server.
-             - "npm run e2e" to run protractor.
+      if (!configOnly) {
+        result = result
+          .then(() => {
+            // Update the CLI Config.
+            config.project.ejected = true;
+            cliConfig.save();
+          })
+          .then(() => {
+            console.log(yellow(stripIndent`
+              =====================================================================================
+              Ejection was successful.
 
-          Running the equivalent CLI commands will result in an error.
+              To run your builds, you now need to do the following commands:
+                - "npm run build" to build.
+                - "npm test" to run unit tests.
+                - "npm start" to serve the app using webpack-dev-server.
+                - "npm run e2e" to run protractor.
 
-          ==========================================================================================
-          Some packages were added. Please run "npm install".
-        `));
-      });
+              Running the equivalent CLI commands will result in an error.
+
+              =====================================================================================
+              Some packages were added. Please run "npm install".
+            `));
+          });
+      }
+
+      return result;
   }
 });
