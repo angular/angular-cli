@@ -1,12 +1,15 @@
 import { ArchitectCommand } from '../models/architect-command';
 import { Option, CommandScope } from '../models/command';
 import { Version } from '../upgrade/version';
+import { experimental } from '@angular-devkit/core';
 
 export interface Options {
   project?: string;
   configuration?: string;
+  projectType?: string;
   prod: boolean;
 }
+
 
 export default class BuildCommand extends ArchitectCommand {
   public readonly name = 'build';
@@ -38,9 +41,13 @@ export default class BuildCommand extends ArchitectCommand {
     delete overrides.configuration;
     delete overrides.prod;
 
+    const filter: experimental.workspace.projectFilter = options.projectType
+      && ((project) => project.projectType === options.projectType);
+
     return this.runArchitectTarget({
       project: options.project,
       target: this.target,
+      projectFilter: filter,
       configuration,
       overrides
     }, options);
