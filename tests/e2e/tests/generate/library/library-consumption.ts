@@ -31,7 +31,7 @@ export default function () {
 
       @Component({
         selector: 'app-root',
-        template: '<my-lib></my-lib>'
+        template: '<lib-my-lib></lib-my-lib>'
       })
       export class AppComponent {
         title = 'app';
