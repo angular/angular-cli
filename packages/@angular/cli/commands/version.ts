@@ -31,6 +31,7 @@ export default class VersionCommand extends Command {
       /^@schematics\/.*/,
       /^rxjs$/,
       /^typescript$/,
+      /^ng-packagr$/,
       /^webpack$/,
     ];
 
