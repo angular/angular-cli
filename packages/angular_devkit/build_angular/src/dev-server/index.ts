@@ -310,7 +310,9 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
           for information on working with HMR for Webpack.`,
         );
         this.context.logger.warn(
-          tags.oneLine`To disable this warning use "ng set warnings.hmrWarning=false".`);
+          tags.oneLine`To disable this warning use "hmrWarning: false" under "serve"
+           options in "angular.json".`,
+        );
       }
       entryPoints.push('webpack/hot/dev-server');
       webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
