@@ -27,6 +27,7 @@ function requireProjectModule(root: string, moduleName: string) {
 
 export interface NgPackagrBuilderOptions {
   project: string;
+  tsConfig?: string;
 }
 
 export class NgPackagrBuilder implements Builder<NgPackagrBuilderOptions> {
@@ -46,9 +47,15 @@ export class NgPackagrBuilder implements Builder<NgPackagrBuilderOptions> {
         getSystemPath(root), 'ng-packagr') as typeof ngPackagr;
       const packageJsonPath = getSystemPath(resolve(root, normalize(options.project)));
 
-      projectNgPackagr.ngPackagr()
-        .forProject(packageJsonPath)
-        .build()
+      const ngPkgProject = projectNgPackagr.ngPackagr()
+        .forProject(packageJsonPath);
+
+      if (options.tsConfig) {
+        const tsConfigPath = getSystemPath(resolve(root, normalize(options.tsConfig)));
+        ngPkgProject.withTsConfig(tsConfigPath);
+      }
+
+      ngPkgProject.build()
         .then(() => {
           obs.next({ success: true });
           obs.complete();
