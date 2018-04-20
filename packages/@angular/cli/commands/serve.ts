@@ -12,7 +12,7 @@ export default class ServeCommand extends ArchitectCommand {
   public readonly name = 'serve';
   public readonly target = 'serve';
   public readonly description = 'Builds and serves your app, rebuilding on file changes.';
-  public static aliases = ['server', 's'];
+  public static aliases = ['s'];
   public readonly scope = CommandScope.inProject;
   public readonly options: Option[] = [
     this.prodOption,
