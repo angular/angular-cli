@@ -9,7 +9,8 @@
         "build": {
           "builder": "../../../../packages/angular_devkit/build_ng_packagr:build",
           "options": {
-            "project": "projects/lib/ng-package.json"
+            "project": "projects/lib/ng-package.json",
+            "tsConfig": "projects/lib/tsconfig.lib.json"
           }
         },
         "test": {
