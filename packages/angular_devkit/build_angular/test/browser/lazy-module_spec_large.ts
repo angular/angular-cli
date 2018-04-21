@@ -182,7 +182,6 @@ describe('Browser Builder lazy modules', () => {
 
   it(`supports extra lazy modules array`, (done) => {
     host.writeMultipleFiles(lazyModuleFiles);
-    host.writeMultipleFiles(lazyModuleImport);
     host.writeMultipleFiles({
       'src/app/app.component.ts': `
         import { Component, SystemJsNgModuleLoader } from '@angular/core';
@@ -196,7 +195,7 @@ describe('Browser Builder lazy modules', () => {
           title = 'app';
           constructor(loader: SystemJsNgModuleLoader) {
             // Module will be split at build time and loaded when requested below
-            loader.load('app/lazy/lazy.module#LazyModule')
+            loader.load('src/app/lazy/lazy.module#LazyModule')
               .then((factory) => { /* Use factory here */ });
           }
         }`,
@@ -207,7 +206,7 @@ describe('Browser Builder lazy modules', () => {
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(host.scopedSync().exists(join(outputPath, 'lazy-lazy-module.js')))
+      tap(() => expect(host.scopedSync().exists(join(outputPath, 'src-app-lazy-lazy-module.js')))
         .toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, Timeout.Basic);
