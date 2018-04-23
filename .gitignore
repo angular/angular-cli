@@ -13,6 +13,7 @@ logs
 # Users Environment Variables
 .lock-wscript
 
+package-lock.json
 typings
 dist
 node_modules
