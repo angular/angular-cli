@@ -148,7 +148,7 @@ export abstract class SchematicCommand extends Command {
     });
 
     workflow.lifeCycle.subscribe(event => {
-      if (event.kind == 'end' || event.kind == 'workflow-end') {
+      if (event.kind == 'end' || event.kind == 'post-tasks-start') {
         if (!error) {
           // Output the logging queue, no error happened.
           loggingQueue.forEach(log => this.logger.info(log));
