@@ -106,11 +106,38 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
       ? projectRoot
       : projectRoot + 'src/';
 
+    const schematics: JsonObject = {};
+
+    if (options.inlineTemplate === true
+      || options.inlineStyle === true
+      || options.style !== 'css') {
+      schematics['@schematics/angular:component'] = {};
+      if (options.inlineTemplate === true) {
+        (schematics['@schematics/angular:component'] as JsonObject).inlineTemplate = true;
+      }
+      if (options.inlineStyle === true) {
+        (schematics['@schematics/angular:component'] as JsonObject).inlineStyle = true;
+      }
+      if (options.style && options.style !== 'css') {
+        (schematics['@schematics/angular:component'] as JsonObject).styleext = options.style;
+      }
+    }
+
+    if (options.skipTests === true) {
+      ['class', 'component', 'directive', 'guard', 'module', 'pipe', 'service'].forEach((type) => {
+        if (!(`@schematics/angular:${type}` in schematics)) {
+          schematics[`@schematics/angular:${type}`] = {};
+        }
+        (schematics[`@schematics/angular:${type}`] as JsonObject).spec = false;
+      });
+    }
+
     // tslint:disable-next-line:no-any
     const project: any = {
       root: projectRoot,
       projectType: 'application',
       prefix: options.prefix || 'app',
+      schematics,
       architect: {
         build: {
           builder: '@angular-devkit/build-angular:browser',
@@ -220,34 +247,6 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
     // }
 
     workspace.projects[options.name] = project;
-
-    const schematics: JsonObject = {};
-
-    if (options.inlineTemplate === true
-        || options.inlineStyle === true
-        || options.style !== 'css') {
-      schematics['@schematics/angular:component'] = {};
-      if (options.inlineTemplate === true) {
-        (schematics['@schematics/angular:component'] as JsonObject).inlineTemplate = true;
-      }
-      if (options.inlineStyle === true) {
-        (schematics['@schematics/angular:component'] as JsonObject).inlineStyle = true;
-      }
-      if (options.style && options.style !== 'css') {
-        (schematics['@schematics/angular:component'] as JsonObject).styleext = options.style;
-      }
-    }
-
-    if (options.skipTests === true) {
-      ['class', 'component', 'directive', 'guard', 'module', 'pipe', 'service'].forEach((type) => {
-        if (!(`@schematics/angular:${type}` in schematics)) {
-          schematics[`@schematics/angular:${type}`] = {};
-        }
-        (schematics[`@schematics/angular:${type}`] as JsonObject).spec = false;
-      });
-    }
-
-    workspace.schematics = schematics;
 
     host.overwrite(getWorkspacePath(host), JSON.stringify(workspace, null, 2));
   };
