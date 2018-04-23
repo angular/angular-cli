@@ -20,46 +20,32 @@ export interface WorkspaceSchema {
    */
   newProjectRoot?: string;
   /**
-   * Tool options.
+   * The default project.
    */
-  cli?: {
-    /**
-     * Link to schema.
-     */
-    $schema?: string;
-    [k: string]: any;
-  };
+  defaultProject?: string;
   /**
    * Tool options.
    */
-  schematics?: {
-    /**
-     * Link to schema.
-     */
-    $schema?: string;
-    [k: string]: any;
-  };
+  cli?: WorkspaceTool;
   /**
    * Tool options.
    */
-  architect?: {
-    /**
-     * Link to schema.
-     */
-    $schema?: string;
-    [k: string]: any;
-  };
+  schematics?: WorkspaceTool;
+  /**
+   * Tool options.
+   */
+  architect?: WorkspaceTool;
   /**
    * A map of project names to project options.
    */
   projects: {
-    [k: string]: Project;
+    [k: string]: WorkspaceProject;
   };
 }
 /**
  * Project options.
  */
-export interface Project {
+export interface WorkspaceProject {
   /**
    * Project type.
    */
@@ -75,32 +61,20 @@ export interface Project {
   /**
    * Tool options.
    */
-  cli?: {
-    /**
-     * Link to schema.
-     */
-    $schema?: string;
-    [k: string]: any;
-  };
+  cli?: WorkspaceTool;
   /**
    * Tool options.
    */
-  schematics?: {
-    /**
-     * Link to schema.
-     */
-    $schema?: string;
-    [k: string]: any;
-  };
+  schematics?: WorkspaceTool;
   /**
    * Tool options.
    */
-  architect?: Architect;
+  architect?: WorkspaceTool;
 }
 /**
  * Architect options.
  */
-export interface Architect {
+export interface WorkspaceTool {
   /**
    * Link to schema.
    */

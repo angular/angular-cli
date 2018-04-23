@@ -14,8 +14,8 @@ import {
   ProjectNotFoundException,
   Workspace,
   WorkspaceNotYetLoadedException,
-  WorkspaceProject,
 } from './workspace';
+import { WorkspaceProject, WorkspaceSchema, WorkspaceTool } from './workspace-schema';
 
 
 describe('Workspace', () => {
@@ -23,9 +23,10 @@ describe('Workspace', () => {
   const root = normalize(__dirname);
   // The content of this JSON object should be kept in sync with the path below:
   // tests/@angular_devkit/workspace/angular-workspace.json
-  const workspaceJson = {
+  const workspaceJson: WorkspaceSchema = {
     version: 1,
     newProjectRoot: './projects',
+    defaultProject: 'app',
     cli: {
       '$globalOverride': '${HOME}/.angular-cli.json',
       'schematics': {
@@ -98,6 +99,13 @@ describe('Workspace', () => {
       },
     },
   };
+  const appProject = {
+    ...workspaceJson.projects['app'],
+    // Tools should not be returned when getting a project.
+    cli: {},
+    schematics: {},
+    architect: {},
+  } as {} as WorkspaceProject;
 
   it('loads workspace from json', (done) => {
     const workspace = new Workspace(root, host);
@@ -168,13 +176,7 @@ describe('Workspace', () => {
   it('gets project by name', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
-      tap((ws) => expect(ws.getProject('app')).toEqual({
-        ...workspaceJson.projects['app'],
-        // Tools should not be returned when getting a project.
-        cli: {},
-        schematics: {},
-        architect: {},
-      } as {} as WorkspaceProject)),
+      tap((ws) => expect(ws.getProject('app')).toEqual(appProject)),
     ).subscribe(undefined, done.fail, done);
   });
 
@@ -185,31 +187,55 @@ describe('Workspace', () => {
     ).subscribe(undefined, done.fail, done);
   });
 
+  it('gets default project', (done) => {
+    const workspace = new Workspace(root, host);
+    workspace.loadWorkspaceFromJson(workspaceJson).pipe(
+      tap((ws) => expect(ws.getDefaultProject()).toEqual(appProject)),
+    ).subscribe(undefined, done.fail, done);
+  });
+
+  it('gets default project when there is a single one', (done) => {
+    const customWorkspaceJson = { ...workspaceJson, defaultProject: undefined };
+    const workspace = new Workspace(root, host);
+    workspace.loadWorkspaceFromJson(customWorkspaceJson).pipe(
+      tap((ws) => expect(ws.getDefaultProject()).toEqual(appProject)),
+    ).subscribe(undefined, done.fail, done);
+  });
+
+  it('gets default project when there is a single one', (done) => {
+    const customWorkspaceJson = { ...workspaceJson, defaultProject: undefined, projects: {} };
+    const workspace = new Workspace(root, host);
+    workspace.loadWorkspaceFromJson(customWorkspaceJson).pipe(
+      tap((ws) => expect(ws.getDefaultProject()).toEqual(null)),
+    ).subscribe(undefined, done.fail, done);
+  });
+
   it('gets workspace cli', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
-      tap((ws) => expect(ws.getCli()).toEqual(workspaceJson.cli)),
+      tap((ws) => expect(ws.getCli()).toEqual(workspaceJson.cli as WorkspaceTool)),
     ).subscribe(undefined, done.fail, done);
   });
 
   it('gets workspace schematics', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
-      tap((ws) => expect(ws.getSchematics()).toEqual(workspaceJson.schematics)),
+      tap((ws) => expect(ws.getSchematics()).toEqual(workspaceJson.schematics as WorkspaceTool)),
     ).subscribe(undefined, done.fail, done);
   });
 
   it('gets workspace architect', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
-      tap((ws) => expect(ws.getArchitect()).toEqual(workspaceJson.architect)),
+      tap((ws) => expect(ws.getArchitect()).toEqual(workspaceJson.architect as WorkspaceTool)),
     ).subscribe(undefined, done.fail, done);
   });
 
   it('gets project cli', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
-      tap((ws) => expect(ws.getProjectCli('app')).toEqual(workspaceJson.projects.app.cli)),
+      tap((ws) => expect(ws.getProjectCli('app'))
+        .toEqual(workspaceJson.projects.app.cli as WorkspaceTool)),
     ).subscribe(undefined, done.fail, done);
   });
 
@@ -217,7 +243,7 @@ describe('Workspace', () => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(ws.getProjectSchematics('app'))
-        .toEqual(workspaceJson.projects.app.schematics)),
+        .toEqual(workspaceJson.projects.app.schematics as WorkspaceTool)),
     ).subscribe(undefined, done.fail, done);
   });
 
@@ -225,7 +251,7 @@ describe('Workspace', () => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(ws.getProjectArchitect('app'))
-        .toEqual(workspaceJson.projects.app.architect)),
+        .toEqual(workspaceJson.projects.app.architect as WorkspaceTool)),
     ).subscribe(undefined, done.fail, done);
   });
 

@@ -17,6 +17,10 @@
       "description": "New project root.",
       "default": "./"
     },
+    "defaultProject": {
+      "type": "string",
+      "description": "The default project."
+    },
     "cli": {
       "$ref": "#/definitions/tool",
       "default": {}

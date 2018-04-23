@@ -19,9 +19,7 @@ import {
   virtualFs,
 } from '..';
 import { BaseException } from '../exception/exception';
-// Note: importing BaseException from '..' seems to lead to odd circular dependency errors.
-// TypeError: Class extends value undefined is not a constructor or null
-// at Object.<anonymous> (<path>\packages\angular_devkit\core\src\workspace\workspace.ts:19:44)
+import { WorkspaceProject, WorkspaceSchema, WorkspaceTool } from './workspace-schema';
 
 
 export class ProjectNotFoundException extends BaseException {
@@ -46,30 +44,11 @@ export class WorkspaceNotYetLoadedException extends BaseException {
   constructor() { super(`Workspace needs to be loaded before it is used.`); }
 }
 
-export interface WorkspaceJson {
-  version: number;
-  // TODO: figure out if newProjectRoot should stay here.
-  newProjectRoot: Path;
-  cli: WorkspaceTool;
-  schematics: WorkspaceTool;
-  architect: WorkspaceTool;
-  projects: { [k: string]: WorkspaceProject };
-}
-
-export interface WorkspaceProject {
-  projectType: 'application' | 'library';
-  root: Path;
-  cli: WorkspaceTool;
-  schematics: WorkspaceTool;
-  architect: WorkspaceTool;
-}
-
-export interface WorkspaceTool extends JsonObject { }
 
 export class Workspace {
   private readonly _workspaceSchemaPath = join(normalize(__dirname), 'workspace-schema.json');
   private _workspaceSchema: JsonObject;
-  private _workspace: WorkspaceJson;
+  private _workspace: WorkspaceSchema;
   private _registry: schema.CoreSchemaRegistry;
 
   constructor(private _root: Path, private _host: virtualFs.Host<{}>) {
@@ -79,7 +58,7 @@ export class Workspace {
   loadWorkspaceFromJson(json: {}) {
     return this._loadWorkspaceSchema().pipe(
       concatMap((workspaceSchema) => this.validateAgainstSchema(json, workspaceSchema)),
-      tap((validatedWorkspace: WorkspaceJson) => this._workspace = validatedWorkspace),
+      tap((validatedWorkspace: WorkspaceSchema) => this._workspace = validatedWorkspace),
       map(() => this),
     );
   }
@@ -147,6 +126,21 @@ export class Workspace {
       schematics: {},
       architect: {},
     };
+  }
+
+  getDefaultProject() {
+    this._assertLoaded();
+
+    if (this._workspace.defaultProject) {
+      // If there is a default project name, return it.
+      return this.getProject(this._workspace.defaultProject);
+    } else if (this.listProjectNames().length === 1) {
+      // If there is only one project, return that one.
+      return this.getProject(this.listProjectNames()[0]);
+    }
+
+    // Otherwise return null.
+    return null;
   }
 
   getCli() {

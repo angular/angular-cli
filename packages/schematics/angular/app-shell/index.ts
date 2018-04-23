@@ -16,9 +16,9 @@ import {
 } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
 import {
-  Architect,
-  Project,
+  WorkspaceProject,
   WorkspaceSchema,
+  WorkspaceTool,
 } from '../../../angular_devkit/core/src/workspace/workspace-schema';
 import { Schema as ComponentOptions } from '../component/schema';
 import {
@@ -54,7 +54,9 @@ function getSourceFile(host: Tree, path: string): ts.SourceFile {
   return source;
 }
 
-function getServerModulePath(host: Tree, project: Project, architect: Architect): string | null {
+function getServerModulePath(
+  host: Tree, project: WorkspaceProject, architect: WorkspaceTool,
+): string | null {
   const mainPath = architect.server.options.main;
   const mainSource = getSourceFile(host, mainPath);
   const allNodes = getSourceNodes(mainSource);
@@ -102,7 +104,7 @@ function getComponentTemplate(host: Tree, compPath: string, tmplInfo: TemplateIn
   return template;
 }
 
-function getBootstrapComponentPath(host: Tree, project: Project): string {
+function getBootstrapComponentPath(host: Tree, project: WorkspaceProject): string {
   if (!project.architect) {
     throw new Error('Project architect not found.');
   }
@@ -317,7 +319,7 @@ function addShellComponent(options: AppShellOptions): Rule {
   };
 }
 
-function getClientProject(host: Tree, options: AppShellOptions): Project {
+function getClientProject(host: Tree, options: AppShellOptions): WorkspaceProject {
   const workspace = getWorkspace(host);
   const clientProject = workspace.projects[options.clientProject];
   if (!clientProject) {
@@ -327,7 +329,7 @@ function getClientProject(host: Tree, options: AppShellOptions): Project {
   return clientProject;
 }
 
-function getClientArchitect(host: Tree, options: AppShellOptions): Architect {
+function getClientArchitect(host: Tree, options: AppShellOptions): WorkspaceTool {
   const clientArchitect = getClientProject(host, options).architect;
 
   if (!clientArchitect) {

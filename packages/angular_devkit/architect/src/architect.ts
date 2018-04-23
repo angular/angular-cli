@@ -188,7 +188,7 @@ export class Architect {
     }
 
     const builderConfiguration: BuilderConfiguration<OptionsT> = {
-      root: project.root,
+      root: project.root as Path,
       projectType: project.projectType,
       builder: target.builder,
       options: {

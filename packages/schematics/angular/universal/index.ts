@@ -39,7 +39,9 @@ function getWorkspacePath(host: Tree): string {
   return possibleFiles.filter(path => host.exists(path))[0];
 }
 
-function getClientProject(host: Tree, options: UniversalOptions): experimental.workspace.Project {
+function getClientProject(
+  host: Tree, options: UniversalOptions,
+): experimental.workspace.WorkspaceProject {
   const workspace = getWorkspace(host);
   const clientProject = workspace.projects[options.clientProject];
   if (!clientProject) {
@@ -52,7 +54,7 @@ function getClientProject(host: Tree, options: UniversalOptions): experimental.w
 function getClientArchitect(
   host: Tree,
   options: UniversalOptions,
-): experimental.workspace.Architect {
+): experimental.workspace.WorkspaceTool {
   const clientArchitect = getClientProject(host, options).architect;
 
   if (!clientArchitect) {
@@ -181,7 +183,7 @@ function addDependencies(): Rule {
   };
 }
 
-function getTsConfigOutDir(host: Tree, architect: experimental.workspace.Architect): string {
+function getTsConfigOutDir(host: Tree, architect: experimental.workspace.WorkspaceTool): string {
   const tsConfigPath = architect.build.options.tsConfig;
   const tsConfigBuffer = host.read(tsConfigPath);
   if (!tsConfigBuffer) {
