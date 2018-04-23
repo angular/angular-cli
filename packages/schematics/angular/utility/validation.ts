@@ -30,6 +30,7 @@ export function validateHtmlSelector(selector: string): void {
 export function validateProjectName(projectName: string) {
   const errorIndex = getRegExpFailPosition(projectName);
   const unsupportedProjectNames = ['test', 'ember', 'ember-cli', 'vendor', 'app'];
+  const packageNameRegex = /^(?:@[a-zA-Z0-9_-]+\/)?[a-zA-Z0-9_-]+$/;
   if (errorIndex !== null) {
     const firstMessage = tags.oneLine`
     Project name "${projectName}" is not valid. New project names must
@@ -43,7 +44,10 @@ export function validateProjectName(projectName: string) {
     `;
     throw new SchematicsException(msg);
   } else if (unsupportedProjectNames.indexOf(projectName) !== -1) {
-    throw new SchematicsException(`Project name "${projectName}" is not a supported name.`);
+    throw new SchematicsException(
+      `Project name ${JSON.stringify(projectName)} is not a supported name.`);
+  } else if (!packageNameRegex.test(projectName)) {
+    throw new SchematicsException(`Project name ${JSON.stringify(projectName)} is invalid.`);
   }
 }
 
