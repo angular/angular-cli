@@ -10,5 +10,12 @@ export default function() {
       if (!stdout.match(/false/)) {
         throw new Error(`Expected "false", received "${JSON.stringify(stdout)}".`);
       }
+    })
+    .then(() => ng('config', 'cli.packageManager' , 'yarn'))
+    .then(() => ng('config', 'cli.packageManager'))
+    .then(({ stdout }) => {
+      if (!stdout.match(/yarn/)) {
+        throw new Error(`Expected "yarn", received "${JSON.stringify(stdout)}".`);
+      }
     });
 }
