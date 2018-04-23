@@ -19,6 +19,7 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { getWorkspace } from '../utility/config';
 import { Schema as PwaOptions } from './schema';
 
@@ -44,6 +45,8 @@ export default function (options: PwaOptions): Rule {
       }),
       move(assetPath),
     ]);
+
+    context.addTask(new NodePackageInstallTask());
 
     return chain([
       addServiceWorker(options),
