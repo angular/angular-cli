@@ -42,6 +42,13 @@ export function resolveWithPaths(
     return;
   }
 
+  // Amd requests are not mapped
+  if (originalRequest.startsWith('!!webpack amd')) {
+    callback(null, request);
+
+    return;
+  }
+
   // check if any path mapping rules are relevant
   const pathMapOptions = [];
   for (const pattern in compilerOptions.paths) {
