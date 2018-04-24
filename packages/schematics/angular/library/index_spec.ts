@@ -78,11 +78,12 @@ describe('Library Schematic', () => {
     expect(tree.files.indexOf('/projects/foobar/src/public_api.ts')).toBeGreaterThanOrEqual(0);
   });
 
-  it(`should add library workspace`, () => {
+  it(`should add library to workspace`, () => {
     const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
     const workspace = getJsonFileContent(tree, '/angular.json');
     expect(workspace.projects.foo).toBeDefined();
+    expect(workspace.defaultProject).toBe('foo');
   });
 
   it('should set the prefix to lib if none is set', () => {

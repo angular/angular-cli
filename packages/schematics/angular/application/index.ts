@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { JsonObject, normalize, relative, strings, tags } from '@angular-devkit/core';
-import { experimental } from '@angular-devkit/core';
 import {
   MergeStrategy,
   Rule,
@@ -24,11 +23,15 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { Schema as E2eOptions } from '../e2e/schema';
-import { getWorkspace, getWorkspacePath } from '../utility/config';
+import {
+  WorkspaceProject,
+  WorkspaceSchema,
+  addProjectToWorkspace,
+  getWorkspace,
+} from '../utility/config';
 import { latestVersions } from '../utility/latest-versions';
 import { Schema as ApplicationOptions } from './schema';
 
-type WorkspaceSchema = experimental.workspace.WorkspaceSchema;
 
 // TODO: use JsonAST
 // function appendPropertyInAstObject(
@@ -85,171 +88,166 @@ function addDependenciesToPackageJson() {
 }
 
 function addAppToWorkspaceFile(options: ApplicationOptions, workspace: WorkspaceSchema): Rule {
-  return (host: Tree, context: SchematicContext) => {
-    // TODO: use JsonAST
-    // const workspacePath = '/angular.json';
-    // const workspaceBuffer = host.read(workspacePath);
-    // if (workspaceBuffer === null) {
-    //   throw new SchematicsException(`Configuration file (${workspacePath}) not found.`);
-    // }
-    // const workspaceJson = parseJson(workspaceBuffer.toString());
-    // if (workspaceJson.value === null) {
-    //   throw new SchematicsException(`Unable to parse configuration file (${workspacePath}).`);
-    // }
-    let projectRoot = options.projectRoot !== undefined
-      ? options.projectRoot
-      : `${workspace.newProjectRoot}/${options.name}`;
-    if (projectRoot !== '' && !projectRoot.endsWith('/')) {
-      projectRoot += '/';
+  // TODO: use JsonAST
+  // const workspacePath = '/angular.json';
+  // const workspaceBuffer = host.read(workspacePath);
+  // if (workspaceBuffer === null) {
+  //   throw new SchematicsException(`Configuration file (${workspacePath}) not found.`);
+  // }
+  // const workspaceJson = parseJson(workspaceBuffer.toString());
+  // if (workspaceJson.value === null) {
+  //   throw new SchematicsException(`Unable to parse configuration file (${workspacePath}).`);
+  // }
+  let projectRoot = options.projectRoot !== undefined
+    ? options.projectRoot
+    : `${workspace.newProjectRoot}/${options.name}`;
+  if (projectRoot !== '' && !projectRoot.endsWith('/')) {
+    projectRoot += '/';
+  }
+  const rootFilesRoot = options.projectRoot === undefined
+    ? projectRoot
+    : projectRoot + 'src/';
+
+  const schematics: JsonObject = {};
+
+  if (options.inlineTemplate === true
+    || options.inlineStyle === true
+    || options.style !== 'css') {
+    schematics['@schematics/angular:component'] = {};
+    if (options.inlineTemplate === true) {
+      (schematics['@schematics/angular:component'] as JsonObject).inlineTemplate = true;
     }
-    const rootFilesRoot = options.projectRoot === undefined
-      ? projectRoot
-      : projectRoot + 'src/';
-
-    const schematics: JsonObject = {};
-
-    if (options.inlineTemplate === true
-      || options.inlineStyle === true
-      || options.style !== 'css') {
-      schematics['@schematics/angular:component'] = {};
-      if (options.inlineTemplate === true) {
-        (schematics['@schematics/angular:component'] as JsonObject).inlineTemplate = true;
-      }
-      if (options.inlineStyle === true) {
-        (schematics['@schematics/angular:component'] as JsonObject).inlineStyle = true;
-      }
-      if (options.style && options.style !== 'css') {
-        (schematics['@schematics/angular:component'] as JsonObject).styleext = options.style;
-      }
+    if (options.inlineStyle === true) {
+      (schematics['@schematics/angular:component'] as JsonObject).inlineStyle = true;
     }
-
-    if (options.skipTests === true) {
-      ['class', 'component', 'directive', 'guard', 'module', 'pipe', 'service'].forEach((type) => {
-        if (!(`@schematics/angular:${type}` in schematics)) {
-          schematics[`@schematics/angular:${type}`] = {};
-        }
-        (schematics[`@schematics/angular:${type}`] as JsonObject).spec = false;
-      });
+    if (options.style && options.style !== 'css') {
+      (schematics['@schematics/angular:component'] as JsonObject).styleext = options.style;
     }
+  }
 
-    // tslint:disable-next-line:no-any
-    const project: any = {
-      root: projectRoot,
-      projectType: 'application',
-      prefix: options.prefix || 'app',
-      schematics,
-      architect: {
-        build: {
-          builder: '@angular-devkit/build-angular:browser',
-          options: {
-            outputPath: `dist/${options.name}`,
-            index: `${projectRoot}src/index.html`,
-            main: `${projectRoot}src/main.ts`,
-            polyfills: `${projectRoot}src/polyfills.ts`,
-            tsConfig: `${rootFilesRoot}tsconfig.app.json`,
-            assets: [
-              {
-                glob: 'favicon.ico',
-                input: `${projectRoot}src`,
-                output: '/',
-              },
-              {
-                glob: '**/*',
-                input: `${projectRoot}src/assets`,
-                output: '/assets',
-              },
-            ],
-            styles: [
-              `${projectRoot}src/styles.${options.style}`,
-            ],
-            scripts: [],
-          },
-          configurations: {
-            production: {
-              fileReplacements: [{
-                replace: `${projectRoot}src/environments/environment.ts`,
-                with: `${projectRoot}src/environments/environment.prod.ts`,
-              }],
-              optimization: true,
-              outputHashing: 'all',
-              sourceMap: false,
-              extractCss: true,
-              namedChunks: false,
-              aot: true,
-              extractLicenses: true,
-              vendorChunk: false,
-              buildOptimizer: true,
+  if (options.skipTests === true) {
+    ['class', 'component', 'directive', 'guard', 'module', 'pipe', 'service'].forEach((type) => {
+      if (!(`@schematics/angular:${type}` in schematics)) {
+        schematics[`@schematics/angular:${type}`] = {};
+      }
+      (schematics[`@schematics/angular:${type}`] as JsonObject).spec = false;
+    });
+  }
+
+  const project: WorkspaceProject = {
+    root: projectRoot,
+    projectType: 'application',
+    prefix: options.prefix || 'app',
+    schematics,
+    architect: {
+      build: {
+        builder: '@angular-devkit/build-angular:browser',
+        options: {
+          outputPath: `dist/${options.name}`,
+          index: `${projectRoot}src/index.html`,
+          main: `${projectRoot}src/main.ts`,
+          polyfills: `${projectRoot}src/polyfills.ts`,
+          tsConfig: `${rootFilesRoot}tsconfig.app.json`,
+          assets: [
+            {
+              glob: 'favicon.ico',
+              input: `${projectRoot}src`,
+              output: '/',
             },
-          },
-        },
-        serve: {
-          builder: '@angular-devkit/build-angular:dev-server',
-          options: {
-            browserTarget: `${options.name}:build`,
-          },
-          configurations: {
-            production: {
-              browserTarget: `${options.name}:build:production`,
+            {
+              glob: '**/*',
+              input: `${projectRoot}src/assets`,
+              output: '/assets',
             },
-          },
+          ],
+          styles: [
+            `${projectRoot}src/styles.${options.style}`,
+          ],
+          scripts: [],
         },
-        'extract-i18n': {
-          builder: '@angular-devkit/build-angular:extract-i18n',
-          options: {
-            browserTarget: `${options.name}:build`,
-          },
-        },
-        test: {
-          builder: '@angular-devkit/build-angular:karma',
-          options: {
-            main: `${projectRoot}src/test.ts`,
-            polyfills: `${projectRoot}src/polyfills.ts`,
-            tsConfig: `${rootFilesRoot}tsconfig.spec.json`,
-            karmaConfig: `${rootFilesRoot}karma.conf.js`,
-            styles: [
-              `${projectRoot}styles.${options.style}`,
-            ],
-            scripts: [],
-            assets: [
-              {
-                glob: 'favicon.ico',
-                input: `${projectRoot}src/`,
-                output: '/',
-              },
-              {
-                glob: '**/*',
-                input: `${projectRoot}src/assets`,
-                output: '/assets',
-              },
-            ],
-          },
-        },
-        lint: {
-          builder: '@angular-devkit/build-angular:tslint',
-          options: {
-            tsConfig: [
-              `${rootFilesRoot}tsconfig.app.json`,
-              `${rootFilesRoot}tsconfig.spec.json`,
-            ],
-            exclude: [
-              '**/node_modules/**',
-            ],
+        configurations: {
+          production: {
+            fileReplacements: [{
+              replace: `${projectRoot}src/environments/environment.ts`,
+              with: `${projectRoot}src/environments/environment.prod.ts`,
+            }],
+            optimization: true,
+            outputHashing: 'all',
+            sourceMap: false,
+            extractCss: true,
+            namedChunks: false,
+            aot: true,
+            extractLicenses: true,
+            vendorChunk: false,
+            buildOptimizer: true,
           },
         },
       },
-    };
-    // tslint:disable-next-line:no-any
-    // const projects: JsonObject = (<any> workspaceAst.value).projects || {};
-    // tslint:disable-next-line:no-any
-    // if (!(<any> workspaceAst.value).projects) {
-    //   // tslint:disable-next-line:no-any
-    //   (<any> workspaceAst.value).projects = projects;
-    // }
-
-    workspace.projects[options.name] = project;
-
-    host.overwrite(getWorkspacePath(host), JSON.stringify(workspace, null, 2));
+      serve: {
+        builder: '@angular-devkit/build-angular:dev-server',
+        options: {
+          browserTarget: `${options.name}:build`,
+        },
+        configurations: {
+          production: {
+            browserTarget: `${options.name}:build:production`,
+          },
+        },
+      },
+      'extract-i18n': {
+        builder: '@angular-devkit/build-angular:extract-i18n',
+        options: {
+          browserTarget: `${options.name}:build`,
+        },
+      },
+      test: {
+        builder: '@angular-devkit/build-angular:karma',
+        options: {
+          main: `${projectRoot}src/test.ts`,
+          polyfills: `${projectRoot}src/polyfills.ts`,
+          tsConfig: `${rootFilesRoot}tsconfig.spec.json`,
+          karmaConfig: `${rootFilesRoot}karma.conf.js`,
+          styles: [
+            `${projectRoot}styles.${options.style}`,
+          ],
+          scripts: [],
+          assets: [
+            {
+              glob: 'favicon.ico',
+              input: `${projectRoot}src/`,
+              output: '/',
+            },
+            {
+              glob: '**/*',
+              input: `${projectRoot}src/assets`,
+              output: '/assets',
+            },
+          ],
+        },
+      },
+      lint: {
+        builder: '@angular-devkit/build-angular:tslint',
+        options: {
+          tsConfig: [
+            `${rootFilesRoot}tsconfig.app.json`,
+            `${rootFilesRoot}tsconfig.spec.json`,
+          ],
+          exclude: [
+            '**/node_modules/**',
+          ],
+        },
+      },
+    },
   };
+  // tslint:disable-next-line:no-any
+  // const projects: JsonObject = (<any> workspaceAst.value).projects || {};
+  // tslint:disable-next-line:no-any
+  // if (!(<any> workspaceAst.value).projects) {
+  //   // tslint:disable-next-line:no-any
+  //   (<any> workspaceAst.value).projects = projects;
+  // }
+
+  return addProjectToWorkspace(workspace, options.name, project);
 }
 const projectNameRegexp = /^[a-zA-Z][.0-9a-zA-Z]*(-[.0-9a-zA-Z]*)*$/;
 const unsupportedProjectNames = ['test', 'ember', 'ember-cli', 'vendor', 'app'];

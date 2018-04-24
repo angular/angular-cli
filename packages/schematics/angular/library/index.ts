@@ -21,7 +21,12 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import { WorkspaceSchema, getWorkspace, getWorkspacePath } from '../utility/config';
+import {
+  WorkspaceProject,
+  WorkspaceSchema,
+  addProjectToWorkspace,
+  getWorkspace,
+} from '../utility/config';
 import { latestVersions } from '../utility/latest-versions';
 import { Schema as LibraryOptions } from './schema';
 
@@ -121,51 +126,47 @@ function addDependenciesToPackageJson() {
 
 function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSchema,
                                projectRoot: string): Rule {
-  return (host: Tree, context: SchematicContext) => {
 
-    // tslint:disable-next-line:no-any
-    const project: any = {
-      root: `${projectRoot}`,
-      projectType: 'library',
-      prefix: options.prefix || 'lib',
-      architect: {
-        build: {
-          builder: '@angular-devkit/build-ng-packagr:build',
-          options: {
-            project: `${projectRoot}/ng-package.json`,
-          },
-          configurations: {
-            production: {
-              project: `${projectRoot}/ng-package.prod.json`,
-            },
-          },
+  const project: WorkspaceProject = {
+    root: `${projectRoot}`,
+    projectType: 'library',
+    prefix: options.prefix || 'lib',
+    architect: {
+      build: {
+        builder: '@angular-devkit/build-ng-packagr:build',
+        options: {
+          project: `${projectRoot}/ng-package.json`,
         },
-        test: {
-          builder: '@angular-devkit/build-angular:karma',
-          options: {
-            main: `${projectRoot}/src/test.ts`,
-            tsConfig: `${projectRoot}/tsconfig.spec.json`,
-            karmaConfig: `${projectRoot}/karma.conf.js`,
-          },
-        },
-        lint: {
-          builder: '@angular-devkit/build-angular:tslint',
-          options: {
-            tsConfig: [
-              `${projectRoot}/tsconfig.lint.json`,
-              `${projectRoot}/tsconfig.spec.json`,
-            ],
-            exclude: [
-              '**/node_modules/**',
-            ],
+        configurations: {
+          production: {
+            project: `${projectRoot}/ng-package.prod.json`,
           },
         },
       },
-    };
-
-    workspace.projects[options.name] = project;
-    host.overwrite(getWorkspacePath(host), JSON.stringify(workspace, null, 2));
+      test: {
+        builder: '@angular-devkit/build-angular:karma',
+        options: {
+          main: `${projectRoot}/src/test.ts`,
+          tsConfig: `${projectRoot}/tsconfig.spec.json`,
+          karmaConfig: `${projectRoot}/karma.conf.js`,
+        },
+      },
+      lint: {
+        builder: '@angular-devkit/build-angular:tslint',
+        options: {
+          tsConfig: [
+            `${projectRoot}/tsconfig.lint.json`,
+            `${projectRoot}/tsconfig.spec.json`,
+          ],
+          exclude: [
+            '**/node_modules/**',
+          ],
+        },
+      },
+    },
   };
+
+  return addProjectToWorkspace(workspace, options.name, project);
 }
 
 export default function (options: LibraryOptions): Rule {

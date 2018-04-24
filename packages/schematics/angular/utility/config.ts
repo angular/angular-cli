@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { experimental } from '@angular-devkit/core';
-import { SchematicsException, Tree } from '@angular-devkit/schematics';
+import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 
 
 // The interfaces below are generated from the Angular CLI configuration schema
@@ -441,6 +441,7 @@ export interface CliConfig {
 }
 
 export type WorkspaceSchema = experimental.workspace.WorkspaceSchema;
+export type WorkspaceProject = experimental.workspace.WorkspaceProject;
 
 
 export function getWorkspacePath(host: Tree): string {
@@ -459,6 +460,29 @@ export function getWorkspace(host: Tree): WorkspaceSchema {
   const config = configBuffer.toString();
 
   return JSON.parse(config);
+}
+
+export function addProjectToWorkspace(
+  workspace: WorkspaceSchema,
+  name: string,
+  project: WorkspaceProject,
+): Rule {
+  return (host: Tree, context: SchematicContext) => {
+
+    if (workspace.projects[name]) {
+      throw new Error(`Project '${name}' already exists in workspace.`);
+    }
+
+    // Add project to workspace.
+    workspace.projects[name] = project;
+
+    if (!workspace.defaultProject && Object.keys(workspace.projects).length === 1) {
+      // Make the new project the default one.
+      workspace.defaultProject = name;
+    }
+
+    host.overwrite(getWorkspacePath(host), JSON.stringify(workspace, null, 2));
+  };
 }
 
 export const configPath = '/.angular-cli.json';

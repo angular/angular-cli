@@ -69,6 +69,7 @@ describe('Application Schematic', () => {
     const tree = schematicRunner.runSchematic('application', options, workspaceTree);
     const workspace = JSON.parse(tree.readContent('/angular.json'));
     expect(workspace.projects.foo).toBeDefined();
+    expect(workspace.defaultProject).toBe('foo');
   });
 
   it('should set the prefix to app if none is set', () => {
