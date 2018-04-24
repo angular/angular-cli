@@ -1,9 +1,8 @@
 import * as path from 'path';
 import { filter } from 'rxjs/operators';
-import { logging, terminal } from '@angular-devkit/core';
+import { logging, terminal, dirname, Path } from '@angular-devkit/core';
 import { runCommand } from '../../models/command-runner';
-
-const Project = require('../../ember-cli/lib/models/project');
+import { findUp } from '../../utilities/find-up';
 
 
 function loadCommands() {
@@ -49,8 +48,16 @@ export default async function(options: any) {
   if (!options.testing) {
     loggingSubscription = initializeLogging(logger);
   }
+
+  const possibleConfigNames = ['angular.json', '.angular.json'];
+  const workspacePath = findUp(possibleConfigNames, process.cwd());
+  const projectRoot = workspacePath !== null
+    ? dirname(workspacePath as Path)
+    : process.cwd();
   const context = {
-    project: Project.projectOrnullProject(undefined, undefined),
+    project: {
+      root: projectRoot
+    }
   };
 
   try {

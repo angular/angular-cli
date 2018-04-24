@@ -11,7 +11,7 @@ export default class UpdateCommand extends SchematicCommand {
   public readonly name = 'update';
   public readonly description = 'Updates your application and its dependencies.';
   public static aliases: string[] = [];
-  public readonly scope = CommandScope.inProject;
+  public readonly scope = CommandScope.everywhere;
   public arguments: string[] = [ 'packages' ];
   public options: Option[] = [
     // Remove the --force flag.

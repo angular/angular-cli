@@ -9,6 +9,7 @@ import {
 import { logging, normalize, tags } from '@angular-devkit/core';
 import { camelize } from '@angular-devkit/core/src/utils/strings';
 import { findUp } from '../utilities/find-up';
+import { insideProject } from '../utilities/project';
 
 import * as yargsParser from 'yargs-parser';
 import * as fs from 'fs';
@@ -41,7 +42,7 @@ export async function runCommand(commandMap: CommandMap,
 
   // remove the command name
   rawOptions._ = rawOptions._.slice(1);
-  const executionScope = context.project.isEmberCLIProject()
+  const executionScope = insideProject()
     ? CommandScope.inProject
     : CommandScope.outsideProject;
 
@@ -298,9 +299,9 @@ function verifyWorkspace(
       normalize('.angular-cli.json'),
       normalize('angular-cli.json'),
     ];
-    const oldConfigFilePath = (root && findUp(oldConfigFileNames, root, true))
-      || findUp(oldConfigFileNames, process.cwd(), true)
-      || findUp(oldConfigFileNames, __dirname, true);
+    const oldConfigFilePath = (root && findUp(oldConfigFileNames, root))
+      || findUp(oldConfigFileNames, process.cwd())
+      || findUp(oldConfigFileNames, __dirname);
 
     // If an old configuration file is found, throw an exception.
     if (oldConfigFilePath) {

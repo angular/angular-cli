@@ -27,5 +27,5 @@ export default function() {
     })
     .then(() => expectToFail(() => ng('config', '--global', 'cli.warnings.notreal', 'true')))
     .then(() => ng('config', '--global', 'cli.warnings.versionMismatch', 'false'))
-    .then(() => expectFileToExist(path.join(homedir(), '.angular.json')));
+    .then(() => expectFileToExist(path.join(homedir(), '.angular-config.json')));
 }
