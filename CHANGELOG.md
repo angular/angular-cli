@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.0.0-rc.0"></a>
+# [6.0.0-rc.0](https://github.com/angular/universal/compare/v5.0.0...v6.0.0-rc.0) (2018-04-24)
+
+
+### Features
+
+* **common:** enable StateTransferInitializerModule ([#948](https://github.com/angular/universal/issues/948)) ([6ff2844](https://github.com/angular/universal/commit/6ff2844))
+
+
+
 <a name="5.0.0"></a>
 # [5.0.0](https://github.com/angular/universal/compare/5.0.0-beta.8...5.0.0) (2018-04-02)
 
