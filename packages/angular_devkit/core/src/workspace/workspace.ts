@@ -12,9 +12,12 @@ import {
   JsonObject,
   JsonParseMode,
   Path,
+  isAbsolute,
   join,
   normalize,
   parseJson,
+  relative,
+  resolve,
   schema,
   virtualFs,
 } from '..';
@@ -140,6 +143,38 @@ export class Workspace {
     }
 
     // Otherwise return null.
+    return null;
+  }
+
+  getProjectByPath(path: Path): string | null {
+    this._assertLoaded();
+
+    const projectNames = this.listProjectNames();
+    if (projectNames.length === 1) {
+      return projectNames[0];
+    }
+
+    const isInside = (base: Path, potential: Path): boolean => {
+      const absoluteBase = resolve(this.root, base);
+      const absolutePotential = resolve(this.root, potential);
+      const relativePotential = relative(absoluteBase, absolutePotential);
+      if (!relativePotential.startsWith('..') && !isAbsolute(relativePotential)) {
+        return true;
+      }
+
+      return false;
+    };
+
+    const projects = this.listProjectNames()
+      .map(name => [this.getProject(name).root, name] as [Path, string])
+      .filter(tuple => isInside(tuple[0], path))
+      // Sort tuples by depth, with the deeper ones first.
+      .sort((a, b) => isInside(a[0], b[0]) ? 1 : 0);
+
+    if (projects[0]) {
+      return projects[0][1];
+    }
+
     return null;
   }
 

@@ -202,11 +202,31 @@ describe('Workspace', () => {
     ).subscribe(undefined, done.fail, done);
   });
 
-  it('gets default project when there is a single one', (done) => {
+  it('gets default project returns null when there is none', (done) => {
     const customWorkspaceJson = { ...workspaceJson, defaultProject: undefined, projects: {} };
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(customWorkspaceJson).pipe(
       tap((ws) => expect(ws.getDefaultProject()).toEqual(null)),
+    ).subscribe(undefined, done.fail, done);
+  });
+
+  it('gets project by path', (done) => {
+    const workspace = new Workspace(root, host);
+    workspace.loadWorkspaceFromJson(workspaceJson).pipe(
+      tap((ws) => expect(ws.getProjectByPath(ws.root)).toEqual('app')),
+    ).subscribe(undefined, done.fail, done);
+  });
+
+  it('gets closest project by path', (done) => {
+    const app = workspaceJson.projects['app'];
+    const anotherAppRoot = join(normalize(app.root), 'folder');
+    const customWorkspaceJson = { ...workspaceJson, projects: {
+      'app': app,
+      'another-app': { ...app, root: anotherAppRoot},
+    } };
+    const workspace = new Workspace(root, host);
+    workspace.loadWorkspaceFromJson(customWorkspaceJson).pipe(
+      tap((ws) => expect(ws.getProjectByPath(anotherAppRoot)).toEqual('another-app')),
     ).subscribe(undefined, done.fail, done);
   });
 
