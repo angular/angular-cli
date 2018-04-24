@@ -8,6 +8,7 @@
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import * as path from 'path';
 import { getFileContent } from '../../angular/utility/test';
+import { Schema as ComponentOptions } from '../component/schema';
 import { latestVersions } from '../utility/latest-versions';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as GenerateLibrarySchema } from './schema';
@@ -202,5 +203,15 @@ describe('Library Schematic', () => {
       const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
       expect(tsConfigJson.compilerOptions.paths).toBeUndefined();
     });
+  });
+
+  it('should generate inside of a library', () => {
+    let tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+    const componentOptions: ComponentOptions = {
+      name: 'comp',
+      project: 'foo',
+    };
+    tree = schematicRunner.runSchematic('component', componentOptions, tree);
+    expect(tree.exists('/projects/foo/src/lib/comp/comp.component.ts')).toBe(true);
   });
 });

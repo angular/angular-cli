@@ -94,7 +94,8 @@ export default function (options: PipeOptions): Rule {
     const project = workspace.projects[options.project];
 
     if (options.path === undefined) {
-      options.path = `/${project.root}/src/app`;
+      const projectDirName = project.projectType === 'application' ? 'app' : 'lib';
+      options.path = `/${project.root}/src/${projectDirName}`;
     }
 
     const parsedPath = parseName(options.path, options.name);

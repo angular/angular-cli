@@ -110,7 +110,8 @@ export default function (options: DirectiveOptions): Rule {
     const project = workspace.projects[options.project];
 
     if (options.path === undefined) {
-      options.path = `/${project.root}/src/app`;
+      const projectDirName = project.projectType === 'application' ? 'app' : 'lib';
+      options.path = `/${project.root}/src/${projectDirName}`;
     }
 
     options.module = findModuleFromOptions(host, options);
