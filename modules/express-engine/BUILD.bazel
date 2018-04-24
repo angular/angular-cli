@@ -22,6 +22,7 @@ ng_package(
         ":package.json",
     ],
     entry_point = "modules/express-engine/index.js",
+    readme_md = ":README.md",
     deps = [
         ":express-engine",
         "//modules/express-engine/tokens",
