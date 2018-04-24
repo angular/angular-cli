@@ -1,11 +1,13 @@
 import * as path from 'path';
 import { existsSync } from 'fs';
+import { homedir } from 'os';
 
 export function findUp(names: string | string[], from: string, stopOnPackageJson = false) {
   if (!Array.isArray(names)) {
     names = [names];
   }
   const root = path.parse(from).root;
+  const isInHomeDir = from.startsWith(homedir());
 
   let currentDir = from;
   while (currentDir && currentDir !== root) {
@@ -16,7 +18,7 @@ export function findUp(names: string | string[], from: string, stopOnPackageJson
       }
     }
 
-    if (stopOnPackageJson) {
+    if (!isInHomeDir && stopOnPackageJson) {
       const packageJsonPth = path.join(currentDir, 'package.json');
       if (existsSync(packageJsonPth)) {
         return null;
