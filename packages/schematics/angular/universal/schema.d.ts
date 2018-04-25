@@ -43,4 +43,8 @@ export interface Schema {
      * The name of the root module class.
      */
     rootModuleClassName?: string;
+    /**
+     * Skip installing dependency packages.
+     */
+    skipInstall?: boolean;
 }

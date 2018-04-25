@@ -109,4 +109,11 @@ describe('Universal Schematic', () => {
     const contents = tree.readContent(filePath);
     expect(contents).toMatch(/document.addEventListener\('DOMContentLoaded', \(\) => {/);
   });
+
+  it('should install npm dependencies', () => {
+    schematicRunner.runSchematic('universal', defaultOptions, appTree);
+    expect(schematicRunner.tasks.length).toBe(1);
+    expect(schematicRunner.tasks[0].name).toBe('node-package');
+    expect((schematicRunner.tasks[0].options as {command: string}).command).toBe('install');
+  });
 });

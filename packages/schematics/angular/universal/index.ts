@@ -25,6 +25,9 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import {
+  NodePackageInstallTask,
+} from '@angular-devkit/schematics/tasks';
 import * as ts from 'typescript';
 import { findNode, getDecoratorMetadata } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
@@ -208,6 +211,11 @@ export default function (options: UniversalOptions): Rule {
     const clientArchitect = getClientArchitect(host, options);
     const outDir = getTsConfigOutDir(host, clientArchitect);
     const tsConfigExtends = basename(clientArchitect.build.options.tsConfig);
+
+    if (!options.skipInstall) {
+      context.addTask(new NodePackageInstallTask());
+    }
+
     const templateSource = apply(url('./files'), [
       template({
         ...strings,
