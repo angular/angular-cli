@@ -22,7 +22,7 @@ export type ProcessOutput = {
 };
 
 
-function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<ProcessOutput> {
+function  _exec(options: ExecOptions, cmd: string, args: string[]): Promise<ProcessOutput> {
   let stdout = '';
   let stderr = '';
   const cwd = process.cwd();
