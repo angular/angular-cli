@@ -305,6 +305,9 @@
         "root": {
           "type": "string"
         },
+        "sourceRoot": {
+          "type": "string"
+        },
         "projectType": {
           "type": "string",
           "description": "Project type.",
