@@ -5,13 +5,9 @@ import {
   JsonAstObject,
   JsonParseMode,
   JsonValue,
-  Path,
   experimental,
-  isAbsolute,
   normalize,
   parseJsonAst,
-  resolve,
-  relative,
   virtualFs,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
@@ -139,49 +135,11 @@ export function validateWorkspace(json: JsonValue) {
   return true;
 }
 
-export function getProjectByCwd(workspace?: experimental.workspace.Workspace): string | null {
-  if (!workspace) {
-    workspace = getWorkspace('local');
-    if (!workspace) {
-      return null;
-    }
-  }
-
-  const projectNames = workspace.listProjectNames();
-  if (projectNames.length === 1) {
-    return projectNames[0];
-  }
-
-  const cwd = normalize(process.cwd());
-  const isInside = (base: Path, potential: Path): boolean => {
-    const absoluteBase = resolve(workspace.root, base);
-    const absolutePotential = resolve(workspace.root, potential);
-    const relativePotential = relative(absoluteBase, absolutePotential);
-    if (!relativePotential.startsWith('..') && !isAbsolute(relativePotential)) {
-      return true;
-    }
-
-    return false;
-  };
-
-  const projects = workspace.listProjectNames()
-    .map(name => [workspace.getProject(name).root, name] as [Path, string])
-    .sort((a, b) => isInside(a[0], b[0]) ? 1 : 0);
-
-  for (const project of projects) {
-    if (isInside(project[0], cwd)) {
-      return project[1];
-    }
-  }
-
-  return null;
-}
-
 export function getPackageManager(): string {
   let workspace = getWorkspace();
 
   if (workspace) {
-    const project = getProjectByCwd(workspace);
+    const project = workspace.getProjectByPath(normalize(process.cwd()));
     if (project && workspace.getProjectCli(project)) {
       const value = workspace.getProjectCli(project)['packageManager'];
       if (typeof value == 'string') {
@@ -210,7 +168,7 @@ export function getDefaultSchematicCollection(): string {
   let workspace = getWorkspace('local');
 
   if (workspace) {
-    const project = getProjectByCwd(workspace);
+    const project = workspace.getProjectByPath(normalize(process.cwd()));
     if (project && workspace.getProjectCli(project)) {
       const value = workspace.getProjectCli(project)['defaultCollection'];
       if (typeof value == 'string') {
@@ -267,7 +225,7 @@ export function getSchematicDefaults(collection: string, schematic: string, proj
       }
     }
 
-    project = project || getProjectByCwd(workspace);
+    project = project || workspace.getProjectByPath(normalize(process.cwd()));
     if (project && workspace.getProjectSchematics(project)) {
       const schematicObject = workspace.getProjectSchematics(project)[fullName];
       if (schematicObject) {
@@ -287,7 +245,7 @@ export function isWarningEnabled(warning: string): boolean {
   let workspace = getWorkspace('local');
 
   if (workspace) {
-    const project = getProjectByCwd(workspace);
+    const project = workspace.getProjectByPath(normalize(process.cwd()));
     if (project && workspace.getProjectCli(project)) {
       const warnings = workspace.getProjectCli(project)['warnings'];
       if (typeof warnings == 'object' && !Array.isArray(warnings)) {
