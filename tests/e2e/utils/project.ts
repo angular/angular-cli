@@ -41,6 +41,7 @@ export function createProject(name: string, ...args: string[]) {
     .then(() => useBuiltPackages())
     .then(() => useCIChrome('e2e'))
     .then(() => useCIChrome('src'))
+    .then(() => useDevKitSnapshots())
     .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
     .then(() => argv['ng4'] ? useNg4() : Promise.resolve())
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
@@ -73,6 +74,18 @@ export function useDevKit(devkitRoot: string) {
           }
         });
     });
+}
+
+export function useDevKitSnapshots() {
+  return updateJsonFile('package.json', json => {
+    // TODO: actually add these.
+    // These were not working on any test that ran `npm i`.
+    // json['devDependencies']['@angular-devkit/build-angular'] =
+    //   'github:angular/angular-devkit-build-angular-builds';
+    // // By adding build-ng-packagr preemptively, adding a lib will not update it.
+    // json['devDependencies']['@angular-devkit/build-ng-packagr'] =
+    //   'github:angular/angular-devkit-build-ng-packagr-builds';
+  });
 }
 
 export function useBuiltPackages() {

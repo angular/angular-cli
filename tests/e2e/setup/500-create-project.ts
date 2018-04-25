@@ -8,6 +8,7 @@ import {
   useCIDefaults,
   useBuiltPackages,
   useDevKit,
+  useDevKitSnapshots,
   updateJsonFile,
 } from '../utils/project';
 import {gitClean, gitCommit} from '../utils/git';
@@ -32,7 +33,7 @@ export default async function() {
 
   return Promise.resolve()
     .then(() => useBuiltPackages())
-    .then(() => argv.devkit && useDevKit(argv.devkit))
+    .then(() => argv.devkit ? useDevKit(argv.devkit) : useDevKitSnapshots())
     .then(() => useCIChrome('e2e'))
     .then(() => useCIChrome('src'))
     .then(() => argv['ng-version'] ? useNgVersion(argv['ng-version']) : Promise.resolve())

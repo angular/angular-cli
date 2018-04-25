@@ -58,7 +58,7 @@ function getDeps(pkg: any): any {
 
 
 export default function build(packagesToBuild: string[],
-                              opts: { local: boolean, devkit: string },
+                              opts: { local: boolean, devkit: string, 'devkit-snapshots': boolean },
                               logger: logging.Logger): Promise<void> {
   const { packages, tools } = require('../../../lib/packages');
 
@@ -269,6 +269,17 @@ export default function build(packagesToBuild: string[],
               json['devDependencies'][packageName] = devkitPackages[packageName].tar;
             }
           }
+        } else if (opts['devkit-snapshots']) {
+          // Use snapshots for devkit packages.
+          logger.info('Using snapshots of devkit packages.');
+          json['dependencies']['@angular-devkit/architect'] =
+            'github:angular/angular-devkit-architect-builds';
+          json['dependencies']['@angular-devkit/core'] =
+            'github:angular/angular-devkit-core-builds';
+          json['dependencies']['@angular-devkit/schematics'] =
+            'github:angular/angular-devkit-schematics-builds';
+          json['dependencies']['@schematics/angular'] = 'github:angular/schematics-angular-builds';
+          json['dependencies']['@schematics/update'] = 'github:angular/schematics-update-builds';
         }
 
         fs.writeFileSync(pkg.distPackageJson, JSON.stringify(json, null, 2));
