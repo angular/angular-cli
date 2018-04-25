@@ -39,6 +39,8 @@ export default function (options: PwaOptions): Rule {
 
     const assetPath = join(project.root as Path, 'src', 'assets');
 
+    options.title = options.title || options.project;
+
     const tempalteSource = apply(url('./files/assets'), [
       template({
         ...options,

@@ -77,4 +77,13 @@ describe('PWA Schematic', () => {
     expect(manifest.name).toEqual(defaultOptions.title);
     expect(manifest.short_name).toEqual(defaultOptions.title);
   });
+
+  it('should set the name & short_name in the manifest file when no title provided', () => {
+    const options = {...defaultOptions, title: undefined};
+    const tree = schematicRunner.runSchematic('ng-add', options, appTree);
+    const manifestText = tree.readContent('/projects/bar/src/assets/manifest.json');
+    const manifest = JSON.parse(manifestText);
+    expect(manifest.name).toEqual(defaultOptions.project);
+    expect(manifest.short_name).toEqual(defaultOptions.project);
+  });
 });
