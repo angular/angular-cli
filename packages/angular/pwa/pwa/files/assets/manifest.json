@@ -3,7 +3,7 @@
   "short_name": "<%= title %>",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
-  "display": "browser",
+  "display": "standalone",
   "scope": "/",
   "start_url": "/",
   "icons": [
@@ -47,6 +47,5 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "splash_pages": null
+  ]
 }

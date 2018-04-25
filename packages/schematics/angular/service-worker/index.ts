@@ -190,8 +190,7 @@ function updateIndexFile(options: ServiceWorkerOptions): Rule {
     const indent = getIndent(closingHeadTagLine) + '  ';
     const itemsToAdd = [
       '<link rel="manifest" href="assets/manifest.json">',
-      '<meta name="Description" content="Angular Application">',
-      '<meta name="theme-color" content="#FFFFFF">',
+      '<meta name="theme-color" content="#1976d2">',
     ];
 
     const textToInsert = itemsToAdd
