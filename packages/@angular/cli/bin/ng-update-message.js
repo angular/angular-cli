@@ -6,6 +6,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 
 let found = false;
@@ -13,7 +14,7 @@ let current = path.dirname(path.dirname(__dirname));
 while (current !== path.dirname(current)) {
   if (fs.existsSync(path.join(current, 'angular-cli.json'))
       || fs.existsSync(path.join(current, '.angular-cli.json'))) {
-    found = true;
+    found = os.homedir() !== current || fs.existsSync(path.join(current, 'package.json'));
     break;
   }
   if (fs.existsSync(path.join(current, 'angular.json'))
