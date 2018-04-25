@@ -19,7 +19,7 @@ describe('Browser Builder', () => {
         name: 'app',
         installMode: 'prefetch',
         resources: {
-          files: [ '/favicon.ico', '/index.html' ],
+          files: ['/favicon.ico', '/index.html'],
           versionedFiles: [
             '/*.bundle.css',
             '/*.bundle.js',
@@ -32,7 +32,7 @@ describe('Browser Builder', () => {
         installMode: 'lazy',
         updateMode: 'prefetch',
         resources: {
-          files: [ '/assets/**' ],
+          files: ['/assets/**'],
         },
       },
     ],
@@ -67,6 +67,12 @@ describe('Browser Builder', () => {
         expect(ngswJson).toEqual({
           configVersion: 1,
           index: '/index.html',
+          navigationUrls: [
+            { positive: true, regex: '^\\\/.*$' },
+            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\\\/]*\\.[^\\\/]*$' },
+            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\\\/]*__[^\\\/]*$' },
+            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\\\/]*__[^\\\/]*\\\/.*$' },
+          ],
           assetGroups: [
             {
               name: 'app',
@@ -116,6 +122,12 @@ describe('Browser Builder', () => {
         expect(ngswJson).toEqual({
           configVersion: 1,
           index: '/foo/bar/index.html',
+          navigationUrls: [
+            { positive: true, regex: '^\\\/.*$' },
+            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\\\/]*\\.[^\\\/]*$' },
+            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\\\/]*__[^\\\/]*$' },
+            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\\\/]*__[^\\\/]*\\\/.*$' },
+          ],
           assetGroups: [
             {
               name: 'app',
