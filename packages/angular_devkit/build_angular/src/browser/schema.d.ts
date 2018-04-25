@@ -182,6 +182,11 @@ export interface BrowserBuilderSchema {
   serviceWorker: boolean;
 
   /**
+   * Path to ngsw-config.json.
+   */
+  ngswConfigPath?: string;
+
+  /**
    * Flag to prevent building an app shell.
    */
   skipAppShell: boolean;

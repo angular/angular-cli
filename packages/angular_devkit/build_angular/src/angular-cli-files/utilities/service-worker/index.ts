@@ -94,6 +94,7 @@ export function augmentAppWithServiceWorker(
   appRoot: Path,
   outputPath: Path,
   baseHref: string,
+  ngswConfigPath?: string,
 ): Promise<void> {
   // Path to the worker script itself.
   const distPath = normalize(outputPath);
@@ -105,7 +106,7 @@ export function augmentAppWithServiceWorker(
     '@angular/service-worker/config',
   );
   const safetyPath = join(dirname(workerPath), 'safety-worker.js');
-  const configPath = join(appRoot, 'ngsw-config.json');
+  const configPath = ngswConfigPath as Path || join(appRoot, 'ngsw-config.json');
 
   return host.exists(configPath).pipe(
     switchMap(exists => {

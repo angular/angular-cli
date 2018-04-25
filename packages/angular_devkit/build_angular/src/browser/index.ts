@@ -111,6 +111,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
                 projectRoot,
                 resolve(root, normalize(options.outputPath)),
                 options.baseHref || '/',
+                options.ngswConfigPath,
               ).then(
                 () => {
                   obs.next({ success: !stats.hasErrors() });
