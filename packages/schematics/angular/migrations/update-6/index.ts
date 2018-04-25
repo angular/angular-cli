@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, Path, join, normalize } from '@angular-devkit/core';
+import { JsonObject, Path, join, normalize, tags } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -608,6 +608,12 @@ export default function (): Rule {
       updateSpecTsConfig(config),
       updatePackageJson(config.packageManager),
       updateTsLintConfig(),
+      (host: Tree, context: SchematicContext) => {
+        context.logger.warn(tags.oneLine`Some configuration options have been changed,
+          please make sure to update any npm scripts which you may have modified.`);
+
+        return host;
+      },
     ])(host, context);
   };
 }
