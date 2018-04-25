@@ -11,6 +11,7 @@ export default class Xi18nCommand extends ArchitectCommand {
   public readonly target = 'extract-i18n';
   public readonly description = 'Extracts i18n messages from source code.';
   public readonly scope = CommandScope.inProject;
+  public readonly multiTarget: true;
   public readonly options: Option[] = [
     this.configurationOption
   ];

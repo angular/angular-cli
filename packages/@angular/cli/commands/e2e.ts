@@ -13,6 +13,7 @@ export default class E2eCommand extends ArchitectCommand {
   public readonly description = 'Run e2e tests in existing project.';
   public static aliases: string[] = ['e'];
   public readonly scope = CommandScope.inProject;
+  public readonly multiTarget: true;
   public readonly options: Option[] = [
     this.prodOption,
     this.configurationOption

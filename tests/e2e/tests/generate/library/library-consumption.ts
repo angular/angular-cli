@@ -41,6 +41,8 @@ export default function () {
         }
       }
     `))
+    // Check that the build succeeds both with named project, unnammed (should build app), and prod.
     .then(() => ng('build', 'test-project'))
-    .then(() => ng('build', 'test-project', '--prod'));
+    .then(() => ng('build'))
+    .then(() => ng('build', '--prod'));
 }
