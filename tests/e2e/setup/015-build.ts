@@ -12,7 +12,9 @@ export default function() {
     return;
   }
 
-  return npm('run', 'build', '--', '--local', argv.devkit ? '--devkit=' + argv.devkit : undefined)
+  const devkitArg = argv.devkit ? '--devkit=' + argv.devkit : '--devkit-snapshots';
+
+  return npm('run', 'build', '--', '--local', devkitArg)
     .then(() => {
       if (!argv.nightly && !argv['ng-sha']) {
         return;
