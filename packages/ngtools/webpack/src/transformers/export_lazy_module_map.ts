@@ -46,7 +46,11 @@ export function exportLazyModuleMap(
         return;
       }
 
-      const relativePath = path.relative(dirName, modulePath).replace(/\\/g, '/');
+      let relativePath = path.relative(dirName, modulePath).replace(/\\/g, '/');
+      if (!(relativePath.startsWith('./') || relativePath.startsWith('../'))) {
+        // 'a/b/c' is a relative path for Node but an absolute path for TS, so we must convert it.
+        relativePath = `./${relativePath}`;
+      }
       // Create the new namespace import node.
       const namespaceImport = ts.createNamespaceImport(ts.createIdentifier(`__lazy_${index}__`));
       const importClause = ts.createImportClause(undefined, namespaceImport);

@@ -42,8 +42,8 @@ describe('@ngtools/webpack transformers', () => {
 
       // tslint:disable:max-line-length
       const output = tags.stripIndent`
-        import * as __lazy_0__ from "app/lazy/lazy.module.ngfactory.ts";
-        import * as __lazy_1__ from "app/lazy2/lazy2.module.ngfactory.ts";
+        import * as __lazy_0__ from "./app/lazy/lazy.module.ngfactory.ts";
+        import * as __lazy_1__ from "./app/lazy2/lazy2.module.ngfactory.ts";
 
         import { enableProdMode } from '@angular/core';
         import { environment } from './environments/environment';
