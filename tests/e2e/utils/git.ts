@@ -18,17 +18,17 @@ export function gitClean() {
 }
 
 export function expectGitToBeClean() {
-  return git('status', '--porcelain')
+  return silentGit('status', '--porcelain')
     .then(({ stdout }) => {
       if (stdout != '') {
-        throw new Error('Git repo is not clean...');
+        throw new Error('Git repo is not clean...\n' + stdout);
       }
     });
 }
 
 export function gitCommit(message: string) {
   return git('add', '-A')
-    .then(() => git('status', '--porcelain'))
+    .then(() => silentGit('status', '--porcelain'))
     .then(({ stdout }) => {
       if (stdout != '') {
         return git('commit', '-am', message);

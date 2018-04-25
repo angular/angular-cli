@@ -1,6 +1,6 @@
 import {join} from 'path';
 import {git, ng, silentNpm} from '../utils/process';
-import {expectFileToExist} from '../utils/fs';
+import { expectFileToExist, writeFile } from '../utils/fs';
 import {
   useSha,
   useNgVersion,
