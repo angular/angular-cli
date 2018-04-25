@@ -2,6 +2,7 @@
   "extends": "./<%= tsConfigExtends %>",
   "compilerOptions": {
     "outDir": "<%= outDir %>-server",
+    "baseUrl": ".",
     "module": "commonjs"
   },
   "angularCompilerOptions": {

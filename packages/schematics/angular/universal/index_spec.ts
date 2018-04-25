@@ -59,17 +59,18 @@ describe('Universal Schematic', () => {
 
   it('should create a tsconfig file', () => {
     const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
-    const filePath = '/projects/bar/tsconfig.server.json';
+    const filePath = '/projects/bar/src/tsconfig.server.json';
     expect(tree.exists(filePath)).toEqual(true);
     const contents = tree.readContent(filePath);
     expect(JSON.parse(contents)).toEqual({
       extends: './tsconfig.app.json',
       compilerOptions: {
         outDir: '../../out-tsc/app-server',
+        baseUrl: '.',
         module: 'commonjs',
       },
       angularCompilerOptions: {
-        entryModule: 'src/app/app.server.module#AppServerModule',
+        entryModule: 'app/app.server.module#AppServerModule',
       },
     });
   });
@@ -92,7 +93,7 @@ describe('Universal Schematic', () => {
     const opts = arch.server.options;
     expect(opts.outputPath).toEqual('dist/bar-server');
     expect(opts.main).toEqual('projects/bar/src/main.server.ts');
-    expect(opts.tsConfig).toEqual('projects/bar/tsconfig.server.json');
+    expect(opts.tsConfig).toEqual('projects/bar/src/tsconfig.server.json');
   });
 
   it('should add a server transition to BrowerModule import', () => {

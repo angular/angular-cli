@@ -66,24 +66,25 @@ function getClientArchitect(
 
 function updateConfigFile(options: UniversalOptions): Rule {
   return (host: Tree) => {
+    const workspace = getWorkspace(host);
+    if (!workspace.projects[options.clientProject]) {
+      throw new SchematicsException(`Client app ${options.clientProject} not found.`);
+    }
+
+    const clientProject = workspace.projects[options.clientProject];
+    if (!clientProject.architect) {
+      throw new Error('Client project architect not found.');
+    }
+
     const builderOptions: JsonObject = {
       outputPath: `dist/${options.clientProject}-server`,
-      main: `projects/${options.clientProject}/src/main.server.ts`,
-      tsConfig: `projects/${options.clientProject}/tsconfig.server.json`,
+      main: `${clientProject.root}src/main.server.ts`,
+      tsConfig: `${clientProject.root}src/tsconfig.server.json`,
     };
     const serverTarget: JsonObject = {
       builder: '@angular-devkit/build-angular:server',
       options: builderOptions,
     };
-    const workspace = getWorkspace(host);
-
-    if (!workspace.projects[options.clientProject]) {
-      throw new SchematicsException(`Client app ${options.clientProject} not found.`);
-    }
-    const clientProject = workspace.projects[options.clientProject];
-    if (!clientProject.architect) {
-      throw new Error('Client project architect not found.');
-    }
     clientProject.architect.server = serverTarget;
 
     const workspacePath = getWorkspacePath(host);
