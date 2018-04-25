@@ -334,7 +334,8 @@ function _usageMessage(
   const packageGroups = new Map<string, string>();
   const packagesToUpdate = [...infoMap.entries()]
     .map(([name, info]) => {
-      const tag = options.next ? 'next' : 'latest';
+      const tag = options.next
+        ? (info.npmPackageJson['dist-tags']['next'] ? 'next' : 'latest') : 'latest';
       const version = info.npmPackageJson['dist-tags'][tag];
       const target = info.npmPackageJson.versions[version];
 
@@ -460,6 +461,8 @@ function _buildPackageInfo(
   if (targetVersion) {
     if (npmPackageJson['dist-tags'][targetVersion]) {
       targetVersion = npmPackageJson['dist-tags'][targetVersion] as VersionRange;
+    } else if (targetVersion == 'next') {
+      targetVersion = npmPackageJson['dist-tags']['latest'] as VersionRange;
     } else {
       targetVersion = semver.maxSatisfying(
         Object.keys(npmPackageJson.versions),
