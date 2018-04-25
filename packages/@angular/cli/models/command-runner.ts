@@ -59,39 +59,26 @@ export async function runCommand(commandMap: CommandMap,
   }
 
   if (!Cmd) {
+    // Based off https://en.wikipedia.org/wiki/Levenshtein_distance
+    // No optimization, really.
     function levenshtein(a: string, b: string): number {
-      if (a.length === 0) {
+      /* base case: empty strings */
+      if (a.length == 0) {
         return b.length;
       }
-      if (b.length === 0) {
+      if (b.length == 0) {
         return a.length;
       }
 
-      if (a.length > b.length) {
-        let tmp = a;
-        a = b;
-        b = tmp;
-      }
+      // Test if last characters of the strings match.
+      const cost = a[a.length - 1] == b[b.length - 1] ? 0 : 1;
 
-      const row = Array(a.length);
-      for (let i = 0; i <= a.length; i++) {
-        row[i] = i;
-      }
-
-      let result: number;
-      for (let i = 1; i <= b.length; i++) {
-        result = i;
-
-        for (let j = 1; j <= a.length; j++) {
-          let tmp = row[j - 1];
-          row[j - 1] = result;
-          result = b[i - 1] === a[j - 1]
-            ? tmp
-            : Math.min(tmp + 1, Math.min(result + 1, row[j] + 1));
-        }
-      }
-
-      return result;
+      /* return minimum of delete char from s, delete char from t, and delete char from both */
+      return Math.min(
+        levenshtein(a.slice(0, -1), b) + 1,
+        levenshtein(a, b.slice(0, -1)) + 1,
+        levenshtein(a.slice(0, -1), b.slice(0, -1)) + cost,
+      );
     }
 
     const commandsDistance = {} as { [name: string]: number };
