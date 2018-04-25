@@ -273,6 +273,14 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
             configurationName = environment;
           }
 
+          let swConfig: JsonObject | null = null;
+          if (serviceWorker) {
+            swConfig = {
+              serviceWorker: true,
+              ngswConfigPath: '/src/ngsw-config.json',
+            };
+          }
+
           acc[configurationName] = {
             ...(isProduction
               ? {
@@ -288,7 +296,7 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
               }
               : {}
             ),
-            ...(isProduction && serviceWorker ? { serviceWorker: true } : {}),
+            ...(isProduction && swConfig ? swConfig : {}),
             fileReplacements: [
               {
                 replace: `${app.root}/${source}`,
