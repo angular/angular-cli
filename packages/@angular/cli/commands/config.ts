@@ -9,7 +9,6 @@ import {
   experimental,
   parseJson,
 } from '@angular-devkit/core';
-import { WorkspaceJson } from '@angular-devkit/core/src/workspace';
 
 const SilentError = require('silent-error');
 
@@ -165,7 +164,8 @@ export default class ConfigCommand extends Command {
 
   public run(options: ConfigOptions) {
     const level = options.global ? 'global' : 'local';
-    const config = (getWorkspace(level) as {} as { _workspace: WorkspaceJson});
+    const config =
+      (getWorkspace(level) as {} as { _workspace: experimental.workspace.WorkspaceSchema });
 
     if (!config) {
       throw new SilentError('No config found.');
@@ -178,7 +178,7 @@ export default class ConfigCommand extends Command {
     }
   }
 
-  private get(config: experimental.workspace.WorkspaceJson, options: ConfigOptions) {
+  private get(config: experimental.workspace.WorkspaceSchema, options: ConfigOptions) {
     const value = options.jsonPath ? getValueFromPath(config as any, options.jsonPath) : config;
 
     if (value === undefined) {
