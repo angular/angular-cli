@@ -7,7 +7,10 @@
  */
 import { logging } from '@angular-devkit/core';
 import {
-  Rule, SchematicContext, SchematicsException, TaskId,
+  Rule,
+  SchematicContext,
+  SchematicsException,
+  TaskId,
   Tree,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
@@ -19,7 +22,30 @@ import { NpmRepositoryPackageJson } from './npm-package-json';
 import { JsonSchemaForNpmPackageJsonFiles } from './package-json';
 import { UpdateSchema } from './schema';
 
-type VersionRange = string & { __: void; };
+type VersionRange = string & { __VERSION_RANGE: void; };
+type PeerVersionTransform = string | ((range: string) => string);
+
+// This is a map of packageGroupName to range extending function. If it isn't found, the range is
+// kept the same.
+// Angular guarantees that a major is compatible with its following major (so packages that depend
+// on Angular 5 are also compatible with Angular 6). This is, in code, represented by verifying
+// that all other packages that have a peer dependency of `"@angular/core": "^5.0.0"` actually
+// supports 6.0, by adding that compatibility to the range, so it is `^5.0.0 || ^6.0.0`.
+const peerCompatibleWhitelist: { [name: string]: PeerVersionTransform } = {
+  '@angular/core': (range: string) => {
+    range = semver.validRange(range);
+    let major = 1;
+    while (semver.ltr(major + '.0.0', range)) {
+      major++;
+      if (major >= 99) {
+        throw new SchematicsException(`Invalid range: ${JSON.stringify(range)}`);
+      }
+    }
+
+    // Add the major - 1 version as compatible with the angular compatible.
+    return semver.validRange(`^${major + 1}.0.0-rc.0 || ${range}`) || range;
+  },
+};
 
 interface PackageVersionInfo {
   version: VersionRange;
@@ -39,6 +65,30 @@ interface UpdateMetadata {
   packageGroup: string[];
   requirements: { [packageName: string]: string };
   migrations?: string;
+}
+
+function _updatePeerVersion(infoMap: Map<string, PackageInfo>, name: string, range: string) {
+  // Resolve packageGroupName.
+  const maybePackageInfo = infoMap.get(name);
+  if (!maybePackageInfo) {
+    return range;
+  }
+  if (maybePackageInfo.target) {
+    name = maybePackageInfo.target.updateMetadata.packageGroup[0] || name;
+  } else {
+    name = maybePackageInfo.installed.updateMetadata.packageGroup[0] || name;
+  }
+
+  const maybeTransform = peerCompatibleWhitelist[name];
+  if (maybeTransform) {
+    if (typeof maybeTransform == 'function') {
+      return maybeTransform(range);
+    } else {
+      return maybeTransform;
+    }
+  }
+
+  return range;
 }
 
 function _validateForwardPeerDependencies(
@@ -90,12 +140,15 @@ function _validateReversePeerDependencies(
     installedLogger.debug(`${installed}...`);
     const peers = (installedInfo.target || installedInfo.installed).packageJson.peerDependencies;
 
-    for (const [peer, range] of Object.entries(peers || {})) {
+    for (let [peer, range] of Object.entries(peers || {})) {
       if (peer != name) {
         // Only check peers to the packages we're updating. We don't care about peers
         // that are unmet but we have no effect on.
         continue;
       }
+
+      // Override the peer version range if it's whitelisted.
+      range = _updatePeerVersion(infoMap, peer, range);
 
       if (!semver.satisfies(version, range)) {
         logger.error([
