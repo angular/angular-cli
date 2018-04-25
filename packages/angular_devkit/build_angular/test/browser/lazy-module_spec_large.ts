@@ -76,7 +76,7 @@ describe('Browser Builder lazy modules', () => {
   beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
-  it('supports lazy bundle for lazy routes', (done) => {
+  it('supports lazy bundle for lazy routes with JIT', (done) => {
     host.writeMultipleFiles(lazyModuleFiles);
     host.writeMultipleFiles(lazyModuleImport);
 
@@ -84,6 +84,19 @@ describe('Browser Builder lazy modules', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.scopedSync().exists(join(outputPath, 'lazy-lazy-module.js'))).toBe(true);
+      }),
+    ).subscribe(undefined, done.fail, done);
+  }, Timeout.Basic);
+
+  it('supports lazy bundle for lazy routes with AOT', (done) => {
+    host.writeMultipleFiles(lazyModuleFiles);
+    host.writeMultipleFiles(lazyModuleImport);
+
+    runTargetSpec(host, browserTargetSpec, { aot: true }).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        expect(host.scopedSync()
+          .exists(join(outputPath, 'lazy-lazy-module-ngfactory.js'))).toBe(true);
       }),
     ).subscribe(undefined, done.fail, done);
   }, Timeout.Basic);
@@ -180,7 +193,7 @@ describe('Browser Builder lazy modules', () => {
     ).subscribe(undefined, done.fail, done);
   }, Timeout.Basic);
 
-  it(`supports extra lazy modules array`, (done) => {
+  it(`supports extra lazy modules array in JIT`, (done) => {
     host.writeMultipleFiles(lazyModuleFiles);
     host.writeMultipleFiles({
       'src/app/app.component.ts': `
@@ -207,6 +220,42 @@ describe('Browser Builder lazy modules', () => {
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(host.scopedSync().exists(join(outputPath, 'src-app-lazy-lazy-module.js')))
+        .toBe(true)),
+    ).subscribe(undefined, done.fail, done);
+  }, Timeout.Basic);
+
+  it(`supports extra lazy modules array in AOT`, (done) => {
+    host.writeMultipleFiles(lazyModuleFiles);
+    host.writeMultipleFiles({
+      'src/app/app.component.ts': `
+        import { Component, SystemJsNgModuleLoader } from '@angular/core';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styleUrls: ['./app.component.css'],
+        })
+        export class AppComponent {
+          title = 'app';
+          constructor(loader: SystemJsNgModuleLoader) {
+            // Module will be split at build time and loaded when requested below
+            loader.load('src/app/lazy/lazy.module#LazyModule')
+              .then((factory) => { /* Use factory here */ });
+          }
+        }`,
+    });
+    host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
+
+    const overrides: Partial<BrowserBuilderSchema> = {
+      lazyModules: ['src/app/lazy/lazy.module'],
+      aot: true,
+      optimization: true,
+    };
+
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => expect(host.scopedSync()
+        .exists(join(outputPath, 'src-app-lazy-lazy-module-ngfactory.js')))
         .toBe(true)),
     ).subscribe(undefined, done.fail, done);
   }, Timeout.Basic);

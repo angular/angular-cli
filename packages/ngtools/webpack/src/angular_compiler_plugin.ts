@@ -492,7 +492,8 @@ export class AngularCompilerPlugin {
           modulePath = lazyRouteTSFile;
           moduleKey = `${lazyRouteModule}${moduleName ? '#' + moduleName : ''}`;
         } else {
-          modulePath = lazyRouteTSFile.replace(/(\.d)?\.ts$/, `.ngfactory.js`);
+          modulePath = lazyRouteTSFile.replace(/(\.d)?\.ts$/, '');
+          modulePath += '.ngfactory.js';
           const factoryModuleName = moduleName ? `#${moduleName}NgFactory` : '';
           moduleKey = `${lazyRouteModule}.ngfactory${factoryModuleName}`;
         }
