@@ -131,15 +131,15 @@ export class Workspace {
     };
   }
 
-  getDefaultProject() {
+  getDefaultProjectName(): string | null {
     this._assertLoaded();
 
     if (this._workspace.defaultProject) {
       // If there is a default project name, return it.
-      return this.getProject(this._workspace.defaultProject);
+      return this._workspace.defaultProject;
     } else if (this.listProjectNames().length === 1) {
       // If there is only one project, return that one.
-      return this.getProject(this.listProjectNames()[0]);
+      return this.listProjectNames()[0];
     }
 
     // Otherwise return null.

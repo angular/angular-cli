@@ -190,7 +190,7 @@ describe('Workspace', () => {
   it('gets default project', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
-      tap((ws) => expect(ws.getDefaultProject()).toEqual(appProject)),
+      tap((ws) => expect(ws.getDefaultProjectName()).toEqual('app')),
     ).subscribe(undefined, done.fail, done);
   });
 
@@ -198,7 +198,7 @@ describe('Workspace', () => {
     const customWorkspaceJson = { ...workspaceJson, defaultProject: undefined };
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(customWorkspaceJson).pipe(
-      tap((ws) => expect(ws.getDefaultProject()).toEqual(appProject)),
+      tap((ws) => expect(ws.getDefaultProjectName()).toEqual('app')),
     ).subscribe(undefined, done.fail, done);
   });
 
@@ -206,7 +206,7 @@ describe('Workspace', () => {
     const customWorkspaceJson = { ...workspaceJson, defaultProject: undefined, projects: {} };
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(customWorkspaceJson).pipe(
-      tap((ws) => expect(ws.getDefaultProject()).toEqual(null)),
+      tap((ws) => expect(ws.getDefaultProjectName()).toEqual(null)),
     ).subscribe(undefined, done.fail, done);
   });
 
