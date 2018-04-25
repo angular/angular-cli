@@ -62,6 +62,12 @@ describe('Library Schematic', () => {
     expect(fileContent).toMatch(/"name": "foo"/);
   });
 
+  it('should create a tsconfig for library', () => {
+    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+    const fileContent = getJsonFileContent(tree, '/projects/foo/tsconfig.lib.json');
+    expect(fileContent).toBeDefined();
+  });
+
   it('should create a ng-package.json with ngPackage conf', () => {
     const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
     const fileContent = getJsonFileContent(tree, '/projects/foo/ng-package.json');

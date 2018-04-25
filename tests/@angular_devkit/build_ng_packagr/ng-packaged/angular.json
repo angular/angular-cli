@@ -28,7 +28,7 @@
           "builder": "../../../../packages/angular_devkit/build_angular:tslint",
           "options": {
             "tsConfig": [
-              "projects/lib/tsconfig.lint.json",
+              "projects/lib/tsconfig.lib.json",
               "projects/lib/tsconfig.spec.json"
             ],
             "exclude": [

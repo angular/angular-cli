@@ -136,6 +136,7 @@ function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSche
       build: {
         builder: '@angular-devkit/build-ng-packagr:build',
         options: {
+          tsConfig: `${projectRoot}/tsconfig.lib.json`,
           project: `${projectRoot}/ng-package.json`,
         },
         configurations: {
@@ -156,7 +157,7 @@ function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSche
         builder: '@angular-devkit/build-angular:tslint',
         options: {
           tsConfig: [
-            `${projectRoot}/tsconfig.lint.json`,
+            `${projectRoot}/tsconfig.lib.json`,
             `${projectRoot}/tsconfig.spec.json`,
           ],
           exclude: [
