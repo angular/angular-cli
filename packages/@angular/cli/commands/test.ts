@@ -13,6 +13,7 @@ export default class TestCommand extends ArchitectCommand {
   public readonly description = 'Run unit tests in existing project.';
   public static aliases = ['t'];
   public readonly scope = CommandScope.inProject;
+  public readonly multiTarget: true;
   public readonly options: Option[] = [
     this.prodOption,
     this.configurationOption

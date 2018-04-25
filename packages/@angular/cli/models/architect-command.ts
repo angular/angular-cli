@@ -11,16 +11,13 @@ import { concatMap, map, tap, toArray } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
 
 
-export interface GenericTargetTargetSpecifier {
-  target: string;
-  configuration?: string;
-}
-
 export abstract class ArchitectCommand<T = any> extends Command<T> {
   private _host = new NodeJsSyncHost();
   private _architect: Architect;
   private _workspace: experimental.workspace.Workspace;
   private _logger = createConsoleLogger();
+  // If this command supports running multiple targets.
+  protected multiTarget = false;
 
   readonly Options: Option[] = [{
     name: 'configuration',
@@ -46,7 +43,7 @@ export abstract class ArchitectCommand<T = any> extends Command<T> {
           const [project, target] = options.target.split(':');
           targetSpec = { project, target };
         } else if (this.target) {
-          const projects = this.getAllProjectsForTargetName(this.target);
+          const projects = this.getProjectNamesByTarget(this.target);
 
           if (projects.length === 1) {
             // If there is a single target, use it to parse overrides.
@@ -70,12 +67,12 @@ export abstract class ArchitectCommand<T = any> extends Command<T> {
         );
       })
     ).toPromise()
-      .then(() => {});
+      .then(() => { });
   }
 
   public validate(options: any) {
     if (!options.project && this.target) {
-      const projectNames = this.getAllProjectsForTargetName(this.target);
+      const projectNames = this.getProjectNamesByTarget(this.target);
       const overrides = { ...options };
       delete overrides.project;
       delete overrides.configuration;
@@ -164,7 +161,7 @@ export abstract class ArchitectCommand<T = any> extends Command<T> {
       if (!targetSpec.project && this.target) {
         // This runs each target sequentially.
         // Running them in parallel would jumble the log messages.
-        return await from(this.getAllProjectsForTargetName(this.target)).pipe(
+        return await from(this.getProjectNamesByTarget(this.target)).pipe(
           concatMap(project => runSingleTarget({ ...targetSpec, project })),
           toArray(),
         ).toPromise().then(results => results.every(res => res === 0) ? 0 : 1);
@@ -197,10 +194,28 @@ export abstract class ArchitectCommand<T = any> extends Command<T> {
     }
   }
 
-  private getAllProjectsForTargetName(targetName: string) {
-    return this._workspace.listProjectNames().map(projectName =>
+  private getProjectNamesByTarget(targetName: string): string[] {
+    const allProjectsForTargetName = this._workspace.listProjectNames().map(projectName =>
       this._architect.listProjectTargets(projectName).includes(targetName) ? projectName : null
     ).filter(x => !!x);
+
+    if (this.multiTarget) {
+      // For multi target commands, we always list all projects that have the target.
+      return allProjectsForTargetName;
+    } else {
+      // For single target commands, we try try the default project project first,
+      // then the full list if it has a single project, then error out.
+      const maybeDefaultProject = this._workspace.getDefaultProjectName();
+      if (maybeDefaultProject && allProjectsForTargetName.includes(maybeDefaultProject)) {
+        return [maybeDefaultProject];
+      }
+
+      if (allProjectsForTargetName.length === 1) {
+        return allProjectsForTargetName;
+      }
+
+      throw new Error(`Could not determine a single project for the '${targetName} target.`);
+    }
   }
 
   private _loadWorkspaceAndArchitect() {
