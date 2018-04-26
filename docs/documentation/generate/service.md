@@ -34,6 +34,13 @@
   <p>
     Specifies where the service should be provided.
   </p>
+  <p>
+    This should be the location of the file relative to the <code>app</code> directory. Two examples follow. The first adds the service to the default module that is provided when you first create a project with the cli. The second links to a module which can be found at <code>MyProject/src/app/my-module/my-module.module.ts</code>
+  </p>
+  <pre><code>ng generate service user --module app.module.ts</code></pre>
+  <pre><code>ng generate service user --module my-module/my-module.module.ts</code></pre>
+  
+
 </details>
 
 <details>
