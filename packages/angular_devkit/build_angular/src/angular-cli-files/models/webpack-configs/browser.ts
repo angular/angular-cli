@@ -132,6 +132,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
         baseHref: buildOptions.baseHref,
         entrypoints: generateEntryPoints(buildOptions),
         deployUrl: buildOptions.deployUrl,
+        sri: buildOptions.subresourceIntegrity,
       }),
     ]),
     node: false,

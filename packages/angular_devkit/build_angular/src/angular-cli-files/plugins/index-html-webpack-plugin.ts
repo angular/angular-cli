@@ -1,6 +1,3 @@
-// tslint:disable
-// TODO: cleanup this file, it's copied as is from Angular CLI.
-
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -8,7 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
+import { createHash } from 'crypto';
+import { Compiler, compilation } from 'webpack';
 import { RawSource } from 'webpack-sources';
 
 const parse5 = require('parse5');
@@ -19,13 +17,15 @@ export interface IndexHtmlWebpackPluginOptions {
   baseHref?: string;
   entrypoints: string[];
   deployUrl?: string;
+  sri: boolean;
 }
 
-function readFile(filename: string, compilation: any): Promise<string> {
+function readFile(filename: string, compilation: compilation.Compilation): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     compilation.inputFileSystem.readFile(filename, (err: Error, data: Buffer) => {
       if (err) {
         reject(err);
+
         return;
       }
 
@@ -53,23 +53,25 @@ export class IndexHtmlWebpackPlugin {
       input: 'index.html',
       output: 'index.html',
       entrypoints: ['polyfills', 'main'],
-      ...options
+      sri: false,
+      ...options,
     };
   }
 
-  apply(compiler: any) {
-    compiler.hooks.emit.tapPromise('index-html-webpack-plugin', async (compilation: any) => {
+  apply(compiler: Compiler) {
+    compiler.hooks.emit.tapPromise('index-html-webpack-plugin', async compilation => {
       // Get input html file
       const inputContent = await readFile(this._options.input, compilation);
-      compilation.fileDependencies.add(this._options.input);
+      (compilation as compilation.Compilation & { fileDependencies: Set<string> })
+        .fileDependencies.add(this._options.input);
 
 
       // Get all files for selected entrypoints
-      const unfilteredSortedFiles: string[] = [];
+      let unfilteredSortedFiles: string[] = [];
       for (const entryName of this._options.entrypoints) {
         const entrypoint = compilation.entrypoints.get(entryName);
-        if (entrypoint) {
-          unfilteredSortedFiles.push(...entrypoint.getFiles());
+        if (entrypoint && entrypoint.getFiles) {
+          unfilteredSortedFiles = unfilteredSortedFiles.concat(entrypoint.getFiles() || []);
         }
       }
 
@@ -116,13 +118,25 @@ export class IndexHtmlWebpackPlugin {
       }
 
       for (const script of scripts) {
+        const attrs = [
+          { name: 'type', value: 'text/javascript' },
+          { name: 'src', value: (this._options.deployUrl || '') + script },
+        ];
+        if (this._options.sri) {
+          const algo = 'sha384';
+          const hash = createHash(algo)
+            .update(compilation.assets[script].source(), 'utf8')
+            .digest('base64');
+          attrs.push(
+            { name: 'integrity', value: `${algo}-${hash}` },
+            { name: 'crossorigin', value: 'anonymous' },
+          );
+        }
+
         const element = treeAdapter.createElement(
           'script',
           undefined,
-          [
-            { name: 'type', value: 'text/javascript' },
-            { name: 'src', value: (this._options.deployUrl || '') + script },
-          ]
+          attrs,
         );
         treeAdapter.appendChild(bodyElement, element);
       }
@@ -143,7 +157,7 @@ export class IndexHtmlWebpackPlugin {
             undefined,
             [
               { name: 'href', value: this._options.baseHref },
-            ]
+            ],
           );
           treeAdapter.appendChild(headElement, element);
         } else {
@@ -168,7 +182,7 @@ export class IndexHtmlWebpackPlugin {
           [
             { name: 'rel', value: 'stylesheet' },
             { name: 'href', value: (this._options.deployUrl || '') + stylesheet },
-          ]
+          ],
         );
         treeAdapter.appendChild(headElement, element);
       }
