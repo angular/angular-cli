@@ -77,7 +77,7 @@ jobs:
       - attach_workspace:
           <<: *attach_workspace_defaults
       - run: cp -r /home/circleci/workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=0 --nosilent --ng-version="6.0.0-rc.2"
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=0 --nosilent
 
   e2e-1:
     <<: *defaults
@@ -88,7 +88,7 @@ jobs:
       - attach_workspace:
           <<: *attach_workspace_defaults
       - run: cp -r /home/circleci/workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=1 --nosilent --ng-version="6.0.0-rc.2"
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=1 --nosilent
 
   e2e-2:
     <<: *defaults
@@ -99,7 +99,7 @@ jobs:
       - attach_workspace:
           <<: *attach_workspace_defaults
       - run: cp -r /home/circleci/workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=2 --nosilent --ng-version="6.0.0-rc.2"
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=2 --nosilent
 
   e2e-3:
     <<: *defaults
@@ -110,7 +110,7 @@ jobs:
       - attach_workspace:
           <<: *attach_workspace_defaults
       - run: cp -r /home/circleci/workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=3 --nosilent --ng-version="6.0.0-rc.2"
+      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/home/circleci/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=3 --nosilent
 
   # Master only E2E.
   nightly-e2e:
