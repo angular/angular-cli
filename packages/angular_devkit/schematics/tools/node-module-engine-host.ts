@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { BaseException } from '@angular-devkit/core';
 import * as core from '@angular-devkit/core/node';
 import { dirname, join, resolve as resolvePath } from 'path';
 import { RuleFactory } from '../src';
@@ -20,6 +21,13 @@ import {
 import { ExportStringRef } from './export-ref';
 import { FileSystemEngineHostBase } from './file-system-engine-host-base';
 import { readJsonFile } from './file-system-utility';
+
+
+export class NodePackageDoesNotSupportSchematics extends BaseException {
+  constructor(name: string) {
+    super(`Package ${JSON.stringify(name)} was found but does not support schematics.`);
+  }
+}
 
 
 /**
@@ -81,6 +89,9 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
       }
 
       const pkgJsonSchematics = require(packageJsonPath)['schematics'];
+      if (!pkgJsonSchematics || typeof pkgJsonSchematics != 'string') {
+        throw new NodePackageDoesNotSupportSchematics(name);
+      }
       collectionPath = this._resolvePath(pkgJsonSchematics, dirname(packageJsonPath));
     }
 
