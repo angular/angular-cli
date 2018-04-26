@@ -314,7 +314,7 @@ export abstract class SchematicCommand extends Command {
     const workspaceLoader = new WorkspaceLoader(this._host);
 
     try {
-      workspaceLoader.loadWorkspace().pipe(take(1))
+      workspaceLoader.loadWorkspace(this.project.root).pipe(take(1))
         .subscribe(
           (workspace: experimental.workspace.Workspace) => this._workspace = workspace,
           (err: Error) => {

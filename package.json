@@ -11,6 +11,7 @@
   "scripts": {
     "crazy2e": "echo This is crazy! Youre INSANE; npm run test:e2e -- --noproject ''; npm run test:e2e -- --nb-shards=4 --shard=0 --nobuild --nolink & npm run test:e2e -- --nb-shards=4 --shard=1  --nobuild --nolink & npm run test:e2e -- --nb-shards=4 --shard=2  --nobuild --nolink & npm run test:e2e -- --nb-shards=4 --shard=3 --nobuild --nolink & wait",
     "build": "node scripts/run-tool.js publish build",
+    "docs": "node scripts/run-tool.js publish docs",
     "test": "npm-run-all -c test:packages test:cli test:deps test:licenses test:messages",
     "e2e": "npm run test:e2e",
     "e2e:nightly": "node tests/run_e2e.js --nightly",
@@ -57,6 +58,7 @@
   },
   "devDependencies": {
     "@ngtools/json-schema": "^1.1.0",
+    "@angular-devkit/build-angular": "github:angular/angular-devkit-build-angular-builds",
     "@types/common-tags": "^1.2.4",
     "@types/express": "^4.0.32",
     "@types/fs-extra": "^4.0.0",
