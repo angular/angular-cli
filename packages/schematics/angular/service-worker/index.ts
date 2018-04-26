@@ -232,6 +232,9 @@ export default function (options: ServiceWorkerOptions): Rule {
     if (!project) {
       throw new SchematicsException(`Invalid project name (${options.project})`);
     }
+    if (project.projectType !== 'application') {
+      throw new SchematicsException(`Service worker requires a project type of "application".`);
+    }
 
     const templateSource = apply(url('./files'), [
       template({...options}),

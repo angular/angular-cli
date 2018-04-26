@@ -9,6 +9,7 @@ import { Path, join } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
+  SchematicsException,
   Tree,
   apply,
   branchAndMerge,
@@ -36,6 +37,9 @@ export default function (options: PwaOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     const workspace = getWorkspace(host);
     const project = workspace.projects[options.project];
+    if (project.projectType !== 'application') {
+      throw new SchematicsException(`PWA requires a project type of "application".`);
+    }
 
     const assetPath = join(project.root as Path, 'src', 'assets');
 

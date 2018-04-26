@@ -144,6 +144,9 @@ function validateProject(options: AppShellOptions): Rule {
     const routerOutletCheckRegex = /<router\-outlet.*?>([\s\S]*?)<\/router\-outlet>/;
 
     const clientProject = getClientProject(host, options);
+    if (clientProject.projectType !== 'application') {
+      throw new SchematicsException(`App shell requires a project type of "application".`);
+    }
     const componentPath = getBootstrapComponentPath(host, clientProject);
     const tmpl = getComponentTemplateInfo(host, componentPath);
     const template = getComponentTemplate(host, componentPath, tmpl);

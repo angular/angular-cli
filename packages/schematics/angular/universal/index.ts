@@ -208,6 +208,9 @@ function getTsConfigOutDir(host: Tree, architect: experimental.workspace.Workspa
 export default function (options: UniversalOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     const clientProject = getClientProject(host, options);
+    if (clientProject.projectType !== 'application') {
+      throw new SchematicsException(`Universal requires a project type of "application".`);
+    }
     const clientArchitect = getClientArchitect(host, options);
     const outDir = getTsConfigOutDir(host, clientArchitect);
     const tsConfigExtends = basename(clientArchitect.build.options.tsConfig);
