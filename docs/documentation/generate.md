@@ -20,29 +20,18 @@
 <details>
   <summary>dry-run</summary>
   <p>
-    <code>--dry-run</code> (aliases: <code>-d</code>) <em>default value: false</em>
+    <code>--dry-run</code> (alias: <code>-d</code>) 
   </p>
   <p>
     Run through without making any changes.
   </p>
 </details>
-
 <details>
   <summary>force</summary>
   <p>
-    <code>--force</code> (aliases: <code>-f</code>) <em>default value: false</em>
+    <code>--force</code> (alias: <code>-f</code>) 
   </p>
   <p>
     Forces overwriting of files.
-  </p>
-</details>
-
-<details>
-  <summary>app</summary>
-  <p>
-    <code>--app</code>
-  </p>
-  <p>
-    Specifies app name to use.
   </p>
 </details>

@@ -130,278 +130,335 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 
 ## Options
 <details>
-  <summary>aot</summary>
+  <summary>prod</summary>
   <p>
-    <code>--aot</code> <em>default value: false</em>
+    <code>--prod</code> 
   </p>
   <p>
-    Build using Ahead of Time compilation.
+    Flag to set configuration to "prod".
   </p>
 </details>
-
 <details>
-  <summary>app</summary>
+  <summary>configuration</summary>
   <p>
-    <code>--app</code> (aliases: <code>-a</code>)
+    <code>--configuration</code> (alias: <code>-c</code>) 
   </p>
   <p>
-    Specifies app name or index to use.
+    Specify the configuration to use.
   </p>
 </details>
-
 <details>
-  <summary>base-href</summary>
+  <summary>main</summary>
   <p>
-    <code>--base-href</code> (aliases: <code>-bh</code>)
+    <code>--main</code> 
   </p>
   <p>
-    Base url for the application being built.
+    The name of the main entry-point file.
   </p>
 </details>
-
 <details>
-  <summary>deploy-url</summary>
+  <summary>polyfills</summary>
   <p>
-    <code>--deploy-url</code> (aliases: <code>-d</code>)
+    <code>--polyfills</code> 
   </p>
   <p>
-    URL where files will be deployed.
+    The name of the polyfills file.
   </p>
 </details>
-
 <details>
-  <summary>environment</summary>
+  <summary>ts-config</summary>
   <p>
-    <code>--environment</code> (aliases: <code>-e</code>)
+    <code>--ts-config</code> 
   </p>
   <p>
-    Defines the build environment.
+    The name of the TypeScript configuration file.
   </p>
 </details>
-
 <details>
-  <summary>extract-css</summary>
+  <summary>optimization</summary>
   <p>
-    <code>--extract-css</code> (aliases: <code>-ec</code>)
+    <code>--optimization</code> 
   </p>
   <p>
-    Extract css from global styles onto css files instead of js ones.
-  </p>
-</details>
-
-<details>
-  <summary>i18n-file</summary>
-  <p>
-    <code>--i18n-file</code>
-  </p>
-  <p>
-    Localization file to use for i18n.
+    Defines the optimization level of the build.
   </p>
 </details>
-
-<details>
-  <summary>i18n-format</summary>
-  <p>
-    <code>--i18n-format</code>
-  </p>
-  <p>
-    Format of the localization file specified with --i18n-file.
-  </p>
-</details>
-
-<details>
-  <summary>locale</summary>
-  <p>
-    <code>--locale</code>
-  </p>
-  <p>
-    Locale to use for i18n.
-  </p>
-</details>
-
-<details>
-  <summary>missing-translation</summary>
-  <p>
-    <code>--missing-translation</code>
-  </p>
-  <p>
-    How to handle missing translations for i18n.
-  </p>
-  <p>
-    Values: <code>error</code>, <code>warning</code>, <code>ignore</code>
-  </p>
-</details>
-
-<details>
-  <summary>output-hashing</summary>
-  <p>
-    <code>--output-hashing</code> (aliases: <code>-oh</code>)
-  </p>
-  <p>
-    Define the output filename cache-busting hashing mode.
-  </p>
-  <p>
-    Values: <code>none</code>, <code>all</code>, <code>media</code>, <code>bundles</code>
-  </p>
-</details>
-
 <details>
   <summary>output-path</summary>
   <p>
-    <code>--output-path</code> (aliases: <code>-op</code>)
+    <code>--output-path</code> 
   </p>
   <p>
     Path where output will be placed.
   </p>
 </details>
-
 <details>
-  <summary>delete-output-path</summary>
+  <summary>aot</summary>
   <p>
-    <code>--delete-output-path</code> (aliases: <code>-dop</code>) <em>default value: true</<em>
+    <code>--aot</code> 
   </p>
   <p>
-    Delete the output-path directory.
+    Build using Ahead of Time compilation.
   </p>
 </details>
-
 <details>
-  <summary>poll</summary>
+  <summary>source-map</summary>
   <p>
-    <code>--poll</code>
-  </p>
-  <p>
-    Enable and define the file watching poll time period (milliseconds).
-  </p>
-</details>
-
-<details>
-  <summary>progress</summary>
-  <p>
-    <code>--progress</code> (aliases: <code>-pr</code>) <em>default value: true inside TTY, false otherwise</<em>
-  </p>
-  <p>
-    Log progress to the console while building.
-  </p>
-</details>
-
-<details>
-  <summary>sourcemap</summary>
-  <p>
-    <code>--sourcemap</code> (aliases: <code>-sm</code>, <code>sourcemaps</code>)
+    <code>--source-map</code> 
   </p>
   <p>
     Output sourcemaps.
   </p>
 </details>
-
 <details>
-  <summary>stats-json</summary>
+  <summary>eval-source-map</summary>
   <p>
-    <code>--stats-json</code>
+    <code>--eval-source-map</code> 
   </p>
   <p>
-    Generates a <code>stats.json</code> file which can be analyzed using tools such as: <code>webpack-bundle-analyzer</code> or https://webpack.github.io/analyse.
+    Output in-file eval sourcemaps.
   </p>
 </details>
-
-<details>
-  <summary>target</summary>
-  <p>
-    <code>--target</code> (aliases: <code>-t</code>, <code>-dev</code>, <code>-prod</code>) <em>default value: development</em>
-  </p>
-  <p>
-    Defines the build target.
-  </p>
-</details>
-
 <details>
   <summary>vendor-chunk</summary>
   <p>
-    <code>--vendor-chunk</code> (aliases: <code>-vc</code>) <em>default value: true</em>
+    <code>--vendor-chunk</code> 
   </p>
   <p>
     Use a separate bundle containing only vendor libraries.
   </p>
 </details>
-
 <details>
   <summary>common-chunk</summary>
   <p>
-    <code>--common-chunk</code> (aliases: <code>-cc</code>) <em>default value: true</em>
+    <code>--common-chunk</code> 
   </p>
   <p>
     Use a separate bundle containing code used across multiple bundles.
   </p>
 </details>
-
+<details>
+  <summary>base-href</summary>
+  <p>
+    <code>--base-href</code> 
+  </p>
+  <p>
+    Base url for the application being built.
+  </p>
+</details>
+<details>
+  <summary>deploy-url</summary>
+  <p>
+    <code>--deploy-url</code> 
+  </p>
+  <p>
+    URL where files will be deployed.
+  </p>
+</details>
 <details>
   <summary>verbose</summary>
   <p>
-    <code>--verbose</code> (aliases: <code>-v</code>) <em>default value: false</em>
+    <code>--verbose</code> 
   </p>
   <p>
     Adds more details to output logging.
   </p>
 </details>
-
+<details>
+  <summary>progress</summary>
+  <p>
+    <code>--progress</code> 
+  </p>
+  <p>
+    Log progress to the console while building.
+  </p>
+</details>
+<details>
+  <summary>i18n-file</summary>
+  <p>
+    <code>--i18n-file</code> 
+  </p>
+  <p>
+    Localization file to use for i18n.
+  </p>
+</details>
+<details>
+  <summary>i18n-format</summary>
+  <p>
+    <code>--i18n-format</code> 
+  </p>
+  <p>
+    Format of the localization file specified with --i18n-file.
+  </p>
+</details>
+<details>
+  <summary>i18n-locale</summary>
+  <p>
+    <code>--i18n-locale</code> 
+  </p>
+  <p>
+    Locale to use for i18n.
+  </p>
+</details>
+<details>
+  <summary>i18n-missing-translation</summary>
+  <p>
+    <code>--i18n-missing-translation</code> 
+  </p>
+  <p>
+    How to handle missing translations for i18n.
+  </p>
+</details>
+<details>
+  <summary>extract-css</summary>
+  <p>
+    <code>--extract-css</code> 
+  </p>
+  <p>
+    Extract css from global styles onto css files instead of js ones.
+  </p>
+</details>
 <details>
   <summary>watch</summary>
   <p>
-    <code>--watch</code> (aliases: <code>-w</code>)
+    <code>--watch</code> 
   </p>
   <p>
     Run build when files change.
   </p>
 </details>
-
+<details>
+  <summary>output-hashing</summary>
+  <p>
+    <code>--output-hashing</code> 
+  </p>
+  <p>
+    Define the output filename cache-busting hashing mode.
+  </p>
+</details>
+<details>
+  <summary>poll</summary>
+  <p>
+    <code>--poll</code> 
+  </p>
+  <p>
+    Enable and define the file watching poll time period in milliseconds.
+  </p>
+</details>
+<details>
+  <summary>delete-output-path</summary>
+  <p>
+    <code>--delete-output-path</code> 
+  </p>
+  <p>
+    Delete the output path before building.
+  </p>
+</details>
+<details>
+  <summary>preserve-symlinks</summary>
+  <p>
+    <code>--preserve-symlinks</code> 
+  </p>
+  <p>
+    Do not use the real path when resolving modules.
+  </p>
+</details>
+<details>
+  <summary>extract-licenses</summary>
+  <p>
+    <code>--extract-licenses</code> 
+  </p>
+  <p>
+    Extract all licenses in a separate file, in the case of production builds only.
+  </p>
+</details>
 <details>
   <summary>show-circular-dependencies</summary>
   <p>
-    <code>--show-circular-dependencies</code> (aliases: <code>-scd</code>)
+    <code>--show-circular-dependencies</code> 
   </p>
   <p>
     Show circular dependency warnings on builds.
   </p>
 </details>
-
 <details>
   <summary>build-optimizer</summary>
   <p>
-    <code>--build-optimizer</code>
+    <code>--build-optimizer</code> 
   </p>
   <p>
-    Enables @angular-devkit/build-optimizer optimizations when using `--aot`.
+    Enables @angular-devkit/build-optimizer optimizations when using the 'aot' option.
   </p>
 </details>
-
 <details>
   <summary>named-chunks</summary>
   <p>
-    <code>--named-chunks</code> (aliases: <code>-nc</code>)
+    <code>--named-chunks</code> 
   </p>
   <p>
     Use file name for lazy loaded chunks.
   </p>
 </details>
-
 <details>
-  <summary>bundle-dependencies</summary>
+  <summary>subresource-integrity</summary>
   <p>
-    <code>--bundle-dependencies</code>
+    <code>--subresource-integrity</code> 
   </p>
   <p>
-    In a server build, state whether `all` or `none` dependencies should be bundles in the output.
+    Enables the use of subresource integrity validation.
   </p>
 </details>
-
-
 <details>
-  <summary>extract-licenses</summary>
+  <summary>service-worker</summary>
   <p>
-    <code>--extract-licenses</code> <em>default value: true</<em>
+    <code>--service-worker</code> 
   </p>
   <p>
-    Extract all licenses in a separate file, in the case of production builds only.
+    Generates a service worker config for production builds.
+  </p>
+</details>
+<details>
+  <summary>ngsw-config-path</summary>
+  <p>
+    <code>--ngsw-config-path</code> 
+  </p>
+  <p>
+    Path to ngsw-config.json.
+  </p>
+</details>
+<details>
+  <summary>skip-app-shell</summary>
+  <p>
+    <code>--skip-app-shell</code> 
+  </p>
+  <p>
+    Flag to prevent building an app shell.
+  </p>
+</details>
+<details>
+  <summary>index</summary>
+  <p>
+    <code>--index</code> 
+  </p>
+  <p>
+    The name of the index HTML file.
+  </p>
+</details>
+<details>
+  <summary>stats-json</summary>
+  <p>
+    <code>--stats-json</code> 
+  </p>
+  <p>
+    Generates a 'stats.json' file which can be analyzed using tools such as: #webpack-bundle-analyzer' or https: //webpack.github.io/analyse.
+  </p>
+</details>
+<details>
+  <summary>fork-type-checker</summary>
+  <p>
+    <code>--fork-type-checker</code> 
+  </p>
+  <p>
+    Run the TypeScript type checker in a forked process.
   </p>
 </details>
