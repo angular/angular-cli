@@ -221,7 +221,7 @@ export abstract class ArchitectCommand<T = any> extends Command<T> {
   private _loadWorkspaceAndArchitect() {
     const workspaceLoader = new WorkspaceLoader(this._host);
 
-    return workspaceLoader.loadWorkspace().pipe(
+    return workspaceLoader.loadWorkspace(this.project.root).pipe(
       tap((workspace: experimental.workspace.Workspace) => this._workspace = workspace),
       concatMap((workspace: experimental.workspace.Workspace) => {
         return new Architect(workspace).loadArchitect();

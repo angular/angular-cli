@@ -43,6 +43,7 @@ switch (command) {
   case 'build-schema': commandFn = require('./build-schema').default; break;
   case 'update-version': commandFn = require('./update-version').default; break;
   case 'changelog': commandFn = require('./changelog').default; break;
+  case 'docs': commandFn = require('./generate-docs').default; break;
 }
 
 if (commandFn) {

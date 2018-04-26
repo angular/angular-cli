@@ -30,8 +30,8 @@ export class WorkspaceLoader {
     );
   }
 
-  loadWorkspace(): Observable<experimental.workspace.Workspace | null> {
-    return this._getProjectWorkspaceFilePath().pipe(
+  loadWorkspace(projectPath?: string): Observable<experimental.workspace.Workspace | null> {
+    return this._getProjectWorkspaceFilePath(projectPath).pipe(
       concatMap(globalWorkspacePath => this._loadWorkspaceFromPath(globalWorkspacePath))
     );
   }
