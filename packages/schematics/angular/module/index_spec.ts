@@ -22,6 +22,7 @@ describe('Module Schematic', () => {
     spec: true,
     module: undefined,
     flat: false,
+    project: 'bar',
   };
 
   const workspaceOptions: WorkspaceOptions = {

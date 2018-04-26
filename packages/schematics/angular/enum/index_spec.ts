@@ -19,6 +19,7 @@ describe('Enum Schematic', () => {
   );
   const defaultOptions: EnumOptions = {
     name: 'foo',
+    project: 'bar',
   };
 
   const workspaceOptions: WorkspaceOptions = {

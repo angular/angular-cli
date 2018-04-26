@@ -225,6 +225,7 @@ export default function (options: LibraryOptions): Rule {
         flat: true,
         path: sourceDir,
         spec: false,
+        project: options.name,
       }),
       schematic('component', {
         name: options.name,
@@ -234,11 +235,13 @@ export default function (options: LibraryOptions): Rule {
         flat: true,
         path: sourceDir,
         export: true,
+        project: options.name,
       }),
       schematic('service', {
         name: options.name,
         flat: true,
         path: sourceDir,
+        project: options.name,
       }),
       (_tree: Tree, context: SchematicContext) => {
         context.addTask(new NodePackageInstallTask());

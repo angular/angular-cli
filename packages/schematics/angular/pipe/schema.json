@@ -21,7 +21,9 @@
     "project": {
       "type": "string",
       "description": "The name of the project.",
-      "visible": false
+      "$default": {
+        "$source": "projectName"
+      }
     },
     "flat": {
       "type": "boolean",

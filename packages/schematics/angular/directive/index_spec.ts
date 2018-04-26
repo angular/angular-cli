@@ -24,6 +24,7 @@ describe('Directive Schematic', () => {
     export: false,
     prefix: 'app',
     flat: true,
+    project: 'bar',
   };
 
   const workspaceOptions: WorkspaceOptions = {

@@ -21,6 +21,7 @@ describe('Interface Schematic', () => {
     name: 'foo',
     prefix: '',
     type: '',
+    project: 'bar',
   };
 
   const workspaceOptions: WorkspaceOptions = {

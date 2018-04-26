@@ -22,6 +22,7 @@ describe('Guard Schematic', () => {
     spec: true,
     module: undefined,
     flat: true,
+    project: 'bar',
   };
   const workspaceOptions: WorkspaceOptions = {
     name: 'workspace',

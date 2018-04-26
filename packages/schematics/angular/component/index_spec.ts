@@ -28,6 +28,7 @@ describe('Component Schematic', () => {
     spec: true,
     module: undefined,
     export: false,
+    project: 'bar',
   };
 
 
@@ -253,7 +254,7 @@ describe('Component Schematic', () => {
   });
 
   it('should handle a path in the name and module options', () => {
-    appTree = schematicRunner.runSchematic('module', { name: 'admin/module' }, appTree);
+    appTree = schematicRunner.runSchematic('module', { name: 'admin/module', project: 'bar' }, appTree);
 
     const options = { ...defaultOptions, name: 'other/test-component', module: 'admin/module' };
     appTree = schematicRunner.runSchematic('component', options, appTree);

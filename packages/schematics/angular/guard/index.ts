@@ -69,7 +69,7 @@ export default function (options: GuardOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     const workspace = getWorkspace(host);
     if (!options.project) {
-      options.project = Object.keys(workspace.projects)[0];
+      throw new SchematicsException('Option (project) is required.');
     }
     const project = workspace.projects[options.project];
 

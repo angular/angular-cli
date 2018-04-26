@@ -21,6 +21,7 @@ describe('Class Schematic', () => {
     name: 'foo',
     type: '',
     spec: false,
+    project: 'bar',
   };
 
 

@@ -24,6 +24,7 @@ describe('Pipe Schematic', () => {
     module: undefined,
     export: false,
     flat: true,
+    project: 'bar',
   };
 
   const workspaceOptions: WorkspaceOptions = {

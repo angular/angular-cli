@@ -346,6 +346,7 @@ export default function (options: ApplicationOptions): Rule {
         routingScope: 'Root',
         path: sourceDir,
         spec: false,
+        project: options.name,
       }),
       schematic('component', {
         name: 'app',
@@ -353,6 +354,7 @@ export default function (options: ApplicationOptions): Rule {
         flat: true,
         path: sourceDir,
         skipImport: true,
+        project: options.name,
         ...componentOptions,
       }),
       mergeWith(
