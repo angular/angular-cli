@@ -22,11 +22,7 @@ With the new project created and ready you will next need to install bootstrap t
 Using the `--save` option the dependency will be saved in package.json
 
 ```sh
-# version 3.x
 npm install bootstrap --save
-
-# version 4.x
-npm install bootstrap@next --save
 ```
 
 ### Configuring Project
@@ -74,33 +70,19 @@ cd my-app
 ### Installing Bootstrap
 
 ```sh
-# version 3.x
-npm install bootstrap-sass --save
-
-# version 4.x
-npm install bootstrap@next --save
+npm install bootstrap --save
 ```
 
 ### Configuring Project
 
-Create an empty file `_variables.scss` in `src/`.
-
-If you are using `bootstrap-sass`, add the following to `_variables.scss`:
-
-```sass
-$icon-font-path: '../node_modules/bootstrap-sass/assets/fonts/bootstrap/';
-```
+Create an empty file `_variables.scss` in `src/`. The `_variables.scss` file allows us to customize Bootstrap by overriding Sass variables
+used by Boostrap. For instance, you can add `$primary: red;` to use red as primary color.
 
 In `styles.scss` add the following:
 
 ```sass
-// version 3
 @import 'variables';
-@import '../node_modules/bootstrap-sass/assets/stylesheets/_bootstrap';
-
-// version 4
-@import 'variables';
-@import '../node_modules/bootstrap/scss/bootstrap';
+@import '~bootstrap/scss/bootstrap';
 ```
 
 ### Testing Project
@@ -117,10 +99,6 @@ Verify the bootstrap styled button appears.
 To ensure your variables are used open `_variables.scss` and add the following:
 
 ```sass
-// version 3
-$brand-primary: red;
-
-// version 4
 $primary: red;
 ```
 
