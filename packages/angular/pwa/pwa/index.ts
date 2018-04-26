@@ -41,7 +41,7 @@ export default function (options: PwaOptions): Rule {
 
     options.title = options.title || options.project;
 
-    const tempalteSource = apply(url('./files/assets'), [
+    const templateSource = apply(url('./files/assets'), [
       template({
         ...options,
       }),
@@ -53,7 +53,7 @@ export default function (options: PwaOptions): Rule {
     return chain([
       addServiceWorker(options),
       branchAndMerge(chain([
-        mergeWith(tempalteSource),
+        mergeWith(templateSource),
       ])),
     ])(host, context);
   };
