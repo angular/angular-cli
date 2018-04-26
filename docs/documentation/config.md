@@ -12,7 +12,7 @@ If both the `[key]` and `[value]` are provided it will set the value.
 <details>
   <summary>global</summary>
   <p>
-    <code>--global</code> <em>default value: false</em>
+    <code>--global</code> (alias: <code>-g</code>) 
   </p>
   <p>
     Get/set the value in the global configuration (in your home directory).
