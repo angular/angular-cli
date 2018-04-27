@@ -219,7 +219,9 @@ export interface BrowserBuilderSchema {
   budgets: Budget[];
 }
 
-export interface AssetPattern {
+export type AssetPattern = string | AssetPatternObject;
+
+export interface AssetPatternObject {
   /**
    * The pattern to match.
    */

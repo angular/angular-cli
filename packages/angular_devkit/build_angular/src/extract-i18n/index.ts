@@ -26,6 +26,7 @@ import {
 import { getWebpackStatsConfig } from '../angular-cli-files/models/webpack-configs/utils';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { statsErrorsToString, statsWarningsToString } from '../angular-cli-files/utilities/stats';
+import { NormalizedBrowserBuilderSchema } from '../browser';
 import { BrowserBuilderSchema } from '../browser/schema';
 const MemoryFS = require('memory-fs');
 const webpackMerge = require('webpack-merge');
@@ -122,7 +123,7 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
   buildWebpackConfig(
     root: Path,
     projectRoot: Path,
-    options: BrowserBuilderSchema,
+    options: NormalizedBrowserBuilderSchema,
   ) {
     let wco: WebpackConfigOptions;
 

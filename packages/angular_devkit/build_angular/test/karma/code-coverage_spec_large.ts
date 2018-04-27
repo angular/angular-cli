@@ -8,7 +8,7 @@
 
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, tap } from 'rxjs/operators';
-import { KarmaBuilderOptions } from '../../src';
+import { NormalizedKarmaBuilderSchema } from '../../src';
 import { host, karmaTargetSpec, runTargetSpec } from '../utils';
 
 
@@ -19,7 +19,7 @@ describe('Karma Builder code coverage', () => {
   afterEach(done => host.restore().subscribe(undefined, done.fail, done));
 
   it('works', (done) => {
-    const overrides: Partial<KarmaBuilderOptions> = { codeCoverage: true };
+    const overrides: Partial<NormalizedKarmaBuilderSchema> = { codeCoverage: true };
 
     runTargetSpec(host, karmaTargetSpec, overrides).pipe(
       // It seems like the coverage files take a while being written to disk, so we wait 500ms here.
@@ -35,7 +35,7 @@ describe('Karma Builder code coverage', () => {
   }, 120000);
 
   it('supports exclude', (done) => {
-    const overrides: Partial<KarmaBuilderOptions> = {
+    const overrides: Partial<NormalizedKarmaBuilderSchema> = {
       codeCoverage: true,
       codeCoverageExclude: [
         'src/polyfills.ts',

@@ -27,9 +27,9 @@ import {
   statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
-import { BrowserBuilder } from '../browser/';
+import { BrowserBuilder, NormalizedBrowserBuilderSchema } from '../browser/';
 import { BrowserBuilderSchema } from '../browser/schema';
-import { addFileReplacements } from '../utils';
+import { addFileReplacements, normalizeAssetPatterns } from '../utils';
 const opn = require('opn');
 const WebpackDevServer = require('webpack-dev-server');
 
@@ -104,10 +104,14 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
       concatMap(() => this._getBrowserOptions(options)),
       tap((opts) => browserOptions = opts),
       concatMap(() => addFileReplacements(root, host, browserOptions.fileReplacements)),
+      concatMap(() => normalizeAssetPatterns(
+        browserOptions.assets, host, root, projectRoot, builderConfig.sourceRoot)),
+      // Replace the assets in options with the normalized version.
+      tap((assetPatternObjects => browserOptions.assets = assetPatternObjects)),
       concatMap(() => new Observable(obs => {
         const browserBuilder = new BrowserBuilder(this.context);
         const webpackConfig = browserBuilder.buildWebpackConfig(
-          root, projectRoot, host, browserOptions);
+          root, projectRoot, host, browserOptions as NormalizedBrowserBuilderSchema);
         const statsConfig = getWebpackStatsConfig(browserOptions.verbose);
 
         let webpackDevServerConfig: WebpackDevServerConfigurationOptions;

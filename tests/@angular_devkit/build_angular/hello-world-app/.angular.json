@@ -8,6 +8,7 @@
   "projects": {
     "app": {
       "root": "src",
+      "sourceRoot": "src",
       "projectType": "application",
       "prefix": "app",
       "schematics": {},

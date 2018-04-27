@@ -16,8 +16,10 @@ describe('Karma Builder assets', () => {
 
   it('works', (done) => {
     const assets: { [path: string]: string } = {
-      './src/folder/folder-asset.txt': 'folder-asset.txt',
+      './src/string-file-asset.txt': 'string-file-asset.txt',
+      './src/string-folder-asset/file.txt': 'string-folder-asset.txt',
       './src/glob-asset.txt': 'glob-asset.txt',
+      './src/folder/folder-asset.txt': 'folder-asset.txt',
       './src/output-asset.txt': 'output-asset.txt',
     };
     host.writeMultipleFiles(assets);
@@ -51,8 +53,10 @@ describe('Karma Builder assets', () => {
         })
         export class AppComponent {
           public assets = [
-            { path: './folder/folder-asset.txt', content: '' },
+            { path: './string-file-asset.txt', content: '' },
+            { path: './string-folder-asset/file.txt', content: '' },
             { path: './glob-asset.txt', content: '' },
+            { path: './folder/folder-asset.txt', content: '' },
             { path: './output-folder/output-asset.txt', content: '' },
           ];
           constructor(private http: Http) {
@@ -87,6 +91,8 @@ describe('Karma Builder assets', () => {
 
     const overrides = {
       assets: [
+        'src/string-file-asset.txt',
+        'src/string-folder-asset',
         { glob: 'glob-asset.txt', input: 'src/', output: '/' },
         { glob: 'output-asset.txt', input: 'src/', output: '/output-folder' },
         { glob: '**/*', input: 'src/folder', output: '/folder' },

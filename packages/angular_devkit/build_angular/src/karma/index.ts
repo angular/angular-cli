@@ -15,7 +15,7 @@ import {
 import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable, of } from 'rxjs';
-import { concatMap } from 'rxjs/operators';
+import { concatMap, tap } from 'rxjs/operators';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import {
@@ -26,20 +26,21 @@ import {
 } from '../angular-cli-files/models/webpack-configs';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
-import { CurrentFileReplacement } from '../browser/schema';
-import { addFileReplacements } from '../utils';
+import { AssetPatternObject, CurrentFileReplacement } from '../browser/schema';
+import { addFileReplacements, normalizeAssetPatterns } from '../utils';
 import { KarmaBuilderSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
 
-export interface KarmaBuilderOptions extends KarmaBuilderSchema {
+export interface NormalizedKarmaBuilderSchema extends KarmaBuilderSchema {
+  assets: AssetPatternObject[];
   fileReplacements: CurrentFileReplacement[];
 }
 
-export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
+export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
   constructor(public context: BuilderContext) { }
 
-  run(builderConfig: BuilderConfiguration<KarmaBuilderOptions>): Observable<BuildEvent> {
+  run(builderConfig: BuilderConfiguration<KarmaBuilderSchema>): Observable<BuildEvent> {
     const options = builderConfig.options;
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
@@ -47,6 +48,10 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
 
     return of(null).pipe(
       concatMap(() => addFileReplacements(root, host, options.fileReplacements)),
+      concatMap(() => normalizeAssetPatterns(
+        options.assets, host, root, projectRoot, builderConfig.sourceRoot)),
+      // Replace the assets in options with the normalized version.
+      tap((assetPatternObjects => options.assets = assetPatternObjects)),
       concatMap(() => new Observable(obs => {
         const karma = requireProjectModule(getSystemPath(projectRoot), 'karma');
         const karmaConfig = getSystemPath(resolve(root, normalize(options.karmaConfig)));
@@ -66,8 +71,9 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
         karmaOptions.buildWebpack = {
           root: getSystemPath(root),
           projectRoot: getSystemPath(projectRoot),
-          options: options,
-          webpackConfig: this._buildWebpackConfig(root, projectRoot, host, options),
+          options: options as NormalizedKarmaBuilderSchema,
+          webpackConfig: this._buildWebpackConfig(root, projectRoot, host,
+            options as NormalizedKarmaBuilderSchema),
           // Pass onto Karma to emit BuildEvents.
           successCb: () => obs.next({ success: true }),
           failureCb: () => obs.next({ success: false }),
@@ -100,7 +106,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderOptions> {
     root: Path,
     projectRoot: Path,
     host: virtualFs.Host<fs.Stats>,
-    options: KarmaBuilderOptions,
+    options: NormalizedKarmaBuilderSchema,
   ) {
     let wco: WebpackConfigOptions;
 

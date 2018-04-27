@@ -10,7 +10,7 @@
 
 // tslint:disable-next-line:no-implicit-dependencies
 import * as ts from 'typescript';
-import { AssetPattern, Budget, ExtraEntryPoint } from '../../browser/schema';
+import { AssetPatternObject, Budget, ExtraEntryPoint } from '../../browser/schema';
 
 export interface BuildOptions {
   optimization: boolean;
@@ -51,7 +51,7 @@ export interface BuildOptions {
   index: string;
   polyfills?: string;
   budgets: Budget[];
-  assets: AssetPattern[];
+  assets: AssetPatternObject[];
   scripts: ExtraEntryPoint[];
   styles: ExtraEntryPoint[];
   stylePreprocessorOptions?: { includePaths: string[] };

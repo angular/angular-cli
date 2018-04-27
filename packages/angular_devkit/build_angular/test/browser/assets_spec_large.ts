@@ -18,19 +18,26 @@ describe('Browser Builder assets', () => {
   it('works', (done) => {
     const assets: { [path: string]: string } = {
       './src/folder/.gitkeep': '',
-      './src/folder/folder-asset.txt': 'folder-asset.txt',
+      './src/string-file-asset.txt': 'string-file-asset.txt',
+      './src/string-folder-asset/file.txt': 'string-folder-asset.txt',
       './src/glob-asset.txt': 'glob-asset.txt',
+      './src/folder/folder-asset.txt': 'folder-asset.txt',
       './src/output-asset.txt': 'output-asset.txt',
     };
     const matches: { [path: string]: string } = {
-      './dist/folder/folder-asset.txt': 'folder-asset.txt',
+      './dist/string-file-asset.txt': 'string-file-asset.txt',
+      './dist/string-folder-asset/file.txt': 'string-folder-asset.txt',
       './dist/glob-asset.txt': 'glob-asset.txt',
+      './dist/folder/folder-asset.txt': 'folder-asset.txt',
       './dist/output-folder/output-asset.txt': 'output-asset.txt',
     };
     host.writeMultipleFiles(assets);
 
     const overrides = {
       assets: [
+        'src/string-file-asset.txt',
+        'src/string-folder-asset',
+        { glob: 'glob-asset.txt', input: 'src/', output: '/' },
         { glob: 'glob-asset.txt', input: 'src/', output: '/' },
         { glob: 'output-asset.txt', input: 'src/', output: '/output-folder' },
         { glob: '**/*', input: 'src/folder', output: '/folder' },
@@ -60,6 +67,22 @@ describe('Browser Builder assets', () => {
       assets: [{
         glob: '**/*', input: '../node_modules/some-package/', output: '../temp',
       }],
+    };
+
+    runTargetSpec(host, browserTargetSpec, overrides).subscribe(undefined, done, done.fail);
+
+    // The node_modules folder must be deleted, otherwise code that tries to find the
+    // node_modules folder will hit this one and can fail.
+    host.scopedSync().delete(normalize('./node_modules'));
+  }, Timeout.Basic);
+
+  it('fails with non-source root input path', (done) => {
+    const assets: { [path: string]: string } = {
+      './node_modules/some-package/node_modules-asset.txt': 'node_modules-asset.txt',
+    };
+    host.writeMultipleFiles(assets);
+    const overrides = {
+      assets: ['not-source-root/file.txt'],
     };
 
     runTargetSpec(host, browserTargetSpec, overrides).subscribe(undefined, done, done.fail);

@@ -12,7 +12,7 @@ import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 import { findUp } from '../../utilities/find-up';
-import { AssetPattern, ExtraEntryPoint } from '../../../browser/schema';
+import { AssetPatternObject, ExtraEntryPoint } from '../../../browser/schema';
 import { normalizeExtraEntryPoints } from './utils';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
@@ -105,7 +105,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   // process asset entries
   if (buildOptions.assets) {
-    const copyWebpackPluginPatterns = buildOptions.assets.map((asset: AssetPattern) => {
+    const copyWebpackPluginPatterns = buildOptions.assets.map((asset: AssetPatternObject) => {
 
       // Resolve input paths relative to workspace root and add slash at the end.
       asset.input = path.resolve(root, asset.input).replace(/\\/g, '/');
@@ -113,20 +113,14 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       asset.output = asset.output.endsWith('/') ? asset.output : asset.output + '/';
 
       if (asset.output.startsWith('..')) {
-        const message = 'An asset cannot be written to a location outside of the . '
-          + 'You can override this message by setting the `allowOutsideOutDir` '
-          + 'property on the asset to true in the CLI configuration.';
+        const message = 'An asset cannot be written to a location outside of the output path.';
         throw new Error(message);
-      }
-
-      if (asset.output.startsWith('/')) {
-        // Now we remove starting slash to make Webpack place it from the output root.
-        asset.output = asset.output.slice(1);
       }
 
       return {
         context: asset.input,
-        to: asset.output,
+        // Now we remove starting slash to make Webpack place it from the output root.
+        to: asset.output.replace(/^\//, ''),
         from: {
           glob: asset.glob,
           dot: true
@@ -164,8 +158,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   if (buildOptions.buildOptimizer) {
     // Set the cache directory to the Build Optimizer dir, so that package updates will delete it.
     const buildOptimizerDir = g['_DevKitIsLocal']
-     ? nodeModules
-     : path.dirname(resolve.sync('@angular-devkit/build-optimizer', { basedir: projectRoot }));
+      ? nodeModules
+      : path.dirname(resolve.sync('@angular-devkit/build-optimizer', { basedir: projectRoot }));
     const cacheDirectory = path.resolve(buildOptimizerDir, './.cache/');
 
     buildOptimizerUseRule = {

@@ -14,9 +14,10 @@ import {
 import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable, concat, of } from 'rxjs';
-import { concatMap, last } from 'rxjs/operators';
+import { concatMap, last, tap } from 'rxjs/operators';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import * as webpack from 'webpack';
+import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import {
   getAotConfig,
   getBrowserConfig,
@@ -33,18 +34,19 @@ import {
   statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
-import { addFileReplacements } from '../utils';
-import { BrowserBuilderSchema } from './schema';
+import { addFileReplacements, normalizeAssetPatterns } from '../utils';
+import { AssetPatternObject, BrowserBuilderSchema, CurrentFileReplacement } from './schema';
 const webpackMerge = require('webpack-merge');
 
 
-export interface WebpackConfigOptions {
-  root: string;
-  projectRoot: string;
-  buildOptions: BrowserBuilderSchema;
-  tsConfig: ts.ParsedCommandLine;
-  tsConfigPath: string;
-  supportES2015: boolean;
+// TODO: figure out a better way to normalize assets, extra entry points, file replacements,
+// and whatever else needs to be normalized, while keeping type safety.
+// Right now this normalization has to be done in all other builders that make use of the
+// BrowserBuildSchema and BrowserBuilder.buildWebpackConfig.
+// It would really help if it happens during architect.validateBuilderOptions, or similar.
+export interface NormalizedBrowserBuilderSchema extends BrowserBuilderSchema {
+  assets: AssetPatternObject[];
+  fileReplacements: CurrentFileReplacement[];
 }
 
 export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
@@ -62,6 +64,10 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
         ? this._deleteOutputDir(root, normalize(options.outputPath), this.context.host)
         : of(null)),
       concatMap(() => addFileReplacements(root, host, options.fileReplacements)),
+      concatMap(() => normalizeAssetPatterns(
+        options.assets, host, root, projectRoot, builderConfig.sourceRoot)),
+      // Replace the assets in options with the normalized version.
+      tap((assetPatternObjects => options.assets = assetPatternObjects)),
       concatMap(() => new Observable(obs => {
         // Ensure Build Optimizer is only used with AOT.
         if (options.buildOptimizer && !options.aot) {
@@ -70,7 +76,8 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
 
         let webpackConfig;
         try {
-          webpackConfig = this.buildWebpackConfig(root, projectRoot, host, options);
+          webpackConfig = this.buildWebpackConfig(root, projectRoot, host,
+            options as NormalizedBrowserBuilderSchema);
         } catch (e) {
           obs.error(e);
 
@@ -153,9 +160,9 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
     root: Path,
     projectRoot: Path,
     host: virtualFs.Host<fs.Stats>,
-    options: BrowserBuilderSchema,
+    options: NormalizedBrowserBuilderSchema,
   ) {
-    let wco: WebpackConfigOptions;
+    let wco: WebpackConfigOptions<NormalizedBrowserBuilderSchema>;
 
     const tsConfigPath = getSystemPath(normalize(resolve(root, normalize(options.tsConfig))));
     const tsConfig = readTsconfig(tsConfigPath);
