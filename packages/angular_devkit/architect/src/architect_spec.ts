@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { experimental, normalize, schema } from '@angular-devkit/core';
+import { Path, experimental, normalize, schema } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { concatMap, tap, toArray } from 'rxjs/operators';
 import { BrowserTargetOptions } from '../test/browser';
@@ -29,6 +29,7 @@ describe('Architect', () => {
     projects: {
       app: {
         root: 'app',
+        sourceRoot: 'app/src',
         projectType: 'application',
         architect: {
           browser: {
@@ -66,6 +67,7 @@ describe('Architect', () => {
     const targetSpec = { project: 'app', target: 'browser', configuration: 'prod' };
     const builderConfig = architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec);
     expect(builderConfig.root).toBe('app');
+    expect(builderConfig.sourceRoot).toBe('app/src' as Path);
     expect(builderConfig.projectType).toBe('application');
     expect(builderConfig.builder).toBe('../test:browser');
     expect(builderConfig.options.browserOption).toBe(1);

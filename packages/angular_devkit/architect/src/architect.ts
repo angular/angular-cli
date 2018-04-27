@@ -70,6 +70,7 @@ export class BuilderNotFoundException extends BaseException {
 
 export interface BuilderConfiguration<OptionsT = {}> {
   root: Path;
+  sourceRoot?: Path;
   projectType: string;
   builder: string;
   options: OptionsT;
@@ -189,6 +190,7 @@ export class Architect {
 
     const builderConfiguration: BuilderConfiguration<OptionsT> = {
       root: project.root as Path,
+      sourceRoot: project.sourceRoot as Path | undefined,
       projectType: project.projectType,
       builder: target.builder,
       options: {
