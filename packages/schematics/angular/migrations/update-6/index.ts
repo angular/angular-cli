@@ -216,14 +216,7 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
 
       function _mapAssets(asset: string | JsonObject) {
         if (typeof asset === 'string') {
-          if (tree.exists(app.root + '/' + asset)) {
-            // If it exists in the tree, then it is a file.
-            return { glob: asset, input: normalize(appRoot + '/'), output: '/' };
-          } else {
-            // If it does not exist, it is either a folder or something we can't statically know.
-            // Folders must get a recursive star glob.
-            return { glob: '**/*', input: normalize(appRoot + '/' + asset), output: '/' + asset };
-          }
+          return normalize(appRoot + '/' + asset);
         } else {
           if (asset.output) {
             return {
@@ -346,6 +339,7 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
 
       const project: JsonObject = {
         root: '',
+        sourceRoot: 'src',
         projectType: 'application',
       };
 
@@ -482,6 +476,7 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
       }
       const e2eProject: JsonObject = {
         root: project.root,
+        sourceRoot: project.root,
         projectType: 'application',
         cli: {},
         schematics: {},

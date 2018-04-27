@@ -513,8 +513,8 @@ describe('Migration to v6', () => {
         expect(build.options.styles).toEqual(['src/styles.css']);
         expect(build.options.stylePreprocessorOptions).toEqual({includePaths: ['src/styleInc']});
         expect(build.options.assets).toEqual([
-          { glob: '**/*', input: 'src/assets', output: '/assets' },
-          { glob: 'favicon.ico', input: 'src', output: '/' },
+          'src/assets',
+          'src/favicon.ico',
           { glob: '**/*', input: 'src/assets', output: '/assets' },
           { glob: 'favicon.ico', input: 'src', output: '/' },
         ]);
@@ -574,8 +574,8 @@ describe('Migration to v6', () => {
         expect(test.options.scripts).toEqual([]);
         expect(test.options.styles).toEqual(['src/styles.css']);
         expect(test.options.assets).toEqual([
-          { glob: '**/*', input: 'src/assets', output: '/assets' },
-          { glob: 'favicon.ico', input: 'src', output: '/' },
+          'src/assets',
+          'src/favicon.ico',
           { glob: '**/*', input: 'src/assets', output: '/assets' },
           { glob: 'favicon.ico', input: 'src', output: '/' },
         ]);
