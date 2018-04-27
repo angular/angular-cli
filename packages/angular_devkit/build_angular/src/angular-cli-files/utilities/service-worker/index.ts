@@ -37,21 +37,25 @@ class CliFilesystem implements Filesystem {
   }
 
   read(path: string): Promise<string> {
-    return this._host.read(this._resolve(path))
-      .toPromise()
+    return this._readIntoBuffer(path)
       .then(content => virtualFs.fileBufferToString(content));
   }
 
   hash(path: string): Promise<string> {
     const sha1 = crypto.createHash('sha1');
 
-    return this.read(path)
-      .then(content => sha1.update(content))
+    return this._readIntoBuffer(path)
+      .then(content => sha1.update(Buffer.from(content)))
       .then(() => sha1.digest('hex'));
   }
 
   write(path: string, content: string): Promise<void> {
     return this._host.write(this._resolve(path), virtualFs.stringToFileBuffer(content))
+      .toPromise();
+  }
+
+  private _readIntoBuffer(path: string): Promise<virtualFs.FileBuffer> {
+    return this._host.read(this._resolve(path))
       .toPromise();
   }
 
