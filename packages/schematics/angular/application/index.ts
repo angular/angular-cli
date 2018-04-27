@@ -137,6 +137,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
 
   const project: WorkspaceProject = {
     root: projectRoot,
+    sourceRoot: `${projectRoot}/src`,
     projectType: 'application',
     prefix: options.prefix || 'app',
     schematics,

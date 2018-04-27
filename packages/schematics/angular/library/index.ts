@@ -130,6 +130,7 @@ function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSche
 
   const project: WorkspaceProject = {
     root: `${projectRoot}`,
+    sourceRoot: `${projectRoot}/src`,
     projectType: 'library',
     prefix: options.prefix || 'lib',
     architect: {
