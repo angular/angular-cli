@@ -12,7 +12,7 @@
   ],
   "dependencies": {
     "ajv": "~6.4.0",
-    "chokidar": "^1.7.0",
+    "chokidar": "^2.0.3",
     "source-map": "^0.5.6",
     "rxjs": "^6.0.0"
   }
