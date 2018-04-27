@@ -1,3 +1,5 @@
+import { tags } from '@angular-devkit/core';
+import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
 import chalk from 'chalk';
 import { CommandScope, Option } from '../models/command';
 import { parseOptions } from '../models/command-runner';
@@ -81,6 +83,17 @@ export default class AddCommand extends SchematicCommand {
       force: false,
     };
 
-    return await this.runSchematic(runOptions);
+    try {
+      return await this.runSchematic(runOptions);
+    } catch (e) {
+      if (e instanceof NodePackageDoesNotSupportSchematics) {
+        throw new SilentError(tags.oneLine`
+          The package that you are trying to add does not support schematics. You can try using
+          a different version of the package or contact the package author to add ng-add support.
+        `);
+      }
+
+      throw e;
+    }
   }
 }
