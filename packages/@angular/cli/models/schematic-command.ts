@@ -116,6 +116,13 @@ export abstract class SchematicCommand extends Command {
     });
     delete schematicOptions._;
 
+    workflow.registry.addSmartDefaultProvider('projectName', (_schema: JsonObject) => {
+      if (this._workspace) {
+        return this._workspace.getDefaultProjectName();
+      }
+      return undefined;
+    });
+
     workflow.reporter.subscribe((event: DryRunEvent) => {
       nothingDone = false;
 
