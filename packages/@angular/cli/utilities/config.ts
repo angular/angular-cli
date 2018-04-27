@@ -14,9 +14,7 @@ import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { findUp } from './find-up';
 
 function getSchemaLocation(): string {
-  const packagePath = require.resolve('@angular-devkit/core/package.json');
-
-  return path.join(path.dirname(packagePath), 'src/workspace/workspace-schema.json');
+  return path.join(__dirname, '../lib/config/schema.json');
 }
 
 export const workspaceSchemaPath = getSchemaLocation();
@@ -59,12 +57,8 @@ export function getWorkspace(
   let configPath = level === 'local' ? projectFilePath() : globalFilePath();
 
   if (!configPath) {
-    if (level === 'global') {
-      configPath = createGlobalSettings();
-    } else {
-      cachedWorkspaces.set(level, null);
-      return null;
-    }
+    cachedWorkspaces.set(level, null);
+    return null;
   }
 
   const root = normalize(path.dirname(configPath));
@@ -79,7 +73,7 @@ export function getWorkspace(
   return workspace;
 }
 
-function createGlobalSettings(): string {
+export function createGlobalSettings(): string {
   const home = os.homedir();
   if (!home) {
     throw new Error('No home directory found.');
@@ -135,7 +129,7 @@ export function validateWorkspace(json: JsonValue) {
 }
 
 export function getPackageManager(): string {
-  let workspace = getWorkspace();
+  let workspace = getWorkspace('local');
 
   if (workspace) {
     const project = workspace.getProjectByPath(normalize(process.cwd()));
@@ -144,7 +138,8 @@ export function getPackageManager(): string {
       if (typeof value == 'string') {
         return value;
       }
-    } else if (workspace.getCli()) {
+    }
+    if (workspace.getCli()) {
       const value = workspace.getCli()['packageManager'];
       if (typeof value == 'string') {
         return value;
@@ -253,7 +248,8 @@ export function isWarningEnabled(warning: string): boolean {
           return value;
         }
       }
-    } else if (workspace.getCli()) {
+    }
+    if (workspace.getCli()) {
       const warnings = workspace.getCli()['warnings'];
       if (typeof warnings == 'object' && !Array.isArray(warnings)) {
         const value = warnings[warning];
