@@ -64,6 +64,10 @@
           "type": "string",
           "description": "Root of the project sourcefiles."
         },
+        "sourceRoot": {
+          "type": "string",
+          "description": "The root of the source files, assets and index.html file structure."
+        },
         "prefix": {
           "type": "string",
           "description": "The prefix to apply to generated selectors."

@@ -51,6 +51,7 @@ describe('Workspace', () => {
     projects: {
       app: {
         root: 'projects/app',
+        sourceRoot: 'projects/app/src',
         projectType: 'application',
         prefix: 'app',
         cli: {},
