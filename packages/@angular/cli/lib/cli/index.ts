@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { filter } from 'rxjs/operators';
-import { logging, terminal, dirname, Path } from '@angular-devkit/core';
+import { logging, terminal } from '@angular-devkit/core';
 import { runCommand } from '../../models/command-runner';
 import { findUp } from '../../utilities/find-up';
 
@@ -52,7 +52,7 @@ export default async function(options: any) {
   const possibleConfigNames = ['angular.json', '.angular.json'];
   const workspacePath = findUp(possibleConfigNames, process.cwd());
   const projectRoot = workspacePath !== null
-    ? dirname(workspacePath as Path)
+    ? path.dirname(workspacePath)
     : process.cwd();
   const context = {
     project: {
