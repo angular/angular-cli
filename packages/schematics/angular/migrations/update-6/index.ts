@@ -366,6 +366,16 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
         buildOptions.polyfills = appRoot + '/' + app.polyfills;
       }
 
+      if (app.stylePreprocessorOptions
+          && app.stylePreprocessorOptions.includePaths
+          && Array.isArray(app.stylePreprocessorOptions.includePaths)
+          && app.stylePreprocessorOptions.includePaths.length > 0) {
+        buildOptions.stylePreprocessorOptions = {
+          includePaths: app.stylePreprocessorOptions.includePaths
+            .map(includePath => join(app.root as Path, includePath)),
+        };
+      }
+
       buildOptions.assets = (app.assets || []).map(_mapAssets);
       buildOptions.styles = (app.styles || []).map(_extraEntryMapper);
       buildOptions.scripts = (app.scripts || []).map(_extraEntryMapper);
