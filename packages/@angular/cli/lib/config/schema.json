@@ -135,8 +135,7 @@
               "default": false,
               "description": "Specifies if declaring module exports the component."
             }
-          },
-          "required": []
+          }
         },
         "@schematics/angular:directive": {
           "type": "object",
@@ -178,8 +177,7 @@
               "default": false,
               "description": "Specifies if declaring module exports the directive."
             }
-          },
-          "required": []
+          }
         },
         "@schematics/angular:module": {
           "type": "object",
@@ -216,8 +214,7 @@
               "description": "Allows specification of the declaring module.",
               "alias": "m"
             }
-          },
-          "required": []
+          }
         },
         "@schematics/angular:service": {
           "type": "object",
@@ -327,6 +324,10 @@
         "root",
         "projectType"
       ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z]{1,3}-.*": {}
+      },
       "definitions": {
         "target": {
           "oneOf": [
@@ -511,11 +512,7 @@
               "description": "The output path of the index.html file. By default will overwrite the input file."
             }
           },
-          "additionalProperties": false,
-          "required": [
-            "browserTarget",
-            "serverTarget"
-          ]
+          "additionalProperties": false
         },
         "browser": {
           "title": "Webpack browser schema for Build Facade.",
@@ -750,12 +747,6 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "outputPath",
-            "index",
-            "main",
-            "tsConfig"
-          ],
           "definitions": {
             "assetPattern": {
               "type": "object",
@@ -1021,10 +1012,7 @@
               "description": "Log progress to the console while building."
             }
           },
-          "additionalProperties": false,
-          "required": [
-            "browserTarget"
-          ]
+          "additionalProperties": false
         },
         "extracti18n": {
           "description": "Extract i18n target options for Build Facade.",
@@ -1060,10 +1048,7 @@
               "description": "Name of the file to output."
             }
           },
-          "additionalProperties": false,
-          "required": [
-            "browserTarget"
-          ]
+          "additionalProperties": false
         },
         "karma": {
           "description": "Karma target options for Build Facade.",
@@ -1212,11 +1197,6 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "main",
-            "tsConfig",
-            "karmaConfig"
-          ],
           "definitions": {
             "assetPattern": {
               "type": "object",
@@ -1327,10 +1307,7 @@
               "description": "Base URL for protractor to connect to."
             }
           },
-          "additionalProperties": false,
-          "required": [
-            "protractorConfig"
-          ]
+          "additionalProperties": false
         },
         "server": {
           "title": "Angular Webpack Architect Builder Schema",
@@ -1487,11 +1464,6 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "outputPath",
-            "main",
-            "tsConfig"
-          ],
           "definitions": {
             "fileReplacement": {
               "oneOf": [
@@ -1605,8 +1577,7 @@
               }
             }
           },
-          "additionalProperties": false,
-          "required": []
+          "additionalProperties": false
         }
       }
     }
