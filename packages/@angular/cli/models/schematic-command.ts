@@ -118,7 +118,8 @@ export abstract class SchematicCommand extends Command {
 
     workflow.registry.addSmartDefaultProvider('projectName', (_schema: JsonObject) => {
       if (this._workspace) {
-        return this._workspace.getDefaultProjectName();
+        return this._workspace.getProjectByPath(normalize(process.cwd()))
+               || this._workspace.getDefaultProjectName();
       }
       return undefined;
     });
