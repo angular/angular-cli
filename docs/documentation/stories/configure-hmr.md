@@ -41,21 +41,21 @@ export const environment = {
 ```
 
 
-Update `.angular-cli.json` by adding the new environment the existing environments object:
+Update `angular.json` to include an hmr environment as explained [here](./application-environments) and add a configuration within serve to enable hmr.
 
 ```json
-"environmentSource": "environments/environment.ts",
-"environments": {
-  "dev": "environments/environment.ts",
-  "hmr": "environments/environment.hmr.ts",
-  "prod": "environments/environment.prod.ts"
-},
+  "serve": {
+    "configuration": {
+      ...
+      "hmr": true
+    }
+  }
 ```
 
-Run `ng serve` with the flag `--hmr -e=hmr` to enable hmr and select the new environment:
+Run `ng serve` with the flag `--configuration hmr` to enable hmr and select the new environment:
 
 ```bash
-ng serve --hmr -e=hmr
+ng serve --configuration hmr
 ```
 
 Create a shortcut for this by updating  `package.json` and adding an entry to the script object:
@@ -63,7 +63,7 @@ Create a shortcut for this by updating  `package.json` and adding an entry to th
 ```json
 "scripts": {
   ...
-  "hmr": "ng serve --hmr -e=hmr"
+  "hmr": "ng serve --configuration hmr"
 }
 ```
 
