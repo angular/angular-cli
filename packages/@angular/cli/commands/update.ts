@@ -1,5 +1,7 @@
+import { normalize } from '@angular-devkit/core';
 import { CommandScope, Option } from '../models/command';
 import { SchematicCommand, CoreSchematicOptions } from '../models/schematic-command';
+import { findUp } from '../utilities/find-up';
 
 export interface UpdateOptions extends CoreSchematicOptions {
   next: boolean;
@@ -38,19 +40,34 @@ export default class UpdateCommand extends SchematicCommand {
     this.arguments = this.arguments.concat(schematicOptions.arguments.map(a => a.name));
   }
 
-  public async run(options: UpdateOptions) {
-    const schematicOptions: any = { ...options };
-    if (schematicOptions._[0] == '@angular/cli'
-        && !schematicOptions.migrateOnly
-        && !schematicOptions.from) {
-      schematicOptions.migrateOnly = true;
-      schematicOptions.from = '1.0.0';
+  async validate(options: any) {
+    if (options._[0] == '@angular/cli'
+        && options.migrateOnly === undefined
+        && options.from === undefined) {
+      // Check for a 1.7 angular-cli.json file.
+      const oldConfigFileNames = [
+        normalize('.angular-cli.json'),
+        normalize('angular-cli.json'),
+      ];
+      const oldConfigFilePath =
+        findUp(oldConfigFileNames, process.cwd())
+        || findUp(oldConfigFileNames, __dirname);
+
+      if (oldConfigFilePath) {
+        options.migrateOnly = true;
+        options.from = '1.0.0';
+      }
     }
 
+    return super.validate(options);
+  }
+
+
+  public async run(options: UpdateOptions) {
     return this.runSchematic({
       collectionName: this.collectionName,
       schematicName: this.schematicName,
-      schematicOptions,
+      schematicOptions: options,
       dryRun: options.dryRun,
       force: false,
       showNothingDone: false,
