@@ -8,9 +8,9 @@ To generate a coverage report run the following command in the root of your proj
 ng test --watch=false --code-coverage
 ```
 
-Once the tests complete a new `/coverage` folder will appear in the project. In your Finder or Windows Explorer open the `index.html` file. You should see a report with your source code and code coverage values. 
+Once the tests complete a new `/coverage` folder will appear in the project. In your Finder or Windows Explorer open the `index.html` file. You should see a report with your source code and code coverage values.
 
-Using the code coverage percentages we can estimate how much of our code is tested. It is up to your team to determine how much code should be unit tested. 
+Using the code coverage percentages we can estimate how much of our code is tested. It is up to your team to determine how much code should be unit tested.
 
 ## Code Coverage Enforcement
 
@@ -27,6 +27,19 @@ coverageIstanbulReporter: {
     functions: 80
   }
 }
-``` 
+```
 
 The `thresholds` property will enforce a minimum of 80% code coverage when the unit tests are run in the project.
+
+Another option to simplify the usage of code coverage, instead of passing it via the command line every time. Is to set the value within the configuration file `angular.json`.
+
+```json
+  ...
+  "test": {
+    "options": {
+      "codeCoverage": true
+    }
+  }
+```
+
+This will produce code coverage results whenever tests are run for the project.
