@@ -164,14 +164,15 @@ export default class ConfigCommand extends Command {
 
   public run(options: ConfigOptions) {
     const level = options.global ? 'global' : 'local';
-    const config =
-      (getWorkspace(level) as {} as { _workspace: experimental.workspace.WorkspaceSchema });
-
-    if (!config) {
-      throw new SilentError('No config found.');
-    }
 
     if (options.value == undefined) {
+      const config =
+      (getWorkspace(level) as {} as { _workspace: experimental.workspace.WorkspaceSchema });
+
+      if (!config) {
+        throw new SilentError('No config found.');
+      }
+
       this.get(config._workspace, options);
     } else {
       this.set(options);
