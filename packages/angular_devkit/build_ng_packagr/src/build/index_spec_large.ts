@@ -38,7 +38,7 @@ describe('NgPackagr Builder', () => {
       concatMap(arch => arch.run(arch.getBuilderConfiguration(targetSpec))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
-  }, 30000);
+  }, 60000);
 
   linuxOnlyIt('tests works', (done) => {
     const targetSpec: TargetSpecifier = { project: 'lib', target: 'test' };

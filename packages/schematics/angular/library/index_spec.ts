@@ -138,7 +138,7 @@ describe('Library Schematic', () => {
       const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
       const packageJson = getJsonFileContent(tree, 'package.json');
-      expect(packageJson.devDependencies['ng-packagr']).toEqual('^2.4.1');
+      expect(packageJson.devDependencies['ng-packagr']).toEqual('^3.0.0-rc.2');
       expect(packageJson.devDependencies['@angular-devkit/build-ng-packagr'])
         .toEqual(latestVersions.DevkitBuildNgPackagr);
     });
