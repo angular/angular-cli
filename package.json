@@ -62,6 +62,7 @@
     "upver": "standard-version",
     "upver:beta": "standard-version --prerelease beta",
     "upver:rc": "standard-version --prerelease rc",
+    "upver:push": "standard-version",
     "postinstall": "ngc -p angular.tsconfig.json",
     "prebuildifier": "bazel build --noshow_progress @com_github_bazelbuild_buildtools//buildifier",
     "buildifier": "find . -type f \\( -name BUILD -or -name BUILD.bazel \\) ! -path \"*/node_modules/*\" | xargs $(bazel info bazel-bin)/external/com_github_bazelbuild_buildtools/buildifier/*/buildifier",
