@@ -14,15 +14,22 @@ import { NodePackageTaskFactoryOptions, NodePackageTaskOptions } from './options
 
 type PackageManagerProfile = {
   quietArgument?: string;
+  commands: { [name: string]: string },
 };
 
 const packageManagers: { [name: string]: PackageManagerProfile } = {
   'npm': {
     quietArgument: '--quiet',
+    commands: { },
   },
-  'cnpm': { },
+  'cnpm': {
+    commands: { },
+   },
   'yarn': {
     quietArgument: '--silent',
+    commands: {
+      'install': 'add',
+    },
   },
 };
 
@@ -61,7 +68,9 @@ export default function(
       shell: true,
       cwd: path.join(rootDirectory, options.workingDirectory || ''),
     };
-    const args = [ options.command ];
+    const args = [
+      taskPackageManagerProfile.commands[options.command] || options.command,
+    ];
 
     if (options.packageName) {
       args.push(options.packageName);
