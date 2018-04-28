@@ -95,11 +95,6 @@
       true,
       "modules/**/*.ts"
     ],
-    "missing-rollup-globals": [
-      true,
-      "./tools/package-tools/rollup-globals.ts",
-      "modules/**/*.ts"
-    ],
     "deletion-target": true
   }
 }
