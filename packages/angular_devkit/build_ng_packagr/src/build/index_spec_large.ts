@@ -30,7 +30,7 @@ describe('NgPackagr Builder', () => {
   const host = new NodeJsSyncHost();
   const workspace = new experimental.workspace.Workspace(workspaceRoot, host);
 
-  it('works', (done) => {
+  linuxOnlyIt('works', (done) => {
     const targetSpec: TargetSpecifier = { project: 'lib', target: 'build' };
 
     return workspace.loadWorkspaceFromHost(workspaceFile).pipe(
@@ -38,7 +38,7 @@ describe('NgPackagr Builder', () => {
       concatMap(arch => arch.run(arch.getBuilderConfiguration(targetSpec))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
-  }, 60000);
+  }, 30000);
 
   linuxOnlyIt('tests works', (done) => {
     const targetSpec: TargetSpecifier = { project: 'lib', target: 'test' };
