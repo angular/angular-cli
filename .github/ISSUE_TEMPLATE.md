@@ -1,15 +1,17 @@
-**Note: for support questions, please use one of [these channels][Channels]**. This repository's issues are reserved 
-for feature requests and bug reports. Also, **Preboot has moved** [here][preboot] - please make preboot-related issues 
-there.
+<!--
+PLEASE HELP US PROCESS GITHUB ISSUES FASTER BY PROVIDING THE FOLLOWING INFORMATION.
 
-* **I'm submitting a ...**
+ISSUES MISSING IMPORTANT INFORMATION MAY BE CLOSED WITHOUT INVESTIGATION.
+-->
+
+## I'm submitting a ...
 ```
-- [ ] bug report
+- [ ] bug report <!-- Please search GitHub for a similar issue or PR before submitting -->
 - [ ] feature request
-- [ ] support request => Please do not submit support request here, see note at the top of this template.
+- [ ] Support request => Please do not submit support request here, instead see https://github.com/angular/universal/blob/master/CONTRIBUTING.md#question
 ```
 
-* **What modules are related to this Issue?**
+## What modules are related to this Issue?
 ```
 - [ ] aspnetcore-engine
 - [ ] common
@@ -18,39 +20,25 @@ there.
 - [ ] module-map-ngfactory-loader
 ```
 
-* **Do you want to request a *feature* or report a *bug*?**
+## Current behavior?
 
+## Expected behavior?
 
+## Minimal reproduction with instructions
 
-* **What is the current behavior?**
+## Environment:
+**@nguniversal versions**
+  - aspnetcore-engine: 
+  - common:
+  - express-engine:
+  - hapi-engine:
+  - module-map-ngfactory-loader:
+```
+<!--
+Output from: `ng --version`.
+If nothing, output from: `node --version` and `npm --version`.
+  Windows (7/8/10). Linux (incl. distribution). macOS (El Capitan? Sierra?)
+-->
+```
 
-
-
-* **If the current behavior is a bug**, please provide the steps to reproduce and if possible a minimal demo of the 
-problem by creating a github repo.
-
-
-
-* **What is the expected behavior?**
-
-
-
-* **What is the motivation / use case for changing the behavior?**
-
-
-
-* **Please tell us about your environment:**
-
-- Angular version: X.Y.Z
-- Browser: [all | Chrome XX | Firefox XX | IE XX | Safari XX ]
-- Language: [all | TypeScript X.X | ES6/7 | ES5 ]
-- OS:  [all | Mac OS X | Windows | Linux ]
-- Platform: [all | NodeJS | Java | PHP | .NETCore | Ruby]
-
-
-
-* **Other information** (e.g. detailed explanation, stacktraces, related issues, suggestions how to fix, links for us 
-to have context, eg. stackoverflow, gitter, etc)
-
-[Channels]: https://github.com/angular/universal/blob/master/CONTRIBUTING.md#question
-[preboot]: https://github.com/angular/preboot
+## Other information (optional)
