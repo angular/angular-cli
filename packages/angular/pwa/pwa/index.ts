@@ -5,7 +5,7 @@
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.io/license
 */
-import { Path, join } from '@angular-devkit/core';
+import { Path, join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -20,8 +20,7 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
-import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import { getWorkspace } from '../utility/config';
+import { getWorkspace, getWorkspacePath } from '../utility/config';
 import { Schema as PwaOptions } from './schema';
 
 
@@ -30,6 +29,106 @@ function addServiceWorker(options: PwaOptions): Rule {
     context.logger.debug('Adding service worker...');
 
     return externalSchematic('@schematics/angular', 'service-worker', options)(host, context);
+  };
+}
+
+function getIndent(text: string): string {
+  let indent = '';
+  let hitNonSpace = false;
+  text.split('')
+    .forEach(char => {
+      if (char === ' ' && !hitNonSpace) {
+        indent += ' ';
+      } else {
+        hitNonSpace = true;
+      }
+    }, 0);
+
+  return indent;
+}
+
+function updateIndexFile(options: PwaOptions): Rule {
+  return (host: Tree, context: SchematicContext) => {
+    const workspace = getWorkspace(host);
+    const project = workspace.projects[options.project as string];
+    let path: string;
+    if (project && project.architect && project.architect.build &&
+        project.architect.build.options.index) {
+      path = project.architect.build.options.index;
+    } else {
+      throw new SchematicsException('Could not find index file for the project');
+    }
+    const buffer = host.read(path);
+    if (buffer === null) {
+      throw new SchematicsException(`Could not read index file: ${path}`);
+    }
+    const content = buffer.toString();
+    const lines = content.split('\n');
+    let closingHeadTagLineIndex = -1;
+    let closingHeadTagLine = '';
+    lines.forEach((line, index) => {
+      if (/<\/head>/.test(line) && closingHeadTagLineIndex === -1) {
+        closingHeadTagLine = line;
+        closingHeadTagLineIndex = index;
+      }
+    });
+
+    const indent = getIndent(closingHeadTagLine) + '  ';
+    const itemsToAdd = [
+      '<link rel="manifest" href="manifest.json">',
+      '<meta name="theme-color" content="#1976d2">',
+    ];
+
+    const textToInsert = itemsToAdd
+      .map(text => indent + text)
+      .join('\n');
+
+    const updatedIndex = [
+      ...lines.slice(0, closingHeadTagLineIndex),
+      textToInsert,
+      ...lines.slice(closingHeadTagLineIndex),
+    ].join('\n');
+
+    host.overwrite(path, updatedIndex);
+
+    return host;
+  };
+}
+
+function addManifestToAssetsConfig(options: PwaOptions) {
+  return (host: Tree, context: SchematicContext) => {
+
+    const workspacePath = getWorkspacePath(host);
+    const workspace = getWorkspace(host);
+    const project = workspace.projects[options.project as string];
+
+    if (!project) {
+      throw new Error(`Project is not defined in this workspace.`);
+    }
+
+    const assetEntry = join(normalize(project.root), 'src', 'manifest.json');
+
+    if (!project.architect) {
+      throw new Error(`Architect is not defined for this project.`);
+    }
+
+    const architect = project.architect;
+
+    ['build', 'test'].forEach((target) => {
+
+      const applyTo = architect[target].options;
+
+      if (!applyTo.assets) {
+        applyTo.assets = [assetEntry];
+      } else {
+        applyTo.assets.push(assetEntry);
+      }
+
+    });
+
+    host.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
+
+    return host;
   };
 }
 
@@ -45,6 +144,7 @@ export default function (options: PwaOptions): Rule {
     }
 
     const assetPath = join(project.root as Path, 'src', 'assets');
+    const sourcePath = join(project.root as Path, 'src');
 
     options.title = options.title || options.project;
 
@@ -55,13 +155,17 @@ export default function (options: PwaOptions): Rule {
       move(assetPath),
     ]);
 
-    context.addTask(new NodePackageInstallTask());
-
     return chain([
       addServiceWorker(options),
       branchAndMerge(chain([
         mergeWith(templateSource),
       ])),
+      mergeWith(apply(url('./files/root'), [
+        template({...options}),
+        move(sourcePath),
+      ])),
+      updateIndexFile(options),
+      addManifestToAssetsConfig(options),
     ])(host, context);
   };
 }

@@ -67,12 +67,12 @@ describe('PWA Schematic', () => {
 
   it('should create a manifest file', () => {
     const tree = schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
-    expect(tree.exists('/projects/bar/src/assets/manifest.json')).toEqual(true);
+    expect(tree.exists('/projects/bar/src/manifest.json')).toEqual(true);
   });
 
   it('should set the name & short_name in the manifest file', () => {
     const tree = schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
-    const manifestText = tree.readContent('/projects/bar/src/assets/manifest.json');
+    const manifestText = tree.readContent('/projects/bar/src/manifest.json');
     const manifest = JSON.parse(manifestText);
     expect(manifest.name).toEqual(defaultOptions.title);
     expect(manifest.short_name).toEqual(defaultOptions.title);
@@ -81,9 +81,27 @@ describe('PWA Schematic', () => {
   it('should set the name & short_name in the manifest file when no title provided', () => {
     const options = {...defaultOptions, title: undefined};
     const tree = schematicRunner.runSchematic('ng-add', options, appTree);
-    const manifestText = tree.readContent('/projects/bar/src/assets/manifest.json');
+    const manifestText = tree.readContent('/projects/bar/src/manifest.json');
     const manifest = JSON.parse(manifestText);
     expect(manifest.name).toEqual(defaultOptions.project);
     expect(manifest.short_name).toEqual(defaultOptions.project);
+  });
+
+  it('should update the index file', () => {
+    const tree = schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
+    const content = tree.readContent('projects/bar/src/index.html');
+
+    expect(content).toMatch(/<link rel="manifest" href="manifest.json">/);
+    expect(content).toMatch(/<meta name="theme-color" content="#1976d2">/);
+  });
+
+  it('should update the build and test assets configuration', () => {
+    const tree = schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
+    const configText = tree.readContent('/angular.json');
+    const config = JSON.parse(configText);
+    const architect = config.projects.bar.architect;
+    ['build', 'test'].forEach((target) => {
+      expect(architect[target].options.assets).toContain('projects/bar/src/manifest.json');
+    });
   });
 });

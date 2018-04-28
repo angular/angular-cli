@@ -18,6 +18,7 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as ts from 'typescript';
 import { addSymbolToNgModuleMetadata, isImported } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
@@ -161,69 +162,6 @@ function getTsSourceFile(host: Tree, path: string): ts.SourceFile {
   return source;
 }
 
-function updateIndexFile(options: ServiceWorkerOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
-    const workspace = getWorkspace(host);
-    const project = workspace.projects[options.project as string];
-    let path: string;
-    if (project && project.architect && project.architect.build &&
-        project.architect.build.options.index) {
-      path = project.architect.build.options.index;
-    } else {
-      throw new SchematicsException('Could not find index file for the project');
-    }
-    const buffer = host.read(path);
-    if (buffer === null) {
-      throw new SchematicsException(`Could not read index file: ${path}`);
-    }
-    const content = buffer.toString();
-    const lines = content.split('\n');
-    let closingHeadTagLineIndex = -1;
-    let closingHeadTagLine = '';
-    lines.forEach((line, index) => {
-      if (/<\/head>/.test(line) && closingHeadTagLineIndex === -1) {
-        closingHeadTagLine = line;
-        closingHeadTagLineIndex = index;
-      }
-    });
-
-    const indent = getIndent(closingHeadTagLine) + '  ';
-    const itemsToAdd = [
-      '<link rel="manifest" href="assets/manifest.json">',
-      '<meta name="theme-color" content="#1976d2">',
-    ];
-
-    const textToInsert = itemsToAdd
-      .map(text => indent + text)
-      .join('\n');
-
-    const updatedIndex = [
-      ...lines.slice(0, closingHeadTagLineIndex),
-      textToInsert,
-      ...lines.slice(closingHeadTagLineIndex),
-    ].join('\n');
-
-    host.overwrite(path, updatedIndex);
-
-    return host;
-  };
-}
-
-function getIndent(text: string): string {
-  let indent = '';
-  let hitNonSpace = false;
-  text.split('')
-    .forEach(char => {
-      if (char === ' ' && !hitNonSpace) {
-        indent += ' ';
-      } else {
-        hitNonSpace = true;
-      }
-    }, 0);
-
-  return indent;
-}
-
 export default function (options: ServiceWorkerOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     const workspace = getWorkspace(host);
@@ -243,12 +181,13 @@ export default function (options: ServiceWorkerOptions): Rule {
       move(project.root),
     ]);
 
+    context.addTask(new NodePackageInstallTask());
+
     return chain([
       mergeWith(templateSource),
       updateConfigFile(options),
       addDependencies(),
       updateAppModule(options),
-      updateIndexFile(options),
     ])(host, context);
   };
 }

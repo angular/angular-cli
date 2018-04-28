@@ -96,12 +96,4 @@ describe('Service Worker Schematic', () => {
     const path = '/projects/bar/ngsw-config.json';
     expect(tree.exists(path)).toEqual(true);
   });
-
-  it('should update the index file', () => {
-    const tree = schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
-    const content = tree.readContent('projects/bar/src/index.html');
-
-    expect(content).toMatch(/<link rel="manifest" href="assets\/manifest.json">/);
-    expect(content).toMatch(/<meta name="theme-color" content="#1976d2">/);
-  });
 });
