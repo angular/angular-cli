@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, normalize, relative, strings } from '@angular-devkit/core';
+import { JsonObject, join, normalize, relative, strings } from '@angular-devkit/core';
 import {
   MergeStrategy,
   Rule,
@@ -151,16 +151,8 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
           polyfills: `${projectRoot}src/polyfills.ts`,
           tsConfig: `${rootFilesRoot}tsconfig.app.json`,
           assets: [
-            {
-              glob: 'favicon.ico',
-              input: `${projectRoot}src`,
-              output: '/',
-            },
-            {
-              glob: '**/*',
-              input: `${projectRoot}src/assets`,
-              output: '/assets',
-            },
+            join(normalize(projectRoot), 'src', 'favicon.ico'),
+            join(normalize(projectRoot), 'src', 'assets'),
           ],
           styles: [
             `${projectRoot}src/styles.${options.style}`,
@@ -214,16 +206,8 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
           ],
           scripts: [],
           assets: [
-            {
-              glob: 'favicon.ico',
-              input: `${projectRoot}src/`,
-              output: '/',
-            },
-            {
-              glob: '**/*',
-              input: `${projectRoot}src/assets`,
-              output: '/assets',
-            },
+            join(normalize(projectRoot), 'src', 'favicon.ico'),
+            join(normalize(projectRoot), 'src', 'assets'),
           ],
         },
       },
