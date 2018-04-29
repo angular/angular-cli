@@ -6,7 +6,10 @@
   "properties": {
     "project": {
       "type": "string",
-      "description": "The name of the project."
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
     },
     "target": {
       "type": "string",
@@ -19,7 +22,5 @@
       "default": "production"
     }
   },
-  "required": [
-    "project"
-  ]
+  "required": []
 }

@@ -38,7 +38,7 @@ function updateConfigFile(options: ServiceWorkerOptions): Rule {
 
     const workspace = getWorkspace(host);
 
-    const project = workspace.projects[options.project];
+    const project = workspace.projects[options.project as string];
 
     if (!project) {
       throw new Error(`Project is not defined in this workspace.`);
@@ -94,7 +94,7 @@ function updateAppModule(options: ServiceWorkerOptions): Rule {
 
     // find app module
     const workspace = getWorkspace(host);
-    const project = workspace.projects[options.project];
+    const project = workspace.projects[options.project as string];
     if (!project.architect) {
       throw new Error('Project architect not found.');
     }
@@ -164,7 +164,7 @@ function getTsSourceFile(host: Tree, path: string): ts.SourceFile {
 function updateIndexFile(options: ServiceWorkerOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     const workspace = getWorkspace(host);
-    const project = workspace.projects[options.project];
+    const project = workspace.projects[options.project as string];
     let path: string;
     if (project && project.architect && project.architect.build &&
         project.architect.build.options.index) {
@@ -227,6 +227,9 @@ function getIndent(text: string): string {
 export default function (options: ServiceWorkerOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     const workspace = getWorkspace(host);
+    if (!options.project) {
+      throw new SchematicsException('Option "project" is required.');
+    }
     const project = workspace.projects[options.project];
     if (!project) {
       throw new SchematicsException(`Invalid project name (${options.project})`);

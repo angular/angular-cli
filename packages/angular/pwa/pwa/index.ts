@@ -36,6 +36,9 @@ function addServiceWorker(options: PwaOptions): Rule {
 export default function (options: PwaOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     const workspace = getWorkspace(host);
+    if (!options.project) {
+      throw new SchematicsException('Option "project" is required.');
+    }
     const project = workspace.projects[options.project];
     if (project.projectType !== 'application') {
       throw new SchematicsException(`PWA requires a project type of "application".`);
