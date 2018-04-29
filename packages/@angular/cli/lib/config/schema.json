@@ -19,6 +19,10 @@
     "newProjectRoot": {
       "type": "string"
     },
+    "defaultProject": {
+      "type": "string",
+      "description": "Default project name used in commands"
+    },
     "projects": {
       "type": "object",
       "patternProperties": {
@@ -281,10 +285,6 @@
       "type": "integer",
       "description": "File format version",
       "minimum": 1
-    },
-    "defaultProject": {
-      "type": "string",
-      "description": "Default project name used in commands"
     },
     "project": {
       "type": "object",
