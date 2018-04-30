@@ -57,7 +57,7 @@ This example places it alongside `app.module.ts` in a file named `app.server.mod
 
 You can see here we're simply Importing everything from AppModule, followed by ServerModule.
 
-> One important thing to Note: We need `ModuleMapLoaderModule` to help make Lazy-loaded routes possible during Server-side renders with the Angular-CLI.
+> One important thing to Note: We need `ModuleMapLoaderModule` to help make Lazy-loaded routes possible during Server-side renders with the Angular CLI.
 
 ```typescript
 import {NgModule} from '@angular/core';
@@ -122,58 +122,23 @@ Add a section for `"angularCompilerOptions"` and set `"entryModule"` to your `Ap
 ```
 
 ---
-## Step 3: Create a new project in `.angular-cli.json`
+## Step 3: Create a new target in `angular.json`
 
-In `.angular-cli.json` there is an array under the key `"apps"`. Copy the configuration for your client application there, and paste it as a new entry in the array, with an additional key `"platform"` set to `"server"`.
-
-Then, remove the `"polyfills"` key - those aren't needed on the server, and adjust `"main"`, and `"tsconfig"` to point to the files you wrote in step 2. Finally, adjust `"outDir"` to a new location (this example uses `dist-server`).
-
-### .angular-cli.json:
+In `angular.json` locate the `architect` property inside your project, and add a new `server`
+target:
 
 ```javascript
-{
-  ...
-  "apps": [
-    {
-      // Keep your original application config intact here, this is app 0
-      // -EXCEPT- for outDir, update it to dist/browser
-      "outDir": "dist/browser" // <-- update this
-    },
-    {
-      // This is your server app. It is app 1.
-      "platform": "server",
-      "root": "src",
-      // Build to dist/server instead of dist. This prevents
-      // client and server builds from overwriting each other.
-      "outDir": "dist/server",
-      "assets": [
-        "assets",
-        "favicon.ico"
-      ],
-      "index": "index.html",
-      // Change the main file to point to your server main.
-      "main": "main.server.ts",
-      // Remove polyfills.
-      // "polyfills": "polyfills.ts",
-      "test": "test.ts",
-      // Change the tsconfig to point to your server config.
-      "tsconfig": "tsconfig.server.json",
-      "testTsconfig": "tsconfig.spec.json",
-      "prefix": "app",
-      "styles": [
-        "styles.css"
-      ],
-      "scripts": [],
-      "environmentSource": "environments/environment.ts",
-      "environments": {
-        "dev": "environments/environment.ts",
-        "prod": "environments/environment.prod.ts"
-      }
+"architect": {
+  "build": { ... }
+  "server": {
+    "builder": "@angular-devkit/build-angular:server",
+    "options": {
+      "outputPath": "dist/your-project-name-server",
+      "main": "src/main.server.ts",
+      "tsConfig": "src/tsconfig.server.json"
     }
-  ],
-  ...
+  }
 }
-
 ```
 
 ## Building the bundle
@@ -181,13 +146,10 @@ Then, remove the `"polyfills"` key - those aren't needed on the server, and adju
 With these steps complete, you should be able to build a server bundle for your application, using the `--app` flag to tell the CLI to build the server bundle, referencing its index of `1` in the `"apps"` array in `.angular-cli.json`:
 
 ```bash
-# This builds the client application in dist/browser/
-$ ng build --prod
-...
-# This builds the server bundle in dist/server/
-$ ng build --prod --app 1 --output-hashing=false
+# This builds your project using the server target, and places the output
+# in dist/your-project-name-server/
+$ ng run your-project-name:server
 
-# outputs:
 Date: 2017-07-24T22:42:09.739Z
 Hash: 9cac7d8e9434007fd8da
 Time: 4933ms
