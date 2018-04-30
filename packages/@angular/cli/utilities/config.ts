@@ -1,4 +1,4 @@
-import { existsSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import {
@@ -155,7 +155,36 @@ export function getPackageManager(): string {
     }
   }
 
+  // Only check legacy if updated workspace is not found.
+  if (!workspace) {
+    const legacyPackageManager = getLegacyPackageManager();
+    if (legacyPackageManager !== null) {
+      return legacyPackageManager;
+    }
+  }
   return 'npm';
+}
+
+// Fallback, check for packageManager in config file in v1.* global config.
+function getLegacyPackageManager(): string | null {
+  const homeDir = os.homedir();
+  if (homeDir) {
+    const legacyGlobalConfigPath = path.join(homeDir, '.angular-cli.json');
+    if (existsSync(legacyGlobalConfigPath)) {
+      const content = readFileSync(legacyGlobalConfigPath, 'utf-8');
+
+      const ast = parseJsonAst(content, JsonParseMode.Loose);
+      if (ast.kind != 'object') {
+        return null;
+      }
+      const cfg = ast as JsonAstObject;
+      if (cfg.value.packageManager && typeof cfg.value.packageManager === 'string' &&
+          cfg.value.packageManager !== 'default') {
+        return cfg.value.packageManager;
+      }
+    }
+  }
+  return null;
 }
 
 export function getDefaultSchematicCollection(): string {
