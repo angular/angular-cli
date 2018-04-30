@@ -162,7 +162,7 @@ export class Version {
 
             npm install typescript@'${currentCombo.typescript}'
 
-        To disable this warning run "ng set warnings.typescriptMismatch=false".
+        To disable this warning run "ng config cli.warnings.typescriptMismatch false".
       ` + '\n')));
     }
   }
