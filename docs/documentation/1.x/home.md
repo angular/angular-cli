@@ -2,6 +2,8 @@
 
 # Angular CLI
 
+NOTE: this documentation is for Angular CLI 1.x. For Angular CLI 6 go [here](home) instead.
+
 ### Overview
 The Angular CLI is a tool to initialize, develop, scaffold  and maintain [Angular](https://angular.io) applications
 
@@ -12,7 +14,7 @@ npm install -g @angular/cli
 ```
 
 Generating and serving an Angular project via a development server
-[Create](new) and [run](serve) a new project:
+[Create](1.x/new) and [run](1.x/serve) a new project:
 ```
 ng new my-project
 cd my-project
@@ -43,22 +45,22 @@ Before running the tests make sure you are serving the app via `ng serve`.
 End-to-end tests are run via [Protractor](https://angular.github.io/protractor/).
 
 ### Additional Commands
-* [ng new](new)
-* [ng serve](serve)
-* [ng generate](generate)
-* [ng lint](lint)
-* [ng test](test)
-* [ng e2e](e2e)
-* [ng build](build)
-* [ng get/ng set](config)
-* [ng doc](doc)
-* [ng eject](eject)
-* [ng xi18n](xi18n)
-* [ng update](update)
+* [ng new](1.x/new)
+* [ng serve](1.x/serve)
+* [ng generate](1.x/generate)
+* [ng lint](1.x/lint)
+* [ng test](1.x/test)
+* [ng e2e](1.x/e2e)
+* [ng build](1.x/build)
+* [ng get/ng set](1.x/config)
+* [ng doc](1.x/doc)
+* [ng eject](1.x/eject)
+* [ng xi18n](1.x/xi18n)
+* [ng update](1.x/update)
 
 ## Angular CLI Config Schema
-* [Config Schema](angular-cli)
+* [Config Schema](1.x/angular-cli)
 
 ### Additional Information
-There are several [stories](stories) which will walk you through setting up
+There are several [stories](1.x/stories) which will walk you through setting up
 additional aspects of Angular applications.
