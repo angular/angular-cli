@@ -9,6 +9,7 @@ import { JsonObject } from '@angular-devkit/core';
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import * as path from 'path';
+import { latestVersions } from '../../utility/latest-versions';
 
 
 describe('Migration to v6', () => {
@@ -691,7 +692,32 @@ describe('Migration to v6', () => {
       tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
       const content = tree.readContent('/package.json');
       const pkg = JSON.parse(content);
-      expect(pkg.devDependencies['@angular-devkit/build-angular']).toBeDefined();
+      expect(pkg.devDependencies['@angular-devkit/build-angular'])
+        .toBe(latestVersions.DevkitBuildAngular);
+    });
+
+    it('should add a dev dependency to @angular-devkit/build-angular (present)', () => {
+      tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+      tree.overwrite('/package.json', JSON.stringify({
+        devDependencies: {
+          '@angular-devkit/build-angular': '0.0.0',
+        },
+      }, null, 2));
+      tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+      const content = tree.readContent('/package.json');
+      const pkg = JSON.parse(content);
+      expect(pkg.devDependencies['@angular-devkit/build-angular'])
+        .toBe(latestVersions.DevkitBuildAngular);
+    });
+
+    it('should add a dev dependency to @angular-devkit/build-angular (no dev)', () => {
+      tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+      tree.overwrite('/package.json', JSON.stringify({}, null, 2));
+      tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+      const content = tree.readContent('/package.json');
+      const pkg = JSON.parse(content);
+      expect(pkg.devDependencies['@angular-devkit/build-angular'])
+        .toBe(latestVersions.DevkitBuildAngular);
     });
   });
 
@@ -702,7 +728,7 @@ describe('Migration to v6', () => {
     beforeEach(() => {
       tslintConfig = {
         rules: {
-          'import-blacklist': ['rxjs'],
+          'import-blacklist': ['some', 'rxjs', 'else'],
         },
       };
     });
@@ -712,8 +738,34 @@ describe('Migration to v6', () => {
       tree.create(tslintPath, JSON.stringify(tslintConfig, null, 2));
       tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
       const tslint = JSON.parse(tree.readContent(tslintPath));
-      const blacklist = tslint.rules['import-blacklist'];
-      expect(blacklist).toEqual([]);
+      expect(tslint.rules['import-blacklist']).toEqual(['some', 'else']);
+    });
+
+    it('should remove "rxjs" from the "import-blacklist" rule (only)', () => {
+      tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+      tslintConfig.rules['import-blacklist'] = ['rxjs'];
+      tree.create(tslintPath, JSON.stringify(tslintConfig, null, 2));
+      tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+      const tslint = JSON.parse(tree.readContent(tslintPath));
+      expect(tslint.rules['import-blacklist']).toEqual([]);
+    });
+
+    it('should remove "rxjs" from the "import-blacklist" rule (first)', () => {
+      tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+      tslintConfig.rules['import-blacklist'] = ['rxjs', 'else'];
+      tree.create(tslintPath, JSON.stringify(tslintConfig, null, 2));
+      tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+      const tslint = JSON.parse(tree.readContent(tslintPath));
+      expect(tslint.rules['import-blacklist']).toEqual(['else']);
+    });
+
+    it('should remove "rxjs" from the "import-blacklist" rule (last)', () => {
+      tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+      tslintConfig.rules['import-blacklist'] = ['some', 'rxjs'];
+      tree.create(tslintPath, JSON.stringify(tslintConfig, null, 2));
+      tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+      const tslint = JSON.parse(tree.readContent(tslintPath));
+      expect(tslint.rules['import-blacklist']).toEqual(['some']);
     });
 
     it('should work if "rxjs" is not in the "import-blacklist" rule', () => {

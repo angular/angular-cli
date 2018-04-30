@@ -5,7 +5,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, Path, join, normalize, tags } from '@angular-devkit/core';
+import {
+  JsonObject,
+  JsonParseMode,
+  Path,
+  join,
+  normalize,
+  parseJson,
+  parseJsonAst,
+  tags,
+} from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -16,6 +25,11 @@ import {
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { AppConfig, CliConfig } from '../../utility/config';
 import { latestVersions } from '../../utility/latest-versions';
+import {
+  appendPropertyInAstObject,
+  appendValueInAstArray,
+  findPropertyInAstObject,
+} from './json-utils';
 
 const defaults = {
   appRoot: 'src',
@@ -492,8 +506,6 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
         root: project.root,
         sourceRoot: project.root,
         projectType: 'application',
-        cli: {},
-        schematics: {},
       };
 
       const e2eArchitect: JsonObject = {};
@@ -542,51 +554,91 @@ function updateSpecTsConfig(config: CliConfig): Rule {
   return (host: Tree, context: SchematicContext) => {
     const apps = config.apps || [];
     apps.forEach((app: AppConfig, idx: number) => {
-      const tsSpecConfigPath =
-        join(app.root as Path, app.testTsconfig || defaults.testTsConfig);
+      const testTsConfig = app.testTsconfig || defaults.testTsConfig;
+      const tsSpecConfigPath = join(normalize(app.root || ''), testTsConfig);
       const buffer = host.read(tsSpecConfigPath);
+
       if (!buffer) {
         return;
       }
-      const tsCfg = JSON.parse(buffer.toString());
-      if (!tsCfg.files) {
-        tsCfg.files = [];
+
+
+      const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
+      if (tsCfgAst.kind != 'object') {
+        throw new SchematicsException('Invalid tsconfig. Was expecting an object');
       }
 
-      // Ensure the spec tsconfig contains the polyfills file
-      if (tsCfg.files.indexOf(app.polyfills || defaults.polyfills) === -1) {
-        tsCfg.files.push(app.polyfills || defaults.polyfills);
-        host.overwrite(tsSpecConfigPath, JSON.stringify(tsCfg, null, 2));
+      const filesAstNode = findPropertyInAstObject(tsCfgAst, 'files');
+      if (filesAstNode && filesAstNode.kind != 'array') {
+        throw new SchematicsException('Invalid tsconfig "files" property; expected an array.');
       }
+
+      const recorder = host.beginUpdate(tsSpecConfigPath);
+
+      const polyfills = app.polyfills || defaults.polyfills;
+      if (!filesAstNode) {
+        // Do nothing if the files array does not exist. This means exclude or include are
+        // set and we shouldn't mess with that.
+      } else {
+        if (filesAstNode.value.indexOf(polyfills) == -1) {
+          appendValueInAstArray(recorder, filesAstNode, polyfills);
+        }
+      }
+
+      host.commitUpdate(recorder);
     });
   };
 }
 
-function updatePackageJson(packageManager?: string) {
+function updatePackageJson(config: CliConfig) {
   return (host: Tree, context: SchematicContext) => {
     const pkgPath = '/package.json';
     const buffer = host.read(pkgPath);
     if (buffer == null) {
       throw new SchematicsException('Could not read package.json');
     }
-    const content = buffer.toString();
-    const pkg = JSON.parse(content);
+    const pkgAst = parseJsonAst(buffer.toString(), JsonParseMode.Strict);
 
-    if (pkg === null || typeof pkg !== 'object' || Array.isArray(pkg)) {
+    if (pkgAst.kind != 'object') {
       throw new SchematicsException('Error reading package.json');
     }
-    if (!pkg.devDependencies) {
-      pkg.devDependencies = {};
+
+    const devDependenciesNode = findPropertyInAstObject(pkgAst, 'devDependencies');
+    if (devDependenciesNode && devDependenciesNode.kind != 'object') {
+      throw new SchematicsException('Error reading package.json; devDependency is not an object.');
     }
 
-    pkg.devDependencies['@angular-devkit/build-angular'] = latestVersions.DevkitBuildAngular;
+    const recorder = host.beginUpdate(pkgPath);
+    const depName = '@angular-devkit/build-angular';
+    if (!devDependenciesNode) {
+      // Haven't found the devDependencies key, add it to the root of the package.json.
+      appendPropertyInAstObject(recorder, pkgAst, 'devDependencies', {
+        [depName]: latestVersions.DevkitBuildAngular,
+      });
+    } else {
+      // Check if there's a build-angular key.
+      const buildAngularNode = findPropertyInAstObject(devDependenciesNode, depName);
 
-    host.overwrite(pkgPath, JSON.stringify(pkg, null, 2));
-
-    if (packageManager && !['npm', 'yarn', 'cnpm'].includes(packageManager)) {
-      packageManager = undefined;
+      if (!buildAngularNode) {
+        // No build-angular package, add it.
+        appendPropertyInAstObject(
+          recorder,
+          devDependenciesNode,
+          depName,
+          latestVersions.DevkitBuildAngular,
+        );
+      } else {
+        const { end, start } = buildAngularNode;
+        recorder.remove(start.offset, end.offset - start.offset);
+        recorder.insertRight(start.offset, JSON.stringify(latestVersions.DevkitBuildAngular));
+      }
     }
-    context.addTask(new NodePackageInstallTask({ packageManager }));
+
+    host.commitUpdate(recorder);
+
+    context.addTask(new NodePackageInstallTask({
+      packageManager: config.packageManager === 'default' ? undefined : config.packageManager,
+    }));
 
     return host;
   };
@@ -597,18 +649,51 @@ function updateTsLintConfig(): Rule {
     const tsLintPath = '/tslint.json';
     const buffer = host.read(tsLintPath);
     if (!buffer) {
-      return;
+      return host;
     }
-    const tsCfg = JSON.parse(buffer.toString());
+    const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
 
-    if (tsCfg.rules && tsCfg.rules['import-blacklist'] &&
-        tsCfg.rules['import-blacklist'].indexOf('rxjs') !== -1) {
-
-      tsCfg.rules['import-blacklist'] = tsCfg.rules['import-blacklist']
-        .filter((rule: string | boolean) => rule !== 'rxjs');
-
-      host.overwrite(tsLintPath, JSON.stringify(tsCfg, null, 2));
+    if (tsCfgAst.kind != 'object') {
+      return host;
     }
+
+    const rulesNode = findPropertyInAstObject(tsCfgAst, 'rules');
+    if (!rulesNode || rulesNode.kind != 'object') {
+      return host;
+    }
+
+    const importBlacklistNode = findPropertyInAstObject(rulesNode, 'import-blacklist');
+    if (!importBlacklistNode || importBlacklistNode.kind != 'array') {
+      return host;
+    }
+
+    const recorder = host.beginUpdate(tsLintPath);
+    for (let i = 0; i < importBlacklistNode.elements.length; i++) {
+      const element = importBlacklistNode.elements[i];
+      if (element.kind == 'string' && element.value == 'rxjs') {
+        const { start, end } = element;
+        // Remove this element.
+        if (i == importBlacklistNode.elements.length - 1) {
+          // Last element.
+          if (i > 0) {
+            // Not first, there's a comma to remove before.
+            const previous = importBlacklistNode.elements[i - 1];
+            recorder.remove(previous.end.offset, end.offset - previous.end.offset);
+          } else {
+            // Only element, just remove the whole rule.
+            const { start, end } = importBlacklistNode;
+            recorder.remove(start.offset, end.offset - start.offset);
+            recorder.insertLeft(start.offset, '[]');
+          }
+        } else {
+          // Middle, just remove the whole node (up to next node start).
+          const next = importBlacklistNode.elements[i + 1];
+          recorder.remove(start.offset, next.start.offset - start.offset);
+        }
+      }
+    }
+
+    host.commitUpdate(recorder);
 
     return host;
   };
@@ -627,13 +712,17 @@ export default function (): Rule {
     if (configBuffer == null) {
       throw new SchematicsException(`Could not find configuration file (${configPath})`);
     }
-    const config = JSON.parse(configBuffer.toString());
+    const config = parseJson(configBuffer.toString(), JsonParseMode.Loose);
+
+    if (typeof config != 'object' || Array.isArray(config) || config === null) {
+      throw new SchematicsException('Invalid angular-cli.json configuration; expected an object.');
+    }
 
     return chain([
       migrateKarmaConfiguration(config),
       migrateConfiguration(config),
       updateSpecTsConfig(config),
-      updatePackageJson(config.packageManager),
+      updatePackageJson(config),
       updateTsLintConfig(),
       (host: Tree, context: SchematicContext) => {
         context.logger.warn(tags.oneLine`Some configuration options have been changed,
