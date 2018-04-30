@@ -7,7 +7,7 @@
  */
 
 import { normalize, virtualFs } from '@angular-devkit/core';
-import { tap } from 'rxjs/operators';
+import { tap, toArray } from 'rxjs/operators';
 import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
@@ -90,5 +90,16 @@ describe('Browser Builder assets', () => {
     // The node_modules folder must be deleted, otherwise code that tries to find the
     // node_modules folder will hit this one and can fail.
     host.scopedSync().delete(normalize('./node_modules'));
+  }, Timeout.Basic);
+
+  it('still builds with empty asset array', (done) => {
+    const overrides = {
+      assets: [],
+    };
+
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+      toArray(),
+      tap((buildEvents) => expect(buildEvents.length).toBe(1)),
+    ).subscribe(undefined, done.fail, done);
   }, Timeout.Basic);
 });

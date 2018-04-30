@@ -38,6 +38,13 @@ export function normalizeAssetPatterns(
   const sourceRoot = maybeSourceRoot || join(projectRoot, 'src');
   const resolvedSourceRoot = resolve(root, sourceRoot);
 
+  if (assetPatterns.length === 0) {
+    // If there are no asset patterns, return an empty array.
+    // It's important to do this because forkJoin with an empty array will immediately complete
+    // the observable.
+    return of([]);
+  }
+
   const assetPatternObjectObservables: Observable<AssetPatternObject>[] = assetPatterns
     .map(assetPattern => {
       // Normalize string asset patterns to objects.
