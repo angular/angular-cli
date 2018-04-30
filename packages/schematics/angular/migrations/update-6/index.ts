@@ -106,7 +106,7 @@ function extractCliConfig(config: CliConfig): JsonObject | null {
     newConfig['packageManager'] = config.packageManager;
   }
 
-  return newConfig;
+  return Object.getOwnPropertyNames(newConfig).length == 0 ? null : newConfig;
 }
 
 function extractSchematicsConfig(config: CliConfig): JsonObject | null {
