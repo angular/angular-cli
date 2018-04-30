@@ -12,7 +12,7 @@ export default class LintCommand extends ArchitectCommand {
   public readonly description = 'Lints code in existing project.';
   public static aliases = ['l'];
   public readonly scope = CommandScope.inProject;
-  public readonly multiTarget: true;
+  public readonly multiTarget = true;
   public readonly options: Option[] = [
     this.configurationOption
   ];

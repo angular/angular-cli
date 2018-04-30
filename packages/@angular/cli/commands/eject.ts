@@ -9,7 +9,7 @@ export default class EjectCommand extends Command {
   public readonly arguments: string[] = [];
   public readonly options: Option[] = [];
 
-  run(_options: any) {
+  run() {
     this.logger.info(tags.stripIndents`
       The 'eject' command has been temporarily disabled, as it is not yet compatible with the new
       angular.json format. The new configuration format provides further flexibility to modify the
