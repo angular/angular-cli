@@ -138,6 +138,16 @@ Default applications are created in a directory of the same name, with an initia
 </details>
 
 <details>
+  <summary>strict</summary>
+  <p>
+    <code>--strict</code> <em>default value: false</em>
+  </p>
+  <p>
+    Configure TypeScript in strict mode.
+  </p>
+</details>
+
+<details>
   <summary>style</summary>
   <p>
     <code>--style</code> <em>default value: css</em>
