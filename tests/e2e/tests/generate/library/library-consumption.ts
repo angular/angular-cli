@@ -1,9 +1,8 @@
-import { ng, silentNpm } from '../../../utils/process';
+import { ng } from '../../../utils/process';
 import { writeFile } from '../../../utils/fs';
 
 export default function () {
   return ng('generate', 'library', 'my-lib')
-    .then(() => silentNpm('install'))
     .then(() => ng('build', 'my-lib'))
     .then(() => writeFile('./src/app/app.module.ts', `
       import { BrowserModule } from '@angular/platform-browser';
