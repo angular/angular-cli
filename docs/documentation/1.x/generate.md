@@ -6,15 +6,15 @@
 `ng generate [name]` generates the specified blueprint
 
 ## Available blueprints:
- - [class](generate/class)
- - [component](generate/component)
- - [directive](generate/directive)
- - [enum](generate/enum)
- - [guard](generate/guard)
- - [interface](generate/interface)
- - [module](generate/module)
- - [pipe](generate/pipe)
- - [service](generate/service)
+ - [class](1.x/generate/class)
+ - [component](1.x/generate/component)
+ - [directive](1.x/generate/directive)
+ - [enum](1.x/generate/enum)
+ - [guard](1.x/generate/guard)
+ - [interface](1.x/generate/interface)
+ - [module](1.x/generate/module)
+ - [pipe](1.x/generate/pipe)
+ - [service](1.x/generate/service)
 
 ## Options
 <details>
