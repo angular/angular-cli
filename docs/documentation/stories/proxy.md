@@ -18,15 +18,21 @@ We create a file next to our project's `package.json` called `proxy.conf.json` w
 
 You can read more about what options are available [here](https://webpack.js.org/configuration/dev-server/#devserver-proxy).
 
-We can then edit the `package.json` file's start script to be
+We can then add the `proxyConfig` option to the serve target:
 
 ```json
-"start": "ng serve --proxy-config proxy.conf.json",
+"architect": {
+  "serve": {
+    "builder": "@angular-devkit/build-angular:dev-server",
+    "options": {
+      "browserTarget": "rx-seven-project:build",
+      "proxyConfig": "src/proxy.conf.json"
+    },
 ```
 
-Now in order to run our dev server with our proxy config, we can simply call `npm start`.
+Now in order to run our dev server with our proxy config we can call `ng serve`.
 
-**After each edit to the proxy.conf.json file remember to relaunch the `npm start` process to make your changes effective.**
+**After each edit to the proxy.conf.json file remember to relaunch the `ng serve` process to make your changes effective.**
 
 ### Rewriting the URL path
 
@@ -105,10 +111,16 @@ const PROXY_CONFIG = [
 module.exports = PROXY_CONFIG;
 ```
 
-and make sure to point to the right file
+Make sure to point to the right file (`.js` instead of `.json`):
 
 ```json
-"start": "ng serve --proxy-config proxy.conf.js",
+"architect": {
+  "serve": {
+    "builder": "@angular-devkit/build-angular:dev-server",
+    "options": {
+      "browserTarget": "rx-seven-project:build",
+      "proxyConfig": "src/proxy.conf.js"
+    },
 ```
 
 ### Bypass the Proxy
@@ -131,10 +143,4 @@ const PROXY_CONFIG = {
 }
 
 module.exports = PROXY_CONFIG;
-```
-
-again, make sure to point to the right file
-
-```json
-"start": "ng serve --proxy-config proxy.conf.js",
 ```
