@@ -91,7 +91,7 @@ resolve('@angular/cli', { basedir: process.cwd() },
         Your global Angular CLI version (${globalVersion}) is greater than your local
         version (${localVersion}). The local Angular CLI version is used.
 
-        To disable this warning use "ng set --global warnings.versionMismatch=false".
+        To disable this warning use "ng config -g cli.warnings.versionMismatch false".
         `);
         // Don't show warning colorised on `ng completion`
         if (process.argv[2] !== 'completion') {

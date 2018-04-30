@@ -19,16 +19,16 @@ export function checkYarnOrCNPM() {
       .then((data: Array<boolean>) => {
         const [isYarnInstalled, isCNPMInstalled] = data;
         if (isYarnInstalled && isCNPMInstalled) {
-          console.log(chalk.yellow('You can `ng set --global packageManager=yarn` '
-            + 'or `ng set --global packageManager=cnpm`.'));
+          console.log(chalk.yellow('You can `ng config -g cli.packageManager yarn` '
+            + 'or `ng config -g cli.packageManager cnpm`.'));
         } else if (isYarnInstalled) {
-          console.log(chalk.yellow('You can `ng set --global packageManager=yarn`.'));
+          console.log(chalk.yellow('You can `ng config -g cli.packageManager yarn`.'));
         } else if (isCNPMInstalled) {
-          console.log(chalk.yellow('You can `ng set --global packageManager=cnpm`.'));
+          console.log(chalk.yellow('You can `ng config -g cli.packageManager cnpm`.'));
         } else  {
           if (packageManager !== 'default' && packageManager !== 'npm') {
             console.log(chalk.yellow(`Seems that ${packageManager} is not installed.`));
-            console.log(chalk.yellow('You can `ng set --global packageManager=npm`.'));
+            console.log(chalk.yellow('You can `ng config -g cli.packageManager npm`.'));
           }
         }
       });
