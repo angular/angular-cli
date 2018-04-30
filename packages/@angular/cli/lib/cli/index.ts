@@ -33,6 +33,10 @@ function loadCommands() {
     'help': require('../../commands/help').default,
     'version': require('../../commands/version').default,
     'doc': require('../../commands/doc').default,
+
+    // deprecated
+    'get': require('../../commands/getset').default,
+    'set': require('../../commands/getset').default,
   };
 }
 
