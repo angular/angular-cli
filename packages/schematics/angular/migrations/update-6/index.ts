@@ -105,6 +105,20 @@ function extractCliConfig(config: CliConfig): JsonObject | null {
   if (config.packageManager && config.packageManager !== 'default') {
     newConfig['packageManager'] = config.packageManager;
   }
+  if (config.warnings) {
+    if (config.warnings.versionMismatch !== undefined) {
+      newConfig.warnings = {
+        ...((newConfig.warnings as JsonObject | null) || {}),
+        ...{ versionMismatch: config.warnings.versionMismatch },
+      };
+    }
+    if (config.warnings.typescriptMismatch !== undefined) {
+      newConfig.warnings = {
+        ...((newConfig.warnings as JsonObject | null) || {}),
+        ...{ typescriptMismatch: config.warnings.typescriptMismatch },
+      };
+    }
+  }
 
   return Object.getOwnPropertyNames(newConfig).length == 0 ? null : newConfig;
 }
