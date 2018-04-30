@@ -1,48 +1,74 @@
 # Application Environments
 
-## Configuring available environments
+In Angular CLI you can configure the build system to replace existing files for your intended
+environment.
 
-`.angular-cli.json` contains an **environments** section.  By default, this looks like:
+## Configuring available file replacements
+
+`angular.json` contains an **fileReplacements** section within the production configuration of the
+build target. By default, this looks like:
 
 ``` json
-"environments": {
-    "dev": "environments/environment.ts",
-    "prod": "environments/environment.prod.ts"
+"configurations": {
+  "production": {
+    "fileReplacements": [
+      {
+        "replace": "src/environments/environment.ts",
+        "with": "src/environments/environment.prod.ts"
+      }
+    ],
+    ...
+```
+
+This means that when you use your production configuration (via `ng build --prod` or
+`ng build --configuration=production`), the `src/environments/environment.ts` file will be replaced
+with `src/environments/environment.prod.ts`.
+
+This is useful for using different code or variables when creating a new build.
+By default no file is replaced in the build.
+
+You can add additional configurations as required.
+To add a **staging** environment, create a copy of `src/environments/environment.ts` called `src/environments/environment.staging.ts`, then add a `staging` configuration to `angular.jsob`:
+
+```json
+"configurations": {
+  "production": { ... },
+  "staging": {
+    "fileReplacements": [
+      {
+        "replace": "src/environments/environment.ts",
+        "with": "src/environments/environment.staging.ts"
+      }
+    ]
+  }
 }
 ```
 
-You can add additional environments as required.  To add a **staging** environment, your configuration would look like:
+You can add more configuration options to this environment as well.
+Any option that your build supports can be overriden in a configuration.
 
-``` json
-"environments": {
-    "dev": "environments/environment.ts",
-    "staging": "environments/environment.staging.ts",
-    "prod": "environments/environment.prod.ts"
-}
+To build using the staging configuration, run `ng build --configuration=staging`.
+
+To serve using the staging configuration, you must edit the `serve` target to use the `staging`
+build configuration:
+```json
+"serve": {
+  "builder": "@angular-devkit/build-angular:dev-server",
+  "options": {
+    "browserTarget": "your-project-name:build"
+  },
+  "configurations": {
+    "production": {
+      "browserTarget": "your-project-name:build:production"
+    },
+    "staging": {
+      "browserTarget": "your-project-name:build:staging"
+    }
+  }
+},
 ```
 
-## Adding environment-specific files
-
-The environment-specific files are set out as shown below:
-
-```
-└── src
-    └── environments
-        ├── environment.prod.ts
-        └── environment.ts
-```
-
-If you wanted to add another environment for **staging**, your file structure would become:
-
-```
-└── src
-    └── environments
-        ├── environment.prod.ts
-        ├── environment.staging.ts
-        └── environment.ts
-```
-
-## Amending environment-specific files
+## Changing environment-specific files
 
 `environment.ts` contains the default settings.  If you take a look at this file, it should look like:
 
@@ -103,20 +129,6 @@ export class AppComponent {
 }
 ```
 
-## Environment-specific builds
+You will always import the original environments file.
+This way the build system can replace the original in each configuration.
 
-Running:
-
-```
-ng build
-```
-
-Will use the defaults found in `environment.ts`
-
-Running:
-
-```
-ng build --env=staging
-```
-
-Will use the values from `environment.staging.ts`
