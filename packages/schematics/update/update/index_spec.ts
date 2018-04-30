@@ -129,6 +129,51 @@ describe('@schematics/update', () => {
     ).subscribe(undefined, done.fail, done);
   }, 45000);
 
+  it('updates Angular as compatible with Angular N-1 (2)', done => {
+    // Add the basic migration package.
+    const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
+    const packageJson = JSON.parse(content);
+    const dependencies = packageJson['dependencies'];
+    dependencies['@angular-devkit-tests/update-peer-dependencies-angular-5-2'] = '1.0.0';
+    dependencies['@angular/core'] = '5.1.0';
+    dependencies['@angular/animations'] = '5.1.0';
+    dependencies['@angular/common'] = '5.1.0';
+    dependencies['@angular/compiler'] = '5.1.0';
+    dependencies['@angular/platform-browser'] = '5.1.0';
+    dependencies['rxjs'] = '5.5.0';
+    dependencies['zone.js'] = '0.8.26';
+    host.sync.write(
+      normalize('/package.json'),
+      virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
+    );
+
+    schematicRunner.runSchematicAsync('update', {
+      packages: ['@angular/core'],
+      next: true,
+    }, appTree).pipe(
+      map(tree => {
+        const packageJson = JSON.parse(tree.readContent('/package.json'));
+        expect(packageJson['dependencies']['@angular/core'][0]).toBe('6');
+
+        // Check install task.
+        expect(schematicRunner.tasks).toEqual([
+          {
+            name: 'node-package',
+            options: jasmine.objectContaining({
+              command: 'install',
+            }),
+          },
+          {
+            name: 'run-schematic',
+            options: jasmine.objectContaining({
+              name: 'migrate',
+            }),
+          },
+        ]);
+      }),
+    ).subscribe(undefined, done.fail, done);
+  }, 45000);
+
   it('can migrate only', done => {
     // Add the basic migration package.
     const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));

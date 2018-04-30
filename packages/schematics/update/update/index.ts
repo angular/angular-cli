@@ -35,15 +35,16 @@ const peerCompatibleWhitelist: { [name: string]: PeerVersionTransform } = {
   '@angular/core': (range: string) => {
     range = semver.validRange(range);
     let major = 1;
-    while (semver.ltr(major + '.0.0', range)) {
+    while (!semver.gtr(major + '.0.0', range)) {
       major++;
       if (major >= 99) {
         throw new SchematicsException(`Invalid range: ${JSON.stringify(range)}`);
       }
     }
 
-    // Add the major - 1 version as compatible with the angular compatible.
-    return semver.validRange(`^${major + 1}.0.0-rc.0 || ${range}`) || range;
+    // Add the major version as compatible with the angular compatible. This is already one
+    // major above the greatest supported, because we increment `major` before checking.
+    return semver.validRange(`^${major}.0.0-rc.0 || ${range}`) || range;
   },
 };
 
