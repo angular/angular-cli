@@ -748,7 +748,7 @@
           },
           "additionalProperties": false,
           "definitions": {
-            "assetPattern": 
+            "assetPattern": {
               "oneOf": [
                 {
                   "type": "object",
