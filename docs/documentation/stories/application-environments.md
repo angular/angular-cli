@@ -2,7 +2,7 @@
 
 ## Configuring available environments
 
-`.angular-cli.json` contains an **environments** section.  By default, this looks like:
+`angular.json` contains an **environments** section for each application.  By default, this looks like:
 
 ``` json
 "environments": {
@@ -105,18 +105,22 @@ export class AppComponent {
 
 ## Environment-specific builds
 
-Running:
+Running builds for specific environements:
 
+- Inside `angular.json` create a configuration for the environment (i.e. staging)
+
+```json
+...{
+"configurations": {
+  "staging": {
+    "fileReplacements": [{
+      "replace": "src/environments/environment.ts",
+      "with": "src/environments/environment.staging.ts",
+    }],
+  }
+}
 ```
-ng build
+2. Build your application by specifying the new configuration.
+```bash
+ng build --configuration staging
 ```
-
-Will use the defaults found in `environment.ts`
-
-Running:
-
-```
-ng build --env=staging
-```
-
-Will use the values from `environment.staging.ts`
