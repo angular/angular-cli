@@ -25,7 +25,7 @@
  - [Application Environments](stories/application-environments)
  - [Autoprefixer Configuration](stories/autoprefixer)
  - [Deploy to GitHub Pages](stories/github-pages)
- - [Linked Library](stories/linked-library)
+ - [Create a Library](stories/create-library)
  - [Multiple projects](stories/multiple-projects)
  - [Continuous Integration](stories/continuous-integration)
  - [Universal Rendering](stories/universal-rendering)
