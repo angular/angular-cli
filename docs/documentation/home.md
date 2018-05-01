@@ -57,8 +57,8 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 * [ng xi18n](xi18n)
 * [ng update](update)
 
-## Angular CLI Config Schema
-* [Config Schema](angular-cli)
+## Angular CLI Workspace Schema
+* [Angular CLI workspace file (angular.json) schema](angular-workspace)
 
 ### Additional Information
 There are several [stories](stories) which will walk you through setting up

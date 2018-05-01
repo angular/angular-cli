@@ -17,11 +17,12 @@
       "$ref": "#/definitions/schematicOptions"
     },
     "newProjectRoot": {
-      "type": "string"
+      "type": "string",
+      "description": "Path where new projects will be created."
     },
     "defaultProject": {
       "type": "string",
-      "description": "Default project name used in commands"
+      "description": "Default project name used in commands."
     },
     "projects": {
       "type": "object",
@@ -59,7 +60,7 @@
               "type": "boolean"
             },
             "typescriptMismatch": {
-              "description": "Show a warning when the TypeScript version is incompatible",
+              "description": "Show a warning when the TypeScript version is incompatible.",
               "type": "boolean"
             }
           }
@@ -297,13 +298,16 @@
         },
         "prefix": {
           "type": "string",
-          "format": "html-selector"
+          "format": "html-selector",
+          "description": "The prefix to apply to generated selectors."
         },
         "root": {
-          "type": "string"
+          "type": "string",
+          "description": "Root of the project files."
         },
         "sourceRoot": {
-          "type": "string"
+          "type": "string",
+          "description": "The root of the source files, assets and index.html file structure."
         },
         "projectType": {
           "type": "string",
