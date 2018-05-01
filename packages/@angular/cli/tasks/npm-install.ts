@@ -9,13 +9,13 @@ export type NpmInstall = (packageName: string,
                           logger: logging.Logger,
                           packageManager: string,
                           projectRoot: string,
-                          save: boolean) => void;
+                          save?: boolean) => void;
 
 export default async function (packageName: string,
                                logger: logging.Logger,
                                packageManager: string,
                                projectRoot: string,
-                               save: boolean) {
+                               save = true) {
   if (packageManager === 'default') {
     packageManager = 'npm';
   }
