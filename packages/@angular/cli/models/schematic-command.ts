@@ -334,7 +334,7 @@ export abstract class SchematicCommand extends Command {
 
   private _cleanDefaults<T, K extends keyof T>(defaults: T, undefinedOptions: string[]): T {
     (Object.keys(defaults) as K[])
-      .filter(key => !undefinedOptions.includes(key))
+      .filter(key => !undefinedOptions.map(strings.camelize).includes(key))
       .forEach(key => {
         delete defaults[key];
       });

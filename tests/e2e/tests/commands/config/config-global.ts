@@ -3,6 +3,7 @@ import {expectToFail} from '../../../utils/utils';
 import { expectFileToExist } from '../../../utils/fs';
 import * as path from 'path';
 import { homedir } from 'os';
+import { deleteFile } from '../../../utils/fs';
 
 
 export default function() {
@@ -27,5 +28,6 @@ export default function() {
     })
     .then(() => expectToFail(() => ng('config', '--global', 'cli.warnings.notreal', 'true')))
     .then(() => ng('config', '--global', 'cli.warnings.versionMismatch', 'false'))
-    .then(() => expectFileToExist(path.join(homedir(), '.angular-config.json')));
+    .then(() => expectFileToExist(path.join(homedir(), '.angular-config.json')))
+    .then(() => deleteFile(path.join(homedir(), '.angular-config.json')));
 }
