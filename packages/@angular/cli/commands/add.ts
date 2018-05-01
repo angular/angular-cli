@@ -67,7 +67,7 @@ export default class AddCommand extends SchematicCommand {
       this.logger,
       packageManager,
       this.project.root,
-      false);
+    );
 
     // Reparse the options with the new schematic accessible.
     options = await this._parseSchematicOptions(collectionName);
