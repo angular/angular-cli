@@ -49,6 +49,11 @@ function addKarmaFiles(files: any[], newFiles: any[], prepend = false) {
 }
 
 const init: any = (config: any, emitter: any, customFileHandlers: any) => {
+  if (!config.buildWebpack) {
+    throw new Error(`The '@angular-devkit/build-angular/plugins/karma' karma plugin is meant to` +
+    ` be used from within Angular CLI and will not work correctly outside of it.`
+    )
+  }
   const options = config.buildWebpack.options;
   const projectRoot = config.buildWebpack.projectRoot as string;
   successCb = config.buildWebpack.successCb;
