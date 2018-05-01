@@ -20,10 +20,6 @@ export interface Schema {
      */
     flat?: boolean;
     /**
-     * Allows specification of the declaring module.
-     */
-    module?: string;
-    /**
      * The path to create the interface.
      */
     path?: string;

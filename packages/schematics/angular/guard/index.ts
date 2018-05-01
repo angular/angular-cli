@@ -21,49 +21,10 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
-import * as ts from 'typescript';
-import { addProviderToModule } from '../utility/ast-utils';
-import { InsertChange } from '../utility/change';
 import { getWorkspace } from '../utility/config';
-import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
 import { Schema as GuardOptions } from './schema';
 
-
-function addDeclarationToNgModule(options: GuardOptions): Rule {
-  return (host: Tree) => {
-    if (!options.module) {
-      return host;
-    }
-
-    const modulePath = options.module;
-    const text = host.read(modulePath);
-    if (text === null) {
-      throw new SchematicsException(`File ${modulePath} does not exist.`);
-    }
-    const sourceText = text.toString('utf-8');
-
-    const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
-
-    const guardPath = `/${options.path}/`
-                          + (options.flat ? '' : strings.dasherize(options.name) + '/')
-                          + strings.dasherize(options.name)
-                          + '.guard';
-    const relativePath = buildRelativePath(modulePath, guardPath);
-    const changes = addProviderToModule(source, modulePath,
-                                        strings.classify(`${options.name}Guard`),
-                                        relativePath);
-    const recorder = host.beginUpdate(modulePath);
-    for (const change of changes) {
-      if (change instanceof InsertChange) {
-        recorder.insertLeft(change.pos, change.toAdd);
-      }
-    }
-    host.commitUpdate(recorder);
-
-    return host;
-  };
-}
 
 export default function (options: GuardOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
@@ -76,10 +37,6 @@ export default function (options: GuardOptions): Rule {
     if (options.path === undefined) {
       const projectDirName = project.projectType === 'application' ? 'app' : 'lib';
       options.path = `/${project.root}/src/${projectDirName}`;
-    }
-
-    if (options.module) {
-      options.module = findModuleFromOptions(host, options);
     }
 
     const parsedPath = parseName(options.path, options.name);
@@ -97,7 +54,6 @@ export default function (options: GuardOptions): Rule {
 
     return chain([
       branchAndMerge(chain([
-        addDeclarationToNgModule(options),
         mergeWith(templateSource),
       ])),
     ])(host, context);
