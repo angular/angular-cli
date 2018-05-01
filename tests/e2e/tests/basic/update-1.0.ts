@@ -6,7 +6,7 @@ import { useCIChrome } from '../../utils/project';
 
 export default function () {
   return Promise.resolve()
-    .then(() => createProjectFromAsset('1.7-project'))
+    .then(() => createProjectFromAsset('1.0-project'))
     .then(() => useCIChrome('.'))
     .then(() => expectToFail(() => ng('build')))
     .then(() => ng('update', '@angular/cli'))
