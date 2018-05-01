@@ -18,7 +18,14 @@
     - *typescriptMismatch* (`boolean`): The name of the project.
 
 - **schematics** (`object`): Workspace configuration options for Schematics.
-  - *schematic-package:schematic-name* (`string`): Object containing options for this schematic.
+  - *schematic-package:schematic-name* (`object`): Object containing options for this schematic. JSON Schema for default schematics:
+    - [@schematics/angular:component](https://github.com/angular/angular-cli/blob/v6.0.0-rc.8/packages/%40angular/cli/lib/config/schema.json#L74-L144)
+    - [@schematics/angular:directive](https://github.com/angular/angular-cli/blob/v6.0.0-rc.8/packages/%40angular/cli/lib/config/schema.json#L145-L186)
+    - [@schematics/angular:module](https://github.com/angular/angular-cli/blob/v6.0.0-rc.8/packages/%40angular/cli/lib/config/schema.json#L187-L223)
+    - [@schematics/angular:service](https://github.com/angular/angular-cli/blob/v6.0.0-rc.8/packages/%40angular/cli/lib/config/schema.json#L224-L238)
+    - [@schematics/angular:pipe](https://github.com/angular/angular-cli/blob/v6.0.0-rc.8/packages/%40angular/cli/lib/config/schema.json#L239-L269)
+    - [@schematics/angular:class](https://github.com/angular/angular-cli/blob/v6.0.0-rc.8/packages/%40angular/cli/lib/config/schema.json#L270-L279)
+
 
 - **projects**: Configuration options for each project in the workspace.
   - *root* (`string`): Root of the project files.
@@ -30,5 +37,14 @@
     - *targetName* (`string`): Name of this target.
       - *builder* (`string`): Builder for this target, in the format `package-name:builder-name`.
       - *options* (`string`): Options for this builder.
+        JSON Schema for default schematics:
+        - [@angular-devkit/build-angular:app-shell](https://github.com/angular/angular-cli/blob/v6.0.0-rc.8/packages/%40angular/cli/lib/config/schema.json#L489-L520)
+        - [@angular-devkit/build-angular:browser](https://github.com/angular/angular-cli/blob/v6.0.0-rc.8/packages/%40angular/cli/lib/config/schema.json#L521-L906)
+        - [@angular-devkit/build-angular:dev-server](https://github.com/angular/angular-cli/blob/v6.0.0-rc.8/packages/%40angular/cli/lib/config/schema.json#L907-L1028)
+        - [@angular-devkit/build-angular:extract-i18n](https://github.com/angular/angular-cli/blob/v6.0.0-rc.8/packages/%40angular/cli/lib/config/schema.json#L1029-L1064)
+        - [@angular-devkit/build-angular:karma](https://github.com/angular/angular-cli/blob/v6.0.0-rc.8/packages/%40angular/cli/lib/config/schema.json#L1065-L1267)
+        - [@angular-devkit/build-angular:protractor](https://github.com/angular/angular-cli/blob/v6.0.0-rc.8/packages/%40angular/cli/lib/config/schema.json#L1268-L1323)
+        - [@angular-devkit/build-angular:server](https://github.com/angular/angular-cli/blob/v6.0.0-rc.8/packages/%40angular/cli/lib/config/schema.json#L1324-L1518)
+        - [@angular-devkit/build-angular:tslint](https://github.com/angular/angular-cli/blob/v6.0.0-rc.8/packages/%40angular/cli/lib/config/schema.json#L1519-L1594)
       - *configurations* (`object`): A map of alternative target options.
         - *configurationName* (`object`): Partial options override for this builder.
