@@ -5,15 +5,13 @@
 // Due to an obscure Mac bug, do not start this title with any symbol.
 process.title = 'ng';
 
-var red = require('chalk').red;
-
 var version = process.version.substr(1).split('.');
 if (Number(version[0]) < 8 || (Number(version[0]) === 8 && Number(version[1]) < 9)) {
-  process.stderr.write(red(
+  process.stderr.write(
     'You are running version ' + process.version + ' of Node.js, which is not supported by Angular CLI v6.\n' +
     'The official Node.js version that is supported is 8.9 and greater.\n\n' +
     'Please visit https://nodejs.org/en/ to find instructions on how to update Node.js.\n'
-  ));
+  );
 
   process.exit(3);
 }

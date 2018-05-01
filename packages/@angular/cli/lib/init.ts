@@ -14,7 +14,7 @@ const packageJson = require('../package.json');
 const path = require('path');
 const resolve = require('resolve');
 const stripIndents = require('@angular-devkit/core').tags.stripIndents;
-const yellow = require('chalk').yellow;
+const yellow = require('@angular-devkit/core').terminal.yellow;
 const SemVer = require('semver').SemVer;
 const events = require('events');
 

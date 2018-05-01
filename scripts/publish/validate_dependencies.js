@@ -2,7 +2,7 @@
 'use strict';
 
 /* eslint-disable no-console */
-const chalk = require('chalk');
+const terminal = require('@angular-devkit/core').terminal;
 const fs = require('fs');
 const glob = require('glob');
 const packages = require('../../lib/packages').packages;
@@ -70,9 +70,9 @@ function listIgnoredModules(source) {
 
 function reportMissingDependencies(missingDeps) {
   if (missingDeps.length == 0) {
-    console.log(chalk.green('  no dependency missing from package.json.'));
+    console.log(terminal.green('  no dependency missing from package.json.'));
   } else {
-    console.log(chalk.yellow(`  ${missingDeps.length} missing from package.json:`));
+    console.log(terminal.yellow(`  ${missingDeps.length} missing from package.json:`));
     missingDeps.forEach(md => console.log(`    ${md}`));
     exitCode = 1;
   }
@@ -80,9 +80,9 @@ function reportMissingDependencies(missingDeps) {
 
 function reportExcessiveDependencies(overDeps) {
   if (overDeps.length == 0) {
-    console.log(chalk.green('  no excessive dependencies in package.json.'));
+    console.log(terminal.green('  no excessive dependencies in package.json.'));
   } else {
-    console.log(chalk.yellow(`  ${overDeps.length} excessive dependencies in package.json:`));
+    console.log(terminal.yellow(`  ${overDeps.length} excessive dependencies in package.json:`));
     overDeps.forEach(md => console.log(`    ${md}`));
     exitCode = 1;
   }
@@ -91,7 +91,7 @@ function reportExcessiveDependencies(overDeps) {
 let exitCode = 0;
 const overallDeps = [];
 for (const packageName of Object.keys(packages)) {
-  console.log(chalk.green(`Reading dependencies of "${packageName}".`));
+  console.log(terminal.green(`Reading dependencies of "${packageName}".`));
 
   const allSources = glob.sync(path.join(__dirname, '../../packages/', packageName, '**/*'))
     .filter(p => p.match(/\.(js|ts)$/))
@@ -117,7 +117,7 @@ for (const packageName of Object.keys(packages)) {
     .filter(x => NODE_PACKAGES.indexOf(x) == -1);
   overallDeps.push(...dependencies);
 
-  console.log(chalk.green(`  found ${dependencies.length} dependencies...`));
+  console.log(terminal.green(`  found ${dependencies.length} dependencies...`));
   const packageJson = JSON.parse(fs.readFileSync(packages[packageName].packageJson, 'utf8'));
   const allDeps = []
     .concat(Object.keys(packageJson['dependencies'] || {}))
@@ -136,7 +136,7 @@ for (const packageName of Object.keys(packages)) {
   console.log('');
 }
 
-console.log(chalk.green('Validating root package. [devDependencies ignored]'));
+console.log(terminal.green('Validating root package. [devDependencies ignored]'));
 const rootPackagePath = path.join(__dirname, '../../package.json');
 const rootPackageJson = JSON.parse(fs.readFileSync(rootPackagePath, 'utf8'));
 // devDependencies are ignored

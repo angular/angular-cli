@@ -5,7 +5,7 @@
 const spawnSync = require( 'child_process').spawnSync;
 const fs = require('fs');
 const temp = require('temp');
-const { blue, green, gray } = require('chalk');
+const { blue, green, gray } = require('@angular-devkit/core').terminal;
 
 const path = require('path');
 const glob = require('glob');

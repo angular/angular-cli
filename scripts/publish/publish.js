@@ -3,7 +3,7 @@
 
 /* eslint-disable no-console */
 const { packages } = require('../../lib/packages');
-const { yellow } = require('chalk');
+const { yellow } = require('@angular-devkit/core').terminal;
 const fs = require('fs');
 const http = require('http');
 const path = require('path');

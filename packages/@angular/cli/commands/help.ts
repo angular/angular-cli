@@ -1,7 +1,6 @@
 import { Command, Option } from '../models/command';
-import chalk from 'chalk';
+import { terminal } from '@angular-devkit/core';
 
-const { cyan } = chalk;
 
 export default class HelpCommand extends Command {
   public readonly name = 'help';
@@ -23,7 +22,7 @@ export default class HelpCommand extends Command {
       }));
     this.logger.info(`Available Commands:`);
     commands.forEach(cmd => {
-      this.logger.info(`  ${cyan(cmd.name)} ${cmd.description}`);
+      this.logger.info(`  ${terminal.cyan(cmd.name)} ${cmd.description}`);
     });
 
     this.logger.info(`\nFor more detailed help run "ng [command name] --help"`);

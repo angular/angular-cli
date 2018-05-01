@@ -1,5 +1,4 @@
-import { logging } from '@angular-devkit/core';
-const { cyan } = require('chalk');
+import { logging, terminal } from '@angular-devkit/core';
 
 export interface CommandConstructor {
   new(context: CommandContext, logger: logging.Logger): Command;
@@ -66,7 +65,7 @@ export abstract class Command<T = any> {
         const aliases = o.aliases && o.aliases.length > 0
           ? '(' + o.aliases.map(a => `-${a}`).join(' ') + ')'
           : '';
-        this.logger.info(`  ${cyan('--' + o.name)} ${aliases}`);
+        this.logger.info(`  ${terminal.cyan('--' + o.name)} ${aliases}`);
         this.logger.info(`    ${o.description}`);
       });
     }

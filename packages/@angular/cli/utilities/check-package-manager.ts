@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { terminal } from '@angular-devkit/core';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { getPackageManager } from './config';
@@ -19,16 +19,16 @@ export function checkYarnOrCNPM() {
       .then((data: Array<boolean>) => {
         const [isYarnInstalled, isCNPMInstalled] = data;
         if (isYarnInstalled && isCNPMInstalled) {
-          console.log(chalk.yellow('You can `ng config -g cli.packageManager yarn` '
+          console.log(terminal.yellow('You can `ng config -g cli.packageManager yarn` '
             + 'or `ng config -g cli.packageManager cnpm`.'));
         } else if (isYarnInstalled) {
-          console.log(chalk.yellow('You can `ng config -g cli.packageManager yarn`.'));
+          console.log(terminal.yellow('You can `ng config -g cli.packageManager yarn`.'));
         } else if (isCNPMInstalled) {
-          console.log(chalk.yellow('You can `ng config -g cli.packageManager cnpm`.'));
+          console.log(terminal.yellow('You can `ng config -g cli.packageManager cnpm`.'));
         } else  {
           if (packageManager !== 'default' && packageManager !== 'npm') {
-            console.log(chalk.yellow(`Seems that ${packageManager} is not installed.`));
-            console.log(chalk.yellow('You can `ng config -g cli.packageManager npm`.'));
+            console.log(terminal.yellow(`Seems that ${packageManager} is not installed.`));
+            console.log(terminal.yellow('You can `ng config -g cli.packageManager npm`.'));
           }
         }
       });
