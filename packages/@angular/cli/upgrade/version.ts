@@ -1,14 +1,10 @@
 import { SemVer, satisfies } from 'semver';
-import chalk from 'chalk';
-import { tags } from '@angular-devkit/core';
+import { tags, terminal } from '@angular-devkit/core';
 import * as path from 'path';
 import { isWarningEnabled } from '../utilities/config';
 import { requireProjectModule } from '../utilities/require-project-module';
 
 const resolve = require('resolve');
-
-
-const { bold, red, yellow } = chalk;
 
 
 export class Version {
@@ -64,14 +60,14 @@ export class Version {
       angularPkgJson = requireProjectModule(projectRoot, '@angular/core/package.json');
       rxjsPkgJson = requireProjectModule(projectRoot, 'rxjs/package.json');
     } catch {
-      console.error(bold(red(tags.stripIndents`
+      console.error(terminal.bold(terminal.red(tags.stripIndents`
         You seem to not be depending on "@angular/core" and/or "rxjs". This is an error.
       `)));
       process.exit(2);
     }
 
     if (!(angularPkgJson && angularPkgJson['version'] && rxjsPkgJson && rxjsPkgJson['version'])) {
-      console.error(bold(red(tags.stripIndents`
+      console.error(terminal.bold(terminal.red(tags.stripIndents`
         Cannot determine versions of "@angular/core" and/or "rxjs".
         This likely means your local installation is broken. Please reinstall your packages.
       `)));
@@ -82,12 +78,12 @@ export class Version {
     let rxjsVersion = new Version(rxjsPkgJson['version']);
 
     if (angularVersion.isLocal()) {
-      console.warn(yellow('Using a local version of angular. Proceeding with care...'));
+      console.warn(terminal.yellow('Using a local version of angular. Proceeding with care...'));
       return;
     }
 
     if (!angularVersion.isGreaterThanOrEqualTo(new SemVer('5.0.0'))) {
-      console.error(bold(red(tags.stripIndents`
+      console.error(terminal.bold(terminal.red(tags.stripIndents`
           This version of CLI is only compatible with Angular version 5.0.0 or higher.
 
           Please visit the link below to find instructions on how to update Angular.
@@ -99,7 +95,7 @@ export class Version {
       && !rxjsVersion.isGreaterThanOrEqualTo(new SemVer('5.6.0-forward-compat.0'))
       && !rxjsVersion.isGreaterThanOrEqualTo(new SemVer('6.0.0-beta.0'))
     ) {
-      console.error(bold(red(tags.stripIndents`
+      console.error(terminal.bold(terminal.red(tags.stripIndents`
           This project uses version ${rxjsVersion} of RxJs, which is not supported by Angular v6.
           The official RxJs version that is supported is 5.6.0-forward-compat.0 and greater.
 
@@ -111,7 +107,7 @@ export class Version {
       angularVersion.isGreaterThanOrEqualTo(new SemVer('6.0.0-rc.0'))
       && !rxjsVersion.isGreaterThanOrEqualTo(new SemVer('6.0.0-beta.0'))
     ) {
-      console.warn(bold(red(tags.stripIndents`
+      console.warn(terminal.bold(terminal.red(tags.stripIndents`
           This project uses a temporary compatibility version of RxJs (${rxjsVersion}).
 
           Please visit the link below to find instructions on how to update RxJs.
@@ -129,7 +125,7 @@ export class Version {
       compilerVersion = requireProjectModule(projectRoot, '@angular/compiler-cli').VERSION.full;
       tsVersion = requireProjectModule(projectRoot, 'typescript').version;
     } catch {
-      console.error(bold(red(tags.stripIndents`
+      console.error(terminal.bold(terminal.red(tags.stripIndents`
         Versions of @angular/compiler-cli and typescript could not be determined.
         The most common reason for this is a broken npm install.
 
@@ -153,7 +149,7 @@ export class Version {
 
     if (currentCombo && !satisfies(tsVersion, currentCombo.typescript)) {
       // First line of warning looks weird being split in two, disable tslint for it.
-      console.log((yellow('\n' + tags.stripIndent`
+      console.log((terminal.yellow('\n' + tags.stripIndent`
         @angular/compiler-cli@${compilerVersion} requires typescript@'${
         currentCombo.typescript}' but ${tsVersion} was found instead.
         Using this version can result in undefined behaviour and difficult to debug problems.

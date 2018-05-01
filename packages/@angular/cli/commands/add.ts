@@ -1,6 +1,5 @@
-import { tags } from '@angular-devkit/core';
+import { tags, terminal } from '@angular-devkit/core';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
-import chalk from 'chalk';
 import { CommandScope, Option } from '../models/command';
 import { parseOptions } from '../models/command-runner';
 import { getPackageManager } from '../utilities/config';
@@ -36,7 +35,7 @@ export default class AddCommand extends SchematicCommand {
     if (!collectionName) {
       throw new SilentError(
         `The "ng ${this.name}" command requires a name argument to be specified eg. `
-        + `${chalk.yellow('ng add [name] ')}. For more details, use "ng help".`
+        + `${terminal.yellow('ng add [name] ')}. For more details, use "ng help".`
       );
     }
 
@@ -49,7 +48,7 @@ export default class AddCommand extends SchematicCommand {
     if (!collectionName) {
       throw new SilentError(
         `The "ng ${this.name}" command requires a name argument to be specified eg. `
-        + `${chalk.yellow('ng add [name] ')}. For more details, use "ng help".`
+        + `${terminal.yellow('ng add [name] ')}. For more details, use "ng help".`
       );
     }
 

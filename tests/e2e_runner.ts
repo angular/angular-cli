@@ -1,8 +1,8 @@
 // This may seem awkward but we're using Logger in our e2e. At this point the unit tests
 // have run already so it should be "safe", teehee.
 import { logging } from '@angular-devkit/core';
-import { createConsoleLogger } from "@angular-devkit/core/node";
-import {blue, bold, green, red, yellow, white} from 'chalk';
+import { createConsoleLogger } from '@angular-devkit/core/node';
+import { terminal } from '@angular-devkit/core';
 import {gitClean} from './e2e/utils/git';
 import * as glob from 'glob';
 import * as minimist from 'minimist';
@@ -11,6 +11,8 @@ import {setGlobalVariable} from './e2e/utils/env';
 
 // RxJS
 import {filter} from 'rxjs/operators';
+
+const { blue, bold, green, red, yellow, white } = terminal;
 
 
 Error.stackTraceLimit = Infinity;

@@ -35,7 +35,6 @@
     "@angular-devkit/schematics": "0.5.10",
     "@schematics/angular": "0.5.10",
     "@schematics/update": "0.5.10",
-    "chalk": "~2.2.0",
     "opn": "~5.1.0",
     "resolve": "^1.1.7",
     "rxjs": "^6.0.0",

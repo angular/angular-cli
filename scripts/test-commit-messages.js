@@ -4,8 +4,7 @@ require('../lib/bootstrap-local');
 
 const validateCommitMessage = require('./validate-commit-message');
 const execSync = require('child_process').execSync;
-const chalk = require('chalk');
-const { logging } = require('@angular-devkit/core');
+const { logging, terminal } = require('@angular-devkit/core');
 const Logger = logging.Logger;
 const filter = require('rxjs/operators').filter;
 
@@ -13,13 +12,13 @@ const filter = require('rxjs/operators').filter;
 const logger = new Logger('test-commit-messages');
 
 logger.subscribe((entry) => {
-  let color = chalk.white;
+  let color = terminal.white;
   let output = process.stdout;
   switch (entry.level) {
-    case 'info': color = chalk.white; break;
-    case 'warn': color = chalk.yellow; break;
-    case 'error': color = chalk.red; output = process.stderr; break;
-    case 'fatal': color = (x) => chalk.bold(chalk.red(x)); output = process.stderr; break;
+    case 'info': color = terminal.white; break;
+    case 'warn': color = terminal.yellow; break;
+    case 'error': color = terminal.red; output = process.stderr; break;
+    case 'fatal': color = (x) => terminal.bold(terminal.red(x)); output = process.stderr; break;
   }
 
   output.write(color(entry.message) + '\n');

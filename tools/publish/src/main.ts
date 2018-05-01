@@ -1,11 +1,10 @@
-import { logging } from '@angular-devkit/core';
-import chalk from 'chalk';
+import { logging, terminal } from '@angular-devkit/core';
 import * as minimist from 'minimist';
 
 import {filter} from 'rxjs/operators';
 
 
-const { bold, red, yellow, white } = chalk;
+const { bold, red, yellow, white } = terminal;
 
 const argv = minimist(process.argv.slice(2), {
   boolean: ['verbose']
