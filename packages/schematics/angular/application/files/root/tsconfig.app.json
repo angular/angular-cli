@@ -1,7 +1,7 @@
 {
-  "extends": "<%= relativeTsConfigPath %>/tsconfig.json",
+  "extends": "<%= relativePathToWorkspaceRoot %>/tsconfig.json",
   "compilerOptions": {
-    "outDir": "<%= relativeTsConfigPath %>/out-tsc/app",
+    "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/app",
     "module": "es2015",
     "types": []
   },

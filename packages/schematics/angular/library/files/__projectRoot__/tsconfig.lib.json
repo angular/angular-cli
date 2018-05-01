@@ -1,7 +1,7 @@
 {
-  "extends": "<%= projectRoot.split('/').map(x => '..').join('/') %>/tsconfig.json",
+  "extends": "<%= relativePathToWorkspaceRoot %>/tsconfig.json",
   "compilerOptions": {
-    "outDir": "<%= projectRoot.split('/').map(x => '..').join('/') %>/out-tsc/lib",
+    "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/lib",
     "target": "es2015",
     "module": "es2015",
     "moduleResolution": "node",

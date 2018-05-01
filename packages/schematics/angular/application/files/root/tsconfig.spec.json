@@ -1,7 +1,7 @@
 {
-  "extends": "<%= relativeTsConfigPath %>/tsconfig.json",
+  "extends": "<%= relativePathToWorkspaceRoot %>/tsconfig.json",
   "compilerOptions": {
-    "outDir": "<%= relativeTsConfigPath %>/out-tsc/spec",
+    "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/spec",
     "module": "commonjs",
     "types": [
       "jasmine",

@@ -199,7 +199,7 @@ export default function (options: LibraryOptions): Rule {
     }
 
     const sourceDir = `${projectRoot}/src/lib`;
-    const relativeTsLintPath = projectRoot.split('/').map(x => '..').join('/');
+    const relativePathToWorkspaceRoot = projectRoot.split('/').map(x => '..').join('/');
 
     const templateSource = apply(url('./files'), [
       template({
@@ -207,7 +207,7 @@ export default function (options: LibraryOptions): Rule {
         ...options,
         packageName,
         projectRoot,
-        relativeTsLintPath,
+        relativePathToWorkspaceRoot,
         prefix,
       }),
       // TODO: Moving inside `branchAndMerge` should work but is bugged right now.

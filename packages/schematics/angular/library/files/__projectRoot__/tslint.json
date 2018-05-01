@@ -1,5 +1,5 @@
 {
-    "extends": "<%= relativeTsLintPath %>/tslint.json",
+    "extends": "<%= relativePathToWorkspaceRoot %>/tslint.json",
     "rules": {
         "directive-selector": [
             true,

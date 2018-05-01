@@ -257,21 +257,16 @@ export default function (options: ApplicationOptions): Rule {
     let appDir = `${newProjectRoot}/${options.name}`;
     let sourceRoot = `${appDir}/src`;
     let sourceDir = `${sourceRoot}/app`;
-    let relativeTsConfigPath = appDir.split('/').map(x => '..').join('/');
-    let relativeTsLintPath = appDir.split('/').map(x => '..').join('/');
+    let relativePathToWorkspaceRoot = appDir.split('/').map(x => '..').join('/');
     const rootInSrc = options.projectRoot !== undefined;
     if (options.projectRoot !== undefined) {
       newProjectRoot = options.projectRoot;
       appDir = `${newProjectRoot}/src`;
       sourceRoot = appDir;
       sourceDir = `${sourceRoot}/app`;
-      relativeTsConfigPath = relative(normalize('/' + sourceRoot), normalize('/'));
-      if (relativeTsConfigPath === '') {
-        relativeTsConfigPath = '.';
-      }
-      relativeTsLintPath = relative(normalize('/' + sourceRoot), normalize('/'));
-      if (relativeTsLintPath === '') {
-        relativeTsLintPath = '.';
+      relativePathToWorkspaceRoot = relative(normalize('/' + sourceRoot), normalize('/'));
+      if (relativePathToWorkspaceRoot === '') {
+        relativePathToWorkspaceRoot = '.';
       }
     }
     const tsLintRoot = appDir;
@@ -294,7 +289,7 @@ export default function (options: ApplicationOptions): Rule {
             utils: strings,
             ...options,
             'dot': '.',
-            relativeTsConfigPath,
+            relativePathToWorkspaceRoot,
           }),
           move(sourceRoot),
         ])),
@@ -304,7 +299,7 @@ export default function (options: ApplicationOptions): Rule {
             utils: strings,
             ...options,
             'dot': '.',
-            relativeTsConfigPath,
+            relativePathToWorkspaceRoot,
             rootInSrc,
           }),
           move(appDir),
@@ -315,7 +310,7 @@ export default function (options: ApplicationOptions): Rule {
             utils: strings,
             ...options,
             tsLintRoot,
-            relativeTsLintPath,
+            relativePathToWorkspaceRoot,
             prefix,
           }),
           // TODO: Moving should work but is bugged right now.
