@@ -7,6 +7,10 @@ export default function () {
   return Promise.resolve()
     .then(() => createProjectFromAsset('1.7-project'))
     .then(() => expectToFail(() => ng('build')))
-    .then(() => ng('update', '@angular/cli', '--migrate-only', '--from=1.7.1'))
-    .then(() => ng('build'));
+    .then(() => ng('update', '@angular/cli'))
+    .then(() => ng('generate', 'component', 'my-comp'))
+    .then(() => ng('test'))
+    .then(() => ng('lint'))
+    .then(() => ng('build', '--prod'))
+    .then(() => ng('e2e'));
 }
