@@ -117,6 +117,10 @@
     "progress": {
       "type": "boolean",
       "description": "Log progress to the console while building."
+    },
+    "poll": {
+      "type": "number",
+      "description": "Enable and define the file watching poll time period in milliseconds."
     }
   },
   "additionalProperties": false,

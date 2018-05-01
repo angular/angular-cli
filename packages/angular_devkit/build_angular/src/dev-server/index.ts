@@ -52,6 +52,7 @@ export interface DevServerBuilderOptions {
   hmrWarning: boolean;
   servePathDefaultWarning: boolean;
 
+  // These options come from the browser builder and are provided here for convenience.
   optimization?: boolean;
   aot?: boolean;
   sourceMap?: boolean;
@@ -60,6 +61,7 @@ export interface DevServerBuilderOptions {
   commonChunk?: boolean;
   baseHref?: string;
   progress?: boolean;
+  poll?: number;
 }
 
 interface WebpackDevServerConfigurationOptions {
@@ -450,6 +452,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
       ...(options.commonChunk !== undefined ? { commonChunk: options.commonChunk } : {}),
       ...(options.baseHref !== undefined ? { baseHref: options.baseHref } : {}),
       ...(options.progress !== undefined ? { progress: options.progress } : {}),
+      ...(options.poll !== undefined ? { poll: options.poll } : {}),
 
       ...builderConfig.options,
     };
