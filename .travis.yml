@@ -93,6 +93,7 @@ matrix:
 
 
 install:
+  - npm install -g npm@5.8.0
   - npm install
 
 env:
