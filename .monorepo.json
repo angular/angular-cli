@@ -42,18 +42,18 @@
   },
   "packages": {
     "@_/benchmark": {
-      "version": "0.5.9",
+      "version": "0.5.11",
       "hash": "37ed7e417435c92dbf301e7b26ea37ca"
     },
     "devkit": {
-      "version": "0.5.9",
-      "hash": "68ede5da854a21d3077ee337e9e7948b"
+      "version": "0.5.11",
+      "hash": "1d066d7c828bdd4072757c9ec255f0ad"
     },
     "@angular/pwa": {
       "name": "Angular PWA Schematics",
       "section": "Schematics",
-      "version": "0.5.9",
-      "hash": "c203b0bc5127d90dea4d4a972c207cee",
+      "version": "0.5.11",
+      "hash": "7dd0c330cbb4ccd70899918e4e7674fa",
       "snapshotRepo": "angular/angular-pwa-builds"
     },
     "@angular-devkit/architect": {
@@ -64,14 +64,14 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/architect/README.md"
         }
       ],
-      "version": "0.5.9",
-      "hash": "1d0af0d9a49365956b9cfa0434d38111",
+      "version": "0.5.11",
+      "hash": "40cbf0679984a11d6af42ad278da23ba",
       "snapshotRepo": "angular/angular-devkit-architect-builds"
     },
     "@angular-devkit/architect-cli": {
       "name": "Architect CLI",
-      "version": "0.5.9",
-      "hash": "0cc3e657940eaf82c7f3625ec6b53145",
+      "version": "0.5.11",
+      "hash": "ad865d8d5f8434501e3bd5c06519c53d",
       "snapshotRepo": "angular/angular-devkit-architect-cli-builds"
     },
     "@angular-devkit/build-optimizer": {
@@ -82,7 +82,7 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_optimizer/README.md"
         }
       ],
-      "version": "0.5.9",
+      "version": "0.5.11",
       "hash": "40c26d3c33be648c3811639baeb487a9",
       "snapshotRepo": "angular/angular-devkit-build-optimizer-builds"
     },
@@ -94,8 +94,8 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_ng_packagr/README.md"
         }
       ],
-      "version": "0.5.9",
-      "hash": "aaaa270a8ff940c84c2a6db4b5cf8852",
+      "version": "0.5.11",
+      "hash": "05d55c3e0e8736386405527b5680c09d",
       "snapshotRepo": "angular/angular-devkit-build-ng-packagr-builds"
     },
     "@angular-devkit/build-angular": {
@@ -106,8 +106,8 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_angular/README.md"
         }
       ],
-      "version": "0.5.9",
-      "hash": "ddf40c50f4382e53b88aa5adec296486",
+      "version": "0.5.11",
+      "hash": "2adf90599eb51edb29f2ba583a6e98b2",
       "snapshotRepo": "angular/angular-devkit-build-angular-builds"
     },
     "@angular-devkit/core": {
@@ -118,8 +118,8 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/core/README.md"
         }
       ],
-      "version": "0.5.9",
-      "hash": "10634650ce62549315edcbb909a5d5c9",
+      "version": "0.5.11",
+      "hash": "547fbef5a37b03dae8fc447d0d329aa8",
       "snapshotRepo": "angular/angular-devkit-core-builds"
     },
     "@angular-devkit/schematics": {
@@ -130,49 +130,49 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/schematics/README.md"
         }
       ],
-      "version": "0.5.9",
-      "hash": "240bd443a87aeb367d3b94505ab1b23c",
+      "version": "0.5.11",
+      "hash": "4065f6ce02d4da74507805436faaee22",
       "snapshotRepo": "angular/angular-devkit-schematics-builds"
     },
     "@angular-devkit/schematics-cli": {
       "name": "Schematics CLI",
-      "version": "0.5.9",
-      "hash": "bc959765b7f8d01da28b1b90684c1772",
+      "version": "0.5.11",
+      "hash": "37f668cbbb9a19190c34e6707a804dc6",
       "snapshotRepo": "angular/angular-devkit-schematics-cli-builds"
     },
     "@ngtools/webpack": {
       "name": "Webpack Angular Plugin",
-      "version": "6.0.0-rc.7",
+      "version": "6.0.0-rc.9",
       "section": "Misc",
-      "hash": "a0c2ff190d167097de741e94dd80e234",
+      "hash": "7fdcb82bd642c7da3e99f8ffe5c9d454",
       "snapshotRepo": "angular/ngtools-webpack-builds"
     },
     "@schematics/angular": {
       "name": "Angular Schematics",
       "section": "Schematics",
-      "version": "0.5.9",
-      "hash": "d6d7d3949185648b98aa0ba712763be7",
+      "version": "0.5.11",
+      "hash": "1e411cf2113f7abd7c67ba51db8397aa",
       "snapshotRepo": "angular/schematics-angular-builds"
     },
     "@schematics/schematics": {
       "name": "Schematics Schematics",
-      "version": "0.5.9",
+      "version": "0.5.11",
       "section": "Schematics",
-      "hash": "bbf0bca054ea720671cb9234e9f593c5",
+      "hash": "bad76fc2322d429a7d7758c61b7c4281",
       "snapshotRepo": "angular/schematics-schematics-builds"
     },
     "@schematics/package-update": {
       "name": "Package JSON Update Schematics",
-      "version": "0.5.9",
+      "version": "0.5.11",
       "section": "Schematics",
-      "hash": "e6a4bb78af3a07ace42a3501c3992c2b",
+      "hash": "394b0cfe9820a4b859566b868af1af2f",
       "snapshotRepo": "angular/schematics-package-update-builds"
     },
     "@schematics/update": {
       "name": "Package Update Schematics",
-      "version": "0.5.9",
+      "version": "0.5.11",
       "section": "Schematics",
-      "hash": "028163a4b5962e505f4841a5a4b45de6",
+      "hash": "86ec9793b43898bc06bda7c9a784e3d3",
       "snapshotRepo": "angular/schematics-update-builds"
     }
   }
