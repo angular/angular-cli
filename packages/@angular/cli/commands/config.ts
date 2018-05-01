@@ -1,6 +1,11 @@
 import { writeFileSync } from 'fs';
 import { Command, Option } from '../models/command';
-import { getWorkspace, getWorkspaceRaw, validateWorkspace } from '../utilities/config';
+import {
+  getWorkspace,
+  getWorkspaceRaw,
+  migrateLegacyGlobalConfig,
+  validateWorkspace,
+} from '../utilities/config';
 import {
   JsonValue,
   JsonArray,
@@ -8,6 +13,7 @@ import {
   JsonParseMode,
   experimental,
   parseJson,
+  tags,
 } from '@angular-devkit/core';
 
 const SilentError = require('silent-error');
@@ -165,10 +171,22 @@ export default class ConfigCommand extends Command {
   public run(options: ConfigOptions) {
     const level = options.global ? 'global' : 'local';
 
-    if (options.value == undefined) {
-      const config =
+    let config =
       (getWorkspace(level) as {} as { _workspace: experimental.workspace.WorkspaceSchema });
 
+    if (options.global && !config) {
+      try {
+        if (migrateLegacyGlobalConfig()) {
+          config =
+            (getWorkspace(level) as {} as { _workspace: experimental.workspace.WorkspaceSchema });
+          this.logger.info(tags.oneLine`
+            We found a global configuration that was used in Angular CLI 1.
+            It has been automatically migrated.`);
+        }
+      } catch {}
+    }
+
+    if (options.value == undefined) {
       if (!config) {
         throw new SilentError('No config found.');
       }
