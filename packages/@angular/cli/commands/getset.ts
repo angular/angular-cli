@@ -10,6 +10,7 @@ export default class GetSetCommand extends Command {
   public readonly description = 'Deprecated in favor of config command.';
   public readonly arguments: string[] = [];
   public readonly options: Option[] = [];
+  public readonly hidden = true;
 
   public async run(_options: Options) {
     this.logger.warn('get/set have been deprecated in favor of the config command.');
