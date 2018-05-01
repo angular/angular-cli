@@ -7,6 +7,7 @@ import { DryRunEvent, UnsuccessfulWorkflowExecution } from '@angular-devkit/sche
 import { getPackageManager, getDefaultSchematicCollection } from '../utilities/config';
 import { getCollection, getSchematic } from '../utilities/schematics';
 import { getSchematicDefaults } from '../utilities/config';
+import { camelize } from '@angular-devkit/core/src/utils/strings';
 import { take } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
 
@@ -353,7 +354,7 @@ export abstract class SchematicCommand extends Command {
     // Get list of all undefined options.
     const undefinedOptions = this.options
       .filter(o => options[o.name] === undefined)
-      .map(o => o.name);
+      .map(o => camelize(o.name));
 
     // Delete any default that is not undefined.
     this._cleanDefaults(defaults, undefinedOptions);
