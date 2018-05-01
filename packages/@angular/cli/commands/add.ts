@@ -43,9 +43,9 @@ export default class AddCommand extends SchematicCommand {
   }
 
   async run(options: any) {
-    const collectionName = options._[0];
+    const firstArg = options._[0];
 
-    if (!collectionName) {
+    if (!firstArg) {
       throw new SilentError(
         `The "ng ${this.name}" command requires a name argument to be specified eg. `
         + `${terminal.yellow('ng add [name] ')}. For more details, use "ng help".`
@@ -56,9 +56,16 @@ export default class AddCommand extends SchematicCommand {
 
     const npmInstall: NpmInstall = require('../tasks/npm-install').default;
 
-    const packageName = collectionName.startsWith('@')
-      ? collectionName.split('/', 2).join('/')
-      : collectionName.split('/', 1)[0];
+    const packageName = firstArg.startsWith('@')
+      ? firstArg.split('/', 2).join('/')
+      : firstArg.split('/', 1)[0];
+
+    // Remove the tag/version from the package name.
+    const collectionName = (
+      packageName.startsWith('@')
+        ? packageName.split('@', 2).join('@')
+        : packageName.split('@', 1).join('@')
+    ) + firstArg.slice(packageName.length);
 
     // We don't actually add the package to package.json, that would be the work of the package
     // itself.
