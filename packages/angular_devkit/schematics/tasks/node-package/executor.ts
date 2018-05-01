@@ -14,21 +14,30 @@ import { NodePackageTaskFactoryOptions, NodePackageTaskOptions } from './options
 
 type PackageManagerProfile = {
   quietArgument?: string;
-  commands: { [name: string]: string },
+  commands: {
+    installAll?: string;
+    installPackage: string;
+  },
 };
 
 const packageManagers: { [name: string]: PackageManagerProfile } = {
   'npm': {
     quietArgument: '--quiet',
-    commands: { },
+    commands: {
+      installAll: 'install',
+      installPackage: 'install',
+    },
   },
   'cnpm': {
-    commands: { },
+    commands: {
+      installAll: 'install',
+      installPackage: 'install',
+    },
    },
   'yarn': {
     quietArgument: '--silent',
     commands: {
-      'install': 'add',
+      installPackage: 'add',
     },
   },
 };
@@ -68,12 +77,15 @@ export default function(
       shell: true,
       cwd: path.join(rootDirectory, options.workingDirectory || ''),
     };
-    const args = [
-      taskPackageManagerProfile.commands[options.command] || options.command,
-    ];
+    const args: string[] = [];
 
     if (options.packageName) {
+      if (options.command === 'install') {
+        args.push(packageManagerProfile.commands.installPackage);
+      }
       args.push(options.packageName);
+    } else if (options.command === 'install' && packageManagerProfile.commands.installAll) {
+      args.push(packageManagerProfile.commands.installAll);
     }
 
     if (options.quiet && taskPackageManagerProfile.quietArgument) {
