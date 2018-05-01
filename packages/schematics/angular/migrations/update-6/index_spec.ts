@@ -140,6 +140,7 @@ describe('Migration to v6', () => {
       const config = getConfig(tree);
       expect(config.version).toEqual(1);
       expect(config.newProjectRoot).toEqual('projects');
+      expect(config.defaultProject).toEqual('foo');
     });
 
     describe('schematics', () => {

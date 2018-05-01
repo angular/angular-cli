@@ -92,6 +92,10 @@ function migrateConfiguration(oldConfig: CliConfig): Rule {
       newProjectRoot: 'projects',
       projects: extractProjectsConfig(oldConfig, host),
     };
+    const defaultProject = extractDefaultProject(oldConfig);
+    if (defaultProject !== null) {
+      config.defaultProject = defaultProject;
+    }
     const cliConfig = extractCliConfig(oldConfig);
     if (cliConfig !== null) {
       config.cli = cliConfig;
@@ -200,10 +204,7 @@ function extractArchitectConfig(_config: CliConfig): JsonObject | null {
 
 function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
   const builderPackage = '@angular-devkit/build-angular';
-  let defaultAppNamePrefix = 'app';
-  if (config.project && config.project.name) {
-    defaultAppNamePrefix = config.project.name;
-  }
+  const defaultAppNamePrefix = getDefaultAppNamePrefix(config);
 
   const buildDefaults: JsonObject = config.defaults && config.defaults.build
     ? {
@@ -548,6 +549,27 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
     }, {} as JsonObject);
 
   return projectMap;
+}
+
+function getDefaultAppNamePrefix(config: CliConfig) {
+  let defaultAppNamePrefix = 'app';
+  if (config.project && config.project.name) {
+    defaultAppNamePrefix = config.project.name;
+  }
+
+  return defaultAppNamePrefix;
+}
+
+function extractDefaultProject(config: CliConfig): string | null {
+  if (config.apps && config.apps[0]) {
+    const app = config.apps[0];
+    const defaultAppName = getDefaultAppNamePrefix(config);
+    const name = app.name || defaultAppName;
+
+    return name;
+  }
+
+  return null;
 }
 
 function updateSpecTsConfig(config: CliConfig): Rule {
