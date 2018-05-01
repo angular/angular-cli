@@ -70,7 +70,15 @@ function migrateKarmaConfiguration(config: CliConfig): Rule {
       const buffer = host.read(karmaPath);
       if (buffer !== null) {
         let content = buffer.toString();
-        content = content.replace( /@angular\/cli/g, '@angular-devkit/build-angular');
+        // Replace the 1.0 files and preprocessor entries, with and without comma at the end.
+        // If these remain, they will cause the `ng test` to fail.
+        content = content.replace(`{ pattern: './src/test.ts', watched: false },`, '');
+        content = content.replace(`{ pattern: './src/test.ts', watched: false }`, '');
+        content = content.replace(`'./src/test.ts': ['@angular/cli'],`, '');
+        content = content.replace(`'./src/test.ts': ['@angular/cli']`, '');
+        // Replace 1.x plugin names.
+        content = content.replace(/@angular\/cli/g, '@angular-devkit/build-angular');
+        // Replace code coverage output path.
         content = content.replace('reports',
           `dir: require('path').join(__dirname, 'coverage'), reports`);
         host.overwrite(karmaPath, content);

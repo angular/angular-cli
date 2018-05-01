@@ -650,6 +650,23 @@ describe('Migration to v6', () => {
       const content = tree.readContent(karmaPath);
       expect(content).toContain(`dir: require('path').join(__dirname, 'coverage'), reports`);
     });
+
+    it('should remove unused properties in 1.0 configs', () => {
+      tree.overwrite(karmaPath, `
+        files: [
+          { pattern: './src/test.ts', watched: false }
+        ],
+        preprocessors: {
+          './src/test.ts': ['@angular/cli']
+        },
+      `);
+
+      tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+      tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+      const content = tree.readContent(karmaPath);
+      expect(content).not.toContain(`{ pattern: './src/test.ts', watched: false }`);
+      expect(content).not.toContain(`'./src/test.ts': ['@angular/cli']`);
+    });
   });
 
   describe('spec ts config', () => {
