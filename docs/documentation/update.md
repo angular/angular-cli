@@ -9,7 +9,7 @@
 <details>
   <summary>dry-run</summary>
   <p>
-    <code>--dry-run</code> (alias: <code>-d</code>) 
+    <code>--dry-run</code> (alias: <code>-d</code>)
   </p>
   <p>
     Run through without making any changes.
@@ -18,7 +18,7 @@
 <details>
   <summary>force</summary>
   <p>
-    <code>--force</code> 
+    <code>--force</code>
   </p>
   <p>
     If false, will error out if installed packages are incompatible with the update.
@@ -27,7 +27,7 @@
 <details>
   <summary>all</summary>
   <p>
-    <code>--all</code> 
+    <code>--all</code>
   </p>
   <p>
     Whether to update all packages in package.json.
@@ -36,7 +36,7 @@
 <details>
   <summary>next</summary>
   <p>
-    <code>--next</code> 
+    <code>--next</code>
   </p>
   <p>
     Use the largest version, including beta and RCs.
@@ -45,7 +45,7 @@
 <details>
   <summary>migrate-only</summary>
   <p>
-    <code>--migrate-only</code> 
+    <code>--migrate-only</code>
   </p>
   <p>
     Only perform a migration, does not update the installed version.
@@ -54,7 +54,7 @@
 <details>
   <summary>from</summary>
   <p>
-    <code>--from</code> 
+    <code>--from</code>
   </p>
   <p>
     Version from which to migrate from. Only available with a single package being updated, and only on migration only.
@@ -63,7 +63,7 @@
 <details>
   <summary>to</summary>
   <p>
-    <code>--to</code> 
+    <code>--to</code>
   </p>
   <p>
     Version up to which to apply migrations. Only available with a single package being updated, and only on migrations only. Requires from to be specified. Default to the installed version detected.
@@ -72,7 +72,7 @@
 <details>
   <summary>registry</summary>
   <p>
-    <code>--registry</code> 
+    <code>--registry</code>
   </p>
   <p>
     The NPM registry to use.

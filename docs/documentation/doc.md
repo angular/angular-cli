@@ -9,7 +9,7 @@
 <details>
   <summary>search</summary>
   <p>
-    <code>--search</code> (alias: <code>-s</code>) 
+    <code>--search</code> (alias: <code>-s</code>)
   </p>
   <p>
     Search whole angular.io instead of just api.
