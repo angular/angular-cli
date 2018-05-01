@@ -9,7 +9,7 @@
 <details>
   <summary>configuration</summary>
   <p>
-    <code>--configuration</code> (alias: <code>-c</code>) 
+    <code>--configuration</code> (alias: <code>-c</code>)
   </p>
   <p>
     Specify the configuration to use.
@@ -18,7 +18,7 @@
 <details>
   <summary>browser-target</summary>
   <p>
-    <code>--browser-target</code> 
+    <code>--browser-target</code>
   </p>
   <p>
     Target to extract from.
@@ -27,7 +27,7 @@
 <details>
   <summary>i18n-format</summary>
   <p>
-    <code>--i18n-format</code> 
+    <code>--i18n-format</code>
   </p>
   <p>
     Output format for the generated file.
@@ -36,7 +36,7 @@
 <details>
   <summary>i18n-locale</summary>
   <p>
-    <code>--i18n-locale</code> 
+    <code>--i18n-locale</code>
   </p>
   <p>
     Specifies the source language of the application.
@@ -45,7 +45,7 @@
 <details>
   <summary>output-path</summary>
   <p>
-    <code>--output-path</code> 
+    <code>--output-path</code>
   </p>
   <p>
     Path where output will be placed.
@@ -54,7 +54,7 @@
 <details>
   <summary>out-file</summary>
   <p>
-    <code>--out-file</code> 
+    <code>--out-file</code>
   </p>
   <p>
     Name of the file to output.

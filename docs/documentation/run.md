@@ -9,7 +9,7 @@ Runs Architect targets.
 <details>
   <summary>configuration</summary>
   <p>
-    <code>--configuration</code> (alias: <code>-c</code>) 
+    <code>--configuration</code> (alias: <code>-c</code>)
   </p>
   <p>
     Specify the configuration to use.

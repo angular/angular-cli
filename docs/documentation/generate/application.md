@@ -1,11 +1,9 @@
-<!-- Links in /docs/documentation should NOT have `.md` at the end, because they end up in our wiki at release. -->
+<!-- Links in /docs/documentation should NOT have \`.md\` at the end, because they end up in our wiki at release. -->
 
-# ng new
+# ng generate application
 
 ## Overview
-`ng new [name]` creates a new angular application.
-
-Default applications are created in a directory of the same name, with an initialized Angular application.
+Create an Angular application.
 
 ## Options
 <details>
@@ -24,24 +22,6 @@ Default applications are created in a directory of the same name, with an initia
   </p>
   <p>
     Forces overwriting of files.
-  </p>
-</details>
-<details>
-  <summary>verbose</summary>
-  <p>
-    <code>--verbose</code> (alias: <code>-v</code>)
-  </p>
-  <p>
-    Adds more details to output logging.
-  </p>
-</details>
-<details>
-  <summary>collection</summary>
-  <p>
-    <code>--collection</code> (alias: <code>-c</code>)
-  </p>
-  <p>
-    Schematics collection to use.
   </p>
 </details>
 <details>
