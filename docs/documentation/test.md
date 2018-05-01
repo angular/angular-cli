@@ -11,7 +11,7 @@
 ng test
 ```
 
-Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false` or `--single-run`.
+Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false`.
 
 You can run tests with coverage via `--code-coverage`. The coverage report will be in the `coverage/` directory.
 
@@ -19,7 +19,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>prod</summary>
   <p>
-    <code>--prod</code> 
+    <code>--prod</code>
   </p>
   <p>
     Flag to set configuration to "prod".
@@ -28,7 +28,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>configuration</summary>
   <p>
-    <code>--configuration</code> (alias: <code>-c</code>) 
+    <code>--configuration</code> (alias: <code>-c</code>)
   </p>
   <p>
     Specify the configuration to use.
@@ -37,7 +37,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>main</summary>
   <p>
-    <code>--main</code> 
+    <code>--main</code>
   </p>
   <p>
     The name of the main entry-point file.
@@ -46,7 +46,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>ts-config</summary>
   <p>
-    <code>--ts-config</code> 
+    <code>--ts-config</code>
   </p>
   <p>
     The name of the TypeScript configuration file.
@@ -55,7 +55,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>karma-config</summary>
   <p>
-    <code>--karma-config</code> 
+    <code>--karma-config</code>
   </p>
   <p>
     The name of the Karma configuration file.
@@ -64,7 +64,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>polyfills</summary>
   <p>
-    <code>--polyfills</code> 
+    <code>--polyfills</code>
   </p>
   <p>
     The name of the polyfills file.
@@ -73,7 +73,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>environment</summary>
   <p>
-    <code>--environment</code> 
+    <code>--environment</code>
   </p>
   <p>
     Defines the build environment.
@@ -82,7 +82,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>source-map</summary>
   <p>
-    <code>--source-map</code> 
+    <code>--source-map</code>
   </p>
   <p>
     Output sourcemaps.
@@ -91,7 +91,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>progress</summary>
   <p>
-    <code>--progress</code> 
+    <code>--progress</code>
   </p>
   <p>
     Log progress to the console while building.
@@ -100,7 +100,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>watch</summary>
   <p>
-    <code>--watch</code> 
+    <code>--watch</code>
   </p>
   <p>
     Run build when files change.
@@ -109,7 +109,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>poll</summary>
   <p>
-    <code>--poll</code> 
+    <code>--poll</code>
   </p>
   <p>
     Enable and define the file watching poll time period in milliseconds.
@@ -118,7 +118,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>preserve-symlinks</summary>
   <p>
-    <code>--preserve-symlinks</code> 
+    <code>--preserve-symlinks</code>
   </p>
   <p>
     Do not use the real path when resolving modules.
@@ -127,7 +127,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>browsers</summary>
   <p>
-    <code>--browsers</code> 
+    <code>--browsers</code>
   </p>
   <p>
     Override which browsers tests are run against.
@@ -136,7 +136,7 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
 <details>
   <summary>code-coverage</summary>
   <p>
-    <code>--code-coverage</code> 
+    <code>--code-coverage</code>
   </p>
   <p>
     Output a code coverage report.

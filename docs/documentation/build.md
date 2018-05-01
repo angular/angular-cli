@@ -3,7 +3,7 @@
 # ng build
 
 ## Overview
-`ng build` compiles the application into an output directory
+`ng build` compiles the application into an output directory.
 
 ### Creating a build
 
@@ -132,7 +132,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>prod</summary>
   <p>
-    <code>--prod</code> 
+    <code>--prod</code>
   </p>
   <p>
     Flag to set configuration to "prod".
@@ -141,7 +141,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>configuration</summary>
   <p>
-    <code>--configuration</code> (alias: <code>-c</code>) 
+    <code>--configuration</code> (alias: <code>-c</code>)
   </p>
   <p>
     Specify the configuration to use.
@@ -150,7 +150,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>main</summary>
   <p>
-    <code>--main</code> 
+    <code>--main</code>
   </p>
   <p>
     The name of the main entry-point file.
@@ -159,7 +159,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>polyfills</summary>
   <p>
-    <code>--polyfills</code> 
+    <code>--polyfills</code>
   </p>
   <p>
     The name of the polyfills file.
@@ -168,7 +168,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>ts-config</summary>
   <p>
-    <code>--ts-config</code> 
+    <code>--ts-config</code>
   </p>
   <p>
     The name of the TypeScript configuration file.
@@ -177,7 +177,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>optimization</summary>
   <p>
-    <code>--optimization</code> 
+    <code>--optimization</code>
   </p>
   <p>
     Defines the optimization level of the build.
@@ -186,7 +186,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>output-path</summary>
   <p>
-    <code>--output-path</code> 
+    <code>--output-path</code>
   </p>
   <p>
     Path where output will be placed.
@@ -195,7 +195,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>aot</summary>
   <p>
-    <code>--aot</code> 
+    <code>--aot</code>
   </p>
   <p>
     Build using Ahead of Time compilation.
@@ -204,7 +204,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>source-map</summary>
   <p>
-    <code>--source-map</code> 
+    <code>--source-map</code>
   </p>
   <p>
     Output sourcemaps.
@@ -213,7 +213,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>eval-source-map</summary>
   <p>
-    <code>--eval-source-map</code> 
+    <code>--eval-source-map</code>
   </p>
   <p>
     Output in-file eval sourcemaps.
@@ -222,7 +222,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>vendor-chunk</summary>
   <p>
-    <code>--vendor-chunk</code> 
+    <code>--vendor-chunk</code>
   </p>
   <p>
     Use a separate bundle containing only vendor libraries.
@@ -231,7 +231,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>common-chunk</summary>
   <p>
-    <code>--common-chunk</code> 
+    <code>--common-chunk</code>
   </p>
   <p>
     Use a separate bundle containing code used across multiple bundles.
@@ -240,7 +240,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>base-href</summary>
   <p>
-    <code>--base-href</code> 
+    <code>--base-href</code>
   </p>
   <p>
     Base url for the application being built.
@@ -249,7 +249,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>deploy-url</summary>
   <p>
-    <code>--deploy-url</code> 
+    <code>--deploy-url</code>
   </p>
   <p>
     URL where files will be deployed.
@@ -258,7 +258,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>verbose</summary>
   <p>
-    <code>--verbose</code> 
+    <code>--verbose</code>
   </p>
   <p>
     Adds more details to output logging.
@@ -267,7 +267,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>progress</summary>
   <p>
-    <code>--progress</code> 
+    <code>--progress</code>
   </p>
   <p>
     Log progress to the console while building.
@@ -276,7 +276,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>i18n-file</summary>
   <p>
-    <code>--i18n-file</code> 
+    <code>--i18n-file</code>
   </p>
   <p>
     Localization file to use for i18n.
@@ -285,7 +285,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>i18n-format</summary>
   <p>
-    <code>--i18n-format</code> 
+    <code>--i18n-format</code>
   </p>
   <p>
     Format of the localization file specified with --i18n-file.
@@ -294,7 +294,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>i18n-locale</summary>
   <p>
-    <code>--i18n-locale</code> 
+    <code>--i18n-locale</code>
   </p>
   <p>
     Locale to use for i18n.
@@ -303,7 +303,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>i18n-missing-translation</summary>
   <p>
-    <code>--i18n-missing-translation</code> 
+    <code>--i18n-missing-translation</code>
   </p>
   <p>
     How to handle missing translations for i18n.
@@ -312,7 +312,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>extract-css</summary>
   <p>
-    <code>--extract-css</code> 
+    <code>--extract-css</code>
   </p>
   <p>
     Extract css from global styles onto css files instead of js ones.
@@ -321,7 +321,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>watch</summary>
   <p>
-    <code>--watch</code> 
+    <code>--watch</code>
   </p>
   <p>
     Run build when files change.
@@ -330,7 +330,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>output-hashing</summary>
   <p>
-    <code>--output-hashing</code> 
+    <code>--output-hashing</code>
   </p>
   <p>
     Define the output filename cache-busting hashing mode.
@@ -339,7 +339,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>poll</summary>
   <p>
-    <code>--poll</code> 
+    <code>--poll</code>
   </p>
   <p>
     Enable and define the file watching poll time period in milliseconds.
@@ -348,7 +348,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>delete-output-path</summary>
   <p>
-    <code>--delete-output-path</code> 
+    <code>--delete-output-path</code>
   </p>
   <p>
     Delete the output path before building.
@@ -357,7 +357,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>preserve-symlinks</summary>
   <p>
-    <code>--preserve-symlinks</code> 
+    <code>--preserve-symlinks</code>
   </p>
   <p>
     Do not use the real path when resolving modules.
@@ -366,7 +366,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>extract-licenses</summary>
   <p>
-    <code>--extract-licenses</code> 
+    <code>--extract-licenses</code>
   </p>
   <p>
     Extract all licenses in a separate file, in the case of production builds only.
@@ -375,7 +375,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>show-circular-dependencies</summary>
   <p>
-    <code>--show-circular-dependencies</code> 
+    <code>--show-circular-dependencies</code>
   </p>
   <p>
     Show circular dependency warnings on builds.
@@ -384,7 +384,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>build-optimizer</summary>
   <p>
-    <code>--build-optimizer</code> 
+    <code>--build-optimizer</code>
   </p>
   <p>
     Enables @angular-devkit/build-optimizer optimizations when using the 'aot' option.
@@ -393,7 +393,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>named-chunks</summary>
   <p>
-    <code>--named-chunks</code> 
+    <code>--named-chunks</code>
   </p>
   <p>
     Use file name for lazy loaded chunks.
@@ -402,7 +402,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>subresource-integrity</summary>
   <p>
-    <code>--subresource-integrity</code> 
+    <code>--subresource-integrity</code>
   </p>
   <p>
     Enables the use of subresource integrity validation.
@@ -411,7 +411,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>service-worker</summary>
   <p>
-    <code>--service-worker</code> 
+    <code>--service-worker</code>
   </p>
   <p>
     Generates a service worker config for production builds.
@@ -420,7 +420,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>ngsw-config-path</summary>
   <p>
-    <code>--ngsw-config-path</code> 
+    <code>--ngsw-config-path</code>
   </p>
   <p>
     Path to ngsw-config.json.
@@ -429,7 +429,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>skip-app-shell</summary>
   <p>
-    <code>--skip-app-shell</code> 
+    <code>--skip-app-shell</code>
   </p>
   <p>
     Flag to prevent building an app shell.
@@ -438,7 +438,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>index</summary>
   <p>
-    <code>--index</code> 
+    <code>--index</code>
   </p>
   <p>
     The name of the index HTML file.
@@ -447,7 +447,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>stats-json</summary>
   <p>
-    <code>--stats-json</code> 
+    <code>--stats-json</code>
   </p>
   <p>
     Generates a 'stats.json' file which can be analyzed using tools such as: #webpack-bundle-analyzer' or https: //webpack.github.io/analyse.
@@ -456,7 +456,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 <details>
   <summary>fork-type-checker</summary>
   <p>
-    <code>--fork-type-checker</code> 
+    <code>--fork-type-checker</code>
   </p>
   <p>
     Run the TypeScript type checker in a forked process.

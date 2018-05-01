@@ -3,7 +3,7 @@
 # ng e2e
 
 ## Overview
-`ng e2e` serves the application and runs end-to-end tests
+`ng e2e` serves the application and runs end-to-end tests.
 
 ### Running end-to-end tests
 
@@ -17,7 +17,7 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 <details>
   <summary>prod</summary>
   <p>
-    <code>--prod</code> 
+    <code>--prod</code>
   </p>
   <p>
     Flag to set configuration to "prod".
@@ -26,7 +26,7 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 <details>
   <summary>configuration</summary>
   <p>
-    <code>--configuration</code> (alias: <code>-c</code>) 
+    <code>--configuration</code> (alias: <code>-c</code>)
   </p>
   <p>
     Specify the configuration to use.
@@ -35,7 +35,7 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 <details>
   <summary>protractor-config</summary>
   <p>
-    <code>--protractor-config</code> 
+    <code>--protractor-config</code>
   </p>
   <p>
     The name of the Protractor configuration file.
@@ -44,7 +44,7 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 <details>
   <summary>dev-server-target</summary>
   <p>
-    <code>--dev-server-target</code> 
+    <code>--dev-server-target</code>
   </p>
   <p>
     Dev server target to run tests against.
@@ -53,7 +53,7 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 <details>
   <summary>suite</summary>
   <p>
-    <code>--suite</code> 
+    <code>--suite</code>
   </p>
   <p>
     Override suite in the protractor config.
@@ -62,7 +62,7 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 <details>
   <summary>element-explorer</summary>
   <p>
-    <code>--element-explorer</code> 
+    <code>--element-explorer</code>
   </p>
   <p>
     Start Protractor's Element Explorer for debugging.
@@ -71,7 +71,7 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 <details>
   <summary>webdriver-update</summary>
   <p>
-    <code>--webdriver-update</code> 
+    <code>--webdriver-update</code>
   </p>
   <p>
     Try to update webdriver.
@@ -80,7 +80,7 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 <details>
   <summary>serve</summary>
   <p>
-    <code>--serve</code> 
+    <code>--serve</code>
   </p>
   <p>
     Compile and Serve the app.
@@ -89,7 +89,7 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 <details>
   <summary>port</summary>
   <p>
-    <code>--port</code> 
+    <code>--port</code>
   </p>
   <p>
     The port to use to serve the application.
@@ -98,7 +98,7 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 <details>
   <summary>host</summary>
   <p>
-    <code>--host</code> 
+    <code>--host</code>
   </p>
   <p>
     Host to listen on.
@@ -107,7 +107,7 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 <details>
   <summary>base-url</summary>
   <p>
-    <code>--base-url</code> 
+    <code>--base-url</code>
   </p>
   <p>
     Base URL for protractor to connect to.

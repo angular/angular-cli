@@ -5,13 +5,11 @@
 ## Overview
 `ng serve` builds the application and starts a web server.
 
-All the build Options are available in serve, below are the additional options.
-
 ## Options
 <details>
   <summary>prod</summary>
   <p>
-    <code>--prod</code> 
+    <code>--prod</code>
   </p>
   <p>
     Flag to set configuration to "prod".
@@ -20,7 +18,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>configuration</summary>
   <p>
-    <code>--configuration</code> (alias: <code>-c</code>) 
+    <code>--configuration</code> (alias: <code>-c</code>)
   </p>
   <p>
     Specify the configuration to use.
@@ -29,7 +27,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>browser-target</summary>
   <p>
-    <code>--browser-target</code> 
+    <code>--browser-target</code>
   </p>
   <p>
     Target to serve.
@@ -38,7 +36,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>port</summary>
   <p>
-    <code>--port</code> 
+    <code>--port</code>
   </p>
   <p>
     Port to listen on.
@@ -47,7 +45,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>host</summary>
   <p>
-    <code>--host</code> 
+    <code>--host</code>
   </p>
   <p>
     Host to listen on.
@@ -56,7 +54,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>proxy-config</summary>
   <p>
-    <code>--proxy-config</code> 
+    <code>--proxy-config</code>
   </p>
   <p>
     Proxy configuration file.
@@ -65,7 +63,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>ssl</summary>
   <p>
-    <code>--ssl</code> 
+    <code>--ssl</code>
   </p>
   <p>
     Serve using HTTPS.
@@ -74,7 +72,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>ssl-key</summary>
   <p>
-    <code>--ssl-key</code> 
+    <code>--ssl-key</code>
   </p>
   <p>
     SSL key to use for serving HTTPS.
@@ -83,7 +81,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>ssl-cert</summary>
   <p>
-    <code>--ssl-cert</code> 
+    <code>--ssl-cert</code>
   </p>
   <p>
     SSL certificate to use for serving HTTPS.
@@ -92,7 +90,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>open</summary>
   <p>
-    <code>--open</code> (alias: <code>-o</code>) 
+    <code>--open</code> (alias: <code>-o</code>)
   </p>
   <p>
     Opens the url in default browser.
@@ -101,7 +99,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>live-reload</summary>
   <p>
-    <code>--live-reload</code> 
+    <code>--live-reload</code>
   </p>
   <p>
     Whether to reload the page on change, using live-reload.
@@ -110,7 +108,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>public-host</summary>
   <p>
-    <code>--public-host</code> 
+    <code>--public-host</code>
   </p>
   <p>
     Specify the URL that the browser client will use.
@@ -119,7 +117,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>serve-path</summary>
   <p>
-    <code>--serve-path</code> 
+    <code>--serve-path</code>
   </p>
   <p>
     The pathname where the app will be served.
@@ -128,7 +126,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>disable-host-check</summary>
   <p>
-    <code>--disable-host-check</code> 
+    <code>--disable-host-check</code>
   </p>
   <p>
     Don't verify connected clients are part of allowed hosts.
@@ -137,7 +135,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>hmr</summary>
   <p>
-    <code>--hmr</code> 
+    <code>--hmr</code>
   </p>
   <p>
     Enable hot module replacement.
@@ -146,7 +144,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>watch</summary>
   <p>
-    <code>--watch</code> 
+    <code>--watch</code>
   </p>
   <p>
     Rebuild on change.
@@ -155,7 +153,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>hmr-warning</summary>
   <p>
-    <code>--hmr-warning</code> 
+    <code>--hmr-warning</code>
   </p>
   <p>
     Show a warning when the --hmr option is enabled.
@@ -164,7 +162,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>serve-path-default-warning</summary>
   <p>
-    <code>--serve-path-default-warning</code> 
+    <code>--serve-path-default-warning</code>
   </p>
   <p>
     Show a warning when deploy-url/base-href use unsupported serve path values.
@@ -173,7 +171,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>optimization</summary>
   <p>
-    <code>--optimization</code> 
+    <code>--optimization</code>
   </p>
   <p>
     Defines the optimization level of the build.
@@ -182,7 +180,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>aot</summary>
   <p>
-    <code>--aot</code> 
+    <code>--aot</code>
   </p>
   <p>
     Build using Ahead of Time compilation.
@@ -191,7 +189,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>source-map</summary>
   <p>
-    <code>--source-map</code> 
+    <code>--source-map</code>
   </p>
   <p>
     Output sourcemaps.
@@ -200,7 +198,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>eval-source-map</summary>
   <p>
-    <code>--eval-source-map</code> 
+    <code>--eval-source-map</code>
   </p>
   <p>
     Output in-file eval sourcemaps.
@@ -209,7 +207,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>vendor-chunk</summary>
   <p>
-    <code>--vendor-chunk</code> 
+    <code>--vendor-chunk</code>
   </p>
   <p>
     Use a separate bundle containing only vendor libraries.
@@ -218,7 +216,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>common-chunk</summary>
   <p>
-    <code>--common-chunk</code> 
+    <code>--common-chunk</code>
   </p>
   <p>
     Use a separate bundle containing code used across multiple bundles.
@@ -227,7 +225,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>base-href</summary>
   <p>
-    <code>--base-href</code> 
+    <code>--base-href</code>
   </p>
   <p>
     Base url for the application being built.
@@ -236,7 +234,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>deploy-url</summary>
   <p>
-    <code>--deploy-url</code> 
+    <code>--deploy-url</code>
   </p>
   <p>
     URL where files will be deployed.
@@ -245,7 +243,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>verbose</summary>
   <p>
-    <code>--verbose</code> 
+    <code>--verbose</code>
   </p>
   <p>
     Adds more details to output logging.
@@ -254,7 +252,7 @@ All the build Options are available in serve, below are the additional options.
 <details>
   <summary>progress</summary>
   <p>
-    <code>--progress</code> 
+    <code>--progress</code>
   </p>
   <p>
     Log progress to the console while building.
