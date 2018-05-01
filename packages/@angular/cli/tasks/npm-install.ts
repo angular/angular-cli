@@ -43,9 +43,7 @@ export default async function (packageName: string,
       // If it's available and we shouldn't save, simply return. Nothing to be done.
       resolve(packageName, { checkLocal: true, basedir: projectRoot });
 
-      if (!save) {
-        return;
-      }
+      return;
     } catch (e) {
       if (!(e instanceof ModuleNotFoundException)) {
         throw e;
