@@ -1211,26 +1211,34 @@
           "additionalProperties": false,
           "definitions": {
             "assetPattern": {
-              "type": "object",
-              "properties": {
-                "glob": {
-                  "type": "string",
-                  "description": "The pattern to match."
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "glob": {
+                      "type": "string",
+                      "description": "The pattern to match."
+                    },
+                    "input": {
+                      "type": "string",
+                      "description": "The input path dir in which to apply 'glob'. Defaults to the project root."
+                    },
+                    "output": {
+                      "type": "string",
+                      "description": "Absolute path within the output."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "glob",
+                    "input",
+                    "output"
+                  ]
                 },
-                "input": {
+                {
                   "type": "string",
-                  "description": "The input path dir in which to apply 'glob'. Defaults to the project root."
-                },
-                "output": {
-                  "type": "string",
-                  "description": "Absolute path within the output."
+                  "description": "The file to include."
                 }
-              },
-              "additionalProperties": false,
-              "required": [
-                "glob",
-                "input",
-                "output"
               ]
             },
             "extraEntryPoint": {
