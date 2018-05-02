@@ -41,13 +41,16 @@ export const environment = {
 ```
 
 
-Update `angular.json` to include an hmr environment as explained [here](./application-environments) and add a configuration within serve to enable hmr.
+Update `angular.json` to include an hmr environment as explained [here](./application-environments.md) and add a configuration within serve to enable hmr.
 
 ```json
   "serve": {
     "configuration": {
       ...
-      "hmr": true
+      "hmr": {
+         "hmr": true,
+         "hmrWarning": false
+       }
     }
   }
 ```
