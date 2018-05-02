@@ -152,7 +152,7 @@ function visitBlockStatements(
         } else if (ts.isObjectLiteralExpression(variableDeclaration.initializer)
           && variableDeclaration.initializer.properties.length !== 0) {
           const literalPropertyCount = variableDeclaration.initializer.properties.length;
-          const enumStatements = findTsickleEnumStatements(name, statements, oIndex + 1);
+          const enumStatements = findEnumNameStatements(name, statements, oIndex + 1);
           if (enumStatements.length === literalPropertyCount) {
             // found an enum
             if (!updatedStatements) {
@@ -264,67 +264,69 @@ function findTs2_2EnumStatements(
   name: string,
   statements: ts.NodeArray<ts.Statement>,
   statementOffset: number,
-): ts.ExpressionStatement[] {
-  const enumStatements: ts.ExpressionStatement[] = [];
-  let beforeValueStatements = true;
+): ts.Statement[] {
+  const enumValueStatements: ts.Statement[] = [];
+  const memberNames: string[] = [];
 
-  for (let index = statementOffset; index < statements.length; index++) {
+  let index = statementOffset;
+  for (; index < statements.length; ++index) {
     // Ensure all statements are of the expected format and using the right identifer.
     // When we find a statement that isn't part of the enum, return what we collected so far.
-    const binExpr = drilldownNodes<ts.BinaryExpression>(statements[index],
-      [
-        { prop: null, kind: ts.SyntaxKind.ExpressionStatement },
-        { prop: 'expression', kind: ts.SyntaxKind.BinaryExpression },
-      ]);
-
-    if (binExpr === null
-      || (binExpr.left.kind !== ts.SyntaxKind.PropertyAccessExpression
-        && binExpr.left.kind !== ts.SyntaxKind.ElementAccessExpression)
-    ) {
-      return beforeValueStatements ? [] : enumStatements;
+    const current = statements[index];
+    if (!ts.isExpressionStatement(current) || !ts.isBinaryExpression(current.expression)) {
+      break;
     }
 
-    const exprStmt = statements[index] as ts.ExpressionStatement;
-    const leftExpr = binExpr.left as ts.PropertyAccessExpression | ts.ElementAccessExpression;
-
-    if (!(leftExpr.expression.kind === ts.SyntaxKind.Identifier
-        && (leftExpr.expression as ts.Identifier).text === name)) {
-      return beforeValueStatements ? [] : enumStatements;
+    const property = current.expression.left;
+    if (!property || !ts.isPropertyAccessExpression(property)) {
+      break;
     }
 
-    if (!beforeValueStatements && leftExpr.kind === ts.SyntaxKind.PropertyAccessExpression) {
-      // We shouldn't find index statements after value statements.
-      return [];
-    } else if (beforeValueStatements && leftExpr.kind === ts.SyntaxKind.ElementAccessExpression) {
-      beforeValueStatements = false;
+    if (!ts.isIdentifier(property.expression) || property.expression.text !== name) {
+      break;
     }
 
-    enumStatements.push(exprStmt);
+    memberNames.push(property.name.text);
+    enumValueStatements.push(current);
   }
 
-  return enumStatements;
+  if (enumValueStatements.length === 0) {
+    return [];
+  }
+
+  const enumNameStatements = findEnumNameStatements(name, statements, index, memberNames);
+  if (enumNameStatements.length !== enumValueStatements.length) {
+    return [];
+  }
+
+  return enumValueStatements.concat(enumNameStatements);
 }
 
 // Tsickle enums have a variable statement with indexes, followed by value statements.
 // See https://github.com/angular/devkit/issues/229#issuecomment-338512056 fore more information.
-function findTsickleEnumStatements(
+function findEnumNameStatements(
   name: string,
   statements: ts.NodeArray<ts.Statement>,
   statementOffset: number,
+  memberNames?: string[],
 ): ts.Statement[] {
   const enumStatements: ts.Statement[] = [];
 
-  for (let index = statementOffset; index < statements.length; index++) {
+  for (let index = statementOffset; index < statements.length; ++index) {
     // Ensure all statements are of the expected format and using the right identifer.
     // When we find a statement that isn't part of the enum, return what we collected so far.
-    const access = drilldownNodes<ts.ElementAccessExpression>(statements[index],
-      [
-        { prop: null, kind: ts.SyntaxKind.ExpressionStatement },
-        { prop: 'expression', kind: ts.SyntaxKind.BinaryExpression },
-        { prop: 'left', kind: ts.SyntaxKind.ElementAccessExpression },
-      ]);
+    const current = statements[index];
+    if (!ts.isExpressionStatement(current) || !ts.isBinaryExpression(current.expression)) {
+      break;
+    }
 
-    if (!access) {
+    const access = current.expression.left;
+    const value = current.expression.right;
+    if (!access || !ts.isElementAccessExpression(access) || !value || !ts.isStringLiteral(value)) {
+      break;
+    }
+
+    if (memberNames && !memberNames.includes(value.text)) {
       break;
     }
 
@@ -341,7 +343,11 @@ function findTsickleEnumStatements(
       break;
     }
 
-    enumStatements.push(statements[index]);
+    if (value.text !== access.argumentExpression.name.text) {
+      break;
+    }
+
+    enumStatements.push(current);
   }
 
   return enumStatements;
