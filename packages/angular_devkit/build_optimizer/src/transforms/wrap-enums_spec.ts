@@ -115,4 +115,54 @@ describe('wrap-enums', () => {
     expect(testWrapEnums(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
+
+  it('wraps enums with multi-line comments in IIFE', () => {
+    const input = tags.stripIndent`
+      /**
+       * Supported http methods.
+       * @deprecated use @angular/common/http instead
+       */
+      var RequestMethod;
+      /**
+       * Supported http methods.
+       * @deprecated use @angular/common/http instead
+       */
+      (function (RequestMethod) {
+          RequestMethod[RequestMethod["Get"] = 0] = "Get";
+          RequestMethod[RequestMethod["Post"] = 1] = "Post";
+          RequestMethod[RequestMethod["Put"] = 2] = "Put";
+          RequestMethod[RequestMethod["Delete"] = 3] = "Delete";
+          RequestMethod[RequestMethod["Options"] = 4] = "Options";
+          RequestMethod[RequestMethod["Head"] = 5] = "Head";
+          RequestMethod[RequestMethod["Patch"] = 6] = "Patch";
+      })(RequestMethod || (RequestMethod = {}));
+    `;
+    // We need to interpolate this space because our editorconfig automatically strips
+    // trailing whitespace.
+    const space = ' ';
+    const output = tags.stripIndent`
+      /**
+       * Supported http methods.
+       * @deprecated use @angular/common/http instead
+       */
+      var RequestMethod =${space}
+       /**
+       * Supported http methods.
+       * @deprecated use @angular/common/http instead
+       */
+      /*@__PURE__*/ (function (RequestMethod) {
+          RequestMethod[RequestMethod["Get"] = 0] = "Get";
+          RequestMethod[RequestMethod["Post"] = 1] = "Post";
+          RequestMethod[RequestMethod["Put"] = 2] = "Put";
+          RequestMethod[RequestMethod["Delete"] = 3] = "Delete";
+          RequestMethod[RequestMethod["Options"] = 4] = "Options";
+          RequestMethod[RequestMethod["Head"] = 5] = "Head";
+          RequestMethod[RequestMethod["Patch"] = 6] = "Patch";
+          return RequestMethod;
+      })({});
+    `;
+
+    expect(testWrapEnums(input)).toBeTruthy();
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
 });
