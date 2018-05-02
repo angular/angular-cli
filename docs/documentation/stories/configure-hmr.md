@@ -47,7 +47,15 @@ Update `angular.json` to include an hmr environment as explained [here](./applic
   "serve": {
     "configuration": {
       ...
-      "hmr": true
+      "hmr": {
+        "hmr": true,
+        "fileReplacements": [
+          {
+            "replace": "src/environments/environment.ts",
+            "with": "src/environments/environment.hmr.ts"
+          }
+        ],
+      }
     }
   }
 ```
