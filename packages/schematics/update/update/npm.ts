@@ -91,6 +91,7 @@ export function getNpmPackageJson(
       return concat(
         getNpmConfigOption('proxy'),
         getNpmConfigOption('https-proxy'),
+        getNpmConfigOption('strict-ssl'),
       ).pipe(
         toArray(),
         concatMap(options => {
@@ -100,6 +101,13 @@ export function getNpmPackageJson(
             proxy: {
               http: options[0],
               https: options[1],
+            },
+            ssl: {
+              ...(options[2] === 'false'
+                ? { strict: false }
+                : (options[2] === 'true'
+                   ? { strict: true }
+                   : {})),
             },
           });
           client.log.level = 'silent';
