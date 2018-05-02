@@ -6,6 +6,6 @@
     "module": "commonjs"
   },
   "angularCompilerOptions": {
-    "entryModule": "<%= appDir %>/<%= stripTsExtension(rootModuleFileName) %>#<%= rootModuleClassName %>"
+    "entryModule": "<%= rootInSrc ? '' : 'src/' %><%= appDir %>/<%= stripTsExtension(rootModuleFileName) %>#<%= rootModuleClassName %>"
   }
 }
