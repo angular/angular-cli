@@ -2,11 +2,10 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { findUp } from './find-up';
+import { normalize } from '@angular-devkit/core';
 
 export function insideProject(): boolean {
-  const possibleConfigFiles = ['angular.json', '.angular.json'];
-
-  return findUp(possibleConfigFiles, process.cwd()) !== null;
+  return getProjectDetails() !== null;
 }
 
 export interface ProjectDetails {
@@ -31,7 +30,7 @@ export function getProjectDetails(): ProjectDetails | null {
   const possibleDir = path.dirname(configFilePath);
 
   const homedir = os.homedir();
-  if (possibleDir === homedir) {
+  if (normalize(possibleDir) === normalize(homedir)) {
     const packageJsonPath = path.join(possibleDir, 'package.json');
     if (!fs.existsSync(packageJsonPath)) {
       // No package.json
