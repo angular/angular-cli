@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.0.0"></a>
+# [6.0.0](https://github.com/angular/universal/compare/v6.0.0-rc.1...v6.0.0) (2018-05-03)
+
+
+
 <a name="6.0.0-rc.2"></a>
 # [6.0.0-rc.2](https://github.com/angular/universal/compare/v6.0.0-rc.1...v6.0.0-rc.2) (2018-04-24)
 
