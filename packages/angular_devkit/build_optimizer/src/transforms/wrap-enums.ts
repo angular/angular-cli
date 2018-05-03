@@ -10,31 +10,8 @@ import { drilldownNodes } from '../helpers/ast-utils';
 
 
 export function testWrapEnums(content: string) {
-  const ts22EnumVarDecl = /var (\S+) = \{\};/;
-  // tslint:disable-next-line:max-line-length
-  const ts22EnumIife = /(\1\.(\S+) = \d+;\r?\n)+\1\[\1\.(\S+)\] = "\4";\r?\n(\1\[\1\.(\S+)\] = "\S+";\r?\n*)+/;
-  const ts23To26VarDecl = /var (\S+);(\/\*@__PURE__\*\/)*/;
-  // tslint:disable-next-line:max-line-length
-  const ts23To26Iife = /\(function \(\1\) \{\s+(\1\[\1\["(\S+)"\] = (\S+)\] = "\4";(\s+\1\[\1\["\S+"\] = (\S+)\] = "\S+";)*\r?\n)\}\)\(\1 \|\| \(\1 = \{\}\)\);/;
-  const enumComment = /\/\*\* @enum \{\w+\} \*\//;
-  const multiLineComment = /\s*(?:\/\*[\s\S]*?\*\/)?\s*/;
-  const newLine = /\s*\r?\n\s*/;
-
-  const regexes = [
-    [
-      ts22EnumVarDecl,
-      newLine, multiLineComment,
-      ts22EnumIife,
-    ],
-    [
-      ts23To26VarDecl,
-      newLine, multiLineComment,
-      ts23To26Iife,
-    ],
-    [enumComment],
-  ].map(arr => new RegExp(arr.map(x => x.source).join(''), 'm'));
-
-  return regexes.some((regex) => regex.test(content));
+  // TODO: remove this method, it's not doing anything anymore.
+  return true;
 }
 
 function isBlockLike(node: ts.Node): node is ts.BlockLike {
