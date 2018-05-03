@@ -37,7 +37,7 @@ function readFiles(directory, filelist) {
       const originalPath = directory + file;
       const newPath = path.join(outputPath, originalPath
         .replace(documentationPath + `${path.sep}`, '')
-        .replace(`${path.sep}`, '-'));
+        .replace(new RegExp(`${path.sep}`, 'g'), '-'));
 
       filelist.push({ originalPath, newPath });
     }
