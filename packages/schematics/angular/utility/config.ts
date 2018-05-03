@@ -126,6 +126,44 @@ export interface AppConfig {
     app: string;
     route: string;
   };
+  budgets?: {
+    /**
+     * The type of budget
+     */
+    type?: ('bundle' | 'initial' | 'allScript' | 'all' | 'anyScript' | 'any');
+    /**
+     * The name of the bundle
+     */
+    name?: string;
+    /**
+     * The baseline size for comparison.
+     */
+    baseline?: string;
+    /**
+     * The maximum threshold for warning relative to the baseline.
+     */
+    maximumWarning?: string;
+    /**
+     * The maximum threshold for error relative to the baseline.
+     */
+    maximumError?: string;
+    /**
+     * The minimum threshold for warning relative to the baseline.
+     */
+    minimumWarning?: string;
+    /**
+     * The minimum threshold for error relative to the baseline.
+     */
+    minimumError?: string;
+    /**
+     * The threshold for warning relative to the baseline (min & max).
+     */
+    warning?: string;
+    /**
+     * The threshold for error relative to the baseline (min & max).
+     */
+    error?: string;
+  }[];
 }
 
 export interface CliConfig {

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
+  JsonArray,
   JsonObject,
   JsonParseMode,
   Path,
@@ -327,6 +328,7 @@ function extractProjectsConfig(config: CliConfig, tree: Tree): JsonObject {
               : {}
             ),
             ...(isProduction && swConfig ? swConfig : {}),
+            ...(isProduction && app.budgets ? { budgets: app.budgets as JsonArray } : {}),
             fileReplacements: [
               {
                 replace: `${app.root}/${source}`,
