@@ -8,7 +8,7 @@
 // tslint:disable-next-line:no-implicit-dependencies
 import { tags } from '@angular-devkit/core';
 import { transformJavascript } from '../helpers/transform-javascript';
-import { getWrapEnumsTransformer, testWrapEnums } from './wrap-enums';
+import { getWrapEnumsTransformer } from './wrap-enums';
 
 
 const transform = (content: string) => transformJavascript(
@@ -34,7 +34,6 @@ describe('wrap-enums', () => {
       }());
     `;
 
-    expect(testWrapEnums(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -54,7 +53,6 @@ describe('wrap-enums', () => {
       })({});
     `;
 
-    expect(testWrapEnums(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -78,7 +76,6 @@ describe('wrap-enums', () => {
       })({});
     `;
 
-    expect(testWrapEnums(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -112,7 +109,6 @@ describe('wrap-enums', () => {
       }());
     `;
 
-    expect(testWrapEnums(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -162,7 +158,6 @@ describe('wrap-enums', () => {
       })({});
     `;
 
-    expect(testWrapEnums(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 });

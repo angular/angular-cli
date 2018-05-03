@@ -16,7 +16,7 @@ import { getImportTslibTransformer, testImportTslib } from '../transforms/import
 import { getPrefixClassesTransformer, testPrefixClasses } from '../transforms/prefix-classes';
 import { getPrefixFunctionsTransformer } from '../transforms/prefix-functions';
 import { getScrubFileTransformer, testScrubFile } from '../transforms/scrub-file';
-import { getWrapEnumsTransformer, testWrapEnums } from '../transforms/wrap-enums';
+import { getWrapEnumsTransformer } from '../transforms/wrap-enums';
 
 
 // Angular packages are known to have no side effects.
@@ -140,9 +140,7 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     getTransforms.unshift(getImportTslibTransformer);
   }
 
-  if (testWrapEnums(content)) {
-    getTransforms.unshift(getWrapEnumsTransformer);
-  }
+  getTransforms.unshift(getWrapEnumsTransformer);
 
   const transformJavascriptOpts: TransformJavascriptOptions = {
     content: content,

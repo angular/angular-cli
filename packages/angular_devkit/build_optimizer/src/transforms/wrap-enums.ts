@@ -6,13 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { drilldownNodes } from '../helpers/ast-utils';
-
-
-export function testWrapEnums(content: string) {
-  // TODO: remove this method, it's not doing anything anymore.
-  return true;
-}
 
 function isBlockLike(node: ts.Node): node is ts.BlockLike {
   return node.kind === ts.SyntaxKind.Block
@@ -166,73 +159,96 @@ function visitBlockStatements(
 
 // TS 2.3 enums have statements that are inside a IIFE.
 function findTs2_3EnumIife(name: string, statement: ts.Statement): ts.CallExpression | null {
-  if (!ts.isExpressionStatement(statement) || !ts.isCallExpression(statement.expression)) {
+  if (!ts.isExpressionStatement(statement)) {
     return null;
   }
 
-  const funcExpr = drilldownNodes<ts.FunctionExpression>(statement,
-    [
-      { prop: null, kind: ts.SyntaxKind.ExpressionStatement },
-      { prop: 'expression', kind: ts.SyntaxKind.CallExpression },
-      { prop: 'expression', kind: ts.SyntaxKind.ParenthesizedExpression },
-      { prop: 'expression', kind: ts.SyntaxKind.FunctionExpression },
-    ]);
+  let expression = statement.expression;
+  while (ts.isParenthesizedExpression(expression)) {
+    expression = expression.expression;
+  }
 
-  if (funcExpr === null) { return null; }
+  if (!expression || !ts.isCallExpression(expression) || expression.arguments.length !== 1) {
+    return null;
+  }
 
-  if (!(
-    funcExpr.parameters.length === 1
-    && funcExpr.parameters[0].name.kind === ts.SyntaxKind.Identifier
-    && (funcExpr.parameters[0].name as ts.Identifier).text === name
-  )) {
+  const callExpression = expression;
+
+  const argument = expression.arguments[0];
+  if (!ts.isBinaryExpression(argument)
+      || argument.operatorToken.kind !== ts.SyntaxKind.BarBarToken) {
+    return null;
+  }
+
+  if (!ts.isIdentifier(argument.left) || argument.left.text !== name) {
+    return null;
+  }
+
+  expression = expression.expression;
+  while (ts.isParenthesizedExpression(expression)) {
+    expression = expression.expression;
+  }
+
+  if (!expression || !ts.isFunctionExpression(expression) || expression.parameters.length !== 1) {
+    return null;
+  }
+
+  const parameter = expression.parameters[0];
+  if (!ts.isIdentifier(parameter.name) || parameter.name.text !== name) {
     return null;
   }
 
   // In TS 2.3 enums, the IIFE contains only expressions with a certain format.
   // If we find any that is different, we ignore the whole thing.
-  for (const innerStmt of funcExpr.body.statements) {
+  for (let bodyIndex = 0; bodyIndex < expression.body.statements.length; ++bodyIndex) {
+    const bodyStatement = expression.body.statements[bodyIndex];
 
-    const innerBinExpr = drilldownNodes<ts.BinaryExpression>(innerStmt,
-      [
-        { prop: null, kind: ts.SyntaxKind.ExpressionStatement },
-        { prop: 'expression', kind: ts.SyntaxKind.BinaryExpression },
-      ]);
-
-    if (innerBinExpr === null) { return null; }
-
-    if (!(innerBinExpr.operatorToken.kind === ts.SyntaxKind.FirstAssignment
-        && innerBinExpr.left.kind === ts.SyntaxKind.ElementAccessExpression)) {
+    if (!ts.isExpressionStatement(bodyStatement) || !bodyStatement.expression) {
       return null;
     }
 
-    const innerElemAcc = innerBinExpr.left as ts.ElementAccessExpression;
-
-    if (!(
-      innerElemAcc.expression.kind === ts.SyntaxKind.Identifier
-      && (innerElemAcc.expression as ts.Identifier).text === name
-      && innerElemAcc.argumentExpression
-      && innerElemAcc.argumentExpression.kind === ts.SyntaxKind.BinaryExpression
-    )) {
+    if (!ts.isBinaryExpression(bodyStatement.expression)
+        || bodyStatement.expression.operatorToken.kind !== ts.SyntaxKind.FirstAssignment) {
       return null;
     }
 
-    const innerArgBinExpr = innerElemAcc.argumentExpression as ts.BinaryExpression;
-
-    if (innerArgBinExpr.left.kind !== ts.SyntaxKind.ElementAccessExpression) {
+    const assignment = bodyStatement.expression.left;
+    const value = bodyStatement.expression.right;
+    if (!ts.isElementAccessExpression(assignment) || !ts.isStringLiteral(value)) {
       return null;
     }
 
-    const innerArgElemAcc = innerArgBinExpr.left as ts.ElementAccessExpression;
+    if (!ts.isIdentifier(assignment.expression) || assignment.expression.text !== name) {
+      return null;
+    }
 
-    if (!(
-      innerArgElemAcc.expression.kind === ts.SyntaxKind.Identifier
-      && (innerArgElemAcc.expression as ts.Identifier).text === name
-    )) {
+    const memberArgument = assignment.argumentExpression;
+    if (!memberArgument || !ts.isBinaryExpression(memberArgument)
+        || memberArgument.operatorToken.kind !== ts.SyntaxKind.FirstAssignment) {
+      return null;
+    }
+
+
+    if (!ts.isElementAccessExpression(memberArgument.left)) {
+      return null;
+    }
+
+    if (!ts.isIdentifier(memberArgument.left.expression)
+        || memberArgument.left.expression.text !== name) {
+      return null;
+    }
+
+    if (!memberArgument.left.argumentExpression
+        || !ts.isStringLiteral(memberArgument.left.argumentExpression)) {
+      return null;
+    }
+
+    if (memberArgument.left.argumentExpression.text !== value.text) {
       return null;
     }
   }
 
-  return statement.expression;
+  return callExpression;
 }
 
 // TS 2.2 enums have statements after the variable declaration, with index statements followed
