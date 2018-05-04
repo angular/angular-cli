@@ -165,10 +165,10 @@ export function getProdConfig(wco: WebpackConfigOptions) {
           ecma: wco.supportES2015 ? 6 : 5,
           warnings: buildOptions.verbose,
           ie8: false,
-          mangle: {
+          mangle: buildOptions.platform == 'server' ? false : {
             safari10: true,
           },
-          compress: uglifyCompressOptions,
+          compress: buildOptions.platform == 'server' ? false : uglifyCompressOptions,
           output: {
             ascii_only: true,
             comments: false,
