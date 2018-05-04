@@ -1,5 +1,5 @@
 import { Command } from '../models/command';
-import opn from 'opn';
+const opn = require('opn');
 
 export interface Options {
   keyword: string;
@@ -34,6 +34,6 @@ export default class DocCommand extends Command {
       searchUrl = `https://www.google.com/search?q=site%3Aangular.io+${options.keyword}`;
     }
 
-    return opn(searchUrl, { wait: false });
+    return opn(searchUrl);
   }
 }
