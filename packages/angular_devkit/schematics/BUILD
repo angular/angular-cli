@@ -22,7 +22,8 @@ ts_library(
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",  # TODO: get rid of this for 6.0
-        # @deps: rxjs
+        "@rxjs",
+        "@rxjs//operators",
     ],
 )
 
@@ -42,7 +43,8 @@ ts_library(
         ":schematics",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
-        # @deps: rxjs
+        "@rxjs",
+        "@rxjs//operators",
     ],
 )
 
@@ -62,7 +64,8 @@ ts_library(
         ":tasks",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
-        # @deps: rxjs
+        "@rxjs",
+        "@rxjs//operators",
     ],
 )
 
@@ -79,7 +82,8 @@ ts_library(
         ":tasks",
         ":tools",
         "//packages/angular_devkit/core",
-        # @deps: rxjs
+        "@rxjs",
+        "@rxjs//operators",
     ],
 )
 
@@ -91,7 +95,8 @@ ts_library(
     deps = [
         ":schematics",
         "//packages/angular_devkit/core",
-        # @deps: rxjs
+        "@rxjs",
+        "@rxjs//operators",
         # @typings: jasmine
     ],
 )
@@ -105,7 +110,9 @@ ts_library(
         ":schematics",
         ":tools",
         "//packages/angular_devkit/core",
-        # @deps: rxjs
+        "//packages/angular_devkit/core:node",
+        "@rxjs",
+        "@rxjs//operators",
         # @typings: jasmine
     ],
 )

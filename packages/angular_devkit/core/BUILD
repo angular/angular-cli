@@ -21,7 +21,8 @@ ts_library(
     module_name = "@angular-devkit/core",
     module_root = "src",
     deps = [
-        # @deps: rxjs
+        "@rxjs",
+        "@rxjs//operators",
         # @typings: es2015.core
         # @typings: es2015.symbol.wellknown
         # @typings: ajv
@@ -44,7 +45,8 @@ ts_library(
     module_root = "node",
     deps = [
         "//packages/angular_devkit/core",
-        # @deps: rxjs
+        "@rxjs",
+        "@rxjs//operators",
     ],
 )
 
@@ -59,7 +61,8 @@ ts_library(
     deps = [
         ":core",
         ":node",
-        # @deps: rxjs
+        "@rxjs",
+        "@rxjs//operators",
         # @typings: jasmine
     ],
 )

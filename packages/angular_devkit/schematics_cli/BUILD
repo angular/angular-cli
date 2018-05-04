@@ -27,6 +27,7 @@ ts_library(
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tasks",
         "//packages/angular_devkit/schematics:tools",
-        # @deps: rxjs
+        "@rxjs",
+        "@rxjs//operators",
     ],
 )
