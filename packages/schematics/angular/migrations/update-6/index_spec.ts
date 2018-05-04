@@ -40,6 +40,12 @@ describe('Migration to v6', () => {
             'favicon.ico',
             { glob: '**/*', input: './assets/', output: './assets/' },
             { glob: 'favicon.ico', input: './', output: './' },
+            {
+              'glob': '**/*.*',
+              'input': '../server/',
+              'output': '../',
+              'allowOutsideOutDir': true,
+            },
           ],
           index: 'index.html',
           main: 'main.ts',
