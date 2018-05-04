@@ -8,7 +8,7 @@
 import { logging } from '@angular-devkit/core';
 import { exec } from 'child_process';
 import { Observable, ReplaySubject, concat, of } from 'rxjs';
-import { concatMap, first, map, toArray } from 'rxjs/operators';
+import { concatMap, filter, first, map, toArray } from 'rxjs/operators';
 import * as url from 'url';
 import { NpmRepositoryPackageJson } from './npm-package-json';
 
@@ -54,8 +54,14 @@ export function getNpmPackageJson(
   registryUrl: string | undefined,
   logger: logging.LoggerApi,
 ): Observable<Partial<NpmRepositoryPackageJson>> {
+  const scope = packageName.startsWith('@') ? packageName.split('/')[0] : null;
 
-  return (registryUrl ? of(registryUrl) : getNpmConfigOption('registry')).pipe(
+  return concat(
+    of(registryUrl),
+    scope ? getNpmConfigOption(scope + ':registry') : of(undefined),
+    getNpmConfigOption('registry'),
+  ).pipe(
+    filter(partialUrl => !!partialUrl),
     first(),
     map(partialUrl => {
       if (!partialUrl) {
