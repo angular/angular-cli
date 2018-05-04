@@ -113,8 +113,8 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   delete webpackConfig.entry.styles;
 
   // The webpack tier owns the watch behavior so we want to force it in the config.
-  webpackConfig.watch = options.watch;
-  if (!options.watch) {
+  webpackConfig.watch = !config.singleRun;
+  if (config.singleRun) {
     // There's no option to turn off file watching in webpack-dev-server, but
     // we can override the file watcher instead.
     webpackConfig.plugins.unshift({

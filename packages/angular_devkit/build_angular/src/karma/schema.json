@@ -74,8 +74,7 @@
     },
     "watch": {
       "type": "boolean",
-      "description": "Run build when files change.",
-      "default": false
+      "description": "Run build when files change."
     },
     "poll": {
       "type": "number",

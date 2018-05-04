@@ -59,9 +59,11 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
         // TODO: adjust options to account for not passing them blindly to karma.
         // const karmaOptions: any = Object.assign({}, options);
         // tslint:disable-next-line:no-any
-        const karmaOptions: any = {
-          singleRun: !options.watch,
-        };
+        const karmaOptions: any = {};
+
+        if (options.watch !== undefined) {
+          karmaOptions.singleRun = !options.watch;
+        }
 
         // Convert browsers from a string to an array
         if (options.browsers) {
