@@ -54,19 +54,10 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
       concatMap(() => options.deleteOutputPath
         ? this._deleteOutputDir(root, normalize(options.outputPath), this.context.host)
         : of(null)),
-        concatMap(() => addFileReplacements(root, host, options.fileReplacements)),
-        concatMap(() => new Observable(obs => {
+      concatMap(() => addFileReplacements(root, host, options.fileReplacements)),
+      concatMap(() => new Observable(obs => {
         // Ensure Build Optimizer is only used with AOT.
-        let webpackConfig;
-        try {
-          webpackConfig = this.buildWebpackConfig(root, projectRoot, host, options);
-        } catch (e) {
-          // TODO: why do I have to catch this error? I thought throwing inside an observable
-          // always got converted into an error.
-          obs.error(e);
-
-          return;
-        }
+        const webpackConfig = this.buildWebpackConfig(root, projectRoot, host, options);
         const webpackCompiler = webpack(webpackConfig);
         const statsConfig = getWebpackStatsConfig(options.verbose);
 
@@ -132,6 +123,7 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
       // TODO: use only this.options, it contains all flags and configs items already.
       buildOptions: {
         ...buildOptions,
+        buildOptimizer: false,
         aot: true,
         platform: 'server',
         scripts: [],
