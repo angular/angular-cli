@@ -37,7 +37,7 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
     const projectRoot = path.dirname(configPath);
 
     appConfig = this.addAppConfigDefaults(appConfig);
-    buildOptions = this.addTargetDefaults(buildOptions);
+    buildOptions = this.addTargetDefaults(buildOptions, appConfig);
     buildOptions = this.mergeConfigs(buildOptions, appConfig, projectRoot);
 
     const tsconfigPath = path.resolve(projectRoot, appConfig.root, appConfig.tsconfig);
@@ -101,7 +101,7 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
   }
 
   // Fill in defaults for build targets
-  public addTargetDefaults(buildOptions: T): T {
+  public addTargetDefaults(buildOptions: T, appConfig: any): T {
     const targetDefaults: { [target: string]: Partial<BuildOptions> } = {
       development: {
         environment: 'dev',
@@ -126,8 +126,10 @@ export class NgCliWebpackConfig<T extends BuildOptions = BuildOptions> {
 
     // Use Build Optimizer on prod AOT builds by default when AngularCompilerPlugin is supported.
     const buildOptimizerDefault = {
-      buildOptimizer: buildOptions.target == 'production' && buildOptions.aot !== false
+      buildOptimizer: buildOptions.target == 'production'
+        && buildOptions.aot !== false
         && AngularCompilerPlugin.isSupported()
+        && appConfig.platform != 'server'
     };
 
     merged = Object.assign({}, buildOptimizerDefault, merged);
