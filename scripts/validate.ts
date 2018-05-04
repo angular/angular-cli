@@ -9,6 +9,7 @@
 import { logging, tags } from '@angular-devkit/core';
 import { execSync } from 'child_process';
 import templates from './templates';
+import validateBuildFiles from './validate-build-files';
 import validateCommits from './validate-commits';
 import validateLicenses from './validate-licenses';
 
@@ -44,6 +45,10 @@ export default function (options: { verbose: boolean }, logger: logging.Logger) 
   logger.info('');
   logger.info('Running license validation...');
   validateLicenses({}, logger.createChild('validate-commits'));
+
+  logger.info('');
+  logger.info('Running BUILD files validation...');
+  validateBuildFiles({}, logger.createChild('validate-build-files'));
 
   if (error) {
     process.exit(101);
