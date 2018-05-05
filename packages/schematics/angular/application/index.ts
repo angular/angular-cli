@@ -202,7 +202,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
           tsConfig: `${rootFilesRoot}tsconfig.spec.json`,
           karmaConfig: `${rootFilesRoot}karma.conf.js`,
           styles: [
-            `${projectRoot}styles.${options.style}`,
+            `${projectRoot}src/styles.${options.style}`,
           ],
           scripts: [],
           assets: [

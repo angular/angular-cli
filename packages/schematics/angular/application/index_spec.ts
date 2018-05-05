@@ -212,6 +212,14 @@ describe('Application Schematic', () => {
       expect(buildOpt.main).toEqual('src/main.ts');
       expect(buildOpt.polyfills).toEqual('src/polyfills.ts');
       expect(buildOpt.tsConfig).toEqual('src/tsconfig.app.json');
+
+      const testOpt = prj.architect.test.options;
+      expect(testOpt.main).toEqual('src/test.ts');
+      expect(testOpt.tsConfig).toEqual('src/tsconfig.spec.json');
+      expect(testOpt.karmaConfig).toEqual('src/karma.conf.js');
+      expect(testOpt.styles).toEqual([
+        'src/styles.css',
+      ]);
     });
 
     it('should set the relative tsconfig paths', () => {
