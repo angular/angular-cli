@@ -124,6 +124,7 @@ constructor(element: ElementRef, renderer: Renderer2) {
 We believe that using the word "universal" is correct when referring to a JavaScript Application that runs in more environments than the browser. (inspired by [Universal JavaScript](https://medium.com/@mjackson/universal-javascript-4761051b7ae9))
 
 # Universal Team
+- [Adam Plumer](https://github.com/CaerusKaru) and [Fabian Wiles](https://github.com/Toxicable) - Current maintainers
 - [PatrickJS](https://twitter.com/gdi2290) and [Jeff Whelpley](https://twitter.com/jeffwhelpley) - Founders of the Angular Universal project. (Universal rendering is also called [PatrickJS-ing](https://twitter.com/jeffbcross/status/846512930971516928))
 - [Mark Pieszak](https://twitter.com/MarkPieszak) - Contributor and Evangelist, ASP.NET Core Engine
 - [Jason Jean](https://github.com/FrozenPandaz) - Express engine and Universal support for CLI
