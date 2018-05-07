@@ -60,7 +60,6 @@ When building you can modify base tag (`<base href="/">`) in your index.html wit
 ```bash
 # Sets base tag href to /myUrl/ in your index.html
 ng build --base-href /myUrl/
-ng build --bh /myUrl/
 ```
 
 ### Bundling & Tree-Shaking
