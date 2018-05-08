@@ -21,6 +21,23 @@ export class UpdateRecorderBase implements UpdateRecorder {
     this._path = entry.path;
   }
 
+  static createFromFileEntry(entry: FileEntry): UpdateRecorderBase {
+    const c0 = entry.content.readUInt8(0, true);
+    const c1 = entry.content.readUInt8(1, true);
+    const c2 = entry.content.readUInt8(2, true);
+
+    // Check if we're BOM.
+    if (c0 == 0xEF && c1 == 0xBB && c2 == 0xBF) {
+      return new UpdateRecorderBom(entry);
+    } else if (c0 === 0xFF && c1 == 0xFE) {
+      return new UpdateRecorderBom(entry, 2);
+    } else if (c0 === 0xFE && c1 == 0xFF) {
+      return new UpdateRecorderBom(entry, 2);
+    }
+
+    return new UpdateRecorderBase(entry);
+  }
+
   get path() { return this._path; }
 
   // These just record changes.
@@ -48,5 +65,24 @@ export class UpdateRecorderBase implements UpdateRecorder {
     }
 
     return this._content.generate();
+  }
+}
+
+
+export class UpdateRecorderBom extends UpdateRecorderBase {
+  constructor(entry: FileEntry, private _delta = 3) {
+    super(entry);
+  }
+
+  insertLeft(index: number, content: Buffer | string) {
+    return super.insertLeft(index + this._delta, content);
+  }
+
+  insertRight(index: number, content: Buffer | string) {
+    return super.insertRight(index + this._delta, content);
+  }
+
+  remove(index: number, length: number) {
+    return super.remove(index + this._delta, length);
   }
 }

@@ -186,7 +186,7 @@ export class VirtualTree implements Tree {
       throw new FileDoesNotExistException(path);
     }
 
-    return new UpdateRecorderBase(entry);
+    return UpdateRecorderBase.createFromFileEntry(entry);
   }
 
   commitUpdate(record: UpdateRecorder) {
