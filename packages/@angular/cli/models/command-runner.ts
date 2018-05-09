@@ -1,21 +1,16 @@
 import {
   Option,
   CommandContext,
-  Command,
   CommandConstructor,
   CommandScope,
   ArgumentStrategy
 } from '../models/command';
-import { logging, normalize, tags } from '@angular-devkit/core';
+import { logging, tags } from '@angular-devkit/core';
 import { camelize } from '@angular-devkit/core/src/utils/strings';
-import { findUp } from '../utilities/find-up';
 import { insideProject } from '../utilities/project';
 
 import * as yargsParser from 'yargs-parser';
-import * as fs from 'fs';
-import { join } from 'path';
 
-const SilentError = require('silent-error');
 
 export interface CommandMap {
   [key: string]: CommandConstructor;
@@ -114,18 +109,57 @@ export async function runCommand(commandMap: CommandMap,
   }
 
   if (options.help) {
-    return await runHelp(command, options);
+    return command.printHelp(options);
   } else {
-    verifyCommandInScope(command, executionScope);
-    verifyWorkspace(
-      command,
-      executionScope,
-      context.project.root,
-      command.allowMissingWorkspace ? logger : null,
-    );
+    if (command.scope !== undefined && command.scope !== CommandScope.everywhere) {
+      if (command.scope !== executionScope) {
+        let errorMessage;
+        if (command.scope === CommandScope.inProject) {
+          errorMessage = `This command can only be run inside of a CLI project.`;
+        } else {
+          errorMessage = `This command can not be run inside of a CLI project.`;
+        }
+        logger.fatal(errorMessage);
+
+        return 1;
+      }
+
+      if (command.scope === CommandScope.inProject) {
+        if (!context.project.configFile) {
+          logger.fatal('Invalid project: missing workspace file.');
+
+          return 1;
+        }
+
+        if (['.angular-cli.json', 'angular-cli.json'].includes(context.project.configFile)) {
+          // --------------------------------------------------------------------------------
+          // If changing this message, please update the same message in
+          // `packages/@angular/cli/bin/ng-update-message.js`
+          const message = tags.stripIndent`
+            The Angular CLI configuration format has been changed, and your existing configuration
+            can be updated automatically by running the following command:
+
+              ng update @angular/cli
+          `;
+
+          logger.warn(message);
+
+          return 1;
+        }
+      }
+    }
+
     delete options.h;
     delete options.help;
-    return await validateAndRunCommand(command, options);
+
+    const isValid = await command.validate(options);
+    if (!isValid) {
+      logger.fatal(`Validation error. Invalid command`);
+
+      return 1;
+    }
+
+    return await command.run(options);
   }
 }
 
@@ -257,87 +291,4 @@ function listAllCommandNames(map: CommandMap): string[] {
         return acc.concat(map[key].aliases);
       }, [] as string[]),
   );
-}
-
-
-function verifyCommandInScope(command: Command, scope = CommandScope.everywhere): void {
-  if (!command) {
-    return;
-  }
-  if (command.scope !== CommandScope.everywhere) {
-    if (command.scope !== scope) {
-      let errorMessage: string;
-      if (command.scope === CommandScope.inProject) {
-        errorMessage = `This command can only be run inside of a CLI project.`;
-      } else {
-        errorMessage = `This command can not be run inside of a CLI project.`;
-      }
-      throw new SilentError(errorMessage);
-    }
-  }
-}
-
-function verifyWorkspace(
-  command: Command,
-  executionScope: CommandScope,
-  root: string,
-  logger: logging.Logger | null = null,
-): void {
-  if (command.scope === CommandScope.everywhere) {
-    return;
-  }
-  if (executionScope === CommandScope.inProject) {
-    if (fs.existsSync(join(root, 'angular.json'))) {
-      return;
-    }
-    if (fs.existsSync(join(root, '.angular.json'))) {
-      return;
-    }
-
-    // Check if there's an old config file meaning that the project has not been updated
-    const oldConfigFileNames = [
-      normalize('.angular-cli.json'),
-      normalize('angular-cli.json'),
-    ];
-    const oldConfigFilePath = (root && findUp(oldConfigFileNames, root))
-      || findUp(oldConfigFileNames, process.cwd())
-      || findUp(oldConfigFileNames, __dirname);
-
-    // If an old configuration file is found, throw an exception.
-    if (oldConfigFilePath) {
-      // ------------------------------------------------------------------------------------------
-      // If changing this message, please update the same message in
-      // `packages/@angular/cli/bin/ng-update-message.js`
-      const message = tags.stripIndent`
-        The Angular CLI configuration format has been changed, and your existing configuration can
-        be updated automatically by running the following command:
-
-          ng update @angular/cli
-      `;
-
-      if (!logger) {
-        throw new SilentError(message);
-      } else {
-        logger.warn(message);
-        return;
-      }
-    }
-
-    // If no configuration file is found (old or new), throw an exception.
-    throw new SilentError('Invalid project: missing workspace file.');
-  }
-}
-
-// Execute a command's `printHelp`.
-async function runHelp<T>(command: Command<T>, options: T): Promise<void> {
-  return await command.printHelp(options);
-}
-
-// Validate and run a command.
-async function validateAndRunCommand<T>(command: Command<T>, options: T): Promise<number | void> {
-  const isValid = await command.validate(options);
-  if (isValid !== undefined && !isValid) {
-    throw new SilentError(`Validation error. Invalid command`);
-  }
-  return await command.run(options);
 }

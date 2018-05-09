@@ -2,8 +2,6 @@ import { ModuleNotFoundException, resolve } from '@angular-devkit/core/node';
 import { spawn } from 'child_process';
 import { logging, terminal } from '@angular-devkit/core';
 
-const SilentError = require('silent-error');
-
 
 export type NpmInstall = (packageName: string,
                           logger: logging.Logger,
@@ -16,12 +14,6 @@ export default async function (packageName: string,
                                packageManager: string,
                                projectRoot: string,
                                save = true) {
-  if (packageManager === 'default') {
-    packageManager = 'npm';
-  }
-
-  logger.info(terminal.green(`Installing packages for tooling via ${packageManager}.`));
-
   const installArgs: string[] = [];
   switch (packageManager) {
     case 'cnpm':
@@ -34,8 +26,12 @@ export default async function (packageName: string,
       break;
 
     default:
-      throw new SilentError(`Invalid package manager: ${JSON.stringify(packageManager)}.`);
+      packageManager = 'npm';
+      installArgs.push('install', '--quiet');
+      break;
   }
+
+  logger.info(terminal.green(`Installing packages for tooling via ${packageManager}.`));
 
   if (packageName) {
     try {

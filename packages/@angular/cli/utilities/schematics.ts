@@ -20,7 +20,11 @@ import {
   validateOptionsWithSchema
 } from '@angular-devkit/schematics/tools';
 
-const SilentError = require('silent-error');
+export class UnknownCollectionError extends Error {
+  constructor(collectionName: string) {
+    super(`Invalid collection (${collectionName}).`);
+  }
+}
 
 const engineHost = new NodeModulesEngineHost();
 const engine: Engine<FileSystemCollectionDesc, FileSystemSchematicDesc>
@@ -43,8 +47,9 @@ export function getCollection(collectionName: string): Collection<any, any> {
   const collection = engine.createCollection(collectionName);
 
   if (collection === null) {
-    throw new SilentError(`Invalid collection (${collectionName}).`);
+    throw new UnknownCollectionError(collectionName);
   }
+
   return collection;
 }
 
