@@ -3,9 +3,9 @@
 # ng generate
 
 ## Overview
-`ng generate [name]` generates the specified blueprint
+`ng generate [name]` generates the specified schematic
 
-## Available blueprints:
+## Available Schematics:
  - [class](generate/class)
  - [component](generate/component)
  - [directive](generate/directive)
@@ -15,6 +15,10 @@
  - [module](generate/module)
  - [pipe](generate/pipe)
  - [service](generate/service)
+
+ - [application](generate/application)
+ - [library](generate/library)
+ - [universal](generate/universal)
 
 ## Options
 <details>

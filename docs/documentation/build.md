@@ -5,6 +5,10 @@
 ## Overview
 `ng build` compiles the application into an output directory.
 
+```bash
+ng build [project]
+```
+
 ### Creating a build
 
 ```bash

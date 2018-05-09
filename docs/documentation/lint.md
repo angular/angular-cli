@@ -5,11 +5,15 @@
 ## Overview
 `ng lint` will lint you app code using tslint.
 
+```bash
+ng lint [project]
+```
+
 ## Options
 <details>
   <summary>configuration</summary>
   <p>
-    <code>--configuration</code> (alias: <code>-c</code>) 
+    <code>--configuration</code> (alias: <code>-c</code>)
   </p>
   <p>
     Specify the configuration to use.
@@ -18,7 +22,7 @@
 <details>
   <summary>tslint-config</summary>
   <p>
-    <code>--tslint-config</code> 
+    <code>--tslint-config</code>
   </p>
   <p>
     The name of the TSLint configuration file.
@@ -27,7 +31,7 @@
 <details>
   <summary>fix</summary>
   <p>
-    <code>--fix</code> 
+    <code>--fix</code>
   </p>
   <p>
     Fixes linting errors (may overwrite linted files).
@@ -36,7 +40,7 @@
 <details>
   <summary>type-check</summary>
   <p>
-    <code>--type-check</code> 
+    <code>--type-check</code>
   </p>
   <p>
     Controls the type check for linting.
@@ -45,7 +49,7 @@
 <details>
   <summary>force</summary>
   <p>
-    <code>--force</code> 
+    <code>--force</code>
   </p>
   <p>
     Succeeds even if there was linting errors.
@@ -54,7 +58,7 @@
 <details>
   <summary>silent</summary>
   <p>
-    <code>--silent</code> 
+    <code>--silent</code>
   </p>
   <p>
     Show output text.
@@ -63,7 +67,7 @@
 <details>
   <summary>format</summary>
   <p>
-    <code>--format</code> 
+    <code>--format</code>
   </p>
   <p>
     Output format (prose, json, stylish, verbose, pmd, msbuild, checkstyle, vso, fileslist).

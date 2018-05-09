@@ -5,6 +5,10 @@
 ## Overview
 `ng serve` builds the application and starts a web server.
 
+```bash
+ng serve [project]
+```
+
 ## Options
 <details>
   <summary>prod</summary>

@@ -5,6 +5,10 @@
 ## Overview
 `ng update` Updates the current application to latest versions.
 
+```bash
+ng update [package]
+```
+
 ## Options
 <details>
   <summary>dry-run</summary>

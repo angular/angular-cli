@@ -5,6 +5,10 @@
 ## Overview
 `ng e2e` serves the application and runs end-to-end tests.
 
+```bash
+ng e2e [project]
+```
+
 ### Running end-to-end tests
 
 ```bash
