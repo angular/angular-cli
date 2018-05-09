@@ -1,12 +1,6 @@
-import { ArchitectCommand } from '../models/architect-command';
 import { Option, CommandScope } from '../models/command';
 import { Version } from '../upgrade/version';
-
-export interface Options {
-  project?: string;
-  configuration?: string;
-  prod: boolean;
-}
+import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
 
 export default class BuildCommand extends ArchitectCommand {
   public readonly name = 'build';
@@ -20,29 +14,14 @@ export default class BuildCommand extends ArchitectCommand {
     this.configurationOption
   ];
 
-  public validate(options: Options) {
+  public validate(options: ArchitectCommandOptions) {
     // Check Angular and TypeScript versions.
     Version.assertCompatibleAngularVersion(this.project.root);
     Version.assertTypescriptVersion(this.project.root);
     return super.validate(options);
   }
 
-  public async run(options: Options) {
-    let configuration = options.configuration;
-    if (!configuration && options.prod) {
-      configuration = 'production';
-    }
-
-    const overrides = { ...options };
-    delete overrides.project;
-    delete overrides.configuration;
-    delete overrides.prod;
-
-    return this.runArchitectTarget({
-      project: options.project,
-      target: this.target,
-      configuration,
-      overrides
-    }, options);
+  public async run(options: ArchitectCommandOptions) {
+    return this.runArchitectTarget(options);
   }
 }

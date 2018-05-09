@@ -1,9 +1,6 @@
 import { CommandScope, Option } from '../models/command';
-import { ArchitectCommand } from '../models/architect-command';
+import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
 
-export interface RunOptions {
-  target: string;
-}
 
 export default class RunCommand extends ArchitectCommand {
   public readonly name = 'run';
@@ -14,17 +11,9 @@ export default class RunCommand extends ArchitectCommand {
     this.configurationOption
   ];
 
-  public async run(options: RunOptions) {
+  public async run(options: ArchitectCommandOptions) {
     if (options.target) {
-      const [project, target, configuration] = options.target.split(':');
-      const overrides = { ...options };
-      delete overrides.target;
-      return this.runArchitectTarget({
-        project,
-        target,
-        configuration,
-        overrides
-      }, options);
+      return this.runArchitectTarget(options);
     } else {
       throw new Error('Invalid architect target.');
     }
