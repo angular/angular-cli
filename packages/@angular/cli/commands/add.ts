@@ -6,8 +6,6 @@ import { getPackageManager } from '../utilities/config';
 import { SchematicCommand } from '../models/schematic-command';
 import { NpmInstall } from '../tasks/npm-install';
 
-const SilentError = require('silent-error');
-
 
 export default class AddCommand extends SchematicCommand {
   readonly name = 'add';
@@ -33,10 +31,12 @@ export default class AddCommand extends SchematicCommand {
     const collectionName = options._[0];
 
     if (!collectionName) {
-      throw new SilentError(
+      this.logger.fatal(
         `The "ng ${this.name}" command requires a name argument to be specified eg. `
         + `${terminal.yellow('ng add [name] ')}. For more details, use "ng help".`
       );
+
+      return false;
     }
 
     return true;
@@ -46,10 +46,12 @@ export default class AddCommand extends SchematicCommand {
     const firstArg = options._[0];
 
     if (!firstArg) {
-      throw new SilentError(
+      this.logger.fatal(
         `The "ng ${this.name}" command requires a name argument to be specified eg. `
         + `${terminal.yellow('ng add [name] ')}. For more details, use "ng help".`
       );
+
+      return 1;
     }
 
     const packageManager = getPackageManager();
@@ -93,10 +95,12 @@ export default class AddCommand extends SchematicCommand {
       return await this.runSchematic(runOptions);
     } catch (e) {
       if (e instanceof NodePackageDoesNotSupportSchematics) {
-        throw new SilentError(tags.oneLine`
+        this.logger.error(tags.oneLine`
           The package that you are trying to add does not support schematics. You can try using
           a different version of the package or contact the package author to add ng-add support.
         `);
+
+        return 1;
       }
 
       throw e;

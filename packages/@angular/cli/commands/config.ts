@@ -16,8 +16,6 @@ import {
   tags,
 } from '@angular-devkit/core';
 
-const SilentError = require('silent-error');
-
 
 export interface ConfigOptions {
   jsonPath: string;
@@ -188,12 +186,14 @@ export default class ConfigCommand extends Command {
 
     if (options.value == undefined) {
       if (!config) {
-        throw new SilentError('No config found.');
+        this.logger.error('No config found.');
+
+        return 1;
       }
 
-      this.get(config._workspace, options);
+      return this.get(config._workspace, options);
     } else {
-      this.set(options);
+      return this.set(options);
     }
   }
 
@@ -201,7 +201,9 @@ export default class ConfigCommand extends Command {
     const value = options.jsonPath ? getValueFromPath(config as any, options.jsonPath) : config;
 
     if (value === undefined) {
-      throw new SilentError('Value cannot be found.');
+      this.logger.error('Value cannot be found.');
+
+      return 1;
     } else if (typeof value == 'object') {
       this.logger.info(JSON.stringify(value, null, 2));
     } else {
@@ -228,14 +230,17 @@ export default class ConfigCommand extends Command {
     const result = setValueFromPath(configValue, options.jsonPath, value);
 
     if (result === undefined) {
-      throw new SilentError('Value cannot be found.');
+      this.logger.error('Value cannot be found.');
+
+      return 1;
     }
 
     try {
       validateWorkspace(configValue);
     } catch (error) {
-      this.logger.error(error.message);
-      throw new SilentError();
+      this.logger.fatal(error.message);
+
+      return 1;
     }
 
     const output = JSON.stringify(configValue, null, 2);
