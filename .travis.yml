@@ -7,6 +7,7 @@ addons:
 language: node_js
 
 cache:
+  yarn: true
   directories:
      - ./node_modules
 
@@ -25,14 +26,14 @@ matrix:
   include:
     # Build stage
     - stage: build
-      script: npm run lint
+      script: yarn run lint
       env: lint
-    - script: npm run build
+    - script: yarn run build
       env: build
 
     # Test stage
     - stage: test
-      script: npm run test
+      script: yarn run test
       env: test
     - node_js: "8"
       os: linux
@@ -93,10 +94,6 @@ matrix:
         on:
           tags: true
 
-
-install:
-  - npm install -g npm@5.8.0
-  - npm install
 
 env:
   global:

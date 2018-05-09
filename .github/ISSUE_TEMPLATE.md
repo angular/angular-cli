@@ -7,7 +7,7 @@ For feature requests, delete the form below and describe the requirements and us
 ```
 <!--
 Output from: `ng --version`.
-If nothing, output from: `node --version` and `npm --version`.
+If nothing, output from: `node --version` and `npm --version`/`yarn --version`.
   Windows (7/8/10). Linux (incl. distribution). macOS (El Capitan? Sierra?)
 -->
 ```
