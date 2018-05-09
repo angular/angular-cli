@@ -10,6 +10,8 @@ import { from } from 'rxjs';
 import { concatMap, map, tap, toArray } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
 
+type projectFilter = experimental.workspace.projectFilter;
+
 
 export abstract class ArchitectCommand<T = any> extends Command<T> {
   private _host = new NodeJsSyncHost();
@@ -161,7 +163,7 @@ export abstract class ArchitectCommand<T = any> extends Command<T> {
       if (!targetSpec.project && this.target) {
         // This runs each target sequentially.
         // Running them in parallel would jumble the log messages.
-        return await from(this.getProjectNamesByTarget(this.target)).pipe(
+        return await from(this.getProjectNamesByTarget(this.target, targetSpec.projectFilter)).pipe(
           concatMap(project => runSingleTarget({ ...targetSpec, project })),
           toArray(),
         ).toPromise().then(results => results.every(res => res === 0) ? 0 : 1);
@@ -194,8 +196,8 @@ export abstract class ArchitectCommand<T = any> extends Command<T> {
     }
   }
 
-  private getProjectNamesByTarget(targetName: string): string[] {
-    const allProjectsForTargetName = this._workspace.listProjectNames().map(projectName =>
+  private getProjectNamesByTarget(targetName: string, filter?: projectFilter): string[] {
+    const allProjectsForTargetName = this._workspace.listProjectNames(filter).map(projectName =>
       this._architect.listProjectTargets(projectName).includes(targetName) ? projectName : null
     ).filter(x => !!x);
 
