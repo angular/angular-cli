@@ -34,11 +34,6 @@
       "description": "Try to update webdriver.",
       "default": true
     },
-    "serve": {
-      "type": "boolean",
-      "description": "Compile and Serve the app.",
-      "default": true
-    },
     "port": {
       "type": "number",
       "description": "The port to use to serve the application."
