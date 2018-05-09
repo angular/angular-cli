@@ -215,7 +215,7 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
         return allProjectsForTargetName;
       }
 
-      throw new Error(`Could not determine a single project for the '${targetName} target.`);
+      throw new Error(`Could not determine a single project for the '${targetName}' target.`);
     }
   }
 
