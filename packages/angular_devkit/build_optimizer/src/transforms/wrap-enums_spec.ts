@@ -50,7 +50,7 @@ describe('wrap-enums', () => {
         ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
         ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
         return ChangeDetectionStrategy;
-      })({});
+      })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
     `;
 
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
@@ -73,7 +73,7 @@ describe('wrap-enums', () => {
           AnimatorControlState[AnimatorControlState["FINISHED"] = 3] = "FINISHED";
           AnimatorControlState[AnimatorControlState["DESTROYED"] = 4] = "DESTROYED";
           return AnimatorControlState;
-      })({});
+      })(AnimatorControlState || (AnimatorControlState = {}));
     `;
 
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
@@ -155,9 +155,31 @@ describe('wrap-enums', () => {
           RequestMethod[RequestMethod["Head"] = 5] = "Head";
           RequestMethod[RequestMethod["Patch"] = 6] = "Patch";
           return RequestMethod;
-      })({});
+      })(RequestMethod || (RequestMethod = {}));
     `;
 
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
+
+  it('wraps exported enums in IIFE', () => {
+    const input = tags.stripIndent`
+      var ExportEnum;
+      (function (ExportEnum) {
+        ExportEnum[ExportEnum["A"] = 0] = "A";
+        ExportEnum[ExportEnum["B"] = 1] = "B";
+        ExportEnum[ExportEnum["C"] = 2] = "C";
+      })(ExportEnum = exports.ExportEnum || (exports.ExportEnum = {}));
+    `;
+    const output = tags.stripIndent`
+      var ExportEnum = /*@__PURE__*/ (function (ExportEnum) {
+        ExportEnum[ExportEnum["A"] = 0] = "A";
+        ExportEnum[ExportEnum["B"] = 1] = "B";
+        ExportEnum[ExportEnum["C"] = 2] = "C";
+        return ExportEnum;
+      })(ExportEnum = exports.ExportEnum || (exports.ExportEnum = {}));
+    `;
+
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
+
 });

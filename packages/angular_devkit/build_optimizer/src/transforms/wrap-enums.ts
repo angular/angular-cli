@@ -174,13 +174,29 @@ function findTs2_3EnumIife(name: string, statement: ts.Statement): ts.CallExpres
 
   const callExpression = expression;
 
-  const argument = expression.arguments[0];
-  if (!ts.isBinaryExpression(argument)
-      || argument.operatorToken.kind !== ts.SyntaxKind.BarBarToken) {
+  let argument = expression.arguments[0];
+  if (!ts.isBinaryExpression(argument)) {
     return null;
   }
 
   if (!ts.isIdentifier(argument.left) || argument.left.text !== name) {
+    return null;
+  }
+
+  if (argument.operatorToken.kind === ts.SyntaxKind.FirstAssignment) {
+    if (!ts.isBinaryExpression(argument.right)
+        || argument.right.operatorToken.kind !== ts.SyntaxKind.BarBarToken) {
+      return null;
+    }
+
+    argument = argument.right;
+  }
+
+  if (!ts.isBinaryExpression(argument)) {
+    return null;
+  }
+
+  if (argument.operatorToken.kind !== ts.SyntaxKind.BarBarToken) {
     return null;
   }
 
@@ -406,7 +422,7 @@ function updateEnumIife(hostNode: ts.VariableStatement, iife: ts.CallExpression)
       updatedFunction,
     ),
     iife.typeArguments,
-    [ts.createObjectLiteral()],
+    iife.arguments,
   );
 
   return updateHostNode(hostNode, updatedIife);
