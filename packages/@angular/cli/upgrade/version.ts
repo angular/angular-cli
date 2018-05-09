@@ -4,8 +4,6 @@ import * as path from 'path';
 import { isWarningEnabled } from '../utilities/config';
 import { requireProjectModule } from '../utilities/require-project-module';
 
-const resolve = require('resolve');
-
 
 export class Version {
   private _semver: SemVer = null;
@@ -30,28 +28,6 @@ export class Version {
   get extra() { return this._semver ? this._semver.prerelease[1] : ''; }
 
   toString() { return this._version; }
-
-  static fromProject(): Version {
-    let packageJson: any = null;
-
-    try {
-      const angularCliPath = resolve.sync('@angular/cli', {
-        basedir: process.cwd(),
-        packageFilter: (pkg: any, _pkgFile: string) => {
-          return packageJson = pkg;
-        }
-      });
-      if (angularCliPath && packageJson) {
-        try {
-          return new Version(packageJson.version);
-        } catch {
-          return new Version(null);
-        }
-      }
-    } catch {
-      return new Version(null);
-    }
-  }
 
   static assertCompatibleAngularVersion(projectRoot: string) {
     let angularPkgJson;

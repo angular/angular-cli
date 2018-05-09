@@ -36,7 +36,6 @@
     "@schematics/angular": "0.6.1",
     "@schematics/update": "0.6.1",
     "opn": "~5.3.0",
-    "resolve": "^1.1.7",
     "rxjs": "^6.0.0",
     "semver": "^5.1.0",
     "symbol-observable": "^1.2.0",
