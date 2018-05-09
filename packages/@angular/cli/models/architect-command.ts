@@ -1,4 +1,4 @@
-import { experimental, schema, strings } from '@angular-devkit/core';
+import { JsonObject, experimental, schema, strings } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import {
   Architect, BuilderDescription, BuildEvent,
@@ -11,7 +11,20 @@ import { concatMap, map, tap, toArray } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
 
 
-export abstract class ArchitectCommand<T = any> extends Command<T> {
+export interface ProjectAndConfigurationOptions {
+  project?: string;
+  configuration?: string;
+  prod: boolean;
+}
+
+export interface TargetOptions {
+  target?: string;
+}
+
+export type ArchitectCommandOptions = ProjectAndConfigurationOptions & TargetOptions & JsonObject;
+
+export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> {
+
   private _host = new NodeJsSyncHost();
   private _architect: Architect;
   private _workspace: experimental.workspace.Workspace;
@@ -30,33 +43,25 @@ export abstract class ArchitectCommand<T = any> extends Command<T> {
 
   target: string | undefined;
 
-  public async initialize(options: any): Promise<void> {
+  public async initialize(options: ArchitectCommandOptions): Promise<void> {
     return this._loadWorkspaceAndArchitect().pipe(
       concatMap(() => {
-        let targetSpec: TargetSpecifier;
-        if (options.project) {
-          targetSpec = {
-            project: options.project,
-            target: this.target
-          };
-        } else if (options.target) {
-          const [project, target] = options.target.split(':');
-          targetSpec = { project, target };
-        } else if (this.target) {
+        const targetSpec: TargetSpecifier = this._makeTargetSpecifier(options);
+
+        if (this.target && !targetSpec.project) {
           const projects = this.getProjectNamesByTarget(this.target);
 
           if (projects.length === 1) {
             // If there is a single target, use it to parse overrides.
-            targetSpec = {
-              project: projects[0],
-              target: this.target
-            };
+            targetSpec.project = projects[0];
           } else {
             // Multiple targets can have different, incompatible options.
             // We only lookup options for single targets.
             return of(null);
           }
-        } else {
+        }
+
+        if (!targetSpec.project || !targetSpec.target) {
           throw new Error('Cannot determine project or target for Architect command.');
         }
 
@@ -70,13 +75,10 @@ export abstract class ArchitectCommand<T = any> extends Command<T> {
       .then(() => { });
   }
 
-  public validate(options: any) {
+  public validate(options: ArchitectCommandOptions) {
     if (!options.project && this.target) {
       const projectNames = this.getProjectNamesByTarget(this.target);
-      const overrides = { ...options };
-      delete overrides.project;
-      delete overrides.configuration;
-      delete overrides.prod;
+      const { overrides } = this._makeTargetSpecifier(options);
       if (projectNames.length > 1 && Object.keys(overrides).length > 0) {
         throw new Error('Architect commands with multiple targets cannot specify overrides.'
           + `'${this.target}' would be run on the following projects: ${projectNames.join()}`);
@@ -146,10 +148,9 @@ export abstract class ArchitectCommand<T = any> extends Command<T> {
     aliases: ['c']
   };
 
-  protected async runArchitectTarget(
-    targetSpec: TargetSpecifier,
-    commandOptions: T,
-  ): Promise<number> {
+  protected async runArchitectTarget(options: ArchitectCommandOptions): Promise<number> {
+    const targetSpec = this._makeTargetSpecifier(options);
+
     const runSingleTarget = (targetSpec: TargetSpecifier) => this._architect.run(
       this._architect.getBuilderConfiguration(targetSpec),
       { logger: this._logger }
@@ -174,7 +175,7 @@ export abstract class ArchitectCommand<T = any> extends Command<T> {
         e.errors.forEach(schemaError => {
           if (schemaError.keyword === 'additionalProperties') {
             const unknownProperty = schemaError.params.additionalProperty;
-            if (unknownProperty in commandOptions) {
+            if (unknownProperty in options) {
               const dashes = unknownProperty.length === 1 ? '-' : '--';
               this.logger.fatal(`Unknown option: '${dashes}${unknownProperty}'`);
 
@@ -228,5 +229,36 @@ export abstract class ArchitectCommand<T = any> extends Command<T> {
       }),
       tap((architect: Architect) => this._architect = architect),
     );
+  }
+
+  private _makeTargetSpecifier(options: ArchitectCommandOptions): TargetSpecifier {
+    let project, target, configuration, overrides;
+
+    if (options.target) {
+      [project, target, configuration] = options.target.split(':');
+
+      overrides = { ...options };
+      delete overrides.target;
+    } else {
+      project = options.project;
+      target = this.target;
+      configuration = options.configuration;
+      if (!configuration && options.prod) {
+        configuration = 'production';
+      }
+
+      overrides = { ...options };
+
+      delete overrides.configuration;
+      delete overrides.prod;
+      delete overrides.project;
+    }
+
+    return {
+      project,
+      configuration,
+      target,
+      overrides
+    };
   }
 }

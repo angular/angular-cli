@@ -1,10 +1,6 @@
 import { CommandScope, Option } from '../models/command';
-import { ArchitectCommand } from '../models/architect-command';
+import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
 
-export interface Options {
-  project?: string;
-  configuration?: string;
-}
 
 export default class LintCommand extends ArchitectCommand {
   public readonly name = 'lint';
@@ -17,14 +13,7 @@ export default class LintCommand extends ArchitectCommand {
     this.configurationOption
   ];
 
-  public async run(options: Options) {
-    const overrides = { ...options };
-    delete overrides.project;
-    return this.runArchitectTarget({
-      project: options.project,
-      target: this.target,
-      configuration: options.configuration,
-      overrides
-    }, options);
+  public async run(options: ArchitectCommandOptions) {
+    return this.runArchitectTarget(options);
   }
 }
