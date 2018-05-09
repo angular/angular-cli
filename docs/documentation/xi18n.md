@@ -5,6 +5,10 @@
 ## Overview
 `ng xi18n` Extracts i18n messages from the templates.
 
+```bash
+ng xi18n [project]
+```
+
 ## Options
 <details>
   <summary>configuration</summary>
