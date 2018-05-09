@@ -1,8 +1,7 @@
-const resolve = require('resolve');
 
 // resolve dependencies within the target project
 export function resolveProjectModule(root: string, moduleName: string) {
-  return resolve.sync(moduleName, { basedir: root });
+  return require.resolve(moduleName, { paths: [root] });
 }
 
 // require dependencies within the target project
