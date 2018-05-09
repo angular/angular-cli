@@ -1,6 +1,7 @@
 {
   "version": 1,
   "newProjectRoot": "./projects",
+  "defaultProject": "app",
   "cli": {
     "$globalOverride": "${HOME}/.angular-cli.json",
     "schematics": {
