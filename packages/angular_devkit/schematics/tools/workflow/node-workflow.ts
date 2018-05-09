@@ -150,7 +150,7 @@ export class NodeWorkflow implements workflow.Workflow {
           return of();
         }
 
-        return fsSink.commit(tree).pipe(last(), defaultIfEmpty());
+        return fsSink.commit(tree).pipe(defaultIfEmpty(), last());
       }),
       concatMap(() => {
         if (this._options.dryRun) {
