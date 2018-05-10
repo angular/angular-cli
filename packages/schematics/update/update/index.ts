@@ -19,7 +19,7 @@ import { map, mergeMap, reduce, switchMap } from 'rxjs/operators';
 import * as semver from 'semver';
 import { getNpmPackageJson } from './npm';
 import { NpmRepositoryPackageJson } from './npm-package-json';
-import { JsonSchemaForNpmPackageJsonFiles } from './package-json';
+import { Dependency, JsonSchemaForNpmPackageJsonFiles } from './package-json';
 import { UpdateSchema } from './schema';
 
 type VersionRange = string & { __VERSION_RANGE: void; };
@@ -220,6 +220,13 @@ function _performUpdate(
     throw new SchematicsException('package.json could not be parsed: ' + e.message);
   }
 
+  const updateDependency = (deps: Dependency, name: string, newVersion: string) => {
+    const oldVersion = deps[name];
+    // We only respect caret and tilde ranges on update.
+    const execResult = /^[\^~]/.exec(oldVersion);
+    deps[name] = `${execResult ? execResult[0] : ''}${newVersion}`;
+  };
+
   const toInstall = [...infoMap.values()]
       .map(x => [x.name, x.target, x.installed])
       // tslint:disable-next-line:non-null-operator
@@ -234,7 +241,7 @@ function _performUpdate(
     );
 
     if (packageJson.dependencies && packageJson.dependencies[name]) {
-      packageJson.dependencies[name] = target.version;
+      updateDependency(packageJson.dependencies, name, target.version);
 
       if (packageJson.devDependencies && packageJson.devDependencies[name]) {
         delete packageJson.devDependencies[name];
@@ -243,13 +250,13 @@ function _performUpdate(
         delete packageJson.peerDependencies[name];
       }
     } else if (packageJson.devDependencies && packageJson.devDependencies[name]) {
-      packageJson.devDependencies[name] = target.version;
+      updateDependency(packageJson.devDependencies, name, target.version);
 
       if (packageJson.peerDependencies && packageJson.peerDependencies[name]) {
         delete packageJson.peerDependencies[name];
       }
     } else if (packageJson.peerDependencies && packageJson.peerDependencies[name]) {
-      packageJson.peerDependencies[name] = target.version;
+      updateDependency(packageJson.peerDependencies, name, target.version);
     } else {
       logger.warn(`Package ${name} was not found in dependencies.`);
     }

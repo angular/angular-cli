@@ -52,6 +52,28 @@ describe('@schematics/update', () => {
     ).subscribe(undefined, done.fail, done);
   }, 45000);
 
+  it('respects existing tilde and caret ranges', done => {
+    // Add ranges.
+    const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
+    const packageJson = JSON.parse(content);
+    packageJson['dependencies']['@angular-devkit-tests/update-base'] = '^1.0.0';
+    packageJson['dependencies']['@angular-devkit-tests/update-migrations'] = '~1.0.0';
+    host.sync.write(
+      normalize('/package.json'),
+      virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
+    );
+
+    schematicRunner.runSchematicAsync('update', { all: true }, appTree).pipe(
+      map(tree => {
+        const packageJson = JSON.parse(tree.readContent('/package.json'));
+        // This one should not change because 1.1.0 was already satisfied by ^1.0.0.
+        expect(packageJson['dependencies']['@angular-devkit-tests/update-base']).toBe('^1.0.0');
+        expect(packageJson['dependencies']['@angular-devkit-tests/update-migrations'])
+          .toBe('~1.6.0');
+      }),
+    ).subscribe(undefined, done.fail, done);
+  }, 45000);
+
   it('calls migration tasks', done => {
     // Add the basic migration package.
     const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
