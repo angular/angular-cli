@@ -199,7 +199,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
               this.context.logger.info(statsErrorsToString(json, statsConfig));
             }
           }
-          obs.next({ success: true });
+          obs.next({ success: !stats.hasErrors() });
 
           if (first && options.open) {
             first = false;
