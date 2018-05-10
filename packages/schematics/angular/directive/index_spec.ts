@@ -146,4 +146,12 @@ describe('Directive Schematic', () => {
     const content = tree.readContent('/projects/bar/src/app/foo.directive.ts');
     expect(content).toMatch(/selector: '\[appFoo\]'/);
   });
+
+  it('should use the supplied prefix if it is ""', () => {
+    const options = { ...defaultOptions, prefix: '' };
+    const tree = schematicRunner.runSchematic('directive', options, appTree);
+
+    const content = tree.readContent('/projects/bar/src/app/foo.directive.ts');
+    expect(content).toMatch(/selector: '\[foo\]'/);
+  });
 });

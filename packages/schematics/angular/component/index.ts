@@ -96,7 +96,7 @@ function buildSelector(options: ComponentOptions, projectPrefix: string) {
   let selector = strings.dasherize(options.name);
   if (options.prefix) {
     selector = `${options.prefix}-${selector}`;
-  } else if (projectPrefix) {
+  } else if (options.prefix === undefined && projectPrefix) {
     selector = `${projectPrefix}-${selector}`;
   }
 

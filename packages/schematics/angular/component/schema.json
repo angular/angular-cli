@@ -52,9 +52,17 @@
     },
     "prefix": {
       "type": "string",
-      "format": "html-selector",
       "description": "The prefix to apply to generated selectors.",
-      "alias": "p"
+      "alias": "p",
+      "oneOf": [
+        {
+          "maxLength": 0
+        },
+        {
+          "minLength": 1,
+          "format": "html-selector"
+        }
+      ]
     },
     "styleext": {
       "description": "The file extension to be used for style files.",

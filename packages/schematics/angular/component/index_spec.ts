@@ -205,6 +205,14 @@ describe('Component Schematic', () => {
     expect(content).toMatch(/selector: 'app-foo'/);
   });
 
+  it('should use the supplied prefix if it is ""', () => {
+    const options = { ...defaultOptions, prefix: '' };
+
+    const tree = schematicRunner.runSchematic('component', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(content).toMatch(/selector: 'foo'/);
+  });
+
   it('should respect the inlineTemplate option', () => {
     const options = { ...defaultOptions, inlineTemplate: true };
     const tree = schematicRunner.runSchematic('component', options, appTree);

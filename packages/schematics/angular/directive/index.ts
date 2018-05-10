@@ -94,7 +94,7 @@ function buildSelector(options: DirectiveOptions, projectPrefix: string) {
   let selector = options.name;
   if (options.prefix) {
     selector = `${options.prefix}-${selector}`;
-  } else if (projectPrefix) {
+  } else if (options.prefix === undefined && projectPrefix) {
     selector = `${projectPrefix}-${selector}`;
   }
 
