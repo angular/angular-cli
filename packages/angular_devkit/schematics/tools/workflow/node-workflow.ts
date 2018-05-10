@@ -162,8 +162,8 @@ export class NodeWorkflow implements workflow.Workflow {
         return this._engine.executePostTasks()
           .pipe(
             tap({ complete: () => this._lifeCycle.next({ kind: 'post-tasks-end' }) }),
-            last(),
             defaultIfEmpty(),
+            last(),
           );
       }),
       tap({ complete: () => {
