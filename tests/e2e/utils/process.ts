@@ -171,8 +171,6 @@ export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: 
 
 let npmInstalledEject = false;
 export function ng(...args: string[]) {
-  process.env.PWD = process.cwd();
-
   const argv = getGlobalVariable('argv');
   const maybeSilentNg = argv['nosilent'] ? noSilentNg : silentNg;
   if (['build', 'serve', 'test', 'e2e', 'xi18n'].indexOf(args[0]) != -1) {
