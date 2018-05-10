@@ -1,4 +1,3 @@
-import * as path from 'path';
 import { filter } from 'rxjs/operators';
 import { logging, terminal } from '@angular-devkit/core';
 import { runCommand } from '../../models/command-runner';
@@ -41,10 +40,6 @@ function loadCommands() {
 }
 
 export default async function(options: any) {
-  // ensure the environemnt variable for dynamic paths
-  process.env.PWD = path.normalize(process.env.PWD || process.cwd());
-  process.env.CLI_ROOT = process.env.CLI_ROOT || path.resolve(__dirname, '..', '..');
-
   const commands = loadCommands();
 
   const logger = new logging.IndentLogger('cling');
