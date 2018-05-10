@@ -679,8 +679,9 @@ export class AngularCompilerPlugin {
         // Wait for the plugin to be done when requesting `.ts` files directly (entry points), or
         // when the issuer is a `.ts` or `.ngfactory.js` file.
         nmf.hooks.beforeResolve.tapAsync('angular-compiler', (request: any, callback: any) => {
-          if (this.done && (request.request.endsWith('.ts')
-              || (request.context.issuer && /\.ts|ngfactory\.js$/.test(request.context.issuer)))) {
+          if (this.done && (request && request.request.endsWith('.ts')
+              || (request && request.context.issuer
+                && /\.ts|ngfactory\.js$/.test(request.context.issuer)))) {
             this.done.then(() => callback(null, request), () => callback(null, request));
           } else {
             callback(null, request);
