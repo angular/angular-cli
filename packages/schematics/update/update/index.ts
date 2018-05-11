@@ -38,7 +38,9 @@ const peerCompatibleWhitelist: { [name: string]: PeerVersionTransform } = {
     while (!semver.gtr(major + '.0.0', range)) {
       major++;
       if (major >= 99) {
-        throw new SchematicsException(`Invalid range: ${JSON.stringify(range)}`);
+        // Use original range if it supports a major this high
+        // Range is most likely unbounded (e.g., >=5.0.0)
+        return range;
       }
     }
 
