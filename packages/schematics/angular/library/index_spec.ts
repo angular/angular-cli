@@ -240,11 +240,15 @@ describe('Library Schematic', () => {
 
     const cfg = JSON.parse(tree.readContent('/angular.json'));
     expect(cfg.projects['@myscope/mylib']).toBeDefined();
+
+    const rootTsCfg = JSON.parse(tree.readContent('/tsconfig.json'));
+    expect(rootTsCfg.compilerOptions.paths['@myscope/mylib']).toEqual(['dist/myscope/mylib']);
   });
 
   it(`should dasherize scoped libraries`, () => {
     const scopedName = '@myScope/myLib';
     const expectedScopeName = '@my-scope/my-lib';
+    const expectedFolderName = 'my-scope/my-lib';
     const options = { ...defaultOptions, name: scopedName };
     const tree = schematicRunner.runSchematic('library', options, workspaceTree);
 
@@ -252,7 +256,7 @@ describe('Library Schematic', () => {
     expect(tree.readContent(pkgJsonPath)).toContain(expectedScopeName);
 
     const ngPkgJsonPath = '/projects/my-scope/my-lib/ng-package.json';
-    expect(tree.readContent(ngPkgJsonPath)).toContain(expectedScopeName);
+    expect(tree.readContent(ngPkgJsonPath)).toContain(expectedFolderName);
 
     const pkgJson = JSON.parse(tree.readContent(pkgJsonPath));
     expect(pkgJson.name).toEqual(expectedScopeName);

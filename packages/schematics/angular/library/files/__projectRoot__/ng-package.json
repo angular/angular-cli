@@ -1,6 +1,6 @@
 {
-  "$schema": "<%= projectRoot.split('/').map(x => '..').join('/') %>/node_modules/ng-packagr/ng-package.schema.json",
-  "dest": "<%= projectRoot.split('/').map(x => '..').join('/') %>/dist/<%= dasherize(packageName) %>",
+  "$schema": "<%= relativePathToWorkspaceRoot %>/node_modules/ng-packagr/ng-package.schema.json",
+  "dest": "<%= relativePathToWorkspaceRoot %>/<%= distRoot %>",
   "deleteDestPath": false,
   "lib": {
     "entryFile": "src/<%= entryFile %>.ts"
