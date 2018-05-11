@@ -186,7 +186,10 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
         });
 
         if (newErrors.length > 0) {
-          this.logger.error(new schema.SchemaValidationException(newErrors).message);
+          const message = 'Configuration contains the following error(s):\n';
+          this.logger.error(
+            message + schema.SchemaValidationException.createMessages(newErrors).join('\n'),
+          );
           return 1;
         }
       } else {

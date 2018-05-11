@@ -1,8 +1,9 @@
-import { experimental, JsonObject } from '@angular-devkit/core';
+import { experimental, JsonObject, schema } from '@angular-devkit/core';
 import { normalize, strings, tags, terminal, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { ArgumentStrategy, Command, Option } from './command';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
+import { InvalidInputOptions } from '@angular-devkit/schematics/tools/schema-option-transform';
 import { DryRunEvent, UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
 import { getPackageManager, getDefaultSchematicCollection } from '../utilities/config';
 import { getCollection, getSchematic } from '../utilities/schematics';
@@ -181,6 +182,25 @@ export abstract class SchematicCommand extends Command {
           if (err instanceof UnsuccessfulWorkflowExecution) {
             // "See above" because we already printed the error.
             this.logger.fatal('The Schematic workflow failed. See above.');
+          } else if (err instanceof InvalidInputOptions) {
+            const newErrors: schema.SchemaValidatorError[] = [];
+            err.errors.forEach(schemaError => {
+              if (schemaError.keyword === 'additionalProperties') {
+                const unknownProperty = schemaError.params.additionalProperty;
+                if (unknownProperty in rawArgs) {
+                  const dashes = unknownProperty.length === 1 ? '-' : '--';
+                  this.logger.fatal(`Unknown option: '${dashes}${unknownProperty}'`);
+
+                  return 1;
+                }
+              }
+              newErrors.push(schemaError);
+            });
+
+            if (newErrors.length > 0) {
+              this.logger.fatal(new schema.SchemaValidationException(newErrors).message);
+              return 1;
+            }
           } else if (debug) {
             this.logger.fatal(`An error occured:\n${err.message}\n${err.stack}`);
           } else {
