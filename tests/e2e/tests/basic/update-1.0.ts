@@ -11,7 +11,7 @@ export default function () {
     .then(() => expectToFail(() => ng('build')))
     .then(() => ng('update', '@angular/cli'))
     .then(() => ng('generate', 'component', 'my-comp'))
-    .then(() => ng('test'))
+    .then(() => ng('test', '--watch=false'))
     .then(() => ng('lint'))
     .then(() => ng('build', '--prod'))
     .then(() => ng('e2e'));
