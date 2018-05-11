@@ -23,7 +23,7 @@ To add Font Awesome CSS icons to your app...
 "build": {
   "options": {
     "styles": [
-      "../node_modules/font-awesome/css/font-awesome.css"
+      "node_modules/font-awesome/css/font-awesome.css"
       "styles.css"
     ],
   }
