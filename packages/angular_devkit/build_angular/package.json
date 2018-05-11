@@ -33,7 +33,6 @@
     "memory-fs": "^0.4.1",
     "mini-css-extract-plugin": "~0.4.0",
     "minimatch": "^3.0.4",
-    "node-sass": "^4.9.0",
     "parse5": "^4.0.0",
     "opn": "^5.1.0",
     "portfinder": "^1.0.13",
@@ -60,5 +59,8 @@
     "webpack-merge": "^4.1.2",
     "webpack-sources": "^1.1.0",
     "webpack-subresource-integrity": "^1.1.0-rc.4"
+  },
+  "optionalDependencies": {
+    "node-sass": "^4.9.0"
   }
 }
