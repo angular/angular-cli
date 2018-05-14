@@ -69,6 +69,7 @@ const licenseReplacements = {
   // Just a longer string that our script catches. SPDX official name is the shorter one.
   'Apache License, Version 2.0': 'Apache-2.0',
   'Apache2': 'Apache-2.0',
+  'Apache 2.0': 'Apache-2.0',
   'AFLv2.1': 'AFL-2.1',
   // BSD is BSD-2-clause by default.
   'BSD': 'BSD-2-Clause',
@@ -83,6 +84,7 @@ const ignoredPackages = [
   'true-case-path@1.0.2', // Apache-2.0 but broken license in package.json
   'pako@1.0.6', // SPDX expression (MIT AND Zlib) in package.json
   'sha.js@2.4.11', // SPDX expression (MIT AND BSD-3-Clause) in package.json
+  '@webassemblyjs/leb128@1.4.3', // Apache-2.0 but no license field in package.json
 
   'jsonify@0.0.0', // TODO(hansl): fix this. this is not an acceptable license, but is 8 deps down
                    // so hard to manage. In talk with owner and users to switch over.
