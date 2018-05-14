@@ -27,6 +27,7 @@ export default class NewCommand extends SchematicCommand {
       description: 'Schematics collection to use.',
     },
   ];
+  private schematicName = 'ng-new';
 
   private initialized = false;
   public initialize(options: any) {
@@ -37,10 +38,9 @@ export default class NewCommand extends SchematicCommand {
     this.initialized = true;
 
     const collectionName = this.parseCollectionName(options);
-    const schematicName = 'application';
 
     return this.getOptions({
-        schematicName,
+        schematicName: this.schematicName,
         collectionName,
       })
       .then((schematicOptions) => {
@@ -75,7 +75,7 @@ export default class NewCommand extends SchematicCommand {
 
     return this.runSchematic({
       collectionName: collectionName,
-      schematicName: 'ng-new',
+      schematicName: this.schematicName,
       schematicOptions: options,
       debug: options.debug,
       dryRun: options.dryRun,
