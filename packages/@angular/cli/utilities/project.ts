@@ -1,8 +1,8 @@
+import { normalize } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { findUp } from './find-up';
-import { normalize } from '@angular-devkit/core';
 
 export function insideProject(): boolean {
   return getProjectDetails() !== null;

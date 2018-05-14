@@ -9,12 +9,12 @@ export interface CommandConstructor {
 export enum CommandScope {
   everywhere,
   inProject,
-  outsideProject
+  outsideProject,
 }
 
 export enum ArgumentStrategy {
   MapToOptions,
-  Nothing
+  Nothing,
 }
 
 export abstract class Command<T = any> {

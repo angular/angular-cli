@@ -5,7 +5,7 @@ export class NgToolkitError extends Error {
     if (message) {
       this.message = message;
     } else {
-      this.message = (<any>this.constructor).name;
+      this.message = (<any> this.constructor).name;
     }
   }
 }

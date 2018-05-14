@@ -1,14 +1,14 @@
+import {
+  Architect, BuildEvent, BuilderDescription,
+  TargetSpecifier,
+} from '@angular-devkit/architect';
 import { JsonObject, experimental, schema, strings } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
-import {
-  Architect, BuilderDescription, BuildEvent,
-  TargetSpecifier
-} from '@angular-devkit/architect';
-import { Command, Option } from './command';
 import { of } from 'rxjs';
 import { from } from 'rxjs';
 import { concatMap, map, tap, toArray } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
+import { Command, Option } from './command';
 
 
 export interface ProjectAndConfigurationOptions {
@@ -36,7 +36,7 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
     name: 'configuration',
     description: 'The configuration',
     type: String,
-    aliases: ['c']
+    aliases: ['c'],
   }];
 
   readonly arguments = ['project'];
@@ -68,9 +68,9 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
         const builderConfig = this._architect.getBuilderConfiguration(targetSpec);
 
         return this._architect.getBuilderDescription(builderConfig).pipe(
-          tap<BuilderDescription>(builderDesc => { this.mapArchitectOptions(builderDesc.schema); })
+          tap<BuilderDescription>(builderDesc => { this.mapArchitectOptions(builderDesc.schema); }),
         );
-      })
+      }),
     ).toPromise()
       .then(() => { });
   }
@@ -138,14 +138,14 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
   protected prodOption: Option = {
     name: 'prod',
     description: 'Flag to set configuration to "prod".',
-    type: Boolean
+    type: Boolean,
   };
 
   protected configurationOption: Option = {
     name: 'configuration',
     description: 'Specify the configuration to use.',
     type: String,
-    aliases: ['c']
+    aliases: ['c'],
   };
 
   protected async runArchitectTarget(options: ArchitectCommandOptions): Promise<number> {
@@ -153,9 +153,9 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
 
     const runSingleTarget = (targetSpec: TargetSpecifier) => this._architect.run(
       this._architect.getBuilderConfiguration(targetSpec),
-      { logger: this._logger }
+      { logger: this._logger },
     ).pipe(
-      map((buildEvent: BuildEvent) => buildEvent.success ? 0 : 1)
+      map((buildEvent: BuildEvent) => buildEvent.success ? 0 : 1),
     );
 
     try {
@@ -197,7 +197,7 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
 
   private getProjectNamesByTarget(targetName: string): string[] {
     const allProjectsForTargetName = this._workspace.listProjectNames().map(projectName =>
-      this._architect.listProjectTargets(projectName).includes(targetName) ? projectName : null
+      this._architect.listProjectTargets(projectName).includes(targetName) ? projectName : null,
     ).filter(x => !!x);
 
     if (this.multiTarget) {
@@ -258,7 +258,7 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
       project,
       configuration,
       target,
-      overrides
+      overrides,
     };
   }
 }

@@ -1,5 +1,5 @@
-import { filter } from 'rxjs/operators';
 import { logging, terminal } from '@angular-devkit/core';
+import { filter } from 'rxjs/operators';
 import { runCommand } from '../../models/command-runner';
 import { getProjectDetails } from '../../utilities/project';
 
@@ -53,7 +53,7 @@ export default async function(options: any) {
     projectDetails = { root: process.cwd() };
   }
   const context = {
-    project: projectDetails
+    project: projectDetails,
   };
 
   try {

@@ -1,5 +1,5 @@
-import { Command, Option } from '../models/command';
 import { terminal } from '@angular-devkit/core';
+import { Command, Option } from '../models/command';
 
 
 export default class HelpCommand extends Command {
@@ -18,7 +18,7 @@ export default class HelpCommand extends Command {
       .filter(cmd => !cmd.hidden && !cmd.unknown)
       .map(cmd => ({
         name: cmd.name,
-        description: cmd.description
+        description: cmd.description,
       }));
     this.logger.info(`Available Commands:`);
     commands.forEach(cmd => {

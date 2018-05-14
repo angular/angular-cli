@@ -1,12 +1,12 @@
-import {
-  Option,
-  CommandContext,
-  CommandConstructor,
-  CommandScope,
-  ArgumentStrategy
-} from '../models/command';
 import { logging, tags } from '@angular-devkit/core';
 import { camelize } from '@angular-devkit/core/src/utils/strings';
+import {
+  ArgumentStrategy,
+  CommandConstructor,
+  CommandContext,
+  CommandScope,
+  Option,
+} from '../models/command';
 import { insideProject } from '../utilities/project';
 
 import * as yargsParser from 'yargs-parser';
@@ -207,7 +207,7 @@ export function parseOptions<T = any>(
     boolean: booleans,
     default: defaults,
     string: strings,
-    number: numbers
+    number: numbers,
   };
 
   const parsedOptions = parser(args, yargsOptions);

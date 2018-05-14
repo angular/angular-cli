@@ -1,5 +1,5 @@
-import { Command, Option } from '../models/command';
 import { terminal } from '@angular-devkit/core';
+import { Command, Option } from '../models/command';
 
 function pickOne(of: string[]): string {
   return of[Math.floor(Math.random() * of.length)];
@@ -21,7 +21,7 @@ export default class AwesomeCommand extends Command {
       `Nothing to do; already awesome. Exiting.`,
       `Error 418: As Awesome As Can Get.`,
       `I spy with my little eye a great developer!`,
-      `Noop... already awesome.`
+      `Noop... already awesome.`,
     ]);
     this.logger.info(terminal.green(phrase));
   }

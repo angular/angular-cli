@@ -1,11 +1,11 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import { logging, schema, strings, tags } from '@angular-devkit/core';
 import { formats } from '@angular-devkit/schematics';
 import {
   NodeModulesEngineHost,
-  validateOptionsWithSchema
+  validateOptionsWithSchema,
 } from '@angular-devkit/schematics/tools';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export default async function () {
   const commandsPath = __dirname + '/../../../packages/@angular/cli/commands';
@@ -48,7 +48,7 @@ export default async function () {
             name: strings.dasherize(schematicName),
             namePrefix: 'generate ',
             description: schematic.description,
-            path: 'generate'
+            path: 'generate',
           },
         );
       }

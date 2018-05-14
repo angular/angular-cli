@@ -17,7 +17,7 @@ import {
   FileSystemCollectionDesc,
   FileSystemSchematicDesc,
   NodeModulesEngineHost,
-  validateOptionsWithSchema
+  validateOptionsWithSchema,
 } from '@angular-devkit/schematics/tools';
 
 export class UnknownCollectionError extends Error {
