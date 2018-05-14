@@ -1,13 +1,13 @@
 import { logging, terminal } from '@angular-devkit/core';
 import * as minimist from 'minimist';
 
-import {filter} from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 
 
 const { bold, red, yellow, white } = terminal;
 
 const argv = minimist(process.argv.slice(2), {
-  boolean: ['verbose']
+  boolean: ['verbose'],
 });
 
 const rootLogger = new logging.IndentLogger('cling');

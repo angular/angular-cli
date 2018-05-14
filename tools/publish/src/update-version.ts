@@ -1,7 +1,7 @@
 import { logging } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
-import {SemVer} from 'semver';
+import { SemVer } from 'semver';
 
 export default function patch(args: string[], opts: any, logger: logging.Logger): void {
   const newVersion = args[0];

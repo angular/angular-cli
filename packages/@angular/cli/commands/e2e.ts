@@ -1,5 +1,5 @@
-import { CommandScope, Option } from '../models/command';
 import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
+import { CommandScope, Option } from '../models/command';
 
 
 export default class E2eCommand extends ArchitectCommand {
@@ -11,7 +11,7 @@ export default class E2eCommand extends ArchitectCommand {
   public readonly multiTarget = true;
   public readonly options: Option[] = [
     this.prodOption,
-    this.configurationOption
+    this.configurationOption,
   ];
 
   public run(options: ArchitectCommandOptions) {

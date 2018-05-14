@@ -32,7 +32,6 @@ declare module 'yargs-parser' {
 }
 
 
-
 declare module 'opn' {
   export default function(url: string, options?: any): Promise<any>;
 }

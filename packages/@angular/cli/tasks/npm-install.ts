@@ -1,6 +1,6 @@
+import { logging, terminal } from '@angular-devkit/core';
 import { ModuleNotFoundException, resolve } from '@angular-devkit/core/node';
 import { spawn } from 'child_process';
-import { logging, terminal } from '@angular-devkit/core';
 
 
 export type NpmInstall = (packageName: string,
@@ -53,7 +53,7 @@ export default async function (packageName: string,
   }
   const installOptions = {
     stdio: 'inherit',
-    shell: true
+    shell: true,
   };
 
   await new Promise((resolve, reject) => {

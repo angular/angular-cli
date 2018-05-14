@@ -1,16 +1,16 @@
 // This may seem awkward but we're using Logger in our e2e. At this point the unit tests
 // have run already so it should be "safe", teehee.
 import { logging } from '@angular-devkit/core';
-import { createConsoleLogger } from '@angular-devkit/core/node';
 import { terminal } from '@angular-devkit/core';
-import {gitClean} from './e2e/utils/git';
+import { createConsoleLogger } from '@angular-devkit/core/node';
 import * as glob from 'glob';
 import * as minimist from 'minimist';
 import * as path from 'path';
-import {setGlobalVariable} from './e2e/utils/env';
+import { setGlobalVariable } from './e2e/utils/env';
+import { gitClean } from './e2e/utils/git';
 
 // RxJS
-import {filter} from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 
 const { blue, bold, green, red, yellow, white } = terminal;
 
@@ -53,7 +53,7 @@ const argv = minimist(process.argv.slice(2), {
     'verbose',
   ],
   'string': ['devkit', 'glob', 'ignore', 'reuse', 'ng-sha', 'tmpdir', 'ng-version'],
-  'number': ['nb-shards', 'shard']
+  'number': ['nb-shards', 'shard'],
 });
 
 

@@ -1,6 +1,6 @@
-import * as fs from 'fs';
 import { logging } from '@angular-devkit/core';
 import { SchemaClassFactory } from '@ngtools/json-schema';
+import * as fs from 'fs';
 
 
 export function buildSchema(inFile: string, _logger: logging.Logger): string {

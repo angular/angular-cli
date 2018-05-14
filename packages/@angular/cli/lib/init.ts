@@ -79,7 +79,7 @@ try {
   }
 
   if (shouldWarn && isWarningEnabled('versionMismatch')) {
-    let warning = yellow(stripIndents`
+    const warning = yellow(stripIndents`
     Your global Angular CLI version (${globalVersion}) is greater than your local
     version (${localVersion}). The local Angular CLI version is used.
 

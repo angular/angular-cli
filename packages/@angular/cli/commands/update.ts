@@ -1,6 +1,6 @@
 import { normalize } from '@angular-devkit/core';
 import { CommandScope, Option } from '../models/command';
-import { SchematicCommand, CoreSchematicOptions } from '../models/schematic-command';
+import { CoreSchematicOptions, SchematicCommand } from '../models/schematic-command';
 import { findUp } from '../utilities/find-up';
 
 export interface UpdateOptions extends CoreSchematicOptions {

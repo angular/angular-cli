@@ -1,11 +1,11 @@
+import { tags, terminal } from '@angular-devkit/core';
 import { CommandScope, Option } from '../models/command';
+import { SchematicCommand } from '../models/schematic-command';
 import { getDefaultSchematicCollection } from '../utilities/config';
 import {
   getCollection,
-  getEngineHost
+  getEngineHost,
 } from '../utilities/schematics';
-import { tags, terminal } from '@angular-devkit/core';
-import { SchematicCommand } from '../models/schematic-command';
 
 
 export default class GenerateCommand extends SchematicCommand {
@@ -15,7 +15,7 @@ export default class GenerateCommand extends SchematicCommand {
   public readonly scope = CommandScope.inProject;
   public arguments = ['schematic'];
   public options: Option[] = [
-    ...this.coreOptions
+    ...this.coreOptions,
   ];
 
   private initialized = false;

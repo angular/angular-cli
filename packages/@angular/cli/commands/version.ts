@@ -1,8 +1,8 @@
 import { terminal } from '@angular-devkit/core';
-import { Command, Option } from '../models/command';
+import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as child_process from 'child_process';
+import { Command, Option } from '../models/command';
 import { findUp } from '../utilities/find-up';
 
 
@@ -15,7 +15,7 @@ export default class VersionCommand extends Command {
 
   public run(_options: any) {
     let angularCoreVersion = '';
-    let angularSameAsCore: string[] = [];
+    const angularSameAsCore: string[] = [];
     const pkg = require(path.resolve(__dirname, '..', 'package.json'));
     let projPkg: any;
     try {
@@ -96,7 +96,7 @@ export default class VersionCommand extends Command {
     }
 
     const namePad = ' '.repeat(
-      Object.keys(versions).sort((a, b) => b.length - a.length)[0].length + 3
+      Object.keys(versions).sort((a, b) => b.length - a.length)[0].length + 3,
     );
     const asciiArt = `
      _                      _                 ____ _     ___

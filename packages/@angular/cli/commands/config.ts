@@ -1,3 +1,12 @@
+import {
+  JsonArray,
+  JsonObject,
+  JsonParseMode,
+  JsonValue,
+  experimental,
+  parseJson,
+  tags,
+} from '@angular-devkit/core';
 import { writeFileSync } from 'fs';
 import { Command, Option } from '../models/command';
 import {
@@ -6,15 +15,6 @@ import {
   migrateLegacyGlobalConfig,
   validateWorkspace,
 } from '../utilities/config';
-import {
-  JsonValue,
-  JsonArray,
-  JsonObject,
-  JsonParseMode,
-  experimental,
-  parseJson,
-  tags,
-} from '@angular-devkit/core';
 
 
 export interface ConfigOptions {
@@ -162,8 +162,8 @@ export default class ConfigCommand extends Command {
       type: Boolean,
       'default': false,
       aliases: ['g'],
-      description: 'Get/set the value in the global configuration (in your home directory).'
-    }
+      description: 'Get/set the value in the global configuration (in your home directory).',
+    },
   ];
 
   public run(options: ConfigOptions) {

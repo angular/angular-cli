@@ -1,14 +1,14 @@
-import { experimental, JsonObject } from '@angular-devkit/core';
+import { JsonObject, experimental } from '@angular-devkit/core';
 import { normalize, strings, tags, terminal, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import { ArgumentStrategy, Command, Option } from './command';
-import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import { DryRunEvent, UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
-import { getPackageManager, getDefaultSchematicCollection } from '../utilities/config';
-import { getCollection, getSchematic } from '../utilities/schematics';
-import { getSchematicDefaults } from '../utilities/config';
+import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import { take } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
+import { getDefaultSchematicCollection, getPackageManager } from '../utilities/config';
+import { getSchematicDefaults } from '../utilities/config';
+import { getCollection, getSchematic } from '../utilities/schematics';
+import { ArgumentStrategy, Command, Option } from './command';
 
 export interface CoreSchematicOptions {
   dryRun: boolean;
@@ -50,14 +50,14 @@ export abstract class SchematicCommand extends Command {
       type: Boolean,
       default: false,
       aliases: ['d'],
-      description: 'Run through without making any changes.'
+      description: 'Run through without making any changes.',
     },
     {
       name: 'force',
       type: Boolean,
       default: false,
       aliases: ['f'],
-      description: 'Forces overwriting of files.'
+      description: 'Forces overwriting of files.',
     }];
 
   readonly arguments = ['project'];
@@ -231,7 +231,7 @@ export abstract class SchematicCommand extends Command {
     if (!schematic.description.schemaJson) {
       return Promise.resolve({
         options: [],
-        arguments: []
+        arguments: [],
       });
     }
 
@@ -302,7 +302,7 @@ export abstract class SchematicCommand extends Command {
 
     return Promise.resolve({
       options: schematicOptions,
-      arguments: schematicArguments
+      arguments: schematicArguments,
     });
   }
 
@@ -321,7 +321,7 @@ export abstract class SchematicCommand extends Command {
               // Ignore missing workspace
               throw err;
             }
-          }
+          },
         );
     } catch (err) {
       if (!this.allowMissingWorkspace) {

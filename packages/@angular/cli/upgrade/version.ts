@@ -1,6 +1,6 @@
-import { SemVer, satisfies } from 'semver';
 import { tags, terminal } from '@angular-devkit/core';
 import * as path from 'path';
+import { SemVer, satisfies } from 'semver';
 import { isWarningEnabled } from '../utilities/config';
 import { requireProjectModule } from '../utilities/require-project-module';
 
@@ -50,11 +50,12 @@ export class Version {
       process.exit(2);
     }
 
-    let angularVersion = new Version(angularPkgJson['version']);
-    let rxjsVersion = new Version(rxjsPkgJson['version']);
+    const angularVersion = new Version(angularPkgJson['version']);
+    const rxjsVersion = new Version(rxjsPkgJson['version']);
 
     if (angularVersion.isLocal()) {
       console.warn(terminal.yellow('Using a local version of angular. Proceeding with care...'));
+
       return;
     }
 

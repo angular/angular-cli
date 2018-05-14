@@ -1,6 +1,6 @@
-import { Option, CommandScope } from '../models/command';
-import { Version } from '../upgrade/version';
 import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
+import { CommandScope, Option } from '../models/command';
+import { Version } from '../upgrade/version';
 
 export default class BuildCommand extends ArchitectCommand {
   public readonly name = 'build';
@@ -11,7 +11,7 @@ export default class BuildCommand extends ArchitectCommand {
   public scope = CommandScope.inProject;
   public options: Option[] = [
     this.prodOption,
-    this.configurationOption
+    this.configurationOption,
   ];
 
   public validate(options: ArchitectCommandOptions) {

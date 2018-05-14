@@ -2,9 +2,9 @@ import { tags, terminal } from '@angular-devkit/core';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
 import { CommandScope, Option } from '../models/command';
 import { parseOptions } from '../models/command-runner';
-import { getPackageManager } from '../utilities/config';
 import { SchematicCommand } from '../models/schematic-command';
 import { NpmInstall } from '../tasks/npm-install';
+import { getPackageManager } from '../utilities/config';
 
 
 export default class AddCommand extends SchematicCommand {
@@ -33,7 +33,7 @@ export default class AddCommand extends SchematicCommand {
     if (!collectionName) {
       this.logger.fatal(
         `The "ng ${this.name}" command requires a name argument to be specified eg. `
-        + `${terminal.yellow('ng add [name] ')}. For more details, use "ng help".`
+        + `${terminal.yellow('ng add [name] ')}. For more details, use "ng help".`,
       );
 
       return false;
@@ -48,7 +48,7 @@ export default class AddCommand extends SchematicCommand {
     if (!firstArg) {
       this.logger.fatal(
         `The "ng ${this.name}" command requires a name argument to be specified eg. `
-        + `${terminal.yellow('ng add [name] ')}. For more details, use "ng help".`
+        + `${terminal.yellow('ng add [name] ')}. For more details, use "ng help".`,
       );
 
       return 1;

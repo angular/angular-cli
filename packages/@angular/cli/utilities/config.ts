@@ -1,8 +1,6 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs';
-import * as os from 'os';
-import * as path from 'path';
 import {
   JsonAstObject,
+  JsonObject,
   JsonParseMode,
   JsonValue,
   experimental,
@@ -10,9 +8,11 @@ import {
   parseJson,
   parseJsonAst,
   virtualFs,
-  JsonObject,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 import { findUp } from './find-up';
 
 function getSchemaLocation(): string {
@@ -56,7 +56,7 @@ export function getWorkspace(
     return cached;
   }
 
-  let configPath = level === 'local' ? projectFilePath() : globalFilePath();
+  const configPath = level === 'local' ? projectFilePath() : globalFilePath();
 
   if (!configPath) {
     cachedWorkspaces.set(level, null);
@@ -195,7 +195,7 @@ export function migrateLegacyGlobalConfig(): boolean {
       if (legacy.warnings && typeof legacy.warnings == 'object'
           && !Array.isArray(legacy.warnings)) {
 
-        let warnings: JsonObject = {};
+        const warnings: JsonObject = {};
         if (typeof legacy.warnings.versionMismatch == 'boolean') {
           warnings['versionMismatch'] = legacy.warnings.versionMismatch;
         }

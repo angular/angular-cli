@@ -1,5 +1,5 @@
-import { CommandScope, Option } from '../models/command';
 import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
+import { CommandScope, Option } from '../models/command';
 
 
 export default class RunCommand extends ArchitectCommand {
@@ -8,7 +8,7 @@ export default class RunCommand extends ArchitectCommand {
   public readonly scope = CommandScope.inProject;
   public readonly arguments: string[] = ['target'];
   public readonly options: Option[] = [
-    this.configurationOption
+    this.configurationOption,
   ];
 
   public async run(options: ArchitectCommandOptions) {

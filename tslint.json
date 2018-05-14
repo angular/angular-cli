@@ -1,5 +1,14 @@
 {
   "rules": {
+    "no-implicit-dependencies": false,
+    "no-import-side-effect": [true, {"ignore-module": "^(?!rxjs\/)"}],
+    "align": [
+      true,
+      "elements",
+      "members",
+      "parameters",
+      "statements"
+    ],
     "max-line-length": [true, 100],
     "no-inferrable-types": true,
     "class-name": true,
@@ -12,27 +21,48 @@
       "spaces"
     ],
     "eofline": true,
+    "import-spacing": true,
+    "match-default-export-name": true,
+    "newline-before-return": false,
+    "no-consecutive-blank-lines": [true, 2],
     "no-duplicate-variable": true,
     "no-eval": true,
+    "no-any": false,
     "no-arg": true,
     "no-internal-module": true,
     "no-trailing-whitespace": true,
-    "no-bitwise": true,
     "no-unused-expression": true,
+    "no-unused-variable": [true, {"ignore-pattern": "^_"}],
     "no-var-keyword": true,
     "one-line": [
       true,
       "check-catch",
       "check-else",
+      "check-finally",
       "check-open-brace",
       "check-whitespace"
     ],
+    "ordered-imports": [
+      true,
+      {
+        "import-sources-order": "lowercase-last",
+        "named-imports-order": "lowercase-last"
+      }
+    ],
+    "prefer-const": true,
     "quotemark": [
       true,
       "single",
       "avoid-escape"
     ],
     "semicolon": [true, "always"],
+    "trailing-comma": [
+      true,
+      {
+        "multiline": "always",
+        "singleline": "never"
+      }
+    ],
     "typedef-whitespace": [
       true,
       {
@@ -55,9 +85,12 @@
       true,
       "check-branch",
       "check-decl",
+      "check-module",
+      "check-preblock",
       "check-operator",
       "check-separator",
-      "check-type"
+      "check-type",
+      "check-typecast"
     ]
   }
 }

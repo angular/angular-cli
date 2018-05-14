@@ -1,5 +1,5 @@
-import { CommandScope, Option } from '../models/command';
 import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
+import { CommandScope, Option } from '../models/command';
 
 
 export default class LintCommand extends ArchitectCommand {
@@ -10,7 +10,7 @@ export default class LintCommand extends ArchitectCommand {
   public readonly scope = CommandScope.inProject;
   public readonly multiTarget = true;
   public readonly options: Option[] = [
-    this.configurationOption
+    this.configurationOption,
   ];
 
   public async run(options: ArchitectCommandOptions) {

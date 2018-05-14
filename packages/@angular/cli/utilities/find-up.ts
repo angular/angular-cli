@@ -1,5 +1,5 @@
-import * as path from 'path';
 import { existsSync } from 'fs';
+import * as path from 'path';
 
 export function findUp(names: string | string[], from: string) {
   if (!Array.isArray(names)) {

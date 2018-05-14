@@ -19,7 +19,7 @@ const changelogStream = fs.createWriteStream('CHANGELOG-delta.md');
 
 const config = {
   preset: 'angular',
-  releaseCount: 1
+  releaseCount: 1,
 };
 
 function prependDelta() {

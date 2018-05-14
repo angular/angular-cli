@@ -1,16 +1,16 @@
 import {
   Path,
   basename,
-  experimental,
   dirname,
+  experimental,
   join,
   normalize,
-  virtualFs
+  virtualFs,
 } from '@angular-devkit/core';
-import { Observable, of } from 'rxjs';
-import { concatMap, tap } from 'rxjs/operators';
 import * as fs from 'fs';
 import { homedir } from 'os';
+import { Observable, of } from 'rxjs';
+import { concatMap, tap } from 'rxjs/operators';
 import { findUp } from '../utilities/find-up';
 
 
@@ -26,13 +26,13 @@ export class WorkspaceLoader {
 
   loadGlobalWorkspace(): Observable<experimental.workspace.Workspace | null> {
     return this._getGlobalWorkspaceFilePath().pipe(
-      concatMap(globalWorkspacePath => this._loadWorkspaceFromPath(globalWorkspacePath))
+      concatMap(globalWorkspacePath => this._loadWorkspaceFromPath(globalWorkspacePath)),
     );
   }
 
   loadWorkspace(projectPath?: string): Observable<experimental.workspace.Workspace | null> {
     return this._getProjectWorkspaceFilePath(projectPath).pipe(
-      concatMap(globalWorkspacePath => this._loadWorkspaceFromPath(globalWorkspacePath))
+      concatMap(globalWorkspacePath => this._loadWorkspaceFromPath(globalWorkspacePath)),
     );
   }
 
@@ -78,7 +78,7 @@ export class WorkspaceLoader {
     const workspace = new experimental.workspace.Workspace(workspaceRoot, this._host);
 
     return workspace.loadWorkspaceFromHost(workspaceFileName).pipe(
-      tap(workspace => this._workspaceCacheMap.set(workspacePath, workspace))
+      tap(workspace => this._workspaceCacheMap.set(workspacePath, workspace)),
     );
   }
 }
