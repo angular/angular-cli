@@ -18,15 +18,21 @@ We create a file next to our project's `package.json` called `proxy.conf.json` w
 
 You can read more about what options are available [here](https://webpack.js.org/configuration/dev-server/#devserver-proxy).
 
-We can then edit the `package.json` file's start script to be
+We can then add the `proxyConfig` option to the serve target:
 
 ```json
-"start": "ng serve --proxy-config proxy.conf.json",
+"architect": {
+  "serve": {
+    "builder": "@angular-devkit/build-angular:dev-server",
+    "options": {
+      "browserTarget": "your-application-name:build",
+      "proxyConfig": "src/proxy.conf.json"
+    },
 ```
 
-Now in order to run our dev server with our proxy config, we can simply call `npm start`.
+Now in order to run our dev server with our proxy config we can call `ng serve`.
 
-**After each edit to the proxy.conf.json file remember to relaunch the `npm start` process to make your changes effective.**
+**After each edit to the proxy.conf.json file remember to relaunch the `ng serve` process to make your changes effective.**
 
 ### Rewriting the URL path
 
@@ -105,10 +111,16 @@ const PROXY_CONFIG = [
 module.exports = PROXY_CONFIG;
 ```
 
-and make sure to point to the right file
+Make sure to point to the right file (`.js` instead of `.json`):
 
 ```json
-"start": "ng serve --proxy-config proxy.conf.js",
+"architect": {
+  "serve": {
+    "builder": "@angular-devkit/build-angular:dev-server",
+    "options": {
+      "browserTarget": "your-application-name:build",
+      "proxyConfig": "src/proxy.conf.js"
+    },
 ```
 
 ### Bypass the Proxy
@@ -133,8 +145,42 @@ const PROXY_CONFIG = {
 module.exports = PROXY_CONFIG;
 ```
 
-again, make sure to point to the right file
+### Using corporate proxy
 
-```json
-"start": "ng serve --proxy-config proxy.conf.js",
+If you work behind a corporate proxy, the regular configuration will not work if you try to proxy
+calls to any URL outside your local network.
+
+In this case, you can configure the backend proxy to redirect calls through your corporate
+proxy using an agent:
+
+```bash
+npm install --save-dev https-proxy-agent
 ```
+
+Then instead of using a `proxy.conf.json` file, we create a file called `proxy.conf.js` with
+the following content:
+
+```js
+var HttpsProxyAgent = require('https-proxy-agent');
+var proxyConfig = [{
+  context: '/api',
+  target: 'http://your-remote-server.com:3000',
+  secure: false
+}];
+
+function setupForCorporateProxy(proxyConfig) {
+  var proxyServer = process.env.http_proxy || process.env.HTTP_PROXY;
+  if (proxyServer) {
+    var agent = new HttpsProxyAgent(proxyServer);
+    console.log('Using corporate proxy server: ' + proxyServer);
+    proxyConfig.forEach(function(entry) {
+      entry.agent = agent;
+    });
+  }
+  return proxyConfig;
+}
+
+module.exports = setupForCorporateProxy(proxyConfig);
+```
+
+This way if you have a `http_proxy` or `HTTP_PROXY` environment variable defined, an agent will automatically be added to pass calls through your corporate proxy when running `npm start`.

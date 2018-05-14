@@ -2,6 +2,8 @@
 
 # Angular CLI
 
+NOTE: this documentation is for Angular CLI 6. For Angular CLI 1.x go [here](1-x/home) instead.
+
 ### Overview
 The Angular CLI is a tool to initialize, develop, scaffold  and maintain [Angular](https://angular.io) applications
 
@@ -52,12 +54,11 @@ End-to-end tests are run via [Protractor](https://angular.github.io/protractor/)
 * [ng build](build)
 * [ng get/ng set](config)
 * [ng doc](doc)
-* [ng eject](eject)
 * [ng xi18n](xi18n)
 * [ng update](update)
 
-## Angular CLI Config Schema
-* [Config Schema](angular-cli)
+## Angular CLI Workspace Schema
+* [Angular CLI workspace file (angular.json) schema](angular-workspace)
 
 ### Additional Information
 There are several [stories](stories) which will walk you through setting up

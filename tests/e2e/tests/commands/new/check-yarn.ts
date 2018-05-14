@@ -1,7 +1,7 @@
 import {ng} from '../../../utils/process';
 import {getGlobalVariable} from '../../../utils/env';
 
-const yarnRegEx = /You can `ng set --global packageManager=yarn`./;
+const yarnRegEx = /You can `ng config -g cli.packageManager yarn`./;
 
 export default function() {
   return Promise.resolve()

@@ -1,9 +1,8 @@
-import { ng, silentNpm } from '../../../utils/process';
+import { ng } from '../../../utils/process';
 import { writeFile } from '../../../utils/fs';
 
 export default function () {
   return ng('generate', 'library', 'my-lib')
-    .then(() => silentNpm('install'))
     .then(() => ng('build', 'my-lib'))
     .then(() => writeFile('./src/app/app.module.ts', `
       import { BrowserModule } from '@angular/platform-browser';
@@ -31,7 +30,7 @@ export default function () {
 
       @Component({
         selector: 'app-root',
-        template: '<my-lib></my-lib>'
+        template: '<lib-my-lib></lib-my-lib>'
       })
       export class AppComponent {
         title = 'app';
@@ -41,6 +40,8 @@ export default function () {
         }
       }
     `))
+    // Check that the build succeeds both with named project, unnammed (should build app), and prod.
     .then(() => ng('build', 'test-project'))
-    .then(() => ng('build', 'test-project', '--prod'));
+    .then(() => ng('build'))
+    .then(() => ng('build', '--prod'));
 }

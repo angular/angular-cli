@@ -1,6 +1,6 @@
 {
   "name": "@angular/cli",
-  "version": "6.0.0-rc.2",
+  "version": "6.0.1",
   "description": "CLI tool for Angular",
   "main": "lib/cli/index.js",
   "trackingCode": "UA-8594346-19",
@@ -12,6 +12,9 @@
     "angular-cli",
     "Angular CLI"
   ],
+  "scripts": {
+    "postinstall": "node ./bin/ng-update-message.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/angular/angular-cli.git"
@@ -27,21 +30,18 @@
   },
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
-    "@angular-devkit/architect": "0.5.4",
-    "@angular-devkit/core": "0.5.4",
-    "@angular-devkit/schematics": "0.5.4",
-    "@schematics/angular": "0.5.4",
-    "@schematics/update": "0.5.4",
-    "chalk": "~2.2.0",
-    "fs-extra": "^4.0.0",
-    "node-modules-path": "^1.0.0",
-    "opn": "~5.1.0",
+    "@angular-devkit/architect": "0.6.1",
+    "@angular-devkit/core": "0.6.1",
+    "@angular-devkit/schematics": "0.6.1",
+    "@schematics/angular": "0.6.1",
+    "@schematics/update": "0.6.1",
+    "opn": "~5.3.0",
     "resolve": "^1.1.7",
-    "rxjs": "^6.0.0-rc.0",
+    "rxjs": "^6.0.0",
     "semver": "^5.1.0",
     "silent-error": "^1.0.0",
     "symbol-observable": "^1.2.0",
-    "yargs-parser": "^9.0.2"
+    "yargs-parser": "^10.0.0"
   },
   "ng-update": {
     "migrations": "@schematics/angular/migrations/migration-collection.json"

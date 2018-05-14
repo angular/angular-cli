@@ -1,6 +1,11 @@
 import { writeFileSync } from 'fs';
 import { Command, Option } from '../models/command';
-import { getWorkspace, getWorkspaceRaw, validateWorkspace } from '../utilities/config';
+import {
+  getWorkspace,
+  getWorkspaceRaw,
+  migrateLegacyGlobalConfig,
+  validateWorkspace,
+} from '../utilities/config';
 import {
   JsonValue,
   JsonArray,
@@ -8,8 +13,8 @@ import {
   JsonParseMode,
   experimental,
   parseJson,
+  tags,
 } from '@angular-devkit/core';
-import { WorkspaceJson } from '@angular-devkit/core/src/workspace';
 
 const SilentError = require('silent-error');
 
@@ -122,6 +127,33 @@ function setValueFromPath<T extends JsonArray | JsonObject>(
   }
 }
 
+function normalizeValue(value: string, path: string): JsonValue {
+  const cliOptionType = validCliPaths.get(path);
+  if (cliOptionType) {
+    switch (cliOptionType) {
+      case 'boolean':
+        if (value.trim() === 'true') {
+          return true;
+        } else if (value.trim() === 'false') {
+          return false;
+        }
+        break;
+      case 'number':
+        const numberValue = Number(value);
+        if (!Number.isNaN(numberValue)) {
+          return numberValue;
+        }
+        break;
+      case 'string':
+        return value;
+    }
+
+    throw new Error(`Invalid value type; expected a ${cliOptionType}.`);
+  }
+
+  return parseJson(value, JsonParseMode.Loose);
+}
+
 export default class ConfigCommand extends Command {
   public readonly name = 'config';
   public readonly description = 'Get/set configuration values.';
@@ -138,20 +170,34 @@ export default class ConfigCommand extends Command {
 
   public run(options: ConfigOptions) {
     const level = options.global ? 'global' : 'local';
-    const config = (getWorkspace(level) as {} as { _workspace: WorkspaceJson});
 
-    if (!config) {
-      throw new SilentError('No config found.');
+    let config =
+      (getWorkspace(level) as {} as { _workspace: experimental.workspace.WorkspaceSchema });
+
+    if (options.global && !config) {
+      try {
+        if (migrateLegacyGlobalConfig()) {
+          config =
+            (getWorkspace(level) as {} as { _workspace: experimental.workspace.WorkspaceSchema });
+          this.logger.info(tags.oneLine`
+            We found a global configuration that was used in Angular CLI 1.
+            It has been automatically migrated.`);
+        }
+      } catch {}
     }
 
     if (options.value == undefined) {
+      if (!config) {
+        throw new SilentError('No config found.');
+      }
+
       this.get(config._workspace, options);
     } else {
       this.set(options);
     }
   }
 
-  private get(config: experimental.workspace.WorkspaceJson, options: ConfigOptions) {
+  private get(config: experimental.workspace.WorkspaceSchema, options: ConfigOptions) {
     const value = options.jsonPath ? getValueFromPath(config as any, options.jsonPath) : config;
 
     if (value === undefined) {
@@ -178,14 +224,7 @@ export default class ConfigCommand extends Command {
     // TODO: Modify & save without destroying comments
     const configValue = config.value;
 
-    const value = parseJson(options.value, JsonParseMode.Loose);
-    const pathType = validCliPaths.get(options.jsonPath);
-    if (pathType) {
-      if (typeof value != pathType) {
-        throw new Error(`Invalid value type; expected a ${pathType}.`);
-      }
-    }
-
+    const value = normalizeValue(options.value, options.jsonPath);
     const result = setValueFromPath(configValue, options.jsonPath, value);
 
     if (result === undefined) {

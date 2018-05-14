@@ -36,30 +36,28 @@ matrix:
       env: test
     - node_js: "8"
       os: linux
-      script: node tests/run_e2e.js --nb-shards=4 --shard=0 --nosilent --ng-version="6.0.0-rc.2"
+      script: node tests/run_e2e.js --nb-shards=4 --shard=0 --nosilent
       env: e2e-0
     - node_js: "8"
       os: linux
-      script: node tests/run_e2e.js --nb-shards=4 --shard=1 --nosilent --ng-version="6.0.0-rc.2"
+      script: node tests/run_e2e.js --nb-shards=4 --shard=1 --nosilent
       env: e2e-1
     - node_js: "8"
       os: linux
-      script: node tests/run_e2e.js --nb-shards=4 --shard=2 --nosilent --ng-version="6.0.0-rc.2"
+      script: node tests/run_e2e.js --nb-shards=4 --shard=2 --nosilent
       env: e2e-2
     - node_js: "8"
       os: linux
-      script: node tests/run_e2e.js --nb-shards=4 --shard=3 --nosilent --ng-version="6.0.0-rc.2"
+      script: node tests/run_e2e.js --nb-shards=4 --shard=3 --nosilent
       env: e2e-3
     - node_js: "8"
       os: linux
-      script: node tests/run_e2e.js --ng-version="^5.0.0" "--glob=tests/{basic,build}/**"
-      env: ng5-subset
-
-    # WEBPACK4_DISABLED - eject temporarily disabled for webpack 4 integration
-    # - node_js: "8"
-    #   os: linux
-    #   script: node tests/run_e2e.js --eject "--glob=tests/build/**"
-    #   env: eject
+      script: node tests/run_e2e.js --ng-version="^5.0.0" "--glob=tests/{basic,build/styles,build/aot}/**"
+      env: ng5-subset-1
+    - node_js: "8"
+      os: linux
+      script: node tests/run_e2e.js --ng-version="^5.0.0" "--glob=tests/build/*"
+      env: ng5-subset-2
 
     # Optional stage.
     - stage: optional
@@ -69,8 +67,12 @@ matrix:
       env: nightly
     - node_js: "9"
       os: linux
-      script: node tests/run_e2e.js "--glob=tests/build/**" --ng-version="6.0.0-rc.2"
+      script: node tests/run_e2e.js "--glob=tests/build/**"
       env: node9
+    - node_js: "10"
+      os: linux
+      script: node tests/run_e2e.js "--glob=tests/build/**"
+      env: node10
 
     # Deploy stage
     - stage: deploy
@@ -93,6 +95,7 @@ matrix:
 
 
 install:
+  - npm install -g npm@5.8.0
   - npm install
 
 env:

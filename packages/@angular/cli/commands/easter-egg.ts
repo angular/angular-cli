@@ -1,5 +1,5 @@
 import { Command, Option } from '../models/command';
-import chalk from 'chalk';
+import { terminal } from '@angular-devkit/core';
 
 function pickOne(of: string[]): string {
   return of[Math.floor(Math.random() * of.length)];
@@ -23,6 +23,6 @@ export default class AwesomeCommand extends Command {
       `I spy with my little eye a great developer!`,
       `Noop... already awesome.`
     ]);
-    this.logger.info(chalk.green(phrase));
+    this.logger.info(terminal.green(phrase));
   }
 }

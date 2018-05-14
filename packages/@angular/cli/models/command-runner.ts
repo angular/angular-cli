@@ -9,6 +9,7 @@ import {
 import { logging, normalize, tags } from '@angular-devkit/core';
 import { camelize } from '@angular-devkit/core/src/utils/strings';
 import { findUp } from '../utilities/find-up';
+import { insideProject } from '../utilities/project';
 
 import * as yargsParser from 'yargs-parser';
 import * as fs from 'fs';
@@ -30,7 +31,7 @@ export interface CommandMap {
 export async function runCommand(commandMap: CommandMap,
                                  args: string[],
                                  logger: logging.Logger,
-                                 context: CommandContext): Promise<any> {
+                                 context: CommandContext): Promise<number | void> {
 
   // if not args supplied, just run the help command.
   if (!args || args.length === 0) {
@@ -41,7 +42,7 @@ export async function runCommand(commandMap: CommandMap,
 
   // remove the command name
   rawOptions._ = rawOptions._.slice(1);
-  const executionScope = context.project.isEmberCLIProject()
+  const executionScope = insideProject()
     ? CommandScope.inProject
     : CommandScope.outsideProject;
 
@@ -59,39 +60,26 @@ export async function runCommand(commandMap: CommandMap,
   }
 
   if (!Cmd) {
+    // Based off https://en.wikipedia.org/wiki/Levenshtein_distance
+    // No optimization, really.
     function levenshtein(a: string, b: string): number {
-      if (a.length === 0) {
+      /* base case: empty strings */
+      if (a.length == 0) {
         return b.length;
       }
-      if (b.length === 0) {
+      if (b.length == 0) {
         return a.length;
       }
 
-      if (a.length > b.length) {
-        let tmp = a;
-        a = b;
-        b = tmp;
-      }
+      // Test if last characters of the strings match.
+      const cost = a[a.length - 1] == b[b.length - 1] ? 0 : 1;
 
-      const row = Array(a.length);
-      for (let i = 0; i <= a.length; i++) {
-        row[i] = i;
-      }
-
-      let result: number;
-      for (let i = 1; i <= b.length; i++) {
-        result = i;
-
-        for (let j = 1; j <= a.length; j++) {
-          let tmp = row[j - 1];
-          row[j - 1] = result;
-          result = b[i - 1] === a[j - 1]
-            ? tmp
-            : Math.min(tmp + 1, Math.min(result + 1, row[j] + 1));
-        }
-      }
-
-      return result;
+      /* return minimum of delete char from s, delete char from t, and delete char from both */
+      return Math.min(
+        levenshtein(a.slice(0, -1), b) + 1,
+        levenshtein(a, b.slice(0, -1)) + 1,
+        levenshtein(a.slice(0, -1), b.slice(0, -1)) + cost,
+      );
     }
 
     const commandsDistance = {} as { [name: string]: number };
@@ -105,12 +93,14 @@ export async function runCommand(commandMap: CommandMap,
       return commandsDistance[a] - commandsDistance[b];
     });
 
-    throw new SilentError(tags.stripIndent`
+    logger.error(tags.stripIndent`
         The specified command ("${commandName}") is invalid. For a list of available options,
         run "ng help".
 
         Did you mean "${allCommands[0]}"?
     `);
+
+    return 1;
   }
 
   const command = new Cmd(context, logger);
@@ -127,9 +117,12 @@ export async function runCommand(commandMap: CommandMap,
     return await runHelp(command, options);
   } else {
     verifyCommandInScope(command, executionScope);
-    if (!command.allowMissingWorkspace) {
-      verifyWorkspace(command, executionScope, context.project.root);
-    }
+    verifyWorkspace(
+      command,
+      executionScope,
+      context.project.root,
+      command.allowMissingWorkspace ? logger : null,
+    );
     delete options.h;
     delete options.help;
     return await validateAndRunCommand(command, options);
@@ -163,13 +156,24 @@ export function parseOptions<T = any>(
       return defaults;
     }, {});
 
+  const strings = cmdOpts
+    .filter(o => o.type === String)
+    .map(o => o.name);
+
+  const numbers = cmdOpts
+    .filter(o => o.type === Number)
+    .map(o => o.name);
+
+
   aliases.help = ['h'];
   booleans.push('help');
 
   const yargsOptions = {
     alias: aliases,
     boolean: booleans,
-    default: defaults
+    default: defaults,
+    string: strings,
+    number: numbers
   };
 
   const parsedOptions = parser(args, yargsOptions);
@@ -273,7 +277,12 @@ function verifyCommandInScope(command: Command, scope = CommandScope.everywhere)
   }
 }
 
-function verifyWorkspace(command: Command, executionScope: CommandScope, root: string): void {
+function verifyWorkspace(
+  command: Command,
+  executionScope: CommandScope,
+  root: string,
+  logger: logging.Logger | null = null,
+): void {
   if (command.scope === CommandScope.everywhere) {
     return;
   }
@@ -290,20 +299,28 @@ function verifyWorkspace(command: Command, executionScope: CommandScope, root: s
       normalize('.angular-cli.json'),
       normalize('angular-cli.json'),
     ];
-    const oldConfigFilePath = (root && findUp(oldConfigFileNames, root, true))
-      || findUp(oldConfigFileNames, process.cwd(), true)
-      || findUp(oldConfigFileNames, __dirname, true);
+    const oldConfigFilePath = (root && findUp(oldConfigFileNames, root))
+      || findUp(oldConfigFileNames, process.cwd())
+      || findUp(oldConfigFileNames, __dirname);
 
     // If an old configuration file is found, throw an exception.
     if (oldConfigFilePath) {
-      throw new SilentError(tags.stripIndent`
-        An old project has been detected, which needs to be updated to Angular CLI 6.
+      // ------------------------------------------------------------------------------------------
+      // If changing this message, please update the same message in
+      // `packages/@angular/cli/bin/ng-update-message.js`
+      const message = tags.stripIndent`
+        The Angular CLI configuration format has been changed, and your existing configuration can
+        be updated automatically by running the following command:
 
-        Please run the following commands to update this project.
+          ng update @angular/cli
+      `;
 
-          ng update @angular/cli --migrate-only --from=1.7.1
-          npm i
-      `);
+      if (!logger) {
+        throw new SilentError(message);
+      } else {
+        logger.warn(message);
+        return;
+      }
     }
 
     // If no configuration file is found (old or new), throw an exception.
@@ -312,12 +329,12 @@ function verifyWorkspace(command: Command, executionScope: CommandScope, root: s
 }
 
 // Execute a command's `printHelp`.
-async function runHelp(command: Command, options: any): Promise<void> {
+async function runHelp<T>(command: Command<T>, options: T): Promise<void> {
   return await command.printHelp(options);
 }
 
 // Validate and run a command.
-async function validateAndRunCommand(command: Command, options: any): Promise<any> {
+async function validateAndRunCommand<T>(command: Command<T>, options: T): Promise<number | void> {
   const isValid = await command.validate(options);
   if (isValid !== undefined && !isValid) {
     throw new SilentError(`Validation error. Invalid command`);

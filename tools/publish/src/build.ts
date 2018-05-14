@@ -2,7 +2,7 @@ import { logging } from '@angular-devkit/core';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { promisify } from 'util';
-import {buildSchema} from './build-schema';
+// import {buildSchema} from './build-schema';
 
 const glob = promisify(require('glob'));
 const tar = require('tar');
@@ -58,7 +58,7 @@ function getDeps(pkg: any): any {
 
 
 export default function build(packagesToBuild: string[],
-                              opts: { local: boolean, devkit: string },
+                              opts: { local: boolean, devkit: string, 'devkit-snapshots': boolean },
                               logger: logging.Logger): Promise<void> {
   const { packages, tools } = require('../../../lib/packages');
 
@@ -75,12 +75,12 @@ export default function build(packagesToBuild: string[],
         return fs.remove(dist);
       }
     })
-    .then(() => logger.info('Creating schema.d.ts...'))
-    .then(() => {
-      const input = path.join(root, 'packages/@angular/cli/lib/config/schema.json');
-      const output = path.join(root, 'packages/@angular/cli/lib/config/schema.d.ts');
-      fs.writeFileSync(output, buildSchema(input, logger), { encoding: 'utf-8' });
-    })
+    // .then(() => logger.info('Creating schema.d.ts...'))
+    // .then(() => {
+    //   const input = path.join(root, 'packages/@angular/cli/lib/config/schema.json');
+    //   const output = path.join(root, 'packages/@angular/cli/lib/config/schema.d.ts');
+    //   fs.writeFileSync(output, buildSchema(input, logger), { encoding: 'utf-8' });
+    // })
     .then(() => logger.info('Compiling packages...'))
     .then(() => {
       const packagesLogger = new logging.Logger('packages', logger);
@@ -269,6 +269,17 @@ export default function build(packagesToBuild: string[],
               json['devDependencies'][packageName] = devkitPackages[packageName].tar;
             }
           }
+        } else if (opts['devkit-snapshots']) {
+          // Use snapshots for devkit packages.
+          logger.info('Using snapshots of devkit packages.');
+          json['dependencies']['@angular-devkit/architect'] =
+            'github:angular/angular-devkit-architect-builds';
+          json['dependencies']['@angular-devkit/core'] =
+            'github:angular/angular-devkit-core-builds';
+          json['dependencies']['@angular-devkit/schematics'] =
+            'github:angular/angular-devkit-schematics-builds';
+          json['dependencies']['@schematics/angular'] = 'github:angular/schematics-angular-builds';
+          json['dependencies']['@schematics/update'] = 'github:angular/schematics-update-builds';
         }
 
         fs.writeFileSync(pkg.distPackageJson, JSON.stringify(json, null, 2));

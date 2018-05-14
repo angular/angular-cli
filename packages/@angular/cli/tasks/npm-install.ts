@@ -1,40 +1,49 @@
 import { ModuleNotFoundException, resolve } from '@angular-devkit/core/node';
-
-import chalk from 'chalk';
 import { spawn } from 'child_process';
-import { logging } from '@angular-devkit/core';
+import { logging, terminal } from '@angular-devkit/core';
+
+const SilentError = require('silent-error');
 
 
 export type NpmInstall = (packageName: string,
                           logger: logging.Logger,
                           packageManager: string,
                           projectRoot: string,
-                          save: boolean) => void;
+                          save?: boolean) => void;
 
 export default async function (packageName: string,
                                logger: logging.Logger,
                                packageManager: string,
                                projectRoot: string,
-                               save: boolean) {
+                               save = true) {
   if (packageManager === 'default') {
     packageManager = 'npm';
   }
 
-  logger.info(chalk.green(`Installing packages for tooling via ${packageManager}.`));
+  logger.info(terminal.green(`Installing packages for tooling via ${packageManager}.`));
 
-  const installArgs = ['install'];
-  if (packageManager === 'npm') {
-    installArgs.push('--quiet');
+  const installArgs: string[] = [];
+  switch (packageManager) {
+    case 'cnpm':
+    case 'npm':
+      installArgs.push('install', '--quiet');
+      break;
+
+    case 'yarn':
+      installArgs.push('add');
+      break;
+
+    default:
+      throw new SilentError(`Invalid package manager: ${JSON.stringify(packageManager)}.`);
   }
+
   if (packageName) {
     try {
       // Verify if we need to install the package (it might already be there).
       // If it's available and we shouldn't save, simply return. Nothing to be done.
       resolve(packageName, { checkLocal: true, basedir: projectRoot });
 
-      if (!save) {
-        return;
-      }
+      return;
     } catch (e) {
       if (!(e instanceof ModuleNotFoundException)) {
         throw e;
@@ -55,11 +64,11 @@ export default async function (packageName: string,
     spawn(packageManager, installArgs, installOptions)
       .on('close', (code: number) => {
         if (code === 0) {
-          logger.info(chalk.green(`Installed packages for tooling via ${packageManager}.`));
+          logger.info(terminal.green(`Installed packages for tooling via ${packageManager}.`));
           resolve();
         } else {
           const message = 'Package install failed, see above.';
-          logger.info(chalk.red(message));
+          logger.info(terminal.red(message));
           reject(message);
         }
       });

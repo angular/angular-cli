@@ -7,25 +7,32 @@
 
 ## Options
 <details>
-  <summary>app</summary>
+  <summary>dry-run</summary>
   <p>
-    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
+    <code>--dry-run</code> (alias: <code>-d</code>)
   </p>
   <p>
-    Specifies app name to use.
+    Run through without making any changes.
   </p>
 </details>
-
 <details>
-  <summary>export</summary>
+  <summary>force</summary>
   <p>
-    <code>--export</code>
+    <code>--force</code> (alias: <code>-f</code>)
   </p>
   <p>
-    Specifies if declaring module exports the pipe.
+    Forces overwriting of files.
   </p>
 </details>
-
+<details>
+  <summary>project</summary>
+  <p>
+    <code>--project</code>
+  </p>
+  <p>
+    The name of the project.
+  </p>
+</details>
 <details>
   <summary>flat</summary>
   <p>
@@ -35,17 +42,15 @@
     Flag to indicate if a dir is created.
   </p>
 </details>
-
 <details>
-  <summary>module</summary>
+  <summary>spec</summary>
   <p>
-    <code>--module</code> (aliases: <code>-m</code>)
+    <code>--spec</code>
   </p>
   <p>
-    Allows specification of the declaring module.
+    Specifies if a spec file is generated.
   </p>
 </details>
-
 <details>
   <summary>skip-import</summary>
   <p>
@@ -55,13 +60,21 @@
     Allows for skipping the module import.
   </p>
 </details>
-
 <details>
-  <summary>spec</summary>
+  <summary>module</summary>
   <p>
-    <code>--spec</code>
+    <code>--module</code> (alias: <code>-m</code>)
   </p>
   <p>
-    Specifies if a spec file is generated.
+    Allows specification of the declaring module.
+  </p>
+</details>
+<details>
+  <summary>export</summary>
+  <p>
+    <code>--export</code>
+  </p>
+  <p>
+    Specifies if declaring module exports the pipe.
   </p>
 </details>

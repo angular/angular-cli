@@ -10,9 +10,8 @@ export default function() {
   return ng('generate', 'service', 'test-service')
     .then(() => expectFileToExist(serviceDir))
     .then(() => expectFileToExist(join(serviceDir, 'test-service.service.ts')))
-    .then(() => expectFileToExist(join(serviceDir, 'test-service.service.spec.ts')));
+    .then(() => expectFileToExist(join(serviceDir, 'test-service.service.spec.ts')))
 
     // Try to run the unit tests.
-    // TODO: re-enable when updated to Angular v6
-    // .then(() => ng('test', '--watch=false'));
+    .then(() => ng('test', '--watch=false'));
 }

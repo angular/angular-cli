@@ -7,35 +7,50 @@
 
 ## Options
 <details>
-  <summary>app</summary>
+  <summary>dry-run</summary>
   <p>
-    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
+    <code>--dry-run</code> (alias: <code>-d</code>)
   </p>
   <p>
-    Specifies app name to use.
+    Run through without making any changes.
   </p>
 </details>
-
 <details>
-  <summary>flat</summary>
+  <summary>force</summary>
   <p>
-    <code>--flat</code>
+    <code>--force</code> (alias: <code>-f</code>)
   </p>
   <p>
-    Flag to indicate if a dir is created.
+    Forces overwriting of files.
   </p>
 </details>
-
 <details>
-  <summary>module</summary>
+  <summary>project</summary>
   <p>
-    <code>--module</code> (aliases: <code>-m</code>)
+    <code>--project</code>
   </p>
   <p>
-    Specifies where the module should be imported.
+    The name of the project.
   </p>
 </details>
-
+<details>
+  <summary>routing</summary>
+  <p>
+    <code>--routing</code>
+  </p>
+  <p>
+    Generates a routing module.
+  </p>
+</details>
+<details>
+  <summary>routing-scope</summary>
+  <p>
+    <code>--routing-scope</code>
+  </p>
+  <p>
+    The scope for the generated routing.
+  </p>
+</details>
 <details>
   <summary>spec</summary>
   <p>
@@ -45,15 +60,21 @@
     Specifies if a spec file is generated.
   </p>
 </details>
-
 <details>
-  <summary>routing</summary>
+  <summary>flat</summary>
   <p>
-    <code>--routing</code>
+    <code>--flat</code>
   </p>
   <p>
-    Specifies if a routing module file should be generated.
+    Flag to indicate if a dir is created.
   </p>
 </details>
-
-
+<details>
+  <summary>module</summary>
+  <p>
+    <code>--module</code> (alias: <code>-m</code>)
+  </p>
+  <p>
+    Allows specification of the declaring module.
+  </p>
+</details>

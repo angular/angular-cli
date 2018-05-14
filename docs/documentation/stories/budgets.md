@@ -4,16 +4,16 @@ As applications grow in functionality, they also grow in size. Budgets is a feat
 Angular CLI which allows you to set budget thresholds in your configuration to ensure parts
 of your application stay within boundries which you set.
 
-**.angular-cli.json**
+**angular.json**
 ```
 {
   ...
-  apps: [
-    {
+  "configurations": {
+    "production": {
       ...
       budgets: []
     }
-  ]
+  }
 }
 ```
 
@@ -49,11 +49,12 @@ of your application stay within boundries which you set.
 ## Specifying sizes
 
 Available formats:
-123 - size in bytes
-123b - size in bytes
-123kb - size in kilobytes
-123mb - size in megabytes
-12% - percentage
+
+- `123` - size in bytes
+- `123b` - size in bytes
+- `123kb` - size in kilobytes
+- `123mb` - size in megabytes
+- `12%` - percentage
 
 ## NOTES
 

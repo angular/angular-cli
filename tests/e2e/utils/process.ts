@@ -1,10 +1,10 @@
 import * as child_process from 'child_process';
-import {blue, yellow} from 'chalk';
-import {Observable, concat, defer, EMPTY, from} from 'rxjs';
+import { terminal } from '@angular-devkit/core';
+import { Observable, concat, defer, EMPTY, from} from 'rxjs';
 import {repeat, takeLast} from 'rxjs/operators';
 import {getGlobalVariable} from './env';
 import {rimraf} from './fs';
-import {catchError} from "rxjs/internal/operators";
+import {catchError} from 'rxjs/operators';
 const treeKill = require('tree-kill');
 
 
@@ -22,7 +22,7 @@ export type ProcessOutput = {
 };
 
 
-function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<ProcessOutput> {
+function  _exec(options: ExecOptions, cmd: string, args: string[]): Promise<ProcessOutput> {
   let stdout = '';
   let stderr = '';
   const cwd = process.cwd();
@@ -39,8 +39,8 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
     .join(', ')
     .replace(/^(.+)$/, ' [$1]');  // Proper formatting.
 
-  console.log(blue(`Running \`${cmd} ${args.map(x => `"${x}"`).join(' ')}\`${flags}...`));
-  console.log(blue(`CWD: ${cwd}`));
+  console.log(terminal.blue(`Running \`${cmd} ${args.map(x => `"${x}"`).join(' ')}\`${flags}...`));
+  console.log(terminal.blue(`CWD: ${cwd}`));
   const spawnOptions: any = {cwd};
 
   if (process.platform.startsWith('win')) {
@@ -68,7 +68,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
     data.toString('utf-8')
       .split(/[\n\r]+/)
       .filter(line => line !== '')
-      .forEach(line => console.error(yellow('  ' + line)));
+      .forEach(line => console.error(terminal.yellow('  ' + line)));
   });
 
   _processes.push(childProcess);
@@ -171,8 +171,6 @@ export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: 
 
 let npmInstalledEject = false;
 export function ng(...args: string[]) {
-  process.env.PWD = process.cwd();
-
   const argv = getGlobalVariable('argv');
   const maybeSilentNg = argv['nosilent'] ? noSilentNg : silentNg;
   if (['build', 'serve', 'test', 'e2e', 'xi18n'].indexOf(args[0]) != -1) {

@@ -1,14 +1,12 @@
 import { CommandScope, Option } from '../models/command';
-import chalk from 'chalk';
 import { getDefaultSchematicCollection } from '../utilities/config';
 import {
   getCollection,
   getEngineHost
 } from '../utilities/schematics';
-import { tags } from '@angular-devkit/core';
+import { tags, terminal } from '@angular-devkit/core';
 import { SchematicCommand } from '../models/schematic-command';
 
-const { cyan } = chalk;
 
 export default class GenerateCommand extends SchematicCommand {
   public readonly name = 'generate';
@@ -72,10 +70,10 @@ export default class GenerateCommand extends SchematicCommand {
   private parseSchematicInfo(options: any) {
     let collectionName = getDefaultSchematicCollection();
 
-    let schematicName = options._[0];
+    let schematicName: string = options._[0];
 
     if (schematicName) {
-      if (schematicName.match(/:/)) {
+      if (schematicName.includes(':')) {
         [collectionName, schematicName] = schematicName.split(':', 2);
       }
     }
@@ -106,7 +104,7 @@ export default class GenerateCommand extends SchematicCommand {
       });
 
       this.logger.warn(`\nTo see help for a schematic run:`);
-      this.logger.info(cyan(`  ng generate <schematic> --help`));
+      this.logger.info(terminal.cyan(`  ng generate <schematic> --help`));
     }
   }
 }
