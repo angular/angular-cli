@@ -98,7 +98,7 @@ describe('Browser Builder', () => {
           hashTable: {
             '/favicon.ico': '84161b857f5c547e3699ddfbffc6d8d737542e01',
             '/assets/folder-asset.txt': '617f202968a6a81050aa617c2e28e1dca11ce8d4',
-            '/index.html': '3e659d6e536916b7d178d02a2e6e5492f868bf68',
+            '/index.html': '843c96f0aeadc8f093b1b2203c08891ecd8f7425',
           },
         });
       }),
@@ -153,7 +153,7 @@ describe('Browser Builder', () => {
           hashTable: {
             '/foo/bar/favicon.ico': '84161b857f5c547e3699ddfbffc6d8d737542e01',
             '/foo/bar/assets/folder-asset.txt': '617f202968a6a81050aa617c2e28e1dca11ce8d4',
-            '/foo/bar/index.html': '5b53fa9e07e4111b8ef84613fb989a56fee502b0',
+            '/foo/bar/index.html': '9ef50361678004b3b197c12cbc74962e5a15b844',
           },
         });
       }),

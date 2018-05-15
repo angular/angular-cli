@@ -7,7 +7,7 @@
  */
 import { createHash } from 'crypto';
 import { Compiler, compilation } from 'webpack';
-import { RawSource } from 'webpack-sources';
+import { RawSource, ReplaceSource } from 'webpack-sources';
 
 const parse5 = require('parse5');
 
@@ -95,71 +95,94 @@ export class IndexHtmlWebpackPlugin {
 
       // Find the head and body elements
       const treeAdapter = parse5.treeAdapters.default;
-      const document = parse5.parse(inputContent, { treeAdapter });
+      const document = parse5.parse(inputContent, { treeAdapter, locationInfo: true });
       let headElement;
       let bodyElement;
-      for (const topNode of document.childNodes) {
-        if (topNode.tagName === 'html') {
-          for (const htmlNode of topNode.childNodes) {
-            if (htmlNode.tagName === 'head') {
-              headElement = htmlNode;
+      for (const docChild of document.childNodes) {
+        if (docChild.tagName === 'html') {
+          for (const htmlChild of docChild.childNodes) {
+            if (htmlChild.tagName === 'head') {
+              headElement = htmlChild;
             }
-            if (htmlNode.tagName === 'body') {
-              bodyElement = htmlNode;
+            if (htmlChild.tagName === 'body') {
+              bodyElement = htmlChild;
             }
           }
         }
       }
-
-      // Inject into the html
 
       if (!headElement || !bodyElement) {
         throw new Error('Missing head and/or body elements');
       }
 
+      // Determine script insertion point
+      let scriptInsertionPoint;
+      if (bodyElement.__location && bodyElement.__location.endTag) {
+        scriptInsertionPoint = bodyElement.__location.endTag.startOffset;
+      } else {
+        // Less accurate fallback
+        // parse5 4.x does not provide locations if malformed html is present
+        scriptInsertionPoint = inputContent.indexOf('</body>');
+      }
+
+      let styleInsertionPoint;
+      if (headElement.__location && headElement.__location.endTag) {
+        styleInsertionPoint = headElement.__location.endTag.startOffset;
+      } else {
+        // Less accurate fallback
+        // parse5 4.x does not provide locations if malformed html is present
+        styleInsertionPoint = inputContent.indexOf('</head>');
+      }
+
+      // Inject into the html
+      const indexSource = new ReplaceSource(new RawSource(inputContent), this._options.input);
+
+      const scriptElements = treeAdapter.createDocumentFragment();
       for (const script of scripts) {
         const attrs = [
           { name: 'type', value: 'text/javascript' },
           { name: 'src', value: (this._options.deployUrl || '') + script },
         ];
+
         if (this._options.sri) {
-          const algo = 'sha384';
-          const hash = createHash(algo)
-            .update(compilation.assets[script].source(), 'utf8')
-            .digest('base64');
-          attrs.push(
-            { name: 'integrity', value: `${algo}-${hash}` },
-            { name: 'crossorigin', value: 'anonymous' },
-          );
+          const content = compilation.assets[script].source();
+          attrs.push(...this._generateSriAttributes(content));
         }
 
-        const element = treeAdapter.createElement(
-          'script',
-          undefined,
-          attrs,
-        );
-        treeAdapter.appendChild(bodyElement, element);
+        const element = treeAdapter.createElement('script', undefined, attrs);
+        treeAdapter.appendChild(scriptElements, element);
       }
 
+      indexSource.insert(
+        scriptInsertionPoint,
+        parse5.serialize(scriptElements, { treeAdapter }),
+      );
+
       // Adjust base href if specified
-      if (this._options.baseHref != undefined) {
+      if (typeof this._options.baseHref == 'string') {
         let baseElement;
-        for (const node of headElement.childNodes) {
-          if (node.tagName === 'base') {
-            baseElement = node;
-            break;
+        for (const headChild of headElement.childNodes) {
+          if (headChild.tagName === 'base') {
+            baseElement = headChild;
           }
         }
 
+        const baseFragment = treeAdapter.createDocumentFragment();
+
         if (!baseElement) {
-          const element = treeAdapter.createElement(
+          baseElement = treeAdapter.createElement(
             'base',
             undefined,
             [
               { name: 'href', value: this._options.baseHref },
             ],
           );
-          treeAdapter.appendChild(headElement, element);
+
+          treeAdapter.appendChild(baseFragment, baseElement);
+          indexSource.insert(
+            headElement.__location.startTag.endOffset + 1,
+            parse5.serialize(baseFragment, { treeAdapter }),
+          );
         } else {
           let hrefAttribute;
           for (const attribute of baseElement.attrs) {
@@ -172,24 +195,51 @@ export class IndexHtmlWebpackPlugin {
           } else {
             baseElement.attrs.push({ name: 'href', value: this._options.baseHref });
           }
+
+          treeAdapter.appendChild(baseFragment, baseElement);
+          indexSource.replace(
+            baseElement.__location.startOffset,
+            baseElement.__location.endOffset,
+            parse5.serialize(baseFragment, { treeAdapter }),
+          );
         }
       }
 
+      const styleElements = treeAdapter.createDocumentFragment();
       for (const stylesheet of stylesheets) {
-        const element = treeAdapter.createElement(
-          'link',
-          undefined,
-          [
-            { name: 'rel', value: 'stylesheet' },
-            { name: 'href', value: (this._options.deployUrl || '') + stylesheet },
-          ],
-        );
-        treeAdapter.appendChild(headElement, element);
+        const attrs = [
+          { name: 'rel', value: 'stylesheet' },
+          { name: 'href', value: (this._options.deployUrl || '') + stylesheet },
+        ];
+
+        if (this._options.sri) {
+          const content = compilation.assets[stylesheet].source();
+          attrs.push(...this._generateSriAttributes(content));
+        }
+
+        const element = treeAdapter.createElement('link', undefined, attrs);
+        treeAdapter.appendChild(styleElements, element);
       }
 
+      indexSource.insert(
+        styleInsertionPoint,
+        parse5.serialize(styleElements, { treeAdapter }),
+      );
+
       // Add to compilation assets
-      const outputContent = parse5.serialize(document, { treeAdapter });
-      compilation.assets[this._options.output] = new RawSource(outputContent);
+      compilation.assets[this._options.output] = indexSource;
     });
+  }
+
+  private _generateSriAttributes(content: string) {
+    const algo = 'sha384';
+    const hash = createHash(algo)
+      .update(content, 'utf8')
+      .digest('base64');
+
+    return [
+      { name: 'integrity', value: `${algo}-${hash}` },
+      { name: 'crossorigin', value: 'anonymous' },
+    ];
   }
 }
