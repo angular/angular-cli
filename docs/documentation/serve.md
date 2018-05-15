@@ -26,6 +26,7 @@ ng serve [project]
   </p>
   <p>
     Specify the configuration to use.
+    Note: Prior to version 6.0.0 this flag was --env
   </p>
 </details>
 <details>
