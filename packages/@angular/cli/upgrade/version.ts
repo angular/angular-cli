@@ -32,6 +32,7 @@ export class Version {
   static assertCompatibleAngularVersion(projectRoot: string) {
     let angularPkgJson;
     let rxjsPkgJson;
+
     try {
       angularPkgJson = requireProjectModule(projectRoot, '@angular/core/package.json');
       rxjsPkgJson = requireProjectModule(projectRoot, 'rxjs/package.json');
