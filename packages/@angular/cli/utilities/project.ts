@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { findUp } from './find-up';
-import { normalize } from '@angular-devkit/core';
+import { Path, normalize, relative } from '@angular-devkit/core';
 
 export function insideProject(): boolean {
   return getProjectDetails() !== null;
@@ -11,6 +11,7 @@ export function insideProject(): boolean {
 export interface ProjectDetails {
   root: string;
   configFile?: string;
+  contextDir?: Path;
 }
 
 export function getProjectDetails(): ProjectDetails | null {
@@ -44,9 +45,13 @@ export function getProjectDetails(): ProjectDetails | null {
       return null;
     }
   }
+
+  const contextDir = relative(normalize(possibleDir), normalize(currentDir));
+
   return {
     root: possibleDir,
     configFile: configFileName,
+    contextDir: contextDir
   };
 }
 

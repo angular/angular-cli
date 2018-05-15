@@ -1,7 +1,7 @@
 import { getProjectDetails } from '@angular/cli/utilities/project';
 import * as mockFs from 'mock-fs';
 import * as os from 'os';
-import {join} from 'path';
+import {join, relative} from 'path';
 
 const homedir = os.homedir();
 const cwds = [`${homedir}/proj`, `${homedir}/proj/abc`];
@@ -99,6 +99,14 @@ cwds.forEach(cwd => {
       const result = getProjectDetails();
       expect(result.root).toEqual(homedir);
       expect(result.configFile).toEqual('.angular-cli.json');
+    });
+
+    it('should set the context dir', () => {
+      mockFs({
+        [`${homedir}/proj/angular.json`]: 'foo'
+      });
+      const result = getProjectDetails();
+      expect(result.contextDir).toEqual(relative(`${homedir}/proj`, cwd));
     });
   });
 });
