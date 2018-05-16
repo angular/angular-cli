@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as fs from 'fs';
-import { EMPTY, Observable, concat, from as observableFrom } from 'rxjs';
+import { EMPTY, Observable, concat, from as observableFrom, throwError } from 'rxjs';
 import {
   concatMap,
   ignoreElements,
@@ -257,9 +257,17 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
           for (const name of fs.readdirSync(getSystemPath(path))) {
             this.delete(join(path, name)).subscribe();
           }
-          fs.rmdirSync(getSystemPath(path));
+          try {
+            fs.rmdirSync(getSystemPath(path));
+          } catch (error) {
+            return throwError(error);
+          }
         } else {
-          fs.unlinkSync(getSystemPath(path));
+          try {
+            fs.unlinkSync(getSystemPath(path));
+          } catch (error) {
+            return throwError(error);
+          }
         }
 
         return EMPTY;
