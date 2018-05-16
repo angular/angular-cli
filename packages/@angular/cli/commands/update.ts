@@ -1,7 +1,6 @@
-import { normalize } from '@angular-devkit/core';
 import { CommandScope, Option } from '../models/command';
 import { SchematicCommand, CoreSchematicOptions } from '../models/schematic-command';
-import { findUp } from '../utilities/find-up';
+import { isProjectVersionOne } from '../utilities/project';
 
 export interface UpdateOptions extends CoreSchematicOptions {
   next: boolean;
@@ -44,16 +43,8 @@ export default class UpdateCommand extends SchematicCommand {
     if (options._[0] == '@angular/cli'
         && options.migrateOnly === undefined
         && options.from === undefined) {
-      // Check for a 1.7 angular-cli.json file.
-      const oldConfigFileNames = [
-        normalize('.angular-cli.json'),
-        normalize('angular-cli.json'),
-      ];
-      const oldConfigFilePath =
-        findUp(oldConfigFileNames, process.cwd())
-        || findUp(oldConfigFileNames, __dirname);
 
-      if (oldConfigFilePath) {
+      if (isProjectVersionOne(this.project)) {
         options.migrateOnly = true;
         options.from = '1.0.0';
       }

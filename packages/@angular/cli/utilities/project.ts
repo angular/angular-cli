@@ -11,7 +11,7 @@ export function insideProject(): boolean {
 export interface ProjectDetails {
   root: string;
   configFile?: string;
-  contextDir?: Path;
+  contextDir?: string;
 }
 
 export function getProjectDetails(): ProjectDetails | null {
@@ -66,4 +66,21 @@ function containsCliDep(obj: any): boolean {
     }
   }
   return false;
+}
+
+export function isProjectVersionOne(project: ProjectDetails): boolean {
+  // Check for a 1.7 angular-cli.json file.
+  const oldConfigFileNames = [
+    normalize('.angular-cli.json'),
+    normalize('angular-cli.json'),
+  ];
+  const startDir = project.contextDir
+    ? path.join(project.root, project.contextDir)
+    : project.root;
+
+  const oldConfigFilePath =
+    findUp(oldConfigFileNames, startDir)
+    || findUp(oldConfigFileNames, __dirname);
+
+  return oldConfigFilePath === null;
 }
