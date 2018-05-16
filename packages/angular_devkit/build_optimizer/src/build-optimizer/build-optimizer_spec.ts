@@ -63,7 +63,7 @@ describe('build-optimizer', () => {
           ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
           ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
           return ChangeDetectionStrategy;
-        })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
+        })({});
         var Clazz = /*@__PURE__*/ (function () { function Clazz() { } ${staticProperty} return Clazz; }());
         var ComponentClazz = /*@__PURE__*/ (function () {
           function ComponentClazz() { }

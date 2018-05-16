@@ -94,7 +94,8 @@ function visitBlockStatements(
             // update IIFE and replace variable statement and old IIFE
             updatedStatements.splice(uIndex, 2, updateEnumIife(
               currentStatement,
-              iife,
+              iife[0],
+              iife[1],
             ));
             // skip IIFE statement
             oIndex++;
@@ -158,7 +159,10 @@ function visitBlockStatements(
 }
 
 // TS 2.3 enums have statements that are inside a IIFE.
-function findTs2_3EnumIife(name: string, statement: ts.Statement): ts.CallExpression | null {
+function findTs2_3EnumIife(
+  name: string,
+  statement: ts.Statement,
+): [ts.CallExpression, ts.Expression | undefined] | null {
   if (!ts.isExpressionStatement(statement)) {
     return null;
   }
@@ -173,6 +177,7 @@ function findTs2_3EnumIife(name: string, statement: ts.Statement): ts.CallExpres
   }
 
   const callExpression = expression;
+  let exportExpression;
 
   let argument = expression.arguments[0];
   if (!ts.isBinaryExpression(argument)) {
@@ -183,12 +188,14 @@ function findTs2_3EnumIife(name: string, statement: ts.Statement): ts.CallExpres
     return null;
   }
 
+  let potentialExport = false;
   if (argument.operatorToken.kind === ts.SyntaxKind.FirstAssignment) {
     if (!ts.isBinaryExpression(argument.right)
         || argument.right.operatorToken.kind !== ts.SyntaxKind.BarBarToken) {
       return null;
     }
 
+    potentialExport = true;
     argument = argument.right;
   }
 
@@ -198,6 +205,10 @@ function findTs2_3EnumIife(name: string, statement: ts.Statement): ts.CallExpres
 
   if (argument.operatorToken.kind !== ts.SyntaxKind.BarBarToken) {
     return null;
+  }
+
+  if (potentialExport && !ts.isIdentifier(argument.left)) {
+    exportExpression = argument.left;
   }
 
   expression = expression.expression;
@@ -264,7 +275,7 @@ function findTs2_3EnumIife(name: string, statement: ts.Statement): ts.CallExpres
     }
   }
 
-  return callExpression;
+  return [callExpression, exportExpression];
 }
 
 // TS 2.2 enums have statements after the variable declaration, with index statements followed
@@ -362,8 +373,21 @@ function findEnumNameStatements(
   return enumStatements;
 }
 
-function updateHostNode(hostNode: ts.VariableStatement, expression: ts.Expression): ts.Statement {
+function addPureComment<T extends ts.Node>(node: T): T {
   const pureFunctionComment = '@__PURE__';
+
+  return ts.addSyntheticLeadingComment(
+    node,
+    ts.SyntaxKind.MultiLineCommentTrivia,
+    pureFunctionComment,
+    false,
+  );
+}
+
+function updateHostNode(
+  hostNode: ts.VariableStatement,
+  expression: ts.Expression,
+): ts.Statement {
 
   // Update existing host node with the pure comment before the variable declaration initializer.
   const variableDeclaration = hostNode.declarationList.declarations[0];
@@ -377,12 +401,7 @@ function updateHostNode(hostNode: ts.VariableStatement, expression: ts.Expressio
           variableDeclaration,
           variableDeclaration.name,
           variableDeclaration.type,
-          ts.addSyntheticLeadingComment(
-            expression,
-            ts.SyntaxKind.MultiLineCommentTrivia,
-            pureFunctionComment,
-            false,
-          ),
+          expression,
         ),
       ],
     ),
@@ -391,10 +410,20 @@ function updateHostNode(hostNode: ts.VariableStatement, expression: ts.Expressio
   return outerVarStmt;
 }
 
-function updateEnumIife(hostNode: ts.VariableStatement, iife: ts.CallExpression): ts.Statement {
+function updateEnumIife(
+  hostNode: ts.VariableStatement,
+  iife: ts.CallExpression,
+  exportAssignment?: ts.Expression,
+): ts.Statement {
   if (!ts.isParenthesizedExpression(iife.expression)
       || !ts.isFunctionExpression(iife.expression.expression)) {
     throw new Error('Invalid IIFE Structure');
+  }
+
+  // Ignore export assignment if variable is directly exported
+  if (hostNode.modifiers
+      && hostNode.modifiers.findIndex(m => m.kind == ts.SyntaxKind.ExportKeyword) != -1) {
+    exportAssignment = undefined;
   }
 
   const expression = iife.expression.expression;
@@ -415,6 +444,10 @@ function updateEnumIife(hostNode: ts.VariableStatement, iife: ts.CallExpression)
     ),
   );
 
+  let arg: ts.Expression = ts.createObjectLiteral();
+  if (exportAssignment) {
+    arg = ts.createBinary(exportAssignment, ts.SyntaxKind.BarBarToken, arg);
+  }
   const updatedIife = ts.updateCall(
     iife,
     ts.updateParen(
@@ -422,10 +455,18 @@ function updateEnumIife(hostNode: ts.VariableStatement, iife: ts.CallExpression)
       updatedFunction,
     ),
     iife.typeArguments,
-    iife.arguments,
+    [arg],
   );
 
-  return updateHostNode(hostNode, updatedIife);
+  let value: ts.Expression = addPureComment(updatedIife);
+  if (exportAssignment) {
+    value = ts.createBinary(
+      exportAssignment,
+      ts.SyntaxKind.FirstAssignment,
+      updatedIife);
+  }
+
+  return updateHostNode(hostNode, value);
 }
 
 function createWrappedEnum(
@@ -450,5 +491,5 @@ function createWrappedEnum(
     innerReturn,
   ]);
 
-  return updateHostNode(hostNode, ts.createParen(iife));
+  return updateHostNode(hostNode, addPureComment(ts.createParen(iife)));
 }
