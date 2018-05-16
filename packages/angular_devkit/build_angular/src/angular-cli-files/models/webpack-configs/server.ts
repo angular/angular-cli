@@ -17,6 +17,7 @@ import { WebpackConfigOptions } from '../build-options';
 export function getServerConfig(wco: WebpackConfigOptions) {
 
   const config: any = {
+    devtool: wco.buildOptions.sourceMap ? 'source-map' : false,
     resolve: {
       mainFields: [
         ...(wco.supportES2015 ? ['es2015'] : []),

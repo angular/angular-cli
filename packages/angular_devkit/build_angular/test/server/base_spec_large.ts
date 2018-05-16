@@ -30,4 +30,19 @@ describe('Server Builder', () => {
       }),
     ).subscribe(undefined, done.fail, done);
   }, Timeout.Standard);
+
+  it('supports sourcemaps', (done) => {
+    const overrides = { sourceMap: true };
+
+    runTargetSpec(host, { project: 'app', target: 'server' }, overrides).pipe(
+      tap((buildEvent) => {
+        expect(buildEvent.success).toBe(true);
+
+        const fileName = join(outputPath, 'main.js');
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+        expect(content).toMatch(/AppServerModuleNgFactory/);
+        expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBeTruthy();
+      }),
+    ).subscribe(undefined, done.fail, done);
+  }, Timeout.Standard);
 });
