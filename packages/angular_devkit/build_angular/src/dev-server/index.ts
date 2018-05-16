@@ -436,14 +436,12 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
   private _getBrowserOptions(options: DevServerBuilderOptions) {
     const architect = this.context.architect;
     const [project, target, configuration] = options.browserTarget.split(':');
-    // Override browser build watch setting.
-    const overrides = { watch: options.watch };
-    const browserTargetSpec = { project, target, configuration, overrides };
-    const builderConfig = architect.getBuilderConfiguration<BrowserBuilderSchema>(
-      browserTargetSpec);
 
-    // Update the browser options with the same options we support in serve, if defined.
-    builderConfig.options = {
+    const overrides = {
+      // Override browser build watch setting.
+      watch: options.watch,
+
+      // Update the browser options with the same options we support in serve, if defined.
       ...(options.optimization !== undefined ? { optimization: options.optimization } : {}),
       ...(options.aot !== undefined ? { aot: options.aot } : {}),
       ...(options.sourceMap !== undefined ? { sourceMap: options.sourceMap } : {}),
@@ -453,9 +451,11 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
       ...(options.baseHref !== undefined ? { baseHref: options.baseHref } : {}),
       ...(options.progress !== undefined ? { progress: options.progress } : {}),
       ...(options.poll !== undefined ? { poll: options.poll } : {}),
-
-      ...builderConfig.options,
     };
+
+    const browserTargetSpec = { project, target, configuration, overrides };
+    const builderConfig = architect.getBuilderConfiguration<BrowserBuilderSchema>(
+      browserTargetSpec);
 
     return architect.getBuilderDescription(builderConfig).pipe(
       concatMap(browserDescription =>
