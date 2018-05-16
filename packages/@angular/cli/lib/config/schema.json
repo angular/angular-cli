@@ -145,27 +145,10 @@
         "@schematics/angular:directive": {
           "type": "object",
           "properties": {
-            "prefix": {
-              "type": "string",
-              "format": "html-selector",
-              "description": "The prefix to apply to generated selectors.",
-              "default": "app",
-              "alias": "p"
-            },
-            "spec": {
+            "export": {
               "type": "boolean",
-              "description": "Specifies if a spec file is generated.",
-              "default": true
-            },
-            "skipImport": {
-              "type": "boolean",
-              "description": "Flag to skip the module import.",
-              "default": false
-            },
-            "selector": {
-              "type": "string",
-              "format": "html-selector",
-              "description": "The selector to use for the directive."
+              "default": false,
+              "description": "Specifies if declaring module exports the directive."
             },
             "flat": {
               "type": "boolean",
@@ -177,10 +160,27 @@
               "description": "Allows specification of the declaring module.",
               "alias": "m"
             },
-            "export": {
+            "prefix": {
+              "type": "string",
+              "format": "html-selector",
+              "description": "The prefix to apply to generated selectors.",
+              "default": "app",
+              "alias": "p"
+            },
+            "selector": {
+              "type": "string",
+              "format": "html-selector",
+              "description": "The selector to use for the directive."
+            },
+            "skipImport": {
               "type": "boolean",
-              "default": false,
-              "description": "Specifies if declaring module exports the directive."
+              "description": "Flag to skip the module import.",
+              "default": false
+            },
+            "spec": {
+              "type": "boolean",
+              "description": "Specifies if a spec file is generated.",
+              "default": true
             }
           }
         },
