@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Path, join, normalize } from '..';
+import { Path, join, normalize } from '../path';
 import { stringToFileBuffer } from './buffer';
 import { SimpleMemoryHost } from './memory';
 import { SyncDelegateHost } from './sync';

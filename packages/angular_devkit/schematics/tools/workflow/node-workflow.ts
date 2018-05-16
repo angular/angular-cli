@@ -18,9 +18,10 @@ import {
 } from '@angular-devkit/schematics';  // tslint:disable-line:no-implicit-dependencies
 import { Observable, Subject, concat, of, throwError } from 'rxjs';
 import { concatMap, defaultIfEmpty, ignoreElements, last, map, tap } from 'rxjs/operators';
-import { NodeModulesEngineHost, validateOptionsWithSchema } from '..';
 import { DryRunEvent } from '../../src/sink/dryrun';
 import { BuiltinTaskExecutor } from '../../tasks/node';
+import { NodeModulesEngineHost } from '../node-module-engine-host';
+import { validateOptionsWithSchema } from '../schema-option-transform';
 
 export class NodeWorkflow implements workflow.Workflow {
   protected _engine: SchematicEngine<{}, {}>;

@@ -7,8 +7,8 @@
  */
 import { Observable, concat, from, of as observableOf } from 'rxjs';
 import { concatMap, ignoreElements, mergeMap, tap } from 'rxjs/operators';
-import { JsonArray, JsonObject, JsonValue } from '..';
 import { isObservable } from '../../utils';
+import { JsonArray, JsonObject, JsonValue } from '../interface';
 import { JsonPointer } from './interface';
 import { buildJsonPointer, joinJsonPointer } from './pointer';
 

@@ -8,14 +8,14 @@
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { RuleFactory } from '../src';
+import { FileSystemCollectionDesc, FileSystemSchematicDesc } from './description';
+import { ExportStringRef } from './export-ref';
 import {
   CollectionCannotBeResolvedException,
   CollectionMissingSchematicsMapException,
+  FileSystemEngineHostBase,
   SchematicMissingFieldsException,
-} from '../tools';
-import { FileSystemCollectionDesc, FileSystemSchematicDesc } from './description';
-import { ExportStringRef } from './export-ref';
-import { FileSystemEngineHostBase } from './file-system-engine-host-base';
+} from './file-system-engine-host-base';
 
 
 /**

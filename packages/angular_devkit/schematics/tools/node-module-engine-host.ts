@@ -10,16 +10,16 @@ import * as core from '@angular-devkit/core/node';
 import { dirname, join, resolve as resolvePath } from 'path';
 import { RuleFactory } from '../src';
 import {
-  CollectionCannotBeResolvedException,
-  CollectionMissingSchematicsMapException,
-  SchematicMissingFieldsException,
-} from '../tools';
-import {
   FileSystemCollectionDesc,
   FileSystemSchematicDesc,
 } from './description';
 import { ExportStringRef } from './export-ref';
-import { FileSystemEngineHostBase } from './file-system-engine-host-base';
+import {
+  CollectionCannotBeResolvedException,
+  CollectionMissingSchematicsMapException,
+  FileSystemEngineHostBase,
+  SchematicMissingFieldsException,
+} from './file-system-engine-host-base';
 import { readJsonFile } from './file-system-utility';
 
 

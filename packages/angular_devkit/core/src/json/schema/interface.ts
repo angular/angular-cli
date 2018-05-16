@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Observable } from 'rxjs';
-import { JsonArray, JsonObject, JsonValue } from '..';
+import { JsonArray, JsonObject, JsonValue } from '../interface';
 
 export type JsonPointer = string & {
   __PRIVATE_DEVKIT_JSON_POINTER: void;
