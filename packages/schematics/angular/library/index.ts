@@ -246,7 +246,9 @@ export default function (options: LibraryOptions): Rule {
         project: options.name,
       }),
       (_tree: Tree, context: SchematicContext) => {
-        context.addTask(new NodePackageInstallTask());
+        if (!options.skipPackageJson) {
+          context.addTask(new NodePackageInstallTask());
+        }
       },
     ])(host, context);
   };
