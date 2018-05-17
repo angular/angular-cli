@@ -275,7 +275,6 @@ export default function (options: ApplicationOptions): Rule {
       name: `${options.name}-e2e`,
       relatedAppName: options.name,
       rootSelector: appRootSelector,
-      prefix: options.prefix || 'app',
     };
     if (options.projectRoot !== undefined) {
       e2eOptions.projectRoot = 'e2e';
