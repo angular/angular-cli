@@ -1566,7 +1566,7 @@
             },
             "format": {
               "type": "string",
-              "description": "Output format (prose, json, stylish, verbose, pmd, msbuild, checkstyle, vso, fileslist).",
+              "description": "Output format (prose, json, stylish, verbose, pmd, msbuild, checkstyle, vso, fileslist, codeFrame).",
               "default": "prose",
               "enum": [
                 "prose",
@@ -1577,7 +1577,8 @@
                 "msbuild",
                 "checkstyle",
                 "vso",
-                "fileslist"
+                "fileslist",
+                "codeFrame"
               ]
             },
             "exclude": {

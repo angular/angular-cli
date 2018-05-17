@@ -70,6 +70,6 @@ ng lint [project]
     <code>--format</code>
   </p>
   <p>
-    Output format (prose, json, stylish, verbose, pmd, msbuild, checkstyle, vso, fileslist).
+    Output format (prose, json, stylish, verbose, pmd, msbuild, checkstyle, vso, fileslist, codeFrame).
   </p>
 </details>
