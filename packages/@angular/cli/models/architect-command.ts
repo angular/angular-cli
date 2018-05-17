@@ -239,6 +239,11 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
 
       overrides = { ...options };
       delete overrides.target;
+
+      if (overrides.configuration) {
+        configuration = overrides.configuration;
+        delete overrides.configuration;
+      }
     } else {
       project = options.project;
       target = this.target;
