@@ -149,7 +149,11 @@ function normalizeValue(value: string, path: string): JsonValue {
     throw new Error(`Invalid value type; expected a ${cliOptionType}.`);
   }
 
-  return parseJson(value, JsonParseMode.Loose);
+  if (typeof value === 'string') {
+    return parseJson(value, JsonParseMode.Loose);
+  }
+
+  return value;
 }
 
 export default class ConfigCommand extends Command {
