@@ -172,6 +172,7 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
     } catch (e) {
       if (e instanceof schema.SchemaValidationException) {
         const newErrors: schema.SchemaValidatorError[] = [];
+        let fatalErrors = 0;
         e.errors.forEach(schemaError => {
           if (schemaError.keyword === 'additionalProperties') {
             const unknownProperty = schemaError.params.additionalProperty;
@@ -179,11 +180,15 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
               const dashes = unknownProperty.length === 1 ? '-' : '--';
               this.logger.fatal(`Unknown option: '${dashes}${unknownProperty}'`);
 
-              return 1;
+              fatalErrors++;
             }
           }
           newErrors.push(schemaError);
         });
+
+        if (fatalErrors > 0) {
+          return 1;
+        }
 
         if (newErrors.length > 0) {
           this.logger.error(new schema.SchemaValidationException(newErrors).message);
