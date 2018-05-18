@@ -77,6 +77,11 @@ function addAppToWorkspaceFile(options: E2eOptions, workspace: WorkspaceSchema):
             protractorConfig: `${projectRoot}protractor.conf.js`,
             devServerTarget: `${options.relatedAppName}:serve`,
           },
+          configurations: {
+            production: {
+              devServerTarget: `${options.relatedAppName}:serve:production`,
+            },
+          },
         },
         lint: {
           builder: '@angular-devkit/build-angular:tslint',
