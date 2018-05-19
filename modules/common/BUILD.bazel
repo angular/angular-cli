@@ -11,7 +11,9 @@ ng_module(
         "src/**/*.ts",
     ]),
     module_name = "@nguniversal/common",
-    deps = [],
+    deps = [
+        "//modules/common/tokens",
+    ],
 )
 
 ng_package(
@@ -19,7 +21,10 @@ ng_package(
     srcs = [":package.json"],
     entry_point = "modules/common/index.js",
     readme_md = ":README.md",
-    deps = [":common"],
+    deps = [
+        ":common",
+        "//modules/common/tokens",
+    ],
 )
 
 ts_library(
