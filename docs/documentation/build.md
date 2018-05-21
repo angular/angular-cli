@@ -78,6 +78,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
   </p>
   <p>
     Specify the configuration to use.
+    Note: Prior to version 6.0.0 this flag was --env
   </p>
 </details>
 <details>
