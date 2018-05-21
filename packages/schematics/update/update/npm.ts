@@ -8,37 +8,64 @@
 import { logging } from '@angular-devkit/core';
 import { exec } from 'child_process';
 import { Observable, ReplaySubject, concat, of } from 'rxjs';
-import { concatMap, filter, first, map, toArray } from 'rxjs/operators';
+import { concatMap, defaultIfEmpty, filter, first, map, toArray } from 'rxjs/operators';
 import * as url from 'url';
 import { NpmRepositoryPackageJson } from './npm-package-json';
 
 const RegistryClient = require('npm-registry-client');
 
 const npmPackageJsonCache = new Map<string, Observable<NpmRepositoryPackageJson>>();
+const npmConfigOptionCache = new Map<string, Observable<string | undefined>>();
 
+function getNpmConfigOption(
+  option: string,
+  scope?: string,
+  tryWithoutScope?: boolean,
+): Observable<string | undefined> {
+  if (scope && tryWithoutScope) {
+    return concat(
+      getNpmConfigOption(option, scope),
+      getNpmConfigOption(option),
+    ).pipe(
+      filter(result => !!result),
+      defaultIfEmpty(),
+      first(),
+    );
+  }
 
-function getNpmConfigOption(option: string) {
-  return new Observable<string | undefined>(obs => {
-    try {
-      exec(`npm get ${option}`, (error, data) => {
-        if (error) {
-          obs.next();
+  const fullOption = `${scope ? scope + ':' : ''}${option}`;
+
+  let value = npmConfigOptionCache.get(fullOption);
+  if (value) {
+    return value;
+  }
+
+  const subject = new ReplaySubject<string | undefined>(1);
+
+  try {
+    exec(`npm get ${fullOption}`, (error, data) => {
+      if (error) {
+        subject.next();
+      } else {
+        data = data.trim();
+        if (!data || data === 'undefined' || data === 'null') {
+          subject.next();
         } else {
-          data = data.trim();
-          if (!data || data === 'undefined' || data === 'null') {
-            obs.next();
-          } else {
-            obs.next(data);
-          }
+          subject.next(data);
         }
+      }
 
-        obs.complete();
-      });
-    } catch {
-      obs.next();
-      obs.complete();
-    }
-  });
+      subject.complete();
+    });
+  } catch {
+    subject.next();
+    subject.complete();
+  }
+
+  value = subject.asObservable();
+  npmConfigOptionCache.set(fullOption, value);
+
+  return value;
 }
 
 /**
@@ -54,15 +81,11 @@ export function getNpmPackageJson(
   registryUrl: string | undefined,
   logger: logging.LoggerApi,
 ): Observable<Partial<NpmRepositoryPackageJson>> {
-  const scope = packageName.startsWith('@') ? packageName.split('/')[0] : null;
+  const scope = packageName.startsWith('@') ? packageName.split('/')[0] : undefined;
 
-  return concat(
-    of(registryUrl),
-    scope ? getNpmConfigOption(scope + ':registry') : of(undefined),
-    getNpmConfigOption('registry'),
+  return (
+    registryUrl ? of(registryUrl) : getNpmConfigOption('registry', scope, true)
   ).pipe(
-    filter(partialUrl => !!partialUrl),
-    first(),
     map(partialUrl => {
       if (!partialUrl) {
         partialUrl = 'https://registry.npmjs.org/';
