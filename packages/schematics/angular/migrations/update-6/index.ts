@@ -478,9 +478,15 @@ function extractProjectsConfig(
 
       const tsConfigs: string[] = [];
       const excludes: string[] = [];
+      let warnForLint = false;
       if (config && config.lint && Array.isArray(config.lint)) {
         config.lint.forEach(lint => {
-          tsConfigs.push(lint.project);
+          if (lint.project) {
+            tsConfigs.push(lint.project);
+          } else {
+            warnForLint = true;
+          }
+
           if (lint.exclude) {
             if (typeof lint.exclude === 'string') {
               excludes.push(lint.exclude);
@@ -489,6 +495,12 @@ function extractProjectsConfig(
             }
           }
         });
+      }
+
+      if (warnForLint) {
+        logger.warn(`
+          Lint without 'project' was not migrated which is not supported in Angular CLI 6.
+        `);
       }
 
       const removeDupes = (items: string[]) => items.reduce((newItems, item) => {
