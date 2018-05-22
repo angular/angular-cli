@@ -1,9 +1,8 @@
-import {ng} from '../../../utils/process';
-import {expectToFail} from '../../../utils/utils';
-import { expectFileToExist } from '../../../utils/fs';
-import * as path from 'path';
 import { homedir } from 'os';
-import { deleteFile } from '../../../utils/fs';
+import * as path from 'path';
+import { deleteFile, expectFileToExist } from '../../../utils/fs';
+import { ng } from '../../../utils/process';
+import { expectToFail } from '../../../utils/utils';
 
 
 export default function() {
@@ -16,9 +15,10 @@ export default function() {
         throw new Error(`Expected "false", received "${JSON.stringify(stdout)}".`);
       }
     })
-    .then(() => expectToFail(() => {
-      return ng('config', '--global', 'schematics.@schematics/angular.component.inlineStyle', 'INVALID_BOOLEAN');
-    }))
+    // This test requires schema querying capabilities
+    // .then(() => expectToFail(() => {
+    //   return ng('config', '--global', 'schematics.@schematics/angular.component.inlineStyle', 'INVALID_BOOLEAN');
+    // }))
     .then(() => ng('config', '--global', 'schematics.@schematics/angular.component.inlineStyle', 'true'))
     .then(() => ng('config', '--global', 'schematics.@schematics/angular.component.inlineStyle'))
     .then(({ stdout }) => {

@@ -1,3 +1,13 @@
+import {
+  InvalidJsonCharacterException,
+  JsonArray,
+  JsonObject,
+  JsonParseMode,
+  JsonValue,
+  experimental,
+  parseJson,
+  tags,
+} from '@angular-devkit/core';
 import { writeFileSync } from 'fs';
 import { Command, Option } from '../models/command';
 import {
@@ -6,15 +16,6 @@ import {
   migrateLegacyGlobalConfig,
   validateWorkspace,
 } from '../utilities/config';
-import {
-  JsonValue,
-  JsonArray,
-  JsonObject,
-  JsonParseMode,
-  experimental,
-  parseJson,
-  tags,
-} from '@angular-devkit/core';
 
 const SilentError = require('silent-error');
 
@@ -152,7 +153,15 @@ function normalizeValue(value: string, path: string): JsonValue {
   }
 
   if (typeof value === 'string') {
-    return parseJson(value, JsonParseMode.Loose);
+    try {
+      return parseJson(value, JsonParseMode.Loose);
+    } catch (e) {
+      if (e instanceof InvalidJsonCharacterException && !value.startsWith('{')) {
+        return value;
+      } else {
+        throw e;
+      }
+    }
   }
 
   return value;
