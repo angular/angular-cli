@@ -79,5 +79,8 @@ export function runModuleAsObservableFork(
       exportName,
       args,
     });
+
+    // Teardown logic. When unsubscribing, kill the forked process.
+    return killForkedProcess;
   });
 }
