@@ -1,4 +1,5 @@
 import {
+  InvalidJsonCharacterException,
   JsonArray,
   JsonObject,
   JsonParseMode,
@@ -150,7 +151,15 @@ function normalizeValue(value: string, path: string): JsonValue {
   }
 
   if (typeof value === 'string') {
-    return parseJson(value, JsonParseMode.Loose);
+    try {
+      return parseJson(value, JsonParseMode.Loose);
+    } catch (e) {
+      if (e instanceof InvalidJsonCharacterException && !value.startsWith('{')) {
+        return value;
+      } else {
+        throw e;
+      }
+    }
   }
 
   return value;
