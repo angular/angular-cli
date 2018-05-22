@@ -86,7 +86,7 @@ describe('prefix-functions', () => {
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('doesn\'t adds comment when inside function declarations or expressions', () => {
+    it('doesn\'t add comment when inside function declarations or expressions', () => {
       const input = tags.stripIndent`
         function funcDecl() {
           var newClazz = Clazz();
@@ -97,6 +97,25 @@ describe('prefix-functions', () => {
           var newClazz = Clazz();
           var newClazzTwo = new Clazz();
         };
+      `;
+      const output = tags.stripIndent`
+        ${emptyImportsComment}
+        ${input}
+      `;
+
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('doesn\'t add comment to downlevel namespaces', () => {
+      const input = tags.stripIndent`
+        function MyFunction() { }
+
+        (function (MyFunction) {
+            function subFunction() { }
+            MyFunction.subFunction = subFunction;
+        })(MyFunction || (MyFunctionn = {}));
+
+        export { MyFunction };
       `;
       const output = tags.stripIndent`
         ${emptyImportsComment}

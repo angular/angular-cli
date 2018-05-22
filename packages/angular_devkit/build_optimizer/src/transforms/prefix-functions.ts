@@ -30,7 +30,7 @@ export function getPrefixFunctionsTransformer(): ts.TransformerFactory<ts.Source
         }
 
         // Add pure function comment to top level functions.
-        if (topLevelFunctions.indexOf(node) !== -1) {
+        if (topLevelFunctions.has(node)) {
           const newNode = ts.addSyntheticLeadingComment(
             node, ts.SyntaxKind.MultiLineCommentTrivia, pureFunctionComment, false);
 
@@ -49,13 +49,12 @@ export function getPrefixFunctionsTransformer(): ts.TransformerFactory<ts.Source
   };
 }
 
-export function findTopLevelFunctions(parentNode: ts.Node): ts.Node[] {
-  const topLevelFunctions: ts.Node[] = [];
+export function findTopLevelFunctions(parentNode: ts.Node): Set<ts.Node> {
+  const topLevelFunctions = new Set<ts.Node>();
 
   function cb(node: ts.Node) {
     // Stop recursing into this branch if it's a function expression or declaration
-    if (node.kind === ts.SyntaxKind.FunctionDeclaration
-      || node.kind === ts.SyntaxKind.FunctionExpression) {
+    if (ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node)) {
       return;
     }
 
@@ -71,9 +70,24 @@ export function findTopLevelFunctions(parentNode: ts.Node): ts.Node[] {
     }
 
     if (noPureComment) {
-      if (innerNode.kind === ts.SyntaxKind.CallExpression
-          || innerNode.kind === ts.SyntaxKind.NewExpression) {
-        topLevelFunctions.push(node);
+      if (ts.isNewExpression(innerNode)) {
+        topLevelFunctions.add(node);
+      } else if (ts.isCallExpression(innerNode)) {
+        let expression: ts.Expression = innerNode.expression;
+        while (expression && ts.isParenthesizedExpression(expression)) {
+          expression = expression.expression;
+        }
+        if (expression) {
+          if (ts.isFunctionExpression(expression)) {
+            // Skip IIFE's with arguments
+            // This could be improved to check if there are any references to variables
+            if (innerNode.arguments.length === 0) {
+              topLevelFunctions.add(node);
+            }
+          } else {
+            topLevelFunctions.add(node);
+          }
+        }
       }
     }
 
