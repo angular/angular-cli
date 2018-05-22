@@ -133,6 +133,16 @@
       "version": "0.0.0",
       "snapshotRepo": "angular/angular-devkit-build-webpack-builds"
     },
+    "@angular-devkit/build-karma": {
+      "name": "Build Karma",
+      "links": [
+        {
+          "label": "README",
+          "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_karma/README.md"
+        }
+      ],
+      "version": "0.0.0"
+    },
     "@angular-devkit/core": {
       "name": "Core",
       "links": [

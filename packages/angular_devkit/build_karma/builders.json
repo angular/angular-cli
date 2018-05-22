@@ -1,0 +1,10 @@
+{
+  "$schema": "../architect/src/builders-schema.json",
+  "builders": {
+    "karma": {
+      "class": "./src/karma",
+      "schema": "./src/karma/schema.json",
+      "description": "Run Karma."
+    }
+  }
+}

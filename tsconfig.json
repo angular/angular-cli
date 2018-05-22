@@ -48,6 +48,7 @@
       "@angular-devkit/architect": [ "./packages/angular_devkit/architect/src/index" ],
       "@angular-devkit/architect/testing": [ "./packages/angular_devkit/architect/testing/index" ],
       "@angular-devkit/build-webpack": [ "./packages/angular_devkit/build_webpack/src/index" ],
+      "@angular-devkit/build-karma": [ "./packages/angular_devkit/build_karma/src/index" ],
       "@ngtools/webpack": [ "./packages/ngtools/webpack/src/index" ],
       "@ngtools/webpack/*": [ "./packages/ngtools/webpack/*" ],
       "@schematics/angular": [ "./packages/schematics/angular/index" ]
