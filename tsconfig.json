@@ -27,15 +27,9 @@
     "types": [
       "jasmine",
       "node"
-    ],
-    "paths": {
-      "@ngtools/json-schema": [ "./packages/@ngtools/json-schema/src" ],
-      "@ngtools/logger": [ "./packages/@ngtools/logger/src" ],
-      "@ngtools/webpack": [ "./packages/@ngtools/webpack/src" ]
-    }
+    ]
   },
   "exclude": [
-    "packages/@angular/cli/blueprints/*/files/**/*",
     "dist/**/*",
     "node_modules/**/*",
     "tmp/**/*"
