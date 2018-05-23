@@ -29,8 +29,6 @@ import { KarmaWebpackFailureCb } from './karma-webpack-failure-cb';
 let blocked: any[] = [];
 let isBlocked = false;
 let webpackMiddleware: any;
-let successCb: () => void;
-let failureCb: () => void;
 
 // Add files to the Karma files array.
 function addKarmaFiles(files: any[], newFiles: any[], prepend = false) {
@@ -58,15 +56,15 @@ function addKarmaFiles(files: any[], newFiles: any[], prepend = false) {
 const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   if (!config.buildWebpack) {
     throw new Error(`The '@angular-devkit/build-angular/plugins/karma' karma plugin is meant to` +
-    ` be used from within Angular CLI and will not work correctly outside of it.`
+      ` be used from within Angular CLI and will not work correctly outside of it.`
     )
   }
   const options = config.buildWebpack.options;
   const projectRoot = config.buildWebpack.projectRoot as string;
-  successCb = config.buildWebpack.successCb;
-  failureCb = config.buildWebpack.failureCb;
 
-  config.reporters.unshift('@angular-devkit/build-angular--event-reporter');
+  // Automatically add the build-karma reporter, and re-export it together with our exports.
+  config.reporters.unshift('@angular-devkit/build-karma');
+
   // Add a reporter that fixes sourcemap urls.
   if (options.sourceMap) {
     config.reporters.unshift('@angular-devkit/build-angular--sourcemap-reporter');
@@ -212,21 +210,6 @@ function requestBlocker() {
   };
 }
 
-// Emits builder events.
-const eventReporter: any = function (this: any, baseReporterDecorator: any) {
-  baseReporterDecorator(this);
-
-  this.onRunComplete = function (_browsers: any, results: any) {
-    if (results.exitCode === 0) {
-      successCb && successCb();
-    } else {
-      failureCb && failureCb();
-    }
-  }
-};
-
-eventReporter.$inject = ['baseReporterDecorator'];
-
 // Strip the server address and webpack scheme (webpack://) from error log.
 const sourceMapReporter: any = function (this: any, baseReporterDecorator: any, config: any) {
   baseReporterDecorator(this);
@@ -274,7 +257,8 @@ function fallbackMiddleware() {
 module.exports = {
   'framework:@angular-devkit/build-angular': ['factory', init],
   'reporter:@angular-devkit/build-angular--sourcemap-reporter': ['type', sourceMapReporter],
-  'reporter:@angular-devkit/build-angular--event-reporter': ['type', eventReporter],
   'middleware:@angular-devkit/build-angular--blocker': ['factory', requestBlocker],
-  'middleware:@angular-devkit/build-angular--fallback': ['factory', fallbackMiddleware]
+  'middleware:@angular-devkit/build-angular--fallback': ['factory', fallbackMiddleware],
+  // Re-export the build-karma plugin. We need to do this because we auto-add it's reporter.
+  ...require('@angular-devkit/build-karma/plugins/karma')
 };
