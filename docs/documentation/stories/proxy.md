@@ -26,7 +26,7 @@ We can then add the `proxyConfig` option to the serve target:
     "builder": "@angular-devkit/build-angular:dev-server",
     "options": {
       "browserTarget": "your-application-name:build",
-      "proxyConfig": "src/proxy.conf.json"
+      "proxyConfig": "proxy.conf.json"
     },
 ```
 
