@@ -7,16 +7,11 @@
  */
 import {NgModuleFactory, StaticProvider, Type} from '@angular/core';
 
-/** These are the allowed options for the engine */
-export interface NgSetupOptions {
+/** These are the allowed options for the render */
+export interface RenderOptions {
   bootstrap: Type<{}> | NgModuleFactory<{}>;
   providers?: StaticProvider[];
-}
-
-/** These are the allowed options for the render */
-export interface RenderOptions extends NgSetupOptions {
-  req: any;
-  res?: any;
-  document?: string;
   url?: string;
+  document?: string;
+  documentFilePath?: string;
 }

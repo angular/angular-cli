@@ -38,23 +38,23 @@ export class CommonEngine {
    * Render an HTML document for a specific URL with specified
    * render options
    */
-  render(filePath: string, opts: RenderOptions): Promise<string> {
+  async render(opts: RenderOptions): Promise<string> {
+    // if opts.document dosen't exist then opts.documentFilePath must
+    const doc = opts.document || await this.getDocument(opts!.documentFilePath as string);
     const extraProviders = [
       ...(opts.providers || []),
       ...(this.providers || []),
-      [
-        {
-          provide: INITIAL_CONFIG,
-          useValue: {
-            document: opts.document || this.getDocument(filePath),
-            url: opts.url
-          }
+      {
+        provide: INITIAL_CONFIG,
+        useValue: {
+          document: doc,
+          url: opts.url
         }
-      ]
+      }
     ];
 
-    return this.getFactory()
-      .then(factory => renderModuleFactory(factory, {extraProviders}));
+    const factory = await this.getFactory();
+    return renderModuleFactory(factory, {extraProviders});
   }
 
   /** Return the factory for a given engine instance */
