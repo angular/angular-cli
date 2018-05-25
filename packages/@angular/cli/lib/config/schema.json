@@ -81,6 +81,11 @@
               "default": "Default",
               "alias": "c"
             },
+            "entryComponent": {
+              "type": "boolean",
+              "default": false,
+              "description": "Specifies if the component is an entry component of declaring module."
+            },
             "export": {
               "type": "boolean",
               "default": false,
