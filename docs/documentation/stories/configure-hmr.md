@@ -41,23 +41,46 @@ export const environment = {
 ```
 
 
-Update `angular.json` to include an hmr environment as explained [here](./application-environments) and add a configuration within serve to enable hmr.
+Update `angular.json` to include an hmr environment as explained [here](./application-environments)
+and add configurations within build and serve to enable hmr. Note that `<project-name>` here 
+represents the name of the project you are adding this configuration to in `angular.json`.
 
 ```json
-  "serve": {
-    "configuration": {
+  "build": {
+    "configurations": {
       ...
       "hmr": {
-        "hmr": true,
         "fileReplacements": [
           {
             "replace": "src/environments/environment.ts",
             "with": "src/environments/environment.hmr.ts"
           }
-        ],
+        ]
+      }
+    }
+  },
+  ...
+  "serve": {
+    "configurations": {
+      ...
+      "hmr": {
+        "hmr": true,
+        "browserTarget": "<project-name>:build:hmr"
       }
     }
   }
+```
+
+Add the necessary types to  `src/tsconfig.app.json`
+
+```json
+{
+  ...
+  "compilerOptions": {
+    ...
+    "types": ["node"]
+  },
+}
 ```
 
 Run `ng serve` with the flag `--configuration hmr` to enable hmr and select the new environment:
@@ -134,7 +157,7 @@ if (environment.hmr) {
     console.log('Are you using the --hmr flag for ng serve?');
   }
 } else {
-  bootstrap();
+  bootstrap().catch(err => console.log(err));
 }
 ```
 
