@@ -14,7 +14,7 @@ import {
   chain,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import * as http from 'http';
+import * as https from 'https';
 import {
   EMPTY,
   Observable,
@@ -81,14 +81,14 @@ function _getNpmPackageJson(
   packageName: string,
   logger: logging.LoggerApi,
 ): Observable<JsonObject> {
-  const url = `http://registry.npmjs.org/${packageName.replace(/\//g, '%2F')}`;
+  const url = `https://registry.npmjs.org/${packageName.replace(/\//g, '%2F')}`;
   logger.debug(`Getting package.json from ${JSON.stringify(packageName)}...`);
 
   let maybeRequest = npmPackageJsonCache.get(url);
   if (!maybeRequest) {
     const subject = new ReplaySubject<JsonObject>(1);
 
-    const request = http.request(url, response => {
+    const request = https.request(url, response => {
       let data = '';
       response.on('data', chunk => data += chunk);
       response.on('end', () => {
@@ -211,7 +211,7 @@ function _getRecursiveVersions(
 
 /**
  * Use a Rule which can return an observable, but do not actually modify the Tree.
- * This rules perform an HTTP request to get the npm registry package.json, then resolve the
+ * This rules perform an HTTPS request to get the npm registry package.json, then resolve the
  * version from the options, and replace the version in the options by an actual version.
  * @param supportedPackages A list of packages to update (at the same version).
  * @param maybeVersion A version to update those packages to.
