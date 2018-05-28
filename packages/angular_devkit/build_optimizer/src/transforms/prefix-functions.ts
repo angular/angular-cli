@@ -53,8 +53,11 @@ export function findTopLevelFunctions(parentNode: ts.Node): Set<ts.Node> {
   const topLevelFunctions = new Set<ts.Node>();
 
   function cb(node: ts.Node) {
-    // Stop recursing into this branch if it's a function expression or declaration
-    if (ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node)) {
+    // Stop recursing into this branch if it's a function expression or declaration, or a class.
+    if (ts.isFunctionDeclaration(node)
+      || ts.isFunctionExpression(node)
+      || ts.isClassDeclaration(node)
+    ) {
       return;
     }
 

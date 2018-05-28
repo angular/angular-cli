@@ -124,5 +124,24 @@ describe('prefix-functions', () => {
 
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
+
+    it('doesn\'t add comment when inside class', () => {
+      const input = tags.stripIndent`
+        class Foo {
+          constructor(e) {
+            super(e);
+          }
+          method() {
+            var newClazz = new Clazz();
+          }
+        }
+      `;
+      const output = tags.stripIndent`
+        ${emptyImportsComment}
+        ${input}
+      `;
+
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
   });
 });
