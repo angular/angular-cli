@@ -682,6 +682,9 @@ describe('Migration to v6', () => {
         preprocessors: {
           './src/test.ts': ['@angular/cli']
         },
+        angularCli: {
+          environment: 'dev'
+        },
       `);
 
       tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
@@ -689,6 +692,7 @@ describe('Migration to v6', () => {
       const content = tree.readContent(karmaPath);
       expect(content).not.toContain(`{ pattern: './src/test.ts', watched: false }`);
       expect(content).not.toContain(`'./src/test.ts': ['@angular/cli']`);
+      expect(content).not.toMatch(/angularCli[^}]*},?/);
     });
   });
 

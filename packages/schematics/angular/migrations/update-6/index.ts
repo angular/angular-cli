@@ -78,6 +78,7 @@ function migrateKarmaConfiguration(config: CliConfig): Rule {
         content = content.replace(`{ pattern: './src/test.ts', watched: false }`, '');
         content = content.replace(`'./src/test.ts': ['@angular/cli'],`, '');
         content = content.replace(`'./src/test.ts': ['@angular/cli']`, '');
+        content = content.replace(/angularCli[^}]*},?/, '');
         // Replace 1.x plugin names.
         content = content.replace(/@angular\/cli/g, '@angular-devkit/build-angular');
         // Replace code coverage output path.
