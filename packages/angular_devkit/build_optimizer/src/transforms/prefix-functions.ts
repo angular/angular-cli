@@ -53,8 +53,12 @@ export function findTopLevelFunctions(parentNode: ts.Node): Set<ts.Node> {
   const topLevelFunctions = new Set<ts.Node>();
 
   function cb(node: ts.Node) {
-    // Stop recursing into this branch if it's a function expression or declaration, a class, or
-    // a arrow function (lambda).
+    // Stop recursing into this branch if it's a definition construct.
+    // These are function expression, function declaration, class, or arrow function (lambda).
+    // The body of these constructs will not execute when loading the module, so we don't
+    // need to mark function calls inside them as pure.
+    // Class static initializers in ES2015 are an exception we don't cover. They would need similar
+    // processing as enums to prevent property setting from causing the class to be retained.
     if (ts.isFunctionDeclaration(node)
       || ts.isFunctionExpression(node)
       || ts.isClassDeclaration(node)
