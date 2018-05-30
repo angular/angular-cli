@@ -161,9 +161,11 @@ describe('@schematics/update', () => {
     dependencies['@angular/animations'] = '5.1.0';
     dependencies['@angular/common'] = '5.1.0';
     dependencies['@angular/compiler'] = '5.1.0';
+    dependencies['@angular/compiler-cli'] = '5.1.0';
     dependencies['@angular/platform-browser'] = '5.1.0';
     dependencies['rxjs'] = '5.5.0';
     dependencies['zone.js'] = '0.8.26';
+    dependencies['typescript'] = '2.4.2';
     host.sync.write(
       normalize('/package.json'),
       virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
@@ -176,6 +178,9 @@ describe('@schematics/update', () => {
       map(tree => {
         const packageJson = JSON.parse(tree.readContent('/package.json'));
         expect(packageJson['dependencies']['@angular/core'][0]).toBe('6');
+        expect(packageJson['dependencies']['rxjs'][0]).toBe('6');
+        expect(packageJson['dependencies']['typescript'][0]).toBe('2');
+        expect(packageJson['dependencies']['typescript'][2]).toBe('7');
 
         // Check install task.
         expect(schematicRunner.tasks).toEqual([

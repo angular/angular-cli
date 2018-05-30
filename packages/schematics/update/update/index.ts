@@ -790,10 +790,16 @@ export default function(options: UpdateSchema): Rule {
 
       map(npmPackageJsonMap => {
         // Augment the command line package list with packageGroups and forward peer dependencies.
-        npmPackageJsonMap.forEach((npmPackageJson) => {
-          _addPackageGroup(packages, allDependencies, npmPackageJson, logger);
-          _addPeerDependencies(packages, allDependencies, npmPackageJson, logger);
-        });
+        // Each added package may uncover new package groups and peer dependencies, so we must
+        // repeat this process until the package list stabilizes.
+        let lastPackagesSize;
+        do {
+          lastPackagesSize = packages.size;
+          npmPackageJsonMap.forEach((npmPackageJson) => {
+            _addPackageGroup(packages, allDependencies, npmPackageJson, logger);
+            _addPeerDependencies(packages, allDependencies, npmPackageJson, logger);
+          });
+        } while (packages.size > lastPackagesSize);
 
         // Build the PackageInfo for each module.
         const packageInfoMap = new Map<string, PackageInfo>();
