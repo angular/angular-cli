@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, normalize } from '@angular-devkit/core';
+import { JsonObject, dirname, join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -92,9 +92,8 @@ function getComponentTemplate(host: Tree, compPath: string, tmplInfo: TemplateIn
     template = tmplInfo.templateProp.getFullText();
   } else if (tmplInfo.templateUrlProp) {
     const templateUrl = (tmplInfo.templateUrlProp.initializer as ts.StringLiteral).text;
-    const dirEntry = host.getDir(compPath);
-    const dir = dirEntry.parent ? dirEntry.parent.path : '/';
-    const templatePath = normalize(`/${dir}/${templateUrl}`);
+    const dir = dirname(normalize(compPath));
+    const templatePath = join(dir, templateUrl);
     const buffer = host.read(templatePath);
     if (buffer) {
       template = buffer.toString();
@@ -131,11 +130,7 @@ function getBootstrapComponentPath(host: Tree, project: WorkspaceProject): strin
       return pathStringLiteral.text;
     })[0];
 
-  const dirEntry = host.getDir(modulePath);
-  const dir = dirEntry.parent ? dirEntry.parent.path : '/';
-  const compPath = normalize(`/${dir}/${relativePath}.ts`);
-
-  return compPath;
+  return join(dirname(normalize(modulePath)), relativePath + '.ts');
 }
 // end helper functions.
 
@@ -310,16 +305,13 @@ function addServerRoutes(options: AppShellOptions): Rule {
 }
 
 function addShellComponent(options: AppShellOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
-
-    const componentOptions: ComponentOptions = {
-      name: 'app-shell',
-      module: options.rootModuleFileName,
-      project: options.clientProject,
-    };
-
-    return schematic('component', componentOptions)(host, context);
+  const componentOptions: ComponentOptions = {
+    name: 'app-shell',
+    module: options.rootModuleFileName,
+    project: options.clientProject,
   };
+
+  return schematic('component', componentOptions);
 }
 
 function getClientProject(host: Tree, options: AppShellOptions): WorkspaceProject {
