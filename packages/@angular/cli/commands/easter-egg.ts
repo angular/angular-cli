@@ -12,7 +12,7 @@ export default class AwesomeCommand extends Command {
   readonly arguments: string[] = [];
   readonly options: Option[] = [];
 
-  run(_options: any) {
+  run() {
     const phrase = pickOne([
       `You're on it, there's nothing for me to do!`,
       `Let's take a look... nope, it's all good!`,

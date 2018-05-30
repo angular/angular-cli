@@ -18,6 +18,7 @@ export default class BuildCommand extends ArchitectCommand {
     // Check Angular and TypeScript versions.
     Version.assertCompatibleAngularVersion(this.project.root);
     Version.assertTypescriptVersion(this.project.root);
+
     return super.validate(options);
   }
 

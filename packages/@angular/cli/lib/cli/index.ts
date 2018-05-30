@@ -39,7 +39,7 @@ function loadCommands() {
   };
 }
 
-export default async function(options: any) {
+export default async function(options: { testing?: boolean, cliArgs: string[] }) {
   const commands = loadCommands();
 
   const logger = new logging.IndentLogger('cling');
@@ -83,6 +83,7 @@ export default async function(options: any) {
     }
 
     loggingSubscription.unsubscribe();
+
     return 1;
   }
 }

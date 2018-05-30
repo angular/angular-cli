@@ -1,3 +1,4 @@
+// tslint:disable:no-any
 import { tags, terminal } from '@angular-devkit/core';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
 import { CommandScope, Option } from '../models/command';
