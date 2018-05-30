@@ -1,22 +1,44 @@
-import { tags } from '@angular-devkit/core';
-import { Command, Option } from '../models/command';
+import { CommandScope, Option } from '../models/command';
+import { CoreSchematicOptions, SchematicCommand } from '../models/schematic-command';
 
 
-export default class EjectCommand extends Command {
+export interface EjectOptions extends CoreSchematicOptions { }
+
+export default class EjectCommand extends SchematicCommand {
   public readonly name = 'eject';
-  public readonly description = 'Temporarily disabled. Ejects your app and output the proper '
-                              + 'webpack configuration and scripts.';
-  public readonly arguments: string[] = [];
-  public readonly options: Option[] = [];
+  public readonly description = 'Create a basic Webpack configuration for your app.';
+  public static aliases: string[] = [];
+  public readonly scope = CommandScope.everywhere;
+  public arguments: string[] = [];
+  public options: Option[] = [];
 
-  run() {
-    this.logger.info(tags.stripIndents`
-      The 'eject' command has been temporarily disabled, as it is not yet compatible with the new
-      angular.json format. The new configuration format provides further flexibility to modify the
-      configuration of your workspace without ejecting. Ejection will be re-enabled in a future
-      release of the CLI.
+  private collectionName = '@schematics/angular';
+  private schematicName = 'update';
 
-      If you need to eject today, use CLI 1.7 to eject your project.
-    `);
+  private initialized = false;
+  public async initialize(options: any) {
+    if (this.initialized) {
+      return;
+    }
+    super.initialize(options);
+    this.initialized = true;
+
+    const schematicOptions = await this.getOptions({
+      schematicName: this.schematicName,
+      collectionName: this.collectionName,
+    });
+    this.options = this.options.concat(schematicOptions.options);
+    this.arguments = this.arguments.concat(schematicOptions.arguments.map(a => a.name));
+  }
+
+  public async run(options: EjectOptions) {
+    return this.runSchematic({
+      collectionName: this.collectionName,
+      schematicName: this.schematicName,
+      schematicOptions: options,
+      dryRun: options.dryRun,
+      force: false,
+      showNothingDone: false,
+    });
   }
 }

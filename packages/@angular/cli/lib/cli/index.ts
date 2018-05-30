@@ -11,6 +11,7 @@ function loadCommands() {
     'new': require('../../commands/new').default,
     'generate': require('../../commands/generate').default,
     'update': require('../../commands/update').default,
+    'eject': require('../../commands/eject').default,
 
     // Architect commands.
     'build': require('../../commands/build').default,
@@ -20,9 +21,6 @@ function loadCommands() {
     'lint': require('../../commands/lint').default,
     'xi18n': require('../../commands/xi18n').default,
     'run': require('../../commands/run').default,
-
-    // Disabled commands.
-    'eject': require('../../commands/eject').default,
 
     // Easter eggs.
     'make-this-awesome': require('../../commands/easter-egg').default,
