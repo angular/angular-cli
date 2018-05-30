@@ -23,6 +23,7 @@ import {
 } from '@angular-devkit/schematics';
 import { getWorkspace } from '../utility/config';
 import { parseName } from '../utility/parse-name';
+import { buildDefaultPath } from '../utility/project';
 import { Schema as GuardOptions } from './schema';
 
 
@@ -35,8 +36,7 @@ export default function (options: GuardOptions): Rule {
     const project = workspace.projects[options.project];
 
     if (options.path === undefined) {
-      const projectDirName = project.projectType === 'application' ? 'app' : 'lib';
-      options.path = `/${project.root}/src/${projectDirName}`;
+      options.path = buildDefaultPath(project);
     }
 
     const parsedPath = parseName(options.path, options.name);

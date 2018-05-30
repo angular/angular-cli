@@ -109,4 +109,19 @@ describe('Pipe Schematic', () => {
     const content = getFileContent(tree, routingModulePath);
     expect(content).toMatch(/import { FooPipe } from '.\/foo.pipe/);
   });
+
+  it('should respect the sourceRoot value', () => {
+    const config = JSON.parse(appTree.readContent('/angular.json'));
+    config.projects.bar.sourceRoot = 'projects/bar/custom';
+    appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
+
+    // should fail without a module in that dir
+    expect(() => schematicRunner.runSchematic('pipe', defaultOptions, appTree)).toThrow();
+
+    // move the module
+    appTree.rename('/projects/bar/src/app/app.module.ts', '/projects/bar/custom/app/app.module.ts');
+    appTree = schematicRunner.runSchematic('pipe', defaultOptions, appTree);
+    expect(appTree.files.indexOf('/projects/bar/custom/app/foo.pipe.ts'))
+      .toBeGreaterThanOrEqual(0);
+  });
 });

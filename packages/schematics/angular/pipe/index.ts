@@ -27,6 +27,7 @@ import { InsertChange } from '../utility/change';
 import { getWorkspace } from '../utility/config';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
+import { buildDefaultPath } from '../utility/project';
 import { Schema as PipeOptions } from './schema';
 
 
@@ -94,8 +95,7 @@ export default function (options: PipeOptions): Rule {
     const project = workspace.projects[options.project];
 
     if (options.path === undefined) {
-      const projectDirName = project.projectType === 'application' ? 'app' : 'lib';
-      options.path = `/${project.root}/src/${projectDirName}`;
+      options.path = buildDefaultPath(project);
     }
 
     const parsedPath = parseName(options.path, options.name);

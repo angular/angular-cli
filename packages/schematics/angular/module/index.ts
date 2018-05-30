@@ -27,6 +27,7 @@ import { InsertChange } from '../utility/change';
 import { getWorkspace } from '../utility/config';
 import { findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
+import { buildDefaultPath } from '../utility/project';
 import { Schema as ModuleOptions } from './schema';
 
 
@@ -79,8 +80,7 @@ export default function (options: ModuleOptions): Rule {
     const project = workspace.projects[options.project];
 
     if (options.path === undefined) {
-      const projectDirName = project.projectType === 'application' ? 'app' : 'lib';
-      options.path = `/${project.root}/src/${projectDirName}`;
+      options.path = buildDefaultPath(project);
     }
     if (options.module) {
       options.module = findModuleFromOptions(host, options);

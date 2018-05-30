@@ -59,4 +59,13 @@ describe('Guard Schematic', () => {
     expect(files.indexOf('/projects/bar/src/app/foo.guard.spec.ts')).toEqual(-1);
     expect(files.indexOf('/projects/bar/src/app/foo.guard.ts')).toBeGreaterThanOrEqual(0);
   });
+
+  it('should respect the sourceRoot value', () => {
+    const config = JSON.parse(appTree.readContent('/angular.json'));
+    config.projects.bar.sourceRoot = 'projects/bar/custom';
+    appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
+    appTree = schematicRunner.runSchematic('guard', defaultOptions, appTree);
+    expect(appTree.files.indexOf('/projects/bar/custom/app/foo.guard.ts'))
+      .toBeGreaterThanOrEqual(0);
+  });
 });

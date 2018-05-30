@@ -279,4 +279,19 @@ describe('Component Schematic', () => {
     const content = appTree.readContent('/projects/bar/src/app/sub/test/test.component.ts');
     expect(content).toMatch(/selector: 'app-test'/);
   });
+
+  it('should respect the sourceRoot value', () => {
+    const config = JSON.parse(appTree.readContent('/angular.json'));
+    config.projects.bar.sourceRoot = 'projects/bar/custom';
+    appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
+
+    // should fail without a module in that dir
+    expect(() => schematicRunner.runSchematic('component', defaultOptions, appTree)).toThrow();
+
+    // move the module
+    appTree.rename('/projects/bar/src/app/app.module.ts', '/projects/bar/custom/app/app.module.ts');
+    appTree = schematicRunner.runSchematic('component', defaultOptions, appTree);
+    expect(appTree.files.indexOf('/projects/bar/custom/app/foo/foo.component.ts'))
+      .toBeGreaterThanOrEqual(0);
+  });
 });
