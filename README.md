@@ -86,6 +86,9 @@ ng g component ./newer-cmp
 # if in the directory src/app you can also run
 ng g component feature/new-cmp
 # and your component will be generated in src/app/feature/new-cmp
+# if you were to run
+ng g module my-module --routing
+# create a separate file my-module-routing.module.ts to store the module routes.
 ```
 You can find all possible blueprints in the table below:
 
@@ -100,6 +103,7 @@ Scaffold  | Usage
 [Interface](https://github.com/angular/angular-cli/wiki/generate-interface) | `ng g interface my-new-interface`
 [Enum](https://github.com/angular/angular-cli/wiki/generate-enum)           | `ng g enum my-new-enum`
 [Module](https://github.com/angular/angular-cli/wiki/generate-module)       | `ng g module my-module`
+[Route](https://github.com/angular/angular-cli/wiki/generate-module)       | `ng g module my-module --routing`
 
 
 
