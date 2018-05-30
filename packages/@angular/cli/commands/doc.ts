@@ -24,6 +24,7 @@ export default class DocCommand extends Command {
   public validate(options: Options) {
     if (!options.keyword) {
       this.logger.error(`keyword argument is required.`);
+
       return false;
     }
   }

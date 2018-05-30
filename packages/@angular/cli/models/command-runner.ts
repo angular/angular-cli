@@ -1,3 +1,4 @@
+// tslint:disable:no-any
 import { logging, tags } from '@angular-devkit/core';
 import { camelize } from '@angular-devkit/core/src/utils/strings';
 import {
@@ -85,6 +86,7 @@ export async function runCommand(commandMap: CommandMap,
       if (!(b in commandsDistance)) {
         commandsDistance[b] = levenshtein(b, commandName);
       }
+
       return commandsDistance[a] - commandsDistance[b];
     });
 
@@ -176,6 +178,7 @@ export function parseOptions<T = any>(
     .reduce((aliases: any, opt: Option) => {
       aliases[opt.name] = opt.aliases
         .filter(a => a.length === 1);
+
       return aliases;
     }, {});
 
@@ -187,6 +190,7 @@ export function parseOptions<T = any>(
     .filter(o => o.default !== undefined || booleans.indexOf(o.name) !== -1)
     .reduce((defaults: any, opt: Option) => {
       defaults[opt.name] = opt.default;
+
       return defaults;
     }, {});
 
@@ -277,6 +281,7 @@ function findCommand(map: CommandMap, name: string): CommandConstructor | null {
   if (!Cmd) {
     return null;
   }
+
   return Cmd;
 }
 

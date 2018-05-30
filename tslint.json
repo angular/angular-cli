@@ -1,6 +1,6 @@
 {
   "rules": {
-    "no-implicit-dependencies": false,
+    "no-implicit-dependencies": true,
     "no-import-side-effect": [true, {"ignore-module": "^(?!rxjs\/)"}],
     "align": [
       true,
@@ -23,11 +23,11 @@
     "eofline": true,
     "import-spacing": true,
     "match-default-export-name": true,
-    "newline-before-return": false,
+    "newline-before-return": true,
     "no-consecutive-blank-lines": [true, 2],
     "no-duplicate-variable": true,
     "no-eval": true,
-    "no-any": false,
+    "no-any": true,
     "no-arg": true,
     "no-internal-module": true,
     "no-trailing-whitespace": true,

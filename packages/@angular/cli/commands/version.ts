@@ -13,11 +13,11 @@ export default class VersionCommand extends Command {
   public readonly arguments: string[] = [];
   public readonly options: Option[] = [];
 
-  public run(_options: any) {
+  public run() {
     let angularCoreVersion = '';
     const angularSameAsCore: string[] = [];
     const pkg = require(path.resolve(__dirname, '..', 'package.json'));
-    let projPkg: any;
+    let projPkg;
     try {
       projPkg = require(path.resolve(this.project.root, 'package.json'));
     } catch (exception) {
@@ -66,6 +66,7 @@ export default class VersionCommand extends Command {
         }
 
         acc[name] = this.getVersion(name, packageRoot, maybeNodeModules);
+
         return acc;
       }, {} as { [module: string]: string });
 
@@ -124,6 +125,7 @@ export default class VersionCommand extends Command {
         } else {
           acc[acc.length - 1] = line;
         }
+
         return acc;
       }, []).join('\n... ')}
 
@@ -144,6 +146,7 @@ export default class VersionCommand extends Command {
     try {
       if (projectNodeModules) {
         const modulePkg = require(path.resolve(projectNodeModules, moduleName, 'package.json'));
+
         return modulePkg.version;
       }
     } catch (_) {
@@ -152,6 +155,7 @@ export default class VersionCommand extends Command {
     try {
       if (cliNodeModules) {
         const modulePkg = require(path.resolve(cliNodeModules, moduleName, 'package.json'));
+
         return modulePkg.version + ' (cli-only)';
       }
     } catch (e) {

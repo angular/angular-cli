@@ -1,3 +1,4 @@
+// tslint:disable:no-any
 import { logging, terminal } from '@angular-devkit/core';
 
 export interface CommandConstructor {
@@ -30,6 +31,7 @@ export abstract class Command<T = any> {
 
   async initializeRaw(args: string[]): Promise<any> {
     this._rawArgs = args;
+
     return args;
   }
   async initialize(_options: any): Promise<void> {

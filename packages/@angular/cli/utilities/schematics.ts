@@ -4,7 +4,7 @@
  *
  * require('@schematics/angular')
  */
-
+// tslint:disable:no-any
 import { schema } from '@angular-devkit/core';
 import {
   Collection,

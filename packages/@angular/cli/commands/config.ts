@@ -105,6 +105,7 @@ function setValueFromPath<T extends JsonArray | JsonObject>(
             value[current] = {};
           }
         }
+
         return value[current];
       } else if (typeof current == 'number' && Array.isArray(value)) {
         if (index === fragments.length - 1) {
@@ -116,6 +117,7 @@ function setValueFromPath<T extends JsonArray | JsonObject>(
             value[current] = {};
           }
         }
+
         return value[current];
       } else {
         return undefined;
@@ -211,7 +213,12 @@ export default class ConfigCommand extends Command {
   }
 
   private get(config: experimental.workspace.WorkspaceSchema, options: ConfigOptions) {
-    const value = options.jsonPath ? getValueFromPath(config as any, options.jsonPath) : config;
+    let value;
+    if (options.jsonPath) {
+      value = getValueFromPath(config as {} as JsonObject, options.jsonPath);
+    } else {
+      value = config;
+    }
 
     if (value === undefined) {
       this.logger.error('Value cannot be found.');

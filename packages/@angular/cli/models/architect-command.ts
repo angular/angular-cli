@@ -1,5 +1,8 @@
+// tslint:disable:no-any
 import {
-  Architect, BuildEvent, BuilderDescription,
+  Architect,
+  BuildEvent,
+  BuilderDescription,
   TargetSpecifier,
 } from '@angular-devkit/architect';
 import { JsonObject, experimental, schema, strings } from '@angular-devkit/core';
@@ -84,6 +87,7 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
           + `'${this.target}' would be run on the following projects: ${projectNames.join()}`);
       }
     }
+
     return true;
   }
 
@@ -187,6 +191,7 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
 
         if (newErrors.length > 0) {
           this.logger.error(new schema.SchemaValidationException(newErrors).message);
+
           return 1;
         }
       } else {

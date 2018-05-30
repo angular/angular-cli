@@ -1,3 +1,4 @@
+// tslint:disable:no-any
 import { normalize } from '@angular-devkit/core';
 import { CommandScope, Option } from '../models/command';
 import { CoreSchematicOptions, SchematicCommand } from '../models/schematic-command';

@@ -1,3 +1,4 @@
+// tslint:disable:no-any
 import { JsonObject, experimental } from '@angular-devkit/core';
 import { normalize, strings, tags, terminal, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
@@ -70,12 +71,14 @@ export abstract class SchematicCommand extends Command {
     if (workingDir === '') {
       return {};
     }
+
     return this.options
       .filter(o => o.format === 'path')
       .map(o => o.name)
       .filter(name => options[name] === undefined)
       .reduce((acc: any, curr) => {
         acc[curr] = workingDir;
+
         return acc;
       }, {});
   }
@@ -120,6 +123,7 @@ export abstract class SchematicCommand extends Command {
         return this._workspace.getProjectByPath(normalize(process.cwd()))
                || this._workspace.getDefaultProjectName();
       }
+
       return undefined;
     });
 
@@ -214,6 +218,7 @@ export abstract class SchematicCommand extends Command {
     if (this._originalOptions.find(option => option.name == 'debug')) {
       delete opts.debug;
     }
+
     return opts;
   }
 

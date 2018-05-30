@@ -1,3 +1,4 @@
+// tslint:disable:no-any
 import { CommandScope, Option } from '../models/command';
 import { SchematicCommand } from '../models/schematic-command';
 import { getDefaultSchematicCollection } from '../utilities/config';
@@ -93,6 +94,7 @@ export default class NewCommand extends SchematicCommand {
     const opts = Object.assign({}, options);
     delete opts.verbose;
     delete opts.collection;
+
     return opts;
   }
 }

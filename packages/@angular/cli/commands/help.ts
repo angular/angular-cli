@@ -1,3 +1,4 @@
+// tslint:disable:no-any
 import { terminal } from '@angular-devkit/core';
 import { Command, Option } from '../models/command';
 
@@ -13,6 +14,7 @@ export default class HelpCommand extends Command {
       .map(key => {
         const Cmd = options.commandMap[key];
         const command: Command = new Cmd(null, null);
+
         return command;
       })
       .filter(cmd => !cmd.hidden && !cmd.unknown)

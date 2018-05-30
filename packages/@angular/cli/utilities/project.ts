@@ -1,3 +1,4 @@
+// tslint:disable:no-any
 import { normalize } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as os from 'os';
@@ -44,6 +45,7 @@ export function getProjectDetails(): ProjectDetails | null {
       return null;
     }
   }
+
   return {
     root: possibleDir,
     configFile: configFileName,
@@ -60,5 +62,6 @@ function containsCliDep(obj: any): boolean {
       return true;
     }
   }
+
   return false;
 }

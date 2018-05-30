@@ -60,6 +60,7 @@ export function getWorkspace(
 
   if (!configPath) {
     cachedWorkspaces.set(level, null);
+
     return null;
   }
 
@@ -72,6 +73,7 @@ export function getWorkspace(
 
   workspace.loadWorkspaceFromHost(file).subscribe();
   cachedWorkspaces.set(level, workspace);
+
   return workspace;
 }
 
@@ -109,6 +111,7 @@ export function getWorkspaceRaw(
   if (ast.kind != 'object') {
     throw new Error('Invalid JSON');
   }
+
   return [ast as JsonAstObject, configPath];
 }
 
@@ -164,6 +167,7 @@ export function getPackageManager(): string {
       return legacyPackageManager;
     }
   }
+
   return 'npm';
 }
 
@@ -211,6 +215,7 @@ export function migrateLegacyGlobalConfig(): boolean {
       if (Object.getOwnPropertyNames(cli).length > 0) {
         const globalPath = path.join(homeDir, globalFileName);
         writeFileSync(globalPath, JSON.stringify({ version: 1, cli }, null, 2));
+
         return true;
       }
     }
@@ -238,6 +243,7 @@ function getLegacyPackageManager(): string | null {
       }
     }
   }
+
   return null;
 }
 

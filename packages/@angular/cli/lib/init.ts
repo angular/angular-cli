@@ -41,9 +41,9 @@ function _fromPackageJson(cwd?: string) {
 
 // Check if we need to profile this CLI run.
 if (process.env['NG_CLI_PROFILING']) {
-  const profiler = require('v8-profiler');
+  const profiler = require('v8-profiler'); // tslint:disable-line:no-implicit-dependencies
   profiler.startProfiling();
-  function exitHandler(options: any, _err: Error) {
+  function exitHandler(options: { cleanup: boolean, exit: boolean }, _err: Error) {
     if (options.cleanup) {
       const cpuProfile = profiler.stopProfiling();
       fs.writeFileSync(path.resolve(process.cwd(), process.env.NG_CLI_PROFILING) + '.cpuprofile',
