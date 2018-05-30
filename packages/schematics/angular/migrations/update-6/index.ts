@@ -403,6 +403,7 @@ function extractProjectsConfig(
         index: `${appRoot}/${app.index || defaults.index}`,
         main: `${appRoot}/${app.main || defaults.main}`,
         tsConfig: `${appRoot}/${app.tsconfig || defaults.tsConfig}`,
+        ...(app.baseHref ? { baseHref: app.baseHref } : {}),
         ...buildDefaults,
       };
 

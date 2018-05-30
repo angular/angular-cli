@@ -557,6 +557,22 @@ describe('Migration to v6', () => {
         });
       });
 
+      it('should not set baseHref on build & serve targets if not defined', () => {
+        tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+        tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+        const build = getConfig(tree).projects.foo.architect.build;
+        expect(build.options.baseHref).toBeUndefined();
+      });
+
+      it('should set baseHref on build & serve targets if defined', () => {
+        const config = {...baseConfig};
+        config.apps[0].baseHref = '/base/href/';
+        tree.create(oldConfigPath, JSON.stringify(config, null, 2));
+        tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+        const build = getConfig(tree).projects.foo.architect.build;
+        expect(build.options.baseHref).toEqual('/base/href/');
+      });
+
       it('should add serviceWorker to production configuration', () => {
         baseConfig.apps[0].serviceWorker = true;
         tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
