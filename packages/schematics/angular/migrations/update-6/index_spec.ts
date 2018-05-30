@@ -509,6 +509,17 @@ describe('Migration to v6', () => {
         tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
         const project = getConfig(tree).projects.foo;
         expect(project.root).toEqual('');
+        expect(project.sourceRoot).toEqual('src');
+        expect(project.projectType).toEqual('application');
+      });
+
+      it('should set the project root values for a different root', () => {
+        baseConfig.apps[0].root = 'apps/app1/src';
+        tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+        tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+        const project = getConfig(tree).projects.foo;
+        expect(project.root).toEqual('apps/app1');
+        expect(project.sourceRoot).toEqual('apps/app1/src');
         expect(project.projectType).toEqual('application');
       });
 
@@ -631,9 +642,26 @@ describe('Migration to v6', () => {
       it('should set the project root values', () => {
         tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
         tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
-        const e2e = getConfig(tree).projects['foo-e2e'].architect.e2e;
-        expect(e2e.builder).toEqual('@angular-devkit/build-angular:protractor');
-        const options = e2e.options;
+        const e2eProject = getConfig(tree).projects['foo-e2e'];
+        expect(e2eProject.root).toBe('');
+        expect(e2eProject.sourceRoot).toBe('e2e');
+        const e2eOptions = e2eProject.architect.e2e;
+        expect(e2eOptions.builder).toEqual('@angular-devkit/build-angular:protractor');
+        const options = e2eOptions.options;
+        expect(options.protractorConfig).toEqual('./protractor.conf.js');
+        expect(options.devServerTarget).toEqual('foo:serve');
+      });
+
+      it('should set the project root values for a different root', () => {
+        baseConfig.apps[0].root = 'apps/app1/src';
+        tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+        tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+        const e2eProject = getConfig(tree).projects['foo-e2e'];
+        expect(e2eProject.root).toBe('apps/app1');
+        expect(e2eProject.sourceRoot).toBe('apps/app1/e2e');
+        const e2eOptions = e2eProject.architect.e2e;
+        expect(e2eOptions.builder).toEqual('@angular-devkit/build-angular:protractor');
+        const options = e2eOptions.options;
         expect(options.protractorConfig).toEqual('./protractor.conf.js');
         expect(options.devServerTarget).toEqual('foo:serve');
       });
