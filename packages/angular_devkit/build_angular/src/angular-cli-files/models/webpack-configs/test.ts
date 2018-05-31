@@ -5,13 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable
-// TODO: cleanup this file, it's copied as is from Angular CLI.
 
-import * as path from 'path';
 import * as glob from 'glob';
-
-// import { CliConfig } from '../config';
+import * as path from 'path';
+import * as webpack from 'webpack';
 import { WebpackConfigOptions, WebpackTestOptions } from '../build-options';
 
 
@@ -23,19 +20,20 @@ import { WebpackConfigOptions, WebpackTestOptions } from '../build-options';
  *
  */
 
-
-export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
+export function getTestConfig(
+  wco: WebpackConfigOptions<WebpackTestOptions>,
+): webpack.Configuration {
   const { root, buildOptions } = wco;
 
-  const extraRules: any[] = [];
-  const extraPlugins: any[] = [];
+  const extraRules: webpack.Rule[] = [];
+  const extraPlugins: webpack.Plugin[] = [];
 
   // if (buildOptions.codeCoverage && CliConfig.fromProject()) {
   if (buildOptions.codeCoverage) {
     const codeCoverageExclude = buildOptions.codeCoverageExclude;
-    let exclude: (string | RegExp)[] = [
+    const exclude: (string | RegExp)[] = [
       /\.(e2e|spec)\.ts$/,
-      /node_modules/
+      /node_modules/,
     ];
 
     if (codeCoverageExclude) {
@@ -51,7 +49,7 @@ export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
       test: /\.(js|ts)$/, loader: 'istanbul-instrumenter-loader',
       options: { esModules: true },
       enforce: 'post',
-      exclude
+      exclude,
     });
   }
 
@@ -60,34 +58,31 @@ export function getTestConfig(wco: WebpackConfigOptions<WebpackTestOptions>) {
     resolve: {
       mainFields: [
         ...(wco.supportES2015 ? ['es2015'] : []),
-        'browser', 'module', 'main'
-      ]
+        'browser', 'module', 'main',
+      ],
     },
     devtool: buildOptions.sourceMap ? 'inline-source-map' : 'eval',
     entry: {
-      main: path.resolve(root, buildOptions.main)
+      main: path.resolve(root, buildOptions.main),
     },
     module: {
-      rules: [].concat(extraRules as any)
+      rules: extraRules,
     },
     plugins: extraPlugins,
     optimization: {
-      // runtimeChunk: 'single',
       splitChunks: {
-        chunks: buildOptions.commonChunk ? 'all' : 'initial',
+        chunks: ((chunk: { name: string }) => chunk.name !== 'polyfills'),
         cacheGroups: {
           vendors: false,
           vendor: {
             name: 'vendor',
             chunks: 'initial',
-            test: (module: any, chunks: Array<{ name: string }>) => {
-              const moduleName = module.nameForCondition ? module.nameForCondition() : '';
-              return /[\\/]node_modules[\\/]/.test(moduleName)
-                && !chunks.some(({ name }) => name === 'polyfills');
-            },
+            test: /[\\/]node_modules[\\/]/,
           },
-        }
-      }
+        },
+      },
     },
-  };
+    // Webpack typings don't yet include the function form for 'chunks',
+    // or the built-in vendors cache group.
+  } as {} as webpack.Configuration;
 }
