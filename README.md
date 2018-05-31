@@ -4,6 +4,7 @@
 [![Build Status](https://img.shields.io/travis/angular/angular-cli/master.svg?label=travis)][travis-badge-url]
 [![Dependency Status][david-badge]][david-badge-url]
 [![devDependency Status][david-dev-badge]][david-dev-badge-url]
+[![Open Source Helpers](https://www.codetriage.com/angular/angular-cli/badges/users.svg)](https://www.codetriage.com/angular/angular-cli)
 
 [![npm](https://img.shields.io/npm/v/%40angular/cli.svg)][npm-badge-url]
 [![npm](https://img.shields.io/npm/v/%40angular/cli/next.svg)][npm-badge-url]
