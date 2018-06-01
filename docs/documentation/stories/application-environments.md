@@ -28,7 +28,7 @@ This is useful for using different code or variables when creating a new build.
 By default no file is replaced in the build.
 
 You can add additional configurations as required.
-To add a **staging** environment, create a copy of `src/environments/environment.ts` called `src/environments/environment.staging.ts`, then add a `staging` configuration to `angular.jsob`:
+To add a **staging** environment, create a copy of `src/environments/environment.ts` called `src/environments/environment.staging.ts`, then add a `staging` configuration to `angular.json`:
 
 ```json
 "configurations": {
