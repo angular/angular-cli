@@ -15,7 +15,7 @@
     "path": {
       "type": "string",
       "format": "path",
-      "description": "The path to create the pipe.",
+      "description": "The path to create the module.",
       "visible": false
     },
     "project": {
