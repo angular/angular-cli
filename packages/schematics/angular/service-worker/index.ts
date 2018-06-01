@@ -131,7 +131,7 @@ function updateAppModule(options: ServiceWorkerOptions): Rule {
 
     // register SW in app module
     const importText =
-      `ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })`;
+      `ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })`;
     moduleSource = getTsSourceFile(host, modulePath);
     const metadataChanges = addSymbolToNgModuleMetadata(
       moduleSource, modulePath, 'imports', importText);

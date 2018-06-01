@@ -87,8 +87,8 @@ describe('Service Worker Schematic', () => {
     const tree = schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
     const pkgText = tree.readContent('/projects/bar/src/app/app.module.ts');
     // tslint:disable-next-line:max-line-length
-    const regex = /ServiceWorkerModule\.register\('\/ngsw-worker.js\', { enabled: environment.production }\)/;
-    expect(pkgText).toMatch(regex);
+    const expectedText = 'ServiceWorkerModule.register(\'ngsw-worker.js\', { enabled: environment.production })';
+    expect(pkgText).toContain(expectedText);
   });
 
   it('should put the ngsw-config.json file in the project root', () => {
