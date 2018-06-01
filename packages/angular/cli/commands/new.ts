@@ -71,9 +71,6 @@ export default class NewCommand extends SchematicCommand {
       collectionName = this.parseCollectionName(options);
     }
 
-    const pathOptions = this.setPathOptions(options, '/');
-    options = { ...options, ...pathOptions };
-
     const packageJson = require('../package.json');
     options.version = packageJson.version;
 
