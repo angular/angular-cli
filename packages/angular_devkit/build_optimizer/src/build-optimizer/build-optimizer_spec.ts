@@ -8,6 +8,7 @@
 // tslint:disable-next-line:no-implicit-dependencies
 import { tags } from '@angular-devkit/core';
 import { RawSourceMap } from 'source-map';
+import { TransformJavascriptOutput } from '../helpers/transform-javascript';
 import { buildOptimizer } from './build-optimizer';
 
 
@@ -144,6 +145,32 @@ describe('build-optimizer', () => {
       `;
 
       expect(() => buildOptimizer({ content: input, strict: true })).toThrow();
+    });
+
+    // TODO: re-enable this test when updating to TypeScript >2.9.1.
+    // The `prefix-classes` tests will also need to be adjusted.
+    // See https://github.com/angular/devkit/pull/998#issuecomment-393867606 for more info.
+    xit(`doesn't exceed call stack size when type checking very big classes`, () => {
+      // BigClass with a thousand methods.
+      // Clazz is included with ctorParameters to trigger transforms with type checking.
+      const input = `
+        var BigClass = /** @class */ (function () {
+          function BigClass() {
+          }
+          ${Array.from(new Array(1000)).map((_v, i) =>
+            `BigClass.prototype.method${i} = function () { return this.myVar; };`,
+          ).join('\n')}
+          return BigClass;
+        }());
+        ${clazz}
+        Clazz.ctorParameters = function () { return []; };
+      `;
+
+      let boOutput: TransformJavascriptOutput;
+      expect(() => {
+        boOutput = buildOptimizer({ content: input });
+        expect(boOutput.emitSkipped).toEqual(false);
+      }).not.toThrow();
     });
   });
 
