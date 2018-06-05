@@ -15,7 +15,6 @@ Next we need to update the bootstrap process of our app to enable the
 Create a file called `src/environments/environment.hmr.ts` with the following contents:
 
 ```typescript
-
 export const environment = {
  production: false,
  hmr: true
@@ -40,21 +39,33 @@ export const environment = {
 };
 ```
 
+Update `angular.json` to include an hmr build configuration as explained [here](./stories-application-environments)
+and add a configuration within serve to enable hmr.
 
-Update `angular.json` to include an hmr environment as explained [here](./application-environments) and add a configuration within serve to enable hmr.
+Change the `myapp` reference accordingly...
 
 ```json
-  "serve": {
-    "configuration": {
+  "build": {
+    ...
+    "configurations": {
       ...
       "hmr": {
-        "hmr": true,
         "fileReplacements": [
           {
             "replace": "src/environments/environment.ts",
             "with": "src/environments/environment.hmr.ts"
           }
-        ],
+        ]
+      }
+    }
+  },
+  "serve": {
+    ...
+    "configurations": {
+      ...
+      "hmr": {
+        "browserTarget": "myapp:build:hmr",
+        "hmr": true
       }
     }
   }
@@ -138,6 +149,15 @@ if (environment.hmr) {
 }
 ```
 
+Run `ng build`. If it outputs `error TS2304: Cannot find name 'module'`,
+then add node types to `src/tsconfig.app.json`:
+
+```json
+"compilerOptions": {
+  ...
+  "types": ["node"]
+}
+```
 
 ### Starting the development environment with HMR enabled
 
@@ -154,5 +174,4 @@ When starting the server Webpack will tell you that it’s enabled:
 
 
 Now if you make changes to one of your components they changes should be visible automatically without a complete browser refresh.
-
 
