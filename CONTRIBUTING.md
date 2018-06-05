@@ -65,7 +65,7 @@ Before you submit an issue, please search the issue tracker, maybe an issue for 
 We want to fix all the issues as soon as possible, but before fixing a bug we need to reproduce and confirm it. In order to reproduce bugs we will systematically ask you to provide a minimal reproduction scenario using `ng new repro-app`. Having a reproducible scenario gives us wealth of important information without going back & forth to you with additional questions like:
 
 - version of Angular CLI used
-- `.angular-cli.json` configuration
+- `.angular-cli.json` or `angular.json` configuration
 - 3rd-party libraries and their versions
 - and most importantly - a use-case that fails
 
