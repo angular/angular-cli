@@ -25,29 +25,39 @@ import { UpdateSchema } from './schema';
 type VersionRange = string & { __VERSION_RANGE: void; };
 type PeerVersionTransform = string | ((range: string) => string);
 
-// This is a map of packageGroupName to range extending function. If it isn't found, the range is
-// kept the same.
+
 // Angular guarantees that a major is compatible with its following major (so packages that depend
 // on Angular 5 are also compatible with Angular 6). This is, in code, represented by verifying
 // that all other packages that have a peer dependency of `"@angular/core": "^5.0.0"` actually
 // supports 6.0, by adding that compatibility to the range, so it is `^5.0.0 || ^6.0.0`.
-const peerCompatibleWhitelist: { [name: string]: PeerVersionTransform } = {
-  '@angular/core': (range: string) => {
-    range = semver.validRange(range);
-    let major = 1;
-    while (!semver.gtr(major + '.0.0', range)) {
-      major++;
-      if (major >= 99) {
-        // Use original range if it supports a major this high
-        // Range is most likely unbounded (e.g., >=5.0.0)
-        return range;
-      }
+// We export it to allow for testing.
+export function angularMajorCompatGuarantee(range: string) {
+  range = semver.validRange(range);
+  let major = 1;
+  while (!semver.gtr(major + '.0.0', range)) {
+    major++;
+    if (major >= 99) {
+      // Use original range if it supports a major this high
+      // Range is most likely unbounded (e.g., >=5.0.0)
+      return range;
     }
+  }
 
-    // Add the major version as compatible with the angular compatible. This is already one
-    // major above the greatest supported, because we increment `major` before checking.
-    return semver.validRange(`^${major}.0.0-rc.0 || ${range}`) || range;
-  },
+  // Add the major version as compatible with the angular compatible, with all minors. This is
+  // already one major above the greatest supported, because we increment `major` before checking.
+  let newRange = range;
+  for (let minor = 0; minor < 20; minor++) {
+    newRange += ` || ^${major}.${minor}.0-alpha.0`;
+  }
+
+  return semver.validRange(newRange) || range;
+}
+
+
+// This is a map of packageGroupName to range extending function. If it isn't found, the range is
+// kept the same.
+const peerCompatibleWhitelist: { [name: string]: PeerVersionTransform } = {
+  '@angular/core': angularMajorCompatGuarantee,
 };
 
 interface PackageVersionInfo {
@@ -143,7 +153,7 @@ function _validateReversePeerDependencies(
     installedLogger.debug(`${installed}...`);
     const peers = (installedInfo.target || installedInfo.installed).packageJson.peerDependencies;
 
-    for (let [peer, range] of Object.entries(peers || {})) {
+    for (const [peer, range] of Object.entries(peers || {})) {
       if (peer != name) {
         // Only check peers to the packages we're updating. We don't care about peers
         // that are unmet but we have no effect on.
@@ -151,12 +161,13 @@ function _validateReversePeerDependencies(
       }
 
       // Override the peer version range if it's whitelisted.
-      range = _updatePeerVersion(infoMap, peer, range);
+      const extendedRange = _updatePeerVersion(infoMap, peer, range);
 
-      if (!semver.satisfies(version, range)) {
+      if (!semver.satisfies(version, extendedRange)) {
         logger.error([
           `Package ${JSON.stringify(installed)} has an incompatible peer dependency to`,
-          `${JSON.stringify(name)} (requires ${JSON.stringify(range)},`,
+          `${JSON.stringify(name)} (requires`,
+          `${JSON.stringify(range)}${extendedRange == range ? '' : ' (extended)'},`,
           `would install ${JSON.stringify(version)}).`,
         ].join(' '));
 
