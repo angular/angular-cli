@@ -231,6 +231,30 @@ describe('Workspace', () => {
     ).toPromise().then(done, done.fail);
   });
 
+  it('gets 1st project when 2 have the same root', (done) => {
+    const app = workspaceJson.projects['app'];
+    const customWorkspaceJson = { ...workspaceJson, projects: {
+      'app': app,
+      'app2': app,
+    } };
+    const workspace = new Workspace(root, host);
+    workspace.loadWorkspaceFromJson(customWorkspaceJson).pipe(
+      tap((ws) => expect(ws.getProjectByPath(app.root)).toEqual('app')),
+    ).toPromise().then(done, done.fail);
+  });
+
+  it('gets 1st project when 2 have the same root equal to the workspace root', (done) => {
+    const app = workspaceJson.projects['app'];
+    const customWorkspaceJson = { ...workspaceJson, projects: {
+      'app': {...app, root: ''},
+      'app2': {...app, root: ''},
+    } };
+    const workspace = new Workspace(root, host);
+    workspace.loadWorkspaceFromJson(customWorkspaceJson).pipe(
+      tap((ws) => expect(ws.getProjectByPath(app.root)).toEqual('app')),
+    ).toPromise().then(done, done.fail);
+  });
+
   it('gets workspace cli', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
