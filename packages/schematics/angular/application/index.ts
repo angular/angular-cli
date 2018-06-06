@@ -29,6 +29,7 @@ import {
   addProjectToWorkspace,
   getWorkspace,
 } from '../utility/config';
+import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { latestVersions } from '../utility/latest-versions';
 import { validateProjectName } from '../utility/validation';
 import { Schema as ApplicationOptions } from './schema';
@@ -60,29 +61,23 @@ import { Schema as ApplicationOptions } from './schema';
 
 function addDependenciesToPackageJson() {
   return (host: Tree) => {
-    const packageJsonPath = 'package.json';
-
-    if (!host.exists('package.json')) { return host; }
-
-    const source = host.read('package.json');
-    if (!source) { return host; }
-
-    const sourceText = source.toString('utf-8');
-    const json = JSON.parse(sourceText);
-
-    if (!json['devDependencies']) {
-      json['devDependencies'] = {};
-    }
-
-    json.devDependencies = {
-      '@angular/compiler-cli': latestVersions.Angular,
-      '@angular-devkit/build-angular': latestVersions.DevkitBuildAngular,
-      'typescript': latestVersions.TypeScript,
-      // De-structure last keeps existing user dependencies.
-      ...json.devDependencies,
-    };
-
-    host.overwrite(packageJsonPath, JSON.stringify(json, null, 2));
+    [
+      {
+        type: NodeDependencyType.Dev,
+        name: '@angular/compiler-cli',
+        version: latestVersions.Angular,
+      },
+      {
+        type: NodeDependencyType.Dev,
+        name: '@angular-devkit/build-angular',
+        version: latestVersions.DevkitBuildAngular,
+      },
+      {
+        type: NodeDependencyType.Dev,
+        name: 'typescript',
+        version: latestVersions.TypeScript,
+      },
+    ].forEach(dependency => addPackageJsonDependency(host, dependency));
 
     return host;
   };

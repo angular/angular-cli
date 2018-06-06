@@ -26,10 +26,9 @@ import {
   getWorkspace,
   getWorkspacePath,
 } from '../utility/config';
+import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
 import { getAppModulePath } from '../utility/ng-ast-utils';
 import { Schema as ServiceWorkerOptions } from './schema';
-
-const packageJsonPath = '/package.json';
 
 function updateConfigFile(options: ServiceWorkerOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
@@ -72,17 +71,15 @@ function addDependencies(): Rule {
   return (host: Tree, context: SchematicContext) => {
     const packageName = '@angular/service-worker';
     context.logger.debug(`adding dependency (${packageName})`);
-    const buffer = host.read(packageJsonPath);
-    if (buffer === null) {
-      throw new SchematicsException('Could not find package.json');
+    const coreDep = getPackageJsonDependency(host, '@angular/core');
+    if (coreDep === null) {
+      throw new SchematicsException('Could not find version.');
     }
-
-    const packageObject = JSON.parse(buffer.toString());
-
-    const ngCoreVersion = packageObject.dependencies['@angular/core'];
-    packageObject.dependencies[packageName] = ngCoreVersion;
-
-    host.overwrite(packageJsonPath, JSON.stringify(packageObject, null, 2));
+    const platformServerDep = {
+      ...coreDep,
+      name: packageName,
+    };
+    addPackageJsonDependency(host, platformServerDep);
 
     return host;
   };
