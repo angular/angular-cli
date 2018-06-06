@@ -1,6 +1,6 @@
 import {join} from 'path';
 import {getGlobalVariable} from '../utils/env';
-import {npm} from '../utils/process';
+import {git, npm} from '../utils/process';
 import {updateJsonFile} from '../utils/project';
 
 const packages = require('../../../lib/packages').packages;
@@ -12,9 +12,31 @@ export default function() {
     return;
   }
 
-  const devkitArg = argv.devkit ? '--devkit=' + argv.devkit : '--devkit-snapshots';
+  const getCurrentBranch = () => {
+    // Get branch from CI, or default to querying git for local.
+    const ciBranch = process.env.TRAVIS_BRANCH
+      || process.env.APPVEYOR_REPO_BRANCH
+      || process.env.CIRCLE_BRANCH;
 
-  return npm('run', 'build', '--', '--local', devkitArg)
+    if (ciBranch) {
+      return Promise.resolve(ciBranch);
+    } else {
+      return git('symbolic-ref', '--short', 'HEAD')
+        .then(({stdout}) => stdout.trim());
+    }
+  };
+
+  let devkitArg = '';
+
+  return getCurrentBranch()
+    .then(currentBranch => {
+      // Only use custom devkit when on master.
+      if (currentBranch === 'master') {
+        // Use a specific devkit path if specified, otherwise use snapshots.
+        devkitArg = argv.devkit ? '--devkit=' + argv.devkit : '--devkit-snapshots';
+      }
+    })
+    .then(() => npm('run', 'build', '--', '--local', devkitArg))
     .then(() => {
       if (!argv.nightly && !argv['ng-sha']) {
         return;
