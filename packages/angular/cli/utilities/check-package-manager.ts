@@ -1,4 +1,11 @@
-// tslint:disable:no-global-tslint-disable file-header
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+
 import { terminal } from '@angular-devkit/core';
 import { exec } from 'child_process';
 import { promisify } from 'util';
