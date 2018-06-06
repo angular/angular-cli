@@ -18,7 +18,7 @@
     [
       {
         "label": "License",
-        "image": "https://img.shields.io/npm/l/@angular-angular-cli/core.svg",
+        "image": "https://img.shields.io/npm/l/@angular/cli.svg",
         "url": "https://github.com/angular/angular-cli/blob/master/LICENSE"
       }
     ],
