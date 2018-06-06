@@ -387,8 +387,9 @@ function extractProjectsConfig(
         return entry;
       }
 
+      const projectRoot = join(normalize(appRoot), '..');
       const project: JsonObject = {
-        root: join(normalize(appRoot), '..'),
+        root: projectRoot,
         sourceRoot: appRoot,
         projectType: 'application',
       };
@@ -538,8 +539,8 @@ function extractProjectsConfig(
         architect.server = serverTarget;
       }
       const e2eProject: JsonObject = {
-        root: project.root,
-        sourceRoot: join(project.root as Path, 'e2e'),
+        root: join(projectRoot, 'e2e'),
+        sourceRoot: join(projectRoot, 'e2e'),
         projectType: 'application',
       };
 
