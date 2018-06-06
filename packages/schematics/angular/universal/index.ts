@@ -34,6 +34,7 @@ import * as ts from 'typescript';
 import { findNode, getDecoratorMetadata } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { getWorkspace } from '../utility/config';
+import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
 import { findBootstrapModuleCall, findBootstrapModulePath } from '../utility/ng-ast-utils';
 import { Schema as UniversalOptions } from './schema';
 
@@ -172,18 +173,15 @@ function addServerTransition(options: UniversalOptions): Rule {
 
 function addDependencies(): Rule {
   return (host: Tree) => {
-    const pkgPath = '/package.json';
-    const buffer = host.read(pkgPath);
-    if (buffer === null) {
-      throw new SchematicsException('Could not find package.json');
+    const coreDep = getPackageJsonDependency(host, '@angular/core');
+    if (coreDep === null) {
+      throw new SchematicsException('Could not find version.');
     }
-
-    const pkg = JSON.parse(buffer.toString());
-
-    const ngCoreVersion = pkg.dependencies['@angular/core'];
-    pkg.dependencies['@angular/platform-server'] = ngCoreVersion;
-
-    host.overwrite(pkgPath, JSON.stringify(pkg, null, 2));
+    const platformServerDep = {
+      ...coreDep,
+      name: '@angular/platform-server',
+    };
+    addPackageJsonDependency(host, platformServerDep);
 
     return host;
   };
