@@ -51,6 +51,7 @@
     },
     "@angular/cli": {
       "name": "Angular CLI",
+      "section": "Tooling",
       "links": [
         {
           "label": "README",
@@ -158,6 +159,7 @@
     },
     "@angular-devkit/schematics-cli": {
       "name": "Schematics CLI",
+      "section": "Tooling",
       "version": "0.7.0-beta.1",
       "hash": "9af2b27b3c56da136d5ce9f9cfec0208",
       "snapshotRepo": "angular/angular-devkit-schematics-cli-builds"

@@ -1,7 +1,6 @@
 ## Angular CLI
 
 <!-- Badges section here. -->
-[![Build Status](https://img.shields.io/travis/angular/angular-cli/master.svg?label=travis)][travis-badge-url]
 [![Dependency Status][david-badge]][david-badge-url]
 [![devDependency Status][david-dev-badge]][david-dev-badge-url]
 
