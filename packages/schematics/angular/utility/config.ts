@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { experimental } from '@angular-devkit/core';
+import { JsonParseMode, experimental, parseJson } from '@angular-devkit/core';
 import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 
 
@@ -495,9 +495,9 @@ export function getWorkspace(host: Tree): WorkspaceSchema {
   if (configBuffer === null) {
     throw new SchematicsException(`Could not find (${path})`);
   }
-  const config = configBuffer.toString();
+  const content = configBuffer.toString();
 
-  return JSON.parse(config);
+  return parseJson(content, JsonParseMode.Loose) as {} as WorkspaceSchema;
 }
 
 export function addProjectToWorkspace(
@@ -531,7 +531,7 @@ export function getConfig(host: Tree): CliConfig {
     throw new SchematicsException('Could not find .angular-cli.json');
   }
 
-  const config = JSON.parse(configBuffer.toString());
+  const config = parseJson(configBuffer.toString(), JsonParseMode.Loose) as {} as CliConfig;
 
   return config;
 }
