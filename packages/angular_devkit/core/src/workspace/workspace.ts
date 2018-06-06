@@ -171,7 +171,11 @@ export class Workspace {
       .map(name => [this.getProject(name).root, name] as [Path, string])
       .filter(tuple => isInside(tuple[0], path))
       // Sort tuples by depth, with the deeper ones first.
-      .sort((a, b) => isInside(a[0], b[0]) ? 1 : 0);
+      // If the root is the same, don't re-sort.
+      .sort((a, b) => isInside(a[0], b[0])
+        ? a[0] === b[0] ? 0 : 1
+        : 0);
+
 
     if (projects[0]) {
       return projects[0][1];
