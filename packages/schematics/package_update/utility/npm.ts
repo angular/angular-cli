@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, logging } from '@angular-devkit/core';
+import { JsonObject, JsonParseMode, logging, parseJson } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -93,7 +93,7 @@ function _getNpmPackageJson(
       response.on('data', chunk => data += chunk);
       response.on('end', () => {
         try {
-          const json = JSON.parse(data);
+          const json = parseJson(data, JsonParseMode.Strict);
           subject.next(json as JsonObject);
           subject.complete();
         } catch (err) {
@@ -233,7 +233,10 @@ export function updatePackageJson(
       if (!packageJsonContent) {
         throw new SchematicsException('Could not find package.json.');
       }
-      const packageJson = JSON.parse(packageJsonContent.toString());
+      const packageJson = parseJson(packageJsonContent.toString(), JsonParseMode.Strict);
+      if (packageJson === null || typeof packageJson !== 'object' || Array.isArray(packageJson)) {
+        throw new SchematicsException('Could not parse package.json.');
+      }
       const packages: { [name: string]: string } = {};
       for (const name of supportedPackages) {
         packages[name] = version;
@@ -251,17 +254,20 @@ export function updatePackageJson(
       if (!packageJsonContent) {
         throw new SchematicsException('Could not find package.json.');
       }
-      const packageJson = JSON.parse(packageJsonContent.toString());
+      const packageJson = parseJson(packageJsonContent.toString(), JsonParseMode.Strict);
+      if (packageJson === null || typeof packageJson !== 'object' || Array.isArray(packageJson)) {
+        throw new SchematicsException('Could not parse package.json.');
+      }
 
       for (const field of kPackageJsonDependencyFields) {
         const deps = packageJson[field];
-        if (!deps) {
+        if (!deps || typeof deps !== 'object' || Array.isArray(deps)) {
           continue;
         }
 
-        for (const depName of Object.keys(packageJson[field])) {
+        for (const depName of Object.keys(deps)) {
           if (allVersions[depName]) {
-            packageJson[field][depName] = allVersions[depName];
+            deps[depName] = allVersions[depName];
           }
         }
       }
