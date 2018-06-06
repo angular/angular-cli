@@ -1,0 +1,46 @@
+{
+  "name": "webpack-app",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "rimraf dist && webpack --hide-modules",
+    "build-no-ngo": "rimraf dist-no-ngo && webpack --config=webpack.config.no-ngo.js --hide-modules",
+    "build-old-ngo": "rimraf dist-old-ngo && webpack --config=webpack.config.old-ngo.js --hide-modules",
+    "serve": "lite-server",
+    "pree2e": "npm run build -- --devtool=source-map",
+    "e2e": "concurrently \"npm run serve\" \"npm run protractor\" --kill-others --success first",
+    "preprotractor": "webdriver-manager update --standalone false --gecko false --versions.chrome 2.33",
+    "protractor": "protractor protractor.config.js",
+    "benchmark": "npm run build && npm run build-no-ngo && node benchmark.js",
+    "reinstall-bo": "rimraf node_modules/@angular-devkit/build-optimizer && npm i -q ../../../../../dist/@angular-devkit_build-optimizer.tgz"
+  },
+  "dependencies": {
+    "@angular/common": "^4.2.3",
+    "@angular/compiler": "^4.2.3",
+    "@angular/compiler-cli": "^4.2.3",
+    "@angular/core": "^4.2.3",
+    "@angular/http": "^4.2.3",
+    "@angular/platform-browser": "^4.2.3",
+    "@angular/platform-browser-dynamic": "^4.2.3",
+    "@angular/router": "^4.2.3",
+    "@ngtools/webpack": "1.4.1",
+    "core-js": "^2.4.1",
+    "rxjs": "^5.5.8",
+    "zone.js": "^0.8.4"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-optimizer": "file:../../../../../dist/@angular-devkit_build-optimizer.tgz",
+    "@types/jasmine": "2.5.45",
+    "compression-webpack-plugin": "^0.4.0",
+    "concurrently": "^3.4.0",
+    "copy-webpack-plugin": "^4.0.1",
+    "jasmine": "^2.6.0",
+    "lite-server": "^2.3.0",
+    "protractor": "^5.1.2",
+    "raw-loader": "^0.5.1",
+    "rimraf": "^2.6.1",
+    "ts-node": "^3.0.4",
+    "typescript": "~2.3.3",
+    "webpack": "3.1.0"
+  }
+}

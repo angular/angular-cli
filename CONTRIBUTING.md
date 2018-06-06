@@ -1,6 +1,6 @@
-# Contributing to Angular CLI
+# Contributing to Angular DevKit
 
-We would love for you to contribute to Angular CLI and help make it even better
+We would love for you to contribute to DevKit and help make it even better
 than it is today! As a contributor, here are the guidelines we would like you
 to follow:
 
@@ -18,7 +18,7 @@ Help us keep Angular open and inclusive. Please read and follow our [Code of Con
 
 ## <a name="question"></a> Got a Question or Problem?
 
-Please, do not open issues for the general support questions as we want to keep GitHub issues for bug reports and feature requests. You've got much better chances of getting your question answered on [StackOverflow](https://stackoverflow.com/questions/tagged/angular-cli) where the questions should be tagged with tag `angular-cli`.
+Please, do not open issues for the general support questions as we want to keep GitHub issues for bug reports and feature requests. You've got much better chances of getting your question answered on [StackOverflow](https://stackoverflow.com/questions/tagged/angular-devkit) where the questions should be tagged with tag `angular-devkit`.
 
 StackOverflow is a much better place to ask questions since:
 
@@ -38,23 +38,13 @@ If you find a bug in the source code or a mistake in the documentation, you can 
 ## <a name="feature"></a> Want a Feature?
 You can *request* a new feature by [submitting an issue](#submit-issue) to our [GitHub
 Repository][github]. If you would like to *implement* a new feature, please submit an issue with
-a proposal for your work first, to be sure that we can use it. Angular CLI is in developer preview
-and we are not ready to accept major contributions ahead of the full release.
+a proposal for your work first, to be sure that we can use it.
+Please consider what kind of change it is:
 
-First open an issue and outline your proposal so that it can be
+* For a **Major Feature**, first open an issue and outline your proposal so that it can be
 discussed. This will also allow us to better coordinate our efforts, prevent duplication of work,
 and help you to craft the change so that it is successfully accepted into the project.
-
-**All features require a proper design and review by team members.** Before starting work, you might want to
-discuss with us to figure out:
-
-* Is this something we want? Sometimes people make feature requests that make sense for them, but aren't valuable
-  to the rest of the CLI users, or impede on other people's workflow. We try to always put the greater community
-  first.
-* Is the API valid? Does it change currently existing flags, or add new ones?
-* What's the impact on the rest of the CLI? Does it affect other commands/flags?
-
-Answering those questions first in the request might help us make a decision.
+* **Small Features** can be crafted and directly [submitted as a Pull Request](#submit-pr).
 
 ## <a name="submit"></a> Submission Guidelines
 
@@ -62,10 +52,10 @@ Answering those questions first in the request might help us make a decision.
 
 Before you submit an issue, please search the issue tracker, maybe an issue for your problem already exists and the discussion might inform you of workarounds readily available.
 
-We want to fix all the issues as soon as possible, but before fixing a bug we need to reproduce and confirm it. In order to reproduce bugs we will systematically ask you to provide a minimal reproduction scenario using `ng new repro-app`. Having a reproducible scenario gives us wealth of important information without going back & forth to you with additional questions like:
+We want to fix all the issues as soon as possible, but before fixing a bug we need to reproduce and confirm it. Having a reproducible scenario gives us wealth of important information without going back & forth to you with additional questions like:
 
-- version of Angular CLI used
-- `.angular-cli.json` configuration
+- version of Angular DevKit used
+- `angular.json` configuration
 - 3rd-party libraries and their versions
 - and most importantly - a use-case that fails
 
@@ -93,7 +83,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
 
 * Create your patch, **including appropriate test cases**.
 * Follow our [Coding Rules](#rules).
-* Run the full Angular CLI test suite, as described in the [developer documentation][dev-doc],
+* Run the full Angular CLI and DevKit test suite, as described in the [developer documentation][dev-doc],
   and ensure that all tests pass (coming soon).
 * Commit your changes using a descriptive commit message that follows our
   [commit message conventions](#commit). Adherence to these conventions
@@ -110,10 +100,10 @@ Before you submit your Pull Request (PR) consider the following guidelines:
     git push origin my-fix-branch
     ```
 
-* In GitHub, send a pull request to `angular-cli:master`.
+* In GitHub, send a pull request to `devkit:master`.
 * If we suggest changes then:
   * Make the required updates.
-  * Re-run the Angular CLI test suites to ensure tests are still passing.
+  * Re-run the Angular DevKit test suites to ensure tests are still passing.
   * Rebase your branch and force push to your GitHub repository (this will update your Pull Request):
 
     ```shell
@@ -164,7 +154,7 @@ To ensure consistency throughout the source code, keep these rules in mind as yo
 
 We have very precise rules over how our git commit messages can be formatted.  This leads to **more
 readable messages** that are easy to follow when looking through the **project history**.  But also,
-we use the git commit messages to **generate the Angular CLI change log**.
+we use the git commit messages to **generate the Angular DevKit change log**.
 
 ### Commit Message Format
 Each commit message consists of a **header**, a **body** and a **footer**.  The header has a special
@@ -196,8 +186,7 @@ Must be one of the following:
 * **fix**: A bug fix
 * **perf**: A code change that improves performance
 * **refactor**: A code change that neither fixes a bug nor adds a feature
-* **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing
-  semi-colons, etc)
+* **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
 * **test**: Adding missing tests or correcting existing tests
 
 ### Scope
@@ -205,10 +194,12 @@ The scope should be the name of the npm package affected as perceived by the per
 
 The following is the list of supported scopes:
 
-* **@angular/cli**
-* **@ngtools/json-schema**
-* **@ngtools/logger**
-* **@ngtools/webpack**
+* **@angular-devkit/core**
+* **@angular-devkit/build-optimizer**
+* **@angular-devkit/schematics**
+* **@angular-devkit/schematics-cli**
+* **@schematics/angular**
+* **@schematics/schematics**
 
 There are currently a few exceptions to the "use package name" rule:
 
@@ -249,8 +240,8 @@ changes to be accepted, the CLA must be signed. It's a quick process, we promise
 [commit-message-format]: https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#
 [corporate-cla]: http://code.google.com/legal/corporate-cla-v1.0.html
 [dev-doc]: https://github.com/angular/angular-cli#development-hints-for-working-on-angular-cli
-[GitHub]: https://github.com/angular/angular-cli
+[GitHub]: https://github.com/angular/devkit
 [gitter]: https://gitter.im/angular/angular-cli
 [individual-cla]: http://code.google.com/legal/individual-cla-v1.0.html
 [js-style-guide]: https://google.github.io/styleguide/jsguide.html
-[stackoverflow]: http://stackoverflow.com/questions/tagged/angular-cli
+[stackoverflow]: http://stackoverflow.com/questions/tagged/angular-devkit

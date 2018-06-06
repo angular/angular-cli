@@ -1,0 +1,18 @@
+{
+  "versions": {
+    "@_/benchmark": "0.0.10",
+    "@angular-devkit/build-optimizer": "0.0.26",
+    "@angular-devkit/core": "0.0.19",
+    "@angular-devkit/schematics": "0.0.32",
+    "@schematics/angular": "0.0.44",
+    "@schematics/schematics": "0.0.1"
+  },
+  "hashes": {
+    "@_/benchmark": "37ed7e417435c92dbf301e7b26ea37ca",
+    "@angular-devkit/core": "5a4d2636cd6cd66b3733884d4d322076",
+    "@angular-devkit/schematics": "2595b05b283c6c47c24930f0950a6266",
+    "@schematics/angular": "f88f704937ac0dd574166ec27e5c407c",
+    "@angular-devkit/build-optimizer": "e2c0761a3c38064f24e89b1dd6be6dac",
+    "@schematics/schematics": "54fdf2ec654a11af6d6623b08295624f"
+  }
+}

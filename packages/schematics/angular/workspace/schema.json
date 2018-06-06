@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularWorkspace",
+  "title": "Angular Workspace Options Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "The name of the workspace.",
+      "type": "string",
+      "format": "html-selector",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "newProjectRoot": {
+      "description": "The path where new projects will be created.",
+      "type": "string",
+      "visible": "false"
+    },
+    "skipInstall": {
+      "description": "Skip installing dependency packages.",
+      "type": "boolean",
+      "default": false
+    },
+    "linkCli": {
+      "description": "Link CLI to global version (internal development only).",
+      "type": "boolean",
+      "default": false,
+      "visible": false
+    },
+    "skipGit": {
+      "description": "Skip initializing a git repository.",
+      "type": "boolean",
+      "default": false,
+      "alias": "g"
+    },
+    "commit": {
+      "description": "Initial repository commit information.",
+      "default": null,
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "email"
+          ]
+        }
+      ]
+    },
+    "version": {
+      "type": "string",
+      "description": "The version of the Angular CLI to use.",
+      "visible": false
+    }
+  },
+  "required": [
+    "name",
+    "version"
+  ],
+  "additionalProperties": false
+}

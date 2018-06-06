@@ -1,0 +1,183 @@
+version: 2
+
+_defaults: &defaults
+  working_directory: ~/ng
+  docker:
+    - image: angular/ngcontainer:0.3.0
+
+_post_checkout: &post_checkout
+  post: git pull --ff-only origin "refs/pull/${CI_PULL_REQUEST//*pull\//}/merge"
+
+_root_package_lock_key: &_root_package_lock_key
+  key: angular_devkit-{{ checksum "package-lock.json" }}-0.3.0
+
+jobs:
+  install:
+    <<: *defaults
+    steps:
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
+      - run: npm install --no-save
+      - save_cache:
+          <<: *_root_package_lock_key
+          paths:
+            - "node_modules"
+  
+  lint:
+    <<: *defaults
+    steps:
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
+      - run: npm run lint
+
+  validate:
+    <<: *defaults
+    steps:
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
+      - run: npm run validate -- --ci
+
+  test:
+    <<: *defaults
+    steps:
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
+      - run: npm run test -- --code-coverage --full
+
+  test-large:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
+      - run: npm run webdriver-update-circleci
+      - run: npm run test-large -- --code-coverage --full
+
+  e2e-cli:
+    <<: *defaults
+    environment:
+      BASH_ENV: ~/.profile
+    resource_class: xlarge
+    parallelism: 4
+    steps:
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
+      - run: xvfb-run -a npm run test-cli-e2e -- --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
+
+  integration:
+    <<: *defaults
+    steps:
+      - checkout:
+          <<: *post_checkout
+      - restore_cache:
+          key: angular_devkit-{{ checksum "package-lock.json" }}
+      - restore_cache:
+          key: angular_devkit-integration-simple-{{ checksum "tests/@angular_devkit/build_optimizer/webpack/simple-app/package-lock.json" }}
+      - restore_cache:
+          key: angular_devkit-integration-aio-{{ checksum "tests/@angular_devkit/build_optimizer/webpack/aio-app/package-lock.json" }}
+
+      - run: xvfb-run -a npm run integration
+
+      - save_cache:
+          key: angular_devkit-integration-simple-{{ checksum "tests/@angular_devkit/build_optimizer/webpack/simple-app/package-lock.json" }}
+          paths:
+            - "tests/@angular_devkit/build_optimizer/webpack/simple-app/node_modules"
+      - save_cache:
+          key: angular_devkit-integration-aio-{{ checksum "tests/@angular_devkit/build_optimizer/webpack/aio-app/package-lock.json" }}
+          paths:
+            - "tests/@angular_devkit/build_optimizer/webpack/aio-app/node_modules"
+
+  build:
+    <<: *defaults
+    steps:
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
+      - run: npm run admin -- build
+
+  build-bazel:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - checkout: *post_checkout
+      - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
+      - run: bazel run @nodejs//:npm install
+      - run: bazel build //packages/...
+
+  snapshot_publish:
+    <<: *defaults
+    steps:
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
+      - run:
+          name: Decrypt Credentials
+          command: |
+            openssl aes-256-cbc -d -in .circleci/github_token -k "${KEY}" -out ~/github_token
+      - run:
+          name: Deployment to Snapshot
+          command: |
+            npm run admin -- snapshots --verbose --githubTokenFile=${HOME}/github_token
+
+  publish:
+    <<: *defaults
+    steps:
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
+      - run:
+          name: Decrypt Credentials
+          command: |
+            openssl aes-256-cbc -d -in .circleci/npm_token -k "${KEY}" -out ~/.npmrc
+      - run:
+          name: Deployment to NPM
+          command: |
+            npm run admin -- publish --verbose
+
+workflows:
+  version: 2
+  default_workflow:
+    jobs:
+      - install
+      - lint:
+          requires:
+            - install
+      - validate:
+          requires:
+            - install
+      - build:
+          requires:
+            - lint
+            - validate
+      - build-bazel:
+          requires:
+            - lint
+            - validate
+      - test:
+          requires:
+            - build
+      - test-large:
+          requires:
+            - build
+      - integration:
+          requires:
+            - build
+      - e2e-cli:
+          requires:
+            - build
+      - snapshot_publish:
+          requires:
+            - test
+            - build
+            - e2e-cli
+          filters:
+            branches:
+              only: master
+      - publish:
+          requires:
+            - test
+            - build
+            - integration
+            - snapshot_publish
+          filters:
+            tags:
+              only: /^v\d+/
+            branches:
+              ignore: /.*/

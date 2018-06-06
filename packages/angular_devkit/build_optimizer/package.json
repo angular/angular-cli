@@ -1,0 +1,20 @@
+{
+  "name": "@angular-devkit/build-optimizer",
+  "version": "0.0.0",
+  "description": "Angular Build Optimizer",
+  "main": "src/index.js",
+  "typings": "src/index.d.ts",
+  "bin": {
+    "build-optimizer": "./src/build-optimizer/cli.js",
+    "purify": "./src/purify/cli.js"
+  },
+  "scripts": {
+    "preinstall": "echo DO NOT INSTALL THIS PROJECT, ONLY THE ROOT PROJECT. && exit 1"
+  },
+  "dependencies": {
+    "loader-utils": "^1.1.0",
+    "source-map": "^0.5.6",
+    "typescript": "~2.9.1",
+    "webpack-sources": "^1.1.0"
+  }
+}

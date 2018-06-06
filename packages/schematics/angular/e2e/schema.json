@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularE2eApp",
+  "title": "Angular e2e Application Options Schema",
+  "type": "object",
+  "properties": {
+    "projectRoot": {
+      "description": "The root directory of the new application.",
+      "type": "string",
+      "visible": false
+    },
+    "name": {
+      "description": "The name of the e2e application.",
+      "type": "string",
+      "format": "html-selector",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "rootSelector": {
+      "description": "HTML selector for the root component.",
+      "type": "string",
+      "default": "app-root"
+    },
+    "relatedAppName": {
+      "description": "The name of the app being tested.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "relatedAppName"
+  ],
+  "additionalProperties": false
+}

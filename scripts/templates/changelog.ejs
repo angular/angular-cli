@@ -1,0 +1,66 @@
+<%#
+  The data structure for this file looks like this:
+    {
+      from: 'v1.2.3',
+      to: 'v1.2.4',
+      // For a commit with description:
+      // ------------------------------------------------------
+      //   feat(@angular/pwa): add something to this
+      //
+      //   Fixes #123
+      // ------------------------------------------------------
+      // See https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-commits-parser
+      commits: [ {
+        type: 'feat', // | 'fix' | 'refactor' | 'build' | 'test' | 'ci'
+        scope: '@angular/pwa',  // package name (or null)
+        subject: 'add something to this',
+        header: 'feat(@angular/pwa): add something to this',
+        body: null,
+        footer: 'Fixes #123',
+        references: [
+          {
+            action: 'Closes',
+            owner: null,
+            repository: null,
+            issue: '123',
+            raw: '#123',
+            prefix: '#'
+          }
+        ],
+      } ]
+    }
+%># Commits
+<%
+  // Get unique scopes.
+  const scopes = commits.map(x => x.scope)
+    .sort()
+    .filter((v, i, a) => v !== a[i - 1]);
+
+  for (const scope of scopes) {
+    const scopeCommits = commits
+      .filter(x => x.scope === scope)
+      .filter(x => ['fix', 'feat'].includes(x.type));
+
+    if (scopeCommits.length == 0) {
+        continue;
+    }
+%>
+## `<%= scope || 'Misc' %>`
+
+| Commit | Description | Notes |
+|:------:| ----------- | -----:|
+<%
+    for (const commit of scopeCommits) {
+        switch (commit.type) {
+            case 'fix': %><%= include('./changelog-fix', commit) %><% break;
+            case 'feat': %><%= include('./changelog-feat', commit) %><% break;
+        }
+    }
+%>
+<% } %>
+
+----
+
+# Special Thanks
+
+<%= include('./changelog-special-thanks', { commits }) %>

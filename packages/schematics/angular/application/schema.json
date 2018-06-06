@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularApp",
+  "title": "Angular Application Options Schema",
+  "type": "object",
+  "properties": {
+    "projectRoot": {
+      "description": "The root directory of the new application.",
+      "type": "string",
+      "visible": false
+    },
+    "name": {
+      "description": "The name of the application.",
+      "type": "string",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "inlineStyle": {
+      "description": "Specifies if the style will be in the ts file.",
+      "type": "boolean",
+      "default": false,
+      "alias": "s"
+    },
+    "inlineTemplate": {
+      "description": "Specifies if the template will be in the ts file.",
+      "type": "boolean",
+      "default": false,
+      "alias": "t"
+    },
+    "viewEncapsulation": {
+      "description": "Specifies the view encapsulation strategy.",
+      "enum": ["Emulated", "Native", "None"],
+      "type": "string"
+    },
+    "routing": {
+      "type": "boolean",
+      "description": "Generates a routing module.",
+      "default": false
+    },
+    "prefix": {
+      "type": "string",
+      "format": "html-selector",
+      "description": "The prefix to apply to generated selectors.",
+      "default": "app",
+      "alias": "p"
+    },
+    "style": {
+      "description": "The file extension to be used for style files.",
+      "type": "string",
+      "default": "css"
+    },
+    "skipTests": {
+      "description": "Skip creating spec files.",
+      "type": "boolean",
+      "default": false,
+      "alias": "S"
+    },
+    "skipPackageJson": {
+      "type": "boolean",
+      "default": false,
+      "description": "Do not add dependencies to package.json."
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

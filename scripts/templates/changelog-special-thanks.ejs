@@ -1,0 +1,17 @@
+<%
+const counter = Object.create(null);
+
+for (const commit of commits) {
+    const name = commit.authorName;
+    if (name) {
+        counter[name] = (counter[name] || 0) + 1;
+    }
+}
+
+const sortedCount = [...Object.entries(counter)].sort((a, b) => b[1] - a[1]).map(x => x[0]);
+
+for (const count of sortedCount.join(', ')) {
+    %><%= count[0] %><%
+}
+
+%>

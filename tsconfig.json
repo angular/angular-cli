@@ -3,20 +3,26 @@
     "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "mapRoot": "",
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "noUnusedParameters": true,
-    "noUnusedLocals": true,
+    "noUnusedParameters": false,  // The linter is used for these.
+    "noUnusedLocals": false,  // The linter is used for these.
     "outDir": "./dist",
     "rootDir": ".",
+    "skipDefaultLibCheck": true,
     "skipLibCheck": true,
-    "sourceMap": true,
-    "sourceRoot": "",
-    "target": "es6",
+    "inlineSourceMap": true,
+    "sourceRoot": ".",
+    // Inline sources are necessary for our tests to show the proper sources, since we are using
+    // Istanbul (not Constantinople) as well, and applying both source maps to get the original
+    // source in devtools.
+    "inlineSources": true,
+    "strictNullChecks": true,
+    "target": "es2016",
     "lib": [
       "es2017"
     ],
@@ -27,11 +33,37 @@
     "types": [
       "jasmine",
       "node"
-    ]
+    ],
+    "paths": {
+      "@_/benchmark": [ "./packages/_/benchmark/src/index" ],
+      "@angular-devkit/core": [ "./packages/angular_devkit/core/src/index" ],
+      "@angular-devkit/core/node": [ "./packages/angular_devkit/core/node/index" ],
+      "@angular-devkit/core/node/testing": [ "./packages/angular_devkit/core/node/testing/index" ],
+      "@angular-devkit/schematics": [ "./packages/angular_devkit/schematics/src/index" ],
+      "@angular-devkit/schematics/tasks": [ "./packages/angular_devkit/schematics/tasks/index" ],
+      "@angular-devkit/schematics/tasks/node": [ "./packages/angular_devkit/schematics/tasks/node/index" ],
+      "@angular-devkit/schematics/tools": [ "./packages/angular_devkit/schematics/tools/index" ],
+      "@angular-devkit/schematics/testing": [ "./packages/angular_devkit/schematics/testing/index" ],
+      "@angular-devkit/build-optimizer": [ "./packages/angular_devkit/build_optimizer/src/index" ],
+      "@angular-devkit/architect": [ "./packages/angular_devkit/architect/src/index" ],
+      "@angular-devkit/architect/testing": [ "./packages/angular_devkit/architect/testing/index" ],
+      "@angular-devkit/build-webpack": [ "./packages/angular_devkit/build_webpack/src/index" ],
+      "@ngtools/webpack": [ "./packages/ngtools/webpack/src/index" ],
+      "@ngtools/webpack/*": [ "./packages/ngtools/webpack/*" ],
+      "@schematics/angular": [ "./packages/schematics/angular/index" ]
+    }
+  },
+  "bazelOptions": {
+    "suppressTsconfigOverrideWarnings": true
   },
   "exclude": [
+    "bazel-*/**/*",
     "dist/**/*",
     "node_modules/**/*",
-    "tmp/**/*"
+    "packages/_/devkit/**/*files/**/*",
+    "packages/schematics/*/*/*files/**/*",
+    "tmp/**/*",
+    "scripts/patches/**/*",
+    "tests/**/*"
   ]
 }

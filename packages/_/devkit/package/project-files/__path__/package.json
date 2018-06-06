@@ -1,0 +1,16 @@
+{
+  "name": "<%= name %>",
+  "version": "0.0.0",
+  "description": "<%= description %>",
+  "main": "src/index.js",
+  "typings": "src/index.d.ts",
+  "scripts": {
+    "preinstall": "echo DO NOT INSTALL THIS PROJECT, ONLY THE ROOT PROJECT. && exit 1"
+  },
+  "keywords": [
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@angular-devkit/core": "0.0.0"
+  }
+}

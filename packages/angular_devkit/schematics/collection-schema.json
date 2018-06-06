@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsCollectionSchema",
+  "title": "Collection Schema for validating a 'collection.json'.",
+  "type": "object",
+  "properties": {
+    "extends": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      ]
+    },
+    "schematics": {
+      "type": "object",
+      "description": "A map of schematic names to schematic details",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "factory": {
+            "type": "string",
+            "description": "A folder or file path to the schematic factory"
+          },
+          "description": {
+            "type": "string",
+            "description": "A description for the schematic"
+          },
+          "extends": {
+            "type": "string",
+            "description": "An schematic override. It can be a local schematic or from another collection (in the format 'collection:schematic')"
+          },
+          "schema": {
+            "type": "string",
+            "description": "Location of the schema.json file of the schematic"
+          },
+          "hidden": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether or not this schematic should be listed by the tooling. This does not prevent the tooling to run this schematic, just removes its name from listSchematicNames()."
+          },
+          "private": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether or not this schematic can be called from an external schematic, or a tool. This implies hidden: true."
+          }
+        },
+        "required": [
+          "factory",
+          "description"
+        ]
+      }
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schematics"
+  ]
+}

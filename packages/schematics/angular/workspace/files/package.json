@@ -1,0 +1,47 @@
+{
+  "name": "<%= utils.dasherize(name) %>",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "test": "ng test",
+    "lint": "ng lint",
+    "e2e": "ng e2e"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "<%= latestVersions.Angular %>",
+    "@angular/common": "<%= latestVersions.Angular %>",
+    "@angular/compiler": "<%= latestVersions.Angular %>",
+    "@angular/core": "<%= latestVersions.Angular %>",
+    "@angular/forms": "<%= latestVersions.Angular %>",
+    "@angular/http": "<%= latestVersions.Angular %>",
+    "@angular/platform-browser": "<%= latestVersions.Angular %>",
+    "@angular/platform-browser-dynamic": "<%= latestVersions.Angular %>",
+    "@angular/router": "<%= latestVersions.Angular %>",
+    "core-js": "^2.5.4",
+    "rxjs": "<%= latestVersions.RxJs %>",
+    "zone.js": "<%= latestVersions.ZoneJs %>"
+  },
+  "devDependencies": {
+    "@angular/cli": "~<%= version %>",
+    "@angular/compiler-cli": "<%= latestVersions.Angular %>",
+    "@angular/language-service": "<%= latestVersions.Angular %>",
+    "@types/jasmine": "~2.8.6",
+    "@types/jasminewd2": "~2.0.3",
+    "@types/node": "~8.9.4",
+    "codelyzer": "~4.2.1",
+    "jasmine-core": "~2.99.1",
+    "jasmine-spec-reporter": "~4.2.1",
+    "karma": "~1.7.1",
+    "karma-chrome-launcher": "~2.2.0",
+    "karma-coverage-istanbul-reporter": "~2.0.0",
+    "karma-jasmine": "~1.1.1",
+    "karma-jasmine-html-reporter": "^0.2.2",
+    "protractor": "~5.3.0",
+    "ts-node": "~5.0.1",
+    "tslint": "~5.9.1",
+    "typescript": "<%= latestVersions.TypeScript %>"
+  }
+}

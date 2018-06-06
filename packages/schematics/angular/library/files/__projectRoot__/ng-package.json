@@ -1,0 +1,8 @@
+{
+  "$schema": "<%= relativePathToWorkspaceRoot %>/node_modules/ng-packagr/ng-package.schema.json",
+  "dest": "<%= relativePathToWorkspaceRoot %>/<%= distRoot %>",
+  "deleteDestPath": false,
+  "lib": {
+    "entryFile": "src/<%= entryFile %>.ts"
+  }
+}

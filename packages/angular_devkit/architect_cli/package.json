@@ -1,0 +1,24 @@
+{
+  "name": "@angular-devkit/architect-cli",
+  "version": "0.0.0",
+  "description": "Angular Architect CLI",
+  "bin": {
+    "architect": "./bin/architect.js"
+  },
+  "scripts": {
+    "preinstall": "echo DO NOT INSTALL THIS PROJECT, ONLY THE ROOT PROJECT. && exit 1"
+  },
+  "keywords": [
+    "build system",
+    "build facade",
+    "build",
+    "tooling"
+  ],
+  "dependencies": {
+    "@angular-devkit/core": "0.0.0",
+    "@angular-devkit/architect": "0.0.0",
+    "minimist": "^1.2.0",
+    "symbol-observable": "^1.2.0",
+    "rxjs": "^6.0.0"
+  }
+}

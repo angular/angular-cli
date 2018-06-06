@@ -1,5 +1,16 @@
 {
+  "extends": "tslint-no-circular-imports",
+  "rulesDirectory": [
+    "dist/rules"
+  ],
   "rules": {
+    "defocus": true,
+    "import-groups": true,
+    "non-null-operator": true,
+    "no-global-tslint-disable": true,
+    "single-eof-line": true,
+
+
     "no-implicit-dependencies": true,
     "no-import-side-effect": [true, {"ignore-module": "^(?!rxjs\/)"}],
     "align": [
@@ -74,6 +85,10 @@
       }
     ],
     "curly": true,
+    "file-header": [
+      true,
+      "Copyright Google Inc\\. All Rights Reserved\\."
+    ],
     "variable-name": [
       true,
       "ban-keywords",
