@@ -1,0 +1,23 @@
+<%
+  if (!hash) {
+    return;
+  }
+
+  const shortSha = hash && hash.slice(0, 7);
+%>| <%# Commit: %><%
+  if (shortSha) {
+    %>[![Bug Fix](https://img.shields.io/badge/<%= shortSha %>-feat-yellow.svg)](https://github.com/angular/angular-cli/commit/<%= hash %>)<%
+  } %><%
+%>| <%# Desc: %><%= subject
+%>| <%# Notes: %><%
+  for (const reference of references) {
+    if (!reference.action || !reference.issue) {
+      continue;
+    }
+
+    const issue = reference.issue;
+    const owner = reference.owner || 'angular';
+    const repository = reference.repository || (issue > 10000 ? 'angular-cli' : 'devkit');
+    %>[Closes #<%= issue %>](https://github.com/<%= owner %>/<%= repository %>/issues/<%= issue %>)<%
+  }
+%>

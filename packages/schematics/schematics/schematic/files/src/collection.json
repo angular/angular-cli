@@ -1,0 +1,36 @@
+// By default, collection.json is a Loose-format JSON5 format, which means it's loaded using a
+// special loader and you can use comments, as well as single quotes or no-quotes for standard
+// JavaScript identifiers.
+// Note that this is only true for collection.json and it depends on the tooling itself.
+// We read package.json using a require() call, which is standard JSON.
+{
+  // This is just to indicate to your IDE that there is a schema for collection.json.
+  "$schema": "./node_modules/@angular-devkit/schematics/collection-schema.json",
+
+  // Schematics are listed as a map of schematicName => schematicDescription.
+  // Each description contains a description field which is required, a factory reference,
+  // an extends field and a schema reference.
+  // The extends field points to another schematic (either in the same collection or a
+  // separate collection using the format collectionName:schematicName).
+  // The factory is required, except when using the extends field. Then the factory can
+  // overwrite the extended schematic factory.
+  "schematics": {
+    "my-schematic": {
+      "description": "An example schematic",
+      "factory": "./my-schematic/index#mySchematic"
+    },
+    "my-other-schematic": {
+      "description": "A schematic that uses another schematics.",
+      "factory": "./my-other-schematic"
+    },
+    "my-full-schematic": {
+      "description": "A schematic using a source and a schema to validate options.",
+      "factory": "./my-full-schematic",
+      "schema": "./my-full-schematic/schema.json"
+    },
+    "my-extend-schematic": {
+      "description": "A schematic that extends another schematic.",
+      "extends": "my-full-schematic"
+    }
+  }
+}

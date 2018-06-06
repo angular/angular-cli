@@ -1,0 +1,4 @@
+node_modules/
+dist/
+dist-no-ngo/
+dist-old-ngo/

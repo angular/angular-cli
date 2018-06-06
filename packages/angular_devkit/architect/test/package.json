@@ -1,0 +1,6 @@
+{
+  "builders": "builders.json",
+  "dependencies": {
+    "rxjs": "^6.0.0"
+  }
+}

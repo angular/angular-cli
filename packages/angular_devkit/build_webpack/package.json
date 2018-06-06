@@ -1,0 +1,20 @@
+{
+  "name": "@angular-devkit/build-webpack",
+  "version": "0.0.0",
+  "description": "Webpack Builder for Architect",
+  "main": "src/index.js",
+  "typings": "src/index.d.ts",
+  "builders": "builders.json",
+  "scripts": {
+    "preinstall": "echo DO NOT INSTALL THIS PROJECT, ONLY THE ROOT PROJECT. && exit 1"
+  },
+  "dependencies": {
+    "@angular-devkit/architect": "0.0.0",
+    "@angular-devkit/core": "0.0.0",
+    "rxjs": "^6.0.0"
+  },
+  "peerDependencies": {
+    "webpack": "~4.6.0",
+    "webpack-dev-server": "^3.1.4"
+  }
+}

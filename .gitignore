@@ -1,7 +1,7 @@
+# Outputs
+bazel-*
+test-project-host-*
 dist/
-node_modules/
-npm-debug.log*
-yarn-error.log*
 
 # IDEs
 .idea/
@@ -12,7 +12,12 @@ jsconfig.json
 typings/
 
 # Misc
+coverage/
+node_modules/
 tmp/
+npm-debug.log*
+yarn-error.log*
+.ng_pkg_build/
 
 # Mac OSX Finder files.
 **/.DS_Store

@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularPipe",
+  "title": "Angular Pipe Options Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the pipe.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path to create the pipe.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "flat": {
+      "type": "boolean",
+      "default": true,
+      "description": "Flag to indicate if a dir is created."
+    },
+    "spec": {
+      "type": "boolean",
+      "default": true,
+      "description": "Specifies if a spec file is generated."
+    },
+    "skipImport": {
+      "type": "boolean",
+      "default": false,
+      "description": "Allows for skipping the module import."
+    },
+    "module": {
+      "type": "string",
+      "default": "",
+      "description": "Allows specification of the declaring module.",
+      "alias": "m"
+    },
+    "export": {
+      "type": "boolean",
+      "default": false,
+      "description": "Specifies if declaring module exports the pipe."
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

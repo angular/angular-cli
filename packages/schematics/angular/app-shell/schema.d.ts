@@ -1,0 +1,71 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+
+export interface Schema {
+    /**
+     * Name of related client app.
+     */
+    clientProject: string;
+    /**
+     * Name of related universal app.
+     */
+    universalProject: string;
+    /**
+     * Route path used to produce the app shell.
+     */
+    route?: string;
+    /**
+     * Name of the universal app
+     */
+    name?: string;
+    /**
+     * The appId to use withServerTransition.
+     */
+    appId?: string;
+    /**
+     * The output directory for build results.
+     */
+    outDir?: string;
+    /**
+     * The root directory of the app.
+     */
+    root?: string;
+    /**
+     * Name of the index file
+     */
+    index?: string;
+    /**
+     * The name of the main entry-point file.
+     */
+    main?: string;
+    /**
+     * The name of the test entry-point file.
+     */
+    test?: string;
+    /**
+     * The name of the TypeScript configuration file.
+     */
+    tsconfigFileName?: string;
+    /**
+     * The name of the TypeScript configuration file for tests.
+     */
+    testTsconfigFileName?: string;
+    /**
+     * The name of the application directory.
+     */
+    appDir?: string;
+    /**
+     * The name of the root module file
+     */
+    rootModuleFileName?: string;
+    /**
+     * The name of the root module class.
+     */
+    rootModuleClassName?: string;
+    sourceDir?: string;
+}

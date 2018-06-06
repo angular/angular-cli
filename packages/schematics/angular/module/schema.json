@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularModule",
+  "title": "Angular Module Options Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the module.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path to create the module.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "routing": {
+      "type": "boolean",
+      "description": "Generates a routing module.",
+      "default": false
+    },
+    "routingScope": {
+      "enum": ["Child", "Root"],
+      "type": "string",
+      "description": "The scope for the generated routing.",
+      "default": "Child"
+    },
+    "spec": {
+      "type": "boolean",
+      "description": "Specifies if a spec file is generated.",
+      "default": true
+    },
+    "flat": {
+      "type": "boolean",
+      "description": "Flag to indicate if a dir is created.",
+      "default": false
+    },
+    "commonModule": {
+      "type": "boolean",
+      "description": "Flag to control whether the CommonModule is imported.",
+      "default": true,
+      "visible": false
+    },
+    "module":  {
+      "type": "string",
+      "description": "Allows specification of the declaring module.",
+      "alias": "m"
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

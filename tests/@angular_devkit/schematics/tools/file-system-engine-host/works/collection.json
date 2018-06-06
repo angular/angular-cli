@@ -1,0 +1,9 @@
+{
+  "name": "works",
+  "schematics": {
+    "schematic1": {
+      "description": "1",
+      "factory": "../null-factory"
+    }
+  }
+}

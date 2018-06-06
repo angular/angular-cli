@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularService",
+  "title": "Angular Service Options Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the service.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path to create the service.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "flat": {
+      "type": "boolean",
+      "default": true,
+      "description": "Flag to indicate if a dir is created."
+    },
+    "spec": {
+      "type": "boolean",
+      "default": true,
+      "description": "Specifies if a spec file is generated."
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

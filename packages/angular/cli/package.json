@@ -1,0 +1,47 @@
+{
+  "name": "@angular/cli",
+  "version": "6.1.0-beta.0",
+  "description": "CLI tool for Angular",
+  "main": "lib/cli/index.js",
+  "trackingCode": "UA-8594346-19",
+  "bin": {
+    "ng": "./bin/ng"
+  },
+  "keywords": [
+    "angular",
+    "angular-cli",
+    "Angular CLI"
+  ],
+  "scripts": {
+    "postinstall": "node ./bin/ng-update-message.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/angular-cli.git"
+  },
+  "engines": {
+    "node": ">= 8.9.0",
+    "npm": ">= 5.5.1"
+  },
+  "author": "Angular Authors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angular/angular-cli/issues"
+  },
+  "homepage": "https://github.com/angular/angular-cli",
+  "dependencies": {
+    "@angular-devkit/architect": "0.0.0",
+    "@angular-devkit/core": "0.0.0",
+    "@angular-devkit/schematics": "0.0.0",
+    "@schematics/angular": "0.0.0",
+    "@schematics/update": "0.0.0",
+    "opn": "^5.3.0",
+    "rxjs": "^6.0.0",
+    "semver": "^5.1.0",
+    "symbol-observable": "^1.2.0",
+    "yargs-parser": "^10.0.0"
+  },
+  "ng-update": {
+    "migrations": "@schematics/angular/migrations/migration-collection.json"
+  }
+}

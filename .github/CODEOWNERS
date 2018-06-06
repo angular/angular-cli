@@ -1,3 +1,17 @@
-packages/@ngtools/webpack/*                 @hansl
-packages/@angular/blueprints/*              @Brocco
-packages/@angular/models/webpack-configs/*  @filipesilva
+/packages/_/                                @hansl @clydin
+/packages/angular/pwa                       @hansl @Brocco
+/packages/angular_devkit/architect/         @filipesilva @hansl
+/packages/angular_devkit/architect_cli/     @filipesilva @hansl 
+/packages/angular_devkit/build_angular/     @filipesilva @clydin
+/packages/angular_devkit/build_ng_packagr/  @filipesilva @clydin
+/packages/angular_devkit/build_optimizer/   @filipesilva @clydin
+/packages/angular_devkit/core/              @hansl @clydin
+/packages/angular_devkit/schematics/        @hansl @Brocco
+/packages/angular_devkit/schematics_cli/    @hansl @Brocco
+/packages/ngtools/webpack/                  @hansl @filipesilva @clydin
+/packages/schematics/angular/               @hansl @Brocco
+/packages/schematics/package_update/        @hansl @Brocco
+/packages/schematics/schematics/            @hansl @Brocco
+/packages/schematics/update/                @hansl @Brocco
+/rules/                                     @hansl @clydin
+/scripts/                                   @hansl @clydin

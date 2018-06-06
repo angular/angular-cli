@@ -1,0 +1,14 @@
+{
+  "title": "Webpack Builder.",
+  "description": "Webpack Builder schema for Architect.",
+  "properties": {
+    "webpackConfig": {
+      "type": "string",
+      "description": "The path to the Webpack configuration file."
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "webpackConfig"
+  ] 
+}

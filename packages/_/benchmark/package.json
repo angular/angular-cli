@@ -1,0 +1,11 @@
+{
+  "name": "@_/benchmark",
+  "version": "0.0.0",
+  "description": "CLI tool for Angular",
+  "main": "src/index.js",
+  "typings": "src/index.d.ts",
+  "scripts": {
+    "preinstall": "echo DO NOT INSTALL THIS PROJECT, ONLY THE ROOT PROJECT. && exit 1"
+  },
+  "private": true
+}

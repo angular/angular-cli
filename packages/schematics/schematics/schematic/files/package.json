@@ -1,0 +1,23 @@
+{
+  "name": "<%= dasherize(name) %>",
+  "version": "0.0.0",
+  "description": "A schematics",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && jasmine **/*_spec.js"
+  },
+  "keywords": [
+    "schematics"
+  ],
+  "author": "<%= author %>",
+  "license": "MIT",
+  "schematics": "./src/collection.json",
+  "dependencies": {
+    "@angular-devkit/core": "^<%= coreVersion %>",
+    "@angular-devkit/schematics": "^<%= schematicsVersion %>",
+    "@types/jasmine": "^2.6.0",
+    "@types/node": "^8.0.31",
+    "jasmine": "^2.8.0",
+    "typescript": "^2.5.2"
+  }
+}
