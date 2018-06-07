@@ -42,6 +42,7 @@ The loader works with webpack plugin to compile your TypeScript. It's important 
 * `skipCodeGeneration`. Optional, defaults to false. Disable code generation and do not refactor the code to bootstrap. This replaces `templateUrl: "string"` with `template: require("string")` (and similar for styles) to allow for webpack to properly link the resources.
 * `sourceMap`. Optional. Include sourcemaps.
 * `compilerOptions`. Optional. Override options in `tsconfig.json`.
+* `contextElementDependencyConstructor`. Optional. Set to `require('webpack/lib/dependencies/ContextElementDependency')` if you are having `No module factory available for dependency type: ContextElementDependency` errors.
 
 ## Features
 The benefits and ability of using [`@ngtools/webpack`](https://www.npmjs.com/~ngtools) standalone from the Angular CLI as presented in [Stephen Fluin's Angular CLI talk](https://youtu.be/uBRK6cTr4Vk?t=6m45s) at Angular Connect 2016:
