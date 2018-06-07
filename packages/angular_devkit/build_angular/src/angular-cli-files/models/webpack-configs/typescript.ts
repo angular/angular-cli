@@ -72,6 +72,7 @@ function _createAotPlugin(
     additionalLazyModules,
     nameLazyFiles: buildOptions.namedChunks,
     forkTypeChecker: buildOptions.forkTypeChecker,
+    contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
     ...options,
     host,
   };
