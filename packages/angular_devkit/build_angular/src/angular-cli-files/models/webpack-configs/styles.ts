@@ -189,7 +189,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   }
 
   // set base rules to derive final rules from
-  const baseRules: webpack.NewUseRule[] = [
+  const baseRules: webpack.Rule[] = [
     { test: /\.css$/, use: [] },
     {
       test: /\.scss$|\.sass$/, use: [{
