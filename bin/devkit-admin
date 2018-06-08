@@ -64,7 +64,13 @@ try {
 
 
 try {
-  require(scriptPath).default(args, logger);
+  Promise.resolve()
+    .then(() => require(scriptPath).default(args, logger))
+    .then(exitCode => process.exit(exitCode || 0))
+    .catch(err => {
+      logger.fatal(err.stack);
+      process.exit(99);
+    });
 } catch (err) {
   logger.fatal(err.stack);
   process.exit(99);
