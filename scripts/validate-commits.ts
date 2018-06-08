@@ -32,7 +32,7 @@ export default function (argv: ValidateCommitsOptions, logger: logging.Logger) {
   let sha = '';
 
   if (prNumber) {
-    const url = `https://api.github.com/repos/angular/devkit/pulls/${prNumber}`;
+    const url = `https://api.github.com/repos/angular/angular-cli/pulls/${prNumber}`;
     const prJson = JSON.parse(execSync(`curl "${url}"`, {
       stdio: ['ignore', 'pipe', 'ignore'],
       encoding: 'utf8',
