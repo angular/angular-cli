@@ -13,7 +13,7 @@ import validateBuildFiles from './validate-build-files';
 import validateCommits from './validate-commits';
 import validateLicenses from './validate-licenses';
 
-export default function (options: { verbose: boolean }, logger: logging.Logger) {
+export default async function (options: { verbose: boolean }, logger: logging.Logger) {
   let error = false;
 
   logger.info('Running templates validation...');
@@ -21,7 +21,7 @@ export default function (options: { verbose: boolean }, logger: logging.Logger) 
   if (execSync(`git status --porcelain`).toString()) {
     logger.error('There are local changes.');
     if (!options.verbose) {
-      process.exit(1);
+      return 101;
     }
     error = true;
   }
@@ -44,13 +44,15 @@ export default function (options: { verbose: boolean }, logger: logging.Logger) 
 
   logger.info('');
   logger.info('Running license validation...');
-  validateLicenses({}, logger.createChild('validate-commits'));
+  error = await validateLicenses({}, logger.createChild('validate-commits')) != 0;
 
   logger.info('');
   logger.info('Running BUILD files validation...');
   validateBuildFiles({}, logger.createChild('validate-build-files'));
 
   if (error) {
-    process.exit(101);
+    return 101;
   }
+
+  return 0;
 }

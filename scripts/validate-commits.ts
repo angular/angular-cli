@@ -145,8 +145,9 @@ export default function (argv: ValidateCommitsOptions, logger: logging.Logger) {
 
   if (invalidCount > 0) {
     logger.fatal(`${invalidCount} commits were found invalid...`);
-    process.exit(1);
   } else {
     logger.info('All green. Thank you, come again.');
   }
+
+  return invalidCount;
 }
