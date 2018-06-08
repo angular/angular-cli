@@ -67,5 +67,6 @@ try {
   require(scriptPath).default(args, logger);
 } catch (err) {
   logger.fatal(err.stack);
+  process.exit(99);
 }
 
