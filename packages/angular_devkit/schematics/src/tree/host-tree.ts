@@ -287,7 +287,7 @@ export class HostTree implements Tree {
       return null;
     }
 
-    return new LazyFileEntry(p, () => new Buffer(this._recordSync.read(p)));
+    return new LazyFileEntry(p, () => Buffer.from(this._recordSync.read(p)));
   }
 
   getDir(path: string): DirEntry {
@@ -324,7 +324,7 @@ export class HostTree implements Tree {
     if (!this._recordSync.exists(p)) {
       throw new FileDoesNotExistException(p);
     }
-    const c = typeof content == 'string' ? new Buffer(content) : content;
+    const c = typeof content == 'string' ? Buffer.from(content) : content;
     this._record.overwrite(p, c as {} as virtualFs.FileBuffer).subscribe();
   }
   beginUpdate(path: string): UpdateRecorder {
@@ -356,7 +356,7 @@ export class HostTree implements Tree {
     if (this._recordSync.exists(p)) {
       throw new FileAlreadyExistException(p);
     }
-    const c = typeof content == 'string' ? new Buffer(content) : content;
+    const c = typeof content == 'string' ? Buffer.from(content) : content;
     this._record.create(p, c as {} as virtualFs.FileBuffer).subscribe();
   }
   delete(path: string): void {
@@ -393,7 +393,7 @@ export class HostTree implements Tree {
                 parent: 0,
                 kind: 'c',
                 path: record.path,
-                content: new Buffer(record.content),
+                content: Buffer.from(record.content),
               } as CreateFileAction;
             case 'overwrite':
               return {
@@ -401,7 +401,7 @@ export class HostTree implements Tree {
                 parent: 0,
                 kind: 'o',
                 path: record.path,
-                content: new Buffer(record.content),
+                content: Buffer.from(record.content),
               } as OverwriteFileAction;
             case 'rename':
               return {

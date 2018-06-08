@@ -207,7 +207,7 @@ export class VirtualTree implements Tree {
   overwrite(path: string, content: Buffer | string) {
     const normalizedTo = this._normalizePath(path);
     if (typeof content == 'string') {
-      content = new Buffer(content, 'utf-8');
+      content = Buffer.from(content, 'utf-8');
     }
     const maybeEntry = this.get(normalizedTo);
     if (maybeEntry && maybeEntry.content.equals(content)) {
@@ -218,7 +218,7 @@ export class VirtualTree implements Tree {
   create(path: string, content: Buffer | string): void {
     const normalizedTo = this._normalizePath(path);
     if (typeof content == 'string') {
-      content = new Buffer(content);
+      content = Buffer.from(content);
     }
     this._create(normalizedTo, content);
   }
