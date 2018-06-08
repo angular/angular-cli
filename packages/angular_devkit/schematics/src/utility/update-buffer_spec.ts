@@ -10,52 +10,52 @@ import { UpdateBuffer } from './update-buffer';
 describe('UpdateBuffer', () => {
   describe('inserts', () => {
     it('works', () => {
-      const mb = new UpdateBuffer(new Buffer('Hello World'));
+      const mb = new UpdateBuffer(Buffer.from('Hello World'));
 
-      mb.insertRight(6, new Buffer('Beautiful '));
+      mb.insertRight(6, Buffer.from('Beautiful '));
       expect(mb.toString()).toBe('Hello Beautiful World');
 
-      mb.insertRight(6, new Buffer('Great '));
+      mb.insertRight(6, Buffer.from('Great '));
       expect(mb.toString()).toBe('Hello Beautiful Great World');
 
-      mb.insertRight(0, new Buffer('1 '));
+      mb.insertRight(0, Buffer.from('1 '));
       expect(mb.toString()).toBe('1 Hello Beautiful Great World');
 
-      mb.insertRight(5, new Buffer('2 '));
+      mb.insertRight(5, Buffer.from('2 '));
       expect(mb.toString()).toBe('1 Hello2  Beautiful Great World');
 
-      mb.insertRight(8, new Buffer('3 '));
+      mb.insertRight(8, Buffer.from('3 '));
       expect(mb.toString()).toBe('1 Hello2  Beautiful Great Wo3 rld');
 
-      mb.insertRight(0, new Buffer('4 '));
+      mb.insertRight(0, Buffer.from('4 '));
       expect(mb.toString()).toBe('1 4 Hello2  Beautiful Great Wo3 rld');
 
-      mb.insertRight(8, new Buffer('5 '));
+      mb.insertRight(8, Buffer.from('5 '));
       expect(mb.toString()).toBe('1 4 Hello2  Beautiful Great Wo3 5 rld');
 
-      mb.insertRight(1, new Buffer('a '));
+      mb.insertRight(1, Buffer.from('a '));
       expect(mb.toString()).toBe('1 4 Ha ello2  Beautiful Great Wo3 5 rld');
 
-      mb.insertRight(2, new Buffer('b '));
+      mb.insertRight(2, Buffer.from('b '));
       expect(mb.toString()).toBe('1 4 Ha eb llo2  Beautiful Great Wo3 5 rld');
 
-      mb.insertRight(7, new Buffer('c '));
+      mb.insertRight(7, Buffer.from('c '));
       expect(mb.toString()).toBe('1 4 Ha eb llo2  Beautiful Great Wc o3 5 rld');
 
-      mb.insertRight(11, new Buffer('d '));
+      mb.insertRight(11, Buffer.from('d '));
       expect(mb.toString()).toBe('1 4 Ha eb llo2  Beautiful Great Wc o3 5 rldd ');
     });
 
     it('works _left and _right', () => {
-      const mb = new UpdateBuffer(new Buffer('Hello World'));
+      const mb = new UpdateBuffer(Buffer.from('Hello World'));
 
-      mb.insertRight(6, new Buffer('Beautiful '));
+      mb.insertRight(6, Buffer.from('Beautiful '));
       expect(mb.toString()).toBe('Hello Beautiful World');
 
-      mb.insertLeft(6, new Buffer('Great '));
+      mb.insertLeft(6, Buffer.from('Great '));
       expect(mb.toString()).toBe('Hello Great Beautiful World');
 
-      mb.insertLeft(6, new Buffer('Awesome '));
+      mb.insertLeft(6, Buffer.from('Awesome '));
       expect(mb.toString()).toBe('Hello Great Awesome Beautiful World');
     });
   });
@@ -64,7 +64,7 @@ describe('UpdateBuffer', () => {
     it('works for non-overlapping ranges', () => {
       //                                                111111111122222222223333333333444444
       //                                      0123456789012345678901234567890123456789012345
-      const mb = new UpdateBuffer(new Buffer('1 4 Ha eb llo2  Beautiful Great Wc o3 5 rldd '));
+      const mb = new UpdateBuffer(Buffer.from('1 4 Ha eb llo2  Beautiful Great Wc o3 5 rldd '));
 
       mb.remove(43, 2);
       expect(mb.toString()).toBe('1 4 Ha eb llo2  Beautiful Great Wc o3 5 rld');
@@ -92,7 +92,7 @@ describe('UpdateBuffer', () => {
 
     it('handles overlapping ranges', () => {
       //                                      0123456789012
-      const mb = new UpdateBuffer(new Buffer('ABCDEFGHIJKLM'));
+      const mb = new UpdateBuffer(Buffer.from('ABCDEFGHIJKLM'));
 
       // Overlapping.
       mb.remove(2, 5);
@@ -114,16 +114,16 @@ describe('UpdateBuffer', () => {
     it('works for non-overlapping indices', () => {
       //                                                1
       //                                      01234567890
-      const mb = new UpdateBuffer(new Buffer('01234567890'));
+      const mb = new UpdateBuffer(Buffer.from('01234567890'));
 
-      mb.insertRight(6, new Buffer('A'));
+      mb.insertRight(6, Buffer.from('A'));
       expect(mb.toString()).toBe('012345A67890');
-      mb.insertRight(2, new Buffer('B'));
+      mb.insertRight(2, Buffer.from('B'));
       expect(mb.toString()).toBe('01B2345A67890');
 
       mb.remove(3, 4);
       expect(mb.toString()).toBe('01B27890');
-      mb.insertRight(4, new Buffer('C'));
+      mb.insertRight(4, Buffer.from('C'));
       expect(mb.toString()).toBe('01B27890');
 
       mb.remove(2, 6);
@@ -132,13 +132,13 @@ describe('UpdateBuffer', () => {
 
     it('works for _left/_right inserts', () => {
       //                                      0123456789
-      const mb = new UpdateBuffer(new Buffer('0123456789'));
+      const mb = new UpdateBuffer(Buffer.from('0123456789'));
 
-      mb.insertLeft(5, new Buffer('A'));
+      mb.insertLeft(5, Buffer.from('A'));
       expect(mb.toString()).toBe('01234A56789');
-      mb.insertRight(5, new Buffer('B'));
+      mb.insertRight(5, Buffer.from('B'));
       expect(mb.toString()).toBe('01234AB56789');
-      mb.insertRight(10, new Buffer('C'));
+      mb.insertRight(10, Buffer.from('C'));
       expect(mb.toString()).toBe('01234AB56789C');
       mb.remove(5, 5);
       expect(mb.toString()).toBe('01234AB');
@@ -147,23 +147,23 @@ describe('UpdateBuffer', () => {
     });
 
     it('supports essential', () => {
-      const mb = new UpdateBuffer(new Buffer('0123456789'));
+      const mb = new UpdateBuffer(Buffer.from('0123456789'));
 
-      mb.insertLeft(5, new Buffer('A'), true);
+      mb.insertLeft(5, Buffer.from('A'), true);
       expect(mb.toString()).toBe('01234A56789');
       mb.remove(5, 5);
       expect(mb.toString()).toBe('01234A');
       expect(() => mb.remove(0, 5)).toThrow();
       expect(mb.toString()).toBe('01234A');
 
-      expect(() => mb.insertRight(6, new Buffer('B'), true)).toThrow();
+      expect(() => mb.insertRight(6, Buffer.from('B'), true)).toThrow();
       expect(mb.toString()).toBe('01234A');
     });
 
     it('works for content at start/end of buffer', () => {
-      const buffer = new UpdateBuffer(new Buffer('012345'));
-      buffer.insertLeft(0, new Buffer('ABC'));
-      buffer.insertRight(6, new Buffer('DEF'));
+      const buffer = new UpdateBuffer(Buffer.from('012345'));
+      buffer.insertLeft(0, Buffer.from('ABC'));
+      buffer.insertRight(6, Buffer.from('DEF'));
       buffer.remove(0, 6);
       expect(buffer.toString()).toBe('ABC');
     });
@@ -172,9 +172,9 @@ describe('UpdateBuffer', () => {
   describe('generate', () => {
     it('works', () => {
       //                                      0123456789
-      const mb = new UpdateBuffer(new Buffer('0123456789'));
+      const mb = new UpdateBuffer(Buffer.from('0123456789'));
 
-      mb.insertLeft(5, new Buffer('A'));
+      mb.insertLeft(5, Buffer.from('A'));
       expect(mb.toString()).toBe('01234A56789');
       mb.remove(5, 5);
       expect(mb.toString()).toBe('01234A');
