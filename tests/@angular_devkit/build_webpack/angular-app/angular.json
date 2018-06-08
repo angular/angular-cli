@@ -23,6 +23,13 @@
           "options": {
             "webpackConfig": "webpack.config.js"
           }
+        },
+        "test-karma": {
+          "builder": "../../../../packages/angular_devkit/build_karma:karma",
+          "options": {
+            "karmaConfig": "karma.conf.js",
+            "singleRun": true
+          }
         }
       }
     }

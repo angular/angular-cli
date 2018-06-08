@@ -1,0 +1,18 @@
+{
+  "title": "Karma Builder.",
+  "description": "Karma Builder schema for Architect.",
+  "properties": {
+    "karmaConfig": {
+      "type": "string",
+      "description": "The path to the Karma configuration file."
+    },
+    "singleRun": {
+      "type": "boolean",
+      "description": "Run only once."
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "karmaConfig"
+  ] 
+}

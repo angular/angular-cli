@@ -12,6 +12,7 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
+import { KarmaBuilder as BaseKarmaBuilder } from '@angular-devkit/build-karma';
 import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable, of } from 'rxjs';
@@ -45,6 +46,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
+    const baseKarmaBuilder = new BaseKarmaBuilder({ ...this.context, host });
 
     return of(null).pipe(
       concatMap(() => addFileReplacements(root, host, options.fileReplacements)),
@@ -52,8 +54,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
         options.assets, host, root, projectRoot, builderConfig.sourceRoot)),
       // Replace the assets in options with the normalized version.
       tap((assetPatternObjects => options.assets = assetPatternObjects)),
-      concatMap(() => new Observable(obs => {
-        const karma = requireProjectModule(getSystemPath(projectRoot), 'karma');
+      concatMap(() => {
         const karmaConfig = getSystemPath(resolve(root, normalize(options.karmaConfig)));
 
         // TODO: adjust options to account for not passing them blindly to karma.
@@ -76,9 +77,6 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
           options: options as NormalizedKarmaBuilderSchema,
           webpackConfig: this._buildWebpackConfig(root, projectRoot, host,
             options as NormalizedKarmaBuilderSchema),
-          // Pass onto Karma to emit BuildEvents.
-          successCb: () => obs.next({ success: true }),
-          failureCb: () => obs.next({ success: false }),
         };
 
         // TODO: inside the configs, always use the project root and not the workspace root.
@@ -88,19 +86,9 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
         // Assign additional karmaConfig options to the local ngapp config
         karmaOptions.configFile = karmaConfig;
 
-        // Complete the observable once the Karma server returns.
-        const karmaServer = new karma.Server(karmaOptions, () => obs.complete());
-        karmaServer.start();
-
-        // Cleanup, signal Karma to exit.
-        return () => {
-          // Karma does not seem to have a way to exit the server gracefully.
-          // See https://github.com/karma-runner/karma/issues/2867#issuecomment-369912167
-          // TODO: make a PR for karma to add `karmaServer.close(code)`, that
-          // calls `disconnectBrowsers(code);`
-          // karmaServer.close();
-        };
-      })),
+        // Run the Karma builder with the modified options.
+        return baseKarmaBuilder.runKarma(karmaOptions);
+      }),
     );
   }
 

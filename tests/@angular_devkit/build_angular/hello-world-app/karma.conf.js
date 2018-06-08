@@ -21,18 +21,20 @@ module.exports = function (config) {
       require('karma-coverage-istanbul-reporter'),
       require('@angular-devkit/build-angular/plugins/karma')
     ],
-    client:{
+    client: {
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
     coverageIstanbulReporter: {
       dir: path.join(__dirname, 'coverage'),
-      reports: [ 'html', 'lcovonly' ],
+      reports: ['html', 'lcovonly'],
       fixWebpackSourcePaths: true
     },
-    reporters: ['progress', 'kjhtml'],
+    // Karma doesn't show any logs because we removed the 'progress' reporter
+    // and set 'logLevel' to 'config.LOG_DISABLE'.
+    reporters: [],
+    logLevel: config.LOG_DISABLE,
     port: 9876,
     colors: true,
-    logLevel: config.LOG_INFO,
     autoWatch: true,
     browsers: ['Chrome'],
     singleRun: false
