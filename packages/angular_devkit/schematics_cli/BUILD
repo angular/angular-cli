@@ -29,5 +29,6 @@ ts_library(
         "//packages/angular_devkit/schematics:tools",
         "@rxjs",
         "@rxjs//operators",
+        # @typings: minimist
     ],
 )
