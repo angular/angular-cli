@@ -45,6 +45,7 @@ const licensesWhitelist = [
   '(AFL-2.1 OR BSD-2-Clause)',
   '(MIT OR CC-BY-3.0)',
   '(MIT OR Apache-2.0)',
+  '(MIT OR BSD-3-Clause)',
 ];
 
 // Name variations of SPDX licenses that some packages have.
@@ -53,6 +54,7 @@ const licenseReplacements: { [key: string]: string } = {
   // Just a longer string that our script catches. SPDX official name is the shorter one.
   'Apache License, Version 2.0': 'Apache-2.0',
   'Apache2': 'Apache-2.0',
+  'Apache 2.0': 'Apache-2.0',
   'AFLv2.1': 'AFL-2.1',
   // BSD is BSD-2-clause by default.
   'BSD': 'BSD-2-Clause',
@@ -61,6 +63,7 @@ const licenseReplacements: { [key: string]: string } = {
 // Specific packages to ignore, add a reason in a comment. Format: package-name@version.
 const ignoredPackages = [
   'spdx-license-ids@2.0.1',  // CC0 but it's content only (index.json, no code) and not distributed.
+  'spdx-license-ids@3.0.0',  // CC0 but it's content only (index.json, no code) and not distributed.
   'map-stream@0.1.0', // MIT, license but it's not listed in package.json.
   'xmldom@0.1.27', // LGPL,MIT but has a broken licenses array.
   'true-case-path@1.0.2', // Apache-2.0 but broken license in package.json
@@ -73,54 +76,62 @@ const ignoredPackages = [
   // TODO(filipesilva): remove this when spec_large is moved to e2e tests.
   'font-awesome@4.7.0', // (OFL-1.1 AND MIT)
 
+  '@webassemblyjs/ieee754@1.5.10', // MIT but no LICENSE file. `license` field in package.json.
+  '@webassemblyjs/leb128@1.5.10', // Apache 2.0 license, but get discovered as "Apache".
 ];
 
 // Find all folders directly under a `node_modules` that have a package.json.
 const checker = require('license-checker');
 
 
-export default function (_options: {}, logger: logging.Logger) {
-  checker.init({ start: path.join(__dirname, '..') }, (err: Error, json: JsonObject) => {
-    if (err) {
-      logger.fatal(`Something happened:\n${err.message}`);
-    } else {
-      logger.info(`Testing ${Object.keys(json).length} packages.\n`);
-
-      // Packages with bad licenses are those that neither pass SPDX nor are ignored.
-      const badLicensePackages = Object.keys(json)
-      .map(key => ({
-          id: key,
-          licenses: ([] as string[])
-            // tslint:disable-next-line:non-null-operator
-            .concat((json[key] ! as JsonObject).licenses as string[])
-            // `*` is used when the license is guessed.
-            .map(x => x.replace(/\*$/, ''))
-            .map(x => x in licenseReplacements ? licenseReplacements[x] : x),
-      }))
-      .filter(pkg => !passesSpdx(pkg.licenses, licensesWhitelist))
-      .filter(pkg => !ignoredPackages.find(ignored => ignored === pkg.id));
-
-      // Report packages with bad licenses
-      if (badLicensePackages.length > 0) {
-        logger.error('Invalid package licences found:');
-        badLicensePackages.forEach(pkg => {
-          logger.error(`${pkg.id}: ${JSON.stringify(pkg.licenses)}`);
-        });
-        logger.fatal(`\n${badLicensePackages.length} total packages with invalid licenses.`);
-      } else {
-        logger.info('All package licenses are valid.');
-      }
+// Check if a license is accepted by an array of accepted licenses
+function _passesSpdx(licenses: string[], accepted: string[]) {
+  return accepted.some(l => {
+    try {
+      return spdxSatisfies(licenses.join(' AND '), l);
+    } catch (_) {
+      return false;
     }
   });
+}
 
-// Check if a license is accepted by an array of accepted licenses
-  function passesSpdx(licenses: string[], accepted: string[]) {
-    return accepted.some(l => {
-      try {
-        return spdxSatisfies(licenses.join(' AND '), l);
-      } catch (_) {
-        return false;
+
+export default function (_options: {}, logger: logging.Logger): Promise<number> {
+  return new Promise(resolve => {
+    checker.init({ start: path.join(__dirname, '..') }, (err: Error, json: JsonObject) => {
+      if (err) {
+        logger.fatal(`Something happened:\n${err.message}`);
+        resolve(1);
+      } else {
+        logger.info(`Testing ${Object.keys(json).length} packages.\n`);
+
+        // Packages with bad licenses are those that neither pass SPDX nor are ignored.
+        const badLicensePackages = Object.keys(json)
+          .map(key => ({
+            id: key,
+            licenses: ([] as string[])
+              // tslint:disable-next-line:non-null-operator
+              .concat((json[key] ! as JsonObject).licenses as string[])
+              // `*` is used when the license is guessed.
+              .map(x => x.replace(/\*$/, ''))
+              .map(x => x in licenseReplacements ? licenseReplacements[x] : x),
+          }))
+          .filter(pkg => !_passesSpdx(pkg.licenses, licensesWhitelist))
+          .filter(pkg => !ignoredPackages.find(ignored => ignored === pkg.id));
+
+        // Report packages with bad licenses
+        if (badLicensePackages.length > 0) {
+          logger.error('Invalid package licences found:');
+          badLicensePackages.forEach(pkg => {
+            logger.error(`${pkg.id}: ${JSON.stringify(pkg.licenses)}`);
+          });
+          logger.fatal(`\n${badLicensePackages.length} total packages with invalid licenses.`);
+          resolve(2);
+        } else {
+          logger.info('All package licenses are valid.');
+          resolve(0);
+        }
       }
     });
-  }
+  });
 }
