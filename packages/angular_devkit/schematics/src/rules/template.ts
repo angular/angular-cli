@@ -47,7 +47,7 @@ export function applyContentTemplate<T extends TemplateOptions>(options: T): Fil
 
     return {
       path: path,
-      content: new Buffer(templateImpl(content.toString('utf-8'), {})(options)),
+      content: Buffer.from(templateImpl(content.toString('utf-8'), {})(options)),
     };
   };
 }

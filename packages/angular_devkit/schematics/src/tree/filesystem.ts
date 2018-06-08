@@ -102,7 +102,7 @@ export class FileSystemTree extends VirtualTree {
       this._initialized = true;
       this._recursiveFileList().forEach(path => {
         this._tree.set(path, new LazyFileEntry(path, () => {
-          return new Buffer(host.read(path));
+          return Buffer.from(host.read(path));
         }));
       });
     }
@@ -121,7 +121,7 @@ export class FileSystemTree extends VirtualTree {
 
       if (fileExists) {
         const host = this._host;
-        entry = new LazyFileEntry(normalizedPath, () => new Buffer(host.read(systemPath)));
+        entry = new LazyFileEntry(normalizedPath, () => Buffer.from(host.read(systemPath)));
         this._tree.set(normalizedPath, entry);
       }
     }
@@ -178,7 +178,7 @@ export class FileSystemCreateTree extends FileSystemTree {
     super(host);
 
     this._recursiveFileList().forEach(path => {
-      this.create(path, new Buffer(this._host.read(path)));
+      this.create(path, Buffer.from(this._host.read(path)));
     });
     this._initialized = true;
   }

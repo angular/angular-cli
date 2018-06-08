@@ -26,7 +26,7 @@ function _entry(path?: string, content?: string): FileEntry {
 
   return {
     path: normalize(path),
-    content: new Buffer(content),
+    content: Buffer.from(content),
   };
 }
 
