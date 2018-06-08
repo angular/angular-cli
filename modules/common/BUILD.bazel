@@ -38,7 +38,7 @@ ts_library(
     ],
 )
 
-# jasmine_node_test(
-#     name = "unit_test",
-#     srcs = [":unit_test_lib"],
-# )
+jasmine_node_test(
+    name = "unit_test",
+    srcs = [":unit_test_lib"],
+)
