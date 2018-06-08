@@ -60,7 +60,7 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
     process.exit(1);
   }
 
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'angular-devkit-publish-'));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'angular-cli-publish-'));
   const message = execSync(`git log --format="%h %s" -n1`).toString().trim();
 
   const githubToken = (
