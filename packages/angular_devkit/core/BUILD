@@ -25,6 +25,7 @@ ts_library(
         "@rxjs//operators",
         # @typings: es2015.core
         # @typings: es2015.symbol.wellknown
+        # @typings: es2016.array.include
         # @typings: ajv
         # @typings: node
         # @typings: source-map
@@ -47,6 +48,7 @@ ts_library(
         "//packages/angular_devkit/core",
         "@rxjs",
         "@rxjs//operators",
+        # @typings: node
     ],
 )
 
@@ -64,5 +66,6 @@ ts_library(
         "@rxjs",
         "@rxjs//operators",
         # @typings: jasmine
+        # @typings: node
     ],
 )
