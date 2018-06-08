@@ -13,13 +13,13 @@ import {
   throwError,
 } from 'rxjs';
 import { concatMap, map, reduce, switchMap, toArray } from 'rxjs/operators';
-import { Path, PathFragment } from '..';
 import {
   FileAlreadyExistException,
   FileDoesNotExistException,
   PathIsDirectoryException,
   UnknownException,
-} from '../..';
+} from '../../exception';
+import { Path, PathFragment } from '../path';
 import {
   FileBuffer,
   Host,
