@@ -204,5 +204,8 @@ export default function (args: ParsedArgs, logger: logging.Logger) {
     logger.info(`Found ${tests.length} spec files, out of ${allTests.length}.`);
   }
 
-  runner.execute(tests);
+  return new Promise(resolve => {
+    runner.onComplete((passed: boolean) => resolve(passed ? 0 : 1));
+    runner.execute(tests);
+  });
 }
