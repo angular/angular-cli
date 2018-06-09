@@ -12,12 +12,12 @@
 // Workaround for https://github.com/webpack-contrib/karma-webpack/issues/66
 
 export class KarmaWebpackFailureCb {
-  constructor(private callback: () => void) { }
+  constructor(private callback: (error: string | undefined, errors: string[]) => void) { }
 
   apply(compiler: any): void {
     compiler.hooks.done.tap('KarmaWebpackFailureCb', (stats: any) => {
       if (stats.compilation.errors.length > 0) {
-        this.callback();
+        this.callback(undefined, stats.compilation.errors.map((error: any) => error.message? error.message : error.toString()));
       }
     });
   }

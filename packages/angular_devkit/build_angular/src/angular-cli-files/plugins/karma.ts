@@ -91,8 +91,16 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     publicPath: '/_karma_webpack_/',
   };
 
-  // Finish Karma run early in case of compilation error.
-  const compilationErrorCb = () => emitter.emit('run_complete', [], { exitCode: 1 });
+  const compilationErrorCb = (error: string | undefined, errors: string[]) => {
+    // Notify potential listeners of the compile error
+    emitter.emit('compile_error', errors);
+
+    // Finish Karma run early in case of compilation error.
+    emitter.emit('run_complete', [], { exitCode: 1 });
+
+    // Unblock any karma requests (potentially started using `karma run`)
+    unblock();
+  }
   webpackConfig.plugins.push(new KarmaWebpackFailureCb(compilationErrorCb));
 
   // Use existing config if any.
@@ -157,14 +165,18 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     });
   });
 
+  function unblock(){
+    isBlocked = false;
+    blocked.forEach((cb) => cb());
+    blocked = [];
+  }
+
   compiler.plugin('done', (stats: any) => {
     // Don't refresh karma when there are webpack errors.
     if (stats.compilation.errors.length === 0) {
       emitter.refreshFiles();
-      isBlocked = false;
-      blocked.forEach((cb) => cb());
-      blocked = [];
     }
+    unblock();
   });
 
   webpackMiddleware = new webpackDevMiddleware(compiler, webpackMiddlewareConfig);
