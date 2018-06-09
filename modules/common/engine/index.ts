@@ -5,5 +5,4 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-export { FileLoader as ɵFileLoader, CommonEngine as ɵCommonEngine,
-   RenderOptions as ɵRenderOptions } from './src/common-engine';
+export * from './public_api';
