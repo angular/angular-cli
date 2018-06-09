@@ -6,6 +6,7 @@ ng_module(
     name = "tokens",
     srcs = glob([
         "src/*.ts",
+        "*.ts",
     ]),
     module_name = "@nguniversal/common/tokens",
 )
