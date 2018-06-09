@@ -8,10 +8,7 @@
 import * as fs from 'fs';
 import { ResourceLoader } from '@angular/compiler';
 
-/**
- * ResourceLoader implementation for loading files
- * @internal
- */
+/** ResourceLoader implementation for loading files */
 export class FileLoader implements ResourceLoader {
   get(url: string): Promise<string> {
     return new Promise((resolve, reject) => {
