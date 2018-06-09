@@ -7,4 +7,4 @@
  */
 export { TransferHttpCacheModule } from './src/transfer_http';
 export { StateTransferInitializerModule } from './src/state-transfer-initializer/module';
-
+export * from './private_api';

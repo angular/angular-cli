@@ -12,10 +12,16 @@ import {
   HttpHeaders,
   HttpInterceptor,
   HttpRequest,
-  HttpResponse
+  HttpResponse,
+  HttpParams
 } from '@angular/common/http';
 import {ApplicationRef, Injectable, NgModule} from '@angular/core';
-import {BrowserTransferStateModule, TransferState, makeStateKey} from '@angular/platform-browser';
+import {
+  BrowserTransferStateModule,
+  TransferState,
+  makeStateKey,
+  StateKey
+} from '@angular/platform-browser';
 import {Observable, of as observableOf} from 'rxjs';
 import {tap, take, filter} from 'rxjs/operators';
 
@@ -41,8 +47,15 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
   private isCacheActive = true;
 
   private invalidateCacheEntry(url: string) {
-    this.transferState.remove(makeStateKey<TransferHttpResponse>('G.' + url));
-    this.transferState.remove(makeStateKey<TransferHttpResponse>('H.' + url));
+    Object.keys(this.transferState['store'])
+      .forEach(key => key.includes(url) ? this.transferState.remove(makeStateKey(key)) : null);
+  }
+
+  private makeCacheKey(method: string, url: string, params: HttpParams): StateKey<string> {
+    // make the params encoded same as a url so it's easy to identify
+    const encodedParams = params.keys().sort().map(k => `${k}=${params.get(k)}`).join('&');
+    const key = (method === 'GET' ? 'G.' : 'H.') + url + '?' + encodedParams;
+    return makeStateKey<TransferHttpResponse>(key);
   }
 
   constructor(appRef: ApplicationRef, private transferState: TransferState) {
@@ -68,8 +81,7 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
       return next.handle(req);
     }
 
-    const key = (req.method === 'GET' ? 'G.' : 'H.') + req.url;
-    const storeKey = makeStateKey<TransferHttpResponse>(key);
+    const storeKey = this.makeCacheKey(req.method, req.url, req.params);
 
     if (this.transferState.hasKey(storeKey)) {
       // Request found in cache. Respond using it.
