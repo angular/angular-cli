@@ -82,6 +82,8 @@
     "@angular/platform-browser": "^6.0.4",
     "@angular/platform-browser-dynamic": "^6.0.4",
     "@angular/platform-server": "^6.0.4",
+    "@angular/router": "^6.0.4",
+    "@angular/upgrade": "^6.0.4",
     "@bazel/ibazel": "^0.3.1",
     "@types/express": "^4.0.39",
     "@types/fs-extra": "^4.0.5",
@@ -109,7 +111,7 @@
     "rollup-plugin-node-resolve": "^3.0.2",
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-uglify": "^2.0.1",
-    "rxjs": "^6.0.0",
+    "rxjs": "^6.2.0",
     "sorcery": "^0.10.0",
     "standard-version": "^4.3.0",
     "systemjs": "0.19.43",
@@ -119,6 +121,6 @@
     "tsutils": "^2.21.2",
     "typescript": "~2.7.2",
     "uglify-js": "^2.8.14",
-    "zone.js": "^0.8.12"
+    "zone.js": "^0.8.26"
   }
 }

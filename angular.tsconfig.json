@@ -2,21 +2,21 @@
 // This file is required to run ngc on angular libraries, to write files like
 // node_modules/@angular/core/core.ngsummary.json
 {
-    "compilerOptions": {
-        "lib": [
-            "dom",
-            "es2015"
-        ],
-        "experimentalDecorators": true
-    },
-    "include": [
-        "node_modules/@angular/**/*"
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "es2015"
     ],
-    "exclude": [
-        "node_modules/@angular/bazel/**",
-        "node_modules/@angular/compiler-cli/**",
-        "node_modules/@angular/tsc-wrapped/**",
-        "node_modules/@angular/platform-browser/testing/**",
-        "node_modules/@angular/core/testing/**"
-    ]
+    "experimentalDecorators": true,
+    "types": []
+  },
+  "include": [
+    "node_modules/@angular/**/*"
+  ],
+  "exclude": [
+    "node_modules/@angular/bazel/**",
+    "node_modules/@angular/compiler-cli/**",
+    "node_modules/@angular/common/locales/**",
+    "node_modules/@angular/*/testing/**"
+  ]
 }

@@ -102,6 +102,47 @@ jobs:
           paths:
             - "node_modules"
 
+  # This job exists only for backwards-compatibility with old scripts and tests
+  # that rely on the pre-Bazel dist/modules-dist layout.
+  # It duplicates some work with the job above: we build the bazel packages
+  # twice. Even though we have a remote cache, these jobs will typically run in
+  # parallel so up-to-date outputs will not be available at the time the build
+  # starts.
+  # No new jobs should depend on this one.
+  build-packages-dist:
+    <<: *job_defaults
+    resource_class: xlarge
+    steps:
+      - checkout:
+          <<: *post_checkout
+
+      - run: bazel run @yarn//:yarn
+      - run: scripts/build-modules-dist.sh
+
+      # Save the npm packages from //modules/... for other workflow jobs to read
+      # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
+      - persist_to_workspace:
+          root: dist
+          paths:
+            - modules-dist
+
+  # We run the integration tests outside of Bazel for now.
+  # They are a separate workflow job so that they can be easily re-run.
+  # When the tests are ported to bazel test targets, they should move to the "test"
+  # job above, as part of the bazel test command. That has flaky_test_attempts so the
+  # need to re-run manually should be alleviated.
+  # See comments inside the integration/run_tests.sh script.
+  integration_test:
+    <<: *job_defaults
+    steps:
+      - checkout:
+          <<: *post_checkout
+      - attach_workspace:
+          at: dist
+      - restore_cache:
+          key: *cache_key
+      - run: xvfb-run --auto-servernum ./integration/run_tests.sh
+
 workflows:
   version: 2
   default_workflow:
@@ -109,3 +150,7 @@ workflows:
       - build
       - bazel-lint
       - lint
+      - build-packages-dist
+      - integration_test:
+          requires:
+            - build-packages-dist

@@ -30,3 +30,6 @@ bazel-out
 /node_modules/
 lerna-debug.log
 /lib/
+integration/**/yarn.lock
+integration/**/built/
+.yarn_local_cache
