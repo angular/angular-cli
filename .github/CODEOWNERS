@@ -6,7 +6,7 @@
 
 # Tooling
 /scripts/**                                        @CaerusKaru @vikerman
-/test/**                                           @CaerusKaru @vikerman
+/integration/**                                    @CaerusKaru @vikerman
 /tools/**                                          @CaerusKaru @vikerman
 
 # Misc
