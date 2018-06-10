@@ -9,7 +9,7 @@ This is a Hapi Engine for running Angular Apps on the server for server side ren
 To use it, set the engine and then route requests to it
 
 ```ts
-import { Base_Reply, Request, Server } from 'hapi';
+import { Request, Server } from 'hapi';
 import { ngHapiEngine } from '@nguniversal/hapi-engine';
 
 const server = new Server();
@@ -18,20 +18,10 @@ server.connection({
   port: 8000
 });
 
-// Set the engine
-const hapiEngine = ngHapiEngine({
-  bootstrap: ServerAppModule // Give it a module to bootstrap
-});
-
 server.route({
   method: 'GET',
   path: '/{path*}',
-  handler: (req: Request, reply: Base_Reply) => {
-    hapiEngine({
-      req
-    }).then(html => reply(html))
-      .then(err => reply(boom.wrap(err)));
-  }
+  handler: (req: Request) => ngHapiEngine({req, bootstrap: ServerAppModule})
 });
 ```
 
@@ -44,15 +34,14 @@ is called. To do so, simply pass in a `url` and/or `document` string to the rend
 server.route({
   method: 'GET',
   path: '/{path*}',
-  handler: (req: Request, reply: Base_Reply) => {
-    let url = 'http://someurl.com';
-    let doc = '<html><head><title>New doc</title></head></html>';
-    hapiEngine({
+  handler: (req: Request) => {
+    const url = 'http://someurl.com';
+    const document = '<html><head><title>New doc</title></head></html>';
+    return ngHapiEngine({
       req,
       url,
-      document: doc
-    }).then(html => reply(html))
-      .then(err => reply(boom.wrap(err)));
+      document,
+    });
   }
 });
 ```
@@ -80,23 +69,21 @@ The Bootstrap module as well as more providers can be passed on request
 server.route({
   method: 'GET',
   path: '/{path*}',
-  handler: (req: Request, reply: Base_Reply) => {
-    hapiEngine({
+  handler: (req: Request) => 
+    ngHapiEngine({
       bootstrap: OtherServerAppModule,
       providers: [
         OtherServerService
       ],
       req
-    }).then(html => reply(html))
-      .then(err => reply(boom.wrap(err)));
-  }
+    })
 });
 ```
 
 ### Using the Request and Response
 
 The Request and Response objects are injected into the app via injection tokens.
-You can access them by @Inject
+You can access them by `@Inject`
 
 ```ts
 import { Request } from 'hapi';

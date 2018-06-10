@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as fs from 'fs';
-import { Request, Response } from 'hapi';
+import { Request, ResponseToolkit } from 'hapi';
 
 import { NgModuleFactory, Type, CompilerFactory, Compiler, StaticProvider } from '@angular/core';
 import { ResourceLoader } from '@angular/compiler';
@@ -32,7 +32,7 @@ export interface NgSetupOptions {
  */
 export interface RenderOptions extends NgSetupOptions {
   req: Request;
-  res?: Response;
+  res?: ResponseToolkit;
   url?: string;
   document?: string;
 }
@@ -90,16 +90,8 @@ export function ngHapiEngine(options: RenderOptions) {
       ]);
 
     getFactory(moduleOrFactory, compiler)
-      .then(factory => {
-        return renderModuleFactory(factory, {
-          extraProviders
-        });
-      })
-      .then((html: string) => {
-        resolve(html);
-      }, (err) => {
-        reject(err);
-      });
+      .then(factory => renderModuleFactory(factory, {extraProviders}))
+      .then(resolve, reject);
   });
 }
 
@@ -128,9 +120,7 @@ function getFactory(
         .then((factory) => {
           factoryCacheMap.set(moduleOrFactory, factory);
           resolve(factory);
-        }, (err => {
-          reject(err);
-        }));
+        }, reject);
     }
   });
 }

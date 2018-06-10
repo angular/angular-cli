@@ -12,7 +12,7 @@
     "@angular/common": "NG_VERSION",
     "@angular/core": "NG_VERSION",
     "@angular/platform-server": "NG_VERSION",
-    "express": "^4.15.2"
+    "express": "EXPRESS_VERSION"
   },
   "ng-update": {
     "packageGroup": "NG_UPDATE_PACKAGE_GROUP"

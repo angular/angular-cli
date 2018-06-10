@@ -8,6 +8,8 @@ DEFAULT_NODE_MODULES = "//:node_modules"
 
 NG_VERSION = "^6.0.0-rc.0"
 RXJS_VERSION = "^6.0.0-beta.0"
+HAPI_VERSION = "^17.0.0"
+EXPRESS_VERSION = "^4.15.2"
 
 NGUNIVERSAL_SCOPED_PACKAGES = ["@nguniversal/%s" % p for p in [
     "aspnetcore-engine",
@@ -20,6 +22,8 @@ NGUNIVERSAL_SCOPED_PACKAGES = ["@nguniversal/%s" % p for p in [
 PKG_GROUP_REPLACEMENTS = {
     "NG_VERSION": NG_VERSION,
     "RXJS_VERSION": RXJS_VERSION,
+    "HAPI_VERSION": HAPI_VERSION,
+    "EXPRESS_VERSION": EXPRESS_VERSION,
     "\"NG_UPDATE_PACKAGE_GROUP\"": """[
       %s
     ]""" % ",\n      ".join(["\"%s\"" % s for s in NGUNIVERSAL_SCOPED_PACKAGES])
@@ -39,14 +43,14 @@ GLOBALS = {
       "@nguniversal/express-engine/tokens": "nguniversal.expressEngine.tokens",
       "@nguniversal/hapi-engine/tokens": "nguniversal.hapiEngine.tokens",
       'tslib': 'tslib',
-      "rxjs": "Rx",
-      "rxjs/operators": "Rx.operators",
+      "rxjs": "rxjs",
+      "rxjs/operators": "rxjs.operators",
       "fs": "fs",
       "express": "express",
       "hapi": "hapi"
     }
 
-# TODO: when a better api for defaults is avilable use that isntead of these macros
+# TODO(Toxicable): when a better api for defaults is avilable use that instead of these macros
 def ts_test_library(node_modules=None, **kwargs):
     ts_library(testonly=1, **kwargs)
 
