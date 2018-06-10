@@ -95,7 +95,7 @@ export class HostDirEntry implements DirEntry {
 
 
 export class HostTree implements Tree {
-  private _id = _uniqueId++;
+  private _id = --_uniqueId;  // We go negative to avoid conflict with VirtualTree's actions.
   private _record: virtualFs.CordHost;
   private _recordSync: virtualFs.SyncDelegateHost;
 
@@ -106,7 +106,10 @@ export class HostTree implements Tree {
     return this;
   }
 
-  constructor(protected _backend: virtualFs.ReadonlyHost<{}> = new virtualFs.Empty()) {
+  constructor(
+    protected _backend: virtualFs.ReadonlyHost<{}> = new virtualFs.Empty(),
+    private _base: HostTree | null = null,
+  ) {
     this._record = new virtualFs.CordHost(new virtualFs.SafeReadonlyHost(_backend));
     this._recordSync = new virtualFs.SyncDelegateHost(this._record);
   }
@@ -188,7 +191,7 @@ export class HostTree implements Tree {
     this._record = new virtualFs.CordHost(record);
     this._recordSync = new virtualFs.SyncDelegateHost(this._record);
 
-    return new HostTree(record);
+    return new HostTree(record, this);
   }
 
   merge(other: Tree, strategy: MergeStrategy = MergeStrategy.Default): void {
@@ -373,56 +376,59 @@ export class HostTree implements Tree {
     // Create a list of all records until we hit our original backend. This is to support branches
     // that diverge from each others.
     const allRecords: CordHostRecord[] = [...this._record.records()];
-    let current = this._record.backend;
-    while (current != this._backend) {
-      if (!(current instanceof virtualFs.CordHost)) {
-        break;
-      }
+    // let current = this._record.backend;
+    // while (current != this._backend) {
+    //   if (!(current instanceof virtualFs.CordHost)) {
+    //     break;
+    //   }
+    //
+    //   allRecords.unshift(...current.records());
+    //   current = current.backend;
+    // }
 
-      allRecords.unshift(...current.records());
-      current = current.backend;
-    }
+    return [
+      ...this._base ? this._base.actions : [],
+      ...clean(
+        allRecords
+          .map(record => {
+            switch (record.kind) {
+              case 'create':
+                return {
+                  id: this._id,
+                  parent: 0,
+                  kind: 'c',
+                  path: record.path,
+                  content: new Buffer(record.content),
+                } as CreateFileAction;
+              case 'overwrite':
+                return {
+                  id: this._id,
+                  parent: 0,
+                  kind: 'o',
+                  path: record.path,
+                  content: new Buffer(record.content),
+                } as OverwriteFileAction;
+              case 'rename':
+                return {
+                  id: this._id,
+                  parent: 0,
+                  kind: 'r',
+                  path: record.from,
+                  to: record.to,
+                } as RenameFileAction;
+              case 'delete':
+                return {
+                  id: this._id,
+                  parent: 0,
+                  kind: 'd',
+                  path: record.path,
+                } as DeleteFileAction;
 
-    return clean(
-      allRecords
-        .map(record => {
-          switch (record.kind) {
-            case 'create':
-              return {
-                id: this._id,
-                parent: 0,
-                kind: 'c',
-                path: record.path,
-                content: new Buffer(record.content),
-              } as CreateFileAction;
-            case 'overwrite':
-              return {
-                id: this._id,
-                parent: 0,
-                kind: 'o',
-                path: record.path,
-                content: new Buffer(record.content),
-              } as OverwriteFileAction;
-            case 'rename':
-              return {
-                id: this._id,
-                parent: 0,
-                kind: 'r',
-                path: record.from,
-                to: record.to,
-              } as RenameFileAction;
-            case 'delete':
-              return {
-                id: this._id,
-                parent: 0,
-                kind: 'd',
-                path: record.path,
-              } as DeleteFileAction;
-
-            default:
-              return;
-          }
-        }),
-    );
+              default:
+                return;
+            }
+          }),
+      ),
+    ];
   }
 }
