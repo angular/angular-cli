@@ -3,7 +3,6 @@
   "compilerOptions": {
     "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/lib",
     "target": "es2015",
-    "module": "es2015",
     "moduleResolution": "node",
     "declaration": true,
     "sourceMap": true,

@@ -82,7 +82,6 @@ describe('Universal Schematic', () => {
       compilerOptions: {
         outDir: '../out-tsc/app-server',
         baseUrl: '.',
-        module: 'commonjs',
       },
       angularCompilerOptions: {
         entryModule: 'app/app.server.module#AppServerModule',
@@ -103,7 +102,6 @@ describe('Universal Schematic', () => {
       compilerOptions: {
         outDir: '../../out-tsc/app-server',
         baseUrl: '.',
-        module: 'commonjs',
       },
       angularCompilerOptions: {
         entryModule: 'src/app/app.server.module#AppServerModule',
