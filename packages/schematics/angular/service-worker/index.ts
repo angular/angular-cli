@@ -75,11 +75,11 @@ function addDependencies(): Rule {
     if (coreDep === null) {
       throw new SchematicsException('Could not find version.');
     }
-    const platformServerDep = {
+    const serviceWorkerDep = {
       ...coreDep,
       name: packageName,
     };
-    addPackageJsonDependency(host, platformServerDep);
+    addPackageJsonDependency(host, serviceWorkerDep);
 
     return host;
   };
