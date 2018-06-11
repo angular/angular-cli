@@ -84,7 +84,7 @@ export function insertPropertyInAstObjectInOrder(
 
   recorder.insertRight(
     insertIndex,
-    `${indentStr}`
+    indentStr
     + `"${propertyName}": ${JSON.stringify(value, null, 2).replace(/\n/g, indentStr)}`
     + ',',
   );
