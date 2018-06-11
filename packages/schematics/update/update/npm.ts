@@ -136,6 +136,7 @@ export function getNpmPackageJson(
         getNpmConfigOption('strict-ssl'),
         getNpmConfigOption('cafile'),
         getNpmConfigOption('_auth', registryKey, true),
+        getNpmConfigOption('_authToken', registryKey, true),
         getNpmConfigOption('username', registryKey, true),
         getNpmConfigOption('password', registryKey, true),
         getNpmConfigOption('alwaysAuth', registryKey, true),
@@ -148,6 +149,7 @@ export function getNpmPackageJson(
             strictSsl,
             cafile,
             token,
+            authToken,
             username,
             password,
             alwaysAuth,
@@ -158,7 +160,9 @@ export function getNpmPackageJson(
           const sslOptions = getNpmClientSslOptions(strictSsl, cafile);
 
           let auth;
-          if (token) {
+          if (authToken) {
+            auth = { token: authToken, alwaysAuth };
+          } else if (token) {
             auth = { token, alwaysAuth };
           } else if (username) {
             auth = { username, password, alwaysAuth };
