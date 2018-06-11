@@ -14,9 +14,9 @@ describe('Action', () => {
     it('works with create', () => {
       const actions = new ActionList;
 
-      actions.create(normalize('/a/b'), new Buffer('1'));
-      actions.create(normalize('/a/c'), new Buffer('2'));
-      actions.create(normalize('/a/c'), new Buffer('3'));
+      actions.create(normalize('/a/b'), Buffer.from('1'));
+      actions.create(normalize('/a/c'), Buffer.from('2'));
+      actions.create(normalize('/a/c'), Buffer.from('3'));
 
       expect(actions.length).toBe(3);
       actions.optimize();
@@ -25,10 +25,10 @@ describe('Action', () => {
     it('works with overwrite', () => {
       const actions = new ActionList;
 
-      actions.create(normalize('/a/b'), new Buffer('1'));
-      actions.create(normalize('/a/c'), new Buffer('2'));
-      actions.overwrite(normalize('/a/c'), new Buffer('3'));
-      actions.overwrite(normalize('/a/b'), new Buffer('4'));
+      actions.create(normalize('/a/b'), Buffer.from('1'));
+      actions.create(normalize('/a/c'), Buffer.from('2'));
+      actions.overwrite(normalize('/a/c'), Buffer.from('3'));
+      actions.overwrite(normalize('/a/b'), Buffer.from('4'));
 
       expect(actions.length).toBe(4);
       actions.optimize();
@@ -38,11 +38,11 @@ describe('Action', () => {
     it('works with cloning a list', () => {
       const actions = new ActionList;
 
-      actions.create(normalize('/a/b'), new Buffer('1'));
-      actions.create(normalize('/a/c'), new Buffer('2'));
-      actions.overwrite(normalize('/a/c'), new Buffer('3'));
-      actions.overwrite(normalize('/a/b'), new Buffer('4'));
-      actions.create(normalize('/a/d'), new Buffer('5'));
+      actions.create(normalize('/a/b'), Buffer.from('1'));
+      actions.create(normalize('/a/c'), Buffer.from('2'));
+      actions.overwrite(normalize('/a/c'), Buffer.from('3'));
+      actions.overwrite(normalize('/a/b'), Buffer.from('4'));
+      actions.create(normalize('/a/d'), Buffer.from('5'));
 
       const actions2 = new ActionList;
       actions.forEach(x => actions2.push(x));
@@ -59,10 +59,10 @@ describe('Action', () => {
     it('handles edge cases (1)', () => {
       const actions = new ActionList;
 
-      actions.create(normalize('/test'), new Buffer('1'));
-      actions.overwrite(normalize('/test'), new Buffer('3'));
-      actions.overwrite(normalize('/hello'), new Buffer('2'));
-      actions.overwrite(normalize('/test'), new Buffer('4'));
+      actions.create(normalize('/test'), Buffer.from('1'));
+      actions.overwrite(normalize('/test'), Buffer.from('3'));
+      actions.overwrite(normalize('/hello'), Buffer.from('2'));
+      actions.overwrite(normalize('/test'), Buffer.from('4'));
 
       const actions2 = new ActionList;
       actions.forEach(x => actions2.push(x));
@@ -79,9 +79,9 @@ describe('Action', () => {
     it('handles edge cases (2)', () => {
       const actions = new ActionList;
 
-      actions.create(normalize('/test'), new Buffer('1'));
+      actions.create(normalize('/test'), Buffer.from('1'));
       actions.rename(normalize('/test'), normalize('/test1'));
-      actions.overwrite(normalize('/test1'), new Buffer('2'));
+      actions.overwrite(normalize('/test1'), Buffer.from('2'));
       actions.rename(normalize('/test1'), normalize('/test2'));
 
       actions.optimize();
@@ -95,7 +95,7 @@ describe('Action', () => {
       const actions = new ActionList;
 
       actions.rename(normalize('/test'), normalize('/test1'));
-      actions.overwrite(normalize('/test1'), new Buffer('2'));
+      actions.overwrite(normalize('/test1'), Buffer.from('2'));
       actions.rename(normalize('/test1'), normalize('/test2'));
 
       actions.optimize();

@@ -11,7 +11,7 @@ import { UpdateRecorderBase, UpdateRecorderBom } from './recorder';
 
 describe('UpdateRecorderBase', () => {
   it('works for simple files', () => {
-    const buffer = new Buffer('Hello World');
+    const buffer = Buffer.from('Hello World');
     const entry = new SimpleFileEntry(normalize('/some/path'), buffer);
 
     const recorder = new UpdateRecorderBase(entry);
@@ -21,7 +21,7 @@ describe('UpdateRecorderBase', () => {
   });
 
   it('works for simple files (2)', () => {
-    const buffer = new Buffer('Hello World');
+    const buffer = Buffer.from('Hello World');
     const entry = new SimpleFileEntry(normalize('/some/path'), buffer);
 
     const recorder = new UpdateRecorderBase(entry);
@@ -31,31 +31,31 @@ describe('UpdateRecorderBase', () => {
   });
 
   it('can create the proper recorder', () => {
-    const e = new SimpleFileEntry(normalize('/some/path'),  new Buffer('hello'));
+    const e = new SimpleFileEntry(normalize('/some/path'),  Buffer.from('hello'));
     expect(UpdateRecorderBase.createFromFileEntry(e) instanceof UpdateRecorderBase).toBe(true);
     expect(UpdateRecorderBase.createFromFileEntry(e) instanceof UpdateRecorderBom).toBe(false);
   });
 
   it('can create the proper recorder (bom)', () => {
-    const eBom = new SimpleFileEntry(normalize('/some/path'), new Buffer('\uFEFFhello'));
+    const eBom = new SimpleFileEntry(normalize('/some/path'), Buffer.from('\uFEFFhello'));
     expect(UpdateRecorderBase.createFromFileEntry(eBom) instanceof UpdateRecorderBase).toBe(true);
     expect(UpdateRecorderBase.createFromFileEntry(eBom) instanceof UpdateRecorderBom).toBe(true);
   });
 
   it('supports empty files', () => {
-    const e = new SimpleFileEntry(normalize('/some/path'),  new Buffer(''));
+    const e = new SimpleFileEntry(normalize('/some/path'),  Buffer.from(''));
     expect(UpdateRecorderBase.createFromFileEntry(e) instanceof UpdateRecorderBase).toBe(true);
   });
 
   it('supports empty files (bom)', () => {
-    const eBom = new SimpleFileEntry(normalize('/some/path'), new Buffer('\uFEFF'));
+    const eBom = new SimpleFileEntry(normalize('/some/path'), Buffer.from('\uFEFF'));
     expect(UpdateRecorderBase.createFromFileEntry(eBom) instanceof UpdateRecorderBase).toBe(true);
   });
 });
 
 describe('UpdateRecorderBom', () => {
   it('works for simple files', () => {
-    const buffer = new Buffer('\uFEFFHello World');
+    const buffer = Buffer.from('\uFEFFHello World');
     const entry = new SimpleFileEntry(normalize('/some/path'), buffer);
 
     const recorder = new UpdateRecorderBom(entry);

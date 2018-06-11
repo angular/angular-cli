@@ -17,7 +17,7 @@
 
     const issue = reference.issue;
     const owner = reference.owner || 'angular';
-    const repository = reference.repository || (issue > 10000 ? 'angular-cli' : 'devkit');
+    const repository = reference.repository || 'angular-cli';
     %>[Closes #<%= issue %>](https://github.com/<%= owner %>/<%= repository %>/issues/<%= issue %>)<%
   }
 %>

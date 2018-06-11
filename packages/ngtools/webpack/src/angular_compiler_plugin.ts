@@ -54,10 +54,13 @@ import {
   VirtualWatchFileSystemDecorator,
 } from './virtual_file_system_decorator';
 
-
-const ContextElementDependency = require('webpack/lib/dependencies/ContextElementDependency');
 const treeKill = require('tree-kill');
 
+export interface ContextElementDependency {}
+
+export interface ContextElementDependencyConstructor {
+  new(modulePath: string, name: string): ContextElementDependency;
+}
 
 /**
  * Option Constants
@@ -85,6 +88,10 @@ export interface AngularCompilerPluginOptions {
 
   // added to the list of lazy routes
   additionalLazyModules?: { [module: string]: string };
+
+  // The ContextElementDependency of correct Webpack compilation.
+  // This is needed when there are multiple Webpack installs.
+  contextElementDependencyConstructor?: ContextElementDependencyConstructor;
 
   // Use tsconfig to include path globs.
   compilerOptions?: ts.CompilerOptions;
@@ -128,6 +135,7 @@ export class AngularCompilerPlugin {
   private _normalizedLocale: string | null;
   private _warnings: (string | Error)[] = [];
   private _errors: (string | Error)[] = [];
+  private _contextElementDependencyConstructor: ContextElementDependencyConstructor;
 
   // TypeChecker process.
   private _forkTypeChecker = true;
@@ -266,6 +274,15 @@ export class AngularCompilerPlugin {
     if (options.platformTransformers !== undefined) {
       this._platformTransformers = options.platformTransformers;
     }
+
+    // Default ContextElementDependency to the one we can import from here.
+    // Failing to use the right ContextElementDependency will throw the error below:
+    // "No module factory available for dependency type: ContextElementDependency"
+    // Hoisting together with peer dependencies can make it so the imported
+    // ContextElementDependency does not come from the same Webpack instance that is used
+    // in the compilation. In that case, we can pass the right one as an option to the plugin.
+    this._contextElementDependencyConstructor = options.contextElementDependencyConstructor
+      || require('webpack/lib/dependencies/ContextElementDependency');
 
     // Create the webpack compiler host.
     const webpackCompilerHost = new WebpackCompilerHost(
@@ -633,7 +650,7 @@ export class AngularCompilerPlugin {
                 if (modulePath !== null) {
                   const name = importPath.replace(/(\.ngfactory)?\.(js|ts)$/, '');
 
-                  return new ContextElementDependency(modulePath, name);
+                  return new this._contextElementDependencyConstructor(modulePath, name);
                 } else {
                   return null;
                 }

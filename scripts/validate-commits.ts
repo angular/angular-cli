@@ -32,7 +32,7 @@ export default function (argv: ValidateCommitsOptions, logger: logging.Logger) {
   let sha = '';
 
   if (prNumber) {
-    const url = `https://api.github.com/repos/angular/devkit/pulls/${prNumber}`;
+    const url = `https://api.github.com/repos/angular/angular-cli/pulls/${prNumber}`;
     const prJson = JSON.parse(execSync(`curl "${url}"`, {
       stdio: ['ignore', 'pipe', 'ignore'],
       encoding: 'utf8',
@@ -145,8 +145,9 @@ export default function (argv: ValidateCommitsOptions, logger: logging.Logger) {
 
   if (invalidCount > 0) {
     logger.fatal(`${invalidCount} commits were found invalid...`);
-    process.exit(1);
   } else {
     logger.info('All green. Thank you, come again.');
   }
+
+  return invalidCount;
 }

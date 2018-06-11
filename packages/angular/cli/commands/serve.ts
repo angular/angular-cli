@@ -1,4 +1,11 @@
-// tslint:disable:no-global-tslint-disable file-header
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+
 import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
 import { CommandScope, Option } from '../models/command';
 import { Version } from '../upgrade/version';

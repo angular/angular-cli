@@ -24,6 +24,7 @@ ts_library(
         "//packages/angular_devkit/core:node",  # TODO: get rid of this for 6.0
         "@rxjs",
         "@rxjs//operators",
+        # @typings: node
     ],
 )
 
@@ -45,6 +46,9 @@ ts_library(
         "//packages/angular_devkit/core:node",
         "@rxjs",
         "@rxjs//operators",
+        # @typings: node
+        # @typings: tslint
+        # @typings: typescript
     ],
 )
 
@@ -114,5 +118,6 @@ ts_library(
         "@rxjs",
         "@rxjs//operators",
         # @typings: jasmine
+        # @typings: node
     ],
 )

@@ -26,12 +26,16 @@ import {
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { AppConfig, CliConfig } from '../../utility/config';
-import { latestVersions } from '../../utility/latest-versions';
 import {
-  appendPropertyInAstObject,
+  NodeDependency,
+  NodeDependencyType,
+  addPackageJsonDependency,
+} from '../../utility/dependencies';
+import {
   appendValueInAstArray,
   findPropertyInAstObject,
-} from './json-utils';
+} from '../../utility/json-utils';
+import { latestVersions } from '../../utility/latest-versions';
 
 const defaults = {
   appRoot: 'src',
@@ -387,8 +391,9 @@ function extractProjectsConfig(
         return entry;
       }
 
+      const projectRoot = join(normalize(appRoot), '..');
       const project: JsonObject = {
-        root: join(normalize(appRoot), '..'),
+        root: projectRoot,
         sourceRoot: appRoot,
         projectType: 'application',
       };
@@ -538,8 +543,8 @@ function extractProjectsConfig(
         architect.server = serverTarget;
       }
       const e2eProject: JsonObject = {
-        root: project.root,
-        sourceRoot: join(project.root as Path, 'e2e'),
+        root: join(projectRoot, 'e2e'),
+        sourceRoot: join(projectRoot, 'e2e'),
         projectType: 'application',
       };
 
@@ -648,49 +653,13 @@ function updateSpecTsConfig(config: CliConfig): Rule {
 
 function updatePackageJson(config: CliConfig) {
   return (host: Tree, context: SchematicContext) => {
-    const pkgPath = '/package.json';
-    const buffer = host.read(pkgPath);
-    if (buffer == null) {
-      throw new SchematicsException('Could not read package.json');
-    }
-    const pkgAst = parseJsonAst(buffer.toString(), JsonParseMode.Strict);
-
-    if (pkgAst.kind != 'object') {
-      throw new SchematicsException('Error reading package.json');
-    }
-
-    const devDependenciesNode = findPropertyInAstObject(pkgAst, 'devDependencies');
-    if (devDependenciesNode && devDependenciesNode.kind != 'object') {
-      throw new SchematicsException('Error reading package.json; devDependency is not an object.');
-    }
-
-    const recorder = host.beginUpdate(pkgPath);
-    const depName = '@angular-devkit/build-angular';
-    if (!devDependenciesNode) {
-      // Haven't found the devDependencies key, add it to the root of the package.json.
-      appendPropertyInAstObject(recorder, pkgAst, 'devDependencies', {
-        [depName]: latestVersions.DevkitBuildAngular,
-      });
-    } else {
-      // Check if there's a build-angular key.
-      const buildAngularNode = findPropertyInAstObject(devDependenciesNode, depName);
-
-      if (!buildAngularNode) {
-        // No build-angular package, add it.
-        appendPropertyInAstObject(
-          recorder,
-          devDependenciesNode,
-          depName,
-          latestVersions.DevkitBuildAngular,
-        );
-      } else {
-        const { end, start } = buildAngularNode;
-        recorder.remove(start.offset, end.offset - start.offset);
-        recorder.insertRight(start.offset, JSON.stringify(latestVersions.DevkitBuildAngular));
-      }
-    }
-
-    host.commitUpdate(recorder);
+    const dependency: NodeDependency = {
+      type: NodeDependencyType.Dev,
+      name: '@angular-devkit/build-angular',
+      version: latestVersions.DevkitBuildAngular,
+      overwrite: true,
+    };
+    addPackageJsonDependency(host, dependency);
 
     context.addTask(new NodePackageInstallTask({
       packageManager: config.packageManager === 'default' ? undefined : config.packageManager,

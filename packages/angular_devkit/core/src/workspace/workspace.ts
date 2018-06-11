@@ -170,8 +170,10 @@ export class Workspace {
     const projects = this.listProjectNames()
       .map(name => [this.getProject(name).root, name] as [Path, string])
       .filter(tuple => isInside(tuple[0], path))
-      // Sort tuples by depth, with the deeper ones first.
-      .sort((a, b) => isInside(a[0], b[0]) ? 1 : 0);
+      // Sort tuples by depth, with the deeper ones first. Since the first member is a path and
+      // we filtered all invalid paths, the longest will be the deepest (and in case of equality
+      // the sort is stable and the first declared project will win).
+      .sort((a, b) => b[0].length - a[0].length);
 
     if (projects[0]) {
       return projects[0][1];

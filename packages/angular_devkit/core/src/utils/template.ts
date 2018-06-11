@@ -334,7 +334,7 @@ function templateWithSourceMap(ast: TemplateAst, options?: TemplateOptions): str
 
   return code.code
        + '\n//# sourceMappingURL=data:application/json;base64,'
-       + new Buffer(code.map.toString()).toString('base64');
+       + Buffer.from(code.map.toString()).toString('base64');
 }
 
 

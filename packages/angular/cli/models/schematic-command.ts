@@ -1,4 +1,12 @@
-// tslint:disable:no-global-tslint-disable no-any file-header
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+
+// tslint:disable:no-global-tslint-disable no-any
 import { JsonObject, experimental } from '@angular-devkit/core';
 import { normalize, strings, tags, terminal, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';

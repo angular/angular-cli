@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { strings } from '@angular-devkit/core';
+import { parseJson, strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -27,22 +27,14 @@ import {
   addProjectToWorkspace,
   getWorkspace,
 } from '../utility/config';
+import {
+  NodeDependencyType,
+  addPackageJsonDependency,
+} from '../utility/dependencies';
 import { latestVersions } from '../utility/latest-versions';
 import { validateProjectName } from '../utility/validation';
 import { Schema as LibraryOptions } from './schema';
 
-
-type PackageJsonPartialType = {
-  scripts: {
-    [key: string]: string;
-  },
-  dependencies: {
-    [key: string]: string;
-  },
-  devDependencies: {
-    [key: string]: string;
-  },
-};
 
 interface UpdateJsonFn<T> {
   (obj: T): T | void;
@@ -61,8 +53,8 @@ function updateJsonFile<T>(host: Tree, path: string, callback: UpdateJsonFn<T>):
   const source = host.read(path);
   if (source) {
     const sourceText = source.toString('utf-8');
-    const json = JSON.parse(sourceText);
-    callback(json);
+    const json = parseJson(sourceText);
+    callback(json as {} as T);
     host.overwrite(path, JSON.stringify(json, null, 2));
   }
 
@@ -96,39 +88,45 @@ function updateTsConfig(packageName: string, distRoot: string) {
 function addDependenciesToPackageJson() {
 
   return (host: Tree) => {
-    if (!host.exists('package.json')) { return host; }
+    [
+      {
+        type: NodeDependencyType.Dev,
+        name: '@angular/compiler-cli',
+        version: latestVersions.Angular,
+      },
+      {
+        type: NodeDependencyType.Dev,
+        name: '@angular-devkit/build-ng-packagr',
+        version: latestVersions.DevkitBuildNgPackagr,
+      },
+      {
+        type: NodeDependencyType.Dev,
+        name: '@angular-devkit/build-angular',
+        version: latestVersions.DevkitBuildNgPackagr,
+      },
+      {
+        type: NodeDependencyType.Dev,
+        name: 'ng-packagr',
+        version: '^3.0.0',
+      },
+      {
+        type: NodeDependencyType.Dev,
+        name: 'tsickle',
+        version: '>=0.29.0',
+      },
+      {
+        type: NodeDependencyType.Dev,
+        name: 'tslib',
+        version: '^1.9.0',
+      },
+      {
+        type: NodeDependencyType.Dev,
+        name: 'typescript',
+        version: latestVersions.TypeScript,
+      },
+    ].forEach(dependency => addPackageJsonDependency(host, dependency));
 
-    return updateJsonFile(host, 'package.json', (json: PackageJsonPartialType) => {
-
-
-      if (!json['dependencies']) {
-        json['dependencies'] = {};
-      }
-
-      json.dependencies = {
-        '@angular/common': latestVersions.Angular,
-        '@angular/core': latestVersions.Angular,
-        '@angular/compiler': latestVersions.Angular,
-        // De-structure last keeps existing user dependencies.
-        ...json.dependencies,
-      };
-
-      if (!json['devDependencies']) {
-        json['devDependencies'] = {};
-      }
-
-      json.devDependencies = {
-        '@angular/compiler-cli': latestVersions.Angular,
-        '@angular-devkit/build-ng-packagr': latestVersions.DevkitBuildNgPackagr,
-        '@angular-devkit/build-angular': latestVersions.DevkitBuildNgPackagr,
-        'ng-packagr': '^3.0.0',
-        'tsickle': '>=0.29.0',
-        'tslib': '^1.9.0',
-        'typescript': latestVersions.TypeScript,
-        // De-structure last keeps existing user dependencies.
-        ...json.devDependencies,
-      };
-    });
+    return host;
   };
 }
 

@@ -56,7 +56,7 @@ export function fileBufferToString(fileBuffer: FileBuffer): string {
   if (fileBuffer.toString.length == 1) {
     return (fileBuffer.toString as (enc: string) => string)('utf-8');
   } else if (typeof Buffer !== 'undefined') {
-    return new Buffer(fileBuffer).toString('utf-8');
+    return Buffer.from(fileBuffer).toString('utf-8');
   } else if (typeof TextDecoder !== 'undefined') {
     // Modern browsers implement TextEncode.
     return new TextDecoder('utf-8').decode(new Uint8Array(fileBuffer));

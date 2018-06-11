@@ -9,7 +9,27 @@ import { normalize, virtualFs } from '@angular-devkit/core';
 import { HostTree, VirtualTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { map } from 'rxjs/operators';
+import * as semver from 'semver';
+import { angularMajorCompatGuarantee } from './index';
 
+
+describe('angularMajorCompatGuarantee', () => {
+  [
+    '5.0.0',
+    '5.1.0',
+    '5.20.0',
+    '6.0.0',
+    '6.0.0-rc.0',
+    '6.0.0-beta.0',
+    '6.1.0-beta.0',
+    '6.1.0-rc.0',
+    '6.10.11',
+  ].forEach(golden => {
+    it('works with ' + JSON.stringify(golden), () => {
+      expect(semver.satisfies(golden, angularMajorCompatGuarantee('^5.0.0'))).toBeTruthy();
+    });
+  });
+});
 
 describe('@schematics/update', () => {
   const schematicRunner = new SchematicTestRunner(
@@ -180,7 +200,7 @@ describe('@schematics/update', () => {
         expect(packageJson['dependencies']['@angular/core'][0]).toBe('6');
         expect(packageJson['dependencies']['rxjs'][0]).toBe('6');
         expect(packageJson['dependencies']['typescript'][0]).toBe('2');
-        expect(packageJson['dependencies']['typescript'][2]).toBe('7');
+        expect(packageJson['dependencies']['typescript'][2]).not.toBe('4');
 
         // Check install task.
         expect(schematicRunner.tasks).toEqual([

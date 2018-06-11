@@ -158,7 +158,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // use includePaths from appConfig
   const includePaths: string[] = [];
-  let lessPathOptions: { paths: string[] } = { paths: [] };
+  let lessPathOptions: { paths?: string[] } = { };
 
   if (buildOptions.stylePreprocessorOptions
     && buildOptions.stylePreprocessorOptions.includePaths
@@ -189,7 +189,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   }
 
   // set base rules to derive final rules from
-  const baseRules: webpack.NewUseRule[] = [
+  const baseRules: webpack.Rule[] = [
     { test: /\.css$/, use: [] },
     {
       test: /\.scss$|\.sass$/, use: [{

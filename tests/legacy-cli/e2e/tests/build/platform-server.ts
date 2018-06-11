@@ -136,7 +136,7 @@ export default function () {
     `))
     .then(() => exec(normalize('node'), 'index.js'))
     .then(() => expectFileToMatch('dist/test-project-server/index.html',
-      new RegExp('<h2 _ngcontent-c0="">Here are some links to help you start: </h2>')))
+      /<h2.*>Here are some links to help you start: <\/h2>/))
     .then(() => expectFileToMatch('./dist/test-project-server/main.js',
       /require\(["']@angular\/[^"']*["']\)/))
 
