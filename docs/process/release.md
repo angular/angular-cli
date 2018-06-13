@@ -1,5 +1,5 @@
-> Hans Larsen (hansl@google.com)  
-> June 8th, 2018  
+> Hans Larsen (hansl@google.com)
+> June 8th, 2018
 
 
 # Setting Up Local Repository
@@ -25,7 +25,7 @@ TBD
 ### Maintaining Patch Branches
 Everytime a PR is merged, commits need to be cherry-picked to an associated branch;
 * the latest patch branch (e.g. `1.2.x` or `1.3.x-rc.0`) should also be updated by cherry-picking all _applicable_
-  commits to it. `fix()`, `docs()`, `refactor()` and 
+  commits to it. `fix()`, `docs()`, `refactor()` and
 
 Say the following PR is merged;
 
@@ -56,10 +56,10 @@ devkit-admin release patch --force
 
 **It is a good idea to wait for CI to be green on the patch branch and tag before doing the release.**
 
-Check out the patch tag (e.g. `v6.7.8`), then run: 
+Check out the patch tag (e.g. `v6.7.8`), then run:
 ```sh
 devkit-admin publish
-``` 
+```
 
 Check out the minor tag (e.g. `v6.8.0-beta.0`), then run:
 ```bash
@@ -72,7 +72,7 @@ Running the following command will output the release notes on stdout between v1
 
 ```bash
 devkit-admin changelog --from=v1.2.3 --to=v1.2.4
-``` 
+```
 
 Copy paste the output (you can use `| pbcopy` on MacOS) and create the release notes on github for the tag just
 released. If you have an API token for GitHub you can create a draft automatically by using the `--githubToken` flag.
