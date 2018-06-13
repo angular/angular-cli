@@ -84,7 +84,7 @@ export default async function(options: { testing?: boolean, cliArgs: string[] })
     } else if (typeof err === 'number') {
       // Log nothing.
     } else {
-      logger.fatal('An unexpected error occured: ' + JSON.stringify(err));
+      logger.fatal('An unexpected error occurred: ' + JSON.stringify(err));
     }
 
     if (options.testing) {
