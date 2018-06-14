@@ -56,6 +56,10 @@ To add Font Awesome CSS icons to your app...
 }
 ```
 
+### Using SASS w/ Custom Variables
+
+Follow steps for `Using SASS` then continue.
+
 Create an empty file _variables.scss in src/.
 
 Add the following to _variables.scss:
