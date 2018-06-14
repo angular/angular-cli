@@ -39,7 +39,7 @@ export default function(args: ChangelogOptions, logger: logging.Logger) {
     || ''
   ).trim();
 
-  new Promise((resolve) => {
+  return new Promise((resolve) => {
     (gitRawCommits({
       from: args.from,
       to: args.to || 'HEAD',
