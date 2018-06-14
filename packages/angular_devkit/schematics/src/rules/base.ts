@@ -8,7 +8,7 @@
 import { Observable, of as observableOf } from 'rxjs';
 import { concatMap, last, map } from 'rxjs/operators';
 import { FileOperator, Rule, SchematicContext, Source } from '../engine/interface';
-import { FilteredTree } from '../tree/filtered';
+import { FilterTree, FilteredTree } from '../tree/filtered';
 import { FileEntry, FilePredicate, MergeStrategy, Tree } from '../tree/interface';
 import {
   branch,
@@ -92,7 +92,13 @@ export function noop(): Rule {
 
 
 export function filter(predicate: FilePredicate<boolean>): Rule {
-  return (tree: Tree) => new FilteredTree(tree, predicate);
+  return ((tree: Tree) => {
+    if (tree instanceof VirtualTree) {
+      return new FilteredTree(tree, predicate);
+    } else {
+      return new FilterTree(tree, predicate);
+    }
+  });
 }
 
 
