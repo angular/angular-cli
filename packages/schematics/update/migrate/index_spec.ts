@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { virtualFs } from '@angular-devkit/core';
-import { HostTree, VirtualTree } from '@angular-devkit/schematics';
+import { HostTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { map } from 'rxjs/operators';
 
@@ -16,7 +16,7 @@ describe('@schematics/update:migrate', () => {
     '@schematics/update', __dirname + '/../collection.json',
   );
   let host: virtualFs.test.TestHost;
-  let appTree: UnitTestTree = new UnitTestTree(new VirtualTree());
+  let appTree: UnitTestTree = new UnitTestTree(new HostTree());
 
   beforeEach(() => {
     host = new virtualFs.test.TestHost({});
