@@ -70,6 +70,7 @@ ts_library(
         "//packages/angular_devkit/core:node",
         "@rxjs",
         "@rxjs//operators",
+        # @typings: node
     ],
 )
 

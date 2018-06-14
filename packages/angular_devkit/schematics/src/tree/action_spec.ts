@@ -8,6 +8,7 @@
 import { normalize } from '@angular-devkit/core';
 import { Action, ActionList } from './action';
 
+type ExpectedAction = jasmine.ObjectContaining<Action>;
 
 describe('Action', () => {
   describe('optimize', () => {
@@ -87,7 +88,7 @@ describe('Action', () => {
       actions.optimize();
       expect(actions.length).toBe(1);
       expect(actions.get(0)).toEqual(
-        jasmine.objectContaining<Action>({ kind: 'c', path: normalize('/test2') }),
+        jasmine.objectContaining({ kind: 'c', path: normalize('/test2') }) as ExpectedAction,
       );
     });
 
@@ -100,14 +101,12 @@ describe('Action', () => {
 
       actions.optimize();
       expect(actions.length).toBe(2);
-      expect(actions.get(0)).toEqual(
-        jasmine.objectContaining<Action>({
-          kind: 'r', path: normalize('/test'), to: normalize('/test2'),
-        }),
-      );
-      expect(actions.get(1)).toEqual(
-        jasmine.objectContaining<Action>({ kind: 'o', path: normalize('/test2') }),
-      );
+      expect(actions.get(0)).toEqual(jasmine.objectContaining({
+        kind: 'r', path: normalize('/test'), to: normalize('/test2'),
+      }) as ExpectedAction);
+      expect(actions.get(1)).toEqual(jasmine.objectContaining({
+        kind: 'o', path: normalize('/test2'),
+      }) as ExpectedAction);
     });
   });
 });
