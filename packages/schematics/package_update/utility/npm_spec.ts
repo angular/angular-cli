@@ -7,7 +7,7 @@
  */
 // tslint:disable:non-null-operator
 import { virtualFs } from '@angular-devkit/core';
-import { FileSystemTree, Tree } from '@angular-devkit/schematics';
+import { HostTree, Tree } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
 import * as path from 'path';
 import { updatePackageJson } from './npm';
@@ -21,7 +21,7 @@ describe('Schematic Update', () => {
   let inputTree: Tree;
 
   beforeEach(() => {
-    inputTree = new FileSystemTree(new virtualFs.test.TestHost({
+    inputTree = new HostTree(new virtualFs.test.TestHost({
       '/package.json': `{
         "dependencies": {
           "@angular/core": "4.0.0",
