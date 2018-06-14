@@ -351,7 +351,7 @@ export class CordHost extends SimpleMemoryHost {
   exists(path: Path): Observable<boolean> {
     return this._exists(path)
       ? of(true)
-      : (this.willDelete(path) ? of(false) : this._back.exists(path));
+      : ((this.willDelete(path) || this.willRename(path)) ? of(false) : this._back.exists(path));
   }
   isDirectory(path: Path): Observable<boolean> {
     return this._exists(path) ? super.isDirectory(path) : this._back.isDirectory(path);
@@ -359,7 +359,7 @@ export class CordHost extends SimpleMemoryHost {
   isFile(path: Path): Observable<boolean> {
     return this._exists(path)
       ? super.isFile(path)
-      : (this.willDelete(path) ? of(false) : this._back.isFile(path));
+      : ((this.willDelete(path) || this.willRename(path)) ? of(false) : this._back.isFile(path));
   }
 
   stat(path: Path) {
