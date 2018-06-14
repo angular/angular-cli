@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { tags } from '@angular-devkit/core';
-import { VirtualTree } from '@angular-devkit/schematics';
+import { HostTree } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
 import { Change, InsertChange } from '../utility/change';
 import { getFileContent } from '../utility/test';
@@ -19,7 +19,7 @@ function getTsSource(path: string, content: string): ts.SourceFile {
 }
 
 function applyChanges(path: string, content: string, changes: Change[]): string {
-  const tree = new VirtualTree();
+  const tree = new HostTree();
   tree.create(path, content);
   const exportRecorder = tree.beginUpdate(path);
   for (const change of changes) {
