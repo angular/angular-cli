@@ -9,7 +9,7 @@
 // tslint:disable:non-null-operator
 import { Path, virtualFs } from '@angular-devkit/core';
 import {
-  FileSystemTree,
+  HostTree,
   MergeStrategy,
   partitionApplyMerge,
 } from '@angular-devkit/schematics';
@@ -138,7 +138,7 @@ describe('partitionApplyMerge', () => {
       '/test1': '',
       '/test2': '',
     });
-    const tree = new FileSystemTree(host);
+    const tree = new HostTree(host);
     const predicate = (path: Path) => path.indexOf('1') != -1;
 
     const ruleYes: Rule = (tree: Tree) => {
