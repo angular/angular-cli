@@ -32,6 +32,7 @@ import {
   addPackageJsonDependency,
 } from '../../utility/dependencies';
 import {
+  appendPropertyInAstObject,
   appendValueInAstArray,
   findPropertyInAstObject,
 } from '../../utility/json-utils';
@@ -724,6 +725,44 @@ function updateTsLintConfig(): Rule {
   };
 }
 
+function updateRootTsConfig(): Rule {
+  return (host: Tree, context: SchematicContext) => {
+    const tsConfigPath = '/tsconfig.json';
+    const buffer = host.read(tsConfigPath);
+    if (!buffer) {
+      return;
+    }
+
+    const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
+    if (tsCfgAst.kind != 'object') {
+      throw new SchematicsException(
+        'Invalid tsconfig. Was expecting an object'
+      );
+    }
+
+    const compilerOptionsAstNode = findPropertyInAstObject(tsCfgAst, 'compilerOptions');
+    if (!compilerOptionsAstNode || compilerOptionsAstNode.kind != 'object') {
+      throw new SchematicsException('Invalid tsconfig "compilerOptions" property; expected an object.');
+    }
+
+    if (findPropertyInAstObject(compilerOptionsAstNode, 'baseUrl')) {
+      return host;
+    }
+
+    const recorder = host.beginUpdate(tsConfigPath);
+    appendPropertyInAstObject(
+      recorder,
+      compilerOptionsAstNode,
+      'baseUrl',
+      './',
+      4,
+    );
+
+    host.commitUpdate(recorder);
+    return host;
+  };
+}
+
 export default function (): Rule {
   return (host: Tree, context: SchematicContext) => {
     if (host.exists('/.angular.json') || host.exists('/angular.json')) {
@@ -748,6 +787,7 @@ export default function (): Rule {
       migrateConfiguration(config, context.logger),
       updateSpecTsConfig(config),
       updatePackageJson(config),
+      updateRootTsConfig(),
       updateTsLintConfig(),
       (host: Tree, context: SchematicContext) => {
         context.logger.warn(tags.oneLine`Some configuration options have been changed,
