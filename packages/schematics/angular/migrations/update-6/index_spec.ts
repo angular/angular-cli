@@ -775,6 +775,27 @@ describe('Migration to v6', () => {
     });
   });
 
+  describe('root ts config', () => {
+    const rootTsConfig = '/tsconfig.json';
+    beforeEach(() => {
+      tree.create(rootTsConfig, `
+        {
+          "compilerOptions": {
+            "module": "es2015"
+          }
+        }
+      `);
+    });
+
+    it('should add baseUrl', () => {
+      tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+      tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+      const content = tree.readContent(rootTsConfig);
+      const config = JSON.parse(content);
+      expect(config.compilerOptions.baseUrl).toEqual('./');
+    });
+  });
+
   describe('package.json', () => {
     it('should add a dev dependency to @angular-devkit/build-angular', () => {
       tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
