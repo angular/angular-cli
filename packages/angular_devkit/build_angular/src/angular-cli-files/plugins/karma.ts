@@ -155,15 +155,19 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     throw e;
   }
 
-  ['invalid', 'watch-run', 'run'].forEach(function (name) {
-    compiler.plugin(name, function (_: any, callback: () => void) {
-      isBlocked = true;
+  function handler(callback?: () => void) {
+    isBlocked = true;
 
-      if (typeof callback === 'function') {
-        callback();
-      }
-    });
-  });
+    if (typeof callback === 'function') {
+      callback();
+    }
+  }
+
+  compiler.hooks.invalid.tap('karma', () => handler());
+
+  compiler.hooks.watchRun.tapAsync('karma', (_: any, callback: () => void) => handler(callback));
+
+  compiler.hooks.run.tapAsync('karma', (_: any, callback: () => void) => handler(callback));
 
   function unblock(){
     isBlocked = false;
@@ -171,7 +175,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     blocked = [];
   }
 
-  compiler.plugin('done', (stats: any) => {
+  compiler.hooks.done.tap('karma', (stats: any) => {
     // Don't refresh karma when there are webpack errors.
     if (stats.compilation.errors.length === 0) {
       emitter.refreshFiles();
