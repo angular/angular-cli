@@ -44,7 +44,7 @@ The packages from this repo are published as scoped packages under [@nguniversal
 - [@nguniversal/express-engine](/modules/express-engine/README.md)
 - [@nguniversal/aspnetcore-engine](/modules/aspnetcore-engine/README.md)
 - [@nguniversal/hapi-engine](/modules/hapi-engine/README.md)
-- [@nguniversal/module-map-ngfactory-loader](/master/modules/module-map-ngfactory-loader)
+- [@nguniversal/module-map-ngfactory-loader](/modules/module-map-ngfactory-loader)
 
 # Universal "Gotchas"
 Moved to [/docs/gotchas.md](/docs/gotchas.md)
