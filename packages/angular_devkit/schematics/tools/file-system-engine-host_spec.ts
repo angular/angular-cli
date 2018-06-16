@@ -8,7 +8,7 @@
 // tslint:disable:no-any
 // tslint:disable:no-implicit-dependencies
 import { normalize, virtualFs } from '@angular-devkit/core';
-import { FileSystemTree, HostSink, SchematicEngine } from '@angular-devkit/schematics';
+import { HostSink, HostTree, SchematicEngine } from '@angular-devkit/schematics';
 import { FileSystemEngineHost } from '@angular-devkit/schematics/tools';
 import * as path from 'path';
 import { of as observableOf } from 'rxjs';
@@ -292,7 +292,7 @@ describe('FileSystemEngineHost', () => {
     const collection = engine.createCollection('extra-properties');
     const schematic = collection.createSchematic('schematic1');
 
-    schematic.call({}, observableOf(new FileSystemTree(host))).toPromise()
+    schematic.call({}, observableOf(new HostTree(host))).toPromise()
       .then(tree => {
         return new HostSink(host).commit(tree).toPromise();
       })

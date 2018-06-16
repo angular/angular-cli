@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-implicit-dependencies
-import { normalize, virtualFs } from '@angular-devkit/core';
+import { Path, normalize, virtualFs } from '@angular-devkit/core';
 import { toArray } from 'rxjs/operators';
-import { FileSystemCreateTree, FileSystemTree } from '../tree/filesystem';
+import { HostCreateTree, HostTree } from '../tree/host-tree';
 import { optimize } from '../tree/static';
 import { DryRunSink } from './dryrun';
 
@@ -22,7 +22,7 @@ const host = new virtualFs.test.TestHost({
 
 describe('DryRunSink', () => {
   it('works when creating everything', done => {
-    const tree = new FileSystemCreateTree(host);
+    const tree = new HostCreateTree(host);
 
     tree.create('/test', 'testing 1 2');
     const recorder = tree.beginUpdate('/test');
@@ -31,7 +31,9 @@ describe('DryRunSink', () => {
     tree.overwrite('/hello', 'world');
 
     const files = ['/hello', '/sub/directory/file2', '/sub/file1', '/test'];
-    expect(tree.files.sort()).toEqual(files.map(normalize));
+    const treeFiles: Path[] = [];
+    tree.visit(path => treeFiles.push(path));
+    expect(treeFiles.sort()).toEqual(files.map(normalize));
 
     const sink = new DryRunSink(new virtualFs.SimpleMemoryHost());
     sink.reporter.pipe(toArray())
@@ -49,7 +51,7 @@ describe('DryRunSink', () => {
   });
 
   it('works with root', done => {
-    const tree = new FileSystemTree(host);
+    const tree = new HostTree(host);
 
     tree.create('/test', 'testing 1 2');
     const recorder = tree.beginUpdate('/test');
@@ -58,7 +60,9 @@ describe('DryRunSink', () => {
     tree.overwrite('/hello', 'world');
 
     const files = ['/hello', '/sub/directory/file2', '/sub/file1', '/test'];
-    expect(tree.files.sort()).toEqual(files.map(normalize));
+    const treeFiles: Path[] = [];
+    tree.visit(path => treeFiles.push(path));
+    expect(treeFiles.sort()).toEqual(files.map(normalize));
 
     // Need to create this file on the filesystem, otherwise the commit phase will fail.
     const outputHost = new virtualFs.SimpleMemoryHost();

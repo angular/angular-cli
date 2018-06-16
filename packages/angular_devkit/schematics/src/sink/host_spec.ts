@@ -7,9 +7,9 @@
  */
 // tslint:disable:no-implicit-dependencies
 import { normalize, virtualFs } from '@angular-devkit/core';
-import { FileSystemTree, HostSink } from '@angular-devkit/schematics';
+import { HostSink } from '@angular-devkit/schematics';
 import { fileBufferToString } from '../../../core/src/virtual-fs/host';
-import { FileSystemCreateTree } from '../tree/filesystem';
+import { HostCreateTree, HostTree } from '../tree/host-tree';
 import { optimize } from '../tree/static';
 
 
@@ -20,7 +20,7 @@ describe('FileSystemSink', () => {
       '/sub/directory/file2': '',
       '/sub/file1': '',
     });
-    const tree = new FileSystemCreateTree(host);
+    const tree = new HostCreateTree(host);
 
     tree.create('/test', 'testing 1 2');
     const recorder = tree.beginUpdate('/test');
@@ -28,14 +28,16 @@ describe('FileSystemSink', () => {
     tree.commitUpdate(recorder);
 
     const files = ['/hello', '/sub/directory/file2', '/sub/file1', '/test'];
-    expect(tree.files).toEqual(files.map(normalize));
+    const treeFiles: string[] = [];
+    tree.visit(path => treeFiles.push(path));
+    expect(treeFiles.sort()).toEqual(files);
 
     const outputHost = new virtualFs.test.TestHost();
     const sink = new HostSink(outputHost);
     sink.commit(optimize(tree))
         .toPromise()
         .then(() => {
-          const tmpFiles = outputHost.files;
+          const tmpFiles = outputHost.files.sort();
           expect(tmpFiles as string[]).toEqual(files);
           expect(outputHost.sync.read(normalize('/test')).toString())
             .toBe('testing testing 1 2');
@@ -51,7 +53,7 @@ describe('FileSystemSink', () => {
         '/sub/directory/file2': '/sub/directory/file2',
         '/sub/file1': '/sub/file1',
       });
-      const tree = new FileSystemCreateTree(host);
+      const tree = new HostCreateTree(host);
 
       const outputHost = new virtualFs.test.TestHost();
       const sink = new HostSink(outputHost);
@@ -64,7 +66,7 @@ describe('FileSystemSink', () => {
       const host = new virtualFs.test.TestHost({
         '/file0': '/file0',
       });
-      const tree = new FileSystemTree(host);
+      const tree = new HostTree(host);
       tree.rename('/file0', '/file1');
 
       const sink = new HostSink(host);
@@ -82,7 +84,7 @@ describe('FileSystemSink', () => {
       const host = new virtualFs.test.TestHost({
         '/sub/directory/file2': '',
       });
-      const tree = new FileSystemTree(host);
+      const tree = new HostTree(host);
       tree.rename('/sub/directory/file2', '/another-directory/file2');
 
       const sink = new HostSink(host);
@@ -99,7 +101,7 @@ describe('FileSystemSink', () => {
       const host = new virtualFs.test.TestHost({
         '/file0': 'world',
       });
-      const tree = new FileSystemTree(host);
+      const tree = new HostTree(host);
       tree.delete('/file0');
       tree.create('/file0', 'hello');
 
@@ -116,9 +118,14 @@ describe('FileSystemSink', () => {
       const host = new virtualFs.test.TestHost({
         '/file0': 'world',
       });
-      const tree = new FileSystemTree(host);
+      const tree = new HostTree(host);
+
       tree.rename('/file0', '/file1');
+      expect(tree.exists('/file0')).toBeFalsy();
+      expect(tree.exists('/file1')).toBeTruthy();
+
       tree.create('/file0', 'hello');
+      expect(tree.exists('/file0')).toBeTruthy();
 
       const sink = new HostSink(host);
       sink.commit(optimize(tree))
