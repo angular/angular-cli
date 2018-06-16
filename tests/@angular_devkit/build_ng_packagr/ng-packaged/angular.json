@@ -16,7 +16,7 @@
         "test": {
           "builder": "../../../../packages/angular_devkit/build_angular:karma",
           "options": {
-            "main": "projects/lib/src/test.ts",
+            "main": "projects/lib/test.ts",
             "tsConfig": "projects/lib/tsconfig.spec.json",
             "karmaConfig": "projects/lib/karma.conf.js",
             "browsers": "ChromeHeadless",

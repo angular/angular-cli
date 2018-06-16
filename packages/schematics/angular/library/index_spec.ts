@@ -47,7 +47,7 @@ describe('Library Schematic', () => {
     expect(files.indexOf('/projects/foo/ng-package.json')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/projects/foo/package.json')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/projects/foo/tslint.json')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/foo/src/test.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/foo/test.ts')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/projects/foo/src/my_index.ts')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/projects/foo/src/lib/foo.module.ts')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/projects/foo/src/lib/foo.component.spec.ts')).toBeGreaterThanOrEqual(0);
