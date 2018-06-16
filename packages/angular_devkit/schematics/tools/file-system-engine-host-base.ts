@@ -19,7 +19,7 @@ import { mergeMap } from 'rxjs/operators';
 import { Url } from 'url';
 import {
   EngineHost,
-  FileSystemCreateTree,
+  HostCreateTree,
   RuleFactory,
   Source,
   TaskExecutor,
@@ -252,7 +252,7 @@ export abstract class FileSystemEngineHostBase implements
             resolve(dirname(context.schematic.description.path), url.path || ''),
           );
 
-          return new FileSystemCreateTree(new virtualFs.ScopedHost(new NodeJsSyncHost(), root));
+          return new HostCreateTree(new virtualFs.ScopedHost(new NodeJsSyncHost(), root));
         };
     }
 
