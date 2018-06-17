@@ -226,7 +226,6 @@ export default function (options: LibraryOptions): Rule {
         commonModule: false,
         flat: true,
         path: sourceDir,
-        spec: false,
         project: options.name,
       }),
       schematic('component', {
