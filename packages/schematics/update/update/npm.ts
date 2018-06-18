@@ -135,8 +135,8 @@ export function getNpmPackageJson(
         getNpmConfigOption('https-proxy'),
         getNpmConfigOption('strict-ssl'),
         getNpmConfigOption('cafile'),
-        getNpmConfigOption('_auth', registryKey, true),
-        getNpmConfigOption('_authToken', registryKey, true),
+        getNpmConfigOption('_auth'),
+        getNpmConfigOption('_authToken', registryKey),
         getNpmConfigOption('username', registryKey, true),
         getNpmConfigOption('password', registryKey, true),
         getNpmConfigOption('alwaysAuth', registryKey, true),
@@ -159,13 +159,24 @@ export function getNpmPackageJson(
 
           const sslOptions = getNpmClientSslOptions(strictSsl, cafile);
 
-          let auth;
+          const auth: {
+            token?: string,
+            alwaysAuth?: boolean;
+            username?: string;
+            password?: string
+          } = {};
+
+          if (alwaysAuth !== undefined) {
+            auth.alwaysAuth = alwaysAuth === 'false' ? false : !!alwaysAuth;
+          }
+
           if (authToken) {
-            auth = { token: authToken, alwaysAuth };
+            auth.token = authToken;
           } else if (token) {
-            auth = { token, alwaysAuth };
+            auth.token = token;
           } else if (username) {
-            auth = { username, password, alwaysAuth };
+            auth.username = username;
+            auth.password = password;
           }
 
           const client = new RegistryClient({
