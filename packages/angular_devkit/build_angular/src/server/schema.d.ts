@@ -5,6 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { FileReplacement } from '../browser/schema';
+
 export interface BuildWebpackServerSchema {
   /**
    * The name of the TypeScript configuration file.
@@ -76,7 +78,7 @@ export interface BuildWebpackServerSchema {
   /**
    * Replace files with other files in the build.
    */
-  fileReplacements: FileReplacements[];
+  fileReplacements: FileReplacement[];
   /**
    * Define the output filename cache-busting hashing mode.
    */
