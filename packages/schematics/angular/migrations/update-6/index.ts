@@ -32,7 +32,6 @@ import {
   addPackageJsonDependency,
 } from '../../utility/dependencies';
 import {
-  appendPropertyInAstObject,
   appendValueInAstArray,
   findPropertyInAstObject,
 } from '../../utility/json-utils';
@@ -734,31 +733,47 @@ function updateRootTsConfig(): Rule {
     }
 
     const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
-    if (tsCfgAst.kind != 'object') {
-      throw new SchematicsException(
-        'Invalid tsconfig. Was expecting an object'
-      );
+    if (tsCfgAst.kind !== 'object') {
+      throw new SchematicsException('Invalid root tsconfig. Was expecting an object');
     }
 
     const compilerOptionsAstNode = findPropertyInAstObject(tsCfgAst, 'compilerOptions');
     if (!compilerOptionsAstNode || compilerOptionsAstNode.kind != 'object') {
-      throw new SchematicsException('Invalid tsconfig "compilerOptions" property; expected an object.');
+      throw new SchematicsException(
+        'Invalid root tsconfig "compilerOptions" property; expected an object.',
+      );
     }
 
-    if (findPropertyInAstObject(compilerOptionsAstNode, 'baseUrl')) {
+    if (
+      findPropertyInAstObject(compilerOptionsAstNode, 'baseUrl') &&
+      findPropertyInAstObject(compilerOptionsAstNode, 'module')
+    ) {
       return host;
     }
 
-    const recorder = host.beginUpdate(tsConfigPath);
-    appendPropertyInAstObject(
-      recorder,
-      compilerOptionsAstNode,
-      'baseUrl',
-      './',
-      4,
-    );
+    const compilerOptions = compilerOptionsAstNode.value;
+    const { baseUrl = './', module = 'es2015'} = compilerOptions;
 
-    host.commitUpdate(recorder);
+    const validBaseUrl = ['./', '', '.'];
+    if (!validBaseUrl.includes(baseUrl as string)) {
+      const formattedBaseUrl = validBaseUrl.map(x => `'${x}'`).join(', ');
+      context.logger.warn(tags.oneLine
+        `Root tsconfig option 'baseUrl' is not one of: ${formattedBaseUrl}.
+        This might cause unexpected behaviour when generating libraries.`,
+      );
+    }
+
+    if (module !== 'es2015') {
+      context.logger.warn(
+        `Root tsconfig option 'module' is not 'es2015'. This might cause unexpected behaviour.`,
+      );
+    }
+
+    compilerOptions.module = module;
+    compilerOptions.baseUrl = baseUrl;
+
+    host.overwrite(tsConfigPath, JSON.stringify(tsCfgAst.value, null, 2));
+
     return host;
   };
 }
