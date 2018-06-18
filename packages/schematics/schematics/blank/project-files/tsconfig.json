@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "tsconfig",
     "lib": [
-      "es2017",
+      "es2018",
       "dom"
     ],
     "declaration": true,
