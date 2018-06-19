@@ -52,36 +52,47 @@ export function resolveWithPaths(
   // check if any path mapping rules are relevant
   const pathMapOptions = [];
   for (const pattern in compilerOptions.paths) {
-      // can only contain zero or one
-      const starIndex = pattern.indexOf('*');
-      if (starIndex === -1) {
-        if (pattern === originalRequest) {
-          pathMapOptions.push({
-            partial: '',
-            potentials: compilerOptions.paths[pattern],
-          });
-        }
-      } else if (starIndex === 0 && pattern.length === 1) {
+    // get potentials and remove duplicates; JS Set maintains insertion order
+    const potentials = Array.from(new Set(compilerOptions.paths[pattern]));
+    if (potentials.length === 0) {
+      // no potential replacements so skip
+      continue;
+    }
+
+    // can only contain zero or one
+    const starIndex = pattern.indexOf('*');
+    if (starIndex === -1) {
+      if (pattern === originalRequest) {
         pathMapOptions.push({
-          partial: originalRequest,
-          potentials: compilerOptions.paths[pattern],
+          starIndex,
+          partial: '',
+          potentials,
         });
-      } else if (starIndex === pattern.length - 1) {
-        if (originalRequest.startsWith(pattern.slice(0, -1))) {
-          pathMapOptions.push({
-            partial: originalRequest.slice(pattern.length - 1),
-            potentials: compilerOptions.paths[pattern],
-          });
-        }
-      } else {
-        const [prefix, suffix] = pattern.split('*');
-        if (originalRequest.startsWith(prefix) && originalRequest.endsWith(suffix)) {
-          pathMapOptions.push({
-            partial: originalRequest.slice(prefix.length).slice(0, -suffix.length),
-            potentials: compilerOptions.paths[pattern],
-          });
-        }
       }
+    } else if (starIndex === 0 && pattern.length === 1) {
+      pathMapOptions.push({
+        starIndex,
+        partial: originalRequest,
+        potentials,
+      });
+    } else if (starIndex === pattern.length - 1) {
+      if (originalRequest.startsWith(pattern.slice(0, -1))) {
+        pathMapOptions.push({
+          starIndex,
+          partial: originalRequest.slice(pattern.length - 1),
+          potentials,
+        });
+      }
+    } else {
+      const [prefix, suffix] = pattern.split('*');
+      if (originalRequest.startsWith(prefix) && originalRequest.endsWith(suffix)) {
+        pathMapOptions.push({
+          starIndex,
+          partial: originalRequest.slice(prefix.length).slice(0, -suffix.length),
+          potentials,
+        });
+      }
+    }
   }
 
   if (pathMapOptions.length === 0) {
@@ -90,7 +101,18 @@ export function resolveWithPaths(
     return;
   }
 
-  if (pathMapOptions.length === 1 && pathMapOptions[0].potentials.length === 1) {
+  // exact matches take priority then largest prefix match
+  pathMapOptions.sort((a, b) => {
+    if (a.starIndex === -1) {
+      return -1;
+    } else if (b.starIndex === -1) {
+      return 1;
+    } else {
+      return b.starIndex - a.starIndex;
+    }
+  });
+
+  if (pathMapOptions[0].potentials.length === 1) {
     const onlyPotential = pathMapOptions[0].potentials[0];
     let replacement;
     const starIndex = onlyPotential.indexOf('*');
@@ -108,6 +130,9 @@ export function resolveWithPaths(
 
     return;
   }
+
+  // TODO: The following is used when there is more than one potential and will not be
+  //       needed once this is turned into a full webpack resolver plugin
 
   const moduleResolver = ts.resolveModuleName(
     originalRequest,
