@@ -8,7 +8,9 @@
 import { Observable, of as observableOf } from 'rxjs';
 import { concatMap, last, map } from 'rxjs/operators';
 import { FileOperator, Rule, SchematicContext, Source } from '../engine/interface';
-import { FilterTree, FilteredTree } from '../tree/filtered';
+import { SchematicsException } from '../exception/exception';
+import { FilteredTree } from '../tree/filtered';
+import { FilterHostTree, HostTree } from '../tree/host-tree';
 import { FileEntry, FilePredicate, MergeStrategy, Tree } from '../tree/interface';
 import {
   branch,
@@ -93,10 +95,13 @@ export function noop(): Rule {
 
 export function filter(predicate: FilePredicate<boolean>): Rule {
   return ((tree: Tree) => {
+    // TODO: Remove VirtualTree usage in 7.0
     if (tree instanceof VirtualTree) {
       return new FilteredTree(tree, predicate);
+    } else if (tree instanceof HostTree) {
+      return new FilterHostTree(tree, predicate);
     } else {
-      return new FilterTree(tree, predicate);
+      throw new SchematicsException('Tree type is not supported.');
     }
   });
 }

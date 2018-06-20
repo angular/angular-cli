@@ -5,8 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { FilterTree, FilteredTree } from './filtered';
-import { HostTree } from './host-tree';
+import { SchematicsException } from '../exception/exception';
+import { FilteredTree } from './filtered';
+import { FilterHostTree, HostTree } from './host-tree';
 import { FilePredicate, MergeStrategy, Tree } from './interface';
 import { VirtualTree } from './virtual';
 
@@ -42,11 +43,13 @@ export function partition(tree: Tree, predicate: FilePredicate<boolean>): [Tree,
       new FilteredTree(tree, predicate),
       new FilteredTree(tree, (path, entry) => !predicate(path, entry)),
     ];
-  } else {
+  } else if (tree instanceof HostTree) {
     return [
-      new FilterTree(tree, predicate),
-      new FilterTree(tree, (path, entry) => !predicate(path, entry)),
+      new FilterHostTree(tree, predicate),
+      new FilterHostTree(tree, (path, entry) => !predicate(path, entry)),
     ];
+  } else {
+    throw new SchematicsException('Tree type is not supported.');
   }
 }
 
