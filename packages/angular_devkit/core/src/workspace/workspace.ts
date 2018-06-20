@@ -49,6 +49,11 @@ export class WorkspaceNotYetLoadedException extends BaseException {
   constructor() { super(`Workspace needs to be loaded before it is used.`); }
 }
 
+export class AmbiguousProjectPathException extends BaseException {
+  constructor(public readonly path: Path, public readonly projects: ReadonlyArray<string>) {
+    super(`Current active project is ambiguous (${projects.join(',')}) using path: '${path}'`);
+  }
+}
 
 export class Workspace {
   private readonly _workspaceSchemaPath = join(normalize(__dirname), 'workspace-schema.json');
@@ -175,11 +180,25 @@ export class Workspace {
       // the sort is stable and the first declared project will win).
       .sort((a, b) => b[0].length - a[0].length);
 
-    if (projects[0]) {
-      return projects[0][1];
+    if (projects.length === 0) {
+      return null;
+    } else if (projects.length > 1) {
+      const found = new Set<Path>();
+      const sameRoots = projects.filter(v => {
+        if (!found.has(v[0])) {
+          found.add(v[0]);
+
+          return false;
+        }
+
+        return true;
+      });
+      if (sameRoots.length > 0) {
+        throw new AmbiguousProjectPathException(path, sameRoots.map(v => v[1]));
+      }
     }
 
-    return null;
+    return projects[0][1];
   }
 
   getCli() {
