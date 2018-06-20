@@ -140,11 +140,22 @@ export function validateWorkspace(json: JsonObject) {
   return true;
 }
 
+function getProjectByCwd(workspace: experimental.workspace.Workspace): string | null {
+  try {
+    return workspace.getProjectByPath(normalize(process.cwd()));
+  } catch (e) {
+    if (e instanceof experimental.workspace.AmbiguousProjectPathException) {
+      return workspace.getDefaultProjectName();
+    }
+    throw e;
+  }
+}
+
 export function getPackageManager(): string {
   let workspace = getWorkspace('local');
 
   if (workspace) {
-    const project = workspace.getProjectByPath(normalize(process.cwd()));
+    const project = getProjectByCwd(workspace);
     if (project && workspace.getProjectCli(project)) {
       const value = workspace.getProjectCli(project)['packageManager'];
       if (typeof value == 'string') {
@@ -258,7 +269,7 @@ export function getDefaultSchematicCollection(): string {
   let workspace = getWorkspace('local');
 
   if (workspace) {
-    const project = workspace.getProjectByPath(normalize(process.cwd()));
+    const project = getProjectByCwd(workspace);
     if (project && workspace.getProjectCli(project)) {
       const value = workspace.getProjectCli(project)['defaultCollection'];
       if (typeof value == 'string') {
@@ -319,7 +330,7 @@ export function getSchematicDefaults(
       }
     }
 
-    project = project || workspace.getProjectByPath(normalize(process.cwd()));
+    project = project || getProjectByCwd(workspace);
     if (project && workspace.getProjectSchematics(project)) {
       const schematicObject = workspace.getProjectSchematics(project)[fullName];
       if (schematicObject) {
@@ -339,7 +350,7 @@ export function isWarningEnabled(warning: string): boolean {
   let workspace = getWorkspace('local');
 
   if (workspace) {
-    const project = workspace.getProjectByPath(normalize(process.cwd()));
+    const project = getProjectByCwd(workspace);
     if (project && workspace.getProjectCli(project)) {
       const warnings = workspace.getProjectCli(project)['warnings'];
       if (typeof warnings == 'object' && !Array.isArray(warnings)) {
