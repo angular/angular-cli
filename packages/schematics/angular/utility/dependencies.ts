@@ -7,12 +7,12 @@
  */
 import { JsonAstObject, JsonParseMode, parseJsonAst } from '@angular-devkit/core';
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
+import { get } from 'http';
 import {
   appendPropertyInAstObject,
   findPropertyInAstObject,
   insertPropertyInAstObjectInOrder,
  } from './json-utils';
-import { get } from 'http';
 
 const pkgJsonPath = '/package.json';
 export enum NodeDependencyType {

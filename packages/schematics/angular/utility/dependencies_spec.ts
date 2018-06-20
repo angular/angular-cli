@@ -11,10 +11,11 @@ import {
   NodeDependency,
   NodeDependencyType,
   addPackageJsonDependency,
-  getPackageJsonDependency,
   getLatestNodeVersion,
+  getPackageJsonDependency,
 } from './dependencies';
 
+const nock = require('nock');
 
 describe('dependencies', () => {
   describe('addDependency', () => {
@@ -91,14 +92,13 @@ describe('dependencies', () => {
   });
 
   describe('getLatestNodeVersion', () => {
-    let nock = require('nock');
     const packageName = 'my-pkg';
 
     describe('when a package is found in the registry', () => {
       it('should return a NodePackage with name & the "latest" version', (done) => {
         nock('http://registry.npmjs.org')
           .get(`/${packageName}`)
-          .reply(200, registryResponse())
+          .reply(200, registryResponse());
 
         getLatestNodeVersion(packageName)
           .then(({ name, version }) => {
@@ -106,7 +106,7 @@ describe('dependencies', () => {
             expect(version).toEqual('2.0.0');
             done();
           })
-          .catch(done.fail)
+          .catch(done.fail);
       });
     });
 
@@ -114,7 +114,7 @@ describe('dependencies', () => {
       it('should return a NodePackage with a "latest" version', (done) => {
         nock('http://registry.npmjs.org')
           .get(`/${packageName}`)
-          .reply(200, {})
+          .reply(200, {});
 
         getLatestNodeVersion(packageName)
           .then(({ name, version }) => {
@@ -122,7 +122,7 @@ describe('dependencies', () => {
             expect(version).toEqual('latest');
             done();
           })
-          .catch(done.fail)
+          .catch(done.fail);
       });
     });
 
@@ -130,7 +130,7 @@ describe('dependencies', () => {
       it('should return a NodePackage with a "latest" version', (done) => {
         nock('http://registry.npmjs.org')
           .get(`/${packageName}`)
-          .reply(404, {})
+          .reply(404, {});
 
         getLatestNodeVersion(packageName)
           .then(({ name, version }) => {
@@ -138,21 +138,21 @@ describe('dependencies', () => {
             expect(version).toEqual('latest');
             done();
           })
-          .catch(done.fail)
+          .catch(done.fail);
       });
     });
 
     function registryResponse() {
       return {
-        "_id": "my-pkg",
-        "_rev": "213-08cfb20d625bfb265385af8eab6e4381",
-        "name": "my-pkg",
-        "dist-tags": {
-          "latest": "2.0.0",
-          "next": "2.1.0-beta.1",
-          "v1-lts": "1.3.0",
+        '_id': 'my-pkg',
+        '_rev': '213-08cfb20d625bfb265385af8eab6e4381',
+        'name': 'my-pkg',
+        'dist-tags': {
+          'latest': '2.0.0',
+          'next': '2.1.0-beta.1',
+          'v1-lts': '1.3.0',
         },
-      }
+      };
     }
-  })
+  });
 });
