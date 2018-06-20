@@ -128,8 +128,21 @@ export abstract class SchematicCommand extends Command {
 
     workflow.registry.addSmartDefaultProvider('projectName', (_schema: JsonObject) => {
       if (this._workspace) {
+        try {
         return this._workspace.getProjectByPath(normalize(process.cwd()))
                || this._workspace.getDefaultProjectName();
+        } catch (e) {
+          if (e instanceof experimental.workspace.AmbiguousProjectPathException) {
+            this.logger.warn(tags.oneLine`
+              Two or more projects are using identical roots.
+              Unable to determine project using current working directory.
+              Using default workspace project instead.
+            `);
+
+            return this._workspace.getDefaultProjectName();
+          }
+          throw e;
+        }
       }
 
       return undefined;
@@ -346,7 +359,7 @@ export abstract class SchematicCommand extends Command {
 
   private _cleanDefaults<T, K extends keyof T>(defaults: T, undefinedOptions: string[]): T {
     (Object.keys(defaults) as K[])
-      .filter(key => !undefinedOptions.map(strings.camelize).includes(key))
+      .filter(key => !undefinedOptions.map(strings.camelize).includes(key as string))
       .forEach(key => {
         delete defaults[key];
       });
