@@ -16,6 +16,8 @@ import {
   normalize,
   virtualFs,
 } from '@angular-devkit/core';
+import { Observable, of } from 'rxjs';
+import { concatMap, map, mergeMap } from 'rxjs/operators';
 import {
   ContentHasMutatedException,
   FileAlreadyExistException,
@@ -35,10 +37,12 @@ import { LazyFileEntry } from './entry';
 import {
   DirEntry,
   FileEntry,
+  FilePredicate,
   FileVisitor,
   FileVisitorCancelToken,
   MergeStrategy,
-  Tree, TreeSymbol,
+  Tree,
+  TreeSymbol,
   UpdateRecorder,
 } from './interface';
 import { UpdateRecorderBase } from './recorder';
@@ -412,5 +416,67 @@ export class HostCreateTree extends HostTree {
         this.create(path, content);
       }
     });
+  }
+}
+
+export class FilterHostTree extends HostTree {
+  constructor(tree: HostTree, filter: FilePredicate<boolean> = () => true) {
+    const newBackend = new virtualFs.SimpleMemoryHost();
+    // cast to allow access
+    const originalBackend = (tree as FilterHostTree)._backend;
+
+    const recurse: (base: Path) => Observable<void> = base => {
+      return originalBackend.list(base)
+        .pipe(
+          mergeMap(x => x),
+          map(path => join(base, path)),
+          concatMap(path => {
+            let isDirectory = false;
+            originalBackend.isDirectory(path).subscribe(val => isDirectory = val);
+            if (isDirectory) {
+              return recurse(path);
+            }
+
+            let isFile = false;
+            originalBackend.isFile(path).subscribe(val => isFile = val);
+            if (!isFile || !filter(path)) {
+              return of();
+            }
+
+            let content: ArrayBuffer | null = null;
+            originalBackend.read(path).subscribe(val => content = val);
+            if (!content) {
+              return of();
+            }
+
+            return newBackend.write(path, content as {} as virtualFs.FileBuffer);
+          }),
+        );
+    };
+
+    recurse(normalize('/')).subscribe();
+
+    super(newBackend);
+
+    for (const action of tree.actions) {
+      if (!filter(action.path)) {
+        continue;
+      }
+
+      switch (action.kind) {
+        case 'c':
+          this.create(action.path, action.content);
+          break;
+        case 'd':
+          this.delete(action.path);
+          break;
+        case 'o':
+          this.overwrite(action.path, action.content);
+          break;
+        case 'r':
+          this.rename(action.path, action.to);
+          break;
+      }
+    }
   }
 }

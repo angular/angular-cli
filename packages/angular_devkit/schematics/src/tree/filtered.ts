@@ -5,11 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { DelegateTree } from './delegate';
 import { FilePredicate, Tree } from './interface';
 import { VirtualTree } from './virtual';
 
-
+// TODO: Remove this along with VirtualTree in 7.0
 export class FilteredTree extends VirtualTree {
   constructor(tree: Tree, filter: FilePredicate<boolean> = () => true) {
     super();
@@ -35,18 +34,6 @@ export class FilteredTree extends VirtualTree {
     virtualTree.actions.forEach(action => {
       if (this._cacheMap.has(action.path) || this._tree.has(action.path)) {
         this._actions.push(action);
-      }
-    });
-  }
-}
-
-export class FilterTree extends DelegateTree {
-  constructor(tree: Tree, filter: FilePredicate<boolean> = () => true) {
-    super(tree.branch());
-
-    tree.visit(path => {
-      if (!filter(path)) {
-        this.delete(path);
       }
     });
   }
