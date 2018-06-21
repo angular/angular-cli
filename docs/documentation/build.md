@@ -153,6 +153,15 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
   </p>
 </details>
 <details>
+  <summary>vendor-source-map</summary>
+  <p>
+    <code>--vendor-source-map</code>
+  </p>
+  <p>
+    Resolve vendor packages sourcemaps.
+  </p>
+</details>
+<details>
   <summary>vendor-chunk</summary>
   <p>
     <code>--vendor-chunk</code>
