@@ -105,7 +105,7 @@ The system operates on placeholders defined inside files or their paths as loade
 | Placeholder | Description |
 |---|---|
 | __variable__ | Replaced with the value of `variable`. |
-| __varaiable@function__ | Replaced with the result of the call `function(variable)`. Can be chained to the left (`__variable@function1@function2__ ` etc).  |
+| __variable@function__ | Replaced with the result of the call `function(variable)`. Can be chained to the left (`__variable@function1@function2__ ` etc).  |
 
 ## Content Templating
 | Placeholder | Description |
