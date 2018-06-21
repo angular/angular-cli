@@ -2,7 +2,7 @@
 > A scaffolding library for the modern web.
 
 ## Description
-Schematics are generators that transform an existing filesystem. It can create files, refactor existing files, or move files around.
+Schematics are generators that transform an existing filesystem. They can create files, refactor existing files, or move files around.
 
 What distinguishes Schematics from other generators, such as Yeoman or Yarn Create, is that schematics are purely descriptive; no changes are applied to the actual filesystem until everything is ready to be committed. There is no side effect, by design, in Schematics.
 
@@ -51,7 +51,7 @@ A Collection is defined by a `collection.json` file (in the reference CLI). This
 ## Schematic
 
 # Operators, Sources and Rules
-A `Source` is a generator of `Tree`; it creates a root tree from nothing. A `Rule` is a transformation from one `Tree` to another. A `Schematic` (at the root) is a `Rule` that is normally applied on the filesystem.
+A `Source` is a generator of a `Tree`; it creates an entirely new root tree from nothing. A `Rule` is a transformation from one `Tree` to another. A `Schematic` (at the root) is a `Rule` that is normally applied on the filesystem.
 
 ## Operators
 `FileOperator`s apply changes to a single `FileEntry` and return a new `FileEntry`. The result follows these rules:
@@ -62,20 +62,23 @@ A `Source` is a generator of `Tree`; it creates a root tree from nothing. A `Rul
 
 It is impossible to create files using a `FileOperator`.
 
+## Provided Operators
+The Schematics library provides multiple `Operator` factories by default that cover basic use cases:
+
 | FileOperator | Description |
 |---|---|
 | `contentTemplate<T>(options: T)` | Apply a content template (see the Template section) |
 | `pathTemplate<T>(options: T)` | Apply a path template (see the Template section) |
 
 ## Provided Sources
-The Schematics library provides multiple `Source` factories by default that cover basic use cases:
+The Schematics library additionally provides multiple `Source` factories by default:
 
 | Source | Description |
 |---|---|
-| `source(tree: Tree)` | Creates a source that returns the tree passed in argument. |
-| `empty()` | Creates a source that returns an empty tree. |
-| `apply(source: Source, rules: Rule[])` | Apply a list of rules to a source, and return the result. |
-| `url(url: string)` | Loads a list of files from a URL and returns a Tree with the files as `CreateAction` applied to an empty `Tree` |
+| `empty()` | Creates a source that returns an empty `Tree`. |
+| `source(tree: Tree)` | Creates a `Source` that returns the `Tree` passed in as argument. |
+| `url(url: string)` | Loads a list of files from the given URL and returns a `Tree` with the files as `CreateAction` applied to an empty `Tree`. |
+| `apply(source: Source, rules: Rule[])` | Apply a list of `Rule`s to a source, and return the resulting `Source`. |
 
 ## Provided Rules
 The schematics library also provides `Rule` factories by default:
@@ -83,14 +86,34 @@ The schematics library also provides `Rule` factories by default:
 | Rule | Description |
 |---|---|
 | `noop()` | Returns the input `Tree` as is. |
-| `chain(rules: Rule[])` | Returns a `Rule` that's the concatenation of other rules. |
+| `chain(rules: Rule[])` | Returns a `Rule` that's the concatenation of other `Rule`s. |
 | `forEach(op: FileOperator)` | Returns a `Rule` that applies an operator to every file of the input `Tree`. |
 | `move(root: string)` | Moves all the files from the input to a subdirectory. |
-| `merge(other: Tree)` | Merge the input `tree` with the other `Tree`. |
+| `merge(other: Tree)` | Merge the input `Tree` with the other `Tree`. |
 | `contentTemplate<T>(options: T)` | Apply a content template (see the Template section) to the entire `Tree`. |
 | `pathTemplate<T>(options: T)` | Apply a path template (see the Template section) to the entire `Tree`. |
 | `template<T>(options: T)` | Apply both path and content templates (see the Template section) to the entire `Tree`. |
 | `filter(predicate: FilePredicate<boolean>)` | Returns the input `Tree` with files that do not pass the `FilePredicate`. |
+
+
+# Templating
+As referenced above, some functions are based upon a file templating system, which consists of path and content templating.
+
+The system operates on placeholders defined inside files or their paths as loaded in the `Tree` and fills these in as defined in the following, using values passed into the `Rule` which applies the templating (i.e. `template<T>(options: T)`).
+
+## Path Templating
+| Placeholder | Description |
+|---|---|
+| __variable__ | Replaced with the value of `variable`. |
+| __varaiable@function__ | Replaced with the result of the call `function(variable)`. Can be chained to the left (`__variable@function1@function2__ ` etc).  |
+
+## Content Templating
+| Placeholder | Description |
+|---|---|
+| <%= expression %> | Replaced with the result of the call of the given expression. This only supports direct expressions, no structural (for/if/...) JavaScript. |
+| <%- expression %> | Same as above, but the value of the result will be escaped for HTML when inserted (i.e. replacing '<' with '&lt;') |
+| <% inline code %> | Inserts the given code into the template structure, allowing to insert structural JavaScript. |
+| <%# text %> | A comment, which gets entirely dropped. |
 
 
 # Examples
@@ -114,8 +137,54 @@ A few things from this example:
 1. The function receives the list of options from the tooling.
 1. It returns a [`Rule`](src/engine/interface.ts#L73), which is a transformation from a `Tree` to another `Tree`.
 
-# Future Work
+## Templating
+A simplified example of a Schematics which creates a file containing a new Class, using an option to determine its name:
 
+```typescript
+// files/__name@dasherize__.ts
+
+export class <%= classify(name) %> {
+}
+```
+
+```typescript
+// index.ts
+
+import { strings } from '@angular-devkit/core';
+import {
+  Rule, SchematicContext, SchematicsException, Tree,
+  apply, branchAndMerge, mergeWith, template, url,
+} from '@angular-devkit/schematics';
+import { Schema as ClassOptions } from './schema';
+
+export default function (options: ClassOptions): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    if (!options.name) {
+      throw new SchematicsException('Option (name) is required.');
+    }
+
+    const templateSource = apply(
+      url('./files'),
+      [
+        template({
+          ...strings,
+          ...options,
+        }),
+      ]
+    );
+
+    return branchAndMerge(mergeWith(templateSource));
+  };
+}
+```
+
+Additional things from this example:
+1. `strings` provides the used `dasherize` and `classify` functions, among others.
+1. The files are on-disk in the same root directory as the `index.ts` and loaded into a `Tree`.
+1. Then the `template` `Rule` fills in the specified templating placeholders. For this, it only knows about the variables and functions passed to it via the options-object.
+1. Finally, the resulting `Tree`, containing the new file, is merged with the existing files of the project which the Schematic is run on.
+
+# Future Work
 Schematics is not done yet. Here's a list of things we are considering:
 
 * Smart defaults for Options. Having a JavaScript function for default values based on other default values.
