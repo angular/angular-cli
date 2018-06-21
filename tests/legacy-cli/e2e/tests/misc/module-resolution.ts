@@ -15,7 +15,7 @@ export default async function () {
   await createDir('xyz');
   await moveFile(
     'node_modules/@angular/common',
-    'xyz/common'
+    'xyz/common',
   );
 
   await expectToFail(() => ng('build'));
@@ -23,6 +23,22 @@ export default async function () {
   await updateJsonFile('tsconfig.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
       '@angular/common': [ './xyz/common' ],
+    };
+  });
+  await ng('build');
+
+  await updateJsonFile('tsconfig.json', tsconfig => {
+    tsconfig.compilerOptions.paths = {
+      '*': ['./node_modules/*'],
+      '@angular/common': [ './xyz/common' ],
+    };
+  });
+  await ng('build');
+
+  await updateJsonFile('tsconfig.json', tsconfig => {
+    tsconfig.compilerOptions.paths = {
+      '@angular/common': [ './xyz/common' ],
+      '*': ['./node_modules/*'],
     };
   });
   await ng('build');
