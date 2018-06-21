@@ -12,7 +12,8 @@ import {
   appendPropertyInAstObject,
   findPropertyInAstObject,
   insertPropertyInAstObjectInOrder,
- } from './json-utils';
+} from './json-utils';
+
 
 const pkgJsonPath = '/package.json';
 export enum NodeDependencyType {

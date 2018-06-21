@@ -7,6 +7,7 @@
  */
 import { EmptyTree } from '@angular-devkit/schematics';
 import { UnitTestTree } from '@angular-devkit/schematics/testing';
+import * as nock from 'nock';
 import {
   NodeDependency,
   NodeDependencyType,
@@ -15,7 +16,6 @@ import {
   getPackageJsonDependency,
 } from './dependencies';
 
-const nock = require('nock');
 
 describe('dependencies', () => {
   describe('addDependency', () => {
