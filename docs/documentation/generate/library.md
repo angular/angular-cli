@@ -52,6 +52,15 @@ Generate a library project for Angular.
   </p>
 </details>
 <details>
+  <summary>skip-install</summary>
+  <p>
+    <code>--skip-install</code>
+  </p>
+  <p>
+    Do not add dependencies to package.json.
+  </p>
+</details>
+<details>
   <summary>skip-ts-config</summary>
   <p>
     <code>--skip-ts-config</code>

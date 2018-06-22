@@ -28,6 +28,7 @@ describe('Library Schematic', () => {
     entryFile: 'my_index',
     skipPackageJson: false,
     skipTsConfig: false,
+    skipInstall: false,
   };
   const workspaceOptions: WorkspaceOptions = {
     name: 'workspace',
