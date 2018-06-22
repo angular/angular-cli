@@ -1,4 +1,5 @@
 {
+  "$schema": "http://json-schema.org/draft-07/schema",
   "title": "TSlint Target",
   "description": "TSlint target options for Build Facade.",
   "type": "object",
@@ -43,16 +44,24 @@
       "type": "string",
       "description": "Output format (prose, json, stylish, verbose, pmd, msbuild, checkstyle, vso, fileslist).",
       "default": "prose",
-      "enum": [
-        "prose",
-        "json",
-        "stylish",
-        "verbose",
-        "pmd",
-        "msbuild",
-        "checkstyle",
-        "vso",
-        "fileslist"
+      "anyOf": [
+        {
+          "enum": [
+            "checkstyle",
+            "codeFrame",
+            "filesList",
+            "json",
+            "junit",
+            "msbuild",
+            "pmd",
+            "prose",
+            "stylish",
+            "tap",
+            "verbose",
+            "vso"
+          ]
+        },
+        { "minLength": 1 }
       ]
     },
     "exclude": {
