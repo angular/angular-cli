@@ -115,6 +115,7 @@ export class AngularCompilerPlugin {
   private _program: (ts.Program | Program) | null;
   private _compilerHost: WebpackCompilerHost & CompilerHost;
   private _moduleResolutionCache: ts.ModuleResolutionCache;
+  private _dtsModuleResolutionCache: Map<string, string>;
   private _resourceLoader: WebpackResourceLoader;
   // Contains `moduleImportPath#exportName` => `fullModulePath`.
   private _lazyRoutes: LazyRouteMap = Object.create(null);
@@ -382,6 +383,9 @@ export class AngularCompilerPlugin {
 
          // Use an identity function as all our paths are absolute already.
         this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
+
+        // Used to cache '.d.ts.' to module directory or .js file
+        this._dtsModuleResolutionCache = new Map<string, string>();
 
         if (this._JitMode) {
           // Create the TypeScript program.
@@ -723,6 +727,7 @@ export class AngularCompilerPlugin {
           this._compilerOptions,
           this._compilerHost,
           this._moduleResolutionCache,
+          this._dtsModuleResolutionCache,
         );
       });
     });
