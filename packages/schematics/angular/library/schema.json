@@ -30,6 +30,11 @@
       "default": false,
       "description": "Do not add dependencies to package.json."
     },
+    "skipInstall": {
+      "description": "Skip installing dependency packages.",
+      "type": "boolean",
+      "default": false
+    },
     "skipTsConfig": {
       "type": "boolean",
       "default": false,

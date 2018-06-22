@@ -245,7 +245,7 @@ export default function (options: LibraryOptions): Rule {
         project: options.name,
       }),
       (_tree: Tree, context: SchematicContext) => {
-        if (!options.skipPackageJson) {
+        if (!options.skipPackageJson && !options.skipInstall) {
           context.addTask(new NodePackageInstallTask());
         }
       },

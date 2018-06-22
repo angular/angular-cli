@@ -14,7 +14,7 @@ export interface Schema {
   /**
    * The path to create the interface.
    */
-  entryFile: string;
+  entryFile?: string;
   /**
    * The prefix to apply to generated selectors.
    */
@@ -22,9 +22,13 @@ export interface Schema {
   /**
    * Do not add dependencies to package.json (e.g., --skipPackageJson)
    */
-  skipPackageJson: boolean;
+  skipPackageJson?: boolean;
+  /**
+   * Skip installing dependency packages.
+   */
+  skipInstall?: boolean;
   /**
    * Do not update tsconfig.json for development experience (e.g., --skipTsConfig)
    */
-  skipTsConfig: boolean;
+  skipTsConfig?: boolean;
 }
