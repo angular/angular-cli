@@ -15,7 +15,7 @@ export default async function () {
   await createDir('xyz');
   await moveFile(
     'node_modules/@angular/common',
-    'xyz/common'
+    'xyz/common',
   );
 
   await expectToFail(() => ng('build'));
@@ -23,6 +23,14 @@ export default async function () {
   await updateJsonFile('tsconfig.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
       '@angular/common': [ './xyz/common' ],
+    };
+  });
+  await ng('build');
+
+  await updateJsonFile('tsconfig.json', tsconfig => {
+    tsconfig.compilerOptions.paths = {
+      '@angular/common': [ './xyz/common' ],
+      '*': ['./node_modules/*'],
     };
   });
   await ng('build');
@@ -38,7 +46,7 @@ export default async function () {
   await ng('build', '--aot');
   await ng('test', '--watch=false');
 
-  await silentNpm('install', 'firebase@4.9.0');
+  await silentNpm('install', 'firebase@4.13.1');
   await ng('build', '--aot');
   await ng('test', '--watch=false');
 
@@ -60,12 +68,12 @@ export default async function () {
       '@firebase/polyfill': ['@firebase/polyfill/index.ts'],
     };
   });
-  await expectToFail(() => ng('build'));
+  await ng('build');
 
   await updateJsonFile('tsconfig.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
       '@firebase/polyfill*': ['@firebase/polyfill/index.ts'],
     };
   });
-  await expectToFail(() => ng('build'));
+  await ng('build');
 }

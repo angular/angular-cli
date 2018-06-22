@@ -21,5 +21,5 @@ export default function () {
     .then(() => ng('build', '--aot', '--i18n-locale=fr_FR'))
     .then(() => expectFileToMatch('dist/test-project/main.js', /registerLocaleData/))
     .then(() => expectFileToMatch('dist/test-project/main.js', /angular_common_locales_fr/))
-    .then(() => rimraf('dist'))
+    .then(() => rimraf('dist'));
 }
