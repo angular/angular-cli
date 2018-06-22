@@ -46,5 +46,5 @@ export interface Schema {
     /**
     * Do not add dependencies to package.json (e.g., --skipPackageJson)
     */
-    skipPackageJson: boolean;
+    skipPackageJson?: boolean;
 }
