@@ -1573,17 +1573,24 @@
               "type": "string",
               "description": "Output format (prose, json, stylish, verbose, pmd, msbuild, checkstyle, vso, fileslist, codeFrame).",
               "default": "prose",
-              "enum": [
-                "prose",
-                "json",
-                "stylish",
-                "verbose",
-                "pmd",
-                "msbuild",
-                "checkstyle",
-                "vso",
-                "fileslist",
-                "codeFrame"
+              "anyOf": [
+                {
+                  "enum": [
+                    "checkstyle",
+                    "codeFrame",
+                    "filesList",
+                    "json",
+                    "junit",
+                    "msbuild",
+                    "pmd",
+                    "prose",
+                    "stylish",
+                    "tap",
+                    "verbose",
+                    "vso"
+                  ]
+                },
+                { "minLength": 1 }
               ]
             },
             "exclude": {
