@@ -40,6 +40,25 @@
 /** IE10 and IE11 requires the following for the Reflect API. */
 // import 'core-js/es6/reflect';
 
+/** IE9 and IE10 requires the following polyfill for using rxjs 6.0 */
+// (function() {
+//   Object.setPrototypeOf = Object.setPrototypeOf || ({__proto__: []} instanceof Array ? setProtoOf : mixinProperties);
+//
+//   function setProtoOf(obj, proto) {
+//     obj.__proto__ = proto;
+//     return obj;
+//   }
+//
+//   function mixinProperties(obj, proto) {
+//     for (const prop in proto) {
+//       if (!obj.hasOwnProperty(prop)) {
+//         obj[prop] = proto[prop];
+//       }
+//     }
+//     return obj;
+//   }
+// })();
+
 
 /** Evergreen browsers require these. **/
 // Used for reflect-metadata in JIT. If you use AOT (and only Angular decorators), you can remove.
