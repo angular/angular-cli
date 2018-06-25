@@ -22,7 +22,7 @@ export default class E2eCommand extends ArchitectCommand {
     this.configurationOption,
   ];
 
-  public run(options: ArchitectCommandOptions) {
+  public async run(options: ArchitectCommandOptions) {
     return this.runArchitectTarget(options);
   }
 }
