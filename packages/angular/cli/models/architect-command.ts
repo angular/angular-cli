@@ -177,7 +177,9 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
         return await from(this.getProjectNamesByTarget(this.target)).pipe(
           concatMap(project => runSingleTarget({ ...targetSpec, project })),
           toArray(),
-        ).toPromise().then(results => results.every(res => res === 0) ? 0 : 1);
+          map(results => results.every(res => res === 0) ? 0 : 1),
+        )
+        .toPromise();
       } else {
         return await runSingleTarget(targetSpec).toPromise();
       }

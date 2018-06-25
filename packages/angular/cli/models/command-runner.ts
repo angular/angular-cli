@@ -169,7 +169,7 @@ export async function runCommand(commandMap: CommandMap,
       return 1;
     }
 
-    return await command.run(options);
+    return command.run(options);
   }
 }
 
