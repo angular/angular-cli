@@ -165,8 +165,9 @@ export abstract class FileSystemEngineHostBase implements
         if (allNames.indexOf(alias) != -1) {
           throw new SchematicNameCollisionException(alias);
         }
-        allNames.push(...aliases);
       }
+
+      allNames.push(...aliases);
     }
 
     return description;
