@@ -84,7 +84,7 @@ export function callRule(
       return observableOf(inputTree);
     } else if (typeof result == 'function') {
       // This is considered a Rule, chain the rule and return its output.
-      return callRule(result, input, context);
+      return callRule(result, observableOf(inputTree), context);
     } else if (isObservable(result)) {
       // Only return the last Tree, and make sure it's a Tree.
       return result.pipe(
