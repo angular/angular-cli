@@ -49,7 +49,7 @@ export interface BrowserBuilderSchema {
   /**
    * Replace files with other files in the build.
    */
-  fileReplacements: FileReplacements[];
+  fileReplacements: FileReplacement[];
 
   /**
    * Path where output will be placed.
