@@ -42,6 +42,45 @@ describe('FileSystemEngineHost', () => {
     expect(schematic1.description.name).toBe('schematic1');
   });
 
+  it('understands multiple aliases for a single schematic', () => {
+    const engineHost = new FileSystemEngineHost(root);
+    const engine = new SchematicEngine(engineHost);
+
+    const testCollection = engine.createCollection('aliases-many');
+
+    const schematic1 = engine.createSchematic('alias1', testCollection);
+    expect(schematic1).not.toBeNull();
+    expect(schematic1.description.name).toBe('schematic1');
+
+    const schematic2 = engine.createSchematic('alias2', testCollection);
+    expect(schematic2).not.toBeNull();
+    expect(schematic2.description.name).toBe('schematic1');
+
+    const schematic3 = engine.createSchematic('alias3', testCollection);
+    expect(schematic3).not.toBeNull();
+    expect(schematic3.description.name).toBe('schematic1');
+  });
+
+
+  it('allows dupe aliases for a single schematic', () => {
+    const engineHost = new FileSystemEngineHost(root);
+    const engine = new SchematicEngine(engineHost);
+
+    const testCollection = engine.createCollection('aliases-dupe');
+
+    const schematic1 = engine.createSchematic('alias1', testCollection);
+    expect(schematic1).not.toBeNull();
+    expect(schematic1.description.name).toBe('schematic1');
+
+    const schematic2 = engine.createSchematic('alias2', testCollection);
+    expect(schematic2).not.toBeNull();
+    expect(schematic2.description.name).toBe('schematic1');
+
+    const schematic3 = engine.createSchematic('alias3', testCollection);
+    expect(schematic3).not.toBeNull();
+    expect(schematic3.description.name).toBe('schematic1');
+  });
+
   it('lists schematics but not aliases', () => {
     const engineHost = new FileSystemEngineHost(root);
     const engine = new SchematicEngine(engineHost);
