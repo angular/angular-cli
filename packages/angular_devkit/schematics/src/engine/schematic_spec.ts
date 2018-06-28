@@ -8,6 +8,7 @@
 // tslint:disable:non-null-operator
 import { logging } from '@angular-devkit/core';
 import { of as observableOf } from 'rxjs';
+import { chain } from '../rules/base';
 import { MergeStrategy, Tree } from '../tree/interface';
 import { branch, empty } from '../tree/static';
 import { CollectionDescription, Engine, Rule, Schematic, SchematicDescription } from './interface';
@@ -96,6 +97,52 @@ describe('Schematic', () => {
         expect(files(inner !)).toEqual([]);
         expect(files(x)).toEqual([]);
         expect(inner).not.toBe(x);
+      })
+      .then(done, done.fail);
+  });
+
+  it('works with nested chained function rules', done => {
+    let chainCount = 0;
+    let oneCount = 0;
+    let twoCount = 0;
+    let threeCount = 0;
+    const one = () => {
+      return chain([
+        () => { oneCount++; },
+      ]);
+    };
+    const two = () => {
+      return chain([
+        () => { twoCount++; },
+      ]);
+    };
+    const three = () => {
+      threeCount++;
+    };
+
+    const desc: SchematicDescription<CollectionT, SchematicT> = {
+      collection,
+      name: 'test',
+      description: '',
+      path: '/a/b/c',
+      factory: () => {
+        return chain([
+          () => { chainCount++; },
+          one,
+          two,
+          three,
+        ]);
+      },
+    };
+
+    const schematic = new SchematicImpl(desc, desc.factory, null !, engine);
+    schematic.call({}, observableOf(empty()))
+      .toPromise()
+      .then(_x => {
+        expect(chainCount).toBe(1);
+        expect(oneCount).toBe(1);
+        expect(twoCount).toBe(1);
+        expect(threeCount).toBe(1);
       })
       .then(done, done.fail);
   });
