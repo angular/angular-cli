@@ -16,9 +16,7 @@
 require('../lib/bootstrap-local');
 
 
-const {bold, gray, red, yellow, white} = require('chalk');
 const minimist = require('minimist');
-const fs = require('fs');
 const path = require('path');
 
 const args = minimist(process.argv.slice(2), {
@@ -34,6 +32,7 @@ process.chdir(path.join(__dirname, '..'));
 let logger = null;
 try {
   logger = new (require('@angular-devkit/core').logging.IndentLogger)('root');
+  const { bold, gray, red, yellow, white } = require('@angular-devkit/core').terminal;
   const filter = require('rxjs/operators').filter;
 
   logger
@@ -51,7 +50,7 @@ try {
       output.write(color(entry.message) + '\n');
     });
 } catch (e) {
-  console.error(red(`Reverting to manual console logging.\nReason: ${e.message}.`));
+  console.error(`Reverting to manual console logging.\nReason: ${e.message}.`);
   logger = {
     debug: console.log.bind(console),
     info: console.log.bind(console),
