@@ -7,7 +7,7 @@
  */
 import { BaseException, isObservable } from '@angular-devkit/core';
 import { Observable, of as observableOf, throwError } from 'rxjs';
-import { last, mergeMap, tap } from 'rxjs/operators';
+import { defaultIfEmpty, last, mergeMap, tap } from 'rxjs/operators';
 import { Rule, SchematicContext, Source } from '../engine/interface';
 import { Tree, TreeSymbol } from '../tree/interface';
 
@@ -51,55 +51,53 @@ export class InvalidSourceResultException extends BaseException {
 
 
 export function callSource(source: Source, context: SchematicContext): Observable<Tree> {
-  const result = source(context) as object;
+  const result = source(context);
 
-  if (result === undefined) {
-    return throwError(new InvalidSourceResultException(result));
-  } else if (TreeSymbol in result) {
-    return observableOf(result as Tree);
-  } else if (isObservable(result)) {
+  if (isObservable(result)) {
     // Only return the last Tree, and make sure it's a Tree.
-    return (result as Observable<Tree>).pipe(
+    return result.pipe(
+      defaultIfEmpty(),
       last(),
       tap(inner => {
-        if (!(TreeSymbol in inner)) {
+        if (!inner || !(TreeSymbol in inner)) {
           throw new InvalidSourceResultException(inner);
         }
       }),
     );
+  } else if (result && TreeSymbol in result) {
+    return observableOf(result);
   } else {
     return throwError(new InvalidSourceResultException(result));
   }
 }
 
 
-export function callRule(rule: Rule,
-                         input: Observable<Tree>,
-                         context: SchematicContext): Observable<Tree> {
+export function callRule(
+  rule: Rule,
+  input: Observable<Tree>,
+  context: SchematicContext,
+): Observable<Tree> {
   return input.pipe(mergeMap(inputTree => {
-    const result = rule(inputTree, context) as object;
+    const result = rule(inputTree, context);
 
     if (result === undefined) {
       return observableOf(inputTree);
-    } else if (TreeSymbol in result) {
-      return observableOf(result as Tree);
     } else if (typeof result == 'function') {
       // This is considered a Rule, chain the rule and return its output.
-      return callRule(result, input, context);
+      return callRule(result, observableOf(inputTree), context);
     } else if (isObservable(result)) {
-      const obs = result as Observable<Tree>;
-
       // Only return the last Tree, and make sure it's a Tree.
-      return obs.pipe(
+      return result.pipe(
+        defaultIfEmpty(),
         last(),
         tap(inner => {
-          if (!(TreeSymbol in inner)) {
+          if (!inner || !(TreeSymbol in inner)) {
             throw new InvalidRuleResultException(inner);
           }
         }),
       );
-    } else if (result === undefined) {
-      return observableOf(inputTree);
+    } else if (TreeSymbol in result) {
+      return observableOf(result);
     } else {
       return throwError(new InvalidRuleResultException(result));
     }
