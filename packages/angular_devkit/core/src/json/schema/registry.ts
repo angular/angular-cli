@@ -186,10 +186,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     // in synchronous (if available).
     let validator: Observable<ajv.ValidateFunction>;
     try {
-      const maybeFnValidate = this._ajv.compile({
-        $async: this._smartDefaultKeyword ? true : undefined,
-        ...schema,
-      });
+      const maybeFnValidate = this._ajv.compile(schema);
       validator = observableOf(maybeFnValidate);
     } catch (e) {
       // Propagate the error.
@@ -293,8 +290,8 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       this._smartDefaultKeyword = true;
 
       this._ajv.addKeyword('$default', {
-        modifying: true,
-        async: true,
+        errors: false,
+        valid: true,
         compile: (schema, _parentSchema, it) => {
           // We cheat, heavily.
           this._smartDefaultRecord.set(
@@ -303,9 +300,15 @@ export class CoreSchemaRegistry implements SchemaRegistry {
             schema,
           );
 
-          return function() {
-            return Promise.resolve(true);
-          };
+          return () => true;
+        },
+        metaSchema: {
+          type: 'object',
+          properties: {
+            '$source': { type: 'string' },
+          },
+          additionalProperties: true,
+          required: [ '$source' ],
         },
       });
     }
