@@ -9,6 +9,7 @@
     "non-null-operator": true,
     "no-global-tslint-disable": true,
     "single-eof-line": true,
+    "no-floating-promises": true,
 
 
     "no-implicit-dependencies": true,

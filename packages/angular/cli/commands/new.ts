@@ -39,24 +39,25 @@ export default class NewCommand extends SchematicCommand {
   private schematicName = 'ng-new';
 
   private initialized = false;
-  public initialize(options: any) {
+  public async initialize(options: any) {
     if (this.initialized) {
-      return Promise.resolve();
+      return;
     }
-    super.initialize(options);
+
+    await super.initialize(options);
+
     this.initialized = true;
 
     const collectionName = this.parseCollectionName(options);
 
-    return this.getOptions({
-        schematicName: this.schematicName,
-        collectionName,
-      })
-      .then((schematicOptions) => {
-        this.options = this.options.concat(schematicOptions.options);
-        const args = schematicOptions.arguments.map(arg => arg.name);
-        this.arguments = this.arguments.concat(args);
-      });
+    const schematicOptions = await this.getOptions({
+      schematicName: this.schematicName,
+      collectionName,
+    });
+
+    this.options = this.options.concat(schematicOptions.options);
+    const args = schematicOptions.arguments.map(arg => arg.name);
+    this.arguments = this.arguments.concat(args);
   }
 
   public async run(options: any) {
