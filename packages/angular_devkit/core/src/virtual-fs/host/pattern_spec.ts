@@ -32,7 +32,7 @@ describe('PatternMatchingHost', () => {
         .subscribe(undefined, err => {
           expect(err.message).toMatch(/does not exist/);
         });
-    } catch (e) {
+    } catch {
       // Ignore it. RxJS <6 still throw errors when they happen synchronously.
     }
 

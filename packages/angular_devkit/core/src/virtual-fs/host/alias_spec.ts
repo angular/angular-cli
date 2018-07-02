@@ -28,7 +28,7 @@ describe('AliasHost', () => {
         .subscribe(undefined, err => {
           expect(err.message).toMatch(/does not exist/);
         });
-    } catch (e) {
+    } catch {
       // Ignore it. RxJS <6 still throw errors when they happen synchronously.
     }
   });
@@ -49,7 +49,7 @@ describe('AliasHost', () => {
     try {
       aHost.read(normalize('/some/folder/file'))
         .subscribe(undefined, err => expect(err.message).toMatch(/does not exist/));
-    } catch (e) {}
+    } catch {}
 
     // Create the file with new content and verify that this has the new content.
     aHost.write(normalize('/other/folder/file'), content2).subscribe();

@@ -62,7 +62,7 @@ function _getFileContent(
     // Strip BOM from file data.
     // https://stackoverflow.com/questions/24356713
     return fs.readFileSync(file, 'utf-8').replace(/^\uFEFF/, '');
-  } catch (e) {
+  } catch {
     throw new Error(`Could not read file '${file}'.`);
   }
 }

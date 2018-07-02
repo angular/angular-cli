@@ -100,7 +100,7 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
     // Clear snapshot directory before publishing to remove deleted build files.
     try {
       _exec('git', ['rm', '-rf', './'], {cwd: destPath}, publishLogger);
-    } catch (e) {
+    } catch {
       // Ignore errors on delete. :shrug:
     }
     _copy(pkg.dist, destPath);

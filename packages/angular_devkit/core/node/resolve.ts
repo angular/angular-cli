@@ -236,7 +236,7 @@ export function resolve(x: string, options: ResolveOptions): string {
             return n;
           }
         }
-      } catch (e) {}
+      } catch {}
     }
 
     return loadAsFileSync(path.join(x, '/index'));

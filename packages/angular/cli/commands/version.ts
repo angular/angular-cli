@@ -90,7 +90,7 @@ export default class VersionCommand extends Command {
       try {
         const gitRefName = '' + child_process.execSync('git symbolic-ref HEAD', {cwd: __dirname});
         gitBranch = path.basename(gitRefName.replace('\n', ''));
-      } catch (e) {
+      } catch {
       }
 
       ngCliVersion = `local (v${pkg.version}, branch: ${gitBranch})`;
@@ -172,7 +172,7 @@ export default class VersionCommand extends Command {
 
         return modulePkg.version + ' (cli-only)';
       }
-    } catch (e) {
+    } catch {
     }
 
     return '<error>';

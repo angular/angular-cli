@@ -106,11 +106,11 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
       // When using npm, webdriver is within protractor/node_modules.
       webdriverUpdate = requireProjectModule(getSystemPath(projectRoot),
         `protractor/node_modules/${webdriverDeepImport}`);
-    } catch (e) {
+    } catch {
       try {
         // When using yarn, webdriver is found as a root module.
         webdriverUpdate = requireProjectModule(getSystemPath(projectRoot), webdriverDeepImport);
-      } catch (e) {
+      } catch {
         throw new Error(tags.stripIndents`
           Cannot automatically find webdriver-manager to update.
           Update webdriver-manager manually and run 'ng e2e --no-webdriver-update' instead.

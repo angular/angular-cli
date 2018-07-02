@@ -224,7 +224,7 @@ function getFileContents(
   // NOTE: The tslint CLI checks for and excludes MPEG transport streams; this does not.
   try {
     return stripBom(readFileSync(file, 'utf-8'));
-  } catch (e) {
+  } catch {
     throw new Error(`Could not read file '${file}'.`);
   }
 }
