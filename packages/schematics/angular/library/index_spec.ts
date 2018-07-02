@@ -74,7 +74,6 @@ describe('Library Schematic', () => {
     const fileContent = getJsonFileContent(tree, '/projects/foo/ng-package.json');
     expect(fileContent.lib).toBeDefined();
     expect(fileContent.lib.entryFile).toEqual('src/my_index.ts');
-    expect(fileContent.deleteDestPath).toEqual(false);
     expect(fileContent.dest).toEqual('../../dist/foo');
   });
 
