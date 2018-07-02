@@ -21,7 +21,7 @@ require('source-map-support').install({
 });
 
 
-declare const global: {} & {
+declare const global: {
   benchmarkReporter: {};
 };
 

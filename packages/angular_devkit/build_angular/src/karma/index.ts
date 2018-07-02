@@ -83,7 +83,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
 
         // TODO: inside the configs, always use the project root and not the workspace root.
         // Until then we pretend the app root is relative (``) but the same as `projectRoot`.
-        (karmaOptions.buildWebpack.options as any).root = ''; // tslint:disable-line:no-any
+        karmaOptions.buildWebpack.options.root = '';
 
         // Assign additional karmaConfig options to the local ngapp config
         karmaOptions.configFile = karmaConfig;
@@ -112,7 +112,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
   ) {
     let wco: WebpackConfigOptions;
 
-    const tsConfigPath = getSystemPath(resolve(root, normalize(options.tsConfig as string)));
+    const tsConfigPath = getSystemPath(resolve(root, normalize(options.tsConfig)));
     const tsConfig = readTsconfig(tsConfigPath);
 
     const projectTs = requireProjectModule(getSystemPath(projectRoot), 'typescript') as typeof ts;

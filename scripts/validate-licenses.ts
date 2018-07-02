@@ -79,6 +79,8 @@ const ignoredPackages = [
   '@webassemblyjs/ieee754@1.5.10', // MIT but no LICENSE file. `license` field in package.json.
   '@webassemblyjs/leb128@1.5.10', // Apache 2.0 license, but get discovered as "Apache".
   '@webassemblyjs/leb128@1.4.3', // Apache 2.0 license, but get discovered as "Apache".
+
+  'tslint-sonarts@1.7.0', // LGPL-3.0 but only used as a tool, not linked in the build.
 ];
 
 // Find all folders directly under a `node_modules` that have a package.json.

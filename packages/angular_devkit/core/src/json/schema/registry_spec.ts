@@ -5,8 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable:no-any
-// tslint:disable:non-null-operator
+// tslint:disable:no-any non-null-operator no-big-function
 import { of as observableOf } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import { CoreSchemaRegistry } from './registry';

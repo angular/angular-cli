@@ -15,7 +15,7 @@ export type NpmInstall = (packageName: string,
                           logger: logging.Logger,
                           packageManager: string,
                           projectRoot: string,
-                          save?: boolean) => void;
+                          save?: boolean) => Promise<void>;
 
 export default async function (packageName: string,
                                logger: logging.Logger,

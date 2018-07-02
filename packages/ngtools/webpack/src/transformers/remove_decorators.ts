@@ -71,7 +71,7 @@ function getDecoratorOrigin(
   const symbol = typeChecker.getSymbolAtLocation(identifier);
   if (symbol && symbol.declarations && symbol.declarations.length > 0) {
     const declaration = symbol.declarations[0];
-    let module: string | undefined = undefined;
+    let module: string | undefined;
     if (ts.isImportSpecifier(declaration)) {
       name = (declaration.propertyName || declaration.name).text;
       module = declaration.parent

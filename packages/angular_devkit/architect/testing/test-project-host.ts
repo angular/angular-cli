@@ -34,8 +34,7 @@ export class TestProjectHost extends NodeJsSyncHost {
       throw new Error('TestProjectHost must be initialized before being used.');
     }
 
-    // tslint:disable-next-line:non-null-operator
-    return this._currentRoot!;
+    return this._currentRoot;
   }
 
   scopedSync(): virtualFs.SyncDelegateHost<Stats> {
@@ -43,8 +42,7 @@ export class TestProjectHost extends NodeJsSyncHost {
       throw new Error('TestProjectHost must be initialized before being used.');
     }
 
-    // tslint:disable-next-line:non-null-operator
-    return this._scopedSyncHost!;
+    return this._scopedSyncHost;
   }
 
   initialize(): Observable<void> {
@@ -100,7 +98,7 @@ export class TestProjectHost extends NodeJsSyncHost {
   }
 
   writeMultipleFiles(files: { [path: string]: string | ArrayBufferLike | Buffer }): void {
-    Object.keys(files).map(fileName => {
+    Object.keys(files).forEach(fileName => {
       let content = files[fileName];
       if (typeof content == 'string') {
         content = virtualFs.stringToFileBuffer(content);

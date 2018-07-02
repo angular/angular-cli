@@ -38,7 +38,7 @@ export function getFoldFileTransformer(program: ts.Program): ts.TransformerFacto
         // Check if node is a class to add statements to.
         const clazz = classes.find((cl) => cl.classFunction === node);
         if (clazz) {
-          const functionExpression = node as ts.FunctionExpression;
+          const functionExpression: ts.FunctionExpression = node as ts.FunctionExpression;
 
           const newExpressions = clazz.statements.map((st) =>
             ts.createStatement(st.expressionStatement.expression));

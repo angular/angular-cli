@@ -208,7 +208,7 @@ export class AngularCompilerPlugin {
 
     this._rootNames = config.rootNames.concat(...this._singleFileIncludes);
     this._compilerOptions = { ...config.options, ...options.compilerOptions };
-    this._basePath = config.options.basePath || '';
+    this._basePath = config.options.basePath || basePath || '';
 
     // Overwrite outDir so we can find generated files next to their .ts origin in compilerHost.
     this._compilerOptions.outDir = '';

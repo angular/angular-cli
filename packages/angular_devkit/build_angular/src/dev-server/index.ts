@@ -290,13 +290,13 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     let sslKey: string | undefined = undefined;
     let sslCert: string | undefined = undefined;
     if (options.sslKey) {
-      const keyPath = path.resolve(root, options.sslKey as string);
+      const keyPath = path.resolve(root, options.sslKey);
       if (existsSync(keyPath)) {
         sslKey = readFileSync(keyPath, 'utf-8');
       }
     }
     if (options.sslCert) {
-      const certPath = path.resolve(root, options.sslCert as string);
+      const certPath = path.resolve(root, options.sslCert);
       if (existsSync(certPath)) {
         sslCert = readFileSync(certPath, 'utf-8');
       }
