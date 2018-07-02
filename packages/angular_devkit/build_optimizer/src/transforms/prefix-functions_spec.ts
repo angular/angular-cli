@@ -162,5 +162,21 @@ describe('prefix-functions', () => {
 
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
+
+    it('doesn\'t add comment when inside object literal method', () => {
+      const input = tags.stripIndent`
+        const literal = {
+          method() {
+            var newClazz = new Clazz();
+          }
+        };
+      `;
+      const output = tags.stripIndent`
+        ${emptyImportsComment}
+        ${input}
+      `;
+
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
   });
 });

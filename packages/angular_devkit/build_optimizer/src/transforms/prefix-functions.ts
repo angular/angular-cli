@@ -63,6 +63,7 @@ export function findTopLevelFunctions(parentNode: ts.Node): Set<ts.Node> {
       || ts.isFunctionExpression(node)
       || ts.isClassDeclaration(node)
       || ts.isArrowFunction(node)
+      || ts.isMethodDeclaration(node)
     ) {
       return;
     }
