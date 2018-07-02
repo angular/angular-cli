@@ -50,7 +50,7 @@ export function getServerConfig(wco: WebpackConfigOptions) {
             // It's a system thing (.ie util, fs...)
             callback();
           }
-        } catch (e) {
+        } catch {
           // Node couldn't find it, so it must be user-aliased
           callback();
         }
