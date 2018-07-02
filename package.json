@@ -132,6 +132,7 @@
     "postcss-url": "^7.3.2",
     "protractor": "^5.3.1",
     "raw-loader": "^0.5.1",
+    "rc": "^1.2.8",
     "rxjs": "^6.0.0",
     "sass-loader": "^7.0.2",
     "semver": "^5.3.0",
