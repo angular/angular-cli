@@ -217,6 +217,9 @@ function extractArchitectConfig(_config: CliConfig): JsonObject | null {
   return null;
 }
 
+// This function is too big, but also really hard to refactor properly as the whole config
+// depends on all parts of the config.
+// tslint:disable-next-line:no-big-function
 function extractProjectsConfig(
   config: CliConfig, tree: Tree, logger: logging.LoggerApi,
 ): JsonObject {
@@ -254,6 +257,9 @@ function extractProjectsConfig(
   const serverApps = apps.filter(app => app.platform === 'server');
 
   const projectMap = browserApps
+    // This function is too big, but also really hard to refactor properly as the whole config
+    // depends on all parts of the config.
+    // tslint:disable-next-line:no-big-function
     .map((app, idx) => {
       const defaultAppName = idx === 0 ? defaultAppNamePrefix : `${defaultAppNamePrefix}${idx}`;
       const name = app.name || defaultAppName;

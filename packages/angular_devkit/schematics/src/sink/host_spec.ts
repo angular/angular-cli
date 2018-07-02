@@ -30,7 +30,8 @@ describe('FileSystemSink', () => {
     const files = ['/hello', '/sub/directory/file2', '/sub/file1', '/test'];
     const treeFiles: string[] = [];
     tree.visit(path => treeFiles.push(path));
-    expect(treeFiles.sort()).toEqual(files);
+    treeFiles.sort();
+    expect(treeFiles).toEqual(files);
 
     const outputHost = new virtualFs.test.TestHost();
     const sink = new HostSink(outputHost);

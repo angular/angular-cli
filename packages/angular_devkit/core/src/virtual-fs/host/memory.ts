@@ -179,7 +179,7 @@ export class SimpleMemoryHost implements Host<{}> {
   protected _delete(path: Path): void {
     path = this._toAbsolute(path);
     if (this._isDirectory(path)) {
-      for (const [cachePath, _] of this._cache.entries()) {
+      for (const [cachePath] of this._cache.entries()) {
         if (path.startsWith(cachePath + NormalizedSep)) {
           this._cache.delete(cachePath);
         }

@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// tslint:disable:no-big-function
 
 import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize, tags, virtualFs } from '@angular-devkit/core';

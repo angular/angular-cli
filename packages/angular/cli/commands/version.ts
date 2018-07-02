@@ -22,8 +22,6 @@ export default class VersionCommand extends Command {
   public readonly options: Option[] = [];
 
   public run() {
-    let angularCoreVersion = '';
-    const angularSameAsCore: string[] = [];
     const pkg = require(path.resolve(__dirname, '..', 'package.json'));
     let projPkg;
     try {
@@ -95,6 +93,8 @@ export default class VersionCommand extends Command {
 
       ngCliVersion = `local (v${pkg.version}, branch: ${gitBranch})`;
     }
+    let angularCoreVersion = '';
+    const angularSameAsCore: string[] = [];
 
     if (projPkg) {
       // Filter all angular versions that are the same as core.
@@ -107,6 +107,9 @@ export default class VersionCommand extends Command {
             delete versions[angularPackage];
           }
         }
+
+        // Make sure we list them in alphabetical order.
+        angularSameAsCore.sort();
       }
     }
 
@@ -128,7 +131,7 @@ export default class VersionCommand extends Command {
       Node: ${process.versions.node}
       OS: ${process.platform} ${process.arch}
       Angular: ${angularCoreVersion}
-      ... ${angularSameAsCore.sort().reduce<string[]>((acc, name) => {
+      ... ${angularSameAsCore.reduce<string[]>((acc, name) => {
         // Perform a simple word wrap around 60.
         if (acc.length == 0) {
           return [name];

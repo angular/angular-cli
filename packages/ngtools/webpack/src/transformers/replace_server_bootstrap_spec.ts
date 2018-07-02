@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// tslint:disable:no-big-function
 import { tags } from '@angular-devkit/core';  // tslint:disable-line:no-implicit-dependencies
 import { createTypescriptContext, transformTypescript } from './ast_helpers';
 import { replaceServerBootstrap } from './replace_server_bootstrap';

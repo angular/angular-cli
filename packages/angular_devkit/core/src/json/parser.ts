@@ -542,13 +542,13 @@ function _readBlanks(context: JsonParserContext): (JsonAstComment | JsonAstMulti
   if ((context.mode & JsonParseMode.CommentsAllowed) != 0) {
     const comments: (JsonAstComment | JsonAstMultilineComment)[] = [];
     while (true) {
-      let char = context.original[context.position.offset];
+      const char = context.original[context.position.offset];
       if (char == '/' && context.original[context.position.offset + 1] == '*') {
         const start = context.position;
         // Multi line comment.
         _next(context);
         _next(context);
-        char = context.original[context.position.offset];
+
         while (context.original[context.position.offset] != '*'
             || context.original[context.position.offset + 1] != '/') {
           _next(context);
@@ -572,7 +572,7 @@ function _readBlanks(context: JsonParserContext): (JsonAstComment | JsonAstMulti
         // Multi line comment.
         _next(context);
         _next(context);
-        char = context.original[context.position.offset];
+
         while (context.original[context.position.offset] != '\n') {
           _next(context);
           if (context.position.offset >= context.original.length) {

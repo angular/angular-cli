@@ -94,7 +94,7 @@ export class DryRunSink extends HostSink {
 
     this._filesToDelete.forEach(path => {
       // Check if this is a renaming.
-      for (const [from, _] of this._filesToRename) {
+      for (const [from] of this._filesToRename) {
         if (from == path) {
           // The event is sent later on.
           return;
@@ -108,7 +108,7 @@ export class DryRunSink extends HostSink {
     });
     this._filesToCreate.forEach((content, path) => {
       // Check if this is a renaming.
-      for (const [_, to] of this._filesToRename) {
+      for (const [, to] of this._filesToRename) {
         if (to == path) {
           // The event is sent later on.
           return;

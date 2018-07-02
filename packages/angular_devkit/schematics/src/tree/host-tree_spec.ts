@@ -47,7 +47,8 @@ describe('FilterHostTree', () => {
     const filtered = new FilterHostTree(tree, p => p != '/file2');
     const filteredFiles: string[] = [];
     filtered.visit(path => filteredFiles.push(path));
-    expect(filteredFiles.sort()).toEqual(['/file1', '/file3'].map(normalize));
+    filteredFiles.sort();
+    expect(filteredFiles).toEqual(['/file1', '/file3'].map(normalize));
     expect(filtered.actions.length).toEqual(2);
   });
 
@@ -61,7 +62,8 @@ describe('FilterHostTree', () => {
     const filtered2 = new FilterHostTree(filtered, p => p != '/file3');
     const filteredFiles: string[] = [];
     filtered2.visit(path => filteredFiles.push(path));
-    expect(filteredFiles.sort()).toEqual(['/file1'].map(normalize));
+    filteredFiles.sort();
+    expect(filteredFiles).toEqual(['/file1'].map(normalize));
     expect(filtered2.actions.map(a => a.kind)).toEqual(['c']);
   });
 
@@ -77,7 +79,8 @@ describe('FilterHostTree', () => {
     const filtered2 = new FilterHostTree(filtered, p => p != '/file3');
     const filteredFiles: string[] = [];
     filtered2.visit(path => filteredFiles.push(path));
-    expect(filteredFiles.sort()).toEqual(['/file1'].map(normalize));
+    filteredFiles.sort();
+    expect(filteredFiles).toEqual(['/file1'].map(normalize));
     expect(filtered2.actions.map(a => a.kind)).toEqual([]);
   });
 
@@ -91,7 +94,8 @@ describe('FilterHostTree', () => {
     const filtered2 = new FilterHostTree(filtered, p => p != '/file3');
     const filteredFiles: string[] = [];
     filtered2.visit(path => filteredFiles.push(path));
-    expect(filteredFiles.sort()).toEqual(['/dir1/file1'].map(normalize));
+    filteredFiles.sort();
+    expect(filteredFiles).toEqual(['/dir1/file1'].map(normalize));
     expect(filtered2.actions.map(a => a.kind)).toEqual(['c']);
   });
 
@@ -107,7 +111,8 @@ describe('FilterHostTree', () => {
     const filtered2 = new FilterHostTree(filtered, p => p != '/file3');
     const filteredFiles: string[] = [];
     filtered2.visit(path => filteredFiles.push(path));
-    expect(filteredFiles.sort()).toEqual(['/dir1/file1'].map(normalize));
+    filteredFiles.sort();
+    expect(filteredFiles).toEqual(['/dir1/file1'].map(normalize));
     expect(filtered2.actions.map(a => a.kind)).toEqual([]);
   });
 });
