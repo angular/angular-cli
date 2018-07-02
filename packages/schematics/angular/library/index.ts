@@ -35,7 +35,6 @@ import { latestVersions } from '../utility/latest-versions';
 import { validateProjectName } from '../utility/validation';
 import { Schema as LibraryOptions } from './schema';
 
-
 interface UpdateJsonFn<T> {
   (obj: T): T | void;
 }
@@ -144,11 +143,6 @@ function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSche
         options: {
           tsConfig: `${projectRoot}/tsconfig.lib.json`,
           project: `${projectRoot}/ng-package.json`,
-        },
-        configurations: {
-          production: {
-            project: `${projectRoot}/ng-package.prod.json`,
-          },
         },
       },
       test: {
