@@ -14,13 +14,15 @@ function syncObs<T>(obs: Observable<T>): T {
   let value: T;
   let set = false;
 
-  obs.forEach(x => {
-    if (set) {
-      throw new Error('Multiple value.');
-    }
-    value = x;
-    set = true;
-  });
+  obs
+    .forEach(x => {
+      if (set) {
+        throw new Error('Multiple value.');
+      }
+      value = x;
+      set = true;
+    })
+    .catch(err => fail(err));
 
   if (!set) {
     throw new Error('Async observable.');
