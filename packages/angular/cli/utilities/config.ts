@@ -119,7 +119,7 @@ export function getWorkspaceRaw(
     throw new Error('Invalid JSON');
   }
 
-  return [ast as JsonAstObject, configPath];
+  return [ast, configPath];
 }
 
 export function validateWorkspace(json: JsonObject) {

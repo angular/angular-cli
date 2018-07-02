@@ -33,7 +33,8 @@ describe('DryRunSink', () => {
     const files = ['/hello', '/sub/directory/file2', '/sub/file1', '/test'];
     const treeFiles: Path[] = [];
     tree.visit(path => treeFiles.push(path));
-    expect(treeFiles.sort()).toEqual(files.map(normalize));
+    treeFiles.sort();
+    expect(treeFiles).toEqual(files.map(normalize));
 
     const sink = new DryRunSink(new virtualFs.SimpleMemoryHost());
     sink.reporter.pipe(toArray())
@@ -62,7 +63,8 @@ describe('DryRunSink', () => {
     const files = ['/hello', '/sub/directory/file2', '/sub/file1', '/test'];
     const treeFiles: Path[] = [];
     tree.visit(path => treeFiles.push(path));
-    expect(treeFiles.sort()).toEqual(files.map(normalize));
+    treeFiles.sort();
+    expect(treeFiles).toEqual(files.map(normalize));
 
     // Need to create this file on the filesystem, otherwise the commit phase will fail.
     const outputHost = new virtualFs.SimpleMemoryHost();

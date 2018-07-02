@@ -138,7 +138,7 @@ export function templateParser(sourceText: string, fileName: string): TemplateAs
   // Optimization that uses the fact that the end of a node is always the beginning of the next
   // node, so we keep the positioning of the nodes in memory.
   let start = _positionFor(sourceText, offset);
-  let end = null as Position | null;
+  let end: Position | null;
 
   const increment = reExpressions.length + 1;
   for (let i = 0; i < parsed.length; i += increment) {

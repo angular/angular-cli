@@ -44,7 +44,8 @@ export default async function (options: { verbose: boolean }, logger: logging.Lo
 
   logger.info('');
   logger.info('Running license validation...');
-  error = await validateLicenses({}, logger.createChild('validate-commits')) != 0;
+  error = await validateLicenses({}, logger.createChild('validate-commits')) != 0
+       || error;
 
   logger.info('');
   logger.info('Running BUILD files validation...');
