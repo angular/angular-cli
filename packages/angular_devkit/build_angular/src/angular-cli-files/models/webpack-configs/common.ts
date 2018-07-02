@@ -203,7 +203,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       : 'rxjs/_esm5/path-mapping';
     const rxPaths = requireProjectModule(projectRoot, rxjsPathMappingImport);
     alias = rxPaths(nodeModules);
-  } catch (e) { }
+  } catch { }
 
   const uglifyOptions = {
     ecma: wco.supportES2015 ? 6 : 5,

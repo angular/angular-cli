@@ -90,7 +90,7 @@ function migrateKarmaConfiguration(config: CliConfig): Rule {
           `dir: require('path').join(__dirname, 'coverage'), reports`);
         host.overwrite(karmaPath, content);
       }
-    } catch (e) { }
+    } catch { }
 
     return host;
   };

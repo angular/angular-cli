@@ -283,7 +283,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
         return stats;
       }
-    } catch (e) {
+    } catch {
       return undefined;
     }
   }
@@ -318,11 +318,11 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       delegated = this._syncHost.list(p).filter((x: string) => {
         try {
           return this._syncHost.isFile(_join(p, x));
-        } catch (e) {
+        } catch {
           return false;
         }
       });
-    } catch (e) {
+    } catch {
       delegated = [];
     }
 
@@ -340,11 +340,11 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       delegated = this._syncHost.list(p).filter((x: string) => {
         try {
           return this._syncHost.isDirectory(_join(p, x));
-        } catch (e) {
+        } catch {
           return false;
         }
       });
-    } catch (e) {
+    } catch {
       delegated = [];
     }
 

@@ -72,8 +72,9 @@ export class LocationService {
               search[decodeURIComponent(pair[0])] = pair[1] && decodeURIComponent(pair[1]);
             }
           });
-      } catch (e) { /* don't care */ }
+        } catch (e) { /* don't care */ }
     }
+
     return search;
   }
 
