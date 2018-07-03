@@ -23,6 +23,10 @@ export interface BuildWebpackServerSchema {
    */
   commonChunk?: boolean;
   /**
+   * URL where files will be deployed.
+   */
+  deployUrl?: string;
+  /**
    * Show circular dependency warnings on builds.
    */
   showCircularDependencies?: boolean;
