@@ -292,11 +292,25 @@ function extractProjectsConfig(
         const environments = app.environments;
         const serviceWorker = app.serviceWorker;
 
+        const productionPartial = {
+          optimization: true,
+          outputHashing: 'all',
+          sourceMap: false,
+          extractCss: true,
+          namedChunks: false,
+          aot: true,
+          extractLicenses: true,
+          vendorChunk: false,
+          buildOptimizer: true,
+          ...(serviceWorker ? {serviceWorker: true, ngswConfigPath: '/src/ngsw-config.json'} : {}),
+          ...(app.budgets ? { budgets: app.budgets as JsonArray} : {}),
+        };
+
         if (!environments) {
-          return {};
+          return { production: productionPartial };
         }
 
-        return Object.keys(environments).reduce((acc, environment) => {
+        const configurations = Object.keys(environments).reduce((acc, environment) => {
           if (source === environments[environment]) {
             return acc;
           }
@@ -319,31 +333,8 @@ function extractProjectsConfig(
             configurationName = environment;
           }
 
-          let swConfig: JsonObject | null = null;
-          if (serviceWorker) {
-            swConfig = {
-              serviceWorker: true,
-              ngswConfigPath: '/src/ngsw-config.json',
-            };
-          }
-
           acc[configurationName] = {
-            ...(isProduction
-              ? {
-                optimization: true,
-                outputHashing: 'all',
-                sourceMap: false,
-                extractCss: true,
-                namedChunks: false,
-                aot: true,
-                extractLicenses: true,
-                vendorChunk: false,
-                buildOptimizer: true,
-              }
-              : {}
-            ),
-            ...(isProduction && swConfig ? swConfig : {}),
-            ...(isProduction && app.budgets ? { budgets: app.budgets as JsonArray } : {}),
+            ...(isProduction ? productionPartial : {}),
             fileReplacements: [
               {
                 replace: `${app.root}/${source}`,
@@ -354,6 +345,12 @@ function extractProjectsConfig(
 
           return acc;
         }, {} as JsonObject);
+
+        if (!configurations['production']) {
+          configurations['production'] = { ...productionPartial };
+        }
+
+        return configurations;
       }
 
       function _serveConfigurations(): JsonObject {
