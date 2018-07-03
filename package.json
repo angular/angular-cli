@@ -77,7 +77,7 @@
     "clean-css": "^4.1.11",
     "codelyzer": "^4.2.1",
     "conventional-changelog": "^1.1.0",
-    "copy-webpack-plugin": "^4.5.1",
+    "copy-webpack-plugin": "^4.5.2",
     "express": "^4.16.2",
     "file-loader": "^1.1.11",
     "font-awesome": "^4.7.0",
