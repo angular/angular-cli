@@ -584,6 +584,52 @@ describe('Migration to v6', () => {
         ).toBe(true);
       });
 
+      it('should add production configuration when no environments', () => {
+        delete baseConfig.apps[0].environments;
+        tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+        tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+        const config = getConfig(tree);
+        expect(config.projects.foo.architect.build.configurations).toEqual({
+          production: {
+            optimization: true,
+            outputHashing: 'all',
+            sourceMap: false,
+            extractCss: true,
+            namedChunks: false,
+            aot: true,
+            extractLicenses: true,
+            vendorChunk: false,
+            buildOptimizer: true,
+          },
+        });
+      });
+
+      it('should add production configuration when no production environment', () => {
+        tree.delete('/src/environments/environment.prod.ts');
+        tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
+        tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
+        const config = getConfig(tree);
+        expect(config.projects.foo.architect.build.configurations).toEqual({
+          prod: {
+            fileReplacements: [{
+              replace: 'src/environments/environment.ts',
+              with: 'src/environments/environment.prod.ts',
+            }],
+          },
+          production: {
+            optimization: true,
+            outputHashing: 'all',
+            sourceMap: false,
+            extractCss: true,
+            namedChunks: false,
+            aot: true,
+            extractLicenses: true,
+            vendorChunk: false,
+            buildOptimizer: true,
+          },
+        });
+      });
+
       it('should set the serve target', () => {
         tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
         tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
