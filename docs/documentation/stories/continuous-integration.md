@@ -57,7 +57,7 @@ exports.config = config;
 Now you can run the following commands to use the `--no-sandbox` flag:
 
 ```
-ng test --single-run --no-progress --browser=ChromeNoSandbox
+ng test --no-watch --no-progress --browser=ChromeNoSandbox
 ng e2e --no-progress --config=protractor-ci.conf.js
 ```
 
@@ -86,7 +86,7 @@ jobs:
           key: my-project-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
             - "node_modules"
-      - run: xvfb-run -a npm run test -- --single-run --no-progress --browser=ChromeNoSandbox
+      - run: xvfb-run -a npm run test -- --no-watch --no-progress --browser=ChromeNoSandbox
       - run: xvfb-run -a npm run e2e -- --no-progress --config=protractor-ci.conf.js
 
 ```
@@ -137,7 +137,7 @@ install:
 script:
   # Use Chromium instead of Chrome.
   - export CHROME_BIN=chromium-browser
-  - xvfb-run -a npm run test -- --single-run --no-progress --browser=ChromeNoSandbox
+  - xvfb-run -a npm run test -- --no-watch --no-progress --browser=ChromeNoSandbox
   - xvfb-run -a npm run e2e -- --no-progress --config=protractor-ci.conf.js
 
 ```
