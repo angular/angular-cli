@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { tap, toArray } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder assets', () => {
@@ -57,7 +57,7 @@ describe('Browser Builder assets', () => {
         expect(host.scopedSync().exists(normalize('./dist/folder/.gitkeep'))).toBe(false);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it('fails with non-absolute output path', (done) => {
     const assets: { [path: string]: string } = {
@@ -76,7 +76,7 @@ describe('Browser Builder assets', () => {
     // The node_modules folder must be deleted, otherwise code that tries to find the
     // node_modules folder will hit this one and can fail.
     host.scopedSync().delete(normalize('./node_modules'));
-  }, Timeout.Basic);
+  });
 
   it('fails with non-source root input path', (done) => {
     const assets: { [path: string]: string } = {
@@ -93,7 +93,7 @@ describe('Browser Builder assets', () => {
     // The node_modules folder must be deleted, otherwise code that tries to find the
     // node_modules folder will hit this one and can fail.
     host.scopedSync().delete(normalize('./node_modules'));
-  }, Timeout.Basic);
+  });
 
   it('still builds with empty asset array', (done) => {
     const overrides = {
@@ -104,5 +104,5 @@ describe('Browser Builder assets', () => {
       toArray(),
       tap((buildEvents) => expect(buildEvents.length).toBe(1)),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 });

@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { runTargetSpec } from '@angular-devkit/architect/testing';
+import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder optimization level', () => {
@@ -21,7 +21,7 @@ describe('Browser Builder optimization level', () => {
   it('works', (done) => {
     const overrides = { optimization: true };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js');
@@ -30,14 +30,14 @@ describe('Browser Builder optimization level', () => {
         expect(content).not.toContain('AppComponent');
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Complex);
+  });
 
   it('tsconfig target changes optimizations to use ES2015', (done) => {
     host.replaceInFile('tsconfig.json', '"target": "es5"', '"target": "es2015"');
 
     const overrides = { optimization: true };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'vendor.js');
@@ -45,5 +45,5 @@ describe('Browser Builder optimization level', () => {
         expect(content).toMatch(/class \w{constructor\(\){/);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Complex);
+  });
 });

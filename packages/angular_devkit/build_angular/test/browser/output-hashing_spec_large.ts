@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { runTargetSpec } from '@angular-devkit/architect/testing';
+import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize } from '@angular-devkit/core';
 import { concatMap, tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_large';
 
 
@@ -61,7 +61,7 @@ describe('Browser Builder output hashing', () => {
 
     // We must do several builds instead of a single one in watch mode, so that the output
     // path is deleted on each run and only contains the most recent files.
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3).pipe(
       tap(() => {
         // Save the current hashes.
         oldHashes = generateFileHashMap();
@@ -107,17 +107,19 @@ describe('Browser Builder output hashing', () => {
         validateHashes(oldHashes, newHashes, []);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Massive);
+  });
 
   it('supports options', (done) => {
     host.writeMultipleFiles({ 'src/styles.css': `h1 { background: url('./spectrum.png')}` });
     host.writeMultipleFiles(lazyModuleFiles);
     host.writeMultipleFiles(lazyModuleImport);
 
+    const overrides = { outputHashing: 'all', extractCss: true };
+
     // We must do several builds instead of a single one in watch mode, so that the output
     // path is deleted on each run and only contains the most recent files.
     // 'all' should hash everything.
-    runTargetSpec(host, browserTargetSpec, { outputHashing: 'all', extractCss: true }).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
       tap(() => {
         expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeTruthy();
         expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeTruthy();
@@ -160,5 +162,5 @@ describe('Browser Builder output hashing', () => {
         expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeFalsy();
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Complex);
+  });
 });

@@ -27,7 +27,7 @@ describe('Webpack Builder basic test', () => {
           expect(basicHost.scopedSync().exists(join(outputPath, 'bundle.js'))).toBe(true);
         }),
       ).toPromise().then(done, done.fail);
-    }, 30000);
+    });
   });
 
   describe('Angular app', () => {
@@ -45,6 +45,6 @@ describe('Webpack Builder basic test', () => {
           expect(angularHost.scopedSync().exists(join(outputPath, 'polyfills.js'))).toBe(true);
         }),
       ).toPromise().then(done, done.fail);
-    }, 30000);
+    });
   });
 });

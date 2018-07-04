@@ -8,7 +8,7 @@
 
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder allow js', () => {
@@ -27,7 +27,7 @@ describe('Browser Builder allow js', () => {
     runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it('works with aot', (done) => {
     host.writeMultipleFiles({
@@ -40,5 +40,5 @@ describe('Browser Builder allow js', () => {
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 });

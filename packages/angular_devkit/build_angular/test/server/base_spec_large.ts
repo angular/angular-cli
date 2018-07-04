@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { take, tap } from 'rxjs/operators';
-import { Timeout, host } from '../utils';
+import { host } from '../utils';
 
 
 describe('Server Builder', () => {
@@ -30,7 +30,7 @@ describe('Server Builder', () => {
         expect(content).toMatch(/AppServerModuleNgFactory/);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Standard);
+  });
 
   it('supports sourcemaps', (done) => {
     const overrides = { sourceMap: true };
@@ -45,7 +45,7 @@ describe('Server Builder', () => {
         expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBeTruthy();
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Standard);
+  });
 
   it('runs watch mode', (done) => {
     const overrides = { watch: true };
@@ -60,5 +60,5 @@ describe('Server Builder', () => {
       }),
       take(1),
     ).subscribe(undefined, done.fail, done);
-  }, Timeout.Standard);
+  });
 });

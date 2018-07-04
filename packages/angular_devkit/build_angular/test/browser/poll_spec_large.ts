@@ -8,7 +8,7 @@
 
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { debounceTime, take, tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder poll', () => {
@@ -39,5 +39,5 @@ describe('Browser Builder poll', () => {
       expect(msAvg).toBeLessThan(2750);
       done();
     });
-  }, Timeout.Basic);
+  });
 });
