@@ -152,7 +152,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         loader,
         filename: `[name]${hashFormat.file}.[ext]`,
       }),
-      autoprefixer({ grid: true }),
+      autoprefixer(),
     ];
   };
 
