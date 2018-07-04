@@ -21,10 +21,3 @@ export const extractI18nTargetSpec = { project: 'app', target: 'extract-i18n' };
 export const karmaTargetSpec = { project: 'app', target: 'test' };
 export const tslintTargetSpec = { project: 'app', target: 'lint' };
 export const protractorTargetSpec = { project: 'app-e2e', target: 'e2e' };
-
-export enum Timeout {
-  Basic = 30000,
-  Standard = Basic * 1.5,
-  Complex = Basic * 2,
-  Massive = Basic * 4,
-}

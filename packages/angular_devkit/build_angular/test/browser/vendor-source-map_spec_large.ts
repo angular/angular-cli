@@ -10,7 +10,7 @@ import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import * as path from 'path';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 describe('Browser Builder external source map', () => {
   const outputPath = normalize('dist');
@@ -32,7 +32,7 @@ describe('Browser Builder external source map', () => {
         expect(path.extname(sourcePath)).toBe('.ts', `${sourcePath} extention should be '.ts'`);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it('does not map sourcemaps from external library when disabled', (done) => {
     const overrides = { sourceMap: true, vendorSourceMap: false };
@@ -48,6 +48,6 @@ describe('Browser Builder external source map', () => {
         expect(path.extname(sourcePath)).toBe('.js', `${sourcePath} extention should be '.js'`);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
 });

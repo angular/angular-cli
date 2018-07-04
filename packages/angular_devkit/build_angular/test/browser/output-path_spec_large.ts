@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder output path', () => {
@@ -33,12 +33,12 @@ describe('Browser Builder output path', () => {
         expect(host.scopedSync().exists(outputPath)).toBe(false);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it('does not allow output path to be project root', (done) => {
     const overrides = { outputPath: './' };
 
     runTargetSpec(host, browserTargetSpec, overrides)
       .subscribe(undefined, () => done(), done.fail);
-  }, Timeout.Basic);
+  });
 });

@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { runTargetSpec } from '@angular-devkit/architect/testing';
+import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
 import { PathFragment, join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder scripts array', () => {
@@ -74,7 +74,7 @@ describe('Browser Builder scripts array', () => {
         expect(content).toMatch(matches[fileName]);
       })),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it('uglifies, uses sourcemaps, and adds hashes', (done) => {
     host.writeMultipleFiles(scripts);
@@ -86,7 +86,7 @@ describe('Browser Builder scripts array', () => {
       scripts: getScriptsOption(),
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const scriptsBundle = host.fileMatchExists(outputPath, /scripts\.[0-9a-f]{20}\.js/);
@@ -108,7 +108,7 @@ describe('Browser Builder scripts array', () => {
           .toBe(true);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Complex);
+  });
 
   it('preserves script order', (done) => {
     host.writeMultipleFiles(scripts);
@@ -132,5 +132,5 @@ describe('Browser Builder scripts array', () => {
         expect(content).toMatch(re);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 });

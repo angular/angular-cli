@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder i18n', () => {
@@ -62,7 +62,7 @@ describe('Browser Builder i18n', () => {
         expect(content).toMatch(/Bonjour i18n!/);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it('ignores missing translations', (done) => {
     const overrides = {
@@ -84,7 +84,7 @@ describe('Browser Builder i18n', () => {
         expect(content).toMatch(/Other content/);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it('reports errors for missing translations', (done) => {
     const overrides = {
@@ -101,7 +101,7 @@ describe('Browser Builder i18n', () => {
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it('register locales', (done) => {
     const overrides = { aot: true, i18nLocale: 'fr_FR' };
@@ -115,5 +115,5 @@ describe('Browser Builder i18n', () => {
         expect(content).toMatch(/angular_common_locales_fr/);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 });

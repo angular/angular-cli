@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
+import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder circular dependency detection', () => {
@@ -22,9 +22,9 @@ describe('Browser Builder circular dependency detection', () => {
     const overrides = { baseHref: '/myUrl' };
     const logger = new TestLogger('circular-dependencies');
 
-    runTargetSpec(host, browserTargetSpec, overrides, logger).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(logger.includes('Circular dependency detected')).toBe(true)),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 });
