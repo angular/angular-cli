@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder service worker', () => {
@@ -49,7 +49,7 @@ describe('Browser Builder service worker', () => {
       .subscribe(event => {
         expect(event.success).toBe(false);
       }, () => done(), done.fail);
-  }, Timeout.Basic);
+  });
 
   it('works with service worker', (done) => {
     host.writeMultipleFiles({
@@ -104,7 +104,7 @@ describe('Browser Builder service worker', () => {
         });
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it('works with service worker and baseHref', (done) => {
     host.writeMultipleFiles({
@@ -159,5 +159,5 @@ describe('Browser Builder service worker', () => {
         });
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 });

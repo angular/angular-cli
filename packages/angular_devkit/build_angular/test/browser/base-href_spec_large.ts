@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder base href', () => {
@@ -34,5 +34,5 @@ describe('Browser Builder base href', () => {
         expect(content).toMatch(/<base href="\/myUrl">/);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 });

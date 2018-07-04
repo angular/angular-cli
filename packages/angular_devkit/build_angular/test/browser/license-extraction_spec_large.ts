@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { runTargetSpec } from '@angular-devkit/architect/testing';
+import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder license extraction', () => {
@@ -24,12 +24,12 @@ describe('Browser Builder license extraction', () => {
     // TODO: make license extraction independent from optimization level.
     const overrides = { extractLicenses: true, optimization: true };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, '3rdpartylicenses.txt');
         expect(host.scopedSync().exists(fileName)).toBe(true);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Complex);
+  });
 });

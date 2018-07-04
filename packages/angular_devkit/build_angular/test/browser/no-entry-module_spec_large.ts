@@ -8,7 +8,7 @@
 
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder no entry module', () => {
@@ -25,5 +25,5 @@ describe('Browser Builder no entry module', () => {
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 });

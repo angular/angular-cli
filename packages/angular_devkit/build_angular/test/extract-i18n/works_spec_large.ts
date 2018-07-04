@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
+import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
 import { extractI18nTargetSpec, host } from '../utils';
@@ -36,7 +36,7 @@ describe('Extract i18n Target', () => {
     host.appendToFile('src/app/app.component.html',
       '<p i18n>Hello world <span i18n>inner</span></p>');
 
-    runTargetSpec(host, extractI18nTargetSpec, {}, logger).pipe(
+    runTargetSpec(host, extractI18nTargetSpec, {}, DefaultTimeout, logger).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
         const msg = 'Could not mark an element as translatable inside a translatable section';

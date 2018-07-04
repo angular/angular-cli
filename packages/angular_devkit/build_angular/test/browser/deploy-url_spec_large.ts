@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { concatMap, tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder deploy url', () => {
@@ -37,7 +37,7 @@ describe('Browser Builder deploy url', () => {
         expect(content).toContain('http://example.com/some/path/main.js');
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it('uses deploy url for in webpack runtime', (done) => {
     const overrides = { deployUrl: 'deployUrl/' };
@@ -50,6 +50,6 @@ describe('Browser Builder deploy url', () => {
         expect(content).toContain('deployUrl/');
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
 });

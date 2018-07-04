@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { runTargetSpec } from '@angular-devkit/architect/testing';
+import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
 import { BrowserBuilderSchema } from '../../src';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 export const lazyModuleFiles: { [path: string]: string } = {
@@ -87,7 +87,7 @@ describe('Browser Builder lazy modules', () => {
         expect(host.scopedSync().exists(join(outputPath, 'lazy-lazy-module.js'))).toBe(true);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it('supports lazy bundle for lazy routes with AOT', (done) => {
     host.writeMultipleFiles(lazyModuleFiles);
@@ -100,7 +100,7 @@ describe('Browser Builder lazy modules', () => {
           .exists(join(outputPath, 'lazy-lazy-module-ngfactory.js'))).toBe(true);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it(`supports lazy bundle for import() calls`, (done) => {
     host.writeMultipleFiles({
@@ -114,7 +114,7 @@ describe('Browser Builder lazy modules', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(host.scopedSync().exists(join(outputPath, '0.js'))).toBe(true)),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it(`supports lazy bundle for dynamic import() calls`, (done) => {
     host.writeMultipleFiles({
@@ -130,7 +130,7 @@ describe('Browser Builder lazy modules', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(host.scopedSync().exists(join(outputPath, 'lazy-module.js'))).toBe(true)),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it(`supports lazy bundle for System.import() calls`, (done) => {
     host.writeMultipleFiles({
@@ -142,7 +142,7 @@ describe('Browser Builder lazy modules', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(host.scopedSync().exists(join(outputPath, '0.js'))).toBe(true)),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it(`supports hiding lazy bundle module name`, (done) => {
     host.writeMultipleFiles({
@@ -157,7 +157,7 @@ describe('Browser Builder lazy modules', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(host.scopedSync().exists(join(outputPath, '0.js'))).toBe(true)),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it(`supports making a common bundle for shared lazy modules`, (done) => {
     host.writeMultipleFiles({
@@ -174,7 +174,7 @@ describe('Browser Builder lazy modules', () => {
       // TODO: the chunk with common modules used to be called `common`, see why that changed.
       tap(() => expect(host.scopedSync().exists(join(outputPath, '2.js'))).toBe(true)),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it(`supports disabling the common bundle`, (done) => {
     host.writeMultipleFiles({
@@ -192,7 +192,7 @@ describe('Browser Builder lazy modules', () => {
       tap(() => expect(host.scopedSync().exists(join(outputPath, '1.js'))).toBe(true)),
       tap(() => expect(host.scopedSync().exists(join(outputPath, '2.js'))).toBe(false)),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it(`supports extra lazy modules array in JIT`, (done) => {
     host.writeMultipleFiles(lazyModuleFiles);
@@ -223,7 +223,7 @@ describe('Browser Builder lazy modules', () => {
       tap(() => expect(host.scopedSync().exists(join(outputPath, 'src-app-lazy-lazy-module.js')))
         .toBe(true)),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it(`supports extra lazy modules array in AOT`, (done) => {
     host.writeMultipleFiles(lazyModuleFiles);
@@ -253,11 +253,11 @@ describe('Browser Builder lazy modules', () => {
       optimization: true,
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(host.scopedSync()
         .exists(join(outputPath, 'src-app-lazy-lazy-module-ngfactory.js')))
         .toBe(true)),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Complex);
+  });
 });

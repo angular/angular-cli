@@ -5,10 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { runTargetSpec } from '@angular-devkit/architect/testing';
+import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, host } from '../utils';
+import { host } from '../utils';
 
 
 describe('AppShell Builder', () => {
@@ -38,7 +38,7 @@ describe('AppShell Builder', () => {
       `,
     });
 
-    runTargetSpec(host, { project: 'app', target: 'app-shell' }).pipe(
+    runTargetSpec(host, { project: 'app', target: 'app-shell' }, DefaultTimeout * 2).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = 'dist/index.html';
@@ -46,6 +46,5 @@ describe('AppShell Builder', () => {
         expect(content).toMatch(/Welcome to app!/);
       }),
     ).toPromise().then(done, done.fail);
-
-  }, Timeout.Complex);
+  });
 });

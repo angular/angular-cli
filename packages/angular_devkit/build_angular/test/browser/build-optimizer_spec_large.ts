@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder build optimizer', () => {
@@ -28,5 +28,5 @@ describe('Browser Builder build optimizer', () => {
         expect(content).not.toMatch(/\.decorators =/);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 });

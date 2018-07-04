@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, tags, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder works with BOM index.html', () => {
@@ -34,7 +34,7 @@ describe('Browser Builder works with BOM index.html', () => {
         expect(content).toBe(`<html><head><base href="/"></head><body><app-root></app-root><script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="styles.js"></script><script type="text/javascript" src="vendor.js"></script><script type="text/javascript" src="main.js"></script></body></html>`);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it('works with UTF16 LE BOM', (done) => {
     host.writeMultipleFiles({
@@ -52,7 +52,7 @@ describe('Browser Builder works with BOM index.html', () => {
         expect(content).toBe(`<html><head><base href="/"></head><body><app-root></app-root><script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="styles.js"></script><script type="text/javascript" src="vendor.js"></script><script type="text/javascript" src="main.js"></script></body></html>`);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it('keeps escaped charaters', (done) => {
     host.writeMultipleFiles({
@@ -71,7 +71,7 @@ describe('Browser Builder works with BOM index.html', () => {
         expect(content).toBe(`<html><head><title>&iacute;</title><base href="/"></head> <body><app-root></app-root><script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="styles.js"></script><script type="text/javascript" src="vendor.js"></script><script type="text/javascript" src="main.js"></script></body></html>`);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
   it('keeps custom template charaters', (done) => {
     host.writeMultipleFiles({
@@ -90,5 +90,5 @@ describe('Browser Builder works with BOM index.html', () => {
         expect(content).toBe(`<html><head><base href="/"><%= csrf_meta_tags %></head> <body><app-root></app-root><script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="styles.js"></script><script type="text/javascript" src="vendor.js"></script><script type="text/javascript" src="main.js"></script></body></html>`);
       }),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 });

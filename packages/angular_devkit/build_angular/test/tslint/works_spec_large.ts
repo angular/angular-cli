@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
+import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
 import { TslintBuilderOptions } from '../../src';
@@ -53,7 +53,7 @@ describe('Tslint Target', () => {
     const logger = new TestLogger('lint-force');
     const overrides: Partial<TslintBuilderOptions> = { force: true };
 
-    runTargetSpec(host, tslintTargetSpec, overrides, logger).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides, DefaultTimeout, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(logger.includes(`" should be '`)).toBe(true);
@@ -67,7 +67,7 @@ describe('Tslint Target', () => {
     const logger = new TestLogger('lint-format');
     const overrides: Partial<TslintBuilderOptions> = { format: 'stylish' };
 
-    runTargetSpec(host, tslintTargetSpec, overrides, logger).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides, DefaultTimeout, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
       tap(() => {
         expect(logger.includes(`quotemark`)).toBe(true);

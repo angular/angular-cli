@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
+import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, take, tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host } from '../utils';
+import { browserTargetSpec, host } from '../utils';
 import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_large';
 
 
@@ -66,7 +66,7 @@ describe('Browser Builder rebuilds', () => {
 
     let buildNumber = 0;
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3).pipe(
       // We must debounce on watch mode because file watchers are not very accurate.
       // Changes from just before a process runs can be picked up and cause rebuilds.
       // In this case, cleanup from the test right before this one causes a few rebuilds.
@@ -109,18 +109,18 @@ describe('Browser Builder rebuilds', () => {
       }),
       take(3),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Massive);
+  });
 
   it('rebuilds on CSS changes', (done) => {
     const overrides = { watch: true };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3).pipe(
       debounceTime(500),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => host.appendToFile('src/app/app.component.css', ':host { color: blue; }')),
       take(2),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Massive);
+  });
 
   it('type checks on rebuilds', (done) => {
     host.writeMultipleFiles({
@@ -137,7 +137,7 @@ describe('Browser Builder rebuilds', () => {
     const typeError = `is not assignable to parameter of type 'number'`;
     let buildNumber = 0;
 
-    runTargetSpec(host, browserTargetSpec, overrides, logger).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3, logger).pipe(
       debounceTime(1000),
       tap((buildEvent) => {
         buildNumber += 1;
@@ -179,7 +179,7 @@ describe('Browser Builder rebuilds', () => {
       }),
       take(4),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Massive);
+  });
 
   it('rebuilds on type changes', (done) => {
     host.writeMultipleFiles({ 'src/type.ts': `export type MyType = number;` });
@@ -187,13 +187,13 @@ describe('Browser Builder rebuilds', () => {
 
     const overrides = { watch: true };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3).pipe(
       debounceTime(1000),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => host.writeMultipleFiles({ 'src/type.ts': `export type MyType = string;` })),
       take(2),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Basic);
+  });
 
 
   it('rebuilds after errors in AOT', (done) => {
@@ -209,7 +209,7 @@ describe('Browser Builder rebuilds', () => {
     const syntaxError = 'Declaration or statement expected.';
     let buildNumber = 0;
 
-    runTargetSpec(host, browserTargetSpec, overrides, logger).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3, logger).pipe(
       debounceTime(1000),
       tap((buildEvent) => {
         buildNumber += 1;
@@ -255,7 +255,7 @@ describe('Browser Builder rebuilds', () => {
       }),
       take(5),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Complex);
+  });
 
 
   it('rebuilds AOT factories', (done) => {
@@ -271,7 +271,7 @@ describe('Browser Builder rebuilds', () => {
     const overrides = { watch: true, aot: true, forkTypeChecker: false };
     let buildNumber = 0;
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3).pipe(
       debounceTime(1000),
       tap((buildEvent) => {
         buildNumber += 1;
@@ -334,5 +334,5 @@ describe('Browser Builder rebuilds', () => {
       }),
       take(7),
     ).toPromise().then(done, done.fail);
-  }, Timeout.Complex);
+  });
 });
