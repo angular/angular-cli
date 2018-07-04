@@ -264,25 +264,32 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
   delete(path: Path): Observable<void> {
     return this.isDirectory(path).pipe(
       concatMap(isDir => {
+        // TODO: remove this try+catch when issue https://github.com/ReactiveX/rxjs/issues/3740 is
+        // fixed.
         if (isDir) {
-          // Since this is synchronous, we can recurse and safely ignore the result.
-          for (const name of fs.readdirSync(getSystemPath(path))) {
-            this.delete(join(path, name)).subscribe();
-          }
-          try {
-            fs.rmdirSync(getSystemPath(path));
-          } catch (error) {
-            return throwError(error);
-          }
+          const dirPaths = fs.readdirSync(getSystemPath(path));
+          const rmDirComplete = new Observable((obs) => {
+            try {
+              fs.rmdirSync(getSystemPath(path));
+              obs.complete();
+            } catch (e) {
+              obs.error(e);
+            }
+          });
+
+          return concat(
+            ...dirPaths.map(name => this.delete(join(path, name))),
+            rmDirComplete,
+          );
         } else {
           try {
             fs.unlinkSync(getSystemPath(path));
-          } catch (error) {
-            return throwError(error);
+          } catch (err) {
+            return throwError(err);
           }
-        }
 
-        return EMPTY;
+          return EMPTY;
+        }
       }),
     );
   }
