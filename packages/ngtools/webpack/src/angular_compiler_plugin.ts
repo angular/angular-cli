@@ -5,14 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// TODO: fix webpack typings.
-// tslint:disable-next-line:no-global-tslint-disable
-// tslint:disable:no-any
 import { dirname, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import { ChildProcess, ForkOptions, fork } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
+import { Compiler, compilation } from 'webpack';
 import { time, timeEnd } from './benchmark';
 import { WebpackCompilerHost, workaroundResolve } from './compiler_host';
 import { resolveEntryModuleFromMain } from './entry_resolver';
@@ -53,6 +51,12 @@ import {
   VirtualFileSystemDecorator,
   VirtualWatchFileSystemDecorator,
 } from './virtual_file_system_decorator';
+import {
+  Callback,
+  InputFileSystem,
+  NodeWatchFileSystemInterface,
+  NormalModuleFactoryRequest,
+} from './webpack';
 
 const treeKill = require('tree-kill');
 
@@ -598,18 +602,28 @@ export class AngularCompilerPlugin {
   }
 
   // Registration hook for webpack plugin.
-  // tslint:disable-next-line:no-any
-  apply(compiler: any) {
+  apply(compiler: Compiler) {
     // Decorate inputFileSystem to serve contents of CompilerHost.
     // Use decorated inputFileSystem in watchFileSystem.
     compiler.hooks.environment.tap('angular-compiler', () => {
-      compiler.inputFileSystem = new VirtualFileSystemDecorator(
-        compiler.inputFileSystem, this._compilerHost);
-      compiler.watchFileSystem = new VirtualWatchFileSystemDecorator(compiler.inputFileSystem);
+      // The webpack types currently do not include these
+      const compilerWithFileSystems = compiler as Compiler & {
+        inputFileSystem: InputFileSystem,
+        watchFileSystem: NodeWatchFileSystemInterface,
+      };
+
+      const inputDecorator = new VirtualFileSystemDecorator(
+        compilerWithFileSystems.inputFileSystem,
+        this._compilerHost,
+      );
+      compilerWithFileSystems.inputFileSystem = inputDecorator;
+      compilerWithFileSystems.watchFileSystem = new VirtualWatchFileSystemDecorator(
+        inputDecorator,
+      );
     });
 
     // Add lazy modules to the context module for @angular/core
-    compiler.hooks.contextModuleFactory.tap('angular-compiler', (cmf: any) => {
+    compiler.hooks.contextModuleFactory.tap('angular-compiler', cmf => {
       const angularCorePackagePath = require.resolve('@angular/core/package.json');
 
       // APFv6 does not have single FESM anymore. Instead of verifying if we're pointing to
@@ -621,141 +635,139 @@ export class AngularCompilerPlugin {
       // We resolve any symbolic links in order to get the real path that would be used in webpack.
       const angularCoreDirname = fs.realpathSync(path.dirname(angularCorePackagePath));
 
-      cmf.hooks.afterResolve.tapAsync('angular-compiler',
-      // tslint:disable-next-line:no-any
-      (result: any, callback: (err?: Error, request?: any) => void) => {
-        if (!result) {
-          return callback();
-        }
-
+      cmf.hooks.afterResolve.tapPromise('angular-compiler', async result => {
         // Alter only request from Angular.
-        if (!result.resource.startsWith(angularCoreDirname)) {
-          return callback(undefined, result);
-        }
-        if (!this.done) {
-          return callback(undefined, result);
+        if (!result || !this.done || !result.resource.startsWith(angularCoreDirname)) {
+          return result;
         }
 
-        this.done.then(() => {
-          // This folder does not exist, but we need to give webpack a resource.
-          // TODO: check if we can't just leave it as is (angularCoreModuleDir).
-          result.resource = path.join(this._basePath, '$$_lazy_route_resource');
-          result.dependencies.forEach((d: any) => d.critical = false);
-          result.resolveDependencies = (_fs: any, resourceOrOptions: any, recursiveOrCallback: any,
-                                        _regExp: RegExp, cb: any) => {
-            const dependencies = Object.keys(this._lazyRoutes)
-              .map((key) => {
-                const modulePath = this._lazyRoutes[key];
-                const importPath = key.split('#')[0];
-                if (modulePath !== null) {
-                  const name = importPath.replace(/(\.ngfactory)?\.(js|ts)$/, '');
+        return this.done.then(
+          () => {
+            // This folder does not exist, but we need to give webpack a resource.
+            // TODO: check if we can't just leave it as is (angularCoreModuleDir).
+            result.resource = path.join(this._basePath, '$$_lazy_route_resource');
+            // tslint:disable-next-line:no-any
+            result.dependencies.forEach((d: any) => d.critical = false);
+            // tslint:disable-next-line:no-any
+            result.resolveDependencies = (_fs: any, options: any, callback: Callback) => {
+              const dependencies = Object.keys(this._lazyRoutes)
+                .map((key) => {
+                  const modulePath = this._lazyRoutes[key];
+                  const importPath = key.split('#')[0];
+                  if (modulePath !== null) {
+                    const name = importPath.replace(/(\.ngfactory)?\.(js|ts)$/, '');
 
-                  return new this._contextElementDependencyConstructor(modulePath, name);
-                } else {
-                  return null;
-                }
-              })
-              .filter(x => !!x);
-            if (typeof cb !== 'function' && typeof recursiveOrCallback === 'function') {
-              // Webpack 4 only has 3 parameters
-              cb = recursiveOrCallback;
+                    return new this._contextElementDependencyConstructor(modulePath, name);
+                  } else {
+                    return null;
+                  }
+                })
+                .filter(x => !!x);
+
               if (this._options.nameLazyFiles) {
-                resourceOrOptions.chunkName = '[request]';
+                options.chunkName = '[request]';
               }
-            }
-            cb(null, dependencies);
-          };
 
-          return callback(undefined, result);
-        }, () => callback())
-          .catch(err => callback(err));
+              callback(null, dependencies);
+            };
+
+            return result;
+          },
+          () => undefined,
+        );
       });
     });
 
     // Create and destroy forked type checker on watch mode.
-    compiler.hooks.watchRun.tapAsync('angular-compiler', (_compiler: any, callback: any) => {
+    compiler.hooks.watchRun.tap('angular-compiler', () => {
       if (this._forkTypeChecker && !this._typeCheckerProcess) {
         this._createForkedTypeChecker();
       }
-      callback();
     });
     compiler.hooks.watchClose.tap('angular-compiler', () => this._killForkedTypeChecker());
 
     // Remake the plugin on each compilation.
-    compiler.hooks.make.tapAsync(
-      'angular-compiler',
-      (compilation: any, cb: any) => this._make(compilation, cb),
-    );
+    compiler.hooks.make.tapPromise('angular-compiler', compilation => this._make(compilation));
     compiler.hooks.invalid.tap('angular-compiler', () => this._firstRun = false);
-    compiler.hooks.afterEmit.tapAsync('angular-compiler', (compilation: any, cb: any) => {
-      compilation._ngToolsWebpackPluginInstance = null;
-      cb();
+    compiler.hooks.afterEmit.tap('angular-compiler', compilation => {
+      // tslint:disable-next-line:no-any
+      (compilation as any)._ngToolsWebpackPluginInstance = null;
     });
     compiler.hooks.done.tap('angular-compiler', () => {
       this._donePromise = null;
     });
 
-    compiler.hooks.afterResolvers.tap('angular-compiler', (compiler: any) => {
-      compiler.hooks.normalModuleFactory.tap('angular-compiler', (nmf: any) => {
+    compiler.hooks.afterResolvers.tap('angular-compiler', compiler => {
+      compiler.hooks.normalModuleFactory.tap('angular-compiler', nmf => {
         // Virtual file system.
         // TODO: consider if it's better to remove this plugin and instead make it wait on the
         // VirtualFileSystemDecorator.
         // Wait for the plugin to be done when requesting `.ts` files directly (entry points), or
         // when the issuer is a `.ts` or `.ngfactory.js` file.
-        nmf.hooks.beforeResolve.tapAsync('angular-compiler', (request: any, callback: any) => {
-          if (this.done
-              && (request && (request.request.endsWith('.ts') || request.request.endsWith('.tsx'))
-              || (request && request.context.issuer
-                && /\.ts|ngfactory\.js$/.test(request.context.issuer)))) {
-            this.done.then(() => callback(null, request), () => callback(null, request));
-          } else {
-            callback(null, request);
-          }
-        });
-      });
-    });
+        nmf.hooks.beforeResolve.tapPromise(
+          'angular-compiler',
+          async (request?: NormalModuleFactoryRequest) => {
+            if (this.done && request) {
+              const name = request.request;
+              const issuer = request.contextInfo.issuer;
+              if (name.endsWith('.ts') || name.endsWith('.tsx')
+                  || (issuer && /\.ts|ngfactory\.js$/.test(issuer))) {
+                try {
+                  await this.done;
+                } catch {}
+              }
+            }
 
-    compiler.hooks.normalModuleFactory.tap('angular-compiler', (nmf: any) => {
-      nmf.hooks.beforeResolve.tapAsync('angular-compiler', (request: any, callback: any) => {
-        resolveWithPaths(
-          request,
-          callback,
-          this._compilerOptions,
-          this._compilerHost,
-          this._moduleResolutionCache,
+            return request;
+          },
         );
       });
     });
+
+    compiler.hooks.normalModuleFactory.tap('angular-compiler', nmf => {
+      nmf.hooks.beforeResolve.tapAsync(
+        'angular-compiler',
+        (request: NormalModuleFactoryRequest, callback: Callback<NormalModuleFactoryRequest>) => {
+          resolveWithPaths(
+            request,
+            callback,
+            this._compilerOptions,
+            this._compilerHost,
+            this._moduleResolutionCache,
+          );
+        },
+      );
+    });
   }
 
-  private _make(compilation: any, cb: (err?: any, request?: any) => void) {
+  private async _make(compilation: compilation.Compilation) {
     time('AngularCompilerPlugin._make');
     this._emitSkipped = true;
-    if (compilation._ngToolsWebpackPluginInstance) {
-      return cb(new Error('An @ngtools/webpack plugin already exist for this compilation.'));
+    // tslint:disable-next-line:no-any
+    if ((compilation as any)._ngToolsWebpackPluginInstance) {
+      throw new Error('An @ngtools/webpack plugin already exist for this compilation.');
     }
 
     // Set a private variable for this plugin instance.
-    compilation._ngToolsWebpackPluginInstance = this;
+    // tslint:disable-next-line:no-any
+    (compilation as any)._ngToolsWebpackPluginInstance = this;
 
     // Update the resource loader with the new webpack compilation.
     this._resourceLoader.update(compilation);
 
-    this._donePromise = Promise.resolve()
+    return this._donePromise = Promise.resolve()
       .then(() => this._update())
       .then(() => {
         this.pushCompilationErrors(compilation);
         timeEnd('AngularCompilerPlugin._make');
-        cb();
-      }, (err: any) => {
+      }, err => {
         compilation.errors.push(err);
         this.pushCompilationErrors(compilation);
         timeEnd('AngularCompilerPlugin._make');
-        cb();
       });
   }
 
-  private pushCompilationErrors(compilation: any) {
+  private pushCompilationErrors(compilation: compilation.Compilation) {
     compilation.errors.push(...this._errors);
     compilation.warnings.push(...this._warnings);
     this._errors = [];

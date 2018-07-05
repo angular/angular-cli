@@ -9,11 +9,6 @@
 // equivalent.
 // tslint:disable-next-line:no-global-tslint-disable
 // tslint:disable:no-implicit-dependencies
-/**
- * This is a copy of types in @compiler-cli/src/ngtools_api.d.ts file,
- * together with safe imports for private apis for cases where @angular/compiler-cli isn't
- * available or is below version 5.
- */
 import * as ngc from '@angular/compiler-cli';
 import * as ngtools from '@angular/compiler-cli/ngtools2';
 import * as path from 'path';
@@ -31,6 +26,14 @@ export type Diagnostics = ReadonlyArray<ts.Diagnostic | Diagnostic>;
 
 function _error(api: string, fn: string): never {
   throw new Error('Could not find API ' + api + ', function ' + fn);
+}
+
+function getApiMember<T, K extends keyof T>(
+  api: T | null,
+  func: K,
+  apiName: string,
+): T[K] {
+  return api && api[func] || _error(apiName, func.toString());
 }
 
 // Manually check for Compiler CLI availability and supported version.
@@ -72,19 +75,13 @@ try {
   // plugin cannot be used.
 }
 
-export const VERSION: typeof ngc.VERSION =
-  compilerCli
-  && compilerCli.VERSION
-  || _error('compiler-cli', 'VERSION');
-export const __NGTOOLS_PRIVATE_API_2: typeof ngc.__NGTOOLS_PRIVATE_API_2 =
-  compilerCli
-  && compilerCli.__NGTOOLS_PRIVATE_API_2
-  || _error('compiler-cli', '__NGTOOLS_PRIVATE_API_2');
-export const readConfiguration: typeof ngc.readConfiguration =
-  compilerCli
-  && compilerCli.readConfiguration
-  || _error('compiler-cli', 'readConfiguration');
-
+export const VERSION: typeof ngc.VERSION = getApiMember(compilerCli, 'VERSION', 'compiler-cli');
+export const __NGTOOLS_PRIVATE_API_2 = getApiMember(
+  compilerCli,
+  '__NGTOOLS_PRIVATE_API_2',
+  'compiler-cli',
+);
+export const readConfiguration = getApiMember(compilerCli, 'readConfiguration', 'compiler-cli');
 
 // These imports do not exist on Angular versions lower than 5, so we cannot use a static ES6
 // import.
@@ -93,15 +90,9 @@ try {
   ngtools2 = require('@angular/compiler-cli/ngtools2');
 } catch {
   // Don't throw an error if the private API does not exist.
-  // Instead, the `AngularCompilerPlugin.isSupported` method should return false and indicate the
-  // plugin cannot be used.
 }
 
-export const createProgram: typeof ngtools.createProgram =
-  ngtools2 && ngtools2.createProgram || _error('ngtools2', 'createProgram');
-export const createCompilerHost: typeof ngtools.createCompilerHost =
-  ngtools2 && ngtools2.createCompilerHost || _error('ngtools2', 'createCompilerHost');
-export const formatDiagnostics: typeof ngtools.formatDiagnostics =
-  ngtools2 && ngtools2.formatDiagnostics || _error('ngtools2', 'formatDiagnostics');
-export const EmitFlags: typeof ngtools.EmitFlags =
-  ngtools2 && ngtools2.EmitFlags || _error('ngtools', 'EmitFlags');
+export const createProgram = getApiMember(ngtools2, 'createProgram', 'ngtools2');
+export const createCompilerHost = getApiMember(ngtools2, 'createCompilerHost', 'ngtools2');
+export const formatDiagnostics = getApiMember(ngtools2, 'formatDiagnostics', 'ngtools2');
+export const EmitFlags = getApiMember(ngtools2, 'EmitFlags', 'ngtools2');
