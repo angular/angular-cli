@@ -78,29 +78,24 @@ directory for the library beforehand, removing old code leftover code from previ
 ## Why do I need to build the library everytime I make changes?
 
 Running `ng build my-lib` every time you change a file is bothersome and takes time.
+In `Angular CLI` version `6.2` an incremental builds functionality has been added to improve the experience of library developers. 
+Everytime a file is changed a partial build is performed that emits the amended files.
 
-Some similar setups instead add the path to the source code directly inside tsconfig.
-This makes seeing changes in your app faster.
+The feature can be using by passing `--watch` command argument as show below;
 
-But doing that is risky.
-When you do that, the build system for your app is building the library as well.
-But your library is built using a different build system than your app.
+```bash
+ng build my-lib --watch
+```
 
-Those two build systems can build things slightly different, or support completely different
-features.
+Note: This feature requires that Angular's Compiler Option [enableResourceInlining](https://angular.io/guide/aot-compiler#enableresourceinlining) is enabled.
+This can be done by adding the below in your `tsconfig.lib.json`.
 
-This leads to subtle bugs where your published library behaves differently from the one in your
-development setup.
-
-For this reason we decided to err on the side of caution, and make the recommended usage
-the safe one.
-
-In the future we want to add watch support to building libraries so it is faster to see changes.
-
-We are also planning to add internal dependency support to Angular CLI.
-This means that Angular CLI would know your app depends on your library, and automatically rebuilds
-the library when the app needs it.
-
+```javascript
+"angularCompilerOptions": {
+    "enableResourceInlining": true,
+    ...
+}
+```
 
 ## Note for upgraded projects
 
