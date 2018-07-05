@@ -47,11 +47,12 @@ jobs:
   test-large:
     <<: *defaults
     resource_class: large
+    parallelism: 4
     steps:
       - checkout: *post_checkout
       - restore_cache: *_root_package_lock_key
       - run: npm run webdriver-update-circleci
-      - run: npm run test-large -- --code-coverage --full
+      - run: npm run test-large -- --code-coverage --full --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
   e2e-cli:
     <<: *defaults
