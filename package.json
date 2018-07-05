@@ -32,10 +32,6 @@
     "test:watch": "nodemon --watch packages -e ts ./bin/devkit-admin test",
     "validate": "node ./bin/devkit-admin validate",
     "validate-commits": "./bin/devkit-admin validate-commits",
-    "integration": "npm run build && npm run integration:build-optimizer",
-    "integration:build-optimizer": "npm run integration:build-optimizer:simple && npm run integration:build-optimizer:aio",
-    "integration:build-optimizer:simple": "cd tests/@angular_devkit/build_optimizer/webpack/simple-app && npm i -q --no-save && npm run e2e && npm run benchmark",
-    "integration:build-optimizer:aio": "cd tests/@angular_devkit/build_optimizer/webpack/aio-app && npm i -q --no-save && npm run e2e && npm run benchmark",
     "prepush": "node ./bin/devkit-admin hooks/pre-push",
     "webdriver-update-appveyor": "webdriver-manager update --standalone false --gecko false --versions.chrome 2.37",
     "webdriver-update-circleci": "webdriver-manager update --standalone false --gecko false --versions.chrome 2.33"
