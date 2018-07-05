@@ -209,6 +209,13 @@ export default function (args: ParsedArgs, logger: logging.Logger) {
     logger.info(`Found ${tests.length} spec files, out of ${allTests.length}.`);
   }
 
+  if (args.shard !== undefined) {
+    // Remove tests that are not part of this shard.
+    const shardId = args['shard'];
+    const nbShards = args['nb-shards'] || 2;
+    tests = tests.filter((name, i) => (i % nbShards) == shardId);
+  }
+
   return new Promise(resolve => {
     runner.onComplete((passed: boolean) => resolve(passed ? 0 : 1));
     runner.execute(tests);
