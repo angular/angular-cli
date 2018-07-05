@@ -11,7 +11,8 @@
   "dependencies": {
     "@angular-devkit/architect": "0.0.0",
     "@angular-devkit/core": "0.0.0",
-    "rxjs": "^6.0.0"
+    "rxjs": "^6.0.0",
+    "semver": "^5.3.0"
   },
   "peerDependencies": {
     "ng-packagr": "^2.2.0 || ^3.0.0 || ^4.0.0"
