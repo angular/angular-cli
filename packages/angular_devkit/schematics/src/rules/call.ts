@@ -80,7 +80,7 @@ export function callRule(
   return input.pipe(mergeMap(inputTree => {
     const result = rule(inputTree, context);
 
-    if (result === undefined) {
+    if (!result) {
       return observableOf(inputTree);
     } else if (typeof result == 'function') {
       // This is considered a Rule, chain the rule and return its output.
