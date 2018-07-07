@@ -154,7 +154,7 @@ function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSche
       test: {
         builder: '@angular-devkit/build-angular:karma',
         options: {
-          main: `${projectRoot}/src/test.ts`,
+          main: `${projectRoot}/test.ts`,
           tsConfig: `${projectRoot}/tsconfig.spec.json`,
           karmaConfig: `${projectRoot}/karma.conf.js`,
         },
