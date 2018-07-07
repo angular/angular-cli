@@ -301,7 +301,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
     <code>--stats-json</code>
   </p>
   <p>
-    Generates a <code>stats.json</code> file which can be analyzed using tools such as: <code>webpack-bundle-analyzer</code> or https://webpack.github.io/analyse.
+    Generates a <code>stats.json</code> file which can be analyzed using tools such as: <code>webpack-bundle-analyzer</code> or https://webpack.github.io/analyse/.
   </p>
 </details>
 

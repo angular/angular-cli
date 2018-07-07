@@ -17,5 +17,5 @@ Commit your changes and push. On the GitHub project page, configure it to
 And that's all you need to do! Now you can see your page at
 `https://USER_NAME.github.io/PROJECT_NAME/`.
 
-You can also use [angular-cli-ghpages](https://github.com/angular-buch/angular-cli-ghpages), a full
+You can also use [angular-cli-ghpages](https://github.com/angular-schule/angular-cli-ghpages), a full
 featured package that does this all this for you and has extra functionality.
