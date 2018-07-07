@@ -17,6 +17,7 @@ import { findUp } from '../../utilities/find-up';
 import { RawCssLoader } from '../../plugins/webpack';
 import { ExtraEntryPoint } from '../../../browser/schema';
 import { normalizeExtraEntryPoints } from './utils';
+import { RemoveHashPlugin } from '../../plugins/remove-hash-plugin';
 
 const postcssUrl = require('postcss-url');
 const autoprefixer = require('autoprefixer');
@@ -158,7 +159,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // use includePaths from appConfig
   const includePaths: string[] = [];
-  let lessPathOptions: { paths?: string[] } = { };
+  let lessPathOptions: { paths?: string[] } = {};
 
   if (buildOptions.stylePreprocessorOptions
     && buildOptions.stylePreprocessorOptions.includePaths
@@ -173,6 +174,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // Process global styles.
   if (buildOptions.styles.length > 0) {
+    const chunkIds: string[] = [];
+
     normalizeExtraEntryPoints(buildOptions.styles, 'styles').forEach(style => {
       const resolvedPath = path.resolve(root, style.input);
 
@@ -183,9 +186,19 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         entryPoints[style.bundleName] = [resolvedPath]
       }
 
+      // Add lazy styles to the list.
+      if (style.lazy) {
+        chunkIds.push(style.bundleName);
+      }
+
       // Add global css paths.
       globalStylePaths.push(resolvedPath);
     });
+
+    if (chunkIds.length > 0) {
+      // Add plugin to remove hashes from lazy styles.
+      extraPlugins.push(new RemoveHashPlugin({ chunkIds, hashFormat}));
+    }
   }
 
   // set base rules to derive final rules from
