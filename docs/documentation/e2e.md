@@ -15,7 +15,7 @@ ng e2e [project]
 ng e2e
 ```
 
-End-to-end tests are run via [Protractor](https://angular.github.io/protractor/).
+End-to-end tests are run via [Protractor](http://www.protractortest.org/).
 
 ## Options
 <details>

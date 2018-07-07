@@ -42,7 +42,7 @@ ng e2e
 ```
 
 Before running the tests make sure you are serving the app via `ng serve`.
-End-to-end tests are run via [Protractor](https://angular.github.io/protractor/).
+End-to-end tests are run via [Protractor](http://www.protractortest.org/).
 
 ### Additional Commands
 * [ng new](1-x/new)
