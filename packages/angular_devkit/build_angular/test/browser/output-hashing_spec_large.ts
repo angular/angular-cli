@@ -163,4 +163,21 @@ describe('Browser Builder output hashing', () => {
       }),
     ).toPromise().then(done, done.fail);
   });
+
+  it('does not hash lazy styles', (done) => {
+    const overrides = {
+      outputHashing: 'all',
+      extractCss: true,
+      styles: [{ input: 'src/styles.css', lazy: true }],
+    };
+
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout).pipe(
+      tap(() => {
+        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.js/)).toBeFalsy();
+        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.js.map/)).toBeFalsy();
+        expect(host.scopedSync().exists(normalize('dist/styles.css'))).toBe(true);
+        expect(host.scopedSync().exists(normalize('dist/styles.css.map'))).toBe(true);
+      }),
+    ).toPromise().then(done, done.fail);
+  });
 });
