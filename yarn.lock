@@ -7082,6 +7082,12 @@ spdy@^3.4.1:
     select-hose "^2.0.0"
     spdy-transport "^2.0.18"
 
+speed-measure-webpack-plugin@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/speed-measure-webpack-plugin/-/speed-measure-webpack-plugin-1.2.3.tgz#de170b5cefbfa1c039d95e639edd3ad50cfc7c48"
+  dependencies:
+    chalk "^2.0.1"
+
 split-string@^3.0.1, split-string@^3.0.2:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/split-string/-/split-string-3.1.0.tgz#7cb09dda3a86585705c64b39a6466038682e8fe2"
