@@ -222,6 +222,11 @@ export interface BrowserBuilderSchema {
    * Budget thresholds to ensure parts of your application stay within boundaries which you set.
    */
   budgets: Budget[];
+
+  /**
+   * Output profile events for Chrome profiler.
+   */
+  profile: boolean;
 }
 
 export type AssetPattern = string | AssetPatternObject;

@@ -52,6 +52,7 @@ export interface BuildOptions {
   skipAppShell?: boolean;
   statsJson: boolean;
   forkTypeChecker: boolean;
+  profile?: boolean;
 
   main: string;
   index: string;

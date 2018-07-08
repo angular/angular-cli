@@ -236,6 +236,11 @@
         "$ref": "#/definitions/budget"
       },
       "default": []
+    },
+    "profile": {
+      "type": "boolean",
+      "description": "Output profile events for Chrome profiler.",
+      "default": false
     }
   },
   "additionalProperties": false,

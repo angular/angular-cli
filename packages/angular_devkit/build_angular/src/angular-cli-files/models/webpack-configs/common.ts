@@ -9,7 +9,7 @@
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
 import * as path from 'path';
-import { HashedModuleIdsPlugin } from 'webpack';
+import { HashedModuleIdsPlugin, debug } from 'webpack';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import { getOutputHashFormat } from './utils';
 import { isDirectory } from '../../utilities/is-directory';
@@ -67,6 +67,12 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       ...(entryPoints['polyfills'] || []),
       path.join(__dirname, '..', 'jit-polyfills.js'),
     ];
+  }
+
+  if (buildOptions.profile) {
+    extraPlugins.push(new debug.ProfilingPlugin({
+      outputPath: path.resolve(root, 'chrome-profiler-events.json'),
+    }))
   }
 
   // determine hashing format

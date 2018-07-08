@@ -40,6 +40,7 @@
     "semver": "5.5.1",
     "source-map-support": "0.5.9",
     "source-map-loader": "0.2.4",
+    "speed-measure-webpack-plugin": "^1.2.3",
     "stats-webpack-plugin": "0.7.0",
     "style-loader": "0.23.0",
     "stylus": "0.54.5",
