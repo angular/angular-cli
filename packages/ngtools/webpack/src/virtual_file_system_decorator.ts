@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { Path, getSystemPath, normalize } from '@angular-devkit/core';
 import { Stats } from 'fs';
 import { WebpackCompilerHost } from './compiler_host';
 import { Callback, InputFileSystem, NodeWatchFileSystemInterface } from './webpack';
@@ -105,26 +106,52 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
 }
 
 export class VirtualWatchFileSystemDecorator extends NodeWatchFileSystem {
-  constructor(private _virtualInputFileSystem: VirtualFileSystemDecorator) {
+  constructor(
+    private _virtualInputFileSystem: VirtualFileSystemDecorator,
+    private _replacements?: Map<Path, Path>,
+  ) {
     super(_virtualInputFileSystem);
   }
 
   watch(
-    files: any,  // tslint:disable-line:no-any
-    dirs: any,  // tslint:disable-line:no-any
-    missing: any,  // tslint:disable-line:no-any
-    startTime: any,  // tslint:disable-line:no-any
-    options: any,  // tslint:disable-line:no-any
+    files: string[],
+    dirs: string[],
+    missing: string[],
+    startTime: number | undefined,
+    options: {},
     callback: any,  // tslint:disable-line:no-any
-    callbackUndelayed: any,  // tslint:disable-line:no-any
+    callbackUndelayed: (filename: string, timestamp: number) => void,
   ) {
+    const reverseReplacements = new Map<string, string>();
+    const reverseTimestamps = (map: Map<string, number>) => {
+      for (const entry of Array.from(map.entries())) {
+        const original = reverseReplacements.get(entry[0]);
+        if (original) {
+          map.set(original, entry[1]);
+          map.delete(entry[0]);
+        }
+      }
+
+      return map;
+    };
+
+    const newCallbackUndelayed = (filename: string, timestamp: number) => {
+      const original = reverseReplacements.get(filename);
+      if (original) {
+        this._virtualInputFileSystem.purge(original);
+        callbackUndelayed(original, timestamp);
+      } else {
+        callbackUndelayed(filename, timestamp);
+      }
+    };
+
     const newCallback = (
-      err: any,  // tslint:disable-line:no-any
-      filesModified: any,  // tslint:disable-line:no-any
-      contextModified: any,  // tslint:disable-line:no-any
-      missingModified: any,  // tslint:disable-line:no-any
-      fileTimestamps: { [k: string]: number },
-      contextTimestamps: { [k: string]: number },
+      err: Error | null,
+      filesModified: string[],
+      contextModified: string[],
+      missingModified: string[],
+      fileTimestamps: Map<string, number>,
+      contextTimestamps: Map<string, number>,
     ) => {
       // Update fileTimestamps with timestamps from virtual files.
       const virtualFilesStats = this._virtualInputFileSystem.getVirtualFilesPaths()
@@ -132,11 +159,51 @@ export class VirtualWatchFileSystemDecorator extends NodeWatchFileSystem {
           path: fileName,
           mtime: +this._virtualInputFileSystem.statSync(fileName).mtime,
         }));
-      virtualFilesStats.forEach(stats => fileTimestamps[stats.path] = +stats.mtime);
-      callback(err, filesModified, contextModified, missingModified, fileTimestamps,
-        contextTimestamps);
+      virtualFilesStats.forEach(stats => fileTimestamps.set(stats.path, +stats.mtime));
+      callback(
+        err,
+        filesModified.map(value => reverseReplacements.get(value) || value),
+        contextModified.map(value => reverseReplacements.get(value) || value),
+        missingModified.map(value => reverseReplacements.get(value) || value),
+        reverseTimestamps(fileTimestamps),
+        reverseTimestamps(contextTimestamps),
+      );
     };
 
-    return super.watch(files, dirs, missing, startTime, options, newCallback, callbackUndelayed);
+    const mapReplacements = (original: string[]): string[] => {
+      if (!this._replacements) {
+        return original;
+      }
+      const replacements = this._replacements;
+
+      return original.map(file => {
+        const replacement = replacements.get(normalize(file));
+        if (replacement) {
+          const fullReplacement = getSystemPath(replacement);
+          reverseReplacements.set(fullReplacement, file);
+
+          return fullReplacement;
+        } else {
+          return file;
+        }
+      });
+    };
+
+    const watcher = super.watch(
+      mapReplacements(files),
+      mapReplacements(dirs),
+      mapReplacements(missing),
+      startTime,
+      options,
+      newCallback,
+      newCallbackUndelayed,
+    );
+
+    return {
+      close: () => watcher.close(),
+      pause: () => watcher.pause(),
+      getFileTimestamps: () => reverseTimestamps(watcher.getFileTimestamps()),
+      getContextTimestamps: () => reverseTimestamps(watcher.getContextTimestamps()),
+    };
   }
 }
