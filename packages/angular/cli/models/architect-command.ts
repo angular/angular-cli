@@ -18,9 +18,8 @@ import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import { of } from 'rxjs';
 import { from } from 'rxjs';
 import { concatMap, map, tap, toArray } from 'rxjs/operators';
-import { WorkspaceLoader } from '../models/workspace-loader';
 import { Command, Option } from './command';
-
+import { WorkspaceLoader } from './workspace-loader';
 
 export interface ProjectAndConfigurationOptions {
   project?: string;
