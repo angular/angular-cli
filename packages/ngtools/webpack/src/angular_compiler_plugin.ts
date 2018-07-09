@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { dirname, normalize, resolve, virtualFs } from '@angular-devkit/core';
+import { Path, dirname, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { ChildProcess, ForkOptions, fork } from 'child_process';
 import * as fs from 'fs';
@@ -617,8 +617,21 @@ export class AngularCompilerPlugin {
         this._compilerHost,
       );
       compilerWithFileSystems.inputFileSystem = inputDecorator;
+
+      let replacements: Map<Path, Path> | undefined;
+      if (this._options.hostReplacementPaths) {
+        replacements = new Map();
+        for (const replace in this._options.hostReplacementPaths) {
+          replacements.set(
+            normalize(replace),
+            normalize(this._options.hostReplacementPaths[replace]),
+          );
+        }
+      }
+
       compilerWithFileSystems.watchFileSystem = new VirtualWatchFileSystemDecorator(
         inputDecorator,
+        replacements,
       );
     });
 
