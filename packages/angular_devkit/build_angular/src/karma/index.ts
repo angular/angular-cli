@@ -27,7 +27,7 @@ import {
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { AssetPatternObject, CurrentFileReplacement } from '../browser/schema';
-import { addFileReplacements, normalizeAssetPatterns } from '../utils';
+import { normalizeAssetPatterns, normalizeFileReplacements } from '../utils';
 import { KarmaBuilderSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
@@ -47,7 +47,8 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
 
     return of(null).pipe(
-      concatMap(() => addFileReplacements(root, host, options.fileReplacements)),
+      concatMap(() => normalizeFileReplacements(options.fileReplacements, host, root)),
+      tap(fileReplacements => options.fileReplacements = fileReplacements),
       concatMap(() => normalizeAssetPatterns(
         options.assets, host, root, projectRoot, builderConfig.sourceRoot)),
       // Replace the assets in options with the normalized version.
