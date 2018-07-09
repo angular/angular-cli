@@ -31,14 +31,14 @@ export const kPathTemplateComponentRE = /__(.+?)__/g;
 export const kPathTemplatePipeRE = /@([^@]+)/;
 
 
-export type TemplateValue = boolean | string | number | undefined;
-export type TemplatePipeFunction = (x: string) => TemplateValue;
-export type TemplateOptions = {
-  [key: string]: TemplateValue | TemplateOptions | TemplatePipeFunction,
+export type PathTemplateValue = boolean | string | number | undefined;
+export type PathTemplatePipeFunction = (x: string) => PathTemplateValue;
+export type PathTemplateOptions = {
+  [key: string]: PathTemplateValue | PathTemplateOptions | PathTemplatePipeFunction,
 };
 
 
-export function applyContentTemplate<T extends TemplateOptions>(options: T): FileOperator {
+export function applyContentTemplate<T>(options: T): FileOperator {
   return (entry: FileEntry) => {
     const {path, content} = entry;
     if (isBinary(content)) {
@@ -53,12 +53,12 @@ export function applyContentTemplate<T extends TemplateOptions>(options: T): Fil
 }
 
 
-export function contentTemplate<T extends TemplateOptions>(options: T): Rule {
+export function contentTemplate<T>(options: T): Rule {
   return forEach(applyContentTemplate(options));
 }
 
 
-export function applyPathTemplate<T extends TemplateOptions>(options: T): FileOperator {
+export function applyPathTemplate<T extends PathTemplateOptions>(options: T): FileOperator {
   return (entry: FileEntry) => {
     let path = entry.path;
     const content = entry.content;
@@ -67,9 +67,11 @@ export function applyPathTemplate<T extends TemplateOptions>(options: T): FileOp
     // Path template.
     path = normalize(path.replace(kPathTemplateComponentRE, (_, match) => {
       const [name, ...pipes] = match.split(kPathTemplatePipeRE);
-      const value = typeof options[name] == 'function'
-        ? (options[name] as TemplatePipeFunction).call(options, original)
-        : options[name];
+      let value = options[name];
+
+      if (typeof value == 'function') {
+        value = value.call(options, original);
+      }
 
       if (value === undefined) {
         throw new OptionIsNotDefinedException(name);
@@ -87,7 +89,7 @@ export function applyPathTemplate<T extends TemplateOptions>(options: T): FileOp
         }
 
         // Coerce to string.
-        return '' + (options[pipe] as TemplatePipeFunction)(acc);
+        return '' + (options[pipe] as PathTemplatePipeFunction)(acc);
       }, '' + value);
     }));
 
@@ -96,14 +98,17 @@ export function applyPathTemplate<T extends TemplateOptions>(options: T): FileOp
 }
 
 
-export function pathTemplate<T extends TemplateOptions>(options: T): Rule {
+export function pathTemplate<T extends PathTemplateOptions>(options: T): Rule {
   return forEach(applyPathTemplate(options));
 }
 
 
-export function template<T extends TemplateOptions>(options: T): Rule {
+export function template<T>(options: T): Rule {
   return chain([
     contentTemplate(options),
-    pathTemplate(options),
+    // Force cast to PathTemplateOptions. We need the type for the actual pathTemplate() call,
+    // but in this case we cannot do anything as contentTemplate are more permissive.
+    // Since values are coerced to strings in PathTemplates it will be fine in the end.
+    pathTemplate(options as {} as PathTemplateOptions),
   ]);
 }
