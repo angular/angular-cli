@@ -34,7 +34,7 @@ import {
   statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
-import { addFileReplacements, normalizeAssetPatterns } from '../utils';
+import { normalizeAssetPatterns, normalizeFileReplacements } from '../utils';
 import { AssetPatternObject, BrowserBuilderSchema, CurrentFileReplacement } from './schema';
 const webpackMerge = require('webpack-merge');
 
@@ -64,7 +64,8 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
       concatMap(() => options.deleteOutputPath
         ? this._deleteOutputDir(root, normalize(options.outputPath), this.context.host)
         : of(null)),
-      concatMap(() => addFileReplacements(root, host, options.fileReplacements)),
+      concatMap(() => normalizeFileReplacements(options.fileReplacements, host, root)),
+      tap(fileReplacements => options.fileReplacements = fileReplacements),
       concatMap(() => normalizeAssetPatterns(
         options.assets, host, root, projectRoot, builderConfig.sourceRoot)),
       // Replace the assets in options with the normalized version.

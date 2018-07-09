@@ -10,7 +10,12 @@
 
 // tslint:disable-next-line:no-implicit-dependencies
 import * as ts from 'typescript';
-import { AssetPatternObject, Budget, ExtraEntryPoint } from '../../browser/schema';
+import {
+  AssetPatternObject,
+  Budget,
+  CurrentFileReplacement,
+  ExtraEntryPoint,
+} from '../../browser/schema';
 
 export interface BuildOptions {
   optimization: boolean;
@@ -58,6 +63,7 @@ export interface BuildOptions {
   stylePreprocessorOptions?: { includePaths: string[] };
   lazyModules: string[];
   platform?: 'browser' | 'server';
+  fileReplacements: CurrentFileReplacement[];
 }
 
 export interface WebpackTestOptions extends BuildOptions {
