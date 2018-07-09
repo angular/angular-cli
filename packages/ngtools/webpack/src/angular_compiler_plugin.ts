@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { dirname, normalize, resolve, virtualFs } from '@angular-devkit/core';
+import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { ChildProcess, ForkOptions, fork } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -288,11 +289,21 @@ export class AngularCompilerPlugin {
     this._contextElementDependencyConstructor = options.contextElementDependencyConstructor
       || require('webpack/lib/dependencies/ContextElementDependency');
 
+
+    let host: virtualFs.Host<fs.Stats> = options.host || new NodeJsSyncHost();
+    if (options.hostReplacementPaths) {
+      const aliasHost = new virtualFs.AliasHost(host);
+      for (const from in options.hostReplacementPaths) {
+        aliasHost.aliases.set(normalize(from), normalize(options.hostReplacementPaths[from]));
+      }
+      host = aliasHost;
+    }
+
     // Create the webpack compiler host.
     const webpackCompilerHost = new WebpackCompilerHost(
       this._compilerOptions,
       this._basePath,
-      this._options.host,
+      host,
     );
     webpackCompilerHost.enableCaching();
 
@@ -305,17 +316,6 @@ export class AngularCompilerPlugin {
       options: this._compilerOptions,
       tsHost: webpackCompilerHost,
     }) as CompilerHost & WebpackCompilerHost;
-
-    // Override some files in the FileSystem with paths from the actual file system.
-    if (this._options.hostReplacementPaths) {
-      for (const filePath of Object.keys(this._options.hostReplacementPaths)) {
-        const replacementFilePath = this._options.hostReplacementPaths[filePath];
-        const content = this._compilerHost.readFile(replacementFilePath);
-        if (content) {
-          this._compilerHost.writeFile(filePath, content, false);
-        }
-      }
-    }
 
     // Resolve mainPath if provided.
     if (options.mainPath) {
