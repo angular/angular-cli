@@ -25,7 +25,7 @@ import * as WebpackDevServer from 'webpack-dev-server';
 import { checkPort } from '../angular-cli-files/utilities/check-port';
 import { BrowserBuilder, NormalizedBrowserBuilderSchema, getBrowserLoggingCb } from '../browser/';
 import { BrowserBuilderSchema } from '../browser/schema';
-import { addFileReplacements, normalizeAssetPatterns } from '../utils';
+import { normalizeAssetPatterns, normalizeFileReplacements } from '../utils';
 const opn = require('opn');
 
 
@@ -78,7 +78,8 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
       tap((port) => options.port = port),
       concatMap(() => this._getBrowserOptions(options)),
       tap((opts) => browserOptions = opts),
-      concatMap(() => addFileReplacements(root, host, browserOptions.fileReplacements)),
+      concatMap(() => normalizeFileReplacements(browserOptions.fileReplacements, host, root)),
+      tap(fileReplacements => browserOptions.fileReplacements = fileReplacements),
       concatMap(() => normalizeAssetPatterns(
         browserOptions.assets, host, root, projectRoot, builderConfig.sourceRoot)),
       // Replace the assets in options with the normalized version.
