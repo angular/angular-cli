@@ -220,7 +220,7 @@ export default Task.extend({
       historyApiFallback: {
         index: `${servePath}/${appConfig.index}`,
         disableDotRule: true,
-        htmlAcceptHeaders: ['text/html', 'application/xhtml+xml']
+        htmlAcceptHeaders: ['text/html', 'application/xhtml+xml', '*/*']
       },
       stats: serveTaskOptions.verbose ? statsConfig : 'none',
       inline: true,
