@@ -84,8 +84,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
       // Replace the assets in options with the normalized version.
       tap((assetPatternObjects => browserOptions.assets = assetPatternObjects)),
       concatMap(() => {
-        const browserBuilder = new BrowserBuilder(this.context);
-        const webpackConfig = browserBuilder.buildWebpackConfig(
+        const webpackConfig = this.buildWebpackConfig(
           root, projectRoot, host, browserOptions as NormalizedBrowserBuilderSchema);
 
         let webpackDevServerConfig: WebpackDevServer.Configuration;
