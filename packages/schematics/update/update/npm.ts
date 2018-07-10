@@ -61,17 +61,20 @@ function getNpmConfigOption(
   return value;
 }
 
-function getNpmClientSslOptions(strictSsl?: string, cafile?: string) {
-  const sslOptions: { strict?: boolean, ca?: Buffer } = {};
+function getNpmClientSslOptions(
+  strictSsl?: string | boolean | undefined,
+  cafile?: string | boolean | undefined
+) {
+  const sslOptions: { strict?: boolean; ca?: Buffer } = {};
 
-  if (strictSsl === 'false') {
-    sslOptions.strict = false;
-  } else if (strictSsl === 'true') {
+  if (strictSsl === undefined) {
     sslOptions.strict = true;
+  } else {
+    sslOptions.strict = <boolean>strictSsl;
   }
 
   if (cafile) {
-    sslOptions.ca = readFileSync(cafile);
+    sslOptions.ca = readFileSync(<string>cafile);
   }
 
   return sslOptions;
