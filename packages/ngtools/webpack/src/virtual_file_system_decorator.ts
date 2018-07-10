@@ -108,7 +108,7 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
 export class VirtualWatchFileSystemDecorator extends NodeWatchFileSystem {
   constructor(
     private _virtualInputFileSystem: VirtualFileSystemDecorator,
-    private _replacements?: Map<Path, Path>,
+    private _replacements?: Map<Path, Path> | ((path: Path) => Path),
   ) {
     super(_virtualInputFileSystem);
   }
@@ -177,14 +177,23 @@ export class VirtualWatchFileSystemDecorator extends NodeWatchFileSystem {
       const replacements = this._replacements;
 
       return original.map(file => {
-        const replacement = replacements.get(normalize(file));
-        if (replacement) {
-          const fullReplacement = getSystemPath(replacement);
-          reverseReplacements.set(fullReplacement, file);
+        if (typeof replacements === 'function') {
+          const replacement = getSystemPath(replacements(normalize(file)));
+          if (replacement !== file) {
+            reverseReplacements.set(replacement, file);
+          }
 
-          return fullReplacement;
+          return replacement;
         } else {
-          return file;
+          const replacement = replacements.get(normalize(file));
+          if (replacement) {
+            const fullReplacement = getSystemPath(replacement);
+            reverseReplacements.set(fullReplacement, file);
+
+            return fullReplacement;
+          } else {
+            return file;
+          }
         }
       });
     };
