@@ -10,12 +10,12 @@ import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-c
 import { CommandScope, Option } from '../models/command';
 
 
-export default class TestCommand extends ArchitectCommand {
+export class TestCommand extends ArchitectCommand {
   public readonly name = 'test';
   public readonly target = 'test';
   public readonly description = 'Run unit tests in existing project.';
   public static aliases = ['t'];
-  public readonly scope = CommandScope.inProject;
+  public static scope = CommandScope.inProject;
   public readonly multiTarget = true;
   public readonly options: Option[] = [
     this.prodOption,

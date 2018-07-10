@@ -13,7 +13,7 @@ export interface Options {
   search?: boolean;
 }
 
-export default class GetSetCommand extends Command {
+export class GetSetCommand extends Command {
   public readonly name = 'getset';
   public readonly description = 'Deprecated in favor of config command.';
   public readonly arguments: string[] = [];

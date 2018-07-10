@@ -11,8 +11,9 @@ import { logging, terminal } from '@angular-devkit/core';
 
 export interface CommandConstructor {
   new(context: CommandContext, logger: logging.Logger): Command;
+  readonly name: string;
   aliases: string[];
-  scope: CommandScope.everywhere;
+  scope: CommandScope;
 }
 
 export enum CommandScope {
@@ -89,7 +90,8 @@ export abstract class Command<T = any> {
   public argStrategy = ArgumentStrategy.MapToOptions;
   public hidden = false;
   public unknown = false;
-  public scope = CommandScope.everywhere;
+  public static scope: CommandScope = CommandScope.everywhere;
+  public static aliases: string[] = [];
   protected readonly logger: logging.Logger;
   protected readonly project: any;
 }

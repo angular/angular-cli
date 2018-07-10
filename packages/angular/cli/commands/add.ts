@@ -16,11 +16,12 @@ import { NpmInstall } from '../tasks/npm-install';
 import { getPackageManager } from '../utilities/config';
 
 
-export default class AddCommand extends SchematicCommand {
+export class AddCommand extends SchematicCommand {
   readonly name = 'add';
   readonly description = 'Add support for a library to your project.';
   readonly allowPrivateSchematics = true;
-  scope = CommandScope.inProject;
+  static aliases = [];
+  static scope = CommandScope.inProject;
   arguments = ['collection'];
   options: Option[] = [];
 
