@@ -14,7 +14,7 @@ import { Command, Option } from '../models/command';
 import { findUp } from '../utilities/find-up';
 
 
-export default class VersionCommand extends Command {
+export class VersionCommand extends Command {
   public readonly name = 'version';
   public readonly description = 'Outputs Angular CLI version.';
   public static aliases = ['v'];

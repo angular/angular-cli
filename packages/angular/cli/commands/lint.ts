@@ -10,12 +10,12 @@ import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-c
 import { CommandScope, Option } from '../models/command';
 
 
-export default class LintCommand extends ArchitectCommand {
+export class LintCommand extends ArchitectCommand {
   public readonly name = 'lint';
   public readonly target = 'lint';
   public readonly description = 'Lints code in existing project.';
   public static aliases = ['l'];
-  public readonly scope = CommandScope.inProject;
+  public static scope = CommandScope.inProject;
   public readonly multiTarget = true;
   public readonly options: Option[] = [
     this.configurationOption,

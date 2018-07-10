@@ -12,12 +12,12 @@ import { SchematicCommand } from '../models/schematic-command';
 import { getDefaultSchematicCollection } from '../utilities/config';
 
 
-export default class NewCommand extends SchematicCommand {
+export class NewCommand extends SchematicCommand {
   public readonly name = 'new';
   public readonly description =
     'Creates a new directory and a new Angular app.';
   public static aliases = ['n'];
-  public scope = CommandScope.outsideProject;
+  public static scope = CommandScope.outsideProject;
   public readonly allowMissingWorkspace = true;
   public arguments: string[] = [];
   public options: Option[] = [

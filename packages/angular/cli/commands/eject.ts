@@ -10,12 +10,13 @@ import { tags } from '@angular-devkit/core';
 import { Command, Option } from '../models/command';
 
 
-export default class EjectCommand extends Command {
+export class EjectCommand extends Command {
   public readonly name = 'eject';
   public readonly description = 'Temporarily disabled. Ejects your app and output the proper '
                               + 'webpack configuration and scripts.';
   public readonly arguments: string[] = [];
   public readonly options: Option[] = [];
+  public static aliases = [];
 
   run() {
     this.logger.info(tags.stripIndents`

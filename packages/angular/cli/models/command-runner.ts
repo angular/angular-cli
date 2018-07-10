@@ -121,10 +121,10 @@ export async function runCommand(commandMap: CommandMap,
 
     return;
   } else {
-    if (command.scope !== undefined && command.scope !== CommandScope.everywhere) {
-      if (command.scope !== executionScope) {
+    if (Cmd.scope !== undefined && Cmd.scope !== CommandScope.everywhere) {
+      if (Cmd.scope !== executionScope) {
         let errorMessage;
-        if (command.scope === CommandScope.inProject) {
+        if (Cmd.scope === CommandScope.inProject) {
           errorMessage = `This command can only be run inside of a CLI project.`;
         } else {
           errorMessage = `This command can not be run inside of a CLI project.`;
@@ -134,7 +134,7 @@ export async function runCommand(commandMap: CommandMap,
         return 1;
       }
 
-      if (command.scope === CommandScope.inProject) {
+      if (Cmd.scope === CommandScope.inProject) {
         if (!context.project.configFile) {
           logger.fatal('Invalid project: missing workspace file.');
 

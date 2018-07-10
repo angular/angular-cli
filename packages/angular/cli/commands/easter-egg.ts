@@ -13,7 +13,7 @@ function pickOne(of: string[]): string {
   return of[Math.floor(Math.random() * of.length)];
 }
 
-export default class AwesomeCommand extends Command {
+export class AwesomeCommand extends Command {
   public readonly name = 'make-this-awesome';
   public readonly description = '';
   public readonly hidden = true;

@@ -8,47 +8,65 @@
 
 import { logging, terminal } from '@angular-devkit/core';
 import { filter } from 'rxjs/operators';
-import { runCommand } from '../../models/command-runner';
+import { AddCommand } from '../../commands/add';
+import { BuildCommand } from '../../commands/build';
+import { ConfigCommand } from '../../commands/config';
+import { DocCommand } from '../../commands/doc';
+import { E2eCommand } from '../../commands/e2e';
+import { AwesomeCommand } from '../../commands/easter-egg';
+import { EjectCommand } from '../../commands/eject';
+import { GenerateCommand } from '../../commands/generate';
+import { GetSetCommand } from '../../commands/getset';
+import { HelpCommand } from '../../commands/help';
+import { LintCommand } from '../../commands/lint';
+import { NewCommand } from '../../commands/new';
+import { RunCommand } from '../../commands/run';
+import { ServeCommand } from '../../commands/serve';
+import { TestCommand } from '../../commands/test';
+import { UpdateCommand } from '../../commands/update';
+import { VersionCommand } from '../../commands/version';
+import { Xi18nCommand } from '../../commands/xi18n';
+import { CommandMap, runCommand } from '../../models/command-runner';
 import { getProjectDetails } from '../../utilities/project';
 
 
-function loadCommands() {
+async function loadCommands(): Promise<CommandMap> {
   return {
     // Schematics commands.
-    'add': require('../../commands/add').default,
-    'new': require('../../commands/new').default,
-    'generate': require('../../commands/generate').default,
-    'update': require('../../commands/update').default,
+    'add': AddCommand,
+    'new': NewCommand,
+    'generate': GenerateCommand,
+    'update': UpdateCommand,
 
     // Architect commands.
-    'build': require('../../commands/build').default,
-    'serve': require('../../commands/serve').default,
-    'test': require('../../commands/test').default,
-    'e2e': require('../../commands/e2e').default,
-    'lint': require('../../commands/lint').default,
-    'xi18n': require('../../commands/xi18n').default,
-    'run': require('../../commands/run').default,
+    'build': BuildCommand,
+    'serve': ServeCommand,
+    'test': TestCommand,
+    'e2e': E2eCommand,
+    'lint': LintCommand,
+    'xi18n': Xi18nCommand,
+    'run': RunCommand,
 
     // Disabled commands.
-    'eject': require('../../commands/eject').default,
+    'eject': EjectCommand,
 
     // Easter eggs.
-    'make-this-awesome': require('../../commands/easter-egg').default,
+    'make-this-awesome': AwesomeCommand,
 
     // Other.
-    'config': require('../../commands/config').default,
-    'help': require('../../commands/help').default,
-    'version': require('../../commands/version').default,
-    'doc': require('../../commands/doc').default,
+    'config': ConfigCommand,
+    'help': HelpCommand,
+    'version': VersionCommand,
+    'doc': DocCommand,
 
     // deprecated
-    'get': require('../../commands/getset').default,
-    'set': require('../../commands/getset').default,
+    'get': GetSetCommand,
+    'set': GetSetCommand,
   };
 }
 
 export default async function(options: { testing?: boolean, cliArgs: string[] }) {
-  const commands = loadCommands();
+  const commands = await loadCommands();
 
   const logger = new logging.IndentLogger('cling');
   let loggingSubscription;

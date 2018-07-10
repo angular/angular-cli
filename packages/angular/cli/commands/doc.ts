@@ -14,7 +14,7 @@ export interface Options {
   search?: boolean;
 }
 
-export default class DocCommand extends Command {
+export class DocCommand extends Command {
   public readonly name = 'doc';
   public readonly description = 'Opens the official Angular API documentation for a given keyword.';
   public static aliases = ['d'];

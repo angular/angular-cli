@@ -17,11 +17,11 @@ import {
 } from '../utilities/schematics';
 
 
-export default class GenerateCommand extends SchematicCommand {
+export class GenerateCommand extends SchematicCommand {
   public readonly name = 'generate';
   public readonly description = 'Generates and/or modifies files based on a schematic.';
   public static aliases = ['g'];
-  public readonly scope = CommandScope.inProject;
+  public static scope = CommandScope.inProject;
   public arguments = ['schematic'];
   public options: Option[] = [
     ...this.coreOptions,

@@ -10,10 +10,11 @@ import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-c
 import { CommandScope, Option } from '../models/command';
 
 
-export default class RunCommand extends ArchitectCommand {
+export class RunCommand extends ArchitectCommand {
   public readonly name = 'run';
   public readonly description = 'Runs Architect targets.';
-  public readonly scope = CommandScope.inProject;
+  public static scope = CommandScope.inProject;
+  public static aliases = [];
   public readonly arguments: string[] = ['target'];
   public readonly options: Option[] = [
     this.configurationOption,
