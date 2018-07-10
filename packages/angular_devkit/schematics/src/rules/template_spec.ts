@@ -53,10 +53,26 @@ describe('applyPathTemplate', () => {
     expect(_applyPathTemplate('/a_b_c/d__e_f__g', { e_f: 1 })).toBe('/a_b_c/d1g');
   });
 
+  it('works with complex _________...', () => {
+    expect(_applyPathTemplate(
+      '/_____' + 'a' + '___a__' + '_/' + '__a___/__b___',
+      { _a: 0, a: 1, b: 2, _: '.' },
+    )).toBe('/.a0_/1_/2_');
+
+    expect(_applyPathTemplate(
+      '_____' + '_____' + '_____' + '___',
+      { _: '.' },
+    )).toBe('...___');
+  });
+
   it('works with functions', () => {
     let arg = '';
     expect(_applyPathTemplate('/a__c__b', {
-      c: (x: string) => (arg = x, 'hello'),
+      c: (x: string) => {
+        arg = x;
+
+        return 'hello';
+      },
     })).toBe('/ahellob');
     expect(arg).toBe('/a__c__b');
   });
