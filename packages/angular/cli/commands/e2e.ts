@@ -10,12 +10,12 @@ import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-c
 import { CommandScope, Option } from '../models/command';
 
 
-export default class E2eCommand extends ArchitectCommand {
+export class E2eCommand extends ArchitectCommand {
   public readonly name = 'e2e';
   public readonly target = 'e2e';
   public readonly description = 'Run e2e tests in existing project.';
   public static aliases: string[] = ['e'];
-  public readonly scope = CommandScope.inProject;
+  public static scope = CommandScope.inProject;
   public readonly multiTarget = true;
   public readonly options: Option[] = [
     this.prodOption,

@@ -178,7 +178,7 @@ function normalizeValue(value: string, path: string): JsonValue {
   return value;
 }
 
-export default class ConfigCommand extends Command {
+export class ConfigCommand extends Command {
   public readonly name = 'config';
   public readonly description = 'Get/set configuration values.';
   public readonly arguments = ['jsonPath', 'value'];

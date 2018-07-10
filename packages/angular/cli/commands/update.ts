@@ -18,11 +18,11 @@ export interface UpdateOptions extends CoreSchematicOptions {
 }
 
 
-export default class UpdateCommand extends SchematicCommand {
+export class UpdateCommand extends SchematicCommand {
   public readonly name = 'update';
   public readonly description = 'Updates your application and its dependencies.';
   public static aliases: string[] = [];
-  public readonly scope = CommandScope.everywhere;
+  public static scope = CommandScope.everywhere;
   public arguments: string[] = [ 'packages' ];
   public options: Option[] = [
     // Remove the --force flag.

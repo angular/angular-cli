@@ -10,11 +10,12 @@ import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-c
 import { CommandScope, Option } from '../models/command';
 
 
-export default class Xi18nCommand extends ArchitectCommand {
+export class Xi18nCommand extends ArchitectCommand {
   public readonly name = 'xi18n';
   public readonly target = 'extract-i18n';
   public readonly description = 'Extracts i18n messages from source code.';
-  public readonly scope = CommandScope.inProject;
+  public static scope = CommandScope.inProject;
+  public static aliases = [];
   public readonly multiTarget: true;
   public readonly options: Option[] = [
     this.configurationOption,

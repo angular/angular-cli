@@ -10,13 +10,13 @@ import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-c
 import { CommandScope, Option } from '../models/command';
 import { Version } from '../upgrade/version';
 
-export default class BuildCommand extends ArchitectCommand {
+export class BuildCommand extends ArchitectCommand {
   public readonly name = 'build';
   public readonly target = 'build';
   public readonly description =
     'Builds your app and places it into the output path (dist/ by default).';
   public static aliases = ['b'];
-  public scope = CommandScope.inProject;
+  public static scope = CommandScope.inProject;
   public options: Option[] = [
     this.prodOption,
     this.configurationOption,

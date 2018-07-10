@@ -11,7 +11,7 @@ import { terminal } from '@angular-devkit/core';
 import { Command, Option } from '../models/command';
 
 
-export default class HelpCommand extends Command {
+export class HelpCommand extends Command {
   public readonly name = 'help';
   public readonly description = 'Help.';
   public readonly arguments: string[] = [];
