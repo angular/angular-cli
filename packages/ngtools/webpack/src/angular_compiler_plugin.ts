@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Path, dirname, normalize, resolve, virtualFs } from '@angular-devkit/core';
+import { Path, dirname, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { ChildProcess, ForkOptions, fork } from 'child_process';
 import * as fs from 'fs';
@@ -77,7 +77,7 @@ export interface AngularCompilerPluginOptions {
   entryModule?: string;
   mainPath?: string;
   skipCodeGeneration?: boolean;
-  hostReplacementPaths?: { [path: string]: string };
+  hostReplacementPaths?: { [path: string]: string } | ((path: string) => string);
   forkTypeChecker?: boolean;
   // TODO: remove singleFileIncludes for 2.0, this is just to support old projects that did not
   // include 'polyfills.ts' in `tsconfig.spec.json'.
@@ -292,11 +292,20 @@ export class AngularCompilerPlugin {
 
     let host: virtualFs.Host<fs.Stats> = options.host || new NodeJsSyncHost();
     if (options.hostReplacementPaths) {
-      const aliasHost = new virtualFs.AliasHost(host);
-      for (const from in options.hostReplacementPaths) {
-        aliasHost.aliases.set(normalize(from), normalize(options.hostReplacementPaths[from]));
+      if (typeof options.hostReplacementPaths == 'function') {
+        const replacementResolver = options.hostReplacementPaths;
+        host = new class extends virtualFs.ResolverHost<fs.Stats> {
+          _resolve(path: Path) {
+            return normalize(replacementResolver(getSystemPath(path)));
+          }
+        }(host);
+      } else {
+        const aliasHost = new virtualFs.AliasHost(host);
+        for (const from in options.hostReplacementPaths) {
+          aliasHost.aliases.set(normalize(from), normalize(options.hostReplacementPaths[from]));
+        }
+        host = aliasHost;
       }
-      host = aliasHost;
     }
 
     // Create the webpack compiler host.
@@ -618,14 +627,19 @@ export class AngularCompilerPlugin {
       );
       compilerWithFileSystems.inputFileSystem = inputDecorator;
 
-      let replacements: Map<Path, Path> | undefined;
+      let replacements: Map<Path, Path> | ((path: Path) => Path) | undefined;
       if (this._options.hostReplacementPaths) {
-        replacements = new Map();
-        for (const replace in this._options.hostReplacementPaths) {
-          replacements.set(
-            normalize(replace),
-            normalize(this._options.hostReplacementPaths[replace]),
-          );
+        if (typeof this._options.hostReplacementPaths === 'function') {
+          const replacementResolver = this._options.hostReplacementPaths;
+          replacements = path => normalize(replacementResolver(getSystemPath(path)));
+        } else {
+          replacements = new Map();
+          for (const replace in this._options.hostReplacementPaths) {
+            replacements.set(
+              normalize(replace),
+              normalize(this._options.hostReplacementPaths[replace]),
+            );
+          }
         }
       }
 
