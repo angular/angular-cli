@@ -28,9 +28,9 @@ const webpackLoader: string = g['_DevKitIsLocal']
 function _createAotPlugin(
   wco: WebpackConfigOptions,
   options: any,
-  host: virtualFs.Host<Stats>,
+  _host: virtualFs.Host<Stats>,
   useMain = true,
-  extract = false
+  extract = false,
 ) {
   const { root, buildOptions } = wco;
   options.compilerOptions = options.compilerOptions || {};
@@ -82,7 +82,6 @@ function _createAotPlugin(
     forkTypeChecker: buildOptions.forkTypeChecker,
     contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
     ...options,
-    host,
   };
   return new AngularCompilerPlugin(pluginOptions);
 }
