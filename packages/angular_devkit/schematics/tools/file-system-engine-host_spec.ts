@@ -17,7 +17,7 @@ describe('FileSystemEngineHost', () => {
   const devkitRoot = (global as any)._DevKitRoot;
   const root = path.join(
     devkitRoot,
-    'tests/@angular_devkit/schematics/tools/file-system-engine-host',
+    'tests/angular_devkit/schematics/tools/file-system-engine-host',
   );
 
   it('works', () => {

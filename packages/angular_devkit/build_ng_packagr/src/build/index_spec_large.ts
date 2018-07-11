@@ -13,7 +13,7 @@ import { tap } from 'rxjs/operators';
 
 
 const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
-const workspaceRoot = join(devkitRoot, 'tests/@angular_devkit/build_ng_packagr/ng-packaged/');
+const workspaceRoot = join(devkitRoot, 'tests/angular_devkit/build_ng_packagr/ng-packaged/');
 export const host = new TestProjectHost(workspaceRoot);
 
 describe('NgPackagr Builder', () => {
