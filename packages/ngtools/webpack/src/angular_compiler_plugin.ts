@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Path, dirname, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { ChildProcess, ForkOptions, fork } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -58,6 +57,7 @@ import {
   NodeWatchFileSystemInterface,
   NormalModuleFactoryRequest,
 } from './webpack';
+import { WebpackInputHost } from './webpack-input-host';
 
 const treeKill = require('tree-kill');
 
@@ -288,48 +288,6 @@ export class AngularCompilerPlugin {
     // in the compilation. In that case, we can pass the right one as an option to the plugin.
     this._contextElementDependencyConstructor = options.contextElementDependencyConstructor
       || require('webpack/lib/dependencies/ContextElementDependency');
-
-
-    let host: virtualFs.Host<fs.Stats> = options.host || new NodeJsSyncHost();
-    if (options.hostReplacementPaths) {
-      if (typeof options.hostReplacementPaths == 'function') {
-        const replacementResolver = options.hostReplacementPaths;
-        host = new class extends virtualFs.ResolverHost<fs.Stats> {
-          _resolve(path: Path) {
-            return normalize(replacementResolver(getSystemPath(path)));
-          }
-        }(host);
-      } else {
-        const aliasHost = new virtualFs.AliasHost(host);
-        for (const from in options.hostReplacementPaths) {
-          aliasHost.aliases.set(normalize(from), normalize(options.hostReplacementPaths[from]));
-        }
-        host = aliasHost;
-      }
-    }
-
-    // Create the webpack compiler host.
-    const webpackCompilerHost = new WebpackCompilerHost(
-      this._compilerOptions,
-      this._basePath,
-      host,
-    );
-    webpackCompilerHost.enableCaching();
-
-    // Create and set a new WebpackResourceLoader.
-    this._resourceLoader = new WebpackResourceLoader();
-    webpackCompilerHost.setResourceLoader(this._resourceLoader);
-
-    // Use the WebpackCompilerHost with a resource loader to create an AngularCompilerHost.
-    this._compilerHost = createCompilerHost({
-      options: this._compilerOptions,
-      tsHost: webpackCompilerHost,
-    }) as CompilerHost & WebpackCompilerHost;
-
-    // Resolve mainPath if provided.
-    if (options.mainPath) {
-      this._mainPath = this._compilerHost.resolve(options.mainPath);
-    }
 
     // Use entryModule if available in options, otherwise resolve it from mainPath after program
     // creation.
@@ -621,28 +579,61 @@ export class AngularCompilerPlugin {
         watchFileSystem: NodeWatchFileSystemInterface,
       };
 
+      let host: virtualFs.Host<fs.Stats> = this._options.host || new WebpackInputHost(
+        compilerWithFileSystems.inputFileSystem,
+      );
+
+      let replacements: Map<Path, Path> | ((path: Path) => Path) | undefined;
+      if (this._options.hostReplacementPaths) {
+        if (typeof this._options.hostReplacementPaths == 'function') {
+          const replacementResolver = this._options.hostReplacementPaths;
+          replacements = path => normalize(replacementResolver(getSystemPath(path)));
+          host = new class extends virtualFs.ResolverHost<fs.Stats> {
+            _resolve(path: Path) {
+              return normalize(replacementResolver(getSystemPath(path)));
+            }
+          }(host);
+        } else {
+          replacements = new Map();
+          const aliasHost = new virtualFs.AliasHost(host);
+          for (const from in this._options.hostReplacementPaths) {
+            const normalizedFrom = normalize(from);
+            const normalizedWith = normalize(this._options.hostReplacementPaths[from]);
+            aliasHost.aliases.set(normalizedFrom, normalizedWith);
+            replacements.set(normalizedFrom, normalizedWith);
+          }
+          host = aliasHost;
+        }
+      }
+
+      // Create the webpack compiler host.
+      const webpackCompilerHost = new WebpackCompilerHost(
+        this._compilerOptions,
+        this._basePath,
+        host,
+      );
+      webpackCompilerHost.enableCaching();
+
+      // Create and set a new WebpackResourceLoader.
+      this._resourceLoader = new WebpackResourceLoader();
+      webpackCompilerHost.setResourceLoader(this._resourceLoader);
+
+      // Use the WebpackCompilerHost with a resource loader to create an AngularCompilerHost.
+      this._compilerHost = createCompilerHost({
+        options: this._compilerOptions,
+        tsHost: webpackCompilerHost,
+      }) as CompilerHost & WebpackCompilerHost;
+
+      // Resolve mainPath if provided.
+      if (this._options.mainPath) {
+        this._mainPath = this._compilerHost.resolve(this._options.mainPath);
+      }
+
       const inputDecorator = new VirtualFileSystemDecorator(
         compilerWithFileSystems.inputFileSystem,
         this._compilerHost,
       );
       compilerWithFileSystems.inputFileSystem = inputDecorator;
-
-      let replacements: Map<Path, Path> | ((path: Path) => Path) | undefined;
-      if (this._options.hostReplacementPaths) {
-        if (typeof this._options.hostReplacementPaths === 'function') {
-          const replacementResolver = this._options.hostReplacementPaths;
-          replacements = path => normalize(replacementResolver(getSystemPath(path)));
-        } else {
-          replacements = new Map();
-          for (const replace in this._options.hostReplacementPaths) {
-            replacements.set(
-              normalize(replace),
-              normalize(this._options.hostReplacementPaths[replace]),
-            );
-          }
-        }
-      }
-
       compilerWithFileSystems.watchFileSystem = new VirtualWatchFileSystemDecorator(
         inputDecorator,
         replacements,

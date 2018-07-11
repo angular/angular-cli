@@ -52,7 +52,7 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
     this._inputFileSystem.readdir(path, callback);
   }
 
-  readFile(path: string, callback: Callback<string | Buffer>): void {
+  readFile(path: string, callback: Callback<Buffer>): void {
     const result = this._readFileSync(path);
     if (result) {
       callback(null, result);
@@ -79,7 +79,7 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
     return this._inputFileSystem.readdirSync(path);
   }
 
-  readFileSync(path: string): string | Buffer {
+  readFileSync(path: string): Buffer {
     const result = this._readFileSync(path);
 
     return result || this._inputFileSystem.readFileSync(path);
