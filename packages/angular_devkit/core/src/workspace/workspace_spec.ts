@@ -23,7 +23,7 @@ describe('Workspace', () => {
   const host = new NodeJsSyncHost();
   const root = normalize(__dirname);
   // The content of this JSON object should be kept in sync with the path below:
-  // tests/@angular_devkit/workspace/angular-workspace.json
+  // tests/angular_devkit/core/workspace/angular-workspace.json
   const workspaceJson: WorkspaceSchema = {
     version: 1,
     newProjectRoot: './projects',
@@ -118,7 +118,7 @@ describe('Workspace', () => {
 
   it('loads workspace from host', (done) => {
     const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
-    const workspaceRoot = join(devkitRoot, 'tests/@angular_devkit/core/workspace');
+    const workspaceRoot = join(devkitRoot, 'tests/angular_devkit/core/workspace');
     const workspace = new Workspace(workspaceRoot, host);
     workspace.loadWorkspaceFromHost(normalize('angular-workspace.json')).pipe(
       tap((ws) => expect(ws.getProject('app').root).toEqual(workspaceJson.projects['app'].root)),
