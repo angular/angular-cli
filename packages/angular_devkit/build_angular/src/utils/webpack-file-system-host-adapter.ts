@@ -93,9 +93,9 @@ export class WebpackFileSystemHostAdapter implements InputFileSystem {
     return this._doHostCall(this._host.list(normalize('/' + path)), callback);
   }
 
-  readFile(path: string, callback: Callback<string>): void {
+  readFile(path: string, callback: Callback<Buffer>): void {
     const o = this._host.read(normalize('/' + path)).pipe(
-      map(content => virtualFs.fileBufferToString(content)),
+      map(content => Buffer.from(content)),
     );
 
     return this._doHostCall(o, callback);
@@ -134,15 +134,21 @@ export class WebpackFileSystemHostAdapter implements InputFileSystem {
 
     return this._syncHost.list(normalize('/' + path));
   }
-  readFileSync(path: string): string {
+  readFileSync(path: string): Buffer {
     if (!this._syncHost) {
       this._syncHost = new virtualFs.SyncDelegateHost(this._host);
     }
 
-    return virtualFs.fileBufferToString(this._syncHost.read(normalize('/' + path)));
+    return Buffer.from(this._syncHost.read(normalize('/' + path)));
   }
-  readJsonSync(path: string): string {
-    return JSON.parse(this.readFileSync(path));
+  readJsonSync(path: string): {} {
+    if (!this._syncHost) {
+      this._syncHost = new virtualFs.SyncDelegateHost(this._host);
+    }
+
+    const data = this._syncHost.read(normalize('/' + path));
+
+    return JSON.parse(virtualFs.fileBufferToString(data));
   }
   readlinkSync(path: string): string {
     const err: NodeJS.ErrnoException = new Error('Not a symlink.');
