@@ -22,12 +22,12 @@ export interface NormalModuleFactoryRequest {
 export interface InputFileSystem {
   stat(path: string, callback: Callback<Stats>): void;
   readdir(path: string, callback: Callback<string[]>): void;
-  readFile(path: string, callback: Callback<string | Buffer>): void;
+  readFile(path: string, callback: Callback<Buffer>): void;
   readJson(path: string, callback: Callback): void;
   readlink(path: string, callback: Callback<string>): void;
   statSync(path: string): Stats;
   readdirSync(path: string): string[];
-  readFileSync(path: string): string | Buffer;
+  readFileSync(path: string): Buffer;
   // tslint:disable-next-line:no-any
   readJsonSync(path: string): any;
   readlinkSync(path: string): string;
