@@ -9,8 +9,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Compiler } from 'webpack';
-import { RawSource, SourceMapSource } from 'webpack-sources';
+import { Compiler, compilation } from 'webpack';
+import { RawSource, Source, SourceMapSource } from 'webpack-sources';
 
 const CleanCSS = require('clean-css');
 
@@ -60,7 +60,7 @@ export class CleanCssWebpackPlugin {
   }
 
   apply(compiler: Compiler): void {
-    hook(compiler, (compilation: any, chunks: Array<Chunk>) => {
+    hook(compiler, (compilation: compilation.Compilation, chunks: Array<Chunk>) => {
       const cleancss = new CleanCSS({
         compatibility: 'ie9',
         level: 2,
@@ -80,7 +80,7 @@ export class CleanCssWebpackPlugin {
       const actions = files
         .filter(file => this._options.test(file))
         .map(file => {
-          const asset = compilation.assets[file];
+          const asset = compilation.assets[file] as Source;
           if (!asset) {
             return Promise.resolve();
           }
@@ -100,7 +100,7 @@ export class CleanCssWebpackPlugin {
           }
 
           return Promise.resolve()
-            .then(() => cleancss.minify(content, map))
+            .then(() => map ? cleancss.minify(content, map) : cleancss.minify(content))
             .then((output: any) => {
               let hasWarnings = false;
               if (output.warnings && output.warnings.length > 0) {
