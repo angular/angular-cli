@@ -15,6 +15,12 @@ ng e2e [project]
 ng e2e
 ```
 
+Add '-e2e' extension to project names.
+
+```bash
+ng e2e myproject-e2e
+```
+
 End-to-end tests are run via [Protractor](https://angular.github.io/protractor/).
 
 ## Options
