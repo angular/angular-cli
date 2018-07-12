@@ -62,12 +62,12 @@ function getNpmConfigOption(
 }
 
 function getNpmClientSslOptions(
-  strictSsl?: boolean,
+  strictSsl?: string | boolean,
   cafile?: string,
 ) {
   const sslOptions: { strict?: boolean; ca?: Buffer } = {};
 
-  sslOptions.strict = strictSsl;
+  sslOptions.strict = <boolean> strictSsl;
 
   if (cafile) {
     sslOptions.ca = readFileSync(cafile);
