@@ -158,6 +158,38 @@ function _readExpNumber(context: JsonParserContext,
 
 
 /**
+ * Read the hexa part of a 0xBADCAFE hexadecimal number.
+ * @private
+ */
+function _readHexaNumber(context: JsonParserContext,
+                         isNegative: boolean,
+                         start: Position,
+                         comments: (JsonAstComment | JsonAstMultilineComment)[]): JsonAstNumber {
+  // Read an hexadecimal number, until it's not hexadecimal.
+  let hexa = '';
+  const valid = '0123456789abcdefABCDEF';
+
+  for (let ch = _peek(context); ch && valid.includes(ch); ch = _peek(context)) {
+    // Add it to the hexa string.
+    hexa += ch;
+    // Move the position of the context to the next character.
+    _next(context);
+  }
+
+  const value = Number.parseInt(hexa, 16);
+
+  // We're done reading this number.
+  return {
+    kind: 'number',
+    start,
+    end: context.position,
+    text: context.original.substring(start.offset, context.position.offset),
+    value: isNegative ? -value : value,
+    comments,
+  };
+}
+
+/**
  * Read a number from the context.
  * @private
  */
@@ -175,6 +207,21 @@ function _readNumber(context: JsonParserContext, comments = _readBlanks(context)
       if (str != '') {
         throw new InvalidJsonCharacterException(context);
       }
+    } else if (char == 'I'
+        && (str == '-' || str == '' || str == '+')
+        && (context.mode & JsonParseMode.NumberConstantsAllowed) != 0) {
+      // Infinity?
+      // _token(context, 'I'); Already read.
+      _token(context, 'n');
+      _token(context, 'f');
+      _token(context, 'i');
+      _token(context, 'n');
+      _token(context, 'i');
+      _token(context, 't');
+      _token(context, 'y');
+
+      str += 'Infinity';
+      break;
     } else if (char == '0') {
       if (str == '0' || str == '-0') {
         throw new InvalidJsonCharacterException(context);
@@ -184,6 +231,8 @@ function _readNumber(context: JsonParserContext, comments = _readBlanks(context)
       if (str == '0' || str == '-0') {
         throw new InvalidJsonCharacterException(context);
       }
+    } else if (char == '+' && str == '') {
+      // Pass over.
     } else if (char == '.') {
       if (dotted) {
         throw new InvalidJsonCharacterException(context);
@@ -191,22 +240,31 @@ function _readNumber(context: JsonParserContext, comments = _readBlanks(context)
       dotted = true;
     } else if (char == 'e' || char == 'E') {
       return _readExpNumber(context, start, str + char, comments);
+    } else if (char == 'x' && (str == '0' || str == '-0')
+               && (context.mode & JsonParseMode.HexadecimalNumberAllowed) != 0) {
+      return _readHexaNumber(context, str == '-0', start, comments);
     } else {
-      // We're done reading this number.
+      // We read one too many characters, so rollback the last character.
       context.position = context.previous;
-
-      return {
-        kind: 'number',
-        start,
-        end: context.position,
-        text: context.original.substring(start.offset, context.position.offset),
-        value: Number.parseFloat(str),
-        comments,
-      };
+      break;
     }
 
     str += char;
   }
+
+  // We're done reading this number.
+  if (str.endsWith('.') && (context.mode & JsonParseMode.HexadecimalNumberAllowed) == 0) {
+    throw new InvalidJsonCharacterException(context);
+  }
+
+  return {
+    kind: 'number',
+    start,
+    end: context.position,
+    text: context.original.substring(start.offset, context.position.offset),
+    value: Number.parseFloat(str),
+    comments,
+  };
 }
 
 
@@ -224,8 +282,6 @@ function _readString(context: JsonParserContext, comments = _readBlanks(context)
     if (delim == '\'') {
       throw new InvalidJsonCharacterException(context);
     }
-  } else if (delim != '\'' && delim != '"') {
-    throw new InvalidJsonCharacterException(context);
   }
 
   let str = '';
@@ -265,6 +321,15 @@ function _readString(context: JsonParserContext, comments = _readBlanks(context)
 
         case undefined:
           throw new UnexpectedEndOfInputException(context);
+
+        case '\n':
+          // Only valid when multiline strings are allowed.
+          if ((context.mode & JsonParseMode.MultiLineStringAllowed) == 0) {
+            throw new InvalidJsonCharacterException(context);
+          }
+          str += char;
+          break;
+
         default:
           throw new InvalidJsonCharacterException(context);
       }
@@ -351,6 +416,31 @@ function _readNull(context: JsonParserContext,
     end,
     text: context.original.substring(start.offset, end.offset),
     value: null,
+    comments: comments,
+  };
+}
+
+
+/**
+ * Read the constant `NaN` from the context.
+ * @private
+ */
+function _readNaN(context: JsonParserContext,
+                  comments = _readBlanks(context)): JsonAstNumber {
+  const start = context.position;
+
+  _token(context, 'N');
+  _token(context, 'a');
+  _token(context, 'N');
+
+  const end = context.position;
+
+  return {
+    kind: 'number',
+    start,
+    end,
+    text: context.original.substring(start.offset, end.offset),
+    value: NaN,
     comments: comments,
   };
 }
@@ -638,9 +728,31 @@ function _readValue(context: JsonParserContext, comments = _readBlanks(context))
       result = _readNumber(context, comments);
       break;
 
+    case '.':
+    case '+':
+      if ((context.mode & JsonParseMode.LaxNumberParsingAllowed) == 0) {
+        throw new InvalidJsonCharacterException(context);
+      }
+      result = _readNumber(context, comments);
+      break;
+
     case '\'':
     case '"':
       result = _readString(context, comments);
+      break;
+
+    case 'I':
+      if ((context.mode & JsonParseMode.NumberConstantsAllowed) == 0) {
+        throw new InvalidJsonCharacterException(context);
+      }
+      result = _readNumber(context, comments);
+      break;
+
+    case 'N':
+      if ((context.mode & JsonParseMode.NumberConstantsAllowed) == 0) {
+        throw new InvalidJsonCharacterException(context);
+      }
+      result = _readNaN(context, comments);
       break;
 
     case 't':
@@ -681,10 +793,19 @@ export enum JsonParseMode {
   SingleQuotesAllowed       = 1 << 1,  // Allow single quoted strings.
   IdentifierKeyNamesAllowed = 1 << 2,  // Allow identifiers as objectp properties.
   TrailingCommasAllowed     = 1 << 3,
+  HexadecimalNumberAllowed  = 1 << 4,
+  MultiLineStringAllowed    = 1 << 5,
+  LaxNumberParsingAllowed   = 1 << 6,  // Allow `.` or `+` as the first character of a number.
+  NumberConstantsAllowed    = 1 << 7,  // Allow -Infinity, Infinity and NaN.
 
   Default                   = Strict,
   Loose                     = CommentsAllowed | SingleQuotesAllowed |
-                              IdentifierKeyNamesAllowed | TrailingCommasAllowed,
+                              IdentifierKeyNamesAllowed | TrailingCommasAllowed |
+                              HexadecimalNumberAllowed | MultiLineStringAllowed |
+                              LaxNumberParsingAllowed | NumberConstantsAllowed,
+
+  Json                      = Strict,
+  Json5                     = Loose,
 }
 
 

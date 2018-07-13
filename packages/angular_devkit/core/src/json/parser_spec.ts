@@ -67,6 +67,12 @@ describe('parseJson and parseJsonAst', () => {
       '-0-0',
       '0.0.0',
       '0\n.0\n.0',
+      '0.',
+      '+1',
+      'Infinity',
+      'NaN',
+      '-Infinity',
+      '+Infinity',
     ];
 
     for (const [n, [start, end, text]] of entries(numbers)) {
@@ -105,6 +111,7 @@ describe('parseJson and parseJsonAst', () => {
       '"a\\zb"',
       '"a',
       '"a\nb"',
+      '"\\\n "',
     ];
 
     for (const [n, [start, end, text]] of entries(strings)) {
@@ -248,11 +255,20 @@ describe('parseJson and parseJsonAst', () => {
       '{hi:["hello",/* */]}': [[0, 0, 0], [20, 0, 20], {hi: ['hello']}],
       '{hi:["hello"/* */,]}': [[0, 0, 0], [20, 0, 20], {hi: ['hello']}],
       '{hi:["hello" , ] , }': [[0, 0, 0], [20, 0, 20], {hi: ['hello']}],
+      '{hi:"\\\n "}': [[0, 0, 0], [10, 1, 3], {hi: '\n '}],
+      '{d: -0xdecaf, e: Infinity, f: -Infinity, g: +Infinity, h: NaN,}': [[0, 0, 0], [63, 0, 63], {
+        d: -0xdecaf,
+        e: Infinity,
+        f: -Infinity,
+        g: Infinity,
+        h: NaN,
+      }],
     };
     const errors = [
       '{1b: 0}',
       ' /*',
       '',
+      '.Infinity',
     ];
 
     for (const [n, [start, end, value, text]] of entries(strings)) {
@@ -298,6 +314,33 @@ describe('parseJson and parseJsonAst', () => {
         a2: 'this /* should also not be a comment',
         b: 1,
         c: 2,
+      });
+    });
+
+    it('works with json5.org example', () => {
+      const input = `{
+        // comments
+        unquoted: 'and you can quote me on that',
+        'singleQuotes': 'I can use "double quotes" here',
+        lineBreaks: "Look, Mom! \\
+No \\\\n's!",
+        hexadecimal: 0xdecaf,
+        leadingDecimalPoint: .8675309, andTrailing: 8675309.,
+        positiveSign: +1,
+        trailingComma: 'in objects', andIn: ['arrays',],
+        "backwardsCompatible": "with JSON",
+      }`;
+
+      expect(parseJson(input, JsonParseMode.Json5)).toEqual({
+        unquoted: 'and you can quote me on that',
+        singleQuotes: 'I can use "double quotes" here',
+        lineBreaks: "Look, Mom! \nNo \\n's!",
+        hexadecimal: 0xdecaf,
+        leadingDecimalPoint: .8675309, andTrailing: 8675309.,
+        positiveSign: +1,
+        trailingComma: 'in objects',
+        andIn: ['arrays'],
+        backwardsCompatible: 'with JSON',
       });
     });
   });
