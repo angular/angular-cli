@@ -67,6 +67,13 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   failureCb = config.buildWebpack.failureCb;
 
   config.reporters.unshift('@angular-devkit/build-angular--event-reporter');
+  
+  // When using code-coverage, auto-add coverage-istanbul.
+  config.reporters = config.reporters || [];
+  if (options.codeCoverage && config.reporters.indexOf('coverage-istanbul') === -1) {
+    config.reporters.unshift('coverage-istanbul');
+  }
+  
   // Add a reporter that fixes sourcemap urls.
   if (options.sourceMap) {
     config.reporters.unshift('@angular-devkit/build-angular--sourcemap-reporter');
@@ -106,12 +113,6 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   // Use existing config if any.
   config.webpack = Object.assign(webpackConfig, config.webpack);
   config.webpackMiddleware = Object.assign(webpackMiddlewareConfig, config.webpackMiddleware);
-
-  // When using code-coverage, auto-add coverage-istanbul.
-  config.reporters = config.reporters || [];
-  if (options.codeCoverage && config.reporters.indexOf('coverage-istanbul') === -1) {
-    config.reporters.push('coverage-istanbul');
-  }
 
   // Our custom context and debug files list the webpack bundles directly instead of using
   // the karma files array.
