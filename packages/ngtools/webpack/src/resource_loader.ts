@@ -102,7 +102,13 @@ export class WebpackResourceLoader {
           reject(err);
         } else {
           Object.keys(childCompilation.assets).forEach(assetName => {
-            if (assetName !== filePath && this._parentCompilation.assets[assetName] == undefined) {
+            // Add all new assets to the parent compilation, with the exception of
+            // the file we're loading and its sourcemap.
+            if (
+              assetName !== filePath
+              && assetName !== `${filePath}.map`
+              && this._parentCompilation.assets[assetName] == undefined
+            ) {
               this._parentCompilation.assets[assetName] = childCompilation.assets[assetName];
             }
           });
