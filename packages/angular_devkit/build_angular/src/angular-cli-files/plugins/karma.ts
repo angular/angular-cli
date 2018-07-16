@@ -67,13 +67,13 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   failureCb = config.buildWebpack.failureCb;
 
   config.reporters.unshift('@angular-devkit/build-angular--event-reporter');
-  
+
   // When using code-coverage, auto-add coverage-istanbul.
   config.reporters = config.reporters || [];
   if (options.codeCoverage && config.reporters.indexOf('coverage-istanbul') === -1) {
     config.reporters.unshift('coverage-istanbul');
   }
-  
+
   // Add a reporter that fixes sourcemap urls.
   if (options.sourceMap) {
     config.reporters.unshift('@angular-devkit/build-angular--sourcemap-reporter');
@@ -135,7 +135,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     // we can override the file watcher instead.
     webpackConfig.plugins.unshift({
       apply: (compiler: any) => { // tslint:disable-line:no-any
-        compiler.plugin('after-environment', () => {
+        compiler.hooks.afterEnvironment.tap('karma', () => {
           compiler.watchFileSystem = { watch: () => { } };
         });
       },
