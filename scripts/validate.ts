@@ -39,8 +39,8 @@ export default async function (options: { verbose: boolean }, logger: logging.Lo
 
   logger.info('');
   logger.info('Running commit validation...');
-  validateCommits({}, logger.createChild('validate-commits'));
-
+  error = await validateCommits({}, logger.createChild('validate-commits')) != 0
+       || error;
 
   logger.info('');
   logger.info('Running license validation...');
@@ -49,7 +49,8 @@ export default async function (options: { verbose: boolean }, logger: logging.Lo
 
   logger.info('');
   logger.info('Running BUILD files validation...');
-  validateBuildFiles({}, logger.createChild('validate-build-files'));
+  error = await validateBuildFiles({}, logger.createChild('validate-build-files')) != 0
+       || error;
 
   if (error) {
     return 101;
