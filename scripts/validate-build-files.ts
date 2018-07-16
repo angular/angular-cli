@@ -11,7 +11,7 @@ import { existsSync } from 'fs';
 import { join } from 'path';
 import { packages } from '../lib/packages';
 
-export default function (_options: {}, logger: logging.Logger) {
+export default async function (_options: {}, logger: logging.Logger) {
   let error = false;
 
   for (const pkgName of Object.keys(packages)) {
@@ -37,4 +37,6 @@ export default function (_options: {}, logger: logging.Logger) {
     // process.exit(1);
     logger.warn('Found some BUILD files missing, which will be breaking your PR soon.');
   }
+
+  return 0;
 }
