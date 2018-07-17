@@ -3,6 +3,7 @@
 # Stories describing how to do more with the CLI
 
  - [1.0 Update](stories/1.0-update)
+ - [App Shell](stories/app-shell)
  - [Asset Configuration](stories/asset-configuration)
  - [Autocompletion](stories/autocompletion)
  - [Configure Hot Module Replacement](stories/configure-hmr)
