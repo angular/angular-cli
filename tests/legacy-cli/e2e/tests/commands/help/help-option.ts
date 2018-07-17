@@ -5,5 +5,7 @@ export default function() {
   return Promise.resolve()
     .then(() => silentNg('--help'))
     .then(() => process.chdir('/'))
-    .then(() => silentNg('--help'));
+    .then(() => silentNg('--help'))
+    .then(() => process.chdir('/'))
+    .then(() => silentNg('--help', '--json'));
 }
