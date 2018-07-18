@@ -160,40 +160,15 @@ export function resolveWithPaths(
     const jsFilePath = `${pathNoExtension}.js`;
 
     if (host.fileExists(pathNoExtension)) {
-      // This is mainly for secondary entry points
-      // ex: 'node_modules/@angular/core/testing.d.ts' -> 'node_modules/@angular/core/testing'
-      request.request = pathNoExtension;
-    } else {
-      const packageJsonContent = host.readFile(packageRootPath);
-      let newRequest: string | undefined;
-
-      if (packageJsonContent) {
-        try {
-          const packageJson = JSON.parse(packageJsonContent);
-
-          // Let webpack resolve the correct module format IIF there is a module resolution field
-          // in the package.json. These are all official fields that Angular uses.
-          if (typeof packageJson.main == 'string'
-              || typeof packageJson.browser == 'string'
-              || typeof packageJson.module == 'string'
-              || typeof packageJson.es2015 == 'string'
-              || typeof packageJson.fesm5 == 'string'
-              || typeof packageJson.fesm2015 == 'string') {
-            newRequest = pathDirName;
-          }
-        } catch {
-          // Ignore exceptions and let it fall through (ie. if package.json file is invalid).
-        }
-      }
-
-      if (newRequest === undefined && host.fileExists(jsFilePath)) {
+        // This is mainly for secondary entry points
+        // ex: 'node_modules/@angular/core/testing.d.ts' -> 'node_modules/@angular/core/testing'
+        request.request = pathNoExtension;
+    } else if (host.fileExists(packageRootPath)) {
+        // Let webpack resolve the correct module format
+        request.request = pathDirName;
+    } else if (host.fileExists(jsFilePath)) {
         // Otherwise, if there is a file with a .js extension use that
-        newRequest = jsFilePath;
-      }
-
-      if (newRequest !== undefined) {
-        request.request = newRequest;
-      }
+        request.request = jsFilePath;
     }
 
     callback(null, request);
