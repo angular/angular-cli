@@ -154,21 +154,14 @@ export function resolveWithPaths(
 
   // If TypeScript gives us a `.d.ts`, it is probably a node module
   if (moduleFilePath.endsWith('.d.ts')) {
-    const pathNoExtension = moduleFilePath.slice(0, -5);
-    const pathDirName = path.dirname(moduleFilePath);
-    const packageRootPath = path.join(pathDirName, 'package.json');
-    const jsFilePath = `${pathNoExtension}.js`;
-
-    if (host.fileExists(pathNoExtension)) {
-        // This is mainly for secondary entry points
-        // ex: 'node_modules/@angular/core/testing.d.ts' -> 'node_modules/@angular/core/testing'
-        request.request = pathNoExtension;
-    } else if (host.fileExists(packageRootPath)) {
-        // Let webpack resolve the correct module format
-        request.request = pathDirName;
-    } else if (host.fileExists(jsFilePath)) {
-        // Otherwise, if there is a file with a .js extension use that
+    // If in a package, let webpack resolve the package
+    const packageRootPath = path.join(path.dirname(moduleFilePath), 'package.json');
+    if (!host.fileExists(packageRootPath)) {
+      // Otherwise, if there is a file with a .js extension use that
+      const jsFilePath = moduleFilePath.slice(0, -5) + '.js';
+      if (host.fileExists(jsFilePath)) {
         request.request = jsFilePath;
+      }
     }
 
     callback(null, request);
