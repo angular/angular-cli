@@ -32,7 +32,7 @@ import { WebpackCompilerHost, workaroundResolve } from './compiler_host';
 import { resolveEntryModuleFromMain } from './entry_resolver';
 import { gatherDiagnostics, hasErrors } from './gather_diagnostics';
 import { LazyRouteMap, findLazyRoutes } from './lazy_routes';
-import { resolveWithPaths } from './paths-plugin';
+import { TypeScriptPathsPlugin } from './paths-plugin';
 import { WebpackResourceLoader } from './resource_loader';
 import {
   exportLazyModuleMap,
@@ -729,6 +729,14 @@ export class AngularCompilerPlugin {
     });
 
     compiler.hooks.afterResolvers.tap('angular-compiler', compiler => {
+      // tslint:disable-next-line:no-any
+      (compiler as any).resolverFactory.hooks.resolver
+        .for('normal')
+        // tslint:disable-next-line:no-any
+        .tap('angular-compiler', (resolver: any) => {
+          new TypeScriptPathsPlugin(this._compilerOptions).apply(resolver);
+        });
+
       compiler.hooks.normalModuleFactory.tap('angular-compiler', nmf => {
         // Virtual file system.
         // TODO: consider if it's better to remove this plugin and instead make it wait on the
@@ -753,21 +761,6 @@ export class AngularCompilerPlugin {
           },
         );
       });
-    });
-
-    compiler.hooks.normalModuleFactory.tap('angular-compiler', nmf => {
-      nmf.hooks.beforeResolve.tapAsync(
-        'angular-compiler',
-        (request: NormalModuleFactoryRequest, callback: Callback<NormalModuleFactoryRequest>) => {
-          resolveWithPaths(
-            request,
-            callback,
-            this._compilerOptions,
-            this._compilerHost,
-            this._moduleResolutionCache,
-          );
-        },
-      );
     });
   }
 

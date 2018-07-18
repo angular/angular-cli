@@ -6,54 +6,97 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as path from 'path';
-import * as ts from 'typescript';
-import {
-  Callback,
-  NormalModuleFactoryRequest,
-} from './webpack';
+import { CompilerOptions, MapLike } from 'typescript';
+import { NormalModuleFactoryRequest } from './webpack';
 
+const getInnerRequest = require('enhanced-resolve/lib/getInnerRequest');
 
-export function resolveWithPaths(
-  request: NormalModuleFactoryRequest,
-  callback: Callback<NormalModuleFactoryRequest>,
-  compilerOptions: ts.CompilerOptions,
-  host: ts.CompilerHost,
-  cache?: ts.ModuleResolutionCache,
-) {
-  if (!request || !request.request || !compilerOptions.paths) {
-    callback(null, request);
+export interface TypeScriptPathsPluginOptions extends Pick<CompilerOptions, 'paths' | 'baseUrl'> {
 
-    return;
+}
+
+export class TypeScriptPathsPlugin {
+  constructor(private _options: TypeScriptPathsPluginOptions) { }
+
+  // tslint:disable-next-line:no-any
+  apply(resolver: any) {
+    if (!this._options.paths || Object.keys(this._options.paths).length === 0) {
+      return;
+    }
+
+    const target = resolver.ensureHook('resolve');
+    const resolveAsync = (request: NormalModuleFactoryRequest, requestContext: {}) => {
+      return new Promise<NormalModuleFactoryRequest | undefined>((resolve, reject) => {
+        resolver.doResolve(
+          target,
+          request,
+          '',
+          requestContext,
+          (error: Error | null, result: NormalModuleFactoryRequest | undefined) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          },
+        );
+      });
+    };
+
+    resolver.getHook('described-resolve').tapPromise(
+      'TypeScriptPathsPlugin',
+      async (request: NormalModuleFactoryRequest, resolveContext: {}) => {
+        if (!request || request.typescriptPathMapped) {
+          return;
+        }
+
+        const originalRequest = getInnerRequest(resolver, request);
+        if (!originalRequest) {
+          return;
+        }
+
+        // Only work on Javascript/TypeScript issuers.
+        if (!request.context.issuer || !request.context.issuer.match(/\.[jt]sx?$/)) {
+          return;
+        }
+
+        // Relative or absolute requests are not mapped
+        if (originalRequest.startsWith('.') || originalRequest.startsWith('/')) {
+          return;
+        }
+
+        // Amd requests are not mapped
+        if (originalRequest.startsWith('!!webpack amd')) {
+          return;
+        }
+
+        const replacements = findReplacements(originalRequest, this._options.paths || {});
+        for (const potential of replacements) {
+          const potentialRequest = {
+            ...request,
+            request: path.resolve(this._options.baseUrl || '', potential),
+            typescriptPathMapped: true,
+          };
+          const result = await resolveAsync(potentialRequest, resolveContext);
+
+          if (result) {
+            return result;
+          }
+        }
+      },
+    );
   }
+}
 
-  // Only work on Javascript/TypeScript issuers.
-  if (!request.contextInfo.issuer || !request.contextInfo.issuer.match(/\.[jt]sx?$/)) {
-    callback(null, request);
-
-    return;
-  }
-
-  const originalRequest = request.request.trim();
-
-  // Relative requests are not mapped
-  if (originalRequest.startsWith('.') || originalRequest.startsWith('/')) {
-    callback(null, request);
-
-    return;
-  }
-
-  // Amd requests are not mapped
-  if (originalRequest.startsWith('!!webpack amd')) {
-    callback(null, request);
-
-    return;
-  }
-
+function findReplacements(
+  originalRequest: string,
+  paths: MapLike<string[]>,
+): Iterable<string> {
   // check if any path mapping rules are relevant
   const pathMapOptions = [];
-  for (const pattern in compilerOptions.paths) {
+  for (const pattern in paths) {
     // get potentials and remove duplicates; JS Set maintains insertion order
-    const potentials = Array.from(new Set(compilerOptions.paths[pattern]));
+    const potentials = Array.from(new Set(paths[pattern]));
     if (potentials.length === 0) {
       // no potential replacements so skip
       continue;
@@ -96,9 +139,7 @@ export function resolveWithPaths(
   }
 
   if (pathMapOptions.length === 0) {
-    callback(null, request);
-
-    return;
+    return [];
   }
 
   // exact matches take priority then largest prefix match
@@ -112,63 +153,23 @@ export function resolveWithPaths(
     }
   });
 
-  if (pathMapOptions[0].potentials.length === 1) {
-    const onlyPotential = pathMapOptions[0].potentials[0];
-    let replacement;
-    const starIndex = onlyPotential.indexOf('*');
-    if (starIndex === -1) {
-      replacement = onlyPotential;
-    } else if (starIndex === onlyPotential.length - 1) {
-      replacement = onlyPotential.slice(0, -1) + pathMapOptions[0].partial;
-    } else {
-      const [prefix, suffix] = onlyPotential.split('*');
-      replacement = prefix + pathMapOptions[0].partial + suffix;
-    }
-
-    request.request = path.resolve(compilerOptions.baseUrl || '', replacement);
-    callback(null, request);
-
-    return;
-  }
-
-  // TODO: The following is used when there is more than one potential and will not be
-  //       needed once this is turned into a full webpack resolver plugin
-
-  const moduleResolver = ts.resolveModuleName(
-    originalRequest,
-    request.contextInfo.issuer,
-    compilerOptions,
-    host,
-    cache,
-  );
-
-  const moduleFilePath = moduleResolver.resolvedModule
-                         && moduleResolver.resolvedModule.resolvedFileName;
-
-  // If there is no result, let webpack try to resolve
-  if (!moduleFilePath) {
-    callback(null, request);
-
-    return;
-  }
-
-  // If TypeScript gives us a `.d.ts`, it is probably a node module
-  if (moduleFilePath.endsWith('.d.ts')) {
-    // If in a package, let webpack resolve the package
-    const packageRootPath = path.join(path.dirname(moduleFilePath), 'package.json');
-    if (!host.fileExists(packageRootPath)) {
-      // Otherwise, if there is a file with a .js extension use that
-      const jsFilePath = moduleFilePath.slice(0, -5) + '.js';
-      if (host.fileExists(jsFilePath)) {
-        request.request = jsFilePath;
+  const replacements: string[] = [];
+  pathMapOptions.forEach(option => {
+    for (const potential of option.potentials) {
+      let replacement;
+      const starIndex = potential.indexOf('*');
+      if (starIndex === -1) {
+        replacement = potential;
+      } else if (starIndex === potential.length - 1) {
+        replacement = potential.slice(0, -1) + option.partial;
+      } else {
+        const [prefix, suffix] = potential.split('*');
+        replacement = prefix + option.partial + suffix;
       }
+
+      replacements.push(replacement);
     }
+  });
 
-    callback(null, request);
-
-    return;
-  }
-
-  request.request = moduleFilePath;
-  callback(null, request);
+  return replacements;
 }

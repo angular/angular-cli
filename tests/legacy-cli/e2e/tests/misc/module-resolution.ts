@@ -73,14 +73,14 @@ export default async function () {
 
   await updateJsonFile('tsconfig.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
-      '@firebase/polyfill': ['@firebase/polyfill/index.ts'],
+      '@firebase/polyfill': ['./node_modules/@firebase/polyfill/index.ts'],
     };
   });
   await expectToFail(() => ng('build'));
 
   await updateJsonFile('tsconfig.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
-      '@firebase/polyfill*': ['@firebase/polyfill/index.ts'],
+      '@firebase/polyfill*': ['./node_modules/@firebase/polyfill/index.ts'],
     };
   });
   await expectToFail(() => ng('build'));

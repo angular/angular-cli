@@ -16,7 +16,9 @@ export interface Callback<T = any> {
 
 export interface NormalModuleFactoryRequest {
   request: string;
+  context: { issuer: string };
   contextInfo: { issuer: string };
+  typescriptPathMapped?: boolean;
 }
 
 export interface InputFileSystem {
