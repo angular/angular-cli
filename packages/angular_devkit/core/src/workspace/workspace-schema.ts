@@ -36,6 +36,10 @@ export interface WorkspaceSchema {
    */
   architect?: WorkspaceTool;
   /**
+   * Tool options.
+   */
+  targets?: WorkspaceTool;
+  /**
    * A map of project names to project options.
    */
   projects: {
@@ -74,6 +78,10 @@ export interface WorkspaceProject {
    * Tool options.
    */
   architect?: WorkspaceTool;
+  /**
+   * Tool options.
+   */
+  targets?: WorkspaceTool;
 }
 /**
  * Architect options.
