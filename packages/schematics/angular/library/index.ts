@@ -131,7 +131,7 @@ function addDependenciesToPackageJson() {
 }
 
 function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSchema,
-                               projectRoot: string, packageName: string): Rule {
+                               projectRoot: string, projectName: string): Rule {
 
   const project: WorkspaceProject<ProjectType.Library> = {
     root: projectRoot,
@@ -169,7 +169,7 @@ function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSche
     },
   };
 
-  return addProjectToWorkspace(workspace, packageName, project);
+  return addProjectToWorkspace(workspace, projectName, project);
 }
 
 export default function (options: LibraryOptions): Rule {
@@ -182,7 +182,8 @@ export default function (options: LibraryOptions): Rule {
     validateProjectName(options.name);
 
     // If scoped project (i.e. "@foo/bar"), convert projectDir to "foo/bar".
-    const packageName = options.name;
+    const projectName = options.name;
+    const packageName = strings.dasherize(projectName);
     let scopeName = null;
     if (/^@.*\/.*/.test(options.name)) {
       const [scope, name] = options.name.split('/');
@@ -218,7 +219,7 @@ export default function (options: LibraryOptions): Rule {
 
     return chain([
       branchAndMerge(mergeWith(templateSource)),
-      addAppToWorkspaceFile(options, workspace, projectRoot, packageName),
+      addAppToWorkspaceFile(options, workspace, projectRoot, projectName),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
       options.skipTsConfig ? noop() : updateTsConfig(packageName, distRoot),
       schematic('module', {
