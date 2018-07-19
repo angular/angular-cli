@@ -10,7 +10,7 @@ export default function() {
   return Promise.resolve()
     .then(() => silentNpm('install', 'bootstrap@4.0.0-beta.3'))
     .then(() => updateJsonFile('angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects['test-project'].architect;
+      const appArchitect = workspaceJson.projects['test-project'].targets;
       appArchitect.build.options.styles = [
         { input: 'node_modules/bootstrap/dist/css/bootstrap.css' }
       ];

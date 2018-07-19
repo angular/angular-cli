@@ -15,7 +15,7 @@ export default function () {
     `)
     .then(() => ng('test', '--watch=false'))
     .then(() => updateJsonFile('angular.json', configJson => {
-      const appArchitect = configJson.projects['test-project'].architect;
+      const appArchitect = configJson.projects['test-project'].targets;
       appArchitect.test.configurations = {
         production: {
           fileReplacements: [

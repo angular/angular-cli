@@ -29,7 +29,7 @@ export default function () {
   })
     .then(() => appendToFile('src/main.ts', 'import \'./string-script.js\';'))
     .then(() => updateJsonFile('angular.json', configJson => {
-      const appArchitect = configJson.projects['test-project'].architect;
+      const appArchitect = configJson.projects['test-project'].targets;
       appArchitect.build.options.scripts = [
         { input: 'src/string-script.js' },
         { input: 'src/zstring-script.js' },
