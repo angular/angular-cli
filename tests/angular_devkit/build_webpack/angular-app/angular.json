@@ -4,14 +4,14 @@
   "newProjectRoot": "./projects",
   "cli": {},
   "schematics": {},
-  "architect": {},
+  "targets": {},
   "projects": {
     "app": {
       "root": "src",
       "sourceRoot": "src",
       "projectType": "application",
       "schematics": {},
-      "architect": {
+      "targets": {
         "build-webpack": {
           "builder": "../../../../packages/angular_devkit/build_webpack:webpack",
           "options": {
