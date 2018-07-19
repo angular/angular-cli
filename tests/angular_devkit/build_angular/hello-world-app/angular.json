@@ -4,7 +4,7 @@
   "newProjectRoot": "./projects",
   "cli": {},
   "schematics": {},
-  "architect": {},
+  "targets": {},
   "projects": {
     "app": {
       "root": "src",
@@ -12,7 +12,7 @@
       "projectType": "application",
       "prefix": "app",
       "schematics": {},
-      "architect": {
+      "targets": {
         "build": {
           "builder": "../../../../packages/angular_devkit/build_angular:browser",
           "options": {
@@ -138,7 +138,7 @@
     "app-e2e": {
       "root": "e2e",
       "projectType": "application",
-      "architect": {
+      "targets": {
         "e2e": {
           "builder": "../../../../packages/angular_devkit/build_angular:protractor",
           "options": {

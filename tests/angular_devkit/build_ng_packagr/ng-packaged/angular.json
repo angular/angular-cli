@@ -5,7 +5,7 @@
     "lib": {
       "root": "projects/lib",
       "projectType": "library",
-      "architect": {
+      "targets": {
         "build": {
           "builder": "../../../../packages/angular_devkit/build_ng_packagr:build",
           "options": {
