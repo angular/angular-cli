@@ -63,6 +63,7 @@ jobs:
     steps:
       - checkout: *post_checkout
       - restore_cache: *_root_package_lock_key
+      - run: npm install --global npm@6.1
       - run: xvfb-run -a npm run test-cli-e2e -- --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
   build:
