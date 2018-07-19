@@ -78,6 +78,17 @@ describe('App Shell Schematic', () => {
     expect(content).toMatch(/import { RouterModule } from \'@angular\/router\';/);
   });
 
+  it('should not fail when AppModule have imported RouterModule already', () => {
+    const updateRecorder = appTree.beginUpdate('/projects/bar/src/app/app.module.ts');
+    updateRecorder.insertLeft(0, 'import { RouterModule } from \'@angular/router\';');
+    appTree.commitUpdate(updateRecorder);
+
+    const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
+    const filePath = '/projects/bar/src/app/app.module.ts';
+    const content = tree.readContent(filePath);
+    expect(content).toMatch(/import { RouterModule } from \'@angular\/router\';/);
+  });
+
   describe('Add router-outlet', () => {
     function makeInlineTemplate(tree: UnitTestTree, template?: string): void {
       template = template || `

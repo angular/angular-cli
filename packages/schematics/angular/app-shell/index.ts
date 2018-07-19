@@ -25,7 +25,7 @@ import {
   insertImport,
   isImported,
 } from '../utility/ast-utils';
-import { InsertChange } from '../utility/change';
+import { Change, InsertChange } from '../utility/change';
 import { getWorkspace, getWorkspacePath } from '../utility/config';
 import { getAppModulePath } from '../utility/ng-ast-utils';
 import { getProjectTargets } from '../utility/project-targets';
@@ -224,8 +224,10 @@ function addRouterModule(options: AppShellOptions): Rule {
     const moduleSource = getSourceFile(host, modulePath);
     const changes = addImportToModule(moduleSource, modulePath, 'RouterModule', '@angular/router');
     const recorder = host.beginUpdate(modulePath);
-    changes.forEach((change: InsertChange) => {
-      recorder.insertLeft(change.pos, change.toAdd);
+    changes.forEach((change: Change) => {
+      if (change instanceof InsertChange) {
+        recorder.insertLeft(change.pos, change.toAdd);
+      }
     });
     host.commitUpdate(recorder);
 
