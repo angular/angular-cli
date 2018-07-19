@@ -177,12 +177,12 @@ export function useNgVersion(version: string) {
 export function useCIDefaults(projectName = 'test-project') {
   return updateJsonFile('angular.json', workspaceJson => {
     // Disable progress reporting on CI to reduce spam.
-    const appArchitect = workspaceJson.projects[projectName].architect;
-    appArchitect.build.options.progress = false;
-    appArchitect.test.options.progress = false;
+    const appTargets = workspaceJson.projects[projectName].targets;
+    appTargets.build.options.progress = false;
+    appTargets.test.options.progress = false;
     // Disable auto-updating webdriver in e2e.
-    const e2eArchitect = workspaceJson.projects[projectName + '-e2e'].architect;
-    e2eArchitect.e2e.options.webdriverUpdate = false;
+    const e2eTargets = workspaceJson.projects[projectName + '-e2e'].targets;
+    e2eTargets.e2e.options.webdriverUpdate = false;
   })
   .then(() => updateJsonFile('package.json', json => {
     // We want to always use the same version of webdriver but can only do so on CircleCI.

@@ -41,7 +41,7 @@ export default function () {
         `})
         // change files to use preprocessor
         .then(() => updateJsonFile('angular.json', workspaceJson => {
-          const appArchitect = workspaceJson.projects['test-project'].architect;
+          const appArchitect = workspaceJson.projects['test-project'].targets;
           appArchitect.build.options.styles = [
             { input: `src/styles.${ext}` }
           ];
@@ -66,7 +66,7 @@ export default function () {
         // Also check imports work on ng test
         .then(() => !ejected && ng('test', '--watch=false'))
         .then(() => updateJsonFile('angular.json', workspaceJson => {
-          const appArchitect = workspaceJson.projects['test-project'].architect;
+          const appArchitect = workspaceJson.projects['test-project'].targets;
           appArchitect.build.options.styles = [
             { input: `src/styles.css` }
           ];

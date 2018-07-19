@@ -36,7 +36,7 @@ export default function () {
       dependencies['@angular/platform-server'] = platformServerVersion;
     }))
     .then(() => updateJsonFile('angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects['test-project'].architect;
+      const appArchitect = workspaceJson.projects['test-project'].targets;
       appArchitect['server'] = {
         builder: '@angular-devkit/build-angular:server',
         options: {

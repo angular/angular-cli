@@ -20,7 +20,7 @@ export default function () {
       'src/pre-rename-lazy-style.css': '.pre-rename-lazy-style { color: red }'
     }))
     .then(() => updateJsonFile('angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects['test-project'].architect;
+      const appArchitect = workspaceJson.projects['test-project'].targets;
       appArchitect.build.options.styles = [
         { input: 'src/string-style.css' },
         { input: 'src/input-style.css' },
