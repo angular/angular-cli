@@ -154,7 +154,7 @@ export class Architect {
           // Validate and cache all project target maps.
           return forkJoin(
             ...this._workspace.listProjectNames().map(projectName => {
-              const unvalidatedTargetMap = this._workspace.getProjectArchitect(projectName);
+              const unvalidatedTargetMap = this._workspace.getProjectTargets(projectName);
 
               return this._workspace.validateAgainstSchema<TargetMap>(
                 unvalidatedTargetMap, this._targetsSchema).pipe(
