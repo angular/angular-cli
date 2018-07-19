@@ -33,6 +33,10 @@
       "$ref": "#/definitions/tool",
       "default": {}
     },
+    "targets": {
+      "$ref": "#/definitions/tool",
+      "default": {}
+    },    
     "projects": {
       "type": "object",
       "description": "A map of project names to project options.",
@@ -81,6 +85,10 @@
           "default": {}
         },
         "architect": {
+          "$ref": "#/definitions/tool",
+          "default": {}
+        },
+        "targets": {
           "$ref": "#/definitions/tool",
           "default": {}
         }

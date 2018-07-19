@@ -48,7 +48,7 @@ describe('Workspace', () => {
         },
       },
     },
-    architect: {},
+    targets: {},
     projects: {
       app: {
         root: 'projects/app',
@@ -63,7 +63,7 @@ describe('Workspace', () => {
             },
           },
         },
-        architect: {
+        targets: {
           build: {
             builder: '@angular-devkit/build-angular:browser',
             transforms: [
@@ -101,13 +101,11 @@ describe('Workspace', () => {
       },
     },
   };
-  const appProject = {
-    ...workspaceJson.projects['app'],
-    // Tools should not be returned when getting a project.
-    cli: {},
-    schematics: {},
-    architect: {},
-  } as {} as WorkspaceProject;
+  // Tools should not be returned when getting a project.
+  const appProject = { ...workspaceJson.projects['app'] };
+  delete appProject['cli'];
+  delete appProject['schematics'];
+  delete appProject['targets'];
 
   it('loads workspace from json', (done) => {
     const workspace = new Workspace(root, host);
@@ -246,10 +244,20 @@ describe('Workspace', () => {
     ).toPromise().then(done, done.fail);
   });
 
-  it('gets workspace architect', (done) => {
+  it('gets workspace targets', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
-      tap((ws) => expect(ws.getArchitect()).toEqual(workspaceJson.architect as WorkspaceTool)),
+      tap((ws) => expect(ws.getTargets()).toEqual(workspaceJson.targets as WorkspaceTool)),
+    ).toPromise().then(done, done.fail);
+  });
+
+  it('gets workspace architect when targets is not there', (done) => {
+    const workspace = new Workspace(root, host);
+    const workspaceJsonClone = { ...workspaceJson };
+    workspaceJsonClone['architect'] = workspaceJsonClone['targets'];
+    delete workspaceJsonClone['targets'];
+    workspace.loadWorkspaceFromJson(workspaceJsonClone).pipe(
+      tap((ws) => expect(ws.getTargets()).toEqual(workspaceJson.targets as WorkspaceTool)),
     ).toPromise().then(done, done.fail);
   });
 
@@ -269,11 +277,26 @@ describe('Workspace', () => {
     ).toPromise().then(done, done.fail);
   });
 
-  it('gets project architect', (done) => {
+  it('gets project targets', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
-      tap((ws) => expect(ws.getProjectArchitect('app'))
-        .toEqual(workspaceJson.projects.app.architect as WorkspaceTool)),
+      tap((ws) => expect(ws.getProjectTargets('app'))
+        .toEqual(workspaceJson.projects.app.targets as WorkspaceTool)),
+    ).toPromise().then(done, done.fail);
+  });
+
+  it('gets project architect when targets is not there', (done) => {
+    const workspace = new Workspace(root, host);
+    const appJsonClone = { ...workspaceJson.projects.app };
+    appJsonClone['architect'] = appJsonClone['targets'];
+    delete appJsonClone['targets'];
+    const simpleWorkspace = {
+      version: 1,
+      projects: { app: appJsonClone },
+    };
+    workspace.loadWorkspaceFromJson(simpleWorkspace).pipe(
+      tap((ws) => expect(ws.getProjectTargets('app'))
+        .toEqual(workspaceJson.projects.app.targets as WorkspaceTool)),
     ).toPromise().then(done, done.fail);
   });
 
