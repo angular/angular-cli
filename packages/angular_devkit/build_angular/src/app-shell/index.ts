@@ -11,10 +11,12 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
-import { Path, getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core';
+import { Path, getSystemPath, join, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import { Observable, forkJoin, from, merge, of, throwError } from 'rxjs';
 import { concatMap, map, switchMap } from 'rxjs/operators';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
+import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
+import { BrowserBuilderSchema } from '../browser/schema';
 import { BuildWebpackServerSchema } from '../server/schema';
 import { BuildWebpackAppShellSchema } from './schema';
 
@@ -30,7 +32,9 @@ export class AppShellBuilder implements Builder<BuildWebpackAppShellSchema> {
       let success = true;
       const subscription = merge(
         this.build(options.serverTarget, {}),
-        this.build(options.browserTarget, { watch: false }),
+        // Never run the browser target in watch mode.
+        // If service worker is needed, it will be added in this.renderUniversal();
+        this.build(options.browserTarget, { watch: false, serviceWorker: false }),
       ).subscribe((event: BuildEvent) => {
         // TODO: once we support a better build event, add support for merging two event streams
         // together.
@@ -109,10 +113,10 @@ export class AppShellBuilder implements Builder<BuildWebpackAppShellSchema> {
     });
   }
 
-  getBrowserIndexOutputPath(options: BuildWebpackAppShellSchema) {
+  getBrowserBuilderConfig(options: BuildWebpackAppShellSchema) {
     const architect = this.context.architect;
     const [project, target, configuration] = options.browserTarget.split(':');
-    const builderConfig = architect.getBuilderConfiguration<BuildWebpackServerSchema>({
+    const builderConfig = architect.getBuilderConfiguration<BrowserBuilderSchema>({
       project,
       target,
       configuration,
@@ -120,14 +124,19 @@ export class AppShellBuilder implements Builder<BuildWebpackAppShellSchema> {
 
     return architect.getBuilderDescription(builderConfig).pipe(
       concatMap(description => architect.validateBuilderOptions(builderConfig, description)),
-      map(config => join(normalize(config.options.outputPath), 'index.html')),
     );
   }
 
   renderUniversal(options: BuildWebpackAppShellSchema): Observable<BuildEvent> {
+    let browserOptions: BrowserBuilderSchema;
+    let projectRoot: Path;
+
     return forkJoin(
-      this.getBrowserIndexOutputPath(options).pipe(
-        switchMap(browserIndexOutputPath => {
+      this.getBrowserBuilderConfig(options).pipe(
+        switchMap(config => {
+          browserOptions = config.options;
+          projectRoot = resolve(this.context.workspace.root, config.root);
+          const browserIndexOutputPath = join(normalize(browserOptions.outputPath), 'index.html');
           const path = join(this.context.workspace.root, browserIndexOutputPath);
 
           return this.context.host.read(path).pipe(
@@ -151,7 +160,7 @@ export class AppShellBuilder implements Builder<BuildWebpackAppShellSchema> {
           getSystemPath(serverBundlePath),
         ).AppServerModuleNgFactory;
         const indexHtml = virtualFs.fileBufferToString(indexContent);
-        const outputPath = join(root, options.outputIndexPath || browserIndexOutputPath);
+        const outputIndexPath = join(root, options.outputIndexPath || browserIndexOutputPath);
 
         // Render to HTML and overwrite the client index file.
         return from(
@@ -161,8 +170,20 @@ export class AppShellBuilder implements Builder<BuildWebpackAppShellSchema> {
           })
           .then((html: string) => {
             return this.context.host
-              .write(outputPath, virtualFs.stringToFileBuffer(html))
+              .write(outputIndexPath, virtualFs.stringToFileBuffer(html))
               .toPromise();
+          })
+          .then(() => {
+            if (browserOptions.serviceWorker) {
+              return augmentAppWithServiceWorker(
+                this.context.host,
+                root,
+                projectRoot,
+                join(root, browserOptions.outputPath),
+                browserOptions.baseHref || '/',
+                browserOptions.ngswConfigPath,
+              );
+            }
           })
           .then(() => ({ success: true })),
         );
