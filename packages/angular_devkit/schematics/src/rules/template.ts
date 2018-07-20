@@ -8,8 +8,12 @@
 import { BaseException, normalize, template as templateImpl } from '@angular-devkit/core';
 import { FileOperator, Rule } from '../engine/interface';
 import { FileEntry } from '../tree/interface';
-import { chain, forEach } from './base';
+import { chain, composeFileOperators, forEach, when } from './base';
+import { rename } from './rename';
 import { isBinary } from './utils/is-binary';
+
+
+export const TEMPLATE_FILENAME_RE = /\.template$/;
 
 
 export class OptionIsNotDefinedException extends BaseException {
@@ -144,6 +148,17 @@ export function pathTemplate<T extends PathTemplateData>(options: T): Rule {
 }
 
 
+/**
+ * Remove every `.template` suffix from file names.
+ */
+export function renameTemplateFiles(): Rule {
+  return rename(
+    path => !!path.match(TEMPLATE_FILENAME_RE),
+    path => path.replace(TEMPLATE_FILENAME_RE, ''),
+  );
+}
+
+
 export function template<T>(options: T): Rule {
   return chain([
     contentTemplate(options),
@@ -152,4 +167,24 @@ export function template<T>(options: T): Rule {
     // Since values are coerced to strings in PathTemplates it will be fine in the end.
     pathTemplate(options as {} as PathTemplateData),
   ]);
+}
+
+
+export function applyTemplates<T>(options: T): Rule {
+  return forEach(
+    when(
+      path => path.endsWith('.template'),
+      composeFileOperators([
+        applyContentTemplate(options),
+        // See above for this weird cast.
+        applyPathTemplate(options as {} as PathTemplateData),
+        entry => {
+          return {
+            content: entry.content,
+            path: entry.path.replace(TEMPLATE_FILENAME_RE, ''),
+          } as FileEntry;
+        },
+      ]),
+    ),
+  );
 }
