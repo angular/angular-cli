@@ -185,3 +185,20 @@ export function forEach(operator: FileOperator): Rule {
     return tree;
   };
 }
+
+
+export function composeFileOperators(operators: FileOperator[]): FileOperator {
+  return (entry: FileEntry) => {
+    let current: FileEntry | null = entry;
+    for (const op of operators) {
+      current = op(current);
+
+      if (current === null) {
+        // Deleted, just return.
+        return null;
+      }
+    }
+
+    return current;
+  };
+}

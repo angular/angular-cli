@@ -99,6 +99,7 @@ ts_library(
     ),
     deps = [
         ":schematics",
+        ":testing",
         "//packages/angular_devkit/core",
         "@rxjs",
         "@rxjs//operators",
