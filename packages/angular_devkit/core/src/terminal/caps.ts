@@ -75,8 +75,15 @@ export interface StreamCapabilities {
 
 const ciVars = ['TRAVIS', 'CIRCLECI', 'APPVEYOR', 'GITLAB_CI'];
 
+function _getColorLevel(stream: Socket): 0 | 1 | 2 | 3 {
+  if ('FORCE_COLOR' in _env) {
+    if (_env.FORCE_COLOR === '1') {
+      return 3;
+    } else if (_env.FORCE_COLOR === '0') {
+      return 0;
+    }
+  }
 
-function _getColorLevel(stream: Socket): number {
   if (stream && !stream.isTTY) {
     return 0;
   }
