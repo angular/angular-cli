@@ -92,7 +92,7 @@ export const getProdConfig = function (wco: WebpackConfigOptions) {
     }));
   }
 
-  const uglifyCompressOptions: any = { screw_ie8: true, warnings: buildOptions.verbose };
+  const uglifyCompressOptions: any = { screw_ie8: true, warnings: buildOptions.verbose, comparisons: false };
 
   if (buildOptions.buildOptimizer) {
     // This plugin must be before webpack.optimize.UglifyJsPlugin.
