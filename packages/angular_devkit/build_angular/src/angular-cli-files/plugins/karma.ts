@@ -240,6 +240,9 @@ const eventReporter: any = function (this: any, baseReporterDecorator: any) {
       failureCb && failureCb();
     }
   }
+
+  // avoid duplicate failure message
+  this.specFailure = () => {};
 };
 
 eventReporter.$inject = ['baseReporterDecorator'];
@@ -271,6 +274,12 @@ const sourceMapReporter: any = function (this: any, baseReporterDecorator: any, 
       });
     }
   };
+
+  // avoid duplicate complete message
+  this.onRunComplete = () => {};
+
+  // avoid duplicate failure message
+  this.specFailure = () => {};
 };
 
 sourceMapReporter.$inject = ['baseReporterDecorator', 'config'];
