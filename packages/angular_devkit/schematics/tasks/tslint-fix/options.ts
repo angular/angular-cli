@@ -17,16 +17,10 @@ export interface TslintFixTaskOptionsBase {
   ignoreErrors?: boolean;
 
   includes?: string | string[];
+  files?: string | string[];
+
+  tslintPath?: string;
+  tslintConfig?: JsonObject;
 }
 
-export interface TslintFixTaskOptionsPath extends TslintFixTaskOptionsBase {
-  tslintPath: string;
-  tslintConfig?: never;
-}
-
-export interface TslintFixTaskOptionsConfig extends TslintFixTaskOptionsBase {
-  tslintPath?: never;
-  tslintConfig: JsonObject;
-}
-
-export type TslintFixTaskOptions = TslintFixTaskOptionsPath | TslintFixTaskOptionsConfig;
+export type TslintFixTaskOptions = TslintFixTaskOptionsBase;

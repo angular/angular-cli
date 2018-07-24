@@ -31,9 +31,9 @@ function _loadConfiguration(
   if (options.tslintConfig) {
     return Configuration.parseConfigFile(options.tslintConfig, root);
   } else if (options.tslintPath) {
-    const tslintPath = path.join(root, options.tslintPath);
-
-    return Configuration.findConfiguration(tslintPath, file && path.join(root, file)).results;
+    return Configuration.findConfiguration(path.join(root, options.tslintPath)).results;
+  } else if (file) {
+    return Configuration.findConfiguration(null, file).results;
   } else {
     throw new Error('Executor must specify a tslint configuration.');
   }
@@ -103,13 +103,18 @@ export default function(): TaskExecutor<TslintFixTaskOptions> {
           ? options.includes
           : (options.includes ? [options.includes] : [])
       );
+      const files = (
+        Array.isArray(options.files)
+          ? options.files
+          : (options.files ? [options.files] : [])
+      );
 
       const Linter = tslint.Linter as LinterT;
       const Configuration = tslint.Configuration as ConfigurationT;
       let program: ts.Program | undefined = undefined;
-      let filesToLint: string[] = [];
+      let filesToLint: string[] = files;
 
-      if (options.tsConfigPath) {
+      if (options.tsConfigPath && files.length == 0) {
         const tsConfigPath = path.join(process.cwd(), options.tsConfigPath);
 
         if (!fs.existsSync(tsConfigPath)) {
@@ -148,9 +153,16 @@ export default function(): TaskExecutor<TslintFixTaskOptions> {
       };
 
       const linter = new Linter(lintOptions, program);
-      const config = _loadConfiguration(Configuration, options, root);
+      // If directory doesn't change, we
+      let lastDirectory: string | null = null;
+      let config;
 
       for (const file of filesToLint) {
+        const dir = path.dirname(file);
+        if (lastDirectory !== dir) {
+          lastDirectory = dir;
+          config = _loadConfiguration(Configuration, options, root, file);
+        }
         const content = _getFileContent(file, options, program);
 
         if (!content) {

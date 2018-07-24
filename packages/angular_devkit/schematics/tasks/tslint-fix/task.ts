@@ -11,19 +11,34 @@ import { TslintFixName, TslintFixTaskOptions, TslintFixTaskOptionsBase } from '.
 
 
 export class TslintFixTask implements TaskConfigurationGenerator<TslintFixTaskOptions> {
+  protected _configOrPath: null | string | JsonObject;
+  protected _options: TslintFixTaskOptionsBase;
+
   constructor(config: JsonObject, options: TslintFixTaskOptionsBase);
+  constructor(options: TslintFixTaskOptionsBase);
   constructor(path: string, options: TslintFixTaskOptionsBase);
   constructor(
-    protected _configOrPath: string | JsonObject,
-    protected _options: TslintFixTaskOptionsBase,
-  ) {}
+    configOrPath: string | JsonObject | TslintFixTaskOptionsBase,
+    options?: TslintFixTaskOptionsBase,
+  ) {
+    if (options) {
+      this._configOrPath = configOrPath as string | JsonObject;
+      this._options = options;
+    } else {
+      this._options = configOrPath as TslintFixTaskOptionsBase;
+      this._configOrPath = null;
+    }
+  }
 
   toConfiguration(): TaskConfiguration<TslintFixTaskOptions> {
+    const path = typeof this._configOrPath == 'string' ? { tslintPath: this._configOrPath } : {};
+    const config = typeof this._configOrPath == 'object' && this._configOrPath !== null
+                 ? { tslintConfig: this._configOrPath }
+                 : {};
     const options = {
       ...this._options,
-      ...((typeof this._configOrPath == 'string'
-        ? { tslintPath: this._configOrPath }
-        : { tslintConfig: this._configOrPath })),
+      ...path,
+      ...config,
     };
 
     return { name: TslintFixName, options };
