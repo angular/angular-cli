@@ -48,6 +48,7 @@ export interface BuildOptions {
   buildOptimizer?: boolean;
   namedChunks?: boolean;
   subresourceIntegrity?: boolean;
+  jsonpFunction?: string;
   serviceWorker?: boolean;
   skipAppShell?: boolean;
   statsJson: boolean;

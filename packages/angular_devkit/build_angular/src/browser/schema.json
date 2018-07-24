@@ -194,6 +194,10 @@
       "description": "Enables the use of subresource integrity validation.",
       "default": false
     },
+    "jsonpFunction": {
+      "type": "string",
+      "description": "The name of JSONP function for loading on-demand chunks."
+    },
     "serviceWorker": {
       "type": "boolean",
       "description": "Generates a service worker config for production builds.",
