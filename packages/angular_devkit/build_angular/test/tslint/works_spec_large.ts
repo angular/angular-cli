@@ -25,6 +25,22 @@ describe('Tslint Target', () => {
     ).toPromise().then(done, done.fail);
   }, 30000);
 
+  it('should report lint error once', (done) => {
+    host.writeMultipleFiles({'src/app/app.component.ts': 'const foo = "";\n' });
+    const logger = new TestLogger('lint-error');
+
+    runTargetSpec(host, tslintTargetSpec, undefined, DefaultTimeout, logger).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(false)),
+      tap(() => {
+        // this is to make sure there are no duplicates
+        expect(logger.includes(`" should be \'\nERROR`)).toBe(false);
+
+        expect(logger.includes(`" should be '`)).toBe(true);
+        expect(logger.includes(`Lint errors found in the listed files`)).toBe(true);
+      }),
+    ).toPromise().then(done, done.fail);
+  }, 30000);
+
   it('supports exclude', (done) => {
     host.writeMultipleFiles(filesWithErrors);
     const overrides: Partial<TslintBuilderOptions> = { exclude: ['**/foo.ts'] };

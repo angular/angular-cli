@@ -23,7 +23,6 @@ import * as tslint from 'tslint'; // tslint:disable-line:no-implicit-dependencie
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import { stripBom } from '../angular-cli-files/utilities/strip-bom';
 
-
 export interface TslintBuilderOptions {
   tslintConfig?: string;
   tsConfig?: string | string[];
@@ -45,7 +44,7 @@ export default class TslintBuilder implements Builder<TslintBuilderOptions> {
     try {
       tslint = await import('tslint'); // tslint:disable-line:no-implicit-dependencies
     } catch {
-      throw new Error('Unable to find TSLint.  Ensure TSLint is installed.');
+      throw new Error('Unable to find TSLint. Ensure TSLint is installed.');
     }
 
     const version = tslint.Linter.VERSION && tslint.Linter.VERSION.split('.');
@@ -72,7 +71,7 @@ export default class TslintBuilder implements Builder<TslintBuilderOptions> {
         : null;
       const Linter = projectTslint.Linter;
 
-      let result;
+      let result: undefined | tslint.LintResult;
       if (options.tsConfig) {
         const tsConfigs = Array.isArray(options.tsConfig) ? options.tsConfig : [options.tsConfig];
 
@@ -82,9 +81,15 @@ export default class TslintBuilder implements Builder<TslintBuilderOptions> {
           if (result == undefined) {
             result = partial;
           } else {
+            result.failures = result.failures
+              .filter(curr => !partial.failures.some(prev => curr.equals(prev)))
+              .concat(partial.failures);
+
+            // we are not doing much with 'errorCount' and 'warningCount'
+            // apart from checking if they are greater than 0 thus no need to dedupe these.
             result.errorCount += partial.errorCount;
             result.warningCount += partial.warningCount;
-            result.failures = result.failures.concat(partial.failures);
+
             if (partial.fixes) {
               result.fixes = result.fixes ? result.fixes.concat(partial.fixes) : partial.fixes;
             }
