@@ -11,6 +11,7 @@ import {
   SchematicsException,
   Tree,
   apply,
+  chain,
   filter,
   mergeWith,
   move,
@@ -19,6 +20,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { getWorkspace } from '../utility/config';
+import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { buildDefaultPath } from '../utility/project';
 import { Schema as ServiceOptions } from './schema';
@@ -49,6 +51,9 @@ export default function (options: ServiceOptions): Rule {
       move(parsedPath.path),
     ]);
 
-    return mergeWith(templateSource);
+    return chain([
+      mergeWith(templateSource),
+      options.lintFix ? applyLintFix(options.path) : noop(),
+    ]);
   };
 }

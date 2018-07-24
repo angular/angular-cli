@@ -71,4 +71,8 @@ export interface Schema {
    * Specifies if the component is an entry component of declaring module.
    */
     entryComponent?: boolean;
+    /**
+     * Specifies whether to apply lint fixes after generating the component.
+     */
+    lintFix?: boolean;
 }

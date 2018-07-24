@@ -25,6 +25,7 @@ import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils'
 import { InsertChange } from '../utility/change';
 import { getWorkspace } from '../utility/config';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
+import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { buildDefaultPath } from '../utility/project';
 import { Schema as PipeOptions } from './schema';
@@ -117,6 +118,7 @@ export default function (options: PipeOptions): Rule {
       chain([
         addDeclarationToNgModule(options),
         mergeWith(templateSource),
+        options.lintFix ? applyLintFix(options.path) : noop(),
       ]),
     );
   };

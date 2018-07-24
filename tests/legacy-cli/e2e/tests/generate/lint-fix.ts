@@ -14,9 +14,6 @@ export default function () {
     }
   }`;
 
-  // TODO(architect): reenable after figuring out what happens to --lint-fix.
-  return;
-
   return Promise.resolve()
 
     // setup a double-quote tslint config
@@ -32,10 +29,13 @@ export default function () {
     .then(() => ng('lint'))
 
     // Enable default option and generate all other module related blueprints
-    .then(() => ng('config', 'defaults.lintFix', 'true'))
+    .then(() => ng('config', 'schematics.@schematics/angular.directive.lintFix', 'true'))
+    .then(() => ng('config', 'schematics.@schematics/angular.service.lintFix', 'true'))
+    .then(() => ng('config', 'schematics.@schematics/angular.pipe.lintFix', 'true'))
+    .then(() => ng('config', 'schematics.@schematics/angular.guard.lintFix', 'true'))
     .then(() => ng('generate', 'directive', 'test-directive'))
     .then(() => ng('generate', 'service', 'test-service'))
     .then(() => ng('generate', 'pipe', 'test-pipe'))
-    .then(() => ng('generate', 'guard', 'test-guard', '--module', 'app.module.ts'))
+    .then(() => ng('generate', 'guard', 'test-guard'))
     .then(() => ng('lint'));
 }

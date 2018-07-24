@@ -24,6 +24,11 @@
       "$default": {
         "$source": "projectName"
       }
+    },
+    "lintFix": {
+      "type": "boolean",
+      "default": false,
+      "description": "Specifies whether to apply lint fixes after generating the enum."
     }
   },
   "required": [],

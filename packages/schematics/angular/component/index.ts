@@ -29,6 +29,7 @@ import {
 import { InsertChange } from '../utility/change';
 import { getWorkspace } from '../utility/config';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
+import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { buildDefaultPath } from '../utility/project';
 import { validateHtmlSelector, validateName } from '../utility/validation';
@@ -164,6 +165,7 @@ export default function(options: ComponentOptions): Rule {
         addDeclarationToNgModule(options),
         mergeWith(templateSource),
       ])),
+      options.lintFix ? applyLintFix(options.path) : noop(),
     ]);
   };
 }
