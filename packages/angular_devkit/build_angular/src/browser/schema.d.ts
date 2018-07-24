@@ -182,6 +182,12 @@ export interface BrowserBuilderSchema {
   subresourceIntegrity: boolean;
 
   /**
+   * Enables the ability to run multiple instances of webpack runtimes on the same page for loading
+   * on-demand chunks from different builds on the same page.
+   */
+  jsonpFunction?: string;
+
+  /**
    * Generates a service worker config for production builds.
    */
   serviceWorker: boolean;

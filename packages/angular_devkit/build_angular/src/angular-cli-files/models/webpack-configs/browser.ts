@@ -71,7 +71,8 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
       ],
     },
     output: {
-      crossOriginLoading: buildOptions.subresourceIntegrity ? 'anonymous' : false,
+      jsonpFunction: buildOptions.jsonpFunction ? buildOptions.jsonpFunction : undefined,
+      crossOriginLoading: buildOptions.subresourceIntegrity ? 'anonymous' : false
     },
     optimization: {
       runtimeChunk: 'single',
