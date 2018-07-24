@@ -5,15 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-// tslint:disable:no-global-tslint-disable no-any
 import {
   Architect,
   BuildEvent,
   BuilderDescription,
   TargetSpecifier,
 } from '@angular-devkit/architect';
-import { JsonObject, experimental, schema, strings } from '@angular-devkit/core';
+import { JsonObject, UnknownException, experimental, schema, strings } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import { of } from 'rxjs';
 import { from } from 'rxjs';
@@ -98,11 +96,24 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
     return true;
   }
 
-  protected mapArchitectOptions(schema: any) {
+  protected mapArchitectOptions(schema: JsonObject) {
     const properties = schema.properties;
+    if (typeof properties != 'object' || properties === null || Array.isArray(properties)) {
+      throw new UnknownException('Invalid schema.');
+    }
     const keys = Object.keys(properties);
     keys
-      .map(key => ({ ...properties[key], ...{ name: strings.dasherize(key) } }))
+      .map(key => {
+        const value = properties[key];
+        if (typeof value != 'object') {
+          throw new UnknownException('Invalid schema.');
+        }
+
+        return {
+          ...value,
+          name: strings.dasherize(key),
+        } as any; // tslint:disable-line:no-any
+      })
       .map(opt => {
         let type;
         const schematicType = opt.type;
