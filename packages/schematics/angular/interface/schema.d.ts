@@ -27,4 +27,8 @@ export interface Schema {
      * Specifies the type of interface.
      */
     type?: string;
+    /**
+     * Specifies whether to apply lint fixes after generating the component.
+     */
+    lintFix?: boolean;
 }

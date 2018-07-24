@@ -34,6 +34,11 @@
       "type": "boolean",
       "default": true,
       "description": "Specifies if a spec file is generated."
+    },
+    "lintFix": {
+      "type": "boolean",
+      "default": false,
+      "description": "Specifies whether to apply lint fixes after generating the pipe."
     }
   },
   "required": [],

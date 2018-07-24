@@ -39,4 +39,8 @@ export interface Schema {
      * Specifies if declaring module exports the pipe.
      */
     export?: boolean;
+    /**
+     * Specifies whether to apply lint fixes after generating the component.
+     */
+    lintFix?: boolean;
 }

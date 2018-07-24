@@ -15,10 +15,12 @@ import {
   chain,
   mergeWith,
   move,
+  noop,
   template,
   url,
 } from '@angular-devkit/schematics';
 import { getWorkspace } from '../utility/config';
+import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { buildDefaultPath } from '../utility/project';
 import { Schema as InterfaceOptions } from './schema';
@@ -55,6 +57,7 @@ export default function (options: InterfaceOptions): Rule {
       branchAndMerge(chain([
         mergeWith(templateSource),
       ])),
+      options.lintFix ? applyLintFix(options.path) : noop(),
     ]);
   };
 }

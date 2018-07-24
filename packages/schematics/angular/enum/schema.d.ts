@@ -19,4 +19,8 @@ export interface Schema {
      * The name of the project.
      */
     project?: string;
+    /**
+     * Specifies whether to apply lint fixes after generating the component.
+     */
+    lintFix?: boolean;
 }

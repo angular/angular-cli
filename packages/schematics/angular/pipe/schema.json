@@ -50,6 +50,11 @@
       "type": "boolean",
       "default": false,
       "description": "Specifies if declaring module exports the pipe."
+    },
+    "lintFix": {
+      "type": "boolean",
+      "default": false,
+      "description": "Specifies whether to apply lint fixes after generating the pipe."
     }
   },
   "required": [],

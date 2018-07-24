@@ -47,4 +47,8 @@ export interface Schema {
      * Specifies if declaring module exports the directive.
      */
     export?: boolean;
+    /**
+     * Specifies whether to apply lint fixes after generating the component.
+     */
+    lintFix?: boolean;
 }
