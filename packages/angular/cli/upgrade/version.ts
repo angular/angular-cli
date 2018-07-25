@@ -151,6 +151,8 @@ export class Version {
       { compiler: '>=5.1.0-beta.0 <5.2.0', typescript: '>=2.4.2 <2.6.0' },
       { compiler: '>=5.2.0-beta.0 <6.0.0', typescript: '>=2.4.2 <2.7.0' },
       { compiler: '>=6.0.0-beta.0 <7.0.0', typescript: '>=2.7.0 <2.8.0' },
+      { compiler: '>=6.1.0-beta.0 <6.1.0-rc.0', typescript: '>=2.7.2 <2.9.0' },
+      { compiler: '>=6.1.0-rc.0 <7.0.0', typescript: '>=2.7.2 <2.10.0' },
     ];
 
     const currentCombo = versionCombos.find((combo) => satisfies(compilerVersion, combo.compiler));
