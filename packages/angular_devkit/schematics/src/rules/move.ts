@@ -7,6 +7,7 @@
  */
 import { normalize } from '@angular-devkit/core';
 import { Rule } from '../engine/interface';
+import { noop } from './base';
 
 
 export function move(from: string, to?: string): Rule {
@@ -17,6 +18,10 @@ export function move(from: string, to?: string): Rule {
 
   const fromPath = normalize('/' + from);
   const toPath = normalize('/' + to);
+
+  if (fromPath === toPath) {
+    return noop;
+  }
 
   return tree => tree.visit(path => {
     if (path.startsWith(fromPath)) {
