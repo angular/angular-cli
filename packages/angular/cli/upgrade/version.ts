@@ -182,7 +182,7 @@ export class Version {
 
         Please run the following command to install a compatible version of TypeScript.
 
-            npm install typescript@'${currentCombo.typescript}'
+            npm install typescript@"${currentCombo.typescript}"
 
         To disable this warning run "ng config cli.warnings.typescriptMismatch false".
       ` + '\n')));
