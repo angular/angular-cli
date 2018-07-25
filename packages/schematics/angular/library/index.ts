@@ -138,7 +138,7 @@ function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSche
     sourceRoot: `${projectRoot}/src`,
     projectType: 'library',
     prefix: options.prefix || 'lib',
-    architect: {
+    targets: {
       build: {
         builder: '@angular-devkit/build-ng-packagr:build',
         options: {
