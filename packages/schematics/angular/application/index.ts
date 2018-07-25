@@ -136,7 +136,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
     projectType: 'application',
     prefix: options.prefix || 'app',
     schematics,
-    architect: {
+    targets: {
       build: {
         builder: '@angular-devkit/build-angular:browser',
         options: {

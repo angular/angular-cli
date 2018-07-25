@@ -119,9 +119,9 @@ function migrateConfiguration(oldConfig: CliConfig, logger: logging.LoggerApi): 
     if (schematicsConfig !== null) {
       config.schematics = schematicsConfig;
     }
-    const architectConfig = extractArchitectConfig(oldConfig);
-    if (architectConfig !== null) {
-      config.architect = architectConfig;
+    const targetsConfig = extractTargetsConfig(oldConfig);
+    if (targetsConfig !== null) {
+      config.targets = targetsConfig;
     }
 
     context.logger.info(`Removing old config file (${oldConfigPath})`);
@@ -213,7 +213,7 @@ function extractSchematicsConfig(config: CliConfig): JsonObject | null {
   return schematicConfigs;
 }
 
-function extractArchitectConfig(_config: CliConfig): JsonObject | null {
+function extractTargetsConfig(_config: CliConfig): JsonObject | null {
   return null;
 }
 
@@ -365,11 +365,11 @@ function extractProjectsConfig(
         if (!environments) {
           return {};
         }
-        if (!architect) {
+        if (!targets) {
           throw new Error();
         }
 
-        const configurations = (architect.build as JsonObject).configurations as JsonObject;
+        const configurations = (targets.build as JsonObject).configurations as JsonObject;
 
         return Object.keys(configurations).reduce((acc, environment) => {
           acc[environment] = { browserTarget: `${name}:build:${environment}` };
@@ -401,8 +401,8 @@ function extractProjectsConfig(
         projectType: 'application',
       };
 
-      const architect: JsonObject = {};
-      project.architect = architect;
+      const targets: JsonObject = {};
+      project.targets = targets;
 
         // Browser target
       const buildOptions: JsonObject = {
@@ -432,7 +432,7 @@ function extractProjectsConfig(
       buildOptions.assets = (app.assets || []).map(_mapAssets).filter(x => !!x);
       buildOptions.styles = (app.styles || []).map(_extraEntryMapper);
       buildOptions.scripts = (app.scripts || []).map(_extraEntryMapper);
-      architect.build = {
+      targets.build = {
         builder: `${builderPackage}:browser`,
         options: buildOptions,
         configurations: _buildConfigurations(),
@@ -443,7 +443,7 @@ function extractProjectsConfig(
         browserTarget: `${name}:build`,
         ...serveDefaults,
       };
-      architect.serve = {
+      targets.serve = {
         builder: `${builderPackage}:dev-server`,
         options: serveOptions,
         configurations: _serveConfigurations(),
@@ -451,7 +451,7 @@ function extractProjectsConfig(
 
       // Extract target
       const extractI18nOptions: JsonObject = { browserTarget: `${name}:build` };
-      architect['extract-i18n'] = {
+      targets['extract-i18n'] = {
         builder: `${builderPackage}:extract-i18n`,
         options: extractI18nOptions,
       };
@@ -478,7 +478,7 @@ function extractProjectsConfig(
       testOptions.assets = (app.assets || []).map(_mapAssets).filter(x => !!x);
 
       if (karmaConfig) {
-        architect.test = {
+        targets.test = {
           builder: `${builderPackage}:karma`,
           options: testOptions,
         };
@@ -524,7 +524,7 @@ function extractProjectsConfig(
         tsConfig: removeDupes(tsConfigs).filter(t => t.indexOf('e2e') === -1),
         exclude: removeDupes(excludes),
       };
-      architect.lint = {
+      targets.lint = {
           builder: `${builderPackage}:tslint`,
           options: lintOptions,
         };
@@ -543,7 +543,7 @@ function extractProjectsConfig(
           builder: '@angular-devkit/build-angular:server',
           options: serverOptions,
         };
-        architect.server = serverTarget;
+        targets.server = serverTarget;
       }
       const e2eProject: JsonObject = {
         root: join(projectRoot, 'e2e'),
@@ -551,7 +551,7 @@ function extractProjectsConfig(
         projectType: 'application',
       };
 
-      const e2eArchitect: JsonObject = {};
+      const e2eTargets: JsonObject = {};
 
       // tslint:disable-next-line:max-line-length
       const protractorConfig = config && config.e2e && config.e2e.protractor && config.e2e.protractor.config
@@ -566,7 +566,7 @@ function extractProjectsConfig(
         options: e2eOptions,
       };
 
-      e2eArchitect.e2e = e2eTarget;
+      e2eTargets.e2e = e2eTarget;
       const e2eLintOptions: JsonObject = {
         tsConfig: removeDupes(tsConfigs).filter(t => t.indexOf('e2e') !== -1),
         exclude: removeDupes(excludes),
@@ -575,9 +575,9 @@ function extractProjectsConfig(
         builder: `${builderPackage}:tslint`,
         options: e2eLintOptions,
       };
-      e2eArchitect.lint = e2eLintTarget;
+      e2eTargets.lint = e2eLintTarget;
       if (protractorConfig) {
-        e2eProject.architect = e2eArchitect;
+        e2eProject.targets = e2eTargets;
       }
 
       return { name, project, e2eProject };

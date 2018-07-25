@@ -208,13 +208,13 @@ describe('Application Schematic', () => {
       const config = JSON.parse(tree.readContent('/angular.json'));
       const prj = config.projects.foo;
       expect(prj.root).toEqual('');
-      const buildOpt = prj.architect.build.options;
+      const buildOpt = prj.targets.build.options;
       expect(buildOpt.index).toEqual('src/index.html');
       expect(buildOpt.main).toEqual('src/main.ts');
       expect(buildOpt.polyfills).toEqual('src/polyfills.ts');
       expect(buildOpt.tsConfig).toEqual('src/tsconfig.app.json');
 
-      const testOpt = prj.architect.test.options;
+      const testOpt = prj.targets.test.options;
       expect(testOpt.main).toEqual('src/test.ts');
       expect(testOpt.tsConfig).toEqual('src/tsconfig.spec.json');
       expect(testOpt.karmaConfig).toEqual('src/karma.conf.js');
