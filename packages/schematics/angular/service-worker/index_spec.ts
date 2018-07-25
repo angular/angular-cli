@@ -50,7 +50,7 @@ describe('Service Worker Schematic', () => {
     const tree = schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
     const configText = tree.readContent('/angular.json');
     const config = JSON.parse(configText);
-    const swFlag = config.projects.bar.architect.build.configurations.production.serviceWorker;
+    const swFlag = config.projects.bar.targets.build.configurations.production.serviceWorker;
     expect(swFlag).toEqual(true);
   });
 
@@ -59,7 +59,7 @@ describe('Service Worker Schematic', () => {
     const tree = schematicRunner.runSchematic('service-worker', options, appTree);
     const configText = tree.readContent('/angular.json');
     const config = JSON.parse(configText);
-    const swFlag = config.projects.bar.architect.build.options.serviceWorker;
+    const swFlag = config.projects.bar.targets.build.options.serviceWorker;
     expect(swFlag).toEqual(true);
   });
 

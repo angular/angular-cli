@@ -65,7 +65,7 @@ describe('App Shell Schematic', () => {
     const filePath = '/angular.json';
     const content = tree.readContent(filePath);
     const workspace = JSON.parse(content);
-    const target = workspace.projects.bar.architect['app-shell'];
+    const target = workspace.projects.bar.targets['app-shell'];
     expect(target.options.browserTarget).toEqual('bar:build');
     expect(target.options.serverTarget).toEqual('bar:server');
     expect(target.options.route).toEqual('shell');

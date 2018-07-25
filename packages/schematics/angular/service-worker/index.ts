@@ -28,6 +28,7 @@ import {
 } from '../utility/config';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
 import { getAppModulePath } from '../utility/ng-ast-utils';
+import { getProjectTargets } from '../utility/project-targets';
 import { Schema as ServiceWorkerOptions } from './schema';
 
 function updateConfigFile(options: ServiceWorkerOptions): Rule {
@@ -43,20 +44,18 @@ function updateConfigFile(options: ServiceWorkerOptions): Rule {
       throw new Error(`Project is not defined in this workspace.`);
     }
 
-    if (!project.architect) {
-      throw new Error(`Architect is not defined for this project.`);
-    }
+    const projectTargets = getProjectTargets(project);
 
-    if (!project.architect[options.target]) {
+    if (!projectTargets[options.target]) {
       throw new Error(`Target is not defined for this project.`);
     }
 
-    let applyTo = project.architect[options.target].options;
+    let applyTo = projectTargets[options.target].options;
 
     if (options.configuration &&
-        project.architect[options.target].configurations &&
-        project.architect[options.target].configurations[options.configuration]) {
-      applyTo = project.architect[options.target].configurations[options.configuration];
+        projectTargets[options.target].configurations &&
+        projectTargets[options.target].configurations[options.configuration]) {
+      applyTo = projectTargets[options.target].configurations[options.configuration];
     }
 
     applyTo.serviceWorker = true;
@@ -92,10 +91,8 @@ function updateAppModule(options: ServiceWorkerOptions): Rule {
     // find app module
     const workspace = getWorkspace(host);
     const project = workspace.projects[options.project as string];
-    if (!project.architect) {
-      throw new Error('Project architect not found.');
-    }
-    const mainPath = project.architect.build.options.main;
+    const projectTargets = getProjectTargets(project);
+    const mainPath = projectTargets.build.options.main;
     const modulePath = getAppModulePath(host, mainPath);
     context.logger.debug(`module path: ${modulePath}`);
 

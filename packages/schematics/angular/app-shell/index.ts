@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, dirname, join, normalize } from '@angular-devkit/core';
+import { JsonObject, dirname, experimental, join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -15,10 +15,6 @@ import {
   schematic,
 } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
-import {
-  WorkspaceProject,
-  WorkspaceTool,
-} from '../../../angular_devkit/core/src/workspace/workspace-schema';
 import { Schema as ComponentOptions } from '../component/schema';
 import {
   addImportToModule,
@@ -32,6 +28,7 @@ import {
 import { InsertChange } from '../utility/change';
 import { getWorkspace, getWorkspacePath } from '../utility/config';
 import { getAppModulePath } from '../utility/ng-ast-utils';
+import { getProjectTargets } from '../utility/project-targets';
 import { Schema as AppShellOptions } from './schema';
 
 
@@ -54,7 +51,9 @@ function getSourceFile(host: Tree, path: string): ts.SourceFile {
 }
 
 function getServerModulePath(
-  host: Tree, project: WorkspaceProject, architect: WorkspaceTool,
+  host: Tree,
+  project: experimental.workspace.WorkspaceProject,
+  architect: experimental.workspace.WorkspaceTool,
 ): string | null {
   const mainPath = architect.server.options.main;
   const mainSource = getSourceFile(host, mainPath);
@@ -102,11 +101,12 @@ function getComponentTemplate(host: Tree, compPath: string, tmplInfo: TemplateIn
   return template;
 }
 
-function getBootstrapComponentPath(host: Tree, project: WorkspaceProject): string {
-  if (!project.architect) {
-    throw new Error('Project architect not found.');
-  }
-  const mainPath = project.architect.build.options.main;
+function getBootstrapComponentPath(
+  host: Tree,
+  project: experimental.workspace.WorkspaceProject,
+): string {
+  const projectTargets = getProjectTargets(project);
+  const mainPath = projectTargets.build.options.main;
   const modulePath = getAppModulePath(host, mainPath);
   const moduleSource = getSourceFile(host, modulePath);
 
@@ -202,10 +202,8 @@ function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
       throw new SchematicsException(`Client app ${options.clientProject} not found.`);
     }
     const clientProject = workspace.projects[options.clientProject];
-    if (!clientProject.architect) {
-      throw new Error('Client project architect not found.');
-    }
-    clientProject.architect['app-shell'] = appShellTarget;
+    const projectTargets = getProjectTargets(clientProject);
+    projectTargets['app-shell'] = appShellTarget;
 
     host.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
 
@@ -317,7 +315,9 @@ function addShellComponent(options: AppShellOptions): Rule {
   return schematic('component', componentOptions);
 }
 
-function getClientProject(host: Tree, options: AppShellOptions): WorkspaceProject {
+function getClientProject(
+  host: Tree, options: AppShellOptions,
+): experimental.workspace.WorkspaceProject {
   const workspace = getWorkspace(host);
   const clientProject = workspace.projects[options.clientProject];
   if (!clientProject) {
@@ -327,14 +327,13 @@ function getClientProject(host: Tree, options: AppShellOptions): WorkspaceProjec
   return clientProject;
 }
 
-function getClientArchitect(host: Tree, options: AppShellOptions): WorkspaceTool {
-  const clientArchitect = getClientProject(host, options).architect;
+function getClientArchitect(
+  host: Tree, options: AppShellOptions,
+): experimental.workspace.WorkspaceTool {
+  const clientProject = getClientProject(host, options);
+  const projectTargets = getProjectTargets(clientProject);
 
-  if (!clientArchitect) {
-    throw new Error('Client project architect not found.');
-  }
-
-  return clientArchitect;
+  return projectTargets;
 }
 
 export default function (options: AppShellOptions): Rule {

@@ -36,6 +36,7 @@ import { InsertChange } from '../utility/change';
 import { getWorkspace } from '../utility/config';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
 import { findBootstrapModuleCall, findBootstrapModulePath } from '../utility/ng-ast-utils';
+import { getProjectTargets } from '../utility/project-targets';
 import { Schema as UniversalOptions } from './schema';
 
 
@@ -57,17 +58,14 @@ function getClientProject(
   return clientProject;
 }
 
-function getClientArchitect(
+function getClientTargets(
   host: Tree,
   options: UniversalOptions,
 ): experimental.workspace.WorkspaceTool {
-  const clientArchitect = getClientProject(host, options).architect;
+  const clientProject = getClientProject(host, options);
+  const projectTargets = getProjectTargets(clientProject);
 
-  if (!clientArchitect) {
-    throw new Error('Client project architect not found.');
-  }
-
-  return clientArchitect;
+  return projectTargets;
 }
 
 function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): Rule {
@@ -78,9 +76,7 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
     }
 
     const clientProject = workspace.projects[options.clientProject];
-    if (!clientProject.architect) {
-      throw new Error('Client project architect not found.');
-    }
+    const projectTargets = getProjectTargets(clientProject);
 
     const builderOptions: JsonObject = {
       outputPath: `dist/${options.clientProject}-server`,
@@ -91,7 +87,7 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
       builder: '@angular-devkit/build-angular:server',
       options: builderOptions,
     };
-    clientProject.architect.server = serverTarget;
+    projectTargets.server = serverTarget;
 
     const workspacePath = getWorkspacePath(host);
 
@@ -122,8 +118,8 @@ function findBrowserModuleImport(host: Tree, modulePath: string): ts.Node {
 
 function wrapBootstrapCall(options: UniversalOptions): Rule {
   return (host: Tree) => {
-    const clientArchitect = getClientArchitect(host, options);
-    const mainPath = normalize('/' + clientArchitect.build.options.main);
+    const clientTargets = getClientTargets(host, options);
+    const mainPath = normalize('/' + clientTargets.build.options.main);
     let bootstrapCall: ts.Node | null = findBootstrapModuleCall(host, mainPath);
     if (bootstrapCall === null) {
       throw new SchematicsException('Bootstrap module not found.');
@@ -151,8 +147,8 @@ function wrapBootstrapCall(options: UniversalOptions): Rule {
 function addServerTransition(options: UniversalOptions): Rule {
   return (host: Tree) => {
     const clientProject = getClientProject(host, options);
-    const clientArchitect = getClientArchitect(host, options);
-    const mainPath = normalize('/' + clientArchitect.build.options.main);
+    const clientTargets = getClientTargets(host, options);
+    const mainPath = normalize('/' + clientTargets.build.options.main);
 
     const bootstrapModuleRelativePath = findBootstrapModulePath(host, mainPath);
     const bootstrapModulePath = normalize(
@@ -187,8 +183,8 @@ function addDependencies(): Rule {
   };
 }
 
-function getTsConfigOutDir(host: Tree, architect: experimental.workspace.WorkspaceTool): string {
-  const tsConfigPath = architect.build.options.tsConfig;
+function getTsConfigOutDir(host: Tree, targets: experimental.workspace.WorkspaceTool): string {
+  const tsConfigPath = targets.build.options.tsConfig;
   const tsConfigBuffer = host.read(tsConfigPath);
   if (!tsConfigBuffer) {
     throw new SchematicsException(`Could not read ${tsConfigPath}`);
@@ -211,9 +207,9 @@ export default function (options: UniversalOptions): Rule {
     if (clientProject.projectType !== 'application') {
       throw new SchematicsException(`Universal requires a project type of "application".`);
     }
-    const clientArchitect = getClientArchitect(host, options);
-    const outDir = getTsConfigOutDir(host, clientArchitect);
-    const tsConfigExtends = basename(clientArchitect.build.options.tsConfig);
+    const clientTargets = getClientTargets(host, options);
+    const outDir = getTsConfigOutDir(host, clientTargets);
+    const tsConfigExtends = basename(clientTargets.build.options.tsConfig);
     const rootInSrc = clientProject.root === '';
     const tsConfigDirectory = join(normalize(clientProject.root), rootInSrc ? 'src' : '');
 
