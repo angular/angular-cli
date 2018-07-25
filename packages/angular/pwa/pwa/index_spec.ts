@@ -51,7 +51,7 @@ describe('PWA Schematic', () => {
     const tree = schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
     const configText = tree.readContent('/angular.json');
     const config = JSON.parse(configText);
-    const swFlag = config.projects.bar.architect.build.configurations.production.serviceWorker;
+    const swFlag = config.projects.bar.targets.build.configurations.production.serviceWorker;
     expect(swFlag).toEqual(true);
   });
 
@@ -101,9 +101,9 @@ describe('PWA Schematic', () => {
     const tree = schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
     const configText = tree.readContent('/angular.json');
     const config = JSON.parse(configText);
-    const architect = config.projects.bar.architect;
+    const targets = config.projects.bar.targets;
     ['build', 'test'].forEach((target) => {
-      expect(architect[target].options.assets).toContain('projects/bar/src/manifest.json');
+      expect(targets[target].options.assets).toContain('projects/bar/src/manifest.json');
     });
   });
 });

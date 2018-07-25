@@ -55,9 +55,9 @@ function updateIndexFile(options: PwaOptions): Rule {
     const workspace = getWorkspace(host);
     const project = workspace.projects[options.project as string];
     let path: string;
-    if (project && project.architect && project.architect.build &&
-        project.architect.build.options.index) {
-      path = project.architect.build.options.index;
+    const projectTargets = project.targets || project.architect;
+    if (project && projectTargets && projectTargets.build && projectTargets.build.options.index) {
+      path = projectTargets.build.options.index;
     } else {
       throw new SchematicsException('Could not find index file for the project');
     }
@@ -115,15 +115,14 @@ function addManifestToAssetsConfig(options: PwaOptions) {
 
     const assetEntry = join(normalize(project.root), 'src', 'manifest.json');
 
-    if (!project.architect) {
-      throw new Error(`Architect is not defined for this project.`);
+    const projectTargets = project.targets || project.architect;
+    if (!projectTargets) {
+      throw new Error(`Targets are not defined for this project.`);
     }
-
-    const architect = project.architect;
 
     ['build', 'test'].forEach((target) => {
 
-      const applyTo = architect[target].options;
+      const applyTo = projectTargets[target].options;
       const assets = applyTo.assets || (applyTo.assets = []);
 
       assets.push(assetEntry);
