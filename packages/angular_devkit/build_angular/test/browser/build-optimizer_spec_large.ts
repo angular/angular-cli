@@ -30,6 +30,12 @@ describe('Browser Builder build optimizer', () => {
     ).toPromise().then(done, done.fail);
   });
 
+  it('fails if AOT is disabled', (done) => {
+    const overrides = { aot: false, buildOptimizer: true };
+    runTargetSpec(host, browserTargetSpec, overrides)
+      .toPromise().then(() => done.fail(), () => done());
+  });
+
   it('reduces bundle size', (done) => {
     const noBoOverrides = { aot: true, optimization: true, vendorChunk: false };
     const boOverrides = { ...noBoOverrides, buildOptimizer: true };
