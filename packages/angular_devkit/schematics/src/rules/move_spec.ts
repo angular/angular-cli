@@ -48,4 +48,20 @@ describe('move', () => {
       })
       .then(done, done.fail);
   });
+
+  it('becomes a noop with identical from and to', done => {
+    const tree = new HostTree();
+    tree.create('a/b/file1', 'hello world');
+    tree.create('a/b/file2', 'hello world');
+    tree.create('a/c/file3', 'hello world');
+
+    callRule(move(''), observableOf(tree), context)
+      .toPromise()
+      .then(result => {
+        expect(result.exists('a/b/file1')).toBe(true);
+        expect(result.exists('a/b/file2')).toBe(true);
+        expect(result.exists('a/c/file3')).toBe(true);
+      })
+      .then(done, done.fail);
+  });
 });
