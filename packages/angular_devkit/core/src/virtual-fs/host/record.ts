@@ -271,11 +271,15 @@ export class CordHost extends SimpleMemoryHost {
     ).pipe(
       toArray(),
       switchMap(([existTo, existFrom]) => {
-        if (existTo) {
-          return throwError(new FileAlreadyExistException(to));
-        }
         if (!existFrom) {
           return throwError(new FileDoesNotExistException(from));
+        }
+        if (from === to) {
+          return of();
+        }
+
+        if (existTo) {
+          return throwError(new FileAlreadyExistException(to));
         }
 
         // If we're renaming a file that's been created, shortcircuit to creating the `to` path.
