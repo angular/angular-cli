@@ -71,11 +71,6 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
       // Replace the assets in options with the normalized version.
       tap((assetPatternObjects => options.assets = assetPatternObjects)),
       concatMap(() => {
-        // Ensure Build Optimizer is only used with AOT.
-        if (options.buildOptimizer && !options.aot) {
-          throw new Error('The `--build-optimizer` option cannot be used without `--aot`.');
-        }
-
         let webpackConfig;
         try {
           webpackConfig = this.buildWebpackConfig(root, projectRoot, host,
@@ -119,6 +114,11 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
     host: virtualFs.Host<fs.Stats>,
     options: NormalizedBrowserBuilderSchema,
   ) {
+    // Ensure Build Optimizer is only used with AOT.
+    if (options.buildOptimizer && !options.aot) {
+      throw new Error('The `--build-optimizer` option cannot be used without `--aot`.');
+    }
+
     let wco: WebpackConfigOptions<NormalizedBrowserBuilderSchema>;
 
     const tsConfigPath = getSystemPath(normalize(resolve(root, normalize(options.tsConfig))));
