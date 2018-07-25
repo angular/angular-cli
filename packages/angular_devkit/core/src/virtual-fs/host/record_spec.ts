@@ -101,6 +101,29 @@ describe('CordHost', () => {
     done();
   });
 
+  it('works (create -> rename (identity))', done => {
+    const base = new TestHost({
+      '/hello': 'world',
+    });
+
+    const host = new CordHost(base);
+    host.write(path`/blue`, fileBuffer`hi`).subscribe(undefined, done.fail);
+    host.rename(path`/blue`, path`/blue`).subscribe(undefined, done.fail);
+
+    const target = new TestHost();
+    host.commit(target).subscribe(undefined, done.fail);
+
+    // Check that there's only 1 write done.
+    expect(target.records.filter(x => mutatingTestRecord.includes(x.kind))).toEqual([
+      { kind: 'write', path: path`/blue` },
+    ]);
+
+    expect(target.$exists('/hello')).toBe(false);
+    expect(target.$exists('/blue')).toBe(true);
+
+    done();
+  });
+
   it('works (create -> rename -> rename)', done => {
     const base = new TestHost({
       '/hello': 'world',
