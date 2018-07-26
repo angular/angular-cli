@@ -109,3 +109,9 @@ export interface JsonAstComment extends JsonAstNodeBase {
 
 
 export type JsonValue = JsonAstNode['value'];
+
+export const JsonValue = {
+  isJsonObject(value: JsonValue): value is JsonObject {
+    return value != null && typeof value === 'object' && !Array.isArray(value);
+  },
+};
