@@ -7,8 +7,8 @@
  */
 import { logging } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
-import { Observable, ReplaySubject, concat, of } from 'rxjs';
-import { concatMap, defaultIfEmpty, filter, first, map, toArray } from 'rxjs/operators';
+import { Observable, ReplaySubject, of } from 'rxjs';
+import { concatMap, map } from 'rxjs/operators';
 import * as url from 'url';
 import { NpmRepositoryPackageJson } from './npm-package-json';
 
@@ -16,65 +16,26 @@ const RegistryClient = require('npm-registry-client');
 const rc = require('rc');
 
 const npmPackageJsonCache = new Map<string, Observable<NpmRepositoryPackageJson>>();
-const npmConfigOptionCache = new Map<string, Observable<string | undefined>>();
 
-
-const npmConfig = rc('npm', {}, {});
+const npmConfig = rc('npm', {}, {}) as { [key: string]: string | boolean | number | undefined };
 
 function getNpmConfigOption(
   option: string,
   scope?: string,
   tryWithoutScope?: boolean,
-): Observable<string | undefined> {
+): string | boolean | number | undefined {
   if (scope && tryWithoutScope) {
-    return concat(
-      getNpmConfigOption(option, scope),
-      getNpmConfigOption(option),
-    ).pipe(
-      filter(result => !!result),
-      defaultIfEmpty(),
-      first(),
-    );
+    const value = getNpmConfigOption(option, scope);
+    if (value === undefined) {
+      return getNpmConfigOption(option);
+    }
+
+    return value;
   }
 
   const fullOption = `${scope ? scope + ':' : ''}${option}`;
 
-  let value = npmConfigOptionCache.get(fullOption);
-  if (value) {
-    return value;
-  }
-
-  const subject = new ReplaySubject<string | undefined>(1);
-
-  const optionValue = npmConfig && npmConfig[fullOption];
-  if (optionValue == undefined || optionValue == null) {
-    subject.next();
-  } else {
-    subject.next(optionValue);
-  }
-
-  subject.complete();
-
-  value = subject.asObservable();
-  npmConfigOptionCache.set(fullOption, value);
-
-  return value;
-}
-
-function getNpmClientSslOptions(strictSsl?: string, cafile?: string) {
-  const sslOptions: { strict?: boolean, ca?: Buffer } = {};
-
-  if (strictSsl === 'false') {
-    sslOptions.strict = false;
-  } else if (strictSsl === 'true') {
-    sslOptions.strict = true;
-  }
-
-  if (cafile) {
-    sslOptions.ca = readFileSync(cafile);
-  }
-
-  return sslOptions;
+  return npmConfig[fullOption];
 }
 
 /**
@@ -93,7 +54,7 @@ export function getNpmPackageJson(
   const scope = packageName.startsWith('@') ? packageName.split('/')[0] : undefined;
 
   return (
-    registryUrl ? of(registryUrl) : getNpmConfigOption('registry', scope, true)
+    registryUrl ? of(registryUrl) : of(getNpmConfigOption('registry', scope, true) as string)
   ).pipe(
     map(partialUrl => {
       if (!partialUrl) {
@@ -122,34 +83,26 @@ export function getNpmPackageJson(
 
       const registryKey = `//${fullUrl.host}/`;
 
-      return concat(
-        getNpmConfigOption('proxy'),
-        getNpmConfigOption('https-proxy'),
-        getNpmConfigOption('strict-ssl'),
-        getNpmConfigOption('cafile'),
-        getNpmConfigOption('_auth'),
-        getNpmConfigOption('_authToken', registryKey),
-        getNpmConfigOption('username', registryKey, true),
-        getNpmConfigOption('password', registryKey, true),
-        getNpmConfigOption('alwaysAuth', registryKey, true),
-      ).pipe(
-        toArray(),
-        concatMap(options => {
-          const [
-            http,
-            https,
-            strictSsl,
-            cafile,
-            token,
-            authToken,
-            username,
-            password,
-            alwaysAuth,
-          ] = options;
-
+      return of(null).pipe(
+        concatMap(() => {
           const subject = new ReplaySubject<NpmRepositoryPackageJson>(1);
 
-          const sslOptions = getNpmClientSslOptions(strictSsl, cafile);
+          const ssl: {
+            strict?: boolean;
+            ca?: Buffer;
+          } = {};
+
+          const strictSsl = getNpmConfigOption('strict-ssl');
+          if (strictSsl !== undefined) {
+            ssl.strict = strictSsl === 'false' ? false : !!strictSsl;
+          }
+
+          const cafile = getNpmConfigOption('cafile');
+          if (typeof cafile === 'string') {
+            try {
+              ssl.ca = readFileSync(cafile);
+            } catch { }
+          }
 
           const auth: {
             token?: string,
@@ -158,22 +111,22 @@ export function getNpmPackageJson(
             password?: string
           } = {};
 
+          const alwaysAuth = getNpmConfigOption('alwaysAuth', registryKey, true);
           if (alwaysAuth !== undefined) {
             auth.alwaysAuth = alwaysAuth === 'false' ? false : !!alwaysAuth;
           }
 
+          const authToken = getNpmConfigOption('_authToken', registryKey) as string;
           if (authToken) {
             auth.token = authToken;
-          } else if (token) {
-            auth.token = token;
-          } else if (username) {
-            auth.username = username;
-            auth.password = password;
           }
 
           const client = new RegistryClient({
-            proxy: { http, https },
-            ssl: sslOptions,
+            proxy: {
+              http: getNpmConfigOption('proxy'),
+              https: getNpmConfigOption('https-proxy'),
+            },
+            ssl,
           });
           client.log.level = 'silent';
           const params = {
