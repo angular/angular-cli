@@ -9,7 +9,16 @@ import { logging } from '@angular-devkit/core';
 import { exec } from 'child_process';
 import { readFileSync } from 'fs';
 import { Observable, ReplaySubject, concat, of } from 'rxjs';
-import { concatMap, defaultIfEmpty, filter, first, map, toArray } from 'rxjs/operators';
+import {
+  catchError,
+  concatMap,
+  defaultIfEmpty,
+  filter,
+  first,
+  map,
+  shareReplay,
+  toArray,
+} from 'rxjs/operators';
 import * as url from 'url';
 import { NpmRepositoryPackageJson } from './npm-package-json';
 
@@ -17,6 +26,69 @@ const RegistryClient = require('npm-registry-client');
 
 const npmPackageJsonCache = new Map<string, Observable<NpmRepositoryPackageJson>>();
 const npmConfigOptionCache = new Map<string, Observable<string | undefined>>();
+
+
+function _readNpmRc(): Observable<{ [key: string]: string }> {
+  return new Observable<{ [key: string]: string }>(subject => {
+    // TODO: have a way to read options without using fs directly.
+    const path = require('path');
+    const fs = require('fs');
+
+    let npmrc = '';
+    if (process.platform === 'win32') {
+      if (process.env.LOCALAPPDATA) {
+        npmrc = fs.readFileSync(path.join(process.env.LOCALAPPDATA, '.npmrc')).toString('utf-8');
+      }
+    } else {
+      if (process.env.HOME) {
+        npmrc = fs.readFileSync(path.join(process.env.HOME, '.npmrc')).toString('utf-8');
+      }
+    }
+
+    const allOptionsArr = npmrc.split(/\r?\n/).map(x => x.trim());
+    const allOptions: { [key: string]: string } = {};
+
+    allOptionsArr.forEach(x => {
+      const [key, ...value] = x.split('=');
+      allOptions[key] = value.join('=');
+    });
+
+    subject.next(allOptions);
+    subject.complete();
+  }).pipe(
+    catchError(() => of({})),
+    shareReplay(),
+  );
+}
+
+
+function getOptionFromNpmRc(option: string): Observable<string | undefined> {
+  return _readNpmRc().pipe(
+    map(options => options[option]),
+  );
+}
+
+function getOptionFromNpmCli(option: string): Observable<string | undefined> {
+  return new Observable<string | undefined>(subject => {
+    exec(`npm get ${option}`, (error, data) => {
+      if (error) {
+        throw error;
+      } else {
+        data = data.trim();
+        if (!data || data === 'undefined' || data === 'null') {
+          subject.next();
+        } else {
+          subject.next(data);
+        }
+      }
+
+      subject.complete();
+    });
+  }).pipe(
+    catchError(() => of()),
+    shareReplay(),
+  );
+}
 
 function getNpmConfigOption(
   option: string,
@@ -41,29 +113,10 @@ function getNpmConfigOption(
     return value;
   }
 
-  const subject = new ReplaySubject<string | undefined>(1);
+  value = option.startsWith('_')
+      ? getOptionFromNpmRc(fullOption)
+      : getOptionFromNpmCli(fullOption);
 
-  try {
-    exec(`npm get ${fullOption}`, (error, data) => {
-      if (error) {
-        subject.next();
-      } else {
-        data = data.trim();
-        if (!data || data === 'undefined' || data === 'null') {
-          subject.next();
-        } else {
-          subject.next(data);
-        }
-      }
-
-      subject.complete();
-    });
-  } catch {
-    subject.next();
-    subject.complete();
-  }
-
-  value = subject.asObservable();
   npmConfigOptionCache.set(fullOption, value);
 
   return value;
