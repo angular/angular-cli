@@ -8,21 +8,11 @@
 
 // tslint:disable:no-global-tslint-disable no-any
 import { tags, terminal } from '@angular-devkit/core';
-import { CommandScope, Option } from '../models/command';
 import { SchematicCommand } from '../models/schematic-command';
 import { getDefaultSchematicCollection } from '../utilities/config';
 
 
 export class GenerateCommand extends SchematicCommand {
-  public readonly name = 'generate';
-  public readonly description = 'Generates and/or modifies files based on a schematic.';
-  public static aliases = ['g'];
-  public static scope = CommandScope.inProject;
-  public arguments = ['schematic'];
-  public options: Option[] = [
-    ...this.coreOptions,
-  ];
-
   private initialized = false;
   public async initialize(options: any) {
     if (this.initialized) {
@@ -32,19 +22,17 @@ export class GenerateCommand extends SchematicCommand {
     this.initialized = true;
 
     const [collectionName, schematicName] = this.parseSchematicInfo(options);
-
     if (!!schematicName) {
       const schematicOptions = await this.getOptions({
         schematicName,
         collectionName,
       });
-      this.options = this.options.concat(schematicOptions.options);
-      this.arguments = this.arguments.concat(schematicOptions.arguments.map(a => a.name));
+      this.addOptions(schematicOptions);
     }
   }
 
   validate(options: any): boolean | Promise<boolean> {
-    if (!options._[0]) {
+    if (!options.schematic) {
       this.logger.error(tags.oneLine`
         The "ng generate" command requires a
         schematic name to be specified.
@@ -60,7 +48,8 @@ export class GenerateCommand extends SchematicCommand {
     const [collectionName, schematicName] = this.parseSchematicInfo(options);
 
     // remove the schematic name from the options
-    options._ = options._.slice(1);
+    // options._ = options._.slice(1);
+    delete options.schematic;
 
     return this.runSchematic({
       collectionName,
@@ -75,7 +64,7 @@ export class GenerateCommand extends SchematicCommand {
   private parseSchematicInfo(options: any) {
     let collectionName = getDefaultSchematicCollection();
 
-    let schematicName: string = options._[0];
+    let schematicName: string = options.schematic;
 
     if (schematicName) {
       if (schematicName.includes(':')) {
@@ -86,20 +75,16 @@ export class GenerateCommand extends SchematicCommand {
     return [collectionName, schematicName];
   }
 
-  public printHelp(options: any) {
+  public printHelp(_name: string, _description: string, options: any) {
     const schematicName = options._[0];
     if (schematicName) {
-      const argDisplay = this.arguments && this.arguments.length > 0
-        ? ' ' + this.arguments.filter(a => a !== 'schematic').map(a => `<${a}>`).join(' ')
-        : '';
-      const optionsDisplay = this.options && this.options.length > 0
-        ? ' [options]'
-        : '';
-      this.logger.info(`usage: ng generate ${schematicName}${argDisplay}${optionsDisplay}`);
-      this.printHelpOptions(options);
+      const optsWithoutSchematic = this.options
+        .filter(o => !(o.name === 'schematic' && this.isArgument(o)));
+      this.printHelpUsage(`generate ${schematicName}`, optsWithoutSchematic);
+      this.printHelpOptions(this.options);
     } else {
-      this.printHelpUsage(this.name, this.arguments, this.options);
-      const engineHost = this.getEngineHost();
+      this.printHelpUsage('generate', this.options);
+      const engineHost = getEngineHost();
       const [collectionName] = this.parseSchematicInfo(options);
       const collection = this.getCollection(collectionName);
       const schematicNames: string[] = engineHost.listSchematics(collection);

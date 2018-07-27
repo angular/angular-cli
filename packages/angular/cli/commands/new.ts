@@ -7,35 +7,12 @@
  */
 
 // tslint:disable:no-global-tslint-disable no-any
-import { CommandScope, Option } from '../models/command';
 import { SchematicCommand } from '../models/schematic-command';
 import { getDefaultSchematicCollection } from '../utilities/config';
 
 
 export class NewCommand extends SchematicCommand {
-  public readonly name = 'new';
-  public readonly description =
-    'Creates a new directory and a new Angular app.';
-  public static aliases = ['n'];
-  public static scope = CommandScope.outsideProject;
   public readonly allowMissingWorkspace = true;
-  public arguments: string[] = [];
-  public options: Option[] = [
-    ...this.coreOptions,
-    {
-      name: 'verbose',
-      type: Boolean,
-      default: false,
-      aliases: ['v'],
-      description: 'Adds more details to output logging.',
-    },
-    {
-      name: 'collection',
-      type: String,
-      aliases: ['c'],
-      description: 'Schematics collection to use.',
-    },
-  ];
   private schematicName = 'ng-new';
 
   private initialized = false;
@@ -54,10 +31,7 @@ export class NewCommand extends SchematicCommand {
       schematicName: this.schematicName,
       collectionName,
     });
-
-    this.options = this.options.concat(schematicOptions.options);
-    const args = schematicOptions.arguments.map(arg => arg.name);
-    this.arguments = this.arguments.concat(args);
+    this.addOptions(this.options.concat(schematicOptions));
   }
 
   public async run(options: any) {

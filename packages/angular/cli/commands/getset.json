@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "GetSetCommandOptions",
+  "description": "Deprecated in favor of config command.",
+  "$longDescription": "",
+
+  "$impl": "./getset#GetSetCommand",
+  "$hidden": true,
+
+  "type": "object"
+}

@@ -12,3 +12,26 @@ declare module 'yargs-parser' {
   const yargsParser: <T = any>(args: string | string[], options?: typeof parseOptions) => T;
   export = yargsParser;
 }
+
+declare module 'json-schema-traverse' {
+  export interface TraverseOptions {
+    allKeys?: boolean;
+  }
+  export type TraverseCallback = (
+    schema: JsonObject,
+    jsonPointer: string,
+    rootSchema: string,
+    parentJsonPointer: string,
+    parentKeyword: string,
+    parentSchema: string,
+    property: string) => void;
+
+  export interface TraverseCallbacks {
+    pre?: TraverseCallback;
+    post?: TraverseCallback;
+  }
+
+  const traverse: (schema: object, options: TraverseOptions, cbs: TraverseCallbacks) => void;
+
+  export = traverse;
+}

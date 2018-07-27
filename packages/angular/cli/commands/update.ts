@@ -45,8 +45,7 @@ export class UpdateCommand extends SchematicCommand {
       schematicName: this.schematicName,
       collectionName: this.collectionName,
     });
-    this.options = this.options.concat(schematicOptions.options);
-    this.arguments = this.arguments.concat(schematicOptions.arguments.map(a => a.name));
+    this.addOptions(schematicOptions);
   }
 
   async validate(options: any) {

@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "TestCommandOptions",
+  "description": "Run unit tests in existing project.",
+  "$longDescription": "",
+
+  "$aliases": [ "t" ],
+  "$scope": "in",
+  "$type": "architect",
+  "$impl": "./test#TestCommand",
+
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project to test.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "configuration": {
+      "description": "Specify the configuration to use.",
+      "type": "string",
+      "aliases": ["c"]
+    },
+    "prod": {
+      "description": "Flag to set configuration to 'production'.",
+      "type": "boolean"
+    }
+  },
+  "required": [
+  ]
+}
