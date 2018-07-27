@@ -13,6 +13,7 @@ import { resolve } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
 import { SemVer } from 'semver';
+import { Duplex } from 'stream';
 import { isWarningEnabled } from '../utilities/config';
 
 const packageJson = require('../package.json');
@@ -121,7 +122,21 @@ if ('default' in cli) {
   cli = cli['default'];
 }
 
-cli({ cliArgs: process.argv.slice(2) })
+// This is required to support 1.x local versions with a 6+ global
+let standardInput;
+try {
+  standardInput = process.stdin;
+} catch (e) {
+  delete process.stdin;
+  process.stdin = new Duplex();
+  standardInput = process.stdin;
+}
+
+cli({
+  cliArgs: process.argv.slice(2),
+  inputStream: standardInput,
+  outputStream: process.stdout,
+})
   .then((exitCode: number) => {
     process.exit(exitCode);
   })
