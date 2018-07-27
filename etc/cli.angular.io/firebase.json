@@ -1,9 +1,15 @@
 {
-  "firebase": "cli-angular-io",
-  "public": "www",
-  "ignore": [
-    "firebase.json",
-    "**/.*"
-  ]
+  "hosting": {
+    "public": "",
+    "ignore": [
+      "firebase.json",
+      "**/.*"
+    ],
+    "rewrites": [
+      {
+        "source": "/**/!(*.@(js|ts|html|css|json|svg|png|jpg|jpeg))",
+        "destination": "/index.html"
+      }
+    ]
+  }
 }
-
