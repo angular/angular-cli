@@ -10,16 +10,12 @@ import { terminal } from '@angular-devkit/core';
 import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Command, Option } from '../models/command';
+import { Command } from '../models/command';
 import { findUp } from '../utilities/find-up';
 
 
 export class VersionCommand extends Command {
-  public readonly name = 'version';
-  public readonly description = 'Outputs Angular CLI version.';
   public static aliases = ['v'];
-  public readonly arguments: string[] = [];
-  public readonly options: Option[] = [];
 
   public run() {
     const pkg = require(path.resolve(__dirname, '..', 'package.json'));

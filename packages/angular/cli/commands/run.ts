@@ -7,19 +7,9 @@
  */
 
 import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
-import { CommandScope, Option } from '../models/command';
 
 
 export class RunCommand extends ArchitectCommand {
-  public readonly name = 'run';
-  public readonly description = 'Runs Architect targets.';
-  public static scope = CommandScope.inProject;
-  public static aliases = [];
-  public readonly arguments: string[] = ['target'];
-  public readonly options: Option[] = [
-    this.configurationOption,
-  ];
-
   public async run(options: ArchitectCommandOptions) {
     if (options.target) {
       return this.runArchitectTarget(options);

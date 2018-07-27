@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "EasterEggCommandOptions",
+  "description": "",
+  "$longDescription": "",
+  "$hidden": true,
+
+  "$impl": "./easter-egg#AwesomeCommand",
+
+  "type": "object"
+}

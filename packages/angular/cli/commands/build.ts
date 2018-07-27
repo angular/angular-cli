@@ -7,20 +7,10 @@
  */
 
 import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
-import { CommandScope, Option } from '../models/command';
 import { Version } from '../upgrade/version';
 
 export class BuildCommand extends ArchitectCommand {
-  public readonly name = 'build';
   public readonly target = 'build';
-  public readonly description =
-    'Builds your app and places it into the output path (dist/ by default).';
-  public static aliases = ['b'];
-  public static scope = CommandScope.inProject;
-  public options: Option[] = [
-    this.prodOption,
-    this.configurationOption,
-  ];
 
   public validate(options: ArchitectCommandOptions) {
     // Check Angular and TypeScript versions.

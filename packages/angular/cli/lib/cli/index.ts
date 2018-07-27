@@ -8,65 +8,12 @@
 
 import { logging, terminal } from '@angular-devkit/core';
 import { filter } from 'rxjs/operators';
-import { AddCommand } from '../../commands/add';
-import { BuildCommand } from '../../commands/build';
-import { ConfigCommand } from '../../commands/config';
-import { DocCommand } from '../../commands/doc';
-import { E2eCommand } from '../../commands/e2e';
-import { AwesomeCommand } from '../../commands/easter-egg';
-import { EjectCommand } from '../../commands/eject';
-import { GenerateCommand } from '../../commands/generate';
-import { GetSetCommand } from '../../commands/getset';
-import { HelpCommand } from '../../commands/help';
-import { LintCommand } from '../../commands/lint';
-import { NewCommand } from '../../commands/new';
-import { RunCommand } from '../../commands/run';
-import { ServeCommand } from '../../commands/serve';
-import { TestCommand } from '../../commands/test';
-import { UpdateCommand } from '../../commands/update';
-import { VersionCommand } from '../../commands/version';
-import { Xi18nCommand } from '../../commands/xi18n';
-import { CommandMap, runCommand } from '../../models/command-runner';
+import { runCommand } from '../../models/command-runner';
 import { getProjectDetails } from '../../utilities/project';
 
 
-async function loadCommands(): Promise<CommandMap> {
-  return {
-    // Schematics commands.
-    'add': AddCommand,
-    'new': NewCommand,
-    'generate': GenerateCommand,
-    'update': UpdateCommand,
-
-    // Architect commands.
-    'build': BuildCommand,
-    'serve': ServeCommand,
-    'test': TestCommand,
-    'e2e': E2eCommand,
-    'lint': LintCommand,
-    'xi18n': Xi18nCommand,
-    'run': RunCommand,
-
-    // Disabled commands.
-    'eject': EjectCommand,
-
-    // Easter eggs.
-    'make-this-awesome': AwesomeCommand,
-
-    // Other.
-    'config': ConfigCommand,
-    'help': HelpCommand,
-    'version': VersionCommand,
-    'doc': DocCommand,
-
-    // deprecated
-    'get': GetSetCommand,
-    'set': GetSetCommand,
-  };
-}
-
 export default async function(options: { testing?: boolean, cliArgs: string[] }) {
-  const commands = await loadCommands();
+  // const commands = await loadCommands();
 
   const logger = new logging.IndentLogger('cling');
   let loggingSubscription;
@@ -83,7 +30,7 @@ export default async function(options: { testing?: boolean, cliArgs: string[] })
   };
 
   try {
-    const maybeExitCode = await runCommand(commands, options.cliArgs, logger, context);
+    const maybeExitCode = await runCommand(options.cliArgs, logger, context);
     if (typeof maybeExitCode === 'number') {
       console.assert(Number.isInteger(maybeExitCode));
 

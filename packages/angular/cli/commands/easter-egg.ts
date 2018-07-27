@@ -7,19 +7,13 @@
  */
 
 import { terminal } from '@angular-devkit/core';
-import { Command, Option } from '../models/command';
+import { Command } from '../models/command';
 
 function pickOne(of: string[]): string {
   return of[Math.floor(Math.random() * of.length)];
 }
 
 export class AwesomeCommand extends Command {
-  public readonly name = 'make-this-awesome';
-  public readonly description = '';
-  public readonly hidden = true;
-  readonly arguments: string[] = [];
-  readonly options: Option[] = [];
-
   run() {
     const phrase = pickOne([
       `You're on it, there's nothing for me to do!`,

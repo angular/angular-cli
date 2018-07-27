@@ -50,7 +50,7 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
   readonly Options: Option[] = [{
     name: 'configuration',
     description: 'The configuration',
-    type: String,
+    type: 'string',
     aliases: ['c'],
   }];
 
@@ -143,24 +143,12 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
         } as any; // tslint:disable-line:no-any
       })
       .map(opt => {
-        let type;
-        const schematicType = opt.type;
-        switch (opt.type) {
-          case 'string':
-            type = String;
-            break;
-          case 'boolean':
-            type = Boolean;
-            break;
-          case 'integer':
-          case 'number':
-            type = Number;
-            break;
-
-          // Ignore arrays / objects.
-          default:
-            return null;
+        const types = ['string', 'boolean', 'integer', 'number'];
+        // Ignore arrays / objects.
+        if (types.indexOf(opt.type) === -1) {
+          return null;
         }
+
         let aliases: string[] = [];
         if (opt.alias) {
           aliases = [...aliases, opt.alias];
@@ -168,37 +156,35 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
         if (opt.aliases) {
           aliases = [...aliases, ...opt.aliases];
         }
-
         const schematicDefault = opt.default;
 
         return {
           ...opt,
           aliases,
-          type,
-          schematicType,
           default: undefined, // do not carry over schematics defaults
           schematicDefault,
           hidden: opt.visible === false,
         };
       })
       .filter(x => x)
-      .forEach(option => this.options.push(option));
+      .forEach(option => this.addOptions(option));
   }
 
   protected prodOption: Option = {
     name: 'prod',
     description: 'Flag to set configuration to "prod".',
-    type: Boolean,
+    type: 'boolean',
   };
 
   protected configurationOption: Option = {
     name: 'configuration',
     description: 'Specify the configuration to use.',
-    type: String,
+    type: 'string',
     aliases: ['c'],
   };
 
   protected async runArchitectTarget(options: ArchitectCommandOptions): Promise<number> {
+    delete options._;
     const targetSpec = this._makeTargetSpecifier(options);
 
     const runSingleTarget = (targetSpec: TargetSpecifier) => this._architect.run(

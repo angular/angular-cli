@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "AddCommandOptions",
+  "description": "Add support for a library to your project.",
+  "$longDescription": "",
+
+  "$scope": "in",
+  "$impl": "./add#AddCommand",
+
+  "type": "object",
+  "properties": {
+    "collection": {
+      "type": "string",
+      "description": "The package to be added.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    }
+  },
+  "required": [
+  ]
+}
