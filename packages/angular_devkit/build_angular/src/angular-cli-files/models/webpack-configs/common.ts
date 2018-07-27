@@ -310,9 +310,27 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         }),
         new UglifyJSPlugin({
           sourceMap: buildOptions.sourceMap,
-          parallel: true,
-          cache: true,
-          uglifyOptions,
+          // Parallelization turned off because it would required process communication to pass
+          // on the computed uglifyOptions.
+          parallel: false,
+          cacheKeys: (defaultCacheKeys: Object) => {
+            return Object.assign(
+              {},
+              defaultCacheKeys,
+              { terser: require('terser/package.json').version },
+            );
+          },
+          minify: (file: string, sourceMap: string) => {
+            const terserOptions: any = uglifyOptions;
+
+            if (sourceMap) {
+              terserOptions.sourceMap = {
+                content: sourceMap,
+              };
+            }
+
+            return require('terser').minify(file, terserOptions);
+          }
         }),
       ],
     },
