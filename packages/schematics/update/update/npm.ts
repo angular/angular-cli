@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { logging } from '@angular-devkit/core';
+import { exec } from 'child_process';
 import { readFileSync } from 'fs';
 import { Observable, ReplaySubject, concat, of } from 'rxjs';
 import { concatMap, defaultIfEmpty, filter, first, map, toArray } from 'rxjs/operators';
@@ -13,13 +14,9 @@ import * as url from 'url';
 import { NpmRepositoryPackageJson } from './npm-package-json';
 
 const RegistryClient = require('npm-registry-client');
-const rc = require('rc');
 
 const npmPackageJsonCache = new Map<string, Observable<NpmRepositoryPackageJson>>();
 const npmConfigOptionCache = new Map<string, Observable<string | undefined>>();
-
-
-const npmConfig = rc('npm', {}, {});
 
 function getNpmConfigOption(
   option: string,
@@ -46,14 +43,25 @@ function getNpmConfigOption(
 
   const subject = new ReplaySubject<string | undefined>(1);
 
-  const optionValue = npmConfig && npmConfig[fullOption];
-  if (optionValue == undefined || optionValue == null) {
-    subject.next();
-  } else {
-    subject.next(optionValue);
-  }
+  try {
+    exec(`npm get ${fullOption}`, (error, data) => {
+      if (error) {
+        subject.next();
+      } else {
+        data = data.trim();
+        if (!data || data === 'undefined' || data === 'null') {
+          subject.next();
+        } else {
+          subject.next(data);
+        }
+      }
 
-  subject.complete();
+      subject.complete();
+    });
+  } catch {
+    subject.next();
+    subject.complete();
+  }
 
   value = subject.asObservable();
   npmConfigOptionCache.set(fullOption, value);
