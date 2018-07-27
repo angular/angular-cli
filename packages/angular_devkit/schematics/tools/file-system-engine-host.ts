@@ -57,7 +57,10 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
       throw new CollectionMissingSchematicsMapException(name);
     }
 
-    return desc as FileSystemCollectionDesc;
+    return {
+      ...desc,
+      name,
+    } as FileSystemCollectionDesc;
   }
 
   protected _transformSchematicDescription(
