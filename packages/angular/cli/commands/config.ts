@@ -17,7 +17,7 @@ import {
   tags,
 } from '@angular-devkit/core';
 import { writeFileSync } from 'fs';
-import { Command, Option } from '../models/command';
+import { Command } from '../models/command';
 import {
   getWorkspace,
   getWorkspaceRaw,
@@ -179,19 +179,6 @@ function normalizeValue(value: string, path: string): JsonValue {
 }
 
 export class ConfigCommand extends Command {
-  public readonly name = 'config';
-  public readonly description = 'Get/set configuration values.';
-  public readonly arguments = ['jsonPath', 'value'];
-  public readonly options: Option[] = [
-    {
-      name: 'global',
-      type: Boolean,
-      'default': false,
-      aliases: ['g'],
-      description: 'Get/set the value in the global configuration (in your home directory).',
-    },
-  ];
-
   public run(options: ConfigOptions) {
     const level = options.global ? 'global' : 'local';
 

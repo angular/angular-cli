@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "UpdateCommandOptions",
+  "description": "Updates your application and its dependencies.",
+  "$longDescription": "",
+
+  "$aliases": [],
+  "$type": "",
+  "$impl": "./update#UpdateCommand",
+
+  "type": "object",
+  "properties": {
+    "packages": {
+      "type": "string",
+      "description": "The names of package(s) to update",
+      "$default": {
+        "$source": "argv"
+      }
+    },
+    "dryRun": {
+      "type": "boolean",
+      "default": false,
+      "aliases": ["d"],
+      "description": "Run through without making any changes."
+    }
+  },
+  "required": [
+  ]
+}

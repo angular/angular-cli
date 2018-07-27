@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "VersionCommandOptions",
+  "description": "Outputs Angular CLI version.",
+  "$longDescription": "",
+
+  "$aliases": [ "v" ],
+  "$impl": "./version#VersionCommand",
+
+  "type": "object"
+}

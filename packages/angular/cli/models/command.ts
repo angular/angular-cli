@@ -7,7 +7,7 @@
  */
 
 // tslint:disable:no-global-tslint-disable no-any
-import { logging, terminal } from '@angular-devkit/core';
+import { JsonValue, logging, terminal } from '@angular-devkit/core';
 
 export interface CommandConstructor {
   new(context: CommandContext, logger: logging.Logger): Command;
@@ -38,6 +38,10 @@ export abstract class Command<T = any> {
     }
   }
 
+  public addOptions(options: Option[]) {
+    this.options = (this.options || []).concat(options);
+  }
+
   async initializeRaw(args: string[]): Promise<any> {
     this._rawArgs = args;
 
@@ -51,47 +55,76 @@ export abstract class Command<T = any> {
     return true;
   }
 
-  printHelp(_options: T): void {
-    this.printHelpUsage(this.name, this.arguments, this.options);
+  printHelp(commandName: string, description: string, options: any): void {
+    if (description) {
+      this.logger.info(description);
+    }
+    this.printHelpUsage(commandName, this.options);
     this.printHelpOptions(this.options);
   }
 
-  protected printHelpUsage(name: string, args: string[], options: Option[]) {
+  private getArgIndex(def: OptionSmartDefault | undefined): number {
+    if (def === undefined || def.index === undefined || typeof def.index !== 'number') {
+      return 99999;
+    }
+
+    return def.index;
+  }
+
+  protected printHelpUsage(name: string, options: Option[]) {
+    const args = options
+      .filter(opt => this.isArgument(opt))
+      .sort((a, b) => this.getArgIndex(a.$default) - this.getArgIndex(b.$default));
+    const opts = options.filter(opt => !this.isArgument(opt));
     const argDisplay = args && args.length > 0
-      ? ' ' + args.map(a => `<${a}>`).join(' ')
+      ? ' ' + args.map(a => `<${a.name}>`).join(' ')
       : '';
-    const optionsDisplay = options && options.length > 0
+    const optionsDisplay = opts && opts.length > 0
       ? ` [options]`
       : ``;
     this.logger.info(`usage: ng ${name}${argDisplay}${optionsDisplay}`);
   }
 
+  protected isArgument(option: Option) {
+    let isArg = false;
+    if (option.$default !== undefined && option.$default.$source === 'argv') {
+      isArg = true;
+    }
+
+    return isArg;
+  }
+
   protected printHelpOptions(options: Option[]) {
-    if (options && this.options.length > 0) {
+    if (!options) {
+      return;
+    }
+    const args = options.filter(opt => this.isArgument(opt));
+    const opts = options.filter(opt => !this.isArgument(opt));
+    if (args.length > 0) {
+      this.logger.info(`arguments:`);
+      args.forEach(o => {
+        this.logger.info(`  ${terminal.cyan(o.name)}`);
+        this.logger.info(`    ${o.description}`);
+      });
+    }
+    if (this.options.length > 0) {
       this.logger.info(`options:`);
-      this.options
+      opts
         .filter(o => !o.hidden)
         .sort((a, b) => a.name >= b.name ? 1 : -1)
         .forEach(o => {
-        const aliases = o.aliases && o.aliases.length > 0
-          ? '(' + o.aliases.map(a => `-${a}`).join(' ') + ')'
-          : '';
-        this.logger.info(`  ${terminal.cyan('--' + o.name)} ${aliases}`);
-        this.logger.info(`    ${o.description}`);
-      });
+          const aliases = o.aliases && o.aliases.length > 0
+            ? '(' + o.aliases.map(a => `-${a}`).join(' ') + ')'
+            : '';
+          this.logger.info(`  ${terminal.cyan('--' + o.name)} ${aliases}`);
+          this.logger.info(`    ${o.description}`);
+        });
     }
   }
 
   abstract run(options: T): number | void | Promise<number | void>;
-  abstract readonly name: string;
-  abstract readonly description: string;
-  abstract readonly arguments: string[];
-  abstract readonly options: Option[];
-  public argStrategy = ArgumentStrategy.MapToOptions;
-  public hidden = false;
-  public unknown = false;
-  public static scope: CommandScope = CommandScope.everywhere;
-  public static aliases: string[] = [];
+  public options: Option[];
+  public additionalSchemas: string[] = [];
   protected readonly logger: logging.Logger;
   protected readonly project: any;
 }
@@ -100,14 +133,19 @@ export interface CommandContext {
   project: any;
 }
 
-export abstract class Option {
-  abstract readonly name: string;
-  abstract readonly description: string;
-  readonly default?: string | number | boolean;
-  readonly required?: boolean;
-  abstract readonly aliases?: string[];
-  abstract readonly type: any;
-  readonly format?: string;
-  readonly values?: any[];
-  readonly hidden?: boolean = false;
+export interface Option {
+  name: string;
+  description: string;
+  type: string;
+  default?: string | number | boolean;
+  required?: boolean;
+  aliases?: string[];
+  format?: string;
+  hidden?: boolean;
+  $default?: OptionSmartDefault;
+}
+
+export interface OptionSmartDefault {
+  $source: string;
+  [key: string]: JsonValue;
 }

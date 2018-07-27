@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "HelpCommandOptions",
+  "description": "Displays help for the Angular CLI.",
+  "$longDescription": "",
+
+  "$aliases": [],
+  "$impl": "./help#HelpCommand",
+
+  "type": "object"
+}

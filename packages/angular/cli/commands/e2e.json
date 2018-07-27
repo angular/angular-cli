@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "E2eCommandOptions",
+  "description": "",
+  "$longDescription": "",
+
+  "$aliases": [ "e" ],
+  "$scope": "in",
+  "$type": "architect",
+  "$impl": "./e2e#E2eCommand",
+
+  "type": "object",
+  "properties": {
+    "configuration": {
+      "description": "Specify the configuration to use.",
+      "type": "string",
+      "aliases": ["c"]
+    },
+    "prod": {
+      "description": "Flag to set configuration to 'production'.",
+      "type": "boolean"
+    }
+  },
+  "required": [
+  ]
+}

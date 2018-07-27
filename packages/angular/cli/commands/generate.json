@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "GenerateCommandOptions",
+  "description": "Generates and/or modifies files based on a schematic.",
+  "$longDescription": "",
+
+  "$aliases": [ "g" ],
+  "$scope": "in",
+  "$type": "",
+  "$impl": "./generate#GenerateCommand",
+
+  "type": "object",
+  "properties": {
+    "schematic": {
+      "type": "string",
+      "description": "The schematic or collection:schematic to generate.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "dryRun": {
+      "type": "boolean",
+      "default": false,
+      "aliases": ["d"],
+      "description": "Run through without making any changes."
+    },
+    "force": {
+      "type": "boolean",
+      "default": false,
+      "aliases": ["f"],
+      "description": "Forces overwriting of files."
+    }
+  },
+  "required": [
+  ]
+}
