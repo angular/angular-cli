@@ -61,7 +61,7 @@ export async function runCommand(commandMap: CommandMap,
   if (!args || args.length === 0) {
     args = ['help'];
   }
-  const rawOptions = yargsParser(args, { alias: { help: ['h'] }, boolean: [ 'help' ] });
+  const rawOptions = yargsParser(args, { alias: { help: ['h'] }, boolean: [ 'help', 'json' ] });
   let commandName = rawOptions._[0];
 
   // remove the command name
@@ -69,6 +69,32 @@ export async function runCommand(commandMap: CommandMap,
   const executionScope = insideProject()
     ? CommandScope.inProject
     : CommandScope.outsideProject;
+
+  if ((args.includes('help') || rawOptions.help) && rawOptions.json) {
+    const allCommands = Object.keys(commandMap)
+      .sort((a, b) => a.localeCompare(b))
+      .map(name => {
+        const Cmd = findCommand(commandMap, name);
+
+        if (Cmd) {
+          const command = new Cmd(context, logger);
+          const { name, description, hidden, options } = command;
+
+          return {
+            name,
+            description,
+            aliases: Cmd.aliases,
+            arguments: command.arguments,
+            options,
+            hidden,
+          };
+        }
+      });
+
+    logger.info(JSON.stringify(allCommands, undefined, '  '));
+
+    return;
+  }
 
   let Cmd: CommandConstructor | null;
   Cmd = findCommand(commandMap, commandName);
