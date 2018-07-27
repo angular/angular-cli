@@ -132,6 +132,7 @@
     "tslint": "^5.9.1",
     "tslint-sonarts": "^1.7.0",
     "tsutils": "~2.22.2",
+    "uglify-es": "^3.3.9",
     "typescript": "~2.7.2",
     "uglifyjs-webpack-plugin": "^1.2.5",
     "url-loader": "^1.0.1",
@@ -155,6 +156,7 @@
     "@types/request": "^2.47.1",
     "@types/semver": "^5.5.0",
     "@types/source-map": "0.5.2",
+    "@types/uglify-es": "^3.0.0",
     "@types/webpack": "^4.4.0",
     "@types/webpack-dev-server": "^2.9.4",
     "@types/webpack-sources": "^0.1.4",
@@ -163,7 +165,7 @@
     "gh-got": "^7.0.0",
     "git-raw-commits": "^2.0.0",
     "license-checker": "^20.1.0",
-    "tslint-no-circular-imports": "^0.5.0",
-    "tar": "^4.4.4"
+    "tar": "^4.4.4",
+    "tslint-no-circular-imports": "^0.5.0"
   }
 }

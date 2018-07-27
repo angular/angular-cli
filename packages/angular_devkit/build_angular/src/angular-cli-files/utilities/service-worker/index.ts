@@ -12,6 +12,7 @@ import { Filesystem } from '@angular/service-worker/config';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as semver from 'semver';
+import * as uglifyJs from 'uglify-es';
 
 import { resolveProjectModule } from '../require-project-module';
 import { map, reduce, switchMap, concatMap, mergeMap, toArray, tap } from "rxjs/operators";
@@ -145,7 +146,7 @@ export function augmentAppWithServiceWorker(
         switchMap(workerCode => {
           return merge(
             host.write(join(distPath, 'ngsw.json'), virtualFs.stringToFileBuffer(manifest)),
-            host.write(join(distPath, 'ngsw-worker.js'), workerCode),
+            host.write(join(distPath, 'ngsw-worker.js'), minifyJs(workerCode)),
           ) as Observable<void>;
         }),
       );
@@ -159,6 +160,7 @@ export function augmentAppWithServiceWorker(
       }
 
       return host.read(safetyPath).pipe(
+        map(safetyCode => minifyJs(safetyCode)),
         switchMap(safetyCode => {
           return merge(
             host.write(join(distPath, 'worker-basic.min.js'), safetyCode),
@@ -169,6 +171,15 @@ export function augmentAppWithServiceWorker(
     }),
 
     // Remove all elements, reduce them to a single emit.
-    reduce(() => {}),
+    reduce(() => { }),
   ).toPromise();
+}
+
+function minifyJs(source: ArrayBuffer): ArrayBuffer {
+  const { error, code } = uglifyJs.minify(virtualFs.fileBufferToString(source));
+  if (error) {
+    throw error;
+  }
+
+  return virtualFs.stringToFileBuffer(code);
 }
