@@ -7,6 +7,7 @@
  */
 
 import { tags, terminal } from '@angular-devkit/core';
+import { resolve } from '@angular-devkit/core/node';
 import * as path from 'path';
 import { SemVer, satisfies } from 'semver';
 import { isWarningEnabled } from '../utilities/config';
@@ -53,9 +54,13 @@ export class Version {
     };
 
     try {
-      const resolveOptions = { paths: [ path.join(projectRoot, 'node_modules'), projectRoot ] };
-      const angularPackagePath = require.resolve('@angular/core/package.json', resolveOptions);
-      const rxjsPackagePath = require.resolve('rxjs/package.json', resolveOptions);
+      const resolveOptions = {
+        basedir: projectRoot,
+        checkGlobal: false,
+        checkLocal: true,
+      };
+      const angularPackagePath = resolve('@angular/core/package.json', resolveOptions);
+      const rxjsPackagePath = resolve('rxjs/package.json', resolveOptions);
 
       if (!isInside(projectRoot, angularPackagePath)
           || !isInside(projectRoot, rxjsPackagePath)) {
