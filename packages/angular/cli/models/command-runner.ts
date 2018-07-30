@@ -62,7 +62,7 @@ export async function runCommand(commandMap: CommandMap,
     args = ['help'];
   }
   const rawOptions = yargsParser(args, { alias: { help: ['h'] }, boolean: [ 'help' ] });
-  let commandName = rawOptions._[0];
+  let commandName = rawOptions._[0] || '';
 
   // remove the command name
   rawOptions._ = rawOptions._.slice(1);
@@ -71,39 +71,48 @@ export async function runCommand(commandMap: CommandMap,
     : CommandScope.outsideProject;
 
   let Cmd: CommandConstructor | null;
-  Cmd = findCommand(commandMap, commandName);
+  Cmd = commandName ? findCommand(commandMap, commandName) : null;
 
-  if (!Cmd && !commandName && (rawOptions.v || rawOptions.version)) {
+  if (!Cmd && (rawOptions.v || rawOptions.version)) {
     commandName = 'version';
     Cmd = findCommand(commandMap, commandName);
-  }
-
-  if (!Cmd && rawOptions.help) {
+  } else if (!Cmd && (!commandName || rawOptions.help)) {
     commandName = 'help';
     Cmd = findCommand(commandMap, commandName);
   }
 
   if (!Cmd) {
-    const commandsDistance = {} as { [name: string]: number };
-    const allCommands = listAllCommandNames(commandMap).sort((a, b) => {
-      if (!(a in commandsDistance)) {
-        commandsDistance[a] = levenshtein(a, commandName);
-      }
-      if (!(b in commandsDistance)) {
-        commandsDistance[b] = levenshtein(b, commandName);
-      }
+    if (!commandName) {
+      logger.error(tags.stripIndent`
+        We could not find a command from the arguments and the help command seems to be disabled.
+        This is an issue with the CLI itself. If you see this comment, please report it and
+        provide your repository.
+      `);
 
-      return commandsDistance[a] - commandsDistance[b];
-    });
+      return 1;
+    } else {
+      // Set name to string (no undefined).
+      const commandsDistance = {} as { [name: string]: number };
+      const allCommands = listAllCommandNames(commandMap).sort((a, b) => {
+        if (!(a in commandsDistance)) {
+          commandsDistance[a] = levenshtein(a, commandName);
+        }
+        if (!(b in commandsDistance)) {
+          commandsDistance[b] = levenshtein(b, commandName);
+        }
 
-    logger.error(tags.stripIndent`
+        return commandsDistance[a] - commandsDistance[b];
+      });
+
+      logger.error(tags.stripIndent`
         The specified command ("${commandName}") is invalid. For a list of available options,
         run "ng help".
 
         Did you mean "${allCommands[0]}"?
-    `);
+      `);
 
-    return 1;
+      return 1;
+    }
   }
 
   const command = new Cmd(context, logger);
