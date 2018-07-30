@@ -85,6 +85,8 @@ export async function runCommand(commandMap: CommandMap,
 
   if (!Cmd) {
     const commandsDistance = {} as { [name: string]: number };
+
+    commandName = args[0].replace(/-*/, '');
     const allCommands = listAllCommandNames(commandMap).sort((a, b) => {
       if (!(a in commandsDistance)) {
         commandsDistance[a] = levenshtein(a, commandName);
