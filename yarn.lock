@@ -1475,7 +1475,7 @@ clone-response@1.0.2:
   dependencies:
     mimic-response "^1.0.0"
 
-clone@^2.1.1:
+clone@^2.1.1, clone@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.2.tgz#1b7f4b9f591f1e8f83670401600345a02887435f"
 
@@ -4486,9 +4486,24 @@ less-loader@^4.1.0:
     loader-utils "^1.1.0"
     pify "^3.0.0"
 
-less@^3.0.0, less@^3.0.4:
+less@^3.0.0:
   version "3.8.0"
   resolved "https://registry.yarnpkg.com/less/-/less-3.8.0.tgz#44785e40c23841c15ba3be741d36bd2775dd0596"
+  optionalDependencies:
+    errno "^0.1.1"
+    graceful-fs "^4.1.2"
+    image-size "~0.5.0"
+    mime "^1.4.1"
+    mkdirp "^0.5.0"
+    promise "^7.1.1"
+    request "^2.83.0"
+    source-map "~0.6.0"
+
+less@^3.7.1:
+  version "3.8.1"
+  resolved "https://registry.yarnpkg.com/less/-/less-3.8.1.tgz#f31758598ef5a1930dd4caefa9e4340641e71e1d"
+  dependencies:
+    clone "^2.1.2"
   optionalDependencies:
     errno "^0.1.1"
     graceful-fs "^4.1.2"
