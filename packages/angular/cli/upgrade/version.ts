@@ -11,7 +11,6 @@ import { resolve } from '@angular-devkit/core/node';
 import * as path from 'path';
 import { SemVer, satisfies } from 'semver';
 import { isWarningEnabled } from '../utilities/config';
-import { requireProjectModule } from '../utilities/require-project-module';
 
 
 export class Version {
@@ -131,10 +130,23 @@ export class Version {
     if (!isWarningEnabled('typescriptMismatch')) {
       return;
     }
-    let compilerVersion: string, tsVersion: string;
+
+    let compilerVersion: string;
+    let tsVersion: string;
+    let compilerTypeScriptPeerVersion: string;
     try {
-      compilerVersion = requireProjectModule(projectRoot, '@angular/compiler-cli').VERSION.full;
-      tsVersion = requireProjectModule(projectRoot, 'typescript').version;
+      const resolveOptions = {
+        basedir: projectRoot,
+        checkGlobal: false,
+        checkLocal: true,
+      };
+      const compilerPackagePath = resolve('@angular/compiler-cli/package.json', resolveOptions);
+      const typescriptProjectPath = resolve('typescript', resolveOptions);
+      const compilerPackageInfo = require(compilerPackagePath);
+
+      compilerVersion = compilerPackageInfo['version'];
+      compilerTypeScriptPeerVersion = compilerPackageInfo['peerDependencies']['typescript'];
+      tsVersion = require(typescriptProjectPath).version;
     } catch {
       console.error(terminal.bold(terminal.red(tags.stripIndents`
         Versions of @angular/compiler-cli and typescript could not be determined.
@@ -149,18 +161,17 @@ export class Version {
       return;
     }
 
+    // These versions do not have accurate typescript peer dependencies
     const versionCombos = [
       { compiler: '>=2.3.1 <3.0.0', typescript: '>=2.0.2 <2.3.0' },
       { compiler: '>=4.0.0-beta.0 <5.0.0', typescript: '>=2.1.0 <2.4.0' },
-      { compiler: '>=5.0.0-beta.0 <5.1.0', typescript: '>=2.4.2 <2.5.0' },
-      { compiler: '>=5.1.0-beta.0 <5.2.0', typescript: '>=2.4.2 <2.6.0' },
-      { compiler: '>=5.2.0-beta.0 <6.0.0', typescript: '>=2.4.2 <2.7.0' },
-      { compiler: '>=6.0.0-beta.0 <6.1.0-beta.0', typescript: '>=2.7.0 <2.8.0' },
-      { compiler: '>=6.1.0-beta.0 <6.1.0-rc.0', typescript: '>=2.7.2 <2.9.0' },
-      { compiler: '>=6.1.0-rc.0 <7.0.0', typescript: '>=2.7.2 <2.10.0' },
+      { compiler: '5.0.0-beta.0 - 5.0.0-rc.2', typescript: '>=2.4.2 <2.5.0' },
     ];
 
-    const currentCombo = versionCombos.find((combo) => satisfies(compilerVersion, combo.compiler));
+    let currentCombo = versionCombos.find((combo) => satisfies(compilerVersion, combo.compiler));
+    if (!currentCombo && compilerTypeScriptPeerVersion) {
+      currentCombo = { compiler: compilerVersion, typescript: compilerTypeScriptPeerVersion };
+    }
 
     if (currentCombo && !satisfies(tsVersion, currentCombo.typescript)) {
       // First line of warning looks weird being split in two, disable tslint for it.
