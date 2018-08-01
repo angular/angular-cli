@@ -605,6 +605,11 @@
               "description": "Output sourcemaps.",
               "default": true
             },
+            "vendorSourceMap": {
+              "type": "boolean",
+              "description": "Resolve vendor packages sourcemaps.",
+              "default": false
+            },
             "evalSourceMap": {
               "type": "boolean",
               "description": "Output in-file eval sourcemaps.",
@@ -1000,6 +1005,11 @@
               "type": "boolean",
               "description": "Output sourcemaps."
             },
+            "vendorSourceMap": {
+              "type": "boolean",
+              "description": "Resolve vendor packages sourcemaps.",
+              "default": false
+            },
             "evalSourceMap": {
               "type": "boolean",
               "description": "Output in-file eval sourcemaps."
@@ -1382,6 +1392,11 @@
               "type": "boolean",
               "description": "Output sourcemaps.",
               "default": true
+            },
+            "vendorSourceMap": {
+              "type": "boolean",
+              "description": "Resolve vendor packages sourcemaps.",
+              "default": false
             },
             "evalSourceMap": {
               "type": "boolean",
