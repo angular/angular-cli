@@ -187,6 +187,28 @@ It can also receive a filename to only run that test (e.g. `node ./tests/legacy-
 As part of the test procedure, all packages will be built and linked.
 You will need to re-run `npm link` to re-link the development Angular CLI environment after tests finish.
 
+### Debugging with VS Code
+
+In order to debug some Angular CLI behaviour using Visual Studio Code, you can run `npm run build`, and then use a launch configuration like the following:
+
+```json
+{
+    "type": "node",
+    "request": "launch",
+    "name": "ng serve",
+    "cwd": "<path to an Angular project generated with Angular-CLI>",
+    "program": "${workspaceFolder}/dist/@angular/cli/bin/ng",
+    "args": [
+        "<ng command>",
+        ...other arguments
+    ],
+    "console": "integratedTerminal"
+}
+```
+
+Then you can add breakpoints in `dist/@angular` files.
+
+For more informations about Node.js debugging in VS Code, see the related [VS Code Documentation](https://code.visualstudio.com/docs/nodejs/nodejs-debugging).
 
 ## Documentation
 
