@@ -1,15 +1,25 @@
 workspace(name = "angular_devkit")
 
+BAZEL_SKYLIB_VERSION = "0.3.1"
+http_archive(
+    name = "bazel_skylib",
+    url = "https://github.com/bazelbuild/bazel-skylib/archive/%s.zip" % BAZEL_SKYLIB_VERSION,
+    strip_prefix = "bazel-skylib-%s" % BAZEL_SKYLIB_VERSION,
+    sha256 = "95518adafc9a2b656667bbf517a952e54ce7f350779d0dd95133db4eb5c27fb1",
+)
+
+RULES_NODEJS_VERSION = "0.11.2"
 http_archive(
     name = "build_bazel_rules_nodejs",
-    url = "https://github.com/bazelbuild/rules_nodejs/archive/0.4.1.zip",
-    strip_prefix = "rules_nodejs-0.4.1",
-    sha256 = "e9bc013417272b17f302dc169ad597f05561bb277451f010043f4da493417607",
+    url = "https://github.com/bazelbuild/rules_nodejs/archive/%s.zip" % RULES_NODEJS_VERSION,
+    strip_prefix = "rules_nodejs-%s" % RULES_NODEJS_VERSION,
+    sha256 = "c00d5381adeefb56e0ef959a7b168cae628535dab933cfad1c2cd1870cd7c9de",
 )
 
 load("@build_bazel_rules_nodejs//:defs.bzl", "check_bazel_version", "node_repositories")
 
-check_bazel_version("0.9.0")
+check_bazel_version("0.15.0")
+
 node_repositories(package_json = ["//:package.json"])
 
 local_repository(
@@ -17,13 +27,20 @@ local_repository(
     path = "node_modules/rxjs/src",
 )
 
-# Pick up the fix for source-map typings
-RULES_TYPESCRIPT_VERSION = "00f8fd5467f2b12ac2fbb8d74ea81d2dd5636d31"
+RULES_WEBTESTING_VERSION = "0.2.1"
+http_archive(
+    name = "io_bazel_rules_webtesting",
+    url = "https://github.com/bazelbuild/rules_webtesting/archive/%s.zip" % RULES_WEBTESTING_VERSION,
+    strip_prefix = "rules_webtesting-%s" % RULES_WEBTESTING_VERSION,
+    sha256 = "7d490aadff9b5262e5251fa69427ab2ffd1548422467cb9f9e1d110e2c36f0fa",
+)
+
+RULES_TYPESCRIPT_VERSION = "0.15.3"
 http_archive(
     name = "build_bazel_rules_typescript",
     url = "https://github.com/bazelbuild/rules_typescript/archive/%s.zip" % RULES_TYPESCRIPT_VERSION,
     strip_prefix = "rules_typescript-%s" % RULES_TYPESCRIPT_VERSION,
-    sha256 = "3606b97a4859cc3f73b47888618b14290cf4b93c411b1bedd821e8bb39b3442b",
+    sha256 = "a2b26ac3fc13036011196063db1bf7f1eae81334449201dc28087ebfa3708c99",
 )
 
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_setup_workspace")
@@ -31,22 +48,27 @@ load("@build_bazel_rules_typescript//:defs.bzl", "ts_setup_workspace")
 ts_setup_workspace()
 
 # We get tools like Buildifier from here
-git_repository(
+BAZEL_BUILDTOOLS_VERSION = "0.15.0"
+http_archive(
     name = "com_github_bazelbuild_buildtools",
-    remote = "https://github.com/bazelbuild/buildtools.git",
-    commit = "b3b620e8bcff18ed3378cd3f35ebeb7016d71f71",
+    url = "https://github.com/bazelbuild/buildtools/archive/%s.zip" % BAZEL_BUILDTOOLS_VERSION,
+    strip_prefix = "buildtools-%s" % BAZEL_BUILDTOOLS_VERSION,
+    sha256 = "76d1837a86fa6ef5b4a07438f8489f00bfa1b841e5643b618e01232ba884b1fe",
 )
 
 # The Go toolchain is used for Buildifier and some TypeScript tooling.
+# We need to use this commit to include Windows path fixes.
+# TODO(@filipesilva): update this commit to a tag, the one after 0.13.0
+RULES_GO_VERSION = "8747ea65f6abbc1f3107afaafb4b42fb40c18788"
 http_archive(
     name = "io_bazel_rules_go",
-    url = "https://github.com/bazelbuild/rules_go/releases/download/0.7.1/rules_go-0.7.1.tar.gz",
-    sha256 = "341d5eacef704415386974bc82a1783a8b7ffbff2ab6ba02375e1ca20d9b031c",
+    url = "https://github.com/bazelbuild/rules_go/archive/%s.zip" % RULES_GO_VERSION,
+    strip_prefix = "rules_go-%s" % RULES_GO_VERSION,
+    sha256 = "e5d6b10fc415a73d41de5fd13ef509a063b1d139480732f6744896cf9ca1d228",
 )
 
-load("@io_bazel_rules_go//go:def.bzl", "go_rules_dependencies", "go_register_toolchains")
+load("@io_bazel_rules_go//go:def.bzl", "go_register_toolchains", "go_rules_dependencies")
 
 go_rules_dependencies()
 
 go_register_toolchains()
-
