@@ -9,10 +9,11 @@ load("//tools:defaults.bzl", "ts_library")
 licenses(["notice"])  # MIT
 
 ts_library(
-    name = "architect-cli",
+    name = "architect_cli",
     srcs = [
         "bin/architect.ts",
     ],
+    module_name = "@angular-devkit/architect-cli",
     deps = [
         "//packages/angular_devkit/architect",
         "//packages/angular_devkit/core",
@@ -20,7 +21,4 @@ ts_library(
         "@rxjs",
         "@rxjs//operators",
     ],
-    tsconfig = "//:tsconfig.json",
-    module_name = "@angular-devkit/architect-cli",
-    module_root = "bin",
 )

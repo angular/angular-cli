@@ -19,6 +19,7 @@ ts_library(
         ],
     ),
     data = glob(["**/*.json"]),
+    module_name = "@angular/cli",
     deps = [
         "//packages/angular_devkit/architect",
         "//packages/angular_devkit/core",
@@ -30,5 +31,4 @@ ts_library(
         # @typings: node
         # @typings: semver
     ],
-    tsconfig = "//:tsconfig.json"
 )
