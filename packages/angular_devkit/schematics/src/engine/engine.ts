@@ -12,7 +12,7 @@ import { Url } from 'url';
 import { MergeStrategy } from '../tree/interface';
 import { NullTree } from '../tree/null';
 import { empty } from '../tree/static';
-import { Workflow } from '../workflow';
+import { Workflow } from '../workflow/interface';
 import {
   Collection,
   CollectionDescription,
