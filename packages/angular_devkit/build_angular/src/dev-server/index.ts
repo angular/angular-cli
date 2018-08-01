@@ -51,6 +51,7 @@ export interface DevServerBuilderOptions {
   optimization?: boolean;
   aot?: boolean;
   sourceMap?: boolean;
+  vendorSourceMap?: boolean;
   evalSourceMap?: boolean;
   vendorChunk?: boolean;
   commonChunk?: boolean;
@@ -399,6 +400,8 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
       ...(options.optimization !== undefined ? { optimization: options.optimization } : {}),
       ...(options.aot !== undefined ? { aot: options.aot } : {}),
       ...(options.sourceMap !== undefined ? { sourceMap: options.sourceMap } : {}),
+      ...(options.vendorSourceMap !== undefined ?
+         { vendorSourceMap: options.vendorSourceMap } : {}),
       ...(options.evalSourceMap !== undefined ? { evalSourceMap: options.evalSourceMap } : {}),
       ...(options.vendorChunk !== undefined ? { vendorChunk: options.vendorChunk } : {}),
       ...(options.commonChunk !== undefined ? { commonChunk: options.commonChunk } : {}),
