@@ -3,6 +3,7 @@
     {
       from: 'v1.2.3',
       to: 'v1.2.4',
+      packages: { /* The PackageInfoMap from "lib/packages.ts" */
       // For a commit with description:
       // ------------------------------------------------------
       //   feat(@angular/pwa): add something to this
@@ -29,12 +30,30 @@
         ],
       } ]
     }
-%># Commits
+%><%
+  // Sort those packages to the top, in those orders. Others will be sorted alphabetically.
+  const CUSTOM_SORT_ORDER = [
+    '@angular/cli',
+    '@schematics/angular',
+    '@angular-devkit/architect-cli',
+    '@angular-devkit/schematics-cli',
+  ];
+%>
+# Commits
+
+<table>
+<tbody>
 <%
   // Get unique scopes.
   const scopes = commits.map(x => x.scope)
     .sort()
-    .filter((v, i, a) => v !== a[i - 1]);
+    .filter((v, i, a) => v !== a[i - 1])
+    .sort((a, b) => {
+        // Sort using the sorting order above, or against each others if undefined.
+        const aOrder = CUSTOM_SORT_ORDER.indexOf(a);
+        const bOrder = CUSTOM_SORT_ORDER.indexOf(b);
+        return aOrder == -1 ? bOrder == -1 ? (a || '').localeCompare(b || '') : 1 : aOrder - bOrder;
+    });
 
   for (const scope of scopes) {
     const scopeCommits = commits
@@ -45,19 +64,35 @@
         continue;
     }
 %>
-## `<%= scope || 'Misc' %>`
-
-| Commit | Description | Notes |
-|:------:| ----------- | -----:|
+<tr><td colspan=3><h3><%
+  if (scope) {
+    %><%= scope %> (<%= packages[scope].version %>)<%
+  } else {
+    %>Misc<%
+  }
+%></h3></td></tr>
+  <tr>
+    <td><b>Commit</b>
+    <td><b>Description</b>
+    <td><b>Notes</b>
+  </tr>
 <%
+    let nbRows = 0;
     for (const commit of scopeCommits) {
+        nbRows++;
         switch (commit.type) {
             case 'fix': %><%= include('./changelog-fix', commit) %><% break;
             case 'feat': %><%= include('./changelog-feat', commit) %><% break;
         }
     }
-%>
+
+    // Add an empty row to get the alternating colors in sync.
+    if (scope != scopes[scopes.length - 1] && nbRows % 2) { %>
+<tr></tr>
+    <% } %>
 <% } %>
+</tbody>
+</table>
 
 ----
 
