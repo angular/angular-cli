@@ -26,6 +26,5 @@
       "description": "The title of the application."
     }
   },
-  "required": [],
-  "additionalProperties": false
+  "required": []
 }
