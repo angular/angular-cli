@@ -61,7 +61,7 @@ class BundleCalculator extends Calculator {
  */
 class InitialCalculator extends Calculator {
   calculate() {
-    const initialChunks = this.compilation.chunks.filter(chunk => chunk.isInitial);
+    const initialChunks = this.compilation.chunks.filter(chunk => chunk.isOnlyInitial());
     const size: number = initialChunks
       .reduce((files, chunk) => [...files, ...chunk.files], [])
       .map((file: string) => this.compilation.assets[file].size())
