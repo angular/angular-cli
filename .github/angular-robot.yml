@@ -43,7 +43,7 @@ merge:
     requiredStatuses:
       - "continuous-integration/appveyor/pr"
       - "ci/circleci: build"
-      - "ci/circleci: build-bazel"
+      - "ci/circleci: bazel"
       - "ci/circleci: install"
       - "ci/circleci: lint"
       - "ci/circleci: validate"

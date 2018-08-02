@@ -93,13 +93,13 @@ jobs:
       - attach_workspace: *attach_options
       - run: npm run admin -- build
 
-  build-bazel:
+  bazel:
     <<: *defaults
     resource_class: large
     steps:
       - attach_workspace: *attach_options
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
-      - run: bazel build //packages/...
+      - run: bazel test //packages/...
 
   snapshot_publish:
     <<: *defaults
@@ -142,7 +142,7 @@ workflows:
           requires:
             - lint
             - validate
-      - build-bazel:
+      - bazel:
           requires:
             - lint
             - validate
