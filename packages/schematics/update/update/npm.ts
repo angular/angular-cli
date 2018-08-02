@@ -85,7 +85,7 @@ function getOptionFromNpmCli(option: string): Observable<string | undefined> {
       subject.complete();
     });
   }).pipe(
-    catchError(() => of()),
+    catchError(() => of(undefined)),
     shareReplay(),
   );
 }
