@@ -5,17 +5,26 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
-import { Path, join, normalize, virtualFs, dirname, getSystemPath, tags, fragment } from '@angular-devkit/core';
-import { Filesystem } from '@angular/service-worker/config';
+import {
+  Path,
+  dirname,
+  getSystemPath,
+  join,
+  normalize,
+  tags,
+  virtualFs,
+} from '@angular-devkit/core';
+import {
+  Filesystem,
+  Generator,
+} from '@angular/service-worker/config'; // tslint:disable-line:no-implicit-dependencies
 import * as crypto from 'crypto';
 import * as fs from 'fs';
+import { Observable, from, merge, of } from 'rxjs';
+import { concatMap, map, mergeMap, reduce, switchMap, toArray } from 'rxjs/operators';
 import * as semver from 'semver';
-
 import { resolveProjectModule } from '../require-project-module';
-import { map, reduce, switchMap, concatMap, mergeMap, toArray, tap } from "rxjs/operators";
-import { Observable, merge, of, from } from "rxjs";
 
 
 export const NEW_SW_VERSION = '5.0.0-rc.0';
@@ -32,8 +41,8 @@ class CliFilesystem implements Filesystem {
       map(fragment => join(path, fragment)),
       // Emit directory content paths instead of the directory path.
       mergeMap(path => this._host.isDirectory(path).pipe(
-          concatMap(isDir => isDir ? recursiveList(path) : of(path))
-        )
+          concatMap(isDir => isDir ? recursiveList(path) : of(path)),
+        ),
       ),
     );
 
@@ -133,14 +142,15 @@ export function augmentAppWithServiceWorker(
     }),
     map(content => JSON.parse(virtualFs.fileBufferToString(content))),
     switchMap(configJson => {
-      const Generator = require(swConfigPath).Generator;
-      const gen = new Generator(new CliFilesystem(host, outputPath), baseHref);
+      const GeneratorConstructor = require(swConfigPath).Generator as typeof Generator;
+      const gen = new GeneratorConstructor(new CliFilesystem(host, outputPath), baseHref);
 
       return gen.process(configJson);
     }),
 
     switchMap(output => {
       const manifest = JSON.stringify(output, null, 2);
+
       return host.read(workerPath).pipe(
         switchMap(workerCode => {
           return merge(
