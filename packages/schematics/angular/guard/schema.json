@@ -41,6 +41,5 @@
       "description": "Specifies whether to apply lint fixes after generating the guard."
     }
   },
-  "required": [],
-  "additionalProperties": false
+  "required": []
 }

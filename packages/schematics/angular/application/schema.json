@@ -63,6 +63,5 @@
       "description": "Do not add dependencies to package.json."
     }
   },
-  "required": [],
-  "additionalProperties": false
+  "required": []
 }
