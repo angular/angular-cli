@@ -31,6 +31,5 @@
       "description": "Specifies whether to apply lint fixes after generating the enum."
     }
   },
-  "required": [],
-  "additionalProperties": false
+  "required": []
 }

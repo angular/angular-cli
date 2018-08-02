@@ -36,6 +36,5 @@
       "default": ""
     }
   },
-  "required": [],
-  "additionalProperties": false
+  "required": []
 }

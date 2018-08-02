@@ -98,6 +98,5 @@
   "required": [
     "clientProject",
     "universalProject"
-  ],
-  "additionalProperties": false
+  ]
 }
