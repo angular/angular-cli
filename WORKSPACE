@@ -58,13 +58,12 @@ http_archive(
 
 # The Go toolchain is used for Buildifier and some TypeScript tooling.
 # We need to use this commit to include Windows path fixes.
-# TODO(@filipesilva): update this commit to a tag, the one after 0.13.0
-RULES_GO_VERSION = "8747ea65f6abbc1f3107afaafb4b42fb40c18788"
+RULES_GO_VERSION = "0.14.0"
 http_archive(
     name = "io_bazel_rules_go",
     url = "https://github.com/bazelbuild/rules_go/archive/%s.zip" % RULES_GO_VERSION,
     strip_prefix = "rules_go-%s" % RULES_GO_VERSION,
-    sha256 = "e5d6b10fc415a73d41de5fd13ef509a063b1d139480732f6744896cf9ca1d228",
+    sha256 = "9bd7c2743f014e4e112b671098ba1da6aec036fe07093b10ca39a9f81ec5cc33",
 )
 
 load("@io_bazel_rules_go//go:def.bzl", "go_register_toolchains", "go_rules_dependencies")
