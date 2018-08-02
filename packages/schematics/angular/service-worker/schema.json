@@ -22,6 +22,5 @@
       "default": "production"
     }
   },
-  "required": [],
-  "additionalProperties": false
+  "required": []
 }

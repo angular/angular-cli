@@ -58,6 +58,5 @@
       "alias": "m"
     }
   },
-  "required": [],
-  "additionalProperties": false
+  "required": []
 }

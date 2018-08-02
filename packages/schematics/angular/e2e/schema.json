@@ -30,6 +30,5 @@
   },
   "required": [
     "relatedAppName"
-  ],
-  "additionalProperties": false
+  ]
 }

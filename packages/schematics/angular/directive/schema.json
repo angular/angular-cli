@@ -70,6 +70,5 @@
       "description": "Specifies if declaring module exports the directive."
     }
   },
-  "required": [],
-  "additionalProperties": false
+  "required": []
 }

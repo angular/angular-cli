@@ -52,6 +52,5 @@
       "description": "Specifies if declaring module exports the pipe."
     }
   },
-  "required": [],
-  "additionalProperties": false
+  "required": []
 }
