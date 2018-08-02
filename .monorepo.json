@@ -187,13 +187,6 @@
       "hash": "872897792f5703b1a76900c363bbdaf5",
       "snapshotRepo": "angular/schematics-schematics-builds"
     },
-    "@schematics/package-update": {
-      "name": "Package JSON Update Schematics",
-      "version": "0.8.0-beta.1",
-      "section": "Schematics",
-      "hash": "7c8e3f2357dd2f7991d49b702ef4948d",
-      "snapshotRepo": "angular/schematics-package-update-builds"
-    },
     "@schematics/update": {
       "name": "Package Update Schematics",
       "version": "0.8.0-beta.1",
