@@ -168,7 +168,7 @@ workflow.reporter.subscribe((event: DryRunEvent) => {
     case 'error':
       error = true;
 
-      const desc = event.description == 'alreadyExist' ? 'already exists' : 'does not exist.';
+      const desc = event.description == 'alreadyExist' ? 'already exists' : 'does not exist';
       logger.warn(`ERROR! ${event.path} ${desc}.`);
       break;
     case 'update':
