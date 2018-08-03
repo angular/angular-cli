@@ -7,10 +7,11 @@
  */
 // tslint:disable:no-implicit-dependencies
 import { JsonObject, logging } from '@angular-devkit/core';
+import * as path from 'path';
+import { packages } from '../lib/packages';
 
 require('../lib/bootstrap-local');
 
-const path = require('path');
 const spdxSatisfies = require('spdx-satisfies');
 
 
@@ -43,9 +44,6 @@ const licensesWhitelist = [
 
   // Combinations.
   '(AFL-2.1 OR BSD-2-Clause)',
-  '(MIT OR CC-BY-3.0)',
-  '(MIT OR Apache-2.0)',
-  '(MIT OR BSD-3-Clause)',
 ];
 
 // Name variations of SPDX licenses that some packages have.
@@ -62,26 +60,27 @@ const licenseReplacements: { [key: string]: string } = {
 
 // Specific packages to ignore, add a reason in a comment. Format: package-name@version.
 const ignoredPackages = [
-  'spdx-license-ids@2.0.1',  // CC0 but it's content only (index.json, no code) and not distributed.
+  // * Development only
   'spdx-license-ids@3.0.0',  // CC0 but it's content only (index.json, no code) and not distributed.
-  'map-stream@0.1.0', // MIT, license but it's not listed in package.json.
-  'xmldom@0.1.27', // LGPL,MIT but has a broken licenses array.
-  'true-case-path@1.0.2', // Apache-2.0 but broken license in package.json
-  'pako@1.0.6', // MIT but broken license in package.json
+  'tslint-sonarts@1.7.0', // LGPL-3.0 but only used as a tool, not linked in the build.
 
+  // * Broken license fields
+  'bitsyntax@0.0.4', // MIT but no license field in package.json
+  'pako@1.0.6', // MIT but broken license in package.json
+  'true-case-path@1.0.2', // Apache-2.0 but broken license in package.json
+
+  // * Other
   'jsonify@0.0.0', // TODO(hansl): fix this. this is not an acceptable license, but is 8 deps down
                    // so hard to manage. In talk with owner and users to switch over.
-
-  'uws@0.14.5', // TODO(filipesilva): remove this when karma is moved to e2e tests.
+  'uws@9.14.0', // Zlib -- TODO(filipesilva): remove this when karma is moved to e2e tests.
   // TODO(filipesilva): remove this when spec_large is moved to e2e tests.
   'font-awesome@4.7.0', // (OFL-1.1 AND MIT)
-
-  '@webassemblyjs/ieee754@1.5.10', // MIT but no LICENSE file. `license` field in package.json.
-  '@webassemblyjs/leb128@1.5.10', // Apache 2.0 license, but get discovered as "Apache".
-  '@webassemblyjs/leb128@1.4.3', // Apache 2.0 license, but get discovered as "Apache".
-
-  'tslint-sonarts@1.7.0', // LGPL-3.0 but only used as a tool, not linked in the build.
 ];
+
+// Ignore own packages (all MIT)
+for (const packageName of Object.keys(packages)) {
+  ignoredPackages.push(`${packageName}@0.0.0`);
+}
 
 // Find all folders directly under a `node_modules` that have a package.json.
 const checker = require('license-checker');
@@ -89,13 +88,11 @@ const checker = require('license-checker');
 
 // Check if a license is accepted by an array of accepted licenses
 function _passesSpdx(licenses: string[], accepted: string[]) {
-  return accepted.some(l => {
-    try {
-      return spdxSatisfies(licenses.join(' AND '), l);
-    } catch (_) {
-      return false;
-    }
-  });
+  try {
+    return spdxSatisfies(licenses.join(' AND '), accepted.join(' OR '));
+  } catch {
+    return false;
+  }
 }
 
 
@@ -113,8 +110,7 @@ export default function (_options: {}, logger: logging.Logger): Promise<number> 
           .map(key => ({
             id: key,
             licenses: ([] as string[])
-              // tslint:disable-next-line:non-null-operator
-              .concat((json[key] ! as JsonObject).licenses as string[])
+              .concat((json[key] as JsonObject).licenses as string[])
               // `*` is used when the license is guessed.
               .map(x => x.replace(/\*$/, ''))
               .map(x => x in licenseReplacements ? licenseReplacements[x] : x),
