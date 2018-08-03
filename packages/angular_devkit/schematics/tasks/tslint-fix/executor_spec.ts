@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-implicit-dependencies
-import { getSystemPath, normalize, virtualFs } from '@angular-devkit/core';
+import { getSystemPath, logging, normalize, virtualFs } from '@angular-devkit/core';
 import { TempScopedNodeJsSyncHost } from '@angular-devkit/core/node/testing';
 import { HostTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
@@ -52,7 +52,7 @@ describe('TsLintTaskExecutor', () => {
       testRunner.runSchematicAsync('run-task', null, tree),
       new Observable<void>(obs => {
         process.chdir(getSystemPath(host.root));
-        testRunner.logger.subscribe(x => messages.push(x.message));
+        testRunner.logger.subscribe((x: logging.LogEntry) => messages.push(x.message));
         testRunner.engine.executePostTasks().subscribe(obs);
       }).pipe(
         catchError(() => {
@@ -88,7 +88,7 @@ describe('TsLintTaskExecutor', () => {
       testRunner.runSchematicAsync('custom-rule', { shouldPass: true }, tree),
       new Observable<void>(obs => {
         process.chdir(getSystemPath(host.root));
-        testRunner.logger.subscribe(x => messages.push(x.message));
+        testRunner.logger.subscribe((x: logging.LogEntry) => messages.push(x.message));
         testRunner.engine.executePostTasks().subscribe(obs);
       }),
     ).toPromise().then(done, done.fail);
@@ -113,7 +113,7 @@ describe('TsLintTaskExecutor', () => {
       testRunner.runSchematicAsync('custom-rule', { shouldPass: false }, tree),
       new Observable<void>(obs => {
         process.chdir(getSystemPath(host.root));
-        testRunner.logger.subscribe(x => messages.push(x.message));
+        testRunner.logger.subscribe((x: logging.LogEntry) => messages.push(x.message));
         testRunner.engine.executePostTasks().subscribe(obs);
       }).pipe(
         catchError(() => {
