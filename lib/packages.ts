@@ -91,6 +91,9 @@ function loadPackageJson(p: string) {
       case 'optionalDependencies':
       case 'typings':
       case 'version':
+      case 'private':
+      case 'workspaces':
+      case 'resolutions':
         continue;
 
       // Remove the following keys from the package.json.
@@ -128,6 +131,8 @@ function _findAllPackageJson(dir: string, exclude: RegExp): string[] {
       const p = path.join(dir, fileName);
 
       if (exclude.test(p)) {
+        return;
+      } else if (/[\/\\]node_modules[\/\\]/.test(p)) {
         return;
       } else if (fileName == 'package.json') {
         result.push(p);

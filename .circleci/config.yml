@@ -3,13 +3,13 @@ version: 2
 _defaults: &defaults
   working_directory: ~/ng
   docker:
-    - image: angular/ngcontainer:0.3.0
+    - image: angular/ngcontainer:0.3.3
 
 _post_checkout: &post_checkout
   post: git pull --ff-only origin "refs/pull/${CI_PULL_REQUEST//*pull\//}/merge"
 
 _root_package_lock_key: &_root_package_lock_key
-  key: angular_devkit-{{ checksum "package-lock.json" }}-0.3.0
+  key: angular_devkit-{{ checksum "yarn.lock" }}-0.3.3
 
 jobs:
   install:
@@ -17,7 +17,7 @@ jobs:
     steps:
       - checkout: *post_checkout
       - restore_cache: *_root_package_lock_key
-      - run: npm install --no-save
+      - run: yarn install --frozen-lockfile
       - save_cache:
           <<: *_root_package_lock_key
           paths:
@@ -64,7 +64,7 @@ jobs:
       - checkout: *post_checkout
       - restore_cache: *_root_package_lock_key
       - run: npm install --global npm@6.1
-      - run: xvfb-run -a npm run test-cli-e2e -- --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
+      - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
   build:
     <<: *defaults
@@ -79,7 +79,6 @@ jobs:
     steps:
       - checkout: *post_checkout
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
-      - run: bazel run @nodejs//:npm install
       - run: bazel build //packages/...
 
   snapshot_publish:
