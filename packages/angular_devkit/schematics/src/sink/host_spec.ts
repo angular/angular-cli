@@ -8,7 +8,6 @@
 // tslint:disable:no-implicit-dependencies
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { HostSink } from '@angular-devkit/schematics';
-import { fileBufferToString } from '../../../core/src/virtual-fs/host';
 import { HostCreateTree, HostTree } from '../tree/host-tree';
 import { optimize } from '../tree/static';
 
@@ -133,7 +132,7 @@ describe('FileSystemSink', () => {
           .toPromise()
           .then(() => {
             expect(host.sync.read(normalize('/file0')).toString()).toBe('hello');
-            expect(fileBufferToString(host.sync.read(normalize('/file1')))).toBe('world');
+            expect(virtualFs.fileBufferToString(host.sync.read(normalize('/file1')))).toBe('world');
           })
           .then(done, done.fail);
     });
