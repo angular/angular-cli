@@ -45,9 +45,10 @@ export function angularMajorCompatGuarantee(range: string) {
 
   // Add the major version as compatible with the angular compatible, with all minors. This is
   // already one major above the greatest supported, because we increment `major` before checking.
+  // We add minors like this because a minor beta is still compatible with a minor non-beta.
   let newRange = range;
   for (let minor = 0; minor < 20; minor++) {
-    newRange += ` || ^${major}.${minor}.0-alpha.0`;
+    newRange += ` || ^${major}.${minor}.0-alpha.0 `;
   }
 
   return semver.validRange(newRange) || range;
@@ -496,7 +497,7 @@ function _usageMessage(
 function _buildPackageInfo(
   tree: Tree,
   packages: Map<string, VersionRange>,
-  allDependencies: Map<string, VersionRange>,
+  allDependencies: ReadonlyMap<string, VersionRange>,
   npmPackageJson: NpmRepositoryPackageJson,
   logger: logging.LoggerApi,
 ): PackageInfo {
@@ -629,8 +630,9 @@ function _buildPackageList(
 
 
 function _addPackageGroup(
+  tree: Tree,
   packages: Map<string, VersionRange>,
-  allDependencies: ReadonlyMap<string, string>,
+  allDependencies: ReadonlyMap<string, VersionRange>,
   npmPackageJson: NpmRepositoryPackageJson,
   logger: logging.LoggerApi,
 ): void {
@@ -639,7 +641,11 @@ function _addPackageGroup(
     return;
   }
 
-  const version = npmPackageJson['dist-tags'][maybePackage] || maybePackage;
+  const info = _buildPackageInfo(tree, packages, allDependencies, npmPackageJson, logger);
+
+  const version = (info.target && info.target.version)
+               || npmPackageJson['dist-tags'][maybePackage]
+               || maybePackage;
   if (!npmPackageJson.versions[version]) {
     return;
   }
@@ -673,17 +679,22 @@ function _addPackageGroup(
  * @private
  */
 function _addPeerDependencies(
+  tree: Tree,
   packages: Map<string, VersionRange>,
-  _allDependencies: ReadonlyMap<string, string>,
+  allDependencies: ReadonlyMap<string, VersionRange>,
   npmPackageJson: NpmRepositoryPackageJson,
-  _logger: logging.LoggerApi,
+  logger: logging.LoggerApi,
 ): void {
   const maybePackage = packages.get(npmPackageJson.name);
   if (!maybePackage) {
     return;
   }
 
-  const version = npmPackageJson['dist-tags'][maybePackage] || maybePackage;
+  const info = _buildPackageInfo(tree, packages, allDependencies, npmPackageJson, logger);
+
+  const version = (info.target && info.target.version)
+               || npmPackageJson['dist-tags'][maybePackage]
+               || maybePackage;
   if (!npmPackageJson.versions[version]) {
     return;
   }
@@ -807,8 +818,8 @@ export default function(options: UpdateSchema): Rule {
         do {
           lastPackagesSize = packages.size;
           npmPackageJsonMap.forEach((npmPackageJson) => {
-            _addPackageGroup(packages, allDependencies, npmPackageJson, logger);
-            _addPeerDependencies(packages, allDependencies, npmPackageJson, logger);
+            _addPackageGroup(tree, packages, allDependencies, npmPackageJson, logger);
+            _addPeerDependencies(tree, packages, allDependencies, npmPackageJson, logger);
           });
         } while (packages.size > lastPackagesSize);
 
