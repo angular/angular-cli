@@ -9,7 +9,6 @@
 // tslint:disable:no-global-tslint-disable no-any
 import { tags, terminal } from '@angular-devkit/core';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
-import { CommandScope, Option } from '../models/command';
 import { parseOptions } from '../models/command-runner';
 import { SchematicCommand } from '../models/schematic-command';
 import { NpmInstall } from '../tasks/npm-install';
@@ -17,24 +16,16 @@ import { getPackageManager } from '../utilities/config';
 
 
 export class AddCommand extends SchematicCommand {
-  readonly name = 'add';
-  readonly description = 'Add support for a library to your project.';
   readonly allowPrivateSchematics = true;
-  static aliases = [];
-  static scope = CommandScope.inProject;
-  arguments = ['collection'];
-  options: Option[] = [];
 
   private async _parseSchematicOptions(collectionName: string): Promise<any> {
     const schematicOptions = await this.getOptions({
       schematicName: 'ng-add',
       collectionName,
     });
+    this.addOptions(schematicOptions);
 
-    const options = this.options.concat(schematicOptions.options);
-    const args = schematicOptions.arguments.map(arg => arg.name);
-
-    return parseOptions(this._rawArgs, options, args, this.argStrategy);
+    return parseOptions(this._rawArgs, this.options);
   }
 
   validate(options: any) {
@@ -42,7 +33,7 @@ export class AddCommand extends SchematicCommand {
 
     if (!collectionName) {
       this.logger.fatal(
-        `The "ng ${this.name}" command requires a name argument to be specified eg. `
+        `The "ng add" command requires a name argument to be specified eg. `
         + `${terminal.yellow('ng add [name] ')}. For more details, use "ng help".`,
       );
 
@@ -57,7 +48,7 @@ export class AddCommand extends SchematicCommand {
 
     if (!firstArg) {
       this.logger.fatal(
-        `The "ng ${this.name}" command requires a name argument to be specified eg. `
+        `The "ng add" command requires a name argument to be specified eg. `
         + `${terminal.yellow('ng add [name] ')}. For more details, use "ng help".`,
       );
 
