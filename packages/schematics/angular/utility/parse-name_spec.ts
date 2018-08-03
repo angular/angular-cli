@@ -36,4 +36,10 @@ describe('parse-name', () => {
   it('should handle name has a higher path above root', () => {
     expect(() => parseName('src/app', '../../../foo')).toThrow();
   });
+
+  it('should handle Windows paths', () => {
+    const result = parseName('', 'foo\\bar\\baz');
+    expect(result.name).toEqual('baz');
+    expect(result.path).toEqual('/foo/bar');
+  });
 });
