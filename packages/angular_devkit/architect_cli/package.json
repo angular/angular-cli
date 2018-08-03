@@ -5,9 +5,6 @@
   "bin": {
     "architect": "./bin/architect.js"
   },
-  "scripts": {
-    "preinstall": "echo DO NOT INSTALL THIS PROJECT, ONLY THE ROOT PROJECT. && exit 1"
-  },
   "keywords": [
     "build system",
     "build facade",

@@ -186,6 +186,10 @@ export default function(argv: { local?: boolean, snapshot?: boolean }, logger: l
     const resources = files
       .map((fileName) => path.relative(pkg.root, fileName))
       .filter(fileName => {
+        if (/(?:^|[\/\\])node_modules[\/\\]/.test(fileName)) {
+          return false;
+        }
+
         // Schematics template files.
         if (pkgJson['schematics'] &&
          (fileName.match(/(\/|\\)files(\/|\\)/) || fileName.match(/(\/|\\)\w+-files(\/|\\)/))) {

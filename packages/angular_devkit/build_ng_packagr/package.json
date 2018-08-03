@@ -5,9 +5,6 @@
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
-  "scripts": {
-    "preinstall": "echo DO NOT INSTALL THIS PROJECT, ONLY THE ROOT PROJECT. && exit 1"
-  },
   "dependencies": {
     "@angular-devkit/architect": "0.0.0",
     "@angular-devkit/core": "0.0.0",
@@ -16,5 +13,12 @@
   },
   "peerDependencies": {
     "ng-packagr": "^2.2.0 || ^3.0.0 || ^4.0.0"
+  },
+  "devDependencies": {
+    "@angular/compiler": "^6.1.0",
+    "@angular/compiler-cli": "^6.1.0",
+    "ng-packagr": "^4.0.0",
+    "tsickle": ">=0.27.3",
+    "tslib": "^1.9.0"
   }
 }
