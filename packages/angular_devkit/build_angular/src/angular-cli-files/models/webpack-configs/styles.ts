@@ -200,6 +200,18 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     }
   }
 
+  let dartSass: {} | undefined;
+  try {
+    dartSass = require('sass');
+  } catch { }
+
+  let fiber: {} | undefined;
+  if (dartSass) {
+    try {
+      fiber = require('fibers');
+    } catch { }
+  }
+
   // set base rules to derive final rules from
   const baseRules: webpack.Rule[] = [
     { test: /\.css$/, use: [] },
@@ -207,6 +219,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       test: /\.scss$|\.sass$/, use: [{
         loader: 'sass-loader',
         options: {
+          implementation: dartSass,
+          fiber,
           sourceMap: cssSourceMap,
           // bootstrap-sass requires a minimum precision of 8
           precision: 8,
