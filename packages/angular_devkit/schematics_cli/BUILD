@@ -8,8 +8,11 @@ load("//tools:defaults.bzl", "ts_library")
 
 licenses(["notice"])  # MIT License
 
+
+# @angular-devkit/schematics-cli
+
 ts_library(
-    name = "schematics-cli",
+    name = "schematics_cli",
     srcs = glob(
         include = ["bin/**/*.ts"],
         exclude = [
