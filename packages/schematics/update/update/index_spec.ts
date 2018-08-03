@@ -147,8 +147,7 @@ describe('@schematics/update', () => {
     );
 
     schematicRunner.runSchematicAsync('update', {
-      packages: ['@angular/core'],
-      next: true,
+      packages: ['@angular/core@^6.0.0'],
     }, appTree).pipe(
       map(tree => {
         const packageJson = JSON.parse(tree.readContent('/package.json'));
@@ -194,8 +193,7 @@ describe('@schematics/update', () => {
     );
 
     schematicRunner.runSchematicAsync('update', {
-      packages: ['@angular/core'],
-      next: true,
+      packages: ['@angular/core@^6.0.0'],
     }, appTree).pipe(
       map(tree => {
         const packageJson = JSON.parse(tree.readContent('/package.json'));
