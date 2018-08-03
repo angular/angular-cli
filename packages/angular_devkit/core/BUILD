@@ -18,6 +18,7 @@ ts_library(
             "src/**/*_benchmark.ts",
         ],
     ),
+    data = glob(["**/*.json"]),
     module_name = "@angular-devkit/core",
     module_root = "src",
     deps = [
