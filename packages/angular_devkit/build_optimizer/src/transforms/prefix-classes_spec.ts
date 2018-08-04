@@ -162,7 +162,7 @@ describe('prefix-classes', () => {
       }());
     `;
     const output = tags.stripIndent`
-      var BasicTestCase = /*@__PURE__*/ (function () {
+      var BasicTestCase = /** @class */ /*@__PURE__*/ (function () {
         function BasicTestCase() {
         }
         return BasicTestCase;
@@ -183,7 +183,7 @@ describe('prefix-classes', () => {
       }());
     `;
     const output = tags.stripIndent`
-      var StaticTestCase = /*@__PURE__*/ (function () {
+      var StaticTestCase = /** @class */ /*@__PURE__*/ (function () {
         function StaticTestCase() {
         }
         StaticTestCase.StaticTest = true;
@@ -206,7 +206,7 @@ describe('prefix-classes', () => {
       }(StaticTestCase));
     `;
     const output = tags.stripIndent`
-      var ExtendedClass = /*@__PURE__*/ (function (_super) {
+      var ExtendedClass = /** @class */ /*@__PURE__*/ (function (_super) {
         __extends(ExtendedClass, _super);
         function ExtendedClass() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -230,7 +230,7 @@ describe('prefix-classes', () => {
       }(OuterSubscriber));
     `;
     const output = tags.stripIndent`
-      var BufferSubscriber = /*@__PURE__*/ (function (_super) {
+      var BufferSubscriber = /** @class */ /*@__PURE__*/ (function (_super) {
         tslib_1.__extends(BufferSubscriber, _super);
         function BufferSubscriber() {
           return _super !== null && _super.apply(this, arguments) || this;
@@ -274,7 +274,7 @@ describe('prefix-classes', () => {
       }(Subscriber));
     `;
     const output = `
-      var ExtendedClass = /*@__PURE__*/ (function (_super) {
+      var ExtendedClass = /*@__PURE__*/ /*@__PURE__*/ ( /*@__PURE__*/function (_super) {
         __extends(ExtendedClass, _super);
         function ExtendedClass() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -287,7 +287,7 @@ describe('prefix-classes', () => {
        * @ignore
        * @extends {Ignored}
        */
-      var zip_ZipSubscriber = /*@__PURE__*/ (function (_super) {
+      var zip_ZipSubscriber = /*@__PURE__*/ /*@__PURE__*/ ( /*@__PURE__*/function (_super) {
           zip___extends(ZipSubscriber, _super);
           function ZipSubscriber(destination, project, values) {
               if (values === void 0) {
