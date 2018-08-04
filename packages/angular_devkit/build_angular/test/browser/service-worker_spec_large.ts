@@ -70,9 +70,9 @@ describe('Browser Builder service worker', () => {
           index: '/index.html',
           navigationUrls: [
             { positive: true, regex: '^\\\/.*$' },
-            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\\\/]*\\.[^\\\/]*$' },
-            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\\\/]*__[^\\\/]*$' },
-            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\\\/]*__[^\\\/]*\\\/.*$' },
+            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\/]*\\.[^\/]*$' },
+            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\/]*__[^\/]*$' },
+            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\/]*__[^\/]*\\\/.*$' },
           ],
           assetGroups: [
             {
@@ -125,9 +125,9 @@ describe('Browser Builder service worker', () => {
           index: '/foo/bar/index.html',
           navigationUrls: [
             { positive: true, regex: '^\\\/.*$' },
-            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\\\/]*\\.[^\\\/]*$' },
-            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\\\/]*__[^\\\/]*$' },
-            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\\\/]*__[^\\\/]*\\\/.*$' },
+            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\/]*\\.[^\/]*$' },
+            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\/]*__[^\/]*$' },
+            { positive: false, regex: '^\\\/(?:.+\\\/)?[^\/]*__[^\/]*\\\/.*$' },
           ],
           assetGroups: [
             {
