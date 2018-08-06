@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { JsonObject, JsonValue, parseJson } from '@angular-devkit/core';
-import * as jsonSchemaTravese from 'json-schema-traverse';
+import * as jsonSchemaTraverse from 'json-schema-traverse';
 import { Option, OptionSmartDefault } from './command';
 
 export async function convertSchemaToOptions(schema: string): Promise<Option[]> {
@@ -86,7 +86,7 @@ function getOptions(schemaText: string, onlyRootProperties = true): Promise<Opti
 
     const callbacks = { post: postCallback };
 
-    jsonSchemaTravese(<object> fullSchema, traverseOptions, callbacks);
+    jsonSchemaTraverse(<object> fullSchema, traverseOptions, callbacks);
   });
 }
 
