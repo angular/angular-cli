@@ -7,7 +7,7 @@
   "$aliases": [ "b" ],
   "$scope": "in",
   "$type": "architect",
-  "$impl": "./build#BuildCommand",
+  "$impl": "./build-impl#BuildCommand",
 
   "type": "object",
   "properties": {

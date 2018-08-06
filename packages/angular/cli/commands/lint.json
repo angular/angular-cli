@@ -7,7 +7,7 @@
   "$aliases": [ "l" ],
   "$scope": "in",
   "$type": "architect",
-  "$impl": "./lint#LintCommand",
+  "$impl": "./lint-impl#LintCommand",
 
   "type": "object",
   "properties": {

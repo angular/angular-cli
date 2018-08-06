@@ -5,7 +5,7 @@
   "$longDescription": "",
 
   "$aliases": [],
-  "$impl": "./help#HelpCommand",
+  "$impl": "./help-impl#HelpCommand",
 
   "type": "object"
 }

@@ -7,7 +7,7 @@
   "$aliases": [ "e" ],
   "$scope": "in",
   "$type": "architect",
-  "$impl": "./e2e#E2eCommand",
+  "$impl": "./e2e-impl#E2eCommand",
 
   "type": "object",
   "properties": {

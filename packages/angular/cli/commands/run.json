@@ -7,7 +7,7 @@
   "$aliases": [],
   "$scope": "in",
   "$type": "architect",
-  "$impl": "./run#RunCommand",
+  "$impl": "./run-impl#RunCommand",
 
   "type": "object",
   "properties": {

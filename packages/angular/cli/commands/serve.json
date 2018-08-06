@@ -7,7 +7,7 @@
   "$aliases": [ "s" ],
   "$scope": "in",
   "$type": "architect",
-  "$impl": "./serve#ServeCommand",
+  "$impl": "./serve-impl#ServeCommand",
 
   "type": "object",
   "properties": {

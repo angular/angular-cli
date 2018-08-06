@@ -7,7 +7,7 @@
   "$aliases": [],
   "$scope": "in",
   "$type": "architect",
-  "$impl": "./xi18n#Xi18nCommand",
+  "$impl": "./xi18n-impl#Xi18nCommand",
 
   "type": "object",
   "properties": {

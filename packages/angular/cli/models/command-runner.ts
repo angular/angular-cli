@@ -279,8 +279,10 @@ export function parseOptions(args: string[], optionsAndArguments: Option[]) {
         return aliases;
       }
 
-      return aliases[opt.name] = (opt.aliases || [])
+      aliases[opt.name] = (opt.aliases || [])
         .filter(a => a.length === 1)[0];
+
+      return aliases;
     }, {});
 
   const booleans = options

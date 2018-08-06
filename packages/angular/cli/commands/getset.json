@@ -4,7 +4,7 @@
   "description": "Deprecated in favor of config command.",
   "$longDescription": "",
 
-  "$impl": "./getset#GetSetCommand",
+  "$impl": "./getset-impl#GetSetCommand",
   "$hidden": true,
 
   "type": "object"

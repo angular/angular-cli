@@ -5,7 +5,7 @@
   "$longDescription": "",
   "$hidden": true,
 
-  "$impl": "./easter-egg#AwesomeCommand",
+  "$impl": "./easter-egg-impl#AwesomeCommand",
 
   "type": "object"
 }

@@ -7,7 +7,7 @@
   "$aliases": [ "g" ],
   "$scope": "in",
   "$type": "",
-  "$impl": "./generate#GenerateCommand",
+  "$impl": "./generate-impl#GenerateCommand",
 
   "type": "object",
   "properties": {
