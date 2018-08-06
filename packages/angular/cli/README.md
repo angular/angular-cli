@@ -153,7 +153,7 @@ npm link
 ```
 
 `npm link` is very similar to `npm install -g` except that instead of downloading the package
-from the repo, the just builded `dist/@angular/cli/` folder becomes the global package.
+from the repo, the just built `dist/@angular/cli/` folder becomes the global package.
 Additionally, this repository publishes several packages and we use special logic to load all of them
 on development setups.
 
