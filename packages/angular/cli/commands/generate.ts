@@ -11,10 +11,6 @@ import { tags, terminal } from '@angular-devkit/core';
 import { CommandScope, Option } from '../models/command';
 import { SchematicCommand } from '../models/schematic-command';
 import { getDefaultSchematicCollection } from '../utilities/config';
-import {
-  getCollection,
-  getEngineHost,
-} from '../utilities/schematics';
 
 
 export class GenerateCommand extends SchematicCommand {
@@ -103,9 +99,9 @@ export class GenerateCommand extends SchematicCommand {
       this.printHelpOptions(options);
     } else {
       this.printHelpUsage(this.name, this.arguments, this.options);
-      const engineHost = getEngineHost();
+      const engineHost = this.getEngineHost();
       const [collectionName] = this.parseSchematicInfo(options);
-      const collection = getCollection(collectionName);
+      const collection = this.getCollection(collectionName);
       const schematicNames: string[] = engineHost.listSchematics(collection);
       this.logger.info('Available schematics:');
       schematicNames.forEach(schematicName => {

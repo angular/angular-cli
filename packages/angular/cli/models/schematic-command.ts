@@ -7,17 +7,44 @@
  */
 
 // tslint:disable:no-global-tslint-disable no-any
-import { JsonObject, experimental } from '@angular-devkit/core';
-import { normalize, strings, tags, terminal, virtualFs } from '@angular-devkit/core';
+import {
+  JsonObject,
+  experimental,
+  logging,
+  normalize,
+  schema,
+  strings,
+  tags,
+  terminal,
+  virtualFs,
+} from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import { DryRunEvent, UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
-import { NodeWorkflow } from '@angular-devkit/schematics/tools';
+import {
+  Collection,
+  DryRunEvent,
+  Engine,
+  Schematic,
+  SchematicEngine,
+  UnsuccessfulWorkflowExecution,
+  formats,
+  workflow,
+} from '@angular-devkit/schematics';
+import {
+  FileSystemCollectionDesc,
+  FileSystemEngineHostBase,
+  FileSystemSchematicDesc,
+  NodeModulesEngineHost,
+  NodeWorkflow,
+  validateOptionsWithSchema,
+} from '@angular-devkit/schematics/tools';
 import { take } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
-import { getDefaultSchematicCollection, getPackageManager } from '../utilities/config';
-import { getSchematicDefaults } from '../utilities/config';
-import { getCollection, getSchematic } from '../utilities/schematics';
-import { ArgumentStrategy, Command, Option } from './command';
+import {
+  getDefaultSchematicCollection,
+  getPackageManager,
+  getSchematicDefaults,
+} from '../utilities/config';
+import { ArgumentStrategy, Command, CommandContext, Option } from './command';
 
 export interface CoreSchematicOptions {
   dryRun: boolean;
@@ -44,6 +71,12 @@ export interface GetOptionsResult {
   arguments: Option[];
 }
 
+export class UnknownCollectionError extends Error {
+  constructor(collectionName: string) {
+    super(`Invalid collection (${collectionName}).`);
+  }
+}
+
 export abstract class SchematicCommand extends Command {
   readonly options: Option[] = [];
   readonly allowPrivateSchematics: boolean = false;
@@ -51,7 +84,21 @@ export abstract class SchematicCommand extends Command {
   private _workspace: experimental.workspace.Workspace;
   private _deAliasedName: string;
   private _originalOptions: Option[];
+  private _engineHost: FileSystemEngineHostBase;
+  private _engine: Engine<FileSystemCollectionDesc, FileSystemSchematicDesc>;
+  private _workFlow: workflow.BaseWorkflow;
   argStrategy = ArgumentStrategy.Nothing;
+
+  constructor(
+      context: CommandContext, logger: logging.Logger,
+      engineHost: FileSystemEngineHostBase = new NodeModulesEngineHost()) {
+    super(context, logger);
+    this._engineHost = engineHost;
+    this._engine = new SchematicEngine(this._engineHost);
+    const registry = new schema.CoreSchemaRegistry(formats.standardFormats);
+    this._engineHost.registerOptionsTransform(
+        validateOptionsWithSchema(registry));
+  }
 
   protected readonly coreOptions: Option[] = [
     {
@@ -75,6 +122,31 @@ export abstract class SchematicCommand extends Command {
     this._loadWorkspace();
   }
 
+  protected getEngineHost() {
+    return this._engineHost;
+  }
+  protected getEngine():
+      Engine<FileSystemCollectionDesc, FileSystemSchematicDesc> {
+    return this._engine;
+  }
+
+  protected getCollection(collectionName: string): Collection<any, any> {
+    const engine = this.getEngine();
+    const collection = engine.createCollection(collectionName);
+
+    if (collection === null) {
+      throw new UnknownCollectionError(collectionName);
+    }
+
+    return collection;
+  }
+
+  protected getSchematic(
+      collection: Collection<any, any>, schematicName: string,
+      allowPrivate?: boolean): Schematic<any, any> {
+    return collection.createSchematic(schematicName, allowPrivate);
+  }
+
   protected setPathOptions(options: any, workingDir: string): any {
     if (workingDir === '') {
       return {};
@@ -91,22 +163,40 @@ export abstract class SchematicCommand extends Command {
       }, {});
   }
 
+  /*
+   * Runtime hook to allow specifying customized workflow
+   */
+  protected getWorkFlow(options: RunSchematicOptions): workflow.BaseWorkflow {
+    const {force, dryRun} = options;
+    const fsHost = new virtualFs.ScopedHost(
+        new NodeJsSyncHost(), normalize(this.project.root));
+
+    return new NodeWorkflow(
+        fsHost as any,
+        {
+          force,
+          dryRun,
+          packageManager: getPackageManager(),
+          root: this.project.root,
+        },
+    );
+  }
+
+  private _getWorkFlow(options: RunSchematicOptions): workflow.BaseWorkflow {
+    if (!this._workFlow) {
+      this._workFlow = this.getWorkFlow(options);
+    }
+
+    return this._workFlow;
+  }
+
   protected runSchematic(options: RunSchematicOptions) {
-    const { collectionName, schematicName, debug, force, dryRun } = options;
+    const {collectionName, schematicName, debug, dryRun} = options;
     let schematicOptions = this.removeCoreOptions(options.schematicOptions);
     let nothingDone = true;
     let loggingQueue: string[] = [];
     let error = false;
-    const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(this.project.root));
-    const workflow = new NodeWorkflow(
-      fsHost as any,
-      {
-        force,
-        dryRun,
-        packageManager: getPackageManager(),
-        root: this.project.root,
-       },
-    );
+    const workflow = this._getWorkFlow(options);
 
     const workingDir = process.cwd().replace(this.project.root, '').replace(/\\/g, '/');
     const pathOptions = this.setPathOptions(schematicOptions, workingDir);
@@ -249,9 +339,10 @@ export abstract class SchematicCommand extends Command {
 
     const collectionName = options.collectionName || getDefaultSchematicCollection();
 
-    const collection = getCollection(collectionName);
+    const collection = this.getCollection(collectionName);
 
-    const schematic = getSchematic(collection, options.schematicName, this.allowPrivateSchematics);
+    const schematic = this.getSchematic(collection, options.schematicName,
+      this.allowPrivateSchematics);
     this._deAliasedName = schematic.description.name;
 
     if (!schematic.description.schemaJson) {
