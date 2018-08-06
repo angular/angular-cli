@@ -6,7 +6,7 @@
 
   "$hidden": true,
   "$scope": "in",
-  "$impl": "./eject#EjectCommand",
+  "$impl": "./eject-impl#EjectCommand",
 
   "type": "object"
 }

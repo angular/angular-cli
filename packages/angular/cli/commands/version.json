@@ -5,7 +5,7 @@
   "$longDescription": "",
 
   "$aliases": [ "v" ],
-  "$impl": "./version#VersionCommand",
+  "$impl": "./version-impl#VersionCommand",
 
   "type": "object"
 }

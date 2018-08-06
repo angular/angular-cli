@@ -6,7 +6,7 @@
 
   "$aliases": [],
   "$scope": "in",
-  "$impl": "./config#ConfigCommand",
+  "$impl": "./config-impl#ConfigCommand",
 
   "type": "object",
   "properties": {

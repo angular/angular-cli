@@ -7,7 +7,7 @@
   "$aliases": [ "t" ],
   "$scope": "in",
   "$type": "architect",
-  "$impl": "./test#TestCommand",
+  "$impl": "./test-impl#TestCommand",
 
   "type": "object",
   "properties": {

@@ -7,7 +7,7 @@
   "$aliases": [ "n" ],
   "$scope": "out",
   "$type": "schematic",
-  "$impl": "./new#NewCommand",
+  "$impl": "./new-impl#NewCommand",
 
   "type": "object",
   "properties": {
