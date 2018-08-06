@@ -141,7 +141,7 @@
             },
             "viewEncapsulation": {
               "description": "Specifies the view encapsulation strategy.",
-              "enum": ["Emulated", "Native", "None"],
+              "enum": ["Emulated", "ShadowDom", "None"],
               "type": "string",
               "alias": "v"
             }

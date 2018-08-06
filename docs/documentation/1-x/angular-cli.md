@@ -58,7 +58,7 @@
     - *spec* (`boolean`): Specifies if a spec file is generated. Default is `true`.
     - *inlineStyle* (`boolean`): Specifies if the style will be in the ts file. Default is `false`.
     - *inlineTemplate* (`boolean`): Specifies if the template will be in the ts file. Default is `false`.
-    - *viewEncapsulation* (`string`): Specifies the view encapsulation strategy. Can be one of `Emulated`, `Native` or `None`.
+    - *viewEncapsulation* (`string`): Specifies the view encapsulation strategy. Can be one of `Emulated`, `ShadowDom` or `None`.
     - *changeDetection* (`string`): Specifies the change detection strategy. Can be one of `Default` or `OnPush`.
   - *directive*: Options for generating a directive.
     - *flat* (`boolean`): Flag to indicate if a dir is created. Default is `true`.

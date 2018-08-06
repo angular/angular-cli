@@ -50,7 +50,7 @@ export interface Schema {
   /**
    * Specifies the view encapsulation strategy.
    */
-  viewEncapsulation?: ('Emulated' | 'Native' | 'None');
+  viewEncapsulation?: ('Emulated' | 'ShadowDom' | 'None');
   /**
    * Generates a routing module.
    */
