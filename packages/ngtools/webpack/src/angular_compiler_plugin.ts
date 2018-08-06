@@ -174,6 +174,12 @@ export class AngularCompilerPlugin {
     return { path, className };
   }
 
+  get typeChecker(): ts.TypeChecker | null {
+    const tsProgram = this._getTsProgram();
+
+    return tsProgram ? tsProgram.getTypeChecker() : null;
+  }
+
   static isSupported() {
     return VERSION && parseInt(VERSION.major) >= 5;
   }
@@ -351,7 +357,7 @@ export class AngularCompilerPlugin {
           this._updateForkedTypeChecker(this._rootNames, this._getChangedCompilationFiles());
         }
 
-         // Use an identity function as all our paths are absolute already.
+        // Use an identity function as all our paths are absolute already.
         this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
 
         if (this._JitMode) {
@@ -1020,7 +1026,7 @@ export class AngularCompilerPlugin {
       .map((resourcePath) => resolve(dirname(resolvedFileName), normalize(resourcePath)));
 
     // These paths are meant to be used by the loader so we must denormalize them.
-    const uniqueDependencies =  new Set([
+    const uniqueDependencies = new Set([
       ...esImports,
       ...resourceImports,
       ...this.getResourceDependencies(this._compilerHost.denormalizePath(resolvedFileName)),
