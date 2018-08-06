@@ -181,7 +181,7 @@ You can also use `ng new foo --link-cli` to automatically link the `@angular/cli
 Please read the official [npm-link documentation](https://docs.npmjs.com/cli/link)
 and the [npm-link cheatsheet](http://browsenpm.org/help#linkinganynpmpackagelocally) for more information.
 
-To run the Angular CLI test suite use the `node ./tests/legacy-cli/run_e2e` command.
+To run the Angular CLI E2E test suite, use the `node ./tests/legacy-cli/run_e2e` command.
 It can also receive a filename to only run that test (e.g. `node ./tests/legacy-cli/run_e2e tests/legacy-cli/e2e/tests/build/dev-build.ts`).
 
 As part of the test procedure, all packages will be built and linked.
