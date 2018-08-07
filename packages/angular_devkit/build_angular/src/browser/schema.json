@@ -115,8 +115,7 @@
     },
     "progress": {
       "type": "boolean",
-      "description": "Log progress to the console while building.",
-      "default": true
+      "description": "Log progress to the console while building."
     },
     "i18nFile": {
       "type": "string",

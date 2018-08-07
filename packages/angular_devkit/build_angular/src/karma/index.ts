@@ -27,7 +27,7 @@ import {
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { AssetPatternObject, CurrentFileReplacement } from '../browser/schema';
-import { normalizeAssetPatterns, normalizeFileReplacements } from '../utils';
+import { defaultProgress, normalizeAssetPatterns, normalizeFileReplacements } from '../utils';
 import { KarmaBuilderSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
@@ -136,6 +136,8 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
       tsConfigPath,
       supportES2015,
     };
+
+    wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);
 
     const webpackConfigs: {}[] = [
       getCommonConfig(wco),
