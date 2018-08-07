@@ -6,7 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-export * from './default-progress';
-export * from './run-module-as-observable-fork';
-export * from './normalize-file-replacements';
-export * from './normalize-asset-patterns';
+export function defaultProgress(progress: boolean | undefined): boolean {
+  if (progress === undefined) {
+    return process.stdout.isTTY === true;
+  }
+
+  return progress;
+}
