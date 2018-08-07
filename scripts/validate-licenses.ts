@@ -81,6 +81,11 @@ const ignoredPackages = [
   '@webassemblyjs/leb128@1.4.3', // Apache 2.0 license, but get discovered as "Apache".
 
   'tslint-sonarts@1.7.0', // LGPL-3.0 but only used as a tool, not linked in the build.
+
+  'bitsyntax@0.0.4', // MIT, but missing from package.
+                     // See https://github.com/squaremo/bitsyntax-js/blob/master/LICENSE
+
+  'uws@9.14.0', // Package is deprecated but compatible license ZLib.
 ];
 
 // Find all folders directly under a `node_modules` that have a package.json.
