@@ -597,8 +597,11 @@ export class AngularCompilerPlugin {
           replacements = new Map();
           const aliasHost = new virtualFs.AliasHost(host);
           for (const from in this._options.hostReplacementPaths) {
-            const normalizedFrom = normalize(from);
-            const normalizedWith = normalize(this._options.hostReplacementPaths[from]);
+            const normalizedFrom = resolve(normalize(this._basePath), normalize(from));
+            const normalizedWith = resolve(
+              normalize(this._basePath),
+              normalize(this._options.hostReplacementPaths[from]),
+            );
             aliasHost.aliases.set(normalizedFrom, normalizedWith);
             replacements.set(normalizedFrom, normalizedWith);
           }
