@@ -12,6 +12,10 @@ export interface Schema {
      */
     name: string;
     /**
+     * Uses the next version of Angular.
+     */
+    experimentalAngularNext?: boolean;
+    /**
      * The path where new projects will be created.
      */
     newProjectRoot?: string;

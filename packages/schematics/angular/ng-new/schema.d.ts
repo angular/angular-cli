@@ -16,6 +16,11 @@ export interface Schema {
    */
   name: string;
   /**
+   * EXPERIMENTAL: Specifies whether to create a new application which uses the Ivy rendering
+   * engine.
+   */
+  experimentalIvy?: boolean;
+  /**
    * Skip installing dependency packages.
    */
   skipInstall?: boolean;

@@ -17,6 +17,11 @@
         "index": 0
       }
     },
+    "experimentalIvy": {
+      "description": "EXPERIMENTAL: Specifies whether to create a new application which uses the Ivy rendering engine.",
+      "type": "boolean",
+      "default": false
+    },
     "inlineStyle": {
       "description": "Specifies if the style will be in the ts file.",
       "type": "boolean",

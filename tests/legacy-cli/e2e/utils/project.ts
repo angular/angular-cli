@@ -47,7 +47,7 @@ export function createProject(name: string, ...args: string[]) {
     .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
     .then(() => console.log(`Project ${name} created... Installing npm.`))
     .then(() => silentNpm('install'))
-    .then(() => useCIDefaults());
+    .then(() => useCIDefaults(name));
 }
 
 
