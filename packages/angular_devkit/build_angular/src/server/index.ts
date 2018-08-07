@@ -30,7 +30,7 @@ import {
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { getBrowserLoggingCb } from '../browser';
-import { normalizeFileReplacements } from '../utils';
+import { defaultProgress, normalizeFileReplacements } from '../utils';
 import { BuildWebpackServerSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
@@ -97,6 +97,8 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
       tsConfigPath,
       supportES2015,
     };
+
+    wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);
 
     const webpackConfigs: {}[] = [
       getCommonConfig(wco),

@@ -104,7 +104,7 @@ export interface BrowserBuilderSchema {
   /**
    * Log progress to the console while building.
    */
-  progress: boolean;
+  progress?: boolean;
 
   /**
    * Localization file to use for i18n.
