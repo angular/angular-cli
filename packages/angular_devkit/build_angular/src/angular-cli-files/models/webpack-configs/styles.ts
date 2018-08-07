@@ -300,8 +300,6 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   }
 
   return {
-    // Workaround stylus-loader defect: https://github.com/shama/stylus-loader/issues/189
-    loader: { stylus: {} },
     entry: entryPoints,
     module: { rules },
     plugins: [].concat(extraPlugins as any)
