@@ -34,7 +34,7 @@ import {
   statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
-import { normalizeAssetPatterns, normalizeFileReplacements } from '../utils';
+import { defaultProgress, normalizeAssetPatterns, normalizeFileReplacements } from '../utils';
 import { AssetPatternObject, BrowserBuilderSchema, CurrentFileReplacement } from './schema';
 const webpackMerge = require('webpack-merge');
 
@@ -137,6 +137,8 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
       tsConfigPath,
       supportES2015,
     };
+
+    wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);
 
     const webpackConfigs: {}[] = [
       getCommonConfig(wco),
