@@ -16,6 +16,11 @@ export interface Schema {
      */
     name: string;
     /**
+     * EXPERIMENTAL: Specifies whether to create a new application which uses the Ivy rendering
+     * engine.
+     */
+    experimentalIvy?: boolean;
+    /**
      * Specifies if the style will be in the ts file.
      */
     inlineStyle?: boolean;

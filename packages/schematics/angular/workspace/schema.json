@@ -13,6 +13,11 @@
         "index": 0
       }
     },
+    "experimentalAngularNext": {
+      "description": "Use the next version of Angular (@next dist-tag).",
+      "type": "boolean",
+      "visible": "false"
+    },
     "newProjectRoot": {
       "description": "The path where new projects will be created.",
       "type": "string",

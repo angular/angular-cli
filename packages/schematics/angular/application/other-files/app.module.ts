@@ -8,10 +8,10 @@ import { AppComponent } from './app.component';
   declarations: [
     AppComponent
   ],
-  imports: [
+  imports: [<% if (!experimentalIvy) { %>
     BrowserModule<% if (routing) { %>,
     AppRoutingModule<% } %>
-  ],
+  <% } %>],
   providers: [],
   bootstrap: [AppComponent]
 })

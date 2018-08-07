@@ -39,11 +39,13 @@ export default function (options: NgNewOptions): Rule {
   const workspaceOptions: WorkspaceOptions = {
     name: options.name,
     version: options.version,
+    experimentalAngularNext: options.experimentalIvy,
     newProjectRoot: options.newProjectRoot || 'projects',
   };
   const applicationOptions: ApplicationOptions = {
     projectRoot: '',
     name: options.name,
+    experimentalIvy: options.experimentalIvy,
     inlineStyle: options.inlineStyle,
     inlineTemplate: options.inlineTemplate,
     prefix: options.prefix,
