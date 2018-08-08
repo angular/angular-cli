@@ -205,6 +205,9 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     alias = rxPaths(nodeModules);
   } catch { }
 
+  const isIvyEnabled = wco.tsConfig.raw.angularCompilerOptions
+                    && wco.tsConfig.raw.angularCompilerOptions.enableIvy;
+
   const uglifyOptions = {
     ecma: wco.supportES2015 ? 6 : 5,
     warnings: !!buildOptions.verbose,
@@ -215,20 +218,27 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       webkit: true,
     },
 
-    // On server, we don't want to compress anything.
-    ...(buildOptions.platform == 'server' ? {} : {
-      compress: {
-        pure_getters: buildOptions.buildOptimizer,
-        // PURE comments work best with 3 passes.
-        // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
-        passes: buildOptions.buildOptimizer ? 3 : 1,
-        // Workaround known uglify-es issue
-        // See https://github.com/mishoo/UglifyJS2/issues/2949#issuecomment-368070307
-        inline: wco.supportES2015 ? 1 : 3,
-      }
+    // On server, we don't want to compress anything. We still set the ngDevMode = false for it
+    // to remove dev code.
+    compress: (buildOptions.platform == 'server' ? {
+      global_defs: {
+        ngDevMode: false,
+      },
+    } : {
+      pure_getters: buildOptions.buildOptimizer,
+      // PURE comments work best with 3 passes.
+      // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
+      passes: buildOptions.buildOptimizer ? 3 : 1,
+      // Workaround known uglify-es issue
+      // See https://github.com/mishoo/UglifyJS2/issues/2949#issuecomment-368070307
+      inline: wco.supportES2015 ? 1 : 3,
+
+      global_defs: {
+        ngDevMode: false,
+      },
     }),
     // We also want to avoid mangling on server.
-    ...(buildOptions.platform == 'server' ? { mangle: false } : {})
+    ...(buildOptions.platform == 'server' ? { mangle: false } : {}),
   };
 
   return {
