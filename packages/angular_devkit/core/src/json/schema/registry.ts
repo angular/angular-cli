@@ -7,7 +7,7 @@
  */
 import * as ajv from 'ajv';
 import * as http from 'http';
-import { Observable, from, of as observableOf } from 'rxjs';
+import { Observable, from, of as observableOf, throwError } from 'rxjs';
 import { concatMap, map, switchMap, tap } from 'rxjs/operators';
 import { BaseException } from '../../exception/exception';
 import { PartiallyOrderedSet, isObservable } from '../../utils';
@@ -176,7 +176,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       validate = (validate.refVal as any)[(validate.refs as any)['#' + refHash]];
     }
 
-    return { context: validate, schema: validate && validate.schema as JsonObject };
+    return { context: validate, schema: validate.schema as JsonObject };
   }
 
   compile(schema: JsonObject): Observable<SchemaValidator> {
@@ -186,23 +186,18 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     // in synchronous (if available).
     let validator: Observable<ajv.ValidateFunction>;
     try {
-      const maybeFnValidate = this._ajv.compile(schema);
-      validator = observableOf(maybeFnValidate);
+      validator = observableOf(this._ajv.compile(schema));
     } catch (e) {
       // Propagate the error.
       if (!(e instanceof (ajv.MissingRefError as {} as Function))) {
-        throw e;
+        return throwError(e);
       }
 
-      validator = new Observable(obs => {
-        this._ajv.compileAsync(schema)
-          .then(validate => {
-            obs.next(validate);
-            obs.complete();
-          }, err => {
-            obs.error(err);
-          });
-      });
+      try {
+        validator = from(this._ajv.compileAsync(schema));
+      } catch (e) {
+        return throwError(e);
+      }
     }
 
     return validator
