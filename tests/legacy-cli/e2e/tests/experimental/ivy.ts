@@ -13,7 +13,7 @@ export default async function() {
   try {
     await createProject('ivy-project', '--experimental-ivy');
 
-    await ngServe('--aot');
+    await ngServe('--prod');
 
     // Verify the index.html
     const body = await request('http://localhost:4200/');
@@ -22,12 +22,17 @@ export default async function() {
     }
 
     // Verify it's Ivy.
-    const main = await request('http://localhost:4200/main.js');
-    if (!main.match(/ngComponentDef/)) {
+    const mainUrlMatch = body.match(/src="(main\.[a-z0-9]{0,32}\.js)"/);
+    const mainUrl = mainUrlMatch && mainUrlMatch[1];
+    const main = await request('http://localhost:4200/' + mainUrl);
+
+    if (!main.match(/ngComponentDef\s*=/)) {
       throw new Error('Ivy could not be found.');
+    }
+    if (main.match(/ngDevMode/)) {
+      throw new Error('NgDevMode was not tree shaken away.');
     }
   } finally {
     await killAllProcesses();
   }
 }
-
