@@ -52,10 +52,11 @@ export class GenerateCommand extends SchematicCommand {
     return this.runSchematic({
       collectionName,
       schematicName,
-      schematicOptions: options,
+      schematicOptions: this.removeLocalOptions(options),
       debug: options.debug,
       dryRun: options.dryRun,
       force: options.force,
+      interactive: options.interactive,
     });
   }
 
@@ -94,5 +95,12 @@ export class GenerateCommand extends SchematicCommand {
       this.logger.warn(`\nTo see help for a schematic run:`);
       this.logger.info(terminal.cyan(`  ng generate <schematic> --help`));
     }
+  }
+
+  private removeLocalOptions(options: any): any {
+    const opts = Object.assign({}, options);
+    delete opts.interactive;
+
+    return opts;
   }
 }

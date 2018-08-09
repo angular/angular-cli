@@ -33,6 +33,11 @@
       "default": false,
       "aliases": ["v"],
       "description": "Adds more details to output logging."
+    },
+    "interactive": {
+      "type": "boolean",
+      "default": "true",
+      "description": "Disables interactive inputs (i.e., prompts)."
     }
   },
   "required": []
