@@ -84,11 +84,11 @@ function _getColorLevel(stream: Socket): 0 | 1 | 2 | 3 {
     }
   }
 
-  if (stream && !stream.isTTY) {
+  if (stream && !stream.isTTY && !_env.MSYSTEM) {
     return 0;
   }
 
-  if (_platform.startsWith('win32')) {
+  if (_platform.startsWith('win32') && !_env.MSYSTEM) {
     // Node.js 7.5.0 is the first version of Node.js to include a patch to
     // libuv that enables 256 color output on Windows. Anything earlier and it
     // won't work. However, here we target Node.js 8 at minimum as it is an LTS
