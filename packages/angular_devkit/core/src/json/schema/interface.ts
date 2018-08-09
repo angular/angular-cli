@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Observable } from 'rxjs';
+import { Observable, SubscribableOrPromise } from 'rxjs';
 import { JsonArray, JsonObject, JsonValue } from '../interface';
 
 export type JsonPointer = string & {
@@ -57,9 +57,13 @@ export interface SchemaValidatorResult {
   errors?: SchemaValidatorError[];
 }
 
+export interface SchemaValidatorOptions {
+  withPrompts: boolean;
+}
+
 export interface SchemaValidator {
   // tslint:disable-next-line:no-any
-  (data: any): Observable<SchemaValidatorResult>;
+  (data: any, options?: Partial<SchemaValidatorOptions>): Observable<SchemaValidatorResult>;
 }
 
 export interface SchemaFormatter {
@@ -90,8 +94,25 @@ export interface SchemaKeywordValidator {
   ): boolean | Observable<boolean>;
 }
 
+export interface PromptDefinition {
+  id: string;
+  type: string;
+  message: string;
+  default?: string | number | boolean | null;
+  priority: number;
+  validator?: (value: string) => boolean | string | Promise<boolean | string>;
+
+  items?: Array<string | { value: JsonValue, label: string }>;
+
+  raw?: string | JsonObject;
+}
+
+export type PromptProvider = (definitions: Array<PromptDefinition>)
+  => SubscribableOrPromise<{ [id: string]: JsonValue }>;
+
 export interface SchemaRegistry {
   compile(schema: Object): Observable<SchemaValidator>;
   addFormat(format: SchemaFormat): void;
   addSmartDefaultProvider<T>(source: string, provider: SmartDefaultProvider<T>): void;
+  usePromptProvider(provider: PromptProvider): void;
 }
