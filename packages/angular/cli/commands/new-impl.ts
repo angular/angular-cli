@@ -50,15 +50,14 @@ export class NewCommand extends SchematicCommand {
     // Ensure skipGit has a boolean value.
     options.skipGit = options.skipGit === undefined ? false : options.skipGit;
 
-    options = this.removeLocalOptions(options);
-
     return this.runSchematic({
       collectionName: collectionName,
       schematicName: this.schematicName,
-      schematicOptions: options,
+      schematicOptions: this.removeLocalOptions(options),
       debug: options.debug,
       dryRun: options.dryRun,
       force: options.force,
+      interactive: options.interactive,
     });
   }
 
@@ -72,6 +71,7 @@ export class NewCommand extends SchematicCommand {
     const opts = Object.assign({}, options);
     delete opts.verbose;
     delete opts.collection;
+    delete opts.interactive;
 
     return opts;
   }

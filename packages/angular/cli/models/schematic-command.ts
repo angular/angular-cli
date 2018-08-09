@@ -37,6 +37,7 @@ import {
   NodeWorkflow,
   validateOptionsWithSchema,
 } from '@angular-devkit/schematics/tools';
+import * as inquirer from 'inquirer';
 import { take } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
 import {
@@ -60,6 +61,7 @@ export interface RunSchematicOptions {
   dryRun: boolean;
   force: boolean;
   showNothingDone?: boolean;
+  interactive?: boolean;
 }
 
 export interface GetOptionsOptions {
@@ -278,6 +280,49 @@ export abstract class SchematicCommand extends Command {
 
       return undefined;
     });
+
+    if (options.interactive !== false && process.stdout.isTTY) {
+      workflow.registry.usePromptProvider((definitions: Array<schema.PromptDefinition>) => {
+        const questions: inquirer.Questions = definitions.map(definition => {
+          const question: inquirer.Question = {
+            name: definition.id,
+            message: definition.message,
+            default: definition.default,
+          };
+
+          const validator = definition.validator;
+          if (validator) {
+            question.validate = input => validator(input);
+          }
+
+          switch (definition.type) {
+            case 'confirmation':
+              question.type = 'confirm';
+              break;
+            case 'list':
+              question.type = 'list';
+              question.choices = definition.items && definition.items.map(item => {
+                if (typeof item == 'string') {
+                  return item;
+                } else {
+                  return {
+                    name: item.label,
+                    value: item.value,
+                  };
+                }
+              });
+              break;
+            default:
+              question.type = definition.type;
+              break;
+          }
+
+          return question;
+        });
+
+        return inquirer.prompt(questions);
+      });
+    }
 
     workflow.reporter.subscribe((event: DryRunEvent) => {
       nothingDone = false;
