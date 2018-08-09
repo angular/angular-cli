@@ -424,4 +424,5 @@ describe('CoreSchemaRegistry', () => {
       )
       .toPromise().then(done, done.fail);
   });
+
 });
