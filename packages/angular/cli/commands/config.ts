@@ -254,7 +254,7 @@ export class ConfigCommand extends Command {
 
     const [config, configPath] = getWorkspaceRaw(options.global ? 'global' : 'local');
     if (!config || !configPath) {
-      this.logger.error('Confguration file cannot be found.');
+      this.logger.error('Configuration file cannot be found.');
 
       return 1;
     }
