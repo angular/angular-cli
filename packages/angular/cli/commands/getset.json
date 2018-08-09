@@ -6,6 +6,7 @@
 
   "$impl": "./getset-impl#GetSetCommand",
   "$hidden": true,
+  "$type": "deprecated",
 
   "type": "object"
 }

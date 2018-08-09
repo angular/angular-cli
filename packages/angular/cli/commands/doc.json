@@ -5,7 +5,7 @@
   "$longDescription": "",
 
   "$aliases": [ "d" ],
-  "$type": "",
+  "$type": "native",
   "$impl": "./doc-impl#DocCommand",
 
   "type": "object",

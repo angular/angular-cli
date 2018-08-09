@@ -6,7 +6,7 @@
 
   "$aliases": [ "g" ],
   "$scope": "in",
-  "$type": "",
+  "$type": "schematics",
   "$impl": "./generate-impl#GenerateCommand",
 
   "type": "object",
