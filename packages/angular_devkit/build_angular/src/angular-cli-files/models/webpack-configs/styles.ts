@@ -139,7 +139,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         {
           // TODO: inline .cur if not supporting IE (use browserslist to check)
           filter: (asset: PostcssUrlAsset) => {
-            return maximumInlineSize > 0 && !asset.hash && !asset.absolutePath.endsWith('.cur');
+            return maximumInlineSize > 0 && !asset.hash && !/\.(cur|otf|ttf|woff|woff2)$/.test(asset.absolutePath);
           },
           url: 'inline',
           // NOTE: maxSize is in KB
