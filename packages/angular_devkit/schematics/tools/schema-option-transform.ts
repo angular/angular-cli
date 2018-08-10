@@ -8,12 +8,7 @@
 import { deepCopy, schema } from '@angular-devkit/core';
 import { Observable, of as observableOf } from 'rxjs';
 import { first, map, mergeMap } from 'rxjs/operators';
-import { SchematicDescription } from '../src';
-import { FileSystemCollectionDescription, FileSystemSchematicDescription } from './description';
-
-export type SchematicDesc =
-  SchematicDescription<FileSystemCollectionDescription, FileSystemSchematicDescription>;
-
+import { FileSystemSchematicDescription } from './description';
 
 export class InvalidInputOptions<T = {}> extends schema.SchemaValidationException {
   constructor(options: T, errors: schema.SchemaValidatorError[]) {
@@ -26,7 +21,7 @@ export class InvalidInputOptions<T = {}> extends schema.SchemaValidationExceptio
 
 // This can only be used in NodeJS.
 export function validateOptionsWithSchema(registry: schema.SchemaRegistry) {
-  return <T extends {}>(schematic: SchematicDesc, options: T): Observable<T> => {
+  return <T extends {}>(schematic: FileSystemSchematicDescription, options: T): Observable<T> => {
     // Prevent a schematic from changing the options object by making a copy of it.
     options = deepCopy(options);
 
