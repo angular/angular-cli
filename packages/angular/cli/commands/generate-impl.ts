@@ -84,10 +84,10 @@ export class GenerateCommand extends SchematicCommand {
       this.printHelpOptions(this.options);
     } else {
       this.printHelpUsage('generate', this.options);
-      const engineHost = getEngineHost();
+      const engineHost = this.getEngineHost();
       const [collectionName] = this.parseSchematicInfo(options);
       const collection = this.getCollection(collectionName);
-      const schematicNames: string[] = engineHost.listSchematics(collection);
+      const schematicNames: string[] = engineHost.listSchematicNames(collection.description);
       this.logger.info('Available schematics:');
       schematicNames.forEach(schematicName => {
         this.logger.info(`    ${schematicName}`);
