@@ -208,6 +208,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
               return visitJson(data, visitor, schema, this._resolver, validate);
             })),
           ).pipe(
+            switchMap(updateData => this._applySmartDefaults(updateData)),
             switchMap(updatedData => {
               const result = validate(updatedData);
 
@@ -227,8 +228,8 @@ export class CoreSchemaRegistry implements SchemaRegistry {
             }),
             switchMap(([data, valid]) => {
               if (valid) {
-                return this._applySmartDefaults(data).pipe(
-                  ...[...this._post].map(visitor => concatMap(data => {
+                return observableOf(data).pipe(
+                  ...[...this._post].map(visitor => concatMap((data: JsonValue) => {
                     return visitJson(data as JsonValue, visitor, schema, this._resolver, validate);
                   })),
                 ).pipe(
