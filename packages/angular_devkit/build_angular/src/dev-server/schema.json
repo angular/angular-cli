@@ -80,7 +80,7 @@
     },
     "optimization": {
       "type": "boolean",
-      "description": "Defines the optimization level of the build."
+      "description": "Enables optimization of the build output."
     },
     "aot": {
       "type": "boolean",
