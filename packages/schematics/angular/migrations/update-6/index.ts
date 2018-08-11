@@ -517,7 +517,7 @@ function extractProjectsConfig(
         }
 
         return newItems;
-      }, <string[]> []);
+      }, [] as string[]);
 
         // Tslint target
       const lintOptions: JsonObject = {

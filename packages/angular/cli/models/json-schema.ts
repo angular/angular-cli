@@ -16,17 +16,20 @@ export async function convertSchemaToOptions(schema: string): Promise<Option[]> 
 }
 
 function getOptions(schemaText: string, onlyRootProperties = true): Promise<Option[]> {
-  // TODO: refactor promise to an observable then use `.toPromise()`
-  return new Promise((resolve, reject) => {
+  // TODO: Use devkit core's visitJsonSchema
+  return new Promise((resolve) => {
     const fullSchema = parseJson(schemaText);
+    if (!isJsonObject(fullSchema)) {
+      return Promise.resolve([]);
+    }
     const traverseOptions = {};
     const options: Option[] = [];
     function postCallback(schema: JsonObject,
                           jsonPointer: string,
-                          rootSchema: string,
-                          parentJsonPointer: string,
+                          _rootSchema: string,
+                          _parentJsonPointer: string,
                           parentKeyword: string,
-                          parentSchema: string,
+                          _parentSchema: string,
                           property: string) {
       if (parentKeyword === 'properties') {
         let includeOption = true;
@@ -43,7 +46,7 @@ function getOptions(schemaText: string, onlyRootProperties = true): Promise<Opti
         }
         let $default: OptionSmartDefault | undefined = undefined;
         if (schema.$default !== null && isJsonObject(schema.$default)) {
-          $default = <OptionSmartDefault> schema.$default;
+          $default = schema.$default as OptionSmartDefault;
         }
         let required = false;
         if (typeof schema.required === 'boolean') {
@@ -51,7 +54,7 @@ function getOptions(schemaText: string, onlyRootProperties = true): Promise<Opti
         }
         let aliases: string[] | undefined = undefined;
         if (typeof schema.aliases === 'object' && Array.isArray(schema.aliases)) {
-          aliases = <string[]> schema.aliases;
+          aliases = schema.aliases as string[];
         }
         let format: string | undefined = undefined;
         if (typeof schema.format === 'string') {
@@ -86,7 +89,7 @@ function getOptions(schemaText: string, onlyRootProperties = true): Promise<Opti
 
     const callbacks = { post: postCallback };
 
-    jsonSchemaTraverse(<object> fullSchema, traverseOptions, callbacks);
+    jsonSchemaTraverse(fullSchema, traverseOptions, callbacks);
   });
 }
 

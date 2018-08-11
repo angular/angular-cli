@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable:non-null-operator no-big-function
+// tslint:disable:no-non-null-assertion no-big-function
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { FileAlreadyExistException, FileDoesNotExistException } from '../exception/exception';
 import { testTreeVisit } from './common_spec';

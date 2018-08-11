@@ -22,12 +22,12 @@ export enum MergeStrategy {
   Error                     = 1 << 0,
 
   // Only content conflicts are overwritten.
-  ContentOnly               = MergeStrategy.AllowOverwriteConflict,
+  ContentOnly               = AllowOverwriteConflict,
 
   // Overwrite everything with the latest change.
-  Overwrite                 = MergeStrategy.AllowOverwriteConflict
-                            + MergeStrategy.AllowCreationConflict
-                            + MergeStrategy.AllowDeleteConflict,
+  Overwrite                 = AllowOverwriteConflict
+                            + AllowCreationConflict
+                            + AllowDeleteConflict,
 }
 
 

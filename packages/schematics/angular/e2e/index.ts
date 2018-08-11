@@ -5,8 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { strings, tags } from '@angular-devkit/core';
-import { experimental } from '@angular-devkit/core';
+import { experimental, strings, tags } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,

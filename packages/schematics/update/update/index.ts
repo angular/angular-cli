@@ -243,7 +243,7 @@ function _performUpdate(
 
   const toInstall = [...infoMap.values()]
       .map(x => [x.name, x.target, x.installed])
-      // tslint:disable-next-line:non-null-operator
+      // tslint:disable-next-line:no-non-null-assertion
       .filter(([name, target, installed]) => {
         return !!name && !!target && !!installed;
       }) as [string, PackageVersionInfo, PackageVersionInfo][];

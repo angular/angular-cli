@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable:non-null-operator
+// tslint:disable:no-non-null-assertion
 import { of as observableOf } from 'rxjs';
 import { SchematicContext } from '../engine/interface';
 import { HostTree } from '../tree/host-tree';

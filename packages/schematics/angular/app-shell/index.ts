@@ -62,7 +62,7 @@ function getServerModulePath(
   if (!expNode) {
     return null;
   }
-  const relativePath = <ts.StringLiteral> (<ts.ExportDeclaration> expNode).moduleSpecifier;
+  const relativePath = (expNode as ts.ExportDeclaration).moduleSpecifier as ts.StringLiteral;
   const modulePath = normalize(`/${project.root}/src/${relativePath.text}.ts`);
 
   return modulePath;
@@ -113,7 +113,7 @@ function getBootstrapComponentPath(
   const metadataNode = getDecoratorMetadata(moduleSource, 'NgModule', '@angular/core')[0];
   const bootstrapProperty = getMetadataProperty(metadataNode, 'bootstrap');
 
-  const arrLiteral = (<ts.PropertyAssignment> bootstrapProperty)
+  const arrLiteral = (bootstrapProperty as ts.PropertyAssignment)
     .initializer as ts.ArrayLiteralExpression;
 
   const componentSymbol = arrLiteral.elements[0].getText();
@@ -124,7 +124,7 @@ function getBootstrapComponentPath(
       return findNode(imp, ts.SyntaxKind.Identifier, componentSymbol);
     })
     .map((imp: ts.ImportDeclaration) => {
-      const pathStringLiteral = <ts.StringLiteral> imp.moduleSpecifier;
+      const pathStringLiteral = imp.moduleSpecifier as ts.StringLiteral;
 
       return pathStringLiteral.text;
     })[0];

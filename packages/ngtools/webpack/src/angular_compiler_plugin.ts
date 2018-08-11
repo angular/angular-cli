@@ -413,7 +413,7 @@ export class AngularCompilerPlugin {
           genDir: '',
         }),
         // TODO: fix compiler-cli typings; entryModule should not be string, but also optional.
-        // tslint:disable-next-line:non-null-operator
+        // tslint:disable-next-line:no-non-null-assertion
         entryModule: this._entryModule !,
       });
       timeEnd('AngularCompilerPlugin._getLazyRoutesFromNgtools');

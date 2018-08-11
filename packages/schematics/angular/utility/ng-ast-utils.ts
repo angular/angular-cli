@@ -67,7 +67,7 @@ export function findBootstrapModulePath(host: Tree, mainPath: string): string {
       return findNode(imp, ts.SyntaxKind.Identifier, bootstrapModule.getText());
     })
     .map((imp: ts.ImportDeclaration) => {
-      const modulePathStringLiteral = <ts.StringLiteral> imp.moduleSpecifier;
+      const modulePathStringLiteral = imp.moduleSpecifier as ts.StringLiteral;
 
       return modulePathStringLiteral.text;
     })[0];
