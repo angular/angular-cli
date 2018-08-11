@@ -53,7 +53,7 @@ export class SyncDelegateHost<T extends object = {}> {
     // The non-null operation is to work around `void` type. We don't allow to return undefined
     // but ResultT could be void, which is undefined in JavaScript, so this doesn't change the
     // behaviour.
-    // tslint:disable-next-line:non-null-operator
+    // tslint:disable-next-line:no-non-null-assertion
     return result !;
   }
 

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-implicit-dependencies
-// tslint:disable:non-null-operator
+// tslint:disable:no-non-null-assertion
 import { Path, virtualFs } from '@angular-devkit/core';
 import {
   HostTree,

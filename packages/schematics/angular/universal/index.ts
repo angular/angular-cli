@@ -221,7 +221,7 @@ export default function (options: UniversalOptions): Rule {
       template({
         ...strings,
         ...options as object,
-        stripTsExtension: (s: string) => { return s.replace(/\.ts$/, ''); },
+        stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
       }),
       move(join(normalize(clientProject.root), 'src')),
     ]);
@@ -230,7 +230,7 @@ export default function (options: UniversalOptions): Rule {
       template({
         ...strings,
         ...options as object,
-        stripTsExtension: (s: string) => { return s.replace(/\.ts$/, ''); },
+        stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
         outDir,
         tsConfigExtends,
         rootInSrc,

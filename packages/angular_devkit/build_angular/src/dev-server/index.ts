@@ -14,8 +14,7 @@ import {
 } from '@angular-devkit/architect';
 import { WebpackDevServerBuilder } from '@angular-devkit/build-webpack';
 import { Path, getSystemPath, resolve, tags, virtualFs } from '@angular-devkit/core';
-import { existsSync, readFileSync } from 'fs';
-import * as fs from 'fs';
+import { Stats, existsSync, readFileSync } from 'fs';
 import * as path from 'path';
 import { Observable, throwError } from 'rxjs';
 import { concatMap, map, tap } from 'rxjs/operators';
@@ -69,7 +68,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     const options = builderConfig.options;
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
-    const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
+    const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<Stats>);
     const webpackDevServerBuilder = new WebpackDevServerBuilder({ ...this.context, host });
     let browserOptions: BrowserBuilderSchema;
     let first = true;
@@ -175,7 +174,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
   buildWebpackConfig(
     root: Path,
     projectRoot: Path,
-    host: virtualFs.Host<fs.Stats>,
+    host: virtualFs.Host<Stats>,
     browserOptions: BrowserBuilderSchema,
   ) {
     const browserBuilder = new BrowserBuilder(this.context);

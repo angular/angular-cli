@@ -5,8 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { FilePredicate, MergeStrategy } from './tree/interface';
-import { Tree as TreeInterface } from './tree/interface';
+import { FilePredicate, MergeStrategy, Tree as TreeInterface } from './tree/interface';
 import { branch, empty, merge, optimize, partition } from './tree/static';
 
 

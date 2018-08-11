@@ -555,7 +555,7 @@ export function isImported(source: ts.SourceFile,
     .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
     .filter((imp: ts.ImportDeclaration) => imp.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral)
     .filter((imp: ts.ImportDeclaration) => {
-      return (<ts.StringLiteral> imp.moduleSpecifier).text === importPath;
+      return (imp.moduleSpecifier as ts.StringLiteral).text === importPath;
     })
     .filter((imp: ts.ImportDeclaration) => {
       if (!imp.importClause) {

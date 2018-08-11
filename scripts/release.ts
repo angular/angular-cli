@@ -10,7 +10,6 @@ import { logging } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as semver from 'semver';
-import { ReleaseType } from 'semver';
 import { packages } from '../lib/packages';
 
 
@@ -81,7 +80,7 @@ function _upgrade(release: string, force: boolean, logger: logging.Logger) {
         }
       }
     } else if (dirty || release !== 'patch') {
-      newVersion = semver.inc(version, release as ReleaseType);
+      newVersion = semver.inc(version, release as semver.ReleaseType);
     }
 
     let message = '';
