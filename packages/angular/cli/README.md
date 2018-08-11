@@ -42,8 +42,22 @@ with NPM 5.5.1 or higher.
 ## Installation
 
 **BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
+
+### Install Globablly
 ```bash
 npm install -g @angular/cli
+```
+
+### Install Locally
+```bash
+npm install @angular/cli
+```
+
+To run a locally installed version of the angular-cli, you can call `ng` commands directly using your file path to where the `ng` package is installed locally, or you can use `npm run ng <command>`, which will look for locally installed packages before using a globally installed version.  
+
+### Install Specific Version (Example: 6.1.1)
+```bash
+npm install -g @angular/cli@6.1.1
 ```
 
 ## Usage
