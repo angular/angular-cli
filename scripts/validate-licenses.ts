@@ -53,6 +53,7 @@ const licenseReplacements: { [key: string]: string } = {
   'Apache License, Version 2.0': 'Apache-2.0',
   'Apache2': 'Apache-2.0',
   'Apache 2.0': 'Apache-2.0',
+  'Apache v2': 'Apache-2.0',
   'AFLv2.1': 'AFL-2.1',
   // BSD is BSD-2-clause by default.
   'BSD': 'BSD-2-Clause',
