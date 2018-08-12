@@ -95,11 +95,11 @@
     "source-map": "^0.5.6",
     "source-map-support": "^0.5.0",
     "spdx-satisfies": "^4.0.0",
+    "tar": "^4.4.4",
     "through2": "^2.0.3",
     "ts-node": "^5.0.0",
     "tslint-no-circular-imports": "^0.5.0",
-    "tslint-sonarts": "^1.7.0",
-    "tar": "^4.4.4"
+    "tslint-sonarts": "^1.7.0"
   },
   "resolutions": {
     "@types/webpack": "4.4.0",
