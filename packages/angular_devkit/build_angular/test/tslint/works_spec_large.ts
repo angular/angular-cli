@@ -41,9 +41,27 @@ describe('Tslint Target', () => {
     ).toPromise().then(done, done.fail);
   }, 30000);
 
-  it('supports exclude', (done) => {
+  it('supports exclude with glob', (done) => {
     host.writeMultipleFiles(filesWithErrors);
     const overrides: Partial<TslintBuilderOptions> = { exclude: ['**/foo.ts'] };
+
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+    ).toPromise().then(done, done.fail);
+  }, 30000);
+
+  it('supports exclude with relative paths', (done) => {
+    host.writeMultipleFiles(filesWithErrors);
+    const overrides: Partial<TslintBuilderOptions> = { exclude: ['src/foo.ts'] };
+
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+    ).toPromise().then(done, done.fail);
+  }, 30000);
+
+  it(`supports exclude with paths starting with './'`, (done) => {
+    host.writeMultipleFiles(filesWithErrors);
+    const overrides: Partial<TslintBuilderOptions> = { exclude: ['./src/foo.ts'] };
 
     runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),

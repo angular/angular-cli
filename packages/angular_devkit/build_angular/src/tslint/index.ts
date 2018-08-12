@@ -201,10 +201,12 @@ function getFilesToLint(
   let programFiles = linter.getFileNames(program);
 
   if (ignore && ignore.length > 0) {
-    const ignoreMatchers = ignore.map(pattern => new Minimatch(pattern, { dot: true }));
+    // normalize to support ./ paths
+    const ignoreMatchers = ignore
+      .map(pattern => new Minimatch(path.normalize(pattern), { dot: true }));
 
     programFiles = programFiles
-      .filter(file => !ignoreMatchers.some(matcher => matcher.match(file)));
+      .filter(file => !ignoreMatchers.some(matcher => matcher.match(path.relative(root, file))));
   }
 
   return programFiles;
