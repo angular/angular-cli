@@ -23,9 +23,10 @@ The array below does the same as the default one:
 ]
 ```
 
-`glob` is the a [node-glob](https://github.com/isaacs/node-glob) using `input` as base directory.
-`input` is relative to the workspace root, while `output` is relative to `outDir`
-(`dist/project-name` default).
+- `glob` is the a [node-glob](https://github.com/isaacs/node-glob) using `input` as base directory.
+- `input` is relative to the workspace root.
+- `ignore` is a list of globs to ignore from copying.
+- `output` is relative to `outDir` (`dist/project-name` default).
 
  You can use this extended configuration to copy assets from outside your project.
  For instance, you can copy assets from a node package:
@@ -36,7 +37,14 @@ The array below does the same as the default one:
 ]
 ```
 
-The contents of `node_modules/some-package/images/` will be available in `dist/some-package/`.
+You can ignore certain files from copying by using the `ignore` option:
+ ```json
+"assets": [
+  { "glob": "**/*", "input": "src/assets/", "ignore": ["**/*.svg"], "output": "/assets/" },
+]
+```
+
+The contents of `node_modules/some-package/images/` will be available in `dist/some-package/`. 
 
 ## Writing assets outside of `dist/`
 

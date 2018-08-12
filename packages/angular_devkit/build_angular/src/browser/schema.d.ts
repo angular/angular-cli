@@ -238,6 +238,11 @@ export interface AssetPatternObject {
   input: string;
 
   /**
+   * 	An array of globs to ignore.
+   */
+  ignore?: string[];
+
+  /**
    * Absolute path within the output.
    */
   output: string;

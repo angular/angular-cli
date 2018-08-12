@@ -59,6 +59,36 @@ describe('Browser Builder assets', () => {
     ).toPromise().then(done, done.fail);
   });
 
+  it('works with ignored patterns', (done) => {
+    const assets: { [path: string]: string } = {
+      './src/folder/.gitkeep': '',
+      './src/folder/asset-ignored.txt': '',
+      './src/folder/asset.txt': '',
+    };
+
+    host.writeMultipleFiles(assets);
+
+    const overrides = {
+      assets: [
+        {
+          glob: '**/*',
+          ignore: ['asset-ignored.txt'],
+          input: 'src/folder',
+          output: '/folder',
+        },
+      ],
+    };
+
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        expect(host.scopedSync().exists(normalize('./dist/folder/asset.txt'))).toBe(true);
+        expect(host.scopedSync().exists(normalize('./dist/folder/asset-ignored.txt'))).toBe(false);
+        expect(host.scopedSync().exists(normalize('./dist/folder/.gitkeep'))).toBe(false);
+      }),
+    ).toPromise().then(done, done.fail);
+  });
+
   it('fails with non-absolute output path', (done) => {
     const assets: { [path: string]: string } = {
       './node_modules/some-package/node_modules-asset.txt': 'node_modules-asset.txt',

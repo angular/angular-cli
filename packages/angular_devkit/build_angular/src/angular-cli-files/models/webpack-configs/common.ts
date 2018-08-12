@@ -125,6 +125,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         context: asset.input,
         // Now we remove starting slash to make Webpack place it from the output root.
         to: asset.output.replace(/^\//, ''),
+        ignore: asset.ignore,
         from: {
           glob: asset.glob,
           dot: true
