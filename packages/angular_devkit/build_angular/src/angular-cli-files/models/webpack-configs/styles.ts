@@ -10,12 +10,12 @@
 
 import * as webpack from 'webpack';
 import * as path from 'path';
+import { Minimatch } from 'minimatch';
 import { SuppressExtractedTextChunksWebpackPlugin } from '../../plugins/webpack';
 import { getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../build-options';
 import { findUp } from '../../utilities/find-up';
 import { RawCssLoader } from '../../plugins/webpack';
-import { ExtraEntryPoint } from '../../../browser/schema';
 import { normalizeExtraEntryPoints } from './utils';
 import { RemoveHashPlugin } from '../../plugins/remove-hash-plugin';
 
@@ -52,15 +52,22 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const entryPoints: { [key: string]: string[] } = {};
   const globalStylePaths: string[] = [];
   const extraPlugins: any[] = [];
-  const cssSourceMap = buildOptions.sourceMap;
+  const {
+    sourceMap: cssSourceMap,
+    excludeFromInlining = [],
+    maximumInlineSize = 10,
 
-  // Maximum resource size to inline (KiB)
-  const maximumInlineSize = 10;
+    // Convert absolute resource URLs to account for base-href and deploy-url.
+    deployUrl = '',
+    baseHref = '',
+    outputHashing
+  } = buildOptions;
+
+  // normalize to support ./ paths
+  const ignoreMatchers = excludeFromInlining.map(pattern => new Minimatch(path.normalize(pattern), { dot: true }));
+
   // Determine hashing format.
-  const hashFormat = getOutputHashFormat(buildOptions.outputHashing as string);
-  // Convert absolute resource URLs to account for base-href and deploy-url.
-  const baseHref = wco.buildOptions.baseHref || '';
-  const deployUrl = wco.buildOptions.deployUrl || '';
+  const hashFormat = getOutputHashFormat(outputHashing !);
 
   const postcssPluginCreator = function (loader: webpack.loader.LoaderContext) {
     return [
@@ -139,7 +146,9 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         {
           // TODO: inline .cur if not supporting IE (use browserslist to check)
           filter: (asset: PostcssUrlAsset) => {
-            return maximumInlineSize > 0 && !asset.hash && !asset.absolutePath.endsWith('.cur');
+            const { absolutePath, hash } = asset;
+            const url = path.relative(root, absolutePath);
+            return maximumInlineSize > 0 && !hash && !url.endsWith('.cur') && !ignoreMatchers.some(matchers => matchers.match(url));
           },
           url: 'inline',
           // NOTE: maxSize is in KB
@@ -181,9 +190,9 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
       // Add style entry points.
       if (entryPoints[style.bundleName]) {
-        entryPoints[style.bundleName].push(resolvedPath)
+        entryPoints[style.bundleName].push(resolvedPath);
       } else {
-        entryPoints[style.bundleName] = [resolvedPath]
+        entryPoints[style.bundleName] = [resolvedPath];
       }
 
       // Add lazy styles to the list.
@@ -197,7 +206,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
     if (chunkIds.length > 0) {
       // Add plugin to remove hashes from lazy styles.
-      extraPlugins.push(new RemoveHashPlugin({ chunkIds, hashFormat}));
+      extraPlugins.push(new RemoveHashPlugin({ chunkIds, hashFormat }));
     }
   }
 

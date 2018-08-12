@@ -64,6 +64,9 @@ export interface BuildOptions {
   lazyModules: string[];
   platform?: 'browser' | 'server';
   fileReplacements: CurrentFileReplacement[];
+
+  excludeFromInlining?: string[];
+  maximumInlineSize?: number;
 }
 
 export interface WebpackTestOptions extends BuildOptions {

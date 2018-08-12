@@ -222,6 +222,16 @@ export interface BrowserBuilderSchema {
    * Budget thresholds to ensure parts of your application stay within boundaries which you set.
    */
   budgets: Budget[];
+
+  /**
+   * Files to exclude from CSS inlining.
+   */
+  excludeFromInlining: string[];
+
+  /**
+   * Maximum resource size to inline (KiB).
+   */
+  maximumInlineSize: number;
 }
 
 export type AssetPattern = string | AssetPatternObject;
