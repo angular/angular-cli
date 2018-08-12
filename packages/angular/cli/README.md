@@ -53,7 +53,9 @@ npm install -g @angular/cli
 npm install @angular/cli
 ```
 
-To run a locally installed version of the angular-cli, you can call `ng` commands directly using your file path to where the `ng` package is installed locally, or you can use `npm run ng <command>`, which will look for locally installed packages before using a globally installed version.  
+To run a locally installed version of the angular-cli, you can call `ng` commands directly by adding the `.bin` folder within your local `node_modules` folder to your PATH. The `node_modules` and `.bin` folders are created in the directory where `npm install @angular/cli` was run upon completion of the install command.
+
+Alternatively, you can run `npx ng <command>` within the local directory where `npm install @angular/cli` was run, which will use the locally installed angular-cli.
 
 ### Install Specific Version (Example: 6.1.1)
 ```bash
