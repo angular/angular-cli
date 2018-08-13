@@ -38,7 +38,7 @@ import { convertSchemaToOptions, parseSchema } from './json-schema';
 
 
 export interface CommandMap {
-  [key: string]: string;
+  [key: string]: Path;
 }
 
 interface CommandMetadata {
@@ -84,9 +84,12 @@ function levenshtein(a: string, b: string): number {
  * @param logger The logger to use.
  * @param context Execution context.
  */
-export async function runCommand(args: string[],
-                                 logger: logging.Logger,
-                                 context: CommandContext): Promise<number | void> {
+export async function runCommand(
+  args: string[],
+  logger: logging.Logger,
+  context: CommandContext,
+  commandMap?: CommandMap,
+): Promise<number | void> {
 
   // if not args supplied, just run the help command.
   if (!args || args.length === 0) {
@@ -101,24 +104,31 @@ export async function runCommand(args: string[],
     ? CommandScope.inProject
     : CommandScope.outsideProject;
 
-  const commandMapPath = findUp('commands.json', __dirname);
-  if (commandMapPath === null) {
-    logger.fatal('Unable to find command map.');
+  if (commandMap === undefined) {
+    const commandMapPath = findUp('commands.json', __dirname);
+    if (commandMapPath === null) {
+      logger.fatal('Unable to find command map.');
 
-    return 1;
+      return 1;
+    }
+    const cliDir = dirname(normalize(commandMapPath));
+    const commandsText = readFileSync(commandMapPath).toString('utf-8');
+    const commandJson = JSON.parse(commandsText) as { [name: string]: string };
+
+    commandMap = {};
+    for (const commandName of Object.keys(commandJson)) {
+      commandMap[commandName] = join(cliDir, commandJson[commandName]);
+    }
   }
-  const cliDir = dirname(normalize(commandMapPath));
-  const commandsText = readFileSync(commandMapPath).toString('utf-8');
-  const commandMap = JSON.parse(commandsText) as CommandMap;
 
-  let commandMetadata = commandName ? findCommand(cliDir, commandMap, commandName) : null;
+  let commandMetadata = commandName ? findCommand(commandMap, commandName) : null;
 
   if (!commandMetadata && (rawOptions.v || rawOptions.version)) {
     commandName = 'version';
-    commandMetadata = findCommand(cliDir, commandMap, commandName);
+    commandMetadata = findCommand(commandMap, commandName);
   } else if (!commandMetadata && rawOptions.help) {
     commandName = 'help';
-    commandMetadata = findCommand(cliDir, commandMap, commandName);
+    commandMetadata = findCommand(commandMap, commandName);
   }
 
   if (!commandMetadata) {
@@ -132,7 +142,7 @@ export async function runCommand(args: string[],
       return 1;
     } else {
       const commandsDistance = {} as { [name: string]: number };
-      const allCommands = listAllCommandNames(cliDir, commandMap).sort((a, b) => {
+      const allCommands = Object.keys(commandMap).sort((a, b) => {
         if (!(a in commandsDistance)) {
           commandsDistance[a] = levenshtein(a, commandName);
         }
@@ -153,7 +163,7 @@ export async function runCommand(args: string[],
     }
   }
 
-  const command = await createCommand(cliDir, commandMetadata, context, logger);
+  const command = await createCommand(commandMetadata, context, logger);
   const metadataOptions = await convertSchemaToOptions(commandMetadata.text);
   if (command === null) {
     logger.error(tags.stripIndent`Command (${commandName}) failed to instantiate.`);
@@ -173,7 +183,7 @@ export async function runCommand(args: string[],
   options = parseOptions(args, command.options);
 
   if (commandName === 'help') {
-    options.commandInfo = getAllCommandInfo(cliDir, commandMap);
+    options.commandInfo = getAllCommandInfo(commandMap);
   }
 
   if (options.help) {
@@ -350,7 +360,7 @@ export function parseOptions(args: string[], optionsAndArguments: Option[]) {
 }
 
 // Find a command.
-function findCommand(rootDir: Path, map: CommandMap, name: string): CommandLocation | null {
+function findCommand(map: CommandMap, name: string): CommandLocation | null {
   // let Cmd: CommandConstructor = map[name];
   let commandName = name;
 
@@ -359,8 +369,7 @@ function findCommand(rootDir: Path, map: CommandMap, name: string): CommandLocat
     commandName = Object.keys(map)
       .filter(key => {
         // get aliases for the key
-        const metadataPath = map[key];
-        const metadataText = readFileSync(join(rootDir, metadataPath)).toString('utf-8');
+        const metadataText = readFileSync(map[key]).toString('utf-8');
         const metadata = JSON.parse(metadataText);
         const aliases = metadata['$aliases'];
         if (!aliases) {
@@ -372,12 +381,11 @@ function findCommand(rootDir: Path, map: CommandMap, name: string): CommandLocat
       })[0];
   }
 
-  const relativeMetadataPath = map[commandName];
+  const metadataPath = map[commandName];
 
-  if (!relativeMetadataPath) {
+  if (!metadataPath) {
     return null;
   }
-  const metadataPath = join(rootDir, relativeMetadataPath);
   const metadataText = readFileSync(metadataPath).toString('utf-8');
 
   const metadata = parseJson(metadataText) as any;
@@ -390,8 +398,7 @@ function findCommand(rootDir: Path, map: CommandMap, name: string): CommandLocat
 }
 
 // Create an instance of a command.
-async function createCommand(rootDir: Path,
-                             metadata: CommandLocation,
+async function createCommand(metadata: CommandLocation,
                              context: CommandContext,
                              logger: logging.Logger): Promise<Command | null> {
   const schema = parseSchema(metadata.text);
@@ -424,26 +431,18 @@ function mapCommandScope(scope: 'in' | 'out' | undefined): CommandScope {
   return commandScope;
 }
 
-// TODO: filter out commands that should not be listed based upon the command's metadata
-function listAllCommandNames(rootDir: Path, map: CommandMap): string[] {
-  return getAllCommandInfo(rootDir, map)
-    .reduce((acc, cmd) => {
-      return [...acc, cmd.name, ...cmd.aliases];
-    }, [] as string[]);
-}
-
 interface CommandInfo {
   name: string;
   description: string;
   aliases: string[];
   hidden: boolean;
 }
-function getAllCommandInfo(rootDir: Path, map: CommandMap): CommandInfo[] {
+function getAllCommandInfo(map: CommandMap): CommandInfo[] {
   return Object.keys(map)
     .map(name => {
       return {
         name: name,
-        metadata: findCommand(rootDir, map, name),
+        metadata: findCommand(map, name),
       };
     })
     .map(info => {
