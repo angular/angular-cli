@@ -86,7 +86,7 @@ export abstract class SchematicCommand extends Command {
   private _originalOptions: Option[];
   private _engineHost: FileSystemEngineHostBase;
   private _engine: Engine<FileSystemCollectionDesc, FileSystemSchematicDesc>;
-  private _workFlow: workflow.BaseWorkflow;
+  private _workflow: workflow.BaseWorkflow;
   argStrategy = ArgumentStrategy.Nothing;
 
   constructor(
@@ -166,7 +166,7 @@ export abstract class SchematicCommand extends Command {
   /*
    * Runtime hook to allow specifying customized workflow
    */
-  protected getWorkFlow(options: RunSchematicOptions): workflow.BaseWorkflow {
+  protected getWorkflow(options: RunSchematicOptions): workflow.BaseWorkflow {
     const {force, dryRun} = options;
     const fsHost = new virtualFs.ScopedHost(
         new NodeJsSyncHost(), normalize(this.project.root));
@@ -182,12 +182,12 @@ export abstract class SchematicCommand extends Command {
     );
   }
 
-  private _getWorkFlow(options: RunSchematicOptions): workflow.BaseWorkflow {
-    if (!this._workFlow) {
-      this._workFlow = this.getWorkFlow(options);
+  private _getWorkflow(options: RunSchematicOptions): workflow.BaseWorkflow {
+    if (!this._workflow) {
+      this._workflow = this.getWorkflow(options);
     }
 
-    return this._workFlow;
+    return this._workflow;
   }
 
   protected runSchematic(options: RunSchematicOptions) {
@@ -196,7 +196,7 @@ export abstract class SchematicCommand extends Command {
     let nothingDone = true;
     let loggingQueue: string[] = [];
     let error = false;
-    const workflow = this._getWorkFlow(options);
+    const workflow = this._getWorkflow(options);
 
     const workingDir = process.cwd().replace(this.project.root, '').replace(/\\/g, '/');
     const pathOptions = this.setPathOptions(schematicOptions, workingDir);
