@@ -63,18 +63,24 @@ export abstract class Command<T = any> {
     this.printHelpOptions(this.options);
   }
 
-  private getArgIndex(def: OptionSmartDefault | undefined): number {
-    if (def === undefined || def.index === undefined || typeof def.index !== 'number') {
-      return 99999;
+  private _getArguments(options: Option[]) {
+    function _getArgIndex(def: OptionSmartDefault | undefined): number {
+      if (def === undefined || def.$source !== 'argv' || typeof def.index !== 'number') {
+        // If there's no proper order, this argument is wonky. We will show it at the end only
+        // (after all other arguments).
+        return Infinity;
+      }
+
+      return def.index;
     }
 
-    return def.index;
+    return options
+      .filter(opt => this.isArgument(opt))
+      .sort((a, b) => _getArgIndex(a.$default) - _getArgIndex(b.$default));
   }
 
   protected printHelpUsage(name: string, options: Option[]) {
-    const args = options
-      .filter(opt => this.isArgument(opt))
-      .sort((a, b) => this.getArgIndex(a.$default) - this.getArgIndex(b.$default));
+    const args = this._getArguments(options);
     const opts = options.filter(opt => !this.isArgument(opt));
     const argDisplay = args && args.length > 0
       ? ' ' + args.map(a => `<${a.name}>`).join(' ')
