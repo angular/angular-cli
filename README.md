@@ -19,7 +19,7 @@ This is the home of the DevKit and the Angular CLI code. You can find the Angula
 
 [![CircleCI branch](https://img.shields.io/circleci/project/github/angular/angular-cli/master.svg?label=circleci)](https://circleci.com/gh/angular/angular-cli) [![Dependency Status](https://david-dm.org/angular/angular-cli.svg)](https://david-dm.org/angular/angular-cli) [![devDependency Status](https://david-dm.org/angular/angular-cli/dev-status.svg)](https://david-dm.org/angular/angular-cli?type=dev) 
 
-[![License](https://img.shields.io/npm/l/@angular-angular-cli/core.svg)](https://github.com/angular/angular-cli/blob/master/LICENSE) 
+[![License](https://img.shields.io/npm/l/@angular/cli.svg)](https://github.com/angular/angular-cli/blob/master/LICENSE) 
 
 [![GitHub forks](https://img.shields.io/github/forks/angular/angular-cli.svg?style=social&label=Fork)](https://github.com/angular/angular-cli/fork) [![GitHub stars](https://img.shields.io/github/stars/angular/angular-cli.svg?style=social&label=Star)](https://github.com/angular/angular-cli) 
 
