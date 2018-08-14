@@ -8,12 +8,12 @@ http_archive(
     sha256 = "95518adafc9a2b656667bbf517a952e54ce7f350779d0dd95133db4eb5c27fb1",
 )
 
-RULES_NODEJS_VERSION = "0.11.2"
+RULES_NODEJS_VERSION = "caae26b8cfc29838969e0614ebcb551a0e39ba26"
 http_archive(
     name = "build_bazel_rules_nodejs",
     url = "https://github.com/bazelbuild/rules_nodejs/archive/%s.zip" % RULES_NODEJS_VERSION,
     strip_prefix = "rules_nodejs-%s" % RULES_NODEJS_VERSION,
-    sha256 = "c00d5381adeefb56e0ef959a7b168cae628535dab933cfad1c2cd1870cd7c9de",
+    sha256 = "8b6978d03f58e9ce8e3c0034afd879d621f9387f693f5a8e1888241b0538a61f",
 )
 
 load("@build_bazel_rules_nodejs//:defs.bzl", "check_bazel_version", "node_repositories")
