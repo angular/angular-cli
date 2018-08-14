@@ -229,9 +229,28 @@ function requestBlocker() {
   };
 }
 
+// Copied from "karma-jasmine-diff-reporter" source code:
+// In case, when multiple reporters are used in conjunction
+// with initSourcemapReporter, they both will show repetitive log
+// messages when displaying everything that supposed to write to terminal.
+// So just suppress any logs from initSourcemapReporter by doing nothing on
+// browser log, because it is an utility reporter,
+// unless it's alone in the "reporters" option and base reporter is used.
+function muteDuplicateReporterLogging(context: any, config: any) {
+  context.writeCommonMsg = function () { };
+  const reporterName = '@angular/cli';
+  const hasTrailingReporters = config.reporters.slice(-1).pop() !== reporterName;
+
+  if (hasTrailingReporters) {
+    context.writeCommonMsg = function () { };
+  }
+}
+
 // Emits builder events.
-const eventReporter: any = function (this: any, baseReporterDecorator: any) {
+const eventReporter: any = function (this: any, baseReporterDecorator: any, config: any) {
   baseReporterDecorator(this);
+
+  muteDuplicateReporterLogging(this, config);
 
   this.onRunComplete = function (_browsers: any, results: any) {
     if (results.exitCode === 0) {
@@ -245,25 +264,13 @@ const eventReporter: any = function (this: any, baseReporterDecorator: any) {
   this.specFailure = () => {};
 };
 
-eventReporter.$inject = ['baseReporterDecorator'];
+eventReporter.$inject = ['baseReporterDecorator', 'config'];
 
 // Strip the server address and webpack scheme (webpack://) from error log.
 const sourceMapReporter: any = function (this: any, baseReporterDecorator: any, config: any) {
   baseReporterDecorator(this);
 
-  const reporterName = '@angular/cli';
-  const hasTrailingReporters = config.reporters.slice(-1).pop() !== reporterName;
-
-  // Copied from "karma-jasmine-diff-reporter" source code:
-  // In case, when multiple reporters are used in conjunction
-  // with initSourcemapReporter, they both will show repetitive log
-  // messages when displaying everything that supposed to write to terminal.
-  // So just suppress any logs from initSourcemapReporter by doing nothing on
-  // browser log, because it is an utility reporter,
-  // unless it's alone in the "reporters" option and base reporter is used.
-  if (hasTrailingReporters) {
-    this.writeCommonMsg = function () { };
-  }
+  muteDuplicateReporterLogging(this, config);
 
   const urlRegexp = /\(http:\/\/localhost:\d+\/_karma_webpack_\/webpack:\//gi;
 
