@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, JsonValue } from '../interface';
+import { JsonObject, JsonValue, isJsonObject } from '../interface';
 import { JsonPointer } from './interface';
 
 const allTypes = ['string', 'integer', 'number', 'object', 'array', 'boolean', 'null'];
@@ -24,7 +24,7 @@ function findTypes(schema: JsonObject): Set<string> {
     potentials = new Set(allTypes);
   }
 
-  if (JsonValue.isJsonObject(schema.not)) {
+  if (isJsonObject(schema.not)) {
     const notTypes = findTypes(schema.not);
     potentials = new Set([...potentials].filter(p => !notTypes.has(p)));
   }
@@ -97,13 +97,13 @@ export function addUndefinedDefaults(
     let newValue;
     if (value == undefined) {
       newValue = {} as JsonObject;
-    } else if (JsonValue.isJsonObject(value)) {
+    } else if (isJsonObject(value)) {
       newValue = value;
     } else {
       return value;
     }
 
-    if (!JsonValue.isJsonObject(schema.properties)) {
+    if (!isJsonObject(schema.properties)) {
       return newValue;
     }
 
