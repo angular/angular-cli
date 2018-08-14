@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as experimental from './experimental';
+import * as json from './json';
 import * as logging from './logger';
 import * as terminal from './terminal';
 
@@ -16,6 +17,7 @@ export * from './virtual-fs';
 
 export {
   experimental,
+  json,
   logging,
   terminal,
 };
