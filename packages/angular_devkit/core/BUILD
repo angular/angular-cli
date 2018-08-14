@@ -9,7 +9,6 @@ load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test")
 
 licenses(["notice"])  # MIT License
 
-
 # @angular-devkit/core
 
 ts_library(
