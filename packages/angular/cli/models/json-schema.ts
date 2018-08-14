@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, JsonValue, parseJson } from '@angular-devkit/core';
+import { JsonObject, isJsonObject, parseJson } from '@angular-devkit/core';
 import * as jsonSchemaTraverse from 'json-schema-traverse';
 import { Option, OptionSmartDefault } from './command';
 
@@ -42,7 +42,7 @@ function getOptions(schemaText: string, onlyRootProperties = true): Promise<Opti
           }
         }
         let $default: OptionSmartDefault | undefined = undefined;
-        if (schema.$default !== null && JsonValue.isJsonObject(schema.$default)) {
+        if (schema.$default !== null && isJsonObject(schema.$default)) {
           $default = <OptionSmartDefault> schema.$default;
         }
         let required = false;
@@ -98,7 +98,7 @@ function isPropertyNested(jsonPath: string): boolean {
 
 export function parseSchema(schema: string): JsonObject | null {
   const parsedSchema = parseJson(schema);
-  if (parsedSchema === null || !JsonValue.isJsonObject(parsedSchema)) {
+  if (parsedSchema === null || !isJsonObject(parsedSchema)) {
     return null;
   }
 
