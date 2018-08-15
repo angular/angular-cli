@@ -1,0 +1,46 @@
+load("//tools:defaults.bzl", "ts_library", "ng_module", "ng_package")
+
+package(default_visibility = ["//visibility:public"])
+
+load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test")
+
+ng_module(
+    name = "socket-engine",
+    srcs = glob([
+        "*.ts",
+        "src/**/*.ts",
+    ]),
+    module_name = "@nguniversal/socket-engine",
+    deps = [
+        "//modules/common",
+    ],
+)
+
+ng_package(
+    name = "npm_package",
+    srcs = [
+        ":package.json",
+    ],
+    entry_point = "modules/socket-engine/index.js",
+    readme_md = ":README.md",
+    deps = [
+        ":socket-engine",
+        "//modules/common",
+    ],
+)
+
+ts_library(
+    name = "unit_test_lib",
+    testonly = True,
+    srcs = glob([
+        "spec/**/*.spec.ts",
+    ]),
+    deps = [
+        ":socket-engine",
+    ],
+)
+
+jasmine_node_test(
+    name = "unit_test",
+    srcs = [":unit_test_lib"],
+)

@@ -1,0 +1,26 @@
+{
+  "name": "@nguniversal/socket-engine",
+  "version": "0.0.0-PLACEHOLDER",
+  "description": "Socket Engine for running Server Angular Apps",
+  "license": "MIT",
+  "keywords": [
+    "socket",
+    "ssr",
+    "universal"
+  ],
+  "peerDependencies": {
+    "@nguniversal/common": "0.0.0-PLACEHOLDER",
+    "@angular/core": "NG_VERSION"
+  },
+  "ng-update": {
+    "packageGroup": "NG_UPDATE_PACKAGE_GROUP"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal"
+  },
+  "bugs": {
+    "url": "https://github.com/angular/universal/issues"
+  },
+  "homepage": "https://github.com/angular/universal"
+}
