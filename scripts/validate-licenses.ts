@@ -61,6 +61,8 @@ const licenseReplacements: { [key: string]: string } = {
 
 // Specific packages to ignore, add a reason in a comment. Format: package-name@version.
 const ignoredPackages = [
+  // Us.
+  '@angular/devkit-repo@0.0.0',  // Hey, that's us!
   // * Development only
   'spdx-license-ids@3.0.0',  // CC0 but it's content only (index.json, no code) and not distributed.
   'tslint-sonarts@1.7.0', // LGPL-3.0 but only used as a tool, not linked in the build.
