@@ -88,3 +88,6 @@ triage:
     -
       - "type: RFC / Discussion / question"
       - "comp: *"
+    -
+      - "type: docs"
+      - "comp: *"
