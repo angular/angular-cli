@@ -65,7 +65,7 @@ jobs:
     parallelism: 4
     steps:
       - attach_workspace: *attach_options
-      - run: npm install --global npm@6.1
+      - run: npm install --global npm@6
       - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
   build:
