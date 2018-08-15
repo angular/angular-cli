@@ -8,7 +8,7 @@
 
 process.on('message', (message) => {
   // Only process messages with the hash in 'run-module-as-observable-fork.ts'.
-  if (message.hash = '5d4b9a5c0a4e0f9977598437b0e85bcc') {
+  if (message.hash === '5d4b9a5c0a4e0f9977598437b0e85bcc') {
     const requiredModule = require(message.modulePath);
     if (message.exportName) {
       requiredModule[message.exportName](...message.args);
