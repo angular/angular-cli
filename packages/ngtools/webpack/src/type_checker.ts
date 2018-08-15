@@ -128,7 +128,7 @@ export class TypeChecker {
 
       if (warnings.length > 0) {
         const message = formatDiagnostics(warnings);
-        console.log(terminal.bold(terminal.yellow('WARNING in ' + message)));
+        console.error(terminal.bold(terminal.yellow('WARNING in ' + message)));
       }
     }
   }

@@ -91,7 +91,7 @@ export function transformTypescript(
 
   // Log diagnostics if emit wasn't successfull.
   if (emitSkipped) {
-    console.log(diagnostics);
+    console.error(diagnostics);
 
     return null;
   }
