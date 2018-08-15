@@ -5,7 +5,7 @@
 
 licenses(["notice"])  # MIT
 
-load("//tools:defaults.bzl", "ts_library")
+load("@build_bazel_rules_typescript//:defs.bzl", "ts_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -27,7 +27,6 @@ ts_library(
     # Borrow the compile-time deps of the typescript compiler
     # Just to avoid an extra npm install action.
     node_modules = "@build_bazel_rules_typescript_tsc_wrapped_deps//:node_modules",
-    tsconfig = "//:tsconfig.json",
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",

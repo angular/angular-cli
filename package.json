@@ -64,6 +64,7 @@
     "typescript": "~2.9.2"
   },
   "devDependencies": {
+    "@bazel/typescript": "0.16.1",
     "@ngtools/json-schema": "^1.1.0",
     "@types/copy-webpack-plugin": "^4.4.1",
     "@types/express": "^4.16.0",
