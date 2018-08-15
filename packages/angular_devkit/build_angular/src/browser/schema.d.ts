@@ -42,7 +42,7 @@ export interface BrowserBuilderSchema {
   stylePreprocessorOptions?: StylePreprocessorOptions;
 
   /**
-   * Defines the optimization level of the build.
+   * Enables optimization of the build output.
    */
   optimization: boolean;
 
