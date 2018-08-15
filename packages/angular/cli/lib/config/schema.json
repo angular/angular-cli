@@ -580,7 +580,7 @@
             },
             "optimization": {
               "type": "boolean",
-              "description": "Defines the optimization level of the build.",
+              "description": "Enables optimization of the build output.",
               "default": false
             },
             "fileReplacements": {
@@ -995,7 +995,7 @@
             },
             "optimization": {
               "type": "boolean",
-              "description": "Defines the optimization level of the build."
+              "description": "Enables optimization of the build output."
             },
             "aot": {
               "type": "boolean",
@@ -1373,7 +1373,7 @@
             },
             "optimization": {
               "type": "boolean",
-              "description": "Defines the optimization level of the build.",
+              "description": "Enables optimization of the build output.",
               "default": false
             },
             "fileReplacements": {

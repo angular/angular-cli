@@ -61,7 +61,7 @@ export interface BuildWebpackServerSchema {
    */
   bundleDependencies?: BundleDependencies;
   /**
-   * Defines the optimization level of the build.
+   * Enables optimization of the build output.
    */
   optimization?: boolean;
   /**

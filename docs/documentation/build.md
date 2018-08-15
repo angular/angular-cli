@@ -113,7 +113,7 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
     <code>--optimization</code>
   </p>
   <p>
-    Defines the optimization level of the build.
+    Enables optimization of the build output.
   </p>
 </details>
 <details>
