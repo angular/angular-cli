@@ -87,7 +87,7 @@ export class Version {
     const rxjsVersion = new Version(rxjsPkgJson['version']);
 
     if (angularVersion.isLocal()) {
-      console.warn(terminal.yellow('Using a local version of angular. Proceeding with care...'));
+      console.error(terminal.yellow('Using a local version of angular. Proceeding with care...'));
 
       return;
     }
@@ -175,7 +175,7 @@ export class Version {
 
     if (currentCombo && !satisfies(tsVersion, currentCombo.typescript)) {
       // First line of warning looks weird being split in two, disable tslint for it.
-      console.log((terminal.yellow('\n' + tags.stripIndent`
+      console.error((terminal.yellow('\n' + tags.stripIndent`
         @angular/compiler-cli@${compilerVersion} requires typescript@'${
         currentCombo.typescript}' but ${tsVersion} was found instead.
         Using this version can result in undefined behaviour and difficult to debug problems.

@@ -99,7 +99,7 @@ try {
     // Don't show warning colorised on `ng completion`
     if (process.argv[2] !== 'completion') {
         // eslint-disable-next-line no-console
-      console.log(warning);
+      console.error(warning);
     } else {
         // eslint-disable-next-line no-console
       console.error(warning);
@@ -141,6 +141,6 @@ cli({
     process.exit(exitCode);
   })
   .catch((err: Error) => {
-    console.log('Unknown error: ' + err.toString());
+    console.error('Unknown error: ' + err.toString());
     process.exit(127);
   });
