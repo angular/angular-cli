@@ -426,7 +426,7 @@ export function addSymbolToNgModuleMetadata(
   }
 
   if (!node) {
-    console.log('No app module found. Please add your new class to your component.');
+    console.error('No app module found. Please add your new class to your component.');
 
     return [];
   }
