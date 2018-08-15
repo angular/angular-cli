@@ -58,6 +58,6 @@
     "webpack-subresource-integrity": "^1.1.0-rc.4"
   },
   "optionalDependencies": {
-    "node-sass": "^4.9.1"
+    "node-sass": "^4.9.3"
   }
 }
