@@ -29,9 +29,9 @@ go_register_toolchains()
 # Load the NodeJS rules, check minimum Bazel version, and define the local node_modules.
 http_archive(
     name = "build_bazel_rules_nodejs",
-    url = "https://github.com/bazelbuild/rules_nodejs/archive/0.11.5.zip",
-    strip_prefix = "rules_nodejs-0.11.5",
-    sha256 = "985bf908faa72cc4638c356a99d19ccac223e5dcd8dae695e3157e5c00f53489",
+    url = "https://github.com/bazelbuild/rules_nodejs/archive/37890ac39a0728b7c44162609d5b1e91291e7b0e.zip",
+    strip_prefix = "rules_nodejs-37890ac39a0728b7c44162609d5b1e91291e7b0e",
+    # sha256 = "985bf908faa72cc4638c356a99d19ccac223e5dcd8dae695e3157e5c00f53489",
 )
 
 load("@build_bazel_rules_nodejs//:package.bzl", "rules_nodejs_dependencies")

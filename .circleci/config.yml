@@ -132,44 +132,45 @@ workflows:
   default_workflow:
     jobs:
       - install
-      - lint:
-          requires:
-            - install
-      - validate:
-          requires:
-            - install
-      - build:
-          requires:
-            - lint
-            - validate
+      # - lint:
+      #     requires:
+      #       - install
+      # - validate:
+      #     requires:
+      #       - install
+      # - build:
+      #     requires:
+      #       - lint
+      #       - validate
       - bazel:
           requires:
-            - lint
-            - validate
-      - test:
-          requires:
-            - build
-      - test-large:
-          requires:
-            - build
-      - e2e-cli:
-          requires:
-            - build
-      - snapshot_publish:
-          requires:
-            - test
-            - build
-            - e2e-cli
-          filters:
-            branches:
-              only: master
-      - publish:
-          requires:
-            - test
-            - build
-            - snapshot_publish
-          filters:
-            tags:
-              only: /^v\d+/
-            branches:
-              ignore: /.*/
+            - install
+      #       - lint
+      #       - validate
+      # - test:
+      #     requires:
+      #       - build
+      # - test-large:
+      #     requires:
+      #       - build
+      # - e2e-cli:
+      #     requires:
+      #       - build
+      # - snapshot_publish:
+      #     requires:
+      #       - test
+      #       - build
+      #       - e2e-cli
+      #     filters:
+      #       branches:
+      #         only: master
+      # - publish:
+      #     requires:
+      #       - test
+      #       - build
+      #       - snapshot_publish
+      #     filters:
+      #       tags:
+      #         only: /^v\d+/
+      #       branches:
+      #         ignore: /.*/
