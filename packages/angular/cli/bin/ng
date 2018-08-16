@@ -3,8 +3,14 @@
 
 // Provide a title to the process in `ps`.
 // Due to an obscure Mac bug, do not start this title with any symbol.
-process.title = 'ng';
+try {
+  process.title = 'ng ' + Array.from(process.argv).slice(2).join(' ');
+} catch(_) {
+  // If an error happened above, use the most basic title.
+  process.title = 'ng';
+}
 
+// Some older versions of Node do not support let or const.
 var version = process.version.substr(1).split('.');
 if (Number(version[0]) < 8 || (Number(version[0]) === 8 && Number(version[1]) < 9)) {
   process.stderr.write(

@@ -1,3 +1,4 @@
+import { SpawnOptions } from "child_process";
 import * as child_process from 'child_process';
 import { terminal } from '@angular-devkit/core';
 import { Observable, concat, defer, EMPTY, from} from 'rxjs';
@@ -11,6 +12,7 @@ const treeKill = require('tree-kill');
 interface ExecOptions {
   silent?: boolean;
   waitForMatch?: RegExp;
+  env?: { [varname: string]: string };
 }
 
 
@@ -26,6 +28,7 @@ function  _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proc
   let stdout = '';
   let stderr = '';
   const cwd = process.cwd();
+  const env = options.env;
   console.log(
     `==========================================================================================`
   );
@@ -41,7 +44,7 @@ function  _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proc
 
   console.log(terminal.blue(`Running \`${cmd} ${args.map(x => `"${x}"`).join(' ')}\`${flags}...`));
   console.log(terminal.blue(`CWD: ${cwd}`));
-  const spawnOptions: any = {cwd};
+  const spawnOptions: SpawnOptions = {cwd, env};
 
   if (process.platform.startsWith('win')) {
     args.unshift('/c', cmd);
@@ -144,6 +147,10 @@ export function exec(cmd: string, ...args: string[]) {
 
 export function silentExec(cmd: string, ...args: string[]) {
   return _exec({ silent: true }, cmd, args);
+}
+
+export function execWithEnv(cmd: string, args: string[], env: { [varname: string]: string }) {
+  return _exec({ env }, cmd, args);
 }
 
 export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: RegExp) {
