@@ -44,10 +44,15 @@ Only the first 2 commits should be cherry picked to the patch branch, as the las
 ## Shepparding
 
 As commits are cherry-picked when PRs are merged, creating the release should be a matter of updating the version
-numbers. This can be done with the following command (for patch):
+numbers. This can be done with the following command.
+
+See `scripts/release.ts` for the full list of release types, e.g. patch updates the third number per semver.
 
 ```bash
-devkit-admin release patch --force
+devkit-admin release patch --force # replace with minor-beta etc.
+git commit -a -m 'release: vXX'
+git tag 'vXX'
+git push upstream && git push upstream --tags
 ```
 
 ### Publishing
@@ -68,13 +73,14 @@ devkit-admin publish --tag next
 
 ### Release Notes
 
-Running the following command will output the release notes on stdout between v1.2.3 and 1.2.4:
+`devkit-admin changelog` takes `from` and `to` arguments which are any valid git ref.
+For example, running the following command will output the release notes on stdout between v1.2.3 and 1.2.4:
 
 ```bash
 devkit-admin changelog --from=v1.2.3 --to=v1.2.4
 ``` 
 
-Copy paste the output (you can use `| pbcopy` on MacOS) and create the release notes on github for the tag just
+Copy paste the output (you can use `| pbcopy` on MacOS or `|xclip` on Linux) and create the release notes on github for the tag just
 released. If you have an API token for GitHub you can create a draft automatically by using the `--githubToken` flag.
 You just have then to confirm the draft.
 
