@@ -55,7 +55,10 @@ rules_nodejs_dependencies()
 
 load("@build_bazel_rules_nodejs//:defs.bzl", "check_bazel_version", "node_repositories")
 check_bazel_version("0.15.0")
-node_repositories(package_json = ["//:package.json"])
+node_repositories(
+    package_json = ["//:package.json"], 
+    preserve_symlinks = True,
+)
 
 local_repository(
     name = "rxjs",
