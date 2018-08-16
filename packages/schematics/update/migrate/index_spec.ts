@@ -9,6 +9,7 @@ import { virtualFs } from '@angular-devkit/core';
 import { HostTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { map } from 'rxjs/operators';
+import { _coerceVersionNumber } from './index';
 
 
 describe('@schematics/update:migrate', () => {
@@ -54,5 +55,31 @@ describe('@schematics/update:migrate', () => {
         ]);
       }),
     ).toPromise().then(done, done.fail);
+  });
+});
+
+
+describe('_coerceVersionNumber', () => {
+  const testCases: { [expected: string]: string | null } = {
+    '1': '1.0.0',
+    '1.2': '1.2.0',
+    '1.2.3': '1.2.3',
+    '1-beta.0': '1.0.0-beta.0',
+    '1.2-beta.0': '1.2.0-beta.0',
+    '1.2.3-beta.0': '1.2.3-beta.0',
+    'a': null,
+    '1.a': null,
+    '1a': null,
+    '1.': null,
+    '1.-beta.0': null,
+  };
+
+  Object.keys(testCases).forEach(input => {
+    const expected = testCases[input];
+    it(`${JSON.stringify(input)} => ${JSON.stringify(expected)}`, () => {
+      const actual = _coerceVersionNumber(input);
+
+      expect(actual).toBe(expected);
+    });
   });
 });

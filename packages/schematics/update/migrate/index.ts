@@ -18,6 +18,36 @@ import * as semver from 'semver';
 import { PostUpdateSchema } from './schema';
 
 
+/**
+ * Cleans up "short" version numbers so they become valid semver. For example;
+ *   1 => 1.0.0
+ *   1.2 => 1.2.0
+ *   1-beta => 1.0.0-beta
+ *
+ * Exported for testing only.
+ * @internal
+ */
+export function _coerceVersionNumber(version: string): string | null {
+  if (!version.match(/^\d{1,30}\.\d{1,30}\.\d{1,30}/)) {
+    const match = version.match(/^\d{1,30}(\.\d{1,30})*/);
+
+    if (!match) {
+      return null;
+    }
+
+    if (!match[1]) {
+      version = version.substr(0, match[0].length) + '.0.0' + version.substr(match[0].length);
+    } else if (!match[2]) {
+      version = version.substr(0, match[0].length) + '.0' + version.substr(match[0].length);
+    } else {
+      return null;
+    }
+  }
+
+  return semver.valid(version);
+}
+
+
 export default function(options: PostUpdateSchema): Rule {
   return (tree: Tree, context: SchematicContext) => {
     const schematicsToRun: { name: string; version: string; }[] = [];
@@ -28,16 +58,12 @@ export default function(options: PostUpdateSchema): Rule {
       const schematic = collection.createSchematic(name, true);
 
       const description: JsonObject = schematic.description as JsonObject;
+      let version = description['version'];
 
-      if (typeof description['version'] == 'string') {
-        let version = description['version'] as string;
-        if (!version.match(/^\d{1,30}\.\d{1,30}\.\d{1,30}$/)) {
-          version += '.0';
-        }
-        if (!version.match(/^\d{1,30}\.\d{1,30}\.\d{1,30}$/)) {
-          version += '.0';
-        }
-        if (!semver.valid(version)) {
+      if (typeof version == 'string') {
+        version = _coerceVersionNumber(version);
+
+        if (!version) {
           throw new SchematicsException(
             `Invalid migration version: ${JSON.stringify(description['version'])}`,
           );
