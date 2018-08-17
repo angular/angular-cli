@@ -16,6 +16,8 @@ const emptySha = '0'.repeat(40);
 
 
 export default function (_: {}, logger: logging.Logger) {
+  let validateCommitResult = 0;
+
   // Work on POSIX and Windows
   const rl = readline.createInterface({
     input: process.stdin,
@@ -33,10 +35,10 @@ export default function (_: {}, logger: logging.Logger) {
 
     if (remoteSha == emptySha) {
       // New branch.
-      validateCommits({ base: localSha }, logger);
+      validateCommitResult = validateCommits({ base: localSha }, logger);
     } else {
-      validateCommits({ base: remoteSha, head: localSha }, logger);
+      validateCommitResult = validateCommits({ base: remoteSha, head: localSha }, logger);
     }
   });
-  rl.on('end', () => process.exit(0));
+  rl.on('end', () => process.exit(validateCommitResult));
 }
