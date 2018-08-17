@@ -13,8 +13,8 @@ install:
 
 test_script:
   - node --version
-  - npm --version
-  - npm test
+  - yarn --version
+  - yarn test
   - node tests\legacy-cli\run_e2e.js --appveyor "--glob=tests/{basic,commands,generate,build/styles}/**"
 
 build: off
@@ -22,3 +22,4 @@ deploy: off
 
 cache:
   - node_modules -> yarn.lock
+  - "%LOCALAPPDATA%\\Yarn"
