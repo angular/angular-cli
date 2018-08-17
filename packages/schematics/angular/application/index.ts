@@ -270,10 +270,8 @@ export default function (options: ApplicationOptions): Rule {
       name: `${options.name}-e2e`,
       relatedAppName: options.name,
       rootSelector: appRootSelector,
+      projectRoot: `${newProjectRoot}/e2e`,
     };
-    if (options.projectRoot !== undefined) {
-      e2eOptions.projectRoot = 'e2e';
-    }
 
     return chain([
       addAppToWorkspaceFile(options, workspace),
