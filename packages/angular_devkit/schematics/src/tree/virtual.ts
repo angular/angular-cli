@@ -104,7 +104,6 @@ export class VirtualDirEntry implements DirEntry {
   }
 }
 
-
 /**
  * The root class of most trees.
  */
@@ -113,6 +112,18 @@ export class VirtualTree implements Tree {
   protected _cacheMap = new Map<Path, FileEntry>();
   protected _root = new VirtualDirEntry(this);
   protected _tree = new Map<Path, FileEntry>();
+
+  static isVirtualTree(tree: Tree): tree is VirtualTree {
+    if (tree instanceof VirtualTree) {
+      return true;
+    }
+
+    if (typeof tree === 'object' && typeof (tree as VirtualTree)._copyTo === 'function') {
+      return true;
+    }
+
+    return false;
+  }
 
   /**
    * Normalize the path. Made available to subclasses to overload.

@@ -109,6 +109,18 @@ export class HostTree implements Tree {
     return this;
   }
 
+  static isHostTree(tree: Tree): tree is HostTree {
+    if (tree instanceof HostTree) {
+      return true;
+    }
+
+    if (typeof tree === 'object' && typeof (tree as HostTree)._ancestry === 'object') {
+      return true;
+    }
+
+    return false;
+  }
+
   constructor(protected _backend: virtualFs.ReadonlyHost<{}> = new virtualFs.Empty()) {
     this._record = new virtualFs.CordHost(new virtualFs.SafeReadonlyHost(_backend));
     this._recordSync = new virtualFs.SyncDelegateHost(this._record);
