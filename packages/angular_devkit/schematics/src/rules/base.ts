@@ -96,9 +96,9 @@ export function noop(): Rule {
 export function filter(predicate: FilePredicate<boolean>): Rule {
   return ((tree: Tree) => {
     // TODO: Remove VirtualTree usage in 7.0
-    if (tree instanceof VirtualTree) {
+    if (VirtualTree.isVirtualTree(tree)) {
       return new FilteredTree(tree, predicate);
-    } else if (tree instanceof HostTree) {
+    } else if (HostTree.isHostTree(tree)) {
       return new FilterHostTree(tree, predicate);
     } else {
       throw new SchematicsException('Tree type is not supported.');
