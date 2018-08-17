@@ -9,12 +9,8 @@
 // tslint:disable:no-global-tslint-disable no-any
 import {
   JsonObject,
-  Path,
   deepCopy,
-  dirname,
-  join,
   logging,
-  normalize,
   parseJson,
   schema,
   strings as coreStrings,
@@ -22,6 +18,7 @@ import {
 } from '@angular-devkit/core';
 import { ExportStringRef } from '@angular-devkit/schematics/tools';
 import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
 import { of, throwError } from 'rxjs';
 import { concatMap } from 'rxjs/operators';
 import * as yargsParser from 'yargs-parser';
@@ -37,8 +34,8 @@ import { insideProject } from '../utilities/project';
 import { convertSchemaToOptions, parseSchema } from './json-schema';
 
 
-export interface CommandMap {
-  [key: string]: Path;
+interface CommandMap {
+  [key: string]: string;
 }
 
 interface CommandMetadata {
@@ -111,7 +108,7 @@ export async function runCommand(
 
       return 1;
     }
-    const cliDir = dirname(normalize(commandMapPath));
+    const cliDir = dirname(commandMapPath);
     const commandsText = readFileSync(commandMapPath).toString('utf-8');
     const commandJson = JSON.parse(commandsText) as { [name: string]: string };
 
@@ -410,7 +407,7 @@ async function createCommand(metadata: CommandLocation,
     throw new Error('Implementation path is incorrect');
   }
 
-  const implRef = new ExportStringRef(implPath, dirname(normalize(metadata.path)));
+  const implRef = new ExportStringRef(implPath, dirname(metadata.path));
 
   const ctor = implRef.ref as CommandConstructor;
 
