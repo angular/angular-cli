@@ -13,6 +13,7 @@ import { Tree } from '../tree/interface';
 import {
   Collection,
   Engine,
+  ExecutionOptions,
   RuleFactory,
   Schematic,
   SchematicDescription,
@@ -46,13 +47,14 @@ export class SchematicImpl<CollectionT extends object, SchematicT extends object
     options: OptionT,
     host: Observable<Tree>,
     parentContext?: Partial<TypedSchematicContext<CollectionT, SchematicT>>,
+    executionOptions?: Partial<ExecutionOptions>,
   ): Observable<Tree> {
-    const context = this._engine.createContext(this, parentContext);
+    const context = this._engine.createContext(this, parentContext, executionOptions);
 
     return host
       .pipe(
         first(),
-        concatMap(tree => this._engine.transformOptions(this, options).pipe(
+        concatMap(tree => this._engine.transformOptions(this, options, context).pipe(
           map(o => [tree, o]),
         )),
         concatMap(([tree, transformedOptions]: [Tree, OptionT]) => {

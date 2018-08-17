@@ -41,6 +41,10 @@ export interface TaskInfo {
   readonly context: SchematicContext;
 }
 
+export interface ExecutionOptions {
+  interactive: boolean;
+}
+
 /**
  * The description (metadata) of a collection. This type contains every information the engine
  * needs to run. The CollectionMetadataT type parameter contains additional metadata that you
@@ -92,6 +96,7 @@ export interface EngineHost<CollectionMetadataT extends object, SchematicMetadat
   transformOptions<OptionT extends object, ResultT extends object>(
     schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>,
     options: OptionT,
+    context?: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>,
   ): Observable<ResultT>;
   transformContext(
     context: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>,
@@ -118,6 +123,7 @@ export interface Engine<CollectionMetadataT extends object, SchematicMetadataT e
   createContext(
     schematic: Schematic<CollectionMetadataT, SchematicMetadataT>,
     parent?: Partial<TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>>,
+    executionOptions?: Partial<ExecutionOptions>,
   ): TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>;
   createSchematic(
       name: string,
@@ -130,6 +136,7 @@ export interface Engine<CollectionMetadataT extends object, SchematicMetadataT e
   transformOptions<OptionT extends object, ResultT extends object>(
       schematic: Schematic<CollectionMetadataT, SchematicMetadataT>,
       options: OptionT,
+      context?: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>,
   ): Observable<ResultT>;
   executePostTasks(): Observable<void>;
 
@@ -166,6 +173,7 @@ export interface Schematic<CollectionMetadataT extends object, SchematicMetadata
     options: OptionT,
     host: Observable<Tree>,
     parentContext?: Partial<TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>>,
+    executionOptions?: Partial<ExecutionOptions>,
   ): Observable<Tree>;
 }
 
@@ -181,6 +189,7 @@ export interface TypedSchematicContext<CollectionMetadataT extends object,
   readonly logger: logging.LoggerApi;
   readonly schematic: Schematic<CollectionMetadataT, SchematicMetadataT>;
   readonly strategy: MergeStrategy;
+  readonly interactive: boolean;
   addTask<T>(task: TaskConfigurationGenerator<T>, dependencies?: Array<TaskId>): TaskId;
 }
 

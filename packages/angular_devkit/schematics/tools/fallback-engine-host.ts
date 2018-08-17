@@ -31,10 +31,6 @@ export type FallbackSchematicDescription = {
 };
 export type FallbackContext =
   TypedSchematicContext<FallbackCollectionDescription, FallbackSchematicDescription>;
-export declare type OptionTransform<T extends object, R extends object> = (
-  schematic: SchematicDescription<FallbackCollectionDescription, FallbackSchematicDescription>,
-  options: T,
-) => Observable<R>;
 
 
 /**
@@ -93,9 +89,12 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
   transformOptions<OptionT extends object, ResultT extends object>(
     schematic: SchematicDescription<FallbackCollectionDescription, FallbackSchematicDescription>,
     options: OptionT,
+    context?: FallbackContext,
   ): Observable<ResultT> {
     return (observableOf(options)
-      .pipe(...this._hosts.map(host => mergeMap(opt => host.transformOptions(schematic, opt))))
+      .pipe(...this._hosts
+        .map(host => mergeMap(opt => host.transformOptions(schematic, opt, context))),
+      )
     ) as {} as Observable<ResultT>;
   }
 
