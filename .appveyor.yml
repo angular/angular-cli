@@ -9,15 +9,13 @@ matrix:
 install:
   - ps: Install-Product node $env:nodejs_version
   - yarn install --frozen-lockfile
-  # Appveyor (via chocolatey) cannot use older versions of Chrome:
-  # https://github.com/chocolatey/chocolatey-coreteampackages/tree/master/automatic/googlechrome
   - npm run webdriver-update-appveyor
 
 test_script:
   - node --version
   - npm --version
   - npm test
-  - npm run test-large
+  - node tests\legacy-cli\run_e2e.js --appveyor "--glob=tests/{basic,commands,generate,build/styles}/**"
 
 build: off
 deploy: off
