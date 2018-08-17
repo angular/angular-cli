@@ -39,7 +39,11 @@ import { readJsonFile } from './file-system-utility';
 
 
 export declare type OptionTransform<T extends object, R extends object>
-    = (schematic: FileSystemSchematicDescription, options: T) => Observable<R>;
+    = (
+      schematic: FileSystemSchematicDescription,
+      options: T,
+      context?: FileSystemSchematicContext,
+    ) => Observable<R>;
 
 
 export class CollectionCannotBeResolvedException extends BaseException {
@@ -269,11 +273,12 @@ export abstract class FileSystemEngineHostBase implements
   transformOptions<OptionT extends object, ResultT extends object>(
     schematic: FileSystemSchematicDesc,
     options: OptionT,
+    context?: FileSystemSchematicContext,
   ): Observable<ResultT> {
     return (observableOf(options)
       .pipe(
         ...this._transforms.map(tFn => mergeMap(opt => {
-          const newOptions = tFn(schematic, opt);
+          const newOptions = tFn(schematic, opt, context);
           if (isObservable(newOptions)) {
             return newOptions;
           } else {

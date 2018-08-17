@@ -18,6 +18,7 @@ import {
   CollectionDescription,
   Engine,
   EngineHost,
+  ExecutionOptions,
   Schematic,
   SchematicContext,
   SchematicDescription,
@@ -215,10 +216,18 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
   createContext(
     schematic: Schematic<CollectionT, SchematicT>,
     parent?: Partial<TypedSchematicContext<CollectionT, SchematicT>>,
+    executionOptions?: Partial<ExecutionOptions>,
   ): TypedSchematicContext<CollectionT, SchematicT> {
     // Check for inconsistencies.
     if (parent && parent.engine && parent.engine !== this) {
       throw new SchematicEngineConflictingException();
+    }
+
+    let interactive = true;
+    if (executionOptions && executionOptions.interactive != undefined) {
+      interactive = executionOptions.interactive;
+    } else if (parent && parent.interactive != undefined) {
+      interactive = parent.interactive;
     }
 
     let context: TypedSchematicContext<CollectionT, SchematicT> = {
@@ -229,6 +238,7 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
       schematic,
       strategy: (parent && parent.strategy !== undefined)
         ? parent.strategy : this.defaultMergeStrategy,
+      interactive,
       addTask,
     };
 
@@ -325,8 +335,9 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
   transformOptions<OptionT extends object, ResultT extends object>(
     schematic: Schematic<CollectionT, SchematicT>,
     options: OptionT,
+    context?: TypedSchematicContext<CollectionT, SchematicT>,
   ): Observable<ResultT> {
-    return this._host.transformOptions<OptionT, ResultT>(schematic.description, options);
+    return this._host.transformOptions<OptionT, ResultT>(schematic.description, options, context);
   }
 
   createSourceFromUrl(url: Url, context: TypedSchematicContext<CollectionT, SchematicT>): Source {

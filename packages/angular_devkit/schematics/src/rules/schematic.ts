@@ -7,7 +7,7 @@
  */
 import { of as observableOf } from 'rxjs';
 import { last, map } from 'rxjs/operators';
-import { Rule, SchematicContext } from '../engine/interface';
+import { ExecutionOptions, Rule, SchematicContext } from '../engine/interface';
 import { MergeStrategy, Tree } from '../tree/interface';
 import { branch } from '../tree/static';
 
@@ -19,14 +19,17 @@ import { branch } from '../tree/static';
  * @param schematicName The name of the schematic to run.
  * @param options The options to pass as input to the RuleFactory.
  */
-export function externalSchematic<OptionT extends object>(collectionName: string,
-                                                          schematicName: string,
-                                                          options: OptionT): Rule {
+export function externalSchematic<OptionT extends object>(
+  collectionName: string,
+  schematicName: string,
+  options: OptionT,
+  executionOptions?: Partial<ExecutionOptions>,
+): Rule {
   return (input: Tree, context: SchematicContext) => {
     const collection = context.engine.createCollection(collectionName);
     const schematic = collection.createSchematic(schematicName);
 
-    return schematic.call(options, observableOf(branch(input)), context);
+    return schematic.call(options, observableOf(branch(input)), context, executionOptions);
   };
 }
 
@@ -37,12 +40,16 @@ export function externalSchematic<OptionT extends object>(collectionName: string
  * @param schematicName The name of the schematic to run.
  * @param options The options to pass as input to the RuleFactory.
  */
-export function schematic<OptionT extends object>(schematicName: string, options: OptionT): Rule {
+export function schematic<OptionT extends object>(
+  schematicName: string,
+  options: OptionT,
+  executionOptions?: Partial<ExecutionOptions>,
+): Rule {
   return (input: Tree, context: SchematicContext) => {
     const collection = context.schematic.collection;
     const schematic = collection.createSchematic(schematicName, true);
 
-    return schematic.call(options, observableOf(branch(input)), context).pipe(
+    return schematic.call(options, observableOf(branch(input)), context, executionOptions).pipe(
       last(),
       map(x => {
         // We allow overwrite conflict here because they're the only merge conflict we particularly
