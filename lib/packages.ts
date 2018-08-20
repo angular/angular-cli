@@ -190,6 +190,12 @@ export const packages: PackageMap =
         // Only build the entry if there's a package name.
         return packages;
       }
+      if (!(name in monorepoPackages)) {
+        throw new Error(
+          `Package ${name} found in ${JSON.stringify(pkg.root)}, not found in .monorepo.json.`,
+        );
+      }
+
       const bin: {[name: string]: string} = {};
       Object.keys(packageJson['bin'] || {}).forEach(binName => {
         let p = path.resolve(pkg.root, packageJson['bin'][binName]);
