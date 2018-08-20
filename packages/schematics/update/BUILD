@@ -37,10 +37,11 @@ ts_library(
             "**/*_spec.ts",
             "**/*_spec_large.ts",
         ],
-        exclude = [
-            # The purify spec also depends on the webpack typings so we ignore it.
-            # "src/purify/**",
-        ],
+    ),
+    data = glob(
+        include = [
+            "**/*.json",
+        ]
     ),
     deps = [
         ":update",
@@ -54,12 +55,7 @@ ts_library(
     ],
 )
 
-# Disabled because 'collection.json' cannot be resolved in bazel, and all tests use it.
-# TODO(@filipesilva): figure out how to make data files resolve correctly.
-# jasmine_node_test(
-#     name = "update_test",
-#     srcs = [":update_test_lib"],
-#     data = [
-#         "collection.json"    
-#     ],
-# )
+jasmine_node_test(
+    name = "update_test",
+    srcs = [":update_test_lib"],
+)

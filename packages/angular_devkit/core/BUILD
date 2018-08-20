@@ -43,15 +43,7 @@ ts_library(
             "src/**/*_spec.ts",
             "src/**/*_spec_large.ts",
         ],
-        exclude = [
-            # The workspace spec expects workspace.json to be there, but it's not.
-            # TODO(@filipesilva): figure out how to resolve these in bazel.
-            "src/workspace/workspace_spec.ts",
-        ],
     ),
-    data = [
-        "src/workspace/workspace-schema.json"    
-    ],
     deps = [
         ":core",
         ":node",
@@ -59,6 +51,10 @@ ts_library(
         "@rxjs//operators",
         # @typings: jasmine
         # @typings: node
+    ],
+    data = [
+        "src/workspace/workspace-schema.json",
+        "src/workspace/test/test-workspace.json"    
     ],
 )
 
@@ -97,11 +93,6 @@ ts_library(
         include = [
             "node/**/*_spec.ts",
             "node/**/*_spec_large.ts",
-        ],
-        exclude = [
-            # The node resolve spec uses the _devKitRoot global, which isn't available in Bazel.
-            # TODO(@filipesilva): figure out an alternative to that global.
-            "node/resolve_spec.ts",
         ],
     ),
     deps = [
