@@ -47,63 +47,96 @@ describe('PWA Schematic', () => {
     appTree = schematicRunner.runExternalSchematic('@schematics/angular', 'application', appOptions, appTree);
   });
 
-  it('should run the service worker schematic', () => {
-    const tree = schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
-    const configText = tree.readContent('/angular.json');
-    const config = JSON.parse(configText);
-    const swFlag = config.projects.bar.targets.build.configurations.production.serviceWorker;
-    expect(swFlag).toEqual(true);
+  it('should run the service worker schematic', (done) => {
+    schematicRunner.runSchematicAsync('ng-add', defaultOptions, appTree).toPromise().then(tree => {
+      const configText = tree.readContent('/angular.json');
+      const config = JSON.parse(configText);
+      const swFlag = config.projects.bar.targets.build.configurations.production.serviceWorker;
+      expect(swFlag).toEqual(true);
+      done();
+    }, done.fail);
   });
 
-  it('should create icon files', () => {
+  it('should create icon files', (done) => {
     const dimensions = [72, 96, 128, 144, 152, 192, 384, 512];
     const iconPath = '/projects/bar/src/assets/icons/icon-';
-    const tree = schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
-    dimensions.forEach(d => {
-      const path = `${iconPath}${d}x${d}.png`;
-      expect(tree.exists(path)).toEqual(true);
-    });
+    schematicRunner.runSchematicAsync('ng-add', defaultOptions, appTree).toPromise().then(tree => {
+      dimensions.forEach(d => {
+        const path = `${iconPath}${d}x${d}.png`;
+        expect(tree.exists(path)).toEqual(true);
+      });
+      done();
+    }, done.fail);
   });
 
-  it('should create a manifest file', () => {
-    const tree = schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
-    expect(tree.exists('/projects/bar/src/manifest.json')).toEqual(true);
+  it('should create a manifest file', (done) => {
+    schematicRunner.runSchematicAsync('ng-add', defaultOptions, appTree).toPromise().then(tree => {
+      expect(tree.exists('/projects/bar/src/manifest.json')).toEqual(true);
+      done();
+    }, done.fail);
   });
 
-  it('should set the name & short_name in the manifest file', () => {
-    const tree = schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
-    const manifestText = tree.readContent('/projects/bar/src/manifest.json');
-    const manifest = JSON.parse(manifestText);
-    expect(manifest.name).toEqual(defaultOptions.title);
-    expect(manifest.short_name).toEqual(defaultOptions.title);
+  it('should set the name & short_name in the manifest file', (done) => {
+    schematicRunner.runSchematicAsync('ng-add', defaultOptions, appTree).toPromise().then(tree => {
+      const manifestText = tree.readContent('/projects/bar/src/manifest.json');
+      const manifest = JSON.parse(manifestText);
+
+      expect(manifest.name).toEqual(defaultOptions.title);
+      expect(manifest.short_name).toEqual(defaultOptions.title);
+      done();
+    }, done.fail);
   });
 
-  it('should set the name & short_name in the manifest file when no title provided', () => {
+  it('should set the name & short_name in the manifest file when no title provided', (done) => {
     const options = {...defaultOptions, title: undefined};
-    const tree = schematicRunner.runSchematic('ng-add', options, appTree);
-    const manifestText = tree.readContent('/projects/bar/src/manifest.json');
-    const manifest = JSON.parse(manifestText);
-    expect(manifest.name).toEqual(defaultOptions.project);
-    expect(manifest.short_name).toEqual(defaultOptions.project);
+    schematicRunner.runSchematicAsync('ng-add', options, appTree).toPromise().then(tree => {
+      const manifestText = tree.readContent('/projects/bar/src/manifest.json');
+      const manifest = JSON.parse(manifestText);
+
+      expect(manifest.name).toEqual(defaultOptions.project);
+      expect(manifest.short_name).toEqual(defaultOptions.project);
+      done();
+    }, done.fail);
   });
 
-  it('should update the index file', () => {
-    const tree = schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
-    const content = tree.readContent('projects/bar/src/index.html');
+  it('should update the index file', (done) => {
+    schematicRunner.runSchematicAsync('ng-add', defaultOptions, appTree).toPromise().then(tree => {
+      const content = tree.readContent('projects/bar/src/index.html');
 
-    expect(content).toMatch(/<link rel="manifest" href="manifest.json">/);
-    expect(content).toMatch(/<meta name="theme-color" content="#1976d2">/);
-    expect(content)
-      .toMatch(/<noscript>Please enable JavaScript to continue using this application.<\/noscript>/);
+      expect(content).toMatch(/<link rel="manifest" href="manifest.json">/);
+      expect(content).toMatch(/<meta name="theme-color" content="#1976d2">/);
+      expect(content)
+        .toMatch(/<noscript>Please enable JavaScript to continue using this application.<\/noscript>/);
+      done();
+    }, done.fail);
   });
 
-  it('should update the build and test assets configuration', () => {
-    const tree = schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
-    const configText = tree.readContent('/angular.json');
-    const config = JSON.parse(configText);
-    const targets = config.projects.bar.targets;
-    ['build', 'test'].forEach((target) => {
-      expect(targets[target].options.assets).toContain('projects/bar/src/manifest.json');
-    });
+  it('should not add noscript element to the index file if already present', (done) => {
+    let index = appTree.readContent('projects/bar/src/index.html');
+    index = index.replace('</body>', '<noscript>NO JAVASCRIPT</noscript></body>');
+    appTree.overwrite('projects/bar/src/index.html', index);
+    schematicRunner.runSchematicAsync('ng-add', defaultOptions, appTree).toPromise().then(tree => {
+      const content = tree.readContent('projects/bar/src/index.html');
+
+      expect(content).toMatch(/<link rel="manifest" href="manifest.json">/);
+      expect(content).toMatch(/<meta name="theme-color" content="#1976d2">/);
+      expect(content).not
+        .toMatch(/<noscript>Please enable JavaScript to continue using this application.<\/noscript>/);
+      expect(content).toMatch(/<noscript>NO JAVASCRIPT<\/noscript>/);
+      done();
+    }, done.fail);
+  });
+
+  it('should update the build and test assets configuration', (done) => {
+    schematicRunner.runSchematicAsync('ng-add', defaultOptions, appTree).toPromise().then(tree => {
+      const configText = tree.readContent('/angular.json');
+      const config = JSON.parse(configText);
+      const targets = config.projects.bar.targets;
+
+      ['build', 'test'].forEach((target) => {
+        expect(targets[target].options.assets).toContain('projects/bar/src/manifest.json');
+      });
+      done();
+    }, done.fail);
   });
 });
