@@ -93,7 +93,7 @@ function updateIndexFile(options: PwaOptions): Rule {
       ...itemsToAddToHead.map(line => headIndent + line),
       ...lines.slice(closingHeadTagLineIndex, closingBodyTagLineIndex),
       ...itemsToAddToBody.map(line => bodyIndent + line),
-      ...lines.slice(closingHeadTagLineIndex),
+      ...lines.slice(closingBodyTagLineIndex),
     ].join('\n');
 
     host.overwrite(path, updatedIndex);
