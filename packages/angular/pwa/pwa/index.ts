@@ -137,7 +137,7 @@ function addManifestToAssetsConfig(options: PwaOptions) {
 }
 
 export default function (options: PwaOptions): Rule {
-  return (host: Tree) => {
+  return (host: Tree, context: SchematicContext) => {
     const workspace = getWorkspace(host);
     if (!options.project) {
       throw new SchematicsException('Option "project" is required.');
@@ -167,6 +167,6 @@ export default function (options: PwaOptions): Rule {
       mergeWith(assetsTemplateSource),
       updateIndexFile(options),
       addManifestToAssetsConfig(options),
-    ]);
+    ])(host, context);
   };
 }
