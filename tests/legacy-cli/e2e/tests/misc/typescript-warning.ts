@@ -17,7 +17,7 @@ export default async function () {
     .then(() => silentNpm('install', `typescript@${unsupportedTsVersion}`, '--no-save'))
     .then(() => ng('build'))
     .then((output) => {
-      if (!output.stdout.match('Using this version can result in undefined behaviour')) {
+      if (!output.stderr.match('Using this version can result in undefined behaviour')) {
         throw new Error('Expected to have typescript version mismatch warning in output.');
       }
     });
