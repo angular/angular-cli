@@ -14,11 +14,9 @@ import { of as observableOf } from 'rxjs';
 
 
 describe('FileSystemEngineHost', () => {
-  const devkitRoot = (global as any)._DevKitRoot;
-  const root = path.join(
-    devkitRoot,
-    'tests/angular_devkit/schematics/tools/file-system-engine-host',
-  );
+  // We need to resolve a file that actually exists, and not just a folder.
+  // tslint:disable-next-line:max-line-length
+  const root = path.join(path.dirname(require.resolve(__filename)), '../../../../tests/angular_devkit/schematics/tools/file-system-engine-host');
 
   it('works', () => {
     const engineHost = new FileSystemEngineHost(root);

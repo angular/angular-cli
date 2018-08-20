@@ -22,7 +22,7 @@ function getJsonFileContent(tree: UnitTestTree, path: string) {
 describe('Library Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/ng_packagr',
-    path.join(__dirname, '../collection.json'),
+    require.resolve('../collection.json'),
   );
   const defaultOptions: GenerateLibrarySchema = {
     name: 'foo',

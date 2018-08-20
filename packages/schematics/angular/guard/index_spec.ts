@@ -15,7 +15,7 @@ import { Schema as GuardOptions } from './schema';
 describe('Guard Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
-    path.join(__dirname, '../collection.json'),
+    require.resolve('../collection.json'),
   );
   const defaultOptions: GuardOptions = {
     name: 'foo',
