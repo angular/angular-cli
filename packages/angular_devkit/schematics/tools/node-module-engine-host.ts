@@ -74,7 +74,7 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
   protected _resolveCollectionPath(name: string): string {
     let collectionPath: string | undefined = undefined;
 
-    if (name.split('/').length > (name[0] == '@' ? 2 : 1)) {
+    if (name.replace(/\\/, '/').split('/').length > (name[0] == '@' ? 2 : 1)) {
       try {
         collectionPath = this._resolvePath(name, process.cwd());
       } catch (_) {
