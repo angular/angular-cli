@@ -11,18 +11,13 @@ load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test")
 package(default_visibility = ["//visibility:public"])
 
 ts_library(
-    name = "angular",
+    name = "update",
     srcs = glob(
         include = ["**/*.ts"],
         exclude = [
             "**/*_spec.ts",
             "**/*_spec_large.ts",
             "**/*_benchmark.ts",
-            # Also exclude templated files.
-            "*/files/**/*.ts",
-            "*/other-files/**/*.ts",
-            # Exclude test helpers.
-            "utility/test/**/*.ts"
         ],
     ),
     deps = [
@@ -31,29 +26,25 @@ ts_library(
         "//packages/angular_devkit/schematics:tasks",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: typescript
         # @typings: node
     ],
 )
 
 ts_library(
-    name = "angular_test_lib",
+    name = "update_test_lib",
     srcs = glob(
         include = [
             "**/*_spec.ts",
             "**/*_spec_large.ts",
-            "utility/test/**/*.ts"
         ],
     ),
     data = glob(
         include = [
             "**/*.json",
-            "*/files/**",
-            "*/other-files/**",
         ]
     ),
     deps = [
-        ":angular",
+        ":update",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:testing",
@@ -65,6 +56,6 @@ ts_library(
 )
 
 jasmine_node_test(
-    name = "angular_test",
-    srcs = [":angular_test_lib"],
+    name = "update_test",
+    srcs = [":update_test_lib"],
 )

@@ -5,7 +5,7 @@
 
 licenses(["notice"])  # MIT
 
-load("//tools:defaults.bzl", "ts_library")
+load("@build_bazel_rules_typescript//:defs.bzl", "ts_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -19,6 +19,7 @@ ts_library(
         ],
     ),
     data = glob(["**/*.json"]),
+    module_name = "@angular/cli",
     deps = [
         "//packages/angular_devkit/architect",
         "//packages/angular_devkit/core",
@@ -30,5 +31,4 @@ ts_library(
         # @typings: node
         # @typings: semver
     ],
-    tsconfig = "//:tsconfig.json"
 )

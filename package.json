@@ -25,7 +25,7 @@
     "fix": "npm run admin -- lint --fix",
     "lint": "npm run admin -- lint",
     "prebuildifier": "bazel build --noshow_progress @com_github_bazelbuild_buildtools//buildifier",
-    "buildifier": "find . -type f \\( -name BUILD -or -name BUILD.bazel \\) ! -path \"*/node_modules/*\" | xargs $(bazel info bazel-bin)/external/com_github_bazelbuild_buildtools/buildifier/buildifier",
+    "buildifier": "bazel run //:buildifier",
     "templates": "node ./bin/devkit-admin templates",
     "test": "node ./bin/devkit-admin test",
     "test-large": "node ./bin/devkit-admin test --large --spec-reporter",
@@ -64,6 +64,7 @@
     "typescript": "~2.9.2"
   },
   "devDependencies": {
+    "@bazel/typescript": "0.16.1",
     "@ngtools/json-schema": "^1.1.0",
     "@types/copy-webpack-plugin": "^4.4.1",
     "@types/express": "^4.16.0",
@@ -91,6 +92,7 @@
     "license-checker": "^20.1.0",
     "minimatch": "^3.0.4",
     "minimist": "^1.2.0",
+    "rxjs": "^6.0.0",
     "semver": "^5.3.0",
     "source-map": "^0.5.6",
     "source-map-support": "^0.5.0",

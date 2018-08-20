@@ -11,12 +11,16 @@ import { ExportStringRef } from './export-ref';
 
 
 describe('ExportStringRef', () => {
+  // Depending on how the package is built the module might be either .js or .ts.
+  // To make expectations easier, we strip the extension.
+  const stripExtension = (p: string) => p.replace(/\.(j|t)s$/, '');
+
   it('works', () => {
     // META
     const ref = new ExportStringRef('./export-ref#ExportStringRef', __dirname);
     expect(ref.ref).toBe(ExportStringRef);
     expect(ref.path).toBe(__dirname);
-    expect(ref.module).toBe(path.join(__dirname, 'export-ref.ts'));
+    expect(stripExtension(ref.module)).toBe(path.join(__dirname, 'export-ref'));
   });
 
   it('works without an inner ref', () => {
@@ -24,7 +28,7 @@ describe('ExportStringRef', () => {
     const ref = new ExportStringRef(path.join(__dirname, 'export-ref'));
     expect(ref.ref).toBe(undefined);
     expect(ref.path).toBe(__dirname);
-    expect(ref.module).toBe(path.join(__dirname, 'export-ref.ts'));
+    expect(stripExtension(ref.module)).toBe(path.join(__dirname, 'export-ref'));
   });
 
   it('returns the exports', () => {
@@ -32,7 +36,7 @@ describe('ExportStringRef', () => {
     const ref = new ExportStringRef('./export-ref#ExportStringRef', __dirname, false);
     expect(ref.ref).toEqual({ ExportStringRef });
     expect(ref.path).toBe(__dirname);
-    expect(ref.module).toBe(path.join(__dirname, 'export-ref.ts'));
+    expect(stripExtension(ref.module)).toBe(path.join(__dirname, 'export-ref'));
   });
 
   it('works on package names', () => {
@@ -42,13 +46,13 @@ describe('ExportStringRef', () => {
     );
     expect(ref.ref).toEqual(CollectionCannotBeResolvedException);
     expect(ref.path).toBe(__dirname);
-    expect(ref.module).toBe(path.join(__dirname, 'index.ts'));
+    expect(stripExtension(ref.module)).toBe(path.join(__dirname, 'index'));
   });
 
   it('works on directory', () => {
     // META
     const ref = new ExportStringRef(__dirname);
     expect(ref.path).toBe(__dirname);
-    expect(ref.module).toBe(path.join(__dirname, 'index.ts'));
+    expect(stripExtension(ref.module)).toBe(path.join(__dirname, 'index'));
   });
 });

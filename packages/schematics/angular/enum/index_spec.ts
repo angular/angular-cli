@@ -15,7 +15,7 @@ import { Schema as EnumOptions } from './schema';
 describe('Enum Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
-    path.join(__dirname, '../collection.json'),
+    require.resolve('../collection.json'),
   );
   const defaultOptions: EnumOptions = {
     name: 'foo',

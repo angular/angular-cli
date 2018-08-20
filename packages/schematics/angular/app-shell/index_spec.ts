@@ -15,7 +15,7 @@ import { Schema as AppShellOptions } from './schema';
 describe('App Shell Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
-    path.join(__dirname, '../collection.json'),
+    require.resolve('../collection.json'),
   );
   const defaultOptions: AppShellOptions = {
     name: 'foo',

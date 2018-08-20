@@ -56,7 +56,7 @@ export class AmbiguousProjectPathException extends BaseException {
 }
 
 export class Workspace {
-  private readonly _workspaceSchemaPath = join(normalize(__dirname), 'workspace-schema.json');
+  private readonly _workspaceSchemaPath = normalize(require.resolve('./workspace-schema.json'));
   private _workspaceSchema: JsonObject;
   private _workspace: WorkspaceSchema;
   private _registry: schema.CoreSchemaRegistry;

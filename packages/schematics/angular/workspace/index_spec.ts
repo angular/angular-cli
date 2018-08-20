@@ -14,7 +14,7 @@ import { Schema as WorkspaceOptions } from './schema';
 describe('Workspace Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
-    path.join(__dirname, '../collection.json'),
+    require.resolve('../collection.json'),
   );
   const defaultOptions: WorkspaceOptions = {
     name: 'foo',

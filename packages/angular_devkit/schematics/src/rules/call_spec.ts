@@ -35,7 +35,7 @@ describe('callSource', () => {
     callSource(source0, context)
       .toPromise()
       .then(() => done.fail(), err => {
-        expect(err.constructor).toBe(InvalidSourceResultException);
+        expect(err).toEqual(new InvalidSourceResultException());
       })
       .then(done, done.fail);
   });
@@ -46,7 +46,7 @@ describe('callSource', () => {
     callSource(source0, context)
       .toPromise()
       .then(() => done.fail(), err => {
-        expect(err.constructor).toBe(InvalidSourceResultException);
+        expect(err).toEqual(new InvalidSourceResultException({}));
       })
       .then(done, done.fail);
   });
@@ -57,7 +57,7 @@ describe('callSource', () => {
     callSource(source0, context)
       .toPromise()
       .then(() => done.fail(), err => {
-        expect(err.constructor).toBe(InvalidSourceResultException);
+        expect(err).toEqual(new InvalidSourceResultException({}));
       })
       .then(done, done.fail);
   });
@@ -95,7 +95,7 @@ describe('callRule', () => {
     callRule(rule0, tree0, context)
       .toPromise()
       .then(() => done.fail(), err => {
-        expect(err.constructor).toBe(InvalidRuleResultException);
+        expect(err).toEqual(new InvalidRuleResultException({}));
       })
       .then(done, done.fail);
   });
@@ -107,7 +107,7 @@ describe('callRule', () => {
     callRule(rule0, tree0, context)
       .toPromise()
       .then(() => done.fail(), err => {
-        expect(err.constructor).toBe(InvalidRuleResultException);
+        expect(err).toEqual(new InvalidRuleResultException({}));
       })
       .then(done, done.fail);
   });

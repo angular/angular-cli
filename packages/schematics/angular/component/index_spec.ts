@@ -17,7 +17,7 @@ import { Schema as ComponentOptions } from './schema';
 describe('Component Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
-    path.join(__dirname, '../collection.json'),
+    require.resolve('../collection.json'),
   );
   const defaultOptions: ComponentOptions = {
     name: 'foo',

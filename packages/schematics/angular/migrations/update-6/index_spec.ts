@@ -16,7 +16,7 @@ import { latestVersions } from '../../utility/latest-versions';
 describe('Migration to v6', () => {
   const schematicRunner = new SchematicTestRunner(
     'migrations',
-    path.join(__dirname, '../migration-collection.json'),
+    require.resolve('../migration-collection.json'),
   );
 
   // tslint:disable-next-line:no-any

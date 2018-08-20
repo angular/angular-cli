@@ -5,29 +5,44 @@
 
 licenses(["notice"])  # MIT
 
-load("//tools:defaults.bzl", "ts_library")
+load("@build_bazel_rules_typescript//:defs.bzl", "ts_library")
+load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test")
 
 package(default_visibility = ["//visibility:public"])
 
 ts_library(
-    name = "lib",
+    name = "build_optimizer",
     srcs = glob(
-        ["**/*.ts"],
-        # Currently, this library is used only with the rollup plugin.
-        # To make it simpler for downstream repositories to compile this, we
-        # neither provide compile-time deps as an `npm_install` rule, nor do we
-        # expect the downstream repository to install @types/webpack[-*]
-        # So we exclude files that depend on webpack typings.
+        include = ["src/**/*.ts"],
         exclude = [
-            "src/build-optimizer/webpack-loader.ts",
-            "src/purify/**",
-            "src/index.ts",
-            "**/*_spec.ts",
-            "**/*_spec_large.ts",
+            # TODO(@filipesilva): shouldn't need to exclude the cli files but can't exclude them
+            # from jasmine_node_test.
+            "src/**/cli.ts",
+            "src/**/*_spec.ts",
+            "src/**/*_spec_large.ts",
+            "src/**/*_benchmark.ts",
         ],
     ),
-    tsconfig = "//:tsconfig.json",
-    # Borrow the compile-time deps of the typescript compiler
-    # Just to avoid an extra npm install action.
-    node_modules = "@build_bazel_rules_typescript_tsc_wrapped_deps//:node_modules",
+    deps = [],
+)
+
+ts_library(
+    name = "build_optimizer_test_lib",
+    srcs = glob(
+        include = [
+            "src/**/*_spec.ts",
+            "src/**/*_spec_large.ts",
+        ],
+    ),
+    deps = [
+        ":build_optimizer",
+        "//packages/angular_devkit/core",
+        # @typings: jasmine
+        # @typings: node
+    ],
+)
+
+jasmine_node_test(
+    name = "build_optimizer_test",
+    srcs = [":build_optimizer_test_lib"],
 )
