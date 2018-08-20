@@ -7,7 +7,6 @@
  */
 // tslint:disable:no-big-function
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import * as path from 'path';
 import { latestVersions } from '../utility/latest-versions';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as ApplicationOptions } from './schema';
@@ -16,7 +15,7 @@ import { Schema as ApplicationOptions } from './schema';
 describe('Application Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
-    path.join(__dirname, '../collection.json'),
+    require.resolve('../collection.json'),
   );
 
   const workspaceOptions: WorkspaceOptions = {

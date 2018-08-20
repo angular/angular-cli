@@ -7,7 +7,6 @@
  */
 // tslint:disable:no-big-function
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import * as path from 'path';
 import { getFileContent } from '../../angular/utility/test';
 import { Schema as ComponentOptions } from '../component/schema';
 import { latestVersions } from '../utility/latest-versions';
@@ -22,7 +21,7 @@ function getJsonFileContent(tree: UnitTestTree, path: string) {
 describe('Library Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/ng_packagr',
-    path.join(__dirname, '../collection.json'),
+    require.resolve('../collection.json'),
   );
   const defaultOptions: GenerateLibrarySchema = {
     name: 'foo',

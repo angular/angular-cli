@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import * as path from 'path';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as E2eOptions } from './schema';
 
@@ -14,7 +13,7 @@ import { Schema as E2eOptions } from './schema';
 describe('Application Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
-    path.join(__dirname, '../collection.json'),
+    require.resolve('../collection.json'),
   );
 
   const workspaceOptions: WorkspaceOptions = {

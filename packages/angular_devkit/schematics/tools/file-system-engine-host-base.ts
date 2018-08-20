@@ -13,6 +13,7 @@ import {
   virtualFs,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
+import { existsSync, statSync } from 'fs';
 import { dirname, isAbsolute, join, resolve } from 'path';
 import { Observable, from as observableFrom, of as observableOf, throwError } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
@@ -220,7 +221,6 @@ export abstract class FileSystemEngineHostBase implements
       throw new FactoryCannotBeResolvedException(name);
     }
 
-    const { path } = resolvedRef;
     let schema = partialDesc.schema;
     let schemaJson: JsonObject | undefined = undefined;
     if (schema) {
@@ -229,6 +229,15 @@ export abstract class FileSystemEngineHostBase implements
       }
       schemaJson = readJsonFile(schema) as JsonObject;
     }
+
+    // The schematic path is used to resolve URLs.
+    // We should be able to just do `dirname(resolvedRef.path)` but for compatibility with
+    // Bazel under Windows this directory needs to be resolved from the collection instead.
+    // This is needed because on Bazel under Windows the data files (such as the collection or
+    // url files) are not in the same place as the compiled JS.
+    const maybePath = join(collectionPath, partialDesc.factory);
+    const path = existsSync(maybePath) && statSync(maybePath).isDirectory()
+      ? maybePath : dirname(maybePath);
 
     return this._transformSchematicDescription(name, collection, {
       ...partialDesc,
@@ -248,9 +257,7 @@ export abstract class FileSystemEngineHostBase implements
         return (context: FileSystemSchematicContext) => {
           // Resolve all file:///a/b/c/d from the schematic's own path, and not the current
           // path.
-          const root = normalize(
-            resolve(dirname(context.schematic.description.path), url.path || ''),
-          );
+          const root = normalize(resolve(context.schematic.description.path, url.path || ''));
 
           return new HostCreateTree(new virtualFs.ScopedHost(new NodeJsSyncHost(), root));
         };

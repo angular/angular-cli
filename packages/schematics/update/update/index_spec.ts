@@ -35,7 +35,8 @@ describe('angularMajorCompatGuarantee', () => {
 
 describe('@schematics/update', () => {
   const schematicRunner = new SchematicTestRunner(
-    '@schematics/update', __dirname + '/../collection.json',
+    '@schematics/update',
+    require.resolve('../collection.json'),
   );
   let host: virtualFs.test.TestHost;
   let appTree: UnitTestTree = new UnitTestTree(new HostTree());

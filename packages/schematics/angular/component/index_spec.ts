@@ -7,7 +7,6 @@
  */
 // tslint:disable:no-big-function
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import * as path from 'path';
 import { Schema as ApplicationOptions } from '../application/schema';
 import { createAppModule } from '../utility/test';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
@@ -17,7 +16,7 @@ import { Schema as ComponentOptions } from './schema';
 describe('Component Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
-    path.join(__dirname, '../collection.json'),
+    require.resolve('../collection.json'),
   );
   const defaultOptions: ComponentOptions = {
     name: 'foo',
