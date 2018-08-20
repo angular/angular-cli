@@ -45,6 +45,12 @@ ts_library(
             "utility/test/**/*.ts"
         ],
     ),
+    data = glob(
+        include = [
+            "**/*.json",
+            "*/files/**",
+        ]
+    ),
     deps = [
         ":angular",
         "//packages/angular_devkit/core",
@@ -57,12 +63,7 @@ ts_library(
     ],
 )
 
-# Disabled because 'collection.json' cannot be resolved in bazel, and all tests use it.
-# TODO(@filipesilva): figure out how to make data files resolve correctly.
-# jasmine_node_test(
-#     name = "angular_test",
-#     srcs = [":angular_test_lib"],
-#     data = [
-#         "collection.json"    
-#     ],
-# )
+jasmine_node_test(
+    name = "angular_test",
+    srcs = [":angular_test_lib"],
+)
