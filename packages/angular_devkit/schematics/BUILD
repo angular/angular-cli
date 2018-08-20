@@ -39,11 +39,6 @@ ts_library(
             "src/**/*_spec.ts",
             "src/**/*_spec_large.ts",
         ],
-        exclude = [
-            # Instances of extended errors are showing Error as the constructor instead.
-            # TODO(@filipesilva): figure out why that is.
-            "src/rules/call_spec.ts",
-        ],
     ),
     deps = [
         ":schematics",
@@ -97,14 +92,10 @@ ts_library(
             "tasks/**/*_spec_large.ts",
             "tasks/tslint-fix/test/**/*.ts",
         ],
-        exclude = [
-            # Disabled because 'collection.json' cannot be resolved in bazel.
-            # TODO(@filipesilva): figure out how to make data files resolve correctly.
-            "tasks/tslint-fix/executor_spec.ts",
-        ],
     ),
     data = [
         "tasks/tslint-fix/test/collection.json",
+        "tasks/tslint-fix/test/rules/customRuleRule.js",
     ],
     deps = [
         ":tasks",
@@ -121,11 +112,10 @@ ts_library(
 )
 
 
-# Disabled since we are excluding the only test in tasks.
-# jasmine_node_test(
-#     name = "tasks_test",
-#     srcs = [":tasks_test_lib"],
-# )
+jasmine_node_test(
+    name = "tasks_test",
+    srcs = [":tasks_test_lib"],
+)
 
 
 # @angular-devkit/schematics/tools
@@ -137,6 +127,7 @@ ts_library(
         exclude = [
             "tools/**/*_spec.ts",
             "tools/**/*_benchmark.ts",
+            "tools/test/**/*.ts",
         ],
     ),
     module_name = "@angular-devkit/schematics/tools",
@@ -158,15 +149,8 @@ ts_library(
         include = [
             "tools/**/*_spec.ts",
             "tools/**/*_spec_large.ts",
+            "tools/test/**/*.ts",
         ],
-        exclude = [
-            # The node resolve spec uses the _devKitRoot global, which isn't available in Bazel.
-            # TODO(@filipesilva): figure out an alternative to that global.
-            "tools/file-system-engine-host_spec.ts",
-        ],
-    ),
-    data = glob(
-        include = ["tools/test/file-system-engine-host/**/collection.json"],
     ),
     deps = [
         ":tools",
@@ -175,6 +159,7 @@ ts_library(
         ":testing",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
+        "//tests/angular_devkit/schematics/tools/file-system-engine-host:file_system_engine_host_test_lib",
         "@rxjs",
         "@rxjs//operators",
         # @typings: jasmine
@@ -194,7 +179,6 @@ ts_library(
     name = "testing",
     srcs = glob(
         include = ["testing/**/*.ts"],
-        exclude = [],
     ),
     module_name = "@angular-devkit/schematics/testing",
     module_root = "testing/index.d.ts",
