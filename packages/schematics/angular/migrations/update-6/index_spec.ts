@@ -9,14 +9,13 @@
 import { JsonObject } from '@angular-devkit/core';
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import * as path from 'path';
 import { latestVersions } from '../../utility/latest-versions';
 
 
 describe('Migration to v6', () => {
   const schematicRunner = new SchematicTestRunner(
     'migrations',
-    path.join(__dirname, '../migration-collection.json'),
+    require.resolve('../migration-collection.json'),
   );
 
   // tslint:disable-next-line:no-any

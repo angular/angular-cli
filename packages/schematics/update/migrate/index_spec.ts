@@ -14,7 +14,8 @@ import { _coerceVersionNumber } from './index';
 
 describe('@schematics/update:migrate', () => {
   const schematicRunner = new SchematicTestRunner(
-    '@schematics/update', __dirname + '/../collection.json',
+    '@schematics/update',
+    require.resolve('../collection.json'),
   );
   let host: virtualFs.test.TestHost;
   let appTree: UnitTestTree = new UnitTestTree(new HostTree());
@@ -30,7 +31,7 @@ describe('@schematics/update:migrate', () => {
     // migrate schematic actually do work appropriately, in a separate test.
     schematicRunner.runSchematicAsync('migrate', {
       package: 'test',
-      collection: __dirname + '/test/migration.json',
+      collection: require.resolve('./test/migration.json'),
       from: '1.0.0',
       to: '2.0.0',
     }, appTree).pipe(

@@ -10,7 +10,8 @@
 import { tap } from 'rxjs/operators';
 import { schema } from '..';
 import { NodeJsSyncHost } from '../../node';
-import { join, normalize } from '../virtual-fs';
+import { AdditionalPropertiesValidatorError } from '../json/schema/interface';
+import { dirname, join, normalize } from '../virtual-fs';
 import {
   ProjectNotFoundException,
   Workspace,
@@ -115,10 +116,10 @@ describe('Workspace', () => {
   });
 
   it('loads workspace from host', (done) => {
-    const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
-    const workspaceRoot = join(devkitRoot, 'tests/angular_devkit/core/workspace');
+    const workspacePath = require.resolve('./test/test-workspace.json');
+    const workspaceRoot = dirname(normalize(workspacePath));
     const workspace = new Workspace(workspaceRoot, host);
-    workspace.loadWorkspaceFromHost(normalize('angular-workspace.json')).pipe(
+    workspace.loadWorkspaceFromHost(normalize('test-workspace.json')).pipe(
       tap((ws) => expect(ws.getProject('app').root).toEqual(workspaceJson.projects['app'].root)),
     ).toPromise().then(done, done.fail);
   });
@@ -127,7 +128,14 @@ describe('Workspace', () => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson({ foo: 'bar' })
       .toPromise().then(() => done.fail, (err) => {
-        expect(err).toEqual(jasmine.any(schema.SchemaValidationException));
+        const validationErrors = [{
+          keyword: 'additionalProperties',
+          dataPath: '',
+          schemaPath: '#/additionalProperties',
+          params: { additionalProperty: 'foo' },
+          message: 'should NOT have additional properties',
+        } as AdditionalPropertiesValidatorError];
+        expect(err).toEqual(new schema.SchemaValidationException(validationErrors));
         done();
       });
   });

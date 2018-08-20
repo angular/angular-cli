@@ -6,14 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
-import * as path from 'path';
 import { Schema as NgNewOptions } from './schema';
 
 
 describe('Ng New Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
-    path.join(__dirname, '../collection.json'),
+    require.resolve('../collection.json'),
   );
   const defaultOptions: NgNewOptions = {
     name: 'foo',

@@ -26,15 +26,22 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
   constructor(protected _root: string) { super(); }
 
   protected _resolveCollectionPath(name: string): string {
-    // Allow `${_root}/${name}.json` as a collection.
-    if (existsSync(join(this._root, name + '.json'))) {
-      return join(this._root, name + '.json');
-    }
+    try {
+      // Allow `${_root}/${name}.json` as a collection.
+      const maybePath = require.resolve(join(this._root, name + '.json'));
+      if (existsSync(maybePath)) {
+        return maybePath;
+      }
+    } catch (error) { }
 
-    // Allow `${_root}/${name}/collection.json.
-    if (existsSync(join(this._root, name, 'collection.json'))) {
-      return join(this._root, name, 'collection.json');
-    }
+    try {
+      // Allow `${_root}/${name}/collection.json.
+      const maybePath = require.resolve(join(this._root, name, 'collection.json'));
+      if (existsSync(maybePath)) {
+        return maybePath;
+      }
+    } catch (error) { }
+
 
     throw new CollectionCannotBeResolvedException(name);
   }

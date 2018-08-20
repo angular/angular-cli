@@ -14,12 +14,15 @@ import * as path from 'path';
 import { Observable, concat } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
+const isWindowsBazel = process.env.RUNFILES_MANIFEST_ONLY === '1'
+  && process.env.RUNFILES_MANIFEST_FILE;
+
 describe('TsLintTaskExecutor', () => {
 
   it('works with config object', done => {
     const testRunner = new SchematicTestRunner(
       '@_/test',
-      path.join(__dirname, 'test/collection.json'),
+      require.resolve('./test/collection.json'),
     );
 
     const host = new TempScopedNodeJsSyncHost();
@@ -35,7 +38,7 @@ describe('TsLintTaskExecutor', () => {
   it('shows errors with config object', done => {
     const testRunner = new SchematicTestRunner(
       '@_/test',
-      path.join(__dirname, 'test/collection.json'),
+      require.resolve('./test/collection.json'),
     );
 
     const host = new TempScopedNodeJsSyncHost();
@@ -71,9 +74,17 @@ describe('TsLintTaskExecutor', () => {
   });
 
   it('supports custom rules in the project (pass)', done => {
+    // This test is disabled on Windows Bazel runs because it relies on TSLint custom rule
+    // loading behavior, which doesn't work with runfile resolution.
+    if (isWindowsBazel) {
+      done();
+
+      return;
+    }
+
     const testRunner = new SchematicTestRunner(
       '@_/test',
-      path.join(__dirname, 'test/collection.json'),
+      require.resolve('./test/collection.json'),
     );
 
     const host = new TempScopedNodeJsSyncHost();
@@ -95,6 +106,14 @@ describe('TsLintTaskExecutor', () => {
   });
 
   it('supports custom rules in the project (fail)', done => {
+    // This test is disabled on Windows Bazel runs because it relies on TSLint custom rule
+    // loading behavior, which doesn't work with runfile resolution.
+    if (isWindowsBazel) {
+      done();
+
+      return;
+    }
+
     const testRunner = new SchematicTestRunner(
       '@_/test',
       path.join(__dirname, 'test/collection.json'),

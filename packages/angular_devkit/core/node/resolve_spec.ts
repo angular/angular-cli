@@ -8,15 +8,12 @@
 // tslint:disable:no-any
 // tslint:disable-next-line:no-implicit-dependencies
 import { resolve } from '@angular-devkit/core/node';
-import * as path from 'path';
-
-const devKitRoot = (global as any)._DevKitRoot;
 
 describe('resolve', () => {
 
   it('works', () => {
-    expect(resolve('tslint', { basedir: __dirname }))
-      .toBe(path.join(devKitRoot, 'node_modules/tslint/lib/index.js'));
+    const tslintRe = /[\\/]node_modules[\\/]tslint[\\/]lib[\\/]index.js$/;
+    expect(resolve('tslint', { basedir: __dirname })).toMatch(tslintRe);
 
     expect(() => resolve('npm', { basedir: '/' })).toThrow();
 
