@@ -24,11 +24,10 @@ ts_library(
             "**/*_spec_large.ts",
         ],
     ),
-    # Borrow the compile-time deps of the typescript compiler
-    # Just to avoid an extra npm install action.
-    node_modules = "@build_bazel_rules_typescript_tsc_wrapped_deps//:node_modules",
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
+        "@rxjs",
+        # @typings: node
     ],
 )
