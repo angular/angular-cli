@@ -136,7 +136,7 @@ function _findAllPackageJson(dir: string, exclude: RegExp): string[] {
         return;
       } else if (fileName == 'package.json') {
         result.push(p);
-      } else if (fs.statSync(p).isDirectory()) {
+      } else if (fs.statSync(p).isDirectory() && fileName != 'node_modules') {
         result.push(..._findAllPackageJson(p, exclude));
       }
     });
