@@ -49,6 +49,7 @@ ts_library(
         include = [
             "**/*.json",
             "*/files/**",
+            "*/other-files/**",
         ]
     ),
     deps = [
