@@ -68,6 +68,16 @@ function getClientTargets(
   return projectTargets;
 }
 
+// TODO: Add types for the Target
+// tslint:disable-next-line:no-any
+function getFileReplacements(target: any ) {
+  const configurations = target.configurations || {};
+  const production = configurations.production || {};
+  const fileReplacements = production.fileReplacements || [];
+
+  return fileReplacements;
+}
+
 function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): Rule {
   return (host: Tree) => {
     const workspace = getWorkspace(host);
@@ -83,9 +93,19 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
       main: `${clientProject.root}src/main.server.ts`,
       tsConfig: join(tsConfigDirectory, `${options.tsconfigFileName}.json`),
     };
+
+    // TODO: Add types for the TargetConfiguration
+    // tslint:disable-next-line:no-any
+    const builderConfigurations: any = {
+      production: {
+        fileReplacements: getFileReplacements(projectTargets.build),
+      },
+    };
+
     const serverTarget: JsonObject = {
       builder: '@angular-devkit/build-angular:server',
       options: builderOptions,
+      configurations: builderConfigurations,
     };
     projectTargets.server = serverTarget;
 
