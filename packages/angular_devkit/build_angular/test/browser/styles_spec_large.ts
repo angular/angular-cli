@@ -529,4 +529,22 @@ describe('Browser Builder styles', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   });
+
+  it(`supports inline javascript in less`, (done) => {
+    const overrides = { styles: [`src/styles.less`] };
+    host.writeMultipleFiles({
+      'src/styles.less': `
+        .myFunction() {
+          @functions: ~\`(function () {
+            return '';
+          })()\`;
+        }
+        .myFunction();
+      `,
+    });
+
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+    ).toPromise().then(done, done.fail);
+  });
 });
