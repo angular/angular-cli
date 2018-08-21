@@ -130,6 +130,13 @@ describe('Universal Schematic', () => {
     expect(opts.outputPath).toEqual('dist/bar-server');
     expect(opts.main).toEqual('projects/bar/src/main.server.ts');
     expect(opts.tsConfig).toEqual('projects/bar/tsconfig.server.json');
+    const configurations = targets.server.configurations;
+    expect(configurations.production).toBeDefined();
+    expect(configurations.production.fileReplacements).toBeDefined();
+    const fileReplacements = targets.server.configurations.production.fileReplacements;
+    expect(fileReplacements.length).toEqual(1);
+    expect(fileReplacements[0].replace).toEqual('projects/bar/src/environments/environment.ts');
+    expect(fileReplacements[0].with).toEqual('projects/bar/src/environments/environment.prod.ts');
   });
 
   it('should add a server transition to BrowerModule import', () => {
