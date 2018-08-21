@@ -171,23 +171,21 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     ref: string,
     validate: ajv.ValidateFunction,
   ): { context?: ajv.ValidateFunction, schema?: JsonObject } {
-    if (!validate) {
+    if (!validate || !validate.refs || !validate.refVal || !ref) {
       return {};
     }
 
-    const refHash = ref.split('#', 2)[1];
-    const refUrl = ref.startsWith('#') ? ref : ref.split('#', 1);
-
-    if (!ref.startsWith('#')) {
-      // tslint:disable-next-line:no-any
-      validate = (validate.refVal as any)[(validate.refs as any)[refUrl[0]]];
-    }
-    if (validate && refHash) {
-      // tslint:disable-next-line:no-any
-      validate = (validate.refVal as any)[(validate.refs as any)['#' + refHash]];
+    // tslint:disable-next-line:no-any
+    const id = (validate.schema as any).$id || (validate.schema as any).id;
+    let fullReference = (ref[0] === '#' && id) ? id + ref : ref;
+    if (fullReference.endsWith('#')) {
+      fullReference = fullReference.slice(0, -1);
     }
 
-    return { context: validate, schema: validate && validate.schema as JsonObject };
+    // tslint:disable-next-line:no-any
+    const context = validate.refVal[(validate.refs as any)[fullReference]];
+
+    return { context, schema: context && context.schema as JsonObject };
   }
 
   compile(schema: JsonObject): Observable<SchemaValidator> {
