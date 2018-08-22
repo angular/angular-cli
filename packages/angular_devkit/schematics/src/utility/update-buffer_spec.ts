@@ -58,6 +58,16 @@ describe('UpdateBuffer', () => {
       mb.insertLeft(6, Buffer.from('Awesome '));
       expect(mb.toString()).toBe('Hello Great Awesome Beautiful World');
     });
+
+    it('works with special characters', () => {
+      const mb = new UpdateBuffer(Buffer.from('Ülaut'));
+
+      mb.insertLeft(1, Buffer.from('m'));
+      expect(mb.toString()).toBe('Ümlaut');
+
+      mb.insertLeft(0, Buffer.from('Hello '));
+      expect(mb.toString()).toBe('Hello Ümlaut');
+    });
   });
 
   describe('delete', () => {
