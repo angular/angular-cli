@@ -96,5 +96,11 @@
       "modules/**/*.ts"
     ],
     "deletion-target": true
+  },
+  "linterOptions": {
+    "exclude": [
+      // Exclude schematic template files that can't be linted.
+      "**/schematics/**/files/**/*"
+    ]
   }
 }

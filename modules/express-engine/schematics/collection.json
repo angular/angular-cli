@@ -1,0 +1,11 @@
+{
+  "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "ng-add": {
+      "description": "Adds Angular Universal Express Engine to the application without affecting any templates",
+      "factory": "./install",
+      "schema": "./install/schema.json",
+      "aliases": ["express-engine-shell"]
+    },
+  }
+}

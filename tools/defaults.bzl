@@ -2,12 +2,13 @@
 load("@build_bazel_rules_typescript//:defs.bzl", _ts_library = "ts_library")
 load("@angular//:index.bzl", _ng_module = "ng_module")
 load("@angular//:index.bzl", _ng_package = "ng_package")
+load("@build_bazel_rules_nodejs//:defs.bzl", _npm_package = "npm_package")
 
 DEFAULT_TS_CONFIG = "//:tsconfig.json"
 DEFAULT_NODE_MODULES = "//:node_modules"
 
-NG_VERSION = "^6.0.0-rc.0"
-RXJS_VERSION = "^6.0.0-beta.0"
+NG_VERSION = "^6.0.0"
+RXJS_VERSION = "^6.0.0"
 HAPI_VERSION = "^17.0.0"
 EXPRESS_VERSION = "^4.15.2"
 
@@ -72,3 +73,10 @@ def ng_package(globals = {}, **kwargs):
   globals = dict(globals, **GLOBALS)
 
   _ng_package(globals = globals, replacements=PKG_GROUP_REPLACEMENTS, **kwargs)
+
+def npm_package(name, replacements = {}, **kwargs):
+    _npm_package(
+        name = name,
+        replacements = dict(replacements, **PKG_GROUP_REPLACEMENTS),
+        **kwargs
+    )

@@ -1,0 +1,57 @@
+package(default_visibility = ["//visibility:public"])
+
+load("//tools:defaults.bzl", "ts_library", "npm_package")
+load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test")
+
+filegroup(
+    name = "schematics_assets",
+    srcs = glob([
+        "**/files/**/*",
+        "**/*.json",
+    ]) + [
+        "README.md",
+    ],
+)
+
+ts_library(
+    name = "schematics",
+    srcs = glob(
+        ["**/*.ts"],
+        exclude = [
+            "**/*.spec.ts",
+            "**/files/**/*",
+            "test-setup/**/*",
+        ],
+    ),
+    module_name = "@nguniversal/express-engine/schematics",
+    tsconfig = ":tsconfig.json",
+)
+
+# This package is intended to be combined into the main @nguniversal/express-engine package as a dep.
+npm_package(
+    name = "npm_package",
+    srcs = [":schematics_assets"],
+    deps = [":schematics"],
+)
+
+### Testing rules
+
+jasmine_node_test(
+    name = "unit_tests",
+    srcs = [":schematics_test_sources"],
+    data = [":schematics_assets"],
+)
+
+ts_library(
+    name = "schematics_test_sources",
+    testonly = True,
+    srcs = glob(
+        [
+            "**/*.spec.ts",
+            "test-setup/**/*.ts",
+        ],
+        exclude = ["**/files/**/*"],
+    ),
+    tsconfig = ":tsconfig.json",
+    deps = [":schematics"],
+)
