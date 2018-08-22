@@ -236,6 +236,18 @@
         "$ref": "#/definitions/budget"
       },
       "default": []
+    },
+    "maximumInlineSize": {
+      "description": "Maximum resource size to inline (KiB).",
+      "type": "number",
+      "default": 10
+    },
+    "excludeFromInlining": {
+      "description": "Files to exclude from CSS inlining.",
+      "default": [],
+      "items": {
+        "type": "string"
+      }
     }
   },
   "additionalProperties": false,

@@ -404,3 +404,21 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
     Run the TypeScript type checker in a forked process.
   </p>
 </details>
+<details>
+  <summary>exclude-from-inlining</summary>
+  <p>
+    <code>--exclude-from-inlining</code>
+  </p>
+  <p>
+    Files to exclude from CSS inlining.
+  </p>
+</details>
+<details>
+  <summary>maximum-inline-size</summary>
+  <p>
+    <code>--maximum-inline-size</code>
+  </p>
+  <p>
+    Maximum resource size to inline (KiB).
+  </p>
+</details>

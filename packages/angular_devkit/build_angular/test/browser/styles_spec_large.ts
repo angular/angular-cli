@@ -334,6 +334,122 @@ describe('Browser Builder styles', () => {
     ).toPromise().then(done, done.fail);
   });
 
+  describe(`when 'maximumInlineSize' is configured`, () => {
+    beforeEach(() => {
+      host.writeMultipleFiles({
+        'src/styles.scss': `
+            @font-face{
+              font-family:'Roboto';
+              font-style:normal;
+              font-weight:400;
+              src:local('Roboto'),local('Roboto-Regular'),
+              url('./roboto-regular.woff2') format('woff2'),
+              url('./roboto-regular.woff') format('woff'),
+              url('./roboto-regular.ttf') format('truetype')
+            }
+
+            a {
+              font-family: 'Roboto';
+            }
+        `,
+      });
+    });
+
+    it(`should inline resources if they don't exceed the configured size`, (done) => {
+      const overrides = {
+        extractCss: true,
+        maximumInlineSize: 20,
+        styles: ['src/styles.scss'],
+      };
+
+      runTargetSpec(host, browserTargetSpec, overrides).pipe(
+        tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+        tap(() => {
+          const fileName = 'dist/styles.css';
+          const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+          expect(content).toContain('data:font/woff2');
+          expect(content).toContain('data:font/woff');
+          expect(content).toContain('data:font/ttf');
+        }),
+        tap(() => {
+          expect(host.scopedSync().exists(normalize('dist/roboto-regular.woff2'))).toBe(false);
+          expect(host.scopedSync().exists(normalize('dist/roboto-regular.woff'))).toBe(false);
+          expect(host.scopedSync().exists(normalize('dist/roboto-regular.ttf'))).toBe(false);
+        }),
+      ).toPromise().then(done, done.fail);
+    });
+
+    it('should not inline resources that exceed the configured size', (done) => {
+      const overrides = {
+        extractCss: true,
+        maximumInlineSize: 5,
+        styles: ['src/styles.scss'],
+      };
+
+      runTargetSpec(host, browserTargetSpec, overrides).pipe(
+        tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+        tap(() => {
+          const fileName = 'dist/styles.css';
+          const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+          expect(content).toContain('roboto-regular.woff');
+          expect(content).toContain('roboto-regular.ttf');
+          expect(content).toContain('roboto-regular.woff2');
+        }),
+        tap(() => {
+          expect(host.scopedSync().exists(normalize('dist/roboto-regular.woff2'))).toBe(true);
+          expect(host.scopedSync().exists(normalize('dist/roboto-regular.woff'))).toBe(true);
+          expect(host.scopedSync().exists(normalize('dist/roboto-regular.ttf'))).toBe(true);
+        }),
+      ).toPromise().then(done, done.fail);
+    });
+
+  });
+
+  it(`should not inline resources that are listed in 'excludeFromInlining'`, (done) => {
+    host.writeMultipleFiles({
+      'src/styles.scss': `
+          @font-face{
+            font-family:'Roboto';
+            font-style:normal;
+            font-weight:400;
+            src:local('Roboto'),local('Roboto-Regular'),
+            url('./roboto-regular.woff2') format('woff2'),
+            url('./roboto-regular.woff') format('woff'),
+            url('./roboto-regular.ttf') format('truetype')
+          }
+
+          a {
+            font-family: 'Roboto';
+          }
+      `,
+    });
+
+    const overrides = {
+      extractCss: true,
+      maximumInlineSize: 100,
+      excludeFromInlining: ['**/*.woff2'],
+      styles: ['src/styles.scss'],
+    };
+
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        const fileName = 'dist/styles.css';
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+        expect(content).toContain('roboto-regular.woff2');
+
+        expect(content).not.toContain('data:font/woff2');
+        expect(content).toContain('data:font/woff');
+        expect(content).toContain('data:font/ttf');
+      }),
+      tap(() => {
+        expect(host.scopedSync().exists(normalize('dist/roboto-regular.woff2'))).toBe(true);
+        expect(host.scopedSync().exists(normalize('dist/roboto-regular.woff'))).toBe(false);
+        expect(host.scopedSync().exists(normalize('dist/roboto-regular.ttf'))).toBe(false);
+      }),
+    ).toPromise().then(done, done.fail);
+  });
+
   it(`supports font-awesome imports`, (done) => {
     host.writeMultipleFiles({
       'src/styles.scss': `
