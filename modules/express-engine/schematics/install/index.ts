@@ -5,14 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {
-  basename,
-  experimental,
-  join,
-  normalize,
-  parseJson,
-  strings,
-} from '@angular-devkit/core';
+import {experimental, JsonObject, strings} from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -21,7 +14,6 @@ import {
   apply,
   chain,
   mergeWith,
-  move,
   template,
   url,
   noop,
@@ -29,7 +21,7 @@ import {
   externalSchematic,
 } from '@angular-devkit/schematics';
 import {NodePackageInstallTask} from '@angular-devkit/schematics/tasks';
-import {getWorkspace} from '@schematics/angular/utility/config';
+import {getWorkspace, getWorkspacePath} from '@schematics/angular/utility/config';
 import {Schema as UniversalOptions} from './schema';
 
 
@@ -43,19 +35,6 @@ function getClientProject(
   }
 
   return clientProject;
-}
-
-function getClientArchitect(
-  host: Tree,
-  options: UniversalOptions,
-): experimental.workspace.WorkspaceTool {
-  const clientArchitect = getClientProject(host, options).architect;
-
-  if (!clientArchitect) {
-    throw new Error('Client project architect not found.');
-  }
-
-  return clientArchitect;
 }
 
 function addDependenciesAndScripts(options: UniversalOptions): Rule {
@@ -86,16 +65,44 @@ function addDependenciesAndScripts(options: UniversalOptions): Rule {
   };
 }
 
+function updateConfigFile(options: UniversalOptions): Rule {
+  return (host: Tree) => {
+    const workspace = getWorkspace(host);
+    if (!workspace.projects[options.clientProject]) {
+      throw new SchematicsException(`Client app ${options.clientProject} not found.`);
+    }
+
+    const clientProject = workspace.projects[options.clientProject];
+    if (!clientProject.architect) {
+      throw new Error('Client project architect not found.');
+    }
+
+    const serverConfig: JsonObject = {
+      production: {
+        fileReplacements: [
+          {
+            replace: 'src/environments/environment.ts',
+            with: 'src/environments/environment.prod.ts'
+          }
+        ]
+      }
+    };
+    clientProject.architect.server.configurations = serverConfig;
+
+    const workspacePath = getWorkspacePath(host);
+
+    host.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
+
+    return host;
+  };
+}
+
 export default function (options: UniversalOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     const clientProject = getClientProject(host, options);
     if (clientProject.projectType !== 'application') {
       throw new SchematicsException(`Universal requires a project type of "application".`);
     }
-    const clientArchitect = getClientArchitect(host, options);
-    const tsConfigExtends = basename(clientArchitect.build.options.tsConfig);
-    const rootInSrc = clientProject.root === '';
-    const tsConfigDirectory = join(normalize(clientProject.root), rootInSrc ? 'src' : '');
 
     if (!options.skipInstall) {
       context.addTask(new NodePackageInstallTask());
@@ -106,15 +113,13 @@ export default function (options: UniversalOptions): Rule {
       template({
         ...strings,
         ...options as object,
-        stripTsExtension: (s: string) => { return s.replace(/\.ts$/, ''); },
-        tsConfigExtends,
-        rootInSrc,
-      }),
-      move(tsConfigDirectory),
+        stripTsExtension: (s: string) => { return s.replace(/\.ts$/, ''); }
+      })
     ]);
 
     return chain([
       externalSchematic('@schematics/angular', 'universal', options),
+      updateConfigFile(options),
       mergeWith(rootSource),
       addDependenciesAndScripts(options),
     ]);
