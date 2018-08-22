@@ -201,19 +201,31 @@ export class UpdateBuffer {
   }
 
   protected _slice(start: number): [Chunk, Chunk] {
-    this._assertIndex(start);
+    // If start is longer than the content, use start, otherwise determine exact position in string.
+    const index = start >= this._originalContent.length ? start : this._getTextPosition(start);
+
+    this._assertIndex(index);
 
     // Find the chunk by going through the list.
-    const h = this._linkedList.find(chunk => start <= chunk.end);
+    const h = this._linkedList.find(chunk => index <= chunk.end);
     if (!h) {
       throw Error('Chunk cannot be found.');
     }
 
-    if (start == h.end && h.next !== null) {
+    if (index == h.end && h.next !== null) {
       return [h, h.next];
     }
 
-    return [h, h.slice(start)];
+    return [h, h.slice(index)];
+  }
+
+  /**
+   * Gets the position in the content based on the position in the string.
+   * Some characters might be wider than one byte, thus we have to determine the position using
+   * string functions.
+   */
+  protected _getTextPosition(index: number): number {
+    return Buffer.from(this._originalContent.toString().substring(0, index)).length;
   }
 
   get length(): number {
