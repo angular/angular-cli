@@ -20,7 +20,7 @@
       }
     },
     "value": {
-      "type": "string",
+      "type": ["string", "number", "boolean"],
       "description": "The new value to be set.",
       "$default": {
         "$source": "argv",
