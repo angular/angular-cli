@@ -14,10 +14,11 @@ declare module 'yargs-parser' {
 }
 
 declare module 'json-schema-traverse' {
-  export interface TraverseOptions {
+  import { JsonObject } from '@angular-devkit/core';
+  interface TraverseOptions {
     allKeys?: boolean;
   }
-  export type TraverseCallback = (
+  type TraverseCallback = (
     schema: JsonObject,
     jsonPointer: string,
     rootSchema: string,
@@ -26,7 +27,7 @@ declare module 'json-schema-traverse' {
     parentSchema: string,
     property: string) => void;
 
-  export interface TraverseCallbacks {
+  interface TraverseCallbacks {
     pre?: TraverseCallback;
     post?: TraverseCallback;
   }
