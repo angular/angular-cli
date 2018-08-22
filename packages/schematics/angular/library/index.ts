@@ -151,6 +151,7 @@ function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSche
           main: `${projectRoot}/src/test.ts`,
           tsConfig: `${projectRoot}/tsconfig.spec.json`,
           karmaConfig: `${projectRoot}/karma.conf.js`,
+          sourceMap: true,
         },
       },
       lint: {
