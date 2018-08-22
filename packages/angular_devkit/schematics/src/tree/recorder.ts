@@ -30,9 +30,9 @@ export class UpdateRecorderBase implements UpdateRecorder {
     if (c0 == 0xEF && c1 == 0xBB && c2 == 0xBF) {
       return new UpdateRecorderBom(entry);
     } else if (c0 === 0xFF && c1 == 0xFE) {
-      return new UpdateRecorderBom(entry, 2);
+      return new UpdateRecorderBom(entry);
     } else if (c0 === 0xFE && c1 == 0xFF) {
-      return new UpdateRecorderBom(entry, 2);
+      return new UpdateRecorderBom(entry);
     }
 
     return new UpdateRecorderBase(entry);
@@ -70,7 +70,7 @@ export class UpdateRecorderBase implements UpdateRecorder {
 
 
 export class UpdateRecorderBom extends UpdateRecorderBase {
-  constructor(entry: FileEntry, private _delta = 3) {
+  constructor(entry: FileEntry, private _delta = 1) {
     super(entry);
   }
 
