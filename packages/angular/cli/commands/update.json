@@ -11,7 +11,10 @@
   "type": "object",
   "properties": {
     "packages": {
-      "type": "string",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
       "description": "The names of package(s) to update",
       "$default": {
         "$source": "argv"
