@@ -5719,6 +5719,16 @@ performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
 
+pidtree@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/pidtree/-/pidtree-0.3.0.tgz#f6fada10fccc9f99bf50e90d0b23d72c9ebc2e6b"
+
+pidusage@^2.0.16:
+  version "2.0.16"
+  resolved "https://registry.yarnpkg.com/pidusage/-/pidusage-2.0.16.tgz#46e2e3185eaef253ef6303f766f7aae72f74f98c"
+  dependencies:
+    safe-buffer "^5.1.2"
+
 pify@^2.0.0, pify@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/pify/-/pify-2.3.0.tgz#ed141a6ac043a849ea588498e7dca8b15330e90c"

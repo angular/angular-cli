@@ -87,6 +87,11 @@
       "hash": "51b6cc55b25fce87f6a92f0d0942f79c",
       "snapshotRepo": "angular/angular-devkit-architect-cli-builds"
     },
+    "@angular-devkit/benchmark": {
+      "name": "Benchmark",
+      "section": "Tooling",
+      "version": "0.0.0"
+    },
     "@angular-devkit/build-optimizer": {
       "name": "Build Optimizer",
       "links": [
