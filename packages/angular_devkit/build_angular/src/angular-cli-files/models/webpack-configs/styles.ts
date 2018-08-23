@@ -15,7 +15,6 @@ import { getOutputHashFormat } from './utils';
 import { WebpackConfigOptions } from '../build-options';
 import { findUp } from '../../utilities/find-up';
 import { RawCssLoader } from '../../plugins/webpack';
-import { ExtraEntryPoint } from '../../../browser/schema';
 import { normalizeExtraEntryPoints } from './utils';
 import { RemoveHashPlugin } from '../../plugins/remove-hash-plugin';
 
@@ -174,7 +173,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // Process global styles.
   if (buildOptions.styles.length > 0) {
-    const chunkIds: string[] = [];
+    const chunkNames: string[] = [];
 
     normalizeExtraEntryPoints(buildOptions.styles, 'styles').forEach(style => {
       const resolvedPath = path.resolve(root, style.input);
@@ -188,16 +187,16 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
       // Add lazy styles to the list.
       if (style.lazy) {
-        chunkIds.push(style.bundleName);
+        chunkNames.push(style.bundleName);
       }
 
       // Add global css paths.
       globalStylePaths.push(resolvedPath);
     });
 
-    if (chunkIds.length > 0) {
+    if (chunkNames.length > 0) {
       // Add plugin to remove hashes from lazy styles.
-      extraPlugins.push(new RemoveHashPlugin({ chunkIds, hashFormat}));
+      extraPlugins.push(new RemoveHashPlugin({ chunkNames, hashFormat}));
     }
   }
 
