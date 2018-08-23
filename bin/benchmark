@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+'use strict';
+
+
+require('../lib/bootstrap-local');
+const packages = require('../lib/packages').packages;
+const main = require(packages['@angular-devkit/benchmark'].bin['benchmark']).main;
+
+const args = process.argv.slice(2);
+main({ args })
+  .then(exitCode => process.exitCode = exitCode)
+  .catch(e => { throw (e); });
