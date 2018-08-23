@@ -40,9 +40,10 @@ import {
 import { take } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
 import {
-  getDefaultSchematicCollection,
   getPackageManager,
+  getProjectByCwd,
   getSchematicDefaults,
+  getWorkspace,
 } from '../utilities/config';
 import { ArgumentStrategy, Command, CommandContext, Option } from './command';
 
@@ -186,6 +187,36 @@ export abstract class SchematicCommand extends Command {
     }
 
     return this._workflow;
+  }
+
+  protected getDefaultSchematicCollection(): string {
+    let workspace = getWorkspace('local');
+
+    if (workspace) {
+      const project = getProjectByCwd(workspace);
+      if (project && workspace.getProjectCli(project)) {
+        const value = workspace.getProjectCli(project)['defaultCollection'];
+        if (typeof value == 'string') {
+          return value;
+        }
+      }
+      if (workspace.getCli()) {
+        const value = workspace.getCli()['defaultCollection'];
+        if (typeof value == 'string') {
+          return value;
+        }
+      }
+    }
+
+    workspace = getWorkspace('global');
+    if (workspace && workspace.getCli()) {
+      const value = workspace.getCli()['defaultCollection'];
+      if (typeof value == 'string') {
+        return value;
+      }
+    }
+
+    return '@schematics/angular';
   }
 
   protected runSchematic(options: RunSchematicOptions) {
@@ -347,7 +378,7 @@ export abstract class SchematicCommand extends Command {
     // Make a copy.
     this._originalOptions = [...this.options];
 
-    const collectionName = options.collectionName || getDefaultSchematicCollection();
+    const collectionName = options.collectionName || this.getDefaultSchematicCollection();
 
     const collection = this.getCollection(collectionName);
 

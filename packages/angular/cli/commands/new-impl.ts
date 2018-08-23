@@ -8,8 +8,6 @@
 
 // tslint:disable:no-global-tslint-disable no-any
 import { SchematicCommand } from '../models/schematic-command';
-import { getDefaultSchematicCollection } from '../utilities/config';
-
 
 export class NewCommand extends SchematicCommand {
   public readonly allowMissingWorkspace = true;
@@ -65,7 +63,7 @@ export class NewCommand extends SchematicCommand {
   }
 
   private parseCollectionName(options: any): string {
-    const collectionName = options.collection || options.c || getDefaultSchematicCollection();
+    const collectionName = options.collection || options.c || this.getDefaultSchematicCollection();
 
     return collectionName;
   }

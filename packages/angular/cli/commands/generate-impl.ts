@@ -9,7 +9,6 @@
 // tslint:disable:no-global-tslint-disable no-any
 import { tags, terminal } from '@angular-devkit/core';
 import { SchematicCommand } from '../models/schematic-command';
-import { getDefaultSchematicCollection } from '../utilities/config';
 
 
 export class GenerateCommand extends SchematicCommand {
@@ -61,7 +60,7 @@ export class GenerateCommand extends SchematicCommand {
   }
 
   private parseSchematicInfo(options: any) {
-    let collectionName = getDefaultSchematicCollection();
+    let collectionName = this.getDefaultSchematicCollection();
 
     let schematicName: string = options.schematic;
 
