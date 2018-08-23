@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.1.0"></a>
+# [6.1.0](https://github.com/angular/universal/compare/v6.0.0...v6.1.0) (2018-08-23)
+
+
+### Bug Fixes
+
+* **common:** fixup secondary entrypoints ([#1017](https://github.com/angular/universal/issues/1017)) ([7bb0e9b](https://github.com/angular/universal/commit/7bb0e9b))
+* **common:** remove internal monicker for FileLoader ([#1009](https://github.com/angular/universal/issues/1009)) ([23f0d0f](https://github.com/angular/universal/commit/23f0d0f))
+* **express-engine:** add server configuration to schematics ([#1056](https://github.com/angular/universal/issues/1056)) ([b031a26](https://github.com/angular/universal/commit/b031a26))
+
+
+### Features
+
+* **common:** add CommonEngine to encapsulate rendering ([#996](https://github.com/angular/universal/issues/996)) ([439b306](https://github.com/angular/universal/commit/439b306))
+* **common:** TransferHttpCache now respects url params ([#1005](https://github.com/angular/universal/issues/1005)) ([f09c51d](https://github.com/angular/universal/commit/f09c51d))
+* **express-engine:** add schematics ([#1051](https://github.com/angular/universal/issues/1051)) ([1909be1](https://github.com/angular/universal/commit/1909be1)), closes [#968](https://github.com/angular/universal/issues/968)
+* **hapi:** upgrade to Hapi v17 ([#1015](https://github.com/angular/universal/issues/1015)) ([311b9fe](https://github.com/angular/universal/commit/311b9fe))
+* **socket-engine:** introduce package ([#999](https://github.com/angular/universal/issues/999)) ([de33b02](https://github.com/angular/universal/commit/de33b02))
+
+
+### BREAKING CHANGES
+
+* **hapi:** * The `ngHapiEngine` is no longer supported for Hapi v16. The `RESPONSE` token provided under `@nguniversal/hapi-engine/tokens` now uses the new `ResponseToolkit`, which is unavailable in Hapi v16. Updated instructions are available in the package's README
+
+
+
 <a name="6.0.0"></a>
 # [6.0.0](https://github.com/angular/universal/compare/v6.0.0-rc.1...v6.0.0) (2018-05-03)
 
