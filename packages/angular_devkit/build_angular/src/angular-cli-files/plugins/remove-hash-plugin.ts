@@ -10,7 +10,7 @@ import { HashFormat } from '../models/webpack-configs/utils';
 
 
 export interface RemoveHashPluginOptions {
-  chunkIds: string[];
+  chunkNames: string[];
   hashFormat: HashFormat;
 }
 
@@ -25,14 +25,15 @@ export class RemoveHashPlugin {
       };
 
       mainTemplate.hooks.assetPath.tap('remove-hash-plugin',
-        (path: string, data: { chunk?: { id: string } }) => {
-          const chunkId = data.chunk && data.chunk.id;
+        (path: string, data: { chunk?: { name: string } }) => {
+          const chunkName = data.chunk && data.chunk.name;
+          const { chunkNames, hashFormat } = this.options;
 
-          if (chunkId && this.options.chunkIds.includes(chunkId)) {
+          if (chunkName && chunkNames.includes(chunkName)) {
             // Replace hash formats with empty strings.
             return path
-              .replace(this.options.hashFormat.chunk, '')
-              .replace(this.options.hashFormat.extract, '');
+              .replace(hashFormat.chunk, '')
+              .replace(hashFormat.extract, '');
           }
 
           return path;
