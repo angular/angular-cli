@@ -51,12 +51,17 @@
     "url": "https://github.com/angular/angular-cli/issues"
   },
   "homepage": "https://github.com/angular/angular-cli",
-  "workspaces": [
-    "packages/angular/*",
-    "packages/angular_devkit/*",
-    "packages/ngtools/*",
-    "packages/schematics/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/angular/*",
+      "packages/angular_devkit/*",
+      "packages/ngtools/*",
+      "packages/schematics/*"
+    ],
+    "nohoist": [
+      "@angular/compiler-cli"
+    ]
+  },
   "dependencies": {
     "glob": "^7.0.3",
     "node-fetch": "^2.2.0",
@@ -66,6 +71,8 @@
     "typescript": "~3.0.1"
   },
   "devDependencies": {
+    "@angular/compiler": "^7.0.0-beta.4",
+    "@angular/compiler-cli": "^7.0.0-beta.4",
     "@bazel/typescript": "0.16.1",
     "@ngtools/json-schema": "^1.1.0",
     "@types/copy-webpack-plugin": "^4.4.1",
