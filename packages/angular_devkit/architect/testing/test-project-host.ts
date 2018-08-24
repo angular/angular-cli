@@ -8,6 +8,7 @@
 
 import {
   Path,
+  PathFragment,
   basename,
   dirname,
   join,
@@ -128,7 +129,7 @@ export class TestProjectHost extends NodeJsSyncHost {
       virtualFs.stringToFileBuffer(content.concat(str)));
   }
 
-  fileMatchExists(dir: string, regex: RegExp) {
+  fileMatchExists(dir: string, regex: RegExp): PathFragment | undefined {
     const [fileName] = this.scopedSync().list(normalize(dir)).filter(name => name.match(regex));
 
     return fileName || undefined;
