@@ -24,7 +24,7 @@ import { normalizeExtraEntryPoints } from './utils';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const StatsPlugin = require('stats-webpack-plugin');
 
 /**
@@ -208,7 +208,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   const isIvyEnabled = wco.tsConfig.raw.angularCompilerOptions
                     && wco.tsConfig.raw.angularCompilerOptions.enableIvy;
 
-  const uglifyOptions = {
+  const terserOptions = {
     ecma: wco.supportES2015 ? 6 : 5,
     warnings: !!buildOptions.verbose,
     safari10: true,
@@ -318,11 +318,11 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
           // component styles retain their original file name
           test: (file) => /\.(?:css|scss|sass|less|styl)$/.test(file),
         }),
-        new UglifyJSPlugin({
+        new TerserPlugin({
           sourceMap: buildOptions.sourceMap,
           parallel: true,
           cache: true,
-          uglifyOptions,
+          terserOptions,
         }),
       ],
     },
