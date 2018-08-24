@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Observable } from 'rxjs';
-import { Path, join, normalize } from '../path';
+import { Path, PathFragment, join, normalize } from '../path';
 import { fileBufferToString, stringToFileBuffer } from './buffer';
 import { FileBuffer, HostWatchEvent, HostWatchOptions, Stats } from './interface';
 import { SimpleMemoryHost, SimpleMemoryHostStats } from './memory';
@@ -96,7 +96,7 @@ export class TestHost extends SimpleMemoryHost {
 
     return super._rename(from, to);
   }
-  protected _list(path: Path) {
+  protected _list(path: Path): PathFragment[] {
     this._records.push({ kind: 'list', path });
 
     return super._list(path);
@@ -135,7 +135,7 @@ export class TestHost extends SimpleMemoryHost {
     return fileBufferToString(super._read(normalize(path)));
   }
 
-  $list(path: string) {
+  $list(path: string): PathFragment[] {
     return super._list(normalize(path));
   }
 
