@@ -87,6 +87,14 @@ function updateConfigFile(options: UniversalOptions): Rule {
         ]
       }
     };
+
+    // We have to check if the project config has a server target, because
+    // if the Universal step in this schematic isn't run, it can't be guaranteed
+    // to exist
+    if (!clientProject.architect.server) {
+      return;
+    }
+
     clientProject.architect.server.configurations = serverConfig;
 
     const workspacePath = getWorkspacePath(host);
@@ -118,7 +126,8 @@ export default function (options: UniversalOptions): Rule {
     ]);
 
     return chain([
-      externalSchematic('@schematics/angular', 'universal', options),
+      options.skipUniversal ?
+        noop() : externalSchematic('@schematics/angular', 'universal', options),
       updateConfigFile(options),
       mergeWith(rootSource),
       addDependenciesAndScripts(options),

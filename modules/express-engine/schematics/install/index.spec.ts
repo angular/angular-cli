@@ -50,4 +50,14 @@ describe('Universal Schematic', () => {
     expect(schematicRunner.tasks[0].name).toBe('node-package');
     expect((schematicRunner.tasks[0].options as {command: string}).command).toBe('install');
   });
+
+  it('should not add Universal files', () => {
+    const noUniversal = Object.assign({}, defaultOptions);
+    noUniversal.skipUniversal = true;
+
+    const tree = schematicRunner.runSchematic('ng-add', noUniversal, appTree);
+    const filePath = '/src/server.main.ts';
+    const contents = tree.readContent(filePath);
+    expect(contents).toMatch('');
+  });
 });
