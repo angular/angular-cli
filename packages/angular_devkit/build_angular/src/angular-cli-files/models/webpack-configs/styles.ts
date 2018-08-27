@@ -258,7 +258,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         options: {
           ident: 'embedded',
           plugins: postcssPluginCreator,
-          sourceMap: cssSourceMap
+          sourceMap: cssSourceMap ? 'inline' : false
         }
       },
       ...(use as webpack.Loader[])
@@ -281,7 +281,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
             options: {
               ident: buildOptions.extractCss ? 'extracted' : 'embedded',
               plugins: postcssPluginCreator,
-              sourceMap: cssSourceMap
+              sourceMap: cssSourceMap && !buildOptions.extractCss ? 'inline' : cssSourceMap
             }
           },
           ...(use as webpack.Loader[])
