@@ -64,6 +64,7 @@ class InitialCalculator extends Calculator {
     const initialChunks = this.compilation.chunks.filter(chunk => chunk.isOnlyInitial());
     const size: number = initialChunks
       .reduce((files, chunk) => [...files, ...chunk.files], [])
+      .filter((file: string) => !/\.map$/.test(file))
       .map((file: string) => this.compilation.assets[file].size())
       .reduce((total: number, size: number) => total + size, 0);
     return [{size, label: 'initial'}];
@@ -90,6 +91,7 @@ class AllScriptCalculator extends Calculator {
 class AllCalculator extends Calculator {
   calculate() {
     const size: number = Object.keys(this.compilation.assets)
+      .filter(key => !/\.map$/.test(key))
       .map(key => this.compilation.assets[key].size())
       .reduce((total: number, size: number) => total + size, 0);
     return [{size, label: 'total'}];
@@ -119,6 +121,7 @@ class AnyScriptCalculator extends Calculator {
 class AnyCalculator extends Calculator {
   calculate() {
     return Object.keys(this.compilation.assets)
+      .filter(key => !/\.map$/.test(key))
       .map(key => {
         const asset = this.compilation.assets[key];
         return {
