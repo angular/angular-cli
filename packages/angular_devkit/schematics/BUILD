@@ -65,6 +65,7 @@ ts_library(
     srcs = glob(
         include = ["tasks/**/*.ts"],
         exclude = [
+            "tasks/node/**/*.ts",
             "tasks/**/*_spec.ts",
             "tasks/**/*_benchmark.ts",
             "tasks/tslint-fix/test/**/*",
@@ -74,6 +75,32 @@ ts_library(
     module_root = "tasks/index.d.ts",
     deps = [
         ":schematics",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core:node",
+        "@rxjs",
+        "@rxjs//operators",
+        # @typings: node
+        # @typings: tslint
+        # @typings: typescript
+    ],
+)
+
+# @angular-devkit/schematics/tasks/node
+
+ts_library(
+    name = "tasks_node",
+    srcs = glob(
+        include = ["tasks/node/**/*.ts"],
+        exclude = [
+            "tasks/node/**/*_spec.ts",
+            "tasks/node/**/*_benchmark.ts",
+        ],
+    ),
+    module_name = "@angular-devkit/schematics/tasks/node",
+    module_root = "tasks/node/index.d.ts",
+    deps = [
+        ":schematics",
+        ":tasks",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
         "@rxjs",
@@ -135,6 +162,7 @@ ts_library(
     deps = [
         ":schematics",
         ":tasks",
+        ":tasks_node",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
         "@rxjs",
@@ -185,6 +213,7 @@ ts_library(
     deps = [
         ":schematics",
         ":tasks",
+        ":tasks_node",
         ":tools",
         "//packages/angular_devkit/core",
         "@rxjs",
