@@ -23,6 +23,7 @@ ng_package(
     ],
     entry_point = "modules/aspnetcore-engine/index.js",
     readme_md = ":README.md",
+    tags = ["release"],
     deps = [
         ":aspnetcore-engine",
         "//modules/aspnetcore-engine/tokens",

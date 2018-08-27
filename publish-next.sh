@@ -8,7 +8,7 @@ set -u -e -o pipefail
 # Publish them to npm (tagged next)
 
 # query for all npm packages to be released as part of the framework release
-NPM_PACKAGE_LABELS=`bazel query --output=label 'kind(".*_package", //modules/...)'`
+NPM_PACKAGE_LABELS=`bazel query --output=label 'attr("tags", "\[.*release.*\]", //modules/...) intersect kind(".*_package", //modules/...)'`
 # build all npm packages in parallel
 bazel build $NPM_PACKAGE_LABELS
 # publish all packages in sequence to make it easier to spot any errors or warnings

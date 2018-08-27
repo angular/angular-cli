@@ -23,6 +23,7 @@ ng_package(
     entry_point = "modules/express-engine/index.js",
     packages = ["//modules/express-engine/schematics:npm_package"],
     readme_md = ":README.md",
+    tags = ["release"],
     deps = [
         ":express-engine",
         "//modules/express-engine/tokens",
