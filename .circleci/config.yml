@@ -140,12 +140,10 @@ workflows:
             - install
       - build:
           requires:
-            - lint
-            - validate
+            - install
       - build-bazel:
           requires:
-            - lint
-            - validate
+            - build
       - test:
           requires:
             - build
@@ -167,6 +165,7 @@ workflows:
           requires:
             - test
             - build
+            - e2e-cli
             - snapshot_publish
           filters:
             tags:
