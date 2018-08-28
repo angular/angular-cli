@@ -7,13 +7,13 @@
  */
 
 import { TestProjectHost } from '@angular-devkit/architect/testing';
-import { join, normalize } from '@angular-devkit/core';
+import { Path, join, normalize } from '@angular-devkit/core';
 
 
 const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
 const workspaceRoot = join(devkitRoot, 'tests/angular_devkit/build_angular/hello-world-app/');
 export const host = new TestProjectHost(workspaceRoot);
-export const outputPath = normalize('dist');
+export const outputPath: Path = normalize('dist');
 
 export const browserTargetSpec = { project: 'app', target: 'build' };
 export const devServerTargetSpec = { project: 'app', target: 'serve' };
