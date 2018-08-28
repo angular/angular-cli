@@ -71,11 +71,13 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
           karmaOptions.browsers = options.browsers.split(',');
         }
 
+        const sourceRoot = builderConfig.sourceRoot && resolve(root, builderConfig.sourceRoot);
+
         karmaOptions.buildWebpack = {
           root: getSystemPath(root),
           projectRoot: getSystemPath(projectRoot),
           options: options as NormalizedKarmaBuilderSchema,
-          webpackConfig: this._buildWebpackConfig(root, projectRoot, host,
+          webpackConfig: this._buildWebpackConfig(root, projectRoot, sourceRoot, host,
             options as NormalizedKarmaBuilderSchema),
           // Pass onto Karma to emit BuildEvents.
           successCb: () => obs.next({ success: true }),
@@ -108,6 +110,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
   private _buildWebpackConfig(
     root: Path,
     projectRoot: Path,
+    sourceRoot: Path | undefined,
     host: virtualFs.Host<fs.Stats>,
     options: NormalizedKarmaBuilderSchema,
   ) {
@@ -130,6 +133,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
     wco = {
       root: getSystemPath(root),
       projectRoot: getSystemPath(projectRoot),
+      sourceRoot: sourceRoot && getSystemPath(sourceRoot),
       // TODO: use only this.options, it contains all flags and configs items already.
       buildOptions: compatOptions,
       tsConfig,
