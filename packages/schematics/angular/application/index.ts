@@ -173,6 +173,11 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
             extractLicenses: true,
             vendorChunk: false,
             buildOptimizer: true,
+            budgets: [{
+              type: 'initial',
+              maximumWarning: '2mb',
+              maximumError: '5mb',
+            }],
           },
         },
       },
