@@ -54,4 +54,39 @@ describe('Browser Builder bundle budgets', () => {
       tap(() => expect(logger.includes('WARNING')).toBe(true)),
     ).toPromise().then(done, done.fail);
   });
+
+  describe(`should ignore '.map' files`, () => {
+    it(`when 'intial' budget`, (done) => {
+      const overrides = {
+        optimization: true,
+        budgets: [{ type: 'initial', maximumError: '1mb' }],
+      };
+
+      runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
+        tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      ).toPromise().then(done, done.fail);
+    });
+
+    it(`when 'all' budget`, (done) => {
+      const overrides = {
+        optimization: true,
+        budgets: [{ type: 'all', maximumError: '1mb' }],
+      };
+
+      runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
+        tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      ).toPromise().then(done, done.fail);
+    });
+
+    it(`when 'any' budget`, (done) => {
+      const overrides = {
+        optimization: true,
+        budgets: [{ type: 'any', maximumError: '1mb' }],
+      };
+
+      runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
+        tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      ).toPromise().then(done, done.fail);
+    });
+  });
 });
