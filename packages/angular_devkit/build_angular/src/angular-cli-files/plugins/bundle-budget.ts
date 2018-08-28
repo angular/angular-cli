@@ -1,6 +1,3 @@
-// tslint:disable
-// TODO: cleanup this file, it's copied as is from Angular CLI.
-
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -8,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { Size, calculateBytes, calculateSizes } from '../utilities/bundle-calculator';
+import { Compiler, compilation } from 'webpack';
 import { Budget } from '../../browser/schema';
+import { Size, calculateBytes, calculateSizes } from '../utilities/bundle-calculator';
 import { formatSize } from '../utilities/stats';
 
 interface Thresholds {
@@ -31,19 +28,20 @@ export interface BundleBudgetPluginOptions {
 export class BundleBudgetPlugin {
   constructor(private options: BundleBudgetPluginOptions) { }
 
-  apply(compiler: any): void {
+  apply(compiler: Compiler): void {
     const { budgets } = this.options;
-    compiler.hooks.afterEmit.tap('BundleBudgetPlugin', (compilation: any) => {
+    compiler.hooks.afterEmit.tap('BundleBudgetPlugin', (compilation: compilation.Compilation) => {
       if (!budgets || budgets.length === 0) {
         return;
       }
 
       budgets.map(budget => {
         const thresholds = this.calculate(budget);
+
         return {
           budget,
           thresholds,
-          sizes: calculateSizes(budget, compilation)
+          sizes: calculateSizes(budget, compilation),
         };
       })
         .forEach(budgetCheck => {
@@ -62,7 +60,7 @@ export class BundleBudgetPlugin {
     });
   }
 
-  private checkMinimum(threshold: number | undefined, size: Size, messages: any) {
+  private checkMinimum(threshold: number | undefined, size: Size, messages: string[]) {
     if (threshold) {
       if (threshold > size.size) {
         const sizeDifference = formatSize(threshold - size.size);
@@ -72,7 +70,7 @@ export class BundleBudgetPlugin {
     }
   }
 
-  private checkMaximum(threshold: number | undefined, size: Size, messages: any) {
+  private checkMaximum(threshold: number | undefined, size: Size, messages: string[]) {
     if (threshold) {
       if (threshold < size.size) {
         const sizeDifference = formatSize(size.size - threshold);
@@ -83,37 +81,37 @@ export class BundleBudgetPlugin {
   }
 
   private calculate(budget: Budget): Thresholds {
-    let thresholds: Thresholds = {};
+    const thresholds: Thresholds = {};
     if (budget.maximumWarning) {
-      thresholds.maximumWarning = calculateBytes(budget.maximumWarning, budget.baseline, 'pos');
+      thresholds.maximumWarning = calculateBytes(budget.maximumWarning, budget.baseline, 1);
     }
 
     if (budget.maximumError) {
-      thresholds.maximumError = calculateBytes(budget.maximumError, budget.baseline, 'pos');
+      thresholds.maximumError = calculateBytes(budget.maximumError, budget.baseline, 1);
     }
 
     if (budget.minimumWarning) {
-      thresholds.minimumWarning = calculateBytes(budget.minimumWarning, budget.baseline, 'neg');
+      thresholds.minimumWarning = calculateBytes(budget.minimumWarning, budget.baseline, -1);
     }
 
     if (budget.minimumError) {
-      thresholds.minimumError = calculateBytes(budget.minimumError, budget.baseline, 'neg');
+      thresholds.minimumError = calculateBytes(budget.minimumError, budget.baseline, -1);
     }
 
     if (budget.warning) {
-      thresholds.warningLow = calculateBytes(budget.warning, budget.baseline, 'neg');
+      thresholds.warningLow = calculateBytes(budget.warning, budget.baseline, -1);
     }
 
     if (budget.warning) {
-      thresholds.warningHigh = calculateBytes(budget.warning, budget.baseline, 'pos');
+      thresholds.warningHigh = calculateBytes(budget.warning, budget.baseline, 1);
     }
 
     if (budget.error) {
-      thresholds.errorLow = calculateBytes(budget.error, budget.baseline, 'neg');
+      thresholds.errorLow = calculateBytes(budget.error, budget.baseline, -1);
     }
 
     if (budget.error) {
-      thresholds.errorHigh = calculateBytes(budget.error, budget.baseline, 'pos');
+      thresholds.errorHigh = calculateBytes(budget.error, budget.baseline, 1);
     }
 
     return thresholds;
