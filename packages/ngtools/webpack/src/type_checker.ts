@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { terminal } from '@angular-devkit/core';
+import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as ts from 'typescript';
 import { time, timeEnd } from './benchmark';
 import { WebpackCompilerHost } from './compiler_host';
@@ -62,8 +63,11 @@ export class TypeChecker {
     private _rootNames: string[],
   ) {
     time('TypeChecker.constructor');
-    const compilerHost = new WebpackCompilerHost(_compilerOptions, _basePath);
-    compilerHost.enableCaching();
+    const compilerHost = new WebpackCompilerHost(
+      _compilerOptions,
+      _basePath,
+      new NodeJsSyncHost(),
+    );
     // We don't set a async resource loader on the compiler host because we only support
     // html templates, which are the only ones that can throw errors, and those can be loaded
     // synchronously.
