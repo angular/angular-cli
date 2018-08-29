@@ -53,8 +53,6 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const extraPlugins: any[] = [];
   const cssSourceMap = buildOptions.sourceMap;
 
-  // Maximum resource size to inline (KiB)
-  const maximumInlineSize = 10;
   // Determine hashing format.
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing as string);
   // Convert absolute resource URLs to account for base-href and deploy-url.
@@ -134,18 +132,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
               return `/${baseHref}/${deployUrl}/${url}`.replace(/\/\/+/g, '/');
             }
           }
-        },
-        {
-          // TODO: inline .cur if not supporting IE (use browserslist to check)
-          filter: (asset: PostcssUrlAsset) => {
-            return maximumInlineSize > 0 && !asset.hash && !asset.absolutePath.endsWith('.cur');
-          },
-          url: 'inline',
-          // NOTE: maxSize is in KB
-          maxSize: maximumInlineSize,
-          fallback: 'rebase',
-        },
-        { url: 'rebase' },
+        }
       ]),
       PostcssCliResources({
         deployUrl: loader.loaders[loader.loaderIndex].options.ident == 'extracted' ? '' : deployUrl,
@@ -196,7 +183,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
     if (chunkNames.length > 0) {
       // Add plugin to remove hashes from lazy styles.
-      extraPlugins.push(new RemoveHashPlugin({ chunkNames, hashFormat}));
+      extraPlugins.push(new RemoveHashPlugin({ chunkNames, hashFormat }));
     }
   }
 
@@ -216,7 +203,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const baseRules: webpack.Rule[] = [
     { test: /\.css$/, use: [] },
     {
-      test: /\.scss$|\.sass$/, use: [{
+      test: /\.scss$|\.sass$/,
+      use: [{
         loader: 'sass-loader',
         options: {
           implementation: dartSass,
@@ -229,7 +217,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       }]
     },
     {
-      test: /\.less$/, use: [{
+      test: /\.less$/,
+      use: [{
         loader: 'less-loader',
         options: {
           sourceMap: cssSourceMap,
@@ -239,7 +228,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       }]
     },
     {
-      test: /\.styl$/, use: [{
+      test: /\.styl$/,
+      use: [{
         loader: 'stylus-loader',
         options: {
           sourceMap: cssSourceMap,
@@ -251,7 +241,9 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // load component css as raw strings
   const rules: webpack.Rule[] = baseRules.map(({ test, use }) => ({
-    exclude: globalStylePaths, test, use: [
+    exclude: globalStylePaths,
+    test,
+    use: [
       { loader: 'raw-loader' },
       {
         loader: 'postcss-loader',
@@ -306,16 +298,17 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   }
 
   if (buildOptions.extractCss) {
-    // extract global css from js files into own css file
     extraPlugins.push(
-      new MiniCssExtractPlugin({ filename: `[name]${hashFormat.extract}.css` }));
-    // suppress empty .js files in css only entry points
-    extraPlugins.push(new SuppressExtractedTextChunksWebpackPlugin());
+      // extract global css from js files into own css file
+      new MiniCssExtractPlugin({ filename: `[name]${hashFormat.extract}.css` }),
+      // suppress empty .js files in css only entry points
+      new SuppressExtractedTextChunksWebpackPlugin(),
+    );
   }
 
   return {
     entry: entryPoints,
     module: { rules },
-    plugins: [].concat(extraPlugins as any)
+    plugins: extraPlugins
   };
 }
