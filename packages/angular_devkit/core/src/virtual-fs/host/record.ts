@@ -366,11 +366,6 @@ export class CordHost extends SimpleMemoryHost {
       : ((this.willDelete(path) || this.willRename(path)) ? of(false) : this._back.isFile(path));
   }
 
-  stat(path: Path) {
-    // TODO: stat should be possible to implement, at least from memory.
-    return null;
-  }
-
   watch(path: Path, options?: HostWatchOptions) {
     // Watching not supported.
     return null;
