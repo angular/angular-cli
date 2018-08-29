@@ -314,6 +314,10 @@ export class AngularCompilerPlugin {
   }
 
   private _getTsProgram() {
+    if (!this._program) {
+      return undefined;
+    }
+
     return this._JitMode ? this._program as ts.Program : (this._program as Program).getTsProgram();
   }
 
@@ -360,6 +364,12 @@ export class AngularCompilerPlugin {
         // Use an identity function as all our paths are absolute already.
         this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
 
+        const tsProgram = this._getTsProgram();
+        const oldFiles = new Set(tsProgram ?
+          tsProgram.getSourceFiles().map(sf => sf.fileName)
+          : [],
+        );
+
         if (this._JitMode) {
           // Create the TypeScript program.
           time('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
@@ -367,9 +377,14 @@ export class AngularCompilerPlugin {
             this._rootNames,
             this._compilerOptions,
             this._compilerHost,
-            this._program as ts.Program,
+            tsProgram,
           );
           timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
+
+          const newFiles = this._program.getSourceFiles().filter(sf => !oldFiles.has(sf.fileName));
+          for (const newFile of newFiles) {
+            this._compilerHost.invalidate(newFile.fileName);
+          }
 
           return Promise.resolve();
         } else {
@@ -388,6 +403,12 @@ export class AngularCompilerPlugin {
           return this._program.loadNgStructureAsync()
             .then(() => {
               timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
+
+              const newFiles = (this._program as Program).getTsProgram()
+                .getSourceFiles().filter(sf => !oldFiles.has(sf.fileName));
+              for (const newFile of newFiles) {
+                this._compilerHost.invalidate(newFile.fileName);
+              }
             });
         }
       })
@@ -396,7 +417,7 @@ export class AngularCompilerPlugin {
         if (!this._entryModule && this._mainPath) {
           time('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
           this._entryModule = resolveEntryModuleFromMain(
-            this._mainPath, this._compilerHost, this._getTsProgram());
+            this._mainPath, this._compilerHost, this._getTsProgram() as ts.Program);
           timeEnd('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
         }
       });
@@ -621,7 +642,6 @@ export class AngularCompilerPlugin {
         this._basePath,
         host,
       );
-      webpackCompilerHost.enableCaching();
 
       // Create and set a new WebpackResourceLoader.
       this._resourceLoader = new WebpackResourceLoader();
@@ -811,7 +831,7 @@ export class AngularCompilerPlugin {
       ? { path: workaroundResolve(this.entryModule.path), className: this.entryModule.className }
       : this.entryModule;
     const getLazyRoutes = () => this._lazyRoutes;
-    const getTypeChecker = () => this._getTsProgram().getTypeChecker();
+    const getTypeChecker = () => (this._getTsProgram() as ts.Program).getTypeChecker();
 
     if (this._JitMode) {
       // Replace resources in JIT.
@@ -868,13 +888,15 @@ export class AngularCompilerPlugin {
           // We need to run the `listLazyRoutes` the first time because it also navigates libraries
           // and other things that we might miss using the (faster) findLazyRoutesInAst.
           // Lazy routes modules will be read with compilerHost and added to the changed files.
-          const changedTsFiles = this._getChangedTsFiles();
           if (this._ngCompilerSupportsNewApi) {
             this._processLazyRoutes(this._listLazyRoutesFromProgram());
           } else if (this._firstRun) {
             this._processLazyRoutes(this._getLazyRoutesFromNgtools());
-          } else if (changedTsFiles.length > 0) {
-            this._processLazyRoutes(this._findLazyRoutesInAst(changedTsFiles));
+          } else {
+            const changedTsFiles = this._getChangedTsFiles();
+            if (changedTsFiles.length > 0) {
+              this._processLazyRoutes(this._findLazyRoutesInAst(changedTsFiles));
+            }
           }
           if (this._options.additionalLazyModules) {
             this._processLazyRoutes(this._options.additionalLazyModules);
@@ -887,7 +909,7 @@ export class AngularCompilerPlugin {
         // We now have the final list of changed TS files.
         // Go through each changed file and add transforms as needed.
         const sourceFiles = this._getChangedTsFiles()
-          .map((fileName) => this._getTsProgram().getSourceFile(fileName))
+          .map((fileName) => (this._getTsProgram() as ts.Program).getSourceFile(fileName))
           // At this point we shouldn't need to filter out undefined files, because any ts file
           // that changed should be emitted.
           // But due to hostReplacementPaths there can be files (the environment files)
@@ -973,7 +995,7 @@ export class AngularCompilerPlugin {
     } else {
       // Check if the TS input file and the JS output file exist.
       if (((fileName.endsWith('.ts') || fileName.endsWith('.tsx'))
-        && !this._compilerHost.fileExists(fileName, false))
+        && !this._compilerHost.fileExists(fileName))
         || !this._compilerHost.fileExists(outputFile, false)) {
         let msg = `${fileName} is missing from the TypeScript compilation. `
           + `Please make sure it is in your tsconfig via the 'files' or 'include' property.`;
@@ -1066,15 +1088,26 @@ export class AngularCompilerPlugin {
         }
 
         if (!hasErrors(allDiagnostics)) {
-          sourceFiles.forEach((sf) => {
-            const timeLabel = `AngularCompilerPlugin._emit.ts+${sf.fileName}+.emit`;
-            time(timeLabel);
-            emitResult = tsProgram.emit(sf, undefined, undefined, undefined,
+          if (this._firstRun || sourceFiles.length > 20) {
+            emitResult = tsProgram.emit(
+              undefined,
+              undefined,
+              undefined,
+              undefined,
               { before: this._transformers },
             );
             allDiagnostics.push(...emitResult.diagnostics);
-            timeEnd(timeLabel);
-          });
+          } else {
+            sourceFiles.forEach((sf) => {
+              const timeLabel = `AngularCompilerPlugin._emit.ts+${sf.fileName}+.emit`;
+              time(timeLabel);
+              emitResult = tsProgram.emit(sf, undefined, undefined, undefined,
+                { before: this._transformers },
+              );
+              allDiagnostics.push(...emitResult.diagnostics);
+              timeEnd(timeLabel);
+            });
+          }
         }
       } else {
         const angularProgram = program as Program;
