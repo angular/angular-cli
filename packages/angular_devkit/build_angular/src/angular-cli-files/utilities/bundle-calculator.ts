@@ -1,6 +1,3 @@
-// tslint:disable
-// TODO: cleanup this file, it's copied as is from Angular CLI.
-
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -11,8 +8,8 @@
 import { Budget } from '../../browser/schema';
 
 export interface Compilation {
-  assets: any;
-  chunks: any[];
+  assets: { [name: string]: { size: () => number } };
+  chunks: { name: string, files: string[], isOnlyInitial: () => boolean }[];
   warnings: string[];
   errors: string[];
 }
@@ -33,6 +30,7 @@ export function calculateSizes(budget: Budget, compilation: Compilation): Size[]
   };
   const ctor = calculatorMap[budget.type];
   const calculator = new ctor(budget, compilation);
+
   return calculator.calculate();
 }
 
@@ -52,6 +50,7 @@ class BundleCalculator extends Calculator {
       .reduce((files, chunk) => [...files, ...chunk.files], [])
       .map((file: string) => this.compilation.assets[file].size())
       .reduce((total: number, size: number) => total + size, 0);
+
     return [{size, label: this.budget.name}];
   }
 }
@@ -67,6 +66,7 @@ class InitialCalculator extends Calculator {
       .filter((file: string) => !file.endsWith('.map'))
       .map((file: string) => this.compilation.assets[file].size())
       .reduce((total: number, size: number) => total + size, 0);
+
     return [{size, label: 'initial'}];
   }
 }
@@ -81,6 +81,7 @@ class AllScriptCalculator extends Calculator {
       .map(key => this.compilation.assets[key])
       .map(asset => asset.size())
       .reduce((total: number, size: number) => total + size, 0);
+
     return [{size, label: 'total scripts'}];
   }
 }
@@ -94,6 +95,7 @@ class AllCalculator extends Calculator {
       .filter(key => !key.endsWith('.map'))
       .map(key => this.compilation.assets[key].size())
       .reduce((total: number, size: number) => total + size, 0);
+
     return [{size, label: 'total'}];
   }
 }
@@ -107,9 +109,10 @@ class AnyScriptCalculator extends Calculator {
       .filter(key => key.endsWith('.js'))
       .map(key => {
         const asset = this.compilation.assets[key];
+
         return {
           size: asset.size(),
-          label: key
+          label: key,
         };
       });
   }
@@ -124,9 +127,10 @@ class AnyCalculator extends Calculator {
       .filter(key => !key.endsWith('.map'))
       .map(key => {
         const asset = this.compilation.assets[key];
+
         return {
           size: asset.size(),
-          label: key
+          label: key,
         };
       });
   }
@@ -135,39 +139,33 @@ class AnyCalculator extends Calculator {
 /**
  * Calculate the bytes given a string value.
  */
-export function calculateBytes(val: string, baseline?: string, factor?: ('pos' | 'neg')): number {
-  if (/^\d+$/.test(val)) {
-    return parseFloat(val);
+export function calculateBytes(
+  input: string,
+  baseline?: string,
+  factor: 1 | -1 = 1,
+): number {
+  const matches = input.match(/^\s*(\d+(?:\.\d+)?)\s*(%|(?:[mM]|[kK]|[gG])?[bB])?\s*$/);
+  if (!matches) {
+    return NaN;
   }
 
-  if (/^(\d+)%$/.test(val)) {
-    return calculatePercentBytes(val, baseline, factor);
+  const baselineBytes = baseline && calculateBytes(baseline) || 0;
+
+  let value = Number(matches[1]);
+  switch (matches[2] && matches[2].toLowerCase()) {
+    case '%':
+      value = baselineBytes * value / 100 * factor;
+      break;
+    case 'kb':
+      value *= 1024;
+      break;
+    case 'mb':
+      value *= 1024 * 1024;
+      break;
+    case 'gb':
+      value *= 1024 * 1024 * 1024;
+      break;
   }
 
-  const multiplier = getMultiplier(val);
-
-  const numberVal = parseFloat(val.replace(/((k|m|M|)b?)$/, ''));
-  const baselineVal = baseline ? parseFloat(baseline.replace(/((k|m|M|)b?)$/, '')) : 0;
-  const baselineMultiplier = baseline ? getMultiplier(baseline) : 1;
-  const factorMultiplier = factor ? (factor === 'pos' ? 1 : -1) : 1;
-
-  return numberVal * multiplier + baselineVal * baselineMultiplier * factorMultiplier;
-}
-
-function getMultiplier(val: string): number {
-  if (/^(\d+)b?$/.test(val)) {
-    return 1;
-  } else if (/^(\d+)kb$/.test(val)) {
-    return 1000;
-  } else if (/^(\d+)(m|M)b$/.test(val)) {
-    return 1000 * 1000;
-  } else {
-    return 1;
-  }
-}
-
-function calculatePercentBytes(val: string, baseline?: string, factor?: ('pos' | 'neg')): number {
-  const baselineBytes = calculateBytes(baseline as string);
-  const percentage = parseFloat(val.replace(/%/g, ''));
-  return baselineBytes + baselineBytes * percentage / 100 * (factor === 'pos' ? 1 : -1);
+  return value + baselineBytes;
 }
