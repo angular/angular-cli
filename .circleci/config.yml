@@ -101,6 +101,17 @@ jobs:
       - run: npm install --global npm@6
       - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --glob=tests/basic/*
 
+  e2e-cli-ng-snapshots:
+    <<: *defaults
+    environment:
+      BASH_ENV: ~/.profile
+    resource_class: xlarge
+    parallelism: 4
+    steps:
+      - attach_workspace: *attach_options
+      - run: npm install --global npm@6
+      - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ng-snapshots
+
   build:
     <<: *defaults
     steps:
@@ -170,6 +181,12 @@ workflows:
       - e2e-node-8:
           requires:
             - build
+      - e2e-cli-ng-snapshots:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
       - snapshot_publish:
           requires:
             - test

@@ -26,11 +26,11 @@ Error.stackTraceLimit = Infinity;
  *                    rerun tests.
  *   --noglobal       Skip linking your local @angular/cli directory. Can save a few seconds.
  *   --nosilent       Never silence ng commands.
- *   --ng-sha=SHA     Use a specific ng-sha. Similar to nightly but point to a master SHA instead
- *                    of using the latest.
+ *   --ng-tag=TAG     Use a specific tag for build snapshots. Similar to ng-snapshots but point to a
+ *                    tag of using the latest master.
+ *   --ng-snapshots   Install angular snapshot builds in the test project.
  *   --glob           Run tests matching this glob pattern (relative to tests/e2e/).
  *   --ignore         Ignore tests matching this glob pattern.
- *   --nightly        Install angular nightly builds over the test project.
  *   --reuse=/path    Use a path instead of create a new project. That project should have been
  *                    created, and npm installed. Ideally you want a project created by a previous
  *                    run of e2e.
@@ -46,13 +46,13 @@ const argv = minimist(process.argv.slice(2), {
     'appveyor',
     'debug',
     'eject',
-    'nightly',
+    'ng-snapshots',
     'noglobal',
     'nosilent',
     'noproject',
     'verbose',
   ],
-  'string': ['devkit', 'glob', 'ignore', 'reuse', 'ng-sha', 'tmpdir', 'ng-version'],
+  'string': ['devkit', 'glob', 'ignore', 'reuse', 'ng-tag', 'tmpdir', 'ng-version'],
   'number': ['nb-shards', 'shard'],
 });
 

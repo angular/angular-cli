@@ -19,7 +19,7 @@ export default async function() {
 
       // Should trigger a rebuild.
     await appendToFile('src/environments/environment.prod.ts', `console.log('PROD');`);
-    await waitForAnyProcessOutputToMatch(webpackGoodRegEx, 40000);
+    await waitForAnyProcessOutputToMatch(webpackGoodRegEx, 45000);
   } catch (e) {
     error = e;
   }
