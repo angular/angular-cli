@@ -258,7 +258,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
                     return Promise.reject(err);
                   }));
             }),
-            switchMap(([data, valid]) => {
+            switchMap(([data, valid]: [JsonValue, boolean]) => {
               if (!validationOptions.withPrompts) {
                 return observableOf([data, valid]);
               }
@@ -274,7 +274,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
                 return observableOf([data, valid]);
               }
             }),
-            switchMap(([data, valid]) => {
+            switchMap(([data, valid]: [JsonValue, boolean]) => {
               if (valid) {
                 return observableOf(data).pipe(
                   ...[...this._post].map(visitor => concatMap((data: JsonValue) => {
@@ -287,7 +287,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
                 return observableOf([data, valid]);
               }
             }),
-            map(([data, valid]) => {
+            map(([data, valid]: [JsonValue, boolean]) => {
               if (valid) {
                 return { data, success: true } as SchemaValidatorResult;
               }
