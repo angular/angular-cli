@@ -53,6 +53,18 @@ describe('find-module', () => {
       }
     });
 
+    it('should throw if only routing modules were found', () => {
+      host = new EmptyTree();
+      host.create('/foo/src/app/anything-routing.module.ts', 'anything routing module');
+
+      try {
+        findModule(host, 'foo/src/app/anything-routing');
+        throw new Error('Succeeded, should have failed');
+      } catch (err) {
+        expect(err.message).toMatch(/Could not find a non Routing NgModule/);
+      }
+    });
+
     it('should throw if two modules found', () => {
       try {
         host = new EmptyTree();
