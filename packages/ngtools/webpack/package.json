@@ -31,11 +31,10 @@
     "webpack-sources": "^1.1.0"
   },
   "peerDependencies": {
-    "typescript": "~2.4.0 || ~2.5.0 || ~2.6.0 || ~2.7.0 || ~2.8.0 || ~2.9.0",
+    "typescript": ">=2.4.0 < 3.1",
     "webpack": "^4.0.0"
   },
   "devDependencies": {
-    "typescript": "~2.9.2",
     "webpack": "^4.0.0"
   }
 }
