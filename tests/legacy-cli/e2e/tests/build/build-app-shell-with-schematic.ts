@@ -19,7 +19,7 @@ export default function () {
 
   let platformServerVersion = readNgVersion();
 
-  if (getGlobalVariable('argv').nightly) {
+  if (getGlobalVariable('argv')['ng-snapshots']) {
     platformServerVersion = 'github:angular/platform-server-builds';
   }
 

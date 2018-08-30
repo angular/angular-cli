@@ -6,7 +6,7 @@ export default async function () {
   // TypeScript minor versions.
   return;
 
-  // Disable the strict TS version check for nightly
+  // Disable the strict TS version check for snapshots
   await updateJsonFile('src/tsconfig.app.json', configJson => {
     configJson.angularCompilerOptions = {
       ...configJson.angularCompilerOptions,

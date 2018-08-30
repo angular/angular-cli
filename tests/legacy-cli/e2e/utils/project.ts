@@ -44,7 +44,7 @@ export function createProject(name: string, ...args: string[]) {
     .then(() => useDevKitSnapshots())
     .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
     .then(() => argv['ng4'] ? useNg4() : Promise.resolve())
-    .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
+    .then(() => argv['ng-snapshots'] || argv['ng-tag'] ? useSha() : Promise.resolve())
     .then(() => console.log(`Project ${name} created... Installing npm.`))
     .then(() => silentNpm('install'))
     .then(() => useCIDefaults(name));
@@ -110,10 +110,13 @@ export function useBuiltPackages() {
 
 export function useSha() {
   const argv = getGlobalVariable('argv');
-  if (argv.nightly || argv['ng-sha']) {
-    const label = argv['ng-sha'] ? `#2.0.0-${argv['ng-sha']}` : '';
+  if (argv['ng-snapshots'] || argv['ng-tag']) {
+    // We need more than the sha here, version is also needed. Examples of latest tags:
+    // 7.0.0-beta.4+dd2a650
+    // 6.1.6+4a8d56a
+    const label = argv['ng-tag'] ? argv['ng-tag'] : '';
     return updateJsonFile('package.json', json => {
-      // Install over the project with nightly builds.
+      // Install over the project with snapshot builds.
       Object.keys(json['dependencies'] || {})
         .filter(name => name.match(/^@angular\//))
         .forEach(name => {
@@ -135,6 +138,8 @@ export function useSha() {
           json['devDependencies'][`@angular/${pkgName}`]
             = `github:angular/${pkgName}-builds${label}`;
         });
+
+      json['devDependencies']['typescript'] = '~3.0.1';
     });
   } else {
     return Promise.resolve();
@@ -143,7 +148,7 @@ export function useSha() {
 
 export function useNgVersion(version: string) {
   return updateJsonFile('package.json', json => {
-    // Install over the project with nightly builds.
+    // Install over the project with specific versions.
     Object.keys(json['dependencies'] || {})
       .filter(name => name.match(/^@angular\//))
       .forEach(name => {

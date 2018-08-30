@@ -37,7 +37,7 @@ export default async function() {
     .then(() => useCIChrome('e2e'))
     .then(() => useCIChrome('src'))
     .then(() => argv['ng-version'] ? useNgVersion(argv['ng-version']) : Promise.resolve())
-    .then(() => argv.nightly || argv['ng-sha'] ? useSha() : Promise.resolve())
+    .then(() => argv['ng-snapshots'] || argv['ng-tag'] ? useSha() : Promise.resolve())
     // npm link on Circle CI is very noisy.
     .then(() => silentNpm('install'))
     .then(() => ng('version'))
