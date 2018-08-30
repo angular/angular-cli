@@ -61,7 +61,7 @@
     "glob": "^7.0.3",
     "temp": "^0.8.3",
     "tslint": "^5.11.0",
-    "typescript": "~2.9.2"
+    "typescript": "~3.0.1"
   },
   "devDependencies": {
     "@bazel/typescript": "0.16.1",
