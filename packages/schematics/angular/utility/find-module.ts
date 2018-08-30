@@ -28,7 +28,7 @@ export function findModuleFromOptions(host: Tree, options: ModuleOptions): Path 
 
   if (!options.module) {
     const pathToCheck = (options.path || '')
-                      + (options.flat ? '' : '/' + strings.dasherize(options.name));
+      + (options.flat ? '' : '/' + strings.dasherize(options.name));
 
     return normalize(findModule(host, pathToCheck));
   } else {
@@ -59,12 +59,17 @@ export function findModule(host: Tree, generateDir: string): Path {
   const moduleRe = /\.module\.ts$/;
   const routingModuleRe = /-routing\.module\.ts/;
 
-  while (dir) {
-    const matches = dir.subfiles.filter(p => moduleRe.test(p) && !routingModuleRe.test(p));
+  let foundRoutingModule = false;
 
-    if (matches.length == 1) {
-      return join(dir.path, matches[0]);
-    } else if (matches.length > 1) {
+  while (dir) {
+    const allMatches = dir.subfiles.filter(p => moduleRe.test(p));
+    const filteredMatches = allMatches.filter(p => !routingModuleRe.test(p));
+
+    foundRoutingModule = foundRoutingModule || allMatches.length !== filteredMatches.length;
+
+    if (filteredMatches.length == 1) {
+      return join(dir.path, filteredMatches[0]);
+    } else if (filteredMatches.length > 1) {
       throw new Error('More than one module matches. Use skip-import option to skip importing '
         + 'the component into the closest module.');
     }
@@ -72,8 +77,12 @@ export function findModule(host: Tree, generateDir: string): Path {
     dir = dir.parent;
   }
 
-  throw new Error('Could not find an NgModule. Use the skip-import '
-    + 'option to skip importing in NgModule.');
+  const errorMsg = foundRoutingModule ? 'Could not find a non Routing NgModule.'
+    + '\nModules with suffix \'-routing.module\' are strictly reserved for routing.'
+    + '\nUse the skip-import option to skip importing in NgModule.'
+    : 'Could not find an NgModule. Use the skip-import option to skip importing in NgModule.';
+
+  throw new Error(errorMsg);
 }
 
 /**
