@@ -230,7 +230,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
                     return Promise.reject(err);
                   }));
             }),
-            switchMap(([data, valid]) => {
+            switchMap(([data, valid]: [JsonValue, boolean]) => {
               if (valid) {
                 return this._applySmartDefaults(data).pipe(
                   ...[...this._post].map(visitor => concatMap(data => {
@@ -243,7 +243,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
                 return observableOf([data, valid]);
               }
             }),
-            map(([data, valid]) => {
+            map(([data, valid]: [JsonValue, boolean]) => {
               if (valid) {
                 return { data, success: true } as SchemaValidatorResult;
               }
