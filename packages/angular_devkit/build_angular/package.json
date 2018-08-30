@@ -36,7 +36,7 @@
     "postcss-loader": "^2.1.5",
     "postcss-url": "^7.3.2",
     "raw-loader": "^0.5.1",
-    "rxjs": "^6.0.0",
+    "rxjs": "~6.2.0",
     "sass-loader": "^7.1.0",
     "semver": "^5.5.0",
     "source-map-support": "^0.5.0",
