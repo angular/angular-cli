@@ -38,7 +38,7 @@
     "inquirer": "^6.1.0",
     "json-schema-traverse": "^0.4.1",
     "opn": "^5.3.0",
-    "rxjs": "^6.0.0",
+    "rxjs": "~6.2.0",
     "semver": "^5.1.0",
     "symbol-observable": "^1.2.0",
     "yargs-parser": "^10.0.0"
