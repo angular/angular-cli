@@ -5,6 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
+import { FileReplacement } from '../browser/schema';
+
 export interface BuildWebpackServerSchema {
   /**
    * The name of the TypeScript configuration file.
@@ -80,7 +83,7 @@ export interface BuildWebpackServerSchema {
   /**
    * Replace files with other files in the build.
    */
-  fileReplacements: FileReplacements[];
+  fileReplacements: FileReplacement[];
   /**
    * Define the output filename cache-busting hashing mode.
    */
@@ -125,9 +128,9 @@ export interface BuildWebpackServerSchema {
    * Run build when files change.
    */
   watch?: boolean;
-    /**
-   * Enable and define the file watching poll time period in milliseconds.
-   */
+  /**
+ * Enable and define the file watching poll time period in milliseconds.
+ */
   poll?: number;
 }
 
