@@ -21,7 +21,7 @@ describe('Browser Builder build optimizer', () => {
 
   it('works', (done) => {
     const overrides = { aot: true, buildOptimizer: true };
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
