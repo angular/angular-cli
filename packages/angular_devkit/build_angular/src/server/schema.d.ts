@@ -80,6 +80,7 @@ export interface BuildWebpackServerSchema {
   /**
    * Replace files with other files in the build.
    */
+  // 这里是什么鬼！没有定义FileReplacements! why i can't find where defined this FileReplacements
   fileReplacements: FileReplacements[];
   /**
    * Define the output filename cache-busting hashing mode.
