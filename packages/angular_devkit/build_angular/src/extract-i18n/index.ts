@@ -74,7 +74,7 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
         architect.validateBuilderOptions(browserBuilderConfig, browserDescription)),
       map(browserBuilderConfig => browserBuilderConfig.options),
       concatMap((validatedBrowserOptions) => {
-        const browserOptions = validatedBrowserOptions;
+        const browserOptions = validatedBrowserOptions as NormalizedBrowserBuilderSchema;
 
         // We need to determine the outFile name so that AngularCompiler can retrieve it.
         let outFile = options.outFile || getI18nOutfile(options.i18nFormat);
