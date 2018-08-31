@@ -37,16 +37,48 @@ function _mkdirp(p: string) {
   fs.mkdirSync(p);
 }
 
+function _recursiveFileList(p: string): string[] {
+  if (!fs.statSync(p).isDirectory()) {
+    return [];
+  }
 
+  const list = fs.readdirSync(p);
+
+  return list
+    .map(subpath => {
+      const subpathList = _recursiveFileList(path.join(p, subpath));
+
+      return [ subpath, ...subpathList.map(sp => path.join(subpath, sp))];
+    })
+    // Flatten.
+    .reduce((acc, curr) => [...acc, ...curr], [])
+    // Filter out directories.
+    .filter(sp => !fs.statSync(path.join(p, sp)).isDirectory());
+}
+
+
+// This method mimics how npm pack tars packages.
 function _tar(out: string, dir: string) {
+  // NOTE: node-tar does some Magic Stuff depending on prefixes for files
+  //       specifically with @ signs, so we just neutralize that one
+  //       and any such future "features" by prepending `./`
+
+  // Without this, the .tar file cannot be opened on Windows.
+
+  const files = _recursiveFileList(dir).map((f) => `./${f}`);
+
   return tar.create({
     gzip: true,
     strict: true,
     portable: true,
     cwd: dir,
+    prefix: 'package/',
     file: out,
     sync: true,
-  }, ['.']);
+    // Provide a specific date in the 1980s for the benefit of zip,
+    // which is confounded by files dated at the Unix epoch 0.
+    mtime: new Date('1985-10-26T08:15:00.000Z'),
+  }, files);
 }
 
 
