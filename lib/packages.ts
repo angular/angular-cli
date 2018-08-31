@@ -212,7 +212,9 @@ export const packages: PackageMap =
         relative: path.relative(path.dirname(__dirname), pkgRoot),
         main: path.resolve(pkgRoot, 'src/index.ts'),
         private: packageJson.private,
-        tar: path.join(distRoot, name.replace('/', '_') + '.tgz'),
+        // yarn doesn't take kindly to @ in tgz filenames
+        // https://github.com/yarnpkg/yarn/issues/6339
+        tar: path.join(distRoot, name.replace(/\/|@/g, '_') + '.tgz'),
         bin,
         name,
         packageJson,
