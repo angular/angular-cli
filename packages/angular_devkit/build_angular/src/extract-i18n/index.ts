@@ -85,7 +85,8 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
 
         // Extracting i18n uses the browser target webpack config with some specific options.
         const webpackConfig = this.buildWebpackConfig(root, projectRoot, {
-          ...browserOptions,
+          // todo: remove this casting when 'CurrentFileReplacement' is changed to 'FileReplacement'
+          ...(browserOptions as NormalizedBrowserBuilderSchema),
           optimization: false,
           i18nLocale: options.i18nLocale,
           i18nFormat: options.i18nFormat,
