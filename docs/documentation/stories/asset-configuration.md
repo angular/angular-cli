@@ -1,7 +1,8 @@
 # Project assets
 
 You use the `assets` array inside the build target in `angular.json` to list files or folders
-you want to copy as-is when building your project.
+you want to copy as-is when building your project. if you think you need to exclude files, 
+consider not putting that thing in the assets
 
 By default, the `src/assets/` folder and `src/favicon.ico` are copied over.
 
@@ -23,7 +24,7 @@ The array below does the same as the default one:
 ]
 ```
 
-- `glob` is the a [node-glob](https://github.com/isaacs/node-glob) using `input` as base directory.
+- `glob` is a [node-glob](https://github.com/isaacs/node-glob) using `input` as base directory.
 - `input` is relative to the workspace root.
 - `ignore` is a list of globs to ignore from copying.
 - `output` is relative to `outDir` (`dist/project-name` default).
