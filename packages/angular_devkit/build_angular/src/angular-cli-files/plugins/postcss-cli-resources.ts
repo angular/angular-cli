@@ -1,7 +1,3 @@
-// tslint:disable
-// TODO: cleanup this file, it's copied as is from Angular CLI.
-
-
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -28,6 +24,7 @@ function wrapUrl(url: string): string {
 }
 
 export interface PostcssCliResourcesOptions {
+  baseHref?: string;
   deployUrl?: string;
   filename: string;
   loader: webpack.loader.LoaderContext;
@@ -36,21 +33,28 @@ export interface PostcssCliResourcesOptions {
 async function resolve(
   file: string,
   base: string,
-  resolver: (file: string, base: string) => Promise<string>
+  resolver: (file: string, base: string) => Promise<string>,
 ): Promise<string> {
   try {
     return await resolver('./' + file, base);
-  } catch (err) {
+  } catch {
     return resolver(file, base);
   }
 }
 
 export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResourcesOptions) => {
-  const { deployUrl, filename, loader } = options;
+  const {
+    deployUrl = '',
+    baseHref = '',
+    filename,
+    loader,
+  } = options;
+
+  const dedupeSlashes = (url: string) => url.replace(/\/\/+/g, '/');
 
   const process = async (inputUrl: string, resourceCache: Map<string, string>) => {
     // If root-relative or absolute, leave as is
-    if (inputUrl.match(/^(?:\w+:\/\/|data:|chrome:|#|\/)/)) {
+    if (inputUrl.match(/^(?:\w+:\/\/|data:|chrome:|#)/)) {
       return inputUrl;
     }
     // If starts with a caret, remove and return remainder
@@ -64,11 +68,34 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
       return cachedUrl;
     }
 
+    if (inputUrl.startsWith('~')) {
+      inputUrl = inputUrl.substr(1);
+    }
+
+    if (inputUrl.startsWith('/') && !inputUrl.startsWith('//')) {
+      let outputUrl = '';
+      if (deployUrl.match(/:\/\//) || deployUrl.startsWith('/')) {
+        // If deployUrl is absolute or root relative, ignore baseHref & use deployUrl as is.
+        outputUrl = `${deployUrl.replace(/\/$/, '')}${inputUrl}`;
+      } else if (baseHref.match(/:\/\//)) {
+        // If baseHref contains a scheme, include it as is.
+        outputUrl = baseHref.replace(/\/$/, '') + dedupeSlashes(`/${deployUrl}/${inputUrl}`);
+      } else {
+        // Join together base-href, deploy-url and the original URL.
+        outputUrl = dedupeSlashes(`/${baseHref}/${deployUrl}/${inputUrl}`);
+      }
+
+      resourceCache.set(inputUrl, outputUrl);
+
+      return outputUrl;
+    }
+
     const { pathname, hash, search } = url.parse(inputUrl.replace(/\\/g, '/'));
     const resolver = (file: string, base: string) => new Promise<string>((resolve, reject) => {
       loader.resolve(base, file, (err, result) => {
         if (err) {
           reject(err);
+
           return;
         }
         resolve(result);
@@ -81,6 +108,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
       loader.fs.readFile(result, (err: Error, content: Buffer) => {
         if (err) {
           reject(err);
+
           return;
         }
 
@@ -98,12 +126,11 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
           outputUrl = url.format({ pathname: outputUrl, hash, search });
         }
 
-        if (deployUrl) {
+        if (deployUrl && loader.loaders[loader.loaderIndex].options.ident !== 'extracted') {
           outputUrl = url.resolve(deployUrl, outputUrl);
         }
 
         resourceCache.set(inputUrl, outputUrl);
-
         resolve(outputUrl);
       });
     });

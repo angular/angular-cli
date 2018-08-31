@@ -34,7 +34,6 @@
     "postcss": "^6.0.22",
     "postcss-import": "^11.1.0",
     "postcss-loader": "^2.1.5",
-    "postcss-url": "^7.3.2",
     "raw-loader": "^0.5.1",
     "rxjs": "~6.2.0",
     "sass-loader": "^7.1.0",
