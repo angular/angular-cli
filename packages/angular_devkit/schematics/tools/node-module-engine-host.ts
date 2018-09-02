@@ -5,7 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BaseException } from '@angular-devkit/core';
+import {
+  BaseException,
+  InvalidJsonCharacterException,
+  UnexpectedEndOfInputException,
+} from '@angular-devkit/core';
 import * as core from '@angular-devkit/core/node';
 import { dirname, join, resolve as resolvePath } from 'path';
 import { RuleFactory } from '../src';
@@ -18,6 +22,7 @@ import {
   CollectionCannotBeResolvedException,
   CollectionMissingSchematicsMapException,
   FileSystemEngineHostBase,
+  InvalidCollectionJsonException,
   SchematicMissingFieldsException,
 } from './file-system-engine-host-base';
 import { readJsonFile } from './file-system-utility';
@@ -77,7 +82,7 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     if (name.replace(/\\/, '/').split('/').length > (name[0] == '@' ? 2 : 1)) {
       try {
         collectionPath = this._resolvePath(name, process.cwd());
-      } catch (_) {
+      } catch {
       }
     }
 
@@ -102,7 +107,13 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
         return collectionPath;
       }
     } catch (e) {
+      if (
+        e instanceof InvalidJsonCharacterException || e instanceof UnexpectedEndOfInputException
+      ) {
+        throw new InvalidCollectionJsonException(name, collectionPath, e);
+      }
     }
+
     throw new CollectionCannotBeResolvedException(name);
   }
 
