@@ -7,7 +7,9 @@
  */
 import {
   BaseException,
+  InvalidJsonCharacterException,
   JsonObject,
+  UnexpectedEndOfInputException,
   isObservable,
   normalize,
   virtualFs,
@@ -48,8 +50,18 @@ export class CollectionCannotBeResolvedException extends BaseException {
   }
 }
 export class InvalidCollectionJsonException extends BaseException {
-  constructor(_name: string, path: string) {
-    super(`Collection JSON at path ${JSON.stringify(path)} is invalid.`);
+  constructor(
+    _name: string,
+    path: string,
+    jsonException?: UnexpectedEndOfInputException | InvalidJsonCharacterException,
+  ) {
+    let msg = `Collection JSON at path ${JSON.stringify(path)} is invalid.`;
+
+    if (jsonException) {
+      msg = `${msg} ${jsonException.message}`;
+    }
+
+    super(msg);
   }
 }
 export class SchematicMissingFactoryException extends BaseException {
