@@ -1,10 +1,10 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "id": "GetSetCommandOptions",
+  "$id": "ng-cli://commands/deprecated.json",
   "description": "Deprecated in favor of config command.",
   "$longDescription": "",
 
-  "$impl": "./getset-impl#GetSetCommand",
+  "$impl": "./deprecated-impl#DeprecatedCommand",
   "$hidden": true,
   "$type": "deprecated",
 
