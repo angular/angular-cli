@@ -44,7 +44,11 @@ function  _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proc
 
   console.log(terminal.blue(`Running \`${cmd} ${args.map(x => `"${x}"`).join(' ')}\`${flags}...`));
   console.log(terminal.blue(`CWD: ${cwd}`));
-  const spawnOptions: SpawnOptions = {cwd, env};
+  console.log(terminal.blue(`ENV: ${JSON.stringify(env)}`));
+  const spawnOptions: SpawnOptions = {
+    cwd,
+    ...env ? { env } : {},
+  };
 
   if (process.platform.startsWith('win')) {
     args.unshift('/c', cmd);
@@ -91,13 +95,14 @@ function  _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proc
     });
 
     if (options.waitForMatch) {
+      const match = options.waitForMatch;
       childProcess.stdout.on('data', (data: Buffer) => {
-        if (data.toString().match(options.waitForMatch)) {
+        if (data.toString().match(match)) {
           resolve({ stdout, stderr });
         }
       });
       childProcess.stderr.on('data', (data: Buffer) => {
-        if (data.toString().match(options.waitForMatch)) {
+        if (data.toString().match(match)) {
           resolve({ stdout, stderr });
         }
       });

@@ -14,7 +14,7 @@ function pickOne(of: string[]): string {
 }
 
 export class AwesomeCommand extends Command {
-  run() {
+  async run() {
     const phrase = pickOne([
       `You're on it, there's nothing for me to do!`,
       `Let's take a look... nope, it's all good!`,

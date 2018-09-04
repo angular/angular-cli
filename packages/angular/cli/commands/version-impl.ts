@@ -17,7 +17,7 @@ import { findUp } from '../utilities/find-up';
 export class VersionCommand extends Command {
   public static aliases = ['v'];
 
-  public run() {
+  async run() {
     const pkg = require(path.resolve(__dirname, '..', 'package.json'));
     let projPkg;
     try {

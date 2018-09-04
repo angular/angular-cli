@@ -1,32 +1,39 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "id": "UpdateCommandOptions",
+  "$id": "ng-cli://commands/update.json",
   "description": "Updates your application and its dependencies.",
   "$longDescription": "",
 
+  "$scope": "all",
   "$aliases": [],
   "$type": "schematics",
   "$impl": "./update-impl#UpdateCommand",
 
   "type": "object",
-  "properties": {
-    "packages": {
-      "type": "array",
-      "items": {
-        "type": "string"
+  "allOf": [
+    {
+      "properties": {
+        "packages": {
+          "type": "array",
+          "description": "The names of package(s) to update",
+          "$default": {
+            "$source": "argv"
+          }
+        },
+        "dryRun": {
+          "type": "boolean",
+          "default": false,
+          "aliases": [
+            "d"
+          ],
+          "description": "Run through without making any changes."
+        }
       },
-      "description": "The names of package(s) to update",
-      "$default": {
-        "$source": "argv"
-      }
+      "required": [
+      ]
     },
-    "dryRun": {
-      "type": "boolean",
-      "default": false,
-      "aliases": ["d"],
-      "description": "Run through without making any changes."
+    {
+      "$ref": "./definitions.json#/definitions/base"
     }
-  },
-  "required": [
   ]
 }

@@ -5,77 +5,83 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-// tslint:disable:no-global-tslint-disable no-any
 import { normalize } from '@angular-devkit/core';
-import { CommandScope, Option } from '../models/command';
-import { CoreSchematicOptions, SchematicCommand } from '../models/schematic-command';
+import { Arguments, Option } from '../models/interface';
+import { BaseSchematicOptions, SchematicCommand } from '../models/schematic-command';
 import { findUp } from '../utilities/find-up';
+import { parseJsonSchemaToOptions } from '../utilities/json-schema';
 
-export interface UpdateOptions extends CoreSchematicOptions {
+export interface UpdateOptions extends BaseSchematicOptions {
   next: boolean;
   schematic?: boolean;
+  dryRun: boolean;
+  force: boolean;
 }
 
+type UpdateSchematicOptions = Arguments & {
+  migrateOnly?: boolean;
+  from?: string;
+  packages?: string | string[];
+};
 
-export class UpdateCommand extends SchematicCommand {
-  public readonly name = 'update';
-  public readonly description = 'Updates your application and its dependencies.';
-  public static aliases: string[] = [];
-  public static scope = CommandScope.everywhere;
-  public arguments: string[] = [ 'packages' ];
-  public options: Option[] = [
-    // Remove the --force flag.
-    ...this.coreOptions.filter(option => option.name !== 'force'),
-  ];
+
+export class UpdateCommand<T extends UpdateOptions = UpdateOptions> extends SchematicCommand<T> {
   public readonly allowMissingWorkspace = true;
 
   private collectionName = '@schematics/update';
   private schematicName = 'update';
 
-  private initialized = false;
-  public async initialize(options: any) {
-    if (this.initialized) {
-      return;
-    }
-    await super.initialize(options);
-    this.initialized = true;
+  async initialize(input: T) {
+    await super.initialize(input);
 
-    const schematicOptions = await this.getOptions({
-      schematicName: this.schematicName,
-      collectionName: this.collectionName,
-    });
-    this.addOptions(schematicOptions);
+    // Set the options.
+    const collection = this.getCollection(this.collectionName);
+    const schematic = this.getSchematic(collection, this.schematicName, true);
+    const options = await parseJsonSchemaToOptions(
+      this._workflow.registry,
+      schematic.description.schemaJson || {},
+    );
+
+    this.description.options.push(...options);
   }
 
-  async validate(options: any) {
-    if (options._[0] == '@angular/cli'
-        && options.migrateOnly === undefined
-        && options.from === undefined) {
+  async parseArguments(schematicOptions: string[], schema: Option[]): Promise<Arguments> {
+    const args = await super.parseArguments(schematicOptions, schema) as UpdateSchematicOptions;
+    const maybeArgsLeftovers = args['--'];
+
+    if (maybeArgsLeftovers
+        && maybeArgsLeftovers.length == 1
+        && maybeArgsLeftovers[0] == '@angular/cli'
+        && args.migrateOnly === undefined
+        && args.from === undefined) {
       // Check for a 1.7 angular-cli.json file.
       const oldConfigFileNames = [
         normalize('.angular-cli.json'),
         normalize('angular-cli.json'),
       ];
-      const oldConfigFilePath =
-        findUp(oldConfigFileNames, process.cwd())
-        || findUp(oldConfigFileNames, __dirname);
+      const oldConfigFilePath = findUp(oldConfigFileNames, process.cwd())
+                             || findUp(oldConfigFileNames, __dirname);
 
       if (oldConfigFilePath) {
-        options.migrateOnly = true;
-        options.from = '1.0.0';
+        args.migrateOnly = true;
+        args.from = '1.0.0';
       }
     }
 
-    return super.validate(options);
+    // Move `--` to packages.
+    if (args.packages == undefined && args['--']) {
+      args.packages = args['--'];
+      delete args['--'];
+    }
+
+    return args;
   }
 
-
-  public async run(options: UpdateOptions) {
+  async run(options: UpdateOptions) {
     return this.runSchematic({
       collectionName: this.collectionName,
       schematicName: this.schematicName,
-      schematicOptions: options,
+      schematicOptions: options['--'],
       dryRun: options.dryRun,
       force: false,
       showNothingDone: false,

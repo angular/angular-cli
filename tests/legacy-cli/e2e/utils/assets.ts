@@ -4,7 +4,7 @@ import {getGlobalVariable} from './env';
 import {relative} from 'path';
 import {copyFile} from './fs';
 import {useBuiltPackages} from './project';
-import {silentNpm} from './process';
+import { git, silentNpm } from './process';
 
 
 export function assetDir(assetName: string) {

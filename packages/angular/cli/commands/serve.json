@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "id": "ServeCommandOptions",
+  "$id": "ng-cli://commands/serve.json",
   "description": "Builds and serves your app, rebuilding on file changes.",
   "$longDescription": "",
 
@@ -10,25 +10,8 @@
   "$impl": "./serve-impl#ServeCommand",
 
   "type": "object",
-  "properties": {
-    "project": {
-      "type": "string",
-      "description": "The name of the project to serve.",
-      "$default": {
-        "$source": "argv",
-        "index": 0
-      }
-    },
-    "configuration": {
-      "description": "Specify the configuration to use.",
-      "type": "string",
-      "aliases": ["c"]
-    },
-    "prod": {
-      "description": "Flag to set configuration to 'production'.",
-      "type": "boolean"
-    }
-  },
-  "required": [
+  "allOf": [
+    { "$ref": "./definitions.json#/definitions/architect" },
+    { "$ref": "./definitions.json#/definitions/base" }
   ]
 }

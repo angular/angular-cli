@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "id": "RunCommandOptions",
+  "$id": "ng-cli://commands/run.json",
   "description": "Runs Architect targets.",
   "$longDescription": "",
 
@@ -10,21 +10,28 @@
   "$impl": "./run-impl#RunCommand",
 
   "type": "object",
-  "properties": {
-    "target": {
-      "type": "string",
-      "description": "The target to run.",
-      "$default": {
-        "$source": "argv",
-        "index": 0
-      }
+  "allOf": [
+    {
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "The target to run.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        },
+        "configuration": {
+          "description": "Specify the configuration to use.",
+          "type": "string",
+          "aliases": [ "c" ]
+        }
+      },
+      "required": [
+      ]
     },
-    "configuration": {
-      "description": "Specify the configuration to use.",
-      "type": "string",
-      "aliases": ["c"]
+    {
+      "$ref": "./definitions.json#/definitions/base"
     }
-  },
-  "required": [
   ]
 }

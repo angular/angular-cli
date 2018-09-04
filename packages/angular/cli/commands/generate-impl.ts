@@ -7,63 +7,64 @@
  */
 
 // tslint:disable:no-global-tslint-disable no-any
-import { tags, terminal } from '@angular-devkit/core';
-import { SchematicCommand } from '../models/schematic-command';
+import { terminal } from '@angular-devkit/core';
+import { Option } from '../models/interface';
+import { BaseSchematicOptions, SchematicCommand } from '../models/schematic-command';
+import { parseJsonSchemaToOptions } from '../utilities/json-schema';
 
+export interface GenerateCommandOptions extends BaseSchematicOptions {
+  schematic?: string;
+}
 
-export class GenerateCommand extends SchematicCommand {
-  private initialized = false;
-  public async initialize(options: any) {
-    if (this.initialized) {
-      return;
-    }
+export class GenerateCommand<
+  T extends GenerateCommandOptions = GenerateCommandOptions,
+> extends SchematicCommand<T> {
+  async initialize(options: T) {
     await super.initialize(options);
-    this.initialized = true;
 
+    // Fill up the schematics property of the command description.
     const [collectionName, schematicName] = this.parseSchematicInfo(options);
-    if (!!schematicName) {
-      const schematicOptions = await this.getOptions({
-        schematicName,
-        collectionName,
-      });
-      this.addOptions(schematicOptions);
+
+    const collection = this.getCollection(collectionName);
+    this.description.schematics = {};
+
+    const schematicNames = schematicName ? [schematicName] : collection.listSchematicNames();
+
+    for (const name of schematicNames) {
+      const schematic = this.getSchematic(collection, name, true);
+      let options: Option[] = [];
+      if (schematic.description.schemaJson) {
+        options = await parseJsonSchemaToOptions(
+          this._workflow.registry,
+          schematic.description.schemaJson,
+        );
+      }
+
+      this.description.schematics[`${collectionName}:${name}`] = options;
     }
   }
 
-  validate(options: any): boolean | Promise<boolean> {
-    if (!options.schematic) {
-      this.logger.error(tags.oneLine`
-        The "ng generate" command requires a
-        schematic name to be specified.
-        For more details, use "ng help".`);
-
-      return false;
-    }
-
-    return true;
-  }
-
-  public run(options: any) {
+  public async run(options: T) {
     const [collectionName, schematicName] = this.parseSchematicInfo(options);
 
-    // remove the schematic name from the options
-    delete options.schematic;
+    if (!schematicName || !collectionName) {
+      return this.printHelp(options);
+    }
 
     return this.runSchematic({
       collectionName,
       schematicName,
-      schematicOptions: this.removeLocalOptions(options),
-      debug: options.debug,
-      dryRun: options.dryRun,
-      force: options.force,
-      interactive: options.interactive,
+      schematicOptions: options['--'] || [],
+      debug: !!options.debug || false,
+      dryRun: !!options.dryRun || false,
+      force: !!options.force || false,
     });
   }
 
-  private parseSchematicInfo(options: any) {
+  private parseSchematicInfo(options: { schematic?: string }): [string, string | undefined] {
     let collectionName = this.getDefaultSchematicCollection();
 
-    let schematicName: string = options.schematic;
+    let schematicName = options.schematic;
 
     if (schematicName) {
       if (schematicName.includes(':')) {
@@ -74,33 +75,14 @@ export class GenerateCommand extends SchematicCommand {
     return [collectionName, schematicName];
   }
 
-  public printHelp(_name: string, _description: string, options: any) {
-    const schematicName = options._[0];
-    if (schematicName) {
-      const optsWithoutSchematic = this.options
-        .filter(o => !(o.name === 'schematic' && this.isArgument(o)));
-      this.printHelpUsage(`generate ${schematicName}`, optsWithoutSchematic);
-      this.printHelpOptions(this.options);
-    } else {
-      this.printHelpUsage('generate', this.options);
-      const engineHost = this.getEngineHost();
-      const [collectionName] = this.parseSchematicInfo(options);
-      const collection = this.getCollection(collectionName);
-      const schematicNames: string[] = engineHost.listSchematicNames(collection.description);
-      this.logger.info('Available schematics:');
-      schematicNames.forEach(schematicName => {
-        this.logger.info(`    ${schematicName}`);
-      });
+  public async printHelp(options: T) {
+    await super.printHelp(options);
 
-      this.logger.warn(`\nTo see help for a schematic run:`);
+    if (Object.keys(this.description.schematics || {}).length == 1) {
+      this.logger.info(`\nTo see help for a schematic run:`);
       this.logger.info(terminal.cyan(`  ng generate <schematic> --help`));
     }
-  }
 
-  private removeLocalOptions(options: any): any {
-    const opts = Object.assign({}, options);
-    delete opts.interactive;
-
-    return opts;
+    return 0;
   }
 }

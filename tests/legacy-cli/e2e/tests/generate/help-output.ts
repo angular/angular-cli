@@ -74,7 +74,7 @@ export default function() {
     .then(() => ng('generate', 'fake-schematics:fake', '--help'))
     .then(({stdout}) => {
       if (!/ng generate fake-schematics:fake <a> <b> \[options\]/.test(stdout)) {
-        throw new Error('Help signature is wrong.');
+        throw new Error('Help signature is wrong (1).');
       }
       if (!/opt-a[\s\S]*opt-b[\s\S]*opt-c/.test(stdout)) {
         throw new Error('Help signature options are incorrect.');
@@ -88,8 +88,8 @@ export default function() {
     .then(() => ng('generate', 'fake', '--help'))
     // verify same output
     .then(({stdout}) => {
-      if (!/ng generate fake <a> <b> \[options\]/.test(stdout)) {
-        throw new Error('Help signature is wrong.');
+      if (!/ng generate fake-schematics:fake <a> <b> \[options\]/.test(stdout)) {
+        throw new Error('Help signature is wrong (2).');
       }
       if (!/opt-a[\s\S]*opt-b[\s\S]*opt-c/.test(stdout)) {
         throw new Error('Help signature options are incorrect.');

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "id": "EasterEggCommandOptions",
+  "$id": "ng-cli://commands/easter-egg.json",
   "description": "",
   "$longDescription": "",
   "$hidden": true,
