@@ -25,15 +25,26 @@ import {
   Position,
 } from './interface';
 
+export class JsonException extends BaseException {}
 
 /**
  * A character was invalid in this context.
  */
-export class InvalidJsonCharacterException extends BaseException {
+export class InvalidJsonCharacterException extends JsonException {
+  invalidChar: string;
+  line: number;
+  character: number;
+  offset: number;
+
   constructor(context: JsonParserContext) {
     const pos = context.previous;
-    super(`Invalid JSON character: ${JSON.stringify(_peek(context))} `
-        + `at ${pos.line}:${pos.character}.`);
+    const invalidChar = JSON.stringify(_peek(context));
+    super(`Invalid JSON character: ${invalidChar} at ${pos.line}:${pos.character}.`);
+
+    this.invalidChar = invalidChar;
+    this.line = pos.line;
+    this.offset = pos.offset;
+    this.character = pos.character;
   }
 }
 
@@ -41,12 +52,20 @@ export class InvalidJsonCharacterException extends BaseException {
 /**
  * More input was expected, but we reached the end of the stream.
  */
-export class UnexpectedEndOfInputException extends BaseException {
+export class UnexpectedEndOfInputException extends JsonException {
   constructor(_context: JsonParserContext) {
     super(`Unexpected end of file.`);
   }
 }
 
+/**
+ * An error happened within a file.
+ */
+export class PathSpecificJsonException extends JsonException {
+  constructor(public path: string, public exception: JsonException) {
+    super(`An error happened at file path ${JSON.stringify(path)}: ${exception.message}`);
+  }
+}
 
 /**
  * Context passed around the parser with information about where we currently are in the parse.
@@ -859,4 +878,24 @@ export function parseJson(input: string, mode = JsonParseMode.Default): JsonValu
   }
 
   return parseJsonAst(input, mode).value;
+}
+
+/**
+ * Parse a JSON string into its value.  This discards the AST and only returns the value itself.
+ * It also absorbs JSON parsing errors and return a new error with the path in it. Useful for
+ * showing errors when parsing from a file.
+ * @param input The string to parse.
+ * @param mode The mode to parse the input with. {@see JsonParseMode}.
+ * @returns {JsonValue} The value represented by the JSON string.
+ */
+export function parseJsonFile(input: string, mode = JsonParseMode.Default, path: string) {
+  try {
+    return parseJson(input, mode);
+  } catch (e) {
+    if (e instanceof JsonException) {
+      throw new PathSpecificJsonException(path, e);
+    } else {
+      throw e;
+    }
+  }
 }
