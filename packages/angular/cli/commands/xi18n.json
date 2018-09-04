@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "id": "Xi18nCommandOptions",
+  "$id": "ng-cli://commands/xi18n.json",
   "description": "Extracts i18n messages from source code.",
   "$longDescription": "",
 
@@ -10,21 +10,8 @@
   "$impl": "./xi18n-impl#Xi18nCommand",
 
   "type": "object",
-  "properties": {
-    "project": {
-      "type": "string",
-      "description": "The name of the project to extract.",
-      "$default": {
-        "$source": "argv",
-        "index": 0
-      }
-    },
-    "configuration": {
-      "description": "Specify the configuration to use.",
-      "type": "string",
-      "aliases": ["c"]
-    }
-  },
-  "required": [
+  "allOf": [
+    { "$ref": "./definitions.json#/definitions/architect" },
+    { "$ref": "./definitions.json#/definitions/base" }
   ]
 }

@@ -12,15 +12,11 @@ import { Version } from '../upgrade/version';
 export class BuildCommand extends ArchitectCommand {
   public readonly target = 'build';
 
-  public validate(options: ArchitectCommandOptions) {
+  public async run(options: ArchitectCommandOptions) {
     // Check Angular and TypeScript versions.
     Version.assertCompatibleAngularVersion(this.project.root);
     Version.assertTypescriptVersion(this.project.root);
 
-    return super.validate(options);
-  }
-
-  public async run(options: ArchitectCommandOptions) {
     return this.runArchitectTarget(options);
   }
 }

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "id": "GenerateCommandOptions",
+  "$id": "ng-cli://commands/generate.json",
   "description": "Generates and/or modifies files based on a schematic.",
   "$longDescription": "",
 
@@ -9,34 +9,23 @@
   "$type": "schematics",
   "$impl": "./generate-impl#GenerateCommand",
 
-  "type": "object",
-  "properties": {
-    "schematic": {
-      "type": "string",
-      "description": "The schematic or collection:schematic to generate.",
-      "$default": {
-        "$source": "argv",
-        "index": 0
-      }
+  "allOf": [
+    {
+      "type": "object",
+      "properties": {
+        "schematic": {
+          "type": "string",
+          "description": "The schematic or collection:schematic to generate.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        }
+      },
+      "required": [
+      ]
     },
-    "dryRun": {
-      "type": "boolean",
-      "default": false,
-      "aliases": ["d"],
-      "description": "Run through without making any changes."
-    },
-    "force": {
-      "type": "boolean",
-      "default": false,
-      "aliases": ["f"],
-      "description": "Forces overwriting of files."
-    },
-    "interactive": {
-      "type": "boolean",
-      "default": "true",
-      "description": "Disables interactive inputs (i.e., prompts)."
-    }
-  },
-  "required": [
+    { "$ref": "./definitions.json#/definitions/base" },
+    { "$ref": "./definitions.json#/definitions/schematic" }
   ]
 }

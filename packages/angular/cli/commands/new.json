@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "id": "NewCommandOptions",
+  "$id": "ng-cli://commands/new.json",
   "description": "Creates a new directory and a new Angular app.",
   "$longDescription": "",
 
@@ -10,35 +10,24 @@
   "$impl": "./new-impl#NewCommand",
 
   "type": "object",
-  "properties": {
-    "collection": {
-      "type": "string",
-      "aliases": ["c"],
-      "description": "Schematics collection to use."
+  "allOf": [
+    {
+      "properties": {
+        "collection": {
+          "type": "string",
+          "aliases": [ "c" ],
+          "description": "Schematics collection to use."
+        },
+        "verbose": {
+          "type": "boolean",
+          "default": false,
+          "aliases": [ "v" ],
+          "description": "Adds more details to output logging."
+        }
+      },
+      "required": []
     },
-    "dryRun": {
-      "type": "boolean",
-      "default": false,
-      "aliases": ["d"],
-      "description": "Run through without making any changes."
-    },
-    "force": {
-      "type": "boolean",
-      "default": false,
-      "aliases": ["f"],
-      "description": "Forces overwriting of files."
-    },
-    "verbose": {
-      "type": "boolean",
-      "default": false,
-      "aliases": ["v"],
-      "description": "Adds more details to output logging."
-    },
-    "interactive": {
-      "type": "boolean",
-      "default": "true",
-      "description": "Disables interactive inputs (i.e., prompts)."
-    }
-  },
-  "required": []
+    { "$ref": "./definitions.json#/definitions/base" },
+    { "$ref": "./definitions.json#/definitions/schematic" }
+  ]
 }

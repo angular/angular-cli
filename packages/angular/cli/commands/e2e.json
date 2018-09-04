@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "id": "E2eCommandOptions",
-  "description": "",
+  "$id": "ng-cli://commands/e2e.json",
+  "description": "Runs the end-to-end tests.",
   "$longDescription": "",
 
   "$aliases": [ "e" ],
@@ -10,17 +10,8 @@
   "$impl": "./e2e-impl#E2eCommand",
 
   "type": "object",
-  "properties": {
-    "configuration": {
-      "description": "Specify the configuration to use.",
-      "type": "string",
-      "aliases": ["c"]
-    },
-    "prod": {
-      "description": "Flag to set configuration to 'production'.",
-      "type": "boolean"
-    }
-  },
-  "required": [
+  "allOf": [
+    { "$ref": "./definitions.json#/definitions/architect" },
+    { "$ref": "./definitions.json#/definitions/base" }
   ]
 }

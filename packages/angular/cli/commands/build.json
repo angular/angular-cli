@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "id": "BuildCommandOptions",
+  "$id": "ng-cli://commands/build.json",
   "description": "Builds your app and places it into the output path (dist/ by default).",
   "$longDescription": "",
 
@@ -9,26 +9,8 @@
   "$type": "architect",
   "$impl": "./build-impl#BuildCommand",
 
-  "type": "object",
-  "properties": {
-    "project": {
-      "type": "string",
-      "description": "The name of the project to build.",
-      "$default": {
-        "$source": "argv",
-        "index": 0
-      }
-    },
-    "configuration": {
-      "description": "Specify the configuration to use.",
-      "type": "string",
-      "aliases": ["c"]
-    },
-    "prod": {
-      "description": "Flag to set configuration to 'production'.",
-      "type": "boolean"
-    }
-  },
-  "required": [
+  "allOf": [
+    { "$ref": "./definitions.json#/definitions/architect" },
+    { "$ref": "./definitions.json#/definitions/base" }
   ]
 }

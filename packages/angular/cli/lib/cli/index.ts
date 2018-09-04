@@ -25,12 +25,9 @@ export default async function(options: { testing?: boolean, cliArgs: string[] })
   if (projectDetails === null) {
     projectDetails = { root: process.cwd() };
   }
-  const context = {
-    project: projectDetails,
-  };
 
   try {
-    const maybeExitCode = await runCommand(options.cliArgs, logger, context);
+    const maybeExitCode = await runCommand(options.cliArgs, logger, projectDetails);
     if (typeof maybeExitCode === 'number') {
       console.assert(Number.isInteger(maybeExitCode));
 

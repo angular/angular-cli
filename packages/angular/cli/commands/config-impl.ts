@@ -17,7 +17,7 @@ import {
   tags,
 } from '@angular-devkit/core';
 import { writeFileSync } from 'fs';
-import { Command } from '../models/command';
+import { BaseCommandOptions, Command } from '../models/command';
 import {
   getWorkspace,
   getWorkspaceRaw,
@@ -26,7 +26,7 @@ import {
 } from '../utilities/config';
 
 
-export interface ConfigOptions {
+export interface ConfigOptions extends BaseCommandOptions {
   jsonPath: string;
   value?: string;
   global?: boolean;
@@ -178,8 +178,8 @@ function normalizeValue(value: string, path: string): JsonValue {
   return value;
 }
 
-export class ConfigCommand extends Command {
-  public run(options: ConfigOptions) {
+export class ConfigCommand<T extends ConfigOptions = ConfigOptions> extends Command<T> {
+  public async run(options: T) {
     const level = options.global ? 'global' : 'local';
 
     let config =
@@ -210,7 +210,7 @@ export class ConfigCommand extends Command {
     }
   }
 
-  private get(config: experimental.workspace.WorkspaceSchema, options: ConfigOptions) {
+  private get(config: experimental.workspace.WorkspaceSchema, options: T) {
     let value;
     if (options.jsonPath) {
       value = getValueFromPath(config as {} as JsonObject, options.jsonPath);

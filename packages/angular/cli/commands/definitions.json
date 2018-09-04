@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/definitions.json",
+
+  "definitions": {
+    "architect": {
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "The name of the project to build.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        },
+        "configuration": {
+          "description": "Specify the configuration to use.",
+          "type": "string",
+          "aliases": [
+            "c"
+          ]
+        },
+        "prod": {
+          "description": "Flag to set configuration to 'production'.",
+          "type": "boolean"
+        }
+      }
+    },
+    "base": {
+      "type": "object",
+      "properties": {
+        "help": {
+          "type": "boolean",
+          "description": "Shows a help message."
+        },
+        "helpJson": {
+          "type": "boolean",
+          "description": "Shows the metadata associated with each flags, in JSON format."
+        }
+      }
+    },
+    "schematic": {
+      "properties": {
+        "dryRun": {
+          "type": "boolean",
+          "default": false,
+          "aliases": [ "d" ],
+          "description": "Run through without making any changes."
+        },
+        "force": {
+          "type": "boolean",
+          "default": false,
+          "aliases": [ "f" ],
+          "description": "Forces overwriting of files."
+        },
+        "interactive": {
+          "type": "boolean",
+          "default": "true",
+          "description": "Disables interactive inputs (i.e., prompts)."
+        }
+      }
+    }
+  }
+}

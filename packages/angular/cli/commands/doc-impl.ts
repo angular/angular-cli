@@ -6,31 +6,23 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Command } from '../models/command';
+import { BaseCommandOptions, Command } from '../models/command';
 const opn = require('opn');
 
-export interface Options {
+export interface DocCommandOptions extends BaseCommandOptions {
   keyword: string;
   search?: boolean;
 }
 
-export class DocCommand extends Command {
-  public validate(options: Options) {
-    if (!options.keyword) {
-      this.logger.error(`keyword argument is required.`);
-
-      return false;
-    }
-
-    return true;
-  }
-
-  public async run(options: Options) {
+export class DocCommand<T extends DocCommandOptions = DocCommandOptions> extends Command<T> {
+  public async run(options: T) {
     let searchUrl = `https://angular.io/api?query=${options.keyword}`;
     if (options.search) {
       searchUrl = `https://www.google.com/search?q=site%3Aangular.io+${options.keyword}`;
     }
 
-    return opn(searchUrl);
+    return opn(searchUrl, {
+      wait: false,
+    });
   }
 }
