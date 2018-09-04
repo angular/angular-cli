@@ -9,11 +9,13 @@
 import { of as observableOf } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import { CoreSchemaRegistry } from './registry';
+import { addUndefinedDefaults } from './transforms';
 
 
 describe('CoreSchemaRegistry', () => {
   it('works asynchronously', done => {
     const registry = new CoreSchemaRegistry();
+    registry.addPostTransform(addUndefinedDefaults);
     const data: any = {};  // tslint:disable-line:no-any
 
     registry
@@ -45,6 +47,7 @@ describe('CoreSchemaRegistry', () => {
 
   it('supports pre transforms', done => {
     const registry = new CoreSchemaRegistry();
+    registry.addPostTransform(addUndefinedDefaults);
     const data: any = {};  // tslint:disable-line:no-any
 
     registry.addPreTransform((data, ptr) => {
@@ -82,6 +85,7 @@ describe('CoreSchemaRegistry', () => {
 
   it('supports local references', done => {
     const registry = new CoreSchemaRegistry();
+    registry.addPostTransform(addUndefinedDefaults);
     const data = { numbers: { one: 1 } };
 
     registry
@@ -108,6 +112,7 @@ describe('CoreSchemaRegistry', () => {
 
   it('fails on invalid additionalProperties', done => {
     const registry = new CoreSchemaRegistry();
+    registry.addPostTransform(addUndefinedDefaults);
     const data = { notNum: 'foo' };
 
     registry
@@ -129,6 +134,7 @@ describe('CoreSchemaRegistry', () => {
 
   it('fails on invalid additionalProperties async', done => {
     const registry = new CoreSchemaRegistry();
+    registry.addPostTransform(addUndefinedDefaults);
     const data = { notNum: 'foo' };
 
     registry
@@ -156,6 +162,7 @@ describe('CoreSchemaRegistry', () => {
   // (i.e. not relyign on the observable).
   it('works synchronously', done => {
     const registry = new CoreSchemaRegistry();
+    registry.addPostTransform(addUndefinedDefaults);
     const data: any = {};  // tslint:disable-line:no-any
     let isDone = false;
 
@@ -298,7 +305,7 @@ describe('CoreSchemaRegistry', () => {
 
       return schema['blue'];
     });
-    registry.addSmartDefaultProvider('test3', (schema) => {
+    registry.addSmartDefaultProvider('test3', () => {
       return [ 1, 2, 3 ];
     });
 
@@ -369,6 +376,7 @@ describe('CoreSchemaRegistry', () => {
 
   it('adds undefined properties', done => {
     const registry = new CoreSchemaRegistry();
+    registry.addPostTransform(addUndefinedDefaults);
     const data: any = {};  // tslint:disable-line:no-any
 
     registry
