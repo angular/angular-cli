@@ -7,7 +7,8 @@
  */
 import { json } from '@angular-devkit/core';
 import { ExportStringRef } from '@angular-devkit/schematics/tools';
-import { dirname } from 'path';
+import { readFileSync } from 'fs';
+import { dirname, resolve } from 'path';
 import {
   CommandConstructor,
   CommandDescription,
@@ -57,12 +58,18 @@ export async function parseJsonSchemaToCommandDescription(
     });
   }
 
+  let longDescription = '';
+  if (typeof schema.$longDescription == 'string' && schema.$longDescription) {
+    const ldPath = resolve(dirname(jsonPath), schema.$longDescription);
+    longDescription = readFileSync(ldPath, 'utf-8');
+  }
+
   const scope = _getEnumFromValue(schema.$scope, CommandScope, CommandScope.Default);
   const type = _getEnumFromValue(schema.$type, CommandType, CommandType.Default);
   const description = '' + (schema.description === undefined ? '' : schema.description);
   const hidden = !!schema.$hidden;
 
-  return { name, description, hidden, type, options, aliases, scope, impl };
+  return { name, description, longDescription, hidden, type, options, aliases, scope, impl };
 }
 
 export async function parseJsonSchemaToOptions(

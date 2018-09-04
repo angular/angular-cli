@@ -74,10 +74,17 @@ export enum OptionType {
  * An option description. This is exposed when using `ng --help-json`.
  */
 export interface Option {
+  /**
+   * The name of the option.
+   */
   name: string;
+
+  /**
+   * A short description of the option.
+   */
   description: string;
 
-  type: OptionType;
+  type: OptionType | 'suboption';
   types?: OptionType[];
 
   aliases: string[];
@@ -108,6 +115,12 @@ export enum CommandType {
 export interface CommandDescription {
   name: string;
   description: string;
+
+  /**
+   * A long description of the option, in Markdown format.
+   */
+  longDescription: string;
+
   options: Option[];
 
   aliases: string[];

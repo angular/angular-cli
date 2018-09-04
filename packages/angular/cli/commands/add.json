@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/add.json",
   "description": "Add support for a library to your project.",
-  "$longDescription": "",
+  "$longDescription": "./add.md",
 
   "$scope": "in",
   "$impl": "./add-impl#AddCommand",
