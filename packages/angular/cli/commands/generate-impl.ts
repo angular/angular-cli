@@ -42,6 +42,12 @@ export class GenerateCommand<
 
       this.description.suboptions[`${collectionName}:${name}`] = options;
     }
+
+    this.description.options.forEach(option => {
+      if (option.name == 'schematic') {
+        option.type = 'suboption';
+      }
+    });
   }
 
   public async run(options: T) {
@@ -78,6 +84,7 @@ export class GenerateCommand<
   public async printHelp(options: T) {
     await super.printHelp(options);
 
+    this.logger.info('');
     if (Object.keys(this.description.suboptions || {}).length == 1) {
       this.logger.info(`\nTo see help for a schematic run:`);
       this.logger.info(terminal.cyan(`  ng generate <schematic> --help`));

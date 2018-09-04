@@ -7,19 +7,21 @@
  *
  */
 import { strings } from '@angular-devkit/core';
-import { Arguments, Option, Value } from './interface';
+import { Arguments, Option, OptionType, Value } from './interface';
 
 
-function _coerceType(str: string | undefined, type: string, v?: Value): Value | undefined {
+function _coerceType(str: string | undefined, type: OptionType, v?: Value): Value | undefined {
   switch (type) {
     case 'any':
       if (Array.isArray(v)) {
         return v.concat(str || '');
       }
 
-      return _coerceType(str, 'boolean', v) !== undefined ? _coerceType(str, 'boolean', v)
-           : _coerceType(str, 'number', v) !== undefined ? _coerceType(str, 'number', v)
-           : _coerceType(str, 'string', v);
+      return _coerceType(str, OptionType.Boolean, v) !== undefined
+           ? _coerceType(str, OptionType.Boolean, v)
+           : _coerceType(str, OptionType.Number, v) !== undefined
+           ? _coerceType(str, OptionType.Number, v)
+           : _coerceType(str, OptionType.String, v);
 
     case 'string':
       return str || '';
@@ -56,7 +58,13 @@ function _coerceType(str: string | undefined, type: string, v?: Value): Value | 
 }
 
 function _coerce(str: string | undefined, o: Option | null, v?: Value): Value | undefined {
-  return _coerceType(str, o ? o.type : 'any', v);
+  if (!o) {
+    return _coerceType(str, OptionType.Any, v);
+  } else if (o.type == 'suboption') {
+    return _coerceType(str, OptionType.String, v);
+  } else {
+    return _coerceType(str, o.type, v);
+  }
 }
 
 
