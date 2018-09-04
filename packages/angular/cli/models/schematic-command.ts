@@ -53,6 +53,7 @@ export interface BaseSchematicOptions extends BaseCommandOptions {
   dryRun?: boolean;
   force?: boolean;
   interactive?: boolean;
+  defaults?: boolean;
 }
 
 export interface RunSchematicOptions {
@@ -234,7 +235,11 @@ export abstract class SchematicCommand<
 
     this._engineHost.registerOptionsTransform(validateOptionsWithSchema(workflow.registry));
 
-    workflow.registry.addPostTransform(schema.transforms.addUndefinedDefaults);
+    if (options.defaults) {
+      workflow.registry.addPreTransform(schema.transforms.addUndefinedDefaults);
+    } else {
+      workflow.registry.addPostTransform(schema.transforms.addUndefinedDefaults);
+    }
 
     workflow.registry.addSmartDefaultProvider('projectName', () => {
       if (this._workspace) {
