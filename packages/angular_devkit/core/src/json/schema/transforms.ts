@@ -7,55 +7,7 @@
  */
 import { JsonObject, JsonValue, isJsonObject } from '../interface';
 import { JsonPointer } from './interface';
-
-const allTypes = ['string', 'integer', 'number', 'object', 'array', 'boolean', 'null'];
-
-function findTypes(schema: JsonObject): Set<string> {
-  if (!schema) {
-    return new Set();
-  }
-
-  let potentials: Set<string>;
-  if (typeof schema.type === 'string') {
-    potentials = new Set([schema.type]);
-  } else if (Array.isArray(schema.type)) {
-    potentials = new Set(schema.type as string[]);
-  } else {
-    potentials = new Set(allTypes);
-  }
-
-  if (isJsonObject(schema.not)) {
-    const notTypes = findTypes(schema.not);
-    potentials = new Set([...potentials].filter(p => !notTypes.has(p)));
-  }
-
-  if (Array.isArray(schema.allOf)) {
-    for (const sub of schema.allOf) {
-      const types = findTypes(sub as JsonObject);
-      potentials = new Set([...potentials].filter(p => types.has(p)));
-    }
-  }
-
-  if (Array.isArray(schema.oneOf)) {
-    let options = new Set<string>();
-    for (const sub of schema.oneOf) {
-      const types = findTypes(sub as JsonObject);
-      options = new Set([...options, ...types]);
-    }
-    potentials = new Set([...potentials].filter(p => options.has(p)));
-  }
-
-  if (Array.isArray(schema.anyOf)) {
-    let options = new Set<string>();
-    for (const sub of schema.anyOf) {
-      const types = findTypes(sub as JsonObject);
-      options = new Set([...options, ...types]);
-    }
-    potentials = new Set([...potentials].filter(p => options.has(p)));
-  }
-
-  return potentials;
-}
+import { getTypesOfSchema } from './utility';
 
 export function addUndefinedDefaults(
   value: JsonValue,
@@ -66,7 +18,7 @@ export function addUndefinedDefaults(
     return value;
   }
 
-  const types = findTypes(schema);
+  const types = getTypesOfSchema(schema);
   if (types.size === 0) {
     return value;
   }
@@ -109,6 +61,8 @@ export function addUndefinedDefaults(
 
     for (const propName of Object.getOwnPropertyNames(schema.properties)) {
       if (propName in newValue) {
+        continue;
+      } else if (propName == '$schema') {
         continue;
       }
 
