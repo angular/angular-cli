@@ -63,6 +63,7 @@ export class Workspace {
 
   constructor(private _root: Path, private _host: virtualFs.Host<{}>) {
     this._registry = new schema.CoreSchemaRegistry();
+    this._registry.addPostTransform(schema.transforms.addUndefinedDefaults);
   }
 
   loadWorkspaceFromJson(json: {}) {
@@ -232,7 +233,9 @@ export class Workspace {
     let workspaceTool = this._workspace[toolName];
 
     // Try falling back to 'architect' if 'targets' is not there or is empty.
-    if ((!workspaceTool || Object.keys(workspaceTool).length === 0) && toolName === 'targets') {
+    if ((!workspaceTool || Object.keys(workspaceTool).length === 0)
+        && toolName === 'targets'
+        && this._workspace['architect']) {
       workspaceTool = this._workspace['architect'];
     }
 
@@ -257,10 +260,11 @@ export class Workspace {
     let projectTool = workspaceProject[toolName];
 
     // Try falling back to 'architect' if 'targets' is not there or is empty.
-    if ((!projectTool || Object.keys(projectTool).length === 0) && toolName === 'targets') {
+    if ((!projectTool || Object.keys(projectTool).length === 0)
+        && workspaceProject['architect']
+        && toolName === 'targets') {
       projectTool = workspaceProject['architect'];
     }
-
 
     if (!projectTool) {
       throw new ProjectToolNotFoundException(toolName);
