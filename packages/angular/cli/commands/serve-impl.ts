@@ -15,8 +15,8 @@ export class ServeCommand extends ArchitectCommand {
 
   public validate(_options: ArchitectCommandOptions) {
     // Check Angular and TypeScript versions.
-    Version.assertCompatibleAngularVersion(this.project.root);
-    Version.assertTypescriptVersion(this.project.root);
+    Version.assertCompatibleAngularVersion(this.workspace.root);
+    Version.assertTypescriptVersion(this.workspace.root);
 
     return true;
   }

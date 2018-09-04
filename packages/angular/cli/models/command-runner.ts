@@ -23,7 +23,7 @@ import { Command } from './command';
 import {
   CommandDescription,
   CommandDescriptionMap,
-  CommandProject,
+  CommandWorkspace,
 } from './interface';
 import * as parser from './parser';
 
@@ -36,13 +36,13 @@ export interface CommandMapOptions {
  * Run a command.
  * @param args Raw unparsed arguments.
  * @param logger The logger to use.
- * @param project Project data structure containing project information.
+ * @param workspace Workspace information.
  * @param commands The map of supported commands.
  */
 export async function runCommand(
   args: string[],
   logger: logging.Logger,
-  project: CommandProject,
+  workspace: CommandWorkspace,
   commands?: CommandMapOptions,
 ): Promise<number | void> {
   if (commands === undefined) {
@@ -176,7 +176,7 @@ export async function runCommand(
 
   const parsedOptions = parser.parseArguments(args, description.options);
   Command.setCommandMap(commandMap);
-  const command = new description.impl({ project }, description, logger);
+  const command = new description.impl({ workspace }, description, logger);
 
   return await command.validateAndRun(parsedOptions);
 }

@@ -7,22 +7,35 @@
  */
 import { json, logging } from '@angular-devkit/core';
 
+/**
+ * Value type of arguments.
+ */
 export type Value = number | string | boolean | (number | string | boolean)[];
 
-export type Arguments = {
-  [argName: string]: Value;
-} & {
+/**
+ * An object representing parsed arguments from the command line.
+ */
+export interface Arguments {
+  [argName: string]: Value | undefined;
+
+  /**
+   * Extra arguments that were not parsed. Will be omitted if all arguments were parsed.
+   */
   '--'?: string[];
 }
 
-export interface CommandInterface<T = {}> {
-  initialize(options: T): Promise<void>;
+/**
+ * The base interface for Command, understood by the command runner.
+ */
+export interface CommandInterface<T extends Arguments = Arguments> {
   printHelp(options: T): Promise<number>;
-  printJsonHelp(_options: T): Promise<number>;
-  run(options: T & Arguments): Promise<number | void>;
-  validateAndRun(options: T & Arguments): Promise<number | void>;
+  printJsonHelp(options: T): Promise<number>;
+  validateAndRun(options: T): Promise<number>;
 }
 
+/**
+ * Command constructor.
+ */
 export interface CommandConstructor {
   new(
     context: CommandContext,
@@ -31,15 +44,24 @@ export interface CommandConstructor {
   ): CommandInterface;
 }
 
-export interface CommandProject {
+/**
+ * A CLI workspace information.
+ */
+export interface CommandWorkspace {
   root: string;
   configFile?: string;
 }
 
+/**
+ * A command runner context.
+ */
 export interface CommandContext {
-  project: CommandProject;
+  workspace: CommandWorkspace;
 }
 
+/**
+ * Value types of an Option.
+ */
 export enum OptionType {
   String = 'string',
   Number = 'number',
@@ -48,11 +70,16 @@ export enum OptionType {
   Any = 'any',
 }
 
+/**
+ * An option description. This is exposed when using `ng --help-json`.
+ */
 export interface Option {
   name: string;
   description: string;
+
   type: OptionType;
   types?: OptionType[];
+
   aliases: string[];
   required?: boolean;
   format?: string;
@@ -85,17 +112,12 @@ export interface CommandDescription {
 
   aliases: string[];
   scope: CommandScope;
+  type: CommandType;
 
   impl: CommandConstructor;
 
   hidden: boolean;
-
-  type: CommandType;
-
-  schematics?: {
-    [name: string]: Option[];
-  };
-  architect?: {
+  suboptions?: {
     [name: string]: Option[];
   };
 }

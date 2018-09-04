@@ -14,20 +14,19 @@ import {
   CommandContext,
   CommandDescription,
   CommandDescriptionMap,
-  CommandProject,
   CommandScope,
+  CommandWorkspace,
   Option,
 } from './interface';
 
-export interface BaseCommandOptions {
+export interface BaseCommandOptions extends Arguments {
   help?: boolean;
-  help_json?: boolean;
-  '--': string[];
+  helpJson?: boolean;
 }
 
 export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions> {
   public allowMissingWorkspace = false;
-  public project: CommandProject;
+  public workspace: CommandWorkspace;
 
   protected static commandMap: CommandDescriptionMap;
   static setCommandMap(map: CommandDescriptionMap) {
@@ -39,7 +38,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     public readonly description: CommandDescription,
     protected readonly logger: logging.Logger,
   ) {
-    this.project = context.project;
+    this.workspace = context.workspace;
   }
 
   async initialize(options: T): Promise<void> {
@@ -113,16 +112,16 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
   async validateScope(): Promise<void> {
     switch (this.description.scope) {
       case CommandScope.OutProject:
-        if (this.project.configFile || getWorkspace('local') !== null) {
+        if (this.workspace.configFile || getWorkspace('local') !== null) {
           this.logger.fatal(tags.oneLine`
             The ${this.description.name} command requires to be run outside of a project, but a
-            project definition was found at "${this.project.root}".
+            project definition was found at "${this.workspace.root}".
           `);
           throw 1;
         }
         break;
       case CommandScope.InProject:
-        if (!this.project.configFile || getWorkspace('local') === null) {
+        if (!this.workspace.configFile || getWorkspace('local') === null) {
           this.logger.fatal(tags.oneLine`
             The ${this.description.name} command requires to be run in an Angular project, but a
             project definition could not be found.
@@ -139,14 +138,14 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
   abstract async run(options: T & Arguments): Promise<number | void>;
 
   async validateAndRun(options: T & Arguments): Promise<number | void> {
-    if (!options.help && !options.help_json) {
+    if (!options.help && !options.helpJson) {
       await this.validateScope();
     }
     await this.initialize(options);
 
     if (options.help) {
       return this.printHelp(options);
-    } else if (options.help_json) {
+    } else if (options.helpJson) {
       return this.printJsonHelp(options);
     } else {
       return await this.run(options);

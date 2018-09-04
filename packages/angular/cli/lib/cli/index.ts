@@ -9,19 +9,17 @@
 import { logging, terminal } from '@angular-devkit/core';
 import { filter } from 'rxjs/operators';
 import { runCommand } from '../../models/command-runner';
-import { getProjectDetails } from '../../utilities/project';
+import { getWorkspaceDetails } from '../../utilities/project';
 
 
 export default async function(options: { testing?: boolean, cliArgs: string[] }) {
-  // const commands = await loadCommands();
-
   const logger = new logging.IndentLogger('cling');
   let loggingSubscription;
   if (!options.testing) {
     loggingSubscription = initializeLogging(logger);
   }
 
-  let projectDetails = getProjectDetails();
+  let projectDetails = getWorkspaceDetails();
   if (projectDetails === null) {
     projectDetails = { root: process.cwd() };
   }
