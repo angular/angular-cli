@@ -79,7 +79,7 @@ export async function parseJsonSchemaToOptions(
     if (!parentSchema) {
       // Ignore root.
       return;
-    } else if (pointer.split(/properties|items/g).length > 2) {
+    } else if (pointer.split(/\/(?:properties|items|definitions)\//g).length > 2) {
       // Ignore subitems (objects or arrays).
       return;
     } else if (json.isJsonArray(current)) {
