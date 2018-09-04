@@ -196,6 +196,11 @@ function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
         serverTarget: `${options.clientProject}:server`,
         route: options.route,
       },
+      configurations: {
+        production: {
+          browserTarget: `${options.clientProject}:build:production`,
+        },
+      },
     };
 
     if (!workspace.projects[options.clientProject]) {
