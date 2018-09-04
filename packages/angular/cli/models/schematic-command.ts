@@ -100,10 +100,9 @@ export abstract class SchematicCommand<
 
   public async printHelp(options: T) {
     await super.printHelp(options);
-    const schematicNames = Object.keys(this.description.suboptions || {});
-
-    await super.printHelpOptions();
     this.logger.info('');
+
+    const schematicNames = Object.keys(this.description.suboptions || {});
 
     if (this.description.suboptions) {
       if (schematicNames.length > 1) {
