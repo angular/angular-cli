@@ -54,6 +54,11 @@
           "type": "boolean",
           "default": "true",
           "description": "Disables interactive inputs (i.e., prompts)."
+        },
+        "defaults": {
+          "type": "boolean",
+          "default": "false",
+          "description": "Disables interactive inputs (i.e., prompts) for options with a default."
         }
       }
     }
