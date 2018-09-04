@@ -26,7 +26,7 @@ export class GenerateCommand<
     const [collectionName, schematicName] = this.parseSchematicInfo(options);
 
     const collection = this.getCollection(collectionName);
-    this.description.schematics = {};
+    this.description.suboptions = {};
 
     const schematicNames = schematicName ? [schematicName] : collection.listSchematicNames();
 
@@ -40,7 +40,7 @@ export class GenerateCommand<
         );
       }
 
-      this.description.schematics[`${collectionName}:${name}`] = options;
+      this.description.suboptions[`${collectionName}:${name}`] = options;
     }
   }
 
@@ -78,7 +78,7 @@ export class GenerateCommand<
   public async printHelp(options: T) {
     await super.printHelp(options);
 
-    if (Object.keys(this.description.schematics || {}).length == 1) {
+    if (Object.keys(this.description.suboptions || {}).length == 1) {
       this.logger.info(`\nTo see help for a schematic run:`);
       this.logger.info(terminal.cyan(`  ng generate <schematic> --help`));
     }

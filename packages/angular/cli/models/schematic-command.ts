@@ -100,13 +100,12 @@ export abstract class SchematicCommand<
 
   public async printHelp(options: T) {
     await super.printHelp(options);
-    const schematicNames = Object.keys(this.description.schematics || {});
+    const schematicNames = Object.keys(this.description.suboptions || {});
 
     await super.printHelpOptions();
     this.logger.info('');
 
-    if (this.description.schematics) {
-
+    if (this.description.suboptions) {
       if (schematicNames.length > 1) {
         this.logger.info('Available Schematics:');
 
@@ -134,7 +133,7 @@ export abstract class SchematicCommand<
         });
       } else if (schematicNames.length == 1) {
         this.logger.info('Options for schematic ' + schematicNames[0]);
-        await this.printHelpOptions(this.description.schematics[schematicNames[0]]);
+        await this.printHelpOptions(this.description.suboptions[schematicNames[0]]);
       }
     }
 
@@ -142,8 +141,8 @@ export abstract class SchematicCommand<
   }
 
   async printHelpUsage() {
-    const schematicNames = Object.keys(this.description.schematics || {});
-    if (this.description.schematics && schematicNames.length == 1) {
+    const schematicNames = Object.keys(this.description.suboptions || {});
+    if (this.description.suboptions && schematicNames.length == 1) {
       this.logger.info(this.description.description);
 
       const opts = this.description.options.filter(x => x.positional === undefined);
@@ -155,7 +154,7 @@ export abstract class SchematicCommand<
         ? schematicName
         : schematicNames[0];
 
-      const schematicOptions = this.description.schematics[schematicNames[0]];
+      const schematicOptions = this.description.suboptions[schematicNames[0]];
       const schematicArgs = schematicOptions.filter(x => x.positional !== undefined);
       const argDisplay = schematicArgs.length > 0
         ? ' ' + schematicArgs.map(a => `<${strings.dasherize(a.name)}>`).join(' ')
@@ -222,7 +221,7 @@ export abstract class SchematicCommand<
     }
 
     const {force, dryRun} = options;
-    const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(this.project.root));
+    const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(this.workspace.root));
 
     const workflow = new NodeWorkflow(
         fsHost,
@@ -230,7 +229,7 @@ export abstract class SchematicCommand<
           force,
           dryRun,
           packageManager: getPackageManager(),
-          root: normalize(this.project.root),
+          root: normalize(this.workspace.root),
         },
     );
 
@@ -346,7 +345,7 @@ export abstract class SchematicCommand<
 
     const workflow = this._workflow;
 
-    const workingDir = normalize(systemPath.relative(this.project.root, process.cwd()));
+    const workingDir = normalize(systemPath.relative(this.workspace.root, process.cwd()));
 
     // Get the option object from the schematic schema.
     const schematic = this.getSchematic(
@@ -476,7 +475,7 @@ export abstract class SchematicCommand<
     const workspaceLoader = new WorkspaceLoader(this._host);
 
     try {
-      workspaceLoader.loadWorkspace(this.project.root).pipe(take(1))
+      workspaceLoader.loadWorkspace(this.workspace.root).pipe(take(1))
         .subscribe(
           (workspace: experimental.workspace.Workspace) => this._workspace = workspace,
           (err: Error) => {

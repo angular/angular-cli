@@ -16,8 +16,6 @@ import { getPackageManager } from '../utilities/config';
 
 export interface AddCommandOptions extends BaseSchematicOptions {
   collection: string;
-  help?: boolean;
-  help_json?: boolean;
 }
 
 export class AddCommand<
@@ -56,12 +54,12 @@ export class AddCommand<
       packageName,
       this.logger,
       packageManager,
-      this.project.root,
+      this.workspace.root,
     );
 
     const runOptions = {
       schematicOptions: options['--'] || [],
-      workingDir: this.project.root,
+      workingDir: this.workspace.root,
       collectionName,
       schematicName: 'ng-add',
       allowPrivate: true,

@@ -45,7 +45,8 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
 
     if (!options.project && this.target) {
       const projectNames = this.getProjectNamesByTarget(this.target);
-      if (projectNames.length > 1 && options['--'] && options['--'].length > 0) {
+      const leftovers = options['--'];
+      if (projectNames.length > 1 && leftovers && leftovers.length > 0) {
         // Verify that all builders are the same, otherwise error out (since the meaning of an
         // option could vary from builder to builder).
 
@@ -183,7 +184,7 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
   private _loadWorkspaceAndArchitect() {
     const workspaceLoader = new WorkspaceLoader(this._host);
 
-    return workspaceLoader.loadWorkspace(this.project.root).pipe(
+    return workspaceLoader.loadWorkspace(this.workspace.root).pipe(
       tap((workspace: experimental.workspace.Workspace) => this._workspace = workspace),
       concatMap((workspace: experimental.workspace.Workspace) => {
         return new Architect(workspace).loadArchitect();

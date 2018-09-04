@@ -14,8 +14,8 @@ export class BuildCommand extends ArchitectCommand {
 
   public async run(options: ArchitectCommandOptions) {
     // Check Angular and TypeScript versions.
-    Version.assertCompatibleAngularVersion(this.project.root);
-    Version.assertTypescriptVersion(this.project.root);
+    Version.assertCompatibleAngularVersion(this.workspace.root);
+    Version.assertTypescriptVersion(this.workspace.root);
 
     return this.runArchitectTarget(options);
   }
