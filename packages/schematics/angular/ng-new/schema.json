@@ -90,7 +90,10 @@
     "version": {
       "type": "string",
       "description": "The version of the Angular CLI to use.",
-      "visible": false
+      "visible": false,
+      "$default": {
+        "$source": "ng-cli-version"
+      }
     },
     "routing": {
       "type": "boolean",
@@ -117,6 +120,5 @@
     }
   },
   "required": [
-    "version"
   ]
 }

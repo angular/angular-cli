@@ -44,11 +44,13 @@ export class NewCommand extends SchematicCommand {
       collectionName = this.parseCollectionName(options);
     }
 
+    // Register the version of the CLI in the registry.
     const packageJson = require('../package.json');
-    options.version = packageJson.version;
+    const version = packageJson.version;
 
     // Ensure skipGit has a boolean value.
     options.skipGit = options.skipGit === undefined ? false : options.skipGit;
+    this._workflow.registry.addSmartDefaultProvider('ng-cli-version', () => version);
 
     return this.runSchematic({
       collectionName: collectionName,
