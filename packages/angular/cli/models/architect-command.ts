@@ -87,6 +87,12 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
     if ((!targetSpec.project || !targetSpec.target) && !this.multiTarget) {
       throw new Error('Cannot determine project or target for Architect command.');
     }
+
+    const builderConf = this._architect.getBuilderConfiguration(targetSpec);
+    const builderDesc = await this._architect.getBuilderDescription(builderConf).toPromise();
+    const targetOptionArray = await parseJsonSchemaToOptions(this._registry, builderDesc.schema);
+
+    this.description.options.push(...targetOptionArray);
   }
 
   async run(options: ArchitectCommandOptions) {
