@@ -57,6 +57,7 @@ export class SchematicTestRunner {
     this._logger = new logging.Logger('test');
 
     const registry = new schema.CoreSchemaRegistry(formats.standardFormats);
+    registry.addPostTransform(schema.transforms.addUndefinedDefaults);
 
     this._engineHost.registerOptionsTransform(validateOptionsWithSchema(registry));
     this._engineHost.registerTaskExecutor(BuiltinTaskExecutor.NodePackage);

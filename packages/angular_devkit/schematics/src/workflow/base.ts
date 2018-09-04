@@ -62,7 +62,14 @@ export abstract class BaseWorkflow implements Workflow {
   constructor(options: BaseWorkflowOptions) {
     this._host = options.host;
     this._engineHost = options.engineHost;
-    this._registry = options.registry || new schema.CoreSchemaRegistry(standardFormats);
+
+    if (options.registry) {
+      this._registry = options.registry;
+    } else {
+      this._registry = new schema.CoreSchemaRegistry(standardFormats);
+      this._registry.addPostTransform(schema.transforms.addUndefinedDefaults);
+    }
+
     this._engine = new SchematicEngine(this._engineHost, this);
 
     this._context = [];

@@ -10,6 +10,7 @@ import {
   Collection,
   CollectionDescription,
   RuleFactory,
+  Schematic,
   SchematicDescription,
   TypedSchematicContext,
 } from '../src';
@@ -45,6 +46,8 @@ export interface FileSystemSchematicDescription extends FileSystemSchematicJsonD
  */
 export declare type FileSystemCollection
   = Collection<FileSystemCollectionDescription, FileSystemSchematicDescription>;
+export declare type FileSystemSchematic
+  = Schematic<FileSystemCollectionDescription, FileSystemSchematicDescription>;
 export declare type FileSystemCollectionDesc
   = CollectionDescription<FileSystemCollectionDescription>;
 export declare type FileSystemSchematicDesc
