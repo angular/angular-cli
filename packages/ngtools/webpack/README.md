@@ -43,6 +43,7 @@ The loader works with webpack plugin to compile your TypeScript. It's important 
 * `sourceMap`. Optional. Include sourcemaps.
 * `compilerOptions`. Optional. Override options in `tsconfig.json`.
 * `contextElementDependencyConstructor`. Optional. Set to `require('webpack/lib/dependencies/ContextElementDependency')` if you are having `No module factory available for dependency type: ContextElementDependency` errors.
+* `keepAotRemoveDecorators`, Optional. Allows to keep the decorators in AOT production.
 
 ## Features
 The benefits and ability of using [`@ngtools/webpack`](https://www.npmjs.com/~ngtools) standalone from the Angular CLI as presented in [Stephen Fluin's Angular CLI talk](https://youtu.be/uBRK6cTr4Vk?t=6m45s) at Angular Connect 2016:
