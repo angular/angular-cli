@@ -26,12 +26,11 @@ load("@io_bazel_rules_go//go:def.bzl", "go_register_toolchains", "go_rules_depen
 go_rules_dependencies()
 go_register_toolchains()
 
-# We need a minimum of this version to include https://github.com/bazelbuild/rules_nodejs/pull/281.
 http_archive(
     name = "build_bazel_rules_nodejs",
-    url = "https://github.com/bazelbuild/rules_nodejs/archive/c75e3dd0571b0937e3ce0c4f0e6b6b50d90468f0.zip",
-    strip_prefix = "rules_nodejs-c75e3dd0571b0937e3ce0c4f0e6b6b50d90468f0",
-    sha256 = "b78506ddaed7c682027f873d2bd50086a28570b3187da9fa16fe1672eed3015e",
+    url = "https://github.com/bazelbuild/rules_nodejs/archive/0.12.2.zip",
+    strip_prefix = "rules_nodejs-0.12.2",
+    sha256 = "b691443ee5877214bfce3b006204528ef92ee57c2c5d21aec6a757bc6f58a7b8",
 )
 
 # Load the TypeScript rules, its dependencies, and setup the workspace.

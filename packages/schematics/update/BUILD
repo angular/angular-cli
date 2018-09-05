@@ -20,6 +20,11 @@ ts_library(
             "**/*_benchmark.ts",
         ],
     ),
+    data = [
+        "collection.json",
+        "migrate/schema.json",
+        "update/schema.json",
+    ],
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
