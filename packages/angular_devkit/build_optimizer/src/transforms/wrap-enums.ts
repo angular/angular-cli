@@ -221,9 +221,13 @@ function findTs2_3EnumIife(
   }
 
   const parameter = expression.parameters[0];
-  if (!ts.isIdentifier(parameter.name) || parameter.name.text !== name) {
+  if (!ts.isIdentifier(parameter.name)) {
     return null;
   }
+
+  // The name of the parameter can be different than the name of the enum if it was renamed
+  // due to scope hoisting.
+  const parameterName = parameter.name.text;
 
   // In TS 2.3 enums, the IIFE contains only expressions with a certain format.
   // If we find any that is different, we ignore the whole thing.
@@ -245,7 +249,7 @@ function findTs2_3EnumIife(
       return null;
     }
 
-    if (!ts.isIdentifier(assignment.expression) || assignment.expression.text !== name) {
+    if (!ts.isIdentifier(assignment.expression) || assignment.expression.text !== parameterName) {
       return null;
     }
 
@@ -261,7 +265,7 @@ function findTs2_3EnumIife(
     }
 
     if (!ts.isIdentifier(memberArgument.left.expression)
-        || memberArgument.left.expression.text !== name) {
+      || memberArgument.left.expression.text !== parameterName) {
       return null;
     }
 
