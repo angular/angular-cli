@@ -20,24 +20,3 @@ export function collectDeepNodes<T extends ts.Node>(node: ts.Node, kind: ts.Synt
 
   return nodes;
 }
-
-export function drilldownNodes<T extends ts.Node>(
-  startingNode: T,
-  path: { prop: keyof T, kind: ts.SyntaxKind }[],
-): T | null {
-  let currentNode: T = startingNode;
-  for (const segment of path) {
-    if (segment.prop) {
-      // ts.Node has no index signature, so we need to cast it as any.
-      const tempNode = currentNode[segment.prop];
-      if (!tempNode || typeof tempNode != 'object' || currentNode.kind !== segment.kind) {
-        return null;
-      }
-
-      // tslint:disable-next-line:no-any
-      currentNode = tempNode as any as T;
-    }
-  }
-
-  return currentNode;
-}
