@@ -341,6 +341,13 @@ describe('scrub-file', () => {
             NotInput(),
             __metadata("design:type", Object)
           ], Clazz.prototype, "other", void 0);
+          Clazz.prototype.myMethod = function () { return 'bar'; };
+          __decorate([
+            myDecorator(),
+            __metadata("design:type", Function),
+            __metadata("design:paramtypes", []),
+            __metadata("design:returntype", void 0)
+          ], MyClass.prototype, "myMethod", null);
           return Clazz;
         }());
       `;
@@ -357,6 +364,13 @@ describe('scrub-file', () => {
             NotInput(),
             __metadata("design:type", Object)
           ], Clazz.prototype, "other", void 0);
+          Clazz.prototype.myMethod = function () { return 'bar'; };
+          __decorate([
+            myDecorator(),
+            __metadata("design:type", Function),
+            __metadata("design:paramtypes", []),
+            __metadata("design:returntype", void 0)
+          ], MyClass.prototype, "myMethod", null);
           return Clazz;
         }());
       `;
