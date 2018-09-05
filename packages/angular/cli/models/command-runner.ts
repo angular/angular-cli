@@ -52,15 +52,21 @@ export async function runCommand(
     }
     const cliDir = dirname(commandMapPath);
     const commandsText = readFileSync(commandMapPath).toString('utf-8');
-    const commandJson = json.parseJsonFile(
+    const commandJson = json.parseJson(
       commandsText,
       JsonParseMode.Loose,
-      commandMapPath,
-    ) as { [name: string]: string };
+      { path: commandMapPath },
+    );
+    if (!isJsonObject(commandJson)) {
+      throw Error('Invalid command.json');
+    }
 
     commands = {};
     for (const commandName of Object.keys(commandJson)) {
-      commands[commandName] = resolve(cliDir, commandJson[commandName]);
+      const commandValue = commandJson[commandName];
+      if (typeof commandValue == 'string') {
+        commands[commandName] = resolve(cliDir, commandValue);
+      }
     }
   }
 
@@ -79,7 +85,7 @@ export async function runCommand(
   for (const name of Object.keys(commands)) {
     const schemaPath = commands[name];
     const schemaContent = readFileSync(schemaPath, 'utf-8');
-    const schema = json.parseJsonFile(schemaContent, JsonParseMode.Loose, schemaPath);
+    const schema = json.parseJson(schemaContent, JsonParseMode.Loose, { path: schemaPath });
     if (!isJsonObject(schema)) {
       throw new Error('Invalid command JSON loaded from ' + JSON.stringify(schemaPath));
     }

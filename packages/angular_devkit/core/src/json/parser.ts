@@ -862,40 +862,48 @@ export function parseJsonAst(input: string, mode = JsonParseMode.Default): JsonA
 
 
 /**
- * Parse a JSON string into its value.  This discards the AST and only returns the value itself.
- * @param input The string to parse.
- * @param mode The mode to parse the input with. {@see JsonParseMode}.
- * @returns {JsonValue} The value represented by the JSON string.
+ * Options for the parseJson() function.
  */
-export function parseJson(input: string, mode = JsonParseMode.Default): JsonValue {
-  // Try parsing for the fastest path available, if error, uses our own parser for better errors.
-  if (mode == JsonParseMode.Strict) {
-    try {
-      return JSON.parse(input);
-    } catch (err) {
-      return parseJsonAst(input, mode).value;
-    }
-  }
-
-  return parseJsonAst(input, mode).value;
+interface ParseJsonOptions {
+  /**
+   * If omitted, will only emit errors related to the content of the JSON. If specified, any
+   * JSON errors will also include the path of the file that caused the error.
+   */
+  path?: string;
 }
+
 
 /**
  * Parse a JSON string into its value.  This discards the AST and only returns the value itself.
- * It also absorbs JSON parsing errors and return a new error with the path in it. Useful for
- * showing errors when parsing from a file.
+ *
+ * If a path option is pass, it also absorbs JSON parsing errors and return a new error with the
+ * path in it. Useful for showing errors when parsing from a file.
+ *
  * @param input The string to parse.
  * @param mode The mode to parse the input with. {@see JsonParseMode}.
+ * @param options Additional optinos for parsing.
  * @returns {JsonValue} The value represented by the JSON string.
  */
-export function parseJsonFile(input: string, mode = JsonParseMode.Default, path: string) {
+export function parseJson(
+  input: string,
+  mode = JsonParseMode.Default,
+  options?: ParseJsonOptions,
+): JsonValue {
   try {
-    return parseJson(input, mode);
-  } catch (e) {
-    if (e instanceof JsonException) {
-      throw new PathSpecificJsonException(path, e);
-    } else {
-      throw e;
+    // Try parsing for the fastest path available, if error, uses our own parser for better errors.
+    if (mode == JsonParseMode.Strict) {
+      try {
+        return JSON.parse(input);
+      } catch (err) {
+        return parseJsonAst(input, mode).value;
+      }
     }
+
+    return parseJsonAst(input, mode).value;
+  } catch (e) {
+    if (options && options.path && e instanceof JsonException) {
+      throw new PathSpecificJsonException(options.path, e);
+    }
+    throw e;
   }
 }
