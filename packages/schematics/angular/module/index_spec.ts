@@ -63,6 +63,15 @@ describe('Module Schematic', () => {
     expect(content).toMatch(/imports: \[[^\]]*FooModule[^\]]*\]/m);
   });
 
+  it('should import into another module when using flat', () => {
+    const options = { ...defaultOptions, flat: true, module: 'app.module.ts' };
+
+    const tree = schematicRunner.runSchematic('module', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/app.module.ts');
+    expect(content).toMatch(/import { FooModule } from '.\/foo.module'/);
+    expect(content).toMatch(/imports: \[[^\]]*FooModule[^\]]*\]/m);
+  });
+
   it('should import into another module (deep)', () => {
     let tree = appTree;
 
