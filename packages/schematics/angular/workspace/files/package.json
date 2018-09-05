@@ -42,6 +42,6 @@
     "protractor": "~5.4.0",
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
-    "typescript": "<%= latestVersions.TypeScript %>"
+    "typescript": "<%= experimentalAngularNext ? '~3.0.3' : latestVersions.TypeScript %>"
   }
 }
