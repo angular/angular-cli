@@ -35,15 +35,15 @@
     "validate-commits": "./bin/devkit-admin validate-commits",
     "prepush": "node ./bin/devkit-admin hooks/pre-push",
     "webdriver-update-appveyor": "webdriver-manager update --standalone false --gecko false --versions.chrome 2.37",
-    "webdriver-update-circleci": "webdriver-manager update --standalone false --gecko false --versions.chrome 2.33"
+    "webdriver-update-circleci": "webdriver-manager update --standalone false --gecko false --versions.chrome $CHROMEDRIVER_VERSION_ARG "
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/angular/angular-cli.git"
   },
   "engines": {
-    "node": ">= 8.9.0",
-    "npm": ">= 5.5.1"
+    "node": ">=10.3.0 <11.0.0",
+    "yarn": ">=1.6.0 <2.0.0"
   },
   "author": "Angular Authors",
   "license": "MIT",

@@ -29,9 +29,9 @@ go_register_toolchains()
 # We need a minimum of this version to include https://github.com/bazelbuild/rules_nodejs/pull/281.
 http_archive(
     name = "build_bazel_rules_nodejs",
-    url = "https://github.com/bazelbuild/rules_nodejs/archive/c75e3dd0571b0937e3ce0c4f0e6b6b50d90468f0.zip",
-    strip_prefix = "rules_nodejs-c75e3dd0571b0937e3ce0c4f0e6b6b50d90468f0",
-    sha256 = "b78506ddaed7c682027f873d2bd50086a28570b3187da9fa16fe1672eed3015e",
+    url = "https://github.com/bazelbuild/rules_nodejs/archive/0.12.4.zip",
+    strip_prefix = "rules_nodejs-0.12.4",
+    sha256 = "c482700e032b4df60425cb9a6f8f28152fb1c4c947a9d61e6132fc59ce332b16",
 )
 
 # Load the TypeScript rules, its dependencies, and setup the workspace.
@@ -58,6 +58,8 @@ check_bazel_version("0.15.0")
 node_repositories(
     package_json = ["//:package.json"], 
     preserve_symlinks = True,
+    node_version = "10.3.0",
+    yarn_version = "1.6.0",
 )
 
 local_repository(

@@ -1,15 +1,14 @@
 environment:
-  # Note: if updating to Node 10, use at least 10.5.0 to include a fix for
-  # https://github.com/nodejs/node/issues/20297
-  nodejs_version: "8.9.2" # Same version as used in CircleCI.
+  nodejs_version: "10.9.0" # Same version as used in CircleCI.
 
 matrix:
   fast_finish: true
 
 install:
   - ps: Install-Product node $env:nodejs_version
-  - yarn install --frozen-lockfile
-  - npm run webdriver-update-appveyor
+  # --network-timeout is a workaround for https://github.com/yarnpkg/yarn/issues/6221
+  - yarn --frozen-lockfile --network-timeout=500000
+  - yarn webdriver-update-appveyor
 
 test_script:
   - node --version
