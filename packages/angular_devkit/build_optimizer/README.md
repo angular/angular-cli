@@ -10,8 +10,6 @@ Transformations applied depend on file content:
 - [Class fold](#class-fold), [Scrub file](#scrub-file) and [Prefix functions](#prefix-functions): applied to Angular apps and libraries.
 - [Import tslib](#import-tslib): applied when TypeScript helpers are found.
 
-Non-transform optimizations are applied via the [Purify Plugin](#purify-plugin).
-
 Some of these optimizations add `/*@__PURE__*/` comments.
 These are used by [UglifyJS](https://github.com/mishoo/UglifyJS2) to identify pure functions that can potentially be dropped.
 
@@ -85,7 +83,6 @@ var ComponentClazz = (function () {
 ### Prefix functions
 
 Adds `/*@__PURE__*/` comments to top level downleveled class declarations and instantiation.
-Webpack library imports are also marked as `/*@__PURE__*/` when used with [Purify Plugin](#purify-plugin).
 
 Warning: this transform assumes the file is a pure module. It should not be used with unpure modules.
 
@@ -165,12 +162,6 @@ var ChangeDetectionStrategy = /*@__PURE__*/ (function () {
 ```
 
 
-### Purify Plugin
-
-Performs regex based replacements on all bundles that add `/*@__PURE__*/` comments to
-known pure webpack imports (used with [Prefix functions](#prefix-functions)).
-
-
 ## Library Usage
 
 ```typescript
@@ -192,11 +183,9 @@ export interface BuildOptimizerOptions {
 ```
 
 
-## Webpack loader and plugin usage:
+## Webpack loader usage:
 
 ```typescript
-const PurifyPlugin = require('@angular-devkit/build-optimizer').PurifyPlugin;
-
 module.exports = {
   module: {
     rules: [
@@ -208,10 +197,7 @@ module.exports = {
         }
       }
     ]
-  },
-  plugins: [
-    new PurifyPlugin()
-  ]
+  }
 }
 ```
 
@@ -221,6 +207,4 @@ module.exports = {
 ```bash
 build-optimizer input.js
 build-optimizer input.js output.js
-purify input.js
-purify input.js output.js
 ```
