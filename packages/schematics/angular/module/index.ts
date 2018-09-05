@@ -5,7 +5,7 @@
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.io/license
 */
-import { basename, dirname, normalize, relative, strings } from '@angular-devkit/core';
+import { normalize, strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -24,7 +24,7 @@ import * as ts from 'typescript';
 import { addImportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { getWorkspace } from '../utility/config';
-import { findModuleFromOptions } from '../utility/find-module';
+import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
 import { buildDefaultPath } from '../utility/project';
 import { Schema as ModuleOptions } from './schema';
@@ -36,7 +36,7 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
       return host;
     }
 
-    const modulePath = normalize('/' + options.module);
+    const modulePath = options.module;
 
     const text = host.read(modulePath);
     if (text === null) {
@@ -51,10 +51,9 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
       + strings.dasherize(options.name)
       + '.module',
     );
-    const relativeDir = relative(dirname(modulePath), dirname(importModulePath));
-    const relativePath = (relativeDir.startsWith('.') ? relativeDir : './' + relativeDir)
-      + '/' + basename(importModulePath);
-    const changes = addImportToModule(source, modulePath,
+    const relativePath = buildRelativePath(modulePath, importModulePath);
+    const changes = addImportToModule(source,
+                                      modulePath,
                                       strings.classify(`${options.name}Module`),
                                       relativePath);
 
