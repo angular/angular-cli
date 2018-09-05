@@ -14,6 +14,7 @@ import { getWrapEnumsTransformer } from './wrap-enums';
 const transform = (content: string) => transformJavascript(
   { content, getTransforms: [getWrapEnumsTransformer] }).content;
 
+// tslint:disable-next-line:no-big-function
 describe('wrap-enums', () => {
   it('wraps ts 2.2 enums in IIFE', () => {
     const input = tags.stripIndent`
@@ -37,7 +38,7 @@ describe('wrap-enums', () => {
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
-  it('wraps ts 2.3 - 2.6 enums in IIFE', () => {
+  it('wraps ts >2.3 enums in IIFE', () => {
     const input = tags.stripIndent`
       export var ChangeDetectionStrategy;
       (function (ChangeDetectionStrategy) {
@@ -56,7 +57,7 @@ describe('wrap-enums', () => {
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
-  it('wraps ts 2.3 - 2.6 enums in IIFE, even if they have funny numbers', () => {
+  it('wraps ts >2.3 enums in IIFE, even if they have funny numbers', () => {
     const input = tags.stripIndent`
       export var AnimatorControlState;
       (function (AnimatorControlState) {
@@ -73,6 +74,61 @@ describe('wrap-enums', () => {
           AnimatorControlState[AnimatorControlState["FINISHED"] = 3] = "FINISHED";
           AnimatorControlState[AnimatorControlState["DESTROYED"] = 4] = "DESTROYED";
           return AnimatorControlState;
+      })({});
+    `;
+
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
+
+  it('wraps ts >2.3 enums in IIFE, even if they were renamed due to scope hoisting', () => {
+    const input = tags.stripIndent`
+      var TokenType$1;
+      (function (TokenType) {
+        TokenType[TokenType["TAG_OPEN_START"] = 0] = "TAG_OPEN_START";
+        TokenType[TokenType["TAG_OPEN_END"] = 1] = "TAG_OPEN_END";
+        TokenType[TokenType["TAG_OPEN_END_VOID"] = 2] = "TAG_OPEN_END_VOID";
+        TokenType[TokenType["TAG_CLOSE"] = 3] = "TAG_CLOSE";
+        TokenType[TokenType["TEXT"] = 4] = "TEXT";
+        TokenType[TokenType["ESCAPABLE_RAW_TEXT"] = 5] = "ESCAPABLE_RAW_TEXT";
+        TokenType[TokenType["RAW_TEXT"] = 6] = "RAW_TEXT";
+        TokenType[TokenType["COMMENT_START"] = 7] = "COMMENT_START";
+        TokenType[TokenType["COMMENT_END"] = 8] = "COMMENT_END";
+        TokenType[TokenType["CDATA_START"] = 9] = "CDATA_START";
+        TokenType[TokenType["CDATA_END"] = 10] = "CDATA_END";
+        TokenType[TokenType["ATTR_NAME"] = 11] = "ATTR_NAME";
+        TokenType[TokenType["ATTR_VALUE"] = 12] = "ATTR_VALUE";
+        TokenType[TokenType["DOC_TYPE"] = 13] = "DOC_TYPE";
+        TokenType[TokenType["EXPANSION_FORM_START"] = 14] = "EXPANSION_FORM_START";
+        TokenType[TokenType["EXPANSION_CASE_VALUE"] = 15] = "EXPANSION_CASE_VALUE";
+        TokenType[TokenType["EXPANSION_CASE_EXP_START"] = 16] = "EXPANSION_CASE_EXP_START";
+        TokenType[TokenType["EXPANSION_CASE_EXP_END"] = 17] = "EXPANSION_CASE_EXP_END";
+        TokenType[TokenType["EXPANSION_FORM_END"] = 18] = "EXPANSION_FORM_END";
+        TokenType[TokenType["EOF"] = 19] = "EOF";
+      })(TokenType$1 || (TokenType$1 = {}));
+    `;
+    const output = tags.stripIndent`
+      var TokenType$1 = /*@__PURE__*/ (function (TokenType) {
+        TokenType[TokenType["TAG_OPEN_START"] = 0] = "TAG_OPEN_START";
+        TokenType[TokenType["TAG_OPEN_END"] = 1] = "TAG_OPEN_END";
+        TokenType[TokenType["TAG_OPEN_END_VOID"] = 2] = "TAG_OPEN_END_VOID";
+        TokenType[TokenType["TAG_CLOSE"] = 3] = "TAG_CLOSE";
+        TokenType[TokenType["TEXT"] = 4] = "TEXT";
+        TokenType[TokenType["ESCAPABLE_RAW_TEXT"] = 5] = "ESCAPABLE_RAW_TEXT";
+        TokenType[TokenType["RAW_TEXT"] = 6] = "RAW_TEXT";
+        TokenType[TokenType["COMMENT_START"] = 7] = "COMMENT_START";
+        TokenType[TokenType["COMMENT_END"] = 8] = "COMMENT_END";
+        TokenType[TokenType["CDATA_START"] = 9] = "CDATA_START";
+        TokenType[TokenType["CDATA_END"] = 10] = "CDATA_END";
+        TokenType[TokenType["ATTR_NAME"] = 11] = "ATTR_NAME";
+        TokenType[TokenType["ATTR_VALUE"] = 12] = "ATTR_VALUE";
+        TokenType[TokenType["DOC_TYPE"] = 13] = "DOC_TYPE";
+        TokenType[TokenType["EXPANSION_FORM_START"] = 14] = "EXPANSION_FORM_START";
+        TokenType[TokenType["EXPANSION_CASE_VALUE"] = 15] = "EXPANSION_CASE_VALUE";
+        TokenType[TokenType["EXPANSION_CASE_EXP_START"] = 16] = "EXPANSION_CASE_EXP_START";
+        TokenType[TokenType["EXPANSION_CASE_EXP_END"] = 17] = "EXPANSION_CASE_EXP_END";
+        TokenType[TokenType["EXPANSION_FORM_END"] = 18] = "EXPANSION_FORM_END";
+        TokenType[TokenType["EOF"] = 19] = "EOF";
+        return TokenType;
       })({});
     `;
 
