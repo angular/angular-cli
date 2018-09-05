@@ -3,7 +3,7 @@
   // things faster.
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../dist",
+    "outDir": "../dist/rules",
     "baseUrl": ""
   },
   "exclude": [

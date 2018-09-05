@@ -60,6 +60,8 @@
   ],
   "dependencies": {
     "glob": "^7.0.3",
+    "node-fetch": "^2.2.0",
+    "quicktype-core": "^5.0.41",
     "temp": "^0.8.3",
     "tslint": "^5.11.0",
     "typescript": "~3.0.1"

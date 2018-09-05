@@ -5,5 +5,4 @@ build --strategy=TypeScriptCompile=worker
 # Performance: avoid stat'ing input files
 build --watchfs
 
-# Do not generate the symbolic links bazel-*.
-build --symlink_prefix=/
+test --test_output=errors

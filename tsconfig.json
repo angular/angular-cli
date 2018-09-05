@@ -27,6 +27,10 @@
       "es2017"
     ],
     "baseUrl": "",
+    "rootDirs": [
+      ".",
+      "./bazel-bin/"
+    ],
     "typeRoots": [
       "./node_modules/@types"
     ],
