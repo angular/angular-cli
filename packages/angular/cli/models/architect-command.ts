@@ -5,7 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Architect, BuildEvent, TargetSpecifier } from '@angular-devkit/architect';
+import {
+  Architect,
+  BuildEvent,
+  BuilderConfiguration,
+  TargetSpecifier,
+} from '@angular-devkit/architect';
 import { experimental, json, schema, tags } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import { from } from 'rxjs';
@@ -88,11 +93,31 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
       throw new Error('Cannot determine project or target for Architect command.');
     }
 
-    const builderConf = this._architect.getBuilderConfiguration(targetSpec);
-    const builderDesc = await this._architect.getBuilderDescription(builderConf).toPromise();
-    const targetOptionArray = await parseJsonSchemaToOptions(this._registry, builderDesc.schema);
+    if (this.target) {
+      // Add options IF there's only one builder of this kind.
+      const projectNames = this.getProjectNamesByTarget(this.target);
+      const builderConfigurations: BuilderConfiguration[] = [];
+      for (const projectName of projectNames) {
+        const targetSpec: TargetSpecifier = this._makeTargetSpecifier(options);
+        const targetDesc = this._architect.getBuilderConfiguration({
+          project: projectName,
+          target: targetSpec.target,
+        });
 
-    this.description.options.push(...targetOptionArray);
+        if (!builderConfigurations.find(b => b.builder === targetDesc.builder)) {
+          builderConfigurations.push(targetDesc);
+        }
+      }
+
+      if (builderConfigurations.length == 1) {
+        const builderConf = builderConfigurations[0];
+        const builderDesc = await this._architect.getBuilderDescription(builderConf).toPromise();
+
+        this.description.options.push(...(
+          await parseJsonSchemaToOptions(this._registry, builderDesc.schema)
+        ));
+      }
+    }
   }
 
   async run(options: ArchitectCommandOptions) {
