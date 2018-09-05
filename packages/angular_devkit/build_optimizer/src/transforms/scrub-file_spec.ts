@@ -422,6 +422,38 @@ describe('scrub-file', () => {
     });
   });
 
+  describe('__param', () => {
+    it('removes all constructor parameters and their type metadata', () => {
+      const output = tags.stripIndent`
+        var MyClass = /** @class */ (function () {
+            function MyClass(myParam) {
+                this.myProp = 'foo';
+            }
+            MyClass = __decorate([
+                myDecorator()
+            ], MyClass);
+            return MyClass;
+        }());
+      `;
+      const input = tags.stripIndent`
+        var MyClass = /** @class */ (function () {
+            function MyClass(myParam) {
+                this.myProp = 'foo';
+            }
+            MyClass = __decorate([
+                myDecorator(),
+                __param(0, myDecorator()),
+                __metadata("design:paramtypes", [Number])
+            ], MyClass);
+            return MyClass;
+        }());
+      `;
+
+      expect(testScrubFile(input)).toBeTruthy();
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+  });
+
   describe('propDecorators', () => {
     it('removes top-level Angular propDecorators', () => {
       const output = tags.stripIndent`
