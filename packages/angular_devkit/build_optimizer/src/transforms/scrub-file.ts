@@ -410,6 +410,7 @@ function pickDecorateNodesToRemove(
 
   // Only remove constructor parameter metadata on non-whitelisted classes.
   if (platformWhitelist.indexOf(classId.text) === -1) {
+    // Remove __metadata calls of type 'design:paramtypes'.
     const metadataCalls = elements.filter((el) => {
       if (!isTslibHelper(el, '__metadata', tslibImports, checker)) {
         return false;
@@ -427,7 +428,21 @@ function pickDecorateNodesToRemove(
 
       return true;
     });
-    ngDecoratorCalls.push(...metadataCalls);
+    // Remove all __param calls.
+    const paramCalls = elements.filter((el) => {
+      if (!isTslibHelper(el, '__param', tslibImports, checker)) {
+        return false;
+      }
+      if (el.arguments.length != 2) {
+        return false;
+      }
+      if (el.arguments[0].kind !== ts.SyntaxKind.NumericLiteral) {
+        return false;
+      }
+
+      return true;
+    });
+    ngDecoratorCalls.push(...metadataCalls, ...paramCalls);
   }
 
   // If all decorators are metadata decorators then return the whole `Class = __decorate([...])'`
