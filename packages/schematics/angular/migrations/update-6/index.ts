@@ -536,8 +536,8 @@ function extractProjectsConfig(
       if (serverApp) {
         const serverOptions: JsonObject = {
           outputPath: serverApp.outDir || defaults.serverOutDir,
-          main: serverApp.main || defaults.serverMain,
-          tsConfig: serverApp.tsconfig || defaults.serverTsConfig,
+          main: `${appRoot}/${serverApp.main || defaults.serverMain}`,
+          tsConfig: `${appRoot}/${serverApp.tsconfig || defaults.serverTsConfig}`,
         };
         const serverTarget: JsonObject = {
           builder: '@angular-devkit/build-angular:server',

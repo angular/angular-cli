@@ -992,8 +992,8 @@ describe('Migration to v6', () => {
       expect(target).toBeDefined();
       expect(target.builder).toEqual('@angular-devkit/build-angular:server');
       expect(target.options.outputPath).toEqual('dist/server');
-      expect(target.options.main).toEqual('main.server.ts');
-      expect(target.options.tsConfig).toEqual('tsconfig.server.json');
+      expect(target.options.main).toEqual('src/main.server.ts');
+      expect(target.options.tsConfig).toEqual('src/tsconfig.server.json');
     });
   });
 });
