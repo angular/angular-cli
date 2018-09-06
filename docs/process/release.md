@@ -41,6 +41,12 @@ Only the first 2 commits should be cherry picked to the patch branch, as the las
 
 # Release
 
+## Before releasing
+
+Make sure the CI is green.
+
+Consider if you need to update `packages/schematics/angular/utility/latest-versions.ts` to reflect changes in dependent versions.
+
 ## Shepparding
 
 As commits are cherry-picked when PRs are merged, creating the release should be a matter of updating the version
