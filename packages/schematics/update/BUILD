@@ -7,6 +7,7 @@ licenses(["notice"])  # MIT
 
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_library")
 load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -20,12 +21,9 @@ ts_library(
             "**/*_benchmark.ts",
         ],
     ),
-    data = [
-        "collection.json",
-        "migrate/schema.json",
-        "update/schema.json",
-    ],
     deps = [
+        ":migrate_schema",
+        ":update_schema",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tasks",
@@ -33,6 +31,16 @@ ts_library(
         "@rxjs//operators",
         # @typings: node
     ],
+)
+
+ts_json_schema(
+    name = "update_schema",
+    src = "update/schema.json",
+)
+
+ts_json_schema(
+    name = "migrate_schema",
+    src = "migrate/schema.json",
 )
 
 ts_library(
