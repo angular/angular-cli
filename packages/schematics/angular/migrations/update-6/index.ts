@@ -308,7 +308,7 @@ function extractProjectsConfig(
           extractLicenses: true,
           vendorChunk: false,
           buildOptimizer: true,
-          ...(serviceWorker ? {serviceWorker: true, ngswConfigPath: '/src/ngsw-config.json'} : {}),
+          ...(serviceWorker ? {serviceWorker: true, ngswConfigPath: 'src/ngsw-config.json'} : {}),
           ...(app.budgets ? { budgets: app.budgets as JsonArray} : {}),
         };
 
