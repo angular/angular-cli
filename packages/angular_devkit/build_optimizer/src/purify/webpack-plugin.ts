@@ -18,11 +18,28 @@ interface Chunk {
 export class PurifyPlugin {
   constructor() { }
   public apply(compiler: Compiler): void {
-    compiler.plugin('compilation', (compilation: compilation.Compilation) => {
+    let compilerPlugin: (callback: (compilation: compilation.Compilation) => void) => void;
+    let compilationPlugin: (compilation: compilation.Compilation,
+                            callback: (chunks: Chunk[], callback: () => void) => void) => void;
+    if (compiler.hooks) { // Webpack 4
+      compilerPlugin = (callback: (compilation: compilation.Compilation) => void) =>
+        compiler.hooks.compilation.tap('purify', callback);
+      compilationPlugin = (compilation: compilation.Compilation,
+                           callback: (chunks: Chunk[], callback: () => void) => void) =>
+        compilation.hooks.optimizeChunkAssets.tapAsync('purify', callback);
+    } else { // Webpack 3
+      compilerPlugin = (callback: (compilation: compilation.Compilation) => void) =>
+        compiler.plugin('compilation', callback);
+      compilationPlugin = (compilation: compilation.Compilation,
+                           callback: (chunks: Chunk[], callback: () => void) => void) =>
+        compilation.plugin('optimize-chunk-assets', callback);
+    }
+
+    compilerPlugin((compilation: compilation.Compilation) => {
       // Webpack 4 provides the same functionality as this plugin and TS transformer
       compilation.warnings.push('PurifyPlugin is deprecated and will be removed in 0.7.0.');
 
-      compilation.plugin('optimize-chunk-assets', (chunks: Chunk[], callback: () => void) => {
+      compilationPlugin(compilation, (chunks: Chunk[], callback: () => void) => {
         chunks.forEach((chunk: Chunk) => {
           chunk.files
             .filter((fileName: string) => fileName.endsWith('.js'))
