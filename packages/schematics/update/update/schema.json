@@ -54,5 +54,11 @@
         }
       ]
     }
-  }
+  },
+  "required": [
+    "all",
+    "force",
+    "migrateOnly",
+    "next"
+  ]
 }
