@@ -20,7 +20,7 @@ import * as semver from 'semver';
 import { getNpmPackageJson } from './npm';
 import { NpmRepositoryPackageJson } from './npm-package-json';
 import { Dependency, JsonSchemaForNpmPackageJsonFiles } from './package-json';
-import { UpdateSchema } from './schema';
+import { Schema as UpdateSchema } from './schema';
 
 type VersionRange = string & { __VERSION_RANGE: void; };
 type PeerVersionTransform = string | ((range: string) => string);
@@ -758,9 +758,11 @@ export default function(options: UpdateSchema): Rule {
     // We cannot just return this because we need to fetch the packages from NPM still for the
     // help/guide to show.
     options.packages = [];
-  } else if (typeof options.packages == 'string') {
-    // If a string, then we should split it and make it an array.
-    options.packages = options.packages.split(/,/g);
+  } else {
+    // We split every packages by commas to allow people to pass in multiple and make it an array.
+    options.packages = options.packages.reduce((acc, curr) => {
+      return acc.concat(curr.split(','));
+    }, [] as string[]);
   }
 
   if (options.migrateOnly && options.from) {
@@ -852,9 +854,9 @@ export default function(options: UpdateSchema): Rule {
             logger.createChild(''),
             'warn',
           );
-          _validateUpdatePackages(infoMap, options.force, sublog);
+          _validateUpdatePackages(infoMap, !!options.force, sublog);
 
-          return _performUpdate(tree, context, infoMap, logger, options.migrateOnly);
+          return _performUpdate(tree, context, infoMap, logger, !!options.migrateOnly);
         } else {
           return _usageMessage(options, infoMap, logger);
         }
