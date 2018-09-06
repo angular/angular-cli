@@ -16,27 +16,26 @@ describe('Browser Builder poll', () => {
   afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
-    const overrides = { watch: true, poll: 1000 };
-    let msAvg = 1000;
-    let lastTime: number;
+    const overrides = { watch: true, poll: 2000 };
+    const intervals: number[] = [];
+    let startTime: number | undefined;
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       // Debounce 1s, otherwise changes are too close together and polling doesn't work.
       debounceTime(1000),
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const currTime = Date.now();
-        if (lastTime) {
-          const ms = Math.floor((currTime - lastTime));
-          msAvg = (msAvg + ms) / 2;
+      tap((buildEvent) => {
+        expect(buildEvent.success).toBe(true);
+        if (startTime != undefined) {
+          intervals.push(Date.now() - startTime - 1000);
         }
-        lastTime = currTime;
+        startTime = Date.now();
         host.appendToFile('src/main.ts', 'console.log(1);');
       }),
-      take(5),
+      take(6),
     ).subscribe(undefined, done.fail, () => {
-      // Check if the average is between 1750 and 2750, allowing for a 1000ms variance.
-      expect(msAvg).toBeGreaterThan(1750);
-      expect(msAvg).toBeLessThan(2750);
+      intervals.sort();
+      const median = intervals[Math.trunc(intervals.length / 2)];
+      expect(median).toBeGreaterThan(1000);
+      expect(median).toBeLessThan(4000);
       done();
     });
   });
