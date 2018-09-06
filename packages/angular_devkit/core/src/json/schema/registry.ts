@@ -500,9 +500,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       valid: true,
       compile: (schema, parentSchema: JsonObject, it) => {
         const compilationSchemInfo = this._currentCompilationSchemaInfo;
-        if (compilationSchemInfo === undefined) {
-          throw new Error('Invalid JSON schema compilation state');
-        } else if (compilationSchemInfo === null) {
+        if (!compilationSchemInfo) {
           return () => true;
         }
 
