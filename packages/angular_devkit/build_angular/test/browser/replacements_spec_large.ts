@@ -8,7 +8,7 @@
 
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { debounceTime, take, tap } from 'rxjs/operators';
+import { takeWhile, tap } from 'rxjs/operators';
 import { browserTargetSpec, host } from '../utils';
 
 
@@ -112,33 +112,46 @@ describe('Browser Builder file replacements', () => {
       watch: true,
     };
 
-    let buildNumber = 0;
-
-    runTargetSpec(host, browserTargetSpec, overrides, 45000).pipe(
-      debounceTime(1000),
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+    let buildCount = 0;
+    let phase = 1;
+    runTargetSpec(host, browserTargetSpec, overrides, 30000).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true, 'build should succeed')),
       tap(() => {
         const fileName = join(outputPath, 'main.js');
         const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
-        buildNumber += 1;
-
-        switch (buildNumber) {
+        const has42 = /meaning\s*=\s*42/.test(content);
+        buildCount++;
+        switch (phase) {
           case 1:
-            expect(content).toMatch(/meaning\s*=\s*42/);
-            expect(content).not.toMatch(/meaning\s*=\s*10/);
-            host.writeMultipleFiles({
-              'src/meaning-too.ts': 'export var meaning = 84;',
-            });
+            const has10 = /meaning\s*=\s*10/.test(content);
+
+            if (has42 && !has10) {
+              phase = 2;
+              host.writeMultipleFiles({
+                'src/meaning-too.ts': 'export var meaning = 84;',
+              });
+            }
             break;
 
           case 2:
-            expect(content).toMatch(/meaning\s*=\s*84/);
-            expect(content).not.toMatch(/meaning\s*=\s*42/);
+            const has84 = /meaning\s*=\s*84/.test(content);
+
+            if (has84 && !has42) {
+              phase = 3;
+            } else {
+              // try triggering a rebuild again
+              host.writeMultipleFiles({
+                'src/meaning-too.ts': 'export var meaning = 84;',
+              });
+            }
             break;
         }
       }),
-      take(2),
-    ).toPromise().then(() => done(), done.fail);
+      takeWhile(() => phase < 3),
+    ).toPromise().then(
+      () => done(),
+      () => done.fail(`stuck at phase ${phase} [builds: ${buildCount}]`),
+    );
   });
 
 });

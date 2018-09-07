@@ -9,7 +9,7 @@
 
 import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { debounceTime, take, tap } from 'rxjs/operators';
+import { debounceTime, take, takeWhile, tap } from 'rxjs/operators';
 import { browserTargetSpec, host } from '../utils';
 import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_large';
 
@@ -65,29 +65,28 @@ describe('Browser Builder rebuilds', () => {
 
     const overrides = { watch: true };
 
-    let buildNumber = 0;
-
+    let buildCount = 0;
+    let phase = 1;
     runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3).pipe(
-      // We must debounce on watch mode because file watchers are not very accurate.
-      // Changes from just before a process runs can be picked up and cause rebuilds.
-      // In this case, cleanup from the test right before this one causes a few rebuilds.
-      debounceTime(1000),
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap((buildEvent) => expect(buildEvent.success).toBe(true, 'build should succeed')),
       tap(() => {
-        buildNumber += 1;
-        switch (buildNumber) {
+        buildCount++;
+        const hasLazyChunk = host.scopedSync().exists(join(outputPath, 'lazy-lazy-module.js'));
+        switch (phase) {
           case 1:
             // No lazy chunk should exist.
-            expect(host.scopedSync().exists(join(outputPath, 'lazy-module.js'))).toBe(false);
-            // Write the lazy chunk files. Order matters when writing these, because of imports.
-            host.writeMultipleFiles(lazyModuleFiles);
-            host.writeMultipleFiles(lazyModuleImport);
+            if (!hasLazyChunk) {
+              phase = 2;
+              host.writeMultipleFiles({ ...lazyModuleFiles, ...lazyModuleImport });
+            }
             break;
 
           case 2:
             // A lazy chunk should have been with the filename.
-            expect(host.scopedSync().exists(join(outputPath, 'lazy-lazy-module.js'))).toBe(true);
-            host.writeMultipleFiles(goldenValueFiles);
+            if (hasLazyChunk) {
+              phase = 3;
+              host.writeMultipleFiles(goldenValueFiles);
+            }
             break;
 
           case 3:
@@ -101,15 +100,18 @@ describe('Browser Builder rebuilds', () => {
             const content = virtualFs.fileBufferToString(
               host.scopedSync().read(normalize(fileName)),
             );
-            expect(content).toMatch(re);
-            break;
 
-          default:
+            if (re.test(content)) {
+              phase = 4;
+            }
             break;
         }
       }),
-      take(3),
-    ).toPromise().then(done, done.fail);
+      takeWhile(() => phase < 4),
+      ).toPromise().then(
+        () => done(),
+        () => done.fail(`stuck at phase ${phase} [builds: ${buildCount}]`),
+      );
   });
 
   it('rebuilds on CSS changes', (done) => {
