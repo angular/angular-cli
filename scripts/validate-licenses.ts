@@ -73,11 +73,8 @@ const ignoredPackages = [
   'true-case-path@1.0.2', // Apache-2.0 but broken license in package.json
 
   // * Other
-  'jsonify@0.0.0', // TODO(hansl): fix this. this is not an acceptable license, but is 8 deps down
-                   // so hard to manage. In talk with owner and users to switch over.
-  'uws@9.14.0', // Zlib -- TODO(filipesilva): remove this when karma is moved to e2e tests.
-  // TODO(filipesilva): remove this when spec_large is moved to e2e tests.
   'font-awesome@4.7.0', // (OFL-1.1 AND MIT)
+  'stream-json@0.5.2', // 'New BSD'
 ];
 
 // Ignore own packages (all MIT)
