@@ -75,12 +75,6 @@ try {
   // plugin cannot be used.
 }
 
-export const VERSION: typeof ngc.VERSION = getApiMember(compilerCli, 'VERSION', 'compiler-cli');
-export const __NGTOOLS_PRIVATE_API_2 = getApiMember(
-  compilerCli,
-  '__NGTOOLS_PRIVATE_API_2',
-  'compiler-cli',
-);
 export const readConfiguration = getApiMember(compilerCli, 'readConfiguration', 'compiler-cli');
 
 // These imports do not exist on Angular versions lower than 5, so we cannot use a static ES6
