@@ -29,6 +29,11 @@ export interface NodeDependency {
   overwrite?: boolean;
 }
 
+export interface NodeScript {
+  name: string;
+  value: string | boolean | number;
+}
+
 export function addPackageJsonDependency(tree: Tree, dependency: NodeDependency): void {
   const packageJsonAst = _readPackageJson(tree);
   const depsNode = findPropertyInAstObject(packageJsonAst, dependency.type);
@@ -56,6 +61,35 @@ export function addPackageJsonDependency(tree: Tree, dependency: NodeDependency)
       const { end, start } = depNode;
       recorder.remove(start.offset, end.offset - start.offset);
       recorder.insertRight(start.offset, JSON.stringify(dependency.version));
+    }
+  }
+
+  tree.commitUpdate(recorder);
+}
+
+export function addPackageJsonScript(tree: Tree, script: NodeScript): void {
+  const packageJsonAst = _readPackageJson(tree);
+  const scripts = findPropertyInAstObject(packageJsonAst, 'scripts');
+  const recorder = tree.beginUpdate(pkgJsonPath);
+
+  if (!scripts) {
+    // Haven't found the script key, add it to the scripts of the package.json.
+    appendPropertyInAstObject(recorder, packageJsonAst, 'scripts', {
+      [script.name]: script.value,
+    }, 2);
+  } else if (scripts.kind === 'object') {
+    // check if script already added
+    const scriptNode = findPropertyInAstObject(scripts, script.name);
+
+    if (!scriptNode) {
+      // Script not found, add it.
+      insertPropertyInAstObjectInOrder(
+        recorder,
+        scripts,
+        script.name,
+        script.value,
+        4,
+      );
     }
   }
 
