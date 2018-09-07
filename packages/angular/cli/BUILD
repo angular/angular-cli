@@ -46,6 +46,7 @@ ts_library(
         ":config_schema",
         ":deprecated_schema",
         ":doc_schema",
+        ":docker_schema",
         ":e2e_schema",
         ":easter_egg_schema",
         ":eject_schema",
@@ -97,6 +98,14 @@ ts_json_schema(
 ts_json_schema(
     name = "doc_schema",
     src = "commands/doc.json",
+    data = [
+        "commands/definitions.json",
+    ],
+)
+
+ts_json_schema(
+    name = "docker_schema",
+    src = "commands/docker.json",
     data = [
         "commands/definitions.json",
     ],

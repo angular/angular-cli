@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/docker.json",
+  "description": "Add/Modify docker files",
+  "$longDescription": "",
+
+  "$scope": "in",
+  "$impl": "./docker-impl#DockerCommand",
+
+  "type": "object",
+  "allOf": [
+    {
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "The specific action to be executed.",
+          "enum": [
+            "init",
+            "deploy",
+            "push"
+          ],
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        }
+      },
+      "required": [
+        "action"
+      ]
+    },
+    { "$ref": "./definitions.json#/definitions/base" },
+    { "$ref": "./definitions.json#/definitions/schematic" }
+  ]
+}
