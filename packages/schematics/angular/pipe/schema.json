@@ -42,7 +42,6 @@
     },
     "module": {
       "type": "string",
-      "default": "",
       "description": "Allows specification of the declaring module.",
       "alias": "m"
     },
@@ -57,5 +56,7 @@
       "description": "Specifies whether to apply lint fixes after generating the pipe."
     }
   },
-  "required": []
+  "required": [
+    "name"
+  ]
 }

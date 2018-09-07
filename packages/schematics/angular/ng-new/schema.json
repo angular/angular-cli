@@ -134,5 +134,7 @@
     }
   },
   "required": [
+    "name",
+    "version"
   ]
 }

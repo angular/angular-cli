@@ -58,5 +58,7 @@
       "alias": "m"
     }
   },
-  "required": []
+  "required": [
+    "name"
+  ]
 }

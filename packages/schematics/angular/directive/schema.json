@@ -75,5 +75,7 @@
       "description": "Specifies whether to apply lint fixes after generating the directive."
     }
   },
-  "required": []
+  "required": [
+    "name"
+  ]
 }
