@@ -26,9 +26,9 @@
   },
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
-    "rxjs": "~6.2.0",
-    "tree-kill": "^1.0.0",
-    "webpack-sources": "^1.1.0"
+    "rxjs": "6.2.2",
+    "tree-kill": "1.2.0",
+    "webpack-sources": "1.2.0"
   },
   "peerDependencies": {
     "typescript": ">=2.4.0 < 3.1",
