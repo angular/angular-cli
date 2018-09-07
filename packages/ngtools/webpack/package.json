@@ -20,10 +20,6 @@
     "url": "https://github.com/angular/angular-cli/issues"
   },
   "homepage": "https://github.com/angular/angular-cli/tree/master/packages/@ngtools/webpack",
-  "engines": {
-    "node": ">= 8.9.0",
-    "npm": ">= 5.5.1"
-  },
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
     "rxjs": "6.2.2",

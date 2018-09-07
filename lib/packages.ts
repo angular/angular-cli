@@ -114,6 +114,14 @@ function loadPackageJson(p: string) {
         pkg[key] = b;
         break;
 
+      // Overwrite engines to a common default.
+      case 'engines':
+        pkg['engines'] = {
+          'node': '>= 8.9.0',
+          'npm': '>= 5.5.1',
+        };
+        break;
+
       // Overwrite the package's key with to root one.
       default:
         pkg[key] = root[key];
