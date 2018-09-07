@@ -6,6 +6,7 @@
 licenses(["notice"])  # MIT
 
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_library")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -25,9 +26,15 @@ ts_library(
         ],
     ),
     deps = [
+        ":pwa_schema",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "@rxjs",
         # @typings: node
     ],
+)
+
+ts_json_schema(
+    name = "pwa_schema",
+    src = "pwa/schema.json",
 )
