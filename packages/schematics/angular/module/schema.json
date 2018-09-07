@@ -58,5 +58,12 @@
       "alias": "m"
     }
   },
-  "required": []
+  "required": [
+    "name",
+    "project",
+    "routing",
+    "spec",
+    "flat",
+    "commonModule"
+  ]
 }

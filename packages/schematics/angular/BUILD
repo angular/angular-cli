@@ -7,6 +7,7 @@ licenses(["notice"])  # MIT
 
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_library")
 load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test")
+load("//tools:defs.bzl", "ts_json_schema")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -26,6 +27,23 @@ ts_library(
         ],
     ),
     deps = [
+        ":app_shell_schema",
+        ":application_schema",
+        ":class_schema",
+        ":component_schema",
+        ":directive_schema",
+        ":e2e_schema",
+        ":enum_schema",
+        ":guard_schema",
+        ":interface_schema",
+        ":library_schema",
+        ":module_schema",
+        ":ng_new_schema",
+        ":pipe_schema",
+        ":service_schema",
+        ":service_worker_schema",
+        ":universal_schema",
+        ":workspace_schema",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tasks",
@@ -34,6 +52,91 @@ ts_library(
         # @typings: typescript
         # @typings: node
     ],
+)
+
+ts_json_schema(
+    name = "app_shell_schema",
+    src = "app-shell/schema.json",
+)
+
+ts_json_schema(
+    name = "application_schema",
+    src = "application/schema.json",
+)
+
+ts_json_schema(
+    name = "class_schema",
+    src = "class/schema.json",
+)
+
+ts_json_schema(
+    name = "component_schema",
+    src = "component/schema.json",
+)
+
+ts_json_schema(
+    name = "directive_schema",
+    src = "directive/schema.json",
+)
+
+ts_json_schema(
+    name = "e2e_schema",
+    src = "e2e/schema.json",
+)
+
+ts_json_schema(
+    name = "enum_schema",
+    src = "enum/schema.json",
+)
+
+ts_json_schema(
+    name = "guard_schema",
+    src = "guard/schema.json",
+)
+
+ts_json_schema(
+    name = "interface_schema",
+    src = "interface/schema.json",
+)
+
+ts_json_schema(
+    name = "library_schema",
+    src = "library/schema.json",
+)
+
+ts_json_schema(
+    name = "module_schema",
+    src = "module/schema.json",
+)
+
+ts_json_schema(
+    name = "ng_new_schema",
+    src = "ng-new/schema.json",
+)
+
+ts_json_schema(
+    name = "pipe_schema",
+    src = "pipe/schema.json",
+)
+
+ts_json_schema(
+    name = "service_schema",
+    src = "service/schema.json",
+)
+
+ts_json_schema(
+    name = "service_worker_schema",
+    src = "service-worker/schema.json",
+)
+
+ts_json_schema(
+    name = "universal_schema",
+    src = "universal/schema.json",
+)
+
+ts_json_schema(
+    name = "workspace_schema",
+    src = "workspace/schema.json",
 )
 
 ts_library(
