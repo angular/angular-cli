@@ -22,5 +22,9 @@
       "default": "production"
     }
   },
-  "required": []
+  "required": [
+    "project",
+    "target",
+    "configuration"
+  ]
 }

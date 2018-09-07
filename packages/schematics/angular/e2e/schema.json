@@ -29,6 +29,7 @@
     }
   },
   "required": [
+    "name",
     "relatedAppName"
   ]
 }

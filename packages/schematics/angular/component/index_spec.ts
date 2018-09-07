@@ -10,7 +10,7 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { Schema as ApplicationOptions } from '../application/schema';
 import { createAppModule } from '../utility/test';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
-import { Schema as ComponentOptions } from './schema';
+import { ChangeDetection, Schema as ComponentOptions } from './schema';
 
 // tslint:disable:max-line-length
 describe('Component Schematic', () => {
@@ -23,7 +23,7 @@ describe('Component Schematic', () => {
     // path: 'src/app',
     inlineStyle: false,
     inlineTemplate: false,
-    changeDetection: 'Default',
+    changeDetection: ChangeDetection.Default,
     styleext: 'css',
     spec: true,
     module: undefined,

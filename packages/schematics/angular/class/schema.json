@@ -36,5 +36,8 @@
       "default": ""
     }
   },
-  "required": []
+  "required": [
+    "name",
+    "project"
+  ]
 }
