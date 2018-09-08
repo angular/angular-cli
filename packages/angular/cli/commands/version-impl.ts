@@ -12,9 +12,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Command } from '../models/command';
 import { findUp } from '../utilities/find-up';
+import { Schema as VersionCommandSchema } from './version';
 
-
-export class VersionCommand extends Command {
+export class VersionCommand extends Command<VersionCommandSchema> {
   public static aliases = ['v'];
 
   async run() {

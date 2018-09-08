@@ -9,22 +9,27 @@
   "$impl": "./doc-impl#DocCommand",
 
   "type": "object",
-  "properties": {
-    "keyword": {
-      "type": "string",
-      "description": "The query to search upon.",
-      "$default": {
-        "$source": "argv",
-        "index": 0
-      }
+  "allOf": [
+    {
+      "properties": {
+        "keyword": {
+          "type": "string",
+          "description": "The query to search upon.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        },
+        "search": {
+          "aliases": ["s"],
+          "type": "boolean",
+          "default": false,
+          "description": "Search whole angular.io instead of just api."
+        }
+      },
+      "required": [
+      ]
     },
-    "search": {
-      "aliases": ["s"],
-      "type": "boolean",
-      "default": false,
-      "description": "Search whole angular.io instead of just api."
-    }
-  },
-  "required": [
+    { "$ref": "./definitions.json#/definitions/base" }
   ]
 }

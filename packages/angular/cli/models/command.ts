@@ -19,7 +19,7 @@ import {
   Option,
 } from './interface';
 
-export interface BaseCommandOptions extends Arguments {
+export interface BaseCommandOptions {
   help?: boolean;
   helpJson?: boolean;
 }
@@ -41,18 +41,18 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     this.workspace = context.workspace;
   }
 
-  async initialize(options: T): Promise<void> {
+  async initialize(options: T & Arguments): Promise<void> {
     return;
   }
 
-  async printHelp(options: T): Promise<number> {
+  async printHelp(options: T & Arguments): Promise<number> {
     await this.printHelpUsage();
     await this.printHelpOptions();
 
     return 0;
   }
 
-  async printJsonHelp(_options: T): Promise<number> {
+  async printJsonHelp(_options: T & Arguments): Promise<number> {
     this.logger.info(JSON.stringify(this.description));
 
     return 0;

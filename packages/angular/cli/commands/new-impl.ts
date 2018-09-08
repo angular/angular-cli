@@ -7,19 +7,16 @@
  */
 
 // tslint:disable:no-global-tslint-disable no-any
-import { BaseSchematicOptions, SchematicCommand } from '../models/schematic-command';
-
-export interface NewCommandOptions extends BaseSchematicOptions {
-  skipGit?: boolean;
-  collection?: string;
-}
+import { Arguments } from '../models/interface';
+import { SchematicCommand } from '../models/schematic-command';
+import { Schema as NewCommandSchema } from './new';
 
 
-export class NewCommand extends SchematicCommand {
+export class NewCommand extends SchematicCommand<NewCommandSchema> {
   public readonly allowMissingWorkspace = true;
   private schematicName = 'ng-new';
 
-  public async run(options: NewCommandOptions) {
+  public async run(options: NewCommandSchema & Arguments) {
     if (options.dryRun) {
       options.skipGit = true;
     }
@@ -41,9 +38,9 @@ export class NewCommand extends SchematicCommand {
       collectionName: collectionName,
       schematicName: this.schematicName,
       schematicOptions: options['--'] || [],
-      debug: options.debug,
-      dryRun: options.dryRun,
-      force: options.force,
+      debug: !!options.debug,
+      dryRun: !!options.dryRun,
+      force: !!options.force,
     });
   }
 

@@ -24,6 +24,9 @@
       ]
     },
     {
+      "$ref": "./definitions.json#/definitions/schematic"
+    },
+    {
       "$ref": "./definitions.json#/definitions/base"
     }
   ]

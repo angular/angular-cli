@@ -7,10 +7,11 @@
  */
 
 import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
+import { Arguments } from '../models/interface';
+import { Schema as RunCommandSchema } from './run';
 
-
-export class RunCommand extends ArchitectCommand {
-  public async run(options: ArchitectCommandOptions) {
+export class RunCommand extends ArchitectCommand<RunCommandSchema> {
+  public async run(options: ArchitectCommandOptions & Arguments) {
     if (options.target) {
       return this.runArchitectTarget(options);
     } else {

@@ -6,14 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
+import { ArchitectCommand } from '../models/architect-command';
+import { Arguments } from '../models/interface';
+import { Schema as Xi18nCommandSchema } from './xi18n';
 
-
-export class Xi18nCommand extends ArchitectCommand {
+export class Xi18nCommand extends ArchitectCommand<Xi18nCommandSchema> {
   public readonly target = 'extract-i18n';
   public readonly multiTarget: true;
 
-  public async run(options: ArchitectCommandOptions) {
+  public async run(options: Xi18nCommandSchema & Arguments) {
     return this.runArchitectTarget(options);
   }
 }

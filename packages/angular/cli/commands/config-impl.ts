@@ -17,20 +17,16 @@ import {
   tags,
 } from '@angular-devkit/core';
 import { writeFileSync } from 'fs';
-import { BaseCommandOptions, Command } from '../models/command';
+import { Command } from '../models/command';
+import { Arguments } from '../models/interface';
 import {
   getWorkspace,
   getWorkspaceRaw,
   migrateLegacyGlobalConfig,
   validateWorkspace,
 } from '../utilities/config';
+import { Schema as ConfigCommandSchema, Value as ConfigCommandSchemaValue } from './config';
 
-
-export interface ConfigOptions extends BaseCommandOptions {
-  jsonPath: string;
-  value?: string;
-  global?: boolean;
-}
 
 const validCliPaths = new Map([
   ['cli.warnings.versionMismatch', 'boolean'],
@@ -139,20 +135,20 @@ function setValueFromPath<T extends JsonArray | JsonObject>(
   }
 }
 
-function normalizeValue(value: string, path: string): JsonValue {
+function normalizeValue(value: ConfigCommandSchemaValue, path: string): JsonValue {
   const cliOptionType = validCliPaths.get(path);
   if (cliOptionType) {
     switch (cliOptionType) {
       case 'boolean':
-        if (value.trim() === 'true') {
+        if (('' + value).trim() === 'true') {
           return true;
-        } else if (value.trim() === 'false') {
+        } else if (('' + value).trim() === 'false') {
           return false;
         }
         break;
       case 'number':
         const numberValue = Number(value);
-        if (!Number.isNaN(numberValue)) {
+        if (!Number.isFinite(numberValue)) {
           return numberValue;
         }
         break;
@@ -178,8 +174,8 @@ function normalizeValue(value: string, path: string): JsonValue {
   return value;
 }
 
-export class ConfigCommand<T extends ConfigOptions = ConfigOptions> extends Command<T> {
-  public async run(options: T) {
+export class ConfigCommand extends Command<ConfigCommandSchema> {
+  public async run(options: ConfigCommandSchema & Arguments) {
     const level = options.global ? 'global' : 'local';
 
     let config =
@@ -210,7 +206,7 @@ export class ConfigCommand<T extends ConfigOptions = ConfigOptions> extends Comm
     }
   }
 
-  private get(config: experimental.workspace.WorkspaceSchema, options: T) {
+  private get(config: experimental.workspace.WorkspaceSchema, options: ConfigCommandSchema) {
     let value;
     if (options.jsonPath) {
       value = getValueFromPath(config as {} as JsonObject, options.jsonPath);
@@ -229,7 +225,7 @@ export class ConfigCommand<T extends ConfigOptions = ConfigOptions> extends Comm
     }
   }
 
-  private set(options: ConfigOptions) {
+  private set(options: ConfigCommandSchema) {
     if (!options.jsonPath || !options.jsonPath.trim()) {
       throw new Error('Invalid Path.');
     }

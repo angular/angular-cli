@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Command } from '../models/command';
+import { Schema as DeprecatedCommandSchema } from './deprecated';
 
-export class DeprecatedCommand extends Command {
+export class DeprecatedCommand extends Command<DeprecatedCommandSchema> {
   public async run() {
     let message = 'The "${this.description.name}" command has been deprecated.';
     if (this.description.name == 'get' || this.description.name == 'set') {
