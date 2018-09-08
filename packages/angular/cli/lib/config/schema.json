@@ -327,11 +327,39 @@
           "additionalProperties": {
             "$ref": "#/definitions/project/definitions/target"
           }
+        },
+        "targets": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/project/definitions/target"
+          }
         }
       },
       "required": [
         "root",
         "projectType"
+      ],
+      "anyOf": [
+        {
+          "required": ["architect"],
+          "not": {
+            "required": ["targets"]
+          }
+        },
+        {
+          "required": ["targets"],
+          "not": {
+            "required": ["architect"]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "targets",
+              "architect"
+            ]
+          }
+        }
       ],
       "additionalProperties": false,
       "patternProperties": {
