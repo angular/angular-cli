@@ -6,16 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BaseCommandOptions, Command } from '../models/command';
+import { Command } from '../models/command';
+import { Arguments } from '../models/interface';
+import { Schema as DocCommandSchema } from './doc';
+
 const opn = require('opn');
 
-export interface DocCommandOptions extends BaseCommandOptions {
-  keyword: string;
-  search?: boolean;
-}
-
-export class DocCommand<T extends DocCommandOptions = DocCommandOptions> extends Command<T> {
-  public async run(options: T) {
+export class DocCommand extends Command<DocCommandSchema> {
+  public async run(options: DocCommandSchema & Arguments) {
     let searchUrl = `https://angular.io/api?query=${options.keyword}`;
     if (options.search) {
       searchUrl = `https://www.google.com/search?q=site%3Aangular.io+${options.keyword}`;

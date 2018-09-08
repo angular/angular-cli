@@ -7,13 +7,14 @@
  */
 
 import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
+import { Arguments } from '../models/interface';
+import { Schema as LintCommandSchema } from './lint';
 
-
-export class LintCommand extends ArchitectCommand {
+export class LintCommand extends ArchitectCommand<LintCommandSchema> {
   public readonly target = 'lint';
   public readonly multiTarget = true;
 
-  public async run(options: ArchitectCommandOptions) {
+  public async run(options: ArchitectCommandOptions & Arguments) {
     return this.runArchitectTarget(options);
   }
 }

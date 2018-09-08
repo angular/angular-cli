@@ -7,31 +7,18 @@
  */
 import { normalize } from '@angular-devkit/core';
 import { Arguments, Option } from '../models/interface';
-import { BaseSchematicOptions, SchematicCommand } from '../models/schematic-command';
+import { SchematicCommand } from '../models/schematic-command';
 import { findUp } from '../utilities/find-up';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
+import { Schema as UpdateCommandSchema } from './update';
 
-export interface UpdateOptions extends BaseSchematicOptions {
-  next: boolean;
-  schematic?: boolean;
-  dryRun: boolean;
-  force: boolean;
-}
-
-type UpdateSchematicOptions = Arguments & {
-  migrateOnly?: boolean;
-  from?: string;
-  packages?: string | string[];
-};
-
-
-export class UpdateCommand<T extends UpdateOptions = UpdateOptions> extends SchematicCommand<T> {
+export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
   public readonly allowMissingWorkspace = true;
 
   private collectionName = '@schematics/update';
   private schematicName = 'update';
 
-  async initialize(input: T) {
+  async initialize(input: UpdateCommandSchema & Arguments) {
     await super.initialize(input);
 
     // Set the options.
@@ -46,7 +33,7 @@ export class UpdateCommand<T extends UpdateOptions = UpdateOptions> extends Sche
   }
 
   async parseArguments(schematicOptions: string[], schema: Option[]): Promise<Arguments> {
-    const args = await super.parseArguments(schematicOptions, schema) as UpdateSchematicOptions;
+    const args = await super.parseArguments(schematicOptions, schema);
     const maybeArgsLeftovers = args['--'];
 
     if (maybeArgsLeftovers
@@ -77,7 +64,7 @@ export class UpdateCommand<T extends UpdateOptions = UpdateOptions> extends Sche
     return args;
   }
 
-  async run(options: UpdateOptions) {
+  async run(options: UpdateCommandSchema & Arguments) {
     return this.runSchematic({
       collectionName: this.collectionName,
       schematicName: this.schematicName,

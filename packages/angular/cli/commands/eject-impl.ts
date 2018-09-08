@@ -8,9 +8,9 @@
 
 import { tags } from '@angular-devkit/core';
 import { Command } from '../models/command';
+import { Schema as EjectCommandSchema } from './eject';
 
-
-export class EjectCommand extends Command {
+export class EjectCommand extends Command<EjectCommandSchema> {
   async run() {
     this.logger.error(tags.stripIndents`
       The 'eject' command has been temporarily disabled, as it is not yet compatible with the new

@@ -8,18 +8,13 @@
 
 // tslint:disable:no-global-tslint-disable no-any
 import { terminal } from '@angular-devkit/core';
-import { Option } from '../models/interface';
-import { BaseSchematicOptions, SchematicCommand } from '../models/schematic-command';
+import { Arguments, Option } from '../models/interface';
+import { SchematicCommand } from '../models/schematic-command';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
+import { Schema as GenerateCommandSchema } from './generate';
 
-export interface GenerateCommandOptions extends BaseSchematicOptions {
-  schematic?: string;
-}
-
-export class GenerateCommand<
-  T extends GenerateCommandOptions = GenerateCommandOptions,
-> extends SchematicCommand<T> {
-  async initialize(options: T) {
+export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
+  async initialize(options: GenerateCommandSchema & Arguments) {
     await super.initialize(options);
 
     // Fill up the schematics property of the command description.
@@ -50,7 +45,7 @@ export class GenerateCommand<
     });
   }
 
-  public async run(options: T) {
+  public async run(options: GenerateCommandSchema & Arguments) {
     const [collectionName, schematicName] = this.parseSchematicInfo(options);
 
     if (!schematicName || !collectionName) {
@@ -81,7 +76,7 @@ export class GenerateCommand<
     return [collectionName, schematicName];
   }
 
-  public async printHelp(options: T) {
+  public async printHelp(options: GenerateCommandSchema & Arguments) {
     await super.printHelp(options);
 
     this.logger.info('');

@@ -7,12 +7,14 @@
  */
 
 import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
+import { Arguments } from '../models/interface';
+import { Schema as TestCommandSchema } from './test';
 
-export class TestCommand extends ArchitectCommand {
+export class TestCommand extends ArchitectCommand<TestCommandSchema> {
   public readonly target = 'test';
   public readonly multiTarget = true;
 
-  public async run(options: ArchitectCommandOptions) {
+  public async run(options: ArchitectCommandOptions & Arguments) {
     return this.runArchitectTarget(options);
   }
 }

@@ -7,8 +7,9 @@
  */
 import { terminal } from '@angular-devkit/core';
 import { Command } from '../models/command';
+import { Schema as HelpCommandSchema } from './help';
 
-export class HelpCommand extends Command {
+export class HelpCommand extends Command<HelpCommandSchema> {
   async run() {
     this.logger.info(`Available Commands:`);
 

@@ -10,20 +10,15 @@
 import { tags, terminal } from '@angular-devkit/core';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
 import { Arguments } from '../models/interface';
-import { BaseSchematicOptions, SchematicCommand } from '../models/schematic-command';
+import { SchematicCommand } from '../models/schematic-command';
 import { NpmInstall } from '../tasks/npm-install';
 import { getPackageManager } from '../utilities/config';
+import { Schema as AddCommandSchema } from './add';
 
-export interface AddCommandOptions extends BaseSchematicOptions {
-  collection: string;
-}
-
-export class AddCommand<
-  T extends AddCommandOptions = AddCommandOptions,
-> extends SchematicCommand<T> {
+export class AddCommand extends SchematicCommand<AddCommandSchema> {
   readonly allowPrivateSchematics = true;
 
-  async run(options: AddCommandOptions & Arguments) {
+  async run(options: AddCommandSchema & Arguments) {
     if (!options.collection) {
       this.logger.fatal(
         `The "ng add" command requires a name argument to be specified eg. `

@@ -17,17 +17,20 @@ import { from } from 'rxjs';
 import { concatMap, map, tap, toArray } from 'rxjs/operators';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
 import { BaseCommandOptions, Command } from './command';
+import { Arguments } from './interface';
 import { parseArguments } from './parser';
 import { WorkspaceLoader } from './workspace-loader';
 
 export interface ArchitectCommandOptions extends BaseCommandOptions {
   project?: string;
   configuration?: string;
-  prod: boolean;
+  prod?: boolean;
   target?: string;
 }
 
-export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> {
+export abstract class ArchitectCommand<
+  T extends ArchitectCommandOptions = ArchitectCommandOptions,
+> extends Command<ArchitectCommandOptions> {
   private _host = new NodeJsSyncHost();
   protected _architect: Architect;
   protected _workspace: experimental.workspace.Workspace;
@@ -40,7 +43,7 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
 
   target: string | undefined;
 
-  public async initialize(options: ArchitectCommandOptions): Promise<void> {
+  public async initialize(options: ArchitectCommandOptions & Arguments): Promise<void> {
     await super.initialize(options);
 
     this._registry = new json.schema.CoreSchemaRegistry();
@@ -120,11 +123,13 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
     }
   }
 
-  async run(options: ArchitectCommandOptions) {
+  async run(options: ArchitectCommandOptions & Arguments) {
     return await this.runArchitectTarget(options);
   }
 
-  protected async runArchitectTarget(options: ArchitectCommandOptions): Promise<number> {
+  protected async runArchitectTarget(
+    options: ArchitectCommandOptions & Arguments,
+  ): Promise<number> {
     const runSingleTarget = async (targetSpec: TargetSpecifier) => {
       // We need to build the builderSpec twice because architect does not understand
       // overrides separately (getting the configuration builds the whole project, including

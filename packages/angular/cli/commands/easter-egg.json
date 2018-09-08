@@ -7,5 +7,8 @@
 
   "$impl": "./easter-egg-impl#AwesomeCommand",
 
-  "type": "object"
+  "type": "object",
+  "allOf": [
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
 }

@@ -50,22 +50,19 @@ import { BaseCommandOptions, Command } from './command';
 import { Arguments, CommandContext, CommandDescription, Option } from './interface';
 import { parseArguments, parseFreeFormArguments } from './parser';
 
-export interface BaseSchematicOptions extends BaseCommandOptions {
+
+export interface BaseSchematicSchema {
   debug?: boolean;
   dryRun?: boolean;
   force?: boolean;
   interactive?: boolean;
 }
 
-export interface RunSchematicOptions {
+export interface RunSchematicOptions extends BaseSchematicSchema {
   collectionName: string;
   schematicName: string;
 
   schematicOptions?: string[];
-
-  debug?: boolean;
-  dryRun?: boolean;
-  force?: boolean;
   showNothingDone?: boolean;
 }
 
@@ -77,7 +74,7 @@ export class UnknownCollectionError extends Error {
 }
 
 export abstract class SchematicCommand<
-  T extends BaseSchematicOptions = BaseSchematicOptions,
+  T extends (BaseSchematicSchema & BaseCommandOptions),
 > extends Command<T> {
   readonly allowPrivateSchematics: boolean = false;
   private _host = new NodeJsSyncHost();
@@ -95,12 +92,12 @@ export abstract class SchematicCommand<
     this._engine = new SchematicEngine(this._engineHost);
   }
 
-  public async initialize(options: T) {
+  public async initialize(options: T & Arguments) {
     this._loadWorkspace();
     this.createWorkflow(options);
   }
 
-  public async printHelp(options: T) {
+  public async printHelp(options: T & Arguments) {
     await super.printHelp(options);
     this.logger.info('');
 
@@ -216,12 +213,12 @@ export abstract class SchematicCommand<
   /*
    * Runtime hook to allow specifying customized workflow
    */
-  protected createWorkflow(options: BaseSchematicOptions): workflow.BaseWorkflow {
+  protected createWorkflow(options: BaseSchematicSchema): workflow.BaseWorkflow {
     if (this._workflow) {
       return this._workflow;
     }
 
-    const {force, dryRun} = options;
+    const { force, dryRun } = options;
     const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(this.workspace.root));
 
     const workflow = new NodeWorkflow(
