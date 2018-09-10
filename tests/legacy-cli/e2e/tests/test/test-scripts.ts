@@ -63,10 +63,10 @@ export default function () {
     // should fail because the global scripts were not added to scripts array
     .then(() => expectToFail(() => ng('test', '--watch=false')))
     .then(() => updateJsonFile('angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects['test-project'].targets;
+      const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.test.options.scripts = [
         { input: 'src/string-script.js' },
-        { input: 'src/input-script.js' }
+        { input: 'src/input-script.js' },
       ];
     }))
     // should pass now

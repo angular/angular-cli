@@ -36,14 +36,14 @@ export default function () {
       dependencies['@angular/platform-server'] = platformServerVersion;
     }))
     .then(() => updateJsonFile('angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects['test-project'].targets;
+      const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect['server'] = {
         builder: '@angular-devkit/build-angular:server',
         options: {
           outputPath: 'dist/test-project-server',
           main: 'src/main.server.ts',
-          tsConfig: 'src/tsconfig.server.json'
-        }
+          tsConfig: 'src/tsconfig.server.json',
+        },
       };
     }))
     .then(() => writeFile('./src/tsconfig.server.json', `

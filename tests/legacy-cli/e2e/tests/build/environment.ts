@@ -7,12 +7,12 @@ export default function() {
   // Try a prod build.
   return Promise.resolve()
     .then(() => updateJsonFile('angular.json', configJson => {
-      const appArchitect = configJson.projects['test-project'].targets;
+      const appArchitect = configJson.projects['test-project'].architect;
       appArchitect.build.configurations['prod-env'] = {
         fileReplacements: [
           {
             src: 'src/environments/environment.ts',
-            replaceWith: 'src/environments/environment.prod.ts'
+            replaceWith: 'src/environments/environment.prod.ts',
           }
         ],
       };

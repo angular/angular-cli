@@ -25,11 +25,11 @@ export default function () {
     'src/input-script.js': 'console.log(\'input-script\');',
     'src/lazy-script.js': 'console.log(\'lazy-script\');',
     'src/pre-rename-script.js': 'console.log(\'pre-rename-script\');',
-    'src/pre-rename-lazy-script.js': 'console.log(\'pre-rename-lazy-script\');'
+    'src/pre-rename-lazy-script.js': 'console.log(\'pre-rename-lazy-script\');',
   })
     .then(() => appendToFile('src/main.ts', 'import \'./string-script.js\';'))
     .then(() => updateJsonFile('angular.json', configJson => {
-      const appArchitect = configJson.projects['test-project'].targets;
+      const appArchitect = configJson.projects['test-project'].architect;
       appArchitect.build.options.scripts = [
         { input: 'src/string-script.js' },
         { input: 'src/zstring-script.js' },
