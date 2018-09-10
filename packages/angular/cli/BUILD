@@ -28,6 +28,8 @@ ts_library(
         "//packages/angular_devkit/schematics:tools",
         "@rxjs",
         "@rxjs//operators",
+        # @typings: es2017.object
+        # @typings: inquirer
         # @typings: node
         # @typings: semver
     ],

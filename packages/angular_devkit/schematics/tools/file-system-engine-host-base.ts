@@ -287,7 +287,8 @@ export abstract class FileSystemEngineHostBase implements
     options: OptionT,
     context?: FileSystemSchematicContext,
   ): Observable<ResultT> {
-    return (observableOf(options)
+    // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/3989
+    return ((observableOf(options) as any)
       .pipe(
         ...this._transforms.map(tFn => mergeMap(opt => {
           const newOptions = tFn(schematic, opt, context);
