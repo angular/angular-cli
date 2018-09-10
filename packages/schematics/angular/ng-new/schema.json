@@ -131,6 +131,11 @@
       "type": "boolean",
       "default": false,
       "alias": "S"
+    },
+    "createApplication": {
+      "description": "Flag to toggle creation of an application in the new workspace.",
+      "type": "boolean",
+      "default": true
     }
   },
   "required": [

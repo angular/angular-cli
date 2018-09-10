@@ -15,6 +15,7 @@ import {
   empty,
   mergeWith,
   move,
+  noop,
   schematic,
 } from '@angular-devkit/schematics';
 import {
@@ -60,7 +61,7 @@ export default function (options: NgNewOptions): Rule {
     mergeWith(
       apply(empty(), [
         schematic('workspace', workspaceOptions),
-        schematic('application', applicationOptions),
+        options.createApplication ? schematic('application', applicationOptions) : noop,
         move(options.directory || options.name),
       ]),
     ),

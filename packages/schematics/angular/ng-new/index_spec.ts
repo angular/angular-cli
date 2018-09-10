@@ -56,4 +56,13 @@ describe('Ng New Schematic', () => {
     const moduleContent = tree.readContent('/foo/src/app/app.module.ts');
     expect(moduleContent).toMatch(/declarations:\s*\[\s*AppComponent\s*\]/m);
   });
+
+  it('createApplication=false should create an empty workspace', () => {
+    const options = { ...defaultOptions, createApplication: false };
+
+    const tree = schematicRunner.runSchematic('ng-new', options);
+    const files = tree.files;
+    expect(files.indexOf('/bar/angular.json')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/bar/src')).toBe(-1);
+  });
 });
