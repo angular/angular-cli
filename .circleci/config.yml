@@ -120,7 +120,7 @@ jobs:
 
   build-bazel:
     <<: *defaults
-    resource_class: large
+    resource_class: xlarge
     steps:
       - attach_workspace: *attach_options
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
