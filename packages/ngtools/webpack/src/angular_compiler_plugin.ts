@@ -346,81 +346,72 @@ export class AngularCompilerPlugin {
       });
   }
 
-  private _createOrUpdateProgram() {
-    return Promise.resolve()
-      .then(() => {
-        // Get the root files from the ts config.
-        // When a new root name (like a lazy route) is added, it won't be available from
-        // following imports on the existing files, so we need to get the new list of root files.
-        const config = readConfiguration(this._tsConfigPath);
-        this._rootNames = config.rootNames.concat(...this._singleFileIncludes);
+  private async _createOrUpdateProgram() {
+    // Get the root files from the ts config.
+    // When a new root name (like a lazy route) is added, it won't be available from
+    // following imports on the existing files, so we need to get the new list of root files.
+    const config = readConfiguration(this._tsConfigPath);
+    this._rootNames = config.rootNames.concat(...this._singleFileIncludes);
 
-        // Update the forked type checker with all changed compilation files.
-        // This includes templates, that also need to be reloaded on the type checker.
-        if (this._forkTypeChecker && this._typeCheckerProcess && !this._firstRun) {
-          this._updateForkedTypeChecker(this._rootNames, this._getChangedCompilationFiles());
-        }
+    // Update the forked type checker with all changed compilation files.
+    // This includes templates, that also need to be reloaded on the type checker.
+    if (this._forkTypeChecker && this._typeCheckerProcess && !this._firstRun) {
+      this._updateForkedTypeChecker(this._rootNames, this._getChangedCompilationFiles());
+    }
 
-        // Use an identity function as all our paths are absolute already.
-        this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
+    // Use an identity function as all our paths are absolute already.
+    this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
 
-        const tsProgram = this._getTsProgram();
-        const oldFiles = new Set(tsProgram ?
-          tsProgram.getSourceFiles().map(sf => sf.fileName)
-          : [],
-        );
+    const tsProgram = this._getTsProgram();
+    const oldFiles = new Set(tsProgram ?
+      tsProgram.getSourceFiles().map(sf => sf.fileName)
+      : [],
+    );
 
-        if (this._JitMode) {
-          // Create the TypeScript program.
-          time('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
-          this._program = ts.createProgram(
-            this._rootNames,
-            this._compilerOptions,
-            this._compilerHost,
-            tsProgram,
-          );
-          timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
+    if (this._JitMode) {
+      // Create the TypeScript program.
+      time('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
+      this._program = ts.createProgram(
+        this._rootNames,
+        this._compilerOptions,
+        this._compilerHost,
+        tsProgram,
+      );
+      timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
 
-          const newFiles = this._program.getSourceFiles().filter(sf => !oldFiles.has(sf.fileName));
-          for (const newFile of newFiles) {
-            this._compilerHost.invalidate(newFile.fileName);
-          }
-
-          return Promise.resolve();
-        } else {
-          time('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
-          // Create the Angular program.
-          this._program = createProgram({
-            rootNames: this._rootNames,
-            options: this._compilerOptions,
-            host: this._compilerHost,
-            oldProgram: this._program as Program,
-          });
-          timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
-
-          time('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
-
-          return this._program.loadNgStructureAsync()
-            .then(() => {
-              timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
-
-              const newFiles = (this._program as Program).getTsProgram()
-                .getSourceFiles().filter(sf => !oldFiles.has(sf.fileName));
-              for (const newFile of newFiles) {
-                this._compilerHost.invalidate(newFile.fileName);
-              }
-            });
-        }
-      })
-      .then(() => {
-        // If there's still no entryModule try to resolve from mainPath.
-        if (!this._entryModule && this._mainPath) {
-          time('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
-          this._entryModule = resolveEntryModuleFromMain(
-            this._mainPath, this._compilerHost, this._getTsProgram() as ts.Program);
-          timeEnd('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
-        }
+      const newFiles = this._program.getSourceFiles().filter(sf => !oldFiles.has(sf.fileName));
+      for (const newFile of newFiles) {
+        this._compilerHost.invalidate(newFile.fileName);
+      }
+    } else {
+      time('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
+      // Create the Angular program.
+      this._program = createProgram({
+        rootNames: this._rootNames,
+        options: this._compilerOptions,
+        host: this._compilerHost,
+        oldProgram: this._program as Program,
       });
+      timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
+
+      time('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
+      await this._program.loadNgStructureAsync();
+      timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
+
+      const newFiles = this._program.getTsProgram()
+        .getSourceFiles().filter(sf => !oldFiles.has(sf.fileName));
+      for (const newFile of newFiles) {
+        this._compilerHost.invalidate(newFile.fileName);
+      }
+    }
+
+    // If there's still no entryModule try to resolve from mainPath.
+    if (!this._entryModule && this._mainPath) {
+      time('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
+      this._entryModule = resolveEntryModuleFromMain(
+        this._mainPath, this._compilerHost, this._getTsProgram() as ts.Program);
+      timeEnd('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
+    }
   }
 
   private _getLazyRoutesFromNgtools() {
@@ -734,7 +725,10 @@ export class AngularCompilerPlugin {
     compiler.hooks.watchClose.tap('angular-compiler', () => this._killForkedTypeChecker());
 
     // Remake the plugin on each compilation.
-    compiler.hooks.make.tapPromise('angular-compiler', compilation => this._make(compilation));
+    compiler.hooks.make.tapPromise(
+      'angular-compiler',
+      compilation => this._donePromise = this._make(compilation),
+    );
     compiler.hooks.invalid.tap('angular-compiler', () => this._firstRun = false);
     compiler.hooks.afterEmit.tap('angular-compiler', compilation => {
       // tslint:disable-next-line:no-any
@@ -802,16 +796,15 @@ export class AngularCompilerPlugin {
     // Update the resource loader with the new webpack compilation.
     this._resourceLoader.update(compilation);
 
-    return this._donePromise = Promise.resolve()
-      .then(() => this._update())
-      .then(() => {
-        this.pushCompilationErrors(compilation);
-        timeEnd('AngularCompilerPlugin._make');
-      }, err => {
-        compilation.errors.push(err);
-        this.pushCompilationErrors(compilation);
-        timeEnd('AngularCompilerPlugin._make');
-      });
+    try {
+      await this._update();
+      this.pushCompilationErrors(compilation);
+    } catch (err) {
+      compilation.errors.push(err);
+      this.pushCompilationErrors(compilation);
+    }
+
+    timeEnd('AngularCompilerPlugin._make');
   }
 
   private pushCompilationErrors(compilation: compilation.Compilation) {
@@ -868,7 +861,7 @@ export class AngularCompilerPlugin {
     }
   }
 
-  private _update() {
+  private async _update() {
     time('AngularCompilerPlugin._update');
     // We only want to update on TS and template changes, but all kinds of files are on this
     // list, like package.json and .ngsummary.json files.
@@ -879,75 +872,72 @@ export class AngularCompilerPlugin {
       return Promise.resolve();
     }
 
-    return Promise.resolve()
-      // Make a new program and load the Angular structure.
-      .then(() => this._createOrUpdateProgram())
-      .then(() => {
-        if (this.entryModule) {
-          // Try to find lazy routes if we have an entry module.
-          // We need to run the `listLazyRoutes` the first time because it also navigates libraries
-          // and other things that we might miss using the (faster) findLazyRoutesInAst.
-          // Lazy routes modules will be read with compilerHost and added to the changed files.
-          if (this._ngCompilerSupportsNewApi) {
-            this._processLazyRoutes(this._listLazyRoutesFromProgram());
-          } else if (this._firstRun) {
-            this._processLazyRoutes(this._getLazyRoutesFromNgtools());
-          } else {
-            const changedTsFiles = this._getChangedTsFiles();
-            if (changedTsFiles.length > 0) {
-              this._processLazyRoutes(this._findLazyRoutesInAst(changedTsFiles));
-            }
-          }
-          if (this._options.additionalLazyModules) {
-            this._processLazyRoutes(this._options.additionalLazyModules);
-          }
+    // Make a new program and load the Angular structure.
+    await this._createOrUpdateProgram();
+
+    if (this.entryModule) {
+      // Try to find lazy routes if we have an entry module.
+      // We need to run the `listLazyRoutes` the first time because it also navigates libraries
+      // and other things that we might miss using the (faster) findLazyRoutesInAst.
+      // Lazy routes modules will be read with compilerHost and added to the changed files.
+      if (this._ngCompilerSupportsNewApi) {
+        this._processLazyRoutes(this._listLazyRoutesFromProgram());
+      } else if (this._firstRun) {
+        this._processLazyRoutes(this._getLazyRoutesFromNgtools());
+      } else {
+        const changedTsFiles = this._getChangedTsFiles();
+        if (changedTsFiles.length > 0) {
+          this._processLazyRoutes(this._findLazyRoutesInAst(changedTsFiles));
         }
-      })
-      .then(() => {
-        // Emit and report errors.
+      }
+      if (this._options.additionalLazyModules) {
+        this._processLazyRoutes(this._options.additionalLazyModules);
+      }
+    }
 
-        // We now have the final list of changed TS files.
-        // Go through each changed file and add transforms as needed.
-        const sourceFiles = this._getChangedTsFiles()
-          .map((fileName) => (this._getTsProgram() as ts.Program).getSourceFile(fileName))
-          // At this point we shouldn't need to filter out undefined files, because any ts file
-          // that changed should be emitted.
-          // But due to hostReplacementPaths there can be files (the environment files)
-          // that changed but aren't part of the compilation, specially on `ng test`.
-          // So we ignore missing source files files here.
-          // hostReplacementPaths needs to be fixed anyway to take care of the following issue.
-          // https://github.com/angular/angular-cli/issues/7305#issuecomment-332150230
-          .filter((x) => !!x) as ts.SourceFile[];
+    // Emit and report errors.
 
-        // Emit files.
-        time('AngularCompilerPlugin._update._emit');
-        const { emitResult, diagnostics } = this._emit(sourceFiles);
-        timeEnd('AngularCompilerPlugin._update._emit');
+    // We now have the final list of changed TS files.
+    // Go through each changed file and add transforms as needed.
+    const sourceFiles = this._getChangedTsFiles()
+      .map((fileName) => (this._getTsProgram() as ts.Program).getSourceFile(fileName))
+      // At this point we shouldn't need to filter out undefined files, because any ts file
+      // that changed should be emitted.
+      // But due to hostReplacementPaths there can be files (the environment files)
+      // that changed but aren't part of the compilation, specially on `ng test`.
+      // So we ignore missing source files files here.
+      // hostReplacementPaths needs to be fixed anyway to take care of the following issue.
+      // https://github.com/angular/angular-cli/issues/7305#issuecomment-332150230
+      .filter((x) => !!x) as ts.SourceFile[];
 
-        // Report diagnostics.
-        const errors = diagnostics
-          .filter((diag) => diag.category === ts.DiagnosticCategory.Error);
-        const warnings = diagnostics
-          .filter((diag) => diag.category === ts.DiagnosticCategory.Warning);
+    // Emit files.
+    time('AngularCompilerPlugin._update._emit');
+    const { emitResult, diagnostics } = this._emit(sourceFiles);
+    timeEnd('AngularCompilerPlugin._update._emit');
 
-        if (errors.length > 0) {
-          const message = formatDiagnostics(errors);
-          this._errors.push(new Error(message));
-        }
+    // Report diagnostics.
+    const errors = diagnostics
+      .filter((diag) => diag.category === ts.DiagnosticCategory.Error);
+    const warnings = diagnostics
+      .filter((diag) => diag.category === ts.DiagnosticCategory.Warning);
 
-        if (warnings.length > 0) {
-          const message = formatDiagnostics(warnings);
-          this._warnings.push(message);
-        }
+    if (errors.length > 0) {
+      const message = formatDiagnostics(errors);
+      this._errors.push(new Error(message));
+    }
 
-        this._emitSkipped = !emitResult || emitResult.emitSkipped;
+    if (warnings.length > 0) {
+      const message = formatDiagnostics(warnings);
+      this._warnings.push(message);
+    }
 
-        // Reset changed files on successful compilation.
-        if (!this._emitSkipped && this._errors.length === 0) {
-          this._compilerHost.resetChangedFileTracker();
-        }
-        timeEnd('AngularCompilerPlugin._update');
-      });
+    this._emitSkipped = !emitResult || emitResult.emitSkipped;
+
+    // Reset changed files on successful compilation.
+    if (!this._emitSkipped && this._errors.length === 0) {
+      this._compilerHost.resetChangedFileTracker();
+    }
+    timeEnd('AngularCompilerPlugin._update');
   }
 
   writeI18nOutFile() {
