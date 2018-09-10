@@ -327,6 +327,12 @@
           "additionalProperties": {
             "$ref": "#/definitions/project/definitions/target"
           }
+        },
+        "targets": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/project/definitions/target"
+          }
         }
       },
       "required": [
