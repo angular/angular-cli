@@ -51,7 +51,7 @@ describe('PWA Schematic', () => {
     schematicRunner.runSchematicAsync('ng-add', defaultOptions, appTree).toPromise().then(tree => {
       const configText = tree.readContent('/angular.json');
       const config = JSON.parse(configText);
-      const swFlag = config.projects.bar.targets.build.configurations.production.serviceWorker;
+      const swFlag = config.projects.bar.architect.build.configurations.production.serviceWorker;
       expect(swFlag).toEqual(true);
       done();
     }, done.fail);
@@ -131,7 +131,7 @@ describe('PWA Schematic', () => {
     schematicRunner.runSchematicAsync('ng-add', defaultOptions, appTree).toPromise().then(tree => {
       const configText = tree.readContent('/angular.json');
       const config = JSON.parse(configText);
-      const targets = config.projects.bar.targets;
+      const targets = config.projects.bar.architect;
 
       ['build', 'test'].forEach((target) => {
         expect(targets[target].options.assets).toContain('projects/bar/src/manifest.json');

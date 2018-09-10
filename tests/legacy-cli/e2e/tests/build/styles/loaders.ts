@@ -27,9 +27,9 @@ export default function () {
       `})
     .then(() => deleteFile('src/app/app.component.css'))
     .then(() => updateJsonFile('angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects['test-project'].targets;
+      const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.styles = [
-        { input: 'src/styles.scss' }
+        { input: 'src/styles.scss' },
       ];
     }))
     .then(() => replaceInFile('src/app/app.component.ts',

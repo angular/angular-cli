@@ -121,7 +121,7 @@ function migrateConfiguration(oldConfig: CliConfig, logger: logging.LoggerApi): 
     }
     const targetsConfig = extractTargetsConfig(oldConfig);
     if (targetsConfig !== null) {
-      config.targets = targetsConfig;
+      config.architect = targetsConfig;
     }
 
     context.logger.info(`Removing old config file (${oldConfigPath})`);
@@ -577,7 +577,7 @@ function extractProjectsConfig(
       };
       e2eTargets.lint = e2eLintTarget;
       if (protractorConfig) {
-        e2eProject.targets = e2eTargets;
+        e2eProject.architect = e2eTargets;
       }
 
       return { name, project, e2eProject };

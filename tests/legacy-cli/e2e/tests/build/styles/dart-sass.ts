@@ -21,7 +21,7 @@ export default async function () {
   });
   await deleteFile('src/app/app.component.css');
   await updateJsonFile('angular.json', workspaceJson => {
-    const appArchitect = workspaceJson.projects['test-project'].targets;
+    const appArchitect = workspaceJson.projects['test-project'].architect;
     appArchitect.build.options.styles = [
       { input: 'src/styles.scss' },
     ];

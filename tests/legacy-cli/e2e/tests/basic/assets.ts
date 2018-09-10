@@ -93,9 +93,9 @@ export default function () {
         { 'glob': '**/*', 'input': 'src/folder', 'output': 'folder' },
         { 'glob': 'glob-asset.txt' },
         { 'glob': 'output-asset.txt', 'output': 'output-folder' },
-        { 'glob': '**/*', 'input': 'node_modules/some-package/', 'output': 'package-folder' }
+        { 'glob': '**/*', 'input': 'node_modules/some-package/', 'output': 'package-folder' },
       ];
-      const appArchitect = workspaceJson.projects['test-project'].targets;
+      const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.assets = assets;
       appArchitect.test.options.assets = assets;
     }))
