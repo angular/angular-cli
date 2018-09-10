@@ -46,7 +46,7 @@ function addAppToWorkspaceFile(options: E2eOptions, workspace: WorkspaceSchema):
       root: projectRoot,
       projectType: ProjectType.Application,
       prefix: '',
-      targets: {
+      architect: {
         e2e: {
           builder: Builders.Protractor,
           options: {
