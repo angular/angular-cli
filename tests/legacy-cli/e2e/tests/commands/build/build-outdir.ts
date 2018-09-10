@@ -8,13 +8,10 @@ export default function() {
 
   return Promise.resolve()
     .then(() => updateJsonFile('angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects['test-project'].targets;
+      const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.outputPath = './';
     }))
     .then(() => expectToFail(() => ng('build')))
     .then(() => expectToFail(() => ng('serve')))
     .then(() => expectToFail(() => ng('eject')));
 }
-
-
-

@@ -10,12 +10,12 @@ export default function() {
   return Promise.resolve()
     .then(() => silentNpm('install', 'bootstrap@4.0.0-beta.3'))
     .then(() => updateJsonFile('angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects['test-project'].targets;
+      const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.styles = [
-        { input: 'node_modules/bootstrap/dist/css/bootstrap.css' }
+        { input: 'node_modules/bootstrap/dist/css/bootstrap.css' },
       ];
       appArchitect.build.options.scripts = [
-        { input: 'node_modules/bootstrap/dist/js/bootstrap.js' }
+        { input: 'node_modules/bootstrap/dist/js/bootstrap.js' },
       ];
     }))
     .then(() => ng('build', '--extract-css'))

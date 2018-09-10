@@ -16,10 +16,10 @@ export default function () {
     .then(() => expectFileToMatch('coverage/lcov.info', 'polyfills.ts'))
     .then(() => expectFileToMatch('coverage/lcov.info', 'test.ts'))
     .then(() => updateJsonFile('angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects['test-project'].targets;
+      const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.test.options.codeCoverageExclude = [
         'src/polyfills.ts',
-        '**/test.ts'
+        '**/test.ts',
       ];
     }))
     .then(() => ng('test', '--watch=false', '--code-coverage'))

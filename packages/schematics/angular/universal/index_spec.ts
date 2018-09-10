@@ -87,8 +87,8 @@ describe('Universal Schematic', () => {
       },
     });
     const angularConfig = JSON.parse(tree.readContent('angular.json'));
-    expect(angularConfig.projects.workspace.targets.server.options.tsConfig)
-      .toEqual('src/tsconfig.server.json');
+    expect(angularConfig.projects.workspace.architect
+      .server.options.tsConfig).toEqual('src/tsconfig.server.json');
   });
 
   it('should create a tsconfig file for a generated application', () => {
@@ -107,8 +107,8 @@ describe('Universal Schematic', () => {
       },
     });
     const angularConfig = JSON.parse(tree.readContent('angular.json'));
-    expect(angularConfig.projects.bar.targets.server.options.tsConfig)
-      .toEqual('projects/bar/tsconfig.server.json');
+    expect(angularConfig.projects.bar.architect
+      .server.options.tsConfig).toEqual('projects/bar/tsconfig.server.json');
   });
 
   it('should add dependency: @angular/platform-server', () => {
@@ -123,7 +123,7 @@ describe('Universal Schematic', () => {
     const filePath = '/angular.json';
     const contents = tree.readContent(filePath);
     const config = JSON.parse(contents.toString());
-    const targets = config.projects.bar.targets;
+    const targets = config.projects.bar.architect;
     expect(targets.server).toBeDefined();
     expect(targets.server.builder).toBeDefined();
     const opts = targets.server.options;
