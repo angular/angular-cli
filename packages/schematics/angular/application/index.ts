@@ -140,7 +140,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
     projectType: ProjectType.Application,
     prefix: options.prefix || 'app',
     schematics,
-    targets: {
+    architect: {
       build: {
         builder: Builders.Browser,
         options: {
