@@ -402,7 +402,7 @@ function extractProjectsConfig(
       };
 
       const targets: JsonObject = {};
-      project.targets = targets;
+      project.architect = targets;
 
         // Browser target
       const buildOptions: JsonObject = {
