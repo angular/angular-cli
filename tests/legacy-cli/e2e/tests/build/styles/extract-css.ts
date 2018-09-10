@@ -17,10 +17,10 @@ export default function () {
       'src/input-style.css': '.input-style { color: red }',
       'src/lazy-style.css': '.lazy-style { color: red }',
       'src/pre-rename-style.css': '.pre-rename-style { color: red }',
-      'src/pre-rename-lazy-style.css': '.pre-rename-lazy-style { color: red }'
+      'src/pre-rename-lazy-style.css': '.pre-rename-lazy-style { color: red }',
     }))
     .then(() => updateJsonFile('angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects['test-project'].targets;
+      const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.styles = [
         { input: 'src/string-style.css' },
         { input: 'src/input-style.css' },

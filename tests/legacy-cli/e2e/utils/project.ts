@@ -182,11 +182,13 @@ export function useNgVersion(version: string) {
 export function useCIDefaults(projectName = 'test-project') {
   return updateJsonFile('angular.json', workspaceJson => {
     // Disable progress reporting on CI to reduce spam.
-    const appTargets = workspaceJson.projects[projectName].targets;
+    const project = workspaceJson.projects[projectName];
+    const appTargets = project.targets || project.architect;
     appTargets.build.options.progress = false;
     appTargets.test.options.progress = false;
     // Disable auto-updating webdriver in e2e.
-    const e2eTargets = workspaceJson.projects[projectName + '-e2e'].targets;
+    const e2eProject = workspaceJson.projects[projectName + '-e2e'];
+    const e2eTargets = e2eProject.targets || e2eProject.architect;
     e2eTargets.e2e.options.webdriverUpdate = false;
   })
   .then(() => updateJsonFile('package.json', json => {
