@@ -7,10 +7,10 @@
  */
 // tslint:disable:no-implicit-dependencies
 import { JsonObject, logging } from '@angular-devkit/core';
+import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
-import * as ts from 'typescript';
 import { packages } from '../lib/packages';
 
 const minimatch = require('minimatch');
@@ -160,34 +160,30 @@ function _sortPackages() {
   return sortedPackages;
 }
 
+function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
+  const { status, error, stderr } = child_process.spawnSync(command, args, { ...opts });
+
+  if (status != 0) {
+    logger.error(`Command failed: ${command} ${args.map(x => JSON.stringify(x)).join(', ')}`);
+    if (error) {
+      logger.error('Error: ' + (error ? error.message : 'undefined'));
+    } else {
+      logger.error(`STDERR:\n${stderr}`);
+    }
+    throw error;
+  }
+}
+
 
 function _build(logger: logging.Logger) {
   logger.info('Building...');
-  const tsConfigPath = path.relative(process.cwd(), path.join(__dirname, '../tsconfig.json'));
-  // Load the Compiler Options.
-  const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
-  const parsedTsConfig = ts.parseJsonConfigFileContent(tsConfig.config, ts.sys, '.');
+  _exec('node_modules/.bin/tsc', ['-p', 'tsconfig.json'], {}, logger);
+}
 
-  // Create the program and emit.
-  const program = ts.createProgram(parsedTsConfig.fileNames, parsedTsConfig.options);
-  const result = program.emit();
-  if (result.emitSkipped) {
-    logger.error(`TypeScript compiler failed:`);
-    const diagLogger = logger.createChild('diagnostics');
-    result.diagnostics.forEach(diagnostic => {
-      const messageText = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
 
-      if (diagnostic.file) {
-        const position = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start || 0);
-        const fileName = diagnostic.file.fileName;
-        const { line, character } = position;
-        diagLogger.error(`${fileName} (${line + 1},${character + 1}): ${messageText}`);
-      } else {
-        diagLogger.error(messageText);
-      }
-    });
-    process.exit(1);
-  }
+function _bazel(logger: logging.Logger) {
+  logger.info('Bazel build...');
+  _exec('bazel', ['build', '//packages/...'], {}, logger);
 }
 
 
@@ -195,6 +191,7 @@ export default function(argv: { local?: boolean, snapshot?: boolean }, logger: l
   _clean(logger);
 
   const sortedPackages = _sortPackages();
+  _bazel(logger);
   _build(logger);
 
   logger.info('Moving packages to dist/');
