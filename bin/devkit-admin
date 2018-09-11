@@ -25,6 +25,7 @@ const args = minimist(process.argv.slice(2), {
 const scriptName = args._.shift();
 const scriptPath = path.join('../scripts', scriptName);
 
+const cwd = process.cwd();
 process.chdir(path.join(__dirname, '..'));
 
 
@@ -64,7 +65,7 @@ try {
 
 try {
   Promise.resolve()
-    .then(() => require(scriptPath).default(args, logger))
+    .then(() => require(scriptPath).default(args, logger, cwd))
     .then(exitCode => process.exit(exitCode || 0))
     .catch(err => {
       logger.fatal(err.stack);
@@ -74,4 +75,3 @@ try {
   logger.fatal(err.stack);
   process.exit(99);
 }
-
