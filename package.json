@@ -80,9 +80,9 @@
     "@types/request": "^2.47.1",
     "@types/semver": "^5.5.0",
     "@types/source-map": "0.5.2",
-    "@types/webpack": "^4.4.0",
-    "@types/webpack-dev-server": "^2.9.4",
-    "@types/webpack-sources": "^0.1.4",
+    "@types/webpack": "^4.4.11",
+    "@types/webpack-dev-server": "^3.1.0",
+    "@types/webpack-sources": "^0.1.5",
     "common-tags": "^1.8.0",
     "conventional-changelog": "^1.1.0",
     "conventional-commits-parser": "^3.0.0",
@@ -107,8 +107,6 @@
     "tslint-sonarts": "^1.7.0"
   },
   "resolutions": {
-    "@types/webpack": "4.4.0",
-    "@types/webpack-dev-server": "2.9.4",
     "rxjs": "~6.2.0"
   }
 }

@@ -223,7 +223,7 @@
     "@types/node" "*"
     "@types/range-parser" "*"
 
-"@types/express@^4.16.0":
+"@types/express@*", "@types/express@^4.16.0":
   version "4.16.0"
   resolved "https://registry.yarnpkg.com/@types/express/-/express-4.16.0.tgz#6d8bc42ccaa6f35cf29a2b7c3333cb47b5a32a19"
   dependencies:
@@ -435,12 +435,6 @@
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/@types/source-map/-/source-map-0.5.2.tgz#973459e744cc7445c85b97f770275b479b138e08"
 
-"@types/spdy@*":
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/@types/spdy/-/spdy-3.4.4.tgz#3282fd4ad8c4603aa49f7017dd520a08a345b2bc"
-  dependencies:
-    "@types/node" "*"
-
 "@types/tapable@*":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.4.tgz#b4ffc7dc97b498c969b360a41eee247f82616370"
@@ -465,17 +459,16 @@
   version "1.0.1"
   resolved "https://codeload.github.com/quicktype/types-urijs/tar.gz/a23603a04e31e883a92244bff8515e3d841a8b98"
 
-"@types/webpack-dev-server@2.9.4", "@types/webpack-dev-server@^2.9.4":
-  version "2.9.4"
-  resolved "http://registry.npmjs.org/@types/webpack-dev-server/-/webpack-dev-server-2.9.4.tgz#cc3c398330ba87c0f1c7bfd020cfafb7bb895493"
+"@types/webpack-dev-server@^3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@types/webpack-dev-server/-/webpack-dev-server-3.1.0.tgz#1fae06ad346d2dd09bc5e34745723946458eed58"
   dependencies:
-    "@types/express-serve-static-core" "*"
+    "@types/express" "*"
     "@types/http-proxy-middleware" "*"
     "@types/serve-static" "*"
-    "@types/spdy" "*"
     "@types/webpack" "*"
 
-"@types/webpack-sources@^0.1.4":
+"@types/webpack-sources@^0.1.5":
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/@types/webpack-sources/-/webpack-sources-0.1.5.tgz#be47c10f783d3d6efe1471ff7f042611bd464a92"
   dependencies:
@@ -483,9 +476,9 @@
     "@types/source-list-map" "*"
     source-map "^0.6.1"
 
-"@types/webpack@*", "@types/webpack@4.4.0", "@types/webpack@^4.4.0":
-  version "4.4.0"
-  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.4.0.tgz#c0551b772be241d786c0548812dd75a932f8efb4"
+"@types/webpack@*", "@types/webpack@^4.4.11":
+  version "4.4.11"
+  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.4.11.tgz#0ca832870d55c4e92498c01d22d00d02b0f62ae9"
   dependencies:
     "@types/node" "*"
     "@types/tapable" "*"
@@ -658,8 +651,8 @@ acorn-dynamic-import@^3.0.0:
     acorn "^5.0.0"
 
 acorn@^5.0.0, acorn@^5.6.2:
-  version "5.7.2"
-  resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.7.2.tgz#91fa871883485d06708800318404e72bfb26dcc5"
+  version "5.7.3"
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.7.3.tgz#67aa231bf8812974b85235a96771eb6bd07ea279"
 
 adm-zip@^0.4.9:
   version "0.4.11"
@@ -1524,9 +1517,9 @@ chrome-trace-event@^1.0.0:
   dependencies:
     tslib "^1.9.0"
 
-ci-info@^1.3.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-1.4.0.tgz#4841d53cad49f11b827b648ebde27a6e189b412f"
+ci-info@^1.5.0:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-1.5.1.tgz#17e8eb5de6f8b2b6038f0cbb714d410bfa9f3030"
 
 cipher-base@^1.0.0, cipher-base@^1.0.1, cipher-base@^1.0.3:
   version "1.0.4"
@@ -1696,9 +1689,13 @@ combined-stream@1.0.6, combined-stream@~1.0.5, combined-stream@~1.0.6:
   dependencies:
     delayed-stream "~1.0.0"
 
-commander@2.17.x, commander@^2.12.0, commander@^2.12.1, commander@~2.17.1:
+commander@2.17.x, commander@~2.17.1:
   version "2.17.1"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.17.1.tgz#bd77ab7de6de94205ceacc72f1716d29f20a77bf"
+
+commander@^2.12.0, commander@^2.12.1:
+  version "2.18.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.18.0.tgz#2bf063ddee7c7891176981a2cc798e5754bc6970"
 
 commander@~2.13.0:
   version "2.13.0"
@@ -2171,15 +2168,27 @@ dateformat@^3.0.0:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/dateformat/-/dateformat-3.0.3.tgz#a6e37499a4d9a9cf85ef5872044d62901c9889ae"
 
-debug@*, debug@^3.1.0, debug@~3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-3.1.0.tgz#5bb5a0672628b64149566ba16819e61518c67261"
+debug@*:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-4.0.0.tgz#ef7592a30b1c5e05a78e96926df2e6b36b5544e7"
   dependencies:
-    ms "2.0.0"
+    ms "^2.1.1"
 
 debug@2.6.9, debug@^2.1.2, debug@^2.2.0, debug@^2.3.3, debug@^2.6.6, debug@^2.6.8:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
+  dependencies:
+    ms "2.0.0"
+
+debug@^3.1.0:
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-3.2.4.tgz#82123737c51afbe9609a2b5dfe9664e7487171f0"
+  dependencies:
+    ms "^2.1.1"
+
+debug@~3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-3.1.0.tgz#5bb5a0672628b64149566ba16819e61518c67261"
   dependencies:
     ms "2.0.0"
 
@@ -2483,8 +2492,8 @@ ee-first@1.1.1:
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
 
 electron-to-chromium@^1.3.47, electron-to-chromium@^1.3.62:
-  version "1.3.63"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.63.tgz#6485f5f4f3375358aa8fa23c2029ada208483b8d"
+  version "1.3.65"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.65.tgz#0655c238e45fea7e0e0e81fd0cac62b8186129c2"
 
 elliptic@^6.0.0:
   version "6.4.1"
@@ -2606,8 +2615,8 @@ es-to-primitive@^1.1.1:
     is-symbol "^1.0.1"
 
 es6-promise@^4.0.3:
-  version "4.2.4"
-  resolved "https://registry.yarnpkg.com/es6-promise/-/es6-promise-4.2.4.tgz#dc4221c2b16518760bd8c39a52d8f356fc00ed29"
+  version "4.2.5"
+  resolved "https://registry.yarnpkg.com/es6-promise/-/es6-promise-4.2.5.tgz#da6d0d5692efb461e082c14817fe2427d8f5d054"
 
 es6-promise@~3.0.2:
   version "3.0.2"
@@ -3882,10 +3891,10 @@ is-callable@^1.1.1, is-callable@^1.1.3:
   resolved "https://registry.yarnpkg.com/is-callable/-/is-callable-1.1.4.tgz#1e1adf219e1eeb684d691f9d6a05ff0d30a24d75"
 
 is-ci@^1.0.10:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/is-ci/-/is-ci-1.2.0.tgz#3f4a08d6303a09882cef3f0fb97439c5f5ce2d53"
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/is-ci/-/is-ci-1.2.1.tgz#e3779c8ee17fccf428488f6e281187f2e632841c"
   dependencies:
-    ci-info "^1.3.0"
+    ci-info "^1.5.0"
 
 is-data-descriptor@^0.1.4:
   version "0.1.4"
@@ -4418,8 +4427,8 @@ karma-chrome-launcher@~2.2.0:
     which "^1.2.1"
 
 karma-coverage-istanbul-reporter@~2.0.0:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/karma-coverage-istanbul-reporter/-/karma-coverage-istanbul-reporter-2.0.3.tgz#ef08d1721ed108407a53f0d298acc6d2dc8a4008"
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/karma-coverage-istanbul-reporter/-/karma-coverage-istanbul-reporter-2.0.4.tgz#402ae4ed6eadb9d9dafbd408ffda17897c0d003a"
   dependencies:
     istanbul-api "^2.0.5"
     minimatch "^3.0.4"
@@ -4479,8 +4488,8 @@ keyv@3.0.0:
     json-buffer "3.0.0"
 
 killable@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/killable/-/killable-1.0.0.tgz#da8b84bd47de5395878f95d64d02f2449fe05e6b"
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/killable/-/killable-1.0.1.tgz#4c8ce441187a061c7474fb87ca08e2a638194892"
 
 kind-of@^3.0.2, kind-of@^3.0.3, kind-of@^3.2.0:
   version "3.2.2"
@@ -5117,8 +5126,8 @@ nanomatch@^1.2.9:
     to-regex "^3.0.1"
 
 needle@^2.2.1:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/needle/-/needle-2.2.2.tgz#1120ca4c41f2fcc6976fd28a8968afe239929418"
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/needle/-/needle-2.2.3.tgz#c1b04da378cd634d8befe2de965dc2cfb0fd65ca"
   dependencies:
     debug "^2.1.2"
     iconv-lite "^0.4.4"
@@ -5959,8 +5968,8 @@ protobufjs@5.0.0:
     yargs "^3.10.0"
 
 protractor@~5.4.0:
-  version "5.4.0"
-  resolved "https://registry.yarnpkg.com/protractor/-/protractor-5.4.0.tgz#e71c9c1f5cf6c5e9bdbcdb71e7f31b17ffd2878f"
+  version "5.4.1"
+  resolved "https://registry.yarnpkg.com/protractor/-/protractor-5.4.1.tgz#011a99e38df7aa45d22455b889ffbb13a6ce0bd9"
   dependencies:
     "@types/node" "^6.0.46"
     "@types/q" "^0.0.32"
@@ -5976,7 +5985,7 @@ protractor@~5.4.0:
     saucelabs "^1.5.0"
     selenium-webdriver "3.6.0"
     source-map-support "~0.4.0"
-    webdriver-js-extender "2.0.0"
+    webdriver-js-extender "2.1.0"
     webdriver-manager "^12.0.6"
 
 proxy-addr@~2.0.3:
@@ -7037,8 +7046,8 @@ spdx-license-ids@^1.0.0:
   resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-1.2.2.tgz#c9df7a3424594ade6bd11900d596696dc06bac57"
 
 spdx-license-ids@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.0.tgz#7a7cd28470cc6d3a1cfe6d66886f6bc430d3ac87"
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.1.tgz#e2a303236cac54b04031fa7a5a79c7e701df852f"
 
 spdx-ranges@^2.0.0:
   version "2.0.0"
@@ -7429,8 +7438,8 @@ terser@^3.8.1:
     source-map-support "~0.5.6"
 
 text-extensions@^1.0.0:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/text-extensions/-/text-extensions-1.7.0.tgz#faaaba2625ed746d568a23e4d0aacd9bf08a8b39"
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/text-extensions/-/text-extensions-1.8.0.tgz#6f343c62268843019b21a616a003557bdb952d2b"
 
 text-hex@1.0.x:
   version "1.0.0"
@@ -7598,8 +7607,8 @@ tslint-no-circular-imports@^0.5.0:
   resolved "https://registry.yarnpkg.com/tslint-no-circular-imports/-/tslint-no-circular-imports-0.5.2.tgz#47ac9194ec531101ac19198d5144f7ac9f57d980"
 
 tslint-sonarts@^1.7.0:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/tslint-sonarts/-/tslint-sonarts-1.7.0.tgz#1bcaf9f524c86b8d4cf9a2afae736edffd2e0dea"
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/tslint-sonarts/-/tslint-sonarts-1.8.0.tgz#80f2e8addd418c3b8807fc0155dec33b5a81e8d1"
   dependencies:
     immutable "^3.8.2"
 
@@ -7940,9 +7949,9 @@ wbuf@^1.1.0, wbuf@^1.7.2:
   dependencies:
     minimalistic-assert "^1.0.0"
 
-webdriver-js-extender@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/webdriver-js-extender/-/webdriver-js-extender-2.0.0.tgz#b27fc1ed1afbf78f0ac57e4c878f31b10e57f146"
+webdriver-js-extender@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/webdriver-js-extender/-/webdriver-js-extender-2.1.0.tgz#57d7a93c00db4cc8d556e4d3db4b5db0a80c3bb7"
   dependencies:
     "@types/selenium-webdriver" "^3.0.0"
     selenium-webdriver "^3.0.1"

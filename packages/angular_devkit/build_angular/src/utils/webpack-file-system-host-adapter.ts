@@ -6,13 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { FileDoesNotExistException, JsonObject, normalize, virtualFs } from '@angular-devkit/core';
-import { Callback, InputFileSystem } from '@ngtools/webpack/src/webpack';
+import { Callback } from '@ngtools/webpack/src/webpack';
 import { Stats } from 'fs';
 import { Observable, of } from 'rxjs';
 import { map, mergeMap, switchMap } from 'rxjs/operators';
 
 
-export class WebpackFileSystemHostAdapter implements InputFileSystem {
+export class WebpackFileSystemHostAdapter {
   protected _syncHost: virtualFs.SyncDelegateHost<Stats> | null = null;
 
   constructor(protected _host: virtualFs.Host<Stats>) {}

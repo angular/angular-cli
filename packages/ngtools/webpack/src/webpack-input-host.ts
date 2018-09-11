@@ -9,7 +9,7 @@ import { Path, PathFragment, fragment, getSystemPath, virtualFs } from '@angular
 import { Stats } from 'fs';
 import { Observable, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { InputFileSystem } from './webpack';
+import { InputFileSystem } from 'webpack';
 
 // Host is used instead of ReadonlyHost due to most decorators only supporting Hosts
 export class WebpackInputHost implements virtualFs.Host<Stats> {
@@ -51,7 +51,8 @@ export class WebpackInputHost implements virtualFs.Host<Stats> {
       // TODO: remove this try+catch when issue https://github.com/ReactiveX/rxjs/issues/3740 is
       // fixed.
       try {
-        const names = this.inputFileSystem.readdirSync(getSystemPath(path));
+        // tslint:disable-next-line:no-any
+        const names: string[] = (this.inputFileSystem as any).readdirSync(getSystemPath(path));
         obs.next(names.map(name => fragment(name)));
         obs.complete();
       } catch (err) {

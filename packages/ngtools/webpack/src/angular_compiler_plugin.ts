@@ -52,7 +52,6 @@ import {
 } from './virtual_file_system_decorator';
 import {
   Callback,
-  InputFileSystem,
   NodeWatchFileSystemInterface,
   NormalModuleFactoryRequest,
 } from './webpack';
@@ -583,7 +582,6 @@ export class AngularCompilerPlugin {
     compiler.hooks.environment.tap('angular-compiler', () => {
       // The webpack types currently do not include these
       const compilerWithFileSystems = compiler as Compiler & {
-        inputFileSystem: InputFileSystem,
         watchFileSystem: NodeWatchFileSystemInterface,
       };
 

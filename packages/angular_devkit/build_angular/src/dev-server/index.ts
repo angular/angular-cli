@@ -210,7 +210,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
         index: `${servePath}/${path.basename(browserOptions.index)}`,
         disableDotRule: true,
         htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
-      },
+      } as WebpackDevServer.HistoryApiFallbackConfig,
       stats: false,
       compress: browserOptions.optimization,
       watchOptions: {
