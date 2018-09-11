@@ -11,6 +11,7 @@ import {
   JsonObject,
   JsonParseMode,
   experimental,
+  isJsonObject,
   normalize,
   parseJson,
   parseJsonAst,
@@ -63,22 +64,21 @@ export function getWorkspace(
     return cached;
   }
 
-  const configPath = level === 'local' ? projectFilePath() : globalFilePath();
+  const [rawWorkspace, configPath] = getWorkspaceRaw(level);
 
-  if (!configPath) {
+  if (!rawWorkspace || !configPath) {
     cachedWorkspaces.set(level, null);
 
     return null;
   }
 
   const root = normalize(path.dirname(configPath));
-  const file = normalize(path.basename(configPath));
   const workspace = new experimental.workspace.Workspace(
     root,
     new NodeJsSyncHost(),
   );
 
-  workspace.loadWorkspaceFromHost(file).subscribe();
+  workspace.loadWorkspaceFromJson(rawWorkspace.value).subscribe();
   cachedWorkspaces.set(level, workspace);
 
   return workspace;
@@ -119,7 +119,37 @@ export function getWorkspaceRaw(
     throw new Error('Invalid JSON');
   }
 
+  // TODO: Remove when 'targets' is the default
+  normalizeArchitectTargets(ast, configPath);
+
   return [ast, configPath];
+}
+
+function normalizeArchitectTargets(ast: JsonAstObject, configPath: string) {
+  const config = ast.value;
+
+  const projects = config.projects;
+  if (!isJsonObject(projects)) {
+    return;
+  }
+
+  let changed = false;
+  for (const projectName in projects) {
+    const project = projects[projectName];
+    if (!isJsonObject(project)) {
+      continue;
+    }
+
+    if (project.targets && !project.architect) {
+      project.architect = project.targets;
+      delete project.targets;
+      changed = true;
+    }
+  }
+
+  if (changed) {
+    writeFileSync(configPath, JSON.stringify(config, null, 2));
+  }
 }
 
 export function validateWorkspace(json: JsonObject) {
