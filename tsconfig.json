@@ -22,7 +22,7 @@
     // source in devtools.
     "inlineSources": true,
     "strictNullChecks": true,
-    "target": "es2016",
+    "target": "es2017",
     "lib": [
       "es2017"
     ],
