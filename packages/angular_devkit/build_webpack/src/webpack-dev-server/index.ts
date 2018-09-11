@@ -49,7 +49,7 @@ export class WebpackDevServerBuilder implements Builder<WebpackDevServerBuilderS
       devServerConfig.port = devServerConfig.port || 8080;
 
       if (devServerConfig.stats) {
-        webpackConfig.stats = devServerConfig.stats;
+        webpackConfig.stats = devServerConfig.stats as webpack.Stats.ToStringOptionsObject;
       }
       // Disable stats reporting by the devserver, we have our own logger.
       devServerConfig.stats = false;

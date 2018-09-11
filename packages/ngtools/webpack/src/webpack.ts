@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Stats } from 'fs';
+import { InputFileSystem } from 'webpack';
 
 // Declarations for (some) Webpack types. Only what's needed.
 
@@ -17,21 +17,6 @@ export interface Callback<T = any> {
 export interface NormalModuleFactoryRequest {
   request: string;
   contextInfo: { issuer: string };
-}
-
-export interface InputFileSystem {
-  stat(path: string, callback: Callback<Stats>): void;
-  readdir(path: string, callback: Callback<string[]>): void;
-  readFile(path: string, callback: Callback<Buffer>): void;
-  readJson(path: string, callback: Callback): void;
-  readlink(path: string, callback: Callback<string>): void;
-  statSync(path: string): Stats;
-  readdirSync(path: string): string[];
-  readFileSync(path: string): Buffer;
-  // tslint:disable-next-line:no-any
-  readJsonSync(path: string): any;
-  readlinkSync(path: string): string;
-  purge(changes?: string[] | string): void;
 }
 
 export interface NodeWatchFileSystemInterface {
