@@ -24,14 +24,18 @@ import {
 } from '@angular-devkit/schematics';
 import { Schema as E2eOptions } from '../e2e/schema';
 import {
-  WorkspaceProject,
-  WorkspaceSchema,
   addProjectToWorkspace,
   getWorkspace,
 } from '../utility/config';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { latestVersions } from '../utility/latest-versions';
 import { validateProjectName } from '../utility/validation';
+import {
+  Builders,
+  ProjectType,
+  WorkspaceProject,
+  WorkspaceSchema,
+} from '../utility/workspace-models';
 import { Schema as ApplicationOptions } from './schema';
 
 
@@ -133,12 +137,12 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
   const project: WorkspaceProject = {
     root: projectRoot,
     sourceRoot: join(normalize(projectRoot), 'src'),
-    projectType: 'application',
+    projectType: ProjectType.Application,
     prefix: options.prefix || 'app',
     schematics,
     targets: {
       build: {
-        builder: '@angular-devkit/build-angular:browser',
+        builder: Builders.Browser,
         options: {
           outputPath: `dist/${options.name}`,
           index: `${projectRoot}src/index.html`,
@@ -173,7 +177,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
         },
       },
       serve: {
-        builder: '@angular-devkit/build-angular:dev-server',
+        builder: Builders.DevServer,
         options: {
           browserTarget: `${options.name}:build`,
         },
@@ -184,13 +188,13 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
         },
       },
       'extract-i18n': {
-        builder: '@angular-devkit/build-angular:extract-i18n',
+        builder: Builders.ExtractI18n,
         options: {
           browserTarget: `${options.name}:build`,
         },
       },
       test: {
-        builder: '@angular-devkit/build-angular:karma',
+        builder: Builders.Karma,
         options: {
           main: `${projectRoot}src/test.ts`,
           polyfills: `${projectRoot}src/polyfills.ts`,
@@ -207,7 +211,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
         },
       },
       lint: {
-        builder: '@angular-devkit/build-angular:tslint',
+        builder: Builders.TsLint,
         options: {
           tsConfig: [
             `${rootFilesRoot}tsconfig.app.json`,

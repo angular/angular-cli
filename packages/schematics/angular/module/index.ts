@@ -23,10 +23,9 @@ import {
 import * as ts from 'typescript';
 import { addImportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
-import { getWorkspace } from '../utility/config';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
-import { buildDefaultPath } from '../utility/project';
+import { buildDefaultPath, getProject } from '../utility/project';
 import { Schema as ModuleOptions } from './schema';
 
 
@@ -71,15 +70,15 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
 
 export default function (options: ModuleOptions): Rule {
   return (host: Tree) => {
-    const workspace = getWorkspace(host);
     if (!options.project) {
       throw new SchematicsException('Option (project) is required.');
     }
-    const project = workspace.projects[options.project];
+    const project = getProject(host, options.project);
 
     if (options.path === undefined) {
       options.path = buildDefaultPath(project);
     }
+
     if (options.module) {
       options.module = findModuleFromOptions(host, options);
     }

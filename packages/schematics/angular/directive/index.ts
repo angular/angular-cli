@@ -23,11 +23,10 @@ import {
 import * as ts from 'typescript';
 import { addDeclarationToModule, addExportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
-import { getWorkspace } from '../utility/config';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
-import { buildDefaultPath } from '../utility/project';
+import { buildDefaultPath, getProject } from '../utility/project';
 import { validateHtmlSelector } from '../utility/validation';
 import { Schema as DirectiveOptions } from './schema';
 
@@ -104,11 +103,10 @@ function buildSelector(options: DirectiveOptions, projectPrefix: string) {
 
 export default function (options: DirectiveOptions): Rule {
   return (host: Tree) => {
-    const workspace = getWorkspace(host);
     if (!options.project) {
       throw new SchematicsException('Option (project) is required.');
     }
-    const project = workspace.projects[options.project];
+    const project = getProject(host, options.project);
 
     if (options.path === undefined) {
       options.path = buildDefaultPath(project);

@@ -10,7 +10,7 @@ export interface Schema {
     /**
      * The name of the project.
      */
-    project?: string;
+    project: string;
     /**
      * The target to apply service worker to.
      */
