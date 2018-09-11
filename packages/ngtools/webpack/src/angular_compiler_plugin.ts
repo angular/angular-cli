@@ -6,18 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Path, dirname, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
-import { ChildProcess, ForkOptions, fork } from 'child_process';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as ts from 'typescript';
-import { Compiler, compilation } from 'webpack';
-import { time, timeEnd } from './benchmark';
-import { WebpackCompilerHost, workaroundResolve } from './compiler_host';
-import { resolveEntryModuleFromMain } from './entry_resolver';
-import { gatherDiagnostics, hasErrors } from './gather_diagnostics';
-import { LazyRouteMap, findLazyRoutes } from './lazy_routes';
 import {
-  CompilerCliIsSupported,
   CompilerHost,
   CompilerOptions,
   DEFAULT_ERROR_CODE,
@@ -32,7 +21,17 @@ import {
   createProgram,
   formatDiagnostics,
   readConfiguration,
-} from './ngtools_api';
+} from '@angular/compiler-cli';
+import { ChildProcess, ForkOptions, fork } from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as ts from 'typescript';
+import { Compiler, compilation } from 'webpack';
+import { time, timeEnd } from './benchmark';
+import { WebpackCompilerHost, workaroundResolve } from './compiler_host';
+import { resolveEntryModuleFromMain } from './entry_resolver';
+import { gatherDiagnostics, hasErrors } from './gather_diagnostics';
+import { LazyRouteMap, findLazyRoutes } from './lazy_routes';
 import { resolveWithPaths } from './paths-plugin';
 import { WebpackResourceLoader } from './resource_loader';
 import {
@@ -152,7 +151,6 @@ export class AngularCompilerPlugin {
   }
 
   constructor(options: AngularCompilerPluginOptions) {
-    CompilerCliIsSupported();
     this._options = Object.assign({}, options);
     this._setupOptions(this._options);
   }

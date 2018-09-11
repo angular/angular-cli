@@ -7,10 +7,6 @@
  */
 import { terminal } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import * as ts from 'typescript';
-import { time, timeEnd } from './benchmark';
-import { WebpackCompilerHost } from './compiler_host';
-import { CancellationToken, gatherDiagnostics } from './gather_diagnostics';
 import {
   CompilerHost,
   CompilerOptions,
@@ -18,7 +14,11 @@ import {
   createCompilerHost,
   createProgram,
   formatDiagnostics,
-} from './ngtools_api';
+} from '@angular/compiler-cli';
+import * as ts from 'typescript';
+import { time, timeEnd } from './benchmark';
+import { WebpackCompilerHost } from './compiler_host';
+import { CancellationToken, gatherDiagnostics } from './gather_diagnostics';
 
 
 // This file should run in a child process with the AUTO_START_ARG argument
