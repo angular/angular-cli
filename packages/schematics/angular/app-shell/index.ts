@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, dirname, experimental, join, normalize } from '@angular-devkit/core';
+import { dirname, experimental, join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -26,18 +26,12 @@ import {
   isImported,
 } from '../utility/ast-utils';
 import { Change, InsertChange } from '../utility/change';
-import { getWorkspace, getWorkspacePath } from '../utility/config';
+import { getWorkspace, updateWorkspace } from '../utility/config';
 import { getAppModulePath } from '../utility/ng-ast-utils';
-import { getProjectTargets } from '../utility/project-targets';
+import { getProject } from '../utility/project';
+import { getProjectTargets, targetBuildNotFoundError } from '../utility/project-targets';
+import { Builders, WorkspaceProject } from '../utility/workspace-models';
 import { Schema as AppShellOptions } from './schema';
-
-
-// Helper functions. (possible refactors to utils)
-function formatMissingAppMsg(label: string, nameOrIndex: string | undefined): string {
-  const nameOrIndexText = nameOrIndex ? ` (${nameOrIndex})` : '';
-
-  return `${label} app ${nameOrIndexText} not found.`;
-}
 
 function getSourceFile(host: Tree, path: string): ts.SourceFile {
   const buffer = host.read(path);
@@ -103,9 +97,13 @@ function getComponentTemplate(host: Tree, compPath: string, tmplInfo: TemplateIn
 
 function getBootstrapComponentPath(
   host: Tree,
-  project: experimental.workspace.WorkspaceProject,
+  project: WorkspaceProject,
 ): string {
   const projectTargets = getProjectTargets(project);
+  if (!projectTargets.build) {
+    throw targetBuildNotFoundError();
+  }
+
   const mainPath = projectTargets.build.options.main;
   const modulePath = getAppModulePath(host, mainPath);
   const moduleSource = getSourceFile(host, modulePath);
@@ -137,7 +135,7 @@ function validateProject(options: AppShellOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     const routerOutletCheckRegex = /<router\-outlet.*?>([\s\S]*?)<\/router\-outlet>/;
 
-    const clientProject = getClientProject(host, options);
+    const clientProject = getProject(host, options.clientProject);
     if (clientProject.projectType !== 'application') {
       throw new SchematicsException(`App shell requires a project type of "application".`);
     }
@@ -155,11 +153,9 @@ function validateProject(options: AppShellOptions): Rule {
 
 function addUniversalTarget(options: AppShellOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
-    const architect = getClientArchitect(host, options);
-    if (architect !== null) {
-      if (architect.server !== undefined) {
-        return host;
-      }
+    const architect = getProjectTargets(host, options.clientProject);
+    if (architect.server) {
+      return host;
     }
 
     // Copy options.
@@ -187,10 +183,9 @@ function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
     }
 
     const workspace = getWorkspace(host);
-    const workspacePath = getWorkspacePath(host);
-
-    const appShellTarget: JsonObject = {
-      builder: '@angular-devkit/build-angular:app-shell',
+    const projectTargets = getProjectTargets(workspace, options.clientProject);
+    projectTargets['app-shell'] = {
+      builder: Builders.AppShell,
       options: {
         browserTarget: `${options.clientProject}:build`,
         serverTarget: `${options.clientProject}:server`,
@@ -203,23 +198,17 @@ function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
       },
     };
 
-    if (!workspace.projects[options.clientProject]) {
-      throw new SchematicsException(`Client app ${options.clientProject} not found.`);
-    }
-    const clientProject = workspace.projects[options.clientProject];
-    const projectTargets = getProjectTargets(clientProject);
-    projectTargets['app-shell'] = appShellTarget;
-
-    host.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
-
-    return host;
+    return updateWorkspace(workspace);
   };
 }
 
 function addRouterModule(options: AppShellOptions): Rule {
   return (host: Tree) => {
-    const clientArchitect = getClientArchitect(host, options);
-    const mainPath = clientArchitect.build.options.main;
+    const projectTargets = getProjectTargets(host, options.clientProject);
+    if (!projectTargets.build) {
+      throw targetBuildNotFoundError();
+    }
+    const mainPath = projectTargets.build.options.main;
     const modulePath = getAppModulePath(host, mainPath);
     const moduleSource = getSourceFile(host, modulePath);
     const changes = addImportToModule(moduleSource, modulePath, 'RouterModule', '@angular/router');
@@ -256,8 +245,8 @@ function getMetadataProperty(metadata: ts.Node, propertyName: string): ts.Proper
 
 function addServerRoutes(options: AppShellOptions): Rule {
   return (host: Tree) => {
-    const clientProject = getClientProject(host, options);
-    const architect = getClientArchitect(host, options);
+    const clientProject = getProject(host, options.clientProject);
+    const architect = getProjectTargets(clientProject);
     // const mainPath = universalArchitect.build.options.main;
     const modulePath = getServerModulePath(host, clientProject, architect);
     if (modulePath === null) {
@@ -320,27 +309,6 @@ function addShellComponent(options: AppShellOptions): Rule {
   };
 
   return schematic('component', componentOptions);
-}
-
-function getClientProject(
-  host: Tree, options: AppShellOptions,
-): experimental.workspace.WorkspaceProject {
-  const workspace = getWorkspace(host);
-  const clientProject = workspace.projects[options.clientProject];
-  if (!clientProject) {
-    throw new SchematicsException(formatMissingAppMsg('Client', options.clientProject));
-  }
-
-  return clientProject;
-}
-
-function getClientArchitect(
-  host: Tree, options: AppShellOptions,
-): experimental.workspace.WorkspaceTool {
-  const clientProject = getClientProject(host, options);
-  const projectTargets = getProjectTargets(clientProject);
-
-  return projectTargets;
 }
 
 export default function (options: AppShellOptions): Rule {

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { WorkspaceProject } from '../utility/config';
+import { ProjectType, WorkspaceProject } from '../utility/workspace-models';
 import { buildDefaultPath } from './project';
 
 
@@ -14,7 +14,7 @@ describe('project', () => {
     let project: WorkspaceProject;
     beforeEach(() => {
       project = {
-        projectType: 'application',
+        projectType: ProjectType.Application,
         root: 'foo',
         prefix: 'app',
       };
@@ -26,7 +26,7 @@ describe('project', () => {
     });
 
     it('should handle projectType of library', () => {
-      project = { ...project, projectType: 'library' };
+      project = { ...project, projectType: ProjectType.Library };
       const result = buildDefaultPath(project);
       expect(result).toEqual('/foo/src/lib');
     });

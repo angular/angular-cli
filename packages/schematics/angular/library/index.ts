@@ -22,17 +22,18 @@ import {
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import {
-  WorkspaceProject,
-  WorkspaceSchema,
   addProjectToWorkspace,
   getWorkspace,
 } from '../utility/config';
-import {
-  NodeDependencyType,
-  addPackageJsonDependency,
-} from '../utility/dependencies';
+import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { latestVersions } from '../utility/latest-versions';
 import { validateProjectName } from '../utility/validation';
+import {
+  Builders,
+  ProjectType,
+  WorkspaceProject,
+  WorkspaceSchema,
+} from '../utility/workspace-models';
 import { Schema as LibraryOptions } from './schema';
 
 interface UpdateJsonFn<T> {
@@ -132,21 +133,21 @@ function addDependenciesToPackageJson() {
 function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSchema,
                                projectRoot: string, packageName: string): Rule {
 
-  const project: WorkspaceProject = {
-    root: `${projectRoot}`,
+  const project: WorkspaceProject<ProjectType.Library> = {
+    root: projectRoot,
     sourceRoot: `${projectRoot}/src`,
-    projectType: 'library',
+    projectType: ProjectType.Library,
     prefix: options.prefix || 'lib',
     targets: {
       build: {
-        builder: '@angular-devkit/build-ng-packagr:build',
+        builder: Builders.NgPackagr,
         options: {
           tsConfig: `${projectRoot}/tsconfig.lib.json`,
           project: `${projectRoot}/ng-package.json`,
         },
       },
       test: {
-        builder: '@angular-devkit/build-angular:karma',
+        builder: Builders.Karma,
         options: {
           main: `${projectRoot}/src/test.ts`,
           tsConfig: `${projectRoot}/tsconfig.spec.json`,
@@ -154,7 +155,7 @@ function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSche
         },
       },
       lint: {
-        builder: '@angular-devkit/build-angular:tslint',
+        builder: Builders.TsLint,
         options: {
           tsConfig: [
             `${projectRoot}/tsconfig.lib.json`,
