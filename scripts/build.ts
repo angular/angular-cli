@@ -88,6 +88,11 @@ function _copy(from: string, to: string) {
     _mkdirp(path.dirname(to));
   }
 
+  // Error out if destination already exists.
+  if (fs.existsSync(to)) {
+    throw new Error(`Path ${to} already exist...`);
+  }
+
   from = path.relative(process.cwd(), from);
   to = path.relative(process.cwd(), to);
 
@@ -161,13 +166,17 @@ function _sortPackages() {
 }
 
 function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
-  const { status, error, stderr } = child_process.spawnSync(command, args, { ...opts });
+  const { status, error, stderr, stdout } = child_process.spawnSync(command, args, {
+    stdio: 'inherit',
+    ...opts,
+  });
 
   if (status != 0) {
     logger.error(`Command failed: ${command} ${args.map(x => JSON.stringify(x)).join(', ')}`);
     if (error) {
       logger.error('Error: ' + (error ? error.message : 'undefined'));
     } else {
+      logger.error(`STDOUT:\n${stdout}`);
       logger.error(`STDERR:\n${stderr}`);
     }
     throw error;
@@ -201,6 +210,19 @@ export default function(argv: { local?: boolean, snapshot?: boolean }, logger: l
     const pkg = packages[packageName];
     _recursiveCopy(pkg.build, pkg.dist, logger);
     _rimraf(pkg.build);
+  }
+
+  logger.info('Merging bazel-bin/ with dist/');
+  for (const packageName of sortedPackages) {
+    const pkg = packages[packageName];
+    const bazelBinPath = pkg.build.replace(/([\\\/]dist[\\\/])(packages)/, (_, dist, packages) => {
+      return path.join(dist, 'bazel-bin', packages);
+    });
+    if (fs.existsSync(bazelBinPath)) {
+      packageLogger.info(packageName);
+      _recursiveCopy(bazelBinPath, pkg.dist, logger);
+      _rimraf(bazelBinPath);
+    }
   }
 
   logger.info('Copying resources...');
@@ -274,9 +296,14 @@ export default function(argv: { local?: boolean, snapshot?: boolean }, logger: l
   logger.info('Removing spec files...');
   const specLogger = logger.createChild('specfiles');
   for (const packageName of sortedPackages) {
-    specLogger.info(packageName);
     const pkg = packages[packageName];
     const files = glob.sync(path.join(pkg.dist, '**/*_spec?(_large).@(js|d.ts)'));
+
+    if (files.length == 0) {
+      continue;
+    }
+
+    specLogger.info(packageName);
     specLogger.info(`  ${files.length} spec files found...`);
     files.forEach(fileName => _rm(fileName));
   }
@@ -285,9 +312,14 @@ export default function(argv: { local?: boolean, snapshot?: boolean }, logger: l
   const templateLogger = logger.createChild('templates');
   const templateCompiler = require('@angular-devkit/core').template;
   for (const packageName of sortedPackages) {
-    templateLogger.info(packageName);
     const pkg = packages[packageName];
     const files = glob.sync(path.join(pkg.dist, '**/*.ejs'));
+
+    if (files.length == 0) {
+      continue;
+    }
+
+    templateLogger.info(packageName);
     templateLogger.info(`  ${files.length} ejs files found...`);
     files.forEach(fileName => {
       const p = path.relative(
