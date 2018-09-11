@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { Diagnostic, Diagnostics, Program } from '@angular/compiler-cli';
 import * as ts from 'typescript';
 import { time, timeEnd } from './benchmark';
-import { Diagnostic, Diagnostics, Program } from './ngtools_api';
 
 
 export class CancellationToken implements ts.CancellationToken {
