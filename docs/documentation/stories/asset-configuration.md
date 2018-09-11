@@ -20,7 +20,7 @@ The array below does the same as the default one:
 ```json
 "assets": [
   { "glob": "**/*", "input": "src/assets/", "output": "/assets/" },
-  { "glob": "favicon.ico", "input": "/src", "output": "/" },
+  { "glob": "favicon.ico", "input": "src/", "output": "/" },
 ]
 ```
 
