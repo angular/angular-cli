@@ -79,9 +79,6 @@ export interface AngularCompilerPluginOptions {
   skipCodeGeneration?: boolean;
   hostReplacementPaths?: { [path: string]: string } | ((path: string) => string);
   forkTypeChecker?: boolean;
-  // TODO: remove singleFileIncludes for 2.0, this is just to support old projects that did not
-  // include 'polyfills.ts' in `tsconfig.spec.json'.
-  singleFileIncludes?: string[];
   i18nInFile?: string;
   i18nInFormat?: string;
   i18nOutFile?: string;
@@ -116,7 +113,6 @@ export class AngularCompilerPlugin {
   // TS compilation.
   private _compilerOptions: CompilerOptions;
   private _rootNames: string[];
-  private _singleFileIncludes: string[] = [];
   private _program: (ts.Program | Program) | null;
   private _compilerHost: WebpackCompilerHost & CompilerHost;
   private _moduleResolutionCache: ts.ModuleResolutionCache;
@@ -203,17 +199,13 @@ export class AngularCompilerPlugin {
       basePath = path.resolve(process.cwd(), options.basePath);
     }
 
-    if (options.singleFileIncludes !== undefined) {
-      this._singleFileIncludes.push(...options.singleFileIncludes);
-    }
-
     // Parse the tsconfig contents.
     const config = readConfiguration(this._tsConfigPath);
     if (config.errors && config.errors.length) {
       throw new Error(formatDiagnostics(config.errors));
     }
 
-    this._rootNames = config.rootNames.concat(...this._singleFileIncludes);
+    this._rootNames = config.rootNames;
     this._compilerOptions = { ...config.options, ...options.compilerOptions };
     this._basePath = config.options.basePath || basePath || '';
 
@@ -351,7 +343,7 @@ export class AngularCompilerPlugin {
     // When a new root name (like a lazy route) is added, it won't be available from
     // following imports on the existing files, so we need to get the new list of root files.
     const config = readConfiguration(this._tsConfigPath);
-    this._rootNames = config.rootNames.concat(...this._singleFileIncludes);
+    this._rootNames = config.rootNames;
 
     // Update the forked type checker with all changed compilation files.
     // This includes templates, that also need to be reloaded on the type checker.
