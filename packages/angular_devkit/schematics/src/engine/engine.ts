@@ -329,7 +329,7 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     }
 
     // remove duplicates
-    return [...new Set(names)];
+    return [...new Set(names)].sort();
   }
 
   transformOptions<OptionT extends object, ResultT extends object>(

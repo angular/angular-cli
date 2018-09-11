@@ -18,8 +18,16 @@ import {
   virtualFs,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
-import { DryRunEvent, UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
-import { NodeWorkflow } from '@angular-devkit/schematics/tools';
+import {
+  DryRunEvent,
+  SchematicEngine,
+  UnsuccessfulWorkflowExecution,
+} from '@angular-devkit/schematics';
+import {
+  FileSystemEngineHost,
+  NodeModulesEngineHost,
+  NodeWorkflow,
+} from '@angular-devkit/schematics/tools';
 import * as minimist from 'minimist';
 
 
@@ -36,12 +44,18 @@ function usage(exitCode = 0): never {
     Options:
         --debug             Debug mode. This is true by default if the collection is a relative
                             path (in that case, turn off with --debug=false).
+
         --allowPrivate      Allow private schematics to be run from the command line. Default to
                             false.
+
         --dry-run           Do not output anything, but instead just show what actions would be
                             performed. Default to true if debug is also true.
+
         --force             Force overwriting files that would otherwise be an error.
-        --list-schematics   List all schematics from the collection, by name.
+
+        --list-schematics   List all schematics from the collection, by name. A collection name
+                            should be suffixed by a colon. Example: '@schematics/schematics:'.
+
         --verbose           Show more information.
 
         --help              Show this message.
@@ -49,8 +63,7 @@ function usage(exitCode = 0): never {
     Any additional option is passed to the Schematics depending on
   `);
 
-  process.exit(exitCode);
-  throw 0;  // The node typing sometimes don't have a never type for process.exit().
+  return process.exit(exitCode);
 }
 
 
@@ -68,20 +81,12 @@ function usage(exitCode = 0): never {
  * @param str The argument to parse.
  * @return {{collection: string, schematic: (string)}}
  */
-function parseSchematicName(str: string | null): { collection: string, schematic: string } {
+function parseSchematicName(str: string | null): { collection: string, schematic: string | null} {
   let collection = '@schematics/schematics';
 
-  if (!str || str === null) {
-    usage(1);
-  }
-
-  let schematic: string = str as string;
-  if (schematic.indexOf(':') != -1) {
+  let schematic = str;
+  if (schematic && schematic.indexOf(':') != -1) {
     [collection, schematic] = schematic.split(':', 2);
-
-    if (!schematic) {
-      usage(2);
-    }
   }
 
   return { collection, schematic };
@@ -124,11 +129,21 @@ const isLocalCollection = collectionName.startsWith('.') || collectionName.start
 
 /** If the user wants to list schematics, we simply show all the schematic names. */
 if (argv['list-schematics']) {
-  // logger.info(engine.listSchematicNames(collection).join('\n'));
+  const engineHost = isLocalCollection
+    ? new FileSystemEngineHost(normalize(process.cwd()))
+    : new NodeModulesEngineHost();
+
+  const engine = new SchematicEngine(engineHost);
+  const collection = engine.createCollection(collectionName);
+  logger.info(engine.listSchematicNames(collection).join('\n'));
+
   process.exit(0);
-  throw 0;  // TypeScript doesn't know that process.exit() never returns.
 }
 
+if (!schematicName) {
+  usage(1);
+  throw 0; // TypeScript doesn't know that process.exit() never returns.
+}
 
 /** Gather the arguments for later use. */
 const debug: boolean = argv.debug === null ? isLocalCollection : argv.debug;
