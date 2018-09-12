@@ -93,6 +93,11 @@ export abstract class ArchitectCommand<
     }
 
     if ((!targetSpec.project || !targetSpec.target) && !this.multiTarget) {
+      if (options.help || options.helpJson) {
+        // This is a special case where we just return.
+        return;
+      }
+
       throw new Error('Cannot determine project or target for Architect command.');
     }
 
