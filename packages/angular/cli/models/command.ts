@@ -112,10 +112,10 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
   async validateScope(): Promise<void> {
     switch (this.description.scope) {
       case CommandScope.OutProject:
-        if (this.workspace.configFile || getWorkspace('local') !== null) {
+        if (this.workspace.configFile) {
           this.logger.fatal(tags.oneLine`
             The ${this.description.name} command requires to be run outside of a project, but a
-            project definition was found at "${this.workspace.root}".
+            project definition was found at "${this.workspace.configFile}".
           `);
           throw 1;
         }
