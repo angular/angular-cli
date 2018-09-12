@@ -13,6 +13,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { packages } from '../lib/packages';
 import build from './build';
+import create from './create';
 
 
 function _copy(from: string, to: string) {
@@ -33,17 +34,17 @@ function _copy(from: string, to: string) {
 
 
 function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
-  const { status, error, stderr } = spawnSync(command, args, { ...opts });
+  const { status, error, stdout } = spawnSync(command, args, {
+    stdio: ['ignore', 'pipe', 'inherit'],
+    ...opts,
+  });
 
   if (status != 0) {
     logger.error(`Command failed: ${command} ${args.map(x => JSON.stringify(x)).join(', ')}`);
-    if (error) {
-      logger.error('Error: ' + (error ? error.message : 'undefined'));
-    } else {
-      logger.error(`STDERR:\n${stderr}`);
-    }
     throw error;
   }
+
+  return stdout.toString('utf-8');
 }
 
 
@@ -69,16 +70,43 @@ export default async function(opts: SnapshotsOptions, logger: logging.Logger) {
     || ''
   ).trim();
 
-  logger.info('Setting up global git name.');
   if (githubToken) {
+    logger.info('Setting up global git name.');
     _exec('git', ['config', '--global', 'user.email', 'circleci@angular.io'], {}, logger);
     _exec('git', ['config', '--global', 'user.name', 'Angular Builds'], {}, logger);
     _exec('git', ['config', '--global', 'push.default', 'simple'], {}, logger);
   }
 
+  // Creating a new project and reading the help.
+  logger.info('Creating temporary project...');
+  const newProjectTempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'angular-cli-create-'));
+  const newProjectName = 'help-project';
+  const newProjectRoot = path.join(newProjectTempRoot, newProjectName);
+  await create({ _: [newProjectName] }, logger.createChild('create'), newProjectTempRoot);
+
   // Run build.
   logger.info('Building...');
   await build({ snapshot: true }, logger.createChild('build'));
+
+  logger.info('Gathering JSON Help...');
+  const ngPath = path.join(newProjectRoot, 'node_modules/.bin/ng');
+  const helpOutputRoot = path.join(packages['@angular/cli'].dist, 'help');
+  fs.mkdirSync(helpOutputRoot);
+  const commands = require('../packages/angular/cli/commands.json');
+  for (const commandName of Object.keys(commands)) {
+    const options = { cwd: newProjectRoot };
+    const childLogger = logger.createChild(commandName);
+    const stdout = _exec(ngPath, [commandName, '--help-json'], options, childLogger);
+    if (stdout.trim()) {
+      fs.writeFileSync(path.join(helpOutputRoot, commandName + '.json'), stdout);
+    }
+  }
+
+  if (!githubToken) {
+    logger.info('No token given, skipping actual publishing...');
+
+    return 0;
+  }
 
   for (const packageName of Object.keys(packages)) {
     const pkg = packages[packageName];
@@ -119,4 +147,6 @@ export default async function(opts: SnapshotsOptions, logger: logging.Logger) {
     _exec('git', ['push', 'origin'], { cwd: destPath }, publishLogger);
     _exec('git', ['push', '--tags', 'origin'], { cwd: destPath }, publishLogger);
   }
+
+  return 0;
 }
