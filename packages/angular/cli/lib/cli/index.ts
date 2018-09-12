@@ -9,6 +9,7 @@
 import { logging, terminal } from '@angular-devkit/core';
 import { filter } from 'rxjs/operators';
 import { runCommand } from '../../models/command-runner';
+import { getWorkspaceRaw } from '../../utilities/config';
 import { getWorkspaceDetails } from '../../utilities/project';
 
 
@@ -21,6 +22,14 @@ export default async function(options: { testing?: boolean, cliArgs: string[] })
 
   let projectDetails = getWorkspaceDetails();
   if (projectDetails === null) {
+    const [, localPath] = getWorkspaceRaw('local');
+    if (localPath !== null) {
+      logger.fatal(`An invalid configuration file was found ['${localPath}'].`
+                 + ' Please delete the file before running the command.');
+
+      return 1;
+    }
+
     projectDetails = { root: process.cwd() };
   }
 
