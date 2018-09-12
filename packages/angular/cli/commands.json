@@ -5,7 +5,6 @@
   "doc": "./commands/doc.json",
   "e2e": "./commands/e2e.json",
   "make-this-awesome": "./commands/easter-egg.json",
-  "eject": "./commands/eject.json",
   "generate": "./commands/generate.json",
   "get": "./commands/deprecated.json",
   "set": "./commands/deprecated.json",
