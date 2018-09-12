@@ -29,6 +29,7 @@
     "baseUrl": "",
     "rootDirs": [
       ".",
+      "./dist-schema/",
       "./bazel-bin/"
     ],
     "typeRoots": [

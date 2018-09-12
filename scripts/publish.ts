@@ -29,9 +29,9 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
 }
 
 
-export default function (args: { tag?: string }, logger: logging.Logger) {
+export default async function (args: { tag?: string }, logger: logging.Logger) {
   logger.info('Building...');
-  build({}, logger.createChild('build'));
+  await build({}, logger.createChild('build'));
 
   return Object.keys(packages).reduce((acc: Promise<void>, name: string) => {
     const pkg = packages[name];
