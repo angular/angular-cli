@@ -52,7 +52,12 @@ _ts_json_schema_interface = rule(
 )
 
 
-def ts_json_schema(name, src, data = [], **kwargs):
+# Generates a library that contains the interface for a JSON Schema file. Takes a single `src`
+# argument as input, an optional data field for reference files, and produces a ts_library()
+# rule containing the typescript interface.
+# The file produced will have the same name, with the extension replaced from `.json` to `.ts`.
+# Any filename collision will be an error thrown by Bazel.
+def ts_json_schema(name, src, data = []):
     out = src.replace(".json", ".ts")
 
     _ts_json_schema_interface(

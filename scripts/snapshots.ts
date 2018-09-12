@@ -53,7 +53,7 @@ export interface SnapshotsOptions {
   githubToken?: string;
 }
 
-export default function(opts: SnapshotsOptions, logger: logging.Logger) {
+export default async function(opts: SnapshotsOptions, logger: logging.Logger) {
   // Get the SHA.
   if (execSync(`git status --porcelain`).toString() && !opts.force) {
     logger.error('You cannot run snapshots with local changes.');
@@ -78,7 +78,7 @@ export default function(opts: SnapshotsOptions, logger: logging.Logger) {
 
   // Run build.
   logger.info('Building...');
-  build({ snapshot: true }, logger.createChild('build'));
+  await build({ snapshot: true }, logger.createChild('build'));
 
   for (const packageName of Object.keys(packages)) {
     const pkg = packages[packageName];

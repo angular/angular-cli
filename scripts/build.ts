@@ -34,7 +34,9 @@ function _mkdirp(p: string) {
   if (!fs.existsSync(path.dirname(p))) {
     _mkdirp(path.dirname(p));
   }
-  fs.mkdirSync(p);
+  if (!fs.existsSync(p)) {
+    fs.mkdirSync(p);
+  }
 }
 
 function _recursiveFileList(p: string): string[] {
@@ -186,21 +188,61 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
 
 function _build(logger: logging.Logger) {
   logger.info('Building...');
-  _exec('node_modules/.bin/tsc', ['-p', 'tsconfig.json'], {}, logger);
+  _exec('node', [
+    require.resolve('typescript/bin/tsc'),
+    '-p',
+    'tsconfig.json',
+  ], {}, logger);
 }
 
 
-function _bazel(logger: logging.Logger) {
-  logger.info('Bazel build...');
-  _exec('bazel', ['build', '//packages/...'], {}, logger);
+async function _bazel(logger: logging.Logger) {
+  // TODO: undo this when we fully support bazel on windows.
+  // logger.info('Bazel build...');
+  // _exec('bazel', ['build', '//packages/...'], {}, logger);
+
+  const allJsonFiles = glob.sync('packages/**/*.json', {
+    ignore: [
+      '**/node_modules/**',
+      '**/files/**',
+      '**/*-files/**',
+      '**/package.json',
+    ],
+  });
+
+  const quicktypeRunner = require('../tools/quicktype_runner');
+  logger.info('Generating JSON Schema....');
+
+  for (const fileName of allJsonFiles) {
+    if (fs.existsSync(fileName.replace(/\.json$/, '.ts'))
+        || fs.existsSync(fileName.replace(/\.json$/, '.d.ts'))) {
+      // Skip files that already exist.
+      continue;
+    }
+    const content = fs.readFileSync(fileName, 'utf-8');
+
+    const json = JSON.parse(content);
+    if (!json.$schema) {
+      // Skip non-schema files.
+      continue;
+    }
+    const tsContent = await quicktypeRunner.generate(fileName);
+    const tsPath = path.join(__dirname, '../dist-schema', fileName.replace(/\.json$/, '.ts'));
+
+    _mkdirp(path.dirname(tsPath));
+    fs.writeFileSync(tsPath, tsContent, 'utf-8');
+  }
 }
 
 
-export default function(argv: { local?: boolean, snapshot?: boolean }, logger: logging.Logger) {
+export default async function(
+  argv: { local?: boolean, snapshot?: boolean },
+  logger: logging.Logger,
+) {
   _clean(logger);
 
   const sortedPackages = _sortPackages();
-  _bazel(logger);
+  await _bazel(logger);
   _build(logger);
 
   logger.info('Moving packages to dist/');
@@ -216,7 +258,7 @@ export default function(argv: { local?: boolean, snapshot?: boolean }, logger: l
   for (const packageName of sortedPackages) {
     const pkg = packages[packageName];
     const bazelBinPath = pkg.build.replace(/([\\\/]dist[\\\/])(packages)/, (_, dist, packages) => {
-      return path.join(dist, 'bazel-bin', packages);
+      return path.join(dist, 'dist-schema', packages);
     });
     if (fs.existsSync(bazelBinPath)) {
       packageLogger.info(packageName);
