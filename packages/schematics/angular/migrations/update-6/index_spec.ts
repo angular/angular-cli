@@ -237,11 +237,11 @@ describe('Migration to v6', () => {
         });
 
         it('should move viewEncapsulation', () => {
-          baseConfig.defaults.component = { viewEncapsulation: 'Native' };
+          baseConfig.defaults.component = { viewEncapsulation: 'ShadowDom' };
           tree.create(oldConfigPath, JSON.stringify(baseConfig, null, 2));
           tree = schematicRunner.runSchematic('migration-01', defaultOptions, tree);
           const config = getSchematicConfig(tree, 'component');
-          expect(config.viewEncapsulation).toEqual('Native');
+          expect(config.viewEncapsulation).toEqual('ShadowDom');
         });
 
         it('should not move viewEncapsulation if not defined', () => {
