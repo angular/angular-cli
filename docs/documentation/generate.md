@@ -5,6 +5,9 @@
 ## Overview
 `ng generate [name]` generates the specified schematic
 
+## Alias
+g - `ng g [name]`
+
 ## Available Schematics:
  - [class](generate/class)
  - [component](generate/component)
@@ -15,7 +18,7 @@
  - [module](generate/module)
  - [pipe](generate/pipe)
  - [service](generate/service)
-
+ - [appShell](generate/app-shell)
  - [application](generate/application)
  - [library](generate/library)
  - [universal](generate/universal)

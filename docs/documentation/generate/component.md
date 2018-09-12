@@ -5,6 +5,9 @@
 ## Overview
 `ng generate component [name]` generates a component
 
+## Alias
+c - `ng generate c [name]`
+
 ## Options
 <details>
   <summary>dry-run</summary>

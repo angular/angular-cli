@@ -3,7 +3,10 @@
 # ng generate application
 
 ## Overview
-Create an Angular application.
+`ng generate application [name]` creates an Angular application.
+
+## Alias
+app - `ng generate app [name]`
 
 ## Options
 <details>

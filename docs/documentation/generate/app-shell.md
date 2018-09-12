@@ -3,7 +3,10 @@
 # ng generate app-shell
 
 ## Overview
-Create an app shell.
+`ng generate appShell [name]` creates an app shell
+
+## Alias
+app-shell - `ng generate app-shell [name]`
 
 ## Options
 <details>

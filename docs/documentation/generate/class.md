@@ -5,6 +5,9 @@
 ## Overview
 `ng generate class [name]` generates a class
 
+## Alias
+cl - `ng generate cl [name]`
+
 ## Options
 <details>
   <summary>dry-run</summary>

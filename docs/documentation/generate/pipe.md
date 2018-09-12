@@ -5,6 +5,9 @@
 ## Overview
 `ng generate pipe [name]` generates a pipe
 
+## Alias
+p - `ng generate p [name]`
+
 ## Options
 <details>
   <summary>dry-run</summary>

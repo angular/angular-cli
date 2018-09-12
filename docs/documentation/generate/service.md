@@ -5,6 +5,9 @@
 ## Overview
 `ng generate service [name]` generates a service
 
+## Alias
+s - `ng generate s [name]`
+
 ## Options
 <details>
   <summary>dry-run</summary>

@@ -5,6 +5,9 @@
 ## Overview
 Generate a library project for Angular.
 
+## Alias
+lib - `ng generate lib [name]`
+
 ## Options
 <details>
   <summary>dry-run</summary>
