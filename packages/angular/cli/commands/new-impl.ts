@@ -14,13 +14,9 @@ import { Schema as NewCommandSchema } from './new';
 
 export class NewCommand extends SchematicCommand<NewCommandSchema> {
   public readonly allowMissingWorkspace = true;
-  private schematicName = 'ng-new';
+  schematicName = 'ng-new';
 
   public async run(options: NewCommandSchema & Arguments) {
-    if (options.dryRun) {
-      options.skipGit = true;
-    }
-
     let collectionName: string;
     if (options.collection) {
       collectionName = options.collection;

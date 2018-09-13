@@ -82,6 +82,9 @@ export abstract class SchematicCommand<
   private readonly _engine: Engine<FileSystemCollectionDesc, FileSystemSchematicDesc>;
   protected _workflow: workflow.BaseWorkflow;
 
+  protected collectionName = '@schematics/angular';
+  protected schematicName?: string;
+
   constructor(
     context: CommandContext,
     description: CommandDescription,
@@ -95,6 +98,18 @@ export abstract class SchematicCommand<
   public async initialize(options: T & Arguments) {
     this._loadWorkspace();
     this.createWorkflow(options);
+
+    if (this.schematicName) {
+      // Set the options.
+      const collection = this.getCollection(this.collectionName);
+      const schematic = this.getSchematic(collection, this.schematicName, true);
+      const options = await parseJsonSchemaToOptions(
+        this._workflow.registry,
+        schematic.description.schemaJson || {},
+      );
+
+      this.description.options.push(...options);
+    }
   }
 
   public async printHelp(options: T & Arguments) {
@@ -330,7 +345,7 @@ export abstract class SchematicCommand<
       }
     }
 
-    return '@schematics/angular';
+    return this.collectionName;
   }
 
   protected async runSchematic(options: RunSchematicOptions) {
@@ -357,7 +372,7 @@ export abstract class SchematicCommand<
     schematicName = schematic.description.name;
 
     // TODO: Remove warning check when 'targets' is default
-    if (collectionName !== '@schematics/angular') {
+    if (collectionName !== this.collectionName) {
       const [ast, configPath] = getWorkspaceRaw('local');
       if (ast) {
         const projectsKeyValue = ast.properties.find(p => p.key.value === 'projects');
