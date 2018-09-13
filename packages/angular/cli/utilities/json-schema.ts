@@ -158,6 +158,9 @@ export async function parseJsonSchemaToOptions(
             defaultValue = schema.default;
           }
           break;
+
+        default:
+          console.log(types[0], schema);
       }
     }
 

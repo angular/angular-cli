@@ -9,28 +9,13 @@ import { normalize } from '@angular-devkit/core';
 import { Arguments, Option } from '../models/interface';
 import { SchematicCommand } from '../models/schematic-command';
 import { findUp } from '../utilities/find-up';
-import { parseJsonSchemaToOptions } from '../utilities/json-schema';
 import { Schema as UpdateCommandSchema } from './update';
 
 export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
   public readonly allowMissingWorkspace = true;
 
-  private collectionName = '@schematics/update';
-  private schematicName = 'update';
-
-  async initialize(input: UpdateCommandSchema & Arguments) {
-    await super.initialize(input);
-
-    // Set the options.
-    const collection = this.getCollection(this.collectionName);
-    const schematic = this.getSchematic(collection, this.schematicName, true);
-    const options = await parseJsonSchemaToOptions(
-      this._workflow.registry,
-      schematic.description.schemaJson || {},
-    );
-
-    this.description.options.push(...options);
-  }
+  collectionName = '@schematics/update';
+  schematicName = 'update';
 
   async parseArguments(schematicOptions: string[], schema: Option[]): Promise<Arguments> {
     const args = await super.parseArguments(schematicOptions, schema);
