@@ -24,6 +24,8 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
     this.description.suboptions = {};
 
     const schematicNames = schematicName ? [schematicName] : collection.listSchematicNames();
+    // Sort as a courtesy for the user.
+    schematicNames.sort();
 
     for (const name of schematicNames) {
       const schematic = this.getSchematic(collection, name, true);
