@@ -10,6 +10,7 @@
 import {
   JsonObject,
   experimental,
+  json,
   logging,
   normalize,
   schema,
@@ -43,6 +44,7 @@ import {
   getDefaultSchematicCollection,
   getPackageManager,
   getSchematicDefaults,
+  getWorkspaceRaw,
 } from '../utilities/config';
 import { ArgumentStrategy, Command, CommandContext, Option } from './command';
 
@@ -201,6 +203,43 @@ export abstract class SchematicCommand extends Command {
     schematicOptions = { ...schematicOptions, ...pathOptions };
     const defaultOptions = this.readDefaults(collectionName, schematicName, schematicOptions);
     schematicOptions = { ...schematicOptions, ...defaultOptions };
+
+    // TODO: Remove warning check when 'targets' is default
+    if (collectionName !== '@schematics/angular') {
+      const [ast, configPath] = getWorkspaceRaw('local');
+      if (ast) {
+        const projectsKeyValue = ast.properties.find(p => p.key.value === 'projects');
+        if (!projectsKeyValue || projectsKeyValue.value.kind !== 'object') {
+          return;
+        }
+
+        const positions: json.Position[] = [];
+        for (const projectKeyValue of projectsKeyValue.value.properties) {
+          const projectNode = projectKeyValue.value;
+          if (projectNode.kind !== 'object') {
+            continue;
+          }
+          const targetsKeyValue = projectNode.properties.find(p => p.key.value === 'targets');
+          if (targetsKeyValue) {
+            positions.push(targetsKeyValue.start);
+          }
+        }
+
+        if (positions.length > 0) {
+          const warning = tags.oneLine`
+            WARNING: This command may not execute successfully.
+            The package/collection may not support the 'targets' field within '${configPath}'.
+            This can be corrected by renaming the following 'targets' fields to 'architect':
+          `;
+
+          const locations = positions
+            .map((p, i) => `${i + 1}) Line: ${p.line + 1}; Column: ${p.character + 1}`)
+            .join('\n');
+
+          this.logger.warn(warning + '\n' + locations + '\n');
+        }
+      }
+    }
 
     // Remove all of the original arguments which have already been parsed
 
