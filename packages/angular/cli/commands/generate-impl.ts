@@ -37,7 +37,11 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
         );
       }
 
-      this.description.suboptions[`${collectionName}:${name}`] = options;
+      if (this.getDefaultSchematicCollection() == collectionName) {
+        this.description.suboptions[name] = options;
+      } else {
+        this.description.suboptions[`${collectionName}:${name}`] = options;
+      }
     }
 
     this.description.options.forEach(option => {
