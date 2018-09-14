@@ -57,6 +57,16 @@ export async function parseJsonSchemaToCommandDescription(
       }
     });
   }
+  if (json.isJsonArray(schema.aliases)) {
+    schema.aliases.forEach(value => {
+      if (typeof value == 'string') {
+        aliases.push(value);
+      }
+    });
+  }
+  if (typeof schema.alias == 'string') {
+    aliases.push(schema.alias);
+  }
 
   let longDescription = '';
   if (typeof schema.$longDescription == 'string' && schema.$longDescription) {
@@ -172,7 +182,8 @@ export async function parseJsonSchemaToOptions(
 
     const required = json.isJsonArray(current.required)
         ? current.required.indexOf(name) != -1 : false;
-    const aliases = json.isJsonArray(current.aliases) ? [...current.aliases].map(x => '' + x) : [];
+    const aliases = json.isJsonArray(current.aliases) ? [...current.aliases].map(x => '' + x)
+                  : current.alias ? ['' + current.alias] : [];
     const format = typeof current.format == 'string' ? current.format : undefined;
     const hidden = !!current.hidden;
 
