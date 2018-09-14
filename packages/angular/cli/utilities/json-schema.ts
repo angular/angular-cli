@@ -151,26 +151,23 @@ export async function parseJsonSchemaToOptions(
     }
 
     let defaultValue: string | number | boolean | undefined = undefined;
-    if (schema.default !== undefined) {
+    if (current.default !== undefined) {
       switch (types[0]) {
         case 'string':
-          if (typeof schema.default == 'string') {
-            defaultValue = schema.default;
+          if (typeof current.default == 'string') {
+            defaultValue = current.default;
           }
           break;
         case 'number':
-          if (typeof schema.default == 'number') {
-            defaultValue = schema.default;
+          if (typeof current.default == 'number') {
+            defaultValue = current.default;
           }
           break;
         case 'boolean':
-          if (typeof schema.default == 'boolean') {
-            defaultValue = schema.default;
+          if (typeof current.default == 'boolean') {
+            defaultValue = current.default;
           }
           break;
-
-        default:
-          console.log(types[0], schema);
       }
     }
 
