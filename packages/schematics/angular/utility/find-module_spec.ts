@@ -74,6 +74,25 @@ describe('find-module', () => {
         expect(err.message).toMatch(/Could not find an NgModule/);
       }
     });
+
+    it('should accept custom ext for module', () => {
+      const host = new EmptyTree();
+      const modulePath = '/foo/src/app/app_module.ts';
+      host.create(modulePath, 'app module');
+      // Should find module if given a custom ext
+      const foundModule = findModule(host, 'foo/src/app/bar', '_module.ts');
+      expect(foundModule).toBe(modulePath);
+      // Should not find module if using default ext
+      expect(() => findModule(host, 'foo/src/app/bar'))
+        .toThrowError(/Could not find an NgModule/);
+    });
+
+    it('should not find module if ext is invalid', () => {
+      expect(() => findModule(host, 'foo/src/app/bar', '-module.ts'))
+        .toThrowError(/Could not find an NgModule/);
+      expect(() => findModule(host, 'foo/src/app/bar', '_module.ts'))
+        .toThrowError(/Could not find an NgModule/);
+    });
   });
 
   describe('findModuleFromOptions', () => {
@@ -99,6 +118,41 @@ describe('find-module', () => {
       options.path = '/projects/my-proj/src';
       const modPath = findModuleFromOptions(tree, options);
       expect(modPath).toEqual('/projects/my-proj/src/admin/foo.module.ts' as Path);
+    });
+
+    it('should find a module using custom ext', () => {
+      tree.create('/projects/my-proj/src/app_module.ts', '');
+      options.module = 'app';
+      options.path = '/projects/my-proj/src';
+      options.moduleExt = '_module.ts';
+      // Should find module using custom moduleExt
+      const modPath = findModuleFromOptions(tree, options);
+      expect(modPath).toBe('/projects/my-proj/src/app_module.ts' as Path);
+      // Should not find module if using invalid ext
+      options.moduleExt = '-module.ts';
+      expect(() => findModuleFromOptions(tree, options)).toThrowError(
+        /Specified module 'app' does not exist/);
+      // Should not find module if using default ext
+      options.moduleExt = undefined;   // use default ext
+      expect(() => findModuleFromOptions(tree, options)).toThrowError(
+        /Specified module 'app' does not exist/);
+    });
+
+    it('should ignore custom ext if module or ${module}.ts exists', () => {
+      tree.create('/projects/my-proj/src/app.module.ts', '');
+      options.path = '/projects/my-proj/src';
+      options.moduleExt = '_module.ts';
+      let modPath;
+
+      // moduleExt ignored because exact path is found
+      options.module = 'app.module.ts';
+      modPath = findModuleFromOptions(tree, options);
+      expect(modPath).toBe('/projects/my-proj/src/app.module.ts' as Path);
+
+      // moduleExt ignored because module + .ts is found
+      options.module = 'app.module';
+      modPath = findModuleFromOptions(tree, options);
+      expect(modPath).toBe('/projects/my-proj/src/app.module.ts' as Path);
     });
   });
 });
