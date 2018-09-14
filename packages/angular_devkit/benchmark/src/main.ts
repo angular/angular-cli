@@ -8,6 +8,7 @@
  */
 
 import { logging, tags, terminal } from '@angular-devkit/core';
+import { ProcessOutput } from '@angular-devkit/core/node';
 import { appendFileSync, writeFileSync } from 'fs';
 import * as minimist from 'minimist';
 import { filter, map, toArray } from 'rxjs/operators';
@@ -19,8 +20,8 @@ import { runBenchmark } from '../src/run-benchmark';
 
 export interface MainOptions {
   args: string[];
-  stdout?: { write(buffer: string | Buffer): boolean };
-  stderr?: { write(buffer: string | Buffer): boolean };
+  stdout?: ProcessOutput;
+  stderr?: ProcessOutput;
 }
 
 export async function main({
