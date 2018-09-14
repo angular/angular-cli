@@ -17,7 +17,7 @@ import {
   terminal,
   virtualFs,
 } from '@angular-devkit/core';
-import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
+import { NodeJsSyncHost, ProcessOutput, createConsoleLogger } from '@angular-devkit/core/node';
 import {
   DryRunEvent,
   SchematicEngine,
@@ -29,42 +29,6 @@ import {
   NodeWorkflow,
 } from '@angular-devkit/schematics/tools';
 import * as minimist from 'minimist';
-
-
-/**
- * Show usage of the CLI tool, and exit the process.
- */
-function usage(exitCode = 0): never {
-  logger.info(tags.stripIndent`
-    schematics [CollectionName:]SchematicName [options, ...]
-
-    By default, if the collection name is not specified, use the internal collection provided
-    by the Schematics CLI.
-
-    Options:
-        --debug             Debug mode. This is true by default if the collection is a relative
-                            path (in that case, turn off with --debug=false).
-
-        --allowPrivate      Allow private schematics to be run from the command line. Default to
-                            false.
-
-        --dry-run           Do not output anything, but instead just show what actions would be
-                            performed. Default to true if debug is also true.
-
-        --force             Force overwriting files that would otherwise be an error.
-
-        --list-schematics   List all schematics from the collection, by name. A collection name
-                            should be suffixed by a colon. Example: '@schematics/schematics:'.
-
-        --verbose           Show more information.
-
-        --help              Show this message.
-
-    Any additional option is passed to the Schematics depending on
-  `);
-
-  return process.exit(exitCode);
-}
 
 
 /**
@@ -81,7 +45,7 @@ function usage(exitCode = 0): never {
  * @param str The argument to parse.
  * @return {{collection: string, schematic: (string)}}
  */
-function parseSchematicName(str: string | null): { collection: string, schematic: string | null} {
+function parseSchematicName(str: string | null): { collection: string, schematic: string | null } {
   let collection = '@schematics/schematics';
 
   let schematic = str;
@@ -93,182 +57,204 @@ function parseSchematicName(str: string | null): { collection: string, schematic
 }
 
 
-/** Parse the command line. */
-const booleanArgs = [
-  'allowPrivate',
-  'debug',
-  'dry-run',
-  'force',
-  'help',
-  'list-schematics',
-  'verbose',
-];
-const argv = minimist(process.argv.slice(2), {
-  boolean: booleanArgs,
-  default: {
-    'debug': null,
-    'dry-run': null,
-  },
-  '--': true,
-});
-
-/** Create the DevKit Logger used through the CLI. */
-const logger = createConsoleLogger(argv['verbose']);
-
-if (argv.help) {
-  usage();
+export interface MainOptions {
+  args: string[];
+  stdout?: ProcessOutput;
+  stderr?: ProcessOutput;
 }
 
-/** Get the collection an schematic name from the first argument. */
-const {
-  collection: collectionName,
-  schematic: schematicName,
-} = parseSchematicName(argv._.shift() || null);
-const isLocalCollection = collectionName.startsWith('.') || collectionName.startsWith('/');
+export async function main({
+  args,
+  stdout = process.stdout,
+  stderr = process.stderr,
+}: MainOptions): Promise<0 | 1> {
+
+  /** Parse the command line. */
+  const booleanArgs = [
+    'allowPrivate',
+    'debug',
+    'dry-run',
+    'force',
+    'help',
+    'list-schematics',
+    'verbose',
+  ];
+  const argv = minimist(args, {
+    boolean: booleanArgs,
+    default: {
+      'debug': null,
+      'dry-run': null,
+    },
+    '--': true,
+  });
+
+  /** Create the DevKit Logger used through the CLI. */
+  const logger = createConsoleLogger(argv['verbose'], stdout, stderr);
+
+  if (argv.help) {
+    logger.info(getUsage());
+
+    return 0;
+  }
+
+  /** Get the collection an schematic name from the first argument. */
+  const {
+    collection: collectionName,
+    schematic: schematicName,
+  } = parseSchematicName(argv._.shift() || null);
+  const isLocalCollection = collectionName.startsWith('.') || collectionName.startsWith('/');
 
 
-/** If the user wants to list schematics, we simply show all the schematic names. */
-if (argv['list-schematics']) {
-  const engineHost = isLocalCollection
-    ? new FileSystemEngineHost(normalize(process.cwd()))
-    : new NodeModulesEngineHost();
+  /** If the user wants to list schematics, we simply show all the schematic names. */
+  if (argv['list-schematics']) {
+    const engineHost = isLocalCollection
+      ? new FileSystemEngineHost(normalize(process.cwd()))
+      : new NodeModulesEngineHost();
 
-  const engine = new SchematicEngine(engineHost);
-  const collection = engine.createCollection(collectionName);
-  logger.info(engine.listSchematicNames(collection).join('\n'));
+    const engine = new SchematicEngine(engineHost);
+    const collection = engine.createCollection(collectionName);
+    logger.info(engine.listSchematicNames(collection).join('\n'));
 
-  process.exit(0);
-}
+    return 0;
+  }
 
-if (!schematicName) {
-  usage(1);
-  throw 0; // TypeScript doesn't know that process.exit() never returns.
-}
+  if (!schematicName) {
+    logger.info(getUsage());
 
-/** Gather the arguments for later use. */
-const debug: boolean = argv.debug === null ? isLocalCollection : argv.debug;
-const dryRun: boolean = argv['dry-run'] === null ? debug : argv['dry-run'];
-const force = argv['force'];
-const allowPrivate = argv['allowPrivate'];
+    return 1;
+  }
 
-/** Create a Virtual FS Host scoped to where the process is being run. **/
-const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(process.cwd()));
+  /** Gather the arguments for later use. */
+  const debug: boolean = argv.debug === null ? isLocalCollection : argv.debug;
+  const dryRun: boolean = argv['dry-run'] === null ? debug : argv['dry-run'];
+  const force = argv['force'];
+  const allowPrivate = argv['allowPrivate'];
 
-/** Create the workflow that will be executed with this run. */
-const workflow = new NodeWorkflow(fsHost, { force, dryRun });
+  /** Create a Virtual FS Host scoped to where the process is being run. **/
+  const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(process.cwd()));
 
-// Indicate to the user when nothing has been done. This is automatically set to off when there's
-// a new DryRunEvent.
-let nothingDone = true;
+  /** Create the workflow that will be executed with this run. */
+  const workflow = new NodeWorkflow(fsHost, { force, dryRun });
 
-// Logging queue that receives all the messages to show the users. This only get shown when no
-// errors happened.
-let loggingQueue: string[] = [];
-let error = false;
+  // Indicate to the user when nothing has been done. This is automatically set to off when there's
+  // a new DryRunEvent.
+  let nothingDone = true;
 
-/**
- * Logs out dry run events.
- *
- * All events will always be executed here, in order of discovery. That means that an error would
- * be shown along other events when it happens. Since errors in workflows will stop the Observable
- * from completing successfully, we record any events other than errors, then on completion we
- * show them.
- *
- * This is a simple way to only show errors when an error occur.
- */
-workflow.reporter.subscribe((event: DryRunEvent) => {
-  nothingDone = false;
+  // Logging queue that receives all the messages to show the users. This only get shown when no
+  // errors happened.
+  let loggingQueue: string[] = [];
+  let error = false;
 
-  switch (event.kind) {
-    case 'error':
-      error = true;
+  /**
+   * Logs out dry run events.
+   *
+   * All events will always be executed here, in order of discovery. That means that an error would
+   * be shown along other events when it happens. Since errors in workflows will stop the Observable
+   * from completing successfully, we record any events other than errors, then on completion we
+   * show them.
+   *
+   * This is a simple way to only show errors when an error occur.
+   */
+  workflow.reporter.subscribe((event: DryRunEvent) => {
+    nothingDone = false;
 
-      const desc = event.description == 'alreadyExist' ? 'already exists' : 'does not exist';
-      logger.warn(`ERROR! ${event.path} ${desc}.`);
-      break;
-    case 'update':
-      loggingQueue.push(tags.oneLine`
+    switch (event.kind) {
+      case 'error':
+        error = true;
+
+        const desc = event.description == 'alreadyExist' ? 'already exists' : 'does not exist';
+        logger.warn(`ERROR! ${event.path} ${desc}.`);
+        break;
+      case 'update':
+        loggingQueue.push(tags.oneLine`
         ${terminal.white('UPDATE')} ${event.path} (${event.content.length} bytes)
       `);
-      break;
-    case 'create':
-      loggingQueue.push(tags.oneLine`
+        break;
+      case 'create':
+        loggingQueue.push(tags.oneLine`
         ${terminal.green('CREATE')} ${event.path} (${event.content.length} bytes)
       `);
-      break;
-    case 'delete':
-      loggingQueue.push(`${terminal.yellow('DELETE')} ${event.path}`);
-      break;
-    case 'rename':
-      loggingQueue.push(`${terminal.blue('RENAME')} ${event.path} => ${event.to}`);
-      break;
+        break;
+      case 'delete':
+        loggingQueue.push(`${terminal.yellow('DELETE')} ${event.path}`);
+        break;
+      case 'rename':
+        loggingQueue.push(`${terminal.blue('RENAME')} ${event.path} => ${event.to}`);
+        break;
+    }
+  });
+
+
+  /**
+   * Listen to lifecycle events of the workflow to flush the logs between each phases.
+   */
+  workflow.lifeCycle.subscribe(event => {
+    if (event.kind == 'workflow-end' || event.kind == 'post-tasks-start') {
+      if (!error) {
+        // Flush the log queue and clean the error state.
+        loggingQueue.forEach(log => logger.info(log));
+      }
+
+      loggingQueue = [];
+      error = false;
+    }
+  });
+
+
+  /**
+   * Remove every options from argv that we support in schematics itself.
+   */
+  const parsedArgs = Object.assign({}, argv);
+  delete parsedArgs['--'];
+  for (const key of booleanArgs) {
+    delete parsedArgs[key];
   }
-});
+
+  /**
+   * Add options from `--` to args.
+   */
+  const argv2 = minimist(argv['--']);
+  for (const key of Object.keys(argv2)) {
+    parsedArgs[key] = argv2[key];
+  }
+
+  // Pass the rest of the arguments as the smart default "argv". Then delete it.
+  workflow.registry.addSmartDefaultProvider('argv', (schema: JsonObject) => {
+    if ('index' in schema) {
+      return argv._[Number(schema['index'])];
+    } else {
+      return argv._;
+    }
+  });
+  delete parsedArgs._;
 
 
-/**
- * Listen to lifecycle events of the workflow to flush the logs between each phases.
- */
-workflow.lifeCycle.subscribe(event => {
-  if (event.kind == 'workflow-end' || event.kind == 'post-tasks-start') {
-    if (!error) {
-      // Flush the log queue and clean the error state.
-      loggingQueue.forEach(log => logger.info(log));
+  /**
+   *  Execute the workflow, which will report the dry run events, run the tasks, and complete
+   *  after all is done.
+   *
+   *  The Observable returned will properly cancel the workflow if unsubscribed, error out if ANY
+   *  step of the workflow failed (sink or task), with details included, and will only complete
+   *  when everything is done.
+   */
+  try {
+    await workflow.execute({
+      collection: collectionName,
+      schematic: schematicName,
+      options: parsedArgs,
+      allowPrivate: allowPrivate,
+      debug: debug,
+      logger: logger,
+    })
+      .toPromise();
+
+    if (nothingDone) {
+      logger.info('Nothing to be done.');
     }
 
-    loggingQueue = [];
-    error = false;
-  }
-});
+    return 0;
 
-
-/**
- * Remove every options from argv that we support in schematics itself.
- */
-const args = Object.assign({}, argv);
-delete args['--'];
-for (const key of booleanArgs) {
-  delete args[key];
-}
-
-/**
- * Add options from `--` to args.
- */
-const argv2 = minimist(argv['--']);
-for (const key of Object.keys(argv2)) {
-  args[key] = argv2[key];
-}
-
-// Pass the rest of the arguments as the smart default "argv". Then delete it.
-workflow.registry.addSmartDefaultProvider('argv', (schema: JsonObject) => {
-  if ('index' in schema) {
-    return argv._[Number(schema['index'])];
-  } else {
-    return argv._;
-  }
-});
-delete args._;
-
-
-/**
- *  Execute the workflow, which will report the dry run events, run the tasks, and complete
- *  after all is done.
- *
- *  The Observable returned will properly cancel the workflow if unsubscribed, error out if ANY
- *  step of the workflow failed (sink or task), with details included, and will only complete
- *  when everything is done.
- */
-workflow.execute({
-  collection: collectionName,
-  schematic: schematicName,
-  options: args,
-  allowPrivate: allowPrivate,
-  debug: debug,
-  logger: logger,
-})
-.subscribe({
-  error(err: Error) {
-    // In case the workflow was not successful, show an appropriate error message.
+  } catch (err) {
     if (err instanceof UnsuccessfulWorkflowExecution) {
       // "See above" because we already printed the error.
       logger.fatal('The Schematic workflow failed. See above.');
@@ -278,11 +264,46 @@ workflow.execute({
       logger.fatal(err.stack || err.message);
     }
 
-    process.exit(1);
-  },
-  complete() {
-    if (nothingDone) {
-      logger.info('Nothing to be done.');
-    }
-  },
-});
+    return 1;
+  }
+}
+
+ /**
+ * Get usage of the CLI tool.
+ */
+function getUsage(): string {
+  return tags.stripIndent`
+  schematics [CollectionName:]SchematicName [options, ...]
+
+  By default, if the collection name is not specified, use the internal collection provided
+  by the Schematics CLI.
+
+  Options:
+      --debug             Debug mode. This is true by default if the collection is a relative
+                          path (in that case, turn off with --debug=false).
+
+      --allowPrivate      Allow private schematics to be run from the command line. Default to
+                          false.
+
+      --dry-run           Do not output anything, but instead just show what actions would be
+                          performed. Default to true if debug is also true.
+
+      --force             Force overwriting files that would otherwise be an error.
+
+      --list-schematics   List all schematics from the collection, by name. A collection name
+                          should be suffixed by a colon. Example: '@schematics/schematics:'.
+
+      --verbose           Show more information.
+
+      --help              Show this message.
+
+  Any additional option is passed to the Schematics depending on
+  `;
+}
+
+if (require.main === module) {
+  const args = process.argv.slice(2);
+  main({ args })
+    .then(exitCode => process.exitCode = exitCode)
+    .catch(e => { throw (e); });
+}
