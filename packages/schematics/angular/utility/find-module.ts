@@ -15,8 +15,12 @@ export interface ModuleOptions {
   flat?: boolean;
   path?: string;
   skipImport?: boolean;
+  moduleExt?: string;
+  routingModuleExt?: string;
 }
 
+const MODULE_EXT = '.module.ts';
+const ROUTING_MODULE_EXT = '-routing.module.ts';
 
 /**
  * Find the module referred by a set of options passed to the schematics.
@@ -26,44 +30,46 @@ export function findModuleFromOptions(host: Tree, options: ModuleOptions): Path 
     return undefined;
   }
 
+  const moduleExt = options.moduleExt || MODULE_EXT;
+  const routingModuleExt = options.routingModuleExt || ROUTING_MODULE_EXT;
+
   if (!options.module) {
     const pathToCheck = (options.path || '')
       + (options.flat ? '' : '/' + strings.dasherize(options.name));
 
-    return normalize(findModule(host, pathToCheck));
+    return normalize(findModule(host, pathToCheck, moduleExt, routingModuleExt));
   } else {
     const modulePath = normalize(
       '/' + (options.path) + '/' + options.module);
     const moduleBaseName = normalize(modulePath).split('/').pop();
 
-    if (host.exists(modulePath)) {
-      return normalize(modulePath);
-    } else if (host.exists(modulePath + '.ts')) {
-      return normalize(modulePath + '.ts');
-    } else if (host.exists(modulePath + '.module.ts')) {
-      return normalize(modulePath + '.module.ts');
-    } else if (host.exists(modulePath + '/' + moduleBaseName + '.module.ts')) {
-      return normalize(modulePath + '/' + moduleBaseName + '.module.ts');
-    } else {
-      throw new Error('Specified module does not exist');
+    const candidates = [
+      modulePath,
+      `${modulePath}.ts`,
+      `${modulePath}${moduleExt}`,
+      `${modulePath}/${moduleBaseName}${moduleExt}`,
+    ];
+    for (const c of candidates) {
+      if (host.exists(c)) {
+        return normalize(c);
+      }
     }
+    throw new Error(`Specified module '${options.module}' does not exist.`);
   }
 }
 
 /**
  * Function to find the "closest" module to a generated file's path.
  */
-export function findModule(host: Tree, generateDir: string): Path {
+export function findModule(host: Tree, generateDir: string,
+                           moduleExt = MODULE_EXT, routingModuleExt = ROUTING_MODULE_EXT): Path {
+
   let dir: DirEntry | null = host.getDir('/' + generateDir);
-
-  const moduleRe = /\.module\.ts$/;
-  const routingModuleRe = /-routing\.module\.ts/;
-
   let foundRoutingModule = false;
 
   while (dir) {
-    const allMatches = dir.subfiles.filter(p => moduleRe.test(p));
-    const filteredMatches = allMatches.filter(p => !routingModuleRe.test(p));
+    const allMatches = dir.subfiles.filter(p => p.endsWith(moduleExt));
+    const filteredMatches = allMatches.filter(p => !p.endsWith(routingModuleExt));
 
     foundRoutingModule = foundRoutingModule || allMatches.length !== filteredMatches.length;
 
@@ -78,7 +84,7 @@ export function findModule(host: Tree, generateDir: string): Path {
   }
 
   const errorMsg = foundRoutingModule ? 'Could not find a non Routing NgModule.'
-    + '\nModules with suffix \'-routing.module\' are strictly reserved for routing.'
+    + `\nModules with suffix '${routingModuleExt}' are strictly reserved for routing.`
     + '\nUse the skip-import option to skip importing in NgModule.'
     : 'Could not find an NgModule. Use the skip-import option to skip importing in NgModule.';
 
