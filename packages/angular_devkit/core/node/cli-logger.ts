@@ -8,18 +8,25 @@
 import { filter } from 'rxjs/operators';
 import { logging, terminal } from '../src';
 
+export interface ProcessOutput {
+  write(buffer: string | Buffer): boolean;
+}
 
 /**
  * A Logger that sends information to STDOUT and STDERR.
  */
-export function createConsoleLogger(verbose = false): logging.Logger {
+export function createConsoleLogger(
+  verbose = false,
+  stdout: ProcessOutput = process.stdout,
+  stderr: ProcessOutput = process.stderr,
+): logging.Logger {
   const logger = new logging.IndentLogger('cling');
 
   logger
     .pipe(filter(entry => (entry.level != 'debug' || verbose)))
     .subscribe(entry => {
       let color: (s: string) => string = x => terminal.dim(terminal.white(x));
-      let output = process.stdout;
+      let output = stdout;
       switch (entry.level) {
         case 'info':
           color = terminal.white;
@@ -29,11 +36,11 @@ export function createConsoleLogger(verbose = false): logging.Logger {
           break;
         case 'error':
           color = terminal.red;
-          output = process.stderr;
+          output = stderr;
           break;
         case 'fatal':
           color = (x: string) => terminal.bold(terminal.red(x));
-          output = process.stderr;
+          output = stderr;
           break;
       }
 
