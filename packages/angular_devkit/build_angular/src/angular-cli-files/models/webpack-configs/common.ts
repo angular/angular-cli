@@ -271,19 +271,10 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       rules: [
         { test: /\.html$/, loader: 'raw-loader' },
         {
-          test: /\.(eot|svg|cur)$/,
+          test: /\.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)$/,
           loader: 'file-loader',
           options: {
             name: `[name]${hashFormat.file}.[ext]`,
-            limit: 10000
-          }
-        },
-        {
-          test: /\.(jpg|png|webp|gif|otf|ttf|woff|woff2|ani)$/,
-          loader: 'url-loader',
-          options: {
-            name: `[name]${hashFormat.file}.[ext]`,
-            limit: 10000
           }
         },
         {
