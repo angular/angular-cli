@@ -108,7 +108,7 @@ export abstract class SchematicCommand<
         schematic.description.schemaJson || {},
       );
 
-      this.description.options.push(...options);
+      this.description.options.push(...options.filter(x => !x.hidden));
     }
   }
 
