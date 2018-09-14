@@ -9,14 +9,22 @@ import { Observable } from 'rxjs';
 import { Command } from './command';
 
 export interface AggregatedProcessStats {
-  processes: number;      // number of processes
-  cpu: number;            // percentage (from 0 to 100*vcore)
-  memory: number;         // bytes
-  ppid: number;           // PPID
-  pid: number;            // PID
-  ctime: number;          // ms user + system time
-  elapsed: number;        // ms since the start of the process
-  timestamp: number;      // ms since epoch
+  /** Number of processes */
+  processes: number;
+  /** Percentage (from 0 to 100 * vcore) */
+  cpu: number;
+  /** Bytes */
+  memory: number;
+  /** Parent Process ID */
+  ppid: number;
+  /** Process ID */
+  pid: number;
+  /** Ms user + system time */
+  ctime: number;
+  /** Ms since the start of the process */
+  elapsed: number;
+  /** Ms since epoch */
+  timestamp: number;
 }
 
 export interface MonitoredProcess {
