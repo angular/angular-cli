@@ -5811,9 +5811,9 @@ pidtree@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/pidtree/-/pidtree-0.3.0.tgz#f6fada10fccc9f99bf50e90d0b23d72c9ebc2e6b"
 
-pidusage@^2.0.16:
-  version "2.0.16"
-  resolved "https://registry.yarnpkg.com/pidusage/-/pidusage-2.0.16.tgz#46e2e3185eaef253ef6303f766f7aae72f74f98c"
+pidusage@^2.0.17:
+  version "2.0.17"
+  resolved "https://registry.yarnpkg.com/pidusage/-/pidusage-2.0.17.tgz#6b4a2b4a09026f0e9828f7e5627837e4c0672581"
   dependencies:
     safe-buffer "^5.1.2"
 
@@ -7546,7 +7546,7 @@ tough-cookie@~2.4.3:
     psl "^1.1.24"
     punycode "^1.4.1"
 
-tree-kill@1.2.0:
+tree-kill@1.2.0, tree-kill@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/tree-kill/-/tree-kill-1.2.0.tgz#5846786237b4239014f05db156b643212d4c6f36"
 
