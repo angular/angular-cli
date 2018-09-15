@@ -198,7 +198,8 @@ export function getNpmPackageJson(
         getNpmConfigOption('_authToken', registryKey),
         getNpmConfigOption('username', registryKey, true),
         getNpmConfigOption('password', registryKey, true),
-        getNpmConfigOption('alwaysAuth', registryKey, true),
+        getNpmConfigOption('email', registryKey, true),
+        getNpmConfigOption('always-auth', registryKey, true),
       ).pipe(
         toArray(),
         concatMap(options => {
@@ -211,6 +212,7 @@ export function getNpmPackageJson(
             authToken,
             username,
             password,
+            email,
             alwaysAuth,
           ] = options;
 
@@ -222,17 +224,38 @@ export function getNpmPackageJson(
             token?: string,
             alwaysAuth?: boolean;
             username?: string;
-            password?: string
+            password?: string;
+            email?: string;
           } = {};
 
           if (alwaysAuth !== undefined) {
             auth.alwaysAuth = alwaysAuth === 'false' ? false : !!alwaysAuth;
           }
 
+          if (email) {
+            auth.email = email;
+          }
+
           if (authToken) {
             auth.token = authToken;
           } else if (token) {
-            auth.token = token;
+            try {
+              // attempt to parse "username:password" from base64 token
+              // to enable Artifactory / Nexus-like repositories support
+              const delimiter = ':';
+              const parsedToken = Buffer.from(token, 'base64').toString('ascii');
+              const [extractedUsername, ...passwordArr] = parsedToken.split(delimiter);
+              const extractedPassword = passwordArr.join(delimiter);
+
+              if (extractedUsername && extractedPassword) {
+                auth.username = extractedUsername;
+                auth.password = extractedPassword;
+              } else {
+                throw new Error('Unable to extract username and password from _auth token');
+              }
+            } catch (ex) {
+              auth.token = token;
+            }
           } else if (username) {
             auth.username = username;
             auth.password = password;
