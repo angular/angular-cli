@@ -33,15 +33,21 @@ function _readNpmRc(): Observable<{ [key: string]: string }> {
     // TODO: have a way to read options without using fs directly.
     const path = require('path');
     const fs = require('fs');
+    const perProjectNpmrc = path.resolve('.npmrc');
 
     let npmrc = '';
-    if (process.platform === 'win32') {
-      if (process.env.LOCALAPPDATA) {
-        npmrc = fs.readFileSync(path.join(process.env.LOCALAPPDATA, '.npmrc')).toString('utf-8');
-      }
+
+    if (fs.existsSync(perProjectNpmrc)) {
+      npmrc = fs.readFileSync(perProjectNpmrc).toString('utf-8');
     } else {
-      if (process.env.HOME) {
-        npmrc = fs.readFileSync(path.join(process.env.HOME, '.npmrc')).toString('utf-8');
+      if (process.platform === 'win32') {
+        if (process.env.LOCALAPPDATA) {
+          npmrc = fs.readFileSync(path.join(process.env.LOCALAPPDATA, '.npmrc')).toString('utf-8');
+        }
+      } else {
+        if (process.env.HOME) {
+          npmrc = fs.readFileSync(path.join(process.env.HOME, '.npmrc')).toString('utf-8');
+        }
       }
     }
 
