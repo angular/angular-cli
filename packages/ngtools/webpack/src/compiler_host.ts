@@ -246,6 +246,10 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       return this.readFile(fileName);
     }
   }
+
+  trace(message: string) {
+    console.log(message);
+  }
 }
 
 
