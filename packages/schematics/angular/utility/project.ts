@@ -35,10 +35,14 @@ export function getProject<TProjectType extends ProjectType = ProjectType.Applic
   return workspace.projects[projectName] as WorkspaceProject<TProjectType>;
 }
 
-export function isWorkspaceSchema(workspace: unknown): workspace is WorkspaceSchema {
+// TODO(hans): change this any to unknown when google3 supports TypeScript 3.0.
+// tslint:disable-next-line:no-any
+export function isWorkspaceSchema(workspace: any): workspace is WorkspaceSchema {
   return !!(workspace && (workspace as WorkspaceSchema).projects);
 }
 
-export function isWorkspaceProject(project: unknown): project is WorkspaceProject {
+// TODO(hans): change this any to unknown when google3 supports TypeScript 3.0.
+// tslint:disable-next-line:no-any
+export function isWorkspaceProject(project: any): project is WorkspaceProject {
   return !!(project && (project as WorkspaceProject).projectType);
 }
