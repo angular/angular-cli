@@ -665,6 +665,7 @@ describe('Migration to v6', () => {
           { glob: '**/*', input: 'src/assets', output: '/assets' },
           { glob: 'favicon.ico', input: 'src', output: '/' },
         ]);
+        expect(test.options.sourceMap).toEqual(true);
       });
 
       it('should set the extract i18n target', () => {

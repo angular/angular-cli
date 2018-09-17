@@ -208,6 +208,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
             join(normalize(projectRoot), 'src', 'favicon.ico'),
             join(normalize(projectRoot), 'src', 'assets'),
           ],
+          sourceMap: true,
         },
       },
       lint: {

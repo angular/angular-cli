@@ -476,6 +476,7 @@ function extractProjectsConfig(
       testOptions.scripts = (app.scripts || []).map(_extraEntryMapper);
       testOptions.styles = (app.styles || []).map(_extraEntryMapper);
       testOptions.assets = (app.assets || []).map(_mapAssets).filter(x => !!x);
+      testOptions.sourceMap = true;
 
       if (karmaConfig) {
         targets.test = {
