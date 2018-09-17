@@ -13,7 +13,6 @@ import {
   CommandConstructor,
   CommandDescription,
   CommandScope,
-  CommandType,
   Option,
   OptionType,
 } from '../models/interface';
@@ -90,7 +89,6 @@ export async function parseJsonSchemaToCommandDescription(
     ...(longDescription ? { longDescription } : {}),
     ...(usageNotes ? { usageNotes } : {}),
     hidden,
-    type,
     options,
     aliases,
     scope,
