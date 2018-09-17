@@ -112,6 +112,9 @@ export enum CommandType {
   Default = Custom,
 }
 
+/**
+ * A description of a command, its metadata.
+ */
 export interface CommandDescription {
   name: string;
   description: string;
@@ -119,7 +122,12 @@ export interface CommandDescription {
   /**
    * A long description of the option, in Markdown format.
    */
-  longDescription: string;
+  longDescription?: string;
+
+  /**
+   * Additional notes about usage of this command.
+   */
+  usageNotes?: string;
 
   options: Option[];
 
