@@ -187,6 +187,7 @@ export async function parseJsonSchemaToOptions(
       }
     }
 
+    const type = types[0];
     const $default = current.$default;
     const $defaultIndex = (json.isJsonObject($default) && $default['$source'] == 'argv')
       ? $default['index'] : undefined;
@@ -204,7 +205,7 @@ export async function parseJsonSchemaToOptions(
     const option: Option = {
       name,
       description: '' + (current.description === undefined ? '' : current.description),
-      ...types.length == 1 ? { type: types[0] } : { type: types[0], types },
+      ...types.length == 1 ? { type } : { type, types },
       ...defaultValue !== undefined ? { default: defaultValue } : {},
       required,
       aliases,

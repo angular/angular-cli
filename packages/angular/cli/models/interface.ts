@@ -84,18 +84,56 @@ export interface Option {
    */
   description: string;
 
+  /**
+   * The type of option value. If multiple types exist, this type will be the first one, and the
+   * types array will contain all types accepted.
+   */
   type: OptionType | 'suboption';
+
+  /**
+   * {@see type}
+   */
   types?: OptionType[];
 
+  /**
+   * Aliases supported by this option.
+   */
   aliases: string[];
+
+  /**
+   * Whether this option is required or not.
+   */
   required?: boolean;
+
+  /**
+   * Format field of this option.
+   */
   format?: string;
+
+  /**
+   * Whether this option should be hidden from the help output. It will still show up in JSON help.
+   */
   hidden?: boolean;
+
+  /**
+   * Default value of this option.
+   */
   default?: string | number | boolean;
+
+  /**
+   * If this option can be used as an argument, the position of the argument. Otherwise omitted.
+   */
   positional?: number;
+
+  /**
+   * Smart default object.
+   */
   $default?: OptionSmartDefault;
 }
 
+/**
+ * Scope of the command.
+ */
 export enum CommandScope {
   InProject = 'in',
   OutProject = 'out',
@@ -116,7 +154,14 @@ export enum CommandType {
  * A description of a command, its metadata.
  */
 export interface CommandDescription {
+  /**
+   * Name of the command.
+   */
   name: string;
+
+  /**
+   * Short description (1-2 lines) of this command.
+   */
   description: string;
 
   /**
@@ -129,15 +174,40 @@ export interface CommandDescription {
    */
   usageNotes?: string;
 
+  /**
+   * List of all supported options.
+   */
   options: Option[];
 
+  /**
+   * Aliases supported for this command.
+   */
   aliases: string[];
+
+  /**
+   * Scope of the command, whether it can be executed in a project, outside of a project or
+   * anywhere.
+   */
   scope: CommandScope;
+
+  /**
+   * Type of command.
+   */
   type: CommandType;
 
+  /**
+   * Whether this command should be hidden from a list of all commands.
+   */
+  hidden: boolean;
+
+  /**
+   * The constructor of the command, which should be extending the abstract Command<> class.
+   */
   impl: CommandConstructor;
 
-  hidden: boolean;
+  /**
+   * Suboptions.
+   */
   suboptions?: {
     [name: string]: Option[];
   };
