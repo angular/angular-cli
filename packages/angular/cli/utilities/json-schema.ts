@@ -73,13 +73,29 @@ export async function parseJsonSchemaToCommandDescription(
     const ldPath = resolve(dirname(jsonPath), schema.$longDescription);
     longDescription = readFileSync(ldPath, 'utf-8');
   }
+  let usageNotes = '';
+  if (typeof schema.$usageNotes == 'string' && schema.$usageNotes) {
+    const unPath = resolve(dirname(jsonPath), schema.$usageNotes);
+    usageNotes = readFileSync(unPath, 'utf-8');
+  }
 
   const scope = _getEnumFromValue(schema.$scope, CommandScope, CommandScope.Default);
   const type = _getEnumFromValue(schema.$type, CommandType, CommandType.Default);
   const description = '' + (schema.description === undefined ? '' : schema.description);
   const hidden = !!schema.$hidden;
 
-  return { name, description, longDescription, hidden, type, options, aliases, scope, impl };
+  return {
+    name,
+    description,
+    ...(longDescription ? { longDescription } : {}),
+    ...(usageNotes ? { usageNotes } : {}),
+    hidden,
+    type,
+    options,
+    aliases,
+    scope,
+    impl,
+  };
 }
 
 export async function parseJsonSchemaToOptions(
