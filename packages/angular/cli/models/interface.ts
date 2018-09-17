@@ -142,14 +142,6 @@ export enum CommandScope {
   Default = InProject,
 }
 
-export enum CommandType {
-  Custom = 'custom',
-  Architect = 'architect',
-  Schematic = 'schematics',
-
-  Default = Custom,
-}
-
 /**
  * A description of a command, its metadata.
  */
@@ -189,11 +181,6 @@ export interface CommandDescription {
    * anywhere.
    */
   scope: CommandScope;
-
-  /**
-   * Type of command.
-   */
-  type: CommandType;
 
   /**
    * Whether this command should be hidden from a list of all commands.
