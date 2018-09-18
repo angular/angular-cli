@@ -9,7 +9,6 @@
     "build-optimizer": "./bin/build-optimizer",
     "devkit-admin": "./bin/devkit-admin",
     "ng": "./bin/ng",
-    "purify": "./bin/purify",
     "schematics": "./bin/schematics"
   },
   "keywords": [
