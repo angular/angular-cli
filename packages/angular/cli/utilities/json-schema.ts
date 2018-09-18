@@ -14,7 +14,9 @@ import {
   CommandDescription,
   CommandScope,
   Option,
-  OptionType, SubCommandDescription,
+  OptionType,
+  SubCommandDescription,
+  Value,
 } from '../models/interface';
 
 function _getEnumFromValue<E, T extends string>(v: json.JsonValue, e: E, d: T): T {
@@ -177,6 +179,19 @@ export async function parseJsonSchemaToOptions(
       return;
     }
 
+    // Only keep enum values we support (booleans, numbers and strings).
+    const enumValues = (json.isJsonArray(current.enum) && current.enum || []).filter(x => {
+      switch (typeof x) {
+        case 'boolean':
+        case 'number':
+        case 'string':
+          return true;
+
+        default:
+          return false;
+      }
+    }) as Value[];
+
     let defaultValue: string | number | boolean | undefined = undefined;
     if (current.default !== undefined) {
       switch (types[0]) {
@@ -218,6 +233,7 @@ export async function parseJsonSchemaToOptions(
       description: '' + (current.description === undefined ? '' : current.description),
       ...types.length == 1 ? { type } : { type, types },
       ...defaultValue !== undefined ? { default: defaultValue } : {},
+      ...enumValues && enumValues.length > 0 ? { enum: enumValues } : {},
       required,
       aliases,
       ...format !== undefined ? { format } : {},
