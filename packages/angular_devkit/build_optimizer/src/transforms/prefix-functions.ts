@@ -15,20 +15,8 @@ export function getPrefixFunctionsTransformer(): ts.TransformerFactory<ts.Source
     const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
 
       const topLevelFunctions = findTopLevelFunctions(sf);
-      const pureImports = findPureImports(sf);
-      const pureImportsComment = `* PURE_IMPORTS_START ${pureImports.join(',')} PURE_IMPORTS_END `;
 
       const visitor: ts.Visitor = (node: ts.Node): ts.Node => {
-
-        // Add the pure imports comment to the first node.
-        if (node.parent && node.parent.parent === undefined && node.pos === 0) {
-          const newNode = ts.addSyntheticLeadingComment(
-            node, ts.SyntaxKind.MultiLineCommentTrivia, pureImportsComment, true);
-
-          // Replace node with modified one.
-          return ts.visitEachChild(newNode, visitor, context);
-        }
-
         // Add pure function comment to top level functions.
         if (topLevelFunctions.has(node)) {
           const newNode = ts.addSyntheticLeadingComment(
@@ -107,28 +95,6 @@ export function findTopLevelFunctions(parentNode: ts.Node): Set<ts.Node> {
   ts.forEachChild(parentNode, cb);
 
   return topLevelFunctions;
-}
-
-export function findPureImports(parentNode: ts.Node): string[] {
-  const pureImports: string[] = [];
-  ts.forEachChild(parentNode, cb);
-
-  function cb(node: ts.Node) {
-    if (node.kind === ts.SyntaxKind.ImportDeclaration
-      && (node as ts.ImportDeclaration).importClause) {
-
-      // Save the path of the import transformed into snake case and remove relative paths.
-      const moduleSpecifier = (node as ts.ImportDeclaration).moduleSpecifier as ts.StringLiteral;
-      const pureImport = moduleSpecifier.text
-        .replace(/[\/@\-]/g, '_')
-        .replace(/^\.+/, '');
-      pureImports.push(pureImport);
-    }
-
-    ts.forEachChild(node, cb);
-  }
-
-  return pureImports;
 }
 
 function hasPureComment(node: ts.Node) {
