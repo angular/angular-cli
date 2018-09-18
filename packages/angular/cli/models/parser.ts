@@ -12,7 +12,7 @@ import { Arguments, Option, OptionType, Value } from './interface';
 
 function _coerceType(str: string | undefined, type: OptionType, v?: Value): Value | undefined {
   switch (type) {
-    case 'any':
+    case OptionType.Any:
       if (Array.isArray(v)) {
         return v.concat(str || '');
       }
@@ -23,10 +23,10 @@ function _coerceType(str: string | undefined, type: OptionType, v?: Value): Valu
            ? _coerceType(str, OptionType.Number, v)
            : _coerceType(str, OptionType.String, v);
 
-    case 'string':
+    case OptionType.String:
       return str || '';
 
-    case 'boolean':
+    case OptionType.Boolean:
       switch (str) {
         case 'false':
           return false;
@@ -40,7 +40,7 @@ function _coerceType(str: string | undefined, type: OptionType, v?: Value): Valu
           return undefined;
       }
 
-    case 'number':
+    case OptionType.Number:
       if (str === undefined) {
         return 0;
       } else if (Number.isFinite(+str)) {
@@ -49,7 +49,7 @@ function _coerceType(str: string | undefined, type: OptionType, v?: Value): Valu
         return undefined;
       }
 
-    case 'array':
+    case OptionType.Array:
       return Array.isArray(v) ? v.concat(str || '') : [str || ''];
 
     default:
@@ -61,7 +61,20 @@ function _coerce(str: string | undefined, o: Option | null, v?: Value): Value | 
   if (!o) {
     return _coerceType(str, OptionType.Any, v);
   } else {
-    return _coerceType(str, o.type, v);
+    const types = o.types || [o.type];
+
+    // Try all the types one by one and pick the first one that returns a value contained in the
+    // enum. If there's no enum, just return the first one that matches.
+    for (const type of types) {
+      const maybeResult = _coerceType(str, type, v);
+      if (maybeResult !== undefined) {
+        if (!o.enum || o.enum.includes(maybeResult)) {
+          return maybeResult;
+        }
+      }
+    }
+
+    return undefined;
   }
 }
 
@@ -118,10 +131,18 @@ function _assignOption(
       // Set it to true if it's a boolean and the next argument doesn't match true/false.
       const maybeOption = _getOptionFromName(key, options);
       if (maybeOption) {
-        // Not of type boolean, consume the next value.
         value = args[0];
-        // Only absorb it if it leads to a value.
-        if (_coerce(value, maybeOption) !== undefined) {
+        let shouldShift = true;
+
+        if (value && value.startsWith('-')) {
+          // Verify if not having a value results in a correct parse, if so don't shift.
+          if (_coerce(undefined, maybeOption) !== undefined) {
+            shouldShift = false;
+          }
+        }
+
+        // Only absorb it if it leads to a better value.
+        if (shouldShift && _coerce(value, maybeOption) !== undefined) {
           args.shift();
         } else {
           value = '';
@@ -134,9 +155,6 @@ function _assignOption(
     option = _getOptionFromName(key, options) || null;
     if (option) {
       value = arg.substring(i + 1);
-      if (option.type === 'boolean' && _coerce(value, option) === undefined) {
-        value = 'true';
-      }
     }
   }
   if (option === null) {
@@ -150,6 +168,8 @@ function _assignOption(
     const v = _coerce(value, option, parsedOptions[option.name]);
     if (v !== undefined) {
       parsedOptions[option.name] = v;
+    } else {
+      leftovers.push(arg);
     }
   }
 }
