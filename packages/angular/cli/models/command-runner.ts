@@ -115,7 +115,11 @@ export async function runCommand(
 
   // if no commands were found, use `help`.
   if (commandName === undefined) {
-    commandName = 'help';
+    if (args.length === 1 && args[0] === '--version') {
+      commandName = 'version';
+    } else {
+      commandName = 'help';
+    }
   }
 
   let description: CommandDescription | null = null;
