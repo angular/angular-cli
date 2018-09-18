@@ -8,9 +8,9 @@
 
 // tslint:disable:no-global-tslint-disable no-any
 import { terminal } from '@angular-devkit/core';
-import { Arguments, Option } from '../models/interface';
+import { Arguments, SubCommandDescription } from '../models/interface';
 import { SchematicCommand } from '../models/schematic-command';
-import { parseJsonSchemaToOptions } from '../utilities/json-schema';
+import { parseJsonSchemaToSubCommandDescription } from '../utilities/json-schema';
 import { Schema as GenerateCommandSchema } from './generate';
 
 export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
@@ -21,7 +21,7 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
     const [collectionName, schematicName] = this.parseSchematicInfo(options);
 
     const collection = this.getCollection(collectionName);
-    this.description.suboptions = {};
+    const subcommands: { [name: string]: SubCommandDescription } = {};
 
     const schematicNames = schematicName ? [schematicName] : collection.listSchematicNames();
     // Sort as a courtesy for the user.
@@ -29,24 +29,28 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
 
     for (const name of schematicNames) {
       const schematic = this.getSchematic(collection, name, true);
-      let options: Option[] = [];
+      let subcommand: SubCommandDescription;
       if (schematic.description.schemaJson) {
-        options = await parseJsonSchemaToOptions(
+        subcommand = await parseJsonSchemaToSubCommandDescription(
+          name,
+          schematic.description.path,
           this._workflow.registry,
           schematic.description.schemaJson,
         );
+      } else {
+        continue;
       }
 
       if (this.getDefaultSchematicCollection() == collectionName) {
-        this.description.suboptions[name] = options;
+        subcommands[name] = subcommand;
       } else {
-        this.description.suboptions[`${collectionName}:${name}`] = options;
+        subcommands[`${collectionName}:${name}`] = subcommand;
       }
     }
 
     this.description.options.forEach(option => {
       if (option.name == 'schematic') {
-        option.type = 'suboption';
+        option.subcommands = subcommands;
       }
     });
   }
@@ -86,7 +90,9 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
     await super.printHelp(options);
 
     this.logger.info('');
-    if (Object.keys(this.description.suboptions || {}).length == 1) {
+    // Find the generate subcommand.
+    const subcommand = this.description.options.filter(x => x.subcommands)[0];
+    if (Object.keys((subcommand && subcommand.subcommands) || {}).length == 1) {
       this.logger.info(`\nTo see help for a schematic run:`);
       this.logger.info(terminal.cyan(`  ng generate <schematic> --help`));
     }
