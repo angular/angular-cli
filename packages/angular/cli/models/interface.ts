@@ -63,11 +63,11 @@ export interface CommandContext {
  * Value types of an Option.
  */
 export enum OptionType {
-  String = 'string',
-  Number = 'number',
-  Boolean = 'boolean',
-  Array = 'array',
   Any = 'any',
+  Array = 'array',
+  Boolean = 'boolean',
+  Number = 'number',
+  String = 'string',
 }
 
 /**
@@ -94,6 +94,15 @@ export interface Option {
    * {@see type}
    */
   types?: OptionType[];
+
+  /**
+   * If this field is set, only values contained in this field are valid. This array can be mixed
+   * types (strings, numbers, boolean). For example, if this field is "enum: ['hello', true]",
+   * then "type" will be either string or boolean, types will be at least both, and the values
+   * accepted will only be either 'hello' or true (not false or any other string).
+   * This mean that prefixing with `no-` will not work on this field.
+   */
+  enum?: Value[];
 
   /**
    * If this option maps to a subcommand in the parent command, will contain all the subcommands
