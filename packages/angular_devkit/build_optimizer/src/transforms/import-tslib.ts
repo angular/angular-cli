@@ -7,7 +7,9 @@
  */
 import * as ts from 'typescript';
 
-
+/**
+ * @deprecated From 0.9.0
+ */
 export function testImportTslib(content: string) {
   const regex = /var (__extends|__decorate|__metadata|__param) = \(.*\r?\n(    .*\r?\n)*\};/;
 

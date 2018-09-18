@@ -7,7 +7,9 @@
  */
 import * as ts from 'typescript';
 
-
+/**
+ * @deprecated From 0.9.0
+ */
 export function testPrefixClasses(content: string) {
   const exportVarSetter = /(?:export )?(?:var|const)\s+(\S+)\s*=\s*/;
   const multiLineComment = /\s*(?:\/\*[\s\S]*?\*\/)?\s*/;
