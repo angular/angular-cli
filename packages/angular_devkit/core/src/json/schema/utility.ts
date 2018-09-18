@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, isJsonObject } from '../interface';
+import { JsonObject, isJsonArray, isJsonObject } from '../interface';
 
 
 const allTypes = ['string', 'integer', 'number', 'object', 'array', 'boolean', 'null'];
@@ -23,6 +23,29 @@ export function getTypesOfSchema(schema: JsonObject | true): Set<string> {
     potentials = new Set([schema.type]);
   } else if (Array.isArray(schema.type)) {
     potentials = new Set(schema.type as string[]);
+  } else if (isJsonArray(schema.enum)) {
+    potentials = new Set();
+
+    // Gather the type of each enum values, and use that as a starter for potential types.
+    for (const v of schema.enum) {
+      switch (typeof v) {
+        case 'string':
+        case 'number':
+        case 'boolean':
+          potentials.add(typeof v);
+          break;
+
+        case 'object':
+          if (Array.isArray(v)) {
+            potentials.add('array');
+          } else if (v === null) {
+            potentials.add('null');
+          } else {
+            potentials.add('object');
+          }
+          break;
+      }
+    }
   } else {
     potentials = new Set(allTypes);
   }
