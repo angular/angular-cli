@@ -64,7 +64,8 @@
     },
     "sourceMap": {
       "type": "boolean",
-      "description": "Output sourcemaps."
+      "description": "Output sourcemaps.",
+      "default": true
     },
     "vendorSourceMap": {
       "type": "boolean",
