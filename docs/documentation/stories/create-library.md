@@ -62,7 +62,7 @@ If this happens just rebuild your library.
 To publish your library follow these steps:
 
 ```
-ng build my-lib --prod
+ng build my-lib
 cd dist/my-lib
 npm publish
 ```
@@ -70,9 +70,6 @@ npm publish
 If you've never published a package in npm before, you will need to create a user account.
 You can read more about publishing on npm here:
 https://docs.npmjs.com/getting-started/publishing-npm-packages
-
-The `--prod` flag should be used when building to publish because it will completely clean the build
-directory for the library beforehand, removing old code leftover code from previous versions.
 
 
 ## Why do I need to build the library everytime I make changes?
