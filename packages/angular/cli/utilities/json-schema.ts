@@ -14,7 +14,7 @@ import {
   CommandDescription,
   CommandScope,
   Option,
-  OptionType,
+  OptionType, SubCommandDescription,
 } from '../models/interface';
 
 function _getEnumFromValue<E, T extends string>(v: json.JsonValue, e: E, d: T): T {
@@ -29,23 +29,12 @@ function _getEnumFromValue<E, T extends string>(v: json.JsonValue, e: E, d: T): 
   return d;
 }
 
-export async function parseJsonSchemaToCommandDescription(
+export async function parseJsonSchemaToSubCommandDescription(
   name: string,
   jsonPath: string,
   registry: json.schema.SchemaRegistry,
   schema: json.JsonObject,
-): Promise<CommandDescription> {
-  // Before doing any work, let's validate the implementation.
-  if (typeof schema.$impl != 'string') {
-    throw new Error(`Command ${name} has an invalid implementation.`);
-  }
-  const ref = new ExportStringRef<CommandConstructor>(schema.$impl, dirname(jsonPath));
-  const impl = ref.ref;
-
-  if (impl === undefined || typeof impl !== 'function') {
-    throw new Error(`Command ${name} has an invalid implementation.`);
-  }
-
+): Promise<SubCommandDescription> {
   const options = await parseJsonSchemaToOptions(registry, schema);
 
   const aliases: string[] = [];
@@ -78,20 +67,44 @@ export async function parseJsonSchemaToCommandDescription(
     usageNotes = readFileSync(unPath, 'utf-8');
   }
 
-  const scope = _getEnumFromValue(schema.$scope, CommandScope, CommandScope.Default);
-  const type = _getEnumFromValue(schema.$type, CommandType, CommandType.Default);
   const description = '' + (schema.description === undefined ? '' : schema.description);
-  const hidden = !!schema.$hidden;
 
   return {
     name,
     description,
     ...(longDescription ? { longDescription } : {}),
     ...(usageNotes ? { usageNotes } : {}),
-    hidden,
     options,
     aliases,
+  };
+}
+
+export async function parseJsonSchemaToCommandDescription(
+  name: string,
+  jsonPath: string,
+  registry: json.schema.SchemaRegistry,
+  schema: json.JsonObject,
+): Promise<CommandDescription> {
+  const subcommand = await parseJsonSchemaToSubCommandDescription(name, jsonPath, registry, schema);
+
+  // Before doing any work, let's validate the implementation.
+  if (typeof schema.$impl != 'string') {
+    throw new Error(`Command ${name} has an invalid implementation.`);
+  }
+  const ref = new ExportStringRef<CommandConstructor>(schema.$impl, dirname(jsonPath));
+  const impl = ref.ref;
+
+  if (impl === undefined || typeof impl !== 'function') {
+    throw new Error(`Command ${name} has an invalid implementation.`);
+  }
+
+  const scope = _getEnumFromValue(schema.$scope, CommandScope, CommandScope.Default);
+  const hidden = !!schema.$hidden;
+
+  return {
+    ...subcommand,
     scope,
+    hidden,
     impl,
   };
 }

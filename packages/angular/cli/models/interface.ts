@@ -88,12 +88,22 @@ export interface Option {
    * The type of option value. If multiple types exist, this type will be the first one, and the
    * types array will contain all types accepted.
    */
-  type: OptionType | 'suboption';
+  type: OptionType;
 
   /**
    * {@see type}
    */
   types?: OptionType[];
+
+  /**
+   * If this option maps to a subcommand in the parent command, will contain all the subcommands
+   * supported. There is a maximum of 1 subcommand Option per command, and the type of this
+   * option will always be "string" (no other types). The value of this option will map into
+   * this map and return the extra information.
+   */
+  subcommands?: {
+    [name: string]: SubCommandDescription;
+  };
 
   /**
    * Aliases supported by this option.
@@ -143,26 +153,26 @@ export enum CommandScope {
 }
 
 /**
- * A description of a command, its metadata.
+ * A description of a command and its options.
  */
-export interface CommandDescription {
+export interface SubCommandDescription {
   /**
-   * Name of the command.
+   * The name of the subcommand.
    */
   name: string;
 
   /**
-   * Short description (1-2 lines) of this command.
+   * Short description (1-2 lines) of this sub command.
    */
   description: string;
 
   /**
-   * A long description of the option, in Markdown format.
+   * A long description of the sub command, in Markdown format.
    */
   longDescription?: string;
 
   /**
-   * Additional notes about usage of this command.
+   * Additional notes about usage of this sub command, in Markdown format.
    */
   usageNotes?: string;
 
@@ -172,10 +182,15 @@ export interface CommandDescription {
   options: Option[];
 
   /**
-   * Aliases supported for this command.
+   * Aliases supported for this sub command.
    */
   aliases: string[];
+}
 
+/**
+ * A description of a command, its metadata.
+ */
+export interface CommandDescription extends SubCommandDescription {
   /**
    * Scope of the command, whether it can be executed in a project, outside of a project or
    * anywhere.
@@ -191,13 +206,6 @@ export interface CommandDescription {
    * The constructor of the command, which should be extending the abstract Command<> class.
    */
   impl: CommandConstructor;
-
-  /**
-   * Suboptions.
-   */
-  suboptions?: {
-    [name: string]: Option[];
-  };
 }
 
 export interface OptionSmartDefault {

@@ -116,46 +116,60 @@ export abstract class SchematicCommand<
     await super.printHelp(options);
     this.logger.info('');
 
-    const schematicNames = Object.keys(this.description.suboptions || {});
+    const subCommandOption = this.description.options.filter(x => x.subcommands)[0];
 
-    if (this.description.suboptions) {
-      if (schematicNames.length > 1) {
-        this.logger.info('Available Schematics:');
+    if (!subCommandOption || !subCommandOption.subcommands) {
+      return 0;
+    }
 
-        const namesPerCollection: { [c: string]: string[] } = {};
-        schematicNames.forEach(name => {
-          const [collectionName, schematicName] = name.split(/:/, 2);
+    const schematicNames = Object.keys(subCommandOption.subcommands);
 
-          if (!namesPerCollection[collectionName]) {
-            namesPerCollection[collectionName] = [];
-          }
+    if (schematicNames.length > 1) {
+      this.logger.info('Available Schematics:');
 
-          namesPerCollection[collectionName].push(schematicName);
+      const namesPerCollection: { [c: string]: string[] } = {};
+      schematicNames.forEach(name => {
+        let [collectionName, schematicName] = name.split(/:/, 2);
+        if (!schematicName) {
+          schematicName = collectionName;
+          collectionName = this.collectionName;
+        }
+
+        if (!namesPerCollection[collectionName]) {
+          namesPerCollection[collectionName] = [];
+        }
+
+        namesPerCollection[collectionName].push(schematicName);
+      });
+
+      const defaultCollection = this.getDefaultSchematicCollection();
+      Object.keys(namesPerCollection).forEach(collectionName => {
+        const isDefault = defaultCollection == collectionName;
+        this.logger.info(
+          `  Collection "${collectionName}"${isDefault ? ' (default)' : ''}:`,
+        );
+
+        namesPerCollection[collectionName].forEach(schematicName => {
+          this.logger.info(`    ${schematicName}`);
         });
-
-        const defaultCollection = this.getDefaultSchematicCollection();
-        Object.keys(namesPerCollection).forEach(collectionName => {
-          const isDefault = defaultCollection == collectionName;
-          this.logger.info(
-            `  Collection "${collectionName}"${isDefault ? ' (default)' : ''}:`,
-          );
-
-          namesPerCollection[collectionName].forEach(schematicName => {
-            this.logger.info(`    ${schematicName}`);
-          });
-        });
-      } else if (schematicNames.length == 1) {
-        this.logger.info('Options for schematic ' + schematicNames[0]);
-        await this.printHelpOptions(this.description.suboptions[schematicNames[0]]);
-      }
+      });
+    } else if (schematicNames.length == 1) {
+      this.logger.info('Help for schematic ' + schematicNames[0]);
+      await this.printHelpSubcommand(subCommandOption.subcommands[schematicNames[0]]);
     }
 
     return 0;
   }
 
   async printHelpUsage() {
-    const schematicNames = Object.keys(this.description.suboptions || {});
-    if (this.description.suboptions && schematicNames.length == 1) {
+    const subCommandOption = this.description.options.filter(x => x.subcommands)[0];
+
+    if (!subCommandOption || !subCommandOption.subcommands) {
+      return;
+    }
+
+    const schematicNames = Object.keys(subCommandOption.subcommands);
+    if (schematicNames.length == 1) {
       this.logger.info(this.description.description);
 
       const opts = this.description.options.filter(x => x.positional === undefined);
@@ -167,7 +181,7 @@ export abstract class SchematicCommand<
         ? schematicName
         : schematicNames[0];
 
-      const schematicOptions = this.description.suboptions[schematicNames[0]];
+      const schematicOptions = subCommandOption.subcommands[schematicNames[0]].options;
       const schematicArgs = schematicOptions.filter(x => x.positional !== undefined);
       const argDisplay = schematicArgs.length > 0
         ? ' ' + schematicArgs.map(a => `<${strings.dasherize(a.name)}>`).join(' ')

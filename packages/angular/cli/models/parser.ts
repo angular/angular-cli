@@ -60,8 +60,6 @@ function _coerceType(str: string | undefined, type: OptionType, v?: Value): Valu
 function _coerce(str: string | undefined, o: Option | null, v?: Value): Value | undefined {
   if (!o) {
     return _coerceType(str, OptionType.Any, v);
-  } else if (o.type == 'suboption') {
-    return _coerceType(str, OptionType.String, v);
   } else {
     return _coerceType(str, o.type, v);
   }

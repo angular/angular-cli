@@ -16,7 +16,7 @@ import {
   CommandDescriptionMap,
   CommandScope,
   CommandWorkspace,
-  Option,
+  Option, SubCommandDescription,
 } from './interface';
 
 export interface BaseCommandOptions {
@@ -74,6 +74,12 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
 
     this.logger.info(`usage: ng ${name}${argDisplay}${optionsDisplay}`);
     this.logger.info('');
+  }
+
+  protected async printHelpSubcommand(subcommand: SubCommandDescription) {
+    this.logger.info(subcommand.description);
+
+    await this.printHelpOptions(subcommand.options);
   }
 
   protected async printHelpOptions(options: Option[] = this.description.options) {
