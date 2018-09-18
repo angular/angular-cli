@@ -28,7 +28,7 @@ describe('parseArguments', () => {
     { name: 'e1', aliases: [], type: OptionType.String, enum: ['hello', 'world'], description: '' },
     { name: 'e2', aliases: [], type: OptionType.String, enum: ['hello', ''], description: '' },
     { name: 'e3', aliases: [], type: OptionType.Boolean,
-      types: [OptionType.String, OptionType.Boolean], enum: ['json', true, false],
+      types: [OptionType.Boolean, OptionType.String], enum: ['json', true, false],
       description: '' },
   ];
 

@@ -20,7 +20,7 @@ import {
 } from './interface';
 
 export interface BaseCommandOptions {
-  help?: boolean;
+  help?: boolean | string;
   helpJson?: boolean;
 }
 
@@ -144,15 +144,22 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
   abstract async run(options: T & Arguments): Promise<number | void>;
 
   async validateAndRun(options: T & Arguments): Promise<number | void> {
-    if (!options.help && !options.helpJson) {
+    if (!(options.help === true || options.help === 'json' || options.help === 'JSON')) {
       await this.validateScope();
     }
     await this.initialize(options);
 
-    if (options.help) {
+    if (options.help === true) {
       return this.printHelp(options);
-    } else if (options.helpJson) {
+    } else if (options.help === 'json' || options.help === 'JSON') {
       return this.printJsonHelp(options);
+    } else if (options.help !== false && options.help !== undefined) {
+      // The user entered an invalid type of help, maybe?
+      this.logger.fatal(
+        `--help was provided, but format ${JSON.stringify(options.help)} was not understood.`,
+      );
+
+      return 1;
     } else {
       return await this.run(options);
     }
