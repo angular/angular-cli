@@ -15,37 +15,7 @@ const transform = (content: string) => transformJavascript(
   { content, getTransforms: [getPrefixFunctionsTransformer] }).content;
 
 describe('prefix-functions', () => {
-  const emptyImportsComment = '/** PURE_IMPORTS_START  PURE_IMPORTS_END */';
   const clazz = 'var Clazz = (function () { function Clazz() { } return Clazz; }());';
-
-  describe('pure imports', () => {
-    it('adds import list', () => {
-      const input = tags.stripIndent`
-        import { Injectable } from '@angular/core';
-        import { Something } from './relative/pure_import';
-        var foo = Injectable;
-        var bar = Something;
-      `;
-      const output = tags.stripIndent`
-        /** PURE_IMPORTS_START _angular_core,_relative_pure_import PURE_IMPORTS_END */
-        ${input}
-      `;
-
-      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
-    });
-
-    it('adds import list even with no imports', () => {
-      const input = tags.stripIndent`
-        var foo = 42;
-      `;
-      const output = tags.stripIndent`
-        ${emptyImportsComment}
-        ${input}
-      `;
-
-      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
-    });
-  });
 
   describe('pure functions', () => {
     it('adds comment to new calls', () => {
@@ -53,7 +23,6 @@ describe('prefix-functions', () => {
         var newClazz = new Clazz();
       `;
       const output = tags.stripIndent`
-        ${emptyImportsComment}
         var newClazz = /*@__PURE__*/ new Clazz();
       `;
 
@@ -65,7 +34,6 @@ describe('prefix-functions', () => {
         var newClazz = Clazz();
       `;
       const output = tags.stripIndent`
-        ${emptyImportsComment}
         var newClazz = /*@__PURE__*/ Clazz();
       `;
 
@@ -78,7 +46,6 @@ describe('prefix-functions', () => {
         var ClazzTwo = (function () { function Clazz() { } return Clazz; })();
       `;
       const output = tags.stripIndent`
-        ${emptyImportsComment}
         var Clazz = /*@__PURE__*/ (function () { function Clazz() { } return Clazz; }());
         var ClazzTwo = /*@__PURE__*/ (function () { function Clazz() { } return Clazz; })();
       `;
@@ -99,7 +66,6 @@ describe('prefix-functions', () => {
         };
       `;
       const output = tags.stripIndent`
-        ${emptyImportsComment}
         ${input}
       `;
 
@@ -118,7 +84,6 @@ describe('prefix-functions', () => {
         export { MyFunction };
       `;
       const output = tags.stripIndent`
-        ${emptyImportsComment}
         ${input}
       `;
 
@@ -137,7 +102,6 @@ describe('prefix-functions', () => {
         }
       `;
       const output = tags.stripIndent`
-        ${emptyImportsComment}
         ${input}
       `;
 
@@ -156,7 +120,6 @@ describe('prefix-functions', () => {
         };
       `;
       const output = tags.stripIndent`
-        ${emptyImportsComment}
         ${input}
       `;
 
@@ -172,7 +135,6 @@ describe('prefix-functions', () => {
         };
       `;
       const output = tags.stripIndent`
-        ${emptyImportsComment}
         ${input}
       `;
 
