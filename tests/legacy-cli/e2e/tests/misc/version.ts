@@ -1,13 +1,22 @@
-import {deleteFile} from '../../utils/fs';
-import {ng} from '../../utils/process';
+import { deleteFile } from '../../utils/fs';
+import { ng } from '../../utils/process';
 
 
-export default function() {
-  return ng('version')
-    .then(() => deleteFile('angular.json'))
-    // doesn't fail on a project with missing angular.json
-    .then(() => ng('version'))
-    // Doesn't fail outside a project.
-    .then(() => process.chdir('/'))
-    .then(() => ng('version'));
+export default async function() {
+  const { stdout: commandOutput } = await ng('version');
+  const { stdout: optionOutput } = await ng('--version');
+  if (!optionOutput.includes('Angular CLI:')) {
+    throw new Error('version not displayed');
+  }
+  if (commandOutput !== optionOutput) {
+    throw new Error('version variants have differing output');
+  }
+
+  // doesn't fail on a project with missing angular.json
+  await deleteFile('angular.json');
+  await ng('version');
+
+  // Doesn't fail outside a project.
+  await process.chdir('/');
+  await ng('version');
 }
