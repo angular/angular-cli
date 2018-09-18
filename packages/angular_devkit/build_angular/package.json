@@ -26,7 +26,7 @@
     "less-loader": "4.1.0",
     "license-webpack-plugin": "1.4.0",
     "loader-utils": "1.1.0",
-    "mini-css-extract-plugin": "0.4.2",
+    "mini-css-extract-plugin": "0.4.3",
     "minimatch": "3.0.4",
     "parse5": "4.0.0",
     "opn": "5.3.0",
@@ -45,13 +45,13 @@
     "stylus": "0.54.5",
     "stylus-loader": "3.0.2",
     "tree-kill": "1.2.0",
-    "terser-webpack-plugin": "1.0.2",
-    "webpack": "4.17.2",
-    "webpack-dev-middleware": "3.2.0",
-    "webpack-dev-server": "3.1.7",
+    "terser-webpack-plugin": "1.1.0",
+    "webpack": "4.19.1",
+    "webpack-dev-middleware": "3.3.0",
+    "webpack-dev-server": "3.1.8",
     "webpack-merge": "4.1.4",
     "webpack-sources": "1.2.0",
-    "webpack-subresource-integrity": "1.1.0-rc.4"
+    "webpack-subresource-integrity": "1.1.0-rc.6"
   },
   "optionalDependencies": {
     "node-sass": "4.9.3"
