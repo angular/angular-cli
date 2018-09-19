@@ -12,7 +12,7 @@ import { Arguments, Option, OptionType, Value } from './interface';
 
 export class ParseArgumentException extends BaseException {
   constructor(
-    comments: string[],
+    public readonly comments: string[],
     public readonly parsed: Arguments,
     public readonly ignored: string[],
   ) {

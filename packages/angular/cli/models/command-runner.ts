@@ -182,9 +182,20 @@ export async function runCommand(
     return 1;
   }
 
-  const parsedOptions = parser.parseArguments(args, description.options);
-  Command.setCommandMap(commandMap);
-  const command = new description.impl({ workspace }, description, logger);
+  try {
+    const parsedOptions = parser.parseArguments(args, description.options);
+    Command.setCommandMap(commandMap);
+    const command = new description.impl({ workspace }, description, logger);
 
-  return await command.validateAndRun(parsedOptions);
+    return await command.validateAndRun(parsedOptions);
+  } catch (e) {
+    if (e instanceof parser.ParseArgumentException) {
+      logger.fatal('Cannot parse arguments. See below for the reasons.');
+      logger.fatal('    ' + e.comments.join('\n    '));
+
+      return 1;
+    } else {
+      throw e;
+    }
+  }
 }
