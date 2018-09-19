@@ -168,14 +168,13 @@ export class AppShellBuilder implements Builder<BuildWebpackAppShellSchema> {
             document: indexHtml,
             url: options.route,
           })
-          .then((html: string) => {
-            return this.context.host
+          .then(async (html: string) => {
+            await this.context.host
               .write(outputIndexPath, virtualFs.stringToFileBuffer(html))
               .toPromise();
-          })
-          .then(() => {
+
             if (browserOptions.serviceWorker) {
-              return augmentAppWithServiceWorker(
+              await augmentAppWithServiceWorker(
                 this.context.host,
                 root,
                 projectRoot,
@@ -184,8 +183,9 @@ export class AppShellBuilder implements Builder<BuildWebpackAppShellSchema> {
                 browserOptions.ngswConfigPath,
               );
             }
-          })
-          .then(() => ({ success: true })),
+
+            return { success: true };
+          }),
         );
       }),
     );
