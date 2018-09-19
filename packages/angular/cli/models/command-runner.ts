@@ -92,12 +92,8 @@ export async function runCommand(
       throw new Error('Invalid command JSON loaded from ' + JSON.stringify(schemaPath));
     }
 
-    commandMap[name] = await parseJsonSchemaToCommandDescription(
-      name,
-      schemaPath,
-      registry,
-      schema,
-    );
+    commandMap[name] =
+      await parseJsonSchemaToCommandDescription(name, schemaPath, registry, schema, logger);
   }
 
   let commandName: string | undefined = undefined;

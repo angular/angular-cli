@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { json } from '@angular-devkit/core';
+import { json, logging } from '@angular-devkit/core';
 import { ExportStringRef } from '@angular-devkit/schematics/tools';
 import { readFileSync } from 'fs';
 import { dirname, resolve } from 'path';
@@ -36,6 +36,7 @@ export async function parseJsonSchemaToSubCommandDescription(
   jsonPath: string,
   registry: json.schema.SchemaRegistry,
   schema: json.JsonObject,
+  logger: logging.Logger,
 ): Promise<SubCommandDescription> {
   const options = await parseJsonSchemaToOptions(registry, schema);
 
@@ -61,12 +62,20 @@ export async function parseJsonSchemaToSubCommandDescription(
   let longDescription = '';
   if (typeof schema.$longDescription == 'string' && schema.$longDescription) {
     const ldPath = resolve(dirname(jsonPath), schema.$longDescription);
-    longDescription = readFileSync(ldPath, 'utf-8');
+    try {
+      longDescription = readFileSync(ldPath, 'utf-8');
+    } catch (e) {
+      logger.warn(`File ${ldPath} was not found while constructing the subcommand ${name}.`);
+    }
   }
   let usageNotes = '';
   if (typeof schema.$usageNotes == 'string' && schema.$usageNotes) {
     const unPath = resolve(dirname(jsonPath), schema.$usageNotes);
-    usageNotes = readFileSync(unPath, 'utf-8');
+    try {
+      usageNotes = readFileSync(unPath, 'utf-8');
+    } catch (e) {
+      logger.warn(`File ${unPath} was not found while constructing the subcommand ${name}.`);
+    }
   }
 
   const description = '' + (schema.description === undefined ? '' : schema.description);
@@ -86,8 +95,10 @@ export async function parseJsonSchemaToCommandDescription(
   jsonPath: string,
   registry: json.schema.SchemaRegistry,
   schema: json.JsonObject,
+  logger: logging.Logger,
 ): Promise<CommandDescription> {
-  const subcommand = await parseJsonSchemaToSubCommandDescription(name, jsonPath, registry, schema);
+  const subcommand =
+    await parseJsonSchemaToSubCommandDescription(name, jsonPath, registry, schema, logger);
 
   // Before doing any work, let's validate the implementation.
   if (typeof schema.$impl != 'string') {
