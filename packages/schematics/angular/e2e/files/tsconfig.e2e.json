@@ -1,0 +1,13 @@
+{
+  "extends": "<%= appDir.split('/').map(x => '..').join('/') %>/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "<%= appDir.split('/').map(x => '..').join('/') %>/out-tsc/app",
+    "module": "commonjs",
+    "target": "es5",
+    "types": [
+      "jasmine",
+      "jasminewd2",
+      "node"
+    ]
+  }
+}

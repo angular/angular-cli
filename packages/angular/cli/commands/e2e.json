@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/e2e.json",
+  "description": "Runs the end-to-end tests.",
+  "$longDescription": "",
+
+  "$aliases": [ "e" ],
+  "$scope": "in",
+  "$type": "architect",
+  "$impl": "./e2e-impl#E2eCommand",
+
+  "type": "object",
+  "allOf": [
+    { "$ref": "./definitions.json#/definitions/architect" },
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}

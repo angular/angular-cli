@@ -11,21 +11,119 @@
 ng test
 ```
 
-Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false` or `--single-run`.
+Tests will execute after a build is executed via [Karma](http://karma-runner.github.io/0.13/index.html), and it will automatically watch your files for changes. You can run tests a single time via `--watch=false`.
 
 You can run tests with coverage via `--code-coverage`. The coverage report will be in the `coverage/` directory.
 
 ## Options
 <details>
-  <summary>app</summary>
+  <summary>prod</summary>
   <p>
-    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
+    <code>--prod</code>
   </p>
   <p>
-    Specifies app name or index to use.
+    Flag to set configuration to "prod".
   </p>
 </details>
-
+<details>
+  <summary>configuration</summary>
+  <p>
+    <code>--configuration</code> (alias: <code>-c</code>)
+  </p>
+  <p>
+    Specify the configuration to use.
+  </p>
+</details>
+<details>
+  <summary>main</summary>
+  <p>
+    <code>--main</code>
+  </p>
+  <p>
+    The name of the main entry-point file.
+  </p>
+</details>
+<details>
+  <summary>ts-config</summary>
+  <p>
+    <code>--ts-config</code>
+  </p>
+  <p>
+    The name of the TypeScript configuration file.
+  </p>
+</details>
+<details>
+  <summary>karma-config</summary>
+  <p>
+    <code>--karma-config</code>
+  </p>
+  <p>
+    The name of the Karma configuration file.
+  </p>
+</details>
+<details>
+  <summary>polyfills</summary>
+  <p>
+    <code>--polyfills</code>
+  </p>
+  <p>
+    The name of the polyfills file.
+  </p>
+</details>
+<details>
+  <summary>environment</summary>
+  <p>
+    <code>--environment</code>
+  </p>
+  <p>
+    Defines the build environment.
+  </p>
+</details>
+<details>
+  <summary>source-map</summary>
+  <p>
+    <code>--source-map</code>
+  </p>
+  <p>
+    Output sourcemaps.
+  </p>
+</details>
+<details>
+  <summary>progress</summary>
+  <p>
+    <code>--progress</code>
+  </p>
+  <p>
+    Log progress to the console while building.
+  </p>
+</details>
+<details>
+  <summary>watch</summary>
+  <p>
+    <code>--watch</code>
+  </p>
+  <p>
+    Run build when files change.
+  </p>
+</details>
+<details>
+  <summary>poll</summary>
+  <p>
+    <code>--poll</code>
+  </p>
+  <p>
+    Enable and define the file watching poll time period in milliseconds.
+  </p>
+</details>
+<details>
+  <summary>preserve-symlinks</summary>
+  <p>
+    <code>--preserve-symlinks</code>
+  </p>
+  <p>
+    Do not use the real path when resolving modules.
+  </p>
+</details>
 <details>
   <summary>browsers</summary>
   <p>
@@ -35,123 +133,12 @@ You can run tests with coverage via `--code-coverage`. The coverage report will 
     Override which browsers tests are run against.
   </p>
 </details>
-
 <details>
   <summary>code-coverage</summary>
   <p>
-    <code>--code-coverage</code> (aliases: <code>-cc</code>) <em>default value: false</em>
+    <code>--code-coverage</code>
   </p>
   <p>
-    Coverage report will be in the coverage/ directory.
-  </p>
-</details>
-
-<details>
-  <summary>colors</summary>
-  <p>
-    <code>--colors</code>
-  </p>
-  <p>
-    Enable or disable colors in the output (reporters and logs).
-  </p>
-</details>
-
-<details>
-  <summary>config</summary>
-  <p>
-    <code>--config</code> (aliases: <code>-c</code>)
-  </p>
-  <p>
-    Use a specific config file. Defaults to the karma config file in `.angular-cli.json`.
-  </p>
-</details>
-
-<details>
-  <summary>environment</summary>
-  <p>
-    <code>--environment</code> (aliases: <code>-e</code>)
-  </p>
-  <p>
-    Defines the build environment.
-  </p>
-</details>
-
-<details>
-  <summary>log-level</summary>
-  <p>
-    <code>--log-level</code>
-  </p>
-  <p>
-    Level of logging.
-  </p>
-</details>
-
-<details>
-  <summary>poll</summary>
-  <p>
-    <code>--poll</code>
-  </p>
-  <p>
-    Enable and define the file watching poll time period (milliseconds).
-  </p>
-</details>
-
-<details>
-  <summary>port</summary>
-  <p>
-    <code>--port</code>
-  </p>
-  <p>
-    Port where the web server will be listening.
-  </p>
-</details>
-
-<details>
-  <summary>progress</summary>
-  <p>
-    <code>--progress</code> <em>default value: true inside TTY, false otherwise</em>
-  </p>
-  <p>
-    Log progress to the console while in progress.
-  </p>
-</details>
-
-<details>
-  <summary>reporters</summary>
-  <p>
-    <code>--reporters</code>
-  </p>
-  <p>
-    List of reporters to use.
-  </p>
-</details>
-
-<details>
-  <summary>single-run</summary>
-  <p>
-    <code>--single-run</code> (aliases: <code>-sr</code>)
-  </p>
-  <p>
-    Run tests a single time.
-  </p>
-</details>
-
-<details>
-  <summary>sourcemap</summary>
-  <p>
-    <code>--sourcemap</code> (aliases: <code>-sm</code>, <code>sourcemaps</code>)
-  </p>
-  <p>
-    Output sourcemaps.
-  </p>
-</details>
-
-<details>
-  <summary>watch</summary>
-  <p>
-    <code>--watch</code> (aliases: <code>-w</code>)
-  </p>
-  <p>
-    Run build when files change.
+    Output a code coverage report.
   </p>
 </details>

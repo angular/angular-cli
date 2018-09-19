@@ -34,6 +34,15 @@ Thanks for reporting this issue. However, you didn't provide sufficient informat
 If the problem persists, please file a new issue and ensure you provide all of the required information when filling out the issue template.
 ```
 
+
+## Angular CLI: NPM install issue (v1)
+```
+This seems like a problem with your node/npm and not with Angular CLI.
+
+Please have a look at the [fixing npm permissions page](https://docs.npmjs.com/getting-started/fixing-npm-permissions), [common errors page](https://docs.npmjs.com/troubleshooting/common-errors), [npm issue tracker](https://github.com/npm/npm/issues), or open a new issue if the problem you are experiencing isn't known.
+```
+
+
 ## Angular CLI: Issue Outside of Angular CLI (v1.1)
 ```
 I'm sorry, but this issue is not caused by Angular CLI. Please contact the author(s) of the <PROJECT NAME> project or file an issue on their issue tracker.
@@ -43,8 +52,12 @@ I'm sorry, but this issue is not caused by Angular CLI. Please contact the autho
 ## Angular CLI: Non-reproducible (v1)
 ```
 I'm sorry, but we can't reproduce the problem following the instructions you provided.
+Remember that we have a large number of issues to resolve, and have only a limited amount of time to reproduce your issue.
+Short, explicit instructions make it much more likely we'll be able to reproduce the problem so we can fix it.
 
 If the problem persists, please open a new issue following [our submission guidelines](https://github.com/angular/angular-cli/blob/master/CONTRIBUTING.md#-submitting-an-issue).
+
+A good way to make a minimal repro is to create a new app via `ng new repro-app` and adding the minimum possible code to show the problem. Then you can push this repository to github and link it here.
 ```
 
 
@@ -68,7 +81,7 @@ If you are wondering why we don't resolve support issues via the issue tracker, 
 ```
 Hello, errors like `Error encountered resolving symbol values statically` mean that there has been some problem in statically analyzing your app.
 
-Angular CLI always runs *some* statical analysis, even on JIT mode, in order to discover lazy-loaded routes.
+Angular CLI always runs *some* static analysis, even in JIT mode, in order to discover lazy-loaded routes.
 This may cause a lot of static analysis errors to surface when importing your project into the CLI, or upgrading for older versions where we didn't run this kind of analysis.
 
 Below are good resources on how to to debug these errors:
@@ -77,4 +90,11 @@ Below are good resources on how to to debug these errors:
 
 If your problem still persists, it might be a bug with the Angular Compiler itself.
 In that case, please open an issue in https://github.com/angular/angular.
+```
+
+## Angular CLI: Lockfiles (v1)
+```
+I'd like to remind everyone that **you only have reproducible installs if you use a lockfile**. Both [NPM v5+](https://docs.npmjs.com/files/package-locks) and [Yarn](https://yarnpkg.com/lang/en/docs/yarn-lock/) support lockfiles. If your CI works one day but not the next and you did not change your code or `package.json`, it is likely because one of your dependencies had a bad release and you did not have a lockfile.
+
+**It is your responsibility as a library consumer to use lockfiles**. No one wants to do a release with bugs but it sometimes happens, and the best we can do is to fix it as fast as possible with a new release. When you have a couple of thousand total dependencies it is only a matter of time until one of them has a bad release.
 ```

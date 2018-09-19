@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "BrowserTargetSchema",
+  "title": "Browser target schema for testing Build Facade.",
+  "type": "object",
+  "description": "Target options",
+  "properties": {
+    "browserOption": {
+      "type": "number",
+      "description": "A required option"
+    },
+    "optionalBrowserOption": {
+      "type": "boolean",
+      "description": "A non-required option with a default",
+      "default": false
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "browserOption"
+  ]
+}

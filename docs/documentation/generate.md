@@ -3,9 +3,9 @@
 # ng generate
 
 ## Overview
-`ng generate [name]` generates the specified blueprint
+`ng generate [name]` generates the specified schematic
 
-## Available blueprints:
+## Available Schematics:
  - [class](generate/class)
  - [component](generate/component)
  - [directive](generate/directive)
@@ -16,33 +16,26 @@
  - [pipe](generate/pipe)
  - [service](generate/service)
 
+ - [application](generate/application)
+ - [library](generate/library)
+ - [universal](generate/universal)
+
 ## Options
 <details>
   <summary>dry-run</summary>
   <p>
-    <code>--dry-run</code> (aliases: <code>-d</code>) <em>default value: false</em>
+    <code>--dry-run</code> (alias: <code>-d</code>)
   </p>
   <p>
     Run through without making any changes.
   </p>
 </details>
-
 <details>
   <summary>force</summary>
   <p>
-    <code>--force</code> (aliases: <code>-f</code>) <em>default value: false</em>
+    <code>--force</code> (alias: <code>-f</code>)
   </p>
   <p>
     Forces overwriting of files.
-  </p>
-</details>
-
-<details>
-  <summary>app</summary>
-  <p>
-    <code>--app</code>
-  </p>
-  <p>
-    Specifies app name to use.
   </p>
 </details>

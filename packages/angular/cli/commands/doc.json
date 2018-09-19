@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/doc.json",
+  "description": "Opens the official Angular API documentation for a given keyword.",
+  "$longDescription": "",
+
+  "$aliases": [ "d" ],
+  "$type": "native",
+  "$impl": "./doc-impl#DocCommand",
+
+  "type": "object",
+  "allOf": [
+    {
+      "properties": {
+        "keyword": {
+          "type": "string",
+          "description": "The query to search upon.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        },
+        "search": {
+          "aliases": ["s"],
+          "type": "boolean",
+          "default": false,
+          "description": "Search whole angular.io instead of just api."
+        }
+      },
+      "required": [
+      ]
+    },
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}

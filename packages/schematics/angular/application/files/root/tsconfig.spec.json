@@ -1,0 +1,18 @@
+{
+  "extends": "<%= relativePathToWorkspaceRoot %>/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/spec",
+    "types": [
+      "jasmine",
+      "node"
+    ]
+  },
+  "files": [
+    "<%= rootInSrc ? '' : 'src/' %>test.ts",
+    "<%= rootInSrc ? '' : 'src/' %>polyfills.ts"
+  ],
+  "include": [
+    "**/*.spec.ts",
+    "**/*.d.ts"
+  ]
+}

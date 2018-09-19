@@ -6,36 +6,42 @@ The `styles.css` file allows users to add global styles and supports
 If the project is created with the `--style=sass` option, this will be a `.sass`
 file instead, and the same applies to `scss/less/styl`.
 
-You can add more global styles via the `apps[0].styles` property in `.angular-cli.json`.
+You can add more global styles via the `styles` option inside your project's build target options
+in `angular.json`.
 These will be loaded exactly as if you had added them in a `<link>` tag inside `index.html`.
 
 ```json
-"styles": [
-  "styles.css",
-  "more-styles.css",
-],
+"architect": {
+  "build": {
+    "builder": "@angular-devkit/build-angular:browser",
+    "options": {
+      "styles": [
+        "src/styles.css",
+        "src/more-styles.css",
+      ],
+      ...
 ```
 
 You can also rename the output and lazy load it by using the object format:
 
 ```json
 "styles": [
-  "styles.css",
-  "more-styles.css",
-  { "input": "lazy-style.scss", "lazy": true },
-  { "input": "pre-rename-style.scss", "output": "renamed-style" },
+  "src/styles.css",
+  "src/more-styles.css",
+  { "input": "src/lazy-style.scss", "lazy": true },
+  { "input": "src/pre-rename-style.scss", "bundleName": "renamed-style" },
 ],
 ```
 
 In Sass and Stylus you can also make use of the `includePaths` functionality for both component and
 global styles, which allows you to add extra base paths that will be checked for imports.
 
-To add paths, use the `stylePreprocessorOptions` entry in angular-cli.json `app` object:
+To add paths, use the `stylePreprocessorOptions` option:
 
 ```
 "stylePreprocessorOptions": {
   "includePaths": [
-    "style-paths"
+    "src/style-paths"
   ]
 },
 ```
@@ -50,3 +56,5 @@ project without the need for a relative path:
 // But now this works as well
 @import 'variables';
 ```
+
+Note: you will also need to add any styles to the `test` builder if you need them for unit tests.

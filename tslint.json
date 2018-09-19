@@ -1,5 +1,68 @@
 {
+  "//00": "Consider using no-identical-functions and disabling in faulty tests",
+  "//01": "Consider using cognitive-complexity and refactor",
+  "//02": "Consider using no-useless-cast but it's annoying",
+  "extends": [
+    "tslint-no-circular-imports"
+  ],
+  "rulesDirectory": [
+    "dist/rules",
+    "node_modules/tslint-sonarts/lib/rules"
+  ],
   "rules": {
+    "//03": "==================================================================================================",
+    "//04": "custom rules defined in dist/rules/**",
+    "defocus": true,
+    "import-groups": true,
+    "no-global-tslint-disable": true,
+    "single-eof-line": true,
+    "//05": "==================================================================================================",
+
+    "//06": "==================================================================================================",
+    "//07": "tslint-sonarts rules. See https://github.com/SonarSource/SonarTS",
+    "//08": "These rules are part of the bug detection section of tslint-sonarts",
+    "no-big-function": true,
+    "no-all-duplicated-branches": true,
+    "no-case-with-or": true,
+    "no-collection-size-mischeck": true,
+    "no-element-overwrite": true,
+    "no-empty-destructuring": true,
+    "no-identical-conditions": true,
+    "no-ignored-initial-value": true,
+    "no-ignored-return": true,
+    "no-in-misuse": true,
+    "no-misleading-array-reverse": true,
+    "no-misspelled-operator": true,
+    "no-self-assignment": true,
+    "no-unthrown-error": true,
+    "no-use-of-empty-return-value": true,
+    "no-useless-increment": true,
+
+    "//09": "These rules are part of the code smell detection section of tslint-sonarts",
+    "no-dead-store": true,
+    "no-useless-intersection": true,
+    "//10": "==================================================================================================",
+
+    "//11": "==================================================================================================",
+    "//12": "base tslint rules",
+    "arrow-return-shorthand": true,
+    "no-duplicate-imports": true,
+    "no-angle-bracket-type-assertion": true,
+    "no-conditional-assignment": true,
+    "no-non-null-assertion": true,
+    "no-unnecessary-qualifier": true,
+    "no-string-throw": true,
+    "encoding": true,
+    "no-floating-promises": true,
+    "no-implicit-dependencies": true,
+    "no-import-side-effect": [true, {"ignore-module": "^(?!rxjs\/)"}],
+    "align": [
+      true,
+      "elements",
+      "members",
+      "parameters",
+      "statements"
+    ],
     "max-line-length": [true, 100],
     "no-inferrable-types": true,
     "class-name": true,
@@ -12,27 +75,48 @@
       "spaces"
     ],
     "eofline": true,
+    "import-spacing": true,
+    "match-default-export-name": true,
+    "newline-before-return": true,
+    "no-consecutive-blank-lines": [true, 2],
     "no-duplicate-variable": true,
     "no-eval": true,
+    "no-any": true,
     "no-arg": true,
     "no-internal-module": true,
     "no-trailing-whitespace": true,
-    "no-bitwise": true,
     "no-unused-expression": true,
+    "no-unused-variable": [true, {"ignore-pattern": "^_"}],
     "no-var-keyword": true,
     "one-line": [
       true,
       "check-catch",
       "check-else",
+      "check-finally",
       "check-open-brace",
       "check-whitespace"
     ],
+    "ordered-imports": [
+      true,
+      {
+        "import-sources-order": "lowercase-last",
+        "named-imports-order": "lowercase-last"
+      }
+    ],
+    "prefer-const": true,
     "quotemark": [
       true,
       "single",
       "avoid-escape"
     ],
     "semicolon": [true, "always"],
+    "trailing-comma": [
+      true,
+      {
+        "multiline": "always",
+        "singleline": "never"
+      }
+    ],
     "typedef-whitespace": [
       true,
       {
@@ -44,6 +128,10 @@
       }
     ],
     "curly": true,
+    "file-header": [
+      true,
+      "Copyright Google Inc\\. All Rights Reserved\\."
+    ],
     "variable-name": [
       true,
       "ban-keywords",
@@ -55,9 +143,12 @@
       true,
       "check-branch",
       "check-decl",
+      "check-module",
+      "check-preblock",
       "check-operator",
       "check-separator",
-      "check-type"
+      "check-type",
+      "check-typecast"
     ]
   }
 }

@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "newProjectRoot": "./projects",
+  "defaultProject": "app",
+  "cli": {
+    "$globalOverride": "${HOME}/.angular-cli.json",
+    "schematics": {
+      "defaultCollection": "@schematics/angular"
+    },
+    "warnings": {
+      "showDeprecation": false
+    }
+  },
+  "schematics": {
+    "@schematics/angular": {
+      "*": {
+        "skipImport": true,
+        "packageManager": "yarn"
+      },
+      "application": {
+        "spec": false
+      }
+    }
+  },
+  "architect": {},
+  "projects": {
+    "app": {
+      "root": "projects/app",
+      "projectType": "application",
+      "cli": {},
+      "schematics": {
+        "@schematics/angular": {
+          "*": {
+            "spec": false
+          }
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "transforms": [
+            {
+              "plugin": "@angular-devkit/architect-transforms:replacement",
+              "file": "environments/environment.ts",
+              "configurations": {
+                "production": "environments/environment.prod.ts"
+              }
+            }
+          ],
+          "options": {
+            "outputPath": "../dist",
+            "index": "index.html",
+            "main": "main.ts",
+            "polyfills": "polyfills.ts",
+            "tsConfig": "tsconfig.app.json",
+            "progress": false
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        }
+      }
+    }
+  }
+}

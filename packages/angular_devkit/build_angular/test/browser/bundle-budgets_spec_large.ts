@@ -1,0 +1,92 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+
+import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
+import { tap } from 'rxjs/operators';
+import { browserTargetSpec, host } from '../utils';
+
+
+describe('Browser Builder bundle budgets', () => {
+
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
+
+  it('accepts valid bundles', (done) => {
+    const overrides = {
+      optimization: true,
+      budgets: [{ type: 'allScript', maximumError: '100mb' }],
+    };
+
+    const logger = new TestLogger('rebuild-type-errors');
+
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2, logger).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => expect(logger.includes('WARNING')).toBe(false)),
+    ).toPromise().then(done, done.fail);
+  });
+
+  it('shows errors', (done) => {
+    const overrides = {
+      optimization: true,
+      budgets: [{ type: 'all', maximumError: '100b' }],
+    };
+
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(false)),
+    ).toPromise().then(done, done.fail);
+  });
+
+  it('shows warnings', (done) => {
+    const overrides = {
+      optimization: true,
+      budgets: [{ type: 'all', minimumWarning: '100mb' }],
+    };
+
+    const logger = new TestLogger('rebuild-type-errors');
+
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2, logger).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => expect(logger.includes('WARNING')).toBe(true)),
+    ).toPromise().then(done, done.fail);
+  });
+
+  describe(`should ignore '.map' files`, () => {
+    it(`when 'intial' budget`, (done) => {
+      const overrides = {
+        optimization: true,
+        budgets: [{ type: 'initial', maximumError: '1mb' }],
+      };
+
+      runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
+        tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      ).toPromise().then(done, done.fail);
+    });
+
+    it(`when 'all' budget`, (done) => {
+      const overrides = {
+        optimization: true,
+        budgets: [{ type: 'all', maximumError: '1mb' }],
+      };
+
+      runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
+        tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      ).toPromise().then(done, done.fail);
+    });
+
+    it(`when 'any' budget`, (done) => {
+      const overrides = {
+        optimization: true,
+        budgets: [{ type: 'any', maximumError: '1mb' }],
+      };
+
+      runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
+        tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      ).toPromise().then(done, done.fail);
+    });
+  });
+});

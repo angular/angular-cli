@@ -1,8 +1,8 @@
 <!-- Links in /docs/documentation should NOT have `.md` at the end, because they end up in our wiki at release. -->
 
-# Include [Font Awesome](http://fontawesome.io/)
+# Include [Font Awesome](https://fontawesome.com/)
 
-[Font Awesome](http://fontawesome.io/) gives you scalable vector icons that can instantly be customized — size, color, drop shadow, and anything that can be done with the power of CSS.
+[Font Awesome](https://fontawesome.com/) gives you scalable vector icons that can instantly be customized — size, color, drop shadow, and anything that can be done with the power of CSS.
 
 Create a new project and navigate into the project...
 ```
@@ -19,12 +19,15 @@ npm install --save font-awesome
 
 To add Font Awesome CSS icons to your app...
 ```json
-// in .angular-cli.json
-
-"styles": [
-  "styles.css",
-  "../node_modules/font-awesome/css/font-awesome.css"
-]
+// in angular.json
+"build": {
+  "options": {
+    "styles": [
+      "../node_modules/font-awesome/css/font-awesome.css"
+      "styles.css"
+    ],
+  }
+}
 ```
 ### Using SASS
 
@@ -56,4 +59,4 @@ After saving this file, return to the browser to see the Font Awesome icon next 
 
 ### More Info
 
-- [Examples](http://fontawesome.io/examples/)
+- [Examples](https://fontawesome.com/how-to-use/on-the-web/setup/getting-started?using=web-fonts-with-css)

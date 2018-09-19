@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/generate.json",
+  "description": "Generates and/or modifies files based on a schematic.",
+  "$longDescription": "",
+
+  "$aliases": [ "g" ],
+  "$scope": "in",
+  "$type": "schematics",
+  "$impl": "./generate-impl#GenerateCommand",
+
+  "allOf": [
+    {
+      "type": "object",
+      "properties": {
+        "schematic": {
+          "type": "string",
+          "description": "The schematic or collection:schematic to generate.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        }
+      },
+      "required": [
+      ]
+    },
+    { "$ref": "./definitions.json#/definitions/base" },
+    { "$ref": "./definitions.json#/definitions/schematic" }
+  ]
+}

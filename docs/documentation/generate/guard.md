@@ -5,35 +5,23 @@
 
 ## Options
 <details>
-  <summary>app</summary>
+  <summary>dry-run</summary>
   <p>
-    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
+    <code>--dry-run</code> (alias: <code>-d</code>)
   </p>
   <p>
-    Specifies app name to use.
+    Run through without making any changes.
   </p>
 </details>
-
 <details>
-  <summary>flat</summary>
+  <summary>force</summary>
   <p>
-    <code>--flat</code>
+    <code>--force</code> (alias: <code>-f</code>)
   </p>
   <p>
-    Indicate if a dir is created.
-  </p>
-</details>
-
-<details>
-  <summary>module</summary>
-  <p>
-    <code>--module</code> (aliases: <code>-m</code>)
-  </p>
-  <p>
-    Specifies where the guard should be provided.
+    Forces overwriting of files.
   </p>
 </details>
-
 <details>
   <summary>spec</summary>
   <p>
@@ -41,5 +29,32 @@
   </p>
   <p>
     Specifies if a spec file is generated.
+  </p>
+</details>
+<details>
+  <summary>flat</summary>
+  <p>
+    <code>--flat</code>
+  </p>
+  <p>
+    Flag to indicate if a dir is created.
+  </p>
+</details>
+<details>
+  <summary>module</summary>
+  <p>
+    <code>--module</code> (alias: <code>-m</code>)
+  </p>
+  <p>
+    Allows specification of the declaring module.
+  </p>
+</details>
+<details>
+  <summary>project</summary>
+  <p>
+    <code>--project</code>
+  </p>
+  <p>
+    The name of the project.
   </p>
 </details>

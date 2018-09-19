@@ -1,0 +1,45 @@
+{
+  "$schema": "../architect/src/builders-schema.json",
+  "builders": {
+    "app-shell": {
+      "class": "./src/app-shell",
+      "schema": "./src/app-shell/schema.json",
+      "description": "Build a server app and a browser app, then render the index.html and use it for the browser output."
+    },
+    "browser": {
+      "class": "./src/browser",
+      "schema": "./src/browser/schema.json",
+      "description": "Build a browser app."
+    },
+    "dev-server": {
+      "class": "./src/dev-server",
+      "schema": "./src/dev-server/schema.json",
+      "description": "Serve a browser app."
+    },
+    "extract-i18n": {
+      "class": "./src/extract-i18n",
+      "schema": "./src/extract-i18n/schema.json",
+      "description": "Extract i18n strings from a browser app."
+    },
+    "karma": {
+      "class": "./src/karma",
+      "schema": "./src/karma/schema.json",
+      "description": "Run Karma unit tests."
+    },
+    "protractor": {
+      "class": "./src/protractor",
+      "schema": "./src/protractor/schema.json",
+      "description": "Run protractor over a dev server."
+    },
+    "tslint": {
+      "class": "./src/tslint",
+      "schema": "./src/tslint/schema.json",
+      "description": "Run tslint over a TS project."
+    },
+    "server": {
+      "class": "./src/server",
+      "schema": "./src/server/schema.json",
+      "description": "Build a server Angular application."
+    }
+  }
+}

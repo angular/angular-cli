@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/config.json",
+  "description": "Get/set configuration values.",
+  "$longDescription": "",
+
+  "$aliases": [],
+  "$scope": "in",
+  "$type": "native",
+  "$impl": "./config-impl#ConfigCommand",
+
+  "type": "object",
+  "allOf": [
+    {
+      "properties": {
+        "jsonPath": {
+          "type": "string",
+          "description": "The path to the value to get/set.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        },
+        "value": {
+          "type": ["string", "number", "boolean"],
+          "description": "The new value to be set.",
+          "$default": {
+            "$source": "argv",
+            "index": 1
+          }
+        },
+        "global": {
+          "type": "boolean",
+          "description": "Get/set the value in the global configuration (in your home directory).",
+          "default": false,
+          "aliases": ["g"]
+        }
+      },
+      "required": [
+      ]
+    },
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}

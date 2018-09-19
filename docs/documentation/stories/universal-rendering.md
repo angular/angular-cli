@@ -23,7 +23,8 @@ Install `@angular/platform-server` into your project. Make sure you use the same
 > You'll also need ts-loader (for your webpack build we'll show later) and @nguniversal/module-map-ngfactory-loader, as it's used to handle lazy-loading in the context of a server-render. (by loading the chunks right away)
 
 ```bash
-$ npm install --save @angular/platform-server @nguniversal/module-map-ngfactory-loader ts-loader
+$ npm install --save @angular/platform-server @nguniversal/module-map-ngfactory-loader express
+$ npm install --save-dev ts-loader webpack-cli
 ```
 
 ## Step 1: Prepare your App for Universal rendering
@@ -33,7 +34,7 @@ The first thing you need to do is make your `AppModule` compatible with Universa
 
 ### src/app/app.module.ts:
 
-```javascript
+```typescript
 @NgModule({
   bootstrap: [AppComponent],
   imports: [
@@ -57,7 +58,7 @@ This example places it alongside `app.module.ts` in a file named `app.server.mod
 
 You can see here we're simply Importing everything from AppModule, followed by ServerModule.
 
-> One important thing to Note: We need `ModuleMapLoaderModule` to help make Lazy-loaded routes possible during Server-side renders with the Angular-CLI.
+> One important thing to Note: We need `ModuleMapLoaderModule` to help make Lazy-loaded routes possible during Server-side renders with the Angular CLI.
 
 ```typescript
 import {NgModule} from '@angular/core';
@@ -122,72 +123,34 @@ Add a section for `"angularCompilerOptions"` and set `"entryModule"` to your `Ap
 ```
 
 ---
-## Step 3: Create a new project in `.angular-cli.json`
+## Step 3: Create a new target in `angular.json`
 
-In `.angular-cli.json` there is an array under the key `"apps"`. Copy the configuration for your client application there, and paste it as a new entry in the array, with an additional key `"platform"` set to `"server"`.
-
-Then, remove the `"polyfills"` key - those aren't needed on the server, and adjust `"main"`, and `"tsconfig"` to point to the files you wrote in step 2. Finally, adjust `"outDir"` to a new location (this example uses `dist-server`).
-
-### .angular-cli.json:
+In `angular.json` locate the `architect` property inside your project, and add a new `server`
+target:
 
 ```javascript
-{
-  ...
-  "apps": [
-    {
-      // Keep your original application config intact here, this is app 0
-      // -EXCEPT- for outDir, update it to dist/browser
-      "outDir": "dist/browser" // <-- update this
-    },
-    {
-      // This is your server app. It is app 1.
-      "platform": "server",
-      "root": "src",
-      // Build to dist/server instead of dist. This prevents
-      // client and server builds from overwriting each other.
-      "outDir": "dist/server",
-      "assets": [
-        "assets",
-        "favicon.ico"
-      ],
-      "index": "index.html",
-      // Change the main file to point to your server main.
-      "main": "main.server.ts",
-      // Remove polyfills.
-      // "polyfills": "polyfills.ts",
-      "test": "test.ts",
-      // Change the tsconfig to point to your server config.
-      "tsconfig": "tsconfig.server.json",
-      "testTsconfig": "tsconfig.spec.json",
-      "prefix": "app",
-      "styles": [
-        "styles.css"
-      ],
-      "scripts": [],
-      "environmentSource": "environments/environment.ts",
-      "environments": {
-        "dev": "environments/environment.ts",
-        "prod": "environments/environment.prod.ts"
-      }
+"architect": {
+  "build": { ... }
+  "server": {
+    "builder": "@angular-devkit/build-angular:server",
+    "options": {
+      "outputPath": "dist/your-project-name-server",
+      "main": "src/main.server.ts",
+      "tsConfig": "src/tsconfig.server.json"
     }
-  ],
-  ...
+  }
 }
-
 ```
 
 ## Building the bundle
 
-With these steps complete, you should be able to build a server bundle for your application, using the `--app` flag to tell the CLI to build the server bundle, referencing its index of `1` in the `"apps"` array in `.angular-cli.json`:
+With these steps complete, you should be able to build a server bundle for your application, using your project name and command name from `angular.json` to tell the CLI to build the server bundle.
 
 ```bash
-# This builds the client application in dist/browser/
-$ ng build --prod
-...
-# This builds the server bundle in dist/server/
-$ ng build --prod --app 1 --output-hashing=false
+# This builds your project using the server target, and places the output
+# in dist/your-project-name-server/
+$ ng run your-project-name:server
 
-# outputs:
 Date: 2017-07-24T22:42:09.739Z
 Hash: 9cac7d8e9434007fd8da
 Time: 4933ms
@@ -254,6 +217,9 @@ import * as express from 'express';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 
+// Import module map for lazy loading
+import { provideModuleMap } from '@nguniversal/module-map-ngfactory-loader';
+
 // Faster server renders w/ Prod mode (dev mode never needed)
 enableProdMode();
 
@@ -265,11 +231,6 @@ const DIST_FOLDER = join(process.cwd(), 'dist');
 
 // Our index.html we'll use as our template
 const template = readFileSync(join(DIST_FOLDER, 'browser', 'index.html')).toString();
-
-// * NOTE :: leave this as require() since this file is built Dynamically from webpack
-const { AppServerModuleNgFactory, LAZY_MODULE_MAP } = require('./dist/server/main.bundle');
-
-const { provideModuleMap } = require('@nguniversal/module-map-ngfactory-loader');
 
 app.engine('html', (_, options, callback) => {
   renderModuleFactory(AppServerModuleNgFactory, {
@@ -317,29 +278,40 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
-  entry: {  server: './server.ts' },
-  resolve: { extensions: ['.js', '.ts'] },
+  mode: 'none',
+  entry: {
+    server: './server.ts',
+  },
   target: 'node',
-  // this makes sure we include node_modules and other 3rd party libraries
-  externals: [/(node_modules|main\..*\.js)/],
+  resolve: { extensions: ['.ts', '.js'] },
+  optimization: {
+    minimize: false
+  },
   output: {
+    // Puts the output at the root of the dist folder
     path: path.join(__dirname, 'dist'),
     filename: '[name].js'
   },
   module: {
     rules: [
-      { test: /\.ts$/, loader: 'ts-loader' }
+      { test: /\.ts$/, loader: 'ts-loader' },
+      {
+        // Mark files inside `@angular/core` as using SystemJS style dynamic imports.
+        // Removing this will cause deprecation warnings to appear.
+        test: /(\\|\/)@angular(\\|\/)core(\\|\/).+\.js$/,
+        parser: { system: true },
+      },
     ]
   },
   plugins: [
-    // Temporary Fix for issue: https://github.com/angular/angular/issues/11580
-    // for "WARNING Critical dependency: the request of a dependency is an expression"
     new webpack.ContextReplacementPlugin(
+      // fixes WARNING Critical dependency: the request of a dependency is an expression
       /(.+)?angular(\\|\/)core(.+)?/,
       path.join(__dirname, 'src'), // location of your src
       {} // a map of your routes
     ),
     new webpack.ContextReplacementPlugin(
+      // fixes WARNING Critical dependency: the request of a dependency is an expression
       /(.+)?express(\\|\/)(.+)?/,
       path.join(__dirname, 'src'),
       {}
@@ -370,13 +342,12 @@ Now lets create a few handy scripts to help us do all of this in the future.
 
 ```json
 "scripts": {
-
   // These will be your common scripts
   "build:ssr": "npm run build:client-and-server-bundles && npm run webpack:server",
   "serve:ssr": "node dist/server.js",
 
   // Helpers for the above scripts
-  "build:client-and-server-bundles": "ng build --prod && ng build --prod --app 1 --output-hashing=false",
+  "build:client-and-server-bundles": "ng build --prod && ng run your-project-name:server",
   "webpack:server": "webpack --config webpack.server.config.js --progress --colors"
 }
 ```

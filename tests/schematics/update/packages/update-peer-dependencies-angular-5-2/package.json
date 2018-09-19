@@ -1,0 +1,10 @@
+{
+  "name": "@angular-devkit-tests/update-peer-dependencies-angular-5-2",
+  "version": "1.0.0",
+  "description": "Tests",
+  "peerDependencies": {
+    "@angular/animations": ">= 1 < 5.0.0 || >= 5.0.0-rc.0 < 6.0.0",
+    "@angular/compiler": ">= 1 < 5.0.0 || >= 5.0.0-rc.0 < 6.0.0",
+    "@angular/platform-browser": ">= 1 < 5.0.0 || >= 5.0.0-rc.0 < 6.0.0"
+  }
+}

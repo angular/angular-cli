@@ -1,0 +1,24 @@
+{
+  "title": "ng-packagr Target",
+  "description": "ng-packagr target options for Build Architect.",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The file path of the package.json for distribution via npm."
+    },
+    "tsConfig": {
+      "type": "string",
+      "description": "The file path of the TypeScript configuration file."
+    },
+    "watch": {
+      "type": "boolean",
+      "description": "Run build when files change.",
+      "default": false
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "project"
+  ]
+}

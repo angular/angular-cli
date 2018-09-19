@@ -1,0 +1,17 @@
+{
+  "extends": "<%= relativePathToWorkspaceRoot %>/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/spec",
+    "types": [
+      "jasmine",
+      "node"
+    ]
+  },
+  "files": [
+    "src/test.ts"
+  ],
+  "include": [
+    "**/*.spec.ts",
+    "**/*.d.ts"
+  ]
+}

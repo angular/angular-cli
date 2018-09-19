@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/deprecated.json",
+  "description": "Deprecated in favor of config command.",
+  "$longDescription": "",
+
+  "$impl": "./deprecated-impl#DeprecatedCommand",
+  "$hidden": true,
+  "$type": "deprecated",
+
+  "type": "object",
+  "allOf": [
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}

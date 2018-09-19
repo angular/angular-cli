@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/xi18n.json",
+  "description": "Extracts i18n messages from source code.",
+  "$longDescription": "",
+
+  "$aliases": [],
+  "$scope": "in",
+  "$type": "architect",
+  "$impl": "./xi18n-impl#Xi18nCommand",
+
+  "type": "object",
+  "allOf": [
+    { "$ref": "./definitions.json#/definitions/architect" },
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}

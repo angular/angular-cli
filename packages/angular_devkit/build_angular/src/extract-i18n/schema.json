@@ -1,0 +1,40 @@
+{
+  "title": "Extract i18n Target",
+  "description": "Extract i18n target options for Build Facade.",
+  "type": "object",
+  "properties": {
+    "browserTarget": {
+      "type": "string",
+      "description": "Target to extract from."
+    },
+    "i18nFormat": {
+      "type": "string",
+      "description": "Output format for the generated file.",
+      "default": "xlf",
+      "enum": [
+        "xmb",
+        "xlf",
+        "xlif",
+        "xliff",
+        "xlf2",
+        "xliff2"
+      ]
+    },
+    "i18nLocale": {
+      "type": "string",
+      "description": "Specifies the source language of the application."
+    },
+    "outputPath": {
+      "type": "string",
+      "description": "Path where output will be placed."
+    },
+    "outFile": {
+      "type": "string",
+      "description": "Name of the file to output."
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "browserTarget"
+  ]
+}

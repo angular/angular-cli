@@ -1,0 +1,14 @@
+{
+  "name": "devkit",
+  "version": "0.0.0",
+  "description": "Schematics specific to DevKit (used internally, not released)",
+  "scripts": {
+    "preinstall": "echo DO NOT INSTALL THIS PROJECT, ONLY THE ROOT PROJECT. && exit 1"
+  },
+  "schematics": "./collection.json",
+  "private": true,
+  "dependencies": {
+    "@angular-devkit/core": "0.0.0",
+    "@angular-devkit/schematics": "0.0.0"
+  }
+}
