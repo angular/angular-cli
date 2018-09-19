@@ -56,7 +56,7 @@ function _readNpmRc(): Observable<{ [key: string]: string }> {
 
     allOptionsArr.forEach(x => {
       const [key, ...value] = x.split('=');
-      allOptions[key] = value.join('=');
+      allOptions[key.trim()] = value.join('=').trim();
     });
 
     subject.next(allOptions);
