@@ -31,27 +31,21 @@ interface DiagnosticSourceFile extends ts.SourceFile {
 
 function validateDiagnostics(diagnostics: ReadonlyArray<ts.Diagnostic>, strict?: boolean): boolean {
   // Print error diagnostics.
-  const checkDiagnostics = (diagnostics: ReadonlyArray<ts.Diagnostic>) => {
-    if (diagnostics && diagnostics.length > 0) {
-      let errors = '';
-      errors = errors + '\n' + ts.formatDiagnostics(diagnostics, {
-        getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
-        getNewLine: () => ts.sys.newLine,
-        getCanonicalFileName: (f: string) => f,
-      });
-
-      return errors;
-    }
-  };
 
   const hasError = diagnostics.some(diag => diag.category === ts.DiagnosticCategory.Error);
   if (hasError) {
     // Throw only if we're in strict mode, otherwise return original content.
     if (strict) {
+      const errorMessages = ts.formatDiagnostics(diagnostics, {
+        getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
+        getNewLine: () => ts.sys.newLine,
+        getCanonicalFileName: (f: string) => f,
+      });
+
       throw new Error(`
         TS failed with the following error messages:
 
-        ${checkDiagnostics(diagnostics)}
+        ${errorMessages}
       `);
     } else {
       return false;
