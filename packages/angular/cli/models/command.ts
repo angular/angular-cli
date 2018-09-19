@@ -153,13 +153,6 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
       return this.printHelp(options);
     } else if (options.help === 'json' || options.help === 'JSON') {
       return this.printJsonHelp(options);
-    } else if (options.help !== false && options.help !== undefined) {
-      // The user entered an invalid type of help, maybe?
-      this.logger.fatal(
-        `--help was provided, but format ${JSON.stringify(options.help)} was not understood.`,
-      );
-
-      return 1;
     } else {
       return await this.run(options);
     }

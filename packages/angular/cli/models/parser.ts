@@ -6,8 +6,19 @@
  * found in the LICENSE file at https://angular.io/license
  *
  */
-import { strings } from '@angular-devkit/core';
+import { BaseException, strings } from '@angular-devkit/core';
 import { Arguments, Option, OptionType, Value } from './interface';
+
+
+export class ParseArgumentException extends BaseException {
+  constructor(
+    comments: string[],
+    public readonly parsed: Arguments,
+    public readonly ignored: string[],
+  ) {
+    super(`One or more errors occured while parsing arguments:\n  ${comments.join('\n  ')}`);
+  }
+}
 
 
 function _coerceType(str: string | undefined, type: OptionType, v?: Value): Value | undefined {
@@ -103,6 +114,8 @@ function _assignOption(
   parsedOptions: Arguments,
   _positionals: string[],
   leftovers: string[],
+  ignored: string[],
+  errors: string[],
 ) {
   let key = arg.substr(2);
   let option: Option | null = null;
@@ -169,7 +182,15 @@ function _assignOption(
     if (v !== undefined) {
       parsedOptions[option.name] = v;
     } else {
-      leftovers.push(arg);
+      let error = `Argument ${key} could not be parsed using value ${JSON.stringify(value)}.`;
+      if (option.enum) {
+        error += ` Valid values are: ${option.enum.map(x => JSON.stringify(x)).join(', ')}.`;
+      } else {
+        error += `Valid type(s) is: ${(option.types || [option.type]).join(', ')}`;
+      }
+
+      errors.push(error);
+      ignored.push(arg);
     }
   }
 }
@@ -244,6 +265,9 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
   const positionals: string[] = [];
   const parsedOptions: Arguments = {};
 
+  const ignored: string[] = [];
+  const errors: string[] = [];
+
   for (let arg = args.shift(); arg !== undefined; arg = args.shift()) {
     if (!arg) {
       break;
@@ -256,7 +280,7 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
     }
 
     if (arg.startsWith('--')) {
-      _assignOption(arg, args, options, parsedOptions, positionals, leftovers);
+      _assignOption(arg, args, options, parsedOptions, positionals, leftovers, ignored, errors);
     } else if (arg.startsWith('-')) {
       // Argument is of form -abcdef.  Starts at 1 because we skip the `-`.
       for (let i = 1; i < arg.length; i++) {
@@ -264,7 +288,8 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
         // Treat the last flag as `--a` (as if full flag but just one letter). We do this in
         // the loop because it saves us a check to see if the arg is just `-`.
         if (i == arg.length - 1) {
-          _assignOption('--' + flag, args, options, parsedOptions, positionals, leftovers);
+          const arg = '--' + flag;
+          _assignOption(arg, args, options, parsedOptions, positionals, leftovers, ignored, errors);
         } else {
           const maybeOption = _getOptionFromName(flag, options);
           if (maybeOption) {
@@ -316,6 +341,10 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
 
   if (positionals.length > 0 || leftovers.length > 0) {
     parsedOptions['--'] = [...positionals, ...leftovers];
+  }
+
+  if (errors.length > 0) {
+    throw new ParseArgumentException(errors, parsedOptions, ignored);
   }
 
   return parsedOptions;

@@ -30,8 +30,8 @@
       "type": "object",
       "properties": {
         "help": {
-          "type": ["boolean", "string"],
-          "description": "Shows a help message. Use '--help=json' as a value to output the help in JSON format.",
+          "enum": [true, false, "json", "JSON"],
+          "description": "Shows a help message. You can pass the format as a value.",
           "default": false
         }
       }
