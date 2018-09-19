@@ -77,6 +77,8 @@ export async function runCommand(
       const content = readFileSync(join(__dirname, '..', uri.substr('ng-cli://'.length)), 'utf-8');
 
       return of(JSON.parse(content));
+    } else {
+      return null;
     }
   });
 

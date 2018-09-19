@@ -223,6 +223,8 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
     } else {
       this.logger.info(value.toString());
     }
+
+    return 0;
   }
 
   private set(options: ConfigCommandSchema) {
@@ -264,6 +266,8 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
 
     const output = JSON.stringify(configValue, null, 2);
     writeFileSync(configPath, output);
+
+    return 0;
   }
 
 }
