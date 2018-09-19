@@ -7,7 +7,7 @@
  *
  */
 import { Arguments, Option, OptionType } from './interface';
-import { parseArguments } from './parser';
+import { ParseArgumentException, parseArguments } from './parser';
 
 describe('parseArguments', () => {
   const options: Option[] = [
@@ -32,10 +32,11 @@ describe('parseArguments', () => {
       description: '' },
   ];
 
-  const tests: { [test: string]: Partial<Arguments> } = {
+  const tests: { [test: string]: Partial<Arguments> | ['!!!', Partial<Arguments>, string[]] } = {
     '--bool': { bool: true },
-    '--bool=1': { '--': ['--bool=1'] },
-    '--bool=yellow': { '--': ['--bool=yellow'] },
+    '--bool=1': ['!!!', {}, ['--bool=1']],
+    '-- --bool=1': { '--': ['--bool=1'] },
+    '--bool=yellow': ['!!!', {}, ['--bool=yellow']],
     '--bool=true': { bool: true },
     '--bool=false': { bool: false },
     '--no-bool': { bool: false },
@@ -45,7 +46,8 @@ describe('parseArguments', () => {
     '--b true': { bool: true },
     '--b false': { bool: false },
     '--bool --num': { bool: true, num: 0 },
-    '--bool --num=true': { bool: true, '--': ['--num=true'] },
+    '--bool --num=true': ['!!!', { bool: true }, ['--num=true']],
+    '-- --bool --num=true': { '--': ['--bool', '--num=true'] },
     '--bool=true --num': { bool: true, num: 0 },
     '--bool true --num': { bool: true, num: 0 },
     '--bool=false --num': { bool: false, num: 0 },
@@ -85,7 +87,7 @@ describe('parseArguments', () => {
     '--t2=true': { t2: true },
     '--t2': { t2: true },
     '--no-t2': { t2: false },
-    '--t2=yellow': { '--': ['--t2=yellow'] },
+    '--t2=yellow': ['!!!', {}, ['--t2=yellow']],
     '--no-t2=true': { '--': ['--no-t2=true'] },
     '--t2=123': { t2: 123 },
     '--t3=a': { t3: 'a' },
@@ -93,22 +95,22 @@ describe('parseArguments', () => {
     '--t3 true': { t3: true },
     '--e1 hello': { e1: 'hello' },
     '--e1=hello': { e1: 'hello' },
-    '--e1 yellow': { p1: 'yellow', '--': ['--e1'] },
-    '--e1=yellow': { '--': ['--e1=yellow'] },
-    '--e1': { '--': ['--e1'] },
-    '--e1 true': { p1: 'true', '--': ['--e1'] },
-    '--e1=true': { '--': ['--e1=true'] },
+    '--e1 yellow': ['!!!', { p1: 'yellow' }, ['--e1']],
+    '--e1=yellow': ['!!!', {}, ['--e1=yellow']],
+    '--e1': ['!!!', {}, ['--e1']],
+    '--e1 true': ['!!!', { p1: 'true' }, ['--e1']],
+    '--e1=true': ['!!!', {},  ['--e1=true']],
     '--e2 hello': { e2: 'hello' },
     '--e2=hello': { e2: 'hello' },
     '--e2 yellow': { p1: 'yellow', e2: '' },
-    '--e2=yellow': { '--': ['--e2=yellow'] },
+    '--e2=yellow': ['!!!', {}, ['--e2=yellow']],
     '--e2': { e2: '' },
     '--e2 true': { p1: 'true', e2: '' },
-    '--e2=true': { '--': ['--e2=true'] },
+    '--e2=true': ['!!!', {}, ['--e2=true']],
     '--e3 json': { e3: 'json' },
     '--e3=json': { e3: 'json' },
     '--e3 yellow': { p1: 'yellow', e3: true },
-    '--e3=yellow': { '--': ['--e3=yellow'] },
+    '--e3=yellow': ['!!!', {}, ['--e3=yellow']],
     '--e3': { e3: true },
     '--e3 true': { e3: true },
     '--e3=true': { e3: true },
@@ -116,9 +118,21 @@ describe('parseArguments', () => {
 
   Object.entries(tests).forEach(([str, expected]) => {
     it(`works for ${str}`, () => {
-      const actual = parseArguments(str.split(/\s+/), options);
+      try {
+        const actual = parseArguments(str.split(/\s+/), options);
 
-      expect(actual).toEqual(expected as Arguments);
+        expect(Array.isArray(expected)).toBe(false);
+        expect(actual).toEqual(expected as Arguments);
+      } catch (e) {
+        if (!(e instanceof ParseArgumentException)) {
+          throw e;
+        }
+
+        // The expected values are an array.
+        expect(Array.isArray(expected)).toBe(true);
+        expect(e.parsed).toEqual(expected[1] as Arguments);
+        expect(e.ignored).toEqual(expected[2] as string[]);
+      }
     });
   });
 });
