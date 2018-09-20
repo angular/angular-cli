@@ -71,7 +71,7 @@ export enum OptionType {
 }
 
 /**
- * An option description. This is exposed when using `ng --help-json`.
+ * An option description. This is exposed when using `ng --help=json`.
  */
 export interface Option {
   /**

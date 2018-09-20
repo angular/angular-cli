@@ -93,7 +93,7 @@ export abstract class ArchitectCommand<
     }
 
     if ((!targetSpec.project || !targetSpec.target) && !this.multiTarget) {
-      if (options.help || options.helpJson) {
+      if (options.help) {
         // This is a special case where we just return.
         return;
       }
