@@ -13,6 +13,7 @@ import { UnsuccessfulWorkflowExecution } from '../exception/exception';
 import { standardFormats } from '../formats';
 import { DryRunEvent, DryRunSink } from '../sink/dryrun';
 import { HostSink } from '../sink/host';
+import { Sink } from '../sink/sink';
 import { HostTree } from '../tree/host-tree';
 import { Tree } from '../tree/interface';
 import { optimize } from '../tree/static';
@@ -96,6 +97,35 @@ export abstract class BaseWorkflow implements Workflow {
     return this._lifeCycle.asObservable();
   }
 
+  protected _createSinks(): Sink[] {
+    let error = false;
+
+    const dryRunSink = new DryRunSink(this._host, this._force);
+    const dryRunSubscriber = dryRunSink.reporter.subscribe(event => {
+      this._reporter.next(event);
+      error = error || (event.kind == 'error');
+    });
+
+    // We need two sinks if we want to output what will happen, and actually do the work.
+    return [
+      dryRunSink,
+      // Add a custom sink that clean ourselves and throws an error if an error happened.
+      {
+        commit() {
+          dryRunSubscriber.unsubscribe();
+          if (error) {
+            return throwError(new UnsuccessfulWorkflowExecution());
+          }
+
+          return of();
+        },
+      },
+
+      // Only add a HostSink if this is not a dryRun.
+      ...(!this._dryRun ? [new HostSink(this._host, this._force)] : []),
+    ];
+  }
+
   execute(
     options: Partial<WorkflowExecutionContext> & RequiredWorkflowExecutionContext,
   ): Observable<void> {
@@ -112,17 +142,7 @@ export abstract class BaseWorkflow implements Workflow {
       || (parentContext && parentContext.collection === options.collection);
     const schematic = collection.createSchematic(options.schematic, allowPrivate);
 
-    // We need two sinks if we want to output what will happen, and actually do the work.
-    // Note that fsSink is technically not used if `--dry-run` is passed, but creating the Sink
-    // does not have any side effect.
-    const dryRunSink = new DryRunSink(this._host, this._force);
-    const fsSink = new HostSink(this._host, this._force);
-
-    let error = false;
-    const dryRunSubscriber = dryRunSink.reporter.subscribe(event => {
-      this._reporter.next(event);
-      error = error || (event.kind == 'error');
-    });
+    const sinks = this._createSinks();
 
     this._lifeCycle.next({ kind: 'workflow-start' });
 
@@ -141,22 +161,17 @@ export abstract class BaseWorkflow implements Workflow {
     ).pipe(
       map(tree => optimize(tree)),
       concatMap((tree: Tree) => {
-        return concat(
-          dryRunSink.commit(tree).pipe(ignoreElements()),
-          of(tree),
+        // Process all sinks.
+        return of(tree).pipe(
+          ...sinks.map(sink => {
+            return concatMap((tree: Tree) => {
+              return concat(
+                sink.commit(tree).pipe(ignoreElements()),
+                of(tree),
+              );
+            });
+          }),
         );
-      }),
-      concatMap((tree: Tree) => {
-        dryRunSubscriber.unsubscribe();
-        if (error) {
-          return throwError(new UnsuccessfulWorkflowExecution());
-        }
-
-        if (this._dryRun) {
-          return of();
-        }
-
-        return fsSink.commit(tree).pipe(defaultIfEmpty(), last());
       }),
       concatMap(() => {
         if (this._dryRun) {
