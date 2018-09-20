@@ -11,4 +11,4 @@
 
 require('../lib/bootstrap-local');
 const packages = require('../lib/packages').packages;
-require(packages['@angular-devkit/schematics-cli'].bin['schematics']);
+require(packages['@angular-devkit/schematics-cli'].bin['schematics']).main({ args: process.argv.slice(2) });
