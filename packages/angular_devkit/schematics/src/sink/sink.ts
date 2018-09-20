@@ -32,10 +32,6 @@ import { Tree } from '../tree/interface';
 
 
 export interface Sink {
-  preCommitAction: (action: Action) => void | PromiseLike<Action> | Observable<Action> | Action;
-  preCommit: () => void | Observable<void>;
-  postCommit: () => void | Observable<void>;
-
   commit(tree: Tree): Observable<void>;
 }
 
