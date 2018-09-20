@@ -62,6 +62,13 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     entryPoints['polyfills'] = [path.resolve(root, buildOptions.polyfills)];
   }
 
+  if (!buildOptions.aot) {
+    entryPoints['polyfills'] = [
+      ...(entryPoints['polyfills'] || []),
+      path.join(__dirname, '..', 'jit-polyfills.js'),
+    ];
+  }
+
   // determine hashing format
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing as any);
 
