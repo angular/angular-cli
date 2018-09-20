@@ -21,7 +21,6 @@ import {
 
 export interface BaseCommandOptions {
   help?: boolean | string;
-  helpJson?: boolean;
 }
 
 export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions> {
