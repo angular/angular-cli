@@ -324,7 +324,6 @@ export default function (options: ApplicationOptions): Rule {
         routing: options.routing,
         routingScope: 'Root',
         path: sourceDir,
-        spec: false,
         project: options.name,
       }),
       schematic('component', {
