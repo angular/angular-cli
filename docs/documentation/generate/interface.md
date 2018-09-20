@@ -5,6 +5,9 @@
 ## Overview
 `ng generate interface [name] <type>` generates an interface
 
+## Alias
+i - `ng generate i [name]`
+
 ## Options
 <details>
   <summary>dry-run</summary>

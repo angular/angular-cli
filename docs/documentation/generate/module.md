@@ -5,6 +5,9 @@
 ## Overview
 `ng generate module [name]` generates an NgModule
 
+## Alias
+m - `ng generate m [name]`
+
 ## Options
 <details>
   <summary>dry-run</summary>

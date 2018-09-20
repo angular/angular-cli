@@ -5,6 +5,9 @@
 ## Overview
 `ng generate enum [name]` generates an enumeration
 
+## Alias
+e - `ng generate e [name]`
+
 ## Options
 <details>
   <summary>dry-run</summary>

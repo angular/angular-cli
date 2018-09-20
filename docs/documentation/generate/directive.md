@@ -5,6 +5,9 @@
 ## Overview
 `ng generate directive [name]` generates a directive
 
+## Alias
+d - `ng generate d [name]`
+
 ## Options
 <details>
   <summary>dry-run</summary>

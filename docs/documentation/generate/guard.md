@@ -3,6 +3,9 @@
 ## Overview
 `ng generate guard [name]` generates a guard
 
+## Alias
+g - `ng generate g [name]`
+
 ## Options
 <details>
   <summary>dry-run</summary>

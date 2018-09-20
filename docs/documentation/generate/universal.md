@@ -3,7 +3,7 @@
 # ng generate universal
 
 ## Overview
-Create an Angular universal app.
+`ng generate universal [name]` creates an Angular universal app.
 
 ## Options
 <details>
