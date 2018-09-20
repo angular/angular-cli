@@ -86,6 +86,9 @@ jobs:
     steps:
       - attach_workspace: *attach_options
       - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
+      - store_artifacts:
+          path: /tmp/dist
+          destination: cli/new-production
   
   e2e-node-8:
     <<: *defaults

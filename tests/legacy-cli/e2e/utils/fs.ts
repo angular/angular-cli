@@ -107,6 +107,10 @@ export function copyFile(from: string, to: string) {
     }));
 }
 
+export function moveDirectory(from: string, to: string) {
+  return fs.move(from, to, { overwrite: true });
+}
+
 
 export function writeMultipleFiles(fs: { [path: string]: string }) {
   return Promise.all(Object.keys(fs).map(fileName => writeFile(fileName, fs[fileName])));
