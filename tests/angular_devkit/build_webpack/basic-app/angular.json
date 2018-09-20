@@ -1,0 +1,30 @@
+{
+  "$schema": "../../../../packages/angular_devkit/core/src/workspace/workspace-schema.json",
+  "version": 1,
+  "newProjectRoot": "./projects",
+  "cli": {},
+  "schematics": {},
+  "targets": {},
+  "projects": {
+    "app": {
+      "root": "src",
+      "sourceRoot": "src",
+      "projectType": "application",
+      "schematics": {},
+      "targets": {
+        "build": {
+          "builder": "../../../../packages/angular_devkit/build_webpack:webpack",
+          "options": {
+            "webpackConfig": "webpack.config.js"
+          }
+        },
+        "serve": {
+          "builder": "../../../../packages/angular_devkit/build_webpack:webpack-dev-server",
+          "options": {
+            "webpackConfig": "webpack.config.js"
+          }
+        }
+      }
+    }
+  }
+}

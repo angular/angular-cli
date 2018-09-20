@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularEnum",
+  "title": "Angular Enum Options Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the enum.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path to create the enum.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "lintFix": {
+      "type": "boolean",
+      "default": false,
+      "description": "Specifies whether to apply lint fixes after generating the enum."
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

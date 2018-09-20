@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/easter-egg.json",
+  "description": "",
+  "$longDescription": "",
+  "$hidden": true,
+
+  "$impl": "./easter-egg-impl#AwesomeCommand",
+
+  "type": "object",
+  "allOf": [
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}

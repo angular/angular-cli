@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/help.json",
+  "description": "Displays help for the Angular CLI.",
+  "$longDescription": "",
+
+  "$scope": "all",
+  "$aliases": [],
+  "$impl": "./help-impl#HelpCommand",
+
+  "type": "object",
+  "allOf": [
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}

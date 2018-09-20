@@ -1,0 +1,14 @@
+{
+  "schematics": {
+    "migration-01": {
+      "version": "6.0.0-beta.8",
+      "factory": "./update-6",
+      "description": "Update an Angular CLI project to version 6."
+    },
+    "migration-02": {
+      "version": "7.0.0-beta.0",
+      "factory": "./update-7",
+      "description": "Update an Angular CLI project to version 7."
+    }
+  }
+}

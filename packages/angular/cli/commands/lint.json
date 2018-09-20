@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/lint.json",
+  "description": "Lints code in existing project.",
+  "$longDescription": "",
+
+  "$aliases": [ "l" ],
+  "$scope": "in",
+  "$type": "architect",
+  "$impl": "./lint-impl#LintCommand",
+
+  "type": "object",
+  "allOf": [
+    {
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "The name of the project to lint.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        },
+        "configuration": {
+          "description": "Specify the configuration to use.",
+          "type": "string",
+          "aliases": [
+            "c"
+          ]
+        }
+      },
+      "required": [
+      ]
+    },
+    {
+      "$ref": "./definitions.json#/definitions/base"
+    }
+  ]
+}

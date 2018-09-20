@@ -28,7 +28,8 @@ ng new sassy-project --style=sass
 Or set the default style on an existing project:
 
 ```bash
-ng set defaults.styleExt scss
+ng config schematics.@schematics/angular:component.styleext scss
+# note: @schematics/angular is the default schematic for the Angular CLI
 ```
 
 Style strings added to the `@Component.styles` array _must be written in CSS_ because the CLI cannot apply a pre-processor to inline styles.

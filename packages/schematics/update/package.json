@@ -1,0 +1,20 @@
+{
+  "name": "@schematics/update",
+  "version": "0.0.0",
+  "description": "Schematics specific to updating packages",
+  "keywords": [
+    "blueprints",
+    "code generation",
+    "schematics",
+    "schematic"
+  ],
+  "schematics": "./collection.json",
+  "dependencies": {
+    "@angular-devkit/core": "0.0.0",
+    "@angular-devkit/schematics": "0.0.0",
+    "npm-registry-client": "8.6.0",
+    "semver": "5.5.1",
+    "semver-intersect": "1.4.0",
+    "rxjs": "6.2.2"
+  }
+}

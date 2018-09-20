@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/build.json",
+  "description": "Builds your app and places it into the output path (dist/ by default).",
+  "$longDescription": "",
+
+  "$aliases": [ "b" ],
+  "$scope": "in",
+  "$type": "architect",
+  "$impl": "./build-impl#BuildCommand",
+
+  "allOf": [
+    { "$ref": "./definitions.json#/definitions/architect" },
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/eject.json",
+  "description": "Temporarily disabled. Ejects your app and output the proper webpack configuration and scripts.",
+  "$longDescription": "",
+
+  "$hidden": true,
+  "$scope": "in",
+  "$impl": "./eject-impl#EjectCommand",
+
+  "type": "object",
+  "allOf": [
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}

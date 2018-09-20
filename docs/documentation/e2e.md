@@ -3,7 +3,11 @@
 # ng e2e
 
 ## Overview
-`ng e2e` serves the application and runs end-to-end tests
+`ng e2e` serves the application and runs end-to-end tests.
+
+```bash
+ng e2e [project]
+```
 
 ### Running end-to-end tests
 
@@ -11,71 +15,105 @@
 ng e2e
 ```
 
-End-to-end tests are run via [Protractor](https://angular.github.io/protractor/).
+End-to-end tests are run via [Protractor](http://www.protractortest.org/).
 
 ## Options
-
-Please note that options that are supported by `ng serve` are also supported by `ng e2e`
-
 <details>
-  <summary>config</summary>
+  <summary>prod</summary>
   <p>
-    <code>--config</code> (aliases: <code>-c</code>)
+    <code>--prod</code>
   </p>
   <p>
-    Use a specific config file. Defaults to the protractor config file in <code>.angular-cli.json</code>.
+    Flag to set configuration to "prod".
   </p>
 </details>
-
 <details>
-  <summary>element-explorer</summary>
+  <summary>configuration</summary>
   <p>
-    <code>--element-explorer</code> (aliases: <code>-ee</code>) <em>default value: false</em>
+    <code>--configuration</code> (alias: <code>-c</code>)
   </p>
   <p>
-    Start Protractor's <a href="https://github.com/angular/protractor/blob/master/docs/debugging.md#testing-out-protractor-interactively">Element Explorer</a> for debugging.
+    Specify the configuration to use.
   </p>
 </details>
-
 <details>
-  <summary>serve</summary>
+  <summary>protractor-config</summary>
   <p>
-    <code>--serve</code> (aliases: <code>-s</code>) <em>default value: true</em>
+    <code>--protractor-config</code>
   </p>
   <p>
-    Compile and Serve the app. All serve options are also available. The live-reload option defaults to false, and the default port will be random.
-  </p>
-  <p>
-    NOTE: Build failure will not launch the e2e task. You must first fix error(s) and run e2e again.
+    The name of the Protractor configuration file.
   </p>
 </details>
-
 <details>
-  <summary>specs</summary>
+  <summary>dev-server-target</summary>
   <p>
-    <code>--specs</code> (aliases: <code>-sp</code>) <em>default value: []</em>
+    <code>--dev-server-target</code>
   </p>
   <p>
-    Override specs in the protractor config. Can send in multiple specs by repeating flag (<code>ng e2e --specs=spec1.ts --specs=spec2.ts</code>).
+    Dev server target to run tests against.
   </p>
 </details>
-
 <details>
   <summary>suite</summary>
   <p>
-    <code>--suite</code> (aliases: <code>-su</code>)
+    <code>--suite</code>
   </p>
   <p>
-    Override suite in the protractor config. Can send in multiple suite by comma separated values (<code>ng e2e --suite=suiteA,suiteB</code>).
+    Override suite in the protractor config.
   </p>
 </details>
-
+<details>
+  <summary>element-explorer</summary>
+  <p>
+    <code>--element-explorer</code>
+  </p>
+  <p>
+    Start Protractor's Element Explorer for debugging.
+  </p>
+</details>
 <details>
   <summary>webdriver-update</summary>
   <p>
-    <code>--webdriver-update</code> (aliases: <code>-wu</code>) <em>default value: true</em>
+    <code>--webdriver-update</code>
   </p>
   <p>
     Try to update webdriver.
+  </p>
+</details>
+<details>
+  <summary>serve</summary>
+  <p>
+    <code>--serve</code>
+  </p>
+  <p>
+    Compile and Serve the app.
+  </p>
+</details>
+<details>
+  <summary>port</summary>
+  <p>
+    <code>--port</code>
+  </p>
+  <p>
+    The port to use to serve the application.
+  </p>
+</details>
+<details>
+  <summary>host</summary>
+  <p>
+    <code>--host</code>
+  </p>
+  <p>
+    Host to listen on.
+  </p>
+</details>
+<details>
+  <summary>base-url</summary>
+  <p>
+    <code>--base-url</code>
+  </p>
+  <p>
+    Base URL for protractor to connect to.
   </p>
 </details>

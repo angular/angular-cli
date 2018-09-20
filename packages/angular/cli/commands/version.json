@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/version.json",
+  "description": "Outputs Angular CLI version.",
+  "$longDescription": "",
+
+  "$aliases": [ "v" ],
+  "$scope": "all",
+  "$impl": "./version-impl#VersionCommand",
+
+  "type": "object",
+  "allOf": [
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}
