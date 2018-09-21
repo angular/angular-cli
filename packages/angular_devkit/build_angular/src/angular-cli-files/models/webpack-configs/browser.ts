@@ -125,7 +125,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
             test: (module: any, chunks: Array<{ name: string }>) => {
               const moduleName = module.nameForCondition ? module.nameForCondition() : '';
               return /[\\/]node_modules[\\/]/.test(moduleName)
-                && !chunks.some(({ name }) => name === 'polyfills'
+                && !chunks.some(({ name }) => name === 'polyfills' || name === 'ie-support'
                   || globalStylesBundleNames.includes(name));
             },
           },
@@ -138,6 +138,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
         output: path.basename(buildOptions.index),
         baseHref: buildOptions.baseHref,
         entrypoints: generateEntryPoints(buildOptions),
+        noModuleEntrypoints: ['ie-support'],
         deployUrl: buildOptions.deployUrl,
         sri: buildOptions.subresourceIntegrity,
       }),
