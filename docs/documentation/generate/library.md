@@ -3,7 +3,7 @@
 # ng generate library
 
 ## Overview
-Generate a library project for Angular.
+`ng generate library [name]` generates a library project for Angular.
 
 ## Alias
 lib - `ng generate lib [name]`
