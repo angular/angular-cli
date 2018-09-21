@@ -11,7 +11,7 @@ import { normalizeExtraEntryPoints } from '../models/webpack-configs/utils';
 export function generateEntryPoints(
   appConfig: { styles: ExtraEntryPoint[], scripts: ExtraEntryPoint[] },
 ) {
-  const entryPoints = ['polyfills', 'sw-register'];
+  const entryPoints = ['es2015-polyfills', 'polyfills', 'sw-register'];
 
   // Add all styles/scripts, except lazy-loaded ones.
   [
