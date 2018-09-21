@@ -53,6 +53,7 @@ export interface BrowserBuilderOptions extends BrowserBuilderBaseOptions {
     extractLicenses?: boolean;
     vendorChunk?: boolean;
     buildOptimizer?: boolean;
+    supportIE?: boolean;
 }
 
 export interface ServeBuilderOptions {
