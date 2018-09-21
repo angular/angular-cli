@@ -15,6 +15,7 @@ export default async function () {
     await expectFileToMatch('dist/test-project/polyfills.js', 'zone.js');
     expectFileToMatch('dist/test-project/index.html', oneLineTrim`
       <script type="text/javascript" src="runtime.js"></script>
+      <script type="text/javascript" src="es2015-polyfills.js" nomodule></script>
       <script type="text/javascript" src="polyfills.js"></script>
     `);
     const jitPolyfillSize = await getFileSize('dist/test-project/polyfills.js');
@@ -27,7 +28,7 @@ export default async function () {
     await expectFileToMatch('dist/test-project/polyfills.js', 'zone.js');
     expectFileToMatch('dist/test-project/index.html', oneLineTrim`
       <script type="text/javascript" src="runtime.js"></script>
-      <script type="text/javascript" src="ie-support.js" nomodule></script>
+      <script type="text/javascript" src="es2015-polyfills.js" nomodule></script>
       <script type="text/javascript" src="polyfills.js"></script>
     `);
 }
