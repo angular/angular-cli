@@ -23,6 +23,7 @@ export default function() {
     .then(() => expectFileToMatch('dist/test-project/styles.css', '* Bootstrap'))
     .then(() => expectFileToMatch('dist/test-project/index.html', oneLineTrim`
       <script type="text/javascript" src="runtime.js"></script>
+      <script type="text/javascript" src="es2015-polyfills.js" nomodule></script>
       <script type="text/javascript" src="polyfills.js"></script>
       <script type="text/javascript" src="scripts.js"></script>
       <script type="text/javascript" src="vendor.js"></script>
@@ -39,6 +40,7 @@ export default function() {
     .then(() => expectFileToMatch('dist/test-project/styles.css', '* Bootstrap'))
     .then(() => expectFileToMatch('dist/test-project/index.html', oneLineTrim`
       <script type="text/javascript" src="runtime.js"></script>
+      <script type="text/javascript" src="es2015-polyfills.js" nomodule></script>
       <script type="text/javascript" src="polyfills.js"></script>
       <script type="text/javascript" src="scripts.js"></script>
       <script type="text/javascript" src="main.js"></script>
