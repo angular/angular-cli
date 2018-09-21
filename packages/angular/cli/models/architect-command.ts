@@ -103,10 +103,13 @@ export abstract class ArchitectCommand<
 
     if (this.target) {
       // Add options IF there's only one builder of this kind.
-      const projectNames = this.getProjectNamesByTarget(this.target);
+      const targetSpec: TargetSpecifier = this._makeTargetSpecifier(options);
+      const projectNames = targetSpec.project
+        ? [targetSpec.project]
+        : this.getProjectNamesByTarget(this.target);
+
       const builderConfigurations: BuilderConfiguration[] = [];
       for (const projectName of projectNames) {
-        const targetSpec: TargetSpecifier = this._makeTargetSpecifier(options);
         const targetDesc = this._architect.getBuilderConfiguration({
           project: projectName,
           target: targetSpec.target,
@@ -207,7 +210,7 @@ export abstract class ArchitectCommand<
       // For multi target commands, we always list all projects that have the target.
       return allProjectsForTargetName;
     } else {
-      // For single target commands, we try try the default project project first,
+      // For single target commands, we try the default project first,
       // then the full list if it has a single project, then error out.
       const maybeDefaultProject = this._workspace.getDefaultProjectName();
       if (maybeDefaultProject && allProjectsForTargetName.includes(maybeDefaultProject)) {
