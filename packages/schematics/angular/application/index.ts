@@ -207,6 +207,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
             `${projectRoot}src/styles.${options.style}`,
           ],
           scripts: [],
+          es5BrowserSupport: true,
         },
         configurations: {
           production: {
