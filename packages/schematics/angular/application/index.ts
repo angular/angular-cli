@@ -157,6 +157,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
             `${projectRoot}src/styles.${options.style}`,
           ],
           scripts: [],
+          supportIE: true,
         },
         configurations: {
           production: {

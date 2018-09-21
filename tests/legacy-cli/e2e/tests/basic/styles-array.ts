@@ -43,6 +43,7 @@ export default function () {
     `))
     .then(() => expectFileToMatch('dist/test-project/index.html', oneLineTrim`
       <script type="text/javascript" src="runtime.js"></script>
+      <script type="text/javascript" src="ie-support.js" nomodule></script>
       <script type="text/javascript" src="polyfills.js"></script>
       <script type="text/javascript" src="vendor.js"></script>
       <script type="text/javascript" src="main.js"></script>

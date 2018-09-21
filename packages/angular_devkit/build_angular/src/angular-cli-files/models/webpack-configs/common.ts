@@ -58,8 +58,26 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     entryPoints['main'] = [path.resolve(root, buildOptions.main)];
   }
 
+  if (buildOptions.supportIE) {
+    entryPoints['ie-support'] = [path.join(__dirname, '..', 'ie-support.js')];
+  }
+
   if (buildOptions.polyfills) {
     entryPoints['polyfills'] = [path.resolve(root, buildOptions.polyfills)];
+  }
+
+  if (!buildOptions.aot) {
+    entryPoints['polyfills'] = [
+      ...(entryPoints['polyfills'] || []),
+      path.join(__dirname, '..', 'jit-polyfills.js'),
+    ];
+
+    if (buildOptions.supportIE) {
+      entryPoints['ie-support'] = [
+        ...entryPoints['ie-support'],
+        path.join(__dirname, '..', 'ie-jit-support.js'),
+      ];
+    }
   }
 
   // determine hashing format

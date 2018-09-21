@@ -236,6 +236,11 @@
         "$ref": "#/definitions/budget"
       },
       "default": []
+    },
+    "supportIE": {
+      "description": "Enables conditionally loaded IE9-11 polyfills",
+      "type": "boolean",
+      "default": false
     }
   },
   "additionalProperties": false,

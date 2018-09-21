@@ -12,7 +12,7 @@ import { ExtraEntryPoint } from '../../browser/schema';
 import { normalizeExtraEntryPoints } from '../models/webpack-configs/utils';
 
 export function generateEntryPoints(appConfig: any) {
-  let entryPoints = ['polyfills', 'sw-register'];
+  const entryPoints = ['ie-support', 'polyfills', 'sw-register'];
 
   // Add all styles/scripts, except lazy-loaded ones.
   [
