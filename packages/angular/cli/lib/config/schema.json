@@ -863,6 +863,11 @@
                 "$ref": "#/definitions/targetOptions/definitions/browser/definitions/budget"
               },
               "default": []
+            },
+            "es5BrowserSupport": {
+              "description": "Enables conditionally loaded ES2015 polyfills.",
+              "type": "boolean",
+              "default": false
             }
           },
           "additionalProperties": false,

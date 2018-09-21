@@ -299,6 +299,11 @@
       "type": "boolean",
       "description": "Output profile events for Chrome profiler.",
       "default": false
+    },
+    "es5BrowserSupport": {
+      "description": "Enables conditionally loaded ES2015 polyfills.",
+      "type": "boolean",
+      "default": false
     }
   },
   "additionalProperties": false,

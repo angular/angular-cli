@@ -236,6 +236,11 @@ export interface BrowserBuilderSchema {
    * Output profile events for Chrome profiler.
    */
   profile: boolean;
+
+  /**
+   * Enables conditionally loaded IE9-11 polyfills.
+   */
+  es5BrowserSupport: boolean;
 }
 
 export type OptimizationOptions = boolean | OptimizationObject;

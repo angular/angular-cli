@@ -44,6 +44,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
       entrypoints: generateEntryPoints(buildOptions),
       deployUrl: buildOptions.deployUrl,
       sri: buildOptions.subresourceIntegrity,
+      noModuleEntrypoints: ['es2015-polyfills'],
     }));
   }
 
@@ -112,7 +113,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
               const moduleName = module.nameForCondition ? module.nameForCondition() : '';
 
               return /[\\/]node_modules[\\/]/.test(moduleName)
-                && !chunks.some(({ name }) => name === 'polyfills'
+                && !chunks.some(({ name }) => name === 'polyfills' || name === 'es2015-polyfills'
                   || globalStylesBundleNames.includes(name));
             },
           },

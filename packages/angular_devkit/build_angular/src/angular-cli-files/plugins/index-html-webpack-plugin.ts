@@ -18,6 +18,7 @@ export interface IndexHtmlWebpackPluginOptions {
   entrypoints: string[];
   deployUrl?: string;
   sri: boolean;
+  noModuleEntrypoints: string[];
 }
 
 function readFile(filename: string, compilation: compilation.Compilation): Promise<string> {
@@ -53,6 +54,7 @@ export class IndexHtmlWebpackPlugin {
       input: 'index.html',
       output: 'index.html',
       entrypoints: ['polyfills', 'main'],
+      noModuleEntrypoints: [],
       sri: false,
       ...options,
     };
@@ -67,13 +69,25 @@ export class IndexHtmlWebpackPlugin {
 
 
       // Get all files for selected entrypoints
-      let unfilteredSortedFiles: string[] = [];
+      const unfilteredSortedFiles: string[] = [];
+      const noModuleFiles = new Set<string>();
+      const otherFiles = new Set<string>();
       for (const entryName of this._options.entrypoints) {
         const entrypoint = compilation.entrypoints.get(entryName);
         if (entrypoint && entrypoint.getFiles) {
-          unfilteredSortedFiles = unfilteredSortedFiles.concat(entrypoint.getFiles() || []);
+          const files: string[] = entrypoint.getFiles() || [];
+          unfilteredSortedFiles.push(...files);
+
+          if (this._options.noModuleEntrypoints.includes(entryName)) {
+            files.forEach(file => noModuleFiles.add(file));
+          } else {
+            files.forEach(file => otherFiles.add(file));
+          }
         }
       }
+
+      // Clean out files that are used in all types of entrypoints
+      otherFiles.forEach(file => noModuleFiles.delete(file));
 
       // Filter files
       const existingFiles = new Set<string>();
@@ -137,25 +151,31 @@ export class IndexHtmlWebpackPlugin {
       // Inject into the html
       const indexSource = new ReplaceSource(new RawSource(inputContent), this._options.input);
 
-      const scriptElements = treeAdapter.createDocumentFragment();
+      let scriptElements = '';
       for (const script of scripts) {
-        const attrs = [
+        const attrs: { name: string, value: string | null }[] = [
           { name: 'type', value: 'text/javascript' },
           { name: 'src', value: (this._options.deployUrl || '') + script },
         ];
+
+        if (noModuleFiles.has(script)) {
+          attrs.push({ name: 'nomodule', value: null });
+        }
 
         if (this._options.sri) {
           const content = compilation.assets[script].source();
           attrs.push(...this._generateSriAttributes(content));
         }
 
-        const element = treeAdapter.createElement('script', undefined, attrs);
-        treeAdapter.appendChild(scriptElements, element);
+        const attributes = attrs
+          .map(attr => attr.value === null ? attr.name : `${attr.name}="${attr.value}"`)
+          .join(' ');
+        scriptElements += `<script ${attributes}></script>`;
       }
 
       indexSource.insert(
         scriptInsertionPoint,
-        parse5.serialize(scriptElements, { treeAdapter }),
+        scriptElements,
       );
 
       // Adjust base href if specified
