@@ -48,6 +48,7 @@ export default function () {
     `)))
     .then(() => expectFileToMatch('dist/test-project/index.html', oneLineTrim`
       <script type="text/javascript" src="runtime.js"></script>
+      <script type="text/javascript" src="es2015-polyfills.js" nomodule></script>
       <script type="text/javascript" src="polyfills.js"></script>
       <script type="text/javascript" src="vendor.js"></script>
       <script type="text/javascript" src="main.js"></script>
@@ -63,6 +64,7 @@ export default function () {
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/test-project/index.html', oneLineTrim`
       <script type="text/javascript" src="runtime.js"></script>
+      <script type="text/javascript" src="es2015-polyfills.js" nomodule></script>
       <script type="text/javascript" src="polyfills.js"></script>
       <script type="text/javascript" src="styles.js"></script>
       <script type="text/javascript" src="renamed-style.js"></script>

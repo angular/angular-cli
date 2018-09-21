@@ -27,6 +27,7 @@ export default async function () {
     await expectFileToMatch('dist/test-project/polyfills.js', 'zone.js');
     expectFileToMatch('dist/test-project/index.html', oneLineTrim`
       <script type="text/javascript" src="runtime.js"></script>
+      <script type="text/javascript" src="ie-support.js" nomodule></script>
       <script type="text/javascript" src="polyfills.js"></script>
     `);
 }
