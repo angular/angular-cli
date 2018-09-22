@@ -12,6 +12,7 @@
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
     "@angular-devkit/schematics": "0.0.0",
+    "npm": "6.4.1",
     "npm-registry-client": "8.6.0",
     "semver": "5.5.1",
     "semver-intersect": "1.4.0",
