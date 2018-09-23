@@ -79,8 +79,10 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
 
   if (buildOptions.extractLicenses) {
     extraPlugins.push(new LicenseWebpackPlugin({
-      pattern: /.*/,
-      suppressErrors: true,
+      stats: {
+        warnings: false,
+        errors: false
+      },
       perChunkOutput: false,
       outputFilename: `3rdpartylicenses.txt`
     }));
