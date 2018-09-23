@@ -2482,10 +2482,6 @@ ee-first@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
 
-ejs@^2.5.7:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/ejs/-/ejs-2.6.1.tgz#498ec0d495655abc6f23cd61868d926464071aa0"
-
 electron-to-chromium@^1.3.47, electron-to-chromium@^1.3.62:
   version "1.3.63"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.63.tgz#6485f5f4f3375358aa8fa23c2029ada208483b8d"
@@ -4583,11 +4579,11 @@ license-checker@^20.1.0:
     strip-ansi "^4.0.0"
     treeify "^1.1.0"
 
-license-webpack-plugin@1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/license-webpack-plugin/-/license-webpack-plugin-1.4.0.tgz#be504a849ba7d736f1a6da4b133864f30af885fa"
+license-webpack-plugin@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/license-webpack-plugin/-/license-webpack-plugin-2.0.1.tgz#d8d24d0d0db70d328ec911ae728719b842260078"
   dependencies:
-    ejs "^2.5.7"
+    webpack-sources "^1.2.0"
 
 lie@~3.1.0:
   version "3.1.1"
