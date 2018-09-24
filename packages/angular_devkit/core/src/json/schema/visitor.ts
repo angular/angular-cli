@@ -69,7 +69,7 @@ function _visitJsonRecursive<ContextT>(
       ? value as Observable<JsonValue>
       : observableOf(value as JsonValue)
   ).pipe(
-    concatMap((value: JsonValue) => {
+    concatMap((value): Observable<JsonValue> => {
       if (Array.isArray(value)) {
         return concat(
           from(value).pipe(
