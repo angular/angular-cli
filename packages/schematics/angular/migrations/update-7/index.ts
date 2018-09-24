@@ -13,6 +13,7 @@ import {
 } from '../../utility/dependencies';
 import { latestVersions } from '../../utility/latest-versions';
 
+export { polyfillMetadataRule } from './polyfill-metadata';
 
 export default function(): Rule {
   return (tree, context) => {
