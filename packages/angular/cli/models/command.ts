@@ -114,8 +114,8 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     }
   }
 
-  async validateScope(): Promise<void> {
-    switch (this.description.scope) {
+  async validateScope(scope?: CommandScope): Promise<void> {
+    switch (scope === undefined ? this.description.scope : scope) {
       case CommandScope.OutProject:
         if (this.workspace.configFile) {
           this.logger.fatal(tags.oneLine`
