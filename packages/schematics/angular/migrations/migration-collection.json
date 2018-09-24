@@ -9,6 +9,11 @@
       "version": "7.0.0-beta.0",
       "factory": "./update-7",
       "description": "Update an Angular CLI project to version 7."
+    },
+    "migration-03": {
+      "version": "7.0.0-rc.0",
+      "factory": "./update-7/index#polyfillMetadataRule",
+      "description": "Update an Angular CLI project to version 7."
     }
   }
 }
