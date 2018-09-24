@@ -18,7 +18,7 @@ import {
 } from '@angular-devkit/core';
 import { writeFileSync } from 'fs';
 import { Command } from '../models/command';
-import { Arguments } from '../models/interface';
+import { Arguments, CommandScope } from '../models/interface';
 import {
   getWorkspace,
   getWorkspaceRaw,
@@ -177,6 +177,10 @@ function normalizeValue(value: ConfigCommandSchemaValue, path: string): JsonValu
 export class ConfigCommand extends Command<ConfigCommandSchema> {
   public async run(options: ConfigCommandSchema & Arguments) {
     const level = options.global ? 'global' : 'local';
+
+    if (!options.global) {
+      await this.validateScope(CommandScope.InProject);
+    }
 
     let config =
       (getWorkspace(level) as {} as { _workspace: experimental.workspace.WorkspaceSchema });

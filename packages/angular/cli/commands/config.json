@@ -5,7 +5,7 @@
   "$longDescription": "",
 
   "$aliases": [],
-  "$scope": "in",
+  "$scope": "all",
   "$type": "native",
   "$impl": "./config-impl#ConfigCommand",
 
