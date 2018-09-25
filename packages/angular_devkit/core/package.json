@@ -12,6 +12,6 @@
     "chokidar": "2.0.4",
     "fast-json-stable-stringify": "2.0.0",
     "source-map": "0.7.3",
-    "rxjs": "6.2.2"
+    "rxjs": "6.3.3"
   }
 }

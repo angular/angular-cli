@@ -33,7 +33,7 @@
     "@schematics/update": "0.0.0",
     "inquirer": "6.2.0",
     "opn": "5.3.0",
-    "rxjs": "6.2.2",
+    "rxjs": "6.3.3",
     "semver": "5.5.1",
     "symbol-observable": "1.2.0"
   },
