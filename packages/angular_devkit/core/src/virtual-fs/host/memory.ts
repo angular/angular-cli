@@ -180,7 +180,7 @@ export class SimpleMemoryHost implements Host<{}> {
     path = this._toAbsolute(path);
     if (this._isDirectory(path)) {
       for (const [cachePath] of this._cache.entries()) {
-        if (path.startsWith(cachePath + NormalizedSep)) {
+        if (cachePath.startsWith(path + NormalizedSep) || cachePath === path) {
           this._cache.delete(cachePath);
         }
       }
