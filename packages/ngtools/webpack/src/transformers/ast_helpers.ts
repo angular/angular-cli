@@ -102,5 +102,5 @@ export function transformTypescript(
   }
 
   // Return the transpiled js.
-  return compilerHost.readFile(fileName.replace(/\.ts$/, '.js'));
+  return compilerHost.readFile(fileName.replace(/\.tsx?$/, '.js'));
 }

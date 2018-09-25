@@ -27,7 +27,7 @@ export function resolveWithPaths(
   }
 
   // Only work on Javascript/TypeScript issuers.
-  if (!request.contextInfo.issuer || !request.contextInfo.issuer.match(/\.[jt]s$/)) {
+  if (!request.contextInfo.issuer || !request.contextInfo.issuer.match(/\.[jt]sx?$/)) {
     callback(null, request);
 
     return;
