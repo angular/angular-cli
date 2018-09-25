@@ -110,7 +110,7 @@ export function getAotConfig(
     });
   }
 
-  const test = /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/;
+  const test = /(?:\.ngfactory\.js|\.ngstyle\.js|\.tsx?)$/;
 
   return {
     module: { rules: [{ test, use: loaders }] },
