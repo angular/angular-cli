@@ -55,6 +55,7 @@ export interface DevServerBuilderOptions {
   vendorChunk?: boolean;
   commonChunk?: boolean;
   baseHref?: string;
+  deployUrl?: string;
   progress?: boolean;
   poll?: number;
   verbose?: boolean;
@@ -406,6 +407,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
       'progress',
       'poll',
       'verbose',
+      'deployUrl',
     ];
 
     // remove options that are undefined or not to be overrriden
