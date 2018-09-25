@@ -68,7 +68,13 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
     <code>--prod</code>
   </p>
   <p>
-    Flag to set configuration to "prod".
+    Flag to set configuration to "production".
+  </p>
+  <p>
+    Note: This is a change from versions of Angular CLI prior to 6. 
+    This switch used to set configuration to "prod". If you migrated your project 
+    from an earlier version, you may need to edit your angular.json file to account
+    for this change.
   </p>
 </details>
 <details>
@@ -276,6 +282,21 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
   </p>
   <p>
     Define the output filename cache-busting hashing mode.
+  </p>
+  <p>
+    Possible values:
+  </p>
+  <ul>
+    <li>all</li>
+    <li>bundles</li>
+    <li>media</li>
+    <li>none</li>
+  </ul>
+  <p>
+    Example:
+  </p>
+  <p>
+    <code>ng build --prod --output-hashing all</code>
   </p>
 </details>
 <details>
