@@ -115,4 +115,15 @@ describe('FilterHostTree', () => {
     expect(filteredFiles).toEqual(['/dir1/file1'].map(normalize));
     expect(filtered2.actions.map(a => a.kind)).toEqual([]);
   });
+
+  it('subdirs only contains directories', () => {
+    const fs = new virtualFs.test.TestHost({
+      '/dir1/file1': '',
+      '/dir1/dir2/file2': '',
+      '/dir1/dir3/file3': '',
+    });
+    const tree = new HostTree(fs);
+    const subDirs = tree.getDir('/dir1').subdirs;
+    expect(subDirs as string[]).toEqual(['dir2', 'dir3']);
+  });
 });
