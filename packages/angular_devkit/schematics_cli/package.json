@@ -19,6 +19,6 @@
     "@schematics/schematics": "0.0.0",
     "minimist": "1.2.0",
     "symbol-observable": "1.2.0",
-    "rxjs": "6.2.2"
+    "rxjs": "6.3.3"
   }
 }

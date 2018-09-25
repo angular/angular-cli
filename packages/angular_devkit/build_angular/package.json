@@ -35,7 +35,7 @@
     "postcss-import": "11.1.0",
     "postcss-loader": "2.1.6",
     "raw-loader": "0.5.1",
-    "rxjs": "6.2.2",
+    "rxjs": "6.3.3",
     "sass-loader": "7.1.0",
     "semver": "5.5.1",
     "source-map-support": "0.5.9",

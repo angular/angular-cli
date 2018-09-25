@@ -15,6 +15,6 @@
     "npm-registry-client": "8.6.0",
     "semver": "5.5.1",
     "semver-intersect": "1.4.0",
-    "rxjs": "6.2.2"
+    "rxjs": "6.3.3"
   }
 }
