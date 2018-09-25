@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { logging, schema, virtualFs } from '@angular-devkit/core';
-import { Observable, Subject, concat, of, throwError } from 'rxjs';
+import { Observable, Subject, concat, from, of, throwError } from 'rxjs';
 import { concatMap, defaultIfEmpty, ignoreElements, last, map, tap } from 'rxjs/operators';
 import { EngineHost, SchematicEngine } from '../engine';
 import { UnsuccessfulWorkflowExecution } from '../exception/exception';
@@ -162,15 +162,12 @@ export abstract class BaseWorkflow implements Workflow {
       map(tree => optimize(tree)),
       concatMap((tree: Tree) => {
         // Process all sinks.
-        return of(tree).pipe(
-          ...sinks.map(sink => {
-            return concatMap((tree: Tree) => {
-              return concat(
-                sink.commit(tree).pipe(ignoreElements()),
-                of(tree),
-              );
-            });
-          }),
+        return concat(
+          from(sinks).pipe(
+            concatMap(sink => sink.commit(tree)),
+            ignoreElements(),
+          ),
+          of(tree),
         );
       }),
       concatMap(() => {
