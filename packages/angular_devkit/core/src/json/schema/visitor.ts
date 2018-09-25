@@ -86,7 +86,7 @@ function _visitJsonRecursive<ContextT>(
             }),
             ignoreElements(),
           ),
-          observableOf(value),
+          observableOf<JsonValue>(value),
         );
       } else if (typeof value == 'object' && value !== null) {
         return concat(
