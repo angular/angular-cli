@@ -162,7 +162,8 @@ export abstract class BaseWorkflow implements Workflow {
       map(tree => optimize(tree)),
       concatMap((tree: Tree) => {
         // Process all sinks.
-        return of(tree).pipe(
+        // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/4177
+        return (of(tree) as any).pipe(
           ...sinks.map(sink => {
             return concatMap((tree: Tree) => {
               return concat(

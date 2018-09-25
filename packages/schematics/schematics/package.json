@@ -11,6 +11,7 @@
   "schematics": "./collection.json",
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
-    "@angular-devkit/schematics": "0.0.0"
+    "@angular-devkit/schematics": "0.0.0",
+    "rxjs": "6.3.2"
   }
 }
