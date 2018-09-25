@@ -17,16 +17,13 @@ describe('Dev Server Builder serve path', () => {
   beforeEach(done => host.initialize().toPromise().then(done, done.fail));
   afterEach(done => host.restore().toPromise().then(done, done.fail));
 
-  // TODO: review this test, it seems to pass with or without the servePath.
   it('works', (done) => {
     const overrides: Partial<DevServerBuilderOptions> = { servePath: 'test/' };
 
     runTargetSpec(host, devServerTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      concatMap(() => from(request('http://localhost:4200/test/'))),
-      tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),
-      concatMap(() => from(request('http://localhost:4200/test/abc/'))),
-      tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),
+      concatMap(() => from(request('http://localhost:4200/test/polyfills.js'))),
+      tap(response => expect(response).toContain('window["webpackJsonp"]')),
       take(1),
     ).toPromise().then(done, done.fail);
   }, 30000);
