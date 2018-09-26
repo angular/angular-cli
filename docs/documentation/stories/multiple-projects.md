@@ -7,7 +7,7 @@ To create another app you can use the following command:
 ng generate application my-other-app
 ```
 
-The new application will be generated inside `projects/my-other-app`.
+The new application will be generated inside `projects/my-other-app`. If you wish to override root folder specify `--project-root applicationPath`
 
 Now we can `serve`, `build` etc. both the apps by passing the project name with the commands:
 

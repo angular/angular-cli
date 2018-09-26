@@ -99,3 +99,12 @@ app - `ng generate app [name]`
     Do not add dependencies to package.json.
   </p>
 </details>
+<details>
+  <summary>project-root</summary>
+  <p>
+    <code>--project-root</code>
+  </p>
+  <p>
+    Specify root folder for new application and e2e tests
+  </p>
+</details>
