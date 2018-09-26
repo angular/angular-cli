@@ -48,6 +48,12 @@
       "description": "Create an Angular directive.",
       "schema": "./directive/schema.json"
     },
+    "docker": {
+      "aliases": [ "dock" ],
+      "factory": "./docker",
+      "description": "Create docker default files.",
+      "schema": "./docker/schema.json"
+    },
     "enum": {
       "aliases": [ "e" ],
       "factory": "./enum",

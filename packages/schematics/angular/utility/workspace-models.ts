@@ -30,6 +30,19 @@ export interface FileReplacements {
     with: string;
 }
 
+export interface DockerOptions {
+    orgName: string;
+    imageName: string;
+    registryAddress: string;
+    environments: {
+        [key: string]: {
+            machineName: string,
+            isImageDeploy: boolean,
+            serviceName: string,
+        },
+    };
+}
+
 export interface BrowserBuilderBaseOptions {
     main: string;
     tsConfig: string;
@@ -101,6 +114,7 @@ export interface BuilderTarget<TBuilder extends Builders, TOptions> {
         production: Partial<TOptions>;
         [key: string]: Partial<TOptions>;
     };
+    docker?: DockerOptions;
 }
 
 export type LibraryBuilderTarget = BuilderTarget<Builders.NgPackagr, LibraryBuilderOptions>;

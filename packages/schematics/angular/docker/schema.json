@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularDocker",
+  "title": "Angular Docker schema",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "name": {
+      "type": "string",
+      "description": "[Deprecated] The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      },
+      "visible": false
+    },
+    "environment": {
+      "description": "Initialize for a particular environment.",
+      "alias": "env",
+      "type": "string",
+      "default": "production"
+    },
+    "imageName": {
+      "description": "The image name to use for image pushes.",
+      "type": "string"
+    },
+    "useImage": {
+      "description": "Initializes the environment for deploying with an image, rather than performing a build.",
+      "type": "boolean",
+      "default": false
+    },
+    "imageOrg": {
+      "description": "The org name to use for image pushes.",
+      "type": "string",
+      "default": "temp"
+    },
+    "imageRegistry": {
+      "description": "The registry address to use for image pushes.",
+      "type": "string",
+      "default": "registry.hub.docker.com"
+    },  
+    "servicePort": {
+      "description": "The port of the computer service.",
+      "type": "number",
+      "default": 8000
+    },
+    "serviceName": {
+      "description": "The name of the service.",
+      "type": "string",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "machineName": {
+      "description": "The name of the machine.",
+      "alias": "machine",
+      "type": "string",
+      "default": "my-machine"
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}
