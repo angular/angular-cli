@@ -281,6 +281,12 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
       // Argument is of form -abcdef.  Starts at 1 because we skip the `-`.
       for (let i = 1; i < arg.length; i++) {
         const flag = arg[i];
+        // If the next character is an '=', treat it as a long flag.
+        if (arg[i + 1] == '=') {
+          const f = '--' + flag + arg.slice(i + 1);
+          _assignOption(f, args, options, parsedOptions, positionals, leftovers, ignored, errors);
+          break;
+        }
         // Treat the last flag as `--a` (as if full flag but just one letter). We do this in
         // the loop because it saves us a check to see if the arg is just `-`.
         if (i == arg.length - 1) {
