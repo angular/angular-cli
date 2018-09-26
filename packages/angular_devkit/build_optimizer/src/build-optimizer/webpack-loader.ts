@@ -17,9 +17,16 @@ interface BuildOptimizerLoaderOptions {
   sourceMap: boolean;
 }
 
-export default function buildOptimizerLoader
-  (this: webpack.loader.LoaderContext, content: string, previousSourceMap: RawSourceMap) {
+export default function buildOptimizerLoader(
+  this: webpack.loader.LoaderContext,
+  content: string,
+  previousSourceMap: RawSourceMap,
+) {
   this.cacheable();
+  const callback = this.async();
+  if (!callback) {
+    throw new Error('async loader support is required');
+  }
   const options: BuildOptimizerLoaderOptions = loaderUtils.getOptions(this) || {};
 
   // Make up names of the intermediate files so we can chain the sourcemaps.
@@ -40,7 +47,7 @@ export default function buildOptimizerLoader
   if (boOutput.emitSkipped || boOutput.content === null) {
     // Webpack typings for previousSourceMap are wrong, they are JSON objects and not strings.
     // tslint:disable-next-line:no-any
-    this.callback(null, content, previousSourceMap as any);
+    callback(null, content, previousSourceMap as any);
 
     return;
   }
@@ -66,10 +73,20 @@ export default function buildOptimizerLoader
       previousSourceMap.file = inputFilePath;
 
       // Chain the sourcemaps.
-      const consumer = new SourceMapConsumer(intermediateSourceMap);
-      const generator = SourceMapGenerator.fromSourceMap(consumer);
-      generator.applySourceMap(new SourceMapConsumer(previousSourceMap));
-      newSourceMap = generator.toJSON();
+      SourceMapConsumer.with(intermediateSourceMap, undefined, async consumer => {
+        const generator = SourceMapGenerator.fromSourceMap(consumer);
+
+        return await SourceMapConsumer.with(previousSourceMap, undefined, consumer => {
+          generator.applySourceMap(consumer);
+
+          return generator.toJSON();
+        });
+      }).then((map) => {
+          // tslint:disable-next-line:no-any
+          callback(null, newContent, map as any);
+      });
+
+      return;
     } else {
       // Otherwise just return our generated sourcemap.
       newSourceMap = intermediateSourceMap;
@@ -78,5 +95,5 @@ export default function buildOptimizerLoader
 
   // Webpack typings for previousSourceMap are wrong, they are JSON objects and not strings.
   // tslint:disable-next-line:no-any
-  this.callback(null, newContent, newSourceMap as any);
+  callback(null, newContent, newSourceMap as any);
 }
