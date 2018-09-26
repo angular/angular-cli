@@ -119,14 +119,9 @@ export default function (options: E2eOptions): Rule {
     validateProjectName(options.name);
 
     const workspace = getWorkspace(host);
-    let newProjectRoot = workspace.newProjectRoot;
-    let appDir = `${newProjectRoot}/${options.name}`;
-
-
-    if (options.projectRoot !== undefined) {
-      newProjectRoot = options.projectRoot;
-      appDir = newProjectRoot;
-    }
+    const appDir = options.projectRoot !== undefined
+      ? options.projectRoot
+      : `${workspace.newProjectRoot}/${options.name}`;
 
     return chain([
       addAppToWorkspaceFile(options, workspace),

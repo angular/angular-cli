@@ -53,6 +53,11 @@ export interface BrowserBuilderOptions extends BrowserBuilderBaseOptions {
     extractLicenses?: boolean;
     vendorChunk?: boolean;
     buildOptimizer?: boolean;
+    budgets?: {
+        type: string;
+        maximumWarning?: string;
+        maximumError?: string;
+    }[];
 }
 
 export interface ServeBuilderOptions {
@@ -119,7 +124,6 @@ export interface WorkspaceSchema extends experimental.workspace.WorkspaceSchema 
     };
 }
 
-// tslint:disable-next-line:no-any
 export interface WorkspaceProject<TProjectType extends ProjectType = ProjectType.Application>
     extends experimental.workspace.WorkspaceProject {
     /**
