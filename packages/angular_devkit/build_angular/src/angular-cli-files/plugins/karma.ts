@@ -125,9 +125,6 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   config.middleware = config.middleware || [];
   config.middleware.push('@angular-devkit/build-angular--fallback');
 
-  // Delete global styles entry, we don't want to load them.
-  delete webpackConfig.entry.styles;
-
   // The webpack tier owns the watch behavior so we want to force it in the config.
   webpackConfig.watch = !config.singleRun;
   if (config.singleRun) {
@@ -198,6 +195,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
           '/_karma_webpack_/runtime.js',
           '/_karma_webpack_/polyfills.js',
           '/_karma_webpack_/scripts.js',
+          '/_karma_webpack_/styles.js',
           '/_karma_webpack_/vendor.js',
         ];
         if (alwaysServe.indexOf(req.url) != -1) {
