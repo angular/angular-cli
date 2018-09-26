@@ -60,6 +60,7 @@ export interface DevServerBuilderOptions {
   verbose?: boolean;
 }
 
+type DevServerBuilderOptionsKeys = Extract<keyof DevServerBuilderOptions, string>;
 
 export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
 
@@ -392,24 +393,30 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     const architect = this.context.architect;
     const [project, target, configuration] = options.browserTarget.split(':');
 
-    const overrides = {
-      // Override browser build watch setting.
-      watch: options.watch,
+    const overridesOptions: DevServerBuilderOptionsKeys[] = [
+      'watch',
+      'optimization',
+      'aot',
+      'sourceMap',
+      'vendorSourceMap',
+      'evalSourceMap',
+      'vendorChunk',
+      'commonChunk',
+      'baseHref',
+      'progress',
+      'poll',
+      'verbose',
+    ];
 
-      // Update the browser options with the same options we support in serve, if defined.
-      ...(options.optimization !== undefined ? { optimization: options.optimization } : {}),
-      ...(options.aot !== undefined ? { aot: options.aot } : {}),
-      ...(options.sourceMap !== undefined ? { sourceMap: options.sourceMap } : {}),
-      ...(options.vendorSourceMap !== undefined ?
-         { vendorSourceMap: options.vendorSourceMap } : {}),
-      ...(options.evalSourceMap !== undefined ? { evalSourceMap: options.evalSourceMap } : {}),
-      ...(options.vendorChunk !== undefined ? { vendorChunk: options.vendorChunk } : {}),
-      ...(options.commonChunk !== undefined ? { commonChunk: options.commonChunk } : {}),
-      ...(options.baseHref !== undefined ? { baseHref: options.baseHref } : {}),
-      ...(options.progress !== undefined ? { progress: options.progress } : {}),
-      ...(options.poll !== undefined ? { poll: options.poll } : {}),
-      ...(options.verbose !== undefined ? { verbose: options.verbose } : {}),
-    };
+    // remove options that are undefined or not to be overrriden
+    const overrides = (Object.keys(options) as DevServerBuilderOptionsKeys[])
+      .filter(key => options[key] !== undefined && overridesOptions.includes(key))
+      .reduce<Partial<BrowserBuilderSchema>>((previous, key) => (
+        {
+          ...previous,
+          [key]: options[key],
+        }
+      ), {});
 
     const browserTargetSpec = { project, target, configuration, overrides };
     const builderConfig = architect.getBuilderConfiguration<BrowserBuilderSchema>(
