@@ -269,10 +269,6 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
   const errors: string[] = [];
 
   for (let arg = args.shift(); arg !== undefined; arg = args.shift()) {
-    if (!arg) {
-      break;
-    }
-
     if (arg == '--') {
       // If we find a --, we're done.
       leftovers.push(...args);

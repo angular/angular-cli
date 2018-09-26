@@ -35,6 +35,7 @@ describe('parseArguments', () => {
   const tests: { [test: string]: Partial<Arguments> | ['!!!', Partial<Arguments>, string[]] } = {
     '--bool': { bool: true },
     '--bool=1': ['!!!', {}, ['--bool=1']],
+    '--bool  ': { bool: true, p1: '' },
     '-- --bool=1': { '--': ['--bool=1'] },
     '--bool=yellow': ['!!!', {}, ['--bool=yellow']],
     '--bool=true': { bool: true },
@@ -68,6 +69,10 @@ describe('parseArguments', () => {
     '--arr=1 --arr --arr c d': { arr: ['1', '', 'c'], p1: 'd' },
     '--arr=1 --arr --arr c d e': { arr: ['1', '', 'c'], p1: 'd', p2: 'e' },
     '--str=1': { str: '1' },
+    '--str=': { str: '' },
+    '--str ': { str: '' },
+    '--str  ': { str: '', p1: '' },
+    '--str    ': { str: '', p1: '', p2: '', '--': [''] },
     '--hello-world=1': { helloWorld: '1' },
     '--hello-bool': { helloBool: true },
     '--helloBool': { helloBool: true },
@@ -119,7 +124,7 @@ describe('parseArguments', () => {
   Object.entries(tests).forEach(([str, expected]) => {
     it(`works for ${str}`, () => {
       try {
-        const actual = parseArguments(str.split(/\s+/), options);
+        const actual = parseArguments(str.split(' '), options);
 
         expect(Array.isArray(expected)).toBe(false);
         expect(actual).toEqual(expected as Arguments);
