@@ -40,6 +40,11 @@
       "default": false,
       "alias": "o"
     },
+    "verbose": {
+      "type": "boolean",
+      "description": "Adds more details to output logging.",
+      "default": false
+    },
     "liveReload": {
       "type": "boolean",
       "description": "Whether to reload the page on change, using live-reload.",

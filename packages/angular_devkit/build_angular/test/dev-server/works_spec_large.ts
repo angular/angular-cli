@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { request, runTargetSpec } from '@angular-devkit/architect/testing';
+import { TestLogger, request, runTargetSpec } from '@angular-devkit/architect/testing';
 import { from } from 'rxjs';
 import { concatMap, take, tap } from 'rxjs/operators';
+import { DevServerBuilderOptions } from '../../src';
 import { devServerTargetSpec, host } from '../utils';
 
 
@@ -21,6 +22,15 @@ describe('Dev Server Builder', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => from(request('http://localhost:4200/index.html'))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),
+      take(1),
+    ).toPromise().then(done, done.fail);
+  }, 30000);
+
+  it('works with verbose', (done) => {
+    const overrides: Partial<DevServerBuilderOptions> = { verbose: true };
+    const logger = new TestLogger('verbose-serve');
+    runTargetSpec(host, devServerTargetSpec, overrides, undefined, logger).pipe(
+      tap(() => expect(logger.includes('Built at')).toBe(true)),
       take(1),
     ).toPromise().then(done, done.fail);
   }, 30000);
