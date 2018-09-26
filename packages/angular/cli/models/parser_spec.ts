@@ -19,6 +19,7 @@ describe('parseArguments', () => {
     { name: 'arr', aliases: [ 'a' ], type: OptionType.Array, description: '' },
     { name: 'p1', positional: 0, aliases: [], type: OptionType.String, description: '' },
     { name: 'p2', positional: 1, aliases: [], type: OptionType.String, description: '' },
+    { name: 'p3', positional: 2, aliases: [], type: OptionType.Number, description: '' },
     { name: 't1', aliases: [], type: OptionType.Boolean,
       types: [OptionType.Boolean, OptionType.String], description: '' },
     { name: 't2', aliases: [], type: OptionType.Boolean,
@@ -63,8 +64,13 @@ describe('parseArguments', () => {
     'val1 --num=1 val2': { num: 1, p1: 'val1', p2: 'val2' },
     '--p1=val1 --num=1 val2': { num: 1, p1: 'val1', p2: 'val2' },
     '--p1=val1 --num=1 --p2=val2 val3': { num: 1, p1: 'val1', p2: 'val2', '--': ['val3'] },
-    '--bool val1 --etc --num val2 --v': { bool: true, num: 0, p1: 'val1', p2: 'val2',
-                                          '--': ['--etc', '--v'] },
+    '--bool val1 --etc --num val2 --v': [
+      '!!!',
+      { bool: true, p1: 'val1', p2: 'val2', '--': ['--etc', '--v'] },
+      ['--num' ],
+    ],
+    '--bool val1 --etc --num=1 val2 --v': { bool: true, num: 1, p1: 'val1', p2: 'val2',
+                                            '--': ['--etc', '--v'] },
     '--arr=a --arr=b --arr c d': { arr: ['a', 'b', 'c'], p1: 'd' },
     '--arr=1 --arr --arr c d': { arr: ['1', '', 'c'], p1: 'd' },
     '--arr=1 --arr --arr c d e': { arr: ['1', '', 'c'], p1: 'd', p2: 'e' },
@@ -121,6 +127,7 @@ describe('parseArguments', () => {
     '--e3': { e3: true },
     '--e3 true': { e3: true },
     '--e3=true': { e3: true },
+    'a b c 1': { p1: 'a', p2: 'b', '--': ['c', '1'] },
   };
 
   Object.entries(tests).forEach(([str, expected]) => {
