@@ -54,6 +54,8 @@ function _coerceType(str: string | undefined, type: OptionType, v?: Value): Valu
     case OptionType.Number:
       if (str === undefined) {
         return 0;
+      } else if (str === '') {
+        return undefined;
       } else if (Number.isFinite(+str)) {
         return +str;
       } else {
@@ -308,6 +310,8 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
   }
 
   // Deal with positionals.
+  // TODO(hansl): this is by far the most complex piece of code in this file. Try to refactor it
+  //   simpler.
   if (positionals.length > 0) {
     let pos = 0;
     for (let i = 0; i < positionals.length;) {
@@ -317,10 +321,11 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
 
       // We do this with a found flag because more than 1 option could have the same positional.
       for (const option of options) {
-        // If any option has this positional and no value, we need to remove it.
+        // If any option has this positional and no value, AND fit the type, we need to remove it.
         if (option.positional === pos) {
-          if (parsedOptions[option.name] === undefined) {
-            parsedOptions[option.name] = positionals[i];
+          const coercedValue = _coerce(positionals[i], option, parsedOptions[option.name]);
+          if (parsedOptions[option.name] === undefined && coercedValue !== undefined) {
+            parsedOptions[option.name] = coercedValue;
             found = true;
           } else {
             incrementI = false;
