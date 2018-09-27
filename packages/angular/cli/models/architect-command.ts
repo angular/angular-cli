@@ -135,31 +135,33 @@ export abstract class ArchitectCommand<
     return await this.runArchitectTarget(options);
   }
 
+  protected async runSingleTarget(targetSpec: TargetSpecifier, options: string[]) {
+    // We need to build the builderSpec twice because architect does not understand
+    // overrides separately (getting the configuration builds the whole project, including
+    // overrides).
+    const builderConf = this._architect.getBuilderConfiguration(targetSpec);
+    const builderDesc = await this._architect.getBuilderDescription(builderConf).toPromise();
+    const targetOptionArray = await parseJsonSchemaToOptions(this._registry, builderDesc.schema);
+    const overrides = parseArguments(options, targetOptionArray);
+
+    if (overrides['--']) {
+      (overrides['--'] || []).forEach(additional => {
+        this.logger.warn(`Unknown option: '${additional.split(/=/)[0]}'`);
+      });
+
+      return 1;
+    }
+    const realBuilderConf = this._architect.getBuilderConfiguration({ ...targetSpec, overrides });
+
+    return this._architect.run(realBuilderConf, { logger: this._logger }).pipe(
+      map((buildEvent: BuildEvent) => buildEvent.success ? 0 : 1),
+    ).toPromise();
+  }
+
   protected async runArchitectTarget(
     options: ArchitectCommandOptions & Arguments,
   ): Promise<number> {
-    const runSingleTarget = async (targetSpec: TargetSpecifier) => {
-      // We need to build the builderSpec twice because architect does not understand
-      // overrides separately (getting the configuration builds the whole project, including
-      // overrides).
-      const builderConf = this._architect.getBuilderConfiguration(targetSpec);
-      const builderDesc = await this._architect.getBuilderDescription(builderConf).toPromise();
-      const targetOptionArray = await parseJsonSchemaToOptions(this._registry, builderDesc.schema);
-      const overrides = parseArguments(options['--'] || [], targetOptionArray);
-
-      if (overrides['--']) {
-        (overrides['--'] || []).forEach(additional => {
-          this.logger.warn(`Unknown option: '${additional.split(/=/)[0]}'`);
-        });
-
-        return 1;
-      }
-      const realBuilderConf = this._architect.getBuilderConfiguration({ ...targetSpec, overrides });
-
-      return this._architect.run(realBuilderConf, { logger: this._logger }).pipe(
-        map((buildEvent: BuildEvent) => buildEvent.success ? 0 : 1),
-      ).toPromise();
-    };
+    const extra = options['--'] || [];
 
     try {
       const targetSpec = this._makeTargetSpecifier(options);
@@ -167,13 +169,13 @@ export abstract class ArchitectCommand<
         // This runs each target sequentially.
         // Running them in parallel would jumble the log messages.
         return await from(this.getProjectNamesByTarget(this.target)).pipe(
-          concatMap(project => from(runSingleTarget({ ...targetSpec, project }))),
+          concatMap(project => from(this.runSingleTarget({ ...targetSpec, project }, extra))),
           toArray(),
           map(results => results.every(res => res === 0) ? 0 : 1),
         )
         .toPromise();
       } else {
-        return await runSingleTarget(targetSpec);
+        return await this.runSingleTarget(targetSpec, extra);
       }
     } catch (e) {
       if (e instanceof schema.SchemaValidationException) {
