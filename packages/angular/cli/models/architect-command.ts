@@ -296,6 +296,12 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
       delete overrides.project;
     }
 
+    // For some reason, latest of yargs-parser with our configuration returns `{ _: [] }` if
+    // there's nothing to parse.
+    if (overrides._ && Array.isArray(overrides._) && overrides._.length == 0) {
+      delete overrides._;
+    }
+
     if (!project) {
       project = '';
     }
