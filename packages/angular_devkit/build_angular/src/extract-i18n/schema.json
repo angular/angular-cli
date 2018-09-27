@@ -24,6 +24,11 @@
       "type": "string",
       "description": "Specifies the source language of the application."
     },
+    "progress": {
+      "type": "boolean",
+      "description": "Log progress to the console.",
+      "default": true
+    },
     "outputPath": {
       "type": "string",
       "description": "Path where output will be placed."
