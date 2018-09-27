@@ -120,6 +120,15 @@ describe('find-module', () => {
       expect(modPath).toEqual('/projects/my-proj/src/admin/foo.module.ts' as Path);
     });
 
+    it('should find a module in a sub dir (2)', () => {
+      tree.create('/projects/my-proj/src/admin/foo.module.ts', '');
+      options.name = 'admin/hello';
+      options.module = 'foo';
+      options.path = '/projects/my-proj/src';
+      const modPath = findModuleFromOptions(tree, options);
+      expect(modPath).toEqual('/projects/my-proj/src/admin/foo.module.ts' as Path);
+    });
+
     it('should find a module using custom ext', () => {
       tree.create('/projects/my-proj/src/app_module.ts', '');
       options.module = 'app';

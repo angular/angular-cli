@@ -5,7 +5,15 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Path, join, normalize, relative, strings } from '@angular-devkit/core';
+import {
+  NormalizedRoot,
+  Path,
+  dirname,
+  join,
+  normalize,
+  relative,
+  strings,
+} from '@angular-devkit/core';
 import { DirEntry, Tree } from '@angular-devkit/schematics';
 
 
@@ -39,22 +47,40 @@ export function findModuleFromOptions(host: Tree, options: ModuleOptions): Path 
 
     return normalize(findModule(host, pathToCheck, moduleExt, routingModuleExt));
   } else {
-    const modulePath = normalize(
-      '/' + (options.path) + '/' + options.module);
+    const modulePath = normalize(`/${options.path}/${options.module}`);
+    const componentPath = normalize(`/${options.path}/${options.name}`);
     const moduleBaseName = normalize(modulePath).split('/').pop();
 
-    const candidates = [
-      modulePath,
-      `${modulePath}.ts`,
-      `${modulePath}${moduleExt}`,
-      `${modulePath}/${moduleBaseName}${moduleExt}`,
-    ];
-    for (const c of candidates) {
-      if (host.exists(c)) {
-        return normalize(c);
+    const candidateSet = new Set<Path>([
+      normalize(options.path || '/'),
+    ]);
+
+    for (let dir = modulePath; dir != NormalizedRoot; dir = dirname(dir)) {
+      candidateSet.add(dir);
+    }
+    for (let dir = componentPath; dir != NormalizedRoot; dir = dirname(dir)) {
+      candidateSet.add(dir);
+    }
+
+    const candidatesDirs = [...candidateSet].sort((a, b) => b.length - a.length);
+    for (const c of candidatesDirs) {
+      const candidateFiles = [
+        '',
+        `${moduleBaseName}.ts`,
+        `${moduleBaseName}${moduleExt}`,
+      ].map(x => join(c, x));
+
+      for (const sc of candidateFiles) {
+        if (host.exists(sc)) {
+          return normalize(sc);
+        }
       }
     }
-    throw new Error(`Specified module '${options.module}' does not exist.`);
+
+    throw new Error(
+      `Specified module '${options.module}' does not exist.\n`
+        + `Looked in the following directories:\n    ${candidatesDirs.join('\n    ')}`,
+    );
   }
 }
 
