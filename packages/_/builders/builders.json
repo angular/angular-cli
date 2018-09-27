@@ -1,0 +1,10 @@
+{
+  "$schema": "../architect/src/builders-schema.json",
+  "builders": {
+    "true": {
+      "class": "./src/true",
+      "schema": "./src/noop-schema.json",
+      "description": "Always succeed."
+    }
+  }
+}

@@ -45,6 +45,10 @@
       "version": "0.9.0-beta.4",
       "hash": "a9b1f213a4069f789d20021bda616775"
     },
+    "@_/builders": {
+      "version": "0.9.0-beta.4",
+      "hash": ""
+    },
     "devkit": {
       "version": "0.9.0-beta.4",
       "hash": "30ac66398ef7b4f7a5dbd3192d24c665"
