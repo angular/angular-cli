@@ -56,9 +56,13 @@
     });
 
   for (const scope of scopes) {
-    const scopeCommits = commits
-      .filter(x => x.scope === scope)
-      .filter(x => ['fix', 'feat'].includes(x.type));
+    // Do feature first, then fixes.
+    const allScopeCommits = commits.filter(x => x.scope === scope);
+
+    const scopeCommits = [
+      ...allScopeCommits.filter(x => x.type === 'feat'),
+      ...allScopeCommits.filter(x => x.type === 'fix'),
+    ];
 
     if (scopeCommits.length == 0) {
         continue;
