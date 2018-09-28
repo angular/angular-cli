@@ -71,6 +71,11 @@
       "type": "string",
       "default": "projects"
     },
+    "projectRoot": {
+      "description": "The root for the initial project.",
+      "type": "string",
+      "default": ""
+    },
     "inlineStyle": {
       "description": "Specifies if the style will be in the ts file.",
       "type": "boolean",

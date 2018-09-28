@@ -38,6 +38,19 @@ describe('Ng New Schematic', () => {
     expect(files.indexOf('/bar/src/app/app.module.ts')).toBeGreaterThanOrEqual(0);
   });
 
+  it('should create files in the project root', () => {
+    const options = { ...defaultOptions, projectRoot: 'new-project' };
+
+    const tree = schematicRunner.runSchematic('ng-new', options);
+    const files = tree.files;
+    expect(files).toContain('/bar/new-project/src/tsconfig.app.json');
+    expect(files).toContain('/bar/new-project/src/main.ts');
+    expect(files).toContain('/bar/new-project/src/app/app.module.ts');
+
+    const content = tree.readContent('/bar/angular.json');
+    expect(content).toMatch(/"sourceRoot": "new-project\/src"/);
+  });
+
   it('should should set the prefix in angular.json and in app.component.ts', () => {
     const options = { ...defaultOptions, prefix: 'pre' };
 
