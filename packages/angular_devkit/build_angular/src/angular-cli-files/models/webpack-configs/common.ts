@@ -150,11 +150,6 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
     const copyWebpackPluginInstance = new CopyWebpackPlugin(copyWebpackPluginPatterns,
       copyWebpackPluginOptions);
-
-    // Save options so we can use them in eject.
-    (copyWebpackPluginInstance as any)['copyWebpackPluginPatterns'] = copyWebpackPluginPatterns;
-    (copyWebpackPluginInstance as any)['copyWebpackPluginOptions'] = copyWebpackPluginOptions;
-
     extraPlugins.push(copyWebpackPluginInstance);
   }
 
