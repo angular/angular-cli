@@ -32,4 +32,9 @@ export interface KarmaBuilderSchema extends Pick<BrowserBuilderSchema,
    * Globs to exclude from code coverage.
    */
   codeCoverageExclude: string[];
+
+  /**
+   * Karma reporters to use. Directly passed to the karma runner.
+   */
+  reporters?: string[];
 }

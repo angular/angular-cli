@@ -1261,6 +1261,13 @@
                 ]
               },
               "default": []
+            },
+            "reporters": {
+              "type": "array",
+              "description": "Karma reporters to use. Directly passed to the karma runner.",
+              "items": {
+                "type": "string"
+              }
             }
           },
           "additionalProperties": false,
