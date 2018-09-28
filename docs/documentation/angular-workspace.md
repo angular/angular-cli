@@ -8,7 +8,7 @@
 
 - **newProjectRoot** (`string`): Path where new projects will be created.
 
-- **defaultProject** (`string`): Default project name used in commands.
+- **defaultProject** (`string`): (**DEPRECATED**) Default project name used in commands.
 
 - **cli**: Workspace configuration options for Angular CLI.
   - *defaultCollection* (`string`): The default schematics collection to use.

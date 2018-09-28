@@ -271,21 +271,7 @@ export abstract class SchematicCommand<
 
     workflow.registry.addSmartDefaultProvider('projectName', () => {
       if (this._workspace) {
-        try {
-          return this._workspace.getProjectByPath(normalize(process.cwd()))
-            || this._workspace.getDefaultProjectName();
-        } catch (e) {
-          if (e instanceof experimental.workspace.AmbiguousProjectPathException) {
-            this.logger.warn(tags.oneLine`
-              Two or more projects are using identical roots.
-              Unable to determine project using current working directory.
-              Using default workspace project instead.
-            `);
-
-            return this._workspace.getDefaultProjectName();
-          }
-          throw e;
-        }
+        return getProjectByCwd(this._workspace, this.logger);
       }
 
       return undefined;

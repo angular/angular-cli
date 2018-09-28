@@ -11,9 +11,11 @@ import {
   JsonObject,
   JsonParseMode,
   experimental,
+  logging,
   normalize,
   parseJson,
   parseJsonAst,
+  tags,
   virtualFs,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
@@ -140,11 +142,21 @@ export function validateWorkspace(json: JsonObject) {
   return true;
 }
 
-export function getProjectByCwd(workspace: experimental.workspace.Workspace): string | null {
+export function getProjectByCwd(
+  workspace: experimental.workspace.Workspace,
+  logger: logging.Logger = new logging.NullLogger(),
+): string | null {
   try {
     return workspace.getProjectByPath(normalize(process.cwd()));
   } catch (e) {
     if (e instanceof experimental.workspace.AmbiguousProjectPathException) {
+      logger.warn(tags.oneLine`
+        Two or more projects are using identical roots.
+        Unable to determine project using current working directory.
+        Using default workspace project instead.
+      `);
+      logger.warn(`The defaultProject property is DEPRECATED and will be removed in CLI v8.`);
+
       return workspace.getDefaultProjectName();
     }
     throw e;

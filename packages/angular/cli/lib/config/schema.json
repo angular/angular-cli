@@ -22,7 +22,7 @@
     },
     "defaultProject": {
       "type": "string",
-      "description": "Default project name used in commands."
+      "description": "(DEPRECATED) Default project name used in commands."
     },
     "projects": {
       "type": "object",

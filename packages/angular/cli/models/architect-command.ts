@@ -15,6 +15,7 @@ import { experimental, json, schema, tags } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import { from } from 'rxjs';
 import { concatMap, map, tap, toArray } from 'rxjs/operators';
+import { getProjectByCwd } from '../utilities/config';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
 import { BaseCommandOptions, Command } from './command';
 import { Arguments } from './interface';
@@ -212,11 +213,11 @@ export abstract class ArchitectCommand<
       // For multi target commands, we always list all projects that have the target.
       return allProjectsForTargetName;
     } else {
-      // For single target commands, we try the default project first,
+      // For single target commands, we try the current project first,
       // then the full list if it has a single project, then error out.
-      const maybeDefaultProject = this._workspace.getDefaultProjectName();
-      if (maybeDefaultProject && allProjectsForTargetName.includes(maybeDefaultProject)) {
-        return [maybeDefaultProject];
+      const maybeCurrentProject = getProjectByCwd(this._workspace, this.logger);
+      if (maybeCurrentProject && allProjectsForTargetName.includes(maybeCurrentProject)) {
+        return [maybeCurrentProject];
       }
 
       if (allProjectsForTargetName.length === 1) {
