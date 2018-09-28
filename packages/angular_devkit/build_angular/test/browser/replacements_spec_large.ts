@@ -8,7 +8,8 @@
 
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { debounceTime, take, tap } from 'rxjs/operators';
+import { timer } from 'rxjs';
+import { debounce, take, tap } from 'rxjs/operators';
 import { browserTargetSpec, host } from '../utils';
 
 
@@ -115,7 +116,7 @@ describe('Browser Builder file replacements', () => {
     let buildNumber = 0;
 
     runTargetSpec(host, browserTargetSpec, overrides, 45000).pipe(
-      debounceTime(1000),
+      debounce(() => timer(1000)),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js');
