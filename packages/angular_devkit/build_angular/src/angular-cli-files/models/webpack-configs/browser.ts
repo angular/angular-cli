@@ -39,6 +39,17 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }
   }
 
+  if (buildOptions.index) {
+    extraPlugins.push(new IndexHtmlWebpackPlugin({
+      input: path.resolve(root, buildOptions.index),
+      output: path.basename(buildOptions.index),
+      baseHref: buildOptions.baseHref,
+      entrypoints: generateEntryPoints(buildOptions),
+      deployUrl: buildOptions.deployUrl,
+      sri: buildOptions.subresourceIntegrity,
+    }));
+  }
+
   if (buildOptions.subresourceIntegrity) {
     extraPlugins.push(new SubresourceIntegrityPlugin({
       hashFuncNames: ['sha384']
@@ -102,16 +113,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
         }
       }
     },
-    plugins: extraPlugins.concat([
-      new IndexHtmlWebpackPlugin({
-        input: path.resolve(root, buildOptions.index),
-        output: path.basename(buildOptions.index),
-        baseHref: buildOptions.baseHref,
-        entrypoints: generateEntryPoints(buildOptions),
-        deployUrl: buildOptions.deployUrl,
-        sri: buildOptions.subresourceIntegrity,
-      }),
-    ]),
+    plugins: extraPlugins,
     node: false,
   };
 }
