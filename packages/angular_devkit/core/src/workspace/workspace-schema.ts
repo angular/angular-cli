@@ -20,6 +20,7 @@ export interface WorkspaceSchema {
    */
   newProjectRoot?: string;
   /**
+   * @deprecated From 7.0.0
    * The default project.
    */
   defaultProject?: string;

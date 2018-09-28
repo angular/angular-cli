@@ -19,7 +19,7 @@
     },
     "defaultProject": {
       "type": "string",
-      "description": "The default project."
+      "description": "(DEPRECATED) The default project."
     },
     "cli": {
       "$ref": "#/definitions/tool",

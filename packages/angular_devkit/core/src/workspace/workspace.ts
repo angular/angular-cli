@@ -140,6 +140,9 @@ export class Workspace {
     return workspaceProjectClone;
   }
 
+  /**
+   * @deprecated From 7.0.0
+   */
   getDefaultProjectName(): string | null {
     this._assertLoaded();
 
