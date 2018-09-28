@@ -174,9 +174,11 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     blocked = [];
   }
 
+  let lastCompilationHash: string | undefined;
   compiler.hooks.done.tap('karma', (stats: any) => {
-    // Don't refresh karma when there are webpack errors.
-    if (stats.compilation.errors.length === 0) {
+    // Refresh karma only when there are no webpack errors, and if the compilation changed.
+    if (stats.compilation.errors.length === 0 && stats.hash != lastCompilationHash) {
+      lastCompilationHash = stats.hash;
       emitter.refreshFiles();
     }
     unblock();

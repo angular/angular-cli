@@ -13,7 +13,8 @@ import { host, karmaTargetSpec } from '../utils';
 
 // Karma watch mode is currently bugged:
 // - errors print a huge stack trace
-// - karma does not have a way to close the server gracefully.
+// - karma does not have a way to close the server
+//   gracefully (https://github.com/karma-runner/karma/issues/3149)
 // TODO: fix these before 6.0 final.
 xdescribe('Karma Builder watch mode', () => {
   beforeEach(done => host.initialize().toPromise().then(done, done.fail));
@@ -63,5 +64,10 @@ xdescribe('Karma Builder watch mode', () => {
       }),
       take(3),
     ).toPromise().then(done, done.fail);
+  }, 30000);
+
+  it('does not rebuild when nothing changed', (done) => {
+    // Start the server in watch mode, wait for the first build to finish, touch
+    // test.js without changing it, wait 5s then exit unsuscribe, verify only one event was emitted.
   }, 30000);
 });
