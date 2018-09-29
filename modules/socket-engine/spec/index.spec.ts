@@ -1,6 +1,6 @@
 
 import { ServerModule } from '@angular/platform-server';
-import { NgModule, Component } from '@angular/core';
+import { NgModule, Component, Inject, InjectionToken } from '@angular/core';
 import 'zone.js';
 
 import { BrowserModule } from '@angular/platform-browser';
@@ -87,5 +87,29 @@ describe('test runner', () => {
     const result = await sendAndRecieve(renderOptions, template);
     expect(result.error).toBeUndefined();
     done();
+  });
+  it('should be able to inject some token', async(done) => {
+    const SOME_TOKEN = new InjectionToken<string>('SOME_TOKEN');
+    const someValue = {message: 'value' + new Date()};
+    @Component({
+      selector: 'root',
+      template: `message:{{_someToken.message}}`
+    })
+    class MockComponent {constructor(@Inject(SOME_TOKEN) public readonly _someToken: any) {}}
+    const appModule = makeTestingModule('', MockComponent);
+    const server = await startSocketEngine(appModule, [{provide: SOME_TOKEN, useValue: someValue}]);
+
+    const client = net.createConnection(9090, 'localhost', () => {
+      const renderOptions = {id: 1, url: '/path',
+      document: '<root></root>'} as SocketEngineRenderOptions;
+      client.write(JSON.stringify(renderOptions));
+    });
+
+    client.on('data', data => {
+      const res = JSON.parse(data.toString()) as SocketEngineResponse;
+      server.close();
+      expect(res.html).toContain(someValue.message);
+      done();
+    });
   });
 });

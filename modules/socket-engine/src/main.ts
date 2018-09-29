@@ -7,7 +7,7 @@
  */
 import { ɵCommonEngine as CommonEngine,
   ɵRenderOptions as RenderOptions } from '@nguniversal/common/engine';
-import { NgModuleFactory, Type } from '@angular/core';
+import { NgModuleFactory, Type, StaticProvider } from '@angular/core';
 import * as net from 'net';
 
 export interface SocketEngineServer {
@@ -26,11 +26,12 @@ export interface SocketEngineResponse {
 
 export function startSocketEngine(
   moduleOrFactory: Type<{}> | NgModuleFactory<{}>,
+  providers: StaticProvider[] = [],
   host = 'localhost',
   port = 9090
 ): Promise<SocketEngineServer> {
   return new Promise((resolve, _reject) => {
-    const engine = new CommonEngine(moduleOrFactory);
+    const engine = new CommonEngine(moduleOrFactory, providers);
 
     const server = net.createServer(socket => {
       socket.on('data', async buff => {
