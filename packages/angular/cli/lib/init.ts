@@ -16,7 +16,8 @@ import { SemVer } from 'semver';
 import { Duplex } from 'stream';
 import { isWarningEnabled } from '../utilities/config';
 
-import { Profiler } from 'v8-profiler';
+// from @types/v8-profiler (no dependency to v8-profiler as we use v8-profiler-node8)
+import { Profiler } from 'v8-profiler'; // tslint:disable-line:no-implicit-dependencies
 
 const packageJson = require('../package.json');
 
