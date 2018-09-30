@@ -226,6 +226,28 @@ Then you can add breakpoints in `dist/@angular` files.
 
 For more informations about Node.js debugging in VS Code, see the related [VS Code Documentation](https://code.visualstudio.com/docs/nodejs/nodejs-debugging).
 
+### CPU Profiling
+
+In order to investigate performance issues, CPU profiling is often usefull.
+
+To capture a CPU profiling, you can:
+1. install the v8-profiler-node8 dependency: `npm install v8-profiler-node8 --no-save`
+1. set the NG_CLI_PROFILING Environment variable to the file name you want:
+    * on Unix systems (Linux & Mac OS X): ̀`export NG_CLI_PROFILING=my-profile`
+    * on Windows: ̀̀`setx NG_CLI_PROFILING my-profile`
+
+Then, just run the ng command on which you want to capture a CPU profile.
+You will then obtain a `my-profile.cpuprofile` file in the folder from wich you ran the ng command.
+
+You can use the Chrome Devtools to process it. To do so:
+1. open `chrome://inspect/#devices` in Chrome
+1. click on "Open dedicated DevTools for Node"
+1. go to the "profiler" tab
+1. click on the "Load" button and select the generated .cpuprofile file
+1. on the left panel, select the associated file
+
+In addition to this one, another, more elaborated way to capture a CPU profile using the Chrome Devtools is detailed in https://github.com/angular/angular-cli/issues/8259#issue-269908550.
+
 ## Documentation
 
 The documentation for the Angular CLI is located in this repo's [wiki](https://github.com/angular/angular-cli/wiki).
