@@ -16,6 +16,8 @@ import { SemVer } from 'semver';
 import { Duplex } from 'stream';
 import { isWarningEnabled } from '../utilities/config';
 
+import { Profiler } from 'v8-profiler';
+
 const packageJson = require('../package.json');
 
 function _fromPackageJson(cwd?: string) {
@@ -43,7 +45,7 @@ function _fromPackageJson(cwd?: string) {
 
 // Check if we need to profile this CLI run.
 if (process.env['NG_CLI_PROFILING']) {
-  let profiler: any = null;
+  let profiler: Profiler;
   try {
     profiler = require('v8-profiler-node8'); // tslint:disable-line:no-implicit-dependencies
   } catch (err) {
