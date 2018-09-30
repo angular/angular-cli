@@ -158,11 +158,14 @@ You can find more details about changes between versions in [the Releases tab on
 
 ## Development Hints for working on Angular CLI
 
+
 ### Working with master
+
+> **NB**: as we now use Yarn Workspaces (see https://github.com/angular/angular-cli/pull/11766), using Yarn for dependencies install is mandatory. However, you can still (but don't have to) use npm for other operations.
 
 ```bash
 git clone https://github.com/angular/angular-cli.git
-npm install
+yarn install
 npm run build
 cd dist/@angular/cli
 npm link
