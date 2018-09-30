@@ -205,7 +205,7 @@ export async function parseJsonSchemaToOptions(
 
     let defaultValue: string | number | boolean | undefined = undefined;
     if (current.default !== undefined) {
-      switch (types[0]) {
+      switch (types[0] as string) {
         case 'string':
           if (typeof current.default == 'string') {
             defaultValue = current.default;
