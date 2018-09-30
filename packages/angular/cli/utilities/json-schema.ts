@@ -19,16 +19,20 @@ import {
   Value,
 } from '../models/interface';
 
-function _getEnumFromValue<E, T extends string>(v: json.JsonValue, e: E, d: T): T {
-  if (typeof v !== 'string') {
-    return d;
+function _getEnumFromValue<E, T extends E[keyof E]>(
+  value: json.JsonValue,
+  enumeration: E,
+  defaultValue: T,
+): T {
+  if (typeof value !== 'string') {
+    return defaultValue;
   }
 
-  if (Object.values(e).indexOf(v) !== -1) {
-    return v as T;
+  if (Object.values(enumeration).indexOf(value) !== -1) {
+    return value as unknown as T;
   }
 
-  return d;
+  return defaultValue;
 }
 
 export async function parseJsonSchemaToSubCommandDescription(
@@ -232,9 +236,9 @@ export async function parseJsonSchemaToOptions(
       ? $defaultIndex : undefined;
 
     const required = json.isJsonArray(current.required)
-        ? current.required.indexOf(name) != -1 : false;
+      ? current.required.indexOf(name) != -1 : false;
     const aliases = json.isJsonArray(current.aliases) ? [...current.aliases].map(x => '' + x)
-                  : current.alias ? ['' + current.alias] : [];
+      : current.alias ? ['' + current.alias] : [];
     const format = typeof current.format == 'string' ? current.format : undefined;
     const visible = current.visible === undefined || current.visible === true;
     const hidden = !!current.hidden || !visible;

@@ -68,11 +68,11 @@
     "quicktype-core": "^5.0.41",
     "temp": "^0.8.3",
     "tslint": "^5.11.0",
-    "typescript": "~3.0.1"
+    "typescript": "~3.1.1"
   },
   "devDependencies": {
-    "@angular/compiler": "^7.0.0-beta.4",
-    "@angular/compiler-cli": "^7.0.0-beta.4",
+    "@angular/compiler": "^7.0.0-rc.0",
+    "@angular/compiler-cli": "^7.0.0-rc.0",
     "@bazel/typescript": "0.16.1",
     "@ngtools/json-schema": "^1.1.0",
     "@types/copy-webpack-plugin": "^4.4.1",
