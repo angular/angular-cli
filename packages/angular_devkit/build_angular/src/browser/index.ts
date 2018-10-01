@@ -132,6 +132,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
 
     wco = {
       root: getSystemPath(root),
+      logger: this.context.logger,
       projectRoot: getSystemPath(projectRoot),
       buildOptions: options,
       tsConfig,

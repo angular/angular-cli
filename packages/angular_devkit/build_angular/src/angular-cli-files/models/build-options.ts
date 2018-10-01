@@ -8,8 +8,8 @@
 
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
-// tslint:disable-next-line:no-implicit-dependencies
-import * as ts from 'typescript';
+import { logging } from '@angular-devkit/core';
+import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import {
   AssetPatternObject,
   Budget,
@@ -74,6 +74,7 @@ export interface WebpackTestOptions extends BuildOptions {
 
 export interface WebpackConfigOptions<T = BuildOptions> {
   root: string;
+  logger: logging.Logger;
   projectRoot: string;
   sourceRoot?: string;
   buildOptions: T;

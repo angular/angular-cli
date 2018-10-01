@@ -83,6 +83,7 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
 
     wco = {
       root: getSystemPath(root),
+      logger: this.context.logger,
       projectRoot: getSystemPath(projectRoot),
       // TODO: use only this.options, it contains all flags and configs items already.
       buildOptions: {
