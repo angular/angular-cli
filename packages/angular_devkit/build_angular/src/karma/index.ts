@@ -143,6 +143,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
 
     wco = {
       root: getSystemPath(root),
+      logger: this.context.logger,
       projectRoot: getSystemPath(projectRoot),
       sourceRoot: sourceRoot && getSystemPath(sourceRoot),
       // TODO: use only this.options, it contains all flags and configs items already.

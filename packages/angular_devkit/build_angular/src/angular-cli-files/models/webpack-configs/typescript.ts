@@ -81,6 +81,7 @@ function _createAotPlugin(
     nameLazyFiles: buildOptions.namedChunks,
     forkTypeChecker: buildOptions.forkTypeChecker,
     contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
+    logger: wco.logger,
     ...options,
   };
   return new AngularCompilerPlugin(pluginOptions);
