@@ -22,14 +22,6 @@
           "$default": {
             "$source": "argv"
           }
-        },
-        "dryRun": {
-          "type": "boolean",
-          "default": false,
-          "aliases": [
-            "d"
-          ],
-          "description": "Run through without making any changes."
         }
       },
       "required": [

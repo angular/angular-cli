@@ -54,7 +54,7 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
       collectionName: this.collectionName,
       schematicName: this.schematicName,
       schematicOptions: options['--'],
-      dryRun: options.dryRun,
+      dryRun: !!options.dryRun,
       force: false,
       showNothingDone: false,
     });
