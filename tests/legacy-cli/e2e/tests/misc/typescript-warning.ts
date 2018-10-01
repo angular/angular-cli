@@ -3,9 +3,16 @@ import { updateJsonFile } from '../../utils/project';
 
 export default async function () {
   // typescript@2.8.0-dev.20180320 is not part of the officially supported range in latest stable.
-  let unsupportedTsVersion = '2.8.0-dev.20180320';
+  const unsupportedTsVersion = '2.8.0-dev.20180320';
 
   await updateJsonFile('src/tsconfig.app.json', configJson => {
+    // skipLibCheck is required because declerations
+    // emitted in TS 3.1 are not compatable with TS 2.8
+    // Thus it will exit with a non zero error code.
+    configJson.compilerOptions = {
+      ...configJson.compilerOptions,
+      skipLibCheck: true,
+    };
     configJson.angularCompilerOptions = {
       ...configJson.angularCompilerOptions,
       disableTypeScriptVersionCheck: true,
