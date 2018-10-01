@@ -11,6 +11,14 @@
 
   "type": "object",
   "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project to build.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
     "configuration": {
       "description": "Specify the configuration to use.",
       "type": "string",
