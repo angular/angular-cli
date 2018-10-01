@@ -139,7 +139,7 @@ export function useSha() {
             = `github:angular/${pkgName}-builds${label}`;
         });
 
-      json['devDependencies']['typescript'] = '~3.0.1';
+      json['devDependencies']['typescript'] = '~3.1.1';
     });
   } else {
     return Promise.resolve();
