@@ -13,6 +13,6 @@ export const latestVersions = {
   ZoneJs: '~0.8.26',
   TypeScript: '~3.1.1',
   // The versions below must be manually updated when making a new devkit release.
-  DevkitBuildAngular: '~0.9.0-beta.1',
-  DevkitBuildNgPackagr: '~0.9.0-beta.1',
+  DevkitBuildAngular: '~0.9.0-rc.1',
+  DevkitBuildNgPackagr: '~0.9.0-rc.1',
 };
