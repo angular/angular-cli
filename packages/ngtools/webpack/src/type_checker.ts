@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { normalize, resolve, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import {
   CompilerHost,
@@ -33,12 +34,25 @@ export class TypeChecker {
     _basePath: string,
     private _JitMode: boolean,
     private _rootNames: string[],
+    hostReplacementPaths: { [path: string]: string },
   ) {
     time('TypeChecker.constructor');
+    const host = new virtualFs.AliasHost(new NodeJsSyncHost());
+
+    // Add file replacements.
+    for (const from in hostReplacementPaths) {
+      const normalizedFrom = resolve(normalize(_basePath), normalize(from));
+      const normalizedWith = resolve(
+        normalize(_basePath),
+        normalize(hostReplacementPaths[from]),
+      );
+      host.aliases.set(normalizedFrom, normalizedWith);
+    }
+
     const compilerHost = new WebpackCompilerHost(
       _compilerOptions,
       _basePath,
-      new NodeJsSyncHost(),
+      host,
     );
     // We don't set a async resource loader on the compiler host because we only support
     // html templates, which are the only ones that can throw errors, and those can be loaded

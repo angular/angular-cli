@@ -602,8 +602,13 @@ export class AngularCompilerPlugin {
   private _updateForkedTypeChecker(rootNames: string[], changedCompilationFiles: string[]) {
     if (this._typeCheckerProcess) {
       if (!this._forkedTypeCheckerInitialized) {
+        let hostReplacementPaths = {};
+        if (this._options.hostReplacementPaths
+          && typeof this._options.hostReplacementPaths != 'function') {
+          hostReplacementPaths = this._options.hostReplacementPaths;
+        }
         this._typeCheckerProcess.send(new InitMessage(this._compilerOptions, this._basePath,
-          this._JitMode, this._rootNames));
+          this._JitMode, this._rootNames, hostReplacementPaths));
         this._forkedTypeCheckerInitialized = true;
       }
       this._typeCheckerProcess.send(new UpdateMessage(rootNames, changedCompilationFiles));
