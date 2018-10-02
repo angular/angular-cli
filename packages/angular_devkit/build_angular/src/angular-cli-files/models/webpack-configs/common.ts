@@ -19,7 +19,7 @@ import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 import { findUp } from '../../utilities/find-up';
-import { AssetPatternObject, ExtraEntryPoint } from '../../../browser/schema';
+import { AssetPatternObject } from '../../../browser/schema';
 import { normalizeExtraEntryPoints } from './utils';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
@@ -213,9 +213,6 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     const rxPaths = requireProjectModule(projectRoot, rxjsPathMappingImport);
     alias = rxPaths(nodeModules);
   } catch { }
-
-  const isIvyEnabled = wco.tsConfig.raw.angularCompilerOptions
-                    && wco.tsConfig.raw.angularCompilerOptions.enableIvy;
 
   const terserOptions = {
     ecma: wco.supportES2015 ? 6 : 5,

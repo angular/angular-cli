@@ -15,8 +15,6 @@ import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 import { generateEntryPoints, packageChunkSort } from '../../utilities/package-chunk-sort';
 import { BaseHrefWebpackPlugin } from '../../lib/base-href-webpack';
 import { IndexHtmlWebpackPlugin } from '../../plugins/index-html-webpack-plugin';
-import { ExtraEntryPoint } from '../../../browser/schema';
-import { BrowserBuilderSchema } from '../../../browser/schema';
 import { WebpackConfigOptions } from '../build-options';
 import { normalizeExtraEntryPoints } from './utils';
 
