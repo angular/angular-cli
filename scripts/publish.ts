@@ -6,10 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-implicit-dependencies
-import { logging } from '@angular-devkit/core';
+import { logging, tags } from '@angular-devkit/core';
 import { spawnSync } from 'child_process';
 import { packages } from '../lib/packages';
 import build from './build';
+
+
+export interface PublishArgs {
+  tag?: string;
+  branchCheck?: boolean;
+}
 
 
 function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
@@ -29,7 +35,28 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
 }
 
 
-export default async function (args: { tag?: string }, logger: logging.Logger) {
+function _branchCheck(args: PublishArgs, logger: logging.Logger) {
+  logger.info('Checking branch...');
+  const ref = _exec('git', ['symbolic-ref', 'HEAD'], {}, logger);
+  const branch = ref.trim().replace(/^refs\/heads\//, '');
+
+  switch (branch) {
+    case 'master':
+      if (args.tag !== 'next') {
+        throw new Error(tags.oneLine`
+          Releasing from master requires a next tag. Use --branchCheck=false to skip this check.
+        `);
+      }
+  }
+}
+
+
+export default async function (args: PublishArgs, logger: logging.Logger) {
+  if (args.branchCheck === undefined || args.branchCheck === true) {
+    _branchCheck(args, logger);
+  }
+
+
   logger.info('Building...');
   await build({}, logger.createChild('build'));
 
