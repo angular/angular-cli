@@ -293,6 +293,20 @@ describe('Browser Builder styles', () => {
     ).toPromise().then(done, done.fail);
   }, 30000);
 
+  it(`supports font-awesome imports without extractCss`, (done) => {
+    host.writeMultipleFiles({
+      'src/styles.scss': `
+        @import "~font-awesome/css/font-awesome.css";
+      `,
+    });
+
+    const overrides = { extractCss: false, styles: [`src/styles.scss`] };
+
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+    ).toPromise().then(done, done.fail);
+  }, 30000);
+
   it(`uses autoprefixer`, (done) => {
     host.writeMultipleFiles({
       'src/styles.css': tags.stripIndents`
