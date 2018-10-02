@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { interpolateName } from 'loader-utils';
+import * as path from 'path';
 import * as postcss from 'postcss';
 import * as url from 'url';
 import * as webpack from 'webpack';
@@ -52,7 +53,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
 
   const dedupeSlashes = (url: string) => url.replace(/\/\/+/g, '/');
 
-  const process = async (inputUrl: string, resourceCache: Map<string, string>) => {
+  const process = async (inputUrl: string, context: string, resourceCache: Map<string, string>) => {
     // If root-relative or absolute, leave as is
     if (inputUrl.match(/^(?:\w+:\/\/|data:|chrome:|#)/)) {
       return inputUrl;
@@ -63,7 +64,8 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
       return inputUrl.substr(1);
     }
 
-    const cachedUrl = resourceCache.get(inputUrl);
+    const cacheKey = path.resolve(context, inputUrl);
+    const cachedUrl = resourceCache.get(cacheKey);
     if (cachedUrl) {
       return cachedUrl;
     }
@@ -85,7 +87,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
         outputUrl = dedupeSlashes(`/${baseHref}/${deployUrl}/${inputUrl}`);
       }
 
-      resourceCache.set(inputUrl, outputUrl);
+      resourceCache.set(cacheKey, outputUrl);
 
       return outputUrl;
     }
@@ -102,7 +104,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
       });
     });
 
-    const result = await resolve(pathname as string, loader.context, resolver);
+    const result = await resolve(pathname as string, context, resolver);
 
     return new Promise<string>((resolve, reject) => {
       loader.fs.readFile(result, (err: Error, content: Buffer) => {
@@ -130,7 +132,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
           outputUrl = url.resolve(deployUrl, outputUrl);
         }
 
-        resourceCache.set(inputUrl, outputUrl);
+        resourceCache.set(cacheKey, outputUrl);
         resolve(outputUrl);
       });
     });
@@ -158,12 +160,16 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
       let match;
       let lastIndex = 0;
       let modified = false;
+
+      // We want to load it relative to the file that imports
+      const context = path.dirname(decl.source.input.file);
+
       // tslint:disable-next-line:no-conditional-assignment
       while (match = urlRegex.exec(value)) {
         const originalUrl = match[1] || match[2] || match[3];
         let processedUrl;
         try {
-          processedUrl = await process(originalUrl, resourceCache);
+          processedUrl = await process(originalUrl, context, resourceCache);
         } catch (err) {
           loader.emitError(decl.error(err.message, { word: originalUrl }).toString());
           continue;
