@@ -463,12 +463,6 @@
   version "1.0.1"
   resolved "https://codeload.github.com/quicktype/types-urijs/tar.gz/a23603a04e31e883a92244bff8515e3d841a8b98"
 
-"@types/v8-profiler@^0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@types/v8-profiler/-/v8-profiler-0.0.5.tgz#2b9f0b7ba3294f5b177b66790607772910a195f9"
-  dependencies:
-    "@types/node" "*"
-
 "@types/webpack-dev-server@^3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@types/webpack-dev-server/-/webpack-dev-server-3.1.0.tgz#1fae06ad346d2dd09bc5e34745723946458eed58"
