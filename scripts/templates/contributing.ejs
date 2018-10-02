@@ -18,7 +18,10 @@ Help us keep Angular open and inclusive. Please read and follow our [Code of Con
 
 ## <a name="question"></a> Got a Question or Problem?
 
-Please, do not open issues for the general support questions as we want to keep GitHub issues for bug reports and feature requests. You've got much better chances of getting your question answered on [StackOverflow](https://stackoverflow.com/questions/tagged/angular-devkit) where the questions should be tagged with tag `angular-devkit`.
+Please, do not open issues for the general support questions as we want to keep GitHub issues for
+bug reports and feature requests. You've got much better chances of getting your question answered
+on [StackOverflow](https://stackoverflow.com/questions/tagged/angular-devkit) where the questions
+should be tagged with tag `angular-cli` or `angular-devkit`.
 
 StackOverflow is a much better place to ask questions since:
 
@@ -26,7 +29,8 @@ StackOverflow is a much better place to ask questions since:
 - questions and answers stay available for public viewing so your question / answer might help someone else
 - StackOverflow's voting system assures that the best answers are prominently visible.
 
-To save your and our time we will be systematically closing all the issues that are requests for general support and redirecting people to StackOverflow.
+To save your and our time we will be systematically closing all the issues that are requests for
+general support and redirecting people to StackOverflow.
 
 If you would like to chat about the question in real-time, you can reach out via [our gitter channel][gitter].
 
@@ -180,17 +184,18 @@ If the commit reverts a previous commit, it should begin with `revert: `, follow
 ### Type
 Must be one of the following:
 
-* **build**: Changes that affect the build system or external dependencies. [2]
-* **ci**: Changes to our CI configuration files and scripts. [2]
-* **docs**: Documentation only changes. 
-* **feat**: A new feature. [1]
-* **fix**: A bug fix. [1]
-* **refactor**: A code change that neither fixes a bug nor adds a feature 
-* **release**: A release commit. Must only include version changes. [2]
-* **revert**: A git commit revert. The description must include the original commit message. [2]
-* **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc). 
-* **test**: Adding missing tests or correcting existing tests. 
-
+<%
+const { types, Scope } = require('../validate-commits');
+for (const typeName of Object.keys(types).sort()) {
+  const type = types[typeName];
+%>* **<%= typeName %>**: <%= type.description %> <%
+  if (type.scope == Scope.MustHave) {
+    %>[1]<%
+  } else if (type.scope == Scope.MustNotHave) {
+    %>[2]<%
+  }
+%>
+<% } %>
 
 <sup>[1] This type MUST have a scope. See the next section for more information.</sup><br/>
 <sup>[2] This type MUST NOT have a scope. It only applies to general scripts and tooling.</sup>
@@ -200,22 +205,10 @@ The scope should be the name of the npm package affected as perceived by the per
 
 The following is the list of supported scopes:
 
-* **@angular/cli**
-* **@angular/pwa**
-* **@angular-devkit/architect**
-* **@angular-devkit/architect-cli**
-* **@angular-devkit/build-angular**
-* **@angular-devkit/build-ng-packagr**
-* **@angular-devkit/build-optimizer**
-* **@angular-devkit/build-webpack**
-* **@angular-devkit/core**
-* **@angular-devkit/schematics**
-* **@angular-devkit/schematics-cli**
-* **@ngtools/webpack**
-* **@schematics/angular**
-* **@schematics/schematics**
-* **@schematics/update**
-
+<%
+for (const packageName of Object.keys(packages).filter(x => !packages[x].private)) {
+%>* **<%= packageName %>**
+<% } %>
 
 ### Subject
 The subject contains succinct description of the change:

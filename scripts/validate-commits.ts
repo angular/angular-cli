@@ -28,6 +28,62 @@ const blacklist = [
 ];
 
 
+export enum Scope {
+  MustHave = 0,
+  MustNotHave = 1,
+  Either = 2,
+}
+
+export const types: { [t: string]: { description: string, scope: Scope } } = {
+  // Types that can contain both a scope or no scope.
+  'docs': {
+    description: 'Documentation only changes.',
+    scope: Scope.Either,
+  },
+  'refactor': {
+    description: 'A code change that neither fixes a bug nor adds a feature',
+    scope: Scope.Either,
+  },
+  'style': {
+    description: 'Changes that do not affect the meaning of the code (white-space, formatting, '
+               + 'missing semi-colons, etc).',
+    scope: Scope.Either,
+  },
+  'test': {
+    description: 'Adding missing tests or correcting existing tests.',
+    scope: Scope.Either,
+  },
+
+  // Types that MUST contain a scope.
+  'feat': {
+    description: 'A new feature.',
+    scope: Scope.MustHave,
+  },
+  'fix': {
+    description: 'A bug fix.',
+    scope: Scope.MustHave,
+  },
+
+  // Types that MUST NOT contain a scope.
+  'build': {
+    description: 'Changes that affect the build system or external dependencies.',
+    scope: Scope.MustNotHave,
+  },
+  'revert': {
+    description: 'A git commit revert. The description must include the original commit message.',
+    scope: Scope.MustNotHave,
+  },
+  'ci': {
+    description: 'Changes to our CI configuration files and scripts.',
+    scope: Scope.MustNotHave,
+  },
+  'release': {
+    description: 'A release commit. Must only include version changes.',
+    scope: Scope.MustNotHave,
+  },
+};
+
+
 export interface ValidateCommitsOptions {
   ci?: boolean;
   base?: string;
@@ -96,21 +152,19 @@ export default function (argv: ValidateCommitsOptions, logger: logging.Logger) {
     }
 
     const [type, scope] = subject.slice(1);
-    switch (type) {
-      // Types that can contain both a scope or no scope.
-      case 'docs':
-      case 'refactor':
-      case 'style':
-      case 'test':
+    if (!(type in types)) {
+      _invalid(sha, message, 'has an unknown type. You can use wip: to avoid this.');
+      continue;
+    }
+    switch (types[type].scope) {
+      case Scope.Either:
         if (scope && !packages[scope]) {
           _invalid(sha, message, 'has a scope that does not exist');
           continue;
         }
         break;
 
-      // Types that MUST contain a scope.
-      case 'feat':
-      case 'fix':
+      case Scope.MustHave:
         if (!scope) {
           _invalid(sha, message, 'should always have a scope');
           continue;
@@ -121,36 +175,24 @@ export default function (argv: ValidateCommitsOptions, logger: logging.Logger) {
         }
         break;
 
-      // Types that MUST NOT contain a scope.
-      case 'build':
-      case 'revert':
-      case 'ci':
+      case Scope.MustNotHave:
         if (scope) {
           _invalid(sha, message, 'should not have a scope');
           continue;
         }
         break;
+    }
 
-      case 'release':
-        if (scope) {
-          _invalid(sha, message, 'should not have a scope');
-          continue;
-        }
-        if (argv.ci && commits.length > 1) {
-          _invalid(sha, message, 'release should always be alone in a PR');
-          continue;
-        }
-        break;
-
-      case 'wip':
-        if (argv.ci) {
-          _invalid(sha, message, 'wip are not allowed in a PR');
-        }
-        break;
-
-      // Unknown types.
-      default:
-        _invalid(sha, message, 'has an unknown type. You can use wip: to avoid this.');
+    // Custom validation.
+    if (type == 'release') {
+      if (argv.ci && commits.length > 1) {
+        _invalid(sha, message, 'release should always be alone in a PR');
+        continue;
+      }
+    } else if (type == 'wip') {
+      if (argv.ci) {
+        _invalid(sha, message, 'wip are not allowed in a PR');
+      }
     }
   }
 

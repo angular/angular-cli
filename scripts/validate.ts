@@ -16,8 +16,6 @@ import validateLicenses from './validate-licenses';
 export default async function (options: { verbose: boolean }, logger: logging.Logger) {
   let error = false;
 
-  logger.info('Running templates validation...');
-  const templateLogger = logger.createChild('templates');
   if (execSync(`git status --porcelain`).toString()) {
     logger.error('There are local changes.');
     if (!options.verbose) {
@@ -25,7 +23,10 @@ export default async function (options: { verbose: boolean }, logger: logging.Lo
     }
     error = true;
   }
-  templates({}, templateLogger);
+
+  logger.info('Running templates validation...');
+  const templateLogger = logger.createChild('templates');
+  await templates({}, templateLogger);
   if (execSync(`git status --porcelain`).toString()) {
     logger.error(tags.oneLine`
       Running templates updated files... Please run "devkit-admin templates" before submitting

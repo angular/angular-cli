@@ -9,17 +9,27 @@
 import { logging } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
-import { packages } from '../lib/packages';
 
-export default function(_options: {}, logger: logging.Logger) {
-  const monorepo = require('../.monorepo.json');
 
-  logger.info('Building README...');
-  const readme = require('./templates/readme').default;
-  const content = readme({
-    monorepo,
-    packages,
+function _runTemplate(inputPath: string, outputPath: string, logger: logging.Logger) {
+  inputPath = path.resolve(__dirname, inputPath);
+  outputPath = path.resolve(__dirname, outputPath);
+
+  logger.info(`Building ${path.relative(path.dirname(__dirname), outputPath)}...`);
+
+  const template = require(inputPath).default;
+  const content = template({
+    monorepo: require('../.monorepo.json'),
+    packages: require('../lib/packages').packages,
     encode: (x: string) => global.encodeURIComponent(x),
+    require: (x: string) => require(path.resolve(path.dirname(inputPath), x)),
   });
-  fs.writeFileSync(path.join(__dirname, '../README.md'), content, 'utf-8');
+  fs.writeFileSync(outputPath, content, 'utf-8');
+}
+
+export default async function(_options: {}, logger: logging.Logger): Promise<number> {
+  _runTemplate('./templates/readme', '../README.md', logger);
+  _runTemplate('./templates/contributing', '../CONTRIBUTING.md', logger);
+
+  return 1;
 }
