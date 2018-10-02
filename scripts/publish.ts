@@ -8,6 +8,7 @@
 // tslint:disable:no-implicit-dependencies
 import { logging, tags } from '@angular-devkit/core';
 import { spawnSync } from 'child_process';
+import * as semver from 'semver';
 import { packages } from '../lib/packages';
 import build from './build';
 
@@ -15,6 +16,7 @@ import build from './build';
 export interface PublishArgs {
   tag?: string;
   branchCheck?: boolean;
+  versionCheck?: boolean;
 }
 
 
@@ -51,11 +53,34 @@ function _branchCheck(args: PublishArgs, logger: logging.Logger) {
 }
 
 
+function _versionCheck(args: PublishArgs, logger: logging.Logger) {
+  logger.info('Checking version...');
+  // Find _any_ version that's beta or RC.
+  let betaOrRc = false;
+  let version = '';
+  Object.keys(packages).forEach((name: string) => {
+    // If there's _ANY_ prerelease information, it's on.
+    if (semver.prerelease(packages[name].version)) {
+      betaOrRc = true;
+      version = packages[name].version;
+    }
+  });
+
+  if (betaOrRc && args.tag !== 'next') {
+    throw new Error(tags.oneLine`
+      Releasing version ${JSON.stringify(version)} requires a next tag.
+      Use --versionCheck=false to skip this check.
+    `);
+  }
+}
+
 export default async function (args: PublishArgs, logger: logging.Logger) {
   if (args.branchCheck === undefined || args.branchCheck === true) {
     _branchCheck(args, logger);
   }
-
+  if (args.versionCheck === undefined || args.versionCheck === true) {
+    _versionCheck(args, logger);
+  }
 
   logger.info('Building...');
   await build({}, logger.createChild('build'));
