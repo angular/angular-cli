@@ -25,28 +25,25 @@ This is the home of the DevKit and the Angular CLI code. You can find the Angula
 
 
 
-----
-
-This is the home for all the tools and libraries built to assist developers with their Angular applications.
-
 ### Quick Links
 [Gitter](https://gitter.im/angular/angular-cli) | [Contributing](https://github.com/angular/angular-cli/blob/master/CONTRIBUTING.md) | [Angular CLI](http://github.com/angular/angular-cli) | 
 |---|---|---|
 
+----
+
+## The Goal of Angular CLI
+
+The Angular CLI creates, manages, builds and test your Angular projects. It's built on top of the
+Angular DevKit.
 
 ## The Goal of DevKit
 
-Our goal is to provide a large set of libraries that can be used to manage, develop, deploy and
+DevKit's goal is to provide a large set of libraries that can be used to manage, develop, deploy and
 analyze your code.
 
-This is the extension of the Angular CLI Project. Once this set of tools is done, the Angular CLI
-as it is today will become one of many interfaces available to perform those tasks. Everything
-will also be available to third party tools and IDEs.
 
 
-
-
-## Tools
+# Tools
 
 | Project | Package | Version | Links |
 |---|---|---|---|
@@ -55,7 +52,7 @@ will also be available to third party tools and IDEs.
 
 
 
-## Packages
+# Packages
 This is a monorepo which contains many packages:
 
 
