@@ -93,6 +93,10 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
           // Pass onto Karma to emit BuildEvents.
           successCb: () => obs.next({ success: true }),
           failureCb: () => obs.next({ success: false }),
+          // Workaround for https://github.com/karma-runner/karma/issues/3154
+          // When this workaround is removed, user projects need to be updated to use a Karma
+          // version that has a fix for this issue.
+          toJSON: () => { },
         };
 
         // TODO: inside the configs, always use the project root and not the workspace root.
