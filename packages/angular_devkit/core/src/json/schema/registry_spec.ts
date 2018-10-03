@@ -433,4 +433,29 @@ describe('CoreSchemaRegistry', () => {
       .toPromise().then(done, done.fail);
   });
 
+  it('coerces properties', done => {
+    const registry = new CoreSchemaRegistry();
+    registry.addPostTransform(addUndefinedDefaults);
+    const data: any = { bool: 'true', num: '10', ary: 'foo' };
+
+    registry
+      .compile({
+        properties: {
+          bool: { type: 'boolean' },
+          ary: { type: 'array' },
+          num: { type: 'number' },
+        },
+      })
+      .pipe(
+        mergeMap(validator => validator(data)),
+        map(result => {
+          expect(result.success).toBe(true);
+          expect(data.bool).toBe(true);
+          expect(data.num).toBe(10);
+          expect(data.ary).toEqual(['foo']);
+        }),
+      )
+      .toPromise().then(done, done.fail);
+  });
+
 });
