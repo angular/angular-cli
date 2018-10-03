@@ -10,7 +10,7 @@
     },
     "tsConfig": {
       "description": "The name of the TypeScript configuration file.",
-      "oneOf": [
+      "anyOf": [
         { "type": "string" },
         {
           "type": "array",

@@ -115,6 +115,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       loadSchema: (uri: string) => this._fetch(uri),
       schemaId: 'auto',
       passContext: true,
+      coerceTypes: 'array',
     });
 
     this._ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'));
