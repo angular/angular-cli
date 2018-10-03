@@ -15,11 +15,11 @@ declare const global: {
 const kNanosecondsPerSeconds = 1e9;
 const kBenchmarkIterationMaxCount = 10000;
 const kBenchmarkTimeoutInMsec = 5000;
-const kWarmupIterationCount = 10;
+const kWarmupIterationCount = 100;
 const kTopMetricCount = 5;
 
 
-function _run(fn: () => void, collector: number[]) {
+function _run(fn: (i: number) => void, collector: number[]) {
   const timeout = Date.now();
   // Gather the first 5 seconds runs, or kMaxNumberOfIterations runs whichever comes first
   // (soft timeout).
@@ -28,7 +28,7 @@ function _run(fn: () => void, collector: number[]) {
        i++) {
     // Start time.
     const start = process.hrtime();
-    fn();
+    fn(i);
     // Get the stop difference time.
     const diff = process.hrtime(start);
 
@@ -41,13 +41,15 @@ function _run(fn: () => void, collector: number[]) {
 function _stats(metrics: number[]) {
   metrics.sort((a, b) => a - b);
 
-  const middle = metrics.length / 2;
+  const count = metrics.length;
+  const middle = count / 2;
   const mean = Number.isInteger(middle)
     ? metrics[middle] : ((metrics[middle - 0.5] + metrics[middle + 0.5]) / 2);
   const total = metrics.reduce((acc, curr) => acc + curr, 0);
-  const average = total / metrics.length;
+  const average = total / count;
 
   return {
+    count: count,
     fastest: metrics.slice(0, kTopMetricCount),
     slowest: metrics.reverse().slice(0, kTopMetricCount),
     mean,
@@ -56,12 +58,12 @@ function _stats(metrics: number[]) {
 }
 
 
-export function benchmark(name: string, fn: () => void, base?: () => void) {
+export function benchmark(name: string, fn: (i: number) => void, base?: (i: number) => void) {
   it(name + ' (time in nanoseconds)', (done) => {
     process.nextTick(() => {
       for (let i = 0; i < kWarmupIterationCount; i++) {
         // Warm it up.
-        fn();
+        fn(i);
       }
 
       const reporter = global.benchmarkReporter;
