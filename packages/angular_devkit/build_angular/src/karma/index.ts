@@ -73,9 +73,13 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
 
         if (options.reporters) {
           // Split along commas to make it more natural, and remove empty strings.
-          karmaOptions.reporters = options.reporters
+          const reporters = options.reporters
             .reduce<string[]>((acc, curr) => acc.concat(curr.split(/,/)), [])
             .filter(x => !!x);
+
+          if (reporters.length > 0) {
+            karmaOptions.reporters = reporters;
+          }
         }
 
         const sourceRoot = builderConfig.sourceRoot && resolve(root, builderConfig.sourceRoot);
