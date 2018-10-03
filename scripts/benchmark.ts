@@ -27,6 +27,7 @@ declare const global: {
 
 
 interface BenchmarkResult {
+  count: number;
   slowest: number[];
   fastest: number[];
   mean: number;
@@ -71,12 +72,17 @@ class BenchmarkReporter extends JasmineSpecReporter implements jasmine.CustomRep
         return p.substr(0, p.length - ('' + s).length) + s;
       }
 
+      const count = pad(stat.count);
       const fastest = stat.fastest.map(x => pad(x)).join('');
       const slowest = stat.slowest.map(x => pad(x)).join('');
       const mean = pad(Math.floor(stat.mean));
       const average = pad(Math.floor(stat.average));
       if (stat.base) {
-        const precision = (x: number) => ('' + Math.floor(x * 100)).replace(/(\d\d)$/, '.$1');
+        const precision = (x: number) => {
+          x = Math.floor(x * 100);
+
+          return `${Math.floor(x / 100)}.${Math.floor(x / 10) % 10}${x % 10}`;
+        };
         const multPad = '      ';
         const baseFastest = stat.base.fastest.map(x => pad(x)).join('');
         const baseSlowest = stat.base.slowest.map(x => pad(x)).join('');
@@ -86,6 +92,7 @@ class BenchmarkReporter extends JasmineSpecReporter implements jasmine.CustomRep
         const baseAverageMult = pad(precision(stat.average / stat.base.average), multPad);
 
         console.log(terminal.colors.yellow(tags.indentBy(6)`
+          count:   ${count}
           fastest: ${fastest}
             (base) ${baseFastest}
           slowest: ${slowest}
@@ -95,6 +102,7 @@ class BenchmarkReporter extends JasmineSpecReporter implements jasmine.CustomRep
         `));
       } else {
         console.log(terminal.colors.yellow(tags.indentBy(6)`
+          count:   ${count}
           fastest: ${fastest}
           slowest: ${slowest}
           mean:    ${mean}
@@ -120,12 +128,6 @@ global.benchmarkReporter = new BenchmarkReporter();
 runner.env.addReporter(global.benchmarkReporter);
 
 
-// Manually set exit code (needed with custom reporters)
-runner.onComplete((success: boolean) => {
-  process.exitCode = success ? 0 : 1;
-});
-
-
 // Run the tests.
 const allTests =
   glob.sync('packages/**/*_benchmark.ts')
@@ -134,5 +136,8 @@ const allTests =
 
 
 export default function(_args: {}) {
-  runner.execute(allTests);
+  return new Promise(resolve => {
+    runner.onComplete((passed: boolean) => resolve(passed ? 0 : 1));
+    runner.execute(allTests);
+  });
 }
