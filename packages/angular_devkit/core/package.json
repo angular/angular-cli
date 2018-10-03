@@ -11,7 +11,10 @@
     "ajv": "6.5.3",
     "chokidar": "2.0.4",
     "fast-json-stable-stringify": "2.0.0",
-    "source-map": "0.7.3",
-    "rxjs": "6.3.3"
+    "rxjs": "6.3.3",
+    "source-map": "0.7.3"
+  },
+  "devDependencies": {
+    "seedrandom": "^2.4.4"
   }
 }

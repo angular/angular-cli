@@ -186,8 +186,26 @@ export function fragment(path: string): PathFragment {
 
 
 /**
+ * normalize() cache to reduce computation. For now this grows and we never flush it, but in the
+ * future we might want to add a few cache flush to prevent this from growing too large.
+ */
+let normalizedCache = new Map<string, Path>();
+
+
+/**
+ * Reset the cache. This is only useful for testing.
+ * @private
+ */
+export function resetNormalizeCache() {
+  normalizedCache = new Map<string, Path>();
+}
+
+
+/**
  * Normalize a string into a Path. This is the only mean to get a Path type from a string that
- * represents a system path. Normalization includes:
+ * represents a system path. This method cache the results as real world paths tend to be
+ * duplicated often.
+ * Normalization includes:
  *   - Windows backslashes `\\` are replaced with `/`.
  *   - Windows drivers are replaced with `/X/`, where X is the drive letter.
  *   - Absolute paths starts with `/`.
@@ -195,8 +213,23 @@ export function fragment(path: string): PathFragment {
  *   - Path segments `.` are removed.
  *   - Path segments `..` are resolved.
  *   - If a path is absolute, having a `..` at the start is invalid (and will throw).
+ * @param path The path to be normalized.
  */
 export function normalize(path: string): Path {
+  let maybePath = normalizedCache.get(path);
+  if (!maybePath) {
+    maybePath = noCacheNormalize(path);
+    normalizedCache.set(path, maybePath);
+  }
+
+  return maybePath;
+}
+
+
+/**
+ * The no cache version of the normalize() function. Used for benchmarking and testing.
+ */
+export function noCacheNormalize(path: string): Path {
   if (path == '' || path == '.') {
     return '' as Path;
   } else if (path == NormalizedRoot) {
