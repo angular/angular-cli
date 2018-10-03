@@ -84,7 +84,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
           root: getSystemPath(root),
           projectRoot: getSystemPath(projectRoot),
           options: options as NormalizedKarmaBuilderSchema,
-          webpackConfig: this._buildWebpackConfig(root, projectRoot, sourceRoot, host,
+          webpackConfig: this.buildWebpackConfig(root, projectRoot, sourceRoot, host,
             options as NormalizedKarmaBuilderSchema),
           // Pass onto Karma to emit BuildEvents.
           successCb: () => obs.next({ success: true }),
@@ -114,7 +114,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
     );
   }
 
-  private _buildWebpackConfig(
+  buildWebpackConfig(
     root: Path,
     projectRoot: Path,
     sourceRoot: Path | undefined,
