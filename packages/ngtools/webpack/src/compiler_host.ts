@@ -87,40 +87,50 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   fileExists(fileName: string, delegate = true): boolean {
     const p = this.resolve(fileName);
 
-    const exists = this._syncHost.exists(p) && this._syncHost.isFile(p);
-    if (delegate) {
-      return exists;
-    } else {
-      const backend = new virtualFs.SyncDelegateHost(
-        (this._syncHost.delegate as virtualFs.CordHost).backend as virtualFs.Host,
-      );
+    try {
+      const exists = this._syncHost.isFile(p);
+      if (delegate) {
+        return exists;
+      } else if (exists) {
+        const backend = new virtualFs.SyncDelegateHost(
+          (this._syncHost.delegate as virtualFs.CordHost).backend as virtualFs.Host,
+        );
 
-      return exists && !(backend.exists(p) && backend.isFile(p));
-    }
+        return !backend.isFile(p);
+      }
+    } catch { }
+
+    return false;
   }
 
   readFile(fileName: string): string | undefined {
     const filePath = this.resolve(fileName);
-    if (!this._syncHost.exists(filePath) || !this._syncHost.isFile(filePath)) {
+
+    try {
+      return virtualFs.fileBufferToString(this._syncHost.read(filePath));
+    } catch {
       return undefined;
     }
-
-    return virtualFs.fileBufferToString(this._syncHost.read(filePath));
   }
 
   readFileBuffer(fileName: string): Buffer | undefined {
     const filePath = this.resolve(fileName);
-    if (!this._syncHost.exists(filePath) || !this._syncHost.isFile(filePath)) {
+
+    try {
+      return Buffer.from(this._syncHost.read(filePath));
+    } catch {
       return undefined;
     }
-
-    return Buffer.from(this._syncHost.read(filePath));
   }
 
   stat(path: string): Stats | null {
     const p = this.resolve(path);
 
-    const stats = this._syncHost.exists(p) && this._syncHost.stat(p);
+    let stats;
+    try {
+      stats = this._syncHost.stat(p);
+    } catch { }
+
     if (!stats) {
       return null;
     }
@@ -151,7 +161,11 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   directoryExists(directoryName: string): boolean {
     const p = this.resolve(directoryName);
 
-    return this._syncHost.exists(p) && this._syncHost.isDirectory(p);
+    try {
+      return this._syncHost.isDirectory(p);
+    } catch {
+      return false;
+    }
   }
 
   getDirectories(path: string): string[] {
