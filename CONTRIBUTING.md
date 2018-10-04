@@ -208,6 +208,7 @@ The following is the list of supported scopes:
 * **@angular/pwa**
 * **@angular-devkit/architect**
 * **@angular-devkit/architect-cli**
+* **@angular-devkit/benchmark**
 * **@angular-devkit/build-angular**
 * **@angular-devkit/build-ng-packagr**
 * **@angular-devkit/build-optimizer**
@@ -268,7 +269,7 @@ changes to be accepted, the CLA must be signed. It's a quick process, we promise
 [coc]: https://github.com/angular/code-of-conduct/blob/master/CODE_OF_CONDUCT.md
 [commit-message-format]: https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#
 [corporate-cla]: http://code.google.com/legal/corporate-cla-v1.0.html
-[dev-doc]: ttps://github.com/angular/angular-cli/blob/master/packages/angular/cli/README.md#development-hints-for-working-on-angular-cli
+[dev-doc]: https://github.com/angular/angular-cli/blob/master/packages/angular/cli/README.md#development-hints-for-working-on-angular-cli
 [GitHub]: https://github.com/angular/angular-cli
 [gitter]: https://gitter.im/angular/angular-cli
 [individual-cla]: http://code.google.com/legal/individual-cla-v1.0.html
