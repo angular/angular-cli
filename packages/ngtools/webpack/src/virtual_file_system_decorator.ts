@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Path, getSystemPath, normalize } from '@angular-devkit/core';
+import { FileDoesNotExistException, Path, getSystemPath, normalize } from '@angular-devkit/core';
 import { Stats } from 'fs';
 import { InputFileSystem } from 'webpack';
 import { WebpackCompilerHost } from './compiler_host';
@@ -21,33 +21,17 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
     private _webpackCompilerHost: WebpackCompilerHost,
   ) { }
 
-  private _readFileSync(path: string): Buffer | null {
-    if (this._webpackCompilerHost.fileExists(path)) {
-      return this._webpackCompilerHost.readFileBuffer(path) || null;
-    }
-
-    return null;
-  }
-
-  private _statSync(path: string): Stats | null {
-    if (this._webpackCompilerHost.fileExists(path)) {
-      return this._webpackCompilerHost.stat(path);
-    }
-
-    return null;
-  }
-
   getVirtualFilesPaths() {
     return this._webpackCompilerHost.getNgFactoryPaths();
   }
 
   stat(path: string, callback: (err: Error, stats: Stats) => void): void {
-    const result = this._statSync(path);
-    if (result) {
+    try {
       // tslint:disable-next-line:no-any
-      callback(null as any, result);
-    } else {
-      this._inputFileSystem.stat(path, callback);
+      callback(null as any, this._webpackCompilerHost.stat(path) as any);
+    } catch (e) {
+      // tslint:disable-next-line:no-any
+      callback(e, undefined as any);
     }
   }
 
@@ -57,12 +41,12 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
   }
 
   readFile(path: string, callback: (err: Error, contents: Buffer) => void): void {
-    const result = this._readFileSync(path);
-    if (result) {
+    try {
       // tslint:disable-next-line:no-any
-      callback(null as any, result);
-    } else {
-      this._inputFileSystem.readFile(path, callback);
+      callback(null as any, this._webpackCompilerHost.readFileBuffer(path));
+    } catch (e) {
+      // tslint:disable-next-line:no-any
+      callback(e, undefined as any);
     }
   }
 
@@ -76,9 +60,12 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
   }
 
   statSync(path: string): Stats {
-    const result = this._statSync(path);
+    const stats = this._webpackCompilerHost.stat(path);
+    if (stats === null) {
+      throw new FileDoesNotExistException(path);
+    }
 
-    return result || this._inputFileSystem.statSync(path);
+    return stats;
   }
 
   readdirSync(path: string): string[] {
@@ -87,9 +74,7 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
   }
 
   readFileSync(path: string): Buffer {
-    const result = this._readFileSync(path);
-
-    return result || this._inputFileSystem.readFileSync(path);
+    return this._webpackCompilerHost.readFileBuffer(path);
   }
 
   readJsonSync(path: string): string {
