@@ -31,5 +31,5 @@ export default async function(_options: {}, logger: logging.Logger): Promise<num
   _runTemplate('./templates/readme', '../README.md', logger);
   _runTemplate('./templates/contributing', '../CONTRIBUTING.md', logger);
 
-  return 1;
+  return 0;
 }
