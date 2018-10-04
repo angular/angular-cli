@@ -12,22 +12,6 @@
   "type": "object",
   "allOf": [
     {
-      "properties": {
-        "packages": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "The names of package(s) to update",
-          "$default": {
-            "$source": "argv"
-          }
-        }
-      },
-      "required": [
-      ]
-    },
-    {
       "$ref": "./definitions.json#/definitions/base"
     }
   ]
