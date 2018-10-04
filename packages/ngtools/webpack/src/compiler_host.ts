@@ -113,20 +113,46 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     }
   }
 
-  readFileBuffer(fileName: string): Buffer | undefined {
+  readFileBuffer(fileName: string): Buffer {
     const filePath = this.resolve(fileName);
 
-    try {
-      return Buffer.from(this._syncHost.read(filePath));
-    } catch {
-      return undefined;
-    }
+    return Buffer.from(this._syncHost.read(filePath));
+  }
+
+  private _makeStats(stats: virtualFs.Stats<Partial<Stats>>): Stats {
+    return {
+      isFile: () => stats.isFile(),
+      isDirectory: () => stats.isDirectory(),
+      isBlockDevice: () => stats.isBlockDevice && stats.isBlockDevice() || false,
+      isCharacterDevice: () => stats.isCharacterDevice && stats.isCharacterDevice() || false,
+      isFIFO: () => stats.isFIFO && stats.isFIFO() || false,
+      isSymbolicLink: () => stats.isSymbolicLink && stats.isSymbolicLink() || false,
+      isSocket: () => stats.isSocket && stats.isSocket() || false,
+      dev: stats.dev === undefined ? dev : stats.dev,
+      ino: stats.ino === undefined ? Math.floor(Math.random() * 100000) : stats.ino,
+      mode: stats.mode === undefined ? parseInt('777', 8) : stats.mode,
+      nlink: stats.nlink === undefined ? 1 : stats.nlink,
+      uid: stats.uid || 0,
+      gid: stats.gid || 0,
+      rdev: stats.rdev || 0,
+      size: stats.size,
+      blksize: stats.blksize === undefined ? 512 : stats.blksize,
+      blocks: stats.blocks === undefined ? Math.ceil(stats.size / 512) : stats.blocks,
+      atime: stats.atime,
+      atimeMs: stats.atime.getTime(),
+      mtime: stats.mtime,
+      mtimeMs: stats.mtime.getTime(),
+      ctime: stats.ctime,
+      ctimeMs: stats.ctime.getTime(),
+      birthtime: stats.birthtime,
+      birthtimeMs: stats.birthtime.getTime(),
+    };
   }
 
   stat(path: string): Stats | null {
     const p = this.resolve(path);
 
-    let stats;
+    let stats: virtualFs.Stats<Partial<Stats>> | Stats | null = null;
     try {
       stats = this._syncHost.stat(p);
     } catch { }
@@ -135,27 +161,11 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       return null;
     }
 
-    return {
-      isBlockDevice: () => false,
-      isCharacterDevice: () => false,
-      isFIFO: () => false,
-      isSymbolicLink: () => false,
-      isSocket: () => false,
-      dev,
-      ino: Math.floor(Math.random() * 100000),
-      mode: parseInt('777', 8),
-      nlink: 1,
-      uid: 0,
-      gid: 0,
-      rdev: 0,
-      blksize: 512,
-      blocks: Math.ceil(stats.size / 512),
-      atimeMs: stats.atime.getTime(),
-      mtimeMs: stats.mtime.getTime(),
-      ctimeMs: stats.ctime.getTime(),
-      birthtimeMs: stats.birthtime.getTime(),
-      ...stats,
-    };
+    if (stats instanceof Stats) {
+      return stats;
+    }
+
+    return this._makeStats(stats);
   }
 
   directoryExists(directoryName: string): boolean {
