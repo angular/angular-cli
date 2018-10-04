@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "packages": {
-      "description": "The packages to get.",
+      "description": "The names of package(s) to update.",
       "type": "array",
       "items": {
         "type": "string"
