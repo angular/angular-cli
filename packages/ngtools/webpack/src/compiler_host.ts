@@ -28,24 +28,25 @@ const dev = Math.floor(Math.random() * 10000);
 
 export class WebpackCompilerHost implements ts.CompilerHost {
   private _syncHost: virtualFs.SyncDelegateHost;
+  private _memoryHost: virtualFs.SyncDelegateHost;
   private _changedFiles = new Set<string>();
   private _basePath: Path;
   private _resourceLoader?: WebpackResourceLoader;
+  private _sourceFileCache = new Map<string, ts.SourceFile>();
 
   constructor(
     private _options: ts.CompilerOptions,
     basePath: string,
     host: virtualFs.Host,
   ) {
-    this._syncHost = new virtualFs.SyncDelegateHost(new virtualFs.CordHost(host));
+    this._syncHost = new virtualFs.SyncDelegateHost(host);
+    this._memoryHost = new virtualFs.SyncDelegateHost(new virtualFs.SimpleMemoryHost());
     this._basePath = normalize(basePath);
   }
 
   private get virtualFiles(): Path[] {
-    return (this._syncHost.delegate as virtualFs.CordHost)
-      .records()
-      .filter(record => record.kind === 'create')
-      .map((record: virtualFs.CordHostCreate) => record.path);
+    return [...(this._memoryHost.delegate as {} as { _cache: Map<Path, {}> })
+      ._cache.keys()];
   }
 
   denormalizePath(path: string) {
@@ -79,35 +80,50 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   invalidate(fileName: string): void {
     const fullPath = this.resolve(fileName);
 
-    if (this.fileExists(fileName)) {
-      this._changedFiles.add(fullPath);
+    if (this._memoryHost.exists(fullPath)) {
+      this._memoryHost.delete(fullPath);
     }
+
+    this._sourceFileCache.delete(fullPath);
+
+    try {
+      const exists = this._syncHost.isFile(fullPath);
+      if (exists) {
+        this._changedFiles.add(fullPath);
+      }
+    } catch { }
   }
 
   fileExists(fileName: string, delegate = true): boolean {
     const p = this.resolve(fileName);
 
-    try {
-      const exists = this._syncHost.isFile(p);
-      if (delegate) {
-        return exists;
-      } else if (exists) {
-        const backend = new virtualFs.SyncDelegateHost(
-          (this._syncHost.delegate as virtualFs.CordHost).backend as virtualFs.Host,
-        );
+    if (this._memoryHost.isFile(p)) {
+      return true;
+    }
 
-        return !backend.isFile(p);
-      }
+    if (!delegate) {
+      return false;
+    }
+
+    let exists = false;
+    try {
+      exists = this._syncHost.isFile(p);
     } catch { }
 
-    return false;
+    return exists;
   }
 
   readFile(fileName: string): string | undefined {
     const filePath = this.resolve(fileName);
 
     try {
-      return virtualFs.fileBufferToString(this._syncHost.read(filePath));
+      if (this._memoryHost.isFile(filePath)) {
+        return virtualFs.fileBufferToString(this._memoryHost.read(filePath));
+      } else {
+        const content = this._syncHost.read(filePath);
+
+        return virtualFs.fileBufferToString(content);
+      }
     } catch {
       return undefined;
     }
@@ -116,7 +132,13 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   readFileBuffer(fileName: string): Buffer {
     const filePath = this.resolve(fileName);
 
-    return Buffer.from(this._syncHost.read(filePath));
+    if (this._memoryHost.isFile(filePath)) {
+      return Buffer.from(this._memoryHost.read(filePath));
+    } else {
+      const content = this._syncHost.read(filePath);
+
+      return Buffer.from(content);
+    }
   }
 
   private _makeStats(stats: virtualFs.Stats<Partial<Stats>>): Stats {
@@ -154,7 +176,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
     let stats: virtualFs.Stats<Partial<Stats>> | Stats | null = null;
     try {
-      stats = this._syncHost.stat(p);
+      stats = this._memoryHost.stat(p) || this._syncHost.stat(p);
     } catch { }
 
     if (!stats) {
@@ -172,7 +194,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     const p = this.resolve(directoryName);
 
     try {
-      return this._syncHost.isDirectory(p);
+      return this._memoryHost.isDirectory(p) || this._syncHost.isDirectory(p);
     } catch {
       return false;
     }
@@ -194,14 +216,37 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       delegated = [];
     }
 
-    return delegated;
+    let memory: string[];
+    try {
+      memory = this._memoryHost.list(p).filter(x => {
+        try {
+          return this._memoryHost.isDirectory(join(p, x));
+        } catch {
+          return false;
+        }
+      });
+    } catch {
+      memory = [];
+    }
+
+    return [...new Set([...delegated, ...memory])];
   }
 
   getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: OnErrorFn) {
+    const p = this.resolve(fileName);
+
     try {
+      const cached = this._sourceFileCache.get(p);
+      if (cached) {
+        return cached;
+      }
+
       const content = this.readFile(fileName);
-      if (content != undefined) {
-        return ts.createSourceFile(workaroundResolve(fileName), content, languageVersion, true);
+      if (content !== undefined) {
+        const sf = ts.createSourceFile(workaroundResolve(fileName), content, languageVersion, true);
+        this._sourceFileCache.set(p, sf);
+
+        return sf;
       }
     } catch (e) {
       if (onError) {
@@ -229,7 +274,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       const p = this.resolve(fileName);
 
       try {
-        this._syncHost.write(p, virtualFs.stringToFileBuffer(data));
+        this._memoryHost.write(p, virtualFs.stringToFileBuffer(data));
       } catch (e) {
         if (onError) {
           onError(e.message);
