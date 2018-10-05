@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/build.json",
-  "description": "Builds your app and places it into the output path (dist/ by default).",
-  "$longDescription": "",
+  "description": "Compiles an Angular app into an output directory named dist/ at the given output path. Must be executed from within a workspace directory.",
+  "$longDescription": "./build-long.md",
 
   "$aliases": [ "b" ],
   "$scope": "in",
