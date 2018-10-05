@@ -15,7 +15,7 @@ describe('Browser Builder poll', () => {
   beforeEach(done => host.initialize().toPromise().then(done, done.fail));
   afterEach(done => host.restore().toPromise().then(done, done.fail));
 
-  it('works', (done) => {
+  xit('works', (done) => {
     const overrides = { watch: true, poll: 2000 };
     const intervals: number[] = [];
     let startTime: number | undefined;
