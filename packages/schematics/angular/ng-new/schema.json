@@ -100,7 +100,7 @@
       "type": "boolean",
       "description": "Generates a routing module.",
       "default": false,
-      "x-prompt": "Would you like to generate a routing module?"
+      "x-prompt": "Would you like to add Angular routing?"
     },
     "prefix": {
       "type": "string",
