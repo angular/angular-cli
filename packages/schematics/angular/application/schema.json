@@ -66,6 +66,11 @@
       "type": "boolean",
       "default": false,
       "description": "Do not add dependencies to package.json."
+    },
+    "minimal": {
+      "description": "Create a barebones project without any testing frameworks",
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [

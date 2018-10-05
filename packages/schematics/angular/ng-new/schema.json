@@ -136,6 +136,11 @@
       "description": "Flag to toggle creation of an application in the new workspace.",
       "type": "boolean",
       "default": true
+    },
+    "minimal": {
+      "description": "Create a barebones project without any testing frameworks",
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [
