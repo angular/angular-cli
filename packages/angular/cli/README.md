@@ -37,6 +37,7 @@ with NPM 5.5.1 or higher.
 * [Updating Angular CLI](#updating-angular-cli)
 * [Development Hints for working on Angular CLI](#development-hints-for-working-on-angular-cli)
 * [Documentation](#documentation)
+* [Programmatic usage](#programmatic-usage)
 * [License](#license)
 
 ## Installation
@@ -251,6 +252,18 @@ In addition to this one, another, more elaborated way to capture a CPU profile u
 ## Documentation
 
 The documentation for the Angular CLI is located in this repo's [wiki](https://github.com/angular/angular-cli/wiki).
+
+## Programmatic usage
+
+You can also use angular cli programmatically. Here is an example on how to run `ng test --watch false` from inside your nodejs application:
+
+```js
+import cli from '@angular/cli';
+
+const returnCode = await cli({ args: ['test', '--watch', 'false'] });
+```
+
+Types for typescript are included.
 
 ## License
 

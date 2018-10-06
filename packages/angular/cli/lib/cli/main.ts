@@ -12,8 +12,24 @@ import { runCommand } from '../../models/command-runner';
 import { getWorkspaceRaw } from '../../utilities/config';
 import { getWorkspaceDetails } from '../../utilities/project';
 
+export interface CliOptions {
+  testing?: boolean;
+  /**
+   * The cli arguments to provide to the command (without the `ng`)
+   */
+  args: string[];
+}
 
-export default async function(options: { testing?: boolean, cliArgs: string[] }) {
+/**
+ * Run an arbitrary `ng` command.
+ *
+ * @example
+ * const returnCode = await cli({ args: ['test', '--watch', 'false' ] } );
+ *
+ * @param options The cli options, including the arguments use to run
+ * @returns {Promise<number>} A promise that resolves to the exit code of the ng command.
+ */
+export default async function(options: CliOptions): Promise<number> {
   const logger = new logging.IndentLogger('cling');
   let loggingSubscription;
   if (!options.testing) {
@@ -34,7 +50,7 @@ export default async function(options: { testing?: boolean, cliArgs: string[] })
   }
 
   try {
-    const maybeExitCode = await runCommand(options.cliArgs, logger, projectDetails);
+    const maybeExitCode = await runCommand(options.args, logger, projectDetails);
     if (typeof maybeExitCode === 'number') {
       console.assert(Number.isInteger(maybeExitCode));
 

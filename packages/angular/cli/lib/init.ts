@@ -126,7 +126,7 @@ try {
   // library from a package.json. Instead, include it from a relative
   // path to this script file (which is likely a globally installed
   // npm package). Most common cause for hitting this is `ng new`
-  cli = require('./cli');
+  cli = require('./cli/main');
 }
 
 if ('default' in cli) {
@@ -144,7 +144,7 @@ try {
 }
 
 cli({
-  cliArgs: process.argv.slice(2),
+  args: process.argv.slice(2),
   inputStream: standardInput,
   outputStream: process.stdout,
 })

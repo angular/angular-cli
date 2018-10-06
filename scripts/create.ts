@@ -7,7 +7,7 @@
  */
 // tslint:disable:no-implicit-dependencies
 import { logging } from '@angular-devkit/core';
-import cli from '@angular/cli/lib/cli';
+import cli from '@angular/cli';
 import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -20,7 +20,7 @@ export interface CreateOptions {
 
 async function _ng(command: string, ...args: string[]) {
   const exitCode = await cli({
-    cliArgs: [command, ...args],
+    args: [command, ...args],
   });
 
   if (exitCode !== 0) {
