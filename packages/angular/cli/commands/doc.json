@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/doc.json",
-  "description": "Opens the official Angular API documentation for a given keyword.",
+  "description": "Opens the official Angular documentation (angular.io) in a browser, and searches for a given keyword.",
   "$longDescription": "",
 
   "$aliases": [ "d" ],
@@ -14,7 +14,7 @@
       "properties": {
         "keyword": {
           "type": "string",
-          "description": "The query to search upon.",
+          "description": "The keyword to search for, as provided in the search bar in angular.io.",
           "$default": {
             "$source": "argv",
             "index": 0
@@ -24,7 +24,7 @@
           "aliases": ["s"],
           "type": "boolean",
           "default": false,
-          "description": "Search whole angular.io instead of just api."
+          "description": "When true, searches all of angular.io. Otherwise, searches only API reference documentation."
         }
       },
       "required": [

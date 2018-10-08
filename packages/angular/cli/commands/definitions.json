@@ -14,7 +14,7 @@
           }
         },
         "configuration": {
-          "description": "A named configuration environment, as specified in the `configurations` section of `angular.json`.",
+          "description": "A named configuration environment, as specified in the \"configurations\" section of angular.json.",
           "type": "string",
           "aliases": [
             "c"
@@ -31,7 +31,7 @@
       "properties": {
         "help": {
           "enum": [true, false, "json", "JSON"],
-          "description": "Shows a help message. You can pass the format as a value.",
+          "description": "Shows a help message for this command in the console.",
           "default": false
         }
       }
@@ -42,23 +42,23 @@
           "type": "boolean",
           "default": false,
           "aliases": [ "d" ],
-          "description": "Run through without making any changes."
+          "description": "When true, run through and report activity without writing out results."
         },
         "force": {
           "type": "boolean",
           "default": false,
           "aliases": [ "f" ],
-          "description": "Forces overwriting of files."
+          "description": "When true, force overwriting of existing files."
         },
         "interactive": {
           "type": "boolean",
           "default": "true",
-          "description": "Disables interactive inputs (i.e., prompts)."
+          "description": "When false, disables interactive input prompts."
         },
         "defaults": {
           "type": "boolean",
           "default": "false",
-          "description": "Disables interactive inputs (i.e., prompts) for options with a default."
+          "description": "When true, disables interactive input prompts for options with a default."
         }
       }
     }

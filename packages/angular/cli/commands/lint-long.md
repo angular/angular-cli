@@ -1,0 +1,2 @@
+Takes the name of the project, as specified in the  `projects` section of the `angular.json` workspace configuration file.
+When a project name is not supplied, uses the configured `defaultProject` of the workspace.
