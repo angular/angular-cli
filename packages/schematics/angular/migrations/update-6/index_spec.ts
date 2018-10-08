@@ -93,6 +93,11 @@ describe('Migration to v6', () => {
         karma: {
           config: './karma.conf.js',
         },
+        codeCoverage: {
+          exclude: [
+            './excluded.spec.ts',
+          ],
+        },
       },
       defaults: {
         styleExt: 'css',
@@ -657,6 +662,7 @@ describe('Migration to v6', () => {
         expect(test.options.polyfills).toEqual('src/polyfills.ts');
         expect(test.options.tsConfig).toEqual('src/tsconfig.spec.json');
         expect(test.options.karmaConfig).toEqual('./karma.conf.js');
+        expect(test.options.codeCoverageExclude).toEqual(['./excluded.spec.ts']);
         expect(test.options.scripts).toEqual([]);
         expect(test.options.styles).toEqual(['src/styles.css']);
         expect(test.options.assets).toEqual([
