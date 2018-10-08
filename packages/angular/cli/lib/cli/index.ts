@@ -7,7 +7,6 @@
  */
 
 import { logging, terminal } from '@angular-devkit/core';
-import { filter } from 'rxjs/operators';
 import { runCommand } from '../../models/command-runner';
 import { getWorkspaceRaw } from '../../utilities/config';
 import { getWorkspaceDetails } from '../../utilities/project';
@@ -72,11 +71,12 @@ export default async function(options: { testing?: boolean, cliArgs: string[] })
 // Initialize logging.
 function initializeLogging(logger: logging.Logger) {
   return logger
-    .pipe(filter(entry => (entry.level != 'debug')))
     .subscribe(entry => {
       let color = (x: string) => terminal.dim(terminal.white(x));
       let output = process.stdout;
       switch (entry.level) {
+        case 'debug':
+          return;
         case 'info':
           color = terminal.white;
           break;
