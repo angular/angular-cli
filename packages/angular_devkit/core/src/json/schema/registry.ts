@@ -43,7 +43,8 @@ interface AjvRefMap {
   schema: JsonObject;
 }
 
-export type UriHandler = (uri: string) => Observable<JsonObject> | null | undefined;
+export type UriHandler = (uri: string) =>
+  Observable<JsonObject> | Promise<JsonObject> | null | undefined;
 
 export class SchemaValidationException extends BaseException {
   public readonly errors: SchemaValidatorError[];
@@ -133,7 +134,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       const handler = maybeHandler(uri);
       if (handler) {
         // The AJV API only understands Promises.
-        return handler.pipe(
+        return from(handler).pipe(
           tap(json => this._uriCache.set(uri, json)),
         ).toPromise();
       }
