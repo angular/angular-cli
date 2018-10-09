@@ -25,6 +25,7 @@ export interface ModuleOptions {
   skipImport?: boolean;
   moduleExt?: string;
   routingModuleExt?: string;
+  nameFormatter?: (str: string) => string;
 }
 
 const MODULE_EXT = '.module.ts';
@@ -42,8 +43,9 @@ export function findModuleFromOptions(host: Tree, options: ModuleOptions): Path 
   const routingModuleExt = options.routingModuleExt || ROUTING_MODULE_EXT;
 
   if (!options.module) {
+    options.nameFormatter = options.nameFormatter || strings.dasherize;
     const pathToCheck = (options.path || '')
-      + (options.flat ? '' : '/' + strings.dasherize(options.name));
+      + (options.flat ? '' : '/' + options.nameFormatter(options.name));
 
     return normalize(findModule(host, pathToCheck, moduleExt, routingModuleExt));
   } else {

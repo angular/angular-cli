@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Path } from '@angular-devkit/core';
+import { Path, strings } from '@angular-devkit/core';
 import { EmptyTree, Tree } from '@angular-devkit/schematics';
 import { ModuleOptions, findModule, findModuleFromOptions } from './find-module';
 
@@ -109,6 +109,14 @@ describe('find-module', () => {
       options.path = '/projects/my-proj/src';
       const modPath = findModuleFromOptions(tree, options);
       expect(modPath).toEqual('/projects/my-proj/src/app.module.ts' as Path);
+    });
+
+    it('should find a module if nameFormatter is provided', () => {
+      tree.create('/projects/my-proj/src/app_test.module.ts', '');
+      options.path = '/projects/my-proj/src';
+      options.nameFormatter = strings.underscore;
+      const modPath = findModuleFromOptions(tree, options);
+      expect(modPath).toEqual('/projects/my-proj/src/app_test.module.ts' as Path);
     });
 
     it('should find a module in a sub dir', () => {
