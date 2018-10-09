@@ -32,6 +32,7 @@ export interface DevServerBuilderOptions {
   browserTarget: string;
   port: number;
   host: string;
+  headers?: { [key: string]: string; };
   proxyConfig?: string;
   ssl: boolean;
   sslKey?: string;
@@ -207,7 +208,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     const config: WebpackDevServer.Configuration = {
       host: options.host,
       port: options.port,
-      headers: { 'Access-Control-Allow-Origin': '*' },
+      headers: options.headers ? options.headers : { 'Access-Control-Allow-Origin': '*' },
       historyApiFallback: {
         index: `${servePath}/${path.basename(browserOptions.index)}`,
         disableDotRule: true,

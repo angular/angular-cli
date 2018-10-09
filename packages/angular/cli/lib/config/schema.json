@@ -967,6 +967,11 @@
               "description": "Host to listen on.",
               "default": "localhost"
             },
+            "headers": {
+              "type": "object",
+              "default": "{ 'Access-Control-Allow-Origin': '*' }",
+              "description": "Http headers in format of keys-values object. Keys are headers names. Values are headers values."
+            },
             "proxyConfig": {
               "type": "string",
               "description": "Proxy configuration file."
