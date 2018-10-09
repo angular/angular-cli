@@ -6,142 +6,68 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { logging } from '@angular-devkit/core';
-import { exec } from 'child_process';
 import { readFileSync } from 'fs';
-import { Observable, ReplaySubject, concat, of } from 'rxjs';
-import {
-  catchError,
-  concatMap,
-  defaultIfEmpty,
-  filter,
-  first,
-  map,
-  shareReplay,
-  toArray,
-} from 'rxjs/operators';
-import * as url from 'url';
+import { Observable, from } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
 import { NpmRepositoryPackageJson } from './npm-package-json';
 
-const RegistryClient = require('npm-registry-client');
+const pacote = require('pacote');
 
 const npmPackageJsonCache = new Map<string, Observable<NpmRepositoryPackageJson>>();
-const npmConfigOptionCache = new Map<string, Observable<string | undefined>>();
+
+let npmrc: { [key: string]: string };
+try {
+  npmrc = _readNpmRc();
+} catch {
+  npmrc = {};
+}
 
 
-function _readNpmRc(): Observable<{ [key: string]: string }> {
-  return new Observable<{ [key: string]: string }>(subject => {
-    // TODO: have a way to read options without using fs directly.
-    const path = require('path');
-    const fs = require('fs');
-    const perProjectNpmrc = path.resolve('.npmrc');
+function _readNpmRc(): { [key: string]: string } {
+  // TODO: have a way to read options without using fs directly.
+  const path = require('path');
+  const fs = require('fs');
+  const perProjectNpmrc = path.resolve('.npmrc');
 
-    let npmrc = '';
+  const configs: string[] = [];
 
-    if (fs.existsSync(perProjectNpmrc)) {
-      npmrc = fs.readFileSync(perProjectNpmrc).toString('utf-8');
-    } else {
-      if (process.platform === 'win32') {
-        if (process.env.LOCALAPPDATA) {
-          npmrc = fs.readFileSync(path.join(process.env.LOCALAPPDATA, '.npmrc')).toString('utf-8');
-        }
-      } else {
-        if (process.env.HOME) {
-          npmrc = fs.readFileSync(path.join(process.env.HOME, '.npmrc')).toString('utf-8');
-        }
-      }
+  if (process.platform === 'win32') {
+    if (process.env.LOCALAPPDATA) {
+      configs.push(fs.readFileSync(path.join(process.env.LOCALAPPDATA, '.npmrc'), 'utf8'));
     }
+  } else {
+    if (process.env.HOME) {
+      configs.push(fs.readFileSync(path.join(process.env.HOME, '.npmrc'), 'utf8'));
+    }
+  }
 
-    const allOptionsArr = npmrc.split(/\r?\n/).map(x => x.trim());
-    const allOptions: { [key: string]: string } = {};
+  if (fs.existsSync(perProjectNpmrc)) {
+    configs.push(fs.readFileSync(perProjectNpmrc, 'utf8'));
+  }
+
+  const allOptions: { [key: string]: string } = {};
+  for (const config of configs) {
+    const allOptionsArr = config.split(/\r?\n/).map(x => x.trim());
 
     allOptionsArr.forEach(x => {
       const [key, ...value] = x.split('=');
-      allOptions[key.trim()] = value.join('=').trim();
-    });
-
-    subject.next(allOptions);
-    subject.complete();
-  }).pipe(
-    catchError(() => of({})),
-    shareReplay(),
-  );
-}
-
-
-function getOptionFromNpmRc(option: string): Observable<string | undefined> {
-  return _readNpmRc().pipe(
-    map(options => options[option]),
-  );
-}
-
-function getOptionFromNpmCli(option: string): Observable<string | undefined> {
-  return new Observable<string | undefined>(subject => {
-    exec(`npm get ${option}`, (error, data) => {
-      if (error) {
-        throw error;
-      } else {
-        data = data.trim();
-        if (!data || data === 'undefined' || data === 'null') {
-          subject.next();
-        } else {
-          subject.next(data);
-        }
+      const fullValue = value.join('=').trim();
+      if (key && fullValue && fullValue !== 'null') {
+        allOptions[key.trim()] = fullValue;
       }
-
-      subject.complete();
     });
-  }).pipe(
-    catchError(() => of(undefined)),
-    shareReplay(),
-  );
-}
 
-function getNpmConfigOption(
-  option: string,
-  scope?: string,
-  tryWithoutScope?: boolean,
-): Observable<string | undefined> {
-  if (scope && tryWithoutScope) {
-    return concat(
-      getNpmConfigOption(option, scope),
-      getNpmConfigOption(option),
-    ).pipe(
-      filter(result => !!result),
-      defaultIfEmpty(),
-      first(),
-    );
+    if (allOptions.cafile) {
+      const cafile = allOptions.cafile;
+      delete allOptions.cafile;
+      try {
+        allOptions.ca = readFileSync(cafile, 'utf8');
+        allOptions.ca = allOptions.ca.replace(/\r?\n/, '\\n');
+      } catch { }
+    }
   }
 
-  const fullOption = `${scope ? scope + ':' : ''}${option}`;
-
-  let value = npmConfigOptionCache.get(fullOption);
-  if (value) {
-    return value;
-  }
-
-  value = option.startsWith('_')
-      ? getOptionFromNpmRc(fullOption)
-      : getOptionFromNpmCli(fullOption);
-
-  npmConfigOptionCache.set(fullOption, value);
-
-  return value;
-}
-
-function getNpmClientSslOptions(strictSsl?: string, cafile?: string) {
-  const sslOptions: { strict?: boolean, ca?: Buffer } = {};
-
-  if (strictSsl === 'false') {
-    sslOptions.strict = false;
-  } else if (strictSsl === 'true') {
-    sslOptions.strict = true;
-  }
-
-  if (cafile) {
-    sslOptions.ca = readFileSync(cafile);
-  }
-
-  return sslOptions;
+  return allOptions;
 }
 
 /**
@@ -155,144 +81,24 @@ function getNpmClientSslOptions(strictSsl?: string, cafile?: string) {
 export function getNpmPackageJson(
   packageName: string,
   registryUrl: string | undefined,
-  logger: logging.LoggerApi,
+  _logger: logging.LoggerApi,
 ): Observable<Partial<NpmRepositoryPackageJson>> {
-  const scope = packageName.startsWith('@') ? packageName.split('/')[0] : undefined;
+  const cachedResponse = npmPackageJsonCache.get(packageName);
+  if (cachedResponse) {
+    return cachedResponse;
+  }
 
-  return (
-    registryUrl ? of(registryUrl) : getNpmConfigOption('registry', scope, true)
-  ).pipe(
-    map(partialUrl => {
-      if (!partialUrl) {
-        partialUrl = 'https://registry.npmjs.org/';
-      }
-      const partial = url.parse(partialUrl);
-      let fullUrl = new url.URL(`http://${partial.host}/${packageName.replace(/\//g, '%2F')}`);
-      try {
-        const registry = new url.URL(partialUrl);
-        registry.pathname = (registry.pathname || '')
-            .replace(/\/?$/, '/' + packageName.replace(/\//g, '%2F'));
-        fullUrl = new url.URL(url.format(registry));
-      } catch {}
-
-      logger.debug(
-        `Getting package.json from '${packageName}' (url: ${JSON.stringify(fullUrl)})...`,
-      );
-
-      return fullUrl;
-    }),
-    concatMap(fullUrl => {
-      let maybeRequest = npmPackageJsonCache.get(fullUrl.toString());
-      if (maybeRequest) {
-        return maybeRequest;
-      }
-
-      const registryKey = `//${fullUrl.host}/`;
-
-      return concat(
-        getNpmConfigOption('proxy'),
-        getNpmConfigOption('https-proxy'),
-        getNpmConfigOption('strict-ssl'),
-        getNpmConfigOption('cafile'),
-        getNpmConfigOption('_auth'),
-        getNpmConfigOption('user-agent'),
-        getNpmConfigOption('_authToken', registryKey),
-        getNpmConfigOption('username', registryKey, true),
-        getNpmConfigOption('password', registryKey, true),
-        getNpmConfigOption('email', registryKey, true),
-        getNpmConfigOption('always-auth', registryKey, true),
-      ).pipe(
-        toArray(),
-        concatMap(options => {
-          const [
-            http,
-            https,
-            strictSsl,
-            cafile,
-            token,
-            userAgent,
-            authToken,
-            username,
-            password,
-            email,
-            alwaysAuth,
-          ] = options;
-
-          const subject = new ReplaySubject<NpmRepositoryPackageJson>(1);
-
-          const sslOptions = getNpmClientSslOptions(strictSsl, cafile);
-
-          const auth: {
-            token?: string,
-            alwaysAuth?: boolean;
-            username?: string;
-            password?: string;
-            email?: string;
-          } = {};
-
-          if (alwaysAuth !== undefined) {
-            auth.alwaysAuth = alwaysAuth === 'false' ? false : !!alwaysAuth;
-          }
-
-          if (email) {
-            auth.email = email;
-          }
-
-          if (authToken) {
-            auth.token = authToken;
-          } else if (token) {
-            try {
-              // attempt to parse "username:password" from base64 token
-              // to enable Artifactory / Nexus-like repositories support
-              const delimiter = ':';
-              const parsedToken = Buffer.from(token, 'base64').toString('ascii');
-              const [extractedUsername, ...passwordArr] = parsedToken.split(delimiter);
-              const extractedPassword = passwordArr.join(delimiter);
-
-              if (extractedUsername && extractedPassword) {
-                auth.username = extractedUsername;
-                auth.password = extractedPassword;
-              } else {
-                throw new Error('Unable to extract username and password from _auth token');
-              }
-            } catch (ex) {
-              auth.token = token;
-            }
-          } else if (username) {
-            auth.username = username;
-            auth.password = password;
-          }
-
-          const client = new RegistryClient({
-            proxy: { http, https },
-            ssl: sslOptions,
-            ...(userAgent && {userAgent: userAgent}),
-          });
-          client.log.level = 'silent';
-          const params = {
-            timeout: 30000,
-            auth,
-          };
-
-          client.get(
-            fullUrl.toString(),
-            params,
-            (error: object, data: NpmRepositoryPackageJson) => {
-            if (error) {
-              subject.error(error);
-            }
-
-            subject.next(data);
-            subject.complete();
-          });
-
-          maybeRequest = subject.asObservable();
-          npmPackageJsonCache.set(fullUrl.toString(), maybeRequest);
-
-          return maybeRequest;
-        }),
-      );
-    }),
+  const resultPromise = pacote.packument(
+    packageName,
+    {
+      'full-metadata': true,
+      ...npmrc,
+      registry: registryUrl,
+    },
   );
 
+  const response = from<NpmRepositoryPackageJson>(resultPromise).pipe(shareReplay());
+  npmPackageJsonCache.set(packageName, response);
+
+  return response;
 }
