@@ -15,7 +15,8 @@
       "$default": {
         "$source": "argv",
         "index": 0
-      }
+      },
+      "x-prompt": "What name would you like to use for the application?"
     },
     "experimentalIvy": {
       "description": "EXPERIMENTAL: Specifies whether to create a new application which uses the Ivy rendering engine.",
