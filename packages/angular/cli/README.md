@@ -162,7 +162,7 @@ You can find more details about changes between versions in [the Releases tab on
 
 ```bash
 git clone https://github.com/angular/angular-cli.git
-npm install
+yarn
 npm run build
 cd dist/@angular/cli
 npm link
