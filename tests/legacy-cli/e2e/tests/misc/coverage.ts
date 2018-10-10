@@ -10,6 +10,7 @@ export default function () {
   return;
 
   return ng('test', '--watch=false', '--code-coverage')
+    .then(output => expect(output.stdout).toContain('Coverage summary'))
     .then(() => expectFileToExist('coverage/src/app'))
     .then(() => expectFileToExist('coverage/lcov.info'))
     // Verify code coverage exclude work
