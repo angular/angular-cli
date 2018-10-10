@@ -15,8 +15,8 @@ describe('Browser Builder poll', () => {
   beforeEach(done => host.initialize().toPromise().then(done, done.fail));
   afterEach(done => host.restore().toPromise().then(done, done.fail));
 
-  xit('works', (done) => {
-    const overrides = { watch: true, poll: 2000 };
+  it('works', (done) => {
+    const overrides = { watch: true, poll: 10000 };
     const intervals: number[] = [];
     let startTime: number | undefined;
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
@@ -30,12 +30,12 @@ describe('Browser Builder poll', () => {
         startTime = Date.now();
         host.appendToFile('src/main.ts', 'console.log(1);');
       }),
-      take(6),
+      take(4),
     ).subscribe(undefined, done.fail, () => {
       intervals.sort();
       const median = intervals[Math.trunc(intervals.length / 2)];
-      expect(median).toBeGreaterThan(1000);
-      expect(median).toBeLessThan(4000);
+      expect(median).toBeGreaterThan(3000);
+      expect(median).toBeLessThan(12000);
       done();
     });
   });
