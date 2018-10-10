@@ -356,6 +356,35 @@ export class CoreSchemaRegistry implements SchemaRegistry {
               schemaInfo.smartDefaultRecord,
             )),
             switchMap(updatedData => {
+              if (validationOptions.withPrompts === false) {
+                return of(updatedData);
+              }
+
+              const visitor: JsonVisitor = (value, pointer) => {
+                if (value !== undefined) {
+                  validationContext.promptFieldsWithValue.add(pointer);
+                }
+
+                return value;
+              };
+
+              return visitJson(updatedData, visitor, schema, this._resolver, validate);
+            }),
+            switchMap(updatedData => {
+              if (validationOptions.withPrompts === false) {
+                return of(updatedData);
+              }
+
+              const definitions = schemaInfo.promptDefinitions
+                .filter(def => !validationContext.promptFieldsWithValue.has(def.id));
+
+              if (this._promptProvider && definitions.length > 0) {
+                return from(this._applyPrompts(updatedData, definitions));
+              } else {
+                return of(updatedData);
+              }
+            }),
+            switchMap(updatedData => {
               const result = validate.call(validationContext, updatedData);
 
               return typeof result == 'boolean'
@@ -371,22 +400,6 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
                     return Promise.reject(err);
                   }));
-            }),
-            switchMap(([data, valid]: [JsonValue, boolean]) => {
-              if (validationOptions.withPrompts === false) {
-                return of([data, valid]);
-              }
-
-              const definitions = schemaInfo.promptDefinitions
-                .filter(def => !validationContext.promptFieldsWithValue.has(def.id));
-
-              if (valid && this._promptProvider && definitions.length > 0) {
-                return from(this._applyPrompts(data, definitions)).pipe(
-                  map(data => [data, valid]),
-                );
-              } else {
-                return of([data, valid]);
-              }
             }),
             switchMap(([data, valid]: [JsonValue, boolean]) => {
               if (valid) {
@@ -508,7 +521,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
         // tslint:disable-next-line:no-any
         const pathArray = ((it as any).dataPathArr as string[]).slice(1, it.dataLevel + 1);
-        const path = pathArray.join('/');
+        const path = '/' + pathArray.map(p => p.replace(/^\'/, '').replace(/\'$/, '')).join('/');
 
         let type: string | undefined;
         let items: Array<string | { label: string, value: string | number | boolean }> | undefined;
@@ -609,9 +622,17 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     return from(provider(prompts)).pipe(
       map(answers => {
         for (const path in answers) {
+          const pathFragments = path.split('/').map(pf => {
+            if (/^\d+$/.test(pf)) {
+              return pf;
+            } else {
+              return '\'' + pf + '\'';
+            }
+          });
+
           CoreSchemaRegistry._set(
             data,
-            path.split('/'),
+            pathFragments.slice(1),
             answers[path] as {},
             null,
             undefined,

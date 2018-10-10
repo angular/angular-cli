@@ -43,9 +43,9 @@ describe('Prompt Provider', () => {
 
     registry.usePromptProvider(async definitions => {
       return {
-        '\'bool\'': true,
-        '\'test\'': 'two',
-        '\'obj\'/\'deep\'/\'three\'': 'test3-answer',
+        '/bool': true,
+        '/test': 'two',
+        '/obj/deep/three': 'test3-answer',
       };
     });
 
