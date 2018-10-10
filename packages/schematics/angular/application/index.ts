@@ -240,6 +240,14 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
   return addProjectToWorkspace(workspace, options.name, project);
 }
 
+function minimalPathFilter(path: string): boolean {
+  const toRemoveList: RegExp[] = [/e2e\//, /editorconfig/, /README/, /karma.conf.js/,
+                                  /protractor.conf.js/, /test.ts/, /tsconfig.spec.json/,
+                                  /tslint.json/, /favicon.ico/];
+
+  return !toRemoveList.some(re => re.test(path));
+}
+
 export default function (options: ApplicationOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     if (!options.name) {
@@ -248,12 +256,19 @@ export default function (options: ApplicationOptions): Rule {
     validateProjectName(options.name);
     const prefix = options.prefix || 'app';
     const appRootSelector = `${prefix}-root`;
-    const componentOptions = {
+    const componentOptions = !options.minimal ?
+    {
       inlineStyle: options.inlineStyle,
       inlineTemplate: options.inlineTemplate,
       spec: !options.skipTests,
       styleext: options.style,
       viewEncapsulation: options.viewEncapsulation,
+    } :
+    {
+      inlineStyle: true,
+      InlineTemplate: true,
+      spec: false,
+      styleext: options.style,
     };
 
     const workspace = getWorkspace(host);
@@ -287,6 +302,7 @@ export default function (options: ApplicationOptions): Rule {
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
       mergeWith(
         apply(url('./files/src'), [
+          options.minimal ? filter(minimalPathFilter) : noop(),
           template({
             utils: strings,
             ...options,
@@ -297,6 +313,7 @@ export default function (options: ApplicationOptions): Rule {
         ])),
       mergeWith(
         apply(url('./files/root'), [
+          options.minimal ? filter(minimalPathFilter) : noop(),
           template({
             utils: strings,
             ...options,
@@ -308,6 +325,7 @@ export default function (options: ApplicationOptions): Rule {
         ])),
       mergeWith(
         apply(url('./files/lint'), [
+          options.minimal ? filter(minimalPathFilter) : noop(),
           template({
             utils: strings,
             ...options,
