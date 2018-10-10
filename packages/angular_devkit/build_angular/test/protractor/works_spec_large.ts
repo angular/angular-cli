@@ -32,9 +32,9 @@ describe('Protractor Builder', () => {
 
   it('overrides protractor specs', (done) => {
     host.scopedSync().rename(normalize('./e2e/app.e2e-spec.ts'),
-      normalize('./e2e/renamed-app.e2e-spec.ts'));
+      normalize('./e2e/renamed-app.e2e.spec.ts'));
 
-    const overrides = { specs: ['./e2e/renamed-app.e2e-spec.ts'] };
+    const overrides = { specs: ['./e2e/renamed-app.e2e.spec.ts'] };
 
     runTargetSpec(host, protractorTargetSpec, overrides).pipe(
       retry(3),

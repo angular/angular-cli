@@ -131,10 +131,10 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
   }
 
   private _runProtractor(root: Path, options: ProtractorBuilderOptions): Observable<BuildEvent> {
-    const additionalProtractorConfig = {
+    const additionalProtractorConfig: Partial<ProtractorBuilderOptions> = {
       elementExplorer: options.elementExplorer,
       baseUrl: options.baseUrl,
-      spec: options.specs.length ? options.specs : undefined,
+      specs: options.specs.length ? options.specs : undefined,
       suite: options.suite,
     };
 
