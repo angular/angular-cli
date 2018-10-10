@@ -227,6 +227,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
       disableHostCheck: options.disableHostCheck,
       publicPath: servePath,
       hot: options.hmr,
+      contentBase: false,
     };
 
     if (options.ssl) {
