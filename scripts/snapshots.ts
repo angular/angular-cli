@@ -11,9 +11,29 @@ import { execSync, spawnSync } from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { packages } from '../lib/packages';
+import { PackageInfo, packages } from '../lib/packages';
 import build from './build';
 import create from './create';
+
+
+// Added to the README.md of the snapshot. This is markdown.
+const readmeHeaderFn = (pkg: PackageInfo) => `
+# Snapshot build of ${pkg.name}
+
+This repository is a snapshot of a commit on the original repository. The original code used to
+generate this is located at http://github.com/angular/angular-cli.
+
+We do not accept PRs or Issues opened on this repository. You should not use this over a tested and
+released version of this package.
+
+To test this snapshot in your own project, use
+
+\`\`\`bash
+npm install github.com/${pkg.snapshotRepo}
+\`\`\`
+
+----
+`;
 
 
 function _copy(from: string, to: string) {
@@ -137,7 +157,17 @@ export default async function(opts: SnapshotsOptions, logger: logging.Logger) {
       _exec('git', ['config', 'commit.gpgSign', 'false'], { cwd: destPath }, publishLogger);
     }
 
-    // Make sure that every snapshots is unique.
+    // Add the header to the existing README.md (or create a README if it doesn't exist).
+    const readmePath = path.join(destPath, 'README.md');
+    let readme = readmeHeaderFn(pkg);
+    try {
+      readme += fs.readFileSync(readmePath, 'utf-8');
+    } catch {}
+
+    fs.writeFileSync(readmePath, readme);
+
+    // Make sure that every snapshots is unique (otherwise we would need to make sure git accepts
+    // empty commits).
     fs.writeFileSync(path.join(destPath, 'uniqueId'), '' + new Date());
 
     // Commit and push.
