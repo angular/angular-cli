@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/help.json",
-  "description": "Displays help for the Angular CLI.",
+  "description": "Lists available commands and their short descriptions in the console. \n &nbsp &nbsp For help with individual commands, use the \"--help\" or \"-h\" option with the command.",
   "$longDescription": "",
 
   "$scope": "all",
