@@ -13,12 +13,14 @@ import { Schema as EjectCommandSchema } from './eject';
 export class EjectCommand extends Command<EjectCommandSchema> {
   async run() {
     this.logger.error(tags.stripIndents`
-      The 'eject' command has been temporarily disabled, as it is not yet compatible with the new
-      angular.json format. The new configuration format provides further flexibility to modify the
-      configuration of your workspace without ejecting. Ejection will be re-enabled in a future
-      release of the CLI.
+      The 'eject' command has been disabled and will be removed completely in 8.0.
+      The new configuration format provides increased flexibility to modify the
+      configuration of your workspace without ejecting.
 
-      If you need to eject today, use CLI 1.7 to eject your project.
+      There are several projects that can be used in conjuction with the new
+      configuration format that provide the benefits of ejecting without the maintenance
+      overhead.  One such project is ngx-build-plus found here:
+      https://github.com/manfredsteyer/ngx-build-plus
     `);
 
     return 1;
