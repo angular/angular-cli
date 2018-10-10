@@ -155,6 +155,12 @@ export async function parseJsonSchemaToOptions(
     const ptr = json.schema.parseJsonPointer(pointer);
     const name = ptr[ptr.length - 1];
 
+    if (options.some((e) => {
+      return e.name === name;
+    })) {
+      // Skip duplicates.
+      return;
+    }
     if (ptr[ptr.length - 2] != 'properties') {
       // Skip any non-property items.
       return;
