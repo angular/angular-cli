@@ -472,7 +472,16 @@ function extractProjectsConfig(
 
       if (app.testTsconfig) {
           testOptions.tsConfig = appRoot + '/' + app.testTsconfig;
-        }
+      }
+
+      const codeCoverageExclude = config.test
+        && config.test.codeCoverage
+        && config.test.codeCoverage.exclude;
+
+      if (codeCoverageExclude) {
+        testOptions.codeCoverageExclude = codeCoverageExclude;
+      }
+
       testOptions.scripts = (app.scripts || []).map(_extraEntryMapper);
       testOptions.styles = (app.styles || []).map(_extraEntryMapper);
       testOptions.assets = (app.assets || []).map(_mapAssets).filter(x => !!x);
