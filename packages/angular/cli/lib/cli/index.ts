@@ -82,6 +82,7 @@ function initializeLogging(logger: logging.Logger) {
           break;
         case 'warn':
           color = terminal.yellow;
+          output = process.stderr;
           break;
         case 'error':
           color = terminal.red;
