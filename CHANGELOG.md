@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="7.0.0-rc.0"></a>
+# [7.0.0-rc.0](https://github.com/angular/universal/compare/v6.1.0...v7.0.0-rc.0) (2018-10-11)
+
+
+### Bug Fixes
+
+* **express-engine:** add webpack option to schematics ([#1081](https://github.com/angular/universal/issues/1081)) ([0922de7](https://github.com/angular/universal/commit/0922de7)), closes [#1080](https://github.com/angular/universal/issues/1080)
+
+
+### Features
+
+* **express-engine:** add option to skip Universal schematic ([#1059](https://github.com/angular/universal/issues/1059)) ([9ebb943](https://github.com/angular/universal/commit/9ebb943))
+* **socket-engine:** add providers parameter ([#1072](https://github.com/angular/universal/issues/1072)) ([c16860c](https://github.com/angular/universal/commit/c16860c))
+
+
+
 <a name="6.1.0"></a>
 # [6.1.0](https://github.com/angular/universal/compare/v6.0.0...v6.1.0) (2018-08-23)
 
