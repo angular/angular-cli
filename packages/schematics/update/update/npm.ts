@@ -277,7 +277,7 @@ export function getNpmPackageJson(
           const params = {
             timeout: 30000,
             auth,
-          }; 
+          };
 
           client.get(
             fullUrl.toString(),
