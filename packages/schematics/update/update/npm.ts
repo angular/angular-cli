@@ -195,6 +195,7 @@ export function getNpmPackageJson(
         getNpmConfigOption('strict-ssl'),
         getNpmConfigOption('cafile'),
         getNpmConfigOption('_auth'),
+        getNpmConfigOption('user-agent'),
         getNpmConfigOption('_authToken', registryKey),
         getNpmConfigOption('username', registryKey, true),
         getNpmConfigOption('password', registryKey, true),
@@ -209,6 +210,7 @@ export function getNpmPackageJson(
             strictSsl,
             cafile,
             token,
+            userAgent,
             authToken,
             username,
             password,
@@ -264,6 +266,7 @@ export function getNpmPackageJson(
           const client = new RegistryClient({
             proxy: { http, https },
             ssl: sslOptions,
+            ...(userAgent && {userAgent: userAgent}),
           });
           client.log.level = 'silent';
           const params = {
