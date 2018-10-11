@@ -99,7 +99,7 @@
     "glob": "^7.1.2",
     "hapi": "^17.5.1",
     "jasmine-core": "^2.8.0",
-    "karma": "^2.0.0",
+    "karma": "^3.0.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^1.1.1",
     "karma-sourcemap-loader": "^0.3.7",

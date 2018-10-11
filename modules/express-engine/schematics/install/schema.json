@@ -77,6 +77,11 @@
       "description": "Skip the Angular Universal schematic",
       "type": "boolean",
       "default": false
+    },
+    "webpack": {
+      "description": "Whether to add webpack configuration files",
+      "type": "boolean",
+      "default": true
     }
   },
   "required": [
