@@ -184,9 +184,9 @@ export default async function(opts: SnapshotsOptions, logger: logging.Logger) {
     const options = { cwd: newProjectRoot };
     const childLogger = logger.createChild(commandName);
     const stdout = _exec(ngPath, [commandName, '--help=json'], options, childLogger);
-    if (stdout.trim()) {
-      fs.writeFileSync(path.join(helpOutputRoot, commandName + '.json'), stdout);
-    }
+    // Make sure the output is JSON before printing it, and format it as well.
+    const jsonOutput = JSON.stringify(JSON.parse(stdout.trim()), undefined, 2);
+    fs.writeFileSync(path.join(helpOutputRoot, commandName + '.json'), jsonOutput);
   }
 
   if (!githubToken) {

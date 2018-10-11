@@ -93,7 +93,7 @@ export async function runCommand(
     }
 
     commandMap[name] =
-      await parseJsonSchemaToCommandDescription(name, schemaPath, registry, schema, logger);
+      await parseJsonSchemaToCommandDescription(name, schemaPath, registry, schema);
   }
 
   let commandName: string | undefined = undefined;

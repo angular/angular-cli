@@ -36,7 +36,6 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
           schematic.description.path,
           this._workflow.registry,
           schematic.description.schemaJson,
-          this.logger,
         );
       } else {
         continue;
