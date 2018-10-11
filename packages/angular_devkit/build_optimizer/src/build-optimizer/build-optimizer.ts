@@ -85,6 +85,7 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
   }
 
   const isWebpackBundle = content.indexOf('__webpack_require__') !== -1;
+  const isCjsLikeModule = /exports.\S+\s*=/.test(content);
 
   // Determine which transforms to apply.
   const getTransforms = [];
@@ -118,11 +119,14 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     getTransforms.unshift(getPrefixClassesTransformer);
   }
 
-  // This transform introduces import/require() calls, but this won't work properly on libraries
-  // built with Webpack. These libraries use __webpack_require__() calls instead, which will break
-  // with a new import that wasn't part of it's original module list.
+  // This transform introduces import calls, but this won't work properly on libraries
+  // built into self contained bundles.
+  // If they are built with Webpack, they will use __webpack_require__() calls instead, which will
+  // break with a new import that wasn't part of it's original module list.
+  // Some bundle runtimes replace 'require()' with a custom loader, which will cause the new import
+  // to also fail to be found.
   // We ignore this transform for such libraries.
-  if (!isWebpackBundle && (ignoreTest || testImportTslib(content))) {
+  if (!isWebpackBundle && !isCjsLikeModule && (ignoreTest || testImportTslib(content))) {
     getTransforms.unshift(getImportTslibTransformer);
   }
 

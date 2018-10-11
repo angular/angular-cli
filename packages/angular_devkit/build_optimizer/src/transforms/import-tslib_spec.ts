@@ -80,36 +80,4 @@ describe('import-tslib', () => {
     expect(testImportTslib(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
-
-  it('replaces uses "require" instead of "import" on CJS modules', () => {
-    const input = tags.stripIndent`
-      var __extends = (this && this.__extends) || function (d, b) {
-          for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-          function __() { this.constructor = d; }
-          d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-      };
-      exports.meaning = 42;
-    `;
-    const output = tags.stripIndent`
-      var __extends = /*@__PURE__*/ require("tslib").__extends;
-      exports.meaning = 42;
-    `;
-
-    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
-  });
-
-  it('tests false for files using __webpack_require__', () => {
-    const input = tags.stripIndent`
-      function __webpack_require__(moduleId) {
-          var __extends = (this && this.__extends) || function (d, b) {
-              for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-              function __() { this.constructor = d; }
-              d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-          };
-          exports.meaning = 42;
-      }
-    `;
-
-    expect(testImportTslib(input)).toBeFalsy();
-  });
 });
