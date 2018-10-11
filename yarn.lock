@@ -9442,6 +9442,11 @@ yargs@^7.0.0:
     y18n "^3.2.1"
     yargs-parser "^5.0.0"
 
+yarn@^1.10.1:
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/yarn/-/yarn-1.10.1.tgz#b792ba28f050ae94cd7e719dbca80639d70da76f"
+  integrity sha512-EH0H1fyfFxkE4UpG4b+VCaVY4I488I2EyQNmGjGGKmvsSIb0G3b+1IcfGYPI2gqa1du43g4ZA3jH8fXlq6oVxg==
+
 yeast@0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/yeast/-/yeast-0.1.2.tgz#008e06d8094320c372dbc2f8ed76a0ca6c8ac419"
