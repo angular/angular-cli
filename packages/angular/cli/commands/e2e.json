@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/e2e.json",
   "description": "Builds and serves an Angular app, and runs end-to-end tests using Protractor.",
-  "$longDescription": "Must be executed from within a workspace directory.\n When a project name is not supplied, the configured default e2e project of the workspace is used.",
+  "$longDescription": "./e2e-long.md",
 
   "$aliases": [ "e" ],
   "$scope": "in",
