@@ -63,7 +63,11 @@ export class CleanCssWebpackPlugin {
     hook(compiler, (compilation: compilation.Compilation, chunks: Array<Chunk>) => {
       const cleancss = new CleanCSS({
         compatibility: 'ie9',
-        level: 2,
+        level: {
+          2: {
+            skipProperties: ['transition'] // Fixes #12408
+          }
+        },
         inline: false,
         returnPromise: true,
         sourceMap: this._options.sourceMap,
