@@ -21,11 +21,11 @@ import {
   DEFAULT_ERROR_CODE,
   Diagnostic,
   EmitFlags,
+  LazyRoute,
   Program,
   SOURCE,
   UNKNOWN_ERROR_CODE,
   VERSION,
-  __NGTOOLS_PRIVATE_API_2,
   createCompilerHost,
   createProgram,
   formatDiagnostics,
@@ -161,14 +161,6 @@ export class AngularCompilerPlugin {
 
   // Logging.
   private _logger: logging.Logger;
-
-  private get _ngCompilerSupportsNewApi() {
-    if (this._JitMode) {
-      return false;
-    } else {
-      return !!(this._program as Program).listLazyRoutes;
-    }
-  }
 
   constructor(options: AngularCompilerPluginOptions) {
     this._options = Object.assign({}, options);
@@ -426,34 +418,6 @@ export class AngularCompilerPlugin {
     }
   }
 
-  private _getLazyRoutesFromNgtools() {
-    try {
-      time('AngularCompilerPlugin._getLazyRoutesFromNgtools');
-      const result = __NGTOOLS_PRIVATE_API_2.listLazyRoutes({
-        program: this._getTsProgram(),
-        host: this._compilerHost,
-        angularCompilerOptions: Object.assign({}, this._compilerOptions, {
-          // genDir seems to still be needed in @angular\compiler-cli\src\compiler_host.js:226.
-          genDir: '',
-        }),
-        // TODO: fix compiler-cli typings; entryModule should not be string, but also optional.
-        // tslint:disable-next-line:no-non-null-assertion
-        entryModule: this._entryModule!,
-      });
-      timeEnd('AngularCompilerPlugin._getLazyRoutesFromNgtools');
-
-      return result;
-    } catch (err) {
-      // We silence the error that the @angular/router could not be found. In that case, there is
-      // basically no route supported by the app itself.
-      if (err.message.startsWith('Could not resolve module @angular/router')) {
-        return {};
-      } else {
-        throw err;
-      }
-    }
-  }
-
   private _findLazyRoutesInAst(changedFilePaths: string[]): LazyRouteMap {
     time('AngularCompilerPlugin._findLazyRoutesInAst');
     const result: LazyRouteMap = Object.create(null);
@@ -471,12 +435,24 @@ export class AngularCompilerPlugin {
   }
 
   private _listLazyRoutesFromProgram(): LazyRouteMap {
-    const ngProgram = this._program as Program;
-    if (!ngProgram.listLazyRoutes) {
-      throw new Error('_listLazyRoutesFromProgram was called with an old program.');
-    }
+    let lazyRoutes: LazyRoute[];
+    if (this._JitMode) {
+      if (!this.entryModule) {
+        return {};
+      }
 
-    const lazyRoutes = ngProgram.listLazyRoutes();
+      const ngProgram = createProgram({
+        rootNames: this._rootNames,
+        options: { ...this._compilerOptions, genDir: '', collectAllErrors: true },
+        host: this._compilerHost,
+      });
+
+      lazyRoutes = ngProgram.listLazyRoutes(
+        this.entryModule.path + '#' + this.entryModule.className,
+      );
+    } else {
+      lazyRoutes = (this._program as Program).listLazyRoutes();
+    }
 
     return lazyRoutes.reduce(
       (acc, curr) => {
@@ -890,30 +866,26 @@ export class AngularCompilerPlugin {
 
     // If nothing we care about changed and it isn't the first run, don't do anything.
     if (changedFiles.length === 0 && !this._firstRun) {
-      return Promise.resolve();
+      return;
     }
 
     // Make a new program and load the Angular structure.
     await this._createOrUpdateProgram();
 
-    if (this.entryModule) {
-      // Try to find lazy routes if we have an entry module.
-      // We need to run the `listLazyRoutes` the first time because it also navigates libraries
-      // and other things that we might miss using the (faster) findLazyRoutesInAst.
-      // Lazy routes modules will be read with compilerHost and added to the changed files.
-      if (this._ngCompilerSupportsNewApi) {
-        this._processLazyRoutes(this._listLazyRoutesFromProgram());
-      } else if (this._firstRun) {
-        this._processLazyRoutes(this._getLazyRoutesFromNgtools());
-      } else {
-        const changedTsFiles = this._getChangedTsFiles();
-        if (changedTsFiles.length > 0) {
-          this._processLazyRoutes(this._findLazyRoutesInAst(changedTsFiles));
-        }
+    // Try to find lazy routes if we have an entry module.
+    // We need to run the `listLazyRoutes` the first time because it also navigates libraries
+    // and other things that we might miss using the (faster) findLazyRoutesInAst.
+    // Lazy routes modules will be read with compilerHost and added to the changed files.
+    if (this._firstRun || !this._JitMode) {
+      this._processLazyRoutes(this._listLazyRoutesFromProgram());
+    } else {
+      const changedTsFiles = this._getChangedTsFiles();
+      if (changedTsFiles.length > 0) {
+        this._processLazyRoutes(this._findLazyRoutesInAst(changedTsFiles));
       }
-      if (this._options.additionalLazyModules) {
-        this._processLazyRoutes(this._options.additionalLazyModules);
-      }
+    }
+    if (this._options.additionalLazyModules) {
+      this._processLazyRoutes(this._options.additionalLazyModules);
     }
 
     // Emit and report errors.
