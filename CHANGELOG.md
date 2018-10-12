@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="7.0.0-rc.1"></a>
+# [7.0.0-rc.1](https://github.com/angular/universal/compare/v7.0.0-rc.0...v7.0.0-rc.1) (2018-10-12)
+
+
+### Bug Fixes
+
+* **express-engine:** modify dist directories to provide consistent access ([#1082](https://github.com/angular/universal/issues/1082)) ([4dc0482](https://github.com/angular/universal/commit/4dc0482))
+
+
+
 <a name="7.0.0-rc.0"></a>
 # [7.0.0-rc.0](https://github.com/angular/universal/compare/v6.1.0...v7.0.0-rc.0) (2018-10-11)
 

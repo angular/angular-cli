@@ -1,7 +1,7 @@
 {
   "name": "nguniversal",
   "main": "index.js",
-  "version": "7.0.0-rc.0",
+  "version": "7.0.0-rc.1",
   "description": "Universal (isomorphic) JavaScript support for Angular",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
@@ -126,5 +126,7 @@
     "uglify-js": "^2.8.14",
     "zone.js": "^0.8.26"
   },
-  "dependencies": {}
+  "dependencies": {
+    "yarn": "^1.10.1"
+  }
 }
