@@ -72,8 +72,8 @@
     "test:watch": "ibazel test //..."
   },
   "devDependencies": {
-    "@angular-devkit/core": "^0.7.3",
-    "@angular-devkit/schematics": "^0.7.3",
+    "@angular-devkit/core": "^0.7.5",
+    "@angular-devkit/schematics": "^0.7.5",
     "@angular/animations": "6.0.4",
     "@angular/bazel": "6.0.4",
     "@angular/common": "6.0.4",
@@ -87,7 +87,7 @@
     "@angular/router": "6.0.4",
     "@angular/upgrade": "6.0.4",
     "@bazel/ibazel": "^0.3.1",
-    "@schematics/angular": "^0.7.3",
+    "@schematics/angular": "^0.7.5",
     "@types/express": "^4.0.39",
     "@types/fs-extra": "^4.0.5",
     "@types/hapi": "^17.0.12",

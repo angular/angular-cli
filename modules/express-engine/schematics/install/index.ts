@@ -28,6 +28,9 @@ import {
   NodeDependencyType,
 } from '@schematics/angular/utility/dependencies';
 
+// TODO(CaerusKaru): make these configurable
+const BROWSER_DIST = 'dist/browser';
+const SERVER_DIST = 'dist/server';
 
 function getClientProject(
   host: Tree, options: UniversalOptions,
@@ -126,6 +129,10 @@ function updateConfigFile(options: UniversalOptions): Rule {
     }
 
     clientProject.architect.server.configurations = serverConfig;
+    // TODO(CaerusKaru): make this configurable
+    clientProject.architect.server.options.outputPath = SERVER_DIST;
+    // TODO(CaerusKaru): make this configurable
+    clientProject.architect.build.options.outputPath = BROWSER_DIST;
 
     const workspacePath = getWorkspacePath(host);
 
@@ -153,7 +160,9 @@ export default function (options: UniversalOptions): Rule {
       template({
         ...strings,
         ...options as object,
-        stripTsExtension: (s: string) => { return s.replace(/\.ts$/, ''); }
+        stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
+        getBrowserDistDirectory: () => BROWSER_DIST,
+        getServerDistDirectory: () => SERVER_DIST,
       })
     ]);
 
