@@ -410,10 +410,17 @@ export class AngularCompilerPlugin {
     }
 
     // If there's still no entryModule try to resolve from mainPath.
-    if (!this._entryModule && this._mainPath) {
+    if (!this._entryModule && this._mainPath && !this._compilerOptions.enableIvy) {
       time('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
       this._entryModule = resolveEntryModuleFromMain(
         this._mainPath, this._compilerHost, this._getTsProgram() as ts.Program);
+
+      if (!this.entryModule) {
+        this._warnings.push('Lazy routes discovery is not enabled. '
+          + 'Because there is neither an entryModule nor a '
+          + 'statically analyzable bootstrap code in the main file.',
+        );
+      }
       timeEnd('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
     }
   }
