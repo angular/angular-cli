@@ -26,6 +26,7 @@ const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const StatsPlugin = require('stats-webpack-plugin');
+const WorkerPlugin = require('worker-plugin');
 
 /**
  * Enumerate loaders and their dependencies from this file to let the dependency validator
@@ -118,6 +119,11 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         basePath: projectRoot,
       }));
     });
+  }
+
+  if (buildOptions.autoBundleWorkerModules) {
+    const workerPluginInstance = new WorkerPlugin();
+    extraPlugins.push(workerPluginInstance);
   }
 
   // process asset entries
