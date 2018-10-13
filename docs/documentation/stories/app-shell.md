@@ -52,3 +52,16 @@ ng run my-app:app-shell
 Verify the build output
 Open dist/app-shell/index.html
 look for text "app-shell works!" which verifies that the app shell route was rendered as part of the output
+
+Note, to create a production build of the client app, change the `app-shell` > `options` > `browserTarget` to the following:
+
+```
+"app-shell": {
+  "builder": "@angular-devkit/build-angular:app-shell",
+  "options": {
+    "browserTarget": "my-app:build:production",
+    "serverTarget": "my-app:server",
+    "route": "shell"
+  }
+}
+```
