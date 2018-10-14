@@ -2,7 +2,7 @@
 
 As applications grow in functionality, they also grow in size. Budgets is a feature in the
 Angular CLI which allows you to set budget thresholds in your configuration to ensure parts
-of your application stay within boundries which you set.
+of your application stay within boundaries which you set.
 
 **angular.json**
 ```
