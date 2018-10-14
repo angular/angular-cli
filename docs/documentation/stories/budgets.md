@@ -60,3 +60,24 @@ Available formats:
 
 All sizes are relative to baseline.
 Percentages are not valid for baseline values.
+
+## Example
+
+```
+{
+  ...
+  "configurations": {
+    "production": {
+      ...
+      budgets: [
+        {
+          "type": "bundle",
+          "name": "vendor",
+          "minimumWarning": "300kb",
+          "minimumError": "400kb",
+        }
+      ]
+    }
+  }
+}
+```
