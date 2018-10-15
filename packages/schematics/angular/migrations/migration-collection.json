@@ -16,6 +16,11 @@
       "description": "Update an Angular CLI project to version 7."
     },
     "migration-04": {
+      "version": "7.1.0-beta.0",
+      "factory": "./update-7/index#typeScriptHelpersRule",
+      "description": "Update an Angular CLI project to version 7."
+    },
+    "migration-04b": {
       "version": "7.0.3",
       "factory": "./update-7",
       "description": "Update an Angular CLI project to version 7."
