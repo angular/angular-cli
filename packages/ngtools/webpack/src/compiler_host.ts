@@ -33,6 +33,13 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   private _basePath: Path;
   private _resourceLoader?: WebpackResourceLoader;
   private _sourceFileCache = new Map<string, ts.SourceFile>();
+  private _virtualFileExtensions = [
+    '.js', '.js.map',
+    '.ngfactory.js', '.ngfactory.js.map',
+    '.ngstyle.js', '.ngstyle.js.map',
+    '.ngsummary.json',
+  ];
+
 
   constructor(
     private _options: ts.CompilerOptions,
@@ -79,11 +86,6 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
   invalidate(fileName: string): void {
     const fullPath = this.resolve(fileName);
-
-    if (this._memoryHost.exists(fullPath)) {
-      this._memoryHost.delete(fullPath);
-    }
-
     this._sourceFileCache.delete(fullPath);
 
     try {
@@ -91,7 +93,17 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       if (exists) {
         this._changedFiles.add(fullPath);
       }
-    } catch { }
+    } catch {
+      // File doesn't exist anymore, so we should delete the related virtual files.
+      if (fullPath.endsWith('.ts')) {
+        this._virtualFileExtensions.forEach(ext => {
+          const virtualFile = fullPath.replace(/\.ts$/, ext) as Path;
+          if (this._memoryHost.exists(virtualFile)) {
+            this._memoryHost.delete(virtualFile);
+          }
+        });
+      }
+    }
   }
 
   fileExists(fileName: string, delegate = true): boolean {
