@@ -12,7 +12,6 @@ import {
   transformJavascript,
 } from '../helpers/transform-javascript';
 import { getFoldFileTransformer } from '../transforms/class-fold';
-import { getImportTslibTransformer, testImportTslib } from '../transforms/import-tslib';
 import { getPrefixClassesTransformer, testPrefixClasses } from '../transforms/prefix-classes';
 import { getPrefixFunctionsTransformer } from '../transforms/prefix-functions';
 import { getScrubFileTransformer, testScrubFile } from '../transforms/scrub-file';
@@ -84,7 +83,7 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     };
   }
 
-  const isWebpackBundle = content.indexOf('__webpack_require__') !== -1;
+  // const isWebpackBundle = content.indexOf('__webpack_require__') !== -1;
 
   // Determine which transforms to apply.
   const getTransforms = [];
@@ -112,7 +111,7 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
 
   // tests are not needed for fast path
   // usage will be expanded once transformers are verified safe
-  const ignoreTest = !options.emitSourceMap && !typeCheck;
+  // const ignoreTest = !options.emitSourceMap && !typeCheck;
 
   if (testPrefixClasses(content)) {
     getTransforms.unshift(getPrefixClassesTransformer);
@@ -122,9 +121,9 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
   // built with Webpack. These libraries use __webpack_require__() calls instead, which will break
   // with a new import that wasn't part of it's original module list.
   // We ignore this transform for such libraries.
-  if (!isWebpackBundle && (ignoreTest || testImportTslib(content))) {
-    getTransforms.unshift(getImportTslibTransformer);
-  }
+  // if (!isWebpackBundle && (ignoreTest || testImportTslib(content))) {
+  //   getTransforms.unshift(getImportTslibTransformer);
+  // }
 
   getTransforms.unshift(getWrapEnumsTransformer);
 
