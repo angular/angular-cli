@@ -11,7 +11,7 @@ import * as ts from 'typescript';
  * @deprecated From 0.9.0
  */
 export function testImportTslib(content: string) {
-  const regex = /var (__extends|__decorate|__metadata|__param) = \(.*\r?\n(    .*\r?\n)*\};/;
+  const regex = /var (__extends|__decorate|__metadata|__param) = \(.*\r?\n\s+(.*\r?\n)*\s*\};/;
 
   return regex.test(content);
 }
@@ -21,10 +21,12 @@ export function getImportTslibTransformer(): ts.TransformerFactory<ts.SourceFile
 
     const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
 
+      const tslibImports: (ts.VariableStatement | ts.ImportDeclaration)[] = [];
+
       // Check if module has CJS exports. If so, use 'require()' instead of 'import'.
       const useRequire = /exports.\S+\s*=/.test(sf.getText());
 
-      const visitor: ts.Visitor = (node: ts.Node): ts.Node => {
+      const visitor: ts.Visitor = (node: ts.Node): ts.Node | undefined => {
 
         // Check if node is a TS helper declaration and replace with import if yes
         if (ts.isVariableStatement(node)) {
@@ -35,8 +37,10 @@ export function getImportTslibTransformer(): ts.TransformerFactory<ts.SourceFile
 
             if (isHelperName(name)) {
               // TODO: maybe add a few more checks, like checking the first part of the assignment.
+              const tslibImport = createTslibImport(name, useRequire);
+              tslibImports.push(tslibImport);
 
-              return createTslibImport(name, useRequire);
+              return undefined;
             }
           }
         }
@@ -44,14 +48,25 @@ export function getImportTslibTransformer(): ts.TransformerFactory<ts.SourceFile
         return ts.visitEachChild(node, visitor, context);
       };
 
-      return ts.visitEachChild(sf, visitor, context);
+      const sfUpdated = ts.visitEachChild(sf, visitor, context);
+
+      // Add tslib imports before any other statement
+      return tslibImports.length > 0
+        ? ts.updateSourceFileNode(sfUpdated, [
+          ...tslibImports,
+          ...sfUpdated.statements,
+        ])
+        : sfUpdated;
     };
 
     return transformer;
   };
 }
 
-function createTslibImport(name: string, useRequire = false): ts.Node {
+function createTslibImport(
+  name: string,
+  useRequire = false,
+): ts.VariableStatement | ts.ImportDeclaration {
   if (useRequire) {
     // Use `var __helper = /*@__PURE__*/ require("tslib").__helper`.
     const requireCall = ts.createCall(ts.createIdentifier('require'), undefined,
