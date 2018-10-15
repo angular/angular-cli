@@ -106,6 +106,7 @@ export interface AngularCompilerPluginOptions {
 
   // added to the list of lazy routes
   additionalLazyModules?: { [module: string]: string };
+  additionalLazyModuleResources?: string[];
 
   // The ContextElementDependency of correct Webpack compilation.
   // This is needed when there are multiple Webpack installs.
@@ -663,15 +664,19 @@ export class AngularCompilerPlugin {
       // APFv6 does not have single FESM anymore. Instead of verifying if we're pointing to
       // FESMs, we resolve the `@angular/core` path and verify that the path for the
       // module starts with it.
-
       // This may be slower but it will be compatible with both APF5, 6 and potential future
       // versions (until the dynamic import appears outside of core I suppose).
       // We resolve any symbolic links in order to get the real path that would be used in webpack.
-      const angularCoreDirname = fs.realpathSync(path.dirname(angularCorePackagePath));
+      const angularCoreResourceRoot = fs.realpathSync(path.dirname(angularCorePackagePath));
 
       cmf.hooks.afterResolve.tapPromise('angular-compiler', async result => {
-        // Alter only request from Angular.
-        if (!result || !this.done || !result.resource.startsWith(angularCoreDirname)) {
+        // Alter only existing request from Angular or one of the additional lazy module resources.
+        const isLazyModuleResource = (resource: string) =>
+          resource.startsWith(angularCoreResourceRoot) ||
+          ( this.options.additionalLazyModuleResources &&
+            this.options.additionalLazyModuleResources.includes(resource));
+
+        if (!result || !this.done || !isLazyModuleResource(result.resource)) {
           return result;
         }
 
