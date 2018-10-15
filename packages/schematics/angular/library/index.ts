@@ -117,7 +117,7 @@ function addDependenciesToPackageJson() {
       {
         type: NodeDependencyType.Dev,
         name: 'tslib',
-        version: '^1.9.0',
+        version: latestVersions.TsLib,
       },
       {
         type: NodeDependencyType.Dev,
