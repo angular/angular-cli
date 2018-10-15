@@ -21,6 +21,7 @@
     "@angular/router": "<%= experimentalAngularNext ? 'next' : latestVersions.Angular %>",
     "core-js": "^2.5.4",
     "rxjs": "<%= latestVersions.RxJs %>",
+    "tslib": "<%= latestVersions.TsLib %>",
     "zone.js": "<%= latestVersions.ZoneJs %>"
   },
   "devDependencies": {

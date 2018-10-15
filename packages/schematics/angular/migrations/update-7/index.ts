@@ -15,6 +15,7 @@ import {
 import { latestVersions } from '../../utility/latest-versions';
 
 export { polyfillMetadataRule } from './polyfill-metadata';
+export { typeScriptHelpersRule } from './typescript-helpers';
 
 export default function(): Rule {
   return (tree, context) => {
