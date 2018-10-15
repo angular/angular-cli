@@ -7,13 +7,35 @@
  */
 import * as ts from 'typescript';
 
+const tsHelpers = [
+  '__extends',
+  '__assign',
+  '__rest',
+  '__decorate',
+  '__param',
+  '__metadata',
+  '__awaiter',
+  '__generator',
+  '__exportStar',
+  '__values',
+  '__read',
+  '__spread',
+  '__await',
+  '__asyncGenerator',
+  '__asyncDelegator',
+  '__asyncValues',
+  '__makeTemplateObject',
+  '__importStar',
+  '__importDefault',
+];
+
+const tsHelpersRegExp = new RegExp(`var (${tsHelpers.join('|')}) = \\(.*\r?\n(    .*\r?\n)*\};`);
+
 /**
  * @deprecated From 0.9.0
  */
 export function testImportTslib(content: string) {
-  const regex = /var (__extends|__decorate|__metadata|__param) = \(.*\r?\n(    .*\r?\n)*\};/;
-
-  return regex.test(content);
+  return tsHelpersRegExp.test(content);
 }
 
 export function getImportTslibTransformer(): ts.TransformerFactory<ts.SourceFile> {
@@ -76,13 +98,5 @@ function createTslibImport(name: string, useRequire = false): ts.Node {
 }
 
 function isHelperName(name: string): boolean {
-  // TODO: there are more helpers than these, should we replace them all?
-  const tsHelpers = [
-    '__extends',
-    '__decorate',
-    '__metadata',
-    '__param',
-  ];
-
   return tsHelpers.indexOf(name) !== -1;
 }
