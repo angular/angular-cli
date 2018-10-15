@@ -88,21 +88,25 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     const fullPath = this.resolve(fileName);
     this._sourceFileCache.delete(fullPath);
 
+    let exists = false;
     try {
-      const exists = this._syncHost.isFile(fullPath);
+      exists = this._syncHost.isFile(fullPath);
       if (exists) {
         this._changedFiles.add(fullPath);
       }
-    } catch {
-      // File doesn't exist anymore, so we should delete the related virtual files.
-      if (fullPath.endsWith('.ts')) {
-        this._virtualFileExtensions.forEach(ext => {
-          const virtualFile = fullPath.replace(/\.ts$/, ext) as Path;
-          if (this._memoryHost.exists(virtualFile)) {
-            this._memoryHost.delete(virtualFile);
-          }
-        });
-      }
+    } catch { }
+
+    // File doesn't exist anymore and is not a factory, so we should delete the related
+    // virtual files.
+    if (!exists && fullPath.endsWith('.ts') && !(
+      fullPath.endsWith('.ngfactory.ts') || fullPath.endsWith('.shim.ngstyle.ts')
+    )) {
+      this._virtualFileExtensions.forEach(ext => {
+        const virtualFile = (fullPath.slice(0, -3) + ext) as Path;
+        if (this._memoryHost.exists(virtualFile)) {
+          this._memoryHost.delete(virtualFile);
+        }
+      });
     }
   }
 
