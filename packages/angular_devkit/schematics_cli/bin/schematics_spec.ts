@@ -35,6 +35,14 @@ describe('schematics-cli binary', () => {
     expect(res).toEqual(0);
   });
 
+  it('listSchematics works', async () => {
+    const args = ['--listSchematics'];
+    const res = await main({ args, stdout, stderr });
+    expect(stdout.lines).toMatch(/blank/);
+    expect(stdout.lines).toMatch(/schematic/);
+    expect(res).toEqual(0);
+  });
+
   it('dry-run works', async () => {
     const args = ['blank', 'foo', '--dry-run'];
     const res = await main({ args, stdout, stderr });
