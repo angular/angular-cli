@@ -23,11 +23,7 @@ import {
   SchematicEngine,
   UnsuccessfulWorkflowExecution,
 } from '@angular-devkit/schematics';
-import {
-  FileSystemEngineHost,
-  NodeModulesEngineHost,
-  NodeWorkflow,
-} from '@angular-devkit/schematics/tools';
+import { NodeModulesEngineHost, NodeWorkflow } from '@angular-devkit/schematics/tools';
 import * as minimist from 'minimist';
 
 
@@ -73,7 +69,6 @@ export async function main({
 
   /** Create the DevKit Logger used through the CLI. */
   const logger = createConsoleLogger(argv['verbose'], stdout, stderr);
-
   if (argv.help) {
     logger.info(getUsage());
 
@@ -87,16 +82,18 @@ export async function main({
   } = parseSchematicName(argv._.shift() || null);
   const isLocalCollection = collectionName.startsWith('.') || collectionName.startsWith('/');
 
-
   /** If the user wants to list schematics, we simply show all the schematic names. */
   if (argv['list-schematics']) {
-    const engineHost = isLocalCollection
-      ? new FileSystemEngineHost(normalize(process.cwd()))
-      : new NodeModulesEngineHost();
+    try {
+      const engineHost = new NodeModulesEngineHost();
+      const engine = new SchematicEngine(engineHost);
+      const collection = engine.createCollection(collectionName);
+      logger.info(engine.listSchematicNames(collection).join('\n'));
+    } catch (error) {
+      logger.fatal(error.message);
 
-    const engine = new SchematicEngine(engineHost);
-    const collection = engine.createCollection(collectionName);
-    logger.info(engine.listSchematicNames(collection).join('\n'));
+      return 1;
+    }
 
     return 0;
   }
