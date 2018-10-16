@@ -52,7 +52,7 @@ function _removeReflectFromPolyfills(tree: Tree, path: string) {
  * @param targetObject The target information.
  * @private
  */
-function _updateProjectTarget(root: string, targetObject: json.JsonObject): Rule {
+function _updateProjectTarget(targetObject: json.JsonObject): Rule {
   // Make sure we're using the correct builder.
   if (targetObject.builder !== '@angular-devkit/build-angular:browser'
       || !json.isJsonObject(targetObject.options)) {
@@ -63,7 +63,7 @@ function _updateProjectTarget(root: string, targetObject: json.JsonObject): Rule
     return noop();
   }
 
-  const polyfillsToUpdate = [`${root}/${options.polyfills}`];
+  const polyfillsToUpdate = [options.polyfills];
   const configurations = targetObject.configurations;
   if (json.isJsonObject(configurations)) {
     for (const configName of Object.keys(configurations)) {
@@ -73,7 +73,7 @@ function _updateProjectTarget(root: string, targetObject: json.JsonObject): Rule
       if (json.isJsonObject(config)
           && typeof config.polyfills == 'string'
           && config.aot !== true) {
-        polyfillsToUpdate.push(`${root}/${config.polyfills}`);
+        polyfillsToUpdate.push(config.polyfills);
       }
     }
   }
@@ -125,7 +125,7 @@ export function polyfillMetadataRule(): Rule {
       for (const targetName of Object.keys(targets)) {
         const target = targets[targetName];
         if (json.isJsonObject(target)) {
-          rules.push(_updateProjectTarget(project.root, target));
+          rules.push(_updateProjectTarget(target));
         }
       }
     }
