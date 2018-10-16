@@ -69,24 +69,7 @@ export async function main({
   stderr = process.stderr,
 }: MainOptions): Promise<0 | 1> {
 
-  /** Parse the command line. */
-  const booleanArgs = [
-    'allowPrivate',
-    'debug',
-    'dry-run',
-    'force',
-    'help',
-    'list-schematics',
-    'verbose',
-  ];
-  const argv = minimist(args, {
-    boolean: booleanArgs,
-    default: {
-      'debug': null,
-      'dry-run': null,
-    },
-    '--': true,
-  });
+  const argv = parseArgs(args);
 
   /** Create the DevKit Logger used through the CLI. */
   const logger = createConsoleLogger(argv['verbose'], stdout, stderr);
@@ -128,7 +111,7 @@ export async function main({
   const debug: boolean = argv.debug === null ? isLocalCollection : argv.debug;
   const dryRun: boolean = argv['dry-run'] === null ? debug : argv['dry-run'];
   const force = argv['force'];
-  const allowPrivate = argv['allowPrivate'];
+  const allowPrivate = argv['allow-private'];
 
   /** Create a Virtual FS Host scoped to where the process is being run. **/
   const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(process.cwd()));
@@ -282,7 +265,7 @@ function getUsage(): string {
       --debug             Debug mode. This is true by default if the collection is a relative
                           path (in that case, turn off with --debug=false).
 
-      --allowPrivate      Allow private schematics to be run from the command line. Default to
+      --allow-private     Allow private schematics to be run from the command line. Default to
                           false.
 
       --dry-run           Do not output anything, but instead just show what actions would be
@@ -299,6 +282,36 @@ function getUsage(): string {
 
   Any additional option is passed to the Schematics depending on
   `;
+}
+
+/** Parse the command line. */
+const booleanArgs = [
+  'allowPrivate',
+  'allow-private',
+  'debug',
+  'dry-run',
+  'dryRun',
+  'force',
+  'help',
+  'list-schematics',
+  'listSchematics',
+  'verbose',
+];
+
+function parseArgs(args: string[] | undefined): minimist.ParsedArgs {
+    return minimist(args, {
+      boolean: booleanArgs,
+      alias: {
+        'dryRun': 'dry-run',
+        'listSchematics': 'list-schematics',
+        'allowPrivate': 'allow-private',
+      },
+      default: {
+        'debug': null,
+        'dry-run': null,
+      },
+      '--': true,
+    });
 }
 
 if (require.main === module) {
