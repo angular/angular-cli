@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/lint.json",
-  "description": "Runs the TSLint tool on Angular app code in the given project folder.",
+  "description": "Runs linting tools on Angular app code in a given project folder.",
   "$longDescription": "./lint-long.md",
 
   "$aliases": [ "l" ],

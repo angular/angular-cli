@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/help.json",
-  "description": "Lists available commands and their short descriptions in the console. \n &nbsp &nbsp For help with individual commands, use the \"--help\" or \"-h\" option with the command.",
-  "$longDescription": "",
+  "description": "Lists available commands and their short descriptions.",
+  "$longDescription": "./help-long.md",
 
   "$scope": "all",
   "$aliases": [],
