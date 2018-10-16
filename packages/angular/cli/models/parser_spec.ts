@@ -42,6 +42,7 @@ describe('parseArguments', () => {
     '--bool=true': { bool: true },
     '--bool=false': { bool: false },
     '--no-bool': { bool: false },
+    '--no-boolean foo': { '--': ['--no-boolean'], p1: 'foo'},
     '--no-bool=true': { '--': ['--no-bool=true'] },
     '--b=true': { bool: true },
     '--b=false': { bool: false },

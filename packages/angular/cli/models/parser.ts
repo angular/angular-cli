@@ -114,7 +114,7 @@ function _assignOption(
   args: string[],
   options: Option[],
   parsedOptions: Arguments,
-  _positionals: string[],
+  positionals: string[],
   leftovers: string[],
   ignored: string[],
   errors: string[],
@@ -174,7 +174,13 @@ function _assignOption(
   }
   if (option === null) {
     if (args[0] && !args[0].startsWith('--')) {
-      leftovers.push(arg, args[0]);
+      if (arg.startsWith('--no')) {
+          positionals.push(args[0]);
+          leftovers.push(arg);
+      } else {
+          leftovers.push(arg, args[0]);
+      }
+
       args.shift();
     } else {
       leftovers.push(arg);
