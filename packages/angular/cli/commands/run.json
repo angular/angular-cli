@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/run.json",
-  "description": "Runs Architect targets.",
+  "description": "Runs a custom target defined in your project.",
   "$longDescription": "",
 
   "$aliases": [],

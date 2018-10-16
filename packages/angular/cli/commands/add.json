@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/add.json",
-  "description": "Adds support for a published library to your project.",
+  "description": "Adds support for an external library to your project.",
   "$longDescription": "./add.md",
 
   "$scope": "in",

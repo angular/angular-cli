@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/eject.json",
-  "description": "Temporarily disabled. Ejects your app and output the proper webpack configuration and scripts.",
-  "$longDescription": "",
+  "description": "Deprecated, will be removed in Angular 8.0.",
+  "$longDescription": "./eject-long.md",
 
   "$hidden": true,
   "$scope": "in",
