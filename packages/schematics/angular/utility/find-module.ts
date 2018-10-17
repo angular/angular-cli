@@ -44,8 +44,7 @@ export function findModuleFromOptions(host: Tree, options: ModuleOptions): Path 
 
   if (!options.module) {
     options.nameFormatter = options.nameFormatter || strings.dasherize;
-    const pathToCheck = (options.path || '')
-      + (options.flat ? '' : '/' + options.nameFormatter(options.name));
+    const pathToCheck = (options.path || '') + '/' + options.nameFormatter(options.name);
 
     return normalize(findModule(host, pathToCheck, moduleExt, routingModuleExt));
   } else {
