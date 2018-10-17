@@ -5,10 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { json } from '@angular-devkit/core';
+import { JsonObject, JsonParseMode, JsonValue, parseJson } from '@angular-devkit/core';
 import { Rule, Tree, chain, noop } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
 
+function isJsonObject(value: JsonValue): value is JsonObject {
+  return value != null && typeof value === 'object' && !Array.isArray(value);
+}
 
 /**
  * Remove the Reflect import from a polyfill file.
@@ -52,10 +55,10 @@ function _removeReflectFromPolyfills(tree: Tree, path: string) {
  * @param targetObject The target information.
  * @private
  */
-function _updateProjectTarget(targetObject: json.JsonObject): Rule {
+function _updateProjectTarget(targetObject: JsonObject): Rule {
   // Make sure we're using the correct builder.
   if (targetObject.builder !== '@angular-devkit/build-angular:browser'
-      || !json.isJsonObject(targetObject.options)) {
+      || !isJsonObject(targetObject.options)) {
     return noop();
   }
   const options = targetObject.options;
@@ -65,12 +68,12 @@ function _updateProjectTarget(targetObject: json.JsonObject): Rule {
 
   const polyfillsToUpdate = [options.polyfills];
   const configurations = targetObject.configurations;
-  if (json.isJsonObject(configurations)) {
+  if (isJsonObject(configurations)) {
     for (const configName of Object.keys(configurations)) {
       const config = configurations[configName];
 
       // Just in case, only do non-AOT configurations.
-      if (json.isJsonObject(config)
+      if (isJsonObject(config)
           && typeof config.polyfills == 'string'
           && config.aot !== true) {
         polyfillsToUpdate.push(config.polyfills);
@@ -100,9 +103,9 @@ export function polyfillMetadataRule(): Rule {
       return;
     }
 
-    const angularJson = json.parseJson(angularConfigContent.toString(), json.JsonParseMode.Loose);
+    const angularJson = parseJson(angularConfigContent.toString(), JsonParseMode.Loose);
 
-    if (!json.isJsonObject(angularJson) || !json.isJsonObject(angularJson.projects)) {
+    if (!isJsonObject(angularJson) || !isJsonObject(angularJson.projects)) {
       // If that field isn't there, no use...
       return;
     }
@@ -110,7 +113,7 @@ export function polyfillMetadataRule(): Rule {
     // For all projects, for all targets, read the polyfill field, and read the environment.
     for (const projectName of Object.keys(angularJson.projects)) {
       const project = angularJson.projects[projectName];
-      if (!json.isJsonObject(project)) {
+      if (!isJsonObject(project)) {
         continue;
       }
       if (typeof project.root != 'string') {
@@ -118,13 +121,13 @@ export function polyfillMetadataRule(): Rule {
       }
 
       const targets = project.targets || project.architect;
-      if (!json.isJsonObject(targets)) {
+      if (!isJsonObject(targets)) {
         continue;
       }
 
       for (const targetName of Object.keys(targets)) {
         const target = targets[targetName];
-        if (json.isJsonObject(target)) {
+        if (isJsonObject(target)) {
           rules.push(_updateProjectTarget(target));
         }
       }
