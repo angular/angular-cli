@@ -7,14 +7,13 @@
  */
 import {
   Architect,
-  BuilderConfiguration,
   TargetSpecifier,
 } from '@angular-devkit/architect';
 import { experimental, json, schema, tags } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
 import { BaseCommandOptions, Command } from './command';
-import { Arguments } from './interface';
+import { Arguments, Option } from './interface';
 import { parseArguments } from './parser';
 import { WorkspaceLoader } from './workspace-loader';
 
@@ -46,84 +45,123 @@ export abstract class ArchitectCommand<
 
     await this._loadWorkspaceAndArchitect();
 
-    if (!options.project && this.target) {
-      const projectNames = this.getProjectNamesByTarget(this.target);
-      const leftovers = options['--'];
-      if (projectNames.length > 1 && leftovers && leftovers.length > 0) {
-        // Verify that all builders are the same, otherwise error out (since the meaning of an
-        // option could vary from builder to builder).
-
-        const builders: string[] = [];
-        for (const projectName of projectNames) {
-          const targetSpec: TargetSpecifier = this._makeTargetSpecifier(options);
-          const targetDesc = this._architect.getBuilderConfiguration({
-            project: projectName,
-            target: targetSpec.target,
-          });
-
-          if (builders.indexOf(targetDesc.builder) == -1) {
-            builders.push(targetDesc.builder);
-          }
-        }
-
-        if (builders.length > 1) {
-          throw new Error(tags.oneLine`
-            Architect commands with command line overrides cannot target different builders. The
-            '${this.target}' target would run on projects ${projectNames.join()} which have the
-            following builders: ${'\n  ' + builders.join('\n  ')}
-          `);
-        }
-      }
-    }
-
-    const targetSpec: TargetSpecifier = this._makeTargetSpecifier(options);
-
-    if (this.target && !targetSpec.project) {
-      const projects = this.getProjectNamesByTarget(this.target);
-
-      if (projects.length === 1) {
-        // If there is a single target, use it to parse overrides.
-        targetSpec.project = projects[0];
-      }
-    }
-
-    if ((!targetSpec.project || !targetSpec.target) && !this.multiTarget) {
+    if (!this.target) {
       if (options.help) {
         // This is a special case where we just return.
         return;
       }
 
-      throw new Error('Cannot determine project or target for Architect command.');
+      const specifier = this._makeTargetSpecifier(options);
+      if (!specifier.project || !specifier.target) {
+        throw new Error('Cannot determine project or target for command.');
+      }
+
+      return;
     }
 
-    if (this.target) {
-      // Add options IF there's only one builder of this kind.
-      const targetSpec: TargetSpecifier = this._makeTargetSpecifier(options);
-      const projectNames = targetSpec.project
-        ? [targetSpec.project]
-        : this.getProjectNamesByTarget(this.target);
+    const commandLeftovers = options['--'];
+    let projectName = options.project;
+    const targetProjectNames: string[] = [];
+    for (const name of this._workspace.listProjectNames()) {
+      if (this._architect.listProjectTargets(name).includes(this.target)) {
+        targetProjectNames.push(name);
+      }
+    }
 
-      const builderConfigurations: BuilderConfiguration[] = [];
-      for (const projectName of projectNames) {
-        const targetDesc = this._architect.getBuilderConfiguration({
-          project: projectName,
-          target: targetSpec.target,
+    if (targetProjectNames.length === 0) {
+      throw new Error(`No projects support the '${this.target}' target.`);
+    }
+
+    if (projectName && !targetProjectNames.includes(projectName)) {
+      throw new Error(`Project '${projectName}' does not support the '${this.target}' target.`);
+    }
+
+    if (!projectName && commandLeftovers && commandLeftovers.length > 0) {
+      const builderNames = new Set<string>();
+      const leftoverMap = new Map<string, { optionDefs: Option[], parsedOptions: Arguments }>();
+      let potentialProjectNames = new Set<string>(targetProjectNames);
+      for (const name of targetProjectNames) {
+        const builderConfig = this._architect.getBuilderConfiguration({
+          project: name,
+          target: this.target,
         });
 
-        if (!builderConfigurations.find(b => b.builder === targetDesc.builder)) {
-          builderConfigurations.push(targetDesc);
+        if (this.multiTarget) {
+          builderNames.add(builderConfig.builder);
+        }
+
+        const builderDesc = await this._architect.getBuilderDescription(builderConfig).toPromise();
+        const optionDefs = await parseJsonSchemaToOptions(this._registry, builderDesc.schema);
+        const parsedOptions = parseArguments([...commandLeftovers], optionDefs);
+        const builderLeftovers = parsedOptions['--'] || [];
+        leftoverMap.set(name, { optionDefs, parsedOptions });
+
+        potentialProjectNames = new Set(builderLeftovers.filter(x => potentialProjectNames.has(x)));
+      }
+
+      if (potentialProjectNames.size === 1) {
+        projectName = [...potentialProjectNames][0];
+
+        // remove the project name from the leftovers
+        const optionInfo = leftoverMap.get(projectName);
+        if (optionInfo) {
+          const locations = [];
+          let i = 0;
+          while (i < commandLeftovers.length) {
+            i = commandLeftovers.indexOf(projectName, i + 1);
+            if (i === -1) {
+              break;
+            }
+            locations.push(i);
+          }
+          delete optionInfo.parsedOptions['--'];
+          for (const location of locations) {
+            const tempLeftovers = [...commandLeftovers];
+            tempLeftovers.splice(location, 1);
+            const tempArgs = parseArguments([...tempLeftovers], optionInfo.optionDefs);
+            delete tempArgs['--'];
+            if (JSON.stringify(optionInfo.parsedOptions) === JSON.stringify(tempArgs)) {
+              options['--'] = tempLeftovers;
+              break;
+            }
+          }
         }
       }
 
-      if (builderConfigurations.length == 1) {
-        const builderConf = builderConfigurations[0];
-        const builderDesc = await this._architect.getBuilderDescription(builderConf).toPromise();
-
-        this.description.options.push(...(
-          await parseJsonSchemaToOptions(this._registry, builderDesc.schema)
-        ));
+      if (!projectName && this.multiTarget && builderNames.size > 1) {
+        throw new Error(tags.oneLine`
+          Architect commands with command line overrides cannot target different builders. The
+          '${this.target}' target would run on projects ${targetProjectNames.join()} which have the
+          following builders: ${'\n  ' + [...builderNames].join('\n  ')}
+        `);
       }
     }
+
+    if (!projectName && !this.multiTarget) {
+      const defaultProjectName = this._workspace.getDefaultProjectName();
+      if (targetProjectNames.length === 1) {
+        projectName = targetProjectNames[0];
+      } else if (defaultProjectName && targetProjectNames.includes(defaultProjectName)) {
+        projectName = defaultProjectName;
+      } else if (options.help) {
+        // This is a special case where we just return.
+        return;
+      } else {
+        throw new Error('Cannot determine project or target for command.');
+      }
+    }
+
+    options.project = projectName;
+
+    const builderConf = this._architect.getBuilderConfiguration({
+      project: projectName || (targetProjectNames.length > 0 ? targetProjectNames[0] : ''),
+      target: this.target,
+    });
+    const builderDesc = await this._architect.getBuilderDescription(builderConf).toPromise();
+
+    this.description.options.push(...(
+      await parseJsonSchemaToOptions(this._registry, builderDesc.schema)
+    ));
   }
 
   async run(options: ArchitectCommandOptions & Arguments) {
