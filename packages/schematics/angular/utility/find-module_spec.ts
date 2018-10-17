@@ -119,6 +119,15 @@ describe('find-module', () => {
       expect(modPath).toEqual('/projects/my-proj/src/app_test.module.ts' as Path);
     });
 
+    it('should find a module if flat is true', () => {
+      tree.create('/projects/my-proj/src/module/app_test.module.ts', '');
+      options.path = '/projects/my-proj/src';
+      options.flat = true;
+      options.name = '/module/directive';
+      const modPath = findModuleFromOptions(tree, options);
+      expect(modPath).toEqual('/projects/my-proj/src/module/app_test.module.ts' as Path);
+    });
+
     it('should find a module in a sub dir', () => {
       tree.create('/projects/my-proj/src/admin/foo.module.ts', '');
       options.name = 'other/test';
