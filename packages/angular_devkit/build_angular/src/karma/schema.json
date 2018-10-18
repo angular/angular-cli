@@ -177,7 +177,7 @@
             },
             "input": {
               "type": "string",
-              "description": "The input path dir in which to apply 'glob'. Defaults to the project root."
+              "description": "The input directory path in which to apply 'glob'. Defaults to the project root."
             },
             "output": {
               "type": "string",

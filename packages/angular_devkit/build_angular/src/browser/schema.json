@@ -136,7 +136,7 @@
     },
     "extractCss": {
       "type": "boolean",
-      "description": "Extract css from global styles onto css files instead of js ones.",
+      "description": "Extract css from global styles into css files instead of js ones.",
       "default": false
     },
     "watch": {
@@ -181,7 +181,7 @@
     },
     "buildOptimizer": {
       "type": "boolean",
-      "description": "Enables @angular-devkit/build-optimizer optimizations when using the 'aot' option.",
+      "description": "Enables '@angular-devkit/build-optimizer' optimizations when using the 'aot' option.",
       "default": false
     },
     "namedChunks": {
@@ -214,7 +214,7 @@
     },
     "statsJson": {
       "type": "boolean",
-      "description": "Generates a 'stats.json' file which can be analyzed using tools such as: #webpack-bundle-analyzer' or https: //webpack.github.io/analyse.",
+      "description": "Generates a 'stats.json' file which can be analyzed using tools such as: 'webpack-bundle-analyzer' or https: //webpack.github.io/analyse.",
       "default": false
     },
     "forkTypeChecker": {
@@ -223,7 +223,7 @@
       "default": true
     },
     "lazyModules": {
-      "description": "List of additional NgModule files that will be lazy loaded. Lazy router modules with be discovered automatically.",
+      "description": "List of additional NgModule files that will be lazy loaded. Lazy router modules will be discovered automatically.",
       "type": "array",
       "items": {
         "type": "string"
@@ -263,7 +263,7 @@
             },
             "input": {
               "type": "string",
-              "description": "The input path dir in which to apply 'glob'. Defaults to the project root."
+              "description": "The input directory path in which to apply 'glob'. Defaults to the project root."
             },
             "ignore": {
               "description": "An array of globs to ignore.",
