@@ -1,3 +1,5 @@
+**Documentation below is for CLI version 6. For version 7 see [here](https://angular.io/guide/deployment#deploy-to-github-pages)**.
+
 # Deploy to GitHub Pages
 
 A simple way to deploy your Angular app is to use

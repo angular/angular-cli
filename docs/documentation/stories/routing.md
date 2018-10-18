@@ -1,3 +1,5 @@
+**Documentation below is for CLI version 6. For version 7 see [here](https://angular.io/guide/router#integrate-routing-with-your-app)**.
+
 # Generating a route
 
 The CLI supports routing in several ways:

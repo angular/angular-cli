@@ -1,3 +1,5 @@
+**Documentation below is for CLI version 6. For version 7 see [here](https://angular.io/guide/universal)**.
+
 # Angular Universal Integration
 
 The Angular CLI supports generation of a Universal build for your application. This is a CommonJS-formatted bundle which can be `require()`'d into a Node application (for example, an Express server) and used with `@angular/platform-server`'s APIs to prerender your application.
