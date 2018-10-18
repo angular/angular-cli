@@ -21,9 +21,6 @@ export function getImportTslibTransformer(): ts.TransformerFactory<ts.SourceFile
 
     const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
 
-      // Check if module has CJS exports. If so, use 'require()' instead of 'import'.
-      const useRequire = /exports.\S+\s*=/.test(sf.getText());
-
       const visitor: ts.Visitor = (node: ts.Node): ts.Node => {
 
         // Check if node is a TS helper declaration and replace with import if yes
@@ -36,7 +33,7 @@ export function getImportTslibTransformer(): ts.TransformerFactory<ts.SourceFile
             if (isHelperName(name)) {
               // TODO: maybe add a few more checks, like checking the first part of the assignment.
 
-              return createTslibImport(name, useRequire);
+              return createTslibImport(name);
             }
           }
         }
@@ -51,28 +48,15 @@ export function getImportTslibTransformer(): ts.TransformerFactory<ts.SourceFile
   };
 }
 
-function createTslibImport(name: string, useRequire = false): ts.Node {
-  if (useRequire) {
-    // Use `var __helper = /*@__PURE__*/ require("tslib").__helper`.
-    const requireCall = ts.createCall(ts.createIdentifier('require'), undefined,
-      [ts.createLiteral('tslib')]);
-    const pureRequireCall = ts.addSyntheticLeadingComment(
-      requireCall, ts.SyntaxKind.MultiLineCommentTrivia, '@__PURE__', false);
-    const helperAccess = ts.createPropertyAccess(pureRequireCall, name);
-    const variableDeclaration = ts.createVariableDeclaration(name, undefined, helperAccess);
-    const variableStatement = ts.createVariableStatement(undefined, [variableDeclaration]);
+function createTslibImport(name: string): ts.Node {
+  // Use `import { __helper } from "tslib"`.
+  const namedImports = ts.createNamedImports([ts.createImportSpecifier(undefined,
+    ts.createIdentifier(name))]);
+  const importClause = ts.createImportClause(undefined, namedImports);
+  const newNode = ts.createImportDeclaration(undefined, undefined, importClause,
+    ts.createLiteral('tslib'));
 
-    return variableStatement;
-  } else {
-    // Use `import { __helper } from "tslib"`.
-    const namedImports = ts.createNamedImports([ts.createImportSpecifier(undefined,
-      ts.createIdentifier(name))]);
-    const importClause = ts.createImportClause(undefined, namedImports);
-    const newNode = ts.createImportDeclaration(undefined, undefined, importClause,
-      ts.createLiteral('tslib'));
-
-    return newNode;
-  }
+  return newNode;
 }
 
 function isHelperName(name: string): boolean {
