@@ -2,7 +2,7 @@
 
 # Angular CLI
 
-NOTE: this documentation is for Angular CLI 6. For Angular CLI 1.x go [here](1-x-home) instead.
+**NOTE: this documentation is for Angular CLI 6. For Angular CLI Version 7 go [here](https://angular.io/cli) and 1.x go [here](1-x-home) instead.**
 
 ### Overview
 The Angular CLI is a tool to initialize, develop, scaffold  and maintain [Angular](https://angular.io) applications

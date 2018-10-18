@@ -1,3 +1,5 @@
+**Documentation below is for CLI version 6. For version 7 see [here](https://angular.io/guide/testing#set-up-continuous-integration)**.
+
 # Continuous Integration
 
 One of the best ways to keep your project bug free is through a test suite, but it's easy to forget

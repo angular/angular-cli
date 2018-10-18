@@ -1,3 +1,5 @@
+**Documentation below is for CLI version 6. For version 7 see [here](https://angular.io/cli/generate)**.
+
 # ng generate guard
 
 ## Overview

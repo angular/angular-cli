@@ -1,3 +1,5 @@
+**Documentation below is for CLI version 6. For version 7 see [here](https://angular.io/guide/build#configuring-application-environments)**.
+
 # Application Environments
 
 In Angular CLI you can configure the build system to replace existing files for your intended

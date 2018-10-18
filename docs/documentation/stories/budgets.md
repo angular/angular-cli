@@ -1,3 +1,5 @@
+**Documentation below is for CLI version 6. For version 7 see [here](https://angular.io/guide/build#configure-size-budgets)**.
+
 # Budgets
 
 As applications grow in functionality, they also grow in size. Budgets is a feature in the
