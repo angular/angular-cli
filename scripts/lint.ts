@@ -20,7 +20,7 @@ const blacklist = [
 
 
 function _buildRules(logger: logging.Logger) {
-  const tsConfigPath = path.join(__dirname, '../rules/tsconfig.json');
+  const tsConfigPath = path.join(__dirname, '../etc/rules/tsconfig.json');
   const configFile = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
 
   const parsedTsConfig = ts.parseJsonConfigFileContent(

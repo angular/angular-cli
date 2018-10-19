@@ -64,6 +64,7 @@
   "exclude": [
     "bazel-*/**/*",
     "dist/**/*",
+    "etc/cli.angular.io",
     "node_modules/**/*",
     "packages/_/devkit/**/*files/**/*",
     "packages/schematics/*/*/*files/**/*",
