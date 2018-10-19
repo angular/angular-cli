@@ -63,6 +63,13 @@ describe('Library Schematic', () => {
     expect(fileContent).toMatch(/"name": "foo"/);
   });
 
+  it('should have the latest Angular major versions in package.json named "foo"', () => {
+    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+    const fileContent = getJsonFileContent(tree, '/projects/foo/package.json');
+    const angularVersion = latestVersions.Angular.replace('~', '').replace('^', '');
+    expect(fileContent.peerDependencies['@angular/core']).toBe(`^${angularVersion}`);
+  });
+
   it('should create a tsconfig for library', () => {
     const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
     const fileContent = getJsonFileContent(tree, '/projects/foo/tsconfig.lib.json');
