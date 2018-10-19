@@ -503,4 +503,25 @@ describe('Browser Builder styles', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   });
+
+  it('supports Protocol-relative Url', (done) => {
+    host.writeMultipleFiles({
+      'src/styles.css': `
+        body {
+          background-image: url('//cdn.com/classic-bg.jpg');
+        }
+      `,
+    });
+
+    const overrides = { extractCss: true, optimization: true };
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+      tap((buildEvent) => {
+        expect(buildEvent.success).toBe(true);
+
+        const filePath = './dist/styles.css';
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(filePath)));
+        expect(content).toContain('background-image:url(//cdn.com/classic-bg.jpg)');
+      }),
+    ).toPromise().then(done, done.fail);
+  });
 });
