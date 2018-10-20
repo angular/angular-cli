@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <reference types="@types/jasmine"/>
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 import { basename, dirname, join } from 'path';
 import { main } from './main';

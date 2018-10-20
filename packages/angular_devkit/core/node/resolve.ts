@@ -259,7 +259,7 @@ export function resolve(x: string, options: ResolveOptions): string {
   }
 
   function nodeModulesPaths(start: string, opts: ResolveOptions) {
-    const modules = ['node_modules'];
+    const modules = ['node_modules', path.join('npm', 'node_modules')];
 
     // ensure that `start` is an absolute path at this point,
     // resolving against the process' current working directory

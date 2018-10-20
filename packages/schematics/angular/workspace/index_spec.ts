@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <reference types="@types/jasmine"/>
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
 import { latestVersions } from '../utility/latest-versions';
 import { Schema as WorkspaceOptions } from './schema';

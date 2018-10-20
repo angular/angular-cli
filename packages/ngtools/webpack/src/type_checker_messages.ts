@@ -42,4 +42,3 @@ export class LogMessage extends TypeCheckerMessage {
     super(MESSAGE_KIND.Log);
   }
 }
-

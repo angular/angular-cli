@@ -115,10 +115,11 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       loadSchema: (uri: string) => this._fetch(uri),
       schemaId: 'auto',
       passContext: true,
-    });
+    // tslint:disable-next-line:no-any TODO(kyliau): fix typings
+    } as any);
 
-    this._ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'));
-    this._ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-06.json'));
+    // this._ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'));
+    // this._ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-06.json'));
   }
 
   private _fetch(uri: string): Promise<JsonObject> {
@@ -253,9 +254,10 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       }
 
       this._currentCompilationSchemaInfo = undefined;
-      validator = from(this._ajv.compileAsync(schema)).pipe(
+      // tslint:disable-next-line:no-any TODO(kyliau): fix typings
+      validator = from(this._ajv.compileAsync(schema) as any).pipe(
         tap(() => this._currentCompilationSchemaInfo = undefined),
-      );
+      ) as Observable<ajv.ValidateFunction>;
     }
 
     return validator.pipe(
@@ -321,7 +323,8 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       }
 
       try {
-        validator = from(this._ajv.compileAsync(schema));
+        // tslint:disable-next-line:no-any TODO(kyliau): fix typings
+        validator = from(this._ajv.compileAsync(schema) as any);
       } catch (e) {
         return throwError(e);
       }

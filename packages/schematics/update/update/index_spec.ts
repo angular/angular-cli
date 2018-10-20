@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-big-function
-
+/// <reference types="@types/jasmine"/>
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { HostTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';

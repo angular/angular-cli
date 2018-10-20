@@ -71,6 +71,7 @@ const ignoredPackages = [
   'bitsyntax@0.0.4', // MIT but no license field in package.json
   'pako@1.0.6', // MIT but broken license in package.json
   'true-case-path@1.0.2', // Apache-2.0 but broken license in package.json
+  'uws@9.14.0', // zlib license
 
   // * Other
   'font-awesome@4.7.0', // (OFL-1.1 AND MIT)

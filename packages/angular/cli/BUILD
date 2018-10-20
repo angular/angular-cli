@@ -31,9 +31,9 @@ ts_library(
         "@rxjs",
         "@rxjs//operators",
         # @typings: es2017.object
-        # @typings: inquirer
-        # @typings: node
-        # @typings: semver
+        "@npm//@types/node",
+        "@npm//@types/inquirer",
+        "@npm//@types/semver",
     ],
 )
 

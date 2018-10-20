@@ -26,5 +26,6 @@ ts_library(
         "//packages/angular_devkit/core:node",
         "@rxjs",
         "@rxjs//operators",
+        "@npm//@types/node",
     ],
 )

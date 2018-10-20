@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-big-function
-
+/// <reference types="@types/jasmine"/>
 import { tap } from 'rxjs/operators';
 import { schema } from '..';
 import { NodeJsSyncHost } from '../../node';

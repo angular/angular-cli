@@ -32,7 +32,7 @@ ts_library(
         "//packages/angular_devkit/schematics:tasks",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: node
+        "@npm//@types/node",
     ],
 )
 
@@ -76,8 +76,8 @@ ts_json_schema(
 #         "//packages/angular_devkit/schematics:testing",
 #         "@rxjs",
 #         "@rxjs//operators",
-#         # @typings: jasmine
-#         # @typings: node
+#         "@npm//@types/node",
+#         "@npm//@types/jasmine",
 #     ],
 # )
 

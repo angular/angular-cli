@@ -8,6 +8,7 @@
 // tslint:disable:no-any
 // tslint:disable:no-non-null-assertion
 // tslint:disable:no-implicit-dependencies
+/// <reference types="@types/jasmine"/>
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { NodeJsAsyncHost, NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';

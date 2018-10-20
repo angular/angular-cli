@@ -71,6 +71,9 @@ def ts_json_schema(name, src, data = []):
 
     ts_library(
         name = name,
+        deps = [
+            "@npm//@types/node",
+        ],
         # Remove these to empty the rule, since those files are also compiled elsewhere.
         # @external_begin
         srcs = [

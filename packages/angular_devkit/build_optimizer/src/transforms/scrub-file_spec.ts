@@ -7,6 +7,7 @@
  */
 // tslint:disable:no-big-function
 // tslint:disable-next-line:no-implicit-dependencies
+/// <reference types="@types/jasmine"/>
 import { tags } from '@angular-devkit/core';
 import { transformJavascript } from '../helpers/transform-javascript';
 import { getScrubFileTransformer, testScrubFile } from './scrub-file';
