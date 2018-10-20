@@ -260,6 +260,12 @@ export function resolve(x: string, options: ResolveOptions): string {
 
   function nodeModulesPaths(start: string, opts: ResolveOptions) {
     const modules = ['node_modules'];
+    if (process.env.BAZEL_TARGET) {
+      // When running test under Bazel, node_modules have to be resolved
+      // differently. node_modules are installed in the `npm` workspace.
+      // For more info, see `yarn_install` rule in WORKSPACE file.
+      modules.push(path.join('npm', 'node_modules'));
+    }
 
     // ensure that `start` is an absolute path at this point,
     // resolving against the process' current working directory

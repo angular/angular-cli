@@ -12,8 +12,8 @@
 ## IMPORTANT
 # If you change the `docker_image` version, also change the `cache_key` suffix and the version of
 # `com_github_bazelbuild_buildtools` in the `/WORKSPACE` file.
-var_1: &docker_image angular/ngcontainer:0.5.0
-var_2: &cache_key angular_devkit-{{ checksum "yarn.lock" }}-0.5.0
+var_1: &docker_image angular/ngcontainer:0.7.0
+var_2: &cache_key angular_devkit-{{ checksum "yarn.lock" }}-0.7.0
 var_3: &node_8_docker_image angular/ngcontainer:0.3.3
 
 # Settings common to each job
@@ -49,7 +49,7 @@ jobs:
           <<: *root_package_lock_key
           paths:
             - ~/.cache/yarn
-  
+
   lint:
     <<: *defaults
     steps:
@@ -89,12 +89,12 @@ jobs:
       - store_artifacts:
           path: /tmp/dist
           destination: cli/new-production
-  
+
   e2e-node-8:
     <<: *defaults
     # Overwrite docker image to node 8.
     docker:
-      - image: *node_8_docker_image    
+      - image: *node_8_docker_image
     environment:
       BASH_ENV: ~/.profile
     resource_class: xlarge

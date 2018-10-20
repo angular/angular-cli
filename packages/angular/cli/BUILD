@@ -29,9 +29,9 @@ ts_library(
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tools",
         # @typings: es2017.object
-        # @typings: inquirer
-        # @typings: node
-        # @typings: semver
+        "@npm//@types/node",
+        "@npm//@types/inquirer",
+        "@npm//@types/semver",
     ],
 )
 
