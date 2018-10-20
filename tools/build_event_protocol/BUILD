@@ -11,6 +11,9 @@ ts_library(
     srcs = ["parse_bep.ts"],
     deps = [
       ":build_event_stream",
+      "@npm//@types/node",
+      "@rxjs",
+      "@rxjs//operators",
     ],
 )
 

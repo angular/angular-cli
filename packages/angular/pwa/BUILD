@@ -30,7 +30,7 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "@rxjs",
-        # @typings: node
+        "@npm//@types/node",
     ],
 )
 
