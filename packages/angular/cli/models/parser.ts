@@ -122,7 +122,7 @@ function _removeLeadingDashes(key: string): string {
 
 function _assignOption(
   arg: string,
-  args: string[],
+  nextArg: string | undefined,
   { options, parsedOptions, leftovers, ignored, errors, warnings }: {
     options: Option[],
     parsedOptions: Arguments,
@@ -134,9 +134,10 @@ function _assignOption(
   },
 ) {
   const from = arg.startsWith('--') ? 2 : 1;
+  let consumedNextArg = false;
   let key = arg.substr(from);
   let option: Option | null = null;
-  let value = '';
+  let value: string | undefined = '';
   const i = arg.indexOf('=');
 
   // If flag is --no-abc AND there's no equal sign.
@@ -155,7 +156,7 @@ function _assignOption(
       // Set it to true if it's a boolean and the next argument doesn't match true/false.
       const maybeOption = _getOptionFromName(key, options);
       if (maybeOption) {
-        value = args[0];
+        value = nextArg;
         let shouldShift = true;
 
         if (value && value.startsWith('-')) {
@@ -167,7 +168,7 @@ function _assignOption(
 
         // Only absorb it if it leads to a better value.
         if (shouldShift && _coerce(value, maybeOption) !== undefined) {
-          args.shift();
+          consumedNextArg = true;
         } else {
           value = '';
         }
@@ -183,9 +184,9 @@ function _assignOption(
   }
 
   if (option === null) {
-    if (args[0] && !args[0].startsWith('-')) {
-      leftovers.push(arg, args[0]);
-      args.shift();
+    if (nextArg && !nextArg.startsWith('-')) {
+      leftovers.push(arg, nextArg);
+      consumedNextArg = true;
     } else {
       leftovers.push(arg);
     }
@@ -220,6 +221,8 @@ function _assignOption(
       ignored.push(arg);
     }
   }
+
+  return consumedNextArg;
 }
 
 
@@ -303,15 +306,18 @@ export function parseArguments(
 
   const state = { options, parsedOptions, positionals, leftovers, ignored, errors, warnings };
 
-  for (let arg = args.shift(); arg !== undefined; arg = args.shift()) {
+  for (let argIndex = 0; argIndex < args.length; argIndex++) {
+    const arg = args[argIndex];
+    let consumedNextArg = false;
+
     if (arg == '--') {
       // If we find a --, we're done.
-      leftovers.push(...args);
+      leftovers.push(...args.slice(argIndex + 1));
       break;
     }
 
     if (arg.startsWith('--')) {
-      _assignOption(arg, args, state);
+      consumedNextArg = _assignOption(arg, args[argIndex + 1], state);
     } else if (arg.startsWith('-')) {
       // Argument is of form -abcdef.  Starts at 1 because we skip the `-`.
       for (let i = 1; i < arg.length; i++) {
@@ -319,14 +325,14 @@ export function parseArguments(
         // If the next character is an '=', treat it as a long flag.
         if (arg[i + 1] == '=') {
           const f = '-' + flag + arg.slice(i + 1);
-          _assignOption(f, args, state);
+          consumedNextArg = _assignOption(f, args[argIndex + 1], state);
           break;
         }
         // Treat the last flag as `--a` (as if full flag but just one letter). We do this in
         // the loop because it saves us a check to see if the arg is just `-`.
         if (i == arg.length - 1) {
           const arg = '-' + flag;
-          _assignOption(arg, args, state);
+          consumedNextArg = _assignOption(arg, args[argIndex + 1], state);
         } else {
           const maybeOption = _getOptionFromName(flag, options);
           if (maybeOption) {
@@ -339,6 +345,10 @@ export function parseArguments(
       }
     } else {
       positionals.push(arg);
+    }
+
+    if (consumedNextArg) {
+      argIndex++;
     }
   }
 
