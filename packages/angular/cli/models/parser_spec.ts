@@ -150,10 +150,14 @@ describe('parseArguments', () => {
   Object.entries(tests).forEach(([str, expected]) => {
     it(`works for ${str}`, () => {
       try {
-        const actual = parseArguments(str.split(' '), options);
+        const originalArgs = str.split(' ');
+        const args = originalArgs.slice();
+
+        const actual = parseArguments(args, options);
 
         expect(Array.isArray(expected)).toBe(false);
         expect(actual).toEqual(expected as Arguments);
+        expect(args).toEqual(originalArgs);
       } catch (e) {
         if (!(e instanceof ParseArgumentException)) {
           throw e;
