@@ -5,27 +5,19 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable
-// TODO: cleanup this file, it's copied as is from Angular CLI.
-
-import * as path from 'path';
-const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
 import { LicenseWebpackPlugin } from 'license-webpack-plugin';
-import { generateEntryPoints } from '../../utilities/package-chunk-sort';
+import * as path from 'path';
 import { IndexHtmlWebpackPlugin } from '../../plugins/index-html-webpack-plugin';
+import { generateEntryPoints } from '../../utilities/package-chunk-sort';
 import { WebpackConfigOptions } from '../build-options';
 import { normalizeExtraEntryPoints } from './utils';
 
-/**
-+ * license-webpack-plugin has a peer dependency on webpack-sources, list it in a comment to
-+ * let the dependency validator know it is used.
-+ *
-+ * require('webpack-sources')
-+ */
+const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
+
 
 export function getBrowserConfig(wco: WebpackConfigOptions) {
   const { root, buildOptions } = wco;
-  let extraPlugins: any[] = [];
+  const extraPlugins = [];
 
   let sourcemaps: string | false = false;
   if (buildOptions.sourceMap) {
@@ -52,7 +44,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
 
   if (buildOptions.subresourceIntegrity) {
     extraPlugins.push(new SubresourceIntegrityPlugin({
-      hashFuncNames: ['sha384']
+      hashFuncNames: ['sha384'],
     }));
   }
 
@@ -60,10 +52,10 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     extraPlugins.push(new LicenseWebpackPlugin({
       stats: {
         warnings: false,
-        errors: false
+        errors: false,
       },
       perChunkOutput: false,
-      outputFilename: `3rdpartylicenses.txt`
+      outputFilename: `3rdpartylicenses.txt`,
     }));
   }
 
@@ -75,11 +67,11 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     resolve: {
       mainFields: [
         ...(wco.supportES2015 ? ['es2015'] : []),
-        'browser', 'module', 'main'
-      ]
+        'browser', 'module', 'main',
+      ],
     },
     output: {
-      crossOriginLoading: buildOptions.subresourceIntegrity ? 'anonymous' : false
+      crossOriginLoading: buildOptions.subresourceIntegrity ? 'anonymous' : false,
     },
     optimization: {
       runtimeChunk: 'single',
@@ -103,15 +95,16 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
             name: 'vendor',
             chunks: 'initial',
             enforce: true,
-            test: (module: any, chunks: Array<{ name: string }>) => {
+            test: (module: { nameForCondition?: Function }, chunks: Array<{ name: string }>) => {
               const moduleName = module.nameForCondition ? module.nameForCondition() : '';
+
               return /[\\/]node_modules[\\/]/.test(moduleName)
                 && !chunks.some(({ name }) => name === 'polyfills'
                   || globalStylesBundleNames.includes(name));
             },
           },
-        }
-      }
+        },
+      },
     },
     plugins: extraPlugins,
     node: false,
