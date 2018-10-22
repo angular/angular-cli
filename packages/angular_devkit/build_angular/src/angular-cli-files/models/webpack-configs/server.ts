@@ -5,10 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable
-// TODO: cleanup this file, it's copied as is from Angular CLI.
-
+import { Configuration } from 'webpack';
 import { WebpackConfigOptions } from '../build-options';
+
 
 /**
  * Returns a partial specific to creating a bundle for node
@@ -16,7 +15,7 @@ import { WebpackConfigOptions } from '../build-options';
  */
 export function getServerConfig(wco: WebpackConfigOptions) {
 
-  const config: any = {
+  const config: Configuration = {
     devtool: wco.buildOptions.sourceMap ? 'source-map' : false,
     resolve: {
       mainFields: [
@@ -26,7 +25,7 @@ export function getServerConfig(wco: WebpackConfigOptions) {
     },
     target: 'node',
     output: {
-      libraryTarget: 'commonjs'
+      libraryTarget: 'commonjs',
     },
     node: false,
   };
@@ -34,6 +33,7 @@ export function getServerConfig(wco: WebpackConfigOptions) {
   if (wco.buildOptions.bundleDependencies == 'none') {
     config.externals = [
       /^@angular/,
+      // tslint:disable-next-line:no-any
       (_: any, request: any, callback: (error?: any, result?: any) => void) => {
         // Absolute & Relative paths are not externals
         if (request.match(/^\.{0,2}\//)) {
@@ -54,7 +54,7 @@ export function getServerConfig(wco: WebpackConfigOptions) {
           // Node couldn't find it, so it must be user-aliased
           callback();
         }
-      }
+      },
     ];
   }
 
