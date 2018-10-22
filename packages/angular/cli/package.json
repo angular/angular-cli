@@ -38,6 +38,9 @@
     "symbol-observable": "1.2.0"
   },
   "ng-update": {
-    "migrations": "@schematics/angular/migrations/migration-collection.json"
+    "migrations": "@schematics/angular/migrations/migration-collection.json",
+    "packageGroup": [
+      "@angular/pwa"
+    ]
   }
 }
