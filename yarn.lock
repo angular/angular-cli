@@ -5144,10 +5144,10 @@ license-checker@^20.1.0:
     strip-ansi "^4.0.0"
     treeify "^1.1.0"
 
-license-webpack-plugin@2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/license-webpack-plugin/-/license-webpack-plugin-2.0.1.tgz#d8d24d0d0db70d328ec911ae728719b842260078"
-  integrity sha512-XUSJoU+M2w/N5ZdzHm++mFSM2BVKAdnSORXF7nbkpBJVdfi3hiiMpNdiuUR7S4OvsceiXQp1yoBwhiAP+gtC2g==
+license-webpack-plugin@2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/license-webpack-plugin/-/license-webpack-plugin-2.0.2.tgz#9d34b521cb7fca8527945310b05be6ef0248b687"
+  integrity sha512-GsomZw5VoT20ST8qH2tOjBgbyhn6Pgs9M94g0mbvfBIV1VXufm1iKY+4dbgfTObj1Mp6nSRE3Zf74deOZr0KwA==
   dependencies:
     webpack-sources "^1.2.0"
 
