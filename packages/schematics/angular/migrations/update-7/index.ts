@@ -20,8 +20,11 @@ export { typeScriptHelpersRule } from './typescript-helpers';
 export default function(): Rule {
   return (tree, context) => {
     const existing = getPackageJsonDependency(tree, '@angular-devkit/build-angular');
-    const type = existing ? existing.type : NodeDependencyType.Dev;
+    if (existing && latestVersions.DevkitBuildAngular === existing.version) {
+      return;
+    }
 
+    const type = existing ? existing.type : NodeDependencyType.Dev;
     addPackageJsonDependency(
       tree,
       {
