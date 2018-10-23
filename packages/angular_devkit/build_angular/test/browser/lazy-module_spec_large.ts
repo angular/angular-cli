@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
+import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize } from '@angular-devkit/core';
-import { tap } from 'rxjs/operators';
+import { take, tap } from 'rxjs/operators';
 import { BrowserBuilderSchema } from '../../src';
 import { browserTargetSpec, host } from '../utils';
 
@@ -70,6 +70,7 @@ export const lazyModuleImport: { [path: string]: string } = {
   `,
 };
 
+// tslint:disable-next-line:no-big-function
 describe('Browser Builder lazy modules', () => {
 
   const outputPath = normalize('dist');
@@ -86,6 +87,50 @@ describe('Browser Builder lazy modules', () => {
       tap(() => {
         expect(host.scopedSync().exists(join(outputPath, 'lazy-lazy-module.js'))).toBe(true);
       }),
+    ).toPromise().then(done, done.fail);
+  });
+
+  it('should show error when lazy route is invalid on watch mode AOT', (done) => {
+    host.writeMultipleFiles(lazyModuleFiles);
+    host.writeMultipleFiles(lazyModuleImport);
+    host.replaceInFile(
+      'src/app/app.module.ts',
+      'lazy.module#LazyModule',
+      'invalid.module#LazyModule',
+    );
+
+    const logger = new TestLogger('rebuild-lazy-errors');
+    const overrides = { watch: true, aot: true };
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout, logger).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(false)),
+      tap(() => {
+        expect(logger.includes('Could not resolve module')).toBe(true);
+        logger.clear();
+        host.appendToFile('src/main.ts', ' ');
+      }),
+      take(2),
+    ).toPromise().then(done, done.fail);
+  });
+
+  it('should show error when lazy route is invalid on watch mode JIT', (done) => {
+    host.writeMultipleFiles(lazyModuleFiles);
+    host.writeMultipleFiles(lazyModuleImport);
+    host.replaceInFile(
+      'src/app/app.module.ts',
+      'lazy.module#LazyModule',
+      'invalid.module#LazyModule',
+    );
+
+    const logger = new TestLogger('rebuild-lazy-errors');
+    const overrides = { watch: true, aot: false };
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout, logger).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(false)),
+      tap(() => {
+        expect(logger.includes('Could not resolve module')).toBe(true);
+        logger.clear();
+        host.appendToFile('src/main.ts', ' ');
+      }),
+      take(2),
     ).toPromise().then(done, done.fail);
   });
 
