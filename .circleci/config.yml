@@ -196,7 +196,8 @@ workflows:
             - e2e-cli
           filters:
             branches:
-              only: master
+              ignore:
+                - /pull\/.*/
       - publish:
           requires:
             - test
