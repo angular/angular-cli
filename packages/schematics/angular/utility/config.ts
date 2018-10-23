@@ -265,7 +265,7 @@ export interface CliConfig {
        */
       component?: {
           /**
-           * Flag to indicate if a dir is created.
+           * Flag to indicate if a directory is created.
            */
           flat?: boolean;
           /**
@@ -294,7 +294,7 @@ export interface CliConfig {
        */
       directive?: {
           /**
-           * Flag to indicate if a dir is created.
+           * Flag to indicate if a directory is created.
            */
           flat?: boolean;
           /**
@@ -307,7 +307,7 @@ export interface CliConfig {
        */
       guard?: {
           /**
-           * Flag to indicate if a dir is created.
+           * Flag to indicate if a directory is created.
            */
           flat?: boolean;
           /**
@@ -329,7 +329,7 @@ export interface CliConfig {
        */
       module?: {
           /**
-           * Flag to indicate if a dir is created.
+           * Flag to indicate if a directory is created.
            */
           flat?: boolean;
           /**
@@ -342,7 +342,7 @@ export interface CliConfig {
        */
       pipe?: {
           /**
-           * Flag to indicate if a dir is created.
+           * Flag to indicate if a directory is created.
            */
           flat?: boolean;
           /**
@@ -355,7 +355,7 @@ export interface CliConfig {
        */
       service?: {
           /**
-           * Flag to indicate if a dir is created.
+           * Flag to indicate if a directory is created.
            */
           flat?: boolean;
           /**
