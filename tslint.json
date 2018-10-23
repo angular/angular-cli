@@ -6,12 +6,12 @@
     "tslint-no-circular-imports"
   ],
   "rulesDirectory": [
-    "dist/rules",
+    "dist/etc/rules",
     "node_modules/tslint-sonarts/lib/rules"
   ],
   "rules": {
     "//03": "==================================================================================================",
-    "//04": "custom rules defined in dist/rules/**",
+    "//04": "custom rules defined in etc/rules/**",
     "defocus": true,
     "import-groups": true,
     "no-global-tslint-disable": true,
@@ -86,7 +86,6 @@
     "no-internal-module": true,
     "no-trailing-whitespace": true,
     "no-unused-expression": true,
-    "no-unused-variable": [true, {"ignore-pattern": "^_"}],
     "no-var-keyword": true,
     "one-line": [
       true,
