@@ -67,11 +67,72 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
   return stdout.toString('utf-8');
 }
 
+async function _publishSnapshot(
+  pkg: PackageInfo,
+  branch: string,
+  message: string,
+  logger: logging.Logger,
+  githubToken: string,
+) {
+  if (!pkg.snapshot) {
+    logger.warn(`Skipping ${pkg.name}.`);
+
+    return;
+  }
+
+  logger.info(`Publishing ${pkg.name} to repo ${JSON.stringify(pkg.snapshotRepo)}.`);
+
+  const root = process.cwd();
+  const publishLogger = logger.createChild('publish');
+  publishLogger.debug('Temporary directory: ' + root);
+
+  const url = `https://${githubToken ? githubToken + '@' : ''}github.com/${pkg.snapshotRepo}.git`;
+  const destPath = path.join(root, path.basename(pkg.snapshotRepo));
+
+  _exec('git', ['clone', url], { cwd: root }, publishLogger);
+  if (branch) {
+    _exec('git', ['checkout', '-B', branch], { cwd: destPath }, publishLogger);
+  }
+
+  // Clear snapshot directory before publishing to remove deleted build files.
+  try {
+    _exec('git', ['rm', '-rf', './'], {cwd: destPath}, publishLogger);
+  } catch {
+    // Ignore errors on delete. :shrug:
+  }
+  _copy(pkg.dist, destPath);
+
+  if (githubToken) {
+    _exec('git', ['config', 'commit.gpgSign', 'false'], { cwd: destPath }, publishLogger);
+  }
+
+  // Add the header to the existing README.md (or create a README if it doesn't exist).
+  const readmePath = path.join(destPath, 'README.md');
+  let readme = readmeHeaderFn(pkg);
+  try {
+    readme += fs.readFileSync(readmePath, 'utf-8');
+  } catch {}
+
+  fs.writeFileSync(readmePath, readme);
+
+  // Make sure that every snapshots is unique (otherwise we would need to make sure git accepts
+  // empty commits).
+  fs.writeFileSync(path.join(destPath, 'uniqueId'), '' + new Date());
+
+  // Commit and push.
+  _exec('git', ['add', '.'], { cwd: destPath }, publishLogger);
+  _exec('git', ['commit', '-a', '-m', message], { cwd: destPath }, publishLogger);
+  _exec('git', ['tag', pkg.snapshotHash], { cwd: destPath }, publishLogger);
+  _exec('git', ['push', 'origin', branch], { cwd: destPath }, publishLogger);
+  _exec('git', ['push', '--tags', 'origin', branch], { cwd: destPath }, publishLogger);
+}
+
 
 export interface SnapshotsOptions {
   force?: boolean;
   githubTokenFile?: string;
   githubToken?: string;
+  branch?: string;
 }
 
 export default async function(opts: SnapshotsOptions, logger: logging.Logger) {
@@ -83,6 +144,12 @@ export default async function(opts: SnapshotsOptions, logger: logging.Logger) {
 
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'angular-cli-publish-'));
   const message = execSync(`git log --format="%h %s" -n1`).toString().trim();
+  let branch = opts.branch || 'master';
+
+  // CIRCLE_BRANCH
+  if (typeof process.env['CIRCLE_BRANCH'] == 'string') {
+    branch = '' + process.env['CIRCLE_BRANCH'];
+  }
 
   const githubToken = (
     opts.githubToken
@@ -129,53 +196,8 @@ export default async function(opts: SnapshotsOptions, logger: logging.Logger) {
   }
 
   for (const packageName of Object.keys(packages)) {
-    const pkg = packages[packageName];
-
-    if (!pkg.snapshot) {
-      logger.warn(`Skipping ${pkg.name}.`);
-      continue;
-    }
-
-    logger.info(`Publishing ${pkg.name} to repo ${JSON.stringify(pkg.snapshotRepo)}.`);
-
-    const publishLogger = logger.createChild('publish');
-    publishLogger.debug('Temporary directory: ' + root);
-
-    const url = `https://${githubToken ? githubToken + '@' : ''}github.com/${pkg.snapshotRepo}.git`;
-    _exec('git', ['clone', url], { cwd: root }, publishLogger);
-
-    const destPath = path.join(root, path.basename(pkg.snapshotRepo));
-    // Clear snapshot directory before publishing to remove deleted build files.
-    try {
-      _exec('git', ['rm', '-rf', './'], {cwd: destPath}, publishLogger);
-    } catch {
-      // Ignore errors on delete. :shrug:
-    }
-    _copy(pkg.dist, destPath);
-
-    if (githubToken) {
-      _exec('git', ['config', 'commit.gpgSign', 'false'], { cwd: destPath }, publishLogger);
-    }
-
-    // Add the header to the existing README.md (or create a README if it doesn't exist).
-    const readmePath = path.join(destPath, 'README.md');
-    let readme = readmeHeaderFn(pkg);
-    try {
-      readme += fs.readFileSync(readmePath, 'utf-8');
-    } catch {}
-
-    fs.writeFileSync(readmePath, readme);
-
-    // Make sure that every snapshots is unique (otherwise we would need to make sure git accepts
-    // empty commits).
-    fs.writeFileSync(path.join(destPath, 'uniqueId'), '' + new Date());
-
-    // Commit and push.
-    _exec('git', ['add', '.'], { cwd: destPath }, publishLogger);
-    _exec('git', ['commit', '-a', '-m', message], { cwd: destPath }, publishLogger);
-    _exec('git', ['tag', pkg.snapshotHash], { cwd: destPath }, publishLogger);
-    _exec('git', ['push', 'origin'], { cwd: destPath }, publishLogger);
-    _exec('git', ['push', '--tags', 'origin'], { cwd: destPath }, publishLogger);
+    process.chdir(root);
+    await _publishSnapshot(packages[packageName], branch, message, logger, githubToken);
   }
 
   return 0;
