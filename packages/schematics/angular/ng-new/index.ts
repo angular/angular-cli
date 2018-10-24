@@ -56,6 +56,8 @@ export default function (options: NgNewOptions): Rule {
     style: options.style,
     skipTests: options.skipTests,
     skipPackageJson: false,
+    // always 'skipInstall' here, so that we do it after the move
+    skipInstall: true,
   };
 
   return chain([
