@@ -3,10 +3,11 @@
   "id": "SchematicsAngularGuard",
   "title": "Angular Guard Options Schema",
   "type": "object",
+  "description": "Generates a new, generic route guard definition in the given or default project.",
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name of the guard.",
+      "description": "The name of the new route guard.",
       "$default": {
         "$source": "argv",
         "index": 0
@@ -15,18 +16,18 @@
     },
     "spec": {
       "type": "boolean",
-      "description": "Specifies if a spec file is generated.",
+      "description": "When true (the default), generates a  \"spec.ts\" test file for the new guard.",
       "default": true
     },
     "flat": {
       "type": "boolean",
-      "description": "Flag to indicate if a directory is created.",
+      "description": "When true (the default), creates the new files at the top level of the current project.",
       "default": true
     },
     "path": {
       "type": "string",
       "format": "path",
-      "description": "The path to create the interface.",
+      "description": "The path at which to create the interface that defines the guard, relative to the current workspace.",
       "visible": false
     },
     "project": {
@@ -39,7 +40,7 @@
     "lintFix": {
       "type": "boolean",
       "default": false,
-      "description": "Specifies whether to apply lint fixes after generating the guard."
+      "description": "When true, applies lint fixes after generating the guard."
     }
   },
   "required": [

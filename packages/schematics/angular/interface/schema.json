@@ -3,6 +3,7 @@
   "id": "SchematicsAngularInterface",
   "title": "Angular Interface Options Schema",
   "type": "object",
+  "description": "Creates a new generic interface definition in the given or default project.",
   "properties": {
     "name": {
       "type": "string",
@@ -16,7 +17,7 @@
     "path": {
       "type": "string",
       "format": "path",
-      "description": "The path to create the interface.",
+      "description": "The path at which to create the interface, relative to the workspace root.",
       "visible": false
     },
     "project": {
@@ -29,11 +30,11 @@
     "prefix": {
       "type": "string",
       "default": "",
-      "description": "Specifies the prefix to use."
+      "description": "A prefix to apply to generated selectors."
     },
     "type": {
       "type": "string",
-      "description": "Specifies the type of interface.",
+      "description": "Adds a developer-defined type to the filename, in the format \"name.type.ts\".",
       "$default": {
         "$source": "argv",
         "index": 1
@@ -42,7 +43,7 @@
     "lintFix": {
       "type": "boolean",
       "default": false,
-      "description": "Specifies whether to apply lint fixes after generating the directive."
+      "description": "When true, applies lint fixes after generating the interface."
     }
   },
   "required": [
