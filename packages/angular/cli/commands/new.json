@@ -16,13 +16,13 @@
         "collection": {
           "type": "string",
           "aliases": [ "c" ],
-          "description": "Schematics collection to use."
+          "description": "A collection of schematics to use in generating the initial app."
         },
         "verbose": {
           "type": "boolean",
           "default": false,
           "aliases": [ "v" ],
-          "description": "Adds more details to output logging."
+          "description": "When true, adds more details to output logging."
         }
       },
       "required": []

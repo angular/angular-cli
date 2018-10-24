@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/run.json",
-  "description": "Runs a custom target defined in your project.",
+  "description": "Runs an architect target with a custom build configuration defined in your project.",
   "$longDescription": "",
 
   "$aliases": [],
@@ -15,14 +15,14 @@
       "properties": {
         "target": {
           "type": "string",
-          "description": "The target to run.",
+          "description": "The command to run.",
           "$default": {
             "$source": "argv",
             "index": 0
           }
         },
         "configuration": {
-          "description": "Specify the configuration to use.",
+          "description": "A named build configuration, defined in the \"configurations\" section of angular.json.\nThe build uses the configuration associated with the given target.",
           "type": "string",
           "aliases": [ "c" ]
         }

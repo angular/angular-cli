@@ -22,7 +22,7 @@
           }
         },
         "configuration": {
-          "description": "Specify the configuration to use.",
+          "description": "The linting configuration to use.",
           "type": "string",
           "aliases": [
             "c"
