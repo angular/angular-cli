@@ -3,11 +3,12 @@
   "id": "SchematicsAngularComponent",
   "title": "Angular Component Options Schema",
   "type": "object",
+  "description": "Creates a new generic component definition in the given or default project.",
   "properties": {
     "path": {
       "type": "string",
       "format": "path",
-      "description": "The path to create the component.",
+      "description": "The path at which to create the component file, relative to the current workspace. Default is a folder with the same name as the component in the project root.",
       "visible": false
     },
     "project": {
@@ -27,25 +28,25 @@
       "x-prompt": "What name would you like to use for the component?"
     },
     "inlineStyle": {
-      "description": "Specifies if the style will be in the ts file.",
+      "description": "When true, includes styles inline in the component TS file.  Only CSS styles can be included inline. By default, an external styles file is created and referenced in the component TS file.",
       "type": "boolean",
       "default": false,
       "alias": "s"
     },
     "inlineTemplate": {
-      "description": "Specifies if the template will be in the ts file.",
+      "description": "When true, includes template inline in the component TS file. By default, an external template file is created and referenced in the component TS file.",
       "type": "boolean",
       "default": false,
       "alias": "t"
     },
     "viewEncapsulation": {
-      "description": "Specifies the view encapsulation strategy.",
+      "description": "The view encapsulation strategy to use in the new component.",
       "enum": ["Emulated", "Native", "None", "ShadowDom"],
       "type": "string",
       "alias": "v"
     },
     "changeDetection": {
-      "description": "Specifies the change detection strategy.",
+      "description": "The change detection strategy to use in the new component.",
       "enum": ["Default", "OnPush"],
       "type": "string",
       "default": "Default",
@@ -53,7 +54,7 @@
     },
     "prefix": {
       "type": "string",
-      "description": "The prefix to apply to generated selectors.",
+      "description": "The prefix to apply to the generated component selector.",
       "alias": "p",
       "oneOf": [
         {
@@ -66,49 +67,49 @@
       ]
     },
     "styleext": {
-      "description": "The file extension to be used for style files.",
+      "description": "The file extension to use for style files.",
       "type": "string",
       "default": "css"
     },
     "spec": {
       "type": "boolean",
-      "description": "Specifies if a spec file is generated.",
+      "description": "When true (the default), generates a  \"spec.ts\" test file for the new component.",
       "default": true
     },
     "flat": {
       "type": "boolean",
-      "description": "Flag to indicate if a directory is created.",
+      "description": "When true, creates the new files at the top level of the current project.",
       "default": false
     },
     "skipImport": {
       "type": "boolean",
-      "description": "Flag to skip the module import.",
+      "description": "When true, does not import this component into the owning NgModule.",
       "default": false
     },
     "selector": {
       "type": "string",
       "format": "html-selector",
-      "description": "The selector to use for the component."
+      "description": "The HTML selector to use for this component."
     },
     "module":  {
       "type": "string",
-      "description": "Allows specification of the declaring module.",
+      "description": "The declaring NgModule.",
       "alias": "m"
     },
     "export": {
       "type": "boolean",
       "default": false,
-      "description": "Specifies if declaring module exports the component."
+      "description": "When true, the declaring NgModule exports this component."
     },
     "entryComponent": {
       "type": "boolean",
       "default": false,
-      "description": "Specifies if the component is an entry component of declaring module."
+      "description": "When true, the new component is the entry component of the declaring NgModule."
     },
     "lintFix": {
       "type": "boolean",
       "default": false,
-      "description": "Specifies whether to apply lint fixes after generating the component."
+      "description": "When true, applies lint fixes after generating the component."
     }
   },
   "required": [
