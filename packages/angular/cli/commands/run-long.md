@@ -5,4 +5,3 @@ For example, the "build" target for a newly generated app has a predefined alter
 
 You can define new targets and their configuration options in the "architect" section of the `angular.json` file.
 If you do so, you can run them from the command line using the `ng run` command.
-
