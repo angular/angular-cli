@@ -26,8 +26,14 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
   }
 
   stat(path: string, callback: (err: Error, stats: Stats) => void): void {
-    // tslint:disable-next-line:no-any
-    callback(null as any, this._webpackCompilerHost.stat(path) as any);
+    const result = this._webpackCompilerHost.stat(path);
+    if (result) {
+      // tslint:disable-next-line:no-any
+      callback(null as any, result);
+    } else {
+      // tslint:disable-next-line:no-any
+      callback(new FileDoesNotExistException(path), undefined as any);
+    }
   }
 
   readdir(path: string, callback: Callback<string[]>): void {
