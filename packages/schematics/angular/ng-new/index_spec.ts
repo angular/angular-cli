@@ -65,4 +65,14 @@ describe('Ng New Schematic', () => {
     expect(files.indexOf('/bar/angular.json')).toBeGreaterThanOrEqual(0);
     expect(files.indexOf('/bar/src')).toBe(-1);
   });
+
+  it('minimal=true should not create e2e project', () => {
+    const options = { ...defaultOptions, minimal: true };
+
+    const tree = schematicRunner.runSchematic('ng-new', options);
+    const files = tree.files;
+    expect(files.indexOf('/bar/e2e')).toEqual(-1);
+    const confContent = JSON.parse(tree.readContent('/bar/angular.json'));
+    expect(confContent.projects['foo-e2e']).toBeUndefined();
+  });
 });
