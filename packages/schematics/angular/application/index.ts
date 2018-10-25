@@ -372,7 +372,7 @@ export default function (options: ApplicationOptions): Rule {
           }),
           move(sourceDir),
         ]), MergeStrategy.Overwrite),
-      !options.minimal ? schematic('e2e', e2eOptions) : noop(),
+      options.minimal ? noop() : schematic('e2e', e2eOptions),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
     ]);
   };
