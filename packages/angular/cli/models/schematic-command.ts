@@ -38,13 +38,13 @@ import * as inquirer from 'inquirer';
 import * as systemPath from 'path';
 import { WorkspaceLoader } from '../models/workspace-loader';
 import {
-  getPackageManager,
   getProjectByCwd,
   getSchematicDefaults,
   getWorkspace,
   getWorkspaceRaw,
 } from '../utilities/config';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
+import { getPackageManager } from '../utilities/package-manager';
 import { BaseCommandOptions, Command } from './command';
 import { Arguments, CommandContext, CommandDescription, Option } from './interface';
 import { parseArguments, parseFreeFormArguments } from './parser';
@@ -255,7 +255,7 @@ export abstract class SchematicCommand<
         {
           force,
           dryRun,
-          packageManager: getPackageManager(),
+          packageManager: getPackageManager(this.workspace.root),
           root: normalize(this.workspace.root),
         },
     );

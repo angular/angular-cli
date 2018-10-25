@@ -12,7 +12,7 @@ import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/
 import { Arguments } from '../models/interface';
 import { SchematicCommand } from '../models/schematic-command';
 import { NpmInstall } from '../tasks/npm-install';
-import { getPackageManager } from '../utilities/config';
+import { getPackageManager } from '../utilities/package-manager';
 import { Schema as AddCommandSchema } from './add';
 
 export class AddCommand extends SchematicCommand<AddCommandSchema> {
@@ -28,7 +28,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       return 1;
     }
 
-    const packageManager = getPackageManager();
+    const packageManager = getPackageManager(this.workspace.root);
 
     const npmInstall: NpmInstall = require('../tasks/npm-install').default;
 
