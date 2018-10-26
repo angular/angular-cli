@@ -81,18 +81,16 @@ function initializeLogging(logger: logging.Logger) {
           color = terminal.white;
           break;
         case 'warn':
-          color = terminal.yellow;
-          output = process.stderr;
-          break;
-        case 'error':
-          color = terminal.red;
+          color = (x: string) => terminal.bold(terminal.yellow(x));
           output = process.stderr;
           break;
         case 'fatal':
-          color = (x) => terminal.bold(terminal.red(x));
+        case 'error':
+          color = (x: string) => terminal.bold(terminal.red(x));
           output = process.stderr;
           break;
       }
+
 
       // If we do console.log(message) or process.stdout.write(message + '\n'), the process might
       // stop before the whole message is written and the stream is flushed. This happens when
