@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/run.json",
-  "description": "Runs an architect target with a custom builder configuration defined in your project.",
+  "description": "Runs an architect target with an optional custom builder configuration defined in your project.",
   "$longDescription": "./run-long.md",
 
   "$aliases": [],
@@ -15,7 +15,7 @@
       "properties": {
         "target": {
           "type": "string",
-          "description": "The target to run.",
+          "description": "The Architect target to run.",
           "$default": {
             "$source": "argv",
             "index": 0
