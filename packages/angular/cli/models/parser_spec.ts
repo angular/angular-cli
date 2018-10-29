@@ -15,6 +15,7 @@ describe('parseArguments', () => {
     { name: 'bool', aliases: [ 'b' ], type: OptionType.Boolean, description: '' },
     { name: 'num', aliases: [ 'n' ], type: OptionType.Number, description: '' },
     { name: 'str', aliases: [ 's' ], type: OptionType.String, description: '' },
+    { name: 'strUpper', aliases: [ 'S' ], type: OptionType.String, description: '' },
     { name: 'helloWorld', aliases: [], type: OptionType.String, description: '' },
     { name: 'helloBool', aliases: [], type: OptionType.Boolean, description: '' },
     { name: 'arr', aliases: [ 'a' ], type: OptionType.Array, description: '' },
@@ -35,6 +36,7 @@ describe('parseArguments', () => {
   ];
 
   const tests: { [test: string]: Partial<Arguments> | ['!!!', Partial<Arguments>, string[]] } = {
+    '-S=b': { strUpper: 'b' },
     '--bool': { bool: true },
     '--bool=1': ['!!!', {}, ['--bool=1']],
     '--bool  ': { bool: true, p1: '' },
