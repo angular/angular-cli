@@ -1,6 +1,6 @@
 {
-  "title": "Karma Target",
-  "description": "Karma target options for Build Facade.",
+  "title": "Dev Server Target",
+  "description": "Dev Server target options for Build Facade.",
   "type": "object",
   "properties": {
     "browserTarget": {
