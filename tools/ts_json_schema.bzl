@@ -57,7 +57,7 @@ _ts_json_schema_interface = rule(
 # rule containing the typescript interface.
 # The file produced will have the same name, with the extension replaced from `.json` to `.ts`.
 # Any filename collision will be an error thrown by Bazel.
-def ts_json_schema(name, src, data = []):
+def ts_json_schema(name, src, data = [], tsconfig = "//:tsconfig.json"):
     out = src.replace(".json", ".ts")
 
     # @external_begin
@@ -75,6 +75,7 @@ def ts_json_schema(name, src, data = []):
         # @external_begin
         srcs = [
             out,
-        ]
+        ],
+        tsconfig = tsconfig,
         # @external_end
     )
