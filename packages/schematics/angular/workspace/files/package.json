@@ -28,8 +28,8 @@
     "@angular/cli": "<%= experimentalAngularNext ? 'next' : '~' + version %>",
     "@angular/compiler-cli": "<%= experimentalAngularNext ? 'next' : latestVersions.Angular %>",
     "@angular/language-service": "<%= experimentalAngularNext ? 'next' : latestVersions.Angular %>",
-    "@types/node": "~8.9.4",
-    <% if (!minimal) { %>"@types/jasmine": "~2.8.8",
+    "@types/node": "~8.9.4",<% if (!minimal) { %>
+    "@types/jasmine": "~2.8.8",
     "@types/jasminewd2": "~2.0.3",
     "codelyzer": "~4.5.0",
     "jasmine-core": "~2.99.1",
