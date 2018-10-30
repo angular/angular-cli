@@ -488,7 +488,7 @@ function _usageMessage(
 
   logger.info('\n');
   logger.info('There might be additional packages that are outdated.');
-  logger.info('Or run ng update --all to try to update all at the same time.\n');
+  logger.info('Run "ng update --all" to try to update all at the same time.\n');
 
   return of<void>(undefined);
 }
