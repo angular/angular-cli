@@ -48,7 +48,12 @@ build with the app shell target
 ```
 ng run my-app:app-shell
 ```
+If you would like to build for production you should run the following command
+```
+ng run my-app:app-shell:production
+ng run my-app:app-shell --configuration production
+```
 
 Verify the build output
-Open dist/app-shell/index.html
+Open dist/index.html
 look for text "app-shell works!" which verifies that the app shell route was rendered as part of the output
