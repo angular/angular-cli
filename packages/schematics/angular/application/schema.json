@@ -6,7 +6,7 @@
   "description": "Generates a new basic app definition in the \"projects\" subfolder of the workspace.",
   "properties": {
     "projectRoot": {
-      "description": "The root folder of the new app.",
+      "description": "The root directory of the new app.",
       "type": "string",
       "visible": false
     },
