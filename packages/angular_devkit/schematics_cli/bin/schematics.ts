@@ -13,6 +13,7 @@ import 'symbol-observable';
 import {
   JsonObject,
   normalize,
+  schema,
   tags,
   terminal,
   virtualFs,
@@ -24,6 +25,7 @@ import {
   UnsuccessfulWorkflowExecution,
 } from '@angular-devkit/schematics';
 import { NodeModulesEngineHost, NodeWorkflow } from '@angular-devkit/schematics/tools';
+import * as inquirer from 'inquirer';
 import * as minimist from 'minimist';
 
 
@@ -51,6 +53,47 @@ function parseSchematicName(str: string | null): { collection: string, schematic
 
   return { collection, schematic };
 }
+
+const promptProvider: schema.PromptProvider = (definitions) => {
+  const questions: inquirer.Questions = definitions.map(definition => {
+    const question: inquirer.Question = {
+      name: definition.id,
+      message: definition.message,
+      default: definition.default,
+    };
+
+    const validator = definition.validator;
+    if (validator) {
+      question.validate = input => validator(input);
+    }
+
+    switch (definition.type) {
+      case 'confirmation':
+        question.type = 'confirm';
+        break;
+      case 'list':
+        question.type = 'list';
+        question.choices = definition.items && definition.items.map(item => {
+          if (typeof item == 'string') {
+            return item;
+          } else {
+            return {
+              name: item.label,
+              value: item.value,
+            };
+          }
+        });
+        break;
+      default:
+        question.type = definition.type;
+        break;
+    }
+
+    return question;
+  });
+
+  return inquirer.prompt(questions);
+};
 
 
 export interface MainOptions {
@@ -109,6 +152,7 @@ export async function main({
   const dryRun: boolean = argv['dry-run'] === null ? debug : argv['dry-run'];
   const force = argv['force'];
   const allowPrivate = argv['allow-private'];
+  const interactive: boolean = argv['interactive'] !== null || argv['interactive'];
 
   /** Create a Virtual FS Host scoped to where the process is being run. **/
   const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(process.cwd()));
@@ -208,6 +252,9 @@ export async function main({
   });
   delete parsedArgs._;
 
+  if (interactive !== false && process.stdout.isTTY) {
+    workflow.registry.usePromptProvider(promptProvider);
+  }
 
   /**
    *  Execute the workflow, which will report the dry run events, run the tasks, and complete
