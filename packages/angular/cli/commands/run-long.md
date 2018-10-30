@@ -12,5 +12,5 @@ If you do so, you can run them from the command line using the `ng run` command.
 Execute the command using the following format.
 
 ```
-ng run project:target[.configuration]
+ng run project:target[:configuration]
 ```
