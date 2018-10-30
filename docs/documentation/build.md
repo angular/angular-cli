@@ -35,7 +35,7 @@ ng build --base-href /myUrl/
 ### Bundling & Tree-Shaking
 
 All builds make use of bundling and limited tree-shaking, while `--prod` builds also run limited
-dead code elimination via UglifyJS.
+dead code elimination via Terser.
 
 ### `--build-optimizer` and `--vendor-chunk`
 
@@ -43,7 +43,7 @@ When using Build Optimizer the vendor chunk will be disabled by default.
 You can override this with `--vendor-chunk=true`.
 
 Total bundle sizes with Build Optimizer are smaller if there is no separate vendor chunk because
-having vendor code in the same chunk as app code makes it possible for Uglify to remove more unused
+having vendor code in the same chunk as app code makes it possible for Terser to remove more unused
 code.
 
 ### CSS resources
@@ -57,7 +57,7 @@ You'll see these resources be outputted and fingerprinted at the root of `dist/`
 
 To build in ES2015 mode, edit `./tsconfig.json` to use `"target": "es2015"` (instead of `es5`).
 
-This will cause application TypeScript and Uglify be output as ES2015, and third party libraries
+This will cause application TypeScript and Terser be output as ES2015, and third party libraries
 to be loaded through the `es2015` entry in `package.json` if available.
 
 Be aware that JIT does not support ES2015 and so you should build/serve your app with `--aot`.
