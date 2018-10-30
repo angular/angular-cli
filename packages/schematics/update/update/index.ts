@@ -32,21 +32,24 @@ type PeerVersionTransform = string | ((range: string) => string);
 // supports 6.0, by adding that compatibility to the range, so it is `^5.0.0 || ^6.0.0`.
 // We export it to allow for testing.
 export function angularMajorCompatGuarantee(range: string) {
-  range = semver.validRange(range);
+  let newRange = semver.validRange(range);
+  if (!newRange) {
+    return range;
+  }
   let major = 1;
-  while (!semver.gtr(major + '.0.0', range)) {
+  while (!semver.gtr(major + '.0.0', newRange)) {
     major++;
     if (major >= 99) {
       // Use original range if it supports a major this high
       // Range is most likely unbounded (e.g., >=5.0.0)
-      return range;
+      return newRange;
     }
   }
 
   // Add the major version as compatible with the angular compatible, with all minors. This is
   // already one major above the greatest supported, because we increment `major` before checking.
   // We add minors like this because a minor beta is still compatible with a minor non-beta.
-  let newRange = range;
+  newRange = range;
   for (let minor = 0; minor < 20; minor++) {
     newRange += ` || ^${major}.${minor}.0-alpha.0 `;
   }
