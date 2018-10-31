@@ -152,7 +152,7 @@ export async function main({
   const dryRun: boolean = argv['dry-run'] === null ? debug : argv['dry-run'];
   const force = argv['force'];
   const allowPrivate = argv['allow-private'];
-  const interactive: boolean = argv['interactive'] !== null || argv['interactive'];
+  const interactive: boolean = argv['interactive'];
 
   /** Create a Virtual FS Host scoped to where the process is being run. **/
   const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(process.cwd()));
@@ -353,10 +353,12 @@ function parseArgs(args: string[] | undefined): minimist.ParsedArgs {
         'dryRun': 'dry-run',
         'listSchematics': 'list-schematics',
         'allowPrivate': 'allow-private',
+        'interactive': 'interactive',
       },
       default: {
         'debug': null,
         'dryRun': null,
+        'interactive': true,
       },
       '--': true,
     });
