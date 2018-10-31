@@ -320,7 +320,11 @@ function getUsage(): string {
       --list-schematics   List all schematics from the collection, by name. A collection name
                           should be suffixed by a colon. Example: '@schematics/schematics:'.
 
+      --interactive       Enable console prompts.
+                          Default to true (turn off with --interactive=false)
+
       --verbose           Show more information.
+
 
       --help              Show this message.
 
