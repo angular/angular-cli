@@ -39,7 +39,7 @@ import { Compiler, compilation } from 'webpack';
 import { time, timeEnd } from './benchmark';
 import { WebpackCompilerHost, workaroundResolve } from './compiler_host';
 import { resolveEntryModuleFromMain } from './entry_resolver';
-import { gatherDiagnostics, hasErrors } from './gather_diagnostics';
+import { DiagnosticMode, gatherDiagnostics, hasErrors } from './gather_diagnostics';
 import { TypeScriptPathsPlugin } from './paths-plugin';
 import { WebpackResourceLoader } from './resource_loader';
 import {
@@ -284,6 +284,7 @@ export class AngularCompilerPlugin {
     if (options.forkTypeChecker !== undefined) {
       this._forkTypeChecker = options.forkTypeChecker;
     }
+    // this._forkTypeChecker = false;
 
     // Add custom platform transformers.
     if (options.platformTransformers !== undefined) {
@@ -1038,6 +1039,8 @@ export class AngularCompilerPlugin {
     time('AngularCompilerPlugin._emit');
     const program = this._program;
     const allDiagnostics: Array<ts.Diagnostic | Diagnostic> = [];
+    const diagMode = (this._firstRun || !this._forkTypeChecker) ?
+      DiagnosticMode.All : DiagnosticMode.Syntactic;
 
     let emitResult: ts.EmitResult | undefined;
     try {
@@ -1051,10 +1054,8 @@ export class AngularCompilerPlugin {
           timeEnd('AngularCompilerPlugin._emit.ts.getOptionsDiagnostics');
         }
 
-        if ((this._firstRun || !this._forkTypeChecker) && this._program) {
-          allDiagnostics.push(...gatherDiagnostics(this._program, this._JitMode,
-            'AngularCompilerPlugin._emit.ts'));
-        }
+        allDiagnostics.push(...gatherDiagnostics(tsProgram, this._JitMode,
+          'AngularCompilerPlugin._emit.ts', diagMode));
 
         if (!hasErrors(allDiagnostics)) {
           if (this._firstRun || sourceFiles.length > 20) {
@@ -1098,10 +1099,8 @@ export class AngularCompilerPlugin {
           timeEnd('AngularCompilerPlugin._emit.ng.getNgOptionDiagnostics');
         }
 
-        if ((this._firstRun || !this._forkTypeChecker) && this._program) {
-          allDiagnostics.push(...gatherDiagnostics(this._program, this._JitMode,
-            'AngularCompilerPlugin._emit.ng'));
-        }
+        allDiagnostics.push(...gatherDiagnostics(angularProgram, this._JitMode,
+          'AngularCompilerPlugin._emit.ng', diagMode));
 
         if (!hasErrors(allDiagnostics)) {
           time('AngularCompilerPlugin._emit.ng.emit');

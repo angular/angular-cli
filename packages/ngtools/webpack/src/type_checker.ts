@@ -18,7 +18,7 @@ import {
 import * as ts from 'typescript';
 import { time, timeEnd } from './benchmark';
 import { WebpackCompilerHost } from './compiler_host';
-import { CancellationToken, gatherDiagnostics } from './gather_diagnostics';
+import { CancellationToken, DiagnosticMode, gatherDiagnostics } from './gather_diagnostics';
 import { LogMessage, TypeCheckerMessage } from './type_checker_messages';
 
 
@@ -101,7 +101,7 @@ export class TypeChecker {
 
   private _diagnose(cancellationToken: CancellationToken) {
     const allDiagnostics = gatherDiagnostics(
-      this._program, this._JitMode, 'TypeChecker', cancellationToken);
+      this._program, this._JitMode, 'TypeChecker', DiagnosticMode.Semantic, cancellationToken);
 
     // Report diagnostics.
     if (!cancellationToken.isCancellationRequested()) {
