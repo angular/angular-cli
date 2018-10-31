@@ -233,7 +233,7 @@ describe('Browser Builder rebuilds', () => {
     // Add a major static analysis error on a non-main file to the initial build.
     host.replaceInFile('./src/app/app.component.ts', `'app-root'`, `(() => 'app-root')()`);
 
-    const overrides = { watch: true, aot: true, forkTypeChecker: false };
+    const overrides = { watch: true, aot: true };
     const logger = new TestLogger('rebuild-aot-errors');
     const staticAnalysisError = 'Function expressions are not supported in decorators';
     const syntaxError = 'Declaration or statement expected.';
@@ -298,7 +298,7 @@ describe('Browser Builder rebuilds', () => {
       'src/app/imported-styles.css': 'p {color: #f00;}',
     });
 
-    const overrides = { watch: true, aot: true, forkTypeChecker: false };
+    const overrides = { watch: true, aot: true };
     let buildNumber = 0;
 
     runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3).pipe(
