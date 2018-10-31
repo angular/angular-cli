@@ -69,6 +69,7 @@ describe('App Shell Schematic', () => {
     expect(target.options.serverTarget).toEqual('bar:server');
     expect(target.options.route).toEqual('shell');
     expect(target.configurations.production.browserTarget).toEqual('bar:build:production');
+    expect(target.configurations.production.serverTarget).toEqual('bar:server:production');
   });
 
   it('should add router module to client app module', () => {
