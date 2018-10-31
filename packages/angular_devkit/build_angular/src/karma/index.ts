@@ -108,15 +108,14 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
 
         // Complete the observable once the Karma server returns.
         const karmaServer = new karma.Server(karmaOptions, () => obs.complete());
-        karmaServer.start();
+        const karmaStartPromise = karmaServer.start();
 
         // Cleanup, signal Karma to exit.
         return () => {
-          // Karma does not seem to have a way to exit the server gracefully.
-          // See https://github.com/karma-runner/karma/issues/2867#issuecomment-369912167
-          // TODO: make a PR for karma to add `karmaServer.close(code)`, that
-          // calls `disconnectBrowsers(code);`
-          // karmaServer.close();
+          // Karma only has the `stop` method start with 3.1.1, so we must defensively check.
+          if (karmaServer.stop && typeof karmaServer.stop === 'function') {
+            return karmaStartPromise.then(() => karmaServer.stop());
+          }
         };
       })),
     );
