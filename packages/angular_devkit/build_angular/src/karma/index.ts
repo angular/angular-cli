@@ -97,6 +97,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
           // When this workaround is removed, user projects need to be updated to use a Karma
           // version that has a fix for this issue.
           toJSON: () => { },
+          logger: this.context.logger,
         };
 
         // TODO: inside the configs, always use the project root and not the workspace root.
