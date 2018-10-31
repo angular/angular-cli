@@ -53,6 +53,16 @@ describe('schematics-cli binary', () => {
     expect(res).toEqual(0);
   });
 
+  it('dry-run is default when debug mode', async () => {
+    const args = ['blank', 'foo', '--debug'];
+    const res = await main({ args, stdout, stderr });
+    expect(stdout.lines).toMatch(/CREATE \/foo\/README.md/);
+    expect(stdout.lines).toMatch(/CREATE \/foo\/.gitignore/);
+    expect(stdout.lines).toMatch(/CREATE \/foo\/src\/foo\/index.ts/);
+    expect(stdout.lines).toMatch(/CREATE \/foo\/src\/foo\/index_spec.ts/);
+    expect(res).toEqual(0);
+  });
+
   it('error when no name is provided', async () => {
     const args = ['blank'];
     const res = await main({ args, stdout, stderr });
