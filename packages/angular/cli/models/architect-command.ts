@@ -137,7 +137,7 @@ export abstract class ArchitectCommand<
     const builderConf = this._architect.getBuilderConfiguration(targetSpec);
     const builderDesc = await this._architect.getBuilderDescription(builderConf).toPromise();
     const targetOptionArray = await parseJsonSchemaToOptions(this._registry, builderDesc.schema);
-    const overrides = parseArguments(options, targetOptionArray);
+    const overrides = parseArguments(options, targetOptionArray, this.logger);
 
     if (overrides['--']) {
       (overrides['--'] || []).forEach(additional => {
