@@ -119,7 +119,8 @@ function _assignOption(
   ignored: string[],
   errors: string[],
 ) {
-  let key = arg.substr(2);
+  const from = arg.startsWith('--') ? 2 : 1;
+  let key = arg.substr(from);
   let option: Option | null = null;
   let value = '';
   const i = arg.indexOf('=');
@@ -172,8 +173,9 @@ function _assignOption(
       value = arg.substring(i + 1);
     }
   }
+
   if (option === null) {
-    if (args[0] && !args[0].startsWith('--')) {
+    if (args[0] && !args[0].startsWith('-')) {
       leftovers.push(arg, args[0]);
       args.shift();
     } else {
@@ -285,14 +287,14 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
         const flag = arg[i];
         // If the next character is an '=', treat it as a long flag.
         if (arg[i + 1] == '=') {
-          const f = '--' + flag + arg.slice(i + 1);
+          const f = '-' + flag + arg.slice(i + 1);
           _assignOption(f, args, options, parsedOptions, positionals, leftovers, ignored, errors);
           break;
         }
         // Treat the last flag as `--a` (as if full flag but just one letter). We do this in
         // the loop because it saves us a check to see if the arg is just `-`.
         if (i == arg.length - 1) {
-          const arg = '--' + flag;
+          const arg = '-' + flag;
           _assignOption(arg, args, options, parsedOptions, positionals, leftovers, ignored, errors);
         } else {
           const maybeOption = _getOptionFromName(flag, options);
