@@ -126,7 +126,7 @@ jobs:
     steps:
       - attach_workspace: *attach_options
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
-      - run: bazel test //packages/...
+      - run: bazel test ...
 
   snapshot_publish:
     <<: *defaults
