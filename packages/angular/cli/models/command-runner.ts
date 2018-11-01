@@ -16,7 +16,6 @@ import {
 } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
-import { of } from 'rxjs';
 import { findUp } from '../utilities/find-up';
 import { parseJsonSchemaToCommandDescription } from '../utilities/json-schema';
 import { Command } from './command';
@@ -76,7 +75,7 @@ export async function runCommand(
     if (uri.startsWith('ng-cli://')) {
       const content = readFileSync(join(__dirname, '..', uri.substr('ng-cli://'.length)), 'utf-8');
 
-      return of(JSON.parse(content));
+      return Promise.resolve(JSON.parse(content));
     } else {
       return null;
     }
@@ -93,7 +92,7 @@ export async function runCommand(
     }
 
     commandMap[name] =
-      await parseJsonSchemaToCommandDescription(name, schemaPath, registry, schema, logger);
+      await parseJsonSchemaToCommandDescription(name, schemaPath, registry, schema);
   }
 
   let commandName: string | undefined = undefined;

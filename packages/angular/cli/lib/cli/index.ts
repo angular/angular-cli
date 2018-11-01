@@ -7,7 +7,6 @@
  */
 
 import { logging, terminal } from '@angular-devkit/core';
-import { filter } from 'rxjs/operators';
 import { runCommand } from '../../models/command-runner';
 import { getWorkspaceRaw } from '../../utilities/config';
 import { getWorkspaceDetails } from '../../utilities/project';
@@ -72,27 +71,26 @@ export default async function(options: { testing?: boolean, cliArgs: string[] })
 // Initialize logging.
 function initializeLogging(logger: logging.Logger) {
   return logger
-    .pipe(filter(entry => (entry.level != 'debug')))
     .subscribe(entry => {
       let color = (x: string) => terminal.dim(terminal.white(x));
       let output = process.stdout;
       switch (entry.level) {
+        case 'debug':
+          return;
         case 'info':
           color = terminal.white;
           break;
         case 'warn':
-          color = terminal.yellow;
-          output = process.stderr;
-          break;
-        case 'error':
-          color = terminal.red;
+          color = (x: string) => terminal.bold(terminal.yellow(x));
           output = process.stderr;
           break;
         case 'fatal':
-          color = (x) => terminal.bold(terminal.red(x));
+        case 'error':
+          color = (x: string) => terminal.bold(terminal.red(x));
           output = process.stderr;
           break;
       }
+
 
       // If we do console.log(message) or process.stdout.write(message + '\n'), the process might
       // stop before the whole message is written and the stream is flushed. This happens when

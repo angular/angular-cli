@@ -23,7 +23,12 @@ ts_library(
             "src/**/*_benchmark.ts",
         ],
     ),
-    deps = [],
+    deps = [
+        "@npm//@types/node",
+        "@npm//@types/source-map",
+        "@npm//typescript",
+        "@npm//@types/webpack",
+    ],
 )
 
 ts_library(
@@ -37,12 +42,19 @@ ts_library(
     deps = [
         ":build_optimizer",
         "//packages/angular_devkit/core",
-        # @typings: jasmine
-        # @typings: node
+        "@npm//@types/node",
+        "@npm//@types/jasmine",
+        "@npm//@types/source-map",
     ],
+    testonly = True,
+    tsconfig = "//:tsconfig-test.json",
 )
 
 jasmine_node_test(
     name = "build_optimizer_test",
     srcs = [":build_optimizer_test_lib"],
+    deps = [
+        "@npm//jasmine",
+        "@npm//source-map",
+    ],
 )

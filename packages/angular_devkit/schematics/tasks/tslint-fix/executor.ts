@@ -182,7 +182,10 @@ export default function(): TaskExecutor<TslintFixTaskOptions> {
         }
         const formatter = new Formatter();
 
-        const output = formatter.format(result.failures, result.fixes);
+        // Certain tslint formatters outputs '\n' when there are no failures.
+        // This will bloat the console when having schematics running refactor tasks.
+        // see https://github.com/palantir/tslint/issues/4244
+        const output = (formatter.format(result.failures, result.fixes) || '').trim();
         if (output) {
           context.logger.info(output);
         }

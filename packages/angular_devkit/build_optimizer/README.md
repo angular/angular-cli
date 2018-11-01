@@ -11,7 +11,7 @@ Transformations applied depend on file content:
 - [Import tslib](#import-tslib): applied when TypeScript helpers are found.
 
 Some of these optimizations add `/*@__PURE__*/` comments.
-These are used by [UglifyJS](https://github.com/mishoo/UglifyJS2) to identify pure functions that can potentially be dropped.
+These are used by JS optimization tools to identify pure functions that can potentially be dropped.
 
 
 ### Class fold

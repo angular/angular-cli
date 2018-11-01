@@ -2,8 +2,8 @@ import { ng, silentNpm } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 export default async function () {
-  // typescript@2.8.0-dev.20180320 is not part of the officially supported range in latest stable.
-  const unsupportedTsVersion = '2.8.0-dev.20180320';
+  // typescript@3.0.1 is not part of the officially supported range in latest stable.
+  const unsupportedTsVersion = '3.0.1';
 
   await updateJsonFile('src/tsconfig.app.json', configJson => {
     // skipLibCheck is required because declerations

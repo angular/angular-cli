@@ -40,7 +40,6 @@ export default function (options: NgNewOptions): Rule {
   const workspaceOptions: WorkspaceOptions = {
     name: options.name,
     version: options.version,
-    experimentalAngularNext: options.experimentalIvy,
     newProjectRoot: options.newProjectRoot || 'projects',
     minimal: options.minimal,
   };
@@ -56,6 +55,9 @@ export default function (options: NgNewOptions): Rule {
     style: options.style,
     skipTests: options.skipTests,
     skipPackageJson: false,
+    // always 'skipInstall' here, so that we do it after the move
+    skipInstall: true,
+    minimal: options.minimal,
   };
 
   return chain([

@@ -27,12 +27,12 @@ ts_library(
     deps = [
         "@rxjs",
         "@rxjs//operators",
+        "@npm//@types/node",
+        "@npm//@types/source-map",
+        "@npm//ajv",
         # @typings: es2015.core
         # @typings: es2015.symbol.wellknown
         # @typings: es2016.array.include
-        # @typings: ajv
-        # @typings: node
-        # @typings: source-map
     ],
 )
 
@@ -49,18 +49,25 @@ ts_library(
         ":node",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: jasmine
-        # @typings: node
+        "@npm//@types/node",
+        "@npm//@types/jasmine",
     ],
     data = [
         "src/workspace/workspace-schema.json",
-        "src/workspace/test/test-workspace.json"    
+        "src/workspace/test/test-workspace.json"
     ],
+    testonly = True,
+    tsconfig = "//:tsconfig-test.json",
 )
 
 jasmine_node_test(
     name = "core_test",
     srcs = [":core_test_lib"],
+    deps = [
+        "@npm//jasmine",
+        "@npm//source-map",
+        "@npm//chokidar",
+    ],
 )
 
 
@@ -83,7 +90,7 @@ ts_library(
         ":core",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: node
+        "@npm//@types/node",
     ],
 )
 
@@ -100,14 +107,23 @@ ts_library(
         ":node",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: jasmine
-        # @typings: node
+        "@npm//@types/node",
+        "@npm//@types/jasmine",
     ],
+    testonly = True,
+    tsconfig = "//:tsconfig-test.json",
 )
 
 jasmine_node_test(
     name = "node_test",
     srcs = [":node_test_lib"],
+    deps = [
+        "@npm//jasmine",
+        "@npm//chokidar",
+        "@npm//source-map",
+        "@npm//temp",
+        "@npm//tslint",
+    ],
 )
 
 
@@ -130,6 +146,7 @@ ts_library(
         ":node",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: node
+        "@npm//@types/node",
+        "@npm//@types/jasmine",
     ],
 )

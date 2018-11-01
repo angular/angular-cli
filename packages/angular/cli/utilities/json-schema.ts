@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { json, logging } from '@angular-devkit/core';
+import { BaseException, json } from '@angular-devkit/core';
 import { ExportStringRef } from '@angular-devkit/schematics/tools';
 import { readFileSync } from 'fs';
 import { dirname, resolve } from 'path';
@@ -18,6 +18,13 @@ import {
   SubCommandDescription,
   Value,
 } from '../models/interface';
+
+
+export class CommandJsonPathException extends BaseException {
+  constructor(public readonly path: string, public readonly name: string) {
+    super(`File ${path} was not found while constructing the subcommand ${name}.`);
+  }
+}
 
 function _getEnumFromValue<E, T extends E[keyof E]>(
   value: json.JsonValue,
@@ -40,7 +47,6 @@ export async function parseJsonSchemaToSubCommandDescription(
   jsonPath: string,
   registry: json.schema.SchemaRegistry,
   schema: json.JsonObject,
-  logger: logging.Logger,
 ): Promise<SubCommandDescription> {
   const options = await parseJsonSchemaToOptions(registry, schema);
 
@@ -69,7 +75,7 @@ export async function parseJsonSchemaToSubCommandDescription(
     try {
       longDescription = readFileSync(ldPath, 'utf-8');
     } catch (e) {
-      logger.warn(`File ${ldPath} was not found while constructing the subcommand ${name}.`);
+      throw new CommandJsonPathException(ldPath, name);
     }
   }
   let usageNotes = '';
@@ -78,7 +84,7 @@ export async function parseJsonSchemaToSubCommandDescription(
     try {
       usageNotes = readFileSync(unPath, 'utf-8');
     } catch (e) {
-      logger.warn(`File ${unPath} was not found while constructing the subcommand ${name}.`);
+      throw new CommandJsonPathException(unPath, name);
     }
   }
 
@@ -99,10 +105,9 @@ export async function parseJsonSchemaToCommandDescription(
   jsonPath: string,
   registry: json.schema.SchemaRegistry,
   schema: json.JsonObject,
-  logger: logging.Logger,
 ): Promise<CommandDescription> {
   const subcommand =
-    await parseJsonSchemaToSubCommandDescription(name, jsonPath, registry, schema, logger);
+    await parseJsonSchemaToSubCommandDescription(name, jsonPath, registry, schema);
 
   // Before doing any work, let's validate the implementation.
   if (typeof schema.$impl != 'string') {

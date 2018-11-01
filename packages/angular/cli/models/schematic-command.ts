@@ -36,7 +36,6 @@ import {
 } from '@angular-devkit/schematics/tools';
 import * as inquirer from 'inquirer';
 import * as systemPath from 'path';
-import { take } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
 import {
   getPackageManager,
@@ -97,7 +96,7 @@ export abstract class SchematicCommand<
   }
 
   public async initialize(options: T & Arguments) {
-    this._loadWorkspace();
+    await this._loadWorkspace();
     this.createWorkflow(options);
 
     if (this.schematicName) {
@@ -537,28 +536,19 @@ export abstract class SchematicCommand<
     return parseArguments(schematicOptions, options);
   }
 
-  private _loadWorkspace() {
+  private async _loadWorkspace() {
     if (this._workspace) {
       return;
     }
     const workspaceLoader = new WorkspaceLoader(this._host);
 
     try {
-      workspaceLoader.loadWorkspace(this.workspace.root).pipe(take(1))
-        .subscribe(
-          (workspace: experimental.workspace.Workspace) => this._workspace = workspace,
-          (err: Error) => {
-            if (!this.allowMissingWorkspace) {
-              // Ignore missing workspace
-              throw err;
-            }
-          },
-        );
+      this._workspace = await workspaceLoader.loadWorkspace(this.workspace.root);
     } catch (err) {
       if (!this.allowMissingWorkspace) {
         // Ignore missing workspace
         throw err;
-  }
+      }
     }
   }
 }

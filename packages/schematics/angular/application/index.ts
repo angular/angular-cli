@@ -22,6 +22,7 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { Schema as E2eOptions } from '../e2e/schema';
 import {
   addProjectToWorkspace,
@@ -63,8 +64,8 @@ import { Schema as ApplicationOptions } from './schema';
 //   );
 // }
 
-function addDependenciesToPackageJson() {
-  return (host: Tree) => {
+function addDependenciesToPackageJson(options: ApplicationOptions) {
+  return (host: Tree, context: SchematicContext) => {
     [
       {
         type: NodeDependencyType.Dev,
@@ -82,6 +83,10 @@ function addDependenciesToPackageJson() {
         version: latestVersions.TypeScript,
       },
     ].forEach(dependency => addPackageJsonDependency(host, dependency));
+
+    if (!options.skipInstall) {
+      context.addTask(new NodePackageInstallTask());
+    }
 
     return host;
   };
@@ -299,7 +304,6 @@ export default function (options: ApplicationOptions): Rule {
 
     return chain([
       addAppToWorkspaceFile(options, workspace),
-      options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
       mergeWith(
         apply(url('./files/src'), [
           options.minimal ? filter(minimalPathFilter) : noop(),
@@ -368,7 +372,8 @@ export default function (options: ApplicationOptions): Rule {
           }),
           move(sourceDir),
         ]), MergeStrategy.Overwrite),
-      schematic('e2e', e2eOptions),
+      options.minimal ? noop() : schematic('e2e', e2eOptions),
+      options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
     ]);
   };
 }

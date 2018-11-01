@@ -305,7 +305,7 @@ function parseArgs(args: string[] | undefined): minimist.ParsedArgs {
       },
       default: {
         'debug': null,
-        'dry-run': null,
+        'dryRun': null,
       },
       '--': true,
     });
