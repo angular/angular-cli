@@ -136,6 +136,16 @@ describe('Application Schematic', () => {
     expect(content.rules['component-selector'][2]).toMatch('app');
   });
 
+  it('minimal=true should not create e2e project', () => {
+    const options = { ...defaultOptions, minimal: true };
+
+    const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+    const files = tree.files;
+    expect(files.indexOf('/projects/foo-e2e')).toEqual(-1);
+    const confContent = JSON.parse(tree.readContent('/angular.json'));
+    expect(confContent.projects['foo-e2e']).toBeUndefined();
+  });
+
   describe(`update package.json`, () => {
     it(`should add build-angular to devDependencies`, () => {
       const tree = schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
