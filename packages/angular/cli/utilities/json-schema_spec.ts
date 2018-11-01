@@ -9,7 +9,6 @@
 import { schema } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { of } from 'rxjs';
 import { CommandJsonPathException, parseJsonSchemaToCommandDescription } from './json-schema';
 
 describe('parseJsonSchemaToCommandDescription', () => {
@@ -37,7 +36,7 @@ describe('parseJsonSchemaToCommandDescription', () => {
         const content = readFileSync(
           join(__dirname, '..', uri.substr('ng-cli://'.length)), 'utf-8');
 
-        return of(JSON.parse(content));
+        return Promise.resolve(JSON.parse(content));
       } else {
         return null;
       }
