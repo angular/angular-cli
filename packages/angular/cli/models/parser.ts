@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  *
  */
-import { BaseException, strings } from '@angular-devkit/core';
+import { BaseException, logging, strings } from '@angular-devkit/core';
 import { Arguments, Option, OptionType, Value } from './interface';
 
 
@@ -112,12 +112,15 @@ function _getOptionFromName(name: string, options: Option[]): Option | undefined
 function _assignOption(
   arg: string,
   args: string[],
-  options: Option[],
-  parsedOptions: Arguments,
-  _positionals: string[],
-  leftovers: string[],
-  ignored: string[],
-  errors: string[],
+  { options, parsedOptions, leftovers, ignored, errors, deprecations }: {
+    options: Option[],
+    parsedOptions: Arguments,
+    positionals: string[],
+    leftovers: string[],
+    ignored: string[],
+    errors: string[],
+    deprecations: string[],
+  },
 ) {
   const from = arg.startsWith('--') ? 2 : 1;
   let key = arg.substr(from);
@@ -185,6 +188,11 @@ function _assignOption(
     const v = _coerce(value, option, parsedOptions[option.name]);
     if (v !== undefined) {
       parsedOptions[option.name] = v;
+
+      if (option.deprecated !== undefined && option.deprecated !== false) {
+        deprecations.push(`Option ${JSON.stringify(option.name)} is deprecated${
+            typeof option.deprecated == 'string' ? ': ' + option.deprecated : ''}.`);
+      }
     } else {
       let error = `Argument ${key} could not be parsed using value ${JSON.stringify(value)}.`;
       if (option.enum) {
@@ -258,9 +266,14 @@ export function parseFreeFormArguments(args: string[]): Arguments {
  *
  * @param args The argument array to parse.
  * @param options List of supported options. {@see Option}.
+ * @param logger Logger to use to warn users.
  * @returns An object that contains a property per option.
  */
-export function parseArguments(args: string[], options: Option[] | null): Arguments {
+export function parseArguments(
+  args: string[],
+  options: Option[] | null,
+  logger?: logging.Logger,
+): Arguments {
   if (options === null) {
     options = [];
   }
@@ -271,6 +284,9 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
 
   const ignored: string[] = [];
   const errors: string[] = [];
+  const deprecations: string[] = [];
+
+  const state = { options, parsedOptions, positionals, leftovers, ignored, errors, deprecations };
 
   for (let arg = args.shift(); arg !== undefined; arg = args.shift()) {
     if (arg == '--') {
@@ -280,7 +296,7 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
     }
 
     if (arg.startsWith('--')) {
-      _assignOption(arg, args, options, parsedOptions, positionals, leftovers, ignored, errors);
+      _assignOption(arg, args, state);
     } else if (arg.startsWith('-')) {
       // Argument is of form -abcdef.  Starts at 1 because we skip the `-`.
       for (let i = 1; i < arg.length; i++) {
@@ -288,14 +304,14 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
         // If the next character is an '=', treat it as a long flag.
         if (arg[i + 1] == '=') {
           const f = '-' + flag + arg.slice(i + 1);
-          _assignOption(f, args, options, parsedOptions, positionals, leftovers, ignored, errors);
+          _assignOption(f, args, state);
           break;
         }
         // Treat the last flag as `--a` (as if full flag but just one letter). We do this in
         // the loop because it saves us a check to see if the arg is just `-`.
         if (i == arg.length - 1) {
           const arg = '-' + flag;
-          _assignOption(arg, args, options, parsedOptions, positionals, leftovers, ignored, errors);
+          _assignOption(arg, args, state);
         } else {
           const maybeOption = _getOptionFromName(flag, options);
           if (maybeOption) {
@@ -350,6 +366,10 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
 
   if (positionals.length > 0 || leftovers.length > 0) {
     parsedOptions['--'] = [...positionals, ...leftovers];
+  }
+
+  if (deprecations.length > 0 && logger) {
+    deprecations.forEach(message => logger.warn(message));
   }
 
   if (errors.length > 0) {

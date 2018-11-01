@@ -182,7 +182,7 @@ export async function runCommand(
   }
 
   try {
-    const parsedOptions = parser.parseArguments(args, description.options);
+    const parsedOptions = parser.parseArguments(args, description.options, logger);
     Command.setCommandMap(commandMap);
     const command = new description.impl({ workspace }, description, logger);
 

@@ -248,6 +248,11 @@ export async function parseJsonSchemaToOptions(
     const visible = current.visible === undefined || current.visible === true;
     const hidden = !!current.hidden || !visible;
 
+    // Deprecated is set only if it's true or a string.
+    const xDeprecated = current['x-deprecated'];
+    const deprecated = (xDeprecated === true || typeof xDeprecated == 'string')
+      ? xDeprecated : undefined;
+
     const option: Option = {
       name,
       description: '' + (current.description === undefined ? '' : current.description),
@@ -258,6 +263,7 @@ export async function parseJsonSchemaToOptions(
       aliases,
       ...format !== undefined ? { format } : {},
       hidden,
+      ...deprecated !== undefined ? { deprecated } : {},
       ...positional !== undefined ? { positional } : {},
     };
 

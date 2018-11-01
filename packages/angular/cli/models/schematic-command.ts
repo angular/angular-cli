@@ -533,7 +533,7 @@ export abstract class SchematicCommand<
     schematicOptions: string[],
     options: Option[] | null,
   ): Promise<Arguments> {
-    return parseArguments(schematicOptions, options);
+    return parseArguments(schematicOptions, options, this.logger);
   }
 
   private async _loadWorkspace() {
