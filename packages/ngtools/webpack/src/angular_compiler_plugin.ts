@@ -537,7 +537,7 @@ export class AngularCompilerPlugin {
       switch (message.kind) {
         case MESSAGE_KIND.Log:
           const logMessage = message as LogMessage;
-          this._logger.log(logMessage.level, logMessage.message);
+          this._logger.log(logMessage.level, `\n${logMessage.message}`);
           break;
         default:
           throw new Error(`TypeChecker: Unexpected message received: ${message}.`);
