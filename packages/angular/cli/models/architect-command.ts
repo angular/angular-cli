@@ -146,7 +146,7 @@ export abstract class ArchitectCommand<
 
     if (overrides['--']) {
       (overrides['--'] || []).forEach(additional => {
-        this.logger.warn(`Unknown option: '${additional.split(/=/)[0]}'`);
+        this.logger.fatal(`Unknown option: '${additional.split(/=/)[0]}'`);
       });
 
       return 1;
