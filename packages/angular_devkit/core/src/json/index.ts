@@ -8,5 +8,5 @@
 export * from './interface';
 export * from './parser';
 
-import * as schema from './schema';
+import * as schema from './schema/index';
 export { schema };
