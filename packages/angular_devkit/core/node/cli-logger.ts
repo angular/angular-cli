@@ -32,13 +32,10 @@ export function createConsoleLogger(
           color = terminal.white;
           break;
         case 'warn':
-          color = terminal.yellow;
-          break;
-        case 'error':
-          color = terminal.red;
-          output = stderr;
+          color = (x: string) => terminal.bold(terminal.yellow(x));
           break;
         case 'fatal':
+        case 'error':
           color = (x: string) => terminal.bold(terminal.red(x));
           output = stderr;
           break;
