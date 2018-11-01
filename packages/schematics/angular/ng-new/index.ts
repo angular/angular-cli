@@ -55,6 +55,7 @@ export default function (options: NgNewOptions): Rule {
     style: options.style,
     skipTests: options.skipTests,
     skipPackageJson: false,
+    minimal: options.minimal,
   };
 
   return chain([
