@@ -1,1 +1,2 @@
-The e2e tests are created in a separate app, next to the project being tested in the `projects` folder of the workspace.
+The e2e tests are created in a separate app in the `projects` folder of the workspace,
+next to the project being tested.

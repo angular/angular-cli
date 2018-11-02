@@ -29,7 +29,7 @@
       "default": false
     },
     "linkCli": {
-      "description": "When true, links CLI to global version (internal development only).",
+      "description": "When true, links the CLI to the global version (internal development only).",
       "type": "boolean",
       "default": false,
       "visible": false
@@ -138,7 +138,7 @@
       "default": true
     },
     "minimal": {
-      "description": "When true, creates a barebones project without any testing frameworks.",
+      "description": "When true, creates a project without any testing frameworks.",
       "type": "boolean",
       "default": false
     }

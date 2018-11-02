@@ -28,13 +28,13 @@
       "x-prompt": "What name would you like to use for the component?"
     },
     "inlineStyle": {
-      "description": "When true, includes styles inline in the component TS file.  Only CSS styles can be included inline. By default, an external styles file is created and referenced in the component TS file.",
+      "description": "When true, includes styles inline in the component.ts file. Only CSS styles can be included inline. By default, an external styles file is created and referenced in the component.ts file.",
       "type": "boolean",
       "default": false,
       "alias": "s"
     },
     "inlineTemplate": {
-      "description": "When true, includes template inline in the component TS file. By default, an external template file is created and referenced in the component TS file.",
+      "description": "When true, includes template inline in the component.ts file. By default, an external template file is created and referenced in the component.ts file.",
       "type": "boolean",
       "default": false,
       "alias": "t"

@@ -24,13 +24,13 @@
       "default": false
     },
     "linkCli": {
-      "description": "When true, link CLI to global version (internal development only).",
+      "description": "When true, links the CLI to the global version (internal development only).",
       "type": "boolean",
       "default": false,
       "visible": false
     },
     "skipGit": {
-      "description": "When true, do not initialize a git repository.",
+      "description": "When true, does not initialize a git repository.",
       "type": "boolean",
       "default": false,
       "alias": "g"
@@ -70,7 +70,7 @@
       }
     },
     "minimal": {
-      "description": "When true, creates a bare-bones project without any testing frameworks",
+      "description": "When true, creates a project without any testing frameworks",
       "type": "boolean",
       "default": false
     }

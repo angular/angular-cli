@@ -21,7 +21,7 @@
           ]
         },
         "prod": {
-          "description": "When true, sets the build configuration to the production target.\nAll builds make use of bundling and limited tree-shaking, A production build also runs limited dead code elimination.",
+          "description": "When true, sets the build configuration to the production target.\nAll builds make use of bundling and limited tree-shaking. A production build also runs limited dead code elimination.",
           "type": "boolean"
         }
       }

@@ -1,5 +1,5 @@
 Architect is the tool that the CLI uses to perform complex tasks such as compilation, according to provided configurations.
-The CLI commands run Architect targets such as `build`, `serve`, `test` and `lint`.
+The CLI commands run Architect targets such as `build`, `serve`, `test`, and `lint`.
 Each named target has a default configuration, specified by an "options" object,
 and an optional set of named alternate configurations in the "configurations" object.
 

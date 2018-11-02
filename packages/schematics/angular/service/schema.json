@@ -30,7 +30,7 @@
     "flat": {
       "type": "boolean",
       "default": true,
-      "description": "When true (the default) creates files at the top level of the project."
+      "description": "When true (the default), creates files at the top level of the project."
     },
     "spec": {
       "type": "boolean",
