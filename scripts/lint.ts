@@ -20,7 +20,7 @@ const blacklist = [
 
 
 function _buildRules(logger: logging.Logger) {
-  const tsConfigPath = path.join(__dirname, '../rules/tsconfig.json');
+  const tsConfigPath = path.join(__dirname, '../etc/rules/tsconfig.json');
   const configFile = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
 
   const parsedTsConfig = ts.parseJsonConfigFileContent(
@@ -43,7 +43,7 @@ function _buildRules(logger: logging.Logger) {
 }
 
 
-export default function (options: ParsedArgs, logger: logging.Logger) {
+export default async function (options: ParsedArgs, logger: logging.Logger) {
   _buildRules(logger);
 
   const lintOptions: ILinterOptions = {
@@ -55,6 +55,22 @@ export default function (options: ParsedArgs, logger: logging.Logger) {
   const tsLintPath = path.join(__dirname, '../tslint.json');
   const tsLintConfig = Configuration.loadConfigurationFromPath(tsLintPath);
 
+  // Remove comments from the configuration, ie. keys that starts with "//".
+  [...tsLintConfig.rules.keys()]
+    .filter(x => x.startsWith('//'))
+    .forEach(key => tsLintConfig.rules.delete(key));
+
+  // Console is used directly by tslint, and when finding a rule that doesn't exist it's considered
+  // a warning by TSLint but _only_ shown on the console and impossible to see through the API.
+  // In order to see any warnings that happen from TSLint itself, we hook into console.warn() and
+  // record any calls.
+  const oldWarn = console.warn;
+  let warnings = false;
+  console.warn = (...args) => {
+    warnings = true;
+    oldWarn(...args);
+  };
+
   program.getRootFileNames().forEach(fileName => {
     if (blacklist.some(x => x.test(path.relative(process.cwd(), fileName)))) {
       return;
@@ -62,6 +78,8 @@ export default function (options: ParsedArgs, logger: logging.Logger) {
 
     linter.lint(fileName, ts.sys.readFile(fileName) || '', tsLintConfig);
   });
+
+  console.warn = oldWarn;
 
   const result = linter.getResult();
   const Formatter = findFormatter('codeFrame');
@@ -76,10 +94,18 @@ export default function (options: ParsedArgs, logger: logging.Logger) {
     if (result.warningCount > 0) {
       logger.info(`Warnings: ${result.warningCount}`);
     }
-    process.exit(2);
+
+    return 2;
   } else if (result.warningCount > 0) {
     logger.warn(formatter.format(result.failures));
     logger.info(`Warnings: ${result.warningCount}`);
-    process.exit(1);
+
+    return 1;
+  } else if (warnings) {
+    logger.warn('TSLint found warnings, but code is okay. See above.');
+
+    return 1;
   }
+
+  return 0;
 }

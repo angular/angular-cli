@@ -93,7 +93,7 @@
             },
             "flat": {
               "type": "boolean",
-              "description": "Flag to indicate if a dir is created.",
+              "description": "Flag to indicate if a directory is created.",
               "default": false
             },
             "inlineStyle": {
@@ -157,7 +157,7 @@
             },
             "flat": {
               "type": "boolean",
-              "description": "Flag to indicate if a dir is created.",
+              "description": "Flag to indicate if a directory is created.",
               "default": true
             },
             "module": {
@@ -210,7 +210,7 @@
             },
             "flat": {
               "type": "boolean",
-              "description": "Flag to indicate if a dir is created.",
+              "description": "Flag to indicate if a directory is created.",
               "default": false
             },
             "commonModule": {
@@ -232,7 +232,7 @@
             "flat": {
               "type": "boolean",
               "default": true,
-              "description": "Flag to indicate if a dir is created."
+              "description": "Flag to indicate if a directory is created."
             },
             "spec": {
               "type": "boolean",
@@ -247,7 +247,7 @@
             "flat": {
               "type": "boolean",
               "default": true,
-              "description": "Flag to indicate if a dir is created."
+              "description": "Flag to indicate if a directory is created."
             },
             "spec": {
               "type": "boolean",

@@ -28,7 +28,7 @@ ts_library(
         "//packages/angular_devkit/core:node",  # TODO: get rid of this for 6.0
         "@rxjs",
         "@rxjs//operators",
-        # @typings: node
+        "@npm//@types/node",
     ],
 )
 
@@ -47,14 +47,21 @@ ts_library(
         "//packages/angular_devkit/core:node",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: jasmine
-        # @typings: node
+        "@npm//@types/node",
+        "@npm//@types/jasmine",
     ],
+    testonly = True,
+    tsconfig = "//:tsconfig-test.json",
 )
 
 jasmine_node_test(
     name = "schematics_test",
     srcs = [":schematics_test_lib"],
+    deps = [
+        "@npm//jasmine",
+        "@npm//source-map",
+        "@npm//chokidar",
+    ],
 )
 
 
@@ -79,9 +86,8 @@ ts_library(
         "//packages/angular_devkit/core:node",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: node
-        # @typings: tslint
-        # @typings: typescript
+        "@npm//@types/node",
+        "@npm//tslint",
     ],
 )
 
@@ -105,9 +111,7 @@ ts_library(
         "//packages/angular_devkit/core:node",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: node
-        # @typings: tslint
-        # @typings: typescript
+        "@npm//@types/node",
     ],
 )
 
@@ -133,15 +137,22 @@ ts_library(
         "//packages/angular_devkit/core:node_testing",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: jasmine
-        # @typings: node
+        "@npm//@types/node",
+        "@npm//@types/jasmine",
     ],
+    testonly = True,
+    tsconfig = "//:tsconfig-test.json",
 )
 
 
 jasmine_node_test(
     name = "tasks_test",
     srcs = [":tasks_test_lib"],
+    deps = [
+        "@npm//jasmine",
+        "@npm//source-map",
+        "@npm//chokidar",
+    ],
 )
 
 
@@ -167,7 +178,7 @@ ts_library(
         "//packages/angular_devkit/core:node",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: node
+        "@npm//@types/node",
     ],
 )
 
@@ -190,14 +201,21 @@ ts_library(
         "//tests/angular_devkit/schematics/tools/file-system-engine-host:file_system_engine_host_test_lib",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: jasmine
-        # @typings: node
+        "@npm//@types/node",
+        "@npm//@types/jasmine",
     ],
+    testonly = True,
+    tsconfig = "//:tsconfig-test.json",
 )
 
 jasmine_node_test(
     name = "tools_test",
     srcs = [":tools_test_lib"],
+    deps = [
+        "@npm//jasmine",
+        "@npm//source-map",
+        "@npm//chokidar",
+    ],
 )
 
 
@@ -218,5 +236,6 @@ ts_library(
         "//packages/angular_devkit/core",
         "@rxjs",
         "@rxjs//operators",
+        "@npm//@types/node",
     ],
 )

@@ -86,4 +86,16 @@ describe('polyfillMetadataRule', () => {
 
     expect(tree2.readContent(polyfillPath)).not.toMatch(/import .*es7.*reflect.*;/);
   });
+
+  it('should work as expected for a project with a root', async () => {
+    const originalContent = JSON.parse(tree.readContent('angular.json'));
+    originalContent.projects['migration-test'].root = 'src';
+    tree.overwrite('angular.json', JSON.stringify(originalContent));
+    const polyfillPath = '/src/polyfills.ts';
+    tree.overwrite(polyfillPath, oldPolyfills);
+    const tree2 = await schematicRunner.runSchematicAsync('migration-03', {}, tree.branch())
+      .toPromise();
+
+    expect(tree2.readContent(polyfillPath)).not.toMatch(/import .*es7.*reflect.*;/);
+  });
 });

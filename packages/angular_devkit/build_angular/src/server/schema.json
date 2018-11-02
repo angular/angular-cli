@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
   "id": "BuildAngularWebpackServerSchema",
-  "title": "Angular Webpack Architect Builder Schema",
+  "title": "Universal Target",
   "properties": {
     "main": {
       "type": "string",
@@ -145,7 +145,7 @@
     },
     "statsJson": {
       "type": "boolean",
-      "description": "Generates a 'stats.json' file which can be analyzed using tools such as: #webpack-bundle-analyzer' or https: //webpack.github.io/analyse.",
+      "description": "Generates a 'stats.json' file which can be analyzed using tools such as: 'webpack-bundle-analyzer' or https: //webpack.github.io/analyse.",
       "default": false
     },
     "forkTypeChecker": {
@@ -154,7 +154,7 @@
       "default": true
     },
     "lazyModules": {
-      "description": "List of additional NgModule files that will be lazy loaded. Lazy router modules with be discovered automatically.",
+      "description": "List of additional NgModule files that will be lazy loaded. Lazy router modules will be discovered automatically.",
       "type": "array",
       "items": {
         "type": "string"

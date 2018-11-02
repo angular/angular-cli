@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import * as fs from 'fs';
-import { join } from 'path';
+
+import { Path, join } from '@angular-devkit/core';
 import * as ts from 'typescript';
 import { TypeScriptFileRefactor } from './refactor';
 
@@ -54,9 +54,10 @@ function _recursiveSymbolExportLookup(refactor: TypeScriptFileRefactor,
     for (const specifier of binding.elements) {
       if (specifier.name.text == symbolName) {
         // If it's a directory, load its index and recursively lookup.
-        if (fs.statSync(module).isDirectory()) {
-          const indexModule = join(module, 'index.ts');
-          if (fs.existsSync(indexModule)) {
+        // If it's a file it will return false
+        if (host.directoryExists && host.directoryExists(module)) {
+          const indexModule = join(module as Path, 'index.ts');
+          if (host.fileExists(indexModule)) {
             const indexRefactor = new TypeScriptFileRefactor(indexModule, host, program);
             const maybeModule = _recursiveSymbolExportLookup(
               indexRefactor, symbolName, host, program);
@@ -152,17 +153,13 @@ export function resolveEntryModuleFromMain(mainPath: string,
     .map(node => node.arguments[0] as ts.Identifier)
     .filter(node => node.kind == ts.SyntaxKind.Identifier);
 
-  if (bootstrap.length != 1) {
-    return null;
-  }
-  const bootstrapSymbolName = bootstrap[0].text;
-  const module = _symbolImportLookup(source, bootstrapSymbolName, host, program);
-  if (module) {
-    return `${module.replace(/\.ts$/, '')}#${bootstrapSymbolName}`;
+  if (bootstrap.length === 1) {
+    const bootstrapSymbolName = bootstrap[0].text;
+    const module = _symbolImportLookup(source, bootstrapSymbolName, host, program);
+    if (module) {
+      return `${module.replace(/\.ts$/, '')}#${bootstrapSymbolName}`;
+    }
   }
 
-  // shrug... something bad happened and we couldn't find the import statement.
-  throw new Error('Tried to find bootstrap code, but could not. Specify either '
-    + 'statically analyzable bootstrap code or pass in an entryModule '
-    + 'to the plugins options.');
+  return null;
 }

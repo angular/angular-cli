@@ -23,11 +23,7 @@ import {
   SchematicEngine,
   UnsuccessfulWorkflowExecution,
 } from '@angular-devkit/schematics';
-import {
-  FileSystemEngineHost,
-  NodeModulesEngineHost,
-  NodeWorkflow,
-} from '@angular-devkit/schematics/tools';
+import { NodeModulesEngineHost, NodeWorkflow } from '@angular-devkit/schematics/tools';
 import * as minimist from 'minimist';
 
 
@@ -69,28 +65,10 @@ export async function main({
   stderr = process.stderr,
 }: MainOptions): Promise<0 | 1> {
 
-  /** Parse the command line. */
-  const booleanArgs = [
-    'allowPrivate',
-    'debug',
-    'dry-run',
-    'force',
-    'help',
-    'list-schematics',
-    'verbose',
-  ];
-  const argv = minimist(args, {
-    boolean: booleanArgs,
-    default: {
-      'debug': null,
-      'dry-run': null,
-    },
-    '--': true,
-  });
+  const argv = parseArgs(args);
 
   /** Create the DevKit Logger used through the CLI. */
   const logger = createConsoleLogger(argv['verbose'], stdout, stderr);
-
   if (argv.help) {
     logger.info(getUsage());
 
@@ -104,16 +82,18 @@ export async function main({
   } = parseSchematicName(argv._.shift() || null);
   const isLocalCollection = collectionName.startsWith('.') || collectionName.startsWith('/');
 
-
   /** If the user wants to list schematics, we simply show all the schematic names. */
   if (argv['list-schematics']) {
-    const engineHost = isLocalCollection
-      ? new FileSystemEngineHost(normalize(process.cwd()))
-      : new NodeModulesEngineHost();
+    try {
+      const engineHost = new NodeModulesEngineHost();
+      const engine = new SchematicEngine(engineHost);
+      const collection = engine.createCollection(collectionName);
+      logger.info(engine.listSchematicNames(collection).join('\n'));
+    } catch (error) {
+      logger.fatal(error.message);
 
-    const engine = new SchematicEngine(engineHost);
-    const collection = engine.createCollection(collectionName);
-    logger.info(engine.listSchematicNames(collection).join('\n'));
+      return 1;
+    }
 
     return 0;
   }
@@ -128,7 +108,7 @@ export async function main({
   const debug: boolean = argv.debug === null ? isLocalCollection : argv.debug;
   const dryRun: boolean = argv['dry-run'] === null ? debug : argv['dry-run'];
   const force = argv['force'];
-  const allowPrivate = argv['allowPrivate'];
+  const allowPrivate = argv['allow-private'];
 
   /** Create a Virtual FS Host scoped to where the process is being run. **/
   const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(process.cwd()));
@@ -282,7 +262,7 @@ function getUsage(): string {
       --debug             Debug mode. This is true by default if the collection is a relative
                           path (in that case, turn off with --debug=false).
 
-      --allowPrivate      Allow private schematics to be run from the command line. Default to
+      --allow-private     Allow private schematics to be run from the command line. Default to
                           false.
 
       --dry-run           Do not output anything, but instead just show what actions would be
@@ -299,6 +279,36 @@ function getUsage(): string {
 
   Any additional option is passed to the Schematics depending on
   `;
+}
+
+/** Parse the command line. */
+const booleanArgs = [
+  'allowPrivate',
+  'allow-private',
+  'debug',
+  'dry-run',
+  'dryRun',
+  'force',
+  'help',
+  'list-schematics',
+  'listSchematics',
+  'verbose',
+];
+
+function parseArgs(args: string[] | undefined): minimist.ParsedArgs {
+    return minimist(args, {
+      boolean: booleanArgs,
+      alias: {
+        'dryRun': 'dry-run',
+        'listSchematics': 'list-schematics',
+        'allowPrivate': 'allow-private',
+      },
+      default: {
+        'debug': null,
+        'dryRun': null,
+      },
+      '--': true,
+    });
 }
 
 if (require.main === module) {

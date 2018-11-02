@@ -1,3 +1,5 @@
+**Documentation below is for CLI version 6. For version 7 see [here](https://angular.io/guide/i18n)**.
+
 # Internationalization (i18n)
 
 If you are working on internationalization, the CLI can help you with the following steps:

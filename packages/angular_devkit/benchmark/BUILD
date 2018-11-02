@@ -27,7 +27,8 @@ ts_library(
         "//packages/angular_devkit/core:node",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: node
+        "@npm//@types/node",
+        "@npm//@types/minimist",
     ],
 )
 
@@ -50,12 +51,23 @@ ts_library(
         "//packages/angular_devkit/core:node",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: jasmine
-        # @typings: node
+        "@npm//@types/node",
+        "@npm//@types/jasmine",
     ],
+    testonly = True,
+    tsconfig = "//:tsconfig-test.json",
 )
 
 jasmine_node_test(
     name = "benchmark_test",
     srcs = [":benchmark_test_lib"],
+    deps = [
+        "@npm//jasmine",
+        "@npm//source-map",
+        "@npm//minimist",
+        "@npm//pidusage",
+        "@npm//pidtree",
+        "@npm//tree-kill",
+        "@npm//temp",
+    ],
 )

@@ -7,14 +7,11 @@
  */
 import {
   Architect,
-  BuildEvent,
   BuilderConfiguration,
   TargetSpecifier,
 } from '@angular-devkit/architect';
 import { experimental, json, schema, tags } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
-import { from } from 'rxjs';
-import { concatMap, map, tap, toArray } from 'rxjs/operators';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
 import { BaseCommandOptions, Command } from './command';
 import { Arguments } from './interface';
@@ -49,7 +46,7 @@ export abstract class ArchitectCommand<
     this._registry = new json.schema.CoreSchemaRegistry();
     this._registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
 
-    await this._loadWorkspaceAndArchitect().toPromise();
+    await this._loadWorkspaceAndArchitect();
 
     if (!options.project && this.target) {
       const projectNames = this.getProjectNamesByTarget(this.target);
@@ -146,16 +143,16 @@ export abstract class ArchitectCommand<
 
     if (overrides['--']) {
       (overrides['--'] || []).forEach(additional => {
-        this.logger.warn(`Unknown option: '${additional.split(/=/)[0]}'`);
+        this.logger.fatal(`Unknown option: '${additional.split(/=/)[0]}'`);
       });
 
       return 1;
     }
     const realBuilderConf = this._architect.getBuilderConfiguration({ ...targetSpec, overrides });
 
-    return this._architect.run(realBuilderConf, { logger: this._logger }).pipe(
-      map((buildEvent: BuildEvent) => buildEvent.success ? 0 : 1),
-    ).toPromise();
+    const result = await this._architect.run(realBuilderConf, { logger: this._logger }).toPromise();
+
+    return result.success ? 0 : 1;
   }
 
   protected async runArchitectTarget(
@@ -168,12 +165,12 @@ export abstract class ArchitectCommand<
       if (!targetSpec.project && this.target) {
         // This runs each target sequentially.
         // Running them in parallel would jumble the log messages.
-        return await from(this.getProjectNamesByTarget(this.target)).pipe(
-          concatMap(project => from(this.runSingleTarget({ ...targetSpec, project }, extra))),
-          toArray(),
-          map(results => results.every(res => res === 0) ? 0 : 1),
-        )
-        .toPromise();
+        let result = 0;
+        for (const project of this.getProjectNamesByTarget(this.target)) {
+          result |= await this.runSingleTarget({ ...targetSpec, project }, extra);
+        }
+
+        return result;
       } else {
         return await this.runSingleTarget(targetSpec, extra);
       }
@@ -227,16 +224,13 @@ export abstract class ArchitectCommand<
     }
   }
 
-  private _loadWorkspaceAndArchitect() {
+  private async _loadWorkspaceAndArchitect() {
     const workspaceLoader = new WorkspaceLoader(this._host);
 
-    return workspaceLoader.loadWorkspace(this.workspace.root).pipe(
-      tap((workspace: experimental.workspace.Workspace) => this._workspace = workspace),
-      concatMap((workspace: experimental.workspace.Workspace) => {
-        return new Architect(workspace).loadArchitect();
-      }),
-      tap((architect: Architect) => this._architect = architect),
-    );
+    const workspace = await workspaceLoader.loadWorkspace(this.workspace.root);
+
+    this._workspace = workspace;
+    this._architect = await new Architect(workspace).loadArchitect().toPromise();
   }
 
   private _makeTargetSpecifier(commandOptions: ArchitectCommandOptions): TargetSpecifier {

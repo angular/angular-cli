@@ -6,68 +6,102 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { runTargetSpec } from '@angular-devkit/architect/testing';
-import { debounceTime, take, tap } from 'rxjs/operators';
+import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
+import { Subject } from 'rxjs';
+import { debounceTime, delay, take, takeUntil, takeWhile, tap } from 'rxjs/operators';
 import { host, karmaTargetSpec } from '../utils';
 
 
-// Karma watch mode is currently bugged:
-// - errors print a huge stack trace
-// - karma does not have a way to close the server
-//   gracefully (https://github.com/karma-runner/karma/issues/3149)
-// TODO: fix these before 6.0 final.
-xdescribe('Karma Builder watch mode', () => {
+describe('Karma Builder watch mode', () => {
   beforeEach(done => host.initialize().toPromise().then(done, done.fail));
   afterEach(done => host.restore().toPromise().then(done, done.fail));
 
-  it('works', (done) => {
+  it('works', async () => {
     const overrides = { watch: true };
-    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
+    const res = await runTargetSpec(host, karmaTargetSpec, overrides).pipe(
       debounceTime(500),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       take(1),
-    ).toPromise().then(done, done.fail);
-  }, 30000);
+    ).toPromise();
+
+    expect(res).toEqual({ success: true });
+  });
 
   it('recovers from compilation failures in watch mode', (done) => {
     const overrides = { watch: true };
-    let buildNumber = 0;
+    let buildCount = 0;
+    let phase = 1;
 
-    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
+    runTargetSpec(host, karmaTargetSpec, overrides, DefaultTimeout * 3).pipe(
       debounceTime(500),
       tap((buildEvent) => {
-        buildNumber += 1;
-        switch (buildNumber) {
+        buildCount += 1;
+        switch (phase) {
           case 1:
             // Karma run should succeed.
             // Add a compilation error.
             expect(buildEvent.success).toBe(true);
-            host.writeMultipleFiles({
-              'src/app/app.component.spec.ts': '<p> definitely not typescript </p>',
-            });
+            // Add an syntax error to a non-main file.
+            host.appendToFile('src/app/app.component.spec.ts', `]]]`);
+            phase = 2;
             break;
 
           case 2:
             // Karma run should fail due to compilation error. Fix it.
             expect(buildEvent.success).toBe(false);
-            host.writeMultipleFiles({ 'src/foo.spec.ts': '' });
+            host.replaceInFile('src/app/app.component.spec.ts', `]]]`, '');
+            phase = 3;
             break;
 
           case 3:
             // Karma run should succeed again.
             expect(buildEvent.success).toBe(true);
-            break;
-
-          default:
+            phase = 4;
             break;
         }
       }),
-      take(3),
-    ).toPromise().then(done, done.fail);
-  }, 30000);
+      takeWhile(() => phase < 4),
+    ).toPromise().then(
+      () => done(),
+      () => done.fail(`stuck at phase ${phase} [builds: ${buildCount}]`),
+    );
+  });
 
   it('does not rebuild when nothing changed', (done) => {
-    // Start the server in watch mode, wait for the first build to finish, touch
-    // test.js without changing it, wait 5s then exit unsuscribe, verify only one event was emitted.
-  }, 30000);
+    const overrides = { watch: true };
+    let buildCount = 0;
+    let phase = 1;
+
+    const stopSubject = new Subject();
+    const stop$ = stopSubject.asObservable().pipe(delay(5000));
+
+    runTargetSpec(host, karmaTargetSpec, overrides, DefaultTimeout * 3).pipe(
+      debounceTime(500),
+      tap((buildEvent) => {
+        buildCount += 1;
+        switch (phase) {
+          case 1:
+            // Karma run should succeed.
+            // Add a compilation error.
+            expect(buildEvent.success).toBe(true);
+            // Touch the file.
+            host.appendToFile('src/app/app.component.spec.ts', ``);
+            // Signal the stopper, which delays emission by 5s.
+            // If there's no rebuild within that time then the test is successful.
+            stopSubject.next();
+            phase = 2;
+            break;
+
+          case 2:
+            // Should never trigger this second build.
+            expect(true).toBeFalsy('Should not trigger second build.');
+            break;
+        }
+      }),
+      takeUntil(stop$),
+    ).toPromise().then(
+      () => done(),
+      () => done.fail(`stuck at phase ${phase} [builds: ${buildCount}]`),
+    );
+  });
 });

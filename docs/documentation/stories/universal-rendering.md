@@ -1,3 +1,5 @@
+**Documentation below is for CLI version 6. For version 7 see [here](https://angular.io/guide/universal)**.
+
 # Angular Universal Integration
 
 The Angular CLI supports generation of a Universal build for your application. This is a CommonJS-formatted bundle which can be `require()`'d into a Node application (for example, an Express server) and used with `@angular/platform-server`'s APIs to prerender your application.
@@ -20,11 +22,10 @@ This story will show you how to set up Universal bundling for an existing `@angu
 
 Install `@angular/platform-server` into your project. Make sure you use the same version as the other `@angular` packages in your project.
 
-> You'll also need ts-loader (for your webpack build we'll show later) and @nguniversal/module-map-ngfactory-loader, as it's used to handle lazy-loading in the context of a server-render. (by loading the chunks right away)
+> You'll also need @nguniversal/module-map-ngfactory-loader, as it's used to handle lazy-loading in the context of a server-render. (by loading the chunks right away)
 
 ```bash
 $ npm install --save @angular/platform-server @nguniversal/module-map-ngfactory-loader express
-$ npm install --save-dev ts-loader webpack-cli
 ```
 
 ## Step 1: Prepare your App for Universal rendering
@@ -197,6 +198,30 @@ app.engine('html', ngExpressEngine({
 }));
 ```
 
+In case you want to use an AppShell with SSR and Lazy loaded modules you need to configure `NgModuleFactoryLoader` as a provider.
+
+For more context see: https://github.com/angular/angular-cli/issues/9202
+
+```typescript
+import { Compiler, NgModuleFactoryLoader } from '@angular/core';
+import { provideModuleMap, ModuleMapNgFactoryLoader, MODULE_MAP } from '@nguniversal/module-map-ngfactory-loader';
+
+app.engine('html', ngExpressEngine({
+  bootstrap: AppServerModuleNgFactory,
+  providers: [
+    provideModuleMap(LAZY_MODULE_MAP),
+    {
+      provide: NgModuleFactoryLoader,
+      useClass: ModuleMapNgFactoryLoader,
+      deps: [
+        Compiler,
+        MODULE_MAP
+      ],
+    },
+  ]
+}));
+```
+
 Below we can see a TypeScript implementation of a -very- simple Express server to fire everything up.
 
 > Note: This is a very bare bones Express application, and is just for demonstrations sake. In a real production environment, you'd want to make sure you have other authentication and security things setup here as well. This is just meant just to show the specific things needed that are relevant to Universal itself. The rest is up to you!
@@ -263,60 +288,36 @@ app.listen(PORT, () => {
 });
 ```
 
-## Step 5: Setup a webpack config to handle this Node server.ts file and serve your application!
+## Step 5: Setup a TypeScript config to handle this Node server.ts file and serve your application!
 
 Now that we have our Node Express server setup, we need to pack it and serve it!
 
-Create a file named `webpack.server.config.js` at the ROOT of your application.
+Create a file named `server.tsconfig.json` at the ROOT of your application.
 
 > This file basically takes that server.ts file, and takes it and compiles it and every dependency it has into `dist/server.js`.
 
-### ./webpack.server.config.js (root project level)
+### ./server.tsconfig.json (root project level)
 
 ```typescript
-const path = require('path');
-const webpack = require('webpack');
-
-module.exports = {
-  mode: 'none',
-  entry: {
-    server: './server.ts',
-  },
-  target: 'node',
-  resolve: { extensions: ['.ts', '.js'] },
-  optimization: {
-    minimize: false
-  },
-  output: {
-    // Puts the output at the root of the dist folder
-    path: path.join(__dirname, 'dist'),
-    filename: '[name].js'
-  },
-  module: {
-    rules: [
-      { test: /\.ts$/, loader: 'ts-loader' },
-      {
-        // Mark files inside `@angular/core` as using SystemJS style dynamic imports.
-        // Removing this will cause deprecation warnings to appear.
-        test: /(\\|\/)@angular(\\|\/)core(\\|\/).+\.js$/,
-        parser: { system: true },
-      },
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "outDir": "./dist",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es5",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2017",
+      "dom"
     ]
   },
-  plugins: [
-    new webpack.ContextReplacementPlugin(
-      // fixes WARNING Critical dependency: the request of a dependency is an expression
-      /(.+)?angular(\\|\/)core(.+)?/,
-      path.join(__dirname, 'src'), // location of your src
-      {} // a map of your routes
-    ),
-    new webpack.ContextReplacementPlugin(
-      // fixes WARNING Critical dependency: the request of a dependency is an expression
-      /(.+)?express(\\|\/)(.+)?/,
-      path.join(__dirname, 'src'),
-      {}
-    )
-  ]
+  "include": ["server.ts"]
 }
 ```
 
@@ -343,12 +344,12 @@ Now lets create a few handy scripts to help us do all of this in the future.
 ```json
 "scripts": {
   // These will be your common scripts
-  "build:ssr": "npm run build:client-and-server-bundles && npm run webpack:server",
+  "build:ssr": "npm run build:client-and-server-bundles && npm run compile:server",
   "serve:ssr": "node dist/server.js",
 
   // Helpers for the above scripts
   "build:client-and-server-bundles": "ng build --prod && ng run your-project-name:server",
-  "webpack:server": "webpack --config webpack.server.config.js --progress --colors"
+  "compile:server": "tsc -p server.tsconfig.json",
 }
 ```
 

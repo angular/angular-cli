@@ -34,7 +34,7 @@ export default function() {
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
         import { FormsModule } from '@angular/forms';
-        import { HttpModule } from '@angular/http';
+        import { HttpClientModule } from '@angular/common/http';
 
         import { AppComponent } from './app.component';
         import { RouterModule } from '@angular/router';
@@ -46,7 +46,7 @@ export default function() {
           imports: [
             BrowserModule,
             FormsModule,
-            HttpModule,
+            HttpClientModule,
             RouterModule.forRoot([
               { path: 'lazy', loadChildren: './lazy/lazy.module#LazyModule' }
             ])

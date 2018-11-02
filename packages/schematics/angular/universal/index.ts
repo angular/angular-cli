@@ -161,7 +161,12 @@ function addDependencies(): Rule {
       ...coreDep,
       name: '@angular/platform-server',
     };
+    const httpDep = {
+      ...coreDep,
+      name: '@angular/http',
+    };
     addPackageJsonDependency(host, platformServerDep);
+    addPackageJsonDependency(host, httpDep);
 
     return host;
   };

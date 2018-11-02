@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/update.json",
-  "description": "Updates your application and its dependencies.",
-  "$longDescription": "",
+  "description": "Updates your application and its dependencies. See https://update.angular.io/",
+  "$longDescription": "./update-long.md",
 
   "$scope": "all",
   "$aliases": [],

@@ -21,11 +21,11 @@ import {
   DEFAULT_ERROR_CODE,
   Diagnostic,
   EmitFlags,
+  LazyRoute,
   Program,
   SOURCE,
   UNKNOWN_ERROR_CODE,
   VERSION,
-  __NGTOOLS_PRIVATE_API_2,
   createCompilerHost,
   createProgram,
   formatDiagnostics,
@@ -39,11 +39,11 @@ import { Compiler, compilation } from 'webpack';
 import { time, timeEnd } from './benchmark';
 import { WebpackCompilerHost, workaroundResolve } from './compiler_host';
 import { resolveEntryModuleFromMain } from './entry_resolver';
-import { gatherDiagnostics, hasErrors } from './gather_diagnostics';
-import { LazyRouteMap, findLazyRoutes } from './lazy_routes';
+import { DiagnosticMode, gatherDiagnostics, hasErrors } from './gather_diagnostics';
 import { TypeScriptPathsPlugin } from './paths-plugin';
 import { WebpackResourceLoader } from './resource_loader';
 import {
+  LazyRouteMap,
   exportLazyModuleMap,
   exportNgFactory,
   findResources,
@@ -161,14 +161,6 @@ export class AngularCompilerPlugin {
 
   // Logging.
   private _logger: logging.Logger;
-
-  private get _ngCompilerSupportsNewApi() {
-    if (this._JitMode) {
-      return false;
-    } else {
-      return !!(this._program as Program).listLazyRoutes;
-    }
-  }
 
   constructor(options: AngularCompilerPluginOptions) {
     this._options = Object.assign({}, options);
@@ -292,6 +284,7 @@ export class AngularCompilerPlugin {
     if (options.forkTypeChecker !== undefined) {
       this._forkTypeChecker = options.forkTypeChecker;
     }
+    // this._forkTypeChecker = false;
 
     // Add custom platform transformers.
     if (options.platformTransformers !== undefined) {
@@ -418,65 +411,40 @@ export class AngularCompilerPlugin {
     }
 
     // If there's still no entryModule try to resolve from mainPath.
-    if (!this._entryModule && this._mainPath) {
+    if (!this._entryModule && this._mainPath && !this._compilerOptions.enableIvy) {
       time('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
       this._entryModule = resolveEntryModuleFromMain(
         this._mainPath, this._compilerHost, this._getTsProgram() as ts.Program);
+
+      if (!this.entryModule) {
+        this._warnings.push('Lazy routes discovery is not enabled. '
+          + 'Because there is neither an entryModule nor a '
+          + 'statically analyzable bootstrap code in the main file.',
+        );
+      }
       timeEnd('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
     }
   }
 
-  private _getLazyRoutesFromNgtools() {
-    try {
-      time('AngularCompilerPlugin._getLazyRoutesFromNgtools');
-      const result = __NGTOOLS_PRIVATE_API_2.listLazyRoutes({
-        program: this._getTsProgram(),
-        host: this._compilerHost,
-        angularCompilerOptions: Object.assign({}, this._compilerOptions, {
-          // genDir seems to still be needed in @angular\compiler-cli\src\compiler_host.js:226.
-          genDir: '',
-        }),
-        // TODO: fix compiler-cli typings; entryModule should not be string, but also optional.
-        // tslint:disable-next-line:no-non-null-assertion
-        entryModule: this._entryModule!,
-      });
-      timeEnd('AngularCompilerPlugin._getLazyRoutesFromNgtools');
-
-      return result;
-    } catch (err) {
-      // We silence the error that the @angular/router could not be found. In that case, there is
-      // basically no route supported by the app itself.
-      if (err.message.startsWith('Could not resolve module @angular/router')) {
-        return {};
-      } else {
-        throw err;
-      }
-    }
-  }
-
-  private _findLazyRoutesInAst(changedFilePaths: string[]): LazyRouteMap {
-    time('AngularCompilerPlugin._findLazyRoutesInAst');
-    const result: LazyRouteMap = Object.create(null);
-    for (const filePath of changedFilePaths) {
-      const fileLazyRoutes = findLazyRoutes(filePath, this._compilerHost, undefined,
-        this._compilerOptions);
-      for (const routeKey of Object.keys(fileLazyRoutes)) {
-        const route = fileLazyRoutes[routeKey];
-        result[routeKey] = route;
-      }
-    }
-    timeEnd('AngularCompilerPlugin._findLazyRoutesInAst');
-
-    return result;
-  }
-
   private _listLazyRoutesFromProgram(): LazyRouteMap {
-    const ngProgram = this._program as Program;
-    if (!ngProgram.listLazyRoutes) {
-      throw new Error('_listLazyRoutesFromProgram was called with an old program.');
-    }
+    let lazyRoutes: LazyRoute[];
+    if (this._JitMode) {
+      if (!this.entryModule) {
+        return {};
+      }
 
-    const lazyRoutes = ngProgram.listLazyRoutes();
+      const ngProgram = createProgram({
+        rootNames: this._rootNames,
+        options: { ...this._compilerOptions, genDir: '', collectAllErrors: true },
+        host: this._compilerHost,
+      });
+
+      lazyRoutes = ngProgram.listLazyRoutes(
+        this.entryModule.path + '#' + this.entryModule.className,
+      );
+    } else {
+      lazyRoutes = (this._program as Program).listLazyRoutes();
+    }
 
     return lazyRoutes.reduce(
       (acc, curr) => {
@@ -570,7 +538,7 @@ export class AngularCompilerPlugin {
       switch (message.kind) {
         case MESSAGE_KIND.Log:
           const logMessage = message as LogMessage;
-          this._logger.log(logMessage.level, logMessage.message);
+          this._logger.log(logMessage.level, `\n${logMessage.message}`);
           break;
         default:
           throw new Error(`TypeChecker: Unexpected message received: ${message}.`);
@@ -721,7 +689,7 @@ export class AngularCompilerPlugin {
                   const modulePath = this._lazyRoutes[key];
                   const importPath = key.split('#')[0];
                   if (modulePath !== null) {
-                    const name = importPath.replace(/(\.ngfactory)?\.(js|ts)$/, '');
+                    const name = importPath.replace(/(\.ngfactory)?(\.(js|ts))?$/, '');
 
                     return new this._contextElementDependencyConstructor(modulePath, name);
                   } else {
@@ -890,31 +858,22 @@ export class AngularCompilerPlugin {
 
     // If nothing we care about changed and it isn't the first run, don't do anything.
     if (changedFiles.length === 0 && !this._firstRun) {
-      return Promise.resolve();
+      return;
     }
 
     // Make a new program and load the Angular structure.
     await this._createOrUpdateProgram();
 
-    if (this.entryModule) {
-      // Try to find lazy routes if we have an entry module.
-      // We need to run the `listLazyRoutes` the first time because it also navigates libraries
-      // and other things that we might miss using the (faster) findLazyRoutesInAst.
-      // Lazy routes modules will be read with compilerHost and added to the changed files.
-      if (this._ngCompilerSupportsNewApi) {
-        this._processLazyRoutes(this._listLazyRoutesFromProgram());
-      } else if (this._firstRun) {
-        this._processLazyRoutes(this._getLazyRoutesFromNgtools());
-      } else {
-        const changedTsFiles = this._getChangedTsFiles();
-        if (changedTsFiles.length > 0) {
-          this._processLazyRoutes(this._findLazyRoutesInAst(changedTsFiles));
-        }
-      }
-      if (this._options.additionalLazyModules) {
-        this._processLazyRoutes(this._options.additionalLazyModules);
-      }
-    }
+    // Try to find lazy routes if we have an entry module.
+    // We need to run the `listLazyRoutes` the first time because it also navigates libraries
+    // and other things that we might miss using the (faster) findLazyRoutesInAst.
+    // Lazy routes modules will be read with compilerHost and added to the changed files.
+    const lazyRouteMap: LazyRouteMap = {
+      ... (this._entryModule || !this._JitMode ? this._listLazyRoutesFromProgram() : {}),
+      ...this._options.additionalLazyModules,
+    };
+
+    this._processLazyRoutes(lazyRouteMap);
 
     // Emit and report errors.
 
@@ -1080,6 +1039,8 @@ export class AngularCompilerPlugin {
     time('AngularCompilerPlugin._emit');
     const program = this._program;
     const allDiagnostics: Array<ts.Diagnostic | Diagnostic> = [];
+    const diagMode = (this._firstRun || !this._forkTypeChecker) ?
+      DiagnosticMode.All : DiagnosticMode.Syntactic;
 
     let emitResult: ts.EmitResult | undefined;
     try {
@@ -1093,10 +1054,8 @@ export class AngularCompilerPlugin {
           timeEnd('AngularCompilerPlugin._emit.ts.getOptionsDiagnostics');
         }
 
-        if ((this._firstRun || !this._forkTypeChecker) && this._program) {
-          allDiagnostics.push(...gatherDiagnostics(this._program, this._JitMode,
-            'AngularCompilerPlugin._emit.ts'));
-        }
+        allDiagnostics.push(...gatherDiagnostics(tsProgram, this._JitMode,
+          'AngularCompilerPlugin._emit.ts', diagMode));
 
         if (!hasErrors(allDiagnostics)) {
           if (this._firstRun || sourceFiles.length > 20) {
@@ -1140,10 +1099,8 @@ export class AngularCompilerPlugin {
           timeEnd('AngularCompilerPlugin._emit.ng.getNgOptionDiagnostics');
         }
 
-        if ((this._firstRun || !this._forkTypeChecker) && this._program) {
-          allDiagnostics.push(...gatherDiagnostics(this._program, this._JitMode,
-            'AngularCompilerPlugin._emit.ng'));
-        }
+        allDiagnostics.push(...gatherDiagnostics(angularProgram, this._JitMode,
+          'AngularCompilerPlugin._emit.ng', diagMode));
 
         if (!hasErrors(allDiagnostics)) {
           time('AngularCompilerPlugin._emit.ng.emit');

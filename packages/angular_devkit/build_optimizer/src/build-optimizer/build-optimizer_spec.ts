@@ -58,8 +58,8 @@ describe('build-optimizer', () => {
       `;
       // tslint:disable:max-line-length
       const output = tags.oneLine`
-        ${imports}
         import { __extends } from "tslib";
+        ${imports}
         var ChangeDetectionStrategy = /*@__PURE__*/ (function (ChangeDetectionStrategy) {
           ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
           ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";

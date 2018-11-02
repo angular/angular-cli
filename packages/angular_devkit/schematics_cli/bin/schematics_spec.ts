@@ -35,8 +35,26 @@ describe('schematics-cli binary', () => {
     expect(res).toEqual(0);
   });
 
+  it('listSchematics works', async () => {
+    const args = ['--listSchematics'];
+    const res = await main({ args, stdout, stderr });
+    expect(stdout.lines).toMatch(/blank/);
+    expect(stdout.lines).toMatch(/schematic/);
+    expect(res).toEqual(0);
+  });
+
   it('dry-run works', async () => {
     const args = ['blank', 'foo', '--dry-run'];
+    const res = await main({ args, stdout, stderr });
+    expect(stdout.lines).toMatch(/CREATE \/foo\/README.md/);
+    expect(stdout.lines).toMatch(/CREATE \/foo\/.gitignore/);
+    expect(stdout.lines).toMatch(/CREATE \/foo\/src\/foo\/index.ts/);
+    expect(stdout.lines).toMatch(/CREATE \/foo\/src\/foo\/index_spec.ts/);
+    expect(res).toEqual(0);
+  });
+
+  it('dry-run is default when debug mode', async () => {
+    const args = ['blank', 'foo', '--debug'];
     const res = await main({ args, stdout, stderr });
     expect(stdout.lines).toMatch(/CREATE \/foo\/README.md/);
     expect(stdout.lines).toMatch(/CREATE \/foo\/.gitignore/);

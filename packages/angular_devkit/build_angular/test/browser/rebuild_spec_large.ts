@@ -198,6 +198,33 @@ describe('Browser Builder rebuilds', () => {
     ).toPromise().then(done, done.fail);
   });
 
+  it('rebuilds shows error', (done) => {
+    host.replaceInFile('./src/app/app.component.ts', 'AppComponent', 'AppComponentZ');
+
+    const overrides = { watch: true, aot: false };
+    let buildCount = 1;
+    const logger = new TestLogger('rebuild-errors');
+
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3, logger).pipe(
+      tap((buildEvent) => {
+        switch (buildCount) {
+          case 1:
+            expect(buildEvent.success).toBe(false);
+            expect(logger.includes('AppComponent cannot be used as an entry component')).toBe(true);
+            logger.clear();
+
+            host.replaceInFile('./src/app/app.component.ts', 'AppComponentZ', 'AppComponent');
+            break;
+
+          default:
+            expect(buildEvent.success).toBe(true);
+            break;
+        }
+        buildCount ++;
+      }),
+      take(2),
+    ).toPromise().then(done, done.fail);
+  });
 
   it('rebuilds after errors in AOT', (done) => {
     // Save the original contents of `./src/app/app.component.ts`.
@@ -206,7 +233,7 @@ describe('Browser Builder rebuilds', () => {
     // Add a major static analysis error on a non-main file to the initial build.
     host.replaceInFile('./src/app/app.component.ts', `'app-root'`, `(() => 'app-root')()`);
 
-    const overrides = { watch: true, aot: true, forkTypeChecker: false };
+    const overrides = { watch: true, aot: true };
     const logger = new TestLogger('rebuild-aot-errors');
     const staticAnalysisError = 'Function expressions are not supported in decorators';
     const syntaxError = 'Declaration or statement expected.';
@@ -271,7 +298,7 @@ describe('Browser Builder rebuilds', () => {
       'src/app/imported-styles.css': 'p {color: #f00;}',
     });
 
-    const overrides = { watch: true, aot: true, forkTypeChecker: false };
+    const overrides = { watch: true, aot: true };
     let buildNumber = 0;
 
     runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3).pipe(

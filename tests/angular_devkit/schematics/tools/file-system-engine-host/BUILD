@@ -17,15 +17,15 @@ ts_library(
     ),
     data = glob(
         include = ["**/collection.json"],
-    ),    
+    ),
     deps = [
-        "//packages/angular_devkit/schematics:schematics",
+        "//packages/angular_devkit/schematics",
         # ":testing",
         # "//packages/angular_devkit/core",
         # "//packages/angular_devkit/core:node",
         # "@rxjs",
         # "@rxjs//operators",
-        # @typings: jasmine
-        # @typings: node
+        "@npm//@types/jasmine",
+        "@npm//@types/node",
     ],
 )

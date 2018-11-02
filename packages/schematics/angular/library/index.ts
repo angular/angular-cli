@@ -117,7 +117,7 @@ function addDependenciesToPackageJson() {
       {
         type: NodeDependencyType.Dev,
         name: 'tslib',
-        version: '^1.9.0',
+        version: latestVersions.TsLib,
       },
       {
         type: NodeDependencyType.Dev,
@@ -211,6 +211,7 @@ export default function (options: LibraryOptions): Rule {
         distRoot,
         relativePathToWorkspaceRoot,
         prefix,
+        angularLatestVersion: latestVersions.Angular.replace('~', '').replace('^', ''),
       }),
       // TODO: Moving inside `branchAndMerge` should work but is bugged right now.
       // The __projectRoot__ is being used meanwhile.
