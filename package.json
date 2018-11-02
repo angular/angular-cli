@@ -69,7 +69,7 @@
     "quicktype-core": "^5.0.41",
     "temp": "^0.8.3",
     "tslint": "^5.11.0",
-    "typescript": "~3.1.5",
+    "typescript": "~3.1.6",
     "yarn": "^1.10.1"
   },
   "devDependencies": {
