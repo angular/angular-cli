@@ -1,3 +1,7 @@
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_library", "ts_proto_library")
 load("@build_bazel_rules_nodejs//:defs.bzl", "nodejs_binary")
 
