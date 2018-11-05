@@ -778,11 +778,12 @@ export default function(options: UpdateSchema): Rule {
     const logger = context.logger;
     const allDependencies = _getAllDependencies(tree);
     const packages = _buildPackageList(options, allDependencies, logger);
+    const usingYarn = options.packageManager === 'yarn';
 
     return observableFrom([...allDependencies.keys()]).pipe(
       // Grab all package.json from the npm repository. This requires a lot of HTTP calls so we
       // try to parallelize as many as possible.
-      mergeMap(depName => getNpmPackageJson(depName, options.registry, logger)),
+      mergeMap(depName => getNpmPackageJson(depName, options.registry, logger, usingYarn)),
 
       // Build a map of all dependencies and their packageJson.
       reduce<NpmRepositoryPackageJson, Map<string, NpmRepositoryPackageJson>>(

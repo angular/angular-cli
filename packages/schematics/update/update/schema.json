@@ -53,6 +53,15 @@
           "format": "hostname"
         }
       ]
+    },
+    "packageManager": {
+      "description": "The preferred package manager configuration files to use for registry settings.",
+      "type": "string",
+      "default": "npm",
+      "enum": [
+        "npm",
+        "yarn"
+      ]
     }
   },
   "required": [
