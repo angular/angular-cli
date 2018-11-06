@@ -70,7 +70,9 @@ ts_library(
         "@npm//pacote",
     ],
     testonly = True,
+    # @external_begin
     tsconfig = "//:tsconfig-test.json",
+    # @external_end
 )
 
 jasmine_node_test(

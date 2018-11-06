@@ -80,7 +80,9 @@ ts_json_schema(
 #         "@npm//@types/jasmine",
 #     ],
 #     testonly = True,
+#     # @external_begin
 #     tsconfig = "//:tsconfig-test.json",
+#     # @external_end
 # )
 
 # jasmine_node_test(

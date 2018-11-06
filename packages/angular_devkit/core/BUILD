@@ -57,7 +57,9 @@ ts_library(
         "src/workspace/test/test-workspace.json"
     ],
     testonly = True,
+    # @external_begin
     tsconfig = "//:tsconfig-test.json",
+    # @external_end
 )
 
 jasmine_node_test(
@@ -111,7 +113,9 @@ ts_library(
         "@npm//@types/jasmine",
     ],
     testonly = True,
+    # @external_begin
     tsconfig = "//:tsconfig-test.json",
+    # @external_end
 )
 
 jasmine_node_test(
