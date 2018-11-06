@@ -588,7 +588,9 @@ export class CoreSchemaRegistry implements SchemaRegistry {
         compilationSchemInfo.promptDefinitions.push(definition);
 
         return function(this: { promptFieldsWithValue: Set<string> }) {
-          if (this) {
+          // If 'this' is undefined in the call, then it defaults to the global
+          // 'this'.
+          if (this && this.promptFieldsWithValue) {
             this.promptFieldsWithValue.add(path);
           }
 
