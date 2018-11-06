@@ -19,8 +19,9 @@ ts_library(
             "**/*_spec_large.ts",
         ],
     ),
-    data = glob(["**/*.json"]),
+    data = glob(["**/*.json", "**/*.md"]),
     module_name = "@angular/cli",
+    # strict_checks = False,
     deps = [
         ":command_schemas",
         "//packages/angular_devkit/architect",
