@@ -76,22 +76,24 @@ export class HostDirEntry implements DirEntry {
   }
 
   visit(visitor: FileVisitor): void {
-    function _recurse(entry: DirEntry) {
-      entry.subfiles.forEach(path => {
-        visitor(join(entry.path, path), entry.file(path));
-      });
-      entry.subdirs.forEach(path => {
-        _recurse(entry.dir(path));
-      });
-    }
-
     try {
-      _recurse(this);
+      this.getSubfilesRecursively().forEach(file => visitor(file.path, file));
     } catch (e) {
       if (e !== FileVisitorCancelToken) {
         throw e;
       }
     }
+  }
+
+  private getSubfilesRecursively() {
+    function _recurse(entry: DirEntry): FileEntry[] {
+      return entry.subdirs.reduce((files, subdir) => [
+        ...files,
+        ..._recurse(entry.dir(subdir)),
+      ], entry.subfiles.map(subfile => entry.file(subfile) as FileEntry));
+    }
+
+    return _recurse(this);
   }
 }
 
@@ -315,12 +317,9 @@ export class HostTree implements Tree {
     return maybeCache;
   }
   visit(visitor: FileVisitor): void {
-    const allFiles: [Path, FileEntry | null | undefined][] = [];
     this.root.visit((path, entry) => {
-      allFiles.push([path, entry]);
+      visitor(path, entry);
     });
-
-    allFiles.forEach(([path, entry]) => visitor(path, entry));
   }
 
   // Change content of host files.
