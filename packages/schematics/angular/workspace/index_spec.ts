@@ -54,4 +54,16 @@ describe('Workspace Schematic', () => {
     expect(pkg.dependencies['zone.js']).toEqual(latestVersions.ZoneJs);
     expect(pkg.devDependencies['typescript']).toEqual(latestVersions.TypeScript);
   });
+
+  it('should create correct files when using minimal', () => {
+    const tree = schematicRunner.runSchematic('workspace', { ...defaultOptions, minimal: true });
+    const files = tree.files;
+    expect(files.indexOf('/angular.json')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/.gitignore')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/package.json')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/README.md')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/tsconfig.json')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/tslint.json')).toBe(-1);
+    expect(files.indexOf('/.editorconfig')).toBe(-1);
+  });
 });

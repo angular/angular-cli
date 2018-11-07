@@ -146,6 +146,30 @@ describe('Application Schematic', () => {
     expect(confContent.projects['foo-e2e']).toBeUndefined();
   });
 
+  it('should create correct files when using minimal', () => {
+    const options = { ...defaultOptions, minimal: true };
+    const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+    const files = tree.files;
+
+    expect(files.indexOf('/projects/foo/karma.conf.js')).toBe(-1);
+    expect(files.indexOf('/projects/foo/tsconfig.app.json')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/foo/tsconfig.spec.json')).toBe(-1);
+    expect(files.indexOf('/projects/foo/tslint.json')).toBe(-1);
+    expect(files.indexOf('/projects/foo/src/environments/environment.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/foo/src/environments/environment.prod.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/foo/src/favicon.ico')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/foo/src/index.html')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/foo/src/main.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/foo/src/polyfills.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/foo/src/styles.css')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/foo/src/test.ts')).toBe(-1);
+    expect(files.indexOf('/projects/foo/src/app/app.module.ts')).toBeGreaterThanOrEqual(0);
+    expect(files.indexOf('/projects/foo/src/app/app.component.css')).toBe(-1);
+    expect(files.indexOf('/projects/foo/src/app/app.component.html')).toBe(-1);
+    expect(files.indexOf('/projects/foo/src/app/app.component.spec.ts')).toBe(-1);
+    expect(files.indexOf('/projects/foo/src/app/app.component.ts')).toBeGreaterThanOrEqual(0);
+  });
+
   describe(`update package.json`, () => {
     it(`should add build-angular to devDependencies`, () => {
       const tree = schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
