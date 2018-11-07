@@ -26,11 +26,16 @@ const webpackOutputOptions = {
 };
 
 const verboseWebpackOutputOptions = {
+  // The verbose output will most likely be piped to a file, so colors just mess it up.
+  colors: false,
+  usedExports: true,
+  maxModules: Infinity,
+  optimizationBailout: true,
+  reasons: true,
   children: true,
   assets: true,
   version: true,
-  reasons: true,
-  chunkModules: false, // TODO: set to true when console to file output is fixed
+  chunkModules: true,
   errorDetails: true,
   moduleTrace: true,
 };
