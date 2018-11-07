@@ -24,6 +24,7 @@ ts_library(
     data = glob(["**/*.json"]),
     module_name = "@angular-devkit/core",
     module_root = "src/index.d.ts",
+    # strict_checks = False,
     deps = [
         "@rxjs",
         "@rxjs//operators",
@@ -44,6 +45,7 @@ ts_library(
             "src/**/*_spec_large.ts",
         ],
     ),
+    # strict_checks = False,
     deps = [
         ":core",
         ":node",
@@ -145,6 +147,7 @@ ts_library(
     ),
     module_name = "@angular-devkit/core/node/testing",
     module_root = "node/testing/index.d.ts",
+    # strict_checks = False,
     deps = [
         ":core",
         ":node",

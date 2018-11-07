@@ -44,6 +44,7 @@ ts_library(
         ],
     ),
     module_name = "@schematics/angular",
+    # strict_checks = False,
     deps = ALL_SCHEMA_DEPS + [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",

@@ -20,6 +20,7 @@ ts_library(
     ),
     module_name = "@angular-devkit/architect",
     module_root = "src/index.d.ts",
+    # strict_checks = False,
     data = glob(["**/*.json"]),
     deps = [
         "//packages/angular_devkit/core",

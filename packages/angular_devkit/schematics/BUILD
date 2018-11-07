@@ -23,6 +23,7 @@ ts_library(
     ),
     module_name = "@angular-devkit/schematics",
     module_root = "src/index.d.ts",
+    # strict_checks = False,
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",  # TODO: get rid of this for 6.0
@@ -60,9 +61,9 @@ jasmine_node_test(
     name = "schematics_test",
     srcs = [":schematics_test_lib"],
     deps = [
+        "@npm//chokidar",
         "@npm//jasmine",
         "@npm//source-map",
-        "@npm//chokidar",
     ],
 )
 
@@ -82,14 +83,16 @@ ts_library(
     ),
     module_name = "@angular-devkit/schematics/tasks",
     module_root = "tasks/index.d.ts",
+    # strict_checks = False,
     deps = [
         ":schematics",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core:node",
-        "@rxjs",
-        "@rxjs//operators",
         "@npm//@types/node",
         "@npm//tslint",
+        "@npm//typescript",
+        "@rxjs",
+        "@rxjs//operators",
+        "//packages/angular_devkit/core:node",
+        "//packages/angular_devkit/core",
     ],
 )
 
@@ -106,6 +109,7 @@ ts_library(
     ),
     module_name = "@angular-devkit/schematics/tasks/node",
     module_root = "tasks/node/index.d.ts",
+    # strict_checks = False,
     deps = [
         ":schematics",
         ":tasks",
@@ -174,6 +178,7 @@ ts_library(
     ),
     module_name = "@angular-devkit/schematics/tools",
     module_root = "tools/index.d.ts",
+    # strict_checks = False,
     deps = [
         ":schematics",
         ":tasks",
