@@ -151,7 +151,7 @@ export function getProjectByCwd(workspace: experimental.workspace.Workspace): st
   }
 }
 
-export function getPackageManager(): string {
+export function getConfiguredPackageManager(): string | null {
   let workspace = getWorkspace('local');
 
   if (workspace) {
@@ -186,7 +186,7 @@ export function getPackageManager(): string {
     }
   }
 
-  return 'npm';
+  return null;
 }
 
 export function migrateLegacyGlobalConfig(): boolean {
