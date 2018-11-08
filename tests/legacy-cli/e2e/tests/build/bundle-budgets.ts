@@ -50,8 +50,8 @@ export default function () {
             json.projects['test-project'].architect.build.options.budgets = [cfg.budget];
           })
           .then(() => ng('build', '--optimization'))
-          .then(({ stdout }) => {
-            if (!/WARNING in budgets/.test(stdout)) {
+          .then(({ stderr }) => {
+            if (!/WARNING in budgets/.test(stderr)) {
               throw new Error(cfg.message);
             }
           });
@@ -62,8 +62,8 @@ export default function () {
             json.projects['test-project'].architect.build.options.budgets = [cfg.budget];
           })
           .then(() => ng('build', '--optimization'))
-          .then(({ stdout }) => {
-            if (/(WARNING|ERROR)/.test(stdout)) {
+          .then(({ stderr }) => {
+            if (/(WARNING|ERROR)/.test(stderr)) {
               throw new Error(cfg.message);
             }
           });

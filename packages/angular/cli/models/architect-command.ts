@@ -31,8 +31,6 @@ export abstract class ArchitectCommand<
   private _host = new NodeJsSyncHost();
   protected _architect: Architect;
   protected _workspace: experimental.workspace.Workspace;
-  protected _logger = createConsoleLogger();
-
   protected _registry: json.schema.SchemaRegistry;
 
   // If this command supports running multiple targets.
@@ -150,7 +148,7 @@ export abstract class ArchitectCommand<
     }
     const realBuilderConf = this._architect.getBuilderConfiguration({ ...targetSpec, overrides });
 
-    const result = await this._architect.run(realBuilderConf, { logger: this._logger }).toPromise();
+    const result = await this._architect.run(realBuilderConf, { logger: this.logger }).toPromise();
 
     return result.success ? 0 : 1;
   }
