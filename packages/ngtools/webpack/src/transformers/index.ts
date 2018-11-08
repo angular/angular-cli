@@ -17,3 +17,4 @@ export * from './export_lazy_module_map';
 export * from './register_locale_data';
 export * from './replace_resources';
 export * from './remove_decorators';
+export * from './find_resources';

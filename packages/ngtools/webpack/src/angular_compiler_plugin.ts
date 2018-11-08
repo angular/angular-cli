@@ -817,7 +817,7 @@ export class AngularCompilerPlugin {
 
     if (this._JitMode) {
       // Replace resources in JIT.
-      this._transformers.push(replaceResources(isAppPath));
+      this._transformers.push(replaceResources(isAppPath, getTypeChecker));
     } else {
       // Remove unneeded angular decorators.
       this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
@@ -1013,9 +1013,7 @@ export class AngularCompilerPlugin {
       .filter(x => x);
 
     const resourceImports = findResources(sourceFile)
-      .map((resourceReplacement) => resourceReplacement.resourcePaths)
-      .reduce((prev, curr) => prev.concat(curr), [])
-      .map((resourcePath) => resolve(dirname(resolvedFileName), normalize(resourcePath)));
+      .map(resourcePath => resolve(dirname(resolvedFileName), normalize(resourcePath)));
 
     // These paths are meant to be used by the loader so we must denormalize them.
     const uniqueDependencies = new Set([
