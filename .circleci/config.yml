@@ -168,6 +168,10 @@ workflows:
       - build:
           requires:
             - install
+          filters:
+            branches:
+              ignore:
+              - /docs-preview/
       - build-bazel:
           requires:
             - build
@@ -183,6 +187,13 @@ workflows:
       - e2e-node-8:
           requires:
             - build
+      - snapshot_publish_docs:
+          requires:
+          - install
+          filters:
+            branches:
+              only:
+              - /docs-preview/
       - e2e-cli-ng-snapshots:
           requires:
             - build
