@@ -54,7 +54,7 @@
     "webpack-subresource-integrity": "1.1.0-rc.6"
   },
   "optionalDependencies": {
-    "node-sass": "4.9.3"
+    "node-sass": "4.10.0"
   },
   "devDependencies": {
     "@angular/animations": "^7.0.0-rc.0",
