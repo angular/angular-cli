@@ -45,6 +45,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     private _options: ts.CompilerOptions,
     basePath: string,
     host: virtualFs.Host,
+    private readonly cacheSourceFiles: boolean,
   ) {
     this._syncHost = new virtualFs.SyncDelegateHost(host);
     this._memoryHost = new virtualFs.SyncDelegateHost(new virtualFs.SimpleMemoryHost());
@@ -260,7 +261,10 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       const content = this.readFile(fileName);
       if (content !== undefined) {
         const sf = ts.createSourceFile(workaroundResolve(fileName), content, languageVersion, true);
-        this._sourceFileCache.set(p, sf);
+
+        if (this.cacheSourceFiles) {
+          this._sourceFileCache.set(p, sf);
+        }
 
         return sf;
       }

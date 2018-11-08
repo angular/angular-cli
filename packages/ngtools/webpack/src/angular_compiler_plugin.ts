@@ -585,7 +585,10 @@ export class AngularCompilerPlugin {
   }
 
   // Registration hook for webpack plugin.
-  apply(compiler: Compiler) {
+  apply(compiler: Compiler & { watchMode?: boolean }) {
+    // only present for webpack 4.23.0+, assume true otherwise
+    const watchMode = compiler.watchMode === undefined ? true : compiler.watchMode;
+
     // Decorate inputFileSystem to serve contents of CompilerHost.
     // Use decorated inputFileSystem in watchFileSystem.
     compiler.hooks.environment.tap('angular-compiler', () => {
@@ -629,6 +632,7 @@ export class AngularCompilerPlugin {
         this._compilerOptions,
         this._basePath,
         host,
+        watchMode,
       );
 
       // Create and set a new WebpackResourceLoader.

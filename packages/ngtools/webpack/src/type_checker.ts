@@ -53,6 +53,7 @@ export class TypeChecker {
       _compilerOptions,
       _basePath,
       host,
+      true,
     );
     // We don't set a async resource loader on the compiler host because we only support
     // html templates, which are the only ones that can throw errors, and those can be loaded

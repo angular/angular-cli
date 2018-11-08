@@ -62,6 +62,7 @@ export function createTypescriptContext(content: string) {
     compilerOptions,
     basePath,
     new virtualFs.SimpleMemoryHost(),
+    false,
   );
 
   // Add a dummy file to host content.
