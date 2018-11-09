@@ -327,12 +327,6 @@ export class AngularCompilerPlugin {
     return this._JitMode ? this._program as ts.Program : (this._program as Program).getTsProgram();
   }
 
-  private _getChangedTsFiles() {
-    return this._compilerHost.getChangedFilePaths()
-      .filter(k => (k.endsWith('.ts') || k.endsWith('.tsx')) && !k.endsWith('.d.ts'))
-      .filter(k => this._compilerHost.fileExists(k));
-  }
-
   updateChangedFileExtensions(extension: string) {
     if (extension) {
       this._changedFileExtensions.add(extension);
@@ -873,35 +867,16 @@ export class AngularCompilerPlugin {
     // Make a new program and load the Angular structure.
     await this._createOrUpdateProgram();
 
-    // Try to find lazy routes if we have an entry module.
-    // We need to run the `listLazyRoutes` the first time because it also navigates libraries
-    // and other things that we might miss using the (faster) findLazyRoutesInAst.
-    // Lazy routes modules will be read with compilerHost and added to the changed files.
+    // Find lazy routes
     const lazyRouteMap: LazyRouteMap = {
-      ... (this._entryModule || !this._JitMode ? this._listLazyRoutesFromProgram() : {}),
+      ...this._listLazyRoutesFromProgram(),
       ...this._options.additionalLazyModules,
     };
-
     this._processLazyRoutes(lazyRouteMap);
-
-    // Emit and report errors.
-
-    // We now have the final list of changed TS files.
-    // Go through each changed file and add transforms as needed.
-    const sourceFiles = this._getChangedTsFiles()
-      .map((fileName) => (this._getTsProgram() as ts.Program).getSourceFile(fileName))
-      // At this point we shouldn't need to filter out undefined files, because any ts file
-      // that changed should be emitted.
-      // But due to hostReplacementPaths there can be files (the environment files)
-      // that changed but aren't part of the compilation, specially on `ng test`.
-      // So we ignore missing source files files here.
-      // hostReplacementPaths needs to be fixed anyway to take care of the following issue.
-      // https://github.com/angular/angular-cli/issues/7305#issuecomment-332150230
-      .filter((x) => !!x) as ts.SourceFile[];
 
     // Emit files.
     time('AngularCompilerPlugin._update._emit');
-    const { emitResult, diagnostics } = this._emit(sourceFiles);
+    const { emitResult, diagnostics } = this._emit();
     timeEnd('AngularCompilerPlugin._update._emit');
 
     // Report diagnostics.
@@ -1042,7 +1017,7 @@ export class AngularCompilerPlugin {
   // This code mostly comes from `performCompilation` in `@angular/compiler-cli`.
   // It skips the program creation because we need to use `loadNgStructureAsync()`,
   // and uses CustomTransformers.
-  private _emit(sourceFiles: ts.SourceFile[]) {
+  private _emit() {
     time('AngularCompilerPlugin._emit');
     const program = this._program;
     const allDiagnostics: Array<ts.Diagnostic | Diagnostic> = [];
@@ -1053,19 +1028,33 @@ export class AngularCompilerPlugin {
     try {
       if (this._JitMode) {
         const tsProgram = program as ts.Program;
+        const changedTsFiles = new Set<string>();
 
         if (this._firstRun) {
           // Check parameter diagnostics.
           time('AngularCompilerPlugin._emit.ts.getOptionsDiagnostics');
           allDiagnostics.push(...tsProgram.getOptionsDiagnostics());
           timeEnd('AngularCompilerPlugin._emit.ts.getOptionsDiagnostics');
+        } else {
+          // generate a list of changed files for emit
+          // not needed on first run since a full program emit is required
+          for (const changedFile of this._compilerHost.getChangedFilePaths()) {
+            if (!changedFile.endsWith('.ts') && !changedFile.endsWith('.tsx')) {
+              continue;
+            }
+            // existing type definitions are not emitted
+            if (changedFile.endsWith('.d.ts')) {
+              continue;
+            }
+            changedTsFiles.add(changedFile);
+          }
         }
 
         allDiagnostics.push(...gatherDiagnostics(tsProgram, this._JitMode,
           'AngularCompilerPlugin._emit.ts', diagMode));
 
         if (!hasErrors(allDiagnostics)) {
-          if (this._firstRun || sourceFiles.length > 20) {
+          if (this._firstRun || changedTsFiles.size > 20) {
             emitResult = tsProgram.emit(
               undefined,
               undefined,
@@ -1075,15 +1064,20 @@ export class AngularCompilerPlugin {
             );
             allDiagnostics.push(...emitResult.diagnostics);
           } else {
-            sourceFiles.forEach((sf) => {
-              const timeLabel = `AngularCompilerPlugin._emit.ts+${sf.fileName}+.emit`;
+            for (const changedFile of changedTsFiles) {
+              const sourceFile = tsProgram.getSourceFile(changedFile);
+              if (!sourceFile) {
+                continue;
+              }
+
+              const timeLabel = `AngularCompilerPlugin._emit.ts+${sourceFile.fileName}+.emit`;
               time(timeLabel);
-              emitResult = tsProgram.emit(sf, undefined, undefined, undefined,
+              emitResult = tsProgram.emit(sourceFile, undefined, undefined, undefined,
                 { before: this._transformers },
               );
               allDiagnostics.push(...emitResult.diagnostics);
               timeEnd(timeLabel);
-            });
+            }
           }
         }
       } else {
