@@ -165,7 +165,7 @@ export abstract class ArchitectCommand<
         // Running them in parallel would jumble the log messages.
         let result = 0;
         for (const project of this.getProjectNamesByTarget(this.target)) {
-          result |= await this.runSingleTarget({ ...targetSpec, project }, extra);
+          result |= await this.runSingleTarget({ ...targetSpec, project }, [...extra]);
         }
 
         return result;
