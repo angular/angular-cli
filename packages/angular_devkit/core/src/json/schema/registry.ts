@@ -540,6 +540,8 @@ export class CoreSchemaRegistry implements SchemaRegistry {
             type = 'confirmation';
           } else if (Array.isArray(parentSchema.enum)) {
             type = 'list';
+          } else if (parentSchema.type === 'number') {
+            type = 'number';
           } else {
             type = 'input';
           }
@@ -570,7 +572,12 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           items,
           default: typeof parentSchema.default == 'object' ? undefined : parentSchema.default,
           async validator(data: string) {
-            const result = it.self.validate(parentSchema, data);
+            let convertedData: string | number = data;
+            if (parentSchema.type === 'number') {
+              const parsed = parseInt(data);
+              convertedData = isNaN(parsed) ? '' : parsed;
+            }
+            const result = it.self.validate(parentSchema, convertedData);
             if (typeof result === 'boolean') {
               return result;
             } else {
