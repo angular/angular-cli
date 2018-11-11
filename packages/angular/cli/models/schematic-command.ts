@@ -292,6 +292,7 @@ export abstract class SchematicCommand<
 
     if (options.interactive !== false && process.stdout.isTTY) {
       workflow.registry.usePromptProvider((definitions: Array<schema.PromptDefinition>) => {
+        const numberQuestions: string[] = [];
         const questions: inquirer.Questions = definitions.map(definition => {
           const question: inquirer.Question = {
             name: definition.id,
@@ -321,6 +322,10 @@ export abstract class SchematicCommand<
                 }
               });
               break;
+            case 'number':
+              numberQuestions.push(definition.id);
+              question.type = 'number';
+              break;
             default:
               question.type = definition.type;
               break;
@@ -329,7 +334,16 @@ export abstract class SchematicCommand<
           return question;
         });
 
-        return inquirer.prompt(questions);
+        return inquirer.prompt(questions).then((answers) => {
+          Object.entries(answers).forEach(([name, answer]) => {
+            if (numberQuestions.indexOf(name) > -1) {
+              const parsed = parseInt(answer);
+              answers[name] = isNaN(parsed) ? '' : parsed;
+            }
+          });
+
+          return answers;
+        });
       });
     }
 
