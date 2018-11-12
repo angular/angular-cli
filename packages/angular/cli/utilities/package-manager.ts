@@ -10,10 +10,9 @@ import { existsSync } from 'fs';
 import { join } from 'path';
 import { getConfiguredPackageManager } from './config';
 
-
-export function supportsYarn(): boolean {
+function supports(name: string): boolean {
   try {
-    execSync('yarn --version');
+    execSync(`${name} --version`, { stdio: 'ignore' });
 
     return true;
   } catch {
@@ -21,14 +20,12 @@ export function supportsYarn(): boolean {
   }
 }
 
-export function supportsNpm(): boolean {
-  try {
-    execSync('npm --version');
+export function supportsYarn(): boolean {
+  return supports('yarn');
+}
 
-    return true;
-  } catch {
-    return false;
-  }
+export function supportsNpm(): boolean {
+  return supports('npm');
 }
 
 export function getPackageManager(root: string): string {
