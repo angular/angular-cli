@@ -8,6 +8,7 @@
 import {
   InvalidPathException,
   Path,
+  asWindowsPath,
   basename,
   dirname,
   join,
@@ -159,4 +160,11 @@ describe('path', () => {
     expect(basename(normalize('.'))).toBe('');
     expect(basename(normalize('./a/b/c'))).toBe('c');
   });
+
+  it('asWindowsPath', () => {
+    expect(asWindowsPath(normalize('c:/'))).toBe('c:\\');
+    expect(asWindowsPath(normalize('c:/b/'))).toBe('c:\\b');
+    expect(asWindowsPath(normalize('c:/b/c'))).toBe('c:\\b\\c');
+  });
+
 });
