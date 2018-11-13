@@ -298,9 +298,11 @@ export type PosixPath = string & {
 };
 
 export function asWindowsPath(path: Path): WindowsPath {
-  const drive = path.match(/^\/(\w)\/(.*)$/);
+  const drive = path.match(/^\/(\w)(?:\/(.*))?$/);
   if (drive) {
-    return `${drive[1]}:\\${drive[2].replace(/\//g, '\\')}` as WindowsPath;
+    const subPath = drive[2] ? drive[2].replace(/\//g, '\\') : '';
+
+    return `${drive[1]}:\\${subPath}` as WindowsPath;
   }
 
   return path.replace(/\//g, '\\') as WindowsPath;
