@@ -3,7 +3,7 @@ The CLI commands run Architect targets such as `build`, `serve`, `test`, and `li
 Each named target has a default configuration, specified by an "options" object,
 and an optional set of named alternate configurations in the "configurations" object.
 
-For example, the "server" target for a newly generated app has a predefined
+For example, the "serve" target for a newly generated app has a predefined
 alternate configuration named "production".
 
 You can define new targets and their configuration options in the "architect" section
