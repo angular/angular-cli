@@ -44,17 +44,19 @@ describe('Library Schematic', () => {
   it('should create files', () => {
     const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
     const files = tree.files;
-    expect(files.indexOf('/projects/foo/karma.conf.js')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/foo/ng-package.json')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/foo/package.json')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/foo/tslint.json')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/foo/src/test.ts')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/foo/src/my_index.ts')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/foo/src/lib/foo.module.ts')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/foo/src/lib/foo.component.spec.ts')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/foo/src/lib/foo.component.ts')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/foo/src/lib/foo.service.spec.ts')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/foo/src/lib/foo.service.ts')).toBeGreaterThanOrEqual(0);
+    expect(files).toEqual(jasmine.arrayContaining([
+      '/projects/foo/karma.conf.js',
+      '/projects/foo/ng-package.json',
+      '/projects/foo/package.json',
+      '/projects/foo/tslint.json',
+      '/projects/foo/src/test.ts',
+      '/projects/foo/src/my_index.ts',
+      '/projects/foo/src/lib/foo.module.ts',
+      '/projects/foo/src/lib/foo.component.spec.ts',
+      '/projects/foo/src/lib/foo.component.ts',
+      '/projects/foo/src/lib/foo.service.spec.ts',
+      '/projects/foo/src/lib/foo.service.ts',
+    ]));
   });
 
   it('should create a package.json named "foo"', () => {
@@ -88,7 +90,7 @@ describe('Library Schematic', () => {
     const tree = schematicRunner.runSchematic('library', {
       name: 'foobar',
     }, workspaceTree);
-    expect(tree.files.indexOf('/projects/foobar/src/public_api.ts')).toBeGreaterThanOrEqual(0);
+    expect(tree.files).toContain('/projects/foobar/src/public_api.ts');
   });
 
   it(`should add library to workspace`, () => {
