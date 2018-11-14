@@ -752,6 +752,10 @@
               "description": "Generates a service worker config for production builds.",
               "default": false
             },
+            "ngswConfigPath": {
+              "type": "string",
+              "description": "Path to ngsw-config.json."
+            },
             "skipAppShell": {
               "type": "boolean",
               "description": "Flag to prevent building an app shell.",
