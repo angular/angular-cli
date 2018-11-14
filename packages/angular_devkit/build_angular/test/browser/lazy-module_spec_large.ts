@@ -142,7 +142,7 @@ describe('Browser Builder lazy modules', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.scopedSync()
-          .exists(join(outputPath, 'lazy-lazy-module.js'))).toBe(true);
+          .exists(join(outputPath, 'lazy-lazy-module-ngfactory.js'))).toBe(true);
       }),
     ).toPromise().then(done, done.fail);
   });
@@ -301,7 +301,7 @@ describe('Browser Builder lazy modules', () => {
     runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(host.scopedSync()
-        .exists(join(outputPath, 'src-app-lazy-lazy-module.js')))
+        .exists(join(outputPath, 'src-app-lazy-lazy-module-ngfactory.js')))
         .toBe(true)),
     ).toPromise().then(done, done.fail);
   });

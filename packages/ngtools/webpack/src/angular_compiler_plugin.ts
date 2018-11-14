@@ -690,9 +690,8 @@ export class AngularCompilerPlugin {
               const dependencies = Object.keys(this._lazyRoutes)
                 .map((key) => {
                   const modulePath = this._lazyRoutes[key];
-                  const importPath = key.split('#')[0];
                   if (modulePath !== null) {
-                    const name = importPath.replace(/(\.ngfactory)?(\.(js|ts))?$/, '');
+                    const name = key.split('#')[0];
 
                     return new this._contextElementDependencyConstructor(modulePath, name);
                   } else {
