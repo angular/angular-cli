@@ -52,8 +52,8 @@ describe('Directive Schematic', () => {
 
     const tree = schematicRunner.runSchematic('directive', options, appTree);
     const files = tree.files;
-    expect(files.indexOf('/projects/bar/src/app/foo.directive.spec.ts')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/bar/src/app/foo.directive.ts')).toBeGreaterThanOrEqual(0);
+    expect(files).toContain('/projects/bar/src/app/foo.directive.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/foo.directive.ts');
     const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
     expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo.directive'/);
     expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooDirective\r?\n/m);
@@ -64,8 +64,8 @@ describe('Directive Schematic', () => {
 
     const tree = schematicRunner.runSchematic('directive', options, appTree);
     const files = tree.files;
-    expect(files.indexOf('/projects/bar/src/app/foo/foo.directive.spec.ts')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/bar/src/app/foo/foo.directive.ts')).toBeGreaterThanOrEqual(0);
+    expect(files).toContain('/projects/bar/src/app/foo/foo.directive.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/foo/foo.directive.ts');
   });
 
   it('should find the closest module', () => {
@@ -165,7 +165,6 @@ describe('Directive Schematic', () => {
     // move the module
     appTree.rename('/projects/bar/src/app/app.module.ts', '/projects/bar/custom/app/app.module.ts');
     appTree = schematicRunner.runSchematic('directive', defaultOptions, appTree);
-    expect(appTree.files.indexOf('/projects/bar/custom/app/foo.directive.ts'))
-      .toBeGreaterThanOrEqual(0);
+    expect(appTree.files).toContain('/projects/bar/custom/app/foo.directive.ts');
   });
 });
