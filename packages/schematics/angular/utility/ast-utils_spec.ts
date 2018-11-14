@@ -11,7 +11,11 @@ import { HostTree } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
 import { Change, InsertChange } from '../utility/change';
 import { getFileContent } from '../utility/test';
-import { addExportToModule, addSymbolToNgModuleMetadata } from './ast-utils';
+import {
+  addDeclarationToModule,
+  addExportToModule,
+  addSymbolToNgModuleMetadata,
+} from './ast-utils';
 
 
 function getTsSource(path: string, content: string): ts.SourceFile {
@@ -71,6 +75,15 @@ describe('ast utils', () => {
     const output = applyChanges(modulePath, moduleContent, changes);
     expect(output).toMatch(/import { FooComponent } from '.\/foo.component';/);
     expect(output).toMatch(/exports: \[FooComponent\]/);
+  });
+
+  it('should add declarations to module if not indented', () => {
+    moduleContent = tags.stripIndents`${moduleContent}`;
+    const source = getTsSource(modulePath, moduleContent);
+    const changes = addDeclarationToModule(source, modulePath, 'FooComponent', './foo.component');
+    const output = applyChanges(modulePath, moduleContent, changes);
+    expect(output).toMatch(/import { FooComponent } from '.\/foo.component';/);
+    expect(output).toMatch(/declarations: \[\nAppComponent,\nFooComponent\n\]/);
   });
 
   it('should add metadata', () => {
