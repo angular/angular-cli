@@ -35,18 +35,20 @@ describe('Application Schematic', () => {
   it('should create all files of an e2e application', () => {
     const tree = schematicRunner.runSchematic('e2e', defaultOptions, workspaceTree);
     const files = tree.files;
-    expect(files.indexOf('/projects/foo/protractor.conf.js')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/foo/tsconfig.e2e.json')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/foo/src/app.e2e-spec.ts')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/projects/foo/src/app.po.ts')).toBeGreaterThanOrEqual(0);
+    expect(files).toEqual(jasmine.arrayContaining([
+      '/projects/foo/protractor.conf.js',
+      '/projects/foo/tsconfig.e2e.json',
+      '/projects/foo/src/app.e2e-spec.ts',
+      '/projects/foo/src/app.po.ts',
+    ]));
   });
 
   it('should create all files of an e2e application', () => {
     const options = {...defaultOptions, projectRoot: 'e2e'};
     const tree = schematicRunner.runSchematic('e2e', options, workspaceTree);
     const files = tree.files;
-    expect(files.indexOf('/projects/foo/protractor.conf.js')).toEqual(-1);
-    expect(files.indexOf('/e2e/protractor.conf.js')).toBeGreaterThanOrEqual(0);
+    expect(files).not.toContain('/projects/foo/protractor.conf.js');
+    expect(files).toContain('/e2e/protractor.conf.js');
   });
 
   it('should set the rootSelector in the app.po.ts', () => {
