@@ -6,68 +6,69 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { logging } from '@angular-devkit/core';
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
+import { homedir } from 'os';
+import * as path from 'path';
 import { Observable, from } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
 import { NpmRepositoryPackageJson } from './npm-package-json';
 
+const ini = require('ini');
+const lockfile = require('@yarnpkg/lockfile');
 const pacote = require('pacote');
 
 const npmPackageJsonCache = new Map<string, Observable<NpmRepositoryPackageJson>>();
-
 let npmrc: { [key: string]: string };
-try {
-  npmrc = _readNpmRc();
-} catch {
-  npmrc = {};
-}
 
 
-function _readNpmRc(): { [key: string]: string } {
+function readOptions(yarn = false): { [key: string]: string } {
   // TODO: have a way to read options without using fs directly.
-  const path = require('path');
-  const fs = require('fs');
-  const perProjectNpmrc = path.resolve('.npmrc');
+  const cwd = process.cwd();
+  const baseFilename = yarn ? 'yarnrc' : 'npmrc';
+  const dotFilename = '.' + baseFilename;
 
-  const configs: string[] = [];
-
-  if (process.platform === 'win32') {
-    if (process.env.LOCALAPPDATA) {
-      configs.push(fs.readFileSync(path.join(process.env.LOCALAPPDATA, '.npmrc'), 'utf8'));
-    }
+  let globalPrefix: string;
+  if (process.env.PREFIX) {
+    globalPrefix = process.env.PREFIX;
   } else {
-    if (process.env.HOME) {
-      configs.push(fs.readFileSync(path.join(process.env.HOME, '.npmrc'), 'utf8'));
+    globalPrefix = path.dirname(process.execPath);
+    if (process.platform !== 'win32') {
+      globalPrefix = path.dirname(globalPrefix);
     }
   }
 
-  if (fs.existsSync(perProjectNpmrc)) {
-    configs.push(fs.readFileSync(perProjectNpmrc, 'utf8'));
+  const defaultConfigLocations = [
+    path.join(globalPrefix, 'etc', baseFilename),
+    path.join(homedir(), dotFilename),
+  ];
+
+  const projectConfigLocations: string[] = [];
+  const root = path.parse(cwd).root;
+  for (let curDir = path.dirname(cwd); curDir && curDir !== root; curDir = path.dirname(curDir)) {
+    projectConfigLocations.unshift(path.join(curDir, dotFilename));
   }
+  projectConfigLocations.push(path.join(cwd, dotFilename));
 
-  const allOptions: { [key: string]: string } = {};
-  for (const config of configs) {
-    const allOptionsArr = config.split(/\r?\n/).map(x => x.trim());
+  let options: { [key: string]: string } = {};
+  for (const location of [...defaultConfigLocations, ...projectConfigLocations]) {
+    if (existsSync(location)) {
+      const data = readFileSync(location, 'utf8');
+      options = {
+        ...options,
+        ...(yarn ? lockfile.parse(data) : ini.parse(data)),
+      };
 
-    allOptionsArr.forEach(x => {
-      const [key, ...value] = x.split('=');
-      const fullValue = value.join('=').trim();
-      if (key && fullValue && fullValue !== 'null') {
-        allOptions[key.trim()] = fullValue;
+      if (options.cafile) {
+        const cafile = path.resolve(path.dirname(location), options.cafile);
+        delete options.cafile;
+        try {
+          options.ca = readFileSync(cafile, 'utf8').replace(/\r?\n/, '\\n');
+        } catch { }
       }
-    });
-
-    if (allOptions.cafile) {
-      const cafile = allOptions.cafile;
-      delete allOptions.cafile;
-      try {
-        allOptions.ca = readFileSync(cafile, 'utf8');
-        allOptions.ca = allOptions.ca.replace(/\r?\n/, '\\n');
-      } catch { }
     }
   }
 
-  return allOptions;
+  return options;
 }
 
 /**
@@ -82,10 +83,23 @@ export function getNpmPackageJson(
   packageName: string,
   registryUrl: string | undefined,
   _logger: logging.LoggerApi,
+  usingYarn = false,
 ): Observable<Partial<NpmRepositoryPackageJson>> {
   const cachedResponse = npmPackageJsonCache.get(packageName);
   if (cachedResponse) {
     return cachedResponse;
+  }
+
+  if (!npmrc) {
+    try {
+      npmrc = readOptions();
+    } catch { }
+
+    if (usingYarn) {
+      try {
+        npmrc = { ...npmrc, ...readOptions(true) };
+      } catch { }
+    }
   }
 
   const resultPromise = pacote.packument(

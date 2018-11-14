@@ -61,7 +61,7 @@ export interface BaseSchematicSchema {
 export interface RunSchematicOptions extends BaseSchematicSchema {
   collectionName: string;
   schematicName: string;
-
+  additionalOptions?: { [key: string]: {} };
   schematicOptions?: string[];
   showNothingDone?: boolean;
 }
@@ -443,7 +443,11 @@ export abstract class SchematicCommand<
     // Read the default values from the workspace.
     const projectName = input.project !== undefined ? '' + input.project : null;
     const defaults = getSchematicDefaults(collectionName, schematicName, projectName);
-    input = Object.assign<{}, {}, typeof input>({}, defaults, input);
+    input = {
+      ...defaults,
+      ...input,
+      ...options.additionalOptions,
+    };
 
     workflow.reporter.subscribe((event: DryRunEvent) => {
       nothingDone = false;

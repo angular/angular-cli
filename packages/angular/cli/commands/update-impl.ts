@@ -9,6 +9,7 @@ import { normalize } from '@angular-devkit/core';
 import { Arguments, Option } from '../models/interface';
 import { SchematicCommand } from '../models/schematic-command';
 import { findUp } from '../utilities/find-up';
+import { getPackageManager } from '../utilities/package-manager';
 import { Schema as UpdateCommandSchema } from './update';
 
 export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
@@ -50,6 +51,8 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
   }
 
   async run(options: UpdateCommandSchema & Arguments) {
+    const packageManager = getPackageManager(this.workspace.root);
+
     return this.runSchematic({
       collectionName: this.collectionName,
       schematicName: this.schematicName,
@@ -57,6 +60,7 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
       dryRun: !!options.dryRun,
       force: false,
       showNothingDone: false,
+      additionalOptions: { packageManager },
     });
   }
 }

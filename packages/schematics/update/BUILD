@@ -67,6 +67,8 @@ ts_library(
         "@npm//@types/jasmine",
         "@npm//@types/node",
         "@npm//@types/semver",
+        "@npm//@yarnpkg/lockfile",
+        "@npm//ini",
         "@npm//pacote",
     ],
     testonly = True,
