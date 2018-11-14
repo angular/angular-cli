@@ -47,6 +47,34 @@ describe('Server Builder', () => {
     ).toPromise().then(done, done.fail);
   });
 
+  ['css', 'scss', 'less', 'styl'].forEach(fileExt => {
+    it(`should not inline ${fileExt} sourcemaps`, (done) => {
+      host.replaceInFile(
+        'src/app/app.component.ts',
+        './app.component.css',
+        `./app.component.${fileExt}`,
+      );
+      host.writeMultipleFiles({
+        [`src/app/app.component.${fileExt}`]: `a {
+          color: #000;
+        }`,
+      });
+
+      const overrides = { sourceMap: true };
+      runTargetSpec(host, { project: 'app', target: 'server' }, overrides).pipe(
+        tap((buildEvent) => {
+          expect(buildEvent.success).toBe(true);
+
+          const fileName = join(outputPath, 'main.js');
+          const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+          expect(content).toMatch(/sourceMappingURL=main.js.map/);
+          expect(content).not.toMatch(/sourceMappingURL=data:application\/json/);
+          expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBeTruthy();
+        }),
+      ).toPromise().then(done, done.fail);
+    });
+  });
+
   it('runs watch mode', (done) => {
     const overrides = { watch: true };
 

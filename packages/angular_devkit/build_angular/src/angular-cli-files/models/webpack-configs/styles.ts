@@ -45,8 +45,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   // Determine hashing format.
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing as string);
   // Convert absolute resource URLs to account for base-href and deploy-url.
-  const baseHref = wco.buildOptions.baseHref || '';
-  const deployUrl = wco.buildOptions.deployUrl || '';
+  const baseHref = buildOptions.baseHref || '';
+  const deployUrl = buildOptions.deployUrl || '';
 
   const postcssPluginCreator = function (loader: webpack.loader.LoaderContext) {
     return [
@@ -185,7 +185,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         options: {
           ident: 'embedded',
           plugins: postcssPluginCreator,
-          sourceMap: cssSourceMap ? 'inline' : false,
+          sourceMap: cssSourceMap && buildOptions.platform !== 'server' ? 'inline' : false,
         },
       },
       ...(use as webpack.Loader[]),
