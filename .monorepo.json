@@ -19,7 +19,7 @@
       {
         "label": "License",
         "image": "https://img.shields.io/npm/l/@angular/cli.svg",
-        "url": "https://github.com/angular/angular-cli/blob/master/LICENSE"
+        "url": "/LICENSE"
       }
     ],
     [
@@ -37,7 +37,7 @@
   ],
   "links": {
     "Gitter": "https://gitter.im/angular/angular-cli",
-    "Contributing": "https://github.com/angular/angular-cli/blob/master/CONTRIBUTING.md",
+    "Contributing": "/CONTRIBUTING.md",
     "Angular CLI": "http://github.com/angular/angular-cli"
   },
   "packages": {
@@ -59,7 +59,7 @@
       "links": [
         {
           "label": "README",
-          "url": "https://github.com/angular/angular-cli/blob/master/packages/angular/cli/README.md"
+          "url": "/packages/angular/cli/README.md"
         }
       ],
       "version": "7.1.0-rc.0",
@@ -78,7 +78,7 @@
       "links": [
         {
           "label": "README",
-          "url": "https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/architect/README.md"
+          "url": "/packages/angular_devkit/architect/README.md"
         }
       ],
       "version": "0.11.0-rc.0",
@@ -102,7 +102,7 @@
       "links": [
         {
           "label": "README",
-          "url": "https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/build_optimizer/README.md"
+          "url": "/packages/angular_devkit/build_optimizer/README.md"
         }
       ],
       "version": "0.11.0-rc.0",
@@ -114,7 +114,7 @@
       "links": [
         {
           "label": "README",
-          "url": "https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/build_ng_packagr/README.md"
+          "url": "/packages/angular_devkit/build_ng_packagr/README.md"
         }
       ],
       "version": "0.11.0-rc.0",
@@ -126,7 +126,7 @@
       "links": [
         {
           "label": "README",
-          "url": "https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/build_angular/README.md"
+          "url": "/packages/angular_devkit/build_angular/README.md"
         }
       ],
       "version": "0.11.0-rc.0",
@@ -138,7 +138,7 @@
       "links": [
         {
           "label": "README",
-          "url": "https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/build_webpack/README.md"
+          "url": "/packages/angular_devkit/build_webpack/README.md"
         }
       ],
       "version": "0.11.0-rc.0",
@@ -150,7 +150,7 @@
       "links": [
         {
           "label": "README",
-          "url": "https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/core/README.md"
+          "url": "/packages/angular_devkit/core/README.md"
         }
       ],
       "version": "7.1.0-rc.0",
@@ -162,7 +162,7 @@
       "links": [
         {
           "label": "README",
-          "url": "https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/schematics/README.md"
+          "url": "/packages/angular_devkit/schematics/README.md"
         }
       ],
       "version": "7.1.0-rc.0",
