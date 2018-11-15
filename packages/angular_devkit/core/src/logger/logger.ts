@@ -21,6 +21,7 @@ export interface LogEntry extends LoggerMetadata {
 export interface LoggerApi {
   createChild(name: string): Logger;
   log(level: LogLevel, message: string, metadata?: JsonObject): void;
+  next(entry: LogEntry): void;
   debug(message: string, metadata?: JsonObject): void;
   info(message: string, metadata?: JsonObject): void;
   warn(message: string, metadata?: JsonObject): void;
@@ -85,6 +86,7 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
       log: (level: LogLevel, message: string, metadata?: JsonObject) => {
         return this.log(level, message, metadata);
       },
+      next: (entry: LogEntry) => this.next(entry),
       debug: (message: string, metadata?: JsonObject) => this.debug(message, metadata),
       info: (message: string, metadata?: JsonObject) => this.info(message, metadata),
       warn: (message: string, metadata?: JsonObject) => this.warn(message, metadata),
@@ -105,6 +107,9 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
     const entry: LogEntry = Object.assign({}, this._metadata, metadata, {
       level, message, timestamp: +Date.now(),
     });
+    this._subject.next(entry);
+  }
+  next(entry: LogEntry): void {
     this._subject.next(entry);
   }
 

@@ -18,6 +18,7 @@ export class NullLogger extends Logger {
   asApi(): LoggerApi {
     return {
       createChild: () => new NullLogger(this),
+      next() {},
       log() {},
       debug() {},
       info() {},
