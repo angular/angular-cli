@@ -13,7 +13,7 @@ export class BaseException extends Error {
 }
 
 
-export class UnknownException extends Error {
+export class UnknownException extends BaseException {
   constructor(message: string) { super(message); }
 }
 
