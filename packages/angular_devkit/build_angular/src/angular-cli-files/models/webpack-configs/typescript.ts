@@ -82,6 +82,7 @@ function _createAotPlugin(
     forkTypeChecker: buildOptions.forkTypeChecker,
     contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
     logger: wco.logger,
+    directTemplateLoading: true,
     ...options,
   };
   return new AngularCompilerPlugin(pluginOptions);
