@@ -103,6 +103,7 @@ export interface AngularCompilerPluginOptions {
   platform?: PLATFORM;
   nameLazyFiles?: boolean;
   logger?: logging.Logger;
+  directTemplateLoading?: boolean;
 
   // added to the list of lazy routes
   additionalLazyModules?: { [module: string]: string };
@@ -627,6 +628,7 @@ export class AngularCompilerPlugin {
         this._basePath,
         host,
         watchMode,
+        this._options.directTemplateLoading,
       );
 
       // Create and set a new WebpackResourceLoader.
