@@ -44,6 +44,11 @@
       "type": "string",
       "description": "Path where output will be placed."
     },
+    "resourcesOutputPath": {
+      "type": "string",
+      "description": "The path where style resources will be placed, relative to outputPath.",
+      "default": ""
+    },
     "sourceMap": {
       "type": "boolean",
       "description": "Output sourcemaps.",
