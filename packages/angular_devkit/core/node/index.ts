@@ -10,5 +10,6 @@ import * as fs from './fs';
 export * from './cli-logger';
 export * from './host';
 export { ModuleNotFoundException, ResolveOptions, resolve } from './resolve';
+export * from './scheduler';
 
 export { fs };
