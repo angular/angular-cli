@@ -27,6 +27,7 @@ function wrapUrl(url: string): string {
 export interface PostcssCliResourcesOptions {
   baseHref?: string;
   deployUrl?: string;
+  resourcesOutputPath?: string;
   filename: string;
   loader: webpack.loader.LoaderContext;
 }
@@ -47,6 +48,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
   const {
     deployUrl = '',
     baseHref = '',
+    resourcesOutputPath = '',
     filename,
     loader,
   } = options;
@@ -115,11 +117,15 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
           return;
         }
 
-        const outputPath = interpolateName(
+        let outputPath = interpolateName(
           { resourcePath: result } as webpack.loader.LoaderContext,
           filename,
           { content },
         );
+
+        if (resourcesOutputPath) {
+          outputPath = path.posix.join(resourcesOutputPath, outputPath);
+        }
 
         loader.addDependency(result);
         loader.emitFile(outputPath, content, undefined);

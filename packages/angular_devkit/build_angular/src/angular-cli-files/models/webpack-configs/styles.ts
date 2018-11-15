@@ -47,6 +47,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   // Convert absolute resource URLs to account for base-href and deploy-url.
   const baseHref = wco.buildOptions.baseHref || '';
   const deployUrl = wco.buildOptions.deployUrl || '';
+  const resourcesOutputPath = buildOptions.resourcesOutputPath || '';
 
   const postcssPluginCreator = function (loader: webpack.loader.LoaderContext) {
     return [
@@ -70,6 +71,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       PostcssCliResources({
         baseHref,
         deployUrl,
+        resourcesOutputPath,
         loader,
         filename: `[name]${hashFormat.file}.[ext]`,
       }),
