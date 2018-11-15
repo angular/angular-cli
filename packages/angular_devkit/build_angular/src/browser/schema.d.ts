@@ -193,6 +193,7 @@ export interface BrowserBuilderSchema {
   ngswConfigPath?: string;
 
   /**
+   * @deprecated
    * Flag to prevent building an app shell.
    */
   skipAppShell: boolean;
