@@ -979,7 +979,7 @@ export declare class UnimplementedException extends BaseException {
     constructor();
 }
 
-export declare class UnknownException extends Error {
+export declare class UnknownException extends BaseException {
     constructor(message: string);
 }
 
