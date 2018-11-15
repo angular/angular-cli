@@ -623,6 +623,10 @@
               "type": "string",
               "description": "Path where output will be placed."
             },
+            "resourcesOutputPath": {
+              "type": "string",
+              "description": "The path where style resources will be placed, relative to outputPath."
+            },
             "aot": {
               "type": "boolean",
               "description": "Build using Ahead of Time compilation.",
@@ -1445,6 +1449,10 @@
             "outputPath": {
               "type": "string",
               "description": "Path where output will be placed."
+            },
+            "resourcesOutputPath": {
+              "type": "string",
+              "description": "The path where style resources will be placed, relative to outputPath."
             },
             "sourceMap": {
               "type": "boolean",
