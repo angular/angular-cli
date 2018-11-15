@@ -72,6 +72,7 @@ export interface BrowserBuilderSchema {
   vendorSourceMap?: boolean;
 
   /**
+    @deprecated
    * Output in-file eval sourcemaps.
    */
   evalSourceMap: boolean;

@@ -74,7 +74,8 @@
     },
     "evalSourceMap": {
       "type": "boolean",
-      "description": "Output in-file eval sourcemaps."
+      "description": "Output in-file eval sourcemaps.",
+      "x-deprecated": true
     },
     "progress": {
       "type": "boolean",
