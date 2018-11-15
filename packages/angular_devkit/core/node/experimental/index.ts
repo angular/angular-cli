@@ -5,10 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import * as jobs from './experimental/jobs/index';
-import * as workspace from './workspace/index';
+import * as jobs from './job-registry';
 
 export {
   jobs,
-  workspace,
 };
