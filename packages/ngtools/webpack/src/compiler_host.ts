@@ -46,6 +46,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     basePath: string,
     host: virtualFs.Host,
     private readonly cacheSourceFiles: boolean,
+    private readonly directTemplateLoading = false,
   ) {
     this._syncHost = new virtualFs.SyncDelegateHost(host);
     this._memoryHost = new virtualFs.SyncDelegateHost(new virtualFs.SimpleMemoryHost());
@@ -326,6 +327,10 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   readResource(fileName: string) {
+    if (this.directTemplateLoading && fileName.endsWith('.html')) {
+      return this.readFile(fileName);
+    }
+
     if (this._resourceLoader) {
       // These paths are meant to be used by the loader so we must denormalize them.
       const denormalizedFileName = this.denormalizePath(normalize(fileName));

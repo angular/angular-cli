@@ -43,6 +43,7 @@ The loader works with webpack plugin to compile your TypeScript. It's important 
 * `sourceMap`. Optional. Include sourcemaps.
 * `compilerOptions`. Optional. Override options in `tsconfig.json`.
 * `contextElementDependencyConstructor`. Optional. Set to `require('webpack/lib/dependencies/ContextElementDependency')` if you are having `No module factory available for dependency type: ContextElementDependency` errors.
+* `directTemplateLoading`. Optional. Causes the plugin to load component templates (HTML) directly from the filesystem.  This is more efficient if only using the `raw-loader` to load component templates.  Do not enable this option if additional loaders are configured for component templates.
 
 ## Features
 The benefits and ability of using [`@ngtools/webpack`](https://www.npmjs.com/~ngtools) standalone from the Angular CLI as presented in [Stephen Fluin's Angular CLI talk](https://youtu.be/uBRK6cTr4Vk?t=6m45s) at Angular Connect 2016:
