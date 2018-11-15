@@ -7,6 +7,7 @@
  */
 export * from './interface';
 export * from './parser';
+export * from './stringify';
 
 import * as schema from './schema';
 export { schema };
