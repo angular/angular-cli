@@ -27,6 +27,7 @@ import {
   SchemaValidatorResult,
   SmartDefaultProvider,
 } from './interface';
+import { JsonSchema } from './schema';
 import { visitJson, visitJsonSchema } from './visitor';
 
 // This interface should be exported from ajv, but they only export the class and not the type.
@@ -299,7 +300,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
    * (using schema as a URI).
    * @returns An Observable of the Validation function.
    */
-  compile(schema: JsonObject): Observable<SchemaValidator> {
+  compile(schema: JsonSchema): Observable<SchemaValidator> {
     const schemaInfo: SchemaInfo = {
       smartDefaultRecord: new Map<string, JsonObject>(),
       promptDefinitions: [],
@@ -346,6 +347,10 @@ export class CoreSchemaRegistry implements SchemaRegistry {
             // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/3989
             result = (result as any).pipe(
               ...[...this._pre].map(visitor => concatMap((data: JsonValue) => {
+                if (schema === false || schema === true) {
+                  return of(data);
+                }
+
                 return visitJson(data, visitor, schema, this._resolver, validate);
               })),
             );
@@ -368,6 +373,9 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
                 return value;
               };
+              if (schema === false || schema === true) {
+                return of(updatedData);
+              }
 
               return visitJson(updatedData, visitor, schema, this._resolver, validate);
             }),
@@ -410,6 +418,10 @@ export class CoreSchemaRegistry implements SchemaRegistry {
                   // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/3989
                   result = (result as any).pipe(
                     ...[...this._post].map(visitor => concatMap((data: JsonValue) => {
+                      if (schema === false || schema === true) {
+                        return of(schema);
+                      }
+
                       return visitJson(data, visitor, schema, this._resolver, validate);
                     })),
                   );
