@@ -6,11 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { JsonObject, isJsonArray, isJsonObject } from '../interface';
+import { JsonSchema } from './schema';
 
 
 const allTypes = ['string', 'integer', 'number', 'object', 'array', 'boolean', 'null'];
 
-export function getTypesOfSchema(schema: JsonObject | true): Set<string> {
+export function getTypesOfSchema(schema: JsonSchema): Set<string> {
   if (!schema) {
     return new Set();
   }
