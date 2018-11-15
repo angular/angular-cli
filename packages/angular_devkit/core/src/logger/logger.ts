@@ -107,6 +107,9 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
     });
     this._subject.next(entry);
   }
+  next(entry: LogEntry): void {
+    this._subject.next(entry);
+  }
 
   debug(message: string, metadata: JsonObject = {}) {
     return this.log('debug', message, metadata);

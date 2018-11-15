@@ -472,6 +472,7 @@ export declare class Logger extends Observable<LogEntry> implements LoggerApi {
     info(message: string, metadata?: JsonObject): void;
     lift<R>(operator: Operator<LogEntry, R>): Observable<R>;
     log(level: LogLevel, message: string, metadata?: JsonObject): void;
+    next(entry: LogEntry): void;
     subscribe(): Subscription;
     subscribe(observer: PartialObserver<LogEntry>): Subscription;
     subscribe(next?: (value: LogEntry) => void, error?: (error: Error) => void, complete?: () => void): Subscription;
