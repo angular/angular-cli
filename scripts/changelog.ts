@@ -55,7 +55,7 @@ export default function(args: ChangelogOptions, logger: logging.Logger) {
         const commit = chunk.toString('utf-8')
           .replace(/https?:\/\/github.com\/(.*?)\/issues\/(\d+)/g, '@$1#$2');
 
-        callback(undefined, new Buffer(commit));
+        callback(undefined, Buffer.from(commit));
       }))
       .pipe(conventionalCommitsParser({
         headerPattern: /^(\w*)(?:\(([^)]*)\))?: (.*)$/,
