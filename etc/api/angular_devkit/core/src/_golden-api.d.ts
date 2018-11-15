@@ -165,7 +165,7 @@ export declare class CoreSchemaRegistry implements SchemaRegistry {
     addPostTransform(visitor: JsonVisitor, deps?: JsonVisitor[]): void;
     addPreTransform(visitor: JsonVisitor, deps?: JsonVisitor[]): void;
     addSmartDefaultProvider<T>(source: string, provider: SmartDefaultProvider<T>): void;
-    compile(schema: JsonObject): Observable<SchemaValidator>;
+    compile(schema: JsonSchema): Observable<SchemaValidator>;
     flatten(schema: JsonObject): Observable<JsonObject>;
     registerUriHandler(handler: UriHandler): void;
     usePromptProvider(provider: PromptProvider): void;
@@ -226,7 +226,7 @@ export declare function fragment(path: string): PathFragment;
 
 export declare function getSystemPath(path: Path): string;
 
-export declare function getTypesOfSchema(schema: JsonObject | true): Set<string>;
+export declare function getTypesOfSchema(schema: JsonSchema): Set<string>;
 
 export declare const gray: (x: string) => string;
 
@@ -991,7 +991,7 @@ export declare type UriHandler = (uri: string) => Observable<JsonObject> | Promi
 
 export declare function visitJson<ContextT>(json: JsonValue, visitor: JsonVisitor, schema?: JsonObject, refResolver?: ReferenceResolver<ContextT>, context?: ContextT): Observable<JsonValue>;
 
-export declare function visitJsonSchema(schema: JsonObject, visitor: JsonSchemaVisitor): void;
+export declare function visitJsonSchema(schema: JsonSchema, visitor: JsonSchemaVisitor): void;
 
 export declare const white: (x: string) => string;
 

@@ -11,6 +11,7 @@ import { isObservable } from '../../utils';
 import { JsonArray, JsonObject, JsonValue } from '../interface';
 import { JsonPointer, JsonSchemaVisitor, JsonVisitor } from './interface';
 import { buildJsonPointer, joinJsonPointer } from './pointer';
+import { JsonSchema } from './schema';
 
 
 export interface ReferenceResolver<ContextT> {
@@ -139,7 +140,12 @@ export function visitJson<ContextT>(
 }
 
 
-export function visitJsonSchema(schema: JsonObject, visitor: JsonSchemaVisitor) {
+export function visitJsonSchema(schema: JsonSchema, visitor: JsonSchemaVisitor) {
+  if (schema === false || schema === true) {
+    // Nothing to visit.
+    return;
+  }
+
   const keywords = {
     additionalItems: true,
     items: true,
