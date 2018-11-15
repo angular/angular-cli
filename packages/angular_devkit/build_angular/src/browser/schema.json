@@ -206,7 +206,8 @@
     "skipAppShell": {
       "type": "boolean",
       "description": "Flag to prevent building an app shell.",
-      "default": false
+      "default": false,
+      "x-deprecated": true
     },
     "index": {
       "type": "string",
