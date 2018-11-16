@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  *
  */
+// tslint:disable:no-global-tslint-disable no-big-function
 import { logging } from '@angular-devkit/core';
 import { Arguments, Option, OptionType } from './interface';
 import { ParseArgumentException, parseArguments } from './parser';
@@ -64,6 +65,10 @@ describe('parseArguments', () => {
     '--str=false val1 val2': { str: 'false', p1: 'val1', p2: 'val2' },
     '--str=false val1 val2 --num1': { str: 'false', p1: 'val1', p2: 'val2', '--': ['--num1'] },
     '--str=false val1 --num1 val2': { str: 'false', p1: 'val1', '--': ['--num1', 'val2'] },
+    '--bool --bool=false': { bool: false },
+    '--bool --bool=false --bool': { bool: true },
+    '--num=1 --num=2 --num=3': { num: 3 },
+    '--str=1 --str=2 --str=3': { str: '3' },
     'val1 --num=1 val2': { num: 1, p1: 'val1', p2: 'val2' },
     '--p1=val1 --num=1 val2': { num: 1, p1: 'val1', p2: 'val2' },
     '--p1=val1 --num=1 --p2=val2 val3': { num: 1, p1: 'val1', p2: 'val2', '--': ['val3'] },
@@ -74,6 +79,7 @@ describe('parseArguments', () => {
     ],
     '--bool val1 --etc --num=1 val2 --v': { bool: true, num: 1, p1: 'val1', p2: 'val2',
                                             '--': ['--etc', '--v'] },
+    '--arr=a d': { arr: ['a'], p1: 'd' },
     '--arr=a --arr=b --arr c d': { arr: ['a', 'b', 'c'], p1: 'd' },
     '--arr=1 --arr --arr c d': { arr: ['1', '', 'c'], p1: 'd' },
     '--arr=1 --arr --arr c d e': { arr: ['1', '', 'c'], p1: 'd', p2: 'e' },
@@ -195,6 +201,37 @@ describe('parseArguments', () => {
     expect(messages[0]).toMatch(/\bdepr\b/);
     expect(messages[1]).toMatch(/\bdeprM\b/);
     expect(messages[1]).toMatch(/\bABCD\b/);
+    messages.shift();
+  });
+
+  it('handles a flag being added multiple times', () => {
+    const options = [
+      { name: 'bool', aliases: [], type: OptionType.Boolean, description: '' },
+    ];
+
+    const logger = new logging.Logger('');
+    const messages: string[] = [];
+
+    logger.subscribe(entry => messages.push(entry.message));
+
+    let result = parseArguments(['--bool'], options, logger);
+    expect(result).toEqual({ bool: true });
+    expect(messages).toEqual([]);
+
+    result = parseArguments(['--bool', '--bool'], options, logger);
+    expect(result).toEqual({ bool: true });
+    expect(messages).toEqual([]);
+
+    result = parseArguments(['--bool', '--bool=false'], options, logger);
+    expect(result).toEqual({ bool: false });
+    expect(messages.length).toEqual(1);
+    expect(messages[0]).toMatch(/\bbool\b.*\btrue\b.*\bfalse\b/);
+    messages.shift();
+
+    result = parseArguments(['--bool', '--bool=false', '--bool=false'], options, logger);
+    expect(result).toEqual({ bool: false });
+    expect(messages.length).toEqual(1);
+    expect(messages[0]).toMatch(/\bbool\b.*\btrue\b.*\bfalse\b/);
     messages.shift();
   });
 });
