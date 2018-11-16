@@ -63,7 +63,11 @@ function _coerceType(str: string | undefined, type: OptionType, v?: Value): Valu
       }
 
     case OptionType.Array:
-      return Array.isArray(v) ? v.concat(str || '') : [str || ''];
+      return Array.isArray(v)
+        ? v.concat(str || '')
+        : v === undefined
+          ? [str || '']
+          : [v + '', str || ''];
 
     default:
       return undefined;
@@ -119,14 +123,14 @@ function _removeLeadingDashes(key: string): string {
 function _assignOption(
   arg: string,
   args: string[],
-  { options, parsedOptions, leftovers, ignored, errors, deprecations }: {
+  { options, parsedOptions, leftovers, ignored, errors, warnings }: {
     options: Option[],
     parsedOptions: Arguments,
     positionals: string[],
     leftovers: string[],
     ignored: string[],
     errors: string[],
-    deprecations: string[],
+    warnings: string[],
   },
 ) {
   const from = arg.startsWith('--') ? 2 : 1;
@@ -188,11 +192,21 @@ function _assignOption(
   } else {
     const v = _coerce(value, option, parsedOptions[option.name]);
     if (v !== undefined) {
-      parsedOptions[option.name] = v;
+      if (parsedOptions[option.name] !== v) {
+        if (parsedOptions[option.name] !== undefined) {
+          warnings.push(
+            `Option ${JSON.stringify(option.name)} was already specified with value `
+            + `${JSON.stringify(parsedOptions[option.name])}. The new value ${JSON.stringify(v)} `
+            + `will override it.`,
+          );
+        }
 
-      if (option.deprecated !== undefined && option.deprecated !== false) {
-        deprecations.push(`Option ${JSON.stringify(option.name)} is deprecated${
+        parsedOptions[option.name] = v;
+
+        if (option.deprecated !== undefined && option.deprecated !== false) {
+          warnings.push(`Option ${JSON.stringify(option.name)} is deprecated${
             typeof option.deprecated == 'string' ? ': ' + option.deprecated : ''}.`);
+        }
       }
     } else {
       let error = `Argument ${key} could not be parsed using value ${JSON.stringify(value)}.`;
@@ -285,9 +299,9 @@ export function parseArguments(
 
   const ignored: string[] = [];
   const errors: string[] = [];
-  const deprecations: string[] = [];
+  const warnings: string[] = [];
 
-  const state = { options, parsedOptions, positionals, leftovers, ignored, errors, deprecations };
+  const state = { options, parsedOptions, positionals, leftovers, ignored, errors, warnings };
 
   for (let arg = args.shift(); arg !== undefined; arg = args.shift()) {
     if (arg == '--') {
@@ -369,8 +383,8 @@ export function parseArguments(
     parsedOptions['--'] = [...positionals, ...leftovers];
   }
 
-  if (deprecations.length > 0 && logger) {
-    deprecations.forEach(message => logger.warn(message));
+  if (warnings.length > 0 && logger) {
+    warnings.forEach(message => logger.warn(message));
   }
 
   if (errors.length > 0) {
