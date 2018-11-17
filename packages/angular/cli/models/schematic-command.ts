@@ -50,7 +50,6 @@ import { BaseCommandOptions, Command } from './command';
 import { Arguments, CommandContext, CommandDescription, Option } from './interface';
 import { parseArguments, parseFreeFormArguments } from './parser';
 
-
 export interface BaseSchematicSchema {
   debug?: boolean;
   dryRun?: boolean;
@@ -310,7 +309,8 @@ export abstract class SchematicCommand<
               question.type = 'confirm';
               break;
             case 'list':
-              question.type = 'list';
+            case 'checkbox':
+              question.type = definition.type;
               question.choices = definition.items && definition.items.map(item => {
                 if (typeof item == 'string') {
                   return item;

@@ -99,7 +99,7 @@ export interface PromptDefinition {
   id: string;
   type: string;
   message: string;
-  default?: string | number | boolean | null;
+  default?: string | string[] | number | boolean | null;
   priority: number;
   validator?: (value: string) => boolean | string | Promise<boolean | string>;
 
@@ -109,7 +109,7 @@ export interface PromptDefinition {
 }
 
 export type PromptProvider = (definitions: Array<PromptDefinition>)
-  => SubscribableOrPromise<{ [id: string]: JsonValue }>;
+  => SubscribableOrPromise<{ [id: string]: JsonValue } | { [id: string]: JsonValue }[]>;
 
 export interface SchemaRegistry {
   compile(schema: Object): Observable<SchemaValidator>;

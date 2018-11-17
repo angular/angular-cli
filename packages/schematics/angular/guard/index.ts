@@ -27,6 +27,7 @@ import { Schema as GuardOptions } from './schema';
 
 
 export default function (options: GuardOptions): Rule {
+
   return (host: Tree) => {
     if (!options.project) {
       throw new SchematicsException('Option (project) is required.');
@@ -36,6 +37,16 @@ export default function (options: GuardOptions): Rule {
     if (options.path === undefined) {
       options.path = buildDefaultPath(project);
     }
+    let implementations = '';
+    let implementationImports = '';
+    if (options.implements && options.implements.length > 0) {
+      implementations = options.implements.join(', ');
+      implementationImports = `${implementations}, `;
+      // As long as we aren't in IE... ;)
+      if (options.implements.includes('CanLoad')) {
+        implementationImports = `${implementationImports}Route, UrlSegment, `;
+      }
+    }
 
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
@@ -44,6 +55,8 @@ export default function (options: GuardOptions): Rule {
     const templateSource = apply(url('./files'), [
       options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
       template({
+        implementations: implementations,
+        implementationImports: implementationImports,
         ...strings,
         ...options,
       }),
