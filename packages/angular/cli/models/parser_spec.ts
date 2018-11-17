@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  *
  */
+import { logging } from '@angular-devkit/core';
 import { Arguments, Option, OptionType } from './interface';
 import { ParseArgumentException, parseArguments } from './parser';
 
@@ -14,6 +15,7 @@ describe('parseArguments', () => {
     { name: 'bool', aliases: [ 'b' ], type: OptionType.Boolean, description: '' },
     { name: 'num', aliases: [ 'n' ], type: OptionType.Number, description: '' },
     { name: 'str', aliases: [ 's' ], type: OptionType.String, description: '' },
+    { name: 'strUpper', aliases: [ 'S' ], type: OptionType.String, description: '' },
     { name: 'helloWorld', aliases: [], type: OptionType.String, description: '' },
     { name: 'helloBool', aliases: [], type: OptionType.Boolean, description: '' },
     { name: 'arr', aliases: [ 'a' ], type: OptionType.Array, description: '' },
@@ -34,6 +36,7 @@ describe('parseArguments', () => {
   ];
 
   const tests: { [test: string]: Partial<Arguments> | ['!!!', Partial<Arguments>, string[]] } = {
+    '-S=b': { strUpper: 'b' },
     '--bool': { bool: true },
     '--bool=1': ['!!!', {}, ['--bool=1']],
     '--bool  ': { bool: true, p1: '' },
@@ -128,6 +131,14 @@ describe('parseArguments', () => {
     '--e3 true': { e3: true },
     '--e3=true': { e3: true },
     'a b c 1': { p1: 'a', p2: 'b', '--': ['c', '1'] },
+
+    '-p=1 -c=prod': {'--': ['-p=1', '-c=prod'] },
+    '--p --c': {'--': ['--p', '--c'] },
+    '--p=123': {'--': ['--p=123'] },
+    '--p -c': {'--': ['--p', '-c'] },
+    '-p --c': {'--': ['-p', '--c'] },
+    '-p --c 123': {'--': ['-p', '--c', '123'] },
+    '--c 123 -p': {'--': ['--c', '123', '-p'] },
   };
 
   Object.entries(tests).forEach(([str, expected]) => {
@@ -148,5 +159,42 @@ describe('parseArguments', () => {
         expect(e.ignored).toEqual(expected[2] as string[]);
       }
     });
+  });
+
+  it('handles deprecation', () => {
+    const options = [
+      { name: 'bool', aliases: [], type: OptionType.Boolean, description: '' },
+      { name: 'depr', aliases: [], type: OptionType.Boolean, description: '', deprecated: true },
+      { name: 'deprM', aliases: [], type: OptionType.Boolean, description: '', deprecated: 'ABCD' },
+    ];
+
+    const logger = new logging.Logger('');
+    const messages: string[] = [];
+
+    logger.subscribe(entry => messages.push(entry.message));
+
+    let result = parseArguments(['--bool'], options, logger);
+    expect(result).toEqual({ bool: true });
+    expect(messages).toEqual([]);
+
+    result = parseArguments(['--depr'], options, logger);
+    expect(result).toEqual({ depr: true });
+    expect(messages.length).toEqual(1);
+    expect(messages[0]).toMatch(/\bdepr\b/);
+    messages.shift();
+
+    result = parseArguments(['--depr', '--bool'], options, logger);
+    expect(result).toEqual({ depr: true, bool: true });
+    expect(messages.length).toEqual(1);
+    expect(messages[0]).toMatch(/\bdepr\b/);
+    messages.shift();
+
+    result = parseArguments(['--depr', '--bool', '--deprM'], options, logger);
+    expect(result).toEqual({ depr: true, deprM: true, bool: true });
+    expect(messages.length).toEqual(2);
+    expect(messages[0]).toMatch(/\bdepr\b/);
+    expect(messages[1]).toMatch(/\bdeprM\b/);
+    expect(messages[1]).toMatch(/\bABCD\b/);
+    messages.shift();
   });
 });

@@ -29,7 +29,8 @@ ts_library(
         "//packages/angular_devkit/schematics:tasks",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: node
+        "@npm//@types/node",
+        "@npm//@types/semver",
     ],
 )
 
@@ -63,12 +64,26 @@ ts_library(
         "//packages/angular_devkit/schematics:testing",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: jasmine
-        # @typings: node
+        "@npm//@types/jasmine",
+        "@npm//@types/node",
+        "@npm//@types/semver",
+        "@npm//@yarnpkg/lockfile",
+        "@npm//ini",
+        "@npm//pacote",
     ],
+    testonly = True,
+    # @external_begin
+    tsconfig = "//:tsconfig-test.json",
+    # @external_end
 )
 
 jasmine_node_test(
     name = "update_test",
     srcs = [":update_test_lib"],
+    deps = [
+        "@npm//jasmine",
+        "@npm//source-map",
+        "@npm//chokidar",
+        "@npm//npm-registry-client",
+    ],
 )

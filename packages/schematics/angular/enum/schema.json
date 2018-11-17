@@ -3,6 +3,7 @@
   "id": "SchematicsAngularEnum",
   "title": "Angular Enum Options Schema",
   "type": "object",
+  "description": "Generates a new, generic enum definition for the given or default project.",
   "properties": {
     "name": {
       "type": "string",
@@ -16,12 +17,12 @@
     "path": {
       "type": "string",
       "format": "path",
-      "description": "The path to create the enum.",
+      "description": "The path at which to create the enum definition, relative to the current workspace.",
       "visible": false
     },
     "project": {
       "type": "string",
-      "description": "The name of the project.",
+      "description": "The name of the project in which to create the enum. Default is the configured default project for the workspace.",
       "$default": {
         "$source": "projectName"
       }
@@ -29,7 +30,7 @@
     "lintFix": {
       "type": "boolean",
       "default": false,
-      "description": "Specifies whether to apply lint fixes after generating the enum."
+      "description": "When true, applies lint fixes after generating the enum."
     }
   },
   "required": [

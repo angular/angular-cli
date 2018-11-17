@@ -71,6 +71,11 @@
       "type": "string",
       "description": "The full path for the new output directory, relative to the current workspace.\n\nBy default, writes output to a folder named dist/ in the current project."
     },
+    "resourcesOutputPath": {
+      "type": "string",
+      "description": "The path where style resources will be placed, relative to outputPath.",
+      "default": ""
+    },
     "aot": {
       "type": "boolean",
       "description": "Build using Ahead of Time compilation.",
@@ -206,7 +211,8 @@
     "skipAppShell": {
       "type": "boolean",
       "description": "Flag to prevent building an app shell.",
-      "default": false
+      "default": false,
+      "x-deprecated": true
     },
     "index": {
       "type": "string",

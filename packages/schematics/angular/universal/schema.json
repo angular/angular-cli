@@ -3,15 +3,16 @@
   "id": "SchematicsAngularUniversalApp",
   "title": "Angular Universal App Options Schema",
   "type": "object",
+  "description": "Pass this schematic to the \"run\" command to set up server-side rendering for an app.",
   "properties": {
     "clientProject": {
       "type": "string",
-      "description": "Name of related client app."
+      "description": "The name of the related client app. Required in place of \"project\"."
     },
     "appId": {
       "type": "string",
       "format": "html-selector",
-      "description": "The appId to use withServerTransition.",
+      "description": "The app identifier to use for transition.",
       "default": "serverApp"
     },
     "main": {
@@ -39,22 +40,22 @@
     "appDir": {
       "type": "string",
       "format": "path",
-      "description": "The name of the application directory.",
+      "description": "The name of the application folder.",
       "default": "app"
     },
     "rootModuleFileName": {
       "type": "string",
       "format": "path",
-      "description": "The name of the root module file",
+      "description": "The name of the root NgModule file.",
       "default": "app.server.module.ts"
     },
     "rootModuleClassName": {
       "type": "string",
-      "description": "The name of the root module class.",
+      "description": "The name of the root NgModule class.",
       "default": "AppServerModule"
     },
     "skipInstall": {
-      "description": "Skip installing dependency packages.",
+      "description": "When true, does not install packages for dependencies.",
       "type": "boolean",
       "default": false
     }

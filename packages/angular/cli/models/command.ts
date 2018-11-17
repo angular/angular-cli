@@ -85,12 +85,15 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     const args = options.filter(opt => opt.positional !== undefined);
     const opts = options.filter(opt => opt.positional === undefined);
 
+    const formatDescription = (description: string) =>
+      `    ${description.replace(/\n/g, '\n    ')}`;
+
     if (args.length > 0) {
       this.logger.info(`arguments:`);
       args.forEach(o => {
         this.logger.info(`  ${terminal.cyan(o.name)}`);
         if (o.description) {
-          this.logger.info(`    ${o.description}`);
+          this.logger.info(formatDescription(o.description));
         }
       });
     }
@@ -108,7 +111,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
             : '';
           this.logger.info(`  ${terminal.cyan('--' + strings.dasherize(o.name))} ${aliases}`);
           if (o.description) {
-            this.logger.info(`    ${o.description}`);
+            this.logger.info(formatDescription(o.description));
           }
         });
     }

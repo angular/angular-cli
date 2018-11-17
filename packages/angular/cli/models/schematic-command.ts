@@ -36,16 +36,15 @@ import {
 } from '@angular-devkit/schematics/tools';
 import * as inquirer from 'inquirer';
 import * as systemPath from 'path';
-import { take } from 'rxjs/operators';
 import { WorkspaceLoader } from '../models/workspace-loader';
 import {
-  getPackageManager,
   getProjectByCwd,
   getSchematicDefaults,
   getWorkspace,
   getWorkspaceRaw,
 } from '../utilities/config';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
+import { getPackageManager } from '../utilities/package-manager';
 import { BaseCommandOptions, Command } from './command';
 import { Arguments, CommandContext, CommandDescription, Option } from './interface';
 import { parseArguments, parseFreeFormArguments } from './parser';
@@ -61,7 +60,7 @@ export interface BaseSchematicSchema {
 export interface RunSchematicOptions extends BaseSchematicSchema {
   collectionName: string;
   schematicName: string;
-
+  additionalOptions?: { [key: string]: {} };
   schematicOptions?: string[];
   showNothingDone?: boolean;
 }
@@ -96,7 +95,7 @@ export abstract class SchematicCommand<
   }
 
   public async initialize(options: T & Arguments) {
-    this._loadWorkspace();
+    await this._loadWorkspace();
     this.createWorkflow(options);
 
     if (this.schematicName) {
@@ -255,7 +254,7 @@ export abstract class SchematicCommand<
         {
           force,
           dryRun,
-          packageManager: getPackageManager(),
+          packageManager: getPackageManager(this.workspace.root),
           root: normalize(this.workspace.root),
         },
     );
@@ -444,7 +443,11 @@ export abstract class SchematicCommand<
     // Read the default values from the workspace.
     const projectName = input.project !== undefined ? '' + input.project : null;
     const defaults = getSchematicDefaults(collectionName, schematicName, projectName);
-    input = Object.assign<{}, {}, typeof input>({}, defaults, input);
+    input = {
+      ...defaults,
+      ...input,
+      ...options.additionalOptions,
+    };
 
     workflow.reporter.subscribe((event: DryRunEvent) => {
       nothingDone = false;
@@ -534,31 +537,22 @@ export abstract class SchematicCommand<
     schematicOptions: string[],
     options: Option[] | null,
   ): Promise<Arguments> {
-    return parseArguments(schematicOptions, options);
+    return parseArguments(schematicOptions, options, this.logger);
   }
 
-  private _loadWorkspace() {
+  private async _loadWorkspace() {
     if (this._workspace) {
       return;
     }
     const workspaceLoader = new WorkspaceLoader(this._host);
 
     try {
-      workspaceLoader.loadWorkspace(this.workspace.root).pipe(take(1))
-        .subscribe(
-          (workspace: experimental.workspace.Workspace) => this._workspace = workspace,
-          (err: Error) => {
-            if (!this.allowMissingWorkspace) {
-              // Ignore missing workspace
-              throw err;
-            }
-          },
-        );
+      this._workspace = await workspaceLoader.loadWorkspace(this.workspace.root);
     } catch (err) {
       if (!this.allowMissingWorkspace) {
         // Ignore missing workspace
         throw err;
-  }
+      }
     }
   }
 }

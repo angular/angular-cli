@@ -25,13 +25,15 @@ describe('Workspace Schematic', () => {
 
     const tree = schematicRunner.runSchematic('workspace', options);
     const files = tree.files;
-    expect(files.indexOf('/.editorconfig')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/angular.json')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/.gitignore')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/package.json')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/README.md')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/tsconfig.json')).toBeGreaterThanOrEqual(0);
-    expect(files.indexOf('/tslint.json')).toBeGreaterThanOrEqual(0);
+    expect(files).toEqual(jasmine.arrayContaining([
+      '/.editorconfig',
+      '/angular.json',
+      '/.gitignore',
+      '/package.json',
+      '/README.md',
+      '/tsconfig.json',
+      '/tslint.json',
+    ]));
   });
 
   it('should set the name in package.json', () => {
@@ -53,5 +55,20 @@ describe('Workspace Schematic', () => {
     expect(pkg.dependencies['rxjs']).toEqual(latestVersions.RxJs);
     expect(pkg.dependencies['zone.js']).toEqual(latestVersions.ZoneJs);
     expect(pkg.devDependencies['typescript']).toEqual(latestVersions.TypeScript);
+  });
+
+  it('should create correct files when using minimal', () => {
+    const tree = schematicRunner.runSchematic('workspace', { ...defaultOptions, minimal: true });
+    const files = tree.files;
+    expect(files).toEqual(jasmine.arrayContaining([
+      '/angular.json',
+      '/.gitignore',
+      '/package.json',
+      '/README.md',
+      '/tsconfig.json',
+    ]));
+
+    expect(files).not.toContain('/tslint.json');
+    expect(files).not.toContain('/.editorconfig');
   });
 });

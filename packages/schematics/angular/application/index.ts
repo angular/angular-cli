@@ -22,6 +22,8 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
+import { Schema as ComponentOptions } from '../component/schema';
 import { Schema as E2eOptions } from '../e2e/schema';
 import {
   addProjectToWorkspace,
@@ -63,8 +65,8 @@ import { Schema as ApplicationOptions } from './schema';
 //   );
 // }
 
-function addDependenciesToPackageJson() {
-  return (host: Tree) => {
+function addDependenciesToPackageJson(options: ApplicationOptions) {
+  return (host: Tree, context: SchematicContext) => {
     [
       {
         type: NodeDependencyType.Dev,
@@ -82,6 +84,10 @@ function addDependenciesToPackageJson() {
         version: latestVersions.TypeScript,
       },
     ].forEach(dependency => addPackageJsonDependency(host, dependency));
+
+    if (!options.skipInstall) {
+      context.addTask(new NodePackageInstallTask());
+    }
 
     return host;
   };
@@ -241,11 +247,9 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
 }
 
 function minimalPathFilter(path: string): boolean {
-  const toRemoveList: RegExp[] = [/e2e\//, /editorconfig/, /README/, /karma.conf.js/,
-                                  /protractor.conf.js/, /test.ts/, /tsconfig.spec.json/,
-                                  /tslint.json/, /favicon.ico/];
+  const toRemoveList = /(test.ts|tsconfig.spec.json|karma.conf.js)$/;
 
-  return !toRemoveList.some(re => re.test(path));
+  return !toRemoveList.test(path);
 }
 
 export default function (options: ApplicationOptions): Rule {
@@ -256,20 +260,20 @@ export default function (options: ApplicationOptions): Rule {
     validateProjectName(options.name);
     const prefix = options.prefix || 'app';
     const appRootSelector = `${prefix}-root`;
-    const componentOptions = !options.minimal ?
-    {
-      inlineStyle: options.inlineStyle,
-      inlineTemplate: options.inlineTemplate,
-      spec: !options.skipTests,
-      styleext: options.style,
-      viewEncapsulation: options.viewEncapsulation,
-    } :
-    {
-      inlineStyle: true,
-      InlineTemplate: true,
-      spec: false,
-      styleext: options.style,
-    };
+    const componentOptions: Partial<ComponentOptions> = !options.minimal ?
+      {
+        inlineStyle: options.inlineStyle,
+        inlineTemplate: options.inlineTemplate,
+        spec: !options.skipTests,
+        styleext: options.style,
+        viewEncapsulation: options.viewEncapsulation,
+      } :
+      {
+        inlineStyle: true,
+        inlineTemplate: true,
+        spec: false,
+        styleext: options.style,
+      };
 
     const workspace = getWorkspace(host);
     let newProjectRoot = workspace.newProjectRoot;
@@ -299,7 +303,6 @@ export default function (options: ApplicationOptions): Rule {
 
     return chain([
       addAppToWorkspaceFile(options, workspace),
-      options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
       mergeWith(
         apply(url('./files/src'), [
           options.minimal ? filter(minimalPathFilter) : noop(),
@@ -323,9 +326,8 @@ export default function (options: ApplicationOptions): Rule {
           }),
           move(appDir),
         ])),
-      mergeWith(
+      options.minimal ? noop() : mergeWith(
         apply(url('./files/lint'), [
-          options.minimal ? filter(minimalPathFilter) : noop(),
           template({
             utils: strings,
             ...options,
@@ -368,7 +370,8 @@ export default function (options: ApplicationOptions): Rule {
           }),
           move(sourceDir),
         ]), MergeStrategy.Overwrite),
-      schematic('e2e', e2eOptions),
+      options.minimal ? noop() : schematic('e2e', e2eOptions),
+      options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
     ]);
   };
 }

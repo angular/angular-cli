@@ -194,6 +194,7 @@ function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
       configurations: {
         production: {
           browserTarget: `${options.clientProject}:build:production`,
+          serverTarget: `${options.clientProject}:server:production`,
         },
       },
     };

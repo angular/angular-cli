@@ -65,8 +65,8 @@ export class TypeScriptPathsPlugin {
           return;
         }
 
-        // Amd requests are not mapped
-        if (originalRequest.startsWith('!!webpack amd')) {
+        // Ignore all webpack special requests
+        if (originalRequest.startsWith('!!')) {
           return;
         }
 
@@ -113,6 +113,10 @@ function findReplacements(
         });
       }
     } else if (starIndex === 0 && pattern.length === 1) {
+      if (potentials.length === 1 && potentials[0] === '*') {
+        // identity mapping -> noop
+        continue;
+      }
       pathMapOptions.push({
         starIndex,
         partial: originalRequest,

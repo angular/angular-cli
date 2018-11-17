@@ -3,6 +3,7 @@
   "id": "SchematicsAngularServiceWorker",
   "title": "Angular Service Worker Options Schema",
   "type": "object",
+  "description": "Pass this schematic to the \"run\" command to create a service worker",
   "properties": {
     "project": {
       "type": "string",

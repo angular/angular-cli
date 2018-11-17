@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/config.json",
-  "description": "Retrieves or sets Angular configuration values.",
+  "description": "Retrieves or sets Angular configuration values in the angular.json file for the workspace.",
   "$longDescription": "",
 
   "$aliases": [],

@@ -43,14 +43,16 @@ ts_library(
             "utility/test/**/*.ts"
         ],
     ),
+    module_name = "@schematics/angular",
+    # strict_checks = False,
     deps = ALL_SCHEMA_DEPS + [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tasks",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: typescript
-        # @typings: node
+        "@npm//@types/node",
+        "@npm//typescript",
     ],
 )
 
@@ -78,12 +80,22 @@ ts_library(
         "//packages/angular_devkit/schematics:testing",
         "@rxjs",
         "@rxjs//operators",
-        # @typings: jasmine
-        # @typings: node
+        "@npm//@types/node",
+        "@npm//@types/jasmine",
+        "@npm//typescript",
     ],
+    testonly = True,
+    # @external_begin
+    tsconfig = "//:tsconfig-test.json",
+    # @external_end
 )
 
 jasmine_node_test(
     name = "angular_test",
     srcs = [":angular_test_lib"],
+    deps = [
+        "@npm//jasmine",
+        "@npm//source-map",
+        "@npm//chokidar",
+    ],
 )

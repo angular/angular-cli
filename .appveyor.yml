@@ -4,6 +4,9 @@ environment:
 matrix:
   fast_finish: true
 
+skip_tags: true
+skip_branch_with_pr: true
+
 install:
   - ps: Install-Product node $env:nodejs_version
   # --network-timeout is a workaround for https://github.com/yarnpkg/yarn/issues/6221

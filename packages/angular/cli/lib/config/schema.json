@@ -93,7 +93,7 @@
             },
             "flat": {
               "type": "boolean",
-              "description": "Flag to indicate if a dir is created.",
+              "description": "Flag to indicate if a directory is created.",
               "default": false
             },
             "inlineStyle": {
@@ -157,7 +157,7 @@
             },
             "flat": {
               "type": "boolean",
-              "description": "Flag to indicate if a dir is created.",
+              "description": "Flag to indicate if a directory is created.",
               "default": true
             },
             "module": {
@@ -210,7 +210,7 @@
             },
             "flat": {
               "type": "boolean",
-              "description": "Flag to indicate if a dir is created.",
+              "description": "Flag to indicate if a directory is created.",
               "default": false
             },
             "commonModule": {
@@ -232,7 +232,7 @@
             "flat": {
               "type": "boolean",
               "default": true,
-              "description": "Flag to indicate if a dir is created."
+              "description": "Flag to indicate if a directory is created."
             },
             "spec": {
               "type": "boolean",
@@ -247,7 +247,7 @@
             "flat": {
               "type": "boolean",
               "default": true,
-              "description": "Flag to indicate if a dir is created."
+              "description": "Flag to indicate if a directory is created."
             },
             "spec": {
               "type": "boolean",
@@ -623,6 +623,10 @@
               "type": "string",
               "description": "Path where output will be placed."
             },
+            "resourcesOutputPath": {
+              "type": "string",
+              "description": "The path where style resources will be placed, relative to outputPath."
+            },
             "aot": {
               "type": "boolean",
               "description": "Build using Ahead of Time compilation.",
@@ -751,6 +755,10 @@
               "type": "boolean",
               "description": "Generates a service worker config for production builds.",
               "default": false
+            },
+            "ngswConfigPath": {
+              "type": "string",
+              "description": "Path to ngsw-config.json."
             },
             "skipAppShell": {
               "type": "boolean",
@@ -1441,6 +1449,10 @@
             "outputPath": {
               "type": "string",
               "description": "Path where output will be placed."
+            },
+            "resourcesOutputPath": {
+              "type": "string",
+              "description": "The path where style resources will be placed, relative to outputPath."
             },
             "sourceMap": {
               "type": "boolean",

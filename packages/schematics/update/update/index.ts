@@ -488,7 +488,7 @@ function _usageMessage(
 
   logger.info('\n');
   logger.info('There might be additional packages that are outdated.');
-  logger.info('Or run ng update --all to try to update all at the same time.\n');
+  logger.info('Run "ng update --all" to try to update all at the same time.\n');
 
   return of<void>(undefined);
 }
@@ -778,11 +778,12 @@ export default function(options: UpdateSchema): Rule {
     const logger = context.logger;
     const allDependencies = _getAllDependencies(tree);
     const packages = _buildPackageList(options, allDependencies, logger);
+    const usingYarn = options.packageManager === 'yarn';
 
     return observableFrom([...allDependencies.keys()]).pipe(
       // Grab all package.json from the npm repository. This requires a lot of HTTP calls so we
       // try to parallelize as many as possible.
-      mergeMap(depName => getNpmPackageJson(depName, options.registry, logger)),
+      mergeMap(depName => getNpmPackageJson(depName, options.registry, logger, usingYarn)),
 
       // Build a map of all dependencies and their packageJson.
       reduce<NpmRepositoryPackageJson, Map<string, NpmRepositoryPackageJson>>(

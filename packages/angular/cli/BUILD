@@ -19,8 +19,9 @@ ts_library(
             "**/*_spec_large.ts",
         ],
     ),
-    data = glob(["**/*.json"]),
+    data = glob(["**/*.json", "**/*.md"]),
     module_name = "@angular/cli",
+    # strict_checks = False,
     deps = [
         ":command_schemas",
         "//packages/angular_devkit/architect",
@@ -28,12 +29,10 @@ ts_library(
         "//packages/angular_devkit/core:node",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tools",
-        "@rxjs",
-        "@rxjs//operators",
         # @typings: es2017.object
-        # @typings: inquirer
-        # @typings: node
-        # @typings: semver
+        "@npm//@types/node",
+        "@npm//@types/inquirer",
+        "@npm//@types/semver",
     ],
 )
 

@@ -23,9 +23,17 @@ export function move(from: string, to?: string): Rule {
     return noop;
   }
 
-  return tree => tree.visit(path => {
-    if (path.startsWith(fromPath)) {
-      tree.rename(path, toPath + '/' + path.substr(fromPath.length));
+  return tree => {
+    if (tree.exists(fromPath)) {
+      // fromPath is a file
+      tree.rename(fromPath, toPath);
+    } else {
+      // fromPath is a directory
+      tree.getDir(fromPath).visit(path => {
+        tree.rename(path, toPath + '/' + path.substr(fromPath.length));
+      });
     }
-  });
+
+    return tree;
+  };
 }

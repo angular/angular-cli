@@ -12,7 +12,9 @@ import 'symbol-observable';
 // tslint:disable-next-line:ordered-imports import-groups
 import {
   JsonObject,
+  logging,
   normalize,
+  schema,
   tags,
   terminal,
   virtualFs,
@@ -23,11 +25,8 @@ import {
   SchematicEngine,
   UnsuccessfulWorkflowExecution,
 } from '@angular-devkit/schematics';
-import {
-  FileSystemEngineHost,
-  NodeModulesEngineHost,
-  NodeWorkflow,
-} from '@angular-devkit/schematics/tools';
+import { NodeModulesEngineHost, NodeWorkflow } from '@angular-devkit/schematics/tools';
+import * as inquirer from 'inquirer';
 import * as minimist from 'minimist';
 
 
@@ -63,34 +62,72 @@ export interface MainOptions {
   stderr?: ProcessOutput;
 }
 
+
+function _listSchematics(collectionName: string, logger: logging.Logger) {
+  try {
+    const engineHost = new NodeModulesEngineHost();
+    const engine = new SchematicEngine(engineHost);
+    const collection = engine.createCollection(collectionName);
+    logger.info(engine.listSchematicNames(collection).join('\n'));
+  } catch (error) {
+    logger.fatal(error.message);
+
+    return 1;
+  }
+
+  return 0;
+}
+
+function _createPromptProvider(): schema.PromptProvider {
+  return (definitions: Array<schema.PromptDefinition>) => {
+    const questions: inquirer.Questions = definitions.map(definition => {
+      const question: inquirer.Question = {
+        name: definition.id,
+        message: definition.message,
+        default: definition.default,
+      };
+
+      const validator = definition.validator;
+      if (validator) {
+        question.validate = input => validator(input);
+      }
+
+      switch (definition.type) {
+        case 'confirmation':
+          return { ...question, type: 'confirm' };
+        case 'list':
+          return {
+            ...question,
+            type: 'list',
+            choices: definition.items && definition.items.map(item => {
+              if (typeof item == 'string') {
+                return item;
+              } else {
+                return {
+                  name: item.label,
+                  value: item.value,
+                };
+              }
+            }),
+          };
+        default:
+          return { ...question, type: definition.type };
+      }
+    });
+
+    return inquirer.prompt(questions);
+  };
+}
+
 export async function main({
   args,
   stdout = process.stdout,
   stderr = process.stderr,
 }: MainOptions): Promise<0 | 1> {
-
-  /** Parse the command line. */
-  const booleanArgs = [
-    'allowPrivate',
-    'debug',
-    'dry-run',
-    'force',
-    'help',
-    'list-schematics',
-    'verbose',
-  ];
-  const argv = minimist(args, {
-    boolean: booleanArgs,
-    default: {
-      'debug': null,
-      'dry-run': null,
-    },
-    '--': true,
-  });
+  const argv = parseArgs(args);
 
   /** Create the DevKit Logger used through the CLI. */
   const logger = createConsoleLogger(argv['verbose'], stdout, stderr);
-
   if (argv.help) {
     logger.info(getUsage());
 
@@ -104,18 +141,9 @@ export async function main({
   } = parseSchematicName(argv._.shift() || null);
   const isLocalCollection = collectionName.startsWith('.') || collectionName.startsWith('/');
 
-
   /** If the user wants to list schematics, we simply show all the schematic names. */
   if (argv['list-schematics']) {
-    const engineHost = isLocalCollection
-      ? new FileSystemEngineHost(normalize(process.cwd()))
-      : new NodeModulesEngineHost();
-
-    const engine = new SchematicEngine(engineHost);
-    const collection = engine.createCollection(collectionName);
-    logger.info(engine.listSchematicNames(collection).join('\n'));
-
-    return 0;
+    return _listSchematics(collectionName, logger);
   }
 
   if (!schematicName) {
@@ -128,7 +156,7 @@ export async function main({
   const debug: boolean = argv.debug === null ? isLocalCollection : argv.debug;
   const dryRun: boolean = argv['dry-run'] === null ? debug : argv['dry-run'];
   const force = argv['force'];
-  const allowPrivate = argv['allowPrivate'];
+  const allowPrivate = argv['allow-private'];
 
   /** Create a Virtual FS Host scoped to where the process is being run. **/
   const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(process.cwd()));
@@ -228,6 +256,9 @@ export async function main({
   });
   delete parsedArgs._;
 
+  // Add prompts.
+  workflow.registry.usePromptProvider(_createPromptProvider());
+
 
   /**
    *  Execute the workflow, which will report the dry run events, run the tasks, and complete
@@ -282,7 +313,7 @@ function getUsage(): string {
       --debug             Debug mode. This is true by default if the collection is a relative
                           path (in that case, turn off with --debug=false).
 
-      --allowPrivate      Allow private schematics to be run from the command line. Default to
+      --allow-private     Allow private schematics to be run from the command line. Default to
                           false.
 
       --dry-run           Do not output anything, but instead just show what actions would be
@@ -299,6 +330,36 @@ function getUsage(): string {
 
   Any additional option is passed to the Schematics depending on
   `;
+}
+
+/** Parse the command line. */
+const booleanArgs = [
+  'allowPrivate',
+  'allow-private',
+  'debug',
+  'dry-run',
+  'dryRun',
+  'force',
+  'help',
+  'list-schematics',
+  'listSchematics',
+  'verbose',
+];
+
+function parseArgs(args: string[] | undefined): minimist.ParsedArgs {
+    return minimist(args, {
+      boolean: booleanArgs,
+      alias: {
+        'dryRun': 'dry-run',
+        'listSchematics': 'list-schematics',
+        'allowPrivate': 'allow-private',
+      },
+      default: {
+        'debug': null,
+        'dryRun': null,
+      },
+      '--': true,
+    });
 }
 
 if (require.main === module) {

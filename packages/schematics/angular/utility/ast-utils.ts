@@ -455,8 +455,8 @@ export function addSymbolToNgModuleMetadata(
       position = node.getEnd();
       // Get the indentation of the last element, if any.
       const text = node.getFullText(source);
-      if (text.match('^\r?\r?\n')) {
-        toInsert = `,${text.match(/^\r?\n\s+/)[0]}${metadataField}: [${symbolName}]`;
+      if (text.match(/^\r?\r?\n/)) {
+        toInsert = `,${text.match(/^\r?\n\s*/)[0]}${metadataField}: [${symbolName}]`;
       } else {
         toInsert = `, ${metadataField}: [${symbolName}]`;
       }
@@ -469,7 +469,7 @@ export function addSymbolToNgModuleMetadata(
     // Get the indentation of the last element, if any.
     const text = node.getFullText(source);
     if (text.match(/^\r?\n/)) {
-      toInsert = `,${text.match(/^\r?\n(\r?)\s+/)[0]}${symbolName}`;
+      toInsert = `,${text.match(/^\r?\n(\r?)\s*/)[0]}${symbolName}`;
     } else {
       toInsert = `, ${symbolName}`;
     }

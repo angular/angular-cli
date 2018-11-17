@@ -14,14 +14,14 @@
           }
         },
         "configuration": {
-          "description": "A named configuration environment, as specified in the \"configurations\" section of angular.json.",
+          "description": "A named build target, as specified in the \"configurations\" section of angular.json.\nEach named target is accompanied by a configuration of option defaults for that target.",
           "type": "string",
           "aliases": [
             "c"
           ]
         },
         "prod": {
-          "description": "When true, sets the build configuration to the production environment.\nAll builds make use of bundling and limited tree-shaking, A production build also runs limited dead code elimination using UglifyJS.",
+          "description": "When true, sets the build configuration to the production target.\nAll builds make use of bundling and limited tree-shaking. A production build also runs limited dead code elimination.",
           "type": "boolean"
         }
       }
@@ -42,13 +42,13 @@
           "type": "boolean",
           "default": false,
           "aliases": [ "d" ],
-          "description": "When true, run through and report activity without writing out results."
+          "description": "When true, runs through and reports activity without writing out results."
         },
         "force": {
           "type": "boolean",
           "default": false,
           "aliases": [ "f" ],
-          "description": "When true, force overwriting of existing files."
+          "description": "When true, forces overwriting of existing files."
         },
         "interactive": {
           "type": "boolean",

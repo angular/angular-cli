@@ -18,7 +18,7 @@ import {
 import * as ts from 'typescript';
 import { time, timeEnd } from './benchmark';
 import { WebpackCompilerHost } from './compiler_host';
-import { CancellationToken, gatherDiagnostics } from './gather_diagnostics';
+import { CancellationToken, DiagnosticMode, gatherDiagnostics } from './gather_diagnostics';
 import { LogMessage, TypeCheckerMessage } from './type_checker_messages';
 
 
@@ -53,6 +53,7 @@ export class TypeChecker {
       _compilerOptions,
       _basePath,
       host,
+      true,
     );
     // We don't set a async resource loader on the compiler host because we only support
     // html templates, which are the only ones that can throw errors, and those can be loaded
@@ -101,7 +102,7 @@ export class TypeChecker {
 
   private _diagnose(cancellationToken: CancellationToken) {
     const allDiagnostics = gatherDiagnostics(
-      this._program, this._JitMode, 'TypeChecker', cancellationToken);
+      this._program, this._JitMode, 'TypeChecker', DiagnosticMode.Semantic, cancellationToken);
 
     // Report diagnostics.
     if (!cancellationToken.isCancellationRequested()) {

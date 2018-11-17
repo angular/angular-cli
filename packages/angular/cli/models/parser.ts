@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  *
  */
-import { BaseException, strings } from '@angular-devkit/core';
+import { BaseException, logging, strings } from '@angular-devkit/core';
 import { Arguments, Option, OptionType, Value } from './interface';
 
 
@@ -29,10 +29,10 @@ function _coerceType(str: string | undefined, type: OptionType, v?: Value): Valu
       }
 
       return _coerceType(str, OptionType.Boolean, v) !== undefined
-           ? _coerceType(str, OptionType.Boolean, v)
-           : _coerceType(str, OptionType.Number, v) !== undefined
-           ? _coerceType(str, OptionType.Number, v)
-           : _coerceType(str, OptionType.String, v);
+        ? _coerceType(str, OptionType.Boolean, v)
+        : _coerceType(str, OptionType.Number, v) !== undefined
+          ? _coerceType(str, OptionType.Number, v)
+          : _coerceType(str, OptionType.String, v);
 
     case OptionType.String:
       return str || '';
@@ -93,14 +93,16 @@ function _coerce(str: string | undefined, o: Option | null, v?: Value): Value | 
 
 
 function _getOptionFromName(name: string, options: Option[]): Option | undefined {
-  const cName = strings.camelize(name);
+  const camelName = /(-|_)/.test(name)
+    ? strings.camelize(name)
+    : name;
 
   for (const option of options) {
-    if (option.name == name || option.name == cName) {
+    if (option.name === name || option.name === camelName) {
       return option;
     }
 
-    if (option.aliases.some(x => x == name || x == cName)) {
+    if (option.aliases.some(x => x === name || x === camelName)) {
       return option;
     }
   }
@@ -108,34 +110,37 @@ function _getOptionFromName(name: string, options: Option[]): Option | undefined
   return undefined;
 }
 
+function _removeLeadingDashes(key: string): string {
+  const from = key.startsWith('--') ? 2 : key.startsWith('-') ? 1 : 0;
+
+  return key.substr(from);
+}
 
 function _assignOption(
   arg: string,
   args: string[],
-  options: Option[],
-  parsedOptions: Arguments,
-  _positionals: string[],
-  leftovers: string[],
-  ignored: string[],
-  errors: string[],
+  { options, parsedOptions, leftovers, ignored, errors, deprecations }: {
+    options: Option[],
+    parsedOptions: Arguments,
+    positionals: string[],
+    leftovers: string[],
+    ignored: string[],
+    errors: string[],
+    deprecations: string[],
+  },
 ) {
-  let key = arg.substr(2);
+  const from = arg.startsWith('--') ? 2 : 1;
+  let key = arg.substr(from);
   let option: Option | null = null;
   let value = '';
   const i = arg.indexOf('=');
 
   // If flag is --no-abc AND there's no equal sign.
   if (i == -1) {
-    if (key.startsWith('no-')) {
+    if (key.startsWith('no')) {
       // Only use this key if the option matching the rest is a boolean.
-      const maybeOption = _getOptionFromName(key.substr(3), options);
-      if (maybeOption && maybeOption.type == 'boolean') {
-        value = 'false';
-        option = maybeOption;
-      }
-    } else if (key.startsWith('no')) {
-      // Only use this key if the option matching the rest is a boolean.
-      const maybeOption = _getOptionFromName(key.substr(2), options);
+      const from = key.startsWith('no-') ? 3 : 2;
+      const maybeOption = _getOptionFromName(strings.camelize(key.substr(from)), options);
       if (maybeOption && maybeOption.type == 'boolean') {
         value = 'false';
         option = maybeOption;
@@ -167,13 +172,14 @@ function _assignOption(
     }
   } else {
     key = arg.substring(0, i);
-    option = _getOptionFromName(key, options) || null;
+    option = _getOptionFromName(_removeLeadingDashes(key), options) || null;
     if (option) {
       value = arg.substring(i + 1);
     }
   }
+
   if (option === null) {
-    if (args[0] && !args[0].startsWith('--')) {
+    if (args[0] && !args[0].startsWith('-')) {
       leftovers.push(arg, args[0]);
       args.shift();
     } else {
@@ -183,6 +189,11 @@ function _assignOption(
     const v = _coerce(value, option, parsedOptions[option.name]);
     if (v !== undefined) {
       parsedOptions[option.name] = v;
+
+      if (option.deprecated !== undefined && option.deprecated !== false) {
+        deprecations.push(`Option ${JSON.stringify(option.name)} is deprecated${
+            typeof option.deprecated == 'string' ? ': ' + option.deprecated : ''}.`);
+      }
     } else {
       let error = `Argument ${key} could not be parsed using value ${JSON.stringify(value)}.`;
       if (option.enum) {
@@ -256,9 +267,14 @@ export function parseFreeFormArguments(args: string[]): Arguments {
  *
  * @param args The argument array to parse.
  * @param options List of supported options. {@see Option}.
+ * @param logger Logger to use to warn users.
  * @returns An object that contains a property per option.
  */
-export function parseArguments(args: string[], options: Option[] | null): Arguments {
+export function parseArguments(
+  args: string[],
+  options: Option[] | null,
+  logger?: logging.Logger,
+): Arguments {
   if (options === null) {
     options = [];
   }
@@ -269,6 +285,9 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
 
   const ignored: string[] = [];
   const errors: string[] = [];
+  const deprecations: string[] = [];
+
+  const state = { options, parsedOptions, positionals, leftovers, ignored, errors, deprecations };
 
   for (let arg = args.shift(); arg !== undefined; arg = args.shift()) {
     if (arg == '--') {
@@ -278,22 +297,22 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
     }
 
     if (arg.startsWith('--')) {
-      _assignOption(arg, args, options, parsedOptions, positionals, leftovers, ignored, errors);
+      _assignOption(arg, args, state);
     } else if (arg.startsWith('-')) {
       // Argument is of form -abcdef.  Starts at 1 because we skip the `-`.
       for (let i = 1; i < arg.length; i++) {
         const flag = arg[i];
         // If the next character is an '=', treat it as a long flag.
         if (arg[i + 1] == '=') {
-          const f = '--' + flag + arg.slice(i + 1);
-          _assignOption(f, args, options, parsedOptions, positionals, leftovers, ignored, errors);
+          const f = '-' + flag + arg.slice(i + 1);
+          _assignOption(f, args, state);
           break;
         }
         // Treat the last flag as `--a` (as if full flag but just one letter). We do this in
         // the loop because it saves us a check to see if the arg is just `-`.
         if (i == arg.length - 1) {
-          const arg = '--' + flag;
-          _assignOption(arg, args, options, parsedOptions, positionals, leftovers, ignored, errors);
+          const arg = '-' + flag;
+          _assignOption(arg, args, state);
         } else {
           const maybeOption = _getOptionFromName(flag, options);
           if (maybeOption) {
@@ -348,6 +367,10 @@ export function parseArguments(args: string[], options: Option[] | null): Argume
 
   if (positionals.length > 0 || leftovers.length > 0) {
     parsedOptions['--'] = [...positionals, ...leftovers];
+  }
+
+  if (deprecations.length > 0 && logger) {
+    deprecations.forEach(message => logger.warn(message));
   }
 
   if (errors.length > 0) {

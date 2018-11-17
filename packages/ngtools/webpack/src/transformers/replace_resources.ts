@@ -6,155 +6,214 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { collectDeepNodes, getFirstNode } from './ast_helpers';
-import {
-  AddNodeOperation,
-  ReplaceNodeOperation,
-  StandardTransform,
-  TransformOperation,
-} from './interfaces';
-import { makeTransform } from './make_transform';
-
 
 export function replaceResources(
   shouldTransform: (fileName: string) => boolean,
+  getTypeChecker: () => ts.TypeChecker,
 ): ts.TransformerFactory<ts.SourceFile> {
-  const standardTransform: StandardTransform = function (sourceFile: ts.SourceFile) {
-    const ops: TransformOperation[] = [];
 
-    if (!shouldTransform(sourceFile.fileName)) {
-      return ops;
-    }
+  return (context: ts.TransformationContext) => {
+    const typeChecker = getTypeChecker();
 
-    const replacements = findResources(sourceFile);
+    const visitNode: ts.Visitor = (node: ts.Decorator) => {
+      if (ts.isClassDeclaration(node)) {
+        node.decorators = ts.visitNodes(
+          node.decorators,
+          (node: ts.Decorator) => visitDecorator(node, typeChecker),
+        );
+      }
 
-    if (replacements.length > 0) {
+      return ts.visitEachChild(node, visitNode, context);
+    };
 
-      // Add the replacement operations.
-      ops.push(...(replacements.map((rep) => rep.replaceNodeOperation)));
+    return (sourceFile: ts.SourceFile) => (
+      shouldTransform(sourceFile.fileName)
+        ? ts.visitNode(sourceFile, visitNode)
+        : sourceFile
+    );
+  };
+}
 
-      // If we added a require call, we need to also add typings for it.
-      // The typings need to be compatible with node typings, but also work by themselves.
+function visitDecorator(node: ts.Decorator, typeChecker: ts.TypeChecker): ts.Decorator {
+  if (!isComponentDecorator(node, typeChecker)) {
+    return node;
+  }
 
-      // interface NodeRequire {(id: string): any;}
-      const nodeRequireInterface = ts.createInterfaceDeclaration([], [], 'NodeRequire', [], [], [
-        ts.createCallSignature([], [
-          ts.createParameter([], [], undefined, 'id', undefined,
-            ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-          ),
-        ], ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)),
-      ]);
+  if (!ts.isCallExpression(node.expression)) {
+    return node;
+  }
 
-      // declare var require: NodeRequire;
-      const varRequire = ts.createVariableStatement(
-        [ts.createToken(ts.SyntaxKind.DeclareKeyword)],
-        [ts.createVariableDeclaration('require', ts.createTypeReferenceNode('NodeRequire', []))],
+  const decoratorFactory = node.expression;
+  const args = decoratorFactory.arguments;
+  if (args.length !== 1 || !ts.isObjectLiteralExpression(args[0])) {
+    // Unsupported component metadata
+    return node;
+  }
+
+  const objectExpression = args[0] as ts.ObjectLiteralExpression;
+  const styleReplacements: ts.Expression[] = [];
+
+  // visit all properties
+  let properties = ts.visitNodes(
+    objectExpression.properties,
+    (node: ts.ObjectLiteralElementLike) => visitComponentMetadata(node, styleReplacements),
+  );
+
+  // replace properties with updated properties
+  if (styleReplacements.length > 0) {
+    const styleProperty = ts.createPropertyAssignment(
+      ts.createIdentifier('styles'),
+      ts.createArrayLiteral(styleReplacements),
+    );
+
+    properties = ts.createNodeArray([...properties, styleProperty]);
+  }
+
+  return ts.updateDecorator(
+    node,
+    ts.updateCall(
+      decoratorFactory,
+      decoratorFactory.expression,
+      decoratorFactory.typeArguments,
+      [ts.updateObjectLiteral(objectExpression, properties)],
+    ),
+  );
+}
+
+function visitComponentMetadata(
+  node: ts.ObjectLiteralElementLike,
+  styleReplacements: ts.Expression[],
+): ts.ObjectLiteralElementLike | undefined {
+  if (!ts.isPropertyAssignment(node) || ts.isComputedPropertyName(node.name)) {
+    return node;
+  }
+
+  const name = node.name.text;
+  switch (name) {
+    case 'moduleId':
+
+      return undefined;
+
+    case 'templateUrl':
+      return ts.updatePropertyAssignment(
+        node,
+        ts.createIdentifier('template'),
+        createRequireExpression(node.initializer),
       );
 
-      ops.push(new AddNodeOperation(sourceFile, getFirstNode(sourceFile), nodeRequireInterface));
-      ops.push(new AddNodeOperation(sourceFile, getFirstNode(sourceFile), varRequire));
-    }
-
-    return ops;
-  };
-
-  return makeTransform(standardTransform);
-}
-
-export interface ResourceReplacement {
-  resourcePaths: string[];
-  replaceNodeOperation: ReplaceNodeOperation;
-}
-
-export function findResources(sourceFile: ts.SourceFile): ResourceReplacement[] {
-  const replacements: ResourceReplacement[] = [];
-
-  // Find all object literals.
-  collectDeepNodes<ts.ObjectLiteralExpression>(sourceFile, ts.SyntaxKind.ObjectLiteralExpression)
-    // Get all their property assignments.
-    .map(node => collectDeepNodes<ts.PropertyAssignment>(node, ts.SyntaxKind.PropertyAssignment))
-    // Flatten into a single array (from an array of array<property assignments>).
-    .reduce((prev, curr) => curr ? prev.concat(curr) : prev, [])
-    // We only want property assignments for the templateUrl/styleUrls keys.
-    .filter((node: ts.PropertyAssignment) => {
-      const key = _getContentOfKeyLiteral(node.name);
-      if (!key) {
-        // key is an expression, can't do anything.
-        return false;
+    case 'styles':
+    case 'styleUrls':
+      if (!ts.isArrayLiteralExpression(node.initializer)) {
+        return node;
       }
 
-      return key == 'templateUrl' || key == 'styleUrls';
-    })
-    // Replace templateUrl/styleUrls key with template/styles, and and paths with require('path').
-    .forEach((node: ts.PropertyAssignment) => {
-      const key = _getContentOfKeyLiteral(node.name);
+      const isInlineStyles = name === 'styles';
+      const styles = ts.visitNodes(
+        node.initializer.elements,
+        (node: ts.Expression) => {
+          if (!ts.isStringLiteral(node) && !ts.isNoSubstitutionTemplateLiteral(node)) {
+            return node;
+          }
 
-      if (key == 'templateUrl') {
-        const resourcePath = _getResourceRequest(node.initializer, sourceFile);
-        const requireCall = _createRequireCall(resourcePath);
-        const propAssign = ts.createPropertyAssignment('template', requireCall);
-        replacements.push({
-          resourcePaths: [resourcePath],
-          replaceNodeOperation: new ReplaceNodeOperation(sourceFile, node, propAssign),
-        });
-      } else if (key == 'styleUrls') {
-        const arr = collectDeepNodes<ts.ArrayLiteralExpression>(node,
-          ts.SyntaxKind.ArrayLiteralExpression);
-        if (!arr || arr.length == 0 || arr[0].elements.length == 0) {
-          return;
-        }
+          return isInlineStyles ? ts.createLiteral(node.text) : createRequireExpression(node);
+        },
+      );
 
-        const stylePaths = arr[0].elements.map((element: ts.Expression) => {
-          return _getResourceRequest(element, sourceFile);
-        });
-
-        const requireArray = ts.createArrayLiteral(
-          stylePaths.map((path) => _createRequireCall(path)),
-        );
-
-        const propAssign = ts.createPropertyAssignment('styles', requireArray);
-        replacements.push({
-          resourcePaths: stylePaths,
-          replaceNodeOperation: new ReplaceNodeOperation(sourceFile, node, propAssign),
-        });
+      // Styles should be placed first
+      if (isInlineStyles) {
+        styleReplacements.unshift(...styles);
+      } else {
+        styleReplacements.push(...styles);
       }
-    });
 
-  return replacements;
+      return undefined;
 
-}
-
-function _getContentOfKeyLiteral(node?: ts.Node): string | null {
-  if (!node) {
-    return null;
-  } else if (node.kind == ts.SyntaxKind.Identifier) {
-    return (node as ts.Identifier).text;
-  } else if (node.kind == ts.SyntaxKind.StringLiteral) {
-    return (node as ts.StringLiteral).text;
-  } else {
-    return null;
+    default:
+      return node;
   }
 }
 
-function _getResourceRequest(element: ts.Expression, sourceFile: ts.SourceFile) {
-  if (
-    element.kind === ts.SyntaxKind.StringLiteral ||
-    element.kind === ts.SyntaxKind.NoSubstitutionTemplateLiteral
-  ) {
-    const url = (element as ts.StringLiteral).text;
-
-    // If the URL does not start with ./ or ../, prepends ./ to it.
-    return `${/^\.?\.\//.test(url) ? '' : './'}${url}`;
-  } else {
-    // if not string, just use expression directly
-    return element.getFullText(sourceFile);
+export function getResourceUrl(node: ts.Expression): string | null {
+  // only analyze strings
+  if (!ts.isStringLiteral(node) && !ts.isNoSubstitutionTemplateLiteral(node)) {
+    return null;
   }
+
+  return `${/^\.?\.\//.test(node.text) ? '' : './'}${node.text}`;
 }
 
-function _createRequireCall(path: string) {
+function isComponentDecorator(node: ts.Node, typeChecker: ts.TypeChecker): node is ts.Decorator {
+  if (!ts.isDecorator(node)) {
+    return false;
+  }
+
+  const origin = getDecoratorOrigin(node, typeChecker);
+  if (origin && origin.module === '@angular/core' && origin.name === 'Component') {
+    return true;
+  }
+
+  return false;
+}
+
+function createRequireExpression(node: ts.Expression): ts.Expression {
+  const url = getResourceUrl(node);
+  if (!url) {
+    return node;
+  }
+
   return ts.createCall(
     ts.createIdentifier('require'),
-    [],
-    [ts.createLiteral(path)],
+    undefined,
+    [ts.createLiteral(url)],
   );
+}
+
+interface DecoratorOrigin {
+  name: string;
+  module: string;
+}
+
+function getDecoratorOrigin(
+  decorator: ts.Decorator,
+  typeChecker: ts.TypeChecker,
+): DecoratorOrigin | null {
+  if (!ts.isCallExpression(decorator.expression)) {
+    return null;
+  }
+
+  let identifier: ts.Node;
+  let name = '';
+
+  if (ts.isPropertyAccessExpression(decorator.expression.expression)) {
+    identifier = decorator.expression.expression.expression;
+    name = decorator.expression.expression.name.text;
+  } else if (ts.isIdentifier(decorator.expression.expression)) {
+    identifier = decorator.expression.expression;
+  } else {
+    return null;
+  }
+
+  // NOTE: resolver.getReferencedImportDeclaration would work as well but is internal
+  const symbol = typeChecker.getSymbolAtLocation(identifier);
+  if (symbol && symbol.declarations && symbol.declarations.length > 0) {
+    const declaration = symbol.declarations[0];
+    let module: string;
+
+    if (ts.isImportSpecifier(declaration)) {
+      name = (declaration.propertyName || declaration.name).text;
+      module = (declaration.parent.parent.parent.moduleSpecifier as ts.Identifier).text;
+    } else if (ts.isNamespaceImport(declaration)) {
+      // Use the name from the decorator namespace property access
+      module = (declaration.parent.parent.moduleSpecifier as ts.Identifier).text;
+    } else if (ts.isImportClause(declaration)) {
+      name = (declaration.name as ts.Identifier).text;
+      module = (declaration.parent.moduleSpecifier as ts.Identifier).text;
+    } else {
+      return null;
+    }
+
+    return { name, module };
+  }
+
+  return null;
 }

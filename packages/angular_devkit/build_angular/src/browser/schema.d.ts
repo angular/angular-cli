@@ -57,6 +57,11 @@ export interface BrowserBuilderSchema {
   outputPath: string;
 
   /**
+   * Path where style resources will be placed (Relative to outputPath).
+   */
+  resourcesOutputPath: string;
+
+  /**
    * Build using Ahead of Time compilation.
    */
   aot: boolean;
@@ -72,6 +77,7 @@ export interface BrowserBuilderSchema {
   vendorSourceMap?: boolean;
 
   /**
+    @deprecated
    * Output in-file eval sourcemaps.
    */
   evalSourceMap: boolean;
@@ -192,6 +198,7 @@ export interface BrowserBuilderSchema {
   ngswConfigPath?: string;
 
   /**
+   * @deprecated
    * Flag to prevent building an app shell.
    */
   skipAppShell: boolean;

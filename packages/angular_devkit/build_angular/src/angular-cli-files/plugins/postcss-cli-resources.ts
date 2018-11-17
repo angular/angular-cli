@@ -27,6 +27,7 @@ function wrapUrl(url: string): string {
 export interface PostcssCliResourcesOptions {
   baseHref?: string;
   deployUrl?: string;
+  resourcesOutputPath?: string;
   filename: string;
   loader: webpack.loader.LoaderContext;
 }
@@ -47,6 +48,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
   const {
     deployUrl = '',
     baseHref = '',
+    resourcesOutputPath = '',
     filename,
     loader,
   } = options;
@@ -54,10 +56,11 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
   const dedupeSlashes = (url: string) => url.replace(/\/\/+/g, '/');
 
   const process = async (inputUrl: string, context: string, resourceCache: Map<string, string>) => {
-    // If root-relative or absolute, leave as is
-    if (inputUrl.match(/^(?:\w+:\/\/|data:|chrome:|#)/)) {
+    // If root-relative, absolute or protocol relative url, leave as is
+    if (/^((?:\w+:)?\/\/|data:|chrome:|#)/.test(inputUrl)) {
       return inputUrl;
     }
+
     // If starts with a caret, remove and return remainder
     // this supports bypassing asset processing
     if (inputUrl.startsWith('^')) {
@@ -74,7 +77,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
       inputUrl = inputUrl.substr(1);
     }
 
-    if (inputUrl.startsWith('/') && !inputUrl.startsWith('//')) {
+    if (inputUrl.startsWith('/')) {
       let outputUrl = '';
       if (deployUrl.match(/:\/\//) || deployUrl.startsWith('/')) {
         // If deployUrl is absolute or root relative, ignore baseHref & use deployUrl as is.
@@ -114,11 +117,15 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
           return;
         }
 
-        const outputPath = interpolateName(
+        let outputPath = interpolateName(
           { resourcePath: result } as webpack.loader.LoaderContext,
           filename,
           { content },
         );
+
+        if (resourcesOutputPath) {
+          outputPath = path.posix.join(resourcesOutputPath, outputPath);
+        }
 
         loader.addDependency(result);
         loader.emitFile(outputPath, content, undefined);
