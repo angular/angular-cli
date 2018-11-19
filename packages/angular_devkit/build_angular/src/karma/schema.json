@@ -62,6 +62,15 @@
       "type": "string",
       "description": "Defines the build environment."
     },
+    "spec": {
+      "type": "string",
+      "description": "Glob of files to include"
+    },
+    "specUpdate": {
+      "type": "boolean",
+      "description": "Should this only update generated test file?",
+      "default": false
+    },
     "sourceMap": {
       "type": "boolean",
       "description": "Output sourcemaps.",

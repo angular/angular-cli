@@ -87,6 +87,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
         karmaOptions.buildWebpack = {
           root: getSystemPath(root),
           projectRoot: getSystemPath(projectRoot),
+          sourceRoot: builderConfig.sourceRoot,
           options: options as NormalizedKarmaBuilderSchema,
           webpackConfig: this.buildWebpackConfig(root, projectRoot, sourceRoot, host,
             options as NormalizedKarmaBuilderSchema),

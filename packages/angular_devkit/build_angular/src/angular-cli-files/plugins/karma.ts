@@ -7,7 +7,7 @@
  */
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
-
+import * as fs from 'fs';
 import * as path from 'path';
 import * as glob from 'glob';
 import * as webpack from 'webpack';
@@ -91,7 +91,38 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
       { pattern: path.join(ksmsPath, 'client.js'), watched: false }
     ], true);
   }
+  // generate new entry point with files matching provided glob
+  if (options.spec) {
+    const mainEntry = config.buildWebpack.webpackConfig.entry.main;
+    // could be temp file, but then it's not possible to update it unless the name is stored somewhere
+    const newMainEntry = config.buildWebpack.webpackConfig.entry.main = config.buildWebpack.webpackConfig.entry.main.replace('.ts', '.generated.ts');
 
+    // TODO: move logic below to separate util file
+    let template = fs.readFileSync(mainEntry).toString();
+    let pattern = options.spec; 
+    if (pattern.indexOf('.spec') === -1) {
+        pattern +='.spec.ts';
+    }
+    const files = glob.sync(pattern, { cwd: path.join(config.buildWebpack.projectRoot, config.buildWebpack.sourceRoot) });
+    if (!files.length) {
+        logger.error('Specified spec glob does not match any files'); 
+        process.exit(1); // TODO: any better way?
+        return;
+    }
+    const start = 'import \'';
+    const end = '\';';
+    const testCode = start + files.map(path=>`./${path.replace('.ts', '')}`).join(`${end}\n${start}`) + end;
+    // TODO: maybe a documented 'marker/comment' inside test.ts would be nicer
+    // or run typescript compiler and make changes based on the tree? 
+    template = template.replace(/declare\s+const\s+require:\s+any;/, '').replace(/require\.context\(.*/, '{keys:()=>({map:(_a:any)=>{}})};\n' + testCode);
+    fs.writeFileSync(newMainEntry, template);
+    // early exit if we are only supposed to update generated file
+    // so that we could avoid killing the runner and starting over
+    if (options.specUpdate) {
+      process.exit(0);
+      return;
+    }
+}
   // Add webpack config.
   const webpackConfig = config.buildWebpack.webpackConfig;
   const webpackMiddlewareConfig = {
