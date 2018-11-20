@@ -35,13 +35,12 @@
     "@angular-devkit/schematics": "0.0.0",
     "@schematics/angular": "0.0.0",
     "@schematics/update": "0.0.0",
-    "json-schema-traverse": "^0.4.1",
-    "opn": "^5.3.0",
-    "json-schema-traverse": "^0.4.1",
-    "rxjs": "~6.2.0",
-    "semver": "^5.1.0",
-    "symbol-observable": "^1.2.0",
-    "yargs-parser": "^10.0.0"
+    "json-schema-traverse": "0.4.1",
+    "opn": "5.4.0",
+    "rxjs": "6.2.2",
+    "semver": "5.6.0",
+    "symbol-observable": "1.2.0",
+    "yargs-parser": "10.1.0"
   },
   "ng-update": {
     "migrations": "@schematics/angular/migrations/migration-collection.json"
