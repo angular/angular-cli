@@ -23,4 +23,4 @@ export interface TslintFixTaskOptionsBase {
   tslintConfig?: JsonObject;
 }
 
-export type TslintFixTaskOptions = TslintFixTaskOptionsBase;
+export type TslintFixTaskOptions = TslintFixTaskOptionsBase & JsonObject;

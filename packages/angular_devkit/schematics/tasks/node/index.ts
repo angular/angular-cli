@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { jobs } from '@angular-devkit/core';
 import { TaskExecutorFactory } from '../../src';
 import { NodePackageName, NodePackageTaskFactoryOptions } from '../node-package/options';
 import {
@@ -28,8 +29,11 @@ export class BuiltinTaskExecutor {
     name: RunSchematicName,
     create: () => import('../run-schematic/executor').then(mod => mod.default()),
   };
-  static readonly TslintFix: TaskExecutorFactory<{}> = {
-    name: TslintFixName,
-    create: () => import('../tslint-fix/executor').then(mod => mod.default()),
-  };
+  static readonly TslintFix = jobs.lazyLoadJob(() => {
+    return import('../tslint-fix/executor').then(mod => mod.default);
+  }, {
+    jobName: TslintFixName,
+    input: {},
+    output: {},
+  });
 }

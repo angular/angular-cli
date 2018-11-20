@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { jobs, json } from '@angular-devkit/core';
 import { resolve } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -14,7 +15,6 @@ import {
   Linter as LinterNS,
 } from 'tslint';  // tslint:disable-line:no-implicit-dependencies
 import * as ts from 'typescript';  // tslint:disable-line:no-implicit-dependencies
-import { SchematicContext, TaskExecutor } from '../../src';
 import { TslintFixTaskOptions } from './options';
 
 
@@ -89,8 +89,8 @@ function _listAllFiles(root: string): string[] {
 }
 
 
-export default function(): TaskExecutor<TslintFixTaskOptions> {
-  return (options: TslintFixTaskOptions, context: SchematicContext) => {
+export default jobs.createJob<TslintFixTaskOptions, json.JsonValue>(
+  (options: TslintFixTaskOptions, context: jobs.SimpleJobHandlerContext) => {
     return new Observable(obs => {
       const root = process.cwd();
       const tslint = require(resolve('tslint', {
@@ -198,5 +198,10 @@ export default function(): TaskExecutor<TslintFixTaskOptions> {
         obs.complete();
       }
     });
-  };
-}
+  },
+  {
+    jobName: 'tslint-fix',
+    input: {},
+    output: {},
+  },
+);

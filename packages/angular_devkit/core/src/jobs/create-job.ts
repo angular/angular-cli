@@ -72,28 +72,6 @@ export interface JobHandlerWithExtra<
 }
 
 
-export function renameJob<I extends JsonValue, O extends JsonValue>(
-  handler: JobHandlerWithExtra<I, O>,
-  options: RegisterJobOptions,
-): JobHandlerWithExtra<I, O>;
-export function renameJob<I extends JsonValue, O extends JsonValue>(
-  handler: JobHandlerWithExtra<I, O>,
-  options: RegisterJobOptions & { jobName: JobName },
-): JobHandlerWithExtra<I, O> & { jobName: JobName };
-
-/**
- * Allows you to override options of another job. This can be used to rename the job for example.
- * @param handler The other job.
- * @param options Additional information to add.
- */
-export function renameJob<I extends JsonValue, O extends JsonValue>(
-  handler: JobHandlerWithExtra<I, O>,
-  options: RegisterJobOptions,
-): JobHandlerWithExtra<I, O> {
-  return Object.assign(handler, options);
-}
-
-
 export function createJob<I extends JsonValue, O extends JsonValue>(
   fn: SimpleJobHandlerFn<I, O>,
   options: Partial<RegisterJobOptions> & { jobName: JobName },
@@ -222,6 +200,27 @@ export function createJob<I extends JsonValue, O extends JsonValue>(
     });
   };
 
+  return Object.assign(handler, options);
+}
+
+export function renameJob<I extends JsonValue, O extends JsonValue>(
+  handler: JobHandlerWithExtra<I, O>,
+  options: RegisterJobOptions,
+): JobHandlerWithExtra<I, O>;
+export function renameJob<I extends JsonValue, O extends JsonValue>(
+  handler: JobHandlerWithExtra<I, O>,
+  options: RegisterJobOptions & { jobName: JobName },
+): JobHandlerWithExtra<I, O> & { jobName: JobName };
+
+/**
+ * Allows you to override options of another job. This can be used to rename the job for example.
+ * @param handler The other job.
+ * @param options Additional information to add.
+ */
+export function renameJob<I extends JsonValue, O extends JsonValue>(
+  handler: JobHandlerWithExtra<I, O>,
+  options: RegisterJobOptions,
+): JobHandlerWithExtra<I, O> {
   return Object.assign(handler, options);
 }
 

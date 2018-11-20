@@ -35,11 +35,12 @@ export class TslintFixTask implements TaskConfigurationGenerator<TslintFixTaskOp
     const config = typeof this._configOrPath == 'object' && this._configOrPath !== null
                  ? { tslintConfig: this._configOrPath }
                  : {};
+
     const options = {
       ...this._options,
       ...path,
       ...config,
-    };
+    } as TslintFixTaskOptions;
 
     return { name: TslintFixName, options };
   }

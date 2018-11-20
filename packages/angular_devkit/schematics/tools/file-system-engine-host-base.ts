@@ -11,6 +11,7 @@ import {
   JsonObject,
   UnexpectedEndOfInputException,
   isObservable,
+  jobs,
   normalize,
   virtualFs,
 } from '@angular-devkit/core';
@@ -20,10 +21,11 @@ import { dirname, isAbsolute, join, resolve } from 'path';
 import { Observable, from as observableFrom, of as observableOf, throwError } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { Url } from 'url';
+import * as json from '../../core/src/json';
 import {
   EngineHost,
   HostCreateTree,
-  RuleFactory,
+  RuleFactory, SchematicContext,
   Source,
   TaskExecutor,
   TaskExecutorFactory,
@@ -96,6 +98,11 @@ export class SchematicNameCollisionException extends BaseException {
           + ' name.');
   }
 }
+export class UnsupportedInputForTaskException extends BaseException {
+  constructor(name: string) {
+    super(`Schematic Task ${name} received the wrong input types.`);
+  }
+}
 
 
 /**
@@ -116,9 +123,11 @@ export abstract class FileSystemEngineHostBase implements
 
   private _transforms: OptionTransform<{}, {}>[] = [];
   private _taskFactories = new Map<string, () => Observable<TaskExecutor>>();
+  private _scheduler = new jobs.SimpleJobRegistry();
 
   /**
    * @deprecated Use `listSchematicNames`.
+   * TODO: remove this for 8.0
    */
   listSchematics(collection: FileSystemCollection): string[] {
     return this.listSchematicNames(collection.description);
@@ -311,8 +320,20 @@ export abstract class FileSystemEngineHostBase implements
     return schematic.factoryFn;
   }
 
-  registerTaskExecutor<T>(factory: TaskExecutorFactory<T>, options?: T): void {
-    this._taskFactories.set(factory.name, () => observableFrom(factory.create(options)));
+  registerTaskExecutor(
+    jobHandler: jobs.JobHandler<json.JsonObject & SchematicContext, json.JsonValue>,
+  ): void;
+  registerTaskExecutor<T>(jobHandler: TaskExecutorFactory<T>, options?: T): void;
+  registerTaskExecutor<T>(
+    factory: TaskExecutorFactory<T>
+           | jobs.JobHandler<json.JsonObject & SchematicContext, json.JsonValue>,
+    options?: T,
+  ): void {
+    if (jobs.isJobHandler(factory)) {
+      this._scheduler.register(factory);
+    } else {
+      this._taskFactories.set(factory.name, () => observableFrom(factory.create(options)));
+    }
   }
 
   createTaskExecutor(name: string): Observable<TaskExecutor> {
@@ -321,10 +342,29 @@ export abstract class FileSystemEngineHostBase implements
       return factory();
     }
 
+    if (this._scheduler.has(name)) {
+      return observableOf(<T>(options: T | undefined, context: SchematicContext) => {
+        if (options !== undefined && !json.isJsonObject(options)) {
+          throw new UnsupportedInputForTaskException(name);
+        }
+        const job = this._scheduler.schedule(
+          name,
+          // We make a pure JSON copy of the options, and throwing exceptions if there are circular
+          // structures.
+          options ? { ...JSON.parse(JSON.stringify(options)) } : {},
+          {
+            logger: context.logger,
+          },
+        );
+
+        return job.promise.then(() => {});
+      });
+    }
+
     return throwError(new UnregisteredTaskException(name));
   }
 
   hasTaskExecutor(name: string): boolean {
-    return this._taskFactories.has(name);
+    return this._taskFactories.has(name) || this._scheduler.has(name);
   }
 }
