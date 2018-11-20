@@ -110,10 +110,14 @@ export interface JsonAstComment extends JsonAstNodeBase {
 
 export type JsonValue = JsonAstNode['value'];
 
-export function isJsonObject(value: JsonValue): value is JsonObject {
+// TODO: this should be unknown
+// tslint:disable-next-line:no-any
+export function isJsonObject(value: any): value is JsonObject {
   return value != null && typeof value === 'object' && !Array.isArray(value);
 }
 
-export function isJsonArray(value: JsonValue): value is JsonArray {
+// TODO: this should be unknown
+// tslint:disable-next-line:no-any
+export function isJsonArray(value: any): value is JsonArray {
   return Array.isArray(value);
 }

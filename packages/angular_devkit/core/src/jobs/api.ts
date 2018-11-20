@@ -419,3 +419,15 @@ export interface Scheduler<
     options?: ScheduleJobOptions,
   ): Job<O>;
 }
+
+
+/**
+ * Returns true if the passed in value is a JobHandler<>.
+ */
+export function isJobHandler<InputT extends JsonValue, OutputT extends JsonValue>(
+  // TODO: this should be unknown
+  // tslint:disable-next-line:no-any
+  value: any,
+): value is JobHandler<InputT, OutputT> {
+  return typeof value == 'function' && value.length < 3;
+}

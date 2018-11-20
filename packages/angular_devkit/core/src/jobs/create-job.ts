@@ -72,6 +72,28 @@ export interface JobHandlerWithExtra<
 }
 
 
+export function renameJob<I extends JsonValue, O extends JsonValue>(
+  handler: JobHandlerWithExtra<I, O>,
+  options: RegisterJobOptions,
+): JobHandlerWithExtra<I, O>;
+export function renameJob<I extends JsonValue, O extends JsonValue>(
+  handler: JobHandlerWithExtra<I, O>,
+  options: RegisterJobOptions & { jobName: JobName },
+): JobHandlerWithExtra<I, O> & { jobName: JobName };
+
+/**
+ * Allows you to override options of another job. This can be used to rename the job for example.
+ * @param handler The other job.
+ * @param options Additional information to add.
+ */
+export function renameJob<I extends JsonValue, O extends JsonValue>(
+  handler: JobHandlerWithExtra<I, O>,
+  options: RegisterJobOptions,
+): JobHandlerWithExtra<I, O> {
+  return Object.assign(handler, options);
+}
+
+
 export function createJob<I extends JsonValue, O extends JsonValue>(
   fn: SimpleJobHandlerFn<I, O>,
   options: Partial<RegisterJobOptions> & { jobName: JobName },
@@ -197,6 +219,35 @@ export function createJob<I extends JsonValue, O extends JsonValue>(
         subject.next({ kind: JobEventKind.End, description });
         subject.complete();
       }
+    });
+  };
+
+  return Object.assign(handler, options);
+}
+
+export function lazyLoadJob<I extends JsonValue, O extends JsonValue>(
+  loader: () => Promise<JobHandler<I, O>>,
+  options: RegisterJobOptions,
+): JobHandlerWithExtra<I, O>;
+export function lazyLoadJob<I extends JsonValue, O extends JsonValue>(
+  loader: () => Promise<JobHandler<I, O>>,
+  options: RegisterJobOptions & { jobName: JobName },
+): JobHandlerWithExtra<I, O> & { jobName: JobName };
+
+/**
+ * Lazily load a job.
+ * @param loader A function that returns a promise of JobHandler.
+ * @param options
+ */
+export function lazyLoadJob<I extends JsonValue, O extends JsonValue>(
+  loader: () => Promise<JobHandler<I, O>>,
+  options: RegisterJobOptions,
+): JobHandlerWithExtra<I, O> {
+  const handler: JobHandlerWithExtra<I, O> = (input, context) => {
+    return new Observable<JobEvent<O>>(subject => {
+      loader()
+        .then(fn => fn(input, context).subscribe(subject))
+        .catch(err => subject.error(err));
     });
   };
 
