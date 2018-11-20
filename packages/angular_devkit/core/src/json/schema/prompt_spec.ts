@@ -262,6 +262,45 @@ describe('Prompt Provider', () => {
         .toPromise().then(done, done.fail);
     });
 
+    it('analyzes enums WITH explicit checkbox type', done => {
+      const registry = new CoreSchemaRegistry();
+      const data: any = {};
+
+      registry.usePromptProvider(async definitions => {
+        expect(definitions.length).toBe(1);
+        expect(definitions[0].type).toBe('checkbox');
+        expect(definitions[0].items).toEqual([
+          'one',
+          'two',
+          'three',
+        ]);
+
+        return [{ [definitions[0].id]: 'one' }, { [definitions[0].id]: 'two' } ];
+      });
+
+      registry
+        .compile({
+          properties: {
+            test: {
+              type: 'array',
+              enum: [
+                'one',
+                'two',
+                'three',
+              ],
+              'x-prompt': {
+                'type': 'checkbox',
+                'message': 'test-message',
+              },
+            },
+          },
+        })
+        .pipe(
+          mergeMap(validator => validator(data)),
+        )
+        .toPromise().then(done, done.fail);
+    });
+
     it('analyzes enums WITHOUT explicit list type', done => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
