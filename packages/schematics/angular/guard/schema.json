@@ -40,21 +40,20 @@
     "lintFix": {
       "type": "boolean",
       "default": false,
-      "description": "Specifies whether to apply lint fixes after generating the guard."
-    },
       "description": "When true, applies lint fixes after generating the guard."
     },
     "implements": {
-        "type": "array",
-        "description": "Specifies which interfaces to implement.",
-        "x-prompt": {
-          "message": "Which interfaces would you like to implement?",
-          "type": "checkbox",
-          "items": [
-            { "value": "CanActivate", "label": "CanActivate" },
-            { "value": "CanActivateChild", "label": "CanActivateChild" },
-            { "value": "CanLoad", "label": "CanLoad" }
-          ]
+      "type": "array",
+      "description": "Specifies which interfaces to implement.",
+      "x-prompt": {
+        "message": "Which interfaces would you like to implement?",
+        "type": "checkbox",
+        "items": [
+          { "value": "CanActivate", "label": "CanActivate" },
+          { "value": "CanActivateChild", "label": "CanActivateChild" },
+          { "value": "CanLoad", "label": "CanLoad" }
+        ]
+      }
     }
   },
   "required": [
