@@ -44,32 +44,33 @@ const kColorFunctions = mapObject(kColors, (_, v) => {
   return mapObject(v, (_, vv) => (x: string) => `\u001b[${vv[0]}m${x}\u001b[${vv[1]}m`);
 });
 
+export namespace colors {
+  export const reset = kColorFunctions.modifiers.reset;
+  export const bold = kColorFunctions.modifiers.bold;
+  export const dim = kColorFunctions.modifiers.dim;
+  export const italic = kColorFunctions.modifiers.italic;
+  export const underline = kColorFunctions.modifiers.underline;
+  export const inverse = kColorFunctions.modifiers.inverse;
+  export const hidden = kColorFunctions.modifiers.hidden;
+  export const strikethrough = kColorFunctions.modifiers.strikethrough;
 
-export const reset = kColorFunctions.modifiers.reset;
-export const bold = kColorFunctions.modifiers.bold;
-export const dim = kColorFunctions.modifiers.dim;
-export const italic = kColorFunctions.modifiers.italic;
-export const underline = kColorFunctions.modifiers.underline;
-export const inverse = kColorFunctions.modifiers.inverse;
-export const hidden = kColorFunctions.modifiers.hidden;
-export const strikethrough = kColorFunctions.modifiers.strikethrough;
+  export const black = kColorFunctions.colors.black;
+  export const red = kColorFunctions.colors.red;
+  export const green = kColorFunctions.colors.green;
+  export const yellow = kColorFunctions.colors.yellow;
+  export const blue = kColorFunctions.colors.blue;
+  export const magenta = kColorFunctions.colors.magenta;
+  export const cyan = kColorFunctions.colors.cyan;
+  export const white = kColorFunctions.colors.white;
+  export const grey = kColorFunctions.colors.gray;
+  export const gray = kColorFunctions.colors.gray;
 
-export const black = kColorFunctions.colors.black;
-export const red = kColorFunctions.colors.red;
-export const green = kColorFunctions.colors.green;
-export const yellow = kColorFunctions.colors.yellow;
-export const blue = kColorFunctions.colors.blue;
-export const magenta = kColorFunctions.colors.magenta;
-export const cyan = kColorFunctions.colors.cyan;
-export const white = kColorFunctions.colors.white;
-export const grey = kColorFunctions.colors.gray;
-export const gray = kColorFunctions.colors.gray;
-
-export const bgBlack = kColorFunctions.bgColors.bgBlack;
-export const bgRed = kColorFunctions.bgColors.bgRed;
-export const bgGreen = kColorFunctions.bgColors.bgGreen;
-export const bgYellow = kColorFunctions.bgColors.bgYellow;
-export const bgBlue = kColorFunctions.bgColors.bgBlue;
-export const bgMagenta = kColorFunctions.bgColors.bgMagenta;
-export const bgCyan = kColorFunctions.bgColors.bgCyan;
-export const bgWhite = kColorFunctions.bgColors.bgWhite;
+  export const bgBlack = kColorFunctions.bgColors.bgBlack;
+  export const bgRed = kColorFunctions.bgColors.bgRed;
+  export const bgGreen = kColorFunctions.bgColors.bgGreen;
+  export const bgYellow = kColorFunctions.bgColors.bgYellow;
+  export const bgBlue = kColorFunctions.bgColors.bgBlue;
+  export const bgMagenta = kColorFunctions.bgColors.bgMagenta;
+  export const bgCyan = kColorFunctions.bgColors.bgCyan;
+  export const bgWhite = kColorFunctions.bgColors.bgWhite;
+}
