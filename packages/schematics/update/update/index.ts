@@ -76,7 +76,8 @@ interface PackageInfo {
 }
 
 interface UpdateMetadata {
-  packageGroup: string[];
+  packageGroupName?: string;
+  packageGroup: { [ packageName: string ]: string };
   requirements: { [packageName: string]: string };
   migrations?: string;
 }
@@ -88,9 +89,9 @@ function _updatePeerVersion(infoMap: Map<string, PackageInfo>, name: string, ran
     return range;
   }
   if (maybePackageInfo.target) {
-    name = maybePackageInfo.target.updateMetadata.packageGroup[0] || name;
+    name = maybePackageInfo.target.updateMetadata.packageGroupName || name;
   } else {
-    name = maybePackageInfo.installed.updateMetadata.packageGroup[0] || name;
+    name = maybePackageInfo.installed.updateMetadata.packageGroupName || name;
   }
 
   const maybeTransform = peerCompatibleWhitelist[name];
@@ -353,7 +354,7 @@ function _getUpdateMetadata(
   const metadata = packageJson['ng-update'];
 
   const result: UpdateMetadata = {
-    packageGroup: [],
+    packageGroup: {},
     requirements: {},
   };
 
@@ -363,15 +364,28 @@ function _getUpdateMetadata(
 
   if (metadata['packageGroup']) {
     const packageGroup = metadata['packageGroup'];
-    // Verify that packageGroup is an array of strings. This is not an error but we still warn
-    // the user and ignore the packageGroup keys.
-    if (!Array.isArray(packageGroup) || packageGroup.some(x => typeof x != 'string')) {
+    // Verify that packageGroup is an array of strings or an map of versions. This is not an error
+    // but we still warn the user and ignore the packageGroup keys.
+    if (Array.isArray(packageGroup) && packageGroup.every(x => typeof x == 'string')) {
+      result.packageGroup = packageGroup.reduce((group, name) => {
+        group[name] = packageJson.version;
+
+        return group;
+      }, result.packageGroup);
+    } else if (typeof packageGroup == 'object' && packageGroup
+               && Object.values(packageGroup).every(x => typeof x == 'string')) {
+      result.packageGroup = packageGroup;
+    } else {
       logger.warn(
         `packageGroup metadata of package ${packageJson.name} is malformed. Ignoring.`,
       );
-    } else {
-      result.packageGroup = packageGroup;
     }
+
+    result.packageGroupName = Object.keys(result.packageGroup)[0];
+  }
+
+  if (typeof metadata['packageGroupName'] == 'string') {
+    result.packageGroupName = metadata['packageGroupName'];
   }
 
   if (metadata['requirements']) {
@@ -654,22 +668,34 @@ function _addPackageGroup(
     return;
   }
 
-  const packageGroup = ngUpdateMetadata['packageGroup'];
+  let packageGroup = ngUpdateMetadata['packageGroup'];
   if (!packageGroup) {
     return;
   }
-  if (!Array.isArray(packageGroup) || packageGroup.some(x => typeof x != 'string')) {
+  if (Array.isArray(packageGroup) && !packageGroup.some(x => typeof x != 'string')) {
+    packageGroup = packageGroup.reduce((acc, curr) => {
+      acc[curr] = maybePackage;
+
+      return acc;
+    }, {} as { [name: string]: string });
+  }
+
+  // Only need to check if it's an object because we set it right the time before.
+  if (typeof packageGroup != 'object'
+      || packageGroup === null
+      || Object.values(packageGroup).some(v => typeof v != 'string')
+  ) {
     logger.warn(`packageGroup metadata of package ${npmPackageJson.name} is malformed.`);
 
     return;
   }
 
-  packageGroup
+  Object.keys(packageGroup)
     .filter(name => !packages.has(name))  // Don't override names from the command line.
     .filter(name => allDependencies.has(name))  // Remove packages that aren't installed.
     .forEach(name => {
-    packages.set(name, maybePackage);
-  });
+      packages.set(name, packageGroup[name]);
+    });
 }
 
 /**

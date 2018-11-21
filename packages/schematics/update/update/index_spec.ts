@@ -222,6 +222,40 @@ describe('@schematics/update', () => {
     ).toPromise().then(done, done.fail);
   }, 45000);
 
+  it('uses packageGroup for versioning', async () => {
+    // Add the basic migration package.
+    const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
+    const packageJson = JSON.parse(content);
+    const dependencies = packageJson['dependencies'];
+    dependencies['@angular-devkit-tests/update-package-group-1'] = '1.0.0';
+    dependencies['@angular-devkit-tests/update-package-group-2'] = '1.0.0';
+    host.sync.write(
+      normalize('/package.json'),
+      virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
+    );
+
+    await schematicRunner.runSchematicAsync('update', {
+      packages: ['@angular-devkit-tests/update-package-group-1'],
+    }, appTree).pipe(
+      map(tree => {
+        const packageJson = JSON.parse(tree.readContent('/package.json'));
+        const deps = packageJson['dependencies'];
+        expect(deps['@angular-devkit-tests/update-package-group-1']).toBe('1.2.0');
+        expect(deps['@angular-devkit-tests/update-package-group-2']).toBe('2.0.0');
+
+        // Check install task.
+        expect(schematicRunner.tasks).toEqual([
+          {
+            name: 'node-package',
+            options: jasmine.objectContaining({
+              command: 'install',
+            }),
+          },
+        ]);
+      }),
+    ).toPromise();
+  }, 45000);
+
   it('can migrate only', done => {
     // Add the basic migration package.
     const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
