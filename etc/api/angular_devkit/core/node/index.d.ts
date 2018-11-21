@@ -1,5 +1,10 @@
 export declare function createConsoleLogger(verbose?: boolean, stdout?: ProcessOutput, stderr?: ProcessOutput): logging.Logger;
 
+export declare namespace fs {
+    function isFile(filePath: string): boolean;
+    function isDirectory(filePath: string): boolean;
+}
+
 export declare class ModuleNotFoundException extends BaseException {
     readonly basePath: string;
     readonly code: string;
