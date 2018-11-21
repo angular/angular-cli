@@ -34,6 +34,33 @@ export declare function asSource(rule: Rule): Source;
 
 export declare type AsyncFileOperator = (tree: FileEntry) => Observable<FileEntry | null>;
 
+export declare abstract class BaseWorkflow implements Workflow {
+    protected _context: WorkflowExecutionContext[];
+    protected _dryRun: boolean;
+    protected _engine: SchematicEngine<{}, {}>;
+    protected _engineHost: EngineHost<{}, {}>;
+    protected _force: boolean;
+    protected _host: virtualFs.Host;
+    protected _lifeCycle: Subject<LifeCycleEvent>;
+    protected _registry: schema.CoreSchemaRegistry;
+    protected _reporter: Subject<DryRunEvent>;
+    readonly context: Readonly<WorkflowExecutionContext>;
+    readonly lifeCycle: Observable<LifeCycleEvent>;
+    readonly registry: schema.SchemaRegistry;
+    readonly reporter: Observable<DryRunEvent>;
+    constructor(options: BaseWorkflowOptions);
+    protected _createSinks(): Sink[];
+    execute(options: Partial<WorkflowExecutionContext> & RequiredWorkflowExecutionContext): Observable<void>;
+}
+
+export interface BaseWorkflowOptions {
+    dryRun?: boolean;
+    engineHost: EngineHost<{}, {}>;
+    force?: boolean;
+    host: virtualFs.Host;
+    registry?: schema.CoreSchemaRegistry;
+}
+
 export declare function branchAndMerge(rule: Rule, strategy?: MergeStrategy): Rule;
 
 export declare function callRule(rule: Rule, input: Observable<Tree>, context: SchematicContext): Observable<Tree>;
@@ -317,6 +344,8 @@ export declare class HostTree implements Tree {
     static isHostTree(tree: Tree): tree is HostTree;
 }
 
+export declare const htmlSelectorFormat: schema.SchemaFormat;
+
 export declare class InvalidPipeException extends BaseException {
     constructor(name: string);
 }
@@ -340,6 +369,10 @@ export declare class InvalidUpdateRecordException extends BaseException {
 export declare function isAction(action: any): action is Action;
 
 export declare function isContentAction(action: Action): action is CreateFileAction | OverwriteFileAction;
+
+export interface LifeCycleEvent {
+    kind: 'start' | 'end' | 'workflow-start' | 'workflow-end' | 'post-tasks-start' | 'post-tasks-end';
+}
 
 export declare class MergeConflictException extends BaseException {
     constructor(path: string);
@@ -371,6 +404,8 @@ export interface OverwriteFileAction extends ActionBase {
 }
 
 export declare function partitionApplyMerge(predicate: FilePredicate<boolean>, ruleYes: Rule, ruleNo?: Rule): Rule;
+
+export declare const pathFormat: schema.SchemaFormat;
 
 export declare function pathTemplate<T extends PathTemplateData>(options: T): Rule;
 
@@ -404,6 +439,12 @@ export interface RenameFileAction extends ActionBase {
 }
 
 export declare function renameTemplateFiles(): Rule;
+
+export interface RequiredWorkflowExecutionContext {
+    collection: string;
+    options: object;
+    schematic: string;
+}
 
 export declare type Rule = (tree: Tree, context: SchematicContext) => Tree | Observable<Tree> | Rule | void;
 
@@ -483,6 +524,8 @@ export interface Sink {
 export declare function source(tree: Tree): Source;
 
 export declare type Source = (context: SchematicContext) => Tree | Observable<Tree>;
+
+export declare const standardFormats: schema.SchemaFormat[];
 
 export interface TaskConfiguration<T = {}> {
     dependencies?: Array<TaskId>;
@@ -643,3 +686,15 @@ export declare class VirtualTree implements Tree {
 }
 
 export declare function when(predicate: FilePredicate<boolean>, operator: FileOperator): FileOperator;
+
+export interface Workflow {
+    readonly context: Readonly<WorkflowExecutionContext>;
+    execute(options: Partial<WorkflowExecutionContext> & RequiredWorkflowExecutionContext): Observable<void>;
+}
+
+export interface WorkflowExecutionContext extends RequiredWorkflowExecutionContext {
+    allowPrivate?: boolean;
+    debug: boolean;
+    logger: logging.Logger;
+    parentContext?: Readonly<WorkflowExecutionContext>;
+}
