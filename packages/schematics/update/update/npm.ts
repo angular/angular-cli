@@ -68,6 +68,11 @@ function readOptions(yarn = false): { [key: string]: string } {
     }
   }
 
+  // Substitute any environment variable references
+  for (const key in options) {
+    options[key] = options[key].replace(/\$\{([^\}]+)\}/, (_, name) => process.env[name] || '');
+  }
+
   return options;
 }
 
