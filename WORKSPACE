@@ -37,9 +37,9 @@ go_register_toolchains()
 # TS API Guardian resides in Angular
 http_archive(
     name = "angular",
-    url = "https://github.com/angular/angular/archive/e026a2792a6a7ae7f51f4008c3e8e994ec4f0200.zip",
-    strip_prefix = "angular-e026a2792a6a7ae7f51f4008c3e8e994ec4f0200",
-    sha256 = "f9426a9e32b82ac30158632053a23bb15fc309dd2c78bf98872b735961117391",
+    url = "https://github.com/angular/angular/archive/7.1.0-rc.0.zip",
+    strip_prefix = "angular-7.1.0-rc.0",
+    sha256 = "dbf3ae2d60b5384715bc002c695be0141f8c9219396ac1edbdc7023bd400c8a1",
 )
 
 load("@angular//:index.bzl", "ng_setup_workspace")
