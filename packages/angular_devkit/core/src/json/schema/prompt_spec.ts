@@ -262,6 +262,83 @@ describe('Prompt Provider', () => {
         .toPromise().then(done, done.fail);
     });
 
+    it('analyzes list with multiselect option and object items', done => {
+      const registry = new CoreSchemaRegistry();
+      const data: any = {};
+
+      registry.usePromptProvider(async definitions => {
+        expect(definitions.length).toBe(1);
+        expect(definitions[0].type).toBe('list');
+        expect(definitions[0].multiselect).toBe(true);
+        expect(definitions[0].items).toEqual([
+          { 'value': 'one', 'label': 'one' },
+          { 'value': 'two', 'label': 'two' },
+        ]);
+
+        return { [definitions[0].id]: { 'value': 'one', 'label': 'one' } };
+      });
+
+      registry
+        .compile({
+          properties: {
+            test: {
+              type: 'array',
+              'x-prompt': {
+                'type': 'list',
+                'multiselect': true,
+                'items': [
+                  { 'value': 'one', 'label': 'one' },
+                  { 'value': 'two', 'label': 'two' },
+                ],
+                'message': 'test-message',
+              },
+            },
+          },
+        })
+        .pipe(
+          mergeMap(validator => validator(data)),
+        )
+        .toPromise().then(done, done.fail);
+    });
+
+    it('analyzes list without multiselect option and object items', done => {
+      const registry = new CoreSchemaRegistry();
+      const data: any = {};
+
+      registry.usePromptProvider(async definitions => {
+        expect(definitions.length).toBe(1);
+        expect(definitions[0].type).toBe('list');
+        expect(definitions[0].multiselect).toBeUndefined();
+        expect(definitions[0].items).toEqual([
+          { 'value': 'one', 'label': 'one' },
+          { 'value': 'two', 'label': 'two' },
+        ]);
+
+        return { [definitions[0].id]: { 'value': 'two', 'label': 'two' } };
+      });
+
+      registry
+        .compile({
+          properties: {
+            test: {
+              type: 'array',
+              'x-prompt': {
+                'type': 'list',
+                'items': [
+                  { 'value': 'one', 'label': 'one' },
+                  { 'value': 'two', 'label': 'two' },
+                ],
+                'message': 'test-message',
+              },
+            },
+          },
+        })
+        .pipe(
+          mergeMap(validator => validator(data)),
+        )
+        .toPromise().then(done, done.fail);
+    });
+
     it('analyzes enums WITHOUT explicit list type', done => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};

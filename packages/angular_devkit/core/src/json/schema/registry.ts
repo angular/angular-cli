@@ -568,6 +568,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           priority: 0,
           raw: schema,
           items,
+          multiselect: type === 'list' ? schema.multiselect : false,
           default: typeof parentSchema.default == 'object' ? undefined : parentSchema.default,
           async validator(data: string) {
             const result = it.self.validate(parentSchema, data);
@@ -624,23 +625,44 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
     return from(provider(prompts)).pipe(
       map(answers => {
-        for (const path in answers) {
-          const pathFragments = path.split('/').map(pf => {
-            if (/^\d+$/.test(pf)) {
-              return pf;
-            } else {
-              return '\'' + pf + '\'';
-            }
-          });
+        const pathFragmenter = (pf: string) => {
+          if (/^\d+$/.test(pf)) {
+            return pf;
+          } else {
+            return '\'' + pf + '\'';
+          }
+        };
 
+        let pathFragments: string[] = [];
+        if (Array.isArray(answers)) {
+          const parsedAnswers = [];
+          for (const answer of answers) {
+            for (const path in answer) {
+              pathFragments = path.split('/').map(pathFragmenter);
+              parsedAnswers.push(answer[path]);
+            }
+          }
           CoreSchemaRegistry._set(
             data,
             pathFragments.slice(1),
-            answers[path] as {},
+            parsedAnswers,
             null,
             undefined,
             true,
           );
+        } else {
+          for (const path in answers) {
+            pathFragments = path.split('/').map(pathFragmenter);
+
+            CoreSchemaRegistry._set(
+              data,
+              pathFragments.slice(1),
+              answers[path] as {},
+              null,
+              undefined,
+              true,
+            );
+          }
         }
 
         return data;

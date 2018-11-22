@@ -98,7 +98,7 @@ function _createPromptProvider(): schema.PromptProvider {
         case 'list':
           return {
             ...question,
-            type: 'list',
+            type: !!definition.multiselect ? 'checkbox' : 'list',
             choices: definition.items && definition.items.map(item => {
               if (typeof item == 'string') {
                 return item;
