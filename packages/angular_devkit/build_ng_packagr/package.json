@@ -15,10 +15,10 @@
     "ng-packagr": "^2.2.0 || ^3.0.0 || ^4.0.0"
   },
   "devDependencies": {
-    "@angular/compiler": "^7.0.3",
-    "@angular/compiler-cli": "^7.0.3",
+    "@angular/compiler": "^7.1.0",
+    "@angular/compiler-cli": "^7.1.0",
     "ng-packagr": "^4.2.0",
-    "tsickle": ">=0.27.3",
+    "tsickle": ">=0.34.0",
     "tslib": "^1.9.0"
   }
 }

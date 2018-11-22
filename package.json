@@ -73,8 +73,8 @@
     "yarn": "^1.10.1"
   },
   "devDependencies": {
-    "@angular/compiler": "^7.0.3",
-    "@angular/compiler-cli": "^7.0.3",
+    "@angular/compiler": "^7.1.0",
+    "@angular/compiler-cli": "^7.1.0",
     "@bazel/karma": "^0.20.3",
     "@bazel/typescript": "0.20.3",
     "@ngtools/json-schema": "^1.1.0",
