@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
+  JsonObject,
   experimental,
   json,
   logging,
@@ -309,7 +310,8 @@ export abstract class SchematicCommand<
               question.type = 'confirm';
               break;
             case 'list':
-              question.type = 'list';
+              const multiselect = !!definition.raw && (definition.raw as JsonObject)['multiselect'];
+              question.type = !!multiselect ? 'checkbox' : 'list';
               question.choices = definition.items && definition.items.map(item => {
                 if (typeof item == 'string') {
                   return item;
