@@ -89,6 +89,11 @@
       "description": "Create an Angular universal app.",
       "schema": "./universal/schema.json"
     },
+    "validator": {
+      "factory": "./validator",
+      "description": "Create an Angular form validator.",
+      "schema": "./validator/schema.json"
+     },
     "appShell": {
       "aliases": [ "app-shell" ],
       "factory": "./app-shell",
