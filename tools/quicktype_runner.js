@@ -9,7 +9,6 @@ const fs = require('fs');
 const path = require('path');
 const {
   InputData,
-  JSONSchema,
   JSONSchemaInput,
   JSONSchemaStore,
   TypeScriptTargetLanguage,
@@ -88,6 +87,8 @@ class FetchingJSONSchemaStore extends JSONSchemaStore {
       return undefined;
     }
 
+    content = appendDeprecatedDescription(content);
+
     return parseJSON(content, "JSON Schema", address);
   }
 }
@@ -116,7 +117,8 @@ async function generate(inPath) {
   // Best description of how to use the API was found at
   //   https://blog.quicktype.io/customizing-quicktype/
   const inputData = new InputData();
-  const source = { name: 'Schema', schema: fs.readFileSync(inPath, 'utf-8') };
+  const content = fs.readFileSync(inPath, 'utf-8');
+  const source = { name: 'Schema', schema: appendDeprecatedDescription(content) };
 
   await inputData.addSource('schema', source, () => {
     return new JSONSchemaInput(new FetchingJSONSchemaStore(inPath));
@@ -135,6 +137,27 @@ async function generate(inPath) {
   });
 
   return header + lines.join('\n') + footer;
+}
+
+/**
+ * Converts `x-deprecated` to `@deprecated` comments.
+ * @param {string} schema
+ */
+function appendDeprecatedDescription(schema) {
+  const content = JSON.parse(schema);
+  const props = content.properties;
+
+  for (const key in props) {
+    let { description = '', 'x-deprecated': deprecated } = props[key];
+    if (!deprecated) {
+      continue;
+    }
+
+    description += '\n@deprecated' + (typeof deprecated === 'string' ? ` ${deprecated}` : '');
+    props[key].description = description;
+  }
+
+  return JSON.stringify(content);
 }
 
 if (require.main === module) {
