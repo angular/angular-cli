@@ -112,7 +112,7 @@ function addDependenciesToPackageJson() {
       {
         type: NodeDependencyType.Dev,
         name: 'tsickle',
-        version: '>=0.29.0',
+        version: '>=0.34.0',
       },
       {
         type: NodeDependencyType.Dev,
