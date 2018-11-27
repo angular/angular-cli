@@ -783,7 +783,11 @@ export default function(options: UpdateSchema): Rule {
     return observableFrom([...allDependencies.keys()]).pipe(
       // Grab all package.json from the npm repository. This requires a lot of HTTP calls so we
       // try to parallelize as many as possible.
-      mergeMap(depName => getNpmPackageJson(depName, options.registry, logger, usingYarn)),
+      mergeMap(depName => getNpmPackageJson(
+        depName,
+        logger,
+        { registryUrl: options.registry, usingYarn, verbose: options.verbose },
+      )),
 
       // Build a map of all dependencies and their packageJson.
       reduce<NpmRepositoryPackageJson, Map<string, NpmRepositoryPackageJson>>(

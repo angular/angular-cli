@@ -54,6 +54,10 @@
         }
       ]
     },
+    "verbose": {
+      "description": "Display additional details during the update process.",
+      "type": "boolean"
+    },
     "packageManager": {
       "description": "The preferred package manager configuration files to use for registry settings.",
       "type": "string",

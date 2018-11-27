@@ -21,8 +21,11 @@ const npmPackageJsonCache = new Map<string, Observable<NpmRepositoryPackageJson>
 let npmrc: { [key: string]: string };
 
 
-function readOptions(yarn = false): { [key: string]: string } {
-  // TODO: have a way to read options without using fs directly.
+function readOptions(
+  logger: logging.LoggerApi,
+  yarn = false,
+  showPotentials = false,
+): Record<string, string> {
   const cwd = process.cwd();
   const baseFilename = yarn ? 'yarnrc' : 'npmrc';
   const dotFilename = '.' + baseFilename;
@@ -42,16 +45,25 @@ function readOptions(yarn = false): { [key: string]: string } {
     path.join(homedir(), dotFilename),
   ];
 
-  const projectConfigLocations: string[] = [];
+  const projectConfigLocations: string[] = [
+    path.join(cwd, dotFilename),
+  ];
   const root = path.parse(cwd).root;
   for (let curDir = path.dirname(cwd); curDir && curDir !== root; curDir = path.dirname(curDir)) {
     projectConfigLocations.unshift(path.join(curDir, dotFilename));
   }
-  projectConfigLocations.push(path.join(cwd, dotFilename));
+
+  if (showPotentials) {
+    logger.info(`Locating potential ${baseFilename} files:`);
+  }
 
   let options: { [key: string]: string } = {};
   for (const location of [...defaultConfigLocations, ...projectConfigLocations]) {
     if (existsSync(location)) {
+      if (showPotentials) {
+        logger.info(`Trying '${location}'...found.`);
+      }
+
       const data = readFileSync(location, 'utf8');
       options = {
         ...options,
@@ -65,6 +77,8 @@ function readOptions(yarn = false): { [key: string]: string } {
           options.ca = readFileSync(cafile, 'utf8').replace(/\r?\n/, '\\n');
         } catch { }
       }
+    } else if (showPotentials) {
+      logger.info(`Trying '${location}'...not found.`);
     }
   }
 
@@ -86,9 +100,12 @@ function readOptions(yarn = false): { [key: string]: string } {
  */
 export function getNpmPackageJson(
   packageName: string,
-  registryUrl: string | undefined,
-  _logger: logging.LoggerApi,
-  usingYarn = false,
+  logger: logging.LoggerApi,
+  options?: {
+    registryUrl?: string;
+    usingYarn?: boolean;
+    verbose?: boolean;
+  },
 ): Observable<Partial<NpmRepositoryPackageJson>> {
   const cachedResponse = npmPackageJsonCache.get(packageName);
   if (cachedResponse) {
@@ -97,12 +114,12 @@ export function getNpmPackageJson(
 
   if (!npmrc) {
     try {
-      npmrc = readOptions();
+      npmrc = readOptions(logger, false, options && options.verbose);
     } catch { }
 
-    if (usingYarn) {
+    if (options && options.usingYarn) {
       try {
-        npmrc = { ...npmrc, ...readOptions(true) };
+        npmrc = { ...npmrc, ...readOptions(logger, true, options && options.verbose) };
       } catch { }
     }
   }
@@ -112,7 +129,7 @@ export function getNpmPackageJson(
     {
       'full-metadata': true,
       ...npmrc,
-      registry: registryUrl,
+      registry: options && options.registryUrl,
     },
   );
 
