@@ -77,8 +77,10 @@ function readOptions(yarn = false): { [key: string]: string } {
 }
 
 /**
- * Get the NPM repository's package.json for a package. This is p
+ * Get the NPM repository's package.json for a package.
  * @param {string} packageName The package name to fetch.
+ * This should include `@<version>` if you are uncertain
+ * if the package is in the npm repository.
  * @param {string} registryUrl The NPM Registry URL to use.
  * @param {LoggerApi} logger A logger instance to log debug information.
  * @returns An observable that will put the pacakge.json content.
