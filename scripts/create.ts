@@ -79,9 +79,9 @@ export default async function(
   // Set the dependencies to the new build we just used.
   for (const packageName of Object.keys(packages)) {
     if (packageJson['dependencies'].hasOwnProperty(packageName)) {
-      packageJson['dependencies'][packageName] = packages[packageName].tar;
+      packageJson['dependencies'][packageName] = 'file:' + packages[packageName].tar;
     } else if (packageJson['devDependencies'].hasOwnProperty(packageName)) {
-      packageJson['devDependencies'][packageName] = packages[packageName].tar;
+      packageJson['devDependencies'][packageName] = 'file:' + packages[packageName].tar;
     }
   }
 

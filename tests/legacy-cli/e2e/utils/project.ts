@@ -100,9 +100,9 @@ export function useBuiltPackages() {
 
       for (const packageName of Object.keys(packages)) {
         if (json['dependencies'].hasOwnProperty(packageName)) {
-          json['dependencies'][packageName] = packages[packageName].tar;
+          json['dependencies'][packageName] = 'file:' + packages[packageName].tar;
         } else if (json['devDependencies'].hasOwnProperty(packageName)) {
-          json['devDependencies'][packageName] = packages[packageName].tar;
+          json['devDependencies'][packageName] = 'file:' + packages[packageName].tar;
         }
       }
     }));
