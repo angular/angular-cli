@@ -568,6 +568,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           priority: 0,
           raw: schema,
           items,
+          multiselect: type === 'list' ? schema.multiselect : false,
           default: typeof parentSchema.default == 'object' ? undefined : parentSchema.default,
           async validator(data: string) {
             const result = it.self.validate(parentSchema, data);
