@@ -26,30 +26,41 @@ import { getWorkspace, updateWorkspace } from '../utility/config';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
 import { getAppModulePath } from '../utility/ng-ast-utils';
 import { getProjectTargets, targetBuildNotFoundError } from '../utility/project-targets';
-import { BrowserBuilderOptions, BrowserBuilderTarget } from '../utility/workspace-models';
+import {
+  BrowserBuilderOptions,
+  BrowserBuilderTarget,
+  WorkspaceSchema,
+} from '../utility/workspace-models';
 import { Schema as ServiceWorkerOptions } from './schema';
+
+function getProjectConfiguration(
+  workspace: WorkspaceSchema,
+  options: ServiceWorkerOptions,
+): BrowserBuilderOptions {
+  const projectTargets = getProjectTargets(workspace, options.project);
+  if (!projectTargets[options.target]) {
+    throw new Error(`Target is not defined for this project.`);
+  }
+
+  const target = projectTargets[options.target] as BrowserBuilderTarget;
+  let applyTo = target.options;
+
+  if (options.configuration &&
+    target.configurations &&
+    target.configurations[options.configuration]) {
+    applyTo = target.configurations[options.configuration] as BrowserBuilderOptions;
+  }
+
+  return applyTo;
+}
 
 function updateConfigFile(options: ServiceWorkerOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     context.logger.debug('updating config file.');
     const workspace = getWorkspace(host);
 
-    const projectTargets = getProjectTargets(workspace, options.project);
-
-    if (!projectTargets[options.target]) {
-      throw new Error(`Target is not defined for this project.`);
-    }
-
-    const target = projectTargets[options.target] as BrowserBuilderTarget;
-    let applyTo = target.options;
-
-    if (options.configuration &&
-      target.configurations &&
-      target.configurations[options.configuration]) {
-      applyTo = target.configurations[options.configuration] as BrowserBuilderOptions;
-    }
-
-    applyTo.serviceWorker = true;
+    const config = getProjectConfiguration(workspace, options);
+    config.serviceWorker = true;
 
     return updateWorkspace(workspace);
   };
@@ -160,8 +171,13 @@ export default function (options: ServiceWorkerOptions): Rule {
       throw new SchematicsException(`Service worker requires a project type of "application".`);
     }
 
+    let { resourcesOutputPath = '' } = getProjectConfiguration(workspace, options);
+    if (resourcesOutputPath) {
+      resourcesOutputPath = '/' + resourcesOutputPath.split('/').filter(x => !!x).join('/');
+    }
+
     const templateSource = apply(url('./files'), [
-      template({...options}),
+      template({ ...options, resourcesOutputPath }),
       move(project.root),
     ]);
 
