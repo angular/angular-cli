@@ -309,7 +309,7 @@ export abstract class SchematicCommand<
               question.type = 'confirm';
               break;
             case 'list':
-              question.type = 'list';
+              question.type = !!definition.multiselect ? 'checkbox' : 'list';
               question.choices = definition.items && definition.items.map(item => {
                 if (typeof item == 'string') {
                   return item;
