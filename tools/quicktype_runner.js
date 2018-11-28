@@ -133,6 +133,7 @@ async function generate(inPath) {
     rendererOptions: {
       'just-types': 'true',
       'explicit-unions': 'true',
+      'acronym-style': 'camel',
     },
   });
 

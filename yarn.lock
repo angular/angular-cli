@@ -2033,10 +2033,10 @@ codelyzer@^4.2.1:
     source-map "^0.5.7"
     sprintf-js "^1.1.1"
 
-collection-utils@0.0.15:
-  version "0.0.15"
-  resolved "https://registry.yarnpkg.com/collection-utils/-/collection-utils-0.0.15.tgz#70f4c54299621699b3f38c66577c9d4284825125"
-  integrity sha512-eLGXa67rSilE5dNCcx2wenWcmmgl4QdlwUj1Z5idKkIBOhZh6PghEZFC3wP3AHH8xnMbIDsky0pR/+1epJBymQ==
+collection-utils@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/collection-utils/-/collection-utils-1.0.1.tgz#31d14336488674f27aefc0a7c5eccacf6df78044"
+  integrity sha512-LA2YTIlR7biSpXkKYwwuzGjwL5rjWEZVOSnvdUc7gObvWe4WkjxOpfrdhoP7Hs09YWDVfg0Mal9BpAqLfVEzQg==
 
 collection-visit@^1.0.0:
   version "1.0.0"
@@ -7315,11 +7315,6 @@ parseqs@0.0.5:
   dependencies:
     better-assert "~1.0.0"
 
-parser-toolkit@>=0.0.3:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/parser-toolkit/-/parser-toolkit-0.0.5.tgz#ec4b61729c86318b56ea971bfba6b3c672d62c01"
-  integrity sha1-7EthcpyGMYtW6pcb+6azxnLWLAE=
-
 parseuri@0.0.5:
   version "0.0.5"
   resolved "https://registry.yarnpkg.com/parseuri/-/parseuri-0.0.5.tgz#80204a50d4dbb779bfdc6ebe2778d90e4bce320a"
@@ -7820,18 +7815,16 @@ quick-lru@^1.0.0:
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-1.1.0.tgz#4360b17c61136ad38078397ff11416e186dcfbb8"
   integrity sha1-Q2CxfGETatOAeDl/8RQW4Ybc+7g=
 
-quicktype-core@^5.0.41:
-  version "5.0.41"
-  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-5.0.41.tgz#83f090b1bddeefcff0581e0d9c754d83410ed453"
-  integrity sha512-CImdVo4M4TlDs0McPSql9HnaoG5/Z3w1bQIlAhc95qekxBx+jJ2HNIqXzEkIsvx7W7sIPZhOuCug9fvmqNkMKQ==
+quicktype-core@^6.0.15:
+  version "6.0.15"
+  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-6.0.15.tgz#44fddfa7ae00fcc06e2eb43829870341be12a34b"
+  integrity sha512-m8GHNFsd2yL9eZmIy0FoZCDuoxfKnvfQHCpcBTvV0760AV9kSNRAk8e2uRs2eYcgj/VUSx0qcUUqm/40CrwYOQ==
   dependencies:
     "@types/urijs" "github:quicktype/types-urijs"
-    collection-utils "0.0.15"
+    collection-utils "^1.0.1"
     js-base64 "^2.4.3"
     pako "^1.0.6"
     pluralize "^7.0.0"
-    stream-json "0.5.2"
-    string-to-stream "^1.1.0"
     unicode-properties "github:quicktype/unicode-properties#dist"
     urijs "^1.19.1"
     wordwrap "^1.0.0"
@@ -7991,7 +7984,7 @@ read-pkg@^3.0.0:
     normalize-package-data "^2.3.2"
     path-type "^3.0.0"
 
-"readable-stream@1 || 2", readable-stream@2, readable-stream@^2.0.0, readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.0.4, readable-stream@^2.0.5, readable-stream@^2.0.6, readable-stream@^2.1.0, readable-stream@^2.1.5, readable-stream@^2.2.2, readable-stream@^2.2.9, readable-stream@^2.3.0, readable-stream@^2.3.3, readable-stream@^2.3.5, readable-stream@^2.3.6, readable-stream@~2.3.3:
+"readable-stream@1 || 2", readable-stream@2, readable-stream@^2.0.0, readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.0.4, readable-stream@^2.0.5, readable-stream@^2.0.6, readable-stream@^2.1.5, readable-stream@^2.2.2, readable-stream@^2.2.9, readable-stream@^2.3.0, readable-stream@^2.3.3, readable-stream@^2.3.5, readable-stream@^2.3.6, readable-stream@~2.3.3:
   version "2.3.6"
   resolved "http://registry.npmjs.org/readable-stream/-/readable-stream-2.3.6.tgz#b11c27d88b8ff1fbe070643cf94b0c79ae1b0aaf"
   integrity sha512-tQtKA9WIAhBF3+VLAseyMqZeBjW0AHJoxOtYqSUZNJxauErmLbVm2FW1y+J/YA9dUrAC39ITejlZWhVIwawkKw==
@@ -9318,13 +9311,6 @@ stream-http@^2.7.2:
     to-arraybuffer "^1.0.0"
     xtend "^4.0.0"
 
-stream-json@0.5.2:
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/stream-json/-/stream-json-0.5.2.tgz#f4256c0ef1a905f2ef2d473706b4b3ff827653cf"
-  integrity sha512-/QlOLybrc6LkH/oVgXo1lJ8oemRIze/grdpfssLn1Pm8nZVhW4VMOqDDYGaORPodQFxiDEUquQJER5LiBu8Ehg==
-  dependencies:
-    parser-toolkit ">=0.0.3"
-
 stream-shift@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.0.tgz#d5c752825e5367e786f78e18e445ea223a155952"
@@ -9344,14 +9330,6 @@ strict-uri-encode@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/strict-uri-encode/-/strict-uri-encode-1.1.0.tgz#279b225df1d582b1f54e65addd4352e18faa0713"
   integrity sha1-J5siXfHVgrH1TmWt3UNS4Y+qBxM=
-
-string-to-stream@^1.1.0:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/string-to-stream/-/string-to-stream-1.1.1.tgz#aba78f73e70661b130ee3e1c0192be4fef6cb599"
-  integrity sha512-QySF2+3Rwq0SdO3s7BAp4x+c3qsClpPQ6abAmb0DGViiSBAkT5kL6JT2iyzEVP+T1SmzHrQD1TwlP9QAHCc+Sw==
-  dependencies:
-    inherits "^2.0.1"
-    readable-stream "^2.1.0"
 
 string-width@^1.0.1, string-width@^1.0.2:
   version "1.0.2"
