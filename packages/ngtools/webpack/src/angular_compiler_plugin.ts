@@ -146,7 +146,7 @@ export class AngularCompilerPlugin {
   private _platform: PLATFORM;
   private _JitMode = false;
   private _emitSkipped = true;
-  private _changedFileExtensions = new Set(['ts', 'tsx', 'html', 'css']);
+  private _changedFileExtensions = new Set(['ts', 'tsx', 'html', 'css', 'js', 'json']);
 
   // Webpack plugin.
   private _firstRun = true;

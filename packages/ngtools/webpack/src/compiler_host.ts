@@ -110,6 +110,13 @@ export class WebpackCompilerHost implements ts.CompilerHost {
         }
       });
     }
+
+    // In case resolveJsonModule and allowJs we also need to remove virtual emitted files
+    if (exists && fullPath.endsWith('.js') || fullPath.endsWith('.json')) {
+      if (this._memoryHost.exists(fullPath)) {
+        this._memoryHost.delete(fullPath);
+      }
+    }
   }
 
   fileExists(fileName: string, delegate = true): boolean {
