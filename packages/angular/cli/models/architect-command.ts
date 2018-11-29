@@ -7,11 +7,13 @@
  */
 import {
   Architect,
+  BuilderConfiguration,
   BuilderContext,
   TargetSpecifier,
 } from '@angular-devkit/architect';
 import { experimental, json, schema, tags } from '@angular-devkit/core';
-import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
+import { NodeJsSyncHost } from '@angular-devkit/core/node';
+import { BepJsonWriter } from '../utilities/bep';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
 import { BaseCommandOptions, Command } from './command';
 import { Arguments, Option } from './interface';
@@ -169,14 +171,46 @@ export abstract class ArchitectCommand<
     return await this.runArchitectTarget(options);
   }
 
-  protected async runSingleTarget(targetSpec: TargetSpecifier, options: string[]) {
+  protected async runBepTarget<T>(
+    command: string,
+    configuration: BuilderConfiguration<T>,
+    buildEventLog: string,
+  ): Promise<number> {
+    const bep = new BepJsonWriter(buildEventLog);
+
+    // Send start
+    bep.writeBuildStarted(command);
+
+    let last = 1;
+    let rebuild = false;
+    await this._architect.run(configuration, { logger: this.logger }).forEach(event => {
+      last = event.success ? 0 : 1;
+
+      if (rebuild) {
+        // NOTE: This will have an incorrect timestamp but this cannot be fixed
+        //       until builders report additional status events
+        bep.writeBuildStarted(command);
+      } else {
+        rebuild = true;
+      }
+
+      bep.writeBuildFinished(last);
+    });
+
+    return last;
+  }
+
+  protected async runSingleTarget(
+    targetSpec: TargetSpecifier,
+    targetOptions: string[],
+    commandOptions: ArchitectCommandOptions & Arguments) {
     // We need to build the builderSpec twice because architect does not understand
     // overrides separately (getting the configuration builds the whole project, including
     // overrides).
     const builderConf = this._architect.getBuilderConfiguration(targetSpec);
     const builderDesc = await this._architect.getBuilderDescription(builderConf).toPromise();
     const targetOptionArray = await parseJsonSchemaToOptions(this._registry, builderDesc.schema);
-    const overrides = parseArguments(options, targetOptionArray, this.logger);
+    const overrides = parseArguments(targetOptions, targetOptionArray, this.logger);
 
     if (overrides['--']) {
       (overrides['--'] || []).forEach(additional => {
@@ -190,9 +224,23 @@ export abstract class ArchitectCommand<
       logger: this.logger,
       targetSpecifier: targetSpec,
     };
-    const result = await this._architect.run(realBuilderConf, builderContext).toPromise();
 
-    return result.success ? 0 : 1;
+    if (commandOptions.buildEventLog && ['build', 'serve'].includes(this.description.name)) {
+      // The build/serve commands supports BEP messaging
+      this.logger.warn('BEP support is experimental and subject to change.');
+
+      return this.runBepTarget(
+        this.description.name,
+        realBuilderConf,
+        commandOptions.buildEventLog as string,
+      );
+    } else {
+      const result = await this._architect
+        .run(realBuilderConf, builderContext)
+        .toPromise();
+
+      return result.success ? 0 : 1;
+    }
   }
 
   protected async runArchitectTarget(
@@ -207,12 +255,12 @@ export abstract class ArchitectCommand<
         // Running them in parallel would jumble the log messages.
         let result = 0;
         for (const project of this.getProjectNamesByTarget(this.target)) {
-          result |= await this.runSingleTarget({ ...targetSpec, project }, extra);
+          result |= await this.runSingleTarget({ ...targetSpec, project }, extra, options);
         }
 
         return result;
       } else {
-        return await this.runSingleTarget(targetSpec, extra);
+        return await this.runSingleTarget(targetSpec, extra, options);
       }
     } catch (e) {
       if (e instanceof schema.SchemaValidationException) {
