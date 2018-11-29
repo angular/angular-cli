@@ -12,47 +12,20 @@ import { debounceTime, take, tap } from 'rxjs/operators';
 import { browserTargetSpec, host, outputPath } from '../utils';
 
 
-describe('Browser Builder allow js', () => {
+describe('Browser Builder resolve json module', () => {
   beforeEach(done => host.initialize().toPromise().then(done, done.fail));
   afterEach(done => host.restore().toPromise().then(done, done.fail));
 
-  it('works', (done) => {
-    host.writeMultipleFiles({
-      'src/my-js-file.js': `console.log(1); export const a = 2;`,
-      'src/main.ts': `import { a } from './my-js-file'; console.log(a);`,
-    });
-
-    // TODO: this test originally edited tsconfig to have `"allowJs": true` but works without it.
-    // Investigate.
-
-    runTargetSpec(host, browserTargetSpec).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).toPromise().then(done, done.fail);
-  });
-
-  it('works with aot', (done) => {
-    host.writeMultipleFiles({
-      'src/my-js-file.js': `console.log(1); export const a = 2;`,
-      'src/main.ts': `import { a } from './my-js-file'; console.log(a);`,
-    });
-
-    const overrides = { aot: true };
-
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).toPromise().then(done, done.fail);
-  });
-
   it('works with watch', (done) => {
     host.writeMultipleFiles({
-      'src/my-js-file.js': `console.log(1); export const a = 2;`,
-      'src/main.ts': `import { a } from './my-js-file'; console.log(a);`,
+      'src/my-json-file.json': `{"foo": "1"}`,
+      'src/main.ts': `import * as a from './my-json-file.json'; console.log(a);`,
     });
 
     host.replaceInFile(
       'tsconfig.json',
       '"target": "es5"',
-      '"target": "es5", "allowJs": true',
+      '"target": "es5", "resolveJsonModule": true',
     );
 
     const overrides = { watch: true };
@@ -67,17 +40,17 @@ describe('Browser Builder allow js', () => {
 
         switch (buildCount) {
           case 1:
-            expect(content).toContain('a = 2');
+            expect(content).toContain('foo":"1"');
             host.writeMultipleFiles({
-              'src/my-js-file.js': `console.log(1); export const a = 1;`,
+              'src/my-json-file.json': `{"foo": "2"}`,
             });
             break;
           case 2:
-            expect(content).toContain('a = 1');
+            expect(content).toContain('foo":"2"');
             break;
         }
 
-        buildCount ++;
+        buildCount++;
       }),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       take(2),
