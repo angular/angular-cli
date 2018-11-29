@@ -110,6 +110,15 @@ export class WebpackCompilerHost implements ts.CompilerHost {
         }
       });
     }
+
+    // In case resolveJsonModule and allowJs we also need to remove virtual emitted files
+    // both if they exists or not.
+    if ((fullPath.endsWith('.js') || fullPath.endsWith('.json'))
+      && !/(\.(ngfactory|ngstyle)\.js|ngsummary\.json)$/.test(fullPath)) {
+      if (this._memoryHost.exists(fullPath)) {
+        this._memoryHost.delete(fullPath);
+      }
+    }
   }
 
   fileExists(fileName: string, delegate = true): boolean {
