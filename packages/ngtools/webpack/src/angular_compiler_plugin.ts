@@ -145,7 +145,7 @@ export class AngularCompilerPlugin {
   private _platform: PLATFORM;
   private _JitMode = false;
   private _emitSkipped = true;
-  private _changedFileExtensions = new Set(['ts', 'tsx', 'html', 'css']);
+  private _changedFileExtensions = new Set(['ts', 'tsx', 'html', 'css', 'js', 'json']);
 
   // Webpack plugin.
   private _firstRun = true;
@@ -1060,7 +1060,7 @@ export class AngularCompilerPlugin {
           // generate a list of changed files for emit
           // not needed on first run since a full program emit is required
           for (const changedFile of this._compilerHost.getChangedFilePaths()) {
-            if (!changedFile.endsWith('.ts') && !changedFile.endsWith('.tsx')) {
+            if (!/.(tsx|ts|json|js)$/.test(changedFile)) {
               continue;
             }
             // existing type definitions are not emitted
