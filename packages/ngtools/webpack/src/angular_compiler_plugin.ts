@@ -133,7 +133,7 @@ export class AngularCompilerPlugin {
   private _program: (ts.Program | Program) | null;
   private _compilerHost: WebpackCompilerHost & CompilerHost;
   private _moduleResolutionCache: ts.ModuleResolutionCache;
-  private _resourceLoader: WebpackResourceLoader;
+  private _resourceLoader?: WebpackResourceLoader;
   // Contains `moduleImportPath#exportName` => `fullModulePath`.
   private _lazyRoutes: LazyRouteMap = Object.create(null);
   private _tsConfigPath: string;
@@ -579,9 +579,20 @@ export class AngularCompilerPlugin {
   }
 
   // Registration hook for webpack plugin.
+  // tslint:disable-next-line:no-big-function
   apply(compiler: Compiler & { watchMode?: boolean }) {
-    // only present for webpack 4.23.0+, assume true otherwise
-    const watchMode = compiler.watchMode === undefined ? true : compiler.watchMode;
+    // cleanup if not watching
+    compiler.hooks.thisCompilation.tap('angular-compiler', compilation => {
+      compilation.hooks.finishModules.tap('angular-compiler', () => {
+        // only present for webpack 4.23.0+, assume true otherwise
+        const watchMode = compiler.watchMode === undefined ? true : compiler.watchMode;
+        if (!watchMode) {
+          this._program = null;
+          this._transformers = [];
+          this._resourceLoader = undefined;
+        }
+      });
+    });
 
     // Decorate inputFileSystem to serve contents of CompilerHost.
     // Use decorated inputFileSystem in watchFileSystem.
@@ -621,6 +632,9 @@ export class AngularCompilerPlugin {
         }
       }
 
+      // only present for webpack 4.23.0+, assume true otherwise
+      const watchMode = compiler.watchMode === undefined ? true : compiler.watchMode;
+
       // Create the webpack compiler host.
       const webpackCompilerHost = new WebpackCompilerHost(
         this._compilerOptions,
@@ -629,9 +643,11 @@ export class AngularCompilerPlugin {
         watchMode,
       );
 
-      // Create and set a new WebpackResourceLoader.
-      this._resourceLoader = new WebpackResourceLoader();
-      webpackCompilerHost.setResourceLoader(this._resourceLoader);
+      // Create and set a new WebpackResourceLoader in AOT
+      if (!this._JitMode) {
+        this._resourceLoader = new WebpackResourceLoader();
+        webpackCompilerHost.setResourceLoader(this._resourceLoader);
+      }
 
       // Use the WebpackCompilerHost with a resource loader to create an AngularCompilerHost.
       this._compilerHost = createCompilerHost({
@@ -785,7 +801,9 @@ export class AngularCompilerPlugin {
     (compilation as any)._ngToolsWebpackPluginInstance = this;
 
     // Update the resource loader with the new webpack compilation.
-    this._resourceLoader.update(compilation);
+    if (this._resourceLoader) {
+      this._resourceLoader.update(compilation);
+    }
 
     try {
       await this._update();
@@ -1010,6 +1028,10 @@ export class AngularCompilerPlugin {
   }
 
   getResourceDependencies(fileName: string): string[] {
+    if (!this._resourceLoader) {
+      return [];
+    }
+
     return this._resourceLoader.getResourceDependencies(fileName);
   }
 
