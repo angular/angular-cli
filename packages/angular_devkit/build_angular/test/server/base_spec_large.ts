@@ -9,6 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { take, tap } from 'rxjs/operators';
+import { BuildWebpackServerSchema } from '../../src/server/schema';
 import { host } from '../utils';
 
 
@@ -43,6 +44,58 @@ describe('Server Builder', () => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(/AppServerModuleNgFactory/);
         expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBeTruthy();
+      }),
+    ).toPromise().then(done, done.fail);
+  });
+
+  it('supports scripts only sourcemaps', (done) => {
+    const overrides: Partial<BuildWebpackServerSchema> = {
+      sourceMap: {
+        styles: false,
+        scripts: true,
+      },
+    };
+
+    host.writeMultipleFiles({
+      'src/app/app.component.css': `p { color: red; }`,
+    });
+
+    runTargetSpec(host, { project: 'app', target: 'server' }, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBe(true);
+
+        const scriptContent = virtualFs.fileBufferToString(
+          host.scopedSync().read(join(outputPath, 'main.js')),
+        );
+        expect(scriptContent).toContain('sourceMappingURL=main.js.map');
+        expect(scriptContent).not.toContain('sourceMappingURL=data:application/json');
+      }),
+    ).toPromise().then(done, done.fail);
+  });
+
+  it('supports component styles sourcemaps', (done) => {
+    const overrides: Partial<BuildWebpackServerSchema> = {
+      sourceMap: {
+        styles: true,
+        scripts: true,
+      },
+    };
+
+    host.writeMultipleFiles({
+      'src/app/app.component.css': `p { color: red; }`,
+    });
+
+    runTargetSpec(host, { project: 'app', target: 'server' }, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBe(true);
+
+        const scriptContent = virtualFs.fileBufferToString(
+          host.scopedSync().read(join(outputPath, 'main.js')),
+        );
+        expect(scriptContent).toContain('sourceMappingURL=main.js.map');
+        expect(scriptContent).toContain('sourceMappingURL=data:application/json');
       }),
     ).toPromise().then(done, done.fail);
   });

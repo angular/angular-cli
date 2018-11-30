@@ -10,6 +10,7 @@ import * as glob from 'glob';
 import * as path from 'path';
 import * as webpack from 'webpack';
 import { WebpackConfigOptions, WebpackTestOptions } from '../build-options';
+import { getSourceMapDevTool } from './utils';
 
 
 /**
@@ -55,6 +56,20 @@ export function getTestConfig(
     });
   }
 
+  if (wco.buildOptions.sourceMap) {
+    const {
+      scriptsSourceMap = false,
+      stylesSourceMap = false,
+    } = wco.buildOptions;
+
+    extraPlugins.push(getSourceMapDevTool(
+      scriptsSourceMap,
+      stylesSourceMap,
+      false,
+      true,
+    ));
+  }
+
   return {
     mode: 'development',
     resolve: {
@@ -63,7 +78,7 @@ export function getTestConfig(
         'browser', 'module', 'main',
       ],
     },
-    devtool: buildOptions.sourceMap ? 'inline-source-map' : 'eval',
+    devtool: buildOptions.sourceMap ? false : 'eval',
     entry: {
       main: path.resolve(root, buildOptions.main),
     },

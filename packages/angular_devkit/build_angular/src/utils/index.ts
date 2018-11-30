@@ -10,3 +10,4 @@ export * from './default-progress';
 export * from './run-module-as-observable-fork';
 export * from './normalize-file-replacements';
 export * from './normalize-asset-patterns';
+export * from './normalize-source-maps';

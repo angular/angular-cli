@@ -11,6 +11,7 @@
 import * as path from 'path';
 import { basename, normalize } from '@angular-devkit/core';
 import { ExtraEntryPoint, ExtraEntryPointObject } from '../../../browser/schema';
+import { SourceMapDevToolPlugin } from 'webpack';
 
 export const ngAppResolve = (resolvePath: string): string => {
   return path.resolve(process.cwd(), resolvePath);
@@ -65,4 +66,26 @@ export function normalizeExtraEntryPoints(
 
     return normalizedEntry;
   })
+}
+
+export function getSourceMapDevTool(
+  scriptsSourceMap: boolean,
+  stylesSourceMap: boolean,
+  hiddenSourceMap = false,
+  inlineSourceMap = false,
+): SourceMapDevToolPlugin {
+  const include = [];
+  if (scriptsSourceMap) {
+    include.push(/js$/);
+  }
+
+  if (stylesSourceMap) {
+    include.push(/css$/);
+  }
+
+  return new SourceMapDevToolPlugin({
+    filename: inlineSourceMap ? undefined : '[file].map',
+    include,
+    append: hiddenSourceMap ? false : undefined,
+  });
 }

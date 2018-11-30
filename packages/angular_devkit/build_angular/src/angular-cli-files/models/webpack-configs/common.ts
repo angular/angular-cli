@@ -15,7 +15,7 @@ import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 import { findUp } from '../../utilities/find-up';
 import { isDirectory } from '../../utilities/is-directory';
 import { requireProjectModule } from '../../utilities/require-project-module';
-import { WebpackConfigOptions } from '../build-options';
+import { BuildOptions, WebpackConfigOptions } from '../build-options';
 import { getOutputHashFormat, normalizeExtraEntryPoints } from './utils';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
@@ -102,7 +102,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
       extraPlugins.push(new ScriptsWebpackPlugin({
         name: bundleName,
-        sourceMap: buildOptions.sourceMap,
+        sourceMap: buildOptions.scriptsSourceMap,
         filename: `${path.basename(bundleName)}${hash}.js`,
         scripts: script.paths,
         basePath: projectRoot,
@@ -174,7 +174,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       use: [
         {
           loader: buildOptimizerLoader,
-          options: { sourceMap: buildOptions.sourceMap },
+          options: { sourceMap: buildOptions.scriptsSourceMap },
         },
       ],
     };
@@ -297,12 +297,12 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         // TODO: check with Mike what this feature needs.
         new BundleBudgetPlugin({ budgets: buildOptions.budgets }),
         new CleanCssWebpackPlugin({
-          sourceMap: buildOptions.sourceMap,
+          sourceMap: buildOptions.stylesSourceMap,
           // component styles retain their original file name
           test: (file) => /\.(?:css|scss|sass|less|styl)$/.test(file),
         }),
         new TerserPlugin({
-          sourceMap: buildOptions.sourceMap,
+          sourceMap: buildOptions.scriptsSourceMap,
           parallel: true,
           cache: true,
           terserOptions,
