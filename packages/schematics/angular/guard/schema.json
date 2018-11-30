@@ -17,7 +17,13 @@
     "spec": {
       "type": "boolean",
       "description": "When true (the default), generates a  \"spec.ts\" test file for the new guard.",
-      "default": true
+      "default": true,
+      "x-deprecated": "Use \"skipTests\" instead."
+    },
+    "skipTests": {
+      "type": "boolean",
+      "description": "When true, does not create \"spec.ts\" test files for the new guard.",
+      "default": false
     },
     "flat": {
       "type": "boolean",

@@ -6,7 +6,7 @@ import {expectFileToExist} from '../../utils/fs';
 export default function() {
   const projectDir = join('src', 'app');
 
-  return ng('generate', 'class', 'test-class', '--spec')
+  return ng('generate', 'class', 'test-class')
     .then(() => expectFileToExist(projectDir))
     .then(() => expectFileToExist(join(projectDir, 'test-class.ts')))
     .then(() => expectFileToExist(join(projectDir, 'test-class.spec.ts')))

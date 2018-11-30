@@ -18,7 +18,6 @@ describe('Service Schematic', () => {
   );
   const defaultOptions: ServiceOptions = {
     name: 'foo',
-    spec: true,
     flat: false,
     project: 'bar',
   };
@@ -34,8 +33,6 @@ describe('Service Schematic', () => {
     inlineStyle: false,
     inlineTemplate: false,
     routing: false,
-    style: 'css',
-    skipTests: false,
     skipPackageJson: false,
   };
   let appTree: UnitTestTree;
@@ -61,8 +58,8 @@ describe('Service Schematic', () => {
     expect(content).toMatch(/providedIn: 'root'/);
   });
 
-  it('should respect the spec flag', () => {
-    const options = { ...defaultOptions, spec: false };
+  it('should respect the skipTests flag', () => {
+    const options = { ...defaultOptions, skipTests: true };
 
     const tree = schematicRunner.runSchematic('service', options, appTree);
     const files = tree.files;

@@ -136,7 +136,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
       if (!(`@schematics/angular:${type}` in schematics)) {
         schematics[`@schematics/angular:${type}`] = {};
       }
-      (schematics[`@schematics/angular:${type}`] as JsonObject).spec = false;
+      (schematics[`@schematics/angular:${type}`] as JsonObject).skipTests = true;
     });
   }
 
@@ -264,15 +264,15 @@ export default function (options: ApplicationOptions): Rule {
       {
         inlineStyle: options.inlineStyle,
         inlineTemplate: options.inlineTemplate,
-        spec: !options.skipTests,
-        styleext: options.style,
+        skipTests: options.skipTests,
+        style: options.style,
         viewEncapsulation: options.viewEncapsulation,
       } :
       {
         inlineStyle: true,
         inlineTemplate: true,
-        spec: false,
-        styleext: options.style,
+        skipTests: true,
+        style: options.style,
       };
 
     const workspace = getWorkspace(host);
@@ -361,7 +361,7 @@ export default function (options: ApplicationOptions): Rule {
       mergeWith(
         apply(url('./other-files'), [
           componentOptions.inlineTemplate ? filter(path => !path.endsWith('.html')) : noop(),
-          !componentOptions.spec ? filter(path => !path.endsWith('.spec.ts')) : noop(),
+          componentOptions.skipTests ? filter(path => !/[.|-]spec.ts$/.test(path)) : noop(),
           template({
             utils: strings,
             ...options as any,  // tslint:disable-line:no-any

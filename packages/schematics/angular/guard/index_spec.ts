@@ -18,7 +18,6 @@ describe('Guard Schematic', () => {
   );
   const defaultOptions: GuardOptions = {
     name: 'foo',
-    spec: true,
     flat: true,
     project: 'bar',
   };
@@ -33,7 +32,6 @@ describe('Guard Schematic', () => {
     inlineStyle: false,
     inlineTemplate: false,
     routing: false,
-    style: 'css',
     skipTests: false,
     skipPackageJson: false,
   };
@@ -50,8 +48,8 @@ describe('Guard Schematic', () => {
     expect(files).toContain('/projects/bar/src/app/foo.guard.ts');
   });
 
-  it('should respect the spec flag', () => {
-    const options = { ...defaultOptions, spec: false };
+  it('should respect the skipTests flag', () => {
+    const options = { ...defaultOptions, skipTests: true };
 
     const tree = schematicRunner.runSchematic('guard', options, appTree);
     const files = tree.files;

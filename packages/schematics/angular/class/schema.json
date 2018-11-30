@@ -29,7 +29,13 @@
     },
     "spec": {
       "type": "boolean",
-      "description": "When true, generates a \"spec.ts\" test file for the new class.",
+      "description": "When true (the default), generates a  \"spec.ts\" test file for the new class.",
+      "default": true,
+      "x-deprecated": "Use \"skipTests\" instead."
+    },
+    "skipTests": {
+      "type": "boolean",
+      "description": "When true, does not create \"spec.ts\" test files for the new class.",
       "default": false
     },
     "type": {

@@ -125,7 +125,7 @@ function buildSelector(options: ComponentOptions, projectPrefix: string) {
 }
 
 
-export default function(options: ComponentOptions): Rule {
+export default function (options: ComponentOptions): Rule {
   return (host: Tree) => {
     if (!options.project) {
       throw new SchematicsException('Option (project) is required.');
@@ -143,12 +143,19 @@ export default function(options: ComponentOptions): Rule {
     options.path = parsedPath.path;
     options.selector = options.selector || buildSelector(options, project.prefix);
 
+    // todo remove these when we remove the deprecations
+    options.style = (
+      options.style && options.style !== 'css'
+        ? options.style : options.styleext
+    ) || 'css';
+    options.skipTests = options.skipTests || !options.spec;
+
     validateName(options.name);
     validateHtmlSelector(options.selector);
 
     const templateSource = apply(url('./files'), [
-      options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
-      options.inlineStyle ? filter(path => !path.endsWith('.__styleext__')) : noop(),
+      options.skipTests ? filter(path => !path.endsWith('.spec.ts')) : noop(),
+      options.inlineStyle ? filter(path => !path.endsWith('.__style__')) : noop(),
       options.inlineTemplate ? filter(path => !path.endsWith('.html')) : noop(),
       template({
         ...strings,

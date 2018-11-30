@@ -102,8 +102,11 @@ export default function (options: PipeOptions): Rule {
 
     options.module = findModuleFromOptions(host, options);
 
+    // todo remove these when we remove the deprecations
+    options.skipTests = options.skipTests || !options.spec;
+
     const templateSource = apply(url('./files'), [
-      options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
+      options.skipTests ? filter(path => !path.endsWith('.spec.ts')) : noop(),
       template({
         ...strings,
         'if-flat': (s: string) => options.flat ? '' : s,

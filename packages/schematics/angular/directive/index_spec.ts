@@ -18,7 +18,6 @@ describe('Directive Schematic', () => {
   );
   const defaultOptions: DirectiveOptions = {
     name: 'foo',
-    spec: true,
     module: undefined,
     export: false,
     prefix: 'app',
@@ -37,7 +36,6 @@ describe('Directive Schematic', () => {
     inlineStyle: false,
     inlineTemplate: false,
     routing: false,
-    style: 'css',
     skipTests: false,
     skipPackageJson: false,
   };

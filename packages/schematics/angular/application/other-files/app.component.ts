@@ -28,7 +28,7 @@ import { Component } from '@angular/core';
   `,<% } else { %>
   templateUrl: './app.component.html',<% } if(inlineStyle) { %>
   styles: []<% } else { %>
-  styleUrls: ['./app.component.<%= styleext %>']<% } %>
+  styleUrls: ['./app.component.<%= style %>']<% } %>
 })
 export class AppComponent {
   title = '<%= name %>';

@@ -139,6 +139,11 @@
               "type": "string",
               "default": "css"
             },
+            "style": {
+              "description": "The file extension to use for style files.",
+              "type": "string",
+              "default": "css"
+            },
             "viewEncapsulation": {
               "description": "Specifies the view encapsulation strategy.",
               "enum": ["Emulated", "Native", "None", "ShadowDom"],
@@ -186,6 +191,11 @@
               "type": "boolean",
               "description": "Specifies if a spec file is generated.",
               "default": true
+            },
+            "skipTests": {
+              "type": "boolean",
+              "description": "When true, does not create test files.",
+              "default": false
             }
           }
         },
@@ -202,11 +212,6 @@
               "type": "string",
               "description": "The scope for the generated routing.",
               "default": "Child"
-            },
-            "spec": {
-              "type": "boolean",
-              "description": "Specifies if a spec file is generated.",
-              "default": true
             },
             "flat": {
               "type": "boolean",
@@ -236,8 +241,13 @@
             },
             "spec": {
               "type": "boolean",
-              "default": true,
-              "description": "Specifies if a spec file is generated."
+              "description": "Specifies if a spec file is generated.",
+              "default": true
+            },
+            "skipTests": {
+              "type": "boolean",
+              "description": "When true, does not create test files.",
+              "default": false
             }
           }
         },
@@ -251,8 +261,13 @@
             },
             "spec": {
               "type": "boolean",
-              "default": true,
-              "description": "Specifies if a spec file is generated."
+              "description": "Specifies if a spec file is generated.",
+              "default": true
+            },
+            "skipTests": {
+              "type": "boolean",
+              "description": "When true, does not create test files.",
+              "default": false
             },
             "skipImport": {
               "type": "boolean",
@@ -277,8 +292,13 @@
           "properties": {
             "spec": {
               "type": "boolean",
-              "default": true,
-              "description": "Specifies if a spec file is generated."
+              "description": "Specifies if a spec file is generated.",
+              "default": true
+            },
+            "skipTests": {
+              "type": "boolean",
+              "description": "When true, does not create test files.",
+              "default": false
             }
           }
         }
