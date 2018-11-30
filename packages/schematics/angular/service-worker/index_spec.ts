@@ -55,7 +55,7 @@ describe('Service Worker Schematic', () => {
   });
 
   it('should update the target options if no configuration is set', () => {
-    const options = {...defaultOptions, configuration: ''};
+    const options = { ...defaultOptions, configuration: '' };
     const tree = schematicRunner.runSchematic('service-worker', options, appTree);
     const configText = tree.readContent('/angular.json');
     const config = JSON.parse(configText);
@@ -97,4 +97,24 @@ describe('Service Worker Schematic', () => {
     const path = '/projects/bar/ngsw-config.json';
     expect(tree.exists(path)).toEqual(true);
   });
+
+  it('should add root assets RegExp', () => {
+    const tree = schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
+    const pkgText = tree.readContent('/projects/bar/ngsw-config.json');
+    const config = JSON.parse(pkgText);
+    expect(config.assetGroups[1].resources.files)
+      .toContain('/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)');
+  });
+
+  it('should add resourcesOutputPath to root assets when specified', () => {
+    const config = JSON.parse(appTree.readContent('/angular.json'));
+    config.projects.bar.architect.build.configurations.production.resourcesOutputPath = 'outDir';
+    appTree.overwrite('/angular.json', JSON.stringify(config));
+    const tree = schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
+    const pkgText = tree.readContent('/projects/bar/ngsw-config.json');
+    const ngswConfig = JSON.parse(pkgText);
+    expect(ngswConfig.assetGroups[1].resources.files)
+      .toContain('/outDir/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)');
+  });
+
 });

@@ -20,8 +20,9 @@ describe('Browser Builder service worker', () => {
         name: 'app',
         installMode: 'prefetch',
         resources: {
-          files: ['/favicon.ico', '/index.html'],
-          versionedFiles: [
+          files: [
+            '/favicon.ico',
+            '/index.html',
             '/*.bundle.css',
             '/*.bundle.js',
             '/*.chunk.js',
@@ -33,7 +34,10 @@ describe('Browser Builder service worker', () => {
         installMode: 'lazy',
         updateMode: 'prefetch',
         resources: {
-          files: ['/assets/**'],
+          files: [
+            '/assets/**',
+            '/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)',
+          ],
         },
       },
     ],
@@ -55,6 +59,7 @@ describe('Browser Builder service worker', () => {
     host.writeMultipleFiles({
       'src/ngsw-config.json': JSON.stringify(manifest),
       'src/assets/folder-asset.txt': 'folder-asset.txt',
+      'src/styles.css': `body { background: url(./spectrum.png); }`,
     });
 
     const overrides = { serviceWorker: true };
@@ -91,6 +96,7 @@ describe('Browser Builder service worker', () => {
               updateMode: 'prefetch',
               urls: [
                 '/assets/folder-asset.txt',
+                '/spectrum.png',
               ],
               patterns: [],
             },
@@ -100,6 +106,7 @@ describe('Browser Builder service worker', () => {
             '/favicon.ico': '84161b857f5c547e3699ddfbffc6d8d737542e01',
             '/assets/folder-asset.txt': '617f202968a6a81050aa617c2e28e1dca11ce8d4',
             '/index.html': '843c96f0aeadc8f093b1b2203c08891ecd8f7425',
+            '/spectrum.png': '8d048ece46c0f3af4b598a95fd8e4709b631c3c0',
           },
         });
       }),
