@@ -5,34 +5,36 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import * as fs from 'fs';
+import { statSync } from 'fs';
 
-
-export function isFile(filePath: string): boolean {
-  let stat;
-  try {
-    stat = fs.statSync(filePath);
-  } catch (e) {
-    if (e && (e.code === 'ENOENT' || e.code === 'ENOTDIR')) {
-      return false;
+export namespace fs {
+  export function isFile(filePath: string): boolean {
+    let stat;
+    try {
+      stat = statSync(filePath);
+    } catch (e) {
+      if (e && (e.code === 'ENOENT' || e.code === 'ENOTDIR')) {
+        return false;
+      }
+      throw e;
     }
-    throw e;
+
+    return stat.isFile() || stat.isFIFO();
   }
 
-  return stat.isFile() || stat.isFIFO();
-}
 
-
-export function isDirectory(filePath: string): boolean {
-  let stat;
-  try {
-    stat = fs.statSync(filePath);
-  } catch (e) {
-    if (e && (e.code === 'ENOENT' || e.code === 'ENOTDIR')) {
-      return false;
+  export function isDirectory(filePath: string): boolean {
+    let stat;
+    try {
+      stat = statSync(filePath);
+    } catch (e) {
+      if (e && (e.code === 'ENOENT' || e.code === 'ENOTDIR')) {
+        return false;
+      }
+      throw e;
     }
-    throw e;
+
+    return stat.isDirectory();
   }
 
-  return stat.isDirectory();
 }

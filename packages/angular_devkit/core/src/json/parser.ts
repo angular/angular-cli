@@ -864,7 +864,7 @@ export function parseJsonAst(input: string, mode = JsonParseMode.Default): JsonA
 /**
  * Options for the parseJson() function.
  */
-interface ParseJsonOptions {
+export interface ParseJsonOptions {
   /**
    * If omitted, will only emit errors related to the content of the JSON. If specified, any
    * JSON errors will also include the path of the file that caused the error.

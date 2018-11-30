@@ -9,10 +9,11 @@
 import { path } from '../path';
 import { fileBuffer } from './buffer';
 import { CordHost } from './record';
-import { TestHost } from './test';
+import { test } from './test';
 
 
 describe('CordHost', () => {
+  const TestHost = test.TestHost;
   const mutatingTestRecord = ['write', 'delete', 'rename'];
 
   it('works (create)', done => {

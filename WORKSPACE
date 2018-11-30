@@ -1,5 +1,13 @@
 workspace(name = "angular_cli")
 
+# This is required by Angular Workspace
+http_archive(
+    name = "bazel_skylib",
+    url = "https://github.com/bazelbuild/bazel-skylib/archive/0.5.0.zip",
+    strip_prefix = "bazel-skylib-0.5.0",
+    sha256 = "ca4e3b8e4da9266c3a9101c8f4704fe2e20eb5625b2a6a7d2d7d45e3dd4efffd",
+)
+
 # We get Buildifier from here.
 http_archive(
     name = "com_github_bazelbuild_buildtools",
@@ -11,8 +19,8 @@ http_archive(
 # Load the TypeScript rules, its dependencies, and setup the workspace.
 http_archive(
     name = "build_bazel_rules_typescript",
-    url = "https://github.com/bazelbuild/rules_typescript/archive/0.20.3.zip",
-    strip_prefix = "rules_typescript-0.20.3",
+    url = "https://github.com/bazelbuild/rules_typescript/archive/8ea1a55cf5cf8be84ddfeefc0940769b80da792f.zip",
+    strip_prefix = "rules_typescript-8ea1a55cf5cf8be84ddfeefc0940769b80da792f",
 )
 
 load("@build_bazel_rules_typescript//:package.bzl", "rules_typescript_dependencies")
@@ -25,6 +33,17 @@ buildifier_dependencies()
 load("@io_bazel_rules_go//go:def.bzl", "go_register_toolchains", "go_rules_dependencies")
 go_rules_dependencies()
 go_register_toolchains()
+
+# TS API Guardian resides in Angular
+http_archive(
+    name = "angular",
+    url = "https://github.com/angular/angular/archive/7.1.0-rc.0.zip",
+    strip_prefix = "angular-7.1.0-rc.0",
+    sha256 = "dbf3ae2d60b5384715bc002c695be0141f8c9219396ac1edbdc7023bd400c8a1",
+)
+
+load("@angular//:index.bzl", "ng_setup_workspace")
+ng_setup_workspace()
 
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_setup_workspace")
 ts_setup_workspace()

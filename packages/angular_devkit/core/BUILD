@@ -5,7 +5,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_library")
-load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test")
+load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test", "npm_package")
 
 licenses(["notice"])  # MIT License
 
@@ -155,5 +155,14 @@ ts_library(
         "@rxjs//operators",
         "@npm//@types/node",
         "@npm//@types/jasmine",
+    ],
+)
+
+npm_package(
+    name = "npm_package",
+    deps = [
+        ":core",
+        ":node",
+        ":node_testing",
     ],
 )

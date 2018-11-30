@@ -72,5 +72,6 @@
     "tests/**/*",
     "tools/**/*",
     "benchmark/**/*",
+    "etc/api/**/*"
   ]
 }

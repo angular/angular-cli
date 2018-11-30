@@ -8,7 +8,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { BaseException } from '../src';
-import { isFile } from './fs';
+import { fs as devkitFs } from './fs';
 
 /**
  * Exception thrown when a module could not be resolved.
@@ -204,16 +204,16 @@ export function resolve(x: string, options: ResolveOptions): string {
   throw new ModuleNotFoundException(x, basePath);
 
   function loadAsFileSync(x: string): string | null {
-    if (isFile(x)) {
+    if (devkitFs.isFile(x)) {
       return x;
     }
 
-    return extensions.map(ex => x + ex).find(f => isFile(f)) || null;
+    return extensions.map(ex => x + ex).find(f => devkitFs.isFile(f)) || null;
   }
 
   function loadAsDirectorySync(x: string): string | null {
     const pkgfile = path.join(x, 'package.json');
-    if (isFile(pkgfile)) {
+    if (devkitFs.isFile(pkgfile)) {
       if (options.resolvePackageJson) {
         return pkgfile;
       }

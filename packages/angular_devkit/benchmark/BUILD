@@ -6,7 +6,7 @@
 licenses(["notice"])  # MIT
 
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_library")
-load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test")
+load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test", "npm_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -71,5 +71,12 @@ jasmine_node_test(
         "@npm//pidtree",
         "@npm//tree-kill",
         "@npm//temp",
+    ],
+)
+
+npm_package(
+    name = "npm_package",
+    deps = [
+        ":benchmark",
     ],
 )

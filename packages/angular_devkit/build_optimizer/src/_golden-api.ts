@@ -5,7 +5,5 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-export * from './fs';
-export * from './cli-logger';
-export * from './host';
-export { ModuleNotFoundException, ResolveOptions, resolve } from './resolve';
+export * from './index';
+export { default } from './build-optimizer/webpack-loader';
