@@ -60,6 +60,17 @@ export default class TslintBuilder implements Builder<TslintBuilderOptions> {
     const root = this.context.workspace.root;
     const systemRoot = getSystemPath(root);
     const options = builderConfig.options;
+    const targetSpecifier = this.context.targetSpecifier;
+    const projectName = targetSpecifier && targetSpecifier.project || '';
+
+    // Print formatter output directly for non human-readable formats.
+    if (!['prose', 'verbose', 'stylish'].includes(options.format)) {
+      options.silent = true;
+    }
+
+    if (!options.silent) {
+      this.context.logger.info(`Linting ${JSON.stringify(projectName)}...`);
+    }
 
     if (!options.tsConfig && options.typeCheck) {
       throw new Error('A "project" must be specified to enable type checking.');
@@ -114,11 +125,6 @@ export default class TslintBuilder implements Builder<TslintBuilderOptions> {
         if (output) {
           this.context.logger.info(output);
         }
-      }
-
-      // Print formatter output directly for non human-readable formats.
-      if (['prose', 'verbose', 'stylish'].indexOf(options.format) == -1) {
-        options.silent = true;
       }
 
       if (result.warningCount > 0 && !options.silent) {

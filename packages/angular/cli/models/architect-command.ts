@@ -7,6 +7,7 @@
  */
 import {
   Architect,
+  BuilderContext,
   TargetSpecifier,
 } from '@angular-devkit/architect';
 import { experimental, json, schema, tags } from '@angular-devkit/core';
@@ -185,8 +186,11 @@ export abstract class ArchitectCommand<
       return 1;
     }
     const realBuilderConf = this._architect.getBuilderConfiguration({ ...targetSpec, overrides });
-
-    const result = await this._architect.run(realBuilderConf, { logger: this.logger }).toPromise();
+    const builderContext: Partial<BuilderContext> = {
+      logger: this.logger,
+      targetSpecifier: targetSpec,
+    };
+    const result = await this._architect.run(realBuilderConf, builderContext).toPromise();
 
     return result.success ? 0 : 1;
   }

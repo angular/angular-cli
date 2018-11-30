@@ -9,7 +9,7 @@
 import { experimental, logging, normalize } from '@angular-devkit/core';
 import { Observable, merge, throwError, timer } from 'rxjs';
 import { concatMap, concatMapTo, finalize, takeUntil } from 'rxjs/operators';
-import { Architect, BuildEvent, TargetSpecifier } from '../src';
+import { Architect, BuildEvent, BuilderContext, TargetSpecifier } from '../src';
 import { TestProjectHost } from './test-project-host';
 
 export const DefaultTimeout = 45000;
@@ -33,9 +33,13 @@ export function runTargetSpec(
   });
 
   // Load the workspace from the root of the host, then run a target.
+  const builderContext: Partial<BuilderContext> = {
+    logger,
+    targetSpecifier: targetSpec,
+  };
   const runArchitect$ = workspace.loadWorkspaceFromHost(workspaceFile).pipe(
     concatMap(ws => new Architect(ws).loadArchitect()),
-    concatMap(arch => arch.run(arch.getBuilderConfiguration(targetSpec), { logger })),
+    concatMap(arch => arch.run(arch.getBuilderConfiguration(targetSpec), builderContext)),
     finalize(() => finalizeCB()),
   );
 

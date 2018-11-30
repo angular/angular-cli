@@ -12,7 +12,7 @@ import { tap } from 'rxjs/operators';
 import { TslintBuilderOptions } from '../../src';
 import { host, tslintTargetSpec } from '../utils';
 
-
+// tslint:disable-next-line:no-big-function
 describe('Tslint Target', () => {
   const filesWithErrors = { 'src/foo.ts': 'const foo = "";\n' };
 
@@ -22,6 +22,28 @@ describe('Tslint Target', () => {
   it('works', (done) => {
     runTargetSpec(host, tslintTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+    ).toPromise().then(done, done.fail);
+  }, 30000);
+
+  it(`should show project name when formatter is human readable`, (done) => {
+    const logger = new TestLogger('lint-info');
+
+    runTargetSpec(host, tslintTargetSpec, undefined, undefined, logger).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        expect(logger.includes('Linting "app"...')).toBe(true);
+      }),
+    ).toPromise().then(done, done.fail);
+  }, 30000);
+
+  it(`should not show project name when formatter is non human readable`, (done) => {
+    const logger = new TestLogger('lint-info');
+
+    runTargetSpec(host, tslintTargetSpec, { format: 'checkstyle' }, undefined, logger).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        expect(logger.includes('Linting "app"...')).toBe(false);
+      }),
     ).toPromise().then(done, done.fail);
   }, 30000);
 

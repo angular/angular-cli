@@ -64,6 +64,7 @@ export interface BuilderContext {
   host: virtualFs.Host<{}>;
   workspace: experimental.workspace.Workspace;
   architect: Architect;
+  targetSpecifier?: TargetSpecifier;
 }
 
 // TODO: use Build Event Protocol
