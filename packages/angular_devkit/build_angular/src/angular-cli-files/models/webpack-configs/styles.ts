@@ -40,7 +40,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const entryPoints: { [key: string]: string[] } = {};
   const globalStylePaths: string[] = [];
   const extraPlugins = [];
-  const cssSourceMap = buildOptions.sourceMap;
+
+  const cssSourceMap = buildOptions.stylesSourceMap;
 
   // Determine hashing format.
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing as string);
@@ -187,7 +188,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         options: {
           ident: 'embedded',
           plugins: postcssPluginCreator,
-          sourceMap: cssSourceMap ? 'inline' : false,
+          sourceMap: cssSourceMap && !buildOptions.hiddenSourceMap ? 'inline' : false,
         },
       },
       ...(use as webpack.Loader[]),
@@ -208,7 +209,10 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
             options: {
               ident: buildOptions.extractCss ? 'extracted' : 'embedded',
               plugins: postcssPluginCreator,
-              sourceMap: cssSourceMap && !buildOptions.extractCss ? 'inline' : cssSourceMap,
+              sourceMap: cssSourceMap
+                && !buildOptions.extractCss
+                && !buildOptions.hiddenSourceMap
+                ? 'inline' : cssSourceMap,
             },
           },
           ...(use as webpack.Loader[]),

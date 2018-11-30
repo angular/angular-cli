@@ -633,9 +633,39 @@
               "default": false
             },
             "sourceMap": {
-              "type": "boolean",
               "description": "Output sourcemaps.",
-              "default": true
+              "default": true,
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "scripts": {
+                      "type": "boolean",
+                      "description": "Output sourcemaps for all scripts.",
+                      "default": true
+                    },
+                    "styles": {
+                      "type": "boolean",
+                      "description": "Output sourcemaps for all styles.",
+                      "default": true
+                    },
+                    "hidden": {
+                      "type": "boolean",
+                      "description": "Output sourcemaps used for error reporting tools.",
+                      "default": false
+                    },
+                    "vendor": {
+                      "type": "boolean",
+                      "description": "Resolve vendor packages sourcemaps.",
+                      "default": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
             },
             "vendorSourceMap": {
               "type": "boolean",
@@ -1045,8 +1075,34 @@
               "description": "Build using Ahead of Time compilation."
             },
             "sourceMap": {
-              "type": "boolean",
-              "description": "Output sourcemaps."
+              "description": "Output sourcemaps.",
+              "default": true,
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "scripts": {
+                      "type": "boolean",
+                      "description": "Output sourcemaps for all scripts.",
+                      "default": true
+                    },
+                    "styles": {
+                      "type": "boolean",
+                      "description": "Output sourcemaps for all styles.",
+                      "default": true
+                    },
+                    "vendor": {
+                      "type": "boolean",
+                      "description": "Resolve vendor packages sourcemaps.",
+                      "default": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
             },
             "vendorSourceMap": {
               "type": "boolean",
@@ -1189,9 +1245,34 @@
               "description": "Defines the build environment."
             },
             "sourceMap": {
-              "type": "boolean",
               "description": "Output sourcemaps.",
-              "default": true
+              "default": true,
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "scripts": {
+                      "type": "boolean",
+                      "description": "Output sourcemaps for all scripts.",
+                      "default": true
+                    },
+                    "styles": {
+                      "type": "boolean",
+                      "description": "Output sourcemaps for all styles.",
+                      "default": true
+                    },
+                    "vendor": {
+                      "type": "boolean",
+                      "description": "Resolve vendor packages sourcemaps.",
+                      "default": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
             },
             "progress": {
               "type": "boolean",
@@ -1455,9 +1536,39 @@
               "description": "The path where style resources will be placed, relative to outputPath."
             },
             "sourceMap": {
-              "type": "boolean",
               "description": "Output sourcemaps.",
-              "default": true
+              "default": true,
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "scripts": {
+                      "type": "boolean",
+                      "description": "Output sourcemaps for all scripts.",
+                      "default": true
+                    },
+                    "styles": {
+                      "type": "boolean",
+                      "description": "Output sourcemaps for all styles.",
+                      "default": true
+                    },
+                    "hidden": {
+                      "type": "boolean",
+                      "description": "Output sourcemaps used for error reporting tools.",
+                      "default": false
+                    },
+                    "vendor": {
+                      "type": "boolean",
+                      "description": "Resolve vendor packages sourcemaps.",
+                      "default": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
             },
             "vendorSourceMap": {
               "type": "boolean",

@@ -10,6 +10,7 @@ import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import * as path from 'path';
 import { tap } from 'rxjs/operators';
+import { BrowserBuilderSchema } from '../../src/browser/schema';
 import { browserTargetSpec, host } from '../utils';
 
 describe('Browser Builder external source map', () => {
@@ -19,7 +20,13 @@ describe('Browser Builder external source map', () => {
   afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
-    const overrides = { sourceMap: true, vendorSourceMap: true };
+    const overrides: Partial<BrowserBuilderSchema> = {
+      sourceMap: {
+        scripts: true,
+        styles: true,
+        vendor: true,
+      },
+    };
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
@@ -35,7 +42,13 @@ describe('Browser Builder external source map', () => {
   });
 
   it('does not map sourcemaps from external library when disabled', (done) => {
-    const overrides = { sourceMap: true, vendorSourceMap: false };
+    const overrides: Partial<BrowserBuilderSchema> = {
+      sourceMap: {
+        scripts: true,
+        styles: true,
+        vendor: false,
+      },
+    };
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),

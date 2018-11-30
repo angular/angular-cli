@@ -30,7 +30,7 @@ import {
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { getBrowserLoggingCb } from '../browser';
-import { defaultProgress, normalizeFileReplacements } from '../utils';
+import { defaultProgress, normalizeFileReplacements, normalizeSourceMaps } from '../utils';
 import { BuildWebpackServerSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
@@ -40,7 +40,7 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
   constructor(public context: BuilderContext) { }
 
   run(builderConfig: BuilderConfiguration<BuildWebpackServerSchema>): Observable<BuildEvent> {
-    const options = builderConfig.options;
+    let options = builderConfig.options;
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<Stats>);
@@ -51,8 +51,19 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
       concatMap(() => options.deleteOutputPath
         ? this._deleteOutputDir(root, normalize(options.outputPath), this.context.host)
         : of(null)),
-        concatMap(() => normalizeFileReplacements(options.fileReplacements, host, root)),
-        tap(fileReplacements => options.fileReplacements = fileReplacements),
+      concatMap(() => normalizeFileReplacements(options.fileReplacements, host, root)),
+      tap(fileReplacements => options.fileReplacements = fileReplacements),
+      tap(() => {
+        const normalizedOptions = normalizeSourceMaps(options.sourceMap);
+        // todo: remove when removing the deprecations
+        normalizedOptions.vendorSourceMap
+          = normalizedOptions.vendorSourceMap || !!options.vendorSourceMap;
+
+        options = {
+          ...options,
+          ...normalizedOptions,
+        };
+      }),
       concatMap(() => {
         const webpackConfig = this.buildWebpackConfig(root, projectRoot, host, options);
 

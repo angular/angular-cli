@@ -69,10 +69,11 @@ export interface BrowserBuilderSchema {
   /**
    * Output sourcemaps.
    */
-  sourceMap: boolean;
+  sourceMap: SourceMapOptions;
 
   /**
    * Resolve vendor packages sourcemaps.
+   * @deprecated - use `sourceMap.vendor` instead
    */
   vendorSourceMap?: boolean;
 
@@ -234,6 +235,19 @@ export interface BrowserBuilderSchema {
    * Output profile events for Chrome profiler.
    */
   profile: boolean;
+}
+
+export type SourceMapOptions = boolean | SourceMapObject;
+
+export interface SourceMapObject {
+  /** Output sourcemaps used for error reports. */
+  hidden?: boolean;
+  /** Resolve vendor packages sourcemaps */
+  vendor?: boolean;
+  /** Output sourcemaps for all scripts */
+  scripts?: boolean;
+  /** Output sourcemaps for all styles. */
+  styles?: boolean;
 }
 
 export type AssetPattern = string | AssetPatternObject;

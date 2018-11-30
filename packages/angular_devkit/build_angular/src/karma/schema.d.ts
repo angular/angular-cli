@@ -7,16 +7,19 @@
  */
 import { BrowserBuilderSchema } from '../browser/schema';
 
-
-// TODO: in TS 2.8 use Extract instead of Pick to make a subset of another type.
 export interface KarmaBuilderSchema extends Pick<BrowserBuilderSchema,
   'assets' | 'main' | 'polyfills' | 'tsConfig' | 'scripts' | 'styles' | 'stylePreprocessorOptions'
-  | 'fileReplacements' | 'sourceMap' | 'poll' | 'preserveSymlinks' | 'watch'
+  | 'fileReplacements' | 'poll' | 'preserveSymlinks' | 'watch' | 'vendorSourceMap'
   > {
   /**
    * The name of the Karma configuration file..
    */
   karmaConfig: string;
+
+  /**
+   * Output sourcemaps.
+   */
+  sourceMap: KarmaSourceMapOptions;
 
   /**
    * Override which browsers tests are run against.
@@ -37,4 +40,15 @@ export interface KarmaBuilderSchema extends Pick<BrowserBuilderSchema,
    * Karma reporters to use. Directly passed to the karma runner.
    */
   reporters?: string[];
+}
+
+export type KarmaSourceMapOptions = boolean | KarmaSourceMapObject;
+
+export interface KarmaSourceMapObject {
+  /** Resolve vendor packages sourcemaps */
+  vendor?: boolean;
+  /** Output sourcemaps for all scripts */
+  scripts?: boolean;
+  /** Output sourcemaps for all styles. */
+  styles?: boolean;
 }

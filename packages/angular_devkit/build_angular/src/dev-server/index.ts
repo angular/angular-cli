@@ -24,11 +24,15 @@ import * as WebpackDevServer from 'webpack-dev-server';
 import { checkPort } from '../angular-cli-files/utilities/check-port';
 import { BrowserBuilder, NormalizedBrowserBuilderSchema, getBrowserLoggingCb } from '../browser/';
 import { BrowserBuilderSchema } from '../browser/schema';
-import { normalizeAssetPatterns, normalizeFileReplacements } from '../utils';
+import { normalizeAssetPatterns, normalizeFileReplacements, normalizeSourceMaps } from '../utils';
 const opn = require('opn');
 
 
-export interface DevServerBuilderOptions {
+export interface DevServerBuilderOptions extends Pick<BrowserBuilderSchema,
+  'optimization' | 'aot' | 'sourceMap' | 'vendorSourceMap'
+  | 'evalSourceMap' | 'vendorChunk' | 'commonChunk' | 'poll'
+  | 'baseHref' | 'deployUrl' | 'progress' | 'verbose'
+  > {
   browserTarget: string;
   port: number;
   host: string;
@@ -45,21 +49,6 @@ export interface DevServerBuilderOptions {
   watch: boolean;
   hmrWarning: boolean;
   servePathDefaultWarning: boolean;
-
-  // These options come from the browser builder and are provided here for convenience.
-  optimization?: boolean;
-  aot?: boolean;
-  sourceMap?: boolean;
-  vendorSourceMap?: boolean;
-  /**@deprecated */
-  evalSourceMap?: boolean;
-  vendorChunk?: boolean;
-  commonChunk?: boolean;
-  baseHref?: string;
-  deployUrl?: string;
-  progress?: boolean;
-  poll?: number;
-  verbose?: boolean;
 }
 
 type DevServerBuilderOptionsKeys = Extract<keyof DevServerBuilderOptions, string>;
@@ -88,14 +77,24 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
         browserOptions.assets, host, root, projectRoot, builderConfig.sourceRoot)),
       // Replace the assets in options with the normalized version.
       tap((assetPatternObjects => browserOptions.assets = assetPatternObjects)),
+      tap(() => {
+        const normalizedOptions = normalizeSourceMaps(browserOptions.sourceMap);
+        // todo: remove when removing the deprecations
+        normalizedOptions.vendorSourceMap
+          = normalizedOptions.vendorSourceMap || !!browserOptions.vendorSourceMap;
+
+        browserOptions = {
+          ...browserOptions,
+          ...normalizedOptions,
+        };
+      }),
       concatMap(() => {
         const webpackConfig = this.buildWebpackConfig(
           root, projectRoot, host, browserOptions as NormalizedBrowserBuilderSchema);
 
         let webpackDevServerConfig: WebpackDevServer.Configuration;
         try {
-          webpackDevServerConfig = this._buildServerConfig(
-            root, projectRoot, options, browserOptions);
+          webpackDevServerConfig = this._buildServerConfig(root, options, browserOptions);
         } catch (err) {
           return throwError(err);
         }
@@ -172,7 +171,8 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
 
         return buildEvent;
       }),
-    );
+     // using more than 10 operators will cause rxjs to loose the types
+    ) as Observable<BuildEvent>;
   }
 
   buildWebpackConfig(
@@ -190,7 +190,6 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
 
   private _buildServerConfig(
     root: Path,
-    projectRoot: Path,
     options: DevServerBuilderOptions,
     browserOptions: BrowserBuilderSchema,
   ) {

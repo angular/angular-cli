@@ -34,8 +34,18 @@ import {
   statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
-import { defaultProgress, normalizeAssetPatterns, normalizeFileReplacements } from '../utils';
-import { AssetPatternObject, BrowserBuilderSchema, CurrentFileReplacement } from './schema';
+import {
+  NormalizedSourceMaps,
+  defaultProgress,
+  normalizeAssetPatterns,
+  normalizeFileReplacements,
+  normalizeSourceMaps,
+} from '../utils';
+import {
+  AssetPatternObject,
+  BrowserBuilderSchema,
+  CurrentFileReplacement,
+} from './schema';
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 const webpackMerge = require('webpack-merge');
 
@@ -45,7 +55,9 @@ const webpackMerge = require('webpack-merge');
 // Right now this normalization has to be done in all other builders that make use of the
 // BrowserBuildSchema and BrowserBuilder.buildWebpackConfig.
 // It would really help if it happens during architect.validateBuilderOptions, or similar.
-export interface NormalizedBrowserBuilderSchema extends BrowserBuilderSchema {
+export interface NormalizedBrowserBuilderSchema extends
+  Pick<BrowserBuilderSchema, Exclude<keyof BrowserBuilderSchema, 'sourceMap' | 'vendorSourceMap'>>,
+  NormalizedSourceMaps {
   assets: AssetPatternObject[];
   fileReplacements: CurrentFileReplacement[];
 }
@@ -55,7 +67,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
   constructor(public context: BuilderContext) { }
 
   run(builderConfig: BuilderConfiguration<BrowserBuilderSchema>): Observable<BuildEvent> {
-    const options = builderConfig.options;
+    let options = builderConfig.options;
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
@@ -71,6 +83,17 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
         options.assets, host, root, projectRoot, builderConfig.sourceRoot)),
       // Replace the assets in options with the normalized version.
       tap((assetPatternObjects => options.assets = assetPatternObjects)),
+      tap(() => {
+        const normalizedOptions = normalizeSourceMaps(options.sourceMap);
+        // todo: remove when removing the deprecations
+        normalizedOptions.vendorSourceMap
+          = normalizedOptions.vendorSourceMap || !!options.vendorSourceMap;
+
+        options = {
+          ...options,
+          ...normalizedOptions,
+        };
+      }),
       concatMap(() => {
         let webpackConfig;
         try {

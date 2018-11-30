@@ -10,7 +10,7 @@ import * as path from 'path';
 import { IndexHtmlWebpackPlugin } from '../../plugins/index-html-webpack-plugin';
 import { generateEntryPoints } from '../../utilities/package-chunk-sort';
 import { WebpackConfigOptions } from '../build-options';
-import { normalizeExtraEntryPoints } from './utils';
+import { getSourceMapDevTool, normalizeExtraEntryPoints } from './utils';
 
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
 
@@ -19,16 +19,11 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   const { root, buildOptions } = wco;
   const extraPlugins = [];
 
-  let sourcemaps: string | false = false;
-  if (buildOptions.sourceMap) {
-    // See https://webpack.js.org/configuration/devtool/ for sourcemap types.
-    if (buildOptions.evalSourceMap && !buildOptions.optimization) {
-      // Produce eval sourcemaps for development with serve, which are faster.
-      sourcemaps = 'eval';
-    } else {
-      // Produce full separate sourcemaps for production.
-      sourcemaps = 'source-map';
-    }
+  let isEval = false;
+  // See https://webpack.js.org/configuration/devtool/ for sourcemap types.
+  if (buildOptions.sourceMap && buildOptions.evalSourceMap && !buildOptions.optimization) {
+    // Produce eval sourcemaps for development with serve, which are faster.
+    isEval = true;
   }
 
   if (buildOptions.index) {
@@ -59,11 +54,25 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }));
   }
 
+  if (!isEval && buildOptions.sourceMap) {
+    const {
+      scriptsSourceMap = false,
+      stylesSourceMap = false,
+      hiddenSourceMap = false,
+    } = buildOptions;
+
+    extraPlugins.push(getSourceMapDevTool(
+      scriptsSourceMap,
+      stylesSourceMap,
+      hiddenSourceMap,
+    ));
+  }
+
   const globalStylesBundleNames = normalizeExtraEntryPoints(buildOptions.styles, 'styles')
     .map(style => style.bundleName);
 
   return {
-    devtool: sourcemaps,
+    devtool: isEval ? 'eval' : false,
     resolve: {
       mainFields: [
         ...(wco.supportES2015 ? ['es2015'] : []),

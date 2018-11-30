@@ -27,7 +27,12 @@ import {
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { AssetPatternObject, CurrentFileReplacement } from '../browser/schema';
-import { defaultProgress, normalizeAssetPatterns, normalizeFileReplacements } from '../utils';
+import {
+  defaultProgress,
+  normalizeAssetPatterns,
+  normalizeFileReplacements,
+  normalizeSourceMaps,
+} from '../utils';
 import { KarmaBuilderSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
@@ -41,7 +46,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
   constructor(public context: BuilderContext) { }
 
   run(builderConfig: BuilderConfiguration<KarmaBuilderSchema>): Observable<BuildEvent> {
-    const options = builderConfig.options;
+    let options = builderConfig.options;
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
@@ -53,6 +58,17 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
         options.assets, host, root, projectRoot, builderConfig.sourceRoot)),
       // Replace the assets in options with the normalized version.
       tap((assetPatternObjects => options.assets = assetPatternObjects)),
+      tap(() => {
+        const normalizedOptions = normalizeSourceMaps(options.sourceMap);
+        // todo: remove when removing the deprecations
+        normalizedOptions.vendorSourceMap
+          = normalizedOptions.vendorSourceMap || !!options.vendorSourceMap;
+
+        options = {
+          ...options,
+          ...normalizedOptions,
+        };
+      }),
       concatMap(() => new Observable(obs => {
         const karma = requireProjectModule(getSystemPath(projectRoot), 'karma');
         const karmaConfig = getSystemPath(resolve(root, normalize(options.karmaConfig)));

@@ -7,6 +7,7 @@
  */
 import { Configuration } from 'webpack';
 import { WebpackConfigOptions } from '../build-options';
+import { getSourceMapDevTool } from './utils';
 
 
 /**
@@ -15,8 +16,22 @@ import { WebpackConfigOptions } from '../build-options';
  */
 export function getServerConfig(wco: WebpackConfigOptions) {
 
+  const extraPlugins = [];
+  if (wco.buildOptions.sourceMap) {
+    const {
+      scriptsSourceMap = false,
+      stylesSourceMap = false,
+      hiddenSourceMap = false,
+    } = wco.buildOptions;
+
+    extraPlugins.push(getSourceMapDevTool(
+      scriptsSourceMap,
+      stylesSourceMap,
+      hiddenSourceMap,
+    ));
+  }
+
   const config: Configuration = {
-    devtool: wco.buildOptions.sourceMap ? 'source-map' : false,
     resolve: {
       mainFields: [
         ...(wco.supportES2015 ? ['es2015'] : []),
@@ -27,6 +42,7 @@ export function getServerConfig(wco: WebpackConfigOptions) {
     output: {
       libraryTarget: 'commonjs',
     },
+    plugins: extraPlugins,
     node: false,
   };
 
