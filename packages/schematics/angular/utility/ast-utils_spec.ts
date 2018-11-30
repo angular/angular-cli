@@ -14,6 +14,7 @@ import { getFileContent } from '../utility/test';
 import {
   addDeclarationToModule,
   addExportToModule,
+  addProviderToModule,
   addSymbolToNgModuleMetadata,
 } from './ast-utils';
 
@@ -178,5 +179,30 @@ describe('ast utils', () => {
     const output = applyChanges(modulePath, moduleContent, changes);
     expect(output).toMatch(/import { FooComponent } from '.\/foo.component';/);
     expect(output).toMatch(/exports: \[FooComponent\]/);
+  });
+
+  it('should add into providers metadata in new line ', () => {
+    const moduleContent = `
+      import { BrowserModule } from '@angular/platform-browser';
+      import { NgModule } from '@angular/core';
+
+      @NgModule({
+        imports: [BrowserModule],
+        declarations: [],
+        providers: [
+          {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthInterceptor,
+            multi: true
+          }
+        ]
+      })
+      export class AppModule { }
+    `;
+    const source = getTsSource(modulePath, moduleContent);
+    const changes = addProviderToModule(source, modulePath, 'LogService', './log.service');
+    const output = applyChanges(modulePath, moduleContent, changes);
+    expect(output).toMatch(/import { LogService } from '.\/log.service';/);
+    expect(output).toMatch(/\},\r?\n\s*LogService\r?\n\s*\]/);
   });
 });
