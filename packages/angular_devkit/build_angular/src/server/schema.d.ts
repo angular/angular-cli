@@ -44,6 +44,7 @@ export interface BuildWebpackServerSchema {
   vendorSourceMap?: boolean;
   /**
    * Output in-file eval sourcemaps.
+   * @deprecated
    */
   evalSourceMap?: boolean;
   /**
