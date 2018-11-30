@@ -41,8 +41,11 @@ export default function (options: GuardOptions): Rule {
     options.name = parsedPath.name;
     options.path = parsedPath.path;
 
+    // todo remove these when we remove the deprecations
+    options.skipTests = options.skipTests || !options.spec;
+
     const templateSource = apply(url('./files'), [
-      options.spec ? noop() : filter(path => !path.endsWith('.spec.ts')),
+      options.skipTests ? filter(path => !path.endsWith('.spec.ts')) : noop(),
       template({
         ...strings,
         ...options,

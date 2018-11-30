@@ -24,8 +24,8 @@ describe('Component Schematic', () => {
     inlineStyle: false,
     inlineTemplate: false,
     changeDetection: ChangeDetection.Default,
-    styleext: 'css',
-    spec: true,
+    style: 'css',
+    skipTests: false,
     module: undefined,
     export: false,
     project: 'bar',
@@ -249,8 +249,8 @@ describe('Component Schematic', () => {
     expect(tree.files).not.toContain('/projects/bar/src/app/foo/foo.component.css');
   });
 
-  it('should respect the styleext option', () => {
-    const options = { ...defaultOptions, styleext: 'scss' };
+  it('should respect the style option', () => {
+    const options = { ...defaultOptions, style: 'scss' };
     const tree = schematicRunner.runSchematic('component', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
     expect(content).toMatch(/styleUrls: \['.\/foo.component.scss/);
@@ -310,4 +310,34 @@ describe('Component Schematic', () => {
     appTree = schematicRunner.runSchematic('component', defaultOptions, appTree);
     expect(appTree.files).toContain('/projects/bar/custom/app/foo/foo.component.ts');
   });
+
+  // testing deprecating options don't cause conflicts
+  it('should respect the deprecated styleext (scss) option', () => {
+    const options = { ...defaultOptions, style: undefined, styleext: 'scss' };
+    const tree = schematicRunner.runSchematic('component', options, appTree);
+    const files = tree.files;
+    expect(files).toContain('/projects/bar/src/app/foo/foo.component.scss');
+  });
+
+  it('should respect the deprecated styleext (css) option', () => {
+    const options = { ...defaultOptions, style: undefined, styleext: 'css' };
+    const tree = schematicRunner.runSchematic('component', options, appTree);
+    const files = tree.files;
+    expect(files).toContain('/projects/bar/src/app/foo/foo.component.css');
+  });
+
+  it('should respect the deprecated spec option when false', () => {
+    const options = { ...defaultOptions, skipTests: undefined, spec: false };
+    const tree = schematicRunner.runSchematic('component', options, appTree);
+    const files = tree.files;
+    expect(files).not.toContain('/projects/bar/src/app/foo/foo.component.spec.ts');
+  });
+
+  it('should respect the deprecated spec option when true', () => {
+    const options = { ...defaultOptions, skipTests: false, spec: true };
+    const tree = schematicRunner.runSchematic('component', options, appTree);
+    const files = tree.files;
+    expect(files).toContain('/projects/bar/src/app/foo/foo.component.spec.ts');
+  });
+
 });
