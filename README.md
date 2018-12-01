@@ -14,7 +14,7 @@
 ### Development tools and libraries specialized for Angular
 
 This is the home of the DevKit and the Angular CLI code. You can find the Angular CLI specific README
-[here](https://github.com/angular/angular-cli/blob/master/packages/angular/cli/README.md).
+[here](/packages/angular/cli/README.md).
 
 
 [![CircleCI branch](https://img.shields.io/circleci/project/github/angular/angular-cli/master.svg?label=circleci)](https://circleci.com/gh/angular/angular-cli) [![Dependency Status](https://david-dm.org/angular/angular-cli.svg)](https://david-dm.org/angular/angular-cli) [![devDependency Status](https://david-dm.org/angular/angular-cli/dev-status.svg)](https://david-dm.org/angular/angular-cli?type=dev) 
