@@ -129,7 +129,7 @@ export function getNpmPackageJson(
     {
       'full-metadata': true,
       ...npmrc,
-      registry: options && options.registryUrl,
+      ...(options && options.registryUrl ? { registry: options.registryUrl } : {}),
     },
   );
 
