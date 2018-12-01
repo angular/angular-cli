@@ -615,13 +615,14 @@ export declare class ProjectToolNotFoundException extends BaseException {
 }
 
 export interface PromptDefinition {
-    default?: string | number | boolean | null;
+    default?: string | string[] | number | boolean | null;
     id: string;
     items?: Array<string | {
         value: JsonValue;
         label: string;
     }>;
     message: string;
+    multiselect?: boolean;
     priority: number;
     raw?: string | JsonObject;
     type: string;
