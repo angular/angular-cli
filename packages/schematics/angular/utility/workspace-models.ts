@@ -74,6 +74,11 @@ export interface ServerBuilderOptions {
     tsConfig: string;
     main: string;
     fileReplacements?: FileReplacements[];
+    optimization?: {
+        scripts?: boolean;
+        styles?: boolean;
+    };
+    sourceMap?: boolean;
 }
 
 export interface AppShellBuilderOptions {
