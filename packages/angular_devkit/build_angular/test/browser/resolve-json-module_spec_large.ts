@@ -8,7 +8,7 @@
 
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, virtualFs } from '@angular-devkit/core';
-import { debounceTime, take, tap } from 'rxjs/operators';
+import { take, tap } from 'rxjs/operators';
 import { browserTargetSpec, host, outputPath } from '../utils';
 
 
@@ -32,7 +32,6 @@ describe('Browser Builder resolve json module', () => {
 
     let buildCount = 1;
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      debounceTime(1000),
       tap(() => {
         const content = virtualFs.fileBufferToString(
           host.scopedSync().read(join(outputPath, 'main.js')),
