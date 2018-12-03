@@ -30,7 +30,12 @@ import {
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { getBrowserLoggingCb } from '../browser';
-import { defaultProgress, normalizeFileReplacements, normalizeSourceMaps } from '../utils';
+import {
+  defaultProgress,
+  normalizeFileReplacements,
+  normalizeOptimization,
+  normalizeSourceMaps,
+} from '../utils';
 import { BuildWebpackServerSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
@@ -62,6 +67,8 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
         options = {
           ...options,
           ...normalizedOptions,
+          // tslint:disable-next-line:no-any
+          optimization: normalizeOptimization(options.optimization || {}) as any,
         };
       }),
       concatMap(() => {

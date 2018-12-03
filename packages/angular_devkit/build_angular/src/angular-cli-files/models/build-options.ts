@@ -16,9 +16,10 @@ import {
   CurrentFileReplacement,
   ExtraEntryPoint,
 } from '../../browser/schema';
+import { NormalizedOptimization } from '../../utils/index';
 
 export interface BuildOptions {
-  optimization: boolean;
+  optimization: NormalizedOptimization;
   environment?: string;
   outputPath: string;
   resourcesOutputPath?: string;
