@@ -11,3 +11,4 @@ export * from './run-module-as-observable-fork';
 export * from './normalize-file-replacements';
 export * from './normalize-asset-patterns';
 export * from './normalize-source-maps';
+export * from './normalize-optimization';

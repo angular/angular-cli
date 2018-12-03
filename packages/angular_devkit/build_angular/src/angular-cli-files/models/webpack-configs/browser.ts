@@ -20,8 +20,12 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   const extraPlugins = [];
 
   let isEval = false;
+  const { styles: stylesOptimization, scripts: scriptsOptimization } = buildOptions.optimization;
   // See https://webpack.js.org/configuration/devtool/ for sourcemap types.
-  if (buildOptions.sourceMap && buildOptions.evalSourceMap && !buildOptions.optimization) {
+  if (buildOptions.sourceMap &&
+    buildOptions.evalSourceMap &&
+    !stylesOptimization &&
+    !scriptsOptimization) {
     // Produce eval sourcemaps for development with serve, which are faster.
     isEval = true;
   }

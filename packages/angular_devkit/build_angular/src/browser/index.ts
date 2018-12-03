@@ -35,10 +35,12 @@ import {
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
 import {
+  NormalizedOptimization,
   NormalizedSourceMaps,
   defaultProgress,
   normalizeAssetPatterns,
   normalizeFileReplacements,
+  normalizeOptimization,
   normalizeSourceMaps,
 } from '../utils';
 import {
@@ -56,10 +58,14 @@ const webpackMerge = require('webpack-merge');
 // BrowserBuildSchema and BrowserBuilder.buildWebpackConfig.
 // It would really help if it happens during architect.validateBuilderOptions, or similar.
 export interface NormalizedBrowserBuilderSchema extends
-  Pick<BrowserBuilderSchema, Exclude<keyof BrowserBuilderSchema, 'sourceMap' | 'vendorSourceMap'>>,
+  Pick<
+  BrowserBuilderSchema,
+  Exclude<keyof BrowserBuilderSchema, 'sourceMap' | 'vendorSourceMap' | 'optimization'>
+  >,
   NormalizedSourceMaps {
   assets: AssetPatternObject[];
   fileReplacements: CurrentFileReplacement[];
+  optimization: NormalizedOptimization;
 }
 
 export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
@@ -92,13 +98,18 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
         options = {
           ...options,
           ...normalizedOptions,
+          // tslint:disable-next-line:no-any
+          optimization: normalizeOptimization(options.optimization) as any,
         };
       }),
       concatMap(() => {
         let webpackConfig;
         try {
           webpackConfig = this.buildWebpackConfig(root, projectRoot, host,
-            options as NormalizedBrowserBuilderSchema);
+            // todo replace with unknown
+            // we need to find a clear way to create this options
+            // tslint:disable-next-line:no-any
+            options as any as NormalizedBrowserBuilderSchema);
         } catch (e) {
           return throwError(e);
         }

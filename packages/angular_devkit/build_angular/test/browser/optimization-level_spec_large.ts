@@ -9,6 +9,7 @@
 import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
+import { BrowserBuilderSchema } from '../../src/browser/schema';
 import { browserTargetSpec, host } from '../utils';
 
 
@@ -43,6 +44,74 @@ describe('Browser Builder optimization level', () => {
         const fileName = join(outputPath, 'vendor.js');
         const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
         expect(content).toMatch(/class \w{constructor\(\){/);
+      }),
+    ).toPromise().then(done, done.fail);
+  });
+
+  it('supports styles only optimizations', (done) => {
+    const overrides: Partial<BrowserBuilderSchema> = {
+      optimization: {
+        styles: true,
+        scripts: false,
+      },
+      aot: true,
+      extractCss: true,
+      styles: ['src/styles.css'],
+    };
+
+    host.appendToFile('src/main.ts', '/** js comment should not be dropped */');
+    host.appendToFile('src/app/app.component.css', 'div { color: white }');
+    host.writeMultipleFiles({
+      'src/styles.css': `div { color: white }`,
+    });
+
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        const scriptContent = virtualFs.fileBufferToString(
+          host.scopedSync().read(join(outputPath, 'main.js')),
+        );
+        expect(scriptContent).toContain('js comment should not be dropped');
+        expect(scriptContent).toContain('color:#fff');
+
+        const styleContent = virtualFs.fileBufferToString(
+          host.scopedSync().read(join(outputPath, 'styles.css')),
+        );
+        expect(styleContent).toContain('color:#fff');
+      }),
+    ).toPromise().then(done, done.fail);
+  });
+
+  it('supports scripts only optimizations', (done) => {
+    const overrides: Partial<BrowserBuilderSchema> = {
+      optimization: {
+        styles: false,
+        scripts: true,
+      },
+      aot: true,
+      extractCss: true,
+      styles: ['src/styles.css'],
+    };
+
+    host.appendToFile('src/main.ts', '/** js comment should be dropped */');
+    host.appendToFile('src/app/app.component.css', 'div { color: white }');
+    host.writeMultipleFiles({
+      'src/styles.css': `div { color: white }`,
+    });
+
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        const scriptContent = virtualFs.fileBufferToString(
+          host.scopedSync().read(join(outputPath, 'main.js')),
+        );
+        expect(scriptContent).not.toContain('js comment should be dropped');
+        expect(scriptContent).toContain('color: white');
+
+        const styleContent = virtualFs.fileBufferToString(
+          host.scopedSync().read(join(outputPath, 'styles.css')),
+        );
+        expect(styleContent).toContain('color: white');
       }),
     ).toPromise().then(done, done.fail);
   });
