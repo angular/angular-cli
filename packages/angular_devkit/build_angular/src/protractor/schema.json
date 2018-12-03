@@ -46,6 +46,19 @@
     "baseUrl": {
       "type": "string",
       "description": "Base URL for protractor to connect to."
+    },
+    "codeCoverage": {
+      "type": "boolean",
+      "description": "Instruments the code for coverage.",
+      "default": false
+    },
+    "codeCoverageExclude": {
+      "type": "array",
+      "description": "Globs to exclude from code coverage.",
+      "items": {
+        "type": "string"
+      },
+      "default": []
     }
   },
   "additionalProperties": false,

@@ -9,7 +9,8 @@ import { BrowserBuilderSchema } from '../browser/schema';
 
 export interface KarmaBuilderSchema extends Pick<BrowserBuilderSchema,
   'assets' | 'main' | 'polyfills' | 'tsConfig' | 'scripts' | 'styles' | 'stylePreprocessorOptions'
-  | 'fileReplacements' | 'poll' | 'preserveSymlinks' | 'watch' | 'vendorSourceMap'
+  | 'fileReplacements' | 'poll' | 'preserveSymlinks' | 'watch' | 'vendorSourceMap' | 'codeCoverage'
+  | 'codeCoverageExclude'
   > {
   /**
    * The name of the Karma configuration file..
@@ -25,16 +26,6 @@ export interface KarmaBuilderSchema extends Pick<BrowserBuilderSchema,
    * Override which browsers tests are run against.
    */
   browsers: string;
-
-  /**
-   * Output a code coverage report.
-   */
-  codeCoverage: boolean;
-
-  /**
-   * Globs to exclude from code coverage.
-   */
-  codeCoverageExclude: string[];
 
   /**
    * Karma reporters to use. Directly passed to the karma runner.

@@ -32,6 +32,8 @@ export interface ProtractorBuilderOptions {
   port?: number;
   host: string;
   baseUrl: string;
+  codeCoverage?: boolean;
+  codeCoverageExclude?: string[];
 }
 
 export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
@@ -63,6 +65,10 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
     // Also override the port and host if they are defined in protractor options.
     if (options.host !== undefined) { overrides.host = options.host; }
     if (options.port !== undefined) { overrides.port = options.port; }
+    if (options.codeCoverage !== undefined) { overrides.codeCoverage = options.codeCoverage; }
+    if (options.codeCoverageExclude !== undefined) {
+      overrides.codeCoverageExclude = options.codeCoverageExclude;
+    }
     const targetSpec = { project, target: targetName, configuration, overrides };
     const builderConfig = architect.getBuilderConfiguration<DevServerBuilderOptions>(targetSpec);
     let devServerDescription: BuilderDescription;

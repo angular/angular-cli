@@ -299,6 +299,19 @@
       "type": "boolean",
       "description": "Output profile events for Chrome profiler.",
       "default": false
+    },
+    "codeCoverage": {
+      "type": "boolean",
+      "description": "Instruments the code for coverage.",
+      "default": false
+    },
+    "codeCoverageExclude": {
+      "type": "array",
+      "description": "Globs to exclude from code coverage.",
+      "items": {
+        "type": "string"
+      },
+      "default": []
     }
   },
   "additionalProperties": false,

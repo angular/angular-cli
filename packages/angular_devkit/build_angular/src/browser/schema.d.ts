@@ -235,6 +235,16 @@ export interface BrowserBuilderSchema {
    * Output profile events for Chrome profiler.
    */
   profile: boolean;
+
+  /**
+   * Instruments the code for coverage.
+   */
+  codeCoverage: boolean;
+
+  /**
+   * Globs to exclude from code coverage.
+   */
+  codeCoverageExclude: string[];
 }
 
 export type OptimizationOptions = boolean | OptimizationObject;

@@ -49,6 +49,8 @@ export interface DevServerBuilderOptions extends Pick<BrowserBuilderSchema,
   watch: boolean;
   hmrWarning: boolean;
   servePathDefaultWarning: boolean;
+  codeCoverage?: boolean;
+  codeCoverageExclude?: string[];
 }
 
 type DevServerBuilderOptionsKeys = Extract<keyof DevServerBuilderOptions, string>;
@@ -403,6 +405,8 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
       'poll',
       'verbose',
       'deployUrl',
+      'codeCoverage',
+      'codeCoverageExclude',
     ];
 
     // remove options that are undefined or not to be overrriden

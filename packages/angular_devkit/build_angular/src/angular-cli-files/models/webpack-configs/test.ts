@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import * as glob from 'glob';
 import * as path from 'path';
 import * as webpack from 'webpack';
 import { WebpackConfigOptions, WebpackTestOptions } from '../build-options';
@@ -24,37 +23,9 @@ import { getSourceMapDevTool } from './utils';
 export function getTestConfig(
   wco: WebpackConfigOptions<WebpackTestOptions>,
 ): webpack.Configuration {
-  const { root, buildOptions, sourceRoot: include } = wco;
+  const { root, buildOptions } = wco;
 
-  const extraRules: webpack.Rule[] = [];
   const extraPlugins: webpack.Plugin[] = [];
-
-  // if (buildOptions.codeCoverage && CliConfig.fromProject()) {
-  if (buildOptions.codeCoverage) {
-    const codeCoverageExclude = buildOptions.codeCoverageExclude;
-    const exclude: (string | RegExp)[] = [
-      /\.(e2e|spec)\.ts$/,
-      /node_modules/,
-    ];
-
-    if (codeCoverageExclude) {
-      codeCoverageExclude.forEach((excludeGlob: string) => {
-        const excludeFiles = glob
-          .sync(path.join(root, excludeGlob), { nodir: true })
-          .map(file => path.normalize(file));
-        exclude.push(...excludeFiles);
-      });
-    }
-
-    extraRules.push({
-      test: /\.(js|ts)$/,
-      loader: 'istanbul-instrumenter-loader',
-      options: { esModules: true },
-      enforce: 'post',
-      exclude,
-      include,
-    });
-  }
 
   if (wco.buildOptions.sourceMap) {
     const { styles, scripts } = wco.buildOptions.sourceMap;
@@ -78,9 +49,6 @@ export function getTestConfig(
     devtool: buildOptions.sourceMap ? false : 'eval',
     entry: {
       main: path.resolve(root, buildOptions.main),
-    },
-    module: {
-      rules: extraRules,
     },
     plugins: extraPlugins,
     optimization: {

@@ -69,12 +69,12 @@ export interface BuildOptions {
   lazyModules: string[];
   platform?: 'browser' | 'server';
   fileReplacements: CurrentFileReplacement[];
-}
 
-export interface WebpackTestOptions extends BuildOptions {
   codeCoverage?: boolean;
   codeCoverageExclude?: string[];
 }
+
+export interface WebpackTestOptions extends BuildOptions {}
 
 export interface WebpackConfigOptions<T = BuildOptions> {
   root: string;
