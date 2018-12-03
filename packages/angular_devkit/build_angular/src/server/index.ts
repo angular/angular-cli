@@ -30,13 +30,14 @@ import {
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { getBrowserLoggingCb } from '../browser';
+import { CurrentFileReplacement } from '../browser/schema';
 import {
+  NormalizedOptimization,
+  NormalizedSourceMaps,
   defaultProgress,
-  normalizeFileReplacements,
-  normalizeOptimization,
-  normalizeSourceMaps,
+  normalizeBuilderSchema,
 } from '../utils';
-import { BuildWebpackServerSchema } from './schema';
+import { BuildWebpackServerSchema, NormalizedServerBuilderServerSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
 
@@ -45,7 +46,7 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
   constructor(public context: BuilderContext) { }
 
   run(builderConfig: BuilderConfiguration<BuildWebpackServerSchema>): Observable<BuildEvent> {
-    let options = builderConfig.options;
+    let options: NormalizedServerBuilderServerSchema;
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<Stats>);
@@ -53,24 +54,15 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
 
     // TODO: verify using of(null) to kickstart things is a pattern.
     return of(null).pipe(
+      concatMap(() => normalizeBuilderSchema(
+        host,
+        root,
+        builderConfig,
+      )),
+      tap(normalizedOptions => options = normalizedOptions),
       concatMap(() => options.deleteOutputPath
         ? this._deleteOutputDir(root, normalize(options.outputPath), this.context.host)
         : of(null)),
-      concatMap(() => normalizeFileReplacements(options.fileReplacements, host, root)),
-      tap(fileReplacements => options.fileReplacements = fileReplacements),
-      tap(() => {
-        const normalizedOptions = normalizeSourceMaps(options.sourceMap);
-        // todo: remove when removing the deprecations
-        normalizedOptions.vendorSourceMap
-          = normalizedOptions.vendorSourceMap || !!options.vendorSourceMap;
-
-        options = {
-          ...options,
-          ...normalizedOptions,
-          // tslint:disable-next-line:no-any
-          optimization: normalizeOptimization(options.optimization || {}) as any,
-        };
-      }),
       concatMap(() => {
         const webpackConfig = this.buildWebpackConfig(root, projectRoot, host, options);
 
@@ -81,7 +73,7 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
 
   buildWebpackConfig(root: Path, projectRoot: Path,
                      host: virtualFs.Host<Stats>,
-                     options: BuildWebpackServerSchema) {
+                     options: NormalizedServerBuilderServerSchema) {
     let wco: WebpackConfigOptions;
 
     // TODO: make target defaults into configurations instead

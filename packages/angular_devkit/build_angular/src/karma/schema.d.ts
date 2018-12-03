@@ -52,3 +52,13 @@ export interface KarmaSourceMapObject {
   /** Output sourcemaps for all styles. */
   styles?: boolean;
 }
+
+
+export interface NormalizedKarmaBuilderSchema extends Pick<
+  KarmaBuilderSchema,
+  Exclude<keyof KarmaBuilderSchema, 'sourceMap' | 'vendorSourceMap'>
+  > {
+  assets: AssetPatternObject[];
+  fileReplacements: CurrentFileReplacement[];
+  sourceMap: NormalizedSourceMaps;
+}

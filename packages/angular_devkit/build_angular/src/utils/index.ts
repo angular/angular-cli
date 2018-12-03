@@ -12,3 +12,4 @@ export * from './normalize-file-replacements';
 export * from './normalize-asset-patterns';
 export * from './normalize-source-maps';
 export * from './normalize-optimization';
+export * from './normalize-builder-schema';

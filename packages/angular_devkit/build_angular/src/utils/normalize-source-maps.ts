@@ -9,24 +9,22 @@
 import { SourceMapOptions } from '../browser/schema';
 
 export interface NormalizedSourceMaps {
-  sourceMap: boolean;
-  scriptsSourceMap: boolean;
-  stylesSourceMap: boolean;
-  hiddenSourceMap: boolean;
-  vendorSourceMap: boolean;
+  scripts: boolean;
+  styles: boolean;
+  hidden: boolean;
+  vendor: boolean;
 }
 
 export function normalizeSourceMaps(sourceMap: SourceMapOptions): NormalizedSourceMaps {
-  const scriptsSourceMap = !!(typeof sourceMap === 'object' ? sourceMap.scripts : sourceMap);
-  const stylesSourceMap = !!(typeof sourceMap === 'object' ? sourceMap.styles : sourceMap);
-  const hiddenSourceMap = typeof sourceMap === 'object' && !!sourceMap.hidden;
-  const vendorSourceMap = typeof sourceMap === 'object' && !!sourceMap.vendor;
+  const scripts = !!(typeof sourceMap === 'object' ? sourceMap.scripts : sourceMap);
+  const styles = !!(typeof sourceMap === 'object' ? sourceMap.styles : sourceMap);
+  const hidden = typeof sourceMap === 'object' && !!sourceMap.hidden;
+  const vendor = typeof sourceMap === 'object' && !!sourceMap.vendor;
 
   return {
-    sourceMap: stylesSourceMap || scriptsSourceMap,
-    vendorSourceMap,
-    hiddenSourceMap,
-    scriptsSourceMap,
-    stylesSourceMap,
+    vendor,
+    hidden,
+    scripts,
+    styles,
   };
 }

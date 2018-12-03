@@ -57,14 +57,11 @@ export function getTestConfig(
   }
 
   if (wco.buildOptions.sourceMap) {
-    const {
-      scriptsSourceMap = false,
-      stylesSourceMap = false,
-    } = wco.buildOptions;
+    const { styles, scripts } = wco.buildOptions.sourceMap;
 
     extraPlugins.push(getSourceMapDevTool(
-      scriptsSourceMap,
-      stylesSourceMap,
+      styles,
+      scripts,
       false,
       true,
     ));

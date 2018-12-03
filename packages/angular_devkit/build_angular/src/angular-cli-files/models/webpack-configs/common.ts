@@ -34,6 +34,11 @@ export const buildOptimizerLoader: string = g['_DevKitIsLocal']
 export function getCommonConfig(wco: WebpackConfigOptions) {
   const { root, projectRoot, buildOptions } = wco;
   const { styles: stylesOptimization, scripts: scriptsOptimization } = buildOptions.optimization;
+  const {
+    styles: stylesSouceMap,
+    scripts: scriptsSourceMap,
+    vendor: vendorSourceMap,
+  } = buildOptions.sourceMap;
 
   const nodeModules = findUp('node_modules', projectRoot);
   if (!nodeModules) {
@@ -103,7 +108,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
       extraPlugins.push(new ScriptsWebpackPlugin({
         name: bundleName,
-        sourceMap: buildOptions.scriptsSourceMap,
+        sourceMap: scriptsSourceMap,
         filename: `${path.basename(bundleName)}${hash}.js`,
         scripts: script.paths,
         basePath: projectRoot,
@@ -159,7 +164,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   }
 
   let sourceMapUseRule;
-  if (buildOptions.sourceMap && buildOptions.vendorSourceMap) {
+  if ((scriptsSourceMap || stylesSouceMap) && vendorSourceMap) {
     sourceMapUseRule = {
       use: [
         {
@@ -175,7 +180,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       use: [
         {
           loader: buildOptimizerLoader,
-          options: { sourceMap: buildOptions.scriptsSourceMap },
+          options: { sourceMap: scriptsSourceMap },
         },
       ],
     };
@@ -209,7 +214,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   if (stylesOptimization) {
     extraMinimizers.push(
       new CleanCssWebpackPlugin({
-        sourceMap: buildOptions.stylesSourceMap,
+        sourceMap: stylesSouceMap,
         // component styles retain their original file name
         test: (file) => /\.(?:css|scss|sass|less|styl)$/.test(file),
       }),
@@ -248,7 +253,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
     extraMinimizers.push(
       new TerserPlugin({
-        sourceMap: buildOptions.scriptsSourceMap,
+        sourceMap: scriptsSourceMap,
         parallel: true,
         cache: true,
         terserOptions,

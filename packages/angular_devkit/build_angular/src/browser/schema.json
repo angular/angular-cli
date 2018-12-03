@@ -56,7 +56,6 @@
     },
     "optimization": {
       "description": "Enables optimization of the build output.",
-      "default": false,
       "oneOf": [
         {
           "type": "object",
