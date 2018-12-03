@@ -18,16 +18,12 @@ export function getServerConfig(wco: WebpackConfigOptions) {
 
   const extraPlugins = [];
   if (wco.buildOptions.sourceMap) {
-    const {
-      scriptsSourceMap = false,
-      stylesSourceMap = false,
-      hiddenSourceMap = false,
-    } = wco.buildOptions;
+    const { scripts, styles, hidden } = wco.buildOptions.sourceMap;
 
     extraPlugins.push(getSourceMapDevTool(
-      scriptsSourceMap,
-      stylesSourceMap,
-      hiddenSourceMap,
+      scripts,
+      styles,
+      hidden,
     ));
   }
 

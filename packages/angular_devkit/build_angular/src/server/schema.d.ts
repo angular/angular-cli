@@ -173,3 +173,12 @@ export interface StylePreprocessorOptions {
    */
   includePaths?: string[];
 }
+
+export interface NormalizedServerBuilderServerSchema extends Pick<
+  BuildWebpackServerSchema,
+  Exclude<keyof BuildWebpackServerSchema, 'sourceMap' | 'optimization'>
+  > {
+  fileReplacements: CurrentFileReplacement[];
+  sourceMap: NormalizedSourceMaps;
+  optimization: NormalizedOptimization;
+}

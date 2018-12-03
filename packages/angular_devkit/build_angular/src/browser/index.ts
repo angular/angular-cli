@@ -38,78 +38,42 @@ import {
   NormalizedOptimization,
   NormalizedSourceMaps,
   defaultProgress,
-  normalizeAssetPatterns,
-  normalizeFileReplacements,
-  normalizeOptimization,
-  normalizeSourceMaps,
+  normalizeBuilderSchema,
 } from '../utils';
 import {
   AssetPatternObject,
   BrowserBuilderSchema,
   CurrentFileReplacement,
+  NormalizedBrowserBuilderSchema,
 } from './schema';
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 const webpackMerge = require('webpack-merge');
-
-
-// TODO: figure out a better way to normalize assets, extra entry points, file replacements,
-// and whatever else needs to be normalized, while keeping type safety.
-// Right now this normalization has to be done in all other builders that make use of the
-// BrowserBuildSchema and BrowserBuilder.buildWebpackConfig.
-// It would really help if it happens during architect.validateBuilderOptions, or similar.
-export interface NormalizedBrowserBuilderSchema extends
-  Pick<
-  BrowserBuilderSchema,
-  Exclude<keyof BrowserBuilderSchema, 'sourceMap' | 'vendorSourceMap' | 'optimization'>
-  >,
-  NormalizedSourceMaps {
-  assets: AssetPatternObject[];
-  fileReplacements: CurrentFileReplacement[];
-  optimization: NormalizedOptimization;
-}
 
 export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
 
   constructor(public context: BuilderContext) { }
 
   run(builderConfig: BuilderConfiguration<BrowserBuilderSchema>): Observable<BuildEvent> {
-    let options = builderConfig.options;
+    let options: NormalizedBrowserBuilderSchema;
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
     const webpackBuilder = new WebpackBuilder({ ...this.context, host });
 
     return of(null).pipe(
+      concatMap(() => normalizeBuilderSchema(
+        host,
+        root,
+        builderConfig,
+      )),
+      tap(normalizedOptions => options = normalizedOptions),
       concatMap(() => options.deleteOutputPath
         ? this._deleteOutputDir(root, normalize(options.outputPath), this.context.host)
         : of(null)),
-      concatMap(() => normalizeFileReplacements(options.fileReplacements, host, root)),
-      tap(fileReplacements => options.fileReplacements = fileReplacements),
-      concatMap(() => normalizeAssetPatterns(
-        options.assets, host, root, projectRoot, builderConfig.sourceRoot)),
-      // Replace the assets in options with the normalized version.
-      tap((assetPatternObjects => options.assets = assetPatternObjects)),
-      tap(() => {
-        const normalizedOptions = normalizeSourceMaps(options.sourceMap);
-        // todo: remove when removing the deprecations
-        normalizedOptions.vendorSourceMap
-          = normalizedOptions.vendorSourceMap || !!options.vendorSourceMap;
-
-        options = {
-          ...options,
-          ...normalizedOptions,
-          // tslint:disable-next-line:no-any
-          optimization: normalizeOptimization(options.optimization) as any,
-        };
-      }),
       concatMap(() => {
         let webpackConfig;
         try {
-          webpackConfig = this.buildWebpackConfig(root, projectRoot, host,
-            // todo replace with unknown
-            // we need to find a clear way to create this options
-            // tslint:disable-next-line:no-any
-            options as any as NormalizedBrowserBuilderSchema);
+          webpackConfig = this.buildWebpackConfig(root, projectRoot, host, options);
         } catch (e) {
           return throwError(e);
         }

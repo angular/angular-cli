@@ -75,7 +75,7 @@ function _createAotPlugin(
     locale: buildOptions.i18nLocale,
     platform: buildOptions.platform === 'server' ? PLATFORM.Server : PLATFORM.Browser,
     missingTranslation: buildOptions.i18nMissingTranslation,
-    sourceMap: buildOptions.scriptsSourceMap,
+    sourceMap: buildOptions.sourceMap.scripts,
     additionalLazyModules,
     hostReplacementPaths,
     nameLazyFiles: buildOptions.namedChunks,
@@ -108,7 +108,7 @@ export function getAotConfig(
   if (buildOptions.buildOptimizer) {
     loaders.unshift({
       loader: buildOptimizerLoader,
-      options: { sourceMap: buildOptions.scriptsSourceMap }
+      options: { sourceMap: buildOptions.sourceMap.scripts }
     });
   }
 

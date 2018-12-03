@@ -27,8 +27,7 @@ import {
 } from '../angular-cli-files/models/webpack-configs';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { statsErrorsToString, statsWarningsToString } from '../angular-cli-files/utilities/stats';
-import { NormalizedBrowserBuilderSchema } from '../browser';
-import { BrowserBuilderSchema } from '../browser/schema';
+import { BrowserBuilderSchema, NormalizedBrowserBuilderSchema } from '../browser/schema';
 const webpackMerge = require('webpack-merge');
 
 
@@ -88,7 +87,10 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
         const webpackConfig = this.buildWebpackConfig(root, projectRoot, {
           // todo: remove this casting when 'CurrentFileReplacement' is changed to 'FileReplacement'
           ...(browserOptions as NormalizedBrowserBuilderSchema),
-          optimization: false,
+          optimization: {
+            scripts: false,
+            styles: false,
+          },
           i18nLocale: options.i18nLocale,
           i18nFormat: options.i18nFormat,
           i18nFile: outFile,

@@ -16,7 +16,7 @@ import {
   CurrentFileReplacement,
   ExtraEntryPoint,
 } from '../../browser/schema';
-import { NormalizedOptimization } from '../../utils/index';
+import { NormalizedOptimization, NormalizedSourceMaps } from '../../utils/index';
 
 export interface BuildOptions {
   optimization: NormalizedOptimization;
@@ -24,11 +24,10 @@ export interface BuildOptions {
   outputPath: string;
   resourcesOutputPath?: string;
   aot?: boolean;
-  sourceMap?: boolean;
-  scriptsSourceMap?: boolean;
-  stylesSourceMap?: boolean;
-  hiddenSourceMap?: boolean;
+  sourceMap: NormalizedSourceMaps;
+  /** @deprecated use sourceMap instead */
   vendorSourceMap?: boolean;
+  /** @deprecated  */
   evalSourceMap?: boolean;
   vendorChunk?: boolean;
   commonChunk?: boolean;

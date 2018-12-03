@@ -403,3 +403,19 @@ export enum BudgetType {
   AnyScript = 'anyScript',
   Bundle = 'bundle',
 }
+
+// TODO: figure out a better way to normalize assets, extra entry points, file replacements,
+// and whatever else needs to be normalized, while keeping type safety.
+// Right now this normalization has to be done in all other builders that make use of the
+// BrowserBuildSchema and BrowserBuilder.buildWebpackConfig.
+// It would really help if it happens during architect.validateBuilderOptions, or similar.
+export interface NormalizedBrowserBuilderSchema extends
+  Pick<
+  BrowserBuilderSchema,
+  Exclude<keyof BrowserBuilderSchema, 'sourceMap' | 'vendorSourceMap' | 'optimization'>
+  > {
+  sourceMap: NormalizedSourceMaps;
+  assets: AssetPatternObject[];
+  fileReplacements: CurrentFileReplacement[];
+  optimization: NormalizedOptimization;
+}

@@ -22,14 +22,9 @@ import * as url from 'url';
 import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
 import { checkPort } from '../angular-cli-files/utilities/check-port';
-import { BrowserBuilder, NormalizedBrowserBuilderSchema, getBrowserLoggingCb } from '../browser/';
-import { BrowserBuilderSchema } from '../browser/schema';
-import {
-  normalizeAssetPatterns,
-  normalizeFileReplacements,
-  normalizeOptimization,
-  normalizeSourceMaps,
-} from '../utils';
+import { BrowserBuilder, getBrowserLoggingCb } from '../browser';
+import { BrowserBuilderSchema, NormalizedBrowserBuilderSchema } from '../browser/schema';
+import { normalizeBuilderSchema } from '../utils';
 const opn = require('opn');
 
 
@@ -68,48 +63,28 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     const projectRoot = resolve(root, builderConfig.root);
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<Stats>);
     const webpackDevServerBuilder = new WebpackDevServerBuilder({ ...this.context, host });
-    let browserOptions: BrowserBuilderSchema;
+    let browserOptions: NormalizedBrowserBuilderSchema;
     let first = true;
     let opnAddress: string;
 
     return checkPort(options.port, options.host).pipe(
       tap((port) => options.port = port),
       concatMap(() => this._getBrowserOptions(options)),
-      tap((opts) => browserOptions = opts),
-      concatMap(() => normalizeFileReplacements(browserOptions.fileReplacements, host, root)),
-      tap(fileReplacements => browserOptions.fileReplacements = fileReplacements),
-      concatMap(() => normalizeAssetPatterns(
-        browserOptions.assets, host, root, projectRoot, builderConfig.sourceRoot)),
-      // Replace the assets in options with the normalized version.
-      tap((assetPatternObjects => browserOptions.assets = assetPatternObjects)),
-      tap(() => {
-        const normalizedOptions = normalizeSourceMaps(browserOptions.sourceMap);
-        // todo: remove when removing the deprecations
-        normalizedOptions.vendorSourceMap
-          = normalizedOptions.vendorSourceMap || !!browserOptions.vendorSourceMap;
-
-        browserOptions = {
-          ...browserOptions,
-          ...normalizedOptions,
-          // tslint:disable-next-line:no-any
-          optimization: normalizeOptimization(options.optimization) as any,
-        };
-      }),
+      concatMap((opts) => normalizeBuilderSchema(
+        host,
+        root,
+        opts,
+      )),
+      tap(normalizedOptions => browserOptions = normalizedOptions),
       concatMap(() => {
-        const webpackConfig = this.buildWebpackConfig(
-          // todo should be unknown
-          // tslint:disable-next-line:no-any
-          root, projectRoot, host, browserOptions as any as NormalizedBrowserBuilderSchema,
-        );
+        const webpackConfig = this.buildWebpackConfig(root, projectRoot, host, browserOptions);
 
         let webpackDevServerConfig: WebpackDevServer.Configuration;
         try {
           webpackDevServerConfig = this._buildServerConfig(
             root,
             options,
-            // todo should be unknown
-            // tslint:disable-next-line:no-any
-            browserOptions as any as NormalizedBrowserBuilderSchema,
+            browserOptions,
           );
         } catch (err) {
           return throwError(err);
@@ -260,7 +235,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
 
   private _addLiveReload(
     options: DevServerBuilderOptions,
-    browserOptions: BrowserBuilderSchema,
+    browserOptions: NormalizedBrowserBuilderSchema,
     webpackConfig: any, // tslint:disable-line:no-any
     clientAddress: string,
   ) {
@@ -448,7 +423,6 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     return architect.getBuilderDescription(builderConfig).pipe(
       concatMap(browserDescription =>
         architect.validateBuilderOptions(builderConfig, browserDescription)),
-      map(browserConfig => browserConfig.options),
     );
   }
 }
