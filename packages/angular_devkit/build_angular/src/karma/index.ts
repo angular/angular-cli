@@ -28,6 +28,7 @@ import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { AssetPatternObject, CurrentFileReplacement } from '../browser/schema';
 import {
+  NormalizedOptimization,
   defaultProgress,
   normalizeAssetPatterns,
   normalizeFileReplacements,
@@ -40,6 +41,7 @@ const webpackMerge = require('webpack-merge');
 export interface NormalizedKarmaBuilderSchema extends KarmaBuilderSchema {
   assets: AssetPatternObject[];
   fileReplacements: CurrentFileReplacement[];
+  optimization: NormalizedOptimization;
 }
 
 export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
@@ -64,9 +66,17 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
         normalizedOptions.vendorSourceMap
           = normalizedOptions.vendorSourceMap || !!options.vendorSourceMap;
 
+        const optimization = {
+          optimization: {
+            scripts: false,
+            styles: false,
+          },
+        };
+
         options = {
           ...options,
           ...normalizedOptions,
+          ...optimization,
         };
       }),
       concatMap(() => new Observable(obs => {

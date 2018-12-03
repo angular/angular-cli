@@ -84,8 +84,28 @@
       "default": true
     },
     "optimization": {
-      "type": "boolean",
-      "description": "Enables optimization of the build output."
+      "description": "Enables optimization of the build output.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "scripts": {
+              "type": "boolean",
+              "description": "Enables optimization of the scripts output.",
+              "default": true
+            },
+            "styles": {
+              "type": "boolean",
+              "description": "Enables optimization of the styles output.",
+              "default": true
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "boolean"
+        }
+      ]
     },
     "aot": {
       "type": "boolean",

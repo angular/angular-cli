@@ -44,7 +44,7 @@ export interface BrowserBuilderSchema {
   /**
    * Enables optimization of the build output.
    */
-  optimization: boolean;
+  optimization: OptimizationOptions;
 
   /**
    * Replace files with other files in the build.
@@ -235,6 +235,15 @@ export interface BrowserBuilderSchema {
    * Output profile events for Chrome profiler.
    */
   profile: boolean;
+}
+
+export type OptimizationOptions = boolean | OptimizationObject;
+
+export interface OptimizationObject {
+  /** Enables optimization of the scripts output. */
+  scripts?: boolean;
+  /** Enables optimization of the styles output. */
+  styles?: boolean;
 }
 
 export type SourceMapOptions = boolean | SourceMapObject;

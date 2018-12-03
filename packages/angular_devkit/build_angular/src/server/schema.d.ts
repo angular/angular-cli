@@ -6,7 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BrowserBuilderSchema, FileReplacement, SourceMapOptions } from '../browser/schema';
+import {
+  BrowserBuilderSchema,
+  FileReplacement,
+  OptimizationObject,
+  SourceMapOptions,
+} from '../browser/schema';
 
 export interface BuildWebpackServerSchema {
   /**
@@ -72,7 +77,7 @@ export interface BuildWebpackServerSchema {
   /**
    * Enables optimization of the build output.
    */
-  optimization?: boolean;
+  optimization?: OptimizationObject;
   /**
    * Log progress to the console while building.
    */

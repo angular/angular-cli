@@ -24,7 +24,12 @@ import * as WebpackDevServer from 'webpack-dev-server';
 import { checkPort } from '../angular-cli-files/utilities/check-port';
 import { BrowserBuilder, NormalizedBrowserBuilderSchema, getBrowserLoggingCb } from '../browser/';
 import { BrowserBuilderSchema } from '../browser/schema';
-import { normalizeAssetPatterns, normalizeFileReplacements, normalizeSourceMaps } from '../utils';
+import {
+  normalizeAssetPatterns,
+  normalizeFileReplacements,
+  normalizeOptimization,
+  normalizeSourceMaps,
+} from '../utils';
 const opn = require('opn');
 
 
@@ -86,15 +91,25 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
         browserOptions = {
           ...browserOptions,
           ...normalizedOptions,
+          optimization: normalizeOptimization(browserOptions.optimization),
         };
       }),
       concatMap(() => {
         const webpackConfig = this.buildWebpackConfig(
-          root, projectRoot, host, browserOptions as NormalizedBrowserBuilderSchema);
+          // todo should be unknown
+          // tslint:disable-next-line:no-any
+          root, projectRoot, host, browserOptions as any as NormalizedBrowserBuilderSchema,
+        );
 
         let webpackDevServerConfig: WebpackDevServer.Configuration;
         try {
-          webpackDevServerConfig = this._buildServerConfig(root, options, browserOptions);
+          webpackDevServerConfig = this._buildServerConfig(
+            root,
+            options,
+            // todo should be unknown
+            // tslint:disable-next-line:no-any
+            browserOptions as any as NormalizedBrowserBuilderSchema,
+          );
         } catch (err) {
           return throwError(err);
         }
@@ -179,11 +194,11 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     root: Path,
     projectRoot: Path,
     host: virtualFs.Host<Stats>,
-    browserOptions: BrowserBuilderSchema,
+    browserOptions: NormalizedBrowserBuilderSchema,
   ) {
     const browserBuilder = new BrowserBuilder(this.context);
     const webpackConfig = browserBuilder.buildWebpackConfig(
-      root, projectRoot, host, browserOptions as NormalizedBrowserBuilderSchema);
+      root, projectRoot, host, browserOptions);
 
     return webpackConfig;
   }
@@ -191,7 +206,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
   private _buildServerConfig(
     root: Path,
     options: DevServerBuilderOptions,
-    browserOptions: BrowserBuilderSchema,
+    browserOptions: NormalizedBrowserBuilderSchema,
   ) {
     const systemRoot = getSystemPath(root);
     if (options.disableHostCheck) {
@@ -203,6 +218,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     }
 
     const servePath = this._buildServePath(options, browserOptions);
+    const { styles, scripts } = browserOptions.optimization;
 
     const config: WebpackDevServer.Configuration = {
       host: options.host,
@@ -214,13 +230,13 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
         htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
       } as WebpackDevServer.HistoryApiFallbackConfig,
       stats: false,
-      compress: browserOptions.optimization,
+      compress: styles || scripts,
       watchOptions: {
         poll: browserOptions.poll,
       },
       https: options.ssl,
       overlay: {
-        errors: !browserOptions.optimization,
+        errors: true,
         warnings: false,
       },
       public: options.publicHost,
@@ -332,7 +348,10 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     config.proxy = proxyConfig;
   }
 
-  private _buildServePath(options: DevServerBuilderOptions, browserOptions: BrowserBuilderSchema) {
+  private _buildServePath(
+    options: DevServerBuilderOptions,
+    browserOptions: NormalizedBrowserBuilderSchema,
+  ) {
     let servePath = options.servePath;
     if (!servePath && servePath !== '') {
       const defaultServePath =
