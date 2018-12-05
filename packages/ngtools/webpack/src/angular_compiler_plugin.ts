@@ -633,15 +633,12 @@ export class AngularCompilerPlugin {
         }
       }
 
-      // only present for webpack 4.23.0+, assume true otherwise
-      const watchMode = compiler.watchMode === undefined ? true : compiler.watchMode;
-
       // Create the webpack compiler host.
       const webpackCompilerHost = new WebpackCompilerHost(
         this._compilerOptions,
         this._basePath,
         host,
-        watchMode,
+        true,
         this._options.directTemplateLoading,
       );
 
