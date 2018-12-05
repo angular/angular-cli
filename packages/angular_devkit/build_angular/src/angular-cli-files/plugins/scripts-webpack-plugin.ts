@@ -37,35 +37,18 @@ interface ScriptOutput {
 }
 
 function addDependencies(compilation: any, scripts: string[]): void {
-  if (compilation.fileDependencies.add) {
-    // Webpack 4+ uses a Set
-    for (const script of scripts) {
-      compilation.fileDependencies.add(script);
-    }
-  } else {
-    // Webpack 3
-    compilation.fileDependencies.push(...scripts);
+  for (const script of scripts) {
+    compilation.fileDependencies.add(script);
   }
 }
 
 function hook(compiler: any, action: (compilation: any, callback: (err?: Error) => void) => void) {
-  if (compiler.hooks) {
-    // Webpack 4
-    compiler.hooks.thisCompilation.tap('scripts-webpack-plugin', (compilation: any) => {
-      compilation.hooks.additionalAssets.tapAsync(
-        'scripts-webpack-plugin',
-        (callback: (err?: Error) => void) => action(compilation, callback),
-      );
-    });
-  } else {
-    // Webpack 3
-    compiler.plugin('this-compilation', (compilation: any) => {
-      compilation.plugin(
-        'additional-assets',
-        (callback: (err?: Error) => void) => action(compilation, callback),
-      );
-    });
-  }
+  compiler.hooks.thisCompilation.tap('scripts-webpack-plugin', (compilation: any) => {
+    compilation.hooks.additionalAssets.tapAsync(
+      'scripts-webpack-plugin',
+      (callback: (err?: Error) => void) => action(compilation, callback),
+    );
+  });
 }
 
 export class ScriptsWebpackPlugin {
@@ -81,14 +64,7 @@ export class ScriptsWebpackPlugin {
     }
 
     for (let i = 0; i < scripts.length; i++) {
-      let scriptTime;
-      if (compilation.fileTimestamps.get) {
-        // Webpack 4+ uses a Map
-        scriptTime = compilation.fileTimestamps.get(scripts[i]);
-      } else {
-        // Webpack 3
-        scriptTime = compilation.fileTimestamps[scripts[i]];
-      }
+      const scriptTime = compilation.fileTimestamps.get(scripts[i]);
       if (!scriptTime || scriptTime > this._lastBuildTime) {
         this._lastBuildTime = Date.now();
         return false;
