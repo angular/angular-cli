@@ -42,6 +42,11 @@
       "type": "string",
       "description": "Adds a developer-defined type to the filename, in the format \"name.type.ts\".",
       "default": ""
+    },
+    "lintFix": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, applies lint fixes after generating the class."
     }
   },
   "required": [

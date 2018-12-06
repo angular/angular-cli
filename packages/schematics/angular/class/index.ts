@@ -13,6 +13,7 @@ import {
   Tree,
   apply,
   branchAndMerge,
+  chain,
   filter,
   mergeWith,
   move,
@@ -20,6 +21,7 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { buildDefaultPath, getProject } from '../utility/project';
 import { Schema as ClassOptions } from './schema';
@@ -54,6 +56,9 @@ export default function (options: ClassOptions): Rule {
       move(parsedPath.path),
     ]);
 
-    return branchAndMerge(mergeWith(templateSource));
+    return chain([
+      branchAndMerge(mergeWith(templateSource)),
+      options.lintFix ? applyLintFix(options.path) : noop(),
+    ]);
   };
 }

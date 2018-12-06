@@ -24,6 +24,7 @@ import * as ts from 'typescript';
 import { addImportToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
+import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { buildDefaultPath, getProject } from '../utility/project';
 import { Schema as ModuleOptions } from './schema';
@@ -102,6 +103,7 @@ export default function (options: ModuleOptions): Rule {
         addDeclarationToNgModule(options),
         mergeWith(templateSource),
       ])),
+      options.lintFix ? applyLintFix(options.path) : noop(),
     ]);
   };
 }

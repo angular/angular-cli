@@ -31,6 +31,7 @@ import {
 } from '../utility/config';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { latestVersions } from '../utility/latest-versions';
+import { applyLintFix } from '../utility/lint-fix';
 import { validateProjectName } from '../utility/validation';
 import {
   Builders,
@@ -372,6 +373,7 @@ export default function (options: ApplicationOptions): Rule {
         ]), MergeStrategy.Overwrite),
       options.minimal ? noop() : schematic('e2e', e2eOptions),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
+      options.lintFix ? applyLintFix(sourceDir) : noop(),
     ]);
   };
 }
