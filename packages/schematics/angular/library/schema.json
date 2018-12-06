@@ -42,6 +42,11 @@
       "type": "boolean",
       "default": false,
       "description": "When true, does not update \"tsconfig.json\" to add a path mapping for the new library. The path mapping is needed to use the library in an app, but can be disabled here to simplify development."
+    },
+    "lintFix": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, applies lint fixes after generating the library."
     }
   },
   "required": []

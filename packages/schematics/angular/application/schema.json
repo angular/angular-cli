@@ -78,6 +78,11 @@
       "description": "Skip installing dependency packages.",
       "type": "boolean",
       "default": false
+    },
+    "lintFix": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, applies lint fixes after generating the application."
     }
   },
   "required": [

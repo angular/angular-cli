@@ -27,6 +27,7 @@ import {
 } from '../utility/config';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { latestVersions } from '../utility/latest-versions';
+import { applyLintFix } from '../utility/lint-fix';
 import { validateProjectName } from '../utility/validation';
 import {
   Builders,
@@ -246,6 +247,7 @@ export default function (options: LibraryOptions): Rule {
         path: sourceDir,
         project: options.name,
       }),
+      options.lintFix ? applyLintFix(sourceDir) : noop(),
       (_tree: Tree, context: SchematicContext) => {
         if (!options.skipPackageJson && !options.skipInstall) {
           context.addTask(new NodePackageInstallTask());
