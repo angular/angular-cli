@@ -8,6 +8,7 @@
 
 // tslint:disable:no-global-tslint-disable no-any
 import { logging, strings, tags, terminal } from '@angular-devkit/core';
+import * as path from 'path';
 import { getWorkspace } from '../utilities/config';
 import {
   Arguments,
@@ -123,7 +124,10 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
         if (this.workspace.configFile) {
           this.logger.fatal(tags.oneLine`
             The ${this.description.name} command requires to be run outside of a project, but a
-            project definition was found at "${this.workspace.configFile}".
+            project definition was found at "${path.join(
+              this.workspace.root,
+              this.workspace.configFile,
+            )}".
           `);
           throw 1;
         }
