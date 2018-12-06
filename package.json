@@ -75,6 +75,7 @@
   "devDependencies": {
     "@angular/compiler": "^7.1.0",
     "@angular/compiler-cli": "^7.1.0",
+    "@bazel/bazel": "~0.19",
     "@bazel/karma": "^0.20.3",
     "@bazel/typescript": "0.20.3",
     "@ngtools/json-schema": "^1.1.0",
