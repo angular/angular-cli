@@ -10,8 +10,6 @@
 
 import { BuilderConfiguration } from '@angular-devkit/architect';
 import { Path, resolve, virtualFs } from '@angular-devkit/core';
-import { Observable, combineLatest, of } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { BrowserBuilderSchema, NormalizedBrowserBuilderSchema } from '../browser/schema';
 import { KarmaBuilderSchema, NormalizedKarmaBuilderSchema } from '../karma/schema';
 import { BuildWebpackServerSchema, NormalizedServerBuilderServerSchema } from '../server/schema';
@@ -26,14 +24,15 @@ export function normalizeBuilderSchema<BuilderConfigurationT extends
         host: virtualFs.Host<{}>,
         root: Path,
         builderConfig: BuilderConfigurationT,
-): Observable<
-OptionsT extends BrowserBuilderSchema ? NormalizedBrowserBuilderSchema :
-OptionsT extends BuildWebpackServerSchema ? NormalizedServerBuilderServerSchema :
-// todo should be unknown
-// tslint:disable-next-line:no-any
-OptionsT extends KarmaBuilderSchema ? NormalizedKarmaBuilderSchema : any> {
+):
+    OptionsT extends BrowserBuilderSchema ? NormalizedBrowserBuilderSchema :
+    OptionsT extends BuildWebpackServerSchema ? NormalizedServerBuilderServerSchema :
+    // todo should be unknown
+    // tslint:disable-next-line:no-any
+    OptionsT extends KarmaBuilderSchema ? NormalizedKarmaBuilderSchema : any {
     const { options } = builderConfig;
     const projectRoot = resolve(root, builderConfig.root);
+    const syncHost = new virtualFs.SyncDelegateHost(host);
 
     // todo: this should be unknown
     // tslint:disable-next-line:no-any
@@ -45,41 +44,34 @@ OptionsT extends KarmaBuilderSchema ? NormalizedKarmaBuilderSchema : any> {
     const isBuildWebpackServerSchema = (options: any): options is BuildWebpackServerSchema =>
         !options.hasOwnProperty('assets');
 
-    return combineLatest(
-        isBuildWebpackServerSchema(options)
-            ? of(null)
-            : normalizeAssetPatterns(
+    const assets = isBuildWebpackServerSchema(options)
+        ? {}
+        : {
+            assets: normalizeAssetPatterns(
                 options.assets,
-                host,
+                syncHost,
                 root,
                 projectRoot,
                 builderConfig.sourceRoot,
             ),
-        normalizeFileReplacements(options.fileReplacements, host, root),
-    ).pipe(
-        map(([assetPatternObjects, fileReplacements]) => {
-            const normalizedSourceMapOptions = normalizeSourceMaps(options.sourceMap);
-            // todo: remove when removing the deprecations
-            normalizedSourceMapOptions.vendor
-                = normalizedSourceMapOptions.vendor || !!options.vendorSourceMap;
+        };
 
-            const optimization = isKarmaBuilderSchema(options)
-                ? {}
-                : options.optimization || {};
+    const normalizedSourceMapOptions = normalizeSourceMaps(options.sourceMap);
+    // todo: remove when removing the deprecations
+    normalizedSourceMapOptions.vendor
+        = normalizedSourceMapOptions.vendor || !!options.vendorSourceMap;
 
-            const assets = isBuildWebpackServerSchema(options)
-                ? {}
-                : { assets: assetPatternObjects };
+    const optimization = isKarmaBuilderSchema(options)
+        ? {}
+        : options.optimization || {};
 
-            return {
-                // todo remove any casing when using typescript 3.2
-                // tslint:disable-next-line:no-any
-                ...options as any,
-                ...assets,
-                fileReplacements,
-                optimization: normalizeOptimization(optimization),
-                sourceMap: normalizeSourceMaps(options.sourceMap),
-            };
-        }),
-    );
+    return {
+        // todo remove any casing when using typescript 3.2
+        // tslint:disable-next-line:no-any
+        ...options as any,
+        ...assets,
+        fileReplacements: normalizeFileReplacements(options.fileReplacements, syncHost, root),
+        optimization: normalizeOptimization(optimization),
+        sourceMap: normalizeSourceMaps(options.sourceMap),
+    };
 }

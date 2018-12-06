@@ -15,7 +15,7 @@ import {
 import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable, of } from 'rxjs';
-import { concatMap, tap } from 'rxjs/operators';
+import { concatMap } from 'rxjs/operators';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import {
@@ -26,8 +26,7 @@ import {
 } from '../angular-cli-files/models/webpack-configs';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
-import { AssetPatternObject, CurrentFileReplacement } from '../browser/schema';
-import { NormalizedSourceMaps, defaultProgress, normalizeBuilderSchema } from '../utils';
+import { defaultProgress, normalizeBuilderSchema } from '../utils';
 import { KarmaBuilderSchema, NormalizedKarmaBuilderSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
@@ -36,18 +35,17 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
   constructor(public context: BuilderContext) { }
 
   run(builderConfig: BuilderConfiguration<KarmaBuilderSchema>): Observable<BuildEvent> {
-    let options: NormalizedKarmaBuilderSchema;
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
 
+    const options = normalizeBuilderSchema(
+      host,
+      root,
+      builderConfig,
+    );
+
     return of(null).pipe(
-      concatMap((opts) => normalizeBuilderSchema(
-        host,
-        root,
-        builderConfig,
-      )),
-      tap(normalizedOptions => options = normalizedOptions),
       concatMap(() => new Observable(obs => {
         const karma = requireProjectModule(getSystemPath(projectRoot), 'karma');
         const karmaConfig = getSystemPath(resolve(root, normalize(options.karmaConfig)));

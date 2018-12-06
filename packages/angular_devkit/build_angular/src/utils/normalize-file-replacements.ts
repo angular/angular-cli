@@ -14,8 +14,6 @@ import {
   normalize,
   virtualFs,
 } from '@angular-devkit/core';
-import { Observable, from, of } from 'rxjs';
-import { concat, concatMap, ignoreElements, map, mergeMap, tap, toArray } from 'rxjs/operators';
 import {
   CurrentFileReplacement,
   DeprecatedFileReplacment,
@@ -36,31 +34,27 @@ export interface NormalizedFileReplacement {
 
 export function normalizeFileReplacements(
   fileReplacements: FileReplacement[],
-  host: virtualFs.Host,
+  host: virtualFs.SyncDelegateHost,
   root: Path,
-): Observable<NormalizedFileReplacement[]> {
+): NormalizedFileReplacement[] {
   if (fileReplacements.length === 0) {
-    return of([]);
+    return [];
   }
 
-  // Ensure all the replacements exist.
-  const errorOnFalse = (path: Path) => tap((exists: boolean) => {
-    if (!exists) {
-      throw new MissingFileReplacementException(getSystemPath(path));
-    }
-  });
+  const normalizedReplacement = fileReplacements
+    .map(replacement => normalizeFileReplacement(replacement, root));
 
-  return from(fileReplacements).pipe(
-    map(replacement => normalizeFileReplacement(replacement, root)),
-    concatMap(normalized => {
-      return from([normalized.replace, normalized.with]).pipe(
-        mergeMap(path => host.exists(path).pipe(errorOnFalse(path))),
-        ignoreElements(),
-        concat(of(normalized)),
-      );
-    }),
-    toArray(),
-  );
+  for (const { replace, with: replacementWith } of normalizedReplacement) {
+    if (!host.exists(replacementWith)) {
+      throw new MissingFileReplacementException(getSystemPath(replacementWith));
+    }
+
+    if (!host.exists(replace)) {
+      throw new MissingFileReplacementException(getSystemPath(replace));
+    }
+  }
+
+  return normalizedReplacement;
 }
 
 function normalizeFileReplacement(
