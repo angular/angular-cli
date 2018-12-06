@@ -37,6 +37,7 @@ export interface BuilderContext {
     architect: Architect;
     host: virtualFs.Host<{}>;
     logger: logging.Logger;
+    targetSpecifier?: TargetSpecifier;
     workspace: experimental.workspace.Workspace;
 }
 
