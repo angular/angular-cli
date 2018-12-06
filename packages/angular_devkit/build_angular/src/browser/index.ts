@@ -34,18 +34,8 @@ import {
   statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
-import {
-  NormalizedOptimization,
-  NormalizedSourceMaps,
-  defaultProgress,
-  normalizeBuilderSchema,
-} from '../utils';
-import {
-  AssetPatternObject,
-  BrowserBuilderSchema,
-  CurrentFileReplacement,
-  NormalizedBrowserBuilderSchema,
-} from './schema';
+import { defaultProgress, normalizeBuilderSchema } from '../utils';
+import { BrowserBuilderSchema, NormalizedBrowserBuilderSchema } from './schema';
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 const webpackMerge = require('webpack-merge');
 
@@ -54,19 +44,18 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
   constructor(public context: BuilderContext) { }
 
   run(builderConfig: BuilderConfiguration<BrowserBuilderSchema>): Observable<BuildEvent> {
-    let options: NormalizedBrowserBuilderSchema;
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
     const webpackBuilder = new WebpackBuilder({ ...this.context, host });
 
+    const options = normalizeBuilderSchema(
+      host,
+      root,
+      builderConfig,
+    );
+
     return of(null).pipe(
-      concatMap(() => normalizeBuilderSchema(
-        host,
-        root,
-        builderConfig,
-      )),
-      tap(normalizedOptions => options = normalizedOptions),
       concatMap(() => options.deleteOutputPath
         ? this._deleteOutputDir(root, normalize(options.outputPath), this.context.host)
         : of(null)),

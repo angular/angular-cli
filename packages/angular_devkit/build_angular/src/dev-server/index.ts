@@ -70,12 +70,11 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     return checkPort(options.port, options.host).pipe(
       tap((port) => options.port = port),
       concatMap(() => this._getBrowserOptions(options)),
-      concatMap((opts) => normalizeBuilderSchema(
+      tap(opts => browserOptions = normalizeBuilderSchema(
         host,
         root,
         opts,
       )),
-      tap(normalizedOptions => browserOptions = normalizedOptions),
       concatMap(() => {
         const webpackConfig = this.buildWebpackConfig(root, projectRoot, host, browserOptions);
 
@@ -162,7 +161,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
 
         return buildEvent;
       }),
-     // using more than 10 operators will cause rxjs to loose the types
+      // using more than 10 operators will cause rxjs to loose the types
     ) as Observable<BuildEvent>;
   }
 

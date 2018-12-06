@@ -16,7 +16,7 @@ import { WebpackBuilder } from '@angular-devkit/build-webpack';
 import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import { Stats } from 'fs';
 import { Observable, concat, of } from 'rxjs';
-import { concatMap, last, tap } from 'rxjs/operators';
+import { concatMap, last } from 'rxjs/operators';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import {
@@ -30,13 +30,7 @@ import {
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { getBrowserLoggingCb } from '../browser';
-import { CurrentFileReplacement } from '../browser/schema';
-import {
-  NormalizedOptimization,
-  NormalizedSourceMaps,
-  defaultProgress,
-  normalizeBuilderSchema,
-} from '../utils';
+import { defaultProgress, normalizeBuilderSchema } from '../utils';
 import { BuildWebpackServerSchema, NormalizedServerBuilderServerSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
@@ -46,20 +40,19 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
   constructor(public context: BuilderContext) { }
 
   run(builderConfig: BuilderConfiguration<BuildWebpackServerSchema>): Observable<BuildEvent> {
-    let options: NormalizedServerBuilderServerSchema;
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<Stats>);
     const webpackBuilder = new WebpackBuilder({ ...this.context, host });
 
+    const options = normalizeBuilderSchema(
+      host,
+      root,
+      builderConfig,
+    );
+
     // TODO: verify using of(null) to kickstart things is a pattern.
     return of(null).pipe(
-      concatMap(() => normalizeBuilderSchema(
-        host,
-        root,
-        builderConfig,
-      )),
-      tap(normalizedOptions => options = normalizedOptions),
       concatMap(() => options.deleteOutputPath
         ? this._deleteOutputDir(root, normalize(options.outputPath), this.context.host)
         : of(null)),

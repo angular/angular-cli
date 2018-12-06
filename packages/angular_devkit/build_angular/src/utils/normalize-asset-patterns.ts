@@ -16,8 +16,6 @@ import {
   resolve,
   virtualFs,
 } from '@angular-devkit/core';
-import { Observable, forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
 import { AssetPattern, AssetPatternObject } from '../browser/schema';
 
 
@@ -29,23 +27,20 @@ export class MissingAssetSourceRootException extends BaseException {
 
 export function normalizeAssetPatterns(
   assetPatterns: AssetPattern[],
-  host: virtualFs.Host,
+  host: virtualFs.SyncDelegateHost,
   root: Path,
   projectRoot: Path,
   maybeSourceRoot: Path | undefined,
-): Observable<AssetPatternObject[]> {
+): AssetPatternObject[] {
   // When sourceRoot is not available, we default to ${projectRoot}/src.
   const sourceRoot = maybeSourceRoot || join(projectRoot, 'src');
   const resolvedSourceRoot = resolve(root, sourceRoot);
 
   if (assetPatterns.length === 0) {
-    // If there are no asset patterns, return an empty array.
-    // It's important to do this because forkJoin with an empty array will immediately complete
-    // the observable.
-    return of([]);
+    return [];
   }
 
-  const assetPatternObjectObservables: Observable<AssetPatternObject>[] = assetPatterns
+  return assetPatterns
     .map(assetPattern => {
       // Normalize string asset patterns to objects.
       if (typeof assetPattern === 'string') {
@@ -57,36 +52,35 @@ export function normalizeAssetPatterns(
           throw new MissingAssetSourceRootException(assetPattern);
         }
 
-        return host.isDirectory(resolvedAssetPath).pipe(
-          // If the path doesn't exist at all, pretend it is a directory.
-          catchError(() => of(true)),
-          map(isDirectory => {
-            let glob: string, input: Path, output: Path;
-            if (isDirectory) {
-              // Folders get a recursive star glob.
-              glob = '**/*';
-              // Input directory is their original path.
-              input = assetPath;
-            } else {
-              // Files are their own glob.
-              glob = basename(assetPath);
-              // Input directory is their original dirname.
-              input = dirname(assetPath);
-            }
+        let glob: string, input: Path, output: Path;
+        let isDirectory = false;
 
-            // Output directory for both is the relative path from source root to input.
-            output = relative(resolvedSourceRoot, resolve(root, input));
+        try {
+          isDirectory = host.isDirectory(resolvedAssetPath);
+        } catch {
+          isDirectory = true;
+        }
 
-            // Return the asset pattern in object format.
-            return { glob, input, output };
-          }),
-        );
+        if (isDirectory) {
+          // Folders get a recursive star glob.
+          glob = '**/*';
+          // Input directory is their original path.
+          input = assetPath;
+        } else {
+          // Files are their own glob.
+          glob = basename(assetPath);
+          // Input directory is their original dirname.
+          input = dirname(assetPath);
+        }
+
+        // Output directory for both is the relative path from source root to input.
+        output = relative(resolvedSourceRoot, resolve(root, input));
+
+        // Return the asset pattern in object format.
+        return { glob, input, output };
       } else {
         // It's already an AssetPatternObject, no need to convert.
-        return of(assetPattern);
+        return assetPattern;
       }
     });
-
-  // Wait for all the asset patterns and return them as an array.
-  return forkJoin(assetPatternObjectObservables);
 }
