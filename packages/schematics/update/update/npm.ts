@@ -112,7 +112,7 @@ export function getNpmPackageJson(
     {
       'full-metadata': true,
       ...npmrc,
-      registry: registryUrl,
+      ...(registryUrl ? { registry: registryUrl } : {}),
     },
   );
 
