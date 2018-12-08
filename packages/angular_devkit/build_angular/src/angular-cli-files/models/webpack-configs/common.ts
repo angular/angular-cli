@@ -35,7 +35,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   const { root, projectRoot, buildOptions } = wco;
   const { styles: stylesOptimization, scripts: scriptsOptimization } = buildOptions.optimization;
   const {
-    styles: stylesSouceMap,
+    styles: stylesSourceMap,
     scripts: scriptsSourceMap,
     vendor: vendorSourceMap,
   } = buildOptions.sourceMap;
@@ -164,7 +164,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   }
 
   let sourceMapUseRule;
-  if ((scriptsSourceMap || stylesSouceMap) && vendorSourceMap) {
+  if ((scriptsSourceMap || stylesSourceMap) && vendorSourceMap) {
     sourceMapUseRule = {
       use: [
         {
@@ -214,7 +214,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   if (stylesOptimization) {
     extraMinimizers.push(
       new CleanCssWebpackPlugin({
-        sourceMap: stylesSouceMap,
+        sourceMap: stylesSourceMap,
         // component styles retain their original file name
         test: (file) => /\.(?:css|scss|sass|less|styl)$/.test(file),
       }),
