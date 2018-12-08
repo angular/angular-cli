@@ -22,13 +22,13 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
   let isEval = false;
   const { styles: stylesOptimization, scripts: scriptsOptimization } = buildOptions.optimization;
   const {
-    styles: stylesSouceMap,
+    styles: stylesSourceMap,
     scripts: scriptsSourceMap,
     hidden: hiddenSourceMap,
   } = buildOptions.sourceMap;
 
   // See https://webpack.js.org/configuration/devtool/ for sourcemap types.
-  if ((stylesSouceMap || scriptsSourceMap) &&
+  if ((stylesSourceMap || scriptsSourceMap) &&
     buildOptions.evalSourceMap &&
     !stylesOptimization &&
     !scriptsOptimization) {
@@ -64,10 +64,10 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     }));
   }
 
-  if (!isEval && (scriptsSourceMap || stylesSouceMap)) {
+  if (!isEval && (scriptsSourceMap || stylesSourceMap)) {
     extraPlugins.push(getSourceMapDevTool(
       scriptsSourceMap,
-      stylesSouceMap,
+      stylesSourceMap,
       hiddenSourceMap,
     ));
   }
