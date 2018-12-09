@@ -62,7 +62,7 @@ export interface BuildWebpackServerSchema {
   resourcesOutputPath: string;
   /**
    * Generates a 'stats.json' file which can be analyzed using tools such as:
-   * #webpack-bundle-analyzer' or https: //webpack.github.io/analyse.
+   * #webpack-bundle-analyzer' or https://webpack.github.io/analyse.
    */
   statsJson?: boolean;
   /**
