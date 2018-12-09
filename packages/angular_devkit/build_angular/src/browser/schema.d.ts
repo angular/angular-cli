@@ -203,7 +203,7 @@ export interface BrowserBuilderSchema {
 
   /**
    * Generates a 'stats.json' file which can be analyzed using tools
-   * such as: #webpack-bundle-analyzer' or https: //webpack.github.io/analyse.
+   * such as: #webpack-bundle-analyzer' or https://webpack.github.io/analyse.
    */
   statsJson: boolean;
 
