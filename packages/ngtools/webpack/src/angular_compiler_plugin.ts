@@ -21,7 +21,6 @@ import {
   DEFAULT_ERROR_CODE,
   Diagnostic,
   EmitFlags,
-  LazyRoute,
   Program,
   SOURCE,
   UNKNOWN_ERROR_CODE,
@@ -423,24 +422,32 @@ export class AngularCompilerPlugin {
   }
 
   private _listLazyRoutesFromProgram(): LazyRouteMap {
-    let lazyRoutes: LazyRoute[];
+    let entryRoute: string | undefined;
+    let ngProgram: Program;
+
     if (this._JitMode) {
       if (!this.entryModule) {
         return {};
       }
 
-      const ngProgram = createProgram({
+      time('AngularCompilerPlugin._listLazyRoutesFromProgram.createProgram');
+      ngProgram = createProgram({
         rootNames: this._rootNames,
         options: { ...this._compilerOptions, genDir: '', collectAllErrors: true },
         host: this._compilerHost,
       });
+      timeEnd('AngularCompilerPlugin._listLazyRoutesFromProgram.createProgram');
 
-      lazyRoutes = ngProgram.listLazyRoutes(
-        this.entryModule.path + '#' + this.entryModule.className,
-      );
+      entryRoute = this.entryModule.path + '#' + this.entryModule.className;
     } else {
-      lazyRoutes = (this._program as Program).listLazyRoutes();
+      ngProgram = this._program as Program;
     }
+
+    time('AngularCompilerPlugin._listLazyRoutesFromProgram.listLazyRoutes');
+    // entryRoute will only be defined in JIT.
+    // In AOT all routes within the program are returned.
+    const lazyRoutes = ngProgram.listLazyRoutes(entryRoute);
+    timeEnd('AngularCompilerPlugin._listLazyRoutesFromProgram.listLazyRoutes');
 
     return lazyRoutes.reduce(
       (acc, curr) => {
