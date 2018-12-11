@@ -9,8 +9,8 @@ import { logging } from '@angular-devkit/core';
 import { existsSync, readFileSync } from 'fs';
 import { homedir } from 'os';
 import * as path from 'path';
-import { Observable, from } from 'rxjs';
-import { shareReplay } from 'rxjs/operators';
+import { EMPTY, Observable, from } from 'rxjs';
+import { catchError, shareReplay } from 'rxjs/operators';
 import { NpmRepositoryPackageJson } from './npm-package-json';
 
 const ini = require('ini');
@@ -133,7 +133,15 @@ export function getNpmPackageJson(
     },
   );
 
-  const response = from<NpmRepositoryPackageJson>(resultPromise).pipe(shareReplay());
+  // TODO: find some way to test this
+  const response = from<NpmRepositoryPackageJson>(resultPromise).pipe(
+    shareReplay(),
+    catchError(err => {
+      logger.warn(err.message || err);
+
+      return EMPTY;
+    }),
+  );
   npmPackageJsonCache.set(packageName, response);
 
   return response;
