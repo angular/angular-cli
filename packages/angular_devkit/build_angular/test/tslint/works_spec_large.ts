@@ -43,6 +43,7 @@ describe('Tslint Target', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(logger.includes('Linting "app"...')).toBe(false);
+        expect(logger.includes('<checkstyle')).toBe(true);
       }),
     ).toPromise().then(done, done.fail);
   }, 30000);
