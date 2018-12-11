@@ -7,7 +7,6 @@
  */
 
 import { logging, terminal } from '@angular-devkit/core';
-import { ModuleNotFoundException, resolve } from '@angular-devkit/core/node';
 import { spawn } from 'child_process';
 
 
@@ -42,17 +41,6 @@ export default async function (packageName: string,
   logger.info(terminal.green(`Installing packages for tooling via ${packageManager}.`));
 
   if (packageName) {
-    try {
-      // Verify if we need to install the package (it might already be there).
-      // If it's available and we shouldn't save, simply return. Nothing to be done.
-      resolve(packageName, { checkLocal: true, basedir: projectRoot });
-
-      return;
-    } catch (e) {
-      if (!(e instanceof ModuleNotFoundException)) {
-        throw e;
-      }
-    }
     installArgs.push(packageName);
   }
 

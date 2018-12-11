@@ -46,5 +46,6 @@ export default function () {
     });
   });
 
-  return promise;
+  // Cleanup the package
+  return promise.then(() => silentNpm('uninstall', '-S', '@angular/material'));
 }
