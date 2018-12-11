@@ -63,12 +63,11 @@ export default class TslintBuilder implements Builder<TslintBuilderOptions> {
     const targetSpecifier = this.context.targetSpecifier;
     const projectName = targetSpecifier && targetSpecifier.project || '';
 
-    // Print formatter output directly for non human-readable formats.
-    if (!['prose', 'verbose', 'stylish'].includes(options.format)) {
-      options.silent = true;
-    }
+    // Print formatter output only for non human-readable formats.
+    const printInfo = ['prose', 'verbose', 'stylish'].includes(options.format)
+      && !options.silent;
 
-    if (!options.silent) {
+    if (printInfo) {
       this.context.logger.info(`Linting ${JSON.stringify(projectName)}...`);
     }
 
@@ -127,15 +126,15 @@ export default class TslintBuilder implements Builder<TslintBuilderOptions> {
         }
       }
 
-      if (result.warningCount > 0 && !options.silent) {
+      if (result.warningCount > 0 && printInfo) {
         this.context.logger.warn('Lint warnings found in the listed files.');
       }
 
-      if (result.errorCount > 0 && !options.silent) {
+      if (result.errorCount > 0 && printInfo) {
         this.context.logger.error('Lint errors found in the listed files.');
       }
 
-      if (result.warningCount === 0 && result.errorCount === 0 && !options.silent) {
+      if (result.warningCount === 0 && result.errorCount === 0 && printInfo) {
         this.context.logger.info('All files pass linting.');
       }
 
