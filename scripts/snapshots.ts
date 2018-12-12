@@ -29,7 +29,7 @@ released version of this package.
 To test this snapshot in your own project, use
 
 \`\`\`bash
-npm install github.com/${pkg.snapshotRepo}
+npm install git+https://github.com/${pkg.snapshotRepo}.git
 \`\`\`
 
 ----
