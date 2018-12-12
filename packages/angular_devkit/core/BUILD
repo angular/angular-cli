@@ -29,7 +29,7 @@ ts_library(
         "@rxjs",
         "@rxjs//operators",
         "@npm//@types/node",
-        "@npm//@types/source-map",
+        "@npm//source-map",
         "@npm//ajv",
         # @typings: es2015.core
         # @typings: es2015.symbol.wellknown

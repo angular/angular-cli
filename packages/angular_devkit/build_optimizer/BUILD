@@ -25,7 +25,7 @@ ts_library(
     ),
     deps = [
         "@npm//@types/node",
-        "@npm//@types/source-map",
+        "@npm//source-map",
         "@npm//typescript",
         "@npm//@types/webpack",
     ],
@@ -44,7 +44,7 @@ ts_library(
         "//packages/angular_devkit/core",
         "@npm//@types/node",
         "@npm//@types/jasmine",
-        "@npm//@types/source-map",
+        "@npm//source-map",
     ],
     testonly = True,
     # @external_begin
