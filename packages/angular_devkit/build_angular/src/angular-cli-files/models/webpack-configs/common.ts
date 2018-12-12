@@ -150,7 +150,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   }
 
   if (buildOptions.progress) {
-    extraPlugins.push(new ProgressPlugin({ profile: buildOptions.verbose, colors: true }));
+    extraPlugins.push(new ProgressPlugin({ profile: buildOptions.verbose }));
   }
 
   if (buildOptions.showCircularDependencies) {
