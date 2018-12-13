@@ -18,7 +18,10 @@
  * BROWSER POLYFILLS
  */
 
-/** IE9, IE10 and IE11 requires all of the following polyfills. **/
+/** IE9, IE10, IE11, and Chrome <55 requires all of the following polyfills.
+ *  This also includes Android Emulators with older versions of Chrome and Google Search/Googlebot
+ */
+
 // import 'core-js/es6/symbol';
 // import 'core-js/es6/object';
 // import 'core-js/es6/function';
@@ -33,13 +36,6 @@
 // import 'core-js/es6/map';
 // import 'core-js/es6/weak-map';
 // import 'core-js/es6/set';
-
-/**
- * If the application will be indexed by Google Search, the following is required.
- * Googlebot uses a renderer based on Chrome 41.
- * https://developers.google.com/search/docs/guides/rendering
- **/
-// import 'core-js/es6/array';
 
 /** IE10 and IE11 requires the following for NgClass support on SVG elements */
 // import 'classlist.js';  // Run `npm install --save classlist.js`.
