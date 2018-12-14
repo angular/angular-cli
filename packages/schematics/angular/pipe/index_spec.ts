@@ -79,6 +79,20 @@ describe('Pipe Schematic', () => {
     expect(thrownError).toBeDefined();
   });
 
+  it('should handle a path in the name and module options', () => {
+    appTree = schematicRunner.runSchematic(
+      'module',
+      { name: 'admin/module', project: 'bar' },
+      appTree,
+    );
+
+    const options = { ...defaultOptions, module: 'admin/module' };
+    appTree = schematicRunner.runSchematic('pipe', options, appTree);
+
+    const content = appTree.readContent('/projects/bar/src/app/admin/module/module.module.ts');
+    expect(content).toMatch(/import { FooPipe } from '\.\.\/\.\.\/foo.pipe'/);
+  });
+
   it('should export the pipe', () => {
     const options = { ...defaultOptions, export: true };
 
