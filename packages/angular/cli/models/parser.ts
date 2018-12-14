@@ -193,7 +193,7 @@ function _assignOption(
 
       if (option.deprecated !== undefined && option.deprecated !== false) {
         deprecations.push(`Option ${JSON.stringify(option.name)} is deprecated${
-            typeof option.deprecated == 'string' ? ': ' + option.deprecated : ''}.`);
+            typeof option.deprecated == 'string' ? ': ' + option.deprecated : '.'}`);
       }
     } else {
       let error = `Argument ${key} could not be parsed using value ${JSON.stringify(value)}.`;
