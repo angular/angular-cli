@@ -16,7 +16,7 @@ ts_library(
         ],
     ),
     data = glob(
-        include = ["**/collection.json"],
+        include = ["**/collection.json", "**/*.js"],
     ),
     deps = [
         "//packages/angular_devkit/schematics",

@@ -7,7 +7,9 @@
  */
 import { existsSync } from 'fs';
 import { join } from 'path';
-import { RuleFactory } from '../src';
+import { Observable, from, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { RuleFactory, TaskExecutor, UnregisteredTaskException } from '../src';
 import { FileSystemCollectionDesc, FileSystemSchematicDesc } from './description';
 import { ExportStringRef } from './export-ref';
 import {
@@ -80,5 +82,34 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
     }
 
     return desc as FileSystemSchematicDesc;
+  }
+
+  hasTaskExecutor(name: string): boolean {
+    if (super.hasTaskExecutor(name)) {
+      return true;
+    }
+
+    try {
+      const maybePath = require.resolve(join(this._root, name));
+      if (existsSync(maybePath)) {
+        return true;
+      }
+    } catch {}
+
+    return false;
+  }
+
+  createTaskExecutor(name: string): Observable<TaskExecutor> {
+    if (!super.hasTaskExecutor(name)) {
+      try {
+        const path = require.resolve(join(this._root, name));
+
+        return from(import(path).then(mod => mod.default())).pipe(
+          catchError(() => throwError(new UnregisteredTaskException(name))),
+        );
+      } catch {}
+    }
+
+    return super.createTaskExecutor(name);
   }
 }
