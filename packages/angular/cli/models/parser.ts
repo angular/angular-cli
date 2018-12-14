@@ -206,7 +206,7 @@ function _assignOption(
 
         if (option.deprecated !== undefined && option.deprecated !== false) {
           warnings.push(`Option ${JSON.stringify(option.name)} is deprecated${
-            typeof option.deprecated == 'string' ? ': ' + option.deprecated : ''}.`);
+            typeof option.deprecated == 'string' ? ': ' + option.deprecated : '.'}`);
         }
       }
     } else {
