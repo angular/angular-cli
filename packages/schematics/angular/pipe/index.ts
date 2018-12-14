@@ -96,11 +96,11 @@ export default function (options: PipeOptions): Rule {
       options.path = buildDefaultPath(project);
     }
 
+    options.module = findModuleFromOptions(host, options);
+
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
-
-    options.module = findModuleFromOptions(host, options);
 
     // todo remove these when we remove the deprecations
     options.skipTests = options.skipTests || !options.spec;
