@@ -153,6 +153,36 @@ describe('Universal Schematic', () => {
     expect(contents).toMatch(/document.addEventListener\('DOMContentLoaded', \(\) => {/);
   });
 
+  it('should wrap the bootstrap decleration in a DOMContentLoaded event handler', () => {
+    const filePath = '/projects/bar/src/main.ts';
+    appTree.overwrite(
+      filePath,
+      `
+      import { enableProdMode } from '@angular/core';
+      import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+      import { AppModule } from './app/app.module';
+      import { environment } from './environments/environment';
+      import { hmrBootstrap } from './hmr';
+
+      if (environment.production) {
+        enableProdMode();
+      }
+
+      const bootstrap = () => platformBrowserDynamic().bootstrapModule(AppModule);
+
+      if (!hmrBootstrap) {
+        bootstrap().catch(err => console.log(err));
+      }
+      `,
+    );
+
+    const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
+    const contents = tree.readContent(filePath);
+    expect(contents).toMatch(
+      /document.addEventListener\('DOMContentLoaded', \(\) => {[\n\r\s]+bootstrap\(\)/,
+    );
+  });
+
   it('should install npm dependencies', () => {
     schematicRunner.runSchematic('universal', defaultOptions, appTree);
     expect(schematicRunner.tasks.length).toBe(1);
