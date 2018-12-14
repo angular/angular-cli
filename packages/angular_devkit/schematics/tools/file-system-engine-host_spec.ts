@@ -10,7 +10,7 @@ import { normalize, virtualFs } from '@angular-devkit/core';
 import { HostSink, HostTree, SchematicEngine } from '@angular-devkit/schematics';
 import { FileSystemEngineHost } from '@angular-devkit/schematics/tools';
 import * as path from 'path';
-import { of as observableOf } from 'rxjs';
+import { from, of as observableOf } from 'rxjs';
 
 
 describe('FileSystemEngineHost', () => {
@@ -299,5 +299,41 @@ describe('FileSystemEngineHost', () => {
           .toEqual('extra-collection');
       })
       .then(done, done.fail);
+  });
+
+  it('discovers a file-based task', () => {
+    const engineHost = new FileSystemEngineHost(root);
+
+    expect(engineHost.hasTaskExecutor('file-tasks/file-task.js')).toBeTruthy();
+  });
+
+  it('creates a file-based task', done => {
+    const engineHost = new FileSystemEngineHost(root);
+
+    engineHost.createTaskExecutor('file-tasks/file-task.js').subscribe(executor => {
+      expect(executor).toBeTruthy();
+      from(executor(undefined, undefined as any)).toPromise().then(() => done.fail, () => done());
+    }, done.fail);
+  });
+
+  it('allows executing a schematic with a file-based task', done => {
+    const engineHost = new FileSystemEngineHost(root);
+    const engine = new SchematicEngine(engineHost);
+    const host = new virtualFs.test.TestHost();
+
+    const collection = engine.createCollection('file-tasks');
+    const schematic = collection.createSchematic('schematic-1');
+
+    schematic.call({}, observableOf(new HostTree(host))).toPromise()
+      .then(tree => new HostSink(host).commit(tree).toPromise())
+      .then(() => engine.executePostTasks().toPromise())
+      .then(() => done.fail())
+      .catch(reason => {
+        if (reason.message === 'task exception') {
+          done();
+        } else {
+          done.fail();
+        }
+      });
   });
 });

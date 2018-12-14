@@ -43,6 +43,8 @@ export declare class FileSystemEngineHost extends FileSystemEngineHostBase {
     } | null;
     protected _transformCollectionDescription(name: string, desc: Partial<FileSystemCollectionDesc>): FileSystemCollectionDesc;
     protected _transformSchematicDescription(name: string, _collection: FileSystemCollectionDesc, desc: Partial<FileSystemSchematicDesc>): FileSystemSchematicDesc;
+    createTaskExecutor(name: string): Observable<TaskExecutor>;
+    hasTaskExecutor(name: string): boolean;
 }
 
 export declare abstract class FileSystemEngineHostBase implements EngineHost<FileSystemCollectionDescription, FileSystemSchematicDescription> {

@@ -1,0 +1,9 @@
+{
+    "name": "file-tasks",
+    "schematics": {
+      "schematic-1": {
+        "description": "1",
+        "factory": "./factory"
+      }
+    }
+  }
