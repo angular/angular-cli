@@ -1,0 +1,47 @@
+{
+  "pinVersions": false,
+  "semanticCommits": true,
+  "semanticPrefix": "build",
+  "commitMessage": "{{semanticPrefix}} update {{depName}} to version {{newVersion}}",
+  "separateMajorMinor": false,
+  "prHourlyLimit": 2,
+  "timezone": "America/Tijuana",
+  "schedule": [
+    "after 10pm every weekday",
+    "before 4am every weekday",
+    "every weekend"
+  ],
+  "baseBranches": [
+    "master"
+  ],
+  "ignoreDeps": [
+    "source-map",
+    "webpack-subresource-integrity"
+  ],
+  "packageFiles": [
+    "package.json",
+    "packages/**/package.json"
+  ],
+  "packageRules": [
+    {
+      "packagePatterns": [
+        "^@angular\/.*"
+      ],
+      "groupName": "angular",
+      "pinVersions": false
+    },
+    {
+      "packagePatterns": [
+        "^@bazel\/.*"
+      ],
+      "groupName": "bazel",
+      "pinVersions": false
+    },
+    {
+      "packageNames": [
+        "typescript"
+      ],
+      "updateTypes": "patch"
+    }
+  ]
+}
