@@ -130,7 +130,7 @@ export class AngularCompilerPlugin {
   // TS compilation.
   private _compilerOptions: CompilerOptions;
   private _rootNames: string[];
-  private _program: (ts.Program | Program) | null;
+  private _program: Program| null;
   private _compilerHost: WebpackCompilerHost & CompilerHost;
   private _moduleResolutionCache: ts.ModuleResolutionCache;
   private _resourceLoader?: WebpackResourceLoader;
@@ -324,7 +324,7 @@ export class AngularCompilerPlugin {
       return undefined;
     }
 
-    return this._JitMode ? this._program as ts.Program : (this._program as Program).getTsProgram();
+    return this._program.getTsProgram();
   }
 
   updateChangedFileExtensions(extension: string) {
@@ -368,41 +368,31 @@ export class AngularCompilerPlugin {
       : [],
     );
 
-    if (this._JitMode) {
-      // Create the TypeScript program.
-      time('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
-      this._program = ts.createProgram(
-        this._rootNames,
-        this._compilerOptions,
-        this._compilerHost,
-        tsProgram,
-      );
-      timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
+    const compilerOptions = {
+      ...this._compilerOptions,
+      annotationsAs: 'decorators' as 'decorators',
+    };
 
-      const newFiles = this._program.getSourceFiles().filter(sf => !oldFiles.has(sf.fileName));
-      for (const newFile of newFiles) {
-        this._compilerHost.invalidate(newFile.fileName);
-      }
-    } else {
-      time('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
-      // Create the Angular program.
-      this._program = createProgram({
-        rootNames: this._rootNames,
-        options: this._compilerOptions,
-        host: this._compilerHost,
-        oldProgram: this._program as Program,
-      });
-      timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
+    time('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
+    // Create the Angular program.
+    this._program = createProgram({
+      rootNames: this._rootNames,
+      options: compilerOptions,
+      host: this._compilerHost,
+      oldProgram: this._program as Program,
+    });
+    timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
 
+    if (!this._JitMode) {
       time('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
       await this._program.loadNgStructureAsync();
       timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
+    }
 
-      const newFiles = this._program.getTsProgram()
-        .getSourceFiles().filter(sf => !oldFiles.has(sf.fileName));
-      for (const newFile of newFiles) {
-        this._compilerHost.invalidate(newFile.fileName);
-      }
+    const newFiles = this._program.getTsProgram()
+      .getSourceFiles().filter(sf => !oldFiles.has(sf.fileName));
+    for (const newFile of newFiles) {
+      this._compilerHost.invalidate(newFile.fileName);
     }
 
     // If there's still no entryModule try to resolve from mainPath.
@@ -423,30 +413,19 @@ export class AngularCompilerPlugin {
 
   private _listLazyRoutesFromProgram(): LazyRouteMap {
     let entryRoute: string | undefined;
-    let ngProgram: Program;
 
     if (this._JitMode) {
       if (!this.entryModule) {
         return {};
       }
 
-      time('AngularCompilerPlugin._listLazyRoutesFromProgram.createProgram');
-      ngProgram = createProgram({
-        rootNames: this._rootNames,
-        options: { ...this._compilerOptions, genDir: '', collectAllErrors: true },
-        host: this._compilerHost,
-      });
-      timeEnd('AngularCompilerPlugin._listLazyRoutesFromProgram.createProgram');
-
       entryRoute = this.entryModule.path + '#' + this.entryModule.className;
-    } else {
-      ngProgram = this._program as Program;
     }
 
     time('AngularCompilerPlugin._listLazyRoutesFromProgram.listLazyRoutes');
     // entryRoute will only be defined in JIT.
     // In AOT all routes within the program are returned.
-    const lazyRoutes = ngProgram.listLazyRoutes(entryRoute);
+    const lazyRoutes = (this._program as Program).listLazyRoutes(entryRoute);
     timeEnd('AngularCompilerPlugin._listLazyRoutesFromProgram.listLazyRoutes');
 
     return lazyRoutes.reduce(
@@ -1053,98 +1032,46 @@ export class AngularCompilerPlugin {
 
     let emitResult: ts.EmitResult | undefined;
     try {
-      if (this._JitMode) {
-        const tsProgram = program as ts.Program;
-        const changedTsFiles = new Set<string>();
+      const angularProgram = program as Program;
 
-        if (this._firstRun) {
-          // Check parameter diagnostics.
-          time('AngularCompilerPlugin._emit.ts.getOptionsDiagnostics');
-          allDiagnostics.push(...tsProgram.getOptionsDiagnostics());
-          timeEnd('AngularCompilerPlugin._emit.ts.getOptionsDiagnostics');
-        } else {
-          // generate a list of changed files for emit
-          // not needed on first run since a full program emit is required
-          for (const changedFile of this._compilerHost.getChangedFilePaths()) {
-            if (!/.(tsx|ts|json|js)$/.test(changedFile)) {
-              continue;
-            }
-            // existing type definitions are not emitted
-            if (changedFile.endsWith('.d.ts')) {
-              continue;
-            }
-            changedTsFiles.add(changedFile);
-          }
-        }
-
-        allDiagnostics.push(...gatherDiagnostics(tsProgram, this._JitMode,
-          'AngularCompilerPlugin._emit.ts', diagMode));
-
-        if (!hasErrors(allDiagnostics)) {
-          if (this._firstRun || changedTsFiles.size > 20) {
-            emitResult = tsProgram.emit(
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              { before: this._transformers },
-            );
-            allDiagnostics.push(...emitResult.diagnostics);
-          } else {
-            for (const changedFile of changedTsFiles) {
-              const sourceFile = tsProgram.getSourceFile(changedFile);
-              if (!sourceFile) {
-                continue;
-              }
-
-              const timeLabel = `AngularCompilerPlugin._emit.ts+${sourceFile.fileName}+.emit`;
-              time(timeLabel);
-              emitResult = tsProgram.emit(sourceFile, undefined, undefined, undefined,
-                { before: this._transformers },
-              );
-              allDiagnostics.push(...emitResult.diagnostics);
-              timeEnd(timeLabel);
-            }
-          }
-        }
-      } else {
-        const angularProgram = program as Program;
-
+      if (!this._JitMode) {
         // Check Angular structural diagnostics.
         time('AngularCompilerPlugin._emit.ng.getNgStructuralDiagnostics');
         allDiagnostics.push(...angularProgram.getNgStructuralDiagnostics());
         timeEnd('AngularCompilerPlugin._emit.ng.getNgStructuralDiagnostics');
+      }
 
-        if (this._firstRun) {
-          // Check TypeScript parameter diagnostics.
-          time('AngularCompilerPlugin._emit.ng.getTsOptionDiagnostics');
-          allDiagnostics.push(...angularProgram.getTsOptionDiagnostics());
-          timeEnd('AngularCompilerPlugin._emit.ng.getTsOptionDiagnostics');
+      if (this._firstRun) {
+        // Check TypeScript parameter diagnostics.
+        time('AngularCompilerPlugin._emit.ng.getTsOptionDiagnostics');
+        allDiagnostics.push(...angularProgram.getTsOptionDiagnostics());
+        timeEnd('AngularCompilerPlugin._emit.ng.getTsOptionDiagnostics');
 
-          // Check Angular parameter diagnostics.
-          time('AngularCompilerPlugin._emit.ng.getNgOptionDiagnostics');
-          allDiagnostics.push(...angularProgram.getNgOptionDiagnostics());
-          timeEnd('AngularCompilerPlugin._emit.ng.getNgOptionDiagnostics');
+        // Check Angular parameter diagnostics.
+        time('AngularCompilerPlugin._emit.ng.getNgOptionDiagnostics');
+        allDiagnostics.push(...angularProgram.getNgOptionDiagnostics());
+        timeEnd('AngularCompilerPlugin._emit.ng.getNgOptionDiagnostics');
+      }
+
+      allDiagnostics.push(...gatherDiagnostics(angularProgram, false,
+        'AngularCompilerPlugin._emit.ng', diagMode));
+
+      if (!hasErrors(allDiagnostics)) {
+        time('AngularCompilerPlugin._emit.ng.emit');
+        const extractI18n = !!this._compilerOptions.i18nOutFile;
+        const emitFlags = extractI18n
+          ? EmitFlags.I18nBundle
+          : (this._JitMode ? EmitFlags.JS : EmitFlags.Default);
+        emitResult = angularProgram.emit({
+          emitFlags, customTransformers: {
+            beforeTs: this._transformers,
+          },
+        });
+        allDiagnostics.push(...emitResult.diagnostics);
+        if (extractI18n) {
+          this.writeI18nOutFile();
         }
-
-        allDiagnostics.push(...gatherDiagnostics(angularProgram, this._JitMode,
-          'AngularCompilerPlugin._emit.ng', diagMode));
-
-        if (!hasErrors(allDiagnostics)) {
-          time('AngularCompilerPlugin._emit.ng.emit');
-          const extractI18n = !!this._compilerOptions.i18nOutFile;
-          const emitFlags = extractI18n ? EmitFlags.I18nBundle : EmitFlags.Default;
-          emitResult = angularProgram.emit({
-            emitFlags, customTransformers: {
-              beforeTs: this._transformers,
-            },
-          });
-          allDiagnostics.push(...emitResult.diagnostics);
-          if (extractI18n) {
-            this.writeI18nOutFile();
-          }
-          timeEnd('AngularCompilerPlugin._emit.ng.emit');
-        }
+        timeEnd('AngularCompilerPlugin._emit.ng.emit');
       }
     } catch (e) {
       time('AngularCompilerPlugin._emit.catch');
