@@ -115,19 +115,61 @@ function wrapBootstrapCall(options: UniversalOptions): Rule {
     let currentCall = bootstrapCall;
     while (bootstrapCallExpression === null && currentCall.parent) {
       currentCall = currentCall.parent;
-      if (currentCall.kind === ts.SyntaxKind.ExpressionStatement) {
+      if (ts.isExpressionStatement(currentCall) || ts.isVariableStatement(currentCall)) {
         bootstrapCallExpression = currentCall;
       }
     }
     bootstrapCall = currentCall;
 
+    // In case the bootstrap code is a variable statement
+    // we need to determine it's usage
+    if (bootstrapCallExpression && ts.isVariableStatement(bootstrapCallExpression)) {
+      const declaration = bootstrapCallExpression.declarationList.declarations[0];
+      const bootstrapVar = (declaration.name as ts.Identifier).text;
+      const sf = bootstrapCallExpression.getSourceFile();
+      bootstrapCall = findCallExpressionNode(sf, bootstrapVar) || currentCall;
+    }
+
+    // indent contents
+    const triviaWidth = bootstrapCall.getLeadingTriviaWidth();
+    const beforeText = `document.addEventListener('DOMContentLoaded', () => {\n`
+      + ' '.repeat(triviaWidth > 2 ? triviaWidth + 1 : triviaWidth);
+    const afterText = `\n${triviaWidth > 2 ? ' '.repeat(triviaWidth - 1) : ''});`;
+
+    // in some cases we need to cater for a trailing semicolon such as;
+    // bootstrap().catch(err => console.log(err));
+    const lastToken = bootstrapCall.parent.getLastToken();
+    let endPos = bootstrapCall.getEnd();
+    if (lastToken && lastToken.kind === ts.SyntaxKind.SemicolonToken) {
+      endPos = lastToken.getEnd();
+    }
+
     const recorder = host.beginUpdate(mainPath);
-    const beforeText = `document.addEventListener('DOMContentLoaded', () => {\n  `;
-    const afterText = `\n});`;
     recorder.insertLeft(bootstrapCall.getStart(), beforeText);
-    recorder.insertRight(bootstrapCall.getEnd(), afterText);
+    recorder.insertRight(endPos, afterText);
     host.commitUpdate(recorder);
   };
+}
+
+function findCallExpressionNode(node: ts.Node, text: string): ts.Node | null {
+  if (
+    ts.isCallExpression(node)
+    && ts.isIdentifier(node.expression)
+    && node.expression.text === text
+  ) {
+    return node;
+  }
+
+  let foundNode: ts.Node | null = null;
+  ts.forEachChild(node, childNode => {
+    foundNode = findCallExpressionNode(childNode, text);
+
+    if (foundNode) {
+      return true;
+    }
+  });
+
+  return foundNode;
 }
 
 function addServerTransition(options: UniversalOptions): Rule {
