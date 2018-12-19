@@ -5,6 +5,9 @@
   "commitMessage": "{{semanticPrefix}} update {{depName}} to version {{newVersion}}",
   "separateMajorMinor": false,
   "prHourlyLimit": 2,
+  "labels": [
+    "PR target: master-only"
+  ],
   "timezone": "America/Tijuana",
   "schedule": [
     "after 10pm every weekday",
