@@ -81,7 +81,7 @@
     "@types/copy-webpack-plugin": "^4.4.1",
     "@types/express": "^4.16.0",
     "@types/glob": "^5.0.35",
-    "@types/inquirer": "^0.0.42",
+    "@types/inquirer": "^0.0.43",
     "@types/istanbul": "^0.4.30",
     "@types/jasmine": "^2.8.8",
     "@types/loader-utils": "^1.1.3",
