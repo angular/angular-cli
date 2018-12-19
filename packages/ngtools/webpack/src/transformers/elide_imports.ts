@@ -100,7 +100,7 @@ export function elideImports(
       // "import { XYZ, ... } from 'abc';"
       const specifierOps = [];
       for (const specifier of node.importClause.namedBindings.elements) {
-        if (isUnused(specifier.propertyName || specifier.name)) {
+        if (isUnused(specifier.name)) {
           specifierOps.push(new RemoveNodeOperation(sourceFile, specifier));
         }
       }
