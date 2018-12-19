@@ -10,7 +10,7 @@
   "dependencies": {
     "loader-utils": "1.1.0",
     "source-map": "0.5.6",
-    "typescript": "3.1.6",
+    "typescript": "3.2.2",
     "webpack-sources": "1.2.0"
   }
 }
