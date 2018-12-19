@@ -147,4 +147,4 @@ export declare class SchematicNameCollisionException extends BaseException {
     constructor(name: string);
 }
 
-export declare function validateOptionsWithSchema(registry: schema.SchemaRegistry): <T extends {}>(schematic: FileSystemSchematicDescription, options: T, context?: import("@angular-devkit/schematics/src/engine/interface").TypedSchematicContext<import("@angular-devkit/schematics/tools/tools/description").FileSystemCollectionDescription, FileSystemSchematicDescription> | undefined) => Observable<T>;
+export declare function validateOptionsWithSchema(registry: schema.SchemaRegistry): <T extends {}>(schematic: FileSystemSchematicDescription, options: T, context?: import("@angular-devkit/schematics").TypedSchematicContext<import("@angular-devkit/schematics/tools/tools/description").FileSystemCollectionDescription, FileSystemSchematicDescription> | undefined) => Observable<T>;
