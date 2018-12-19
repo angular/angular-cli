@@ -83,7 +83,7 @@ export class ScriptsWebpackPlugin {
 
     const entrypoint = new EntryPoint(this.options.name);
     entrypoint.pushChunk(chunk);
-
+    chunk.addGroup(entrypoint);
     compilation.entrypoints.set(this.options.name, entrypoint);
     compilation.chunks.push(chunk);
     compilation.assets[filename] = source;

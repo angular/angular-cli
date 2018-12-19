@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
+import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
 import { PathFragment, join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
 import { browserTargetSpec, host } from '../utils';
@@ -130,6 +130,24 @@ describe('Browser Builder scripts array', () => {
         const fileName = './dist/scripts.js';
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(re);
+      }),
+    ).toPromise().then(done, done.fail);
+  });
+
+  it('chunk in entry', (done) => {
+    host.writeMultipleFiles(scripts);
+
+    const overrides = { scripts: getScriptsOption() };
+    const logger = new TestLogger('build-script-entry');
+
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout, logger).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        const validate = ` [1m[33m[entry][39m[22m[1m[32m [rendered]`;
+        expect(logger.includes(`(lazy-script) 69 bytes${validate}`)).toBe(true);
+        expect(logger.includes(`(renamed-script) 78 bytes${validate}`)).toBe(true);
+        expect(logger.includes(`(renamed-lazy-script) 88 bytes${validate}`)).toBe(true);
+        logger.clear();
       }),
     ).toPromise().then(done, done.fail);
   });
