@@ -155,7 +155,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   if (buildOptions.showCircularDependencies) {
     extraPlugins.push(new CircularDependencyPlugin({
-      exclude: /[\\\/]node_modules[\\\/]/,
+      exclude: /([\\\/]node_modules[\\\/])|(ngfactory\.js$)/,
     }));
   }
 
