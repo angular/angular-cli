@@ -45,12 +45,13 @@ export function getLastNode(sourceFile: ts.SourceFile): ts.Node | null {
 const basePath = '/project/src/';
 const fileName = basePath + 'test-file.ts';
 
-export function createTypescriptContext(content: string) {
+export function createTypescriptContext(content: string, additionalFiles?: Record<string, string>) {
   // Set compiler options.
   const compilerOptions: ts.CompilerOptions = {
     noEmitOnError: false,
     allowJs: true,
     newLine: ts.NewLineKind.LineFeed,
+    moduleResolution: ts.ModuleResolutionKind.NodeJs,
     target: ts.ScriptTarget.ESNext,
     skipLibCheck: true,
     sourceMap: false,
@@ -67,6 +68,12 @@ export function createTypescriptContext(content: string) {
 
   // Add a dummy file to host content.
   compilerHost.writeFile(fileName, content, false);
+
+  if (additionalFiles) {
+    for (const key in additionalFiles) {
+      compilerHost.writeFile(basePath + key, additionalFiles[key], false);
+    }
+  }
 
   // Create the TypeScript program.
   const program = ts.createProgram([fileName], compilerOptions, compilerHost);
