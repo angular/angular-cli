@@ -29,9 +29,9 @@ export function elideImports(
   const typeChecker = getTypeChecker();
 
   // Collect all imports and used identifiers
-  const specialCaseNames = new Set<string>();
   const usedSymbols = new Set<ts.Symbol>();
   const imports: ts.ImportDeclaration[] = [];
+
   ts.forEachChild(sourceFile, function visit(node) {
     // Skip removed nodes
     if (removedNodes.includes(node)) {
@@ -45,20 +45,22 @@ export function elideImports(
       return;
     }
 
-    if (ts.isIdentifier(node)) {
-      const symbol = typeChecker.getSymbolAtLocation(node);
-      if (symbol) {
-        usedSymbols.add(symbol);
-      }
-    } else if (ts.isExportSpecifier(node)) {
-      // Export specifiers return the non-local symbol from the above
-      // so check the name string instead
-      specialCaseNames.add((node.propertyName || node.name).text);
+    let symbol: ts.Symbol | undefined;
 
-      return;
-    } else if (ts.isShorthandPropertyAssignment(node)) {
-      // Shorthand property assignments return the object property's symbol not the import's
-      specialCaseNames.add(node.name.text);
+    switch (node.kind) {
+      case ts.SyntaxKind.Identifier:
+        symbol = typeChecker.getSymbolAtLocation(node);
+        break;
+      case ts.SyntaxKind.ExportSpecifier:
+        symbol = typeChecker.getExportSpecifierLocalTargetSymbol(node as ts.ExportSpecifier);
+        break;
+      case ts.SyntaxKind.ShorthandPropertyAssignment:
+        symbol = typeChecker.getShorthandAssignmentValueSymbol(node);
+        break;
+    }
+
+    if (symbol) {
+      usedSymbols.add(symbol);
     }
 
     ts.forEachChild(node, visit);
@@ -69,10 +71,6 @@ export function elideImports(
   }
 
   const isUnused = (node: ts.Identifier) => {
-    if (specialCaseNames.has(node.text)) {
-      return false;
-    }
-
     const symbol = typeChecker.getSymbolAtLocation(node);
 
     return symbol && !usedSymbols.has(symbol);
