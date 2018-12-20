@@ -7,8 +7,9 @@
  */
 
 import { runTargetSpec } from '@angular-devkit/architect/testing';
-import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { tap } from 'rxjs/operators';
+import { PathFragment, join, normalize, virtualFs } from '@angular-devkit/core';
+import { forkJoin } from 'rxjs';
+import { mergeMap, switchMap, tap } from 'rxjs/operators';
 import { BrowserBuilderSchema, OutputHashing } from '../../src';
 import { browserTargetSpec, host } from '../utils';
 
@@ -219,5 +220,45 @@ describe('Browser Builder source map', () => {
         expect(styleContent).not.toContain('sourceMappingURL=styles.css.map');
       }),
     ).toPromise().then(done, done.fail);
+  });
+
+  it('should generate equal hash with sourcemaps on and wihout sourcemaps', (done) => {
+    const overridesWithSourceMaps: Partial<BrowserBuilderSchema> = {
+      sourceMap: true,
+      buildOptimizer: true,
+      aot: true,
+      outputHashing: OutputHashing.All,
+
+    };
+    const overridesWithoutSourcemaps: Partial<BrowserBuilderSchema> = {
+      sourceMap: false,
+      buildOptimizer: true,
+      aot: true,
+      outputHashing: OutputHashing.All,
+
+    };
+    let mainFileOutput: PathFragment | undefined;
+    let mainFileWithSourceMapOutput: PathFragment | undefined;
+
+    const runWithoutSourceMaps = runTargetSpec(host, browserTargetSpec, overridesWithoutSourcemaps)
+    .pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        mainFileWithSourceMapOutput = host.fileMatchExists(outputPath, /main\.[0-9a-f]{20}\.js/);
+      })).toPromise();
+
+
+    const runWithSourceMaps = runTargetSpec(host, browserTargetSpec, overridesWithSourceMaps).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        mainFileOutput = host.fileMatchExists(outputPath, /main\.[0-9a-f]{20}\.js/);
+      }),
+    ).toPromise();
+
+    forkJoin(runWithoutSourceMaps, runWithSourceMaps).toPromise()
+    .then(() => {
+      expect(mainFileWithSourceMapOutput).toEqual(mainFileOutput);
+      }).then(done, done.fail);
+
   });
 });
