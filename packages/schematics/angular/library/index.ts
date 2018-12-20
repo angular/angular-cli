@@ -213,6 +213,7 @@ export default function (options: LibraryOptions): Rule {
         relativePathToWorkspaceRoot,
         prefix,
         angularLatestVersion: latestVersions.Angular.replace('~', '').replace('^', ''),
+        folderName,
       }),
       // TODO: Moving inside `branchAndMerge` should work but is bugged right now.
       // The __projectRoot__ is being used meanwhile.
