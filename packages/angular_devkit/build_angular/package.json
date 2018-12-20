@@ -29,7 +29,7 @@
     "minimatch": "3.0.4",
     "parse5": "4.0.0",
     "opn": "5.4.0",
-    "portfinder": "1.0.17",
+    "portfinder": "1.0.20",
     "postcss": "7.0.7",
     "postcss-import": "12.0.0",
     "postcss-loader": "3.0.0",
