@@ -31,7 +31,7 @@ export function elideImports(
   // Collect all imports and used identifiers
   const specialCaseNames = new Set<string>();
   const usedSymbols = new Set<ts.Symbol>();
-  const imports = [] as ts.ImportDeclaration[];
+  const imports: ts.ImportDeclaration[] = [];
   ts.forEachChild(sourceFile, function visit(node) {
     // Skip removed nodes
     if (removedNodes.includes(node)) {
@@ -84,28 +84,45 @@ export function elideImports(
       continue;
     }
 
-    if (node.importClause.name) {
-      // "import XYZ from 'abc';"
-      if (isUnused(node.importClause.name)) {
-        ops.push(new RemoveNodeOperation(sourceFile, node));
-      }
-    } else if (node.importClause.namedBindings
-               && ts.isNamespaceImport(node.importClause.namedBindings)) {
+    const namedBindings = node.importClause.namedBindings;
+
+    if (namedBindings && ts.isNamespaceImport(namedBindings)) {
       // "import * as XYZ from 'abc';"
-      if (isUnused(node.importClause.namedBindings.name)) {
+      if (isUnused(namedBindings.name)) {
         ops.push(new RemoveNodeOperation(sourceFile, node));
       }
-    } else if (node.importClause.namedBindings
-               && ts.isNamedImports(node.importClause.namedBindings)) {
-      // "import { XYZ, ... } from 'abc';"
+    } else {
       const specifierOps = [];
-      for (const specifier of node.importClause.namedBindings.elements) {
-        if (isUnused(specifier.name)) {
-          specifierOps.push(new RemoveNodeOperation(sourceFile, specifier));
+      let clausesCount = 0;
+
+      // "import { XYZ, ... } from 'abc';"
+      if (namedBindings && ts.isNamedImports(namedBindings)) {
+        let removedClausesCount = 0;
+        clausesCount += namedBindings.elements.length;
+
+        for (const specifier of namedBindings.elements) {
+          if (isUnused(specifier.name)) {
+            removedClausesCount++;
+            // in case we don't have any more namedImports we should remove the parent ie the {}
+            const nodeToRemove = clausesCount === removedClausesCount
+              ? specifier.parent
+              : specifier;
+
+            specifierOps.push(new RemoveNodeOperation(sourceFile, nodeToRemove));
+          }
         }
       }
 
-      if (specifierOps.length === node.importClause.namedBindings.elements.length) {
+      // "import XYZ from 'abc';"
+      if (node.importClause.name) {
+        clausesCount++;
+
+        if (isUnused(node.importClause.name)) {
+          specifierOps.push(new RemoveNodeOperation(sourceFile, node.importClause.name));
+        }
+      }
+
+      if (specifierOps.length === clausesCount) {
         ops.push(new RemoveNodeOperation(sourceFile, node));
       } else {
         ops.push(...specifierOps);
