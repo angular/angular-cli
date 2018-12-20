@@ -262,6 +262,9 @@ describe('Library Schematic', () => {
 
     const rootTsCfg = JSON.parse(tree.readContent('/tsconfig.json'));
     expect(rootTsCfg.compilerOptions.paths['@myscope/mylib']).toEqual(['dist/myscope/mylib']);
+
+    const karmaConf = getFileContent(tree, '/projects/myscope/mylib/karma.conf.js');
+    expect(karmaConf).toContain(`dir: require('path').join(__dirname, '../../../coverage/myscope/mylib')`);
   });
 
   it(`should dasherize scoped libraries`, () => {
@@ -282,5 +285,11 @@ describe('Library Schematic', () => {
 
     const cfg = JSON.parse(tree.readContent('/angular.json'));
     expect(cfg.projects['@myScope/myLib']).toBeDefined();
+  });
+
+  it(`should set coverage folder to "coverage/foo"`, () => {
+    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+    const karmaConf = getFileContent(tree, '/projects/foo/karma.conf.js');
+    expect(karmaConf).toContain(`dir: require('path').join(__dirname, '../../coverage/foo')`);
   });
 });
