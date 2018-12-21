@@ -142,7 +142,7 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
     // process. To work around this we run it in a subprocess.
     // https://github.com/angular/protractor/issues/4160
     return runModuleAsObservableFork(
-      root,
+      getSystemPath(root),
       'protractor/built/launcher',
       'init',
       [
