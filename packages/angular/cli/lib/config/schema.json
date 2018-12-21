@@ -1074,7 +1074,7 @@
             },
             "publicHost": {
               "type": "string",
-              "description": "The URL that the browser client (or live-reload client, if enabled) should use to connect to the development server. Use for a complex server setup, such as one with reverse proxies."
+              "description": "The URL that the browser client (or live-reload client, if enabled) should use to connect to the development server. Use for a complex dev server setup, such as one with reverse proxies."
             },
             "servePath": {
               "type": "string",
