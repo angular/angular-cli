@@ -147,4 +147,24 @@ describe('Schematic', () => {
       .then(done, done.fail);
   });
 
+  it('can be called with a scope', done => {
+    const desc: SchematicDescription<CollectionT, SchematicT> = {
+      collection,
+      name: 'test',
+      description: '',
+      path: '/a/b/c',
+      factory: () => (tree: Tree) => {
+        tree.create('a/b/c', 'some content');
+      },
+    };
+
+    const schematic = new SchematicImpl(desc, desc.factory, null !, engine);
+    schematic.call({}, observableOf(empty()), {}, { scope: 'base' })
+      .toPromise()
+      .then(x => {
+        expect(files(x)).toEqual(['/base/a/b/c']);
+      })
+      .then(done, done.fail);
+  });
+
 });

@@ -218,6 +218,7 @@ export interface EngineHost<CollectionMetadataT extends object, SchematicMetadat
 
 export interface ExecutionOptions {
     interactive: boolean;
+    scope: string;
 }
 
 export declare function externalSchematic<OptionT extends object>(collectionName: string, schematicName: string, options: OptionT, executionOptions?: Partial<ExecutionOptions>): Rule;

@@ -10,6 +10,7 @@ import { Observable, of as observableOf } from 'rxjs';
 import { concatMap, first, map } from 'rxjs/operators';
 import { callRule } from '../rules/call';
 import { Tree } from '../tree/interface';
+import { ScopedTree } from '../tree/scoped';
 import {
   Collection,
   Engine,
@@ -58,7 +59,28 @@ export class SchematicImpl<CollectionT extends object, SchematicT extends object
           map(o => [tree, o]),
         )),
         concatMap(([tree, transformedOptions]: [Tree, OptionT]) => {
-          return callRule(this._factory(transformedOptions), observableOf(tree), context);
+          let input: Tree;
+          let scoped = false;
+          if (executionOptions && executionOptions.scope) {
+            scoped = true;
+            input = new ScopedTree(tree, executionOptions.scope);
+          } else {
+            input = tree;
+          }
+
+          return callRule(this._factory(transformedOptions), observableOf(input), context).pipe(
+            map(output => {
+              if (output === input) {
+                return tree;
+              } else if (scoped) {
+                tree.merge(output);
+
+                return tree;
+              } else {
+                return output;
+              }
+            }),
+          );
         }),
       );
   }

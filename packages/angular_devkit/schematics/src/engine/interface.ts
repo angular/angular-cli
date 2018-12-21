@@ -42,6 +42,7 @@ export interface TaskInfo {
 }
 
 export interface ExecutionOptions {
+  scope: string;
   interactive: boolean;
 }
 
