@@ -98,7 +98,7 @@
     "common-tags": "^1.8.0",
     "conventional-changelog": "^1.1.0",
     "conventional-commits-parser": "^3.0.0",
-    "gh-got": "^7.0.0",
+    "gh-got": "^8.0.0",
     "git-raw-commits": "^2.0.0",
     "husky": "^0.14.3",
     "istanbul": "^0.4.5",
