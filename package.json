@@ -69,8 +69,7 @@
     "quicktype-core": "^6.0.15",
     "temp": "^0.9.0",
     "tslint": "^5.11.0",
-    "typescript": "~3.2.2",
-    "yarn": "^1.10.1"
+    "typescript": "~3.2.2"
   },
   "devDependencies": {
     "@angular/compiler": "^7.2.0-rc.0",
@@ -98,7 +97,7 @@
     "common-tags": "^1.8.0",
     "conventional-changelog": "^1.1.0",
     "conventional-commits-parser": "^3.0.0",
-    "gh-got": "^7.0.0",
+    "gh-got": "^8.0.1",
     "git-raw-commits": "^2.0.0",
     "husky": "^0.14.3",
     "istanbul": "^0.4.5",
