@@ -100,7 +100,7 @@
     "conventional-commits-parser": "^3.0.0",
     "gh-got": "^7.0.0",
     "git-raw-commits": "^2.0.0",
-    "husky": "^0.14.3",
+    "husky": "^1.0.0",
     "istanbul": "^0.4.5",
     "jasmine": "^2.6.0",
     "jasmine-spec-reporter": "^3.2.0",
