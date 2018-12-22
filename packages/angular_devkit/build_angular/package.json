@@ -27,7 +27,7 @@
     "loader-utils": "1.1.0",
     "mini-css-extract-plugin": "0.5.0",
     "minimatch": "3.0.4",
-    "parse5": "4.0.0",
+    "parse5": "5.1.0",
     "opn": "5.4.0",
     "portfinder": "1.0.20",
     "postcss": "7.0.7",
