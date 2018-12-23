@@ -12,30 +12,45 @@ cd "$(dirname "$0")"
 
 # basedir is the workspace root
 readonly basedir=$(pwd)/..
+# We need to resolve the Bazel binary in the node modules because running Bazel
+# through `yarn bazel` causes additional output that throws off command stdout.
+readonly bazelBin=$(yarn bin)/bazel
+readonly bin=$(${bazelBin} info bazel-bin)
 
-echo "##################################"
-echo "scripts/build-modules-dist.sh:"
-echo "  building @nguniversal/* npm packages"
-echo "##################################"
+function buildTargetPackages() {
+  targets="$1"
+  destPath="$2"
+  desc="$3"
+
+  echo "##################################"
+  echo "scripts/build-modules-dist.sh:"
+  echo "  building @nguniversal/* npm packages"
+  echo "  mode: ${desc}"
+  echo "##################################"
+
+  # Use --config=release so that snapshot builds get published with embedded version info
+  echo "$targets" | xargs ${bazelBin} build
+
+  [ -d "${basedir}/${destPath}" ] || mkdir -p $basedir/${destPath}
+
+  dirs=`echo "$targets" | sed -e 's/\/\/modules\/\(.*\):npm_package/\1/'`
+
+  for pkg in $dirs; do
+    # Skip any that don't have an "npm_package" target
+    srcDir="${bin}/modules/${pkg}/npm_package"
+    destDir="${basedir}/${destPath}/${pkg}"
+    if [ -d $srcDir ]; then
+      echo "# Copy artifacts to ${destDir}"
+      rm -rf $destDir
+      cp -R $srcDir $destDir
+      chmod -R u+w $destDir
+    fi
+  done
+}
+
 # Ideally these integration tests should run under bazel, and just list the npm
 # packages in their deps[].
 # Until then, we have to manually run bazel first to create the npm packages we
 # want to test.
-bazel query --output=label 'kind(.*_package, //modules/...)' \
-  | xargs bazel build
-readonly bin=$(bazel info bazel-bin)
-
-# Create the legacy dist/modules-dist folder
-[ -d "${basedir}/dist/modules-dist" ] || mkdir -p $basedir/dist/modules-dist
-# Each package is a subdirectory of bazel-bin/modules/
-for pkg in $(ls ${bin}/modules); do
-  # Skip any that don't have an "npm_package" target
-  srcDir="${bin}/modules/${pkg}/npm_package"
-  destDir="${basedir}/dist/modules-dist/${pkg}"
-  if [ -d $srcDir ]; then
-    echo "# Copy artifacts to ${destDir}"
-    rm -rf $destDir
-    cp -R $srcDir $destDir
-    chmod -R u+w $destDir
-  fi
-done
+BAZEL_TARGETS=`${bazelBin} query --output=label 'attr("tags", "\[.*release\]", //modules/...) intersect kind(".*_package", //modules/...)'`
+buildTargetPackages "$BAZEL_TARGETS" "dist/modules-dist" "Production"

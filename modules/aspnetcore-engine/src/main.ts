@@ -37,8 +37,8 @@ function _getUniversalData(doc: Document): UniversalData {
   const META: string[] = [];
   const LINKS: string[] = [];
 
-  for (let i = 0; i < doc.head.children.length; i++) {
-    const element = doc.head.children[i];
+  for (let i = 0; i < doc.head!.children.length; i++) {
+    const element = doc.head!.children[i];
     const tagName = element.tagName.toUpperCase();
 
     switch (tagName) {

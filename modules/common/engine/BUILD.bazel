@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("//tools:defaults.bzl", "ng_module")
+
+package(default_visibility = ["//visibility:public"])
 
 ng_module(
     name = "engine",
@@ -9,4 +9,9 @@ ng_module(
         "*.ts",
     ]),
     module_name = "@nguniversal/common/engine",
+    deps = [
+        "@angular//packages/compiler",
+        "@angular//packages/core",
+        "@angular//packages/platform-server",
+    ],
 )

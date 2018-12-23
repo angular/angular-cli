@@ -7,7 +7,7 @@
  */
 import {SchematicTestRunner} from '@angular-devkit/schematics/testing';
 import {Schema as UniversalOptions} from './schema';
-import {collectionPath, createTestApp} from '../test-setup/test-app';
+import {collectionPath, createTestApp} from '../testing/test-app';
 import {Tree} from '@angular-devkit/schematics';
 
 describe('Universal Schematic', () => {

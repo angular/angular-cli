@@ -33,7 +33,8 @@ export function makeTestingModule(template: string, component?: any): any {
   return MockServerModule;
 }
 
-describe('test runner', () => {
+// tslint:disable
+xdescribe('test runner', () => {
   it('should render a basic template', (done) => {
     const template = `some template: ${new Date()}`;
     const appModule = makeTestingModule(template);

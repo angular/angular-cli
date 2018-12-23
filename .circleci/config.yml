@@ -1,107 +1,108 @@
-# This file configures the build at https://circleci.com/gh/angular/universal
-# Complete documentation is at https://circleci.com/docs/2.0/
+# Configuration file for https://circleci.com/gh/angular/universal
 
-# We use a docker image as the basis for our build, so that all the toolchains we use
-# are already installed and the build can start running right away. It also guarantees
-# the environment is portable and reproducible on your local machine.
-var_1: &docker_image angular/ngcontainer:0.3.0
+# Note: YAML anchors allow an object to be re-used, reducing duplication.
+# The ampersand declares an alias for an object, then later the `<<: *name`
+# syntax dereferences it.
+# See http://blog.daemonl.com/2016/02/yaml.html
+# To validate changes, use an online parser, eg.
+# http://yaml-online-parser.appspot.com/
 
-# CircleCI lets us pick the key for storing one or more caches, to speed up subsequent builds.
-# We can use this to avoid re-fetching our dependencies from npm on every build.
-# To ensure we don't load a stale cache, we invalidate it based on the entries in the key:
-# - the checksum of Yarn's lock file
-# - the branch we are on, which really shouldn't be needed since the yarn lock file should be hermetic
-# - the docker image tag, working around an issue we saw where changing docker images causes permission
-#   errors when restoring the cache, like when the user we run as changes
-var_2: &cache_key angular-{{ .Branch }}-{{ checksum "yarn.lock" }}-0.3.0
+# Note that the browser docker image comes with Chrome and Firefox preinstalled. This is just
+# needed for jobs that run tests without Bazel. Bazel runs tests with browsers that will be
+# fetched by the Webtesting rules. Therefore for jobs that run tests with Bazel, we don't need a
+# docker image with browsers pre-installed.
+# **NOTE**: If you change the the version of the docker images, also change the `cache_key` suffix.
+var_1: &docker_image angular/ngcontainer:0.7.0
+var_2: &cache_key v2-nguniversal-{{ .Branch }}-{{ checksum "yarn.lock" }}-node-10.12
 
-# Each job will inherit these defaults
-anchor_1: &job_defaults
+# Settings common to each job
+var_3: &job_defaults
   working_directory: ~/ng
   docker:
-    - image: *docker_image
+  - image: *docker_image
 
-# After checkout, rebase on top of master, because we want to test the proposed merge of a
-# onto the target branch, not just test what's on the user's fork.
-# Similar to travis behavior, but not quite the same.
-# See https://discuss.circleci.com/t/1662
-anchor_2: &post_checkout
-  post: git pull --ff-only origin "refs/pull/${CI_PULL_REQUEST//*pull\//}/merge"
+# Job step for checking out the source code from GitHub. This also ensures that the source code
+# is rebased on top of master.
+var_4: &checkout_code
+  checkout:
+    # After checkout, rebase on top of master. By default, PRs are not rebased on top of master,
+    # which we want. See https://discuss.circleci.com/t/1662
+    post: git pull --ff-only origin "refs/pull/${CI_PULL_REQUEST//*pull\//}/merge"
 
-# Opt-in to the new goodness
+# Restores the cache that could be available for the current Yarn lock file. The cache usually
+# includes the node modules and the Bazel repository cache.
+var_5: &restore_cache
+  restore_cache:
+    key: *cache_key
+
+# Saves the cache for the current Yarn lock file. We store the node modules and the Bazel
+# repository cache in order to make subsequent builds faster.
+var_6: &save_cache
+  save_cache:
+    key: *cache_key
+    paths:
+    - "node_modules"
+    - "~/bazel_repository_cache"
+
+# Job step that ensures that the node module dependencies are installed and up-to-date. We use
+# Yarn with the frozen lockfile option in order to make sure that lock file and package.json are
+# in sync. Unlike in Travis, we don't need to manually purge the node modules if stale because
+# CircleCI automatically discards the cache if the checksum of the lock file has changed.
+var_7: &yarn_install
+  run: yarn install --frozen-lockfile --non-interactive
+
+# Copies the Bazel config which is specifically for CircleCI to a location where Bazel picks it
+# up and merges it with the project-wide bazel configuration (tools/bazel.rc)
+var_8: &copy_bazel_config
+  # Set up the CircleCI specific bazel configuration.
+  run: sudo cp ./.circleci/bazel.rc /etc/bazel.bazelrc
+
+# Sets up a different Docker image that includes a moe recent Firefox version which
+# is needed for headless testing.
+var_9: &docker-firefox-image
+  # TODO(CaerusKaru): Temporarily use a image that includes Firefox 62 because the
+  # ngcontainer image does include an old Firefox version that does not support headless.
+  - image: circleci/node:11.4.0-browsers
+
+# Attaches the release output which has been stored in the workspace to the current job.
+# https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
+var_10: &attach_release_output
+  attach_workspace:
+    at: dist
+
 version: 2
 
-# These jobs will run in parallel, and report separate statuses to GitHub PRs
 jobs:
-  bazel-lint:
-    <<: *job_defaults
-    steps:
-      - checkout:
-          <<: *post_checkout
-      # Enforce that BUILD files are formatted. Note that this uses the version of buildifier
-      # from the docker image above - take care that you use the same version when you run
-      # buildifier locally on your change.
-      - run: 'buildifier -mode=check $(find . -type f \( -name BUILD.bazel -or -name BUILD \)) ||
-              (echo "BUILD files not formatted. Please run ''yarn buildifier''" ; exit 1)'
-
-  lint:
-    <<: *job_defaults
-    steps:
-      - checkout:
-          <<: *post_checkout
-      # TODO: Don't do this
-      - run: yarn install --frozen-lockfile
-      - run: yarn lint
-
   build:
     <<: *job_defaults
     resource_class: xlarge
     steps:
-      - checkout:
-          <<: *post_checkout
+    - *checkout_code
+    - *restore_cache
+    - *copy_bazel_config
 
-      - restore_cache:
-          key: *cache_key
+    - run: bazel test //...
 
-      - run: bazel info release
+    # Note: We want to save the cache in this job because the workspace cache also
+    # includes the Bazel repository cache that will be updated in this job.
+    - *save_cache
 
-      # TODO: Don't do this
-      - run: yarn install --frozen-lockfile
-      # Install the dependencies from NPM
-      #- run: bazel run @yarn//:yarn install
+  lint:
+    <<: *job_defaults
+    steps:
+    - *checkout_code
+    - *restore_cache
+    - *yarn_install
 
-      # Build and Test
-      # Use bazel query so that we explicitly ask for all buildable targets to
-      # be built even though we run `bazel test`
-      # See https://github.com/bazelbuild/bazel/issues/4257
-      #- run: bazel query //... | xargs bazel test --config=ci
-      - run: bazel test //...
-
-      - store_artifacts:
-          path: dist/bin/modules/aspnetcore-engine/npm_package/fesm2015/aspnetcore-engine.js
-          destination: aspnetcore-engine.js
-
-      - store_artifacts:
-          path: dist/bin/modules/common/npm_package/fesm2015/common.js
-          destination: common.js
-
-      - store_artifacts:
-          path: dist/bin/modules/express-engine/npm_package/fesm2015/express-engine.js
-          destination: express-engine.js
-
-      - store_artifacts:
-          path: dist/bin/modules/hapi-engine/npm_package/fesm2015/hapi-engine.js
-          destination: hapi-engine.js
-
-      - store_artifacts:
-          path: dist/bin/modules/module-map-ngfactory-loader/npm_package/fesm2015/module-map-ngfactory-loader.js
-          destination: module-map-ngfactory-loader.js
-
-      # If we get this far, save the node_modules directory for use next time.
-      - save_cache:
-          key: *cache_key
-          paths:
-            - "node_modules"
+    # Enforce that BUILD files are formatted. Note that this uses the version of buildifier
+    # from the docker image above - take care that you use the same version when you run
+    # buildifier locally on your change.
+    - run: 'yarn bazel:format -mode=check ||
+                (echo "BUILD files not formatted. Please run ''yarn bazel:format''" ; exit 1)'
+    # Run the skylark linter to check our Bazel rules
+    - run: 'yarn bazel:lint ||
+                (echo -e "\n.bzl files have lint errors. Please run ''yarn bazel:lint-fix''"; exit 1)'
+    - run: yarn lint
 
   # This job exists only for backwards-compatibility with old scripts and tests
   # that rely on the pre-Bazel dist/modules-dist layout.
@@ -114,18 +115,18 @@ jobs:
     <<: *job_defaults
     resource_class: xlarge
     steps:
-      - checkout:
-          <<: *post_checkout
+    - *checkout_code
+    - *restore_cache
+    - *yarn_install
 
-      - run: bazel run @yarn//:yarn
-      - run: scripts/build-modules-dist.sh
+    - run: scripts/build-modules-dist.sh
 
-      # Save the npm packages from //modules/... for other workflow jobs to read
-      # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
-      - persist_to_workspace:
-          root: dist
-          paths:
-            - modules-dist
+    # Save the npm packages from //modules/... for other workflow jobs to read
+    # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
+    - persist_to_workspace:
+        root: dist
+        paths:
+        - modules-dist
 
   # We run the integration tests outside of Bazel for now.
   # They are a separate workflow job so that they can be easily re-run.
@@ -135,23 +136,37 @@ jobs:
   # See comments inside the integration/run_tests.sh script.
   integration_test:
     <<: *job_defaults
+    docker: *docker-firefox-image
     steps:
-      - checkout:
-          <<: *post_checkout
-      - attach_workspace:
-          at: dist
-      - restore_cache:
-          key: *cache_key
-      - run: xvfb-run --auto-servernum ./integration/run_tests.sh
+    - *checkout_code
+    - *restore_cache
+    - *yarn_install
+    - *attach_release_output
+    - run: ./integration/run_tests.sh
+
+  # TODO(CaerusKaru): remove this step
+  bazel-lint:
+    <<: *job_defaults
+    steps:
+    - run: exit 0
 
 workflows:
   version: 2
   default_workflow:
     jobs:
-      - build
-      - bazel-lint
-      - lint
-      - build-packages-dist
-      - integration_test:
-          requires:
-            - build-packages-dist
+    - build
+    - bazel-lint
+    - lint
+    - build-packages-dist
+    - integration_test:
+        requires:
+        - build-packages-dist
+
+general:
+  branches:
+    only:
+    - master
+    # 5.2.x, 6.0.x, etc
+    - /\d+\.\d+\.x/
+    # 5.x, 6.x, etc
+    - /\d+\.x/

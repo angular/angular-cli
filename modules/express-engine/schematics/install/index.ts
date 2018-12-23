@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {experimental, JsonObject, strings} from '@angular-devkit/core';
+import {experimental, strings} from '@angular-devkit/core';
 import {
   apply,
   chain,
@@ -27,6 +27,7 @@ import {
   addPackageJsonDependency,
   NodeDependencyType,
 } from '@schematics/angular/utility/dependencies';
+import {BrowserBuilderOptions} from '@schematics/angular/utility/workspace-models';
 
 // TODO(CaerusKaru): make these configurable
 const BROWSER_DIST = 'dist/browser';
@@ -110,7 +111,14 @@ function updateConfigFile(options: UniversalOptions): Rule {
       throw new Error('Client project architect not found.');
     }
 
-    const serverConfig: JsonObject = {
+    // We have to check if the project config has a server target, because
+    // if the Universal step in this schematic isn't run, it can't be guaranteed
+    // to exist
+    if (!clientProject.architect.server) {
+      return;
+    }
+
+    clientProject.architect.server.configurations = {
       production: {
         fileReplacements: [
           {
@@ -120,19 +128,10 @@ function updateConfigFile(options: UniversalOptions): Rule {
         ]
       }
     };
-
-    // We have to check if the project config has a server target, because
-    // if the Universal step in this schematic isn't run, it can't be guaranteed
-    // to exist
-    if (!clientProject.architect.server) {
-      return;
-    }
-
-    clientProject.architect.server.configurations = serverConfig;
     // TODO(CaerusKaru): make this configurable
     clientProject.architect.server.options.outputPath = SERVER_DIST;
     // TODO(CaerusKaru): make this configurable
-    clientProject.architect.build.options.outputPath = BROWSER_DIST;
+    (clientProject.architect.build.options as BrowserBuilderOptions).outputPath = BROWSER_DIST;
 
     const workspacePath = getWorkspacePath(host);
 

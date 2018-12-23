@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("//tools:defaults.bzl", "ng_module")
+
+package(default_visibility = ["//visibility:public"])
 
 ng_module(
     name = "tokens",
@@ -9,4 +9,7 @@ ng_module(
         "*.ts",
     ]),
     module_name = "@nguniversal/common/tokens",
+    deps = [
+        "@angular//packages/core",
+    ],
 )

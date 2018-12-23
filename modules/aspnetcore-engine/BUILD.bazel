@@ -1,7 +1,6 @@
-package(default_visibility = ["//visibility:public"])
+load("//tools:defaults.bzl", "jasmine_node_test", "ng_module", "ng_package", "ng_test_library")
 
-load("//tools:defaults.bzl", "ts_library", "ng_module", "ng_package")
-load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test")
+package(default_visibility = ["//visibility:public"])
 
 ng_module(
     name = "aspnetcore-engine",
@@ -12,7 +11,11 @@ ng_module(
     module_name = "@nguniversal/aspnetcore-engine",
     deps = [
         "//modules/aspnetcore-engine/tokens",
-        "@rxjs",
+        "@angular//packages/common",
+        "@angular//packages/compiler",
+        "@angular//packages/platform-browser",
+        "@angular//packages/platform-server",
+        "@rxjs//operators",
     ],
 )
 
@@ -30,9 +33,8 @@ ng_package(
     ],
 )
 
-ts_library(
+ng_test_library(
     name = "unit_test_lib",
-    testonly = True,
     srcs = glob([
         "spec/**/*.spec.ts",
     ]),

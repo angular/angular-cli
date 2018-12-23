@@ -1,71 +1,132 @@
 workspace(name = "nguniversal")
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# Add NodeJS rules (explicitly used for sass bundle rules)
 http_archive(
     name = "build_bazel_rules_nodejs",
-    # TODO: upgrade once https://github.com/bazelbuild/rules_nodejs/issues/218#issuecomment-395826361 is released
-    url = "https://github.com/bazelbuild/rules_nodejs/archive/0.8.0.zip",
-    strip_prefix = "rules_nodejs-0.8.0",
+    strip_prefix = "rules_nodejs-c40ceb960af4213164d4299d8fbc8220ebdd727f",
+    # TODO(CaerusKaru): temporarily depend on a specific commit because we want to make sure that
+    # our CI is not flaky until there is a new version of the NodeJS rules. See commit:
+    # https://github.com/bazelbuild/rules_nodejs/commit/c40ceb960af4213164d4299d8fbc8220ebdd727f
+    url = "https://github.com/bazelbuild/rules_nodejs/archive/c40ceb960af4213164d4299d8fbc8220ebdd727f.zip",
 )
 
-http_archive(
-    name = "io_bazel_rules_webtesting",
-    url = "https://github.com/bazelbuild/rules_webtesting/archive/v0.2.0.zip",
-    strip_prefix = "rules_webtesting-0.2.0",
-    sha256 = "cecc12f07e95740750a40d38e8b14b76fefa1551bef9332cb432d564d693723c",
-)
-
+# Add TypeScript rules
 http_archive(
     name = "build_bazel_rules_typescript",
-    url = "https://github.com/bazelbuild/rules_typescript/archive/0.15.0.zip",
-    strip_prefix = "rules_typescript-0.15.0",
-    sha256 = "1aa75917330b820cb239b3c10a936a10f0a46fe215063d4492dd76dc6e1616f4",
+    strip_prefix = "rules_typescript-0.22.0",
+    url = "https://github.com/bazelbuild/rules_typescript/archive/0.22.0.zip",
 )
 
+# Add Angular source and Bazel rules.
 http_archive(
-    name = "io_bazel_rules_go",
-    url = "https://github.com/bazelbuild/rules_go/releases/download/0.10.3/rules_go-0.10.3.tar.gz",
-    sha256 = "feba3278c13cde8d67e341a837f69a029f698d7a27ddbb2a202be7a10b22142a",
-)
-
-# This commit matches the version of buildifier in angular/ngcontainer
-# If you change this, also check if it matches the version in the angular/ngcontainer
-# version in /.circleci/config.yml
-BAZEL_BUILDTOOLS_VERSION = "fd9878fd5de921e0bbab3dcdcb932c2627812ee1"
-
-http_archive(
-    name = "com_github_bazelbuild_buildtools",
-    url = "https://github.com/bazelbuild/buildtools/archive/%s.zip" % BAZEL_BUILDTOOLS_VERSION,
-    strip_prefix = "buildtools-%s" % BAZEL_BUILDTOOLS_VERSION,
-    sha256 = "27bb461ade23fd44ba98723ad98f84ee9c83cd3540b773b186a1bc5037f3d862",
-)
-
-# Fetching the Bazel source code allows us to compile the Skylark linter
-http_archive(
-    name = "io_bazel",
-    url = "https://github.com/bazelbuild/bazel/archive/968f87900dce45a7af749a965b72dbac51b176b3.zip",
-    strip_prefix = "bazel-968f87900dce45a7af749a965b72dbac51b176b3",
-    sha256 = "e373d2ae24955c1254c495c9c421c009d88966565c35e4e8444c082cb1f0f48f",
-)
-
-local_repository(
     name = "angular",
-    path = "node_modules/@angular/bazel",
+    strip_prefix = "angular-7.1.3",
+    url = "https://github.com/angular/angular/archive/7.1.3.zip",
 )
 
-local_repository(
+# Add RxJS as repository because those are needed in order to build Angular from source.
+# Also we cannot refer to the RxJS version from the node modules because self-managed
+# node modules are not guaranteed to be installed.
+# TODO(gmagolan): remove this once rxjs ships with an named UMD bundle and we
+# are no longer building it from source.
+http_archive(
     name = "rxjs",
-    path = "node_modules/rxjs/src",
+    sha256 = "72b0b4e517f43358f554c125e40e39f67688cd2738a8998b4a266981ed32f403",
+    strip_prefix = "package/src",
+    url = "https://registry.yarnpkg.com/rxjs/-/rxjs-6.3.3.tgz",
 )
 
-load("@build_bazel_rules_nodejs//:defs.bzl", "check_bazel_version", "node_repositories", "yarn_install")
+# We need to create a local repository called "npm" because currently Angular Universal
+# stores all of it's NPM dependencies in the "@ngudeps" repository. This is necessary because
+# we don't want to reserve the "npm" repository that is commonly used by downstream projects.
+# Since we still need the "npm" repository in order to use the Angular or TypeScript Bazel
+# rules, we create a local repository that is just defined in **this** workspace and is not
+# being shipped to downstream projects. This can be removed once downstream projects can
+# consume Angular Universal completely from NPM.
+# TODO(CaerusKaru): remove once Angular Universal can be consumed from NPM with Bazel.
+local_repository(
+    name = "npm",
+    path = "tools/npm-workspace",
+)
 
-check_bazel_version("0.13.0")
-node_repositories(package_json = ["//:package.json"])
+# Add sass rules
+http_archive(
+    name = "io_bazel_rules_sass",
+    strip_prefix = "rules_sass-1.15.2",
+    url = "https://github.com/bazelbuild/rules_sass/archive/1.15.2.zip",
+)
 
+# Since we are explitly fetching @build_bazel_rules_typescript, we should explicitly ask for
+# its transitive dependencies in case those haven't been fetched yet.
+load("@build_bazel_rules_typescript//:package.bzl", "rules_typescript_dependencies")
 
+rules_typescript_dependencies()
+
+# Since we are explitly fetching @build_bazel_rules_nodejs, we should explicitly ask for
+# its transitive dependencies in case those haven't been fetched yet.
+load("@build_bazel_rules_nodejs//:package.bzl", "rules_nodejs_dependencies")
+
+rules_nodejs_dependencies()
+
+# Fetch transitive dependencies which are needed by the Angular build targets.
+load("@angular//packages/bazel:package.bzl", "rules_angular_dependencies")
+
+rules_angular_dependencies()
+
+# Fetch transitive dependencies which are needed to use the Sass rules.
+load("@io_bazel_rules_sass//:package.bzl", "rules_sass_dependencies")
+
+rules_sass_dependencies()
+
+load("@build_bazel_rules_nodejs//:defs.bzl", "check_bazel_version", "node_repositories")
+
+check_bazel_version(minimum_bazel_version = "0.18.0")
+
+node_repositories(
+    node_version = "10.10.0",
+    package_json = ["//:package.json"],
+    preserve_symlinks = True,
+    yarn_version = "1.12.1",
+)
+
+# Setup TypeScript Bazel workspace
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_setup_workspace")
+
 ts_setup_workspace()
 
+# Setup the Sass rule repositories.
+load("@io_bazel_rules_sass//:defs.bzl", "sass_repositories")
 
-load("@io_bazel_rules_go//go:def.bzl", "go_rules_dependencies", "go_register_toolchains")
+sass_repositories()
+
+# Setup Angular workspace for building (Bazel managed node modules)
+load("@angular//:index.bzl", "ng_setup_workspace")
+
+ng_setup_workspace()
+
+load("@nguniversal//:index.bzl", "nguniversal_setup_workspace")
+
+nguniversal_setup_workspace()
+
+# Setup Go toolchain (required for Bazel web testing rules)
+load("@io_bazel_rules_go//go:def.bzl", "go_register_toolchains", "go_rules_dependencies")
+
 go_rules_dependencies()
+
 go_register_toolchains()
+
+# Setup web testing. We need to setup a browser because the web testing rules for TypeScript need
+# a reference to a registered browser (ideally that's a hermetic version of a browser)
+load(
+    "@io_bazel_rules_webtesting//web:repositories.bzl",
+    "browser_repositories",
+    "web_test_repositories",
+)
+
+web_test_repositories()
+
+browser_repositories(
+    chromium = True,
+)

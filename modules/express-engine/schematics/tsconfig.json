@@ -17,5 +17,8 @@
   "exclude": [
     "**/*.spec.ts",
     "*/files/**/*"
-  ]
+  ],
+  "bazelOptions": {
+    "suppressTsconfigOverrideWarnings": true
+  }
 }
