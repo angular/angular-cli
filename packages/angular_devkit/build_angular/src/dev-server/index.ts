@@ -16,7 +16,7 @@ import { WebpackDevServerBuilder } from '@angular-devkit/build-webpack';
 import { Path, getSystemPath, resolve, tags, virtualFs } from '@angular-devkit/core';
 import { Stats, existsSync, readFileSync } from 'fs';
 import * as path from 'path';
-import { Observable, throwError } from 'rxjs';
+import { Observable, from, throwError } from 'rxjs';
 import { concatMap, map, tap } from 'rxjs/operators';
 import * as url from 'url';
 import * as webpack from 'webpack';
@@ -67,7 +67,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     let first = true;
     let opnAddress: string;
 
-    return checkPort(options.port, options.host).pipe(
+    return from(checkPort(options.port, options.host)).pipe(
       tap((port) => options.port = port),
       concatMap(() => this._getBrowserOptions(options)),
       tap(opts => browserOptions = normalizeBuilderSchema(
