@@ -23,13 +23,31 @@ To add Font Awesome CSS icons to your app...
 "build": {
   "options": {
     "styles": [
-      "../node_modules/font-awesome/css/font-awesome.css"
-      "styles.css"
+      "../node_modules/font-awesome/css/font-awesome.css",
+      "src/styles.css"
     ],
   }
 }
 ```
 ### Using SASS
+Create new project with SASS:
+```
+ng new cli-app --style=scss
+```
+To use with existing project with `CSS`:
+1. Rename `src/styles.css` to `src/styles.scss`
+2. Change `angular.json` to look for `styles.scss` instead of css:
+```
+// in angular.json
+"build": {
+  "options": {
+    "styles": [
+      "src/styles.scss"
+    ],
+  }
+}
+```
+Make sure to change `styles.css` to `styles.scss`.
 
 Create an empty file _variables.scss in src/.
 
