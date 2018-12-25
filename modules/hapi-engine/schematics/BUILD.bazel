@@ -21,7 +21,7 @@ ts_library(
             "**/files/**/*",
         ],
     ),
-    module_name = "@nguniversal/express-engine/schematics",
+    module_name = "@nguniversal/hapi-engine/schematics",
     tsconfig = ":tsconfig.json",
     deps = [
         "@ngudeps//@angular-devkit/schematics",
@@ -30,7 +30,7 @@ ts_library(
     ],
 )
 
-# This package is intended to be combined into the main @nguniversal/express-engine package as a dep.
+# This package is intended to be combined into the main @nguniversal/hapi-engine package as a dep.
 npm_package(
     name = "npm_package",
     srcs = [":schematics_assets"],

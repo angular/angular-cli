@@ -22,6 +22,7 @@ ng_package(
         ":package.json",
     ],
     entry_point = "modules/hapi-engine/index.js",
+    packages = ["//modules/hapi-engine/schematics:npm_package"],
     readme_md = ":README.md",
     tags = ["release"],
     deps = [
