@@ -33,7 +33,6 @@ app.get('/helloworld', (req: Request, res) =>
     bootstrap: HelloWorldServerModuleNgFactory,
     req,
     document: helloworld,
-    url: req.url
   }, (err, html) => res.send(html))
 );
 

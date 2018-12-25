@@ -35,4 +35,12 @@ describe('Hello world E2E Tests', function() {
     // Make sure there were no client side errors.
     verifyNoBrowserErrors();
   });
+  it('should populate window.location', () => {
+   // Load the page without waiting for Angular since it is not bootstrapped automatically.
+   browser.driver.get(browser.baseUrl + 'helloworld');
+
+   // Test the contents from the server.
+   const serverDiv = browser.driver.findElement(by.css('span.href-check'));
+   expect(serverDiv.getText()).toMatch('http://localhost:9876/helloworld');
+  });
 });

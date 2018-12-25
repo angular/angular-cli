@@ -66,9 +66,9 @@ export function ngHapiEngine(options: RenderOptions) {
     return Promise.reject(new Error('url is undefined'));
   }
 
-  const rawUrl = req.url;
+  const protocol = req.server.info.protocol;
   const filePath = <string> req.raw.req.url;
-  const url = `${rawUrl.protocol || ''}://${rawUrl.host || ''}${rawUrl.path || ''}`;
+  const url = `${protocol}://${req.info.host}${req.path}`;
 
   options.providers = options.providers || [];
 
