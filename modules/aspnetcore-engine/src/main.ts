@@ -128,7 +128,7 @@ export function ngAspnetCoreEngine(options: IEngineOptions): Promise<IEngineRend
         .then(factory => {
           return renderModuleFactory(factory, {
             document: options.document || options.appSelector,
-            url: options.url || options.request.url,
+            url: options.url || options.request.absoluteUrl,
             extraProviders: extraProviders
           });
         })

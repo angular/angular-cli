@@ -76,6 +76,7 @@ export function ngExpressEngine(setupOptions: NgSetupOptions) {
 
       setupOptions.providers = setupOptions.providers || [];
 
+      const req = options.req;
       const extraProviders = setupOptions.providers.concat(
         options.providers,
         getReqResProviders(options.req, options.res),
@@ -84,7 +85,7 @@ export function ngExpressEngine(setupOptions: NgSetupOptions) {
             provide: INITIAL_CONFIG,
             useValue: {
               document: options.document || getDocument(filePath),
-              url: options.url || options.req.originalUrl
+              url: options.url || req.protocol + '://' + (req.get('host') || '') + req.originalUrl
             }
           }
         ]);
