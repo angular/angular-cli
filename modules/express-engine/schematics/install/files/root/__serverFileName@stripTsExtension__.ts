@@ -34,7 +34,7 @@ app.set('views', DIST_FOLDER);
 
 // Example Express Rest API endpoints
 // app.get('/api/**', (req, res) => { });
-// Server static files from /browser
+// Serve static files from /browser
 app.get('*.*', express.static(DIST_FOLDER, {
   maxAge: '1y'
 }));
