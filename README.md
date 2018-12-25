@@ -1,8 +1,8 @@
-[![Build Status](https://travis-ci.org/angular/universal.svg?branch=master)](https://travis-ci.org/angular/universal)
+[![CircleCI](https://circleci.com/gh/angular/universal/tree/master.svg?style=shield)](https://circleci.com/gh/angular/universal/tree/master)
 [![Join the chat at https://gitter.im/angular/universal](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/angular/universal?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # Angular Universal
-![Angular Universal](https://angular.io/assets/images/logos/concept-icons/universal.png)
+![Angular Universal](https://angular.io/generated/images/marketing/concept-icons/universal.png)
 
 # Table of Contents
 * [Introduction](#introduction)
@@ -45,6 +45,7 @@ The packages from this repo are published as scoped packages under [@nguniversal
 - [@nguniversal/aspnetcore-engine](/modules/aspnetcore-engine/README.md)
 - [@nguniversal/hapi-engine](/modules/hapi-engine/README.md)
 - [@nguniversal/module-map-ngfactory-loader](/modules/module-map-ngfactory-loader)
+- [@nguniversal/socket-engine](/modules/socket-engine)
 
 # Universal "Gotchas"
 Moved to [/docs/gotchas.md](/docs/gotchas.md)
