@@ -15,7 +15,7 @@ export function domContentLoadedFactory(doc: Document) {
       doc.removeEventListener('DOMContentLoaded', contentLoaded);
       resolve();
     };
-    if (doc.readyState === 'complete' || doc.readyState === 'loaded') {
+    if (doc.readyState === 'complete' || doc.readyState === 'interactive') {
       resolve();
     } else {
       doc.addEventListener('DOMContentLoaded', contentLoaded);
