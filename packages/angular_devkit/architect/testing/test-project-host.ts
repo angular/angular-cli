@@ -22,6 +22,9 @@ import { EMPTY, Observable, from, of } from 'rxjs';
 import { concatMap, delay, finalize, map, mergeMap, retry, tap } from 'rxjs/operators';
 
 
+/**
+ * @deprecated
+ */
 export class TestProjectHost extends NodeJsSyncHost {
   private _currentRoot: Path | null = null;
   private _scopedSyncHost: virtualFs.SyncDelegateHost<Stats> | null = null;

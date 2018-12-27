@@ -9,6 +9,9 @@
 import { logging } from '@angular-devkit/core';
 
 
+/**
+ * @deprecated
+ */
 export class TestLogger extends logging.Logger {
   private _latestEntries: logging.LogEntry[] = [];
   constructor(name: string, parent: logging.Logger | null = null) {

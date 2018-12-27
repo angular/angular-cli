@@ -9,6 +9,9 @@ import * as http from 'http';
 import * as https from 'https';
 import * as Url from 'url';
 
+/**
+ * @deprecated
+ */
 export function request(url: string, headers = {}): Promise<string> {
   return new Promise((resolve, reject) => {
     const u = Url.parse(url);

@@ -12,8 +12,14 @@ import { concatMap, concatMapTo, finalize, takeUntil } from 'rxjs/operators';
 import { Architect, BuildEvent, BuilderContext, TargetSpecifier } from '../src';
 import { TestProjectHost } from './test-project-host';
 
+/**
+ * @deprecated
+ */
 export const DefaultTimeout = 45000;
 
+/**
+ * @deprecated
+ */
 export function runTargetSpec(
   host: TestProjectHost,
   targetSpec: TargetSpecifier,
