@@ -7,13 +7,10 @@
  */
 import * as path from 'path';
 import * as ts from 'typescript';
+import { LazyRouteMap } from '../lazy_routes';
 import { getFirstNode, getLastNode } from './ast_helpers';
 import { AddNodeOperation, StandardTransform, TransformOperation } from './interfaces';
 import { makeTransform } from './make_transform';
-
-export interface LazyRouteMap {
-  [path: string]: string;
-}
 
 export function exportLazyModuleMap(
   shouldTransform: (fileName: string) => boolean,
