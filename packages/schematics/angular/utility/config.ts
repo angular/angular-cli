@@ -484,9 +484,9 @@ export type WorkspaceProject = experimental.workspace.WorkspaceProject;
 
 export function getWorkspacePath(host: Tree): string {
   const possibleFiles = [ '/angular.json', '/.angular.json' ];
-  const path = possibleFiles.filter(path => host.exists(path))[0];
+  const path = possibleFiles.find(value => host.exists(value));
 
-  return path;
+  return path as string;
 }
 
 export function getWorkspace(host: Tree): WorkspaceSchema {
