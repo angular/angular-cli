@@ -15,7 +15,7 @@ import {
   BuilderCannotBeResolvedException,
   ConfigurationNotFoundException,
   TargetNotFoundException,
-} from './architect';
+} from './architect-legacy';
 
 
 describe('Architect', () => {

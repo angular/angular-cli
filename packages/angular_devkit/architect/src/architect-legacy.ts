@@ -24,18 +24,27 @@ import { resolve as nodeResolve } from '@angular-devkit/core/node';
 import { Observable, forkJoin, of, throwError } from 'rxjs';
 import { concatMap, map, tap } from 'rxjs/operators';
 
+/**
+ * @deprecated
+ */
 export class ProjectNotFoundException extends BaseException {
   constructor(projectName: string) {
     super(`Project '${projectName}' could not be found in Workspace.`);
   }
 }
 
+/**
+ * @deprecated
+ */
 export class TargetNotFoundException extends BaseException {
   constructor(projectName: string, targetName: string) {
     super(`Target '${targetName}' could not be found in project '${projectName}'.`);
   }
 }
 
+/**
+ * @deprecated
+ */
 export class ConfigurationNotFoundException extends BaseException {
   constructor(projectName: string, configurationName: string) {
     super(`Configuration '${configurationName}' could not be found in project '${projectName}'.`);
@@ -43,22 +52,34 @@ export class ConfigurationNotFoundException extends BaseException {
 }
 
 // TODO: break this exception apart into more granular ones.
+/**
+ * @deprecated
+ */
 export class BuilderCannotBeResolvedException extends BaseException {
   constructor(builder: string) {
     super(`Builder '${builder}' cannot be resolved.`);
   }
 }
 
+/**
+ * @deprecated
+ */
 export class ArchitectNotYetLoadedException extends BaseException {
   constructor() { super(`Architect needs to be loaded before Architect is used.`); }
 }
 
+/**
+ * @deprecated
+ */
 export class BuilderNotFoundException extends BaseException {
   constructor(builder: string) {
     super(`Builder ${builder} could not be found.`);
   }
 }
 
+/**
+ * @deprecated
+ */
 export interface BuilderContext {
   logger: logging.Logger;
   host: virtualFs.Host<{}>;
@@ -70,37 +91,57 @@ export interface BuilderContext {
 // TODO: use Build Event Protocol
 // https://docs.bazel.build/versions/master/build-event-protocol.html
 // https://github.com/googleapis/googleapis/tree/master/google/devtools/build/v1
-// TODO: use unknown
-// tslint:disable-next-line:no-any
-export interface BuildEvent<BuildResultT = any> {
+/**
+ * TODO: use unknown
+ * @deprecated
+ */
+export interface BuildEvent<BuildResultT = any> {  // tslint:disable-line:no-any
   success: boolean;
   result?: BuildResultT;
 }
 
+/**
+ * @deprecated
+ */
 export interface Builder<OptionsT> {
   run(builderConfig: BuilderConfiguration<Partial<OptionsT>>): Observable<BuildEvent>;
 }
 
+/**
+ * @deprecated
+ */
 export interface BuilderPathsMap {
   builders: { [k: string]: BuilderPaths };
 }
 
+/**
+ * @deprecated
+ */
 export interface BuilderPaths {
   class: Path;
   schema: Path;
   description: string;
 }
 
+/**
+ * @deprecated
+ */
 export interface BuilderDescription {
   name: string;
   schema: JsonObject;
   description: string;
 }
 
+/**
+ * @deprecated
+ */
 export interface BuilderConstructor<OptionsT> {
   new(context: BuilderContext): Builder<OptionsT>;
 }
 
+/**
+ * @deprecated
+ */
 export interface BuilderConfiguration<OptionsT = {}> {
   root: Path;
   sourceRoot?: Path;
@@ -109,6 +150,9 @@ export interface BuilderConfiguration<OptionsT = {}> {
   options: OptionsT;
 }
 
+/**
+ * @deprecated
+ */
 export interface TargetSpecifier<OptionsT = {}> {
   project: string;
   target: string;
@@ -116,6 +160,9 @@ export interface TargetSpecifier<OptionsT = {}> {
   overrides?: Partial<OptionsT>;
 }
 
+/**
+ * @deprecated
+ */
 export interface TargetMap {
   [k: string]: Target;
 }
@@ -123,12 +170,18 @@ export interface TargetMap {
 export declare type TargetOptions<T = JsonObject> = T;
 export declare type TargetConfiguration<T = JsonObject> = Partial<T>;
 
+/**
+ * @deprecated
+ */
 export interface Target<T = JsonObject> {
   builder: string;
   options: TargetOptions<T>;
   configurations?: { [k: string]: TargetConfiguration<T> };
 }
 
+/**
+ * @deprecated
+ */
 export class Architect {
   private readonly _targetsSchemaPath = join(normalize(__dirname), 'targets-schema.json');
   private readonly _buildersSchemaPath = join(normalize(__dirname), 'builders-schema.json');
