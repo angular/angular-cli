@@ -9252,10 +9252,10 @@ spdy@^4.0.0:
     select-hose "^2.0.0"
     spdy-transport "^3.0.0"
 
-speed-measure-webpack-plugin@1.2.3:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/speed-measure-webpack-plugin/-/speed-measure-webpack-plugin-1.2.3.tgz#de170b5cefbfa1c039d95e639edd3ad50cfc7c48"
-  integrity sha512-p+taQ69VkRUXYMoZOx2nxV/Tz8tt79ahctoZJyJDHWP7fEYvwFNf5Pd73k5kZ6auu0pTsPNLEUwWpM8mCk85Zw==
+speed-measure-webpack-plugin@1.2.5:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/speed-measure-webpack-plugin/-/speed-measure-webpack-plugin-1.2.5.tgz#8179936eb8c5e891f7481bd5075a9ea9a0f74823"
+  integrity sha512-S/guYjC4Izn5wY2d0+M4zowED/F77Lxh9yjkTZ+XAr244pr9c1MYNcXcRe9lx2hmAj0GPbOrBXgOF2YIp/CZ8A==
   dependencies:
     chalk "^2.0.1"
 
