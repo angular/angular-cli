@@ -48,6 +48,7 @@ describe('Library Schematic', () => {
       '/projects/foo/karma.conf.js',
       '/projects/foo/ng-package.json',
       '/projects/foo/package.json',
+      '/projects/foo/README.md',
       '/projects/foo/tslint.json',
       '/projects/foo/src/test.ts',
       '/projects/foo/src/my_index.ts',
@@ -70,6 +71,12 @@ describe('Library Schematic', () => {
     const fileContent = getJsonFileContent(tree, '/projects/foo/package.json');
     const angularVersion = latestVersions.Angular.replace('~', '').replace('^', '');
     expect(fileContent.peerDependencies['@angular/core']).toBe(`^${angularVersion}`);
+  });
+
+  it('should create a README.md named "foo"', () => {
+    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+    const fileContent = getFileContent(tree, '/projects/foo/README.md');
+    expect(fileContent).toMatch(/# Foo/);
   });
 
   it('should create a tsconfig for library', () => {
