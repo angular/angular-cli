@@ -39,10 +39,10 @@ import { time, timeEnd } from './benchmark';
 import { WebpackCompilerHost, workaroundResolve } from './compiler_host';
 import { resolveEntryModuleFromMain } from './entry_resolver';
 import { DiagnosticMode, gatherDiagnostics, hasErrors } from './gather_diagnostics';
+import { LazyRouteMap, findLazyRoutes } from './lazy_routes';
 import { TypeScriptPathsPlugin } from './paths-plugin';
 import { WebpackResourceLoader } from './resource_loader';
 import {
-  LazyRouteMap,
   exportLazyModuleMap,
   exportNgFactory,
   findResources,
@@ -135,7 +135,7 @@ export class AngularCompilerPlugin {
   private _moduleResolutionCache: ts.ModuleResolutionCache;
   private _resourceLoader?: WebpackResourceLoader;
   // Contains `moduleImportPath#exportName` => `fullModulePath`.
-  private _lazyRoutes: LazyRouteMap = Object.create(null);
+  private _lazyRoutes: LazyRouteMap = {};
   private _tsConfigPath: string;
   private _entryModule: string | null;
   private _mainPath: string | undefined;
@@ -419,6 +419,22 @@ export class AngularCompilerPlugin {
       }
       timeEnd('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
     }
+  }
+
+  private _findLazyRoutesInAst(changedFilePaths: string[]): LazyRouteMap {
+    time('AngularCompilerPlugin._findLazyRoutesInAst');
+    const result: LazyRouteMap = {};
+    for (const filePath of changedFilePaths) {
+      const fileLazyRoutes = findLazyRoutes(filePath, this._compilerHost, undefined,
+        this._compilerOptions);
+      for (const routeKey of Object.keys(fileLazyRoutes)) {
+        const route = fileLazyRoutes[routeKey];
+        result[routeKey] = route;
+      }
+    }
+    timeEnd('AngularCompilerPlugin._findLazyRoutesInAst');
+
+    return result;
   }
 
   private _listLazyRoutesFromProgram(): LazyRouteMap {
@@ -876,6 +892,12 @@ export class AngularCompilerPlugin {
     }
   }
 
+  private _getChangedTsFiles() {
+    return this._getChangedCompilationFiles()
+      .filter(k => (k.endsWith('.ts') || k.endsWith('.tsx')) && !k.endsWith('.d.ts'))
+      .filter(k => this._compilerHost.fileExists(k));
+  }
+
   private async _update() {
     time('AngularCompilerPlugin._update');
     // We only want to update on TS and template changes, but all kinds of files are on this
@@ -890,11 +912,26 @@ export class AngularCompilerPlugin {
     // Make a new program and load the Angular structure.
     await this._createOrUpdateProgram();
 
+    // Try to find lazy routes if we have an entry module.
+    // We need to run the `listLazyRoutes` the first time because it also navigates libraries
+    // and other things that we might miss using the (faster) findLazyRoutesInAst.
+    // Lazy routes modules will be read with compilerHost and added to the changed files.
+    let lazyRouteMap: LazyRouteMap = {};
+    if (!this._JitMode || this._firstRun) {
+      lazyRouteMap = this._listLazyRoutesFromProgram();
+    } else {
+      const changedTsFiles = this._getChangedTsFiles();
+      if (changedTsFiles.length > 0) {
+        lazyRouteMap = this._findLazyRoutesInAst(changedTsFiles);
+      }
+    }
+
     // Find lazy routes
-    const lazyRouteMap: LazyRouteMap = {
-      ...this._listLazyRoutesFromProgram(),
+    lazyRouteMap = {
+      ...lazyRouteMap,
       ...this._options.additionalLazyModules,
     };
+
     this._processLazyRoutes(lazyRouteMap);
 
     // Emit files.
