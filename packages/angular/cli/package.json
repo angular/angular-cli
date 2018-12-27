@@ -32,8 +32,8 @@
     "@schematics/angular": "0.0.0",
     "@schematics/update": "0.0.0",
     "inquirer": "6.2.1",
-    "opn": "5.3.0",
-    "semver": "5.5.1",
+    "opn": "5.4.0",
+    "semver": "5.6.0",
     "symbol-observable": "1.2.0"
   },
   "ng-update": {

@@ -67,10 +67,9 @@
     "glob": "^7.0.3",
     "node-fetch": "^2.2.0",
     "quicktype-core": "^6.0.15",
-    "temp": "^0.8.3",
+    "temp": "^0.9.0",
     "tslint": "^5.11.0",
-    "typescript": "~3.2.2",
-    "yarn": "^1.10.1"
+    "typescript": "~3.2.2"
   },
   "devDependencies": {
     "@angular/compiler": "^7.2.0-rc.0",
@@ -80,7 +79,7 @@
     "@ngtools/json-schema": "^1.1.0",
     "@types/copy-webpack-plugin": "^4.4.1",
     "@types/express": "^4.16.0",
-    "@types/glob": "^5.0.35",
+    "@types/glob": "^7.0.0",
     "@types/inquirer": "^0.0.43",
     "@types/istanbul": "^0.4.30",
     "@types/jasmine": "^2.8.8",
@@ -98,7 +97,7 @@
     "common-tags": "^1.8.0",
     "conventional-changelog": "^1.1.0",
     "conventional-commits-parser": "^3.0.0",
-    "gh-got": "^7.0.0",
+    "gh-got": "^8.0.1",
     "git-raw-commits": "^2.0.0",
     "husky": "^0.14.3",
     "istanbul": "^0.4.5",
@@ -122,7 +121,7 @@
     "through2": "^2.0.3",
     "tree-kill": "^1.2.0",
     "ts-node": "^5.0.0",
-    "tslint-no-circular-imports": "^0.5.0",
+    "tslint-no-circular-imports": "^0.6.0",
     "tslint-sonarts": "^1.7.0"
   }
 }

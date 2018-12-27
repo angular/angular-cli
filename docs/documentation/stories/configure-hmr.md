@@ -176,6 +176,6 @@ When starting the server Webpack will tell you that it’s enabled:
     NOTICE Hot Module Replacement (HMR) is enabled for the dev server.
 
 
-Now if you make changes to one of your components they changes should be visible automatically without a complete browser refresh.
+Now if you make changes to one of your components the changes should be visible automatically without a complete browser refresh.
 
 

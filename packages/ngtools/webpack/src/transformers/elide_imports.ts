@@ -29,9 +29,9 @@ export function elideImports(
   const typeChecker = getTypeChecker();
 
   // Collect all imports and used identifiers
-  const specialCaseNames = new Set<string>();
   const usedSymbols = new Set<ts.Symbol>();
-  const imports = [] as ts.ImportDeclaration[];
+  const imports: ts.ImportDeclaration[] = [];
+
   ts.forEachChild(sourceFile, function visit(node) {
     // Skip removed nodes
     if (removedNodes.includes(node)) {
@@ -45,20 +45,22 @@ export function elideImports(
       return;
     }
 
-    if (ts.isIdentifier(node)) {
-      const symbol = typeChecker.getSymbolAtLocation(node);
-      if (symbol) {
-        usedSymbols.add(symbol);
-      }
-    } else if (ts.isExportSpecifier(node)) {
-      // Export specifiers return the non-local symbol from the above
-      // so check the name string instead
-      specialCaseNames.add((node.propertyName || node.name).text);
+    let symbol: ts.Symbol | undefined;
 
-      return;
-    } else if (ts.isShorthandPropertyAssignment(node)) {
-      // Shorthand property assignments return the object property's symbol not the import's
-      specialCaseNames.add(node.name.text);
+    switch (node.kind) {
+      case ts.SyntaxKind.Identifier:
+        symbol = typeChecker.getSymbolAtLocation(node);
+        break;
+      case ts.SyntaxKind.ExportSpecifier:
+        symbol = typeChecker.getExportSpecifierLocalTargetSymbol(node as ts.ExportSpecifier);
+        break;
+      case ts.SyntaxKind.ShorthandPropertyAssignment:
+        symbol = typeChecker.getShorthandAssignmentValueSymbol(node);
+        break;
+    }
+
+    if (symbol) {
+      usedSymbols.add(symbol);
     }
 
     ts.forEachChild(node, visit);
@@ -69,10 +71,6 @@ export function elideImports(
   }
 
   const isUnused = (node: ts.Identifier) => {
-    if (specialCaseNames.has(node.text)) {
-      return false;
-    }
-
     const symbol = typeChecker.getSymbolAtLocation(node);
 
     return symbol && !usedSymbols.has(symbol);
@@ -84,28 +82,45 @@ export function elideImports(
       continue;
     }
 
-    if (node.importClause.name) {
-      // "import XYZ from 'abc';"
-      if (isUnused(node.importClause.name)) {
-        ops.push(new RemoveNodeOperation(sourceFile, node));
-      }
-    } else if (node.importClause.namedBindings
-               && ts.isNamespaceImport(node.importClause.namedBindings)) {
+    const namedBindings = node.importClause.namedBindings;
+
+    if (namedBindings && ts.isNamespaceImport(namedBindings)) {
       // "import * as XYZ from 'abc';"
-      if (isUnused(node.importClause.namedBindings.name)) {
+      if (isUnused(namedBindings.name)) {
         ops.push(new RemoveNodeOperation(sourceFile, node));
       }
-    } else if (node.importClause.namedBindings
-               && ts.isNamedImports(node.importClause.namedBindings)) {
-      // "import { XYZ, ... } from 'abc';"
+    } else {
       const specifierOps = [];
-      for (const specifier of node.importClause.namedBindings.elements) {
-        if (isUnused(specifier.name)) {
-          specifierOps.push(new RemoveNodeOperation(sourceFile, specifier));
+      let clausesCount = 0;
+
+      // "import { XYZ, ... } from 'abc';"
+      if (namedBindings && ts.isNamedImports(namedBindings)) {
+        let removedClausesCount = 0;
+        clausesCount += namedBindings.elements.length;
+
+        for (const specifier of namedBindings.elements) {
+          if (isUnused(specifier.name)) {
+            removedClausesCount++;
+            // in case we don't have any more namedImports we should remove the parent ie the {}
+            const nodeToRemove = clausesCount === removedClausesCount
+              ? specifier.parent
+              : specifier;
+
+            specifierOps.push(new RemoveNodeOperation(sourceFile, nodeToRemove));
+          }
         }
       }
 
-      if (specifierOps.length === node.importClause.namedBindings.elements.length) {
+      // "import XYZ from 'abc';"
+      if (node.importClause.name) {
+        clausesCount++;
+
+        if (isUnused(node.importClause.name)) {
+          specifierOps.push(new RemoveNodeOperation(sourceFile, node.importClause.name));
+        }
+      }
+
+      if (specifierOps.length === clausesCount) {
         ops.push(new RemoveNodeOperation(sourceFile, node));
       } else {
         ops.push(...specifierOps);

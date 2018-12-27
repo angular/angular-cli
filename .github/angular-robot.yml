@@ -96,4 +96,4 @@ triage:
 size:
   circleCiStatusName: "ci/circleci: e2e-cli"
   maxSizeIncrease: 10000
-  comment: true
+  comment: false
