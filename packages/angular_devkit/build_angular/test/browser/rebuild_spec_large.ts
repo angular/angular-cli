@@ -198,33 +198,6 @@ describe('Browser Builder rebuilds', () => {
     ).toPromise().then(done, done.fail);
   });
 
-  it('rebuilds shows error', (done) => {
-    host.replaceInFile('./src/app/app.component.ts', 'AppComponent', 'AppComponentZ');
-
-    const overrides = { watch: true, aot: false };
-    let buildCount = 1;
-    const logger = new TestLogger('rebuild-errors');
-
-    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3, logger).pipe(
-      tap((buildEvent) => {
-        switch (buildCount) {
-          case 1:
-            expect(buildEvent.success).toBe(false);
-            expect(logger.includes('AppComponent cannot be used as an entry component')).toBe(true);
-            logger.clear();
-
-            host.replaceInFile('./src/app/app.component.ts', 'AppComponentZ', 'AppComponent');
-            break;
-
-          default:
-            expect(buildEvent.success).toBe(true);
-            break;
-        }
-        buildCount ++;
-      }),
-      take(2),
-    ).toPromise().then(done, done.fail);
-  });
 
   it('rebuilds after errors in AOT', (done) => {
     // Save the original contents of `./src/app/app.component.ts`.
