@@ -169,13 +169,16 @@ export default function (options: ServiceWorkerOptions): Rule {
       throw new SchematicsException(`Service worker requires a project type of "application".`);
     }
 
+    const relativePathToWorkspaceRoot = project.root ?
+      project.root.split('/').filter(x => x !== '').map(x => '..').join('/') : '.';
+
     let { resourcesOutputPath = '' } = getProjectConfiguration(workspace, options);
     if (resourcesOutputPath) {
       resourcesOutputPath = '/' + resourcesOutputPath.split('/').filter(x => !!x).join('/');
     }
 
     const templateSource = apply(url('./files'), [
-      applyTemplates({ ...options, resourcesOutputPath }),
+      applyTemplates({ ...options, resourcesOutputPath, relativePathToWorkspaceRoot }),
       move(project.root),
     ]);
 
