@@ -101,6 +101,31 @@ describe('Service Worker Schematic', () => {
       .toBe('projects/bar/ngsw-config.json');
   });
 
+  it('should add $schema in ngsw-config.json with correct relative path', () => {
+    const pathToNgswConfigSchema = 'node_modules/@angular/service-worker/config/schema.json';
+
+    const name = 'foo';
+    const rootAppOptions: ApplicationOptions = {
+      ...appOptions,
+      name,
+      projectRoot: '',
+    };
+    const rootSWOptions: ServiceWorkerOptions = {
+      ...defaultOptions,
+      project: name,
+    };
+    const rootAppTree = schematicRunner.runSchematic('application', rootAppOptions, appTree);
+    const treeInRoot = schematicRunner.runSchematic('service-worker', rootSWOptions, rootAppTree);
+    const pkgTextInRoot = treeInRoot.readContent('/ngsw-config.json');
+    const configInRoot = JSON.parse(pkgTextInRoot);
+    expect(configInRoot.$schema).toBe(`./${pathToNgswConfigSchema}`);
+
+    const treeNotInRoot = schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
+    const pkgTextNotInRoot = treeNotInRoot.readContent('/projects/bar/ngsw-config.json');
+    const configNotInRoot = JSON.parse(pkgTextNotInRoot);
+    expect(configNotInRoot.$schema).toBe(`../../${pathToNgswConfigSchema}`);
+  });
+
   it('should add root assets RegExp', () => {
     const tree = schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
     const pkgText = tree.readContent('/projects/bar/ngsw-config.json');
