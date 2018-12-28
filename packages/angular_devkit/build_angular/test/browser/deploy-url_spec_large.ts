@@ -58,9 +58,9 @@ describe('Browser Builder deploy url', () => {
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
-        const fileName = join(outputPath, 'favicon.ico');
+        const fileName = join(outputPath, 'index.html');
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toContain('deployUrl/');
+        expect(content).toContain('deployUrl/favicon.ico');
       }),
     ).toPromise().then(done, done.fail);
   });

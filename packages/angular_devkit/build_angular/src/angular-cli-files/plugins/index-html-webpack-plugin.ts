@@ -8,6 +8,7 @@
 import { createHash } from 'crypto';
 import { Compiler, compilation } from 'webpack';
 import { RawSource, ReplaceSource } from 'webpack-sources';
+import { Element } from '../../../../../../node_modules/@angular/compiler/src/render3/r3_ast';
 
 const parse5 = require('parse5');
 
@@ -158,7 +159,7 @@ export class IndexHtmlWebpackPlugin {
         parse5.serialize(scriptElements, { treeAdapter }),
       );
       // Adjust icon href for deploy url
-      this.adjustIconDeployUrl(headElement,treeAdapter,indexSource);
+      this.adjustIconDeployUrl(headElement, treeAdapter, indexSource);
       // Adjust base href if specified
       if (typeof this._options.baseHref == 'string') {
         let baseElement;
@@ -243,14 +244,14 @@ export class IndexHtmlWebpackPlugin {
       { name: 'crossorigin', value: 'anonymous' },
     ];
   }
-  private adjustIconDeployUrl(headElement: any,treeAdapter: any,indexSource: ReplaceSource) {
+  private adjustIconDeployUrl(headElement: any, treeAdapter: any, indexSource: ReplaceSource) {
     // Adjust deploy url for icon if specified
     if (typeof this._options.deployUrl == 'string') {
       let iconElement;
       for (const headChild of headElement.childNodes) {
-          if (headChild.tagName === 'link'){
+          if (headChild.tagName === 'link') {
               for (const attr of headChild.attrs) {
-                  if (attr.name === "rel" && attr.value === "icon") {
+                  if (attr.name === 'rel' && attr.value === 'icon') {
                       iconElement = headChild;
                   }
               }
@@ -282,7 +283,7 @@ export class IndexHtmlWebpackPlugin {
           indexSource.replace(
               iconElement.__location.startOffset,
                iconElement.__location.endOffset,
-                parse5.serialize(iconFragment, { treeAdapter })
+                parse5.serialize(iconFragment, { treeAdapter }),
           );
       }
     }
