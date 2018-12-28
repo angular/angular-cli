@@ -70,8 +70,11 @@ export interface BuilderContext {
 // TODO: use Build Event Protocol
 // https://docs.bazel.build/versions/master/build-event-protocol.html
 // https://github.com/googleapis/googleapis/tree/master/google/devtools/build/v1
-export interface BuildEvent {
+// TODO: use unknown
+// tslint:disable-next-line:no-any
+export interface BuildEvent<BuildResultT = any> {
   success: boolean;
+  result?: BuildResultT;
 }
 
 export interface Builder<OptionsT> {
