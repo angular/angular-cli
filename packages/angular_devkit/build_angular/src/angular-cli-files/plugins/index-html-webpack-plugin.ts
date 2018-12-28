@@ -157,51 +157,8 @@ export class IndexHtmlWebpackPlugin {
         scriptInsertionPoint,
         parse5.serialize(scriptElements, { treeAdapter }),
       );
-      
-      //Adjust deploy url for icon if specified
-      if (typeof this._options.deployUrl == 'string') {
-        let iconElement;
-        for(const headChild of headElement.childNodes){
-            if (headChild.tagName === 'link'){
-                for(const attr of headChild.attrs){
-                    if(attr.name === "rel" && attr.value === "icon"){
-                        iconElement = headChild;
-                    }
-                }
-            }
-        }
-        const iconFragment = treeAdapter.createDocumentFragment();
-        if(!iconElement){
-            iconElement = treeAdapter.createElement('link', undefined, [
-                { name: 'href', value: this._options.deployUrl },
-            ]);
-            treeAdapter.appendChild(iconFragment, iconElement);
-            indexSource.insert(
-                headElement.__location.startTag.endOffset + 1, 
-                parse5.serialize(iconFragment, { treeAdapter })
-            );
-        }else{
-            let hrefAttribute;
-            for (const attribute of iconElement.attrs) {
-                if (attribute.name === 'href') {
-                    hrefAttribute = attribute;
-                }
-            }
-            if (hrefAttribute) {
-                hrefAttribute.value = this._options.deployUrl + hrefAttribute.value;
-            }
-            else {
-                iconElement.attrs.push({ name: 'href', value: this._options.deployUrl });
-            }
-            treeAdapter.appendChild(iconFragment, iconElement);
-            indexSource.replace(
-                iconElement.__location.startOffset,
-                 iconElement.__location.endOffset,
-                  parse5.serialize(iconFragment, { treeAdapter })
-            );
-        }
-      }
-
+      // Adjust icon href for deploy url
+      this.adjustIconDeployUrl(headElement,treeAdapter,indexSource);
       // Adjust base href if specified
       if (typeof this._options.baseHref == 'string') {
         let baseElement;
@@ -285,5 +242,49 @@ export class IndexHtmlWebpackPlugin {
       { name: 'integrity', value: `${algo}-${hash}` },
       { name: 'crossorigin', value: 'anonymous' },
     ];
+  }
+  private adjustIconDeployUrl(headElement: any,treeAdapter: any,indexSource: ReplaceSource) {
+    // Adjust deploy url for icon if specified
+    if (typeof this._options.deployUrl == 'string') {
+      let iconElement;
+      for (const headChild of headElement.childNodes) {
+          if (headChild.tagName === 'link'){
+              for (const attr of headChild.attrs) {
+                  if (attr.name === "rel" && attr.value === "icon") {
+                      iconElement = headChild;
+                  }
+              }
+          }
+      }
+      const iconFragment = treeAdapter.createDocumentFragment();
+      if (!iconElement) {
+          iconElement = treeAdapter.createElement('link', undefined, [
+              { name: 'href', value: this._options.deployUrl },
+          ]);
+          treeAdapter.appendChild(iconFragment, iconElement);
+          indexSource.insert(
+              headElement.__location.startTag.endOffset + 1, 
+              parse5.serialize(iconFragment, { treeAdapter })
+          );
+      } else {
+          let hrefAttribute;
+          for (const attribute of iconElement.attrs) {
+              if (attribute.name === 'href') {
+                  hrefAttribute = attribute;
+              }
+          }
+          if (hrefAttribute) {
+              hrefAttribute.value = this._options.deployUrl + hrefAttribute.value;
+          } else {
+              iconElement.attrs.push({ name: 'href', value: this._options.deployUrl });
+          }
+          treeAdapter.appendChild(iconFragment, iconElement);
+          indexSource.replace(
+              iconElement.__location.startOffset,
+               iconElement.__location.endOffset,
+                parse5.serialize(iconFragment, { treeAdapter })
+          );
+      }
+    }
   }
 }

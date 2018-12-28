@@ -52,4 +52,17 @@ describe('Browser Builder deploy url', () => {
     ).toPromise().then(done, done.fail);
   });
 
+  it('uses deploy url for app icon', (done) => {
+    const overrides = { deployUrl: 'deployUrl/' };
+
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        const fileName = join(outputPath, 'favicon.ico');
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+        expect(content).toContain('deployUrl/');
+      }),
+    ).toPromise().then(done, done.fail);
+  });
+
 });
