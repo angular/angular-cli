@@ -63,7 +63,8 @@ export interface BuilderPathsMap {
     };
 }
 
-export interface BuildEvent {
+export interface BuildEvent<BuildResultT = any> {
+    result?: BuildResultT;
     success: boolean;
 }
 
