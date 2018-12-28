@@ -13,9 +13,10 @@ import {
   BuilderContext,
   BuilderDescription,
 } from '@angular-devkit/architect';
+import { DevServerResult } from '@angular-devkit/build-webpack';
 import { Path, getSystemPath, normalize, resolve, tags } from '@angular-devkit/core';
 import { Observable, from, of } from 'rxjs';
-import { concatMap, take, tap } from 'rxjs/operators';
+import { concatMap, map, take, tap } from 'rxjs/operators';
 import * as url from 'url';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { DevServerBuilderOptions } from '../dev-server';
@@ -70,9 +71,15 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
 
     return architect.getBuilderDescription(builderConfig).pipe(
       tap(description => devServerDescription = description),
-      concatMap(devServerDescription => architect.validateBuilderOptions(
-        builderConfig, devServerDescription)),
-      concatMap(() => {
+      concatMap(devServerDescription =>
+        architect.validateBuilderOptions(builderConfig, devServerDescription)),
+      map(() => this.context.architect.getBuilder(devServerDescription, this.context)),
+      concatMap(builder => builder.run(builderConfig)),
+      tap(buildEvent => {
+        if (!buildEvent.success) {
+          return;
+        }
+
         // Compute baseUrl from devServerOptions.
         if (options.devServerTarget && builderConfig.options.publicHost) {
           let publicHost = builderConfig.options.publicHost;
@@ -84,19 +91,18 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
           const clientUrl = url.parse(publicHost);
           baseUrl = url.format(clientUrl);
         } else if (options.devServerTarget) {
+          const result: DevServerResult | undefined = buildEvent.result;
+
           baseUrl = url.format({
             protocol: builderConfig.options.ssl ? 'https' : 'http',
             hostname: options.host,
-            port: builderConfig.options.port.toString(),
+            port: result && result.port.toString(),
           });
         }
 
         // Save the computed baseUrl back so that Protractor can use it.
         options.baseUrl = baseUrl;
-
-        return of(this.context.architect.getBuilder(devServerDescription, this.context));
       }),
-      concatMap(builder => builder.run(builderConfig)),
     );
   }
 
