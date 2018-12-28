@@ -60,6 +60,12 @@ describe('Protractor Builder', () => {
     ).toPromise().then(done, done.fail);
   }, 60000);
 
+  it('works with port 0', (done) => {
+    runTargetSpec(host, protractorTargetSpec, { port: 0 }).pipe(
+      retry(3),
+    ).toPromise().then(done, done.fail);
+  }, 30000);
+
   // TODO: test `element-explorer` when the protractor builder emits build events with text.
   // .then(() => execAndWaitForOutputToMatch('ng', ['e2e', '--element-explorer'],
   // /Element Explorer/))
