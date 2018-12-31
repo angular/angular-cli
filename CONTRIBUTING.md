@@ -307,6 +307,6 @@ import * as foo from './foo';
 export { foo };
 ```
 There are currently not supported by the API guardian. 
-To overcome this limitiation we created `_golden-api.ts` in certain packages.
+To overcome this limitation we created `_golden-api.ts` in certain packages.
 
 When adding a new API, it might be the case that you need to add it to `_golden-api.ts`.
