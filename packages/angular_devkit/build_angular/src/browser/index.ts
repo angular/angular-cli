@@ -43,11 +43,20 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
 
   constructor(public context: BuilderContext) { }
 
+  protected createWebpackBuilder(context: BuilderContext): WebpackBuilder {
+    return new WebpackBuilder(context);
+  }
+
+  protected createLoggingFactory(): (verbose: boolean) => LoggingCallback  {
+    return getBrowserLoggingCb;
+  }
+
   run(builderConfig: BuilderConfiguration<BrowserBuilderSchema>): Observable<BuildEvent> {
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
-    const webpackBuilder = new WebpackBuilder({ ...this.context, host });
+    const webpackBuilder = this.createWebpackBuilder({ ...this.context, host });
+    const getLoggingCb = this.createLoggingFactory();
 
     const options = normalizeBuilderSchema(
       host,
@@ -67,7 +76,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
           return throwError(e);
         }
 
-        return webpackBuilder.runWebpack(webpackConfig, getBrowserLoggingCb(options.verbose));
+        return webpackBuilder.runWebpack(webpackConfig, getLoggingCb(options.verbose));
       }),
       concatMap(buildEvent => {
         if (buildEvent.success && !options.watch && options.serviceWorker) {
