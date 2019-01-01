@@ -42,11 +42,15 @@ export class WebpackBuilder implements Builder<WebpackBuilderSchema> {
     return from(import(webpackConfigPath));
   }
 
+  protected createWebpackCompiler(config: webpack.Configuration): webpack.Compiler {
+    return webpack(config);
+  }
+
   public runWebpack(
     config: webpack.Configuration, loggingCb = defaultLoggingCb,
   ): Observable<BuildEvent> {
     return new Observable(obs => {
-      const webpackCompiler = webpack(config);
+      const webpackCompiler = this.createWebpackCompiler(config);
 
       const callback: webpack.compiler.CompilerCallback = (err, stats) => {
         if (err) {
