@@ -324,6 +324,7 @@ export default function (options: ApplicationOptions): Rule {
             'dot': '.',
             relativePathToWorkspaceRoot,
             rootInSrc,
+            appName: options.name,
           }),
           move(appDir),
         ])),

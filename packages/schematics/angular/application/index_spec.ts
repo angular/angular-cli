@@ -8,6 +8,7 @@
 // tslint:disable:no-big-function
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { latestVersions } from '../utility/latest-versions';
+import { getFileContent } from '../utility/test';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as ApplicationOptions } from './schema';
 
@@ -134,6 +135,12 @@ describe('Application Schematic', () => {
     expect(content.extends).toMatch('../../tslint.json');
     expect(content.rules['directive-selector'][2]).toMatch('app');
     expect(content.rules['component-selector'][2]).toMatch('app');
+  });
+
+  it('should set the right coverage folder in the karma.json file', () => {
+    const tree = schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
+    const karmaConf = getFileContent(tree, '/projects/foo/karma.conf.js');
+    expect(karmaConf).toContain(`dir: require('path').join(__dirname, '../../coverage/foo')`);
   });
 
   it('minimal=true should not create e2e project', () => {
