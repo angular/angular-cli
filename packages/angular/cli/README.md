@@ -6,7 +6,7 @@
 
 [![npm](https://img.shields.io/npm/v/%40angular/cli.svg)][npm-badge-url]
 [![npm](https://img.shields.io/npm/v/%40angular/cli/next.svg)][npm-badge-url]
-[![npm](https://img.shields.io/npm/l/@angular/cli.svg)][npm-badge-url]
+[![npm](https://img.shields.io/npm/l/@angular/cli.svg)][license-url]
 [![npm](https://img.shields.io/npm/dm/@angular/cli.svg)][npm-badge-url]
 
 [![Join the chat at https://gitter.im/angular/angular-cli](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/angular/angular-cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -254,7 +254,7 @@ The documentation for the Angular CLI is located in this repo's [wiki](https://a
 
 ## License
 
-MIT
+[MIT](https://github.com/angular/angular-cli/blob/master/LICENSE)
 
 
 [travis-badge]: https://travis-ci.org/angular/angular-cli.svg?branch=master
@@ -265,4 +265,5 @@ MIT
 [david-dev-badge-url]: https://david-dm.org/angular/angular-cli?type=dev
 [npm-badge]: https://img.shields.io/npm/v/@angular/cli.svg
 [npm-badge-url]: https://www.npmjs.com/package/@angular/cli
+[license-url]: https://github.com/angular/angular-cli/blob/master/LICENSE
 
