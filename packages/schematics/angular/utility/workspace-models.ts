@@ -54,6 +54,7 @@ export interface BrowserBuilderOptions extends BrowserBuilderBaseOptions {
     extractLicenses?: boolean;
     vendorChunk?: boolean;
     buildOptimizer?: boolean;
+    ngswConfigPath?: string;
     budgets?: {
         type: string;
         maximumWarning?: string;
