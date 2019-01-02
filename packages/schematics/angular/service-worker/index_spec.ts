@@ -96,6 +96,10 @@ describe('Service Worker Schematic', () => {
     const tree = schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
     const path = '/projects/bar/ngsw-config.json';
     expect(tree.exists(path)).toEqual(true);
+
+    const { projects } = JSON.parse(tree.readContent('/angular.json'));
+    expect(projects.bar.architect.build.configurations.production.ngswConfigPath)
+      .toBe('projects/bar/ngsw-config.json');
   });
 
   it('should add root assets RegExp', () => {
@@ -115,6 +119,27 @@ describe('Service Worker Schematic', () => {
     const ngswConfig = JSON.parse(pkgText);
     expect(ngswConfig.assetGroups[1].resources.files)
       .toContain('/outDir/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)');
+  });
+
+  it('should generate ngsw-config.json in src when the application is at root level', () => {
+    const name = 'foo';
+    const rootAppOptions: ApplicationOptions = {
+      ...appOptions,
+      name,
+      projectRoot: '',
+    };
+    const rootSWOptions: ServiceWorkerOptions = {
+      ...defaultOptions,
+      project: name,
+    };
+
+    let tree = schematicRunner.runSchematic('application', rootAppOptions, appTree);
+    tree = schematicRunner.runSchematic('service-worker', rootSWOptions, tree);
+    expect(tree.exists('/src/ngsw-config.json')).toBe(true);
+
+    const { projects } = JSON.parse(tree.readContent('/angular.json'));
+    expect(projects.foo.architect.build.configurations.production.ngswConfigPath)
+      .toBe('src/ngsw-config.json');
   });
 
 });

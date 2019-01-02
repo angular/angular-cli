@@ -10,7 +10,6 @@ import {
   SchematicContext,
   SchematicsException,
   Tree,
-  UpdateRecorder,
   apply,
   chain,
   mergeWith,
@@ -54,13 +53,14 @@ function getProjectConfiguration(
   return applyTo;
 }
 
-function updateConfigFile(options: ServiceWorkerOptions): Rule {
+function updateConfigFile(options: ServiceWorkerOptions, root: string): Rule {
   return (host: Tree, context: SchematicContext) => {
     context.logger.debug('updating config file.');
     const workspace = getWorkspace(host);
 
     const config = getProjectConfiguration(workspace, options);
     config.serviceWorker = true;
+    config.ngswConfigPath = `${root.endsWith('/') ? root : root + '/'}ngsw-config.json`;
 
     return updateWorkspace(workspace);
   };
@@ -103,8 +103,7 @@ function updateAppModule(options: ServiceWorkerOptions): Rule {
     let importModule = 'ServiceWorkerModule';
     let importPath = '@angular/service-worker';
     if (!isImported(moduleSource, importModule, importPath)) {
-      const change = insertImport
-      (moduleSource, modulePath, importModule, importPath);
+      const change = insertImport(moduleSource, modulePath, importModule, importPath);
       if (change) {
         const recorder = host.beginUpdate(modulePath);
         recorder.insertLeft((change as InsertChange).pos, (change as InsertChange).toAdd);
@@ -119,8 +118,7 @@ function updateAppModule(options: ServiceWorkerOptions): Rule {
     // TODO: dynamically find environments relative path
     importPath = '../environments/environment';
     if (!isImported(moduleSource, importModule, importPath)) {
-      const change = insertImport
-      (moduleSource, modulePath, importModule, importPath);
+      const change = insertImport(moduleSource, modulePath, importModule, importPath);
       if (change) {
         const recorder = host.beginUpdate(modulePath);
         recorder.insertLeft((change as InsertChange).pos, (change as InsertChange).toAdd);
@@ -176,16 +174,17 @@ export default function (options: ServiceWorkerOptions): Rule {
       resourcesOutputPath = '/' + resourcesOutputPath.split('/').filter(x => !!x).join('/');
     }
 
+    const root = project.root || project.sourceRoot || '';
     const templateSource = apply(url('./files'), [
       template({ ...options, resourcesOutputPath }),
-      move(project.root),
+      move(root),
     ]);
 
     context.addTask(new NodePackageInstallTask());
 
     return chain([
       mergeWith(templateSource),
-      updateConfigFile(options),
+      updateConfigFile(options, root),
       addDependencies(),
       updateAppModule(options),
     ]);
