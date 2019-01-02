@@ -7,6 +7,7 @@
  */
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
+import * as fs from 'fs';
 import { ids, debug } from 'webpack';
 import { AssetPatternObject } from '../../../browser/schema';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
@@ -165,6 +166,36 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     extraPlugins.push(new StatsPlugin('stats.json', 'verbose'));
   }
 
+  const cacheDirectory = path.resolve(nodeModules, '.cache');
+  const cacheName = 'angular-devkit_build-angular';
+  if (buildOptions.clearPersistentCache) {
+    console.log('clearing cache')
+    const cacheFile = path.resolve(cacheDirectory, `${cacheName}.pack`);
+    if (fs.existsSync(cacheFile)) {
+      fs.unlinkSync(cacheFile);
+    }
+  }
+
+  let cache: any = false;
+  if (buildOptions.persistentCache) {
+    cache = {
+      type: 'filesystem',
+      cacheDirectory,
+      name: cacheName,
+      loglevel: 'warning',
+      // Need to calculate version from: dependencies plus configuration.
+      // For dependencies we can use package-lock.json / yarn.lock.
+      // For config maybe we can just hash our own config option status instead of webpacks whole
+      // configuration object.
+      version: 'abcd',
+      // This controls when the cache is written.
+      // Default is 'idle' and means cache is written when idle.
+      // Not sure how to detect if cache is still being written so waiting 20s instead in tests.
+      store: 'idle',
+    }
+
+  }
+
   let sourceMapUseRule;
   if ((scriptsSourceMap || stylesSourceMap) && vendorSourceMap) {
     sourceMapUseRule = {
@@ -268,6 +299,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       ? 'production'
       : 'development',
     devtool: false,
+    cache,
     resolve: {
       extensions: ['.ts', '.tsx', '.mjs', '.js'],
       symlinks: !buildOptions.preserveSymlinks,

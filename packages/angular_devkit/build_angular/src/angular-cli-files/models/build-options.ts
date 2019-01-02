@@ -57,6 +57,8 @@ export interface BuildOptions {
   statsJson: boolean;
   forkTypeChecker: boolean;
   profile?: boolean;
+  persistentCache?: boolean;
+  clearPersistentCache?: boolean;
 
   main: string;
   index: string;

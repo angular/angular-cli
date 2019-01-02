@@ -10,16 +10,17 @@ import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
 import { browserTargetSpec, host } from '../utils';
+import { createConsoleLogger } from '@angular-devkit/core/node';
 
 
-describe('Browser Builder basic test', () => {
+fdescribe('Browser Builder basic test', () => {
   const outputPath = normalize('dist');
 
   beforeEach(done => host.initialize().toPromise().then(done, done.fail));
   afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
-    runTargetSpec(host, browserTargetSpec).pipe(
+    runTargetSpec(host, browserTargetSpec, {}, 10000000, createConsoleLogger()).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         // Default files should be in outputPath.

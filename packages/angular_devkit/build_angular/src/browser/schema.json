@@ -299,6 +299,16 @@
       "type": "boolean",
       "description": "Output profile events for Chrome profiler.",
       "default": false
+    },
+    "persistentCache": {
+      "type": "boolean",
+      "description": "**EXPERIMENTAL** Use a persistent cache between builds.",
+      "default": false
+    },
+    "clearPersistentCache": {
+      "type": "boolean",
+      "description": "**EXPERIMENTAL** Clear the persistent cache.",
+      "default": false
     }
   },
   "additionalProperties": false,
