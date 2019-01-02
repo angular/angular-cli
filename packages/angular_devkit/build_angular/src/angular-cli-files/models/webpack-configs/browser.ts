@@ -108,8 +108,9 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
             name: 'vendor',
             chunks: 'initial',
             enforce: true,
-            test: (module: { nameForCondition?: Function }, chunks: Array<{ name: string }>) => {
+            test: (module: any) => {
               const moduleName = module.nameForCondition ? module.nameForCondition() : '';
+              const chunks = module.getChunks();
 
               return /[\\/]node_modules[\\/]/.test(moduleName)
                 && !chunks.some(({ name }) => name === 'polyfills'

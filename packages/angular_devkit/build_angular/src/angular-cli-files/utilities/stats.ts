@@ -69,7 +69,7 @@ export function statsWarningsToString(json: any, statsConfig: any) {
   const rs = (x: string) => colors ? reset(x) : x;
   const y = (x: string) => colors ? bold(yellow(x)) : x;
 
-  return rs('\n' + json.warnings.map((warning: any) => y(`WARNING in ${warning}`)).join('\n\n'));
+  return rs('\n' + json.warnings.map((warning: any) => y(`WARNING in ${warning.message}`)).join('\n\n'));
 }
 
 export function statsErrorsToString(json: any, statsConfig: any) {
@@ -77,5 +77,5 @@ export function statsErrorsToString(json: any, statsConfig: any) {
   const rs = (x: string) => colors ? reset(x) : x;
   const r = (x: string) => colors ? bold(red(x)) : x;
 
-  return rs('\n' + json.errors.map((error: any) => r(`ERROR in ${error}`)).join('\n'));
+  return rs('\n' + json.errors.map((error: any) => r(`ERROR in ${error.message}`)).join('\n'));
 }

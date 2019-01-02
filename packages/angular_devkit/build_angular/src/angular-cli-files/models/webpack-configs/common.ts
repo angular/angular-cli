@@ -7,7 +7,7 @@
  */
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
-import { HashedModuleIdsPlugin, debug } from 'webpack';
+import { ids, debug } from 'webpack';
 import { AssetPatternObject } from '../../../browser/schema';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
@@ -154,9 +154,11 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   }
 
   if (buildOptions.showCircularDependencies) {
-    extraPlugins.push(new CircularDependencyPlugin({
-      exclude: /([\\\/]node_modules[\\\/])|(ngfactory\.js$)/,
-    }));
+    // Breaks with Webpack 5:
+    // Error: module property was removed from Dependency (use compilation.moduleGraph.getModule(dependency) instead)
+    // extraPlugins.push(new CircularDependencyPlugin({
+    //   exclude: /([\\\/]node_modules[\\\/])|(ngfactory\.js$)/,
+    // }));
   }
 
   if (buildOptions.statsJson) {
@@ -306,6 +308,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
           // Mark files inside `@angular/core` as using SystemJS style dynamic imports.
           // Removing this will cause deprecation warnings to appear.
           test: /[\/\\]@angular[\/\\]core[\/\\].+\.js$/,
+          // Seems like this doesn't hide the warning anymore. Might need to use a filter on the
+          // warnings instead.
           parser: { system: true },
         },
         {
@@ -323,7 +327,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     optimization: {
       noEmitOnErrors: true,
       minimizer: [
-        new HashedModuleIdsPlugin(),
+        new ids.HashedModuleIdsPlugin(),
         // TODO: check with Mike what this feature needs.
         new BundleBudgetPlugin({ budgets: buildOptions.budgets }),
         ...extraMinimizers,
