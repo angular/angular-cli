@@ -205,30 +205,38 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
           browserTarget: `${options.name}:build`,
         },
       },
-      test: {
-        builder: Builders.Karma,
-        options: {
-          main: `${projectRoot}src/test.ts`,
-          polyfills: `${projectRoot}src/polyfills.ts`,
-          tsConfig: `${rootFilesRoot}tsconfig.spec.json`,
-          karmaConfig: `${rootFilesRoot}karma.conf.js`,
-          styles: [
-            `${projectRoot}src/styles.${options.style}`,
-          ],
-          scripts: [],
-          assets: [
-            join(normalize(projectRoot), 'src', 'favicon.ico'),
-            join(normalize(projectRoot), 'src', 'assets'),
-          ],
-        },
-      },
+      ...(
+        options.minimal ? {} : {
+          test: {
+            builder: Builders.Karma,
+            options: {
+              main: `${projectRoot}src/test.ts`,
+              polyfills: `${projectRoot}src/polyfills.ts`,
+              tsConfig: `${rootFilesRoot}tsconfig.spec.json`,
+              karmaConfig: `${rootFilesRoot}karma.conf.js`,
+              styles: [
+                `${projectRoot}src/styles.${options.style}`,
+              ],
+              scripts: [],
+              assets: [
+                join(normalize(projectRoot), 'src', 'favicon.ico'),
+                join(normalize(projectRoot), 'src', 'assets'),
+              ],
+            },
+          },
+        }
+      ),
       lint: {
         builder: Builders.TsLint,
         options: {
-          tsConfig: [
-            `${rootFilesRoot}tsconfig.app.json`,
-            `${rootFilesRoot}tsconfig.spec.json`,
-          ],
+          tsConfig: options.minimal
+            ? [
+              `${rootFilesRoot}tsconfig.app.json`,
+            ]
+            : [
+              `${rootFilesRoot}tsconfig.app.json`,
+              `${rootFilesRoot}tsconfig.spec.json`,
+            ],
           exclude: [
             '**/node_modules/**',
           ],
