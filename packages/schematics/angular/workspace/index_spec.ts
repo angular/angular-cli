@@ -66,9 +66,8 @@ describe('Workspace Schematic', () => {
       '/package.json',
       '/README.md',
       '/tsconfig.json',
+      '/tslint.json',
+      '/.editorconfig',
     ]));
-
-    expect(files).not.toContain('/tslint.json');
-    expect(files).not.toContain('/.editorconfig');
   });
 });

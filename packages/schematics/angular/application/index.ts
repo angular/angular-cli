@@ -327,7 +327,7 @@ export default function (options: ApplicationOptions): Rule {
           }),
           move(appDir),
         ])),
-      options.minimal ? noop() : mergeWith(
+      mergeWith(
         apply(url('./files/lint'), [
           template({
             utils: strings,

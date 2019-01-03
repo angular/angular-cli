@@ -9,9 +9,7 @@ import { strings } from '@angular-devkit/core';
 import {
   Rule,
   apply,
-  filter,
   mergeWith,
-  noop,
   template,
   url,
 } from '@angular-devkit/schematics';
@@ -20,10 +18,8 @@ import { Schema as WorkspaceOptions } from './schema';
 
 
 export default function (options: WorkspaceOptions): Rule {
-  const minimalFilesRegExp = /(.editorconfig|tslint.json)$/;
 
   return mergeWith(apply(url('./files'), [
-    options.minimal ? filter(path => !minimalFilesRegExp.test(path)) : noop(),
     template({
       utils: strings,
       ...options,

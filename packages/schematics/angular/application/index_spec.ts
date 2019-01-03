@@ -152,7 +152,6 @@ describe('Application Schematic', () => {
     const files = tree.files;
     [
       '/projects/foo/tsconfig.spec.json',
-      '/projects/foo/tslint.json',
       '/projects/foo/karma.conf.js',
       '/projects/foo/src/test.ts',
       '/projects/foo/src/app/app.component.css',
