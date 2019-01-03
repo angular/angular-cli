@@ -16,11 +16,11 @@ import { TslintFixTask } from '@angular-devkit/schematics/tasks';
 
 export function applyLintFix(path = '/'): Rule {
   return (tree: Tree, context: SchematicContext) => {
-    // Find the closest tsling.json
+    // Find the closest tslint.json or tslint.yaml
     let dir: DirEntry | null = tree.getDir(path.substr(0, path.lastIndexOf('/')));
 
     do {
-      if ((dir.subfiles as string[]).includes('tslint.json')) {
+      if ((dir.subfiles as string[]).some(f => f === 'tslint.json' || f === 'tslint.yaml')) {
         break;
       }
 
@@ -28,7 +28,8 @@ export function applyLintFix(path = '/'): Rule {
     } while (dir !== null);
 
     if (dir === null) {
-      throw new SchematicsException('Asked to run lint fixes, but could not find a tslint.json.');
+      throw new SchematicsException(
+        'Asked to run lint fixes, but could not find a tslint.json or tslint.yaml config file.');
     }
 
     // Only include files that have been touched.
