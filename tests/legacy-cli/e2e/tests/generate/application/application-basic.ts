@@ -8,5 +8,5 @@ export default function() {
     .then(() => expectFileToMatch('angular.json', /\"app2\":/))
     .then(() => useCIChrome('projects/app2'))
     .then(() => useCIChrome('projects/app2-e2e'))
-    .then(() => ng('test', 'app2', '--watch=false'));
+    .then(() => ng('test', 'app2', '--watch=false', '--browsers=ChromeHeadlessCI'));
 }

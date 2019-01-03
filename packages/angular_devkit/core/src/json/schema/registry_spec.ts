@@ -14,7 +14,7 @@ import { addUndefinedDefaults } from './transforms';
 
 describe('CoreSchemaRegistry', () => {
   it('works asynchronously', done => {
-    if (process.env.BUILDKITE === 'true') {
+    if (process.platform.startsWith('win')) {
       // This test consistently fails on Windows BuildKite, but doesn't fail on local Windows
       // or in Appveyor. Many tests test the async behaviour of the registry, but this is the only
       // one that also fetches an async ref. Perhaps that is why.
