@@ -19,7 +19,7 @@
             "main": "projects/lib/src/test.ts",
             "tsConfig": "projects/lib/tsconfig.spec.json",
             "karmaConfig": "projects/lib/karma.conf.js",
-            "browsers": "ChromeHeadless",
+            "browsers": "ChromeHeadlessCI",
             "progress": false,
             "watch": false
           }

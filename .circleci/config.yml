@@ -74,7 +74,7 @@ jobs:
     parallelism: 4
     steps:
       - attach_workspace: *attach_options
-      - run: npm run webdriver-update-circleci
+      - run: npm run webdriver-update
       - run: npm run test-large -- --full --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
   e2e-cli:

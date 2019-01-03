@@ -11,7 +11,7 @@ install:
   - ps: Install-Product node $env:nodejs_version
   # --network-timeout is a workaround for https://github.com/yarnpkg/yarn/issues/6221
   - yarn --frozen-lockfile --network-timeout=500000
-  - yarn webdriver-update-appveyor
+  - yarn webdriver-update
 
 test_script:
   - node --version

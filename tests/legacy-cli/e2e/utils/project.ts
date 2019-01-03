@@ -1,4 +1,5 @@
-import { readFile, writeFile, replaceInFile } from './fs';
+import * as fs from 'fs-extra';
+import { readFile, writeFile, replaceInFile, prependToFile } from './fs';
 import { execAndWaitForOutputToMatch, npm, silentNpm, ng } from './process';
 import { getGlobalVariable } from './env';
 
@@ -186,58 +187,61 @@ export function useCIDefaults(projectName = 'test-project') {
     const appTargets = project.targets || project.architect;
     appTargets.build.options.progress = false;
     appTargets.test.options.progress = false;
+    // Use the CI chrome setup in karma.
+    appTargets.test.options.browsers = 'ChromeHeadlessCI';
     // Disable auto-updating webdriver in e2e.
     const e2eProject = workspaceJson.projects[projectName + '-e2e'];
     const e2eTargets = e2eProject.targets || e2eProject.architect;
     e2eTargets.e2e.options.webdriverUpdate = false;
   })
   .then(() => updateJsonFile('package.json', json => {
-    // We want to always use the same version of webdriver but can only do so on CircleCI.
-    // Appveyor and Travis will use latest Chrome stable.
-    // CircleCI (via ngcontainer:0.1.1) uses Chrome 63.0.3239.84.
-    // Appveyor (via chocolatey) cannot use older versions of Chrome at all:
-    // https://github.com/chocolatey/chocolatey-coreteampackages/tree/master/automatic/googlechrome
-    // webdriver 2.33 matches Chrome 63.0.3239.84.
-    // webdriver 2.37 matches Chrome 65.0.3325.18100 (latest stable).
-    // The webdriver versions for latest stable will need to be manually updated.
-    const webdriverVersion = process.env['CIRCLECI'] ? '2.33' : '2.37';
-    const driverOption = process.env['CHROMEDRIVER_VERSION_ARG']
-                         || `--versions.chrome ${webdriverVersion}`;
+    // Use matching versions of Chrome and Webdriver.
     json['scripts']['webdriver-update'] = 'webdriver-manager update' +
-      ` --standalone false --gecko false ${driverOption}`;
+      ` --standalone false --gecko false --versions.chrome 2.45`; // Supports Chrome v70-72
+
   }))
   .then(() => npm('run', 'webdriver-update'));
 }
 
 export function useCIChrome(projectDir: string) {
-  // There's a race condition happening in Chrome. Enabling logging in chrome used by
-  // protractor actually fixes it. Logging is piped to a file so it doesn't affect our setup.
-  // --no-sandbox is needed for Circle CI.
-  // Travis can use headless chrome, but not appveyor.
+  const protractorConf = `${projectDir}/protractor.conf.js`;
+  const karmaConf = `${projectDir}/karma.conf.js`;
+
   return Promise.resolve()
-    .then(() => replaceInFile(`${projectDir}/protractor.conf.js`,
-      `'browserName': 'chrome'`,
-      `'browserName': 'chrome',
-        chromeOptions: {
-          args: [
-            "--enable-logging",
-            // "--no-sandbox",
-            // "--headless"
-          ]
-        }
-    `))
-    // Not a problem if the file can't be found.
-    // .catch(() => null)
-    // .then(() => replaceInFile(`${projectDir}/karma.conf.js`, `browsers: ['Chrome'],`,
-    //   `browsers: ['ChromeCI'],
-    //   customLaunchers: {
-    //     ChromeCI: {
-    //       base: 'ChromeHeadless',
-    //       flags: ['--no-sandbox']
-    //     }
-    //   },
-    // `))
-    .catch(() => null);
+    .then(() => updateJsonFile('package.json', json => {
+      // Use matching versions of Chrome and Webdriver.
+      json['devDependencies']['puppeteer'] = '1.11.0'; // Chromium 72.0.3618.0 (r609904)
+      json['devDependencies']['karma-chrome-launcher'] = '~2.2.0'; // Minimum for ChromeHeadless.
+    }))
+    // Use Pupeteer in protractor if a config is found on the project.
+    .then(() =>  {
+      if (fs.existsSync(protractorConf)) {
+        return replaceInFile(protractorConf,
+          `'browserName': 'chrome'`,
+          `'browserName': 'chrome',
+          chromeOptions: {
+            args: ['--headless'],
+            binary: require('puppeteer').executablePath()
+          }
+        `);
+      }
+    })
+    // Use Pupeteer in karma if a config is found on the project.
+    .then(() =>  {
+      if (fs.existsSync(karmaConf)) {
+        return prependToFile(karmaConf,
+          `process.env.CHROME_BIN = require('puppeteer').executablePath();`)
+        .then(() => replaceInFile(karmaConf,
+          `browsers: ['Chrome']`,
+          `browsers: ['Chrome'],
+          customLaunchers: {
+            ChromeHeadlessCI: {
+              base: 'ChromeHeadless',
+            }
+          }
+        `));
+      }
+    });
 }
 
 // Convert a Angular 5 project to Angular 2.

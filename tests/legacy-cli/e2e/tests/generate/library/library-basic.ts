@@ -7,5 +7,5 @@ export default function () {
     .then(() => expectFileToMatch('angular.json', /\"my-lib\":/))
     .then(() => useCIChrome('projects/my-lib'))
     .then(() => ng('build', 'my-lib'))
-    .then(() => ng('test', 'my-lib', '--watch=false'));
+    .then(() => ng('test', 'my-lib', '--watch=false', '--browsers=ChromeHeadlessCI'));
 }

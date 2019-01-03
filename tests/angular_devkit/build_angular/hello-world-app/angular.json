@@ -97,7 +97,7 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "browsers": "ChromeHeadless",
+            "browsers": "ChromeHeadlessCI",
             "progress": false,
             "watch": false,
             "styles": [
