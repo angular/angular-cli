@@ -21,6 +21,7 @@ const failBuildEvent: BuildEvent = {
 export interface BrowserTargetOptions {
   browserOption: number;
   optionalBrowserOption: boolean;
+  anotherOptionalBrowserOption: boolean;
 }
 
 export default class BrowserTarget implements Builder<BrowserTargetOptions> {

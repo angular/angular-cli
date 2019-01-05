@@ -197,24 +197,32 @@ export class Architect {
     const {
       project: projectName,
       target: targetName,
-      configuration: configurationName,
+      configuration: configurationSpecifier,
       overrides,
     } = targetSpec;
+
+    const configurationNames = configurationSpecifier
+      ? configurationSpecifier.split(',').filter(Boolean)
+      : [];
 
     const project = this._workspace.getProject(projectName);
     const target = this._getProjectTarget(projectName, targetName);
     const options = target.options;
-    let configuration: TargetConfiguration = {};
+    const configurations: TargetConfiguration[] = [];
 
-    if (configurationName) {
+    if (configurationNames && configurationNames.length) {
       if (!target.configurations) {
-        throw new ConfigurationNotFoundException(projectName, configurationName);
+        throw new ConfigurationNotFoundException(projectName, configurationNames[0]);
       }
 
-      configuration = target.configurations[configurationName];
+      for (const configurationName of configurationNames) {
+        const configuration = target.configurations[configurationName];
 
-      if (!configuration) {
-        throw new ConfigurationNotFoundException(projectName, configurationName);
+        if (!configuration) {
+          throw new ConfigurationNotFoundException(projectName, configurationName);
+        }
+
+        configurations.push(configuration);
       }
     }
 
@@ -225,7 +233,7 @@ export class Architect {
       builder: target.builder,
       options: {
         ...options,
-        ...configuration,
+        ...Object.assign({}, ...configurations),
         ...overrides as {},
       } as OptionsT,
     };

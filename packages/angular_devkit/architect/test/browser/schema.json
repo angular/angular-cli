@@ -13,6 +13,11 @@
       "type": "boolean",
       "description": "A non-required option with a default",
       "default": false
+    },
+    "anotherOptionalBrowserOption": {
+      "type": "boolean",
+      "description": "Another non-required option with a default",
+      "default": false
     }
   },
   "additionalProperties": false,

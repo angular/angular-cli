@@ -41,6 +41,10 @@ describe('Architect', () => {
               prod: {
                 optionalBrowserOption: false,
               },
+              another: {
+                optionalBrowserOption: true,
+                anotherOptionalBrowserOption: true,
+              },
             },
           },
           badBrowser: {
@@ -72,6 +76,13 @@ describe('Architect', () => {
     expect(builderConfig.builder).toBe('../test:browser');
     expect(builderConfig.options.browserOption).toBe(1);
     expect(builderConfig.options.optionalBrowserOption).toBe(false);
+  });
+
+  it('mixes configurations', () => {
+    const targetSpec = { project: 'app', target: 'browser', configuration: 'prod,another' };
+    const builderConfig = architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec);
+    expect(builderConfig.options.optionalBrowserOption).toBe(true);
+    expect(builderConfig.options.anotherOptionalBrowserOption).toBe(true);
   });
 
   it('lists targets by name', () => {
