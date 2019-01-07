@@ -1,4 +1,4 @@
-**Documentation below is for CLI version 6. For version 7 see [here](https://angular.io/guide/testing#set-up-continuous-integration)**.
+**Documentation below is for CLI version 6 and we no longer accept PRs to improve this. For version 7 see [here](https://angular.io/guide/testing#set-up-continuous-integration)**.
 
 # Continuous Integration
 

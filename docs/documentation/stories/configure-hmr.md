@@ -1,3 +1,5 @@
+**Documentation below is deprecated and we no longer accept PRs to improve this. The new documentation is available [here](https://angular.io/guide/build)**.
+
 # Configure Hot Module Replacement
 
 Hot Module Replacement (HMR) is a WebPack feature to update code in a running app without rebuilding it.

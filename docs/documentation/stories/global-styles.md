@@ -1,3 +1,5 @@
+**Documentation below is deprecated and we no longer accept PRs to improve this. The new documentation will be available here [angular.io](https://angular.io/guide/build)**.
+
 # Global styles
 
 The `styles.css` file allows users to add global styles and supports
