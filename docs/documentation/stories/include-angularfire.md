@@ -1,4 +1,5 @@
 <!-- Links in /docs/documentation should NOT have `.md` at the end, because they end up in our wiki at release. -->
+**Documentation below is deprecated and we no longer accept PRs to improve this.**
 
 # Include AngularFire
 

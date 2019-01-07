@@ -1,3 +1,5 @@
+**Documentation below is for CLI version 6 and we no longer accept PRs to improve this. For version 7 see [here](https://angular.io/guide/creating-libs)**.
+
 # Library support in Angular CLI 6
 
 Angular CLI v6 comes with library support via [ng-packagr](https://github.com/dherges/ng-packagr)

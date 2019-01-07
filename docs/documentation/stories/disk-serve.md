@@ -1,3 +1,5 @@
+**Documentation below is deprecated and we no longer accept PRs to improve this. The new documentation will be available here [angular.io](https://angular.io/guide/build)**.
+
 # Serve from Disk
 
 The CLI supports running a live browser reload experience to users by running `ng serve`. This will compile the application upon file saves and reload the browser with the newly compiled application. This is done by hosting the application in memory and serving it via [webpack-dev-server](https://webpack.js.org/guides/development/#webpack-dev-server).

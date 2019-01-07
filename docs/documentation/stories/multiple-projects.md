@@ -1,3 +1,5 @@
+**Documentation below is deprecated and we no longer accept PRs to improve this. The new documentation is available [here](https://next.angular.io/guide/build)**.
+
 # Multiple Projects
 
 Angular CLI supports multiple applications within one workspace.

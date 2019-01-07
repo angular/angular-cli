@@ -1,3 +1,5 @@
+**Documentation below is deprecated and we no longer accept PRs to improve this. The new documentation is available [here](https://angular.io/guide/build#configuring-browser-compatibility)**.
+
 # Change target browsers for Autoprefixer
 
 Currently, the CLI uses [Autoprefixer](https://github.com/postcss/autoprefixer) to ensure compatibility

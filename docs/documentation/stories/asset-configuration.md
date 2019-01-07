@@ -1,3 +1,5 @@
+**Documentation below is deprecated and we no longer accept PRs to improve this. The new documentation is available [here](https://angular.io/guide/build)**.
+
 # Project assets
 
 You use the `assets` array inside the build target in `angular.json` to list files or folders

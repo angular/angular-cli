@@ -1,4 +1,4 @@
-**Documentation below is for CLI version 6. For version 7 see [here](https://angular.io/guide/i18n)**.
+**Documentation below is for CLI version 6 and we no longer accept PRs to improve this. For version 7 see [here](https://angular.io/guide/i18n)**.
 
 # Internationalization (i18n)
 

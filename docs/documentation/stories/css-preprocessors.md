@@ -1,3 +1,5 @@
+**Documentation below is deprecated and we no longer accept PRs to improve this. The new documentation will be available here [angular.io](https://angular.io/guide/build)**.
+
 # CSS Preprocessor integration
 
 Angular CLI supports all major CSS preprocessors:

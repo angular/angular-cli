@@ -1,3 +1,5 @@
+**Documentation below is deprecated and we no longer accept PRs to improve this. The new documentation is available [here](https://next.angular.io/guide/build)**.
+
 # 3rd Party Library Installation
 
 Simply install your library via `npm install lib-name --save` and import it in your code.
