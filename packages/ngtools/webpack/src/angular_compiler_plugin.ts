@@ -406,12 +406,12 @@ export class AngularCompilerPlugin {
     }
 
     // If there's still no entryModule try to resolve from mainPath.
-    if (!this._entryModule && this._mainPath && !this._compilerOptions.enableIvy) {
+    if (!this._entryModule && this._mainPath) {
       time('AngularCompilerPlugin._make.resolveEntryModuleFromMain');
       this._entryModule = resolveEntryModuleFromMain(
         this._mainPath, this._compilerHost, this._getTsProgram() as ts.Program);
 
-      if (!this.entryModule) {
+      if (!this.entryModule && !this._compilerOptions.enableIvy) {
         this._warnings.push('Lazy routes discovery is not enabled. '
           + 'Because there is neither an entryModule nor a '
           + 'statically analyzable bootstrap code in the main file.',
@@ -879,7 +879,12 @@ export class AngularCompilerPlugin {
 
         if (!this._JitMode) {
           // Replace bootstrap in browser AOT.
-          this._transformers.push(replaceBootstrap(isAppPath, getEntryModule, getTypeChecker));
+          this._transformers.push(replaceBootstrap(
+            isAppPath,
+            getEntryModule,
+            getTypeChecker,
+            !!this._compilerOptions.enableIvy,
+          ));
         }
       } else if (this._platform === PLATFORM.Server) {
         this._transformers.push(exportLazyModuleMap(isMainPath, getLazyRoutes));
