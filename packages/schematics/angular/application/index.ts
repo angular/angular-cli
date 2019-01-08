@@ -5,7 +5,15 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonObject, join, normalize, relative, strings } from '@angular-devkit/core';
+import {
+  JsonObject,
+  JsonParseMode,
+  join,
+  normalize,
+  parseJsonAst,
+  relative,
+  strings,
+} from '@angular-devkit/core';
 import {
   MergeStrategy,
   Rule,
@@ -30,6 +38,7 @@ import {
   getWorkspace,
 } from '../utility/config';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
+import { findPropertyInAstObject, insertPropertyInAstObjectInOrder } from '../utility/json-utils';
 import { latestVersions } from '../utility/latest-versions';
 import { applyLintFix } from '../utility/lint-fix';
 import { validateProjectName } from '../utility/validation';
@@ -91,6 +100,40 @@ function addDependenciesToPackageJson(options: ApplicationOptions) {
     }
 
     return host;
+  };
+}
+
+function addPostInstallScript() {
+  return (host: Tree) => {
+    const pkgJsonPath = '/package.json';
+    const buffer = host.read(pkgJsonPath);
+    if (!buffer) {
+      throw new SchematicsException('Could not read package.json.');
+    }
+
+    const packageJsonAst = parseJsonAst(buffer.toString(), JsonParseMode.Strict);
+    if (packageJsonAst.kind !== 'object') {
+      throw new SchematicsException('Invalid package.json. Was expecting an object.');
+    }
+
+    const scriptsNode = findPropertyInAstObject(packageJsonAst, 'scripts');
+    if (scriptsNode && scriptsNode.kind === 'object') {
+      const recorder = host.beginUpdate(pkgJsonPath);
+      const postInstall = findPropertyInAstObject(scriptsNode, 'postinstall');
+
+      if (!postInstall) {
+        // postinstall script not found, add it.
+        insertPropertyInAstObjectInOrder(
+          recorder,
+          scriptsNode,
+          'postinstall',
+          'ivy-ngcc',
+          4,
+        );
+      }
+
+      host.commitUpdate(recorder);
+    }
   };
 }
 
@@ -372,6 +415,7 @@ export default function (options: ApplicationOptions): Rule {
           move(sourceDir),
         ]), MergeStrategy.Overwrite),
       options.minimal ? noop() : schematic('e2e', e2eOptions),
+      options.experimentalIvy ? addPostInstallScript() : noop(),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
       options.lintFix ? applyLintFix(sourceDir) : noop(),
     ]);

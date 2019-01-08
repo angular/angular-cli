@@ -1,6 +1,6 @@
-<% if (!experimentalIvy) { %>import { BrowserModule } from '@angular/platform-browser';<% } %>
+import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-<% if (routing && !experimentalIvy) { %>
+<% if (routing) { %>
 import { AppRoutingModule } from './app-routing.module';<% } %>
 import { AppComponent } from './app.component';
 
@@ -8,10 +8,10 @@ import { AppComponent } from './app.component';
   declarations: [
     AppComponent
   ],
-  imports: [<% if (!experimentalIvy) { %>
+  imports: [
     BrowserModule<% if (routing) { %>,
     AppRoutingModule<% } %>
-  <% } %>],
+  ],
   providers: [],
   bootstrap: [AppComponent]
 })
