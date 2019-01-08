@@ -40,7 +40,7 @@ Now that the project is set up it must be configured to include the bootstrap CS
   "build": {
     "options": {
       "styles": [
-        "../node_modules/bootstrap/dist/css/bootstrap.min.css",
+        "node_modules/bootstrap/dist/css/bootstrap.min.css",
         "styles.css"
       ],
     }
