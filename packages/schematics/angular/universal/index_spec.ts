@@ -150,10 +150,11 @@ describe('Universal Schematic', () => {
     const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
     const filePath = '/projects/bar/src/main.ts';
     const contents = tree.readContent(filePath);
-    expect(contents).toMatch(/document.addEventListener\('DOMContentLoaded', \(\) => {/);
+    expect(contents)
+      .toMatch(/document.addEventListener\('DOMContentLoaded', \(\) => {[\w\W]+;[\r\n]}\);/);
   });
 
-  it('should wrap the bootstrap decleration in a DOMContentLoaded event handler', () => {
+  it('should wrap the bootstrap declaration in a DOMContentLoaded event handler', () => {
     const filePath = '/projects/bar/src/main.ts';
     appTree.overwrite(
       filePath,
