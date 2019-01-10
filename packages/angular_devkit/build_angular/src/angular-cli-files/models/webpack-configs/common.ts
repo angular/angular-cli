@@ -14,6 +14,9 @@ import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 import { findUp } from '../../utilities/find-up';
 import { isDirectory } from '../../utilities/is-directory';
+import {
+  selectProgressReporter,
+} from '../../utilities/progress-reporters/progress-reporter-selector';
 import { requireProjectModule } from '../../utilities/require-project-module';
 import { BuildOptions, WebpackConfigOptions } from '../build-options';
 import { getOutputHashFormat, normalizeExtraEntryPoints } from './utils';
@@ -149,8 +152,11 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     extraPlugins.push(copyWebpackPluginInstance);
   }
 
-  if (buildOptions.progress) {
-    extraPlugins.push(new ProgressPlugin({ profile: buildOptions.verbose }));
+  if (buildOptions.progress ) {
+    extraPlugins.push(
+      new ProgressPlugin(
+        selectProgressReporter(buildOptions.progressType)
+          .buildOptions(buildOptions)));
   }
 
   if (buildOptions.showCircularDependencies) {

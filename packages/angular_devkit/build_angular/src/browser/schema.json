@@ -174,6 +174,10 @@
       "type": "boolean",
       "description": "Log progress to the console while building."
     },
+    "progressType": {
+      "type": "string",
+      "description": "The method in which progress is logged to the console while building."
+    },
     "i18nFile": {
       "type": "string",
       "description": "Localization file to use for i18n."

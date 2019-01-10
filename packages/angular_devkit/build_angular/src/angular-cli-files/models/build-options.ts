@@ -35,6 +35,7 @@ export interface BuildOptions {
   deployUrl?: string;
   verbose?: boolean;
   progress?: boolean;
+  progressType?: string;
   i18nFile?: string;
   i18nFormat?: string;
   i18nLocale?: string;

@@ -8,8 +8,17 @@
 
 export function defaultProgress(progress: boolean | undefined): boolean {
   if (progress === undefined) {
-    return process.stdout.isTTY === true;
+    return true;
   }
 
   return progress;
+}
+
+
+export function defaultProgressType(progressType: string | undefined): string {
+  if (progressType === undefined) {
+    return process.stdout.isTTY ? 'tty' : 'non-tty';
+  }
+
+  return progressType;
 }

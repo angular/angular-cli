@@ -34,7 +34,7 @@ import {
   statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
-import { defaultProgress, normalizeBuilderSchema } from '../utils';
+import { defaultProgress, defaultProgressType, normalizeBuilderSchema } from '../utils';
 import { BrowserBuilderSchema, NormalizedBrowserBuilderSchema } from './schema';
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 const webpackMerge = require('webpack-merge');
@@ -137,6 +137,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
     };
 
     wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);
+    wco.buildOptions.progressType = defaultProgressType(wco.buildOptions.progressType);
 
     const webpackConfigs: {}[] = [
       getCommonConfig(wco),

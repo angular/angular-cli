@@ -114,6 +114,11 @@ export interface BrowserBuilderSchema {
   progress?: boolean;
 
   /**
+   * The method in which progress is logged to the console while building
+   */
+  progressType?: string;
+
+  /**
    * Localization file to use for i18n.
    */
   i18nFile?: string;

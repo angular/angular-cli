@@ -26,7 +26,7 @@ import {
 } from '../angular-cli-files/models/webpack-configs';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
-import { defaultProgress, normalizeBuilderSchema } from '../utils';
+import { defaultProgress, defaultProgressType, normalizeBuilderSchema } from '../utils';
 import { KarmaBuilderSchema, NormalizedKarmaBuilderSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
@@ -150,6 +150,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
     };
 
     wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);
+    wco.buildOptions.progressType = defaultProgressType(wco.buildOptions.progressType);
 
     const webpackConfigs: {}[] = [
       getCommonConfig(wco),
