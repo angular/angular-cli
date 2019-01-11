@@ -21,13 +21,13 @@ import {
   SchematicsException,
   Tree,
   apply,
+  applyTemplates,
   chain,
   filter,
   mergeWith,
   move,
   noop,
   schematic,
-  template,
   url,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
@@ -292,7 +292,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
 }
 
 function minimalPathFilter(path: string): boolean {
-  const toRemoveList = /(test.ts|tsconfig.spec.json|karma.conf.js)$/;
+  const toRemoveList = /(test.ts|tsconfig.spec.json|karma.conf.js).template$/;
 
   return !toRemoveList.test(path);
 }
@@ -351,7 +351,7 @@ export default function (options: ApplicationOptions): Rule {
       mergeWith(
         apply(url('./files/src'), [
           options.minimal ? filter(minimalPathFilter) : noop(),
-          template({
+          applyTemplates({
             utils: strings,
             ...options,
             'dot': '.',
@@ -362,7 +362,7 @@ export default function (options: ApplicationOptions): Rule {
       mergeWith(
         apply(url('./files/root'), [
           options.minimal ? filter(minimalPathFilter) : noop(),
-          template({
+          applyTemplates({
             utils: strings,
             ...options,
             'dot': '.',
@@ -374,7 +374,7 @@ export default function (options: ApplicationOptions): Rule {
         ])),
       options.minimal ? noop() : mergeWith(
         apply(url('./files/lint'), [
-          template({
+          applyTemplates({
             utils: strings,
             ...options,
             tsLintRoot,
@@ -406,9 +406,13 @@ export default function (options: ApplicationOptions): Rule {
       }),
       mergeWith(
         apply(url('./other-files'), [
-          componentOptions.inlineTemplate ? filter(path => !path.endsWith('.html')) : noop(),
-          componentOptions.skipTests ? filter(path => !/[.|-]spec.ts$/.test(path)) : noop(),
-          template({
+          componentOptions.inlineTemplate
+            ? filter(path => !path.endsWith('.html.template'))
+            : noop(),
+          componentOptions.skipTests
+            ? filter(path => !/[.|-]spec.ts.template$/.test(path))
+            : noop(),
+          applyTemplates({
             utils: strings,
             ...options as any,  // tslint:disable-line:no-any
             selector: appRootSelector,

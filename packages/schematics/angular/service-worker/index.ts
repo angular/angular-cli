@@ -11,10 +11,10 @@ import {
   SchematicsException,
   Tree,
   apply,
+  applyTemplates,
   chain,
   mergeWith,
   move,
-  template,
   url,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
@@ -176,7 +176,7 @@ export default function (options: ServiceWorkerOptions): Rule {
 
     const root = project.root || project.sourceRoot || '';
     const templateSource = apply(url('./files'), [
-      template({ ...options, resourcesOutputPath }),
+      applyTemplates({ ...options, resourcesOutputPath }),
       move(root),
     ]);
 

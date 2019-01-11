@@ -11,13 +11,13 @@ import {
   SchematicsException,
   Tree,
   apply,
+  applyTemplates,
   branchAndMerge,
   chain,
   filter,
   mergeWith,
   move,
   noop,
-  template,
   url,
 } from '@angular-devkit/schematics';
 import * as ts from 'typescript';
@@ -89,8 +89,8 @@ export default function (options: ModuleOptions): Rule {
     options.path = parsedPath.path;
 
     const templateSource = apply(url('./files'), [
-      options.routing ? noop() : filter(path => !path.endsWith('-routing.module.ts')),
-      template({
+      options.routing ? noop() : filter(path => !path.endsWith('-routing.module.ts.template')),
+      applyTemplates({
         ...strings,
         'if-flat': (s: string) => options.flat ? '' : s,
         ...options,
