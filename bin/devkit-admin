@@ -68,7 +68,7 @@ try {
     .then(() => require(scriptPath).default(args, logger, cwd))
     .then(exitCode => process.exit(exitCode || 0))
     .catch(err => {
-      logger.fatal(err.stack);
+      logger.fatal(err && err.stack);
       process.exit(99);
     });
 } catch (err) {
