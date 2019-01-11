@@ -138,7 +138,7 @@
       "default": true
     },
     "minimal": {
-      "description": "When true, creates a project without any testing frameworks.",
+      "description": "When true, creates a project without any testing frameworks and should be used for learning purposes only.",
       "type": "boolean",
       "default": false
     }

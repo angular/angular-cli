@@ -70,7 +70,7 @@
       "description": "When true, does not add dependencies to the \"package.json\" file."
     },
     "minimal": {
-      "description": "When true, creates a bare-bones project without any testing frameworks.",
+      "description": "When true, creates a bare-bones project without any testing frameworks and should be used for learning purposes.",
       "type": "boolean",
       "default": false
     },
