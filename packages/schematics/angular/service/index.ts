@@ -11,12 +11,12 @@ import {
   SchematicsException,
   Tree,
   apply,
+  applyTemplates,
   chain,
   filter,
   mergeWith,
   move,
   noop,
-  template,
   url,
 } from '@angular-devkit/schematics';
 import { applyLintFix } from '../utility/lint-fix';
@@ -43,8 +43,8 @@ export default function (options: ServiceOptions): Rule {
     options.skipTests = options.skipTests || !options.spec;
 
     const templateSource = apply(url('./files'), [
-      options.skipTests ? filter(path => !path.endsWith('.spec.ts')) : noop(),
-      template({
+      options.skipTests ? filter(path => !path.endsWith('.spec.ts.template')) : noop(),
+      applyTemplates({
         ...strings,
         'if-flat': (s: string) => options.flat ? '' : s,
         ...options,

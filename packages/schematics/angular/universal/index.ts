@@ -20,10 +20,10 @@ import {
   SchematicsException,
   Tree,
   apply,
+  applyTemplates,
   chain,
   mergeWith,
   move,
-  template,
   url,
 } from '@angular-devkit/schematics';
 import {
@@ -257,7 +257,7 @@ export default function (options: UniversalOptions): Rule {
     }
 
     const templateSource = apply(url('./files/src'), [
-      template({
+      applyTemplates({
         ...strings,
         ...options as object,
         stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
@@ -266,7 +266,7 @@ export default function (options: UniversalOptions): Rule {
     ]);
 
     const rootSource = apply(url('./files/root'), [
-      template({
+      applyTemplates({
         ...strings,
         ...options as object,
         stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),

@@ -12,10 +12,10 @@ import {
   SchematicsException,
   Tree,
   apply,
+  applyTemplates,
   chain,
   mergeWith,
   move,
-  template,
   url,
 } from '@angular-devkit/schematics';
 import { getWorkspace, updateWorkspace } from '../utility/config';
@@ -127,7 +127,7 @@ export default function (options: E2eOptions): Rule {
       addAppToWorkspaceFile(options, workspace),
       mergeWith(
         apply(url('./files'), [
-          template({
+          applyTemplates({
             utils: strings,
             ...options,
             'dot': '.',

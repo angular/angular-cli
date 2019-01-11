@@ -21,10 +21,10 @@ import {
   Tree,
   UpdateRecorder,
   apply,
+  applyTemplates,
   chain,
   mergeWith,
   move,
-  template,
   url,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
@@ -114,7 +114,7 @@ export default function (options: Schema): Rule {
     }
 
     let source = apply(url('./schematic-files'), [
-        template({
+        applyTemplates({
           ...options as object,
           coreVersion,
           schematicsVersion,
@@ -128,7 +128,7 @@ export default function (options: Schema): Rule {
     if (!collectionPath) {
       collectionPath = normalize('/' + options.name + '/src/collection.json');
       source = apply(url('./project-files'), [
-        template({
+        applyTemplates({
           ...options as object,
           coreVersion,
           schematicsVersion,

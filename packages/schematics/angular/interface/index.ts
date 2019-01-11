@@ -11,12 +11,12 @@ import {
   SchematicsException,
   Tree,
   apply,
+  applyTemplates,
   branchAndMerge,
   chain,
   mergeWith,
   move,
   noop,
-  template,
   url,
 } from '@angular-devkit/schematics';
 import { applyLintFix } from '../utility/lint-fix';
@@ -44,7 +44,7 @@ export default function (options: InterfaceOptions): Rule {
     options.type = !!options.type ? `.${options.type}` : '';
 
     const templateSource = apply(url('./files'), [
-      template({
+      applyTemplates({
         ...strings,
         ...options,
       }),

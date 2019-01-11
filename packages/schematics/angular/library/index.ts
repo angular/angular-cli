@@ -12,12 +12,12 @@ import {
   SchematicsException,
   Tree,
   apply,
+  applyTemplates,
   branchAndMerge,
   chain,
   mergeWith,
   noop,
   schematic,
-  template,
   url,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
@@ -204,7 +204,7 @@ export default function (options: LibraryOptions): Rule {
     const relativePathToWorkspaceRoot = projectRoot.split('/').map(x => '..').join('/');
 
     const templateSource = apply(url('./files'), [
-      template({
+      applyTemplates({
         ...strings,
         ...options,
         packageName,
