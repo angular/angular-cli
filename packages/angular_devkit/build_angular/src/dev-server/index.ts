@@ -184,6 +184,20 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     browserOptions: NormalizedBrowserBuilderSchema,
   ) {
     const systemRoot = getSystemPath(root);
+    if (options.host) {
+      // Check that the host is either localhost or prints out a message.
+      if (!/^127\.\d+\.\d+\.\d+/g.test(options.host) && options.host !== 'localhost') {
+        this.context.logger.warn(tags.stripIndent`
+          WARNING: This is a simple server for use in testing or debugging Angular applications
+          locally. It hasn't been reviewed for security issues.
+
+          Binding this server to an open connection can result in compromising your application or
+          computer. Using a different host than the one passed to the "--host" flag might result in
+          websocket connection issues. You might need to use "--disableHostCheck" if that's the
+          case.
+        `);
+      }
+    }
     if (options.disableHostCheck) {
       this.context.logger.warn(tags.oneLine`
         WARNING: Running a server with --disable-host-check is a security risk.
