@@ -15,8 +15,9 @@ import {
   Budget,
   CurrentFileReplacement,
   ExtraEntryPoint,
+  NormalizedOptimization,
+  NormalizedSourceMaps,
 } from '../../browser/schema';
-import { NormalizedOptimization, NormalizedSourceMaps } from '../../utils/index';
 
 export interface BuildOptions {
   optimization: NormalizedOptimization;
