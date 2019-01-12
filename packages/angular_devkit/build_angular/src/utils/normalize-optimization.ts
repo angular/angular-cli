@@ -6,12 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { OptimizationOptions, SourceMapOptions } from '../browser/schema';
-
-export interface NormalizedOptimization {
-  scripts: boolean;
-  styles: boolean;
-}
+import {
+  NormalizedOptimization,
+  OptimizationOptions,
+  SourceMapOptions,
+} from '../browser/schema';
 
 export function normalizeOptimization(optimization: OptimizationOptions): NormalizedOptimization {
   const scripts = !!(typeof optimization === 'object' ? optimization.scripts : optimization);

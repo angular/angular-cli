@@ -6,14 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { SourceMapOptions } from '../browser/schema';
-
-export interface NormalizedSourceMaps {
-  scripts: boolean;
-  styles: boolean;
-  hidden: boolean;
-  vendor: boolean;
-}
+import { NormalizedSourceMaps, SourceMapOptions } from '../browser/schema';
 
 export function normalizeSourceMaps(sourceMap: SourceMapOptions): NormalizedSourceMaps {
   const scripts = !!(typeof sourceMap === 'object' ? sourceMap.scripts : sourceMap);
