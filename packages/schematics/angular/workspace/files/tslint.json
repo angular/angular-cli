@@ -4,21 +4,16 @@
     "codelyzer"
   ],
   "rules": {
-    "adjacent-overload-signatures": false,
-    "align": false,
     "array-type": false,
     "arrow-parens": false,
-    "ban-types": false,
     "deprecation": {
       "severity": "warn"
     },
-    "function-constructor": false,
     "import-blacklist": [
       true,
       "rxjs/Rx"
     ],
     "interface-name": false,
-    "jsdoc-format": false,
     "max-classes-per-file": false,
     "max-line-length": [
       true,
@@ -36,9 +31,6 @@
         ]
       }
     ],
-    "new-parens": false,
-    "no-angle-bracket-type-assertion": false,
-    "no-conditional-assignment": false,
     "no-consecutive-blank-lines": false,
     "no-console": [
       true,
@@ -53,56 +45,22 @@
       true,
       "ignore-params"
     ],
-    "no-namespace": false,
     "no-non-null-assertion": true,
     "no-redundant-jsdoc": true,
-    "no-reference": false,
-    "no-reference-import": false,
-    "no-string-literal": false,
     "no-switch-case-fall-through": true,
-    "no-unsafe-finally": false,
     "no-use-before-declare": true,
     "no-var-requires": false,
-    "object-literal-key-quotes": false,
-    "object-literal-shorthand": false,
-    "object-literal-sort-keys": false,
-    "one-line": [
+    "object-literal-key-quotes": [
       true,
-      "check-open-brace",
-      "check-catch",
-      "check-else",
-      "check-whitespace"
+      "as-needed"
     ],
-    "one-variable-per-declaration": false,
-    "only-arrow-functions": false,
+    "object-literal-sort-keys": false,
     "ordered-imports": false,
-    "prefer-for-of": false,
     "quotemark": [
       true,
       "single"
     ],
-    "space-before-function-paren": false,
     "trailing-comma": false,
-    "typedef-whitespace": [
-      true,
-      {
-        "call-signature": "nospace",
-        "index-signature": "nospace",
-        "parameter": "nospace",
-        "property-declaration": "nospace",
-        "variable-declaration": "nospace"
-      }
-    ],
-    "use-isnan": false,
-    "variable-name": false,
-    "whitespace": [
-      true,
-      "check-branch",
-      "check-decl",
-      "check-operator",
-      "check-separator",
-      "check-type"
-    ],
     "no-output-on-prefix": true,
     "use-input-property-decorator": true,
     "use-output-property-decorator": true,
