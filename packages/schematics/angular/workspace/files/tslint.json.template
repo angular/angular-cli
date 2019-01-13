@@ -61,15 +61,20 @@
       "single"
     ],
     "trailing-comma": false,
-    "no-output-on-prefix": true,
-    "use-input-property-decorator": true,
-    "use-output-property-decorator": true,
-    "use-host-property-decorator": true,
-    "no-input-rename": true,
-    "no-output-rename": true,
-    "use-life-cycle-interface": true,
-    "use-pipe-transform-interface": true,
+    "banana-in-box": true,
     "component-class-suffix": true,
-    "directive-class-suffix": true
+    "contextual-life-cycle": true,
+    "directive-class-suffix": true,
+    "no-conflicting-life-cycle-hooks": true,
+    "no-input-rename": true,
+    "no-output-named-after-standard-event": true,
+    "no-output-on-prefix": true,
+    "no-output-rename": true,
+    "templates-no-negated-async": true,
+    "use-host-property-decorator": true,
+    "use-input-property-decorator": true,
+    "use-life-cycle-interface": true,
+    "use-output-property-decorator": true,
+    "use-pipe-transform-interface": true
   }
 }
