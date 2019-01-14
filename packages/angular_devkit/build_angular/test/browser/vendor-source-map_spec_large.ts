@@ -41,6 +41,29 @@ describe('Browser Builder external source map', () => {
     ).toPromise().then(done, done.fail);
   });
 
+  it(`works when using deprecated 'vendorSourceMap'`, (done) => {
+    const overrides: Partial<BrowserBuilderSchema> = {
+      sourceMap: {
+        scripts: true,
+        styles: true,
+      },
+      vendorSourceMap: true,
+    };
+
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        const fileName = join(outputPath, 'vendor.js.map');
+        expect(host.scopedSync().exists(fileName)).toBe(true);
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+        // this is due the fact that some vendors like `tslib` sourcemaps to js files
+        const sourcePath = JSON.parse(content).sources[0];
+        expect(path.extname(sourcePath)).toBe('.ts', `${sourcePath} extention should be '.ts'`);
+      }),
+    ).toPromise().then(done, done.fail);
+  });
+
+
   it('does not map sourcemaps from external library when disabled', (done) => {
     const overrides: Partial<BrowserBuilderSchema> = {
       sourceMap: {

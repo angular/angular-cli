@@ -72,6 +72,6 @@ export function normalizeBuilderSchema<BuilderConfigurationT extends
         ...assets,
         fileReplacements: normalizeFileReplacements(options.fileReplacements, syncHost, root),
         optimization: normalizeOptimization(optimization),
-        sourceMap: normalizeSourceMaps(options.sourceMap),
+        sourceMap: normalizedSourceMapOptions,
     };
 }
