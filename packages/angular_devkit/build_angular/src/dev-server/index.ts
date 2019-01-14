@@ -128,7 +128,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
           });
         }
 
-        if (browserOptions.optimization) {
+        if (browserOptions.optimization.scripts || browserOptions.optimization.styles) {
           this.context.logger.error(tags.stripIndents`
             ****************************************************************************************
             This is a simple server for use in testing or debugging Angular applications locally.
