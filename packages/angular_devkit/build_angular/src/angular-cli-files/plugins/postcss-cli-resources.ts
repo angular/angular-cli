@@ -169,7 +169,8 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
       let modified = false;
 
       // We want to load it relative to the file that imports
-      const context = path.dirname(decl.source.input.file);
+      const inputFile = decl.source && decl.source.input.file;
+      const context = inputFile && path.dirname(inputFile) || loader.context;
 
       // tslint:disable-next-line:no-conditional-assignment
       while (match = urlRegex.exec(value)) {
