@@ -21,5 +21,12 @@ steps:
     plugins:
       - docker#v2.1.0:
           image: "filipesilva/node-bazel-windows:0.0.2"
+    # Times out in 2h
+    timeout_in_minutes: 120
+    # Automatically retries up to 2 times.
+    retry:
+      automatic:
+        exit_status: "*"
+        limit: 2    
     agents:
       windows: true
