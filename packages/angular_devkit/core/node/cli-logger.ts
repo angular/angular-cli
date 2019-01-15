@@ -25,19 +25,19 @@ export function createConsoleLogger(
   logger
     .pipe(filter(entry => (entry.level != 'debug' || verbose)))
     .subscribe(entry => {
-      let color: (s: string) => string = x => terminal.dim(terminal.white(x));
+      let color = terminal.dim;
       let output = stdout;
       switch (entry.level) {
         case 'info':
-          color = terminal.white;
+          color = terminal.reset;
           break;
         case 'warn':
-          color = (x: string) => terminal.bold(terminal.yellow(x));
+          color = (s: string) => terminal.bold(terminal.yellow(s));
           output = stderr;
           break;
         case 'fatal':
         case 'error':
-          color = (x: string) => terminal.bold(terminal.red(x));
+          color = (s: string) => terminal.bold(terminal.red(s));
           output = stderr;
           break;
       }
