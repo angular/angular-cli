@@ -48,7 +48,7 @@ The loader works with webpack plugin to compile your TypeScript. It's important 
 ## Features
 The benefits and ability of using [`@ngtools/webpack`](https://www.npmjs.com/~ngtools) standalone from the Angular CLI as presented in [Stephen Fluin's Angular CLI talk](https://youtu.be/uBRK6cTr4Vk?t=6m45s) at Angular Connect 2016:
 
-* Compiles SCSS/LESS
+* Compiles Sass/Less into CSS
 * TypeScript transpilation
 * Bundles JavaScript, CSS
 * Asset optimization
