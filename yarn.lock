@@ -7279,10 +7279,10 @@ package-json@^4.0.0:
     registry-url "^3.0.3"
     semver "^5.1.0"
 
-pacote@9.3.0:
-  version "9.3.0"
-  resolved "https://registry.yarnpkg.com/pacote/-/pacote-9.3.0.tgz#ec0d21b739a625d81a19ae546386fedee3300bc1"
-  integrity sha512-uy5xghB5wUtmFS+uNhQGhlsIF9rfsfxw6Zsu2VpmSz4/f+8D2+5V1HwjHdSn7W6aQTrxNNmmoUF5qNE10/EVdA==
+pacote@9.4.0:
+  version "9.4.0"
+  resolved "https://registry.yarnpkg.com/pacote/-/pacote-9.4.0.tgz#af979abdeb175cd347c3e33be3241af1ed254807"
+  integrity sha512-WQ1KL/phGMkedYEQx9ODsjj7xvwLSpdFJJdEXrLyw5SILMxcTNt5DTxT2Z93fXuLFYJBlZJdnwdalrQdB/rX5w==
   dependencies:
     bluebird "^3.5.3"
     cacache "^11.3.2"
