@@ -119,9 +119,8 @@
         "type": "list",
         "items": [
           { "value": "css", "label": "CSS" },
-          { "value": "scss", "label": "SCSS   [ http://sass-lang.com   ]" },
-          { "value": "sass", "label": "SASS   [ http://sass-lang.com   ]" },
-          { "value": "less", "label": "LESS   [ http://lesscss.org     ]" },
+          { "value": "scss", "label": "Sass   [ http://sass-lang.com   ]" },
+          { "value": "less", "label": "Less   [ http://lesscss.org     ]" },
           { "value": "styl", "label": "Stylus [ http://stylus-lang.com ]" }
         ]
       }
