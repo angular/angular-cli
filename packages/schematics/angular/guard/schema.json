@@ -47,6 +47,24 @@
       "type": "boolean",
       "default": false,
       "description": "When true, applies lint fixes after generating the guard."
+    },
+    "implements": {
+      "type": "array",
+      "description": "Specifies which interfaces to implement.",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      },
+      "x-prompt": {
+        "message": "Which interfaces would you like to implement?",
+        "type": "list",
+        "multiselect": true,
+        "items": [
+          "CanActivate",
+          "CanActivateChild",
+          "CanLoad"
+        ]
+      }
     }
   },
   "required": [
