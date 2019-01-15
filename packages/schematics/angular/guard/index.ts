@@ -36,6 +36,20 @@ export default function (options: GuardOptions): Rule {
     if (options.path === undefined) {
       options.path = buildDefaultPath(project);
     }
+    if (options.implements === undefined) {
+      options.implements = [];
+    }
+
+    let implementations = '';
+    let implementationImports = '';
+    if (options.implements.length > 0) {
+      implementations = options.implements.join(', ');
+      implementationImports = `${implementations}, `;
+      // As long as we aren't in IE... ;)
+      if (options.implements.includes('CanLoad')) {
+        implementationImports = `${implementationImports}Route, UrlSegment, `;
+      }
+    }
 
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
@@ -47,6 +61,8 @@ export default function (options: GuardOptions): Rule {
     const templateSource = apply(url('./files'), [
       options.skipTests ? filter(path => !path.endsWith('.spec.ts')) : noop(),
       template({
+        implementations,
+        implementationImports,
         ...strings,
         ...options,
       }),
