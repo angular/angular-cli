@@ -74,8 +74,8 @@
   "devDependencies": {
     "@angular/compiler": "^7.2.0-rc.0",
     "@angular/compiler-cli": "^7.2.0-rc.0",
-    "@bazel/karma": "^0.20.3",
-    "@bazel/typescript": "0.20.3",
+    "@bazel/karma": "^0.22.1",
+    "@bazel/typescript": "0.22.1",
     "@ngtools/json-schema": "^1.1.0",
     "@types/copy-webpack-plugin": "^4.4.1",
     "@types/express": "^4.16.0",

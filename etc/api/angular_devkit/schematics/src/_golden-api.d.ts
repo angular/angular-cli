@@ -566,7 +566,7 @@ export declare function template<T>(options: T): Rule;
 
 export declare const TEMPLATE_FILENAME_RE: RegExp;
 
-export declare const Tree: TreeConstructor;
+export declare type Tree = TreeInterface;
 
 export interface TreeConstructor {
     branch(tree: TreeInterface): TreeInterface;

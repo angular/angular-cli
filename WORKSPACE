@@ -1,5 +1,7 @@
 workspace(name = "angular_cli")
 
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
 # This is required by Angular Workspace
 http_archive(
     name = "bazel_skylib",
@@ -19,8 +21,9 @@ http_archive(
 # Load the TypeScript rules, its dependencies, and setup the workspace.
 http_archive(
     name = "build_bazel_rules_typescript",
-    url = "https://github.com/bazelbuild/rules_typescript/archive/8ea1a55cf5cf8be84ddfeefc0940769b80da792f.zip",
-    strip_prefix = "rules_typescript-8ea1a55cf5cf8be84ddfeefc0940769b80da792f",
+    url = "https://github.com/bazelbuild/rules_typescript/archive/0.22.1.zip",
+    strip_prefix = "rules_typescript-0.22.1",
+    sha256 = "351abe89b291a3b3d6af38d9d04c6270f5d2ed8781e2fda25bc65fd12db25e66",
 )
 
 load("@build_bazel_rules_typescript//:package.bzl", "rules_typescript_dependencies")
@@ -37,9 +40,9 @@ go_register_toolchains()
 # TS API Guardian resides in Angular
 http_archive(
     name = "angular",
-    url = "https://github.com/angular/angular/archive/7.1.0-rc.0.zip",
-    strip_prefix = "angular-7.1.0-rc.0",
-    sha256 = "dbf3ae2d60b5384715bc002c695be0141f8c9219396ac1edbdc7023bd400c8a1",
+    url = "https://github.com/angular/angular/archive/7.2.0.zip",
+    strip_prefix = "angular-7.2.0",
+    sha256 = "8a4915a524f3fed17424da4b77cd7a943fbbddba44275f06671493339713914b",
 )
 
 load("@angular//:index.bzl", "ng_setup_workspace")
