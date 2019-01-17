@@ -70,7 +70,7 @@
       }
     },
     "minimal": {
-      "description": "When true, creates a workspace without any testing frameworks and should be used for learning.",
+      "description": "When true, creates a workspace without any testing frameworks. (Use for learning purposes only.)",
       "type": "boolean",
       "default": false
     }
