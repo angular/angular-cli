@@ -30,6 +30,8 @@ export declare function applyPathTemplate<T extends PathTemplateData>(data: T, o
 
 export declare function applyTemplates<T>(options: T): Rule;
 
+export declare function applyToSubtree(path: string, rules: Rule[]): Rule;
+
 export declare function asSource(rule: Rule): Source;
 
 export declare type AsyncFileOperator = (tree: FileEntry) => Observable<FileEntry | null>;
