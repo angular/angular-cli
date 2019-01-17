@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { parseJson, strings } from '@angular-devkit/core';
+import { JsonParseMode, parseJson, strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -54,7 +54,7 @@ function updateJsonFile<T>(host: Tree, path: string, callback: UpdateJsonFn<T>):
   const source = host.read(path);
   if (source) {
     const sourceText = source.toString('utf-8');
-    const json = parseJson(sourceText);
+    const json = parseJson(sourceText, JsonParseMode.Loose);
     callback(json as {} as T);
     host.overwrite(path, JSON.stringify(json, null, 2));
   }
