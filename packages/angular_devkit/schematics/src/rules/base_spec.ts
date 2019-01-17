@@ -17,8 +17,9 @@ import { of as observableOf } from 'rxjs';
 import { Rule, SchematicContext, Source } from '../engine/interface';
 import { Tree } from '../tree/interface';
 import { empty } from '../tree/static';
-import { apply, chain } from './base';
+import { apply, applyToSubtree, chain } from './base';
 import { callRule, callSource } from './call';
+import { move } from './move';
 
 
 const context: SchematicContext = {
@@ -159,6 +160,24 @@ describe('partitionApplyMerge', () => {
       .then(result => {
         expect(result.exists('/test1')).toBe(false);
         expect(result.exists('/test2')).toBe(false);
+      })
+      .then(done, done.fail);
+  });
+});
+
+describe('applyToSubtree', () => {
+  it('works', done => {
+    const tree = new HostTree();
+    tree.create('a/b/file1', 'hello world');
+    tree.create('a/b/file2', 'hello world');
+    tree.create('a/c/file3', 'hello world');
+
+    callRule(applyToSubtree('a/b', [move('x')]), observableOf(tree), context)
+      .toPromise()
+      .then(result => {
+        expect(result.exists('a/b/x/file1')).toBe(true);
+        expect(result.exists('a/b/x/file2')).toBe(true);
+        expect(result.exists('a/c/file3')).toBe(true);
       })
       .then(done, done.fail);
   });

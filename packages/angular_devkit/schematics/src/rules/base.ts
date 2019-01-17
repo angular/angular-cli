@@ -12,6 +12,7 @@ import { SchematicsException } from '../exception/exception';
 import { FilteredTree } from '../tree/filtered';
 import { FilterHostTree, HostTree } from '../tree/host-tree';
 import { FileEntry, FilePredicate, MergeStrategy, Tree } from '../tree/interface';
+import { ScopedTree } from '../tree/scoped';
 import {
   branch,
   empty as staticEmpty,
@@ -200,5 +201,23 @@ export function composeFileOperators(operators: FileOperator[]): FileOperator {
     }
 
     return current;
+  };
+}
+
+export function applyToSubtree(path: string, rules: Rule[]): Rule {
+  return (tree, context) => {
+    const scoped = new ScopedTree(tree, path);
+
+    return callRule(chain(rules), observableOf(scoped), context).pipe(
+      map(result => {
+        if (result === scoped) {
+          return tree;
+        } else {
+          throw new SchematicsException(
+            'Original tree must be returned from all rules when using "applyToSubtree".',
+          );
+        }
+      }),
+    );
   };
 }
