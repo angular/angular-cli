@@ -14,5 +14,9 @@ export { getFoldFileTransformer } from './transforms/class-fold';
 export { getImportTslibTransformer, testImportTslib } from './transforms/import-tslib';
 export { getPrefixClassesTransformer, testPrefixClasses } from './transforms/prefix-classes';
 export { getPrefixFunctionsTransformer } from './transforms/prefix-functions';
-export { getScrubFileTransformer, testScrubFile } from './transforms/scrub-file';
+export {
+  getScrubFileTransformer,
+  getScrubFileTransformerForCore,
+  testScrubFile,
+} from './transforms/scrub-file';
 export { getWrapEnumsTransformer } from './transforms/wrap-enums';
