@@ -69,7 +69,7 @@
     "quicktype-core": "^6.0.15",
     "temp": "^0.9.0",
     "tslint": "^5.11.0",
-    "typescript": "~3.2.2"
+    "typescript": "3.2.4"
   },
   "devDependencies": {
     "@angular/compiler": "^7.2.0-rc.0",
