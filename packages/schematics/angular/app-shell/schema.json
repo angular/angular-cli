@@ -4,7 +4,7 @@
   "title": "Angular AppShell Options Schema",
   "type": "object",
   "description": "Generates an app shell for running a server-side version of an app.",
-  "long-description": "",
+  "long-description": "./app-shell-long.md",
   "properties": {
     "clientProject": {
       "type": "string",
