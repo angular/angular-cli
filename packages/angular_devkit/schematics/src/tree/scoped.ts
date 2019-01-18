@@ -14,6 +14,7 @@ import {
   relative,
 } from '@angular-devkit/core';
 import { Action } from './action';
+import { DelegateTree } from './delegate';
 import {
   DirEntry,
   FileEntry,
@@ -89,7 +90,16 @@ export class ScopedTree implements Tree {
   get root(): DirEntry { return this._root; }
 
   branch(): Tree { return new ScopedTree(this._base.branch(), this._root.scope); }
-  merge(other: Tree, strategy?: MergeStrategy): void { this._base.merge(other, strategy); }
+  merge(other: Tree, strategy?: MergeStrategy): void {
+    const self = this;
+    const delegate = new class extends DelegateTree {
+      get actions(): Action[] {
+        return other.actions.map(action => self._fullPathAction(action));
+      }
+    }(other);
+
+    this._base.merge(delegate, strategy);
+  }
 
   // Readonly.
   read(path: string): Buffer | null { return this._base.read(this._fullPath(path)); }
@@ -125,15 +135,57 @@ export class ScopedTree implements Tree {
   }
 
   apply(action: Action, strategy?: MergeStrategy): void {
-    return this._base.apply(action, strategy);
+    return this._base.apply(this._fullPathAction(action), strategy);
   }
-  get actions(): Action[] { return this._base.actions; }
+
+  get actions(): Action[] {
+    const scopedActions = [];
+
+    for (const action of this._base.actions) {
+      if (!action.path.startsWith(this._root.scope + '/')) {
+        continue;
+      }
+
+      if (action.kind !== 'r') {
+        scopedActions.push({
+          ...action,
+          path: join(NormalizedRoot, relative(this._root.scope, action.path)),
+        });
+      } else if (action.to.startsWith(this._root.scope + '/')) {
+        scopedActions.push({
+          ...action,
+          path: join(NormalizedRoot, relative(this._root.scope, action.path)),
+          to: join(NormalizedRoot, relative(this._root.scope, action.to)),
+        });
+      }
+    }
+
+    return scopedActions;
+  }
 
   [TreeSymbol]() {
     return this;
   }
 
-  private _fullPath(path: string) {
+  private _fullPath(path: string): Path {
     return join(this._root.scope, normalize('/' + path));
+  }
+
+  private _fullPathAction(action: Action) {
+    let fullPathAction: Action;
+    if (action.kind === 'r') {
+      fullPathAction = {
+        ...action,
+        path: this._fullPath(action.path),
+        to: this._fullPath(action.to),
+      };
+    } else {
+      fullPathAction = {
+        ...action,
+        path: this._fullPath(action.path),
+      };
+    }
+
+    return fullPathAction;
   }
 }

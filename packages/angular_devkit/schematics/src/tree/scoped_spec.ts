@@ -133,6 +133,31 @@ describe('ScopedTree', () => {
     ]);
   });
 
+  it('supports merge into a scoped tree', () => {
+    const other = new HostTree();
+    other.create('other-file', 'other');
+
+    scoped.merge(other);
+
+    expect(base.exists('/level-1/other-file')).toBeTruthy();
+    expect(base.exists('/other-file')).toBeFalsy();
+  });
+
+  it('supports merge from a scoped tree', () => {
+    const other = new HostTree();
+
+    other.merge(scoped);
+
+    expect(other.exists('/file-1-1')).toBeTruthy();
+    expect(other.exists('file-1-1')).toBeTruthy();
+    expect(other.exists('/file-1-2')).toBeTruthy();
+
+    expect(other.exists('/file-0-1')).toBeFalsy();
+    expect(other.exists('file-0-1')).toBeFalsy();
+    expect(other.exists('/level-1/file-1-1')).toBeFalsy();
+    expect(other.exists('level-1/file-1-1')).toBeFalsy();
+  });
+
   it('supports root', () => {
     expect(scoped.root).not.toBeNull();
     expect(scoped.root.path as string).toBe('/');
