@@ -15,7 +15,11 @@ import { getFoldFileTransformer } from '../transforms/class-fold';
 import { getImportTslibTransformer, testImportTslib } from '../transforms/import-tslib';
 import { getPrefixClassesTransformer, testPrefixClasses } from '../transforms/prefix-classes';
 import { getPrefixFunctionsTransformer } from '../transforms/prefix-functions';
-import { getScrubFileTransformer, testScrubFile } from '../transforms/scrub-file';
+import {
+  getScrubFileTransformer,
+  getScrubFileTransformerForCore,
+  testScrubFile,
+} from '../transforms/scrub-file';
 import { getWrapEnumsTransformer } from '../transforms/wrap-enums';
 
 
@@ -44,6 +48,18 @@ const ngFactories = [
   /\.ngstyle\.[jt]s/,
 ];
 
+// Known locations for the source files of @angular/core.
+const coreFilesRegex = [
+  /[\\/]node_modules[\\/]@angular[\\/]core[\\/]esm5[\\/]/,
+  /[\\/]node_modules[\\/]@angular[\\/]core[\\/]fesm5[\\/]/,
+  /[\\/]node_modules[\\/]@angular[\\/]core[\\/]esm2015[\\/]/,
+  /[\\/]node_modules[\\/]@angular[\\/]core[\\/]fesm2015[\\/]/,
+];
+
+function isKnownCoreFile(filePath: string) {
+  return coreFilesRegex.some(re => re.test(filePath));
+}
+
 function isKnownSideEffectFree(filePath: string) {
   return ngFactories.some((re) => re.test(filePath)) ||
     whitelistedAngularModules.some((re) => re.test(filePath));
@@ -57,11 +73,12 @@ export interface BuildOptimizerOptions {
   emitSourceMap?: boolean;
   strict?: boolean;
   isSideEffectFree?: boolean;
+  isAngularCoreFile?: boolean;
 }
 
 export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascriptOutput {
 
-  const { inputFilePath } = options;
+  const { inputFilePath, isAngularCoreFile } = options;
   let { originalFilePath, content } = options;
 
   if (!originalFilePath && inputFilePath) {
@@ -84,6 +101,15 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     };
   }
 
+  let selectedGetScrubFileTransformer = getScrubFileTransformer;
+
+  if (
+    isAngularCoreFile === true ||
+    (isAngularCoreFile === undefined && originalFilePath && isKnownCoreFile(originalFilePath))
+  ) {
+    selectedGetScrubFileTransformer = getScrubFileTransformerForCore;
+  }
+
   const isWebpackBundle = content.indexOf('__webpack_require__') !== -1;
 
   // Determine which transforms to apply.
@@ -97,14 +123,14 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
       // We only apply it to whitelisted modules, since we know they are safe.
       // getPrefixFunctionsTransformer needs to be before getFoldFileTransformer.
       getPrefixFunctionsTransformer,
-      getScrubFileTransformer,
+      selectedGetScrubFileTransformer,
       getFoldFileTransformer,
     );
     typeCheck = true;
   } else if (testScrubFile(content)) {
     // Always test as these require the type checker
     getTransforms.push(
-      getScrubFileTransformer,
+      selectedGetScrubFileTransformer,
       getFoldFileTransformer,
     );
     typeCheck = true;

@@ -20,6 +20,7 @@ const DEBUG = false;
 
 export interface Options {
   sideEffectFreeModules?: string[];
+  angularCoreModules?: string[];
 }
 
 export default function optimizer(options: Options) {
@@ -34,8 +35,10 @@ export default function optimizer(options: Options) {
       const normalizedId = id.replace(/\\/g, '/');
       const isSideEffectFree = options.sideEffectFreeModules &&
         options.sideEffectFreeModules.some(m => normalizedId.indexOf(m) >= 0);
+      const isAngularCoreFile = options.angularCoreModules &&
+        options.angularCoreModules.some(m => normalizedId.indexOf(m) >= 0);
       const { content: code, sourceMap: map } = buildOptimizer({
-        content, inputFilePath: id, emitSourceMap: true, isSideEffectFree,
+        content, inputFilePath: id, emitSourceMap: true, isSideEffectFree, isAngularCoreFile,
       });
       if (!code) {
         if (DEBUG) {

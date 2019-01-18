@@ -12,6 +12,8 @@ export declare function getPrefixFunctionsTransformer(): ts.TransformerFactory<t
 
 export declare function getScrubFileTransformer(program: ts.Program): ts.TransformerFactory<ts.SourceFile>;
 
+export declare function getScrubFileTransformerForCore(program: ts.Program): ts.TransformerFactory<ts.SourceFile>;
+
 export declare function getWrapEnumsTransformer(): ts.TransformerFactory<ts.SourceFile>;
 
 export declare function testImportTslib(content: string): boolean;

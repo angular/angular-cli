@@ -50,13 +50,21 @@ const angularSpecifiers = [
 ];
 
 export function getScrubFileTransformer(program: ts.Program): ts.TransformerFactory<ts.SourceFile> {
-  const checker = program.getTypeChecker();
+  return scrubFileTransformer(program.getTypeChecker(), false);
+}
 
+export function getScrubFileTransformerForCore(
+  program: ts.Program,
+): ts.TransformerFactory<ts.SourceFile> {
+  return scrubFileTransformer(program.getTypeChecker(), true);
+}
+
+function scrubFileTransformer(checker: ts.TypeChecker, isAngularCoreFile: boolean) {
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
 
     const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
 
-      const ngMetadata = findAngularMetadata(sf);
+      const ngMetadata = findAngularMetadata(sf, isAngularCoreFile);
       const tslibImports = findTslibImports(sf);
 
       const nodes: ts.Node[] = [];
@@ -116,22 +124,27 @@ function nameOfSpecifier(node: ts.ImportSpecifier): string {
   return node.name && node.name.text || '<unknown>';
 }
 
-function findAngularMetadata(node: ts.Node): ts.Node[] {
+function findAngularMetadata(node: ts.Node, isAngularCoreFile: boolean): ts.Node[] {
   let specs: ts.Node[] = [];
+  // Find all specifiers from imports of `@angular/core`.
   ts.forEachChild(node, (child) => {
     if (child.kind === ts.SyntaxKind.ImportDeclaration) {
       const importDecl = child as ts.ImportDeclaration;
-      if (isAngularCoreImport(importDecl)) {
+      if (isAngularCoreImport(importDecl, isAngularCoreFile)) {
         specs.push(...collectDeepNodes<ts.ImportSpecifier>(node, ts.SyntaxKind.ImportSpecifier)
           .filter((spec) => isAngularCoreSpecifier(spec)));
       }
     }
   });
 
-  const localDecl = findAllDeclarations(node)
-    .filter((decl) => angularSpecifiers.indexOf((decl.name as ts.Identifier).text) !== -1);
-  if (localDecl.length === angularSpecifiers.length) {
-    specs = specs.concat(localDecl);
+  // Check if the current module contains all know `@angular/core` specifiers.
+  // If it does, we assume it's a `@angular/core` FESM.
+  if (isAngularCoreFile) {
+    const localDecl = findAllDeclarations(node)
+      .filter((decl) => angularSpecifiers.indexOf((decl.name as ts.Identifier).text) !== -1);
+    if (localDecl.length === angularSpecifiers.length) {
+      specs = specs.concat(localDecl);
+    }
   }
 
   return specs;
@@ -154,11 +167,23 @@ function findAllDeclarations(node: ts.Node): ts.VariableDeclaration[] {
   return nodes;
 }
 
-function isAngularCoreImport(node: ts.ImportDeclaration): boolean {
-  return true &&
-    node.moduleSpecifier &&
-    node.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral &&
-    (node.moduleSpecifier as ts.StringLiteral).text === '@angular/core';
+function isAngularCoreImport(node: ts.ImportDeclaration, isAngularCoreFile: boolean): boolean {
+  if (!(node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier))) {
+    return false;
+  }
+  const importText = node.moduleSpecifier.text;
+
+  // Imports to `@angular/core` are always core imports.
+  if (importText === '@angular/core') {
+    return true;
+  }
+
+  // Relative imports from a Angular core file are also core imports.
+  if (isAngularCoreFile && (importText.startsWith('./') || importText.startsWith('../'))) {
+    return true;
+  }
+
+  return false;
 }
 
 function isAngularCoreSpecifier(node: ts.ImportSpecifier): boolean {
