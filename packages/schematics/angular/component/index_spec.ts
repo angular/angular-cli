@@ -10,7 +10,7 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { Schema as ApplicationOptions } from '../application/schema';
 import { createAppModule } from '../utility/test';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
-import { ChangeDetection, Schema as ComponentOptions } from './schema';
+import { ChangeDetection, Schema as ComponentOptions, Style } from './schema';
 
 // tslint:disable:max-line-length
 describe('Component Schematic', () => {
@@ -24,7 +24,7 @@ describe('Component Schematic', () => {
     inlineStyle: false,
     inlineTemplate: false,
     changeDetection: ChangeDetection.Default,
-    style: 'css',
+    style: Style.Css,
     skipTests: false,
     module: undefined,
     export: false,
@@ -43,7 +43,7 @@ describe('Component Schematic', () => {
     inlineStyle: false,
     inlineTemplate: false,
     routing: false,
-    style: 'css',
+    style: Style.Css,
     skipTests: false,
     skipPackageJson: false,
   };
@@ -250,7 +250,16 @@ describe('Component Schematic', () => {
   });
 
   it('should respect the style option', () => {
-    const options = { ...defaultOptions, style: 'scss' };
+    const options = { ...defaultOptions, style: Style.Scss };
+    const tree = schematicRunner.runSchematic('component', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(content).toMatch(/styleUrls: \['.\/foo.component.scss/);
+    expect(tree.files).toContain('/projects/bar/src/app/foo/foo.component.scss');
+    expect(tree.files).not.toContain('/projects/bar/src/app/foo/foo.component.css');
+  });
+
+  it('should respect the style preprocessor option', () => {
+    const options = { ...defaultOptions, style: Style.Sass };
     const tree = schematicRunner.runSchematic('component', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
     expect(content).toMatch(/styleUrls: \['.\/foo.component.scss/);

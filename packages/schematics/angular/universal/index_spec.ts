@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import { Schema as ApplicationOptions } from '../application/schema';
+import { Schema as ApplicationOptions, Style } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as UniversalOptions } from './schema';
 
@@ -33,7 +33,7 @@ describe('Universal Schematic', () => {
     inlineStyle: false,
     inlineTemplate: false,
     routing: false,
-    style: 'css',
+    style: Style.Css,
     skipTests: false,
     skipPackageJson: false,
   };
@@ -44,7 +44,7 @@ describe('Universal Schematic', () => {
     inlineStyle: false,
     inlineTemplate: false,
     routing: false,
-    style: 'css',
+    style: Style.Css,
     skipTests: false,
     skipPackageJson: false,
   };

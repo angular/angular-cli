@@ -32,7 +32,7 @@ import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { buildDefaultPath, getProject } from '../utility/project';
 import { validateHtmlSelector, validateName } from '../utility/validation';
-import { Schema as ComponentOptions } from './schema';
+import { Schema as ComponentOptions, Style } from './schema';
 
 function readIntoSourceFile(host: Tree, modulePath: string): ts.SourceFile {
   const text = host.read(modulePath);
@@ -145,9 +145,9 @@ export default function (options: ComponentOptions): Rule {
 
     // todo remove these when we remove the deprecations
     options.style = (
-      options.style && options.style !== 'css'
-        ? options.style : options.styleext
-    ) || 'css';
+      options.style && options.style !== Style.Css
+        ? options.style : options.styleext as Style
+    ) || Style.Css;
     options.skipTests = options.skipTests || !options.spec;
 
     validateName(options.name);
@@ -155,12 +155,13 @@ export default function (options: ComponentOptions): Rule {
 
     const templateSource = apply(url('./files'), [
       options.skipTests ? filter(path => !path.endsWith('.spec.ts.template')) : noop(),
-      options.inlineStyle ? filter(path => !path.endsWith('.__style__.template')) : noop(),
+      options.inlineStyle ? filter(path => !path.endsWith('.__styleExt__.template')) : noop(),
       options.inlineTemplate ? filter(path => !path.endsWith('.html.template')) : noop(),
       applyTemplates({
         ...strings,
         'if-flat': (s: string) => options.flat ? '' : s,
         ...options,
+        styleExt: styleToFileExtention(options.style),
       }),
       move(parsedPath.path),
     ]);
@@ -173,4 +174,13 @@ export default function (options: ComponentOptions): Rule {
       options.lintFix ? applyLintFix(options.path) : noop(),
     ]);
   };
+}
+
+export function styleToFileExtention(style: Style | undefined): string {
+  switch (style) {
+    case Style.Sass:
+      return 'scss';
+    default:
+      return style || 'css';
+  }
 }

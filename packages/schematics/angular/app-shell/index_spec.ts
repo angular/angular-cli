@@ -33,7 +33,6 @@ describe('App Shell Schematic', () => {
     inlineStyle: false,
     inlineTemplate: false,
     routing: true,
-    style: 'css',
     skipTests: false,
     skipPackageJson: false,
   };
