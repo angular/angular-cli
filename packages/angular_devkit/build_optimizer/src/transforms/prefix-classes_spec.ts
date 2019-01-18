@@ -173,6 +173,26 @@ describe('prefix-classes', () => {
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
+  it('prefix TS 2.5 - 2.6 renamed downlevel class', () => {
+    const input = tags.stripIndent`
+      var ComponentFactoryResolver$1 = /** @class */ (function () {
+        function ComponentFactoryResolver$$1() {
+        }
+        return ComponentFactoryResolver$$1;
+      }());
+    `;
+    const output = tags.stripIndent`
+      var ComponentFactoryResolver$1 = /** @class */ /*@__PURE__*/ (function () {
+        function ComponentFactoryResolver$$1() {
+        }
+        return ComponentFactoryResolver$$1;
+      }());
+    `;
+
+    expect(testPrefixClasses(input)).toBeTruthy();
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
+
   it('prefix TS 2.5 - 2.6 downlevel class with static variable', () => {
     const input = tags.stripIndent`
       var StaticTestCase = /** @class */ (function () {
