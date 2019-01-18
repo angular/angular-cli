@@ -31,6 +31,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
+import { styleToFileExtention } from '../component/index';
 import { Schema as ComponentOptions } from '../component/schema';
 import { Schema as E2eOptions } from '../e2e/schema';
 import {
@@ -48,7 +49,7 @@ import {
   WorkspaceProject,
   WorkspaceSchema,
 } from '../utility/workspace-models';
-import { Schema as ApplicationOptions } from './schema';
+import { Schema as ApplicationOptions, Style } from './schema';
 
 
 // TODO: use JsonAST
@@ -162,7 +163,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
 
   if (options.inlineTemplate === true
     || options.inlineStyle === true
-    || options.style !== 'css') {
+    || options.style !== Style.Css) {
     schematics['@schematics/angular:component'] = {};
     if (options.inlineTemplate === true) {
       (schematics['@schematics/angular:component'] as JsonObject).inlineTemplate = true;
@@ -170,7 +171,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
     if (options.inlineStyle === true) {
       (schematics['@schematics/angular:component'] as JsonObject).inlineStyle = true;
     }
-    if (options.style && options.style !== 'css') {
+    if (options.style && options.style !== Style.Css) {
       (schematics['@schematics/angular:component'] as JsonObject).styleext = options.style;
     }
   }
@@ -346,6 +347,8 @@ export default function (options: ApplicationOptions): Rule {
       projectRoot: newProjectRoot ? `${newProjectRoot}/${options.name}-e2e` : 'e2e',
     };
 
+    const styleExt = styleToFileExtention(options.style);
+
     return chain([
       addAppToWorkspaceFile(options, workspace),
       mergeWith(
@@ -356,6 +359,7 @@ export default function (options: ApplicationOptions): Rule {
             ...options,
             'dot': '.',
             relativePathToWorkspaceRoot,
+            styleExt,
           }),
           move(sourceRoot),
         ])),
@@ -417,6 +421,7 @@ export default function (options: ApplicationOptions): Rule {
             ...options as any,  // tslint:disable-line:no-any
             selector: appRootSelector,
             ...componentOptions,
+            styleExt,
           }),
           move(sourceDir),
         ]), MergeStrategy.Overwrite),

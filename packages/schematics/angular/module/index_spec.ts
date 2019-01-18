@@ -34,7 +34,6 @@ describe('Module Schematic', () => {
     inlineStyle: false,
     inlineTemplate: false,
     routing: false,
-    style: 'css',
     skipTests: false,
     skipPackageJson: false,
   };

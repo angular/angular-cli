@@ -111,15 +111,22 @@
       "alias": "p"
     },
     "style": {
-      "description": "The file extension to use for style files.",
+      "description": "The file extension or preprocessor to use for style files.",
       "type": "string",
       "default": "css",
+      "enum": [
+        "css",
+        "scss",
+        "sass",
+        "less",
+        "styl"
+      ],
       "x-prompt": {
         "message": "Which stylesheet format would you like to use?",
         "type": "list",
         "items": [
           { "value": "css", "label": "CSS" },
-          { "value": "scss", "label": "Sass   [ http://sass-lang.com   ]" },
+          { "value": "sass", "label": "Sass   [ http://sass-lang.com   ]" },
           { "value": "less", "label": "Less   [ http://lesscss.org     ]" },
           { "value": "styl", "label": "Stylus [ http://stylus-lang.com ]" }
         ]

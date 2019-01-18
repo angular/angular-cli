@@ -140,9 +140,16 @@
               "default": "css"
             },
             "style": {
-              "description": "The file extension to use for style files.",
+              "description": "The file extension or preprocessor to use for style files.",
               "type": "string",
-              "default": "css"
+              "default": "css",
+              "enum": [
+                "css",
+                "scss",
+                "sass",
+                "less",
+                "styl"
+              ]
             },
             "viewEncapsulation": {
               "description": "Specifies the view encapsulation strategy.",
