@@ -14,6 +14,6 @@ export const latestVersions = {
   TypeScript: '~3.2.2',
   TsLib: '^1.9.0',
   // The versions below must be manually updated when making a new devkit release.
-  DevkitBuildAngular: '~0.12.0-rc.0',
-  DevkitBuildNgPackagr: '~0.12.0-rc.0',
+  DevkitBuildAngular: '~0.13.0-beta.0',
+  DevkitBuildNgPackagr: '~0.13.0-beta.0',
 };
