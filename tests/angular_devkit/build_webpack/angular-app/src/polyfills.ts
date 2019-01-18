@@ -44,7 +44,11 @@
 /** IE10 and IE11 requires the following for NgClass support on SVG elements */
 // import 'classlist.js';  // Run `npm install --save classlist.js`.
 
-/** IE10 and IE11 requires the following for the Reflect API. */
+/**
+ * IE10 and IE11 requires the following for the Reflect API.
+ * `es6/reflect` is needed, if you use any of these features in your application, to work in IE10 and IE11.
+ * `es7/reflect` is required by Angular when running JIT Compilation (`--aot=false`) but this will be imported by default.
+ */
 // import 'core-js/es6/reflect';
 
 
