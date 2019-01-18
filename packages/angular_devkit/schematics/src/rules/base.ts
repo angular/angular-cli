@@ -9,7 +9,6 @@ import { Observable, of as observableOf } from 'rxjs';
 import { concatMap, last, map } from 'rxjs/operators';
 import { FileOperator, Rule, SchematicContext, Source } from '../engine/interface';
 import { SchematicsException } from '../exception/exception';
-import { FilteredTree } from '../tree/filtered';
 import { FilterHostTree, HostTree } from '../tree/host-tree';
 import { FileEntry, FilePredicate, MergeStrategy, Tree } from '../tree/interface';
 import { ScopedTree } from '../tree/scoped';
@@ -17,10 +16,8 @@ import {
   branch,
   empty as staticEmpty,
   merge as staticMerge,
-  optimize as staticOptimize,
   partition as staticPartition,
 } from '../tree/static';
-import { VirtualTree } from '../tree/virtual';
 import { callRule, callSource } from './call';
 
 
@@ -56,24 +53,7 @@ export function chain(rules: Rule[]): Rule {
  * Apply multiple rules to a source, and returns the source transformed.
  */
 export function apply(source: Source, rules: Rule[]): Source {
-  return (context: SchematicContext) => {
-    return callRule(chain([
-      ...rules,
-      // Optimize the tree. Since this is a source tree, there's not much harm here and this might
-      // avoid further issues.
-      tree => {
-        if (tree instanceof VirtualTree) {
-          tree.optimize();
-
-          return tree;
-        } else if (tree.actions.length != 0) {
-          return staticOptimize(tree);
-        } else {
-          return tree;
-        }
-      },
-    ]), callSource(source, context), context);
-  };
+  return context => callRule(chain(rules), callSource(source, context), context);
 }
 
 
@@ -96,10 +76,7 @@ export function noop(): Rule {
 
 export function filter(predicate: FilePredicate<boolean>): Rule {
   return ((tree: Tree) => {
-    // TODO: Remove VirtualTree usage in 7.0
-    if (VirtualTree.isVirtualTree(tree)) {
-      return new FilteredTree(tree, predicate);
-    } else if (HostTree.isHostTree(tree)) {
+    if (HostTree.isHostTree(tree)) {
       return new FilterHostTree(tree, predicate);
     } else {
       throw new SchematicsException('Tree type is not supported.');
