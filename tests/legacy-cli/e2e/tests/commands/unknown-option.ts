@@ -15,4 +15,13 @@ export default async function() {
     [ 'build', '--notanoption' ],
     /should NOT have additional properties\(notanoption\)./,
   ));
+
+  const ngGenerateArgs = [ 'generate', 'component', 'component-name', '--notanoption' ];
+  await expectToFail(() => ng(...ngGenerateArgs));
+
+  await execAndWaitForOutputToMatch(
+    'ng',
+    ngGenerateArgs,
+    /Unknown option: '--notanoption'/,
+  );
 }

@@ -437,6 +437,15 @@ export abstract class SchematicCommand<
       args = await this.parseArguments(schematicOptions || [], o);
     }
 
+    // ng-add is special because we don't know all possible options at this point
+    if (args['--'] && schematicName !== 'ng-add') {
+      args['--'].forEach(additional => {
+        this.logger.fatal(`Unknown option: '${additional.split(/=/)[0]}'`);
+      });
+
+      return 1;
+    }
+
     const pathOptions = o ? this.setPathOptions(o, workingDir) : {};
     let input = Object.assign(pathOptions, args);
 
