@@ -128,7 +128,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
       (schematics['@schematics/angular:component'] as JsonObject).inlineStyle = true;
     }
     if (options.style && options.style !== 'css') {
-      (schematics['@schematics/angular:component'] as JsonObject).styleext = options.style;
+      (schematics['@schematics/angular:component'] as JsonObject).style = options.style;
     }
   }
 
