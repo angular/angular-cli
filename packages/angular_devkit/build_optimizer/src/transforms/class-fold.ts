@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
+import { addPureComment } from '../helpers/ast-utils';
 
 interface ClassData {
   name: string;
@@ -81,18 +82,12 @@ export function getFoldFileTransformer(program: ts.Program): ts.TransformerFacto
           const classStatement = clazz.declaration as ts.ClassDeclaration;
           const innerReturn = ts.createReturn(ts.createIdentifier(clazz.name));
 
-          const iife = ts.createImmediatelyInvokedFunctionExpression([
-            classStatement,
-            ...clazz.statements.map(st => st.expressionStatement),
-            innerReturn,
-          ]);
-
-          const pureIife = ts.addSyntheticLeadingComment(
-            iife,
-            ts.SyntaxKind.MultiLineCommentTrivia,
-            '@__PURE__',
-            false,
-          );
+          const pureIife = addPureComment(
+            ts.createImmediatelyInvokedFunctionExpression([
+              classStatement,
+              ...clazz.statements.map(st => st.expressionStatement),
+              innerReturn,
+            ]));
 
           // Move the original class modifiers to the var statement.
           const newNode = ts.createVariableStatement(

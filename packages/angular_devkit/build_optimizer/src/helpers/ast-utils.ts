@@ -7,6 +7,8 @@
  */
 import * as ts from 'typescript';
 
+const pureFunctionComment = '@__PURE__';
+
 // Find all nodes from the AST in the subtree of node of SyntaxKind kind.
 export function collectDeepNodes<T extends ts.Node>(node: ts.Node, kind: ts.SyntaxKind): T[] {
   const nodes: T[] = [];
@@ -19,4 +21,23 @@ export function collectDeepNodes<T extends ts.Node>(node: ts.Node, kind: ts.Synt
   ts.forEachChild(node, helper);
 
   return nodes;
+}
+
+export function addPureComment<T extends ts.Node>(node: T): T {
+  return ts.addSyntheticLeadingComment(
+    node,
+    ts.SyntaxKind.MultiLineCommentTrivia,
+    pureFunctionComment,
+    false,
+  );
+}
+
+export function hasPureComment(node: ts.Node): boolean {
+  if (!node) {
+    return false;
+  }
+
+  const leadingComment = ts.getSyntheticLeadingComments(node);
+
+  return !!leadingComment && leadingComment.some(comment => comment.text === pureFunctionComment);
 }

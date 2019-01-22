@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
+import { addPureComment } from '../helpers/ast-utils';
 
 function isBlockLike(node: ts.Node): node is ts.BlockLike {
   return node.kind === ts.SyntaxKind.Block
@@ -382,17 +383,6 @@ function findEnumNameStatements(
   }
 
   return enumStatements;
-}
-
-function addPureComment<T extends ts.Node>(node: T): T {
-  const pureFunctionComment = '@__PURE__';
-
-  return ts.addSyntheticLeadingComment(
-    node,
-    ts.SyntaxKind.MultiLineCommentTrivia,
-    pureFunctionComment,
-    false,
-  );
 }
 
 function updateHostNode(
