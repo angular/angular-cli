@@ -292,6 +292,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     context: projectRoot,
     entry: entryPoints,
     output: {
+      futureEmitAssets: true,
       path: path.resolve(root, buildOptions.outputPath as string),
       publicPath: buildOptions.deployUrl,
       filename: `[name]${hashFormat.chunk}.js`,
