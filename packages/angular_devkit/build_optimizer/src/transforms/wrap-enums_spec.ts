@@ -38,6 +38,64 @@ describe('wrap-enums', () => {
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
+  it('wraps ES2015 tsickle enums in IIFE', () => {
+    const input = tags.stripIndent`
+      const ChangeDetectionStrategy = {
+          OnPush: 0,
+          Default: 1,
+      };
+      export { ChangeDetectionStrategy };
+      ChangeDetectionStrategy[ChangeDetectionStrategy.OnPush] = 'OnPush';
+      ChangeDetectionStrategy[ChangeDetectionStrategy.Default] = 'Default';
+    `;
+
+    const output = tags.stripIndent`
+      export const ChangeDetectionStrategy = /*@__PURE__*/ (function () {
+          var ChangeDetectionStrategy = { OnPush: 0, Default: 1, };
+
+          ChangeDetectionStrategy[ChangeDetectionStrategy.OnPush] = 'OnPush';
+          ChangeDetectionStrategy[ChangeDetectionStrategy.Default] = 'Default';
+          return ChangeDetectionStrategy;
+      }());
+    `;
+
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
+
+  it('wraps only ES2015 tsickle enums in IIFE', () => {
+    const input = tags.stripIndent`
+      const RendererStyleFlags3 = {
+          Important: 1,
+          DashCase: 2,
+      };
+      export { RendererStyleFlags3 };
+      RendererStyleFlags3[RendererStyleFlags3.Important] = 'Important';
+      RendererStyleFlags3[RendererStyleFlags3.DashCase] = 'DashCase';
+
+      export const domRendererFactory3 = {
+          createRenderer: (hostElement, rendererType) => { return document; }
+      };
+
+      export const unusedValueExportToPlacateAjd = 1;
+    `;
+    const output = tags.stripIndent`
+      export const RendererStyleFlags3 = /*@__PURE__*/ (function () {
+        var RendererStyleFlags3 = { Important: 1, DashCase: 2, };
+        RendererStyleFlags3[RendererStyleFlags3.Important] = 'Important';
+        RendererStyleFlags3[RendererStyleFlags3.DashCase] = 'DashCase';
+        return RendererStyleFlags3;
+      }());
+
+      export const domRendererFactory3 = {
+        createRenderer: (hostElement, rendererType) => { return document; }
+      };
+
+      export const unusedValueExportToPlacateAjd = 1;
+    `;
+
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
+
   it('wraps ts >2.3 enums in IIFE', () => {
     const input = tags.stripIndent`
       export var ChangeDetectionStrategy;
