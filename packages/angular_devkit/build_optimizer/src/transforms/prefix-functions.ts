@@ -6,9 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-
-
-const pureFunctionComment = '@__PURE__';
+import { addPureComment, hasPureComment } from '../helpers/ast-utils';
 
 export function getPrefixFunctionsTransformer(): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
@@ -19,8 +17,7 @@ export function getPrefixFunctionsTransformer(): ts.TransformerFactory<ts.Source
       const visitor: ts.Visitor = (node: ts.Node): ts.Node => {
         // Add pure function comment to top level functions.
         if (topLevelFunctions.has(node)) {
-          const newNode = ts.addSyntheticLeadingComment(
-            node, ts.SyntaxKind.MultiLineCommentTrivia, pureFunctionComment, false);
+          const newNode = addPureComment(node);
 
           // Replace node with modified one.
           return ts.visitEachChild(newNode, visitor, context);
@@ -95,13 +92,4 @@ export function findTopLevelFunctions(parentNode: ts.Node): Set<ts.Node> {
   ts.forEachChild(parentNode, cb);
 
   return topLevelFunctions;
-}
-
-function hasPureComment(node: ts.Node) {
-  if (!node) {
-    return false;
-  }
-  const leadingComment = ts.getSyntheticLeadingComments(node);
-
-  return leadingComment && leadingComment.some((comment) => comment.text === pureFunctionComment);
 }
