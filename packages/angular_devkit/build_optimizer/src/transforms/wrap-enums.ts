@@ -120,6 +120,14 @@ function visitBlockStatements(
         } else if (ts.isObjectLiteralExpression(variableDeclaration.initializer)
           && variableDeclaration.initializer.properties.length !== 0) {
           const literalPropertyCount = variableDeclaration.initializer.properties.length;
+
+          // tsickle es2015 enums first statement is an export declaration
+          const isPotentialEnumExport = ts.isExportDeclaration(statements[oIndex + 1]);
+          if (isPotentialEnumExport) {
+            // skip the export
+            oIndex ++;
+          }
+
           const enumStatements = findEnumNameStatements(name, statements, oIndex + 1);
           if (enumStatements.length === literalPropertyCount) {
             // found an enum
@@ -127,11 +135,13 @@ function visitBlockStatements(
               updatedStatements = statements.slice();
             }
             // create wrapper and replace variable statement and enum member statements
-            updatedStatements.splice(uIndex, enumStatements.length + 1, createWrappedEnum(
+            const deleteCount = enumStatements.length + (isPotentialEnumExport ? 2 : 1);
+            updatedStatements.splice(uIndex, deleteCount, createWrappedEnum(
               name,
               currentStatement,
               enumStatements,
               variableDeclaration.initializer,
+              isPotentialEnumExport,
             ));
             // skip enum member declarations
             oIndex += enumStatements.length;
@@ -475,8 +485,18 @@ function createWrappedEnum(
   hostNode: ts.VariableStatement,
   statements: Array<ts.Statement>,
   literalInitializer: ts.ObjectLiteralExpression | undefined,
+  addExportModifier = false,
 ): ts.Statement {
   literalInitializer = literalInitializer || ts.createObjectLiteral();
+
+  const node = addExportModifier
+    ? ts.updateVariableStatement(
+      hostNode,
+      [ts.createToken(ts.SyntaxKind.ExportKeyword)],
+      hostNode.declarationList,
+    )
+    : hostNode;
+
   const innerVarStmt = ts.createVariableStatement(
     undefined,
     ts.createVariableDeclarationList([
@@ -492,5 +512,5 @@ function createWrappedEnum(
     innerReturn,
   ]);
 
-  return updateHostNode(hostNode, addPureComment(ts.createParen(iife)));
+  return updateHostNode(node, addPureComment(ts.createParen(iife)));
 }
