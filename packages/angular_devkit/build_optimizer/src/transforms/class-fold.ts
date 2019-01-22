@@ -9,8 +9,8 @@ import * as ts from 'typescript';
 
 interface ClassData {
   name: string;
-  class: ts.VariableDeclaration;
-  classFunction: ts.FunctionExpression;
+  declaration: ts.VariableDeclaration | ts.ClassDeclaration;
+  function?: ts.FunctionExpression;
   statements: StatementData[];
 }
 
@@ -26,28 +26,34 @@ export function getFoldFileTransformer(program: ts.Program): ts.TransformerFacto
 
     const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
 
-      const classes = findClassDeclarations(sf);
-      const statements = findClassStaticPropertyAssignments(sf, checker, classes);
+      const statementsToRemove: ts.ExpressionStatement[] = [];
+      const classesWithoutStatements = findClassDeclarations(sf);
+      let classes = findClassesWithStaticPropertyAssignments(sf, checker, classesWithoutStatements);
 
       const visitor: ts.Visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
+        if (classes.length === 0 && statementsToRemove.length === 0) {
+          // There are no more statements to fold.
+          return ts.visitEachChild(node, visitor, context);
+        }
+
         // Check if node is a statement to be dropped.
-        if (statements.find((st) => st.expressionStatement === node)) {
+        const stmtIdx = statementsToRemove.indexOf(node as ts.ExpressionStatement);
+        if (stmtIdx != -1) {
+          statementsToRemove.splice(stmtIdx, 1);
+
           return undefined;
         }
 
-        // Check if node is a class to add statements to.
-        const clazz = classes.find((cl) => cl.classFunction === node);
+        // Check if node is a ES5 class to add statements to.
+        let clazz = classes.find((cl) => cl.function === node);
         if (clazz) {
-          const functionExpression: ts.FunctionExpression = node as ts.FunctionExpression;
-
-          const newExpressions = clazz.statements.map((st) =>
-            ts.createStatement(st.expressionStatement.expression));
+          const functionExpression = node as ts.FunctionExpression;
 
           // Create a new body with all the original statements, plus new ones,
           // plus return statement.
           const newBody = ts.createBlock([
             ...functionExpression.body.statements.slice(0, -1),
-            ...newExpressions,
+            ...clazz.statements.map(st => st.expressionStatement),
             ...functionExpression.body.statements.slice(-1),
           ]);
 
@@ -61,8 +67,47 @@ export function getFoldFileTransformer(program: ts.Program): ts.TransformerFacto
             newBody,
           );
 
+          // Update remaining classes and statements.
+          statementsToRemove.push(...clazz.statements.map(st => st.expressionStatement));
+          classes = classes.filter(cl => cl != clazz);
+
           // Replace node with modified one.
-          return ts.visitEachChild(newNode, visitor, context);
+          return newNode;
+        }
+
+        // Check if node is a ES2015 class to replace with a pure IIFE.
+        clazz = classes.find((cl) => !cl.function && cl.declaration === node);
+        if (clazz) {
+          const classStatement = clazz.declaration as ts.ClassDeclaration;
+          const innerReturn = ts.createReturn(ts.createIdentifier(clazz.name));
+
+          const iife = ts.createImmediatelyInvokedFunctionExpression([
+            classStatement,
+            ...clazz.statements.map(st => st.expressionStatement),
+            innerReturn,
+          ]);
+
+          const pureIife = ts.addSyntheticLeadingComment(
+            iife,
+            ts.SyntaxKind.MultiLineCommentTrivia,
+            '@__PURE__',
+            false,
+          );
+
+          // Move the original class modifiers to the var statement.
+          const newNode = ts.createVariableStatement(
+            clazz.declaration.modifiers,
+            ts.createVariableDeclarationList([
+              ts.createVariableDeclaration(clazz.name, undefined, pureIife),
+            ], ts.NodeFlags.Const),
+          );
+          clazz.declaration.modifiers = undefined;
+
+          // Update remaining classes and statements.
+          statementsToRemove.push(...clazz.statements.map(st => st.expressionStatement));
+          classes = classes.filter(cl => cl != clazz);
+
+          return newNode;
         }
 
         // Otherwise return node as is.
@@ -80,6 +125,19 @@ function findClassDeclarations(node: ts.Node): ClassData[] {
   const classes: ClassData[] = [];
   // Find all class declarations, build a ClassData for each.
   ts.forEachChild(node, (child) => {
+    // Check if it is a named class declaration first.
+    // Technically it doesn't need a name in TS if it's the default export, but when downleveled
+    // it will be have a name (e.g. `default_1`).
+    if (ts.isClassDeclaration(child) && child.name) {
+      classes.push({
+        name: child.name.text,
+        declaration: child,
+        statements: [],
+      });
+
+      return;
+    }
+
     if (child.kind !== ts.SyntaxKind.VariableStatement) {
       return;
     }
@@ -122,8 +180,8 @@ function findClassDeclarations(node: ts.Node): ClassData[] {
     }
     classes.push({
       name,
-      class: varDecl,
-      classFunction: fn,
+      declaration: varDecl,
+      function: fn,
       statements: [],
     });
   });
@@ -131,13 +189,11 @@ function findClassDeclarations(node: ts.Node): ClassData[] {
   return classes;
 }
 
-function findClassStaticPropertyAssignments(
+function findClassesWithStaticPropertyAssignments(
   node: ts.Node,
   checker: ts.TypeChecker,
-  classes: ClassData[]): StatementData[] {
-
-  const statements: StatementData[] = [];
-
+  classes: ClassData[],
+) {
   // Find each assignment outside of the declaration.
   ts.forEachChild(node, (child) => {
     if (child.kind !== ts.SyntaxKind.ExpressionStatement) {
@@ -166,15 +222,15 @@ function findClassStaticPropertyAssignments(
       return;
     }
 
-    const hostClass = classes.find((clazz => decls.includes(clazz.class)));
+    const hostClass = classes.find((clazz => decls.includes(clazz.declaration)));
     if (!hostClass) {
       return;
     }
     const statement: StatementData = { expressionStatement, hostClass };
 
     hostClass.statements.push(statement);
-    statements.push(statement);
   });
 
-  return statements;
+  // Only return classes that have static property assignments.
+  return classes.filter(cl => cl.statements.length != 0);
 }
