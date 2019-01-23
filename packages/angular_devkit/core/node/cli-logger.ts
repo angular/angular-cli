@@ -29,7 +29,7 @@ export function createConsoleLogger(
       let output = stdout;
       switch (entry.level) {
         case 'info':
-          color = terminal.reset;
+          color = s => s;
           break;
         case 'warn':
           color = (s: string) => terminal.bold(terminal.yellow(s));
