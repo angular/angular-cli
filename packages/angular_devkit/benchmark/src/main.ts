@@ -98,10 +98,11 @@ export async function main({
       let output = stdout;
       switch (entry.level) {
         case 'info':
-          color = terminal.white;
+          color = s => s;
           break;
         case 'warn':
           color = terminal.yellow;
+          output = stderr;
           break;
         case 'error':
           color = terminal.red;
