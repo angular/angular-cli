@@ -8,7 +8,8 @@
 
 import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize, virtualFs } from '@angular-devkit/core';
-import { tap } from 'rxjs/operators';
+import { EMPTY } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import { TslintBuilderOptions } from '../../src';
 import { host, tslintTargetSpec } from '../utils';
 
@@ -212,6 +213,37 @@ describe('Tslint Target', () => {
 
     runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+    ).toPromise().then(done, done.fail);
+  }, 30000);
+
+  it('works when a file is only part of one project when using two program', (done) => {
+    const overrides: Partial<TslintBuilderOptions> = {
+      tsConfig: ['src/tsconfig.app.json', 'src/tsconfig.spec.json'],
+      files: ['src/foo/foo.component.ts'],
+    };
+
+    host.writeMultipleFiles({ 'src/foo/foo.component.ts': `const foo = '';\n` });
+
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+    ).toPromise().then(done, done.fail);
+  }, 30000);
+
+  it('errors when file is not part of any typescript program', (done) => {
+    const overrides: Partial<TslintBuilderOptions> = {
+      tsConfig: ['src/tsconfig.spec.json'],
+      files: ['src/foo/foo.component.ts'],
+    };
+
+    host.writeMultipleFiles({ 'src/foo/foo.component.ts': `const foo = '';\n` });
+
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(false)),
+      catchError((err) => {
+        expect(err).toMatch(`foo.component.ts' is not part of a TypeScript project`);
+
+        return EMPTY;
+      }),
     ).toPromise().then(done, done.fail);
   }, 30000);
 
