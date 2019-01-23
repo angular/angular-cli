@@ -91,7 +91,12 @@ async function _publishSnapshot(
 
   _exec('git', ['clone', url], { cwd: root }, publishLogger);
   if (branch) {
-    _exec('git', ['checkout', '-B', branch], { cwd: destPath }, publishLogger);
+    // Try to checkout an existing branch, otherwise create it.
+    try {
+      _exec('git', ['checkout', branch], { cwd: destPath }, publishLogger);
+    } catch {
+      _exec('git', ['checkout', '-b', branch], { cwd: destPath }, publishLogger);
+    }
   }
 
   // Clear snapshot directory before publishing to remove deleted build files.
