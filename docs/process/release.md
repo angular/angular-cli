@@ -56,6 +56,11 @@ See `scripts/release.ts` for the full list of release types, e.g. patch updates 
 
 ```bash
 devkit-admin release patch --force # replace with minor-beta etc.
+```
+
+Make sure you update the package versions in `packages/schematics/angular/utility/latest-versions.ts`. After that:
+
+```bash
 git commit -a -m 'release: vXX'
 git tag 'vXX'
 git push upstream && git push upstream --tags
