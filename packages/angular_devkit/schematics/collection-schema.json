@@ -26,6 +26,12 @@
       "additionalProperties": {
         "type": "object",
         "properties": {
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "factory": {
             "type": "string",
             "description": "A folder or file path to the schematic factory"
