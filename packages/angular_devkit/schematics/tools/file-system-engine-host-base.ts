@@ -9,6 +9,7 @@ import {
   BaseException,
   InvalidJsonCharacterException,
   JsonObject,
+  Path,
   UnexpectedEndOfInputException,
   isObservable,
   isPromise,
@@ -17,21 +18,23 @@ import {
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { existsSync, statSync } from 'fs';
-import { dirname, isAbsolute, join, resolve } from 'path';
+import fetch from 'node-fetch';
+import { basename, dirname, isAbsolute, join, resolve } from 'path';
 import {
   Observable,
   from as observableFrom,
   of as observableOf,
   throwError,
 } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
-import { Url } from 'url';
+import { concatMap, filter, map, merge, mergeMap, shareReplay } from 'rxjs/operators';
+import { Url, parse } from 'url';
 import {
   HostCreateTree,
   RuleFactory,
   Source,
   TaskExecutor,
   TaskExecutorFactory,
+  Tree,
   UnregisteredTaskException,
 } from '../src';
 import {
@@ -287,6 +290,45 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
           const root = normalize(resolve(context.schematic.description.path, url.path || ''));
 
           return new HostCreateTree(new virtualFs.ScopedHost(new NodeJsSyncHost(), root));
+        };
+      case 'http:':
+      case 'https:':
+        return (context: FileSystemSchematicContext) => {
+          const tree = Tree.empty();
+          const urlPath = url.path;
+          if (!urlPath) {
+            return observableOf(tree);
+          }
+
+          // Make the remote request via fetch.
+          const req$ = observableFrom(fetch(urlPath)).pipe(shareReplay());
+
+          // Handle whether the call succeeded.
+          const success$ = req$.pipe(
+            filter(response => response.status === 200),
+            concatMap(response => response.text()),
+            map(content => {
+              const parsedUrl = parse(urlPath);
+
+              const destFileName = basename(parsedUrl.pathname as Path);
+              if (destFileName && content.length !== 0) {
+                tree.create(destFileName, content);
+              }
+
+              return tree;
+            }),
+          );
+
+          // Handle whether the call failed.
+          const failure$ = req$.pipe(
+            filter(response => response.status !== 200),
+            map(_ => {
+              return tree;
+            }),
+          );
+
+          // Merge the success and failure processors (only one will emit).
+          return success$.pipe(merge(failure$));
         };
     }
 

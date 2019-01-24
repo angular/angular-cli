@@ -28,8 +28,10 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",  # TODO: get rid of this for 6.0
         "@npm//rxjs",
-        
+        "@npm//node-fetch",
+
         "@npm//@types/node",
+        "@npm//@types/node-fetch",
     ],
 )
 
@@ -47,9 +49,11 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
         "@npm//rxjs",
-        
+        "@npm//node-fetch",
+
         "@npm//@types/node",
         "@npm//@types/jasmine",
+        "@npm//@types/node-fetch",
     ],
     testonly = True,
     # @external_begin
@@ -89,7 +93,7 @@ ts_library(
         "@npm//tslint",
         "@npm//typescript",
         "@npm//rxjs",
-        
+
         "//packages/angular_devkit/core:node",
         "//packages/angular_devkit/core",
     ],
@@ -115,7 +119,7 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
         "@npm//rxjs",
-        
+
         "@npm//@types/node",
     ],
 )
@@ -141,7 +145,7 @@ ts_library(
         "//packages/angular_devkit/core:node",
         "//packages/angular_devkit/core:node_testing",
         "@npm//rxjs",
-        
+
         "@npm//@types/node",
         "@npm//@types/jasmine",
     ],
@@ -184,7 +188,7 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
         "@npm//rxjs",
-        
+
         "@npm//@types/node",
     ],
 )
@@ -207,7 +211,7 @@ ts_library(
         "//packages/angular_devkit/core:node",
         "//tests/angular_devkit/schematics/tools/file-system-engine-host:file_system_engine_host_test_lib",
         "@npm//rxjs",
-        
+
         "@npm//@types/node",
         "@npm//@types/jasmine",
     ],
@@ -243,7 +247,7 @@ ts_library(
         ":tools",
         "//packages/angular_devkit/core",
         "@npm//rxjs",
-        
+
         "@npm//@types/node",
     ],
 )
