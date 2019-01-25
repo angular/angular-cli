@@ -173,7 +173,7 @@ export default function (options: ClassOptions): Rule {
       ]
     );
 
-    return branchAndMerge(mergeWith(templateSource));
+    return branchAndMerge(mergeWith(templateSource))(tree, context);
   };
 }
 ```
