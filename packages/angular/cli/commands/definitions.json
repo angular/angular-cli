@@ -49,7 +49,11 @@
           "default": false,
           "aliases": [ "f" ],
           "description": "When true, forces overwriting of existing files."
-        },
+        }
+      }
+    },
+    "interactive": {
+      "properties": {
         "interactive": {
           "type": "boolean",
           "default": "true",
