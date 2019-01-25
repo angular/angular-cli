@@ -24,7 +24,7 @@
       ]
     },
     {
-      "$ref": "./definitions.json#/definitions/schematic"
+      "$ref": "./definitions.json#/definitions/interactive"
     },
     {
       "$ref": "./definitions.json#/definitions/base"
