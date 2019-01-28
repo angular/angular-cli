@@ -140,7 +140,11 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
 
   private isPackageInstalled(name: string): boolean {
     try {
-      resolve(name, { checkLocal: true, basedir: this.workspace.root });
+      resolve(name, {
+        checkLocal: true,
+        basedir: this.workspace.root,
+        resolvePackageJson: true,
+      });
 
       return true;
     } catch (e) {
