@@ -454,7 +454,7 @@ export class AngularCompilerPlugin {
       });
       timeEnd('AngularCompilerPlugin._listLazyRoutesFromProgram.createProgram');
 
-      entryRoute = this.entryModule.path + '#' + this.entryModule.className;
+      entryRoute = workaroundResolve(this.entryModule.path) + '#' + this.entryModule.className;
     } else {
       ngProgram = this._program as Program;
     }
