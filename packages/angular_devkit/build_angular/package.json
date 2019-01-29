@@ -12,7 +12,7 @@
     "@angular-devkit/core": "0.0.0",
     "@ngtools/webpack": "0.0.0",
     "ajv": "6.7.0",
-    "autoprefixer": "9.4.6",
+    "autoprefixer": "9.4.7",
     "circular-dependency-plugin": "5.0.2",
     "clean-css": "4.2.1",
     "copy-webpack-plugin": "4.6.0",
