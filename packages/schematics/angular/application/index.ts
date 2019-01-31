@@ -185,6 +185,8 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
     });
   }
 
+  const styleExt = styleToFileExtention(options.style);
+
   const project: WorkspaceProject = {
     root: projectRoot,
     sourceRoot: join(normalize(projectRoot), 'src'),
@@ -205,7 +207,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
             join(normalize(projectRoot), 'src', 'assets'),
           ],
           styles: [
-            `${projectRoot}src/styles.${options.style}`,
+            `${projectRoot}src/styles.${styleExt}`,
           ],
           scripts: [],
           es5BrowserSupport: true,
@@ -258,7 +260,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
           tsConfig: `${rootFilesRoot}tsconfig.spec.json`,
           karmaConfig: `${rootFilesRoot}karma.conf.js`,
           styles: [
-            `${projectRoot}src/styles.${options.style}`,
+            `${projectRoot}src/styles.${styleExt}`,
           ],
           scripts: [],
           assets: [
