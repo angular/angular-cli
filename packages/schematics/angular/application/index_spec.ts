@@ -295,5 +295,17 @@ describe('Application Schematic', () => {
       expect(content.rules['directive-selector'][2]).toMatch('app');
       expect(content.rules['component-selector'][2]).toMatch('app');
     });
+
+    it('should use `scss` file extension instead of `sass` for `styles.scss`', () => {
+      const options = { ...defaultOptions, style: 'sass' };
+
+      const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+      const config = JSON.parse(tree.readContent('/angular.json'));
+      const project = config.projects.foo;
+      const projectArchitect = config.projects.foo.architect;
+      expect(projectArchitect.build.options.styles).toEqual(['projects/foo/src/styles.scss']);
+      expect(projectArchitect.test.options.styles).toEqual(['projects/foo/src/styles.scss']);
+    });
+
   });
 });
