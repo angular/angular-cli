@@ -10,13 +10,13 @@ import { existsSync } from 'fs';
 import * as path from 'path';
 import { Observable, of, throwError } from 'rxjs';
 import { concatMap, first, map, tap } from 'rxjs/operators';
-import { BaseException } from '../exception';
+import { BaseException } from '../../exception';
 import {
   JsonObject,
   JsonParseMode,
   parseJson,
   schema,
-} from '../json';
+} from '../../json';
 import {
   Path,
   basename,
@@ -24,8 +24,10 @@ import {
   isAbsolute,
   join,
   normalize,
-  relative, resolve, virtualFs,
-} from '../virtual-fs';
+  relative,
+  resolve,
+  virtualFs,
+} from '../../virtual-fs';
 import { WorkspaceProject, WorkspaceSchema, WorkspaceTool } from './workspace-schema';
 
 

@@ -8,10 +8,10 @@
 // tslint:disable:no-big-function
 
 import { tap } from 'rxjs/operators';
-import { schema } from '..';
-import { NodeJsSyncHost } from '../../node';
-import { AdditionalPropertiesValidatorError } from '../json/schema/interface';
-import { dirname, join, normalize } from '../virtual-fs';
+import { schema } from '../..';
+import { NodeJsSyncHost } from '../../../node';
+import { AdditionalPropertiesValidatorError } from '../../json/schema/interface';
+import { dirname, join, normalize } from '../../virtual-fs';
 import {
   ProjectNotFoundException,
   Workspace,
