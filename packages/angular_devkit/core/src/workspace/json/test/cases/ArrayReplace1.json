@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  // Comment
+  "schematics": {
+    "@angular/schematics:component": {
+      "prefix": "abc"
+    }
+  },
+  "x-baz": 1,
+  "x-foo": {
+    "is": [
+      "value"
+    ]
+  },
+  "x-bar": 5,
+}
