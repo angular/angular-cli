@@ -1,7 +1,8 @@
 import * as fs from 'fs-extra';
 import { readFile, writeFile, replaceInFile, prependToFile } from './fs';
-import { execAndWaitForOutputToMatch, npm, silentNpm, ng } from './process';
+import { execAndWaitForOutputToMatch, npm, silentNpm, ng, git } from './process';
 import { getGlobalVariable } from './env';
+import { gitCommit } from './git';
 
 const packages = require('../../../../lib/packages').packages;
 
@@ -32,23 +33,34 @@ export function ngServe(...args: string[]) {
 }
 
 
-export function createProject(name: string, ...args: string[]) {
+export async function createProject(name: string, ...args: string[]) {
+  process.chdir(getGlobalVariable('tmp-root'));
+  await ng('new', name, '--skip-install', ...args);
+  process.chdir(name);
+  await prepareProjectForE2e(name);
+}
+
+export async function prepareProjectForE2e(name) {
   const argv: any = getGlobalVariable('argv');
 
-  return Promise.resolve()
-    .then(() => process.chdir(getGlobalVariable('tmp-root')))
-    .then(() => ng('new', name, '--skip-install', ...args))
-    .then(() => process.chdir(name))
-    .then(() => useBuiltPackages())
-    .then(() => useCIChrome('e2e'))
-    .then(() => useCIChrome('src'))
-    .then(() => useDevKitSnapshots())
-    .then(() => argv['ng2'] ? useNg2() : Promise.resolve())
-    .then(() => argv['ng4'] ? useNg4() : Promise.resolve())
-    .then(() => argv['ng-snapshots'] || argv['ng-tag'] ? useSha() : Promise.resolve())
-    .then(() => console.log(`Project ${name} created... Installing npm.`))
-    .then(() => silentNpm('install'))
-    .then(() => useCIDefaults(name));
+  await git('config', 'user.email', 'angular-core+e2e@google.com');
+  await git('config', 'user.name', 'Angular CLI E2e');
+  await git('config', 'commit.gpgSign', 'false');
+  await useBuiltPackages();
+  await useCIChrome('e2e');
+  await useCIChrome('src');
+  await useDevKitSnapshots();
+  await argv['ng2'] ? useNg2() : Promise.resolve();
+  await argv['ng4'] ? useNg4() : Promise.resolve();
+  await argv['ng-snapshots'] || argv['ng-tag'] ? useSha() : Promise.resolve();
+  await console.log(`Project ${name} created... Installing npm.`);
+  await silentNpm('install');
+  await useCIDefaults(name);
+  // Force sourcemaps to be from the root of the filesystem.
+  await updateJsonFile('tsconfig.json', json => {
+    json['compilerOptions']['sourceRoot'] = '/';
+  });
+  await gitCommit('prepare-project-for-e2e');
 }
 
 
