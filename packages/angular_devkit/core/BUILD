@@ -57,8 +57,8 @@ ts_library(
         "@npm//@types/jasmine",
     ],
     data = [
-        "src/workspace/workspace-schema.json",
-        "src/workspace/test/test-workspace.json"
+        "src/experimental/workspace/workspace-schema.json",
+        "src/experimental/workspace/test/test-workspace.json"
     ],
     testonly = True,
     # @external_begin

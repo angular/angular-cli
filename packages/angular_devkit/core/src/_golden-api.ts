@@ -9,7 +9,7 @@
 export * from './exception/exception';
 
  // Start experimental namespace
-export * from './workspace/index';
+export * from './experimental/workspace/index';
 // End experimental namespace
 
 // Start json namespace
