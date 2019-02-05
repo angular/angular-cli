@@ -34,8 +34,15 @@ export function ngServe(...args: string[]) {
 
 
 export async function createProject(name: string, ...args: string[]) {
+  const argv: any = getGlobalVariable('argv');
+  const extraArgs = [];
+
+  if (argv['ivy']) {
+    extraArgs.push('--experimentalIvy');
+  }
+
   process.chdir(getGlobalVariable('tmp-root'));
-  await ng('new', name, '--skip-install', ...args);
+  await ng('new', name, '--skip-install', ...extraArgs, ...args);
   process.chdir(name);
   await prepareProjectForE2e(name);
 }

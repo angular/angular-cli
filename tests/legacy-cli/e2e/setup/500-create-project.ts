@@ -8,6 +8,11 @@ import {getGlobalVariable} from '../utils/env';
 
 export default async function() {
   const argv = getGlobalVariable('argv');
+  const extraArgs = [];
+
+  if (argv['ivy']) {
+    extraArgs.push('--experimentalIvy');
+  }
 
   if (argv.noproject) {
     return;
@@ -17,7 +22,7 @@ export default async function() {
     process.chdir(argv.reuse);
     await gitClean();
   } else {
-    await ng('new', 'test-project', '--skip-install');
+    await ng('new', 'test-project', '--skip-install', ...extraArgs);
     await expectFileToExist(join(process.cwd(), 'test-project'));
     process.chdir('./test-project');
   }

@@ -29,6 +29,7 @@ Error.stackTraceLimit = Infinity;
  *   --ng-tag=TAG     Use a specific tag for build snapshots. Similar to ng-snapshots but point to a
  *                    tag of using the latest master.
  *   --ng-snapshots   Install angular snapshot builds in the test project.
+ *   --ivy	          Use the Ivy compiler.
  *   --glob           Run tests matching this glob pattern (relative to tests/e2e/).
  *   --ignore         Ignore tests matching this glob pattern.
  *   --reuse=/path    Use a path instead of create a new project. That project should have been
@@ -51,6 +52,7 @@ const argv = minimist(process.argv.slice(2), {
     'nosilent',
     'noproject',
     'verbose',
+    'ivy',
   ],
   'string': ['devkit', 'glob', 'ignore', 'reuse', 'ng-tag', 'tmpdir', 'ng-version'],
   'number': ['nb-shards', 'shard'],
