@@ -114,6 +114,16 @@ jobs:
       - attach_workspace: *attach_options
       - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ng-snapshots
 
+  e2e-cli-ivy-snapshots:
+    <<: *defaults
+    environment:
+      BASH_ENV: ~/.profile
+    resource_class: xlarge
+    parallelism: 4
+    steps:
+      - attach_workspace: *attach_options
+      - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ng-snapshots --ivy
+
   build:
     <<: *defaults
     steps:
@@ -195,6 +205,12 @@ workflows:
               only:
               - /docs-preview/
       - e2e-cli-ng-snapshots:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+      - e2e-cli-ivy-snapshots:
           requires:
             - build
           filters:
