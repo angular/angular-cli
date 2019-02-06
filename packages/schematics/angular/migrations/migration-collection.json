@@ -29,6 +29,11 @@
       "version": "7.0.3",
       "factory": "./update-7/index#updateDevkitBuildNgPackagr",
       "description": "Update an Angular CLI project to version 7."
+    },
+    "migration-07": {
+      "version": "8.0.0",
+      "factory": "./update-vscode-recommendations/update-8.0.0",
+      "description": "Update an Angular CLI project to version 8.0.0"
     }
   }
 }
