@@ -285,7 +285,7 @@ const sourceMapReporter: any = function (this: any, baseReporterDecorator: any, 
 
   muteDuplicateReporterLogging(this, config);
 
-  const urlRegexp = /\(http:\/\/localhost:\d+\/_karma_webpack_\/webpack:\//gi;
+  const urlRegexp = /http:\/\/localhost:\d+\/_karma_webpack_\/webpack:\//gi;
 
   this.onSpecComplete = function (_browser: any, result: any) {
     if (!result.success && result.log.length > 0) {
