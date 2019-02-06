@@ -11,23 +11,36 @@ import { normalizeExtraEntryPoints } from '../models/webpack-configs/utils';
 export function generateEntryPoints(
   appConfig: { styles: ExtraEntryPoint[], scripts: ExtraEntryPoint[] },
 ) {
-  const entryPoints = ['es2015-polyfills', 'polyfills', 'sw-register'];
 
   // Add all styles/scripts, except lazy-loaded ones.
-  [
-    ...normalizeExtraEntryPoints(appConfig.styles, 'styles')
+  const extraEntryPoints = (
+    extraEntryPoints: ExtraEntryPoint[],
+    defaultBundleName: string,
+  ): string[] => {
+    const entryPoints = normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName)
       .filter(entry => !entry.lazy)
-      .map(entry => entry.bundleName),
-    ...normalizeExtraEntryPoints(appConfig.scripts, 'scripts')
-      .filter(entry => !entry.lazy)
-      .map(entry => entry.bundleName),
-  ].forEach(bundleName => {
-    if (entryPoints.indexOf(bundleName) === -1) {
-      entryPoints.push(bundleName);
-    }
-  });
+      .map(entry => entry.bundleName);
 
-  entryPoints.push('main');
+    // remove duplicates
+    return [...new Set(entryPoints)];
+  };
+
+  const entryPoints = [
+    'es2015-polyfills',
+    'polyfills',
+    'sw-register',
+    ...extraEntryPoints(appConfig.styles, 'styles'),
+    ...extraEntryPoints(appConfig.scripts, 'scripts'),
+    'main',
+  ];
+
+  const duplicates = [...new Set(
+    entryPoints.filter(x => entryPoints.indexOf(x) !== entryPoints.lastIndexOf(x)),
+  )];
+
+  if (duplicates.length > 0) {
+    throw new Error(`Multiple bundles have been named the same: '${duplicates.join(`', '`)}'.`);
+  }
 
   return entryPoints;
 }
