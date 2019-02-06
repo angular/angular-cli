@@ -166,7 +166,7 @@ describe('App Shell Schematic', () => {
 
   it('should create the shell component', () => {
     const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
-    expect(tree.exists('/projects/bar/src/app/app-shell/app-shell.component.ts'));
+    expect(tree.exists('/projects/bar/src/app/app-shell/app-shell.component.ts')).toBe(true);
     const content = tree.readContent('/projects/bar/src/app/app.server.module.ts');
     expect(content).toMatch(/app\-shell\.component/);
   });
