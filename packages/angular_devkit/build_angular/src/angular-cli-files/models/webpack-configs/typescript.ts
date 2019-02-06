@@ -13,16 +13,11 @@ import * as path from 'path';
 import {
   AngularCompilerPlugin,
   AngularCompilerPluginOptions,
+  NgToolsLoader,
   PLATFORM
 } from '@ngtools/webpack';
 import { buildOptimizerLoader } from './common';
 import { WebpackConfigOptions } from '../build-options';
-
-
-const g: any = typeof global !== 'undefined' ? global : {};
-const webpackLoader: string = g['_DevKitIsLocal']
-  ? require.resolve('@ngtools/webpack')
-  : '@ngtools/webpack';
 
 
 function _createAotPlugin(
@@ -92,7 +87,7 @@ export function getNonAotConfig(wco: WebpackConfigOptions, host: virtualFs.Host<
   const { tsConfigPath } = wco;
 
   return {
-    module: { rules: [{ test: /\.tsx?$/, loader: webpackLoader }] },
+    module: { rules: [{ test: /\.tsx?$/, loader: NgToolsLoader }] },
     plugins: [_createAotPlugin(wco, { tsConfigPath, skipCodeGeneration: true }, host)]
   };
 }
@@ -104,7 +99,7 @@ export function getAotConfig(
 ) {
   const { tsConfigPath, buildOptions } = wco;
 
-  const loaders: any[] = [webpackLoader];
+  const loaders: any[] = [NgToolsLoader];
   if (buildOptions.buildOptimizer) {
     loaders.unshift({
       loader: buildOptimizerLoader,
@@ -124,7 +119,7 @@ export function getNonAotTestConfig(wco: WebpackConfigOptions, host: virtualFs.H
   const { tsConfigPath } = wco;
 
   return {
-    module: { rules: [{ test: /\.tsx?$/, loader: webpackLoader }] },
+    module: { rules: [{ test: /\.tsx?$/, loader: NgToolsLoader }] },
     plugins: [_createAotPlugin(wco, { tsConfigPath, skipCodeGeneration: true }, host, false)]
   };
 }
