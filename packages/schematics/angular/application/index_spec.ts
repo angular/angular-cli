@@ -10,7 +10,7 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { latestVersions } from '../utility/latest-versions';
 import { getFileContent } from '../utility/test';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
-import { Schema as ApplicationOptions } from './schema';
+import { Schema as ApplicationOptions, Style } from './schema';
 
 // tslint:disable:max-line-length
 describe('Application Schematic', () => {
@@ -273,6 +273,22 @@ describe('Application Schematic', () => {
       expect(testOpt.styles).toEqual([
         'src/styles.css',
       ]);
+    });
+
+    it('should set values in angular.json correctly when using a style preprocessor', () => {
+      const options = { ...defaultOptions, projectRoot: '', style: Style.Sass };
+      const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+      const config = JSON.parse(tree.readContent('/angular.json'));
+      const prj = config.projects.foo;
+      const buildOpt = prj.architect.build.options;
+      expect(buildOpt.styles).toEqual([
+        'src/styles.scss',
+      ]);
+      const testOpt = prj.architect.test.options;
+      expect(testOpt.styles).toEqual([
+        'src/styles.scss',
+      ]);
+      expect(tree.exists('src/styles.scss')).toBe(true);
     });
 
     it('should set the relative tsconfig paths', () => {
