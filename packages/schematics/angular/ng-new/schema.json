@@ -126,7 +126,7 @@
         "type": "list",
         "items": [
           { "value": "css", "label": "CSS" },
-          { "value": "sass", "label": "Sass   [ http://sass-lang.com   ]" },
+          { "value": "scss", "label": "Sass   [ http://sass-lang.com   ]" },
           { "value": "less", "label": "Less   [ http://lesscss.org     ]" },
           { "value": "styl", "label": "Stylus [ http://stylus-lang.com ]" }
         ]
