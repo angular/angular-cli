@@ -25,6 +25,7 @@ const npa = require('npm-package-arg');
 
 export class AddCommand extends SchematicCommand<AddCommandSchema> {
   readonly allowPrivateSchematics = true;
+  readonly allowAdditionalArgs = true;
   readonly packageManager = getPackageManager(this.workspace.root);
 
   async run(options: AddCommandSchema & Arguments) {
