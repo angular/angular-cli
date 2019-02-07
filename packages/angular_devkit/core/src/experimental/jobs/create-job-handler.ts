@@ -39,7 +39,7 @@ export interface SimpleJobHandlerContext<
 > extends JobHandlerContext<A, I, O> {
   logger: LoggerApi;
   createChannel: (name: string) => Observer<JsonValue>;
-  input: Observable<JsonValue>;
+  input: Observable<I>;
 }
 
 
@@ -68,7 +68,7 @@ export function createJobHandler<A extends JsonValue, I extends JsonValue, O ext
   const handler = (argument: A, context: JobHandlerContext<A, I, O>) => {
     const description = context.description;
     const inboundBus = context.inboundBus;
-    const inputChannel = new Subject<JsonValue>();
+    const inputChannel = new Subject<I>();
     let subscription: Subscription;
 
     return new Observable<JobOutboundMessage<O>>(subject => {
@@ -112,7 +112,7 @@ export function createJobHandler<A extends JsonValue, I extends JsonValue, O ext
 
       const channels = new Map<string, Subject<JsonValue>>();
 
-      const newContext = {
+      const newContext: SimpleJobHandlerContext<A, I, O> = {
         ...context,
         input: inputChannel.asObservable(),
         logger,
