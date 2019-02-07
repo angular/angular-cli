@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as path from 'path';
-import { experimental as core_experimental } from '../../src';
+import { experimental as core_experimental } from '../../../src';
 import { NodeModuleJobRegistry } from './job-registry';
 
 const root = path.join(
   path.dirname(require.resolve(__filename)),
-  '../../../../../tests/angular_devkit/core/node/jobs',
+  '../../../../../../tests/angular_devkit/core/node/jobs',
 );
 
 

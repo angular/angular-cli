@@ -8,7 +8,7 @@
 
 // Start experimental namespace
 // Start jobs namespace
-export * from './experimental/job-registry';
+export * from './experimental/jobs/job-registry';
 // End jobs namespace
 // End experimental namespace
 
