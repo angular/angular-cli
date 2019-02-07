@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Observable, of } from 'rxjs';
-import { JsonValue, experimental as core_experimental, schema } from '../../src';
-import { ModuleNotFoundException, resolve } from '../resolve';
+import { JsonValue, experimental as core_experimental, schema } from '../../../src';
+import { ModuleNotFoundException, resolve } from '../../resolve';
 
 export class NodeModuleJobRegistry<MinimumArgumentValueT extends JsonValue = JsonValue,
   MinimumInputValueT extends JsonValue = JsonValue,
