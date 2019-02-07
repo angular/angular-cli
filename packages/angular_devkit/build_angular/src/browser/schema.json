@@ -303,7 +303,7 @@
     "es5BrowserSupport": {
       "description": "Enables conditionally loaded ES2015 polyfills.",
       "type": "boolean",
-      "default": false
+      "default": true
     }
   },
   "additionalProperties": false,
