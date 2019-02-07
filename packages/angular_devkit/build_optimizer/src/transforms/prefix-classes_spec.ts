@@ -193,6 +193,40 @@ describe('prefix-classes', () => {
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
+  it('prefix TS 2.5 - 2.6 renamed downlevel class with extends', () => {
+    const input = tags.stripIndent`
+      var NgModuleFactory$1 = /** @class */ (function (_super) {
+          __extends(NgModuleFactory$$1, _super);
+          function NgModuleFactory$$1(moduleType) {
+              var _this = _super.call(this) || this;
+              _this.moduleType = moduleType;
+              return _this;
+          }
+          NgModuleFactory$$1.prototype.create = function (parentInjector) {
+              return new NgModuleRef$1(this.moduleType, parentInjector);
+          };
+          return NgModuleFactory$$1;
+      }(NgModuleFactory));
+    `;
+    const output = tags.stripIndent`
+      var NgModuleFactory$1 = /** @class */ /*@__PURE__*/ (function (_super) {
+          __extends(NgModuleFactory$$1, _super);
+          function NgModuleFactory$$1(moduleType) {
+              var _this = _super.call(this) || this;
+              _this.moduleType = moduleType;
+              return _this;
+          }
+          NgModuleFactory$$1.prototype.create = function (parentInjector) {
+              return new NgModuleRef$1(this.moduleType, parentInjector);
+          };
+          return NgModuleFactory$$1;
+      }(NgModuleFactory));
+    `;
+
+    expect(testPrefixClasses(input)).toBeTruthy();
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
+
   it('prefix TS 2.5 - 2.6 downlevel class with static variable', () => {
     const input = tags.stripIndent`
       var StaticTestCase = /** @class */ (function () {
