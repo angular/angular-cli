@@ -5,10 +5,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Observable, concat, of } from 'rxjs';
-import { ignoreElements, share, shareReplay } from 'rxjs/operators';
+import { Observable, Subject, concat, of } from 'rxjs';
+import { finalize, ignoreElements, share, shareReplay, tap } from 'rxjs/operators';
 import { JsonValue } from '../../json';
-import { JobDescription, JobHandler, JobHandlerContext, JobOutboundMessage } from './api';
+import {
+  JobDescription,
+  JobHandler,
+  JobHandlerContext, JobInboundMessage,
+  JobOutboundMessage,
+  JobOutboundMessageKind,
+} from './api';
 
 const stableStringify = require('fast-json-stable-stringify');
 
@@ -45,6 +51,64 @@ export namespace strategy {
       return Object.assign(newHandler, {
         jobDescription: Object.assign({}, handler.jobDescription, options),
       });
+    };
+  }
+
+
+  /**
+   * Creates a JobStrategy that will always reuse a running job, and restart it if the job ended.
+   * @param replayMessages Replay ALL messages if a job is reused, otherwise just hook up where it
+   *        is.
+   */
+  export function reuse<
+    A extends JsonValue = JsonValue,
+    I extends JsonValue = JsonValue,
+    O extends JsonValue = JsonValue,
+  >(replayMessages = false): JobStrategy<A, I, O> {
+    let inboundBus = new Subject<JobInboundMessage<I>>();
+    let runContext: JobHandlerContext | null = null;
+    let run: Observable<JobOutboundMessage<O>> | null = null;
+    let state: JobOutboundMessage<O> | null = null;
+
+    return (handler, options) => {
+      const newHandler = (argument: A, context: JobHandlerContext<A, I, O>) => {
+        // Forward inputs.
+        const subscription = context.inboundBus.subscribe(inboundBus);
+
+        if (run) {
+          return concat(
+            // Update state.
+            of(state),
+            run,
+          ).pipe(
+            finalize(() => subscription.unsubscribe()),
+          );
+        }
+
+        run = handler(argument, { ...context, inboundBus: inboundBus.asObservable() }).pipe(
+          tap(
+            message => {
+              if (message.kind == JobOutboundMessageKind.Start
+                  || message.kind == JobOutboundMessageKind.OnReady
+                  || message.kind == JobOutboundMessageKind.End) {
+                state = message;
+              }
+            },
+            undefined,
+            () => {
+              subscription.unsubscribe();
+              inboundBus = new Subject<JobInboundMessage<I>>();
+              run = null;
+            },
+          ),
+          replayMessages ? shareReplay() : share(),
+        );
+        runContext = context;
+
+        return run;
+      };
+
+      return Object.assign(newHandler, handler, options || {});
     };
   }
 
