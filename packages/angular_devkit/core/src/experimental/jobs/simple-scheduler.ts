@@ -22,7 +22,7 @@ import {
   filter,
   first,
   ignoreElements,
-  map,
+  map, share,
   shareReplay,
   switchMap,
   tap,
@@ -47,6 +47,11 @@ import {
 import { JobDoesNotExistException } from './exception';
 
 
+export class JobArgumentSchemaValidationError extends schema.SchemaValidationException {
+  constructor(errors?: schema.SchemaValidatorError[]) {
+    super(errors, 'Job Argument failed to validate. Errors: ');
+  }
+}
 export class JobInboundMessageSchemaValidationError extends schema.SchemaValidationException {
   constructor(errors?: schema.SchemaValidatorError[]) {
     super(errors, 'Job Inbound Message failed to validate. Errors: ');
@@ -144,7 +149,9 @@ export class SimpleScheduler<
         }
 
         const description: JobDescription = {
-          name,
+          // Make a copy of it to be sure it's proper JSON.
+          ...JSON.parse(JSON.stringify(handler.jobDescription)),
+          name: handler.jobDescription.name || name,
           argument: handler.jobDescription.argument || true,
           input: handler.jobDescription.input || true,
           output: handler.jobDescription.output || true,
@@ -519,7 +526,7 @@ export class SimpleScheduler<
             switchMap(validate => validate(argument)),
             switchMap(output => {
               if (!output.success) {
-                throw new JobInboundMessageSchemaValidationError(output.errors);
+                throw new JobArgumentSchemaValidationError(output.errors);
               }
 
               const argument: A = output.data as A;
