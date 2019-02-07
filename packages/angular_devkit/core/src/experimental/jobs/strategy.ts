@@ -20,7 +20,11 @@ const stableStringify = require('fast-json-stable-stringify');
 
 export namespace strategy {
 
-  export type JobStrategy<A extends JsonValue, I extends JsonValue, O extends JsonValue> = (
+  export type JobStrategy<
+    A extends JsonValue = JsonValue,
+    I extends JsonValue = JsonValue,
+    O extends JsonValue = JsonValue,
+  > = (
     handler: JobHandler<A, I, O>,
     options?: Partial<Readonly<JobDescription>>,
   ) => JobHandler<A, I, O>;
