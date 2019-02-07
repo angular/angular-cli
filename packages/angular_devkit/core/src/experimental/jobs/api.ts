@@ -42,7 +42,7 @@ export interface JobHandlerContext<
   MinimumOutputValueT extends JsonValue = JsonValue,
 > {
   readonly description: JobDescription;
-  readonly scheduler: Scheduler<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT>;
+  readonly scheduler: Scheduler<JsonValue, JsonValue, JsonValue>;
 
   // In this context, JsonValue is comparable to `any`.
   readonly dependencies: Job<JsonValue, JsonValue, JsonValue>[];
