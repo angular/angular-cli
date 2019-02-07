@@ -113,7 +113,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
   ) {
     // Ensure Build Optimizer is only used with AOT.
     if (options.buildOptimizer && !options.aot) {
-      throw new Error('The `--build-optimizer` option cannot be used without `--aot`.');
+      throw new Error(`The 'buildOptimizer' option cannot be used without 'aot'.`);
     }
 
     let wco: WebpackConfigOptions<NormalizedBrowserBuilderSchema>;
