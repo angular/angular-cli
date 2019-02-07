@@ -181,7 +181,7 @@ export function createJobHandler<A extends JsonValue, I extends JsonValue, O ext
  */
 export function createJobFactory<A extends JsonValue, I extends JsonValue, O extends JsonValue>(
   loader: () => Promise<JobHandler<A, I, O>>,
-  options: Partial<JobDescription>,
+  options: Partial<JobDescription> = {},
 ): JobHandler<A, I, O> {
   const handler = (argument: A, context: JobHandlerContext<A, I, O>) => {
     return from(loader())
