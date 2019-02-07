@@ -30,7 +30,7 @@ export function testPrefixClasses(content: string) {
       exportVarSetter, multiLineComment,
       /\(/, multiLineComment,
       /\s*function \(_super\) {/, newLine,
-      /\w*\.?__extends\(\w+, _super\);/,
+      /\S*\.?__extends\(\S+, _super\);/,
     ],
   ].map(arr => new RegExp(arr.map(x => x.source).join(''), 'm'));
 
