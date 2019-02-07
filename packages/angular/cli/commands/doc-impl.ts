@@ -24,8 +24,11 @@ export class DocCommand extends Command<DocCommandSchema> {
       searchUrl = `https://www.google.com/search?q=site%3Aangular.io+${options.keyword}`;
     }
 
-    return opn(searchUrl, {
-      wait: false,
+    // We should wrap `opn` in a new Promise because `opn` is already resolved
+    await new Promise(() => {
+      opn(searchUrl, {
+        wait: false,
+      });
     });
   }
 }
