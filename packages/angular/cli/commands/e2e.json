@@ -11,6 +11,13 @@
 
   "type": "object",
   "allOf": [
+    "properties": {
+      "force": {
+        "description": "When true, forces to continue even if command (protractor) fails.",
+        "type": "boolean",
+		    "default": false
+      }
+    },
     { "$ref": "./definitions.json#/definitions/architect" },
     { "$ref": "./definitions.json#/definitions/base" }
   ]
