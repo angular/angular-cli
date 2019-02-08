@@ -38,7 +38,10 @@ export default async function(options: { testing?: boolean, cliArgs: string[] })
 
     return 0;
   } catch (err) {
-    if (err instanceof Error) {
+    if (options.cliArgs.includes('e2e') && options.cliArgs[options.cliArgs.findIndex('-force')+1] === "true") {
+      logger.fatal('An unexpected error occurred while e2e run: ' + JSON.stringify(err) + ';  Used --force to continue');
+      return 0;
+    } else if (err instanceof Error) {
       logger.fatal(err.message);
       if (err.stack) {
         logger.fatal(err.stack);
