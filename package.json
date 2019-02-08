@@ -72,8 +72,8 @@
     "typescript": "3.2.4"
   },
   "devDependencies": {
-    "@angular/compiler": "^7.2.0-rc.0",
-    "@angular/compiler-cli": "^7.2.0-rc.0",
+    "@angular/compiler": "^8.0.0-beta.0",
+    "@angular/compiler-cli": "^8.0.0-beta.0",
     "@bazel/karma": "^0.22.1",
     "@bazel/typescript": "0.22.1",
     "@ngtools/json-schema": "^1.1.0",

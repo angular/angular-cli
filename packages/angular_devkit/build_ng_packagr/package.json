@@ -15,8 +15,8 @@
     "ng-packagr": "^2.2.0 || ^3.0.0 || ^4.0.0"
   },
   "devDependencies": {
-    "@angular/compiler": "^7.2.0-rc.0",
-    "@angular/compiler-cli": "^7.2.0-rc.0",
+    "@angular/compiler": "^8.0.0-beta.0",
+    "@angular/compiler-cli": "^8.0.0-beta.0",
     "ng-packagr": "^4.2.0",
     "tsickle": ">=0.34.0",
     "tslib": "^1.9.0"
