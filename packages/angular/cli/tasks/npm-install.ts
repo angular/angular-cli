@@ -24,8 +24,9 @@ export default async function (packageName: string,
   const installArgs: string[] = [];
   switch (packageManager) {
     case 'cnpm':
+    case 'pnpm':
     case 'npm':
-      installArgs.push('install', '--quiet');
+      installArgs.push('install', '--silent');
       break;
 
     case 'yarn':
