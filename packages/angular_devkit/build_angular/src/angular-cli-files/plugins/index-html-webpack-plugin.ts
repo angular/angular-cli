@@ -154,7 +154,6 @@ export class IndexHtmlWebpackPlugin {
       let scriptElements = '';
       for (const script of scripts) {
         const attrs: { name: string, value: string | null }[] = [
-          { name: 'type', value: 'text/javascript' },
           { name: 'src', value: (this._options.deployUrl || '') + script },
         ];
 

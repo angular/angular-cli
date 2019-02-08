@@ -56,12 +56,12 @@ describe('Browser Builder styles', () => {
       './dist/renamed-lazy-style.js': '.pre-rename-lazy-style',
     };
     const jsIndexMatches: { [path: string]: string } = {
-      './dist/index.html': '<script type="text/javascript" src="runtime.js"></script>'
-        + '<script type="text/javascript" src="polyfills.js"></script>'
-        + '<script type="text/javascript" src="styles.js"></script>'
-        + '<script type="text/javascript" src="renamed-style.js"></script>'
-        + '<script type="text/javascript" src="vendor.js"></script>'
-        + '<script type="text/javascript" src="main.js"></script>',
+      './dist/index.html': '<script src="runtime.js"></script>'
+        + '<script src="polyfills.js"></script>'
+        + '<script src="styles.js"></script>'
+        + '<script src="renamed-style.js"></script>'
+        + '<script src="vendor.js"></script>'
+        + '<script src="main.js"></script>',
     };
 
     host.writeMultipleFiles(styles);

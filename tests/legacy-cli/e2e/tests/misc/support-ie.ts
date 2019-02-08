@@ -12,21 +12,21 @@ export default async function () {
   await ng('build');
   await expectFileNotToExist('dist/test-project/es2015-polyfills.js');
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
-    <script type="text/javascript" src="runtime.js"></script>
-    <script type="text/javascript" src="polyfills.js"></script>
-    <script type="text/javascript" src="styles.js"></script>
-    <script type="text/javascript" src="vendor.js"></script>
-    <script type="text/javascript" src="main.js"></script>
+    <script src="runtime.js"></script>
+    <script src="polyfills.js"></script>
+    <script src="styles.js"></script>
+    <script src="vendor.js"></script>
+    <script src="main.js"></script>
   `);
 
   await ng('build', `--es5BrowserSupport`);
   await expectFileToMatch('dist/test-project/es2015-polyfills.js', 'core-js');
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
-    <script type="text/javascript" src="runtime.js"></script>
-    <script type="text/javascript" src="es2015-polyfills.js" nomodule></script>
-    <script type="text/javascript" src="polyfills.js"></script>
-    <script type="text/javascript" src="styles.js"></script>
-    <script type="text/javascript" src="vendor.js"></script>
-    <script type="text/javascript" src="main.js"></script>
+    <script src="runtime.js"></script>
+    <script src="es2015-polyfills.js" nomodule></script>
+    <script src="polyfills.js"></script>
+    <script src="styles.js"></script>
+    <script src="vendor.js"></script>
+    <script src="main.js"></script>
   `);
 }

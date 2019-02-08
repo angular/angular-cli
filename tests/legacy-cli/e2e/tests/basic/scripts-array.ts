@@ -53,13 +53,13 @@ export default function () {
     .then(() => expectFileToMatch('dist/test-project/renamed-lazy-script.js', 'pre-rename-lazy-script'))
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/test-project/index.html', oneLineTrim`
-      <script type="text/javascript" src="runtime.js"></script>
-      <script type="text/javascript" src="es2015-polyfills.js" nomodule></script>
-      <script type="text/javascript" src="polyfills.js"></script>
-      <script type="text/javascript" src="scripts.js"></script>
-      <script type="text/javascript" src="renamed-script.js"></script>
-      <script type="text/javascript" src="vendor.js"></script>
-      <script type="text/javascript" src="main.js"></script>
+      <script src="runtime.js"></script>
+      <script src="es2015-polyfills.js" nomodule></script>
+      <script src="polyfills.js"></script>
+      <script src="scripts.js"></script>
+      <script src="renamed-script.js"></script>
+      <script src="vendor.js"></script>
+      <script src="main.js"></script>
     `))
     // Ensure scripts can be separately imported from the app.
     .then(() => expectFileToMatch('dist/test-project/main.js', 'console.log(\'string-script\');'));
