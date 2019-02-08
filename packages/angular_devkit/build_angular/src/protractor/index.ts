@@ -44,7 +44,14 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
     const options = builderConfig.options;
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
-    // const projectSystemRoot = getSystemPath(projectRoot);
+
+    // ensure that either one of this option is used
+    if (options.devServerTarget && options.baseUrl) {
+      throw new Error(tags.stripIndents`
+      The 'baseUrl' option cannot be used with 'devServerTarget'.
+      When present, 'devServerTarget' will be used to automatically setup 'baseUrl' for Protractor.
+      `);
+    }
 
     // TODO: verify using of(null) to kickstart things is a pattern.
     return of(null).pipe(
@@ -81,7 +88,7 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
         }
 
         // Compute baseUrl from devServerOptions.
-        if (options.devServerTarget && builderConfig.options.publicHost) {
+        if (builderConfig.options.publicHost) {
           let publicHost = builderConfig.options.publicHost;
           if (!/^\w+:\/\//.test(publicHost)) {
             publicHost = `${builderConfig.options.ssl
@@ -90,7 +97,7 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
           }
           const clientUrl = url.parse(publicHost);
           baseUrl = url.format(clientUrl);
-        } else if (options.devServerTarget) {
+        } else {
           const result: DevServerResult | undefined = buildEvent.result;
 
           baseUrl = url.format({
