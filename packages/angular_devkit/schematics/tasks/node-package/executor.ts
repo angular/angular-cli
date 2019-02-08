@@ -40,6 +40,13 @@ const packageManagers: { [name: string]: PackageManagerProfile } = {
       installPackage: 'add',
     },
   },
+  'pnpm': {
+    quietArgument: '--silent',
+    commands: {
+      installAll: 'install',
+      installPackage: 'install',
+    },
+  },
 };
 
 export class UnknownPackageManagerException extends BaseException {
