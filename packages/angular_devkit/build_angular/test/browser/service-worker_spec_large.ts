@@ -105,7 +105,7 @@ describe('Browser Builder service worker', () => {
           hashTable: {
             '/favicon.ico': '84161b857f5c547e3699ddfbffc6d8d737542e01',
             '/assets/folder-asset.txt': '617f202968a6a81050aa617c2e28e1dca11ce8d4',
-            '/index.html': '843c96f0aeadc8f093b1b2203c08891ecd8f7425',
+            '/index.html': '1bcafd53046ffb270ac5e6f3cab23e0442f95c4f',
             '/spectrum.png': '8d048ece46c0f3af4b598a95fd8e4709b631c3c0',
           },
         });
@@ -161,7 +161,7 @@ describe('Browser Builder service worker', () => {
           hashTable: {
             '/foo/bar/favicon.ico': '84161b857f5c547e3699ddfbffc6d8d737542e01',
             '/foo/bar/assets/folder-asset.txt': '617f202968a6a81050aa617c2e28e1dca11ce8d4',
-            '/foo/bar/index.html': '9ef50361678004b3b197c12cbc74962e5a15b844',
+            '/foo/bar/index.html': '925d80777b6ba64b526b0be79761d254dfe94c65',
           },
         });
       }),

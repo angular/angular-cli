@@ -50,12 +50,12 @@ describe('Browser Builder scripts array', () => {
       './dist/renamed-script.js': 'pre-rename-script',
       './dist/renamed-lazy-script.js': 'pre-rename-lazy-script',
       './dist/main.js': 'input-script',
-      './dist/index.html': '<script type="text/javascript" src="runtime.js"></script>'
-        + '<script type="text/javascript" src="polyfills.js"></script>'
-        + '<script type="text/javascript" src="scripts.js"></script>'
-        + '<script type="text/javascript" src="renamed-script.js"></script>'
-        + '<script type="text/javascript" src="vendor.js"></script>'
-        + '<script type="text/javascript" src="main.js"></script>',
+      './dist/index.html': '<script src="runtime.js"></script>'
+        + '<script src="polyfills.js"></script>'
+        + '<script src="scripts.js"></script>'
+        + '<script src="renamed-script.js"></script>'
+        + '<script src="vendor.js"></script>'
+        + '<script src="main.js"></script>',
     };
 
     host.writeMultipleFiles(scripts);

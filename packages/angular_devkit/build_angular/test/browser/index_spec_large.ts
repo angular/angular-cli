@@ -31,7 +31,7 @@ describe('Browser Builder works with BOM index.html', () => {
         const fileName = join(outputPath, 'index.html');
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         // tslint:disable-next-line:max-line-length
-        expect(content).toBe(`<html><head><base href="/"></head><body><app-root></app-root><script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="styles.js"></script><script type="text/javascript" src="vendor.js"></script><script type="text/javascript" src="main.js"></script></body></html>`);
+        expect(content).toBe(`<html><head><base href="/"></head><body><app-root></app-root><script src="runtime.js"></script><script src="polyfills.js"></script><script src="styles.js"></script><script src="vendor.js"></script><script src="main.js"></script></body></html>`);
       }),
     ).toPromise().then(done, done.fail);
   });
@@ -49,7 +49,7 @@ describe('Browser Builder works with BOM index.html', () => {
         const fileName = join(outputPath, 'index.html');
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         // tslint:disable-next-line:max-line-length
-        expect(content).toBe(`<html><head><base href="/"></head><body><app-root></app-root><script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="styles.js"></script><script type="text/javascript" src="vendor.js"></script><script type="text/javascript" src="main.js"></script></body></html>`);
+        expect(content).toBe(`<html><head><base href="/"></head><body><app-root></app-root><script src="runtime.js"></script><script src="polyfills.js"></script><script src="styles.js"></script><script src="vendor.js"></script><script src="main.js"></script></body></html>`);
       }),
     ).toPromise().then(done, done.fail);
   });
@@ -68,7 +68,7 @@ describe('Browser Builder works with BOM index.html', () => {
         const fileName = join(outputPath, 'index.html');
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         // tslint:disable-next-line:max-line-length
-        expect(content).toBe(`<html><head><title>&iacute;</title><base href="/"></head> <body><app-root></app-root><script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="styles.js"></script><script type="text/javascript" src="vendor.js"></script><script type="text/javascript" src="main.js"></script></body></html>`);
+        expect(content).toBe(`<html><head><title>&iacute;</title><base href="/"></head> <body><app-root></app-root><script src="runtime.js"></script><script src="polyfills.js"></script><script src="styles.js"></script><script src="vendor.js"></script><script src="main.js"></script></body></html>`);
       }),
     ).toPromise().then(done, done.fail);
   });
@@ -87,7 +87,7 @@ describe('Browser Builder works with BOM index.html', () => {
         const fileName = join(outputPath, 'index.html');
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         // tslint:disable-next-line:max-line-length
-        expect(content).toBe(`<html><head><base href="/"><%= csrf_meta_tags %></head> <body><app-root></app-root><script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="styles.js"></script><script type="text/javascript" src="vendor.js"></script><script type="text/javascript" src="main.js"></script></body></html>`);
+        expect(content).toBe(`<html><head><base href="/"><%= csrf_meta_tags %></head> <body><app-root></app-root><script src="runtime.js"></script><script src="polyfills.js"></script><script src="styles.js"></script><script src="vendor.js"></script><script src="main.js"></script></body></html>`);
       }),
     ).toPromise().then(done, done.fail);
   });

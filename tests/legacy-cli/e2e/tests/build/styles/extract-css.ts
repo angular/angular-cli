@@ -47,11 +47,11 @@ export default function () {
       <link rel="stylesheet" href="renamed-style\.css"/?>
     `)))
     .then(() => expectFileToMatch('dist/test-project/index.html', oneLineTrim`
-      <script type="text/javascript" src="runtime.js"></script>
-      <script type="text/javascript" src="es2015-polyfills.js" nomodule></script>
-      <script type="text/javascript" src="polyfills.js"></script>
-      <script type="text/javascript" src="vendor.js"></script>
-      <script type="text/javascript" src="main.js"></script>
+      <script src="runtime.js"></script>
+      <script src="es2015-polyfills.js" nomodule></script>
+      <script src="polyfills.js"></script>
+      <script src="vendor.js"></script>
+      <script src="main.js"></script>
     `))
     // also check when css isn't extracted
     .then(() => ng('build', '--no-extract-css'))
@@ -63,12 +63,12 @@ export default function () {
     .then(() => expectFileToMatch('dist/test-project/renamed-lazy-style.js', '.pre-rename-lazy-style'))
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/test-project/index.html', oneLineTrim`
-      <script type="text/javascript" src="runtime.js"></script>
-      <script type="text/javascript" src="es2015-polyfills.js" nomodule></script>
-      <script type="text/javascript" src="polyfills.js"></script>
-      <script type="text/javascript" src="styles.js"></script>
-      <script type="text/javascript" src="renamed-style.js"></script>
-      <script type="text/javascript" src="vendor.js"></script>
-      <script type="text/javascript" src="main.js"></script>
+      <script src="runtime.js"></script>
+      <script src="es2015-polyfills.js" nomodule></script>
+      <script src="polyfills.js"></script>
+      <script src="styles.js"></script>
+      <script src="renamed-style.js"></script>
+      <script src="vendor.js"></script>
+      <script src="main.js"></script>
     `));
 }
