@@ -49,7 +49,7 @@
         "packageManager": {
           "description": "Specify which package manager tool to use.",
           "type": "string",
-          "enum": [ "npm", "cnpm", "yarn" ]
+          "enum": [ "npm", "cnpm", "yarn", "pnpm" ]
         },
         "warnings": {
           "description": "Control CLI specific console warnings",
