@@ -9,6 +9,6 @@
     "**/*.spec.ts"
   ]<% if (experimentalIvy) { %>,
   "angularCompilerOptions": {
-    "enableIvy": "ngtsc"
+    "enableIvy": true
   }<% } %>
 }
