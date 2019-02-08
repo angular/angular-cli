@@ -110,11 +110,14 @@ const e2eRoot = path.join(__dirname, 'e2e');
 const allSetups = glob.sync(path.join(e2eRoot, 'setup/**/*.ts'), { nodir: true })
   .map(name => path.relative(e2eRoot, name))
   .sort();
-const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: argv.ignore })
+let allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: argv.ignore })
   .map(name => path.relative(e2eRoot, name))
-  // TODO: UPDATE TESTS
   // Replace windows slashes.
   .map(name => name.replace(/\\/g, '/'))
+  .sort();
+
+// TODO: either update or remove these tests.
+allTests = allTests
   .filter(name => !name.endsWith('/build-app-shell-with-schematic.ts'))
   // IS this test still valid? \/
   .filter(name => !name.endsWith('/module-id.ts'))
@@ -127,8 +130,24 @@ const allTests = glob.sync(path.join(e2eRoot, testGlob), { nodir: true, ignore: 
   // NEEDS devkit change
   .filter(name => !name.endsWith('/existing-directory.ts'))
   // Disabled on rc.0 due to needed sync with devkit for changes.
-  .filter(name => !name.endsWith('/service-worker.ts'))
-  .sort();
+  .filter(name => !name.endsWith('/service-worker.ts'));
+
+if (argv.ivy) {
+  // These tests are disabled on the Ivy-only CI job because:
+  // - Ivy doesn't support the functionality yet
+  // - The test itself is not applicable to Ivy
+  // As we transition into using Ivy as the default this list should be reassessed.
+  allTests = allTests
+    // The basic AOT check is different with Ivy and being checked in /experimental/ivy.ts.
+    .filter(name => !name.endsWith('tests/basic/aot.ts'))
+    // Ivy doesn't support i18n externally at the moment.
+    .filter(name => !name.includes('tests/i18n/'))
+    .filter(name => !name.endsWith('tests/build/aot/aot-i18n.ts'))
+    // Lazy load support is WIP https://github.com/angular/angular-cli/pull/13524
+    .filter(name => !name.endsWith('tests/misc/lazy-module.ts'))
+    // We don't have a library consumption story yet for Ivy.
+    .filter(name => !name.endsWith('tests/generate/library/library-consumption.ts'));
+}
 
 const shardId = ('shard' in argv) ? argv['shard'] : null;
 const nbShards = (shardId === null ? 1 : argv['nb-shards']) || 2;

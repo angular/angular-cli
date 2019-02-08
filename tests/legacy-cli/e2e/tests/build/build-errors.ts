@@ -70,7 +70,8 @@ export default function () {
     .then(() => expectToFail(() => ng('build', '--aot')))
     .then(({ message }) => {
       if (!message.includes('Function calls are not supported')
-        && !message.includes('Function expressions are not supported in decorators')) {
+        && !message.includes('Function expressions are not supported in decorators')
+        && !message.includes('selector must be a string')) {
         throw new Error(`Expected static analysis error, got this instead:\n${message}`);
       }
       if (extraErrors.some((e) => message.includes(e))) {
