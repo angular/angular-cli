@@ -154,7 +154,7 @@ export function calculateBytes(
   let value = Number(matches[1]);
   switch (matches[2] && matches[2].toLowerCase()) {
     case '%':
-      value = baselineBytes * value / 100 * factor;
+      value = baselineBytes * value / 100;
       break;
     case 'kb':
       value *= 1024;
@@ -167,5 +167,9 @@ export function calculateBytes(
       break;
   }
 
-  return value + baselineBytes;
+  if (baselineBytes === 0) {
+    return value;
+  }
+
+  return baselineBytes + value * factor;
 }
