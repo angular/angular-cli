@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { tags } from '@angular-devkit/core';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
 import { HashedModuleIdsPlugin, debug } from 'webpack';
@@ -270,6 +271,14 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         terserOptions,
       }),
     );
+  }
+
+  if (wco.tsConfig.options.target === 4) {
+    wco.logger.warn(tags.stripIndent`
+      WARNING: Zone.js does not support native async/await in ES2017.
+      These blocks are not intercepted by zone.js and will not triggering change detection.
+      See: https://github.com/angular/zone.js/pull/1140 for more information.
+    `);
   }
 
   return {
