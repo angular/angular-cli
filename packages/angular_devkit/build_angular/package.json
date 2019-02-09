@@ -14,6 +14,7 @@
     "ajv": "6.8.1",
     "autoprefixer": "9.4.7",
     "circular-dependency-plugin": "5.0.2",
+    "classlist.js": "1.1.20150312",
     "clean-css": "4.2.1",
     "copy-webpack-plugin": "4.6.0",
     "file-loader": "3.0.1",
