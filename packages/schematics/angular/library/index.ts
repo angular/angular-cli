@@ -13,9 +13,9 @@ import {
   Tree,
   apply,
   applyTemplates,
-  branchAndMerge,
   chain,
   mergeWith,
+  move,
   noop,
   schematic,
   url,
@@ -215,13 +215,11 @@ export default function (options: LibraryOptions): Rule {
         angularLatestVersion: latestVersions.Angular.replace('~', '').replace('^', ''),
         folderName,
       }),
-      // TODO: Moving inside `branchAndMerge` should work but is bugged right now.
-      // The __projectRoot__ is being used meanwhile.
-      // move(projectRoot),
+      move(projectRoot),
     ]);
 
     return chain([
-      branchAndMerge(mergeWith(templateSource)),
+      mergeWith(templateSource),
       addAppToWorkspaceFile(options, workspace, projectRoot, projectName),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
       options.skipTsConfig ? noop() : updateTsConfig(packageName, distRoot),

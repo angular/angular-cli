@@ -12,7 +12,6 @@ import {
   Tree,
   apply,
   applyTemplates,
-  branchAndMerge,
   chain,
   filter,
   mergeWith,
@@ -115,12 +114,10 @@ export default function (options: PipeOptions): Rule {
       move(parsedPath.path),
     ]);
 
-    return branchAndMerge(
-      chain([
-        addDeclarationToNgModule(options),
-        mergeWith(templateSource),
-        options.lintFix ? applyLintFix(options.path) : noop(),
-      ]),
-    );
+    return chain([
+      addDeclarationToNgModule(options),
+      mergeWith(templateSource),
+      options.lintFix ? applyLintFix(options.path) : noop(),
+    ]);
   };
 }
