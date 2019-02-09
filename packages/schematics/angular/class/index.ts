@@ -13,7 +13,6 @@ import {
   Tree,
   apply,
   applyTemplates,
-  branchAndMerge,
   chain,
   filter,
   mergeWith,
@@ -57,7 +56,7 @@ export default function (options: ClassOptions): Rule {
     ]);
 
     return chain([
-      branchAndMerge(mergeWith(templateSource)),
+      mergeWith(templateSource),
       options.lintFix ? applyLintFix(options.path) : noop(),
     ]);
   };
