@@ -12,7 +12,6 @@ import {
   Tree,
   apply,
   applyTemplates,
-  branchAndMerge,
   chain,
   filter,
   mergeWith,
@@ -135,10 +134,8 @@ export default function (options: DirectiveOptions): Rule {
     ]);
 
     return chain([
-      branchAndMerge(chain([
-        addDeclarationToNgModule(options),
-        mergeWith(templateSource),
-      ])),
+      addDeclarationToNgModule(options),
+      mergeWith(templateSource),
       options.lintFix ? applyLintFix(options.path) : noop(),
     ]);
   };
