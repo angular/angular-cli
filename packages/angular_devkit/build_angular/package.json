@@ -11,7 +11,7 @@
     "@angular-devkit/build-webpack": "0.0.0",
     "@angular-devkit/core": "0.0.0",
     "@ngtools/webpack": "0.0.0",
-    "ajv": "6.8.1",
+    "ajv": "6.9.1",
     "autoprefixer": "9.4.7",
     "circular-dependency-plugin": "5.0.2",
     "clean-css": "4.2.1",
