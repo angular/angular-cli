@@ -19,6 +19,11 @@
     "prod": {
       "description": "Flag to set configuration to 'production'.",
       "type": "boolean"
+    },
+    "force": {
+      "description": "When true, forces to continue even if command (protractor) fails.",
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [
