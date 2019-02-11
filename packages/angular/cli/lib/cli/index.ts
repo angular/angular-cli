@@ -36,7 +36,7 @@ export default async function(options: { testing?: boolean, cliArgs: string[] })
 
       return maybeExitCode;
     }
-
+    
     return 0;
   } catch (err) {
     if (options.cliArgs.includes('e2e') && options.cliArgs[options.cliArgs.findIndex((element) => {
@@ -46,7 +46,7 @@ export default async function(options: { testing?: boolean, cliArgs: string[] })
         + ';  Used --force to continue');
       
       return 0;
-    } else if (err instanceof Error) {if (err instanceof Error) {
+    } else if (err instanceof Error) {
       logger.fatal(err.message);
       if (err.stack) {
         logger.fatal(err.stack);
