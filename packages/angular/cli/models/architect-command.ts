@@ -294,6 +294,7 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
       delete overrides.configuration;
       delete overrides.prod;
       delete overrides.project;
+      delete overrides.force;
     }
 
     // For some reason, latest of yargs-parser with our configuration returns `{ _: [] }` if
