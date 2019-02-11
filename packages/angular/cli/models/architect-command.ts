@@ -29,6 +29,7 @@ export interface ProjectAndConfigurationOptions {
   project?: string;
   configuration?: string;
   prod: boolean;
+  force: boolean;
 }
 
 export interface TargetOptions {
