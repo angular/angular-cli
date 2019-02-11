@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { runTargetSpec } from '@angular-devkit/architect/testing';
+import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
 import { browserTargetSpec, host } from '../utils';
@@ -19,7 +19,9 @@ describe('Browser Builder basic test', () => {
   afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
-    runTargetSpec(host, browserTargetSpec).pipe(
+    const logger = new TestLogger('rebuild-type-errors');
+
+    runTargetSpec(host, browserTargetSpec, {}, DefaultTimeout, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         // Default files should be in outputPath.
@@ -31,6 +33,8 @@ describe('Browser Builder basic test', () => {
         expect(host.scopedSync().exists(join(outputPath, 'favicon.ico'))).toBe(true);
         expect(host.scopedSync().exists(join(outputPath, 'index.html'))).toBe(true);
       }),
+      tap(() => expect(logger.includes('WARNING')).toBe(false, 'Should have no warnings.')),
+      tap(() => expect(logger.includes('ERROR')).toBe(false, 'Should have no errors.')),
     ).toPromise().then(done, done.fail);
   });
 });

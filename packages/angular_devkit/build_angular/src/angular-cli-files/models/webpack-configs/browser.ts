@@ -80,8 +80,8 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
     devtool: isEval ? 'eval' : false,
     resolve: {
       mainFields: [
-        ...(wco.supportES2015 ? ['es2015'] : []),
-        'browser', 'module', 'main',
+        ...(wco.supportES2015 ? ['es2015', 'fesm2015'] : []),
+        'esm5', 'fesm5', 'browser', 'module', 'main',
       ],
     },
     output: {
