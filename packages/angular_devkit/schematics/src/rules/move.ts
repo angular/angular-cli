@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { normalize } from '@angular-devkit/core';
+import { join, normalize } from '@angular-devkit/core';
 import { Rule } from '../engine/interface';
 import { noop } from './base';
 
@@ -30,7 +30,7 @@ export function move(from: string, to?: string): Rule {
     } else {
       // fromPath is a directory
       tree.getDir(fromPath).visit(path => {
-        tree.rename(path, toPath + '/' + path.substr(fromPath.length));
+        tree.rename(path, join(toPath, path.substr(fromPath.length)));
       });
     }
 
