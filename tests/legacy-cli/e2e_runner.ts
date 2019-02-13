@@ -130,7 +130,9 @@ allTests = allTests
   // NEEDS devkit change
   .filter(name => !name.endsWith('/existing-directory.ts'))
   // Disabled on rc.0 due to needed sync with devkit for changes.
-  .filter(name => !name.endsWith('/service-worker.ts'));
+  .filter(name => !name.endsWith('/service-worker.ts'))
+  // Lazy load support is WIP https://github.com/angular/angular/pull/28685
+  .filter(name => !name.endsWith('tests/experimental/ivy-lazy-load.ts'));
 
 if (argv.ivy) {
   // These tests are disabled on the Ivy-only CI job because:
@@ -143,7 +145,7 @@ if (argv.ivy) {
     // Ivy doesn't support i18n externally at the moment.
     .filter(name => !name.includes('tests/i18n/'))
     .filter(name => !name.endsWith('tests/build/aot/aot-i18n.ts'))
-    // Lazy load support is WIP https://github.com/angular/angular-cli/pull/13524
+    // Lazy load support is WIP https://github.com/angular/angular/pull/28685
     .filter(name => !name.endsWith('tests/misc/lazy-module.ts'))
     // We don't have a library consumption story yet for Ivy.
     .filter(name => !name.endsWith('tests/generate/library/library-consumption.ts'));
