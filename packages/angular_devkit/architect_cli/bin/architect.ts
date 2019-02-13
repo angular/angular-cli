@@ -6,18 +6,22 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import 'symbol-observable';
-// symbol polyfill must go first
-// tslint:disable-next-line:ordered-imports import-groups
-import { Architect } from '@angular-devkit/architect';
-import { dirname, experimental, normalize, tags } from '@angular-devkit/core';
+import { index2 } from '@angular-devkit/architect';
+import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
+import {
+  dirname,
+  experimental,
+  json,
+  logging,
+  normalize,
+  schema,
+  tags, terminal,
+} from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import { existsSync, readFileSync } from 'fs';
 import * as minimist from 'minimist';
 import * as path from 'path';
-import { throwError } from 'rxjs';
-import { concatMap } from 'rxjs/operators';
+import { MultiProgressBar } from '../src/progress';
 
 
 function findUp(names: string | string[], from: string) {
@@ -44,7 +48,7 @@ function findUp(names: string | string[], from: string) {
 /**
  * Show usage of the CLI tool, and exit the process.
  */
-function usage(exitCode = 0): never {
+function usage(logger: logging.Logger, exitCode = 0): never {
   logger.info(tags.stripIndent`
     architect [project][:target][:configuration] [options, ...]
 
@@ -63,86 +67,165 @@ function usage(exitCode = 0): never {
   throw 0;  // The node typing sometimes don't have a never type for process.exit().
 }
 
-/** Parse the command line. */
-const argv = minimist(process.argv.slice(2), { boolean: ['help'] });
-
-/** Create the DevKit Logger used through the CLI. */
-const logger = createConsoleLogger(argv['verbose']);
-
-// Check the target.
-const targetStr = argv._.shift();
-if (!targetStr && argv.help) {
-  // Show architect usage if there's no target.
-  usage();
+function _targetStringFromTarget({project, target, configuration}: index2.Target) {
+  return `${project}:${target}${configuration !== undefined ? ':' + configuration : ''}`;
 }
 
-// Split a target into its parts.
-let project: string, targetName: string, configuration: string;
-if (targetStr) {
-  [project, targetName, configuration] = targetStr.split(':');
+
+interface BarInfo {
+  status?: string;
+  builder: index2.BuilderInfo;
+  target?: index2.Target;
 }
 
-// Load workspace configuration file.
-const currentPath = process.cwd();
-const configFileNames = [
-  'angular.json',
-  '.angular.json',
-  'workspace.json',
-  '.workspace.json',
-];
 
-const configFilePath = findUp(configFileNames, currentPath);
+async function _executeTarget(
+  parentLogger: logging.Logger,
+  workspace: experimental.workspace.Workspace,
+  root: string,
+  argv: minimist.ParsedArgs,
+  registry: json.schema.SchemaRegistry,
+) {
+  const architectHost = new WorkspaceNodeModulesArchitectHost(workspace, root);
+  const architect = new index2.Architect(architectHost, registry);
 
-if (!configFilePath) {
-  logger.fatal(`Workspace configuration file (${configFileNames.join(', ')}) cannot be found in `
-    + `'${currentPath}' or in parent directories.`);
-  process.exit(3);
-  throw 3;  // TypeScript doesn't know that process.exit() never returns.
-}
+  // Split a target into its parts.
+  const targetStr = argv._.shift() || '';
+  const [project, target, configuration] = targetStr.split(':');
+  const targetSpec = { project, target, configuration };
 
-const root = dirname(normalize(configFilePath));
-const configContent = readFileSync(configFilePath, 'utf-8');
-const workspaceJson = JSON.parse(configContent);
+  delete argv['help'];
+  delete argv['_'];
 
-const host = new NodeJsSyncHost();
-const workspace = new experimental.workspace.Workspace(root, host);
+  const logger = new logging.Logger('jobs');
+  const logs: logging.LogEntry[] = [];
+  logger.subscribe(entry => logs.push({ ...entry, message: `${entry.name}: ` + entry.message }));
 
-let lastBuildEvent = { success: true };
+  const run = await architect.scheduleTarget(targetSpec, argv, { logger });
+  const bars = new MultiProgressBar<number, BarInfo>(':name :bar (:current/:total) :status');
 
-workspace.loadWorkspaceFromJson(workspaceJson).pipe(
-  concatMap(ws => new Architect(ws).loadArchitect()),
-  concatMap(architect => {
+  run.progress.subscribe(
+    update => {
+      const data = bars.get(update.id) || {
+        id: update.id,
+        builder: update.builder,
+        target: update.target,
+        status: update.status || '',
+        name: ((update.target ? _targetStringFromTarget(update.target) : update.builder.name)
+                + ' '.repeat(80)
+              ).substr(0, 40),
+      };
 
-    const overrides = { ...argv };
-    delete overrides['help'];
-    delete overrides['_'];
+      if (update.status !== undefined) {
+        data.status = update.status;
+      }
 
-    const targetSpec = {
-      project,
-      target: targetName,
-      configuration,
-      overrides,
-    };
+      switch (update.state) {
+        case index2.BuilderProgressState.Error:
+          data.status = 'Error: ' + update.error;
+          bars.update(update.id, data);
+          break;
 
-    // TODO: better logging of what's happening.
-    if (argv.help) {
-      // TODO: add target help
-      return throwError('Target help NYI.');
-      // architect.help(targetOptions, logger);
+        case index2.BuilderProgressState.Stopped:
+          data.status = 'Done.';
+          bars.complete(update.id);
+          bars.update(update.id, data, update.total, update.total);
+          break;
+
+        case index2.BuilderProgressState.Waiting:
+          bars.update(update.id, data);
+          break;
+
+        case index2.BuilderProgressState.Running:
+          bars.update(update.id, data, update.current, update.total);
+          break;
+      }
+
+      bars.render();
+    },
+  );
+
+  // Wait for full completion of the builder.
+  try {
+    const result = await run.result;
+
+    if (result.success) {
+      parentLogger.info(terminal.green('SUCCESS'));
     } else {
-      const builderConfig = architect.getBuilderConfiguration(targetSpec);
+      parentLogger.info(terminal.yellow('FAILURE'));
+    }
 
-      return architect.run(builderConfig, { logger });
-    }
-  }),
-).subscribe({
-  next: (buildEvent => lastBuildEvent = buildEvent),
-  complete: () => process.exit(lastBuildEvent.success ? 0 : 1),
-  error: (err: Error) => {
-    logger.fatal(err.message);
-    if (err.stack) {
-      logger.fatal(err.stack);
-    }
-    process.exit(1);
-  },
-});
+    parentLogger.info('\nLogs:');
+    logs.forEach(l => parentLogger.next(l));
+
+    await run.stop();
+    bars.terminate();
+
+    return result.success ? 0 : 1;
+  } catch (err) {
+    parentLogger.info(terminal.red('ERROR'));
+    parentLogger.info('\nLogs:');
+    logs.forEach(l => parentLogger.next(l));
+
+    parentLogger.fatal('Exception:');
+    parentLogger.fatal(err.stack);
+
+    return 2;
+  }
+}
+
+
+async function main(args: string[]): Promise<number> {
+  /** Parse the command line. */
+  const argv = minimist(args, { boolean: ['help'] });
+
+  /** Create the DevKit Logger used through the CLI. */
+  const logger = createConsoleLogger(argv['verbose']);
+
+  // Check the target.
+  const targetStr = argv._[0] || '';
+  if (!targetStr || argv.help) {
+    // Show architect usage if there's no target.
+    usage(logger);
+  }
+
+  // Load workspace configuration file.
+  const currentPath = process.cwd();
+  const configFileNames = [
+    'angular.json',
+    '.angular.json',
+    'workspace.json',
+    '.workspace.json',
+  ];
+
+  const configFilePath = findUp(configFileNames, currentPath);
+
+  if (!configFilePath) {
+    logger.fatal(`Workspace configuration file (${configFileNames.join(', ')}) cannot be found in `
+      + `'${currentPath}' or in parent directories.`);
+
+    return 3;
+  }
+
+  const root = dirname(normalize(configFilePath));
+  const configContent = readFileSync(configFilePath, 'utf-8');
+  const workspaceJson = JSON.parse(configContent);
+
+  const registry = new schema.CoreSchemaRegistry();
+  registry.addPostTransform(schema.transforms.addUndefinedDefaults);
+
+  const host = new NodeJsSyncHost();
+  const workspace = new experimental.workspace.Workspace(root, host);
+
+  await workspace.loadWorkspaceFromJson(workspaceJson).toPromise();
+
+  return await _executeTarget(logger, workspace, root, argv, registry);
+}
+
+main(process.argv.slice(2))
+  .then(code => {
+    process.exit(code);
+  }, err => {
+    console.error('Error: ' + err.stack || err.message || err);
+    process.exit(-1);
+  });

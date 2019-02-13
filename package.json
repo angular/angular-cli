@@ -63,6 +63,7 @@
     ]
   },
   "dependencies": {
+    "@types/progress": "^2.0.3",
     "glob": "^7.0.3",
     "node-fetch": "^2.2.0",
     "puppeteer": "1.12.2",
