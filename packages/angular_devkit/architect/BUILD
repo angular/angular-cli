@@ -7,8 +7,26 @@ licenses(["notice"])  # MIT
 
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_library")
 load("@build_bazel_rules_nodejs//:defs.bzl", "npm_package")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 package(default_visibility = ["//visibility:public"])
+
+ts_json_schema(
+    name = "builder_input_schema",
+    src = "src/input-schema.json",
+)
+ts_json_schema(
+    name = "builder_output_schema",
+    src = "src/output-schema.json",
+)
+ts_json_schema(
+    name = "builder_builders_schema",
+    src = "src/builders-schema.json",
+)
+ts_json_schema(
+    name = "progress_schema",
+    src = "src/progress-schema.json",
+)
 
 ts_library(
     name = "architect",
@@ -29,6 +47,9 @@ ts_library(
         "@rxjs",
         "@rxjs//operators",
         "@npm//@types/node",
+        ":builder_input_schema",
+        ":builder_output_schema",
+        ":progress_schema",
     ],
 )
 
