@@ -9,33 +9,62 @@
       "description": "Link to schema."
     },
     "builders": {
+      "type": "object",
       "additionalProperties": {
         "$ref": "#/definitions/builder"
       }
     }
   },
+  "required": [
+    "builders"
+  ],
   "definitions": {
     "builder": {
       "type": "object",
-      "description": "Target options.",
-      "properties": {
-        "class": {
-          "type": "string",
-          "description": "The builder class module."
+      "description": "Target options for Builders.",
+      "allOf": [
+        {
+          "properties": {
+            "schema": {
+              "type": "string",
+              "description": "Schema for builder option validation."
+            },
+            "description": {
+              "type": "string",
+              "description": "Builder description."
+            }
+          },
+          "required": [
+            "schema",
+            "description"
+          ]
         },
-        "schema": {
-          "type": "string",
-          "description": "Schema for builder option validation."
-        },
-        "description": {
-          "type": "string",
-          "description": "Builder description."
+        {
+          "anyOf": [
+            {
+              "properties": {
+                "implementation": {
+                  "type": "string",
+                  "description": "The next generation builder module."
+                }
+              },
+              "required": [
+                "implementation"
+              ]
+            },
+            {
+              "properties": {
+                "class": {
+                  "type": "string",
+                  "description": "The builder class module."
+                }
+              },
+              "required": [
+                "class"
+              ]
+            }
+          ]
         }
-      },
-      "required": [
-        "class",
-        "schema",
-        "description"
       ]
     }
   }
