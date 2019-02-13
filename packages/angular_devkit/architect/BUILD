@@ -29,6 +29,31 @@ ts_json_schema(
 )
 
 ts_library(
+    name = "node",
+    srcs = glob(
+        include = ["node/**/*.ts"],
+        exclude = [
+            "**/*_spec.ts",
+            "**/*_spec_large.ts",
+        ],
+    ),
+    module_name = "@angular-devkit/architect/node",
+    module_root = "node/index.d.ts",
+    # strict_checks = False,
+    deps = [
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core:node",
+        "@rxjs",
+        "@rxjs//operators",
+        "@npm//@types/node",
+        ":architect",
+        ":builder_builders_schema",
+        ":builder_input_schema",
+        ":builder_output_schema",
+    ],
+)
+
+ts_library(
     name = "architect",
     srcs = glob(
         include = ["src/**/*.ts"],
