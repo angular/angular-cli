@@ -65,7 +65,7 @@ export default function (options: GuardOptions): Rule {
         ...strings,
         ...options,
       }),
-      move(parsedPath.path),
+      move(parsedPath.path + (options.flat ? '' : '/' + strings.dasherize(options.name))),
     ]);
 
     return chain([
