@@ -152,10 +152,10 @@ function _getColorLevel(stream: Socket): 0 | 1 | 2 | 3 {
 
 
 function _getRows() {
-  return process.stdout.rows || null;
+  return typeof process == 'object' && process.stdout.rows || null;
 }
 function _getColumns() {
-  return process.stdout.columns || null;
+  return typeof process == 'object' && process.stdout.columns || null;
 }
 
 
@@ -189,8 +189,3 @@ export function getCapabilities(
 
   return maybeCaps;
 }
-
-
-export const stdin = getCapabilities(process.stdin as Socket);
-export const stdout = getCapabilities(process.stdout);
-export const stderr = getCapabilities(process.stderr);
