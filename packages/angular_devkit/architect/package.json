@@ -7,5 +7,6 @@
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
     "rxjs": "6.3.3"
-  }
+  },
+  "builders": "./builders/builders.json"
 }
