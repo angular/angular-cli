@@ -305,7 +305,7 @@ export class SimpleScheduler<
     let state = JobState.Queued;
     let pingId = 0;
 
-    const logger = options.logger ? options.logger.createChild('job') : new NullLogger();
+    const logger = options.logger ? options.logger : new NullLogger();
 
     // Create the input channel by having a filter.
     const input = new Subject<JsonValue>();
@@ -349,7 +349,8 @@ export class SimpleScheduler<
 
         switch (message.kind) {
           case JobOutboundMessageKind.Log:
-            logger.next(message.entry);
+            const entry = message.entry;
+            logger.log(entry.level, entry.message, entry);
             break;
 
           case JobOutboundMessageKind.ChannelCreate: {

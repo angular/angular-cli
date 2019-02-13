@@ -101,7 +101,7 @@ export function createJobHandler<A extends JsonValue, I extends JsonValue, O ext
       });
 
       // Configure a logger to pass in as additional context.
-      const logger = new Logger('job');
+      const logger = new Logger('-internal-job-logger-');
       const logSub = logger.subscribe(entry => {
         subject.next({
           kind: JobOutboundMessageKind.Log,
