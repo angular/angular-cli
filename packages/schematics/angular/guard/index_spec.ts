@@ -56,6 +56,15 @@ describe('Guard Schematic', () => {
     expect(files).toContain('/projects/bar/src/app/foo.guard.ts');
   });
 
+  it('should respect the flat flag', () => {
+    const options = { ...defaultOptions, flat: false };
+
+    const tree = schematicRunner.runSchematic('guard', options, appTree);
+    const files = tree.files;
+    expect(files).toContain('/projects/bar/src/app/foo/foo.guard.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/foo/foo.guard.ts');
+  });
+
   it('should respect the sourceRoot value', () => {
     const config = JSON.parse(appTree.readContent('/angular.json'));
     config.projects.bar.sourceRoot = 'projects/bar/custom';
