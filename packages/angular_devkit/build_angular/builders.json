@@ -32,6 +32,7 @@
       "description": "Run protractor over a dev server."
     },
     "tslint": {
+      "implementation": "./src/tslint/index2",
       "class": "./src/tslint",
       "schema": "./src/tslint/schema.json",
       "description": "Run tslint over a TS project."
