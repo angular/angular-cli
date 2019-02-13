@@ -12,15 +12,17 @@ ts_library(
     name = "architect_cli",
     srcs = [
         "bin/architect.ts",
-    ],
+    ] + glob(["src/**/*.ts"]),
     module_name = "@angular-devkit/architect-cli",
     deps = [
         "//packages/angular_devkit/architect",
+        "//packages/angular_devkit/architect:node",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
         "@rxjs",
         "@rxjs//operators",
         "@npm//@types/node",
         "@npm//@types/minimist",
+        "@npm//@types/progress",
     ],
 )
