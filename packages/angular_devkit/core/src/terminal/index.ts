@@ -6,4 +6,5 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export * from './text';
+export * from './caps';
 export * from './colors';
