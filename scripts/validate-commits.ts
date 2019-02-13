@@ -11,7 +11,7 @@ import { execSync } from 'child_process';
 import { packages } from '../lib/packages';
 
 
-const blacklist = [
+const ignoreCommitShaList = [
   '9ce1aed331ad0742463b587f1f5555486ccc202f',
   'de7a44f23514594274394322adaf40ac87c38d8b',
   '21d87e93955b12d137417a2bb0536d7faef3ad07',
@@ -25,6 +25,8 @@ const blacklist = [
   'fb1c2af810d069229760800c2f539e8a764fe1eb',
   '7ba94c8084eb65407abd5531dcbb7275401969c9',
   '8475b3dadba3d50a96a2f876188bbf78d55039aa',
+  'bf566c710181b0e23af0070540294de99f259fe9',
+  'fa6795a8471d1c9ae4d583f8e698e49f74a137e6',
 ];
 
 
@@ -140,7 +142,7 @@ export default function (argv: ValidateCommitsOptions, logger: logging.Logger) {
   }
 
   for (const [sha, message] of commits) {
-    if (blacklist.find(i => i.startsWith(sha))) {
+    if (ignoreCommitShaList.find(i => i.startsWith(sha))) {
       // Some commits are better ignored.
       continue;
     }
