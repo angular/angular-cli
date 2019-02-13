@@ -102,7 +102,7 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
   }
 
   log(level: LogLevel, message: string, metadata: JsonObject = {}): void {
-    const entry: LogEntry = Object.assign({}, this._metadata, metadata, {
+    const entry: LogEntry = Object.assign({}, metadata, this._metadata, {
       level, message, timestamp: +Date.now(),
     });
     this._subject.next(entry);
