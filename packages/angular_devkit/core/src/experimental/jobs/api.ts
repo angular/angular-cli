@@ -7,7 +7,6 @@
  */
 import { Observable, Observer } from 'rxjs';
 import { JsonObject, JsonValue, schema } from '../../json/index';
-import { LogEntry, LoggerApi } from '../../logger/index';
 import { DeepReadonly } from '../../utils/index';
 
 /**
@@ -135,7 +134,6 @@ export enum JobOutboundMessageKind {
   Pong = 'p',
 
   // Feedback messages.
-  Log = 'l',
   Output = 'o',
 
   // Channel specific messages.
@@ -170,14 +168,6 @@ export interface JobOutboundMessageOnReady extends JobOutboundMessageBase {
  */
 export interface JobOutboundMessageStart extends JobOutboundMessageBase {
   readonly kind: JobOutboundMessageKind.Start;
-}
-
-/**
- * A logging message, supporting the logging.LogEntry.
- */
-export interface JobOutboundMessageLog extends JobOutboundMessageBase {
-  readonly kind: JobOutboundMessageKind.Log;
-  readonly entry: LogEntry;
 }
 
 /**
@@ -274,7 +264,6 @@ export interface JobOutboundMessagePong extends JobOutboundMessageBase {
 export type JobOutboundMessage<OutputT extends JsonValue> =
   JobOutboundMessageOnReady
   | JobOutboundMessageStart
-  | JobOutboundMessageLog
   | JobOutboundMessageOutput<OutputT>
   | JobOutboundMessageChannelCreate
   | JobOutboundMessageChannelMessage
@@ -381,11 +370,6 @@ export interface Job<
  * Options for scheduling jobs.
  */
 export interface ScheduleJobOptions {
-  /**
-   * Where should logging be passed in. By default logging will be dropped.
-   */
-  logger?: LoggerApi;
-
   /**
    * Jobs that need to finish before scheduling this job. These dependencies will be passed
    * to the job itself in its context.

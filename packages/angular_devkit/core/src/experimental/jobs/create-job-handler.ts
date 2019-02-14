@@ -10,7 +10,7 @@ import { Observable, Observer, Subject, Subscription, from, isObservable, of } f
 import { switchMap, tap } from 'rxjs/operators';
 import { BaseException } from '../../exception/index';
 import { JsonValue } from '../../json/index';
-import { Logger, LoggerApi } from '../../logger/index';
+import { LoggerApi } from '../../logger';
 import { isPromise } from '../../utils/index';
 import {
   JobDescription,
@@ -37,7 +37,6 @@ export interface SimpleJobHandlerContext<
   I extends JsonValue,
   O extends JsonValue,
 > extends JobHandlerContext<A, I, O> {
-  logger: LoggerApi;
   createChannel: (name: string) => Observer<JsonValue>;
   input: Observable<I>;
 }
@@ -100,23 +99,12 @@ export function createJobHandler<A extends JsonValue, I extends JsonValue, O ext
         }
       });
 
-      // Configure a logger to pass in as additional context.
-      const logger = new Logger('-internal-job-logger-');
-      const logSub = logger.subscribe(entry => {
-        subject.next({
-          kind: JobOutboundMessageKind.Log,
-          description,
-          entry,
-        });
-      });
-
       // Execute the function with the additional context.
       const channels = new Map<string, Subject<JsonValue>>();
 
       const newContext: SimpleJobHandlerContext<A, I, O> = {
         ...context,
         input: inputChannel.asObservable(),
-        logger,
         createChannel(name: string) {
           if (channels.has(name)) {
             throw new ChannelAlreadyExistException(name);
@@ -164,7 +152,6 @@ export function createJobHandler<A extends JsonValue, I extends JsonValue, O ext
         () => complete(),
       );
       subscription.add(inboundSub);
-      subscription.add(logSub);
 
       return subscription;
     });

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { experimental, isPromise, json } from '@angular-devkit/core';
+import { experimental, isPromise, json, logging } from '@angular-devkit/core';
 import { Observable, Subscription, from, isObservable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import {
@@ -17,6 +17,7 @@ import {
   BuilderProgressState,
   Target,
   TypedBuilderProgress,
+  targetStringFromTarget,
 } from './api';
 import { Builder, BuilderSymbol, BuilderVersionSymbol } from './internal';
 import { scheduleByName, scheduleByTarget } from './schedule-by-name';
@@ -28,13 +29,16 @@ export function createBuilder<OptT extends json.JsonObject>(
   const cjh = experimental.jobs.createJobHandler;
   const handler = cjh<json.JsonObject, BuilderInput, BuilderOutput>((options, context) => {
     const scheduler = context.scheduler;
-    const logger = context.logger;
     const progressChannel = context.createChannel('progress');
+    const logChannel = context.createChannel('log');
     let currentState: BuilderProgressState = BuilderProgressState.Stopped;
     let current = 0;
     let status = '';
     let total = 1;
 
+    function log(entry: logging.LogEntry) {
+      logChannel.next(entry);
+    }
     function progress(progress: TypedBuilderProgress, context: BuilderContext) {
       currentState = progress.state;
       if (progress.state === BuilderProgressState.Running) {
@@ -74,6 +78,13 @@ export function createBuilder<OptT extends json.JsonObject>(
 
       function onInput(i: BuilderInput) {
         const builder = i.info as BuilderInfo;
+        const loggerName = i.target
+          ? targetStringFromTarget(i.target as Target)
+          : builder.builderName;
+        const logger = new logging.Logger(loggerName);
+
+        subscriptions.push(logger.subscribe(entry => log(entry)));
+
         const context: BuilderContext = {
           builder,
           workspaceRoot: i.workspaceRoot,

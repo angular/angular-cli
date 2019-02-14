@@ -22,13 +22,12 @@ import {
   filter,
   first,
   ignoreElements,
-  map, share,
+  map,
   shareReplay,
   switchMap,
   tap,
 } from 'rxjs/operators';
 import { JsonValue, schema } from '../../json';
-import { NullLogger } from '../../logger';
 import {
   Job,
   JobDescription,
@@ -305,8 +304,6 @@ export class SimpleScheduler<
     let state = JobState.Queued;
     let pingId = 0;
 
-    const logger = options.logger ? options.logger : new NullLogger();
-
     // Create the input channel by having a filter.
     const input = new Subject<JsonValue>();
     input.pipe(
@@ -348,11 +345,6 @@ export class SimpleScheduler<
         state = this._updateState(message, state);
 
         switch (message.kind) {
-          case JobOutboundMessageKind.Log:
-            const entry = message.entry;
-            logger.log(entry.level, entry.message, entry);
-            break;
-
           case JobOutboundMessageKind.ChannelCreate: {
             const maybeSubject = channelsSubject.get(message.name);
             // If it doesn't exist or it's closed on the other end.
