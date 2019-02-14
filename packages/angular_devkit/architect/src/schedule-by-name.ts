@@ -65,15 +65,16 @@ export async function scheduleByName(
     job.input.next(message);
   }
 
+  const logChannelSub = job.getChannel<logging.LogEntry>('log').subscribe(entry => {
+    logger.next(entry);
+  });
+
   const s = job.outboundBus.subscribe(
-    message => {
-      if (message.kind == experimental.jobs.JobOutboundMessageKind.Log) {
-        logger.log(message.entry.level, message.entry.message, message.entry);
-      }
-    },
+    undefined,
     undefined,
     () => {
       s.unsubscribe();
+      logChannelSub.unsubscribe();
       if (stateSubscription) {
         stateSubscription.unsubscribe();
       }
