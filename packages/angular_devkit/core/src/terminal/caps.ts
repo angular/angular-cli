@@ -8,7 +8,7 @@
 import ReadableStream = NodeJS.ReadableStream;
 import WriteStream = NodeJS.WriteStream;
 import Socket = NodeJS.Socket;
-
+const supportsColor = require('../../third_party/github.com/chalk/supports-color');
 
 /**
  * Node specific stuff.
@@ -28,11 +28,6 @@ declare const os: {
   release: () => string;
 };
 
-
-const _env = (typeof process == 'object' && process.env) || {};
-const _platform = (typeof process == 'object' && process.platform) || '';
-const _versions = (typeof process == 'object' && process.versions) || { node: '' };
-const _os = (typeof os == 'object' && os) || { release: () => '' };
 
 const streamMap = new WeakMap<{}, StreamCapabilities>();
 
@@ -72,85 +67,6 @@ export interface StreamCapabilities {
   columns: number | null;
 }
 
-
-const ciVars = ['TRAVIS', 'CIRCLECI', 'APPVEYOR', 'GITLAB_CI'];
-
-function _getColorLevel(stream: Socket): 0 | 1 | 2 | 3 {
-  if ('FORCE_COLOR' in _env) {
-    if (_env.FORCE_COLOR === '1') {
-      return 3;
-    } else if (_env.FORCE_COLOR === '0') {
-      return 0;
-    }
-  }
-
-  if (stream && !stream.isTTY && !_env.MSYSTEM) {
-    return 0;
-  }
-
-  if (_platform.startsWith('win32') && !_env.MSYSTEM) {
-    // Node.js 7.5.0 is the first version of Node.js to include a patch to
-    // libuv that enables 256 color output on Windows. Anything earlier and it
-    // won't work. However, here we target Node.js 8 at minimum as it is an LTS
-    // release, and Node.js 7 is not. Windows 10 build 10586 is the first Windows
-    // release that supports 256 colors.
-    const osRelease = _os.release().split('.');
-    if (Number(_versions.node.split('.')[0]) >= 8
-        && Number(osRelease[0]) >= 10
-        && Number(osRelease[2]) >= 10586) {
-      return 2;
-    }
-
-    return 1;
-  }
-
-  if ('CI' in _env) {
-    if (ciVars.some(sign => sign in _env) || _env.CI_NAME === 'codeship') {
-      return 1;
-    }
-
-    return 0;
-  }
-
-  if ('TEAMCITY_VERSION' in _env) {
-    return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(_env.TEAMCITY_VERSION) ? 1 : 0;
-  }
-
-  if ('TERM_PROGRAM' in _env) {
-    const version = parseInt((_env.TERM_PROGRAM_VERSION || '').split('.')[0], 10);
-
-    switch (_env.TERM_PROGRAM) {
-      case 'iTerm.app':
-        return version >= 3 ? 3 : 2;
-      case 'Hyper':
-        return 3;
-      case 'Apple_Terminal':
-        return 2;
-
-      // No default
-    }
-  }
-
-  if (/-256(color)?$/i.test(_env.TERM)) {
-    return 2;
-  }
-
-  if (/^screen|^xterm|^vt100|^rxvt|color|ansi|cygwin|linux/i.test(_env.TERM)) {
-    return 1;
-  }
-
-  if ('COLORTERM' in _env) {
-    return 1;
-  }
-
-  if (_env.TERM === 'dumb') {
-    return 0;
-  }
-
-  return 0;
-}
-
-
 function _getRows() {
   return typeof process == 'object' && process.stdout.rows || null;
 }
@@ -159,9 +75,11 @@ function _getColumns() {
 }
 
 
-function _createCapabilities(stream: Socket, isTerminalStream: boolean): StreamCapabilities {
-  const level = _getColorLevel(stream);
-
+function _createCapabilities(
+  stream: Socket,
+  isTerminalStream: boolean,
+  level: 0|1|2|3 = supportsColor.stdout.level,
+): StreamCapabilities {
   return {
     readable: stream.readable,
     writable: stream.writable,

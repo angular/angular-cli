@@ -21,7 +21,9 @@ ts_library(
             "src/**/*_benchmark.ts",
         ],
     ),
-    data = glob(["**/*.json"]),
+    data = glob(["**/*.json"]) + [
+        "//packages/angular_devkit/core/third_party/github.com/chalk/supports-color",
+    ],
     module_name = "@angular-devkit/core",
     module_root = "src/index.d.ts",
     # strict_checks = False,
