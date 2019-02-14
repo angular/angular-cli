@@ -5,7 +5,7 @@ export interface AdditionalPropertiesValidatorError extends SchemaValidatorError
     };
 }
 
-export declare function addUndefinedDefaults(value: JsonValue, _pointer: JsonPointer, schema?: JsonObject): JsonValue;
+export declare function addUndefinedDefaults(value: JsonValue, _pointer: JsonPointer, schema?: JsonSchema): JsonValue;
 
 export declare class AliasHost<StatsT extends object = {}> extends ResolverHost<StatsT> {
     protected _aliases: Map<Path, Path>;
@@ -989,7 +989,7 @@ export declare class UnsupportedPlatformException extends BaseException {
 
 export declare type UriHandler = (uri: string) => Observable<JsonObject> | Promise<JsonObject> | null | undefined;
 
-export declare function visitJson<ContextT>(json: JsonValue, visitor: JsonVisitor, schema?: JsonObject, refResolver?: ReferenceResolver<ContextT>, context?: ContextT): Observable<JsonValue>;
+export declare function visitJson<ContextT>(json: JsonValue, visitor: JsonVisitor, schema?: JsonSchema, refResolver?: ReferenceResolver<ContextT>, context?: ContextT): Observable<JsonValue>;
 
 export declare function visitJsonSchema(schema: JsonSchema, visitor: JsonSchemaVisitor): void;
 

@@ -7,14 +7,18 @@
  */
 import { JsonObject, JsonValue, isJsonObject } from '../interface';
 import { JsonPointer } from './interface';
+import { JsonSchema } from './schema';
 import { getTypesOfSchema } from './utility';
 
 export function addUndefinedDefaults(
   value: JsonValue,
   _pointer: JsonPointer,
-  schema?: JsonObject,
+  schema?: JsonSchema,
 ): JsonValue {
-  if (!schema) {
+  if (schema === true || schema === false) {
+    return value;
+  }
+  if (schema === undefined) {
     return value;
   }
 

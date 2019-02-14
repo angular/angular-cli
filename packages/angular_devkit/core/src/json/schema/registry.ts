@@ -347,10 +347,6 @@ export class CoreSchemaRegistry implements SchemaRegistry {
             // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/3989
             result = (result as any).pipe(
               ...[...this._pre].map(visitor => concatMap((data: JsonValue) => {
-                if (schema === false || schema === true) {
-                  return of(data);
-                }
-
                 return visitJson(data, visitor, schema, this._resolver, validate);
               })),
             );
@@ -418,10 +414,6 @@ export class CoreSchemaRegistry implements SchemaRegistry {
                   // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/3989
                   result = (result as any).pipe(
                     ...[...this._post].map(visitor => concatMap((data: JsonValue) => {
-                      if (schema === false || schema === true) {
-                        return of(schema);
-                      }
-
                       return visitJson(data, visitor, schema, this._resolver, validate);
                     })),
                   );
