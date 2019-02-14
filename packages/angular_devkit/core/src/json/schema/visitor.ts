@@ -19,7 +19,7 @@ export interface ReferenceResolver<ContextT> {
 }
 
 function _getObjectSubSchema(
-  schema: JsonObject | undefined,
+  schema: JsonSchema | undefined,
   key: string,
 ): JsonObject | undefined {
   if (typeof schema !== 'object' || schema === null) {
@@ -51,11 +51,15 @@ function _visitJsonRecursive<ContextT>(
   json: JsonValue,
   visitor: JsonVisitor,
   ptr: JsonPointer,
-  schema?: JsonObject,
+  schema?: JsonSchema,
   refResolver?: ReferenceResolver<ContextT>,
   context?: ContextT,  // tslint:disable-line:no-any
   root?: JsonObject | JsonArray,
 ): Observable<JsonValue> {
+  if (schema === true || schema === false) {
+    // There's no schema definition, so just visit the JSON recursively.
+    schema = undefined;
+  }
   if (schema && schema.hasOwnProperty('$ref') && typeof schema['$ref'] == 'string') {
     if (refResolver) {
       const resolved = refResolver(schema['$ref'] as string, context);
@@ -132,7 +136,7 @@ function _visitJsonRecursive<ContextT>(
 export function visitJson<ContextT>(
   json: JsonValue,
   visitor: JsonVisitor,
-  schema?: JsonObject,
+  schema?: JsonSchema,
   refResolver?: ReferenceResolver<ContextT>,
   context?: ContextT,  // tslint:disable-line:no-any
 ): Observable<JsonValue> {

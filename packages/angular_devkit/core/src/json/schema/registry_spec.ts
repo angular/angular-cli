@@ -382,6 +382,18 @@ describe('CoreSchemaRegistry', () => {
       .toPromise().then(done, done.fail);
   });
 
+  it('works with true as a schema and post-transforms', async () => {
+    const registry = new CoreSchemaRegistry();
+    registry.addPostTransform(addUndefinedDefaults);
+    const data: any = { a: 1, b: 2 };  // tslint:disable-line:no-any
+
+    const validate = await registry.compile(true).toPromise();
+    const result = await validate(data).toPromise();
+
+    expect(result.success).toBe(true);
+    expect(result.data).toBe(data);
+  });
+
   it('adds undefined properties', done => {
     const registry = new CoreSchemaRegistry();
     registry.addPostTransform(addUndefinedDefaults);
