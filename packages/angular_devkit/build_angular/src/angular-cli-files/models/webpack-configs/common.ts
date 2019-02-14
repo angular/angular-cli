@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { NgccPlugin } from '@ngtools/webpack';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
 import { HashedModuleIdsPlugin, debug } from 'webpack';
@@ -285,6 +286,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         'node_modules',
       ],
       alias,
+      // TODO: get the mainfields list from the config, browser/server/test have different ones
+      plugins: true ? [new NgccPlugin({ mainFields: ['browser', 'module', 'main']})] : [],
     },
     resolveLoader: {
       modules: loaderNodeModules,
