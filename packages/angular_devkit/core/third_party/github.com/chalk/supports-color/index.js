@@ -1,8 +1,14 @@
 'use strict';
 const os = require('os');
-const hasFlag = require('has-flag');
+// LOCAL MOD: import the dependency from local vendored location
+const hasFlag = require('../../sindresorhus/has-flag');
 
-const {env} = process;
+// LOCAL MOD: support loading this file in a browser
+const {env, versions, stdout, stderr, platform} = typeof process == 'object' ? process : {
+	platform: '',
+	env: {},
+	versions: {node: ''},
+};
 
 let forceColor;
 if (hasFlag('no-color') ||
@@ -54,7 +60,8 @@ function supportsColor(stream) {
 		return 2;
 	}
 
-	if (stream && !stream.isTTY && forceColor === undefined) {
+	// LOCAL MOD: support mingw
+	if (stream && !stream.isTTY && forceColor === undefined && !env.MSYSTEM) {
 		return 0;
 	}
 
@@ -64,7 +71,8 @@ function supportsColor(stream) {
 		return min;
 	}
 
-	if (process.platform === 'win32') {
+	// LOCAL MOD: support mingw
+	if (platform.startsWith('win32') && !env.MSYSTEM) {
 		// Node.js 7.5.0 is the first version of Node.js to include a patch to
 		// libuv that enables 256 color output on Windows. Anything earlier and it
 		// won't work. However, here we target Node.js 8 at minimum as it is an LTS
@@ -73,7 +81,7 @@ function supportsColor(stream) {
 		// that supports 16m/TrueColor.
 		const osRelease = os.release().split('.');
 		if (
-			Number(process.versions.node.split('.')[0]) >= 8 &&
+			Number(versions.node.split('.')[0]) >= 8 &&
 			Number(osRelease[0]) >= 10 &&
 			Number(osRelease[2]) >= 10586
 		) {
@@ -133,6 +141,6 @@ function getSupportLevel(stream) {
 
 module.exports = {
 	supportsColor: getSupportLevel,
-	stdout: getSupportLevel(process.stdout),
-	stderr: getSupportLevel(process.stderr)
+	stdout: getSupportLevel(stdout),
+	stderr: getSupportLevel(stderr)
 };
