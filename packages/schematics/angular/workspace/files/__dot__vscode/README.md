@@ -15,6 +15,8 @@ This means they are authored and governed by either the Angular or VSCode teams.
 We do this because our recommendations carry an obligation for us to address some issues, especially privacy or security vulnerabilities.
 Extensions that we don't control could have problems, and we are not in a position to mediate these.
 
+(Note that the Angular Console extension from Nrwl is a joint effort with the Angular team, who has final governance control.)
+
 ## Criteria for adding new recommendations
 
 The Angular team loves the great work of the community in making VSCode more useful for Angular development.
