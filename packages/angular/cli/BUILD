@@ -47,7 +47,6 @@ ts_library(
         ":doc_schema",
         ":e2e_schema",
         ":easter_egg_schema",
-        ":eject_schema",
         ":generate_schema",
         ":help_schema",
         ":lint_schema",
@@ -112,14 +111,6 @@ ts_json_schema(
 ts_json_schema(
     name = "easter_egg_schema",
     src = "commands/easter-egg.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "eject_schema",
-    src = "commands/eject.json",
     data = [
         "commands/definitions.json",
     ],
