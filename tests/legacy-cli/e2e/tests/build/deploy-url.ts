@@ -27,8 +27,6 @@ export default function () {
       /__webpack_require__\.p = "deployUrl\/";/));
     // // verify slash is appended to the end of --deploy-url if missing
     // .then(() => ng('build', '--deploy-url=deployUrl', '--extract-css=false'))
-    // // skip this in ejected tests
-    // .then(() => getGlobalVariable('argv').eject
-    //   ? Promise.resolve()
-    //   : expectFileToMatch('dist/test-project/untime.js', /__webpack_require__\.p = "deployUrl\/";/));
+    // .then(() =>
+    //   expectFileToMatch('dist/test-project/untime.js', /__webpack_require__\.p = "deployUrl\/";/));
 }

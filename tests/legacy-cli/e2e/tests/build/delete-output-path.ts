@@ -6,11 +6,6 @@ import {getGlobalVariable} from '../../utils/env';
 export default function() {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
-  // Skip this in ejected tests.
-  if (getGlobalVariable('argv').eject) {
-    return Promise.resolve();
-  }
-
   return ng('build')
     // This is supposed to fail since there's a missing file
     .then(() => deleteFile('src/app/app.component.ts'))

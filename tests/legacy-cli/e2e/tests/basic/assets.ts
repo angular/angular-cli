@@ -8,7 +8,6 @@ import {
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
-import {getGlobalVariable} from '../../utils/env';
 
 
 // const temp = require('temp');
@@ -17,7 +16,6 @@ import {getGlobalVariable} from '../../utils/env';
 // tslint:disable:max-line-length
 export default function () {
   // Disable parts of it in webpack tests.
-  const ejected = getGlobalVariable('argv').eject;
 
   // TODO: update test
   return;
@@ -110,7 +108,7 @@ export default function () {
     // .gitkeep shouldn't be copied.
     .then(() => expectToFail(() => expectFileToExist('dist/assets/.gitkeep')))
     // Update app to test assets are present.
-    .then(_ => !ejected && writeMultipleFiles({
+    .then(_ => writeMultipleFiles({
       'src/app/app.module.ts': `
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
@@ -191,6 +189,6 @@ export default function () {
           });
         });`,
     }))
-    .then(() => !ejected && ng('test', '--watch=false'))
-    .then(() => !ejected && ng('e2e', 'test-project-e2e'));
+    .then(() => ng('test', '--watch=false'))
+    .then(() => ng('e2e', 'test-project-e2e'));
 }

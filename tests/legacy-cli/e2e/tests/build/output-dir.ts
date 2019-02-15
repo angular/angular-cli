@@ -9,11 +9,6 @@ import {expectToFail} from '../../utils/utils';
 export default function() {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
-  // Skip this in ejected tests.
-  if (getGlobalVariable('argv').eject) {
-    return Promise.resolve();
-  }
-
   return ng('build', '--output-path', 'build-output')
     .then(() => expectFileToExist('./build-output/index.html'))
     .then(() => expectFileToExist('./build-output/main.js'))

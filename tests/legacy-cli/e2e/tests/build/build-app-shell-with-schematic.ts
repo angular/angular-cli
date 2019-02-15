@@ -7,11 +7,6 @@ import { readNgVersion } from '../../utils/version';
 
 
 export default function () {
-  // Skip this in ejected tests.
-  if (getGlobalVariable('argv').eject) {
-    return Promise.resolve();
-  }
-
   // Skip this test in Angular 2/4.
   if (getGlobalVariable('argv').ng2 || getGlobalVariable('argv').ng4) {
     return Promise.resolve();

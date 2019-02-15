@@ -18,10 +18,6 @@ export default function() {
   if (process.platform.startsWith('win')) {
     return Promise.resolve();
   }
-  // Skip this in ejected tests.
-  if (getGlobalVariable('argv').eject) {
-    return Promise.resolve();
-  }
 
   return Promise.resolve()
     // Create and import files.

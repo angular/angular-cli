@@ -12,6 +12,5 @@ export default function() {
       appArchitect.build.options.outputPath = './';
     }))
     .then(() => expectToFail(() => ng('build')))
-    .then(() => expectToFail(() => ng('serve')))
-    .then(() => expectToFail(() => ng('eject')));
+    .then(() => expectToFail(() => ng('serve')));
 }

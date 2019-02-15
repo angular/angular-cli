@@ -15,10 +15,6 @@ export default async function() {
   if (process.platform.startsWith('win')) {
     return;
   }
-  // Skip this in ejected tests.
-  if (getGlobalVariable('argv').eject) {
-    return;
-  }
 
   await writeFile('src/app/type.ts', `export type MyType = number;`);
   await prependToFile('src/app/app.component.ts', 'import { MyType } from "./type";\n');

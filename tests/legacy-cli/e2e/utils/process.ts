@@ -181,24 +181,11 @@ export function execAndWaitForOutputToMatch(cmd: string, args: string[], match: 
   }
 }
 
-let npmInstalledEject = false;
 export function ng(...args: string[]) {
   const argv = getGlobalVariable('argv');
   const maybeSilentNg = argv['nosilent'] ? noSilentNg : silentNg;
   if (['build', 'serve', 'test', 'e2e', 'xi18n'].indexOf(args[0]) != -1) {
-    // If we have the --eject, use webpack for the test.
-    if (args[0] == 'build' && argv.eject) {
-      return maybeSilentNg('eject', ...args.slice(1), '--force')
-        .then(() => {
-          if (!npmInstalledEject) {
-            npmInstalledEject = true;
-            // We need to delete node_modules, then run npm install on the first eject.
-            return rimraf('node_modules').then(() => silentNpm('install'));
-          }
-        })
-        .then(() => rimraf('dist'))
-        .then(() => _exec({silent: true}, 'node_modules/.bin/webpack', []));
-    } else if (args[0] == 'e2e') {
+    if (args[0] == 'e2e') {
       // Wait 1 second before running any end-to-end test.
       return new Promise(resolve => setTimeout(resolve, 1000))
         .then(() => maybeSilentNg(...args));
