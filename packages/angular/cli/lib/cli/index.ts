@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
+import { terminal } from '@angular-devkit/core';
 import { createConsoleLogger } from '@angular-devkit/core/node';
 import { runCommand } from '../../models/command-runner';
 import { getWorkspaceRaw } from '../../utilities/config';
@@ -13,7 +13,16 @@ import { getWorkspaceDetails } from '../../utilities/project';
 
 
 export default async function(options: { testing?: boolean, cliArgs: string[] }) {
-  const logger = createConsoleLogger();
+  const logger = createConsoleLogger(
+    false,
+    process.stdout,
+    process.stderr,
+    {
+      warn: s => terminal.bold(terminal.yellow(s)),
+      error: s => terminal.bold(terminal.red(s)),
+      fatal: s => terminal.bold(terminal.red(s)),
+    },
+  );
 
   let projectDetails = getWorkspaceDetails();
   if (projectDetails === null) {
