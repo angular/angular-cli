@@ -135,7 +135,7 @@ export class ProtractorBuilder implements Builder<ProtractorBuilderOptions> {
     }
 
     // run `webdriver-manager update --standalone false --gecko false --quiet`
-    // if you change this, update the command comment in prev line, and in `eject` task
+    // if you change this, update the command comment in prev line
     return from(webdriverUpdate.program.run({
       standalone: false,
       gecko: false,
