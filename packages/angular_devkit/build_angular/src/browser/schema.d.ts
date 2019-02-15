@@ -241,6 +241,14 @@ export interface BrowserBuilderSchema {
    * Enables conditionally loaded IE9-11 polyfills.
    */
   es5BrowserSupport: boolean;
+
+  /**
+   * @deprecated
+   * Change root relative URLs in stylesheets to include base HREF and deploy URL.
+   * Use only for compatibility and transition.
+   * The behavior of this option is non-standard and will be removed in the next major release.
+   */
+  rebaseRootRelativeCssUrls: boolean;
 }
 
 export type OptimizationOptions = boolean | OptimizationObject;
