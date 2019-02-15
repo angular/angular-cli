@@ -45,10 +45,6 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // Determine hashing format.
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing as string);
-  // Convert absolute resource URLs to account for base-href and deploy-url.
-  const baseHref = buildOptions.baseHref || '';
-  const deployUrl = buildOptions.deployUrl || '';
-  const resourcesOutputPath = buildOptions.resourcesOutputPath || '';
 
   const postcssPluginCreator = function (loader: webpack.loader.LoaderContext) {
     return [
@@ -70,10 +66,11 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         },
       }),
       PostcssCliResources({
-        baseHref,
-        deployUrl,
-        resourcesOutputPath,
+        baseHref: buildOptions.baseHref,
+        deployUrl: buildOptions.deployUrl,
+        resourcesOutputPath: buildOptions.resourcesOutputPath,
         loader,
+        rebaseRootRelative: buildOptions.rebaseRootRelativeCssUrls,
         filename: `[name]${hashFormat.file}.[ext]`,
       }),
       autoprefixer(),

@@ -352,7 +352,7 @@ describe('Browser Builder styles', () => {
   });
 
   // TODO: consider making this a unit test in the url processing plugins.
-  it(`supports baseHref and deployUrl in resource urls`, (done) => {
+  it(`supports baseHref/deployUrl in resource urls without rebaseRootRelativeCssUrls`, (done) => {
     // Use a large image for the relative ref so it cannot be inlined.
     host.copyFile('src/spectrum.png', './src/assets/global-img-relative.png');
     host.copyFile('src/spectrum.png', './src/assets/component-img-relative.png');
@@ -402,13 +402,139 @@ describe('Browser Builder styles', () => {
         );
         const main = virtualFs.fileBufferToString(host.scopedSync().read(normalize(mainBundle)));
         expect(styles)
+          .toContain(`url('/assets/global-img-absolute.svg')`);
+        expect(main)
+          .toContain(`url('/assets/component-img-absolute.svg')`);
+      }),
+      // Check urls with base-href scheme are used as is (with deploy-url).
+      concatMap(() => runTargetSpec(host, browserTargetSpec,
+        { extractCss: true, baseHref: 'http://base.url/', deployUrl: 'deploy/' },
+      )),
+      tap(() => {
+        const styles = virtualFs.fileBufferToString(
+          host.scopedSync().read(normalize(stylesBundle)),
+        );
+        const main = virtualFs.fileBufferToString(host.scopedSync().read(normalize(mainBundle)));
+        expect(styles)
+          .toContain(`url('/assets/global-img-absolute.svg')`);
+        expect(main)
+          .toContain(`url('/assets/component-img-absolute.svg')`);
+      }),
+      // Check urls with deploy-url and base-href scheme only use deploy-url.
+      concatMap(() => runTargetSpec(host, browserTargetSpec, {
+        extractCss: true,
+        baseHref: 'http://base.url/',
+        deployUrl: 'http://deploy.url/',
+      },
+      )),
+      tap(() => {
+        const styles = virtualFs.fileBufferToString(
+          host.scopedSync().read(normalize(stylesBundle)),
+        );
+        const main = virtualFs.fileBufferToString(host.scopedSync().read(normalize(mainBundle)));
+        expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
+        expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
+      }),
+      // Check with schemeless base-href and deploy-url flags.
+      concatMap(() => runTargetSpec(host, browserTargetSpec,
+        { extractCss: true, baseHref: '/base/', deployUrl: 'deploy/' },
+      )),
+      tap(() => {
+        const styles = virtualFs.fileBufferToString(
+          host.scopedSync().read(normalize(stylesBundle)),
+        );
+        const main = virtualFs.fileBufferToString(host.scopedSync().read(normalize(mainBundle)));
+        expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
+        expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
+      }),
+      // Check with identical base-href and deploy-url flags.
+      concatMap(() => runTargetSpec(host, browserTargetSpec,
+        { extractCss: true, baseHref: '/base/', deployUrl: '/base/' },
+      )),
+      tap(() => {
+        const styles = virtualFs.fileBufferToString(
+          host.scopedSync().read(normalize(stylesBundle)),
+        );
+        const main = virtualFs.fileBufferToString(host.scopedSync().read(normalize(mainBundle)));
+        expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
+        expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
+      }),
+      // Check with only base-href flag.
+      concatMap(() => runTargetSpec(host, browserTargetSpec,
+        { extractCss: true, baseHref: '/base/' },
+      )),
+      tap(() => {
+        const styles = virtualFs.fileBufferToString(
+          host.scopedSync().read(normalize(stylesBundle)),
+        );
+        const main = virtualFs.fileBufferToString(host.scopedSync().read(normalize(mainBundle)));
+        expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
+        expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
+      }),
+    ).toPromise().then(done, done.fail);
+  }, 90000);
+
+  it(`supports baseHref/deployUrl in resource urls with rebaseRootRelativeCssUrls`, (done) => {
+    // Use a large image for the relative ref so it cannot be inlined.
+    host.copyFile('src/spectrum.png', './src/assets/global-img-relative.png');
+    host.copyFile('src/spectrum.png', './src/assets/component-img-relative.png');
+    host.writeMultipleFiles({
+      'src/styles.css': `
+        h1 { background: url('/assets/global-img-absolute.svg'); }
+        h2 { background: url('./assets/global-img-relative.png'); }
+      `,
+      'src/app/app.component.css': `
+        h3 { background: url('/assets/component-img-absolute.svg'); }
+        h4 { background: url('../assets/component-img-relative.png'); }
+      `,
+      'src/assets/global-img-absolute.svg': imgSvg,
+      'src/assets/component-img-absolute.svg': imgSvg,
+    });
+
+    const stylesBundle = 'dist/styles.css';
+    const mainBundle = 'dist/main.js';
+
+    // Check base paths are correctly generated.
+    const overrides = {
+      extractCss: true,
+      rebaseRootRelativeCssUrls: true,
+    };
+    runTargetSpec(host, browserTargetSpec, { ...overrides, aot: true }).pipe(
+      tap(() => {
+        const styles = virtualFs.fileBufferToString(
+          host.scopedSync().read(normalize(stylesBundle)),
+        );
+        const main = virtualFs.fileBufferToString(host.scopedSync().read(normalize(mainBundle)));
+        expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
+        expect(styles).toContain(`url('global-img-relative.png')`);
+        expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
+        expect(main).toContain(`url('component-img-relative.png')`);
+        expect(host.scopedSync().exists(normalize('dist/assets/global-img-absolute.svg')))
+          .toBe(true);
+        expect(host.scopedSync().exists(normalize('dist/global-img-relative.png')))
+          .toBe(true);
+        expect(host.scopedSync().exists(normalize('dist/assets/component-img-absolute.svg')))
+          .toBe(true);
+        expect(host.scopedSync().exists(normalize('dist/component-img-relative.png')))
+          .toBe(true);
+      }),
+      // Check urls with deploy-url scheme are used as is.
+      concatMap(() => runTargetSpec(host, browserTargetSpec,
+        { ...overrides, baseHref: '/base/', deployUrl: 'http://deploy.url/' },
+      )),
+      tap(() => {
+        const styles = virtualFs.fileBufferToString(
+          host.scopedSync().read(normalize(stylesBundle)),
+        );
+        const main = virtualFs.fileBufferToString(host.scopedSync().read(normalize(mainBundle)));
+        expect(styles)
           .toContain(`url('http://deploy.url/assets/global-img-absolute.svg')`);
         expect(main)
           .toContain(`url('http://deploy.url/assets/component-img-absolute.svg')`);
       }),
       // Check urls with base-href scheme are used as is (with deploy-url).
       concatMap(() => runTargetSpec(host, browserTargetSpec,
-        { extractCss: true, baseHref: 'http://base.url/', deployUrl: 'deploy/' },
+        { ...overrides, baseHref: 'http://base.url/', deployUrl: 'deploy/' },
       )),
       tap(() => {
         const styles = virtualFs.fileBufferToString(
@@ -422,7 +548,7 @@ describe('Browser Builder styles', () => {
       }),
       // Check urls with deploy-url and base-href scheme only use deploy-url.
       concatMap(() => runTargetSpec(host, browserTargetSpec, {
-        extractCss: true,
+        ...overrides,
         baseHref: 'http://base.url/',
         deployUrl: 'http://deploy.url/',
       },
@@ -437,7 +563,7 @@ describe('Browser Builder styles', () => {
       }),
       // Check with schemeless base-href and deploy-url flags.
       concatMap(() => runTargetSpec(host, browserTargetSpec,
-        { extractCss: true, baseHref: '/base/', deployUrl: 'deploy/' },
+        { ...overrides, baseHref: '/base/', deployUrl: 'deploy/' },
       )),
       tap(() => {
         const styles = virtualFs.fileBufferToString(
@@ -449,7 +575,7 @@ describe('Browser Builder styles', () => {
       }),
       // Check with identical base-href and deploy-url flags.
       concatMap(() => runTargetSpec(host, browserTargetSpec,
-        { extractCss: true, baseHref: '/base/', deployUrl: '/base/' },
+        { ...overrides, baseHref: '/base/', deployUrl: '/base/' },
       )),
       tap(() => {
         const styles = virtualFs.fileBufferToString(
@@ -461,7 +587,7 @@ describe('Browser Builder styles', () => {
       }),
       // Check with only base-href flag.
       concatMap(() => runTargetSpec(host, browserTargetSpec,
-        { extractCss: true, baseHref: '/base/' },
+        { ...overrides, baseHref: '/base/' },
       )),
       tap(() => {
         const styles = virtualFs.fileBufferToString(

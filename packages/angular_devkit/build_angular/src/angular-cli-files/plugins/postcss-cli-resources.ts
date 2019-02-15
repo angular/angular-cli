@@ -28,6 +28,7 @@ export interface PostcssCliResourcesOptions {
   baseHref?: string;
   deployUrl?: string;
   resourcesOutputPath?: string;
+  rebaseRootRelative?: boolean;
   filename: string;
   loader: webpack.loader.LoaderContext;
 }
@@ -49,6 +50,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
     deployUrl = '',
     baseHref = '',
     resourcesOutputPath = '',
+    rebaseRootRelative = false,
     filename,
     loader,
   } = options;
@@ -58,6 +60,10 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
   const process = async (inputUrl: string, context: string, resourceCache: Map<string, string>) => {
     // If root-relative, absolute or protocol relative url, leave as is
     if (/^((?:\w+:)?\/\/|data:|chrome:|#)/.test(inputUrl)) {
+      return inputUrl;
+    }
+
+    if (!rebaseRootRelative && /^\//.test(inputUrl)) {
       return inputUrl;
     }
 
