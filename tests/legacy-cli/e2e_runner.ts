@@ -45,7 +45,6 @@ const argv = minimist(process.argv.slice(2), {
   'boolean': [
     'appveyor',
     'debug',
-    'eject',
     'ng-snapshots',
     'noglobal',
     'nosilent',

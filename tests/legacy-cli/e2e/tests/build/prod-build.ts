@@ -9,9 +9,6 @@ import {getGlobalVariable} from '../../utils/env';
 export default function() {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
-  // Skip this in ejected tests.
-  const ejected = getGlobalVariable('argv').eject;
-
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
   return ng('build', '--prod')
@@ -26,5 +23,5 @@ export default function() {
       expectFileToMatch(`dist/test-project/${main}`, /bootstrapModuleFactory\(/);
     })
     // Check that the process didn't change local files.
-    .then(() => !ejected && expectGitToBeClean());
+    .then(() => expectGitToBeClean());
 }

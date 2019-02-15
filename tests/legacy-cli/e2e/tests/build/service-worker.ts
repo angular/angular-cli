@@ -23,11 +23,6 @@ const MANIFEST = {
 };
 
 export default function() {
-  // Skip this in ejected tests.
-  if (getGlobalVariable('argv').eject) {
-    return Promise.resolve();
-  }
-
   // Can't use the `ng` helper because somewhere the environment gets
   // stuck to the first build done
   return silentNpm('remove', '@angular/service-worker')
@@ -46,12 +41,4 @@ export default function() {
     .then(() => ng('build', '--optimization'))
     .then(() => expectFileToExist('dist/test-project/safety-worker.js'))
     .then(() => expectFileToExist('dist/test-project/worker-basic.min.js'));
-    // WEBPACK4_DISABLED - eject temporarily disabled for webpack 4 integration
-    // .then(() => ng('eject', '--prod'))
-    // .then(() => silentNpm('install'))
-    // .then(() => npm('run', 'build'))
-    // .then(() => expectFileToMatch('package.json', /"sw-config"/))
-    // .then(() => expectFileToExist(join(process.cwd(), 'dist/ngsw-worker.js')))
-    // .then(() => expectFileToExist(join(process.cwd(), 'dist/ngsw.json')))
-    // .then(() => ng('set', 'apps.0.serviceWorker=false'));
 }

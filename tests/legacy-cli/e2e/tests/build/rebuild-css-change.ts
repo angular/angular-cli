@@ -14,11 +14,6 @@ export default function() {
   if (process.platform.startsWith('win')) {
     return Promise.resolve();
   }
-  // Skip this in ejected tests.
-  if (getGlobalVariable('argv').eject) {
-    return Promise.resolve();
-  }
-
 
   return execAndWaitForOutputToMatch('ng', ['serve'], webpackGoodRegEx)
     // Should trigger a rebuild.
