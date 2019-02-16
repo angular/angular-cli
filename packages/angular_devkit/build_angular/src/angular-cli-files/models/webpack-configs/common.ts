@@ -13,8 +13,7 @@ import { AssetPatternObject } from '../../../browser/schema';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
-import { findUp } from '../../utilities/find-up';
-import { isDirectory } from '../../utilities/is-directory';
+import { findAllNodeModules, findUp } from '../../utilities/find-up';
 import { requireProjectModule } from '../../utilities/require-project-module';
 import { BuildOptions, WebpackConfigOptions } from '../build-options';
 import { getOutputHashFormat, normalizeExtraEntryPoints } from './utils';
@@ -201,15 +200,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   // Allow loaders to be in a node_modules nested inside the devkit/build-angular package.
   // This is important in case loaders do not get hoisted.
   // If this file moves to another location, alter potentialNodeModules as well.
-  const loaderNodeModules = ['node_modules'];
-  const buildAngularNodeModules = findUp('node_modules', __dirname);
-  if (buildAngularNodeModules
-    && isDirectory(buildAngularNodeModules)
-    && buildAngularNodeModules !== nodeModules
-    && buildAngularNodeModules.startsWith(nodeModules)
-  ) {
-    loaderNodeModules.push(buildAngularNodeModules);
-  }
+  const loaderNodeModules = findAllNodeModules(__dirname, projectRoot);
+  loaderNodeModules.unshift('node_modules');
 
   // Load rxjs path aliases.
   // https://github.com/ReactiveX/rxjs/blob/master/doc/lettable-operators.md#build-and-treeshaking
