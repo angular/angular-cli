@@ -863,7 +863,8 @@ export class AngularCompilerPlugin {
 
     if (this._JitMode) {
       // Replace resources in JIT.
-      this._transformers.push(replaceResources(isAppPath, getTypeChecker));
+      this._transformers.push(
+        replaceResources(isAppPath, getTypeChecker, this._options.directTemplateLoading));
     } else {
       // Remove unneeded angular decorators.
       this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
