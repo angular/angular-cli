@@ -326,7 +326,7 @@ export default function (options: ApplicationOptions): Rule {
       };
 
     const workspace = getWorkspace(host);
-    let newProjectRoot = workspace.newProjectRoot;
+    let newProjectRoot = workspace.newProjectRoot || 'projects';
     let appDir = `${newProjectRoot}/${options.name}`;
     let sourceRoot = `${appDir}/src`;
     let sourceDir = `${sourceRoot}/app`;

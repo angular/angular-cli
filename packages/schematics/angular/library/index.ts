@@ -193,7 +193,7 @@ export default function (options: LibraryOptions): Rule {
     }
 
     const workspace = getWorkspace(host);
-    const newProjectRoot = workspace.newProjectRoot;
+    const newProjectRoot = workspace.newProjectRoot || 'projects';
 
     const scopeFolder = scopeName ? strings.dasherize(scopeName) + '/' : '';
     const folderName = `${scopeFolder}${strings.dasherize(options.name)}`;
