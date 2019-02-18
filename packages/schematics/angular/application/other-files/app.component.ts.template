@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }%> } from '@angular/core';
 
 @Component({
   selector: '<%= selector %>',<% if(inlineTemplate) { %>
@@ -28,7 +28,8 @@ import { Component } from '@angular/core';
   `,<% } else { %>
   templateUrl: './app.component.html',<% } if(inlineStyle) { %>
   styles: []<% } else { %>
-  styleUrls: ['./app.component.<%= styleExt %>']<% } %>
+  styleUrls: ['./app.component.<%= styleExt %>']<% } %>,<% if(!!viewEncapsulation) { %>,
+  encapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } %>
 })
 export class AppComponent {
   title = '<%= name %>';
