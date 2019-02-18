@@ -10,7 +10,7 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { latestVersions } from '../utility/latest-versions';
 import { getFileContent } from '../utility/test';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
-import { Schema as ApplicationOptions, Style } from './schema';
+import { Schema as ApplicationOptions, Style, ViewEncapsulation } from './schema';
 
 // tslint:disable:max-line-length
 describe('Application Schematic', () => {
@@ -114,6 +114,17 @@ describe('Application Schematic', () => {
     const path = '/projects/foo/src/app/app.module.ts';
     const content = tree.readContent(path);
     expect(content).toMatch(/import { AppComponent } from \'\.\/app\.component\';/);
+  });
+
+  it(`should set 'defaultEncapsulation' in main.ts when 'ViewEncapsulation' is provided`, () => {
+    const tree = schematicRunner.runSchematic('application', {
+      ...defaultOptions,
+      viewEncapsulation: ViewEncapsulation.ShadowDom,
+    }, workspaceTree);
+    const path = '/projects/foo/src/main.ts';
+    const content = tree.readContent(path);
+    expect(content).toContain('defaultEncapsulation: ViewEncapsulation.ShadowDom');
+    expect(content).toContain(`import { enableProdMode, ViewEncapsulation } from '@angular/core'`);
   });
 
   it('should set the right paths in the tsconfig files', () => {
@@ -293,7 +304,6 @@ describe('Application Schematic', () => {
 
     it('should set the relative tsconfig paths', () => {
       const options = { ...defaultOptions, projectRoot: '' };
-
       const tree = schematicRunner.runSchematic('application', options, workspaceTree);
       const appTsConfig = JSON.parse(tree.readContent('/src/tsconfig.app.json'));
       expect(appTsConfig.extends).toEqual('../tsconfig.json');
