@@ -36,6 +36,6 @@
     "@angular/compiler": "^7.2.0-rc.0",
     "@angular/compiler-cli": "^7.2.0-rc.0",
     "typescript": "3.2.4",
-    "webpack": "4.29.4"
+    "webpack": "4.29.5"
   }
 }
