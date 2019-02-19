@@ -30,7 +30,6 @@ import { Schema as ConfigCommandSchema, Value as ConfigCommandSchemaValue } from
 
 const validCliPaths = new Map([
   ['cli.warnings.versionMismatch', 'boolean'],
-  ['cli.warnings.typescriptMismatch', 'boolean'],
   ['cli.defaultCollection', 'string'],
   ['cli.packageManager', 'string'],
 ]);
@@ -213,6 +212,15 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
   private get(config: experimental.workspace.WorkspaceSchema, options: ConfigCommandSchema) {
     let value;
     if (options.jsonPath) {
+      if (options.jsonPath === 'cli.warnings.typescriptMismatch') {
+        // NOTE: Remove this in 9.0.
+        this.logger.warn('The "typescriptMismatch" warning has been removed in 8.0.');
+        // Since there is no actual warning, this value is always false.
+        this.logger.info('false');
+
+        return 0;
+      }
+
       value = getValueFromPath(config as {} as JsonObject, options.jsonPath);
     } else {
       value = config;
@@ -235,6 +243,14 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
     if (!options.jsonPath || !options.jsonPath.trim()) {
       throw new Error('Invalid Path.');
     }
+
+    if (options.jsonPath === 'cli.warnings.typescriptMismatch') {
+      // NOTE: Remove this in 9.0.
+      this.logger.warn('The "typescriptMismatch" warning has been removed in 8.0.');
+
+      return 0;
+    }
+
     if (options.global
         && !options.jsonPath.startsWith('schematics.')
         && !validCliPaths.has(options.jsonPath)) {

@@ -61,7 +61,8 @@
             },
             "typescriptMismatch": {
               "description": "Show a warning when the TypeScript version is incompatible.",
-              "type": "boolean"
+              "type": "boolean",
+              "x-deprecated": true
             }
           }
         }
