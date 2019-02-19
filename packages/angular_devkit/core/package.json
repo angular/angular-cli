@@ -9,7 +9,7 @@
   ],
   "dependencies": {
     "ajv": "6.9.1",
-    "chokidar": "2.1.0",
+    "chokidar": "2.1.2",
     "fast-json-stable-stringify": "2.0.0",
     "rxjs": "6.3.3",
     "source-map": "0.7.3"
