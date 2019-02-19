@@ -15,9 +15,8 @@ export class ServeCommand extends ArchitectCommand<ServeCommandSchema> {
   public readonly target = 'serve';
 
   public validate(_options: ArchitectCommandOptions & Arguments) {
-    // Check Angular and TypeScript versions.
+    // Check Angular versions.
     Version.assertCompatibleAngularVersion(this.workspace.root);
-    Version.assertTypescriptVersion(this.workspace.root);
 
     return true;
   }

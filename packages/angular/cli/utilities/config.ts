@@ -221,9 +221,6 @@ export function migrateLegacyGlobalConfig(): boolean {
         if (typeof legacy.warnings.versionMismatch == 'boolean') {
           warnings['versionMismatch'] = legacy.warnings.versionMismatch;
         }
-        if (typeof legacy.warnings.typescriptMismatch == 'boolean') {
-          warnings['typescriptMismatch'] = legacy.warnings.typescriptMismatch;
-        }
 
         if (Object.getOwnPropertyNames(warnings).length > 0) {
           cli['warnings'] = warnings;

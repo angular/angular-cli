@@ -145,12 +145,6 @@ function extractCliConfig(config: CliConfig): JsonObject | null {
         ...{ versionMismatch: config.warnings.versionMismatch },
       };
     }
-    if (config.warnings.typescriptMismatch !== undefined) {
-      newConfig.warnings = {
-        ...((newConfig.warnings as JsonObject | null) || {}),
-        ...{ typescriptMismatch: config.warnings.typescriptMismatch },
-      };
-    }
   }
 
   return Object.getOwnPropertyNames(newConfig).length == 0 ? null : newConfig;

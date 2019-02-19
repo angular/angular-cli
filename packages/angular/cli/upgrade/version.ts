@@ -9,8 +9,7 @@
 import { tags, terminal } from '@angular-devkit/core';
 import { resolve } from '@angular-devkit/core/node';
 import * as path from 'path';
-import { SemVer, satisfies } from 'semver';
-import { isWarningEnabled } from '../utilities/config';
+import { SemVer } from 'semver';
 
 
 export class Version {
@@ -107,69 +106,6 @@ export class Version {
           Please visit the link below to find instructions on how to update RxJs.
           https://docs.google.com/document/d/12nlLt71VLKb-z3YaSGzUfx6mJbc34nsMXtByPUN35cg/edit#
         ` + '\n')));
-    }
-  }
-
-  static assertTypescriptVersion(projectRoot: string) {
-    if (!isWarningEnabled('typescriptMismatch')) {
-      return;
-    }
-
-    let compilerVersion: string;
-    let tsVersion: string;
-    let compilerTypeScriptPeerVersion: string;
-    try {
-      const resolveOptions = {
-        basedir: projectRoot,
-        checkGlobal: false,
-        checkLocal: true,
-      };
-      const compilerPackagePath = resolve('@angular/compiler-cli/package.json', resolveOptions);
-      const typescriptProjectPath = resolve('typescript', resolveOptions);
-      const compilerPackageInfo = require(compilerPackagePath);
-
-      compilerVersion = compilerPackageInfo['version'];
-      compilerTypeScriptPeerVersion = compilerPackageInfo['peerDependencies']['typescript'];
-      tsVersion = require(typescriptProjectPath).version;
-    } catch {
-      console.error(terminal.bold(terminal.red(tags.stripIndents`
-        Versions of @angular/compiler-cli and typescript could not be determined.
-        The most common reason for this is a broken npm install.
-
-        Please make sure your package.json contains both @angular/compiler-cli and typescript in
-        devDependencies, then delete node_modules and package-lock.json (if you have one) and
-        run npm install again.
-      `)));
-      process.exit(2);
-
-      return;
-    }
-
-    // These versions do not have accurate typescript peer dependencies
-    const versionCombos = [
-      { compiler: '>=2.3.1 <3.0.0', typescript: '>=2.0.2 <2.3.0' },
-      { compiler: '>=4.0.0-beta.0 <5.0.0', typescript: '>=2.1.0 <2.4.0' },
-      { compiler: '5.0.0-beta.0 - 5.0.0-rc.2', typescript: '>=2.4.2 <2.5.0' },
-    ];
-
-    let currentCombo = versionCombos.find((combo) => satisfies(compilerVersion, combo.compiler));
-    if (!currentCombo && compilerTypeScriptPeerVersion) {
-      currentCombo = { compiler: compilerVersion, typescript: compilerTypeScriptPeerVersion };
-    }
-
-    if (currentCombo && !satisfies(tsVersion, currentCombo.typescript)) {
-      // First line of warning looks weird being split in two, disable tslint for it.
-      console.error((terminal.yellow('\n' + tags.stripIndent`
-        @angular/compiler-cli@${compilerVersion} requires typescript@'${
-        currentCombo.typescript}' but ${tsVersion} was found instead.
-        Using this version can result in undefined behaviour and difficult to debug problems.
-
-        Please run the following command to install a compatible version of TypeScript.
-
-            npm install typescript@"${currentCombo.typescript}"
-
-        To disable this warning run "ng config cli.warnings.typescriptMismatch false".
-      ` + '\n')));
     }
   }
 
