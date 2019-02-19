@@ -82,6 +82,24 @@ Check out the minor tag (e.g. `v6.8.0-beta.0`), then run:
 devkit-admin publish --tag next
 ```
 
+### Microsite Publishing
+
+**This can ONLY be done by a Google employee.**
+
+**You will need firebase access to our cli-angular-io firebase site. If you don't have it, escalate.**
+
+Check out if changes were made to the microsite:
+
+```sh
+git log v8.0.0-beta.0..HEAD --oneline etc/cli.angular.io | wc -l
+```
+
+If the number is 0 you can ignore the rest of this section.
+
+To publish, go to the `etc/cli.angular.io` directory and run `firebase deploy`. You might have to `firebase login` first. If you don't have the firebase CLI installed, you can install it using `npm install --global firebase-tools` (or use your package manager of choice).
+
+This is detailed in `etc/cli.angular.io/README.md`.
+
 ### Release Notes
 
 `devkit-admin changelog` takes `from` and `to` arguments which are any valid git ref.
