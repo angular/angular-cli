@@ -11,21 +11,21 @@
 import { logging } from '@angular-devkit/core';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import {
-  AssetPatternObject,
+  AssetPatternClass,
   Budget,
-  CurrentFileReplacement,
   ExtraEntryPoint,
-  NormalizedOptimization,
-  NormalizedSourceMaps,
+  OptimizationClass,
+  SourceMapClass,
 } from '../../browser/schema';
+import { NormalizedFileReplacement } from '../../utils/normalize-file-replacements';
 
 export interface BuildOptions {
-  optimization: NormalizedOptimization;
+  optimization: OptimizationClass;
   environment?: string;
   outputPath: string;
   resourcesOutputPath?: string;
   aot?: boolean;
-  sourceMap: NormalizedSourceMaps;
+  sourceMap: SourceMapClass;
   /** @deprecated use sourceMap instead */
   vendorSourceMap?: boolean;
   /** @deprecated  */
@@ -64,13 +64,13 @@ export interface BuildOptions {
   index: string;
   polyfills?: string;
   budgets: Budget[];
-  assets: AssetPatternObject[];
+  assets: AssetPatternClass[];
   scripts: ExtraEntryPoint[];
   styles: ExtraEntryPoint[];
   stylePreprocessorOptions?: { includePaths: string[] };
   lazyModules: string[];
   platform?: 'browser' | 'server';
-  fileReplacements: CurrentFileReplacement[];
+  fileReplacements: NormalizedFileReplacement[];
     /** @deprecated use only for compatibility in 8.x; will be removed in 9.0 */
   rebaseRootRelativeCssUrls?: boolean;
 }

@@ -14,11 +14,7 @@ import {
   normalize,
   virtualFs,
 } from '@angular-devkit/core';
-import {
-  CurrentFileReplacement,
-  DeprecatedFileReplacment,
-  FileReplacement,
-} from '../browser/schema';
+import { FileReplacement } from '../browser/schema';
 
 
 export class MissingFileReplacementException extends BaseException {
@@ -61,17 +57,16 @@ function normalizeFileReplacement(
   fileReplacement: FileReplacement,
   root?: Path,
 ): NormalizedFileReplacement {
-  const currentFormat = fileReplacement as CurrentFileReplacement;
-  const maybeOldFormat = fileReplacement as DeprecatedFileReplacment;
-
   let replacePath: Path;
   let withPath: Path;
-  if (maybeOldFormat.src && maybeOldFormat.replaceWith) {
-    replacePath = normalize(maybeOldFormat.src);
-    withPath = normalize(maybeOldFormat.replaceWith);
+  if (fileReplacement.src && fileReplacement.replaceWith) {
+    replacePath = normalize(fileReplacement.src);
+    withPath = normalize(fileReplacement.replaceWith);
+  } else if (fileReplacement.replace && fileReplacement.with) {
+    replacePath = normalize(fileReplacement.replace);
+    withPath = normalize(fileReplacement.with);
   } else {
-    replacePath = normalize(currentFormat.replace);
-    withPath = normalize(currentFormat.with);
+    throw new Error(`Invalid file replacement: ${JSON.stringify(fileReplacement)}`);
   }
 
   // TODO: For 7.x should this only happen if not absolute?

@@ -19,7 +19,7 @@ import { Observable, from, of } from 'rxjs';
 import { concatMap, map, take, tap } from 'rxjs/operators';
 import * as url from 'url';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
-import { DevServerBuilderOptions } from '../dev-server';
+import { Schema as DevServerBuilderOptions } from '../dev-server/schema';
 import { runModuleAsObservableFork } from '../utils';
 
 

@@ -23,41 +23,22 @@ import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
 import { checkPort } from '../angular-cli-files/utilities/check-port';
 import { BrowserBuilder, getBrowserLoggingCb } from '../browser';
-import { BrowserBuilderSchema, NormalizedBrowserBuilderSchema } from '../browser/schema';
-import { normalizeBuilderSchema } from '../utils';
+import { Schema as BrowserBuilderSchema } from '../browser/schema';
+import {
+  NormalizedBrowserBuilderSchema,
+  normalizeBrowserSchema,
+} from '../utils';
+import { Schema as DevServerBuilderSchema } from './schema';
 const opn = require('opn');
 
 
-export interface DevServerBuilderOptions extends Pick<BrowserBuilderSchema,
-  'optimization' | 'aot' | 'sourceMap' | 'vendorSourceMap'
-  | 'evalSourceMap' | 'vendorChunk' | 'commonChunk' | 'poll'
-  | 'baseHref' | 'deployUrl' | 'progress' | 'verbose'
-  > {
-  browserTarget: string;
-  port: number;
-  host: string;
-  proxyConfig?: string;
-  ssl: boolean;
-  sslKey?: string;
-  sslCert?: string;
-  open: boolean;
-  liveReload: boolean;
-  publicHost?: string;
-  servePath?: string;
-  disableHostCheck: boolean;
-  hmr: boolean;
-  watch: boolean;
-  hmrWarning: boolean;
-  servePathDefaultWarning: boolean;
-}
+type DevServerBuilderSchemaKeys = Extract<keyof DevServerBuilderSchema, string>;
 
-type DevServerBuilderOptionsKeys = Extract<keyof DevServerBuilderOptions, string>;
-
-export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
+export class DevServerBuilder implements Builder<DevServerBuilderSchema> {
 
   constructor(public context: BuilderContext) { }
 
-  run(builderConfig: BuilderConfiguration<DevServerBuilderOptions>): Observable<BuildEvent> {
+  run(builderConfig: BuilderConfiguration<DevServerBuilderSchema>): Observable<BuildEvent> {
     const options = builderConfig.options;
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
@@ -67,13 +48,15 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     let first = true;
     let opnAddress: string;
 
-    return from(checkPort(options.port, options.host)).pipe(
+    return from(checkPort(options.port || 4200, options.host || 'localhost')).pipe(
       tap((port) => options.port = port),
       concatMap(() => this._getBrowserOptions(options)),
-      tap(opts => browserOptions = normalizeBuilderSchema(
+      tap(opts => browserOptions = normalizeBrowserSchema(
         host,
         root,
-        opts,
+        resolve(root, builderConfig.root),
+        builderConfig.sourceRoot,
+        opts.options,
       )),
       concatMap(() => {
         const webpackConfig = this.buildWebpackConfig(root, projectRoot, host, browserOptions);
@@ -105,7 +88,9 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
         const serverAddress = url.format({
           protocol: options.ssl ? 'https' : 'http',
           hostname: options.host === '0.0.0.0' ? 'localhost' : options.host,
-          port: options.port.toString(),
+          // Port cannot be undefined here since we have a step that sets it back in options above.
+          // tslint:disable-next-line:no-non-null-assertion
+          port: options.port !.toString(),
         });
 
         // Add live reload config.
@@ -150,7 +135,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
         webpackConfig.devServer = webpackDevServerConfig;
 
         return webpackDevServerBuilder.runWebpackDevServer(
-          webpackConfig, undefined, getBrowserLoggingCb(browserOptions.verbose),
+          webpackConfig, undefined, getBrowserLoggingCb(browserOptions.verbose || false),
         );
       }),
       map(buildEvent => {
@@ -172,15 +157,13 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     browserOptions: NormalizedBrowserBuilderSchema,
   ) {
     const browserBuilder = new BrowserBuilder(this.context);
-    const webpackConfig = browserBuilder.buildWebpackConfig(
-      root, projectRoot, host, browserOptions);
 
-    return webpackConfig;
+    return browserBuilder.buildWebpackConfig(root, projectRoot, host, browserOptions);
   }
 
   private _buildServerConfig(
     root: Path,
-    options: DevServerBuilderOptions,
+    options: DevServerBuilderSchema,
     browserOptions: NormalizedBrowserBuilderSchema,
   ) {
     const systemRoot = getSystemPath(root);
@@ -247,7 +230,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
   }
 
   private _addLiveReload(
-    options: DevServerBuilderOptions,
+    options: DevServerBuilderSchema,
     browserOptions: NormalizedBrowserBuilderSchema,
     webpackConfig: any, // tslint:disable-line:no-any
     clientAddress: string,
@@ -294,7 +277,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
 
   private _addSslConfig(
     root: string,
-    options: DevServerBuilderOptions,
+    options: DevServerBuilderSchema,
     config: WebpackDevServer.Configuration,
   ) {
     let sslKey: string | undefined = undefined;
@@ -323,7 +306,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
 
   private _addProxyConfig(
     root: string,
-    options: DevServerBuilderOptions,
+    options: DevServerBuilderSchema,
     config: WebpackDevServer.Configuration,
   ) {
     let proxyConfig = {};
@@ -338,7 +321,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
   }
 
   private _buildServePath(
-    options: DevServerBuilderOptions,
+    options: DevServerBuilderSchema,
     browserOptions: NormalizedBrowserBuilderSchema,
   ) {
     let servePath = options.servePath;
@@ -399,11 +382,11 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     return `${normalizedBaseHref}${deployUrl || ''}`;
   }
 
-  private _getBrowserOptions(options: DevServerBuilderOptions) {
+  private _getBrowserOptions(options: DevServerBuilderSchema) {
     const architect = this.context.architect;
     const [project, target, configuration] = options.browserTarget.split(':');
 
-    const overridesOptions: DevServerBuilderOptionsKeys[] = [
+    const overridesOptions: DevServerBuilderSchemaKeys[] = [
       'watch',
       'optimization',
       'aot',
@@ -420,7 +403,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     ];
 
     // remove options that are undefined or not to be overrriden
-    const overrides = (Object.keys(options) as DevServerBuilderOptionsKeys[])
+    const overrides = (Object.keys(options) as DevServerBuilderSchemaKeys[])
       .filter(key => options[key] !== undefined && overridesOptions.includes(key))
       .reduce<Partial<BrowserBuilderSchema>>((previous, key) => (
         {

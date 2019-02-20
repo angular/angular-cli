@@ -30,7 +30,7 @@ import {
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { getBrowserLoggingCb } from '../browser';
-import { defaultProgress, normalizeBuilderSchema } from '../utils';
+import { defaultProgress, normalizeWebpackServerSchema } from '../utils';
 import { BuildWebpackServerSchema, NormalizedServerBuilderServerSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
@@ -45,10 +45,12 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<Stats>);
     const webpackBuilder = new WebpackBuilder({ ...this.context, host });
 
-    const options = normalizeBuilderSchema(
+    const options = normalizeWebpackServerSchema(
       host,
       root,
-      builderConfig,
+      resolve(root, builderConfig.root),
+      builderConfig.sourceRoot,
+      builderConfig.options,
     );
 
     // TODO: verify using of(null) to kickstart things is a pattern.

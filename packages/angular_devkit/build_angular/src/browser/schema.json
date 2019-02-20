@@ -1,6 +1,8 @@
 {
+  "$schema": "http://json-schema.org/schema",
   "title": "Webpack browser schema for Build Facade.",
   "description": "Browser target options",
+  "type": "object",
   "properties": {
     "assets": {
       "type": "array",

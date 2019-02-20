@@ -9,7 +9,7 @@
 import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { BrowserBuilderSchema } from '../../src/browser/schema';
+import { Schema as BrowserBuilderSchema } from '../../src/browser/schema';
 import { browserTargetSpec, host } from '../utils';
 
 

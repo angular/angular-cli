@@ -11,7 +11,7 @@ import * as express from 'express'; // tslint:disable-line:no-implicit-dependenc
 import * as http from 'http';
 import { from } from 'rxjs';
 import { concatMap, take, tap } from 'rxjs/operators';
-import { DevServerBuilderOptions } from '../../src';
+import { Schema as DevServerBuilderOptions } from '../../src/dev-server/schema';
 import { devServerTargetSpec, host } from '../utils';
 
 

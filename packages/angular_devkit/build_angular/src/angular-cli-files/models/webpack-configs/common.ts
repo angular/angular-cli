@@ -9,7 +9,7 @@ import { tags } from '@angular-devkit/core';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
 import { HashedModuleIdsPlugin, debug } from 'webpack';
-import { AssetPatternObject } from '../../../browser/schema';
+import { AssetPatternClass } from '../../../browser/schema';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
@@ -103,7 +103,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
           prev.push({
             bundleName,
             paths: [resolvedPath],
-            lazy: curr.lazy,
+            lazy: curr.lazy || false,
           });
         }
 
@@ -129,7 +129,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   // process asset entries
   if (buildOptions.assets) {
-    const copyWebpackPluginPatterns = buildOptions.assets.map((asset: AssetPatternObject) => {
+    const copyWebpackPluginPatterns = buildOptions.assets.map((asset: AssetPatternClass) => {
 
       // Resolve input paths relative to workspace root and add slash at the end.
       asset.input = path.resolve(root, asset.input).replace(/\\/g, '/');

@@ -10,7 +10,7 @@
 
 import * as path from 'path';
 import { basename, normalize } from '@angular-devkit/core';
-import { ExtraEntryPoint, ExtraEntryPointObject } from '../../../browser/schema';
+import { ExtraEntryPoint, ExtraEntryPointClass } from '../../../browser/schema';
 import { SourceMapDevToolPlugin } from 'webpack';
 
 export const ngAppResolve = (resolvePath: string): string => {
@@ -36,7 +36,7 @@ export function getOutputHashFormat(option: string, length = 20): HashFormat {
   return hashFormats[option] || hashFormats['none'];
 }
 
-export type NormalizedEntryPoint = ExtraEntryPointObject & { bundleName: string };
+export type NormalizedEntryPoint = ExtraEntryPointClass & { bundleName: string };
 
 export function normalizeExtraEntryPoints(
   extraEntryPoints: ExtraEntryPoint[],

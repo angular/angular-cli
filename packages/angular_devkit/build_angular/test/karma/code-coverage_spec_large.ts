@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, tap } from 'rxjs/operators';
-import { NormalizedKarmaBuilderSchema } from '../../src';
+import { NormalizedKarmaBuilderSchema } from '../../src/utils';
 import { host, karmaTargetSpec } from '../utils';
 
 

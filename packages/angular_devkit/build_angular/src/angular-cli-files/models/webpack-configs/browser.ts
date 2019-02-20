@@ -67,8 +67,8 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
 
   if (!isEval && (scriptsSourceMap || stylesSourceMap)) {
     extraPlugins.push(getSourceMapDevTool(
-      scriptsSourceMap,
-      stylesSourceMap,
+      !!scriptsSourceMap,
+      !!stylesSourceMap,
       hiddenSourceMap,
     ));
   }

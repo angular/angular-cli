@@ -16,7 +16,7 @@ import {
   resolve,
   virtualFs,
 } from '@angular-devkit/core';
-import { AssetPattern, AssetPatternObject } from '../browser/schema';
+import { AssetPattern, AssetPatternClass } from '../browser/schema';
 
 
 export class MissingAssetSourceRootException extends BaseException {
@@ -31,7 +31,7 @@ export function normalizeAssetPatterns(
   root: Path,
   projectRoot: Path,
   maybeSourceRoot: Path | undefined,
-): AssetPatternObject[] {
+): AssetPatternClass[] {
   // When sourceRoot is not available, we default to ${projectRoot}/src.
   const sourceRoot = maybeSourceRoot || join(projectRoot, 'src');
   const resolvedSourceRoot = resolve(root, sourceRoot);

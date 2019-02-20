@@ -26,8 +26,8 @@ import {
 } from '../angular-cli-files/models/webpack-configs';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
-import { defaultProgress, normalizeBuilderSchema } from '../utils';
-import { KarmaBuilderSchema, NormalizedKarmaBuilderSchema } from './schema';
+import { NormalizedKarmaBuilderSchema, defaultProgress, normalizeKarmaSchema } from '../utils';
+import { KarmaBuilderSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
 
@@ -39,10 +39,12 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
     const projectRoot = resolve(root, builderConfig.root);
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
 
-    const options = normalizeBuilderSchema(
+    const options = normalizeKarmaSchema(
       host,
       root,
-      builderConfig,
+      resolve(root, builderConfig.root),
+      builderConfig.sourceRoot,
+      builderConfig.options,
     );
 
     return of(null).pipe(
