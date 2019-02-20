@@ -18,6 +18,7 @@ export class MultiProgressBar<Key, T> {
     const value = {
       data,
       bar: new ProgressBar(this._status, {
+        renderThrottle: 0,
         clear: true,
         total: 1,
         width: width,
