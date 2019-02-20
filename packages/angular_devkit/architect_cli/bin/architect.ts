@@ -21,6 +21,7 @@ import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import { existsSync, readFileSync } from 'fs';
 import * as minimist from 'minimist';
 import * as path from 'path';
+import { last } from 'rxjs/operators';
 import { MultiProgressBar } from '../src/progress';
 
 
@@ -147,7 +148,7 @@ async function _executeTarget(
 
   // Wait for full completion of the builder.
   try {
-    const result = await run.result;
+    const result = await run.output.pipe(last()).toPromise();
 
     if (result.success) {
       parentLogger.info(terminal.green('SUCCESS'));
