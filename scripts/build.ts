@@ -12,6 +12,7 @@ import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
 import { packages } from '../lib/packages';
+import buildSchema from './build-schema';
 
 const minimatch = require('minimatch');
 const tar = require('tar');
@@ -200,40 +201,7 @@ async function _bazel(logger: logging.Logger) {
   // TODO: undo this when we fully support bazel on windows.
   // logger.info('Bazel build...');
   // _exec('bazel', ['build', '//packages/...'], {}, logger);
-
-  const allJsonFiles = glob.sync('packages/**/*.json', {
-    ignore: [
-      '**/node_modules/**',
-      '**/files/**',
-      '**/*-files/**',
-      '**/package.json',
-    ],
-  });
-
-  const quicktypeRunner = require('../tools/quicktype_runner');
-  logger.info('Generating JSON Schema....');
-
-  for (const fileName of allJsonFiles) {
-    if (fs.existsSync(fileName.replace(/\.json$/, '.ts'))
-        || fs.existsSync(fileName.replace(/\.json$/, '.d.ts'))) {
-      // Skip files that already exist.
-      continue;
-    }
-    const content = fs.readFileSync(fileName, 'utf-8');
-
-    const json = JSON.parse(content);
-    if (!json.$schema) {
-      // Skip non-schema files.
-      continue;
-    }
-    const tsContent = await quicktypeRunner.generate(fileName);
-    const tsPath = path.join(__dirname, '../dist-schema', fileName.replace(/\.json$/, '.ts'));
-
-    _mkdirp(path.dirname(tsPath));
-    fs.writeFileSync(tsPath, tsContent, 'utf-8');
-  }
 }
-
 
 export default async function(
   argv: { local?: boolean, snapshot?: boolean },
@@ -243,6 +211,7 @@ export default async function(
 
   const sortedPackages = _sortPackages();
   await _bazel(logger);
+  await buildSchema({}, logger);
   _build(logger);
 
   logger.info('Moving packages to dist/');
