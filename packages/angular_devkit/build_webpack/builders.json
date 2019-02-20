@@ -2,6 +2,7 @@
   "$schema": "../architect/src/builders-schema.json",
   "builders": {
     "webpack": {
+      "implementation": "./src/webpack/index2",
       "class": "./src/webpack",
       "schema": "./src/webpack/schema.json",
       "description": "Build a webpack app."
