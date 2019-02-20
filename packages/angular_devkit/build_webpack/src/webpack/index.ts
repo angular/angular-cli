@@ -11,7 +11,7 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
-import { Path, getSystemPath, logging, normalize, resolve } from '@angular-devkit/core';
+import { getSystemPath, logging, normalize, resolve } from '@angular-devkit/core';
 import { Observable, from } from 'rxjs';
 import { concatMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
