@@ -1,0 +1,61 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+// tslint:disable:no-implicit-dependencies
+import { logging } from '@angular-devkit/core';
+import * as fs from 'fs';
+import * as glob from 'glob';
+import * as path from 'path';
+
+
+function _mkdirp(p: string) {
+  // Create parent folder if necessary.
+  if (!fs.existsSync(path.dirname(p))) {
+    _mkdirp(path.dirname(p));
+  }
+  if (!fs.existsSync(p)) {
+    fs.mkdirSync(p);
+  }
+}
+
+
+export default async function(
+  argv: { },
+  logger: logging.Logger,
+) {
+  const allJsonFiles = glob.sync('packages/**/*.json', {
+    ignore: [
+      '**/node_modules/**',
+      '**/files/**',
+      '**/*-files/**',
+      '**/package.json',
+    ],
+  });
+
+  const quicktypeRunner = require('../tools/quicktype_runner');
+  logger.info('Generating JSON Schema....');
+
+  for (const fileName of allJsonFiles) {
+    if (fs.existsSync(fileName.replace(/\.json$/, '.ts'))
+      || fs.existsSync(fileName.replace(/\.json$/, '.d.ts'))) {
+      // Skip files that already exist.
+      continue;
+    }
+    const content = fs.readFileSync(fileName, 'utf-8');
+
+    const json = JSON.parse(content);
+    if (!json.$schema) {
+      // Skip non-schema files.
+      continue;
+    }
+    const tsContent = await quicktypeRunner.generate(fileName);
+    const tsPath = path.join(__dirname, '../dist-schema', fileName.replace(/\.json$/, '.ts'));
+
+    _mkdirp(path.dirname(tsPath));
+    fs.writeFileSync(tsPath, tsContent, 'utf-8');
+  }
+}
