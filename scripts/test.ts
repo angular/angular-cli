@@ -176,6 +176,10 @@ export default function (args: ParsedArgs, logger: logging.Logger) {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
   }
 
+  if (args.timeout && Number.parseInt(args.timeout) > 0) {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = Number.parseInt(args.timeout);
+  }
+
   // Run the tests.
   const allTests =
     glob.sync(regex)
