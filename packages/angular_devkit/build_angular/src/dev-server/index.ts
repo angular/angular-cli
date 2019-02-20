@@ -290,6 +290,19 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     }
     if (!webpackConfig.entry.main) { webpackConfig.entry.main = []; }
     webpackConfig.entry.main.unshift(...entryPoints);
+
+    // The dev server live reload requires a node 'events' builtin shim to function.
+    // The dev server as written only currently works with package managers
+    // that hoist the `events` shim package to an accessible location.
+    // Hoisting is unfortunately not standardized and the assumption within
+    // the dev server will not hold true for all package managers.
+    // The actual code is only accessed when hmr is enabled which allows
+    // the 'events' import to be ignored in the non-hmr case.
+    if (!webpackConfig.node) {
+      webpackConfig.node = { events: options.hmr || false };
+    } else if (typeof webpackConfig.node === 'object') {
+      webpackConfig.node.events = webpackConfig.node.events || options.hmr || false;
+    }
   }
 
   private _addSslConfig(
