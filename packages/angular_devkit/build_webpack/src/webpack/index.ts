@@ -15,7 +15,7 @@ import { Path, getSystemPath, logging, normalize, resolve } from '@angular-devki
 import { Observable, from } from 'rxjs';
 import { concatMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
-import { WebpackBuilderSchema } from './schema';
+import { Schema as WebpackBuilderSchema } from './schema';
 
 
 export interface LoggingCallback {

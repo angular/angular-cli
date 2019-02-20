@@ -6,18 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {
-  NormalizedOptimization,
-  OptimizationOptions,
-  SourceMapOptions,
-} from '../browser/schema';
+import { OptimizationClass, OptimizationUnion } from '../browser/schema';
 
-export function normalizeOptimization(optimization: OptimizationOptions): NormalizedOptimization {
-  const scripts = !!(typeof optimization === 'object' ? optimization.scripts : optimization);
-  const styles = !!(typeof optimization === 'object' ? optimization.styles : optimization);
-
+export function normalizeOptimization(
+  optimization: OptimizationUnion = false,
+): Required<OptimizationClass> {
   return {
-    scripts,
-    styles,
+    scripts: typeof optimization === 'object' ? !!optimization.scripts : optimization,
+    styles: typeof optimization === 'object' ? !!optimization.styles : optimization,
   };
 }

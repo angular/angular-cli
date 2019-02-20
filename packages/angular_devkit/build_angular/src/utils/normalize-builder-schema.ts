@@ -8,70 +8,62 @@
  */
 
 
-import { BuilderConfiguration } from '@angular-devkit/architect';
-import { Path, resolve, virtualFs } from '@angular-devkit/core';
-import { BrowserBuilderSchema, NormalizedBrowserBuilderSchema } from '../browser/schema';
-import { KarmaBuilderSchema, NormalizedKarmaBuilderSchema } from '../karma/schema';
-import { BuildWebpackServerSchema, NormalizedServerBuilderServerSchema } from '../server/schema';
+import { Path, virtualFs } from '@angular-devkit/core';
+import { BuildOptions } from '../angular-cli-files/models/build-options';
+import {
+  AssetPatternClass,
+  OptimizationClass,
+  Schema as BrowserBuilderSchema,
+  SourceMapClass,
+} from '../browser/schema';
 import { normalizeAssetPatterns } from './normalize-asset-patterns';
-import { normalizeFileReplacements } from './normalize-file-replacements';
+import {
+  NormalizedFileReplacement,
+  normalizeFileReplacements,
+} from './normalize-file-replacements';
 import { normalizeOptimization } from './normalize-optimization';
 import { normalizeSourceMaps } from './normalize-source-maps';
 
-export function normalizeBuilderSchema<BuilderConfigurationT extends
-    BuilderConfiguration<BrowserBuilderSchema | BuildWebpackServerSchema | KarmaBuilderSchema>,
-    OptionsT = BuilderConfigurationT['options']>(
-        host: virtualFs.Host<{}>,
-        root: Path,
-        builderConfig: BuilderConfigurationT,
-):
-    OptionsT extends BrowserBuilderSchema ? NormalizedBrowserBuilderSchema :
-    OptionsT extends BuildWebpackServerSchema ? NormalizedServerBuilderServerSchema :
-    // todo should be unknown
-    // tslint:disable-next-line:no-any
-    OptionsT extends KarmaBuilderSchema ? NormalizedKarmaBuilderSchema : any {
-    const { options } = builderConfig;
-    const projectRoot = resolve(root, builderConfig.root);
-    const syncHost = new virtualFs.SyncDelegateHost(host);
 
-    // todo: this should be unknown
-    // tslint:disable-next-line:no-any
-    const isKarmaBuilderSchema = (options: any): options is KarmaBuilderSchema =>
-        !options.hasOwnProperty('optimization');
+/**
+ * A normalized browser builder schema.
+ */
+export type NormalizedBrowserBuilderSchema = BrowserBuilderSchema & BuildOptions & {
+  sourceMap: SourceMapClass;
+  assets: AssetPatternClass[];
+  fileReplacements: NormalizedFileReplacement[];
+  optimization: OptimizationClass;
+};
 
-    // todo: this should be unknown
-    // tslint:disable-next-line:no-any
-    const isBuildWebpackServerSchema = (options: any): options is BuildWebpackServerSchema =>
-        !options.hasOwnProperty('assets');
+export function normalizeBrowserSchema(
+  host: virtualFs.Host<{}>,
+  root: Path,
+  projectRoot: Path,
+  sourceRoot: Path | undefined,
+  options: BrowserBuilderSchema,
+): NormalizedBrowserBuilderSchema {
+  const syncHost = new virtualFs.SyncDelegateHost(host);
 
-    const assets = isBuildWebpackServerSchema(options)
-        ? {}
-        : {
-            assets: normalizeAssetPatterns(
-                options.assets,
-                syncHost,
-                root,
-                projectRoot,
-                builderConfig.sourceRoot,
-            ),
-        };
+  const normalizedSourceMapOptions = normalizeSourceMaps(options.sourceMap || false);
+  normalizedSourceMapOptions.vendor = normalizedSourceMapOptions.vendor || options.vendorSourceMap;
 
-    const normalizedSourceMapOptions = normalizeSourceMaps(options.sourceMap);
-    // todo: remove when removing the deprecations
-    normalizedSourceMapOptions.vendor
-        = normalizedSourceMapOptions.vendor || !!options.vendorSourceMap;
+  return {
+    ...options,
+    assets: normalizeAssetPatterns(options.assets || [], syncHost, root, projectRoot, sourceRoot),
+    fileReplacements: normalizeFileReplacements(options.fileReplacements || [], syncHost, root),
+    optimization: normalizeOptimization(options.optimization),
+    sourceMap: normalizedSourceMapOptions,
 
-    const optimization = isKarmaBuilderSchema(options)
-        ? {}
-        : options.optimization || {};
-
-    return {
-        // todo remove any casing when using typescript 3.2
-        // tslint:disable-next-line:no-any
-        ...options as any,
-        ...assets,
-        fileReplacements: normalizeFileReplacements(options.fileReplacements, syncHost, root),
-        optimization: normalizeOptimization(optimization),
-        sourceMap: normalizedSourceMapOptions,
-    };
+    statsJson: options.statsJson || false,
+    forkTypeChecker: options.forkTypeChecker || false,
+    budgets: options.budgets || [],
+    scripts: options.scripts || [],
+    styles: options.styles || [],
+    stylePreprocessorOptions: {
+      includePaths: options.stylePreprocessorOptions
+        && options.stylePreprocessorOptions.includePaths
+        || [],
+    },
+    lazyModules: options.lazyModules || [],
+  };
 }

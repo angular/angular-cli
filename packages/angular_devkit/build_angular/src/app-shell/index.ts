@@ -16,7 +16,7 @@ import { Observable, forkJoin, from, merge, of, throwError } from 'rxjs';
 import { concatMap, map, switchMap } from 'rxjs/operators';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
-import { BrowserBuilderSchema } from '../browser/schema';
+import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { BuildWebpackServerSchema } from '../server/schema';
 import { BuildWebpackAppShellSchema } from './schema';
 

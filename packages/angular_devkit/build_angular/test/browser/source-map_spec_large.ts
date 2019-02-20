@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { BrowserBuilderSchema, OutputHashing } from '../../src';
+import { OutputHashing, Schema as BrowserBuilderSchema } from '../../src/browser/schema';
 import { browserTargetSpec, host } from '../utils';
 
 // tslint:disable-next-line:no-big-function

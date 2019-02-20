@@ -27,7 +27,8 @@ import {
 } from '../angular-cli-files/models/webpack-configs';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { statsErrorsToString, statsWarningsToString } from '../angular-cli-files/utilities/stats';
-import { BrowserBuilderSchema, NormalizedBrowserBuilderSchema } from '../browser/schema';
+import { Schema as BrowserBuilderSchema } from '../browser/schema';
+import { NormalizedBrowserBuilderSchema, normalizeBrowserSchema } from '../utils';
 const webpackMerge = require('webpack-merge');
 
 

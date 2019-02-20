@@ -60,8 +60,8 @@ export function getTestConfig(
     const { styles, scripts } = wco.buildOptions.sourceMap;
 
     extraPlugins.push(getSourceMapDevTool(
-      styles,
-      scripts,
+      styles || false,
+      scripts || false,
       false,
       true,
     ));

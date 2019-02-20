@@ -10,6 +10,7 @@ import {
   BrowserBuilderSchema,
   CurrentFileReplacement,
   NormalizedSourceMaps,
+  SourceMapUnion,
 } from '../browser/schema';
 
 export interface KarmaBuilderSchema extends Pick<BrowserBuilderSchema,
@@ -24,7 +25,7 @@ export interface KarmaBuilderSchema extends Pick<BrowserBuilderSchema,
   /**
    * Output sourcemaps.
    */
-  sourceMap: KarmaSourceMapOptions;
+  sourceMap: SourceMapUnion;
 
   /**
    * Override which browsers tests are run against.
@@ -45,25 +46,4 @@ export interface KarmaBuilderSchema extends Pick<BrowserBuilderSchema,
    * Karma reporters to use. Directly passed to the karma runner.
    */
   reporters?: string[];
-}
-
-export type KarmaSourceMapOptions = boolean | KarmaSourceMapObject;
-
-export interface KarmaSourceMapObject {
-  /** Resolve vendor packages sourcemaps */
-  vendor?: boolean;
-  /** Output sourcemaps for all scripts */
-  scripts?: boolean;
-  /** Output sourcemaps for all styles. */
-  styles?: boolean;
-}
-
-
-export interface NormalizedKarmaBuilderSchema extends Pick<
-  KarmaBuilderSchema,
-  Exclude<keyof KarmaBuilderSchema, 'sourceMap' | 'vendorSourceMap'>
-  > {
-  assets: AssetPatternObject[];
-  fileReplacements: CurrentFileReplacement[];
-  sourceMap: NormalizedSourceMaps;
 }
