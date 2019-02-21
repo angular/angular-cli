@@ -91,7 +91,7 @@
     "@types/jasmine": "^2.8.6",
     "@types/node": "^9.4.6",
     "camelcase": "^4.1.0",
-    "domino": "^2.1.1",
+    "domino": "^2.1.2",
     "express": "^4.15.2",
     "fs-extra": "^3.0.1",
     "glob": "^7.1.2",
