@@ -14,7 +14,7 @@ import {
 } from '@angular-devkit/architect';
 import { WebpackDevServerBuilder } from '@angular-devkit/build-webpack';
 import { Path, getSystemPath, resolve, tags, virtualFs } from '@angular-devkit/core';
-import { Stats, existsSync, readFileSync } from 'fs';
+import { Stats, existsSync } from 'fs';
 import * as path from 'path';
 import { Observable, from, throwError } from 'rxjs';
 import { concatMap, map, tap } from 'rxjs/operators';
@@ -297,27 +297,13 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     options: DevServerBuilderOptions,
     config: WebpackDevServer.Configuration,
   ) {
-    let sslKey: string | undefined = undefined;
-    let sslCert: string | undefined = undefined;
-    if (options.sslKey) {
-      const keyPath = path.resolve(root, options.sslKey);
-      if (existsSync(keyPath)) {
-        sslKey = readFileSync(keyPath, 'utf-8');
-      }
-    }
-    if (options.sslCert) {
-      const certPath = path.resolve(root, options.sslCert);
-      if (existsSync(certPath)) {
-        sslCert = readFileSync(certPath, 'utf-8');
-      }
-    }
-
-    config.https = true;
-    if (sslKey != null && sslCert != null) {
+    if (options.sslKey && options.sslCert) {
       config.https = {
-        key: sslKey,
-        cert: sslCert,
+        key: path.resolve(root, options.sslKey),
+        cert: path.resolve(root, options.sslCert),
       };
+    } else {
+      config.https = true;
     }
   }
 
