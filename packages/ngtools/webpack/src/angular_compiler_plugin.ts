@@ -867,6 +867,8 @@ export class AngularCompilerPlugin {
 
     // If there is no compiler host at this point, it means that the environment hook did not run.
     // This happens in child compilations that inherit the parent compilation file system.
+    // Node: child compilations also do not run most webpack compiler hooks, including almost all
+    // we use here. The child compiler will always run as if it was the first build.
     if (this._compilerHost === undefined) {
       const inputFs = compilation.compiler.inputFileSystem as VirtualFileSystemDecorator;
       if (!inputFs.getWebpackCompilerHost) {

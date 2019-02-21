@@ -108,3 +108,24 @@ export function getAotConfig(wco: WebpackConfigOptions, extract = false) {
     plugins: [_createAotPlugin(wco, { tsConfigPath }, true, extract)]
   };
 }
+
+export function getTypescriptWorkerPlugin(wco: WebpackConfigOptions, workerTsConfigPath: string) {
+  const { buildOptions } = wco;
+
+  const pluginOptions: AngularCompilerPluginOptions = {
+    skipCodeGeneration: true,
+    tsConfigPath: workerTsConfigPath,
+    mainPath: undefined,
+    platform: PLATFORM.Browser,
+    sourceMap: buildOptions.sourceMap.scripts,
+    forkTypeChecker: buildOptions.forkTypeChecker,
+    contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
+    logger: wco.logger,
+    // Run no transformers.
+    platformTransformers: [],
+    // Don't attempt lazy route discovery.
+    discoverLazyRoutes: false,
+  };
+
+  return new AngularCompilerPlugin(pluginOptions);
+}

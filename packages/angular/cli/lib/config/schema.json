@@ -836,11 +836,6 @@
             "ngswConfigPath": {
               "type": "string",
               "description": "Path to ngsw-config.json."
-            },  
-            "autoBundleWorkerModules": {
-              "type": "boolean",
-              "description": "Automatically bundle new Worker('..', { type:'module' })",
-              "default": true
             },
             "skipAppShell": {
               "type": "boolean",
@@ -887,6 +882,10 @@
               "type": "boolean",
               "default": false,
               "x-deprecated": true
+            },
+            "webWorkerTsConfig": {
+              "type": "string",
+              "description": "TypeScript configuration for Web Worker modules."
             }
           },
           "additionalProperties": false,

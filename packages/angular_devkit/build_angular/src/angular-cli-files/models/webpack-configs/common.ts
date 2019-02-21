@@ -28,7 +28,6 @@ const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const StatsPlugin = require('stats-webpack-plugin');
-const WorkerPlugin = require('worker-plugin');
 
 
 // tslint:disable-next-line:no-any
@@ -132,11 +131,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         basePath: projectRoot,
       }));
     });
-  }
-
-  if (buildOptions.autoBundleWorkerModules) {
-    const workerPluginInstance = new WorkerPlugin({ globalObject: false });
-    extraPlugins.push(workerPluginInstance);
   }
 
   // process asset entries
