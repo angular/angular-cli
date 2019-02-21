@@ -28,6 +28,7 @@
       "type": "object"
     }
   },
+  "additionalProperties": true,
   "required": [
     "success"
   ]

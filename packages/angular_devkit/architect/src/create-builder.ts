@@ -23,11 +23,14 @@ import { Builder, BuilderSymbol, BuilderVersionSymbol } from './internal';
 import { scheduleByName, scheduleByTarget } from './schedule-by-name';
 
 
-export function createBuilder<OptT extends json.JsonObject>(
+export function createBuilder<
+  OptT extends json.JsonObject,
+  OutT extends BuilderOutput = BuilderOutput,
+>(
   fn: BuilderHandlerFn<OptT>,
 ): Builder<OptT> {
   const cjh = experimental.jobs.createJobHandler;
-  const handler = cjh<json.JsonObject, BuilderInput, BuilderOutput>((options, context) => {
+  const handler = cjh<json.JsonObject, BuilderInput, OutT>((options, context) => {
     const scheduler = context.scheduler;
     const progressChannel = context.createChannel('progress');
     const logChannel = context.createChannel('log');
@@ -60,7 +63,7 @@ export function createBuilder<OptT extends json.JsonObject>(
       });
     }
 
-    return new Observable<BuilderOutput>(observer => {
+    return new Observable<OutT>(observer => {
       const subscriptions: Subscription[] = [];
 
       const inputSubscription = context.inboundBus.subscribe(
@@ -161,7 +164,7 @@ export function createBuilder<OptT extends json.JsonObject>(
             progress({ state: BuilderProgressState.Stopped }, context);
           }),
         ).subscribe(
-          message => observer.next(message),
+          message => observer.next(message as OutT),
           error => observer.error(error),
           () => observer.complete(),
         ));
