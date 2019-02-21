@@ -596,7 +596,7 @@ export class AngularCompilerPlugin {
 
   // Registration hook for webpack plugin.
   // tslint:disable-next-line:no-big-function
-  apply(compiler: Compiler & { watchMode?: boolean }) {
+  apply(compiler: Compiler & { watchMode?: boolean, parentCompilation?: compilation.Compilation }) {
     // The below is require by NGCC processor
     // since we need to know which fields we need to process
     compiler.hooks.environment.tap('angular-compiler', () => {
@@ -610,8 +610,14 @@ export class AngularCompilerPlugin {
     // cleanup if not watching
     compiler.hooks.thisCompilation.tap('angular-compiler', compilation => {
       compilation.hooks.finishModules.tap('angular-compiler', () => {
+        let rootCompiler = compiler;
+        while (rootCompiler.parentCompilation) {
+          // tslint:disable-next-line:no-any
+          rootCompiler = compiler.parentCompilation as any;
+        }
+
         // only present for webpack 4.23.0+, assume true otherwise
-        const watchMode = compiler.watchMode === undefined ? true : compiler.watchMode;
+        const watchMode = rootCompiler.watchMode === undefined ? true : rootCompiler.watchMode;
         if (!watchMode) {
           this._program = null;
           this._transformers = [];
@@ -857,6 +863,22 @@ export class AngularCompilerPlugin {
     // tslint:disable-next-line:no-any
     if ((compilation as any)._ngToolsWebpackPluginInstance) {
       throw new Error('An @ngtools/webpack plugin already exist for this compilation.');
+    }
+
+    // If there is no compiler host at this point, it means that the environment hook did not run.
+    // This happens in child compilations that inherit the parent compilation file system.
+    if (this._compilerHost === undefined) {
+      const inputFs = compilation.compiler.inputFileSystem as VirtualFileSystemDecorator;
+      if (!inputFs.getWebpackCompilerHost) {
+        throw new Error('AngularCompilerPlugin is running in a child compilation, but could' +
+          'not find a WebpackCompilerHost in the parent compilation.');
+      }
+
+      // Use the existing WebpackCompilerHost to ensure builds and rebuilds work.
+      this._compilerHost = createCompilerHost({
+        options: this._compilerOptions,
+        tsHost: inputFs.getWebpackCompilerHost(),
+      }) as CompilerHost & WebpackCompilerHost;
     }
 
     // Set a private variable for this plugin instance.
