@@ -54,7 +54,7 @@ export interface BuildOptions {
   namedChunks?: boolean;
   subresourceIntegrity?: boolean;
   serviceWorker?: boolean;
-  autoBundleWorkerModules?: boolean;
+  webWorkerTsConfig?: string;
   skipAppShell?: boolean;
   statsJson: boolean;
   forkTypeChecker: boolean;

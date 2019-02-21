@@ -13,3 +13,4 @@ export * from './test';
 export * from './typescript';
 export * from './utils';
 export * from './stats';
+export * from './worker';
