@@ -19,7 +19,7 @@ import { concatMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
 import { LoggingCallback, defaultLoggingCb } from '../webpack';
-import { WebpackDevServerBuilderSchema } from './schema';
+import { Schema as WebpackDevServerBuilderSchema } from './schema';
 
 export interface DevServerResult {
   port: number;
