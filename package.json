@@ -63,6 +63,7 @@
     ]
   },
   "dependencies": {
+    "@types/node-fetch": "^2.1.6",
     "@types/progress": "^2.0.3",
     "glob": "^7.0.3",
     "node-fetch": "^2.2.0",
