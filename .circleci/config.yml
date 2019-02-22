@@ -26,7 +26,23 @@ anchor_1: &defaults
 # Similar to travis behavior, but not quite the same.
 # See https://discuss.circleci.com/t/1662
 anchor_2: &post_checkout
-  post: git pull --ff-only origin "refs/pull/${CI_PULL_REQUEST//*pull\//}/merge"
+  run:
+    name: Post checkout step
+    command: >
+      if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
+        # Fetch the head and merge commits for this PR.
+        git fetch origin +refs/pull/$CIRCLE_PR_NUMBER/head:pr/$CIRCLE_PR_NUMBER/head
+        git fetch origin +refs/pull/$CIRCLE_PR_NUMBER/merge:pr/$CIRCLE_PR_NUMBER/merge
+        # Checkout the merged PR for testing as CircleCI will just use the PR head otherwise.
+        git checkout -qf pr/$CIRCLE_PR_NUMBER/merge
+        # Reset the merge commit into its PR head.
+        git reset pr/$CIRCLE_PR_NUMBER/head
+        # Commit the merge changes into the head of the PR.
+        # This way we keep the last commit message.
+        git config user.name "angular-ci"
+        git config user.email "angular-ci"
+        git commit . --amend --no-edit
+      fi
 anchor_3: &root_package_lock_key
   key: *cache_key
 anchor_4: &attach_options
@@ -38,7 +54,8 @@ jobs:
   install:
     <<: *defaults
     steps:
-      - checkout: *post_checkout
+      - checkout
+      - *post_checkout
       - restore_cache: *root_package_lock_key
       - run: yarn install --frozen-lockfile
       - persist_to_workspace:
