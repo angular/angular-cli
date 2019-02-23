@@ -6,8 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { existsSync } from 'fs';
+import * as path from 'path';
 import { Observable, of, throwError } from 'rxjs';
-import { concatMap, map, tap } from 'rxjs/operators';
+import { concatMap, first, map, tap } from 'rxjs/operators';
 import { BaseException } from '../exception';
 import {
   JsonObject,
@@ -17,15 +19,21 @@ import {
 } from '../json';
 import {
   Path,
+  basename,
+  dirname,
   isAbsolute,
   join,
   normalize,
-  relative,
-  resolve,
-  virtualFs,
+  relative, resolve, virtualFs,
 } from '../virtual-fs';
 import { WorkspaceProject, WorkspaceSchema, WorkspaceTool } from './workspace-schema';
 
+
+export class WorkspaceFileNotFoundException extends BaseException {
+  constructor(path: Path) {
+    super(`Workspace could not be found from path ${path}.`);
+  }
+}
 
 export class ProjectNotFoundException extends BaseException {
   constructor(name: string) {
@@ -55,15 +63,69 @@ export class AmbiguousProjectPathException extends BaseException {
   }
 }
 
+async function _findUp(host: virtualFs.Host, names: string[], from: Path): Promise<Path | null> {
+  if (!Array.isArray(names)) {
+    names = [names];
+  }
+
+  do {
+    for (const name of names) {
+      const p = join(from, name);
+      if (await host.exists(p)) {
+        return p;
+      }
+    }
+
+    from = dirname(from);
+  } while (from && from !== dirname(from));
+
+  return null;
+}
+
 export class Workspace {
+  protected static _workspaceFileNames = [
+    'angular.json',
+    '.angular.json',
+    'workspace.json',
+    '.workspace.json',
+  ];
+
   private readonly _workspaceSchemaPath = normalize(require.resolve('./workspace-schema.json'));
   private _workspaceSchema: JsonObject;
   private _workspace: WorkspaceSchema;
   private _registry: schema.CoreSchemaRegistry;
 
-  constructor(private _root: Path, private _host: virtualFs.Host<{}>) {
-    this._registry = new schema.CoreSchemaRegistry();
-    this._registry.addPostTransform(schema.transforms.addUndefinedDefaults);
+  constructor(
+    private _root: Path,
+    private _host: virtualFs.Host<{}>,
+    registry?: schema.CoreSchemaRegistry,
+  ) {
+    if (registry) {
+      this._registry = registry;
+    } else {
+      this._registry = new schema.CoreSchemaRegistry();
+      this._registry.addPostTransform(schema.transforms.addUndefinedDefaults);
+    }
+  }
+
+  static async findWorkspaceFile(host: virtualFs.Host<{}>, path: Path): Promise<Path | null> {
+    return await _findUp(host, this._workspaceFileNames, path);
+  }
+  static async fromPath(
+    host: virtualFs.Host<{}>,
+    path: Path,
+    registry: schema.CoreSchemaRegistry,
+  ): Promise<Workspace> {
+    const maybePath = await this.findWorkspaceFile(host, path);
+
+    if (!maybePath) {
+      throw new WorkspaceFileNotFoundException(path);
+    }
+
+    return new Workspace(dirname(maybePath), host, registry)
+      .loadWorkspaceFromHost(basename(maybePath))
+      .pipe(first())
+      .toPromise();
   }
 
   loadWorkspaceFromJson(json: {}) {
