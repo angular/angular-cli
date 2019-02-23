@@ -1004,7 +1004,7 @@ export declare class Workspace {
     readonly newProjectRoot: string | undefined;
     readonly root: Path;
     readonly version: number;
-    constructor(_root: Path, _host: virtualFs.Host<{}>);
+    constructor(_root: Path, _host: virtualFs.Host<{}>, registry?: schema.CoreSchemaRegistry);
     getCli(): WorkspaceTool;
     getDefaultProjectName(): string | null;
     getProject(projectName: string): WorkspaceProject;
@@ -1018,6 +1018,13 @@ export declare class Workspace {
     loadWorkspaceFromHost(workspacePath: Path): Observable<this>;
     loadWorkspaceFromJson(json: {}): Observable<this>;
     validateAgainstSchema<T = {}>(contentJson: {}, schemaJson: JsonObject): Observable<T>;
+    protected static _workspaceFileNames: string[];
+    static findWorkspaceFile(host: virtualFs.Host<{}>, path: Path): Promise<Path | null>;
+    static fromPath(host: virtualFs.Host<{}>, path: Path, registry: schema.CoreSchemaRegistry): Promise<Workspace>;
+}
+
+export declare class WorkspaceFileNotFoundException extends BaseException {
+    constructor(path: Path);
 }
 
 export declare class WorkspaceNotYetLoadedException extends BaseException {
