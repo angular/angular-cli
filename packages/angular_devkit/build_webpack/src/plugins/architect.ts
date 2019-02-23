@@ -100,7 +100,7 @@ export class ArchitectPlugin {
       // This is safe since we still verify it.
       const m = module as unknown as { identifier?: () => string };
       const moduleId = '' + (typeof m.identifier == 'function' ? m.identifier() : '');
-      const id = moduleId.split('!').slice(-1)[0].trim();
+      const id = moduleId.split(/!|\s+|\bmulti\b/).slice(-1)[0].trim();
       const p = path.relative(context.workspaceRoot, id);
 
       update(`Building ${p}`);
