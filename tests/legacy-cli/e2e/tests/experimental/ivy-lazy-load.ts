@@ -11,7 +11,7 @@ import { ng } from '../../utils/process';
 import { createProject } from '../../utils/project';
 
 export default async function() {
-  await createProject('ivy-project', '--experimental-ivy');
+  await createProject('ivy-project', '--enable-ivy');
 
   await ng('generate', 'module', 'lazy', '--routing');
   await prependToFile('src/app/app.module.ts', `import { RouterModule } from '@angular/router';`);

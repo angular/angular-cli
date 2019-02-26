@@ -38,7 +38,7 @@ export async function createProject(name: string, ...args: string[]) {
   const extraArgs = [];
 
   if (argv['ivy']) {
-    extraArgs.push('--experimentalIvy');
+    extraArgs.push('--enableIvy');
   }
 
   process.chdir(getGlobalVariable('tmp-root'));

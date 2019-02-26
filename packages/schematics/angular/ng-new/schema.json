@@ -18,8 +18,8 @@
       },
       "x-prompt": "What name would you like to use for the new workspace and initial project?"
     },
-    "experimentalIvy": {
-      "description": "EXPERIMENTAL: When true, creates a new app that uses the Ivy rendering engine.",
+    "enableIvy": {
+      "description": "When true, creates a new app that uses the Ivy rendering engine.",
       "type": "boolean",
       "default": false
     },

@@ -17,7 +17,7 @@ export default async function() {
     return;
   }
   try {
-    await createProject('ivy-project', '--experimental-ivy');
+    await createProject('ivy-project', '--enable-ivy');
 
     await ngServe('--prod');
 

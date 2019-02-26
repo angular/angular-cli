@@ -11,7 +11,7 @@ export default async function() {
   const extraArgs = [];
 
   if (argv['ivy']) {
-    extraArgs.push('--experimentalIvy');
+    extraArgs.push('--enable-ivy');
   }
 
   if (argv.noproject) {
