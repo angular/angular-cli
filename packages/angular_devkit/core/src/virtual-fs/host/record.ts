@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
+  EMPTY,
   Observable,
   concat,
   from as observableFrom,
@@ -276,7 +277,7 @@ export class CordHost extends SimpleMemoryHost {
           return throwError(new FileDoesNotExistException(from));
         }
         if (from === to) {
-          return of();
+          return EMPTY;
         }
 
         if (existTo) {

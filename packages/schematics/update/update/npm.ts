@@ -126,7 +126,7 @@ export function getNpmPackageJson(
     }
   }
 
-  const resultPromise = pacote.packument(
+  const resultPromise: Promise<NpmRepositoryPackageJson> = pacote.packument(
     packageName,
     {
       'full-metadata': true,
@@ -136,7 +136,7 @@ export function getNpmPackageJson(
   );
 
   // TODO: find some way to test this
-  const response = from<NpmRepositoryPackageJson>(resultPromise).pipe(
+  const response = from(resultPromise).pipe(
     shareReplay(),
     catchError(err => {
       logger.warn(err.message || err);

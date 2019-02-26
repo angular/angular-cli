@@ -75,76 +75,77 @@ export default class TslintBuilder implements Builder<TslintBuilderOptions> {
       throw new Error('A "project" must be specified to enable type checking.');
     }
 
-    return from(this.loadTslint()).pipe(concatMap(projectTslint => new Observable(obs => {
-      const tslintConfigPath = options.tslintConfig
-        ? path.resolve(systemRoot, options.tslintConfig)
-        : null;
-      const Linter = projectTslint.Linter;
+    return from(this.loadTslint())
+      .pipe(concatMap(projectTslint => new Observable<BuildEvent>(obs => {
+        const tslintConfigPath = options.tslintConfig
+          ? path.resolve(systemRoot, options.tslintConfig)
+          : null;
+        const Linter = projectTslint.Linter;
 
-      let result: undefined | tslint.LintResult;
-      if (options.tsConfig) {
-        const tsConfigs = Array.isArray(options.tsConfig) ? options.tsConfig : [options.tsConfig];
-        const allPrograms =
-          tsConfigs.map(tsConfig => Linter.createProgram(path.resolve(systemRoot, tsConfig)));
+        let result: undefined | tslint.LintResult;
+        if (options.tsConfig) {
+          const tsConfigs = Array.isArray(options.tsConfig) ? options.tsConfig : [options.tsConfig];
+          const allPrograms =
+            tsConfigs.map(tsConfig => Linter.createProgram(path.resolve(systemRoot, tsConfig)));
 
-        for (const program of allPrograms) {
-          const partial
-            = lint(projectTslint, systemRoot, tslintConfigPath, options, program, allPrograms);
-          if (result == undefined) {
-            result = partial;
-          } else {
-            result.failures = result.failures
-              .filter(curr => !partial.failures.some(prev => curr.equals(prev)))
-              .concat(partial.failures);
+          for (const program of allPrograms) {
+            const partial
+              = lint(projectTslint, systemRoot, tslintConfigPath, options, program, allPrograms);
+            if (result == undefined) {
+              result = partial;
+            } else {
+              result.failures = result.failures
+                .filter(curr => !partial.failures.some(prev => curr.equals(prev)))
+                .concat(partial.failures);
 
-            // we are not doing much with 'errorCount' and 'warningCount'
-            // apart from checking if they are greater than 0 thus no need to dedupe these.
-            result.errorCount += partial.errorCount;
-            result.warningCount += partial.warningCount;
+              // we are not doing much with 'errorCount' and 'warningCount'
+              // apart from checking if they are greater than 0 thus no need to dedupe these.
+              result.errorCount += partial.errorCount;
+              result.warningCount += partial.warningCount;
 
-            if (partial.fixes) {
-              result.fixes = result.fixes ? result.fixes.concat(partial.fixes) : partial.fixes;
+              if (partial.fixes) {
+                result.fixes = result.fixes ? result.fixes.concat(partial.fixes) : partial.fixes;
+              }
             }
           }
+        } else {
+          result = lint(projectTslint, systemRoot, tslintConfigPath, options);
         }
-      } else {
-        result = lint(projectTslint, systemRoot, tslintConfigPath, options);
-      }
 
-      if (result == undefined) {
-        throw new Error('Invalid lint configuration. Nothing to lint.');
-      }
-
-      if (!options.silent) {
-        const Formatter = projectTslint.findFormatter(options.format);
-        if (!Formatter) {
-          throw new Error(`Invalid lint format "${options.format}".`);
+        if (result == undefined) {
+          throw new Error('Invalid lint configuration. Nothing to lint.');
         }
-        const formatter = new Formatter();
 
-        const output = formatter.format(result.failures, result.fixes);
-        if (output) {
-          this.context.logger.info(output);
+        if (!options.silent) {
+          const Formatter = projectTslint.findFormatter(options.format);
+          if (!Formatter) {
+            throw new Error(`Invalid lint format "${options.format}".`);
+          }
+          const formatter = new Formatter();
+
+          const output = formatter.format(result.failures, result.fixes);
+          if (output) {
+            this.context.logger.info(output);
+          }
         }
-      }
 
-      if (result.warningCount > 0 && printInfo) {
-        this.context.logger.warn('Lint warnings found in the listed files.');
-      }
+        if (result.warningCount > 0 && printInfo) {
+          this.context.logger.warn('Lint warnings found in the listed files.');
+        }
 
-      if (result.errorCount > 0 && printInfo) {
-        this.context.logger.error('Lint errors found in the listed files.');
-      }
+        if (result.errorCount > 0 && printInfo) {
+          this.context.logger.error('Lint errors found in the listed files.');
+        }
 
-      if (result.warningCount === 0 && result.errorCount === 0 && printInfo) {
-        this.context.logger.info('All files pass linting.');
-      }
+        if (result.warningCount === 0 && result.errorCount === 0 && printInfo) {
+          this.context.logger.info('All files pass linting.');
+        }
 
-      const success = options.force || result.errorCount === 0;
-      obs.next({ success });
+        const success = options.force || result.errorCount === 0;
+        obs.next({ success });
 
-      return obs.complete();
-    })));
+        return obs.complete();
+      })));
   }
 }
 

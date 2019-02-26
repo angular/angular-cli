@@ -41,8 +41,8 @@ export default createBuilder<json.JsonObject & OperatorSchema>((options, context
 
   return from(allRuns).pipe(
     mergeMap(runPromise => from(runPromise)),
-    mergeMap(([i, run]: [number, BuilderRun]) => run.output.pipe(map(output => [i, output]))),
-    mergeMap<[number, BuilderOutput], BuilderOutput>(([i, output]) => {
+    mergeMap(([i, run]) => run.output.pipe(map(output => [i, output] as [number, BuilderOutput]))),
+    mergeMap(([i, output]) => {
       allResults[i] = output;
       context.reportProgress(n++, allRuns.length);
 

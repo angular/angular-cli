@@ -82,7 +82,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
       }),
       concatMap(buildEvent => {
         if (buildEvent.success && !options.watch && options.serviceWorker) {
-          return new Observable(obs => {
+          return new Observable<BuildEvent>(obs => {
             augmentAppWithServiceWorker(
               this.context.host,
               root,

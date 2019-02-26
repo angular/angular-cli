@@ -128,13 +128,13 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
             ),
             observableFrom(allDirs).pipe(
               concatMap(p => _callFs(fs.rmdir, getSystemPath(p))),
-              map(() => {}),
             ),
           );
         } else {
           return _callFs(fs.unlink, getSystemPath(path));
         }
       }),
+      map(() => undefined),
     );
   }
 
@@ -268,7 +268,7 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
         // fixed.
         if (isDir) {
           const dirPaths = fs.readdirSync(getSystemPath(path));
-          const rmDirComplete = new Observable((obs) => {
+          const rmDirComplete = new Observable<void>((obs) => {
             try {
               fs.rmdirSync(getSystemPath(path));
               obs.complete();
