@@ -7,7 +7,7 @@
   "exclude": [
     "test.ts",
     "**/*.spec.ts"
-  ]<% if (experimentalIvy) { %>,
+  ]<% if (enableIvy) { %>,
   "angularCompilerOptions": {
     "enableIvy": true
   }<% } %>

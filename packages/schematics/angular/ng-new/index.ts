@@ -46,7 +46,7 @@ export default function (options: NgNewOptions): Rule {
   const applicationOptions: ApplicationOptions = {
     projectRoot: '',
     name: options.name,
-    experimentalIvy: options.experimentalIvy,
+    enableIvy: options.enableIvy,
     inlineStyle: options.inlineStyle,
     inlineTemplate: options.inlineTemplate,
     prefix: options.prefix,
