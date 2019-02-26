@@ -9,6 +9,18 @@ import { Tree } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
 import { readJsonInTree, serializeJson, updateJsonInTree } from './ast-utils';
 
+const recommendations = [
+  'angular.ng-template',
+  'nrwl.angular-console',
+  'ms-vscode.vscode-typescript-tslint-plugin',
+  'Mikael.Angular-BeastCode',
+  'EditorConfig.EditorConfig',
+  'msjsdiag.debugger-for-chrome',
+  'eg2.vscode-npm-script',
+  'PKief.material-icon-theme',
+  'natewallace.angular2-inline',
+];
+
 describe('Update 8.0.0', () => {
   let initialTree: Tree;
   let schematicRunner: SchematicTestRunner;
@@ -34,10 +46,7 @@ describe('Update 8.0.0', () => {
       .runSchematicAsync('migration-07', {}, initialTree)
       .toPromise();
 
-    expect(readJsonInTree(result, '.vscode/extensions.json')).toEqual({
-      recommendations: [
-        'angular.ng-template', 'nrwl.angular-console', 'ms-vscode.vscode-typescript-tslint-plugin'],
-    });
+    expect(readJsonInTree(result, '.vscode/extensions.json')).toEqual({recommendations});
   });
 
   it('should add to existing vscode extension recommendations', async () => {
@@ -46,9 +55,7 @@ describe('Update 8.0.0', () => {
         updateJsonInTree('.vscode/extensions.json', () => ({
           recommendations: [
             'eamodio.gitlens',
-            'angular.ng-template',
-            'nrwl.angular-console',
-            'ms-vscode.vscode-typescript-tslint-plugin'],
+            ...recommendations],
         })),
         initialTree,
       )
@@ -61,9 +68,7 @@ describe('Update 8.0.0', () => {
     expect(readJsonInTree(result, '.vscode/extensions.json')).toEqual({
       recommendations: [
         'eamodio.gitlens',
-        'angular.ng-template',
-        'nrwl.angular-console',
-        'ms-vscode.vscode-typescript-tslint-plugin'],
+        ...recommendations],
     });
   });
 });
