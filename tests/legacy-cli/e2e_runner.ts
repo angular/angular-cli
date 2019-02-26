@@ -171,6 +171,11 @@ const shardedTests = tests
   .filter((name, i) => (shardId === null || (i % nbShards) == shardId));
 const testsToRun = allSetups.concat(shardedTests);
 
+if (shardedTests.length === 0) {
+  console.log(`No tests would be ran, aborting.`);
+  process.exit(1);
+}
+
 console.log(testsToRun.join('\n'));
 /**
  * Load all the files from the e2e, filter and sort them and build a promise of their default
