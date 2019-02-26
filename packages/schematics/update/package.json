@@ -17,6 +17,6 @@
     "pacote": "9.5.0",
     "semver": "5.6.0",
     "semver-intersect": "1.4.0",
-    "rxjs": "6.3.3"
+    "rxjs": "6.4.0"
   }
 }

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { logging, schema, virtualFs } from '@angular-devkit/core';
-import { Observable, Subject, concat, from, of, throwError } from 'rxjs';
+import { EMPTY, Observable, Subject, concat, from, of, throwError } from 'rxjs';
 import { concatMap, defaultIfEmpty, ignoreElements, last, map, tap } from 'rxjs/operators';
 import { EngineHost, SchematicEngine } from '../engine';
 import { UnsuccessfulWorkflowExecution } from '../exception/exception';
@@ -172,7 +172,7 @@ export abstract class BaseWorkflow implements Workflow {
       }),
       concatMap(() => {
         if (this._dryRun) {
-          return of();
+          return EMPTY;
         }
 
         this._lifeCycle.next({ kind: 'post-tasks-start' });

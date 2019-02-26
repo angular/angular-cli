@@ -48,7 +48,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
     );
 
     return of(null).pipe(
-      concatMap(() => new Observable(obs => {
+      concatMap(() => new Observable<BuildEvent>(obs => {
         const karma = requireProjectModule(getSystemPath(projectRoot), 'karma');
         const karmaConfig = getSystemPath(resolve(root, normalize(options.karmaConfig)));
 

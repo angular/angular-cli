@@ -163,7 +163,7 @@ export class AppShellBuilder implements Builder<BuildWebpackAppShellSchema> {
         const outputIndexPath = join(root, options.outputIndexPath || browserIndexOutputPath);
 
         // Render to HTML and overwrite the client index file.
-        return from(
+        return from<Promise<BuildEvent>>(
           renderModuleFactory(AppServerModuleNgFactory, {
             document: indexHtml,
             url: options.route,

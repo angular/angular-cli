@@ -720,7 +720,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/3989
     return (of(data) as any).pipe(
       ...[...smartDefaults.entries()].map(([pointer, schema]) => {
-        return concatMap<T, T>(data => {
+        return concatMap(data => {
           const fragments = JSON.parse(pointer);
           const source = this._sourceMap.get((schema as JsonObject).$source as string);
 

@@ -16,7 +16,7 @@ import {
   normalize,
   virtualFs,
 } from '@angular-devkit/core';
-import { Observable, of } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 import { concatMap, map, mergeMap } from 'rxjs/operators';
 import {
   ContentHasMutatedException,
@@ -457,13 +457,13 @@ export class FilterHostTree extends HostTree {
             let isFile = false;
             originalBackend.isFile(path).subscribe(val => isFile = val);
             if (!isFile || !filter(path)) {
-              return of();
+              return EMPTY;
             }
 
             let content: ArrayBuffer | null = null;
             originalBackend.read(path).subscribe(val => content = val);
             if (!content) {
-              return of();
+              return EMPTY;
             }
 
             return newBackend.write(path, content as {} as virtualFs.FileBuffer);
