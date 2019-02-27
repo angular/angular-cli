@@ -8,10 +8,10 @@
 
 export const latestVersions = {
   // These versions should be kept up to date with latest Angular peer dependencies.
-  Angular: '~8.0.0-beta.7',
+  Angular: '~8.0.0-beta.9',
   RxJs: '~6.4.0',
   ZoneJs: '~0.8.26',
-  TypeScript: '~3.2.2',
+  TypeScript: '~3.3.3333',
   TsLib: '^1.9.0',
   // The versions below must be manually updated when making a new devkit release.
   DevkitBuildAngular: '~0.800.0-beta.7',

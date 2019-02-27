@@ -72,11 +72,11 @@
     "quicktype-core": "^6.0.15",
     "temp": "^0.9.0",
     "tslint": "^5.13.1",
-    "typescript": "3.2.4"
+    "typescript": "3.3.3333"
   },
   "devDependencies": {
-    "@angular/compiler": "^8.0.0-beta.0",
-    "@angular/compiler-cli": "^8.0.0-beta.0",
+    "@angular/compiler": "^8.0.0-beta.9",
+    "@angular/compiler-cli": "^8.0.0-beta.9",
     "@bazel/karma": "~0.26.0",
     "@bazel/typescript": "~0.26.0",
     "@ngtools/json-schema": "^1.1.0",

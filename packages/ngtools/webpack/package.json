@@ -28,14 +28,14 @@
     "webpack-sources": "1.3.0"
   },
   "peerDependencies": {
-    "@angular/compiler-cli": ">=5.0.0 <8.0.0 || ^7.0.0-beta.0",
-    "typescript": ">=2.4.0 < 3.3",
+    "@angular/compiler-cli": ">=6.0.0 <9.0.0 || ^8.0.0-beta.0",
+    "typescript": ">=2.7 < 3.4",
     "webpack": "^4.0.0"
   },
   "devDependencies": {
-    "@angular/compiler": "^7.2.0-rc.0",
-    "@angular/compiler-cli": "^7.2.0-rc.0",
-    "typescript": "3.2.4",
+    "@angular/compiler": "^8.0.0-beta.9",
+    "@angular/compiler-cli": "^8.0.0-beta.9",
+    "typescript": "3.3.3333",
     "webpack": "4.29.6"
   }
 }

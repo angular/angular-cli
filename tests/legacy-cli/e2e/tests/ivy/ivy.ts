@@ -5,17 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { getGlobalVariable } from '../../utils/env';
 import { request } from '../../utils/http';
 import { killAllProcesses } from '../../utils/process';
 import { createProject, ngServe } from '../../utils/project';
 
 export default async function() {
-  const argv = getGlobalVariable('argv');
-  if (!argv['ng-snapshots']) {
-    // Only run this test on 8.x versions of Angular, which are currently only on snapshots.
-    return;
-  }
   try {
     await createProject('ivy-project', '--enable-ivy');
 
