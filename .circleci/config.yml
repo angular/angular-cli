@@ -12,8 +12,11 @@
 ## IMPORTANT
 # If you change the `docker_image` version, also change the `cache_key` suffix and the version of
 # `com_github_bazelbuild_buildtools` in the `/WORKSPACE` file.
+# If you change the cache key prefix, also sync the restore_cache fallback to match.
+# Keep the static part of the cache key as prefix to enable correct fallbacks.
+# See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
 var_1: &docker_image angular/ngcontainer:0.7.0
-var_2: &cache_key angular_devkit-{{ checksum "yarn.lock" }}-0.7.0
+var_2: &cache_key angular_devkit-0.7.0-{{ checksum "yarn.lock" }}
 var_3: &node_8_docker_image angular/ngcontainer:0.3.3
 
 # Settings common to each job
@@ -27,8 +30,12 @@ anchor_1: &defaults
 # See https://discuss.circleci.com/t/1662
 anchor_2: &post_checkout
   post: git pull --ff-only origin "refs/pull/${CI_PULL_REQUEST//*pull\//}/merge"
-anchor_3: &root_package_lock_key
-  key: *cache_key
+anchor_3: &restore_cache
+  restore_cache:
+    keys:
+      - *cache_key
+      # This fallback should be the cache_key without variables.
+      - angular_devkit-0.7.0-
 anchor_4: &attach_options
   at: .
 
@@ -39,14 +46,14 @@ jobs:
     <<: *defaults
     steps:
       - checkout: *post_checkout
-      - restore_cache: *root_package_lock_key
+      - *restore_cache
       - run: yarn install --frozen-lockfile
       - persist_to_workspace:
           root: .
           paths:
             - ./*
       - save_cache:
-          <<: *root_package_lock_key
+          key: *cache_key
           paths:
             - ~/.cache/yarn
 
