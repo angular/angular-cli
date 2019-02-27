@@ -302,13 +302,13 @@ describe('Application Schematic', () => {
       const prj = config.projects.foo;
       const buildOpt = prj.architect.build.options;
       expect(buildOpt.styles).toEqual([
-        'src/styles.scss',
+        'src/styles.sass',
       ]);
       const testOpt = prj.architect.test.options;
       expect(testOpt.styles).toEqual([
-        'src/styles.scss',
+        'src/styles.sass',
       ]);
-      expect(tree.exists('src/styles.scss')).toBe(true);
+      expect(tree.exists('src/styles.sass')).toBe(true);
     });
 
     it('should set the relative tsconfig paths', () => {

@@ -262,8 +262,8 @@ describe('Component Schematic', () => {
     const options = { ...defaultOptions, style: Style.Sass };
     const tree = schematicRunner.runSchematic('component', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
-    expect(content).toMatch(/styleUrls: \['.\/foo.component.scss/);
-    expect(tree.files).toContain('/projects/bar/src/app/foo/foo.component.scss');
+    expect(content).toMatch(/styleUrls: \['.\/foo.component.sass/);
+    expect(tree.files).toContain('/projects/bar/src/app/foo/foo.component.sass');
     expect(tree.files).not.toContain('/projects/bar/src/app/foo/foo.component.css');
   });
 

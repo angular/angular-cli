@@ -31,7 +31,6 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import { styleToFileExtention } from '../component/index';
 import { Schema as ComponentOptions } from '../component/schema';
 import { Schema as E2eOptions } from '../e2e/schema';
 import {
@@ -187,8 +186,6 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
     });
   }
 
-  const styleExt = styleToFileExtention(options.style);
-
   const project: WorkspaceProject = {
     root: projectRoot,
     sourceRoot: join(normalize(projectRoot), 'src'),
@@ -209,7 +206,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
             join(normalize(projectRoot), 'src', 'assets'),
           ],
           styles: [
-            `${projectRoot}src/styles.${styleExt}`,
+            `${projectRoot}src/styles.${options.style}`,
           ],
           scripts: [],
           es5BrowserSupport: true,
@@ -262,7 +259,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
           tsConfig: `${rootFilesRoot}tsconfig.spec.json`,
           karmaConfig: `${rootFilesRoot}karma.conf.js`,
           styles: [
-            `${projectRoot}src/styles.${styleExt}`,
+            `${projectRoot}src/styles.${options.style}`,
           ],
           scripts: [],
           assets: [
@@ -349,8 +346,6 @@ export default function (options: ApplicationOptions): Rule {
       rootSelector: appRootSelector,
     };
 
-    const styleExt = styleToFileExtention(options.style);
-
     return chain([
       addAppToWorkspaceFile(options, workspace),
       mergeWith(
@@ -361,7 +356,6 @@ export default function (options: ApplicationOptions): Rule {
             ...options,
             'dot': '.',
             relativePathToWorkspaceRoot,
-            styleExt,
           }),
           move(sourceRoot),
         ])),
@@ -423,7 +417,6 @@ export default function (options: ApplicationOptions): Rule {
             ...options as any,  // tslint:disable-line:no-any
             selector: appRootSelector,
             ...componentOptions,
-            styleExt,
           }),
           move(sourceDir),
         ]), MergeStrategy.Overwrite),
