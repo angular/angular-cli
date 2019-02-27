@@ -37,6 +37,10 @@ describe('Ng New Schematic', () => {
       '/bar/src/tsconfig.app.json',
       '/bar/src/main.ts',
       '/bar/src/app/app.module.ts',
+      '/bar/e2e/src/app.po.ts',
+      '/bar/e2e/src/app.e2e-spec.ts',
+      '/bar/e2e/tsconfig.e2e.json',
+      '/bar/e2e/protractor.conf.js',
     ]));
   });
 
@@ -68,13 +72,11 @@ describe('Ng New Schematic', () => {
     expect(files).not.toContain('/bar/src');
   });
 
-  it('minimal=true should not create e2e project', () => {
+  it('minimal=true should not create an e2e target', () => {
     const options = { ...defaultOptions, minimal: true };
 
     const tree = schematicRunner.runSchematic('ng-new', options);
-    const files = tree.files;
-    expect(files).not.toContain('/bar/e2e');
     const confContent = JSON.parse(tree.readContent('/bar/angular.json'));
-    expect(confContent.projects['foo-e2e']).toBeUndefined();
+    expect(confContent.projects.foo.e2e).toBeUndefined();
   });
 });
