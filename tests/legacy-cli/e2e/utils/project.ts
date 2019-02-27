@@ -48,7 +48,7 @@ export async function createProject(name: string, ...args: string[]) {
 }
 
 export async function prepareProjectForE2e(name) {
-  const argv: any = getGlobalVariable('argv');
+  const argv: string[] = getGlobalVariable('argv');
 
   await git('config', 'user.email', 'angular-core+e2e@google.com');
   await git('config', 'user.name', 'Angular CLI E2e');
@@ -209,9 +209,9 @@ export function useCIDefaults(projectName = 'test-project') {
     // Use the CI chrome setup in karma.
     appTargets.test.options.browsers = 'ChromeHeadlessCI';
     // Disable auto-updating webdriver in e2e.
-    const e2eProject = workspaceJson.projects[projectName + '-e2e'];
-    const e2eTargets = e2eProject.targets || e2eProject.architect;
-    e2eTargets.e2e.options.webdriverUpdate = false;
+    if (appTargets.e2e) {
+      appTargets.e2e.options.webdriverUpdate = false;
+    }
   })
   .then(() => updateJsonFile('package.json', json => {
     // Use matching versions of Chrome and Webdriver.
