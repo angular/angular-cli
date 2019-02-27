@@ -12,6 +12,8 @@
   },
   "private": true,
   "dependencies": {
+    "//NOTE1": "These dependencies are not actually installed so it doesn't matter what they are.",
+    "//NOTE2": "The used dependencies are the ones in packages/angular_devkit/build_angular.",
     "@angular/animations": "^6.0.0-rc.0",
     "@angular/common": "^6.0.0-rc.0",
     "@angular/compiler": "^6.0.0-rc.0",

@@ -70,7 +70,7 @@ describe('Browser Builder service worker', () => {
         const ngswJson = JSON.parse(virtualFs.fileBufferToString(
           host.scopedSync().read(normalize('dist/ngsw.json'))));
         // Verify index and assets are there.
-        expect(ngswJson).toEqual({
+        expect(ngswJson).toEqual(jasmine.objectContaining({
           configVersion: 1,
           index: '/index.html',
           navigationUrls: [
@@ -108,7 +108,7 @@ describe('Browser Builder service worker', () => {
             '/index.html': '1bcafd53046ffb270ac5e6f3cab23e0442f95c4f',
             '/spectrum.png': '8d048ece46c0f3af4b598a95fd8e4709b631c3c0',
           },
-        });
+        }));
       }),
     ).toPromise().then(done, done.fail);
   });
@@ -127,7 +127,7 @@ describe('Browser Builder service worker', () => {
         const ngswJson = JSON.parse(virtualFs.fileBufferToString(
           host.scopedSync().read(normalize('dist/ngsw.json'))));
         // Verify index and assets include the base href.
-        expect(ngswJson).toEqual({
+        expect(ngswJson).toEqual(jasmine.objectContaining({
           configVersion: 1,
           index: '/foo/bar/index.html',
           navigationUrls: [
@@ -163,7 +163,7 @@ describe('Browser Builder service worker', () => {
             '/foo/bar/assets/folder-asset.txt': '617f202968a6a81050aa617c2e28e1dca11ce8d4',
             '/foo/bar/index.html': '925d80777b6ba64b526b0be79761d254dfe94c65',
           },
-        });
+        }));
       }),
     ).toPromise().then(done, done.fail);
   });
