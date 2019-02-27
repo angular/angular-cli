@@ -1,7 +1,7 @@
 {
-  "extends": "<%= appDir.split('/').map(x => '..').join('/') %>/tsconfig.json",
+  "extends": "<%= relativePathToWorkspaceRoot %>/tsconfig.json",
   "compilerOptions": {
-    "outDir": "<%= appDir.split('/').map(x => '..').join('/') %>/out-tsc/app",
+    "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/e2e",
     "module": "commonjs",
     "target": "es5",
     "types": [

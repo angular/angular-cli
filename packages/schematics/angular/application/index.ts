@@ -345,10 +345,8 @@ export default function (options: ApplicationOptions): Rule {
     const tsLintRoot = appDir;
 
     const e2eOptions: E2eOptions = {
-      name: `${options.name}-e2e`,
       relatedAppName: options.name,
       rootSelector: appRootSelector,
-      projectRoot: newProjectRoot ? `${newProjectRoot}/${options.name}-e2e` : 'e2e',
     };
 
     const styleExt = styleToFileExtention(options.style);

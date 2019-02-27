@@ -6,20 +6,6 @@
   "description": "Generates a new, generic end-to-end test definition for the given or default project.",
   "long-description": "e2e-long.md",
   "properties": {
-    "projectRoot": {
-      "description": "The root folder for the new test app.",
-      "type": "string",
-      "visible": false
-    },
-    "name": {
-      "description": "The name of the new e2e app.",
-      "type": "string",
-      "format": "html-selector",
-      "$default": {
-        "$source": "argv",
-        "index": 0
-      }
-    },
     "rootSelector": {
       "description": "The HTML selector for the root component of the test app.",
       "type": "string",
@@ -31,7 +17,6 @@
     }
   },
   "required": [
-    "name",
     "relatedAppName"
   ]
 }
