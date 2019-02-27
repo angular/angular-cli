@@ -154,13 +154,12 @@ export default function (options: ComponentOptions): Rule {
 
     const templateSource = apply(url('./files'), [
       options.skipTests ? filter(path => !path.endsWith('.spec.ts.template')) : noop(),
-      options.inlineStyle ? filter(path => !path.endsWith('.__styleExt__.template')) : noop(),
+      options.inlineStyle ? filter(path => !path.endsWith('.__style__.template')) : noop(),
       options.inlineTemplate ? filter(path => !path.endsWith('.html.template')) : noop(),
       applyTemplates({
         ...strings,
         'if-flat': (s: string) => options.flat ? '' : s,
         ...options,
-        styleExt: styleToFileExtention(options.style),
       }),
       move(parsedPath.path),
     ]);
@@ -171,13 +170,4 @@ export default function (options: ComponentOptions): Rule {
       options.lintFix ? applyLintFix(options.path) : noop(),
     ]);
   };
-}
-
-export function styleToFileExtention(style: Style | undefined): string {
-  switch (style) {
-    case Style.Sass:
-      return 'scss';
-    default:
-      return style || 'css';
-  }
 }
