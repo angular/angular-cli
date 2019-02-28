@@ -18,13 +18,7 @@ const addExtensionRecommendations = updateJsonInTree(
     [
       'angular.ng-template',
       'nrwl.angular-console',
-      'ms-vscode.vscode-typescript-tslint-plugin',
-      'Mikael.Angular-BeastCode',
-      'EditorConfig.EditorConfig',
-      'msjsdiag.debugger-for-chrome',
-      'eg2.vscode-npm-script',
-      'PKief.material-icon-theme',
-      'natewallace.angular2-inline'].forEach(extension => {
+      'ms-vscode.vscode-typescript-tslint-plugin'].forEach(extension => {
         json.recommendations = json.recommendations || [];
         if (!json.recommendations.includes(extension)) {
           json.recommendations.push(extension);
