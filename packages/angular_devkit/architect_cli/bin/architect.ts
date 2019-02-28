@@ -208,7 +208,7 @@ async function main(args: string[]): Promise<number> {
     return 3;
   }
 
-  const root = dirname(normalize(configFilePath));
+  const root = path.dirname(configFilePath);
   const configContent = readFileSync(configFilePath, 'utf-8');
   const workspaceJson = JSON.parse(configContent);
 
@@ -216,7 +216,7 @@ async function main(args: string[]): Promise<number> {
   registry.addPostTransform(schema.transforms.addUndefinedDefaults);
 
   const host = new NodeJsSyncHost();
-  const workspace = new experimental.workspace.Workspace(root, host);
+  const workspace = new experimental.workspace.Workspace(normalize(root), host);
 
   await workspace.loadWorkspaceFromJson(workspaceJson).toPromise();
 
