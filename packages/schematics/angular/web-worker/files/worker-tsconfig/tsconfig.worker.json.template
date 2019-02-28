@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/worker",
+    "lib": [
+      "es2018",
+      "webworker"
+    ],
+    "types": []
+  },
+  "include": [
+    "**/*.worker.ts"
+  ]
+}

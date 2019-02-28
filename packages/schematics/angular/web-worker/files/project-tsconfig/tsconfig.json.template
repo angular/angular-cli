@@ -1,0 +1,10 @@
+{
+  "extends": "<%= relativePathToWorkspaceRoot %>/tsconfig.json",
+  "compilerOptions": {
+    "lib": [
+      "es2018",
+      "dom",
+      "webworker"
+    ],
+  }
+}
