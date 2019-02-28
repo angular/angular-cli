@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { prependToFile, replaceInFile, writeFile } from '../../utils/fs';
+import { replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { createProject, updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
@@ -25,9 +25,6 @@ export async function ivyLazyLoadSetup(projectName: string) {
     const routes: Routes = [{ path: '', component: LazyCompComponent }];
   `);
   await writeFile('src/app/app.component.html', '<router-outlet></router-outlet>');
-
-  // Allow `import()` calls.
-  await replaceInFile('tsconfig.json', `"module": "es2015"`, `"module": "esnext"`);
 
   // Add lazy route e2e
   await writeFile('e2e/src/app.e2e-spec.ts', `
