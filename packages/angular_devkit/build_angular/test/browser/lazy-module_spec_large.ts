@@ -72,8 +72,6 @@ describe('Browser Builder lazy modules', () => {
       'src/lazy-module.ts': 'export const value = 42;',
       'src/main.ts': `import('./lazy-module');`,
     });
-    // Using `import()` in TS require targetting `esnext` modules.
-    host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
     runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
@@ -89,7 +87,6 @@ describe('Browser Builder lazy modules', () => {
         import(/*webpackChunkName: '[request]'*/'./lazy-' + lazyFileName);
       `,
     });
-    host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
     runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
@@ -114,7 +111,6 @@ describe('Browser Builder lazy modules', () => {
       'src/lazy-module.ts': 'export const value = 42;',
       'src/main.ts': `const lazyFileName = 'module'; import('./lazy-' + lazyFileName);`,
     });
-    host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
     const overrides: Partial<BrowserBuilderSchema> = { namedChunks: false };
 
@@ -130,7 +126,6 @@ describe('Browser Builder lazy modules', () => {
       'src/two.ts': `import * as http from '@angular/http'; console.log(http);`,
       'src/main.ts': `import('./one'); import('./two');`,
     });
-    host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
     runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
@@ -147,7 +142,6 @@ describe('Browser Builder lazy modules', () => {
       'src/two.ts': `import * as http from '@angular/http'; console.log(http);`,
       'src/main.ts': `import('./one'); import('./two');`,
     });
-    host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
     const overrides: Partial<BrowserBuilderSchema> = { commonChunk: false };
 
@@ -179,7 +173,6 @@ describe('Browser Builder lazy modules', () => {
           }
         }`,
     });
-    host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
     const overrides: Partial<BrowserBuilderSchema> = { lazyModules: ['src/app/lazy/lazy.module'] };
 
@@ -210,7 +203,6 @@ describe('Browser Builder lazy modules', () => {
           }
         }`,
     });
-    host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
     const overrides: Partial<BrowserBuilderSchema> = {
       lazyModules: ['src/app/lazy/lazy.module'],
