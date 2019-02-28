@@ -52,7 +52,9 @@ Simple steps to reproduce this bug.
 
 Please include: commands run (including args), packages added, related code changes.
 
-If reproduction steps are not enough for reproduction of your issue, please create a minimal GitHub repository with the reproduction of the issue. Share the link to the repo below along with step-by-step instructions to reproduce the problem, as well as expected and actual behavior.
+If reproduction steps are not enough for reproduction of your issue, please create a minimal GitHub repository with the reproduction of the issue. 
+A good way to make a minimal reproduction is to create a new app via `ng new repro-app` and add the minimum possible code to show the problem. 
+Share the link to the repo below along with step-by-step instructions to reproduce the problem, as well as expected and actual behavior.
 
 Issues that don't have enough info and can't be reproduced will be closed.
 
