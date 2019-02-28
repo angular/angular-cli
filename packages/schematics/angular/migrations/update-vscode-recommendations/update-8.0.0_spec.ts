@@ -35,8 +35,7 @@ describe('Update 8.0.0', () => {
       .toPromise();
 
     expect(readJsonInTree(result, '.vscode/extensions.json')).toEqual({
-      recommendations: [
-        'angular.ng-template', 'nrwl.angular-console', 'ms-vscode.vscode-typescript-tslint-plugin'],
+      recommendations: ['angular.ng-template', 'ms-vscode.vscode-typescript-tslint-plugin'],
     });
   });
 
@@ -45,10 +44,7 @@ describe('Update 8.0.0', () => {
       .callRule(
         updateJsonInTree('.vscode/extensions.json', () => ({
           recommendations: [
-            'eamodio.gitlens',
-            'angular.ng-template',
-            'nrwl.angular-console',
-            'ms-vscode.vscode-typescript-tslint-plugin'],
+            'eamodio.gitlens', 'angular.ng-template', 'ms-vscode.vscode-typescript-tslint-plugin'],
         })),
         initialTree,
       )
@@ -60,10 +56,7 @@ describe('Update 8.0.0', () => {
 
     expect(readJsonInTree(result, '.vscode/extensions.json')).toEqual({
       recommendations: [
-        'eamodio.gitlens',
-        'angular.ng-template',
-        'nrwl.angular-console',
-        'ms-vscode.vscode-typescript-tslint-plugin'],
+        'eamodio.gitlens', 'angular.ng-template', 'ms-vscode.vscode-typescript-tslint-plugin'],
     });
   });
 });

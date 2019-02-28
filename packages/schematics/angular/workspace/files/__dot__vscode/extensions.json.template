@@ -1,7 +1,6 @@
 {
   "recommendations": [
     "angular.ng-template",
-    "nrwl.angular-console",
     "ms-vscode.vscode-typescript-tslint-plugin"
   ]
 }
