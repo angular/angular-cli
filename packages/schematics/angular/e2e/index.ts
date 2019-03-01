@@ -54,7 +54,7 @@ function AddBuilderToWorkspace(options: E2eOptions, workspace: WorkspaceSchema):
       const lintConfig = architect.lint;
       if (lintConfig) {
         lintConfig.options.tsConfig =
-          lintConfig.options.tsConfig.concat(`${projectRoot}/tsconfig.e2e.json`);
+          lintConfig.options.tsConfig.concat(`${projectRoot}/tsconfig.json`);
       }
 
       workspace.projects[options.relatedAppName] = project;

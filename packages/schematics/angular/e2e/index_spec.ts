@@ -47,7 +47,7 @@ describe('Application Schematic', () => {
     const files = tree.files;
     expect(files).toEqual(jasmine.arrayContaining([
       '/projects/foo/e2e/protractor.conf.js',
-      '/projects/foo/e2e/tsconfig.e2e.json',
+      '/projects/foo/e2e/tsconfig.json',
       '/projects/foo/e2e/src/app.e2e-spec.ts',
       '/projects/foo/e2e/src/app.po.ts',
     ]));
@@ -96,7 +96,7 @@ describe('Application Schematic', () => {
       expect(lintOptions.tsConfig).toEqual([
         'projects/foo/tsconfig.app.json',
         'projects/foo/tsconfig.spec.json',
-        'projects/foo/e2e/tsconfig.e2e.json',
+        'projects/foo/e2e/tsconfig.json',
       ]);
     });
   });
