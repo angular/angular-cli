@@ -148,6 +148,15 @@ describe('Application Schematic', () => {
     expect(content.rules['component-selector'][2]).toMatch('app');
   });
 
+  it('should set the right prefix in the tslint file when provided is kebabed', () => {
+    const options: ApplicationOptions = { ...defaultOptions, prefix: 'foo-bar' };
+    const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+    const path = '/projects/foo/tslint.json';
+    const content = JSON.parse(tree.readContent(path));
+    expect(content.rules['directive-selector'][2]).toMatch('fooBar');
+    expect(content.rules['component-selector'][2]).toMatch('foo-bar');
+  });
+
   it('should set the right coverage folder in the karma.json file', () => {
     const tree = schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
     const karmaConf = getFileContent(tree, '/projects/foo/karma.conf.js');

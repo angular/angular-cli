@@ -123,6 +123,15 @@ describe('Library Schematic', () => {
     expect(workspace.projects.foo.prefix).toEqual('pre');
   });
 
+  it('should set the right prefix in the tslint file when provided is kebabed', () => {
+    const options: GenerateLibrarySchema = { ...defaultOptions, prefix: 'foo-bar' };
+    const tree = schematicRunner.runSchematic('library', options, workspaceTree);
+    const path = '/projects/foo/tslint.json';
+    const content = JSON.parse(tree.readContent(path));
+    expect(content.rules['directive-selector'][2]).toMatch('fooBar');
+    expect(content.rules['component-selector'][2]).toMatch('foo-bar');
+  });
+
   it('should handle a pascalCasedName', () => {
     const options = {...defaultOptions, name: 'pascalCasedName'};
     const tree = schematicRunner.runSchematic('library', options, workspaceTree);
