@@ -107,7 +107,7 @@
     "istanbul": "^0.4.5",
     "jasmine": "^2.6.0",
     "jasmine-spec-reporter": "^4.2.1",
-    "karma": "~4.0.0",
+    "karma": "~4.0.1",
     "karma-jasmine": "^2.0.1",
     "karma-jasmine-html-reporter": "^1.4.0",
     "license-checker": "^20.1.0",
