@@ -62,7 +62,7 @@ export interface BuildOptions {
   es5BrowserSupport?: boolean;
 
   main: string;
-  index: string;
+  index?: string;
   polyfills?: string;
   budgets: Budget[];
   assets: AssetPatternClass[];
