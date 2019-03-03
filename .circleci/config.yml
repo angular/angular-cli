@@ -15,8 +15,8 @@
 # If you change the cache key prefix, also sync the restore_cache fallback to match.
 # Keep the static part of the cache key as prefix to enable correct fallbacks.
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
-var_1: &docker_image angular/ngcontainer:0.7.0
-var_2: &cache_key angular_devkit-0.7.0-{{ checksum "yarn.lock" }}
+var_1: &docker_image angular/ngcontainer:0.10.0
+var_2: &cache_key angular_devkit-0.10.0-{{ checksum "yarn.lock" }}
 var_3: &node_8_docker_image angular/ngcontainer:0.3.3
 
 # Settings common to each job

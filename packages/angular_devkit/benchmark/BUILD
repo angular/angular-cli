@@ -5,7 +5,7 @@
 
 licenses(["notice"])  # MIT
 
-load("@build_bazel_rules_typescript//:defs.bzl", "ts_library")
+load("@npm_bazel_typescript//:defs.bzl", "ts_library")
 load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test", "npm_package")
 
 package(default_visibility = ["//visibility:public"])
@@ -25,8 +25,8 @@ ts_library(
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
-        "@rxjs",
-        "@rxjs//operators",
+        "@npm//rxjs",
+        
         "@npm//@types/node",
         "@npm//@types/minimist",
     ],
@@ -49,8 +49,8 @@ ts_library(
         ":benchmark",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
-        "@rxjs",
-        "@rxjs//operators",
+        "@npm//rxjs",
+        
         "@npm//@types/node",
         "@npm//@types/jasmine",
     ],

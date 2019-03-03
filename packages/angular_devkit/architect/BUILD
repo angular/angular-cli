@@ -5,7 +5,7 @@
 
 licenses(["notice"])  # MIT
 
-load("@build_bazel_rules_typescript//:defs.bzl", "ts_library")
+load("@npm_bazel_typescript//:defs.bzl", "ts_library")
 load("@build_bazel_rules_nodejs//:defs.bzl", "npm_package")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
@@ -43,8 +43,8 @@ ts_library(
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
-        "@rxjs",
-        "@rxjs//operators",
+        "@npm//rxjs",
+        
         "@npm//@types/node",
         ":architect",
         ":builder_builders_schema",
@@ -69,8 +69,8 @@ ts_library(
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
-        "@rxjs",
-        "@rxjs//operators",
+        "@npm//rxjs",
+        
         "@npm//@types/node",
         ":builder_input_schema",
         ":builder_output_schema",
@@ -93,8 +93,8 @@ ts_library(
         ":architect",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
-        "@rxjs",
-        "@rxjs//operators",
+        "@npm//rxjs",
+        
         "@npm//@types/node",
     ],
 )

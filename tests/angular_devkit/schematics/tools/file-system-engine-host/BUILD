@@ -4,7 +4,7 @@
 # found in the LICENSE file at https://angular.io/license
 package(default_visibility = ["//visibility:public"])
 
-load("@build_bazel_rules_typescript//:defs.bzl", "ts_library")
+load("@npm_bazel_typescript//:defs.bzl", "ts_library")
 
 licenses(["notice"])  # MIT License
 
@@ -23,8 +23,8 @@ ts_library(
         # ":testing",
         # "//packages/angular_devkit/core",
         # "//packages/angular_devkit/core:node",
-        # "@rxjs",
-        # "@rxjs//operators",
+        # "@npm//rxjs",
+        # 
         "@npm//@types/jasmine",
         "@npm//@types/node",
     ],
