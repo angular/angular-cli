@@ -8,7 +8,7 @@
     "core"
   ],
   "dependencies": {
-    "ajv": "6.9.2",
+    "ajv": "6.10.0",
     "chokidar": "2.1.2",
     "fast-json-stable-stringify": "2.0.0",
     "rxjs": "6.4.0",
