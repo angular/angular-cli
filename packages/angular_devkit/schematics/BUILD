@@ -4,7 +4,7 @@
 # found in the LICENSE file at https://angular.io/license
 package(default_visibility = ["//visibility:public"])
 
-load("@build_bazel_rules_typescript//:defs.bzl", "ts_library")
+load("@npm_bazel_typescript//:defs.bzl", "ts_library")
 load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test", "npm_package")
 
 licenses(["notice"])  # MIT License
@@ -27,8 +27,8 @@ ts_library(
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",  # TODO: get rid of this for 6.0
-        "@rxjs",
-        "@rxjs//operators",
+        "@npm//rxjs",
+        
         "@npm//@types/node",
     ],
 )
@@ -46,8 +46,8 @@ ts_library(
         ":testing",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
-        "@rxjs",
-        "@rxjs//operators",
+        "@npm//rxjs",
+        
         "@npm//@types/node",
         "@npm//@types/jasmine",
     ],
@@ -89,8 +89,8 @@ ts_library(
         "@npm//@types/node",
         "@npm//tslint",
         "@npm//typescript",
-        "@rxjs",
-        "@rxjs//operators",
+        "@npm//rxjs",
+        
         "//packages/angular_devkit/core:node",
         "//packages/angular_devkit/core",
     ],
@@ -115,8 +115,8 @@ ts_library(
         ":tasks",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
-        "@rxjs",
-        "@rxjs//operators",
+        "@npm//rxjs",
+        
         "@npm//@types/node",
     ],
 )
@@ -141,8 +141,8 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
         "//packages/angular_devkit/core:node_testing",
-        "@rxjs",
-        "@rxjs//operators",
+        "@npm//rxjs",
+        
         "@npm//@types/node",
         "@npm//@types/jasmine",
     ],
@@ -185,8 +185,8 @@ ts_library(
         ":tasks_node",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
-        "@rxjs",
-        "@rxjs//operators",
+        "@npm//rxjs",
+        
         "@npm//@types/node",
     ],
 )
@@ -208,8 +208,8 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
         "//tests/angular_devkit/schematics/tools/file-system-engine-host:file_system_engine_host_test_lib",
-        "@rxjs",
-        "@rxjs//operators",
+        "@npm//rxjs",
+        
         "@npm//@types/node",
         "@npm//@types/jasmine",
     ],
@@ -245,8 +245,8 @@ ts_library(
         ":tasks_node",
         ":tools",
         "//packages/angular_devkit/core",
-        "@rxjs",
-        "@rxjs//operators",
+        "@npm//rxjs",
+        
         "@npm//@types/node",
     ],
 )

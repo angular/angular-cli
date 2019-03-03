@@ -2,7 +2,7 @@
 #
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
-load("@build_bazel_rules_typescript//:defs.bzl", "ts_library", "ts_proto_library")
+load("@npm_bazel_typescript//:defs.bzl", "ts_library", "ts_proto_library")
 load("@build_bazel_rules_nodejs//:defs.bzl", "nodejs_binary")
 
 ts_proto_library(
@@ -16,8 +16,8 @@ ts_library(
     deps = [
       ":build_event_stream",
       "@npm//@types/node",
-      "@rxjs",
-      "@rxjs//operators",
+      "@npm//rxjs",
+      
     ],
 )
 
