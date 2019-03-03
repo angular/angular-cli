@@ -54,7 +54,7 @@ export default function () {
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/test-project/index.html', oneLineTrim`
       <script src="runtime.js"></script>
-      <script src="es2015-polyfills.js" nomodule></script>
+      <script src="polyfills.es5.js" nomodule></script>
       <script src="polyfills.js"></script>
       <script src="scripts.js"></script>
       <script src="renamed-script.js"></script>

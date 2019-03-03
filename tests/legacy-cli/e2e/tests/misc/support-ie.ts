@@ -10,7 +10,7 @@ export default async function () {
   });
 
   await ng('build');
-  await expectFileNotToExist('dist/test-project/es2015-polyfills.js');
+  await expectFileNotToExist('dist/test-project/polyfills.es5.js');
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
     <script src="runtime.js"></script>
     <script src="polyfills.js"></script>
@@ -20,10 +20,10 @@ export default async function () {
   `);
 
   await ng('build', `--es5BrowserSupport`);
-  await expectFileToMatch('dist/test-project/es2015-polyfills.js', 'core-js');
+  await expectFileToMatch('dist/test-project/polyfills.es5.js', 'core-js');
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
     <script src="runtime.js"></script>
-    <script src="es2015-polyfills.js" nomodule></script>
+    <script src="polyfills.es5.js" nomodule></script>
     <script src="polyfills.js"></script>
     <script src="styles.js"></script>
     <script src="vendor.js"></script>
