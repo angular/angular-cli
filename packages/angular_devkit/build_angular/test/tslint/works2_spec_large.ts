@@ -9,13 +9,19 @@
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { Architect, Target } from '@angular-devkit/architect/src/index2';
 import { TestingArchitectHost } from '@angular-devkit/architect/testing/index2';
-import { experimental, join, logging, normalize, schema } from '@angular-devkit/core';
+import {
+  experimental,
+  logging,
+  normalize,
+  schema,
+} from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
-const workspaceRoot = join(devkitRoot, 'tests/angular_devkit/build_angular/hello-world-app/');
+const devkitRoot = (global as any)._DevKitRoot; // tslint:disable-line:no-any
+const workspaceRoot = path.join(devkitRoot, 'tests/angular_devkit/build_angular/hello-world-app/');
+
 const lintTarget: Target = { project: 'app', target: 'lint' };
 
 // tslint:disable-next-line:no-big-function
@@ -26,17 +32,19 @@ describe('Tslint Target', () => {
 
   beforeEach(async () => {
     const vfHost = new NodeJsSyncHost();
-    const configContent = fs.readFileSync(path.join(workspaceRoot, 'angular.json'), 'utf-8');
+    const configPath = path.join(workspaceRoot, 'angular.json');
+    const configContent = fs.readFileSync(configPath, 'utf-8');
     const workspaceJson = JSON.parse(configContent);
 
     const registry = new schema.CoreSchemaRegistry();
     registry.addPostTransform(schema.transforms.addUndefinedDefaults);
 
-    const workspace = new experimental.workspace.Workspace(workspaceRoot, vfHost);
+    const workspace = new experimental.workspace.Workspace(normalize(workspaceRoot), vfHost);
     await workspace.loadWorkspaceFromJson(workspaceJson).toPromise();
 
     testArchitectHost = new TestingArchitectHost(
-      workspaceRoot, workspaceRoot,
+      workspaceRoot,
+      workspaceRoot,
       new WorkspaceNodeModulesArchitectHost(workspace, workspaceRoot),
     );
     architect = new Architect(testArchitectHost, registry);
