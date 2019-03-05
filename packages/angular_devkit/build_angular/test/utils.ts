@@ -166,5 +166,3 @@ export const lazyModuleImport: { [path: string]: string } = {
     export class AppModule { }
   `,
 };
-
-

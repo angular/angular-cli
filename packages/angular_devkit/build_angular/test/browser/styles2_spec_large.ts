@@ -480,7 +480,7 @@ describe('Browser Builder styles', () => {
     files = (await browserBuild(architect, host, target, {
       ...overrides,
       baseHref: 'http://base.url/',
-      deployUrl: 'deploy/'
+      deployUrl: 'deploy/',
     })).files;
 
     styles = await files['styles.css'];
