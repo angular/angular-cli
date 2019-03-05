@@ -85,12 +85,6 @@ jobs:
     steps:
       - attach_workspace: *attach_options
       - run: npm run validate -- --ci
-      - run:
-          name: Validate Code Formatting
-          command: |
-            if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
-              yarn run precise-commits --check-only --head=$CIRCLE_SHA1 --base=$(git merge-base HEAD $CIRCLE_BRANCH)
-            fi
 
   test:
     <<: *defaults
