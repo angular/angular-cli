@@ -14,9 +14,7 @@ import * as ts from 'typescript';
 
 // Blacklist (regexes) of the files to not lint. Generated files should not be linted.
 // TODO: when moved to using bazel for the build system, this won't be needed.
-const blacklist = [
-  /^dist-schema[\\\/].*/,
-];
+const blacklist = [/^dist-schema[\\\/].*/, /.*\/third_party\/.*/];
 
 
 function _buildRules(logger: logging.Logger) {

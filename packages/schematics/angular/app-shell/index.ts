@@ -14,8 +14,8 @@ import {
   chain,
   schematic,
 } from '@angular-devkit/schematics';
-import * as ts from 'typescript';
 import { Schema as ComponentOptions } from '../component/schema';
+import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import {
   addImportToModule,
   addSymbolToNgModuleMetadata,
