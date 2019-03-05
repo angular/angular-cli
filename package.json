@@ -24,7 +24,6 @@
     "build-tsc": "tsc -p tsconfig.json",
     "fix": "npm run admin -- lint --fix",
     "lint": "npm run admin -- lint",
-    "precise-commits": "precise-commits",
     "prebuildifier": "bazel build --noshow_progress @com_github_bazelbuild_buildtools//buildifier",
     "buildifier": "find . -type f \\( -name BUILD -or -name BUILD.bazel \\) ! -path \"*/node_modules/*\" | xargs $(bazel info bazel-bin)/external/com_github_bazelbuild_buildtools/buildifier/buildifier",
     "templates": "node ./bin/devkit-admin templates",
@@ -34,6 +33,7 @@
     "test:watch": "nodemon --watch packages -e ts ./bin/devkit-admin test",
     "validate": "node ./bin/devkit-admin validate",
     "validate-commits": "./bin/devkit-admin validate-commits",
+    "prepush": "node ./bin/devkit-admin hooks/pre-push",
     "preinstall": "node ./tools/yarn/check-yarn.js",
     "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 2.45"
   },
@@ -103,7 +103,7 @@
     "conventional-commits-parser": "^3.0.0",
     "gh-got": "^8.0.1",
     "git-raw-commits": "^2.0.0",
-    "husky": "^1.3.1",
+    "husky": "^0.14.3",
     "istanbul": "^0.4.5",
     "jasmine": "^2.6.0",
     "jasmine-spec-reporter": "^4.2.1",
@@ -111,15 +111,12 @@
     "karma-jasmine": "^2.0.1",
     "karma-jasmine-html-reporter": "^1.4.0",
     "license-checker": "^20.1.0",
-    "lint-staged": "^8.1.4",
     "minimatch": "^3.0.4",
     "minimist": "^1.2.0",
     "npm-registry-client": "8.6.0",
     "pacote": "^9.2.3",
     "pidtree": "^0.3.0",
     "pidusage": "^2.0.17",
-    "precise-commits": "^1.0.2",
-    "prettier": "^1.16.4",
     "rxjs": "~6.4.0",
     "semver": "^5.3.0",
     "source-map": "^0.5.6",
@@ -129,14 +126,7 @@
     "through2": "^2.0.3",
     "tree-kill": "^1.2.0",
     "ts-node": "^5.0.0",
-    "tslint-config-prettier": "^1.18.0",
     "tslint-no-circular-imports": "^0.6.0",
     "tslint-sonarts": "^1.7.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "node ./bin/devkit-admin hooks/pre-push"
-    }
   }
 }

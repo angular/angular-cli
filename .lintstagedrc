@@ -1,5 +1,0 @@
-{
-  "linters": {
-    "*.{js,ts}": ["precise-commits", "git add"]
-  }
-}
