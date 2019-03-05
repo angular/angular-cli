@@ -37,15 +37,17 @@ async function _loadTslint() {
 }
 
 
-async function _run(config: TslintBuilderOptions, context: BuilderContext): Promise<BuilderOutput> {
+async function _run(
+  options: TslintBuilderOptions,
+  context: BuilderContext,
+): Promise<BuilderOutput> {
   const systemRoot = context.workspaceRoot;
   process.chdir(context.currentDirectory);
-  const options = config;
-  const projectName = context.target && context.target.project || '<???>';
+  const projectName = (context.target && context.target.project) || '<???>';
 
   // Print formatter output only for non human-readable formats.
-  const printInfo = ['prose', 'verbose', 'stylish'].includes(options.format || '')
-                    && !options.silent;
+  const printInfo =
+    ['prose', 'verbose', 'stylish'].includes(options.format || '') && !options.silent;
 
   context.reportStatus(`Linting ${JSON.stringify(projectName)}...`);
   if (printInfo) {
@@ -72,8 +74,14 @@ async function _run(config: TslintBuilderOptions, context: BuilderContext): Prom
 
     let i = 0;
     for (const program of allPrograms) {
-      const partial
-        = await _lint(projectTslint, systemRoot, tslintConfigPath, options, program, allPrograms);
+      const partial = await _lint(
+        projectTslint,
+        systemRoot,
+        tslintConfigPath,
+        options,
+        program,
+        allPrograms,
+      );
       if (result === undefined) {
         result = partial;
       } else {
