@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { strings } from '@angular-devkit/core';
+import { normalize, strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -24,7 +24,7 @@ import { Builders, WorkspaceSchema } from '../utility/workspace-models';
 import { Schema as E2eOptions } from './schema';
 
 function getE2eRoot(projectRoot: string): string {
-  const root = projectRoot.split('/').filter(x => x).join('/');
+  const root = normalize(projectRoot);
 
   return root ? root + '/e2e' : 'e2e';
 }

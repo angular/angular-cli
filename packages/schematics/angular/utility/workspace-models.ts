@@ -37,7 +37,7 @@ export interface BrowserBuilderBaseOptions {
     outputPath?: string;
     index?: string;
     polyfills: string;
-    assets?: object[];
+    assets?: (object|string)[];
     styles?: string[];
     scripts?: string[];
     sourceMap?: boolean;

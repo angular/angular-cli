@@ -8,11 +8,11 @@
     ]
   },
   "files": [
-    "<%= rootInSrc ? '' : 'src/' %>test.ts",
-    "<%= rootInSrc ? '' : 'src/' %>polyfills.ts"
+    "src/test.ts",
+    "src/polyfills.ts"
   ],
   "include": [
-    "**/*.spec.ts",
-    "**/*.d.ts"
+    "src/**/*.spec.ts",
+    "src/**/*.d.ts"
   ]
 }

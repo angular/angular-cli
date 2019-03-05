@@ -248,8 +248,12 @@ export default function (options: UniversalOptions): Rule {
     if (!clientTargets.build) {
       throw targetBuildNotFoundError();
     }
-    const tsConfigExtends = basename(normalize(clientTargets.build.options.tsConfig));
-    const rootInSrc = clientProject.root === '';
+
+    const clientTsConfig = normalize(clientTargets.build.options.tsConfig);
+    const tsConfigExtends = basename(clientTsConfig);
+    // this is needed because prior to version 8, tsconfig might have been in 'src'
+    // and we don't want to break the 'ng add @nguniversal/express-engine schematics'
+    const rootInSrc = clientProject.root === '' && clientTsConfig.includes('src/');
     const tsConfigDirectory = join(normalize(clientProject.root), rootInSrc ? 'src' : '');
 
     if (!options.skipInstall) {

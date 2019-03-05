@@ -4,10 +4,12 @@
     "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/app",
     "types": []
   },
+  "include": [
+    "src/**/*.ts"
+  ],
   "exclude": [
-    "test.ts",
-    "**/*.spec.ts",
-    "e2e/**"
+    "src/test.ts",
+    "src/**/*.spec.ts"
   ]<% if (enableIvy) { %>,
   "angularCompilerOptions": {
     "enableIvy": true
