@@ -1,0 +1,14 @@
+load("@npm_bazel_typescript//:defs.bzl", "ts_library")
+
+# files fetched on 2019-03-05 from
+# https://github.com/Microsoft/TypeScript/tree/v3.3.3333
+licenses(["notice"])  # Apache 2.0
+
+ts_library(
+    name = "TypeScript",
+    srcs = ["lib/typescript.d.ts"],
+    data = ["lib/typescript.js"],
+    module_name = "typescript",
+    module_root = "lib/typescript.d.ts",
+    visibility = ["//packages/schematics/angular:__subpackages__"],
+)

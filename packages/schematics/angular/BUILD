@@ -49,9 +49,18 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tasks",
+        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
         "@npm//@types/node",
         "@npm//rxjs",
-        "@npm//typescript",
+    ],
+)
+
+jasmine_node_test(
+    name = "no_typescript_runtime_dep_test",
+    srcs = ["no_typescript_runtime_dep_spec.js"],
+    deps = [
+        ":angular",
+        "@npm//jasmine",
     ],
 )
 
@@ -76,10 +85,10 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:testing",
+        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
         "@npm//@types/node",
         "@npm//@types/jasmine",
         "@npm//rxjs",
-        "@npm//typescript",
     ],
     testonly = True,
     # @external_begin
@@ -94,5 +103,6 @@ jasmine_node_test(
         "@npm//jasmine",
         "@npm//source-map",
         "@npm//chokidar",
+        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
     ],
 )

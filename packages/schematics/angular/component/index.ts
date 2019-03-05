@@ -19,7 +19,7 @@ import {
   noop,
   url,
 } from '@angular-devkit/schematics';
-import * as ts from 'typescript';
+import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import {
   addDeclarationToModule,
   addEntryComponentToModule,

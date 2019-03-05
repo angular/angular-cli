@@ -7,7 +7,7 @@
  */
 import { JsonObject, JsonParseMode, JsonValue, parseJson } from '@angular-devkit/core';
 import { Rule, Tree, chain, noop } from '@angular-devkit/schematics';
-import * as ts from 'typescript';
+import * as ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 
 function isJsonObject(value: JsonValue): value is JsonObject {
   return value != null && typeof value === 'object' && !Array.isArray(value);

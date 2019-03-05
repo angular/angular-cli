@@ -8,7 +8,7 @@
 import { normalize } from '@angular-devkit/core';
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import { dirname } from 'path';
-import * as ts from 'typescript';
+import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { findNode, getSourceNodes } from '../utility/ast-utils';
 
 export function findBootstrapModuleCall(host: Tree, mainPath: string): ts.CallExpression | null {

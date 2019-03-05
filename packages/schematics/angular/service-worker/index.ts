@@ -18,7 +18,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import * as ts from 'typescript';
+import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { addSymbolToNgModuleMetadata, insertImport, isImported } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { getWorkspace, updateWorkspace } from '../utility/config';
