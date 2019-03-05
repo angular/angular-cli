@@ -203,19 +203,35 @@ export function resolve(x: string, options: ResolveOptions): string {
 
   throw new ModuleNotFoundException(x, basePath);
 
-  function loadAsFileSync(x: string): string | null {
-    if (isFile(x)) {
-      return x;
+  /**
+   * Will resolve the path and return the realpath when 'preserveSymlinks' is false
+   */
+  function resolvePath(p: string): string {
+    const resolvedPath = path.resolve(p);
+    if (options && options.preserveSymlinks === false) {
+      try {
+        return fs.realpathSync(resolvedPath);
+      } catch (err) {
+        if (err.code !== 'ENOENT') {
+          throw err;
+        }
+      }
     }
 
-    return extensions.map(ex => x + ex).find(f => isFile(f)) || null;
+    return resolvedPath;
+  }
+
+  function loadAsFileSync(x: string): string | null {
+    const file = isFile(x) ? x : extensions.map(ex => x + ex).find(f => isFile(f));
+
+    return file ? resolvePath(file) : null;
   }
 
   function loadAsDirectorySync(x: string): string | null {
     const pkgfile = path.join(x, 'package.json');
     if (isFile(pkgfile)) {
       if (options.resolvePackageJson) {
-        return pkgfile;
+        return resolvePath(pkgfile);
       }
 
       try {
@@ -269,18 +285,7 @@ export function resolve(x: string, options: ResolveOptions): string {
 
     // ensure that `start` is an absolute path at this point,
     // resolving against the process' current working directory
-    let absoluteStart = path.resolve(start);
-
-    if (opts && opts.preserveSymlinks === false) {
-      try {
-        absoluteStart = fs.realpathSync(absoluteStart);
-      } catch (err) {
-        if (err.code !== 'ENOENT') {
-          throw err;
-        }
-      }
-    }
-
+    const absoluteStart = resolvePath(start);
     let prefix = '/';
     if (/^([A-Za-z]:)/.test(absoluteStart)) {
       prefix = '';
@@ -296,9 +301,11 @@ export function resolve(x: string, options: ResolveOptions): string {
     }
 
     const dirs = paths.reduce((dirs: string[], aPath: string) => {
-      return dirs.concat(modules.map(function (moduleDir) {
-        return path.join(prefix, aPath, moduleDir);
-      }));
+      return dirs.concat(
+        modules.map(function(moduleDir) {
+          return path.join(prefix, aPath, moduleDir);
+        }),
+      );
     }, []);
 
     return opts && opts.paths ? dirs.concat(opts.paths) : dirs;
