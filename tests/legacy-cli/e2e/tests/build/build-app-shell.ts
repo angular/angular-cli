@@ -5,8 +5,7 @@ import { ng, npm } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { readNgVersion } from '../../utils/version';
 
-
-export default function () {
+export default function() {
   // Skip this test in Angular 2/4.
   if (getGlobalVariable('argv').ng2 || getGlobalVariable('argv').ng4) {
     return Promise.resolve();
@@ -21,26 +20,31 @@ export default function () {
   }
 
   return Promise.resolve()
-    .then(() => updateJsonFile('angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects['test-project'].architect;
-      appArchitect['server'] = {
-        builder: '@angular-devkit/build-angular:server',
-        options: {
-          outputPath: 'dist/test-project-server',
-          main: 'src/main.server.ts',
-          tsConfig: 'tsconfig.server.json'
-        }
-      };
-      appArchitect['app-shell'] = {
-        builder: '@angular-devkit/build-angular:app-shell',
-        options: {
-          browserTarget: 'test-project:build:production',
-          serverTarget: 'test-project:server',
-          route: '/shell'
-        }
-      };
-    }))
-    .then(() => writeFile('./tsconfig.server.json', `
+    .then(() =>
+      updateJsonFile('angular.json', workspaceJson => {
+        const appArchitect = workspaceJson.projects['test-project'].architect;
+        appArchitect['server'] = {
+          builder: '@angular-devkit/build-angular:server',
+          options: {
+            outputPath: 'dist/test-project-server',
+            main: 'src/main.server.ts',
+            tsConfig: 'tsconfig.server.json',
+          },
+        };
+        appArchitect['app-shell'] = {
+          builder: '@angular-devkit/build-angular:app-shell',
+          options: {
+            browserTarget: 'test-project:build:production',
+            serverTarget: 'test-project:server',
+            route: '/shell',
+          },
+        };
+      }),
+    )
+    .then(() =>
+      writeFile(
+        './tsconfig.server.json',
+        `
       {
         "extends": "./tsconfig.app.json",
         "compilerOptions": {
@@ -53,8 +57,13 @@ export default function () {
           "entryModule": "src/app/app.server.module#AppServerModule"
         }
       }
-    `))
-    .then(() => writeFile('./src/main.server.ts', `
+    `,
+      ),
+    )
+    .then(() =>
+      writeFile(
+        './src/main.server.ts',
+        `
       import { enableProdMode } from '@angular/core';
 
       import { environment } from './environments/environment';
@@ -64,12 +73,22 @@ export default function () {
       }
 
       export { AppServerModule } from './app/app.server.module';
-    `))
-    .then(() => writeFile('./src/app/app.component.html', stripIndent`
+    `,
+      ),
+    )
+    .then(() =>
+      writeFile(
+        './src/app/app.component.html',
+        stripIndent`
       Hello World
       <router-outlet></router-outlet>
-    `))
-    .then(() => writeFile('./src/app/app.module.ts', stripIndent`
+    `,
+      ),
+    )
+    .then(() =>
+      writeFile(
+        './src/app/app.module.ts',
+        stripIndent`
       import { BrowserModule } from '@angular/platform-browser';
       import { NgModule } from '@angular/core';
       import { RouterModule } from '@angular/router';
@@ -85,8 +104,13 @@ export default function () {
         bootstrap: [AppComponent]
       })
       export class AppModule { }
-    `))
-    .then(() => writeFile('./src/app/app.server.module.ts', stripIndent`
+    `,
+      ),
+    )
+    .then(() =>
+      writeFile(
+        './src/app/app.server.module.ts',
+        stripIndent`
       import {NgModule} from '@angular/core';
       import {ServerModule} from '@angular/platform-server';
       import { Routes, RouterModule } from '@angular/router';
@@ -113,8 +137,13 @@ export default function () {
         declarations: [ShellComponent],
       })
       export class AppServerModule {}
-    `))
-    .then(() => writeFile('./src/app/shell.component.ts', stripIndent`
+    `,
+      ),
+    )
+    .then(() =>
+      writeFile(
+        './src/app/shell.component.ts',
+        stripIndent`
       import { Component } from '@angular/core';
       @Component({
         selector: 'app-shell',
@@ -122,14 +151,17 @@ export default function () {
         styles: []
       })
       export class ShellComponent {}
-    `))
-    .then(() => updateJsonFile('package.json', packageJson => {
-      const dependencies = packageJson['dependencies'];
-      dependencies['@angular/platform-server'] = platformServerVersion;
-      // ServerModule depends on @angular/http regardless the app's dependency.
-      dependencies['@angular/http'] = httpVersion;
-    })
-    .then(() => npm('install')))
+    `,
+      ),
+    )
+    .then(() =>
+      updateJsonFile('package.json', packageJson => {
+        const dependencies = packageJson['dependencies'];
+        dependencies['@angular/platform-server'] = platformServerVersion;
+        // ServerModule depends on @angular/http regardless the app's dependency.
+        dependencies['@angular/http'] = httpVersion;
+      }).then(() => npm('install')),
+    )
     .then(() => ng('run', 'test-project:app-shell'))
     .then(() => expectFileToMatch('dist/test-project/index.html', /shell Works!/));
 }
