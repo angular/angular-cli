@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { experimental, json, logging } from '@angular-devkit/core';
-import { Subscription } from 'rxjs';
-import { first, ignoreElements, map, shareReplay } from 'rxjs/operators';
+import { EMPTY, Subscription } from 'rxjs';
+import { catchError, first, ignoreElements, map, share, shareReplay, tap } from 'rxjs/operators';
 import {
   BuilderInfo,
   BuilderInput,
@@ -60,38 +60,44 @@ export async function scheduleByName(
       if (event.kind === experimental.jobs.JobOutboundMessageKind.Start) {
         job.input.next(message);
       }
-    });
+    }, () => {});
   } else {
     job.input.next(message);
   }
 
   const logChannelSub = job.getChannel<logging.LogEntry>('log').subscribe(entry => {
     logger.next(entry);
-  });
+  }, () => {});
 
-  const s = job.outboundBus.subscribe(
-    undefined,
-    undefined,
-    () => {
+  const s = job.outboundBus.subscribe({
+    error() {},
+    complete() {
       s.unsubscribe();
       logChannelSub.unsubscribe();
       if (stateSubscription) {
         stateSubscription.unsubscribe();
       }
     },
-  );
+  });
   const output = job.output.pipe(
     map(output => ({
       ...output,
       ...options.target ? { target: options.target } : 0,
       info,
     } as BuilderOutput)),
+    shareReplay(),
   );
+
+  // Start the builder.
+  output.pipe(first()).subscribe({
+    error() {},
+  });
 
   return {
     id,
     info,
-    result: output.pipe(first()).toPromise(),
+    // This is a getter so that it always returns the next output, and not the same one.
+    get result() { return output.pipe(first()).toPromise(); },
     output,
     progress: job.getChannel<BuilderProgressReport>('progress', progressSchema).pipe(
       shareReplay(1),
@@ -99,7 +105,10 @@ export async function scheduleByName(
     stop() {
       job.stop();
 
-      return output.pipe(ignoreElements()).toPromise();
+      return job.outboundBus.pipe(
+        ignoreElements(),
+        catchError(() => EMPTY),
+      ).toPromise();
     },
   };
 }
