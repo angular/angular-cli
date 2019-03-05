@@ -1,17 +1,14 @@
 import { normalize } from 'path';
-
-import { updateJsonFile, updateTsConfig } from '../../utils/project';
-import {
-  expectFileToMatch,
-  writeFile,
-  replaceInFile,
-  prependToFile,
-  appendToFile,
-} from '../../utils/fs';
-import { ng, silentNpm, exec } from '../../utils/process';
 import { getGlobalVariable } from '../../utils/env';
+import {
+  appendToFile,
+  expectFileToMatch,
+  prependToFile,
+  writeFile,
+} from '../../utils/fs';
+import { exec, ng, silentNpm } from '../../utils/process';
+import { updateJsonFile } from '../../utils/project';
 import { readNgVersion } from '../../utils/version';
-import { expectToFail } from '../../utils/utils';
 
 export default function () {
   let platformServerVersion = readNgVersion();
@@ -41,25 +38,21 @@ export default function () {
         options: {
           outputPath: 'dist/test-project-server',
           main: 'src/main.server.ts',
-          tsConfig: 'src/tsconfig.server.json',
+          tsConfig: 'tsconfig.server.json',
         },
       };
     }))
-    .then(() => writeFile('./src/tsconfig.server.json', `
+    .then(() => writeFile('./tsconfig.server.json', `
       {
-        "extends": "../tsconfig.json",
+        "extends": "./tsconfig.app.json",
         "compilerOptions": {
           "outDir": "../dist-server",
           "baseUrl": "./",
           "module": "commonjs",
           "types": []
         },
-        "exclude": [
-          "test.ts",
-          "**/*.spec.ts"
-        ],
         "angularCompilerOptions": {
-          "entryModule": "app/app.server.module#AppServerModule"
+          "entryModule": "src/app/app.server.module#AppServerModule"
         }
       }
     `))
@@ -155,9 +148,4 @@ export default function () {
         fs.writeFileSync('dist/test-project-server/index.html', html);
       \});
     `)))
-    // This part of the test requires a non-aot build, which isn't available anymore.
-    // .then(() => ng('run', 'test-project:server', '--bundle-dependencies=all'))
-    // .then(() => expectToFail(() => expectFileToMatch('./dist/test-project-server/main.js',
-    //   /require\(["']@angular\/[^"']*["']\)/)))
-    // .then(() => exec(normalize('node'), 'dist/test-project-server/main.js'));
 }

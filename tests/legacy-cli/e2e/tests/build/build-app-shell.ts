@@ -1,10 +1,9 @@
-import { ng, npm } from '../../utils/process';
-import { expectFileToMatch, writeFile } from '../../utils/fs';
+import { stripIndent } from 'common-tags';
 import { getGlobalVariable } from '../../utils/env';
-import { expectToFail } from '../../utils/utils';
+import { expectFileToMatch, writeFile } from '../../utils/fs';
+import { ng, npm } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { readNgVersion } from '../../utils/version';
-import { stripIndent } from 'common-tags';
 
 
 export default function () {
@@ -29,7 +28,7 @@ export default function () {
         options: {
           outputPath: 'dist/test-project-server',
           main: 'src/main.server.ts',
-          tsConfig: 'src/tsconfig.server.json'
+          tsConfig: 'tsconfig.server.json'
         }
       };
       appArchitect['app-shell'] = {
@@ -41,21 +40,17 @@ export default function () {
         }
       };
     }))
-    .then(() => writeFile('./src/tsconfig.server.json', `
+    .then(() => writeFile('./tsconfig.server.json', `
       {
-        "extends": "../tsconfig.json",
+        "extends": "./tsconfig.app.json",
         "compilerOptions": {
           "outDir": "../dist-server",
           "baseUrl": "./",
           "module": "commonjs",
           "types": []
         },
-        "exclude": [
-          "test.ts",
-          "**/*.spec.ts"
-        ],
         "angularCompilerOptions": {
-          "entryModule": "app/app.server.module#AppServerModule"
+          "entryModule": "src/app/app.server.module#AppServerModule"
         }
       }
     `))
