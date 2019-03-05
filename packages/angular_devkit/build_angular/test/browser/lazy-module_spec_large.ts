@@ -10,65 +10,7 @@ import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/archi
 import { join, normalize } from '@angular-devkit/core';
 import { take, tap } from 'rxjs/operators';
 import { Schema as BrowserBuilderSchema } from '../../src/browser/schema';
-import { browserTargetSpec, host } from '../utils';
-
-
-export const lazyModuleFiles: { [path: string]: string } = {
-  'src/app/lazy/lazy-routing.module.ts': `
-    import { NgModule } from '@angular/core';
-    import { Routes, RouterModule } from '@angular/router';
-
-    const routes: Routes = [];
-
-    @NgModule({
-      imports: [RouterModule.forChild(routes)],
-      exports: [RouterModule]
-    })
-    export class LazyRoutingModule { }
-  `,
-  'src/app/lazy/lazy.module.ts': `
-    import { NgModule } from '@angular/core';
-    import { CommonModule } from '@angular/common';
-
-    import { LazyRoutingModule } from './lazy-routing.module';
-
-    @NgModule({
-      imports: [
-        CommonModule,
-        LazyRoutingModule
-      ],
-      declarations: []
-    })
-    export class LazyModule { }
-  `,
-};
-
-export const lazyModuleImport: { [path: string]: string } = {
-  'src/app/app.module.ts': `
-    import { BrowserModule } from '@angular/platform-browser';
-    import { NgModule } from '@angular/core';
-    import { HttpModule } from '@angular/http';
-
-    import { AppComponent } from './app.component';
-    import { RouterModule } from '@angular/router';
-
-    @NgModule({
-      declarations: [
-        AppComponent
-      ],
-      imports: [
-        BrowserModule,
-        HttpModule,
-        RouterModule.forRoot([
-          { path: 'lazy', loadChildren: './lazy/lazy.module#LazyModule' }
-        ])
-      ],
-      providers: [],
-      bootstrap: [AppComponent]
-    })
-    export class AppModule { }
-  `,
-};
+import { browserTargetSpec, host, lazyModuleFiles, lazyModuleImport } from '../utils';
 
 // tslint:disable-next-line:no-big-function
 describe('Browser Builder lazy modules', () => {

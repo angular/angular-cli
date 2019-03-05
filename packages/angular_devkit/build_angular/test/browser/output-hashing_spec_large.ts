@@ -9,8 +9,7 @@
 import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize } from '@angular-devkit/core';
 import { concatMap, tap } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
-import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_large';
+import { browserTargetSpec, host, lazyModuleFiles, lazyModuleImport } from '../utils';
 
 
 describe('Browser Builder output hashing', () => {
