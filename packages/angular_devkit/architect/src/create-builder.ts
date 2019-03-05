@@ -16,6 +16,7 @@ import {
   BuilderOutput,
   BuilderOutputLike,
   BuilderProgressState,
+  ScheduleOptions,
   Target,
   TypedBuilderProgress,
   targetStringFromTarget,
@@ -96,10 +97,14 @@ export function createBuilder<
           target: i.target as Target,
           logger: logger,
           id: i.id,
-          async scheduleTarget(target: Target, overrides: json.JsonObject = {}) {
+          async scheduleTarget(
+            target: Target,
+            overrides: json.JsonObject = {},
+            scheduleOptions: ScheduleOptions = {},
+          ) {
             const run = await scheduleByTarget(target, overrides, {
               scheduler,
-              logger: logger.createChild(''),
+              logger: scheduleOptions.logger || logger.createChild(''),
               workspaceRoot: i.workspaceRoot,
               currentDirectory: i.currentDirectory,
             });
@@ -109,10 +114,14 @@ export function createBuilder<
 
             return run;
           },
-          async scheduleBuilder(builderName: string, options: json.JsonObject = {}) {
+          async scheduleBuilder(
+            builderName: string,
+            options: json.JsonObject = {},
+            scheduleOptions: ScheduleOptions = {},
+          ) {
             const run = await scheduleByName(builderName, options, {
               scheduler,
-              logger: logger.createChild(''),
+              logger: scheduleOptions.logger || logger.createChild(''),
               workspaceRoot: i.workspaceRoot,
               currentDirectory: i.currentDirectory,
             });
@@ -121,19 +130,23 @@ export function createBuilder<
             subscriptions.push(run.progress.subscribe(event => progressChannel.next(event)));
 
             return run;
+          },
+          async getTargetOptions(target: Target) {
+            return scheduler.schedule<Target, json.JsonValue, json.JsonObject>(
+                    '..getTargetOptions', target).output.toPromise();
           },
           reportRunning() {
             switch (currentState) {
               case BuilderProgressState.Waiting:
               case BuilderProgressState.Stopped:
-                progress({state: BuilderProgressState.Running, current: 0, total}, context);
+                progress({ state: BuilderProgressState.Running, current: 0, total  }, context);
                 break;
             }
           },
           reportStatus(status: string) {
             switch (currentState) {
               case BuilderProgressState.Running:
-                progress({ state: currentState, status, current, total }, context);
+                progress({ state: currentState, status, current, total  }, context);
                 break;
               case BuilderProgressState.Waiting:
                 progress({ state: currentState, status }, context);

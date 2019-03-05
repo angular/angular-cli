@@ -13,6 +13,7 @@ import { BuilderOutput, BuilderRun } from './api';
 import { Architect } from './architect';
 import { createBuilder } from './create-builder';
 
+// tslint:disable-next-line:no-big-function
 describe('architect', () => {
   let testArchitectHost: TestingArchitectHost;
   let architect: Architect;
@@ -184,5 +185,43 @@ describe('architect', () => {
     if (run) {
       await run.stop();
     }
+  });
+
+  it('exposes getTargetOptions() properly', async () => {
+    const goldenOptions = {
+      value: 'value',
+    };
+    let options = {} as object;
+
+    const target = {
+      project: 'project',
+      target: 'target',
+    };
+    testArchitectHost.addTarget(target, 'package:target', goldenOptions);
+
+    testArchitectHost.addBuilder('package:getTargetOptions', createBuilder(async (_, context) => {
+      options = await context.getTargetOptions(target);
+
+      return { success: true };
+    }));
+
+    const run = await architect.scheduleBuilder('package:getTargetOptions', {});
+    const output = await run.output.toPromise();
+    expect(output.success).toBe(true);
+    expect(options).toEqual(goldenOptions);
+    await run.stop();
+
+    // Use an invalid target and check for error.
+    target.target = 'invalid';
+    options = {};
+
+    // This should not error.
+    const run2 = await architect.scheduleBuilder('package:getTargetOptions', {});
+
+    // But this should.
+    try {
+      await run2.output.toPromise();
+    } catch {}
+    await run2.stop();
   });
 });
