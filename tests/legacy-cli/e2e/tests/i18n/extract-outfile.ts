@@ -13,7 +13,7 @@ export default function() {
     .then(() => ng('xi18n', '--out-file', 'messages.fr.xlf'))
     .then((output) => {
       if (!output.stdout.match(/starting from Angular v4/)) {
-        return expectFileToMatch('src/messages.fr.xlf', 'Hello world');
+        return expectFileToMatch('messages.fr.xlf', 'Hello world');
       }
     });
 }

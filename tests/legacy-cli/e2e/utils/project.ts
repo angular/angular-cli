@@ -55,7 +55,7 @@ export async function prepareProjectForE2e(name) {
   await git('config', 'commit.gpgSign', 'false');
   await useBuiltPackages();
   await useCIChrome('e2e');
-  await useCIChrome('src');
+  await useCIChrome('');
   await useDevKitSnapshots();
   await argv['ng2'] ? useNg2() : Promise.resolve();
   await argv['ng4'] ? useNg4() : Promise.resolve();
@@ -224,7 +224,7 @@ export function useCIDefaults(projectName = 'test-project') {
 
 export function useCIChrome(projectDir: string) {
   const protractorConf = `${projectDir}/protractor.conf.js`;
-  const karmaConf = `${projectDir}/karma.conf.js`;
+  const karmaConf = `${projectDir ? projectDir + '/' : ''}karma.conf.js`;
 
   return Promise.resolve()
     .then(() => updateJsonFile('package.json', json => {
