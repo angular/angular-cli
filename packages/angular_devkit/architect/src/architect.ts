@@ -108,7 +108,7 @@ export interface ScheduleOptions {
 /**
  * A JobRegistry that resolves builder targets from the host.
  */
-export class ArchitectBuilderJobRegistry implements BuilderRegistry {
+class ArchitectBuilderJobRegistry implements BuilderRegistry {
   constructor(
     protected _host: ArchitectHost,
     protected _registry: json.schema.SchemaRegistry,
@@ -172,18 +172,16 @@ export class ArchitectBuilderJobRegistry implements BuilderRegistry {
     return result;
   }
 
-  get<
-    A extends json.JsonObject,
-    I extends BuilderInput,
-    O extends BuilderOutput,
-    >(name: string): Observable<experimental.jobs.JobHandler<A, I, O> | null> {
+  get<A extends json.JsonObject, I extends BuilderInput, O extends BuilderOutput>(
+    name: string,
+  ): Observable<experimental.jobs.JobHandler<A, I, O> | null> {
     const m = name.match(/^([^:]+):([^:]+)$/i);
     if (!m) {
       return of(null);
     }
 
     return from(this._resolveBuilder(name)).pipe(
-      concatMap(builderInfo => builderInfo ? this._createBuilder(builderInfo) : of(null)),
+      concatMap(builderInfo => (builderInfo ? this._createBuilder(builderInfo) : of(null))),
       first(null, null),
     ) as Observable<experimental.jobs.JobHandler<A, I, O> | null>;
   }
@@ -192,12 +190,10 @@ export class ArchitectBuilderJobRegistry implements BuilderRegistry {
 /**
  * A JobRegistry that resolves targets from the host.
  */
-export class ArchitectTargetJobRegistry extends ArchitectBuilderJobRegistry {
-  get<
-    A extends json.JsonObject,
-    I extends BuilderInput,
-    O extends BuilderOutput,
-    >(name: string): Observable<experimental.jobs.JobHandler<A, I, O> | null> {
+class ArchitectTargetJobRegistry extends ArchitectBuilderJobRegistry {
+  get<A extends json.JsonObject, I extends BuilderInput, O extends BuilderOutput>(
+    name: string,
+  ): Observable<experimental.jobs.JobHandler<A, I, O> | null> {
     const m = name.match(/^{([^:]+):([^:]+)(?::([^:]*))?}$/i);
     if (!m) {
       return of(null);
@@ -209,10 +205,12 @@ export class ArchitectTargetJobRegistry extends ArchitectBuilderJobRegistry {
       configuration: m[3],
     };
 
-    return from(Promise.all([
-      this._host.getBuilderNameForTarget(target),
-      this._host.getOptionsForTarget(target),
-    ])).pipe(
+    return from(
+      Promise.all([
+        this._host.getBuilderNameForTarget(target),
+        this._host.getOptionsForTarget(target),
+      ]),
+    ).pipe(
       concatMap(([builderStr, options]) => {
         if (builderStr === null || options === null) {
           return of(null);
@@ -234,6 +232,22 @@ export class ArchitectTargetJobRegistry extends ArchitectBuilderJobRegistry {
 }
 
 
+function _getTargetOptionsFactory(host: ArchitectHost) {
+  return experimental.jobs.createJobHandler<Target, json.JsonValue, json.JsonObject>(
+    target => {
+      return host.getOptionsForTarget(target).then(options => {
+        return options || {};
+      });
+    },
+    {
+      name: '..getTargetOptions',
+      output: { type: 'object' },
+      argument: inputSchema.properties.target,
+    },
+  );
+}
+
+
 export class Architect {
   private readonly _scheduler: experimental.jobs.Scheduler;
   private readonly _jobCache = new Map<string, Observable<BuilderJobHandler>>();
@@ -244,9 +258,14 @@ export class Architect {
     private _registry: json.schema.SchemaRegistry = new json.schema.CoreSchemaRegistry(),
     additionalJobRegistry?: experimental.jobs.Registry,
   ) {
+    const privateArchitectJobRegistry = new experimental.jobs.SimpleJobRegistry();
+    // Create private jobs.
+    privateArchitectJobRegistry.register(_getTargetOptionsFactory(_host));
+
     const jobRegistry = new experimental.jobs.FallbackRegistry([
       new ArchitectTargetJobRegistry(_host, _registry, this._jobCache, this._infoCache),
       new ArchitectBuilderJobRegistry(_host, _registry, this._jobCache, this._infoCache),
+      privateArchitectJobRegistry,
       ...(additionalJobRegistry ? [additionalJobRegistry] : []),
     ] as experimental.jobs.Registry[]);
 
