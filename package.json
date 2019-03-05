@@ -135,7 +135,6 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
       "pre-push": "node ./bin/devkit-admin hooks/pre-push"
     }
   }
