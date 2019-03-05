@@ -34,7 +34,7 @@ describe('Ng New Schematic', () => {
     const tree = schematicRunner.runSchematic('ng-new', options);
     const files = tree.files;
     expect(files).toEqual(jasmine.arrayContaining([
-      '/bar/src/tsconfig.app.json',
+      '/bar/tsconfig.app.json',
       '/bar/src/main.ts',
       '/bar/src/app/app.module.ts',
       '/bar/e2e/src/app.po.ts',

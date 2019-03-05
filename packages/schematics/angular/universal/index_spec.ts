@@ -73,22 +73,22 @@ describe('Universal Schematic', () => {
 
   it('should create a tsconfig file for the workspace project', () => {
     const tree = schematicRunner.runSchematic('universal', workspaceUniversalOptions, appTree);
-    const filePath = '/src/tsconfig.server.json';
+    const filePath = '/tsconfig.server.json';
     expect(tree.exists(filePath)).toEqual(true);
     const contents = tree.readContent(filePath);
     expect(JSON.parse(contents)).toEqual({
       extends: './tsconfig.app.json',
       compilerOptions: {
-        outDir: '../out-tsc/app-server',
+        outDir: './out-tsc/app-server',
         baseUrl: '.',
       },
       angularCompilerOptions: {
-        entryModule: 'app/app.server.module#AppServerModule',
+        entryModule: 'src/app/app.server.module#AppServerModule',
       },
     });
     const angularConfig = JSON.parse(tree.readContent('angular.json'));
     expect(angularConfig.projects.workspace.architect
-      .server.options.tsConfig).toEqual('src/tsconfig.server.json');
+      .server.options.tsConfig).toEqual('tsconfig.server.json');
   });
 
   it('should create a tsconfig file for a generated application', () => {

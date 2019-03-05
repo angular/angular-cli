@@ -1,5 +1,6 @@
-{
-  "extends": "<%= relativePathToWorkspaceRoot %>/tslint.json",
+{<% if (!isRootApp) { %>
+  "extends": "<%= relativePathToWorkspaceRoot %>/tslint.json",<%
+  } %>
   "rules": {
     "directive-selector": [
       true,

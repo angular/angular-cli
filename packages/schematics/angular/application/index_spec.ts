@@ -253,10 +253,10 @@ describe('Application Schematic', () => {
       const tree = schematicRunner.runSchematic('application', options, workspaceTree);
       const files = tree.files;
       expect(files).toEqual(jasmine.arrayContaining([
-        '/src/karma.conf.js',
-        '/src/tsconfig.app.json',
-        '/src/tsconfig.spec.json',
-        '/src/tslint.json',
+        '/karma.conf.js',
+        '/tsconfig.app.json',
+        '/tsconfig.spec.json',
+        '/tslint.json',
         '/src/environments/environment.ts',
         '/src/environments/environment.prod.ts',
         '/src/favicon.ico',
@@ -284,12 +284,12 @@ describe('Application Schematic', () => {
       expect(buildOpt.index).toEqual('src/index.html');
       expect(buildOpt.main).toEqual('src/main.ts');
       expect(buildOpt.polyfills).toEqual('src/polyfills.ts');
-      expect(buildOpt.tsConfig).toEqual('src/tsconfig.app.json');
+      expect(buildOpt.tsConfig).toEqual('tsconfig.app.json');
 
       const testOpt = prj.architect.test.options;
       expect(testOpt.main).toEqual('src/test.ts');
-      expect(testOpt.tsConfig).toEqual('src/tsconfig.spec.json');
-      expect(testOpt.karmaConfig).toEqual('src/karma.conf.js');
+      expect(testOpt.tsConfig).toEqual('tsconfig.spec.json');
+      expect(testOpt.karmaConfig).toEqual('karma.conf.js');
       expect(testOpt.styles).toEqual([
         'src/styles.css',
       ]);
@@ -314,21 +314,31 @@ describe('Application Schematic', () => {
     it('should set the relative tsconfig paths', () => {
       const options = { ...defaultOptions, projectRoot: '' };
       const tree = schematicRunner.runSchematic('application', options, workspaceTree);
-      const appTsConfig = JSON.parse(tree.readContent('/src/tsconfig.app.json'));
-      expect(appTsConfig.extends).toEqual('../tsconfig.json');
-      const specTsConfig = JSON.parse(tree.readContent('/src/tsconfig.spec.json'));
-      expect(specTsConfig.extends).toEqual('../tsconfig.json');
-      expect(specTsConfig.files).toEqual(['test.ts', 'polyfills.ts']);
+      const appTsConfig = JSON.parse(tree.readContent('/tsconfig.app.json'));
+      expect(appTsConfig.extends).toEqual('./tsconfig.json');
+      const specTsConfig = JSON.parse(tree.readContent('/tsconfig.spec.json'));
+      expect(specTsConfig.extends).toEqual('./tsconfig.json');
+      expect(specTsConfig.files).toEqual(['src/test.ts', 'src/polyfills.ts']);
     });
 
     it('should set the relative path and prefix in the tslint file', () => {
       const options = { ...defaultOptions, projectRoot: '' };
 
       const tree = schematicRunner.runSchematic('application', options, workspaceTree);
-      const content = JSON.parse(tree.readContent('/src/tslint.json'));
-      expect(content.extends).toMatch('../tslint.json');
+      const content = JSON.parse(tree.readContent('/tslint.json'));
+      expect(content.extends).toMatch('tslint:recommended');
       expect(content.rules['directive-selector'][2]).toMatch('app');
       expect(content.rules['component-selector'][2]).toMatch('app');
+    });
+
+    it('should merge tslint file', () => {
+      const options = { ...defaultOptions, projectRoot: '' };
+
+      const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+      const content = JSON.parse(tree.readContent('/tslint.json'));
+      expect(content.extends).toMatch('tslint:recommended');
+      expect(content.rules['component-selector'][2]).toMatch('app');
+      expect(content.rules['trailing-comma']).toBeDefined();
     });
   });
 });
