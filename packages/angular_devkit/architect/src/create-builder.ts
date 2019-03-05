@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { experimental, isPromise, json, logging } from '@angular-devkit/core';
-import { Observable, Subscription, from, isObservable, of } from 'rxjs';
+import { Observable, Subscription, from, isObservable, of, throwError } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import {
   BuilderContext,
@@ -14,6 +14,7 @@ import {
   BuilderInfo,
   BuilderInput,
   BuilderOutput,
+  BuilderOutputLike,
   BuilderProgressState,
   Target,
   TypedBuilderProgress,
@@ -148,7 +149,12 @@ export function createBuilder<
         };
 
         context.reportRunning();
-        let result = fn(i.options as OptT, context);
+        let result: BuilderOutputLike;
+        try {
+          result = fn(i.options as OptT, context);
+        } catch (e) {
+          result = throwError(e);
+        }
 
         if (isPromise(result)) {
           result = from(result);

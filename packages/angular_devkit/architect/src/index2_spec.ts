@@ -9,7 +9,7 @@ import { schema } from '@angular-devkit/core';
 import { timer } from 'rxjs';
 import { map, take, tap, toArray } from 'rxjs/operators';
 import { TestingArchitectHost } from '../testing/testing-architect-host';
-import { BuilderOutput } from './api';
+import { BuilderOutput, BuilderRun } from './api';
 import { Architect } from './architect';
 import { createBuilder } from './create-builder';
 
@@ -134,5 +134,55 @@ describe('architect', () => {
     expect(called).toBe(1);
     expect(results).toBe(10);
     expect(all.length).toBe(10);
+  });
+
+  it('reports errors in the builder', async () => {
+    testArchitectHost.addBuilder('package:error', createBuilder(() => {
+      throw new Error('Error in the builder.');
+    }));
+
+    let run: BuilderRun | undefined = undefined;
+    try {
+      try {
+        // This should not throw.
+        run = await architect.scheduleBuilder('package:error', {});
+      } catch (err) {
+        expect(err).toBeUndefined();
+        throw err;
+      }
+
+      // This should throw.
+      await run.result;
+      expect('to throw').not.toEqual('to throw');
+    } catch {
+    }
+    if (run) {
+      await run.stop();
+    }
+  });
+
+  it('reports errors in the builder (async)', async () => {
+    testArchitectHost.addBuilder('package:error', createBuilder(() => {
+      return new Promise((_, reject) => reject(new Error('Error async')));
+    }));
+
+    let run: BuilderRun | undefined = undefined;
+    try {
+      try {
+        // This should not throw.
+        run = await architect.scheduleBuilder('package:error', {});
+      } catch (err) {
+        expect(err).toBeUndefined();
+        throw err;
+      }
+
+      // This should throw.
+      await run.result;
+      expect('to throw').not.toEqual('to throw');
+    } catch {
+    }
+    if (run) {
+      await run.stop();
+    }
   });
 });
