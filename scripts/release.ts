@@ -41,6 +41,9 @@ function _showVersions(logger: logging.Logger) {
 
 
 function _upgradeSingle(release: string, version: string): string {
+  const simpleVersion = version.replace(/-beta\.\d+$|-rc\.\d+$/, '');
+  const isExperimental = semver.satisfies(simpleVersion, '<1.0.0');
+
   if (release == 'minor-beta') {
     if (version.match(/-beta\.\d+$/)) {
       return semver.inc(version, 'prerelease') || version;
@@ -58,6 +61,8 @@ function _upgradeSingle(release: string, version: string): string {
   } else if (release == 'major-beta') {
     if (version.match(/-beta\.\d+$/)) {
       return semver.inc(version, 'prerelease') || version;
+    } else if (isExperimental) {
+      return semver.inc(version, 'minor') ? semver.inc(version, 'minor') + '-beta.0' : version;
     } else {
       return semver.inc(version, 'major') ? semver.inc(version, 'major') + '-beta.0' : version;
     }
@@ -66,9 +71,13 @@ function _upgradeSingle(release: string, version: string): string {
       return semver.inc(version, 'prerelease') || version;
     } else if (version.match(/-beta\.\d+$/)) {
       return version.replace(/-beta\.\d+$/, '-rc.0');
+    } else if (isExperimental) {
+      return semver.inc(version, 'minor') ? semver.inc(version, 'minor') + '-rc.0' : version;
     } else {
       return semver.inc(version, 'major') ? semver.inc(version, 'major') + '-rc.0' : version;
     }
+  } else if (release == 'major' && isExperimental) {
+    return semver.inc(version, 'minor') || version;
   } else {
     return semver.inc(version, release as semver.ReleaseType) || version;
   }
