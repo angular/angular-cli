@@ -35,6 +35,10 @@ export interface TslintBuilderOptions {
   files: string[];
 }
 
+interface LintResult extends tslint.LintResult {
+  fileNames: string[];
+}
+
 export default class TslintBuilder implements Builder<TslintBuilderOptions> {
 
   constructor(public context: BuilderContext) { }
@@ -82,7 +86,7 @@ export default class TslintBuilder implements Builder<TslintBuilderOptions> {
           : null;
         const Linter = projectTslint.Linter;
 
-        let result: undefined | tslint.LintResult;
+        let result: undefined | LintResult;
         if (options.tsConfig) {
           const tsConfigs = Array.isArray(options.tsConfig) ? options.tsConfig : [options.tsConfig];
           const allPrograms =
@@ -102,6 +106,7 @@ export default class TslintBuilder implements Builder<TslintBuilderOptions> {
               // apart from checking if they are greater than 0 thus no need to dedupe these.
               result.errorCount += partial.errorCount;
               result.warningCount += partial.warningCount;
+              result.fileNames = [...new Set([...result.fileNames, ...partial.fileNames])];
 
               if (partial.fixes) {
                 result.fixes = result.fixes ? result.fixes.concat(partial.fixes) : partial.fixes;
@@ -123,7 +128,7 @@ export default class TslintBuilder implements Builder<TslintBuilderOptions> {
           }
           const formatter = new Formatter();
 
-          const output = formatter.format(result.failures, result.fixes);
+          const output = formatter.format(result.failures, result.fixes, result.fileNames);
           if (output) {
             this.context.logger.info(output);
           }
@@ -156,7 +161,7 @@ function lint(
   options: TslintBuilderOptions,
   program?: ts.Program,
   allPrograms?: ts.Program[],
-) {
+): LintResult {
   const Linter = projectTslint.Linter;
   const Configuration = projectTslint.Configuration;
 
@@ -170,6 +175,7 @@ function lint(
 
   let lastDirectory;
   let configLoad;
+  const lintedFiles: string[] = [];
   for (const file of files) {
     let contents = '';
     if (program && allPrograms) {
@@ -196,10 +202,14 @@ function lint(
 
     if (configLoad) {
       linter.lint(file, contents, configLoad.results);
+      lintedFiles.push(file);
     }
   }
 
-  return linter.getResult();
+  return {
+    ...linter.getResult(),
+    fileNames: lintedFiles,
+  };
 }
 
 function getFilesToLint(

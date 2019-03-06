@@ -102,6 +102,7 @@ describe('Tslint Target', () => {
 
     const output = await run.result;
     expect(output.success).toBe(true);
+    expect(allLogs).toContain(jasmine.stringMatching(/file name=.*app.module.ts/i));
     expect(allStatus).toContain(jasmine.stringMatching(/linting.*"app".*/i));
     expect(allLogs).not.toContain(jasmine.stringMatching(/linting.*"app".*/i));
     await run.stop();
