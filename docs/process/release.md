@@ -49,16 +49,9 @@ Consider if you need to update `packages/schematics/angular/utility/latest-versi
 
 ## Shepparding
 
-As commits are cherry-picked when PRs are merged, creating the release should be a matter of updating the version
-numbers. This can be done with the following command.
+As commits are cherry-picked when PRs are merged, creating the release should be a matter of creating a tag.
 
-See `scripts/release.ts` for the full list of release types, e.g. patch updates the third number per semver.
-
-```bash
-devkit-admin release patch --force # replace with minor-beta etc.
-```
-
-Make sure you update the package versions in `packages/schematics/angular/utility/latest-versions.ts`. After that:
+**Make sure you update the package versions in `packages/schematics/angular/utility/latest-versions.ts`.**
 
 ```bash
 git commit -a -m 'release: vXX'

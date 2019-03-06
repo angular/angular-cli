@@ -2,6 +2,7 @@
   "name": "@schematics/update",
   "version": "0.0.0",
   "description": "Schematics specific to updating packages",
+  "experimental": true,
   "keywords": [
     "blueprints",
     "code generation",

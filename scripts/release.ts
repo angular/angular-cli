@@ -17,16 +17,20 @@ const monorepo = require('../.monorepo.json');
 
 
 function _showVersions(logger: logging.Logger) {
+  const versions = Object.keys(packages).reduce((acc, curr) => {
+    acc[curr] = packages[curr] && packages[curr].version || '???';
+
+    return acc;
+  }, {} as { [pkg: string]: string });
+  const maxVersionLength = Math.max(...Object.keys(versions).map(x => versions[x].length));
+
   for (const pkgName of Object.keys(packages)) {
     const pkg = packages[pkgName];
 
     const version = pkg.version || '???';
-    const hash = pkg.hash;
-    const diff = pkg.dirty ? '!' : '';
 
-    const pad1 = '                                  '.slice(pkgName.length);
-    const pad2 = '                 '.slice(version.length);
-    const message = `${pkgName} ${pad1}v${version}${pad2}${hash} ${diff}`;
+    const pad1 = '                                       '.slice(pkgName.length);
+    const message = `${pkgName} ${pad1}${('      ' + version).slice(-maxVersionLength)}`;
     if (pkg.private) {
       logger.debug(message);
     } else {
