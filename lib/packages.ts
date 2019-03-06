@@ -29,6 +29,7 @@ export interface PackageInfo {
   experimental: boolean;
   packageJson: JsonObject;
   dependencies: string[];
+  reverseDependencies: string[];
 
   snapshot: boolean;
   snapshotRepo: string;
@@ -227,6 +228,7 @@ export const packages: PackageMap =
         },
 
         dependencies: [],
+        reverseDependencies: [],
         get version() {
           return _getVersionFromGit(experimental);
         },
@@ -244,4 +246,5 @@ for (const pkgName of Object.keys(packages)) {
     return name in (pkgJson.dependencies || {})
         || name in (pkgJson.devDependencies || {});
   });
+  pkg.dependencies.forEach(depName => packages[depName].reverseDependencies.push(pkgName));
 }
