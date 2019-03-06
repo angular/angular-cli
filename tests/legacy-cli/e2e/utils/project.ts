@@ -48,27 +48,82 @@ export async function createProject(name: string, ...args: string[]) {
 }
 
 export async function prepareProjectForE2e(name) {
-  const argv: string[] = getGlobalVariable('argv');
+                                                   const argv: string[] = getGlobalVariable(
+                                                     'argv',
+                                                   );
 
-  await git('config', 'user.email', 'angular-core+e2e@google.com');
-  await git('config', 'user.name', 'Angular CLI E2e');
-  await git('config', 'commit.gpgSign', 'false');
-  await useBuiltPackages();
-  await useCIChrome('e2e');
-  await useCIChrome('');
-  await useDevKitSnapshots();
-  await argv['ng2'] ? useNg2() : Promise.resolve();
-  await argv['ng4'] ? useNg4() : Promise.resolve();
-  await argv['ng-snapshots'] || argv['ng-tag'] ? useSha() : Promise.resolve();
-  await console.log(`Project ${name} created... Installing npm.`);
-  await silentNpm('install');
-  await useCIDefaults(name);
-  // Force sourcemaps to be from the root of the filesystem.
-  await updateJsonFile('tsconfig.json', json => {
-    json['compilerOptions']['sourceRoot'] = '/';
-  });
-  await gitCommit('prepare-project-for-e2e');
-}
+                                                   await git(
+                                                     'config',
+                                                     'user.email',
+                                                     'angular-core+e2e@google.com',
+                                                   );
+                                                   await git(
+                                                     'config',
+                                                     'user.name',
+                                                     'Angular CLI E2e',
+                                                   );
+                                                   await git(
+                                                     'config',
+                                                     'commit.gpgSign',
+                                                     'false',
+                                                   );
+                                                   await useBuiltPackages();
+                                                   await useCIChrome(
+                                                     'e2e',
+                                                   );
+                                                   await useCIChrome(
+                                                     '',
+                                                   );
+
+                                                   // legacy projects
+                                                   await useCIChrome(
+                                                     'src',
+                                                   );
+
+                                                   await useDevKitSnapshots();
+                                                   (await argv[
+                                                     'ng2'
+                                                   ])
+                                                     ? useNg2()
+                                                     : Promise.resolve();
+                                                   (await argv[
+                                                     'ng4'
+                                                   ])
+                                                     ? useNg4()
+                                                     : Promise.resolve();
+                                                   (await argv[
+                                                     'ng-snapshots'
+                                                   ]) ||
+                                                   argv[
+                                                     'ng-tag'
+                                                   ]
+                                                     ? useSha()
+                                                     : Promise.resolve();
+                                                   await console.log(
+                                                     `Project ${name} created... Installing npm.`,
+                                                   );
+                                                   await silentNpm(
+                                                     'install',
+                                                   );
+                                                   await useCIDefaults(
+                                                     name,
+                                                   );
+                                                   // Force sourcemaps to be from the root of the filesystem.
+                                                   await updateJsonFile(
+                                                     'tsconfig.json',
+                                                     json => {
+                                                       json[
+                                                         'compilerOptions'
+                                                       ][
+                                                         'sourceRoot'
+                                                       ] =
+                                                         '/';
+                                                     },
+                                                   );
+                                                   await gitCommit(
+                                                     'prepare-project-for-e2e',
+                                                   );
+                                                 }
 
 
 export function useDevKit(devkitRoot: string) {
@@ -99,7 +154,7 @@ export function useDevKit(devkitRoot: string) {
 export function useDevKitSnapshots() {
   return updateJsonFile('package.json', json => {
     // TODO: actually add these.
-    // These were not working on any test that ran `npm i`.
+                                                           // These were not working on any test that ran `npm i`.
     // json['devDependencies']['@angular-devkit/build-angular'] =
     //   'github:angular/angular-devkit-build-angular-builds';
     // // By adding build-ng-packagr preemptively, adding a lib will not update it.
@@ -119,8 +174,9 @@ export function useBuiltPackages() {
       }
 
       for (const packageName of Object.keys(packages)) {
-        if (json['dependencies'].hasOwnProperty(packageName)) {
-          json['dependencies'][packageName] = packages[packageName].tar;
+        if (json['dependencies'].hasOwnProperty(packageName)
+                                                           ) {
+                                                                 json['dependencies'][packageName] = packages[packageName].tar;
         } else if (json['devDependencies'].hasOwnProperty(packageName)) {
           json['devDependencies'][packageName] = packages[packageName].tar;
         }
@@ -212,6 +268,13 @@ export function useCIDefaults(projectName = 'test-project') {
     if (appTargets.e2e) {
       appTargets.e2e.options.webdriverUpdate = false;
     }
+
+    // legacy project structure
+    const e2eProject = workspaceJson.projects[projectName + '-e2e'];
+    if (e2eProject){
+      const e2eTargets = e2eProject.targets || e2eProject.architect;
+      e2eTargets.e2e.options.webdriverUpdate = false;
+    }
   })
   .then(() => updateJsonFile('package.json', json => {
     // Use matching versions of Chrome and Webdriver.
@@ -223,8 +286,9 @@ export function useCIDefaults(projectName = 'test-project') {
 }
 
 export function useCIChrome(projectDir: string) {
-  const protractorConf = `${projectDir}/protractor.conf.js`;
-  const karmaConf = `${projectDir ? projectDir + '/' : ''}karma.conf.js`;
+  const dir = projectDir ? projectDir + '/' : '';
+  const protractorConf = `${dir}protractor.conf.js`;
+  const karmaConf = `${dir}karma.conf.js`;
 
   return Promise.resolve()
     .then(() => updateJsonFile('package.json', json => {
