@@ -120,7 +120,7 @@ describe('Service Worker Schematic', () => {
       .toContain('/outDir/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)');
   });
 
-  it('should generate ngsw-config.json in src when the application is at root level', () => {
+  it('should generate ngsw-config.json in root when the application is at root level', () => {
     const name = 'foo';
     const rootAppOptions: ApplicationOptions = {
       ...appOptions,
@@ -134,11 +134,11 @@ describe('Service Worker Schematic', () => {
 
     let tree = schematicRunner.runSchematic('application', rootAppOptions, appTree);
     tree = schematicRunner.runSchematic('service-worker', rootSWOptions, tree);
-    expect(tree.exists('/src/ngsw-config.json')).toBe(true);
+    expect(tree.exists('/ngsw-config.json')).toBe(true);
 
     const { projects } = JSON.parse(tree.readContent('/angular.json'));
     expect(projects.foo.architect.build.configurations.production.ngswConfigPath)
-      .toBe('src/ngsw-config.json');
+      .toBe('ngsw-config.json');
   });
 
 });
