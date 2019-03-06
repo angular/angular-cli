@@ -47,7 +47,7 @@ export async function ivyLazyLoadSetup(projectName: string) {
   `);
 
   // Set factory shims to false.
-  await updateJsonFile('src/tsconfig.app.json', json => {
+  await updateJsonFile('tsconfig.app.json', json => {
     const angularCompilerOptions = json['angularCompilerOptions'];
     angularCompilerOptions['allowEmptyCodegenFiles'] = false;
   });
@@ -74,7 +74,7 @@ export default async function () {
   await ivyLazyLoadSetup('ivy-lazy-string-shims');
   await replaceInFile('src/app/app-routing.module.ts', 'LOAD_CHILDREN_MARKER',
     `'./lazy/lazy.module#LazyModule'`);
-  await replaceInFile('src/tsconfig.app.json', `"allowEmptyCodegenFiles": false`,
+  await replaceInFile('tsconfig.app.json', `"allowEmptyCodegenFiles": false`,
     `"allowEmptyCodegenFiles": true`);
   await expectToFail(() => ng('e2e')); // Currently broken.
   await ng('e2e', '--prod');
