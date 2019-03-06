@@ -18,7 +18,9 @@ import { Schema as RealTslintBuilderOptions } from './schema';
 
 
 type TslintBuilderOptions = RealTslintBuilderOptions & json.JsonObject;
-
+interface LintResult extends tslint.LintResult {
+  fileNames: string[];
+}
 
 async function _loadTslint() {
   let tslint;
@@ -62,7 +64,7 @@ async function _run(config: TslintBuilderOptions, context: BuilderContext): Prom
     : null;
   const Linter = projectTslint.Linter;
 
-  let result: undefined | tslint.LintResult = undefined;
+  let result: undefined | LintResult = undefined;
   if (options.tsConfig) {
     const tsConfigs = Array.isArray(options.tsConfig) ? options.tsConfig : [options.tsConfig];
     context.reportProgress(0, tsConfigs.length);
@@ -87,6 +89,7 @@ async function _run(config: TslintBuilderOptions, context: BuilderContext): Prom
         // apart from checking if they are greater than 0 thus no need to dedupe these.
         result.errorCount += partial.errorCount;
         result.warningCount += partial.warningCount;
+        result.fileNames = [...new Set([...result.fileNames, ...partial.fileNames])];
 
         if (partial.fixes) {
           result.fixes = result.fixes ? result.fixes.concat(partial.fixes) : partial.fixes;
@@ -110,7 +113,7 @@ async function _run(config: TslintBuilderOptions, context: BuilderContext): Prom
     }
     const formatter = new Formatter();
 
-    const output = formatter.format(result.failures, result.fixes);
+    const output = formatter.format(result.failures, result.fixes, result.fileNames);
     if (output.trim()) {
       context.logger.info(output);
     }
@@ -144,7 +147,7 @@ async function _lint(
   options: TslintBuilderOptions,
   program?: ts.Program,
   allPrograms?: ts.Program[],
-) {
+): Promise<LintResult> {
   const Linter = projectTslint.Linter;
   const Configuration = projectTslint.Configuration;
 
@@ -158,6 +161,7 @@ async function _lint(
 
   let lastDirectory: string | undefined = undefined;
   let configLoad;
+  const lintedFiles: string[] = [];
   for (const file of files) {
     if (program && allPrograms) {
       // If it cannot be found in ANY program, then this is an error.
@@ -184,10 +188,14 @@ async function _lint(
       // Give some breathing space to other promises that might be waiting.
       await Promise.resolve();
       linter.lint(file, contents, configLoad.results);
+      lintedFiles.push(file);
     }
   }
 
-  return linter.getResult();
+  return {
+    ...linter.getResult(),
+    fileNames: lintedFiles,
+  };
 }
 
 function getFilesToLint(
