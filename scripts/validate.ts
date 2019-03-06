@@ -11,6 +11,7 @@ import { execSync } from 'child_process';
 import templates from './templates';
 import validateBuildFiles from './validate-build-files';
 import validateCommits from './validate-commits';
+import validateDoNotSubmit from './validate-do-not-submit';
 import validateLicenses from './validate-licenses';
 
 export default async function (options: { verbose: boolean }, logger: logging.Logger) {
@@ -41,6 +42,11 @@ export default async function (options: { verbose: boolean }, logger: logging.Lo
   logger.info('');
   logger.info('Running commit validation...');
   error = await validateCommits({}, logger.createChild('validate-commits')) != 0
+       || error;
+
+  logger.info('');
+  logger.info(`Running DO_NOT${''}_SUBMIT validation...`);
+  error = await validateDoNotSubmit({}, logger.createChild('validate-do-not-submit')) != 0
        || error;
 
   logger.info('');
