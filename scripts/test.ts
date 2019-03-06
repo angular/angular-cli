@@ -7,6 +7,7 @@
  */
 // tslint:disable:no-implicit-dependencies
 import { logging } from '@angular-devkit/core';
+import { spawnSync } from 'child_process';
 import * as glob from 'glob';
 import * as Istanbul from 'istanbul';
 import 'jasmine';
@@ -35,6 +36,21 @@ type CoverageType = any;  // tslint:disable-line:no-any
 declare const global: {
   __coverage__: CoverageType;
 };
+
+
+function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
+  const { status, error, stdout } = spawnSync(command, args, {
+    stdio: ['ignore', 'pipe', 'inherit'],
+    ...opts,
+  });
+
+  if (status != 0) {
+    logger.error(`Command failed: ${command} ${args.map(x => JSON.stringify(x)).join(', ')}`);
+    throw error;
+  }
+
+  return stdout.toString('utf-8');
+}
 
 
 // Add the Istanbul (not Constantinople) reporter.
@@ -202,15 +218,39 @@ export default function (args: ParsedArgs, logger: logging.Logger) {
   let tests = allTests.filter(x => !excludeRe.test(x));
 
   if (!args.full) {
-    // Remove the tests from packages that haven't changed.
-    tests = tests
-      .filter(p => Object.keys(packages).some(name => {
-        const relativeRoot = relative(projectBaseDir, packages[name].root);
+    // Find the point where this branch merged with master.
+    const branch = _exec('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {}, logger).trim();
+    const masterRevList = _exec('git', ['rev-list', 'master'], {}, logger).trim().split('\n');
+    const branchRevList = _exec('git', ['rev-list', branch], {}, logger).trim().split('\n');
+    const sha = branchRevList.find(s => masterRevList.includes(s));
 
-        return p.startsWith(relativeRoot) && packages[name].dirty;
-      }));
+    if (sha) {
+      const diffFiles = _exec(
+        'git',
+        ['diff', sha, 'HEAD', '--name-only'],
+        {},
+        logger,
+      ).trim().split('\n');
+      const diffPackages = new Set();
+      for (const pkgName of Object.keys(packages)) {
+        const relativeRoot = relative(projectBaseDir, packages[pkgName].root);
+        if (diffFiles.some(x => x.startsWith(relativeRoot))) {
+          diffPackages.add(pkgName);
+          // Add all reverse dependents too.
+          packages[pkgName].reverseDependencies.forEach(d => diffPackages.add(d));
+        }
+      }
 
-    logger.info(`Found ${tests.length} spec files, out of ${allTests.length}.`);
+      // Remove the tests from packages that haven't changed.
+      tests = tests
+        .filter(p => Object.keys(packages).some(name => {
+          const relativeRoot = relative(projectBaseDir, packages[name].root);
+
+          return p.startsWith(relativeRoot) && diffPackages.has(name);
+        }));
+
+      logger.info(`Found ${tests.length} spec files, out of ${allTests.length}.`);
+    }
   }
 
   if (args.shard !== undefined) {
