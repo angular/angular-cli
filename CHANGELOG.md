@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="7.1.1"></a>
+## [7.1.1](https://github.com/angular/universal/compare/v7.1.0...v7.1.1) (2019-03-07)
+
+
+### Features
+
+* **express-engine:** add ModuleMapLoaderModule to the app server imports during ng-add ([#1130](https://github.com/angular/universal/issues/1130)) ([e776dfc](https://github.com/angular/universal/commit/e776dfc))
+
+
+
 <a name="7.1.0"></a>
 # [7.1.0](https://github.com/angular/universal/compare/v7.0.2...v7.1.0) (2019-01-19)
 
