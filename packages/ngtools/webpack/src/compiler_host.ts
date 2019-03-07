@@ -314,7 +314,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   getCurrentDirectory(): string {
-    return this._basePath;
+    return workaroundResolve(this._basePath);
   }
 
   getCanonicalFileName(fileName: string): string {
