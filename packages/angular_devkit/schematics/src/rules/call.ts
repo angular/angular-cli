@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BaseException, isObservable } from '@angular-devkit/core';
-import { Observable, of as observableOf, throwError } from 'rxjs';
-import { defaultIfEmpty, last, mergeMap, tap } from 'rxjs/operators';
+import { BaseException, isObservable, isPromise } from '@angular-devkit/core';
+import { Observable, from, of as observableOf, throwError } from 'rxjs';
+import { defaultIfEmpty, last, map, mergeMap, tap } from 'rxjs/operators';
 import { Rule, SchematicContext, Source } from '../engine/interface';
 import { Tree, TreeSymbol } from '../tree/interface';
 
@@ -96,6 +96,8 @@ export function callRule(
           }
         }),
       );
+    } else if (isPromise(result)) {
+      return from(result).pipe(map(() => inputTree));
     } else if (TreeSymbol in result) {
       return observableOf(result);
     } else {
