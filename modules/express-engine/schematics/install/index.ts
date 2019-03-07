@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {experimental, strings} from '@angular-devkit/core';
+import {experimental, strings, normalize} from '@angular-devkit/core';
 import {
   apply,
   chain,
@@ -28,6 +28,15 @@ import {
   NodeDependencyType,
 } from '@schematics/angular/utility/dependencies';
 import {BrowserBuilderOptions} from '@schematics/angular/utility/workspace-models';
+import {getProject} from '@schematics/angular/utility/project';
+import {
+  getProjectTargets,
+  targetBuildNotFoundError,
+} from '@schematics/angular/utility/project-targets';
+import {InsertChange} from '@schematics/angular/utility/change';
+import {addSymbolToNgModuleMetadata, insertImport} from '@schematics/angular/utility/ast-utils';
+import * as ts from 'typescript';
+import {findAppServerModulePath} from './utils';
 
 // TODO(CaerusKaru): make these configurable
 const BROWSER_DIST = 'dist/browser';
@@ -141,6 +150,59 @@ function updateConfigFile(options: UniversalOptions): Rule {
   };
 }
 
+function addModuleMapLoader(options: UniversalOptions): Rule {
+  return (host: Tree) => {
+    const clientProject = getProject(host, options.clientProject);
+    const clientTargets = getProjectTargets(clientProject);
+    if (!clientTargets.server) {
+      // If they skipped Universal schematics and don't have a server target,
+      // just get out
+      return;
+    }
+    const mainPath = normalize('/' + clientTargets.server.options.main);
+
+    const appServerModuleRelativePath = findAppServerModulePath(host, mainPath);
+    const modulePath = normalize(
+      `/${clientProject.root}/src/${appServerModuleRelativePath}.ts`);
+
+    // Add the module map loader import
+    let moduleSource = getTsSourceFile(host, modulePath);
+    const importModule = 'ModuleMapLoaderModule';
+    const importPath = '@nguniversal/module-map-ngfactory-loader';
+    const moduleMapImportChange = insertImport(moduleSource, modulePath, importModule,
+      importPath) as InsertChange;
+    if (moduleMapImportChange) {
+      const recorder = host.beginUpdate(modulePath);
+      recorder.insertLeft(moduleMapImportChange.pos, moduleMapImportChange.toAdd);
+      host.commitUpdate(recorder);
+    }
+
+    // Add the module map loader module to the imports
+    const importText = 'ModuleMapLoaderModule';
+    moduleSource = getTsSourceFile(host, modulePath);
+    const metadataChanges = addSymbolToNgModuleMetadata(
+      moduleSource, modulePath, 'imports', importText);
+    if (metadataChanges) {
+      const recorder = host.beginUpdate(modulePath);
+      metadataChanges.forEach((change: InsertChange) => {
+        recorder.insertRight(change.pos, change.toAdd);
+      });
+      host.commitUpdate(recorder);
+    }
+  };
+}
+
+function getTsSourceFile(host: Tree, path: string): ts.SourceFile {
+  const buffer = host.read(path);
+  if (!buffer) {
+    throw new SchematicsException(`Could not read file (${path}).`);
+  }
+  const content = buffer.toString();
+  const source = ts.createSourceFile(path, content, ts.ScriptTarget.Latest, true);
+
+  return source;
+}
+
 export default function (options: UniversalOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     const clientProject = getClientProject(host, options);
@@ -171,6 +233,7 @@ export default function (options: UniversalOptions): Rule {
       updateConfigFile(options),
       mergeWith(rootSource),
       addDependenciesAndScripts(options),
+      addModuleMapLoader(options),
     ]);
   };
 }

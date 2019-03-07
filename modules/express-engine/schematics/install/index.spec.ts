@@ -88,8 +88,15 @@ describe('Universal Schematic', () => {
     noUniversal.skipUniversal = true;
 
     const tree = schematicRunner.runSchematic('ng-add', noUniversal, appTree);
-    const filePath = '/src/server.main.ts';
+    const filePath = '/projects/bar/src/main.server.ts';
     const contents = tree.readContent(filePath);
     expect(contents).toMatch('');
+  });
+
+  it('should add module map loader to server module imports', () => {
+    const tree = schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
+    const filePath = '/projects/bar/src/app/app.server.module.ts';
+    const contents = tree.readContent(filePath);
+    expect(contents).toContain('ModuleMapLoaderModule');
   });
 });
