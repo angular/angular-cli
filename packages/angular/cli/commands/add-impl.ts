@@ -6,9 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { analytics, tags, terminal } from '@angular-devkit/core';
-import { ModuleNotFoundException, resolve } from '@angular-devkit/core/node';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 import { intersects, prerelease, rcompare, satisfies, valid, validRange } from 'semver';
 import { isPackageNameSafeForAnalytics } from '../models/analytics';
 import { Arguments } from '../models/interface';
@@ -160,15 +159,11 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
 
   private isPackageInstalled(name: string): boolean {
     try {
-      resolve(name, {
-        checkLocal: true,
-        basedir: this.workspace.root,
-        resolvePackageJson: true,
-      });
+      require.resolve(join(name, 'package.json'), { paths: [this.workspace.root] });
 
       return true;
     } catch (e) {
-      if (!(e instanceof ModuleNotFoundException)) {
+      if (e.code !== 'MODULE_NOT_FOUND') {
         throw e;
       }
     }
@@ -209,9 +204,9 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
   private async findProjectVersion(name: string): Promise<string | null> {
     let installedPackage;
     try {
-      installedPackage = resolve(
-        name,
-        { checkLocal: true, basedir: this.workspace.root, resolvePackageJson: true },
+      installedPackage = require.resolve(
+        join(name, 'package.json'),
+        { paths: [this.workspace.root] },
       );
     } catch { }
 
