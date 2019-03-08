@@ -3,6 +3,7 @@
   "builders": {
     "build": {
       "class": "./src/build",
+      "implementation": "./src/build/index2",
       "schema": "./src/build/schema.json",
       "description": "Build a library with ng-packagr."
     }
