@@ -6,7 +6,8 @@
   "properties": {
     "browserTarget": {
       "type": "string",
-      "description": "Target to serve."
+      "description": "Target to serve.",
+      "pattern": ".+:.+(:.+)?"
     },
     "port": {
       "type": "number",
