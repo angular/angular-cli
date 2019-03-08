@@ -9,11 +9,11 @@
 import { request, runTargetSpec } from '@angular-devkit/architect/testing';
 import * as express from 'express'; // tslint:disable-line:no-implicit-dependencies
 import * as http from 'http';
+import { AddressInfo } from 'net';
 import { from } from 'rxjs';
 import { concatMap, take, tap } from 'rxjs/operators';
 import { Schema as DevServerBuilderOptions } from '../../src/dev-server/schema';
 import { devServerTargetSpec, host } from '../utils';
-
 
 describe('Dev Server Builder proxy', () => {
   beforeEach(done => host.initialize().toPromise().then(done, done.fail));
@@ -25,13 +25,15 @@ describe('Dev Server Builder proxy', () => {
     const server = http.createServer(app);
     server.listen(0);
 
-    app.set('port', server.address().port);
+    // cast is safe, the HTTP server is not using a pipe or UNIX domain socket
+    app.set('port', (server.address() as AddressInfo).port);
     app.get('/api/test', function (_req, res) {
       res.send('TEST_API_RETURN');
     });
 
     const backendHost = 'localhost';
-    const backendPort = server.address().port;
+    // cast is safe, the HTTP server is not using a pipe or UNIX domain socket
+    const backendPort = (server.address() as AddressInfo).port;
     const proxyServerUrl = `http://${backendHost}:${backendPort}`;
 
     host.writeMultipleFiles({
