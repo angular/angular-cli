@@ -219,10 +219,10 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@bazel/karma@~0.26.0":
-  version "0.26.0"
-  resolved "https://registry.yarnpkg.com/@bazel/karma/-/karma-0.26.0.tgz#6ad796686f5775df33a96fa5ef3df76a66aed3b2"
-  integrity sha512-yZv0fgAjVrfrM0ld8e+wNaPIpYCpwBzVQi2GUErsKStUZXPUUofpBwBjlYsdY1Osn5/FmAF9e6xDkk1JWn/wSg==
+"@bazel/karma@~0.27.0":
+  version "0.27.1"
+  resolved "https://registry.yarnpkg.com/@bazel/karma/-/karma-0.27.1.tgz#b1a829c1ddd6b504fda970f0129efe707c14c112"
+  integrity sha512-/donHv0pi6qTRj5hjqquCP5et+Q2r1glrOChBRQsvAb7y2b/n634niMAfv8CVWAktFA6OCUj6cYv04GTVv+YBQ==
   dependencies:
     jasmine-core "2.8.0"
     karma "^4.0.0"
@@ -236,10 +236,10 @@
     semver "5.6.0"
     tmp "0.0.33"
 
-"@bazel/typescript@~0.26.0":
-  version "0.26.0"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-0.26.0.tgz#c06139d76c8b9d3a3ed98a721b776fedb4b11c82"
-  integrity sha512-dh/Y/SZzmeChsLap8FVHYl0FuaeLh/6t9WBVhm5nOgyVrqfEyVpNzy4W20E4NqnmJY2/PqmD5qncf+Oo1q9h1A==
+"@bazel/typescript@~0.27.0":
+  version "0.27.1"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-0.27.1.tgz#43a495c074bc0501568c3b5c2de073a9f000bdd5"
+  integrity sha512-MQwsSxHLljmbZr4Xuu7ShCHOKFE1Ar1jBGlT1NKS5OuuQGMB+rUEcZs5fFpDYAhmIwXDOaM6W/GmB04bOoc8vQ==
   dependencies:
     jasmine-core "2.8.0"
     protobufjs "5.0.3"
