@@ -407,15 +407,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/node@*":
+"@types/node@*", "@types/node@10.9.4":
   version "10.9.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.9.4.tgz#0f4cb2dc7c1de6096055357f70179043c33e9897"
   integrity sha512-fCHV45gS+m3hH17zgkgADUSi2RR1Vht6wOZ0jyHP8rjiQra9f+mIcgwPQHllmDocYOstIEbKlxbFDYlgrTPYqw==
-
-"@types/node@8.10.10":
-  version "8.10.10"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.10.tgz#fec07bc2ad549d9e6d2f7aa0fb0be3491b83163a"
-  integrity sha512-p3W/hFzQs76RlYRIZsZc5a9bht6m0TspmWYYbKhRswmLnwj9fsE40EbuGifeu/XWR/c0UJQ1DDbvTxIsm/OOAA==
 
 "@types/node@^6.0.46":
   version "6.14.0"
