@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { experimental, json, logging } from '@angular-devkit/core';
-import { Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { Schema as RealBuilderInput, Target as RealTarget } from './input-schema';
 import { Schema as RealBuilderOutput } from './output-schema';
 import { Schema as RealBuilderProgress, State as BuilderProgressState } from './progress-schema';
@@ -211,6 +212,11 @@ export interface BuilderContext {
    * @param status Update the status string. If omitted the status string is not modified.
    */
   reportProgress(current: number, total?: number, status?: string): void;
+
+  /**
+   * Add teardown logic to this Context, so that when it's being stopped it will execute teardown.
+   */
+  addTeardown(teardown: () => (Promise<void> | void)): void;
 }
 
 
@@ -267,4 +273,42 @@ export function targetFromTargetString(str: string): Target {
     target: tuple[1],
     ...(tuple[2] !== undefined) && { configuration: tuple[2] },
   };
+}
+
+/**
+ * Schedule a target, and forget about its run. This will return an observable of outputs, that
+ * as a a teardown will stop the target from running. This means that the Run object this returns
+ * should not be shared.
+ *
+ * The reason this is not part of the Context interface is to keep the Context as normal form as
+ * possible. This is really an utility that people would implement in their project.
+ *
+ * @param context The context of your current execution.
+ * @param target The target to schedule.
+ * @param overrides Overrides that are used in the target.
+ * @param scheduleOptions Additional scheduling options.
+ */
+export function scheduleTargetAndForget(
+  context: BuilderContext,
+  target: Target,
+  overrides?: json.JsonObject,
+  scheduleOptions?: ScheduleOptions,
+): Observable<BuilderOutput> {
+  let resolve: (() => void) | null = null;
+  const promise = new Promise<void>(r => resolve = r);
+  context.addTeardown(() => promise);
+
+  return from(context.scheduleTarget(target, overrides, scheduleOptions)).pipe(
+    switchMap(run => new Observable<BuilderOutput>(observer => {
+      const subscription = run.output.subscribe(observer);
+
+      return () => {
+        subscription.unsubscribe();
+        // We can properly ignore the floating promise as it's a "reverse" promise; the teardown
+        // is waiting for the resolve.
+        // tslint:disable-next-line:no-floating-promises
+        run.stop().then(resolve);
+      };
+    })),
+  );
 }

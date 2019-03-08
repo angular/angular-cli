@@ -37,6 +37,8 @@ export function createBuilder<
     const progressChannel = context.createChannel('progress');
     const logChannel = context.createChannel('log');
     let currentState: BuilderProgressState = BuilderProgressState.Stopped;
+    const teardownLogics: Array<() => (PromiseLike<void> | void)> = [];
+    let tearingDown = false;
     let current = 0;
     let status = '';
     let total = 1;
@@ -72,10 +74,15 @@ export function createBuilder<
         i => {
           switch (i.kind) {
             case experimental.jobs.JobInboundMessageKind.Stop:
-              observer.complete();
+              // Run teardown logic then complete.
+              tearingDown = true;
+              Promise.all(teardownLogics.map(fn => fn() || Promise.resolve()))
+                .then(() => observer.complete(), err => observer.error(err));
               break;
             case experimental.jobs.JobInboundMessageKind.Input:
-              onInput(i.value);
+              if (!tearingDown) {
+                onInput(i.value);
+              }
               break;
           }
         },
@@ -158,6 +165,9 @@ export function createBuilder<
               case BuilderProgressState.Running:
                 progress({ state: currentState, current, total, status }, context);
             }
+          },
+          addTeardown(teardown: () => (Promise<void> | void)): void {
+            teardownLogics.push(teardown);
           },
         };
 
