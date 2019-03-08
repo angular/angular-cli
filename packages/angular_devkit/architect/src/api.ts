@@ -252,3 +252,19 @@ export type BuilderInfo = json.JsonObject & {
 export function targetStringFromTarget({project, target, configuration}: Target) {
   return `${project}:${target}${configuration !== undefined ? ':' + configuration : ''}`;
 }
+
+/**
+ * Return a Target tuple from a string.
+ */
+export function targetFromTargetString(str: string): Target {
+  const tuple = str.split(/:/, 3);
+  if (tuple.length < 2) {
+    throw new Error('Invalid target string: ' + JSON.stringify(str));
+  }
+
+  return {
+    project: tuple[0],
+    target: tuple[1],
+    ...(tuple[2] !== undefined) && { configuration: tuple[2] },
+  };
+}
