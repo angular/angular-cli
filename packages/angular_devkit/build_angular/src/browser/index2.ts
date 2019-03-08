@@ -279,7 +279,7 @@ export function buildWebpackBrowser(
               resolve(root, normalize(options.outputPath)),
               options.baseHref || '/',
               options.ngswConfigPath,
-            ).then(() => ({ success: true })));
+            ).then(() => ({ success: true }), () => ({ success: false })));
           } else {
             return of(buildEvent);
           }
