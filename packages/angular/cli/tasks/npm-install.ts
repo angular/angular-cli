@@ -48,13 +48,9 @@ export default async function (packageName: string,
   if (!save) {
     installArgs.push('--no-save');
   }
-  const installOptions = {
-    stdio: 'inherit',
-    shell: true,
-  };
 
   await new Promise((resolve, reject) => {
-    spawn(packageManager, installArgs, installOptions)
+    spawn(packageManager, installArgs, { stdio: 'inherit', shell: true })
       .on('close', (code: number) => {
         if (code === 0) {
           logger.info(terminal.green(`Installed packages for tooling via ${packageManager}.`));
