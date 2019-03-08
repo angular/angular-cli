@@ -117,8 +117,8 @@ function loadPackageJson(p: string) {
       // Overwrite engines to a common default.
       case 'engines':
         pkg['engines'] = {
-          'node': '>= 8.9.0',
-          'npm': '>= 5.5.1',
+          'node': '>= 10.9.0',
+          'npm': '>= 6.2.0',
         };
         break;
 
