@@ -73,11 +73,12 @@ export function runWebpackDevServer(
           if (err) {
             obs.error(err);
           } else {
+            const address = this.address();
             result = {
               success: true,
-              port: this.address().port,
-              family: this.address().family,
-              address: this.address().address,
+              port: typeof address === 'string' ? 0 : address.port,
+              family: typeof address === 'string' ? '' : address.family,
+              address: typeof address === 'string' ? address : address.address,
             };
           }
         },
