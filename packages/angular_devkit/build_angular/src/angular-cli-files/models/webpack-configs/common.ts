@@ -8,7 +8,7 @@
 import { tags } from '@angular-devkit/core';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
-import { HashedModuleIdsPlugin, debug } from 'webpack';
+import { Configuration, HashedModuleIdsPlugin, Output, debug } from 'webpack';
 import { AssetPatternClass } from '../../../browser/schema';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
@@ -31,7 +31,7 @@ export const buildOptimizerLoader: string = g['_DevKitIsLocal']
   : '@angular-devkit/build-optimizer/webpack-loader';
 
 // tslint:disable-next-line:no-big-function
-export function getCommonConfig(wco: WebpackConfigOptions) {
+export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   const { root, projectRoot, buildOptions } = wco;
   const { styles: stylesOptimization, scripts: scriptsOptimization } = buildOptions.optimization;
   const {
@@ -300,7 +300,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       path: path.resolve(root, buildOptions.outputPath as string),
       publicPath: buildOptions.deployUrl,
       filename: `[name]${hashFormat.chunk}.js`,
-    },
+      // cast required until typings include `futureEmitAssets` property
+    } as Output,
     watch: buildOptions.watch,
     watchOptions: {
       poll: buildOptions.poll,

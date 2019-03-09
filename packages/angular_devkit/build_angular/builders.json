@@ -25,6 +25,7 @@
     },
     "karma": {
       "class": "./src/karma",
+      "implementation": "./src/karma/index2",
       "schema": "./src/karma/schema.json",
       "description": "Run Karma unit tests."
     },

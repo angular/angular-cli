@@ -27,7 +27,7 @@ import {
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { NormalizedKarmaBuilderSchema, defaultProgress, normalizeKarmaSchema } from '../utils';
-import { KarmaBuilderSchema } from './schema';
+import { Schema as KarmaBuilderSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
 
