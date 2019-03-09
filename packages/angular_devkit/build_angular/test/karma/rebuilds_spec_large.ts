@@ -5,34 +5,36 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
+import { Architect } from '@angular-devkit/architect/src/index2';
 import { Subject } from 'rxjs';
-import { debounceTime, delay, take, takeUntil, takeWhile, tap } from 'rxjs/operators';
-import { host, karmaTargetSpec } from '../utils';
-
+import { debounceTime, delay, takeUntil, takeWhile, tap } from 'rxjs/operators';
+import { createArchitect, host, karmaTargetSpec } from '../utils';
 
 describe('Karma Builder watch mode', () => {
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  let architect: Architect;
 
-  it('works', async () => {
-    const overrides = { watch: true };
-    const res = await runTargetSpec(host, karmaTargetSpec, overrides).pipe(
-      debounceTime(500),
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      take(1),
-    ).toPromise();
-
-    expect(res).toEqual({ success: true });
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
   });
 
-  it('recovers from compilation failures in watch mode', (done) => {
-    const overrides = { watch: true };
+  afterEach(() => host.restore().toPromise());
+
+  it('performs initial build', async () => {
+    const run = await architect.scheduleTarget(karmaTargetSpec, { watch: true });
+
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
+
+    await run.stop();
+  });
+
+  it('recovers from compilation failures in watch mode', async () => {
     let buildCount = 0;
     let phase = 1;
 
-    runTargetSpec(host, karmaTargetSpec, overrides, DefaultTimeout * 3).pipe(
+    const run = await architect.scheduleTarget(karmaTargetSpec, { watch: true });
+
+    await run.output.pipe(
       debounceTime(500),
       tap((buildEvent) => {
         buildCount += 1;
@@ -61,21 +63,21 @@ describe('Karma Builder watch mode', () => {
         }
       }),
       takeWhile(() => phase < 4),
-    ).toPromise().then(
-      () => done(),
-      () => done.fail(`stuck at phase ${phase} [builds: ${buildCount}]`),
-    );
+    ).toPromise().catch(() => fail(`stuck at phase ${phase} [builds: ${buildCount}]`));
+
+    await run.stop();
   });
 
-  it('does not rebuild when nothing changed', (done) => {
-    const overrides = { watch: true };
+  it('does not rebuild when nothing changed', async () => {
     let buildCount = 0;
     let phase = 1;
 
     const stopSubject = new Subject();
     const stop$ = stopSubject.asObservable().pipe(delay(5000));
 
-    runTargetSpec(host, karmaTargetSpec, overrides, DefaultTimeout * 3).pipe(
+    const run = await architect.scheduleTarget(karmaTargetSpec, { watch: true });
+
+    await run.output.pipe(
       debounceTime(500),
       tap((buildEvent) => {
         buildCount += 1;
@@ -99,9 +101,8 @@ describe('Karma Builder watch mode', () => {
         }
       }),
       takeUntil(stop$),
-    ).toPromise().then(
-      () => done(),
-      () => done.fail(`stuck at phase ${phase} [builds: ${buildCount}]`),
-    );
+    ).toPromise().catch(() => fail(`stuck at phase ${phase} [builds: ${buildCount}]`));
+
+    await run.stop();
   });
 });

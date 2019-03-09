@@ -1,4 +1,5 @@
 {
+  "$schema": "http://json-schema.org/draft-07/schema",
   "title": "Karma Target",
   "description": "Karma target options for Build Facade.",
   "type": "object",
