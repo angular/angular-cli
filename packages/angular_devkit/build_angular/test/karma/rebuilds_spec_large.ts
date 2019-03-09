@@ -5,42 +5,56 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
-import { Subject } from 'rxjs';
-import { debounceTime, delay, take, takeUntil, takeWhile, tap } from 'rxjs/operators';
-import { host, karmaTargetSpec } from '../utils';
-
+import { Architect } from '@angular-devkit/architect/src/index2';
+import { Subject, timer } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  delay,
+  map,
+  switchMap,
+  takeUntil,
+  takeWhile,
+  tap,
+} from 'rxjs/operators';
+import { createArchitect, host, karmaTargetSpec } from '../utils';
 
 describe('Karma Builder watch mode', () => {
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  let architect: Architect;
 
-  it('works', async () => {
-    const overrides = { watch: true };
-    const res = await runTargetSpec(host, karmaTargetSpec, overrides).pipe(
-      debounceTime(500),
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      take(1),
-    ).toPromise();
-
-    expect(res).toEqual({ success: true });
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
   });
 
-  it('recovers from compilation failures in watch mode', (done) => {
-    const overrides = { watch: true };
+  afterEach(() => host.restore().toPromise());
+
+  it('performs initial build', async () => {
+    const run = await architect.scheduleTarget(karmaTargetSpec, { watch: true });
+
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
+
+    await run.stop();
+  });
+
+  it('recovers from compilation failures in watch mode', async () => {
     let buildCount = 0;
     let phase = 1;
 
-    runTargetSpec(host, karmaTargetSpec, overrides, DefaultTimeout * 3).pipe(
+    // The current linux-based CI environments may not fully settled in regards to filesystem
+    // changes from previous tests which reuse the same directory and fileset.
+    // The initial delay helps mitigate false positive rebuild triggers in such scenarios.
+    const { run } = await timer(1000).pipe(
+      switchMap(() => architect.scheduleTarget(karmaTargetSpec, { watch: true })),
+      switchMap(run => run.output.pipe(map(output => ({ run, output })))),
       debounceTime(500),
-      tap((buildEvent) => {
+      tap(({ output }) => {
         buildCount += 1;
         switch (phase) {
           case 1:
             // Karma run should succeed.
             // Add a compilation error.
-            expect(buildEvent.success).toBe(true);
+            expect(output.success).toBe(true);
             // Add an syntax error to a non-main file.
             host.appendToFile('src/app/app.component.spec.ts', `]]]`);
             phase = 2;
@@ -48,42 +62,47 @@ describe('Karma Builder watch mode', () => {
 
           case 2:
             // Karma run should fail due to compilation error. Fix it.
-            expect(buildEvent.success).toBe(false);
+            expect(output.success).toBe(false);
             host.replaceInFile('src/app/app.component.spec.ts', `]]]`, '');
             phase = 3;
             break;
 
           case 3:
             // Karma run should succeed again.
-            expect(buildEvent.success).toBe(true);
+            expect(output.success).toBe(true);
             phase = 4;
             break;
         }
       }),
       takeWhile(() => phase < 4),
-    ).toPromise().then(
-      () => done(),
-      () => done.fail(`stuck at phase ${phase} [builds: ${buildCount}]`),
-    );
+      catchError((_, caught) => {
+        fail(`stuck at phase ${phase} [builds: ${buildCount}]`);
+
+        return caught;
+      }),
+    ).toPromise();
+
+    await run.stop();
   });
 
-  it('does not rebuild when nothing changed', (done) => {
-    const overrides = { watch: true };
-    let buildCount = 0;
+  it('does not rebuild when nothing changed', async () => {
     let phase = 1;
 
     const stopSubject = new Subject();
     const stop$ = stopSubject.asObservable().pipe(delay(5000));
 
-    runTargetSpec(host, karmaTargetSpec, overrides, DefaultTimeout * 3).pipe(
+    // The current linux-based CI environments may not fully settled in regards to filesystem
+    // changes from previous tests which reuse the same directory and fileset.
+    // The initial delay helps mitigate false positive rebuild triggers in such scenarios.
+    const { run } = await timer(1000).pipe(
+      switchMap(() => architect.scheduleTarget(karmaTargetSpec, { watch: true })),
+      switchMap(run => run.output.pipe(map(output => ({ run, output })))),
       debounceTime(500),
-      tap((buildEvent) => {
-        buildCount += 1;
+      tap(({ output }) => {
         switch (phase) {
           case 1:
             // Karma run should succeed.
-            // Add a compilation error.
-            expect(buildEvent.success).toBe(true);
+            expect(output.success).toBe(true);
             // Touch the file.
             host.appendToFile('src/app/app.component.spec.ts', ``);
             // Signal the stopper, which delays emission by 5s.
@@ -94,14 +113,13 @@ describe('Karma Builder watch mode', () => {
 
           case 2:
             // Should never trigger this second build.
-            expect(true).toBeFalsy('Should not trigger second build.');
+            fail('Should not trigger second build.');
             break;
         }
       }),
       takeUntil(stop$),
-    ).toPromise().then(
-      () => done(),
-      () => done.fail(`stuck at phase ${phase} [builds: ${buildCount}]`),
-    );
+    ).toPromise();
+
+    await run.stop();
   });
 });

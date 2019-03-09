@@ -5,38 +5,40 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { runTargetSpec } from '@angular-devkit/architect/testing';
+import { Architect } from '@angular-devkit/architect/src/index2';
 import { normalize, virtualFs } from '@angular-devkit/core';
-import { debounceTime, tap } from 'rxjs/operators';
-import { NormalizedKarmaBuilderSchema } from '../../src/utils';
-import { host, karmaTargetSpec } from '../utils';
-
+import { createArchitect, host, karmaTargetSpec } from '../utils';
 
 describe('Karma Builder code coverage', () => {
   const coverageFilePath = normalize('coverage/lcov.info');
+  let architect: Architect;
 
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
 
-  it('works', (done) => {
-    const overrides: Partial<NormalizedKarmaBuilderSchema> = { codeCoverage: true };
+  afterEach(() => host.restore().toPromise());
 
-    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
-      // It seems like the coverage files take a while being written to disk, so we wait 500ms here.
-      debounceTime(500),
-      tap(buildEvent => {
-        expect(buildEvent.success).toBe(true);
-        expect(host.scopedSync().exists(coverageFilePath)).toBe(true);
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(coverageFilePath));
-        expect(content).toContain('polyfills.ts');
-        expect(content).toContain('test.ts');
-      }),
-    ).toPromise().then(done, done.fail);
+  it('supports code coverage option', async () => {
+    const run = await architect.scheduleTarget(karmaTargetSpec, { codeCoverage: true });
+
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
+
+    await run.stop();
+
+    const exists = host.scopedSync().exists(coverageFilePath);
+    expect(exists).toBe(true);
+
+    if (exists) {
+      const content = virtualFs.fileBufferToString(host.scopedSync().read(coverageFilePath));
+      expect(content).toContain('polyfills.ts');
+      expect(content).toContain('test.ts');
+    }
   }, 120000);
 
-  it('supports exclude', (done) => {
-    const overrides: Partial<NormalizedKarmaBuilderSchema> = {
+  it('supports code coverage exclude option', async () => {
+    const overrides = {
       codeCoverage: true,
       codeCoverageExclude: [
         'src/polyfills.ts',
@@ -44,22 +46,23 @@ describe('Karma Builder code coverage', () => {
       ],
     };
 
-    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
-      // It seems like the coverage files take a while being written to disk, so we wait 500ms here.
-      debounceTime(500),
-      tap(buildEvent => {
-        expect(buildEvent.success).toBe(true);
-        expect(host.scopedSync().exists(coverageFilePath)).toBe(true);
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(coverageFilePath));
-        expect(content).not.toContain('polyfills.ts');
-        expect(content).not.toContain('test.ts');
-      }),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(karmaTargetSpec, overrides);
+
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
+
+    await run.stop();
+
+    const exists = host.scopedSync().exists(coverageFilePath);
+    expect(exists).toBe(true);
+
+    if (exists) {
+      const content = virtualFs.fileBufferToString(host.scopedSync().read(coverageFilePath));
+      expect(content).not.toContain('polyfills.ts');
+      expect(content).not.toContain('test.ts');
+    }
   }, 120000);
 
-  it(`should collect coverage from paths in 'sourceRoot'`, (done) => {
-    const overrides: Partial<NormalizedKarmaBuilderSchema> = { codeCoverage: true };
-
+  it(`should collect coverage from paths in 'sourceRoot'`, async () => {
     const files: { [path: string]: string } = {
       './dist/my-lib/index.d.ts': `
         export declare const title = 'app';
@@ -93,15 +96,18 @@ describe('Karma Builder code coverage', () => {
       },
     `);
 
-    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
-      // It seems like the coverage files take a while being written to disk, so we wait 500ms here.
-      debounceTime(500),
-      tap(buildEvent => {
-        expect(buildEvent.success).toBe(true);
-        expect(host.scopedSync().exists(coverageFilePath)).toBe(true);
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(coverageFilePath));
-        expect(content).not.toContain('my-lib');
-      }),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(karmaTargetSpec, { codeCoverage: true });
+
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
+
+    await run.stop();
+
+    const exists = host.scopedSync().exists(coverageFilePath);
+    expect(exists).toBe(true);
+
+    if (exists) {
+      const content = virtualFs.fileBufferToString(host.scopedSync().read(coverageFilePath));
+      expect(content).not.toContain('my-lib');
+    }
   }, 120000);
 });
