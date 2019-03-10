@@ -25,7 +25,7 @@ describe('Library Schematic', () => {
   );
   const defaultOptions: GenerateLibrarySchema = {
     name: 'foo',
-    entryFile: 'my_index',
+    entryFile: 'my-index',
     skipPackageJson: false,
     skipTsConfig: false,
     skipInstall: false,
@@ -51,7 +51,7 @@ describe('Library Schematic', () => {
       '/projects/foo/README.md',
       '/projects/foo/tslint.json',
       '/projects/foo/src/test.ts',
-      '/projects/foo/src/my_index.ts',
+      '/projects/foo/src/my-index.ts',
       '/projects/foo/src/lib/foo.module.ts',
       '/projects/foo/src/lib/foo.component.spec.ts',
       '/projects/foo/src/lib/foo.component.ts',
@@ -89,7 +89,7 @@ describe('Library Schematic', () => {
     const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
     const fileContent = getJsonFileContent(tree, '/projects/foo/ng-package.json');
     expect(fileContent.lib).toBeDefined();
-    expect(fileContent.lib.entryFile).toEqual('src/my_index.ts');
+    expect(fileContent.lib.entryFile).toEqual('src/my-index.ts');
     expect(fileContent.dest).toEqual('../../dist/foo');
   });
 
@@ -97,7 +97,7 @@ describe('Library Schematic', () => {
     const tree = schematicRunner.runSchematic('library', {
       name: 'foobar',
     }, workspaceTree);
-    expect(tree.files).toContain('/projects/foobar/src/public_api.ts');
+    expect(tree.files).toContain('/projects/foobar/src/public-api.ts');
   });
 
   it(`should add library to workspace`, () => {
