@@ -199,7 +199,7 @@ export class IndexHtmlWebpackPlugin {
 
           treeAdapter.appendChild(baseFragment, baseElement);
           indexSource.insert(
-            headElement.__location.startTag.endOffset + 1,
+            headElement.__location.startTag.endOffset,
             parse5.serialize(baseFragment, { treeAdapter }),
           );
         } else {
