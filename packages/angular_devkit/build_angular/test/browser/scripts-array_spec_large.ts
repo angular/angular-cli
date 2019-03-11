@@ -147,7 +147,6 @@ describe('Browser Builder scripts array', () => {
         expect(logger.includes(`(lazy-script) 69 bytes${validate}`)).toBe(true);
         expect(logger.includes(`(renamed-script) 78 bytes${validate}`)).toBe(true);
         expect(logger.includes(`(renamed-lazy-script) 88 bytes${validate}`)).toBe(true);
-        logger.clear();
       }),
     ).toPromise().then(done, done.fail);
   });

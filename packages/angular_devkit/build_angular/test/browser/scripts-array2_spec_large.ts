@@ -121,7 +121,7 @@ describe('Browser Builder scripts array', () => {
   it('chunk in entry', async () => {
     host.writeMultipleFiles(scripts);
 
-    const logger = new TestLogger('build-script-entry');
+    const logger = new TestLogger('build-script-chunk-entry');
     await browserBuild(
       architect,
       host,
@@ -136,6 +136,5 @@ describe('Browser Builder scripts array', () => {
     expect(logger.includes(`(lazy-script) 69 bytes${validate}`)).toBe(true);
     expect(logger.includes(`(renamed-script) 78 bytes${validate}`)).toBe(true);
     expect(logger.includes(`(renamed-lazy-script) 88 bytes${validate}`)).toBe(true);
-    logger.clear();
   });
 });
