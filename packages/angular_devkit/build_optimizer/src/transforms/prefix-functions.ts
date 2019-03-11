@@ -64,6 +64,14 @@ export function findTopLevelFunctions(parentNode: ts.Node): Set<ts.Node> {
       return;
     }
 
+    if ((ts.isFunctionExpression(innerNode) || ts.isArrowFunction(innerNode))
+      && ts.isParenthesizedExpression(node)) {
+        // pure functions can be wrapped in parentizes
+        // we should not add pure comments to this sort of syntax.
+        // example var foo = (() => x)
+      return;
+    }
+
     if (noPureComment) {
       if (ts.isNewExpression(innerNode)) {
         topLevelFunctions.add(node);
