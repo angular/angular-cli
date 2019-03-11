@@ -42,9 +42,9 @@ const validCliPaths = new Map([
  * @returns {string[]} The fragments for the string.
  * @private
  */
-function parseJsonPath(path: string): string[] {
+function parseJsonPath(path: string): (string|number)[] {
   const fragments = (path || '').split(/\./g);
-  const result: string[] = [];
+  const result: (string|number)[] = [];
 
   while (fragments.length > 0) {
     const fragment = fragments.shift();
