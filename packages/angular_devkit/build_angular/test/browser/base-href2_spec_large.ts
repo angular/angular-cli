@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect/src/index2';
 import { runTargetSpec } from '@angular-devkit/architect/testing';
-import { join, normalize, virtualFs } from '@angular-devkit/core';
+import { join, normalize, tags, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
 import { BrowserBuilderOutput } from '../../src/browser/index2';
 import { browserTargetSpec, createArchitect, host } from '../utils';
@@ -39,6 +39,24 @@ describe('Browser Builder base href', () => {
     const content = virtualFs.fileBufferToString(await host.read(fileName).toPromise());
     expect(content).toMatch(/<base href="\/myUrl">/);
 
+    await run.stop();
+  });
+
+  it('should insert base href in the the correct position', async () => {
+    host.writeMultipleFiles({
+      'src/index.html': tags.oneLine`
+        <html><head><meta charset="UTF-8"></head>
+        <body><app-root></app-root></body></html>
+      `,
+    });
+
+    const overrides = { baseHref: '/myUrl' };
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
+    const fileName = join(normalize(output.outputPath), 'index.html');
+    const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
+    expect(content).toContain('<head><base href="/myUrl"><meta charset="UTF-8"></head>');
     await run.stop();
   });
 });
