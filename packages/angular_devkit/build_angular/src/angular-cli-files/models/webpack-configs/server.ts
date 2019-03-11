@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { isAbsolute } from 'path';
 import { Configuration } from 'webpack';
 import { WebpackConfigOptions } from '../build-options';
 import { getSourceMapDevTool } from './utils';
@@ -38,7 +39,7 @@ export function getServerConfig(wco: WebpackConfigOptions) {
       /^@angular/,
       (context: string, request: string, callback: (error?: null, result?: string) => void) => {
         // Absolute & Relative paths are not externals
-        if (request.match(/^\.{0,2}\//)) {
+        if (/^\.{0,2}\//.test(request) || isAbsolute(request)) {
           return callback();
         }
 
