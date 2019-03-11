@@ -30,6 +30,7 @@
     },
     "protractor": {
       "class": "./src/protractor",
+      "implementation": "./src/protractor/index2",
       "schema": "./src/protractor/schema.json",
       "description": "Run protractor over a dev server."
     },
