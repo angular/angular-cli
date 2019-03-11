@@ -9,6 +9,13 @@ skip_branch_with_pr: true
 
 install:
   - ps: Install-Product node $env:nodejs_version
+  - ps: |
+      if (Test-Path env:APPVEYOR_PULL_REQUEST_NUMBER) {
+        # user is required for rebase.	
+        git config user.name "angular-ci"	
+        git config user.email "angular-ci"
+        # Rebase on target branch.
+        node tools\rebase-pr.js angular/angular-cli $env:APPVEYOR_PULL_REQUEST_NUMBER }
   # --network-timeout is a workaround for https://github.com/yarnpkg/yarn/issues/6221
   - yarn --frozen-lockfile --network-timeout=500000
   - yarn webdriver-update
