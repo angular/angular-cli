@@ -193,6 +193,27 @@ export interface BuilderContext {
   getTargetOptions(target: Target): Promise<json.JsonObject>;
 
   /**
+   * Resolves and return a builder name. The exact format of the name is up to the host,
+   * so it should not be parsed to gather information (it's free form). This string can be
+   * used to validate options or schedule a builder directly.
+   * @param target The target to resolve the builder name.
+   */
+  getBuilderNameForTarget(target: Target): Promise<string>;
+
+  /**
+   * Validates the options against a builder schema. This uses the same methods as the
+   * scheduleTarget and scheduleBrowser methods to validate and apply defaults to the options.
+   * It can be generically typed, if you know which interface it is supposed to validate against.
+   * @param options A generic option object to validate.
+   * @param builderName The name of a builder to use. This can be gotten for a target by using the
+   *                    getBuilderForTarget() method on the context.
+   */
+  validateOptions<T extends json.JsonObject = json.JsonObject>(
+    options: json.JsonObject,
+    builderName: string,
+  ): Promise<T>;
+
+  /**
    * Set the builder to running. This should be used if an external event triggered a re-run,
    * e.g. a file watched was changed.
    */

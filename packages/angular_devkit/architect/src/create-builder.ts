@@ -142,6 +142,21 @@ export function createBuilder<
             return scheduler.schedule<Target, json.JsonValue, json.JsonObject>(
                     '..getTargetOptions', target).output.toPromise();
           },
+          async getBuilderNameForTarget(target: Target) {
+            return scheduler.schedule<Target, json.JsonValue, string>(
+              '..getBuilderNameForTarget',
+              target,
+            ).output.toPromise();
+          },
+          async validateOptions<T extends json.JsonObject = json.JsonObject>(
+            options: json.JsonObject,
+            builderName: string,
+          ) {
+            return scheduler.schedule<[string, json.JsonObject], json.JsonValue, T>(
+              '..validateOptions',
+              [builderName, options],
+            ).output.toPromise();
+          },
           reportRunning() {
             switch (currentState) {
               case BuilderProgressState.Waiting:
