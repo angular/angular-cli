@@ -19,7 +19,7 @@ import { Schema as WebpackDevServerBuilderSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
 
-export type DevServerBuildResult = BuilderOutput & {
+export type DevServerBuildOutput = BuilderOutput & {
   port: number;
   family: string;
   address: string;
@@ -54,7 +54,7 @@ export function runWebpackDevServer(
   return createWebpack(config).pipe(
     switchMap(webpackCompiler => new Observable<BuilderOutput>(obs => {
       const server = new WebpackDevServer(webpackCompiler, devServerConfig);
-      let result: DevServerBuildResult;
+      let result: DevServerBuildOutput;
 
       webpackCompiler.hooks.done.tap('build-webpack', (stats) => {
         // Log stats.
@@ -63,7 +63,7 @@ export function runWebpackDevServer(
         obs.next({
           ...result,
           success: !stats.hasErrors(),
-        } as DevServerBuildResult);
+        } as DevServerBuildOutput);
       });
 
       server.listen(
@@ -92,7 +92,7 @@ export function runWebpackDevServer(
 
 
 export default createBuilder<
-  json.JsonObject & WebpackDevServerBuilderSchema, DevServerBuildResult
+  json.JsonObject & WebpackDevServerBuilderSchema, DevServerBuildOutput
 >((options, context) => {
   const configPath = resolve(normalize(context.workspaceRoot), normalize(options.webpackConfig));
 
