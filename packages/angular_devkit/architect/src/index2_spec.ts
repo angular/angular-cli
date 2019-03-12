@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { schema } from '@angular-devkit/core';
+import { json, schema } from '@angular-devkit/core';
 import { timer } from 'rxjs';
 import { map, take, tap, toArray } from 'rxjs/operators';
 import { TestingArchitectHost } from '../testing/testing-architect-host';
@@ -221,6 +221,84 @@ describe('architect', () => {
     // But this should.
     try {
       await run2.output.toPromise();
+      expect('THE ABOVE LINE SHOULD NOT ERROR').toBe('false');
+    } catch {}
+    await run2.stop();
+  });
+
+  it('exposes getBuilderNameForTarget()', async () => {
+    const builderName = 'ImBlue:DabadeeDabada';
+    testArchitectHost.addBuilder(builderName, createBuilder(() => ({ success: true })));
+
+    const target = {
+      project: 'some-project',
+      target: 'some-target',
+    };
+    testArchitectHost.addTarget(target, builderName);
+
+    let actualBuilderName = '';
+    testArchitectHost.addBuilder('package:do-it', createBuilder(async (_, context) => {
+      actualBuilderName = await context.getBuilderNameForTarget(target);
+
+      return { success: true };
+    }));
+
+    const run = await architect.scheduleBuilder('package:do-it', {});
+    const output = await run.output.toPromise();
+    expect(output.success).toBe(true);
+    expect(actualBuilderName).toEqual(builderName);
+    await run.stop();
+
+    // Use an invalid target and check for error.
+    target.target = 'invalid';
+    actualBuilderName = '';
+
+    // This should not error.
+    const run2 = await architect.scheduleBuilder('package:do-it', {});
+
+    // But this should.
+    try {
+      await run2.output.toPromise();
+      expect('THE ABOVE LINE SHOULD NOT ERROR').toBe('false');
+    } catch {}
+    await run2.stop();
+  });
+
+  it('exposes validateOptions()', async () => {
+    const builderName = 'Hello:World';
+    testArchitectHost.addBuilder(builderName, createBuilder(() => ({ success: true })), '', {
+      type: 'object',
+      properties: {
+        p0: { type: 'number', default: 123 },
+        p1: { type: 'string' },
+      },
+      required: [
+        'p1',
+      ],
+    });
+
+    let actualOptions: json.JsonObject = {};
+    testArchitectHost.addBuilder('package:do-it', createBuilder(async (options, context) => {
+      actualOptions = await context.validateOptions(options, builderName);
+
+      return { success: true };
+    }));
+
+    const run = await architect.scheduleBuilder('package:do-it', { p1: 'hello' });
+    const output = await run.output.toPromise();
+    expect(output.success).toBe(true);
+    expect(actualOptions).toEqual({
+      p0: 123,
+      p1: 'hello',
+    });
+    await run.stop();
+
+    // Should also error.
+    const run2 = await architect.scheduleBuilder('package:do-it', {});
+
+    try {
+      await run2.output.toPromise();
+      expect('THE ABOVE LINE SHOULD NOT ERROR').toBe('false');
     } catch {}
     await run2.stop();
   });
