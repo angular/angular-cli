@@ -5,27 +5,38 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { request, runTargetSpec } from '@angular-devkit/architect/testing';
+import { Architect, BuilderRun } from '@angular-devkit/architect/src/index2';
 import * as express from 'express'; // tslint:disable-line:no-implicit-dependencies
 import * as http from 'http';
 import { AddressInfo } from 'net';
-import { from } from 'rxjs';
-import { concatMap, take, tap } from 'rxjs/operators';
+import fetch from 'node-fetch';  // tslint:disable-line:no-implicit-dependencies
+import { DevServerBuilderOutput } from '../../src/dev-server/index2';
 import { Schema as DevServerBuilderOptions } from '../../src/dev-server/schema';
-import { devServerTargetSpec, host } from '../utils';
+import { createArchitect, host } from '../utils';
+
 
 describe('Dev Server Builder proxy', () => {
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  const target = { project: 'app', target: 'serve' };
+  let architect: Architect;
+  // We use runs like this to ensure it WILL stop the servers at the end of each tests.
+  let runs: BuilderRun[];
 
-  it('works', (done) => {
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+    runs = [];
+  });
+  afterEach(async () => {
+    await host.restore().toPromise();
+    await Promise.all(runs.map(r => r.stop()));
+  });
+
+  it('works', async () => {
     // Create an express app that serves as a proxy.
     const app = express();
     const server = http.createServer(app);
     server.listen(0);
 
-    // cast is safe, the HTTP server is not using a pipe or UNIX domain socket
     app.set('port', (server.address() as AddressInfo).port);
     app.get('/api/test', function (_req, res) {
       res.send('TEST_API_RETURN');
@@ -40,23 +51,27 @@ describe('Dev Server Builder proxy', () => {
       'proxy.config.json': `{ "/api/*": { "target": "${proxyServerUrl}" } }`,
     });
 
-    const overrides: Partial<DevServerBuilderOptions> = { proxyConfig: 'proxy.config.json' };
+    const run = await architect.scheduleTarget(target, { proxyConfig: 'proxy.config.json' });
+    runs.push(run);
+    const output = await run.result as DevServerBuilderOutput;
+    expect(output.success).toBe(true);
+    expect(output.baseUrl).toBe('http://localhost:4200/');
 
-    runTargetSpec(host, devServerTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      concatMap(() => from(request('http://localhost:4200/api/test'))),
-      tap(response => {
-        expect(response).toContain('TEST_API_RETURN');
-        server.close();
-      }),
-      take(1),
-    ).toPromise().then(done, done.fail);
+    const response = await fetch('http://localhost:4200/api/test');
+    expect(await response.text()).toContain('TEST_API_RETURN');
+    server.close();
   }, 30000);
 
-  it('errors out with a missing proxy file', (done) => {
+  it('errors out with a missing proxy file', async () => {
     const overrides: Partial<DevServerBuilderOptions> = { proxyConfig: '../proxy.config.json' };
+    const run = await architect.scheduleTarget(target, { proxyConfig: 'INVALID.json' });
+    runs.push(run);
 
-    runTargetSpec(host, devServerTargetSpec, overrides)
-      .subscribe(undefined, () => done(), done.fail);
+    try {
+      await run.result;
+      expect('THE ABOVE LINE SHOULD THROW').toBe('true');
+    } catch {
+      // Success!
+    }
   }, 30000);
 });
