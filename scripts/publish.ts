@@ -72,6 +72,15 @@ function _versionCheck(args: PublishArgs, logger: logging.Logger) {
       Use --versionCheck=false to skip this check.
     `);
   }
+
+  Object.keys(packages).forEach((name: string) => {
+    if (packages[name].version.indexOf('+') >= 0) {
+      throw new Error(tags.oneLine`
+        Releasing a version with a + in it means that the latest commit is not tagged properly.
+        Version found: ${JSON.stringify(packages[name].version)}
+      `);
+    }
+  });
 }
 
 export default async function (args: PublishArgs, logger: logging.Logger) {
