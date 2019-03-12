@@ -86,8 +86,11 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
     return this._root;
   }
 
-  async getOptionsForTarget(target: Target): Promise<json.JsonObject> {
+  async getOptionsForTarget(target: Target): Promise<json.JsonObject | null> {
     const targetSpec = this._workspace.getProjectTargets(target.project)[target.target];
+    if (targetSpec === undefined) {
+      return null;
+    }
     if (target.configuration && !targetSpec['configurations']) {
       throw new Error('Configuration not set in the workspace.');
     }
