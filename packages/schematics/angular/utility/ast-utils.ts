@@ -574,3 +574,23 @@ export function isImported(source: ts.SourceFile,
 
   return matchingNodes.length > 0;
 }
+
+/*
+ * Returns the RouterModule declaration from NgModule metadata, if any.
+ */
+export function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression | undefined {
+  const result = getDecoratorMetadata(source, 'NgModule', '@angular/core') as ts.Node[];
+  const node = result[0] as ts.ObjectLiteralExpression;
+  const matchingProperties = getMetadataField(source, node, 'imports');
+  const assignment = matchingProperties[0] as ts.PropertyAssignment;
+
+  if (assignment.initializer.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
+    return;
+  }
+
+  const arrLiteral = assignment.initializer as ts.ArrayLiteralExpression;
+
+  return arrLiteral.elements
+    .filter(el => el.kind === ts.SyntaxKind.CallExpression)
+    .find(el => (el as ts.Identifier).getText(source).startsWith('RouterModule'));
+}
