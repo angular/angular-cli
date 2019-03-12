@@ -13,7 +13,7 @@ import * as fs from 'fs';
 import fetch from 'node-fetch';  // tslint:disable-line:no-implicit-dependencies
 import * as path from 'path';
 import { WorkspaceNodeModulesArchitectHost } from '../../../architect/node';
-import { DevServerBuildResult } from './index2';
+import { DevServerBuildOutput } from './index2';
 
 const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
 
@@ -47,7 +47,7 @@ describe('Dev Server Builder', () => {
 
   it('works', async () => {
     const run = await architect.scheduleTarget(webpackTargetSpec);
-    const output = await run.result as DevServerBuildResult;
+    const output = await run.result as DevServerBuildOutput;
     expect(output.success).toBe(true);
 
     const response = await fetch(`http://${output.address}:${output.port}/bundle.js`);
