@@ -21,7 +21,7 @@ import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import { existsSync, readFileSync } from 'fs';
 import * as minimist from 'minimist';
 import * as path from 'path';
-import { last } from 'rxjs/operators';
+import { last, tap } from 'rxjs/operators';
 import { MultiProgressBar } from '../src/progress';
 
 
@@ -148,21 +148,25 @@ async function _executeTarget(
 
   // Wait for full completion of the builder.
   try {
-    const result = await run.output.pipe(last()).toPromise();
+    const { success } = await run.output.pipe(
+      tap(result => {
+        if (result.success) {
+          parentLogger.info(terminal.green('SUCCESS'));
+        } else {
+          parentLogger.info(terminal.yellow('FAILURE'));
+        }
+        parentLogger.info('Result: ' + JSON.stringify({ ...result, info: undefined }, null, 4));
 
-    if (result.success) {
-      parentLogger.info(terminal.green('SUCCESS'));
-    } else {
-      parentLogger.info(terminal.yellow('FAILURE'));
-    }
-
-    parentLogger.info('\nLogs:');
-    logs.forEach(l => parentLogger.next(l));
+        parentLogger.info('\nLogs:');
+        logs.forEach(l => parentLogger.next(l));
+        logs.splice(0);
+      }),
+    ).toPromise();
 
     await run.stop();
     bars.terminate();
 
-    return result.success ? 0 : 1;
+    return success ? 0 : 1;
   } catch (err) {
     parentLogger.info(terminal.red('ERROR'));
     parentLogger.info('\nLogs:');
@@ -219,6 +223,9 @@ async function main(args: string[]): Promise<number> {
   const workspace = new experimental.workspace.Workspace(normalize(root), host);
 
   await workspace.loadWorkspaceFromJson(workspaceJson).toPromise();
+
+  // Clear the console.
+  process.stdout.write('\u001Bc');
 
   return await _executeTarget(logger, workspace, root, argv, registry);
 }
