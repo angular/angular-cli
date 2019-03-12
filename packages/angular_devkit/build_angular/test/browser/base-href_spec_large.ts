@@ -7,7 +7,7 @@
  */
 
 import { runTargetSpec } from '@angular-devkit/architect/testing';
-import { join, normalize, virtualFs } from '@angular-devkit/core';
+import { join, normalize, tags, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
 import { browserTargetSpec, host } from '../utils';
 
@@ -32,6 +32,26 @@ describe('Browser Builder base href', () => {
         const fileName = join(outputPath, 'index.html');
         const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
         expect(content).toMatch(/<base href="\/myUrl">/);
+      }),
+    ).toPromise().then(done, done.fail);
+  });
+
+  it('should insert base href in the the correct position', (done) => {
+    host.writeMultipleFiles({
+      'src/index.html': tags.oneLine`
+        <html><head><meta charset="UTF-8"></head>
+        <body><app-root></app-root></body></html>
+      `,
+    });
+
+    const overrides = { baseHref: '/myUrl' };
+
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      tap(() => {
+        const fileName = join(outputPath, 'index.html');
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
+        expect(content).toContain('<head><base href="/myUrl"><meta charset="UTF-8"></head>');
       }),
     ).toPromise().then(done, done.fail);
   });
