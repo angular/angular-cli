@@ -11,8 +11,8 @@ install:
   - ps: Install-Product node $env:nodejs_version
   - ps: |
       if (Test-Path env:APPVEYOR_PULL_REQUEST_NUMBER) {
-        # user is required for rebase.	
-        git config user.name "angular-ci"	
+        # user is required for rebase.
+        git config user.name "angular-ci"
         git config user.email "angular-ci"
         # Rebase on target branch.
         node tools\rebase-pr.js angular/angular-cli $env:APPVEYOR_PULL_REQUEST_NUMBER }
@@ -23,7 +23,7 @@ install:
 test_script:
   - node --version
   - yarn --version
-  - yarn test
+  - yarn test -- --full
   - appveyor-e2e.bat
 
 build: off
@@ -32,4 +32,3 @@ deploy: off
 cache:
   - node_modules -> yarn.lock
   - "%LOCALAPPDATA%\\Yarn"
-  
