@@ -38,8 +38,24 @@ interface ChokidarWatcher {
   close(): void;
 }
 
-const { FSWatcher }: { FSWatcher: ChokidarWatcher } = require('chokidar');
-
+// This will only be initialized if the watch() method is called.
+// Otherwise chokidar appears only in type positions, and shouldn't be referenced
+// in the JavaScript output.
+let FSWatcher: ChokidarWatcher;
+function loadFSWatcher() {
+  if (!FSWatcher) {
+    try {
+      // tslint:disable-next-line:no-implicit-dependencies
+      FSWatcher = require('chokidar').FSWatcher;
+    } catch (e) {
+      if (e.code !== 'MODULE_NOT_FOUND') {
+        throw new Error('As of angular-devkit version 8.0, the "chokidar" package ' +
+            'must be installed in order to use watch() features.');
+      }
+      throw e;
+    }
+  }
+}
 
 type FsFunction0<R> = (cb: (err?: Error, result?: R) => void) => void;
 type FsFunction1<R, T1> = (p1: T1, cb: (err?: Error, result?: R) => void) => void;
@@ -180,6 +196,7 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
     _options?: virtualFs.HostWatchOptions,
   ): Observable<virtualFs.HostWatchEvent> | null {
     return new Observable<virtualFs.HostWatchEvent>(obs => {
+      loadFSWatcher();
       const watcher = new FSWatcher({ persistent: true }).add(getSystemPath(path));
 
       watcher
@@ -365,6 +382,7 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
   ): Observable<virtualFs.HostWatchEvent> | null {
     return new Observable<virtualFs.HostWatchEvent>(obs => {
       const opts = { persistent: false };
+      loadFSWatcher();
       const watcher = new FSWatcher(opts).add(getSystemPath(path));
 
       watcher

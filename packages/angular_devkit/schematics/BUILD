@@ -61,7 +61,6 @@ jasmine_node_test(
     name = "schematics_test",
     srcs = [":schematics_test_lib"],
     deps = [
-        "@npm//chokidar",
         "@npm//jasmine",
         "@npm//source-map",
     ],
@@ -159,7 +158,6 @@ jasmine_node_test(
     deps = [
         "@npm//jasmine",
         "@npm//source-map",
-        "@npm//chokidar",
     ],
 )
 
@@ -225,7 +223,6 @@ jasmine_node_test(
     deps = [
         "@npm//jasmine",
         "@npm//source-map",
-        "@npm//chokidar",
     ],
 )
 
