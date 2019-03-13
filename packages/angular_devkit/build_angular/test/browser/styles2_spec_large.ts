@@ -8,7 +8,7 @@
 // tslint:disable:no-big-function
 
 import { Architect } from '@angular-devkit/architect/src/index2';
-import { normalize, tags } from '@angular-devkit/core';
+import { logging, normalize, tags } from '@angular-devkit/core';
 import { browserBuild, createArchitect, host } from '../utils';
 
 
@@ -594,5 +594,24 @@ describe('Browser Builder styles', () => {
     const overrides = { extractCss: true };
     const { output } = await browserBuild(architect, host, target, overrides);
     expect(output.success).toBe(true);
+  });
+
+  it('supports font names with spaces', async () => {
+    host.writeMultipleFiles({
+      'src/styles.css': `
+        body {
+          font: 10px "Font Awesome";
+        }
+      `,
+    });
+
+    const overrides = { extractCss: true, optimization: true };
+    const logger = new logging.Logger('font-name-spaces');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
+    const { output } = await browserBuild(architect, host, target, overrides, { logger });
+    expect(output.success).toBe(true);
+    expect(logs.join()).not.toContain('WARNING in Invalid font values ');
   });
 });

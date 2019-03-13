@@ -52,7 +52,10 @@ export class CleanCssWebpackPlugin {
         compatibility: 'ie9',
         level: {
           2: {
-            skipProperties: ['transition'] // Fixes #12408
+            skipProperties: [
+              'transition', // Fixes #12408
+              'font', // Fixes #9648
+            ] 
           }
         },
         inline: false,
