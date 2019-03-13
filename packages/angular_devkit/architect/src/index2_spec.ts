@@ -34,9 +34,11 @@ describe('architect', () => {
     testArchitectHost = new TestingArchitectHost();
     architect = new Architect(testArchitectHost, registry);
 
+    options = {};
     called = 0;
-    testArchitectHost.addBuilder('package:test', createBuilder(async () => {
+    testArchitectHost.addBuilder('package:test', createBuilder(async o => {
       called++;
+      options = o;
 
       return new Promise<BuilderOutput>(resolve => {
         setTimeout(() => resolve({ success: true }), 10);
@@ -93,13 +95,15 @@ describe('architect', () => {
     const run = await architect.scheduleBuilder('package:test-options', o);
     expect(await run.result).toEqual(jasmine.objectContaining({ success: true }));
     expect(options).toEqual(o);
+    await run.stop();
   });
 
   it('passes options to targets', async () => {
     const o = { helloTarget: 'world' };
     const run = await architect.scheduleTarget(target1, o);
     expect(await run.result).toEqual(jasmine.objectContaining({ success: true }));
-    // FIXME(hansl): expect(options).toEqual(o);
+    expect(options).toEqual(o);
+    await run.stop();
   });
 
   it('errors when builder cannot be resolved', async () => {
