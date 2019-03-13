@@ -149,8 +149,8 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
 
     if (wco.buildOptions.main || wco.buildOptions.polyfills) {
       const typescriptConfigPartial = wco.buildOptions.aot
-        ? getAotConfig(wco, host)
-        : getNonAotConfig(wco, host);
+        ? getAotConfig(wco)
+        : getNonAotConfig(wco);
       webpackConfigs.push(typescriptConfigPartial);
     }
 

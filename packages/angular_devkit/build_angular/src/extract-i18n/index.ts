@@ -12,8 +12,7 @@ import {
   BuilderContext,
 } from '@angular-devkit/architect';
 import { LoggingCallback, WebpackBuilder } from '@angular-devkit/build-webpack';
-import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
-import * as fs from 'fs';
+import { Path, getSystemPath, normalize, resolve } from '@angular-devkit/core';
 import * as path from 'path';
 import { Observable } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
@@ -114,8 +113,6 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
   ) {
     let wco: WebpackConfigOptions;
 
-    const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
-
     const tsConfigPath = getSystemPath(normalize(resolve(root, normalize(options.tsConfig))));
     const tsConfig = readTsconfig(tsConfigPath);
 
@@ -134,7 +131,7 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
       // We don't need to write to disk.
       { plugins: [new InMemoryOutputPlugin()] },
       getCommonConfig(wco),
-      getAotConfig(wco, host, true),
+      getAotConfig(wco, true),
       getStylesConfig(wco),
       getStatsConfig(wco),
     ];

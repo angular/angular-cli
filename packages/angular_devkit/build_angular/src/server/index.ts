@@ -67,7 +67,7 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
   }
 
   buildWebpackConfig(root: Path, projectRoot: Path,
-                     host: virtualFs.Host<Stats>,
+                     _host: virtualFs.Host<Stats>,
                      options: NormalizedServerBuilderServerSchema) {
     let wco: WebpackConfigOptions;
 
@@ -115,8 +115,8 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
 
     if (wco.buildOptions.main || wco.buildOptions.polyfills) {
       const typescriptConfigPartial = wco.buildOptions.aot
-        ? getAotConfig(wco, host)
-        : getNonAotConfig(wco, host);
+        ? getAotConfig(wco)
+        : getNonAotConfig(wco);
       webpackConfigs.push(typescriptConfigPartial);
     }
 
