@@ -237,10 +237,11 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       },
 
       // On server, we don't want to compress anything. We still set the ngDevMode = false for it
-      // to remove dev code.
+      // to remove dev code, and ngI18nClosureMode to remove Closure compiler i18n code
       compress: (buildOptions.platform == 'server' ? {
         global_defs: {
           ngDevMode: false,
+          ngI18nClosureMode: false,
         },
       } : {
           pure_getters: buildOptions.buildOptimizer,
@@ -249,6 +250,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
           passes: buildOptions.buildOptimizer ? 3 : 1,
           global_defs: {
             ngDevMode: false,
+            ngI18nClosureMode: false,
           },
         }),
       // We also want to avoid mangling on server.
