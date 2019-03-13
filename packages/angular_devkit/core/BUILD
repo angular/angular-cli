@@ -72,7 +72,6 @@ jasmine_node_test(
     deps = [
         "@npm//jasmine",
         "@npm//source-map",
-        "@npm//chokidar",
     ],
 )
 
