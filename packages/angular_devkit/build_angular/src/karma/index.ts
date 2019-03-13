@@ -20,7 +20,7 @@ import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencie
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import {
   getCommonConfig,
-  getNonAotTestConfig,
+  getNonAotConfig,
   getStylesConfig,
   getTestConfig,
 } from '../angular-cli-files/models/webpack-configs';
@@ -156,7 +156,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
     const webpackConfigs: {}[] = [
       getCommonConfig(wco),
       getStylesConfig(wco),
-      getNonAotTestConfig(wco, host),
+      getNonAotConfig(wco, host),
       getTestConfig(wco),
     ];
 

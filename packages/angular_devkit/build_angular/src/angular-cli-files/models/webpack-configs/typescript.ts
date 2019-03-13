@@ -114,12 +114,3 @@ export function getAotConfig(
     plugins: [_createAotPlugin(wco, { tsConfigPath }, host, true, extract)]
   };
 }
-
-export function getNonAotTestConfig(wco: WebpackConfigOptions, host: virtualFs.Host<Stats>) {
-  const { tsConfigPath } = wco;
-
-  return {
-    module: { rules: [{ test: /\.tsx?$/, loader: NgToolsLoader }] },
-    plugins: [_createAotPlugin(wco, { tsConfigPath, skipCodeGeneration: true }, host, false)]
-  };
-}
