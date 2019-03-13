@@ -575,4 +575,24 @@ describe('Browser Builder styles', () => {
     const { files } = await browserBuild(architect, host, target, overrides);
     expect(await files['styles.css']).toContain('background-image:url(//cdn.com/classic-bg.jpg)');
   });
+
+  it('supports fonts with space in filename', async () => {
+    host.writeMultipleFiles({
+      'src/styles.css': `
+        @font-face {
+          font-family: "Font Awesome";
+          src: url("./assets/fa solid-900.woff2") format("woff2");
+        }
+
+        body {
+          font-family: "Font Awesome";
+        }
+      `,
+      'src/assets/fa solid-900.woff2': '',
+    });
+
+    const overrides = { extractCss: true };
+    const { output } = await browserBuild(architect, host, target, overrides);
+    expect(output.success).toBe(true);
+  });
 });
