@@ -156,7 +156,7 @@ export class KarmaBuilder implements Builder<KarmaBuilderSchema> {
     const webpackConfigs: {}[] = [
       getCommonConfig(wco),
       getStylesConfig(wco),
-      getNonAotConfig(wco, host),
+      getNonAotConfig(wco),
       getTestConfig(wco),
     ];
 
