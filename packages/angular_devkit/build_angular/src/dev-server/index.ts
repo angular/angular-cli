@@ -48,7 +48,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderSchema> {
     let first = true;
     let opnAddress: string;
 
-    return from(checkPort(options.port || 4200, options.host || 'localhost')).pipe(
+    return from(checkPort(options.port || 0, options.host || 'localhost', 4200)).pipe(
       tap((port) => options.port = port),
       concatMap(() => this._getBrowserOptions(options)),
       tap(opts => browserOptions = normalizeBrowserSchema(
