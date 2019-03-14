@@ -113,6 +113,13 @@ jobs:
     resource_class: xlarge
     parallelism: 4
     steps:
+      - run:
+          name: Don't run expensive e2e tests for forks other than renovate-bot and angular
+          command: >
+            if [[ "$CIRCLE_PROJECT_USERNAME" != "renovate-bot" ]] &&
+               [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
+              circleci step halt
+            fi
       - attach_workspace: *attach_options
       - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ng-snapshots
 
@@ -123,6 +130,13 @@ jobs:
     resource_class: xlarge
     parallelism: 4
     steps:
+      - run:
+          name: Don't run expensive e2e tests for forks other than renovate-bot and angular
+          command: >
+            if [[ "$CIRCLE_PROJECT_USERNAME" != "renovate-bot" ]] &&
+               [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
+              circleci step halt
+            fi
       - attach_workspace: *attach_options
       - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ng-snapshots --ivy
 
