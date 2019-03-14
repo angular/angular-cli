@@ -191,30 +191,40 @@ export function useSha() {
     // 7.0.0-beta.4+dd2a650
     // 6.1.6+4a8d56a
     const label = argv['ng-tag'] ? argv['ng-tag'] : '';
+    const ngSnapshotVersions = require('../ng-snapshot/package.json');
     return updateJsonFile('package.json', json => {
       // Install over the project with snapshot builds.
-      Object.keys(json['dependencies'] || {})
+      function replaceDependencies(key: string) {
+        const missingSnapshots = [];
+        Object.keys(json[key] || {})
         .filter(name => name.match(/^@angular\//))
         .forEach(name => {
           const pkgName = name.split(/\//)[1];
           if (pkgName == 'cli') {
             return;
           }
-          json['dependencies'][`@angular/${pkgName}`]
-            = `github:angular/${pkgName}-builds${label}`;
-        });
-
-      Object.keys(json['devDependencies'] || {})
-        .filter(name => name.match(/^@angular\//))
-        .forEach(name => {
-          const pkgName = name.split(/\//)[1];
-          if (pkgName == 'cli') {
-            return;
+          if (label) {
+            json[key][`@angular/${pkgName}`]
+              = `github:angular/${pkgName}-builds${label}`;
+          } else {
+            const replacement = ngSnapshotVersions.dependencies[`@angular/${pkgName}`];
+            if (!replacement) {
+              missingSnapshots.push(`missing @angular/${pkgName}`);
+            }
+            json[key][`@angular/${pkgName}`] = replacement;
           }
-          json['devDependencies'][`@angular/${pkgName}`]
-            = `github:angular/${pkgName}-builds${label}`;
         });
-
+        if (missingSnapshots.length > 0) {
+          throw new Error('e2e test with --ng-snapshots requires all angular packages be ' +
+          'listed in tests/legacy-cli/e2e/ng-snapshot/package.json.\nErrors:\n' + missingSnapshots.join('\n  '));
+        }
+      }
+      try {
+        replaceDependencies('dependencies');
+        replaceDependencies('devDependencies');
+      } catch (e) {
+        return Promise.reject(e);
+      }
       json['devDependencies']['typescript'] = '~3.1.1';
     });
   } else {

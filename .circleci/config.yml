@@ -206,15 +206,9 @@ workflows:
       - e2e-cli-ng-snapshots:
           requires:
             - build
-          filters:
-            branches:
-              only: master
       - e2e-cli-ivy-snapshots:
           requires:
             - build
-          filters:
-            branches:
-              only: master
       - snapshot_publish:
           requires:
             - test
