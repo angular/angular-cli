@@ -12,11 +12,9 @@ import * as path from 'path';
 import { Configuration, ILinterOptions, Linter, findFormatter } from 'tslint';
 import * as ts from 'typescript';
 
-// Blacklist (regexes) of the files to not lint. Generated files should not be linted.
+// Excluded (regexes) of the files to not lint. Generated files should not be linted.
 // TODO: when moved to using bazel for the build system, this won't be needed.
-const blacklist = [
-  /^dist-schema[\\\/].*/,
-];
+const excluded = [/^dist-schema[\\\/].*/, /.*\/third_party\/.*/];
 
 
 function _buildRules(logger: logging.Logger) {
@@ -72,7 +70,8 @@ export default async function (options: ParsedArgs, logger: logging.Logger) {
   };
 
   program.getRootFileNames().forEach(fileName => {
-    if (blacklist.some(x => x.test(path.relative(process.cwd(), fileName)))) {
+    const filePath = path.relative(process.cwd(), fileName).replace(/\\/g, '/');
+    if (excluded.some(x => x.test(filePath))) {
       return;
     }
 
