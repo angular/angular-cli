@@ -8,6 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect/src/index2';
 import { TestLogger } from '@angular-devkit/architect/testing';
+import { logging } from '@angular-devkit/core';
 import { browserBuild, createArchitect, host } from '../utils';
 
 
@@ -121,7 +122,12 @@ describe('Browser Builder scripts array', () => {
   it('chunk in entry', async () => {
     host.writeMultipleFiles(scripts);
 
-    const logger = new TestLogger('build-script-chunk-entry');
+    const logger = new logging.Logger('build-script-chunk-entry');
+    const logs: string[] = [];
+    logger.subscribe(({ message }) => {
+      logs.push(message);
+    });
+
     await browserBuild(
       architect,
       host,
@@ -132,9 +138,8 @@ describe('Browser Builder scripts array', () => {
       { logger },
     );
 
-    const validate = ` [1m[33m[entry][39m[22m[1m[32m [rendered]`;
-    expect(logger.includes(`(lazy-script) 69 bytes${validate}`)).toBe(true);
-    expect(logger.includes(`(renamed-script) 78 bytes${validate}`)).toBe(true);
-    expect(logger.includes(`(renamed-lazy-script) 88 bytes${validate}`)).toBe(true);
+    expect(logs.join('\n')).toMatch(/\(lazy-script\) 69 bytes.*\[entry].*\[rendered]/);
+    expect(logs.join('\n')).toMatch(/\(renamed-script\) 78 bytes.*\[entry].*\[rendered]/);
+    expect(logs.join('\n')).toMatch(/\(renamed-lazy-script\) 88 bytes.*\[entry].*\[rendered]/);
   });
 });
