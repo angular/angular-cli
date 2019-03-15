@@ -5,15 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { runTargetSpec } from '@angular-devkit/architect/testing';
+import { Architect } from '@angular-devkit/architect/src/index2';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
+import { BrowserBuilderOutput } from '../../src/browser/index2';
+import { createArchitect, host } from '../utils';
 
 
 describe('Browser Builder i18n', () => {
-  const outputPath = normalize('dist');
   const emptyTranslationFile = `
       <?xml version="1.0" encoding="UTF-8" ?>
       <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
@@ -23,10 +21,16 @@ describe('Browser Builder i18n', () => {
         </file>
       </xliff>`;
 
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  const targetSpec = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  it('uses translations', (done) => {
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
+
+  it('uses translations', async () => {
     host.writeMultipleFiles({
       'src/locale/messages.fr.xlf': `
       <?xml version="1.0" encoding="UTF-8" ?>
@@ -54,17 +58,18 @@ describe('Browser Builder i18n', () => {
       i18nLocale: 'fr',
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const fileName = join(outputPath, 'main.js');
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toMatch(/Bonjour i18n!/);
-      }),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
+    const outputPath = output.outputPath;
+    const fileName = join(normalize(outputPath), 'main.js');
+    const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
+    expect(content).toMatch(/Bonjour i18n!/);
+
+    await run.stop();
   });
 
-  it('ignores missing translations', (done) => {
+  it('ignores missing translations', async () => {
     const overrides = {
       aot: true,
       i18nFile: 'src/locale/messages.fr.xlf',
@@ -76,17 +81,18 @@ describe('Browser Builder i18n', () => {
     host.writeMultipleFiles({ 'src/locale/messages.fr.xlf': emptyTranslationFile });
     host.appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const fileName = join(outputPath, 'main.js');
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toMatch(/Other content/);
-      }),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
+    const outputPath = output.outputPath;
+    const fileName = join(normalize(outputPath), 'main.js');
+    const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
+    expect(content).toMatch(/Other content/);
+
+    await run.stop();
   });
 
-  it('reports errors for missing translations', (done) => {
+  it('reports errors for missing translations', async () => {
     const overrides = {
       aot: true,
       i18nFile: 'src/locale/messages.fr.xlf',
@@ -98,22 +104,25 @@ describe('Browser Builder i18n', () => {
     host.writeMultipleFiles({ 'src/locale/messages.fr.xlf': emptyTranslationFile });
     host.appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(false)),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(false);
+
+    await run.stop();
   });
 
-  it('register locales', (done) => {
+  it('register locales', async () => {
     const overrides = { aot: true, i18nLocale: 'fr_FR' };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const fileName = join(outputPath, 'main.js');
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toMatch(/registerLocaleData/);
-        expect(content).toMatch(/angular_common_locales_fr/);
-      }),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
+    const outputPath = output.outputPath;
+    const fileName = join(normalize(outputPath), 'main.js');
+    const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
+    expect(content).toMatch(/registerLocaleData/);
+    expect(content).toMatch(/angular_common_locales_fr/);
+
+    await run.stop();
   });
 });

@@ -6,17 +6,24 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { runTargetSpec } from '@angular-devkit/architect/testing';
+import { Architect } from '@angular-devkit/architect/src/index2';
 import { normalize, virtualFs } from '@angular-devkit/core';
-import { tap, toArray } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
+import { toArray } from 'rxjs/operators';
+import { BrowserBuilderOutput } from '../../src/browser/index2';
+import { createArchitect, host } from '../utils';
 
 
 describe('Browser Builder assets', () => {
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  const targetSpec = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  it('works', (done) => {
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
+
+  it('works', async () => {
     const assets: { [path: string]: string } = {
       './src/folder/.gitkeep': '',
       './src/string-file-asset.txt': 'string-file-asset.txt',
@@ -45,21 +52,22 @@ describe('Browser Builder assets', () => {
       ],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        // Assets we expect should be there.
-        Object.keys(matches).forEach(fileName => {
-          const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-          expect(content).toMatch(matches[fileName]);
-        });
-        // .gitkeep should not be there.
-        expect(host.scopedSync().exists(normalize('./dist/folder/.gitkeep'))).toBe(false);
-      }),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
+
+    // Assets we expect should be there.
+    Object.keys(matches).forEach(fileName => {
+      const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+      expect(content).toMatch(matches[fileName]);
+    });
+    // .gitkeep should not be there.
+    expect(host.scopedSync().exists(normalize('./dist/folder/.gitkeep'))).toBe(false);
+
+    await run.stop();
   });
 
-  it('works with ignored patterns', (done) => {
+  it('works with ignored patterns', async () => {
     const assets: { [path: string]: string } = {
       './src/folder/.gitkeep': '',
       './src/folder/asset-ignored.txt': '',
@@ -79,17 +87,18 @@ describe('Browser Builder assets', () => {
       ],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        expect(host.scopedSync().exists(normalize('./dist/folder/asset.txt'))).toBe(true);
-        expect(host.scopedSync().exists(normalize('./dist/folder/asset-ignored.txt'))).toBe(false);
-        expect(host.scopedSync().exists(normalize('./dist/folder/.gitkeep'))).toBe(false);
-      }),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
+
+    expect(host.scopedSync().exists(normalize('./dist/folder/asset.txt'))).toBe(true);
+    expect(host.scopedSync().exists(normalize('./dist/folder/asset-ignored.txt'))).toBe(false);
+    expect(host.scopedSync().exists(normalize('./dist/folder/.gitkeep'))).toBe(false);
+
+    await run.stop();
   });
 
-  it('fails with non-absolute output path', (done) => {
+  it('fails with non-absolute output path', async () => {
     const assets: { [path: string]: string } = {
       './node_modules/some-package/node_modules-asset.txt': 'node_modules-asset.txt',
     };
@@ -100,15 +109,20 @@ describe('Browser Builder assets', () => {
       }],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides)
-      .subscribe(undefined, () => done(), done.fail);
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+    try {
+      await run.result;
+      expect('THE ABOVE LINE SHOULD THROW').toBe('');
+    } catch {}
 
     // The node_modules folder must be deleted, otherwise code that tries to find the
     // node_modules folder will hit this one and can fail.
     host.scopedSync().delete(normalize('./node_modules'));
+
+    await run.stop();
   });
 
-  it('fails with non-source root input path', (done) => {
+  it('fails with non-source root input path', async () => {
     const assets: { [path: string]: string } = {
       './node_modules/some-package/node_modules-asset.txt': 'node_modules-asset.txt',
     };
@@ -117,22 +131,28 @@ describe('Browser Builder assets', () => {
       assets: ['not-source-root/file.txt'],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides)
-      .subscribe(undefined, () => done(), done.fail);
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+    try {
+      await run.result;
+      expect('THE ABOVE LINE SHOULD THROW').toBe('');
+    } catch {}
 
     // The node_modules folder must be deleted, otherwise code that tries to find the
     // node_modules folder will hit this one and can fail.
     host.scopedSync().delete(normalize('./node_modules'));
+
+    await run.stop();
   });
 
-  it('still builds with empty asset array', (done) => {
+  it('still builds with empty asset array', async () => {
     const overrides = {
       assets: [],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      toArray(),
-      tap((buildEvents) => expect(buildEvents.length).toBe(1)),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+    const events = await run.output.pipe(toArray()).toPromise();
+    expect(events.length).toBe(1);
+
+    await run.stop();
   });
 });

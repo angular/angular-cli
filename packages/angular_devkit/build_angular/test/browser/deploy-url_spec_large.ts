@@ -5,51 +5,49 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { runTargetSpec } from '@angular-devkit/architect/testing';
+import { Architect } from '@angular-devkit/architect/src/index2';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { concatMap, tap } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
+import { BrowserBuilderOutput } from '../../src/browser/index2';
+import { createArchitect, host } from '../utils';
 
 
 describe('Browser Builder deploy url', () => {
-  const outputPath = normalize('dist');
+  const targetSpec = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
-
-  it('uses deploy url for bundles urls', (done) => {
-    const overrides = { deployUrl: 'deployUrl/' };
-
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const fileName = join(outputPath, 'index.html');
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toContain('deployUrl/main.js');
-      }),
-      concatMap(() => runTargetSpec(host, browserTargetSpec,
-        { deployUrl: 'http://example.com/some/path/' })),
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const fileName = join(outputPath, 'index.html');
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toContain('http://example.com/some/path/main.js');
-      }),
-    ).toPromise().then(done, done.fail);
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
   });
+  afterEach(async () => host.restore().toPromise());
 
-  it('uses deploy url for in webpack runtime', (done) => {
+  it('uses deploy url for bundles urls and runtime', async () => {
     const overrides = { deployUrl: 'deployUrl/' };
+    const overrides2 = { deployUrl: 'http://example.com/some/path/' };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const fileName = join(outputPath, 'runtime.js');
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toContain('deployUrl/');
-      }),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
+    expect(output.outputPath).not.toBeUndefined();
+    const outputPath = normalize(output.outputPath);
+
+    const fileName = join(outputPath, 'index.html');
+    const runtimeFileName = join(outputPath, 'runtime.js');
+    const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
+    expect(content).toContain('deployUrl/main.js');
+    const runtimeContent = virtualFs.fileBufferToString(
+      await host.read(normalize(runtimeFileName)).toPromise(),
+    );
+    expect(runtimeContent).toContain('deployUrl/');
+
+    const run2 = await architect.scheduleTarget(targetSpec, overrides2);
+    const output2 = await run2.result as BrowserBuilderOutput;
+    expect(output2.outputPath).toEqual(outputPath);  // These should be the same.
+
+    const content2 = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
+    expect(content2).toContain('http://example.com/some/path/main.js');
+
+    await run.stop();
+    await run2.stop();
   });
-
 });

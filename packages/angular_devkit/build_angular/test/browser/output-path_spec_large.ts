@@ -6,39 +6,46 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { runTargetSpec } from '@angular-devkit/architect/testing';
-import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
+import { Architect } from '@angular-devkit/architect/src/index2';
+import { join, virtualFs } from '@angular-devkit/core';
+import { createArchitect, host } from '../utils';
 
 
 describe('Browser Builder output path', () => {
-  const outputPath = normalize('dist');
+  const target = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
 
-  it('deletes output path', (done) => {
+  it('deletes output path', async () => {
     // Write a file to the output path to later verify it was deleted.
-    host.scopedSync().write(join(outputPath, 'file.txt'), virtualFs.stringToFileBuffer('file'));
+    await host.write(
+      join(host.root(), 'dist/file.txt'),
+      virtualFs.stringToFileBuffer('file'),
+    ).toPromise();
+
     // Delete an app file to force a failed compilation.
     // Failed compilations still delete files, but don't output any.
-    host.delete(join(host.root(), 'src', 'app', 'app.component.ts')).subscribe({
-      error: done.fail,
-    });
+    await host.delete(join(host.root(), 'src', 'app', 'app.component.ts')).toPromise();
 
-    runTargetSpec(host, browserTargetSpec).pipe(
-      tap((buildEvent) => {
-        expect(buildEvent.success).toBe(false);
-        expect(host.scopedSync().exists(outputPath)).toBe(false);
-      }),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(target);
+    const output = await run.result;
+    expect(output.success).toBe(false);
+    expect(await host.exists(join(host.root(), 'dist')).toPromise()).toBe(false);
+    await run.stop();
   });
 
-  it('does not allow output path to be project root', (done) => {
+  it('does not allow output path to be project root', async () => {
     const overrides = { outputPath: './' };
-
-    runTargetSpec(host, browserTargetSpec, overrides)
-      .subscribe(undefined, () => done(), done.fail);
+    const run = await architect.scheduleTarget(target, overrides);
+    try {
+      await run.result;
+      expect('THE ABOVE LINE SHOULD THROW').toBe('');
+    } catch {}
+    await run.stop();
   });
 });

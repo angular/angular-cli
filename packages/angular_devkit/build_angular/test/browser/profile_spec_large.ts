@@ -5,25 +5,30 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { runTargetSpec } from '@angular-devkit/architect/testing';
-import { normalize } from '@angular-devkit/core';
-import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
+import { Architect } from '@angular-devkit/architect/src/index2';
+import { join, normalize } from '@angular-devkit/core';
+import { BrowserBuilderOutput } from '../../src/browser/index2';
+import { browserBuild, createArchitect, host } from '../utils';
 
 
 describe('Browser Builder profile', () => {
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  const target = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  it('works', (done) => {
-    const overrides = { profile: true };
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        expect(host.scopedSync().exists(normalize('chrome-profiler-events.json'))).toBe(true);
-        expect(host.scopedSync().exists(normalize('speed-measure-plugin.json'))).toBe(true);
-      }),
-    ).toPromise().then(done, done.fail);
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
+
+  it('works', async () => {
+    const run = await architect.scheduleTarget(target, { profile: true });
+    const output = await run.result as BrowserBuilderOutput;
+
+    expect(output.success).toBe(true);
+    expect(host.scopedSync().exists(normalize('chrome-profiler-events.json'))).toBe(true);
+    expect(host.scopedSync().exists(normalize('speed-measure-plugin.json'))).toBe(true);
+
+    await run.stop();
   });
 });

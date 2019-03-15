@@ -6,52 +6,60 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
-import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
+import { Architect } from '@angular-devkit/architect/src/index2';
+import { logging } from '@angular-devkit/core';
+import { createArchitect, host } from '../utils';
 
 
 describe('Browser Builder errors', () => {
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  const targetSpec = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  it('shows error when files are not part of the compilation', (done) => {
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
+
+  it('shows error when files are not part of the compilation', async () => {
     host.replaceInFile('src/tsconfig.app.json', '"compilerOptions": {', `
       "files": ["main.ts"],
       "compilerOptions": {
     `);
-    const logger = new TestLogger('errors-compilation');
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
 
-    runTargetSpec(host, browserTargetSpec, {}, DefaultTimeout, logger).pipe(
-      tap((buildEvent) => {
-        expect(buildEvent.success).toBe(false);
-        expect(logger.includes('polyfills.ts is missing from the TypeScript')).toBe(true);
-      }),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, {}, { logger });
+    const output = await run.result;
+    expect(output.success).toBe(false);
+    expect(logs.join()).toContain('polyfills.ts is missing from the TypeScript');
+    await run.stop();
   });
 
-  it('shows TS syntax errors', (done) => {
+  it('shows TS syntax errors', async () => {
     host.appendToFile('src/app/app.component.ts', ']]]');
-    const logger = new TestLogger('errors-syntax');
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
 
-    runTargetSpec(host, browserTargetSpec, {}, DefaultTimeout, logger).pipe(
-      tap((buildEvent) => {
-        expect(buildEvent.success).toBe(false);
-        expect(logger.includes('Declaration or statement expected.')).toBe(true);
-      }),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, {}, { logger });
+    const output = await run.result;
+    expect(output.success).toBe(false);
+    expect(logs.join()).toContain('Declaration or statement expected');
+    await run.stop();
   });
 
-  it('shows static analysis errors', (done) => {
+  it('shows static analysis errors', async () => {
     host.replaceInFile('src/app/app.component.ts', `'app-root'`, `(() => 'app-root')()`);
-    const logger = new TestLogger('errors-static');
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
 
-    runTargetSpec(host, browserTargetSpec, { aot: true }, DefaultTimeout, logger).pipe(
-      tap((buildEvent) => {
-        expect(buildEvent.success).toBe(false);
-        expect(logger.includes('Function expressions are not supported in')).toBe(true);
-      }),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, { aot: true }, { logger });
+    const output = await run.result;
+    expect(output.success).toBe(false);
+    expect(logs.join()).toContain('Function expressions are not supported in');
+    await run.stop();
   });
-
 });

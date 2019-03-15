@@ -5,18 +5,24 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { runTargetSpec } from '@angular-devkit/architect/testing';
-import { join, virtualFs } from '@angular-devkit/core';
+import { Architect } from '@angular-devkit/architect/src/index2';
+import { join, normalize, relative, virtualFs } from '@angular-devkit/core';
 import { take, tap } from 'rxjs/operators';
-import { browserTargetSpec, host, outputPath } from '../utils';
+import { BrowserBuilderOutput } from '../../src/browser/index2';
+import { createArchitect, host } from '../utils';
 
 
 describe('Browser Builder allow js', () => {
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  const targetSpec = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  it('works', (done) => {
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
+
+  it('works', async () => {
     host.writeMultipleFiles({
       'src/my-js-file.js': `console.log(1); export const a = 2;`,
       'src/main.ts': `import { a } from './my-js-file'; console.log(a);`,
@@ -28,19 +34,20 @@ describe('Browser Builder allow js', () => {
       '"target": "es5", "allowJs": true',
     );
 
-    runTargetSpec(host, browserTargetSpec).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const content = virtualFs.fileBufferToString(
-          host.scopedSync().read(join(outputPath, 'main.js')),
-        );
+    const run = await architect.scheduleTarget(targetSpec);
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
 
-        expect(content).toContain('var a = 2');
-      }),
-    ).toPromise().then(done, done.fail);
+    const content = virtualFs.fileBufferToString(
+      await host.read(join(normalize(output.outputPath), 'main.js')).toPromise(),
+    );
+
+    expect(content).toContain('var a = 2');
+
+    await run.stop();
   });
 
-  it('works with aot', (done) => {
+  it('works with aot', async () => {
     host.writeMultipleFiles({
       'src/my-js-file.js': `console.log(1); export const a = 2;`,
       'src/main.ts': `import { a } from './my-js-file'; console.log(a);`,
@@ -54,19 +61,20 @@ describe('Browser Builder allow js', () => {
 
     const overrides = { aot: true };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const content = virtualFs.fileBufferToString(
-          host.scopedSync().read(join(outputPath, 'main.js')),
-        );
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
 
-        expect(content).toContain('var a = 2');
-      }),
-    ).toPromise().then(done, done.fail);
+    const content = virtualFs.fileBufferToString(
+      await host.read(join(normalize(output.outputPath), 'main.js')).toPromise(),
+    );
+
+    expect(content).toContain('var a = 2');
+
+    await run.stop();
   });
 
-  it('works with watch', (done) => {
+  it('works with watch', async () => {
     host.writeMultipleFiles({
       'src/my-js-file.js': `console.log(1); export const a = 2;`,
       'src/main.ts': `import { a } from './my-js-file'; console.log(a);`,
@@ -81,10 +89,13 @@ describe('Browser Builder allow js', () => {
     const overrides = { watch: true };
 
     let buildCount = 1;
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap(() => {
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+
+    await run.output.pipe(
+      tap((output: BrowserBuilderOutput) => {
+        const path = relative(host.root(), join(normalize(output.outputPath), 'main.js'));
         const content = virtualFs.fileBufferToString(
-          host.scopedSync().read(join(outputPath, 'main.js')),
+          host.scopedSync().read(path),
         );
 
         switch (buildCount) {
@@ -103,7 +114,8 @@ describe('Browser Builder allow js', () => {
       }),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       take(2),
-    ).toPromise().then(done, done.fail);
-  });
+    ).toPromise();
 
+    await run.stop();
+  });
 });

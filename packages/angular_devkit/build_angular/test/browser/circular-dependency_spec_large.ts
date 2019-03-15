@@ -5,26 +5,34 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
-import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
+import { Architect } from '@angular-devkit/architect/src/index2';
+import { logging } from '@angular-devkit/core';
+import { createArchitect, host } from '../utils';
 
 
 describe('Browser Builder circular dependency detection', () => {
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  const targetSpec = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  it('works', (done) => {
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
+
+  it('works', async () => {
     host.appendToFile('src/app/app.component.ts',
       `import { AppModule } from './app.module'; console.log(AppModule);`);
 
     const overrides = { baseHref: '/myUrl' };
-    const logger = new TestLogger('circular-dependencies');
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
 
-    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout, logger).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(logger.includes('Circular dependency detected')).toBe(true)),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
+    const output = await run.result;
+    expect(output.success).toBe(true);
+    expect(logs.join()).toContain('Circular dependency detected');
+    await run.stop();
   });
 });

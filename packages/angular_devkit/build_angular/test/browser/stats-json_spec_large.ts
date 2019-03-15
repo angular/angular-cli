@@ -5,28 +5,22 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { runTargetSpec } from '@angular-devkit/architect/testing';
-import { join, normalize } from '@angular-devkit/core';
-import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
+import { Architect } from '@angular-devkit/architect/src/index2';
+import { browserBuild, createArchitect, host } from '../utils';
 
 
 describe('Browser Builder stats json', () => {
-  const outputPath = normalize('dist');
+  const target = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
 
-  it('works', (done) => {
-    const overrides = { statsJson: true };
-
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const fileName = join(outputPath, 'stats.json');
-        expect(host.scopedSync().exists(fileName)).toBe(true);
-      }),
-    ).toPromise().then(done, done.fail);
+  it('works', async () => {
+    const { files } = await browserBuild(architect, host, target, { statsJson: true });
+    expect('stats.json' in files).toBe(true);
   });
 });
