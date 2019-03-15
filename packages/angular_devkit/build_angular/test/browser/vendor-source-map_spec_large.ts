@@ -5,22 +5,22 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { runTargetSpec } from '@angular-devkit/architect/testing';
-import { join, normalize, virtualFs } from '@angular-devkit/core';
+import { Architect } from '@angular-devkit/architect/src/index2';
 import * as path from 'path';
-import { tap } from 'rxjs/operators';
-import { Schema as BrowserBuilderSchema } from '../../src/browser/schema';
-import { browserTargetSpec, host } from '../utils';
+import { browserBuild, createArchitect, host } from '../utils';
 
 describe('Browser Builder external source map', () => {
-  const outputPath = normalize('dist');
+  const target = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
 
-  it('works', (done) => {
-    const overrides: Partial<BrowserBuilderSchema> = {
+  it('works', async () => {
+    const overrides = {
       sourceMap: {
         scripts: true,
         styles: true,
@@ -28,21 +28,13 @@ describe('Browser Builder external source map', () => {
       },
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const fileName = join(outputPath, 'vendor.js.map');
-        expect(host.scopedSync().exists(fileName)).toBe(true);
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        // this is due the fact that some vendors like `tslib` sourcemaps to js files
-        const sourcePath = JSON.parse(content).sources[0];
-        expect(path.extname(sourcePath)).toBe('.ts', `${sourcePath} extention should be '.ts'`);
-      }),
-    ).toPromise().then(done, done.fail);
+    const { files } = await browserBuild(architect, host, target, overrides);
+    const sourcePath = JSON.parse(await files['vendor.js.map']).sources[0];
+    expect(path.extname(sourcePath)).toBe('.ts', `${sourcePath} extention should be '.ts'`);
   });
 
-  it(`works when using deprecated 'vendorSourceMap'`, (done) => {
-    const overrides: Partial<BrowserBuilderSchema> = {
+  it(`works when using deprecated 'vendorSourceMap'`, async () => {
+    const overrides = {
       sourceMap: {
         scripts: true,
         styles: true,
@@ -50,22 +42,13 @@ describe('Browser Builder external source map', () => {
       vendorSourceMap: true,
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const fileName = join(outputPath, 'vendor.js.map');
-        expect(host.scopedSync().exists(fileName)).toBe(true);
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        // this is due the fact that some vendors like `tslib` sourcemaps to js files
-        const sourcePath = JSON.parse(content).sources[0];
-        expect(path.extname(sourcePath)).toBe('.ts', `${sourcePath} extention should be '.ts'`);
-      }),
-    ).toPromise().then(done, done.fail);
+    const { files } = await browserBuild(architect, host, target, overrides);
+    const sourcePath = JSON.parse(await files['vendor.js.map']).sources[0];
+    expect(path.extname(sourcePath)).toBe('.ts', `${sourcePath} extention should be '.ts'`);
   });
 
-
-  it('does not map sourcemaps from external library when disabled', (done) => {
-    const overrides: Partial<BrowserBuilderSchema> = {
+  it('does not map sourcemaps from external library when disabled', async () => {
+    const overrides = {
       sourceMap: {
         scripts: true,
         styles: true,
@@ -73,17 +56,8 @@ describe('Browser Builder external source map', () => {
       },
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const fileName = join(outputPath, 'vendor.js.map');
-        expect(host.scopedSync().exists(fileName)).toBe(true);
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        // this is due the fact that some vendors like `tslib` sourcemaps to js files
-        const sourcePath = JSON.parse(content).sources[0];
-        expect(path.extname(sourcePath)).toBe('.js', `${sourcePath} extention should be '.js'`);
-      }),
-    ).toPromise().then(done, done.fail);
+    const { files } = await browserBuild(architect, host, target, overrides);
+    const sourcePath = JSON.parse(await files['vendor.js.map']).sources[0];
+    expect(path.extname(sourcePath)).toBe('.js', `${sourcePath} extention should be '.ts'`);
   });
-
 });

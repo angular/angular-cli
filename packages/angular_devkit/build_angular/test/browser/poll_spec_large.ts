@@ -6,20 +6,28 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { runTargetSpec } from '@angular-devkit/architect/testing';
+import { Architect } from '@angular-devkit/architect/src/index2';
 import { debounceTime, take, tap } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
+import { createArchitect, host } from '../utils';
 
 
 describe('Browser Builder poll', () => {
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  const target = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  it('works', (done) => {
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
+
+  it('works', async () => {
     const overrides = { watch: true, poll: 10000 };
     const intervals: number[] = [];
     let startTime: number | undefined;
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+
+    const run = await architect.scheduleTarget(target, overrides);
+    await run.output.pipe(
       // Debounce 1s, otherwise changes are too close together and polling doesn't work.
       debounceTime(1000),
       tap((buildEvent) => {
@@ -31,12 +39,11 @@ describe('Browser Builder poll', () => {
         host.appendToFile('src/main.ts', 'console.log(1);');
       }),
       take(4),
-    ).subscribe(undefined, done.fail, () => {
-      intervals.sort();
-      const median = intervals[Math.trunc(intervals.length / 2)];
-      expect(median).toBeGreaterThan(3000);
-      expect(median).toBeLessThan(12000);
-      done();
-    });
+    ).toPromise();
+
+    intervals.sort();
+    const median = intervals[Math.trunc(intervals.length / 2)];
+    expect(median).toBeGreaterThan(3000);
+    expect(median).toBeLessThan(12000);
   });
 });

@@ -6,28 +6,36 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { Architect } from '@angular-devkit/architect/src/index2';
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
+import { BrowserBuilderOutput } from '../../src/browser/index2';
+import { browserTargetSpec, createArchitect, host } from '../utils';
 
 
 describe('Browser Builder AOT', () => {
-  const outputPath = normalize('dist');
+  const targetSpec = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
 
-  it('works', (done) => {
+  it('works', async () => {
     const overrides = { aot: true };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const fileName = join(outputPath, 'main.js');
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toMatch(/platformBrowser.*bootstrapModuleFactory.*AppModuleNgFactory/);
-      }),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+    const output = await run.result as BrowserBuilderOutput;
+
+    expect(output.success).toBe(true);
+
+    const fileName = join(normalize(output.outputPath), 'main.js');
+    const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
+    expect(content).toMatch(/platformBrowser.*bootstrapModuleFactory.*AppModuleNgFactory/);
+
+    await run.stop();
   });
 });

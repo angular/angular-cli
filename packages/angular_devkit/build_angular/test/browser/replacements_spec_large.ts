@@ -6,18 +6,23 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
-import { join, normalize, virtualFs } from '@angular-devkit/core';
+import { Architect } from '@angular-devkit/architect/src/index2';
+import { TestLogger } from '@angular-devkit/architect/testing';
+import { normalize, virtualFs } from '@angular-devkit/core';
 import { of, race } from 'rxjs';
-import { delay, filter, map, take, takeUntil, takeWhile, tap } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
+import { delay, filter, map, take, takeUntil, takeWhile, tap, timeout } from 'rxjs/operators';
+import { browserBuild, createArchitect, host } from '../utils';
 
 
 describe('Browser Builder file replacements', () => {
-  const outputPath = normalize('dist');
+  const target = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
 
   beforeEach(() => host.writeMultipleFiles({
     'src/meaning-too.ts': 'export var meaning = 42;',
@@ -30,7 +35,7 @@ describe('Browser Builder file replacements', () => {
       `,
   }));
 
-  it('allows file replacements', (done) => {
+  it('allows file replacements', async () => {
     const overrides = {
       fileReplacements: [
         {
@@ -40,19 +45,12 @@ describe('Browser Builder file replacements', () => {
       ],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const fileName = join(outputPath, 'main.js');
-        expect(virtualFs.fileBufferToString(host.scopedSync().read(fileName)))
-          .toMatch(/meaning\s*=\s*42/);
-        expect(virtualFs.fileBufferToString(host.scopedSync().read(fileName)))
-          .not.toMatch(/meaning\s*=\s*10/);
-      }),
-    ).toPromise().then(done, done.fail);
+    const { files } = await browserBuild(architect, host, target, overrides);
+    expect(await files['main.js']).toMatch(/meaning\s*=\s*42/);
+    expect(await files['main.js']).not.toMatch(/meaning\s*=\s*10/);
   });
 
-  it(`allows file replacements with deprecated format`, (done) => {
+  it(`allows file replacements with deprecated format`, async () => {
     const overrides = {
       fileReplacements: [
         {
@@ -62,19 +60,12 @@ describe('Browser Builder file replacements', () => {
       ],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const fileName = join(outputPath, 'main.js');
-        expect(virtualFs.fileBufferToString(host.scopedSync().read(fileName)))
-          .toMatch(/meaning\s*=\s*42/);
-        expect(virtualFs.fileBufferToString(host.scopedSync().read(fileName)))
-          .not.toMatch(/meaning\s*=\s*10/);
-      }),
-    ).toPromise().then(done, done.fail);
+    const { files } = await browserBuild(architect, host, target, overrides);
+    expect(await files['main.js']).toMatch(/meaning\s*=\s*42/);
+    expect(await files['main.js']).not.toMatch(/meaning\s*=\s*10/);
   });
 
-  it(`fails compilation with missing 'replace' file`, (done) => {
+  it(`fails compilation with missing 'replace' file`, async () => {
     const overrides = {
       fileReplacements: [
         {
@@ -84,11 +75,15 @@ describe('Browser Builder file replacements', () => {
       ],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides)
-      .subscribe(undefined, () => done(), done.fail);
+    const run = await architect.scheduleTarget(target, overrides);
+    try {
+      await run.result;
+      expect('THE ABOVE LINE SHOULD THROW').toBe('');
+    } catch {}
+    await run.stop();
   });
 
-  it(`fails compilation with missing 'with' file`, (done) => {
+  it(`fails compilation with missing 'with' file`, async () => {
     const overrides = {
       fileReplacements: [
         {
@@ -98,11 +93,15 @@ describe('Browser Builder file replacements', () => {
       ],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides)
-      .subscribe(undefined, () => done(), done.fail);
+    const run = await architect.scheduleTarget(target, overrides);
+    try {
+      await run.result;
+      expect('THE ABOVE LINE SHOULD THROW').toBe('');
+    } catch {}
+    await run.stop();
   });
 
-  it('file replacements work with watch mode', (done) => {
+  it('file replacements work with watch mode', async () => {
     const overrides = {
       fileReplacements: [
         {
@@ -115,10 +114,14 @@ describe('Browser Builder file replacements', () => {
 
     let buildCount = 0;
     let phase = 1;
-    runTargetSpec(host, browserTargetSpec, overrides, 30000).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true, 'build should succeed')),
-      tap(() => {
-        const fileName = join(outputPath, 'main.js');
+
+    const run = await architect.scheduleTarget(target, overrides);
+    await run.output.pipe(
+      timeout(30000),
+      tap((result) => {
+        expect(result.success).toBe(true, 'build should succeed');
+
+        const fileName = normalize('dist/main.js');
         const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
         const has42 = /meaning\s*=\s*42/.test(content);
         buildCount++;
@@ -149,10 +152,11 @@ describe('Browser Builder file replacements', () => {
         }
       }),
       takeWhile(() => phase < 3),
-    ).toPromise().then(
-      () => done(),
-      () => done.fail(`stuck at phase ${phase} [builds: ${buildCount}]`),
-    );
+    ).toPromise().catch(() => {
+      throw new Error(`stuck at phase ${phase} [builds: ${buildCount}]`);
+    });
+
+    await run.stop();
   });
 
   it('file replacements work with forked type checker on watch mode', async () => {
@@ -179,7 +183,7 @@ describe('Browser Builder file replacements', () => {
 
     // Race between a timeout and the expected log entry.
     const stop$ = race<null | string>(
-      of(null).pipe(delay(DefaultTimeout * 2 / 3)),
+      of(null).pipe(delay(45000 * 2 / 3)),
       logger.pipe(
         filter(entry => entry.message.includes(expectedError)),
         map(entry => entry.message),
@@ -188,7 +192,8 @@ describe('Browser Builder file replacements', () => {
     );
 
     let errorAdded = false;
-    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout, logger).pipe(
+    const run = await architect.scheduleTarget(target, overrides, { logger });
+    run.output.pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true, 'build should succeed')),
       tap(() => {
         // Introduce a known type error to detect in the logger filter.
@@ -203,5 +208,6 @@ describe('Browser Builder file replacements', () => {
     const res = await stop$.toPromise();
     expect(res).not.toBe(null, 'Test timed out.');
     expect(res).not.toContain(unexpectedError);
+    await run.stop();
   });
 });

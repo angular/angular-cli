@@ -6,17 +6,21 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
+import { Architect } from '@angular-devkit/architect/src/index2';
 import { normalize } from '@angular-devkit/core';
-import { concatMap, tap } from 'rxjs/operators';
-import { browserTargetSpec, host, lazyModuleFiles, lazyModuleImport } from '../utils';
-
+import { browserBuild, createArchitect, host, lazyModuleFiles, lazyModuleImport } from '../utils';
 
 describe('Browser Builder output hashing', () => {
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  const target = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  it('updates hash as content changes', (done) => {
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
+
+  it('updates hash as content changes', async () => {
     const OUTPUT_RE = /(main|styles|lazy\.module)\.([a-z0-9]+)\.(chunk|bundle)\.(js|css)$/;
 
     function generateFileHashMap(): Map<string, string> {
@@ -60,127 +64,109 @@ describe('Browser Builder output hashing', () => {
 
     // We must do several builds instead of a single one in watch mode, so that the output
     // path is deleted on each run and only contains the most recent files.
-    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3).pipe(
-      tap(() => {
-        // Save the current hashes.
-        oldHashes = generateFileHashMap();
-        host.writeMultipleFiles(lazyModuleFiles);
-        host.writeMultipleFiles(lazyModuleImport);
-      }),
-      // Lazy chunk hash should have changed without modifying main bundle.
-      concatMap(() => runTargetSpec(host, browserTargetSpec, overrides)),
-      tap(() => {
-        newHashes = generateFileHashMap();
-        validateHashes(oldHashes, newHashes, []);
-        oldHashes = newHashes;
-        host.writeMultipleFiles({ 'src/styles.css': 'body { background: blue; }' });
-      }),
-      // Style hash should change.
-      concatMap(() => runTargetSpec(host, browserTargetSpec, overrides)),
-      tap(() => {
-        newHashes = generateFileHashMap();
-        validateHashes(oldHashes, newHashes, ['styles']);
-        oldHashes = newHashes;
-        host.writeMultipleFiles({ 'src/app/app.component.css': 'h1 { margin: 10px; }' });
-      }),
-      // Main hash should change, since inline styles go in the main bundle.
-      concatMap(() => runTargetSpec(host, browserTargetSpec, overrides)),
-      tap(() => {
-        newHashes = generateFileHashMap();
-        validateHashes(oldHashes, newHashes, ['main']);
-        oldHashes = newHashes;
-        host.appendToFile('src/app/lazy/lazy.module.ts', `console.log(1);`);
-      }),
-      // Lazy loaded bundle should change, and so should inline.
-      concatMap(() => runTargetSpec(host, browserTargetSpec, overrides)),
-      tap(() => {
-        newHashes = generateFileHashMap();
-        validateHashes(oldHashes, newHashes, ['lazy.module']);
-        oldHashes = newHashes;
-        host.appendToFile('src/main.ts', '');
-      }),
-      // Nothing should have changed.
-      concatMap(() => runTargetSpec(host, browserTargetSpec, overrides)),
-      tap(() => {
-        newHashes = generateFileHashMap();
-        validateHashes(oldHashes, newHashes, []);
-      }),
-    ).toPromise().then(done, done.fail);
+    await browserBuild(architect, host, target, overrides);
+
+    // Save the current hashes.
+    oldHashes = generateFileHashMap();
+    host.writeMultipleFiles(lazyModuleFiles);
+    host.writeMultipleFiles(lazyModuleImport);
+
+    await browserBuild(architect, host, target, overrides);
+    newHashes = generateFileHashMap();
+    validateHashes(oldHashes, newHashes, []);
+    oldHashes = newHashes;
+    host.writeMultipleFiles({ 'src/styles.css': 'body { background: blue; }' });
+
+    // Style hash should change.
+    await browserBuild(architect, host, target, overrides);
+    newHashes = generateFileHashMap();
+    validateHashes(oldHashes, newHashes, ['styles']);
+    oldHashes = newHashes;
+    host.writeMultipleFiles({ 'src/app/app.component.css': 'h1 { margin: 10px; }' });
+
+    // Main hash should change, since inline styles go in the main bundle.
+    await browserBuild(architect, host, target, overrides);
+    newHashes = generateFileHashMap();
+    validateHashes(oldHashes, newHashes, ['main']);
+    oldHashes = newHashes;
+    host.appendToFile('src/app/lazy/lazy.module.ts', `console.log(1);`);
+
+    // Lazy loaded bundle should change, and so should inline.
+    await browserBuild(architect, host, target, overrides);
+    newHashes = generateFileHashMap();
+    validateHashes(oldHashes, newHashes, ['lazy.module']);
+    oldHashes = newHashes;
+    host.appendToFile('src/main.ts', '');
+
+    // Nothing should have changed.
+    await browserBuild(architect, host, target, overrides);
+    newHashes = generateFileHashMap();
+    validateHashes(oldHashes, newHashes, []);
   });
 
-  it('supports options', (done) => {
+  it('supports options', async () => {
     host.writeMultipleFiles({ 'src/styles.css': `h1 { background: url('./spectrum.png')}` });
     host.writeMultipleFiles(lazyModuleFiles);
     host.writeMultipleFiles(lazyModuleImport);
 
-    const overrides = { outputHashing: 'all', extractCss: true };
-
     // We must do several builds instead of a single one in watch mode, so that the output
     // path is deleted on each run and only contains the most recent files.
     // 'all' should hash everything.
-    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
-      tap(() => {
-        expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.css/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeTruthy();
-      }),
-      // 'none' should hash nothing.
-      concatMap(() => runTargetSpec(host, browserTargetSpec,
-        { outputHashing: 'none', extractCss: true })),
-      tap(() => {
-        expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.css/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeFalsy();
-      }),
-      // 'media' should hash css resources only.
-      concatMap(() => runTargetSpec(host, browserTargetSpec,
-        { outputHashing: 'media', extractCss: true })),
-      tap(() => {
-        expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.css/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeTruthy();
-      }),
-      // 'bundles' should hash bundles only.
-      concatMap(() => runTargetSpec(host, browserTargetSpec,
-        { outputHashing: 'bundles', extractCss: true })),
-      tap(() => {
-        expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.js/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.css/)).toBeTruthy();
-        expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeFalsy();
-      }),
-    ).toPromise().then(done, done.fail);
+    await browserBuild(architect, host, target, { outputHashing: 'all', extractCss: true });
+
+    expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeTruthy();
+    expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeTruthy();
+    expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.js/)).toBeTruthy();
+    expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.js/)).toBeTruthy();
+    expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.css/)).toBeTruthy();
+    expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeTruthy();
+
+    // 'none' should hash nothing.
+    await browserBuild(architect, host, target, { outputHashing: 'none', extractCss: true });
+
+    expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeFalsy();
+    expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeFalsy();
+    expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.js/)).toBeFalsy();
+    expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.js/)).toBeFalsy();
+    expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.css/)).toBeFalsy();
+    expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeFalsy();
+
+    // 'media' should hash css resources only.
+    await browserBuild(architect, host, target, { outputHashing: 'media', extractCss: true });
+
+    expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeFalsy();
+    expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeFalsy();
+    expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.js/)).toBeFalsy();
+    expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.js/)).toBeFalsy();
+    expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.css/)).toBeFalsy();
+    expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeTruthy();
+
+    // 'bundles' should hash bundles only.
+    await browserBuild(architect, host, target, { outputHashing: 'bundles', extractCss: true });
+    expect(host.fileMatchExists('dist', /runtime\.[0-9a-f]{20}\.js/)).toBeTruthy();
+    expect(host.fileMatchExists('dist', /main\.[0-9a-f]{20}\.js/)).toBeTruthy();
+    expect(host.fileMatchExists('dist', /polyfills\.[0-9a-f]{20}\.js/)).toBeTruthy();
+    expect(host.fileMatchExists('dist', /vendor\.[0-9a-f]{20}\.js/)).toBeTruthy();
+    expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.css/)).toBeTruthy();
+    expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeFalsy();
   });
 
-  it('does not hash lazy styles', (done) => {
+  it('does not hash lazy styles', async () => {
     const overrides = {
       outputHashing: 'all',
       extractCss: true,
       styles: [{ input: 'src/styles.css', lazy: true }],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout).pipe(
-      tap(() => {
-        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.js.map/)).toBeFalsy();
-        expect(host.scopedSync().exists(normalize('dist/styles.css'))).toBe(true);
-        expect(host.scopedSync().exists(normalize('dist/styles.css.map'))).toBe(true);
-      }),
-    ).toPromise().then(done, done.fail);
+    await browserBuild(architect, host, target, overrides);
+
+    expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.js/)).toBeFalsy();
+    expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.js.map/)).toBeFalsy();
+    expect(host.scopedSync().exists(normalize('dist/styles.css'))).toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/styles.css.map'))).toBe(true);
   });
 
-  it('does not hash lazy styles when optimization is enabled', (done) => {
+  it('does not hash lazy styles when optimization is enabled', async () => {
     const overrides = {
       outputHashing: 'all',
       extractCss: true,
@@ -188,13 +174,10 @@ describe('Browser Builder output hashing', () => {
       styles: [{ input: 'src/styles.css', lazy: true }],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout).pipe(
-      tap(() => {
-        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.js/)).toBeFalsy();
-        expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.js.map/)).toBeFalsy();
-        expect(host.scopedSync().exists(normalize('dist/styles.css'))).toBe(true);
-        expect(host.scopedSync().exists(normalize('dist/styles.css.map'))).toBe(true);
-      }),
-    ).toPromise().then(done, done.fail);
+    await browserBuild(architect, host, target, overrides);
+    expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.js/)).toBeFalsy();
+    expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.js.map/)).toBeFalsy();
+    expect(host.scopedSync().exists(normalize('dist/styles.css'))).toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/styles.css.map'))).toBe(true);
   });
 });

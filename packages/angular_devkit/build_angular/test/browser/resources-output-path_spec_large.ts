@@ -6,17 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-big-function
-
-import { runTargetSpec } from '@angular-devkit/architect/testing';
-import { normalize, virtualFs } from '@angular-devkit/core';
-import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
+import { Architect } from '@angular-devkit/architect/src/index2';
+import { normalize } from '@angular-devkit/core';
+import { browserBuild, createArchitect, host } from '../utils';
 
 
 describe('Browser Builder styles resources output path', () => {
-  const stylesBundle = 'dist/styles.css';
-  const mainBundle = 'dist/main.js';
-
   const imgSvg = `
     <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
       <circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" />
@@ -41,10 +36,16 @@ describe('Browser Builder styles resources output path', () => {
     });
   }
 
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  const target = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  it(`supports resourcesOutputPath in resource urls`, (done) => {
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
+
+  it(`supports resourcesOutputPath in resource urls`, async () => {
     writeFiles();
     // Check base paths are correctly generated.
     const overrides = {
@@ -53,56 +54,45 @@ describe('Browser Builder styles resources output path', () => {
       resourcesOutputPath: 'out-assets',
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides, undefined, undefined).pipe(
-      tap(() => {
-        const styles = virtualFs.fileBufferToString(
-          host.scopedSync().read(normalize(stylesBundle)),
-        );
+    const { files } = await browserBuild(architect, host, target, overrides);
+    const styles = await files['styles.css'];
+    const main = await files['main.js'];
 
-        const main = virtualFs.fileBufferToString(host.scopedSync().read(normalize(mainBundle)));
-        expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
-        expect(styles).toContain(`url('out-assets/global-img-relative.png')`);
-        expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
-        expect(main).toContain(`url('out-assets/component-img-relative.png')`);
+    expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
+    expect(styles).toContain(`url('out-assets/global-img-relative.png')`);
+    expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
+    expect(main).toContain(`url('out-assets/component-img-relative.png')`);
 
-        expect(host.scopedSync()
-          .exists(normalize('dist/assets/global-img-absolute.svg'))).toBe(true);
-        expect(host.scopedSync()
-          .exists(normalize('dist/out-assets/global-img-relative.png'))).toBe(true);
-        expect(host.scopedSync()
-          .exists(normalize('dist/assets/component-img-absolute.svg'))).toBe(true);
-        expect(host.scopedSync()
-          .exists(normalize('dist/out-assets/component-img-relative.png'))).toBe(true);
-      }),
-    ).toPromise().then(done, done.fail);
+    expect(host.scopedSync()
+      .exists(normalize('dist/assets/global-img-absolute.svg'))).toBe(true);
+    expect(host.scopedSync()
+      .exists(normalize('dist/out-assets/global-img-relative.png'))).toBe(true);
+    expect(host.scopedSync()
+      .exists(normalize('dist/assets/component-img-absolute.svg'))).toBe(true);
+    expect(host.scopedSync()
+      .exists(normalize('dist/out-assets/component-img-relative.png'))).toBe(true);
   });
 
-  it(`supports blank resourcesOutputPath`, (done) => {
+  it(`supports blank resourcesOutputPath`, async () => {
     writeFiles();
 
     // Check base paths are correctly generated.
     const overrides = { aot: true, extractCss: true };
-    runTargetSpec(host, browserTargetSpec, overrides, undefined, undefined).pipe(
-      tap(() => {
-        const styles = virtualFs.fileBufferToString(
-          host.scopedSync().read(normalize(stylesBundle)),
-        );
+    const { files } = await browserBuild(architect, host, target, overrides);
+    const styles = await files['styles.css'];
+    const main = await files['main.js'];
 
-        const main = virtualFs.fileBufferToString(host.scopedSync().read(normalize(mainBundle)));
-        expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
-        expect(styles).toContain(`url('global-img-relative.png')`);
-        expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
-        expect(main).toContain(`url('component-img-relative.png')`);
-        expect(host.scopedSync().exists(normalize('dist/assets/global-img-absolute.svg')))
-          .toBe(true);
-        expect(host.scopedSync().exists(normalize('dist/global-img-relative.png')))
-          .toBe(true);
-        expect(host.scopedSync().exists(normalize('dist/assets/component-img-absolute.svg')))
-          .toBe(true);
-        expect(host.scopedSync().exists(normalize('dist/component-img-relative.png')))
-          .toBe(true);
-      }),
-    ).toPromise().then(done, done.fail);
+    expect(styles).toContain(`url('/assets/global-img-absolute.svg')`);
+    expect(styles).toContain(`url('global-img-relative.png')`);
+    expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
+    expect(main).toContain(`url('component-img-relative.png')`);
+    expect(host.scopedSync().exists(normalize('dist/assets/global-img-absolute.svg')))
+      .toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/global-img-relative.png')))
+      .toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/assets/component-img-absolute.svg')))
+      .toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/component-img-relative.png')))
+      .toBe(true);
   });
-
 });

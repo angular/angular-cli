@@ -5,88 +5,100 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
-import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
+import { Architect } from '@angular-devkit/architect/src/index2';
+import { logging } from '@angular-devkit/core';
+import { createArchitect, host } from '../utils';
 
 
 describe('Browser Builder bundle budgets', () => {
+  const targetSpec = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
 
-  it('accepts valid bundles', (done) => {
+  it('accepts valid bundles', async () => {
     const overrides = {
       optimization: true,
       budgets: [{ type: 'allScript', maximumError: '100mb' }],
     };
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
 
-    const logger = new TestLogger('rebuild-type-errors');
-
-    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2, logger).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(logger.includes('WARNING')).toBe(false)),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
+    const output = await run.result;
+    expect(output.success).toBe(true);
+    expect(logs.join()).not.toContain('WARNING');
+    await run.stop();
   });
 
-  it('shows errors', (done) => {
+  it('shows errors', async () => {
     const overrides = {
       optimization: true,
       budgets: [{ type: 'all', maximumError: '100b' }],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(false)),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+    const output = await run.result;
+    expect(output.success).toBe(false);
+    await run.stop();
   });
 
-  it('shows warnings', (done) => {
+  it('shows warnings', async () => {
     const overrides = {
       optimization: true,
       budgets: [{ type: 'all', minimumWarning: '100mb' }],
     };
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
 
-    const logger = new TestLogger('rebuild-type-errors');
-
-    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2, logger).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => expect(logger.includes('WARNING')).toBe(true)),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
+    const output = await run.result;
+    expect(output.success).toBe(true);
+    expect(logs.join()).toContain('WARNING');
+    await run.stop();
   });
 
   describe(`should ignore '.map' files`, () => {
-    it(`when 'intial' budget`, (done) => {
+    it(`when 'intial' budget`, async () => {
       const overrides = {
         optimization: true,
         budgets: [{ type: 'initial', maximumError: '1mb' }],
       };
 
-      runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
-        tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      ).toPromise().then(done, done.fail);
+      const run = await architect.scheduleTarget(targetSpec, overrides);
+      const output = await run.result;
+      expect(output.success).toBe(true);
+      await run.stop();
     });
 
-    it(`when 'all' budget`, (done) => {
+    it(`when 'all' budget`, async () => {
       const overrides = {
         optimization: true,
         budgets: [{ type: 'all', maximumError: '1mb' }],
       };
 
-      runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
-        tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      ).toPromise().then(done, done.fail);
+      const run = await architect.scheduleTarget(targetSpec, overrides);
+      const output = await run.result;
+      expect(output.success).toBe(true);
+      await run.stop();
     });
 
-    it(`when 'any' budget`, (done) => {
+    it(`when 'any' budget`, async () => {
       const overrides = {
         optimization: true,
         budgets: [{ type: 'any', maximumError: '1mb' }],
       };
 
-      runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
-        tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      ).toPromise().then(done, done.fail);
+      const run = await architect.scheduleTarget(targetSpec, overrides);
+      const output = await run.result;
+      expect(output.success).toBe(true);
+      await run.stop();
     });
   });
 });

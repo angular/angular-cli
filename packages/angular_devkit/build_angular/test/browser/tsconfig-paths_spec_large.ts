@@ -6,16 +6,23 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { Architect } from '@angular-devkit/architect/src/index2';
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
+import { browserBuild, browserTargetSpec, createArchitect, host } from '../utils';
 
 
 describe('Browser Builder tsconfig paths', () => {
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  const target = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  it('works', (done) => {
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
+
+  it('works', async () => {
     host.replaceInFile('src/app/app.module.ts', './app.component', '@root/app/app.component');
     host.replaceInFile('tsconfig.json', /"baseUrl": ".\/",/, `
       "baseUrl": "./",
@@ -26,12 +33,10 @@ describe('Browser Builder tsconfig paths', () => {
       },
     `);
 
-    runTargetSpec(host, browserTargetSpec).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).toPromise().then(done, done.fail);
+    await browserBuild(architect, host, target);
   });
 
-  it('works', (done) => {
+  it('works', async () => {
     host.writeMultipleFiles({
       'src/meaning-too.ts': 'export var meaning = 42;',
       'src/app/shared/meaning.ts': 'export var meaning = 42;',
@@ -68,8 +73,6 @@ describe('Browser Builder tsconfig paths', () => {
       console.log(meaning5)
     `);
 
-    runTargetSpec(host, browserTargetSpec).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).toPromise().then(done, done.fail);
+    await browserBuild(architect, host, target);
   });
 });
