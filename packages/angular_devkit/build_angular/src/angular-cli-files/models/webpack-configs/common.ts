@@ -280,6 +280,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       ? 'production'
       : 'development',
     devtool: false,
+    profile: buildOptions.statsJson,
     resolve: {
       extensions: ['.ts', '.tsx', '.mjs', '.js'],
       symlinks: !buildOptions.preserveSymlinks,
