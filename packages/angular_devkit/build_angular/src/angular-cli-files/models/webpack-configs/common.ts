@@ -75,7 +75,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     }
   }
 
-  if (buildOptions.profile) {
+  if (buildOptions.profile || process.env['NG_BUILD_PROFILING']) {
     extraPlugins.push(new debug.ProfilingPlugin({
       outputPath: path.resolve(root, 'chrome-profiler-events.json'),
     }));

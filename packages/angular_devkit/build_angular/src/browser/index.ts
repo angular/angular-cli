@@ -156,7 +156,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
 
     const webpackConfig = webpackMerge(webpackConfigs);
 
-    if (options.profile) {
+    if (options.profile || process.env['NG_BUILD_PROFILING']) {
       const smp = new SpeedMeasurePlugin({
         outputFormat: 'json',
         outputTarget: getSystemPath(join(root, 'speed-measure-plugin.json')),
