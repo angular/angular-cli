@@ -24,8 +24,8 @@ import {
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
-import { EMPTY, Observable, from, of } from 'rxjs';
-import { concatMap, last, map, switchMap } from 'rxjs/operators';
+import { Observable, from, of } from 'rxjs';
+import { concatMap, map, switchMap } from 'rxjs/operators';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import {
@@ -44,7 +44,12 @@ import {
   statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
-import { NormalizedBrowserBuilderSchema, defaultProgress, normalizeBrowserSchema } from '../utils';
+import {
+  NormalizedBrowserBuilderSchema,
+  defaultProgress,
+  deleteOutputDir,
+  normalizeBrowserSchema,
+} from '../utils';
 import { Schema as BrowserBuilderSchema } from './schema';
 
 import webpack = require('webpack');
@@ -55,19 +60,6 @@ const webpackMerge = require('webpack-merge');
 export type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
   outputPath: string;
 };
-
-
-function _deleteOutputDir(root: Path, outputPath: Path, host: virtualFs.Host) {
-  const resolvedOutputPath = resolve(root, outputPath);
-  if (resolvedOutputPath === root) {
-    throw new Error('Output path MUST not be project root directory!');
-  }
-
-  return host.exists(resolvedOutputPath).pipe(
-    concatMap(exists => exists ? host.delete(resolvedOutputPath) : EMPTY),
-    last(null, null),
-  );
-}
 
 
 export function createBrowserLoggingCallback(
@@ -246,7 +238,7 @@ export function buildWebpackBrowser(
     }),
     switchMap(({workspace, config}) => {
       if (options.deleteOutputPath) {
-        return _deleteOutputDir(
+        return deleteOutputDir(
           normalize(context.workspaceRoot),
           normalize(options.outputPath),
           host,
