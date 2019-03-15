@@ -120,8 +120,8 @@ describe('Browser Builder scripts array', () => {
 
   it('chunk in entry', async () => {
     host.writeMultipleFiles(scripts);
-
     const logger = new TestLogger('build-script-chunk-entry');
+
     await browserBuild(
       architect,
       host,
