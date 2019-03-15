@@ -6,76 +6,80 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { runTargetSpec } from '@angular-devkit/architect/testing';
+import { Architect } from '@angular-devkit/architect/src/index2';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { take, tap } from 'rxjs/operators';
-import { BuildWebpackServerSchema } from '../../src/server/schema';
-import { host } from '../utils';
+import { BrowserBuilderOutput } from '../../src/browser/index2';
+import { Schema as BuildWebpackServerSchema } from '../../src/server/schema';
+import { createArchitect, host } from '../utils';
 
 
 describe('Server Builder', () => {
+  const target = { project: 'app', target: 'server' };
+  let architect: Architect;
+
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
+
   const outputPath = normalize('dist-server');
 
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  it('works (base)', async () => {
+    const run = await architect.scheduleTarget(target);
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
 
-  it('works (base)', (done) => {
-    const overrides = { };
+    const fileName = join(outputPath, 'main.js');
+    const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+    expect(content).toMatch(/AppServerModuleNgFactory/);
 
-    runTargetSpec(host, { project: 'app', target: 'server' }, overrides).pipe(
-      tap((buildEvent) => {
-        expect(buildEvent.success).toBe(true);
-
-        const fileName = join(outputPath, 'main.js');
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toMatch(/AppServerModuleNgFactory/);
-      }),
-    ).toPromise().then(done, done.fail);
+    await run.stop();
   });
 
-  it('supports sourcemaps', (done) => {
+  it('supports sourcemaps', async () => {
     const overrides = { sourceMap: true };
 
-    runTargetSpec(host, { project: 'app', target: 'server' }, overrides).pipe(
-      tap((buildEvent) => {
-        expect(buildEvent.success).toBe(true);
+    const run = await architect.scheduleTarget(target, overrides);
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
 
-        const fileName = join(outputPath, 'main.js');
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toMatch(/AppServerModuleNgFactory/);
-        expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBeTruthy();
-      }),
-    ).toPromise().then(done, done.fail);
+    const fileName = join(outputPath, 'main.js');
+    const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+    expect(content).toMatch(/AppServerModuleNgFactory/);
+    expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBeTruthy();
+
+    await run.stop();
   });
 
-  it('supports scripts only sourcemaps', (done) => {
-    const overrides: Partial<BuildWebpackServerSchema> = {
-      sourceMap: {
-        styles: false,
-        scripts: true,
-      },
-    };
-
+  it('supports scripts only sourcemaps', async () => {
     host.writeMultipleFiles({
       'src/app/app.component.css': `p { color: red; }`,
     });
 
-    runTargetSpec(host, { project: 'app', target: 'server' }, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBe(true);
+    const run = await architect.scheduleTarget(target, {
+      sourceMap: {
+        styles: false,
+        scripts: true,
+      },
+    });
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
 
-        const scriptContent = virtualFs.fileBufferToString(
-          host.scopedSync().read(join(outputPath, 'main.js')),
-        );
-        expect(scriptContent).toContain('sourceMappingURL=main.js.map');
-        expect(scriptContent).not.toContain('sourceMappingURL=data:application/json');
-      }),
-    ).toPromise().then(done, done.fail);
+    expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBe(true);
+
+    const scriptContent = virtualFs.fileBufferToString(
+      host.scopedSync().read(join(outputPath, 'main.js')),
+    );
+    expect(scriptContent).toContain('sourceMappingURL=main.js.map');
+    expect(scriptContent).not.toContain('sourceMappingURL=data:application/json');
+
+    await run.stop();
   });
-
-  it('supports component styles sourcemaps', (done) => {
-    const overrides: Partial<BuildWebpackServerSchema> = {
+  //
+  it('supports component styles sourcemaps', async () => {
+    const overrides = {
       sourceMap: {
         styles: true,
         scripts: true,
@@ -86,24 +90,27 @@ describe('Server Builder', () => {
       'src/app/app.component.css': `p { color: red; }`,
     });
 
-    runTargetSpec(host, { project: 'app', target: 'server' }, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBe(true);
+    const run = await architect.scheduleTarget(target, overrides);
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
 
-        const scriptContent = virtualFs.fileBufferToString(
-          host.scopedSync().read(join(outputPath, 'main.js')),
-        );
-        expect(scriptContent).toContain('sourceMappingURL=main.js.map');
-        expect(scriptContent).toContain('sourceMappingURL=data:application/json');
-      }),
-    ).toPromise().then(done, done.fail);
+    expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBe(true);
+
+    const scriptContent = virtualFs.fileBufferToString(
+      host.scopedSync().read(join(outputPath, 'main.js')),
+    );
+    expect(scriptContent).toContain('sourceMappingURL=main.js.map');
+    expect(scriptContent).toContain('sourceMappingURL=data:application/json');
+
+    await run.stop();
   });
 
-  it('runs watch mode', (done) => {
+  it('runs watch mode', async () => {
     const overrides = { watch: true };
 
-    runTargetSpec(host, { project: 'app', target: 'server' }, overrides).pipe(
+    const run = await architect.scheduleTarget(target, overrides);
+
+    await run.output.pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(true);
 
@@ -112,6 +119,8 @@ describe('Server Builder', () => {
         expect(content).toMatch(/AppServerModuleNgFactory/);
       }),
       take(1),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise();
+
+    await run.stop();
   });
 });
