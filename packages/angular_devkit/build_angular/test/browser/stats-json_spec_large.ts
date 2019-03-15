@@ -23,4 +23,11 @@ describe('Browser Builder stats json', () => {
     const { files } = await browserBuild(architect, host, target, { statsJson: true });
     expect('stats.json' in files).toBe(true);
   });
+
+  it('works with profile flag', async () => {
+    const { files } = await browserBuild(architect, host, target, { statsJson: true });
+    expect('stats.json' in files).toBe(true);
+    const stats = await files['stats.json'];
+    expect(stats).toMatch(/profile.+building/);
+  });
 });
