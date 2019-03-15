@@ -250,6 +250,11 @@ export default function (args: ParsedArgs, logger: logging.Logger) {
         }));
 
       logger.info(`Found ${tests.length} spec files, out of ${allTests.length}.`);
+
+      if (tests.length === 0) {
+        logger.info('No test to run, exiting... You might want to rerun with "--full".');
+        process.exit('CI' in process.env ? 1 : 0);
+      }
     }
   }
 
