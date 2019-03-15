@@ -30,8 +30,12 @@ import {
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { getBrowserLoggingCb } from '../browser';
-import { defaultProgress, normalizeWebpackServerSchema } from '../utils';
-import { BuildWebpackServerSchema, NormalizedServerBuilderServerSchema } from './schema';
+import {
+  NormalizedWebpackServerBuilderSchema,
+  defaultProgress,
+  normalizeWebpackServerSchema,
+} from '../utils';
+import { Schema as BuildWebpackServerSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
 
@@ -61,14 +65,14 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
       concatMap(() => {
         const webpackConfig = this.buildWebpackConfig(root, projectRoot, host, options);
 
-        return webpackBuilder.runWebpack(webpackConfig, getBrowserLoggingCb(options.verbose));
+        return webpackBuilder.runWebpack(webpackConfig, getBrowserLoggingCb(!!options.verbose));
       }),
     );
   }
 
   buildWebpackConfig(root: Path, projectRoot: Path,
                      _host: virtualFs.Host<Stats>,
-                     options: NormalizedServerBuilderServerSchema) {
+                     options: NormalizedWebpackServerBuilderSchema) {
     let wco: WebpackConfigOptions;
 
     // TODO: make target defaults into configurations instead

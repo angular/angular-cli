@@ -17,7 +17,7 @@ import { concatMap, map, switchMap } from 'rxjs/operators';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
-import { BuildWebpackServerSchema } from '../server/schema';
+import { Schema as BuildWebpackServerSchema } from '../server/schema';
 import { BuildWebpackAppShellSchema } from './schema';
 
 

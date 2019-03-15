@@ -10,7 +10,7 @@
 
 import { Path, virtualFs } from '@angular-devkit/core';
 import { OptimizationClass, SourceMapClass } from '../browser/schema';
-import { BuildWebpackServerSchema } from '../server/schema';
+import { Schema as BuildWebpackServerSchema } from '../server/schema';
 import {
   NormalizedFileReplacement,
   normalizeFileReplacements,
@@ -36,7 +36,7 @@ export function normalizeWebpackServerSchema(
 ): NormalizedWebpackServerBuilderSchema {
   const syncHost = new virtualFs.SyncDelegateHost(host);
 
-  const normalizedSourceMapOptions = normalizeSourceMaps(options.sourceMap);
+  const normalizedSourceMapOptions = normalizeSourceMaps(options.sourceMap || {});
   normalizedSourceMapOptions.vendor =
     normalizedSourceMapOptions.vendor || options.vendorSourceMap || false;
 
@@ -44,7 +44,7 @@ export function normalizeWebpackServerSchema(
 
   return {
     ...options,
-    fileReplacements: normalizeFileReplacements(options.fileReplacements, syncHost, root),
+    fileReplacements: normalizeFileReplacements(options.fileReplacements || [], syncHost, root),
     optimization: normalizeOptimization(optimization),
     sourceMap: normalizedSourceMapOptions,
   };
