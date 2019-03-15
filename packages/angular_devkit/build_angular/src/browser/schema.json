@@ -300,7 +300,8 @@
     "profile": {
       "type": "boolean",
       "description": "Output profile events for Chrome profiler.",
-      "default": false
+      "default": false,
+      "x-deprecated": "Use \"NG_BUILD_PROFILING\" environment variable instead."
     },
     "es5BrowserSupport": {
       "description": "Enables conditionally loaded ES2015 polyfills.",
