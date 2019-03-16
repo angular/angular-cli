@@ -567,3 +567,54 @@ export function isImported(source: ts.SourceFile,
 
   return matchingNodes.length > 0;
 }
+
+/*
+ * Returns the RouterModule declaration from NgModule metadata, if any.
+ */
+export function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression | undefined {
+  const result = getDecoratorMetadata(source, 'NgModule', '@angular/core') as ts.Node[];
+  const node = result[0] as ts.ObjectLiteralExpression;
+  const matchingProperties = getMetadataField(source, node, 'imports');
+  const assignment = matchingProperties[0] as ts.PropertyAssignment;
+
+  if (assignment.initializer.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
+    return;
+  }
+
+  const arrLiteral = assignment.initializer as ts.ArrayLiteralExpression;
+
+  return arrLiteral.elements
+    .filter(el => el.kind === ts.SyntaxKind.CallExpression)
+    .find(el => (el as ts.Identifier).getText(source).startsWith('RouterModule'));
+}
+
+export function addRouteDeclarationToModule(
+  source: ts.SourceFile,
+  fileToAdd: string,
+  routeLiteral: string
+): Change {
+  const routerModuleExpr = getRouterModuleDeclaration(source);
+  if (!routerModuleExpr) {
+    throw new Error('TBD');
+  }
+  const scopeConfigMethodArgs = (routerModuleExpr as ts.CallExpression).arguments;
+
+  if (scopeConfigMethodArgs.length > 0) {
+    if (scopeConfigMethodArgs[0].kind === ts.SyntaxKind.ArrayLiteralExpression) {
+      const routesExpr = scopeConfigMethodArgs[0] as ts.ArrayLiteralExpression;
+
+      // Works only if there are occurrences
+      return insertAfterLastOccurrence(
+        routesExpr.elements as any,
+        routeLiteral,
+        fileToAdd,
+        routesExpr.elements.pos,
+        ts.SyntaxKind.ObjectLiteralExpression
+      );
+    } else {
+      // const routesVar = scopeConfigMethodArgs[0].getText();
+      // Run AST search for this var
+    }
+  }
+  return {} as any;
+}
