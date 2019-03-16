@@ -116,7 +116,7 @@ jobs:
       - run:
           name: Don't run expensive e2e tests for forks other than renovate-bot and angular
           command: >
-            if [[ "$CIRCLE_PROJECT_USERNAME" != "renovate-bot" ]] &&
+            if [[ "$CIRCLE_PR_USERNAME" != "renovate-bot" ]] &&
                [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
               circleci step halt
             fi
@@ -133,7 +133,7 @@ jobs:
       - run:
           name: Don't run expensive e2e tests for forks other than renovate-bot and angular
           command: >
-            if [[ "$CIRCLE_PROJECT_USERNAME" != "renovate-bot" ]] &&
+            if [[ "$CIRCLE_PR_USERNAME" != "renovate-bot" ]] &&
                [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
               circleci step halt
             fi
