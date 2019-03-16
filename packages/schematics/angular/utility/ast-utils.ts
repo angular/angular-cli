@@ -594,3 +594,34 @@ export function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression
     .filter(el => el.kind === ts.SyntaxKind.CallExpression)
     .find(el => (el as ts.Identifier).getText(source).startsWith('RouterModule'));
 }
+
+export function addRouteDeclarationToModule(
+  source: ts.SourceFile,
+  fileToAdd: string,
+  routeLiteral: string
+): Change {
+  const routerModuleExpr = getRouterModuleDeclaration(source);
+  if (!routerModuleExpr) {
+    throw new Error('TBD');
+  }
+  const scopeConfigMethodArgs = (routerModuleExpr as ts.CallExpression).arguments;
+
+  if (scopeConfigMethodArgs.length > 0) {
+    if (scopeConfigMethodArgs[0].kind === ts.SyntaxKind.ArrayLiteralExpression) {
+      const routesExpr = scopeConfigMethodArgs[0] as ts.ArrayLiteralExpression;
+
+      // Works only if there are occurrences
+      return insertAfterLastOccurrence(
+        routesExpr.elements as any,
+        routeLiteral,
+        fileToAdd,
+        routesExpr.elements.pos,
+        ts.SyntaxKind.ObjectLiteralExpression
+      );
+    } else {
+      // const routesVar = scopeConfigMethodArgs[0].getText();
+      // Run AST search for this var
+    }
+  }
+  return {} as any;
+}
