@@ -15,6 +15,7 @@ import {
   addDeclarationToModule,
   addExportToModule,
   addProviderToModule,
+  addRouteDeclarationToModule,
   addSymbolToNgModuleMetadata,
   findNodes,
   insertAfterLastOccurrence,
@@ -269,6 +270,242 @@ describe('ast utils', () => {
       const output = applyChanges(filePath, fileContent, [change]);
 
       expect(output).toMatch(/const arr = \['bar'\];/);
+    });
+  });
+
+  // tslint:disable-next-line:no-big-function
+  describe('addRouteDeclarationToModule', () => {
+    it('should throw an error when there is no router module', () => {
+      const moduleContent = `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { AppComponent } from './app.component';
+
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [BrowserModule],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+      `;
+
+      const source = getTsSource(modulePath, moduleContent);
+      const change = () => addRouteDeclarationToModule(source, './src/app', '');
+      expect(change).toThrowError(`Couldn't find a route declaration in ./src/app.`);
+    });
+
+    it(`should throw an error when router module doesn't have arguments`, () => {
+      const moduleContent = `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { AppComponent } from './app.component';
+
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule,
+            RouterModule.forRoot()
+          ],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+      `;
+
+      const source = getTsSource(modulePath, moduleContent);
+      const change = () => addRouteDeclarationToModule(source, './src/app', '');
+      expect(change).toThrowError(
+        `The router module method doesn't have arguments at line 11 in ./src/app`,
+      );
+    });
+
+    it(`should throw an error when the provided var (array) to router module doesn't exist`, () => {
+      const moduleContent = `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { AppComponent } from './app.component';
+
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule,
+            RouterModule.forRoot(routes)
+          ],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+      `;
+
+      const source = getTsSource(modulePath, moduleContent);
+      const change = () => addRouteDeclarationToModule(source, './src/app', '');
+      expect(change).toThrowError(
+        // tslint:disable-next-line:max-line-length
+        `No route declaration array was found that corresponds to router module at line 11 in ./src/app`,
+      );
+    });
+
+    // tslint:disable-next-line:max-line-length
+    it(`should throw an error, if the provided first argument of router module is not an identifier`, () => {
+      const moduleContent = `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { AppComponent } from './app.component';
+
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule,
+            RouterModule.forRoot(42)
+          ],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+      `;
+
+      const source = getTsSource(modulePath, moduleContent);
+      const change = () => addRouteDeclarationToModule(source, './src/app', '');
+      expect(change).toThrowError(
+        // tslint:disable-next-line:max-line-length
+        `No route declaration array was found that corresponds to router module at line 11 in ./src/app`,
+      );
+    });
+
+    it('should add a route to the routes array', () => {
+      const moduleContent = `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { AppComponent } from './app.component';
+
+        const routes = [];
+
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule,
+            RouterModule.forRoot(routes)
+          ],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+      `;
+
+      const source = getTsSource(modulePath, moduleContent);
+      const changes = addRouteDeclarationToModule(
+        source,
+        './src/app', `{ path: 'foo', component: FooComponent }`,
+      );
+      const output = applyChanges(modulePath, moduleContent, [changes]);
+
+      expect(output).toMatch(/const routes = \[{ path: 'foo', component: FooComponent }\]/);
+    });
+
+    it('should add a route to the routes array when there are multiple declarations', () => {
+      const moduleContent = `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { AppComponent } from './app.component';
+
+        const routes = [
+          { path: 'foo', component: FooComponent }
+        ];
+
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule,
+            RouterModule.forRoot(routes)
+          ],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+      `;
+
+      const source = getTsSource(modulePath, moduleContent);
+      const changes = addRouteDeclarationToModule(
+        source,
+        './src/app', `{ path: 'bar', component: BarComponent }`,
+      );
+      const output = applyChanges(modulePath, moduleContent, [changes]);
+
+      expect(output).toMatch(
+        // tslint:disable-next-line:max-line-length
+        /const routes = \[\r?\n?\s*{ path: 'foo', component: FooComponent },\r?\n?\s*{ path: 'bar', component: BarComponent }\r?\n?\s*\]/,
+      );
+    });
+
+    it('should add a route to the routes argument of RouteModule', () => {
+      const moduleContent = `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { AppComponent } from './app.component';
+
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule,
+            RouterModule.forRoot([])
+          ],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+      `;
+
+      const source = getTsSource(modulePath, moduleContent);
+      const changes = addRouteDeclarationToModule(
+        source,
+        './src/app', `{ path: 'foo', component: FooComponent }`,
+      );
+      const output = applyChanges(modulePath, moduleContent, [changes]);
+
+      expect(output).toMatch(
+        /RouterModule\.forRoot\(\[{ path: 'foo', component: FooComponent }\]\)/,
+      );
+    });
+
+    // tslint:disable-next-line:max-line-length
+    it('should add a route to the routes argument of RouterModule when there are multiple declarations', () => {
+      const moduleContent = `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { AppComponent } from './app.component';
+
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule,
+            RouterModule.forRoot([{ path: 'foo', component: FooComponent }])
+          ],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+      `;
+
+      const source = getTsSource(modulePath, moduleContent);
+      const changes = addRouteDeclarationToModule(
+        source,
+        './src/app', `{ path: 'bar', component: BarComponent }`,
+      );
+      const output = applyChanges(modulePath, moduleContent, [changes]);
+
+      expect(output).toMatch(
+        // tslint:disable-next-line:max-line-length
+        /RouterModule\.forRoot\(\[\r?\n?\s*{ path: 'foo', component: FooComponent },\r?\n?\s*{ path: 'bar', component: BarComponent }\r?\n?\s*\]\)/,
+      );
     });
   });
 });
