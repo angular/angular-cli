@@ -20,14 +20,15 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { addImportToModule } from '../utility/ast-utils';
-import { InsertChange } from '../utility/change';
-import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
+import { addImportToModule, addRouteDeclarationToModule } from '../utility/ast-utils';
+import { Change, InsertChange } from '../utility/change';
+import { buildRelativePath, findModuleFromOptions, ModuleOptions } from '../utility/find-module';
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { buildDefaultPath, getProject } from '../utility/project';
 import { Schema as ModuleOptions } from './schema';
 
+let isThereRoutingModule: boolean;
 
 function addDeclarationToNgModule(options: ModuleOptions): Rule {
   return (host: Tree) => {
@@ -66,6 +67,29 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
 
     return host;
   };
+}
+
+function addRouteDeclaration(host: Tree, modulePath: string, routePath: string): Change {
+  isThereRoutingModule = true;
+  const routingModulePath = modulePath + '-routing';
+
+  let text = host.read(routingModulePath);
+  if (!text) {
+    isThereRoutingModule = false;
+    text = host.read(modulePath);
+  }
+  if (!text) {
+    throw new Error('Could not find a route declaration.');
+  }
+
+  const path = isThereRoutingModule ? routingModulePath : modulePath;
+  const sourceText = text.toString('utf-8');
+
+  return addRouteDeclarationToModule(
+    ts.createSourceFile(path, sourceText, ts.ScriptTarget.Latest, true),
+    isThereRoutingModule ? routingModulePath : modulePath,
+    `{ path: ${routePath} }`
+  );
 }
 
 export default function (options: ModuleOptions): Rule {
