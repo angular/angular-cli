@@ -39,6 +39,10 @@
       "description": "The scope for the new routing module.",
       "default": "Child"
     },
+    "route": {
+      "type": "string",
+      "description": "Creates lazy loaded routing module. Requires --module option."
+    },
     "flat": {
       "type": "boolean",
       "description": "When true, creates the new files at the top level of the current project root. ",

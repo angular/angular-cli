@@ -344,6 +344,20 @@ export function getFirstNgModuleName(source: ts.SourceFile): string|undefined {
   return moduleClass.name.text;
 }
 
+export function getMetadataField(
+  node: ts.ObjectLiteralExpression,
+  metadataField: string,
+): ts.ObjectLiteralElement[] {
+  return node.properties
+    .filter(prop => ts.isPropertyAssignment(prop))
+    // Filter out every fields that's not "metadataField". Also handles string literals
+    // (but not expressions).
+    .filter(({ name }: ts.PropertyAssignment) => {
+      return (ts.isIdentifier(name) || ts.isStringLiteral(name))
+        && name.getText() === metadataField;
+    });
+}
+
 export function addSymbolToNgModuleMetadata(
   source: ts.SourceFile,
   ngModulePath: string,
@@ -360,22 +374,10 @@ export function addSymbolToNgModuleMetadata(
   }
 
   // Get all the children property assignment of object literals.
-  const matchingProperties: ts.ObjectLiteralElement[] =
-    (node as ts.ObjectLiteralExpression).properties
-    .filter(prop => prop.kind == ts.SyntaxKind.PropertyAssignment)
-    // Filter out every fields that's not "metadataField". Also handles string literals
-    // (but not expressions).
-    .filter((prop: ts.PropertyAssignment) => {
-      const name = prop.name;
-      switch (name.kind) {
-        case ts.SyntaxKind.Identifier:
-          return (name as ts.Identifier).getText(source) == metadataField;
-        case ts.SyntaxKind.StringLiteral:
-          return (name as ts.StringLiteral).text == metadataField;
-      }
-
-      return false;
-    });
+  const matchingProperties = getMetadataField(
+    node as ts.ObjectLiteralExpression,
+    metadataField,
+  );
 
   // Get the last node of the array literal.
   if (!matchingProperties) {
@@ -566,4 +568,97 @@ export function isImported(source: ts.SourceFile,
     });
 
   return matchingNodes.length > 0;
+}
+
+/**
+ * Returns the RouterModule declaration from NgModule metadata, if any.
+ */
+export function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression | undefined {
+  const result = getDecoratorMetadata(source, 'NgModule', '@angular/core') as ts.Node[];
+  const node = result[0] as ts.ObjectLiteralExpression;
+  const matchingProperties = getMetadataField(node, 'imports');
+
+  if (!matchingProperties) {
+    return;
+  }
+
+  const assignment = matchingProperties[0] as ts.PropertyAssignment;
+
+  if (assignment.initializer.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
+    return;
+  }
+
+  const arrLiteral = assignment.initializer as ts.ArrayLiteralExpression;
+
+  return arrLiteral.elements
+    .filter(el => el.kind === ts.SyntaxKind.CallExpression)
+    .find(el => (el as ts.Identifier).getText().startsWith('RouterModule'));
+}
+
+/**
+ * Adds a new route declaration to a router module (i.e. has a RouterModule declaration)
+ */
+export function addRouteDeclarationToModule(
+  source: ts.SourceFile,
+  fileToAdd: string,
+  routeLiteral: string,
+): Change {
+  const routerModuleExpr = getRouterModuleDeclaration(source);
+  if (!routerModuleExpr) {
+    throw new Error(`Couldn't find a route declaration in ${fileToAdd}.`);
+  }
+  const scopeConfigMethodArgs = (routerModuleExpr as ts.CallExpression).arguments;
+  if (!scopeConfigMethodArgs.length) {
+    const { line } = source.getLineAndCharacterOfPosition(routerModuleExpr.getStart());
+    throw new Error(
+      `The router module method doesn't have arguments ` +
+      `at line ${line} in ${fileToAdd}`,
+    );
+  }
+
+  let routesArr: ts.ArrayLiteralExpression | undefined;
+  const routesArg = scopeConfigMethodArgs[0];
+
+  // Check if the route declarations array is
+  // an inlined argument of RouterModule or a standalone variable
+  if (routesArg.kind === ts.SyntaxKind.ArrayLiteralExpression) {
+    routesArr = routesArg as ts.ArrayLiteralExpression;
+  } else {
+    const routesVarName = routesArg.getText();
+    let routesVar;
+    if (routesArg.kind === ts.SyntaxKind.Identifier) {
+      routesVar = source.statements
+        .filter((s: ts.Statement) => s.kind === ts.SyntaxKind.VariableStatement)
+        .find((v: ts.VariableStatement) => {
+          return v.declarationList.declarations[0].name.getText() === routesVarName;
+        }) as ts.VariableStatement | undefined;
+    }
+
+    if (!routesVar) {
+      const { line } = source.getLineAndCharacterOfPosition(routesArg.getStart());
+      throw new Error(
+        `No route declaration array was found that corresponds ` +
+        `to router module at line ${line} in ${fileToAdd}`,
+      );
+    }
+    const arrExpr = findNodes(routesVar, ts.SyntaxKind.ArrayLiteralExpression).pop();
+    routesArr = arrExpr as ts.ArrayLiteralExpression;
+  }
+
+  const occurencesCount = routesArr.elements.length;
+  const text = routesArr.getFullText(source);
+
+  let route: string = routeLiteral;
+  if (occurencesCount > 0) {
+    const identation = text.match(/\r?\n(\r?)\s*/) || [];
+    route = `,${identation[0] || ' '}${routeLiteral}`;
+  }
+
+  return insertAfterLastOccurrence(
+    routesArr.elements as unknown as ts.Node[],
+    route,
+    fileToAdd,
+    routesArr.elements.pos,
+    ts.SyntaxKind.ObjectLiteralExpression,
+  );
 }
