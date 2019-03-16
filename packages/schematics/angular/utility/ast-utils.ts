@@ -191,10 +191,7 @@ export function insertAfterLastOccurrence(nodes: ts.Node[],
                                           syntaxKind?: ts.SyntaxKind): Change {
   // sort() has a side effect, so make a copy so that we won't overwrite the parent's object.
   let lastItem = [...nodes].sort(nodesByPosition).pop();
-  if (!lastItem) {
-    throw new Error();
-  }
-  if (syntaxKind) {
+  if (syntaxKind && lastItem) {
     lastItem = findNodes(lastItem, syntaxKind).sort(nodesByPosition).pop();
   }
   if (!lastItem && fallbackPos == undefined) {
@@ -614,11 +611,12 @@ export function addRouteDeclarationToModule(
   if (scopeConfigMethodArgs.length > 0) {
     if (scopeConfigMethodArgs[0].kind === ts.SyntaxKind.ArrayLiteralExpression) {
       const routesExpr = scopeConfigMethodArgs[0] as ts.ArrayLiteralExpression;
+      const occurencesCount = routesExpr.elements.length;
+      const route = occurencesCount > 0 ? `,\n${routeLiteral}` : routeLiteral;
 
-      // Works only if there are occurrences
       return insertAfterLastOccurrence(
-        routesExpr.elements as any,
-        routeLiteral,
+        routesExpr.elements as any as ts.Node[],
+        route,
         fileToAdd,
         routesExpr.elements.pos,
         ts.SyntaxKind.ObjectLiteralExpression
