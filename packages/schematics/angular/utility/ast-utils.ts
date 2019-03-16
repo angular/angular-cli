@@ -597,29 +597,45 @@ export function addRouteDeclarationToModule(
 ): Change {
   const routerModuleExpr = getRouterModuleDeclaration(source);
   if (!routerModuleExpr) {
-    throw new Error('TBD');
+    throw new Error(`Couldn't find a route declaration`);
   }
   const scopeConfigMethodArgs = (routerModuleExpr as ts.CallExpression).arguments;
-
-  if (scopeConfigMethodArgs.length > 0) {
-    const routesArg = scopeConfigMethodArgs[0];
-
-    if (routesArg.kind === ts.SyntaxKind.ArrayLiteralExpression) {
-      const routesArr = routesArg as ts.ArrayLiteralExpression;
-      const occurencesCount = routesArr.elements.length;
-      const route = occurencesCount > 0 ? `,\n${routeLiteral}` : routeLiteral;
-
-      return insertAfterLastOccurrence(
-        routesArr.elements as any as ts.Node[],
-        route,
-        fileToAdd,
-        routesArr.elements.pos,
-        ts.SyntaxKind.ObjectLiteralExpression
-      );
-    } else {
-      // const routesVar = scopeConfigMethodArgs[0].getText();
-      // Run AST search for this var
-    }
+  if (!scopeConfigMethodArgs.length) {
+    throw new Error(`The router module method doesn't have arguments`);
   }
-  return {} as any;
+
+  let routesArr: ts.ArrayLiteralExpression | undefined;
+  const routesArg = scopeConfigMethodArgs[0];
+
+  if (routesArg.kind === ts.SyntaxKind.ArrayLiteralExpression) {
+    routesArr = routesArg as ts.ArrayLiteralExpression;
+  } else {
+    const routesVarName = routesArg.getText();
+    const routesVar = source.statements
+      .filter((s: ts.Statement) => s.kind === ts.SyntaxKind.VariableStatement)
+      .find((v: ts.VariableStatement) => {
+        return v.declarationList.declarations[0].name.getText() === routesVarName
+      }) as ts.VariableStatement | undefined;
+
+    if (!routesVar) {
+      throw new Error(`The route declaration variable "${routesVarName}" is used but not defined`);
+    }
+    routesArr =
+      (findNodes(routesVar, ts.SyntaxKind.ArrayLiteralExpression) || {})[0] as ts.ArrayLiteralExpression | undefined;
+  }
+
+  if (!routesArr) {
+    throw new Error(`Couldn't find a route declaration array.`);
+  }
+
+  const occurencesCount = routesArr.elements.length;
+  const route = occurencesCount > 0 ? `,\n${routeLiteral}` : routeLiteral;
+
+  return insertAfterLastOccurrence(
+    routesArr.elements as any as ts.Node[],
+    route,
+    fileToAdd,
+    routesArr.elements.pos,
+    ts.SyntaxKind.ObjectLiteralExpression
+  );
 }
