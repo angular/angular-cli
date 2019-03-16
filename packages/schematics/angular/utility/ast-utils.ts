@@ -609,16 +609,18 @@ export function addRouteDeclarationToModule(
   const scopeConfigMethodArgs = (routerModuleExpr as ts.CallExpression).arguments;
 
   if (scopeConfigMethodArgs.length > 0) {
-    if (scopeConfigMethodArgs[0].kind === ts.SyntaxKind.ArrayLiteralExpression) {
-      const routesExpr = scopeConfigMethodArgs[0] as ts.ArrayLiteralExpression;
-      const occurencesCount = routesExpr.elements.length;
+    const routesArg = scopeConfigMethodArgs[0];
+
+    if (routesArg.kind === ts.SyntaxKind.ArrayLiteralExpression) {
+      const routesArr = routesArg as ts.ArrayLiteralExpression;
+      const occurencesCount = routesArr.elements.length;
       const route = occurencesCount > 0 ? `,\n${routeLiteral}` : routeLiteral;
 
       return insertAfterLastOccurrence(
-        routesExpr.elements as any as ts.Node[],
+        routesArr.elements as any as ts.Node[],
         route,
         fileToAdd,
-        routesExpr.elements.pos,
+        routesArr.elements.pos,
         ts.SyntaxKind.ObjectLiteralExpression
       );
     } else {
