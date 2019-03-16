@@ -575,6 +575,11 @@ export function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression
   const result = getDecoratorMetadata(source, 'NgModule', '@angular/core') as ts.Node[];
   const node = result[0] as ts.ObjectLiteralExpression;
   const matchingProperties = getMetadataField(source, node, 'imports');
+
+  if (!matchingProperties) {
+    return;
+  }
+
   const assignment = matchingProperties[0] as ts.PropertyAssignment;
 
   if (assignment.initializer.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
