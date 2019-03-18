@@ -12,7 +12,7 @@
     "Angular CLI"
   ],
   "scripts": {
-    "postinstall": "node ./bin/ng-update-message.js"
+    "postinstall": "node ./bin/postinstall/script.js"
   },
   "repository": {
     "type": "git",
