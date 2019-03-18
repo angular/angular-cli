@@ -42,13 +42,15 @@
           "type": "boolean",
           "default": false,
           "aliases": [ "d" ],
-          "description": "When true, runs through and reports activity without writing out results."
+          "description": "When true, runs through and reports activity without writing out results.",
+          "x-user-analytics": 1
         },
         "force": {
           "type": "boolean",
           "default": false,
           "aliases": [ "f" ],
-          "description": "When true, forces overwriting of existing files."
+          "description": "When true, forces overwriting of existing files.",
+          "x-user-analytics": 2
         }
       }
     },
@@ -57,7 +59,8 @@
         "interactive": {
           "type": "boolean",
           "default": "true",
-          "description": "When false, disables interactive input prompts."
+          "description": "When false, disables interactive input prompts.",
+          "x-user-analytics": 3
         },
         "defaults": {
           "type": "boolean",
