@@ -371,8 +371,6 @@ export async function promptGlobalAnalytics(force = false) {
         type: 'confirm',
         name: 'analytics',
         message: tags.stripIndents`
-          === MESSAGE TO BE FINALIZED ==== DO_NOT_SUBMIT
-
           Would you like to share anonymous usage data with the Angular Team at Google under
           Google’s Privacy Policy at https://policies.google.com/privacy? For more details and
           how to change this setting, see http://angular.io/analytics.
@@ -419,8 +417,6 @@ export async function promptProjectAnalytics(force = false): Promise<boolean> {
         type: 'confirm',
         name: 'analytics',
         message: tags.stripIndents`
-          === MESSAGE TO BE FINALIZED ==== DO_NOT_SUBMIT
-
           Would you like to share anonymous usage data about this project with the Angular Team at
           Google under Google’s Privacy Policy at https://policies.google.com/privacy? For more
           details and how to change this setting, see http://angular.io/analytics.
@@ -435,8 +431,6 @@ export async function promptProjectAnalytics(force = false): Promise<boolean> {
     if (answers.analytics) {
       console.log('');
       console.log(tags.stripIndent`
-        === MESSAGE TO BE FINALIZED ==== DO_NOT_SUBMIT
-
         Thank you for sharing anonymous usage data. Would you change your mind, the following
         command will disable this feature entirely:
 
