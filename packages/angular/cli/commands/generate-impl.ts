@@ -72,6 +72,22 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
     });
   }
 
+  async reportAnalytics(
+    paths: string[],
+    options: GenerateCommandSchema & Arguments,
+  ): Promise<void> {
+    const [collectionName, schematicName] = this.parseSchematicInfo(options);
+
+    if (!schematicName || !collectionName) {
+      return;
+    }
+
+    return super.reportAnalytics(
+      ['generate', collectionName.replace(/\//g, '_'), schematicName.replace(/\//g, '_')],
+      options,
+    );
+  }
+
   private parseSchematicInfo(options: { schematic?: string }): [string, string | undefined] {
     let collectionName = this.getDefaultSchematicCollection();
 

@@ -15,6 +15,7 @@ import { experimental, json, schema, tags } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { BepJsonWriter } from '../utilities/bep';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
+import { isPackageNameSafeForAnalytics } from './analytics';
 import { BaseCommandOptions, Command } from './command';
 import { Arguments, Option } from './interface';
 import { parseArguments } from './parser';
@@ -165,6 +166,15 @@ export abstract class ArchitectCommand<
     this.description.options.push(...(
       await parseJsonSchemaToOptions(this._registry, builderDesc.schema)
     ));
+
+    // Update options to remove analytics from options if the builder isn't safelisted.
+    for (const o of this.description.options) {
+      if (o.userAnalytics) {
+        if (!isPackageNameSafeForAnalytics(builderDesc.name)) {
+          o.userAnalytics = undefined;
+        }
+      }
+    }
   }
 
   async run(options: ArchitectCommandOptions & Arguments) {

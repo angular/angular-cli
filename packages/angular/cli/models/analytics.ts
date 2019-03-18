@@ -21,8 +21,29 @@ const analyticsLogDebug = debug('ng:analytics:log');  // Actual logs of events.
 
 const BYTES_PER_MEGABYTES = 1024 * 1024;
 
-
 /**
+ * This is the ultimate safelist for checking if a package name is safe to report to analytics.
+ */
+export const analyticsPackageSafelist = [
+  /^@angular\//,
+  /^@angular-devkit\//,
+  /^@ngtools\//,
+  '@schematics/angular',
+  '@schematics/schematics',
+  '@schematics/update',
+];
+
+export function isPackageNameSafeForAnalytics(name: string) {
+  return analyticsPackageSafelist.some(pattern => {
+    if (typeof pattern == 'string') {
+      return pattern === name;
+    } else {
+      return pattern.test(name);
+    }
+  });
+}
+
+  /**
  * MAKE SURE TO KEEP THIS IN SYNC WITH THE TABLE AND CONTENT IN `/docs/design/analytics.md`.
  * WE LIST THOSE DIMENSIONS (AND MORE).
  */
@@ -354,7 +375,7 @@ export async function promptGlobalAnalytics(force = false) {
 
           Would you like to share anonymous usage data with the Angular Team at Google under
           Google’s Privacy Policy at https://policies.google.com/privacy? For more details and
-          how to change this setting, see http://angular.io/usage/.
+          how to change this setting, see http://angular.io/analytics.
         `,
         default: false,
       },
@@ -402,7 +423,7 @@ export async function promptProjectAnalytics(force = false): Promise<boolean> {
 
           Would you like to share anonymous usage data about this project with the Angular Team at
           Google under Google’s Privacy Policy at https://policies.google.com/privacy? For more
-          details and how to change this setting, see http://angular.io/usage.
+          details and how to change this setting, see http://angular.io/analytics.
 
         `,
         default: false,

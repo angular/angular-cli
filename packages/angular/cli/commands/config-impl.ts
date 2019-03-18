@@ -32,6 +32,9 @@ const validCliPaths = new Map([
   ['cli.warnings.versionMismatch', 'boolean'],
   ['cli.defaultCollection', 'string'],
   ['cli.packageManager', 'string'],
+  ['cli.analytics', 'string'],
+  ['cli.analyticsSharing.tracking', 'string'],
+  ['cli.analyticsSharing.uuid', 'string'],
 ]);
 
 /**
