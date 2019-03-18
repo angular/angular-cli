@@ -26,7 +26,8 @@
     "skipInstall": {
       "description": "When true, does not install dependency packages.",
       "type": "boolean",
-      "default": false
+      "default": false,
+      "x-user-analytics": 4
     },
     "linkCli": {
       "description": "When true, links the CLI to the global version (internal development only).",
@@ -75,18 +76,21 @@
       "description": "When true, includes styles inline in the component TS file. By default, an external styles file is created and referenced in the component TS file.",
       "type": "boolean",
       "default": false,
-      "alias": "s"
+      "alias": "s",
+      "x-user-analytics": 9
     },
     "inlineTemplate": {
       "description": "When true, includes template inline in the component TS file. By default, an external template file is created and referenced in the component TS file.",
       "type": "boolean",
       "default": false,
-      "alias": "t"
+      "alias": "t",
+      "x-user-analytics": 10
     },
     "viewEncapsulation": {
       "description": "The view encapsulation strategy to use in the initial project.",
       "enum": ["Emulated", "Native", "None", "ShadowDom"],
-      "type": "string"
+      "type": "string",
+      "x-user-analytics": 11
     },
     "version": {
       "type": "string",
@@ -100,7 +104,8 @@
       "type": "boolean",
       "description": "When true, generates a routing module for the initial project.",
       "default": false,
-      "x-prompt": "Would you like to add Angular routing?"
+      "x-prompt": "Would you like to add Angular routing?",
+      "x-user-analytics": 17
     },
     "prefix": {
       "type": "string",
@@ -131,13 +136,15 @@
           { "value": "less", "label": "Less   [ http://lesscss.org                                                 ]" },
           { "value": "styl", "label": "Stylus [ http://stylus-lang.com                                             ] " }
         ]
-      }
+      },
+      "x-user-analytics": 5
     },
     "skipTests": {
       "description": "When true, does not generate \"spec.ts\" test files for the new project. ",
       "type": "boolean",
       "default": false,
-      "alias": "S"
+      "alias": "S",
+      "x-user-analytics": 12
     },
     "createApplication": {
       "description": "When true (the default), creates a new initial app project in the src folder of the new workspace. When false, creates an empty workspace with no initial app. You can then use the generate application command so that all apps are created in the projects folder.",
@@ -147,7 +154,8 @@
     "minimal": {
       "description": "When true, creates a project without any testing frameworks. (Use for learning purposes only.)",
       "type": "boolean",
-      "default": false
+      "default": false,
+      "x-user-analytics": 14
     }
   },
   "required": [

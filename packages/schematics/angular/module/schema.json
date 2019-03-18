@@ -30,7 +30,8 @@
     "routing": {
       "type": "boolean",
       "description": "When true, creates a routing module.",
-      "default": false
+      "default": false,
+      "x-user-analytics": 17
     },
     "routingScope": {
       "enum": ["Child", "Root"],
@@ -57,7 +58,8 @@
     "lintFix": {
       "type": "boolean",
       "default": false,
-      "description": "When true, applies lint fixes after generating the module."
+      "description": "When true, applies lint fixes after generating the module.",
+      "x-user-analytics": 15
     }
   },
   "required": [

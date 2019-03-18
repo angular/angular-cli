@@ -30,6 +30,7 @@
     },
     "optimization": {
       "description": "Enables optimization of the build output.",
+      "x-user-analytics": 16,
       "oneOf": [
         {
           "type": "object",

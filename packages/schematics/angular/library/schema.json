@@ -31,12 +31,14 @@
     "skipPackageJson": {
       "type": "boolean",
       "default": false,
-      "description": "When true, does not add dependencies to the \"package.json\" file. "
+      "description": "When true, does not add dependencies to the \"package.json\" file. ",
+      "x-user-analytics": 13
     },
     "skipInstall": {
       "description": "When true, does not install dependency packages.",
       "type": "boolean",
-      "default": false
+      "default": false,
+      "x-user-analytics": 4
     },
     "skipTsConfig": {
       "type": "boolean",
@@ -46,7 +48,8 @@
     "lintFix": {
       "type": "boolean",
       "default": false,
-      "description": "When true, applies lint fixes after generating the library."
+      "description": "When true, applies lint fixes after generating the library.",
+      "x-user-analytics": 15
     }
   },
   "required": []
