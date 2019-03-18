@@ -7,7 +7,7 @@
  */
 
 // tslint:disable:no-global-tslint-disable no-any
-import { logging, strings, tags, terminal } from '@angular-devkit/core';
+import { analytics, logging, strings, tags, terminal } from '@angular-devkit/core';
 import * as path from 'path';
 import { getWorkspace } from '../utilities/config';
 import {
@@ -27,6 +27,7 @@ export interface BaseCommandOptions {
 export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions> {
   public allowMissingWorkspace = false;
   public workspace: CommandWorkspace;
+  public analytics: analytics.Analytics;
 
   protected static commandMap: CommandDescriptionMap;
   static setCommandMap(map: CommandDescriptionMap) {
@@ -39,6 +40,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     protected readonly logger: logging.Logger,
   ) {
     this.workspace = context.workspace;
+    this.analytics = context.analytics || new analytics.NoopAnalytics();
   }
 
   async initialize(options: T & Arguments): Promise<void> {
@@ -147,6 +149,24 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     }
   }
 
+  async reportAnalytics(
+    paths: string[],
+    options: T & Arguments,
+    dimensions: (boolean | number | string)[] = [],
+    metrics: (boolean | number | string)[] = [],
+  ): Promise<void> {
+    for (const option of this.description.options) {
+      const ua = option.userAnalytics;
+      const v = options[option.name];
+
+      if (v !== undefined && !Array.isArray(v) && ua) {
+        dimensions[ua] = v;
+      }
+    }
+
+    this.analytics.pageview('/command/' + paths.join('/'), { dimensions });
+  }
+
   abstract async run(options: T & Arguments): Promise<number | void>;
 
   async validateAndRun(options: T & Arguments): Promise<number | void> {
@@ -160,6 +180,8 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     } else if (options.help === 'json' || options.help === 'JSON') {
       return this.printJsonHelp(options);
     } else {
+      await this.reportAnalytics([this.description.name], options);
+
       return await this.run(options);
     }
   }
