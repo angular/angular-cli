@@ -7,6 +7,7 @@
  */
 import {
   JsonParseMode,
+  analytics,
   isJsonObject,
   json,
   logging,
@@ -14,10 +15,12 @@ import {
   strings,
   tags,
 } from '@angular-devkit/core';
+import * as debug from 'debug';
 import { readFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
 import { findUp } from '../utilities/find-up';
 import { parseJsonSchemaToCommandDescription } from '../utilities/json-schema';
+import { UniversalAnalytics,  getGlobalAnalytics } from './analytics';
 import { Command } from './command';
 import {
   CommandDescription,
@@ -26,9 +29,39 @@ import {
 } from './interface';
 import * as parser from './parser';
 
+const analyticsDebug = debug('ng:analytics:commands');
+
 
 export interface CommandMapOptions {
   [key: string]: string;
+}
+
+
+async function _createAnalytics(): Promise<analytics.Analytics> {
+  const config = getGlobalAnalytics();
+
+  switch (config) {
+    case undefined:
+    case false:
+      analyticsDebug('Analytics disabled. Ignoring all analytics.');
+
+      return new analytics.NoopAnalytics();
+
+    case true:
+      analyticsDebug('Analytics enabled, anonymous user.');
+
+      return new UniversalAnalytics('UA-8594346-29', '');
+
+    case 'ci':
+      analyticsDebug('Logging analytics as CI.');
+
+      return new UniversalAnalytics('UA-8594346-29', 'ci');
+
+    default:
+      analyticsDebug('Analytics enabled. User ID: %j', config);
+
+      return new UniversalAnalytics('UA-8594346-29', config);
+  }
 }
 
 /**
@@ -37,12 +70,14 @@ export interface CommandMapOptions {
  * @param logger The logger to use.
  * @param workspace Workspace information.
  * @param commands The map of supported commands.
+ * @param options Additional options.
  */
 export async function runCommand(
   args: string[],
   logger: logging.Logger,
   workspace: CommandWorkspace,
   commands?: CommandMapOptions,
+  options: { analytics?: analytics.Analytics } = {},
 ): Promise<number | void> {
   if (commands === undefined) {
     const commandMapPath = findUp('commands.json', __dirname);
@@ -184,9 +219,23 @@ export async function runCommand(
   try {
     const parsedOptions = parser.parseArguments(args, description.options, logger);
     Command.setCommandMap(commandMap);
-    const command = new description.impl({ workspace }, description, logger);
 
-    return await command.validateAndRun(parsedOptions);
+    const analytics = options.analytics || await _createAnalytics();
+    const context = { workspace, analytics };
+    const command = new description.impl(context, description, logger);
+
+    // Flush on an interval (if the event loop is waiting).
+    let analyticsFlushPromise = Promise.resolve();
+    setInterval(() => {
+      analyticsFlushPromise = analyticsFlushPromise.then(() => analytics.flush());
+    }, 1000);
+
+    const result = await command.validateAndRun(parsedOptions);
+
+    // Flush one last time.
+    await analyticsFlushPromise.then(() => analytics.flush());
+
+    return result;
   } catch (e) {
     if (e instanceof parser.ParseArgumentException) {
       logger.fatal('Cannot parse arguments. See below for the reasons.');
