@@ -9,6 +9,8 @@ import { JsonObject } from '@angular-devkit/core';
 import {
   Collection,
   CollectionDescription,
+  Engine,
+  EngineHost,
   RuleFactory,
   Schematic,
   SchematicDescription,
@@ -44,6 +46,10 @@ export interface FileSystemSchematicDescription extends FileSystemSchematicJsonD
 /**
  * Used to simplify typings.
  */
+export declare type FileSystemEngine
+  = Engine<FileSystemCollectionDescription, FileSystemSchematicDescription>;
+export declare type FileSystemEngineHost
+  = EngineHost<FileSystemCollectionDescription, FileSystemSchematicDescription>;
 export declare type FileSystemCollection
   = Collection<FileSystemCollectionDescription, FileSystemSchematicDescription>;
 export declare type FileSystemSchematic

@@ -8,7 +8,7 @@
 import { logging, schema, virtualFs } from '@angular-devkit/core';
 import { EMPTY, Observable, Subject, concat, from, of, throwError } from 'rxjs';
 import { concatMap, defaultIfEmpty, ignoreElements, last, map, tap } from 'rxjs/operators';
-import { EngineHost, SchematicEngine } from '../engine';
+import { Engine, EngineHost, SchematicEngine } from '../engine';
 import { UnsuccessfulWorkflowExecution } from '../exception/exception';
 import { standardFormats } from '../formats';
 import { DryRunEvent, DryRunSink } from '../sink/dryrun';
@@ -46,7 +46,7 @@ export interface BaseWorkflowOptions {
  * @public
  */
 export abstract class BaseWorkflow implements Workflow {
-  protected _engine: SchematicEngine<{}, {}>;
+  protected _engine: Engine<{}, {}>;
   protected _engineHost: EngineHost<{}, {}>;
   protected _registry: schema.CoreSchemaRegistry;
 
@@ -86,6 +86,12 @@ export abstract class BaseWorkflow implements Workflow {
     }
 
     return maybeContext;
+  }
+  get engine(): Engine<{}, {}> {
+    return this._engine;
+  }
+  get engineHost(): EngineHost<{}, {}> {
+    return this._engineHost;
   }
   get registry(): schema.SchemaRegistry {
     return this._registry;
