@@ -1,5 +1,5 @@
-#!/usr/bin/env node
 'use strict';
+// This file is ES6 because it needs to be executed as is.
 
 // Check if the current directory contains '.angular-cli.json'. If it does, show a message to the user that they
 // should use the migration script.
