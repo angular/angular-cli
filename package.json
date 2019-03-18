@@ -65,6 +65,8 @@
     "@types/debug": "^4.1.2",
     "@types/node-fetch": "^2.1.6",
     "@types/progress": "^2.0.3",
+    "@types/universal-analytics": "^0.4.2",
+    "@types/uuid": "^3.4.4",
     "debug": "^4.1.1",
     "glob": "^7.0.3",
     "node-fetch": "^2.2.0",
