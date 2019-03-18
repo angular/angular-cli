@@ -37,15 +37,10 @@ import {
 } from '../utilities/config';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
 import { getPackageManager } from '../utilities/package-manager';
+import { isPackageNameSafeForAnalytics } from './analytics';
 import { BaseCommandOptions, Command } from './command';
 import { Arguments, CommandContext, CommandDescription, Option } from './interface';
 import { parseArguments, parseFreeFormArguments } from './parser';
-
-
-export const schematicsAnalyticsWhitelist = [
-  '@schematics/angular',
-  '@schematics/update',
-];
 
 
 export interface BaseSchematicSchema {
@@ -106,10 +101,10 @@ export abstract class SchematicCommand<
 
       this.description.options.push(...options.filter(x => !x.hidden));
 
-      // Remove any user analytics from schematics that are NOT part of our whitelist.
+      // Remove any user analytics from schematics that are NOT part of our safelist.
       for (const o of this.description.options) {
         if (o.userAnalytics) {
-          if (!schematicsAnalyticsWhitelist.includes(this.collectionName)) {
+          if (!isPackageNameSafeForAnalytics(this.collectionName)) {
             o.userAnalytics = undefined;
           }
         }
@@ -262,9 +257,9 @@ export abstract class SchematicCommand<
     );
     workflow.engineHost.registerContextTransform(context => {
       // This is run by ALL schematics, so if someone uses `externalSchematics(...)` which
-      // is whitelisted, it would move to the right analytics (even if their own isn't).
+      // is safelisted, it would move to the right analytics (even if their own isn't).
       const collectionName: string = context.schematic.collection.description.name;
-      if (schematicsAnalyticsWhitelist.includes(collectionName)) {
+      if (isPackageNameSafeForAnalytics(collectionName)) {
         return {
           ...context,
           analytics: this.analytics,
@@ -293,7 +288,7 @@ export abstract class SchematicCommand<
       const collectionName = context.schematic.collection.description.name;
       const schematicName = context.schematic.description.name;
 
-      if (!schematicsAnalyticsWhitelist.includes(collectionName)) {
+      if (!isPackageNameSafeForAnalytics(collectionName)) {
         return options;
       }
 
