@@ -57,7 +57,8 @@
     "skipInstall": {
       "description": "When true, does not install packages for dependencies.",
       "type": "boolean",
-      "default": false
+      "default": false,
+      "x-user-analytics": 4
     }
   },
   "required": [

@@ -43,7 +43,8 @@
     "lintFix": {
       "type": "boolean",
       "default": false,
-      "description": "When true, applies lint fixes after generating the interface."
+      "description": "When true, applies lint fixes after generating the interface.",
+      "x-user-analytics": 15
     }
   },
   "required": [

@@ -31,19 +31,22 @@
       "description": "When true, includes styles inline in the component.ts file. Only CSS styles can be included inline. By default, an external styles file is created and referenced in the component.ts file.",
       "type": "boolean",
       "default": false,
-      "alias": "s"
+      "alias": "s",
+      "x-user-analytics": 9
     },
     "inlineTemplate": {
       "description": "When true, includes template inline in the component.ts file. By default, an external template file is created and referenced in the component.ts file.",
       "type": "boolean",
       "default": false,
-      "alias": "t"
+      "alias": "t",
+      "x-user-analytics": 10
     },
     "viewEncapsulation": {
       "description": "The view encapsulation strategy to use in the new component.",
       "enum": ["Emulated", "Native", "None", "ShadowDom"],
       "type": "string",
-      "alias": "v"
+      "alias": "v",
+      "x-user-analytics": 11
     },
     "changeDetection": {
       "description": "The change detection strategy to use in the new component.",
@@ -82,7 +85,8 @@
         "sass",
         "less",
         "styl"
-      ]
+      ],
+      "x-user-analytics": 5
     },
     "spec": {
       "type": "boolean",
@@ -93,7 +97,8 @@
     "skipTests": {
       "type": "boolean",
       "description": "When true, does not create \"spec.ts\" test files for the new component.",
-      "default": false
+      "default": false,
+      "x-user-analytics": 12
     },
     "flat": {
       "type": "boolean",
@@ -103,7 +108,8 @@
     "skipImport": {
       "type": "boolean",
       "description": "When true, does not import this component into the owning NgModule.",
-      "default": false
+      "default": false,
+      "x-user-analytics": 18
     },
     "selector": {
       "type": "string",
@@ -118,17 +124,20 @@
     "export": {
       "type": "boolean",
       "default": false,
-      "description": "When true, the declaring NgModule exports this component."
+      "description": "When true, the declaring NgModule exports this component.",
+      "x-user-analytics": 19
     },
     "entryComponent": {
       "type": "boolean",
       "default": false,
-      "description": "When true, the new component is the entry component of the declaring NgModule."
+      "description": "When true, the new component is the entry component of the declaring NgModule.",
+      "x-user-analytics": 20
     },
     "lintFix": {
       "type": "boolean",
       "default": false,
-      "description": "When true, applies lint fixes after generating the component."
+      "description": "When true, applies lint fixes after generating the component.",
+      "x-user-analytics": 15
     }
   },
   "required": [

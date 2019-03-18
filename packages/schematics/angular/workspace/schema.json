@@ -21,7 +21,8 @@
     "skipInstall": {
       "description": "When true, does not install packages for dependencies.",
       "type": "boolean",
-      "default": false
+      "default": false,
+      "x-user-analytics": 4
     },
     "linkCli": {
       "description": "When true, links the CLI to the global version (internal development only).",
@@ -72,7 +73,8 @@
     "minimal": {
       "description": "When true, creates a workspace without any testing frameworks. (Use for learning purposes only.)",
       "type": "boolean",
-      "default": false
+      "default": false,
+      "x-user-analytics": 14
     }
   },
   "required": [

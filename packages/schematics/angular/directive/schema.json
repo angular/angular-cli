@@ -50,12 +50,14 @@
     "skipTests": {
       "type": "boolean",
       "description": "When true, does not create \"spec.ts\" test files for the new class.",
-      "default": false
+      "default": false,
+      "x-user-analytics": 12
     },
     "skipImport": {
       "type": "boolean",
       "description": "When true, does not import this directive into the owning NgModule.",
-      "default": false
+      "default": false,
+      "x-user-analytics": 18
     },
     "selector": {
       "type": "string",
@@ -75,12 +77,14 @@
     "export": {
       "type": "boolean",
       "default": false,
-      "description": "When true, the declaring NgModule exports this directive."
+      "description": "When true, the declaring NgModule exports this directive.",
+      "x-user-analytics": 19
     },
     "lintFix": {
       "type": "boolean",
       "default": false,
-      "description": "When true, applies lint fixes after generating the directive."
+      "description": "When true, applies lint fixes after generating the directive.",
+      "x-user-analytics": 15
     }
   },
   "required": [
