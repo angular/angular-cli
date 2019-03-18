@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/analytics.json",
+  "description": "Configures usage metric gathering for the Angular CLI. See http://angular.io/MORE_INFO_HERE",
+  "$longDescription": "",
+
+  "$aliases": [],
+  "$scope": "all",
+  "$type": "native",
+  "$impl": "./analytics-impl#AnalyticsCommand",
+
+  "type": "object",
+  "allOf": [
+    {
+      "properties": {
+        "settingOrProject": {
+          "enum": [
+            "on",
+            "off",
+            "ci",
+            "project",
+            "prompt"
+          ],
+          "description": ".",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        },
+        "projectSetting": {
+          "enum": [
+            "on",
+            "off",
+            "prompt"
+          ],
+          "description": ".",
+          "$default": {
+            "$source": "argv",
+            "index": 1
+          }
+        }
+      },
+      "required": [
+        "settingOrProject"
+      ]
+    },
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}

@@ -1,5 +1,6 @@
 {
   "add": "./commands/add.json",
+  "analytics": "./commands/analytics.json",
   "build": "./commands/build.json",
   "config": "./commands/config.json",
   "doc": "./commands/doc.json",
