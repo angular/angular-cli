@@ -34,6 +34,7 @@
     "postcss-loader": "3.0.0",
     "raw-loader": "1.0.0",
     "rxjs": "6.4.0",
+    "sass": "1.17.3",
     "sass-loader": "7.1.0",
     "semver": "5.6.0",
     "source-map-support": "0.5.11",
@@ -51,9 +52,6 @@
     "webpack-merge": "4.2.1",
     "webpack-sources": "1.3.0",
     "webpack-subresource-integrity": "1.1.0-rc.6"
-  },
-  "optionalDependencies": {
-    "node-sass": "4.11.0"
   },
   "devDependencies": {
     "@angular/animations": "^8.0.0-beta.9",
