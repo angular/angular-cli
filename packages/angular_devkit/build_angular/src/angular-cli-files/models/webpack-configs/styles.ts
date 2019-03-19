@@ -120,14 +120,14 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     }
   }
 
-  let dartSass: {} | undefined;
+  let sassImplementation: {} | undefined;
+  let fiber: {} | undefined;
   try {
     // tslint:disable-next-line:no-implicit-dependencies
-    dartSass = require('sass');
-  } catch { }
+    sassImplementation = require('node-sass');
+  } catch {
+    sassImplementation = require('sass');
 
-  let fiber: {} | undefined;
-  if (dartSass) {
     try {
       // tslint:disable-next-line:no-implicit-dependencies
       fiber = require('fibers');
@@ -142,7 +142,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       use: [{
         loader: 'sass-loader',
         options: {
-          implementation: dartSass,
+          implementation: sassImplementation,
           fiber,
           sourceMap: cssSourceMap,
           // bootstrap-sass requires a minimum precision of 8
