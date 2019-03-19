@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Architect } from '@angular-devkit/architect/src/index2';
-import { join, normalize } from '@angular-devkit/core';
+import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { BrowserBuilderOutput } from '../../src/browser/index2';
 import { browserBuild, createArchitect, host } from '../utils';
 
@@ -26,9 +26,13 @@ describe('Browser Builder profile', () => {
     const output = await run.result as BrowserBuilderOutput;
 
     expect(output.success).toBe(true);
-    expect(host.scopedSync().exists(normalize('chrome-profiler-events.json'))).toBe(true);
-    expect(host.scopedSync().exists(normalize('speed-measure-plugin.json'))).toBe(true);
 
+    const speedMeasureLogPath = normalize('speed-measure-plugin.json');
+    expect(host.scopedSync().exists(normalize('chrome-profiler-events.json'))).toBe(true);
+    expect(host.scopedSync().exists(speedMeasureLogPath)).toBe(true);
+
+    const content = virtualFs.fileBufferToString(host.scopedSync().read(speedMeasureLogPath));
+    expect(content).toContain('plugins');
     await run.stop();
   });
 });
