@@ -60,9 +60,15 @@ export default async function(
     }
     const content = fs.readFileSync(fileName, 'utf-8');
 
-    const json = JSON.parse(content);
-    if (!json.$schema) {
-      // Skip non-schema files.
+    let json;
+    try {
+      json = JSON.parse(content);
+      if (typeof json.$schema !== 'string' || !json.$schema.startsWith('http://json-schema.org/')) {
+        // Skip non-schema files.
+        continue;
+      }
+    } catch {
+      // malformed or JSON5
       continue;
     }
     const tsContent = await quicktypeRunner.generate(fileName);
