@@ -5,17 +5,36 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { readFile, replaceInFile, writeFile } from '../../utils/fs';
+import { getGlobalVariable } from '../../utils/env';
+import { appendToFile, prependToFile, readFile, replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
-import { createProject, updateJsonFile } from '../../utils/project';
+import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
 export default async function () {
-  const projectName = 'ivy-lazy-loading';
+  const argv = getGlobalVariable('argv');
+  const ivyProject = argv['ivy'];
+  const projectName = 'test-project';
   const appRoutingModulePath = 'src/app/app-routing.module.ts';
 
-  // Make Ivy project.
-  await createProject(projectName, '--enable-ivy', '--routing');
+  // Add app routing.
+  // This is done automatically on a new app with --routing.
+  await writeFile(appRoutingModulePath, `
+    import { NgModule } from '@angular/core';
+    import { Routes, RouterModule } from '@angular/router';
+
+    const routes: Routes = [];
+
+    @NgModule({
+      imports: [RouterModule.forRoot(routes)],
+      exports: [RouterModule]
+    })
+    export class AppRoutingModule { }
+  `);
+  await prependToFile('src/app/app.module.ts',
+    `import { AppRoutingModule } from './app-routing.module';`);
+  await replaceInFile('src/app/app.module.ts', `imports: [`, `imports: [ AppRoutingModule,`);
+  await appendToFile('src/app/app.component.html', '<router-outlet></router-outlet>');
 
   const originalAppRoutingModule = await readFile(appRoutingModulePath);
   // helper to replace loadChildren
@@ -57,8 +76,10 @@ export default async function () {
 
   // Set factory shims to false.
   await updateJsonFile('tsconfig.app.json', json => {
-    const angularCompilerOptions = json['angularCompilerOptions'];
-    angularCompilerOptions['allowEmptyCodegenFiles'] = false;
+    if (json['angularCompilerOptions'] === undefined) {
+      json['angularCompilerOptions'] = {};
+    }
+    json['angularCompilerOptions']['allowEmptyCodegenFiles'] = false;
   });
 
   // Convert the default config to use JIT and prod to just do AOT.
@@ -69,22 +90,42 @@ export default async function () {
     buildTarget['configurations']['production'] = { aot: true };
   });
 
-  // Test `import()` style lazy load.
-  await replaceLoadChildren(`() => import('./lazy/lazy.module').then(m => m.LazyModule)`);
-  await ng('e2e');
-  await ng('e2e', '--prod');
-
   // Test string import with factory shims.
   await replaceLoadChildren(`'./lazy/lazy.module#LazyModule'`);
   await replaceInFile('tsconfig.app.json', `"allowEmptyCodegenFiles": false`,
     `"allowEmptyCodegenFiles": true`);
-  await expectToFail(() => ng('e2e')); // Currently broken.
-  await ng('e2e', '--prod');
+  if (ivyProject) {
+    // Ivy should not support the string syntax.
+    await expectToFail(() => ng('e2e'));
+    await expectToFail(() => ng('e2e', '--prod'));
+  } else {
+    // View engine should support the string syntax.
+    await ng('e2e');
+    await ng('e2e', '--prod');
+  }
 
   // Test string import without factory shims.
   await replaceLoadChildren(`'./lazy/lazy.module#LazyModule'`);
   await replaceInFile('tsconfig.app.json', `"allowEmptyCodegenFiles": true`,
-  `"allowEmptyCodegenFiles": false`);
-  await expectToFail(() => ng('e2e')); // Not supported.
-  await expectToFail(() => ng('e2e', '--prod')); // Not supported.
+    `"allowEmptyCodegenFiles": false`);
+  if (ivyProject) {
+    // Ivy should not support the string syntax.
+    await expectToFail(() => ng('e2e'));
+    await expectToFail(() => ng('e2e', '--prod'));
+  } else {
+    // View engine should support the string syntax.
+    await ng('e2e');
+    await ng('e2e', '--prod');
+  }
+
+  // Test `import()` style lazy load.
+  await updateJsonFile('angular.json', json => {
+    // Add the experimental flag to import factories in View Engine.
+    const buildTarget = json['projects'][projectName]['architect']['build'];
+    buildTarget['options']['experimentalImportFactories'] = true;
+  });
+  // Both Ivy and View Engine should support it.
+  await replaceLoadChildren(`() => import('./lazy/lazy.module').then(m => m.LazyModule)`);
+  await ng('e2e');
+  await ng('e2e', '--prod');
 }
