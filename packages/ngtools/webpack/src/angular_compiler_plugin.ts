@@ -46,6 +46,7 @@ import {
   exportLazyModuleMap,
   exportNgFactory,
   findResources,
+  importFactory,
   registerLocaleData,
   removeDecorators,
   replaceBootstrap,
@@ -108,6 +109,7 @@ export interface AngularCompilerPluginOptions {
   // When using Ivy, the string syntax is not supported at all. Thus we shouldn't attempt that.
   // This option is also used for when the compilation doesn't need this sort of processing at all.
   discoverLazyRoutes?: boolean;
+  importFactories?: boolean;
 
   // added to the list of lazy routes
   additionalLazyModules?: { [module: string]: string };
@@ -140,6 +142,7 @@ export class AngularCompilerPlugin {
   private _moduleResolutionCache: ts.ModuleResolutionCache;
   private _resourceLoader?: WebpackResourceLoader;
   private _discoverLazyRoutes = true;
+  private _importFactories = false;
   // Contains `moduleImportPath#exportName` => `fullModulePath`.
   private _lazyRoutes: LazyRouteMap = {};
   private _tsConfigPath: string;
@@ -298,7 +301,12 @@ export class AngularCompilerPlugin {
       this._platformTransformers = options.platformTransformers;
     }
 
-    if (options.discoverLazyRoutes !== undefined) {
+    // Determine if lazy route discovery via Compiler CLI private API should be attempted.
+    if (this._compilerOptions.enableIvy) {
+      // Never try to discover lazy routes with Ivy.
+      this._discoverLazyRoutes = false;
+    } else if (options.discoverLazyRoutes !== undefined) {
+      // The default is to discover routes, but it can be overriden.
       this._discoverLazyRoutes = options.discoverLazyRoutes;
     }
 
@@ -316,6 +324,11 @@ export class AngularCompilerPlugin {
         new Error(`Lazy route discovery is disabled but additional lazy modules were provided.`
           + `These will be ignored.`),
       );
+    }
+
+    if (!this._compilerOptions.enableIvy && options.importFactories === true) {
+      // Only transform imports to use factories with View Engine.
+      this._importFactories = true;
     }
 
     // Default ContextElementDependency to the one we can import from here.
@@ -896,6 +909,10 @@ export class AngularCompilerPlugin {
     } else {
       // Remove unneeded angular decorators.
       this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
+      // Import ngfactory in loadChildren import syntax
+      if (this._importFactories) {
+        this._transformers.push(importFactory(msg => this._warnings.push(msg)));
+      }
     }
 
     if (this._platformTransformers !== null) {

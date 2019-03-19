@@ -8,7 +8,13 @@
 import { tags } from '@angular-devkit/core';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
-import { Configuration, HashedModuleIdsPlugin, Output, debug } from 'webpack';
+import {
+  Configuration,
+  ContextReplacementPlugin,
+  HashedModuleIdsPlugin,
+  Output,
+  debug,
+} from 'webpack';
 import { AssetPatternClass } from '../../../browser/schema';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
@@ -345,6 +351,12 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         ...extraMinimizers,
       ],
     },
-    plugins: extraPlugins,
+    plugins: [
+      // Always replace the context for the System.import in angular/core to prevent warnings.
+      // https://github.com/angular/angular/issues/11580
+      // With VE the correct context is added in @ngtools/webpack, but Ivy doesn't need it at all.
+      new ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)/),
+      ...extraPlugins,
+    ],
   };
 }
