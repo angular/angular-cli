@@ -1,4 +1,5 @@
 {
+  "$schema": "http://json-schema.org/draft-07/schema",
   "title": "Extract i18n Target",
   "description": "Extract i18n target options for Build Facade.",
   "type": "object",
