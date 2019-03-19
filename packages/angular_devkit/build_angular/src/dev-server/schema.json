@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
   "title": "Dev Server Target",
   "description": "Dev Server target options for Build Facade.",
   "type": "object",

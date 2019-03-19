@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
   "title": "Webpack Dev-Server Builder",
   "description": "Webpack Dev-Server Builder schema for Architect.",
   "type": "object",
