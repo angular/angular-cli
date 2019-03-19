@@ -21,6 +21,7 @@
     },
     "extract-i18n": {
       "class": "./src/extract-i18n",
+      "implementation": "./src/extract-i18n/index2",
       "schema": "./src/extract-i18n/schema.json",
       "description": "Extract i18n strings from a browser app."
     },
