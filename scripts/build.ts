@@ -203,6 +203,79 @@ async function _bazel(logger: logging.Logger) {
   // _exec('bazel', ['build', '//packages/...'], {}, logger);
 }
 
+async function _setVersions(
+  sortedPackages: string[],
+  argv: { local?: boolean, snapshot?: boolean },
+  logger: logging.Logger,
+) {
+  for (const packageName of sortedPackages) {
+    logger.info(packageName);
+    const pkg = packages[packageName];
+    const packageJsonPath = path.join(pkg.dist, 'package.json');
+    const packageJson = pkg.packageJson;
+    const version = pkg.version;
+
+    if (version) {
+      packageJson['version'] = version;
+    } else {
+      logger.error('No version found... Only updating dependencies.');
+    }
+
+    for (const depName of Object.keys(packages)) {
+      const v = packages[depName].version;
+      for (const depKey of ['dependencies', 'peerDependencies', 'devDependencies']) {
+        const obj = packageJson[depKey] as JsonObject | null;
+        if (obj && obj[depName]) {
+          if (argv.local) {
+            obj[depName] = packages[depName].tar;
+          } else if (argv.snapshot) {
+            const pkg = packages[depName];
+            if (!pkg.snapshotRepo) {
+              logger.error(
+                `Package ${JSON.stringify(depName)} is not published as a snapshot. `
+                + `Fixing to current version ${v}.`,
+              );
+              obj[depName] = v;
+            } else {
+              obj[depName] = `github:${pkg.snapshotRepo}#${pkg.snapshotHash}`;
+            }
+          } else if ((obj[depName] as string).match(/\b0\.0\.0\b/)) {
+            obj[depName] = (obj[depName] as string).replace(/\b0\.0\.0\b/, v);
+          }
+        }
+      }
+    }
+
+    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
+  }
+}
+
+async function _setPackageGroups(sortedPackages: string[], logger: logging.Logger) {
+  for (const packageName of sortedPackages) {
+    logger.info(packageName);
+    const pkg = packages[packageName];
+
+    const packageJsonPath = path.join(pkg.dist, 'package.json');
+    const packageJson = pkg.packageJson;
+    // tslint:disable-next-line:no-any
+    const ngUpdateJson: any = packageJson['ng-update'] || (packageJson['ng-update'] = {});
+    const packageGroup = ngUpdateJson['packageGroup'] || (ngUpdateJson['packageGroup'] = {});
+
+    let changed = false;
+    for (const subPackageName of sortedPackages) {
+      const subpkg = packages[subPackageName];
+      if (packageGroup[subPackageName] === '0.0.0') {
+        packageGroup[subPackageName] = subpkg.version;
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
+    }
+  }
+}
+
 export default async function(
   argv: { local?: boolean, snapshot?: boolean },
   logger: logging.Logger,
@@ -350,48 +423,10 @@ export default async function(
   }
 
   logger.info('Setting versions...');
+  await _setVersions(sortedPackages, argv, logger.createChild('versions'));
 
-  const versionLogger = logger.createChild('versions');
-  for (const packageName of sortedPackages) {
-    versionLogger.info(packageName);
-    const pkg = packages[packageName];
-    const packageJsonPath = path.join(pkg.dist, 'package.json');
-    const packageJson = pkg.packageJson;
-    const version = pkg.version;
-
-    if (version) {
-      packageJson['version'] = version;
-    } else {
-      versionLogger.error('No version found... Only updating dependencies.');
-    }
-
-    for (const depName of Object.keys(packages)) {
-      const v = packages[depName].version;
-      for (const depKey of ['dependencies', 'peerDependencies', 'devDependencies']) {
-        const obj = packageJson[depKey] as JsonObject | null;
-        if (obj && obj[depName]) {
-          if (argv.local) {
-            obj[depName] = packages[depName].tar;
-          } else if (argv.snapshot) {
-            const pkg = packages[depName];
-            if (!pkg.snapshotRepo) {
-              versionLogger.error(
-                `Package ${JSON.stringify(depName)} is not published as a snapshot. `
-                + `Fixing to current version ${v}.`,
-              );
-              obj[depName] = v;
-            } else {
-              obj[depName] = `github:${pkg.snapshotRepo}#${pkg.snapshotHash}`;
-            }
-          } else if ((obj[depName] as string).match(/\b0\.0\.0\b/)) {
-            obj[depName] = (obj[depName] as string).replace(/\b0\.0\.0\b/, v);
-          }
-        }
-      }
-    }
-
-    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
-  }
+  logger.info('Setting packageGroups...');
+  await _setPackageGroups(sortedPackages, logger.createChild('packageGroups'));
 
   logger.info('Tarring all packages...');
   const tarLogger = logger.createChild('license');

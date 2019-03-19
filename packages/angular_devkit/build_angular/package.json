@@ -85,5 +85,20 @@
     "popper.js": "^1.14.1",
     "protractor": "~5.4.0",
     "zone.js": "^0.8.19"
+  },
+  "ng-update": {
+    "packageGroupName": "@angular/cli",
+    "packageGroup": {
+      "@angular-devkit/architect": "0.0.0",
+      "@angular-devkit/build-angular":  "0.0.0",
+      "@angular-devkit/build-ng-packagr": "0.0.0",
+      "@angular-devkit/build-optimizer":  "0.0.0",
+      "@angular-devkit/build-webpack": "0.0.0",
+      "@angular-devkit/core":  "0.0.0",
+      "@angular-devkit/schematics": "0.0.0",
+      "@ngtools/webpack": "0.0.0",
+      "@schematics/angular":  "0.0.0",
+      "@schematics/update":  "0.0.0"
+    }
   }
 }
