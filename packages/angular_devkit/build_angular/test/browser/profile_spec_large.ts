@@ -7,7 +7,7 @@
  */
 
 import { runTargetSpec } from '@angular-devkit/architect/testing';
-import { normalize } from '@angular-devkit/core';
+import { normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
 import { browserTargetSpec, host } from '../utils';
 
@@ -21,8 +21,11 @@ describe('Browser Builder profile', () => {
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
+        const speedMeasureLogPath = normalize('speed-measure-plugin.json');
         expect(host.scopedSync().exists(normalize('chrome-profiler-events.json'))).toBe(true);
-        expect(host.scopedSync().exists(normalize('speed-measure-plugin.json'))).toBe(true);
+        expect(host.scopedSync().exists(speedMeasureLogPath)).toBe(true);
+        const content = virtualFs.fileBufferToString(host.scopedSync().read(speedMeasureLogPath));
+        expect(content).toContain('plugins');
       }),
     ).toPromise().then(done, done.fail);
   });
