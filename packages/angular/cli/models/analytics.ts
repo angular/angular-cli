@@ -42,15 +42,6 @@ export function isPackageNameSafeForAnalytics(name: string) {
   });
 }
 
-  /**
- * MAKE SURE TO KEEP THIS IN SYNC WITH THE TABLE AND CONTENT IN `/docs/design/analytics.md`.
- * WE LIST THOSE DIMENSIONS (AND MORE).
- */
-export enum AnalyticsDimensions {
-  NgAddCollection = 6,
-  NgBuildBuildEventLog = 7,
-}
-
 
 /**
  * Attempt to get the Windows Language Code string.

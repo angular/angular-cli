@@ -10,7 +10,7 @@ import { ModuleNotFoundException, resolve } from '@angular-devkit/core/node';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
 import { dirname } from 'path';
 import { intersects, prerelease, rcompare, satisfies, valid, validRange } from 'semver';
-import { AnalyticsDimensions, isPackageNameSafeForAnalytics } from '../models/analytics';
+import { isPackageNameSafeForAnalytics } from '../models/analytics';
 import { Arguments } from '../models/interface';
 import { SchematicCommand } from '../models/schematic-command';
 import npmInstall from '../tasks/npm-install';
@@ -152,7 +152,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
     if (collection && isPackageNameSafeForAnalytics(collection)) {
       dimensions[analytics.NgCliAnalyticsDimensions.NgAddCollection] = collection;
     } else {
-      delete dimensions[AnalyticsDimensions.NgAddCollection];
+      delete dimensions[analytics.NgCliAnalyticsDimensions.NgAddCollection];
     }
 
     return super.reportAnalytics(paths, options, dimensions, metrics);

@@ -8,22 +8,19 @@ Each command creates a pageview with the path `/command/${commandName}/${subcomm
 `ng generate component my-component --dryRun` would create a page view with the path
 `/command/generate/@schematics_angular/component`.
 
-Additionally, only the Architect configuration of `default`, `production` and `staging` will be
-logged. The project name will be removed, and if the configuration is different than the three
-basic ones, it will be replaced with `_`. 
+We use page views to keep track of sessions more effectively, and to tag events to a page.
+
+Project names and target names will be removed. 
 The command `ng run some-project:lint:some-configuration` will create a page view with the path
-`/command/run/_:lint:_`. Configurations are only used when actually mentioned on the command
-line, thus the command `ng build some-project --prod` will create a page view of
-`/command/build/_:default` (with the `prod` flag), while `ng build some-project:some-conf` will log
-`/command/build/_:_`.
+`/command/run`.
 
 # Dimensions
-Google Analytics Custom Dimensions are used to track flag values. These dimensions are aggregated
-automatically on the backend.
+Google Analytics Custom Dimensions are used to track system values and flag values. These
+dimensions are aggregated automatically on the backend.
 
 One dimension per flag, and although technically there can be an overlap between 2 commands, for
-simplicity it should remain unique across all CLI commands. These are numbers added to our own
-`schema.json` files. Dimensions are not to be used for anything else.
+simplicity it should remain unique across all CLI commands. The dimension is the value of the
+`x-user-analytics` field in the `schema.json` files.
 
 To create a new dimension (tracking a new flag):
 
@@ -41,42 +38,59 @@ PROJECT NAME TO BUILD OR A MODULE NAME.**
 Note: There's a limit of 20 custom dimensions.
 
 ### List Of All Dimensions
-| Id | Category | Flag | Type | File / Description |
-|:---:|:---|:---|:---|---:|
-| 1 | `generate`, `new` | `--dryRun`      | `Boolean` | |
-| 2 | `generate`, `new` | `--force`       | `Boolean` | |
-| 3 | `generate`, `new` | `--interactive` | `Boolean` | |
-| 4 | `generate` | `--skipInstall` | `Boolean` | |
-| 5 | `generate` | `--style` | `String` | |
-| 6 | `add` | `--collection` | `String` | Only for packages that we control (see safelist in `add-impl.ts`). |
-| 7 | `build`, `serve` | `--buildEventLog` | `Boolean` | If the flag was used (does not report its value). See `build-impl.ts`. |
-| 8 | `generate`, `new` | `--enableIvy` | `Boolean` | |
-| 9 | `generate` | `--inlineStyle` | `Boolean` | |
-| 10 | `generate` | `--inlineTemplate` | `Boolean` | |
-| 11 | `generate` | `--viewEncapsulation` | `String` | |
-| 12 | `generate` | `--skipTests` | `Boolean` | |
-| 13 | `build` | `--aot` | `Boolean` | |
-| 14 | `generate` | `--minimal` | `Boolean` | |
-| 15 | `generate` | `--lintFix` | `Boolean` | |
-| 16 | `build` | `--optimization` | `Boolean` | |
-| 17 | `generate` | `--routing` | `Boolean` | |
-| 18 | `generate` | `--skipImport` | `Boolean` | |
-| 19 | `generate` | `--export` | `Boolean` | |
-| 20 | `generate` | `--entryComponent` | `Boolean` | |
+<!--DIMENSIONS_TABLE_BEGIN-->
+| Id | Flag | Type |
+|:---:|:---|:---|
+| 1 | `CPU Count` | `number` |
+| 2 | `CPU Speed` | `number` |
+| 3 | `RAM (In MB)` | `number` |
+| 4 | `Node Version` | `number` |
+| 5 | `Flag: --style` | `string` |
+| 6 | `--collection` | `string` |
+| 7 | `--buildEventLog` | `boolean` |
+| 8 | `Flag: --enableIvy` | `boolean` |
+| 9 | `Flag: --inlineStyle` | `boolean` |
+| 10 | `Flag: --inlineTemplate` | `boolean` |
+| 11 | `Flag: --viewEncapsulation` | `string` |
+| 12 | `Flag: --skipTests` | `boolean` |
+| 13 | `Flag: --aot` | `boolean` |
+| 14 | `Flag: --minimal` | `boolean` |
+| 15 | `Flag: --lintFix` | `boolean` |
+| 16 | `Flag: --optimization` | `boolean` |
+| 17 | `Flag: --routing` | `boolean` |
+| 18 | `Flag: --skipImport` | `boolean` |
+| 19 | `Flag: --export` | `boolean` |
+| 20 | `Build Errors (comma separated)` | `string` |
+<!--DIMENSIONS_TABLE_END-->
 
 # Metrics
 
 ### List of All Metrics
-| Id  | Type | Description |
-|:---:|:-----|-------------|
-| 1 | `Number` | CPU count |
-| 2 | `Number` | Average CPU speed |
-| 3 | `Number` | RAM Count |
-| 4 | `Number` | Node Version (Major.Minor) |
+<!--METRICS_TABLE_BEGIN-->
+| Id | Flag | Type |
+|:---:|:---|:---|
+| 1 | `UNUSED_1` | `none` |
+| 2 | `UNUSED_2` | `none` |
+| 3 | `UNUSED_3` | `none` |
+| 4 | `UNUSED_4` | `none` |
+| 5 | `Build Time` | `number` |
+| 6 | `NgOnInit Count` | `number` |
+| 7 | `Initial Chunk Size` | `number` |
+| 8 | `Total Chunk Count` | `number` |
+| 9 | `Total Chunk Size` | `number` |
+| 10 | `Lazy Chunk Count` | `number` |
+| 11 | `Lazy Chunk Size` | `number` |
+| 12 | `Asset Count` | `number` |
+| 13 | `Asset Size` | `number` |
+| 14 | ` Polyfill Size` | `number` |
+| 15 | ` Css Size` | `number` |
+<!--METRICS_TABLE_END-->
 
 # Operating System and Node Version
 A User Agent string is built to "fool" Google Analytics into reading the Operating System and
 version fields from it. The base dimensions are used for those.
+
+Node version is our App ID, but a dimension is also used to get the numeric MAJOR.MINOR of node.
 
 # Debugging
 Using `DEBUG=universal-analytics` will report all calls to the universal-analytics library,
