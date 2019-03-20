@@ -29,10 +29,11 @@ export default async function () {
   await replaceInFile('src/app/app.component.ts', './app.component.css', './app.component.scss');
 
   await silentExec('rm', '-rf', 'node_modules/node-sass');
+  await silentExec('rm', '-rf', 'node_modules/sass');
   await expectToFail(() => ng('build', '--extract-css', '--source-map'));
 
-  await silentNpm('install', 'sass');
-  await silentExec('rm', '-rf', 'node_modules/node-sass');
+  await silentNpm('install', 'node-sass');
+  await silentExec('rm', '-rf', 'node_modules/sass');
   await ng('build', '--extract-css', '--source-map');
 
   await expectFileToMatch('dist/test-project/styles.css', /body\s*{\s*background-color: blue;\s*}/);
@@ -42,6 +43,7 @@ export default async function () {
 
   await silentNpm('install', 'node-gyp');
   await silentNpm('install', 'fibers');
+  await silentNpm('install', 'sass');
   await silentExec('rm', '-rf', 'node_modules/node-sass');
   await ng('build', '--extract-css', '--source-map');
 
