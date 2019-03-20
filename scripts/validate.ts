@@ -13,6 +13,7 @@ import validateBuildFiles from './validate-build-files';
 import validateCommits from './validate-commits';
 import validateDoNotSubmit from './validate-do-not-submit';
 import validateLicenses from './validate-licenses';
+import validateUserAnalytics from './validate-user-analytics';
 
 export default async function (options: { verbose: boolean }, logger: logging.Logger) {
   let error = false;
@@ -58,6 +59,11 @@ export default async function (options: { verbose: boolean }, logger: logging.Lo
   logger.info('Running BUILD files validation...');
   error = await validateBuildFiles({}, logger.createChild('validate-build-files')) != 0
        || error;
+
+  logger.info('');
+  logger.info('Running User Analytics validation...');
+  error = await validateUserAnalytics({}, logger.createChild('validate-user-analytics')) != 0
+    || error;
 
   if (error) {
     return 101;
