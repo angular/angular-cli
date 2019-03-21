@@ -13,11 +13,10 @@ import * as Istanbul from 'istanbul';
 import 'jasmine';
 import { SpecReporter as JasmineSpecReporter } from 'jasmine-spec-reporter';
 import { ParsedArgs } from 'minimist';
-import { join, relative } from 'path';
+import { join, normalize, relative } from 'path';
 import { Position, SourceMapConsumer } from 'source-map';
 import * as ts from 'typescript';
 import { packages } from '../lib/packages';
-import { diff } from 'semver';
 
 const codeMap = require('../lib/istanbul-local').codeMap;
 const Jasmine = require('jasmine');
@@ -233,7 +232,9 @@ export default function (args: ParsedArgs, logger: logging.Logger) {
         // And add the current status to it (so it takes the non-committed changes).
         ..._exec('git', ['status', '--short', '--show-stash'], {}, logger)
           .split('\n').map(x => x.slice(2).trim()),
-      ].filter(x => x !== '');
+      ]
+        .map(x => normalize(x))
+        .filter(x => x !== '.' && x !== '');  // Empty paths will be normalized to dot.
 
       const diffPackages = new Set();
       for (const pkgName of Object.keys(packages)) {
