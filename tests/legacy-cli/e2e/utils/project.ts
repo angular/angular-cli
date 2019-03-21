@@ -225,7 +225,6 @@ export function useSha() {
       } catch (e) {
         return Promise.reject(e);
       }
-      json['devDependencies']['typescript'] = '~3.1.1';
     });
   } else {
     return Promise.resolve();
