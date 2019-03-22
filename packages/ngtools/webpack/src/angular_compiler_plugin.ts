@@ -45,6 +45,7 @@ import {
   PLATFORM,
 } from './interfaces';
 import { LazyRouteMap, findLazyRoutes } from './lazy_routes';
+import { NgccProcessor } from './ngcc_processor';
 import { TypeScriptPathsPlugin } from './paths-plugin';
 import { WebpackResourceLoader } from './resource_loader';
 import {
@@ -68,7 +69,7 @@ import {
   MESSAGE_KIND,
   UpdateMessage,
 } from './type_checker_messages';
-import { workaroundResolve } from './utils';
+import { flattenArray, workaroundResolve } from './utils';
 import {
   VirtualFileSystemDecorator,
   VirtualWatchFileSystemDecorator,
@@ -122,6 +123,8 @@ export class AngularCompilerPlugin {
 
   // Logging.
   private _logger: logging.Logger;
+
+  private _mainFields: string[] = [];
 
   constructor(options: AngularCompilerPluginOptions) {
     this._options = Object.assign({}, options);
@@ -594,6 +597,16 @@ export class AngularCompilerPlugin {
   // Registration hook for webpack plugin.
   // tslint:disable-next-line:no-big-function
   apply(compiler: Compiler & { watchMode?: boolean }) {
+    // The below is require by NGCC processor
+    // since we need to know which fields we need to process
+    compiler.hooks.environment.tap('angular-compiler', () => {
+      const { options } = compiler;
+      const mainFields = options.resolve && options.resolve.mainFields;
+      if (mainFields) {
+        this._mainFields = flattenArray(mainFields);
+      }
+    });
+
     // cleanup if not watching
     compiler.hooks.thisCompilation.tap('angular-compiler', compilation => {
       compilation.hooks.finishModules.tap('angular-compiler', () => {
@@ -645,6 +658,25 @@ export class AngularCompilerPlugin {
         }
       }
 
+      let ngccProcessor: NgccProcessor | undefined;
+      if (this._compilerOptions.enableIvy) {
+        let ngcc: typeof import('@angular/compiler-cli/ngcc') | undefined;
+        try {
+          // this is done for the sole reason that @ngtools/webpack
+          // support versions of Angular that don't have NGCC API
+          ngcc = require('@angular/compiler-cli/ngcc');
+        } catch {
+        }
+
+        if (ngcc) {
+          ngccProcessor = new NgccProcessor(
+            ngcc,
+            this._mainFields,
+            compilerWithFileSystems.inputFileSystem,
+          );
+        }
+      }
+
       // Create the webpack compiler host.
       const webpackCompilerHost = new WebpackCompilerHost(
         this._compilerOptions,
@@ -652,7 +684,7 @@ export class AngularCompilerPlugin {
         host,
         true,
         this._options.directTemplateLoading,
-        this._platform,
+        ngccProcessor,
       );
 
       // Create and set a new WebpackResourceLoader in AOT
@@ -764,6 +796,26 @@ export class AngularCompilerPlugin {
     });
 
     compiler.hooks.afterResolvers.tap('angular-compiler', compiler => {
+      if (this._compilerOptions.enableIvy) {
+        // When Ivy is enabled we need to add the fields added by NGCC
+        // to take precedence over the provided mainFields.
+        // NGCC adds fields in package.json suffixed with '_ivy_ngcc'
+        // Example: module -> module__ivy_ngcc
+        // tslint:disable-next-line:no-any
+        (compiler as any).resolverFactory.hooks.resolveOptions
+          .for('normal')
+          // tslint:disable-next-line:no-any
+          .tap('WebpackOptionsApply', (resolveOptions: any) => {
+            const mainFields = (resolveOptions.mainFields as string[])
+              .map(f => [`${f}_ivy_ngcc`, f]);
+
+            return {
+              ...resolveOptions,
+              mainFields: flattenArray(mainFields),
+            };
+          });
+      }
+
       // tslint:disable-next-line:no-any
       (compiler as any).resolverFactory.hooks.resolver
         .for('normal')
