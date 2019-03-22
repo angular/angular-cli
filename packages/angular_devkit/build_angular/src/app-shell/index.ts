@@ -18,7 +18,7 @@ import { requireProjectModule } from '../angular-cli-files/utilities/require-pro
 import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { Schema as BuildWebpackServerSchema } from '../server/schema';
-import { BuildWebpackAppShellSchema } from './schema';
+import { Schema as BuildWebpackAppShellSchema } from './schema';
 
 
 export class AppShellBuilder implements Builder<BuildWebpackAppShellSchema> {
