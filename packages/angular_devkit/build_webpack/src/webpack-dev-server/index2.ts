@@ -13,13 +13,14 @@ import { switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
 import { ArchitectPlugin } from '../plugins/architect';
-import { WebpackFactory, WebpackLoggingCallback } from '../webpack/index2';
+import { getEmittedFiles } from '../utils';
+import { BuildResult, WebpackFactory, WebpackLoggingCallback } from '../webpack/index2';
 import { Schema as WebpackDevServerBuilderSchema } from './schema';
 
 const webpackMerge = require('webpack-merge');
 
 
-export type DevServerBuildOutput = BuilderOutput & {
+export type DevServerBuildOutput = BuildResult & {
   port: number;
   family: string;
   address: string;
@@ -33,7 +34,7 @@ export function runWebpackDevServer(
     logging?: WebpackLoggingCallback,
     webpackFactory?: WebpackFactory,
   } = {},
-): Observable<BuilderOutput> {
+): Observable<DevServerBuildOutput> {
   const createWebpack = options.webpackFactory || (config => of(webpack(config)));
   const log: WebpackLoggingCallback = options.logging
     || ((stats, config) => context.logger.info(stats.toString(config.stats)));
@@ -52,7 +53,7 @@ export function runWebpackDevServer(
   devServerConfig.stats = false;
 
   return createWebpack(config).pipe(
-    switchMap(webpackCompiler => new Observable<BuilderOutput>(obs => {
+    switchMap(webpackCompiler => new Observable<DevServerBuildOutput>(obs => {
       const server = new WebpackDevServer(webpackCompiler, devServerConfig);
       let result: DevServerBuildOutput;
 
@@ -62,8 +63,9 @@ export function runWebpackDevServer(
 
         obs.next({
           ...result,
+          emittedFiles: getEmittedFiles(stats.compilation),
           success: !stats.hasErrors(),
-        } as DevServerBuildOutput);
+        } as unknown as DevServerBuildOutput);
       });
 
       server.listen(

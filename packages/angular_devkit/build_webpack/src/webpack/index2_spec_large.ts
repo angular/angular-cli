@@ -12,8 +12,9 @@ import * as path from 'path';
 import { WorkspaceNodeModulesArchitectHost } from '../../../architect/node';
 import { Architect } from '../../../architect/src/architect';
 import { TestingArchitectHost } from '../../../architect/testing/testing-architect-host';
+import { BuildResult } from './index2';
 
-const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
+const devkitRoot = (global as any)._DevKitRoot; // tslint:disable-line:no-any
 
 
 describe('Webpack Builder basic test', () => {
@@ -38,8 +39,8 @@ describe('Webpack Builder basic test', () => {
   }
 
   describe('basic app', () => {
-    const workspaceRoot = join(devkitRoot, 'tests/angular_devkit/build_webpack/basic-app/');
-    const outputPath = join(workspaceRoot, 'dist');
+    const workspaceRoot = path.join(devkitRoot, 'tests/angular_devkit/build_webpack/basic-app/');
+    const outputPath = join(normalize(workspaceRoot), 'dist');
 
     beforeEach(async () => {
       await createArchitect(workspaceRoot);
@@ -53,11 +54,26 @@ describe('Webpack Builder basic test', () => {
       expect(await vfHost.exists(join(outputPath, 'bundle.js')).toPromise()).toBe(true);
       await run.stop();
     });
+
+    it('works and returns emitted files', async () => {
+      const run = await architect.scheduleTarget({ project: 'app', target: 'build' });
+      const output = await run.result as BuildResult;
+
+      expect(output.success).toBe(true);
+      expect(output.emittedFiles).toContain({
+        name: 'main',
+        initial: true,
+        file: 'bundle.js',
+        extension: 'js',
+      });
+
+      await run.stop();
+    });
   });
 
   describe('Angular app', () => {
-    const workspaceRoot = join(devkitRoot, 'tests/angular_devkit/build_webpack/angular-app/');
-    const outputPath = join(workspaceRoot, 'dist/');
+    const workspaceRoot = path.join(devkitRoot, 'tests/angular_devkit/build_webpack/angular-app/');
+    const outputPath = join(normalize(workspaceRoot), 'dist/');
 
     beforeEach(async () => {
       await createArchitect(workspaceRoot);
@@ -70,6 +86,19 @@ describe('Webpack Builder basic test', () => {
       expect(output.success).toBe(true);
       expect(await vfHost.exists(join(outputPath, 'main.js')).toPromise()).toBe(true);
       expect(await vfHost.exists(join(outputPath, 'polyfills.js')).toPromise()).toBe(true);
+      await run.stop();
+    });
+
+    it('works and returns emitted files', async () => {
+      const run = await architect.scheduleTarget({ project: 'app', target: 'build-webpack' });
+      const output = await run.result as BuildResult;
+
+      expect(output.success).toBe(true);
+      expect(output.emittedFiles).toContain(
+        { name: 'main', initial: true, file: 'main.js', extension: 'js' },
+        { name: 'polyfills', initial: true, file: 'polyfills.js', extension: 'js' },
+      );
+
       await run.stop();
     });
   });
