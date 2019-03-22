@@ -3,6 +3,7 @@
   "builders": {
     "app-shell": {
       "class": "./src/app-shell",
+      "implementation": "./src/app-shell/index2",
       "schema": "./src/app-shell/schema.json",
       "description": "Build a server app and a browser app, then render the index.html and use it for the browser output."
     },
