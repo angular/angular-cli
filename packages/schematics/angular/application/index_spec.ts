@@ -217,12 +217,6 @@ describe('Application Schematic', () => {
       expect(pkg.devDependencies['typescript']).toEqual(latestVersions.TypeScript);
     });
 
-    it(`should add a postinstall in package.json when 'enableIvy'`, () => {
-      const tree = schematicRunner.runSchematic('application', { ...defaultOptions, enableIvy: true }, workspaceTree);
-      const pkg = JSON.parse(tree.readContent('/package.json'));
-      expect(pkg.scripts.postinstall).toEqual('ivy-ngcc');
-    });
-
     it(`should not override existing users dependencies`, () => {
       const oldPackageJson = workspaceTree.readContent('package.json');
       workspaceTree.overwrite('package.json', oldPackageJson.replace(
