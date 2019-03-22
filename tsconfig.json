@@ -16,9 +16,9 @@
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "target": "es2017",
+    "target": "es2018",
     "lib": [
-      "es2017"
+      "es2018"
     ],
     "baseUrl": "",
     "rootDirs": [
