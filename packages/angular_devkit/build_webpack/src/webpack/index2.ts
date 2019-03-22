@@ -11,6 +11,7 @@ import { Observable, from, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
 import { ArchitectPlugin } from '../plugins/architect';
+import { EmittedFiles, getEmittedFiles } from '../utils';
 import { Schema as RealWebpackBuilderSchema } from './schema';
 
 const webpackMerge = require('webpack-merge');
@@ -24,6 +25,9 @@ export interface WebpackFactory {
   (config: webpack.Configuration): Observable<webpack.Compiler>;
 }
 
+export type BuildResult = BuilderOutput & {
+  emittedFiles?: EmittedFiles[];
+};
 
 export function runWebpack(
   config: webpack.Configuration,
@@ -32,7 +36,7 @@ export function runWebpack(
     logging?: WebpackLoggingCallback,
     webpackFactory?: WebpackFactory,
   } = {},
-): Observable<BuilderOutput> {
+): Observable<BuildResult> {
   const createWebpack = options.webpackFactory || (config => of(webpack(config)));
   const log: WebpackLoggingCallback = options.logging
     || ((stats, config) => context.logger.info(stats.toString(config.stats)));
@@ -44,7 +48,7 @@ export function runWebpack(
   });
 
   return createWebpack(config).pipe(
-    switchMap(webpackCompiler => new Observable<BuilderOutput>(obs => {
+    switchMap(webpackCompiler => new Observable<BuildResult>(obs => {
       const callback: webpack.Compiler.Handler = (err, stats) => {
         if (err) {
           return obs.error(err);
@@ -53,7 +57,10 @@ export function runWebpack(
         // Log stats.
         log(stats, config);
 
-        obs.next({ success: !stats.hasErrors() });
+        obs.next({
+          success: !stats.hasErrors(),
+          emittedFiles: getEmittedFiles(stats.compilation),
+        } as unknown as BuildResult);
 
         if (!config.watch) {
           obs.complete();

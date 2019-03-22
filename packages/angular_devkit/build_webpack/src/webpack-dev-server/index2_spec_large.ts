@@ -7,7 +7,7 @@
  */
 import { Architect } from '@angular-devkit/architect/src/index2';
 import { TestingArchitectHost } from '@angular-devkit/architect/testing/index2';
-import { experimental, join, normalize, schema } from '@angular-devkit/core';
+import { experimental, normalize, schema } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import fetch from 'node-fetch';  // tslint:disable-line:no-implicit-dependencies
@@ -15,7 +15,7 @@ import * as path from 'path';
 import { WorkspaceNodeModulesArchitectHost } from '../../../architect/node';
 import { DevServerBuildOutput } from './index2';
 
-const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
+const devkitRoot = (global as any)._DevKitRoot; // tslint:disable-line:no-any
 
 
 describe('Dev Server Builder', () => {
@@ -42,7 +42,7 @@ describe('Dev Server Builder', () => {
   }
 
   beforeEach(async () => {
-    await createArchitect(join(devkitRoot, 'tests/angular_devkit/build_webpack/basic-app/'));
+    await createArchitect(path.join(devkitRoot, 'tests/angular_devkit/build_webpack/basic-app/'));
   });
 
   it('works', async () => {
@@ -53,6 +53,20 @@ describe('Dev Server Builder', () => {
     const response = await fetch(`http://${output.address}:${output.port}/bundle.js`);
     expect(await response.text()).toContain(`console.log('hello world')`);
 
+    await run.stop();
+  }, 30000);
+
+  it('works and returns emitted files', async () => {
+    const run = await architect.scheduleTarget(webpackTargetSpec);
+    const output = await run.result as DevServerBuildOutput;
+
+    expect(output.success).toBe(true);
+    expect(output.emittedFiles).toContain({
+      name: 'main',
+      initial: true,
+      file: 'bundle.js',
+      extension: 'js',
+    });
     await run.stop();
   }, 30000);
 });
