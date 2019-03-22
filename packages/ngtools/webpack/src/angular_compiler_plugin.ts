@@ -36,9 +36,14 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import { Compiler, compilation } from 'webpack';
 import { time, timeEnd } from './benchmark';
-import { WebpackCompilerHost, workaroundResolve } from './compiler_host';
+import { WebpackCompilerHost } from './compiler_host';
 import { resolveEntryModuleFromMain } from './entry_resolver';
 import { DiagnosticMode, gatherDiagnostics, hasErrors } from './gather_diagnostics';
+import {
+  AngularCompilerPluginOptions,
+  ContextElementDependencyConstructor,
+  PLATFORM,
+} from './interfaces';
 import { LazyRouteMap, findLazyRoutes } from './lazy_routes';
 import { TypeScriptPathsPlugin } from './paths-plugin';
 import { WebpackResourceLoader } from './resource_loader';
@@ -63,6 +68,7 @@ import {
   MESSAGE_KIND,
   UpdateMessage,
 } from './type_checker_messages';
+import { workaroundResolve } from './utils';
 import {
   VirtualFileSystemDecorator,
   VirtualWatchFileSystemDecorator,
@@ -75,61 +81,6 @@ import {
 import { WebpackInputHost } from './webpack-input-host';
 
 const treeKill = require('tree-kill');
-
-export interface ContextElementDependency { }
-
-export interface ContextElementDependencyConstructor {
-  new(modulePath: string, name: string): ContextElementDependency;
-}
-
-/**
- * Option Constants
- */
-export interface AngularCompilerPluginOptions {
-  sourceMap?: boolean;
-  tsConfigPath: string;
-  basePath?: string;
-  entryModule?: string;
-  mainPath?: string;
-  skipCodeGeneration?: boolean;
-  hostReplacementPaths?: { [path: string]: string } | ((path: string) => string);
-  forkTypeChecker?: boolean;
-  i18nInFile?: string;
-  i18nInFormat?: string;
-  i18nOutFile?: string;
-  i18nOutFormat?: string;
-  locale?: string;
-  missingTranslation?: string;
-  platform?: PLATFORM;
-  nameLazyFiles?: boolean;
-  logger?: logging.Logger;
-  directTemplateLoading?: boolean;
-  // When using the loadChildren string syntax, @ngtools/webpack must query @angular/compiler-cli
-  // via a private API to know which lazy routes exist. This increases build and rebuild time.
-  // When using Ivy, the string syntax is not supported at all. Thus we shouldn't attempt that.
-  // This option is also used for when the compilation doesn't need this sort of processing at all.
-  discoverLazyRoutes?: boolean;
-  importFactories?: boolean;
-
-  // added to the list of lazy routes
-  additionalLazyModules?: { [module: string]: string };
-  additionalLazyModuleResources?: string[];
-
-  // The ContextElementDependency of correct Webpack compilation.
-  // This is needed when there are multiple Webpack installs.
-  contextElementDependencyConstructor?: ContextElementDependencyConstructor;
-
-  // Use tsconfig to include path globs.
-  compilerOptions?: ts.CompilerOptions;
-
-  host?: virtualFs.Host<fs.Stats>;
-  platformTransformers?: ts.TransformerFactory<ts.SourceFile>[];
-}
-
-export enum PLATFORM {
-  Browser,
-  Server,
-}
 
 export class AngularCompilerPlugin {
   private _options: AngularCompilerPluginOptions;
@@ -701,6 +652,7 @@ export class AngularCompilerPlugin {
         host,
         true,
         this._options.directTemplateLoading,
+        this._platform,
       );
 
       // Create and set a new WebpackResourceLoader in AOT
