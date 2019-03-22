@@ -7,19 +7,22 @@
  */
 // tslint:disable:no-big-function
 
-import { DefaultTimeout, runTargetSpec } from '@angular-devkit/architect/testing';
 import { getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core';
 import * as express from 'express'; // tslint:disable-line:no-implicit-dependencies
-import { Server } from 'http';
-import { concatMap, tap } from 'rxjs/operators';
-import { host, protractorTargetSpec } from '../utils';
+import { Architect } from '../../../architect/src/architect';
+import { createArchitect, host } from '../utils';
 
 
 describe('AppShell Builder', () => {
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  const target = { project: 'app', target: 'app-shell' };
+  let architect: Architect;
 
-  const targetSpec = { project: 'app', target: 'app-shell' };
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
+
   const appShellRouteFiles = {
     'src/app/app-shell/app-shell.component.html': `
       <p>
@@ -120,36 +123,37 @@ describe('AppShell Builder', () => {
     `,
   };
 
-  it('works (basic)', done => {
+  it('works (basic)', async () => {
     host.replaceInFile('src/app/app.module.ts', /    BrowserModule/, `
       BrowserModule.withServerTransition({ appId: 'some-app' })
     `);
 
-    runTargetSpec(host, targetSpec, {}, DefaultTimeout * 2).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const fileName = 'dist/index.html';
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toMatch(/Welcome to app!/);
-      }),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(target);
+    const output = await run.result;
+    await run.stop();
+
+    expect(output.success).toBe(true);
+
+    const fileName = 'dist/index.html';
+    const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+    expect(content).toMatch(/Welcome to app!/);
   });
 
-  it('works with route', done => {
+  it('works with route', async () => {
     host.writeMultipleFiles(appShellRouteFiles);
     const overrides = { route: 'shell' };
 
-    runTargetSpec(host, targetSpec, overrides, DefaultTimeout * 2).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const fileName = 'dist/index.html';
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toContain('app-shell works!');
-      }),
-    ).toPromise().then(done, done.fail);
+    const run = await architect.scheduleTarget(target, overrides);
+    const output = await run.result;
+    await run.stop();
+
+    expect(output.success).toBe(true);
+    const fileName = 'dist/index.html';
+    const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+    expect(content).toContain('app-shell works!');
   });
 
-  it('works with route and service-worker', done => {
+  it('works with route and service-worker', async () => {
     host.writeMultipleFiles(appShellRouteFiles);
     host.writeMultipleFiles({
       'src/ngsw-config.json': `
@@ -225,29 +229,39 @@ describe('AppShell Builder', () => {
       '"buildOptimizer": true, "serviceWorker": true',
     );
 
-    const overrides = { route: 'shell' };
-    const prodTargetSpec = { ...targetSpec, configuration: 'production' };
-    let server: Server;
+    // We're changing the workspace file so we need to recreate the Architect instance.
+    architect = (await createArchitect(host.root())).architect;
 
-    // Build the app shell.
-    runTargetSpec(host, prodTargetSpec, overrides, DefaultTimeout * 2).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      // Make sure the index is pre-rendering the route.
-      tap(() => {
-        const fileName = 'dist/index.html';
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toContain('app-shell works!');
-      }),
-      tap(() => {
-        // Serve the app using a simple static server.
-        const app = express();
-        app.use('/', express.static(getSystemPath(join(host.root(), 'dist')) + '/'));
-        server = app.listen(4200);
-      }),
-      // Load app in protractor, then check service worker status.
-      concatMap(() => runTargetSpec(host, protractorTargetSpec, { devServerTarget: undefined })),
-      // Close the express server.
-      tap(() => server.close()),
-    ).toPromise().then(done, done.fail);
+    const overrides = { route: 'shell' };
+    const run = await architect.scheduleTarget(
+      { ...target, configuration: 'production' },
+      overrides,
+    );
+    const output = await run.result;
+    await run.stop();
+
+    expect(output.success).toBe(true);
+
+    // Make sure the index is pre-rendering the route.
+    const fileName = 'dist/index.html';
+    const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+    expect(content).toContain('app-shell works!');
+
+    // Serve the app using a simple static server.
+    const app = express();
+    app.use('/', express.static(getSystemPath(join(host.root(), 'dist')) + '/'));
+    const server = app.listen(4200);
+
+    // Load app in protractor, then check service worker status.
+    const protractorRun = await architect.scheduleTarget(
+      { project: 'app-e2e', target: 'e2e' },
+      { devServerTarget: undefined } as {},
+    );
+    const protractorOutput = await protractorRun.result;
+    await protractorRun.stop();
+    expect(protractorOutput.success).toBe(true);
+
+    // Close the express server.
+    server.close();
   });
 });
