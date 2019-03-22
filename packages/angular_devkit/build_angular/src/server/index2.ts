@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { createBuilder } from '@angular-devkit/architect/src/index2';
+import { BuilderOutput, createBuilder } from '@angular-devkit/architect/src/index2';
 import {
   Path,
   experimental,
@@ -17,6 +17,7 @@ import {
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { Stats } from 'fs';
+import * as path from 'path';
 import { from, of } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
@@ -41,7 +42,16 @@ import { Schema as BuildWebpackServerSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
 
-export default createBuilder<json.JsonObject & BuildWebpackServerSchema>((options, context) => {
+// If success is true, outputPath should be set.
+export type ServerBuilderOutput = json.JsonObject & BuilderOutput & {
+  outputPath?: string;
+};
+
+
+export default createBuilder<
+  json.JsonObject & BuildWebpackServerSchema,
+  ServerBuilderOutput
+>((options, context) => {
   const host = new virtualFs.AliasHost(new NodeJsSyncHost());
   const root = context.workspaceRoot;
 
@@ -100,6 +110,16 @@ export default createBuilder<json.JsonObject & BuildWebpackServerSchema>((option
       );
 
       return runWebpack(webpackConfig, context);
+    }),
+    map(output => {
+      if (output.success === false) {
+        return output as ServerBuilderOutput;
+      }
+
+      return {
+        ...output,
+        outputPath: path.resolve(root, options.outputPath),
+      } as ServerBuilderOutput;
     }),
   );
 });
