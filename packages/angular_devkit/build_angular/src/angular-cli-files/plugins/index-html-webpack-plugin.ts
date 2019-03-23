@@ -5,11 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { createHash } from 'crypto';
 import { Compiler, compilation } from 'webpack';
-import { RawSource, ReplaceSource } from 'webpack-sources';
-
-const parse5 = require('parse5');
+import { CompiledFileInfo, CompiledFileType, generateIndexHtml } from './generate-index-html';
 
 export interface IndexHtmlWebpackPluginOptions {
   input: string;
@@ -46,6 +43,7 @@ function readFile(filename: string, compilation: compilation.Compilation): Promi
   });
 }
 
+
 export class IndexHtmlWebpackPlugin {
   private _options: IndexHtmlWebpackPluginOptions;
 
@@ -67,6 +65,7 @@ export class IndexHtmlWebpackPlugin {
       (compilation as compilation.Compilation & { fileDependencies: Set<string> })
         .fileDependencies.add(this._options.input);
 
+      const loadOutputFile = (name: string) => compilation.assets[name].source();
 
       // Get all files for selected entrypoints
       const unfilteredSortedFiles: string[] = [];
@@ -89,176 +88,26 @@ export class IndexHtmlWebpackPlugin {
       // Clean out files that are used in all types of entrypoints
       otherFiles.forEach(file => noModuleFiles.delete(file));
 
-      // Filter files
-      const existingFiles = new Set<string>();
-      const stylesheets: string[] = [];
-      const scripts: string[] = [];
-      for (const file of unfilteredSortedFiles) {
-        if (existingFiles.has(file)) {
-          continue;
-        }
-        existingFiles.add(file);
+      // If this plugin calls generateIndexHtml it always uses type: 'none' to align with
+      // its original behavior.
+      const compiledFiles: CompiledFileInfo[] = unfilteredSortedFiles.map(f => ({
+        file: f,
+        type: 'none' as CompiledFileType,
+      }));
 
-        if (file.endsWith('.js')) {
-          scripts.push(file);
-        } else if (file.endsWith('.css')) {
-          stylesheets.push(file);
-        }
-
-      }
-
-      // Find the head and body elements
-      const treeAdapter = parse5.treeAdapters.default;
-      const document = parse5.parse(inputContent, { treeAdapter, locationInfo: true });
-      let headElement;
-      let bodyElement;
-      for (const docChild of document.childNodes) {
-        if (docChild.tagName === 'html') {
-          for (const htmlChild of docChild.childNodes) {
-            if (htmlChild.tagName === 'head') {
-              headElement = htmlChild;
-            }
-            if (htmlChild.tagName === 'body') {
-              bodyElement = htmlChild;
-            }
-          }
-        }
-      }
-
-      if (!headElement || !bodyElement) {
-        throw new Error('Missing head and/or body elements');
-      }
-
-      // Determine script insertion point
-      let scriptInsertionPoint;
-      if (bodyElement.__location && bodyElement.__location.endTag) {
-        scriptInsertionPoint = bodyElement.__location.endTag.startOffset;
-      } else {
-        // Less accurate fallback
-        // parse5 4.x does not provide locations if malformed html is present
-        scriptInsertionPoint = inputContent.indexOf('</body>');
-      }
-
-      let styleInsertionPoint;
-      if (headElement.__location && headElement.__location.endTag) {
-        styleInsertionPoint = headElement.__location.endTag.startOffset;
-      } else {
-        // Less accurate fallback
-        // parse5 4.x does not provide locations if malformed html is present
-        styleInsertionPoint = inputContent.indexOf('</head>');
-      }
-
-      // Inject into the html
-      const indexSource = new ReplaceSource(new RawSource(inputContent), this._options.input);
-
-      let scriptElements = '';
-      for (const script of scripts) {
-        const attrs: { name: string, value: string | null }[] = [
-          { name: 'src', value: (this._options.deployUrl || '') + script },
-        ];
-
-        if (noModuleFiles.has(script)) {
-          attrs.push({ name: 'nomodule', value: null });
-        }
-
-        if (this._options.sri) {
-          const content = compilation.assets[script].source();
-          attrs.push(...this._generateSriAttributes(content));
-        }
-
-        const attributes = attrs
-          .map(attr => attr.value === null ? attr.name : `${attr.name}="${attr.value}"`)
-          .join(' ');
-        scriptElements += `<script ${attributes}></script>`;
-      }
-
-      indexSource.insert(
-        scriptInsertionPoint,
-        scriptElements,
-      );
-
-      // Adjust base href if specified
-      if (typeof this._options.baseHref == 'string') {
-        let baseElement;
-        for (const headChild of headElement.childNodes) {
-          if (headChild.tagName === 'base') {
-            baseElement = headChild;
-          }
-        }
-
-        const baseFragment = treeAdapter.createDocumentFragment();
-
-        if (!baseElement) {
-          baseElement = treeAdapter.createElement(
-            'base',
-            undefined,
-            [
-              { name: 'href', value: this._options.baseHref },
-            ],
-          );
-
-          treeAdapter.appendChild(baseFragment, baseElement);
-          indexSource.insert(
-            headElement.__location.startTag.endOffset,
-            parse5.serialize(baseFragment, { treeAdapter }),
-          );
-        } else {
-          let hrefAttribute;
-          for (const attribute of baseElement.attrs) {
-            if (attribute.name === 'href') {
-              hrefAttribute = attribute;
-            }
-          }
-          if (hrefAttribute) {
-            hrefAttribute.value = this._options.baseHref;
-          } else {
-            baseElement.attrs.push({ name: 'href', value: this._options.baseHref });
-          }
-
-          treeAdapter.appendChild(baseFragment, baseElement);
-          indexSource.replace(
-            baseElement.__location.startOffset,
-            baseElement.__location.endOffset,
-            parse5.serialize(baseFragment, { treeAdapter }),
-          );
-        }
-      }
-
-      const styleElements = treeAdapter.createDocumentFragment();
-      for (const stylesheet of stylesheets) {
-        const attrs = [
-          { name: 'rel', value: 'stylesheet' },
-          { name: 'href', value: (this._options.deployUrl || '') + stylesheet },
-        ];
-
-        if (this._options.sri) {
-          const content = compilation.assets[stylesheet].source();
-          attrs.push(...this._generateSriAttributes(content));
-        }
-
-        const element = treeAdapter.createElement('link', undefined, attrs);
-        treeAdapter.appendChild(styleElements, element);
-      }
-
-      indexSource.insert(
-        styleInsertionPoint,
-        parse5.serialize(styleElements, { treeAdapter }),
-      );
+      const indexSource = generateIndexHtml({
+        input: this._options.input,
+        inputContent,
+        baseHref: this._options.baseHref,
+        deployUrl: this._options.deployUrl,
+        sri: this._options.sri,
+        unfilteredSortedFiles: compiledFiles,
+        noModuleFiles,
+        loadOutputFile,
+      });
 
       // Add to compilation assets
       compilation.assets[this._options.output] = indexSource;
     });
-  }
-
-  private _generateSriAttributes(content: string) {
-    const algo = 'sha384';
-    const hash = createHash(algo)
-      .update(content, 'utf8')
-      .digest('base64');
-
-    return [
-      { name: 'integrity', value: `${algo}-${hash}` },
-      { name: 'crossorigin', value: 'anonymous' },
-    ];
   }
 }
