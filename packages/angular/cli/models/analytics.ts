@@ -475,10 +475,14 @@ export function getGlobalAnalytics(): string | boolean | undefined {
     const analyticsConfig = globalWorkspace
       && globalWorkspace.getCli()
       && globalWorkspace.getCli()['analytics'];
+    analyticsDebug('Client Analytics config found: %j', analyticsConfig);
 
     if (analyticsConfig === false) {
       return false;
-    } else if (analyticsConfig === undefined) {
+    } else if (analyticsConfig === undefined || analyticsConfig === null) {
+      // globalWorkspace can be null if there is no file. analyticsConfig would be null in this
+      // case. Since there is no file, the user hasn't answered and the expected return value is
+      // undefined.
       return undefined;
     } else {
       let uid: string | undefined = undefined;
@@ -492,7 +496,9 @@ export function getGlobalAnalytics(): string | boolean | undefined {
 
       return uid;
     }
-  } catch {
+  } catch (err) {
+    analyticsDebug('Error happened during reading of analytics config: %s', err.message);
+
     return false;
   }
 }
