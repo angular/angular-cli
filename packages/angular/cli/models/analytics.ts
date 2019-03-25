@@ -13,7 +13,6 @@ import * as inquirer from 'inquirer';
 import * as os from 'os';
 import * as ua from 'universal-analytics';
 import { v4 as uuidV4 } from 'uuid';
-import { TimingOptions } from '../../../angular_devkit/core/src/analytics';
 import { getWorkspace, getWorkspaceRaw } from '../utilities/config';
 
 const analyticsDebug = debug('ng:analytics');  // Generate analytics, including settings and users.
@@ -309,7 +308,7 @@ export class UniversalAnalytics implements analytics.Analytics {
     this._dirty = true;
     this._ua.pageview({ dp, dh, dt, ...vars });
   }
-  timing(utc: string, utv: string, utt: string | number, options: TimingOptions = {}) {
+  timing(utc: string, utv: string, utt: string | number, options: analytics.TimingOptions = {}) {
     const vars = this._customVariables(options);
     analyticsLogDebug('timing utc=%j, utv=%j, utl=%j, %j', utc, utv, utt, vars);
 
