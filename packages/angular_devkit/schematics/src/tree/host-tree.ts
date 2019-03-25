@@ -180,7 +180,7 @@ export class HostTree implements Tree {
     const overwriteConflictAllowed =
       (strategy & MergeStrategy.AllowOverwriteConflict) == MergeStrategy.AllowOverwriteConflict;
     const deleteConflictAllowed =
-      (strategy & MergeStrategy.AllowOverwriteConflict) == MergeStrategy.AllowDeleteConflict;
+      (strategy & MergeStrategy.AllowDeleteConflict) == MergeStrategy.AllowDeleteConflict;
 
     other.actions.forEach(action => {
       switch (action.kind) {
