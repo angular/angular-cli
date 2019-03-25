@@ -5,6 +5,6 @@ try {
   const analytics = require('../../models/analytics');
 
   if (analytics.getGlobalAnalytics() === undefined) {
-    analytics.promptGlobalAnalytics(true);
+    analytics.promptGlobalAnalytics();
   }
 } catch (_) {}
