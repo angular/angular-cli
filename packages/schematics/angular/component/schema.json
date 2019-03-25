@@ -130,8 +130,7 @@
     "entryComponent": {
       "type": "boolean",
       "default": false,
-      "description": "When true, the new component is the entry component of the declaring NgModule.",
-      "x-user-analytics": 20
+      "description": "When true, the new component is the entry component of the declaring NgModule."
     },
     "lintFix": {
       "type": "boolean",
