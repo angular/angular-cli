@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { tags, terminal } from '@angular-devkit/core';
+import { analytics, tags, terminal } from '@angular-devkit/core';
 import { ModuleNotFoundException, resolve } from '@angular-devkit/core/node';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
 import { dirname } from 'path';
@@ -150,7 +150,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
 
     // Add the collection if it's safe listed.
     if (collection && isPackageNameSafeForAnalytics(collection)) {
-      dimensions[AnalyticsDimensions.NgAddCollection] = collection;
+      dimensions[analytics.NgCliAnalyticsDimensions.NgAddCollection] = collection;
     } else {
       delete dimensions[AnalyticsDimensions.NgAddCollection];
     }

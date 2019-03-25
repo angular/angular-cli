@@ -241,6 +241,7 @@ function _buildUserAgentString() {
 export class UniversalAnalytics implements analytics.Analytics {
   private _ua: ua.Visitor;
   private _dirty = false;
+  private _metrics: (string | number)[] = [];
 
   /**
    * @param trackingId The Google Analytics ID.
@@ -266,10 +267,10 @@ export class UniversalAnalytics implements analytics.Analytics {
     this._ua.set('aid', _getNodeVersion());
 
     // We set custom metrics for values we care about.
-    this._ua.set('cm1', _getCpuCount());
-    this._ua.set('cm2', _getCpuSpeed());
-    this._ua.set('cm3', _getRamSize());
-    this._ua.set('cm4', _getNumericNodeVersion());
+    this._metrics[analytics.NgCliAnalyticsMetrics.CpuCount] = _getCpuCount();
+    this._metrics[analytics.NgCliAnalyticsMetrics.CpuSpeed] = _getCpuSpeed();
+    this._metrics[analytics.NgCliAnalyticsMetrics.RamInMegabytes] = _getRamSize();
+    this._metrics[analytics.NgCliAnalyticsMetrics.NodeVersion] = _getNumericNodeVersion();
   }
 
   /**
@@ -278,6 +279,7 @@ export class UniversalAnalytics implements analytics.Analytics {
    */
   private _customVariables(options: analytics.CustomDimensionsAndMetricsOptions) {
     const additionals: { [key: string]: boolean | number | string } = {};
+    this._metrics.forEach((v, i) => additionals['cm' + i] = v);
     (options.dimensions || []).forEach((v, i) => additionals['cd' + i] = v);
     (options.metrics || []).forEach((v, i) => additionals['cm' + i] = v);
 
