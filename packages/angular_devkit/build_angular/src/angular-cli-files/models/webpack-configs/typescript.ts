@@ -75,6 +75,7 @@ function _createAotPlugin(
     contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
     logger: wco.logger,
     directTemplateLoading: true,
+    importFactories: buildOptions.experimentalImportFactories,
     ...options,
   };
   return new AngularCompilerPlugin(pluginOptions);
