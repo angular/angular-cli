@@ -12,6 +12,7 @@ import {
 } from '@angular-devkit/build-webpack/src/webpack/index2';
 import {
   Path,
+  analytics,
   experimental,
   getSystemPath,
   join,
@@ -27,6 +28,7 @@ import * as fs from 'fs';
 import { Observable, from, of } from 'rxjs';
 import { concatMap, map, switchMap } from 'rxjs/operators';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
+import { NgBuildAnalyticsPlugin } from '../../plugins/webpack/analytics';
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import {
   getAotConfig,
@@ -88,7 +90,10 @@ export function buildWebpackConfig(
   root: Path,
   projectRoot: Path,
   options: NormalizedBrowserBuilderSchema,
-  logger: logging.LoggerApi,
+  additionalOptions: {
+    logger?: logging.LoggerApi,
+    analytics?: analytics.Analytics,
+  } = {},
 ): webpack.Configuration {
   // Ensure Build Optimizer is only used with AOT.
   if (options.buildOptimizer && !options.aot) {
@@ -105,9 +110,13 @@ export function buildWebpackConfig(
   const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
     && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
 
+  const logger = additionalOptions.logger
+    ? additionalOptions.logger.createChild('webpackConfigOptions')
+    : new logging.NullLogger();
+
   wco = {
     root: getSystemPath(root),
-    logger: logger.createChild('webpackConfigOptions'),
+    logger,
     projectRoot: getSystemPath(projectRoot),
     buildOptions: options,
     tsConfig,
@@ -123,6 +132,15 @@ export function buildWebpackConfig(
     getStylesConfig(wco),
     getStatsConfig(wco),
   ];
+
+  if (additionalOptions.analytics) {
+    // If there's analytics, add our plugin. Otherwise no need to slow down the build.
+    webpackConfigs.push({
+      plugins: [
+        new NgBuildAnalyticsPlugin(wco.projectRoot, additionalOptions.analytics, 'build'),
+      ],
+    });
+  }
 
   if (wco.buildOptions.main || wco.buildOptions.polyfills) {
     const typescriptConfigPartial = wco.buildOptions.aot
@@ -151,7 +169,10 @@ export async function buildBrowserWebpackConfigFromWorkspace(
   projectName: string,
   workspace: experimental.workspace.Workspace,
   host: virtualFs.Host<fs.Stats>,
-  logger: logging.LoggerApi,
+  additionalOptions: {
+    logger?: logging.LoggerApi,
+    analytics?: analytics.Analytics,
+  } = {},
 ): Promise<webpack.Configuration> {
   // TODO: Use a better interface for workspace access.
   const projectRoot = resolve(workspace.root, normalize(workspace.getProject(projectName).root));
@@ -165,7 +186,7 @@ export async function buildBrowserWebpackConfigFromWorkspace(
     options,
   );
 
-  return buildWebpackConfig(workspace.root, projectRoot, normalizedOptions, logger);
+  return buildWebpackConfig(workspace.root, projectRoot, normalizedOptions, additionalOptions);
 }
 
 
@@ -194,7 +215,10 @@ export async function buildBrowserWebpackConfigFromContext(
     projectName,
     workspace,
     host,
-    context.logger,
+    {
+      logger: context.logger,
+      analytics: context.analytics,
+    },
   );
 
   return { workspace, config };
