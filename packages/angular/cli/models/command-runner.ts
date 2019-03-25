@@ -20,7 +20,7 @@ import { readFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
 import { findUp } from '../utilities/find-up';
 import { parseJsonSchemaToCommandDescription } from '../utilities/json-schema';
-import { UniversalAnalytics,  getGlobalAnalytics } from './analytics';
+import { UniversalAnalytics, getGlobalAnalytics, getSharedAnalytics } from './analytics';
 import { Command } from './command';
 import {
   CommandDescription,
@@ -37,30 +37,22 @@ export interface CommandMapOptions {
 }
 
 
+/**
+ * Create the analytics instance.
+ * @private
+ */
 async function _createAnalytics(): Promise<analytics.Analytics> {
   const config = getGlobalAnalytics();
+  const maybeSharedAnalytics = getSharedAnalytics();
 
-  switch (config) {
-    case undefined:
-    case false:
-      analyticsDebug('Analytics disabled. Ignoring all analytics.');
-
-      return new analytics.NoopAnalytics();
-
-    case true:
-      analyticsDebug('Analytics enabled, anonymous user.');
-
-      return new UniversalAnalytics('UA-8594346-29', '');
-
-    case 'ci':
-      analyticsDebug('Logging analytics as CI.');
-
-      return new UniversalAnalytics('UA-8594346-29', 'ci');
-
-    default:
-      analyticsDebug('Analytics enabled. User ID: %j', config);
-
-      return new UniversalAnalytics('UA-8594346-29', config);
+  if (config && maybeSharedAnalytics) {
+    return new analytics.MultiAnalytics([config, maybeSharedAnalytics]);
+  } else if (config) {
+    return config;
+  } else if (maybeSharedAnalytics) {
+    return maybeSharedAnalytics;
+  } else {
+    return new analytics.NoopAnalytics();
   }
 }
 
