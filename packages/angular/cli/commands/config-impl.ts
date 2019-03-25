@@ -17,6 +17,7 @@ import {
   tags,
 } from '@angular-devkit/core';
 import { writeFileSync } from 'fs';
+import { v4 as uuidV4 } from 'uuid';
 import { Command } from '../models/command';
 import { Arguments, CommandScope } from '../models/interface';
 import {
@@ -28,13 +29,56 @@ import {
 import { Schema as ConfigCommandSchema, Value as ConfigCommandSchemaValue } from './config';
 
 
-const validCliPaths = new Map([
-  ['cli.warnings.versionMismatch', 'boolean'],
-  ['cli.defaultCollection', 'string'],
-  ['cli.packageManager', 'string'],
-  ['cli.analytics', 'string'],
-  ['cli.analyticsSharing.tracking', 'string'],
-  ['cli.analyticsSharing.uuid', 'string'],
+function _validateBoolean(value: string) {
+  if (('' + value).trim() === 'true') {
+    return true;
+  } else if (('' + value).trim() === 'false') {
+    return false;
+  } else {
+    throw new Error(`Invalid value type; expected Boolean, received ${JSON.stringify(value)}.`);
+  }
+}
+function _validateNumber(value: string) {
+  const numberValue = Number(value);
+  if (!Number.isFinite(numberValue)) {
+    return numberValue;
+  }
+  throw new Error(`Invalid value type; expected Number, received ${JSON.stringify(value)}.`);
+}
+function _validateString(value: string) {
+  return value;
+}
+function _validateAnalytics(value: string) {
+  if (value === '') {
+    // Disable analytics.
+    return null;
+  } else {
+    return value;
+  }
+}
+function _validateAnalyticsSharingUuid(value: string) {
+  if (value == '') {
+    return uuidV4();
+  } else {
+    return value;
+  }
+}
+function _validateAnalyticsSharingTracking(value: string) {
+  if (!value.match(/^GA-\d+-\d+$/)) {
+    throw new Error(`Invalid GA property ID: ${JSON.stringify(value)}.`);
+  }
+
+  return value;
+}
+
+
+const validCliPaths = new Map<string, ((arg: string) => JsonValue)>([
+  ['cli.warnings.versionMismatch', _validateBoolean],
+  ['cli.defaultCollection', _validateString],
+  ['cli.packageManager', _validateString],
+  ['cli.analytics', _validateAnalytics],
+  ['cli.analyticsSharing.tracking', _validateAnalyticsSharingTracking],
+  ['cli.analyticsSharing.uuid', _validateAnalyticsSharingUuid],
 ]);
 
 /**
@@ -140,25 +184,7 @@ function setValueFromPath<T extends JsonArray | JsonObject>(
 function normalizeValue(value: ConfigCommandSchemaValue, path: string): JsonValue {
   const cliOptionType = validCliPaths.get(path);
   if (cliOptionType) {
-    switch (cliOptionType) {
-      case 'boolean':
-        if (('' + value).trim() === 'true') {
-          return true;
-        } else if (('' + value).trim() === 'false') {
-          return false;
-        }
-        break;
-      case 'number':
-        const numberValue = Number(value);
-        if (!Number.isFinite(numberValue)) {
-          return numberValue;
-        }
-        break;
-      case 'string':
-        return value;
-    }
-
-    throw new Error(`Invalid value type; expected a ${cliOptionType}.`);
+    return cliOptionType('' + value);
   }
 
   if (typeof value === 'string') {
