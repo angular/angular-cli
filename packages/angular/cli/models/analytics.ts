@@ -393,6 +393,8 @@ export async function promptGlobalAnalytics(force = false) {
     }
 
     return true;
+  } else {
+    analyticsDebug('Either STDOUT or STDIN are not TTY and we skipped the prompt.');
   }
 
   return false;
