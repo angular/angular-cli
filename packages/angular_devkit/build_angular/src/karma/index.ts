@@ -26,6 +26,9 @@ type KarmaConfigOptions = import ('karma').ConfigOptions & {
   configFile?: string;
 };
 
+type WebpackConfigurationTransformer =
+  (configuration: webpack.Configuration) => webpack.Configuration;
+
 async function initialize(
   options: KarmaBuilderOptions,
   context: BuilderContext,
@@ -53,6 +56,10 @@ async function initialize(
 export function execute(
   options: KarmaBuilderOptions,
   context: BuilderContext,
+  transforms: {
+    webpackConfiguration?: WebpackConfigurationTransformer,
+    karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions,
+  } = {},
 ): Observable<BuilderOutput> {
   return from(initialize(options, context)).pipe(
     switchMap(([karma, webpackConfig]) => new Observable<BuilderOutput>(subscriber => {
@@ -83,7 +90,9 @@ export function execute(
 
       karmaOptions.buildWebpack = {
         options,
-        webpackConfig,
+        webpackConfig: transforms.webpackConfiguration
+          ? transforms.webpackConfiguration(webpackConfig)
+          : webpackConfig,
         // Pass onto Karma to emit BuildEvents.
         successCb: () => subscriber.next({ success: true }),
         failureCb: () => subscriber.next({ success: false }),
@@ -95,7 +104,9 @@ export function execute(
       };
 
       // Complete the observable once the Karma server returns.
-      const karmaServer = new karma.Server(karmaOptions, () => subscriber.complete());
+      const karmaServer = new karma.Server(
+        transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions,
+        () => subscriber.complete());
       // karma typings incorrectly define start's return value as void
       // tslint:disable-next-line:no-use-of-empty-return-value
       const karmaStart = karmaServer.start() as unknown as Promise<void>;
@@ -112,4 +123,5 @@ export function execute(
   );
 }
 
+export { KarmaBuilderOptions };
 export default createBuilder<Record<string, string> & KarmaBuilderOptions>(execute);
