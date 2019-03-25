@@ -347,4 +347,42 @@ describe('Browser Builder rebuilds', () => {
     ).toPromise();
     await run.stop();
   });
+
+  it('forkTypeChecker emits interface error on rebuilds', async () => {
+    host.writeMultipleFiles({
+      'src/interface.ts': `export interface Foo { bar: boolean };`,
+    });
+    host.appendToFile('src/main.ts', `
+      import { Foo } from './interface';
+      const x: Foo = { bar: true };
+    `);
+
+    const overrides = { watch: true, aot: false, forkTypeChecker: true };
+    let buildNumber = 0;
+    const logger = new TestLogger('rebuild-interface-errors');
+    const run = await architect.scheduleTarget(target, overrides, { logger });
+    await run.output.pipe(
+      debounceTime(2000),
+      tap((buildEvent) => {
+        buildNumber += 1;
+        switch (buildNumber) {
+          case 1:
+            expect(buildEvent.success).toBe(true);
+            host.writeMultipleFiles({
+              'src/interface.ts': `export interface Foo {
+                bar: string;
+               };`,
+            });
+            break;
+
+          case 2:
+            expect(logger.includes(`Type 'true' is not assignable to type 'string'`)).toBe(true);
+            logger.clear();
+            break;
+        }
+      }),
+      take(2),
+    ).toPromise();
+    await run.stop();
+  });
 });
