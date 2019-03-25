@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { experimental, json, logging } from '@angular-devkit/core';
+import { analytics, experimental, json, logging } from '@angular-devkit/core';
 import { Observable, from, of } from 'rxjs';
 import { concatMap, first, map, shareReplay, switchMap } from 'rxjs/operators';
 import {
@@ -102,6 +102,7 @@ function _createJobHandlerFromBuilderInfo(
 
 export interface ScheduleOptions {
   logger?: logging.Logger;
+  analytics?: analytics.Analytics;
 }
 
 
@@ -347,6 +348,7 @@ export class Architect {
       logger: scheduleOptions.logger || new logging.NullLogger(),
       currentDirectory: this._host.getCurrentDirectory(),
       workspaceRoot: this._host.getWorkspaceRoot(),
+      analytics: scheduleOptions.analytics,
     });
   }
   scheduleTarget(
@@ -359,6 +361,7 @@ export class Architect {
       logger: scheduleOptions.logger || new logging.NullLogger(),
       currentDirectory: this._host.getCurrentDirectory(),
       workspaceRoot: this._host.getWorkspaceRoot(),
+      analytics: scheduleOptions.analytics,
     });
   }
 }

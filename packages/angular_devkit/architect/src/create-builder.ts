@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { experimental, isPromise, json, logging } from '@angular-devkit/core';
+import { analytics, experimental, isPromise, json, logging } from '@angular-devkit/core';
 import { Observable, Subscription, from, isObservable, of, throwError } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import {
@@ -36,6 +36,7 @@ export function createBuilder<
     const scheduler = context.scheduler;
     const progressChannel = context.createChannel('progress');
     const logChannel = context.createChannel('log');
+    const analyticsChannel = context.createChannel('analytics');
     let currentState: BuilderProgressState = BuilderProgressState.Stopped;
     const teardownLogics: Array<() => (PromiseLike<void> | void)> = [];
     let tearingDown = false;
@@ -181,6 +182,7 @@ export function createBuilder<
                 progress({ state: currentState, current, total, status }, context);
             }
           },
+          analytics: new analytics.ForwardingAnalytics(report => analyticsChannel.next(report)),
           addTeardown(teardown: () => (Promise<void> | void)): void {
             teardownLogics.push(teardown);
           },
