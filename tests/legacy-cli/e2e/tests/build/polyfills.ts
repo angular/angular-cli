@@ -11,7 +11,7 @@ import { expectToFail } from '../../utils/utils';
 export default async function () {
     await ng('build');
     // files were created successfully
-    await expectFileToMatch('dist/test-project/polyfills.js', 'core-js/es7/reflect');
+    await expectFileToMatch('dist/test-project/polyfills.js', 'core-js/proposals/reflect-metadata');
     await expectFileToMatch('dist/test-project/polyfills.js', 'zone.js');
     expectFileToMatch('dist/test-project/index.html', oneLineTrim`
       <script src="runtime.js"></script>
@@ -24,7 +24,7 @@ export default async function () {
     // files were created successfully
     await expectFileToExist('dist/test-project/polyfills.js');
     await expectFileSizeToBeUnder('dist/test-project/polyfills.js', jitPolyfillSize);
-    await expectToFail(() => expectFileToMatch('dist/test-project/polyfills.js', 'core-js/es7/reflect'));
+    await expectToFail(() => expectFileToMatch('dist/test-project/polyfills.js', 'core-js/proposals/reflect-metadata'));
     await expectFileToMatch('dist/test-project/polyfills.js', 'zone.js');
     expectFileToMatch('dist/test-project/index.html', oneLineTrim`
       <script src="runtime.js"></script>

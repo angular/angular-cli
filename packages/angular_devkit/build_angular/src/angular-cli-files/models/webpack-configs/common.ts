@@ -60,7 +60,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   if (buildOptions.es5BrowserSupport) {
-    entryPoints['polyfills.es5'] = [path.join(__dirname, '..', 'es2015-polyfills.js')];
+    entryPoints['polyfills.es5'] = [path.join(__dirname, '..', 'es5-polyfills.js')];
   }
 
   if (buildOptions.polyfills) {
@@ -76,7 +76,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     if (buildOptions.es5BrowserSupport) {
       entryPoints['polyfills.es5'] = [
         ...entryPoints['polyfills.es5'],
-        path.join(__dirname, '..', 'es2015-jit-polyfills.js'),
+        path.join(__dirname, '..', 'es5-jit-polyfills.js'),
       ];
     }
   }
