@@ -59,11 +59,11 @@ function loadPackageJson(p: string) {
       case 'private':
       case 'workspaces':
       case 'resolutions':
+      case 'scripts':
         continue;
 
       // Remove the following keys from the package.json.
       case 'devDependencies':
-      case 'scripts':
         delete pkg[key];
         continue;
 
