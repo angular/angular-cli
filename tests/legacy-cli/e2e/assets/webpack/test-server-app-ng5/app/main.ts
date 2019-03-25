@@ -1,4 +1,4 @@
-import 'core-js/es7/reflect';
+import 'core-js/proposals/reflect-metadata';
 import {platformDynamicServer, renderModule} from '@angular/platform-server';
 import {AppModule} from './app.module';
 
