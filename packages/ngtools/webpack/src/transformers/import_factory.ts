@@ -53,6 +53,7 @@ export function importFactory(
   warningCb: (warning: string) => void,
 ): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext) => {
+    // TODO(filipesilva): change the link to https://angular.io/guide/ivy once it is out.
     return (sourceFile: ts.SourceFile) => {
       const warning = `
 Found 'loadChildren' with a non-string syntax in ${sourceFile.fileName} but could not transform it.
@@ -60,7 +61,10 @@ Make sure it matches the format below:
 
 loadChildren: () => import('IMPORT_STRING').then(m => m.EXPORT_NAME)
 
-Please note that only IMPORT_STRING and EXPORT_NAME can be replaced in this format.`;
+Please note that only IMPORT_STRING and EXPORT_NAME can be replaced in this format.
+
+Visit https://next.angular.io/guide/ivy for more information on using Ivy.
+`;
 
       const emitWarning = () => warningCb(warning);
       const visitVariableStatement: ts.Visitor = (node: ts.Node) => {
