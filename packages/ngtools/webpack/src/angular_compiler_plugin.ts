@@ -362,11 +362,7 @@ export class AngularCompilerPlugin {
     // Use an identity function as all our paths are absolute already.
     this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
 
-    const tsProgram = this._getTsProgram();
-    const oldFiles = new Set(tsProgram ?
-      tsProgram.getSourceFiles().map(sf => sf.fileName)
-      : [],
-    );
+    const oldTsProgram = this._getTsProgram();
 
     if (this._JitMode) {
       // Create the TypeScript program.
@@ -375,14 +371,9 @@ export class AngularCompilerPlugin {
         this._rootNames,
         this._compilerOptions,
         this._compilerHost,
-        tsProgram,
+        oldTsProgram,
       );
       timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
-
-      const newFiles = this._program.getSourceFiles().filter(sf => !oldFiles.has(sf.fileName));
-      for (const newFile of newFiles) {
-        this._compilerHost.invalidate(newFile.fileName);
-      }
     } else {
       time('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
       // Create the Angular program.
@@ -397,9 +388,14 @@ export class AngularCompilerPlugin {
       time('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
       await this._program.loadNgStructureAsync();
       timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.loadNgStructureAsync');
+    }
 
-      const newFiles = this._program.getTsProgram()
-        .getSourceFiles().filter(sf => !oldFiles.has(sf.fileName));
+    const newTsProgram = this._getTsProgram();
+    if (oldTsProgram && newTsProgram) {
+      // The invalidation should only happen if we have an old program
+      // as otherwise we will invalidate all the sourcefiles.
+      const oldFiles = new Set(oldTsProgram.getSourceFiles().map(sf => sf.fileName));
+      const newFiles = newTsProgram.getSourceFiles().filter(sf => !oldFiles.has(sf.fileName));
       for (const newFile of newFiles) {
         this._compilerHost.invalidate(newFile.fileName);
       }
