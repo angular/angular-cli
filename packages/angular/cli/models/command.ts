@@ -180,9 +180,14 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     } else if (options.help === 'json' || options.help === 'JSON') {
       return this.printJsonHelp(options);
     } else {
+      const startTime = +new Date();
       await this.reportAnalytics([this.description.name], options);
+      const result = await this.run(options);
+      const endTime = +new Date();
 
-      return await this.run(options);
+      this.analytics.timing(this.description.name, 'duration', endTime - startTime);
+
+      return result;
     }
   }
 }
