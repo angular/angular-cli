@@ -92,8 +92,7 @@
     "skipInstall": {
       "description": "Skip installing dependency packages.",
       "type": "boolean",
-      "default": false,
-      "x-user-analytics": 4
+      "default": false
     },
     "lintFix": {
       "type": "boolean",

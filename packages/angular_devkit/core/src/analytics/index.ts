@@ -17,16 +17,20 @@ export * from './noop';
  * WE LIST THOSE DIMENSIONS (AND MORE).
  */
 export enum NgCliAnalyticsDimensions {
+  CpuCount = 1,
+  CpuSpeed = 2,
+  RamInMegabytes = 3,
+  NodeVersion = 4,
   NgAddCollection = 6,
   NgBuildBuildEventLog = 7,
   BuildErrors = 20,
 }
 
 export enum NgCliAnalyticsMetrics {
-  CpuCount = 1,
-  CpuSpeed = 2,
-  RamInMegabytes = 3,
-  NodeVersion = 4,
+  UNUSED_1 = 1,
+  UNUSED_2 = 2,
+  UNUSED_3 = 3,
+  UNUSED_4 = 4,
   BuildTime = 5,
   NgOnInitCount = 6,
   InitialChunkSize = 7,
