@@ -347,4 +347,42 @@ describe('Browser Builder rebuilds', () => {
     ).toPromise();
     await run.stop();
   });
+
+  it('rebuilds on changes in barrel file dependency', async () => {
+    host.writeMultipleFiles({
+      'src/index.ts': `export * from './interface'`,
+      'src/interface.ts': `export interface Foo { bar: boolean };`,
+    });
+    host.appendToFile('src/main.ts', `
+      import { Foo } from './index';
+      const x: Foo = { bar: true };
+    `);
+
+    const overrides = { watch: true, aot: false };
+    let buildNumber = 0;
+    const run = await architect.scheduleTarget(target, overrides);
+    await run.output.pipe(
+      debounceTime(1000),
+      tap((buildEvent) => {
+        buildNumber += 1;
+        switch (buildNumber) {
+          case 1:
+            expect(buildEvent.success).toBe(true);
+            host.writeMultipleFiles({
+              'src/interface.ts': `export interface Foo {
+                bar: boolean;
+                baz?: string;
+               };`,
+            });
+            break;
+
+          case 2:
+            expect(buildEvent.success).toBe(true);
+            break;
+        }
+      }),
+      take(2),
+    ).toPromise();
+    await run.stop();
+  });
 });
