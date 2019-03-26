@@ -26,8 +26,7 @@
     "skipInstall": {
       "description": "When true, does not install dependency packages.",
       "type": "boolean",
-      "default": false,
-      "x-user-analytics": 4
+      "default": false
     },
     "linkCli": {
       "description": "When true, links the CLI to the global version (internal development only).",
