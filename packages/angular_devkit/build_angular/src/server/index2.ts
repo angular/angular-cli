@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderOutput, createBuilder } from '@angular-devkit/architect/src/index2';
+import { runWebpack } from '@angular-devkit/build-webpack/src/webpack/index2';
 import {
   Path,
   experimental,
@@ -21,7 +22,6 @@ import * as path from 'path';
 import { from, of } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
-import { runWebpack } from '../../../build_webpack/src/webpack/index2';
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import {
   getAotConfig,
