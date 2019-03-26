@@ -5,7 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect/src/index2';
+import {
+  BuilderContext,
+  BuilderInfo,
+  BuilderOutput,
+  createBuilder,
+} from '@angular-devkit/architect/src/index2';
 import {
   WebpackLoggingCallback,
   runWebpack,
@@ -93,6 +98,7 @@ export function buildWebpackConfig(
   additionalOptions: {
     logger?: logging.LoggerApi,
     analytics?: analytics.Analytics,
+    builderInfo?: BuilderInfo,
   } = {},
 ): webpack.Configuration {
   // Ensure Build Optimizer is only used with AOT.
@@ -135,9 +141,15 @@ export function buildWebpackConfig(
 
   if (additionalOptions.analytics) {
     // If there's analytics, add our plugin. Otherwise no need to slow down the build.
+    let category = 'build';
+    if (additionalOptions.builderInfo) {
+      // We already vetted that this is a "safe" package, otherwise the analytics would be noop.
+      category = additionalOptions.builderInfo.builderName.split(':')[1];
+    }
+    // The category is the builder name if it's an angular builder.
     webpackConfigs.push({
       plugins: [
-        new NgBuildAnalyticsPlugin(wco.projectRoot, additionalOptions.analytics, 'build'),
+        new NgBuildAnalyticsPlugin(wco.projectRoot, additionalOptions.analytics, category),
       ],
     });
   }
@@ -172,6 +184,7 @@ export async function buildBrowserWebpackConfigFromWorkspace(
   additionalOptions: {
     logger?: logging.LoggerApi,
     analytics?: analytics.Analytics,
+    builderInfo?: BuilderInfo,
   } = {},
 ): Promise<webpack.Configuration> {
   // TODO: Use a better interface for workspace access.
@@ -218,6 +231,7 @@ export async function buildBrowserWebpackConfigFromContext(
     {
       logger: context.logger,
       analytics: context.analytics,
+      builderInfo: context.builder,
     },
   );
 
