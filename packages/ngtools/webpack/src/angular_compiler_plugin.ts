@@ -760,39 +760,36 @@ export class AngularCompilerPlugin {
             return result;
           }
 
-          return this.done.then(
-            () => {
-              // This folder does not exist, but we need to give webpack a resource.
-              // TODO: check if we can't just leave it as is (angularCoreModuleDir).
-              result.resource = path.join(this._basePath, '$$_lazy_route_resource');
-              // tslint:disable-next-line:no-any
-              result.dependencies.forEach((d: any) => d.critical = false);
-              // tslint:disable-next-line:no-any
-              result.resolveDependencies = (_fs: any, options: any, callback: Callback) => {
-                const dependencies = Object.keys(this._lazyRoutes)
-                  .map((key) => {
-                    const modulePath = this._lazyRoutes[key];
-                    if (modulePath !== null) {
-                      const name = key.split('#')[0];
+          await this.done;
 
-                      return new this._contextElementDependencyConstructor(modulePath, name);
-                    } else {
-                      return null;
-                    }
-                  })
-                  .filter(x => !!x);
+          // This folder does not exist, but we need to give webpack a resource.
+          // TODO: check if we can't just leave it as is (angularCoreModuleDir).
+          result.resource = path.join(this._basePath, '$$_lazy_route_resource');
+          // tslint:disable-next-line:no-any
+          result.dependencies.forEach((d: any) => d.critical = false);
+          // tslint:disable-next-line:no-any
+          result.resolveDependencies = (_fs: any, options: any, callback: Callback) => {
+            const dependencies = Object.keys(this._lazyRoutes)
+              .map((key) => {
+                const modulePath = this._lazyRoutes[key];
+                if (modulePath !== null) {
+                  const name = key.split('#')[0];
 
-                if (this._options.nameLazyFiles) {
-                  options.chunkName = '[request]';
+                  return new this._contextElementDependencyConstructor(modulePath, name);
+                } else {
+                  return null;
                 }
+              })
+              .filter(x => !!x);
 
-                callback(null, dependencies);
-              };
+            if (this._options.nameLazyFiles) {
+              options.chunkName = '[request]';
+            }
 
-              return result;
-            },
-            () => undefined,
-          );
+            callback(null, dependencies);
+          };
+
+          return result;
         });
       });
     }
