@@ -5,12 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {
-  Architect,
-  BuilderConfiguration,
-  BuilderContext,
-  TargetSpecifier,
-} from '@angular-devkit/architect';
+import { index2 } from '@angular-devkit/architect';
+import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { experimental, json, schema, tags } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { BepJsonWriter } from '../utilities/bep';
@@ -31,8 +27,8 @@ export interface ArchitectCommandOptions extends BaseCommandOptions {
 export abstract class ArchitectCommand<
   T extends ArchitectCommandOptions = ArchitectCommandOptions,
 > extends Command<ArchitectCommandOptions> {
-  private _host = new NodeJsSyncHost();
-  protected _architect: Architect;
+  protected _architect: index2.Architect;
+  protected _architectHost: WorkspaceNodeModulesArchitectHost;
   protected _workspace: experimental.workspace.Workspace;
   protected _registry: json.schema.SchemaRegistry;
 
@@ -47,7 +43,13 @@ export abstract class ArchitectCommand<
     this._registry = new json.schema.CoreSchemaRegistry();
     this._registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
 
-    await this._loadWorkspaceAndArchitect();
+    const workspaceLoader = new WorkspaceLoader(new NodeJsSyncHost());
+
+    const workspace = await workspaceLoader.loadWorkspace(this.workspace.root);
+    this._workspace = workspace;
+
+    this._architectHost = new WorkspaceNodeModulesArchitectHost(workspace, this.workspace.root);
+    this._architect = new index2.Architect(this._architectHost, this._registry);
 
     if (!this.target) {
       if (options.help) {
@@ -67,7 +69,7 @@ export abstract class ArchitectCommand<
     let projectName = options.project;
     const targetProjectNames: string[] = [];
     for (const name of this._workspace.listProjectNames()) {
-      if (this._architect.listProjectTargets(name).includes(this.target)) {
+      if (this._workspace.getProjectTargets(name)[this.target]) {
         targetProjectNames.push(name);
       }
     }
@@ -85,17 +87,20 @@ export abstract class ArchitectCommand<
       const leftoverMap = new Map<string, { optionDefs: Option[], parsedOptions: Arguments }>();
       let potentialProjectNames = new Set<string>(targetProjectNames);
       for (const name of targetProjectNames) {
-        const builderConfig = this._architect.getBuilderConfiguration({
+        const builderName = await this._architectHost.getBuilderNameForTarget({
           project: name,
           target: this.target,
         });
 
         if (this.multiTarget) {
-          builderNames.add(builderConfig.builder);
+          builderNames.add(builderName);
         }
 
-        const builderDesc = await this._architect.getBuilderDescription(builderConfig).toPromise();
-        const optionDefs = await parseJsonSchemaToOptions(this._registry, builderDesc.schema);
+        const builderDesc = await this._architectHost.resolveBuilder(builderName);
+        const optionDefs = await parseJsonSchemaToOptions(
+          this._registry,
+          builderDesc.optionSchema as json.JsonObject,
+        );
         const parsedOptions = parseArguments([...commandLeftovers], optionDefs);
         const builderLeftovers = parsedOptions['--'] || [];
         leftoverMap.set(name, { optionDefs, parsedOptions });
@@ -157,20 +162,20 @@ export abstract class ArchitectCommand<
 
     options.project = projectName;
 
-    const builderConf = this._architect.getBuilderConfiguration({
+    const builderConf = await this._architectHost.getBuilderNameForTarget({
       project: projectName || (targetProjectNames.length > 0 ? targetProjectNames[0] : ''),
       target: this.target,
     });
-    const builderDesc = await this._architect.getBuilderDescription(builderConf).toPromise();
+    const builderDesc = await this._architectHost.resolveBuilder(builderConf);
 
     this.description.options.push(...(
-      await parseJsonSchemaToOptions(this._registry, builderDesc.schema)
+      await parseJsonSchemaToOptions(this._registry, builderDesc.optionSchema as json.JsonObject)
     ));
 
     // Update options to remove analytics from options if the builder isn't safelisted.
     for (const o of this.description.options) {
       if (o.userAnalytics) {
-        if (!isPackageNameSafeForAnalytics(builderDesc.name)) {
+        if (!isPackageNameSafeForAnalytics(builderConf)) {
           o.userAnalytics = undefined;
         }
       }
@@ -183,7 +188,8 @@ export abstract class ArchitectCommand<
 
   protected async runBepTarget<T>(
     command: string,
-    configuration: BuilderConfiguration<T>,
+    configuration: index2.Target,
+    overrides: json.JsonObject,
     buildEventLog: string,
   ): Promise<number> {
     const bep = new BepJsonWriter(buildEventLog);
@@ -193,7 +199,12 @@ export abstract class ArchitectCommand<
 
     let last = 1;
     let rebuild = false;
-    await this._architect.run(configuration, { logger: this.logger }).forEach(event => {
+    const run = await this._architect.scheduleTarget(
+      configuration,
+      overrides,
+      { logger: this.logger },
+    );
+    await run.output.forEach(event => {
       last = event.success ? 0 : 1;
 
       if (rebuild) {
@@ -207,19 +218,25 @@ export abstract class ArchitectCommand<
       bep.writeBuildFinished(last);
     });
 
+    await run.stop();
+
     return last;
   }
 
   protected async runSingleTarget(
-    targetSpec: TargetSpecifier,
+    target: index2.Target,
     targetOptions: string[],
-    commandOptions: ArchitectCommandOptions & Arguments) {
+    commandOptions: ArchitectCommandOptions & Arguments,
+  ) {
     // We need to build the builderSpec twice because architect does not understand
     // overrides separately (getting the configuration builds the whole project, including
     // overrides).
-    const builderConf = this._architect.getBuilderConfiguration(targetSpec);
-    const builderDesc = await this._architect.getBuilderDescription(builderConf).toPromise();
-    const targetOptionArray = await parseJsonSchemaToOptions(this._registry, builderDesc.schema);
+    const builderConf = await this._architectHost.getBuilderNameForTarget(target);
+    const builderDesc = await this._architectHost.resolveBuilder(builderConf);
+    const targetOptionArray = await parseJsonSchemaToOptions(
+      this._registry,
+      builderDesc.optionSchema as json.JsonObject,
+    );
     const overrides = parseArguments(targetOptions, targetOptionArray, this.logger);
 
     if (overrides['--']) {
@@ -229,11 +246,6 @@ export abstract class ArchitectCommand<
 
       return 1;
     }
-    const realBuilderConf = this._architect.getBuilderConfiguration({ ...targetSpec, overrides });
-    const builderContext: Partial<BuilderContext> = {
-      logger: this.logger,
-      targetSpecifier: targetSpec,
-    };
 
     if (commandOptions.buildEventLog && ['build', 'serve'].includes(this.description.name)) {
       // The build/serve commands supports BEP messaging
@@ -241,13 +253,19 @@ export abstract class ArchitectCommand<
 
       return this.runBepTarget(
         this.description.name,
-        realBuilderConf,
+        target,
+        overrides as json.JsonObject,
         commandOptions.buildEventLog as string,
       );
     } else {
-      const result = await this._architect
-        .run(realBuilderConf, builderContext)
-        .toPromise();
+      const run = await this._architect.scheduleTarget(
+        target,
+        overrides as json.JsonObject,
+        { logger: this.logger },
+      );
+
+      const result = await run.output.toPromise();
+      await run.stop();
 
       return result.success ? 0 : 1;
     }
@@ -265,7 +283,11 @@ export abstract class ArchitectCommand<
         // Running them in parallel would jumble the log messages.
         let result = 0;
         for (const project of this.getProjectNamesByTarget(this.target)) {
-          result |= await this.runSingleTarget({ ...targetSpec, project }, extra, options);
+          result |= await this.runSingleTarget(
+            { ...targetSpec, project } as index2.Target,
+            extra,
+            options,
+          );
         }
 
         return result;
@@ -300,7 +322,7 @@ export abstract class ArchitectCommand<
 
   private getProjectNamesByTarget(targetName: string): string[] {
     const allProjectsForTargetName = this._workspace.listProjectNames().map(projectName =>
-      this._architect.listProjectTargets(projectName).includes(targetName) ? projectName : null,
+      this._workspace.getProjectTargets(projectName)[targetName] ? projectName : null,
     ).filter(x => !!x) as string[];
 
     if (this.multiTarget) {
@@ -322,16 +344,7 @@ export abstract class ArchitectCommand<
     }
   }
 
-  private async _loadWorkspaceAndArchitect() {
-    const workspaceLoader = new WorkspaceLoader(this._host);
-
-    const workspace = await workspaceLoader.loadWorkspace(this.workspace.root);
-
-    this._workspace = workspace;
-    this._architect = await new Architect(workspace).loadArchitect().toPromise();
-  }
-
-  private _makeTargetSpecifier(commandOptions: ArchitectCommandOptions): TargetSpecifier {
+  private _makeTargetSpecifier(commandOptions: ArchitectCommandOptions): index2.Target {
     let project, target, configuration;
 
     if (commandOptions.target) {
@@ -358,7 +371,7 @@ export abstract class ArchitectCommand<
 
     return {
       project,
-      configuration,
+      configuration: configuration || '',
       target,
     };
   }

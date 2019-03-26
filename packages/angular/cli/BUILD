@@ -25,6 +25,7 @@ ts_library(
     deps = [
         ":command_schemas",
         "//packages/angular_devkit/architect",
+        "//packages/angular_devkit/architect:node",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
         "//packages/angular_devkit/schematics",
