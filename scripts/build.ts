@@ -397,8 +397,10 @@ export default async function(
   const tarLogger = logger.createChild('license');
   Object.keys(packages).forEach(pkgName => {
     const pkg = packages[pkgName];
-    tarLogger.info(`${pkgName} => ${pkg.tar}`);
-    _tar(pkg.tar, pkg.dist);
+    if (!pkg.private) {
+      tarLogger.info(`${pkgName} => ${pkg.tar}`);
+      _tar(pkg.tar, pkg.dist);
+    }
   });
 
   logger.info(`Done.`);
