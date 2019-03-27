@@ -17,9 +17,6 @@ import * as fs from 'fs';
 import * as ngPackagr from 'ng-packagr';
 import { EMPTY, Observable } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import * as semver from 'semver';
-
-const NEW_NG_PACKAGR_VERSION = '4.0.0-rc.3';
 
 // TODO move this function to architect or somewhere else where it can be imported from.
 // Blatantly copy-pasted from 'require-project-module.ts'.
@@ -27,42 +24,11 @@ function requireProjectModule(root: string, moduleName: string) {
   return require(require.resolve(moduleName, { paths: [root] }));
 }
 
-function resolveProjectModule(root: string, moduleName: string) {
-  return require.resolve(moduleName, { paths: [root] });
-}
-
 export interface NgPackagrBuilderOptions {
   project: string;
   tsConfig?: string;
   watch?: boolean;
 }
-
-function checkNgPackagrVersion(projectRoot: string): boolean {
-  let ngPackagrJsonPath;
-
-  try {
-    ngPackagrJsonPath = resolveProjectModule(projectRoot, 'ng-packagr/package.json');
-  } catch {
-    // ng-packagr is not installed
-    throw new Error(tags.stripIndent`
-    ng-packagr is not installed. Run \`npm install ng-packagr --save-dev\` and try again.
-  `);
-  }
-
-  const ngPackagrPackageJson = fs.readFileSync(ngPackagrJsonPath).toString();
-  const ngPackagrVersion = JSON.parse(ngPackagrPackageJson)['version'];
-
-  if (!semver.gte(ngPackagrVersion, NEW_NG_PACKAGR_VERSION)) {
-    throw new Error(tags.stripIndent`
-    The installed version of ng-packagr is ${ngPackagrVersion}. The watch feature
-    requires ng-packagr version to satisfy ${NEW_NG_PACKAGR_VERSION}.
-    Please upgrade your ng-packagr version.
-  `);
-  }
-
-  return true;
-}
-
 export class NgPackagrBuilder implements Builder<NgPackagrBuilderOptions> {
 
   constructor(public context: BuilderContext) { }
@@ -89,8 +55,6 @@ export class NgPackagrBuilder implements Builder<NgPackagrBuilderOptions> {
       }
 
       if (options.watch) {
-        checkNgPackagrVersion(getSystemPath(root));
-
         const ngPkgSubscription = ngPkgProject
           .watch()
           .pipe(
