@@ -47,8 +47,8 @@ export async function scheduleByName(
 
   const message = {
     id,
-    currentDirectory: workspaceRoot,
-    workspaceRoot: currentDirectory,
+    currentDirectory,
+    workspaceRoot,
     info: info,
     options: buildOptions,
     ...(options.target ? { target: options.target } : {}),
