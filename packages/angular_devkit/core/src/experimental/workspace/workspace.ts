@@ -73,7 +73,7 @@ async function _findUp(host: virtualFs.Host, names: string[], from: Path): Promi
   do {
     for (const name of names) {
       const p = join(from, name);
-      if (await host.exists(p)) {
+      if (await host.exists(p).toPromise()) {
         return p;
       }
     }
@@ -88,8 +88,6 @@ export class Workspace {
   protected static _workspaceFileNames = [
     'angular.json',
     '.angular.json',
-    'workspace.json',
-    '.workspace.json',
   ];
 
   private readonly _workspaceSchemaPath = normalize(require.resolve('./workspace-schema.json'));
