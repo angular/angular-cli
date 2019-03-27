@@ -42,14 +42,23 @@ export function countOccurrences(source: string, match: string, wordBreak = fals
   // We condition here so branch prediction happens out of the loop, not in it.
   if (wordBreak) {
     const re = /\w/;
-    for (let pos = source.lastIndexOf(match); pos >= 0; pos = source.lastIndexOf(match, pos - 1)) {
-      if (!(re.test(source[pos - 1]) || re.test(source[pos + match.length]))) {
+    for (let pos = source.lastIndexOf(match); pos >= 0; pos = source.lastIndexOf(match, pos)) {
+      if (!(re.test(source[pos - 1] || '') || re.test(source[pos + match.length] || ''))) {
         count++;  // 1 match, AH! AH! AH! 2 matches, AH! AH! AH!
+      }
+
+      pos -= match.length;
+      if (pos < 0) {
+        break;
       }
     }
   } else {
-    for (let pos = source.lastIndexOf(match); pos >= 0; pos = source.lastIndexOf(match, pos - 1)) {
+    for (let pos = source.lastIndexOf(match); pos >= 0; pos = source.lastIndexOf(match, pos)) {
       count++;  // 1 match, AH! AH! AH! 2 matches, AH! AH! AH!
+      pos -= match.length;
+      if (pos < 0) {
+        break;
+      }
     }
   }
 
