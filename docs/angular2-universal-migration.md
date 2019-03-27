@@ -1,6 +1,6 @@
 # Upgrading from Angular2-Universal (2.x) to Angular v4 / platform-server
 
-In general, you're going to want to make sure you remove all references of `angular2-universal` from your project. If you're using `isBrowser / isNode`, use instead `isPlatformBrowser()` which you'll find information on [here](#universal-gotchas).
+In general, you're going to want to make sure you remove all references of `angular2-universal` from your project. If you're using `isBrowser / isNode`, use instead `isPlatformBrowser()` which you'll find information on [here](gotchas.md).
 
 Install platform-server into your application (and its dependency `@angular/animations` (this is due to NoOpAnimationsModule being needed for the Server))
 
