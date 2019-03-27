@@ -9,7 +9,13 @@ import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/nod
 import { Architect } from '@angular-devkit/architect/src/index2';
 import { TestProjectHost } from '@angular-devkit/architect/testing';
 import { TestingArchitectHost } from '@angular-devkit/architect/testing/testing-architect-host';
-import { experimental, join, normalize, schema, virtualFs } from '@angular-devkit/core';
+import {
+  experimental,
+  join,
+  normalize,
+  schema,
+  virtualFs,
+} from '@angular-devkit/core'; // tslint:disable-line:no-implicit-dependencies
 import { map, take, tap } from 'rxjs/operators';
 
 const devkitRoot = (global as unknown as { _DevKitRoot: string})._DevKitRoot;
