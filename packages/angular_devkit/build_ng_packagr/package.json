@@ -8,7 +8,6 @@
   "builders": "builders.json",
   "dependencies": {
     "@angular-devkit/architect": "0.0.0",
-    "@angular-devkit/core": "0.0.0",
     "rxjs": "6.4.0"
   },
   "peerDependencies": {
@@ -17,6 +16,7 @@
   "devDependencies": {
     "@angular/compiler": "^8.0.0-beta.9",
     "@angular/compiler-cli": "^8.0.0-beta.9",
+    "@angular-devkit/core": "0.0.0",
     "ng-packagr": "^5.0.1",
     "tslib": "^1.9.0"
   }

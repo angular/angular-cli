@@ -5,80 +5,41 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect/src/index2';
+import { resolve } from 'path';
+import { Observable, from } from 'rxjs';
+import { catchError, mapTo, switchMap } from 'rxjs/operators';
+import { Schema as NgPackagrBuilderOptions } from './schema';
 
-import {
-  BuildEvent,
-  Builder,
-  BuilderConfiguration,
-  BuilderContext,
-} from '@angular-devkit/architect';
-import { getSystemPath, normalize, resolve, tags } from '@angular-devkit/core';
-import * as fs from 'fs';
-import * as ngPackagr from 'ng-packagr';
-import { EMPTY, Observable } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+async function initialize(
+  options: NgPackagrBuilderOptions,
+  root: string,
+): Promise<import ('ng-packagr').NgPackagr> {
+  const packager = (await import('ng-packagr')).ngPackagr();
 
-// TODO move this function to architect or somewhere else where it can be imported from.
-// Blatantly copy-pasted from 'require-project-module.ts'.
-function requireProjectModule(root: string, moduleName: string) {
-  return require(require.resolve(moduleName, { paths: [root] }));
-}
+  packager.forProject(resolve(root, options.project));
 
-export interface NgPackagrBuilderOptions {
-  project: string;
-  tsConfig?: string;
-  watch?: boolean;
-}
-export class NgPackagrBuilder implements Builder<NgPackagrBuilderOptions> {
-
-  constructor(public context: BuilderContext) { }
-
-  run(builderConfig: BuilderConfiguration<NgPackagrBuilderOptions>): Observable<BuildEvent> {
-    const root = this.context.workspace.root;
-    const options = builderConfig.options;
-
-    if (!options.project) {
-      throw new Error('A "project" must be specified to build a library\'s npm package.');
-    }
-
-    return new Observable(obs => {
-      const projectNgPackagr = requireProjectModule(
-        getSystemPath(root), 'ng-packagr') as typeof ngPackagr;
-      const packageJsonPath = getSystemPath(resolve(root, normalize(options.project)));
-
-      const ngPkgProject = projectNgPackagr.ngPackagr()
-        .forProject(packageJsonPath);
-
-      if (options.tsConfig) {
-        const tsConfigPath = getSystemPath(resolve(root, normalize(options.tsConfig)));
-        ngPkgProject.withTsConfig(tsConfigPath);
-      }
-
-      if (options.watch) {
-        const ngPkgSubscription = ngPkgProject
-          .watch()
-          .pipe(
-            tap(() => obs.next({ success: true })),
-            catchError(e => {
-              obs.error(e);
-
-              return EMPTY;
-            }),
-          )
-          .subscribe();
-
-        return () => ngPkgSubscription.unsubscribe();
-      } else {
-        ngPkgProject.build()
-          .then(() => {
-            obs.next({ success: true });
-            obs.complete();
-          })
-          .catch(e => obs.error(e));
-      }
-    });
+  if (options.tsConfig) {
+    packager.withTsConfig(resolve(root, options.tsConfig));
   }
 
+  return packager;
 }
 
-export default NgPackagrBuilder;
+export function execute(
+  options: NgPackagrBuilderOptions,
+  context: BuilderContext,
+): Observable<BuilderOutput> {
+  return from(initialize(options, context.workspaceRoot)).pipe(
+    switchMap(packager => options.watch ? packager.watch() : packager.build()),
+    mapTo({ success: true }),
+    catchError(error => {
+      context.reportStatus('Error: ' + error);
+
+      return [{ success: false }];
+    }),
+  );
+}
+
+export { NgPackagrBuilderOptions };
+export default createBuilder<Record<string, string> & NgPackagrBuilderOptions>(execute);

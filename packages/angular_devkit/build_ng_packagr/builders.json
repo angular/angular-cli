@@ -2,8 +2,7 @@
   "$schema": "../architect/src/builders-schema.json",
   "builders": {
     "build": {
-      "class": "./src/build",
-      "implementation": "./src/build/index2",
+      "implementation": "./src/build",
       "schema": "./src/build/schema.json",
       "description": "Build a library with ng-packagr."
     }
