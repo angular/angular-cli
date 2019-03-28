@@ -9,7 +9,7 @@
 import { Architect } from '@angular-devkit/architect/src/index2';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { toArray } from 'rxjs/operators';
-import { BrowserBuilderOutput } from '../../src/browser/index2';
+import { BrowserBuilderOutput } from '../../src/browser';
 import { createArchitect, host } from '../utils';
 
 

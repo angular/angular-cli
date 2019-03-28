@@ -8,7 +8,7 @@
 import { Architect, BuilderRun } from '@angular-devkit/architect/src/index2';
 import { logging } from '@angular-devkit/core';
 import fetch from 'node-fetch';  // tslint:disable-line:no-implicit-dependencies
-import { DevServerBuilderOutput } from '../../src/dev-server/index2';
+import { DevServerBuilderOutput } from '../../src/dev-server';
 import { createArchitect, host } from '../utils';
 
 

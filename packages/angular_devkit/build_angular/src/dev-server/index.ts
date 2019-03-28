@@ -30,7 +30,7 @@ import {
   BrowserConfigTransformFn,
   buildBrowserWebpackConfigFromContext,
   createBrowserLoggingCallback,
-} from '../browser/index2';
+} from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { normalizeOptimization } from '../utils';
 import { Schema } from './schema';

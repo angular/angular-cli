@@ -9,7 +9,7 @@ import { Architect, BuilderRun } from '@angular-devkit/architect/src/index2';
 import { tags } from '@angular-devkit/core';
 import * as https from 'https';
 import fetch from 'node-fetch';  // tslint:disable-line:no-implicit-dependencies
-import { DevServerBuilderOutput } from '../../src/dev-server/index2';
+import { DevServerBuilderOutput } from '../../src/dev-server';
 import { createArchitect, host } from '../utils';
 
 

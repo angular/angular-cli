@@ -25,7 +25,7 @@ import {
 } from '@angular-devkit/core';
 import { WorkspaceNodeModulesArchitectHost } from '../../architect/node';
 import { TestingArchitectHost } from '../../architect/testing/testing-architect-host';
-import { BrowserBuilderOutput } from '../src/browser/index2';
+import { BrowserBuilderOutput } from '../src/browser';
 
 
 const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
