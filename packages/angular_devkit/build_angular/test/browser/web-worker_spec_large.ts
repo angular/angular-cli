@@ -6,15 +6,22 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
+import { Architect } from '@angular-devkit/architect/src/index2';
+import { TestLogger } from '@angular-devkit/architect/testing';
 import { join, virtualFs } from '@angular-devkit/core';
 import { debounceTime, takeWhile, tap } from 'rxjs/operators';
-import { browserTargetSpec, host, outputPath } from '../utils';
+import { browserBuild, createArchitect, host, outputPath } from '../utils';
 
 
 describe('Browser Builder Web Worker support', () => {
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  const target = { project: 'app', target: 'build' };
+  let architect: Architect;
+
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
 
   const workerFiles: { [k: string]: string } = {
     'src/app/dep.ts': `export const foo = 'bar';`,
@@ -77,62 +84,52 @@ describe('Browser Builder Web Worker support', () => {
       }`,
   };
 
-  it('bundles TS worker', (done) => {
-    const logger = new TestLogger('worker-warnings');
+  it('bundles TS worker', async () => {
     host.writeMultipleFiles(workerFiles);
+    const logger = new TestLogger('worker-warnings');
     const overrides = { webWorkerTsConfig: 'src/tsconfig.worker.json' };
-    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout, logger).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const workerContent = virtualFs.fileBufferToString(
-          host.scopedSync().read(join(outputPath, '0.worker.js')),
-        );
-        // worker bundle contains worker code.
-        expect(workerContent).toContain('hello from worker');
-        expect(workerContent).toContain('bar');
+    await browserBuild(architect, host, target, overrides, { logger });
 
-        const mainContent = virtualFs.fileBufferToString(
-          host.scopedSync().read(join(outputPath, 'main.js')),
-        );
-        // main bundle references worker.
-        expect(mainContent).toContain('0.worker.js');
-      }),
-      // Doesn't show any warnings.
-      tap(() => expect(logger.includes('WARNING')).toBe(false, 'Should show no warnings.')),
-    ).toPromise().then(done, done.fail);
+    // Worker bundle contains worker code.
+    const workerContent = virtualFs.fileBufferToString(
+      host.scopedSync().read(join(outputPath, '0.worker.js')));
+    expect(workerContent).toContain('hello from worker');
+    expect(workerContent).toContain('bar');
+
+    // Main bundle references worker.
+    const mainContent = virtualFs.fileBufferToString(
+      host.scopedSync().read(join(outputPath, 'main.js')));
+    expect(mainContent).toContain('0.worker.js');
+    expect(logger.includes('WARNING')).toBe(false, 'Should show no warnings.');
   });
 
-  it('minimizes and hashes worker', (done) => {
+  it('minimizes and hashes worker', async () => {
     host.writeMultipleFiles(workerFiles);
     const overrides = {
       webWorkerTsConfig: 'src/tsconfig.worker.json',
       outputHashing: 'all',
       optimization: true,
     };
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const workerBundle = host.fileMatchExists(outputPath,
-          /0\.[0-9a-f]{20}\.worker\.js/) as string;
-        expect(workerBundle).toBeTruthy('workerBundle should exist');
-        const workerContent = virtualFs.fileBufferToString(
-          host.scopedSync().read(join(outputPath, workerBundle)),
-        );
-        expect(workerContent).toContain('hello from worker');
-        expect(workerContent).toContain('bar');
-        expect(workerContent).toContain('"hello"===t&&postMessage');
+    await browserBuild(architect, host, target, overrides);
 
-        const mainBundle = host.fileMatchExists(outputPath, /main\.[0-9a-f]{20}\.js/) as string;
-        expect(mainBundle).toBeTruthy('mainBundle should exist');
-        const mainContent = virtualFs.fileBufferToString(
-          host.scopedSync().read(join(outputPath, mainBundle)),
-        );
-        expect(mainContent).toContain(workerBundle);
-      }),
-    ).toPromise().then(done, done.fail);
+    // Worker bundle should have hash and minified code.
+    const workerBundle = host.fileMatchExists(outputPath, /0\.[0-9a-f]{20}\.worker\.js/) as string;
+    expect(workerBundle).toBeTruthy('workerBundle should exist');
+    const workerContent = virtualFs.fileBufferToString(
+      host.scopedSync().read(join(outputPath, workerBundle)));
+    expect(workerContent).toContain('hello from worker');
+    expect(workerContent).toContain('bar');
+    expect(workerContent).toContain('"hello"===t&&postMessage');
+
+    // Main bundle should reference hashed worker bundle.
+    const mainBundle = host.fileMatchExists(outputPath, /main\.[0-9a-f]{20}\.js/) as string;
+    expect(mainBundle).toBeTruthy('mainBundle should exist');
+    const mainContent = virtualFs.fileBufferToString(
+      host.scopedSync().read(join(outputPath, mainBundle)));
+    expect(mainContent).toContain(workerBundle);
   });
 
-  it('rebuilds TS worker', (done) => {
+  it('rebuilds TS worker', async () => {
     host.writeMultipleFiles(workerFiles);
     const overrides = {
       webWorkerTsConfig: 'src/tsconfig.worker.json',
@@ -144,7 +141,8 @@ describe('Browser Builder Web Worker support', () => {
     const workerPath = join(outputPath, '0.worker.js');
     let workerContent = '';
 
-    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3).pipe(
+    const run = await architect.scheduleTarget(target, overrides);
+    await run.output.pipe(
       // Wait for files to be written to disk.
       debounceTime(1000),
       tap((buildEvent) => expect(buildEvent.success).toBe(true, 'build should succeed')),
@@ -178,9 +176,7 @@ describe('Browser Builder Web Worker support', () => {
         }
       }),
       takeWhile(() => phase < 3),
-    ).toPromise().then(
-      () => done(),
-      () => done.fail(`stuck at phase ${phase} [builds: ${buildCount}]`),
-    );
+    ).toPromise();
+    await run.stop();
   });
 });
