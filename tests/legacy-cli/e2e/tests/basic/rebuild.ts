@@ -7,6 +7,7 @@ import {
 import {writeFile, writeMultipleFiles} from '../../utils/fs';
 import {wait} from '../../utils/utils';
 import {request} from '../../utils/http';
+import {getGlobalVariable} from '../../utils/env';
 
 const validBundleRegEx = /: Compiled successfully./;
 
@@ -15,7 +16,10 @@ export default function() {
     return Promise.resolve();
   }
 
-  const lazyChunkRegExp = /lazy-module\.js/g;
+  const argv = getGlobalVariable('argv');
+  const ivyProject = argv['ivy'];
+  const lazyImport = ivyProject ? `() => import('./lazy/lazy.module').then(m => m.LazyModule)`
+    : `'./lazy/lazy.module#LazyModule'`;
 
   return execAndWaitForOutputToMatch('ng', ['serve'], validBundleRegEx)
     // Add a lazy module.
@@ -43,7 +47,7 @@ export default function() {
             FormsModule,
             HttpClientModule,
             RouterModule.forRoot([
-              { path: 'lazy', loadChildren: './lazy/lazy.module#LazyModule' }
+              { path: 'lazy', loadChildren: ${lazyImport} }
             ])
           ],
           providers: [],
@@ -55,7 +59,7 @@ export default function() {
     // Count the bundles.
     .then((results) => {
       const stdout = results[0].stdout;
-      if (!lazyChunkRegExp.test(stdout)) {
+      if (!/(lazy-module|0)\.js/g.test(stdout)) {
         throw new Error('Expected webpack to create a new chunk, but did not.');
       }
     })

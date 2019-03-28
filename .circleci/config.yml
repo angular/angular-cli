@@ -106,6 +106,16 @@ jobs:
           path: /tmp/dist
           destination: cli/new-production
 
+  e2e-cli-ivy:
+    <<: *defaults
+    environment:
+      BASH_ENV: ~/.profile
+    resource_class: xlarge
+    parallelism: 4
+    steps:
+      - attach_workspace: *attach_options
+      - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ivy          
+
   e2e-cli-ng-snapshots:
     <<: *defaults
     environment:
@@ -122,23 +132,6 @@ jobs:
             fi
       - attach_workspace: *attach_options
       - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ng-snapshots
-
-  e2e-cli-ivy-snapshots:
-    <<: *defaults
-    environment:
-      BASH_ENV: ~/.profile
-    resource_class: xlarge
-    parallelism: 4
-    steps:
-      - run:
-          name: Don't run expensive e2e tests for forks other than renovate-bot and angular
-          command: >
-            if [[ "$CIRCLE_PR_USERNAME" != "renovate-bot" ]] &&
-               [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
-              circleci step halt
-            fi
-      - attach_workspace: *attach_options
-      - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ng-snapshots --ivy
 
   build:
     <<: *defaults
@@ -210,6 +203,9 @@ workflows:
       - e2e-cli:
           requires:
             - build
+      - e2e-cli-ivy:
+          requires:
+            - build            
       - snapshot_publish_docs:
           requires:
           - install
@@ -218,9 +214,6 @@ workflows:
               only:
               - /docs-preview/
       - e2e-cli-ng-snapshots:
-          requires:
-            - build
-      - e2e-cli-ivy-snapshots:
           requires:
             - build
       - snapshot_publish:

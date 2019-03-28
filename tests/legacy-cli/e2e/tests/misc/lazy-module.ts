@@ -2,9 +2,19 @@ import {readdirSync} from 'fs';
 
 import {ng, silentNpm} from '../../utils/process';
 import {appendToFile, writeFile, prependToFile, replaceInFile} from '../../utils/fs';
+import {getGlobalVariable} from '../../utils/env';
 
 
 export default function() {
+  const argv = getGlobalVariable('argv');
+  const ivyProject = argv['ivy'];
+  const lazyImport = ivyProject ? `() => import('src/app/lazy/lazy.module').then(m => m.LazyModule)`
+    : `'src/app/lazy/lazy.module#LazyModule'`;
+  const lazyImport1 = ivyProject ? `() => import('./lazy/lazy.module').then(m => m.LazyModule)`
+    : `'./lazy/lazy.module#LazyModule'`;
+  const lazyImport2 = ivyProject ? `() => import('./too/lazy/lazy.module').then(m => m.LazyModule)`
+    : `'./too/lazy/lazy.module#LazyModule'`;
+
   let oldNumberOfFiles = 0;
   return Promise.resolve()
     .then(() => ng('build'))
@@ -15,9 +25,9 @@ export default function() {
       import { RouterModule } from '@angular/router';
     `))
     .then(() => replaceInFile('src/app/app.module.ts', 'imports: [', `imports: [
-      RouterModule.forRoot([{ path: "lazy", loadChildren: "src/app/lazy/lazy.module#LazyModule" }]),
-      RouterModule.forRoot([{ path: "lazy1", loadChildren: "./lazy/lazy.module#LazyModule" }]),
-      RouterModule.forRoot([{ path: "lazy2", loadChildren: "./too/lazy/lazy.module#LazyModule" }]),
+      RouterModule.forRoot([{ path: "lazy", loadChildren: ${lazyImport} }]),
+      RouterModule.forRoot([{ path: "lazy1", loadChildren: ${lazyImport1} }]),
+      RouterModule.forRoot([{ path: "lazy2", loadChildren: ${lazyImport2} }]),
     `))
     .then(() => ng('build', '--named-chunks'))
     .then(() => readdirSync('dist/test-project'))
@@ -28,11 +38,14 @@ export default function() {
       }
       oldNumberOfFiles = currentNumberOfDistFiles;
 
-      if (!distFiles.includes('lazy-lazy-module.js')) {
-        throw new Error('The lazy module chunk did not have a name.');
-      }
-      if (!distFiles.includes('too-lazy-lazy-module.js')) {
-        throw new Error('The lazy module chunk did not use a unique name.');
+      // Named lazy route chunks are not available with Ivy.
+      if (!ivyProject) {
+        if (!distFiles.includes('lazy-lazy-module.js')) {
+          throw new Error('The lazy module chunk did not have a name.');
+        }
+        if (!distFiles.includes('too-lazy-lazy-module.js')) {
+          throw new Error('The lazy module chunk did not use a unique name.');
+        }
       }
     })
     // verify System.import still works

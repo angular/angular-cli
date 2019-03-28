@@ -144,6 +144,8 @@ if (argv.ivy) {
     .filter(name => !name.endsWith('tests/build/aot/aot-i18n.ts'))
     // We don't have a library consumption story yet for Ivy.
     .filter(name => !name.endsWith('tests/generate/library/library-consumption.ts'))
+    // The additional lazy modules array does not work with Ivy because it's not needed.
+    .filter(name => !name.endsWith('tests/build/dynamic-import.ts'))
     // We don't have a platform-server usage story yet for Ivy.
     // It's contingent on lazy loading and factory shim considerations that are still being
     // discussed.
