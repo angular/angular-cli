@@ -9,7 +9,7 @@
 import { Architect } from '@angular-devkit/architect/src/index2';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { take, tap } from 'rxjs/operators';
-import { BrowserBuilderOutput } from '../../src/browser/index2';
+import { BrowserBuilderOutput } from '../../src/browser';
 import { Schema as BuildWebpackServerSchema } from '../../src/server/schema';
 import { createArchitect, host } from '../utils';
 

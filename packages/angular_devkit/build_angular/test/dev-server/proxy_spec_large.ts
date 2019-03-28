@@ -10,7 +10,7 @@ import * as express from 'express'; // tslint:disable-line:no-implicit-dependenc
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import fetch from 'node-fetch';  // tslint:disable-line:no-implicit-dependencies
-import { DevServerBuilderOutput } from '../../src/dev-server/index2';
+import { DevServerBuilderOutput } from '../../src/dev-server';
 import { Schema as DevServerBuilderOptions } from '../../src/dev-server/schema';
 import { createArchitect, host } from '../utils';
 

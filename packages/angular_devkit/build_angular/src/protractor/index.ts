@@ -76,7 +76,7 @@ async function updateWebdriver() {
   } as unknown as JSON);
 }
 
-export async function execute(
+async function execute(
   options: ProtractorBuilderOptions,
   context: BuilderContext,
 ): Promise<BuilderOutput> {

@@ -10,7 +10,7 @@ import { Architect } from '@angular-devkit/architect/src/index2';
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { BrowserBuilderOutput } from '../../src/browser/index2';
+import { BrowserBuilderOutput } from '../../src/browser';
 import { browserTargetSpec, createArchitect, host } from '../utils';
 
 

@@ -46,7 +46,7 @@ class InMemoryOutputPlugin {
   }
 }
 
-export async function execute(options: ExtractI18nBuilderOptions, context: BuilderContext) {
+async function execute(options: ExtractI18nBuilderOptions, context: BuilderContext) {
   const browserTarget = targetFromTargetString(options.browserTarget);
   const browserOptions = await context.validateOptions<JsonObject & BrowserBuilderOptions>(
     await context.getTargetOptions(browserTarget),

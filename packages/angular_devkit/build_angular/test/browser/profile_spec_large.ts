@@ -7,7 +7,7 @@
  */
 import { Architect } from '@angular-devkit/architect/src/index2';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { BrowserBuilderOutput } from '../../src/browser/index2';
+import { BrowserBuilderOutput } from '../../src/browser';
 import { browserBuild, createArchitect, host } from '../utils';
 
 

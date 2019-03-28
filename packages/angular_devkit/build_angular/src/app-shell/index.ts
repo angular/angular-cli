@@ -17,9 +17,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
-import { BrowserBuilderOutput } from '../browser/index2';
+import { BrowserBuilderOutput } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
-import { ServerBuilderOutput } from '../server/index2';
+import { ServerBuilderOutput } from '../server';
 import { Schema as BuildWebpackAppShellSchema } from './schema';
 
 
