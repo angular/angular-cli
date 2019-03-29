@@ -1,8 +1,17 @@
-export declare const DefaultTimeout = 45000;
-
-export declare function request(url: string, headers?: {}): Promise<string>;
-
-export declare function runTargetSpec(host: TestProjectHost, targetSpec: TargetSpecifier, overrides?: {}, timeout?: number, logger?: logging.Logger): Observable<BuildEvent>;
+export declare class TestingArchitectHost implements ArchitectHost {
+    currentDirectory: string;
+    workspaceRoot: string;
+    constructor(workspaceRoot?: string, currentDirectory?: string, _backendHost?: ArchitectHost | null);
+    addBuilder(builderName: string, builder: Builder, description?: string, optionSchema?: json.schema.JsonSchema): void;
+    addBuilderFromPackage(packageName: string): Promise<void>;
+    addTarget(target: Target, builderName: string, options?: json.JsonObject): void;
+    getBuilderNameForTarget(target: Target): Promise<string | null>;
+    getCurrentDirectory(): Promise<string>;
+    getOptionsForTarget(target: Target): Promise<json.JsonObject | null>;
+    getWorkspaceRoot(): Promise<string>;
+    loadBuilder(info: BuilderInfo): Promise<Builder | null>;
+    resolveBuilder(builderName: string): Promise<BuilderInfo | null>;
+}
 
 export declare class TestLogger extends logging.Logger {
     constructor(name: string, parent?: logging.Logger | null);
