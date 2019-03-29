@@ -10,7 +10,7 @@ import {
   createBuilder,
   targetFromTargetString,
 } from '@angular-devkit/architect/src/index2';
-import { runWebpack } from '@angular-devkit/build-webpack/src/webpack/index2';
+import { runWebpack } from '@angular-devkit/build-webpack/src/webpack';
 import { JsonObject } from '@angular-devkit/core';
 import * as path from 'path';
 import * as webpack from 'webpack';

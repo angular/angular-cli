@@ -14,7 +14,7 @@ import {
 import {
   WebpackLoggingCallback,
   runWebpack,
-} from '@angular-devkit/build-webpack/src/webpack/index2';
+} from '@angular-devkit/build-webpack/src/webpack';
 import {
   Path,
   analytics,

@@ -11,11 +11,11 @@ import {
   createBuilder,
   targetFromTargetString,
 } from '@angular-devkit/architect/src/index2';
+import { WebpackLoggingCallback } from '@angular-devkit/build-webpack/src/webpack';
 import {
   DevServerBuildOutput,
   runWebpackDevServer,
-} from '@angular-devkit/build-webpack/src/webpack-dev-server/index2';
-import { WebpackLoggingCallback } from '@angular-devkit/build-webpack/src/webpack/index2';
+} from '@angular-devkit/build-webpack/src/webpack-dev-server';
 import { experimental, json, logging, tags } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { existsSync, readFileSync } from 'fs';
