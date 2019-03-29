@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { Architect } from '@angular-devkit/architect/src/index2';
 import { TestingArchitectHost } from '@angular-devkit/architect/testing/index2';
 import { experimental, normalize, schema } from '@angular-devkit/core';
@@ -12,8 +13,7 @@ import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import fetch from 'node-fetch';  // tslint:disable-line:no-implicit-dependencies
 import * as path from 'path';
-import { WorkspaceNodeModulesArchitectHost } from '../../../architect/node';
-import { DevServerBuildOutput } from './index2';
+import { DevServerBuildOutput } from './index';
 
 const devkitRoot = (global as any)._DevKitRoot; // tslint:disable-line:no-any
 

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect/src/index2';
+import { BuilderContext, createBuilder } from '@angular-devkit/architect/src/index2';
 import { getSystemPath, json, normalize, resolve } from '@angular-devkit/core';
 import * as net from 'net';
 import { Observable, from, of } from 'rxjs';
@@ -14,7 +14,7 @@ import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
 import { ArchitectPlugin } from '../plugins/architect';
 import { getEmittedFiles } from '../utils';
-import { BuildResult, WebpackFactory, WebpackLoggingCallback } from '../webpack/index2';
+import { BuildResult, WebpackFactory, WebpackLoggingCallback } from '../webpack';
 import { Schema as WebpackDevServerBuilderSchema } from './schema';
 
 const webpackMerge = require('webpack-merge');
