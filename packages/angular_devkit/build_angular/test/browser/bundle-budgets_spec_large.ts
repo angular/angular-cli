@@ -65,6 +65,18 @@ describe('Browser Builder bundle budgets', () => {
   });
 
   describe(`should ignore '.map' files`, () => {
+    it(`when 'bundle' budget`, async () => {
+      const overrides = {
+        optimization: true,
+        budgets: [{ type: 'bundle', name: 'main', maximumError: '3Kb' }],
+      };
+
+      const run = await architect.scheduleTarget(targetSpec, overrides);
+      const output = await run.result;
+      expect(output.success).toBe(true);
+      await run.stop();
+    });
+
     it(`when 'intial' budget`, async () => {
       const overrides = {
         optimization: true,
