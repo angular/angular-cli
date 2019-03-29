@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderOutput, createBuilder } from '@angular-devkit/architect/src/index2';
-import { runWebpack } from '@angular-devkit/build-webpack/src/webpack/index2';
+import { runWebpack } from '@angular-devkit/build-webpack/src/webpack';
 import {
   Path,
   experimental,
