@@ -90,15 +90,14 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
         }
 
         // Resolve public host and client address.
-        let clientAddress = `${options.ssl ? 'https' : 'http'}://0.0.0.0:0`;
+        let clientAddress = url.parse(`${options.ssl ? 'https' : 'http'}://0.0.0.0:0`);
         if (options.publicHost) {
           let publicHost = options.publicHost;
           if (!/^\w+:\/\//.test(publicHost)) {
             publicHost = `${options.ssl ? 'https' : 'http'}://${publicHost}`;
           }
-          const clientUrl = url.parse(publicHost);
-          options.publicHost = clientUrl.host;
-          clientAddress = url.format(clientUrl);
+          clientAddress = url.parse(publicHost);
+          options.publicHost = clientAddress.host;
         }
 
         // Resolve serve address.
@@ -250,7 +249,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     options: DevServerBuilderOptions,
     browserOptions: NormalizedBrowserBuilderSchema,
     webpackConfig: any, // tslint:disable-line:no-any
-    clientAddress: string,
+    clientAddress: url.UrlWithStringQuery,
   ) {
     // This allows for live reload of page when changes are made to repo.
     // https://webpack.js.org/configuration/dev-server/#devserver-inline
@@ -260,7 +259,14 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     } catch {
       throw new Error('The "webpack-dev-server" package could not be found.');
     }
-    const entryPoints = [`${webpackDevServerPath}?${clientAddress}`];
+
+    // If a custom path is provided the webpack dev server client drops the sockjs-node segment.
+    // This adds it back so that behavior is consistent when using a custom URL path
+    if (clientAddress.pathname) {
+      clientAddress.pathname = path.posix.join(clientAddress.pathname, 'sockjs-node');
+    }
+
+    const entryPoints = [`${webpackDevServerPath}?${url.format(clientAddress)}`];
     if (options.hmr) {
       const webpackHmrLink = 'https://webpack.js.org/guides/hot-module-replacement';
 
