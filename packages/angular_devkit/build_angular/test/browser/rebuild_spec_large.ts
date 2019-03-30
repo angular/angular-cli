@@ -339,7 +339,7 @@ describe('Browser Builder rebuilds', () => {
     ).toPromise().then(done, done.fail);
   });
 
-  it('rebuilds on changes in barrel file dependency', async () => {
+  it('rebuilds on changes in barrel file dependency', (done) => {
     host.writeMultipleFiles({
       'src/index.ts': `export * from './interface'`,
       'src/interface.ts': `export interface Foo { bar: boolean };`,
@@ -351,8 +351,7 @@ describe('Browser Builder rebuilds', () => {
 
     const overrides = { watch: true, aot: false };
     let buildNumber = 0;
-    const run = await architect.scheduleTarget(target, overrides);
-    await run.output.pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 3).pipe(
       debounceTime(1000),
       tap((buildEvent) => {
         buildNumber += 1;
@@ -373,7 +372,6 @@ describe('Browser Builder rebuilds', () => {
         }
       }),
       take(2),
-    ).toPromise();
-    await run.stop();
+    ).toPromise().then(done, done.fail);
   });
 });
