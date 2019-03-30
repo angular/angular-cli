@@ -106,6 +106,19 @@ function addRouteDeclarationToNgModule(options: ModuleOptions, routingModulePath
   };
 }
 
+function getRoutingModulePath(host: Tree, options: ModuleOptions): Path | undefined {
+  let path: Path | undefined;
+  const modulePath = options.module as string;
+  const routingModuleName = modulePath.split('.')[0] + '-routing';
+  const { module, ...rest } = options;
+
+  try {
+    path = findModuleFromOptions(host, { module: routingModuleName, ...rest });
+  } catch {}
+
+  return path;
+}
+
 export default function (options: ModuleOptions): Rule {
   return (host: Tree) => {
     if (!options.project) {
