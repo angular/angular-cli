@@ -133,19 +133,30 @@ export default function (options: ModuleOptions): Rule {
     options.name = parsedPath.name;
     options.path = parsedPath.path;
 
-    const templateSource = apply(url('./files'), [
-      options.routing ? noop() : filter(path => !path.endsWith('-routing.module.ts.template')),
+    let routingModulePath: Path | undefined;
+    if (options.route && options.module) {
+      options.routing = true;
+      options.routingScope = 'Child';
+      routingModulePath = getRoutingModulePath(host, options);
+    }
+
+    const templateSource = () => apply(url('./files'), [
+      options.routing && !!routingModulePath ? noop() : filter(path => !path.endsWith('-routing.module.ts.template')),
+      options.route ? noop() : filter(path => !path.includes('component')),
       applyTemplates({
         ...strings,
         'if-flat': (s: string) => options.flat ? '' : s,
+        routeDeclarationInlined: !routingModulePath,
+        routerOutletCmpSelector: `${project.prefix}-${strings.dasherize(options.name)}`,
         ...options,
       }),
       move(parsedPath.path),
     ]);
 
     return chain([
-      addDeclarationToNgModule(options),
-      mergeWith(templateSource),
+      !options.route ? addDeclarationToNgModule(options) : noop(),
+      addRouteDeclarationToNgModule(options, routingModulePath),
+      mergeWith(templateSource()),
       options.lintFix ? applyLintFix(options.path) : noop(),
     ]);
   };
