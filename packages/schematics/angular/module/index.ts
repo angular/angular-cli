@@ -5,7 +5,7 @@
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.io/license
 */
-import { normalize, strings, Path } from '@angular-devkit/core';
+import { Path, normalize, strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -21,11 +21,13 @@ import {
 } from '@angular-devkit/schematics';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { addImportToModule, addRouteDeclarationToModule } from '../utility/ast-utils';
-import { Change, InsertChange } from '../utility/change';
-import { buildRelativePath, findModuleFromOptions, ModuleOptions } from '../utility/find-module';
+import { InsertChange } from '../utility/change';
+import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
+import { getProject, isProjectUsingIvy } from '../utility/project';
 import { createDefaultPath } from '../utility/workspace';
+import { WorkspaceProject } from '../utility/workspace-models';
 import { Schema as ModuleOptions } from './schema';
 
 function addDeclarationToNgModule(options: ModuleOptions): Rule {
@@ -67,7 +69,11 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
   };
 }
 
-function addRouteDeclarationToNgModule(options: ModuleOptions, routingModulePath: Path | undefined): Rule {
+function addRouteDeclarationToNgModule(
+  options: ModuleOptions,
+  project: WorkspaceProject,
+  routingModulePath: Path | undefined
+): Rule {
   return (host: Tree) => {
     if (!options.route) {
       return host;
@@ -88,14 +94,12 @@ function addRouteDeclarationToNgModule(options: ModuleOptions, routingModulePath
       throw new Error(`Couldn't find the module nor its routing module.`);
     }
 
+    const ivyEnabled = isProjectUsingIvy(host, project);
     const sourceText = text.toString('utf-8');
     const addDeclaration = addRouteDeclarationToModule(
       ts.createSourceFile(path, sourceText, ts.ScriptTarget.Latest, true),
       path,
-      `{
-         path: '${options.route}',
-         loadChildren: './${options.name}/${options.name}.module#${strings.classify(options.name)}Module'
-       }`
+      buildRoute(options, ivyEnabled)
     ) as InsertChange;
 
     const recorder = host.beginUpdate(path);
@@ -119,6 +123,19 @@ function getRoutingModulePath(host: Tree, options: ModuleOptions): Path | undefi
   return path;
 }
 
+function buildRoute(options: ModuleOptions, ivyEnabled: boolean) {
+  let loadChildren: string;
+  const modulePath = `./${options.name}/${options.name}.module`;
+
+  if (ivyEnabled) {
+    loadChildren = `() => import('${modulePath}')`;
+  } else {
+    loadChildren = `'${modulePath}#${strings.classify(options.name)}Module'`;
+  }
+
+  return `{ path: '${options.route}', loadChildren: ${loadChildren} }`;
+}
+
 export default function (options: ModuleOptions): Rule {
   return async (host: Tree) => {
     if (options.path === undefined) {
@@ -140,6 +157,7 @@ export default function (options: ModuleOptions): Rule {
       routingModulePath = getRoutingModulePath(host, options);
     }
 
+    const project = getProject(host, options.project);
     const templateSource = () => apply(url('./files'), [
       options.routing && !!routingModulePath ? noop() : filter(path => !path.endsWith('-routing.module.ts.template')),
       options.route ? noop() : filter(path => !path.includes('component')),
@@ -155,7 +173,7 @@ export default function (options: ModuleOptions): Rule {
 
     return chain([
       !options.route ? addDeclarationToNgModule(options) : noop(),
-      addRouteDeclarationToNgModule(options, routingModulePath),
+      addRouteDeclarationToNgModule(options, project, routingModulePath),
       mergeWith(templateSource()),
       options.lintFix ? applyLintFix(options.path) : noop(),
     ]);
