@@ -158,7 +158,7 @@ export default function (options: ModuleOptions): Rule {
     }
 
     const project = getProject(host, options.project);
-    const templateSource = () => apply(url('./files'), [
+    const templateSource = apply(url('./files'), [
       options.routing && !!routingModulePath ? noop() : filter(path => !path.endsWith('-routing.module.ts.template')),
       options.route ? noop() : filter(path => !path.includes('component')),
       applyTemplates({
@@ -174,7 +174,7 @@ export default function (options: ModuleOptions): Rule {
     return chain([
       !options.route ? addDeclarationToNgModule(options) : noop(),
       addRouteDeclarationToNgModule(options, project, routingModulePath),
-      mergeWith(templateSource()),
+      mergeWith(templateSource),
       options.lintFix ? applyLintFix(options.path) : noop(),
     ]);
   };
