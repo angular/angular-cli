@@ -8,7 +8,14 @@ export default function () {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
 
   // Skip this test in Angular 2, it had different bundles.
-  if (getGlobalVariable('argv').ng2) {
+  if (getGlobalVariable('argv')['ng2']) {
+    return Promise.resolve();
+  }
+
+  if (getGlobalVariable('argv')['ivy']) {
+    // todo: enable when NGCC supports this.
+    // At the moment, we re-run NGCC with a different 'propertiesToConsider'.
+    // https://angular-team.atlassian.net/browse/FW-1211
     return Promise.resolve();
   }
 
