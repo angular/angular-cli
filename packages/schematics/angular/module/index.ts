@@ -21,12 +21,13 @@ import {
 } from '@angular-devkit/schematics';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { addImportToModule, addRouteDeclarationToModule } from '../utility/ast-utils';
-import { Change, InsertChange } from '../utility/change';
+import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions, ModuleOptions } from '../utility/find-module';
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
-import { buildDefaultPath, getProject } from '../utility/project';
+import { buildDefaultPath, getProject, isProjectUsingIvy } from '../utility/project';
 import { Schema as ModuleOptions } from './schema';
+import { WorkspaceProject } from '../utility/workspace-models';
 
 function addDeclarationToNgModule(options: ModuleOptions): Rule {
   return (host: Tree) => {
@@ -67,7 +68,11 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
   };
 }
 
-function addRouteDeclarationToNgModule(options: ModuleOptions, routingModulePath: Path | undefined): Rule {
+function addRouteDeclarationToNgModule(
+  options: ModuleOptions,
+  project: WorkspaceProject,
+  routingModulePath: Path | undefined
+): Rule {
   return (host: Tree) => {
     if (!options.route) {
       return host;
@@ -88,14 +93,12 @@ function addRouteDeclarationToNgModule(options: ModuleOptions, routingModulePath
       throw new Error(`Couldn't find the module nor its routing module.`);
     }
 
+    const ivyEnabled = isProjectUsingIvy(host, project);
     const sourceText = text.toString('utf-8');
     const addDeclaration = addRouteDeclarationToModule(
       ts.createSourceFile(path, sourceText, ts.ScriptTarget.Latest, true),
       path,
-      `{
-         path: '${options.route}',
-         loadChildren: './${options.name}/${options.name}.module#${strings.classify(options.name)}Module'
-       }`
+      buildRoute(options, ivyEnabled)
     ) as InsertChange;
 
     const recorder = host.beginUpdate(path);
@@ -117,6 +120,19 @@ function getRoutingModulePath(host: Tree, options: ModuleOptions): Path | undefi
   } catch {}
 
   return path;
+}
+
+function buildRoute(options: ModuleOptions, ivyEnabled: boolean) {
+  let loadChildren: string;
+  const modulePath = `./${options.name}/${options.name}.module`;
+
+  if (ivyEnabled) {
+    loadChildren = `() => import('${modulePath}')`;
+  } else {
+    loadChildren = `'${modulePath}#${strings.classify(options.name)}Module'`;
+  }
+
+  return `{ path: '${options.route}', loadChildren: ${loadChildren} }`;
 }
 
 export default function (options: ModuleOptions): Rule {
@@ -160,7 +176,7 @@ export default function (options: ModuleOptions): Rule {
 
     return chain([
       !options.route ? addDeclarationToNgModule(options) : noop(),
-      addRouteDeclarationToNgModule(options, routingModulePath),
+      addRouteDeclarationToNgModule(options, project, routingModulePath),
       mergeWith(templateSource()),
       options.lintFix ? applyLintFix(options.path) : noop(),
     ]);
