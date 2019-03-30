@@ -5,7 +5,7 @@
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.io/license
 */
-import { normalize, strings } from '@angular-devkit/core';
+import { normalize, strings, Path } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -27,8 +27,6 @@ import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { createDefaultPath } from '../utility/workspace';
 import { Schema as ModuleOptions } from './schema';
-
-let isThereRoutingModule: boolean;
 
 function addDeclarationToNgModule(options: ModuleOptions): Rule {
   return (host: Tree) => {
@@ -69,27 +67,43 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
   };
 }
 
-function addRouteDeclaration(host: Tree, modulePath: string, routePath: string): Change {
-  isThereRoutingModule = true;
-  const routingModulePath = modulePath + '-routing';
+function addRouteDeclarationToNgModule(options: ModuleOptions, routingModulePath: Path | undefined): Rule {
+  return (host: Tree) => {
+    if (!options.route) {
+      return host;
+    }
+    if (options.route && !options.module) {
+      throw new Error('Module option required when creating a route module.');
+    }
 
-  let text = host.read(routingModulePath);
-  if (!text) {
-    isThereRoutingModule = false;
-    text = host.read(modulePath);
-  }
-  if (!text) {
-    throw new Error('Could not find a route declaration.');
-  }
+    let path: string;
+    if (routingModulePath) {
+      path = routingModulePath as string;
+    } else {
+      path = options.module as string;
+    }
 
-  const path = isThereRoutingModule ? routingModulePath : modulePath;
-  const sourceText = text.toString('utf-8');
+    const text = host.read(path);
+    if (!text) {
+      throw new Error(`Couldn't find the module nor its routing module.`);
+    }
 
-  return addRouteDeclarationToModule(
-    ts.createSourceFile(path, sourceText, ts.ScriptTarget.Latest, true),
-    isThereRoutingModule ? routingModulePath : modulePath,
-    `{ path: ${routePath} }`
-  );
+    const sourceText = text.toString('utf-8');
+    const addDeclaration = addRouteDeclarationToModule(
+      ts.createSourceFile(path, sourceText, ts.ScriptTarget.Latest, true),
+      path,
+      `{
+         path: '${options.route}',
+         loadChildren: './${options.name}/${options.name}.module#${strings.classify(options.name)}Module'
+       }`
+    ) as InsertChange;
+
+    const recorder = host.beginUpdate(path);
+    recorder.insertLeft(addDeclaration.pos, addDeclaration.toAdd);
+    host.commitUpdate(recorder);
+
+    return host;
+  };
 }
 
 export default function (options: ModuleOptions): Rule {
