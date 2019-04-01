@@ -25,7 +25,7 @@ import { checkPort } from '../angular-cli-files/utilities/check-port';
 import { BrowserBuilder, getBrowserLoggingCb } from '../browser';
 import { BrowserBuilderSchema, NormalizedBrowserBuilderSchema } from '../browser/schema';
 import { normalizeBuilderSchema } from '../utils';
-const opn = require('opn');
+const open = require('open');
 
 
 export interface DevServerBuilderOptions extends Pick<BrowserBuilderSchema,
@@ -65,7 +65,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     const webpackDevServerBuilder = new WebpackDevServerBuilder({ ...this.context, host });
     let browserOptions: NormalizedBrowserBuilderSchema;
     let first = true;
-    let opnAddress: string;
+    let openAddress: string;
 
     return from(checkPort(options.port || 0, options.host || 'localhost', 4200)).pipe(
       tap((port) => options.port = port),
@@ -145,7 +145,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
           **
         `);
 
-        opnAddress = serverAddress + webpackDevServerConfig.publicPath;
+        openAddress = serverAddress + webpackDevServerConfig.publicPath;
         webpackConfig.devServer = webpackDevServerConfig;
 
         return webpackDevServerBuilder.runWebpackDevServer(
@@ -155,7 +155,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
       map(buildEvent => {
         if (first && options.open) {
           first = false;
-          opn(opnAddress);
+          open(openAddress);
         }
 
         return buildEvent;
