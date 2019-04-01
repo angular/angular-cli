@@ -34,7 +34,7 @@ import {
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { normalizeOptimization } from '../utils';
 import { Schema } from './schema';
-const opn = require('opn');
+const open = require('open');
 
 export type DevServerBuilderSchema = Schema & json.JsonObject;
 
@@ -83,7 +83,7 @@ export function serveWebpackBrowser(
   const browserTarget = targetFromTargetString(options.browserTarget);
   const root = context.workspaceRoot;
   let first = true;
-  let opnAddress: string;
+  let openAddress: string;
   const host = new NodeJsSyncHost();
 
   const loggingFn = transforms.logging
@@ -202,7 +202,7 @@ export function serveWebpackBrowser(
         **
       `);
 
-      opnAddress = serverAddress + webpackDevServerConfig.publicPath;
+      openAddress = serverAddress + webpackDevServerConfig.publicPath;
       webpackConfig.devServer = webpackDevServerConfig;
 
       return runWebpackDevServer(webpackConfig, context, { logging: loggingFn });
@@ -210,10 +210,10 @@ export function serveWebpackBrowser(
     map(buildEvent => {
       if (first && options.open) {
         first = false;
-        opn(opnAddress);
+        open(openAddress);
       }
 
-      return { ...buildEvent, baseUrl: opnAddress } as DevServerBuilderOutput;
+      return { ...buildEvent, baseUrl: openAddress } as DevServerBuilderOutput;
     }),
   );
 }
