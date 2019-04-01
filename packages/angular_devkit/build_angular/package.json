@@ -28,7 +28,7 @@
     "mini-css-extract-plugin": "0.5.0",
     "minimatch": "3.0.4",
     "parse5": "4.0.0",
-    "opn": "5.4.0",
+    "open": "6.0.0",
     "postcss": "7.0.14",
     "postcss-import": "12.0.1",
     "postcss-loader": "3.0.0",

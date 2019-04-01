@@ -11,7 +11,8 @@ export default function () {
 
   const extensions = ['css', 'scss', 'less', 'styl'];
   let promise: Promise<any> = Promise.resolve()
-    .then(() => silentNpm('install', '@angular/material@5.0.4'));
+    .then(() => silentNpm('install', '@angular/material@7.3.6'))
+    .then(() => silentNpm('install', '@angular/cdk@7.3.6'));
 
   extensions.forEach(ext => {
     promise = promise.then(() => {
