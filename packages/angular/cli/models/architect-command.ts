@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { index2 } from '@angular-devkit/architect';
+import { Architect, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { experimental, json, schema, tags } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
@@ -27,7 +27,7 @@ export interface ArchitectCommandOptions extends BaseCommandOptions {
 export abstract class ArchitectCommand<
   T extends ArchitectCommandOptions = ArchitectCommandOptions,
 > extends Command<ArchitectCommandOptions> {
-  protected _architect: index2.Architect;
+  protected _architect: Architect;
   protected _architectHost: WorkspaceNodeModulesArchitectHost;
   protected _workspace: experimental.workspace.Workspace;
   protected _registry: json.schema.SchemaRegistry;
@@ -49,7 +49,7 @@ export abstract class ArchitectCommand<
     this._workspace = workspace;
 
     this._architectHost = new WorkspaceNodeModulesArchitectHost(workspace, this.workspace.root);
-    this._architect = new index2.Architect(this._architectHost, this._registry);
+    this._architect = new Architect(this._architectHost, this._registry);
 
     if (!this.target) {
       if (options.help) {
@@ -188,7 +188,7 @@ export abstract class ArchitectCommand<
 
   protected async runBepTarget<T>(
     command: string,
-    configuration: index2.Target,
+    configuration: Target,
     overrides: json.JsonObject,
     buildEventLog: string,
   ): Promise<number> {
@@ -224,7 +224,7 @@ export abstract class ArchitectCommand<
   }
 
   protected async runSingleTarget(
-    target: index2.Target,
+    target: Target,
     targetOptions: string[],
     commandOptions: ArchitectCommandOptions & Arguments,
   ) {
@@ -284,7 +284,7 @@ export abstract class ArchitectCommand<
         let result = 0;
         for (const project of this.getProjectNamesByTarget(this.target)) {
           result |= await this.runSingleTarget(
-            { ...targetSpec, project } as index2.Target,
+            { ...targetSpec, project } as Target,
             extra,
             options,
           );
@@ -344,7 +344,7 @@ export abstract class ArchitectCommand<
     }
   }
 
-  private _makeTargetSpecifier(commandOptions: ArchitectCommandOptions): index2.Target {
+  private _makeTargetSpecifier(commandOptions: ArchitectCommandOptions): Target {
     let project, target, configuration;
 
     if (commandOptions.target) {
