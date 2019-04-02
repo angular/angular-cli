@@ -7,10 +7,8 @@
  */
 
 import { Architect } from '@angular-devkit/architect/src/index2';
-import { runTargetSpec } from '@angular-devkit/architect/testing';
-import { join, normalize } from '@angular-devkit/core';
-import { tap } from 'rxjs/operators';
-import { browserBuild, browserTargetSpec, createArchitect, host } from '../utils';
+import { normalize } from '@angular-devkit/core';
+import { browserBuild, createArchitect, host } from '../utils';
 
 
 describe('Browser Builder basic test', () => {
