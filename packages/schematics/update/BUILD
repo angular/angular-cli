@@ -28,6 +28,7 @@ ts_library(
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tasks",
         "@npm//rxjs",
+        "@npm//semver",
         
         "@npm//@types/node",
         "@npm//@types/semver",
