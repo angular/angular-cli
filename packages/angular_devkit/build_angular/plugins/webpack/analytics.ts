@@ -160,10 +160,7 @@ export class NgBuildAnalyticsPlugin {
               this._stats.errors.push(message);
             }
           }
-          // console.log(allErrors);
         }
-        console.log(errObject.message);
-        console.log('------');
       }
     }
   }
