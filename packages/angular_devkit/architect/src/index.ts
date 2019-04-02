@@ -8,8 +8,3 @@
 export * from './api';
 export { Architect, ScheduleOptions } from './architect';
 export { createBuilder } from './create-builder';
-
-import * as index2 from './index2';
-export {
-  index2,
-};

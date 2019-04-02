@@ -8,7 +8,7 @@
 import { json } from '@angular-devkit/core';
 import { EMPTY, from, of } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
-import { BuilderOutput, BuilderRun, createBuilder } from '../src/index2';
+import { BuilderOutput, BuilderRun, createBuilder } from '../src';
 import { Schema as OperatorSchema } from './operator-schema';
 
 export default createBuilder<json.JsonObject & OperatorSchema>((options, context) => {
