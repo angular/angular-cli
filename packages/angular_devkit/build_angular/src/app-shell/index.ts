@@ -10,7 +10,7 @@ import {
   BuilderOutput,
   createBuilder,
   targetFromTargetString,
-} from '@angular-devkit/architect/src/index2';
+} from '@angular-devkit/architect';
 import { JsonObject, experimental, join, normalize, resolve, schema } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';

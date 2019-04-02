@@ -7,7 +7,7 @@
  */
 // tslint:disable:no-big-function
 
-import { Architect } from '@angular-devkit/architect/src/index2';
+import { Architect } from '@angular-devkit/architect';
 import { logging, normalize, tags } from '@angular-devkit/core';
 import { browserBuild, createArchitect, host } from '../utils';
 

@@ -10,11 +10,11 @@ import {
   BuilderInfo,
   BuilderOutput,
   createBuilder,
-} from '@angular-devkit/architect/src/index2';
+} from '@angular-devkit/architect';
 import {
   WebpackLoggingCallback,
   runWebpack,
-} from '@angular-devkit/build-webpack/src/webpack';
+} from '@angular-devkit/build-webpack';
 import {
   Path,
   analytics,

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect/src/index2';
+import { Architect } from '@angular-devkit/architect';
 import { join, normalize, tags, virtualFs } from '@angular-devkit/core';
 import { BrowserBuilderOutput } from '../../src/browser';
 import { createArchitect, host } from '../utils';

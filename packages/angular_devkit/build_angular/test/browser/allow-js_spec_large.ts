@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Architect } from '@angular-devkit/architect/src/index2';
+import { Architect } from '@angular-devkit/architect';
 import { join, normalize, relative, virtualFs } from '@angular-devkit/core';
 import { take, tap } from 'rxjs/operators';
 import { BrowserBuilderOutput } from '../../src/browser';

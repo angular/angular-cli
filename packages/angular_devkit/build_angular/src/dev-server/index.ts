@@ -10,12 +10,12 @@ import {
   BuilderContext,
   createBuilder,
   targetFromTargetString,
-} from '@angular-devkit/architect/src/index2';
-import { WebpackLoggingCallback } from '@angular-devkit/build-webpack/src/webpack';
+} from '@angular-devkit/architect';
 import {
   DevServerBuildOutput,
+  WebpackLoggingCallback,
   runWebpackDevServer,
-} from '@angular-devkit/build-webpack/src/webpack-dev-server';
+} from '@angular-devkit/build-webpack';
 import { experimental, json, logging, tags } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { existsSync, readFileSync } from 'fs';

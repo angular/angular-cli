@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect/src/index2';
+import { Architect } from '@angular-devkit/architect';
 import { TestLogger } from '@angular-devkit/architect/testing';
 import { join, virtualFs } from '@angular-devkit/core';
 import { debounceTime, takeWhile, tap } from 'rxjs/operators';

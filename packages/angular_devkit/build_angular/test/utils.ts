@@ -11,20 +11,18 @@ import {
   BuilderOutput,
   ScheduleOptions,
   Target,
-} from '@angular-devkit/architect/src/index2';
-import { TestProjectHost } from '@angular-devkit/architect/testing';
+} from '@angular-devkit/architect';
+import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
+import { TestProjectHost, TestingArchitectHost } from '@angular-devkit/architect/testing';
 import {
   Path,
   experimental,
   join,
   json,
-  logging,
   normalize,
   schema,
   virtualFs,
 } from '@angular-devkit/core';
-import { WorkspaceNodeModulesArchitectHost } from '../../architect/node';
-import { TestingArchitectHost } from '../../architect/testing/testing-architect-host';
 import { BrowserBuilderOutput } from '../src/browser';
 
 

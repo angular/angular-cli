@@ -7,7 +7,7 @@
  */
 // tslint:disable:no-big-function
 
-import { Architect } from '@angular-devkit/architect/src/index2';
+import { Architect } from '@angular-devkit/architect';
 import { TestLogger } from '@angular-devkit/architect/testing';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, take, takeWhile, tap } from 'rxjs/operators';

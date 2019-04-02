@@ -10,7 +10,7 @@ import {
   BuilderOutput,
   createBuilder,
   targetFromTargetString,
-} from '@angular-devkit/architect/src/index2';
+} from '@angular-devkit/architect';
 import { JsonObject, tags } from '@angular-devkit/core';
 import { resolve } from 'path';
 import * as url from 'url';
