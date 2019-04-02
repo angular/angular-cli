@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BuilderContext, createBuilder } from '@angular-devkit/architect/src/index2';
+import { BuilderContext, createBuilder } from '@angular-devkit/architect';
 import { getSystemPath, json, normalize, resolve } from '@angular-devkit/core';
 import * as net from 'net';
 import { Observable, from, of } from 'rxjs';

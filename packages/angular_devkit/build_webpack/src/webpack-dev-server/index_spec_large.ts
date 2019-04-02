@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { Architect } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
-import { Architect } from '@angular-devkit/architect/src/index2';
-import { TestingArchitectHost } from '@angular-devkit/architect/testing/index2';
+import { TestingArchitectHost } from '@angular-devkit/architect/testing';
 import { experimental, normalize, schema } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
