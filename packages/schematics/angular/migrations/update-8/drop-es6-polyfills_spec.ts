@@ -80,8 +80,8 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
       const polyfills = tree.readContent(polyfillsPath);
       expect(polyfills).not.toContain('core-js/es6/symbol');
       expect(polyfills).not.toContain('core-js/es6/set');
-      expect(polyfills).not.toContain('zone.js');
-      expect(polyfills).not.toContain('Zone');
+      expect(polyfills).toContain('zone.js');
+      expect(polyfills).toContain('Zone');
 
       // We don't want to drop this commented import comments
       expect(polyfills).toContain('core-js/es6/reflect');
