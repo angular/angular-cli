@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BuildEvent } from '@angular-devkit/architect';
+import { BuilderOutput } from '@angular-devkit/architect';
 import { ForkOptions, fork } from 'child_process';
 import { resolve } from 'path';
 import { Observable } from 'rxjs';
@@ -18,7 +18,7 @@ export function runModuleAsObservableFork(
   exportName: string | undefined,
   // tslint:disable-next-line:no-any
   args: any[],
-): Observable<BuildEvent> {
+): Observable<BuilderOutput> {
   return new Observable(obs => {
     const workerPath: string = resolve(__dirname, './run-module-worker.js');
 
