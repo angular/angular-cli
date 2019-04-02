@@ -6,11 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Architect } from '@angular-devkit/architect/src/index2';
+import { Architect } from '@angular-devkit/architect';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { take, tap } from 'rxjs/operators';
 import { BrowserBuilderOutput } from '../../src/browser';
-import { Schema as BuildWebpackServerSchema } from '../../src/server/schema';
 import { createArchitect, host } from '../utils';
 
 

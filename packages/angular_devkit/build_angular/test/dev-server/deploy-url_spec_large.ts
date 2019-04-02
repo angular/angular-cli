@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Architect, BuilderRun } from '@angular-devkit/architect/src/index2';
+import { Architect, BuilderRun } from '@angular-devkit/architect';
 import fetch from 'node-fetch';  // tslint:disable-line:no-implicit-dependencies
 import { DevServerBuilderOutput } from '../../src/dev-server';
 import { createArchitect, host } from '../utils';

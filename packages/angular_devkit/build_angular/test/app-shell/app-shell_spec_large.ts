@@ -6,10 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-big-function
-
+import { Architect } from '@angular-devkit/architect/src/architect';
 import { getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core';
 import * as express from 'express'; // tslint:disable-line:no-implicit-dependencies
-import { Architect } from '../../../architect/src/architect';
 import { createArchitect, host } from '../utils';
 
 
