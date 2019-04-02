@@ -8,8 +8,8 @@
 import { experimental, json } from '@angular-devkit/core';
 import { resolve } from '@angular-devkit/core/node';
 import * as path from 'path';
+import { BuilderInfo } from '../src';
 import { Schema as BuilderSchema } from '../src/builders-schema';
-import { BuilderInfo } from '../src/index2';
 import { Target } from '../src/input-schema';
 import { ArchitectHost, Builder, BuilderSymbol } from '../src/internal';
 
