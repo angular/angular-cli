@@ -65,7 +65,7 @@ const ignoredPackages = [
   '@angular/devkit-repo@0.0.0',  // Hey, that's us!
   // * Development only
   'spdx-license-ids@3.0.1',  // CC0 but it's content only (index.json, no code) and not distributed.
-  'tslint-sonarts@1.8.0', // LGPL-3.0 but only used as a tool, not linked in the build.
+  'tslint-sonarts@1.9.0', // LGPL-3.0 but only used as a tool, not linked in the build.
 
   // * Broken license fields
   'bitsyntax@0.0.4', // MIT but no license field in package.json
