@@ -179,7 +179,6 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     exclude: globalStylePaths,
     test,
     use: [
-      { loader: 'raw-loader' },
       {
         loader: 'postcss-loader',
         options: {

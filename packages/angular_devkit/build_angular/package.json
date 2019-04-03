@@ -32,7 +32,7 @@
     "postcss": "7.0.14",
     "postcss-import": "12.0.1",
     "postcss-loader": "3.0.0",
-    "raw-loader": "1.0.0",
+    "raw-loader": "2.0.0",
     "rxjs": "6.4.0",
     "sass": "1.17.3",
     "sass-loader": "7.1.0",

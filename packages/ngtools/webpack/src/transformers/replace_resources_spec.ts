@@ -20,6 +20,7 @@ function transform(input: string, shouldTransform = true, directTemplateLoading 
 
 // tslint:disable-next-line:no-big-function
 describe('@ngtools/webpack transformers', () => {
+  // tslint:disable:max-line-length
   // tslint:disable-next-line:no-big-function
   describe('find_resources', () => {
     it('should replace resources', () => {
@@ -46,8 +47,11 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = tslib_1.__decorate([
             Component({
                 selector: 'app-root',
-                template: require("!raw-loader!./app.component.html"),
-                styles: [require("./app.component.css"), require("./app.component.2.css")]
+                template: tslib_1.__importDefault(require("!raw-loader!./app.component.html")).default,
+                styles: [
+                  tslib_1.__importDefault(require("./app.component.css")).default,
+                  tslib_1.__importDefault(require("./app.component.2.css")).default
+                ]
             })
         ], AppComponent);
         export { AppComponent };
@@ -64,7 +68,10 @@ describe('@ngtools/webpack transformers', () => {
           @Component({
             selector: 'app-root',
             templateUrl: './app.component.html',
-            styleUrls: ['./app.component.css', './app.component.2.css']
+            styleUrls: [
+              './app.component.css',
+              './app.component.2.css'
+            ]
           })
           export class AppComponent {
             title = 'app';
@@ -81,8 +88,11 @@ describe('@ngtools/webpack transformers', () => {
           AppComponent = tslib_1.__decorate([
               Component({
                   selector: 'app-root',
-                  template: require("./app.component.html"),
-                  styles: [require("./app.component.css"), require("./app.component.2.css")]
+                  template: tslib_1.__importDefault(require("./app.component.html")).default,
+                  styles: [
+                    tslib_1.__importDefault(require("./app.component.css")).default,
+                    tslib_1.__importDefault(require("./app.component.2.css")).default
+                  ]
               })
           ], AppComponent);
           export { AppComponent };
@@ -116,7 +126,7 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = tslib_1.__decorate([
             Component({
                 selector: 'app-root',
-                template: require("!raw-loader!./app.component.svg")
+                template: tslib_1.__importDefault(require("!raw-loader!./app.component.svg")).default
             })
         ], AppComponent);
         export { AppComponent };
@@ -151,8 +161,11 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = tslib_1.__decorate([
             Component({
                 selector: 'app-root',
-                template: require("!raw-loader!./app.component.html"),
-                styles: ["a { color: red }", require("./app.component.css")]
+                template: tslib_1.__importDefault(require("!raw-loader!./app.component.html")).default,
+                styles: [
+                  "a { color: red }",
+                  tslib_1.__importDefault(require("./app.component.css")).default
+                ]
             })
         ], AppComponent);
         export { AppComponent };
@@ -186,8 +199,11 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = tslib_1.__decorate([
             Component({
                 selector: 'app-root',
-                template: require("!raw-loader!./app.component.html"),
-                styles: [require("./app.component.css"), require("./app.component.2.css")]
+                template: tslib_1.__importDefault(require("!raw-loader!./app.component.html")).default,
+                styles: [
+                  tslib_1.__importDefault(require("./app.component.css")).default,
+                  tslib_1.__importDefault(require("./app.component.2.css")).default
+                ]
             })
         ], AppComponent);
         export { AppComponent };
@@ -221,8 +237,11 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = tslib_1.__decorate([
           NgComponent({
                 selector: 'app-root',
-                template: require("!raw-loader!./app.component.html"),
-                styles: [require("./app.component.css"), require("./app.component.2.css")]
+                template: tslib_1.__importDefault(require("!raw-loader!./app.component.html")).default,
+                styles: [
+                  tslib_1.__importDefault(require("./app.component.css")).default,
+                  tslib_1.__importDefault(require("./app.component.2.css")).default
+                ]
             })
         ], AppComponent);
         export { AppComponent };
@@ -260,8 +279,11 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = tslib_1.__decorate([
           ng.Component({
                 selector: 'app-root',
-                template: require("!raw-loader!./app.component.html"),
-                styles: [require("./app.component.css"), require("./app.component.2.css")]
+                template: tslib_1.__importDefault(require("!raw-loader!./app.component.html")).default,
+                styles: [
+                  tslib_1.__importDefault(require("./app.component.css")).default,
+                  tslib_1.__importDefault(require("./app.component.2.css")).default
+                ]
             })
         ], AppComponent);
         export { AppComponent };
@@ -308,8 +330,10 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = tslib_1.__decorate([
             Component({
                 selector: 'app-root',
-                template: require("!raw-loader!./app.component.html"),
-                styles: [require("./app.component.css")]
+                template: tslib_1.__importDefault(require("!raw-loader!./app.component.html")).default,
+                styles: [
+                  tslib_1.__importDefault(require("./app.component.css")).default
+                ]
             })
         ], AppComponent);
         export { AppComponent };
