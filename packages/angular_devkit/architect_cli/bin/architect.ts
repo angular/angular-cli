@@ -6,22 +6,22 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { index2 } from '@angular-devkit/architect';
+import { Architect, BuilderInfo, BuilderProgressState, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import {
-  dirname,
   experimental,
   json,
   logging,
   normalize,
   schema,
-  tags, terminal,
+  tags,
+  terminal,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import { existsSync, readFileSync } from 'fs';
 import * as minimist from 'minimist';
 import * as path from 'path';
-import { last, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { MultiProgressBar } from '../src/progress';
 
 
@@ -68,15 +68,15 @@ function usage(logger: logging.Logger, exitCode = 0): never {
   throw 0;  // The node typing sometimes don't have a never type for process.exit().
 }
 
-function _targetStringFromTarget({project, target, configuration}: index2.Target) {
+function _targetStringFromTarget({project, target, configuration}: Target) {
   return `${project}:${target}${configuration !== undefined ? ':' + configuration : ''}`;
 }
 
 
 interface BarInfo {
   status?: string;
-  builder: index2.BuilderInfo;
-  target?: index2.Target;
+  builder: BuilderInfo;
+  target?: Target;
 }
 
 
@@ -88,7 +88,7 @@ async function _executeTarget(
   registry: json.schema.SchemaRegistry,
 ) {
   const architectHost = new WorkspaceNodeModulesArchitectHost(workspace, root);
-  const architect = new index2.Architect(architectHost, registry);
+  const architect = new Architect(architectHost, registry);
 
   // Split a target into its parts.
   const targetStr = argv._.shift() || '';
@@ -122,22 +122,22 @@ async function _executeTarget(
       }
 
       switch (update.state) {
-        case index2.BuilderProgressState.Error:
+        case BuilderProgressState.Error:
           data.status = 'Error: ' + update.error;
           bars.update(update.id, data);
           break;
 
-        case index2.BuilderProgressState.Stopped:
+        case BuilderProgressState.Stopped:
           data.status = 'Done.';
           bars.complete(update.id);
           bars.update(update.id, data, update.total, update.total);
           break;
 
-        case index2.BuilderProgressState.Waiting:
+        case BuilderProgressState.Waiting:
           bars.update(update.id, data);
           break;
 
-        case index2.BuilderProgressState.Running:
+        case BuilderProgressState.Running:
           bars.update(update.id, data, update.current, update.total);
           break;
       }
