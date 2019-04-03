@@ -27,7 +27,7 @@ export * from './tree/empty';
 export * from './tree/host-tree';
 export * from './tree/filesystem';
 export * from './tree/virtual';
-export {UpdateRecorder} from './tree/interface';
+export { UpdateRecorder } from './tree/interface';
 export * from './engine/schematic';
 export * from './sink/dryrun';
 export * from './sink/filesystem';
