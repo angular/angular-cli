@@ -23,8 +23,6 @@ export function replaceResources(
           (node: ts.Decorator) => visitDecorator(node, typeChecker, directTemplateLoading),
         );
 
-        // todo: we need to investigate and confirm that using
-        //  `updateClassDeclaration` has no regressions
         return ts.updateClassDeclaration(
           node,
           decorators,
