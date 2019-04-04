@@ -72,14 +72,12 @@ describe('Karma Builder', () => {
        `,
       'src/app/app.component.spec.ts': `
         import { TestBed, async } from '@angular/core/testing';
-        import { HttpModule } from '@angular/http';
         import { AppComponent } from './app.component';
 
         describe('AppComponent', () => {
           beforeEach(async(() => {
             TestBed.configureTestingModule({
               imports: [
-                HttpModule
               ],
               declarations: [
                 AppComponent
@@ -114,7 +112,7 @@ describe('Karma Builder', () => {
       'src/app/app.module.ts': `
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
-        import { HttpModule } from '@angular/http';
+        import { HttpClientModule } from '@angular/common/http';
         import { AppComponent } from './app.component';
 
         @NgModule({
@@ -123,7 +121,7 @@ describe('Karma Builder', () => {
           ],
           imports: [
             BrowserModule,
-            HttpModule
+            HttpClientModule
           ],
           providers: [],
           bootstrap: [AppComponent]
@@ -132,7 +130,7 @@ describe('Karma Builder', () => {
       `,
       'src/app/app.component.ts': `
         import { Component } from '@angular/core';
-        import { Http, Response } from '@angular/http';
+        import { HttpClient } from '@angular/common/http';
 
         @Component({
           selector: 'app-root',
@@ -146,21 +144,21 @@ describe('Karma Builder', () => {
             { path: './folder/folder-asset.txt', content: '' },
             { path: './output-folder/output-asset.txt', content: '' },
           ];
-          constructor(private http: Http) {
-            this.assets.forEach(asset => http.get(asset.path)
-              .subscribe(res => asset.content = res['_body']));
+          constructor(private http: HttpClient) {
+            this.assets.forEach(asset => http.get(asset.path, { responseType: 'text' })
+              .subscribe(res => asset.content = res));
           }
         }`,
       'src/app/app.component.spec.ts': `
         import { TestBed, async } from '@angular/core/testing';
-        import { HttpModule } from '@angular/http';
+        import { HttpClientModule } from '@angular/common/http';
         import { AppComponent } from './app.component';
 
         describe('AppComponent', () => {
           beforeEach(async(() => {
             TestBed.configureTestingModule({
               imports: [
-                HttpModule
+                HttpClientModule
               ],
               declarations: [
                 AppComponent
