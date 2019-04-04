@@ -8,7 +8,6 @@
 import { analytics } from '@angular-devkit/core';
 import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
 import { Arguments } from '../models/interface';
-import { Version } from '../upgrade/version';
 import { Schema as BuildCommandSchema } from './build';
 import { Schema as ServeCommandSchema } from './serve';
 
@@ -16,9 +15,6 @@ export class ServeCommand extends ArchitectCommand<ServeCommandSchema> {
   public readonly target = 'serve';
 
   public validate(_options: ArchitectCommandOptions & Arguments) {
-    // Check Angular versions.
-    Version.assertCompatibleAngularVersion(this.workspace.root);
-
     return true;
   }
 

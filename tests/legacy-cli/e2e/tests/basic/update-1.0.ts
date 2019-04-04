@@ -7,7 +7,7 @@ import { expectToFail } from '../../utils/utils';
 
 
 export default async function () {
-  const extraUpdateArgs = await isPrereleaseCli() ? ['--next'] : [];
+  const extraUpdateArgs = await isPrereleaseCli() ? ['--next', '--force'] : [];
 
   await createProjectFromAsset('1.0-project');
   await useCIChrome('.');
