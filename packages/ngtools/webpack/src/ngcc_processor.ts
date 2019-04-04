@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { Logger } from '@angular/compiler-cli/ngcc';
 import * as ts from 'typescript';
 import { InputFileSystem } from 'webpack';
 import { time, timeEnd } from './benchmark';
@@ -24,11 +25,16 @@ import { workaroundResolve } from './utils';
 export class NgccProcessor {
   private _processedModules = new Set<string>();
 
+  private _logger: NgccLogger;
+
   constructor(
     private readonly ngcc: typeof import('@angular/compiler-cli/ngcc'),
     private readonly propertiesToConsider: string[],
     private readonly inputFileSystem: InputFileSystem,
+    private readonly compilationWarnings: (Error | string)[],
+    private readonly compilationErrors: (Error | string)[],
   ) {
+    this._logger = new NgccLogger(this.compilationWarnings, this.compilationErrors);
   }
 
   processModule(
@@ -61,6 +67,7 @@ export class NgccProcessor {
       propertiesToConsider: this.propertiesToConsider,
       compileAllFormats: false,
       createNewEntryPointFormats: true,
+      logger: this._logger,
     });
     timeEnd(timeLabel);
 
@@ -93,5 +100,25 @@ export class NgccProcessor {
       // Ex: @angular/compiler/src/i18n/i18n_ast/package.json
       return undefined;
     }
+  }
+}
+
+class NgccLogger implements Logger {
+  constructor(
+    private readonly compilationWarnings: (Error | string)[],
+    private readonly compilationErrors: (Error | string)[],
+  ) {
+  }
+
+  debug(..._args: string[]) { }
+
+  info(..._args: string[]) { }
+
+  warn(...args: string[]) {
+    this.compilationWarnings.push(args.join(' '));
+  }
+
+  error(...args: string[]) {
+    this.compilationErrors.push(new Error(args.join(' ')));
   }
 }
