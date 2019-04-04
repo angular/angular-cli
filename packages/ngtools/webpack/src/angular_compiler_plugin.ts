@@ -679,6 +679,8 @@ export class AngularCompilerPlugin {
             ngcc,
             this._mainFields,
             compilerWithFileSystems.inputFileSystem,
+            this._warnings,
+            this._errors,
           );
         }
       }
