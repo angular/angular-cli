@@ -112,8 +112,8 @@ describe('Browser Builder lazy modules', () => {
 
   it(`supports making a common bundle for shared lazy modules`, async () => {
     host.writeMultipleFiles({
-      'src/one.ts': `import * as http from '@angular/http'; console.log(http);`,
-      'src/two.ts': `import * as http from '@angular/http'; console.log(http);`,
+      'src/one.ts': `import * as http from '@angular/common/http'; console.log(http);`,
+      'src/two.ts': `import * as http from '@angular/common/http'; console.log(http);`,
       'src/main.ts': `import('./one'); import('./two');`,
     });
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
@@ -127,8 +127,8 @@ describe('Browser Builder lazy modules', () => {
 
   it(`supports disabling the common bundle`, async () => {
     host.writeMultipleFiles({
-      'src/one.ts': `import * as http from '@angular/http'; console.log(http);`,
-      'src/two.ts': `import * as http from '@angular/http'; console.log(http);`,
+      'src/one.ts': `import * as http from '@angular/common/http'; console.log(http);`,
+      'src/two.ts': `import * as http from '@angular/common/http'; console.log(http);`,
       'src/main.ts': `import('./one'); import('./two');`,
     });
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
