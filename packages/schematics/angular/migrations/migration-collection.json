@@ -31,7 +31,7 @@
       "description": "Update an Angular CLI project to version 7."
     },
     "migration-07": {
-      "version": "8.0.0",
+      "version": "8.0.0-beta.12",
       "factory": "./update-8",
       "description": "Update an Angular CLI project to version 8."
     }
