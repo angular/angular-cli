@@ -203,6 +203,7 @@ async function _bazel(logger: logging.Logger) {
   // _exec('bazel', ['build', '//packages/...'], {}, logger);
 }
 
+// tslint:disable-next-line:no-big-function
 export default async function(
   argv: { local?: boolean, snapshot?: boolean },
   logger: logging.Logger,
@@ -367,9 +368,18 @@ export default async function(
 
     for (const depName of Object.keys(packages)) {
       const v = packages[depName].version;
-      for (const depKey of ['dependencies', 'peerDependencies', 'devDependencies']) {
-        const obj = packageJson[depKey] as JsonObject | null;
-        if (obj && obj[depName]) {
+      for (const depKey of ['dependencies', 'peerDependencies', 'devDependencies', 'ng-update']) {
+        let obj: JsonObject | null;
+        if (depKey === 'ng-update') {
+          const updateObject = packageJson[depKey] as JsonObject | null;
+          if (!updateObject) {
+            continue;
+          }
+          obj = updateObject['packageGroup'] as JsonObject | null;
+        } else {
+          obj = packageJson[depKey] as JsonObject | null;
+        }
+        if (obj && typeof obj === 'object' && obj[depName]) {
           if (argv.local) {
             obj[depName] = packages[depName].tar;
           } else if (argv.snapshot) {
