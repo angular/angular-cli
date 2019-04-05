@@ -52,7 +52,7 @@ async function initialize(
   // tslint:disable-next-line:no-implicit-dependencies
   const karma = await import('karma');
 
-  return [karma, config];
+  return [karma, config[0]];
 }
 
 export function execute(
