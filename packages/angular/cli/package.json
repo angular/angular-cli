@@ -43,6 +43,12 @@
     "uuid": "^3.3.2"
   },
   "ng-update": {
-    "migrations": "@schematics/angular/migrations/migration-collection.json"
+    "migrations": "@schematics/angular/migrations/migration-collection.json",
+    "packageGroup": {
+      "@angular/cli": "0.0.0",
+      "@angular-devkit/build-angular":  "0.0.0",
+      "@angular-devkit/build-ng-packagr": "0.0.0",
+      "@angular-devkit/build-webpack": "0.0.0"
+    }
   }
 }
