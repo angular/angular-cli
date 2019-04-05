@@ -87,7 +87,7 @@ async function execute(options: ExtractI18nBuilderOptions, context: BuilderConte
     ],
   );
 
-  return runWebpack(config, context).toPromise();
+  return runWebpack(config[0], context).toPromise();
 }
 
 export default createBuilder<JsonObject & ExtractI18nBuilderOptions>(execute);

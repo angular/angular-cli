@@ -7,6 +7,7 @@
  */
 import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 import * as path from 'path';
+import * as webpack from 'webpack';
 import { IndexHtmlWebpackPlugin } from '../../plugins/index-html-webpack-plugin';
 import { generateEntryPoints } from '../../utilities/package-chunk-sort';
 import { WebpackConfigOptions } from '../build-options';
@@ -15,7 +16,7 @@ import { getSourceMapDevTool, normalizeExtraEntryPoints } from './utils';
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
 
 
-export function getBrowserConfig(wco: WebpackConfigOptions) {
+export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configuration {
   const { root, buildOptions } = wco;
   const extraPlugins = [];
 
@@ -119,7 +120,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions) {
           },
         },
       },
-    },
+    } as webpack.Options.Optimization,
     plugins: extraPlugins,
     node: false,
   };
