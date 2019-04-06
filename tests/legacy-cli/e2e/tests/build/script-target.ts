@@ -12,13 +12,6 @@ export default function () {
     return Promise.resolve();
   }
 
-  if (getGlobalVariable('argv')['ivy']) {
-    // todo: enable when NGCC supports this.
-    // At the moment, we re-run NGCC with a different 'propertiesToConsider'.
-    // https://angular-team.atlassian.net/browse/FW-1211
-    return Promise.resolve();
-  }
-
   return Promise.resolve()
     .then(() => updateJsonFile('tsconfig.json', configJson => {
       const compilerOptions = configJson['compilerOptions'];
