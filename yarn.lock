@@ -6604,10 +6604,10 @@ onetime@^2.0.0:
   dependencies:
     mimic-fn "^1.0.0"
 
-open@6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/open/-/open-6.0.0.tgz#cae5e2c1a3a1bfaee0d0acc8c4b7609374750346"
-  integrity sha512-/yb5mVZBz7mHLySMiSj2DcLtMBbFPJk5JBKEkHVZFxZAPzeg3L026O0T+lbdz1B2nyDnkClRSwRQJdeVUIF7zw==
+open@6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/open/-/open-6.1.0.tgz#0e7e671b883976a4e5251b5d1ca905ab6f4be78f"
+  integrity sha512-Vqch7NFb/WsMujhqfq+B3u0xkssRjZlxh+NSsBSphpcgaFD7gfB0SUBfR91E9ygBlyNGNogXR2cUB8rRfoo2kQ==
   dependencies:
     is-wsl "^1.1.0"
 
