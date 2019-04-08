@@ -106,6 +106,9 @@ export function serveWebpackBrowser(
       [key]: options[key],
     }), {});
 
+    // In dev server we should not have budgets because of extra libs such as socks-js
+    overrides.budgets = undefined;
+
     const browserName = await context.getBuilderNameForTarget(browserTarget);
     const browserOptions = await context.validateOptions<json.JsonObject & BrowserBuilderSchema>(
       { ...rawBrowserOptions, ...overrides },
