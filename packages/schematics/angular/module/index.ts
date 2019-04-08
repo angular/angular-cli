@@ -28,7 +28,7 @@ import { parseName } from '../utility/parse-name';
 import { getProject, isProjectUsingIvy } from '../utility/project';
 import { createDefaultPath } from '../utility/workspace';
 import { WorkspaceProject } from '../utility/workspace-models';
-import { Schema as ModuleOptions } from './schema';
+import { Schema as ModuleOptions, RoutingScope } from './schema';
 
 function addDeclarationToNgModule(options: ModuleOptions): Rule {
   return (host: Tree) => {
@@ -153,7 +153,7 @@ export default function (options: ModuleOptions): Rule {
     let routingModulePath: Path | undefined;
     if (options.route && options.module) {
       options.routing = true;
-      options.routingScope = 'Child';
+      options.routingScope = RoutingScope.Child;
       routingModulePath = getRoutingModulePath(host, options);
     }
 
