@@ -26,7 +26,7 @@ import { buildRelativePath, findModuleFromOptions } from '../utility/find-module
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { buildDefaultPath, getProject, isProjectUsingIvy } from '../utility/project';
-import { Schema as ModuleOptions } from './schema';
+import { Schema as ModuleOptions, RoutingScope } from './schema';
 import { WorkspaceProject } from '../utility/workspace-models';
 
 function addDeclarationToNgModule(options: ModuleOptions): Rule {
@@ -157,7 +157,7 @@ export default function (options: ModuleOptions): Rule {
     let routingModulePath: Path | undefined;
     if (options.route && options.module) {
       options.routing = true;
-      options.routingScope = 'Child';
+      options.routingScope = RoutingScope.Child;
       routingModulePath = getRoutingModulePath(host, options);
     }
 
