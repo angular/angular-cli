@@ -15,8 +15,37 @@ import {
   PLATFORM
 } from '@ngtools/webpack';
 import { buildOptimizerLoader } from './common';
-import { WebpackConfigOptions } from '../build-options';
+import { WebpackConfigOptions, BuildOptions } from '../build-options';
 
+function _pluginOptionsOverrides(
+  buildOptions: BuildOptions,
+  pluginOptions: AngularCompilerPluginOptions
+): AngularCompilerPluginOptions {
+  const compilerOptions = {
+    ...(pluginOptions.compilerOptions || {})
+  }
+
+  const hostReplacementPaths: { [replace: string]: string } = {};
+  if (buildOptions.fileReplacements) {
+    for (const replacement of buildOptions.fileReplacements) {
+      hostReplacementPaths[replacement.replace] = replacement.with;
+    }
+  }
+
+  if (buildOptions.scriptTargetOverride) {
+    compilerOptions.target = buildOptions.scriptTargetOverride;
+  }
+
+  if (buildOptions.preserveSymlinks) {
+    compilerOptions.preserveSymlinks = true;
+  }
+
+  return {
+    ...pluginOptions,
+    hostReplacementPaths,
+    compilerOptions
+  };
+}
 
 function _createAotPlugin(
   wco: WebpackConfigOptions,
@@ -25,13 +54,8 @@ function _createAotPlugin(
   extract = false,
 ) {
   const { root, buildOptions } = wco;
-  options.compilerOptions = options.compilerOptions || {};
 
-  if (wco.buildOptions.preserveSymlinks) {
-    options.compilerOptions.preserveSymlinks = true;
-  }
-
-  let i18nInFile = buildOptions.i18nFile
+  const i18nInFile = buildOptions.i18nFile
     ? path.resolve(root, buildOptions.i18nFile)
     : undefined;
 
@@ -54,14 +78,7 @@ function _createAotPlugin(
     }
   }
 
-  const hostReplacementPaths: { [replace: string]: string } = {};
-  if (buildOptions.fileReplacements) {
-    for (const replacement of buildOptions.fileReplacements) {
-      hostReplacementPaths[replacement.replace] = replacement.with;
-    }
-  }
-
-  const pluginOptions: AngularCompilerPluginOptions = {
+  let pluginOptions: AngularCompilerPluginOptions = {
     mainPath: useMain ? path.join(root, buildOptions.main) : undefined,
     ...i18nFileAndFormat,
     locale: buildOptions.i18nLocale,
@@ -69,7 +86,6 @@ function _createAotPlugin(
     missingTranslation: buildOptions.i18nMissingTranslation,
     sourceMap: buildOptions.sourceMap.scripts,
     additionalLazyModules,
-    hostReplacementPaths,
     nameLazyFiles: buildOptions.namedChunks,
     forkTypeChecker: buildOptions.forkTypeChecker,
     contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
@@ -78,6 +94,9 @@ function _createAotPlugin(
     importFactories: buildOptions.experimentalImportFactories,
     ...options,
   };
+
+  pluginOptions = _pluginOptionsOverrides(buildOptions, pluginOptions);
+
   return new AngularCompilerPlugin(pluginOptions);
 }
 
@@ -112,7 +131,7 @@ export function getAotConfig(wco: WebpackConfigOptions, extract = false) {
 export function getTypescriptWorkerPlugin(wco: WebpackConfigOptions, workerTsConfigPath: string) {
   const { buildOptions } = wco;
 
-  const pluginOptions: AngularCompilerPluginOptions = {
+  let pluginOptions: AngularCompilerPluginOptions = {
     skipCodeGeneration: true,
     tsConfigPath: workerTsConfigPath,
     mainPath: undefined,
@@ -126,6 +145,8 @@ export function getTypescriptWorkerPlugin(wco: WebpackConfigOptions, workerTsCon
     // Don't attempt lazy route discovery.
     discoverLazyRoutes: false,
   };
+
+  pluginOptions = _pluginOptionsOverrides(buildOptions, pluginOptions);
 
   return new AngularCompilerPlugin(pluginOptions);
 }
