@@ -63,7 +63,6 @@ describe('Dev Server Builder proxy', () => {
   }, 30000);
 
   it('errors out with a missing proxy file', async () => {
-    const overrides: Partial<DevServerBuilderOptions> = { proxyConfig: '../proxy.config.json' };
     const run = await architect.scheduleTarget(target, { proxyConfig: 'INVALID.json' });
     runs.push(run);
 

@@ -36,9 +36,10 @@ async function initialize(
   // tslint:disable-next-line:no-implicit-dependencies
 ): Promise<[typeof import ('karma'), webpack.Configuration]> {
   const { config } = await generateBrowserWebpackConfigFromContext(
-    // only one property is missing:
-    // * `index` which is not used for tests
-    { ...options as unknown as BrowserBuilderOptions, outputPath: '' },
+    // only two properties are missing:
+    // * `outputPath` which is fixed for tests
+    // * `budgets` which might be incorrect due to extra dev libs
+    { ...options as unknown as BrowserBuilderOptions, outputPath: '', budgets: undefined },
     context,
     wco => [
       getCommonConfig(wco),
