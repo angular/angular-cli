@@ -117,7 +117,9 @@ export function serveWebpackBrowser(
       context,
       host,
     );
-    let webpackConfig = webpackConfigResult.config;
+
+    // No differential loading for dev-server, hence there is just one config
+    let webpackConfig = webpackConfigResult.config[0];
     const workspace = webpackConfigResult.workspace;
 
     if (transforms.browserConfig) {

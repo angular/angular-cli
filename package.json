@@ -82,6 +82,8 @@
     "@bazel/karma": "~0.26.0",
     "@bazel/typescript": "~0.26.0",
     "@ngtools/json-schema": "^1.1.0",
+    "@types/browserslist": "^4.4.0",
+    "@types/caniuse-api": "^3.0.0",
     "@types/copy-webpack-plugin": "^4.4.1",
     "@types/express": "^4.16.0",
     "@types/glob": "^7.0.0",
