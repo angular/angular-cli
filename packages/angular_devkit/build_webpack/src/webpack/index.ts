@@ -5,62 +5,62 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {
-  BuildEvent,
-  Builder,
-  BuilderConfiguration,
-  BuilderContext,
-} from '@angular-devkit/architect';
-import { getSystemPath, logging, normalize, resolve } from '@angular-devkit/core';
-import { Observable, from } from 'rxjs';
-import { concatMap } from 'rxjs/operators';
+import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import { getSystemPath, json, normalize, resolve } from '@angular-devkit/core';
+import { Observable, from, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
-import { Schema as WebpackBuilderSchema } from './schema';
+import { ArchitectPlugin } from '../plugins/architect';
+import { EmittedFiles, getEmittedFiles } from '../utils';
+import { Schema as RealWebpackBuilderSchema } from './schema';
 
+const webpackMerge = require('webpack-merge');
 
-export interface LoggingCallback {
-  (stats: webpack.Stats, config: webpack.Configuration, logger: logging.Logger): void;
+export type WebpackBuilderSchema = json.JsonObject & RealWebpackBuilderSchema;
+
+export interface WebpackLoggingCallback {
+  (stats: webpack.Stats, config: webpack.Configuration): void;
+}
+export interface WebpackFactory {
+  (config: webpack.Configuration): Observable<webpack.Compiler>;
 }
 
-export const defaultLoggingCb: LoggingCallback = (stats, config, logger) =>
-  logger.info(stats.toString(config.stats));
+export type BuildResult = BuilderOutput & {
+  emittedFiles?: EmittedFiles[];
+};
 
-export class WebpackBuilder implements Builder<WebpackBuilderSchema> {
+export function runWebpack(
+  config: webpack.Configuration,
+  context: BuilderContext,
+  options: {
+    logging?: WebpackLoggingCallback,
+    webpackFactory?: WebpackFactory,
+  } = {},
+): Observable<BuildResult> {
+  const createWebpack = options.webpackFactory || (config => of(webpack(config)));
+  const log: WebpackLoggingCallback = options.logging
+    || ((stats, config) => context.logger.info(stats.toString(config.stats)));
 
-  constructor(public context: BuilderContext) { }
+  config = webpackMerge(config, {
+    plugins: [
+      new ArchitectPlugin(context),
+    ],
+  });
 
-  run(builderConfig: BuilderConfiguration<WebpackBuilderSchema>): Observable<BuildEvent> {
-    const configPath = resolve(this.context.workspace.root,
-      normalize(builderConfig.options.webpackConfig));
-
-    return this.loadWebpackConfig(getSystemPath(configPath)).pipe(
-      concatMap(config => this.runWebpack(config)),
-    );
-  }
-
-  public loadWebpackConfig(webpackConfigPath: string): Observable<webpack.Configuration> {
-    return from(import(webpackConfigPath));
-  }
-
-  protected createWebpackCompiler(config: webpack.Configuration): webpack.Compiler {
-    return webpack(config);
-  }
-
-  public runWebpack(
-    config: webpack.Configuration, loggingCb = defaultLoggingCb,
-  ): Observable<BuildEvent> {
-    return new Observable(obs => {
-      const webpackCompiler = this.createWebpackCompiler(config);
-
-      const callback: webpack.compiler.CompilerCallback = (err, stats) => {
+  return createWebpack(config).pipe(
+    switchMap(webpackCompiler => new Observable<BuildResult>(obs => {
+      const callback: webpack.Compiler.Handler = (err, stats) => {
         if (err) {
           return obs.error(err);
         }
 
         // Log stats.
-        loggingCb(stats, config, this.context.logger);
+        log(stats, config);
 
-        obs.next({ success: !stats.hasErrors() });
+        obs.next({
+          success: !stats.hasErrors(),
+          emittedFiles: getEmittedFiles(stats.compilation),
+        } as unknown as BuildResult);
 
         if (!config.watch) {
           obs.complete();
@@ -79,13 +79,19 @@ export class WebpackBuilder implements Builder<WebpackBuilderSchema> {
         }
       } catch (err) {
         if (err) {
-          this.context.logger.error(
-            '\nAn error occured during the build:\n' + ((err && err.stack) || err));
+          context.logger.error(`\nAn error occurred during the build:\n${err && err.stack || err}`);
         }
         throw err;
       }
-    });
-  }
+    }),
+  ));
 }
 
-export default WebpackBuilder;
+
+export default createBuilder<WebpackBuilderSchema>((options, context) => {
+  const configPath = resolve(normalize(context.workspaceRoot), normalize(options.webpackConfig));
+
+  return from(import(getSystemPath(configPath))).pipe(
+    switchMap((config: webpack.Configuration) => runWebpack(config, context)),
+  );
+});

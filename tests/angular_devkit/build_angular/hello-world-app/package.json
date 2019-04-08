@@ -12,6 +12,8 @@
   },
   "private": true,
   "dependencies": {
+    "//NOTE1": "These dependencies are not actually installed so it doesn't matter what they are.",
+    "//NOTE2": "The used dependencies are the ones in packages/angular_devkit/build_angular.",
     "@angular/animations": "^6.0.0-rc.0",
     "@angular/common": "^6.0.0-rc.0",
     "@angular/compiler": "^6.0.0-rc.0",
@@ -32,7 +34,7 @@
     "@types/jasmine": "~2.8.3",
     "@types/jasminewd2": "~2.0.2",
     "@types/node": "~6.0.60",
-    "codelyzer": "^4.0.1",
+    "codelyzer": "^5.0.0",
     "jasmine-core": "~2.8.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~2.0.0",

@@ -6,7 +6,8 @@
   "properties": {
     "browserTarget": {
       "type": "string",
-      "description": "Target to serve."
+      "description": "Target to serve.",
+      "pattern": ".+:.+(:.+)?"
     },
     "port": {
       "type": "number",
@@ -86,6 +87,7 @@
     },
     "optimization": {
       "description": "Enables optimization of the build output.",
+      "x-user-analytics": 16,
       "oneOf": [
         {
           "type": "object",
@@ -110,7 +112,8 @@
     },
     "aot": {
       "type": "boolean",
-      "description": "Build using Ahead of Time compilation."
+      "description": "Build using Ahead of Time compilation.",
+      "x-user-analytics": 13
     },
     "sourceMap": {
       "description": "Output sourcemaps.",

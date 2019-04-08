@@ -163,14 +163,13 @@ describe('Application Schematic', () => {
     expect(karmaConf).toContain(`dir: require('path').join(__dirname, '../../coverage/foo')`);
   });
 
-  it('minimal=true should not create e2e project', () => {
+  it('minimal=true should not create e2e and test targets', () => {
     const options = { ...defaultOptions, minimal: true };
-
     const tree = schematicRunner.runSchematic('application', options, workspaceTree);
-    const files = tree.files;
-    expect(files).not.toContain('/projects/foo-e2e');
-    const confContent = JSON.parse(tree.readContent('/angular.json'));
-    expect(confContent.projects['foo-e2e']).toBeUndefined();
+    const config = JSON.parse(tree.readContent('/angular.json'));
+    const architect = config.projects.foo.architect;
+    expect(architect.test).not.toBeDefined();
+    expect(architect.e2e).not.toBeDefined();
   });
 
   it('should create correct files when using minimal', () => {
@@ -215,12 +214,6 @@ describe('Application Schematic', () => {
       const pkg = JSON.parse(tree.readContent('/package.json'));
       expect(pkg.devDependencies['@angular/compiler-cli']).toEqual(latestVersions.Angular);
       expect(pkg.devDependencies['typescript']).toEqual(latestVersions.TypeScript);
-    });
-
-    it(`should add a postinstall in package.json when 'enableIvy'`, () => {
-      const tree = schematicRunner.runSchematic('application', { ...defaultOptions, enableIvy: true }, workspaceTree);
-      const pkg = JSON.parse(tree.readContent('/package.json'));
-      expect(pkg.scripts.postinstall).toEqual('ivy-ngcc');
     });
 
     it(`should not override existing users dependencies`, () => {

@@ -5,18 +5,22 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
+import { BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import { runWebpack } from '@angular-devkit/build-webpack';
 import {
-  BuildEvent,
-  Builder,
-  BuilderConfiguration,
-  BuilderContext,
-} from '@angular-devkit/architect';
-import { WebpackBuilder } from '@angular-devkit/build-webpack';
-import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
+  Path,
+  experimental,
+  getSystemPath,
+  json,
+  logging,
+  normalize,
+  resolve, schema, virtualFs,
+} from '@angular-devkit/core';
+import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { Stats } from 'fs';
-import { Observable, concat, of } from 'rxjs';
-import { concatMap, last } from 'rxjs/operators';
+import * as path from 'path';
+import { from, of } from 'rxjs';
+import { concatMap, map } from 'rxjs/operators';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import {
@@ -29,114 +33,154 @@ import {
 } from '../angular-cli-files/models/webpack-configs';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
-import { getBrowserLoggingCb } from '../browser';
-import { defaultProgress, normalizeWebpackServerSchema } from '../utils';
-import { BuildWebpackServerSchema, NormalizedServerBuilderServerSchema } from './schema';
+import {
+  NormalizedWebpackServerBuilderSchema, defaultProgress,
+  deleteOutputDir,
+  normalizeWebpackServerSchema,
+} from '../utils';
+import { Schema as BuildWebpackServerSchema } from './schema';
 const webpackMerge = require('webpack-merge');
 
 
-export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
+// If success is true, outputPath should be set.
+export type ServerBuilderOutput = json.JsonObject & BuilderOutput & {
+  outputPath?: string;
+};
 
-  constructor(public context: BuilderContext) { }
 
-  run(builderConfig: BuilderConfiguration<BuildWebpackServerSchema>): Observable<BuildEvent> {
-    const root = this.context.workspace.root;
-    const projectRoot = resolve(root, builderConfig.root);
-    const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<Stats>);
-    const webpackBuilder = new WebpackBuilder({ ...this.context, host });
+export default createBuilder<
+  json.JsonObject & BuildWebpackServerSchema,
+  ServerBuilderOutput
+>((options, context) => {
+  const host = new virtualFs.AliasHost(new NodeJsSyncHost());
+  const root = context.workspaceRoot;
 
-    const options = normalizeWebpackServerSchema(
+  async function setup() {
+    const registry = new schema.CoreSchemaRegistry();
+    registry.addPostTransform(schema.transforms.addUndefinedDefaults);
+
+    const workspace = await experimental.workspace.Workspace.fromPath(
       host,
-      root,
-      resolve(root, builderConfig.root),
-      builderConfig.sourceRoot,
-      builderConfig.options,
+      normalize(context.workspaceRoot),
+      registry,
     );
+    const projectName = context.target ? context.target.project : workspace.getDefaultProjectName();
 
-    // TODO: verify using of(null) to kickstart things is a pattern.
-    return of(null).pipe(
-      concatMap(() => options.deleteOutputPath
-        ? this._deleteOutputDir(root, normalize(options.outputPath), this.context.host)
-        : of(null)),
-      concatMap(() => {
-        const webpackConfig = this.buildWebpackConfig(root, projectRoot, host, options);
-
-        return webpackBuilder.runWebpack(webpackConfig, getBrowserLoggingCb(options.verbose));
-      }),
-    );
-  }
-
-  buildWebpackConfig(root: Path, projectRoot: Path,
-                     host: virtualFs.Host<Stats>,
-                     options: NormalizedServerBuilderServerSchema) {
-    let wco: WebpackConfigOptions;
-
-    // TODO: make target defaults into configurations instead
-    // options = this.addTargetDefaults(options);
-
-    const tsConfigPath = getSystemPath(normalize(resolve(root, normalize(options.tsConfig))));
-    const tsConfig = readTsconfig(tsConfigPath);
-
-    const projectTs = requireProjectModule(getSystemPath(projectRoot), 'typescript') as typeof ts;
-
-    const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
-      && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
-
-    const buildOptions: typeof wco['buildOptions'] = {
-      ...options as {} as typeof wco['buildOptions'],
-    };
-
-    wco = {
-      root: getSystemPath(root),
-      logger: this.context.logger,
-      projectRoot: getSystemPath(projectRoot),
-      // TODO: use only this.options, it contains all flags and configs items already.
-      buildOptions: {
-        ...buildOptions,
-        buildOptimizer: false,
-        aot: true,
-        platform: 'server',
-        scripts: [],
-        styles: [],
-      },
-      tsConfig,
-      tsConfigPath,
-      supportES2015,
-    };
-
-    wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);
-
-    const webpackConfigs: {}[] = [
-      getCommonConfig(wco),
-      getServerConfig(wco),
-      getStylesConfig(wco),
-      getStatsConfig(wco),
-    ];
-
-    if (wco.buildOptions.main || wco.buildOptions.polyfills) {
-      const typescriptConfigPartial = wco.buildOptions.aot
-        ? getAotConfig(wco, host)
-        : getNonAotConfig(wco, host);
-      webpackConfigs.push(typescriptConfigPartial);
+    if (!projectName) {
+      throw new Error('Must either have a target from the context or a default project.');
     }
-
-    return webpackMerge(webpackConfigs);
-  }
-
-  private _deleteOutputDir(root: Path, outputPath: Path, host: virtualFs.Host) {
-    const resolvedOutputPath = resolve(root, outputPath);
-    if (resolvedOutputPath === root) {
-      throw new Error('Output path MUST not be project root directory!');
-    }
-
-    return host.exists(resolvedOutputPath).pipe(
-      concatMap(exists => exists
-        // TODO: remove this concat once host ops emit an event.
-        ? concat(host.delete(resolvedOutputPath), of(null)).pipe(last())
-        // ? of(null)
-        : of(null)),
+    const projectRoot = resolve(
+      workspace.root,
+      normalize(workspace.getProject(projectName).root),
     );
+    const workspaceSourceRoot = workspace.getProject(projectName).sourceRoot;
+    const sourceRoot = workspaceSourceRoot !== undefined ? resolve(
+      workspace.root,
+      normalize(workspaceSourceRoot),
+    ) : undefined;
+
+    const normalizedOptions = normalizeWebpackServerSchema(
+      host,
+      normalize(root),
+      projectRoot,
+      sourceRoot,
+      options,
+    );
+
+    return { normalizedOptions, projectRoot };
   }
+
+  return from(setup()).pipe(
+    concatMap(v => {
+      if (options.deleteOutputPath) {
+        return deleteOutputDir(normalize(root), normalize(options.outputPath), host).pipe(
+          map(() => v),
+        );
+      } else {
+        return of(v);
+      }
+    }),
+    concatMap(({ normalizedOptions, projectRoot }) => {
+      const webpackConfig = buildServerWebpackConfig(
+        normalize(root),
+        projectRoot,
+        host,
+        normalizedOptions,
+        context.logger.createChild('webpack'),
+      );
+
+      return runWebpack(webpackConfig, context);
+    }),
+    map(output => {
+      if (output.success === false) {
+        return output as ServerBuilderOutput;
+      }
+
+      return {
+        ...output,
+        outputPath: path.resolve(root, options.outputPath),
+      } as ServerBuilderOutput;
+    }),
+  );
+});
+
+export function buildServerWebpackConfig(
+  root: Path,
+  projectRoot: Path,
+  _host: virtualFs.Host<Stats>,
+  options: NormalizedWebpackServerBuilderSchema,
+  logger: logging.Logger,
+) {
+  let wco: WebpackConfigOptions;
+
+  // TODO: make target defaults into configurations instead
+  // options = this.addTargetDefaults(options);
+
+  const tsConfigPath = getSystemPath(normalize(resolve(root, normalize(options.tsConfig))));
+  const tsConfig = readTsconfig(tsConfigPath);
+
+  const projectTs = requireProjectModule(getSystemPath(projectRoot), 'typescript') as typeof ts;
+
+  const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
+    && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
+
+  const buildOptions: typeof wco['buildOptions'] = {
+    ...options as {} as typeof wco['buildOptions'],
+  };
+
+  wco = {
+    root: getSystemPath(root),
+    projectRoot: getSystemPath(projectRoot),
+    // TODO: use only this.options, it contains all flags and configs items already.
+    buildOptions: {
+      ...buildOptions,
+      buildOptimizer: false,
+      aot: true,
+      platform: 'server',
+      scripts: [],
+      styles: [],
+    },
+    tsConfig,
+    tsConfigPath,
+    supportES2015,
+    logger,
+  };
+
+  wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);
+
+  const webpackConfigs: {}[] = [
+    getCommonConfig(wco),
+    getServerConfig(wco),
+    getStylesConfig(wco),
+    getStatsConfig(wco),
+  ];
+
+  if (wco.buildOptions.main || wco.buildOptions.polyfills) {
+    const typescriptConfigPartial = wco.buildOptions.aot
+      ? getAotConfig(wco)
+      : getNonAotConfig(wco);
+    webpackConfigs.push(typescriptConfigPartial);
+  }
+
+  return webpackMerge(webpackConfigs);
 }
-
-export default ServerBuilder;

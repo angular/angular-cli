@@ -6,15 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { DefaultTimeout, TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
-import { PathFragment, join, normalize, virtualFs } from '@angular-devkit/core';
-import { tap } from 'rxjs/operators';
-import { browserTargetSpec, host } from '../utils';
+import { Architect } from '@angular-devkit/architect';
+import { TestLogger } from '@angular-devkit/architect/testing';
+import { logging } from '@angular-devkit/core';
+import { browserBuild, createArchitect, host } from '../utils';
 
 
 describe('Browser Builder scripts array', () => {
-
-  const outputPath = normalize('dist');
   const scripts: { [path: string]: string } = {
     'src/input-script.js': 'console.log(\'input-script\'); var number = 1+1;',
     'src/zinput-script.js': 'console.log(\'zinput-script\');',
@@ -40,17 +38,23 @@ describe('Browser Builder scripts array', () => {
     { input: 'src/pre-rename-lazy-script.js', bundleName: 'renamed-lazy-script', lazy: true },
   ];
 
-  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
-  afterEach(done => host.restore().toPromise().then(done, done.fail));
+  const target = { project: 'app', target: 'build' };
+  let architect: Architect;
 
-  it('works', (done) => {
+  beforeEach(async () => {
+    await host.initialize().toPromise();
+    architect = (await createArchitect(host.root())).architect;
+  });
+  afterEach(async () => host.restore().toPromise());
+
+  it('works', async () => {
     const matches: { [path: string]: string } = {
-      './dist/scripts.js': 'input-script',
-      './dist/lazy-script.js': 'lazy-script',
-      './dist/renamed-script.js': 'pre-rename-script',
-      './dist/renamed-lazy-script.js': 'pre-rename-lazy-script',
-      './dist/main.js': 'input-script',
-      './dist/index.html': '<script src="runtime.js"></script>'
+      'scripts.js': 'input-script',
+      'lazy-script.js': 'lazy-script',
+      'renamed-script.js': 'pre-rename-script',
+      'renamed-lazy-script.js': 'pre-rename-lazy-script',
+      'main.js': 'input-script',
+      'index.html': '<script src="runtime.js"></script>'
         + '<script src="polyfills.js"></script>'
         + '<script src="scripts.js"></script>'
         + '<script src="renamed-script.js"></script>'
@@ -62,93 +66,80 @@ describe('Browser Builder scripts array', () => {
     host.appendToFile('src/main.ts', '\nimport \'./input-script.js\';');
 
     // Remove styles so we don't have to account for them in the index.html order check.
-    const overrides = {
+    const { files } = await browserBuild(architect, host, target, {
       styles: [],
       scripts: getScriptsOption(),
-    };
+    } as {});
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => Object.keys(matches).forEach(fileName => {
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toMatch(matches[fileName]);
-      })),
-    ).toPromise().then(done, done.fail);
+    for (const fileName of Object.keys(matches)) {
+      expect(await files[fileName]).toMatch(matches[fileName]);
+    }
   });
 
-  it('uglifies, uses sourcemaps, and adds hashes', (done) => {
+  it('uglifies, uses sourcemaps, and adds hashes', async () => {
     host.writeMultipleFiles(scripts);
 
-    const overrides = {
+    const { files } = await browserBuild(architect, host, target, {
       optimization: true,
       sourceMap: true,
       outputHashing: 'all',
       scripts: getScriptsOption(),
-    };
+    } as {});
 
-    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout * 2).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const scriptsBundle = host.fileMatchExists(outputPath, /scripts\.[0-9a-f]{20}\.js/);
-        expect(scriptsBundle).toBeTruthy();
-        const fileName = join(outputPath, scriptsBundle as PathFragment);
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toMatch('var number=2;');
-        expect(host.fileMatchExists(outputPath, /scripts\.[0-9a-f]{20}\.js\.map/))
-          .toBeTruthy();
-        expect(host.fileMatchExists(outputPath, /renamed-script\.[0-9a-f]{20}\.js/))
-          .toBeTruthy();
-        expect(host.fileMatchExists(outputPath, /renamed-script\.[0-9a-f]{20}\.js\.map/))
-          .toBeTruthy();
-        expect(host.fileMatchExists(outputPath, /scripts\.[0-9a-f]{20}\.js/)).toBeTruthy();
-        expect(host.scopedSync().exists(normalize('dist/lazy-script.js'))).toBe(true);
-        expect(host.scopedSync().exists(normalize('dist/lazy-script.js.map'))).toBe(true);
-        expect(host.scopedSync().exists(normalize('dist/renamed-lazy-script.js'))).toBe(true);
-        expect(host.scopedSync().exists(normalize('dist/renamed-lazy-script.js.map')))
-          .toBe(true);
-      }),
-    ).toPromise().then(done, done.fail);
+    const fileNames = Object.keys(files);
+    const scriptsBundle = fileNames.find(n => /scripts\.[0-9a-f]{20}\.js/.test(n));
+    expect(scriptsBundle).toBeTruthy();
+    expect(await files[scriptsBundle || '']).toMatch('var number=2;');
+
+    expect(fileNames.some(n => /scripts\.[0-9a-f]{20}\.js\.map/.test(n))).toBeTruthy();
+    expect(fileNames.some(n => /renamed-script\.[0-9a-f]{20}\.js/.test(n))).toBeTruthy();
+    expect(fileNames.some(n => /renamed-script\.[0-9a-f]{20}\.js\.map/.test(n))).toBeTruthy();
+    expect(fileNames.some(n => /script\.[0-9a-f]{20}\.js/.test(n))).toBeTruthy();
+    expect(await files['lazy-script.js']).not.toBeUndefined();
+    expect(await files['lazy-script.js.map']).not.toBeUndefined();
+    expect(await files['renamed-lazy-script.js']).not.toBeUndefined();
+    expect(await files['renamed-lazy-script.js.map']).not.toBeUndefined();
   });
 
-  it('preserves script order', (done) => {
+  it('preserves script order', async () => {
     host.writeMultipleFiles(scripts);
 
-    const overrides = { scripts: getScriptsOption() };
+    const { files } = await browserBuild(architect, host, target, {
+      scripts: getScriptsOption(),
+    } as {});
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const re = new RegExp(
-          /.*['"]input-script['"](.|\n|\r)*/.source
-          + /['"]zinput-script['"](.|\n|\r)*/.source
-          + /['"]finput-script['"](.|\n|\r)*/.source
-          + /['"]uinput-script['"](.|\n|\r)*/.source
-          + /['"]binput-script['"](.|\n|\r)*/.source
-          + /['"]ainput-script['"](.|\n|\r)*/.source
-          + /['"]cinput-script['"]/.source,
-        );
-        const fileName = './dist/scripts.js';
-        const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toMatch(re);
-      }),
-    ).toPromise().then(done, done.fail);
+    expect(await files['scripts.js']).toMatch(new RegExp(
+      /.*['"]input-script['"](.|\n|\r)*/.source
+      + /['"]zinput-script['"](.|\n|\r)*/.source
+      + /['"]finput-script['"](.|\n|\r)*/.source
+      + /['"]uinput-script['"](.|\n|\r)*/.source
+      + /['"]binput-script['"](.|\n|\r)*/.source
+      + /['"]ainput-script['"](.|\n|\r)*/.source
+      + /['"]cinput-script['"]/.source,
+    ));
   });
 
-  it('chunk in entry', (done) => {
+  it('chunk in entry', async () => {
     host.writeMultipleFiles(scripts);
 
-    const overrides = { scripts: getScriptsOption() };
-    const logger = new TestLogger('build-script-entry');
+    const logger = new logging.Logger('build-script-chunk-entry');
+    const logs: string[] = [];
+    logger.subscribe(({ message }) => {
+      logs.push(message);
+    });
 
-    runTargetSpec(host, browserTargetSpec, overrides, DefaultTimeout, logger).pipe(
-      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      tap(() => {
-        const validate = ` [1m[33m[entry][39m[22m[1m[32m [rendered]`;
-        expect(logger.includes(`(lazy-script) 69 bytes${validate}`)).toBe(true);
-        expect(logger.includes(`(renamed-script) 78 bytes${validate}`)).toBe(true);
-        expect(logger.includes(`(renamed-lazy-script) 88 bytes${validate}`)).toBe(true);
-        logger.clear();
-      }),
-    ).toPromise().then(done, done.fail);
+    await browserBuild(
+      architect,
+      host,
+      target,
+      {
+        scripts: getScriptsOption(),
+      } as {},
+      { logger },
+    );
+
+    expect(logs.join('\n')).toMatch(/\(lazy-script\) 69 bytes.*\[entry].*\[rendered]/);
+    expect(logs.join('\n')).toMatch(/\(renamed-script\) 78 bytes.*\[entry].*\[rendered]/);
+    expect(logs.join('\n')).toMatch(/\(renamed-lazy-script\) 88 bytes.*\[entry].*\[rendered]/);
   });
 });

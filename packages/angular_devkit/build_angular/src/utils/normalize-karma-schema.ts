@@ -10,7 +10,7 @@
 
 import { Path, virtualFs } from '@angular-devkit/core';
 import { AssetPatternClass, OptimizationClass, SourceMapClass } from '../browser/schema';
-import { KarmaBuilderSchema } from '../karma/schema';
+import { Schema as KarmaBuilderSchema } from '../karma/schema';
 import { normalizeAssetPatterns } from './normalize-asset-patterns';
 import {
   NormalizedFileReplacement,
@@ -38,13 +38,13 @@ export function normalizeKarmaSchema(
 ): NormalizedKarmaBuilderSchema {
   const syncHost = new virtualFs.SyncDelegateHost(host);
 
-  const normalizedSourceMapOptions = normalizeSourceMaps(options.sourceMap);
+  const normalizedSourceMapOptions = normalizeSourceMaps(options.sourceMap || false);
   normalizedSourceMapOptions.vendor =
     normalizedSourceMapOptions.vendor || options.vendorSourceMap || false;
 
   return {
     ...options,
-    fileReplacements: normalizeFileReplacements(options.fileReplacements, syncHost, root),
+    fileReplacements: normalizeFileReplacements(options.fileReplacements || [], syncHost, root),
     assets: normalizeAssetPatterns(options.assets || [], syncHost, root, projectRoot, sourceRoot),
     sourceMap: normalizedSourceMapOptions,
     optimization: normalizeOptimization(undefined),

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { experimental, isPromise, json, logging } from '@angular-devkit/core';
+import { analytics, experimental, isPromise, json, logging } from '@angular-devkit/core';
 import { Observable, Subscription, from, isObservable, of, throwError } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import {
@@ -36,7 +36,10 @@ export function createBuilder<
     const scheduler = context.scheduler;
     const progressChannel = context.createChannel('progress');
     const logChannel = context.createChannel('log');
+    const analyticsChannel = context.createChannel('analytics');
     let currentState: BuilderProgressState = BuilderProgressState.Stopped;
+    const teardownLogics: Array<() => (PromiseLike<void> | void)> = [];
+    let tearingDown = false;
     let current = 0;
     let status = '';
     let total = 1;
@@ -72,10 +75,15 @@ export function createBuilder<
         i => {
           switch (i.kind) {
             case experimental.jobs.JobInboundMessageKind.Stop:
-              observer.complete();
+              // Run teardown logic then complete.
+              tearingDown = true;
+              Promise.all(teardownLogics.map(fn => fn() || Promise.resolve()))
+                .then(() => observer.complete(), err => observer.error(err));
               break;
             case experimental.jobs.JobInboundMessageKind.Input:
-              onInput(i.value);
+              if (!tearingDown) {
+                onInput(i.value);
+              }
               break;
           }
         },
@@ -135,6 +143,21 @@ export function createBuilder<
             return scheduler.schedule<Target, json.JsonValue, json.JsonObject>(
                     '..getTargetOptions', target).output.toPromise();
           },
+          async getBuilderNameForTarget(target: Target) {
+            return scheduler.schedule<Target, json.JsonValue, string>(
+              '..getBuilderNameForTarget',
+              target,
+            ).output.toPromise();
+          },
+          async validateOptions<T extends json.JsonObject = json.JsonObject>(
+            options: json.JsonObject,
+            builderName: string,
+          ) {
+            return scheduler.schedule<[string, json.JsonObject], json.JsonValue, T>(
+              '..validateOptions',
+              [builderName, options],
+            ).output.toPromise();
+          },
           reportRunning() {
             switch (currentState) {
               case BuilderProgressState.Waiting:
@@ -158,6 +181,10 @@ export function createBuilder<
               case BuilderProgressState.Running:
                 progress({ state: currentState, current, total, status }, context);
             }
+          },
+          analytics: new analytics.ForwardingAnalytics(report => analyticsChannel.next(report)),
+          addTeardown(teardown: () => (Promise<void> | void)): void {
+            teardownLogics.push(teardown);
           },
         };
 

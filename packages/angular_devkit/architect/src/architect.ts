@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { experimental, json, logging } from '@angular-devkit/core';
+import { analytics, experimental, json, logging } from '@angular-devkit/core';
 import { Observable, from, of } from 'rxjs';
-import { concatMap, first, map, shareReplay } from 'rxjs/operators';
+import { concatMap, first, map, shareReplay, switchMap } from 'rxjs/operators';
 import {
   BuilderInfo,
   BuilderInput,
@@ -102,6 +102,7 @@ function _createJobHandlerFromBuilderInfo(
 
 export interface ScheduleOptions {
   logger?: logging.Logger;
+  analytics?: analytics.Analytics;
 }
 
 
@@ -236,13 +237,68 @@ function _getTargetOptionsFactory(host: ArchitectHost) {
   return experimental.jobs.createJobHandler<Target, json.JsonValue, json.JsonObject>(
     target => {
       return host.getOptionsForTarget(target).then(options => {
-        return options || {};
+        if (options === null) {
+          throw new Error(`Invalid target: ${JSON.stringify(target)}.`);
+        }
+
+        return options;
       });
     },
     {
       name: '..getTargetOptions',
       output: { type: 'object' },
       argument: inputSchema.properties.target,
+    },
+  );
+}
+
+function _getBuilderNameForTargetFactory(host: ArchitectHost) {
+  return experimental.jobs.createJobHandler<Target, never, string>(async target => {
+    const builderName = await host.getBuilderNameForTarget(target);
+    if (!builderName) {
+      throw new Error(`No builder were found for target ${targetStringFromTarget(target)}.`);
+    }
+
+    return builderName;
+  }, {
+    name: '..getBuilderNameForTarget',
+    output: { type: 'string' },
+    argument: inputSchema.properties.target,
+  });
+}
+
+function _validateOptionsFactory(host: ArchitectHost, registry: json.schema.SchemaRegistry) {
+  return experimental.jobs.createJobHandler<[string, json.JsonObject], never, json.JsonObject>(
+    async ([builderName, options]) => {
+      // Get option schema from the host.
+      const builderInfo = await host.resolveBuilder(builderName);
+      if (!builderInfo) {
+        throw new Error(`No builder info were found for builder ${JSON.stringify(builderName)}.`);
+      }
+
+      return registry.compile(builderInfo.optionSchema).pipe(
+        concatMap(validation => validation(options)),
+        switchMap(({ data, success, errors }) => {
+          if (success) {
+            return of(data as json.JsonObject);
+          } else {
+            throw new Error(
+              'Data did not validate: ' + (errors ? errors.join() : 'Unknown error.'),
+            );
+          }
+        }),
+      ).toPromise();
+    },
+    {
+      name: '..validateOptions',
+      output: { type: 'object' },
+      argument: {
+        type: 'array',
+        items: [
+          { type: 'string' },
+          { type: 'object' },
+        ],
+      },
     },
   );
 }
@@ -261,6 +317,8 @@ export class Architect {
     const privateArchitectJobRegistry = new experimental.jobs.SimpleJobRegistry();
     // Create private jobs.
     privateArchitectJobRegistry.register(_getTargetOptionsFactory(_host));
+    privateArchitectJobRegistry.register(_getBuilderNameForTargetFactory(_host));
+    privateArchitectJobRegistry.register(_validateOptionsFactory(_host, _registry));
 
     const jobRegistry = new experimental.jobs.FallbackRegistry([
       new ArchitectTargetJobRegistry(_host, _registry, this._jobCache, this._infoCache),
@@ -290,6 +348,7 @@ export class Architect {
       logger: scheduleOptions.logger || new logging.NullLogger(),
       currentDirectory: this._host.getCurrentDirectory(),
       workspaceRoot: this._host.getWorkspaceRoot(),
+      analytics: scheduleOptions.analytics,
     });
   }
   scheduleTarget(
@@ -302,6 +361,7 @@ export class Architect {
       logger: scheduleOptions.logger || new logging.NullLogger(),
       currentDirectory: this._host.getCurrentDirectory(),
       workspaceRoot: this._host.getWorkspaceRoot(),
+      analytics: scheduleOptions.analytics,
     });
   }
 }

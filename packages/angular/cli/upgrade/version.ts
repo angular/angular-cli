@@ -7,7 +7,6 @@
  */
 
 import { tags, terminal } from '@angular-devkit/core';
-import { resolve } from '@angular-devkit/core/node';
 import * as path from 'path';
 import { SemVer } from 'semver';
 
@@ -41,13 +40,9 @@ export class Version {
     let rxjsPkgJson;
 
     try {
-      const resolveOptions = {
-        basedir: projectRoot,
-        checkGlobal: false,
-        checkLocal: true,
-      };
-      const angularPackagePath = resolve('@angular/core/package.json', resolveOptions);
-      const rxjsPackagePath = resolve('rxjs/package.json', resolveOptions);
+      const resolveOptions = { paths: [projectRoot] };
+      const angularPackagePath = require.resolve('@angular/core/package.json', resolveOptions);
+      const rxjsPackagePath = require.resolve('rxjs/package.json', resolveOptions);
 
       angularPkgJson = require(angularPackagePath);
       rxjsPkgJson = require(rxjsPackagePath);

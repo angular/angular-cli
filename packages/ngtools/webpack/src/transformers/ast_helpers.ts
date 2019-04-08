@@ -11,10 +11,14 @@ import { WebpackCompilerHost } from '../compiler_host';
 
 
 // Find all nodes from the AST in the subtree of node of SyntaxKind kind.
-export function collectDeepNodes<T extends ts.Node>(node: ts.Node, kind: ts.SyntaxKind): T[] {
+export function collectDeepNodes<T extends ts.Node>(
+  node: ts.Node,
+  kind: ts.SyntaxKind | ts.SyntaxKind[],
+): T[] {
+  const kinds = Array.isArray(kind) ? kind : [kind];
   const nodes: T[] = [];
   const helper = (child: ts.Node) => {
-    if (child.kind === kind) {
+    if (kinds.includes(child.kind)) {
       nodes.push(child as T);
     }
     ts.forEachChild(child, helper);

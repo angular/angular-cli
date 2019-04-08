@@ -8,6 +8,7 @@
 import { experimental, json, logging } from '@angular-devkit/core';
 import { EMPTY, Subscription } from 'rxjs';
 import { catchError, first, ignoreElements, map, share, shareReplay, tap } from 'rxjs/operators';
+import { Analytics, AnalyticsReport, AnalyticsReporter } from '../../core/src/analytics';
 import {
   BuilderInfo,
   BuilderInput,
@@ -31,6 +32,7 @@ export async function scheduleByName(
     logger: logging.LoggerApi,
     workspaceRoot: string | Promise<string>,
     currentDirectory: string | Promise<string>,
+    analytics?: Analytics,
   },
 ): Promise<BuilderRun> {
   const childLoggerName = options.target ? `{${targetStringFromTarget(options.target)}}` : name;
@@ -47,8 +49,8 @@ export async function scheduleByName(
 
   const message = {
     id,
-    currentDirectory: workspaceRoot,
-    workspaceRoot: currentDirectory,
+    currentDirectory,
+    workspaceRoot,
     info: info,
     options: buildOptions,
     ...(options.target ? { target: options.target } : {}),
@@ -88,6 +90,12 @@ export async function scheduleByName(
     shareReplay(),
   );
 
+  // If there's an analytics object, take the job channel and report it to the analytics.
+  if (options.analytics) {
+    const reporter = new AnalyticsReporter(options.analytics);
+    job.getChannel<AnalyticsReport>('analytics')
+      .subscribe(report => reporter.report(report));
+  }
   // Start the builder.
   output.pipe(first()).subscribe({
     error() {},
@@ -121,6 +129,7 @@ export async function scheduleByTarget(
     logger: logging.LoggerApi,
     workspaceRoot: string | Promise<string>,
     currentDirectory: string | Promise<string>,
+    analytics?: Analytics,
   },
 ): Promise<BuilderRun> {
   return scheduleByName(`{${targetStringFromTarget(target)}}`, overrides, {

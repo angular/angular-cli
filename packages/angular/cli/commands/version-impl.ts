@@ -30,6 +30,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
       /^@angular\/.*/,
       /^@angular-devkit\/.*/,
       /^@ngtools\/.*/,
+      /^@nguniversal\/.*/,
       /^@schematics\/.*/,
       /^rxjs$/,
       /^typescript$/,

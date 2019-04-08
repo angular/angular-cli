@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/schema",
   "id": "BuildAngularWebpackServerSchema",
   "title": "Universal Target",
+  "type": "object",
   "properties": {
     "main": {
       "type": "string",
@@ -29,6 +30,7 @@
     },
     "optimization": {
       "description": "Enables optimization of the build output.",
+      "x-user-analytics": 16,
       "oneOf": [
         {
           "type": "object",

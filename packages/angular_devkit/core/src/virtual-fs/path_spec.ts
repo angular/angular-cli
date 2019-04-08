@@ -133,6 +133,8 @@ describe('path', () => {
         '/src/app/sub1/test1', '/src/app/sub2/test2',
         '../../sub2/test2',
       ],
+      ['/', '/a/b/c', 'a/b/c'],
+      ['/a/b/c', '/d', '../../../d'],
     ];
 
     for (const [from, to, result] of tests) {
@@ -141,6 +143,7 @@ describe('path', () => {
         const t = normalize(to);
 
         expect(relative(f, t)).toBe(result);
+        expect(join(f, relative(f, t))).toBe(t);
       });
     }
   });

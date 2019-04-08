@@ -7,6 +7,7 @@
  */
 
 export * from './angular_compiler_plugin';
+export * from './interfaces';
 export { ngcLoader as default } from './loader';
 
 export const NgToolsLoader = __filename;

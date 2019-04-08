@@ -80,10 +80,9 @@ describe('Universal Schematic', () => {
       extends: './tsconfig.app.json',
       compilerOptions: {
         outDir: './out-tsc/app-server',
-        baseUrl: '.',
       },
       angularCompilerOptions: {
-        entryModule: 'src/app/app.server.module#AppServerModule',
+        entryModule: './src/app/app.server.module#AppServerModule',
       },
     });
     const angularConfig = JSON.parse(tree.readContent('angular.json'));
@@ -100,10 +99,9 @@ describe('Universal Schematic', () => {
       extends: './tsconfig.app.json',
       compilerOptions: {
         outDir: '../../out-tsc/app-server',
-        baseUrl: '.',
       },
       angularCompilerOptions: {
-        entryModule: 'src/app/app.server.module#AppServerModule',
+        entryModule: './src/app/app.server.module#AppServerModule',
       },
     });
     const angularConfig = JSON.parse(tree.readContent('angular.json'));

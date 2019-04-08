@@ -58,6 +58,7 @@
     },
     "optimization": {
       "description": "Enables optimization of the build output.",
+      "x-user-analytics": 16,
       "oneOf": [
         {
           "type": "object",
@@ -100,6 +101,7 @@
     "aot": {
       "type": "boolean",
       "description": "Build using Ahead of Time compilation.",
+      "x-user-analytics": 13,
       "default": false
     },
     "sourceMap": {
@@ -300,7 +302,8 @@
     "profile": {
       "type": "boolean",
       "description": "Output profile events for Chrome profiler.",
-      "default": false
+      "default": false,
+      "x-deprecated": "Use \"NG_BUILD_PROFILING\" environment variable instead."
     },
     "es5BrowserSupport": {
       "description": "Enables conditionally loaded ES2015 polyfills.",
@@ -312,6 +315,15 @@
       "type": "boolean",
       "default": false,
       "x-deprecated": true
+    },
+    "experimentalImportFactories": {
+      "description": "**EXPERIMENTAL** Transform import statements for lazy routes to import factories when using View Engine. Should only be used when switching back and forth between View Engine and Ivy. See https://angular.io/guide/ivy for usage information.",
+      "type": "boolean",
+      "default": false
+    },
+    "webWorkerTsConfig": {
+      "type": "string",
+      "description": "TypeScript configuration for Web Worker modules."
     }
   },
   "additionalProperties": false,

@@ -255,6 +255,9 @@ export async function parseJsonSchemaToOptions(
     const deprecated = (xDeprecated === true || typeof xDeprecated == 'string')
       ? xDeprecated : undefined;
 
+    const xUserAnalytics = current['x-user-analytics'];
+    const userAnalytics = typeof xUserAnalytics == 'number' ? xUserAnalytics : undefined;
+
     const option: Option = {
       name,
       description: '' + (current.description === undefined ? '' : current.description),
@@ -265,6 +268,7 @@ export async function parseJsonSchemaToOptions(
       aliases,
       ...format !== undefined ? { format } : {},
       hidden,
+      ...userAnalytics ? { userAnalytics } : {},
       ...deprecated !== undefined ? { deprecated } : {},
       ...positional !== undefined ? { positional } : {},
     };

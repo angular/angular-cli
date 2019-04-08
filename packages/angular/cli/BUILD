@@ -25,14 +25,19 @@ ts_library(
     deps = [
         ":command_schemas",
         "//packages/angular_devkit/architect",
+        "//packages/angular_devkit/architect:node",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tools",
         # @typings: es2017.object
+        "@npm//@types/debug",
+        "@npm//debug",
         "@npm//@types/node",
         "@npm//@types/inquirer",
         "@npm//@types/semver",
+        "@npm//@types/universal-analytics",
+        "@npm//@types/uuid",
         "@npm//rxjs",
     ],
 )
@@ -42,6 +47,7 @@ ts_library(
     srcs = [],
     deps = [
         ":add_schema",
+        ":analytics_schema",
         ":build_schema",
         ":config_schema",
         ":deprecated_schema",
@@ -58,6 +64,14 @@ ts_library(
         ":update_schema",
         ":version_schema",
         ":xi18n_schema",
+    ],
+)
+
+ts_json_schema(
+    name = "analytics_schema",
+    src = "commands/analytics.json",
+    data = [
+        "commands/definitions.json",
     ],
 )
 

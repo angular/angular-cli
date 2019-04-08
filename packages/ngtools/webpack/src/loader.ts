@@ -68,7 +68,11 @@ export function ngcLoader(this: loader.LoaderContext) {
       if (sourceFileName.endsWith('.ts')) {
         result.errorDependencies.forEach(dep => this.addDependency(dep));
         const dependencies = plugin.getDependencies(sourceFileName);
-        dependencies.forEach(dep => {
+        dependencies
+          .filter(d => d.endsWith('index.ts'))
+          .forEach(d => dependencies.push(...plugin.getDependencies(d)));
+
+        [...new Set(dependencies)].forEach(dep => {
           plugin.updateChangedFileExtensions(path.extname(dep));
           this.addDependency(dep);
         });

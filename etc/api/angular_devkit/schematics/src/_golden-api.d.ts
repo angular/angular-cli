@@ -39,7 +39,7 @@ export declare type AsyncFileOperator = (tree: FileEntry) => Observable<FileEntr
 export declare abstract class BaseWorkflow implements Workflow {
     protected _context: WorkflowExecutionContext[];
     protected _dryRun: boolean;
-    protected _engine: SchematicEngine<{}, {}>;
+    protected _engine: Engine<{}, {}>;
     protected _engineHost: EngineHost<{}, {}>;
     protected _force: boolean;
     protected _host: virtualFs.Host;
@@ -47,6 +47,8 @@ export declare abstract class BaseWorkflow implements Workflow {
     protected _registry: schema.CoreSchemaRegistry;
     protected _reporter: Subject<DryRunEvent>;
     readonly context: Readonly<WorkflowExecutionContext>;
+    readonly engine: Engine<{}, {}>;
+    readonly engineHost: EngineHost<{}, {}>;
     readonly lifeCycle: Observable<LifeCycleEvent>;
     readonly registry: schema.SchemaRegistry;
     readonly reporter: Observable<DryRunEvent>;
@@ -556,6 +558,7 @@ export interface TreeConstructor {
 export declare const TreeSymbol: symbol;
 
 export interface TypedSchematicContext<CollectionMetadataT extends object, SchematicMetadataT extends object> {
+    readonly analytics?: analytics.Analytics;
     readonly debug: boolean;
     readonly engine: Engine<CollectionMetadataT, SchematicMetadataT>;
     readonly interactive: boolean;

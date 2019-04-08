@@ -12,10 +12,10 @@ try {
 
 // Some older versions of Node do not support let or const.
 var version = process.version.substr(1).split('.');
-if (Number(version[0]) < 8 || (Number(version[0]) === 8 && Number(version[1]) < 9)) {
+if (Number(version[0]) < 10 || (Number(version[0]) === 10 && Number(version[1]) < 9)) {
   process.stderr.write(
-    'You are running version ' + process.version + ' of Node.js, which is not supported by Angular CLI v6.\n' +
-    'The official Node.js version that is supported is 8.9 and greater.\n\n' +
+    'You are running version ' + process.version + ' of Node.js, which is not supported by Angular CLI 8.0+.\n' +
+    'The official Node.js version that is supported is 10.9 or greater.\n\n' +
     'Please visit https://nodejs.org/en/ to find instructions on how to update Node.js.\n'
   );
 

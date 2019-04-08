@@ -10,7 +10,7 @@ import { Command } from '../models/command';
 import { Arguments } from '../models/interface';
 import { Schema as DocCommandSchema } from './doc';
 
-const opn = require('opn');
+const open = require('open');
 
 export class DocCommand extends Command<DocCommandSchema> {
   public async run(options: DocCommandSchema & Arguments) {
@@ -24,9 +24,9 @@ export class DocCommand extends Command<DocCommandSchema> {
       searchUrl = `https://www.google.com/search?q=site%3Aangular.io+${options.keyword}`;
     }
 
-    // We should wrap `opn` in a new Promise because `opn` is already resolved
+    // We should wrap `open` in a new Promise because `open` is already resolved
     await new Promise(() => {
-      opn(searchUrl, {
+      open(searchUrl, {
         wait: false,
       });
     });

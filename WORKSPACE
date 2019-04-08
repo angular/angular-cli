@@ -5,16 +5,16 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
     name = "build_bazel_rules_nodejs",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/0.26.0/rules_nodejs-0.26.0.tar.gz"],
-    sha256 = "5c86b055c57e15bf32d9009a15bcd6d8e190c41b1ff2fb18037b75e0012e4e7c",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/0.27.7/rules_nodejs-0.27.7.tar.gz"],
+    sha256 = "fb87ed5965cef93188af9a7287511639403f4b0da418961ce6defb9dcf658f51",
 )
 
 # TS API Guardian resides in Angular
 http_archive(
     name = "angular",
-    sha256 = "5a5a56c93e454b6fb3d470e2f49f6c47db85d25765fca0f26276c71c2263be38",
-    strip_prefix = "angular-7.2.7",
-    url = "https://github.com/angular/angular/archive/7.2.7.zip",
+    sha256 = "6af15858f480438a9ca3fa8eaf4fdf993ccae878b834f3ea72fa8442f76b73c2",
+    strip_prefix = "angular-7.2.9",
+    url = "https://github.com/angular/angular/archive/7.2.9.zip",
 )
 
 # We use protocol buffers for the Build Event Protocol
@@ -72,7 +72,7 @@ yarn_install(
 load("@npm//:install_bazel_dependencies.bzl", "install_bazel_dependencies")
 install_bazel_dependencies()
 
-load("@npm_bazel_typescript//:defs.bzl", "ts_setup_workspace")		
+load("@npm_bazel_typescript//:defs.bzl", "ts_setup_workspace")
 
 ts_setup_workspace()
 
@@ -86,6 +86,8 @@ load("@io_bazel_rules_webtesting//web:repositories.bzl", "web_test_repositories"
 
 web_test_repositories()
 
-load("@angular//:index.bzl", "ng_setup_workspace")
-
-ng_setup_workspace()
+yarn_install(
+    name = "ts-api-guardian_deps",
+    package_json = "@angular//tools/ts-api-guardian:package.json",
+    yarn_lock = "@angular//tools/ts-api-guardian:yarn.lock",
+)

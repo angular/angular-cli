@@ -7,7 +7,7 @@
  */
 import { Path } from '@angular-devkit/core';
 import { EmptyTree, Tree } from '@angular-devkit/schematics';
-import { ModuleOptions, findModule, findModuleFromOptions } from './find-module';
+import { ModuleOptions, buildRelativePath, findModule, findModuleFromOptions } from './find-module';
 
 
 describe('find-module', () => {
@@ -187,6 +187,19 @@ describe('find-module', () => {
       options.module = 'app.module';
       modPath = findModuleFromOptions(tree, options);
       expect(modPath).toBe('/projects/my-proj/src/app.module.ts' as Path);
+    });
+  });
+
+  describe('buildRelativePath', () => {
+    it('works', () => {
+      expect(buildRelativePath('/test/module', '/test/service'))
+          .toEqual('./service');
+      expect(buildRelativePath('/test/module', '/other/service'))
+          .toEqual('../other/service');
+      expect(buildRelativePath('/module', '/test/service'))
+          .toEqual('./test/service');
+      expect(buildRelativePath('/test/service', '/module'))
+          .toEqual('../module');
     });
   });
 });

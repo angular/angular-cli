@@ -103,7 +103,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
 
     const { pathname, hash, search } = url.parse(inputUrl.replace(/\\/g, '/'));
     const resolver = (file: string, base: string) => new Promise<string>((resolve, reject) => {
-      loader.resolve(base, file, (err, result) => {
+      loader.resolve(base, decodeURI(file), (err, result) => {
         if (err) {
           reject(err);
 

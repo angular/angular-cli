@@ -18,9 +18,19 @@ export function replaceResources(
 
     const visitNode: ts.Visitor = (node: ts.Decorator) => {
       if (ts.isClassDeclaration(node)) {
-        node.decorators = ts.visitNodes(
+        const decorators = ts.visitNodes(
           node.decorators,
           (node: ts.Decorator) => visitDecorator(node, typeChecker, directTemplateLoading),
+        );
+
+        return ts.updateClassDeclaration(
+          node,
+          decorators,
+          node.modifiers,
+          node.name,
+          node.typeParameters,
+          node.heritageClauses,
+          node.members,
         );
       }
 

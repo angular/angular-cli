@@ -72,7 +72,8 @@
     "minimal": {
       "description": "When true, creates a workspace without any testing frameworks. (Use for learning purposes only.)",
       "type": "boolean",
-      "default": false
+      "default": false,
+      "x-user-analytics": 14
     }
   },
   "required": [

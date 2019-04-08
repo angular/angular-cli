@@ -1,4 +1,5 @@
 {
+  "$schema": "http://json-schema.org/draft-07/schema",
   "title": "Protractor Target",
   "description": "Protractor target options for Build Facade.",
   "type": "object",

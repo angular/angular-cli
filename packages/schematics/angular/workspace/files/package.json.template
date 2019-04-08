@@ -19,7 +19,6 @@
     "@angular/platform-browser": "<%= latestVersions.Angular %>",
     "@angular/platform-browser-dynamic": "<%= latestVersions.Angular %>",
     "@angular/router": "<%= latestVersions.Angular %>",
-    "core-js": "^2.5.4",
     "rxjs": "<%= latestVersions.RxJs %>",
     "tslib": "<%= latestVersions.TsLib %>",
     "zone.js": "<%= latestVersions.ZoneJs %>"
@@ -31,8 +30,8 @@
     "@types/node": "~8.9.4",<% if (!minimal) { %>
     "@types/jasmine": "~3.3.8",
     "@types/jasminewd2": "~2.0.3",
-    "codelyzer": "~4.5.0",
-    "jasmine-core": "~2.99.1",
+    "codelyzer": "^5.0.0",
+    "jasmine-core": "~3.3.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.0.1",
     "karma-chrome-launcher": "~2.2.0",

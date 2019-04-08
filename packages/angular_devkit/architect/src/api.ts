@@ -5,8 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { experimental, json, logging } from '@angular-devkit/core';
-import { Observable } from 'rxjs';
+import { analytics, experimental, json, logging } from '@angular-devkit/core';
+import { Observable, from } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { Schema as RealBuilderInput, Target as RealTarget } from './input-schema';
 import { Schema as RealBuilderOutput } from './output-schema';
 import { Schema as RealBuilderProgress, State as BuilderProgressState } from './progress-schema';
@@ -192,6 +193,27 @@ export interface BuilderContext {
   getTargetOptions(target: Target): Promise<json.JsonObject>;
 
   /**
+   * Resolves and return a builder name. The exact format of the name is up to the host,
+   * so it should not be parsed to gather information (it's free form). This string can be
+   * used to validate options or schedule a builder directly.
+   * @param target The target to resolve the builder name.
+   */
+  getBuilderNameForTarget(target: Target): Promise<string>;
+
+  /**
+   * Validates the options against a builder schema. This uses the same methods as the
+   * scheduleTarget and scheduleBrowser methods to validate and apply defaults to the options.
+   * It can be generically typed, if you know which interface it is supposed to validate against.
+   * @param options A generic option object to validate.
+   * @param builderName The name of a builder to use. This can be gotten for a target by using the
+   *                    getBuilderForTarget() method on the context.
+   */
+  validateOptions<T extends json.JsonObject = json.JsonObject>(
+    options: json.JsonObject,
+    builderName: string,
+  ): Promise<T>;
+
+  /**
    * Set the builder to running. This should be used if an external event triggered a re-run,
    * e.g. a file watched was changed.
    */
@@ -211,6 +233,17 @@ export interface BuilderContext {
    * @param status Update the status string. If omitted the status string is not modified.
    */
   reportProgress(current: number, total?: number, status?: string): void;
+
+  /**
+   * API to report analytics. This might be undefined if the feature is unsupported. This might
+   * not be undefined, but the backend could also not report anything.
+   */
+  readonly analytics: analytics.Analytics;
+
+  /**
+   * Add teardown logic to this Context, so that when it's being stopped it will execute teardown.
+   */
+  addTeardown(teardown: () => (Promise<void> | void)): void;
 }
 
 
@@ -251,4 +284,58 @@ export type BuilderInfo = json.JsonObject & {
  */
 export function targetStringFromTarget({project, target, configuration}: Target) {
   return `${project}:${target}${configuration !== undefined ? ':' + configuration : ''}`;
+}
+
+/**
+ * Return a Target tuple from a string.
+ */
+export function targetFromTargetString(str: string): Target {
+  const tuple = str.split(/:/, 3);
+  if (tuple.length < 2) {
+    throw new Error('Invalid target string: ' + JSON.stringify(str));
+  }
+
+  return {
+    project: tuple[0],
+    target: tuple[1],
+    ...(tuple[2] !== undefined) && { configuration: tuple[2] },
+  };
+}
+
+/**
+ * Schedule a target, and forget about its run. This will return an observable of outputs, that
+ * as a a teardown will stop the target from running. This means that the Run object this returns
+ * should not be shared.
+ *
+ * The reason this is not part of the Context interface is to keep the Context as normal form as
+ * possible. This is really an utility that people would implement in their project.
+ *
+ * @param context The context of your current execution.
+ * @param target The target to schedule.
+ * @param overrides Overrides that are used in the target.
+ * @param scheduleOptions Additional scheduling options.
+ */
+export function scheduleTargetAndForget(
+  context: BuilderContext,
+  target: Target,
+  overrides?: json.JsonObject,
+  scheduleOptions?: ScheduleOptions,
+): Observable<BuilderOutput> {
+  let resolve: (() => void) | null = null;
+  const promise = new Promise<void>(r => resolve = r);
+  context.addTeardown(() => promise);
+
+  return from(context.scheduleTarget(target, overrides, scheduleOptions)).pipe(
+    switchMap(run => new Observable<BuilderOutput>(observer => {
+      const subscription = run.output.subscribe(observer);
+
+      return () => {
+        subscription.unsubscribe();
+        // We can properly ignore the floating promise as it's a "reverse" promise; the teardown
+        // is waiting for the resolve.
+        // tslint:disable-next-line:no-floating-promises
+        run.stop().then(resolve);
+      };
+    })),
+  );
 }

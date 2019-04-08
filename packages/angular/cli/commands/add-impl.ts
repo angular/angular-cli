@@ -5,11 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { tags, terminal } from '@angular-devkit/core';
-import { ModuleNotFoundException, resolve } from '@angular-devkit/core/node';
+import { analytics, tags, terminal } from '@angular-devkit/core';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 import { intersects, prerelease, rcompare, satisfies, valid, validRange } from 'semver';
+import { isPackageNameSafeForAnalytics } from '../models/analytics';
 import { Arguments } from '../models/interface';
 import { SchematicCommand } from '../models/schematic-command';
 import npmInstall from '../tasks/npm-install';
@@ -139,17 +139,31 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
     return this.executeSchematic(collectionName, options['--']);
   }
 
+  async reportAnalytics(
+    paths: string[],
+    options: AddCommandSchema & Arguments,
+    dimensions: (boolean | number | string)[] = [],
+    metrics: (boolean | number | string)[] = [],
+  ): Promise<void> {
+    const collection = options.collection;
+
+    // Add the collection if it's safe listed.
+    if (collection && isPackageNameSafeForAnalytics(collection)) {
+      dimensions[analytics.NgCliAnalyticsDimensions.NgAddCollection] = collection;
+    } else {
+      delete dimensions[analytics.NgCliAnalyticsDimensions.NgAddCollection];
+    }
+
+    return super.reportAnalytics(paths, options, dimensions, metrics);
+  }
+
   private isPackageInstalled(name: string): boolean {
     try {
-      resolve(name, {
-        checkLocal: true,
-        basedir: this.workspace.root,
-        resolvePackageJson: true,
-      });
+      require.resolve(join(name, 'package.json'), { paths: [this.workspace.root] });
 
       return true;
     } catch (e) {
-      if (!(e instanceof ModuleNotFoundException)) {
+      if (e.code !== 'MODULE_NOT_FOUND') {
         throw e;
       }
     }
@@ -190,9 +204,9 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
   private async findProjectVersion(name: string): Promise<string | null> {
     let installedPackage;
     try {
-      installedPackage = resolve(
-        name,
-        { checkLocal: true, basedir: this.workspace.root, resolvePackageJson: true },
+      installedPackage = require.resolve(
+        join(name, 'package.json'),
+        { paths: [this.workspace.root] },
       );
     } catch { }
 

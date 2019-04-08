@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
+import { analytics } from '@angular-devkit/core';
 import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
 import { Arguments } from '../models/interface';
 import { Version } from '../upgrade/version';
@@ -19,5 +19,18 @@ export class BuildCommand extends ArchitectCommand<BuildCommandSchema> {
     Version.assertCompatibleAngularVersion(this.workspace.root);
 
     return this.runArchitectTarget(options);
+  }
+
+  async reportAnalytics(
+    paths: string[],
+    options: BuildCommandSchema & Arguments,
+    dimensions: (boolean | number | string)[] = [],
+    metrics: (boolean | number | string)[] = [],
+  ): Promise<void> {
+    if (options.buildEventLog !== undefined) {
+      dimensions[analytics.NgCliAnalyticsDimensions.NgBuildBuildEventLog] = true;
+    }
+
+    return super.reportAnalytics(paths, options, dimensions, metrics);
   }
 }

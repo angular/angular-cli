@@ -21,6 +21,10 @@ export class VirtualFileSystemDecorator implements InputFileSystem {
     private _webpackCompilerHost: WebpackCompilerHost,
   ) { }
 
+  getWebpackCompilerHost() {
+    return this._webpackCompilerHost;
+  }
+
   getVirtualFilesPaths() {
     return this._webpackCompilerHost.getNgFactoryPaths();
   }

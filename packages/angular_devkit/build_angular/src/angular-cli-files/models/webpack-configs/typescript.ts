@@ -7,8 +7,6 @@
  */
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
-import { virtualFs } from '@angular-devkit/core';
-import { Stats } from 'fs';
 import * as path from 'path';
 import {
   AngularCompilerPlugin,
@@ -23,7 +21,6 @@ import { WebpackConfigOptions } from '../build-options';
 function _createAotPlugin(
   wco: WebpackConfigOptions,
   options: any,
-  _host: virtualFs.Host<Stats>,
   useMain = true,
   extract = false,
 ) {
@@ -78,25 +75,22 @@ function _createAotPlugin(
     contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
     logger: wco.logger,
     directTemplateLoading: true,
+    importFactories: buildOptions.experimentalImportFactories,
     ...options,
   };
   return new AngularCompilerPlugin(pluginOptions);
 }
 
-export function getNonAotConfig(wco: WebpackConfigOptions, host: virtualFs.Host<Stats>) {
+export function getNonAotConfig(wco: WebpackConfigOptions) {
   const { tsConfigPath } = wco;
 
   return {
     module: { rules: [{ test: /\.tsx?$/, loader: NgToolsLoader }] },
-    plugins: [_createAotPlugin(wco, { tsConfigPath, skipCodeGeneration: true }, host)]
+    plugins: [_createAotPlugin(wco, { tsConfigPath, skipCodeGeneration: true })]
   };
 }
 
-export function getAotConfig(
-  wco: WebpackConfigOptions,
-  host: virtualFs.Host<Stats>,
-  extract = false
-) {
+export function getAotConfig(wco: WebpackConfigOptions, extract = false) {
   const { tsConfigPath, buildOptions } = wco;
 
   const loaders: any[] = [NgToolsLoader];
@@ -111,15 +105,27 @@ export function getAotConfig(
 
   return {
     module: { rules: [{ test, use: loaders }] },
-    plugins: [_createAotPlugin(wco, { tsConfigPath }, host, true, extract)]
+    plugins: [_createAotPlugin(wco, { tsConfigPath }, true, extract)]
   };
 }
 
-export function getNonAotTestConfig(wco: WebpackConfigOptions, host: virtualFs.Host<Stats>) {
-  const { tsConfigPath } = wco;
+export function getTypescriptWorkerPlugin(wco: WebpackConfigOptions, workerTsConfigPath: string) {
+  const { buildOptions } = wco;
 
-  return {
-    module: { rules: [{ test: /\.tsx?$/, loader: NgToolsLoader }] },
-    plugins: [_createAotPlugin(wco, { tsConfigPath, skipCodeGeneration: true }, host, false)]
+  const pluginOptions: AngularCompilerPluginOptions = {
+    skipCodeGeneration: true,
+    tsConfigPath: workerTsConfigPath,
+    mainPath: undefined,
+    platform: PLATFORM.Browser,
+    sourceMap: buildOptions.sourceMap.scripts,
+    forkTypeChecker: buildOptions.forkTypeChecker,
+    contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
+    logger: wco.logger,
+    // Run no transformers.
+    platformTransformers: [],
+    // Don't attempt lazy route discovery.
+    discoverLazyRoutes: false,
   };
+
+  return new AngularCompilerPlugin(pluginOptions);
 }

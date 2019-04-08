@@ -8,7 +8,13 @@
 import { tags } from '@angular-devkit/core';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
-import { HashedModuleIdsPlugin, debug } from 'webpack';
+import {
+  Configuration,
+  ContextReplacementPlugin,
+  HashedModuleIdsPlugin,
+  Output,
+  debug,
+} from 'webpack';
 import { AssetPatternClass } from '../../../browser/schema';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
@@ -31,7 +37,7 @@ export const buildOptimizerLoader: string = g['_DevKitIsLocal']
   : '@angular-devkit/build-optimizer/webpack-loader';
 
 // tslint:disable-next-line:no-big-function
-export function getCommonConfig(wco: WebpackConfigOptions) {
+export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   const { root, projectRoot, buildOptions } = wco;
   const { styles: stylesOptimization, scripts: scriptsOptimization } = buildOptions.optimization;
   const {
@@ -54,7 +60,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
   }
 
   if (buildOptions.es5BrowserSupport) {
-    entryPoints['polyfills.es5'] = [path.join(__dirname, '..', 'es2015-polyfills.js')];
+    entryPoints['polyfills.es5'] = [path.join(__dirname, '..', 'es5-polyfills.js')];
   }
 
   if (buildOptions.polyfills) {
@@ -70,12 +76,12 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     if (buildOptions.es5BrowserSupport) {
       entryPoints['polyfills.es5'] = [
         ...entryPoints['polyfills.es5'],
-        path.join(__dirname, '..', 'es2015-jit-polyfills.js'),
+        path.join(__dirname, '..', 'es5-jit-polyfills.js'),
       ];
     }
   }
 
-  if (buildOptions.profile) {
+  if (buildOptions.profile || process.env['NG_BUILD_PROFILING']) {
     extraPlugins.push(new debug.ProfilingPlugin({
       outputPath: path.resolve(root, 'chrome-profiler-events.json'),
     }));
@@ -237,10 +243,11 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       },
 
       // On server, we don't want to compress anything. We still set the ngDevMode = false for it
-      // to remove dev code.
+      // to remove dev code, and ngI18nClosureMode to remove Closure compiler i18n code
       compress: (buildOptions.platform == 'server' ? {
         global_defs: {
           ngDevMode: false,
+          ngI18nClosureMode: false,
         },
       } : {
           pure_getters: buildOptions.buildOptimizer,
@@ -249,6 +256,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
           passes: buildOptions.buildOptimizer ? 3 : 1,
           global_defs: {
             ngDevMode: false,
+            ngI18nClosureMode: false,
           },
         }),
       // We also want to avoid mangling on server.
@@ -278,6 +286,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       ? 'production'
       : 'development',
     devtool: false,
+    profile: buildOptions.statsJson,
     resolve: {
       extensions: ['.ts', '.tsx', '.mjs', '.js'],
       symlinks: !buildOptions.preserveSymlinks,
@@ -297,7 +306,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
       path: path.resolve(root, buildOptions.outputPath as string),
       publicPath: buildOptions.deployUrl,
       filename: `[name]${hashFormat.chunk}.js`,
-    },
+      // cast required until typings include `futureEmitAssets` property
+    } as Output,
     watch: buildOptions.watch,
     watchOptions: {
       poll: buildOptions.poll,
@@ -341,6 +351,12 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         ...extraMinimizers,
       ],
     },
-    plugins: extraPlugins,
+    plugins: [
+      // Always replace the context for the System.import in angular/core to prevent warnings.
+      // https://github.com/angular/angular/issues/11580
+      // With VE the correct context is added in @ngtools/webpack, but Ivy doesn't need it at all.
+      new ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)/),
+      ...extraPlugins,
+    ],
   };
 }

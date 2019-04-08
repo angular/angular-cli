@@ -102,7 +102,6 @@ jasmine_node_test(
     deps = [
         "@npm//jasmine",
         "@npm//source-map",
-        "@npm//chokidar",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
     ],
 )

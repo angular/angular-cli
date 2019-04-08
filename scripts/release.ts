@@ -17,16 +17,20 @@ const monorepo = require('../.monorepo.json');
 
 
 function _showVersions(logger: logging.Logger) {
+  const versions = Object.keys(packages).reduce((acc, curr) => {
+    acc[curr] = packages[curr] && packages[curr].version || '???';
+
+    return acc;
+  }, {} as { [pkg: string]: string });
+  const maxVersionLength = Math.max(...Object.keys(versions).map(x => versions[x].length));
+
   for (const pkgName of Object.keys(packages)) {
     const pkg = packages[pkgName];
 
     const version = pkg.version || '???';
-    const hash = pkg.hash;
-    const diff = pkg.dirty ? '!' : '';
 
-    const pad1 = '                                  '.slice(pkgName.length);
-    const pad2 = '                 '.slice(version.length);
-    const message = `${pkgName} ${pad1}v${version}${pad2}${hash} ${diff}`;
+    const pad1 = '                                       '.slice(pkgName.length);
+    const message = `${pkgName} ${pad1}${('      ' + version).slice(-maxVersionLength)}`;
     if (pkg.private) {
       logger.debug(message);
     } else {
@@ -36,80 +40,74 @@ function _showVersions(logger: logging.Logger) {
 }
 
 
-function _upgrade(release: string, force: boolean, logger: logging.Logger) {
-  for (const pkg of Object.keys(packages)) {
-    const hash = packages[pkg].hash;
-    const version = packages[pkg].version;
-    const dirty = packages[pkg].dirty || force;
-    let newVersion: string | null = version;
+function _upgradeSingle(release: string, version: string): string {
+  const simpleVersion = version.replace(/-beta\.\d+$|-rc\.\d+$/, '');
+  const isExperimental = semver.satisfies(simpleVersion, '<1.0.0');
 
-    if (release == 'minor-beta') {
-      if (dirty) {
-        if (version.match(/-beta\.\d+$/)) {
-          newVersion = semver.inc(version, 'prerelease');
-        } else {
-          newVersion = semver.inc(version, 'minor') + '-beta.0';
-        }
-      }
-    } else if (release == 'minor-rc') {
-      if (dirty) {
-        if (version.match(/-rc/)) {
-          newVersion = semver.inc(version, 'prerelease');
-        } else if (version.match(/-beta\.\d+$/)) {
-          newVersion = version.replace(/-beta\.\d+$/, '-rc.0');
-        } else {
-          newVersion = semver.inc(version, 'minor') + '-rc.0';
-        }
-      }
-    } else if (release == 'major-beta') {
-      if (dirty) {
-        if (version.match(/-beta\.\d+$/)) {
-          newVersion = semver.inc(version, 'prerelease');
-        } else {
-          newVersion = semver.inc(version, 'major') + '-beta.0';
-        }
-      }
-    } else if (release == 'major-rc') {
-      if (dirty) {
-        if (version.match(/-rc/)) {
-          newVersion = semver.inc(version, 'prerelease');
-        } else if (version.match(/-beta\.\d+$/)) {
-          newVersion = version.replace(/-beta\.\d+$/, '-rc.0');
-        } else {
-          newVersion = semver.inc(version, 'major') + '-rc.0';
-        }
-      }
-    } else if (dirty || release !== 'patch') {
-      newVersion = semver.inc(version, release as semver.ReleaseType);
-    }
-
-    let message = '';
-    if (!(pkg in monorepo.packages)) {
-      message = `${pkg} is new... setting v${newVersion}`;
-      monorepo.packages[pkg] = {
-        version: newVersion,
-        hash: hash,
-      };
-    } else if (newVersion && version !== newVersion) {
-      message = `${pkg} changed... updating v${version} => v${newVersion}`;
-      monorepo.packages[pkg].version = newVersion;
-      monorepo.packages[pkg].hash = hash;
+  if (release == 'minor-beta') {
+    if (version.match(/-beta\.\d+$/)) {
+      return semver.inc(version, 'prerelease') || version;
     } else {
-      message = `${pkg} SAME: v${version}`;
+      return semver.inc(version, 'minor') ? semver.inc(version, 'minor') + '-beta.0' : version;
     }
-
-    if (packages[pkg].private) {
-      logger.debug(message);
+  } else if (release == 'minor-rc') {
+    if (version.match(/-rc/)) {
+      return semver.inc(version, 'prerelease') || version;
+    } else if (version.match(/-beta\.\d+$/)) {
+      return version.replace(/-beta\.\d+$/, '-rc.0');
     } else {
-      logger.info(message);
+      return semver.inc(version, 'minor') ? semver.inc(version, 'minor') + '-rc.0' : version;
     }
+  } else if (release == 'major-beta') {
+    if (version.match(/-beta\.\d+$/)) {
+      return semver.inc(version, 'prerelease') || version;
+    } else if (isExperimental) {
+      return semver.inc(version, 'minor') ? semver.inc(version, 'minor') + '-beta.0' : version;
+    } else {
+      return semver.inc(version, 'major') ? semver.inc(version, 'major') + '-beta.0' : version;
+    }
+  } else if (release == 'major-rc') {
+    if (version.match(/-rc/)) {
+      return semver.inc(version, 'prerelease') || version;
+    } else if (version.match(/-beta\.\d+$/)) {
+      return version.replace(/-beta\.\d+$/, '-rc.0');
+    } else if (isExperimental) {
+      return semver.inc(version, 'minor') ? semver.inc(version, 'minor') + '-rc.0' : version;
+    } else {
+      return semver.inc(version, 'major') ? semver.inc(version, 'major') + '-rc.0' : version;
+    }
+  } else if (release == 'major' && isExperimental) {
+    return semver.inc(version, 'minor') || version;
+  } else {
+    return semver.inc(version, release as semver.ReleaseType) || version;
   }
+}
+
+function _upgrade(release: string, logger: logging.Logger) {
+  // Update stable.
+  const stable = monorepo.versions.stable;
+  const experimental = monorepo.versions.experimental;
+  if (!stable) {
+    throw new Error('Should have a version.stable key.');
+  }
+  if (!experimental) {
+    throw new Error('Should have a version.experimental key.');
+  }
+  const newStable = _upgradeSingle(release, stable);
+  const newExperimental = _upgradeSingle(release, experimental);
+  monorepo.versions = {
+    stable: newStable,
+    experimental: newExperimental,
+  };
+
+  logger.info(`Updated versions:`);
+  logger.info(`     stable:       ${stable} => ${newStable}`);
+  logger.info(`     experimental: ${experimental} => ${newExperimental}`);
 }
 
 
 export interface ReleaseOptions {
   _: string[];
-  'force'?: boolean;
   'dry-run'?: boolean;
 }
 
@@ -129,7 +127,7 @@ export default function(args: ReleaseOptions, logger: logging.Logger) {
     case 'major':
     case 'minor':
     case 'patch':
-      _upgrade(maybeRelease, args.force || false, logger);
+      _upgrade(maybeRelease, logger);
       if (!dryRun) {
         fs.writeFileSync(path.join(__dirname, '../.monorepo.json'),
                          JSON.stringify(monorepo, null, 2) + '\n');

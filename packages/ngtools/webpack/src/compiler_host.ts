@@ -15,7 +15,9 @@ import {
 } from '@angular-devkit/core';
 import { Stats } from 'fs';
 import * as ts from 'typescript';
+import { NgccProcessor } from './ngcc_processor';
 import { WebpackResourceLoader } from './resource_loader';
+import { workaroundResolve } from './utils';
 
 
 export interface OnErrorFn {
@@ -47,6 +49,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     host: virtualFs.Host,
     private readonly cacheSourceFiles: boolean,
     private readonly directTemplateLoading = false,
+    private readonly ngccProcessor?: NgccProcessor,
   ) {
     this._syncHost = new virtualFs.SyncDelegateHost(host);
     this._memoryHost = new virtualFs.SyncDelegateHost(new virtualFs.SimpleMemoryHost());
@@ -354,13 +357,46 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   trace(message: string) {
     console.log(message);
   }
-}
 
+  resolveModuleNames(
+    moduleNames: string[],
+    containingFile: string,
+  ): (ts.ResolvedModule | undefined)[] {
+    return moduleNames.map(moduleName => {
+      const { resolvedModule } = ts.resolveModuleName(
+        moduleName,
+        workaroundResolve(containingFile),
+        this._options,
+        this,
+      );
 
-// `TsCompilerAotCompilerTypeCheckHostAdapter` in @angular/compiler-cli seems to resolve module
-// names directly via `resolveModuleName`, which prevents full Path usage.
-// To work around this we must provide the same path format as TS internally uses in
-// the SourceFile paths.
-export function workaroundResolve(path: Path | string) {
-  return getSystemPath(normalize(path)).replace(/\\/g, '/');
+      if (this._options.enableIvy && resolvedModule && this.ngccProcessor) {
+        this.ngccProcessor.processModule(moduleName, resolvedModule);
+      }
+
+      return resolvedModule;
+    });
+  }
+
+  resolveTypeReferenceDirectives(
+    typeReferenceDirectiveNames: string[],
+    containingFile: string,
+    redirectedReference?: ts.ResolvedProjectReference,
+  ): (ts.ResolvedTypeReferenceDirective | undefined)[] {
+      return typeReferenceDirectiveNames.map(moduleName => {
+        const { resolvedTypeReferenceDirective } = ts.resolveTypeReferenceDirective(
+          moduleName,
+          workaroundResolve(containingFile),
+          this._options,
+          this,
+          redirectedReference,
+        );
+
+        if (this._options.enableIvy && resolvedTypeReferenceDirective && this.ngccProcessor) {
+          this.ngccProcessor.processModule(moduleName, resolvedTypeReferenceDirective);
+        }
+
+        return resolvedTypeReferenceDirective;
+      });
+  }
 }

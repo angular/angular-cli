@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": true,
@@ -13,18 +11,11 @@
     "noUnusedLocals": false,  // The linter is used for these.
     "outDir": "./dist",
     "rootDir": ".",
-    "skipDefaultLibCheck": true,
     "skipLibCheck": true,
-    "inlineSourceMap": true,
-    "sourceRoot": ".",
-    // Inline sources are necessary for our tests to show the proper sources, since we are using
-    // Istanbul (not Constantinople) as well, and applying both source maps to get the original
-    // source in devtools.
-    "inlineSources": true,
     "strictNullChecks": true,
-    "target": "es2017",
+    "target": "es2018",
     "lib": [
-      "es2017"
+      "es2018"
     ],
     "baseUrl": "",
     "rootDirs": [
