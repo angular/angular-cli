@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import * as path from 'path';
 import * as webpack from 'webpack';
 
 export interface EmittedFiles {
@@ -16,7 +17,6 @@ export interface EmittedFiles {
 }
 
 export function getEmittedFiles(compilation: webpack.compilation.Compilation): EmittedFiles[] {
-  const getExtension = (file: string) => file.split('.').reverse()[0];
   const files: EmittedFiles[] = [];
 
   for (const chunk of Object.values(compilation.chunks)) {
@@ -26,7 +26,7 @@ export function getEmittedFiles(compilation: webpack.compilation.Compilation): E
     };
 
     for (const file of chunk.files) {
-      files.push({ ...entry, file, extension: getExtension(file) } as EmittedFiles);
+      files.push({ ...entry, file, extension: path.extname(file) } as EmittedFiles);
     }
   }
 
@@ -38,7 +38,7 @@ export function getEmittedFiles(compilation: webpack.compilation.Compilation): E
 
     files.push({
       file,
-      extension: getExtension(file),
+      extension: path.extname(file),
       initial: false,
     });
   }
