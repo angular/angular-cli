@@ -95,6 +95,7 @@ export class AngularCompilerPlugin {
   private _resourceLoader?: WebpackResourceLoader;
   private _discoverLazyRoutes = true;
   private _importFactories = false;
+  private _useFactories = false;
   // Contains `moduleImportPath#exportName` => `fullModulePath`.
   private _lazyRoutes: LazyRouteMap = {};
   private _tsConfigPath: string;
@@ -256,11 +257,8 @@ export class AngularCompilerPlugin {
     }
 
     // Determine if lazy route discovery via Compiler CLI private API should be attempted.
-    if (this._compilerOptions.enableIvy) {
-      // Never try to discover lazy routes with Ivy.
-      this._discoverLazyRoutes = false;
-    } else if (options.discoverLazyRoutes !== undefined) {
-      // The default is to discover routes, but it can be overriden.
+    // The default is to discover routes, but it can be overriden.
+    if (options.discoverLazyRoutes !== undefined) {
       this._discoverLazyRoutes = options.discoverLazyRoutes;
     }
 
@@ -280,7 +278,12 @@ export class AngularCompilerPlugin {
       );
     }
 
-    if (!this._compilerOptions.enableIvy && options.importFactories === true) {
+    if (!this._JitMode && !this._compilerOptions.enableIvy) {
+      // Only attempt to use factories when AOT and not Ivy.
+      this._useFactories = true;
+    }
+
+    if (this._useFactories && options.importFactories === true) {
       // Only transform imports to use factories with View Engine.
       this._importFactories = true;
     }
@@ -488,18 +491,14 @@ export class AngularCompilerPlugin {
         const lazyRouteTSFile = discoveredLazyRoutes[lazyRouteKey].replace(/\\/g, '/');
         let modulePath: string, moduleKey: string;
 
-        if (this._JitMode ||
-          // When using Ivy and not using allowEmptyCodegenFiles, factories are not generated.
-          (this._compilerOptions.enableIvy && !this._compilerOptions.allowEmptyCodegenFiles)
-        ) {
-          modulePath = lazyRouteTSFile;
-          moduleKey = `${lazyRouteModule}${moduleName ? '#' + moduleName : ''}`;
-        } else {
-          // NgFactories are only used with AOT on ngc (legacy) mode.
+        if (this._useFactories) {
           modulePath = lazyRouteTSFile.replace(/(\.d)?\.tsx?$/, '');
           modulePath += '.ngfactory.js';
           const factoryModuleName = moduleName ? `#${moduleName}NgFactory` : '';
           moduleKey = `${lazyRouteModule}.ngfactory${factoryModuleName}`;
+        } else {
+          modulePath = lazyRouteTSFile;
+          moduleKey = `${lazyRouteModule}${moduleName ? '#' + moduleName : ''}`;
         }
 
         modulePath = workaroundResolve(modulePath);
@@ -949,7 +948,7 @@ export class AngularCompilerPlugin {
             this._normalizedLocale));
         }
 
-        if (!this._JitMode) {
+        if (this._useFactories) {
           // Replace bootstrap in browser AOT.
           this._transformers.push(replaceBootstrap(
             isAppPath,
@@ -960,7 +959,7 @@ export class AngularCompilerPlugin {
         }
       } else if (this._platform === PLATFORM.Server) {
         this._transformers.push(exportLazyModuleMap(isMainPath, getLazyRoutes));
-        if (!this._JitMode) {
+        if (this._useFactories) {
           this._transformers.push(
             exportNgFactory(isMainPath, getEntryModule),
             replaceServerBootstrap(isMainPath, getEntryModule, getTypeChecker));
