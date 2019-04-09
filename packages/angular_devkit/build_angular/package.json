@@ -40,7 +40,7 @@
     "sass": "1.18.0",
     "sass-loader": "7.1.0",
     "semver": "6.0.0",
-    "source-map-support": "0.5.11",
+    "source-map-support": "0.5.12",
     "source-map-loader": "0.2.4",
     "speed-measure-webpack-plugin": "1.3.1",
     "stats-webpack-plugin": "0.7.0",
