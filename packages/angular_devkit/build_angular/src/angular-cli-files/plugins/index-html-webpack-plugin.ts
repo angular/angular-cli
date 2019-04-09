@@ -5,8 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import * as path from 'path';
 import { Compiler, compilation } from 'webpack';
-import { CompiledFileInfo, CompiledFileType, generateIndexHtml } from './generate-index-html';
+import { FileInfo, generateIndexHtml } from './generate-index-html';
 
 export interface IndexHtmlWebpackPluginOptions {
   input: string;
@@ -65,45 +66,36 @@ export class IndexHtmlWebpackPlugin {
       (compilation as compilation.Compilation & { fileDependencies: Set<string> })
         .fileDependencies.add(this._options.input);
 
-      const loadOutputFile = (name: string) => compilation.assets[name].source();
-
       // Get all files for selected entrypoints
-      const unfilteredSortedFiles: string[] = [];
-      const noModuleFiles = new Set<string>();
-      const otherFiles = new Set<string>();
-      for (const entryName of this._options.entrypoints) {
-        const entrypoint = compilation.entrypoints.get(entryName);
-        if (entrypoint && entrypoint.getFiles) {
-          const files: string[] = entrypoint.getFiles() || [];
-          unfilteredSortedFiles.push(...files);
+      const files: FileInfo[] = [];
+      const noModuleFiles: FileInfo[] = [];
 
-          if (this._options.noModuleEntrypoints.includes(entryName)) {
-            files.forEach(file => noModuleFiles.add(file));
-          } else {
-            files.forEach(file => otherFiles.add(file));
-          }
+      for (const [entryName, entrypoint] of compilation.entrypoints) {
+        const entryFiles: FileInfo[] = (entrypoint && entrypoint.getFiles() || [])
+          .map((f: string): FileInfo => ({
+            name: entryName,
+            fileName: f,
+            extension: path.extname(f),
+          }));
+
+        if (this._options.noModuleEntrypoints.includes(entryName)) {
+          noModuleFiles.push(...entryFiles);
+        } else {
+          files.push(...entryFiles);
         }
       }
 
-      // Clean out files that are used in all types of entrypoints
-      otherFiles.forEach(file => noModuleFiles.delete(file));
-
-      // If this plugin calls generateIndexHtml it always uses type: 'none' to align with
-      // its original behavior.
-      const compiledFiles: CompiledFileInfo[] = unfilteredSortedFiles.map(f => ({
-        file: f,
-        type: 'none' as CompiledFileType,
-      }));
-
-      const indexSource = generateIndexHtml({
+      const loadOutputFile = (name: string) => compilation.assets[name].source();
+      const indexSource = await generateIndexHtml({
         input: this._options.input,
         inputContent,
         baseHref: this._options.baseHref,
         deployUrl: this._options.deployUrl,
         sri: this._options.sri,
-        unfilteredSortedFiles: compiledFiles,
+        files,
         noModuleFiles,
         loadOutputFile,
+        entrypoints: this._options.entrypoints,
       });
 
       // Add to compilation assets
