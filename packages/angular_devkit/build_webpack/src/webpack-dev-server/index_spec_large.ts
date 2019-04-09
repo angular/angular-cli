@@ -65,7 +65,7 @@ describe('Dev Server Builder', () => {
       name: 'main',
       initial: true,
       file: 'bundle.js',
-      extension: 'js',
+      extension: '.js',
     });
     await run.stop();
   }, 30000);
