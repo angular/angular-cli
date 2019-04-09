@@ -12,6 +12,7 @@ import {
 } from '@angular-devkit/schematics';
 import { updatePackageJson, updateTsLintConfig } from './codelyzer-5';
 import { dropES2015Polyfills } from './drop-es6-polyfills';
+import { updateLazyModulePaths } from './update-lazy-module-paths';
 
 export default function(): Rule {
   return () => {
@@ -19,6 +20,7 @@ export default function(): Rule {
       updateTsLintConfig(),
       updatePackageJson(),
       dropES2015Polyfills(),
+      updateLazyModulePaths()
     ]);
   };
 }
