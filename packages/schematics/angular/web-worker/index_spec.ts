@@ -46,39 +46,45 @@ describe('Service Worker Schematic', () => {
     appTree = schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
-  it('should put the worker file in the project root', () => {
-    const tree = schematicRunner.runSchematic('web-worker', defaultOptions, appTree);
+  it('should put the worker file in the project root', async () => {
+    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
+      .toPromise();
     const path = '/projects/bar/src/app/app.worker.ts';
     expect(tree.exists(path)).toEqual(true);
   });
 
-  it('should put a new tsconfig.json file in the project root', () => {
-    const tree = schematicRunner.runSchematic('web-worker', defaultOptions, appTree);
+  it('should put a new tsconfig.json file in the project root', async () => {
+    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
+      .toPromise();
     const path = '/projects/bar/tsconfig.json';
     expect(tree.exists(path)).toEqual(true);
   });
 
-  it('should put the tsconfig.worker.json file in the project root', () => {
-    const tree = schematicRunner.runSchematic('web-worker', defaultOptions, appTree);
+  it('should put the tsconfig.worker.json file in the project root', async () => {
+    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
+      .toPromise();
     const path = '/projects/bar/tsconfig.worker.json';
     expect(tree.exists(path)).toEqual(true);
   });
 
-  it('should add the webWorkerTsConfig option to workspace', () => {
-    const tree = schematicRunner.runSchematic('web-worker', defaultOptions, appTree);
+  it('should add the webWorkerTsConfig option to workspace', async () => {
+    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
+      .toPromise();
     const { projects } = JSON.parse(tree.readContent('/angular.json'));
     expect(projects.bar.architect.build.options.webWorkerTsConfig)
       .toBe('projects/bar/tsconfig.worker.json');
   });
 
-  it('should add exclusions to tsconfig.app.json', () => {
-    const tree = schematicRunner.runSchematic('web-worker', defaultOptions, appTree);
+  it('should add exclusions to tsconfig.app.json', async () => {
+    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
+      .toPromise();
     const { exclude } = JSON.parse(tree.readContent('/projects/bar/tsconfig.app.json'));
     expect(exclude).toContain('**/*.worker.ts');
   });
 
-  it('should add snippet to sibling file', () => {
-    const tree = schematicRunner.runSchematic('web-worker', defaultOptions, appTree);
+  it('should add snippet to sibling file', async () => {
+    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
+      .toPromise();
     const appComponent = tree.readContent('/projects/bar/src/app/app.component.ts');
     expect(appComponent).toContain(`new Worker('./${defaultOptions.name}.worker`);
     expect(appComponent).toContain('console.log(`page got message: ${data}`)');
