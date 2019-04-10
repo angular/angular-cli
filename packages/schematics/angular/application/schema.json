@@ -20,7 +20,7 @@
       "x-prompt": "What name would you like to use for the application?"
     },
     "enableIvy": {
-      "description": "EXPERIMENTAL: True to create a new app that uses the Ivy rendering engine.",
+      "description": "**EXPERIMENTAL** True to create a new app that uses the Ivy rendering engine.",
       "type": "boolean",
       "default": false,
       "x-user-analytics": 8
