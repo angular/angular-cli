@@ -185,6 +185,10 @@
       "items": {
         "type": "string"
       }
+    },
+    "webWorkerTsConfig": {
+      "type": "string",
+      "description": "TypeScript configuration for Web Worker modules."
     }
   },
   "additionalProperties": false,

@@ -15,6 +15,7 @@ import {
   getNonAotConfig,
   getStylesConfig,
   getTestConfig,
+  getWorkerConfig,
 } from '../angular-cli-files/models/webpack-configs';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
@@ -44,6 +45,7 @@ async function initialize(
       getStylesConfig(wco),
       getNonAotConfig(wco),
       getTestConfig(wco),
+      getWorkerConfig(wco),
     ],
   );
 

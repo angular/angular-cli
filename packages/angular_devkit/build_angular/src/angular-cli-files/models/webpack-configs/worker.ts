@@ -15,7 +15,12 @@ const WorkerPlugin = require('worker-plugin');
 
 export function getWorkerConfig(wco: WebpackConfigOptions): Configuration {
   const { buildOptions } = wco;
+
   if (!buildOptions.webWorkerTsConfig) {
+    return {};
+  }
+
+  if (typeof buildOptions.webWorkerTsConfig != 'string') {
     throw new Error('The `webWorkerTsConfig` must be a string.');
   }
 
