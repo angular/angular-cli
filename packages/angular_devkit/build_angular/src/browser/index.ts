@@ -155,6 +155,7 @@ export function buildWebpackConfig(
       getBrowserConfig(wco),
       getStylesConfig(wco),
       getStatsConfig(wco),
+      getWorkerConfig(wco),
     ];
 
     if (wco.buildOptions.main || wco.buildOptions.polyfills) {
@@ -177,10 +178,6 @@ export function buildWebpackConfig(
           new NgBuildAnalyticsPlugin(wco.projectRoot, additionalOptions.analytics, category),
         ],
       });
-    }
-
-    if (wco.buildOptions.webWorkerTsConfig) {
-      webpackConfigs.push(getWorkerConfig(wco));
     }
 
     const webpackConfig = webpackMerge(webpackConfigs);
