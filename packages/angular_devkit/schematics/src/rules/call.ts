@@ -97,7 +97,16 @@ export function callRule(
         }),
       );
     } else if (isPromise(result)) {
-      return from(result).pipe(map(() => inputTree));
+      return from(result).pipe(
+        mergeMap(inner => {
+          if (typeof inner === 'function') {
+            // This is considered a Rule, chain the rule and return its output.
+            return callRule(inner, observableOf(inputTree), context);
+          } else {
+            return observableOf(inputTree);
+          }
+        }),
+      );
     } else if (TreeSymbol in result) {
       return observableOf(result);
     } else {
