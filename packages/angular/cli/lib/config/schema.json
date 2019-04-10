@@ -548,7 +548,7 @@
       "type": "null",
       "definitions": {
         "appShell": {
-          "description": "App Shell target options for Build Facade.",
+          "description": "App Shell target options for Architect.",
           "type": "object",
           "properties": {
             "browserTarget": {
@@ -580,7 +580,7 @@
           "additionalProperties": false
         },
         "browser": {
-          "title": "Webpack browser schema for Build Facade.",
+          "title": "Webpack browser schema for Architect.",
           "description": "Browser target options",
           "properties": {
             "assets": {
@@ -1050,7 +1050,7 @@
           }
         },
         "devServer": {
-          "description": "Dev Server target options for Build Facade.",
+          "description": "Dev Server target options for Architect.",
           "type": "object",
           "properties": {
             "browserTarget": {
@@ -1223,7 +1223,7 @@
           "additionalProperties": false
         },
         "extracti18n": {
-          "description": "Extract i18n target options for Build Facade.",
+          "description": "Extract i18n target options for Architect.",
           "type": "object",
           "properties": {
             "browserTarget": {
@@ -1264,7 +1264,7 @@
           "additionalProperties": false
         },
         "karma": {
-          "description": "Karma target options for Build Facade.",
+          "description": "Karma target options for Architect.",
           "type": "object",
           "properties": {
             "main": {
@@ -1439,6 +1439,10 @@
               "items": {
                 "type": "string"
               }
+            },
+            "webWorkerTsConfig": {
+              "type": "string",
+              "description": "TypeScript configuration for Web Worker modules."
             }
           },
           "additionalProperties": false,
@@ -1514,7 +1518,7 @@
           }
         },
         "protractor": {
-          "description": "Protractor target options for Build Facade.",
+          "description": "Protractor target options for Architect.",
           "type": "object",
           "properties": {
             "protractorConfig": {
@@ -1822,7 +1826,7 @@
           }
         },
         "tslint": {
-          "description": "TSlint target options for Build Facade.",
+          "description": "TSlint target options for Architect.",
           "type": "object",
           "properties": {
             "tslintConfig": {
