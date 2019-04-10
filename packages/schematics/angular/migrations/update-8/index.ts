@@ -20,7 +20,7 @@ export default function(): Rule {
       updateTsLintConfig(),
       updatePackageJson(),
       dropES2015Polyfills(),
-      updateLazyModulePaths()
+      updateLazyModulePaths(),
     ]);
   };
 }

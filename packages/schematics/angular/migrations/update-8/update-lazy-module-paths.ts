@@ -27,4 +27,4 @@ export const updateLazyModulePaths = (): Rule => {
       silent: false,
     }));
   };
-}
+};

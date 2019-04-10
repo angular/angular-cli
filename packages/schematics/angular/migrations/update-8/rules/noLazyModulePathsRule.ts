@@ -6,9 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+
 import { tsquery } from '@phenomnomnominal/tsquery';
-// tslint:disable-next-line:no-implicit-dependencies
-import { Replacement, RuleFailure, Rules } from 'tslint';
+import {
+    Replacement,
+    RuleFailure,
+    Rules,
+} from 'tslint'; // tslint:disable-line:no-implicit-dependencies
 import * as ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 
 // Constants:
