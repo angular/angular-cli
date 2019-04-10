@@ -10,46 +10,16 @@ import {
   Rule, SchematicContext, SchematicsException, Tree,
   apply, applyTemplates, chain, mergeWith, move, noop, url,
 } from '@angular-devkit/schematics';
-import { getWorkspace, updateWorkspace } from '../utility/config';
 import { appendValueInAstArray, findPropertyInAstObject } from '../utility/json-utils';
 import { parseName } from '../utility/parse-name';
-import { buildDefaultPath, getProject } from '../utility/project';
-import { getProjectTargets } from '../utility/project-targets';
-import {
-  BrowserBuilderOptions,
-  BrowserBuilderTarget,
-  WorkspaceSchema,
-} from '../utility/workspace-models';
+import { buildDefaultPath, getWorkspace, updateWorkspace } from '../utility/workspace';
+import { BrowserBuilderOptions } from '../utility/workspace-models';
 import { Schema as WebWorkerOptions } from './schema';
 
-function getProjectConfiguration(
-  workspace: WorkspaceSchema,
-  options: WebWorkerOptions,
-): BrowserBuilderOptions {
-  if (!options.target) {
-    throw new SchematicsException('Option (target) is required.');
-  }
 
-  const projectTargets = getProjectTargets(workspace, options.project);
-  if (!projectTargets[options.target]) {
-    throw new Error(`Target is not defined for this project.`);
-  }
-
-  const target = projectTargets[options.target] as BrowserBuilderTarget;
-
-  return target.options;
-}
-
-function addConfig(options: WebWorkerOptions, root: string): Rule {
+function addConfig(options: WebWorkerOptions, root: string, tsConfigPath: string): Rule {
   return (host: Tree, context: SchematicContext) => {
     context.logger.debug('updating project configuration.');
-    const workspace = getWorkspace(host);
-    const config = getProjectConfiguration(workspace, options);
-
-    if (config.webWorkerTsConfig) {
-      // Don't do anything if the configuration is already there.
-      return;
-    }
 
     const tsConfigRules = [];
 
@@ -59,9 +29,6 @@ function addConfig(options: WebWorkerOptions, root: string): Rule {
       applyTemplates({ ...options, relativePathToWorkspaceRoot }),
       move(root),
     ])));
-
-    // Add build-angular config flag.
-    config.webWorkerTsConfig = `${root.endsWith('/') ? root : root + '/'}tsconfig.worker.json`;
 
     // Add project tsconfig.json.
     // The project level tsconfig.json with webworker lib is for editor support since
@@ -102,7 +69,6 @@ function addConfig(options: WebWorkerOptions, root: string): Rule {
 
     // Add worker glob exclusion to tsconfig.app.json.
     const workerGlob = '**/*.worker.ts';
-    const tsConfigPath = config.tsConfig;
     const buffer = host.read(tsConfigPath);
     if (buffer) {
       const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
@@ -124,8 +90,6 @@ function addConfig(options: WebWorkerOptions, root: string): Rule {
     return chain([
       // Add tsconfigs.
       ...tsConfigRules,
-      // Add workspace configuration.
-      updateWorkspace(workspace),
     ]);
   };
 }
@@ -174,17 +138,30 @@ function addSnippet(options: WebWorkerOptions): Rule {
 }
 
 export default function (options: WebWorkerOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
-    const project = getProject(host, options.project);
+  return async (host: Tree) => {
+    const workspace = await getWorkspace(host);
+
     if (!options.project) {
       throw new SchematicsException('Option "project" is required.');
     }
+    if (!options.target) {
+      throw new SchematicsException('Option (target) is required.');
+    }
+
+    const project = workspace.projects.get(options.project);
     if (!project) {
       throw new SchematicsException(`Invalid project name (${options.project})`);
     }
-    if (project.projectType !== 'application') {
+    const projectType = project.extensions['projectType'];
+    if (projectType !== 'application') {
       throw new SchematicsException(`Web Worker requires a project type of "application".`);
     }
+
+    const projectTarget = project.targets.get(options.target);
+    if (!projectTarget) {
+      throw new Error(`Target is not defined for this project.`);
+    }
+    const projectTargetOptions = (projectTarget.options || {}) as unknown as BrowserBuilderOptions;
 
     if (options.path === undefined) {
       options.path = buildDefaultPath(project);
@@ -194,6 +171,12 @@ export default function (options: WebWorkerOptions): Rule {
     options.path = parsedPath.path;
     const root = project.root || project.sourceRoot || '';
 
+    const needWebWorkerConfig = !projectTargetOptions.webWorkerTsConfig;
+    if (needWebWorkerConfig) {
+      projectTargetOptions.webWorkerTsConfig =
+        `${root.endsWith('/') ? root : root + '/'}tsconfig.worker.json`;
+    }
+
     const templateSource = apply(url('./files/worker'), [
       applyTemplates({ ...options, ...strings }),
       move(parsedPath.path),
@@ -201,7 +184,8 @@ export default function (options: WebWorkerOptions): Rule {
 
     return chain([
       // Add project configuration.
-      addConfig(options, root),
+      needWebWorkerConfig ? addConfig(options, root, projectTargetOptions.tsConfig) : noop(),
+      needWebWorkerConfig ? updateWorkspace(workspace) : noop(),
       // Create the worker in a sibling module.
       options.snippet ? addSnippet(options) : noop(),
       // Add the worker.
