@@ -78,7 +78,7 @@ export async function readJsonWorkspace(
 
 const specialWorkspaceExtensions = ['cli', 'defaultProject', 'newProjectRoot', 'schematics'];
 
-const specialProjectExtensions = ['cli', 'schematics'];
+const specialProjectExtensions = ['cli', 'schematics', 'projectType'];
 
 function parseWorkspace(workspaceNode: JsonAstObject, context: ParserContext): WorkspaceDefinition {
   const jsonMetadata = context.metadata;
