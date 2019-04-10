@@ -17,7 +17,7 @@
       "properties": {
         "buildEventLog": {
           "type": "string",
-          "description": "(experimental) Output file path for Build Event Protocol events"
+          "description": "**EXPERIMENTAL** Output file path for Build Event Protocol events"
         }
       }
     }
