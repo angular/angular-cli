@@ -150,12 +150,13 @@ function addSnippet(options: WebWorkerOptions): Rule {
     }
 
     const siblingModulePath = `${options.path}/${siblingModules[0]}`;
+    const logMessage = 'console.log(`page got message: ${data}`);';
     const workerCreationSnippet = tags.stripIndent`
       if (typeof Worker !== 'undefined') {
         // Create a new
         const worker = new Worker('./${options.name}.worker', { type: 'module' });
         worker.onmessage = ({ data }) => {
-          console.log('page got message: $\{data\}');
+          ${logMessage}
         };
         worker.postMessage('hello');
       } else {
