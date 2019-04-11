@@ -44,22 +44,24 @@ describe('App Shell Schematic', () => {
   });
 
 
-  it('should ensure the client app has a router-outlet', () => {
+  it('should ensure the client app has a router-outlet', async () => {
     appTree = schematicRunner.runSchematic('workspace', workspaceOptions);
     appTree = schematicRunner.runSchematic('application', {...appOptions, routing: false}, appTree);
-    expect(() => {
-      schematicRunner.runSchematic('appShell', defaultOptions, appTree);
-    }).toThrowError();
+    await expectAsync(
+      schematicRunner.runSchematicAsync('appShell', defaultOptions, appTree).toPromise(),
+    ).toBeRejected();
   });
 
-  it('should add a universal app', () => {
-    const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
+  it('should add a universal app', async () => {
+    const tree = await schematicRunner.runSchematicAsync('appShell', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/projects/bar/src/app/app.server.module.ts';
     expect(tree.exists(filePath)).toEqual(true);
   });
 
-  it('should add app shell configuration', () => {
-    const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
+  it('should add app shell configuration', async () => {
+    const tree = await schematicRunner.runSchematicAsync('appShell', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/angular.json';
     const content = tree.readContent(filePath);
     const workspace = JSON.parse(content);
@@ -71,19 +73,21 @@ describe('App Shell Schematic', () => {
     expect(target.configurations.production.serverTarget).toEqual('bar:server:production');
   });
 
-  it('should add router module to client app module', () => {
-    const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
+  it('should add router module to client app module', async () => {
+    const tree = await schematicRunner.runSchematicAsync('appShell', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/projects/bar/src/app/app.module.ts';
     const content = tree.readContent(filePath);
     expect(content).toMatch(/import { RouterModule } from \'@angular\/router\';/);
   });
 
-  it('should not fail when AppModule have imported RouterModule already', () => {
+  it('should not fail when AppModule have imported RouterModule already', async () => {
     const updateRecorder = appTree.beginUpdate('/projects/bar/src/app/app.module.ts');
     updateRecorder.insertLeft(0, 'import { RouterModule } from \'@angular/router\';');
     appTree.commitUpdate(updateRecorder);
 
-    const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
+    const tree = await schematicRunner.runSchematicAsync('appShell', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/projects/bar/src/app/app.module.ts';
     const content = tree.readContent(filePath);
     expect(content).toMatch(/import { RouterModule } from \'@angular\/router\';/);
@@ -119,10 +123,11 @@ describe('App Shell Schematic', () => {
       tree.delete('/projects/bar/src/app/app.component.html');
     }
 
-    it('should not re-add the router outlet (external template)', () => {
+    it('should not re-add the router outlet (external template)', async () => {
       const htmlPath = '/projects/bar/src/app/app.component.html';
       appTree.overwrite(htmlPath, '<router-outlet></router-outlet>');
-      const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
+      const tree = await schematicRunner.runSchematicAsync('appShell', defaultOptions, appTree)
+        .toPromise();
 
       const content = tree.readContent(htmlPath);
       const matches = content.match(/<router\-outlet><\/router\-outlet>/g);
@@ -130,9 +135,10 @@ describe('App Shell Schematic', () => {
       expect(numMatches).toEqual(1);
     });
 
-    it('should not re-add the router outlet (inline template)', () => {
+    it('should not re-add the router outlet (inline template)', async () => {
       makeInlineTemplate(appTree, '<router-outlet></router-outlet>');
-      const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
+      const tree = await schematicRunner.runSchematicAsync('appShell', defaultOptions, appTree)
+        .toPromise();
       const content = tree.readContent('/projects/bar/src/app/app.component.ts');
       const matches = content.match(/<router\-outlet><\/router\-outlet>/g);
       const numMatches = matches ? matches.length : 0;
@@ -140,22 +146,25 @@ describe('App Shell Schematic', () => {
     });
   });
 
-  it('should add router imports to server module', () => {
-    const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
+  it('should add router imports to server module', async () => {
+    const tree = await schematicRunner.runSchematicAsync('appShell', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/projects/bar/src/app/app.server.module.ts';
     const content = tree.readContent(filePath);
     expect(content).toMatch(/import { Routes, RouterModule } from \'@angular\/router\';/);
   });
 
-  it('should define a server route', () => {
-    const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
+  it('should define a server route', async () => {
+    const tree = await schematicRunner.runSchematicAsync('appShell', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/projects/bar/src/app/app.server.module.ts';
     const content = tree.readContent(filePath);
     expect(content).toMatch(/const routes: Routes = \[/);
   });
 
-  it('should import RouterModule with forRoot', () => {
-    const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
+  it('should import RouterModule with forRoot', async () => {
+    const tree = await schematicRunner.runSchematicAsync('appShell', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/projects/bar/src/app/app.server.module.ts';
     const content = tree.readContent(filePath);
     expect(content)
@@ -164,8 +173,9 @@ describe('App Shell Schematic', () => {
       .toMatch(/ServerModule,\r?\n\s*RouterModule\.forRoot\(routes\),/);
   });
 
-  it('should create the shell component', () => {
-    const tree = schematicRunner.runSchematic('appShell', defaultOptions, appTree);
+  it('should create the shell component', async () => {
+    const tree = await schematicRunner.runSchematicAsync('appShell', defaultOptions, appTree)
+      .toPromise();
     expect(tree.exists('/projects/bar/src/app/app-shell/app-shell.component.ts')).toBe(true);
     const content = tree.readContent('/projects/bar/src/app/app.server.module.ts');
     expect(content).toMatch(/app\-shell\.component/);
