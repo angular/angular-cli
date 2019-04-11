@@ -53,6 +53,7 @@ ts_library(
         "@npm//@phenomnomnominal/tsquery",
         "@npm//@types/node",
         "@npm//rxjs",
+        "@npm//tslint",
     ],
 )
 
@@ -91,6 +92,7 @@ ts_library(
         "@npm//@types/node",
         "@npm//@types/jasmine",
         "@npm//rxjs",
+        "@npm//tslint",
     ],
     testonly = True,
     # @external_begin
