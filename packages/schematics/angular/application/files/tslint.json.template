@@ -1,6 +1,9 @@
 {<% if (!isRootApp) { %>
   "extends": "<%= relativePathToWorkspaceRoot %>/tslint.json",<%
   } %>
+  "rulesDirectory": [
+    "codelyzer"
+  ],
   "rules": {
     "directive-selector": [
       true,
@@ -13,6 +16,21 @@
       "element",
       "<%= utils.dasherize(prefix) %>",
       "kebab-case"
-    ]
+    ],
+    "component-class-suffix": true,
+    "contextual-lifecycle": true,
+    "directive-class-suffix": true,
+    "no-conflicting-lifecycle": true,
+    "no-host-metadata-property": true,
+    "no-input-rename": true,
+    "no-inputs-metadata-property": true,
+    "no-output-native": true,
+    "no-output-on-prefix": true,
+    "no-output-rename": true,
+    "no-outputs-metadata-property": true,
+    "template-banana-in-box": true,
+    "template-no-negated-async": true,
+    "use-lifecycle-interface": true,
+    "use-pipe-transform-interface": true
   }
 }
