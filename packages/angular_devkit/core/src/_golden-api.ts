@@ -51,3 +51,7 @@ export * from './utils/lang';
 export * from './virtual-fs/path';
 export * from './virtual-fs/host/index';
 // End virtualFs namespace
+
+// Start workspace namespace
+export * from './workspace/index';
+// End workspace namespace

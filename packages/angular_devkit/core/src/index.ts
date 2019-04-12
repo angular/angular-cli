@@ -10,6 +10,7 @@ import * as experimental from './experimental';
 import * as json from './json/index';
 import * as logging from './logger/index';
 import * as terminal from './terminal/index';
+import * as workspace from './workspace';
 
 export * from './exception/exception';
 export * from './json/index';
@@ -22,4 +23,5 @@ export {
   json,
   logging,
   terminal,
+  workspace,
 };
