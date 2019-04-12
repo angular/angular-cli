@@ -35,7 +35,8 @@ export async function readWorkspace(
   path: string,
   host: WorkspaceHost,
   format?: WorkspaceFormat,
-): Promise<WorkspaceDefinition> {
+  // return type will eventually have a `diagnostics` property as well
+): Promise<{ workspace: WorkspaceDefinition }> {
   if (await host.isDirectory(path)) {
     // TODO: Warn if multiple found (requires diagnostics support)
     const directory = normalize(path);
@@ -78,7 +79,7 @@ export async function readWorkspace(
 
   formatLookup.set(workspace, WorkspaceFormat.JSON);
 
-  return workspace;
+  return { workspace };
 }
 
 export async function writeWorkspace(
