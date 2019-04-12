@@ -82,12 +82,12 @@ describe('augment-index-html', () => {
           <link rel="stylesheet" href="styles.css">
         </head>
         <body>
-          <script src="runtime-es5.js" nomodule></script>
-          <script src="polyfills-es5.js" nomodule></script>
           <script src="runtime-es2015.js" type="module"></script>
           <script src="polyfills-es2015.js" type="module"></script>
-          <script src="main-es5.js" nomodule></script>
+          <script src="runtime-es5.js" nomodule></script>
+          <script src="polyfills-es5.js" nomodule></script>
           <script src="main-es2015.js" type="module"></script>
+          <script src="main-es5.js" nomodule></script>
         </body>
       </html>
     `);
@@ -125,8 +125,8 @@ describe('augment-index-html', () => {
         </head>
         <body>
           <script src="scripts.js"></script>
-          <script src="main-es5.js" nomodule></script>
           <script src="main-es2015.js" type="module"></script>
+          <script src="main-es5.js" nomodule></script>
         </body>
       </html>
     `);
