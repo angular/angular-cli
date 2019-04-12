@@ -44,54 +44,61 @@ describe('Class Schematic', () => {
     appTree = schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
-  it('should create just the class file', () => {
-    const tree = schematicRunner.runSchematic('class', defaultOptions, appTree);
+  it('should create just the class file', async () => {
+    const tree = await schematicRunner.runSchematicAsync('class', defaultOptions, appTree)
+      .toPromise();
     expect(tree.files).toContain('/projects/bar/src/app/foo.ts');
     expect(tree.files).not.toContain('/projects/bar/src/app/foo.spec.ts');
   });
 
-  it('should create the class and spec file', () => {
+  it('should create the class and spec file', async () => {
     const options = {
       ...defaultOptions,
       spec: true,
     };
-    const tree = schematicRunner.runSchematic('class', options, appTree);
+    const tree = await schematicRunner.runSchematicAsync('class', options, appTree)
+      .toPromise();
     expect(tree.files).toContain('/projects/bar/src/app/foo.ts');
     expect(tree.files).toContain('/projects/bar/src/app/foo.spec.ts');
   });
 
-  it('should create an class named "Foo"', () => {
-    const tree = schematicRunner.runSchematic('class', defaultOptions, appTree);
+  it('should create an class named "Foo"', async () => {
+    const tree = await schematicRunner.runSchematicAsync('class', defaultOptions, appTree)
+      .toPromise();
     const fileContent = tree.readContent('/projects/bar/src/app/foo.ts');
     expect(fileContent).toMatch(/export class Foo/);
   });
 
-  it('should put type in the file name', () => {
+  it('should put type in the file name', async () => {
     const options = { ...defaultOptions, type: 'model' };
 
-    const tree = schematicRunner.runSchematic('class', options, appTree);
+    const tree = await schematicRunner.runSchematicAsync('class', options, appTree)
+      .toPromise();
     expect(tree.files).toContain('/projects/bar/src/app/foo.model.ts');
   });
 
-  it('should split the name to name & type with split on "."', () => {
+  it('should split the name to name & type with split on "."', async () => {
     const options = {...defaultOptions, name: 'foo.model' };
-    const tree = schematicRunner.runSchematic('class', options, appTree);
+    const tree = await schematicRunner.runSchematicAsync('class', options, appTree)
+      .toPromise();
     const classPath = '/projects/bar/src/app/foo.model.ts';
     const content = tree.readContent(classPath);
     expect(content).toMatch(/export class Foo/);
   });
 
-  it('should respect the path option', () => {
+  it('should respect the path option', async () => {
     const options = { ...defaultOptions, path: 'zzz' };
-    const tree = schematicRunner.runSchematic('class', options, appTree);
+    const tree = await schematicRunner.runSchematicAsync('class', options, appTree)
+      .toPromise();
     expect(tree.files).toContain('/zzz/foo.ts');
   });
 
-  it('should respect the sourceRoot value', () => {
+  it('should respect the sourceRoot value', async () => {
     const config = JSON.parse(appTree.readContent('/angular.json'));
     config.projects.bar.sourceRoot = 'projects/bar/custom';
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
-    appTree = schematicRunner.runSchematic('class', defaultOptions, appTree);
+    appTree = await schematicRunner.runSchematicAsync('class', defaultOptions, appTree)
+      .toPromise();
     expect(appTree.files).toContain('/projects/bar/custom/app/foo.ts');
   });
 });
