@@ -171,6 +171,8 @@ export declare class CoreSchemaRegistry implements SchemaRegistry {
     usePromptProvider(provider: PromptProvider): void;
 }
 
+export declare function createWorkspaceHost(host: virtualFs.Host): WorkspaceHost;
+
 export declare const cyan: (x: string) => string;
 
 export declare function dasherize(str: string): string;
@@ -178,6 +180,8 @@ export declare function dasherize(str: string): string;
 export declare function decamelize(str: string): string;
 
 export declare function deepCopy<T extends any>(value: T): T;
+
+export declare type DefinitionCollectionListener<V> = (name: string, action: 'add' | 'remove' | 'replace', newValue: V | undefined, oldValue: V | undefined) => void;
 
 export declare class DependencyNotFoundException extends BaseException {
     constructor();
@@ -607,6 +611,27 @@ export declare class PriorityQueue<T> {
     toArray(): Array<T>;
 }
 
+export interface ProjectDefinition {
+    readonly extensions: Record<string, JsonValue | undefined>;
+    prefix?: string;
+    root: string;
+    sourceRoot?: string;
+    readonly targets: TargetDefinitionCollection;
+}
+
+export declare class ProjectDefinitionCollection extends DefinitionCollection<ProjectDefinition> {
+    constructor(initial?: Record<string, ProjectDefinition>, listener?: DefinitionCollectionListener<ProjectDefinition>);
+    add(definition: {
+        name: string;
+        root: string;
+        sourceRoot?: string;
+        prefix?: string;
+        targets?: Record<string, TargetDefinition>;
+        [key: string]: unknown;
+    }): this;
+    set(name: string, value: ProjectDefinition): this;
+}
+
 export declare class ProjectNotFoundException extends BaseException {
     constructor(name: string);
 }
@@ -643,6 +668,10 @@ export interface ReadonlyHost<StatsT extends object = {}> {
     read(path: Path): Observable<FileBuffer>;
     stat(path: Path): Observable<Stats<StatsT> | null> | null;
 }
+
+export declare function readWorkspace(path: string, host: WorkspaceHost, format?: WorkspaceFormat): Promise<{
+    workspace: WorkspaceDefinition;
+}>;
 
 export declare const red: (x: string) => string;
 
@@ -866,6 +895,20 @@ export declare class SynchronousDelegateExpectedException extends BaseException 
     constructor();
 }
 
+export interface TargetDefinition {
+    builder: string;
+    configurations?: Record<string, Record<string, JsonValue | undefined> | undefined>;
+    options?: Record<string, JsonValue | undefined>;
+}
+
+export declare class TargetDefinitionCollection extends DefinitionCollection<TargetDefinition> {
+    constructor(initial?: Record<string, TargetDefinition>, listener?: DefinitionCollectionListener<TargetDefinition>);
+    add(definition: {
+        name: string;
+    } & TargetDefinition): this;
+    set(name: string, value: TargetDefinition): this;
+}
+
 export declare function template<T>(content: string, options?: TemplateOptions): (input: T) => string;
 
 export interface TemplateAst {
@@ -1023,8 +1066,24 @@ export declare class Workspace {
     static fromPath(host: virtualFs.Host<{}>, path: Path, registry: schema.CoreSchemaRegistry): Promise<Workspace>;
 }
 
+export interface WorkspaceDefinition {
+    readonly extensions: Record<string, JsonValue | undefined>;
+    readonly projects: ProjectDefinitionCollection;
+}
+
 export declare class WorkspaceFileNotFoundException extends BaseException {
     constructor(path: Path);
+}
+
+export declare enum WorkspaceFormat {
+    JSON = 0
+}
+
+export interface WorkspaceHost {
+    isDirectory(path: string): Promise<boolean>;
+    isFile(path: string): Promise<boolean>;
+    readFile(path: string): Promise<string>;
+    writeFile(path: string, data: string): Promise<void>;
 }
 
 export declare class WorkspaceNotYetLoadedException extends BaseException {
@@ -1064,5 +1123,7 @@ export interface WorkspaceTool {
 export declare class WorkspaceToolNotFoundException extends BaseException {
     constructor(name: string);
 }
+
+export declare function writeWorkspace(workspace: WorkspaceDefinition, host: WorkspaceHost, path?: string, format?: WorkspaceFormat): Promise<void>;
 
 export declare const yellow: (x: string) => string;
