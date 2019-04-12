@@ -24,6 +24,7 @@ import { getEsVersionForFileName } from '../angular-cli-files/models/webpack-con
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { NormalizedBrowserBuilderSchema, defaultProgress, normalizeBrowserSchema } from '../utils';
+import { isDifferentialLoadingNeeded } from './differential-loading';
 
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 const webpackMerge = require('webpack-merge');
@@ -31,6 +32,7 @@ const webpackMerge = require('webpack-merge');
 type BrowserWebpackConfigOptions = WebpackConfigOptions<NormalizedBrowserBuilderSchema>;
 
 export async function generateWebpackConfig(
+  context: BuilderContext,
   workspaceRoot: string,
   projectRoot: string,
   sourceRoot: string | undefined,
@@ -51,13 +53,10 @@ export async function generateWebpackConfig(
 
   // At the moment, only the browser builder supports differential loading
   // However this config generation is used by multiple builders such as dev-server
-  // const builderInfo = additionalOptions.builderInfo;
-  // const differentialLoading =
-  //   builderInfo
-  //   && builderInfo.builderName === 'browser'
-  //   && isDifferentialLoadingNeeded(projectRoot, scriptTarget);
-  const differentialLoading = false;
-  const scriptTargets = [tsConfig.options.target];
+  const scriptTarget = tsConfig.options.target;
+  const differentialLoading = context.builder.builderName === 'browser'
+    && isDifferentialLoadingNeeded(projectRoot, scriptTarget);
+  const scriptTargets = [scriptTarget];
 
   if (differentialLoading) {
     scriptTargets.unshift(ts.ScriptTarget.ES5);
@@ -121,6 +120,7 @@ export async function generateWebpackConfig(
 
 export async function generateBrowserWebpackConfigFromWorkspace(
   options: BrowserBuilderSchema,
+  context: BuilderContext,
   projectName: string,
   workspace: experimental.workspace.Workspace,
   host: virtualFs.Host<fs.Stats>,
@@ -143,6 +143,7 @@ export async function generateBrowserWebpackConfigFromWorkspace(
   );
 
   return generateWebpackConfig(
+    context,
     getSystemPath(workspace.root),
     getSystemPath(projectRoot),
     sourceRoot && getSystemPath(sourceRoot),
@@ -176,6 +177,7 @@ export async function generateBrowserWebpackConfigFromContext(
 
   const config = await generateBrowserWebpackConfigFromWorkspace(
     options,
+    context,
     projectName,
     workspace,
     host,

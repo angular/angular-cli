@@ -47,7 +47,6 @@ import {
 import { deleteOutputDir } from '../utils';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
 import { Schema as BrowserBuilderSchema } from './schema';
-import { isDifferentialLoadingNeeded } from './utils';
 
 export type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
   outputPath: string;
