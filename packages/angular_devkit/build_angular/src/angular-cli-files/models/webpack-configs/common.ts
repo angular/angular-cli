@@ -73,11 +73,14 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     }
   }
 
-  if (buildOptions.es5BrowserSupport === undefined
-    && buildOptions.scriptTargetOverride === ts.ScriptTarget.ES5) {
-    entryPoints['polyfills'] = [es5Polyfills];
-    if (!buildOptions.aot) {
-      entryPoints['polyfills'].push(path.join(__dirname, '..', 'es5-jit-polyfills.js'));
+  if (buildOptions.es5BrowserSupport === undefined) {
+    if (buildOptions.scriptTargetOverride === ts.ScriptTarget.ES2015) {
+      entryPoints['polyfills'] = [path.join(__dirname, '..', 'safari-nomodule.js')];
+    } else {
+      entryPoints['polyfills'] = [es5Polyfills];
+      if (!buildOptions.aot) {
+        entryPoints['polyfills'].push(path.join(__dirname, '..', 'es5-jit-polyfills.js'));
+      }
     }
   }
 

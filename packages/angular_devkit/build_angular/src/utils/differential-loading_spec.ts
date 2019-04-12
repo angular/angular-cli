@@ -10,7 +10,7 @@
 import { TestProjectHost } from '@angular-devkit/architect/testing';
 import { join } from '@angular-devkit/core';
 import { ScriptTarget } from 'typescript';
-import { isDifferentialLoadingNeeded } from './utils';
+import { isDifferentialLoadingNeeded } from './differential-loading';
 
 const devkitRoot = (global as any)._DevKitRoot; // tslint:disable-line:no-any
 const workspaceRoot = join(

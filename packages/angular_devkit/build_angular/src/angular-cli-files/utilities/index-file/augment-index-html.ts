@@ -70,7 +70,7 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
   const scripts = new Set<string>();
 
   // Sort files in the order we want to insert them by entrypoint and dedupes duplicates
-  const mergedFiles = [...noModuleFiles, ...moduleFiles, ...files];
+  const mergedFiles = [...moduleFiles, ...noModuleFiles, ...files];
   for (const entrypoint of entrypoints) {
     for (const { extension, file, name } of mergedFiles) {
       if (name !== entrypoint) { continue; }
