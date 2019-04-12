@@ -70,7 +70,6 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
         "@npm//rxjs",
-        
         "@npm//@types/node",
         ":builder_input_schema",
         ":builder_output_schema",
