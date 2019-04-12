@@ -1,8 +1,10 @@
+import { expectFileToMatch } from '../../utils/fs';
 import { ng } from '../../utils/process';
-import {expectFileToMatch} from '../../utils/fs';
 
-export default function() {
-  return ng('build', '--aot=true')
-    .then(() => expectFileToMatch('dist/test-project/main.js',
-      /platformBrowser.*bootstrapModuleFactory.*AppModuleNgFactory/));
+export default async function () {
+  await ng('build', '--aot=true');
+  await expectFileToMatch('dist/test-project/main-es5.js',
+    /platformBrowser.*bootstrapModuleFactory.*AppModuleNgFactory/);
+  await expectFileToMatch('dist/test-project/main-es2015.js',
+    /platformBrowser.*bootstrapModuleFactory.*AppModuleNgFactory/);
 }
