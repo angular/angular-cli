@@ -41,37 +41,41 @@ describe('Service Schematic', () => {
     appTree = schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
-  it('should create a service', () => {
+  it('should create a service', async () => {
     const options = { ...defaultOptions };
 
-    const tree = schematicRunner.runSchematic('service', options, appTree);
+    const tree = await schematicRunner.runSchematicAsync('service', options, appTree)
+      .toPromise();
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.service.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo/foo.service.ts');
   });
 
-  it('service should be tree-shakeable', () => {
+  it('service should be tree-shakeable', async () => {
     const options = { ...defaultOptions};
 
-    const tree = schematicRunner.runSchematic('service', options, appTree);
+    const tree = await schematicRunner.runSchematicAsync('service', options, appTree)
+      .toPromise();
     const content = tree.readContent('/projects/bar/src/app/foo/foo.service.ts');
     expect(content).toMatch(/providedIn: 'root'/);
   });
 
-  it('should respect the skipTests flag', () => {
+  it('should respect the skipTests flag', async () => {
     const options = { ...defaultOptions, skipTests: true };
 
-    const tree = schematicRunner.runSchematic('service', options, appTree);
+    const tree = await schematicRunner.runSchematicAsync('service', options, appTree)
+      .toPromise();
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.service.ts');
     expect(files).not.toContain('/projects/bar/src/app/foo/foo.service.spec.ts');
   });
 
-  it('should respect the sourceRoot value', () => {
+  it('should respect the sourceRoot value', async () => {
     const config = JSON.parse(appTree.readContent('/angular.json'));
     config.projects.bar.sourceRoot = 'projects/bar/custom';
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
-    appTree = schematicRunner.runSchematic('service', defaultOptions, appTree);
+    appTree = await schematicRunner.runSchematicAsync('service', defaultOptions, appTree)
+      .toPromise();
     expect(appTree.files).toContain('/projects/bar/custom/app/foo/foo.service.ts');
   });
 });
