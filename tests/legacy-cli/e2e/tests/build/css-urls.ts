@@ -38,9 +38,9 @@ export default function () {
       /url\('\/assets\/global-img-absolute\.svg'\)/))
     .then(() => expectFileToMatch('dist/test-project/styles.css',
       /global-img-relative\.png/))
-    .then(() => expectFileToMatch('dist/test-project/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js',
       '/assets/component-img-absolute.svg'))
-    .then(() => expectFileToMatch('dist/test-project/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js',
       /component-img-relative\.png/))
     // Check files are correctly created.
     .then(() => expectToFail(() => expectFileToExist('dist/test-project/global-img-absolute.svg')))
@@ -52,21 +52,21 @@ export default function () {
       '--extract-css'))
     .then(() => expectFileToMatch('dist/test-project/styles.css',
       /url\(\'\/assets\/global-img-absolute\.svg\'\)/))
-    .then(() => expectFileToMatch('dist/test-project/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js',
       /url\(\'\/assets\/component-img-absolute\.svg\'\)/))
     // Check urls with base-href scheme are used as is (with deploy-url).
     .then(() => ng('build', '--base-href=http://base.url/', '--deploy-url=deploy/',
       '--extract-css'))
     .then(() => expectFileToMatch('dist/test-project/styles.css',
       /url\(\'\/assets\/global-img-absolute\.svg\'\)/))
-    .then(() => expectFileToMatch('dist/test-project/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js',
       /url\(\'\/assets\/component-img-absolute\.svg\'\)/))
     // Check urls with deploy-url and base-href scheme only use deploy-url.
     .then(() => ng('build', '--base-href=http://base.url/', '--deploy-url=http://deploy.url/',
       '--extract-css'))
     .then(() => expectFileToMatch('dist/test-project/styles.css',
       /url\(\'\/assets\/global-img-absolute\.svg\'\)/))
-    .then(() => expectFileToMatch('dist/test-project/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js',
       /url\(\'\/assets\/component-img-absolute\.svg\'\)/))
     // Check with base-href and deploy-url flags.
     .then(() => ng('build', '--base-href=/base/', '--deploy-url=deploy/',
@@ -75,9 +75,9 @@ export default function () {
       '/assets/global-img-absolute.svg'))
     .then(() => expectFileToMatch('dist/test-project/styles.css',
       /global-img-relative\.png/))
-    .then(() => expectFileToMatch('dist/test-project/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js',
       '/assets/component-img-absolute.svg'))
-    .then(() => expectFileToMatch('dist/test-project/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js',
       /deploy\/component-img-relative\.png/))
     // Check with identical base-href and deploy-url flags.
     .then(() => ng('build', '--base-href=/base/', '--deploy-url=/base/',
@@ -86,9 +86,9 @@ export default function () {
       '/assets/global-img-absolute.svg'))
     .then(() => expectFileToMatch('dist/test-project/styles.css',
       /global-img-relative\.png/))
-    .then(() => expectFileToMatch('dist/test-project/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js',
       '/assets/component-img-absolute.svg'))
-    .then(() => expectFileToMatch('dist/test-project/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js',
       /\/base\/component-img-relative\.png/))
     // Check with only base-href flag.
     .then(() => ng('build', '--base-href=/base/',
@@ -97,8 +97,8 @@ export default function () {
       '/assets/global-img-absolute.svg'))
     .then(() => expectFileToMatch('dist/test-project/styles.css',
       /global-img-relative\.png/))
-    .then(() => expectFileToMatch('dist/test-project/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js',
       '/assets/component-img-absolute.svg'))
-    .then(() => expectFileToMatch('dist/test-project/main.js',
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js',
       /component-img-relative\.png/));
 }

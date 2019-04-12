@@ -13,17 +13,17 @@ export default function () {
     // use image with file size >10KB to prevent inlining
     .then(() => copyProjectAsset('images/spectrum.png', './src/assets/more.png'))
     .then(() => ng('build', '--deploy-url=deployUrl/', '--extract-css'))
-    .then(() => expectFileToMatch('dist/test-project/index.html', 'deployUrl/main.js'))
+    .then(() => expectFileToMatch('dist/test-project/index.html', 'deployUrl/main-es5.js'))
     // verify --deploy-url isn't applied to extracted css urls
     .then(() => expectFileToMatch('dist/test-project/styles.css',
       /url\(['"]?more\.png['"]?\)/))
     .then(() => ng('build', '--deploy-url=http://example.com/some/path/', '--extract-css'))
-    .then(() => expectFileToMatch('dist/test-project/index.html', 'http://example.com/some/path/main.js'))
+    .then(() => expectFileToMatch('dist/test-project/index.html', 'http://example.com/some/path/main-es5.js'))
     // verify --deploy-url is applied to non-extracted css urls
     .then(() => ng('build', '--deploy-url=deployUrl/', '--extract-css=false'))
-    .then(() => expectFileToMatch('dist/test-project/styles.js',
+    .then(() => expectFileToMatch('dist/test-project/styles-es5.js',
       /\(['"]?deployUrl\/more\.png['"]?\)/))
-    .then(() => expectFileToMatch('dist/test-project/runtime.js',
+    .then(() => expectFileToMatch('dist/test-project/runtime-es5.js',
       /__webpack_require__\.p = "deployUrl\/";/));
     // // verify slash is appended to the end of --deploy-url if missing
     // .then(() => ng('build', '--deploy-url=deployUrl', '--extract-css=false'))
