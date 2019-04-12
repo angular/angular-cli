@@ -5840,12 +5840,12 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
-magic-string@0.25.1, magic-string@^0.25.1:
-  version "0.25.1"
-  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.25.1.tgz#b1c248b399cd7485da0fe7385c2fc7011843266e"
-  integrity sha512-sCuTz6pYom8Rlt4ISPFn6wuFodbKMIHUMv4Qko9P17dpxb7s52KJTmRuZZqHdGmLCK9AOcDare039nRIcfdkEg==
+magic-string@0.25.2:
+  version "0.25.2"
+  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.25.2.tgz#139c3a729515ec55e96e69e82a11fe890a293ad9"
+  integrity sha512-iLs9mPjh9IuTtRsqqhNGYcZXGei0Nh/A4xirrsqW7c+QhKVFL2vm7U09ru6cHRD22azaP/wMDgI+HCqbETMTtg==
   dependencies:
-    sourcemap-codec "^1.4.1"
+    sourcemap-codec "^1.4.4"
 
 magic-string@^0.22.4:
   version "0.22.5"
@@ -5858,6 +5858,13 @@ magic-string@^0.25.0:
   version "0.25.0"
   resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.25.0.tgz#1f3696f9931ff0a1ed4c132250529e19cad6759b"
   integrity sha512-Msbwa9oNYNPjwVh9ury5X2BHbTFWoirTlzuf4X+pIoSOQVKNRJHXTx1WmKYuXzRM4QZFv8dGXyZvhDMmWhGLPw==
+  dependencies:
+    sourcemap-codec "^1.4.1"
+
+magic-string@^0.25.1:
+  version "0.25.1"
+  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.25.1.tgz#b1c248b399cd7485da0fe7385c2fc7011843266e"
+  integrity sha512-sCuTz6pYom8Rlt4ISPFn6wuFodbKMIHUMv4Qko9P17dpxb7s52KJTmRuZZqHdGmLCK9AOcDare039nRIcfdkEg==
   dependencies:
     sourcemap-codec "^1.4.1"
 
@@ -8715,6 +8722,11 @@ sourcemap-codec@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/sourcemap-codec/-/sourcemap-codec-1.4.1.tgz#c8fd92d91889e902a07aee392bdd2c5863958ba2"
   integrity sha512-hX1eNBNuilj8yfFnECh0DzLgwKpBLMIvmhgEhixXNui8lMLBInTI8Kyxt++RwJnMNu7cAUo635L2+N1TxMJCzA==
+
+sourcemap-codec@^1.4.4:
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/sourcemap-codec/-/sourcemap-codec-1.4.4.tgz#c63ea927c029dd6bd9a2b7fa03b3fec02ad56e9f"
+  integrity sha512-CYAPYdBu34781kLHkaW3m6b/uUSyMOC2R61gcYMWooeuaGtjof86ZA/8T+qVPPt7np1085CR9hmMGrySwEc8Xg==
 
 spdx-compare@^1.0.0:
   version "1.0.0"
