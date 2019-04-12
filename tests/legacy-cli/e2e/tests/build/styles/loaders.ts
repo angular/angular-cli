@@ -36,6 +36,6 @@ export default function () {
       './app.component.css', './app.component.scss'))
     .then(() => ng('build'))
     .then(() => expectToFail(() => expectFileToMatch('dist/test-project/styles.css', /exports/)))
-    .then(() => expectToFail(() => expectFileToMatch('dist/test-project/main.js',
+    .then(() => expectToFail(() => expectFileToMatch('dist/test-project/main-es5.js',
       /".*module\.exports.*\.outer.*background:/)));
 }

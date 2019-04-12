@@ -37,38 +37,55 @@ export default function () {
     .then(() => expectFileToMatch('dist/test-project/renamed-style.css', '.pre-rename-style'))
     .then(() => expectFileToMatch('dist/test-project/renamed-lazy-style.css', '.pre-rename-lazy-style'))
     // there are no js entry points for css only bundles
-    .then(() => expectToFail(() => expectFileToExist('dist/test-project/style.js')))
-    .then(() => expectToFail(() => expectFileToExist('dist/test-project/lazy-style.js')))
-    .then(() => expectToFail(() => expectFileToExist('dist/test-project/renamed-style.js')))
-    .then(() => expectToFail(() => expectFileToExist('dist/test-project/renamed-lazy-style.js')))
+    .then(() => expectToFail(() => expectFileToExist('dist/test-project/style-es5.js')))
+    .then(() => expectToFail(() => expectFileToExist('dist/test-project/lazy-style-es5.js')))
+    .then(() => expectToFail(() => expectFileToExist('dist/test-project/renamed-style-es5.js')))
+    .then(() => expectToFail(() => expectFileToExist('dist/test-project/renamed-lazy-style-es5.js')))
+    .then(() => expectToFail(() => expectFileToExist('dist/test-project/style-es2015.js')))
+    .then(() => expectToFail(() => expectFileToExist('dist/test-project/lazy-style-es2015.js')))
+    .then(() => expectToFail(() => expectFileToExist('dist/test-project/renamed-style-es2015.js')))
+    .then(() => expectToFail(() => expectFileToExist('dist/test-project/renamed-lazy-style-es2015.js')))
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/test-project/index.html', new RegExp(oneLineTrim`
       <link rel="stylesheet" href="styles\.css"/?>
       <link rel="stylesheet" href="renamed-style\.css"/?>
     `)))
     .then(() => expectFileToMatch('dist/test-project/index.html', oneLineTrim`
-      <script src="runtime.js"></script>
-      <script src="polyfills.es5.js" nomodule></script>
-      <script src="polyfills.js"></script>
-      <script src="vendor.js"></script>
-      <script src="main.js"></script>
+    <script src="runtime-es2015.js" type="module"></script>
+    <script src="polyfills-es2015.js" type="module"></script>
+    <script src="runtime-es5.js" nomodule></script>
+    <script src="polyfills-es5.js" nomodule></script>
+    <script src="vendor-es2015.js" type="module"></script>
+    <script src="main-es2015.js" type="module"></script>
+    <script src="vendor-es5.js" nomodule></script>
+    <script src="main-es5.js" nomodule></script>
     `))
     // also check when css isn't extracted
     .then(() => ng('build', '--no-extract-css'))
     // files were created successfully
-    .then(() => expectFileToMatch('dist/test-project/styles.js', '.string-style'))
-    .then(() => expectFileToMatch('dist/test-project/styles.js', '.input-style'))
-    .then(() => expectFileToMatch('dist/test-project/lazy-style.js', '.lazy-style'))
-    .then(() => expectFileToMatch('dist/test-project/renamed-style.js', '.pre-rename-style'))
-    .then(() => expectFileToMatch('dist/test-project/renamed-lazy-style.js', '.pre-rename-lazy-style'))
+    .then(() => expectFileToMatch('dist/test-project/styles-es5.js', '.string-style'))
+    .then(() => expectFileToMatch('dist/test-project/styles-es5.js', '.input-style'))
+    .then(() => expectFileToMatch('dist/test-project/lazy-style-es5.js', '.lazy-style'))
+    .then(() => expectFileToMatch('dist/test-project/renamed-style-es5.js', '.pre-rename-style'))
+    .then(() => expectFileToMatch('dist/test-project/renamed-lazy-style-es5.js', '.pre-rename-lazy-style'))
+    .then(() => expectFileToMatch('dist/test-project/styles-es2015.js', '.string-style'))
+    .then(() => expectFileToMatch('dist/test-project/styles-es2015.js', '.input-style'))
+    .then(() => expectFileToMatch('dist/test-project/lazy-style-es2015.js', '.lazy-style'))
+    .then(() => expectFileToMatch('dist/test-project/renamed-style-es2015.js', '.pre-rename-style'))
+    .then(() => expectFileToMatch('dist/test-project/renamed-lazy-style-es2015.js', '.pre-rename-lazy-style'))
     // index.html lists the right bundles
     .then(() => expectFileToMatch('dist/test-project/index.html', oneLineTrim`
-      <script src="runtime.js"></script>
-      <script src="polyfills.es5.js" nomodule></script>
-      <script src="polyfills.js"></script>
-      <script src="styles.js"></script>
-      <script src="renamed-style.js"></script>
-      <script src="vendor.js"></script>
-      <script src="main.js"></script>
+    <script src="runtime-es2015.js" type="module"></script>
+    <script src="polyfills-es2015.js" type="module"></script>
+    <script src="runtime-es5.js" nomodule></script>
+    <script src="polyfills-es5.js" nomodule></script>
+    <script src="styles-es2015.js" type="module"></script>
+    <script src="styles-es5.js" nomodule></script>
+    <script src="renamed-style-es2015.js" type="module"></script>
+    <script src="renamed-style-es5.js" nomodule></script>
+    <script src="vendor-es2015.js" type="module"></script>
+    <script src="main-es2015.js" type="module"></script>
+    <script src="vendor-es5.js" nomodule></script>
+    <script src="main-es5.js" nomodule></script>
     `));
 }

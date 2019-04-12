@@ -15,11 +15,15 @@ export default function () {
   return Promise.resolve()
     // tests for register_locale_data transformer
     .then(() => ng('build', '--aot', '--i18n-locale=fr'))
-    .then(() => expectFileToMatch('dist/test-project/main.js', /registerLocaleData/))
-    .then(() => expectFileToMatch('dist/test-project/main.js', /angular_common_locales_fr/))
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js', /registerLocaleData/))
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js', /angular_common_locales_fr/))
+    .then(() => expectFileToMatch('dist/test-project/main-es2015.js', /registerLocaleData/))
+    .then(() => expectFileToMatch('dist/test-project/main-es2015.js', /angular_common_locales_fr/))
     .then(() => rimraf('dist'))
     .then(() => ng('build', '--aot', '--i18n-locale=fr_FR'))
-    .then(() => expectFileToMatch('dist/test-project/main.js', /registerLocaleData/))
-    .then(() => expectFileToMatch('dist/test-project/main.js', /angular_common_locales_fr/))
-    .then(() => rimraf('dist'))
+    .then(() => expectFileToMatch('dist/test-project/main-es2015.js', /registerLocaleData/))
+    .then(() => expectFileToMatch('dist/test-project/main-es2015.js', /angular_common_locales_fr/))
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js', /registerLocaleData/))
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js', /angular_common_locales_fr/))
+    .then(() => rimraf('dist'));
 }

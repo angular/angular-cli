@@ -42,5 +42,6 @@ export default function () {
     .then(() => expectFileToMatch('dist/test-project/styles.css',
       /p\s*{\s*background-color: #f00;\s*}/))
     .then(() => expectToFail(() => expectFileToMatch('dist/test-project/styles.css', '"mappings":""')))
-    .then(() => expectFileToMatch('dist/test-project/main.js', /.outer.*.inner.*background:\s*#[fF]+/));
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js', /.outer.*.inner.*background:\s*#[fF]+/));
+    .then(() => expectFileToMatch('dist/test-project/main-es2015.js', /.outer.*.inner.*background:\s*#[fF]+/));
 }
