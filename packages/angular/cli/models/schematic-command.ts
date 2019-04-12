@@ -492,7 +492,7 @@ export abstract class SchematicCommand<
     }
 
     const pathOptions = o ? this.setPathOptions(o, workingDir) : {};
-    let input = Object.assign(pathOptions, args);
+    let input = { ...pathOptions, ...args };
 
     // Read the default values from the workspace.
     const projectName = input.project !== undefined ? '' + input.project : null;
