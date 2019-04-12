@@ -40,42 +40,47 @@ describe('Guard Schematic', () => {
     appTree = schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
-  it('should create a guard', () => {
-    const tree = schematicRunner.runSchematic('guard', defaultOptions, appTree);
+  it('should create a guard', async () => {
+    const tree = await schematicRunner.runSchematicAsync('guard', defaultOptions, appTree)
+      .toPromise();
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo.guard.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo.guard.ts');
   });
 
-  it('should respect the skipTests flag', () => {
+  it('should respect the skipTests flag', async () => {
     const options = { ...defaultOptions, skipTests: true };
 
-    const tree = schematicRunner.runSchematic('guard', options, appTree);
+    const tree = await schematicRunner.runSchematicAsync('guard', options, appTree)
+      .toPromise();
     const files = tree.files;
     expect(files).not.toContain('/projects/bar/src/app/foo.guard.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo.guard.ts');
   });
 
-  it('should respect the flat flag', () => {
+  it('should respect the flat flag', async () => {
     const options = { ...defaultOptions, flat: false };
 
-    const tree = schematicRunner.runSchematic('guard', options, appTree);
+    const tree = await schematicRunner.runSchematicAsync('guard', options, appTree)
+      .toPromise();
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.guard.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo/foo.guard.ts');
   });
 
-  it('should respect the sourceRoot value', () => {
+  it('should respect the sourceRoot value', async () => {
     const config = JSON.parse(appTree.readContent('/angular.json'));
     config.projects.bar.sourceRoot = 'projects/bar/custom';
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
-    appTree = schematicRunner.runSchematic('guard', defaultOptions, appTree);
+    appTree = await schematicRunner.runSchematicAsync('guard', defaultOptions, appTree)
+      .toPromise();
     expect(appTree.files).toContain('/projects/bar/custom/app/foo.guard.ts');
   });
 
-  it('should respect the implements value', () => {
+  it('should respect the implements value', async () => {
     const options = { ...defaultOptions, implements: ['CanActivate']};
-    const tree = schematicRunner.runSchematic('guard', options, appTree);
+    const tree = await schematicRunner.runSchematicAsync('guard', options, appTree)
+      .toPromise();
     const fileString = tree.readContent('/projects/bar/src/app/foo.guard.ts');
     expect(fileString).toContain('CanActivate');
     expect(fileString).toContain('canActivate');
@@ -85,10 +90,11 @@ describe('Guard Schematic', () => {
     expect(fileString).not.toContain('canLoad');
   });
 
-  it('should respect the implements values', () => {
+  it('should respect the implements values', async () => {
     const implementationOptions = ['CanActivate', 'CanLoad', 'CanActivateChild'];
     const options = { ...defaultOptions, implements: implementationOptions};
-    const tree = schematicRunner.runSchematic('guard', options, appTree);
+    const tree = await schematicRunner.runSchematicAsync('guard', options, appTree)
+      .toPromise();
     const fileString = tree.readContent('/projects/bar/src/app/foo.guard.ts');
 
     // Should contain all implementations
