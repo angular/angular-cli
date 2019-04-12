@@ -19,6 +19,63 @@ export declare class AmbiguousProjectPathException extends BaseException {
     constructor(path: Path, projects: ReadonlyArray<string>);
 }
 
+export interface Analytics {
+    event(category: string, action: string, options?: EventOptions): void;
+    flush(): Promise<void>;
+    pageview(path: string, options?: PageviewOptions): void;
+    screenview(screenName: string, appName: string, options?: ScreenviewOptions): void;
+    timing(category: string, variable: string, time: string | number, options?: TimingOptions): void;
+}
+
+export declare type AnalyticsForwarderFn = (report: JsonObject & AnalyticsReport) => void;
+
+export declare type AnalyticsReport = AnalyticsReportEvent | AnalyticsReportScreenview | AnalyticsReportPageview | AnalyticsReportTiming;
+
+export interface AnalyticsReportBase extends JsonObject {
+    kind: AnalyticsReportKind;
+}
+
+export declare class AnalyticsReporter {
+    protected _analytics: Analytics;
+    constructor(_analytics: Analytics);
+    report(report: AnalyticsReport): void;
+}
+
+export interface AnalyticsReportEvent extends AnalyticsReportBase {
+    action: string;
+    category: string;
+    kind: AnalyticsReportKind.Event;
+    options: JsonObject & EventOptions;
+}
+
+export declare enum AnalyticsReportKind {
+    Event = "event",
+    Screenview = "screenview",
+    Pageview = "pageview",
+    Timing = "timing"
+}
+
+export interface AnalyticsReportPageview extends AnalyticsReportBase {
+    kind: AnalyticsReportKind.Pageview;
+    options: JsonObject & PageviewOptions;
+    path: string;
+}
+
+export interface AnalyticsReportScreenview extends AnalyticsReportBase {
+    appName: string;
+    kind: AnalyticsReportKind.Screenview;
+    options: JsonObject & ScreenviewOptions;
+    screenName: string;
+}
+
+export interface AnalyticsReportTiming extends AnalyticsReportBase {
+    category: string;
+    kind: AnalyticsReportKind.Timing;
+    options: JsonObject & TimingOptions;
+    time: string | number;
+    variable: string;
+}
+
 export declare function asPosixPath(path: Path): PosixPath;
 
 export declare function asWindowsPath(path: Path): WindowsPath;
@@ -173,6 +230,11 @@ export declare class CoreSchemaRegistry implements SchemaRegistry {
 
 export declare function createWorkspaceHost(host: virtualFs.Host): WorkspaceHost;
 
+export interface CustomDimensionsAndMetricsOptions {
+    dimensions?: (boolean | number | string)[];
+    metrics?: (boolean | number | string)[];
+}
+
 export declare const cyan: (x: string) => string;
 
 export declare function dasherize(str: string): string;
@@ -201,6 +263,11 @@ export declare class Empty implements ReadonlyHost {
     stat(path: Path): Observable<Stats<{}> | null>;
 }
 
+export interface EventOptions extends CustomDimensionsAndMetricsOptions {
+    label?: string;
+    value?: string;
+}
+
 export declare function extname(path: Path): string;
 
 export declare class FileAlreadyExistException extends BaseException {
@@ -224,6 +291,16 @@ export interface FormatValidatorError extends SchemaValidatorErrorBase {
     params: {
         format: string;
     };
+}
+
+export declare class ForwardingAnalytics implements Analytics {
+    protected _fn: AnalyticsForwarderFn;
+    constructor(_fn: AnalyticsForwarderFn);
+    event(category: string, action: string, options?: EventOptions): void;
+    flush(): Promise<void>;
+    pageview(path: string, options?: PageviewOptions): void;
+    screenview(screenName: string, appName: string, options?: ScreenviewOptions): void;
+    timing(category: string, variable: string, time: string | number, options?: TimingOptions): void;
 }
 
 export declare function fragment(path: string): PathFragment;
@@ -499,6 +576,16 @@ export interface LoggerMetadata extends JsonObject {
     path: string[];
 }
 
+export declare class LoggingAnalytics implements Analytics {
+    protected _logger: Logger;
+    constructor(_logger: Logger);
+    event(category: string, action: string, options?: EventOptions): void;
+    flush(): Promise<void>;
+    pageview(path: string, options?: PageviewOptions): void;
+    screenview(screenName: string, appName: string, options?: ScreenviewOptions): void;
+    timing(category: string, variable: string, time: string | number, options?: TimingOptions): void;
+}
+
 export declare type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
 export declare const magenta: (x: string) => string;
@@ -513,7 +600,62 @@ export declare class MergeConflictException extends BaseException {
     constructor(path: string);
 }
 
+export declare class MultiAnalytics implements Analytics {
+    protected _backends: Analytics[];
+    constructor(_backends?: Analytics[]);
+    event(category: string, action: string, options?: EventOptions): void;
+    flush(): Promise<void>;
+    pageview(path: string, options?: PageviewOptions): void;
+    push(...backend: Analytics[]): void;
+    screenview(screenName: string, appName: string, options?: ScreenviewOptions): void;
+    timing(category: string, variable: string, time: string | number, options?: TimingOptions): void;
+}
+
+export declare enum NgCliAnalyticsDimensions {
+    CpuCount = 1,
+    CpuSpeed = 2,
+    RamInMegabytes = 3,
+    NodeVersion = 4,
+    NgAddCollection = 6,
+    NgBuildBuildEventLog = 7,
+    BuildErrors = 20
+}
+
+export declare const NgCliAnalyticsDimensionsFlagInfo: {
+    [name: string]: [string, string];
+};
+
+export declare enum NgCliAnalyticsMetrics {
+    UNUSED_1 = 1,
+    UNUSED_2 = 2,
+    UNUSED_3 = 3,
+    UNUSED_4 = 4,
+    BuildTime = 5,
+    NgOnInitCount = 6,
+    InitialChunkSize = 7,
+    TotalChunkCount = 8,
+    TotalChunkSize = 9,
+    LazyChunkCount = 10,
+    LazyChunkSize = 11,
+    AssetCount = 12,
+    AssetSize = 13,
+    PolyfillSize = 14,
+    CssSize = 15
+}
+
+export declare const NgCliAnalyticsMetricsFlagInfo: {
+    [name: string]: [string, string];
+};
+
 export declare function noCacheNormalize(path: string): Path;
+
+export declare class NoopAnalytics implements Analytics {
+    event(): void;
+    flush(): Promise<void>;
+    pageview(): void;
+    screenview(): void;
+    timing(): void;
+}
 
 export declare function normalize(path: string): Path;
 
@@ -527,6 +669,11 @@ export declare class NullLogger extends Logger {
 }
 
 export declare function oneLine(strings: TemplateStringsArray, ...values: any[]): string;
+
+export interface PageviewOptions extends CustomDimensionsAndMetricsOptions {
+    hostname?: string;
+    title?: string;
+}
 
 export declare function parseJson(input: string, mode?: JsonParseMode, options?: ParseJsonOptions): JsonValue;
 
@@ -795,6 +942,12 @@ export declare class ScopedHost<T extends object> extends ResolverHost<T> {
     protected _resolve(path: Path): Path;
 }
 
+export interface ScreenviewOptions extends CustomDimensionsAndMetricsOptions {
+    appId?: string;
+    appInstallerId?: string;
+    appVersion?: string;
+}
+
 export declare class SimpleMemoryHost implements Host<{}> {
     protected _cache: Map<Path, Stats<SimpleMemoryHostStats>>;
     readonly capabilities: HostCapabilities;
@@ -1002,6 +1155,10 @@ export declare namespace test {
         clearRecords(): void;
         clone(): TestHost;
     }
+}
+
+export interface TimingOptions extends CustomDimensionsAndMetricsOptions {
+    label?: string;
 }
 
 export declare class TransformLogger extends Logger {

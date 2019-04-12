@@ -55,3 +55,7 @@ export * from './virtual-fs/host/index';
 // Start workspace namespace
 export * from './workspace/index';
 // End workspace namespace
+
+// Start analytics namespace
+export * from './analytics/index';
+// End analytics namespace
