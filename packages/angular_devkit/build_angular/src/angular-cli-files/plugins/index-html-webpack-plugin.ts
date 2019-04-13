@@ -7,7 +7,7 @@
  */
 import * as path from 'path';
 import { Compiler, compilation } from 'webpack';
-import { FileInfo, generateIndexHtml } from './generate-index-html';
+import { FileInfo, augmentIndexHtml } from '../utilities/index-file/augment-index-html';
 
 export interface IndexHtmlWebpackPluginOptions {
   input: string;
@@ -74,7 +74,7 @@ export class IndexHtmlWebpackPlugin {
         const entryFiles: FileInfo[] = (entrypoint && entrypoint.getFiles() || [])
           .map((f: string): FileInfo => ({
             name: entryName,
-            fileName: f,
+            file: f,
             extension: path.extname(f),
           }));
 
@@ -86,7 +86,7 @@ export class IndexHtmlWebpackPlugin {
       }
 
       const loadOutputFile = (name: string) => compilation.assets[name].source();
-      const indexSource = await generateIndexHtml({
+      const indexSource = await augmentIndexHtml({
         input: this._options.input,
         inputContent,
         baseHref: this._options.baseHref,

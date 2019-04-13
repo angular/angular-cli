@@ -13,6 +13,7 @@ import {
 import { WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
 import {
   experimental,
+  join,
   json,
   logging,
   normalize,
@@ -22,8 +23,8 @@ import {
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Observable, combineLatest, from, of } from 'rxjs';
-import { concatMap, map, switchMap } from 'rxjs/operators';
+import { Observable, combineLatest, from, of, zip } from 'rxjs';
+import { catchError, concatMap, map, switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
 import { NgBuildAnalyticsPlugin } from '../../plugins/webpack/analytics';
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
@@ -36,6 +37,7 @@ import {
   getStylesConfig,
   getWorkerConfig,
 } from '../angular-cli-files/models/webpack-configs';
+import { writeIndexHtml } from '../angular-cli-files/utilities/index-file/write-index-html';
 import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
 import {
   statsErrorsToString,
@@ -45,6 +47,7 @@ import {
 import { deleteOutputDir } from '../utils';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
 import { Schema as BrowserBuilderSchema } from './schema';
+import { isDifferentialLoadingNeeded } from './utils';
 
 export type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
   outputPath: string;
@@ -163,7 +166,7 @@ export function buildWebpackBrowser(
     switchMap(({ workspace, config }) => {
       if (options.deleteOutputPath) {
         return deleteOutputDir(
-          normalize(context.workspaceRoot),
+          root,
           normalize(options.outputPath),
           host,
         ).pipe(map(() => ({ workspace, config })));
@@ -184,18 +187,38 @@ export function buildWebpackBrowser(
         normalize(workspace.getProject(projectName).root),
       );
 
-      return combineLatest(
-        configs.map(config => runWebpack(config, context, { logging: loggingFn })),
+      // We use zip because when having multiple builds we want to wait
+      // for all builds to finish before processeding
+      return zip(
+        ...configs.map(config => runWebpack(config, context, { logging: loggingFn })),
       )
       .pipe(
         switchMap(buildEvents => {
-          if (buildEvents.length === 2) {
-            // todo implement writing index.html for differential loading in another PR
-          }
+          const success = buildEvents.every(r => r.success);
+          if (success && buildEvents.length === 2 && options.index) {
+            const { emittedFiles: ES5BuildFiles = [] } = buildEvents[0];
+            const { emittedFiles: ES2015BuildFiles = [] } = buildEvents[1];
 
-          return of(buildEvents);
+            return writeIndexHtml({
+              host,
+              outputPath: join(root, options.outputPath),
+              indexPath: join(root, options.index),
+              ES5BuildFiles,
+              ES2015BuildFiles,
+              baseHref: options.baseHref,
+              deployUrl: options.deployUrl,
+              sri: options.subresourceIntegrity,
+              scripts: options.scripts,
+              styles: options.styles,
+            })
+            .pipe(
+              map(() => ({ success: true })),
+              catchError(() => of({ success: false })),
+            );
+          } else {
+            return of({ success });
+          }
         }),
-        map(buildEvents => ({ success: buildEvents.every(r => r.success) })),
         concatMap(buildEvent => {
           if (buildEvent.success && !options.watch && options.serviceWorker) {
             return from(augmentAppWithServiceWorker(

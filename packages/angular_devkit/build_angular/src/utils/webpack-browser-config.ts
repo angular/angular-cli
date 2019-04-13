@@ -49,11 +49,16 @@ export async function generateWebpackConfig(
   // tslint:disable-next-line:no-implicit-dependencies
   const ts = await import('typescript');
 
-  // todo enabe when differential loading is complete
-  // const differentialLoading = isDifferentialLoadingNeeded(projectRoot, scriptTarget);
+  // At the moment, only the browser builder supports differential loading
+  // However this config generation is used by multiple builders such as dev-server
+  // const builderInfo = additionalOptions.builderInfo;
+  // const differentialLoading =
+  //   builderInfo
+  //   && builderInfo.builderName === 'browser'
+  //   && isDifferentialLoadingNeeded(projectRoot, scriptTarget);
   const differentialLoading = false;
+  const scriptTargets = [tsConfig.options.target];
 
-  const scriptTargets = [ tsConfig.options.target ];
   if (differentialLoading) {
     scriptTargets.unshift(ts.ScriptTarget.ES5);
   }
