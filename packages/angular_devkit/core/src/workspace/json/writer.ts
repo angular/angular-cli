@@ -15,6 +15,7 @@ import {
   JsonWorkspaceMetadata,
   JsonWorkspaceSymbol,
 } from './metadata';
+import { unescapeKey } from './utilities';
 
 export async function writeJsonWorkspace(
   workspace: WorkspaceDefinition,
@@ -211,7 +212,7 @@ function updateJsonWorkspace(metadata: JsonWorkspaceMetadata): string {
     const multiline = node.start.line !== node.end.line;
     const pathSegments = path.split('/');
     const depth = pathSegments.length - 1; // TODO: more complete analysis
-    const propertyOrIndex = pathSegments[depth];
+    const propertyOrIndex = unescapeKey(pathSegments[depth]);
     const jsonValue = normalizeValue(value, type);
     if (op === 'add' && jsonValue === undefined) {
       continue;
