@@ -98,6 +98,10 @@ export default async function () {
   }
   // Both Ivy and View Engine should support it.
   await replaceLoadChildren(`() => import('./lazy/lazy.module').then(m => m.LazyModule)`);
+
+  // TODO: remove cast after https://github.com/angular/angular/pull/29832 is released.
+  await replaceInFile(appRoutingModulePath, '];', '] as Routes;');
+
   await ng('e2e');
   await ng('e2e', '--prod');
 }
