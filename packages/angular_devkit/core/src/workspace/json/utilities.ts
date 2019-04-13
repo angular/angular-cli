@@ -65,6 +65,22 @@ function createPropertyDescriptor(value: JsonValue | undefined): PropertyDescrip
   };
 }
 
+export function escapeKey(key: string | number): string | number {
+  if (typeof key === 'number') {
+    return key;
+  }
+
+  return key.replace('~', '~0').replace('/', '~1');
+}
+
+export function unescapeKey(key: string | number): string | number {
+  if (typeof key === 'number') {
+    return key;
+  }
+
+  return key.replace('~1', '/').replace('~0', '~');
+}
+
 export function createVirtualAstObject<T extends object = JsonObject>(
   root: JsonAstObject,
   options: {
@@ -129,7 +145,7 @@ function create(
         return undefined;
       }
 
-      const propertyPath = path + '/' + p;
+      const propertyPath = path + '/' + escapeKey(p);
       const cacheEntry = cache.get(propertyPath);
       if (cacheEntry) {
         if (cacheEntry.value) {
@@ -153,7 +169,7 @@ function create(
         return false;
       }
 
-      return cache.has(path + '/' + p) || findNode(ast, p) !== undefined;
+      return cache.has(path + '/' + escapeKey(p)) || findNode(ast, p) !== undefined;
     },
     get(target: {}, p: PropertyKey): unknown {
       if (typeof p === 'symbol' || Reflect.has(target, p)) {
@@ -162,7 +178,7 @@ function create(
         return undefined;
       }
 
-      const propertyPath = path + '/' + p;
+      const propertyPath = path + '/' + escapeKey(p);
       const cacheEntry = cache.get(propertyPath);
       if (cacheEntry) {
         return cacheEntry.value;
@@ -200,7 +216,7 @@ function create(
       // TODO: Check if is JSON value
       const jsonValue = value as JsonValue;
 
-      const propertyPath = path + '/' + p;
+      const propertyPath = path + '/' + escapeKey(p);
       const cacheEntry = cache.get(propertyPath);
       if (cacheEntry) {
         const oldValue = cacheEntry.value;
@@ -227,7 +243,7 @@ function create(
         return false;
       }
 
-      const propertyPath = path + '/' + p;
+      const propertyPath = path + '/' + escapeKey(p);
       const cacheEntry = cache.get(propertyPath);
       if (cacheEntry) {
         const oldValue = cacheEntry.value;
@@ -267,7 +283,7 @@ function create(
       for (const key of cache.keys()) {
         const relativeKey = key.substr(path.length + 1);
         if (relativeKey.length > 0 && !relativeKey.includes('/')) {
-          keys.push(relativeKey);
+          keys.push(unescapeKey(relativeKey));
         }
       }
 

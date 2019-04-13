@@ -302,7 +302,7 @@ describe('JSON WorkspaceDefinition Tracks Workspace Changes', () => {
     expect(metadata.hasChanges).toBeTruthy();
     expect(metadata.changeCount).toBe(2);
 
-    change = metadata.findChangesForPath('/schematics/@angular/schematics:component')[0];
+    change = metadata.findChangesForPath('/schematics/@angular~1schematics:component')[0];
     expect(change).not.toBeUndefined();
     if (change) {
       expect(change.op).toBe('replace');
@@ -350,7 +350,7 @@ describe('JSON WorkspaceDefinition Tracks Workspace Changes', () => {
     expect(metadata.hasChanges).toBeTruthy();
     expect(metadata.changeCount).toBe(2);
 
-    change = metadata.findChangesForPath('/schematics/@angular/schematics:component')[0];
+    change = metadata.findChangesForPath('/schematics/@angular~1schematics:component')[0];
     expect(change).not.toBeUndefined();
     if (change) {
       expect(change.op).toBe('replace');
