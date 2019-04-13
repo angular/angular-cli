@@ -18,7 +18,7 @@ const parse5 = require('parse5');
 
 export type LoadOutputFileFunctionType = (file: string) => Promise<string>;
 
-export interface GenerateIndexHtmlOptions {
+export interface AugmentIndexHtmlOptions {
   /* Input file name (e. g. index.html) */
   input: string;
   /* Input contents */
@@ -46,7 +46,7 @@ export interface GenerateIndexHtmlOptions {
 }
 
 export interface FileInfo {
-  fileName: string;
+  file: string;
   name: string;
   extension: string;
 }
@@ -57,7 +57,7 @@ export interface FileInfo {
  * after processing several configurations in order to build different sets of
  * bundles for differential serving.
  */
-export async function generateIndexHtml(params: GenerateIndexHtmlOptions): Promise<Source> {
+export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise<Source> {
   const {
     loadOutputFile,
     files,
@@ -72,15 +72,15 @@ export async function generateIndexHtml(params: GenerateIndexHtmlOptions): Promi
   // Sort files in the order we want to insert them by entrypoint and dedupes duplicates
   const mergedFiles = [...noModuleFiles, ...moduleFiles, ...files];
   for (const entrypoint of entrypoints) {
-    for (const { extension, fileName, name } of mergedFiles) {
+    for (const { extension, file, name } of mergedFiles) {
       if (name !== entrypoint) { continue; }
 
       switch (extension) {
         case '.js':
-          scripts.add(fileName);
+          scripts.add(file);
           break;
         case '.css':
-          stylesheets.add(fileName);
+          stylesheets.add(file);
           break;
       }
     }
@@ -137,11 +137,17 @@ export async function generateIndexHtml(params: GenerateIndexHtmlOptions): Promi
 
     // We want to include nomodule or module when a file is not common amongs all
     // such as runtime.js
-    const scriptPredictor = ({ fileName }: FileInfo): boolean => fileName === script;
+    const scriptPredictor = ({ file }: FileInfo): boolean => file === script;
     if (!files.some(scriptPredictor)) {
-      if (noModuleFiles.some(scriptPredictor)) {
+      // in some cases for differential loading file with the same name is avialable in both
+      // nomodule and module such as scripts.js
+      // we shall not add these attributes if that's the case
+      const isNoModuleType = noModuleFiles.some(scriptPredictor);
+      const isModuleType = moduleFiles.some(scriptPredictor);
+
+      if (isNoModuleType && !isModuleType) {
         attrs.push({ name: 'nomodule', value: null });
-      } else if (moduleFiles.some(scriptPredictor)) {
+      } else if (isModuleType && !isNoModuleType) {
         attrs.push({ name: 'type', value: 'module' });
       }
     }
