@@ -15,7 +15,9 @@ import {
   addDeclarationToModule,
   addExportToModule,
   addProviderToModule,
+  addRouteDeclarationToModule,
   addSymbolToNgModuleMetadata,
+  getRouterModuleDeclaration
 } from './ast-utils';
 
 
@@ -204,5 +206,117 @@ describe('ast utils', () => {
     const output = applyChanges(modulePath, moduleContent, changes);
     expect(output).toMatch(/import { LogService } from '.\/log.service';/);
     expect(output).toMatch(/\},\r?\n\s*LogService\r?\n\s*\]/);
+  });
+
+  it('should add a route to the routes array', () => {
+    const moduleContent = `
+      import { BrowserModule } from '@angular/platform-browser';
+      import { NgModule } from '@angular/core';
+      import { AppComponent } from './app.component';
+
+      const routes = [];
+
+      @NgModule({
+        declarations: [
+          AppComponent
+        ],
+        imports: [
+          BrowserModule,
+          RouterModule.forRoot(routes)
+        ],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule { }
+    `;
+
+    const source = getTsSource(modulePath, moduleContent);
+    const changes = addRouteDeclarationToModule(source, './src/app', `{ path: 'foo', component: FooComponent }`);
+    const output = applyChanges(modulePath, moduleContent, [changes]);
+
+    expect(output).toMatch(/const routes = \[{ path: 'foo', component: FooComponent }\]/);
+  });
+
+  it('should add a route to the routes array when there are multiple declarations', () => {
+    const moduleContent = `
+      import { BrowserModule } from '@angular/platform-browser';
+      import { NgModule } from '@angular/core';
+      import { AppComponent } from './app.component';
+
+      const routes = [
+        { path: 'foo', component: FooComponent }
+      ];
+
+      @NgModule({
+        declarations: [
+          AppComponent
+        ],
+        imports: [
+          BrowserModule,
+          RouterModule.forRoot(routes)
+        ],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule { }
+    `;
+
+    const source = getTsSource(modulePath, moduleContent);
+    const changes = addRouteDeclarationToModule(source, './src/app', `{ path: 'bar', component: BarComponent }`);
+    const output = applyChanges(modulePath, moduleContent, [changes]);
+
+    expect(output).toMatch(
+      /const routes = \[([\n\r\t\s]+)?{ path: 'foo', component: FooComponent },([\n\r\t\s]+)?{ path: 'bar', component: BarComponent }([\n\r\t\s]+)?\]/
+    );
+  });
+
+  it('should add a route to the routes argument of RouteModule', () => {
+    const moduleContent = `
+      import { BrowserModule } from '@angular/platform-browser';
+      import { NgModule } from '@angular/core';
+      import { AppComponent } from './app.component';
+
+      @NgModule({
+        declarations: [
+          AppComponent
+        ],
+        imports: [
+          BrowserModule,
+          RouterModule.forRoot([])
+        ],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule { }
+    `;
+
+    const source = getTsSource(modulePath, moduleContent);
+    const changes = addRouteDeclarationToModule(source, './src/app', `{ path: 'foo', component: FooComponent }`);
+    const output = applyChanges(modulePath, moduleContent, [changes]);
+
+    expect(output).toMatch(/RouterModule\.forRoot\(\[{ path: 'foo', component: FooComponent }\]\)/);
+  });
+
+  it('should add a route to the routes argument of RouterModule when there are multiple declarations', () => {
+    const moduleContent = `
+      import { BrowserModule } from '@angular/platform-browser';
+      import { NgModule } from '@angular/core';
+      import { AppComponent } from './app.component';
+
+      @NgModule({
+        declarations: [
+          AppComponent
+        ],
+        imports: [
+          BrowserModule,
+          RouterModule.forRoot([{ path: 'foo', component: FooComponent }])
+        ],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule { }
+    `;
+
+    const source = getTsSource(modulePath, moduleContent);
+    const changes = addRouteDeclarationToModule(source, './src/app', `{ path: 'bar', component: BarComponent }`);
+    const output = applyChanges(modulePath, moduleContent, [changes]);
+
+    expect(output).toMatch(/RouterModule\.forRoot\(\[([\n\r\t\s]+)?{ path: 'foo', component: FooComponent },([\n\r\t\s]+)?{ path: 'bar', component: BarComponent }([\n\r\t\s]+)?\]\)/)
   });
 });
