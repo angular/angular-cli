@@ -36,5 +36,5 @@ export * from './extract-i18n';
 export * from './karma';
 export * from './karma/schema';
 export * from './protractor';
-export * from './server';
+export { execute as executeServerBuilder } from './server';
 export * from './tslint';
