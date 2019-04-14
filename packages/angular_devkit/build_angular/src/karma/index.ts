@@ -18,6 +18,7 @@ import {
   getWorkerConfig,
 } from '../angular-cli-files/models/webpack-configs';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
+import { ExecutionTransformer } from '../transforms';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
 import { Schema as KarmaBuilderOptions } from './schema';
 
@@ -27,12 +28,10 @@ type KarmaConfigOptions = import ('karma').ConfigOptions & {
   configFile?: string;
 };
 
-type WebpackConfigurationTransformer =
-  (configuration: webpack.Configuration) => webpack.Configuration;
-
 async function initialize(
   options: KarmaBuilderOptions,
   context: BuilderContext,
+  webpackConfigurationTransformer?: ExecutionTransformer<webpack.Configuration>,
   // tslint:disable-next-line:no-implicit-dependencies
 ): Promise<[typeof import ('karma'), webpack.Configuration]> {
   const { config } = await generateBrowserWebpackConfigFromContext(
@@ -53,18 +52,22 @@ async function initialize(
   // tslint:disable-next-line:no-implicit-dependencies
   const karma = await import('karma');
 
-  return [karma, config[0]];
+  return [
+    karma,
+    webpackConfigurationTransformer ? await webpackConfigurationTransformer(config[0]) : config[0],
+  ];
 }
 
 export function execute(
   options: KarmaBuilderOptions,
   context: BuilderContext,
   transforms: {
-    webpackConfiguration?: WebpackConfigurationTransformer,
+    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>,
+    // The karma options transform cannot be async without a refactor of the builder implementation
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions,
   } = {},
 ): Observable<BuilderOutput> {
-  return from(initialize(options, context)).pipe(
+  return from(initialize(options, context, transforms.webpackConfiguration)).pipe(
     switchMap(([karma, webpackConfig]) => new Observable<BuilderOutput>(subscriber => {
       const karmaOptions: KarmaConfigOptions = {};
 
@@ -93,9 +96,7 @@ export function execute(
 
       karmaOptions.buildWebpack = {
         options,
-        webpackConfig: transforms.webpackConfiguration
-          ? transforms.webpackConfiguration(webpackConfig)
-          : webpackConfig,
+        webpackConfig,
         // Pass onto Karma to emit BuildEvents.
         successCb: () => subscriber.next({ success: true }),
         failureCb: () => subscriber.next({ success: false }),

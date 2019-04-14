@@ -12,7 +12,7 @@
 // See https://github.com/angular/angular-cli/issues/9691#issuecomment-367322703 for details.
 // We need to add a require here to satisfy the dependency checker.
 // require('ajv');
-
+export * from './transforms';
 export * from './app-shell';
 export * from './browser';
 export {

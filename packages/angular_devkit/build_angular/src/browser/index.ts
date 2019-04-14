@@ -23,7 +23,7 @@ import {
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Observable, combineLatest, from, of, zip } from 'rxjs';
+import { from, of, zip } from 'rxjs';
 import { catchError, concatMap, map, switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
 import { NgBuildAnalyticsPlugin } from '../../plugins/webpack/analytics';
@@ -44,6 +44,7 @@ import {
   statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
+import { ExecutionTransformer } from '../transforms';
 import { deleteOutputDir } from '../utils';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
 import { Schema as BrowserBuilderSchema } from './schema';
@@ -77,7 +78,7 @@ export function createBrowserLoggingCallback(
 export async function buildBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,
   context: BuilderContext,
-  host: virtualFs.Host<fs.Stats>,
+  host: virtualFs.Host<fs.Stats> = new NodeJsSyncHost(),
 ): Promise<{ workspace: experimental.workspace.Workspace, config: webpack.Configuration[] }> {
   return generateBrowserWebpackConfigFromContext(
     options,
@@ -126,53 +127,48 @@ function getCompilerConfig(wco: WebpackConfigOptions): webpack.Configuration {
   return {};
 }
 
-export type BrowserConfigTransformFn = (
-  workspace: experimental.workspace.Workspace,
-  config: webpack.Configuration,
-) => Observable<webpack.Configuration>;
+async function initialize(
+  options: BrowserBuilderSchema,
+  context: BuilderContext,
+  host: virtualFs.Host<fs.Stats>,
+  webpackConfigurationTransform?: ExecutionTransformer<webpack.Configuration>,
+): Promise<{ workspace: experimental.workspace.Workspace, config: webpack.Configuration[] }> {
+  const { config, workspace } = await buildBrowserWebpackConfigFromContext(options, context, host);
 
+  let transformedConfig;
+  if (webpackConfigurationTransform) {
+    transformedConfig = [];
+    for (const c of config) {
+      transformedConfig.push(await webpackConfigurationTransform(c));
+    }
+  }
+
+  if (options.deleteOutputPath) {
+    await deleteOutputDir(
+      normalize(context.workspaceRoot),
+      normalize(options.outputPath),
+      host,
+    ).toPromise();
+  }
+
+  return { config: transformedConfig || config, workspace };
+}
 
 export function buildWebpackBrowser(
   options: BrowserBuilderSchema,
   context: BuilderContext,
   transforms: {
-    config?: BrowserConfigTransformFn,
-    output?: (output: BrowserBuilderOutput) => Observable<BuilderOutput>,
+    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>,
     logging?: WebpackLoggingCallback,
   } = {},
 ) {
   const host = new NodeJsSyncHost();
   const root = normalize(context.workspaceRoot);
 
-  const configFn = transforms.config;
-  const outputFn = transforms.output;
   const loggingFn = transforms.logging
     || createBrowserLoggingCallback(!!options.verbose, context.logger);
 
-  // This makes a host observable into a cold one. This is because we want to wait until
-  // subscription before calling buildBrowserWebpackConfigFromContext, which can throw.
-  return of(null).pipe(
-    switchMap(() => from(buildBrowserWebpackConfigFromContext(options, context, host))),
-    switchMap(({ workspace, config }) => {
-      if (configFn) {
-        return combineLatest(config.map(config => configFn(workspace, config))).pipe(
-          map(config => ({ workspace, config })),
-        );
-      } else {
-        return of({ workspace, config });
-      }
-    }),
-    switchMap(({ workspace, config }) => {
-      if (options.deleteOutputPath) {
-        return deleteOutputDir(
-          root,
-          normalize(options.outputPath),
-          host,
-        ).pipe(map(() => ({ workspace, config })));
-      } else {
-        return of({ workspace, config });
-      }
-    }),
+  return from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
     switchMap(({ workspace, config: configs }) => {
       const projectName = context.target
         ? context.target.project : workspace.getDefaultProjectName();
@@ -237,11 +233,9 @@ export function buildWebpackBrowser(
           // If we use differential loading, both configs have the same outputs
           outputPath: path.resolve(context.workspaceRoot, options.outputPath),
         } as BrowserBuilderOutput)),
-        concatMap(output => outputFn ? outputFn(output) : of(output)),
       );
     }),
   );
 }
-
 
 export default createBuilder<json.JsonObject & BrowserBuilderSchema>(buildWebpackBrowser);

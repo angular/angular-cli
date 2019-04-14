@@ -27,11 +27,11 @@ import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
 import { checkPort } from '../angular-cli-files/utilities/check-port';
 import {
-  BrowserConfigTransformFn,
   buildBrowserWebpackConfigFromContext,
   createBrowserLoggingCallback,
 } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
+import { ExecutionTransformer } from '../transforms';
 import { normalizeOptimization } from '../utils';
 import { Schema } from './schema';
 const open = require('open');
@@ -75,8 +75,7 @@ export function serveWebpackBrowser(
   options: DevServerBuilderSchema,
   context: BuilderContext,
   transforms: {
-    browserConfig?: BrowserConfigTransformFn,
-    serverConfig?: ServerConfigTransformFn,
+    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>,
     logging?: WebpackLoggingCallback,
   } = {},
 ): Observable<DevServerBuilderOutput> {
@@ -123,22 +122,17 @@ export function serveWebpackBrowser(
 
     // No differential loading for dev-server, hence there is just one config
     let webpackConfig = webpackConfigResult.config[0];
-    const workspace = webpackConfigResult.workspace;
-
-    if (transforms.browserConfig) {
-      webpackConfig = await transforms.browserConfig(workspace, webpackConfig).toPromise();
-    }
 
     const port = await checkPort(options.port || 0, options.host || 'localhost', 4200);
-    let webpackDevServerConfig = buildServerConfig(
+    const webpackDevServerConfig = webpackConfig.devServer = buildServerConfig(
       root,
       options,
       browserOptions,
       context.logger,
     );
 
-    if (transforms.serverConfig) {
-      webpackDevServerConfig = await transforms.serverConfig(workspace, webpackConfig).toPromise();
+    if (transforms.webpackConfiguration) {
+      webpackConfig = await transforms.webpackConfiguration(webpackConfig);
     }
 
     return { browserOptions, webpackConfig, webpackDevServerConfig, port };
@@ -208,7 +202,6 @@ export function serveWebpackBrowser(
       `);
 
       openAddress = serverAddress + webpackDevServerConfig.publicPath;
-      webpackConfig.devServer = webpackDevServerConfig;
 
       return runWebpackDevServer(webpackConfig, context, { logging: loggingFn });
     }),
