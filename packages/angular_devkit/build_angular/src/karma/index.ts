@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import { experimental, normalize, schema } from '@angular-devkit/core';
+import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { resolve } from 'path';
 import { Observable, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -27,15 +29,22 @@ type KarmaConfigOptions = import ('karma').ConfigOptions & {
   configFile?: string;
 };
 
-type WebpackConfigurationTransformer =
-  (configuration: webpack.Configuration) => webpack.Configuration;
+type WebpackConfigurationTransformer = (
+  workspace: experimental.workspace.Workspace,
+  configuration: webpack.Configuration) => Observable<webpack.Configuration>;
+
+export interface Transforms {
+  config?: WebpackConfigurationTransformer;
+  karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
+}
 
 async function initialize(
   options: KarmaBuilderOptions,
   context: BuilderContext,
+  transforms: Transforms,
   // tslint:disable-next-line:no-implicit-dependencies
 ): Promise<[typeof import ('karma'), webpack.Configuration]> {
-  const { config } = await generateBrowserWebpackConfigFromContext(
+  let { config } = await generateBrowserWebpackConfigFromContext(
     // only two properties are missing:
     // * `outputPath` which is fixed for tests
     // * `budgets` which might be incorrect due to extra dev libs
@@ -50,6 +59,21 @@ async function initialize(
     ],
   );
 
+  if (transforms && transforms.config) {
+    const host = new NodeJsSyncHost();
+    const root = normalize(context.workspaceRoot);
+    const registry = new schema.CoreSchemaRegistry();
+
+    const workspace = await experimental.workspace.Workspace.fromPath(
+      host,
+      normalize(context.workspaceRoot),
+      registry);
+
+    // As differential loading is not supported by this builder
+    // we can go with the first configuration
+    config = [await transforms.config(workspace, config[0]).toPromise()];
+  }
+
   // tslint:disable-next-line:no-implicit-dependencies
   const karma = await import('karma');
 
@@ -59,12 +83,9 @@ async function initialize(
 export function execute(
   options: KarmaBuilderOptions,
   context: BuilderContext,
-  transforms: {
-    webpackConfiguration?: WebpackConfigurationTransformer,
-    karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions,
-  } = {},
+  transforms: Transforms = {},
 ): Observable<BuilderOutput> {
-  return from(initialize(options, context)).pipe(
+  return from(initialize(options, context, transforms)).pipe(
     switchMap(([karma, webpackConfig]) => new Observable<BuilderOutput>(subscriber => {
       const karmaOptions: KarmaConfigOptions = {};
 
@@ -93,9 +114,7 @@ export function execute(
 
       karmaOptions.buildWebpack = {
         options,
-        webpackConfig: transforms.webpackConfiguration
-          ? transforms.webpackConfiguration(webpackConfig)
-          : webpackConfig,
+        webpackConfig,
         // Pass onto Karma to emit BuildEvents.
         successCb: () => subscriber.next({ success: true }),
         failureCb: () => subscriber.next({ success: false }),
