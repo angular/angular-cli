@@ -10,25 +10,23 @@ import { Architect } from '@angular-devkit/architect/src/index';
 import { PathFragment } from '@angular-devkit/core';
 import { browserBuild, createArchitect, host } from '../utils';
 
-// This feature is currently hidden behind a flag
-xdescribe('Browser Builder with differential loading', () => {
+describe('Browser Builder with differential loading', () => {
   const target = { project: 'app', target: 'build' };
   let architect: Architect;
 
   beforeEach(async () => {
     await host.initialize().toPromise();
+    // to trigger differential loading we need an non ever green browser
+    host.writeMultipleFiles({
+      'browserslist': 'IE 10',
+    });
+
     architect = (await createArchitect(host.root())).architect;
   });
 
   afterEach(async () => host.restore().toPromise());
 
   it('emits all the neccessary files', async () => {
-    host.replaceInFile(
-      'tsconfig.json',
-      '"target": "es5"',
-      '"target": "es2015"',
-    );
-
     const { files } = await browserBuild(architect, host, target);
 
     const expectedOutputs = [
@@ -66,15 +64,8 @@ xdescribe('Browser Builder with differential loading', () => {
   });
 
   it('emits the right ES formats', async () => {
-    host.replaceInFile(
-      'tsconfig.json',
-      '"target": "es5"',
-      '"target": "es2015"',
-    );
-
     const { files } = await browserBuild(architect, host, target, { optimization: true });
     expect(await files['main-es5.js']).not.toContain('class');
     expect(await files['main-es2015.js']).toContain('class');
   });
-
 });
