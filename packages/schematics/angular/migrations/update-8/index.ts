@@ -11,6 +11,7 @@ import {
   chain,
 } from '@angular-devkit/schematics';
 import { updatePackageJson, updateTsLintConfig } from './codelyzer-5';
+import { updateES5Projects } from './differential-loading';
 import { dropES2015Polyfills } from './drop-es6-polyfills';
 
 export default function(): Rule {
@@ -19,6 +20,7 @@ export default function(): Rule {
       updateTsLintConfig(),
       updatePackageJson(),
       dropES2015Polyfills(),
+      updateES5Projects(),
     ]);
   };
 }
