@@ -80,6 +80,7 @@ const ignoredPackages = [
   '@bazel/bazel-linux_x64@0.24.1',
   '@bazel/buildifier@0.22.0',
   '@bazel/buildifier-linux_x64@0.22.0',
+  '@bazel/jasmine@0.26.0',
 
   // * Other
   'font-awesome@4.7.0', // (OFL-1.1 AND MIT)
