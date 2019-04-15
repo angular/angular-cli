@@ -29,8 +29,8 @@ ts_library(
         ":pwa_schema",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
-        "@npm//rxjs",
         "@npm//@types/node",
+        "@npm//rxjs",
     ],
 )
 

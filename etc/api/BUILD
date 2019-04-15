@@ -11,6 +11,13 @@ load("@angular//tools/ts-api-guardian:index.bzl", "ts_api_guardian_test")
         bundle[1],
         bundle[2],
     ),
+    allow_module_identifiers = [
+        "fs",
+        "ts",
+        "ajv",
+        "Symbol",
+        "webpack",
+    ],
     data = glob([
         "%s/%s/**/*.d.ts" % (
             bundle[0],
@@ -37,13 +44,6 @@ load("@angular//tools/ts-api-guardian:index.bzl", "ts_api_guardian_test")
         "^formats$",
         # @angular-devkit/build-optimizer
         "^buildOptimizerLoader$",
-    ],
-    allow_module_identifiers = [
-        "fs",
-        "ts",
-        "ajv",
-        "Symbol",
-        "webpack",
     ],
     # At the moment using this will ignore a big change
     use_angular_tag_rules = False,

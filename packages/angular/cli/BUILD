@@ -19,7 +19,10 @@ ts_library(
             "**/*_spec_large.ts",
         ],
     ),
-    data = glob(["**/*.json", "**/*.md"]),
+    data = glob([
+        "**/*.json",
+        "**/*.md",
+    ]),
     module_name = "@angular/cli",
     # strict_checks = False,
     deps = [

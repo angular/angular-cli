@@ -14,15 +14,14 @@ ts_library(
     name = "parse_bep",
     srcs = ["parse_bep.ts"],
     deps = [
-      ":build_event_stream",
-      "@npm//@types/node",
-      "@npm//rxjs",
-      
+        ":build_event_stream",
+        "@npm//@types/node",
+        "@npm//rxjs",
     ],
 )
 
 nodejs_binary(
     name = "parse",
-    entry_point = "angular_devkit/tools/build_event_protocol/parse_bep",
     data = [":parse_bep"],
+    entry_point = "angular_devkit/tools/build_event_protocol/parse_bep",
 )

@@ -27,11 +27,9 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tasks",
-        "@npm//rxjs",
-        "@npm//semver",
-        
         "@npm//@types/node",
         "@npm//@types/semver",
+        "@npm//rxjs",
     ],
 )
 
@@ -47,6 +45,7 @@ ts_json_schema(
 
 ts_library(
     name = "update_test_lib",
+    testonly = True,
     srcs = glob(
         include = [
             "**/*_spec.ts",
@@ -56,25 +55,23 @@ ts_library(
     data = glob(
         include = [
             "**/*.json",
-        ]
+        ],
     ),
+    # @external_begin
+    tsconfig = "//:tsconfig-test.json",
     deps = [
         ":update",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:testing",
-        "@npm//rxjs",
-        
         "@npm//@types/jasmine",
         "@npm//@types/node",
         "@npm//@types/semver",
         "@npm//@yarnpkg/lockfile",
         "@npm//ini",
         "@npm//pacote",
+        "@npm//rxjs",
     ],
-    testonly = True,
-    # @external_begin
-    tsconfig = "//:tsconfig-test.json",
     # @external_end
 )
 
@@ -83,7 +80,7 @@ jasmine_node_test(
     srcs = [":update_test_lib"],
     deps = [
         "@npm//jasmine",
-        "@npm//source-map",
         "@npm//npm-registry-client",
+        "@npm//source-map",
     ],
 )

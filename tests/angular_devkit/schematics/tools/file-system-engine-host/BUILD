@@ -16,7 +16,10 @@ ts_library(
         ],
     ),
     data = glob(
-        include = ["**/collection.json", "**/*.js"],
+        include = [
+            "**/collection.json",
+            "**/*.js",
+        ],
     ),
     deps = [
         "//packages/angular_devkit/schematics",
@@ -24,7 +27,7 @@ ts_library(
         # "//packages/angular_devkit/core",
         # "//packages/angular_devkit/core:node",
         # "@npm//rxjs",
-        # 
+        #
         "@npm//@types/jasmine",
         "@npm//@types/node",
     ],
