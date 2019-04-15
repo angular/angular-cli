@@ -26,18 +26,14 @@ _ts_json_schema_interface = rule(
     _ts_json_schema_interface_impl,
     attrs = {
         "src": attr.label(
-            allow_files = FileType([
-                ".json",
-            ]),
+            allow_files = [".json"],
             mandatory = True,
         ),
         "out": attr.string(
             mandatory = True,
         ),
         "data": attr.label_list(
-            allow_files = FileType([
-                ".json",
-            ]),
+            allow_files = [".json"],
         ),
         "_binary": attr.label(
             default = Label("//tools:quicktype_runner"),

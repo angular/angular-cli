@@ -188,6 +188,48 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
+"@bazel/bazel-darwin_x64@0.24.0":
+  version "0.24.0"
+  resolved "https://registry.yarnpkg.com/@bazel/bazel-darwin_x64/-/bazel-darwin_x64-0.24.0.tgz#828ef298d8d542961df388f17b0244f4f4302a74"
+  integrity sha512-xly44vkcD/fauUb7Lm5Lme4qhEZdkuuyBKSVQUHPbYAGDdbj/W8dupI3bZREkJAgG/WrRU+WXUemMj4U8ZcLcw==
+
+"@bazel/bazel-linux_x64@0.24.0":
+  version "0.24.0"
+  resolved "https://registry.yarnpkg.com/@bazel/bazel-linux_x64/-/bazel-linux_x64-0.24.0.tgz#9ef2e7266833ad2221fe4af4ceb6763d2897e3ff"
+  integrity sha512-p5ylPLWnJZDGbaIFBrtD/tp3Su5rMdzeeNJKU24XyiWQTHVZ3OD3I2Fb0ILCgfBjY8AlA7EtCtOI4hYnAuIOtg==
+
+"@bazel/bazel-win32_x64@0.24.0":
+  version "0.24.0"
+  resolved "https://registry.yarnpkg.com/@bazel/bazel-win32_x64/-/bazel-win32_x64-0.24.0.tgz#02d83113a6c6ed99795a3e41bff5631aa141638d"
+  integrity sha512-/bcSEx+GoV/q7H4WM0jazfxTcurSiIIePhRv+d05mxRDcaWwhCO8KzmmZRWH1abW6npvq5tLkbSQi7G7nUBhgg==
+
+"@bazel/bazel@^0.24.0":
+  version "0.24.0"
+  resolved "https://registry.yarnpkg.com/@bazel/bazel/-/bazel-0.24.0.tgz#f4e68e3680ac299858c24c26be3d08d1151e78fc"
+  integrity sha512-/5E55tqH9ogAGF9Dd7RSCJmk7/xdlsPTAhsX3yEsEMs7GLdHlgD3jbeePsKUiHKKr8LXAufjTs2pXQfjrkZRMg==
+  optionalDependencies:
+    "@bazel/bazel-darwin_x64" "0.24.0"
+    "@bazel/bazel-linux_x64" "0.24.0"
+    "@bazel/bazel-win32_x64" "0.24.0"
+
+"@bazel/buildifier-darwin_x64@0.22.0":
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier-darwin_x64/-/buildifier-darwin_x64-0.22.0.tgz#00dde7ce03be8c550b3908dd91cf1fc0baef7ff7"
+  integrity sha512-tpJ6w3mmh8wBm/k5AidAZvjWm3Hge3ipSjGtxTfq/xgUCacAtGt219nwyAMs0CwLPuABLbcINQmmKtG5VpxK9A==
+
+"@bazel/buildifier-linux_x64@0.22.0":
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier-linux_x64/-/buildifier-linux_x64-0.22.0.tgz#146c44bafbb1e4711725414582a49835d04b8618"
+  integrity sha512-qaE7QF2YHKOXFBk2QcwOBfA3Ipm08vP9ZK9Vxtubbq9O0MM5tWvfKI48VkfX6pg8QNXDJ+sBndznxQSSWstsWQ==
+
+"@bazel/buildifier@^0.22.0":
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-0.22.0.tgz#d1abc2ce4317ba71351276c6b1b9e1533abf8e3d"
+  integrity sha512-S+mrUwanR8HMcp92iEDk4D1oOLsVhCM42Hx0rqL1eVmXPwLYL+F/sIjeGTw/6BgxMEHVSl2M3CcTFAS0b60BTQ==
+  optionalDependencies:
+    "@bazel/buildifier-darwin_x64" "0.22.0"
+    "@bazel/buildifier-linux_x64" "0.22.0"
+
 "@bazel/karma@~0.26.0":
   version "0.26.0"
   resolved "https://registry.yarnpkg.com/@bazel/karma/-/karma-0.26.0.tgz#6ad796686f5775df33a96fa5ef3df76a66aed3b2"
