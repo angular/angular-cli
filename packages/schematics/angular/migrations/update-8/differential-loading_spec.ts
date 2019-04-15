@@ -1,0 +1,78 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+
+import { EmptyTree } from '@angular-devkit/schematics';
+import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+
+
+describe('Migration to version 8', () => {
+  describe('Migrate ES5 projects to enable differential loading', () => {
+    const tsConfigPath = '/tsconfig.json';
+    const oldTsConfig = {
+      compilerOptions: {
+        module: 'es2015',
+        moduleResolution: 'node',
+        typeRoots: [
+          'node_modules/@types',
+        ],
+      },
+    };
+
+    const schematicRunner = new SchematicTestRunner(
+      'migrations',
+      require.resolve('../migration-collection.json'),
+    );
+
+    let tree: UnitTestTree;
+
+    beforeEach(async () => {
+      tree = new UnitTestTree(new EmptyTree());
+      tree = await schematicRunner.runExternalSchematicAsync(
+        require.resolve('../../collection.json'), 'ng-new',
+        {
+          name: 'migration-test',
+          version: '1.2.3',
+          directory: '.',
+        },
+        tree,
+      ).toPromise();
+      tree.overwrite(tsConfigPath, JSON.stringify(oldTsConfig, null, 2));
+    });
+
+    it(`should update 'target' to es2015 when property exists`, () => {
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
+      const { target } = JSON.parse(tree2.readContent(tsConfigPath)).compilerOptions;
+      expect(target).toBe('es2015');
+    });
+
+    it(`should create 'target' property when doesn't exists`, () => {
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
+      const compilerOptions = {
+        ...oldTsConfig.compilerOptions,
+        target: undefined,
+      };
+
+      tree.overwrite(tsConfigPath, JSON.stringify({ compilerOptions }, null, 2));
+      const { target } = JSON.parse(tree2.readContent(tsConfigPath)).compilerOptions;
+      expect(target).toBe('es2015');
+    });
+
+    it(`should update browserslist file to add an non evergreen browser`, () => {
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
+      expect(tree2.readContent('/browserslist')).toContain('Chrome 41');
+    });
+
+    it(`should create browserslist file if it doesn't exist`, () => {
+      tree.delete('/browserslist');
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
+      expect(tree2.exists('/browserslist')).toBe(true);
+      expect(tree2.readContent('/browserslist'))
+        .toContain('Googlebot support');
+    });
+  });
+});
