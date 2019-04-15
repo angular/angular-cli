@@ -25,15 +25,15 @@ ts_library(
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
-        "@npm//rxjs",
-        
-        "@npm//@types/node",
         "@npm//@types/minimist",
+        "@npm//@types/node",
+        "@npm//rxjs",
     ],
 )
 
 ts_library(
     name = "benchmark_test_lib",
+    testonly = True,
     srcs = glob(
         include = [
             "src/**/*_spec.ts",
@@ -45,18 +45,16 @@ ts_library(
         "src/test/fibonacci.js",
         "src/test/test-script.js",
     ],
+    # @external_begin
+    tsconfig = "//:tsconfig-test.json",
     deps = [
         ":benchmark",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
-        "@npm//rxjs",
-        
-        "@npm//@types/node",
         "@npm//@types/jasmine",
+        "@npm//@types/node",
+        "@npm//rxjs",
     ],
-    testonly = True,
-    # @external_begin
-    tsconfig = "//:tsconfig-test.json",
     # @external_end
 )
 
@@ -65,12 +63,12 @@ jasmine_node_test(
     srcs = [":benchmark_test_lib"],
     deps = [
         "@npm//jasmine",
-        "@npm//source-map",
         "@npm//minimist",
-        "@npm//pidusage",
         "@npm//pidtree",
-        "@npm//tree-kill",
+        "@npm//pidusage",
+        "@npm//source-map",
         "@npm//temp",
+        "@npm//tree-kill",
     ],
 )
 

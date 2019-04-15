@@ -29,7 +29,6 @@ ts_library(
     # strict_checks = False,
     deps = [
         "@npm//rxjs",
-        
         "@npm//@types/node",
         "@npm//@types/source-map",
         "@npm//ajv",
@@ -42,28 +41,27 @@ ts_library(
 
 ts_library(
     name = "core_test_lib",
+    testonly = True,
     srcs = glob(
         include = [
             "src/**/*_spec.ts",
             "src/**/*_spec_large.ts",
         ],
     ),
+    data = [
+        "src/experimental/workspace/test/test-workspace.json",
+        "src/experimental/workspace/workspace-schema.json",
+    ],
+    # @external_begin
+    tsconfig = "//:tsconfig-test.json",
     # strict_checks = False,
     deps = [
         ":core",
         ":node",
-        "@npm//rxjs",
-        
-        "@npm//@types/node",
         "@npm//@types/jasmine",
+        "@npm//@types/node",
+        "@npm//rxjs",
     ],
-    data = [
-        "src/experimental/workspace/workspace-schema.json",
-        "src/experimental/workspace/test/test-workspace.json"
-    ],
-    testonly = True,
-    # @external_begin
-    tsconfig = "//:tsconfig-test.json",
     # @external_end
 )
 
@@ -75,7 +73,6 @@ jasmine_node_test(
         "@npm//source-map",
     ],
 )
-
 
 # @angular-devkit/core/node
 
@@ -94,32 +91,30 @@ ts_library(
     module_root = "node/index.d.ts",
     deps = [
         ":core",
-        "@npm//rxjs",
-        
         "@npm//@types/node",
+        "@npm//rxjs",
     ],
 )
 
 ts_library(
     name = "node_test_lib",
+    testonly = True,
     srcs = glob(
         include = [
             "node/**/*_spec.ts",
             "node/**/*_spec_large.ts",
         ],
     ),
+    # @external_begin
+    tsconfig = "//:tsconfig-test.json",
     deps = [
         ":core",
         ":node",
         "//tests/angular_devkit/core/node/jobs:jobs_test_lib",
-        "@npm//rxjs",
-        
-        "@npm//@types/node",
         "@npm//@types/jasmine",
+        "@npm//@types/node",
+        "@npm//rxjs",
     ],
-    testonly = True,
-    # @external_begin
-    tsconfig = "//:tsconfig-test.json",
     # @external_end
 )
 
@@ -127,14 +122,13 @@ jasmine_node_test(
     name = "node_test",
     srcs = [":node_test_lib"],
     deps = [
-        "@npm//jasmine",
         "@npm//chokidar",
+        "@npm//jasmine",
         "@npm//source-map",
         "@npm//temp",
         "@npm//tslint",
     ],
 )
-
 
 # @angular-devkit/core/node/testing
 
@@ -154,10 +148,9 @@ ts_library(
     deps = [
         ":core",
         ":node",
-        "@npm//rxjs",
-        
-        "@npm//@types/node",
         "@npm//@types/jasmine",
+        "@npm//@types/node",
+        "@npm//rxjs",
     ],
 )
 

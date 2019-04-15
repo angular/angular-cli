@@ -19,10 +19,9 @@ ts_library(
         "//packages/angular_devkit/architect:node",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
-        "@npm//rxjs",
-        
-        "@npm//@types/node",
         "@npm//@types/minimist",
+        "@npm//@types/node",
         "@npm//@types/progress",
+        "@npm//rxjs",
     ],
 )

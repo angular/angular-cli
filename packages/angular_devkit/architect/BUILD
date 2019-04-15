@@ -15,14 +15,17 @@ ts_json_schema(
     name = "builder_input_schema",
     src = "src/input-schema.json",
 )
+
 ts_json_schema(
     name = "builder_output_schema",
     src = "src/output-schema.json",
 )
+
 ts_json_schema(
     name = "builder_builders_schema",
     src = "src/builders-schema.json",
 )
+
 ts_json_schema(
     name = "progress_schema",
     src = "src/progress-schema.json",
@@ -41,15 +44,14 @@ ts_library(
     module_root = "node/index.d.ts",
     # strict_checks = False,
     deps = [
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core:node",
-        "@npm//rxjs",
-        
-        "@npm//@types/node",
         ":architect",
         ":builder_builders_schema",
         ":builder_input_schema",
         ":builder_output_schema",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core:node",
+        "@npm//@types/node",
+        "@npm//rxjs",
     ],
 )
 
@@ -62,18 +64,18 @@ ts_library(
             "**/*_spec_large.ts",
         ],
     ),
-    module_name = "@angular-devkit/architect",
-    module_root = "src/index.d.ts",
     # strict_checks = False,
     data = glob(["**/*.json"]),
+    module_name = "@angular-devkit/architect",
+    module_root = "src/index.d.ts",
     deps = [
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core:node",
-        "@npm//rxjs",
-        "@npm//@types/node",
         ":builder_input_schema",
         ":builder_output_schema",
         ":progress_schema",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core:node",
+        "@npm//@types/node",
+        "@npm//rxjs",
     ],
 )
 
@@ -92,17 +94,15 @@ ts_library(
         ":architect",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
-        "@npm//rxjs",
-        
         "@npm//@types/node",
+        "@npm//rxjs",
     ],
 )
-
 
 npm_package(
     name = "npm_package",
     deps = [
         ":architect",
-        ":testing"
+        ":testing",
     ],
 )

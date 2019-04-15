@@ -26,29 +26,29 @@ ts_library(
     deps = [
         "@npm//@types/node",
         "@npm//@types/source-map",
-        "@npm//typescript",
         "@npm//@types/webpack",
+        "@npm//typescript",
     ],
 )
 
 ts_library(
     name = "build_optimizer_test_lib",
+    testonly = True,
     srcs = glob(
         include = [
             "src/**/*_spec.ts",
             "src/**/*_spec_large.ts",
         ],
     ),
+    # @external_begin
+    tsconfig = "//:tsconfig-test.json",
     deps = [
         ":build_optimizer",
         "//packages/angular_devkit/core",
-        "@npm//@types/node",
         "@npm//@types/jasmine",
+        "@npm//@types/node",
         "@npm//@types/source-map",
     ],
-    testonly = True,
-    # @external_begin
-    tsconfig = "//:tsconfig-test.json",
     # @external_end
 )
 
@@ -58,7 +58,7 @@ jasmine_node_test(
     deps = [
         "@npm//jasmine",
         "@npm//source-map",
-    ]
+    ],
 )
 
 npm_package(
