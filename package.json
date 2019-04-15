@@ -83,7 +83,7 @@
   "devDependencies": {
     "@angular/compiler": "^8.0.0-beta.12",
     "@angular/compiler-cli": "^8.0.0-beta.12",
-    "@bazel/bazel": "^0.24.0",
+    "@bazel/bazel": "0.24.1",
     "@bazel/buildifier": "^0.22.0",
     "@bazel/karma": "~0.26.0",
     "@bazel/typescript": "~0.26.0",
