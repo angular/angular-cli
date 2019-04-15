@@ -18,7 +18,7 @@ export default async function() {
     await execAndWaitForOutputToMatch('ng', ['serve', '--prod'], webpackGoodRegEx);
 
     // delay file change by 1 second
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 4000));
 
     // Should trigger a rebuild.
     await appendToFile('src/environments/environment.prod.ts', `console.log('PROD');`);
