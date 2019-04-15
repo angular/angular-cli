@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/analytics.json",
-  "description": "Configures usage metric gathering for the Angular CLI. See http://angular.io/MORE_INFO_HERE",
+  "description": "Configures the gathering of Angular CLI usage metrics. See https://next.angular.io/cli/usage-analytics-gathering.",
   "$longDescription": "",
 
   "$aliases": [],
@@ -21,7 +21,7 @@
             "project",
             "prompt"
           ],
-          "description": ".",
+          "description": "Directly enables or disables all usage analytics for the user, or prompts the user to set the status interactively, or sets the default status for the project.",
           "$default": {
             "$source": "argv",
             "index": 0
@@ -33,7 +33,7 @@
             "off",
             "prompt"
           ],
-          "description": ".",
+          "description": "Sets the default analytics enablement status for the project.",
           "$default": {
             "$source": "argv",
             "index": 1
