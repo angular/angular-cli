@@ -1,5 +1,4 @@
-> 0.5%
-last 2 versions
-Firefox ESR
-not dead
-IE 9-11
+# We want to run tests large with ever green browser so that 
+# we never trigger differential loading as this will slow down the tests.
+
+last 2 Chrome versions

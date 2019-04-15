@@ -8,7 +8,7 @@
 
 
 import { TestProjectHost } from '@angular-devkit/architect/testing';
-import { join } from '@angular-devkit/core';
+import { getSystemPath, join } from '@angular-devkit/core';
 import { ScriptTarget } from 'typescript';
 import { isDifferentialLoadingNeeded } from './differential-loading';
 
@@ -30,7 +30,7 @@ describe('differential loading', () => {
       'browserslist': 'IE 9-11',
     });
 
-    const needed = isDifferentialLoadingNeeded(host.root(), ScriptTarget.ES2015);
+    const needed = isDifferentialLoadingNeeded(getSystemPath(host.root()), ScriptTarget.ES2015);
     expect(needed).toBe(true);
   });
 
@@ -39,7 +39,7 @@ describe('differential loading', () => {
       'browserslist': 'last 1 chrome version',
     });
 
-    const needed = isDifferentialLoadingNeeded(host.root(), ScriptTarget.ES2015);
+    const needed = isDifferentialLoadingNeeded(getSystemPath(host.root()), ScriptTarget.ES2015);
 
     expect(needed).toBe(false);
   });
@@ -49,7 +49,7 @@ describe('differential loading', () => {
       'browserslist': 'last 1 chrome version',
     });
 
-    const needed = isDifferentialLoadingNeeded(host.root(), ScriptTarget.ES5);
+    const needed = isDifferentialLoadingNeeded(getSystemPath(host.root()), ScriptTarget.ES5);
 
     expect(needed).toBe(false);
   });
