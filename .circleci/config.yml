@@ -100,6 +100,7 @@ jobs:
     <<: *defaults
     environment:
       BASH_ENV: ~/.profile
+      NPM_CONFIG_PREFIX: ~/.npm-global
     resource_class: xlarge
     parallelism: 4
     steps:
@@ -113,6 +114,7 @@ jobs:
     <<: *defaults
     environment:
       BASH_ENV: ~/.profile
+      NPM_CONFIG_PREFIX: ~/.npm-global
     resource_class: xlarge
     parallelism: 4
     steps:
