@@ -4,8 +4,9 @@
 # found in the LICENSE file at https://angular.io/license
 package(default_visibility = ["//visibility:public"])
 
+load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
 load("@npm_bazel_typescript//:defs.bzl", "ts_library")
-load("@build_bazel_rules_nodejs//:defs.bzl", "jasmine_node_test", "npm_package")
+load("@build_bazel_rules_nodejs//:defs.bzl", "npm_package")
 
 licenses(["notice"])  # MIT License
 

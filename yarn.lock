@@ -230,6 +230,13 @@
     "@bazel/buildifier-darwin_x64" "0.22.0"
     "@bazel/buildifier-linux_x64" "0.22.0"
 
+"@bazel/jasmine@~0.26.0":
+  version "0.26.0"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-0.26.0.tgz#f7aed169b057b5af547d2573657b394ecbda0b5d"
+  integrity sha512-lkvzPHdbSEe1zitnV1hIBwodriXqp/ClHSZQJ5Y486UaLQ6Sm7k7gV2phOwtg7LqLVZnElZDmFLSI0/O1UYYyQ==
+  dependencies:
+    jasmine "~3.3.1"
+
 "@bazel/karma@~0.26.0":
   version "0.26.0"
   resolved "https://registry.yarnpkg.com/@bazel/karma/-/karma-0.26.0.tgz#6ad796686f5775df33a96fa5ef3df76a66aed3b2"
@@ -5247,7 +5254,7 @@ jasmine@2.8.0:
     glob "^7.0.6"
     jasmine-core "~2.8.0"
 
-jasmine@^3.3.1:
+jasmine@^3.3.1, jasmine@~3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-3.3.1.tgz#d61bb1dd8888859bd11ea83074a78ee13d949905"
   integrity sha512-/vU3/H7U56XsxIXHwgEuWpCgQ0bRi2iiZeUpx7Nqo8n1TpoDHfZhkPIc7CO8I4pnMzYsi3XaSZEiy8cnTfujng==
