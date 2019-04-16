@@ -36,9 +36,9 @@ describe('Service Schematic', () => {
     skipPackageJson: false,
   };
   let appTree: UnitTestTree;
-  beforeEach(() => {
+  beforeEach(async () => {
     appTree = schematicRunner.runSchematic('workspace', workspaceOptions);
-    appTree = schematicRunner.runSchematic('application', appOptions, appTree);
+    appTree = await schematicRunner.runSchematicAsync('application', appOptions, appTree).toPromise();
   });
 
   it('should create a service', async () => {

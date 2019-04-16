@@ -246,7 +246,7 @@ describe('Library Schematic', () => {
       name: 'comp',
       project: 'foo',
     };
-    tree = schematicRunner.runSchematic('component', componentOptions, tree);
+    tree = await schematicRunner.runSchematicAsync('component', componentOptions, tree).toPromise();
     expect(tree.exists('/projects/foo/src/lib/comp/comp.component.ts')).toBe(true);
   });
 
