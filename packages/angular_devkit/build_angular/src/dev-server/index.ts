@@ -36,9 +36,9 @@ import { normalizeOptimization } from '../utils';
 import { Schema } from './schema';
 const open = require('open');
 
-export type DevServerBuilderSchema = Schema & json.JsonObject;
+export type DevServerBuilderOptions = Schema & json.JsonObject;
 
-export const devServerBuildOverriddenKeys: (keyof DevServerBuilderSchema)[] = [
+export const devServerBuildOverriddenKeys: (keyof DevServerBuilderOptions)[] = [
   'watch',
   'optimization',
   'aot',
@@ -72,7 +72,7 @@ export type ServerConfigTransformFn = (
  *     transforming webpack configuration before passing it to webpack).
  */
 export function serveWebpackBrowser(
-  options: DevServerBuilderSchema,
+  options: DevServerBuilderOptions,
   context: BuilderContext,
   transforms: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>,
@@ -98,7 +98,7 @@ export function serveWebpackBrowser(
     const rawBrowserOptions = await context.getTargetOptions(browserTarget);
 
     // Override options we need to override, if defined.
-    const overrides = (Object.keys(options) as (keyof DevServerBuilderSchema)[])
+    const overrides = (Object.keys(options) as (keyof DevServerBuilderOptions)[])
     .filter(key => options[key] !== undefined && devServerBuildOverriddenKeys.includes(key))
     .reduce<json.JsonObject & Partial<BrowserBuilderSchema>>((previous, key) => ({
       ...previous,
@@ -227,7 +227,7 @@ export function serveWebpackBrowser(
  */
 export function buildServerConfig(
   workspaceRoot: string,
-  serverOptions: DevServerBuilderSchema,
+  serverOptions: DevServerBuilderOptions,
   browserOptions: BrowserBuilderSchema,
   logger: logging.LoggerApi,
 ): WebpackDevServer.Configuration {
@@ -301,7 +301,7 @@ export function buildServerConfig(
  * @param logger A generic logger to use for showing warnings.
  */
 export function buildServePath(
-  serverOptions: DevServerBuilderSchema,
+  serverOptions: DevServerBuilderOptions,
   browserOptions: BrowserBuilderSchema,
   logger: logging.LoggerApi,
 ): string {
@@ -332,7 +332,7 @@ export function buildServePath(
  * @private
  */
 function _addLiveReload(
-  options: DevServerBuilderSchema,
+  options: DevServerBuilderOptions,
   browserOptions: BrowserBuilderSchema,
   webpackConfig: webpack.Configuration,
   clientAddress: url.UrlWithStringQuery,
@@ -400,7 +400,7 @@ function _addLiveReload(
  */
 function _addSslConfig(
   root: string,
-  options: DevServerBuilderSchema,
+  options: DevServerBuilderOptions,
   config: WebpackDevServer.Configuration,
 ) {
   let sslKey: string | undefined = undefined;
@@ -433,7 +433,7 @@ function _addSslConfig(
  */
 function _addProxyConfig(
   root: string,
-  options: DevServerBuilderSchema,
+  options: DevServerBuilderOptions,
   config: WebpackDevServer.Configuration,
 ) {
   let proxyConfig = {};
@@ -488,4 +488,4 @@ function _findDefaultServePath(baseHref?: string, deployUrl?: string): string | 
 }
 
 
-export default createBuilder<DevServerBuilderSchema, DevServerBuilderOutput>(serveWebpackBrowser);
+export default createBuilder<DevServerBuilderOptions, DevServerBuilderOutput>(serveWebpackBrowser);

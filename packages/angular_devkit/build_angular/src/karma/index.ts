@@ -23,7 +23,7 @@ import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browse
 import { Schema as KarmaBuilderOptions } from './schema';
 
 // tslint:disable-next-line:no-implicit-dependencies
-type KarmaConfigOptions = import ('karma').ConfigOptions & {
+export type KarmaConfigOptions = import ('karma').ConfigOptions & {
   buildWebpack?: unknown;
   configFile?: string;
 };
