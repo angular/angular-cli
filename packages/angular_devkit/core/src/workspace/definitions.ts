@@ -146,7 +146,7 @@ export class ProjectDefinitionCollection extends DefinitionCollection<ProjectDef
       root: string,
       sourceRoot?: string,
       prefix?: string,
-      targets?: Record<string, TargetDefinition>,
+      targets?: Record<string, TargetDefinition | undefined>,
       [key: string]: unknown,
     },
   ): this {
@@ -165,7 +165,9 @@ export class ProjectDefinitionCollection extends DefinitionCollection<ProjectDef
 
     if (definition.targets) {
       for (const [name, target] of Object.entries(definition.targets)) {
-        project.targets.set(name, target);
+        if (target) {
+          project.targets.set(name, target);
+        }
       }
     }
 

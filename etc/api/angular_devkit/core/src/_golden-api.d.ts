@@ -773,7 +773,7 @@ export declare class ProjectDefinitionCollection extends DefinitionCollection<Pr
         root: string;
         sourceRoot?: string;
         prefix?: string;
-        targets?: Record<string, TargetDefinition>;
+        targets?: Record<string, TargetDefinition | undefined>;
         [key: string]: unknown;
     }): this;
     set(name: string, value: ProjectDefinition): this;
