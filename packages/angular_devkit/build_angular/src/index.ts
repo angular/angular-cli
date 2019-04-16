@@ -12,9 +12,9 @@
 // See https://github.com/angular/angular-cli/issues/9691#issuecomment-367322703 for details.
 // We need to add a require here to satisfy the dependency checker.
 // require('ajv');
+
 export * from './transforms';
-export * from './app-shell';
-export * from './browser';
+
 export {
   AssetPattern,
   AssetPatternClass as AssetPatternObject,
@@ -25,16 +25,32 @@ export {
   OptimizationClass as OptimizationObject,
   OptimizationUnion,
   OutputHashing,
-  Schema as BrowserBuilderSchema,
+  Schema as BrowserBuilderOptions,
   SourceMapClass as SourceMapObject,
   SourceMapUnion,
   StylePreprocessorOptions,
   Type,
 } from './browser/schema';
-export * from './dev-server';
-export * from './extract-i18n';
-export * from './karma';
-export * from './karma/schema';
-export * from './protractor';
-export { execute as executeServerBuilder } from './server';
-export * from './tslint';
+
+export {
+  buildWebpackBrowser as executeBrowserBuilder,
+  BrowserBuilderOutput,
+} from './browser';
+
+export {
+  serveWebpackBrowser as executeDevServerBuilder,
+  DevServerBuilderOptions,
+  DevServerBuilderOutput,
+} from './dev-server';
+
+export {
+  execute as executeKarmaBuilder,
+  KarmaBuilderOptions,
+  KarmaConfigOptions,
+} from './karma';
+
+export {
+  execute as executeServerBuilder,
+  ServerBuilderOptions,
+  ServerBuilderOutput,
+} from './server';

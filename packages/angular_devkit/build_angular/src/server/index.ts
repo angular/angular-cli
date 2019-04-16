@@ -25,15 +25,17 @@ import {
 import { ExecutionTransformer } from '../transforms';
 import { NormalizedBrowserBuilderSchema, deleteOutputDir } from '../utils';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
-import { Schema as BuildWebpackServerOptions } from './schema';
+import { Schema as ServerBuilderOptions } from './schema';
 
 // If success is true, outputPath should be set.
 export type ServerBuilderOutput = json.JsonObject & BuilderOutput & {
   outputPath?: string;
 };
 
+export { ServerBuilderOptions };
+
 export function execute(
-  options: BuildWebpackServerOptions,
+  options: ServerBuilderOptions,
   context: BuilderContext,
   transforms: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
@@ -67,7 +69,7 @@ export function execute(
   );
 }
 
-export default createBuilder<json.JsonObject & BuildWebpackServerOptions, ServerBuilderOutput>(
+export default createBuilder<json.JsonObject & ServerBuilderOptions, ServerBuilderOutput>(
   execute,
 );
 
@@ -80,7 +82,7 @@ function getCompilerConfig(wco: WebpackConfigOptions) {
 }
 
 async function buildServerWebpackConfig(
-  options: BuildWebpackServerOptions,
+  options: ServerBuilderOptions,
   context: BuilderContext,
 ) {
   const { config } = await generateBrowserWebpackConfigFromContext(
