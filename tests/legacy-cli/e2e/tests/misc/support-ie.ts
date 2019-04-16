@@ -1,5 +1,5 @@
 import { oneLineTrim } from 'common-tags';
-import { expectFileNotToExist, expectFileToMatch } from '../../utils/fs';
+import { expectFileNotToExist, expectFileToMatch, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
@@ -14,6 +14,7 @@ export default async function () {
       appArchitect.build.options.es5BrowserSupport = false;
   });
 
+  await writeFile('browserslist', 'last 2 Chrome versions');
   await ng('build');
   await expectFileNotToExist('dist/test-project/polyfills.es5.js');
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
@@ -24,6 +25,7 @@ export default async function () {
     <script src="main.js"></script>
   `);
 
+  await writeFile('browserslist', 'IE 10');
   await ng('build', `--es5BrowserSupport`);
   await expectFileToMatch('dist/test-project/polyfills.es5.js', 'core-js');
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
