@@ -14,6 +14,8 @@ import { updatePackageJson, updateTsLintConfig } from './codelyzer-5';
 import { updateES5Projects } from './differential-loading';
 import { dropES2015Polyfills } from './drop-es6-polyfills';
 
+export { updateLazyModulePaths } from './update-lazy-module-paths';
+
 export default function(): Rule {
   return () => {
     return chain([
