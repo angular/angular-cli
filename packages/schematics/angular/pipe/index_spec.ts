@@ -41,15 +41,16 @@ describe('Pipe Schematic', () => {
     skipPackageJson: false,
   };
   let appTree: UnitTestTree;
-  beforeEach(() => {
+  beforeEach(async () => {
     appTree = schematicRunner.runSchematic('workspace', workspaceOptions);
-    appTree = schematicRunner.runSchematic('application', appOptions, appTree);
+    appTree = await schematicRunner.runSchematicAsync('application', appOptions, appTree)
+      .toPromise();
   });
 
-  it('should create a pipe', () => {
+  it('should create a pipe', async () => {
     const options = { ...defaultOptions };
 
-    const tree = schematicRunner.runSchematic('pipe', options, appTree);
+    const tree = await schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise();
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo.pipe.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo.pipe.ts');
@@ -58,52 +59,52 @@ describe('Pipe Schematic', () => {
     expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooPipe\r?\n/m);
   });
 
-  it('should import into a specified module', () => {
+  it('should import into a specified module', async () => {
     const options = { ...defaultOptions, module: 'app.module.ts' };
 
-    const tree = schematicRunner.runSchematic('pipe', options, appTree);
+    const tree = await schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise();
     const appModule = getFileContent(tree, '/projects/bar/src/app/app.module.ts');
 
     expect(appModule).toMatch(/import { FooPipe } from '.\/foo.pipe'/);
   });
 
-  it('should fail if specified module does not exist', () => {
+  it('should fail if specified module does not exist', async () => {
     const options = { ...defaultOptions, module: '/projects/bar/src/app/app.moduleXXX.ts' };
     let thrownError: Error | null = null;
     try {
-      schematicRunner.runSchematic('pipe', options, appTree);
+      await schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise();
     } catch (err) {
       thrownError = err;
     }
     expect(thrownError).toBeDefined();
   });
 
-  it('should handle a path in the name and module options', () => {
-    appTree = schematicRunner.runSchematic(
+  it('should handle a path in the name and module options', async () => {
+    appTree = await schematicRunner.runSchematicAsync(
       'module',
       { name: 'admin/module', project: 'bar' },
       appTree,
-    );
+    ).toPromise();
 
     const options = { ...defaultOptions, module: 'admin/module' };
-    appTree = schematicRunner.runSchematic('pipe', options, appTree);
+    appTree = await schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise();
 
     const content = appTree.readContent('/projects/bar/src/app/admin/module/module.module.ts');
     expect(content).toMatch(/import { FooPipe } from '\.\.\/\.\.\/foo.pipe'/);
   });
 
-  it('should export the pipe', () => {
+  it('should export the pipe', async () => {
     const options = { ...defaultOptions, export: true };
 
-    const tree = schematicRunner.runSchematic('pipe', options, appTree);
+    const tree = await schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise();
     const appModuleContent = getFileContent(tree, '/projects/bar/src/app/app.module.ts');
     expect(appModuleContent).toMatch(/exports: \[FooPipe\]/);
   });
 
-  it('should respect the flat flag', () => {
+  it('should respect the flat flag', async () => {
     const options = { ...defaultOptions, flat: false };
 
-    const tree = schematicRunner.runSchematic('pipe', options, appTree);
+    const tree = await schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise();
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.pipe.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo/foo.pipe.ts');
@@ -112,27 +113,29 @@ describe('Pipe Schematic', () => {
     expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooPipe\r?\n/m);
   });
 
-  it('should use the module flag even if the module is a routing module', () => {
+  it('should use the module flag even if the module is a routing module', async () => {
     const routingFileName = 'app-routing.module.ts';
     const routingModulePath = `/projects/bar/src/app/${routingFileName}`;
     const newTree = createAppModule(appTree, routingModulePath);
     const options = { ...defaultOptions, module: routingFileName };
-    const tree = schematicRunner.runSchematic('pipe', options, newTree);
+    const tree = await schematicRunner.runSchematicAsync('pipe', options, newTree).toPromise();
     const content = getFileContent(tree, routingModulePath);
     expect(content).toMatch(/import { FooPipe } from '.\/foo.pipe/);
   });
 
-  it('should respect the sourceRoot value', () => {
+  it('should respect the sourceRoot value', async () => {
     const config = JSON.parse(appTree.readContent('/angular.json'));
     config.projects.bar.sourceRoot = 'projects/bar/custom';
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
 
     // should fail without a module in that dir
-    expect(() => schematicRunner.runSchematic('pipe', defaultOptions, appTree)).toThrow();
+    await expectAsync(
+      schematicRunner.runSchematicAsync('pipe', defaultOptions, appTree).toPromise(),
+    ).toBeRejected();
 
     // move the module
     appTree.rename('/projects/bar/src/app/app.module.ts', '/projects/bar/custom/app/app.module.ts');
-    appTree = schematicRunner.runSchematic('pipe', defaultOptions, appTree);
+    appTree = await schematicRunner.runSchematicAsync('pipe', defaultOptions, appTree).toPromise();
     expect(appTree.files).toContain('/projects/bar/custom/app/foo.pipe.ts');
   });
 });
