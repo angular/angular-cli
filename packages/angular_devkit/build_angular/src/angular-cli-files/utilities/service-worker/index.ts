@@ -5,13 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// TODO: cleanup this file, it's copied as is from Angular CLI.
 import {
   Path,
   dirname,
   getSystemPath,
   join,
   normalize,
+  relative,
   tags,
   virtualFs,
 } from '@angular-devkit/core';
@@ -20,49 +20,23 @@ import {
   Generator,
 } from '@angular/service-worker/config'; // tslint:disable-line:no-implicit-dependencies
 import * as crypto from 'crypto';
-import * as fs from 'fs';
-import { Observable, from, merge, of } from 'rxjs';
-import { concatMap, map, mergeMap, reduce, switchMap, toArray } from 'rxjs/operators';
-import * as semver from 'semver';
-import { resolveProjectModule } from '../require-project-module';
-
-
-export const NEW_SW_VERSION = '5.0.0-rc.0';
-
 
 class CliFilesystem implements Filesystem {
   constructor(private _host: virtualFs.Host, private base: string) { }
 
   list(path: string): Promise<string[]> {
-    const recursiveList = (path: Path): Observable<Path> => this._host.list(path).pipe(
-      // Emit each fragment individually.
-      concatMap(fragments => from(fragments)),
-      // Join the path with fragment.
-      map(fragment => join(path, fragment)),
-      // Emit directory content paths instead of the directory path.
-      mergeMap(path => this._host.isDirectory(path).pipe(
-          concatMap(isDir => isDir ? recursiveList(path) : of(path)),
-        ),
-      ),
-    );
-
-    return recursiveList(this._resolve(path)).pipe(
-      map(path => path.replace(this.base, '')),
-      toArray(),
-    ).toPromise().then(x => x, _err => []);
+    return this._recursiveList(this._resolve(path), []).catch(() => []);
   }
 
-  read(path: string): Promise<string> {
-    return this._readIntoBuffer(path)
-      .then(content => virtualFs.fileBufferToString(content));
+  async read(path: string): Promise<string> {
+    return virtualFs.fileBufferToString(await this._readIntoBuffer(path));
   }
 
-  hash(path: string): Promise<string> {
+  async hash(path: string): Promise<string> {
     const sha1 = crypto.createHash('sha1');
+    sha1.update(Buffer.from(await this._readIntoBuffer(path)));
 
-    return this._readIntoBuffer(path)
-      .then(content => sha1.update(Buffer.from(content)))
-      .then(() => sha1.digest('hex'));
+    return sha1.digest('hex');
   }
 
   write(path: string, content: string): Promise<void> {
@@ -70,45 +44,32 @@ class CliFilesystem implements Filesystem {
       .toPromise();
   }
 
-  private _readIntoBuffer(path: string): Promise<virtualFs.FileBuffer> {
-    return this._host.read(this._resolve(path))
-      .toPromise();
+  private _readIntoBuffer(path: string): Promise<ArrayBuffer> {
+    return this._host.read(this._resolve(path)).toPromise();
   }
 
   private _resolve(path: string): Path {
-    return join(normalize(this.base), path);
+    return join(normalize(this.base), normalize(path));
+  }
+
+  private async _recursiveList(path: Path, items: string[]): Promise<string[]> {
+    const fragments = await this._host.list(path).toPromise();
+
+    for (const fragment of fragments) {
+      const item = join(path, fragment);
+
+      if (await this._host.isDirectory(item).toPromise()) {
+        await this._recursiveList(item, items);
+      } else {
+        items.push('/' + relative(normalize(this.base), item));
+      }
+    }
+
+    return items;
   }
 }
 
-export function usesServiceWorker(projectRoot: string): boolean {
-  let swPackageJsonPath;
-
-  try {
-    swPackageJsonPath = resolveProjectModule(projectRoot, '@angular/service-worker/package.json');
-  } catch (_) {
-    // @angular/service-worker is not installed
-    throw new Error(tags.stripIndent`
-    Your project is configured with serviceWorker = true, but @angular/service-worker
-    is not installed. Run \`npm install --save-dev @angular/service-worker\`
-    and try again, or run \`ng set apps.0.serviceWorker=false\` in your .angular-cli.json.
-  `);
-  }
-
-  const swPackageJson = fs.readFileSync(swPackageJsonPath).toString();
-  const swVersion = JSON.parse(swPackageJson)['version'];
-
-  if (!semver.gte(swVersion, NEW_SW_VERSION)) {
-    throw new Error(tags.stripIndent`
-    The installed version of @angular/service-worker is ${swVersion}. This version of the CLI
-    requires the @angular/service-worker version to satisfy ${NEW_SW_VERSION}. Please upgrade
-    your service worker version.
-  `);
-  }
-
-  return true;
-}
-
-export function augmentAppWithServiceWorker(
+export async function augmentAppWithServiceWorker(
   host: virtualFs.Host,
   projectRoot: Path,
   appRoot: Path,
@@ -116,69 +77,60 @@ export function augmentAppWithServiceWorker(
   baseHref: string,
   ngswConfigPath?: string,
 ): Promise<void> {
-  // Path to the worker script itself.
   const distPath = normalize(outputPath);
+  const systemProjectRoot = getSystemPath(projectRoot);
+
+  // Find the service worker package
   const workerPath = normalize(
-    resolveProjectModule(getSystemPath(projectRoot), '@angular/service-worker/ngsw-worker.js'),
+    require.resolve('@angular/service-worker/ngsw-worker.js', { paths: [systemProjectRoot] }),
   );
-  const swConfigPath = resolveProjectModule(
-    getSystemPath(projectRoot),
+  const swConfigPath = require.resolve(
     '@angular/service-worker/config',
+    { paths: [systemProjectRoot] },
   );
+
+  // Determine the configuration file path
+  let configPath;
+  if (ngswConfigPath) {
+    configPath = normalize(ngswConfigPath);
+  } else {
+    configPath = join(appRoot, 'ngsw-config.json');
+  }
+
+  // Ensure the configuration file exists
+  const configExists = await host.exists(configPath).toPromise();
+  if (!configExists) {
+    throw new Error(tags.oneLine`
+      Error: Expected to find an ngsw-config.json configuration
+      file in the ${appRoot} folder. Either provide one or disable Service Worker
+      in your angular.json configuration file.
+    `);
+  }
+
+  // Read the configuration file
+  const config = JSON.parse(virtualFs.fileBufferToString(await host.read(configPath).toPromise()));
+
+  // Generate the manifest
+  const GeneratorConstructor = require(swConfigPath).Generator as typeof Generator;
+  const generator = new GeneratorConstructor(new CliFilesystem(host, outputPath), baseHref);
+  const output = await generator.process(config);
+
+  // Write the manifest
+  const manifest = JSON.stringify(output, null, 2);
+  await host.write(join(distPath, 'ngsw.json'), virtualFs.stringToFileBuffer(manifest)).toPromise();
+
+  // Write the worker code
+  // NOTE: This is inefficient (kernel -> userspace -> kernel).
+  //       `fs.copyFile` would be a better option but breaks the host abstraction
+  const workerCode = await host.read(workerPath).toPromise();
+  await host.write(join(distPath, 'ngsw-worker.js'), workerCode).toPromise();
+
+  // If present, write the safety worker code
   const safetyPath = join(dirname(workerPath), 'safety-worker.js');
-  const configPath = ngswConfigPath as Path || join(appRoot, 'ngsw-config.json');
+  if (await host.exists(safetyPath).toPromise()) {
+    const safetyCode = await host.read(safetyPath).toPromise();
 
-  return host.exists(configPath).pipe(
-    switchMap(exists => {
-      if (!exists) {
-        throw new Error(tags.oneLine`
-          Error: Expected to find an ngsw-config.json configuration
-          file in the ${appRoot} folder. Either provide one or disable Service Worker
-          in your angular.json configuration file.`,
-        );
-      }
-
-      return host.read(configPath) as Observable<virtualFs.FileBuffer>;
-    }),
-    map(content => JSON.parse(virtualFs.fileBufferToString(content))),
-    switchMap(configJson => {
-      const GeneratorConstructor = require(swConfigPath).Generator as typeof Generator;
-      const gen = new GeneratorConstructor(new CliFilesystem(host, outputPath), baseHref);
-
-      return gen.process(configJson);
-    }),
-
-    switchMap(output => {
-      const manifest = JSON.stringify(output, null, 2);
-
-      return host.read(workerPath).pipe(
-        switchMap(workerCode => {
-          return merge(
-            host.write(join(distPath, 'ngsw.json'), virtualFs.stringToFileBuffer(manifest)),
-            host.write(join(distPath, 'ngsw-worker.js'), workerCode),
-          ) as Observable<void>;
-        }),
-      );
-    }),
-
-    switchMap(() => host.exists(safetyPath)),
-    // If @angular/service-worker has the safety script, copy it into two locations.
-    switchMap(exists => {
-      if (!exists) {
-        return of<void>(undefined);
-      }
-
-      return host.read(safetyPath).pipe(
-        switchMap(safetyCode => {
-          return merge(
-            host.write(join(distPath, 'worker-basic.min.js'), safetyCode),
-            host.write(join(distPath, 'safety-worker.js'), safetyCode),
-          ) as Observable<void>;
-        }),
-      );
-    }),
-
-    // Remove all elements, reduce them to a single emit.
-    reduce(() => {}),
-  ).toPromise();
+    await host.write(join(distPath, 'worker-basic.min.js'), safetyCode).toPromise();
+    await host.write(join(distPath, 'safety-worker.js'), safetyCode).toPromise();
+  }
 }
