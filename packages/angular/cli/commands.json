@@ -3,6 +3,7 @@
   "analytics": "./commands/analytics.json",
   "build": "./commands/build.json",
   "config": "./commands/config.json",
+  "deploy": "./commands/deploy.json",
   "doc": "./commands/doc.json",
   "e2e": "./commands/e2e.json",
   "make-this-awesome": "./commands/easter-egg.json",

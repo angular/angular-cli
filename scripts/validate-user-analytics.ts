@@ -59,7 +59,7 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
 
   // Create the data with dimensions missing from schema.json:
   const allFixedDimensions = Object.keys(analytics.NgCliAnalyticsDimensions)
-  // tslint:disable-next-line:no-any
+    // tslint:disable-next-line:no-any
     .filter(x => typeof analytics.NgCliAnalyticsDimensions[x as any] === 'number');
 
   for (const name of allFixedDimensions) {
@@ -93,9 +93,11 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
 
   logger.info('Gathering options...');
 
+  // We can't generate help for the deploy command because there is no default deploy builder.
+  const excludedCommands = ['deploy'];
   const commands = require('../packages/angular/cli/commands.json');
   const ngPath = path.join(newProjectRoot, 'node_modules/.bin/ng');
-  for (const commandName of Object.keys(commands)) {
+  for (const commandName of Object.keys(commands).filter(c => !excludedCommands.includes(c))) {
     const options = { cwd: newProjectRoot };
     const childLogger = logger.createChild(commandName);
     const stdout = _exec(ngPath, [commandName, '--help=json'], options, childLogger);
@@ -154,7 +156,7 @@ async function _checkMetrics(metricsTable: string, logger: logging.Logger) {
 
   // Create the data with dimensions missing from schema.json:
   const allFixedMetrics = Object.keys(analytics.NgCliAnalyticsMetrics)
-  // tslint:disable-next-line:no-any
+    // tslint:disable-next-line:no-any
     .filter(x => typeof analytics.NgCliAnalyticsMetrics[x as any] === 'number');
 
   for (const name of allFixedMetrics) {

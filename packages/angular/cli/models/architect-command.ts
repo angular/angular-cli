@@ -76,7 +76,8 @@ export abstract class ArchitectCommand<
     }
 
     if (targetProjectNames.length === 0) {
-      throw new Error(`No projects support the '${this.target}' target.`);
+      throw new Error(`No projects support the '${this.target}' target.` +
+        `See https://angular.io/guide/workspace-config on how to add targets.`);
     }
 
     if (projectName && !targetProjectNames.includes(projectName)) {
