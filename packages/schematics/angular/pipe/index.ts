@@ -25,7 +25,7 @@ import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
-import { buildDefaultPath, getProject } from '../utility/project';
+import { createDefaultPath } from '../utility/workspace';
 import { Schema as PipeOptions } from './schema';
 
 
@@ -85,14 +85,9 @@ function addDeclarationToNgModule(options: PipeOptions): Rule {
 }
 
 export default function (options: PipeOptions): Rule {
-  return (host: Tree) => {
-    if (!options.project) {
-      throw new SchematicsException('Option (project) is required.');
-    }
-    const project = getProject(host, options.project);
-
+  return async (host: Tree) => {
     if (options.path === undefined) {
-      options.path = buildDefaultPath(project);
+      options.path = await createDefaultPath(host, options.project as string);
     }
 
     options.module = findModuleFromOptions(host, options);
