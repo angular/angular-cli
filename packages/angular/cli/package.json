@@ -35,7 +35,7 @@
     "ini": "1.3.5",
     "inquirer": "6.2.2",
     "npm-package-arg": "6.1.0",
-    "open": "6.0.0",
+    "open": "6.1.0",
     "pacote": "9.5.0",
     "semver": "6.0.0",
     "symbol-observable": "1.2.0",
@@ -43,6 +43,12 @@
     "uuid": "^3.3.2"
   },
   "ng-update": {
-    "migrations": "@schematics/angular/migrations/migration-collection.json"
+    "migrations": "@schematics/angular/migrations/migration-collection.json",
+    "packageGroup": {
+      "@angular/cli": "0.0.0",
+      "@angular-devkit/build-angular":  "0.0.0",
+      "@angular-devkit/build-ng-packagr": "0.0.0",
+      "@angular-devkit/build-webpack": "0.0.0"
+    }
   }
 }

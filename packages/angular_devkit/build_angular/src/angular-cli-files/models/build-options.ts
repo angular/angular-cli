@@ -73,8 +73,14 @@ export interface BuildOptions {
   lazyModules: string[];
   platform?: 'browser' | 'server';
   fileReplacements: NormalizedFileReplacement[];
-    /** @deprecated use only for compatibility in 8.x; will be removed in 9.0 */
+  /** @deprecated use only for compatibility in 8.x; will be removed in 9.0 */
   rebaseRootRelativeCssUrls?: boolean;
+
+  /* Append script target version to filename. */
+  esVersionInFileName?: boolean;
+
+  /* When specified it will be used instead of the script target in the tsconfig.json. */
+  scriptTargetOverride?: ts.ScriptTarget;
 }
 
 export interface WebpackTestOptions extends BuildOptions {

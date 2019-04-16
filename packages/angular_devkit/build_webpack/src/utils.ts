@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import * as path from 'path';
 import * as webpack from 'webpack';
 
 export interface EmittedFiles {
@@ -16,32 +17,35 @@ export interface EmittedFiles {
 }
 
 export function getEmittedFiles(compilation: webpack.compilation.Compilation): EmittedFiles[] {
-  const getExtension = (file: string) => file.split('.').reverse()[0];
   const files: EmittedFiles[] = [];
 
+  // entrypoints might have multiple outputs
+  // such as runtime.js
+  for (const [name, entrypoint] of compilation.entrypoints) {
+    const entryFiles: string[] = (entrypoint && entrypoint.getFiles()) || [];
+    for (const file of entryFiles) {
+      files.push({ name, file, extension: path.extname(file), initial: true });
+    }
+  }
+
+  // adds all chunks to the list of emitted files such as lazy loaded modules
   for (const chunk of Object.values(compilation.chunks)) {
-    const entry: Partial<EmittedFiles> = {
-      name: chunk.name,
-      initial: chunk.isOnlyInitial(),
-    };
-
-    for (const file of chunk.files) {
-      files.push({ ...entry, file, extension: getExtension(file) } as EmittedFiles);
+    for (const file of chunk.files as string[]) {
+      files.push({
+        name: chunk.name,
+        file,
+        extension: path.extname(file),
+        initial: chunk.isOnlyInitial(),
+      });
     }
   }
 
+  // other all files
   for (const file of Object.keys(compilation.assets)) {
-    if (files.some(e => e.file === file)) {
-      // skip as this already exists
-      continue;
-    }
-
-    files.push({
-      file,
-      extension: getExtension(file),
-      initial: false,
-    });
+    files.push({ file, extension: path.extname(file), initial: false });
   }
 
-  return files;
+  // dedupe
+  return files.filter(({ file, name }, index) =>
+    files.findIndex(f => f.file === file && (!name || name === f.name)) === index);
 }

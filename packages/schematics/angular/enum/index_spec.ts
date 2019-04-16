@@ -41,22 +41,26 @@ describe('Enum Schematic', () => {
     appTree = schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
-  it('should create an enumeration', () => {
-    const tree = schematicRunner.runSchematic('enum', defaultOptions, appTree);
+  it('should create an enumeration', async () => {
+    const tree = await schematicRunner.runSchematicAsync('enum', defaultOptions, appTree)
+      .toPromise();
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo.enum.ts');
   });
-  it('should create an enumeration', () => {
-    const tree = schematicRunner.runSchematic('enum', defaultOptions, appTree);
+
+  it('should create an enumeration', async () => {
+    const tree = await schematicRunner.runSchematicAsync('enum', defaultOptions, appTree)
+      .toPromise();
     const content = tree.readContent('/projects/bar/src/app/foo.enum.ts');
     expect(content).toMatch('export enum Foo {');
   });
 
-  it('should respect the sourceRoot value', () => {
+  it('should respect the sourceRoot value', async () => {
     const config = JSON.parse(appTree.readContent('/angular.json'));
     config.projects.bar.sourceRoot = 'projects/bar/custom';
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
-    appTree = schematicRunner.runSchematic('enum', defaultOptions, appTree);
+    appTree = await schematicRunner.runSchematicAsync('enum', defaultOptions, appTree)
+      .toPromise();
     expect(appTree.files).toContain('/projects/bar/custom/app/foo.enum.ts');
   });
 });

@@ -12,7 +12,7 @@
 // See https://github.com/angular/angular-cli/issues/9691#issuecomment-367322703 for details.
 // We need to add a require here to satisfy the dependency checker.
 // require('ajv');
-
+export * from './transforms';
 export * from './app-shell';
 export * from './browser';
 export {
@@ -36,5 +36,5 @@ export * from './extract-i18n';
 export * from './karma';
 export * from './karma/schema';
 export * from './protractor';
-export * from './server';
+export { execute as executeServerBuilder } from './server';
 export * from './tslint';

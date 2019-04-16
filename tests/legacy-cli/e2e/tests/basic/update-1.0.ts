@@ -1,22 +1,27 @@
 import { createProjectFromAsset } from '../../utils/assets';
 import { ng, silentNpm } from '../../utils/process';
-import { useBuiltPackages, useCIChrome, useCIDefaults } from '../../utils/project';
+import {
+  isPrereleaseCli, removeHttpDep, useBuiltPackages, useCIChrome, useCIDefaults,
+} from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
 
-export default function () {
-  return Promise.resolve()
-    .then(() => createProjectFromAsset('1.0-project'))
-    .then(() => useCIChrome('.'))
-    .then(() => expectToFail(() => ng('build')))
-    .then(() => ng('update', '@angular/cli'))
-    .then(() => useBuiltPackages())
-    .then(() => silentNpm('install'))
-    .then(() => useCIDefaults('one-oh-project'))
-    .then(() => ng('generate', 'component', 'my-comp'))
-    .then(() => ng('test', '--watch=false'))
-    .then(() => ng('lint'))
-    .then(() => ng('build'))
-    .then(() => ng('build', '--prod'))
-    .then(() => ng('e2e'));
+export default async function () {
+  const extraUpdateArgs = await isPrereleaseCli() ? ['--next', '--force'] : [];
+
+  await createProjectFromAsset('1.0-project');
+  await useCIChrome('.');
+  await expectToFail(() => ng('build'));
+  await ng('update', '@angular/cli');
+  await useBuiltPackages();
+  await silentNpm('install');
+  await removeHttpDep();
+  await ng('update', '@angular/core', ...extraUpdateArgs);
+  await useCIDefaults('one-oh-project');
+  await ng('generate', 'component', 'my-comp');
+  await ng('test', '--watch=false');
+  await ng('lint');
+  await ng('build');
+  await ng('build', '--prod');
+  await ng('e2e');
 }

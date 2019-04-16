@@ -57,22 +57,27 @@ describe('Universal Schematic', () => {
     appTree = schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
-  it('should create a root module file', () => {
-    const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
+  it('should create a root module file', async () => {
+    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/projects/bar/src/app/app.server.module.ts';
     expect(tree.exists(filePath)).toEqual(true);
   });
 
-  it('should create a main file', () => {
-    const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
+  it('should create a main file', async () => {
+    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/projects/bar/src/main.server.ts';
     expect(tree.exists(filePath)).toEqual(true);
     const contents = tree.readContent(filePath);
     expect(contents).toMatch(/export { AppServerModule } from '\.\/app\/app\.server\.module'/);
   });
 
-  it('should create a tsconfig file for the workspace project', () => {
-    const tree = schematicRunner.runSchematic('universal', workspaceUniversalOptions, appTree);
+  it('should create a tsconfig file for the workspace project', async () => {
+    const tree = await schematicRunner
+      .runSchematicAsync('universal', workspaceUniversalOptions, appTree)
+      .toPromise();
+    debugger;
     const filePath = '/tsconfig.server.json';
     expect(tree.exists(filePath)).toEqual(true);
     const contents = tree.readContent(filePath);
@@ -90,8 +95,9 @@ describe('Universal Schematic', () => {
       .server.options.tsConfig).toEqual('tsconfig.server.json');
   });
 
-  it('should create a tsconfig file for a generated application', () => {
-    const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
+  it('should create a tsconfig file for a generated application', async () => {
+    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/projects/bar/tsconfig.server.json';
     expect(tree.exists(filePath)).toEqual(true);
     const contents = tree.readContent(filePath);
@@ -109,15 +115,17 @@ describe('Universal Schematic', () => {
       .server.options.tsConfig).toEqual('projects/bar/tsconfig.server.json');
   });
 
-  it('should add dependency: @angular/platform-server', () => {
-    const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
+  it('should add dependency: @angular/platform-server', async () => {
+    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/package.json';
     const contents = tree.readContent(filePath);
     expect(contents).toMatch(/\"@angular\/platform-server\": \"/);
   });
 
-  it('should update workspace with a server target', () => {
-    const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
+  it('should update workspace with a server target', async () => {
+    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/angular.json';
     const contents = tree.readContent(filePath);
     const config = JSON.parse(contents.toString());
@@ -137,22 +145,24 @@ describe('Universal Schematic', () => {
     expect(fileReplacements[0].with).toEqual('projects/bar/src/environments/environment.prod.ts');
   });
 
-  it('should add a server transition to BrowerModule import', () => {
-    const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
+  it('should add a server transition to BrowerModule import', async () => {
+    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/projects/bar/src/app/app.module.ts';
     const contents = tree.readContent(filePath);
     expect(contents).toMatch(/BrowserModule\.withServerTransition\({ appId: 'serverApp' }\)/);
   });
 
-  it('should wrap the bootstrap call in a DOMContentLoaded event handler', () => {
-    const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
+  it('should wrap the bootstrap call in a DOMContentLoaded event handler', async () => {
+    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+      .toPromise();
     const filePath = '/projects/bar/src/main.ts';
     const contents = tree.readContent(filePath);
     expect(contents)
       .toMatch(/document.addEventListener\('DOMContentLoaded', \(\) => {[\w\W]+;[\r\n]}\);/);
   });
 
-  it('should wrap the bootstrap declaration in a DOMContentLoaded event handler', () => {
+  it('should wrap the bootstrap declaration in a DOMContentLoaded event handler', async () => {
     const filePath = '/projects/bar/src/main.ts';
     appTree.overwrite(
       filePath,
@@ -175,15 +185,16 @@ describe('Universal Schematic', () => {
       `,
     );
 
-    const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
+    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+      .toPromise();
     const contents = tree.readContent(filePath);
     expect(contents).toMatch(
       /document.addEventListener\('DOMContentLoaded', \(\) => {[\n\r\s]+bootstrap\(\)/,
     );
   });
 
-  it('should install npm dependencies', () => {
-    schematicRunner.runSchematic('universal', defaultOptions, appTree);
+  it('should install npm dependencies', async () => {
+    await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree).toPromise();
     expect(schematicRunner.tasks.length).toBe(1);
     expect(schematicRunner.tasks[0].name).toBe('node-package');
     expect((schematicRunner.tasks[0].options as {command: string}).command).toBe('install');

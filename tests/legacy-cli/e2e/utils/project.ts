@@ -3,6 +3,7 @@ import { readFile, writeFile, replaceInFile, prependToFile } from './fs';
 import { execAndWaitForOutputToMatch, npm, silentNpm, ng, git } from './process';
 import { getGlobalVariable } from './env';
 import { gitCommit } from './git';
+import { prerelease } from 'semver';
 
 const packages = require('../../../../lib/packages').packages;
 
@@ -253,13 +254,20 @@ export function useNgVersion(version: string) {
         }
         json['devDependencies'][`@angular/${pkgName}`] = version;
       });
-    // TODO: determine the appropriate version for the Angular version
+    // Set the correct peer dependencies for @angular/core and @angular/compiler-cli.
+    // This list should be kept up to date with each major release.
     if (version.startsWith('^5')) {
-      json['devDependencies']['typescript'] = '~2.5.0';
-      json['dependencies']['rxjs'] = '5.5.8';
-    } else {
-      json['devDependencies']['typescript'] = '~2.7.0';
-      json['dependencies']['rxjs'] = '6.0.0-rc.0';
+      json['devDependencies']['typescript'] = '>=2.4.2 <2.5';
+      json['dependencies']['rxjs'] = '^5.5.0';
+      json['dependencies']['zone.js'] = '~0.8.4';
+    } else if (version.startsWith('^6')) {
+      json['devDependencies']['typescript'] = '>=2.7.2 <2.8';
+      json['dependencies']['rxjs'] = '^6.0.0';
+      json['dependencies']['zone.js'] = '~0.8.26';
+    } else if (version.startsWith('^7')) {
+      json['devDependencies']['typescript'] = '>=3.1.1 <3.2';
+      json['dependencies']['rxjs'] = '^6.0.0';
+      json['dependencies']['zone.js'] = '~0.8.26';
     }
   });
 }
@@ -488,4 +496,14 @@ export function useNg4() {
       });
       console.log(JSON.stringify(json));
     }));
+}
+
+export async function isPrereleaseCli() {
+  const angularCliPkgJson = JSON.parse(await readFile('node_modules/@angular/cli/package.json'));
+
+  return prerelease(angularCliPkgJson.version).length > 0;
+}
+
+export async function removeHttpDep() {
+  await updateJsonFile('package.json', json => { delete json['dependencies']['@angular/http']; });
 }

@@ -19,6 +19,7 @@ describe('Browser Builder basic test', () => {
     await host.initialize().toPromise();
     architect = (await createArchitect(host.root())).architect;
   });
+
   afterEach(async () => host.restore().toPromise());
 
   it('works', async () => {

@@ -21,20 +21,12 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import {
-  addProjectToWorkspace,
-  getWorkspace,
-} from '../utility/config';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { latestVersions } from '../utility/latest-versions';
 import { applyLintFix } from '../utility/lint-fix';
 import { validateProjectName } from '../utility/validation';
-import {
-  Builders,
-  ProjectType,
-  WorkspaceProject,
-  WorkspaceSchema,
-} from '../utility/workspace-models';
+import { getWorkspace, updateWorkspace } from '../utility/workspace';
+import { Builders, ProjectType } from '../utility/workspace-models';
 import { Schema as LibraryOptions } from './schema';
 
 interface UpdateJsonFn<T> {
@@ -108,7 +100,7 @@ function addDependenciesToPackageJson() {
       {
         type: NodeDependencyType.Dev,
         name: 'ng-packagr',
-        version: '^5.0.0',
+        version: '^5.1.0',
       },
       {
         type: NodeDependencyType.Default,
@@ -126,50 +118,57 @@ function addDependenciesToPackageJson() {
   };
 }
 
-function addAppToWorkspaceFile(options: LibraryOptions, workspace: WorkspaceSchema,
-                               projectRoot: string, projectName: string): Rule {
+function addAppToWorkspaceFile(
+  options: LibraryOptions,
+  projectRoot: string,
+  projectName: string,
+): Rule {
+  return updateWorkspace(workspace => {
+    if (workspace.projects.size === 0) {
+      workspace.extensions.defaultProject = projectName;
+    }
 
-  const project: WorkspaceProject<ProjectType.Library> = {
-    root: projectRoot,
-    sourceRoot: `${projectRoot}/src`,
-    projectType: ProjectType.Library,
-    prefix: options.prefix || 'lib',
-    architect: {
-      build: {
-        builder: Builders.NgPackagr,
-        options: {
-          tsConfig: `${projectRoot}/tsconfig.lib.json`,
-          project: `${projectRoot}/ng-package.json`,
+    workspace.projects.add({
+      name: projectName,
+      root: projectRoot,
+      sourceRoot: `${projectRoot}/src`,
+      projectType: ProjectType.Library,
+      prefix: options.prefix || 'lib',
+      targets: {
+        build: {
+          builder: Builders.NgPackagr,
+          options: {
+            tsConfig: `${projectRoot}/tsconfig.lib.json`,
+            project: `${projectRoot}/ng-package.json`,
+          },
+        },
+        test: {
+          builder: Builders.Karma,
+          options: {
+            main: `${projectRoot}/src/test.ts`,
+            tsConfig: `${projectRoot}/tsconfig.spec.json`,
+            karmaConfig: `${projectRoot}/karma.conf.js`,
+          },
+        },
+        lint: {
+          builder: Builders.TsLint,
+          options: {
+            tsConfig: [
+              `${projectRoot}/tsconfig.lib.json`,
+              `${projectRoot}/tsconfig.spec.json`,
+            ],
+            exclude: [
+              '**/node_modules/**',
+            ],
+          },
         },
       },
-      test: {
-        builder: Builders.Karma,
-        options: {
-          main: `${projectRoot}/src/test.ts`,
-          tsConfig: `${projectRoot}/tsconfig.spec.json`,
-          karmaConfig: `${projectRoot}/karma.conf.js`,
-        },
-      },
-      lint: {
-        builder: Builders.TsLint,
-        options: {
-          tsConfig: [
-            `${projectRoot}/tsconfig.lib.json`,
-            `${projectRoot}/tsconfig.spec.json`,
-          ],
-          exclude: [
-            '**/node_modules/**',
-          ],
-        },
-      },
-    },
-  };
-
-  return addProjectToWorkspace(workspace, projectName, project);
+    });
+  });
 }
 
 export default function (options: LibraryOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
+  return async (host: Tree) => {
     if (!options.name) {
       throw new SchematicsException(`Invalid options, "name" is required.`);
     }
@@ -187,8 +186,8 @@ export default function (options: LibraryOptions): Rule {
       options.name = name;
     }
 
-    const workspace = getWorkspace(host);
-    const newProjectRoot = workspace.newProjectRoot || '';
+    const workspace = await getWorkspace(host);
+    const newProjectRoot = workspace.extensions.newProjectRoot || '';
 
     const scopeFolder = scopeName ? strings.dasherize(scopeName) + '/' : '';
     const folderName = `${scopeFolder}${strings.dasherize(options.name)}`;
@@ -215,7 +214,7 @@ export default function (options: LibraryOptions): Rule {
 
     return chain([
       mergeWith(templateSource),
-      addAppToWorkspaceFile(options, workspace, projectRoot, projectName),
+      addAppToWorkspaceFile(options, projectRoot, projectName),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
       options.skipTsConfig ? noop() : updateTsConfig(packageName, distRoot),
       schematic('module', {

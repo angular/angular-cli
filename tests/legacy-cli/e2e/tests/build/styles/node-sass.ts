@@ -39,7 +39,8 @@ export default async function () {
   await expectFileToMatch('dist/test-project/styles.css', /body\s*{\s*background-color: blue;\s*}/);
   await expectFileToMatch('dist/test-project/styles.css', /p\s*{\s*background-color: red;\s*}/);
   await expectToFail(() => expectFileToMatch('dist/test-project/styles.css', '"mappings":""'));
-  await expectFileToMatch('dist/test-project/main.js', /.outer.*.inner.*background:\s*#[fF]+/);
+  await expectFileToMatch('dist/test-project/main-es5.js', /.outer.*.inner.*background:\s*#[fF]+/);
+  await expectFileToMatch('dist/test-project/main-es2015.js', /.outer.*.inner.*background:\s*#[fF]+/);
 
   await silentNpm('install', 'node-gyp');
   await silentNpm('install', 'fibers');
@@ -50,5 +51,6 @@ export default async function () {
   await expectFileToMatch('dist/test-project/styles.css', /body\s*{\s*background-color: blue;\s*}/);
   await expectFileToMatch('dist/test-project/styles.css', /p\s*{\s*background-color: red;\s*}/);
   await expectToFail(() => expectFileToMatch('dist/test-project/styles.css', '"mappings":""'));
-  await expectFileToMatch('dist/test-project/main.js', /.outer.*.inner.*background:\s*#[fF]+/);
+  await expectFileToMatch('dist/test-project/main-es5.js', /.outer.*.inner.*background:\s*#[fF]+/);
+  await expectFileToMatch('dist/test-project/main-es2015.js', /.outer.*.inner.*background:\s*#[fF]+/);
 }

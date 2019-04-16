@@ -6,8 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { basename, getSystemPath, join, normalize } from '../virtual-fs';
-import { ProjectDefinitionCollection, WorkspaceDefinition } from './definitions';
+import { WorkspaceDefinition } from './definitions';
 import { WorkspaceHost } from './host';
+import { readJsonWorkspace } from './json/reader';
+import { writeJsonWorkspace } from './json/writer';
 
 const formatLookup = new WeakMap<WorkspaceDefinition, WorkspaceFormat>();
 
@@ -33,7 +35,8 @@ export async function readWorkspace(
   path: string,
   host: WorkspaceHost,
   format?: WorkspaceFormat,
-): Promise<WorkspaceDefinition> {
+  // return type will eventually have a `diagnostics` property as well
+): Promise<{ workspace: WorkspaceDefinition }> {
   if (await host.isDirectory(path)) {
     // TODO: Warn if multiple found (requires diagnostics support)
     const directory = normalize(path);
@@ -45,8 +48,6 @@ export async function readWorkspace(
 
       const potential = getSystemPath(join(directory, name));
       if (await host.isFile(potential)) {
-        // TEMP - remove disable when actual reader is used
-        // tslint:disable-next-line:no-dead-store
         path = potential;
         format = nameFormat;
         found = true;
@@ -70,12 +71,7 @@ export async function readWorkspace(
   let workspace;
   switch (format) {
     case WorkspaceFormat.JSON:
-      // TEMP: remove the following two statements when JSON support is introduced
-      await host.readFile(path);
-      workspace = {
-        extensions: {},
-        projects: new ProjectDefinitionCollection(),
-      };
+      workspace = await readJsonWorkspace(path, host);
       break;
     default:
       throw new Error('Unsupported workspace format.');
@@ -83,13 +79,13 @@ export async function readWorkspace(
 
   formatLookup.set(workspace, WorkspaceFormat.JSON);
 
-  return workspace;
+  return { workspace };
 }
 
 export async function writeWorkspace(
   workspace: WorkspaceDefinition,
-  _host: WorkspaceHost,
-  _path?: string,
+  host: WorkspaceHost,
+  path?: string,
   format?: WorkspaceFormat,
 ): Promise<void> {
   if (format === undefined) {
@@ -101,7 +97,7 @@ export async function writeWorkspace(
 
   switch (format) {
     case WorkspaceFormat.JSON:
-      throw new Error('Not Implemented.');
+      return writeJsonWorkspace(workspace, host, path);
     default:
       throw new Error('Unsupported workspace format.');
   }

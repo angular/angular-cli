@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  // Comment
+  "schematics": {
+    "@angular/schematics:component": {
+      "prefix": "abc"
+    }
+  },
+  "x-baz": 10,
+  "x-foo": {
+    "is": ["good", "great", "awesome"]
+  },
+  "x-bar": 5,
+  "projects": {
+    "new": {
+      "root": "src",
+      "targets": {
+        "build": {
+          "builder": "build-builder",
+          "options": {
+            "one": 1,
+            "two": false
+          },
+          "configurations": {
+            "staging": {
+              "two": true
+            }
+          }
+        }
+      }
+    }
+  }
+}

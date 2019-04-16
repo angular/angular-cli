@@ -41,8 +41,8 @@ describe('Library Schematic', () => {
     workspaceTree = schematicRunner.runSchematic('workspace', workspaceOptions);
   });
 
-  it('should create files', () => {
-    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+  it('should create files', async () => {
+    const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
     const files = tree.files;
     expect(files).toEqual(jasmine.arrayContaining([
       '/projects/foo/karma.conf.js',
@@ -60,81 +60,81 @@ describe('Library Schematic', () => {
     ]));
   });
 
-  it('should create a package.json named "foo"', () => {
-    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+  it('should create a package.json named "foo"', async () => {
+    const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
     const fileContent = getFileContent(tree, '/projects/foo/package.json');
     expect(fileContent).toMatch(/"name": "foo"/);
   });
 
-  it('should have the latest Angular major versions in package.json named "foo"', () => {
-    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+  it('should have the latest Angular major versions in package.json named "foo"', async () => {
+    const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
     const fileContent = getJsonFileContent(tree, '/projects/foo/package.json');
     const angularVersion = latestVersions.Angular.replace('~', '').replace('^', '');
     expect(fileContent.peerDependencies['@angular/core']).toBe(`^${angularVersion}`);
   });
 
-  it('should create a README.md named "foo"', () => {
-    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+  it('should create a README.md named "foo"', async () => {
+    const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
     const fileContent = getFileContent(tree, '/projects/foo/README.md');
     expect(fileContent).toMatch(/# Foo/);
   });
 
-  it('should create a tsconfig for library', () => {
-    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+  it('should create a tsconfig for library', async () => {
+    const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
     const fileContent = getJsonFileContent(tree, '/projects/foo/tsconfig.lib.json');
     expect(fileContent).toBeDefined();
   });
 
-  it('should create a ng-package.json with ngPackage conf', () => {
-    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+  it('should create a ng-package.json with ngPackage conf', async () => {
+    const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
     const fileContent = getJsonFileContent(tree, '/projects/foo/ng-package.json');
     expect(fileContent.lib).toBeDefined();
     expect(fileContent.lib.entryFile).toEqual('src/my-index.ts');
     expect(fileContent.dest).toEqual('../../dist/foo');
   });
 
-  it('should use default value for baseDir and entryFile', () => {
-    const tree = schematicRunner.runSchematic('library', {
+  it('should use default value for baseDir and entryFile', async () => {
+    const tree = await schematicRunner.runSchematicAsync('library', {
       name: 'foobar',
-    }, workspaceTree);
+    }, workspaceTree).toPromise();
     expect(tree.files).toContain('/projects/foobar/src/public-api.ts');
   });
 
-  it(`should add library to workspace`, () => {
-    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+  it(`should add library to workspace`, async () => {
+    const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
 
     const workspace = getJsonFileContent(tree, '/angular.json');
     expect(workspace.projects.foo).toBeDefined();
     expect(workspace.defaultProject).toBe('foo');
   });
 
-  it('should set the prefix to lib if none is set', () => {
-    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+  it('should set the prefix to lib if none is set', async () => {
+    const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
 
     const workspace = JSON.parse(tree.readContent('/angular.json'));
     expect(workspace.projects.foo.prefix).toEqual('lib');
   });
 
-  it('should set the prefix correctly', () => {
+  it('should set the prefix correctly', async () => {
     const options = { ...defaultOptions, prefix: 'pre' };
-    const tree = schematicRunner.runSchematic('library', options, workspaceTree);
+    const tree = await schematicRunner.runSchematicAsync('library', options, workspaceTree).toPromise();
 
     const workspace = JSON.parse(tree.readContent('/angular.json'));
     expect(workspace.projects.foo.prefix).toEqual('pre');
   });
 
-  it('should set the right prefix in the tslint file when provided is kebabed', () => {
+  it('should set the right prefix in the tslint file when provided is kebabed', async () => {
     const options: GenerateLibrarySchema = { ...defaultOptions, prefix: 'foo-bar' };
-    const tree = schematicRunner.runSchematic('library', options, workspaceTree);
+    const tree = await schematicRunner.runSchematicAsync('library', options, workspaceTree).toPromise();
     const path = '/projects/foo/tslint.json';
     const content = JSON.parse(tree.readContent(path));
     expect(content.rules['directive-selector'][2]).toMatch('fooBar');
     expect(content.rules['component-selector'][2]).toMatch('foo-bar');
   });
 
-  it('should handle a pascalCasedName', () => {
+  it('should handle a pascalCasedName', async () => {
     const options = {...defaultOptions, name: 'pascalCasedName'};
-    const tree = schematicRunner.runSchematic('library', options, workspaceTree);
+    const tree = await schematicRunner.runSchematicAsync('library', options, workspaceTree).toPromise();
     const config = getJsonFileContent(tree, '/angular.json');
     const project = config.projects.pascalCasedName;
     expect(project).toBeDefined();
@@ -143,14 +143,14 @@ describe('Library Schematic', () => {
     expect(svcContent).toMatch(/providedIn: 'root'/);
   });
 
-  it('should export the component in the NgModule', () => {
-    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+  it('should export the component in the NgModule', async () => {
+    const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
     const fileContent = getFileContent(tree, '/projects/foo/src/lib/foo.module.ts');
     expect(fileContent).toContain('exports: [FooComponent]');
   });
 
-  it('should set the right path and prefix in the tslint file', () => {
-    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+  it('should set the right path and prefix in the tslint file', async () => {
+    const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
     const path = '/projects/foo/tslint.json';
     const content = JSON.parse(tree.readContent(path));
     expect(content.extends).toMatch('../../tslint.json');
@@ -159,39 +159,39 @@ describe('Library Schematic', () => {
   });
 
   describe(`update package.json`, () => {
-    it(`should add ng-packagr to devDependencies`, () => {
-      const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+    it(`should add ng-packagr to devDependencies`, async () => {
+      const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
 
       const packageJson = getJsonFileContent(tree, 'package.json');
-      expect(packageJson.devDependencies['ng-packagr']).toEqual('^5.0.0');
+      expect(packageJson.devDependencies['ng-packagr']).toEqual('^5.1.0');
       expect(packageJson.devDependencies['@angular-devkit/build-ng-packagr'])
         .toEqual(latestVersions.DevkitBuildNgPackagr);
     });
 
-    it('should use the latest known versions in package.json', () => {
-      const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+    it('should use the latest known versions in package.json', async () => {
+      const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
       const pkg = JSON.parse(tree.readContent('/package.json'));
       expect(pkg.devDependencies['@angular/compiler-cli']).toEqual(latestVersions.Angular);
       expect(pkg.devDependencies['typescript']).toEqual(latestVersions.TypeScript);
     });
 
-    it(`should not override existing users dependencies`, () => {
+    it(`should not override existing users dependencies`, async () => {
       const oldPackageJson = workspaceTree.readContent('package.json');
       workspaceTree.overwrite('package.json', oldPackageJson.replace(
         `"typescript": "${latestVersions.TypeScript}"`,
         `"typescript": "~2.5.2"`,
       ));
 
-      const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+      const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
       const packageJson = getJsonFileContent(tree, 'package.json');
       expect(packageJson.devDependencies.typescript).toEqual('~2.5.2');
     });
 
-    it(`should not modify the file when --skipPackageJson`, () => {
-      const tree = schematicRunner.runSchematic('library', {
+    it(`should not modify the file when --skipPackageJson`, async () => {
+      const tree = await schematicRunner.runSchematicAsync('library', {
         name: 'foo',
         skipPackageJson: true,
-      }, workspaceTree);
+      }, workspaceTree).toPromise();
 
       const packageJson = getJsonFileContent(tree, 'package.json');
       expect(packageJson.devDependencies['ng-packagr']).toBeUndefined();
@@ -200,8 +200,8 @@ describe('Library Schematic', () => {
   });
 
   describe(`update tsconfig.json`, () => {
-    it(`should add paths mapping to empty tsconfig`, () => {
-      const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+    it(`should add paths mapping to empty tsconfig`, async () => {
+      const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
 
       const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
       expect(tsConfigJson.compilerOptions.paths.foo).toBeTruthy();
@@ -212,7 +212,7 @@ describe('Library Schematic', () => {
       expect(tsConfigJson.compilerOptions.paths['foo/*'][0]).toEqual('dist/foo/*');
     });
 
-    it(`should append to existing paths mappings`, () => {
+    it(`should append to existing paths mappings`, async () => {
       workspaceTree.overwrite('tsconfig.json', JSON.stringify({
         compilerOptions: {
           paths: {
@@ -221,7 +221,7 @@ describe('Library Schematic', () => {
           },
         },
       }));
-      const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+      const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
 
       const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
       expect(tsConfigJson.compilerOptions.paths.foo).toBeTruthy();
@@ -229,19 +229,19 @@ describe('Library Schematic', () => {
       expect(tsConfigJson.compilerOptions.paths.foo[1]).toEqual('dist/foo');
     });
 
-    it(`should not modify the file when --skipTsConfig`, () => {
-      const tree = schematicRunner.runSchematic('library', {
+    it(`should not modify the file when --skipTsConfig`, async () => {
+      const tree = await schematicRunner.runSchematicAsync('library', {
         name: 'foo',
         skipTsConfig: true,
-      }, workspaceTree);
+      }, workspaceTree).toPromise();
 
       const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
       expect(tsConfigJson.compilerOptions.paths).toBeUndefined();
     });
   });
 
-  it('should generate inside of a library', () => {
-    let tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+  it('should generate inside of a library', async () => {
+    let tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
     const componentOptions: ComponentOptions = {
       name: 'comp',
       project: 'foo',
@@ -250,10 +250,10 @@ describe('Library Schematic', () => {
     expect(tree.exists('/projects/foo/src/lib/comp/comp.component.ts')).toBe(true);
   });
 
-  it(`should support creating scoped libraries`, () => {
+  it(`should support creating scoped libraries`, async () => {
     const scopedName = '@myscope/mylib';
     const options = { ...defaultOptions, name: scopedName };
-    const tree = schematicRunner.runSchematic('library', options, workspaceTree);
+    const tree = await schematicRunner.runSchematicAsync('library', options, workspaceTree).toPromise();
 
     const pkgJsonPath = '/projects/myscope/mylib/package.json';
     expect(tree.files).toContain(pkgJsonPath);
@@ -276,12 +276,12 @@ describe('Library Schematic', () => {
     expect(karmaConf).toContain(`dir: require('path').join(__dirname, '../../../coverage/myscope/mylib')`);
   });
 
-  it(`should dasherize scoped libraries`, () => {
+  it(`should dasherize scoped libraries`, async () => {
     const scopedName = '@myScope/myLib';
     const expectedScopeName = '@my-scope/my-lib';
     const expectedFolderName = 'my-scope/my-lib';
     const options = { ...defaultOptions, name: scopedName };
-    const tree = schematicRunner.runSchematic('library', options, workspaceTree);
+    const tree = await schematicRunner.runSchematicAsync('library', options, workspaceTree).toPromise();
 
     const pkgJsonPath = '/projects/my-scope/my-lib/package.json';
     expect(tree.readContent(pkgJsonPath)).toContain(expectedScopeName);
@@ -296,8 +296,8 @@ describe('Library Schematic', () => {
     expect(cfg.projects['@myScope/myLib']).toBeDefined();
   });
 
-  it(`should set coverage folder to "coverage/foo"`, () => {
-    const tree = schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+  it(`should set coverage folder to "coverage/foo"`, async () => {
+    const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
     const karmaConf = getFileContent(tree, '/projects/foo/karma.conf.js');
     expect(karmaConf).toContain(`dir: require('path').join(__dirname, '../../coverage/foo')`);
   });

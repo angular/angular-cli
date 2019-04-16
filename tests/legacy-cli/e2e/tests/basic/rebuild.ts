@@ -7,7 +7,6 @@ import {
 import {writeFile, writeMultipleFiles} from '../../utils/fs';
 import {wait} from '../../utils/utils';
 import {request} from '../../utils/http';
-import {getGlobalVariable} from '../../utils/env';
 
 const validBundleRegEx = /: Compiled successfully./;
 
@@ -15,11 +14,6 @@ export default function() {
   if (process.platform.startsWith('win')) {
     return Promise.resolve();
   }
-
-  const argv = getGlobalVariable('argv');
-  const ivyProject = argv['ivy'];
-  const lazyImport = ivyProject ? `() => import('./lazy/lazy.module').then(m => m.LazyModule)`
-    : `'./lazy/lazy.module#LazyModule'`;
 
   return execAndWaitForOutputToMatch('ng', ['serve'], validBundleRegEx)
     // Add a lazy module.
@@ -47,7 +41,7 @@ export default function() {
             FormsModule,
             HttpClientModule,
             RouterModule.forRoot([
-              { path: 'lazy', loadChildren: ${lazyImport} }
+              { path: 'lazy', loadChildren: './lazy/lazy.module#LazyModule' }
             ])
           ],
           providers: [],

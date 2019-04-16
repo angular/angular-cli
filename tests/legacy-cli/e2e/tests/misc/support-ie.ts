@@ -4,6 +4,11 @@ import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 export default async function () {
+  await updateJsonFile('tsconfig.json', configJson => {
+    const compilerOptions = configJson['compilerOptions'];
+    compilerOptions['target'] = 'es5';
+  });
+
   await updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects['test-project'].architect;
       appArchitect.build.options.es5BrowserSupport = false;

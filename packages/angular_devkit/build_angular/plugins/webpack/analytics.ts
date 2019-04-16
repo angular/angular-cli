@@ -200,7 +200,7 @@ export class NgBuildAnalyticsPlugin {
       }
     }
     for (const chunk of json.chunks) {
-      if (chunk.files[0].endsWith('.css')) {
+      if (chunk.files[0] && chunk.files[0].endsWith('.css')) {
         this._stats.cssSize += chunk.size || 0;
       }
     }

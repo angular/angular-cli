@@ -426,7 +426,7 @@ export interface RequiredWorkflowExecutionContext {
     schematic: string;
 }
 
-export declare type Rule = (tree: Tree, context: SchematicContext) => Tree | Observable<Tree> | Rule | Promise<void> | void;
+export declare type Rule = (tree: Tree, context: SchematicContext) => Tree | Observable<Tree> | Rule | Promise<void> | Promise<Rule> | void;
 
 export declare type RuleFactory<T extends object> = (options: T) => Rule;
 
