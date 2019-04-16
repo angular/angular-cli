@@ -17,7 +17,7 @@ export function replaceBootstrap(
   shouldTransform: (fileName: string) => boolean,
   getEntryModule: () => { path: string, className: string } | null,
   getTypeChecker: () => ts.TypeChecker,
-  enableIvy?: boolean,
+  useFactories = true,
 ): ts.TransformerFactory<ts.SourceFile> {
 
   const standardTransform: StandardTransform = function (sourceFile: ts.SourceFile) {
@@ -82,7 +82,7 @@ export function replaceBootstrap(
       let modulePath = `./${relativeEntryModulePath}`.replace(/\\/g, '/');
       let bootstrapIdentifier = 'bootstrapModule';
 
-      if (!enableIvy) {
+      if (useFactories) {
         className += 'NgFactory';
         modulePath += '.ngfactory';
         bootstrapIdentifier = 'bootstrapModuleFactory';
