@@ -38,15 +38,19 @@ describe('App Shell Schematic', () => {
   };
   let appTree: UnitTestTree;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     appTree = schematicRunner.runSchematic('workspace', workspaceOptions);
-    appTree = schematicRunner.runSchematic('application', appOptions, appTree);
+    appTree = await schematicRunner.runSchematicAsync('application', appOptions, appTree)
+      .toPromise();
   });
-
 
   it('should ensure the client app has a router-outlet', async () => {
     appTree = schematicRunner.runSchematic('workspace', workspaceOptions);
-    appTree = schematicRunner.runSchematic('application', {...appOptions, routing: false}, appTree);
+    appTree = await schematicRunner.runSchematicAsync(
+      'application',
+      {...appOptions, routing: false},
+      appTree,
+    ).toPromise();
     await expectAsync(
       schematicRunner.runSchematicAsync('appShell', defaultOptions, appTree).toPromise(),
     ).toBeRejected();
