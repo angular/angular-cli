@@ -8,6 +8,7 @@
 
 export * from './default-progress';
 export * from './delete-output-dir';
+export * from './differential-loading';
 export * from './run-module-as-observable-fork';
 export * from './normalize-file-replacements';
 export * from './normalize-asset-patterns';
