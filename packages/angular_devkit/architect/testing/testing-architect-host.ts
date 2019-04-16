@@ -56,7 +56,7 @@ export class TestingArchitectHost implements ArchitectHost {
       const b = builders[builderName];
       // TODO: remove this check as v1 is not supported anymore.
       if (!b.implementation) { continue; }
-      const handler = await import(builderJsonPath + '/../' + b.implementation);
+      const handler = (await import(builderJsonPath + '/../' + b.implementation)).default;
       const optionsSchema = await import(builderJsonPath + '/../' + b.schema);
       this.addBuilder(`${packageJson.name}:${builderName}`, handler, b.description, optionsSchema);
     }
