@@ -25,8 +25,8 @@ import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
-import { buildDefaultPath, getProject } from '../utility/project';
 import { validateHtmlSelector } from '../utility/validation';
+import { buildDefaultPath, getWorkspace } from '../utility/workspace';
 import { Schema as DirectiveOptions } from './schema';
 
 
@@ -101,11 +101,12 @@ function buildSelector(options: DirectiveOptions, projectPrefix: string) {
 }
 
 export default function (options: DirectiveOptions): Rule {
-  return (host: Tree) => {
-    if (!options.project) {
-      throw new SchematicsException('Option (project) is required.');
+  return async (host: Tree) => {
+    const workspace = await getWorkspace(host);
+    const project = workspace.projects.get(options.project as string);
+    if (!project) {
+      throw new SchematicsException(`Invalid project name (${options.project})`);
     }
-    const project = getProject(host, options.project);
 
     if (options.path === undefined) {
       options.path = buildDefaultPath(project);
@@ -116,7 +117,7 @@ export default function (options: DirectiveOptions): Rule {
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
-    options.selector = options.selector || buildSelector(options, project.prefix);
+    options.selector = options.selector || buildSelector(options, project.prefix || '');
 
     validateHtmlSelector(options.selector);
 
