@@ -9,13 +9,6 @@
 import { logging, terminal } from '@angular-devkit/core';
 import { spawn } from 'child_process';
 
-
-export type NpmInstall = (packageName: string,
-                          logger: logging.Logger,
-                          packageManager: string,
-                          projectRoot: string,
-                          save?: boolean) => Promise<void>;
-
 export default async function (packageName: string,
                                logger: logging.Logger,
                                packageManager: string,
