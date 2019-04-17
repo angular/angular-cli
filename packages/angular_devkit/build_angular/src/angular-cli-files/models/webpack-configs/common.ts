@@ -83,9 +83,9 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     // For NON differential loading we want to have 2 polyfill bundles
     if (buildOptions.es5BrowserSupport
       || (buildOptions.es5BrowserSupport === undefined && isEs5SupportNeeded(projectRoot))) {
-      entryPoints['polyfills.es5'] = [es5Polyfills];
+      entryPoints['polyfills-es5'] = [es5Polyfills];
       if (!buildOptions.aot) {
-        entryPoints['polyfills.es5'].push(es5JitPolyfills);
+        entryPoints['polyfills-es5'].push(es5JitPolyfills);
       }
     }
   }
