@@ -14,6 +14,9 @@ import { parseJsonSchemaToSubCommandDescription } from '../utilities/json-schema
 import { Schema as GenerateCommandSchema } from './generate';
 
 export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
+  // Allows us to resolve aliases before reporting analytics
+  longSchematicName: string|undefined;
+
   async initialize(options: GenerateCommandSchema & Arguments) {
     await super.initialize(options);
 
@@ -29,6 +32,7 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
 
     for (const name of schematicNames) {
       const schematic = this.getSchematic(collection, name, true);
+      this.longSchematicName = schematic.description.name;
       let subcommand: SubCommandDescription;
       if (schematic.description.schemaJson) {
         subcommand = await parseJsonSchemaToSubCommandDescription(
@@ -81,9 +85,10 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
     if (!schematicName || !collectionName) {
       return;
     }
+    const escapedSchematicName = (this.longSchematicName || schematicName).replace(/\//g, '_');
 
     return super.reportAnalytics(
-      ['generate', collectionName.replace(/\//g, '_'), schematicName.replace(/\//g, '_')],
+      ['generate', collectionName.replace(/\//g, '_'), escapedSchematicName],
       options,
     );
   }
