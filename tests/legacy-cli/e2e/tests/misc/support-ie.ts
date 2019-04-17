@@ -25,8 +25,23 @@ export default async function () {
     <script src="main.js"></script>
   `);
 
-  await writeFile('browserslist', 'IE 10');
   await ng('build', `--es5BrowserSupport`);
+  await expectFileToMatch('dist/test-project/polyfills-es5.js', 'core-js');
+  await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
+    <script src="runtime.js"></script>
+    <script src="polyfills-es5.js" nomodule></script>
+    <script src="polyfills.js"></script>
+    <script src="styles.js"></script>
+    <script src="vendor.js"></script>
+    <script src="main.js"></script>
+  `);
+
+  await updateJsonFile('angular.json', workspaceJson => {
+    const appArchitect = workspaceJson.projects['test-project'].architect;
+    appArchitect.build.options.es5BrowserSupport = undefined;
+  });
+  await writeFile('browserslist', 'IE 10');
+  await ng('build');
   await expectFileToMatch('dist/test-project/polyfills-es5.js', 'core-js');
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
     <script src="runtime.js"></script>
