@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { normalize, strings } from '@angular-devkit/core';
+import { join, normalize, strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -17,15 +17,10 @@ import {
   move,
   url,
 } from '@angular-devkit/schematics';
+import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
 import { Schema as E2eOptions } from './schema';
-
-function getE2eRoot(projectRoot: string): string {
-  const root = normalize(projectRoot);
-
-  return root ? root + '/e2e' : 'e2e';
-}
 
 export default function (options: E2eOptions): Rule {
   return async (host: Tree) => {
@@ -36,8 +31,7 @@ export default function (options: E2eOptions): Rule {
       throw new SchematicsException(`Project name "${appProject}" doesn't not exist.`);
     }
 
-    const root = getE2eRoot(project.root);
-    const relativePathToWorkspaceRoot = root.split('/').map(() => '..').join('/');
+    const root = join(normalize(project.root), 'e2e');
 
     project.targets.add({
       name: 'e2e',
@@ -66,7 +60,7 @@ export default function (options: E2eOptions): Rule {
           applyTemplates({
             utils: strings,
             ...options,
-            relativePathToWorkspaceRoot,
+            relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(root),
           }),
           move(root),
         ])),

@@ -5,13 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, parseJsonAst, strings, tags } from '@angular-devkit/core';
+import { JsonParseMode, normalize, parseJsonAst, strings, tags } from '@angular-devkit/core';
 import {
   Rule, SchematicContext, SchematicsException, Tree,
   apply, applyTemplates, chain, mergeWith, move, noop, url,
 } from '@angular-devkit/schematics';
 import { appendValueInAstArray, findPropertyInAstObject } from '../utility/json-utils';
 import { parseName } from '../utility/parse-name';
+import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { buildDefaultPath, getWorkspace, updateWorkspace } from '../utility/workspace';
 import { BrowserBuilderOptions, LintBuilderOptions } from '../utility/workspace-models';
 import { Schema as WebWorkerOptions } from './schema';
@@ -24,9 +25,13 @@ function addConfig(options: WebWorkerOptions, root: string, tsConfigPath: string
     const tsConfigRules = [];
 
     // Add tsconfig.worker.json.
-    const relativePathToWorkspaceRoot = root.split('/').map(x => '..').join('/');
+    const relativePath = relativePathToWorkspaceRoot(root);
+
     tsConfigRules.push(mergeWith(apply(url('./files/worker-tsconfig'), [
-      applyTemplates({ ...options, relativePathToWorkspaceRoot }),
+      applyTemplates({
+        ...options,
+        relativePathToWorkspaceRoot: relativePath,
+      }),
       move(root),
     ])));
 
@@ -62,7 +67,10 @@ function addConfig(options: WebWorkerOptions, root: string, tsConfigPath: string
     } else {
       // Otherwise create it.
       tsConfigRules.push(mergeWith(apply(url('./files/project-tsconfig'), [
-        applyTemplates({ ...options, relativePathToWorkspaceRoot }),
+        applyTemplates({
+          ...options,
+          relativePathToWorkspaceRoot: relativePath,
+         }),
         move(root),
       ])));
     }
@@ -173,7 +181,7 @@ export default function (options: WebWorkerOptions): Rule {
 
     const needWebWorkerConfig = !projectTargetOptions.webWorkerTsConfig;
     if (needWebWorkerConfig) {
-      const workerConfigPath = `${root.endsWith('/') ? root : root + '/'}tsconfig.worker.json`;
+      const workerConfigPath = `${normalize(root)}/tsconfig.worker.json`;
       projectTargetOptions.webWorkerTsConfig = workerConfigPath;
 
       // add worker tsconfig to lint architect target

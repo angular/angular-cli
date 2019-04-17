@@ -37,6 +37,7 @@ import { NodeDependencyType, addPackageJsonDependency } from '../utility/depende
 import { findPropertyInAstObject, insertPropertyInAstObjectInOrder } from '../utility/json-utils';
 import { latestVersions } from '../utility/latest-versions';
 import { applyLintFix } from '../utility/lint-fix';
+import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { validateProjectName } from '../utility/validation';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders, ProjectType } from '../utility/workspace-models';
@@ -147,9 +148,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, newProjectRoot: stri
     ? options.projectRoot
     : `${newProjectRoot}/${options.name}`;
 
-  if (projectRoot !== '' && !projectRoot.endsWith('/')) {
-    projectRoot += '/';
-  }
+  projectRoot = `${normalize(projectRoot)}/`;
 
   const schematics: JsonObject = {};
 
@@ -325,9 +324,6 @@ export default function (options: ApplicationOptions): Rule {
     const appDir = isRootApp
       ? options.projectRoot as string
       : `${newProjectRoot}/${options.name}`;
-    const relativePathToWorkspaceRoot = appDir
-      ? appDir.split('/').map(() => '..').join('/')
-      : '.';
     const sourceDir = `${appDir}/src/app`;
 
     const e2eOptions: E2eOptions = {
@@ -343,7 +339,7 @@ export default function (options: ApplicationOptions): Rule {
           applyTemplates({
             utils: strings,
             ...options,
-            relativePathToWorkspaceRoot,
+            relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(appDir),
             appName: options.name,
             isRootApp,
           }),
