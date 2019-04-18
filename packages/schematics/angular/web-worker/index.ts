@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, parseJsonAst, strings, tags } from '@angular-devkit/core';
+import { JsonParseMode, join, normalize, parseJsonAst, strings, tags } from '@angular-devkit/core';
 import {
   Rule, SchematicContext, SchematicsException, Tree,
   apply, applyTemplates, chain, mergeWith, move, noop, url,
@@ -21,54 +21,16 @@ function addConfig(options: WebWorkerOptions, root: string, tsConfigPath: string
   return (host: Tree, context: SchematicContext) => {
     context.logger.debug('updating project configuration.');
 
-    const tsConfigRules = [];
-
-    // Add tsconfig.worker.json.
-    const relativePathToWorkspaceRoot = root.split('/').map(x => '..').join('/');
-    tsConfigRules.push(mergeWith(apply(url('./files/worker-tsconfig'), [
-      applyTemplates({ ...options, relativePathToWorkspaceRoot }),
-      move(root),
-    ])));
-
-    // Add project tsconfig.json.
-    // The project level tsconfig.json with webworker lib is for editor support since
-    // the dom and webworker libs are mutually exclusive.
-    // Note: this schematic does not change other tsconfigs to use the project-level tsconfig.
-    const projectTsConfigPath = `${root}/tsconfig.json`;
-    if (host.exists(projectTsConfigPath)) {
-      // If the file already exists, alter it.
-      const buffer = host.read(projectTsConfigPath);
-      if (buffer) {
-        const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
-        if (tsCfgAst.kind != 'object') {
-          throw new SchematicsException('Invalid tsconfig. Was expecting an object');
-        }
-        const optsAstNode = findPropertyInAstObject(tsCfgAst, 'compilerOptions');
-        if (optsAstNode && optsAstNode.kind != 'object') {
-          throw new SchematicsException(
-            'Invalid tsconfig "compilerOptions" property; Was expecting an object.');
-        }
-        const libAstNode = findPropertyInAstObject(tsCfgAst, 'lib');
-        if (libAstNode && libAstNode.kind != 'array') {
-          throw new SchematicsException('Invalid tsconfig "lib" property; expected an array.');
-        }
-        const newLibProp = 'webworker';
-        if (libAstNode && !libAstNode.value.includes(newLibProp)) {
-          const recorder = host.beginUpdate(projectTsConfigPath);
-          appendValueInAstArray(recorder, libAstNode, newLibProp);
-          host.commitUpdate(recorder);
-        }
-      }
-    } else {
-      // Otherwise create it.
-      tsConfigRules.push(mergeWith(apply(url('./files/project-tsconfig'), [
-        applyTemplates({ ...options, relativePathToWorkspaceRoot }),
-        move(root),
-      ])));
-    }
+    // todo: replace with the new helper method in a seperate PR
+    // https://github.com/angular/angular-cli/pull/14207
+    const rootNormalized = root.endsWith('/') ? root.slice(0, -1) : root;
+    const relativePathToWorkspaceRoot =
+      rootNormalized
+        ? rootNormalized.split('/').map(x => '..').join('/')
+        : '.';
 
     // Add worker glob exclusion to tsconfig.app.json.
-    const workerGlob = '**/*.worker.ts';
+    const workerGlob = 'src/**/*.worker.ts';
     const buffer = host.read(tsConfigPath);
     if (buffer) {
       const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
@@ -80,17 +42,19 @@ function addConfig(options: WebWorkerOptions, root: string, tsConfigPath: string
         throw new SchematicsException('Invalid tsconfig "exclude" property; expected an array.');
       }
 
-      if (filesAstNode && filesAstNode.value.indexOf(workerGlob) == -1) {
+      if (filesAstNode && !filesAstNode.value.includes(workerGlob)) {
         const recorder = host.beginUpdate(tsConfigPath);
         appendValueInAstArray(recorder, filesAstNode, workerGlob);
         host.commitUpdate(recorder);
       }
     }
 
-    return chain([
-      // Add tsconfigs.
-      ...tsConfigRules,
-    ]);
+    return mergeWith(
+      apply(url('./files/worker-tsconfig'), [
+        applyTemplates({ ...options, relativePathToWorkspaceRoot }),
+        move(root),
+      ]),
+    );
   };
 }
 
@@ -145,7 +109,7 @@ export default function (options: WebWorkerOptions): Rule {
       throw new SchematicsException('Option "project" is required.');
     }
     if (!options.target) {
-      throw new SchematicsException('Option (target) is required.');
+      throw new SchematicsException('Option "target" is required.');
     }
 
     const project = workspace.projects.get(options.project);
@@ -169,11 +133,11 @@ export default function (options: WebWorkerOptions): Rule {
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
-    const root = project.root || project.sourceRoot || '';
+    const root = project.root || '';
 
     const needWebWorkerConfig = !projectTargetOptions.webWorkerTsConfig;
     if (needWebWorkerConfig) {
-      const workerConfigPath = `${root.endsWith('/') ? root : root + '/'}tsconfig.worker.json`;
+      const workerConfigPath = join(normalize(root), 'tsconfig.worker.json');
       projectTargetOptions.webWorkerTsConfig = workerConfigPath;
 
       // add worker tsconfig to lint architect target
