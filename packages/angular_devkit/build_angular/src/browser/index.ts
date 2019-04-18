@@ -23,8 +23,8 @@ import {
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
-import { from, of, zip } from 'rxjs';
-import { catchError, concatMap, map, switchMap } from 'rxjs/operators';
+import { concat, from, of } from 'rxjs';
+import { catchError, concatMap, map, switchMap, toArray } from 'rxjs/operators';
 import * as webpack from 'webpack';
 import { NgBuildAnalyticsPlugin } from '../../plugins/webpack/analytics';
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
@@ -182,12 +182,30 @@ export function buildWebpackBrowser(
         normalize(workspace.getProject(projectName).root),
       );
 
-      // We use zip because when having multiple builds we want to wait
-      // for all builds to finish before processeding
-      return zip(
-        ...configs.map(config => runWebpack(config, context, { logging: loggingFn })),
-      )
-      .pipe(
+      // Execute each configuration in sequence
+      // NOTE: For watch mode, only the initial configuration is watched and used to trigger
+      //       the remaining configuration builds.  Currently the remaining builds are full
+      //       rebuilds.  Additional functionality to trigger rebuilds without file watching
+      //       would be required to support incremental building of the remaining configurations.
+      return runWebpack(configs[0], context, { logging: loggingFn }).pipe(
+        switchMap(buildEvent => {
+          // Only build the remaining configurations if the first was successful
+          // NOTE: Currently, TypeScript type related errors do not affect the success property
+          if (buildEvent.success && configs.length > 1) {
+            return concat(
+              of(buildEvent),
+              ...configs
+                .slice(1)
+                .map(config => runWebpack(
+                  { ...config, watch: false },
+                  context,
+                  { logging: loggingFn },
+                )),
+            ).pipe(toArray());
+          } else {
+            return of([buildEvent]);
+          }
+        }),
         switchMap(buildEvents => {
           const success = buildEvents.every(r => r.success);
           if (success && buildEvents.length === 2 && options.index) {
