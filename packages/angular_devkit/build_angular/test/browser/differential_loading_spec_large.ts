@@ -63,6 +63,36 @@ describe('Browser Builder with differential loading', () => {
       .toEqual(jasmine.arrayWithExactContents(expectedOutputs));
   });
 
+  it('deactivates differential loading for watch mode', async () => {
+    const { files } = await browserBuild(architect, host, target, { watch: true });
+
+    const expectedOutputs = [
+      'favicon.ico',
+      'index.html',
+
+      'main.js',
+      'main.js.map',
+
+      'polyfills-es5.js',
+      'polyfills-es5.js.map',
+      'polyfills.js',
+      'polyfills.js.map',
+
+      'runtime.js',
+      'runtime.js.map',
+
+      'styles.js',
+      'styles.js.map',
+
+      'vendor.js',
+      'vendor.js.map',
+    ] as PathFragment[];
+
+    expect(Object.keys(files))
+      .toEqual(jasmine.arrayWithExactContents(expectedOutputs));
+  });
+
+
   it('emits the right ES formats', async () => {
     const { files } = await browserBuild(architect, host, target, { optimization: true });
     expect(await files['main-es5.js']).not.toContain('class');
