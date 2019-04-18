@@ -12,6 +12,7 @@ import {
 } from '@angular-devkit/schematics';
 import { appendValueInAstArray, findPropertyInAstObject } from '../utility/json-utils';
 import { parseName } from '../utility/parse-name';
+import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { buildDefaultPath, getWorkspace, updateWorkspace } from '../utility/workspace';
 import { BrowserBuilderOptions, LintBuilderOptions } from '../utility/workspace-models';
 import { Schema as WebWorkerOptions } from './schema';
@@ -20,14 +21,6 @@ import { Schema as WebWorkerOptions } from './schema';
 function addConfig(options: WebWorkerOptions, root: string, tsConfigPath: string): Rule {
   return (host: Tree, context: SchematicContext) => {
     context.logger.debug('updating project configuration.');
-
-    // todo: replace with the new helper method in a seperate PR
-    // https://github.com/angular/angular-cli/pull/14207
-    const rootNormalized = root.endsWith('/') ? root.slice(0, -1) : root;
-    const relativePathToWorkspaceRoot =
-      rootNormalized
-        ? rootNormalized.split('/').map(x => '..').join('/')
-        : '.';
 
     // Add worker glob exclusion to tsconfig.app.json.
     const workerGlob = 'src/**/*.worker.ts';
@@ -51,7 +44,10 @@ function addConfig(options: WebWorkerOptions, root: string, tsConfigPath: string
 
     return mergeWith(
       apply(url('./files/worker-tsconfig'), [
-        applyTemplates({ ...options, relativePathToWorkspaceRoot }),
+        applyTemplates({
+          ...options,
+          relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(root),
+        }),
         move(root),
       ]),
     );
