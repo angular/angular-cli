@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -23,6 +24,7 @@ import { addSymbolToNgModuleMetadata, insertImport, isImported } from '../utilit
 import { InsertChange } from '../utility/change';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
 import { getAppModulePath } from '../utility/ng-ast-utils';
+import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { BrowserBuilderOptions } from '../utility/workspace-models';
@@ -136,18 +138,19 @@ export default function (options: ServiceWorkerOptions): Rule {
     const root = project.root;
 
     config.serviceWorker = true;
-    config.ngswConfigPath = `${root && !root.endsWith('/') ? root + '/' : root}ngsw-config.json`;
-
-    const relativePathToWorkspaceRoot = project.root ?
-      project.root.split('/').filter(x => x !== '').map(x => '..').join('/') : '.';
+    config.ngswConfigPath = join(normalize(root), 'ngsw-config.json');
 
     let { resourcesOutputPath = '' } = config;
     if (resourcesOutputPath) {
-      resourcesOutputPath = '/' + resourcesOutputPath.split('/').filter(x => !!x).join('/');
+      resourcesOutputPath = normalize(`/${resourcesOutputPath}`);
     }
 
     const templateSource = apply(url('./files'), [
-      applyTemplates({ ...options, resourcesOutputPath, relativePathToWorkspaceRoot }),
+      applyTemplates({
+        ...options,
+        resourcesOutputPath,
+        relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(project.root),
+      }),
       move(project.root),
     ]);
 

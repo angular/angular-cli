@@ -24,6 +24,7 @@ import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { latestVersions } from '../utility/latest-versions';
 import { applyLintFix } from '../utility/lint-fix';
+import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { validateProjectName } from '../utility/validation';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders, ProjectType } from '../utility/workspace-models';
@@ -195,7 +196,6 @@ export default function (options: LibraryOptions): Rule {
     const distRoot = `dist/${folderName}`;
 
     const sourceDir = `${projectRoot}/src/lib`;
-    const relativePathToWorkspaceRoot = projectRoot.split('/').map(x => '..').join('/');
 
     const templateSource = apply(url('./files'), [
       applyTemplates({
@@ -204,7 +204,7 @@ export default function (options: LibraryOptions): Rule {
         packageName,
         projectRoot,
         distRoot,
-        relativePathToWorkspaceRoot,
+        relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(projectRoot),
         prefix,
         angularLatestVersion: latestVersions.Angular.replace('~', '').replace('^', ''),
         folderName,
