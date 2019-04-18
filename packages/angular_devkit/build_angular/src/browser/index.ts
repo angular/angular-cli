@@ -10,7 +10,7 @@ import {
   BuilderOutput,
   createBuilder,
 } from '@angular-devkit/architect';
-import { WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
+import { BuildResult, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
 import {
   experimental,
   join,
@@ -23,8 +23,8 @@ import {
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
-import { from, of, zip } from 'rxjs';
-import { catchError, concatMap, map, switchMap } from 'rxjs/operators';
+import { concat, from, of, zip } from 'rxjs';
+import { bufferCount, catchError, concatMap, map, mergeScan, switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
 import { NgBuildAnalyticsPlugin } from '../../plugins/webpack/analytics';
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
@@ -182,12 +182,18 @@ export function buildWebpackBrowser(
         normalize(workspace.getProject(projectName).root),
       );
 
-      // We use zip because when having multiple builds we want to wait
-      // for all builds to finish before processeding
-      return zip(
-        ...configs.map(config => runWebpack(config, context, { logging: loggingFn })),
-      )
-      .pipe(
+      return from(configs).pipe(
+        // the concurrency parameter (3rd parameter of mergeScan) is deliberately
+        // set to 1 to make sure the build steps are executed in sequence.
+        mergeScan((lastResult, config) => {
+          // Make sure to only run the 2nd build step, if 1st one succeeded
+          if (lastResult.success) {
+            return runWebpack(config, context, { logging: loggingFn });
+          } else {
+            return of();
+          }
+        }, { success: true } as BuildResult, 1),
+        bufferCount(configs.length),
         switchMap(buildEvents => {
           const success = buildEvents.every(r => r.success);
           if (success && buildEvents.length === 2 && options.index) {
