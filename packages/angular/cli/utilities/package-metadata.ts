@@ -24,6 +24,8 @@ export interface PackageIdentifier {
   scope: string | null;
   registry: boolean;
   raw: string;
+  fetchSpec: string;
+  rawSpec: string;
 }
 
 export interface PackageManifest {
