@@ -16,7 +16,7 @@ describe('Migration to version 8', () => {
   );
 
   let tree: UnitTestTree;
-  const polyfillsPath = '/polyfills.ts';
+  const polyfillsPath = '/src/polyfills.ts';
   const defaultOptions = {};
   const polyfills = `/**
  */
@@ -61,18 +61,19 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
  */
 `;
 
-  const packageJson = {
-    devDependencies: {
-      codelyzer: '^4.5.0',
-    },
-  };
-  const packageJsonPath = '/package.json';
-
   describe('Migration to differential polyfill loading', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       tree = new UnitTestTree(new EmptyTree());
-      tree.create(polyfillsPath, polyfills);
-      tree.create(packageJsonPath, JSON.stringify(packageJson, null, 2));
+      tree = await schematicRunner.runExternalSchematicAsync(
+        require.resolve('../../collection.json'), 'ng-new',
+        {
+          name: 'migration-test',
+          version: '1.2.3',
+          directory: '.',
+        },
+        tree,
+      ).toPromise();
+      tree.overwrite(polyfillsPath, polyfills);
     });
 
     it('should drop the es6 polyfills', () => {
@@ -88,6 +89,31 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
       expect(polyfills).toContain('core-js/es7/reflect');
       expect(polyfills).toContain('BROWSER POLYFILLS');
       expect(polyfills).toContain('core-js/es6/weak-map');
+    });
+
+    it('should work as expected for a project with a root', async () => {
+      const originalContent = JSON.parse(tree.readContent('angular.json'));
+      originalContent
+        .projects['migration-test']
+        .architect
+        .build
+        .options
+        .polyfills = 'foo/src/polyfills.ts';
+      tree.overwrite('angular.json', JSON.stringify(originalContent));
+      const polyfillPath = '/foo/src/polyfills.ts';
+      tree.create(polyfillPath, polyfills);
+      tree = schematicRunner.runSchematic('migration-07', defaultOptions, tree);
+      const newPolyfills = tree.readContent(polyfillPath);
+      expect(newPolyfills).not.toContain('core-js/es6/symbol');
+      expect(newPolyfills).not.toContain('core-js/es6/set');
+      expect(newPolyfills).toContain('zone.js');
+      expect(newPolyfills).toContain('Zone');
+
+      // We don't want to drop this commented import comments
+      expect(newPolyfills).toContain('core-js/es6/reflect');
+      expect(newPolyfills).toContain('core-js/es7/reflect');
+      expect(newPolyfills).toContain('BROWSER POLYFILLS');
+      expect(newPolyfills).toContain('core-js/es6/weak-map');
     });
   });
 });
