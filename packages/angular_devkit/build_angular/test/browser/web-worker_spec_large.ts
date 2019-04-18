@@ -26,6 +26,8 @@ describe('Browser Builder Web Worker support', () => {
   const workerFiles: { [k: string]: string } = {
     'src/app/dep.ts': `export const foo = 'bar';`,
     'src/app/app.worker.ts': `
+      /// <reference lib="webworker" />
+
       import { foo } from './dep';
       console.log('hello from worker');
       addEventListener('message', ({ data }) => {
