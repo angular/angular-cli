@@ -295,7 +295,8 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     );
   }
 
-  if (wco.tsConfig.options.target === 4) {
+  if (wco.tsConfig.options.target !== undefined &&
+      wco.tsConfig.options.target >= ts.ScriptTarget.ES2017) {
     wco.logger.warn(tags.stripIndent`
       WARNING: Zone.js does not support native async/await in ES2017.
       These blocks are not intercepted by zone.js and will not triggering change detection.
