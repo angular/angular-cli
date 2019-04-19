@@ -149,7 +149,7 @@ export class ProjectDefinitionCollection extends DefinitionCollection<ProjectDef
       targets?: Record<string, TargetDefinition | undefined>,
       [key: string]: unknown,
     },
-  ): this {
+  ): ProjectDefinition {
     if (this.has(definition.name)) {
       throw new Error('Project name already exists.');
     }
@@ -191,7 +191,7 @@ export class ProjectDefinitionCollection extends DefinitionCollection<ProjectDef
 
     super.set(definition.name, project);
 
-    return this;
+    return project;
   }
 
   set(name: string, value: ProjectDefinition): this {
@@ -223,7 +223,7 @@ export class TargetDefinitionCollection extends DefinitionCollection<TargetDefin
     definition: {
       name: string,
     } & TargetDefinition,
-  ): this {
+  ): TargetDefinition {
     if (this.has(definition.name)) {
       throw new Error('Target name already exists.');
     }
@@ -237,7 +237,7 @@ export class TargetDefinitionCollection extends DefinitionCollection<TargetDefin
 
     super.set(definition.name, target);
 
-    return this;
+    return target;
   }
 
   set(name: string, value: TargetDefinition): this {
