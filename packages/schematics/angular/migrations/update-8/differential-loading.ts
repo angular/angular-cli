@@ -53,19 +53,26 @@ export function updateES5Projects(): Rule {
       return host;
     }
 
-    const scriptTarget = findPropertyInAstObject(compilerOptions, 'target');
-    if (scriptTarget && scriptTarget.value === 'es2015') {
-      return host;
-    }
-
     const recorder = host.beginUpdate(tsConfigPath);
-    if (scriptTarget) {
+
+    const scriptTarget = findPropertyInAstObject(compilerOptions, 'target');
+    if (!scriptTarget) {
+      insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'target', 'es2015', 4);
+    } else if (scriptTarget.value !== 'es2015') {
       const { start, end } = scriptTarget;
       recorder.remove(start.offset, end.offset - start.offset);
       recorder.insertLeft(start.offset, '"es2015"');
-    } else {
-      insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'target', 'es2015', 4);
     }
+
+    const scriptModule = findPropertyInAstObject(compilerOptions, 'module');
+    if (!scriptModule) {
+      insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'module', 'esnext', 4);
+    } else if (scriptModule.value !== 'esnext') {
+      const { start, end } = scriptModule;
+      recorder.remove(start.offset, end.offset - start.offset);
+      recorder.insertLeft(start.offset, '"esnext"');
+    }
+
     host.commitUpdate(recorder);
 
     return updateBrowserlist;
