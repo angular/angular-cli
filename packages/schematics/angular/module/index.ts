@@ -156,13 +156,14 @@ export default function (options: ModuleOptions): Rule {
 
     let routingModulePath: Path | undefined;
     if (options.route && options.module) {
-      options.routing = true;
       options.routingScope = RoutingScope.Child;
       routingModulePath = getRoutingModulePath(host, options);
     }
 
     const templateSource = apply(url('./files'), [
-      options.routing && !!routingModulePath ? noop() : filter(path => !path.endsWith('-routing.module.ts.template')),
+      options.routing || options.route && !!routingModulePath
+        ? noop()
+        : filter(path => !path.endsWith('-routing.module.ts.template')),
       options.route ? noop() : filter(path => !path.includes('component')),
       applyTemplates({
         ...strings,
