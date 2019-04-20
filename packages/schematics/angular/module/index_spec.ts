@@ -33,7 +33,7 @@ describe('Module Schematic', () => {
     name: 'bar',
     inlineStyle: false,
     inlineTemplate: false,
-    routing: false,
+    routing: true,
     skipTests: false,
     skipPackageJson: false,
   };
@@ -115,5 +115,90 @@ describe('Module Schematic', () => {
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
     appTree = schematicRunner.runSchematic('module', defaultOptions, appTree);
     expect(appTree.files).toContain('/projects/bar/custom/app/foo/foo.module.ts');
+  });
+
+  describe('lazy route generator', () => {
+    const options = {
+      ...defaultOptions,
+      route: '/new-route',
+      module: 'app',
+    };
+
+    beforeEach(() => {
+      appTree.create(
+        '/projects/bar/src/tsconfig.app.json',
+        '{ "angularCompilerOptions": { "enableIvy": false } }'
+      );
+    });
+
+    it('should generate a lazy loaded module with a routing module', () => {
+      const tree = schematicRunner.runSchematic('module', options, appTree);
+      const files = tree.files;
+
+      expect(files).toContain('/projects/bar/src/app/foo/foo.module.ts');
+      expect(files).toContain('/projects/bar/src/app/foo/foo-routing.module.ts');
+      expect(files).toContain('/projects/bar/src/app/foo/foo.component.ts');
+      expect(files).toContain('/projects/bar/src/app/foo/foo.component.html');
+      expect(files).toContain('/projects/bar/src/app/foo/foo.component.css');
+
+      const appRoutingModuleContent = tree.readContent('/projects/bar/src/app/app-routing.module.ts');
+      expect(appRoutingModuleContent).toMatch(/ path: '\/new-route', loadChildren: '.\/foo\/foo.module#FooModule' /);
+
+      const fooRoutingModuleContent = tree.readContent('/projects/bar/src/app/foo/foo-routing.module.ts');
+      expect(fooRoutingModuleContent).toMatch(/RouterModule.forChild\(routes\)/);
+      expect(fooRoutingModuleContent)
+        .toMatch(/const routes: Routes = \[([\n\r\s]+)?{ path: '', component: FooComponent }([\n\r\s]+)?\];/);
+    });
+
+    it('should generate a lazy loaded module with embedded route declarations', () => {
+      appTree.overwrite('/projects/bar/src/app/app.module.ts',
+        `
+        import { NgModule } from '@angular/core';
+        import { AppComponent } from './app.component';
+
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule,
+            RouterModule.forRoot([])
+          ],
+          providers: [],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+        `
+      );
+      appTree.delete('/projects/bar/src/app/app-routing.module.ts');
+
+      const tree = schematicRunner.runSchematic('module', options, appTree);
+      const files = tree.files;
+
+      expect(files).toContain('/projects/bar/src/app/foo/foo.module.ts');
+      expect(files).not.toContain('/projects/bar/src/app/foo/foo-routing.module.ts');
+      expect(files).toContain('/projects/bar/src/app/foo/foo.component.ts');
+      expect(files).toContain('/projects/bar/src/app/foo/foo.component.html');
+      expect(files).toContain('/projects/bar/src/app/foo/foo.component.css');
+
+      const appModuleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
+      expect(appModuleContent).toMatch(/ path: '\/new-route', loadChildren: '.\/foo\/foo.module#FooModule' /);
+
+      const fooModuleContent = tree.readContent('/projects/bar/src/app/foo/foo.module.ts');
+      expect(fooModuleContent).toMatch(/RouterModule.forChild\(routes\)/);
+      expect(fooModuleContent)
+        .toMatch(/const routes: Routes = \[([\n\r\s]+)?{ path: '', component: FooComponent }([\n\r\s]+)?\];/);
+    });
+
+    it('should support Ivy module imports', () => {
+      appTree.overwrite(
+        '/projects/bar/src/tsconfig.app.json',
+        '{ "angularCompilerOptions": { "enableIvy": true } }'
+      )
+      const tree = schematicRunner.runSchematic('module', options, appTree);
+
+      const appRoutingModuleContent = tree.readContent('/projects/bar/src/app/app-routing.module.ts');
+      expect(appRoutingModuleContent).toMatch(/loadChildren: \(\) => import\('.\/foo\/foo.module'\)/);
+    });
   });
 });
