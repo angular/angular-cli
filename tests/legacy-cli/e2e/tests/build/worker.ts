@@ -14,8 +14,8 @@ export default async function () {
 
   const workerPath = join('src', 'app', 'app.worker.ts');
   const snippetPath = join('src', 'app', 'app.component.ts');
-  const projectTsConfig = join('src', 'tsconfig.json');
-  const workerTsConfig = join('src', 'tsconfig.worker.json');
+  const projectTsConfig = 'tsconfig.json';
+  const workerTsConfig = 'tsconfig.worker.json';
 
   await ng('generate', 'web-worker', 'app');
   await expectFileToExist(workerPath);

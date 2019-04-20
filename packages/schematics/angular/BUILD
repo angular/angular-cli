@@ -50,8 +50,10 @@ ts_library(
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tasks",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
+        "@npm//@phenomnomnominal/tsquery",
         "@npm//@types/node",
         "@npm//rxjs",
+        "@npm//tslint",
     ],
 )
 
@@ -83,12 +85,15 @@ ts_library(
     deps = ALL_SCHEMA_DEPS + [
         ":angular",
         "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core:node_testing",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:testing",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
+        "@npm//@phenomnomnominal/tsquery",
         "@npm//@types/node",
         "@npm//@types/jasmine",
         "@npm//rxjs",
+        "@npm//tslint",
     ],
     testonly = True,
     # @external_begin

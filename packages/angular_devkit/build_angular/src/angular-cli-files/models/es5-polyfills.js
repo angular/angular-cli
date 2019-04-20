@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
- // ES2015 symbol capabilities
+// ES2015 symbol capabilities
 import 'core-js/modules/es.symbol';
 
 // ES2015 function capabilities

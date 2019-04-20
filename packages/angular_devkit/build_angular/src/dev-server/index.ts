@@ -27,18 +27,18 @@ import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
 import { checkPort } from '../angular-cli-files/utilities/check-port';
 import {
-  BrowserConfigTransformFn,
   buildBrowserWebpackConfigFromContext,
   createBrowserLoggingCallback,
 } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
+import { ExecutionTransformer } from '../transforms';
 import { normalizeOptimization } from '../utils';
 import { Schema } from './schema';
 const open = require('open');
 
-export type DevServerBuilderSchema = Schema & json.JsonObject;
+export type DevServerBuilderOptions = Schema & json.JsonObject;
 
-export const devServerBuildOverriddenKeys: (keyof DevServerBuilderSchema)[] = [
+export const devServerBuildOverriddenKeys: (keyof DevServerBuilderOptions)[] = [
   'watch',
   'optimization',
   'aot',
@@ -72,11 +72,10 @@ export type ServerConfigTransformFn = (
  *     transforming webpack configuration before passing it to webpack).
  */
 export function serveWebpackBrowser(
-  options: DevServerBuilderSchema,
+  options: DevServerBuilderOptions,
   context: BuilderContext,
   transforms: {
-    browserConfig?: BrowserConfigTransformFn,
-    serverConfig?: ServerConfigTransformFn,
+    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>,
     logging?: WebpackLoggingCallback,
   } = {},
 ): Observable<DevServerBuilderOutput> {
@@ -99,12 +98,15 @@ export function serveWebpackBrowser(
     const rawBrowserOptions = await context.getTargetOptions(browserTarget);
 
     // Override options we need to override, if defined.
-    const overrides = (Object.keys(options) as (keyof DevServerBuilderSchema)[])
+    const overrides = (Object.keys(options) as (keyof DevServerBuilderOptions)[])
     .filter(key => options[key] !== undefined && devServerBuildOverriddenKeys.includes(key))
     .reduce<json.JsonObject & Partial<BrowserBuilderSchema>>((previous, key) => ({
       ...previous,
       [key]: options[key],
     }), {});
+
+    // In dev server we should not have budgets because of extra libs such as socks-js
+    overrides.budgets = undefined;
 
     const browserName = await context.getBuilderNameForTarget(browserTarget);
     const browserOptions = await context.validateOptions<json.JsonObject & BrowserBuilderSchema>(
@@ -117,23 +119,20 @@ export function serveWebpackBrowser(
       context,
       host,
     );
-    let webpackConfig = webpackConfigResult.config;
-    const workspace = webpackConfigResult.workspace;
 
-    if (transforms.browserConfig) {
-      webpackConfig = await transforms.browserConfig(workspace, webpackConfig).toPromise();
-    }
+    // No differential loading for dev-server, hence there is just one config
+    let webpackConfig = webpackConfigResult.config[0];
 
     const port = await checkPort(options.port || 0, options.host || 'localhost', 4200);
-    let webpackDevServerConfig = buildServerConfig(
+    const webpackDevServerConfig = webpackConfig.devServer = buildServerConfig(
       root,
       options,
       browserOptions,
       context.logger,
     );
 
-    if (transforms.serverConfig) {
-      webpackDevServerConfig = await transforms.serverConfig(workspace, webpackConfig).toPromise();
+    if (transforms.webpackConfiguration) {
+      webpackConfig = await transforms.webpackConfiguration(webpackConfig);
     }
 
     return { browserOptions, webpackConfig, webpackDevServerConfig, port };
@@ -203,7 +202,6 @@ export function serveWebpackBrowser(
       `);
 
       openAddress = serverAddress + webpackDevServerConfig.publicPath;
-      webpackConfig.devServer = webpackDevServerConfig;
 
       return runWebpackDevServer(webpackConfig, context, { logging: loggingFn });
     }),
@@ -229,7 +227,7 @@ export function serveWebpackBrowser(
  */
 export function buildServerConfig(
   workspaceRoot: string,
-  serverOptions: DevServerBuilderSchema,
+  serverOptions: DevServerBuilderOptions,
   browserOptions: BrowserBuilderSchema,
   logger: logging.LoggerApi,
 ): WebpackDevServer.Configuration {
@@ -303,7 +301,7 @@ export function buildServerConfig(
  * @param logger A generic logger to use for showing warnings.
  */
 export function buildServePath(
-  serverOptions: DevServerBuilderSchema,
+  serverOptions: DevServerBuilderOptions,
   browserOptions: BrowserBuilderSchema,
   logger: logging.LoggerApi,
 ): string {
@@ -334,7 +332,7 @@ export function buildServePath(
  * @private
  */
 function _addLiveReload(
-  options: DevServerBuilderSchema,
+  options: DevServerBuilderOptions,
   browserOptions: BrowserBuilderSchema,
   webpackConfig: webpack.Configuration,
   clientAddress: url.UrlWithStringQuery,
@@ -402,7 +400,7 @@ function _addLiveReload(
  */
 function _addSslConfig(
   root: string,
-  options: DevServerBuilderSchema,
+  options: DevServerBuilderOptions,
   config: WebpackDevServer.Configuration,
 ) {
   let sslKey: string | undefined = undefined;
@@ -435,7 +433,7 @@ function _addSslConfig(
  */
 function _addProxyConfig(
   root: string,
-  options: DevServerBuilderSchema,
+  options: DevServerBuilderOptions,
   config: WebpackDevServer.Configuration,
 ) {
   let proxyConfig = {};
@@ -490,4 +488,4 @@ function _findDefaultServePath(baseHref?: string, deployUrl?: string): string | 
 }
 
 
-export default createBuilder<DevServerBuilderSchema, DevServerBuilderOutput>(serveWebpackBrowser);
+export default createBuilder<DevServerBuilderOptions, DevServerBuilderOutput>(serveWebpackBrowser);

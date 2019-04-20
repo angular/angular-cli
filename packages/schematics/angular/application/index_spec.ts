@@ -38,10 +38,11 @@ describe('Application Schematic', () => {
     workspaceTree = schematicRunner.runSchematic('workspace', workspaceOptions);
   });
 
-  it('should create all files of an application', () => {
+  it('should create all files of an application', async () => {
     const options = { ...defaultOptions };
 
-    const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
     const files = tree.files;
     expect(files).toEqual(jasmine.arrayContaining([
       '/projects/foo/karma.conf.js',
@@ -64,35 +65,39 @@ describe('Application Schematic', () => {
     ]));
   });
 
-  it('should add the application to the workspace', () => {
+  it('should add the application to the workspace', async () => {
     const options = { ...defaultOptions };
 
-    const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
     const workspace = JSON.parse(tree.readContent('/angular.json'));
     expect(workspace.projects.foo).toBeDefined();
     expect(workspace.defaultProject).toBe('foo');
   });
 
-  it('should set the prefix to app if none is set', () => {
+  it('should set the prefix to app if none is set', async () => {
     const options = { ...defaultOptions };
 
-    const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
     const workspace = JSON.parse(tree.readContent('/angular.json'));
     expect(workspace.projects.foo.prefix).toEqual('app');
   });
 
-  it('should set the prefix correctly', () => {
+  it('should set the prefix correctly', async () => {
     const options = { ...defaultOptions, prefix: 'pre' };
 
-    const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
     const workspace = JSON.parse(tree.readContent('/angular.json'));
     expect(workspace.projects.foo.prefix).toEqual('pre');
   });
 
-  it('should handle the routing flag', () => {
+  it('should handle the routing flag', async () => {
     const options = { ...defaultOptions, routing: true };
 
-    const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
     const files = tree.files;
     expect(files).toContain('/projects/foo/src/app/app.module.ts');
     expect(files).toContain('/projects/foo/src/app/app-routing.module.ts');
@@ -102,33 +107,36 @@ describe('Application Schematic', () => {
     expect(routingModuleContent).toMatch(/RouterModule.forRoot\(routes\)/);
   });
 
-  it('should import BrowserModule in the app module', () => {
-    const tree = schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
+  it('should import BrowserModule in the app module', async () => {
+    const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
+      .toPromise();
     const path = '/projects/foo/src/app/app.module.ts';
     const content = tree.readContent(path);
     expect(content).toMatch(/import { BrowserModule } from \'@angular\/platform-browser\';/);
   });
 
-  it('should declare app component in the app module', () => {
-    const tree = schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
+  it('should declare app component in the app module', async () => {
+    const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
+      .toPromise();
     const path = '/projects/foo/src/app/app.module.ts';
     const content = tree.readContent(path);
     expect(content).toMatch(/import { AppComponent } from \'\.\/app\.component\';/);
   });
 
-  it(`should set 'defaultEncapsulation' in main.ts when 'ViewEncapsulation' is provided`, () => {
-    const tree = schematicRunner.runSchematic('application', {
+  it(`should set 'defaultEncapsulation' in main.ts when 'ViewEncapsulation' is provided`, async () => {
+    const tree = await schematicRunner.runSchematicAsync('application', {
       ...defaultOptions,
       viewEncapsulation: ViewEncapsulation.ShadowDom,
-    }, workspaceTree);
+    }, workspaceTree).toPromise();
     const path = '/projects/foo/src/main.ts';
     const content = tree.readContent(path);
     expect(content).toContain('defaultEncapsulation: ViewEncapsulation.ShadowDom');
     expect(content).toContain(`import { enableProdMode, ViewEncapsulation } from '@angular/core'`);
   });
 
-  it('should set the right paths in the tsconfig files', () => {
-    const tree = schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
+  it('should set the right paths in the tsconfig files', async () => {
+    const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
+      .toPromise();
     let path = '/projects/foo/tsconfig.app.json';
     let content = tree.readContent(path);
     expect(content).toMatch('../../tsconfig.json');
@@ -139,8 +147,9 @@ describe('Application Schematic', () => {
     expect(specTsConfig.files).toEqual(['src/test.ts', 'src/polyfills.ts']);
   });
 
-  it('should set the right path and prefix in the tslint file', () => {
-    const tree = schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
+  it('should set the right path and prefix in the tslint file', async () => {
+    const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
+      .toPromise();
     const path = '/projects/foo/tslint.json';
     const content = JSON.parse(tree.readContent(path));
     expect(content.extends).toMatch('../../tslint.json');
@@ -148,33 +157,37 @@ describe('Application Schematic', () => {
     expect(content.rules['component-selector'][2]).toMatch('app');
   });
 
-  it('should set the right prefix in the tslint file when provided is kebabed', () => {
+  it('should set the right prefix in the tslint file when provided is kebabed', async () => {
     const options: ApplicationOptions = { ...defaultOptions, prefix: 'foo-bar' };
-    const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
     const path = '/projects/foo/tslint.json';
     const content = JSON.parse(tree.readContent(path));
     expect(content.rules['directive-selector'][2]).toMatch('fooBar');
     expect(content.rules['component-selector'][2]).toMatch('foo-bar');
   });
 
-  it('should set the right coverage folder in the karma.json file', () => {
-    const tree = schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
+  it('should set the right coverage folder in the karma.json file', async () => {
+    const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
+      .toPromise();
     const karmaConf = getFileContent(tree, '/projects/foo/karma.conf.js');
     expect(karmaConf).toContain(`dir: require('path').join(__dirname, '../../coverage/foo')`);
   });
 
-  it('minimal=true should not create e2e and test targets', () => {
+  it('minimal=true should not create e2e and test targets', async () => {
     const options = { ...defaultOptions, minimal: true };
-    const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
     const config = JSON.parse(tree.readContent('/angular.json'));
     const architect = config.projects.foo.architect;
     expect(architect.test).not.toBeDefined();
     expect(architect.e2e).not.toBeDefined();
   });
 
-  it('should create correct files when using minimal', () => {
+  it('should create correct files when using minimal', async () => {
     const options = { ...defaultOptions, minimal: true };
-    const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
     const files = tree.files;
     [
       '/projects/foo/tsconfig.spec.json',
@@ -201,38 +214,41 @@ describe('Application Schematic', () => {
   });
 
   describe(`update package.json`, () => {
-    it(`should add build-angular to devDependencies`, () => {
-      const tree = schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
+    it(`should add build-angular to devDependencies`, async () => {
+      const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
+        .toPromise();
 
       const packageJson = JSON.parse(tree.readContent('package.json'));
       expect(packageJson.devDependencies['@angular-devkit/build-angular'])
         .toEqual(latestVersions.DevkitBuildAngular);
     });
 
-    it('should use the latest known versions in package.json', () => {
-      const tree = schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
+    it('should use the latest known versions in package.json', async () => {
+      const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
+        .toPromise();
       const pkg = JSON.parse(tree.readContent('/package.json'));
       expect(pkg.devDependencies['@angular/compiler-cli']).toEqual(latestVersions.Angular);
       expect(pkg.devDependencies['typescript']).toEqual(latestVersions.TypeScript);
     });
 
-    it(`should not override existing users dependencies`, () => {
+    it(`should not override existing users dependencies`, async () => {
       const oldPackageJson = workspaceTree.readContent('package.json');
       workspaceTree.overwrite('package.json', oldPackageJson.replace(
         `"typescript": "${latestVersions.TypeScript}"`,
         `"typescript": "~2.5.2"`,
       ));
 
-      const tree = schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
+      const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
+        .toPromise();
       const packageJson = JSON.parse(tree.readContent('package.json'));
       expect(packageJson.devDependencies.typescript).toEqual('~2.5.2');
     });
 
-    it(`should not modify the file when --skipPackageJson`, () => {
-      const tree = schematicRunner.runSchematic('application', {
+    it(`should not modify the file when --skipPackageJson`, async () => {
+      const tree = await schematicRunner.runSchematicAsync('application', {
         name: 'foo',
         skipPackageJson: true,
-      }, workspaceTree);
+      }, workspaceTree).toPromise();
 
       const packageJson = JSON.parse(tree.readContent('package.json'));
       expect(packageJson.devDependencies['@angular-devkit/build-angular']).toBeUndefined();
@@ -240,10 +256,11 @@ describe('Application Schematic', () => {
   });
 
   describe('custom projectRoot', () => {
-    it('should put app files in the right spot', () => {
+    it('should put app files in the right spot', async () => {
       const options = { ...defaultOptions, projectRoot: '' };
 
-      const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+      const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+        .toPromise();
       const files = tree.files;
       expect(files).toEqual(jasmine.arrayContaining([
         '/karma.conf.js',
@@ -266,10 +283,11 @@ describe('Application Schematic', () => {
       ]));
     });
 
-    it('should set values in angular.json correctly', () => {
+    it('should set values in angular.json correctly', async () => {
       const options = { ...defaultOptions, projectRoot: '' };
 
-      const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+      const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+        .toPromise();
       const config = JSON.parse(tree.readContent('/angular.json'));
       const prj = config.projects.foo;
       expect(prj.root).toEqual('');
@@ -288,9 +306,10 @@ describe('Application Schematic', () => {
       ]);
     });
 
-    it('should set values in angular.json correctly when using a style preprocessor', () => {
+    it('should set values in angular.json correctly when using a style preprocessor', async () => {
       const options = { ...defaultOptions, projectRoot: '', style: Style.Sass };
-      const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+      const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+        .toPromise();
       const config = JSON.parse(tree.readContent('/angular.json'));
       const prj = config.projects.foo;
       const buildOpt = prj.architect.build.options;
@@ -304,9 +323,10 @@ describe('Application Schematic', () => {
       expect(tree.exists('src/styles.sass')).toBe(true);
     });
 
-    it('should set the relative tsconfig paths', () => {
+    it('should set the relative tsconfig paths', async () => {
       const options = { ...defaultOptions, projectRoot: '' };
-      const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+      const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+        .toPromise();
       const appTsConfig = JSON.parse(tree.readContent('/tsconfig.app.json'));
       expect(appTsConfig.extends).toEqual('./tsconfig.json');
       const specTsConfig = JSON.parse(tree.readContent('/tsconfig.spec.json'));
@@ -314,20 +334,22 @@ describe('Application Schematic', () => {
       expect(specTsConfig.files).toEqual(['src/test.ts', 'src/polyfills.ts']);
     });
 
-    it('should set the relative path and prefix in the tslint file', () => {
+    it('should set the relative path and prefix in the tslint file', async () => {
       const options = { ...defaultOptions, projectRoot: '' };
 
-      const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+      const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+        .toPromise();
       const content = JSON.parse(tree.readContent('/tslint.json'));
       expect(content.extends).toMatch('tslint:recommended');
       expect(content.rules['directive-selector'][2]).toMatch('app');
       expect(content.rules['component-selector'][2]).toMatch('app');
     });
 
-    it('should merge tslint file', () => {
+    it('should merge tslint file', async () => {
       const options = { ...defaultOptions, projectRoot: '' };
 
-      const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+      const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+        .toPromise();
       const content = JSON.parse(tree.readContent('/tslint.json'));
       expect(content.extends).toMatch('tslint:recommended');
       expect(content.rules['component-selector'][2]).toMatch('app');

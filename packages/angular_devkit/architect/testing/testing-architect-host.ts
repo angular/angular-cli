@@ -41,6 +41,10 @@ export class TestingArchitectHost implements ArchitectHost {
       throw new Error('Invalid package.json, builders key not found.');
     }
 
+    if (!packageJson.name) {
+      throw new Error('Invalid package name');
+    }
+
     const builderJsonPath = packageName + '/' + packageJson['builders'];
     const builderJson = await import(builderJsonPath);
     const builders = builderJson['builders'];
@@ -52,9 +56,9 @@ export class TestingArchitectHost implements ArchitectHost {
       const b = builders[builderName];
       // TODO: remove this check as v1 is not supported anymore.
       if (!b.implementation) { continue; }
-      const handler = await import(builderJsonPath + '/../' + b.implementation);
+      const handler = (await import(builderJsonPath + '/../' + b.implementation)).default;
       const optionsSchema = await import(builderJsonPath + '/../' + b.schema);
-      this.addBuilder(builderName, handler, b.description, optionsSchema);
+      this.addBuilder(`${packageJson.name}:${builderName}`, handler, b.description, optionsSchema);
     }
   }
   addTarget(target: Target, builderName: string, options: json.JsonObject = {}) {

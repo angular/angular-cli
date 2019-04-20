@@ -231,4 +231,4 @@ export type AsyncFileOperator = (tree: FileEntry) => Observable<FileEntry | null
  */
 export type Source = (context: SchematicContext) => Tree | Observable<Tree>;
 export type Rule = (tree: Tree, context: SchematicContext) =>
-  Tree | Observable<Tree> | Rule | Promise<void> | void;
+  Tree | Observable<Tree> | Rule | Promise<void> | Promise<Rule> | void;

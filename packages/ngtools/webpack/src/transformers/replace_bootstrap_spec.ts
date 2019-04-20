@@ -52,7 +52,7 @@ describe('@ngtools/webpack transformers', () => {
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('should replace bootstrap for Ivy without referencing ngFactory', () => {
+    it('should replace bootstrap without referencing ngFactory when useFactories is false', () => {
       const input = tags.stripIndent`
         import { enableProdMode } from '@angular/core';
         import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -87,7 +87,7 @@ describe('@ngtools/webpack transformers', () => {
         () => true,
         () => ({ path: '/project/src/app/app.module', className: 'AppModule' }),
         () => program.getTypeChecker(),
-        true,
+        false,
       );
       const result = transformTypescript(undefined, [transformer], program, compilerHost);
 

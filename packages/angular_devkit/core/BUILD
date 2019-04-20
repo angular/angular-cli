@@ -33,6 +33,7 @@ ts_library(
         "@npm//@types/node",
         "@npm//@types/source-map",
         "@npm//ajv",
+        "@npm//magic-string",
         # @typings: es2015.core
         # @typings: es2015.symbol.wellknown
         # @typings: es2016.array.include

@@ -25,9 +25,10 @@ import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
-import { buildDefaultPath, getProject, isProjectUsingIvy } from '../utility/project';
+import { getProject, isProjectUsingIvy } from '../utility/project';
 import { Schema as ModuleOptions, RoutingScope } from './schema';
 import { WorkspaceProject } from '../utility/workspace-models';
+import { createDefaultPath } from '../utility/workspace';
 
 function addDeclarationToNgModule(options: ModuleOptions): Rule {
   return (host: Tree) => {
@@ -136,14 +137,9 @@ function buildRoute(options: ModuleOptions, ivyEnabled: boolean) {
 }
 
 export default function (options: ModuleOptions): Rule {
-  return (host: Tree) => {
-    if (!options.project) {
-      throw new SchematicsException('Option (project) is required.');
-    }
-    const project = getProject(host, options.project);
-
+  return async (host: Tree) => {
     if (options.path === undefined) {
-      options.path = buildDefaultPath(project);
+      options.path = await createDefaultPath(host, options.project as string);
     }
 
     if (options.module) {
@@ -160,6 +156,7 @@ export default function (options: ModuleOptions): Rule {
       routingModulePath = getRoutingModulePath(host, options);
     }
 
+    const project = getProject(host, options.project);
     const templateSource = apply(url('./files'), [
       options.routing || options.route && !!routingModulePath
         ? noop()

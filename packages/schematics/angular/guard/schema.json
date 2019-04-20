@@ -70,7 +70,6 @@
     }
   },
   "required": [
-    "name",
-    "project"
+    "name"
   ]
 }

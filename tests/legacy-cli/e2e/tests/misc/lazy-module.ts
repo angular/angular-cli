@@ -2,19 +2,9 @@ import {readdirSync} from 'fs';
 
 import {ng, silentNpm} from '../../utils/process';
 import {appendToFile, writeFile, prependToFile, replaceInFile} from '../../utils/fs';
-import {getGlobalVariable} from '../../utils/env';
 
 
 export default function() {
-  const argv = getGlobalVariable('argv');
-  const ivyProject = argv['ivy'];
-  const lazyImport = ivyProject ? `() => import('src/app/lazy/lazy.module').then(m => m.LazyModule)`
-    : `'src/app/lazy/lazy.module#LazyModule'`;
-  const lazyImport1 = ivyProject ? `() => import('./lazy/lazy.module').then(m => m.LazyModule)`
-    : `'./lazy/lazy.module#LazyModule'`;
-  const lazyImport2 = ivyProject ? `() => import('./too/lazy/lazy.module').then(m => m.LazyModule)`
-    : `'./too/lazy/lazy.module#LazyModule'`;
-
   let oldNumberOfFiles = 0;
   return Promise.resolve()
     .then(() => ng('build'))
@@ -25,9 +15,9 @@ export default function() {
       import { RouterModule } from '@angular/router';
     `))
     .then(() => replaceInFile('src/app/app.module.ts', 'imports: [', `imports: [
-      RouterModule.forRoot([{ path: "lazy", loadChildren: ${lazyImport} }]),
-      RouterModule.forRoot([{ path: "lazy1", loadChildren: ${lazyImport1} }]),
-      RouterModule.forRoot([{ path: "lazy2", loadChildren: ${lazyImport2} }]),
+      RouterModule.forRoot([{ path: "lazy", loadChildren: 'src/app/lazy/lazy.module#LazyModule' }]),
+      RouterModule.forRoot([{ path: "lazy1", loadChildren: './lazy/lazy.module#LazyModule' }]),
+      RouterModule.forRoot([{ path: "lazy2", loadChildren: './too/lazy/lazy.module#LazyModule' }]),
     `))
     .then(() => ng('build', '--named-chunks'))
     .then(() => readdirSync('dist/test-project'))
@@ -38,14 +28,8 @@ export default function() {
       }
       oldNumberOfFiles = currentNumberOfDistFiles;
 
-      // Named lazy route chunks are not available with Ivy.
-      if (!ivyProject) {
-        if (!distFiles.includes('lazy-lazy-module.js')) {
-          throw new Error('The lazy module chunk did not have a name.');
-        }
-        if (!distFiles.includes('too-lazy-lazy-module.js')) {
-          throw new Error('The lazy module chunk did not use a unique name.');
-        }
+      if (!distFiles.includes('too-lazy-lazy-module-es5.js')) {
+        throw new Error('The lazy module chunk did not use a unique name.');
       }
     })
     // verify System.import still works
@@ -63,7 +47,7 @@ export default function() {
       if (oldNumberOfFiles >= currentNumberOfDistFiles) {
         throw new Error('A bundle for the lazy file was not created.');
       }
-      if (!distFiles.includes('lazy-file.js')) {
+      if (!distFiles.includes('lazy-file-es5.js')) {
         throw new Error('The lazy file chunk did not have a name.');
       }
       oldNumberOfFiles = currentNumberOfDistFiles;
@@ -84,8 +68,8 @@ export default function() {
     .then(() => ng('build', '--no-named-chunks'))
     .then(() => readdirSync('dist/test-project'))
     .then((distFiles) => {
-      if (distFiles.includes('lazy-lazy-module.js')
-        || distFiles.includes('too-lazy-lazy-module.js')
+      if (distFiles.includes('lazy-lazy-module-es5.js')
+        || distFiles.includes('too-lazy-lazy-module-es5.js')
       ) {
         throw new Error('Lazy chunks shouldn\'t have a name but did.');
       }

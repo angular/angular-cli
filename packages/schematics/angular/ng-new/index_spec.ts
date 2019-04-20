@@ -20,18 +20,18 @@ describe('Ng New Schematic', () => {
     version: '6.0.0',
   };
 
-  it('should create files of a workspace', () => {
+  it('should create files of a workspace', async () => {
     const options = { ...defaultOptions };
 
-    const tree = schematicRunner.runSchematic('ng-new', options);
+    const tree = await schematicRunner.runSchematicAsync('ng-new', options).toPromise();
     const files = tree.files;
     expect(files).toContain('/bar/angular.json');
   });
 
-  it('should create files of an application', () => {
+  it('should create files of an application', async () => {
     const options = { ...defaultOptions };
 
-    const tree = schematicRunner.runSchematic('ng-new', options);
+    const tree = await schematicRunner.runSchematicAsync('ng-new', options).toPromise();
     const files = tree.files;
     expect(files).toEqual(jasmine.arrayContaining([
       '/bar/tsconfig.app.json',
@@ -44,38 +44,38 @@ describe('Ng New Schematic', () => {
     ]));
   });
 
-  it('should should set the prefix in angular.json and in app.component.ts', () => {
+  it('should should set the prefix in angular.json and in app.component.ts', async () => {
     const options = { ...defaultOptions, prefix: 'pre' };
 
-    const tree = schematicRunner.runSchematic('ng-new', options);
+    const tree = await schematicRunner.runSchematicAsync('ng-new', options).toPromise();
     const content = tree.readContent('/bar/angular.json');
     expect(content).toMatch(/"prefix": "pre"/);
   });
 
-  it('should set up the app module', () => {
+  it('should set up the app module', async () => {
     const options: NgNewOptions = {
       name: 'foo',
       version: '6.0.0',
     };
 
-    const tree = schematicRunner.runSchematic('ng-new', options);
+    const tree = await schematicRunner.runSchematicAsync('ng-new', options).toPromise();
     const moduleContent = tree.readContent('/foo/src/app/app.module.ts');
     expect(moduleContent).toMatch(/declarations:\s*\[\s*AppComponent\s*\]/m);
   });
 
-  it('createApplication=false should create an empty workspace', () => {
+  it('createApplication=false should create an empty workspace', async () => {
     const options = { ...defaultOptions, createApplication: false };
 
-    const tree = schematicRunner.runSchematic('ng-new', options);
+    const tree = await schematicRunner.runSchematicAsync('ng-new', options).toPromise();
     const files = tree.files;
     expect(files).toContain('/bar/angular.json');
     expect(files).not.toContain('/bar/src');
   });
 
-  it('minimal=true should not create an e2e target', () => {
+  it('minimal=true should not create an e2e target', async () => {
     const options = { ...defaultOptions, minimal: true };
 
-    const tree = schematicRunner.runSchematic('ng-new', options);
+    const tree = await schematicRunner.runSchematicAsync('ng-new', options).toPromise();
     const confContent = JSON.parse(tree.readContent('/bar/angular.json'));
     expect(confContent.projects.foo.e2e).toBeUndefined();
   });

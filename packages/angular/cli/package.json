@@ -33,7 +33,7 @@
     "@yarnpkg/lockfile": "1.1.0",
     "debug": "^4.1.1",
     "ini": "1.3.5",
-    "inquirer": "6.2.2",
+    "inquirer": "6.3.1",
     "npm-package-arg": "6.1.0",
     "open": "6.1.0",
     "pacote": "9.5.0",

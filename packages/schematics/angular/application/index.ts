@@ -33,47 +33,15 @@ import {
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { Schema as ComponentOptions } from '../component/schema';
 import { Schema as E2eOptions } from '../e2e/schema';
-import {
-  addProjectToWorkspace,
-  getWorkspace,
-} from '../utility/config';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { findPropertyInAstObject, insertPropertyInAstObjectInOrder } from '../utility/json-utils';
 import { latestVersions } from '../utility/latest-versions';
 import { applyLintFix } from '../utility/lint-fix';
+import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { validateProjectName } from '../utility/validation';
-import {
-  Builders,
-  ProjectType,
-  WorkspaceProject,
-  WorkspaceSchema,
-} from '../utility/workspace-models';
+import { getWorkspace, updateWorkspace } from '../utility/workspace';
+import { Builders, ProjectType } from '../utility/workspace-models';
 import { Schema as ApplicationOptions, Style } from './schema';
-
-
-// TODO: use JsonAST
-// function appendPropertyInAstObject(
-//   recorder: UpdateRecorder,
-//   node: JsonAstObject,
-//   propertyName: string,
-//   value: JsonValue,
-//   indent = 4,
-// ) {
-//   const indentStr = '\n' + new Array(indent + 1).join(' ');
-
-//   if (node.properties.length > 0) {
-//     // Insert comma.
-//     const last = node.properties[node.properties.length - 1];
-//     recorder.insertRight(last.start.offset + last.text.replace(/\s+$/, '').length, ',');
-//   }
-
-//   recorder.insertLeft(
-//     node.end.offset - 1,
-//     '  '
-//     + `"${propertyName}": ${JSON.stringify(value, null, 2).replace(/\n/g, indentStr)}`
-//     + indentStr.slice(0, -2),
-//   );
-// }
 
 function addDependenciesToPackageJson(options: ApplicationOptions) {
   return (host: Tree, context: SchematicContext) => {
@@ -175,23 +143,13 @@ function mergeWithRootTsLint(parentHost: Tree) {
   };
 }
 
-function addAppToWorkspaceFile(options: ApplicationOptions, workspace: WorkspaceSchema): Rule {
-  // TODO: use JsonAST
-  // const workspacePath = '/angular.json';
-  // const workspaceBuffer = host.read(workspacePath);
-  // if (workspaceBuffer === null) {
-  //   throw new SchematicsException(`Configuration file (${workspacePath}) not found.`);
-  // }
-  // const workspaceJson = parseJson(workspaceBuffer.toString());
-  // if (workspaceJson.value === null) {
-  //   throw new SchematicsException(`Unable to parse configuration file (${workspacePath}).`);
-  // }
-
+function addAppToWorkspaceFile(options: ApplicationOptions, newProjectRoot: string): Rule {
   let projectRoot = options.projectRoot !== undefined
     ? options.projectRoot
-    : `${workspace.newProjectRoot}/${options.name}`;
+    : `${newProjectRoot}/${options.name}`;
 
-  if (projectRoot !== '' && !projectRoot.endsWith('/')) {
+  projectRoot = normalize(projectRoot);
+  if (projectRoot) {
     projectRoot += '/';
   }
 
@@ -224,13 +182,14 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
   }
 
   const sourceRoot = join(normalize(projectRoot), 'src');
-  const project: WorkspaceProject = {
+
+  const project = {
     root: projectRoot,
     sourceRoot,
     projectType: ProjectType.Application,
     prefix: options.prefix || 'app',
     schematics,
-    architect: {
+    targets: {
       build: {
         builder: Builders.Browser,
         options: {
@@ -247,7 +206,6 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
             `${sourceRoot}/styles.${options.style}`,
           ],
           scripts: [],
-          es5BrowserSupport: true,
         },
         configurations: {
           production: {
@@ -321,7 +279,16 @@ function addAppToWorkspaceFile(options: ApplicationOptions, workspace: Workspace
     },
   };
 
-  return addProjectToWorkspace(workspace, options.name, project);
+  return updateWorkspace(workspace => {
+    if (workspace.projects.size === 0) {
+      workspace.extensions.defaultProject = options.name;
+    }
+
+    workspace.projects.add({
+      name: options.name,
+      ...project,
+    });
+  });
 }
 
 function minimalPathFilter(path: string): boolean {
@@ -331,7 +298,7 @@ function minimalPathFilter(path: string): boolean {
 }
 
 export default function (options: ApplicationOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
+  return async (host: Tree, context: SchematicContext) => {
     if (!options.name) {
       throw new SchematicsException(`Invalid options, "name" is required.`);
     }
@@ -353,15 +320,12 @@ export default function (options: ApplicationOptions): Rule {
         style: options.style,
       };
 
-    const workspace = getWorkspace(host);
-    const newProjectRoot = workspace.newProjectRoot || '';
+    const workspace = await getWorkspace(host);
+    const newProjectRoot = workspace.extensions.newProjectRoot as string || '';
     const isRootApp = options.projectRoot !== undefined;
     const appDir = isRootApp
       ? options.projectRoot as string
       : `${newProjectRoot}/${options.name}`;
-    const relativePathToWorkspaceRoot = appDir
-      ? appDir.split('/').map(() => '..').join('/')
-      : '.';
     const sourceDir = `${appDir}/src/app`;
 
     const e2eOptions: E2eOptions = {
@@ -370,14 +334,14 @@ export default function (options: ApplicationOptions): Rule {
     };
 
     return chain([
-      addAppToWorkspaceFile(options, workspace),
+      addAppToWorkspaceFile(options, newProjectRoot),
       mergeWith(
         apply(url('./files'), [
           options.minimal ? filter(minimalPathFilter) : noop(),
           applyTemplates({
             utils: strings,
             ...options,
-            relativePathToWorkspaceRoot,
+            relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(appDir),
             appName: options.name,
             isRootApp,
           }),

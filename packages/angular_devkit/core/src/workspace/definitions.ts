@@ -146,7 +146,7 @@ export class ProjectDefinitionCollection extends DefinitionCollection<ProjectDef
       root: string,
       sourceRoot?: string,
       prefix?: string,
-      targets?: Record<string, TargetDefinition>,
+      targets?: Record<string, TargetDefinition | undefined>,
       [key: string]: unknown,
     },
   ): this {
@@ -165,7 +165,9 @@ export class ProjectDefinitionCollection extends DefinitionCollection<ProjectDef
 
     if (definition.targets) {
       for (const [name, target] of Object.entries(definition.targets)) {
-        project.targets.set(name, target);
+        if (target) {
+          project.targets.set(name, target);
+        }
       }
     }
 
@@ -201,8 +203,8 @@ export class ProjectDefinitionCollection extends DefinitionCollection<ProjectDef
   }
 
   private _validateName(name: string): void {
-    if (typeof name !== 'string' || !/^[a-zA-Z][.0-9a-zA-Z]*(-[.0-9a-zA-Z]*)*$/.test(name)) {
-      throw new Error('Project name must be a valid npm package name without a scope.');
+    if (typeof name !== 'string' || !/^(?:@\w[\w\.-]*\/)?\w[\w\.-]*$/.test(name)) {
+      throw new Error('Project name must be a valid npm package name.');
     }
   }
 

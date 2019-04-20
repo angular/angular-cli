@@ -17,6 +17,7 @@ import { TestProjectHost, TestingArchitectHost } from '@angular-devkit/architect
 import {
   Path,
   experimental,
+  getSystemPath,
   join,
   json,
   normalize,
@@ -42,15 +43,16 @@ export const tslintTargetSpec = { project: 'app', target: 'lint' };
 export const protractorTargetSpec = { project: 'app-e2e', target: 'e2e' };
 
 
-export async function createArchitect(workspaceRoot: string) {
+export async function createArchitect(workspaceRoot: Path) {
   const registry = new schema.CoreSchemaRegistry();
   registry.addPostTransform(schema.transforms.addUndefinedDefaults);
+  const workspaceSysPath = getSystemPath(workspaceRoot);
 
   const workspace = await experimental.workspace.Workspace.fromPath(host, host.root(), registry);
   const architectHost = new TestingArchitectHost(
-    workspaceRoot,
-    workspaceRoot,
-    new WorkspaceNodeModulesArchitectHost(workspace, workspaceRoot),
+    workspaceSysPath,
+    workspaceSysPath,
+    new WorkspaceNodeModulesArchitectHost(workspace, workspaceSysPath),
   );
   const architect = new Architect(architectHost, registry);
 

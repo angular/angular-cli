@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -21,50 +22,13 @@ import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { addSymbolToNgModuleMetadata, insertImport, isImported } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
-import { getWorkspace, updateWorkspace } from '../utility/config';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
 import { getAppModulePath } from '../utility/ng-ast-utils';
-import { getProjectTargets, targetBuildNotFoundError } from '../utility/project-targets';
-import {
-  BrowserBuilderOptions,
-  BrowserBuilderTarget,
-  WorkspaceSchema,
-} from '../utility/workspace-models';
+import { relativePathToWorkspaceRoot } from '../utility/paths';
+import { targetBuildNotFoundError } from '../utility/project-targets';
+import { getWorkspace, updateWorkspace } from '../utility/workspace';
+import { BrowserBuilderOptions } from '../utility/workspace-models';
 import { Schema as ServiceWorkerOptions } from './schema';
-
-function getProjectConfiguration(
-  workspace: WorkspaceSchema,
-  options: ServiceWorkerOptions,
-): BrowserBuilderOptions {
-  const projectTargets = getProjectTargets(workspace, options.project);
-  if (!projectTargets[options.target]) {
-    throw new Error(`Target is not defined for this project.`);
-  }
-
-  const target = projectTargets[options.target] as BrowserBuilderTarget;
-  let applyTo = target.options;
-
-  if (options.configuration &&
-    target.configurations &&
-    target.configurations[options.configuration]) {
-    applyTo = target.configurations[options.configuration] as BrowserBuilderOptions;
-  }
-
-  return applyTo;
-}
-
-function updateConfigFile(options: ServiceWorkerOptions, root: string): Rule {
-  return (host: Tree, context: SchematicContext) => {
-    context.logger.debug('updating config file.');
-    const workspace = getWorkspace(host);
-
-    const config = getProjectConfiguration(workspace, options);
-    config.serviceWorker = true;
-    config.ngswConfigPath = `${root && !root.endsWith('/') ? root + '/' : root}ngsw-config.json`;
-
-    return updateWorkspace(workspace);
-  };
-}
 
 function addDependencies(): Rule {
   return (host: Tree, context: SchematicContext) => {
@@ -84,17 +48,10 @@ function addDependencies(): Rule {
   };
 }
 
-function updateAppModule(options: ServiceWorkerOptions): Rule {
+function updateAppModule(mainPath: string): Rule {
   return (host: Tree, context: SchematicContext) => {
     context.logger.debug('Updating appmodule');
 
-    // find app module
-    const projectTargets = getProjectTargets(host, options.project);
-    if (!projectTargets.build) {
-      throw targetBuildNotFoundError();
-    }
-
-    const mainPath = projectTargets.build.options.main;
     const modulePath = getAppModulePath(host, mainPath);
     context.logger.debug(`module path: ${modulePath}`);
 
@@ -156,29 +113,44 @@ function getTsSourceFile(host: Tree, path: string): ts.SourceFile {
 }
 
 export default function (options: ServiceWorkerOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
-    const workspace = getWorkspace(host);
-    if (!options.project) {
-      throw new SchematicsException('Option "project" is required.');
-    }
-    const project = workspace.projects[options.project];
+  return async (host: Tree, context: SchematicContext) => {
+    const workspace = await getWorkspace(host);
+    const project = workspace.projects.get(options.project);
     if (!project) {
       throw new SchematicsException(`Invalid project name (${options.project})`);
     }
-    if (project.projectType !== 'application') {
+    if (project.extensions.projectType !== 'application') {
       throw new SchematicsException(`Service worker requires a project type of "application".`);
     }
+    const buildTarget = project.targets.get('build');
+    if (!buildTarget) {
+      throw targetBuildNotFoundError();
+    }
+    const buildOptions =
+      (buildTarget.options || {}) as unknown as BrowserBuilderOptions;
+    let buildConfiguration;
+    if (options.configuration && buildTarget.configurations) {
+      buildConfiguration =
+        buildTarget.configurations[options.configuration] as BrowserBuilderOptions | undefined;
+    }
 
-    const relativePathToWorkspaceRoot = project.root ?
-      project.root.split('/').filter(x => x !== '').map(x => '..').join('/') : '.';
+    const config = buildConfiguration || buildOptions;
+    const root = project.root;
 
-    let { resourcesOutputPath = '' } = getProjectConfiguration(workspace, options);
+    config.serviceWorker = true;
+    config.ngswConfigPath = join(normalize(root), 'ngsw-config.json');
+
+    let { resourcesOutputPath = '' } = config;
     if (resourcesOutputPath) {
-      resourcesOutputPath = '/' + resourcesOutputPath.split('/').filter(x => !!x).join('/');
+      resourcesOutputPath = normalize(`/${resourcesOutputPath}`);
     }
 
     const templateSource = apply(url('./files'), [
-      applyTemplates({ ...options, resourcesOutputPath, relativePathToWorkspaceRoot }),
+      applyTemplates({
+        ...options,
+        resourcesOutputPath,
+        relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(project.root),
+      }),
       move(project.root),
     ]);
 
@@ -186,9 +158,9 @@ export default function (options: ServiceWorkerOptions): Rule {
 
     return chain([
       mergeWith(templateSource),
-      updateConfigFile(options, project.root),
+      updateWorkspace(workspace),
       addDependencies(),
-      updateAppModule(options),
+      updateAppModule(buildOptions.main),
     ]);
   };
 }

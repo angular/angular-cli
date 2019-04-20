@@ -74,14 +74,6 @@ export default async function () {
     });
   `);
 
-  // Set factory shims to false.
-  await updateJsonFile('tsconfig.app.json', json => {
-    if (json['angularCompilerOptions'] === undefined) {
-      json['angularCompilerOptions'] = {};
-    }
-    json['angularCompilerOptions']['allowEmptyCodegenFiles'] = false;
-  });
-
   // Convert the default config to use JIT and prod to just do AOT.
   // This way we can use `ng e2e` to test JIT and `ng e2e --prod` to test AOT.
   await updateJsonFile('angular.json', json => {
@@ -90,42 +82,26 @@ export default async function () {
     buildTarget['configurations']['production'] = { aot: true };
   });
 
-  // Test string import with factory shims.
+  // Test string import.
+  // Both Ivy and View Engine should support it.
   await replaceLoadChildren(`'./lazy/lazy.module#LazyModule'`);
-  await replaceInFile('tsconfig.app.json', `"allowEmptyCodegenFiles": false`,
-    `"allowEmptyCodegenFiles": true`);
-  if (ivyProject) {
-    // Ivy should not support the string syntax.
-    await expectToFail(() => ng('e2e'));
-    await expectToFail(() => ng('e2e', '--prod'));
-  } else {
-    // View engine should support the string syntax.
-    await ng('e2e');
-    await ng('e2e', '--prod');
-  }
-
-  // Test string import without factory shims.
-  await replaceLoadChildren(`'./lazy/lazy.module#LazyModule'`);
-  await replaceInFile('tsconfig.app.json', `"allowEmptyCodegenFiles": true`,
-    `"allowEmptyCodegenFiles": false`);
-  if (ivyProject) {
-    // Ivy should not support the string syntax.
-    await expectToFail(() => ng('e2e'));
-    await expectToFail(() => ng('e2e', '--prod'));
-  } else {
-    // View engine should support the string syntax.
-    await ng('e2e');
-    await ng('e2e', '--prod');
-  }
+  await ng('e2e');
+  await ng('e2e', '--prod');
 
   // Test `import()` style lazy load.
-  await updateJsonFile('angular.json', json => {
-    // Add the experimental flag to import factories in View Engine.
-    const buildTarget = json['projects'][projectName]['architect']['build'];
-    buildTarget['options']['experimentalImportFactories'] = true;
-  });
+  if (!ivyProject) {
+    await updateJsonFile('angular.json', json => {
+      // Add the experimental flag to import factories in View Engine.
+      const buildTarget = json['projects'][projectName]['architect']['build'];
+      buildTarget['options']['experimentalImportFactories'] = true;
+    });
+  }
   // Both Ivy and View Engine should support it.
   await replaceLoadChildren(`() => import('./lazy/lazy.module').then(m => m.LazyModule)`);
+
+  // TODO: remove cast after https://github.com/angular/angular/pull/29832 is released.
+  await replaceInFile(appRoutingModulePath, '];', '] as Routes;');
+
   await ng('e2e');
   await ng('e2e', '--prod');
 }

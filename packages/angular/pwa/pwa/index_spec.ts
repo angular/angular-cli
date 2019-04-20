@@ -42,9 +42,14 @@ describe('PWA Schematic', () => {
     skipTests: false,
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     appTree = schematicRunner.runExternalSchematic('@schematics/angular', 'workspace', workspaceOptions);
-    appTree = schematicRunner.runExternalSchematic('@schematics/angular', 'application', appOptions, appTree);
+    appTree = await schematicRunner.runExternalSchematicAsync(
+      '@schematics/angular',
+      'application',
+      appOptions,
+      appTree,
+    ).toPromise();
   });
 
   it('should run the service worker schematic', (done) => {

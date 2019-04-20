@@ -291,6 +291,7 @@ describe('Browser Builder styles', () => {
         /* normal-comment */
         /*! important-comment */
         div { flex: 1 }`,
+      'browserslist': 'IE 10',
     });
 
     const overrides = { extractCss: true, optimization: false };
@@ -312,7 +313,7 @@ describe('Browser Builder styles', () => {
 
     const overrides = { extractCss: true, optimization: true };
     const { files } = await browserBuild(architect, host, target, overrides);
-    expect(await files['styles.css']).toContain('/*! important-comment */div{-ms-flex:1;flex:1}');
+    expect(await files['styles.css']).toContain('/*! important-comment */div{flex:1}');
   });
 
   // TODO: consider making this a unit test in the url processing plugins.

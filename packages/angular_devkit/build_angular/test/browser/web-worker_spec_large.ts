@@ -26,6 +26,8 @@ describe('Browser Builder Web Worker support', () => {
   const workerFiles: { [k: string]: string } = {
     'src/app/dep.ts': `export const foo = 'bar';`,
     'src/app/app.worker.ts': `
+      /// <reference lib="webworker" />
+
       import { foo } from './dep';
       console.log('hello from worker');
       addEventListener('message', ({ data }) => {
@@ -119,7 +121,7 @@ describe('Browser Builder Web Worker support', () => {
       host.scopedSync().read(join(outputPath, workerBundle)));
     expect(workerContent).toContain('hello from worker');
     expect(workerContent).toContain('bar');
-    expect(workerContent).toContain('"hello"===t&&postMessage');
+    expect(workerContent).toContain('"hello"===e&&postMessage');
 
     // Main bundle should reference hashed worker bundle.
     const mainBundle = host.fileMatchExists(outputPath, /main\.[0-9a-f]{20}\.js/) as string;

@@ -18,5 +18,6 @@ export default function() {
       };
     }))
     .then(() => ng('build', '--configuration=prod-env'))
-    .then(() => expectFileToMatch('dist/test-project/main.js', 'production: true'));
+    .then(() => expectFileToMatch('dist/test-project/main-es5.js', 'production: true'))
+    .then(() => expectFileToMatch('dist/test-project/main-es2015.js', 'production: true'));
 }

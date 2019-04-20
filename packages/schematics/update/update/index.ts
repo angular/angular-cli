@@ -528,7 +528,7 @@ function _buildPackageInfo(
 
   // Find out the currently installed version. Either from the package.json or the node_modules/
   // TODO: figure out a way to read package-lock.json and/or yarn.lock.
-  let installedVersion: string | undefined;
+  let installedVersion: string | undefined | null;
   const packageContent = tree.read(`/node_modules/${name}/package.json`);
   if (packageContent) {
     const content = JSON.parse(packageContent.toString()) as JsonSchemaForNpmPackageJsonFiles;
@@ -539,6 +539,12 @@ function _buildPackageInfo(
     installedVersion = semver.maxSatisfying(
       Object.keys(npmPackageJson.versions),
       packageJsonRange,
+    );
+  }
+
+  if (!installedVersion) {
+    throw new SchematicsException(
+      `An unexpected error happened; could not determine version for package ${name}.`,
     );
   }
 

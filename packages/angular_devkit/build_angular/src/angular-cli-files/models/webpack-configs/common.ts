@@ -8,6 +8,7 @@
 import { tags } from '@angular-devkit/core';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
+import * as ts from 'typescript';
 import {
   Configuration,
   ContextReplacementPlugin,
@@ -16,13 +17,14 @@ import {
   debug,
 } from 'webpack';
 import { AssetPatternClass } from '../../../browser/schema';
+import { isEs5SupportNeeded } from '../../../utils/differential-loading';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 import { findAllNodeModules, findUp } from '../../utilities/find-up';
 import { requireProjectModule } from '../../utilities/require-project-module';
-import { BuildOptions, WebpackConfigOptions } from '../build-options';
-import { getOutputHashFormat, normalizeExtraEntryPoints } from './utils';
+import { WebpackConfigOptions } from '../build-options';
+import { getEsVersionForFileName, getOutputHashFormat, normalizeExtraEntryPoints } from './utils';
 
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
@@ -55,16 +57,44 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   const extraPlugins: any[] = [];
   const entryPoints: { [key: string]: string[] } = {};
 
+  const targetInFileName = getEsVersionForFileName(
+    buildOptions.scriptTargetOverride,
+    buildOptions.esVersionInFileName,
+  );
+
   if (buildOptions.main) {
     entryPoints['main'] = [path.resolve(root, buildOptions.main)];
   }
 
-  if (buildOptions.es5BrowserSupport) {
-    entryPoints['polyfills.es5'] = [path.join(__dirname, '..', 'es5-polyfills.js')];
+  const es5Polyfills = path.join(__dirname, '..', 'es5-polyfills.js');
+  const es5JitPolyfills = path.join(__dirname, '..', 'es5-jit-polyfills.js');
+
+  if (targetInFileName) {
+    // For differential loading we don't need to have 2 polyfill bundles
+    if (buildOptions.scriptTargetOverride === ts.ScriptTarget.ES2015) {
+      entryPoints['polyfills'] = [path.join(__dirname, '..', 'safari-nomodule.js')];
+    } else {
+      entryPoints['polyfills'] = [es5Polyfills];
+      if (!buildOptions.aot) {
+        entryPoints['polyfills'].push(es5JitPolyfills);
+      }
+    }
+  } else {
+    // For NON differential loading we want to have 2 polyfill bundles
+    if (buildOptions.es5BrowserSupport
+      || (buildOptions.es5BrowserSupport === undefined && isEs5SupportNeeded(projectRoot))) {
+      entryPoints['polyfills-es5'] = [es5Polyfills];
+      if (!buildOptions.aot) {
+        entryPoints['polyfills-es5'].push(es5JitPolyfills);
+      }
+    }
   }
 
   if (buildOptions.polyfills) {
-    entryPoints['polyfills'] = [path.resolve(root, buildOptions.polyfills)];
+    entryPoints['polyfills'] = [
+      ...(entryPoints['polyfills'] || []),
+      path.resolve(root, buildOptions.polyfills),
+    ];
   }
 
   if (!buildOptions.aot) {
@@ -72,18 +102,11 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       ...(entryPoints['polyfills'] || []),
       path.join(__dirname, '..', 'jit-polyfills.js'),
     ];
-
-    if (buildOptions.es5BrowserSupport) {
-      entryPoints['polyfills.es5'] = [
-        ...entryPoints['polyfills.es5'],
-        path.join(__dirname, '..', 'es5-jit-polyfills.js'),
-      ];
-    }
   }
 
   if (buildOptions.profile || process.env['NG_BUILD_PROFILING']) {
     extraPlugins.push(new debug.ProfilingPlugin({
-      outputPath: path.resolve(root, 'chrome-profiler-events.json'),
+      outputPath: path.resolve(root, `chrome-profiler-events${targetInFileName}.json`),
     }));
   }
 
@@ -104,7 +127,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
           }
 
           existingEntry.paths.push(resolvedPath);
-
         } else {
           prev.push({
             bundleName,
@@ -177,7 +199,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   if (buildOptions.statsJson) {
-    extraPlugins.push(new StatsPlugin('stats.json', 'verbose'));
+    extraPlugins.push(new StatsPlugin(`stats${targetInFileName}.json`, 'verbose'));
   }
 
   let sourceMapUseRule;
@@ -273,7 +295,8 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     );
   }
 
-  if (wco.tsConfig.options.target === 4) {
+  if (wco.tsConfig.options.target !== undefined &&
+      wco.tsConfig.options.target >= ts.ScriptTarget.ES2017) {
     wco.logger.warn(tags.stripIndent`
       WARNING: Zone.js does not support native async/await in ES2017.
       These blocks are not intercepted by zone.js and will not triggering change detection.
@@ -305,7 +328,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       futureEmitAssets: true,
       path: path.resolve(root, buildOptions.outputPath as string),
       publicPath: buildOptions.deployUrl,
-      filename: `[name]${hashFormat.chunk}.js`,
+      filename: `[name]${targetInFileName}${hashFormat.chunk}.js`,
       // cast required until typings include `futureEmitAssets` property
     } as Output,
     watch: buildOptions.watch,
