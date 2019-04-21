@@ -1,29 +1,20 @@
 import { NgModule } from '@angular/core';<% if (commonModule) { %>
 import { CommonModule } from '@angular/common';<% } %><% if (route && routeDeclarationInlined) { %>
 import { Routes, RouterModule } from '@angular/router';<% } %>
-
 <% if (routing) { %>
-import { <%= classify(name) %>RoutingModule } from './<%= dasherize(name) %>-routing.module';
-<% } %>
-
-<% if (route) { %>
-import { <%= classify(name) %>Component } from './<%= dasherize(name) %>.component.ts';
-<% } %>
-
+import { <%= classify(name) %>RoutingModule } from './<%= dasherize(name) %>-routing.module';<% } %><% if (route) { %>
+import { <%= classify(name) %>Component } from './<%= dasherize(name) %>.component.ts';<% } %>
 <% if (route && routeDeclarationInlined) { %>
 const routes: Routes = [
   { path: '', component: <%= classify(name) %>Component }
-];
-<% } %>
+];<% } %>
 
 @NgModule({
   declarations: [<% if (route) { %><%= classify(name) %>Component<% } %>],
   imports: [<% if (commonModule) { %>
-    CommonModule<%= routing ? ',' : '' %><% } %><% if (routing) { %>
-    <%= classify(name) %>RoutingModule<% } %><%= route && routeDeclarationInlined ? ',' : '' %>
-    <% if (route && routeDeclarationInlined) { %>
-    RouterModule.forChild(routes)
-    <% } %>
+    CommonModule<%= routing ? ',' : '' %><% } %><% if (routing) { %><%= classify(name) %>
+    RoutingModule<% } %><%= route && routeDeclarationInlined ? ',' : '' %><% if (route && routeDeclarationInlined) { %>
+    RouterModule.forChild(routes)<% } %>
   ]
 })
 export class <%= classify(name) %>Module { }

@@ -1,12 +1,9 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 <% if (route) { %>
 import { <%= classify(name) %>Component } from './<%= dasherize(name) %>.component.ts';<% } %>
 
-const routes: Routes = [
-  <% if (route) { %>{ path: '', component: <%= classify(name) %>Component }<% } %>
-];
+const routes: Routes = [<% if (route) { %>{ path: '', component: <%= classify(name) %>Component }<% } %>];
 
 @NgModule({
   imports: [RouterModule.for<%= routingScope %>(routes)],
