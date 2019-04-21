@@ -1,3 +1,3 @@
-<p>
+<% if (!routerOutlet) { %><p>
   <%= dasherize(name) %> works!
-</p>
+</p><% } else { %><router-outlet></router-outlet><% } %>
