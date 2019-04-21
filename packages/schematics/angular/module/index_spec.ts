@@ -123,7 +123,7 @@ describe('Module Schematic', () => {
     const options = {
       ...defaultOptions,
       route: '/new-route',
-      module: 'app',
+      module: 'app.module.ts',
     };
 
     beforeEach(() => {
@@ -140,6 +140,7 @@ describe('Module Schematic', () => {
       expect(files).toContain('/projects/bar/src/app/foo/foo.module.ts');
       expect(files).toContain('/projects/bar/src/app/foo/foo-routing.module.ts');
       expect(files).toContain('/projects/bar/src/app/foo/foo.component.ts');
+      expect(files).toContain('/projects/bar/src/app/foo/foo.component.spec.ts');
       expect(files).toContain('/projects/bar/src/app/foo/foo.component.html');
       expect(files).toContain('/projects/bar/src/app/foo/foo.component.css');
 
@@ -180,6 +181,7 @@ describe('Module Schematic', () => {
       expect(files).toContain('/projects/bar/src/app/foo/foo.module.ts');
       expect(files).not.toContain('/projects/bar/src/app/foo/foo-routing.module.ts');
       expect(files).toContain('/projects/bar/src/app/foo/foo.component.ts');
+      expect(files).toContain('/projects/bar/src/app/foo/foo.component.spec.ts');
       expect(files).toContain('/projects/bar/src/app/foo/foo.component.html');
       expect(files).toContain('/projects/bar/src/app/foo/foo.component.css');
 
