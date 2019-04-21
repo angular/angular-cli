@@ -18,6 +18,7 @@ import {
   move,
   noop,
   url,
+  schematic,
 } from '@angular-devkit/schematics';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { addImportToModule, addRouteDeclarationToModule } from '../utility/ast-utils';
@@ -151,17 +152,17 @@ export default function (options: ModuleOptions): Rule {
     options.path = parsedPath.path;
 
     let routingModulePath: Path | undefined;
-    if (options.route && options.module) {
+    const isLazyLoadedModuleGen = options.route && options.module;
+    if (isLazyLoadedModuleGen) {
       options.routingScope = RoutingScope.Child;
       routingModulePath = getRoutingModulePath(host, options);
     }
 
     const project = getProject(host, options.project);
     const templateSource = apply(url('./files'), [
-      options.routing || options.route && !!routingModulePath
+      options.routing || isLazyLoadedModuleGen && !!routingModulePath
         ? noop()
         : filter(path => !path.endsWith('-routing.module.ts.template')),
-      options.route ? noop() : filter(path => !path.includes('component')),
       applyTemplates({
         ...strings,
         'if-flat': (s: string) => options.flat ? '' : s,
@@ -173,8 +174,15 @@ export default function (options: ModuleOptions): Rule {
     ]);
 
     return chain([
-      !options.route ? addDeclarationToNgModule(options) : noop(),
+      !isLazyLoadedModuleGen ? addDeclarationToNgModule(options) : noop(),
       addRouteDeclarationToNgModule(options, project, routingModulePath),
+      isLazyLoadedModuleGen
+        ? schematic('component', {
+            ...options,
+            skipImport: true,
+            routerOutlet: true,
+          })
+        : noop(),
       mergeWith(templateSource),
       options.lintFix ? applyLintFix(options.path) : noop(),
     ]);
