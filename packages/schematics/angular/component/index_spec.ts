@@ -375,4 +375,26 @@ describe('Component Schematic', () => {
     expect(files).toContain('/projects/bar/src/app/foo/foo.component.spec.ts');
   });
 
+  it('should generate router outlet component', async () => {
+    const options = { ...defaultOptions, routerOutlet: true };
+    const tree = await schematicRunner.runSchematicAsync('component', options, appTree)
+      .toPromise();
+
+    const templateContent = tree.readContent('/projects/bar/src/app/foo/foo.component.html');
+    expect(templateContent).toMatch(/<router-outlet><\/router-outlet>/);
+  });
+
+  it('should generate router outlet component when template inlined', async () => {
+    const options = {
+      ...defaultOptions,
+      routerOutlet: true,
+      inlineTemplate: true
+    };
+    const tree = await schematicRunner.runSchematicAsync('component', options, appTree)
+      .toPromise();
+
+    const componentContent = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(componentContent).toMatch(/<router-outlet><\/router-outlet>/);
+  });
+
 });
