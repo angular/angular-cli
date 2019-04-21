@@ -168,7 +168,6 @@ export default function (options: ModuleOptions): Rule {
         'if-flat': (s: string) => options.flat ? '' : s,
         lazyRoute: isLazyLoadedModuleGen,
         routeDeclarationInlined: !routingModulePath,
-        routerOutletCmpSelector: `${project.prefix}-${strings.dasherize(options.name)}`,
         ...options,
       }),
       move(parsedPath.path),
