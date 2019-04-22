@@ -22,7 +22,7 @@ export default function() {
     // We need to use Promise.all to ensure we are waiting for the rebuild just before we write
     // the file, otherwise rebuilds can be too fast and fail CI.
     .then(() => Promise.all([
-      waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
+      waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
       writeFile('src/app/app.module.ts', `
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
@@ -59,7 +59,7 @@ export default function() {
     })
     // Change multiple files and check that all of them are invalidated and recompiled.
     .then(() => Promise.all([
-      waitForAnyProcessOutputToMatch(validBundleRegEx, 10000),
+      waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
       writeMultipleFiles({
         'src/app/app.module.ts': `
           import { BrowserModule } from '@angular/platform-browser';
