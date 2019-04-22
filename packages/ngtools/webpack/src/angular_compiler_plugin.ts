@@ -94,7 +94,6 @@ export class AngularCompilerPlugin {
   private _moduleResolutionCache: ts.ModuleResolutionCache;
   private _resourceLoader?: WebpackResourceLoader;
   private _discoverLazyRoutes = true;
-  private _importFactories = false;
   private _useFactories = false;
   // Contains `moduleImportPath#exportName` => `fullModulePath`.
   private _lazyRoutes: LazyRouteMap = {};
@@ -281,11 +280,6 @@ export class AngularCompilerPlugin {
     if (!this._JitMode && !this._compilerOptions.enableIvy) {
       // Only attempt to use factories when AOT and not Ivy.
       this._useFactories = true;
-    }
-
-    if (this._useFactories && options.importFactories === true) {
-      // Only transform imports to use factories with View Engine.
-      this._importFactories = true;
     }
 
     // Default ContextElementDependency to the one we can import from here.
@@ -931,7 +925,8 @@ export class AngularCompilerPlugin {
       // Remove unneeded angular decorators.
       this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
       // Import ngfactory in loadChildren import syntax
-      if (this._importFactories) {
+      if (this._useFactories) {
+        // Only transform imports to use factories with View Engine.
         this._transformers.push(importFactory(msg => this._warnings.push(msg)));
       }
     }
