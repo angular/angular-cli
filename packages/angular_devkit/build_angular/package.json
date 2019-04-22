@@ -87,6 +87,6 @@
     "zone.js": "^0.9.0"
   },
   "peerDependencies": {
-    "typescript": ">=2.7 < 3.5"
+    "typescript": ">=3.4 < 3.5"
   }
 }
