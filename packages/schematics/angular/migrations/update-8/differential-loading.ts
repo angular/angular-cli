@@ -88,12 +88,15 @@ function updateBrowserlist(): Rule {
     }
 
     // For all projects
-    for (const projectName of Object.keys(angularJson.projects)) {
-      const project = angularJson.projects[projectName];
+    for (const [name, project] of Object.entries(angularJson.projects)) {
       if (!isJsonObject(project)) {
         continue;
       }
       if (typeof project.root != 'string' || project.projectType !== 'application') {
+        continue;
+      }
+      if (name.endsWith('-e2e')) {
+        // Skip existing separate E2E projects
         continue;
       }
 
