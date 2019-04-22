@@ -89,13 +89,6 @@ export default async function () {
   await ng('e2e', '--prod');
 
   // Test `import()` style lazy load.
-  if (!ivyProject) {
-    await updateJsonFile('angular.json', json => {
-      // Add the experimental flag to import factories in View Engine.
-      const buildTarget = json['projects'][projectName]['architect']['build'];
-      buildTarget['options']['experimentalImportFactories'] = true;
-    });
-  }
   // Both Ivy and View Engine should support it.
   await replaceLoadChildren(`() => import('./lazy/lazy.module').then(m => m.LazyModule)`);
 

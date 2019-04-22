@@ -316,11 +316,6 @@
       "default": false,
       "x-deprecated": true
     },
-    "experimentalImportFactories": {
-      "description": "**EXPERIMENTAL** Transform import statements for lazy routes to import factories when using View Engine. Should only be used when switching back and forth between View Engine and Ivy. See https://angular.io/guide/ivy for usage information.",
-      "type": "boolean",
-      "default": false
-    },
     "webWorkerTsConfig": {
       "type": "string",
       "description": "TypeScript configuration for Web Worker modules."
