@@ -59,11 +59,6 @@ export type DevServerBuilderOutput = DevServerBuildOutput & {
   baseUrl: string;
 };
 
-export type ServerConfigTransformFn = (
-  workspace: experimental.workspace.Workspace,
-  config: WebpackDevServer.Configuration,
-) => Observable<WebpackDevServer.Configuration>;
-
 /**
  * Reusable implementation of the build angular webpack dev server builder.
  * @param options Dev Server options.
