@@ -39,10 +39,10 @@ export function copyAssets(assetName: string) {
 }
 
 
-export function createProjectFromAsset(assetName: string) {
+export function createProjectFromAsset(assetName: string, useNpmPackages = false) {
   return Promise.resolve()
     .then(() => copyAssets(assetName))
     .then(dir => process.chdir(dir))
-    .then(() => useBuiltPackages())
+    .then(() => useNpmPackages ? null : useBuiltPackages())
     .then(() => silentNpm('install'));
 }

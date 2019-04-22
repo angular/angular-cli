@@ -1,7 +1,7 @@
 import { createProjectFromAsset } from '../../utils/assets';
 import { ng, silentNpm } from '../../utils/process';
 import {
-  isPrereleaseCli, removeHttpDep, useBuiltPackages, useCIChrome, useCIDefaults,
+  isPrereleaseCli, useBuiltPackages, useCIChrome, useCIDefaults,
 } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
@@ -15,7 +15,6 @@ export default async function () {
   await ng('update', '@angular/cli');
   await useBuiltPackages();
   await silentNpm('install');
-  await removeHttpDep();
   await ng('update', '@angular/core', ...extraUpdateArgs);
   await useCIDefaults('one-oh-project');
   await ng('generate', 'component', 'my-comp');

@@ -503,7 +503,3 @@ export async function isPrereleaseCli() {
 
   return prerelease(angularCliPkgJson.version).length > 0;
 }
-
-export async function removeHttpDep() {
-  await updateJsonFile('package.json', json => { delete json['dependencies']['@angular/http']; });
-}
