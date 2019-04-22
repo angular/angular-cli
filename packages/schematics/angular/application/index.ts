@@ -143,12 +143,8 @@ function mergeWithRootTsLint(parentHost: Tree) {
   };
 }
 
-function addAppToWorkspaceFile(options: ApplicationOptions, newProjectRoot: string): Rule {
-  let projectRoot = options.projectRoot !== undefined
-    ? options.projectRoot
-    : `${newProjectRoot}/${options.name}`;
-
-  projectRoot = normalize(projectRoot);
+function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rule {
+  let projectRoot = appDir;
   if (projectRoot) {
     projectRoot += '/';
   }
@@ -184,7 +180,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, newProjectRoot: stri
   const sourceRoot = join(normalize(projectRoot), 'src');
 
   const project = {
-    root: projectRoot,
+    root: normalize(projectRoot),
     sourceRoot,
     projectType: ProjectType.Application,
     prefix: options.prefix || 'app',
@@ -321,11 +317,11 @@ export default function (options: ApplicationOptions): Rule {
       };
 
     const workspace = await getWorkspace(host);
-    const newProjectRoot = workspace.extensions.newProjectRoot as string || '';
+    const newProjectRoot = workspace.extensions.newProjectRoot as (string | undefined) || '';
     const isRootApp = options.projectRoot !== undefined;
     const appDir = isRootApp
       ? options.projectRoot as string
-      : `${newProjectRoot}/${options.name}`;
+      : join(normalize(newProjectRoot), options.name);
     const sourceDir = `${appDir}/src/app`;
 
     const e2eOptions: E2eOptions = {
@@ -334,7 +330,7 @@ export default function (options: ApplicationOptions): Rule {
     };
 
     return chain([
-      addAppToWorkspaceFile(options, newProjectRoot),
+      addAppToWorkspaceFile(options, appDir),
       mergeWith(
         apply(url('./files'), [
           options.minimal ? filter(minimalPathFilter) : noop(),

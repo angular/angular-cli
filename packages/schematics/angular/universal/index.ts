@@ -53,7 +53,7 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
         builder: Builders.Server,
         options: {
           outputPath: `dist/${options.clientProject}-server`,
-          main: `${clientProject.root}src/main.server.ts`,
+          main: join(normalize(clientProject.root), 'src/main.server.ts'),
           tsConfig: join(tsConfigDirectory, `${options.tsconfigFileName}.json`),
         },
         configurations: {
