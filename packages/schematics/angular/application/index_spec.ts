@@ -355,5 +355,25 @@ describe('Application Schematic', () => {
       expect(content.rules['component-selector'][2]).toMatch('app');
       expect(content.rules['trailing-comma']).toBeDefined();
     });
+
+    it(`should create correct paths when 'newProjectRoot' is blank`, async () => {
+      const workspaceTree = schematicRunner.runSchematic('workspace', { ...workspaceOptions, newProjectRoot: '' });
+      const options = { ...defaultOptions, projectRoot: undefined };
+      const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+        .toPromise();
+      const config = JSON.parse(tree.readContent('/angular.json'));
+      const project = config.projects.foo;
+      expect(project.root).toEqual('foo');
+      const buildOpt = project.architect.build.options;
+      expect(buildOpt.index).toEqual('foo/src/index.html');
+      expect(buildOpt.main).toEqual('foo/src/main.ts');
+      expect(buildOpt.polyfills).toEqual('foo/src/polyfills.ts');
+      expect(buildOpt.tsConfig).toEqual('foo/tsconfig.app.json');
+
+      const appTsConfig = JSON.parse(tree.readContent('/foo/tsconfig.app.json'));
+      expect(appTsConfig.extends).toEqual('../tsconfig.json');
+      const specTsConfig = JSON.parse(tree.readContent('/foo/tsconfig.spec.json'));
+      expect(specTsConfig.extends).toEqual('../tsconfig.json');
+    });
   });
 });

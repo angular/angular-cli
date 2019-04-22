@@ -301,4 +301,21 @@ describe('Library Schematic', () => {
     const karmaConf = getFileContent(tree, '/projects/foo/karma.conf.js');
     expect(karmaConf).toContain(`dir: require('path').join(__dirname, '../../coverage/foo')`);
   });
+
+  it(`should create correct paths when 'newProjectRoot' is blank`, async () => {
+    const workspaceTree = schematicRunner.runSchematic('workspace', { ...workspaceOptions, newProjectRoot: '' });
+    const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree)
+      .toPromise();
+    const config = JSON.parse(tree.readContent('/angular.json'));
+    const project = config.projects.foo;
+    expect(project.root).toEqual('foo');
+    const buildOpt = project.architect.build.options;
+    expect(buildOpt.project).toEqual('foo/ng-package.json');
+    expect(buildOpt.tsConfig).toEqual('foo/tsconfig.lib.json');
+
+    const appTsConfig = JSON.parse(tree.readContent('/foo/tsconfig.lib.json'));
+    expect(appTsConfig.extends).toEqual('../tsconfig.json');
+    const specTsConfig = JSON.parse(tree.readContent('/foo/tsconfig.spec.json'));
+    expect(specTsConfig.extends).toEqual('../tsconfig.json');
+  });
 });
