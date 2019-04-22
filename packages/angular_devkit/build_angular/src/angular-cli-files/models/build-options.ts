@@ -60,7 +60,6 @@ export interface BuildOptions {
   forkTypeChecker: boolean;
   profile?: boolean;
   es5BrowserSupport?: boolean;
-  experimentalImportFactories?: boolean;
 
   main: string;
   index: string;
