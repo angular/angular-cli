@@ -88,7 +88,6 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
       expect(polyfills).toContain('core-js/es6/reflect');
       expect(polyfills).toContain('core-js/es7/reflect');
       expect(polyfills).toContain('BROWSER POLYFILLS');
-      expect(polyfills).toContain('core-js/es6/weak-map');
     });
 
     it('should work as expected for a project with a root', async () => {
@@ -113,7 +112,6 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
       expect(newPolyfills).toContain('core-js/es6/reflect');
       expect(newPolyfills).toContain('core-js/es7/reflect');
       expect(newPolyfills).toContain('BROWSER POLYFILLS');
-      expect(newPolyfills).toContain('core-js/es6/weak-map');
     });
   });
 });
