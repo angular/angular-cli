@@ -5,9 +5,19 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { JsonParseMode, isJsonObject, join, normalize, parseJson } from '@angular-devkit/core';
-import { Rule, Tree, chain, noop } from '@angular-devkit/schematics';
+import { JsonParseMode, isJsonObject, parseJson } from '@angular-devkit/core';
+import {
+  MergeStrategy,
+  Rule,
+  Tree,
+  apply,
+  chain,
+  filter,
+  mergeWith,
+  move,
+  url,
+} from '@angular-devkit/schematics';
+import { createHash } from 'crypto';
 import * as ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 
 const toDrop: {[importName: string]: true} = {
@@ -24,6 +34,7 @@ const toDrop: {[importName: string]: true} = {
   'core-js/es6/regexp': true,
   'core-js/es6/map': true,
   'core-js/es6/set': true,
+  'core-js/es6/weak-map': true,
 };
 
 const header = `/**
@@ -45,12 +56,20 @@ const header = `/**
 /***************************************************************************************************
 * BROWSER POLYFILLS
 */
-
-/** IE9, IE10 and IE11 requires all of the following polyfills. **/
-// import 'core-js/es6/weak-map';
 `;
 
 const applicationPolyfillsHeader = 'APPLICATION IMPORTS';
+const browserPolyfillsHeader = 'BROWSER POLYFILLS';
+
+const knownPolyfillHashes = [
+  '3dba718d7afe009e112e10d69073d2a2', // 6.0 - unmodified
+  'fccdb76b06ea636933f8b99b1c8d9725', // 6.0 - all core-js uncommented
+  '97e16639be1de06153695f5fefde745d', // 7.0 - unmodified
+  'd6c13d6dcf94ff3749283f33dd0d4864', // 7.0 - all core-js uncommented
+  '79bf0fd46c215e5f4145e15641c325f3', // 7.2 - unmodified
+  '6fe8080c7e38ee0ce677fdbc3884377a', // 7.2 - all core-js uncommented
+  '8e7f6abb3d2dca03b4dbb300e400a880', // 7.3 - unmodified
+];
 
 function dropES2015PolyfillsFromFile(polyfillPath: string): Rule {
   return (tree: Tree) => {
@@ -59,33 +78,64 @@ function dropES2015PolyfillsFromFile(polyfillPath: string): Rule {
       return;
     }
 
-    // Start the update of the file.
-    const recorder = tree.beginUpdate(polyfillPath);
+    // normalize line endings to increase hash match chances
+    const content = source.toString().replace(/\r\n|\r/g, '\n');
+
+    // Check if file is unmodified, if so then replace and return
+    const hash = createHash('md5');
+    hash.update(content);
+    const digest = hash.digest('hex');
+    if (knownPolyfillHashes.includes(digest)) {
+      // Replace with new project polyfills file
+      // This removes the need to parse and also updates all included comments
+
+      // mergeWith overwrite doesn't work so clear out existing file
+      tree.delete(polyfillPath);
+
+      return mergeWith(
+        apply(url('../../application/files/src'), [
+          filter(path => path === '/polyfills.ts.template'),
+          move('/polyfills.ts.template', polyfillPath),
+        ]),
+        MergeStrategy.Overwrite,
+      );
+    }
+
+    if (!content.includes('core-js')) {
+      // no action required if no mention of core-js
+      return;
+    }
 
     const sourceFile = ts.createSourceFile(polyfillPath,
-      source.toString(),
+      content,
       ts.ScriptTarget.Latest,
       true,
     );
     const imports = sourceFile.statements
       .filter(s => s.kind === ts.SyntaxKind.ImportDeclaration) as ts.ImportDeclaration[];
 
-    const applicationPolyfillsStart = sourceFile.getText().indexOf(applicationPolyfillsHeader);
-
     if (imports.length === 0) { return; }
 
+    // Start the update of the file.
+    const recorder = tree.beginUpdate(polyfillPath);
+
+    const applicationPolyfillsStart = content.indexOf(applicationPolyfillsHeader);
+    const browserPolyfillsStart = content.indexOf(browserPolyfillsHeader);
+
+    let addHeader = false;
     for (const i of imports) {
       const module = ts.isStringLiteral(i.moduleSpecifier) && i.moduleSpecifier.text;
       // We do not want to remove imports which are after the "APPLICATION IMPORTS" header.
       if (module && toDrop[module] && applicationPolyfillsStart > i.getFullStart()) {
         recorder.remove(i.getFullStart(), i.getFullWidth());
+        if (i.getFullStart() <= browserPolyfillsStart) {
+          addHeader = true;
+        }
       }
     }
 
     // We've removed the header since it's part of the JSDoc of the nodes we dropped
-    // As part of the header, we also add the comment for importing WeakMap since
-    // it's not part of the internal ES2015 polyfills we provide.
-    if (sourceFile.getText().indexOf(header) < 0) {
+    if (addHeader) {
       recorder.insertLeft(0, header);
     }
 
