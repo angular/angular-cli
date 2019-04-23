@@ -12,6 +12,7 @@ import {
   appendPropertyInAstObject,
   appendValueInAstArray,
   insertPropertyInAstObjectInOrder,
+  removePropertyInAstObject,
 } from './json-utils';
 
 describe('json-utils', () => {
@@ -126,6 +127,48 @@ describe('json-utils', () => {
         expect(got).toBe(JSON.stringify(want, null, indent));
         expect(JSON.parse(got)).toEqual(want);
       }
+    });
+  });
+
+  describe('removePropertyInAstObject', () => {
+    it('should remove a first prop', () => {
+      const indent = 2;
+      const result = runTest((rec: UpdateRecorder, ast: JsonAstObject) => {
+        expect(ast.kind).toBe('object');
+        removePropertyInAstObject(rec, ast, a);
+      }, {a, m, z}, indent);
+      expect(result).toBe(JSON.stringify({m, z}, null, indent));
+      expect(JSON.parse(result)).toEqual({m, z});
+    });
+
+    it('should remove a middle prop', () => {
+      const indent = 2;
+      const result = runTest((rec: UpdateRecorder, ast: JsonAstObject) => {
+        expect(ast.kind).toBe('object');
+        removePropertyInAstObject(rec, ast, m);
+      }, {a, m, z}, indent);
+      expect(result).toBe(JSON.stringify({a, z}, null, indent));
+      expect(JSON.parse(result)).toEqual({a, z});
+    });
+
+    it('should remove a last prop', () => {
+      const indent = 2;
+      const result = runTest((rec: UpdateRecorder, ast: JsonAstObject) => {
+        expect(ast.kind).toBe('object');
+        removePropertyInAstObject(rec, ast, z);
+      }, {a, m, z}, indent);
+      expect(result).toBe(JSON.stringify({a, m}, null, indent));
+      expect(JSON.parse(result)).toEqual({a, m});
+    });
+
+    it('should remove only prop', () => {
+      const indent = 2;
+      const result = runTest((rec: UpdateRecorder, ast: JsonAstObject) => {
+        expect(ast.kind).toBe('object');
+        removePropertyInAstObject(rec, ast, a);
+      }, {a}, indent);
+      expect(result).toBe(JSON.stringify({}, null, indent));
+      expect(JSON.parse(result)).toEqual({});
     });
   });
 
