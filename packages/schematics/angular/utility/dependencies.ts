@@ -11,7 +11,8 @@ import {
   appendPropertyInAstObject,
   findPropertyInAstObject,
   insertPropertyInAstObjectInOrder,
- } from './json-utils';
+  removePropertyInAstObject,
+} from './json-utils';
 
 
 const pkgJsonPath = '/package.json';
@@ -58,6 +59,24 @@ export function addPackageJsonDependency(tree: Tree, dependency: NodeDependency)
       recorder.insertRight(start.offset, JSON.stringify(dependency.version));
     }
   }
+
+  tree.commitUpdate(recorder);
+}
+
+export function removePackageJsonDependency(tree: Tree, name: string): void {
+  const packageJson = _readPackageJson(tree);
+  const recorder = tree.beginUpdate(pkgJsonPath);
+  [
+    NodeDependencyType.Default,
+    NodeDependencyType.Dev,
+    NodeDependencyType.Optional,
+    NodeDependencyType.Peer,
+  ].forEach(depType => {
+    const depsNode = findPropertyInAstObject(packageJson, depType);
+    if (depsNode !== null && depsNode.kind === 'object') {
+      removePropertyInAstObject(recorder, depsNode, name);
+    }
+  });
 
   tree.commitUpdate(recorder);
 }
