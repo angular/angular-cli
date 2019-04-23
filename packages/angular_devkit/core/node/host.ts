@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as fs from 'fs';
-import { EMPTY, Observable, concat, from as observableFrom, throwError } from 'rxjs';
+import { Observable, concat, from as observableFrom, of, throwError } from 'rxjs';
 import {
   concatMap,
   ignoreElements,
@@ -305,7 +305,7 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
             return throwError(err);
           }
 
-          return EMPTY;
+          return of(undefined);
         }
       }),
     );
