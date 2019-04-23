@@ -9,14 +9,6 @@ http_archive(
     urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/0.27.7/rules_nodejs-0.27.7.tar.gz"],
 )
 
-# TS API Guardian resides in Angular
-http_archive(
-    name = "angular",
-    sha256 = "6af15858f480438a9ca3fa8eaf4fdf993ccae878b834f3ea72fa8442f76b73c2",
-    strip_prefix = "angular-7.2.9",
-    url = "https://github.com/angular/angular/archive/7.2.9.zip",
-)
-
 # We use protocol buffers for the Build Event Protocol
 git_repository(
     name = "com_google_protobuf",
@@ -88,9 +80,3 @@ rules_karma_dependencies()
 load("@io_bazel_rules_webtesting//web:repositories.bzl", "web_test_repositories")
 
 web_test_repositories()
-
-yarn_install(
-    name = "ts-api-guardian_deps",
-    package_json = "@angular//tools/ts-api-guardian:package.json",
-    yarn_lock = "@angular//tools/ts-api-guardian:yarn.lock",
-)
