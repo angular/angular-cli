@@ -92,5 +92,15 @@ describe('Migration to version 8', () => {
       expect(tree2.readContent('/browserslist'))
         .toContain('Support for Googlebot');
     });
+
+    it('should move browserslist file if it exists in the sourceRoot', () => {
+      tree.create('/src/browserslist', 'last 2 Chrome versions');
+      tree.delete('/browserslist');
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
+      expect(tree2.exists('/browserslist')).toBe(true);
+      const content = tree2.readContent('/browserslist');
+      expect(content).toContain('Chrome 41');
+      expect(content).toContain('last 2 Chrome versions');
+    });
   });
 });
