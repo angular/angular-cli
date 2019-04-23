@@ -24,15 +24,18 @@ const browserslistContent = `# This file is used by the build system to adjust C
 # For additional information regarding the format and rule options, please see:
 # https://github.com/browserslist/browserslist#queries
 
+# You can see what browsers were selected by your queries by running:
+#   npx browserslist
+
 # Googlebot uses an older version of Chrome
 # For additional information see: https://developers.google.com/search/docs/guides/rendering
 
 > 0.5%
 last 2 versions
 Firefox ESR
+Chrome 41 # Support for Googlebot
 not dead
-not IE 9-11 # For IE 9-11 support, remove 'not'.
-not Chrome 41 # For Googlebot support, remove 'not'.`;
+not IE 9-11 # For IE 9-11 support, remove 'not'.`;
 
 export function updateES5Projects(): Rule {
   return (host: Tree) => {

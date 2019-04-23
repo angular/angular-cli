@@ -90,7 +90,7 @@ describe('Migration to version 8', () => {
       const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
       expect(tree2.exists('/browserslist')).toBe(true);
       expect(tree2.readContent('/browserslist'))
-        .toContain('Googlebot support');
+        .toContain('Support for Googlebot');
     });
   });
 });
