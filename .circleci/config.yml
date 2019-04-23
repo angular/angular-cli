@@ -130,8 +130,11 @@ jobs:
 
   e2e-cli-ng-snapshots:
     <<: *defaults
+    docker:
+      - image: *browsers_docker_image
     environment:
       BASH_ENV: ~/.profile
+      NPM_CONFIG_PREFIX: ~/.npm-global
     resource_class: xlarge
     parallelism: 4
     steps:
@@ -143,7 +146,7 @@ jobs:
               circleci step halt
             fi
       - attach_workspace: *attach_options
-      - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ng-snapshots
+      - run: PATH=~/.npm-global/bin:$PATH xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ng-snapshots
 
   build:
     <<: *defaults
