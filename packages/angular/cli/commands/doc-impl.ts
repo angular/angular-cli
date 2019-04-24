@@ -6,11 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import * as open from 'open';
 import { Command } from '../models/command';
 import { Arguments } from '../models/interface';
 import { Schema as DocCommandSchema } from './doc';
-
-const open = require('open');
 
 export class DocCommand extends Command<DocCommandSchema> {
   public async run(options: DocCommandSchema & Arguments) {

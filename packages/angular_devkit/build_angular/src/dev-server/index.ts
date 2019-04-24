@@ -16,9 +16,10 @@ import {
   WebpackLoggingCallback,
   runWebpackDevServer,
 } from '@angular-devkit/build-webpack';
-import { experimental, json, logging, tags } from '@angular-devkit/core';
+import { json, logging, tags } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { existsSync, readFileSync } from 'fs';
+import * as open from 'open';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
@@ -34,7 +35,6 @@ import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { normalizeOptimization } from '../utils';
 import { Schema } from './schema';
-const open = require('open');
 
 export type DevServerBuilderOptions = Schema & json.JsonObject;
 
