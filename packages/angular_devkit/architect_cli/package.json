@@ -19,7 +19,7 @@
     "ascii-progress": "^1.0.5",
     "minimist": "1.2.0",
     "progress": "^2.0.3",
-    "rxjs": "6.4.0",
+    "rxjs": "6.5.1",
     "symbol-observable": "1.2.0"
   }
 }
