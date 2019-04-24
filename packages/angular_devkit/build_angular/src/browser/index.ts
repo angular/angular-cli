@@ -13,6 +13,7 @@ import {
 import { BuildResult, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
 import {
   experimental,
+  getSystemPath,
   join,
   json,
   logging,
@@ -185,7 +186,7 @@ export function buildWebpackBrowser(
         normalize(workspace.getProject(projectName).root),
       );
 
-      const tsConfigPath = path.resolve(workspace.root, options.tsConfig);
+      const tsConfigPath = path.resolve(getSystemPath(workspace.root), options.tsConfig);
       const tsConfig = readTsconfig(tsConfigPath);
 
       if (isEs5SupportNeeded(projectRoot) &&
