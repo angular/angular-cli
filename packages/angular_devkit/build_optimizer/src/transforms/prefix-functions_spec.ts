@@ -167,4 +167,23 @@ describe('prefix-functions', () => {
 
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
+
+  it('doesn\'t add comment when inside class expression', () => {
+    const input = tags.stripIndent`
+      let Foo = class Foo {
+        constructor() {
+          this.isExpandedChange = new EventEmitter();
+        }
+
+        set isExpanded(value) {
+          this.isExpandedChange.emit(value);
+        }
+      };
+    `;
+    const output = tags.stripIndent`
+      ${input}
+    `;
+
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
 });
