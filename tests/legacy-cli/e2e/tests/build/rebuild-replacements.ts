@@ -10,6 +10,14 @@ import { wait } from '../../utils/utils';
 const webpackGoodRegEx = /: Compiled successfully./;
 
 export default async function() {
+  const argv = getGlobalVariable('argv');
+  if (argv['ivy']) {
+    // todo: enable when the below is solved
+    // rebuilds under ivy are broken at the moment
+    // https://github.com/angular/angular/issues/30079
+    return;
+  }
+
   if (process.platform.startsWith('win')) {
     return;
   }
