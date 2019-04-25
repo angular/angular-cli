@@ -12,7 +12,7 @@
 # fetched by the Webtesting rules. Therefore for jobs that run tests with Bazel, we don't need a
 # docker image with browsers pre-installed.
 # **NOTE**: If you change the the version of the docker images, also change the `cache_key` suffix.
-var_1: &docker_image angular/ngcontainer:0.7.0
+var_1: &docker_image angular/ngcontainer:0.10.0
 var_2: &cache_key v2-nguniversal-{{ .Branch }}-{{ checksum "yarn.lock" }}-node-10.12
 
 # Settings common to each job

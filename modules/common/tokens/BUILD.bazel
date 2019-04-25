@@ -10,6 +10,6 @@ ng_module(
     ]),
     module_name = "@nguniversal/common/tokens",
     deps = [
-        "@angular//packages/core",
+        "@npm//@angular/core",
     ],
 )

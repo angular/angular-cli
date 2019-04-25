@@ -11,8 +11,8 @@ ng_module(
     module_name = "@nguniversal/hapi-engine",
     deps = [
         "//modules/hapi-engine/tokens",
-        "@angular//packages/platform-server",
-        "@ngudeps//@types/hapi",
+        "@npm//@angular/platform-server",
+        "@npm//@types/hapi",
     ],
 )
 
@@ -38,13 +38,13 @@ ng_test_library(
     ]),
     deps = [
         ":hapi-engine",
-        "@angular//packages/platform-browser",
-        "@angular//packages/platform-server",
-        "@ngudeps//@types/hapi",
-        "@ngudeps//domino",
-        "@ngudeps//hapi",
-        "@ngudeps//xhr2",
-        "@ngudeps//zone.js",
+        "@npm//@angular/platform-browser",
+        "@npm//@angular/platform-server",
+        "@npm//@types/hapi",
+        "@npm//domino",
+        "@npm//hapi",
+        "@npm//xhr2",
+        "@npm//zone.js",
     ],
 )
 

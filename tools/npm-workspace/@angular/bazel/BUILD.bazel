@@ -5,5 +5,5 @@ package(default_visibility = ["//visibility:public"])
 # target. See: https://github.com/angular/angular/blob/master/BUILD.bazel#L45
 alias(
     name = "bazel",
-    actual = "@ngudeps//@angular/bazel",
+    actual = "@npm//@angular/bazel",
 )

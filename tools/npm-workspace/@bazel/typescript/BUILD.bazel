@@ -6,5 +6,5 @@ package(default_visibility = ["//visibility:public"])
 # See: https://github.com/bazelbuild/rules_typescript/blob/master/BUILD.bazel#L66
 alias(
     name = "typescript",
-    actual = "@ngudeps//@bazel/typescript",
+    actual = "@npm//@bazel/typescript",
 )

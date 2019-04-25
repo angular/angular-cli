@@ -12,12 +12,10 @@ ng_module(
     deps = [
         "//modules/common/engine",
         "//modules/common/tokens",
-        "@angular//packages/common",
-        "@angular//packages/common/http",
-        "@angular//packages/core",
-        "@angular//packages/platform-browser",
-        "@rxjs",
-        "@rxjs//operators",
+        "@npm//@angular/common",
+        "@npm//@angular/core",
+        "@npm//@angular/platform-browser",
+        "@npm//rxjs",
     ],
 )
 
@@ -41,8 +39,8 @@ ng_test_library(
     ]),
     deps = [
         ":common",
-        "@angular//packages/common/http",
-        "@rxjs",
+        "@npm//@angular/common",
+        "@npm//rxjs",
     ],
 )
 

@@ -1,16 +1,17 @@
 """Re-export of some bazel rules with repository-wide defaults."""
 
-load("@angular//:index.bzl", _ng_module = "ng_module", _ng_package = "ng_package")
-load("@build_bazel_rules_nodejs//:defs.bzl", _jasmine_node_test = "jasmine_node_test", _npm_package = "npm_package")
+load("@npm_angular_bazel//:index.bzl", _ng_module = "ng_module", _ng_package = "ng_package")
+load("@build_bazel_rules_nodejs//:defs.bzl", _npm_package = "npm_package")
+load("@npm_bazel_jasmine//:index.bzl", _jasmine_node_test = "jasmine_node_test")
 load(
-    "@build_bazel_rules_typescript//:defs.bzl",
+    "@npm_bazel_typescript//:defs.bzl",
     _ts_library = "ts_library",
-    _ts_web_test_suite = "ts_web_test_suite",
 )
+load("@npm_bazel_karma//:defs.bzl", _ts_web_test_suite = "ts_web_test_suite")
 
 DEFAULT_TSCONFIG_BUILD = "//modules:bazel-tsconfig-build.json"
 DEFAULT_TSCONFIG_TEST = "//modules:bazel-tsconfig-test"
-DEFAULT_TS_TYPINGS = "@ngudeps//typescript:typescript__typings"
+DEFAULT_TS_TYPINGS = "@npm//typescript:typescript__typings"
 
 def _getDefaultTsConfig(testonly):
     if testonly:
@@ -19,7 +20,7 @@ def _getDefaultTsConfig(testonly):
         return DEFAULT_TSCONFIG_BUILD
 
 def ts_library(tsconfig = None, deps = [], testonly = False, **kwargs):
-    local_deps = ["@ngudeps//tslib", "@ngudeps//@types/node"] + deps
+    local_deps = ["@npm//tslib", "@npm//@types/node"] + deps
     if not tsconfig:
         tsconfig = _getDefaultTsConfig(testonly)
 
@@ -31,7 +32,7 @@ def ts_library(tsconfig = None, deps = [], testonly = False, **kwargs):
         **kwargs
     )
 
-NG_VERSION = "^7.1.4"
+NG_VERSION = "^8.0.0-beta.14"
 RXJS_VERSION = "^6.3.3"
 HAPI_VERSION = "^17.0.0"
 EXPRESS_VERSION = "^4.15.2"
@@ -85,8 +86,7 @@ def ts_test_library(deps = [], tsconfig = None, **kwargs):
     )
 
 def ng_module(tsconfig = None, testonly = False, deps = [], **kwargs):
-    """Default values for ng_module"""
-    deps = deps + ["@ngudeps//tslib", "@ngudeps//@types/node"]
+    deps = deps + ["@npm//tslib", "@npm//@types/node"]
     if not tsconfig:
         tsconfig = _getDefaultTsConfig(testonly)
     _ng_module(
@@ -100,8 +100,8 @@ def ng_module(tsconfig = None, testonly = False, deps = [], **kwargs):
 def jasmine_node_test(deps = [], **kwargs):
     local_deps = [
         # Workaround for: https://github.com/bazelbuild/rules_nodejs/issues/344
-        "@ngudeps//jasmine",
-        "@ngudeps//source-map-support",
+        "@npm//jasmine",
+        "@npm//source-map-support",
     ] + deps
 
     _jasmine_node_test(
@@ -112,11 +112,10 @@ def jasmine_node_test(deps = [], **kwargs):
 
 def ng_test_library(deps = [], tsconfig = None, **kwargs):
     local_deps = [
-        # We declare "@angular/core" and "@angular/core/testing" as default dependencies because
+        # We declare "@angular/core" as default dependencies because
         # all Angular component unit tests use the `TestBed` and `Component` exports.
-        "@angular//packages/core",
-        "@angular//packages/core/testing",
-        "@ngudeps//@types/jasmine",
+        "@npm//@angular/core",
+        "@npm//@types/jasmine",
     ] + deps
 
     ts_library(
@@ -140,12 +139,12 @@ def npm_package(name, replacements = {}, **kwargs):
 def ng_web_test_suite(deps = [], srcs = [], **kwargs):
     _ts_web_test_suite(
         # Required for running the compiled ng modules that use TypeScript import helpers.
-        srcs = ["@ngudeps//node_modules/tslib:tslib.js"] + srcs,
+        srcs = ["@npm//node_modules/tslib:tslib.js"] + srcs,
         # Depend on our custom test initialization script. This needs to be the first dependency.
         deps = ["//test:angular_test_init"] + deps,
         bootstrap = [
-            "@ngudeps//node_modules/zone.js:dist/zone-testing-bundle.js",
-            "@ngudeps//node_modules/reflect-metadata:Reflect.js",
+            "@npm//node_modules/zone.js:dist/zone-testing-bundle.js",
+            "@npm//node_modules/reflect-metadata:Reflect.js",
         ],
         **kwargs
     )

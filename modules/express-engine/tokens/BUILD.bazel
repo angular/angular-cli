@@ -11,7 +11,7 @@ ng_module(
     ]),
     module_name = "@nguniversal/express-engine/tokens",
     deps = [
-        "@angular//packages/core",
-        "@ngudeps//@types/express",
+        "@npm//@angular/core",
+        "@npm//@types/express",
     ],
 )

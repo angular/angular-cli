@@ -7,5 +7,5 @@ package(default_visibility = ["//visibility:public"])
 
 alias(
     name = "karma",
-    actual = "@ngudeps//@bazel/karma/bin:karma",
+    actual = "@npm//@bazel/karma/bin:karma",
 )

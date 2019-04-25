@@ -11,7 +11,7 @@ ng_module(
     module_name = "@nguniversal/socket-engine",
     deps = [
         "//modules/common/engine",
-        "@angular//packages/core",
+        "@npm//@angular/core",
     ],
 )
 
@@ -35,11 +35,11 @@ ng_test_library(
     ]),
     deps = [
         ":socket-engine",
-        "@angular//packages/platform-browser",
-        "@angular//packages/platform-server",
-        "@ngudeps//domino",
-        "@ngudeps//xhr2",
-        "@ngudeps//zone.js",
+        "@npm//@angular/platform-browser",
+        "@npm//@angular/platform-server",
+        "@npm//domino",
+        "@npm//xhr2",
+        "@npm//zone.js",
     ],
 )
 

@@ -10,7 +10,7 @@ ng_module(
     ]),
     module_name = "@nguniversal/module-map-ngfactory-loader",
     deps = [
-        "@angular//packages/core",
+        "@npm//@angular/core",
     ],
 )
 

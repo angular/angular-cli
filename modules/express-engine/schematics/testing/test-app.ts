@@ -8,20 +8,26 @@
 
 import {SchematicTestRunner, UnitTestTree} from '@angular-devkit/schematics/testing';
 import {join} from 'path';
+import {Observable} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
 
 /** Path to the collection file for the NgUniversal schematics */
 export const collectionPath = join(__dirname, '..', 'collection.json');
 
 /** Create a base app used for testing. */
-export function createTestApp(appOptions = {}): UnitTestTree {
-  const baseRunner = new SchematicTestRunner('universal-schematics', collectionPath);
+export function createTestApp(appOptions = {}): Observable<UnitTestTree> {
+  const baseRunner =
+      new SchematicTestRunner('universal-schematics', collectionPath);
 
-  const workspaceTree = baseRunner.runExternalSchematic('@schematics/angular', 'workspace', {
-    name: 'workspace',
-    version: '6.0.0',
-    newProjectRoot: 'projects',
-  });
-
-  return baseRunner.runExternalSchematic('@schematics/angular', 'application',
-    {...appOptions, name: 'bar'}, workspaceTree);
+  return baseRunner
+      .runExternalSchematicAsync('@schematics/angular', 'workspace', {
+        name: 'workspace',
+        version: '6.0.0',
+        newProjectRoot: 'projects',
+      })
+      .pipe(
+          switchMap(workspaceTree => baseRunner.runExternalSchematicAsync(
+                  '@schematics/angular', 'application',
+                  {...appOptions, name: 'bar'}, workspaceTree)),
+      );
 }

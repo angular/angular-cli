@@ -9,7 +9,7 @@ ng_module(
     ]),
     module_name = "@nguniversal/hapi-engine/tokens",
     deps = [
-        "@angular//packages/core",
-        "@ngudeps//@types/hapi",
+        "@npm//@angular/core",
+        "@npm//@types/hapi",
     ],
 )
