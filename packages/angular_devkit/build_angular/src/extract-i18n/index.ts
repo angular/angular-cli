@@ -21,6 +21,7 @@ import {
   getStylesConfig,
 } from '../angular-cli-files/models/webpack-configs';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
+import { Version } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
 import { Schema as ExtractI18nBuilderOptions } from './schema';
 
@@ -47,6 +48,9 @@ class InMemoryOutputPlugin {
 }
 
 async function execute(options: ExtractI18nBuilderOptions, context: BuilderContext) {
+  // Check Angular version.
+  Version.assertCompatibleAngularVersion(context.workspaceRoot);
+
   const browserTarget = targetFromTargetString(options.browserTarget);
   const browserOptions = await context.validateOptions<JsonObject & BrowserBuilderOptions>(
     await context.getTargetOptions(browserTarget),

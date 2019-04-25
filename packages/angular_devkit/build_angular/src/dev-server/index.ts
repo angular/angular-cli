@@ -33,6 +33,7 @@ import {
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { normalizeOptimization } from '../utils';
+import { Version } from '../utils/version';
 import { Schema } from './schema';
 const open = require('open');
 
@@ -74,6 +75,9 @@ export function serveWebpackBrowser(
     logging?: WebpackLoggingCallback,
   } = {},
 ): Observable<DevServerBuilderOutput> {
+  // Check Angular version.
+  Version.assertCompatibleAngularVersion(context.workspaceRoot);
+
   const browserTarget = targetFromTargetString(options.browserTarget);
   const root = context.workspaceRoot;
   let first = true;
