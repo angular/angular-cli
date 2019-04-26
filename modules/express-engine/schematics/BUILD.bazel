@@ -28,6 +28,7 @@ ts_library(
         "@npm//@schematics/angular",
         "@npm//@types/jasmine",
         "@npm//rxjs",
+        "@npm//typescript",
     ],
 )
 
