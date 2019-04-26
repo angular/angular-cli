@@ -64,7 +64,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
         packageMetadata = await fetchPackageMetadata(
           packageIdentifier.name,
           this.logger,
-          { usingYarn },
+          { registry: options.registry, usingYarn },
         );
       } catch (e) {
         this.logger.error('Unable to fetch package metadata: ' + e.message);
@@ -114,7 +114,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
         const manifest = await fetchPackageManifest(
           packageIdentifier,
           this.logger,
-          { usingYarn },
+          { registry: options.registry, usingYarn },
         );
 
         collectionName = manifest.name;
