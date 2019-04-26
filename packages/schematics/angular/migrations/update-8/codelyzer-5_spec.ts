@@ -79,7 +79,7 @@ describe('Migration to version 8', () => {
     it('should update codelyzer\'s version', () => {
       tree = schematicRunner.runSchematic('migration-07', defaultOptions, tree);
       const packageJson = JSON.parse(tree.readContent(packageJsonPath));
-      expect(packageJson.devDependencies.codelyzer).toBe('^5.0.0');
+      expect(packageJson.devDependencies.codelyzer).toBe('^5.0.1');
     });
   });
 });
