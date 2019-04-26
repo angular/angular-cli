@@ -289,7 +289,7 @@ describe('readWorkspace', () => {
 });
 
 describe('writeWorkspace', () => {
-  xit('attempts to write to specified file path', async (done) => {
+  it('attempts to write to specified file path', async (done) => {
     const requestedPath = '/path/to/workspace/angular.json';
 
     let writtenPath: string | undefined;
