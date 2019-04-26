@@ -21,7 +21,16 @@ export class Rule extends Rules.AbstractRule {
     const ruleName = this.ruleName;
     const changes: RuleFailure[] = [];
 
-    ts.forEachChild(ast, function analyze(node) {
+    // NOTE: This should ideally be excluded at a higher level to avoid parsing
+    if (ast.isDeclarationFile || /[\\\/]node_modules[\\\/]/.test(ast.fileName)) {
+      return [];
+    }
+
+    // Workaround mismatched tslint TS version and vendored TS version
+    // The TS SyntaxKind enum numeric values change between versions
+    const sourceFile = ts.createSourceFile(ast.fileName, ast.text, ast.languageVersion, true);
+
+    ts.forEachChild(sourceFile, function analyze(node) {
       if (ts.isPropertyAssignment(node) &&
           (ts.isIdentifier(node.name) || ts.isStringLiteral(node.name)) &&
           node.name.text === 'loadChildren' &&
