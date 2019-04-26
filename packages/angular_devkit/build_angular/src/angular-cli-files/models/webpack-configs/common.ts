@@ -279,13 +279,18 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         comments: false,
         webkit: true,
       },
-      compress: {
-        // PURE comments work best with 3 passes.
-        // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
-        passes: 3,
+      // On server, we don't want to compress anything. We still set the ngDevMode = false for it
+      // to remove dev code, and ngI18nClosureMode to remove Closure compiler i18n code
+      compress: (buildOptions.platform == 'server' ? {
         global_defs: angularGlobalDefinitions,
-      },
-      // We want to avoid mangling on server.
+      } : {
+          pure_getters: buildOptions.buildOptimizer,
+          // PURE comments work best with 3 passes.
+          // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
+          passes: buildOptions.buildOptimizer ? 3 : 1,
+          global_defs: angularGlobalDefinitions,
+        }),
+      // We also want to avoid mangling on server.
       ...(buildOptions.platform == 'server' ? { mangle: false } : {}),
     };
 
