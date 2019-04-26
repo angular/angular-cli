@@ -42,6 +42,20 @@ export function updateBuilders() {
       );
     }
 
+    current = getPackageJsonDependency(host, 'zone.js');
+    if (current && current.version !== latestVersions.ZoneJs) {
+      updates = true;
+      addPackageJsonDependency(
+        host,
+        {
+          type: current.type,
+          name: 'zone.js',
+          version: latestVersions.ZoneJs,
+          overwrite: true,
+        },
+      );
+    }
+
     if (updates) {
       context.addTask(new NodePackageInstallTask());
     }
