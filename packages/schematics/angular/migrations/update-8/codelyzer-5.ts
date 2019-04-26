@@ -82,7 +82,7 @@ export const updatePackageJson = () => {
     const dependency: NodeDependency = {
       type: NodeDependencyType.Dev,
       name: 'codelyzer',
-      version: '^5.0.0',
+      version: '^5.0.1',
       overwrite: true,
     };
 
