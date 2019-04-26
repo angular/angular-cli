@@ -300,10 +300,9 @@ describe('architect', () => {
     // Should also error.
     const run2 = await architect.scheduleBuilder('package:do-it', {});
 
-    try {
-      await run2.output.toPromise();
-      expect('THE ABOVE LINE SHOULD NOT ERROR').toBe('false');
-    } catch {}
+    await expectAsync(run2.output.toPromise())
+      .toBeRejectedWith(jasmine.objectContaining({ message: jasmine.stringMatching('p1')}));
+
     await run2.stop();
   });
 });
