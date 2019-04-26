@@ -1,25 +1,10 @@
-import {Component, destroyPlatform, getPlatform, NgModule} from '@angular/core';
-import {ServerModule} from '@angular/platform-server';
+import {destroyPlatform, getPlatform} from '@angular/core';
 import {ngHapiEngine} from '@nguniversal/hapi-engine';
 import {ServerInjectResponse, Request, Server} from 'hapi';
+import {ExampleModuleNgFactory} from '../testing/example.ngfactory';
 import 'zone.js';
-import {BrowserModule} from '@angular/platform-browser';
 
-@Component({selector: 'app', template: `Works!`})
-class MyServerApp {
-}
-
-
-@NgModule({
-  bootstrap: [MyServerApp],
-  declarations: [MyServerApp],
-  imports: [ServerModule, BrowserModule.withServerTransition({appId: 'hapi-test'})],
-})
-class ExampleModule {
-}
-
-// tslint:disable
-xdescribe('test runner', () => {
+describe('test runner', () => {
 
   const server = new Server({ debug: false });
   server.route([
@@ -27,7 +12,7 @@ xdescribe('test runner', () => {
       method: 'GET',
       path: '/',
       handler: (req: Request) => ngHapiEngine({
-        bootstrap: ExampleModule,
+        bootstrap: ExampleModuleNgFactory,
         req,
         document: '<html><body><app></app></body></html>'
       })

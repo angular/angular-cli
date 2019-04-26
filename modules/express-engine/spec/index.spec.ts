@@ -1,53 +1,26 @@
-import { ngExpressEngine } from '@nguniversal/express-engine';
-import { CompilerFactory, Compiler,
-   Component, Inject, InjectionToken } from '@angular/core';
-import { platformDynamicServer } from '@angular/platform-server';
-import { ServerModule } from '@angular/platform-server';
-import { NgModule } from '@angular/core';
-import { ResourceLoader } from '@angular/compiler';
-import { FileLoader } from '../src/file-loader';
 import 'zone.js';
 
-import { BrowserModule } from '@angular/platform-browser';
-import { REQUEST } from '@nguniversal/express-engine/tokens';
+import {ngExpressEngine} from '@nguniversal/express-engine';
 
-export function getCompiler(): Compiler {
-  const compilerFactory = platformDynamicServer().injector.get(CompilerFactory) as CompilerFactory;
-  return compilerFactory.createCompiler([{
-    providers: [{provide: ResourceLoader, useClass: FileLoader}]
-  }]);
-}
+import {SOME_TOKEN} from '../testing/mock.server.module';
+import {
+  MockServerModuleNgFactory,
+  RequestServerModuleNgFactory,
+  TokenServerModuleNgFactory
+} from '../testing/mock.server.module.ngfactory';
 
-export function makeTestingModule(template: string, component?: any): any {
-  @Component({
-    selector: 'root',
-    template: template
-  })
-  class MockComponent {}
-  @NgModule({
-    imports: [ServerModule, BrowserModule.withServerTransition({appId: 'mock'})],
-    declarations: [component || MockComponent],
-    bootstrap: [component || MockComponent]
-  })
-  class MockServerModule {}
-  return MockServerModule;
-}
-
-// tslint:disable
-xdescribe('test runner', () => {
+describe('test runner', () => {
   it('should render a basic template', (done) => {
-    const template = `some template: ${new Date()}`;
-    const appModule = makeTestingModule(template);
-    ngExpressEngine({bootstrap: appModule})(null as any as string, {
-      req: {} as any,
+    ngExpressEngine({bootstrap: MockServerModuleNgFactory})(null as any as string, {
+      req: {get: () => 'localhost'} as any,
       // TODO this shouldn't be required
-      bootstrap: appModule,
+      bootstrap: MockServerModuleNgFactory,
       document: '<root></root>'
     }, (err, html) => {
       if (err) {
         throw err;
       }
-      expect(html).toContain(template);
+      expect(html).toContain('some template');
       done();
     });
   });
@@ -63,18 +36,13 @@ xdescribe('test runner', () => {
   });
 
   it('should be able to inject REQUEST token', (done) => {
-    @Component({
-      selector: 'root',
-      template: `url:{{_req.url}}`
-    })
-    class RequestComponent {
-      constructor(@Inject(REQUEST) public readonly _req: any) { }
-    }
-    const appModule = makeTestingModule('', RequestComponent);
-    ngExpressEngine({bootstrap: appModule})(null as any as string, {
-      req: {url: 'http://localhost:4200'} as any,
+    ngExpressEngine({bootstrap: RequestServerModuleNgFactory})(null as any as string, {
+      req: {
+        get: () => 'localhost',
+        url: 'http://localhost:4200'
+      } as any,
       // TODO this shouldn't be required
-      bootstrap: appModule,
+      bootstrap: RequestServerModuleNgFactory,
       document: '<root></root>'
     }, (err, html) => {
       if (err) {
@@ -85,23 +53,17 @@ xdescribe('test runner', () => {
     });
   });
 
-  it('should be able to inject REQUEST token', (done) => {
-    const SOME_TOKEN = new InjectionToken<string>('SOME_TOKEN');
+  it('should be able to inject some token', (done) => {
     const someValue = {message: 'value' + new Date()};
-    @Component({
-      selector: 'root',
-      template: `message:{{_someToken.message}}`
-    })
-    class RequestComponent {
-      constructor(@Inject(SOME_TOKEN) public readonly _someToken: any) { }
-    }
-    const appModule = makeTestingModule('', RequestComponent);
-    ngExpressEngine({bootstrap: appModule, providers: [
+    ngExpressEngine({bootstrap: TokenServerModuleNgFactory, providers: [
       {provide: SOME_TOKEN, useValue: someValue}
     ]})(null as any as string, {
-      req: {url: 'http://localhost:4200'} as any,
+      req: {
+        get: () => 'localhost',
+        url: 'http://localhost:4200'
+      } as any,
       // TODO this shouldn't be required
-      bootstrap: appModule,
+      bootstrap: TokenServerModuleNgFactory,
       document: '<root></root>'
     }, (err, html) => {
       if (err) {

@@ -43,8 +43,7 @@ export function startSocketEngine(
         } catch (error) {
           // send the error down to the client then rethrow it
           socket.write(JSON.stringify({html: null,
-            id: renderOptions.id, error} as SocketEngineResponse));
-          throw error;
+            id: renderOptions.id, error: error.toString()} as SocketEngineResponse));
         }
       });
     });

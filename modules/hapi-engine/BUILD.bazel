@@ -31,6 +31,18 @@ ng_package(
     ],
 )
 
+# NgModule used only for tests.
+ng_module(
+    name = "testing",
+    srcs = glob([
+        "testing/**/*.ts",
+    ]),
+    deps = [
+        "@npm//@angular/platform-browser",
+        "@npm//@angular/platform-server",
+    ],
+)
+
 ng_test_library(
     name = "unit_test_lib",
     srcs = glob([
@@ -38,6 +50,7 @@ ng_test_library(
     ]),
     deps = [
         ":hapi-engine",
+        ":testing",
         "@npm//@angular/platform-browser",
         "@npm//@angular/platform-server",
         "@npm//@types/hapi",
