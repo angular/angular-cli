@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /**
- * A map keyed by loadChildren strings and Modules or NgModuleFactories as vaules
+ * A map keyed by loadChildren strings and Modules or NgModuleFactories as values
  */
 import {NgModuleFactory, Type} from '@angular/core';
 
