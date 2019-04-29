@@ -29,8 +29,8 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
   public workspace: CommandWorkspace;
   public analytics: analytics.Analytics;
 
-  protected static commandMap: CommandDescriptionMap;
-  static setCommandMap(map: CommandDescriptionMap) {
+  protected static commandMap: () => Promise<CommandDescriptionMap>;
+  static setCommandMap(map: () => Promise<CommandDescriptionMap>) {
     this.commandMap = map;
   }
 

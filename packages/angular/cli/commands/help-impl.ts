@@ -13,9 +13,7 @@ export class HelpCommand extends Command<HelpCommandSchema> {
   async run() {
     this.logger.info(`Available Commands:`);
 
-    for (const name of Object.keys(Command.commandMap)) {
-      const cmd = Command.commandMap[name];
-
+    for (const cmd of Object.values(await Command.commandMap())) {
       if (cmd.hidden) {
         continue;
       }
