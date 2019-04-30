@@ -7,7 +7,7 @@
  */
 import { BaseException, isObservable, isPromise } from '@angular-devkit/core';
 import { Observable, from, of as observableOf, throwError } from 'rxjs';
-import { defaultIfEmpty, last, map, mergeMap, tap } from 'rxjs/operators';
+import { defaultIfEmpty, last, mergeMap, tap } from 'rxjs/operators';
 import { Rule, SchematicContext, Source } from '../engine/interface';
 import { Tree, TreeSymbol } from '../tree/interface';
 
