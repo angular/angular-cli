@@ -191,6 +191,18 @@ describe('architect', () => {
     }
   });
 
+  it('reports errors in options', async () => {
+    const builderName = 'options:error';
+    const builder = createBuilder(() => ({ success: true }));
+    const optionSchema = { type: 'object', additionalProperties: false };
+    testArchitectHost.addBuilder(builderName, builder, '', optionSchema);
+
+    const run = await architect.scheduleBuilder(builderName, { extraProp: true });
+    await expectAsync(run.result).toBeRejectedWith(
+      jasmine.objectContaining({ message: jasmine.stringMatching('extraProp') }));
+    await run.stop();
+  });
+
   it('exposes getTargetOptions() properly', async () => {
     const goldenOptions = {
       value: 'value',
