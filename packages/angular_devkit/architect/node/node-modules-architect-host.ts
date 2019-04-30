@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { experimental, json } from '@angular-devkit/core';
+import { experimental, json, workspaces } from '@angular-devkit/core';
 import { resolve } from '@angular-devkit/core/node';
 import * as path from 'path';
 import { BuilderInfo } from '../src';
@@ -21,13 +21,26 @@ export type NodeModulesBuilderInfo = BuilderInfo & {
 
 // TODO: create a base class for all workspace related hosts.
 export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModulesBuilderInfo> {
+
+  /**
+   * @deprecated
+   */
+  constructor(_workspace: experimental.workspace.Workspace, _root: string)
+
+  constructor(_workspace: workspaces.WorkspaceDefinition, _root: string)
+
   constructor(
-    protected _workspace: experimental.workspace.Workspace,
+    protected _workspace: experimental.workspace.Workspace | workspaces.WorkspaceDefinition,
     protected _root: string,
   ) {}
 
   async getBuilderNameForTarget(target: Target) {
-    return this._workspace.getProjectTargets(target.project)[target.target]['builder'];
+    const targetDefinition = this.findProjectTarget(target);
+    if (!targetDefinition) {
+      throw new Error('Project target does not exist.');
+    }
+
+    return targetDefinition.builder;
   }
 
   /**
@@ -87,7 +100,7 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
   }
 
   async getOptionsForTarget(target: Target): Promise<json.JsonObject | null> {
-    const targetSpec = this._workspace.getProjectTargets(target.project)[target.target];
+    const targetSpec = this.findProjectTarget(target);
     if (targetSpec === undefined) {
       return null;
     }
@@ -108,5 +121,18 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
     }
 
     throw new Error('Builder is not a builder');
+  }
+
+  private findProjectTarget(target: Target) {
+    if ('getProjectTargets' in this._workspace) {
+      return this._workspace.getProjectTargets(target.project)[target.target];
+    } else {
+      const projectDefinition = this._workspace.projects.get(target.project);
+      if (!projectDefinition) {
+        throw new Error('Project does not exist.');
+      }
+
+      return projectDefinition.targets.get(target.target);
+    }
   }
 }
