@@ -41,8 +41,7 @@
     },
     "host": {
       "type": "string",
-      "description": "Host to listen on.",
-      "default": "localhost"
+      "description": "Host to listen on."
     },
     "baseUrl": {
       "type": "string",
