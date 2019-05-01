@@ -5,9 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { getSystemPath, normalize, virtualFs } from '@angular-devkit/core';
-import { TempScopedNodeJsSyncHost } from '@angular-devkit/core/node/testing';
-import { HostTree } from '@angular-devkit/schematics';
+import { normalize, virtualFs } from '@angular-devkit/core';
+import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 
 describe('Migration to version 8', () => {
@@ -17,7 +16,6 @@ describe('Migration to version 8', () => {
   );
 
   let tree: UnitTestTree;
-  let host: TempScopedNodeJsSyncHost;
 
   const lazyRoutePath = normalize('src/lazy-route.ts');
   const lazyRoute = virtualFs.stringToFileBuffer(`
@@ -45,21 +43,17 @@ describe('Migration to version 8', () => {
 
   describe('Migration to import() style lazy routes', () => {
     beforeEach(async () => {
-      host = new TempScopedNodeJsSyncHost();
-      tree = new UnitTestTree(new HostTree(host));
+      tree = new UnitTestTree(new EmptyTree());
       tree.create('/package.json', JSON.stringify({}));
-      process.chdir(getSystemPath(host.root));
     });
 
     it('should replace the module path string', async () => {
-      await host.write(lazyRoutePath, lazyRoute).toPromise();
+      tree.create(lazyRoutePath, Buffer.from(lazyRoute));
 
       schematicRunner.runSchematic('migration-08', {}, tree);
       await schematicRunner.engine.executePostTasks().toPromise();
 
-      const routes = await host.read(lazyRoutePath)
-        .toPromise()
-        .then(virtualFs.fileBufferToString);
+      const routes = tree.readContent(lazyRoutePath);
 
       expect(routes).not.toContain('./lazy/lazy.module#LazyModule');
       expect(routes).toContain(
@@ -67,14 +61,12 @@ describe('Migration to version 8', () => {
     });
 
     it('should replace the module path string in a child path', async () => {
-      await host.write(lazyRoutePath, lazyChildRoute).toPromise();
+      tree.create(lazyRoutePath, Buffer.from(lazyChildRoute));
 
       schematicRunner.runSchematic('migration-08', {}, tree);
       await schematicRunner.engine.executePostTasks().toPromise();
 
-      const routes = await host.read(lazyRoutePath)
-        .toPromise()
-        .then(virtualFs.fileBufferToString);
+      const routes = tree.readContent(lazyRoutePath);
 
       expect(routes).not.toContain('./lazy/lazy.module#LazyModule');
 
