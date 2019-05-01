@@ -5,18 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { SchematicContext, Tree } from '@angular-devkit/schematics';
-import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
+import { Tree } from '@angular-devkit/schematics';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../../utility/dependencies';
 import { latestVersions } from '../../utility/latest-versions';
 
 export function updateBuilders() {
-  return (host: Tree, context: SchematicContext) => {
-    let updates = false;
-
+  return (host: Tree) => {
     let current = getPackageJsonDependency(host, '@angular-devkit/build-angular');
     if (current && current.version !== latestVersions.DevkitBuildAngular) {
-      updates = true;
       addPackageJsonDependency(
         host,
         {
@@ -30,7 +26,6 @@ export function updateBuilders() {
 
     current = getPackageJsonDependency(host, '@angular-devkit/build-ng-packagr');
     if (current && current.version !== latestVersions.DevkitBuildNgPackagr) {
-      updates = true;
       addPackageJsonDependency(
         host,
         {
@@ -44,7 +39,6 @@ export function updateBuilders() {
 
     current = getPackageJsonDependency(host, 'zone.js');
     if (current && current.version !== latestVersions.ZoneJs) {
-      updates = true;
       addPackageJsonDependency(
         host,
         {
@@ -54,10 +48,6 @@ export function updateBuilders() {
           overwrite: true,
         },
       );
-    }
-
-    if (updates) {
-      context.addTask(new NodePackageInstallTask());
     }
   };
 }
