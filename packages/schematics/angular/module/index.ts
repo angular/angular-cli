@@ -80,7 +80,7 @@ function addRouteDeclarationToNgModule(
       return host;
     }
     if (options.route && !options.module) {
-      throw new Error('Module option required when creating a route module.');
+      throw new Error('Module option required when creating a lazy loaded routing module.');
     }
 
     let path: string;

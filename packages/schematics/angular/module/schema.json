@@ -41,7 +41,7 @@
     },
     "route": {
       "type": "string",
-      "description": "Creates lazy-loading routing module. Requires --module option."
+      "description": "Creates lazy loaded routing module. Requires --module option."
     },
     "flat": {
       "type": "boolean",
