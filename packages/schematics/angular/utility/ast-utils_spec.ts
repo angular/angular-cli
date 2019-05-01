@@ -17,7 +17,6 @@ import {
   addProviderToModule,
   addRouteDeclarationToModule,
   addSymbolToNgModuleMetadata,
-  getRouterModuleDeclaration
 } from './ast-utils';
 
 
