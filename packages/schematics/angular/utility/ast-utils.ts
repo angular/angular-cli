@@ -597,6 +597,7 @@ export function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression
     .find(el => (el as ts.Identifier).getText(source).startsWith('RouterModule'));
 }
 
+// todo
 export function addRouteDeclarationToModule(
   source: ts.SourceFile,
   fileToAdd: string,
@@ -604,16 +605,17 @@ export function addRouteDeclarationToModule(
 ): Change {
   const routerModuleExpr = getRouterModuleDeclaration(source);
   if (!routerModuleExpr) {
-    throw new Error(`Couldn't find a route declaration`);
+    throw new Error(`Couldn't find a route declaration.`);
   }
   const scopeConfigMethodArgs = (routerModuleExpr as ts.CallExpression).arguments;
   if (!scopeConfigMethodArgs.length) {
-    throw new Error(`The router module method doesn't have arguments`);
+    throw new Error(`The router module method doesn't have arguments.`);
   }
 
   let routesArr: ts.ArrayLiteralExpression | undefined;
   const routesArg = scopeConfigMethodArgs[0];
 
+  // Check if the route declarations array is an inlined argument of RouterModule or a standalone variable
   if (routesArg.kind === ts.SyntaxKind.ArrayLiteralExpression) {
     routesArr = routesArg as ts.ArrayLiteralExpression;
   } else {
@@ -625,7 +627,7 @@ export function addRouteDeclarationToModule(
       }) as ts.VariableStatement | undefined;
 
     if (!routesVar) {
-      throw new Error(`The route declaration variable "${routesVarName}" is used but not defined`);
+      throw new Error(`The route declaration variable "${routesVarName}" is used but not defined.`);
     }
     routesArr =
       (findNodes(routesVar, ts.SyntaxKind.ArrayLiteralExpression) || {})[0] as ts.ArrayLiteralExpression | undefined;
@@ -636,7 +638,13 @@ export function addRouteDeclarationToModule(
   }
 
   const occurencesCount = routesArr.elements.length;
-  const route = occurencesCount > 0 ? `,\n${routeLiteral}` : routeLiteral;
+  const text = routesArr.getFullText(source);
+
+  let route: string = routeLiteral;
+  if (occurencesCount > 0) {
+    const identation = text.match(/\r?\n(\r?)\s*/) || [];
+    route = `,${identation[0] || ' '}${routeLiteral}`;
+  }
 
   return insertAfterLastOccurrence(
     routesArr.elements as any as ts.Node[],
