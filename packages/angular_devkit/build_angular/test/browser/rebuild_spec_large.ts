@@ -11,7 +11,7 @@ import { Architect } from '@angular-devkit/architect';
 import { TestLogger } from '@angular-devkit/architect/testing';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, take, takeWhile, tap } from 'rxjs/operators';
-import { createArchitect, host, lazyModuleFiles, lazyModuleImport } from '../utils';
+import { createArchitect, host, lazyModuleFiles, lazyModuleStringImport } from '../utils';
 
 
 describe('Browser Builder rebuilds', () => {
@@ -82,7 +82,7 @@ describe('Browser Builder rebuilds', () => {
             // No lazy chunk should exist.
             if (!hasLazyChunk) {
               phase = 2;
-              host.writeMultipleFiles({ ...lazyModuleFiles, ...lazyModuleImport });
+              host.writeMultipleFiles({ ...lazyModuleFiles, ...lazyModuleStringImport });
             }
             break;
 

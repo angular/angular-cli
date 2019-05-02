@@ -20,6 +20,7 @@ import { AssetPatternClass } from '../../../browser/schema';
 import { isEs5SupportNeeded } from '../../../utils/differential-loading';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
+import { NamedLazyChunksPlugin } from '../../plugins/named-chunks-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 import { findAllNodeModules, findUp } from '../../utilities/find-up';
 import { requireProjectModule } from '../../utilities/require-project-module';
@@ -200,6 +201,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
 
   if (buildOptions.statsJson) {
     extraPlugins.push(new StatsPlugin(`stats${targetInFileName}.json`, 'verbose'));
+  }
+
+  if (buildOptions.namedChunks) {
+    extraPlugins.push(new NamedLazyChunksPlugin());
   }
 
   let sourceMapUseRule;

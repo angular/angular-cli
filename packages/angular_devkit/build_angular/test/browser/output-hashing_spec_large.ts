@@ -8,7 +8,9 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { normalize } from '@angular-devkit/core';
-import { browserBuild, createArchitect, host, lazyModuleFiles, lazyModuleImport } from '../utils';
+import {
+  browserBuild, createArchitect, host, lazyModuleFiles, lazyModuleStringImport,
+} from '../utils';
 
 describe('Browser Builder output hashing', () => {
   const target = { project: 'app', target: 'build' };
@@ -58,7 +60,7 @@ describe('Browser Builder output hashing', () => {
     let newHashes: Map<string, string>;
 
     host.writeMultipleFiles(lazyModuleFiles);
-    host.writeMultipleFiles(lazyModuleImport);
+    host.writeMultipleFiles(lazyModuleStringImport);
 
     const overrides = { outputHashing: 'all', extractCss: true };
 
@@ -69,7 +71,7 @@ describe('Browser Builder output hashing', () => {
     // Save the current hashes.
     oldHashes = generateFileHashMap();
     host.writeMultipleFiles(lazyModuleFiles);
-    host.writeMultipleFiles(lazyModuleImport);
+    host.writeMultipleFiles(lazyModuleStringImport);
 
     await browserBuild(architect, host, target, overrides);
     newHashes = generateFileHashMap();
@@ -107,7 +109,7 @@ describe('Browser Builder output hashing', () => {
   it('supports options', async () => {
     host.writeMultipleFiles({ 'src/styles.css': `h1 { background: url('./spectrum.png')}` });
     host.writeMultipleFiles(lazyModuleFiles);
-    host.writeMultipleFiles(lazyModuleImport);
+    host.writeMultipleFiles(lazyModuleStringImport);
 
     // We must do several builds instead of a single one in watch mode, so that the output
     // path is deleted on each run and only contains the most recent files.
