@@ -140,7 +140,7 @@ export const lazyModuleFiles: { [path: string]: string } = {
   `,
 };
 
-export const lazyModuleImport: { [path: string]: string } = {
+export const lazyModuleStringImport: { [path: string]: string } = {
   'src/app/app.module.ts': `
     import { BrowserModule } from '@angular/platform-browser';
     import { NgModule } from '@angular/core';
@@ -163,4 +163,11 @@ export const lazyModuleImport: { [path: string]: string } = {
     })
     export class AppModule { }
   `,
+};
+
+export const lazyModuleFnImport: { [path: string]: string } = {
+  'src/app/app.module.ts': lazyModuleStringImport['src/app/app.module.ts'].replace(
+    `loadChildren: './lazy/lazy.module#LazyModule'`,
+    `loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule)`,
+  ),
 };
