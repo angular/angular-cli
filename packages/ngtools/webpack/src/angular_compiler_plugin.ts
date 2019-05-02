@@ -674,6 +674,7 @@ export class AngularCompilerPlugin {
             compilerWithFileSystems.inputFileSystem,
             this._warnings,
             this._errors,
+            this._basePath,
           );
         }
       }
