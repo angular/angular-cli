@@ -9,7 +9,10 @@
 import { Architect } from '@angular-devkit/architect';
 import { TestLogger } from '@angular-devkit/architect/testing';
 import { take, tap, timeout } from 'rxjs/operators';
-import { browserBuild, createArchitect, host, lazyModuleFiles, lazyModuleImport } from '../utils';
+import {
+  browserBuild, createArchitect, host, lazyModuleFiles,
+  lazyModuleFnImport, lazyModuleStringImport,
+} from '../utils';
 
 // tslint:disable-next-line:no-big-function
 describe('Browser Builder lazy modules', () => {
@@ -22,46 +25,60 @@ describe('Browser Builder lazy modules', () => {
   });
   afterEach(async () => host.restore().toPromise());
 
-  it('supports lazy bundle for lazy routes with JIT', async () => {
-    host.writeMultipleFiles(lazyModuleFiles);
-    host.writeMultipleFiles(lazyModuleImport);
+  for (const [name, imports] of Object.entries({
+    'string': lazyModuleStringImport,
+    'function': lazyModuleFnImport,
+  })) {
+    describe(`Load children ${name} syntax`, () => {
+      it('supports lazy bundle for lazy routes with JIT', async () => {
+        host.writeMultipleFiles(lazyModuleFiles);
+        host.writeMultipleFiles(imports);
 
-    const { files } = await browserBuild(architect, host, target);
-    expect('lazy-lazy-module.js' in files).toBe(true);
-  });
+        const { files } = await browserBuild(architect, host, target);
+        expect('lazy-lazy-module.js' in files).toBe(true);
+      });
 
-  it('should show error when lazy route is invalid on watch mode AOT', async () => {
-    host.writeMultipleFiles(lazyModuleFiles);
-    host.writeMultipleFiles(lazyModuleImport);
-    host.replaceInFile(
-      'src/app/app.module.ts',
-      'lazy.module#LazyModule',
-      'invalid.module#LazyModule',
-    );
+      it('should show error when lazy route is invalid on watch mode AOT', async () => {
+        host.writeMultipleFiles(lazyModuleFiles);
+        host.writeMultipleFiles(imports);
+        host.replaceInFile(
+          'src/app/app.module.ts',
+          'lazy.module',
+          'invalid.module',
+        );
 
-    const logger = new TestLogger('rebuild-lazy-errors');
-    const overrides = { watch: true, aot: true };
-    const run = await architect.scheduleTarget(target, overrides, { logger });
-    await run.output.pipe(
-      timeout(15000),
-      tap((buildEvent) => expect(buildEvent.success).toBe(false)),
-      tap(() => {
-        expect(logger.includes('Could not resolve module')).toBe(true);
-        logger.clear();
-        host.appendToFile('src/main.ts', ' ');
-      }),
-      take(2),
-    ).toPromise();
-    await run.stop();
-  });
+        const logger = new TestLogger('rebuild-lazy-errors');
+        const overrides = { watch: true, aot: true };
+        const run = await architect.scheduleTarget(target, overrides, { logger });
+        await run.output.pipe(
+          timeout(15000),
+          tap((buildEvent) => expect(buildEvent.success).toBe(false)),
+          tap(() => {
+            // Webpack error when using loadchildren string syntax.
+            const hasMissingModuleError = logger.includes('Could not resolve module')
+              // TS type error when using import().
+              || logger.includes('Cannot find module')
+              // Webpack error when using import() on a rebuild.
+              // There is no TS error because the type checker is forked on rebuilds.
+              || logger.includes('Module not found');
+            expect(hasMissingModuleError).toBe(true, 'Should show missing module error');
+            logger.clear();
+            host.appendToFile('src/main.ts', ' ');
+          }),
+          take(2),
+        ).toPromise();
+        await run.stop();
+      });
 
-  it('supports lazy bundle for lazy routes with AOT', async () => {
-    host.writeMultipleFiles(lazyModuleFiles);
-    host.writeMultipleFiles(lazyModuleImport);
+      it('supports lazy bundle for lazy routes with AOT', async () => {
+        host.writeMultipleFiles(lazyModuleFiles);
+        host.writeMultipleFiles(imports);
 
-    const { files } = await browserBuild(architect, host, target, { aot: true });
-    expect(files['lazy-lazy-module-ngfactory.js']).not.toBeUndefined();
-  });
+        const { files } = await browserBuild(architect, host, target, { aot: true });
+        expect(files['lazy-lazy-module-ngfactory.js']).not.toBeUndefined();
+      });
+    });
+  }
 
   it(`supports lazy bundle for import() calls`, async () => {
     host.writeMultipleFiles({
@@ -72,7 +89,7 @@ describe('Browser Builder lazy modules', () => {
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
     const { files } = await browserBuild(architect, host, target);
-    expect(files['0.js']).not.toBeUndefined();
+    expect(files['lazy-module.js']).not.toBeUndefined();
   });
 
   it(`supports lazy bundle for dynamic import() calls`, async () => {
@@ -96,7 +113,7 @@ describe('Browser Builder lazy modules', () => {
     });
 
     const { files } = await browserBuild(architect, host, target);
-    expect(files['0.js']).not.toBeUndefined();
+    expect(files['lazy-module.js']).not.toBeUndefined();
   });
 
   it(`supports hiding lazy bundle module name`, async () => {
@@ -116,13 +133,12 @@ describe('Browser Builder lazy modules', () => {
       'src/two.ts': `import * as http from '@angular/common/http'; console.log(http);`,
       'src/main.ts': `import('./one'); import('./two');`,
     });
-    host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
-    const { files } = await browserBuild(architect, host, target, { namedChunks: false });
-    expect(files['0.js']).not.toBeUndefined();
-    expect(files['1.js']).not.toBeUndefined();
+    const { files } = await browserBuild(architect, host, target);
+    expect(files['one.js']).not.toBeUndefined();
+    expect(files['two.js']).not.toBeUndefined();
     // TODO: the chunk with common modules used to be called `common`, see why that changed.
-    expect(files['2.js']).not.toBeUndefined();
+    expect(files['default~one~two.js']).not.toBeUndefined();
   });
 
   it(`supports disabling the common bundle`, async () => {
@@ -131,12 +147,11 @@ describe('Browser Builder lazy modules', () => {
       'src/two.ts': `import * as http from '@angular/common/http'; console.log(http);`,
       'src/main.ts': `import('./one'); import('./two');`,
     });
-    host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
     const { files } = await browserBuild(architect, host, target, { commonChunk: false });
-    expect(files['0.js']).not.toBeUndefined();
-    expect(files['1.js']).not.toBeUndefined();
-    expect(files['2.js']).toBeUndefined();
+    expect(files['one.js']).not.toBeUndefined();
+    expect(files['two.js']).not.toBeUndefined();
+    expect(files['common.js']).toBeUndefined();
   });
 
   it(`supports extra lazy modules array in JIT`, async () => {
