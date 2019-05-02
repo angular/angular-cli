@@ -16,6 +16,8 @@ import {
   addExportToModule,
   addProviderToModule,
   addSymbolToNgModuleMetadata,
+  insertAfterLastOccurrence,
+  findNodes,
 } from './ast-utils';
 
 
@@ -204,5 +206,46 @@ describe('ast utils', () => {
     const output = applyChanges(modulePath, moduleContent, changes);
     expect(output).toMatch(/import { LogService } from '.\/log.service';/);
     expect(output).toMatch(/\},\r?\n\s*LogService\r?\n\s*\]/);
+  });
+
+  describe('insertAfterLastOccurrence', () => {
+    const filePath: string = './src/foo.ts';
+
+    it('should work for the default scenario', () => {
+      const fileContent = `const arr = ['foo'];`;
+      const source = getTsSource(filePath, fileContent);
+      const arrayNode = findNodes(source.getChildren().shift() as ts.Node, ts.SyntaxKind.ArrayLiteralExpression);
+      const elements = (arrayNode.pop() as ts.ArrayLiteralExpression).elements;
+
+      const change = insertAfterLastOccurrence(
+        elements as any as ts.Node[],
+        `, 'bar'`,
+        filePath,
+        elements.pos,
+        ts.SyntaxKind.StringLiteral
+      );
+      const output = applyChanges(filePath, fileContent, [change]);
+
+      expect(output).toMatch(/const arr = \['foo', 'bar'\];/);
+    });
+
+
+    it('should work without occurrences', () => {
+      const fileContent = `const arr = [];`;
+      const source = getTsSource(filePath, fileContent);
+      const arrayNode = findNodes(source.getChildren().shift() as ts.Node, ts.SyntaxKind.ArrayLiteralExpression);
+      const elements = (arrayNode.pop() as ts.ArrayLiteralExpression).elements;
+
+      const change = insertAfterLastOccurrence(
+        elements as any as ts.Node[],
+        `'bar'`,
+        filePath,
+        elements.pos,
+        ts.SyntaxKind.StringLiteral
+      );
+      const output = applyChanges(filePath, fileContent, [change]);
+
+      expect(output).toMatch(/const arr = \['bar'\];/);
+    });
   });
 });
