@@ -7,10 +7,11 @@
  */
 
 import { Logger } from '@angular/compiler-cli/ngcc';
+import { existsSync } from 'fs';
+import * as path from 'path';
 import * as ts from 'typescript';
 import { InputFileSystem } from 'webpack';
 import { time, timeEnd } from './benchmark';
-import { workaroundResolve } from './utils';
 
 // We cannot create a plugin for this, because NGTSC requires addition type
 // information which ngcc creates when processing a package which was compiled with NGC.
@@ -24,8 +25,8 @@ import { workaroundResolve } from './utils';
 
 export class NgccProcessor {
   private _processedModules = new Set<string>();
-
   private _logger: NgccLogger;
+  private _nodeModulesDirectory: string;
 
   constructor(
     private readonly ngcc: typeof import('@angular/compiler-cli/ngcc'),
@@ -33,8 +34,10 @@ export class NgccProcessor {
     private readonly inputFileSystem: InputFileSystem,
     private readonly compilationWarnings: (Error | string)[],
     private readonly compilationErrors: (Error | string)[],
+    private readonly basePath: string,
   ) {
     this._logger = new NgccLogger(this.compilationWarnings, this.compilationErrors);
+    this._nodeModulesDirectory = this.findNodeModulesDirectory(this.basePath);
   }
 
   processModule(
@@ -57,13 +60,12 @@ export class NgccProcessor {
 
       return;
     }
-    const normalizedJsonPath = workaroundResolve(packageJsonPath);
 
     const timeLabel = `NgccProcessor.processModule.ngcc.process+${moduleName}`;
     time(timeLabel);
     this.ngcc.process({
-      basePath: normalizedJsonPath.substring(0, normalizedJsonPath.indexOf(moduleName)),
-      targetEntryPointPath: moduleName,
+      basePath: this._nodeModulesDirectory,
+      targetEntryPointPath: path.dirname(packageJsonPath),
       propertiesToConsider: this.propertiesToConsider,
       compileAllFormats: false,
       createNewEntryPointFormats: true,
@@ -100,6 +102,20 @@ export class NgccProcessor {
       // Ex: @angular/compiler/src/i18n/i18n_ast/package.json
       return undefined;
     }
+  }
+
+  private findNodeModulesDirectory(startPoint: string): string {
+    let current = startPoint;
+    while (path.dirname(current) !== current) {
+      const nodePath = path.join(current, 'node_modules');
+      if (existsSync(nodePath)) {
+        return nodePath;
+      }
+
+      current = path.dirname(current);
+    }
+
+    throw new Error(`Cannot locate the 'node_modules' directory.`);
   }
 }
 
