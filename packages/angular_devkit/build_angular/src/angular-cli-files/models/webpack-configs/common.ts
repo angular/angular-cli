@@ -8,7 +8,7 @@
 import { tags } from '@angular-devkit/core';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
-import * as ts from 'typescript';
+import { ScriptTarget } from 'typescript';
 import {
   Configuration,
   ContextReplacementPlugin,
@@ -72,7 +72,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
 
   if (targetInFileName) {
     // For differential loading we don't need to have 2 polyfill bundles
-    if (buildOptions.scriptTargetOverride === ts.ScriptTarget.ES2015) {
+    if (buildOptions.scriptTargetOverride === ScriptTarget.ES2015) {
       entryPoints['polyfills'] = [path.join(__dirname, '..', 'safari-nomodule.js')];
     } else {
       entryPoints['polyfills'] = [es5Polyfills];
@@ -310,7 +310,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   if (wco.tsConfig.options.target !== undefined &&
-    wco.tsConfig.options.target >= ts.ScriptTarget.ES2017) {
+    wco.tsConfig.options.target >= ScriptTarget.ES2017) {
     wco.logger.warn(tags.stripIndent`
       WARNING: Zone.js does not support native async/await in ES2017.
       These blocks are not intercepted by zone.js and will not triggering change detection.
