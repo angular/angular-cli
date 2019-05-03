@@ -9,7 +9,7 @@
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
 import { logging } from '@angular-devkit/core';
-import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
+import { ParsedCommandLine, ScriptTarget } from 'typescript';
 import {
   AssetPatternClass,
   Budget,
@@ -79,7 +79,7 @@ export interface BuildOptions {
   esVersionInFileName?: boolean;
 
   /* When specified it will be used instead of the script target in the tsconfig.json. */
-  scriptTargetOverride?: ts.ScriptTarget;
+  scriptTargetOverride?: ScriptTarget;
 }
 
 export interface WebpackTestOptions extends BuildOptions {
@@ -93,7 +93,7 @@ export interface WebpackConfigOptions<T = BuildOptions> {
   projectRoot: string;
   sourceRoot?: string;
   buildOptions: T;
-  tsConfig: ts.ParsedCommandLine;
+  tsConfig: ParsedCommandLine;
   tsConfigPath: string;
   supportES2015: boolean;
 }
