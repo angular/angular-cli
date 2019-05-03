@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';<% } %><% if (lazyRoute && routeD
 import { Routes, RouterModule } from '@angular/router';<% } %>
 <% if (routing || lazyRoute) { %>
 import { <%= classify(name) %>RoutingModule } from './<%= dasherize(name) %>-routing.module';<% } %><% if (lazyRoute) { %>
-import { <%= classify(name) %>Component } from './<%= dasherize(name) %>.component.ts';<% } %>
+import { <%= classify(name) %>Component } from './<%= dasherize(name) %>.component';<% } %>
 <% if (lazyRoute && routeDeclarationInlined) { %>
 const routes: Routes = [
   { path: '', component: <%= classify(name) %>Component }
