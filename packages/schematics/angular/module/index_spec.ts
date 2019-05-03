@@ -200,7 +200,9 @@ describe('Module Schematic', () => {
       const tree = await schematicRunner.runSchematicAsync('module', options, appTree).toPromise();
 
       const appRoutingModuleContent = tree.readContent('/projects/bar/src/app/app-routing.module.ts');
-      expect(appRoutingModuleContent).toMatch(/loadChildren: \(\) => import\('.\/foo\/foo.module'\)/);
+      expect(appRoutingModuleContent).toMatch(
+        /loadChildren: \(\) => import\('.\/foo\/foo.module'\).then\(m => m.FooModule\)/,
+      );
     });
   });
 });

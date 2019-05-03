@@ -127,11 +127,12 @@ function getRoutingModulePath(host: Tree, options: ModuleOptions): Path | undefi
 function buildRoute(options: ModuleOptions, ivyEnabled: boolean) {
   let loadChildren: string;
   const modulePath = `./${options.name}/${options.name}.module`;
+  const moduleName = `${strings.classify(options.name)}Module`;
 
   if (ivyEnabled) {
-    loadChildren = `() => import('${modulePath}')`;
+    loadChildren = `() => import('${modulePath}').then(m => m.${moduleName})`;
   } else {
-    loadChildren = `'${modulePath}#${strings.classify(options.name)}Module'`;
+    loadChildren = `'${modulePath}#${moduleName}'`;
   }
 
   return `{ path: '${options.route}', loadChildren: ${loadChildren} }`;
