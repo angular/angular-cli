@@ -180,7 +180,6 @@ export default function (options: ModuleOptions): Rule {
         ? schematic('component', {
             ...options,
             skipImport: true,
-            routerOutlet: true,
           })
         : noop(),
       mergeWith(templateSource),
