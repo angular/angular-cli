@@ -149,7 +149,7 @@ describe('Module Schematic', () => {
       const fooRoutingModuleContent = tree.readContent('/projects/bar/src/app/foo/foo-routing.module.ts');
       expect(fooRoutingModuleContent).toMatch(/RouterModule.forChild\(routes\)/);
       expect(fooRoutingModuleContent)
-        .toMatch(/const routes: Routes = \[([\n\r\s]+)?{ path: '', component: FooComponent }([\n\r\s]+)?\];/);
+        .toMatch(/const routes: Routes = \[\r?\n?\s*{ path: '', component: FooComponent }\r?\n?\s*\];/);
     });
 
     it('should generate a lazy loaded module with embedded route declarations', async () => {
@@ -189,7 +189,7 @@ describe('Module Schematic', () => {
       const fooModuleContent = tree.readContent('/projects/bar/src/app/foo/foo.module.ts');
       expect(fooModuleContent).toMatch(/RouterModule.forChild\(routes\)/);
       expect(fooModuleContent)
-        .toMatch(/const routes: Routes = \[([\n\r\s]+)?{ path: '', component: FooComponent }([\n\r\s]+)?\];/);
+        .toMatch(/const routes: Routes = \[\r?\n?\s*{ path: '', component: FooComponent }\r?\n?\s*\];/);
     });
 
     it('should support Ivy module imports', () => {
