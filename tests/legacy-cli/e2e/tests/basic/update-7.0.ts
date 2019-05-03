@@ -8,7 +8,7 @@ import { expectToFail } from '../../utils/utils';
 
 
 export default async function () {
-  const extraUpdateArgs = await isPrereleaseCli() ? ['--next', '--force'] : [];
+  const extraUpdateArgs = await isPrereleaseCli() ? ['--next'] : [];
 
   // Create new project from previous version files.
   // We must use the original NPM packages to force a real update.

@@ -12,7 +12,7 @@ import * as glob from 'glob';
 import { Minimatch } from 'minimatch';
 import * as path from 'path';
 import * as tslint from 'tslint'; // tslint:disable-line:no-implicit-dependencies
-import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
+import { Program } from 'typescript';
 import { stripBom } from '../angular-cli-files/utilities/strip-bom';
 import { Schema as RealTslintBuilderOptions } from './schema';
 
@@ -153,8 +153,8 @@ async function _lint(
   systemRoot: string,
   tslintConfigPath: string | null,
   options: TslintBuilderOptions,
-  program?: ts.Program,
-  allPrograms?: ts.Program[],
+  program?: Program,
+  allPrograms?: Program[],
 ): Promise<LintResult> {
   const Linter = projectTslint.Linter;
   const Configuration = projectTslint.Configuration;
@@ -210,7 +210,7 @@ function getFilesToLint(
   root: string,
   options: TslintBuilderOptions,
   linter: typeof tslint.Linter,
-  program?: ts.Program,
+  program?: Program,
 ): string[] {
   const ignore = options.exclude;
   const files = options.files || [];

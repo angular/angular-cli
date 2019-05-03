@@ -8,14 +8,14 @@
 
 import * as browserslist from 'browserslist';
 import * as caniuse from 'caniuse-api';
-import * as ts from 'typescript';
+import { ScriptTarget } from 'typescript';
 
 
 export function isDifferentialLoadingNeeded(
   projectRoot: string,
-  target: ts.ScriptTarget = ts.ScriptTarget.ES5): boolean {
+  target: ScriptTarget = ScriptTarget.ES5): boolean {
 
-  const supportES2015 = target !== ts.ScriptTarget.ES3 && target !== ts.ScriptTarget.ES5;
+  const supportES2015 = target !== ScriptTarget.ES3 && target !== ScriptTarget.ES5;
 
   return supportES2015 && isEs5SupportNeeded(projectRoot);
 }

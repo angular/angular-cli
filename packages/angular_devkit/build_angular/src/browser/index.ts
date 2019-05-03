@@ -27,7 +27,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { from, of } from 'rxjs';
 import { bufferCount, catchError, concatMap, map, mergeScan, switchMap } from 'rxjs/operators';
-import * as ts from 'typescript';
+import { ScriptTarget } from 'typescript';
 import * as webpack from 'webpack';
 import { NgBuildAnalyticsPlugin } from '../../plugins/webpack/analytics';
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
@@ -194,8 +194,8 @@ export function buildWebpackBrowser(
       const tsConfig = readTsconfig(tsConfigPath);
 
       if (isEs5SupportNeeded(projectRoot) &&
-          tsConfig.options.target !== ts.ScriptTarget.ES5 &&
-          tsConfig.options.target !== ts.ScriptTarget.ES2015) {
+          tsConfig.options.target !== ScriptTarget.ES5 &&
+          tsConfig.options.target !== ScriptTarget.ES2015) {
         context.logger.warn(tags.stripIndent`
           WARNING: Using differential loading with targets ES5 and ES2016 or higher may
           cause problems. Browsers with support for ES2015 will load the ES2016+ scripts
