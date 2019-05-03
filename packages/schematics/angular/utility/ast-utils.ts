@@ -576,7 +576,7 @@ export function isImported(source: ts.SourceFile,
   return matchingNodes.length > 0;
 }
 
-/*
+/**
  * Returns the RouterModule declaration from NgModule metadata, if any.
  */
 export function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression | undefined {
@@ -601,7 +601,9 @@ export function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression
     .find(el => (el as ts.Identifier).getText(source).startsWith('RouterModule'));
 }
 
-// todo
+/**
+ * Adds a new route declaration to a router module (i.e. has a RouterModule declaration)
+ */
 export function addRouteDeclarationToModule(
   source: ts.SourceFile,
   fileToAdd: string,
