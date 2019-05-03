@@ -222,7 +222,7 @@ export default function (options: LibraryOptions): Rule {
         commonModule: false,
         flat: true,
         path: sourceDir,
-        project: projectName,
+        project: options.name,
       }),
       schematic('component', {
         name: options.name,
@@ -232,13 +232,13 @@ export default function (options: LibraryOptions): Rule {
         flat: true,
         path: sourceDir,
         export: true,
-        project: projectName,
+        project: options.name,
       }),
       schematic('service', {
         name: options.name,
         flat: true,
         path: sourceDir,
-        project: projectName,
+        project: options.name,
       }),
       options.lintFix ? applyLintFix(sourceDir) : noop(),
       (_tree: Tree, context: SchematicContext) => {
