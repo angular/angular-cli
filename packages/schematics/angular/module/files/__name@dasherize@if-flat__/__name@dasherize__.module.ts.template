@@ -10,11 +10,7 @@ const routes: Routes = [
 ];<% } %>
 
 @NgModule({
-<<<<<<< HEAD
-  declarations: [],
-=======
   declarations: [<% if (lazyRoute) { %><%= classify(name) %>Component<% } %>],
->>>>>>> e95688a53... fix(@schematics/angular): routing module import in the module generator template
   imports: [<% if (commonModule) { %>
     CommonModule<%= routing || lazyRoute ? ',' : '' %><% } %><% if (routing || lazyRoute) { %>
     <%= classify(name) %>RoutingModule<% } %><%= lazyRoute && routeDeclarationInlined ? ',' : '' %><% if (lazyRoute && routeDeclarationInlined) { %>
