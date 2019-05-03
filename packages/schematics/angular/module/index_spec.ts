@@ -192,12 +192,12 @@ describe('Module Schematic', () => {
         .toMatch(/const routes: Routes = \[\r?\n?\s*{ path: '', component: FooComponent }\r?\n?\s*\];/);
     });
 
-    it('should support Ivy module imports', () => {
+    it('should support Ivy module imports', async () => {
       appTree.overwrite(
         '/projects/bar/src/tsconfig.app.json',
         '{ "angularCompilerOptions": { "enableIvy": true } }',
       );
-      const tree = schematicRunner.runSchematic('module', options, appTree);
+      const tree = await schematicRunner.runSchematicAsync('module', options, appTree).toPromise();
 
       const appRoutingModuleContent = tree.readContent('/projects/bar/src/app/app-routing.module.ts');
       expect(appRoutingModuleContent).toMatch(/loadChildren: \(\) => import\('.\/foo\/foo.module'\)/);
