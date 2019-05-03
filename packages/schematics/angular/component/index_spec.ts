@@ -388,7 +388,7 @@ describe('Component Schematic', () => {
     const options = {
       ...defaultOptions,
       routerOutlet: true,
-      inlineTemplate: true
+      inlineTemplate: true,
     };
     const tree = await schematicRunner.runSchematicAsync('component', options, appTree)
       .toPromise();
