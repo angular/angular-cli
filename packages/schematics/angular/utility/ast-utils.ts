@@ -341,6 +341,28 @@ export function getFirstNgModuleName(source: ts.SourceFile): string|undefined {
   return moduleClass.name.text;
 }
 
+export function getMetadataField(
+  source: ts.SourceFile,
+  node: ts.ObjectLiteralExpression,
+  metadataField: string,
+): ts.ObjectLiteralElement[] {
+    return node.properties
+      .filter(prop => prop.kind == ts.SyntaxKind.PropertyAssignment)
+      // Filter out every fields that's not "metadataField". Also handles string literals
+      // (but not expressions).
+      .filter((prop: ts.PropertyAssignment) => {
+        const name = prop.name;
+        switch (name.kind) {
+          case ts.SyntaxKind.Identifier:
+            return (name as ts.Identifier).getText(source) == metadataField;
+          case ts.SyntaxKind.StringLiteral:
+            return (name as ts.StringLiteral).text == metadataField;
+        }
+
+        return false;
+      });
+}
+
 export function addSymbolToNgModuleMetadata(
   source: ts.SourceFile,
   ngModulePath: string,
@@ -357,22 +379,11 @@ export function addSymbolToNgModuleMetadata(
   }
 
   // Get all the children property assignment of object literals.
-  const matchingProperties: ts.ObjectLiteralElement[] =
-    (node as ts.ObjectLiteralExpression).properties
-    .filter(prop => prop.kind == ts.SyntaxKind.PropertyAssignment)
-    // Filter out every fields that's not "metadataField". Also handles string literals
-    // (but not expressions).
-    .filter((prop: ts.PropertyAssignment) => {
-      const name = prop.name;
-      switch (name.kind) {
-        case ts.SyntaxKind.Identifier:
-          return (name as ts.Identifier).getText(source) == metadataField;
-        case ts.SyntaxKind.StringLiteral:
-          return (name as ts.StringLiteral).text == metadataField;
-      }
-
-      return false;
-    });
+  const matchingProperties = getMetadataField(
+    source,
+    node as ts.ObjectLiteralExpression,
+    metadataField,
+  );
 
   // Get the last node of the array literal.
   if (!matchingProperties) {
