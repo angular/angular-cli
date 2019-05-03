@@ -271,7 +271,7 @@ describe('ast utils', () => {
 
     expect(output).toMatch(
       // tslint:disable-next-line:max-line-length
-      /const routes = \[([\n\r\t\s]+)?{ path: 'foo', component: FooComponent },([\n\r\t\s]+)?{ path: 'bar', component: BarComponent }([\n\r\t\s]+)?\]/,
+      /const routes = \[\r?\n?\s*{ path: 'foo', component: FooComponent },\r?\n?\s*{ path: 'bar', component: BarComponent }\r?\n?\s*\]/,
     );
   });
 
@@ -333,7 +333,7 @@ describe('ast utils', () => {
 
     expect(output).toMatch(
       // tslint:disable-next-line:max-line-length
-      /RouterModule\.forRoot\(\[([\n\r\t\s]+)?{ path: 'foo', component: FooComponent },([\n\r\t\s]+)?{ path: 'bar', component: BarComponent }([\n\r\t\s]+)?\]\)/,
+      /RouterModule\.forRoot\(\[\r?\n?\s*{ path: 'foo', component: FooComponent },\r?\n?\s*{ path: 'bar', component: BarComponent }\r?\n?\s*\]\)/,
     );
   });
 });
