@@ -344,7 +344,7 @@ export function getFirstNgModuleName(source: ts.SourceFile): string|undefined {
 export function getMetadataField(
   source: ts.SourceFile,
   node: ts.ObjectLiteralExpression,
-  metadataField: string
+  metadataField: string,
 ): ts.ObjectLiteralElement[] {
     return node.properties
       .filter(prop => prop.kind == ts.SyntaxKind.PropertyAssignment)
@@ -379,7 +379,11 @@ export function addSymbolToNgModuleMetadata(
   }
 
   // Get all the children property assignment of object literals.
-  const matchingProperties = getMetadataField(source, node as ts.ObjectLiteralExpression, metadataField)
+  const matchingProperties = getMetadataField(
+    source,
+    node as ts.ObjectLiteralExpression,
+    metadataField,
+  );
 
   // Get the last node of the array literal.
   if (!matchingProperties) {
@@ -601,7 +605,7 @@ export function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression
 export function addRouteDeclarationToModule(
   source: ts.SourceFile,
   fileToAdd: string,
-  routeLiteral: string
+  routeLiteral: string,
 ): Change {
   const routerModuleExpr = getRouterModuleDeclaration(source);
   if (!routerModuleExpr) {
@@ -615,7 +619,8 @@ export function addRouteDeclarationToModule(
   let routesArr: ts.ArrayLiteralExpression | undefined;
   const routesArg = scopeConfigMethodArgs[0];
 
-  // Check if the route declarations array is an inlined argument of RouterModule or a standalone variable
+  // Check if the route declarations array is
+  // an inlined argument of RouterModule or a standalone variable
   if (routesArg.kind === ts.SyntaxKind.ArrayLiteralExpression) {
     routesArr = routesArg as ts.ArrayLiteralExpression;
   } else {
@@ -623,14 +628,14 @@ export function addRouteDeclarationToModule(
     const routesVar = source.statements
       .filter((s: ts.Statement) => s.kind === ts.SyntaxKind.VariableStatement)
       .find((v: ts.VariableStatement) => {
-        return v.declarationList.declarations[0].name.getText() === routesVarName
+        return v.declarationList.declarations[0].name.getText() === routesVarName;
       }) as ts.VariableStatement | undefined;
 
     if (!routesVar) {
       throw new Error(`The route declaration variable "${routesVarName}" is used but not defined.`);
     }
-    routesArr =
-      (findNodes(routesVar, ts.SyntaxKind.ArrayLiteralExpression) || {})[0] as ts.ArrayLiteralExpression | undefined;
+    const arrayNode = (findNodes(routesVar, ts.SyntaxKind.ArrayLiteralExpression) || {})[0];
+    routesArr = arrayNode as ts.ArrayLiteralExpression | undefined;
   }
 
   if (!routesArr) {
@@ -647,10 +652,10 @@ export function addRouteDeclarationToModule(
   }
 
   return insertAfterLastOccurrence(
-    routesArr.elements as any as ts.Node[],
+    routesArr.elements as unknown as ts.Node[],
     route,
     fileToAdd,
     routesArr.elements.pos,
-    ts.SyntaxKind.ObjectLiteralExpression
+    ts.SyntaxKind.ObjectLiteralExpression,
   );
 }

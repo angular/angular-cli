@@ -38,6 +38,7 @@ function applyChanges(path: string, content: string, changes: Change[]): string 
   return getFileContent(tree, path);
 }
 
+// tslint:disable-next-line:no-big-function
 describe('ast utils', () => {
   let modulePath: string;
   let moduleContent: string;
@@ -229,7 +230,10 @@ describe('ast utils', () => {
     `;
 
     const source = getTsSource(modulePath, moduleContent);
-    const changes = addRouteDeclarationToModule(source, './src/app', `{ path: 'foo', component: FooComponent }`);
+    const changes = addRouteDeclarationToModule(
+      source,
+      './src/app', `{ path: 'foo', component: FooComponent }`,
+    );
     const output = applyChanges(modulePath, moduleContent, [changes]);
 
     expect(output).toMatch(/const routes = \[{ path: 'foo', component: FooComponent }\]/);
@@ -259,11 +263,15 @@ describe('ast utils', () => {
     `;
 
     const source = getTsSource(modulePath, moduleContent);
-    const changes = addRouteDeclarationToModule(source, './src/app', `{ path: 'bar', component: BarComponent }`);
+    const changes = addRouteDeclarationToModule(
+      source,
+      './src/app', `{ path: 'bar', component: BarComponent }`,
+    );
     const output = applyChanges(modulePath, moduleContent, [changes]);
 
     expect(output).toMatch(
-      /const routes = \[([\n\r\t\s]+)?{ path: 'foo', component: FooComponent },([\n\r\t\s]+)?{ path: 'bar', component: BarComponent }([\n\r\t\s]+)?\]/
+      // tslint:disable-next-line:max-line-length
+      /const routes = \[([\n\r\t\s]+)?{ path: 'foo', component: FooComponent },([\n\r\t\s]+)?{ path: 'bar', component: BarComponent }([\n\r\t\s]+)?\]/,
     );
   });
 
@@ -287,12 +295,16 @@ describe('ast utils', () => {
     `;
 
     const source = getTsSource(modulePath, moduleContent);
-    const changes = addRouteDeclarationToModule(source, './src/app', `{ path: 'foo', component: FooComponent }`);
+    const changes = addRouteDeclarationToModule(
+      source,
+      './src/app', `{ path: 'foo', component: FooComponent }`,
+    );
     const output = applyChanges(modulePath, moduleContent, [changes]);
 
     expect(output).toMatch(/RouterModule\.forRoot\(\[{ path: 'foo', component: FooComponent }\]\)/);
   });
 
+  // tslint:disable-next-line:max-line-length
   it('should add a route to the routes argument of RouterModule when there are multiple declarations', () => {
     const moduleContent = `
       import { BrowserModule } from '@angular/platform-browser';
@@ -313,9 +325,15 @@ describe('ast utils', () => {
     `;
 
     const source = getTsSource(modulePath, moduleContent);
-    const changes = addRouteDeclarationToModule(source, './src/app', `{ path: 'bar', component: BarComponent }`);
+    const changes = addRouteDeclarationToModule(
+      source,
+      './src/app', `{ path: 'bar', component: BarComponent }`,
+    );
     const output = applyChanges(modulePath, moduleContent, [changes]);
 
-    expect(output).toMatch(/RouterModule\.forRoot\(\[([\n\r\t\s]+)?{ path: 'foo', component: FooComponent },([\n\r\t\s]+)?{ path: 'bar', component: BarComponent }([\n\r\t\s]+)?\]\)/)
+    expect(output).toMatch(
+      // tslint:disable-next-line:max-line-length
+      /RouterModule\.forRoot\(\[([\n\r\t\s]+)?{ path: 'foo', component: FooComponent },([\n\r\t\s]+)?{ path: 'bar', component: BarComponent }([\n\r\t\s]+)?\]\)/,
+    );
   });
 });
