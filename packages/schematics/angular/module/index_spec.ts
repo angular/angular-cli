@@ -133,8 +133,8 @@ describe('Module Schematic', () => {
       );
     });
 
-    it('should generate a lazy loaded module with a routing module', () => {
-      const tree = schematicRunner.runSchematic('module', options, appTree);
+    it('should generate a lazy loaded module with a routing module', async () => {
+      const tree = await schematicRunner.runSchematicAsync('module', options, appTree).toPromise();
       const files = tree.files;
 
       expect(files).toContain('/projects/bar/src/app/foo/foo.module.ts');
@@ -152,7 +152,7 @@ describe('Module Schematic', () => {
         .toMatch(/const routes: Routes = \[([\n\r\s]+)?{ path: '', component: FooComponent }([\n\r\s]+)?\];/);
     });
 
-    it('should generate a lazy loaded module with embedded route declarations', () => {
+    it('should generate a lazy loaded module with embedded route declarations', async () => {
       appTree.overwrite('/projects/bar/src/app/app.module.ts',
         `
         import { NgModule } from '@angular/core';
@@ -174,7 +174,7 @@ describe('Module Schematic', () => {
       );
       appTree.delete('/projects/bar/src/app/app-routing.module.ts');
 
-      const tree = schematicRunner.runSchematic('module', options, appTree);
+      const tree = await schematicRunner.runSchematicAsync('module', options, appTree).toPromise();
       const files = tree.files;
 
       expect(files).toContain('/projects/bar/src/app/foo/foo.module.ts');
