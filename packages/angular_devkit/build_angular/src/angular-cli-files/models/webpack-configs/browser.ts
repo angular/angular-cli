@@ -11,7 +11,7 @@ import * as webpack from 'webpack';
 import { IndexHtmlWebpackPlugin } from '../../plugins/index-html-webpack-plugin';
 import { generateEntryPoints } from '../../utilities/package-chunk-sort';
 import { WebpackConfigOptions } from '../build-options';
-import { getSourceMapDevTool, normalizeExtraEntryPoints } from './utils';
+import { getSourceMapDevTool, isPolyfillsEntry, normalizeExtraEntryPoints } from './utils';
 
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
 
@@ -114,7 +114,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
               const moduleName = module.nameForCondition ? module.nameForCondition() : '';
 
               return /[\\/]node_modules[\\/]/.test(moduleName)
-                && !chunks.some(({ name }) => name === 'polyfills' || name === 'polyfills-es5'
+                && !chunks.some(({ name }) => isPolyfillsEntry(name)
                   || globalStylesBundleNames.includes(name));
             },
           },

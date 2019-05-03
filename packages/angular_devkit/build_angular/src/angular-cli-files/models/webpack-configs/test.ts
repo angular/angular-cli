@@ -10,7 +10,7 @@ import * as glob from 'glob';
 import * as path from 'path';
 import * as webpack from 'webpack';
 import { WebpackConfigOptions, WebpackTestOptions } from '../build-options';
-import { getSourceMapDevTool } from './utils';
+import { getSourceMapDevTool, isPolyfillsEntry } from './utils';
 
 
 /**
@@ -85,7 +85,7 @@ export function getTestConfig(
     plugins: extraPlugins,
     optimization: {
       splitChunks: {
-        chunks: ((chunk: { name: string }) => chunk.name !== 'polyfills'),
+        chunks: ((chunk: { name: string }) => !isPolyfillsEntry(chunk.name)),
         cacheGroups: {
           vendors: false,
           vendor: {
@@ -95,7 +95,7 @@ export function getTestConfig(
               const moduleName = module.nameForCondition ? module.nameForCondition() : '';
 
               return /[\\/]node_modules[\\/]/.test(moduleName)
-                && !chunks.some(({ name }) => name === 'polyfills');
+                && !chunks.some(({ name }) => isPolyfillsEntry(name));
             },
           },
         },

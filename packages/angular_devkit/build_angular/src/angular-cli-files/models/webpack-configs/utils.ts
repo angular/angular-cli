@@ -101,3 +101,7 @@ export function getEsVersionForFileName(
   return scriptTargetOverride && esVersionInFileName ?
     '-' + ts.ScriptTarget[scriptTargetOverride].toLowerCase() : '';
 }
+
+export function isPolyfillsEntry(name: string) {
+  return name === 'polyfills' || name === 'polyfills-es5';
+}
