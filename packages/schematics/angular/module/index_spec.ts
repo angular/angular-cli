@@ -129,7 +129,7 @@ describe('Module Schematic', () => {
     beforeEach(() => {
       appTree.create(
         '/projects/bar/src/tsconfig.app.json',
-        '{ "angularCompilerOptions": { "enableIvy": false } }'
+        '{ "angularCompilerOptions": { "enableIvy": false } }',
       );
     });
 
@@ -170,7 +170,7 @@ describe('Module Schematic', () => {
           bootstrap: [AppComponent]
         })
         export class AppModule { }
-        `
+        `,
       );
       appTree.delete('/projects/bar/src/app/app-routing.module.ts');
 
@@ -195,8 +195,8 @@ describe('Module Schematic', () => {
     it('should support Ivy module imports', () => {
       appTree.overwrite(
         '/projects/bar/src/tsconfig.app.json',
-        '{ "angularCompilerOptions": { "enableIvy": true } }'
-      )
+        '{ "angularCompilerOptions": { "enableIvy": true } }',
+      );
       const tree = schematicRunner.runSchematic('module', options, appTree);
 
       const appRoutingModuleContent = tree.readContent('/projects/bar/src/app/app-routing.module.ts');

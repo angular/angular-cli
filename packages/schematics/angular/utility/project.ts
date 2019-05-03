@@ -45,12 +45,13 @@ export function getProjectConfig(host: Tree, project: WorkspaceProject) {
     throw new Error(`Couldn't find project config (tsconfig.app.json).`);
   }
   const configText = configFile.toString('utf-8');
-  let config: any;
+  let config: unknown;
   try {
     config = JSON.parse(configText);
   } catch {
     throw new Error(`Couldn't parse project config (tsconfig.app.json).`);
   }
+
   return config;
 }
 
@@ -68,10 +69,13 @@ export function isWorkspaceProject(project: any): project is WorkspaceProject {
 }
 
 export function isProjectUsingIvy(host: Tree, project: WorkspaceProject) {
-  const config = getProjectConfig(host, project);
+  const config = getProjectConfig(host, project) as Partial<{
+    angularCompilerOptions: { enableIvy: boolean };
+  }>;
 
   if (config && config.angularCompilerOptions) {
     return !!config.angularCompilerOptions.enableIvy;
   }
+
   return false;
 }

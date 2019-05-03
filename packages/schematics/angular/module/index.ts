@@ -17,8 +17,8 @@ import {
   mergeWith,
   move,
   noop,
-  url,
   schematic,
+  url,
 } from '@angular-devkit/schematics';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { addImportToModule, addRouteDeclarationToModule } from '../utility/ast-utils';
@@ -29,7 +29,7 @@ import { parseName } from '../utility/parse-name';
 import { getProject, isProjectUsingIvy } from '../utility/project';
 import { createDefaultPath } from '../utility/workspace';
 import { WorkspaceProject } from '../utility/workspace-models';
-import { Schema as ModuleOptions, RoutingScope } from './schema';
+import { RoutingScope, Schema as ModuleOptions } from './schema';
 
 function addDeclarationToNgModule(options: ModuleOptions): Rule {
   return (host: Tree) => {
@@ -73,7 +73,7 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
 function addRouteDeclarationToNgModule(
   options: ModuleOptions,
   project: WorkspaceProject,
-  routingModulePath: Path | undefined
+  routingModulePath: Path | undefined,
 ): Rule {
   return (host: Tree) => {
     if (!options.route) {
@@ -100,7 +100,7 @@ function addRouteDeclarationToNgModule(
     const addDeclaration = addRouteDeclarationToModule(
       ts.createSourceFile(path, sourceText, ts.ScriptTarget.Latest, true),
       path,
-      buildRoute(options, ivyEnabled)
+      buildRoute(options, ivyEnabled),
     ) as InsertChange;
 
     const recorder = host.beginUpdate(path);
