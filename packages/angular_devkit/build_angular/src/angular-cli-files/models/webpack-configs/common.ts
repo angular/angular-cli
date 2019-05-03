@@ -254,6 +254,22 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   if (scriptsOptimization) {
+    let angularGlobalDefinitions = {
+      ngDevMode: false,
+      ngI18nClosureMode: false,
+    };
+
+    try {
+      // Try to load known global definitions from @angular/compiler-cli.
+      // tslint:disable-next-line:no-implicit-dependencies
+      const GLOBAL_DEFS_FOR_TERSER = require('@angular/compiler-cli').GLOBAL_DEFS_FOR_TERSER;
+      if (GLOBAL_DEFS_FOR_TERSER) {
+        angularGlobalDefinitions = GLOBAL_DEFS_FOR_TERSER;
+      }
+    } catch {
+      // Do nothing, the default above will be used instead.
+    }
+
     const terserOptions = {
       ecma: wco.supportES2015 ? 6 : 5,
       warnings: !!buildOptions.verbose,
@@ -263,23 +279,16 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         comments: false,
         webkit: true,
       },
-
       // On server, we don't want to compress anything. We still set the ngDevMode = false for it
       // to remove dev code, and ngI18nClosureMode to remove Closure compiler i18n code
       compress: (buildOptions.platform == 'server' ? {
-        global_defs: {
-          ngDevMode: false,
-          ngI18nClosureMode: false,
-        },
+        global_defs: angularGlobalDefinitions,
       } : {
           pure_getters: buildOptions.buildOptimizer,
           // PURE comments work best with 3 passes.
           // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
           passes: buildOptions.buildOptimizer ? 3 : 1,
-          global_defs: {
-            ngDevMode: false,
-            ngI18nClosureMode: false,
-          },
+          global_defs: angularGlobalDefinitions,
         }),
       // We also want to avoid mangling on server.
       ...(buildOptions.platform == 'server' ? { mangle: false } : {}),
@@ -296,7 +305,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   if (wco.tsConfig.options.target !== undefined &&
-      wco.tsConfig.options.target >= ts.ScriptTarget.ES2017) {
+    wco.tsConfig.options.target >= ts.ScriptTarget.ES2017) {
     wco.logger.warn(tags.stripIndent`
       WARNING: Zone.js does not support native async/await in ES2017.
       These blocks are not intercepted by zone.js and will not triggering change detection.

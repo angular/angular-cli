@@ -82,6 +82,11 @@ export class Version {
       process.exit(2);
     }
 
+    if (angularCliPkgJson['version'] === '0.0.0') {
+      // Internal testing version
+      return;
+    }
+
     const cliMajor = new Version(angularCliPkgJson['version']).major;
     // e.g. CLI 8.0 supports '>=8.0.0 <9.0.0', including pre-releases (betas, rcs, snapshots)
     // of both 8 and 9.

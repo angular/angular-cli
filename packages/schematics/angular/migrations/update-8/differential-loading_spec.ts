@@ -62,6 +62,24 @@ describe('Migration to version 8', () => {
       expect(target).toBe('es2015');
     });
 
+    it(`should update 'module' to esnext when property exists`, () => {
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
+      const { module } = JSON.parse(tree2.readContent(tsConfigPath)).compilerOptions;
+      expect(module).toBe('esnext');
+    });
+
+    it(`should create 'module' property when doesn't exists`, () => {
+      const compilerOptions = {
+        ...oldTsConfig.compilerOptions,
+        module: undefined,
+      };
+
+      tree.overwrite(tsConfigPath, JSON.stringify({ compilerOptions }, null, 2));
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
+      const { module } = JSON.parse(tree2.readContent(tsConfigPath)).compilerOptions;
+      expect(module).toBe('esnext');
+    });
+
     it(`should update browserslist file to add an non evergreen browser`, () => {
       const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
       expect(tree2.readContent('/browserslist')).toContain('Chrome 41');
@@ -72,7 +90,17 @@ describe('Migration to version 8', () => {
       const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
       expect(tree2.exists('/browserslist')).toBe(true);
       expect(tree2.readContent('/browserslist'))
-        .toContain('Googlebot support');
+        .toContain('Support for Googlebot');
+    });
+
+    it('should move browserslist file if it exists in the sourceRoot', () => {
+      tree.create('/src/browserslist', 'last 2 Chrome versions');
+      tree.delete('/browserslist');
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
+      expect(tree2.exists('/browserslist')).toBe(true);
+      const content = tree2.readContent('/browserslist');
+      expect(content).toContain('Chrome 41');
+      expect(content).toContain('last 2 Chrome versions');
     });
   });
 });

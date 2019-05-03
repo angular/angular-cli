@@ -8,7 +8,6 @@ load("@npm_bazel_typescript//:defs.bzl", "ts_library")
 
 licenses(["notice"])  # MIT License
 
-
 # @angular-devkit/schematics-cli
 
 ts_library(
@@ -29,10 +28,9 @@ ts_library(
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tasks",
         "//packages/angular_devkit/schematics:tools",
-        "@npm//rxjs",
-        
         "@npm//@types/inquirer",
         "@npm//@types/minimist",
         "@npm//@types/node",
+        "@npm//rxjs",
     ],
 )

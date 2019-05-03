@@ -10,19 +10,18 @@
 # Variables
 
 ## IMPORTANT
-# If you change the `docker_image` version, also change the `cache_key` suffix and the version of
-# `com_github_bazelbuild_buildtools` in the `/WORKSPACE` file.
 # If you change the cache key prefix, also sync the restore_cache fallback to match.
 # Keep the static part of the cache key as prefix to enable correct fallbacks.
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
-var_1: &docker_image angular/ngcontainer:0.10.0
-var_2: &cache_key angular_devkit-0.10.0-{{ checksum "yarn.lock" }}
+var_1: &default_docker_image circleci/node:10.12
+var_2: &browsers_docker_image circleci/node:10.12-browsers
+var_3: &cache_key angular_devkit-0.10.0-{{ checksum "yarn.lock" }}
 
 # Settings common to each job
 anchor_1: &defaults
   working_directory: ~/ng
   docker:
-    - image: *docker_image
+    - image: *default_docker_image
 
 # After checkout, rebase on top of target branch.
 anchor_2: &post_checkout
@@ -71,6 +70,11 @@ jobs:
     steps:
       - attach_workspace: *attach_options
       - run: npm run lint
+      - run: 'yarn bazel:format -mode=check ||
+              (echo "BUILD files not formatted. Please run ''yarn bazel:format''" ; exit 1)'
+      # Run the skylark linter to check our Bazel rules
+      - run: 'yarn bazel:lint ||
+              (echo -e "\n.bzl files have lint errors. Please run ''yarn bazel:lint-fix''"; exit 1)'
 
   validate:
     <<: *defaults
@@ -86,6 +90,8 @@ jobs:
 
   test-large:
     <<: *defaults
+    docker:
+      - image: *browsers_docker_image
     resource_class: large
     parallelism: 4
     steps:
@@ -95,31 +101,40 @@ jobs:
 
   e2e-cli:
     <<: *defaults
+    docker:
+      - image: *browsers_docker_image
     environment:
       BASH_ENV: ~/.profile
+      NPM_CONFIG_PREFIX: ~/.npm-global
     resource_class: xlarge
     parallelism: 4
     steps:
       - attach_workspace: *attach_options
-      - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
+      - run: PATH=~/.npm-global/bin:$PATH xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
       - store_artifacts:
           path: /tmp/dist
           destination: cli/new-production
 
   e2e-cli-ivy:
     <<: *defaults
+    docker:
+      - image: *browsers_docker_image
     environment:
       BASH_ENV: ~/.profile
+      NPM_CONFIG_PREFIX: ~/.npm-global
     resource_class: xlarge
     parallelism: 4
     steps:
       - attach_workspace: *attach_options
-      - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ivy          
+      - run: PATH=~/.npm-global/bin:$PATH xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ivy
 
   e2e-cli-ng-snapshots:
     <<: *defaults
+    docker:
+      - image: *browsers_docker_image
     environment:
       BASH_ENV: ~/.profile
+      NPM_CONFIG_PREFIX: ~/.npm-global
     resource_class: xlarge
     parallelism: 4
     steps:
@@ -131,7 +146,7 @@ jobs:
               circleci step halt
             fi
       - attach_workspace: *attach_options
-      - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ng-snapshots
+      - run: PATH=~/.npm-global/bin:$PATH xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ng-snapshots
 
   build:
     <<: *defaults
@@ -145,7 +160,7 @@ jobs:
     steps:
       - attach_workspace: *attach_options
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
-      - run: bazel test ...
+      - run: yarn bazel:test
 
   snapshot_publish:
     <<: *defaults

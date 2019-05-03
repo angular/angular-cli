@@ -21,23 +21,18 @@ def _ts_json_schema_interface_impl(ctx):
 
     return [DefaultInfo()]
 
-
 _ts_json_schema_interface = rule(
     _ts_json_schema_interface_impl,
     attrs = {
         "src": attr.label(
-            allow_files = FileType([
-                ".json",
-            ]),
+            allow_files = [".json"],
             mandatory = True,
         ),
         "out": attr.string(
             mandatory = True,
         ),
         "data": attr.label_list(
-            allow_files = FileType([
-                ".json",
-            ]),
+            allow_files = [".json"],
         ),
         "_binary": attr.label(
             default = Label("//tools:quicktype_runner"),
@@ -46,11 +41,10 @@ _ts_json_schema_interface = rule(
         ),
     },
     outputs = {
-        "ts": "%{out}"
+        "ts": "%{out}",
     },
 )
 # @external_end
-
 
 # Generates a library that contains the interface for a JSON Schema file. Takes a single `src`
 # argument as input, an optional data field for reference files, and produces a ts_library()
@@ -78,6 +72,6 @@ def ts_json_schema(name, src, data = []):
         # @external_begin
         srcs = [
             out,
-        ]
+        ],
         # @external_end
     )

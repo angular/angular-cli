@@ -49,7 +49,6 @@ export interface AngularCompilerPluginOptions {
   // When using Ivy, the string syntax is not supported at all. Thus we shouldn't attempt that.
   // This option is also used for when the compilation doesn't need this sort of processing at all.
   discoverLazyRoutes?: boolean;
-  importFactories?: boolean;
 
   // added to the list of lazy routes
   additionalLazyModules?: { [module: string]: string };

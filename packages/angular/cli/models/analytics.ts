@@ -441,6 +441,20 @@ export async function promptProjectAnalytics(force = false): Promise<boolean> {
   return false;
 }
 
+export function hasGlobalAnalyticsConfiguration(): boolean {
+  try {
+    const globalWorkspace = getWorkspace('global');
+    const analyticsConfig: string | undefined | null | { uid?: string } = globalWorkspace
+      && globalWorkspace.getCli()
+      && globalWorkspace.getCli()['analytics'];
+
+    if (analyticsConfig !== undefined) {
+      return true;
+    }
+  } catch {}
+
+  return false;
+}
 
 /**
  * Get the global analytics object for the user. This returns an instance of UniversalAnalytics,

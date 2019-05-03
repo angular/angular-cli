@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, parseJson, strings } from '@angular-devkit/core';
+import { JsonParseMode, join, normalize, parseJson, strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -188,11 +188,11 @@ export default function (options: LibraryOptions): Rule {
     }
 
     const workspace = await getWorkspace(host);
-    const newProjectRoot = workspace.extensions.newProjectRoot || '';
+    const newProjectRoot = workspace.extensions.newProjectRoot as (string | undefined) || '';
 
     const scopeFolder = scopeName ? strings.dasherize(scopeName) + '/' : '';
     const folderName = `${scopeFolder}${strings.dasherize(options.name)}`;
-    const projectRoot = `${newProjectRoot}/${folderName}`;
+    const projectRoot = join(normalize(newProjectRoot), folderName);
     const distRoot = `dist/${folderName}`;
 
     const sourceDir = `${projectRoot}/src/lib`;

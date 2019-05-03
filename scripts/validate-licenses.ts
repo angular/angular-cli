@@ -73,6 +73,15 @@ const ignoredPackages = [
   'true-case-path@1.0.2', // Apache-2.0 but broken license in package.json
   'uws@9.14.0', // zlib license
 
+  // * Need to publish these with LICENSE files
+  // see https://github.com/bazelbuild/rules_nodejs/pull/696
+  // TODO(alexeagle): remove these after a release that fixes it
+  '@bazel/bazel@0.24.1',
+  '@bazel/bazel-linux_x64@0.24.1',
+  '@bazel/buildifier@0.22.0',
+  '@bazel/buildifier-linux_x64@0.22.0',
+  '@bazel/jasmine@0.26.0',
+
   // * Other
   'font-awesome@4.7.0', // (OFL-1.1 AND MIT)
   'stream-json@0.5.2', // 'New BSD'

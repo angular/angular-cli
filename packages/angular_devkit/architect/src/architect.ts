@@ -55,7 +55,7 @@ function _createJobHandlerFromBuilderInfo(
               if (result.success) {
                 return { ...v, options: result.data } as BuilderInput;
               } else if (result.errors) {
-                throw new Error('Options did not validate.' + result.errors.join());
+                throw new json.schema.SchemaValidationException(result.errors);
               } else {
                 return v;
               }
@@ -282,9 +282,7 @@ function _validateOptionsFactory(host: ArchitectHost, registry: json.schema.Sche
           if (success) {
             return of(data as json.JsonObject);
           } else {
-            throw new Error(
-              'Data did not validate: ' + (errors ? errors.join() : 'Unknown error.'),
-            );
+            throw new json.schema.SchemaValidationException(errors);
           }
         }),
       ).toPromise();

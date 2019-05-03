@@ -9,7 +9,6 @@ import { Architect, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { experimental, json, schema, tags } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import { Version } from '../upgrade/version';
 import { BepJsonWriter } from '../utilities/bep';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
 import { isPackageNameSafeForAnalytics } from './analytics';
@@ -275,9 +274,6 @@ export abstract class ArchitectCommand<
   protected async runArchitectTarget(
     options: ArchitectCommandOptions & Arguments,
   ): Promise<number> {
-    // Check Angular version.
-    Version.assertCompatibleAngularVersion(this.workspace.root);
-
     const extra = options['--'] || [];
 
     try {

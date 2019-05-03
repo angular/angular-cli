@@ -31,7 +31,7 @@
     "mini-css-extract-plugin": "0.6.0",
     "minimatch": "3.0.4",
     "parse5": "4.0.0",
-    "open": "6.1.0",
+    "open": "6.2.0",
     "postcss": "7.0.14",
     "postcss-import": "12.0.1",
     "postcss-loader": "3.0.0",
@@ -58,18 +58,18 @@
     "worker-plugin": "3.1.0"
   },
   "devDependencies": {
-    "@angular/animations": "^8.0.0-beta.12",
+    "@angular/animations": "^8.0.0-beta.14",
     "@angular/cdk": "^7.3.4",
-    "@angular/common": "^8.0.0-beta.12",
-    "@angular/compiler": "^8.0.0-beta.12",
-    "@angular/compiler-cli": "^8.0.0-beta.12",
-    "@angular/core": "^8.0.0-beta.12",
+    "@angular/common": "^8.0.0-beta.14",
+    "@angular/compiler": "^8.0.0-beta.14",
+    "@angular/compiler-cli": "^8.0.0-beta.14",
+    "@angular/core": "^8.0.0-beta.14",
     "@angular/material": "^7.3.4",
-    "@angular/platform-browser": "^8.0.0-beta.12",
-    "@angular/platform-browser-dynamic": "^8.0.0-beta.12",
-    "@angular/platform-server": "^8.0.0-beta.12",
-    "@angular/router": "^8.0.0-beta.12",
-    "@angular/service-worker": "^8.0.0-beta.12",
+    "@angular/platform-browser": "^8.0.0-beta.14",
+    "@angular/platform-browser-dynamic": "^8.0.0-beta.14",
+    "@angular/platform-server": "^8.0.0-beta.14",
+    "@angular/router": "^8.0.0-beta.14",
+    "@angular/service-worker": "^8.0.0-beta.14",
     "codelyzer": "^5.0.0",
     "bootstrap": "^4.0.0",
     "font-awesome": "^4.7.0",
@@ -87,6 +87,6 @@
     "zone.js": "^0.9.0"
   },
   "peerDependencies": {
-    "typescript": ">=2.7 < 3.5"
+    "typescript": ">=3.4 < 3.5"
   }
 }

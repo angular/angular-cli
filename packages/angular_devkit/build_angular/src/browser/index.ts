@@ -13,18 +13,21 @@ import {
 import { BuildResult, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
 import {
   experimental,
+  getSystemPath,
   join,
   json,
   logging,
   normalize,
   resolve,
+  tags,
   virtualFs,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
-import { concat, from, of, zip } from 'rxjs';
+import { from, of } from 'rxjs';
 import { bufferCount, catchError, concatMap, map, mergeScan, switchMap } from 'rxjs/operators';
+import * as ts from 'typescript';
 import * as webpack from 'webpack';
 import { NgBuildAnalyticsPlugin } from '../../plugins/webpack/analytics';
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
@@ -38,6 +41,7 @@ import {
   getWorkerConfig,
 } from '../angular-cli-files/models/webpack-configs';
 import { writeIndexHtml } from '../angular-cli-files/utilities/index-file/write-index-html';
+import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
 import {
   statsErrorsToString,
@@ -45,7 +49,8 @@ import {
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
 import { ExecutionTransformer } from '../transforms';
-import { deleteOutputDir } from '../utils';
+import { deleteOutputDir, isEs5SupportNeeded } from '../utils';
+import { Version } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
 import { Schema as BrowserBuilderSchema } from './schema';
 
@@ -165,6 +170,9 @@ export function buildWebpackBrowser(
   const host = new NodeJsSyncHost();
   const root = normalize(context.workspaceRoot);
 
+  // Check Angular version.
+  Version.assertCompatibleAngularVersion(context.workspaceRoot);
+
   const loggingFn = transforms.logging
     || createBrowserLoggingCallback(!!options.verbose, context.logger);
 
@@ -181,6 +189,19 @@ export function buildWebpackBrowser(
         workspace.root,
         normalize(workspace.getProject(projectName).root),
       );
+
+      const tsConfigPath = path.resolve(getSystemPath(workspace.root), options.tsConfig);
+      const tsConfig = readTsconfig(tsConfigPath);
+
+      if (isEs5SupportNeeded(projectRoot) &&
+          tsConfig.options.target !== ts.ScriptTarget.ES5 &&
+          tsConfig.options.target !== ts.ScriptTarget.ES2015) {
+        context.logger.warn(tags.stripIndent`
+          WARNING: Using differential loading with targets ES5 and ES2016 or higher may
+          cause problems. Browsers with support for ES2015 will load the ES2016+ scripts
+          referenced with script[type="module"] but they may not support ES2016+ syntax.
+        `);
+      }
 
       return from(configs).pipe(
         // the concurrency parameter (3rd parameter of mergeScan) is deliberately

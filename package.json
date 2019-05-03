@@ -20,12 +20,14 @@
   ],
   "scripts": {
     "admin": "node ./bin/devkit-admin",
+    "bazel:format": "find . -type f \\( -name \"*.bzl\" -or -name WORKSPACE -or -name BUILD -or -name BUILD.bazel \\) ! -path \"*/node_modules/*\" | xargs buildifier -v --warnings=attr-cfg,attr-license,attr-non-empty,attr-output-default,attr-single-file,constant-glob,ctx-args,depset-iteration,depset-union,dict-concatenation,duplicated-name,filetype,git-repository,http-archive,integer-division,load,load-on-top,native-build,native-package,output-group,package-name,package-on-top,positional-args,redefined-variable,repository-name,same-origin-load,string-iteration,unused-variable",
+    "bazel:lint": "yarn bazel:format --lint=warn",
+    "bazel:lint-fix": "yarn bazel:format --lint=fix",
+    "bazel:test": "bazel test //...",
     "build": "npm run admin -- build",
     "build-tsc": "tsc -p tsconfig.json",
     "fix": "npm run admin -- lint --fix",
     "lint": "npm run admin -- lint",
-    "prebuildifier": "bazel build --noshow_progress @com_github_bazelbuild_buildtools//buildifier",
-    "buildifier": "find . -type f \\( -name BUILD -or -name BUILD.bazel \\) ! -path \"*/node_modules/*\" | xargs $(bazel info bazel-bin)/external/com_github_bazelbuild_buildtools/buildifier/buildifier",
     "templates": "node ./bin/devkit-admin templates",
     "test": "node ./bin/devkit-admin test",
     "test-large": "node ./bin/devkit-admin test --large --spec-reporter",
@@ -62,7 +64,6 @@
     ]
   },
   "dependencies": {
-    "@phenomnomnominal/tsquery": "3.0.0",
     "@types/debug": "^4.1.2",
     "@types/node-fetch": "^2.1.6",
     "@types/progress": "^2.0.3",
@@ -78,8 +79,11 @@
     "typescript": "3.4.4"
   },
   "devDependencies": {
-    "@angular/compiler": "^8.0.0-beta.12",
-    "@angular/compiler-cli": "^8.0.0-beta.12",
+    "@angular/compiler": "^8.0.0-beta.14",
+    "@angular/compiler-cli": "^8.0.0-beta.14",
+    "@bazel/bazel": "0.24.1",
+    "@bazel/buildifier": "^0.22.0",
+    "@bazel/jasmine": "~0.26.0",
     "@bazel/karma": "~0.26.0",
     "@bazel/typescript": "~0.26.0",
     "@ngtools/json-schema": "^1.1.0",
@@ -130,6 +134,7 @@
     "tar": "^4.4.4",
     "through2": "^2.0.3",
     "tree-kill": "^1.2.0",
+    "ts-api-guardian": "0.4.2",
     "ts-node": "^5.0.0",
     "tslint-no-circular-imports": "^0.6.0",
     "tslint-sonarts": "1.9.0"

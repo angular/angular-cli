@@ -33,6 +33,7 @@ import {
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { normalizeOptimization } from '../utils';
+import { Version } from '../utils/version';
 import { Schema } from './schema';
 const open = require('open');
 
@@ -59,11 +60,6 @@ export type DevServerBuilderOutput = DevServerBuildOutput & {
   baseUrl: string;
 };
 
-export type ServerConfigTransformFn = (
-  workspace: experimental.workspace.Workspace,
-  config: WebpackDevServer.Configuration,
-) => Observable<WebpackDevServer.Configuration>;
-
 /**
  * Reusable implementation of the build angular webpack dev server builder.
  * @param options Dev Server options.
@@ -79,6 +75,9 @@ export function serveWebpackBrowser(
     logging?: WebpackLoggingCallback,
   } = {},
 ): Observable<DevServerBuilderOutput> {
+  // Check Angular version.
+  Version.assertCompatibleAngularVersion(context.workspaceRoot);
+
   const browserTarget = targetFromTargetString(options.browserTarget);
   const root = context.workspaceRoot;
   let first = true;
@@ -275,6 +274,8 @@ export function buildServerConfig(
       errors: !(styles || scripts),
       warnings: false,
     },
+    // inline is always false, because we add live reloading scripts in _addLiveReload when needed
+    inline: false,
     public: serverOptions.publicHost,
     disableHostCheck: serverOptions.disableHostCheck,
     publicPath: servePath,
