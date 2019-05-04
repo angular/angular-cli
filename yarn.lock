@@ -8202,10 +8202,10 @@ sass-loader@7.1.0:
     pify "^3.0.0"
     semver "^5.5.0"
 
-sass@1.19.0:
-  version "1.19.0"
-  resolved "https://registry.yarnpkg.com/sass/-/sass-1.19.0.tgz#5de82c713d4299fac57384ef5219534a37fe3e6c"
-  integrity sha512-8kzKCgxCzh8/zEn3AuRwzLWVSSFj8omkiGwqdJdeOufjM+I88dXxu9LYJ/Gw4rRTHXesN0r1AixBuqM6yLQUJw==
+sass@1.20.1:
+  version "1.20.1"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.20.1.tgz#737b901fe072336da540b6d00ec155e2267420da"
+  integrity sha512-BnCawee/L5kVG3B/5Jg6BFwASqUwFVE6fj2lnkVuSXDgQ7gMAhY9a2yPeqsKhJMCN+Wgx0r2mAW7XF/aTF5qtA==
   dependencies:
     chokidar "^2.0.0"
 
