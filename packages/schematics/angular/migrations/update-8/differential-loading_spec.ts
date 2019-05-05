@@ -102,5 +102,26 @@ describe('Migration to version 8', () => {
       expect(content).toContain('Chrome 41');
       expect(content).toContain('last 2 Chrome versions');
     });
+
+    it(`should remove 'target' and 'module' from non workspace tsconfig.json`, () => {
+      const appTsConfig = '/tsconfig.app.json';
+      const specsTsConfig = '/tsconfig.spec.json';
+      const compilerOptions = {
+        ...oldTsConfig.compilerOptions,
+        target: 'es2015',
+        module: 'es2015',
+      };
+
+      tree.overwrite(appTsConfig, JSON.stringify({ compilerOptions }, null, 2));
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
+      const { compilerOptions: appCompilerOptions } = JSON.parse(tree2.readContent(appTsConfig));
+      expect(appCompilerOptions.target).toBeUndefined();
+      expect(appCompilerOptions.module).toBeUndefined();
+
+      const { compilerOptions: specsCompilerOptions }
+        = JSON.parse(tree2.readContent(specsTsConfig));
+      expect(specsCompilerOptions.target).toBeUndefined();
+      expect(specsCompilerOptions.module).toBeUndefined();
+    });
   });
 });
