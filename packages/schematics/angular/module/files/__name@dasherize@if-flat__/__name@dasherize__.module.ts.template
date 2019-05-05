@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';<% if (commonModule) { %>
 import { CommonModule } from '@angular/common';<% } %><% if (lazyRoute && routeDeclarationInlined) { %>
 import { Routes, RouterModule } from '@angular/router';<% } %>
-<% if (routing || lazyRoute) { %>
+<% if (routing || lazyRoute && !routeDeclarationInlined) { %>
 import { <%= classify(name) %>RoutingModule } from './<%= dasherize(name) %>-routing.module';<% } %><% if (lazyRoute) { %>
 import { <%= classify(name) %>Component } from './<%= dasherize(name) %>.component';<% } %>
 <% if (lazyRoute && routeDeclarationInlined) { %>
@@ -12,7 +12,7 @@ const routes: Routes = [
 @NgModule({
   declarations: [<% if (lazyRoute) { %><%= classify(name) %>Component<% } %>],
   imports: [<% if (commonModule) { %>
-    CommonModule<%= routing || lazyRoute ? ',' : '' %><% } %><% if (routing || lazyRoute) { %>
+    CommonModule<%= routing || lazyRoute && !routeDeclarationInlined ? ',' : '' %><% } %><% if (routing || lazyRoute && !routeDeclarationInlined) { %>
     <%= classify(name) %>RoutingModule<% } %><%= lazyRoute && routeDeclarationInlined ? ',' : '' %><% if (lazyRoute && routeDeclarationInlined) { %>
     RouterModule.forChild(routes)<% } %>
   ]
