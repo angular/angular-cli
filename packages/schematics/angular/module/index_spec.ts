@@ -131,6 +131,7 @@ describe('Module Schematic', () => {
         '/projects/bar/src/tsconfig.app.json',
         '{ "angularCompilerOptions": { "enableIvy": false } }',
       );
+      appTree.create('/projects/bar/tsconfig.json', '{}');
     });
 
     it('should generate a lazy loaded module with a routing module', async () => {

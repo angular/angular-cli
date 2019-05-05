@@ -9,6 +9,11 @@ import { Tree } from '@angular-devkit/schematics';
 import { getWorkspace } from '../utility/config';
 import { ProjectType, WorkspaceProject, WorkspaceSchema } from '../utility/workspace-models';
 
+interface ProjectConfig {
+  angularCompilerOptions?: {
+    enableIvy?: boolean;
+  };
+}
 
 export function getProjectRoot(project: WorkspaceProject) {
   return project.sourceRoot
@@ -38,23 +43,22 @@ export function getProject<TProjectType extends ProjectType = ProjectType.Applic
   return workspace.projects[projectName] as WorkspaceProject<TProjectType>;
 }
 
-export function getProjectConfig(host: Tree, project: WorkspaceProject) {
-  const root = getProjectRoot(project);
-  const configFile = host.read(root + 'tsconfig.app.json');
+export function getProjectConfig(host: Tree, path: string) {
+  const configName = path.split('/').pop();
+  const configFile = host.read(path);
   if (!configFile) {
-    throw new Error(`Couldn't find project config (tsconfig.app.json).`);
+    throw new Error(`Couldn't find project config (${configName}).`);
   }
   const configText = configFile.toString('utf-8');
-  let config: unknown;
+  let config: ProjectConfig;
   try {
-    config = JSON.parse(configText);
+    config = JSON.parse(configText || '{}');
   } catch {
-    throw new Error(`Couldn't parse project config (tsconfig.app.json).`);
+    throw new Error(`Couldn't parse project config (${configName}).`);
   }
 
   return config;
 }
-
 
 // TODO(hans): change this any to unknown when google3 supports TypeScript 3.0.
 // tslint:disable-next-line:no-any
@@ -69,13 +73,17 @@ export function isWorkspaceProject(project: any): project is WorkspaceProject {
 }
 
 export function isProjectUsingIvy(host: Tree, project: WorkspaceProject) {
-  const config = getProjectConfig(host, project) as Partial<{
-    angularCompilerOptions: { enableIvy: boolean };
-  }>;
+  const projectRoot = getProjectRoot(project);
+  const config = getProjectConfig(host, projectRoot + 'tsconfig.app.json');
 
-  if (config && config.angularCompilerOptions) {
-    return !!config.angularCompilerOptions.enableIvy;
+  const ivyEnabled = config.angularCompilerOptions && config.angularCompilerOptions.enableIvy;
+
+  if (!ivyEnabled) {
+    const mainConfig = getProjectConfig(host, `${project.root}/tsconfig.json`);
+    const { angularCompilerOptions } = mainConfig;
+
+    return angularCompilerOptions && angularCompilerOptions.enableIvy;
   }
 
-  return false;
+  return ivyEnabled;
 }
