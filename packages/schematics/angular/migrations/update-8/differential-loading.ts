@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
+  JsonAstObject,
   JsonParseMode,
   isJsonObject,
   join,
@@ -17,6 +18,7 @@ import { Rule, Tree } from '@angular-devkit/schematics';
 import {
   findPropertyInAstObject,
   insertPropertyInAstObjectInOrder,
+  removePropertyInAstObject,
 } from '../../utility/json-utils';
 
 // tslint:disable-next-line:max-line-length
@@ -40,24 +42,12 @@ not IE 9-11 # For IE 9-11 support, remove 'not'.`;
 export function updateES5Projects(): Rule {
   return (host: Tree) => {
     const tsConfigPath = '/tsconfig.json';
-    const buffer = host.read(tsConfigPath);
-    if (!buffer) {
-      return host;
-    }
-
-    const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
-
-    if (tsCfgAst.kind !== 'object') {
-      return host;
-    }
-
-    const compilerOptions = findPropertyInAstObject(tsCfgAst, 'compilerOptions');
-    if (!compilerOptions || compilerOptions.kind !== 'object') {
+    const compilerOptions = getCompilerOptionsAstObject(host, tsConfigPath);
+    if (!compilerOptions) {
       return host;
     }
 
     const recorder = host.beginUpdate(tsConfigPath);
-
     const scriptTarget = findPropertyInAstObject(compilerOptions, 'target');
     if (!scriptTarget) {
       insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'target', 'es2015', 4);
@@ -78,11 +68,11 @@ export function updateES5Projects(): Rule {
 
     host.commitUpdate(recorder);
 
-    return updateBrowserlist;
+    return updateProjects;
   };
 }
 
-function updateBrowserlist(): Rule {
+function updateProjects(): Rule {
   return (tree) => {
     const angularConfigContent = tree.read('angular.json') || tree.read('.angular.json');
 
@@ -108,6 +98,34 @@ function updateBrowserlist(): Rule {
       if (name.endsWith('-e2e')) {
         // Skip existing separate E2E projects
         continue;
+      }
+
+      // Older projects app and spec ts configs had script and module set in them.
+      const tsConfigs = [];
+      const architect = project.architect;
+      if (isJsonObject(architect)
+        && isJsonObject(architect.build)
+        && isJsonObject(architect.build.options)
+        && typeof architect.build.options.tsConfig === 'string') {
+        tsConfigs.push(architect.build.options.tsConfig);
+      }
+
+      if (isJsonObject(architect)
+        && isJsonObject(architect.test)
+        && isJsonObject(architect.test.options)
+        && typeof architect.test.options.tsConfig === 'string') {
+        tsConfigs.push(architect.test.options.tsConfig);
+      }
+
+      for (const tsConfig of tsConfigs) {
+        const compilerOptions = getCompilerOptionsAstObject(tree, tsConfig);
+        if (!compilerOptions) {
+          continue;
+        }
+        const recorder = tree.beginUpdate(tsConfig);
+        removePropertyInAstObject(recorder, compilerOptions, 'target');
+        removePropertyInAstObject(recorder, compilerOptions, 'module');
+        tree.commitUpdate(recorder);
       }
 
       const browserslistPath = join(normalize(project.root), 'browserslist');
@@ -142,4 +160,24 @@ function updateBrowserlist(): Rule {
 
     return tree;
   };
+}
+
+function getCompilerOptionsAstObject(host: Tree, tsConfigPath: string): JsonAstObject | undefined {
+  const buffer = host.read(tsConfigPath);
+  if (!buffer) {
+    return;
+  }
+
+  const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
+
+  if (tsCfgAst.kind !== 'object') {
+    return;
+  }
+
+  const compilerOptions = findPropertyInAstObject(tsCfgAst, 'compilerOptions');
+  if (!compilerOptions || compilerOptions.kind !== 'object') {
+    return;
+  }
+
+  return compilerOptions;
 }
