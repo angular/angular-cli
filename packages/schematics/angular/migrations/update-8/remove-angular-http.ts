@@ -6,15 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { SchematicContext, Tree } from '@angular-devkit/schematics';
-import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
+import { Tree } from '@angular-devkit/schematics';
 import { removePackageJsonDependency } from '../../utility/dependencies';
 
 export const removeAngularHttp = () => {
-  return (host: Tree, context: SchematicContext) => {
+  return (host: Tree) => {
     removePackageJsonDependency(host, '@angular/http');
-    context.addTask(new NodePackageInstallTask());
-
-    return host;
   };
 };
