@@ -130,9 +130,16 @@ async function execute(
       const clientUrl = url.parse(publicHost);
       baseUrl = url.format(clientUrl);
     } else if (typeof result.port === 'number') {
+      let pathname = undefined;
+      if (typeof serverOptions.servePath === 'string') {
+        pathname = serverOptions.servePath;
+        pathname = pathname.endsWith('/') ? pathname : `${pathname}/`;
+      }
+
       baseUrl = url.format({
         protocol: serverOptions.ssl ? 'https' : 'http',
         hostname: options.host,
+        pathname,
         port: result.port.toString(),
       });
     }
