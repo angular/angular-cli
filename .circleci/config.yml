@@ -15,6 +15,7 @@
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
 var_1: &default_docker_image circleci/node:10.12
 var_2: &browsers_docker_image circleci/node:10.12-browsers
+var_2: &browsers_docker_image_node_12 circleci/node:12.1-browsers
 var_3: &cache_key angular_devkit-0.10.0-{{ checksum "yarn.lock" }}
 
 # Settings common to each job
@@ -114,6 +115,19 @@ jobs:
       - store_artifacts:
           path: /tmp/dist
           destination: cli/new-production
+
+  e2e-cli-node-12:
+    <<: *defaults
+    docker:
+      - image: *browsers_docker_image_node_12
+    environment:
+      BASH_ENV: ~/.profile
+      NPM_CONFIG_PREFIX: ~/.npm-global
+    resource_class: xlarge
+    parallelism: 4
+    steps:
+      - attach_workspace: *attach_options
+      - run: PATH=~/.npm-global/bin:$PATH xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
   e2e-cli-ivy:
     <<: *defaults
@@ -216,6 +230,9 @@ workflows:
           requires:
             - build
       - e2e-cli:
+          requires:
+            - build
+      - e2e-cli-node-12:
           requires:
             - build
       - e2e-cli-ivy:
