@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "packages": {
-      "description": "The names of package(s) to update.",
+      "description": "The package or packages to update.",
       "type": "array",
       "items": {
         "type": "string"
@@ -15,35 +15,35 @@
       }
     },
     "force": {
-      "description": "If false, will error out if installed packages are incompatible with the update.",
+      "description": "When false (the default), reports an error if installed packages are incompatible with the update.",
       "default": false,
       "type": "boolean"
     },
     "all": {
-      "description": "Whether to update all packages in package.json.",
+      "description": "When true, update all packages in `package.json`.",
       "default": false,
       "type": "boolean"
     },
     "next": {
-      "description": "Use the largest version, including beta and RCs.",
+      "description": "Update to the latest version, including beta and RCs.",
       "default": false,
       "type": "boolean"
     },
     "migrateOnly": {
-      "description": "Only perform a migration, does not update the installed version.",
+      "description": "Perform a migration, but do not update the installed version.",
       "default": false,
       "type": "boolean"
     },
     "from": {
-      "description": "Version from which to migrate from. Only available with a single package being updated, and only on migration only.",
+      "description": "When using `--migrateOnly` for a single package, the version of that package from which to migrate.",
       "type": "string"
     },
     "to": {
-      "description": "Version up to which to apply migrations. Only available with a single package being updated, and only on migrations only. Requires from to be specified. Default to the installed version detected.",
+      "description": "When using `--migrateOnly` for a single package, the version of that package to which to migrate.",
       "type": "string"
     },
     "registry": {
-      "description": "The NPM registry to use.",
+      "description": "The npm registry to use.",
       "type": "string",
       "oneOf": [
         {
@@ -55,7 +55,7 @@
       ]
     },
     "verbose": {
-      "description": "Display additional details during the update process.",
+      "description": "When true, display additional details during the update process.",
       "type": "boolean"
     },
     "packageManager": {
