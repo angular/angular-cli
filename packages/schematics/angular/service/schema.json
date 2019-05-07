@@ -47,11 +47,9 @@
     "lintFix": {
       "type": "boolean",
       "default": false,
-      "description": "When true, applies lint fixes after generating the pipe.",
+      "description": "When true, applies lint fixes after generating the service.",
       "x-user-analytics": 15
     }
   },
-  "required": [
-    "name"
-  ]
+  "required": ["name"]
 }
