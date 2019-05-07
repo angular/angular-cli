@@ -35,7 +35,7 @@
   "devDependencies": {
     "@angular/compiler": "^8.0.0-beta.14",
     "@angular/compiler-cli": "^8.0.0-beta.14",
-    "typescript": "3.4.4",
+    "typescript": "3.4.5",
     "webpack": "4.30.0"
   }
 }
