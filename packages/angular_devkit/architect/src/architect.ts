@@ -6,8 +6,17 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { analytics, experimental, json, logging } from '@angular-devkit/core';
-import { Observable, from, of } from 'rxjs';
-import { concatMap, first, map, shareReplay, switchMap } from 'rxjs/operators';
+import { Observable, from, merge, of, onErrorResumeNext } from 'rxjs';
+import {
+  concatMap,
+  first,
+  ignoreElements,
+  last,
+  map,
+  shareReplay,
+  switchMap,
+  takeUntil,
+} from 'rxjs/operators';
 import {
   BuilderInfo,
   BuilderInput,
@@ -39,7 +48,8 @@ function _createJobHandlerFromBuilderInfo(
   };
 
   function handler(argument: json.JsonObject, context: experimental.jobs.JobHandlerContext) {
-    const inboundBus = context.inboundBus.pipe(
+    // Add input validation to the inbound bus.
+    const inboundBusWithInputValidation = context.inboundBus.pipe(
       concatMap(message => {
         if (message.kind === experimental.jobs.JobInboundMessageKind.Input) {
           const v = message.value as BuilderInput;
@@ -51,14 +61,12 @@ function _createJobHandlerFromBuilderInfo(
           // Validate v against the options schema.
           return registry.compile(info.optionSchema).pipe(
             concatMap(validation => validation(options)),
-            map(result => {
-              if (result.success) {
-                return { ...v, options: result.data } as BuilderInput;
-              } else if (result.errors) {
-                throw new json.schema.SchemaValidationException(result.errors);
-              } else {
-                return v;
+            map(({ data, success, errors }) => {
+              if (success) {
+                return { ...v, options: data } as BuilderInput;
               }
+
+              throw new json.schema.SchemaValidationException(errors);
             }),
             map(value => ({ ...message, value })),
           );
@@ -71,7 +79,11 @@ function _createJobHandlerFromBuilderInfo(
       shareReplay(1),
     );
 
-    return from(host.loadBuilder(info)).pipe(
+    // Make an inboundBus that completes instead of erroring out.
+    // We'll merge the errors into the output instead.
+    const inboundBus = onErrorResumeNext(inboundBusWithInputValidation);
+
+    const output = from(host.loadBuilder(info)).pipe(
       concatMap(builder => {
         if (builder === null) {
           throw new Error(`Cannot load builder for builderInfo ${JSON.stringify(info, null, 2)}`);
@@ -94,7 +106,19 @@ function _createJobHandlerFromBuilderInfo(
           }),
         );
       }),
+      // Share subscriptions to the output, otherwise the the handler will be re-run.
+      shareReplay(),
     );
+
+    // Separate the errors from the inbound bus into their own observable that completes when the
+    // builder output does.
+    const inboundBusErrors = inboundBusWithInputValidation.pipe(
+      ignoreElements(),
+      takeUntil(onErrorResumeNext(output.pipe(last()))),
+    );
+
+    // Return the builder output plus any input errors.
+    return merge(inboundBusErrors, output);
   }
 
   return of(Object.assign(handler, { jobDescription }) as BuilderJobHandler);
@@ -281,9 +305,9 @@ function _validateOptionsFactory(host: ArchitectHost, registry: json.schema.Sche
         switchMap(({ data, success, errors }) => {
           if (success) {
             return of(data as json.JsonObject);
-          } else {
-            throw new json.schema.SchemaValidationException(errors);
           }
+
+          throw new json.schema.SchemaValidationException(errors);
         }),
       ).toPromise();
     },
