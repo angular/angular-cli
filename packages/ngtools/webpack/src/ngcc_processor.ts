@@ -112,7 +112,10 @@ class NgccLogger implements Logger {
 
   debug(..._args: string[]) { }
 
-  info(..._args: string[]) { }
+  info(...args: string[]) {
+    // Log to stderr because it's a progress-like info message.
+    process.stderr.write(`\n${args.join(' ')}\n`);
+  }
 
   warn(...args: string[]) {
     this.compilationWarnings.push(args.join(' '));
