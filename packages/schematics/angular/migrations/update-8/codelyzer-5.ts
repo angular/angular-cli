@@ -9,10 +9,8 @@
 import { JsonParseMode, parseJsonAst } from '@angular-devkit/core';
 import {
   Rule,
-  SchematicContext,
   Tree,
 } from '@angular-devkit/schematics';
-import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import {
   NodeDependency,
   NodeDependencyType,
@@ -78,7 +76,7 @@ export const updateTsLintConfig = (): Rule => {
 };
 
 export const updatePackageJson = () => {
-  return (host: Tree, context: SchematicContext) => {
+  return (host: Tree) => {
     const dependency: NodeDependency = {
       type: NodeDependencyType.Dev,
       name: 'codelyzer',
@@ -87,8 +85,5 @@ export const updatePackageJson = () => {
     };
 
     addPackageJsonDependency(host, dependency);
-    context.addTask(new NodePackageInstallTask());
-
-    return host;
   };
 };
