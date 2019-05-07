@@ -70,7 +70,7 @@ export function mergeWith(source: Source, strategy: MergeStrategy = MergeStrateg
 
 
 export function noop(): Rule {
-  return (tree: Tree, _context: SchematicContext) => tree;
+  return () => {};
 }
 
 
@@ -159,11 +159,8 @@ export function forEach(operator: FileOperator): Rule {
         tree.overwrite(newEntry.path, newEntry.content);
       }
     });
-
-    return tree;
   };
 }
-
 
 export function composeFileOperators(operators: FileOperator[]): FileOperator {
   return (entry: FileEntry) => {
