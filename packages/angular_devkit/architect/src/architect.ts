@@ -309,23 +309,23 @@ export class Architect {
 
   constructor(
     private _host: ArchitectHost,
-    private _registry: json.schema.SchemaRegistry = new json.schema.CoreSchemaRegistry(),
+    registry: json.schema.SchemaRegistry = new json.schema.CoreSchemaRegistry(),
     additionalJobRegistry?: experimental.jobs.Registry,
   ) {
     const privateArchitectJobRegistry = new experimental.jobs.SimpleJobRegistry();
     // Create private jobs.
     privateArchitectJobRegistry.register(_getTargetOptionsFactory(_host));
     privateArchitectJobRegistry.register(_getBuilderNameForTargetFactory(_host));
-    privateArchitectJobRegistry.register(_validateOptionsFactory(_host, _registry));
+    privateArchitectJobRegistry.register(_validateOptionsFactory(_host, registry));
 
     const jobRegistry = new experimental.jobs.FallbackRegistry([
-      new ArchitectTargetJobRegistry(_host, _registry, this._jobCache, this._infoCache),
-      new ArchitectBuilderJobRegistry(_host, _registry, this._jobCache, this._infoCache),
+      new ArchitectTargetJobRegistry(_host, registry, this._jobCache, this._infoCache),
+      new ArchitectBuilderJobRegistry(_host, registry, this._jobCache, this._infoCache),
       privateArchitectJobRegistry,
       ...(additionalJobRegistry ? [additionalJobRegistry] : []),
     ] as experimental.jobs.Registry[]);
 
-    this._scheduler = new experimental.jobs.SimpleScheduler(jobRegistry, _registry);
+    this._scheduler = new experimental.jobs.SimpleScheduler(jobRegistry, registry);
   }
 
   has(name: experimental.jobs.JobName) {
