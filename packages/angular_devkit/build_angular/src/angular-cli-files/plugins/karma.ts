@@ -209,6 +209,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
         const alwaysServe = [
           '/_karma_webpack_/runtime.js',
           '/_karma_webpack_/polyfills.js',
+          '/_karma_webpack_/polyfills-es5.js',
           '/_karma_webpack_/scripts.js',
           '/_karma_webpack_/styles.js',
           '/_karma_webpack_/vendor.js',
