@@ -15,6 +15,7 @@
 var_1: &docker_image angular/ngcontainer:0.7.0
 var_2: &cache_key angular_devkit-{{ checksum "yarn.lock" }}-0.7.0
 var_3: &node_8_docker_image angular/ngcontainer:0.3.3
+var_3: &node_12_docker_image circleci/node:12.1-browsers
 
 # Settings common to each job
 anchor_1: &defaults
@@ -104,6 +105,20 @@ jobs:
       - run: npm install --global npm@6
       - run: xvfb-run -a node ./tests/legacy-cli/run_e2e --glob=tests/basic/* --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
+  e2e-node-12:
+    <<: *defaults
+    # Overwrite docker image to node 8.
+    docker:
+      - image: *node_12_docker_image
+    environment:
+      BASH_ENV: ~/.profile
+      NPM_CONFIG_PREFIX: ~/.npm-global      
+    resource_class: xlarge
+    parallelism: 2
+    steps:
+      - attach_workspace: *attach_options
+      - run: PATH=~/.npm-global/bin:$PATH xvfb-run -a node ./tests/legacy-cli/run_e2e --glob=tests/basic/* --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
+
   e2e-cli-ng-snapshots:
     <<: *defaults
     environment:
@@ -185,6 +200,9 @@ workflows:
           requires:
             - build
       - e2e-node-8:
+          requires:
+            - build
+      - e2e-node-12:
           requires:
             - build
       - snapshot_publish_docs:
