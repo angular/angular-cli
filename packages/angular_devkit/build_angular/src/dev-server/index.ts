@@ -107,6 +107,12 @@ export function serveWebpackBrowser(
     // In dev server we should not have budgets because of extra libs such as socks-js
     overrides.budgets = undefined;
 
+    // When having a serve path we need to change the
+    // baseHref from '/' as otherwise resources won't be found.
+    if (options.servePath && !(rawBrowserOptions.baseHref || options.baseHref)) {
+      overrides.baseHref = '';
+    }
+
     const browserName = await context.getBuilderNameForTarget(browserTarget);
     const browserOptions = await context.validateOptions<json.JsonObject & BrowserBuilderSchema>(
       { ...rawBrowserOptions, ...overrides },
@@ -276,7 +282,7 @@ export function buildServerConfig(
     },
     public: serverOptions.publicHost,
     disableHostCheck: serverOptions.disableHostCheck,
-    publicPath: servePath,
+    publicPath: servePath.endsWith('/') ? servePath : `${servePath}/`,
     hot: serverOptions.hmr,
     contentBase: false,
   };

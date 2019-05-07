@@ -31,9 +31,9 @@ describe('Dev Server Deploy Url', () => {
     runs.push(run);
     const output = await run.result as DevServerBuilderOutput;
     expect(output.success).toBe(true);
-    expect(output.baseUrl).toBe('http://localhost:4200/test');
+    expect(output.baseUrl).toBe('http://localhost:4200/test/');
 
-    const response = await fetch(`${output.baseUrl}/polyfills.js`);
+    const response = await fetch(`${output.baseUrl}polyfills.js`);
     expect(await response.text()).toContain('window["webpackJsonp"]');
   }, 30000);
 });
