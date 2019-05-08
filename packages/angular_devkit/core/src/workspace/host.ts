@@ -30,7 +30,7 @@ export function createWorkspaceHost(host: virtualFs.Host): WorkspaceHost {
     },
     async isDirectory(path: string): Promise<boolean> {
       try {
-        return host.isDirectory(normalize(path)).toPromise();
+        return await host.isDirectory(normalize(path)).toPromise();
       } catch {
         // some hosts throw if path does not exist
         return false;
@@ -38,7 +38,7 @@ export function createWorkspaceHost(host: virtualFs.Host): WorkspaceHost {
     },
     async isFile(path: string): Promise<boolean> {
       try {
-        return host.isFile(normalize(path)).toPromise();
+        return await host.isFile(normalize(path)).toPromise();
       } catch {
         // some hosts throw if path does not exist
         return false;
