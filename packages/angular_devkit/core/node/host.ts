@@ -181,7 +181,7 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
   }
   isFile(path: Path): Observable<boolean> {
     return _callFs(fs.stat, getSystemPath(path)).pipe(
-      map(stat => stat.isDirectory()),
+      map(stat => stat.isFile()),
     );
   }
 
