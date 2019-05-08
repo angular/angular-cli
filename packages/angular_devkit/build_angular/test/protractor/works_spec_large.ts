@@ -81,4 +81,20 @@ describe('Protractor Builder', () => {
     await run.stop();
   }, 30000);
 
+  it('supports dev server builder with browser builder base HREF option', async () => {
+    host.replaceInFile(
+      'angular.json',
+      '"main": "src/main.ts",',
+      '"main": "src/main.ts", "baseHref": "/base/",',
+    );
+    // Need to reset architect to use the modified config
+    architect = (await createArchitect(host.root())).architect;
+
+    const run = await architect.scheduleTarget(protractorTargetSpec);
+
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
+
+    await run.stop();
+  }, 30000);
+
 });
