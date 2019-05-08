@@ -81,7 +81,6 @@ export function serveWebpackBrowser(
   const browserTarget = targetFromTargetString(options.browserTarget);
   const root = context.workspaceRoot;
   let first = true;
-  let openAddress: string;
   const host = new NodeJsSyncHost();
 
   const loggingFn = transforms.logging
@@ -152,15 +151,6 @@ export function serveWebpackBrowser(
         options.publicHost = clientAddress.host;
       }
 
-      // Resolve serve address.
-      const serverAddress = url.format({
-        protocol: options.ssl ? 'https' : 'http',
-        hostname: options.host === '0.0.0.0' ? 'localhost' : options.host,
-        // Port cannot be undefined here since we have a step that sets it back in options above.
-        // tslint:disable-next-line:no-non-null-assertion
-        port: options.port !.toString(),
-      });
-
       // Add live reload config.
       if (options.liveReload) {
         _addLiveReload(options, browserOptions, webpackConfig, clientAddress, context.logger);
@@ -193,24 +183,34 @@ export function serveWebpackBrowser(
         `);
       }
 
-      context.logger.info(tags.oneLine`
-        **
-        Angular Live Development Server is listening on ${options.host}:${options.port},
-        open your browser on ${serverAddress}${webpackDevServerConfig.publicPath}
-        **
-      `);
+      return runWebpackDevServer(webpackConfig, context, { logging: loggingFn }).pipe(
+        map(buildEvent => {
+          // Resolve serve address.
+          const serverAddress = url.format({
+            protocol: options.ssl ? 'https' : 'http',
+            hostname: options.host === '0.0.0.0' ? 'localhost' : options.host,
+            pathname: webpackDevServerConfig.publicPath,
+            port: buildEvent.port,
+          });
 
-      openAddress = serverAddress + webpackDevServerConfig.publicPath;
+          if (first) {
+            first = false;
 
-      return runWebpackDevServer(webpackConfig, context, { logging: loggingFn });
-    }),
-    map(buildEvent => {
-      if (first && options.open) {
-        first = false;
-        open(openAddress);
-      }
+            context.logger.info(tags.oneLine`
+              **
+              Angular Live Development Server is listening on ${options.host}:${options.port},
+              open your browser on ${serverAddress}
+              **
+            `);
 
-      return { ...buildEvent, baseUrl: openAddress } as DevServerBuilderOutput;
+            if (options.open) {
+              open(serverAddress);
+            }
+          }
+
+          return { ...buildEvent, baseUrl: serverAddress } as DevServerBuilderOutput;
+        }),
+      );
     }),
   );
 }
