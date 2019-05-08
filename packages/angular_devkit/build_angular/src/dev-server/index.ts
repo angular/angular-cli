@@ -259,10 +259,16 @@ export function buildServerConfig(
     host: serverOptions.host,
     port: serverOptions.port,
     headers: { 'Access-Control-Allow-Origin': '*' },
-    historyApiFallback: {
+    historyApiFallback: !!browserOptions.index && {
       index: `${servePath}/${path.basename(browserOptions.index)}`,
       disableDotRule: true,
       htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
+      rewrites: [
+        {
+          from: new RegExp(`^(?!${servePath})/.*`),
+          to: context => url.format(context.parsedUrl),
+        },
+      ],
     } as WebpackDevServer.HistoryApiFallbackConfig,
     stats: false,
     compress: styles || scripts,
