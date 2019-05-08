@@ -6,7 +6,9 @@
 licenses(["notice"])  # MIT
 
 load("@npm_bazel_typescript//:defs.bzl", "ts_library")
+# @external_begin
 load("@build_bazel_rules_nodejs//:defs.bzl", "npm_package")
+# @external_end
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 package(default_visibility = ["//visibility:public"])
@@ -99,6 +101,7 @@ ts_library(
     ],
 )
 
+# @external_begin
 npm_package(
     name = "npm_package",
     deps = [
@@ -106,3 +109,4 @@ npm_package(
         ":testing",
     ],
 )
+# @external_end
