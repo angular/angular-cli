@@ -6,7 +6,9 @@ package(default_visibility = ["//visibility:public"])
 
 load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
 load("@npm_bazel_typescript//:defs.bzl", "ts_library")
+# @external_begin
 load("@build_bazel_rules_nodejs//:defs.bzl", "npm_package")
+# @external_end
 
 licenses(["notice"])  # MIT License
 
@@ -237,6 +239,7 @@ ts_library(
     ],
 )
 
+# @external_begin
 npm_package(
     name = "npm_package",
     deps = [
@@ -246,3 +249,4 @@ npm_package(
         ":tools",
     ],
 )
+# @external_end
