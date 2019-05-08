@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
+  JsonParseMode,
   Path,
   basename,
   join,
@@ -206,7 +207,7 @@ function getTsConfigOutDir(host: Tree, tsConfigPath: string): string {
     throw new SchematicsException(`Could not read ${tsConfigPath}`);
   }
   const tsConfigContent = tsConfigBuffer.toString();
-  const tsConfig = parseJson(tsConfigContent);
+  const tsConfig = parseJson(tsConfigContent, JsonParseMode.Loose);
   if (tsConfig === null || typeof tsConfig !== 'object' || Array.isArray(tsConfig) ||
     tsConfig.compilerOptions === null || typeof tsConfig.compilerOptions !== 'object' ||
     Array.isArray(tsConfig.compilerOptions)) {
