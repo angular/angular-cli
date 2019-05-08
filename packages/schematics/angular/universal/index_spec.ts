@@ -10,6 +10,7 @@ import { Schema as ApplicationOptions, Style } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as UniversalOptions } from './schema';
 
+// tslint:disable-next-line:no-big-function
 describe('Universal Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
@@ -82,7 +83,6 @@ describe('Universal Schematic', () => {
     const tree = await schematicRunner
       .runSchematicAsync('universal', workspaceUniversalOptions, appTree)
       .toPromise();
-    debugger;
     const filePath = '/tsconfig.server.json';
     expect(tree.exists(filePath)).toEqual(true);
     const contents = tree.readContent(filePath);
@@ -204,4 +204,17 @@ describe('Universal Schematic', () => {
     expect(schematicRunner.tasks[0].name).toBe('node-package');
     expect((schematicRunner.tasks[0].options as {command: string}).command).toBe('install');
   });
+
+  it(`should work when 'tsconfig.app.json' has comments`, async () => {
+    const appTsConfigPath = '/projects/bar/tsconfig.app.json';
+    const appTsConfigContent = appTree.readContent(appTsConfigPath);
+    appTree.overwrite(appTsConfigPath, '// comment in json file\n' + appTsConfigContent);
+
+    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+      .toPromise();
+
+    const filePath = '/projects/bar/tsconfig.server.json';
+    expect(tree.exists(filePath)).toEqual(true);
+  });
+
 });
