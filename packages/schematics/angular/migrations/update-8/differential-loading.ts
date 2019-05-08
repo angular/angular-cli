@@ -29,13 +29,9 @@ const browserslistContent = `# This file is used by the build system to adjust C
 # You can see what browsers were selected by your queries by running:
 #   npx browserslist
 
-# Googlebot uses an older version of Chrome
-# For additional information see: https://developers.google.com/search/docs/guides/rendering
-
 > 0.5%
 last 2 versions
 Firefox ESR
-Chrome 41 # Support for Googlebot
 not dead
 not IE 9-11 # For IE 9-11 support, remove 'not'.`;
 
@@ -148,13 +144,8 @@ function updateProjects(): Rule {
         }
       }
 
-      const source = tree.read(browserslistPath);
-      if (!source) {
+      if (!tree.exists(browserslistPath)) {
         tree.create(browserslistPath, browserslistContent);
-      } else if (!source.toString().toLowerCase().includes('chrome 41')) {
-        const recorder = tree.beginUpdate(browserslistPath);
-        recorder.insertRight(source.length, '\nChrome 41 # Googlebot');
-        tree.commitUpdate(recorder);
       }
     }
 

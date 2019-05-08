@@ -5,12 +5,8 @@
 # You can see what browsers were selected by your queries by running:
 #   npx browserslist
 
-# Googlebot uses an older version of Chrome
-# For additional information see: https://developers.google.com/search/docs/guides/rendering
-
 > 0.5%
 last 2 versions
 Firefox ESR
-Chrome 41 # Support for Googlebot
 not dead
 not IE 9-11 # For IE 9-11 support, remove 'not'.
