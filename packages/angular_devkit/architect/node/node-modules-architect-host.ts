@@ -124,6 +124,7 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
   }
 
   private findProjectTarget(target: Target) {
+    // NOTE: Remove conditional when deprecated support for experimental workspace API is removed.
     if ('getProjectTargets' in this._workspace) {
       return this._workspace.getProjectTargets(target.project)[target.target];
     } else {
