@@ -239,7 +239,10 @@ export abstract class ArchitectCommand<
     );
     const overrides = parseArguments(targetOptions, targetOptionArray, this.logger);
 
-    if (overrides['--']) {
+    const allowAdditionalProperties = typeof builderDesc.optionSchema === 'object'
+      && builderDesc.optionSchema.additionalProperties;
+
+    if (overrides['--'] && !allowAdditionalProperties) {
       (overrides['--'] || []).forEach(additional => {
         this.logger.fatal(`Unknown option: '${additional.split(/=/)[0]}'`);
       });
