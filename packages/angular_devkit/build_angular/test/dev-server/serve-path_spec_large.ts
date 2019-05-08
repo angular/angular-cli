@@ -27,7 +27,7 @@ describe('Dev Server Builder serve path', () => {
     await Promise.all(runs.map(r => r.stop()));
   });
 
-  it('works', async () => {
+  it('uses the servePath option when specified', async () => {
     const run = await architect.scheduleTarget(target, { servePath: 'test/' });
     runs.push(run);
     const output = await run.result as DevServerBuilderOutput;
@@ -37,4 +37,39 @@ describe('Dev Server Builder serve path', () => {
     const response = await fetch(`${output.baseUrl}/polyfills.js`);
     expect(await response.text()).toContain('window["webpackJsonp"]');
   }, 30000);
+
+  it('does not fallback when request is outside serve path', async () => {
+    const run = await architect.scheduleTarget(target, { servePath: 'test/' });
+
+    await expectAsync(run.result).toBeResolvedTo(
+      jasmine.objectContaining({ success: true, baseUrl: 'http://localhost:4200/test' }),
+    );
+
+    // fallback processing requires an accept header
+    await expectAsync(
+      fetch('http://localhost:4200', { headers: { 'accept': 'text/html' } }),
+    ).toBeResolvedTo(jasmine.objectContaining({ status: 404 }));
+
+    await expectAsync(
+      fetch('http://localhost:4200/api/', { headers: { 'accept': 'text/html' } }),
+    ).toBeResolvedTo(jasmine.objectContaining({ status: 404 }));
+
+    await run.stop();
+  }, 30000);
+
+  it('does fallback when request is inside serve path', async () => {
+    const run = await architect.scheduleTarget(target, { servePath: 'test/' });
+
+    await expectAsync(run.result).toBeResolvedTo(
+      jasmine.objectContaining({ success: true, baseUrl: 'http://localhost:4200/test' }),
+    );
+
+    // fallback processing requires an accept header
+    await expectAsync(
+      fetch('http://localhost:4200/test/nothere', { headers: { 'accept': 'text/html' } }),
+    ).toBeResolvedTo(jasmine.objectContaining({ status: 200 }));
+
+    await run.stop();
+  }, 30000);
+
 });
