@@ -80,17 +80,10 @@ describe('Migration to version 8', () => {
       expect(module).toBe('esnext');
     });
 
-    it(`should update browserslist file to add an non evergreen browser`, () => {
-      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
-      expect(tree2.readContent('/browserslist')).toContain('Chrome 41');
-    });
-
     it(`should create browserslist file if it doesn't exist`, () => {
       tree.delete('/browserslist');
       const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
       expect(tree2.exists('/browserslist')).toBe(true);
-      expect(tree2.readContent('/browserslist'))
-        .toContain('Support for Googlebot');
     });
 
     it('should move browserslist file if it exists in the sourceRoot', () => {
@@ -98,9 +91,6 @@ describe('Migration to version 8', () => {
       tree.delete('/browserslist');
       const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
       expect(tree2.exists('/browserslist')).toBe(true);
-      const content = tree2.readContent('/browserslist');
-      expect(content).toContain('Chrome 41');
-      expect(content).toContain('last 2 Chrome versions');
     });
 
     it(`should remove 'target' and 'module' from non workspace tsconfig.json`, () => {
