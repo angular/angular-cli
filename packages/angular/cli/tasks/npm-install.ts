@@ -26,7 +26,7 @@ export default async function (packageName: string,
     case 'cnpm':
     case 'pnpm':
     case 'npm':
-      installArgs.push('install', '--silent');
+      installArgs.push('install');
       break;
 
     case 'yarn':
@@ -35,7 +35,7 @@ export default async function (packageName: string,
 
     default:
       packageManager = 'npm';
-      installArgs.push('install', '--quiet');
+      installArgs.push('install');
       break;
   }
 
@@ -49,6 +49,8 @@ export default async function (packageName: string,
     installArgs.push('--no-save');
   }
 
+  installArgs.push('--quiet');
+
   await new Promise((resolve, reject) => {
     spawn(packageManager, installArgs, { stdio: 'inherit', shell: true })
       .on('close', (code: number) => {
@@ -56,9 +58,7 @@ export default async function (packageName: string,
           logger.info(terminal.green(`Installed packages for tooling via ${packageManager}.`));
           resolve();
         } else {
-          const message = 'Package install failed, see above.';
-          logger.info(terminal.red(message));
-          reject(message);
+          reject('Package install failed, see above.');
         }
       });
   });
