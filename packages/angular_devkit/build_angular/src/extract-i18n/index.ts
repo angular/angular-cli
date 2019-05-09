@@ -10,7 +10,7 @@ import {
   createBuilder,
   targetFromTargetString,
 } from '@angular-devkit/architect';
-import { runWebpack } from '@angular-devkit/build-webpack';
+import { WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
 import { JsonObject } from '@angular-devkit/core';
 import * as path from 'path';
 import * as webpack from 'webpack';
@@ -20,6 +20,7 @@ import {
   getStatsConfig,
   getStylesConfig,
 } from '../angular-cli-files/models/webpack-configs';
+import { statsErrorsToString, statsWarningsToString } from '../angular-cli-files/utilities/stats';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
 import { Version } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
@@ -91,7 +92,19 @@ async function execute(options: ExtractI18nBuilderOptions, context: BuilderConte
     ],
   );
 
-  return runWebpack(config[0], context).toPromise();
+  const logging: WebpackLoggingCallback = (stats, config) => {
+    const json = stats.toJson({ errors: true, warnings: true });
+
+    if (stats.hasWarnings()) {
+      context.logger.warn(statsWarningsToString(json, config.stats));
+    }
+
+    if (stats.hasErrors()) {
+      context.logger.error(statsErrorsToString(json, config.stats));
+    }
+  };
+
+  return runWebpack(config[0], context, { logging }).toPromise();
 }
 
 export default createBuilder<JsonObject & ExtractI18nBuilderOptions>(execute);
