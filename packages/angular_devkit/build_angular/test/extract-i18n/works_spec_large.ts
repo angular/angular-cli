@@ -22,7 +22,7 @@ describe('Extract i18n Target', () => {
 
   afterEach(() => host.restore().toPromise());
 
-  it('works', async () => {
+  it('generates an extraction file', async () => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
 
     const run = await architect.scheduleTarget(extractI18nTargetSpec);
@@ -38,6 +38,20 @@ describe('Extract i18n Target', () => {
       const content = virtualFs.fileBufferToString(host.scopedSync().read(extractionFile));
       expect(content).toContain('i18n test');
     }
+  }, 30000);
+
+  it('does not show full build logs', async () => {
+    const logger = new TestLogger('i18n');
+    host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
+
+    const run = await architect.scheduleTarget(extractI18nTargetSpec);
+
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
+
+    await run.stop();
+
+    expect(logger.includes('Chunk Names')).toBe(false);
+    expect(logger.includes('[emitted]')).toBe(false);
   }, 30000);
 
   it('shows errors', async () => {
