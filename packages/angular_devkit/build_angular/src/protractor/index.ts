@@ -89,13 +89,7 @@ async function execute(
   }
 
   if (options.webdriverUpdate) {
-    try {
-      await updateWebdriver();
-    } catch (error) {
-      context.reportStatus('Error: ' + error);
-
-      return { success: false };
-    }
+    await updateWebdriver();
   }
 
   let baseUrl;
@@ -120,14 +114,8 @@ async function execute(
     }
 
     server = await context.scheduleTarget(target, overrides);
-    let result;
-    try {
-      result = await server.result;
-    } catch (error) {
-      context.reportStatus('Error: ' + error);
-    }
-
-    if (!result || !result.success) {
+    const result = await server.result;
+    if (!result.success) {
       return { success: false };
     }
 
