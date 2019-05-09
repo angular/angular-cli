@@ -67,7 +67,7 @@ export interface BaseWorkflowOptions {
 
 export declare function branchAndMerge(rule: Rule, strategy?: MergeStrategy): Rule;
 
-export declare function callRule(rule: Rule, input: Observable<Tree>, context: SchematicContext): Observable<Tree>;
+export declare function callRule(rule: Rule, input: Tree | Observable<Tree>, context: SchematicContext): Observable<Tree>;
 
 export declare function callSource(source: Source, context: SchematicContext): Observable<Tree>;
 
