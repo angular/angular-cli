@@ -27,7 +27,6 @@ ts_library(
     ),
     module_name = "@angular-devkit/schematics",
     module_root = "src/index.d.ts",
-    # strict_checks = False,
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",  # TODO: get rid of this for 6.0
@@ -47,6 +46,7 @@ ts_library(
     ),
     # @external_begin
     tsconfig = "//:tsconfig-test.json",
+    # @external_end
     deps = [
         ":schematics",
         ":testing",
@@ -56,7 +56,6 @@ ts_library(
         "@npm//@types/node",
         "@npm//rxjs",
     ],
-    # @external_end
 )
 
 jasmine_node_test(
@@ -83,7 +82,6 @@ ts_library(
     ),
     module_name = "@angular-devkit/schematics/tasks",
     module_root = "tasks/index.d.ts",
-    # strict_checks = False,
     deps = [
         ":schematics",
         "//packages/angular_devkit/core",
@@ -108,7 +106,6 @@ ts_library(
     ),
     module_name = "@angular-devkit/schematics/tasks/node",
     module_root = "tasks/node/index.d.ts",
-    # strict_checks = False,
     deps = [
         ":schematics",
         ":tasks",
@@ -135,6 +132,7 @@ ts_library(
     ],
     # @external_begin
     tsconfig = "//:tsconfig-test.json",
+    # @external_end
     deps = [
         ":schematics",
         ":tasks",
@@ -146,7 +144,6 @@ ts_library(
         "@npm//@types/node",
         "@npm//rxjs",
     ],
-    # @external_end
 )
 
 jasmine_node_test(
@@ -172,7 +169,6 @@ ts_library(
     ),
     module_name = "@angular-devkit/schematics/tools",
     module_root = "tools/index.d.ts",
-    # strict_checks = False,
     deps = [
         ":schematics",
         ":tasks",
@@ -196,6 +192,7 @@ ts_library(
     ),
     # @external_begin
     tsconfig = "//:tsconfig-test.json",
+    # @external_end
     deps = [
         ":schematics",
         ":tasks",
@@ -208,7 +205,6 @@ ts_library(
         "@npm//@types/node",
         "@npm//rxjs",
     ],
-    # @external_end
 )
 
 jasmine_node_test(

@@ -30,7 +30,6 @@ ts_library(
     ],
     module_name = "@angular-devkit/core",
     module_root = "src/index.d.ts",
-    # strict_checks = False,
     deps = [
         "@npm//rxjs",
         "@npm//@types/node",
@@ -58,7 +57,7 @@ ts_library(
     ],
     # @external_begin
     tsconfig = "//:tsconfig-test.json",
-    # strict_checks = False,
+    # @external_end
     deps = [
         ":core",
         ":node",
@@ -66,7 +65,6 @@ ts_library(
         "@npm//@types/node",
         "@npm//rxjs",
     ],
-    # @external_end
 )
 
 jasmine_node_test(
@@ -111,6 +109,7 @@ ts_library(
     ),
     # @external_begin
     tsconfig = "//:tsconfig-test.json",
+    # @external_end
     deps = [
         ":core",
         ":node",
@@ -119,7 +118,6 @@ ts_library(
         "@npm//@types/node",
         "@npm//rxjs",
     ],
-    # @external_end
 )
 
 jasmine_node_test(
@@ -148,7 +146,6 @@ ts_library(
     ),
     module_name = "@angular-devkit/core/node/testing",
     module_root = "node/testing/index.d.ts",
-    # strict_checks = False,
     deps = [
         ":core",
         ":node",
