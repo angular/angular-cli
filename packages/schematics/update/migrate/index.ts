@@ -82,6 +82,8 @@ export default function(options: PostUpdateSchema): Rule {
     });
 
     if (schematicsToRun.length > 0) {
+      context.logger.info(`** Executing migrations for package '${options.package}' **`);
+
       const rules = schematicsToRun.map(x => externalSchematic(options.collection, x.name, {}));
 
       return chain(rules);
