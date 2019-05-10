@@ -264,7 +264,10 @@ export abstract class ArchitectCommand<
       const run = await this._architect.scheduleTarget(
         target,
         overrides as json.JsonObject,
-        { logger: this.logger },
+        {
+          logger: this.logger,
+          analytics: isPackageNameSafeForAnalytics(builderConf) ? this.analytics : undefined,
+        },
       );
 
       const result = await run.output.toPromise();
