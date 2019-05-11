@@ -7,6 +7,311 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link
+      href="https://fonts.googleapis.com/css?family=Roboto"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto+Mono"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+
+  <style>
+    body {
+      font-family: "Roboto", Arial, sans-serif;
+      font-size: 14px;
+      color: #333;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body,
+    body * {
+      margin: 0;
+      padding: 0;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin: 8px 0;
+    }
+
+    hr {
+      border: 0;
+      height: 1px;
+      width: 80%;
+      background-color: #eee;
+      margin: 16px 0;
+    }
+
+    .toolbar {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      background-color: #1976d2;
+      color: white;
+      font-weight: 600;
+    }
+
+    .toolbar img {
+      margin: 0 16px;
+    }
+
+    .content {
+      display: flex;
+      margin: 32px auto;
+      padding: 0 16px;
+      max-width: 960px;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    svg.material-icons {
+      height: 24px;
+      width: auto;
+    }
+
+    svg.material-icons:not(:last-child) {
+      margin-right: 8px;
+    }
+
+    .content .card svg.material-icons path {
+      fill: #888;
+    }
+
+    .card-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .card {
+      border-radius: 4px;
+      border: 1px solid #eee;
+      background-color: #fafafa;
+      height: 40px;
+      width: 200px;
+      margin: 0 8px 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.2s ease-in-out;
+      line-height: 24px;
+    }
+
+    .card-container .card:not(:last-child) {
+      margin-right: 0;
+    }
+
+    .card.card-small {
+      height: 16px;
+      width: 160px;
+    }
+
+    .card-container .card:not(.highlight-card) {
+      cursor: pointer;
+    }
+
+    .card-container .card:not(.highlight-card):hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 17px rgba(black, 0.35);
+    }
+
+    .card-container .card:not(.highlight-card):hover .material-icons path {
+      fill: rgb(105, 103, 103);
+    }
+
+    .card.highlight-card {
+      background-color: #1976d2;
+      color: white;
+      font-weight: 600;
+      border: none;
+      width: auto;
+      min-width: 30%;
+      position: relative;
+    }
+
+    .card.highlight-card svg#rocket {
+      width: 80px;
+      position: absolute;
+      left: -60px;
+      top: -24px;
+    }
+
+    .card.highlight-card svg#rocket-smoke {
+      height: 100vh;
+      position: absolute;
+      top: 10px;
+      right: 230px;
+      z-index: -10;
+    }
+
+    a,
+    a:visited,
+    a:hover {
+      color: #1976d2;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: #125699;
+    }
+
+    .terminal {
+      position: relative;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 6px;
+      padding-top: 45px;
+      margin: 8px;
+      overflow: hidden;
+      background-color: rgb(15, 15, 16);
+    }
+
+    .terminal::before {
+      content: "\2022 \2022 \2022";
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: rgb(58, 58, 58);
+      color: #c2c3c4;
+      width: 100%;
+      font-size: 2.5rem;
+      margin: 0;
+      line-height: 0;
+      padding: 14px 0;
+      text-indent: 4px;
+      letter-spacing: -3px;
+    }
+
+    .terminal pre {
+      font-family: "Roboto Mono", monospace;
+      color: white;
+      padding: 0 1rem 1rem;
+    }
+
+    .circle-link {
+      height: 40px;
+      width: 40px;
+      border-radius: 40px;
+      margin: 8px;
+      background-color: white;
+      border: 1px solid #eeeeee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+      transition: 1s ease-out;
+    }
+
+    .circle-link:hover {
+      transform: translateY(-0.25rem);
+      box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    footer {
+      margin-top: 24px;
+    display: flex;
+    align-items: center;
+    line-height: 20px;
+    }
+
+    footer a {
+      display: flex;
+      align-items: center;
+    }
+
+    footer .github-star-badge {
+      color: #24292e;
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      padding: 3px 10px;
+      border: 1px solid rgba(27,31,35,.2);
+      border-radius: 3px;
+      background-image: linear-gradient(-180deg,#fafbfc,#eff3f6 90%);
+      margin-left: 4px;
+      font-weight: 600;
+      font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
+    }
+
+    footer .github-star-badge:hover {
+      background-image: linear-gradient(-180deg,#f0f3f6,#e6ebf1 90%);
+      border-color: rgba(27,31,35,.35);
+      background-position: -.5em;
+    }
+
+    footer .github-star-badge .material-icons {
+      height: 16px;
+      width: 16px;
+      margin-right: 4px;
+    }
+
+    svg#clouds {
+      position: fixed;
+      bottom: -160px;
+      left: -230px;
+      z-index: -10;
+      width: 1920px;
+    }
+
+
+    /* Responsive Styles */
+    @media screen and (max-width: 767px) {
+      hr {
+        width: 100%;
+        margin: 16px 0;
+      }
+
+      .card:not(.highlight-card) {
+        width: 100%;
+        height: 16px;
+        margin: 8px 0;
+      }
+
+      .card-container .card.card-small:not(.highlight-card) {
+        width: 100%;
+      }
+
+      .card.highlight-card span {
+        margin-left: 72px;
+      }
+
+      svg#rocket {
+        left: 10px;
+      }
+
+      svg#rocket-smoke {
+        right: 250px;
+        transform: rotate(-5deg);
+      }
+
+      .terminal {
+        width: 100%;
+      }
+    }
+
+    @media screen and (max-width: 575px) {
+      svg#rocket-smoke {
+        display: none;
+        visibility: hidden;
+      }
+    }
+  </style>
 </head>
 <body>
   <<%= prefix %>-root></<%= prefix %>-root>
