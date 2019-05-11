@@ -54,11 +54,11 @@ export default async function () {
 
   // Size checks in bytes
   if (ivyProject) {
-    verifySize(mainES5Path, 147789);
-    verifySize(mainES2015Path, 130153);
+    verifySize(mainES5Path, 167355);
+    verifySize(mainES2015Path, 149806);
   } else {
-    verifySize(mainES5Path, 155523);
-    verifySize(mainES2015Path, 135394);
+    verifySize(mainES5Path, 184470);
+    verifySize(mainES2015Path, 163627);
   }
 
   // Check that the process didn't change local files.
