@@ -796,7 +796,6 @@ export interface PromptDefinition {
     }>;
     message: string;
     multiselect?: boolean;
-    priority: number;
     raw?: string | JsonObject;
     type: string;
     validator?: (value: string) => boolean | string | Promise<boolean | string>;

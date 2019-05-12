@@ -569,7 +569,6 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           id: path,
           type,
           message,
-          priority: 0,
           raw: schema,
           items,
           multiselect: type === 'list' ? schema.multiselect : false,
@@ -624,8 +623,6 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     if (!provider) {
       return of(data);
     }
-
-    prompts.sort((a, b) => b.priority - a.priority);
 
     return from(provider(prompts)).pipe(
       map(answers => {
