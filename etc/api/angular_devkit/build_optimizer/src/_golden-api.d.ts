@@ -16,10 +16,4 @@ export declare function getScrubFileTransformerForCore(program: ts.Program): ts.
 
 export declare function getWrapEnumsTransformer(): ts.TransformerFactory<ts.SourceFile>;
 
-export declare function testImportTslib(content: string): boolean;
-
-export declare function testPrefixClasses(content: string): boolean;
-
-export declare function testScrubFile(content: string): boolean;
-
 export declare function transformJavascript(options: TransformJavascriptOptions): TransformJavascriptOutput;
