@@ -12,9 +12,14 @@ import { Path, getSystemPath, normalize } from '@angular-devkit/core';
 // To work around this we must provide the same path format as TS internally uses in
 // the SourceFile paths.
 export function workaroundResolve(path: Path | string) {
-  return getSystemPath(normalize(path)).replace(/\\/g, '/');
+  return forwardSlashPath(getSystemPath(normalize(path)));
 }
 
 export function flattenArray<T>(value: Array<T | T[]>): T[] {
   return [].concat.apply([], value);
+}
+
+// TS represents paths internally with '/' and expects paths to be in this format.
+export function forwardSlashPath(path: string) {
+  return path.replace(/\\/g, '/');
 }

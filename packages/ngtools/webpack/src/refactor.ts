@@ -7,6 +7,7 @@
  */
 import * as path from 'path';
 import * as ts from 'typescript';
+import { forwardSlashPath } from './utils';
 
 
 /**
@@ -95,7 +96,7 @@ export class TypeScriptFileRefactor {
     let sourceFile: ts.SourceFile | null = null;
 
     if (_program) {
-      fileName = resolve(fileName, _host, _program.getCompilerOptions()).replace(/\\/g, '/');
+      fileName = forwardSlashPath(resolve(fileName, _host, _program.getCompilerOptions()));
       this._fileName = fileName;
 
       if (source) {

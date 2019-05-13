@@ -7,6 +7,7 @@
  */
 import { dirname, relative } from 'path';
 import * as ts from 'typescript';
+import { forwardSlashPath } from '../utils';
 import { collectDeepNodes } from './ast_helpers';
 import { insertStarImport } from './insert_import';
 import { ReplaceNodeOperation, StandardTransform, TransformOperation } from './interfaces';
@@ -79,7 +80,7 @@ export function replaceBootstrap(
       // Add the transform operations.
       const relativeEntryModulePath = relative(dirname(sourceFile.fileName), entryModule.path);
       let className = entryModule.className;
-      let modulePath = `./${relativeEntryModulePath}`.replace(/\\/g, '/');
+      let modulePath = forwardSlashPath(`./${relativeEntryModulePath}`);
       let bootstrapIdentifier = 'bootstrapModule';
 
       if (useFactories) {

@@ -7,6 +7,7 @@
  */
 import { dirname, relative } from 'path';
 import * as ts from 'typescript';
+import { forwardSlashPath } from '../utils';
 import { collectDeepNodes, getFirstNode } from './ast_helpers';
 import { AddNodeOperation, StandardTransform, TransformOperation } from './interfaces';
 import { makeTransform } from './make_transform';
@@ -35,7 +36,7 @@ export function exportNgFactory(
     }
 
     const relativeEntryModulePath = relative(dirname(sourceFile.fileName), entryModule.path);
-    const normalizedEntryModulePath = `./${relativeEntryModulePath}`.replace(/\\/g, '/');
+    const normalizedEntryModulePath = forwardSlashPath(`./${relativeEntryModulePath}`);
 
     // Get the module path from the import.
     entryModuleIdentifiers.forEach((entryModuleIdentifier) => {

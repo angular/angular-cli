@@ -69,7 +69,7 @@ import {
   MESSAGE_KIND,
   UpdateMessage,
 } from './type_checker_messages';
-import { flattenArray, workaroundResolve } from './utils';
+import { flattenArray, forwardSlashPath, workaroundResolve } from './utils';
 import {
   VirtualFileSystemDecorator,
   VirtualWatchFileSystemDecorator,
@@ -163,7 +163,7 @@ export class AngularCompilerPlugin {
       throw new Error('Must specify "tsConfigPath" in the configuration of @ngtools/webpack.');
     }
     // TS represents paths internally with '/' and expects the tsconfig path to be in this format
-    this._tsConfigPath = options.tsConfigPath.replace(/\\/g, '/');
+    this._tsConfigPath = forwardSlashPath(options.tsConfigPath);
 
     // Check the base path.
     const maybeBasePath = path.resolve(process.cwd(), this._tsConfigPath);
@@ -482,7 +482,7 @@ export class AngularCompilerPlugin {
           return;
         }
 
-        const lazyRouteTSFile = discoveredLazyRoutes[lazyRouteKey].replace(/\\/g, '/');
+        const lazyRouteTSFile = forwardSlashPath(discoveredLazyRoutes[lazyRouteKey]);
         let modulePath: string, moduleKey: string;
 
         if (this._useFactories) {
