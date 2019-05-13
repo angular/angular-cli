@@ -7,11 +7,11 @@
  */
 import * as ajv from 'ajv';
 import * as http from 'http';
-import { Observable, from, of, throwError } from 'rxjs';
+import { Observable, from, isObservable, of, throwError } from 'rxjs';
 import { concatMap, map, switchMap, tap } from 'rxjs/operators';
 import * as Url from 'url';
 import { BaseException } from '../../exception/exception';
-import { PartiallyOrderedSet, deepCopy, isObservable } from '../../utils';
+import { PartiallyOrderedSet, deepCopy } from '../../utils';
 import { JsonArray, JsonObject, JsonValue, isJsonObject } from '../interface';
 import {
   JsonPointer,
