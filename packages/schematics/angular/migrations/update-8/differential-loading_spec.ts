@@ -113,5 +113,19 @@ describe('Migration to version 8', () => {
       expect(specsCompilerOptions.target).toBeUndefined();
       expect(specsCompilerOptions.module).toBeUndefined();
     });
+
+    it(`should not update projects which browser builder is not 'build-angular:browser'`, () => {
+      tree.delete('/browserslist');
+      const config = JSON.parse(tree.readContent('angular.json'));
+      config
+        .projects['migration-test']
+        .architect
+        .build
+        .builder = '@dummy/builders:browser';
+
+      tree.overwrite('angular.json', JSON.stringify(config));
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
+      expect(tree2.exists('/browserslist')).toBe(false);
+    });
   });
 });
