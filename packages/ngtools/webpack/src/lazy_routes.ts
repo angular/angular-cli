@@ -8,6 +8,7 @@
 import { dirname, join } from 'path';
 import * as ts from 'typescript';
 import { findAstNodes, resolve } from './refactor';
+import { forwardSlashPath } from './utils';
 
 
 function _getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string | null {
@@ -38,7 +39,7 @@ export function findLazyRoutes(
     }
     compilerOptions = program.getCompilerOptions();
   }
-  const fileName = resolve(filePath, host, compilerOptions).replace(/\\/g, '/');
+  const fileName = forwardSlashPath(resolve(filePath, host, compilerOptions));
   let sourceFile: ts.SourceFile | undefined;
   if (program) {
     sourceFile = program.getSourceFile(fileName);
