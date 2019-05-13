@@ -59,9 +59,9 @@ export function importFactory(
 Found 'loadChildren' with a non-string syntax in ${sourceFile.fileName} but could not transform it.
 Make sure it matches the format below:
 
-loadChildren: () => import('IMPORT_STRING').then(m => m.EXPORT_NAME)
+loadChildren: () => import('IMPORT_STRING').then(M => M.EXPORT_NAME)
 
-Please note that only IMPORT_STRING and EXPORT_NAME can be replaced in this format.
+Please note that only IMPORT_STRING, M, and EXPORT_NAME can be replaced in this format.
 
 Visit https://next.angular.io/guide/ivy for more information on using Ivy.
 `;
@@ -97,14 +97,13 @@ function replaceImport(
   emitWarning: () => void,
 ): ts.Node {
   // This ONLY matches the original source code format below:
-  // loadChildren: () => import('IMPORT_STRING').then(m => m.EXPORT_NAME)
+  // loadChildren: () => import('IMPORT_STRING').then(M => M.EXPORT_NAME)
   // And expects that source code to be transformed by NGC (see comment for importFactory).
   // It will not match nor alter variations, for instance:
   // - not using arrow functions
-  // - not using `m` as the module argument
   // - using `await` instead of `then`
   // - using a default export (https://github.com/angular/angular/issues/11402)
-  // The only parts that can change are the ones in caps: IMPORT_STRING and EXPORT_NAME.
+  // The only parts that can change are the ones in caps: IMPORT_STRING, M and EXPORT_NAME.
 
   // Exit early if the structure is not what we expect.
 
