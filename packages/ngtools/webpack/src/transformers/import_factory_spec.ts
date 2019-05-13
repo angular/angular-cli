@@ -51,5 +51,29 @@ describe('@ngtools/webpack transformers', () => {
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${input}`);
       expect(warningCalled).toBeTruthy();
     });
+
+    it('should support different arg name', () => {
+      const input = tags.stripIndent`
+        const ɵ0 = () => import('./lazy/lazy.module').then(a => a.LazyModule);
+        const routes = [{
+          path: 'lazy',
+          loadChildren: ɵ0
+        }];
+      `;
+      const output = tags.stripIndent`
+        const ɵ0 = () => import("./lazy/lazy.module.ngfactory").then(a => a.LazyModuleNgFactory);
+        const routes = [{
+          path: 'lazy',
+          loadChildren: ɵ0
+        }];
+      `;
+
+      let warningCalled = false;
+      const transformer = importFactory(() => warningCalled = true);
+      const result = transformTypescript(input, [transformer]);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+      expect(warningCalled).toBeFalsy();
+    });
   });
 });
