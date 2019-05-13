@@ -5,14 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Observable, concat, from, of as observableOf } from 'rxjs';
+import { Observable, concat, from, isObservable, of as observableOf } from 'rxjs';
 import { concatMap, ignoreElements, mergeMap, tap } from 'rxjs/operators';
-import { isObservable } from '../../utils';
 import { JsonArray, JsonObject, JsonValue } from '../interface';
 import { JsonPointer, JsonSchemaVisitor, JsonVisitor } from './interface';
 import { buildJsonPointer, joinJsonPointer } from './pointer';
 import { JsonSchema } from './schema';
-
 
 export interface ReferenceResolver<ContextT> {
   (ref: string, context?: ContextT): { context?: ContextT, schema?: JsonObject };
@@ -70,11 +68,8 @@ function _visitJsonRecursive<ContextT>(
 
   const value = visitor(json, ptr, schema, root);
 
-  return (isObservable(value)
-      ? value as Observable<JsonValue>
-      : observableOf(value as JsonValue)
-  ).pipe(
-    concatMap((value: JsonValue) => {
+  return (isObservable<JsonValue>(value) ? value : observableOf(value)).pipe(
+    concatMap(value => {
       if (Array.isArray(value)) {
         return concat(
           from(value).pipe(
