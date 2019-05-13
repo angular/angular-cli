@@ -265,47 +265,11 @@ export abstract class SchematicCommand<
           analytics: this.analytics,
         };
       } else {
-        return {
-          ...context,
-          analytics: new analytics.NoopAnalytics(),
-        };
+        return context;
       }
     });
 
     workflow.engineHost.registerOptionsTransform(validateOptionsWithSchema(workflow.registry));
-
-    // This needs to be the last transform as it reports the flags to analytics (if enabled).
-    workflow.engineHost.registerOptionsTransform(async (
-      schematic,
-      options: { [prop: string]: number | string },
-      context,
-    ): Promise<{ [prop: string]: number | string }> => {
-      const analytics = context && context.analytics;
-      if (!schematic.schemaJson || !context || !analytics) {
-        return options;
-      }
-
-      const collectionName = context.schematic.collection.description.name;
-      const schematicName = context.schematic.description.name;
-
-      if (!isPackageNameSafeForAnalytics(collectionName)) {
-        return options;
-      }
-
-      const args = await parseJsonSchemaToOptions(this._workflow.registry, schematic.schemaJson);
-      const dimensions: (boolean | number | string)[] = [];
-      for (const option of args) {
-        const ua = option.userAnalytics;
-
-        if (option.name in options && ua) {
-          dimensions[ua] = options[option.name];
-        }
-      }
-
-      analytics.event('schematics', collectionName + ':' + schematicName, { dimensions });
-
-      return options;
-    });
 
     if (options.defaults) {
       workflow.registry.addPreTransform(schema.transforms.addUndefinedDefaults);
