@@ -928,7 +928,7 @@ export class AngularCompilerPlugin {
       // Import ngfactory in loadChildren import syntax
       if (this._useFactories) {
         // Only transform imports to use factories with View Engine.
-        this._transformers.push(importFactory(msg => this._warnings.push(msg)));
+        this._transformers.push(importFactory(msg => this._warnings.push(msg), getTypeChecker));
       }
     }
 
