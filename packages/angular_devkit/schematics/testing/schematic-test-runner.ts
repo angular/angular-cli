@@ -85,6 +85,12 @@ export class SchematicTestRunner {
       .pipe(map(tree => new UnitTestTree(tree)));
   }
 
+  /**
+   * @deprecated Since v8.0.0 - Use {@link SchematicTestRunner.runSchematicAsync} instead.
+   * All schematics can potentially be async.
+   * This synchronous variant will fail if the schematic, any of its rules, or any schematics
+   * it calls are async.
+   */
   runSchematic<SchematicSchemaT>(
     schematicName: string,
     opts?: SchematicSchemaT,
@@ -126,6 +132,12 @@ export class SchematicTestRunner {
       .pipe(map(tree => new UnitTestTree(tree)));
   }
 
+  /**
+   * @deprecated Since v8.0.0 - Use {@link SchematicTestRunner.runExternalSchematicAsync} instead.
+   * All schematics can potentially be async.
+   * This synchronous variant will fail if the schematic, any of its rules, or any schematics
+   * it calls are async.
+   */
   runExternalSchematic<SchematicSchemaT>(
     collectionName: string,
     schematicName: string,
