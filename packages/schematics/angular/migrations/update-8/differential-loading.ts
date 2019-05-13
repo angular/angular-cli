@@ -97,20 +97,26 @@ function updateProjects(): Rule {
       }
 
       // Older projects app and spec ts configs had script and module set in them.
-      const tsConfigs = [];
       const architect = project.architect;
-      if (isJsonObject(architect)
+      if (!(isJsonObject(architect)
         && isJsonObject(architect.build)
-        && isJsonObject(architect.build.options)
-        && typeof architect.build.options.tsConfig === 'string') {
-        tsConfigs.push(architect.build.options.tsConfig);
+        && architect.build.builder === '@angular-devkit/build-angular:browser')
+      ) {
+        // Skip projects who's build builder is not build-angular:browser
+        continue;
       }
 
-      if (isJsonObject(architect)
-        && isJsonObject(architect.test)
-        && isJsonObject(architect.test.options)
-        && typeof architect.test.options.tsConfig === 'string') {
-        tsConfigs.push(architect.test.options.tsConfig);
+      const tsConfigs = [];
+      const buildOptionsConfig = architect.build.options;
+      if (isJsonObject(buildOptionsConfig) && typeof buildOptionsConfig.tsConfig === 'string') {
+        tsConfigs.push(buildOptionsConfig.tsConfig);
+      }
+
+      const testConfig = architect.test;
+      if (isJsonObject(testConfig)
+        && isJsonObject(testConfig.options)
+        && typeof testConfig.options.tsConfig === 'string') {
+        tsConfigs.push(testConfig.options.tsConfig);
       }
 
       for (const tsConfig of tsConfigs) {
