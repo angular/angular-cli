@@ -8,6 +8,7 @@
 import * as path from 'path';
 import * as ts from 'typescript';
 import { LazyRouteMap } from '../lazy_routes';
+import { forwardSlashPath } from '../utils';
 import { getFirstNode, getLastNode } from './ast_helpers';
 import { AddNodeOperation, StandardTransform, TransformOperation } from './interfaces';
 import { makeTransform } from './make_transform';
@@ -46,7 +47,7 @@ export function exportLazyModuleMap(
         return;
       }
 
-      let relativePath = path.relative(dirName, modulePath).replace(/\\/g, '/');
+      let relativePath = forwardSlashPath(path.relative(dirName, modulePath));
       if (!(relativePath.startsWith('./') || relativePath.startsWith('../'))) {
         // 'a/b/c' is a relative path for Node but an absolute path for TS, so we must convert it.
         relativePath = `./${relativePath}`;
