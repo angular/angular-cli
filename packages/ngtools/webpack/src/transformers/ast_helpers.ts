@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { virtualFs } from '@angular-devkit/core';
+import { readFileSync, readdirSync } from 'fs';
+import { dirname, join } from 'path';
 import * as ts from 'typescript';
 import { WebpackCompilerHost } from '../compiler_host';
 
@@ -48,14 +50,20 @@ export function getLastNode(sourceFile: ts.SourceFile): ts.Node | null {
 // Test transform helpers.
 const basePath = '/project/src/';
 const fileName = basePath + 'test-file.ts';
+const tsLibFiles = loadTsLibFiles();
 
-export function createTypescriptContext(content: string, additionalFiles?: Record<string, string>) {
+export function createTypescriptContext(
+  content: string,
+  additionalFiles?: Record<string, string>,
+  useLibs = false,
+) {
   // Set compiler options.
   const compilerOptions: ts.CompilerOptions = {
-    noEmitOnError: false,
+    noEmitOnError: useLibs,
     allowJs: true,
     newLine: ts.NewLineKind.LineFeed,
     moduleResolution: ts.ModuleResolutionKind.NodeJs,
+    module: ts.ModuleKind.ESNext,
     target: ts.ScriptTarget.ESNext,
     skipLibCheck: true,
     sourceMap: false,
@@ -72,6 +80,15 @@ export function createTypescriptContext(content: string, additionalFiles?: Recor
 
   // Add a dummy file to host content.
   compilerHost.writeFile(fileName, content, false);
+
+  if (useLibs) {
+    // Write the default libs.
+    // These are needed for tests that use import(), because it relies on a Promise being there.
+    const compilerLibFolder = dirname(compilerHost.getDefaultLibFileName(compilerOptions));
+    for (const [k, v] of Object.entries(tsLibFiles)) {
+      compilerHost.writeFile(join(compilerLibFolder, k), v, false);
+    }
+  }
 
   if (additionalFiles) {
     for (const key in additionalFiles) {
@@ -106,13 +123,27 @@ export function transformTypescript(
     undefined, undefined, undefined, undefined, { before: transformers },
   );
 
-  // Log diagnostics if emit wasn't successfull.
+  // Throw error with diagnostics if emit wasn't successfull.
   if (emitSkipped) {
-    console.error(diagnostics);
-
-    return null;
+    throw new Error(ts.formatDiagnostics(diagnostics, compilerHost));
   }
 
   // Return the transpiled js.
   return compilerHost.readFile(fileName.replace(/\.tsx?$/, '.js'));
+}
+
+function loadTsLibFiles() {
+  const libFolderPath = dirname(require.resolve('typescript/lib/lib.d.ts'));
+  const libFolderFiles = readdirSync(libFolderPath);
+  const libFileNames = libFolderFiles.filter(f => f.startsWith('lib.') && f.endsWith('.d.ts'));
+
+  // Return a map of the lib names to their content.
+  return libFileNames.reduce(
+    (map, f) => {
+      map[f] = readFileSync(join(libFolderPath, f), 'utf-8');
+
+      return map;
+    },
+    {} as { [k: string]: string },
+  );
 }
