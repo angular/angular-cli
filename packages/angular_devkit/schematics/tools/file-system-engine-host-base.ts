@@ -10,7 +10,6 @@ import {
   InvalidJsonCharacterException,
   JsonObject,
   UnexpectedEndOfInputException,
-  isObservable,
   isPromise,
   normalize,
   virtualFs,
@@ -21,6 +20,7 @@ import { dirname, isAbsolute, join, resolve } from 'path';
 import {
   Observable,
   from as observableFrom,
+  isObservable,
   of as observableOf,
   throwError,
 } from 'rxjs';
