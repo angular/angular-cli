@@ -10,12 +10,14 @@ import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
 import { ScriptTarget } from 'typescript';
 import {
+  Compiler,
   Configuration,
   ContextReplacementPlugin,
   HashedModuleIdsPlugin,
   Output,
   debug,
 } from 'webpack';
+import { RawSource } from 'webpack-sources';
 import { AssetPatternClass } from '../../../browser/schema';
 import { isEs5SupportNeeded } from '../../../utils/differential-loading';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
@@ -30,8 +32,6 @@ import { getEsVersionForFileName, getOutputHashFormat, normalizeExtraEntryPoints
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-const StatsPlugin = require('stats-webpack-plugin');
-
 
 // tslint:disable-next-line:no-any
 const g: any = typeof global !== 'undefined' ? global : {};
@@ -200,7 +200,14 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   if (buildOptions.statsJson) {
-    extraPlugins.push(new StatsPlugin(`stats${targetInFileName}.json`, 'verbose'));
+    extraPlugins.push(new class {
+      apply(compiler: Compiler) {
+        compiler.hooks.emit.tap('angular-cli-stats', compilation => {
+          const data = JSON.stringify(compilation.getStats().toJson('verbose'));
+          compilation.assets[`stats${targetInFileName}.json`] = new RawSource(data);
+        });
+      }
+    });
   }
 
   if (buildOptions.namedChunks) {
