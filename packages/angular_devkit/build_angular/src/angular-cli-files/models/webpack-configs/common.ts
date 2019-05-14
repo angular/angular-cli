@@ -23,7 +23,6 @@ import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { NamedLazyChunksPlugin } from '../../plugins/named-chunks-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 import { findAllNodeModules, findUp } from '../../utilities/find-up';
-import { requireProjectModule } from '../../utilities/require-project-module';
 import { WebpackConfigOptions } from '../build-options';
 import { getEsVersionForFileName, getOutputHashFormat, normalizeExtraEntryPoints } from './utils';
 
@@ -237,13 +236,13 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   loaderNodeModules.unshift('node_modules');
 
   // Load rxjs path aliases.
-  // https://github.com/ReactiveX/rxjs/blob/master/doc/lettable-operators.md#build-and-treeshaking
+  // https://github.com/ReactiveX/rxjs/blob/master/doc/pipeable-operators.md#build-and-treeshaking
   let alias = {};
   try {
     const rxjsPathMappingImport = wco.supportES2015
       ? 'rxjs/_esm2015/path-mapping'
       : 'rxjs/_esm5/path-mapping';
-    const rxPaths = requireProjectModule(projectRoot, rxjsPathMappingImport);
+    const rxPaths = require(require.resolve(rxjsPathMappingImport, { paths: [projectRoot] }));
     alias = rxPaths(nodeModules);
   } catch { }
 
