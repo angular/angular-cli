@@ -29,6 +29,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
     const patterns = [
       /^@angular\/.*/,
       /^@angular-devkit\/.*/,
+      /^@bazel\/.*/,
       /^@ngtools\/.*/,
       /^@nguniversal\/.*/,
       /^@schematics\/.*/,
