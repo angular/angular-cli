@@ -14,7 +14,7 @@
     "@ngtools/webpack": "0.0.0",
     "ajv": "6.10.0",
     "autoprefixer": "9.5.1",
-    "browserslist": "4.5.6",
+    "browserslist": "4.6.0",
     "caniuse-api": "3.0.0",
     "circular-dependency-plugin": "5.0.2",
     "clean-css": "4.2.1",
