@@ -7,11 +7,7 @@
  */
 
 import { createHash } from 'crypto';
-import {
-  RawSource,
-  ReplaceSource,
-  Source,
-} from 'webpack-sources';
+import { RawSource, ReplaceSource } from 'webpack-sources';
 
 const parse5 = require('parse5');
 
@@ -57,7 +53,7 @@ export interface FileInfo {
  * after processing several configurations in order to build different sets of
  * bundles for differential serving.
  */
-export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise<Source> {
+export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise<string> {
   const {
     loadOutputFile,
     files,
@@ -236,7 +232,7 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
     parse5.serialize(styleElements, { treeAdapter }),
   );
 
-  return indexSource;
+  return indexSource.source();
 }
 
 function _generateSriAttributes(content: string) {

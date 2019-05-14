@@ -34,7 +34,7 @@ describe('augment-index-html', () => {
       ],
     });
 
-    const html = (await source).source();
+    const html = await source;
     expect(html).toEqual(oneLineHtml`
       <html>
         <head><base href="/">
@@ -74,7 +74,7 @@ describe('augment-index-html', () => {
       noModuleFiles: es5JsFiles,
     });
 
-    const html = (await source).source();
+    const html = await source;
     expect(html).toEqual(oneLineHtml`
       <html>
         <head>
@@ -116,7 +116,7 @@ describe('augment-index-html', () => {
         noModuleFiles: es5JsFiles,
       });
 
-      const html = (await source).source();
+      const html = await source;
       expect(html).toEqual(oneLineHtml`
       <html>
         <head>

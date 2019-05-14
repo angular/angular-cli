@@ -10,7 +10,12 @@ import {
   BuilderOutput,
   createBuilder,
 } from '@angular-devkit/architect';
-import { BuildResult, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
+import {
+  BuildResult,
+  EmittedFiles,
+  WebpackLoggingCallback,
+  runWebpack,
+ } from '@angular-devkit/build-webpack';
 import {
   experimental,
   getSystemPath,
@@ -40,7 +45,10 @@ import {
   getStylesConfig,
   getWorkerConfig,
 } from '../angular-cli-files/models/webpack-configs';
-import { writeIndexHtml } from '../angular-cli-files/utilities/index-file/write-index-html';
+import {
+  IndexHtmlTransform,
+  writeIndexHtml,
+} from '../angular-cli-files/utilities/index-file/write-index-html';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
 import {
@@ -165,6 +173,7 @@ export function buildWebpackBrowser(
   transforms: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>,
     logging?: WebpackLoggingCallback,
+    indexHtml?: IndexHtmlTransform,
   } = {},
 ) {
   const host = new NodeJsSyncHost();
@@ -217,21 +226,36 @@ export function buildWebpackBrowser(
         bufferCount(configs.length),
         switchMap(buildEvents => {
           const success = buildEvents.every(r => r.success);
-          if (success && buildEvents.length === 2 && options.index) {
-            const { emittedFiles: ES5BuildFiles = [] } = buildEvents[0];
-            const { emittedFiles: ES2015BuildFiles = [] } = buildEvents[1];
+          if (success && options.index) {
+            let noModuleFiles: EmittedFiles[] | undefined;
+            let moduleFiles: EmittedFiles[] | undefined;
+            let files: EmittedFiles[] | undefined;
+
+            const [ES5Result, ES2015Result] = buildEvents;
+
+            if (buildEvents.length === 2) {
+              noModuleFiles = ES5Result.emittedFiles;
+              moduleFiles = ES2015Result.emittedFiles || [];
+              files = moduleFiles.filter(x => x.extension === '.css');
+            } else {
+              const { emittedFiles = [] } = ES5Result;
+              files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
+              noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
+            }
 
             return writeIndexHtml({
               host,
               outputPath: join(root, options.outputPath),
               indexPath: join(root, options.index),
-              ES5BuildFiles,
-              ES2015BuildFiles,
+              files,
+              noModuleFiles,
+              moduleFiles,
               baseHref: options.baseHref,
               deployUrl: options.deployUrl,
               sri: options.subresourceIntegrity,
               scripts: options.scripts,
               styles: options.styles,
+              postTransform: transforms.indexHtml,
             })
             .pipe(
               map(() => ({ success: true })),

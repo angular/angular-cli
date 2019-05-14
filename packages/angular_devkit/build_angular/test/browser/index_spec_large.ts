@@ -43,7 +43,8 @@ describe('Browser Builder works with BOM index.html', () => {
     await run.stop();
   });
 
-  it('works with UTF16 LE BOM', async () => {
+  // todo: enable when utf16 is supported
+  xit('works with UTF16 LE BOM', async () => {
     host.writeMultipleFiles({
       'src/index.html': Buffer.from(
         '\ufeff<html><head><base href="/"></head><body><app-root></app-root></body></html>',

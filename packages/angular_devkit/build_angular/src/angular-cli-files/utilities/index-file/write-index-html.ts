@@ -8,37 +8,45 @@
 
 import { EmittedFiles } from '@angular-devkit/build-webpack';
 import { Path, basename, getSystemPath, join, virtualFs } from '@angular-devkit/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { ExtraEntryPoint } from '../../../browser/schema';
 import { generateEntryPoints } from '../package-chunk-sort';
 import { stripBom } from '../strip-bom';
 import { FileInfo, augmentIndexHtml } from './augment-index-html';
 
+type ExtensionFilter = '.js' | '.css';
+
 export interface WriteIndexHtmlOptions {
   host: virtualFs.Host;
   outputPath: Path;
   indexPath: Path;
-  ES5BuildFiles: EmittedFiles[];
-  ES2015BuildFiles: EmittedFiles[];
+  files?: EmittedFiles[];
+  noModuleFiles?: EmittedFiles[];
+  moduleFiles?: EmittedFiles[];
   baseHref?: string;
   deployUrl?: string;
   sri?: boolean;
   scripts?: ExtraEntryPoint[];
   styles?: ExtraEntryPoint[];
+  postTransform?: IndexHtmlTransform;
 }
+
+export type IndexHtmlTransform = (content: string) => Promise<string>;
 
 export function writeIndexHtml({
   host,
   outputPath,
   indexPath,
-  ES5BuildFiles,
-  ES2015BuildFiles,
+  files = [],
+  noModuleFiles = [],
+  moduleFiles = [],
   baseHref,
   deployUrl,
   sri = false,
   scripts = [],
   styles = [],
+  postTransform,
 }: WriteIndexHtmlOptions): Observable<void> {
 
   return host.read(indexPath)
@@ -51,9 +59,9 @@ export function writeIndexHtml({
         deployUrl,
         sri,
         entrypoints: generateEntryPoints({ scripts, styles }),
-        files: filterAndMapBuildFiles(ES5BuildFiles, '.css'),
-        noModuleFiles: filterAndMapBuildFiles(ES5BuildFiles, '.js'),
-        moduleFiles: filterAndMapBuildFiles(ES2015BuildFiles, '.js'),
+        files: filterAndMapBuildFiles(files, ['.js', '.css']),
+        noModuleFiles: filterAndMapBuildFiles(noModuleFiles, '.js'),
+        moduleFiles: filterAndMapBuildFiles(moduleFiles, '.js'),
         loadOutputFile: async filePath => {
           return host.read(join(outputPath, filePath))
             .pipe(
@@ -63,18 +71,23 @@ export function writeIndexHtml({
         },
       }),
       ),
-      map(content => virtualFs.stringToFileBuffer(content.source())),
+      switchMap(content => postTransform ? postTransform(content) : of(content)),
+      map(content => virtualFs.stringToFileBuffer(content)),
       switchMap(content => host.write(join(outputPath, basename(indexPath)), content)),
     );
 }
 
 function filterAndMapBuildFiles(
   files: EmittedFiles[],
-  extensionFilter: '.js' | '.css',
+  extensionFilter: ExtensionFilter | ExtensionFilter[],
 ): FileInfo[] {
   const filteredFiles: FileInfo[] = [];
+  const validExtensions: string[] = Array.isArray(extensionFilter)
+    ? extensionFilter
+    : [extensionFilter];
+
   for (const { file, name, extension, initial } of files) {
-    if (name && initial && extension === extensionFilter) {
+    if (name && initial && validExtensions.includes(extension)) {
       filteredFiles.push({ file, extension, name });
     }
   }

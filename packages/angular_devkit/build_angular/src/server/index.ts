@@ -92,7 +92,6 @@ async function buildServerWebpackConfig(
   const { config } = await generateBrowserWebpackConfigFromContext(
     {
       ...options,
-      index: '',
       buildOptimizer: false,
       aot: true,
       platform: 'server',
