@@ -7,7 +7,10 @@
  */
 import * as path from 'path';
 import { Compiler, compilation } from 'webpack';
+import { RawSource } from 'webpack-sources';
 import { FileInfo, augmentIndexHtml } from '../utilities/index-file/augment-index-html';
+import { IndexHtmlTransform } from '../utilities/index-file/write-index-html';
+import { stripBom } from '../utilities/strip-bom';
 
 export interface IndexHtmlWebpackPluginOptions {
   input: string;
@@ -17,6 +20,7 @@ export interface IndexHtmlWebpackPluginOptions {
   deployUrl?: string;
   sri: boolean;
   noModuleEntrypoints: string[];
+  postTransform?: IndexHtmlTransform;
 }
 
 function readFile(filename: string, compilation: compilation.Compilation): Promise<string> {
@@ -28,18 +32,7 @@ function readFile(filename: string, compilation: compilation.Compilation): Promi
         return;
       }
 
-      let content;
-      if (data.length >= 3 && data[0] === 0xEF && data[1] === 0xBB && data[2] === 0xBF) {
-        // Strip UTF-8 BOM
-        content = data.toString('utf8', 3);
-      } else if (data.length >= 2 && data[0] === 0xFF && data[1] === 0xFE) {
-        // Strip UTF-16 LE BOM
-        content = data.toString('utf16le', 2);
-      } else {
-        content = data.toString();
-      }
-
-      resolve(content);
+      resolve(stripBom(data.toString()));
     });
   });
 }
@@ -86,7 +79,7 @@ export class IndexHtmlWebpackPlugin {
       }
 
       const loadOutputFile = (name: string) => compilation.assets[name].source();
-      const indexSource = await augmentIndexHtml({
+      let indexSource = await augmentIndexHtml({
         input: this._options.input,
         inputContent,
         baseHref: this._options.baseHref,
@@ -98,8 +91,12 @@ export class IndexHtmlWebpackPlugin {
         entrypoints: this._options.entrypoints,
       });
 
+      if (this._options.postTransform) {
+        indexSource = await this._options.postTransform(indexSource);
+      }
+
       // Add to compilation assets
-      compilation.assets[this._options.output] = indexSource;
+      compilation.assets[this._options.output] = new RawSource(indexSource);
     });
   }
 }

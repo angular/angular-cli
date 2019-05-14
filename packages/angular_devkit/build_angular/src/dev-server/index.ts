@@ -16,7 +16,7 @@ import {
   WebpackLoggingCallback,
   runWebpackDevServer,
 } from '@angular-devkit/build-webpack';
-import { experimental, json, logging, tags } from '@angular-devkit/core';
+import { json, logging, tags } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { existsSync, readFileSync } from 'fs';
 import * as path from 'path';
@@ -25,7 +25,10 @@ import { map, switchMap } from 'rxjs/operators';
 import * as url from 'url';
 import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
+import { IndexHtmlWebpackPlugin } from '../angular-cli-files/plugins/index-html-webpack-plugin';
 import { checkPort } from '../angular-cli-files/utilities/check-port';
+import { IndexHtmlTransform } from '../angular-cli-files/utilities/index-file/write-index-html';
+import { generateEntryPoints } from '../angular-cli-files/utilities/package-chunk-sort';
 import {
   buildBrowserWebpackConfigFromContext,
   createBrowserLoggingCallback,
@@ -73,6 +76,7 @@ export function serveWebpackBrowser(
   transforms: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>,
     logging?: WebpackLoggingCallback,
+    indexHtml?: IndexHtmlTransform,
   } = {},
 ): Observable<DevServerBuilderOutput> {
   // Check Angular version.
@@ -158,17 +162,34 @@ export function serveWebpackBrowser(
         context.logger.warn('Live reload is disabled. HMR option ignored.');
       }
 
+      webpackConfig.plugins = [...(webpackConfig.plugins || [])];
+
       if (!options.watch) {
         // There's no option to turn off file watching in webpack-dev-server, but
         // we can override the file watcher instead.
-        webpackConfig.plugins = [...(webpackConfig.plugins || []),  {
+        webpackConfig.plugins.push({
           // tslint:disable-next-line:no-any
           apply: (compiler: any) => {
             compiler.hooks.afterEnvironment.tap('angular-cli', () => {
               compiler.watchFileSystem = { watch: () => { } };
             });
           },
-        }];
+        });
+      }
+
+      if (browserOptions.index) {
+        const { scripts = [], styles = [], index, baseHref } = browserOptions;
+
+        webpackConfig.plugins.push(new IndexHtmlWebpackPlugin({
+          input: path.resolve(root, index),
+          output: path.basename(index),
+          baseHref,
+          entrypoints: generateEntryPoints({ scripts, styles }),
+          deployUrl: browserOptions.deployUrl,
+          sri: browserOptions.subresourceIntegrity,
+          noModuleEntrypoints: ['polyfills-es5'],
+          postTransform: transforms.indexHtml,
+        }));
       }
 
       const normalizedOptimization = normalizeOptimization(browserOptions.optimization);

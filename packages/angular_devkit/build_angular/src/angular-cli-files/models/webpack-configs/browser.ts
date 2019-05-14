@@ -6,10 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { LicenseWebpackPlugin } from 'license-webpack-plugin';
-import * as path from 'path';
 import * as webpack from 'webpack';
-import { IndexHtmlWebpackPlugin } from '../../plugins/index-html-webpack-plugin';
-import { generateEntryPoints } from '../../utilities/package-chunk-sort';
 import { WebpackConfigOptions } from '../build-options';
 import { getSourceMapDevTool, isPolyfillsEntry, normalizeExtraEntryPoints } from './utils';
 
@@ -17,7 +14,7 @@ const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
 
 
 export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configuration {
-  const { root, buildOptions } = wco;
+  const { buildOptions } = wco;
   const extraPlugins = [];
 
   let isEval = false;
@@ -35,18 +32,6 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
     !scriptsOptimization) {
     // Produce eval sourcemaps for development with serve, which are faster.
     isEval = true;
-  }
-
-  if (buildOptions.index) {
-    extraPlugins.push(new IndexHtmlWebpackPlugin({
-      input: path.resolve(root, buildOptions.index),
-      output: path.basename(buildOptions.index),
-      baseHref: buildOptions.baseHref,
-      entrypoints: generateEntryPoints(buildOptions),
-      deployUrl: buildOptions.deployUrl,
-      sri: buildOptions.subresourceIntegrity,
-      noModuleEntrypoints: ['polyfills-es5'],
-    }));
   }
 
   if (buildOptions.subresourceIntegrity) {
