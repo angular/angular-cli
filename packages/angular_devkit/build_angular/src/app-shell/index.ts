@@ -15,7 +15,6 @@ import { JsonObject, experimental, join, normalize, resolve, schema } from '@ang
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
-import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
 import { BrowserBuilderOutput } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
@@ -34,12 +33,17 @@ async function _renderUniversal(
   const serverBundlePath = await _getServerModuleBundlePath(options, context, serverResult);
 
   const root = context.workspaceRoot;
-  requireProjectModule(root, 'zone.js/dist/zone-node');
 
-  const renderModuleFactory = requireProjectModule(
-    root,
-    '@angular/platform-server',
-  ).renderModuleFactory;
+  // Initialize zone.js
+  const zonePackage = require.resolve('zone.js', { paths: [root] });
+  await import(zonePackage);
+
+  // Load platform server module renderer
+  const platformServerPackage = require.resolve('@angular/platform-server', { paths: [root] });
+  const renderModuleFactory = await import(platformServerPackage)
+    // tslint:disable-next-line:no-implicit-dependencies
+    .then((m: typeof import('@angular/platform-server')) => m.renderModuleFactory);
+
   const AppServerModuleNgFactory = require(serverBundlePath).AppServerModuleNgFactory;
   const outputIndexPath = options.outputIndexPath
     ? path.join(root, options.outputIndexPath)
