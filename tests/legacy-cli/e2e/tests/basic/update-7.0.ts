@@ -27,17 +27,15 @@ export default async function () {
     `loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule)`);
   // Should update tsconfig and src/browserslist via differential-loading.
   await expectFileToMatch('tsconfig.json', `"target": "es2015",`);
-  await expectFileToMatch('browserslist', `\nChrome 41`);
   await expectToFail(() => expectFileToExist('e2e/browserlist'));
   // Should update the build-angular version.
   await expectFileToMatch('package.json', `"@angular-devkit/build-angular": "~0.8`);
   // Should rename codelyzer rules.
   await expectFileToMatch('tslint.json', `use-lifecycle-interface`);
   // Unnecessary es6 polyfills should be removed via drop-es6-polyfills.
-  // TODO: uncomment after https://github.com/angular/angular-cli/issues/14234 is fixed.
-  // await expectToFail(() => expectFileToMatch('src/polyfills.ts',
-  //  `import 'core-js/es6/symbol';`));
-  // await expectToFail(() => expectFileToMatch('src/polyfills.ts', `import 'core-js/es6/set';`));
+  await expectToFail(() => expectFileToMatch('src/polyfills.ts',
+   `import 'core-js/es6/symbol';`));
+  await expectToFail(() => expectFileToMatch('src/polyfills.ts', `import 'core-js/es6/set';`));
 
   // Use the packages we are building in this commit, and CI Chrome.
   await useBuiltPackages();
