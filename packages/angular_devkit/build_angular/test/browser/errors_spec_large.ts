@@ -62,4 +62,23 @@ describe('Browser Builder errors', () => {
     expect(logs.join()).toContain('Function expressions are not supported in');
     await run.stop();
   });
+
+  it('shows missing export errors', async () => {
+    host.writeMultipleFiles({
+      'src/not-main.js': `
+        import { missingExport } from 'rxjs';
+        console.log(missingExport);
+      `,
+    });
+    const overrides = { main: 'src/not-main.js' };
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
+    const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
+    const output = await run.result;
+    expect(output.success).toBe(false);
+    expect(logs.join()).toContain(`export 'missingExport' was not found in 'rxjs'`);
+    await run.stop();
+  });
 });
