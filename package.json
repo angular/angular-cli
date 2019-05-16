@@ -41,7 +41,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/angular/angular-cli.git"
+    "url": "https://github.com/applegater/angular-cli.git"
   },
   "engines": {
     "node": ">=10.9.0 <11.0.0",
@@ -52,7 +52,7 @@
   "bugs": {
     "url": "https://github.com/angular/angular-cli/issues"
   },
-  "homepage": "https://github.com/rapplegt323/angular-cli",
+  "homepage": "https://github.com/applegater/angular-cli",
   "dependencies": {
     "@angular-devkit/build-optimizer": "0.13.9",
     "@angular-devkit/core": "0.8.9",
