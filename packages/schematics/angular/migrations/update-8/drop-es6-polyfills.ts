@@ -78,12 +78,11 @@ function dropES2015PolyfillsFromFile(polyfillPath: string): Rule {
       return;
     }
 
-    // normalize line endings to increase hash match chances
-    const content = source.toString().replace(/\r\n|\r/g, '\n');
-
+    const content = source.toString();
     // Check if file is unmodified, if so then replace and return
     const hash = createHash('md5');
-    hash.update(content);
+    // normalize line endings to increase hash match chances
+    hash.update(content.replace(/\r\n|\r/g, '\n'));
     const digest = hash.digest('hex');
     if (knownPolyfillHashes.includes(digest)) {
       // Replace with new project polyfills file
