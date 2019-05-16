@@ -1,0 +1,15 @@
+{
+  "name": "@schematics/angular",
+  "version": "0.0.0",
+  "description": "Schematics specific to Angular",
+  "keywords": [
+    "blueprints",
+    "code generation",
+    "schematics"
+  ],
+  "schematics": "./collection.json",
+  "dependencies": {
+    "@angular-devkit/core": "0.0.0",
+    "@angular-devkit/schematics": "0.0.0"
+  }
+}

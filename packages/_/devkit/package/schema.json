@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsSchematicSchema",
+  "title": "DevKit Package Schematic Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The package name for the new schematic.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "description": {
+      "type": "string",
+      "description": "The description of the new package"
+    },
+    "displayName": {
+      "type": "string",
+      "$default": {
+        "$source": "interpolation",
+        "value": "${name}"
+      },
+      "description": "The human readable name."
+    }
+  },
+  "required": [
+    "name",
+    "displayName"
+  ]
+}

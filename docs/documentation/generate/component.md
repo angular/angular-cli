@@ -1,101 +1,97 @@
 <!-- Links in /docs/documentation should NOT have `.md` at the end, because they end up in our wiki at release. -->
 
+**Documentation below is for CLI version 6 and we no longer accept PRs to improve this. For version 7 see [here](https://angular.io/cli/generate)**.
+
 # ng generate component
 
 ## Overview
 `ng generate component [name]` generates a component
 
+## Alias
+c - `ng generate c [name]`
+
 ## Options
 <details>
-  <summary>app</summary>
+  <summary>dry-run</summary>
   <p>
-    <code>--app</code> (aliases: <code>-a</code>) <em>default value: 1st app</em>
+    <code>--dry-run</code> (alias: <code>-d</code>)
   </p>
   <p>
-    Specifies app name to use.
+    Run through without making any changes.
   </p>
 </details>
-
 <details>
-  <summary>change-detection</summary>
+  <summary>force</summary>
   <p>
-    <code>--change-detection</code> (aliases: <code>-cd</code>)
+    <code>--force</code> (alias: <code>-f</code>)
   </p>
   <p>
-    Specifies the change detection strategy.
+    Forces overwriting of files.
   </p>
 </details>
-
 <details>
-  <summary>flat</summary>
+  <summary>project</summary>
   <p>
-    <code>--flat</code> <em>default value: false</em>
+    <code>--project</code>
   </p>
   <p>
-    Flag to indicate if a dir is created.
-  </p>
-</details>
-
-<details>
-  <summary>export</summary>
-  <p>
-    <code>--export</code> <em>default value: false</em>
-  </p>
-  <p>
-    Specifies if declaring module exports the component.
+    The name of the project.
   </p>
 </details>
-
 <details>
   <summary>inline-style</summary>
   <p>
-    <code>--inline-style</code> (aliases: <code>-is</code>) <em>default value: false</em>
+    <code>--inline-style</code> (alias: <code>-s</code>)
   </p>
   <p>
     Specifies if the style will be in the ts file.
   </p>
 </details>
-
 <details>
   <summary>inline-template</summary>
   <p>
-    <code>--inline-template</code> (aliases: <code>-it</code>) <em>default value: false</em>
+    <code>--inline-template</code> (alias: <code>-t</code>)
   </p>
   <p>
     Specifies if the template will be in the ts file.
   </p>
 </details>
-
 <details>
-  <summary>module</summary>
+  <summary>view-encapsulation</summary>
   <p>
-    <code>--module</code> (aliases: <code>-m</code>)
+    <code>--view-encapsulation</code> (alias: <code>-v</code>)
   </p>
   <p>
-    Allows specification of the declaring module's file name (e.g `app.module.ts`).
+    Specifies the view encapsulation strategy.
   </p>
 </details>
-
+<details>
+  <summary>change-detection</summary>
+  <p>
+    <code>--change-detection</code> (alias: <code>-c</code>)
+  </p>
+  <p>
+    Specifies the change detection strategy.
+  </p>
+</details>
 <details>
   <summary>prefix</summary>
   <p>
-    <code>--prefix</code>
+    <code>--prefix</code> (alias: <code>-p</code>)
   </p>
   <p>
-    Specifies whether to use the prefix.
+    The prefix to apply to generated selectors.
   </p>
 </details>
-
 <details>
-  <summary>skip-import</summary>
+  <summary>styleext</summary>
   <p>
-    <code>--skip-import</code> <em>default value: false</em>
+    <code>--styleext</code>
   </p>
   <p>
-    Allows for skipping the module import.
+    The file extension to be used for style files.
   </p>
 </details>
-
 <details>
   <summary>spec</summary>
   <p>
@@ -105,13 +101,48 @@
     Specifies if a spec file is generated.
   </p>
 </details>
-
 <details>
-  <summary>view-encapsulation</summary>
+  <summary>flat</summary>
   <p>
-    <code>--view-encapsulation</code> (aliases: <code>-ve</code>)
+    <code>--flat</code>
   </p>
   <p>
-    Specifies the view encapsulation strategy.
+    Flag to indicate if a dir is created.
+  </p>
+</details>
+<details>
+  <summary>skip-import</summary>
+  <p>
+    <code>--skip-import</code>
+  </p>
+  <p>
+    Flag to skip the module import.
+  </p>
+</details>
+<details>
+  <summary>selector</summary>
+  <p>
+    <code>--selector</code>
+  </p>
+  <p>
+    The selector to use for the component.
+  </p>
+</details>
+<details>
+  <summary>module</summary>
+  <p>
+    <code>--module</code> (alias: <code>-m</code>)
+  </p>
+  <p>
+    Allows specification of the declaring module.
+  </p>
+</details>
+<details>
+  <summary>export</summary>
+  <p>
+    <code>--export</code>
+  </p>
+  <p>
+    Specifies if declaring module exports the component.
   </p>
 </details>

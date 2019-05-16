@@ -1,0 +1,26 @@
+{
+  "name": "@angular-devkit/schematics-cli",
+  "version": "0.0.0",
+  "description": "Angular Schematics - CLI",
+  "experimental": true,
+  "bin": {
+    "schematics": "./bin/schematics.js"
+  },
+  "keywords": [
+    "blueprints",
+    "scaffolding",
+    "template",
+    "tooling",
+    "code generation",
+    "schematics"
+  ],
+  "dependencies": {
+    "@angular-devkit/core": "0.0.0",
+    "@angular-devkit/schematics": "0.0.0",
+    "@schematics/schematics": "0.0.0",
+    "inquirer": "6.3.1",
+    "minimist": "1.2.0",
+    "rxjs": "6.4.0",
+    "symbol-observable": "1.2.0"
+  }
+}

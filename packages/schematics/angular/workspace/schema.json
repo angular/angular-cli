@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularWorkspace",
+  "title": "Angular Workspace Options Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "The name of the workspace.",
+      "type": "string",
+      "format": "html-selector",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "newProjectRoot": {
+      "description": "The path where new projects will be created.",
+      "type": "string",
+      "visible": "false"
+    },
+    "skipInstall": {
+      "description": "When true, does not install packages for dependencies.",
+      "type": "boolean",
+      "default": false
+    },
+    "linkCli": {
+      "description": "When true, links the CLI to the global version (internal development only).",
+      "type": "boolean",
+      "default": false,
+      "visible": false
+    },
+    "skipGit": {
+      "description": "When true, does not initialize a git repository.",
+      "type": "boolean",
+      "default": false,
+      "alias": "g"
+    },
+    "commit": {
+      "description": "Initial repository commit information.",
+      "default": null,
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "email"
+          ]
+        }
+      ]
+    },
+    "version": {
+      "type": "string",
+      "description": "The version of the Angular CLI to use.",
+      "visible": false,
+      "$default": {
+        "$source": "ng-cli-version"
+      }
+    },
+    "minimal": {
+      "description": "When true, creates a workspace without any testing frameworks. (Use for learning purposes only.)",
+      "type": "boolean",
+      "default": false,
+      "x-user-analytics": 14
+    }
+  },
+  "required": [
+    "name",
+    "version"
+  ]
+}

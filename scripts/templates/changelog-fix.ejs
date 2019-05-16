@@ -1,0 +1,40 @@
+<%
+  if (!hash) {
+    return;
+  }
+
+  const shortSha = hash && hash.slice(0, 7);
+%>
+<tr>
+  <%# Commit: %>
+  <td><%
+  if (shortSha) {
+    %>
+<a href="https://github.com/angular/angular-cli/commit/<%= hash %>"><img
+   align="top"
+   title="Bug Fix" src="https://img.shields.io/badge/<%= shortSha %>-fix-green.svg" />
+</a><%
+  } %>
+  </td>
+
+  <%# Desc: %>
+  <td><%= subject %></td>
+
+  <%# Notes: %>
+  <td><%
+      for (const reference of references) {
+        if (!reference.action || !reference.issue) {
+          continue;
+        }
+
+        const issue = reference.issue;
+        const owner = reference.owner || 'angular';
+        const repository = reference.repository || 'angular-cli';
+        %>
+
+<a href="https://github.com/<%= owner %>/<%= repository %>/issues/<%= issue %>">
+  [Closes #<%= issue %>]<br />
+</a>
+  <% } %>
+  </td>
+</tr>

@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "title": "Webpack Builder.",
+  "description": "Webpack Builder schema for Architect.",
+  "type": "object",
+  "properties": {
+    "webpackConfig": {
+      "type": "string",
+      "description": "The path to the Webpack configuration file."
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "webpackConfig"
+  ]
+}

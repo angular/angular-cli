@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/test.json",
+  "description": "Runs unit tests in a project.",
+  "$longDescription": "./test-long.md",
+
+  "$aliases": [ "t" ],
+  "$scope": "in",
+  "$type": "architect",
+  "$impl": "./test-impl#TestCommand",
+
+  "type": "object",
+  "allOf": [
+    { "$ref": "./definitions.json#/definitions/architect" },
+    { "$ref": "./definitions.json#/definitions/base" }
+  ]
+}

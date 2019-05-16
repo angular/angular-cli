@@ -1,0 +1,32 @@
+steps:
+  - label: windows-test
+    commands:
+      # Yarn workspaces creates directory junctions inside node_modules, but these fail in docker.
+      # E.g. inside the container, `mklink /J "C:\src\_" "C:\src\packages\_"` will fail with 
+      # `Access is denied.`
+      # https://github.com/moby/moby/issues/37024
+      # As a workaround, we copy all files in the shared volume and run the commands in the new dir.
+      - xcopy C:\workdir C:\workdir-copy /E /H /K /S /Q /I
+      - cd C:\workdir-copy
+      # Actual CI commands
+      # --network-timeout is a workaround for https://github.com/yarnpkg/yarn/issues/6221
+      - yarn install --frozen-lockfile --non-interactive --network-timeout 500000
+      - yarn webdriver-update
+      - node --version
+      - yarn --version
+      - yarn test
+      # Move this file into the .buildkite folder if Appveyor is removed.
+      - appveyor-e2e.bat
+      # - bazel test ...
+    plugins:
+      - docker#v2.1.0:
+          image: "filipesilva/node-bazel-windows:0.0.2"
+    # Times out in 2h
+    timeout_in_minutes: 120
+    # Automatically retries up to 2 times.
+    retry:
+      automatic:
+        exit_status: "*"
+        limit: 2    
+    agents:
+      windows: true

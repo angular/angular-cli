@@ -1,0 +1,14 @@
+{
+  "name": "aliases-many",
+  "schematics": {
+    "schematic1": {
+      "aliases": ["alias1", "alias2", "alias3"],
+      "description": "1",
+      "factory": "../null-factory"
+    },
+    "schematic2": {
+      "description": "2",
+      "factory": "../null-factory"
+    }
+  }
+}

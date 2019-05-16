@@ -1,0 +1,18 @@
+{
+  "name": "aio-benchmark",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "initialize": "yarn clone && yarn setup && yarn update", 
+    "clone": "(git clone https://github.com/angular/angular --depth 1 || true) && cd angular && git fetch origin dd2a650c3455f3bc0a88f8181758a84aacb25fea && git checkout -f FETCH_HEAD",
+    "setup": "cd angular && yarn && cd aio && yarn && yarn setup",
+    "update": "cd angular/aio && yarn add ../../../../dist/_angular-devkit_build-angular.tgz --dev",
+    "//": "Shouldn't need to install the package twice, but the first install seems to leave two @ngtools/webpack installs around.",
+    "postupdate": "cd angular/aio && yarn add ../../../../dist/_angular-devkit_build-angular.tgz --dev",
+    "benchmark": "cd angular/aio && benchmark --verbose -- yarn ~~build --configuration=stable"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

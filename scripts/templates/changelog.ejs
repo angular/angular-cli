@@ -1,0 +1,109 @@
+<%#
+  The data structure for this file looks like this:
+    {
+      from: 'v1.2.3',
+      to: 'v1.2.4',
+      packages: { /* The PackageInfoMap from "lib/packages.ts" */
+      // For a commit with description:
+      // ------------------------------------------------------
+      //   feat(@angular/pwa): add something to this
+      //
+      //   Fixes #123
+      // ------------------------------------------------------
+      // See https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-commits-parser
+      commits: [ {
+        type: 'feat', // | 'fix' | 'refactor' | 'build' | 'test' | 'ci'
+        scope: '@angular/pwa',  // package name (or null)
+        subject: 'add something to this',
+        header: 'feat(@angular/pwa): add something to this',
+        body: null,
+        footer: 'Fixes #123',
+        references: [
+          {
+            action: 'Closes',
+            owner: null,
+            repository: null,
+            issue: '123',
+            raw: '#123',
+            prefix: '#'
+          }
+        ],
+      } ]
+    }
+%><%
+  // Sort those packages to the top, in those orders. Others will be sorted alphabetically.
+  const CUSTOM_SORT_ORDER = [
+    '@angular/cli',
+    '@schematics/angular',
+    '@angular-devkit/architect-cli',
+    '@angular-devkit/schematics-cli',
+  ];
+%>
+# Commits
+
+<table>
+<tbody>
+<%
+  // Get unique scopes.
+  const scopes = commits.map(x => x.scope)
+    .sort()
+    .filter((v, i, a) => v !== a[i - 1])
+    .sort((a, b) => {
+        // Sort using the sorting order above, or against each others if undefined.
+        const aOrder = CUSTOM_SORT_ORDER.indexOf(a);
+        const bOrder = CUSTOM_SORT_ORDER.indexOf(b);
+        return aOrder == -1 ? bOrder == -1 ? (a || '').localeCompare(b || '') : 1 : aOrder - bOrder;
+    });
+
+  for (const scope of scopes) {
+    // Do feature first, then fixes.
+    const allScopeCommits = commits.filter(x => x.scope === scope);
+
+    const scopeCommits = [
+      ...allScopeCommits.filter(x => x.type === 'feat'),
+      ...allScopeCommits.filter(x => x.type === 'fix'),
+    ];
+
+    if (scopeCommits.length == 0) {
+        continue;
+    }
+%>
+<tr><td colspan=3><h3><%
+  if (scope) {
+    %><%= scope %> (<%= packages[scope].version %>)<%
+  } else {
+    %>Misc<%
+  }
+%></h3></td></tr>
+  <tr>
+    <td><b>Commit</b>
+    <td><b>Description</b>
+    <td><b>Notes</b>
+  </tr>
+<%
+    let nbRows = 0;
+    for (const commit of scopeCommits) {
+        nbRows++;
+        switch (commit.type) {
+            case 'fix': %><%= include('./changelog-fix', commit) %><% break;
+            case 'feat': %><%= include('./changelog-feat', commit) %><% break;
+        }
+    }
+
+    // Add an empty row to get the alternating colors in sync.
+    if (scope != scopes[scopes.length - 1] && nbRows % 2) { %>
+<tr></tr>
+    <% } %>
+<% } %>
+</tbody>
+</table>
+
+----
+
+<%= include('./changelog-breaking-changes', { commits }) %>
+
+----
+
+# Special Thanks
+
+<%= include('./changelog-special-thanks', { commits }) %>

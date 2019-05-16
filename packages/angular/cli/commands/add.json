@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/add.json",
+  "description": "Adds support for an external library to your project.",
+  "$longDescription": "./add.md",
+
+  "$scope": "in",
+  "$impl": "./add-impl#AddCommand",
+
+  "type": "object",
+  "allOf": [
+    {
+      "properties": {
+        "collection": {
+          "type": "string",
+          "description": "The package to be added.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        },
+        "registry": {
+          "description": "The NPM registry to use.",
+          "type": "string",
+          "oneOf": [
+            {
+              "format": "uri"
+            },
+            {
+              "format": "hostname"
+            }
+          ]
+        }
+      },
+      "required": [
+      ]
+    },
+    {
+      "$ref": "./definitions.json#/definitions/interactive"
+    },
+    {
+      "$ref": "./definitions.json#/definitions/base"
+    }
+  ]
+}

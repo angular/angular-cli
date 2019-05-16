@@ -1,0 +1,19 @@
+{
+  "name": "@angular-devkit/schematics",
+  "version": "0.0.0",
+  "description": "Angular Schematics - Library",
+  "main": "src/index.js",
+  "typings": "src/index.d.ts",
+  "keywords": [
+    "blueprints",
+    "scaffolding",
+    "template",
+    "tooling",
+    "code generation",
+    "schematics"
+  ],
+  "dependencies": {
+    "@angular-devkit/core": "0.0.0",
+    "rxjs": "6.4.0"
+  }
+}

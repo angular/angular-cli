@@ -1,0 +1,57 @@
+{
+  "pinVersions": false,
+  "semanticCommits": true,
+  "semanticPrefix": "build",
+  "commitMessage": "{{semanticPrefix}} update {{depName}} to version {{newVersion}}",
+  "separateMajorMinor": false,
+  "prHourlyLimit": 2,
+  "labels": [
+    "PR target: master-only"
+  ],
+  "timezone": "America/Tijuana",
+  "schedule": [
+    "after 10pm every weekday",
+    "before 4am every weekday",
+    "every weekend"
+  ],
+  "baseBranches": [
+    "master"
+  ],
+  "ignoreDeps": [
+    "source-map",
+    "@types/node",
+    "webpack-subresource-integrity"
+  ],
+  "packageFiles": [
+    "package.json",
+    "packages/**/package.json",
+    "tests/legacy-cli/e2e/ng-snapshot/package.json"
+  ],
+  "major": {
+    "devDependencies": {
+      "enabled": false
+    }
+  },
+  "packageRules": [
+    {
+      "packagePatterns": [
+        "^@angular\/.*"
+      ],
+      "groupName": "angular",
+      "pinVersions": false
+    },
+    {
+      "packagePatterns": [
+        "^@bazel\/.*"
+      ],
+      "groupName": "bazel",
+      "pinVersions": false
+    },
+    {
+      "packageNames": [
+        "typescript"
+      ],
+      "updateTypes": "patch"
+    }
+  ]
+}

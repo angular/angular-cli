@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularModule",
+  "title": "Angular Module Options Schema",
+  "type": "object",
+  "description": "Creates a new generic NgModule definition in the given or default project.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the NgModule.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the NgModule?"
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path at which to create the NgModule, relative to the workspace root.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "routing": {
+      "type": "boolean",
+      "description": "When true, creates a routing module.",
+      "default": false,
+      "x-user-analytics": 17
+    },
+    "routingScope": {
+      "enum": ["Child", "Root"],
+      "type": "string",
+      "description": "The scope for the new routing module.",
+      "default": "Child"
+    },
+    "flat": {
+      "type": "boolean",
+      "description": "When true, creates the new files at the top level of the current project root. ",
+      "default": false
+    },
+    "commonModule": {
+      "type": "boolean",
+      "description": "When true, the new NgModule imports \"CommonModule\". ",
+      "default": true,
+      "visible": false
+    },
+    "module":  {
+      "type": "string",
+      "description": "The declaring NgModule.",
+      "alias": "m"
+    },
+    "lintFix": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, applies lint fixes after generating the module.",
+      "x-user-analytics": 15
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

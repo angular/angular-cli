@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "Protractor Target",
+  "description": "Protractor target options for Build Facade.",
+  "type": "object",
+  "properties": {
+    "protractorConfig": {
+      "type": "string",
+      "description": "The name of the Protractor configuration file."
+    },
+    "devServerTarget": {
+      "type": "string",
+      "description": "Dev server target to run tests against."
+    },
+    "specs": {
+      "type": "array",
+      "description": "Override specs in the protractor config.",
+      "default": [],
+      "items": {
+        "type": "string",
+        "description": "Spec name."
+      }
+    },
+    "suite": {
+      "type": "string",
+      "description": "Override suite in the protractor config."
+    },
+    "elementExplorer": {
+      "type": "boolean",
+      "description": "Start Protractor's Element Explorer for debugging.",
+      "default": false
+    },
+    "webdriverUpdate": {
+      "type": "boolean",
+      "description": "Try to update webdriver.",
+      "default": true
+    },
+    "port": {
+      "type": "number",
+      "description": "The port to use to serve the application."
+    },
+    "host": {
+      "type": "string",
+      "description": "Host to listen on."
+    },
+    "baseUrl": {
+      "type": "string",
+      "description": "Base URL for protractor to connect to.",
+      "x-deprecated": "Use \"baseUrl\" in the Protractor config file instead."
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "protractorConfig"
+  ]
+}

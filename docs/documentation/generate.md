@@ -1,11 +1,16 @@
 <!-- Links in /docs/documentation should NOT have `.md` at the end, because they end up in our wiki at release. -->
 
+**Documentation below is for CLI version 6 and we no longer accept PRs to improve this. For version 7 see [here](https://angular.io/cli/generate)**.
+
 # ng generate
 
 ## Overview
-`ng generate [name]` generates the specified blueprint
+`ng generate [name]` generates the specified schematic
 
-## Available blueprints:
+## Alias
+g - `ng g [name]`
+
+## Available Schematics:
  - [class](generate/class)
  - [component](generate/component)
  - [directive](generate/directive)
@@ -15,47 +20,27 @@
  - [module](generate/module)
  - [pipe](generate/pipe)
  - [service](generate/service)
+ - [appShell](generate/app-shell)
+ - [application](generate/application)
+ - [library](generate/library)
+ - [universal](generate/universal)
 
 ## Options
 <details>
   <summary>dry-run</summary>
   <p>
-    <code>--dry-run</code> (aliases: <code>-d</code>) <em>default value: false</em>
+    <code>--dry-run</code> (alias: <code>-d</code>)
   </p>
   <p>
-     Run through without making any changes. Will list all files that would have been created when running <code>ng generate</code>.
-  </p>
-</details>
-
-<details>
-  <summary>lint-fix</summary>
-  <p>
-    <code>--lint-fix</code> (aliases: <code>-lf</code>)
-  </p>
-  <p>
-    Use lint to fix files after generation.
-  </p>
-  <p>
-    You can also set default true to use lint every time after generation. To do this, change the value in <em>.angular-cli.json</em> (<code>defaults.lintFix</code>).
+    Run through without making any changes.
   </p>
 </details>
-
 <details>
-  <summary>verbose</summary>
+  <summary>force</summary>
   <p>
-    <code>--verbose</code> (aliases: <code>-v</code>) <em>default value: false</em>
+    <code>--force</code> (alias: <code>-f</code>)
   </p>
   <p>
-    Adds more details to output logging.
-  </p>
-</details>
-
-<details>
-  <summary>collection</summary>
-  <p>
-    <code>--collection</code> (aliases: <code>-c</code>) <em>default value: @schematics/angular</em>
-  </p>
-  <p>
-    Schematics collection to use.
+    Forces overwriting of files.
   </p>
 </details>

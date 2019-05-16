@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularWebWorker",
+  "title": "Angular Web Worker Options Schema",
+  "type": "object",
+  "description": "Creates a new generic web worker definition in the given or default project.",
+  "properties": {
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path at which to create the worker file, relative to the current workspace.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "target": {
+      "type": "string",
+      "description": "The target to apply web worker to.",
+      "default": "build"
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the worker.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the worker?"
+    },
+    "snippet": {
+      "type": "boolean",
+      "default": true,
+      "description": "Add a worker creation snippet in a sibling file of the same name."
+    }
+  },
+  "required": [
+    "name",
+    "project"
+  ]
+}

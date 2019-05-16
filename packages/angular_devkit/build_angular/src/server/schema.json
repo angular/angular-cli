@@ -1,0 +1,276 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "BuildAngularWebpackServerSchema",
+  "title": "Universal Target",
+  "type": "object",
+  "properties": {
+    "main": {
+      "type": "string",
+      "description": "The name of the main entry-point file."
+    },
+    "tsConfig": {
+      "type": "string",
+      "default": "tsconfig.app.json",
+      "description": "The name of the TypeScript configuration file."
+    },
+    "stylePreprocessorOptions": {
+      "description": "Options to pass to style preprocessors",
+      "type": "object",
+      "properties": {
+        "includePaths": {
+          "description": "Paths to include. Paths will be resolved to project root.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "optimization": {
+      "description": "Enables optimization of the build output.",
+      "x-user-analytics": 16,
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "scripts": {
+              "type": "boolean",
+              "description": "Enables optimization of the scripts output.",
+              "default": true
+            },
+            "styles": {
+              "type": "boolean",
+              "description": "Enables optimization of the styles output.",
+              "default": true
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "boolean"
+        }
+      ]
+    },
+    "fileReplacements": {
+      "description": "Replace files with other files in the build.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/fileReplacement"
+      },
+      "default": []
+    },
+    "outputPath": {
+      "type": "string",
+      "description": "Path where output will be placed."
+    },
+    "resourcesOutputPath": {
+      "type": "string",
+      "description": "The path where style resources will be placed, relative to outputPath.",
+      "default": ""
+    },
+    "sourceMap": {
+      "description": "Output sourcemaps.",
+      "default": true,
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "scripts": {
+              "type": "boolean",
+              "description": "Output sourcemaps for all scripts.",
+              "default": true
+            },
+            "styles": {
+              "type": "boolean",
+              "description": "Output sourcemaps for all styles.",
+              "default": true
+            },
+            "hidden": {
+              "type": "boolean",
+              "description": "Output sourcemaps used for error reporting tools.",
+              "default": false
+            },
+            "vendor": {
+              "type": "boolean",
+              "description": "Resolve vendor packages sourcemaps.",
+              "default": false
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "boolean"
+        }
+      ]
+    },
+    "vendorSourceMap": {
+      "type": "boolean",
+      "description": "Resolve vendor packages sourcemaps.",
+      "x-deprecated": true,
+      "default": false
+    },
+    "evalSourceMap": {
+      "type": "boolean",
+      "description": "Output in-file eval sourcemaps.",
+      "default": false,
+      "x-deprecated": true
+    },
+    "vendorChunk": {
+      "type": "boolean",
+      "description": "Use a separate bundle containing only vendor libraries.",
+      "default": true
+    },
+    "commonChunk": {
+      "type": "boolean",
+      "description": "Use a separate bundle containing code used across multiple bundles.",
+      "default": true
+    },
+    "deployUrl": {
+      "type": "string",
+      "description": "URL where files will be deployed."
+    },
+    "verbose": {
+      "type": "boolean",
+      "description": "Adds more details to output logging.",
+      "default": false
+    },
+    "progress": {
+      "type": "boolean",
+      "description": "Log progress to the console while building."
+    },
+    "i18nFile": {
+      "type": "string",
+      "description": "Localization file to use for i18n."
+    },
+    "i18nFormat": {
+      "type": "string",
+      "description": "Format of the localization file specified with --i18n-file."
+    },
+    "i18nLocale": {
+      "type": "string",
+      "description": "Locale to use for i18n."
+    },
+    "i18nMissingTranslation": {
+      "type": "string",
+      "description": "How to handle missing translations for i18n."
+    },
+    "outputHashing": {
+      "type": "string",
+      "description": "Define the output filename cache-busting hashing mode.",
+      "default": "none",
+      "enum": [
+        "none",
+        "all",
+        "media",
+        "bundles"
+      ]
+    },
+    "deleteOutputPath": {
+      "type": "boolean",
+      "description": "Delete the output path before building.",
+      "default": true
+    },
+    "preserveSymlinks": {
+      "type": "boolean",
+      "description": "Do not use the real path when resolving modules.",
+      "default": false
+    },
+    "extractLicenses": {
+      "type": "boolean",
+      "description": "Extract all licenses in a separate file, in the case of production builds only.",
+      "default": true
+    },
+    "showCircularDependencies": {
+      "type": "boolean",
+      "description": "Show circular dependency warnings on builds.",
+      "default": true
+    },
+    "namedChunks": {
+      "type": "boolean",
+      "description": "Use file name for lazy loaded chunks.",
+      "default": true
+    },
+    "bundleDependencies": {
+      "type": "string",
+      "description": "Available on server platform only. Which external dependencies to bundle into the module. By default, all of node_modules will be kept as requires.",
+      "default": "none",
+      "enum": [
+        "none",
+        "all"
+      ]
+    },
+    "statsJson": {
+      "type": "boolean",
+      "description": "Generates a 'stats.json' file which can be analyzed using tools such as 'webpack-bundle-analyzer'.",
+      "default": false
+    },
+    "forkTypeChecker": {
+      "type": "boolean",
+      "description": "Run the TypeScript type checker in a forked process.",
+      "default": true
+    },
+    "lazyModules": {
+      "description": "List of additional NgModule files that will be lazy loaded. Lazy router modules will be discovered automatically.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "watch": {
+      "type": "boolean",
+      "description": "Run build when files change.",
+      "default": false
+    },
+    "poll": {
+      "type": "number",
+      "description": "Enable and define the file watching poll time period in milliseconds."
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "outputPath",
+    "main",
+    "tsConfig"
+  ],
+  "definitions": {
+    "fileReplacement": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "src": {
+              "type": "string"
+            },
+            "replaceWith": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "src",
+            "replaceWith"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "replace": {
+              "type": "string"
+            },
+            "with": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "replace",
+            "with"
+          ]
+        }
+      ]
+    }
+  }
+}

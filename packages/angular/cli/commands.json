@@ -1,0 +1,21 @@
+{
+  "add": "./commands/add.json",
+  "analytics": "./commands/analytics.json",
+  "build": "./commands/build.json",
+  "config": "./commands/config.json",
+  "doc": "./commands/doc.json",
+  "e2e": "./commands/e2e.json",
+  "make-this-awesome": "./commands/easter-egg.json",
+  "generate": "./commands/generate.json",
+  "get": "./commands/deprecated.json",
+  "set": "./commands/deprecated.json",
+  "help": "./commands/help.json",
+  "lint": "./commands/lint.json",
+  "new": "./commands/new.json",
+  "run": "./commands/run.json",
+  "serve": "./commands/serve.json",
+  "test": "./commands/test.json",
+  "update": "./commands/update.json",
+  "version": "./commands/version.json",
+  "xi18n": "./commands/xi18n.json"
+}

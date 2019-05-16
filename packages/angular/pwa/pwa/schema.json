@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularPWA",
+  "title": "Angular PWA Options Schema",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "target": {
+      "type": "string",
+      "description": "The target to apply service worker to.",
+      "default": "build"
+    },
+    "configuration": {
+      "type": "string",
+      "description": "The configuration to apply service worker to.",
+      "default": "production"
+    },
+    "title": {
+      "type": "string",
+      "description": "The title of the application."
+    }
+  },
+  "required": []
+}

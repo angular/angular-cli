@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsSchematicSchema",
+  "title": "Schematic Options Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The package name for the new schematic.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "author": {
+      "type": "string",
+      "description": "Author for the new schematic."
+    }
+  },
+  "required": []
+}

@@ -1,0 +1,269 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "Karma Target",
+  "description": "Karma target options for Build Facade.",
+  "type": "object",
+  "properties": {
+    "main": {
+      "type": "string",
+      "description": "The name of the main entry-point file."
+    },
+    "tsConfig": {
+      "type": "string",
+      "description": "The name of the TypeScript configuration file."
+    },
+    "karmaConfig": {
+      "type": "string",
+      "description": "The name of the Karma configuration file."
+    },
+    "polyfills": {
+      "type": "string",
+      "description": "The name of the polyfills file."
+    },
+    "assets": {
+      "type": "array",
+      "description": "List of static application assets.",
+      "default": [],
+      "items": {
+        "$ref": "#/definitions/assetPattern"
+      }
+    },
+    "scripts": {
+      "description": "Global scripts to be included in the build.",
+      "type": "array",
+      "default": [],
+      "items": {
+        "$ref": "#/definitions/extraEntryPoint"
+      }
+    },
+    "styles": {
+      "description": "Global styles to be included in the build.",
+      "type": "array",
+      "default": [],
+      "items": {
+        "$ref": "#/definitions/extraEntryPoint"
+      }
+    },
+    "stylePreprocessorOptions": {
+      "description": "Options to pass to style preprocessors",
+      "type": "object",
+      "properties": {
+        "includePaths": {
+          "description": "Paths to include. Paths will be resolved to project root.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "environment": {
+      "type": "string",
+      "description": "Defines the build environment."
+    },
+    "sourceMap": {
+      "description": "Output sourcemaps.",
+      "default": true,
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "scripts": {
+              "type": "boolean",
+              "description": "Output sourcemaps for all scripts.",
+              "default": true
+            },
+            "styles": {
+              "type": "boolean",
+              "description": "Output sourcemaps for all styles.",
+              "default": true
+            },
+            "vendor": {
+              "type": "boolean",
+              "description": "Resolve vendor packages sourcemaps.",
+              "default": false
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "boolean"
+        }
+      ]
+    },
+    "vendorSourceMap": {
+      "type": "boolean",
+      "description": "Resolve vendor packages sourcemaps.",
+      "x-deprecated": true,
+      "default": false
+    },
+    "evalSourceMap": {
+      "type": "boolean",
+      "description": "Output in-file eval sourcemaps.",
+      "x-deprecated": true
+    },
+    "progress": {
+      "type": "boolean",
+      "description": "Log progress to the console while building."
+    },
+    "watch": {
+      "type": "boolean",
+      "description": "Run build when files change."
+    },
+    "poll": {
+      "type": "number",
+      "description": "Enable and define the file watching poll time period in milliseconds."
+    },
+    "preserveSymlinks": {
+      "type": "boolean",
+      "description": "Do not use the real path when resolving modules.",
+      "default": false
+    },
+    "browsers": {
+      "type": "string",
+      "description": "Override which browsers tests are run against."
+    },
+    "codeCoverage": {
+      "type": "boolean",
+      "description": "Output a code coverage report.",
+      "default": false
+    },
+    "codeCoverageExclude": {
+      "type": "array",
+      "description": "Globs to exclude from code coverage.",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "fileReplacements": {
+      "description": "Replace files with other files in the build.",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "src": {
+                "type": "string"
+              },
+              "replaceWith": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "src",
+              "replaceWith"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "replace": {
+                "type": "string"
+              },
+              "with": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "replace",
+              "with"
+            ]
+          }
+        ]
+      },
+      "default": []
+    },
+    "reporters": {
+      "type": "array",
+      "description": "Karma reporters to use. Directly passed to the karma runner.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "webWorkerTsConfig": {
+      "type": "string",
+      "description": "TypeScript configuration for Web Worker modules."
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "main",
+    "tsConfig",
+    "karmaConfig"
+  ],
+  "definitions": {
+    "assetPattern": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "glob": {
+              "type": "string",
+              "description": "The pattern to match."
+            },
+            "input": {
+              "type": "string",
+              "description": "The input directory path in which to apply 'glob'. Defaults to the project root."
+            },
+            "output": {
+              "type": "string",
+              "description": "Absolute path within the output."
+            },
+            "ignore": {
+              "description": "An array of globs to ignore.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "glob",
+            "input",
+            "output"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "extraEntryPoint": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "input": {
+              "type": "string",
+              "description": "The file to include."
+            },
+            "bundleName": {
+              "type": "string",
+              "description": "The bundle name for this extra entry point."
+            },
+            "lazy": {
+              "type": "boolean",
+              "description": "If the bundle will be lazy loaded.",
+              "default": false
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "input"
+          ]
+        },
+        {
+          "type": "string",
+          "description": "The file to include."
+        }
+      ]
+    }
+  }
+}

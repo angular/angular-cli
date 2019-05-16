@@ -1,186 +1,270 @@
-version: 2
+# Configuration file for https://circleci.com/gh/angular/angular-cli
 
-# Settings common to each job.
+# Note: YAML anchors allow an object to be re-used, reducing duplication.
+# The ampersand declares an alias for an object, then later the `<<: *name`
+# syntax dereferences it.
+# See http://blog.daemonl.com/2016/02/yaml.html
+# To validate changes, use an online parser, eg.
+# http://yaml-online-parser.appspot.com/
+
+# Variables
+
+## IMPORTANT
+# If you change the cache key prefix, also sync the restore_cache fallback to match.
+# Keep the static part of the cache key as prefix to enable correct fallbacks.
+# See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
+var_1: &default_docker_image circleci/node:10.12
+var_2: &browsers_docker_image circleci/node:10.12-browsers
+var_2: &browsers_docker_image_node_12 circleci/node:12.1-browsers
+var_3: &cache_key angular_devkit-0.10.0-{{ checksum "yarn.lock" }}
+
+# Settings common to each job
 anchor_1: &defaults
-  working_directory: ~/angular-cli
+  working_directory: ~/ng
   docker:
-    - image: angular/ngcontainer:0.0.5
+    - image: *default_docker_image
 
-# Restore cache based on package-lock.json checksum for branch.
-anchor_2: &restore_cache_defaults
-    key: angular-cli-{{ checksum "package-lock.json" }}
+# After checkout, rebase on top of target branch.
+anchor_2: &post_checkout
+  run:
+    name: Rebase PR on target branch
+    command: >
+      if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
+        # User is required for rebase.
+        git config user.name "angular-ci"	
+        git config user.email "angular-ci"      
+        # Rebase PR on top of target branch.
+        node tools/rebase-pr.js angular/angular-cli ${CIRCLE_PR_NUMBER}
+      else
+        echo "This build is not over a PR, nothing to do."
+      fi
+anchor_3: &restore_cache
+  restore_cache:
+    keys:
+      - *cache_key
+      # This fallback should be the cache_key without variables.
+      - angular_devkit-0.7.0-
+anchor_4: &attach_options
+  at: .
 
-# Attach workspace that contains:
-# - dist/ : built cli
-# - angular-cli-e2e-default/ : initialized e2e test project
-anchor_3: &attach_workspace_defaults
-    at: /workspace
-
+# Job definitions
+version: 2
 jobs:
-  build:
+  install:
     <<: *defaults
     steps:
       - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - run: node --version
-      - run: npm --version
-      - run: npm install --no-save
-      - run: npm run build
-      - save_cache:
-          key: angular-cli-{{ checksum "package-lock.json" }}
+      - *post_checkout
+      - *restore_cache
+      - run: yarn install --frozen-lockfile
+      - persist_to_workspace:
+          root: .
           paths:
-            - "node_modules"
+            - ./*
+      - save_cache:
+          key: *cache_key
+          paths:
+            - ~/.cache/yarn
 
   lint:
     <<: *defaults
     steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
+      - attach_workspace: *attach_options
       - run: npm run lint
+      - run: 'yarn bazel:format -mode=check ||
+              (echo "BUILD files not formatted. Please run ''yarn bazel:format''" ; exit 1)'
+      # Run the skylark linter to check our Bazel rules
+      - run: 'yarn bazel:lint ||
+              (echo -e "\n.bzl files have lint errors. Please run ''yarn bazel:lint-fix''"; exit 1)'
+
+  validate:
+    <<: *defaults
+    steps:
+      - attach_workspace: *attach_options
+      - run: npm run validate -- --ci
 
   test:
     <<: *defaults
     steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - run: npm run test
+      - attach_workspace: *attach_options
+      - run: npm run test -- --full
 
-  # E2E test for current Angular.
-  e2e-setup:
+  test-large:
+    <<: *defaults
+    docker:
+      - image: *browsers_docker_image
+    resource_class: large
+    parallelism: 4
+    steps:
+      - attach_workspace: *attach_options
+      - run: npm run webdriver-update
+      - run: npm run test-large -- --full --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
+
+  e2e-cli:
+    <<: *defaults
+    docker:
+      - image: *browsers_docker_image
+    environment:
+      BASH_ENV: ~/.profile
+      NPM_CONFIG_PREFIX: ~/.npm-global
+    resource_class: xlarge
+    parallelism: 4
+    steps:
+      - attach_workspace: *attach_options
+      - run: PATH=~/.npm-global/bin:$PATH xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
+      - store_artifacts:
+          path: /tmp/dist
+          destination: cli/new-production
+
+  e2e-cli-node-12:
+    <<: *defaults
+    docker:
+      - image: *browsers_docker_image_node_12
+    environment:
+      BASH_ENV: ~/.profile
+      NPM_CONFIG_PREFIX: ~/.npm-global
+    resource_class: xlarge
+    parallelism: 4
+    steps:
+      - attach_workspace: *attach_options
+      - run: PATH=~/.npm-global/bin:$PATH xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
+
+  e2e-cli-ivy:
+    <<: *defaults
+    docker:
+      - image: *browsers_docker_image
+    environment:
+      BASH_ENV: ~/.profile
+      NPM_CONFIG_PREFIX: ~/.npm-global
+    resource_class: xlarge
+    parallelism: 4
+    steps:
+      - attach_workspace: *attach_options
+      - run: PATH=~/.npm-global/bin:$PATH xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ivy
+
+  e2e-cli-ng-snapshots:
+    <<: *defaults
+    docker:
+      - image: *browsers_docker_image
+    environment:
+      BASH_ENV: ~/.profile
+      NPM_CONFIG_PREFIX: ~/.npm-global
+    resource_class: xlarge
+    parallelism: 4
+    steps:
+      - run:
+          name: Don't run expensive e2e tests for forks other than renovate-bot and angular
+          command: >
+            if [[ "$CIRCLE_PR_USERNAME" != "renovate-bot" ]] &&
+               [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
+              circleci step halt
+            fi
+      - attach_workspace: *attach_options
+      - run: PATH=~/.npm-global/bin:$PATH xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ng-snapshots
+
+  build:
     <<: *defaults
     steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - run: mkdir /workspace
-      - run: mkdir /workspace/angular-cli-e2e-default
-      # Ignore all tests, we just want the setup step to persist it to the workspace.
-      - run: node tests/run_e2e.js --tmpdir=/workspace/angular-cli-e2e-default --ignore=**/*
-      - run: mv dist /workspace/
-      - persist_to_workspace:
-          root: /workspace
-          paths:
-            - dist/
-            - angular-cli-e2e-default/
+      - attach_workspace: *attach_options
+      - run: npm run admin -- build
 
-  e2e-0:
+  build-bazel:
+    <<: *defaults
+    resource_class: xlarge
+    steps:
+      - attach_workspace: *attach_options
+      - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
+      - run: yarn bazel:test
+
+  snapshot_publish:
     <<: *defaults
     steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - attach_workspace:
-          <<: *attach_workspace_defaults
-      - run: cp -r /workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=0 --nosilent
+      - attach_workspace: *attach_options
+      - run:
+          name: Decrypt Credentials
+          command: |
+            openssl aes-256-cbc -d -in .circleci/github_token -k "${KEY}" -out ~/github_token
+      - run:
+          name: Deployment to Snapshot
+          command: |
+            npm run admin -- snapshots --verbose --githubTokenFile=${HOME}/github_token
 
-  e2e-1:
+  publish:
     <<: *defaults
     steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - attach_workspace:
-          <<: *attach_workspace_defaults
-      - run: cp -r /workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=1 --nosilent
-
-  e2e-2:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - attach_workspace:
-          <<: *attach_workspace_defaults
-      - run: cp -r /workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=2 --nosilent
-
-  e2e-3:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - attach_workspace:
-          <<: *attach_workspace_defaults
-      - run: cp -r /workspace/dist/ ./
-      - run: xvfb-run -a node tests/run_e2e.js --nobuild --reuse=/workspace/angular-cli-e2e-default/test-project --nb-shards=4 --shard=3 --nosilent
-
-  # Master only E2E.
-  ng2-e2e:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - run: xvfb-run -a node tests/run_e2e.js --ng2 "--glob=tests/build/**"
-
-  ng4-e2e:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - run: xvfb-run -a node tests/run_e2e.js --ng4 "--glob=tests/build/**"
-
-  nightly-e2e:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_cache_defaults
-      - run: xvfb-run -a node tests/run_e2e.js --nightly "--glob=tests/build/**"
+      - attach_workspace: *attach_options
+      - run:
+          name: Decrypt Credentials
+          command: |
+            openssl aes-256-cbc -d -in .circleci/npm_token -k "${KEY}" -out ~/.npmrc
+      - run:
+          name: Deployment to NPM
+          command: |
+            npm run admin -- publish --verbose
 
 workflows:
   version: 2
-  build_and_test:
+  default_workflow:
     jobs:
-      - build
+      - install
       - lint:
+          requires:
+            - install
+      - validate:
+          requires:
+            - install
+      - build:
+          requires:
+            - install
+          filters:
+            branches:
+              ignore:
+              - /docs-preview/
+      - build-bazel:
           requires:
             - build
       - test:
           requires:
             - build
-      # E2E test for current Angular.
-      - e2e-setup:
+      - test-large:
           requires:
             - build
-      - e2e-0:
-          requires:
-            - e2e-setup
-      - e2e-1:
-          requires:
-            - e2e-setup
-      - e2e-2:
-          requires:
-            - e2e-setup
-      - e2e-3:
-          requires:
-            - e2e-setup
-      # Master only E2E.
-      - ng2-e2e:
+      - e2e-cli:
           requires:
             - build
+      - e2e-cli-node-12:
+          requires:
+            - build
+      - e2e-cli-ivy:
+          requires:
+            - build            
+      - snapshot_publish_docs:
+          requires:
+          - install
           filters:
             branches:
               only:
-                - master
-      - ng4-e2e:
+              - /docs-preview/
+      - e2e-cli-ng-snapshots:
           requires:
             - build
-          filters:
-            branches:
-              only:
-                - master
-      - nightly-e2e:
+      - snapshot_publish:
           requires:
+            - test
             - build
+            - e2e-cli
           filters:
             branches:
-              only:
-                - master
+              ignore:
+                - /pull\/.*/
+      - publish:
+          requires:
+            - test
+            - build
+            - e2e-cli
+            - snapshot_publish
+          filters:
+            tags:
+              only: /^v\d+/
+            branches:
+              ignore: /.*/

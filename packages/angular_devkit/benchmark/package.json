@@ -1,0 +1,24 @@
+{
+  "name": "@angular-devkit/benchmark",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Angular Benchmark",
+  "bin": {
+    "benchmark": "./src/main.js"
+  },
+  "keywords": [
+    "benchmark"
+  ],
+  "engines": {
+    "node": ">= 10.9.0",
+    "npm": ">= 6.2.0"
+  },
+  "dependencies": {
+    "@angular-devkit/core": "0.0.0",
+    "minimist": "1.2.0",
+    "pidusage": "2.0.17",
+    "pidtree": "0.3.0",
+    "rxjs": "6.4.0",
+    "tree-kill": "^1.2.0"
+  }
+}

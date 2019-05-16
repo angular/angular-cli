@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "inlineSourceMap": true,
+    "sourceRoot": ".",
+    // Inline sources are necessary for our tests to show the proper sources, since we are using
+    // Istanbul (not Constantinople) as well, and applying both source maps to get the original
+    // source in devtools.
+    "inlineSources": true,
+    "types": [
+      "node",
+      "jasmine"
+    ]
+  },
+}

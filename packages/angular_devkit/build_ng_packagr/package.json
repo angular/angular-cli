@@ -1,0 +1,23 @@
+{
+  "name": "@angular-devkit/build-ng-packagr",
+  "version": "0.0.0",
+  "description": "Angular Build Architect for ng-packagr",
+  "experimental": true,
+  "main": "src/index.js",
+  "typings": "src/index.d.ts",
+  "builders": "builders.json",
+  "dependencies": {
+    "@angular-devkit/architect": "0.0.0",
+    "rxjs": "6.4.0"
+  },
+  "peerDependencies": {
+    "ng-packagr": "^4.0.0 || ^5.0.0"
+  },
+  "devDependencies": {
+    "@angular/compiler": "^8.0.0-beta.14",
+    "@angular/compiler-cli": "^8.0.0-beta.14",
+    "@angular-devkit/core": "0.0.0",
+    "ng-packagr": "^5.1.0",
+    "tslib": "^1.9.0"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "PostUpdateSchema",
+  "type": "object",
+  "properties": {
+    "package": {
+      "description": "The package to migrate.",
+      "type": "string"
+    },
+    "collection": {
+      "description": "The collection to load the migrations from.",
+      "type": "string"
+    },
+    "from": {
+      "description": "The version installed previously.",
+      "type": "string"
+    },
+    "to": {
+      "description": "The version to migrate to.",
+      "type": "string"
+    }
+  },
+  "required": ["package", "collection", "from", "to"]
+}

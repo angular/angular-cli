@@ -1,9 +1,11 @@
 environment:
-  matrix:
-    - nodejs_version: "6"
+  nodejs_version: "10.9.0" # Same version as used in CircleCI.
 
 matrix:
   fast_finish: true
+
+skip_tags: true
+skip_branch_with_pr: true
 
 install:
   - ps: Install-Product node $env:nodejs_version
@@ -12,12 +14,13 @@ install:
 
 test_script:
   - node --version
-  - npm --version
-  - npm run test:packages
-  - npm run test:cli
-  - node tests\run_e2e.js --appveyor "--glob=tests/{basic,commands,generate,build/styles}/**"
+  - yarn --version
+  - yarn test -- --full
+  - appveyor-e2e.bat
 
 build: off
+deploy: off
 
 cache:
-  - node_modules -> package-lock.json
+  - node_modules -> yarn.lock
+  - "%LOCALAPPDATA%\\Yarn"

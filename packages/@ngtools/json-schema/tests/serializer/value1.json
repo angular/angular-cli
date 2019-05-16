@@ -1,7 +1,0 @@
-{
-  "requiredKey": 1,
-  "arrayKey2": [
-    { "stringKey": "value1" },
-    { "stringKey": "value2" }
-  ]
-}

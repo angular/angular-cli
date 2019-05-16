@@ -1,3 +1,5 @@
+**Documentation below is for CLI version 6 and we no longer accept PRs to improve this. For version 7 see [here](https://angular.io/guide/testing#set-up-continuous-integration)**.
+
 # Continuous Integration
 
 One of the best ways to keep your project bug free is through a test suite, but it's easy to forget
@@ -23,22 +25,24 @@ set up Circle CI and Travis CI.
 Even though `ng test` and `ng e2e` already run on your environment, they need to be adjusted to
 run in CI environments.
 
-When using Chrome in CI environments it has to be started without sandboxing.
-We can achieve that by editing our test configs.
+We'll use [Headless Chrome](https://developers.google.com/web/updates/2017/04/headless-chrome#cli) in CI environments. In some environments we need to start the browser without
+sandboxing or disable the gpu. Here we'll do both. 
 
-In `karma.conf.js`, add a custom launcher called `ChromeNoSandbox` below `browsers`:
+In `karma.conf.js`, add a custom launcher called `ChromeHeadlessCI` below `browsers`:
 
 ```
 browsers: ['Chrome'],
 customLaunchers: {
-  ChromeNoSandbox: {
-    base: 'Chrome',
-    flags: ['--no-sandbox']
+  ChromeHeadlessCI: {
+    base: 'ChromeHeadless',
+    flags: ['--no-sandbox', '--disable-gpu']
   }
 },
 ```
 
-Create a new file in the root of your project called `protractor-ci.conf.js`, that extends
+We'll override the `browsers` option from the command line to use our new configuration.
+
+Create a new file in the `e2e` directory of your project called `protractor-ci.conf.js`, that extends
 the original `protractor.conf.js`:
 
 ```
@@ -47,22 +51,24 @@ const config = require('./protractor.conf').config;
 config.capabilities = {
   browserName: 'chrome',
   chromeOptions: {
-    args: ['--no-sandbox']
+    args: ['--headless', '--no-sandbox', '--disable-gpu']
   }
 };
 
 exports.config = config;
 ```
 
-Now you can run the following commands to use the `--no-sandbox` flag:
+Now you can run the following commands to use the new configurations:
 
 ```
-ng test --single-run --no-progress --browser=ChromeNoSandbox
-ng e2e --no-progress --config=protractor-ci.conf.js
+ng test --watch=false --progress=false --browsers=ChromeHeadlessCI
+ng e2e --protractor-config=./e2e/protractor-ci.conf.js
 ```
 
-For CI environments it's also a good idea to disable progress reporting (via `--no-progress`)
-to avoid spamming the server log with progress messages.
+For CI environments it's also a good idea to disable progress reporting (via `--progress=false`)
+to avoid spamming the server log with progress messages. We've added that option to `ng test`. An equivalent
+option has been requested for
+`ng e2e` [(#11412)](https://github.com/angular/angular-cli/issues/11412). 
 
 
 ## Using Circle CI
@@ -80,24 +86,21 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: my-project-{{ .Branch }}-{{ checksum "package.json" }}
+          key: my-project-{{ .Branch }}-{{ checksum "package-lock.json" }}
       - run: npm install
       - save_cache:
-          key: my-project-{{ .Branch }}-{{ checksum "package.json" }}
+          key: my-project-{{ .Branch }}-{{ checksum "package-lock.json" }}
           paths:
-            - "node_modules"
-      - run: xvfb-run -a npm run test -- --single-run --no-progress --browser=ChromeNoSandbox
-      - run: xvfb-run -a npm run e2e -- --no-progress --config=protractor-ci.conf.js
-
+             - "node_modules"
+      - run: npm run test -- --watch=false --progress=false --browsers=ChromeHeadlessCI
+      - run: npm run e2e -- --protractor-config=./e2e/protractor-ci.conf.js
 ```
 
 We're doing a few things here:
   -
   - `node_modules` is cached.
-  - [npm run](https://docs.npmjs.com/cli/run-script) is used to run `ng` because `@angular/cli` is
+  - we use [npm run](https://docs.npmjs.com/cli/run-script) to run `ng` because `@angular/cli` is
   not installed globally. The double dash (`--`) is needed to pass arguments into the npm script.
-  - `xvfb-run` is used to run `npm run` to run a command using a virtual screen, which is needed by
-  Chrome.
 
 Commit your changes and push them to your repository.
 
@@ -135,16 +138,9 @@ install:
   - npm install
 
 script:
-  # Use Chromium instead of Chrome.
-  - export CHROME_BIN=chromium-browser
-  - xvfb-run -a npm run test -- --single-run --no-progress --browser=ChromeNoSandbox
-  - xvfb-run -a npm run e2e -- --no-progress --config=protractor-ci.conf.js
-
+  - npm run test -- --watch=false --progress=false --browsers=ChromeHeadlessCI
+  - npm run e2e -- --protractor-config=./e2e/protractor-ci.conf.js
 ```
-
-Although the syntax is different, we're mostly doing the same steps as were done in the
-Circle CI config.
-The only difference is that Travis doesn't come with Chrome, so we use Chromium instead.
 
 Commit your changes and push them to your repository.
 
@@ -153,3 +149,23 @@ Next you'll need to [sign up for Travis CI](https://travis-ci.org/auth) and
 You'll need to push a new commit to trigger a build.
 
 Be sure to check out the [Travis CI docs](https://docs.travis-ci.com/) if you want to know more.
+
+## ChromeDriver
+
+In CI environments it's a good idea to to use a specific version of [ChromeDriver](http://chromedriver.chromium.org/)
+instead of allowing `ng e2e` to use the latest one. CI environments often use older versions of chrome, which are unsupported by newer versions of ChromeDriver.
+
+An easy way to do this is to define a NPM script:
+
+```text
+"webdriver-update-ci": "webdriver-manager update --standalone false --gecko false --versions.chrome 2.37"
+```
+
+And then on CI environments you call that script followed by the e2e command without updating webdriver:
+
+```text
+npm run webdriver-update-ci
+ng e2e --webdriver-update=false
+```
+
+This way you will always use a specific version of chrome driver between runs.

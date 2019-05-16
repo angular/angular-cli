@@ -1,0 +1,11 @@
+{
+  // This tsconfig is to help only build the tslint rules instead of the whole project. Makes
+  // things faster.
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/etc/rules",
+    "baseUrl": ""
+  },
+  "exclude": [
+  ]
+}

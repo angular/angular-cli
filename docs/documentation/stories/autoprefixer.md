@@ -1,10 +1,12 @@
+**Documentation below is deprecated and we no longer accept PRs to improve this. The new documentation is available [here](https://angular.io/guide/build#configuring-browser-compatibility)**.
+
 # Change target browsers for Autoprefixer
 
 Currently, the CLI uses [Autoprefixer](https://github.com/postcss/autoprefixer) to ensure compatibility
 with different browser and browser versions. You may find it necessary to target specific browsers
 or exclude certain browser versions from your build.
 
-Internally, Autoprefixer relies on a library called [Browserslist](https://github.com/ai/browserslist)
+Internally, Autoprefixer relies on a library called [Browserslist](https://github.com/browserslist/browserslist)
 to figure out which browsers to support with prefixing.
 
 There are a few ways to tell Autoprefixer what browsers to target:
@@ -26,7 +28,7 @@ last 2 versions
 ```
 
 Autoprefixer will look for the configuration file/property to use when it prefixes your css.
-Check out the [browserslist repo](https://github.com/ai/browserslist) for more examples of how to target
+Check out the [browserslist repo](https://github.com/browserslist/browserslist) for more examples of how to target
 specific browsers and versions.
 
 _Side note:_

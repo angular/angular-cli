@@ -1,3 +1,5 @@
+**Documentation below is for CLI version 6 and we no longer accept PRs to improve this. For version 7 see [here](https://angular.io/guide/deployment#deploy-to-github-pages)**.
+
 # Deploy to GitHub Pages
 
 A simple way to deploy your Angular app is to use
@@ -17,5 +19,12 @@ Commit your changes and push. On the GitHub project page, configure it to
 And that's all you need to do! Now you can see your page at
 `https://USER_NAME.github.io/PROJECT_NAME/`.
 
-You can also use [angular-cli-ghpages](https://github.com/angular-buch/angular-cli-ghpages), a full
+You can also use [angular-cli-ghpages](https://github.com/angular-schule/angular-cli-ghpages), a full
 featured package that does this all this for you and has extra functionality.
+All you need is a single command:
+
+```bash
+ngh --dir=dist/docs
+```
+
+It takes care of pushing to the `gh-pages` branch and copying your `index.html` to `404.html`.

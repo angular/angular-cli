@@ -1,0 +1,10 @@
+{
+  "name": "extends-circular",
+  "extends": "extends-circular",
+  "schematics": {
+    "schematic2": {
+      "description": "2",
+      "factory": "../null-factory"
+    }
+  }
+}

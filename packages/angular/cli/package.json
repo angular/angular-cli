@@ -1,0 +1,54 @@
+{
+  "name": "@angular/cli",
+  "version": "0.0.0",
+  "description": "CLI tool for Angular",
+  "main": "lib/cli/index.js",
+  "bin": {
+    "ng": "./bin/ng"
+  },
+  "keywords": [
+    "angular",
+    "angular-cli",
+    "Angular CLI"
+  ],
+  "scripts": {
+    "postinstall": "node ./bin/postinstall/script.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/angular-cli.git"
+  },
+  "author": "Angular Authors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angular/angular-cli/issues"
+  },
+  "homepage": "https://github.com/angular/angular-cli",
+  "dependencies": {
+    "@angular-devkit/architect": "0.0.0",
+    "@angular-devkit/core": "0.0.0",
+    "@angular-devkit/schematics": "0.0.0",
+    "@schematics/angular": "0.0.0",
+    "@schematics/update": "0.0.0",
+    "@yarnpkg/lockfile": "1.1.0",
+    "debug": "^4.1.1",
+    "ini": "1.3.5",
+    "inquirer": "6.3.1",
+    "npm-package-arg": "6.1.0",
+    "open": "6.3.0",
+    "pacote": "9.5.0",
+    "semver": "6.0.0",
+    "symbol-observable": "1.2.0",
+    "universal-analytics": "^0.4.20",
+    "uuid": "^3.3.2"
+  },
+  "ng-update": {
+    "migrations": "@schematics/angular/migrations/migration-collection.json",
+    "packageGroup": {
+      "@angular/cli": "0.0.0",
+      "@angular-devkit/build-angular":  "0.0.0",
+      "@angular-devkit/build-ng-packagr": "0.0.0",
+      "@angular-devkit/build-webpack": "0.0.0"
+    }
+  }
+}

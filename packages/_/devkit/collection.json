@@ -1,0 +1,9 @@
+{
+  "schematics": {
+    "package": {
+      "factory": "./package/factory",
+      "schema": "./package/schema.json",
+      "description": "Create an empty schematic project or add a blank schematic to the current project."
+    }
+  }
+}

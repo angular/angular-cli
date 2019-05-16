@@ -1,0 +1,11 @@
+{
+  "name": "@angular-devkit-tests/update-package-group-1",
+  "version": "1.2.0",
+  "description": "Tests",
+  "ng-update": {
+    "packageGroup": {
+      "@angular-devkit-tests/update-package-group-1": "",
+      "@angular-devkit-tests/update-package-group-2": "^2"
+    }
+  }
+}

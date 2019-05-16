@@ -1,9 +1,14 @@
 #!/usr/bin/env node
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 'use strict';
 
-// Provide a title to the process in `ps`.
-// Due to an obscure Mac bug, do not start this title with any symbol.
-process.title = 'ng';
 
 require('../lib/bootstrap-local');
-require('../packages/@angular/cli/bin/ng');
+const packages = require('../lib/packages').packages;
+require(packages['@angular/cli'].bin['ng']);

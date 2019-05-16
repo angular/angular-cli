@@ -1,0 +1,16 @@
+{
+  "hosting": {
+    "public": "",
+    "ignore": [
+      "firebase.json",
+      "README.md",
+      "**/.*"
+    ],
+    "rewrites": [
+      {
+        "source": "/**/!(*.@(js|ts|html|css|json|svg|png|jpg|jpeg))",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
