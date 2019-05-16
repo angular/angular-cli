@@ -189,8 +189,12 @@ export function insertAfterLastOccurrence(nodes: ts.Node[],
                                           file: string,
                                           fallbackPos: number,
                                           syntaxKind?: ts.SyntaxKind): Change {
-  // sort() has a side effect, so make a copy so that we won't overwrite the parent's object.
-  let lastItem = [...nodes].sort(nodesByPosition).pop();
+  let lastItem: ts.Node | undefined;
+  for (const node of nodes) {
+    if (!lastItem || lastItem.getStart() < node.getStart()) {
+      lastItem = node;
+    }
+  }
   if (syntaxKind && lastItem) {
     lastItem = findNodes(lastItem, syntaxKind).sort(nodesByPosition).pop();
   }
