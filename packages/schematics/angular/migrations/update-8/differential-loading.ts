@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
-  JsonAstObject,
   JsonParseMode,
   isJsonObject,
   join,
@@ -36,40 +35,10 @@ not dead
 not IE 9-11 # For IE 9-11 support, remove 'not'.`;
 
 export function updateES5Projects(): Rule {
-  return (host: Tree) => {
-    const tsConfigPath = '/tsconfig.json';
-    const compilerOptions = getCompilerOptionsAstObject(host, tsConfigPath);
-    if (!compilerOptions) {
-      return host;
-    }
+  return (tree: Tree) => {
+    // update workspace tsconfig
+    updateTsConfig(tree, '/tsconfig.json');
 
-    const recorder = host.beginUpdate(tsConfigPath);
-    const scriptTarget = findPropertyInAstObject(compilerOptions, 'target');
-    if (!scriptTarget) {
-      insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'target', 'es2015', 4);
-    } else if (scriptTarget.value !== 'es2015') {
-      const { start, end } = scriptTarget;
-      recorder.remove(start.offset, end.offset - start.offset);
-      recorder.insertLeft(start.offset, '"es2015"');
-    }
-
-    const scriptModule = findPropertyInAstObject(compilerOptions, 'module');
-    if (!scriptModule) {
-      insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'module', 'esnext', 4);
-    } else if (scriptModule.value !== 'esnext') {
-      const { start, end } = scriptModule;
-      recorder.remove(start.offset, end.offset - start.offset);
-      recorder.insertLeft(start.offset, '"esnext"');
-    }
-
-    host.commitUpdate(recorder);
-
-    return updateProjects;
-  };
-}
-
-function updateProjects(): Rule {
-  return (tree) => {
     const angularConfigContent = tree.read('angular.json') || tree.read('.angular.json');
 
     if (!angularConfigContent) {
@@ -106,28 +75,16 @@ function updateProjects(): Rule {
         continue;
       }
 
-      const tsConfigs = [];
       const buildOptionsConfig = architect.build.options;
       if (isJsonObject(buildOptionsConfig) && typeof buildOptionsConfig.tsConfig === 'string') {
-        tsConfigs.push(buildOptionsConfig.tsConfig);
+        updateTsConfig(tree, buildOptionsConfig.tsConfig);
       }
 
       const testConfig = architect.test;
       if (isJsonObject(testConfig)
         && isJsonObject(testConfig.options)
         && typeof testConfig.options.tsConfig === 'string') {
-        tsConfigs.push(testConfig.options.tsConfig);
-      }
-
-      for (const tsConfig of tsConfigs) {
-        const compilerOptions = getCompilerOptionsAstObject(tree, tsConfig);
-        if (!compilerOptions) {
-          continue;
-        }
-        const recorder = tree.beginUpdate(tsConfig);
-        removePropertyInAstObject(recorder, compilerOptions, 'target');
-        removePropertyInAstObject(recorder, compilerOptions, 'module');
-        tree.commitUpdate(recorder);
+        updateTsConfig(tree, testConfig.options.tsConfig);
       }
 
       const browserslistPath = join(normalize(project.root), 'browserslist');
@@ -159,8 +116,8 @@ function updateProjects(): Rule {
   };
 }
 
-function getCompilerOptionsAstObject(host: Tree, tsConfigPath: string): JsonAstObject | undefined {
-  const buffer = host.read(tsConfigPath);
+function updateTsConfig(tree: Tree, tsConfigPath: string): void {
+  const buffer = tree.read(tsConfigPath);
   if (!buffer) {
     return;
   }
@@ -171,10 +128,37 @@ function getCompilerOptionsAstObject(host: Tree, tsConfigPath: string): JsonAstO
     return;
   }
 
+  const configExtends = findPropertyInAstObject(tsCfgAst, 'extends');
+  const isExtendedConfig = configExtends && configExtends.kind === 'string';
+
   const compilerOptions = findPropertyInAstObject(tsCfgAst, 'compilerOptions');
   if (!compilerOptions || compilerOptions.kind !== 'object') {
     return;
   }
 
-  return compilerOptions;
+  const recorder = tree.beginUpdate(tsConfigPath);
+
+  if (isExtendedConfig) {
+    removePropertyInAstObject(recorder, compilerOptions, 'target');
+    removePropertyInAstObject(recorder, compilerOptions, 'module');
+  } else {
+    const scriptTarget = findPropertyInAstObject(compilerOptions, 'target');
+    if (!scriptTarget) {
+      insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'target', 'es2015', 4);
+    } else if (scriptTarget.value !== 'es2015') {
+      const { start, end } = scriptTarget;
+      recorder.remove(start.offset, end.offset - start.offset);
+      recorder.insertLeft(start.offset, '"es2015"');
+    }
+    const scriptModule = findPropertyInAstObject(compilerOptions, 'module');
+    if (!scriptModule) {
+      insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'module', 'esnext', 4);
+    } else if (scriptModule.value !== 'esnext') {
+      const { start, end } = scriptModule;
+      recorder.remove(start.offset, end.offset - start.offset);
+      recorder.insertLeft(start.offset, '"esnext"');
+    }
+  }
+
+  tree.commitUpdate(recorder);
 }

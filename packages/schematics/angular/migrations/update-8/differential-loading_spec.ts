@@ -93,16 +93,21 @@ describe('Migration to version 8', () => {
       expect(tree2.exists('/browserslist')).toBe(true);
     });
 
-    it(`should remove 'target' and 'module' from non workspace tsconfig.json`, () => {
+    it(`should remove 'target' and 'module' from non workspace extended tsconfig.json`, () => {
       const appTsConfig = '/tsconfig.app.json';
       const specsTsConfig = '/tsconfig.spec.json';
-      const compilerOptions = {
-        ...oldTsConfig.compilerOptions,
-        target: 'es2015',
-        module: 'es2015',
-      };
+      const tsConfig = JSON.stringify({
+        extends: '../../tsconfig.json',
+        compilerOptions: {
+          moduleResolution: 'node',
+          target: 'es2015',
+          module: 'es2015',
+        },
+      }, null, 2);
 
-      tree.overwrite(appTsConfig, JSON.stringify({ compilerOptions }, null, 2));
+      tree.overwrite(appTsConfig, tsConfig);
+      tree.overwrite(specsTsConfig, tsConfig);
+
       const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
       const { compilerOptions: appCompilerOptions } = JSON.parse(tree2.readContent(appTsConfig));
       expect(appCompilerOptions.target).toBeUndefined();
@@ -112,6 +117,40 @@ describe('Migration to version 8', () => {
         = JSON.parse(tree2.readContent(specsTsConfig));
       expect(specsCompilerOptions.target).toBeUndefined();
       expect(specsCompilerOptions.module).toBeUndefined();
+    });
+
+    it(`should update 'target' and 'module' to non workspace non-extended tsconfig.json`, () => {
+      const appTsConfig = '/tsconfig.app.json';
+      const tsConfig = JSON.stringify({
+        compilerOptions: {
+          moduleResolution: 'node',
+          target: 'es5',
+          module: 'es5',
+        },
+      }, null, 2);
+
+      tree.overwrite(appTsConfig, tsConfig);
+
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
+      const { compilerOptions: appCompilerOptions } = JSON.parse(tree2.readContent(appTsConfig));
+      expect(appCompilerOptions.target).toBe('es2015');
+      expect(appCompilerOptions.module).toBe('esnext');
+    });
+
+    it(`should add 'target' and 'module' to non workspace non-extended tsconfig.json`, () => {
+      const appTsConfig = '/tsconfig.app.json';
+      const tsConfig = JSON.stringify({
+        compilerOptions: {
+          moduleResolution: 'node',
+        },
+      }, null, 2);
+
+      tree.overwrite(appTsConfig, tsConfig);
+
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
+      const { compilerOptions: appCompilerOptions } = JSON.parse(tree2.readContent(appTsConfig));
+      expect(appCompilerOptions.target).toBe('es2015');
+      expect(appCompilerOptions.module).toBe('esnext');
     });
 
     it(`should not update projects which browser builder is not 'build-angular:browser'`, () => {
