@@ -60,6 +60,7 @@ import {
   replaceServerBootstrap,
 } from './transformers';
 import { collectDeepNodes } from './transformers/ast_helpers';
+import { downlevelConstructorParameters } from './transformers/ctor-parameters';
 import {
   AUTO_START_ARG,
 } from './type_checker';
@@ -922,6 +923,9 @@ export class AngularCompilerPlugin {
       // Replace resources in JIT.
       this._transformers.push(
         replaceResources(isAppPath, getTypeChecker, this._options.directTemplateLoading));
+      // Downlevel constructor parameters for DI support
+      // This is required to support forwardRef in ES2015 due to TDZ issues
+      this._transformers.push(downlevelConstructorParameters(getTypeChecker));
     } else {
       // Remove unneeded angular decorators.
       this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
