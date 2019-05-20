@@ -7,6 +7,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- *** Remove Template Code Below *** -->
   <link
       href="https://fonts.googleapis.com/css?family=Roboto"
       rel="stylesheet"
@@ -143,10 +145,14 @@
       position: relative;
     }
 
+    .card.card.highlight-card span {
+      margin-left: 60px;
+    }
+
     .card.highlight-card svg#rocket {
       width: 80px;
       position: absolute;
-      left: -60px;
+      left: -10px;
       top: -24px;
     }
 
@@ -154,7 +160,7 @@
       height: 100vh;
       position: absolute;
       top: 10px;
-      right: 230px;
+      right: 180px;
       z-index: -10;
     }
 
@@ -291,12 +297,8 @@
         margin-left: 72px;
       }
 
-      svg#rocket {
-        left: 10px;
-      }
-
-      svg#rocket-smoke {
-        right: 250px;
+      .card.highlight-card svg#rocket-smoke {
+        right: 120px;
         transform: rotate(-5deg);
       }
 
@@ -312,6 +314,8 @@
       }
     }
   </style>
+  <!-- *** Template Code Ends *** -->
+
 </head>
 <body>
   <<%= prefix %>-root></<%= prefix %>-root>
