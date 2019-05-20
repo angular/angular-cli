@@ -2574,10 +2574,10 @@ copy-webpack-plugin@5.0.3:
     serialize-javascript "^1.7.0"
     webpack-log "^2.0.0"
 
-core-js@3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.0.1.tgz#1343182634298f7f38622f95e73f54e48ddf4738"
-  integrity sha512-sco40rF+2KlE0ROMvydjkrVMMG1vYilP2ALoRXcYR4obqbYIuV3Bg+51GEDW+HF8n7NRA+iaA4qD0nD9lo9mew==
+core-js@3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.1.1.tgz#502ba6e7c15300de20a372b390f9fc9039db76f2"
+  integrity sha512-OddJJmAMN6czmPEtp1ScHFWq4RXzH1iWJFGL8CZ6UcopeBzCMjo4Slv0UoLW2hhny1/wsDowm6xCmBCWQ1azkA==
 
 core-js@^2.2.0, core-js@^2.4.0:
   version "2.5.7"
