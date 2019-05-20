@@ -15,7 +15,6 @@ import {
 } from '@angular-devkit/core';
 import {
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   apply,
@@ -26,7 +25,6 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
-import { Observable } from 'rxjs';
 import { Readable, Writable } from 'stream';
 import { Schema as PwaOptions } from './schema';
 
@@ -85,7 +83,7 @@ function updateIndexFile(path: string): Rule {
       rewriter.emitEndTag(endTag);
     });
 
-    return new Observable<Tree>(obs => {
+    return new Promise<void>(resolve => {
       const input = new Readable({
         encoding: 'utf8',
         read(): void {
@@ -104,8 +102,7 @@ function updateIndexFile(path: string): Rule {
           const full = Buffer.concat(chunks);
           host.overwrite(path, full.toString());
           callback();
-          obs.next(host);
-          obs.complete();
+          resolve();
         },
       });
 
@@ -115,7 +112,7 @@ function updateIndexFile(path: string): Rule {
 }
 
 export default function (options: PwaOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
+  return (host: Tree) => {
     if (!options.title) {
       options.title = options.project;
     }
@@ -210,6 +207,6 @@ export default function (options: PwaOptions): Rule {
       mergeWith(rootTemplateSource),
       mergeWith(assetsTemplateSource),
       ...[...indexFiles].map(path => updateIndexFile(path)),
-    ])(host, context);
+    ]);
   };
 }
