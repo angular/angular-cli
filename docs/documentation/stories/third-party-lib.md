@@ -1,4 +1,4 @@
-**Documentation below is deprecated and we no longer accept PRs to improve this. The new documentation is available [here](https://next.angular.io/guide/build)**.
+**Documentation below is deprecated and we no longer accept PRs to improve this. The new documentation is available [here](https://angular.io/guide/build)**.
 
 # 3rd Party Library Installation
 
