@@ -19,6 +19,7 @@ import { getWebpackStatsConfig } from '../models/webpack-configs/stats';
 import { createConsoleLogger } from '@angular-devkit/core/node';
 import { logging } from '@angular-devkit/core';
 import { WebpackTestOptions } from '../models/build-options';
+import { normalizeSourceMaps } from '../../utils/index';
 
 /**
  * Enumerate needed (but not require/imported) dependencies from this file
@@ -78,7 +79,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   }
 
   // Add a reporter that fixes sourcemap urls.
-  if (options.sourceMap.scripts) {
+  if (normalizeSourceMaps(options.sourceMap).scripts) {
     config.reporters.unshift('@angular-devkit/build-angular--sourcemap-reporter');
 
     // Code taken from https://github.com/tschaub/karma-source-map-support.
