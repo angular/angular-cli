@@ -63,8 +63,10 @@ function addSnippet(options: WebWorkerOptions): Rule {
     }
 
     const siblingModules = host.getDir(options.path).subfiles
-      // Find all files that start with the same name, are ts files, and aren't spec files.
-      .filter(f => f.startsWith(options.name) && f.endsWith('.ts') && !f.endsWith('spec.ts'))
+      // Find all files that start with the same name, are ts files,
+      // and aren't spec or module files.
+      .filter(f => f.startsWith(options.name) && f.endsWith('.ts')
+      && !f.endsWith('spec.ts') && !f.endsWith('-.module.ts'))
       // Sort alphabetically for consistency.
       .sort();
 
