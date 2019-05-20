@@ -66,7 +66,7 @@ loadChildren: () => import('IMPORT_STRING').then(M => M.EXPORT_NAME)
 
 Please note that only IMPORT_STRING, M, and EXPORT_NAME can be replaced in this format.
 
-Visit https://next.angular.io/guide/ivy for more information on using Ivy.
+Visit https://v8.angular.io/guide/ivy for more information on using Ivy.
 `;
 
       const emitWarning = () => warningCb(warning);
