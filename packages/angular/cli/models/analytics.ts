@@ -449,7 +449,7 @@ export function hasGlobalAnalyticsConfiguration(): boolean {
       && globalWorkspace.getCli()
       && globalWorkspace.getCli()['analytics'];
 
-    if (analyticsConfig !== undefined) {
+    if (analyticsConfig !== null && analyticsConfig !== undefined) {
       return true;
     }
   } catch {}
