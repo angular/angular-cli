@@ -223,7 +223,7 @@ export function buildWebpackBrowser(
 
             return writeIndexHtml({
               host,
-              outputPath: join(root, options.outputPath),
+              outputPath: resolve(root, normalize(options.outputPath)),
               indexPath: join(root, options.index),
               ES5BuildFiles,
               ES2015BuildFiles,
