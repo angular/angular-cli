@@ -1,5 +1,14 @@
 <!-- *** Remove Template Code Below *** -->
 
+<link
+    href="https://fonts.googleapis.com/css?family=Roboto"
+    rel="stylesheet"
+  />
+  <link
+    href="https://fonts.googleapis.com/css?family=Roboto+Mono"
+    rel="stylesheet"
+  />
+
 <style>
     :host {
       font-family: "Roboto", Arial, sans-serif;

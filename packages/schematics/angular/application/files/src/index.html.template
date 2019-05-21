@@ -9,15 +9,6 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
   <!-- *** Remove Template Code Below *** -->
-  <link
-      href="https://fonts.googleapis.com/css?family=Roboto"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css?family=Roboto+Mono"
-      rel="stylesheet"
-    />
-
   <style>
     body,
     body * {
