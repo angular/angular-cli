@@ -7,8 +7,8 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { join, virtualFs } from '@angular-devkit/core';
-import { createArchitect, host } from '../utils';
+import { getSystemPath, join, virtualFs } from '@angular-devkit/core';
+import { browserBuild, createArchitect, host } from '../utils';
 
 
 describe('Browser Builder output path', () => {
@@ -47,5 +47,14 @@ describe('Browser Builder output path', () => {
       expect('THE ABOVE LINE SHOULD THROW').toBe('');
     } catch {}
     await run.stop();
+  });
+
+  it('works with absolute outputPath', async () => {
+    const overrides = {
+      outputPath: getSystemPath(join(host.root(), 'dist')),
+    };
+    const { files } = await browserBuild(architect, host, target, overrides);
+    expect('main.js' in files).toBe(true);
+    expect('index.html' in files).toBe(true);
   });
 });
