@@ -7,7 +7,7 @@
       "properties": {
         "project": {
           "type": "string",
-          "description": "The name of the project to build. Can be an app or a library.",
+          "description": "The name of the project to build. Can be an application or a library.",
           "$default": {
             "$source": "argv",
             "index": 0
