@@ -14,6 +14,7 @@ import * as os from 'os';
 import * as ua from 'universal-analytics';
 import { v4 as uuidV4 } from 'uuid';
 import { getWorkspace, getWorkspaceRaw } from '../utilities/config';
+import { isTTY } from '../utilities/tty';
 
 const analyticsDebug = debug('ng:analytics');  // Generate analytics, including settings and users.
 const analyticsLogDebug = debug('ng:analytics:log');  // Actual logs of events.
@@ -359,7 +360,7 @@ export function setAnalyticsConfig(level: 'global' | 'local', value: string | bo
  */
 export async function promptGlobalAnalytics(force = false) {
   analyticsDebug('prompting global analytics.');
-  if (force || (process.stdout.isTTY && process.stdin.isTTY)) {
+  if (force || isTTY()) {
     const answers = await inquirer.prompt<{ analytics: boolean }>([
       {
         type: 'confirm',
@@ -407,7 +408,7 @@ export async function promptProjectAnalytics(force = false): Promise<boolean> {
     throw new Error(`Could not find a local workspace. Are you in a project?`);
   }
 
-  if (force || (process.stdout.isTTY && process.stdin.isTTY)) {
+  if (force || isTTY()) {
     const answers = await inquirer.prompt<{ analytics: boolean }>([
       {
         type: 'confirm',

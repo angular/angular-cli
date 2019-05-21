@@ -37,6 +37,7 @@ import {
 } from '../utilities/config';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
 import { getPackageManager } from '../utilities/package-manager';
+import { isTTY } from '../utilities/tty';
 import { isPackageNameSafeForAnalytics } from './analytics';
 import { BaseCommandOptions, Command } from './command';
 import { Arguments, CommandContext, CommandDescription, Option } from './interface';
@@ -299,7 +300,7 @@ export abstract class SchematicCommand<
       return undefined;
     });
 
-    if (options.interactive !== false && process.stdout.isTTY) {
+    if (options.interactive !== false && isTTY()) {
       workflow.registry.usePromptProvider((definitions: Array<schema.PromptDefinition>) => {
         const questions: inquirer.Questions = definitions.map(definition => {
           const question: inquirer.Question = {
