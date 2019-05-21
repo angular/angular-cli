@@ -11,7 +11,7 @@ import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as WebWorkerOptions } from './schema';
 
 
-describe('Service Worker Schematic', () => {
+describe('Web Worker Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
     require.resolve('../collection.json'),
@@ -35,7 +35,7 @@ describe('Service Worker Schematic', () => {
     name: 'bar',
     inlineStyle: false,
     inlineTemplate: false,
-    routing: false,
+    routing: true,
     skipTests: false,
     skipPackageJson: false,
   };
