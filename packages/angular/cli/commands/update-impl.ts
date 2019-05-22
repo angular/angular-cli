@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { execSync } from 'child_process';
 import * as path from 'path';
 import * as semver from 'semver';
 import { Arguments, Option } from '../models/interface';
@@ -78,6 +79,16 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
       this.logger.error('Can only use "from" or "to" options with "migrate-only" option.');
 
       return 1;
+    }
+
+    // If not asking for status then check for a clean git repository.
+    // This allows the user to easily reset any changes from the update.
+    if ((packages.length !== 0 || options.all) && !this.checkCleanGit()) {
+      this.logger.error(
+        'Repository is not clean.  Please commit or stash any changes before updating.',
+      );
+
+      return 2;
     }
 
     const packageManager = getPackageManager(this.workspace.root);
@@ -265,5 +276,15 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
         packages: requests.map(p => p.toString()),
       },
     });
+  }
+
+  checkCleanGit() {
+    try {
+      const result = execSync('git status --porcelain', { encoding: 'utf8', stdio: 'pipe' });
+
+      return result.trim().length === 0;
+    } catch {
+      return true;
+    }
   }
 }
