@@ -169,6 +169,22 @@ describe('ast utils', () => {
     expect(output).toMatch(/imports: \[HelloWorld],\r?\n/m);
   });
 
+  it(`should handle NgModule with newline after '@'`, () => {
+    const moduleContent = `
+      import { BrowserModule } from '@angular/platform-browser';
+      import { NgModule } from '@angular/core';
+
+      @
+      NgModule({imports: [BrowserModule], declarations: []})
+      export class AppModule { }
+    `;
+    const source = getTsSource(modulePath, moduleContent);
+    const changes = addExportToModule(source, modulePath, 'FooComponent', './foo.component');
+    const output = applyChanges(modulePath, moduleContent, changes);
+    expect(output).toMatch(/import { FooComponent } from '.\/foo.component';/);
+    expect(output).toMatch(/exports: \[FooComponent\]/);
+  });
+
   it('should handle NgModule with no newlines', () => {
     const moduleContent = `
       import { BrowserModule } from '@angular/platform-browser';
