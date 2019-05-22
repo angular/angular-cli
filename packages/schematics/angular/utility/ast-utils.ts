@@ -290,8 +290,7 @@ export function getDecoratorMetadata(source: ts.SourceFile, identifier: string,
       if (expr.expression.kind == ts.SyntaxKind.Identifier) {
         const id = expr.expression as ts.Identifier;
 
-        return id.getFullText(source) == identifier
-          && angularImports[id.getFullText(source)] === module;
+        return id.text == identifier && angularImports[id.text] === module;
       } else if (expr.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
         // This covers foo.NgModule when importing * as foo.
         const paExpr = expr.expression as ts.PropertyAccessExpression;
@@ -301,7 +300,7 @@ export function getDecoratorMetadata(source: ts.SourceFile, identifier: string,
         }
 
         const id = paExpr.name.text;
-        const moduleId = (paExpr.expression as ts.Identifier).getText(source);
+        const moduleId = (paExpr.expression as ts.Identifier).text;
 
         return id === identifier && (angularImports[moduleId + '.'] === module);
       }
