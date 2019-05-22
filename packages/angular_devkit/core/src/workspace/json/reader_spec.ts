@@ -183,6 +183,188 @@ describe('JSON WorkspaceDefinition Tracks Workspace Changes', () => {
     }
   });
 
+  it('tracks complex extension additions with Object.assign target', async () => {
+    const host = createTestHost(basicFile);
+
+    const workspace = await readJsonWorkspace('', host);
+
+    const value = { a: 1, b: 2, c: { d: 'abc' } };
+    workspace.extensions['x-baz'] = value;
+    expect(workspace.extensions['x-baz']).toEqual({ a: 1, b: 2, c: { d: 'abc' } });
+
+    Object.assign(value, { x: 9, y: 8, z: 7 });
+    expect(workspace.extensions['x-baz'])
+      .toEqual({ a: 1, b: 2, c: { d: 'abc' }, x: 9, y: 8, z: 7 });
+
+    const metadata = getMetadata(workspace);
+
+    expect(metadata.hasChanges).toBeTruthy();
+    expect(metadata.changeCount).toBe(1);
+
+    const change = metadata.findChangesForPath('/x-baz')[0];
+    expect(change).not.toBeUndefined();
+    if (change) {
+      expect(change.op).toBe('add');
+      expect(change.value).toEqual({ a: 1, b: 2, c: { d: 'abc' }, x: 9, y: 8, z: 7 });
+    }
+  });
+
+  it('tracks complex extension additions with Object.assign return', async () => {
+    const host = createTestHost(basicFile);
+
+    const workspace = await readJsonWorkspace('', host);
+
+    const value = { a: 1, b: 2, c: { d: 'abc' } };
+    workspace.extensions['x-baz'] = value;
+    expect(workspace.extensions['x-baz']).toEqual({ a: 1, b: 2, c: { d: 'abc' } });
+
+    workspace.extensions['x-baz'] = Object.assign(value, { x: 9, y: 8, z: 7 });
+    expect(workspace.extensions['x-baz'])
+      .toEqual({ a: 1, b: 2, c: { d: 'abc' }, x: 9, y: 8, z: 7 });
+
+    const metadata = getMetadata(workspace);
+
+    expect(metadata.hasChanges).toBeTruthy();
+    expect(metadata.changeCount).toBe(1);
+
+    const change = metadata.findChangesForPath('/x-baz')[0];
+    expect(change).not.toBeUndefined();
+    if (change) {
+      expect(change.op).toBe('add');
+      expect(change.value).toEqual({ a: 1, b: 2, c: { d: 'abc' }, x: 9, y: 8, z: 7 });
+    }
+  });
+
+  it('tracks complex extension additions with spread operator', async () => {
+    const host = createTestHost(basicFile);
+
+    const workspace = await readJsonWorkspace('', host);
+
+    const value = { a: 1, b: 2, c: { d: 'abc' } };
+    workspace.extensions['x-baz'] = value;
+    expect(workspace.extensions['x-baz']).toEqual({ a: 1, b: 2, c: { d: 'abc' } });
+
+    workspace.extensions['x-baz'] = { ...value, ...{ x: 9, y: 8 }, z: 7 };
+    expect(workspace.extensions['x-baz'])
+      .toEqual({ a: 1, b: 2, c: { d: 'abc' }, x: 9, y: 8, z: 7 });
+
+    const metadata = getMetadata(workspace);
+
+    expect(metadata.hasChanges).toBeTruthy();
+    expect(metadata.changeCount).toBe(1);
+
+    const change = metadata.findChangesForPath('/x-baz')[0];
+    expect(change).not.toBeUndefined();
+    if (change) {
+      expect(change.op).toBe('add');
+      expect(change.value).toEqual({ a: 1, b: 2, c: { d: 'abc' }, x: 9, y: 8, z: 7 });
+    }
+  });
+
+  it('tracks modifying an existing extension object with spread operator', async () => {
+    const host = createTestHost(basicFile);
+
+    const workspace = await readJsonWorkspace('', host);
+
+    workspace.extensions['x-foo'] = {
+      ...workspace.extensions['x-foo'] as JsonObject,
+      ...{ x: 9, y: 8 }, z: 7 };
+    expect(workspace.extensions['x-foo'])
+      .toEqual({ is: ['good', 'great', 'awesome'], x: 9, y: 8, z: 7 });
+
+    const metadata = getMetadata(workspace);
+
+    expect(metadata.hasChanges).toBeTruthy();
+    expect(metadata.changeCount).toBe(1);
+
+    const change = metadata.findChangesForPath('/x-foo')[0];
+    expect(change).not.toBeUndefined();
+    if (change) {
+      expect(change.op).toBe('replace');
+      expect(change.value).toEqual({ is: ['good', 'great', 'awesome'], x: 9, y: 8, z: 7 });
+    }
+  });
+
+  it('tracks modifying an existing extension object with Object.assign target', async () => {
+    const host = createTestHost(basicFile);
+
+    const workspace = await readJsonWorkspace('', host);
+
+    Object.assign(
+      workspace.extensions['x-foo'],
+      { x: 9, y: 8 },
+      { z: 7 },
+    );
+    expect(workspace.extensions['x-foo'])
+      .toEqual({ is: ['good', 'great', 'awesome'], x: 9, y: 8, z: 7 });
+
+    const metadata = getMetadata(workspace);
+
+    expect(metadata.hasChanges).toBeTruthy();
+    expect(metadata.changeCount).toBe(3);
+
+    let change = metadata.findChangesForPath('/x-foo/x')[0];
+    expect(change).not.toBeUndefined();
+    if (change) {
+      expect(change.op).toBe('add');
+      expect(change.value).toEqual(9);
+    }
+
+    change = metadata.findChangesForPath('/x-foo/y')[0];
+    expect(change).not.toBeUndefined();
+    if (change) {
+      expect(change.op).toBe('add');
+      expect(change.value).toEqual(8);
+    }
+
+    change = metadata.findChangesForPath('/x-foo/z')[0];
+    expect(change).not.toBeUndefined();
+    if (change) {
+      expect(change.op).toBe('add');
+      expect(change.value).toEqual(7);
+    }
+  });
+
+  it('tracks modifying an existing extension object with Object.assign return', async () => {
+    const host = createTestHost(basicFile);
+
+    const workspace = await readJsonWorkspace('', host);
+
+    workspace.extensions['x-foo'] = Object.assign(
+      workspace.extensions['x-foo'],
+      { x: 9, y: 8 },
+      { z: 7 },
+    );
+    expect(workspace.extensions['x-foo'])
+      .toEqual({ is: ['good', 'great', 'awesome'], x: 9, y: 8, z: 7 });
+
+    const metadata = getMetadata(workspace);
+
+    expect(metadata.hasChanges).toBeTruthy();
+    expect(metadata.changeCount).toBe(3);
+
+    let change = metadata.findChangesForPath('/x-foo/x')[0];
+    expect(change).not.toBeUndefined();
+    if (change) {
+      expect(change.op).toBe('add');
+      expect(change.value).toEqual(9);
+    }
+
+    change = metadata.findChangesForPath('/x-foo/y')[0];
+    expect(change).not.toBeUndefined();
+    if (change) {
+      expect(change.op).toBe('add');
+      expect(change.value).toEqual(8);
+    }
+
+    change = metadata.findChangesForPath('/x-foo/z')[0];
+    expect(change).not.toBeUndefined();
+    if (change) {
+      expect(change.op).toBe('add');
+      expect(change.value).toEqual(7);
+    }
+  });
+
   it('tracks add and remove of an existing extension object', async () => {
     const host = createTestHost(basicFile);
 

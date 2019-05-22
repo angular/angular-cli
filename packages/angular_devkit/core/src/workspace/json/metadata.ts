@@ -60,6 +60,9 @@ export class JsonWorkspaceMetadata {
       for (let i = this.changes.length - 1; i >= 0; --i) {
         const currentPath = this.changes[i].path;
         if (currentPath === path || currentPath.startsWith(path + '/')) {
+          if (op === 'replace' && currentPath === path && this.changes[i].op === 'add') {
+            op = 'add';
+          }
           this.changes.splice(i, 1);
         }
       }
