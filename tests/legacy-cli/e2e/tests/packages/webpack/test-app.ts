@@ -6,9 +6,9 @@ import {expectFileSizeToBeUnder, replaceInFile, expectFileToMatch} from '../../.
 
 export default function(skipCleaning: () => void) {
   return Promise.resolve()
-    .then(() => createProjectFromAsset('webpack/test-app-ng5'))
+    .then(() => createProjectFromAsset('webpack/test-app'))
     .then(() => exec(normalize('node_modules/.bin/webpack-cli')))
-    .then(() => expectFileSizeToBeUnder('dist/app.main.js', 375 * 1024))
+    .then(() => expectFileSizeToBeUnder('dist/app.main.js', 470 * 1024))
     .then(() => expectFileSizeToBeUnder('dist/0.app.main.js', 25 * 1024))
     .then(() => expectFileSizeToBeUnder('dist/1.app.main.js', 2 * 1024))
     // test resource urls without ./
