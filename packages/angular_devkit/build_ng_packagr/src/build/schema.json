@@ -10,11 +10,11 @@
     },
     "tsConfig": {
       "type": "string",
-      "description": "The file path of the TypeScript configuration file."
+      "description": "The full path for the TypeScript configuration file, relative to the current workspace. Applies to both libraries and applications."
     },
     "watch": {
       "type": "boolean",
-      "description": "Run build when files change.",
+      "description": "Run build when files change. Applies to both libraries and applications.",
       "default": false
     }
   },
