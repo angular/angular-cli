@@ -10,7 +10,7 @@ export default function (skipCleaning: () => void) {
   return;
 
   return Promise.resolve()
-    .then(() => createProjectFromAsset('webpack/test-server-app-ng5'))
+    .then(() => createProjectFromAsset('webpack/test-server-app'))
     .then(() => exec(normalize('node_modules/.bin/webpack-cli')))
     .then(() => expectFileToMatch('dist/app.main.js',
       new RegExp('MyInjectable.ctorParameters = .*'

@@ -202,6 +202,6 @@ export async function expectFileSizeToBeUnder(fileName: string, sizeInBytes: num
   const fileSize = await getFileSize(fileName);
 
   if (fileSize > sizeInBytes) {
-    throw new Error(`File "${fileName}" exceeded file size of "${sizeInBytes}".`);
+    throw new Error(`File "${fileName}" exceeded file size of "${sizeInBytes}". Size is ${fileSize}.`);
   }
 }

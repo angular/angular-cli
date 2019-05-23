@@ -1,6 +1,5 @@
 import {NgModule, Component} from '@angular/core';
 import {RouterModule} from '@angular/router';
-import {HttpModule, Http} from '@angular/http';
 
 @Component({
   selector: 'lazy-comp',
@@ -15,12 +14,9 @@ export class LazyComponent {}
      {path: 'feature', loadChildren: './feature/feature.module#FeatureModule'},
      {path: 'lazy-feature', loadChildren: './feature/lazy-feature.module#LazyFeatureModule'}
     ]),
-    HttpModule
   ],
   declarations: [LazyComponent]
 })
-export class LazyModule {
-  constructor(http: Http) {}
-}
+export class LazyModule {}
 
 export class SecondModule {}

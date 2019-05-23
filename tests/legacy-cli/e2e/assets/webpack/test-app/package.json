@@ -1,0 +1,27 @@
+{
+  "name": "test",
+  "license": "MIT",
+  "dependencies": {
+    "@angular/common": "^8.0.0-rc.0",
+    "@angular/compiler": "^8.0.0-rc.0",
+    "@angular/compiler-cli": "^8.0.0-rc.0",
+    "@angular/core": "^8.0.0-rc.0",
+    "@angular/platform-browser": "^8.0.0-rc.0",
+    "@angular/platform-browser-dynamic": "^8.0.0-rc.0",
+    "@angular/platform-server": "^8.0.0-rc.0",
+    "@angular/router": "^8.0.0-rc.0",
+    "@ngtools/webpack": "0.0.0",
+    "core-js": "^3.0.0",
+    "rxjs": "^6.4.0",
+    "zone.js": "^0.9.1"
+  },
+  "devDependencies": {
+    "node-sass": "^4.7.0",
+    "performance-now": "^0.2.0",
+    "raw-loader": "^0.5.1",
+    "sass-loader": "^6.0.0",
+    "typescript": "~3.4.5",
+    "webpack": "~4.0.1",
+    "webpack-cli": "~2.0.9"
+  }
+}
