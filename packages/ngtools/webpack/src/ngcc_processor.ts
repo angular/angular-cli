@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Logger } from '@angular/compiler-cli/ngcc';
+import { Logger, process as mainNgcc } from '@angular/compiler-cli/ngcc';
 import { existsSync } from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
@@ -29,7 +29,6 @@ export class NgccProcessor {
   private _nodeModulesDirectory: string;
 
   constructor(
-    private readonly ngcc: typeof import('@angular/compiler-cli/ngcc'),
     private readonly propertiesToConsider: string[],
     private readonly inputFileSystem: InputFileSystem,
     private readonly compilationWarnings: (Error | string)[],
@@ -63,7 +62,7 @@ export class NgccProcessor {
 
     const timeLabel = `NgccProcessor.processModule.ngcc.process+${moduleName}`;
     time(timeLabel);
-    this.ngcc.process({
+    mainNgcc({
       basePath: this._nodeModulesDirectory,
       targetEntryPointPath: path.dirname(packageJsonPath),
       propertiesToConsider: this.propertiesToConsider,
