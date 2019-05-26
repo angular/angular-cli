@@ -124,4 +124,15 @@ describe('Universal Schematic', () => {
     const contents = tree.readContent(filePath);
     expect(contents).toContain('ModuleMapLoaderModule');
   });
+
+  it('should add exports to main server file', async () => {
+    const tree = await schematicRunner
+      .runSchematicAsync('ng-add', defaultOptions, appTree)
+      .toPromise();
+    const filePath = '/projects/bar/src/main.server.ts';
+    const contents = tree.readContent(filePath);
+    console.log({contents});
+    expect(contents).toContain('ngExpressEngine');
+    expect(contents).toContain('provideModuleMap');
+  });
 });

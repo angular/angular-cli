@@ -21,22 +21,24 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import {NodePackageInstallTask} from '@angular-devkit/schematics/tasks';
-import {getWorkspace, getWorkspacePath} from '@schematics/angular/utility/config';
+import {getWorkspace} from '@schematics/angular/utility/config';
 import {Schema as UniversalOptions} from './schema';
 import {
   addPackageJsonDependency,
   NodeDependencyType,
 } from '@schematics/angular/utility/dependencies';
-import {BrowserBuilderOptions} from '@schematics/angular/utility/workspace-models';
 import {getProject} from '@schematics/angular/utility/project';
-import {
-  getProjectTargets,
-  targetBuildNotFoundError,
-} from '@schematics/angular/utility/project-targets';
+import {getProjectTargets} from '@schematics/angular/utility/project-targets';
 import {InsertChange} from '@schematics/angular/utility/change';
-import {addSymbolToNgModuleMetadata, insertImport} from '@schematics/angular/utility/ast-utils';
+import {
+  addSymbolToNgModuleMetadata,
+  findNodes,
+  insertAfterLastOccurrence,
+  insertImport
+} from '@schematics/angular/utility/ast-utils';
 import * as ts from 'typescript';
-import {findAppServerModulePath} from './utils';
+import {findAppServerModulePath, generateExport, getTsSourceFile, getTsSourceText} from './utils';
+import {updateWorkspace} from '@schematics/angular/utility/workspace';
 
 // TODO(CaerusKaru): make these configurable
 const BROWSER_DIST = 'dist/browser';
@@ -100,7 +102,8 @@ function addDependenciesAndScripts(options: UniversalOptions): Rule {
     pkg.scripts['serve:ssr'] = `node dist/${serverFileName}`;
     pkg.scripts['build:ssr'] = 'npm run build:client-and-server-bundles && npm run compile:server';
     pkg.scripts['build:client-and-server-bundles'] =
-      `ng build --prod && ng run ${options.clientProject}:server:production`;
+      // tslint:disable:max-line-length
+      `ng build --prod && ng run ${options.clientProject}:server:production --bundleDependencies all`;
 
     host.overwrite(pkgPath, JSON.stringify(pkg, null, 2));
 
@@ -108,46 +111,41 @@ function addDependenciesAndScripts(options: UniversalOptions): Rule {
   };
 }
 
-function updateConfigFile(options: UniversalOptions): Rule {
-  return (host: Tree) => {
-    const workspace = getWorkspace(host);
-    if (!workspace.projects[options.clientProject]) {
-      throw new SchematicsException(`Client app ${options.clientProject} not found.`);
-    }
+function updateConfigFile(options: UniversalOptions) {
+  return updateWorkspace((workspace => {
+    const clientProject = workspace.projects.get(options.clientProject);
+    if (clientProject) {
+      const buildTarget = clientProject.targets.get('build');
+      const serverTarget = clientProject.targets.get('build');
 
-    const clientProject = workspace.projects[options.clientProject];
-    if (!clientProject.architect) {
-      throw new Error('Client project architect not found.');
-    }
-
-    // We have to check if the project config has a server target, because
-    // if the Universal step in this schematic isn't run, it can't be guaranteed
-    // to exist
-    if (!clientProject.architect.server) {
-      return;
-    }
-
-    clientProject.architect.server.configurations = {
-      production: {
-        fileReplacements: [
-          {
-            replace: 'src/environments/environment.ts',
-            with: 'src/environments/environment.prod.ts'
-          }
-        ]
+      // We have to check if the project config has a server target, because
+      // if the Universal step in this schematic isn't run, it can't be guaranteed
+      // to exist
+      if (!serverTarget || !buildTarget) {
+        return;
       }
-    };
-    // TODO(CaerusKaru): make this configurable
-    clientProject.architect.server.options.outputPath = SERVER_DIST;
-    // TODO(CaerusKaru): make this configurable
-    (clientProject.architect.build.options as BrowserBuilderOptions).outputPath = BROWSER_DIST;
 
-    const workspacePath = getWorkspacePath(host);
+      serverTarget.configurations = {
+        production: {
+          fileReplacements: [
+            {
+              replace: 'src/environments/environment.ts',
+              with: 'src/environments/environment.prod.ts'
+            }
+          ]
+        }
+      };
 
-    host.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
+      serverTarget.options = {
+        ...serverTarget.options,
+        outputPath: SERVER_DIST,
+      };
 
-    return host;
-  };
+      buildTarget.options = {
+        outputPath: BROWSER_DIST,
+      };
+    }
+  }));
 }
 
 function addModuleMapLoader(options: UniversalOptions): Rule {
@@ -160,7 +158,6 @@ function addModuleMapLoader(options: UniversalOptions): Rule {
       return;
     }
     const mainPath = normalize('/' + clientTargets.server.options.main);
-
     const appServerModuleRelativePath = findAppServerModulePath(host, mainPath);
     const modulePath = normalize(
       `/${clientProject.root}/src/${appServerModuleRelativePath}.ts`);
@@ -192,15 +189,33 @@ function addModuleMapLoader(options: UniversalOptions): Rule {
   };
 }
 
-function getTsSourceFile(host: Tree, path: string): ts.SourceFile {
-  const buffer = host.read(path);
-  if (!buffer) {
-    throw new SchematicsException(`Could not read file (${path}).`);
-  }
-  const content = buffer.toString();
-  const source = ts.createSourceFile(path, content, ts.ScriptTarget.Latest, true);
+function addExports(options: UniversalOptions): Rule {
+  return (host: Tree) => {
+    const clientProject = getProject(host, options.clientProject);
+    const clientTargets = getProjectTargets(clientProject);
 
-  return source;
+    if (!clientTargets.server) {
+      // If they skipped Universal schematics and don't have a server target,
+      // just get out
+      return;
+    }
+
+    const mainPath = normalize('/' + clientTargets.server.options.main);
+    const mainSourceFile = getTsSourceFile(host, mainPath);
+    let mainText = getTsSourceText(host, mainPath);
+    const mainRecorder = host.beginUpdate(mainPath);
+    const expressEngineExport = generateExport(mainSourceFile, ['ngExpressEngine'],
+      '@nguniversal/express-engine');
+    const moduleMapExport = generateExport(mainSourceFile, ['provideModuleMap'],
+      '@nguniversal/module-map-ngfactory-loader');
+    const exports = findNodes(mainSourceFile, ts.SyntaxKind.ExportDeclaration);
+    const addedExports = `\n${expressEngineExport}\n${moduleMapExport}\n`;
+    const exportChange = insertAfterLastOccurrence(exports, addedExports, mainText,
+      0) as InsertChange;
+
+    mainRecorder.insertLeft(exportChange.pos, exportChange.toAdd);
+    host.commitUpdate(mainRecorder);
+  };
 }
 
 export default function (options: UniversalOptions): Rule {
@@ -234,6 +249,7 @@ export default function (options: UniversalOptions): Rule {
       mergeWith(rootSource),
       addDependenciesAndScripts(options),
       addModuleMapLoader(options),
+      addExports(options),
     ]);
   };
 }

@@ -25,15 +25,14 @@ enableProdMode();
 app.use('/built', express.static('built'));
 
 // Keep the browser logs free of errors.
-app.get('/favicon.ico', (req, res) => { res.send(''); });
+app.get('/favicon.ico', (_, res) => { res.send(''); });
 
 //-----------ADD YOUR SERVER SIDE RENDERED APP HERE ----------------------
-app.get('/helloworld', (req: Request, res) =>
-  ngExpressEngine({bootstrap: HelloWorldServerModuleNgFactory})('built/src/index.html', {
+app.get('/helloworld', (req: Request, res) => ngExpressEngine({bootstrap: HelloWorldServerModuleNgFactory})('built/src/index.html', {
     bootstrap: HelloWorldServerModuleNgFactory,
     req,
     document: helloworld,
-  }, (err, html) => res.send(html))
+  }, (_, html) => res.send(html))
 );
 
 app.listen(9876, function() { console.log('Server listening on port 9876!'); });

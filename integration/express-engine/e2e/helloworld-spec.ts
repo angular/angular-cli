@@ -42,5 +42,8 @@ describe('Hello world E2E Tests', function() {
     // Test the contents from the server.
     const serverDiv = browser.driver.findElement(by.css('span.href-check'));
     expect(serverDiv.getText()).toMatch('http://localhost:9876/helloworld');
+
+    // Make sure there were no client side errors.
+    verifyNoBrowserErrors();
    });
 });

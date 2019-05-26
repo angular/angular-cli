@@ -76,19 +76,19 @@
     "bazel": "bazel"
   },
   "dependencies": {
-    "@angular/animations": "^8.0.0-rc.4",
-    "@angular/common": "^8.0.0-rc.4",
-    "@angular/compiler": "^8.0.0-rc.4",
-    "@angular/compiler-cli": "^8.0.0-rc.4",
-    "@angular/core": "^8.0.0-rc.4",
-    "@angular/platform-browser": "^8.0.0-rc.4",
-    "@angular/platform-browser-dynamic": "^8.0.0-rc.4",
-    "@angular/platform-server": "^8.0.0-rc.4",
+    "@angular/animations": "^8.0.0-rc.5",
+    "@angular/common": "^8.0.0-rc.5",
+    "@angular/compiler": "^8.0.0-rc.5",
+    "@angular/compiler-cli": "^8.0.0-rc.5",
+    "@angular/core": "^8.0.0-rc.5",
+    "@angular/platform-browser": "^8.0.0-rc.5",
+    "@angular/platform-browser-dynamic": "^8.0.0-rc.5",
+    "@angular/platform-server": "^8.0.0-rc.5",
     "rxjs": "^6.4.0",
     "typescript": "^3.4.0"
   },
   "devDependencies": {
-    "@angular/bazel": "8.0.0-rc.4",
+    "@angular/bazel": "8.0.0-rc.5",
     "@bazel/bazel": "0.24.1",
     "@bazel/buildifier": "0.22.0",
     "@bazel/ibazel": "0.10.1",
@@ -114,7 +114,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-typescript": "^3.0.13",
     "minimatch": "^3.0.4",
-    "protractor": "^5.2.0",
+    "protractor": "^6.0.0",
     "replace-in-file": "^3.1.1",
     "rimraf": "^2.6.1",
     "rollup": "^0.56.5",
@@ -135,6 +135,6 @@
     "uglify-js": "^2.8.14",
     "xhr2": "^0.1.4",
     "yarn": "^1.10.1",
-    "zone.js": "^0.9.0"
+    "zone.js": "^0.9.1"
   }
 }

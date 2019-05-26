@@ -11,7 +11,7 @@ cd "$(dirname "$0")"
 readonly basedir=$(pwd)/..
 
 # Track payload size functions
-if [$CI != true]; then
+if !($CI); then
   # Not on CircleCI so let's build the packages-dist directory.
   # This should be fast on incremental re-build.
   ${basedir}/scripts/build-modules-dist.sh
