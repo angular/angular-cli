@@ -23,6 +23,7 @@
     "webpack-subresource-integrity"
   ],
   "packageFiles": [
+    "WORKSPACE",
     "package.json",
     "packages/**/package.json",
     "tests/legacy-cli/e2e/ng-snapshot/package.json"
