@@ -460,7 +460,11 @@ export abstract class SchematicCommand<
     let input = { ...pathOptions, ...args };
 
     // Read the default values from the workspace.
-    const projectName = input.project !== undefined ? '' + input.project : null;
+    let projectName = input.project !== undefined ? '' + input.project : null;
+    if (!projectName && this._workspace) {
+      projectName = this._workspace.getDefaultProjectName();
+    }
+
     const defaults = getSchematicDefaults(collectionName, schematicName, projectName);
     input = {
       ...defaults,
