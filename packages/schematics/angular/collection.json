@@ -102,7 +102,7 @@
       "description": "Generate a library project for Angular."
     },
     "webWorker": {
-      "aliases": ["web-worker", "worker"],
+      "aliases": ["web-worker"],
       "factory": "./web-worker",
       "schema": "./web-worker/schema.json",
       "description": "Create a Web Worker."
