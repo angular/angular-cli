@@ -49,12 +49,12 @@
     },
     "liveReload": {
       "type": "boolean",
-      "description": "Whether to reload the page on change, using live-reload.",
+      "description": "Whether to reload the page on change, using live-reload with the public host.",
       "default": true
     },
     "publicHost": {
       "type": "string",
-      "description": "Specify the URL that the browser client will use."
+      "description": "Specify the URL that the browser client will use for live reload."
     },
     "servePath": {
       "type": "string",
