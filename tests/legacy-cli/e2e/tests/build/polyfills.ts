@@ -9,7 +9,7 @@ import { ng } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
 
 export default async function () {
-    await ng('build');
+    await ng('build', '--aot=false');
     // files were created successfully
     await expectFileToMatch('dist/test-project/polyfills-es5.js', 'core-js/proposals/reflect-metadata');
     await expectFileToMatch('dist/test-project/polyfills-es5.js', 'zone.js');
@@ -21,7 +21,7 @@ export default async function () {
     `);
     const jitPolyfillSize = await getFileSize('dist/test-project/polyfills-es5.js');
 
-    await ng('build', '--aot');
+    await ng('build', '--aot=true');
     // files were created successfully
     await expectFileToExist('dist/test-project/polyfills-es5.js');
     await expectFileSizeToBeUnder('dist/test-project/polyfills-es5.js', jitPolyfillSize);

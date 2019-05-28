@@ -213,6 +213,24 @@ describe('Application Schematic', () => {
     ]));
   });
 
+  it('should set AOT option to false for VE projects', async () => {
+    const options = { ...defaultOptions };
+
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
+    const workspace = JSON.parse(tree.readContent('/angular.json'));
+    expect(workspace.projects.foo.architect.build.options.aot).toEqual(false);
+  });
+
+  it('should set AOT option to true for Ivy projects', async () => {
+    const options = { ...defaultOptions, enableIvy: true };
+
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
+    const workspace = JSON.parse(tree.readContent('/angular.json'));
+    expect(workspace.projects.foo.architect.build.options.aot).toEqual(true);
+  });
+
   describe(`update package.json`, () => {
     it(`should add build-angular to devDependencies`, async () => {
       const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
