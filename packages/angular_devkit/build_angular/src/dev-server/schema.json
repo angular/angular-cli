@@ -49,12 +49,12 @@
     },
     "liveReload": {
       "type": "boolean",
-      "description": "Whether to reload the page on change, using live-reload with the public host.",
+      "description": "Whether to reload the page on change, using live-reload.",
       "default": true
     },
     "publicHost": {
       "type": "string",
-      "description": "Specify the URL that the browser client will use for live reload."
+      "description": "The URL that the browser client (or live-reload client, if enabled) should use to connect to the development server. Use for a complex dev server setup, such as one with reverse proxies."
     },
     "servePath": {
       "type": "string",
