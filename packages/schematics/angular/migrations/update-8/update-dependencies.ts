@@ -9,7 +9,7 @@ import { Tree } from '@angular-devkit/schematics';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../../utility/dependencies';
 import { latestVersions } from '../../utility/latest-versions';
 
-export function updateBuilders() {
+export function updateDependencies() {
   return (host: Tree) => {
     let current = getPackageJsonDependency(host, '@angular-devkit/build-angular');
     if (current && current.version !== latestVersions.DevkitBuildAngular) {
@@ -45,6 +45,21 @@ export function updateBuilders() {
           type: current.type,
           name: 'zone.js',
           version: latestVersions.ZoneJs,
+          overwrite: true,
+        },
+      );
+    }
+
+    // FIXME: change to ^2.3.2 as soon as it's released with the pr208 fix
+    const webAnimationsJsVersion = 'github:angular/web-animations-js#release_pr208';
+    current = getPackageJsonDependency(host, 'web-animations-js');
+    if (current && current.version !== webAnimationsJsVersion) {
+      addPackageJsonDependency(
+        host,
+        {
+          type: current.type,
+          name: 'web-animations-js',
+          version: webAnimationsJsVersion,
           overwrite: true,
         },
       );
