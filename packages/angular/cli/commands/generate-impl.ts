@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// tslint:disable:no-global-tslint-disable no-any
 import { terminal } from '@angular-devkit/core';
 import { Arguments, SubCommandDescription } from '../models/interface';
 import { SchematicCommand } from '../models/schematic-command';
@@ -18,10 +17,12 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
   longSchematicName: string|undefined;
 
   async initialize(options: GenerateCommandSchema & Arguments) {
-    await super.initialize(options);
-
     // Fill up the schematics property of the command description.
     const [collectionName, schematicName] = this.parseSchematicInfo(options);
+    this.collectionName = collectionName;
+    this.schematicName = schematicName;
+
+    await super.initialize(options);
 
     const collection = this.getCollection(collectionName);
     const subcommands: { [name: string]: SubCommandDescription } = {};
@@ -60,15 +61,13 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
   }
 
   public async run(options: GenerateCommandSchema & Arguments) {
-    const [collectionName, schematicName] = this.parseSchematicInfo(options);
-
-    if (!schematicName || !collectionName) {
+    if (!this.schematicName || !this.collectionName) {
       return this.printHelp(options);
     }
 
     return this.runSchematic({
-      collectionName,
-      schematicName,
+      collectionName: this.collectionName,
+      schematicName: this.schematicName,
       schematicOptions: options['--'] || [],
       debug: !!options.debug || false,
       dryRun: !!options.dryRun || false,

@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
-  analytics,
   experimental,
   json,
   logging,
@@ -76,7 +75,8 @@ export abstract class SchematicCommand<
   private _workspace: experimental.workspace.Workspace;
   protected _workflow: NodeWorkflow;
 
-  protected collectionName = '@schematics/angular';
+  private readonly defaultCollectionName = '@schematics/angular';
+  protected collectionName = this.defaultCollectionName;
   protected schematicName?: string;
 
   constructor(
@@ -373,7 +373,7 @@ export abstract class SchematicCommand<
       }
     }
 
-    return this.collectionName;
+    return this.defaultCollectionName;
   }
 
   protected async runSchematic(options: RunSchematicOptions) {
@@ -400,7 +400,7 @@ export abstract class SchematicCommand<
     schematicName = schematic.description.name;
 
     // TODO: Remove warning check when 'targets' is default
-    if (collectionName !== this.collectionName) {
+    if (collectionName !== this.defaultCollectionName) {
       const [ast, configPath] = getWorkspaceRaw('local');
       if (ast) {
         const projectsKeyValue = ast.properties.find(p => p.key.value === 'projects');

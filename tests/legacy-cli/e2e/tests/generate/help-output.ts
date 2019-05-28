@@ -22,7 +22,7 @@ export default function() {
             "factory": "./fake",
             "description": "Fake schematic",
             "schema": "./fake-schema.json"
-          }
+          },
         }
       }`,
       [join(genRoot, 'fake-schema.json')]: `
@@ -93,6 +93,33 @@ export default function() {
       }
       if (!/opt-a[\s\S]*opt-b[\s\S]*opt-c/.test(stdout)) {
         throw new Error('Help signature options are incorrect.');
+      }
+    })
+
+    // should print all the available schematics in a collection
+    // when a collection has more than 1 schematic
+    .then(() => writeMultipleFiles({
+      [join(genRoot, 'collection.json')]: `
+      {
+        "schematics": {
+          "fake": {
+            "factory": "./fake",
+            "description": "Fake schematic",
+            "schema": "./fake-schema.json"
+          },
+          "fake-two": {
+            "factory": "./fake",
+            "description": "Fake schematic",
+            "schema": "./fake-schema.json"
+          },
+        }
+      }`,
+    }))
+    .then(() => ng('generate', '--help'))
+    .then(({stdout}) => {
+      if (!/Collection \"fake-schematics\" \(default\):[\s\S]*fake[\s\S]*fake-two/.test(stdout)) {
+        throw new Error(
+          `Help result is wrong, it didn't contain all the schematics.`);
       }
     });
 
