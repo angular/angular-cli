@@ -51,6 +51,20 @@ export default function(options: PostUpdateSchema): Rule {
   return (tree: Tree, context: SchematicContext) => {
     const schematicsToRun: { name: string; version: string; }[] = [];
 
+    const from = _coerceVersionNumber(options.from);
+    if (!from) {
+      throw new SchematicsException(
+        `Invalid from option: ${JSON.stringify(options.from)}`,
+      );
+    }
+
+    const to = semver.validRange('<=' + options.to);
+    if (!to) {
+      throw new SchematicsException(
+        `Invalid to option: ${JSON.stringify(options.to)}`,
+      );
+    }
+
     // Create the collection for the package.
     const collection = context.engine.createCollection(options.collection);
     for (const name of collection.listSchematicNames()) {
@@ -68,7 +82,8 @@ export default function(options: PostUpdateSchema): Rule {
           );
         }
 
-        if (semver.gt(version, options.from) && semver.lte(version, options.to)) {
+        if (semver.gt(version, from) &&
+            semver.satisfies(version, to, { includePrerelease: true })) {
           schematicsToRun.push({ name, version });
         }
       }

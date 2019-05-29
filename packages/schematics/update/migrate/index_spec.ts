@@ -57,6 +57,75 @@ describe('@schematics/update:migrate', () => {
       }),
     ).toPromise().then(done, done.fail);
   });
+
+  it('supports partial version ranges with only major', done => {
+    // Since we cannot run tasks in unit tests, we need to validate that the default
+    // update schematic updates the package.json appropriately, AND validate that the
+    // migrate schematic actually do work appropriately, in a separate test.
+    schematicRunner.runSchematicAsync('migrate', {
+      package: 'test',
+      collection: require.resolve('./test/migration.json'),
+      from: '1',
+      to: '2',
+    }, appTree).pipe(
+      map(tree => {
+        const resultJson = JSON.parse(tree.readContent('/migrations'));
+
+        expect(resultJson).toEqual([
+          'migration-03', // "1.0.5"
+          'migration-05', // "1.1.0-beta.0"
+          'migration-04', // "1.1.0-beta.1"
+          'migration-02', // "1.1.0"
+          'migration-13', // "1.1.0"
+          'migration-19', // "1.1"
+          'migration-06', // "1.4.0"
+          'migration-17', // "2.0.0-alpha"
+          'migration-16', // "2.0.0-alpha.5"
+          'migration-08', // "2.0.0-beta.0"
+          'migration-07', // "2.0.0-rc.0"
+          'migration-12', // "2.0.0-rc.4"
+          'migration-14', // "2.0.0"
+          'migration-20', // "2"
+          'migration-15', // "2.0.1"
+          'migration-11', // "2.1.0"
+        ]);
+      }),
+    ).toPromise().then(done, done.fail);
+  });
+
+  it('supports partial version ranges with major and minor', done => {
+    // Since we cannot run tasks in unit tests, we need to validate that the default
+    // update schematic updates the package.json appropriately, AND validate that the
+    // migrate schematic actually do work appropriately, in a separate test.
+    schematicRunner.runSchematicAsync('migrate', {
+      package: 'test',
+      collection: require.resolve('./test/migration.json'),
+      from: '1.0',
+      to: '2.0',
+    }, appTree).pipe(
+      map(tree => {
+        const resultJson = JSON.parse(tree.readContent('/migrations'));
+
+        expect(resultJson).toEqual([
+          'migration-03', // "1.0.5"
+          'migration-05', // "1.1.0-beta.0"
+          'migration-04', // "1.1.0-beta.1"
+          'migration-02', // "1.1.0"
+          'migration-13', // "1.1.0"
+          'migration-19', // "1.1"
+          'migration-06', // "1.4.0"
+          'migration-17', // "2.0.0-alpha"
+          'migration-16', // "2.0.0-alpha.5"
+          'migration-08', // "2.0.0-beta.0"
+          'migration-07', // "2.0.0-rc.0"
+          'migration-12', // "2.0.0-rc.4"
+          'migration-14', // "2.0.0"
+          'migration-20', // "2"
+          'migration-15', // "2.0.1"
+        ]);
+      }),
+    ).toPromise().then(done, done.fail);
+  });
 });
 
 
