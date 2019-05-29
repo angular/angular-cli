@@ -15,8 +15,8 @@
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
 var_1: &default_docker_image circleci/node:10.12
 var_2: &browsers_docker_image circleci/node:10.12-browsers
-var_2: &browsers_docker_image_node_12 circleci/node:12.1-browsers
-var_3: &cache_key angular_devkit-0.10.0-{{ checksum "yarn.lock" }}
+var_3: &browsers_docker_image_node_12 circleci/node:12.1-browsers
+var_4: &cache_key angular_devkit-0.10.0-{{ checksum "yarn.lock" }}
 
 # Settings common to each job
 anchor_1: &defaults
