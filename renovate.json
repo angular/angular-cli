@@ -43,7 +43,8 @@
     },
     {
       "packagePatterns": [
-        "^@bazel\/.*"
+        "^@bazel\/.*",
+        "^build_bazel.*"
       ],
       "groupName": "bazel",
       "pinVersions": false
