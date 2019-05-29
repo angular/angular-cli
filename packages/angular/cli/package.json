@@ -38,7 +38,7 @@
     "open": "6.3.0",
     "pacote": "9.5.0",
     "read-package-tree": "5.2.2",
-    "semver": "6.1.0",
+    "semver": "6.1.1",
     "symbol-observable": "1.2.0",
     "universal-analytics": "^0.4.20",
     "uuid": "^3.3.2"
