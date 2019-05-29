@@ -29,6 +29,7 @@ const licensesWhitelist = [
   // Regular valid open source licenses supported by Google.
   'MIT',
   'ISC',
+  'Apache',
   'Apache-2.0',
 
   'BSD-2-Clause',
