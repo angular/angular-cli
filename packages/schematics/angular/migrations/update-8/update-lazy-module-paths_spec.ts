@@ -73,5 +73,19 @@ describe('Migration to version 8', () => {
       expect(routes).toContain(
         `loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule)`);
     });
+
+    it('should replace the module path string when file has BOM', async () => {
+      tree.create(lazyRoutePath, '\uFEFF' + Buffer.from(lazyRoute).toString());
+
+      schematicRunner.runSchematic('migration-08', {}, tree);
+      await schematicRunner.engine.executePostTasks().toPromise();
+
+      const routes = tree.readContent(lazyRoutePath);
+
+      expect(routes).not.toContain('./lazy/lazy.module#LazyModule');
+      expect(routes).toContain(
+        `loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule)`);
+    });
+
   });
 });
