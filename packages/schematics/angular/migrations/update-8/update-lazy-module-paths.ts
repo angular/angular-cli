@@ -17,7 +17,7 @@ function* visit(directory: DirEntry): IterableIterator<ts.SourceFile> {
         if (content.includes('loadChildren')) {
           const source = ts.createSourceFile(
             entry.path,
-            content.toString(),
+            content.toString().replace(/^\uFEFF/, ''),
             ts.ScriptTarget.Latest,
             true,
           );

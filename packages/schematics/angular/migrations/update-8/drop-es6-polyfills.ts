@@ -106,7 +106,7 @@ function dropES2015PolyfillsFromFile(polyfillPath: string): Rule {
     }
 
     const sourceFile = ts.createSourceFile(polyfillPath,
-      content,
+      content.replace(/^\uFEFF/, ''),
       ts.ScriptTarget.Latest,
       true,
     );
