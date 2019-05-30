@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { analytics, experimental, isPromise, json, logging } from '@angular-devkit/core';
-import { Observable, Subscription, from, isObservable, of, throwError } from 'rxjs';
+import { analytics, experimental, json, logging } from '@angular-devkit/core';
+import { Observable, Subscription, from, of, throwError } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import {
   BuilderContext,
@@ -14,11 +14,11 @@ import {
   BuilderInfo,
   BuilderInput,
   BuilderOutput,
-  BuilderOutputLike,
   BuilderProgressState,
   ScheduleOptions,
   Target,
   TypedBuilderProgress,
+  isBuilderOutput,
   targetStringFromTarget,
 } from './api';
 import { Builder, BuilderSymbol, BuilderVersionSymbol } from './internal';
@@ -189,17 +189,16 @@ export function createBuilder<
         };
 
         context.reportRunning();
-        let result: BuilderOutputLike;
+        let result;
         try {
           result = fn(i.options as OptT, context);
+          if (isBuilderOutput(result)) {
+            result = of(result);
+          } else {
+            result = from(result);
+          }
         } catch (e) {
           result = throwError(e);
-        }
-
-        if (isPromise(result)) {
-          result = from(result);
-        } else if (!isObservable(result)) {
-          result = of(result);
         }
 
         // Manage some state automatically.
