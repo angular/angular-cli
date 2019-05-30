@@ -65,6 +65,10 @@
               "x-deprecated": true
             }
           }
+        },
+        "analytics": {
+          "type": "boolean",
+          "description": "Share anonymous usage data with the Angular Team at Google."
         }
       },
       "additionalProperties": false
