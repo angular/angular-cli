@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { logging } from '@angular-devkit/core';
+import { logging, tags } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -214,7 +214,10 @@ function _validateUpdatePackages(
   });
 
   if (!force && peerErrors) {
-    throw new SchematicsException(`Incompatible peer dependencies found. See above.`);
+    throw new SchematicsException(tags.stripIndents
+      `Incompatible peer dependencies found.
+      Peer dependency warnings when installing dependencies means that those dependencies might not work correctly together.
+      You can use the '--force' option to ignore incompatible peer dependencies and instead address these warnings later.`);
   }
 }
 
