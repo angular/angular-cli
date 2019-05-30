@@ -500,6 +500,7 @@ export function useNg4() {
 
 export async function isPrereleaseCli() {
   const angularCliPkgJson = JSON.parse(await readFile('node_modules/@angular/cli/package.json'));
+  const pre = prerelease(angularCliPkgJson.version);
 
-  return prerelease(angularCliPkgJson.version).length > 0;
+  return pre && pre.length > 0;
 }
