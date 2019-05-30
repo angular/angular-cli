@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { analytics, experimental, json, logging } from '@angular-devkit/core';
-import { Observable, from } from 'rxjs';
+import { Observable, SubscribableOrPromise, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { Schema as RealBuilderInput, Target as RealTarget } from './input-schema';
 import { Schema as RealBuilderOutput } from './output-schema';
@@ -250,8 +250,16 @@ export interface BuilderContext {
 /**
  * An accepted return value from a builder. Can be either an Observable, a Promise or a vector.
  */
-export type BuilderOutputLike = Observable<BuilderOutput> | Promise<BuilderOutput> | BuilderOutput;
+export type BuilderOutputLike = SubscribableOrPromise<BuilderOutput> | BuilderOutput;
 
+// tslint:disable-next-line:no-any
+export function isBuilderOutput(obj: any): obj is BuilderOutput {
+  if (!obj || typeof obj.then === 'function' || typeof obj.subscribe === 'function') {
+    return false;
+  }
+
+  return typeof obj.success === 'boolean';
+}
 
 /**
  * A builder handler function. The function signature passed to `createBuilder()`.
