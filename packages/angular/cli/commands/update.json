@@ -53,6 +53,10 @@
         "to": {
           "description": "Version up to which to apply migrations. Only available with a single package being updated, and only on migrations only. Requires from to be specified. Default to the installed version detected.",
           "type": "string"
+        },
+        "allowDirty": {
+          "description": "Whether to allow updating when the repository contains modified or untracked files.",
+          "type": "boolean"
         }
       }
     }
