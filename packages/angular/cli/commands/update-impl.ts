@@ -83,12 +83,19 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
 
     // If not asking for status then check for a clean git repository.
     // This allows the user to easily reset any changes from the update.
-    if ((packages.length !== 0 || options.all) && !this.checkCleanGit()) {
-      this.logger.error(
-        'Repository is not clean.  Please commit or stash any changes before updating.',
-      );
+    const statusCheck = packages.length === 0 && !options.all;
+    if (!statusCheck && !this.checkCleanGit()) {
+      if (options.allowDirty) {
+        this.logger.warn(
+          'Repository is not clean.  Update changes will be mixed with pre-existing changes.',
+        );
+      } else {
+        this.logger.error(
+          'Repository is not clean.  Please commit or stash any changes before updating.',
+        );
 
-      return 2;
+        return 2;
+      }
     }
 
     const packageManager = getPackageManager(this.workspace.root);
