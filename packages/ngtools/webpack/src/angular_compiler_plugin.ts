@@ -150,6 +150,7 @@ export class AngularCompilerPlugin {
     return tsProgram ? tsProgram.getTypeChecker() : null;
   }
 
+  /** @deprecated  From 8.0.2 */
   static isSupported() {
     return VERSION && parseInt(VERSION.major) >= 8;
   }
