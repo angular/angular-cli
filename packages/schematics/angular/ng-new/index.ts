@@ -65,7 +65,7 @@ export default function (options: NgNewOptions): Rule {
       apply(empty(), [
         schematic('workspace', workspaceOptions),
         options.createApplication ? schematic('application', applicationOptions) : noop,
-        move(options.directory || options.name),
+        move(options.directory),
       ]),
     ),
     (_host: Tree, context: SchematicContext) => {
