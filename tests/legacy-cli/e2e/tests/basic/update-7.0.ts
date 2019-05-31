@@ -1,15 +1,11 @@
 import { createProjectFromAsset } from '../../utils/assets';
 import { expectFileMatchToExist, expectFileToExist, expectFileToMatch } from '../../utils/fs';
 import { ng, noSilentNg, silentNpm } from '../../utils/process';
-import {
-  isPrereleaseCli, useBuiltPackages, useCIChrome, useCIDefaults,
-} from '../../utils/project';
+import { useBuiltPackages, useCIChrome, useCIDefaults } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
 
 export default async function () {
-  const extraUpdateArgs = await isPrereleaseCli() ? ['--next'] : [];
-
   // Create new project from previous version files.
   // We must use the original NPM packages to force a real update.
   // This also means that we can only truly test updates after a release.
@@ -19,7 +15,7 @@ export default async function () {
   // Users of CLI <7.2 will see the following warnings:
   //   packageGroup metadata of package @angular/cli is malformed. Ignoring.
   // This is expected since the format changed in 7.2.
-  await ng('update', '@angular/cli', ...extraUpdateArgs);
+  await ng('update', '@angular/cli');
 
   // Test CLI migrations.
   // Should update the lazy route syntax via update-lazy-module-paths.
@@ -45,7 +41,7 @@ export default async function () {
   await silentNpm('install');
 
   // Update Angular.
-  await ng('update', '@angular/core', ...extraUpdateArgs);
+  await ng('update', '@angular/core');
 
   // Run CLI commands.
   await ng('generate', 'component', 'my-comp');
