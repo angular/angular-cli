@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { execSync } from 'child_process';
+import * as fs from 'fs';
 import * as path from 'path';
 import * as semver from 'semver';
 import { Arguments, Option } from '../models/interface';
@@ -22,10 +23,7 @@ import { Schema as UpdateCommandSchema } from './update';
 
 const npa = require('npm-package-arg');
 
-const oldConfigFileNames = [
-  '.angular-cli.json',
-  'angular-cli.json',
-];
+const oldConfigFileNames = ['.angular-cli.json', 'angular-cli.json'];
 
 export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
   public readonly allowMissingWorkspace = true;
@@ -185,11 +183,44 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
         this.logger.error('Package contains a malformed migrations field.');
 
         return 1;
+      } else if (path.posix.isAbsolute(migrations) || path.win32.isAbsolute(migrations)) {
+        this.logger.error(
+          'Package contains an invalid migrations field. Absolute paths are not permitted.',
+        );
+
+        return 1;
       }
 
-      // if not non-relative, add package name
-      if (migrations.startsWith('.') || migrations.startsWith('/')) {
-        migrations = path.join(packageName, migrations);
+      // Normalize slashes
+      migrations = migrations.replace(/\\/g, '/');
+
+      if (migrations.startsWith('../')) {
+        this.logger.error(
+          'Package contains an invalid migrations field. ' +
+            'Paths outside the package root are not permitted.',
+        );
+
+        return 1;
+      }
+
+      // Check if it is a package-local location
+      const localMigrations = path.join(packageNode.path, migrations);
+      if (fs.existsSync(localMigrations)) {
+        migrations = localMigrations;
+      } else {
+        // Try to resolve from package location.
+        // This avoids issues with package hoisting.
+        try {
+          migrations = require.resolve(migrations, { paths: [packageNode.path] });
+        } catch (e) {
+          if (e.code === 'MODULE_NOT_FOUND') {
+            this.logger.error('Migrations for package were not found.');
+          } else {
+            this.logger.error(`Unable to resolve migrations for package.  [${e.message}]`);
+          }
+
+          return 1;
+        }
       }
 
       return this.runSchematic({
@@ -219,9 +250,11 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
       }
 
       // If a specific version is requested and matches the installed version, skip.
-      if (pkg.type === 'version' &&
-         typeof node === 'object' &&
-         node.package.version === pkg.fetchSpec) {
+      if (
+        pkg.type === 'version' &&
+        typeof node === 'object' &&
+        node.package.version === pkg.fetchSpec
+      ) {
         this.logger.info(`Package '${pkg.name}' is already at '${pkg.fetchSpec}'.`);
         continue;
       }
