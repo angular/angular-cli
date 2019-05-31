@@ -163,7 +163,7 @@ describe('Library Schematic', () => {
       const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
 
       const packageJson = getJsonFileContent(tree, 'package.json');
-      expect(packageJson.devDependencies['ng-packagr']).toEqual('^5.1.0');
+      expect(packageJson.devDependencies['ng-packagr']).toEqual(latestVersions.ngPackagr);
       expect(packageJson.devDependencies['@angular-devkit/build-ng-packagr'])
         .toEqual(latestVersions.DevkitBuildNgPackagr);
     });
