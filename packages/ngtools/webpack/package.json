@@ -29,13 +29,13 @@
   },
   "peerDependencies": {
     "@angular/compiler-cli": ">=8.0.0-beta.0 < 9.0.0",
-    "typescript": ">=3.4 < 3.5",
+    "typescript": "< 3.6",
     "webpack": "^4.0.0"
   },
   "devDependencies": {
     "@angular/compiler": "^8.0.0-beta.14",
     "@angular/compiler-cli": "^8.0.0-beta.14",
-    "typescript": "3.4.5",
+    "typescript": "3.5.1",
     "webpack": "4.32.2"
   }
 }
