@@ -61,7 +61,7 @@ function visitBlockStatements(
   };
 
   // 'oIndex' is the original statement index; 'uIndex' is the updated statement index
-  for (let oIndex = 0, uIndex = 0; oIndex < statements.length; oIndex++, uIndex++) {
+  for (let oIndex = 0, uIndex = 0; oIndex < statements.length - 1; oIndex++, uIndex++) {
     const currentStatement = statements[oIndex];
 
     // these can't contain an enum declaration
@@ -74,9 +74,14 @@ function visitBlockStatements(
     //   * be a variable statement
     //   * have only one declaration
     //   * have an identifer as a declaration name
-    if (oIndex < statements.length - 1
-        && ts.isVariableStatement(currentStatement)
-        && currentStatement.declarationList.declarations.length === 1) {
+
+    // ClassExpression declarations must:
+    //   * not be last statement
+    //   * be a variable statement
+    //   * have only one declaration
+    //   * have an ClassExpression as a initializer
+    if (ts.isVariableStatement(currentStatement)
+      && currentStatement.declarationList.declarations.length === 1) {
 
       const variableDeclaration = currentStatement.declarationList.declarations[0];
       if (ts.isIdentifier(variableDeclaration.name)) {
@@ -148,6 +153,23 @@ function visitBlockStatements(
             oIndex += enumStatements.length;
             continue;
           }
+        } else if (ts.isClassExpression(variableDeclaration.initializer)) {
+          const classStatements = findClassExpressionStatements(name, statements, oIndex);
+          if (!classStatements) {
+            continue;
+          }
+
+          if (!updatedStatements) {
+            updatedStatements = [...statements];
+          }
+
+          updatedStatements.splice(uIndex, classStatements.length, createWrappedClass(
+            name,
+            classStatements,
+          ));
+
+          oIndex += classStatements.length - 1;
+          continue;
         }
       }
     }
@@ -389,7 +411,6 @@ function updateHostNode(
   hostNode: ts.VariableStatement,
   expression: ts.Expression,
 ): ts.Statement {
-
   // Update existing host node with the pure comment before the variable declaration initializer.
   const variableDeclaration = hostNode.declarationList.declarations[0];
   const outerVarStmt = ts.updateVariableStatement(
@@ -409,6 +430,54 @@ function updateHostNode(
   );
 
   return outerVarStmt;
+}
+
+/**
+ * Find class expression statements.
+ *
+ * The classExpressions block to wrap in an iife must
+ * - end with an ExpressionStatement
+ * - it's expression must be a BinaryExpression
+ * - have the same name
+ *
+ * ```
+ let Foo = class Foo {};
+ Foo = __decorate([]);
+ ```
+ */
+function findClassExpressionStatements(
+  name: string,
+  statements: ts.NodeArray<ts.Statement>,
+  statementIndex: number,
+): ts.Statement[] | undefined {
+  let index = statementIndex + 1;
+  let statement = statements[index];
+
+  while (ts.isExpressionStatement(statement)) {
+    const expression = statement.expression;
+    if (ts.isCallExpression(expression)) {
+      // Ex:
+      // __decorate([propDecorator()], FooClass, "propertyName", void 0);
+      // __decorate$1([propDecorator()], FooClass, "propertyName", void 0);
+      const callExpression = expression.expression;
+      if (!ts.isIdentifier(callExpression) || !/^__decorate(\$\d+)?$/.test(callExpression.text)) {
+        break;
+      }
+    }
+
+    if (
+      ts.isBinaryExpression(expression)
+      && ts.isIdentifier(expression.left)
+      && expression.left.getText() === name
+    ) {
+      // Ex: FooClass = __decorate([Component()], FooClass);
+      return statements.slice(statementIndex, index + 1);
+    }
+
+    statement = statements[++index];
+  }
+
+  return undefined;
 }
 
 function updateEnumIife(
@@ -474,11 +543,9 @@ function createWrappedEnum(
   name: string,
   hostNode: ts.VariableStatement,
   statements: Array<ts.Statement>,
-  literalInitializer: ts.ObjectLiteralExpression | undefined,
+  literalInitializer: ts.ObjectLiteralExpression = ts.createObjectLiteral(),
   addExportModifier = false,
 ): ts.Statement {
-  literalInitializer = literalInitializer || ts.createObjectLiteral();
-
   const node = addExportModifier
     ? ts.updateVariableStatement(
       hostNode,
@@ -503,4 +570,25 @@ function createWrappedEnum(
   ]);
 
   return updateHostNode(node, addPureComment(ts.createParen(iife)));
+}
+
+function createWrappedClass(
+  name: string,
+  statements: ts.Statement[],
+): ts.Statement {
+  const pureIife = addPureComment(
+    ts.createImmediatelyInvokedArrowFunction([
+      ...statements,
+      ts.createReturn(ts.createIdentifier(name)),
+    ]),
+  );
+
+  return ts.createVariableStatement(
+    undefined,
+    ts.createVariableDeclarationList([
+      ts.createVariableDeclaration(name, undefined, pureIife),
+    ],
+      ts.NodeFlags.Const,
+    ),
+  );
 }
