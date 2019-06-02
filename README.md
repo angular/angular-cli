@@ -75,7 +75,7 @@ This is a monorepo which contains many tools and packages:
 | Project | Package | Version | Links |
 |---|---|---|---|
 **Angular CLI** | [`@angular/cli`](https://npmjs.com/package/@angular/cli) | [![latest](https://img.shields.io/npm/v/%40angular%2Fcli/latest.svg)](https://npmjs.com/package/@angular/cli) | [![README](https://img.shields.io/badge/README--green.svg)](/packages/angular/cli/README.md) [![snapshot](https://img.shields.io/badge/snapshot--blue.svg)](https://github.com/angular/cli-builds)
-**Schematics CLI** | [`@angular-devkit/schematics-cli`](https://npmjs.com/package/@angular-devkit/schematics-cli) | [![latest](https://img.shields.io/npm/v/%40angular-devkit%2Fschematics-cli/latest.svg)](https://npmjs.com/package/@angular-devkit/schematics-cli) |  [![snapshot](https://img.shields.io/badge/snapshot--blue.svg)](https://github.com/angular/angular-devkit-schematics-cli-builds)
+**Schematics CLI** | [`@angular-devkit/schematics-cli`](https://www.npmjs.com/package/@angular-devkit/schematics) | [![latest](https://img.shields.io/npm/v/%40angular-devkit%2Fschematics-cli/latest.svg)](https://www.npmjs.com/package/@angular-devkit/schematics) |  [![snapshot](https://img.shields.io/badge/snapshot--blue.svg)](https://github.com/angular/angular-devkit-schematics-cli-builds)
 
 
 ## Packages
