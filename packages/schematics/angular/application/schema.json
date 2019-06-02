@@ -48,7 +48,9 @@
     "routing": {
       "type": "boolean",
       "description": "When true, creates a routing NgModule.",
-      "default": false
+      "default": false,
+      "x-prompt": "Would you like to add Angular routing?",
+      "x-user-analytics": 17
     },
     "prefix": {
       "type": "string",
@@ -68,6 +70,17 @@
         "less",
         "styl"
       ],
+      "x-prompt": {
+        "message": "Which stylesheet format would you like to use?",
+        "type": "list",
+        "items": [
+          { "value": "css",  "label": "CSS" },
+          { "value": "scss", "label": "SCSS   [ https://sass-lang.com/documentation/syntax#scss                ]" },
+          { "value": "sass", "label": "Sass   [ https://sass-lang.com/documentation/syntax#the-indented-syntax ]" },
+          { "value": "less", "label": "Less   [ http://lesscss.org                                             ]" },
+          { "value": "styl", "label": "Stylus [ http://stylus-lang.com                                         ]" }
+        ]
+      },
       "x-user-analytics": 5
     },
     "skipTests": {
