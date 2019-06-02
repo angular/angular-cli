@@ -75,6 +75,7 @@
     },
     "@angular-devkit/architect-cli": {
       "name": "Architect CLI",
+      "section": "Tooling",
       "snapshotRepo": "angular/angular-devkit-architect-cli-builds"
     },
     "@angular-devkit/benchmark": {
