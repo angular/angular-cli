@@ -53,7 +53,17 @@
       "packageNames": [
         "typescript"
       ],
-      "updateTypes": "patch"
+      "separateMinorPatch": true
+    },
+    {
+      "packageNames": [
+        "typescript"
+      ],
+      "updateTypes": [
+        "minor",
+        "major"
+      ],
+      "enabled": false
     }
   ]
 }
