@@ -20,6 +20,7 @@ interface StatementData {
   hostClass: ClassData;
 }
 
+/** @deprecated Since version 8 */
 export function getFoldFileTransformer(program: ts.Program): ts.TransformerFactory<ts.SourceFile> {
   const checker = program.getTypeChecker();
 
