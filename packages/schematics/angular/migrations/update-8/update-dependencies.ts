@@ -15,6 +15,7 @@ export function updateDependencies() {
     const dependenciesToUpdate: Record<string, string> = {
       '@angular-devkit/build-angular': latestVersions.DevkitBuildAngular,
       '@angular-devkit/build-ng-packagr': latestVersions.DevkitBuildNgPackagr,
+      '@angular-devkit/build-webpack': latestVersions.DevkitBuildWebpack,
       'zone.js': latestVersions.ZoneJs,
       'tsickle': latestVersions.tsickle,
       'ng-packagr': latestVersions.ngPackagr,
