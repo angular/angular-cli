@@ -18,7 +18,11 @@ import {
   PackageManifest,
   fetchPackageMetadata,
 } from '../utilities/package-metadata';
-import { findNodeDependencies, readPackageTree } from '../utilities/package-tree';
+import {
+  PackageTreeActual,
+  findNodeDependencies,
+  readPackageTree,
+} from '../utilities/package-tree';
 import { Schema as UpdateCommandSchema } from './update';
 
 const npa = require('npm-package-arg');
@@ -238,7 +242,10 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
       });
     }
 
-    const requests: PackageIdentifier[] = [];
+    const requests: {
+      identifier: PackageIdentifier;
+      node: PackageTreeActual | string;
+    }[] = [];
 
     // Validate packages actually are part of the workspace
     for (const pkg of packages) {
@@ -259,22 +266,26 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
         continue;
       }
 
-      requests.push(pkg);
+      requests.push({ identifier: pkg, node });
     }
 
     if (requests.length === 0) {
       return 0;
     }
 
+    const packagesToUpdate: string[] = [];
+
     this.logger.info('Fetching dependency metadata from registry...');
-    for (const requestIdentifier of requests) {
+    for (const { identifier: requestIdentifier, node } of requests) {
+      const packageName = requestIdentifier.name;
+
       let metadata;
       try {
         // Metadata requests are internally cached; multiple requests for same name
         // does not result in additional network traffic
-        metadata = await fetchPackageMetadata(requestIdentifier.name, this.logger);
+        metadata = await fetchPackageMetadata(packageName, this.logger);
       } catch (e) {
-        this.logger.error(`Error fetching metadata for '${requestIdentifier.name}': ` + e.message);
+        this.logger.error(`Error fetching metadata for '${packageName}': ` + e.message);
 
         return 1;
       }
@@ -303,6 +314,20 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
 
         return 1;
       }
+
+      if (
+        (typeof node === 'string' && manifest.version === node) ||
+        (typeof node === 'object' && manifest.version === node.package.version)
+      ) {
+        this.logger.info(`Package '${packageName}' is already up to date.`);
+        continue;
+      }
+
+      packagesToUpdate.push(requestIdentifier.toString());
+    }
+
+    if (packagesToUpdate.length === 0) {
+      return 0;
     }
 
     return this.runSchematic({
@@ -313,7 +338,7 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
       additionalOptions: {
         force: options.force || false,
         packageManager,
-        packages: requests.map(p => p.toString()),
+        packages: packagesToUpdate,
       },
     });
   }
