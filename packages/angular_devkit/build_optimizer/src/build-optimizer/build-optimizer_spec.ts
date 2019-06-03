@@ -16,11 +16,10 @@ import { buildOptimizer } from './build-optimizer';
 describe('build-optimizer', () => {
   const imports = 'import { Injectable, Input, Component } from \'@angular/core\';';
   const clazz = 'var Clazz = (function () { function Clazz() { } return Clazz; }());';
-  const staticProperty = 'Clazz.prop = 1;';
   const decorators = 'Clazz.decorators = [ { type: Injectable } ];';
 
   describe('basic functionality', () => {
-    it('applies class-fold, scrub-file and prefix-functions to side-effect free modules', () => {
+    it('applies scrub-file and prefix-functions to side-effect free modules', () => {
       const input = tags.stripIndent`
         ${imports}
         var __extends = (this && this.__extends) || function (d, b) {
@@ -34,7 +33,6 @@ describe('build-optimizer', () => {
           ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
         })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
         ${clazz}
-        ${staticProperty}
         ${decorators}
         Clazz.propDecorators = { 'ngIf': [{ type: Input }] };
         Clazz.ctorParameters = function () { return [{type: Injectable}]; };
@@ -65,7 +63,7 @@ describe('build-optimizer', () => {
           ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
           return ChangeDetectionStrategy;
         })({});
-        var Clazz = /*@__PURE__*/ (function () { function Clazz() { } ${staticProperty} return Clazz; }());
+        var Clazz = /*@__PURE__*/ (function () { function Clazz() { } return Clazz; }());
         var ComponentClazz = /*@__PURE__*/ (function () {
           function ComponentClazz() { }
           return ComponentClazz;
@@ -202,7 +200,6 @@ describe('build-optimizer', () => {
     xit('doesn\'t produce sourcemaps when emitting was skipped', () => {
       const ignoredInput = tags.oneLine`
         var Clazz = (function () { function Clazz() { } return Clazz; }());
-        ${staticProperty}
       `;
       const invalidInput = tags.oneLine`
         ))))invalid syntax

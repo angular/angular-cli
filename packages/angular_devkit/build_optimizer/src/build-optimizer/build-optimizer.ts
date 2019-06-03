@@ -11,7 +11,6 @@ import {
   TransformJavascriptOutput,
   transformJavascript,
 } from '../helpers/transform-javascript';
-import { getFoldFileTransformer } from '../transforms/class-fold';
 import { getImportTslibTransformer, testImportTslib } from '../transforms/import-tslib';
 import { getPrefixClassesTransformer, testPrefixClasses } from '../transforms/prefix-classes';
 import { getPrefixFunctionsTransformer } from '../transforms/prefix-functions';
@@ -124,14 +123,12 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
       // getPrefixFunctionsTransformer needs to be before getFoldFileTransformer.
       getPrefixFunctionsTransformer,
       selectedGetScrubFileTransformer,
-      getFoldFileTransformer,
     );
     typeCheck = true;
   } else if (testScrubFile(content)) {
     // Always test as these require the type checker
     getTransforms.push(
       selectedGetScrubFileTransformer,
-      getFoldFileTransformer,
     );
     typeCheck = true;
   }

@@ -16,8 +16,129 @@ const transform = (content: string) => transformJavascript(
 
 // tslint:disable-next-line:no-big-function
 describe('wrap enums and classes transformer', () => {
+  describe('wraps class declarations', () => {
+    it('should ClassDeclarations that are referenced with in CallExpressions', () => {
+      const input = tags.stripIndent`
+        class ApplicationModule {
+            constructor(appRef) { }
+        }
+        ApplicationModule.ngModuleDef = ɵɵdefineNgModule({ type: ApplicationModule });
+        /*@__PURE__*/ setClassMetadata(ApplicationModule, [{
+                type: NgModule,
+                args: [{ providers: APPLICATION_MODULE_PROVIDERS }]
+            }], function () { return [{ type: ApplicationRef }]; }, { constructor: [] });
+        ApplicationModule.ctorParameters = () => [
+            { type: ApplicationRef }
+        ];
+      `;
+
+      const output = tags.stripIndent`
+        const ApplicationModule = /*@__PURE__*/ (() => {
+          ${input}
+
+          return ApplicationModule;
+        })();
+      `;
+
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('with nested static properties in IIFE', () => {
+      const input = tags.stripIndent`
+        class CommonModule { }
+        CommonModule.ngModuleDef = defineNgModule({
+            type: CommonModule
+        }), CommonModule.ngInjectorDef = defineInjector({
+            factory: function (t) {
+                return new (t || CommonModule)();
+            },
+            providers: [{
+                provide: NgLocalization,
+                useClass: NgLocaleLocalization
+            }]
+        });
+      `;
+
+      const output = tags.stripIndent`
+        const CommonModule = /*@__PURE__*/ (() => {
+          ${input}
+
+          return CommonModule;
+        })();
+      `;
+
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('with property decorators in IIFE', () => {
+      const input = tags.stripIndent`
+        export class Foo {
+          method() {
+          }
+        }
+        Foo.bar = 'barValue';
+        __decorate([
+            methodDecorator
+        ], Foo.prototype, "method", null);
+      `;
+
+      const output = tags.stripIndent`
+          export const Foo = /*@__PURE__*/ (() => {
+            ${input.replace('export ', '')}
+
+            return Foo;
+          })();
+      `;
+
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('folds static properties in IIFE', () => {
+      const input = tags.stripIndent`
+        export class TemplateRef { }
+        TemplateRef.__NG_ELEMENT_ID__ = () => SWITCH_TEMPLATE_REF_FACTORY(TemplateRef, ElementRef);
+      `;
+      const output = tags.stripIndent`
+      export const TemplateRef = /*@__PURE__*/ (() => {
+        class TemplateRef { }
+        TemplateRef.__NG_ELEMENT_ID__ = () => SWITCH_TEMPLATE_REF_FACTORY(TemplateRef, ElementRef);
+        return TemplateRef;
+      })();
+    `;
+
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('folds multiple static properties into class', () => {
+      const input = tags.stripIndent`
+      export class TemplateRef { }
+      TemplateRef.__NG_ELEMENT_ID__ = () => SWITCH_TEMPLATE_REF_FACTORY(TemplateRef, ElementRef);
+      TemplateRef.somethingElse = true;
+    `;
+      const output = tags.stripIndent`
+      export const TemplateRef = /*@__PURE__*/ (() => {
+        class TemplateRef {
+        }
+        TemplateRef.__NG_ELEMENT_ID__ = () => SWITCH_TEMPLATE_REF_FACTORY(TemplateRef, ElementRef);
+        TemplateRef.somethingElse = true;
+        return TemplateRef;
+      })();
+    `;
+
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it(`doesn't wrap classes without static properties in IIFE`, () => {
+      const input = tags.stripIndent`
+      export class TemplateRef { }
+    `;
+
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${input}`);
+    });
+  });
+
   describe('wrap class expressions', () => {
-    it('should wrap ClassExpression without property decorators in IIFE', () => {
+    it('without property decorators in IIFE', () => {
       const input = tags.stripIndent`
           let AggregateColumnDirective = class AggregateColumnDirective {
               constructor(viewContainerRef) { }
@@ -39,7 +160,40 @@ describe('wrap enums and classes transformer', () => {
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('should wrap ClassExpression with property decorators in IIFE', () => {
+    it('with forwardRef in IIFE', () => {
+      const classContent = tags.stripIndent`
+        let FooDirective = FooDirective_1 = class FooDirective {
+            constructor(parent) { }
+        };
+        FooDirective = FooDirective_1 = __decorate([
+            Directive({
+                selector: '[libUnshakeable2]',
+            }),
+            __param(0, SkipSelf()), __param(0, Inject(forwardRef(() => FooDirective_1))),
+            __metadata("design:paramtypes", [FooDirective])
+        ], FooDirective);
+      `;
+
+      const input = tags.stripIndent`
+        var FooDirective_1;
+        ${classContent}
+        export { FooDirective };
+      `;
+
+      const output = tags.stripIndent`
+        var FooDirective_1;
+        const FooDirective = /*@__PURE__*/ (() => {
+            ${classContent}
+
+            return FooDirective;
+        })();
+        export { FooDirective };
+      `;
+
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('with property decorators in IIFE', () => {
       const input = tags.stripIndent`
           let ChipList = class ChipList extends Component {
             constructor(options, element) {
@@ -58,8 +212,8 @@ describe('wrap enums and classes transformer', () => {
 
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
-    
-    it('should not wrap ClassExpression without decorators', () => {
+
+    it('should not wrap without decorators', () => {
       const input = tags.stripIndent`
           let ChipList = class ChipList extends Component {
             constructor(options, element) {
