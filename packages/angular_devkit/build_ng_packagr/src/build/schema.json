@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
   "title": "ng-packagr Target",
-  "description": "ng-packagr target options for Build Architect.",
+  "description": "ng-packagr target options for Build Architect. Use to build library projects.",
   "type": "object",
   "properties": {
     "project": {
@@ -10,11 +10,11 @@
     },
     "tsConfig": {
       "type": "string",
-      "description": "The full path for the TypeScript configuration file, relative to the current workspace. Applies to both libraries and applications."
+      "description": "The full path for the TypeScript configuration file, relative to the current workspace."
     },
     "watch": {
       "type": "boolean",
-      "description": "Run build when files change. Applies to both libraries and applications.",
+      "description": "Run build when files change.",
       "default": false
     }
   },
