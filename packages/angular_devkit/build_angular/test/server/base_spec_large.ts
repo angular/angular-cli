@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { join, normalize, virtualFs } from '@angular-devkit/core';
+import { getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core';
 import { take, tap } from 'rxjs/operators';
 import { BrowserBuilderOutput } from '../../src/browser';
 import { createArchitect, host } from '../utils';
@@ -33,6 +33,34 @@ describe('Server Builder', () => {
     const fileName = join(outputPath, 'main.js');
     const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
     expect(content).toMatch(/AppServerModuleNgFactory/);
+
+    await run.stop();
+  });
+
+  it('should not emit polyfills', async () => {
+    const run = await architect.scheduleTarget(target);
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
+
+    expect(host.fileMatchExists(getSystemPath(outputPath), /polyfills/)).not.toBeDefined();
+    expect(host.fileMatchExists(getSystemPath(outputPath), /main/)).toBeDefined();
+
+    await run.stop();
+  });
+
+  it('should not emit polyfills when ES5 support is needed', async () => {
+    // the below is needed because of different code paths
+    // for polyfills if differential loading is needed
+    host.writeMultipleFiles({
+      'browserslist': 'IE 10',
+    });
+
+    const run = await architect.scheduleTarget(target);
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
+
+    expect(host.fileMatchExists(getSystemPath(outputPath), /polyfills/)).not.toBeDefined();
+    expect(host.fileMatchExists(getSystemPath(outputPath), /main/)).toBeDefined();
 
     await run.stop();
   });
