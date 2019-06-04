@@ -1195,7 +1195,7 @@ export class AngularCompilerPlugin {
           'AngularCompilerPlugin._emit.ts', diagMode));
 
         if (!hasErrors(allDiagnostics)) {
-          if (this._firstRun || changedTsFiles.size > 20) {
+          if (this._firstRun || changedTsFiles.size > 20 || this._emitSkipped) {
             emitResult = tsProgram.emit(
               undefined,
               undefined,

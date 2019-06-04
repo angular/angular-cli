@@ -9,7 +9,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { TestLogger } from '@angular-devkit/architect/testing';
-import { normalize, virtualFs } from '@angular-devkit/core';
+import { logging, normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, take, takeWhile, tap } from 'rxjs/operators';
 import { createArchitect, host, lazyModuleFiles, lazyModuleStringImport } from '../utils';
 
@@ -68,14 +68,11 @@ describe('Browser Builder rebuilds', () => {
 
     const overrides = { watch: true };
 
-    let buildCount = 0;
     let phase = 1;
     const run = await architect.scheduleTarget(target, overrides);
     await run.output.pipe(
       tap(result => {
         expect(result.success).toBe(true, 'build should succeed');
-        buildCount++;
-
         const hasLazyChunk = host.scopedSync().exists(normalize('dist/lazy-lazy-module.js'));
         switch (phase) {
           case 1:
@@ -203,6 +200,47 @@ describe('Browser Builder rebuilds', () => {
       tap(() => host.writeMultipleFiles({ 'src/type.ts': `export type MyType = string;` })),
       take(2),
     ).toPromise();
+  });
+
+  it('rebuilds after errors in JIT', async () => {
+    const origContent = virtualFs.fileBufferToString(
+      host.scopedSync().read(normalize('src/app/app.component.ts')));
+    host.appendToFile('./src/app/app.component.ts', `console.logg('error')`);
+
+    const overrides = { watch: true, aot: false };
+    let buildNumber = 0;
+    const logger = new logging.Logger('');
+    let logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
+    const run = await architect.scheduleTarget(target, overrides, { logger });
+    await run.output.pipe(
+      debounceTime(1000),
+      tap((buildEvent) => {
+        buildNumber ++;
+        switch (buildNumber) {
+          case 1:
+            // The first build should error out with an error.
+            expect(buildEvent.success).toBe(false);
+            expect(logs.join()).toContain(`Property 'logg' does not exist on type 'Console'`);
+            logs = [];
+            // Fix the error.
+            host.writeMultipleFiles({ 'src/app/app.component.ts': `
+              ${origContent}
+              console.errorr('error');
+            `});
+            break;
+
+          case 2:
+            // The second build should have everything fixed.
+            expect(buildEvent.success).toBe(true);
+            expect(logs.join()).not.toContain('Module build failed');
+            break;
+        }
+      }),
+      take(2),
+    ).toPromise();
+    await run.stop();
   });
 
   it('rebuilds after errors in AOT', async () => {
