@@ -41,6 +41,7 @@ ts_library(
         "@npm//@types/semver",
         "@npm//@types/universal-analytics",
         "@npm//@types/uuid",
+        "@npm//ansi-colors",
         "@npm//rxjs",
     ],
 )

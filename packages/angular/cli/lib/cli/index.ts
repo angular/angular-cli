@@ -5,24 +5,37 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { terminal } from '@angular-devkit/core';
 import { createConsoleLogger } from '@angular-devkit/core/node';
+import * as colors from 'ansi-colors';
+import { WriteStream } from 'tty';
+import { format } from 'util';
 import { runCommand } from '../../models/command-runner';
 import { getWorkspaceRaw } from '../../utilities/config';
 import { getWorkspaceDetails } from '../../utilities/project';
 
-
 export default async function(options: { testing?: boolean, cliArgs: string[] }) {
+  // Typings do not contain the function call (added in Node.js v9.9.0)
+  const supportsColor = process.stdout instanceof WriteStream &&
+    (process.stdout as unknown as { getColorDepth(): number }).getColorDepth() > 1;
+
   const logger = createConsoleLogger(
     false,
     process.stdout,
     process.stderr,
     {
-      warn: s => terminal.bold(terminal.yellow(s)),
-      error: s => terminal.bold(terminal.red(s)),
-      fatal: s => terminal.bold(terminal.red(s)),
+      info: s => supportsColor ? s : colors.unstyle(s),
+      debug: s => supportsColor ? s : colors.unstyle(s),
+      warn: s => supportsColor ? colors.bold.yellow(s) : colors.unstyle(s),
+      error: s => supportsColor ? colors.bold.red(s) : colors.unstyle(s),
+      fatal: s => supportsColor ? colors.bold.red(s) : colors.unstyle(s),
     },
   );
+
+  // Redirect console to logger
+  console.log = function() { logger.info(format.apply(null, arguments)); };
+  console.info = function() { logger.info(format.apply(null, arguments)); };
+  console.warn = function() { logger.warn(format.apply(null, arguments)); };
+  console.error = function() { logger.error(format.apply(null, arguments)); };
 
   let projectDetails = getWorkspaceDetails();
   if (projectDetails === null) {
