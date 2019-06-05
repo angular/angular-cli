@@ -14,9 +14,40 @@ import { getWrapEnumsTransformer } from './wrap-enums';
 const transform = (content: string) => transformJavascript(
   { content, getTransforms: [getWrapEnumsTransformer] }).content;
 
-// tslint:disable-next-line:no-big-function
+// tslint:disable:no-big-function
 describe('wrap enums and classes transformer', () => {
   describe('wraps class declarations', () => {
+    it('should wrap tsickle emitted classes which followed by metadata', () => {
+      const input = tags.stripIndent`
+       class CustomComponentEffects {
+            constructor(_actions) {
+              this._actions = _actions;
+              this.doThis = this._actions;
+            }
+        }
+        CustomComponentEffects.decorators = [{ type: Injectable }];
+        CustomComponentEffects.ctorParameters = () => [{ type: Actions }];
+        tslib_1.__decorate([
+            Effect(),
+            tslib_1.__metadata("design:type", Object)
+        ], CustomComponentEffects.prototype, "doThis", void 0);
+        tslib_1.__decorate([
+            Effect({ dispatch: false }),
+            tslib_1.__metadata("design:type", Object)
+        ], CustomComponentEffects.prototype, "doThat", void 0);
+      `;
+
+      const output = tags.stripIndent`
+        const CustomComponentEffects = /*@__PURE__*/ (() => {
+          ${input}
+
+          return CustomComponentEffects;
+        })();
+      `;
+
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
     it('should ClassDeclarations that are referenced with in CallExpressions', () => {
       const input = tags.stripIndent`
         class ApplicationModule {
@@ -305,7 +336,6 @@ describe('wrap enums and classes transformer', () => {
     });
   });
 
-  // tslint:disable-next-line:no-big-function
   describe('wrap enums', () => {
     it('wraps ts 2.2 enums in IIFE', () => {
       const input = tags.stripIndent`
