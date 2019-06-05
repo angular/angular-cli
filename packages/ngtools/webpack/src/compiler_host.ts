@@ -147,13 +147,15 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     const filePath = this.resolve(fileName);
 
     try {
+      let content: ArrayBuffer;
       if (this._memoryHost.isFile(filePath)) {
-        return virtualFs.fileBufferToString(this._memoryHost.read(filePath));
+        content = this._memoryHost.read(filePath);
       } else {
-        const content = this._syncHost.read(filePath);
-
-        return virtualFs.fileBufferToString(content);
+        content = this._syncHost.read(filePath);
       }
+
+      // strip BOM
+      return virtualFs.fileBufferToString(content).replace(/^\uFEFF/, '');
     } catch {
       return undefined;
     }
