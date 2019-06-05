@@ -31,6 +31,7 @@
     "@schematics/angular": "0.0.0",
     "@schematics/update": "0.0.0",
     "@yarnpkg/lockfile": "1.1.0",
+    "ansi-colors": "3.2.4",
     "debug": "^4.1.1",
     "ini": "1.3.5",
     "inquirer": "6.3.1",
