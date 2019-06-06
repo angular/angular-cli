@@ -13,10 +13,10 @@
 # If you change the cache key prefix, also sync the restore_cache fallback to match.
 # Keep the static part of the cache key as prefix to enable correct fallbacks.
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
-var_1: &default_docker_image circleci/node:10.12
-var_2: &browsers_docker_image circleci/node:10.12-browsers
-var_3: &browsers_docker_image_node_12 circleci/node:12.1-browsers
-var_4: &cache_key angular_devkit-0.10.0-{{ checksum "yarn.lock" }}
+var_1: &default_docker_image circleci/node:12.1
+var_2: &browsers_docker_image circleci/node:12.1-browsers
+var_3: &browsers_docker_image_node_10 circleci/node:10.12-browsers
+var_4: &cache_key angular_devkit-0.11.0-{{ checksum "yarn.lock" }}
 
 # Settings common to each job
 anchor_1: &defaults
@@ -57,7 +57,7 @@ anchor_3: &restore_cache
     keys:
       - *cache_key
       # This fallback should be the cache_key without variables.
-      - angular_devkit-0.7.0-
+      - angular_devkit-0.11.0-
 anchor_4: &attach_options
   at: .
 anchor_5: &env_win
@@ -136,10 +136,10 @@ jobs:
           path: /tmp/dist
           destination: cli/new-production
 
-  e2e-cli-node-12:
+  e2e-cli-node-10:
     <<: *defaults
     docker:
-      - image: *browsers_docker_image_node_12
+      - image: *browsers_docker_image_node_10
     environment:
       BASH_ENV: ~/.profile
       NPM_CONFIG_PREFIX: ~/.npm-global
@@ -291,7 +291,7 @@ workflows:
       - e2e-cli:
           requires:
             - build
-      - e2e-cli-node-12:
+      - e2e-cli-node-10:
           requires:
             - build
       - e2e-cli-ivy:
