@@ -11,10 +11,6 @@ import {request} from '../../utils/http';
 const validBundleRegEx = /: Compiled successfully./;
 
 export default function() {
-  if (process.platform.startsWith('win')) {
-    return Promise.resolve();
-  }
-
   return execAndWaitForOutputToMatch('ng', ['serve'], validBundleRegEx)
     // Add a lazy module.
     .then(() => ng('generate', 'module', 'lazy', '--routing'))
