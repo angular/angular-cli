@@ -23,6 +23,12 @@ anchor_1: &defaults
   working_directory: ~/ng
   docker:
     - image: *default_docker_image
+anchor_1_win: &defaults_win
+  working_directory: ~/ng
+  resource_class: windows.medium
+  shell: powershell.exe -ExecutionPolicy Bypass
+  machine:
+    image: windows-server-2019  
 
 # After checkout, rebase on top of target branch.
 anchor_2: &post_checkout
@@ -38,6 +44,14 @@ anchor_2: &post_checkout
       else
         echo "This build is not over a PR, nothing to do."
       fi
+anchor_2_win: &post_checkout_win
+  run:
+    name: Rebase PR on target branch
+    command: >
+      if (Test-Path env:CIRCLE_PR_NUMBER) {
+        git config user.name "angular-ci"
+        git config user.email "angular-ci"
+        node tools\rebase-pr.js angular/angular-cli $env:CIRCLE_PR_NUMBER }
 anchor_3: &restore_cache
   restore_cache:
     keys:
@@ -46,9 +60,15 @@ anchor_3: &restore_cache
       - angular_devkit-0.7.0-
 anchor_4: &attach_options
   at: .
+anchor_5: &env_win
+  run:
+    # Need to install node and yarn before, as the base windows image doesn't have anything.
+    # TODO: remove when CircleCI provides preconfigured node images/VMs.
+    name: Setup windows node environment
+    command: ./.circleci/windows-env.ps1 
 
 # Job definitions
-version: 2
+version: 2.1
 jobs:
   install:
     <<: *defaults
@@ -202,6 +222,45 @@ jobs:
           command: |
             npm run admin -- publish --verbose
 
+  # Windows jobs
+  # CircleCI support for Windows jobs is still in preview.
+  # Docs: https://github.com/CircleCI-Public/windows-preview-docs
+  test-win:
+    <<: *defaults_win
+    # Skipping cache and workspace for now because it takes 10x longer than on linux. 
+    # TODO: when/if CircleCI makes them faster, use cache and workspaces fully.
+    # Notes: 
+    # - windows needs its own cache key because binaries in node_modules are different.
+    # - windows might need its own workspace for the same reason.
+    # - get cache dir on windows via `yarn cache dir` (was `C:\Users\circleci\AppData\Local\Yarn\Cache\v4` last time)
+    steps:
+      - checkout
+      - *env_win
+      - *post_checkout_win
+      - run: node --version
+      - run: yarn --version
+      - run: yarn install --frozen-lockfile
+      # Build and test should be on their own jobs, but restoring workspaces is too slow
+      # so we do it here.
+      - run: npm run admin -- build  
+      - run: npm run test -- --full        
+      # Run partial e2e suite on PRs only. Master will run the full e2e suite with sharding.
+      - run: if (Test-Path env:CIRCLE_PR_NUMBER) { node tests\legacy-cli\run_e2e.js "--glob=tests/{basic,ivy}/**" }            
+             
+  e2e-cli-win:
+    <<: *defaults_win
+    parallelism: 4
+    steps:     
+      - checkout
+      - *env_win
+      # TODO: remove commands other than the e2e runner when workspaces on windows are well supported.
+      - *post_checkout_win
+      - run: node --version
+      - run: yarn --version
+      - run: yarn install --frozen-lockfile
+      - run: npm run admin -- build  
+      - run: node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX             
+
 workflows:
   version: 2
   default_workflow:
@@ -237,7 +296,7 @@ workflows:
             - build
       - e2e-cli-ivy:
           requires:
-            - build            
+            - build
       - snapshot_publish_docs:
           requires:
           - install
@@ -248,6 +307,16 @@ workflows:
       - e2e-cli-ng-snapshots:
           requires:
             - build
+      - test-win:
+          requires:
+            - test     
+      - e2e-cli-win:
+          requires:
+            - e2e-cli      
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
       - snapshot_publish:
           requires:
             - test

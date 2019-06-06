@@ -164,7 +164,7 @@ describe('Universal Schematic', () => {
     const filePath = '/projects/bar/src/main.ts';
     const contents = tree.readContent(filePath);
     expect(contents)
-      .toMatch(/document.addEventListener\('DOMContentLoaded', \(\) => {[\w\W]+;[\r\n]}\);/);
+      .toMatch(/document.addEventListener\('DOMContentLoaded', \(\) => {/);
   });
 
   it('should wrap the bootstrap declaration in a DOMContentLoaded event handler', async () => {
