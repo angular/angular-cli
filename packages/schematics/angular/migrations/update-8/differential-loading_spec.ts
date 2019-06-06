@@ -166,5 +166,18 @@ describe('Migration to version 8', () => {
       const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
       expect(tree2.exists('/browserslist')).toBe(false);
     });
+
+    it(`should move 'browserslist' to root when 'sourceRoot' is not defined`, () => {
+      tree.rename('/browserslist', '/src/browserslist');
+      expect(tree.exists('/src/browserslist')).toBe(true);
+
+      const config = JSON.parse(tree.readContent('angular.json'));
+      config.projects['migration-test'].sourceRoot = undefined;
+
+      tree.overwrite('angular.json', JSON.stringify(config));
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
+      expect(tree2.exists('/src/browserslist')).toBe(false);
+      expect(tree2.exists('/browserslist')).toBe(true);
+    });
   });
 });

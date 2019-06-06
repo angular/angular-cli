@@ -88,26 +88,16 @@ export function updateES5Projects(): Rule {
       }
 
       const browserslistPath = join(normalize(project.root), 'browserslist');
-      if (typeof project.sourceRoot === 'string') {
-        // Move the CLI 7 style browserlist to root if it's there.
-        const srcBrowsersList = join(normalize(project.sourceRoot), 'browserslist');
-        if (tree.exists(srcBrowsersList) && !tree.exists(browserslistPath)) {
-          // TODO: use rename instead.
-          // This is a hacky workaround. We should be able to just rename it.
-          // On unit tests the rename works fine but on real projects it fails with
-          //     ERROR! browserslist does not exist..
-          // This seems to happen because we are both renaming and then commiting an update.
-          // But it's fine if we read/create/delete. There's a bug somewhere.
-          // tree.rename(srcBrowsersList, browserslistPath);
-          const content = tree.read(srcBrowsersList);
-          if (content) {
-            tree.create(browserslistPath, content);
-            tree.delete(srcBrowsersList);
-          }
-        }
-      }
 
-      if (!tree.exists(browserslistPath)) {
+      // Move the CLI 7 style browserlist to root if it's there.
+      const sourceRoot = project.sourceRoot === 'string'
+        ? project.sourceRoot
+        : join(normalize(project.root), 'src');
+      const srcBrowsersList = join(normalize(sourceRoot), 'browserslist');
+
+      if (tree.exists(srcBrowsersList)) {
+        tree.rename(srcBrowsersList, browserslistPath);
+      } else if (!tree.exists(browserslistPath)) {
         tree.create(browserslistPath, browserslistContent);
       }
     }
