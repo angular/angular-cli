@@ -8,11 +8,6 @@
 import { Architect } from '@angular-devkit/architect';
 import { createArchitect, host, karmaTargetSpec } from '../utils';
 
-// TODO: replace this with an "it()" macro that's reusable globally.
-let linuxOnlyIt: typeof it = it;
-if (process.platform.startsWith('win')) {
-  linuxOnlyIt = xit;
-}
 
 // tslint:disable-next-line:no-big-function
 describe('Karma Builder', () => {
@@ -33,9 +28,7 @@ describe('Karma Builder', () => {
     await run.stop();
   });
 
-  // This test seems to succeed on appveyor but not terminate Karma, leaving the port used
-  // and killing Chrome after 60s. This causes other tests that use Chrome to fail.
-  linuxOnlyIt('fails with broken compilation', async () => {
+  it('fails with broken compilation', async () => {
     host.writeMultipleFiles({
       'src/app/app.component.spec.ts': '<p> definitely not typescript </p>',
     });
