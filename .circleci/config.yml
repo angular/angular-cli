@@ -95,7 +95,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace: *attach_options
-      - run: npm run lint
+      - run: yarn lint
       - run: 'yarn bazel:format -mode=check ||
               (echo "BUILD files not formatted. Please run ''yarn bazel:format''" ; exit 1)'
       # Run the skylark linter to check our Bazel rules
@@ -106,13 +106,13 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace: *attach_options
-      - run: npm run validate -- --ci
+      - run: yarn validate -- --ci
 
   test:
     <<: *defaults
     steps:
       - attach_workspace: *attach_options
-      - run: npm run test -- --full
+      - run: yarn test -- --full
 
   test-large:
     <<: *defaults
@@ -122,8 +122,8 @@ jobs:
     parallelism: 4
     steps:
       - attach_workspace: *attach_options
-      - run: npm run webdriver-update
-      - run: npm run test-large -- --full --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
+      - run: yarn webdriver-update
+      - run: yarn test-large -- --full --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
   e2e-cli:
     <<: *defaults
@@ -184,7 +184,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace: *attach_options
-      - run: npm run admin -- build
+      - run: yarn admin -- build
 
   build-bazel:
     <<: *defaults
@@ -205,7 +205,7 @@ jobs:
       - run:
           name: Deployment to Snapshot
           command: |
-            npm run admin -- snapshots --verbose --githubTokenFile=${HOME}/github_token
+            yarn admin -- snapshots --verbose --githubTokenFile=${HOME}/github_token
 
   publish:
     <<: *defaults
@@ -218,7 +218,7 @@ jobs:
       - run:
           name: Deployment to NPM
           command: |
-            npm run admin -- publish --verbose
+            yarn admin -- publish --verbose
 
   # Windows jobs
   # CircleCI support for Windows jobs is still in preview.
@@ -240,8 +240,8 @@ jobs:
       - run: yarn install --frozen-lockfile
       # Build and test should be on their own jobs, but restoring workspaces is too slow
       # so we do it here.
-      - run: npm run admin -- build  
-      - run: npm run test -- --full        
+      - run: yarn admin -- build  
+      - run: yarn test -- --full        
       # Run partial e2e suite on PRs only. Master will run the full e2e suite with sharding.
       - run: if (Test-Path env:CIRCLE_PR_NUMBER) { node tests\legacy-cli\run_e2e.js "--glob=tests/{basic,ivy}/**" }            
              
@@ -256,7 +256,7 @@ jobs:
       - run: node --version
       - run: yarn --version
       - run: yarn install --frozen-lockfile
-      - run: npm run admin -- build  
+      - run: yarn admin -- build  
       - run: node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX             
 
 workflows:
