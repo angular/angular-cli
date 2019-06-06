@@ -65,7 +65,12 @@ anchor_5: &env_win
     # Need to install node and yarn before, as the base windows image doesn't have anything.
     # TODO: remove when CircleCI provides preconfigured node images/VMs.
     name: Setup windows node environment
-    command: ./.circleci/windows-env.ps1 
+    command: ./.circleci/windows-env.ps1
+anchor_6: &ignore_pull_requests
+  filters:  
+    branches:
+      ignore:
+        - /pull\/.*/
 
 # Job definitions
 version: 2.1
@@ -172,13 +177,6 @@ jobs:
     resource_class: xlarge
     parallelism: 4
     steps:
-      - run:
-          name: Don't run expensive e2e tests for forks other than renovate-bot and angular
-          command: >
-            if [[ "$CIRCLE_PR_USERNAME" != "renovate-bot" ]] &&
-               [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
-              circleci step halt
-            fi
       - attach_workspace: *attach_options
       - run: PATH=~/.npm-global/bin:$PATH xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} --ng-snapshots
 
@@ -285,18 +283,30 @@ workflows:
       - test:
           requires:
             - build
+      - test-win:
+          requires:
+            - test
       - test-large:
           requires:
             - build
       - e2e-cli:
           requires:
             - build
-      - e2e-cli-node-10:
-          requires:
-            - build
       - e2e-cli-ivy:
           requires:
             - build
+      - e2e-cli-ng-snapshots:
+          <<: *ignore_pull_requests
+          requires:
+            - e2e-cli
+      - e2e-cli-node-10:
+          <<: *ignore_pull_requests
+          requires:
+            - e2e-cli
+      - e2e-cli-win:
+          <<: *ignore_pull_requests
+          requires:
+            - e2e-cli
       - snapshot_publish_docs:
           requires:
           - install
@@ -304,28 +314,12 @@ workflows:
             branches:
               only:
               - /docs-preview/
-      - e2e-cli-ng-snapshots:
-          requires:
-            - build
-      - test-win:
-          requires:
-            - test     
-      - e2e-cli-win:
-          requires:
-            - e2e-cli      
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
       - snapshot_publish:
+          <<: *ignore_pull_requests
           requires:
             - test
             - build
             - e2e-cli
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
       - publish:
           requires:
             - test
