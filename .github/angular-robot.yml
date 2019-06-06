@@ -41,13 +41,13 @@ merge:
 
     # list of PR statuses that need to be successful
     requiredStatuses:
-      - "continuous-integration/appveyor/pr"
       - "ci/circleci: build"
       - "ci/circleci: build-bazel"
       - "ci/circleci: install"
       - "ci/circleci: lint"
       - "ci/circleci: validate"
       - "ci/circleci: test"
+      - "ci/circleci: test-win"
       - "ci/circleci: test-large"
 
   # the comment that will be added when the merge label is added despite failing checks, leave empty or set to false to disable
