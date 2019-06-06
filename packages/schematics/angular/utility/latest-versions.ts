@@ -17,7 +17,7 @@ export const latestVersions = {
   DevkitBuildAngular: '~0.800.0',
   DevkitBuildNgPackagr: '~0.800.0',
   DevkitBuildWebpack: '~0.800.0',
-  
+
   tsickle: '^0.35.0',
   ngPackagr: '^5.1.0',
 };
