@@ -44,7 +44,6 @@ Error.stackTraceLimit = Infinity;
  */
 const argv = minimist(process.argv.slice(2), {
   'boolean': [
-    'appveyor',
     'debug',
     'ng-snapshots',
     'noglobal',
