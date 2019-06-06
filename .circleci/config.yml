@@ -307,13 +307,6 @@ workflows:
           <<: *ignore_pull_requests
           requires:
             - e2e-cli
-      - snapshot_publish_docs:
-          requires:
-          - install
-          filters:
-            branches:
-              only:
-              - /docs-preview/
       - snapshot_publish:
           <<: *ignore_pull_requests
           requires:
