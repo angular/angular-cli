@@ -131,7 +131,16 @@ function updateTsConfig(tree: Tree, tsConfigPath: string): void {
   if (isExtendedConfig) {
     removePropertyInAstObject(recorder, compilerOptions, 'target');
     removePropertyInAstObject(recorder, compilerOptions, 'module');
+    removePropertyInAstObject(recorder, compilerOptions, 'downlevelIteration');
   } else {
+    const downlevelIteration = findPropertyInAstObject(compilerOptions, 'downlevelIteration');
+    if (!downlevelIteration) {
+      insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'downlevelIteration', true, 4);
+    } else if (!downlevelIteration.value) {
+      const { start, end } = downlevelIteration;
+      recorder.remove(start.offset, end.offset - start.offset);
+      recorder.insertLeft(start.offset, 'true');
+    }
     const scriptTarget = findPropertyInAstObject(compilerOptions, 'target');
     if (!scriptTarget) {
       insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'target', 'es2015', 4);
