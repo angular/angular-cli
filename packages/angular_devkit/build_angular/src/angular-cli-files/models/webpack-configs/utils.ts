@@ -8,15 +8,10 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
-import * as path from 'path';
 import { basename, normalize } from '@angular-devkit/core';
 import { ExtraEntryPoint, ExtraEntryPointClass } from '../../../browser/schema';
 import { SourceMapDevToolPlugin } from 'webpack';
 import { ScriptTarget } from 'typescript';
-
-export const ngAppResolve = (resolvePath: string): string => {
-  return path.resolve(process.cwd(), resolvePath);
-};
 
 export interface HashFormat {
   chunk: string;
