@@ -80,6 +80,29 @@ describe('Migration to version 8', () => {
       expect(module).toBe('esnext');
     });
 
+    it(`should create 'downlevelIteration' property when doesn't exists`, () => {
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
+      const compilerOptions = {
+        ...oldTsConfig.compilerOptions,
+      };
+
+      tree.overwrite(tsConfigPath, JSON.stringify({ compilerOptions }, null, 2));
+      const { downlevelIteration } = JSON.parse(tree2.readContent(tsConfigPath)).compilerOptions;
+      expect(downlevelIteration).toBe(true);
+    });
+
+    it(`should update 'downlevelIteration' to true when it's false`, () => {
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
+      const compilerOptions = {
+        ...oldTsConfig.compilerOptions,
+        downlevelIteration: false,
+      };
+
+      tree.overwrite(tsConfigPath, JSON.stringify({ compilerOptions }, null, 2));
+      const { downlevelIteration } = JSON.parse(tree2.readContent(tsConfigPath)).compilerOptions;
+      expect(downlevelIteration).toBe(true);
+    });
+
     it(`should create browserslist file if it doesn't exist`, () => {
       tree.delete('/browserslist');
       const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
