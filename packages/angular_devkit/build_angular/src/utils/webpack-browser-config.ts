@@ -24,7 +24,7 @@ import { getEsVersionForFileName } from '../angular-cli-files/models/webpack-con
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { NormalizedBrowserBuilderSchema, defaultProgress, normalizeBrowserSchema } from '../utils';
-import { isDifferentialLoadingNeeded } from './differential-loading';
+import { BuildBrowserFeatures } from './build-browser-features';
 
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 const webpackMerge = require('webpack-merge');
@@ -53,9 +53,11 @@ export async function generateWebpackConfig(
 
   // At the moment, only the browser builder supports differential loading
   // However this config generation is used by multiple builders such as dev-server
-  const scriptTarget = tsConfig.options.target;
+  const scriptTarget = tsConfig.options.target || ts.ScriptTarget.ES5;
+  const buildBrowserFeatures = new BuildBrowserFeatures(projectRoot, scriptTarget);
   const differentialLoading = context.builder.builderName === 'browser'
-    && isDifferentialLoadingNeeded(projectRoot, scriptTarget) && !options.watch;
+    && !options.watch
+    && buildBrowserFeatures.isDifferentialLoadingNeeded();
 
   const scriptTargets = [scriptTarget];
 

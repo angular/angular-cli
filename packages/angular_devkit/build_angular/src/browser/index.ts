@@ -57,7 +57,7 @@ import {
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
 import { ExecutionTransformer } from '../transforms';
-import { deleteOutputDir, isEs5SupportNeeded } from '../utils';
+import { BuildBrowserFeatures, deleteOutputDir } from '../utils';
 import { Version } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
 import { Schema as BrowserBuilderSchema } from './schema';
@@ -202,9 +202,13 @@ export function buildWebpackBrowser(
       const tsConfigPath = path.resolve(getSystemPath(workspace.root), options.tsConfig);
       const tsConfig = readTsconfig(tsConfigPath);
 
-      if (isEs5SupportNeeded(projectRoot) &&
-          tsConfig.options.target !== ScriptTarget.ES5 &&
-          tsConfig.options.target !== ScriptTarget.ES2015) {
+      const target = tsConfig.options.target || ScriptTarget.ES5;
+      const buildBrowserFeatures = new BuildBrowserFeatures(
+        getSystemPath(projectRoot),
+        target,
+      );
+
+      if (target > ScriptTarget.ES2015 && buildBrowserFeatures.isDifferentialLoadingNeeded()) {
         context.logger.warn(tags.stripIndent`
           WARNING: Using differential loading with targets ES5 and ES2016 or higher may
           cause problems. Browsers with support for ES2015 will load the ES2016+ scripts

@@ -73,8 +73,6 @@ describe('Browser Builder with differential loading', () => {
       'main.js',
       'main.js.map',
 
-      'polyfills-es5.js',
-      'polyfills-es5.js.map',
       'polyfills.js',
       'polyfills.js.map',
 
