@@ -18,8 +18,8 @@ import {
   debug,
 } from 'webpack';
 import { RawSource } from 'webpack-sources';
-import { AssetPatternClass } from '../../../browser/schema';
-import { isEs5SupportNeeded } from '../../../utils/differential-loading';
+import { AssetPatternClass, ExtraEntryPoint } from '../../../browser/schema';
+import { BuildBrowserFeatures } from '../../../utils/build-browser-features';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { NamedLazyChunksPlugin } from '../../plugins/named-chunks-plugin';
@@ -40,7 +40,7 @@ export const buildOptimizerLoader: string = g['_DevKitIsLocal']
 
 // tslint:disable-next-line:no-big-function
 export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
-  const { root, projectRoot, buildOptions } = wco;
+  const { root, projectRoot, buildOptions, tsConfig } = wco;
   const { styles: stylesOptimization, scripts: scriptsOptimization } = buildOptions.optimization;
   const {
     styles: stylesSourceMap,
@@ -67,25 +67,39 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   if (wco.buildOptions.platform !== 'server') {
-    const es5Polyfills = path.join(__dirname, '..', 'es5-polyfills.js');
-    const es5JitPolyfills = path.join(__dirname, '..', 'es5-jit-polyfills.js');
-    if (targetInFileName) {
-      // For differential loading we don't need to have 2 polyfill bundles
-      if (buildOptions.scriptTargetOverride === ScriptTarget.ES2015) {
-        entryPoints['polyfills'] = [path.join(__dirname, '..', 'safari-nomodule.js')];
-      } else {
-        entryPoints['polyfills'] = [es5Polyfills];
-        if (!buildOptions.aot) {
-          entryPoints['polyfills'].push(es5JitPolyfills);
+    const buildBrowserFeatures = new BuildBrowserFeatures(
+      projectRoot,
+      tsConfig.options.target || ScriptTarget.ES5,
+    );
+    if ((buildOptions.scriptTargetOverride || tsConfig.options.target) === ScriptTarget.ES5) {
+      if (buildOptions.es5BrowserSupport ||
+        (
+          buildOptions.es5BrowserSupport === undefined &&
+          buildBrowserFeatures.isEs5SupportNeeded()
+        )
+      ) {
+        // The nomodule polyfill needs to be inject prior to any script and be
+        // outside of webpack compilation because otherwise webpack will cause the
+        // script to be wrapped in window["webpackJsonp"] which causes this to fail.
+        if (buildBrowserFeatures.isNoModulePolyfillNeeded()) {
+          const noModuleScript: ExtraEntryPoint = {
+            bundleName: 'polyfills-nomodule-es5',
+            input: path.join(__dirname, '..', 'safari-nomodule.js'),
+          };
+          buildOptions.scripts = buildOptions.scripts
+            ? [...buildOptions.scripts, noModuleScript]
+            : [noModuleScript];
         }
-      }
-    } else {
-      // For NON differential loading we want to have 2 polyfill bundles
-      if (buildOptions.es5BrowserSupport
-        || (buildOptions.es5BrowserSupport === undefined && isEs5SupportNeeded(projectRoot))) {
-        entryPoints['polyfills-es5'] = [es5Polyfills];
+
+         // For differential loading we don't need to generate a seperate polyfill file
+        // because they will be loaded exclusivly based on module and nomodule
+        const polyfillsChunkName = buildBrowserFeatures.isDifferentialLoadingNeeded()
+          ? 'polyfills'
+          : 'polyfills-es5';
+
+        entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
         if (!buildOptions.aot) {
-          entryPoints['polyfills-es5'].push(es5JitPolyfills);
+          entryPoints[polyfillsChunkName].push(path.join(__dirname, '..', 'es5-jit-polyfills.js'));
         }
       }
     }

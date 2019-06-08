@@ -26,6 +26,7 @@ export function generateEntryPoints(
   };
 
   const entryPoints = [
+    'polyfills-nomodule-es5',
     'polyfills-es5',
     'polyfills',
     'sw-register',
