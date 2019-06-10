@@ -79,8 +79,8 @@
     "typescript": "3.4.5"
   },
   "devDependencies": {
-    "@angular/compiler": "^8.0.0-beta.14",
-    "@angular/compiler-cli": "^8.0.0-beta.14",
+    "@angular/compiler": "~8.1.0-next.1",
+    "@angular/compiler-cli": "~8.1.0-next.1",
     "@bazel/bazel": "0.24.1",
     "@bazel/buildifier": "^0.22.0",
     "@bazel/jasmine": "~0.26.0",
