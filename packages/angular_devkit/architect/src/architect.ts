@@ -361,7 +361,8 @@ export class Architect {
     options: json.JsonObject,
     scheduleOptions: ScheduleOptions = {},
   ): Promise<BuilderRun> {
-    if (!/^[^:]+:[^:]+$/.test(name)) {
+    // The below will match 'project:target:configuration'
+    if (!/^[^:]+:[^:]+(:[^:]+)?$/.test(name)) {
       throw new Error('Invalid builder name: ' + JSON.stringify(name));
     }
 
