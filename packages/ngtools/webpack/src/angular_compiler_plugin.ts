@@ -846,7 +846,6 @@ export class AngularCompilerPlugin {
 
   private async _make(compilation: compilation.Compilation) {
     time('AngularCompilerPlugin._make');
-    this._emitSkipped = true;
     // tslint:disable-next-line:no-any
     if ((compilation as any)._ngToolsWebpackPluginInstance) {
       throw new Error('An @ngtools/webpack plugin already exist for this compilation.');
