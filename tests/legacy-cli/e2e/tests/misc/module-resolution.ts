@@ -2,17 +2,9 @@ import { appendToFile, createDir, moveFile, prependToFile } from '../../utils/fs
 import { ng, silentNpm } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
-import { getGlobalVariable } from '../../utils/env';
 
 
 export default async function () {
-  if (getGlobalVariable('argv')['ivy']) {
-    // todo: enable when NGCC supports this.
-    // this test is not yet supported under IVY because can only transform packages from a single basePaths.
-    // https://angular-team.atlassian.net/browse/FW-1204
-    return;
-  }
-
   await updateJsonFile('tsconfig.json', tsconfig => {
     tsconfig.compilerOptions.paths = {
       '*': ['./node_modules/*'],

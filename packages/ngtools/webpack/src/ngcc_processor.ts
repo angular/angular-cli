@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Logger, process as mainNgcc } from '@angular/compiler-cli/ngcc';
+import { Logger, PathMappings, process as mainNgcc } from '@angular/compiler-cli/ngcc';
 import { existsSync } from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
@@ -27,6 +27,7 @@ export class NgccProcessor {
   private _processedModules = new Set<string>();
   private _logger: NgccLogger;
   private _nodeModulesDirectory: string;
+  private _pathMappings: PathMappings | undefined;
 
   constructor(
     private readonly propertiesToConsider: string[],
@@ -34,9 +35,18 @@ export class NgccProcessor {
     private readonly compilationWarnings: (Error | string)[],
     private readonly compilationErrors: (Error | string)[],
     private readonly basePath: string,
+    private readonly compilerOptions: ts.CompilerOptions,
   ) {
     this._logger = new NgccLogger(this.compilationWarnings, this.compilationErrors);
     this._nodeModulesDirectory = this.findNodeModulesDirectory(this.basePath);
+
+    const { baseUrl, paths } = this.compilerOptions;
+    if (baseUrl && paths) {
+      this._pathMappings = {
+        baseUrl,
+        paths,
+      };
+    }
   }
 
   processModule(
@@ -69,6 +79,7 @@ export class NgccProcessor {
       compileAllFormats: false,
       createNewEntryPointFormats: true,
       logger: this._logger,
+      pathMappings: this._pathMappings,
     });
     timeEnd(timeLabel);
 
