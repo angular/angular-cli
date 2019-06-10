@@ -41,80 +41,59 @@ export class NodePackageDoesNotSupportSchematics extends BaseException {
 export class NodeModulesEngineHost extends FileSystemEngineHostBase {
   constructor() { super(); }
 
-  protected _resolvePackageJson(name: string, basedir = process.cwd()) {
-    return core.resolve(name, {
-      basedir,
-      checkLocal: true,
-      checkGlobal: true,
-      resolvePackageJson: true,
-    });
-  }
+  protected _resolvePath(name: string, basedir: string): string {
+    let collectionPath;
 
-  protected _resolvePath(name: string, basedir = process.cwd()) {
     // Allow relative / absolute paths.
     if (name.startsWith('.') || name.startsWith('/')) {
-      return resolvePath(basedir, name);
-    } else {
-      // If it's a file inside a package, resolve the package then return the file...
-      if (name.split('/').length > (name[0] == '@' ? 2 : 1)) {
-        const rest = name.split('/');
-        const packageName = rest.shift() + (name[0] == '@' ? '/' + rest.shift() : '');
-
-        return resolvePath(core.resolve(packageName, {
-          basedir,
-          checkLocal: true,
-          checkGlobal: true,
-          resolvePackageJson: true,
-        }), '..', ...rest);
-      }
-
-      return core.resolve(name, {
-        basedir,
-        checkLocal: true,
-        checkGlobal: true,
-      });
+      collectionPath = resolvePath(basedir, name);
     }
-  }
 
-  protected _resolveCollectionPath(name: string): string {
-    let collectionPath: string | undefined = undefined;
-
-    if (name.replace(/\\/g, '/').split('/').length > (name[0] == '@' ? 2 : 1)) {
+    if (!collectionPath || !core.fs.isFile(collectionPath)) {
+      let packageJsonPath;
       try {
-        collectionPath = this._resolvePath(name, process.cwd());
-      } catch {
+        packageJsonPath = require.resolve(join(name, 'package.json'), { paths: [basedir] });
+      } catch { }
+      if (packageJsonPath) {
+        const pkgJsonSchematics = require(packageJsonPath)['schematics'];
+        if (!pkgJsonSchematics || typeof pkgJsonSchematics != 'string') {
+          throw new NodePackageDoesNotSupportSchematics(name);
+        }
+        collectionPath = this._resolvePath(pkgJsonSchematics, dirname(packageJsonPath));
+      } else {
+        try {
+          collectionPath = require.resolve(name, { paths: [basedir] });
+        } catch { }
       }
     }
 
-    if (!collectionPath) {
-      let packageJsonPath = this._resolvePackageJson(name, process.cwd());
-      // If it's a file, use it as is. Otherwise append package.json to it.
-      if (!core.fs.isFile(packageJsonPath)) {
-        packageJsonPath = join(packageJsonPath, 'package.json');
-      }
-
-      const pkgJsonSchematics = require(packageJsonPath)['schematics'];
-      if (!pkgJsonSchematics || typeof pkgJsonSchematics != 'string') {
-        throw new NodePackageDoesNotSupportSchematics(name);
-      }
-      collectionPath = this._resolvePath(pkgJsonSchematics, dirname(packageJsonPath));
-    }
-
-    try {
-      if (collectionPath) {
+    if (collectionPath) {
+      try {
         readJsonFile(collectionPath);
 
         return collectionPath;
-      }
-    } catch (e) {
-      if (
-        e instanceof InvalidJsonCharacterException || e instanceof UnexpectedEndOfInputException
-      ) {
-        throw new InvalidCollectionJsonException(name, collectionPath, e);
+      } catch (e) {
+        if (
+          e instanceof InvalidJsonCharacterException || e instanceof UnexpectedEndOfInputException
+        ) {
+          throw new InvalidCollectionJsonException(name, collectionPath, e);
+        }
       }
     }
 
     throw new CollectionCannotBeResolvedException(name);
+  }
+
+  protected _resolveCollectionPath(name: string): string {
+    try {
+      return this._resolvePath(name, process.cwd());
+    } catch (e) {
+      if (e instanceof CollectionCannotBeResolvedException) {
+        return this._resolvePath(name, __dirname);
+      } else {
+        throw e;
+      }
+    }
   }
 
   protected _resolveReferenceString(refString: string, parentPath: string) {
