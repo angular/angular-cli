@@ -1,6 +1,6 @@
 # <%= utils.classify(name) %>
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version <%= version %>.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) <%= next ? 'next' : 'version ' + version %>.
 
 ## Development server
 
