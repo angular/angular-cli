@@ -42,6 +42,7 @@ export default function (options: NgNewOptions): Rule {
     version: options.version,
     newProjectRoot: options.newProjectRoot || 'projects',
     minimal: options.minimal,
+    next: options.next,
   };
   const applicationOptions: ApplicationOptions = {
     projectRoot: '',
