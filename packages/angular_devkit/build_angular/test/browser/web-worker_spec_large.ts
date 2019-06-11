@@ -138,7 +138,6 @@ describe('Browser Builder Web Worker support', () => {
       watch: true,
     };
 
-    let buildCount = 0;
     let phase = 1;
     const workerPath = join(outputPath, '0.worker.js');
     let workerContent = '';
@@ -146,10 +145,13 @@ describe('Browser Builder Web Worker support', () => {
     const run = await architect.scheduleTarget(target, overrides);
     await run.output.pipe(
       // Wait for files to be written to disk.
-      debounceTime(1000),
+      // FIXME: Not quite sure why such a long 'debounceTime' is needed.
+      // Anything under `2500` is a constant failure locally when using
+      // 'fdescribe' and this tests doesn't run as first one and is also rather flaky on CI.
+      // It seems that the outputted files contents don't get updated in time.
+      debounceTime(2500),
       tap((buildEvent) => expect(buildEvent.success).toBe(true, 'build should succeed')),
       tap(() => {
-        buildCount++;
         switch (phase) {
           case 1:
             // Original worker content should be there.
