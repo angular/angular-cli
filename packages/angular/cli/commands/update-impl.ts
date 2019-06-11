@@ -346,10 +346,24 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
   checkCleanGit() {
     try {
       const result = execSync('git status --porcelain', { encoding: 'utf8', stdio: 'pipe' });
+      if (result.trim().length === 0) {
+        return true;
+      }
 
-      return result.trim().length === 0;
-    } catch {
-      return true;
-    }
+      // Only files inside the workspace root are relevant
+      for (const entry of result.split('\n')) {
+        const relativeEntry = path.relative(
+          path.resolve(this.workspace.root),
+          path.resolve(entry.slice(3).trim()),
+        );
+
+        if (!relativeEntry.startsWith('..') && !path.isAbsolute(relativeEntry)) {
+          return false;
+        }
+      }
+
+    } catch { }
+
+    return true;
   }
 }
