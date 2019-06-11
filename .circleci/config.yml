@@ -28,7 +28,7 @@ anchor_1_win: &defaults_win
   resource_class: windows.medium
   shell: powershell.exe -ExecutionPolicy Bypass
   machine:
-    image: windows-server-2019  
+    image: windows-server-2019
 
 # After checkout, rebase on top of target branch.
 anchor_2: &post_checkout
@@ -37,8 +37,8 @@ anchor_2: &post_checkout
     command: >
       if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
         # User is required for rebase.
-        git config user.name "angular-ci"	
-        git config user.email "angular-ci"      
+        git config user.name "angular-ci"
+        git config user.email "angular-ci"
         # Rebase PR on top of target branch.
         node tools/rebase-pr.js angular/angular-cli ${CIRCLE_PR_NUMBER}
       else
@@ -67,7 +67,7 @@ anchor_5: &env_win
     name: Setup windows node environment
     command: ./.circleci/windows-env.ps1
 anchor_6: &ignore_pull_requests
-  filters:  
+  filters:
     branches:
       ignore:
         - /pull\/.*/
@@ -228,9 +228,9 @@ jobs:
   # Docs: https://github.com/CircleCI-Public/windows-preview-docs
   test-win:
     <<: *defaults_win
-    # Skipping cache and workspace for now because it takes 10x longer than on linux. 
+    # Skipping cache and workspace for now because it takes 10x longer than on linux.
     # TODO: when/if CircleCI makes them faster, use cache and workspaces fully.
-    # Notes: 
+    # Notes:
     # - windows needs its own cache key because binaries in node_modules are different.
     # - windows might need its own workspace for the same reason.
     # - get cache dir on windows via `yarn cache dir` (was `C:\Users\circleci\AppData\Local\Yarn\Cache\v4` last time)
@@ -243,10 +243,10 @@ jobs:
       - run: yarn install --frozen-lockfile
       # Build and test should be on their own jobs, but restoring workspaces is too slow
       # so we do it here.
-      - run: yarn admin -- build  
-      - run: yarn test -- --full        
+      - run: yarn admin -- build
+      - run: yarn test -- --full
       # Run partial e2e suite on PRs only. Master will run the full e2e suite with sharding.
-      - run: if (Test-Path env:CIRCLE_PR_NUMBER) { node tests\legacy-cli\run_e2e.js "--glob=tests/{basic,ivy}/**" }            
+      - run: if (Test-Path env:CIRCLE_PR_NUMBER) { node tests\legacy-cli\run_e2e.js "--glob=tests/{basic,ivy}/**" }
              
   e2e-cli-win:
     <<: *defaults_win
@@ -259,8 +259,8 @@ jobs:
       - run: node --version
       - run: yarn --version
       - run: yarn install --frozen-lockfile
-      - run: yarn admin -- build  
-      - run: node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX             
+      - run: yarn admin -- build
+      - run: node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
 
 workflows:
   version: 2
