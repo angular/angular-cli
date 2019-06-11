@@ -79,4 +79,12 @@ describe('Ng New Schematic', () => {
     const confContent = JSON.parse(tree.readContent('/bar/angular.json'));
     expect(confContent.projects.foo.e2e).toBeUndefined();
   });
+
+  it('next=true should set next angular versions', async () => {
+    const options = { ...defaultOptions, next: true };
+
+    const tree = await schematicRunner.runSchematicAsync('ng-new', options).toPromise();
+    const packageContent = JSON.parse(tree.readContent('/bar/package.json'));
+    expect(packageContent.dependencies['@angular/core']).toEqual('next');
+  });
 });
