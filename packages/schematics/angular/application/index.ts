@@ -261,7 +261,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
           scripts: [],
         },
       },
-      lint: {
+      lint: options.minimal ? undefined : {
         builder: Builders.TsLint,
         options: {
           tsConfig: [
