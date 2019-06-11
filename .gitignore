@@ -8,6 +8,7 @@ dist-schema/
 .idea/
 jsconfig.json
 .vscode/
+.history/
 
 # Typings file.
 typings/
