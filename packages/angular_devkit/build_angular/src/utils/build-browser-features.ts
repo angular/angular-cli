@@ -34,7 +34,7 @@ export class BuildBrowserFeatures {
    * True, when one or more browsers requires ES5 support
    */
   isEs5SupportNeeded(): boolean {
-    return !caniuse.isSupported('es6-module', this._supportedBrowsers.join(', '));
+    return !this.isFeatureSupported('es6-module');
   }
 
   /**
@@ -54,5 +54,34 @@ export class BuildBrowserFeatures {
     ];
 
     return this._supportedBrowsers.some(browser => safariBrowsers.includes(browser));
+  }
+
+  /**
+   * True, when a browser feature is supported partially or fully.
+   */
+  isFeatureSupported(featureId: string): boolean {
+    // y: feature is fully available
+    // n: feature is unavailable
+    // a: feature is partially supported
+    // x: feature is prefixed
+    const criteria = [
+      'y',
+      'a',
+    ];
+
+    const data = feature(features[featureId]);
+
+    return !this._supportedBrowsers
+      .some(browser => {
+        const [agentId, version] = browser.split(' ');
+
+        const browserData = data.stats[agentId];
+        const featureStatus = (browserData && browserData[version]) as string | undefined;
+
+        // We are only interested in the first character
+        // Ex: when 'a #4 #5', we only need to check for 'a'
+        // as for such cases we should polyfill these features as needed
+        return !featureStatus || !criteria.includes(featureStatus.charAt(0));
+      });
   }
 }
