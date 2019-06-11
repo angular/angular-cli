@@ -155,6 +155,11 @@
       "type": "boolean",
       "default": false,
       "x-user-analytics": 14
+    },
+    "next": {
+      "description": "When true, creates a workspace with next versions of the Angular.",
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [
