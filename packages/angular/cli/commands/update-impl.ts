@@ -104,15 +104,18 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
     this.logger.info(`Using package manager: '${packageManager}'`);
 
     // Special handling for Angular CLI 1.x migrations
-    if (options.migrateOnly === undefined && options.from === undefined) {
-      if (!options.all && packages.length === 1 && packages[0].name === '@angular/cli') {
-        const oldConfigFilePath = findUp(oldConfigFileNames, process.cwd());
-        if (oldConfigFilePath) {
+    if (
+      options.migrateOnly === undefined &&
+      options.from === undefined &&
+      !options.all &&
+      packages.length === 1 &&
+      packages[0].name === '@angular/cli' &&
+      this.workspace.configFile &&
+      oldConfigFileNames.includes(this.workspace.configFile)
+    ) {
           options.migrateOnly = true;
           options.from = '1.0.0';
         }
-      }
-    }
 
     this.logger.info('Collecting installed dependencies...');
 
