@@ -98,17 +98,5 @@ describe('Application Schematic', () => {
       expect(e2eOptions.protractorConfig).toEqual('projects/foo/e2e/protractor.conf.js');
       expect(e2eOptions.devServerTarget).toEqual('foo:serve');
     });
-
-    it('should set the lint options', async () => {
-      const tree = await schematicRunner.runSchematicAsync('e2e', defaultOptions, applicationTree)
-        .toPromise();
-      const workspace = JSON.parse(tree.readContent('/angular.json'));
-      const lintOptions = workspace.projects.foo.architect.lint.options;
-      expect(lintOptions.tsConfig).toEqual([
-        'projects/foo/tsconfig.app.json',
-        'projects/foo/tsconfig.spec.json',
-        'projects/foo/e2e/tsconfig.json',
-      ]);
-    });
   });
 });
