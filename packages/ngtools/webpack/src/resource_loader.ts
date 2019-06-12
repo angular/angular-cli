@@ -27,6 +27,7 @@ export class WebpackResourceLoader {
   private _parentCompilation: any;
   private _context: string;
   private _fileDependencies = new Map<string, string[]>();
+  private _reverseDependencies = new Map<string, string[]>();
   private _cachedSources = new Map<string, string>();
   private _cachedEvaluatedSources = new Map<string, RawSource>();
 
@@ -39,6 +40,10 @@ export class WebpackResourceLoader {
 
   getResourceDependencies(filePath: string) {
     return this._fileDependencies.get(filePath) || [];
+  }
+
+  getAffectedResources(file: string) {
+    return this._reverseDependencies.get(file) || [];
   }
 
   private _compile(filePath: string): Promise<CompilationOutput> {
@@ -117,6 +122,14 @@ export class WebpackResourceLoader {
 
           // Save the dependencies for this resource.
           this._fileDependencies.set(filePath, childCompilation.fileDependencies);
+          for (const file of childCompilation.fileDependencies) {
+            const entry = this._reverseDependencies.get(file);
+            if (entry) {
+              entry.push(filePath);
+            } else {
+              this._reverseDependencies.set(file, [filePath]);
+            }
+          }
 
           const compilationHash = childCompilation.fullHash;
           const maybeSource = this._cachedSources.get(compilationHash);
