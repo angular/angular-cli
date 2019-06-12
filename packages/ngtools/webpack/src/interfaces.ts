@@ -7,6 +7,7 @@
  */
 
 import { logging, virtualFs } from '@angular-devkit/core';
+import { CompilerOptions } from '@angular/compiler-cli';
 import * as fs from 'fs';
 import * as ts from 'typescript';
 
@@ -59,7 +60,7 @@ export interface AngularCompilerPluginOptions {
   contextElementDependencyConstructor?: ContextElementDependencyConstructor;
 
   // Use tsconfig to include path globs.
-  compilerOptions?: ts.CompilerOptions;
+  compilerOptions?: CompilerOptions;
 
   host?: virtualFs.Host<fs.Stats>;
   platformTransformers?: ts.TransformerFactory<ts.SourceFile>[];
