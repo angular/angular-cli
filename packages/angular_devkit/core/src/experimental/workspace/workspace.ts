@@ -17,6 +17,7 @@ import {
   parseJson,
   schema,
 } from '../../json';
+import { SchemaValidatorResult } from '../../json/schema/interface';
 import {
   Path,
   basename,
@@ -342,7 +343,7 @@ export class Workspace {
 
     return this._registry.compile(schemaJson).pipe(
       concatMap(validator => validator(contentJsonCopy)),
-      concatMap(validatorResult => {
+      concatMap((validatorResult: SchemaValidatorResult) => {
         if (validatorResult.success) {
           return of(contentJsonCopy as T);
         } else {
