@@ -72,6 +72,7 @@ async function execute(options: ExtractI18nBuilderOptions, context: BuilderConte
         scripts: false,
         styles: false,
       },
+      buildOptimizer: false,
       i18nLocale: options.i18nLocale,
       i18nFormat: options.i18nFormat,
       i18nFile: outFile,
