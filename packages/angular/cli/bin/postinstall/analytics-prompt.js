@@ -5,10 +5,12 @@ if ('NG_CLI_ANALYTICS' in process.env) {
   return;
 }
 
-try {
-  const analytics = require('../../models/analytics');
+(async () => {
+  try {
+    const analytics = require('../../models/analytics');
 
-  if (!analytics.hasGlobalAnalyticsConfiguration()) {
-    analytics.promptGlobalAnalytics();
-  }
-} catch (_) {}
+    if (!analytics.hasGlobalAnalyticsConfiguration()) {
+      await analytics.promptGlobalAnalytics();
+    }
+  } catch (_) {}
+})();
