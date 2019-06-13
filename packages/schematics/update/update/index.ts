@@ -508,10 +508,6 @@ function _usageMessage(
     logger.info('  ' + fields.map((x, i) => x.padEnd(pads[i])).join(''));
   });
 
-  logger.info('\n');
-  logger.info('There might be additional packages that are outdated.');
-  logger.info('Run "ng update --all" to try to update all at the same time.\n');
-
   return of<void>(undefined);
 }
 
