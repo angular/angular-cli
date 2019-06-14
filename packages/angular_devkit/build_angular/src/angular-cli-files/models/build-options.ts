@@ -9,7 +9,8 @@
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
 import { logging } from '@angular-devkit/core';
-import { ParsedCommandLine, ScriptTarget } from 'typescript';
+import { ParsedConfiguration } from '@angular/compiler-cli';
+import { ScriptTarget } from 'typescript';
 import {
   AssetPatternClass,
   Budget,
@@ -93,7 +94,7 @@ export interface WebpackConfigOptions<T = BuildOptions> {
   projectRoot: string;
   sourceRoot?: string;
   buildOptions: T;
-  tsConfig: ParsedCommandLine;
+  tsConfig: ParsedConfiguration;
   tsConfigPath: string;
   supportES2015: boolean;
 }
