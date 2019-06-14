@@ -199,9 +199,7 @@ export function buildWebpackBrowser(
         normalize(workspace.getProject(projectName).root),
       );
 
-      const tsConfigPath = path.resolve(getSystemPath(workspace.root), options.tsConfig);
-      const tsConfig = readTsconfig(tsConfigPath);
-
+      const tsConfig = readTsconfig(options.tsConfig, context.workspaceRoot);
       const target = tsConfig.options.target || ScriptTarget.ES5;
       const buildBrowserFeatures = new BuildBrowserFeatures(
         getSystemPath(projectRoot),
