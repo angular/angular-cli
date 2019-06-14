@@ -107,6 +107,9 @@ export class AngularCompilerPlugin {
   private _platform: PLATFORM;
   private _JitMode = false;
   private _emitSkipped = true;
+  // This is needed because if the first build fails we need to do a full emit
+  // even whe only a single file gets updated.
+  private _hadFullJitEmit: boolean | undefined;
   private _changedFileExtensions = new Set(['ts', 'tsx', 'html', 'css', 'js', 'json']);
 
   // Webpack plugin.
@@ -1196,7 +1199,7 @@ export class AngularCompilerPlugin {
           'AngularCompilerPlugin._emit.ts', diagMode));
 
         if (!hasErrors(allDiagnostics)) {
-          if (this._firstRun || changedTsFiles.size > 20 || this._emitSkipped) {
+          if (this._firstRun || changedTsFiles.size > 20 || !this._hadFullJitEmit) {
             emitResult = tsProgram.emit(
               undefined,
               undefined,
@@ -1204,6 +1207,7 @@ export class AngularCompilerPlugin {
               undefined,
               { before: this._transformers },
             );
+            this._hadFullJitEmit = !emitResult.emitSkipped;
             allDiagnostics.push(...emitResult.diagnostics);
           } else {
             for (const changedFile of changedTsFiles) {
