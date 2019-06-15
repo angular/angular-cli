@@ -325,6 +325,15 @@ describe('Component Schematic', () => {
     expect(content).toMatch(/selector: 'app-test'/);
   });
 
+  it('should respect the skipSelector option', async () => {
+    const options = { ...defaultOptions, name: 'sub/test', skipSelector: true };
+    appTree = await schematicRunner.runSchematicAsync('component', options, appTree)
+      .toPromise();
+    const content = appTree.readContent('/projects/bar/src/app/sub/test/test.component.ts');
+    expect(content).not.toMatch(/selector: 'app-test'/);
+    console.log(content);
+  });
+
   it('should respect the sourceRoot value', async () => {
     const config = JSON.parse(appTree.readContent('/angular.json'));
     config.projects.bar.sourceRoot = 'projects/bar/custom';

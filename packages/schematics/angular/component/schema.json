@@ -116,6 +116,11 @@
       "format": "html-selector",
       "description": "The HTML selector to use for this component."
     },
+    "skipSelector": {
+      "type": "boolean",
+      "default": false,
+      "description": "Specifies if the component should have a selector or not."
+    },
     "module":  {
       "type": "string",
       "description": "The declaring NgModule.",
