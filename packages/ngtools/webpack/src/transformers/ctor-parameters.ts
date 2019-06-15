@@ -202,8 +202,7 @@ export function decoratorDownlevelTransformer(
   diagnostics: ts.Diagnostic[],
 ): (context: ts.TransformationContext) => ts.Transformer<ts.SourceFile> {
   return (context: ts.TransformationContext) => {
-    /** A map from symbols to the identifier of an import, reset per SourceFile. */
-    let importNamesBySymbol = new Map<ts.Symbol, ts.Identifier>();
+    const parameterTypeSymbols = new Set<ts.Symbol>();
 
     /**
      * Converts an EntityName (from a type annotation) to an expression (accessing a value).
@@ -211,40 +210,23 @@ export function decoratorDownlevelTransformer(
      * For a given ts.EntityName, this walks depth first to find the leftmost ts.Identifier, then
      * converts the path into property accesses.
      *
-     * This generally works, but TypeScript's emit pipeline does not serialize identifiers that are
-     * only used in a type location (such as identifiers in a TypeNode), even if the identifier
-     * itself points to a value (e.g. a class). To avoid that problem, this method finds the symbol
-     * representing the identifier (using typeChecker), then looks up where it was imported (using
-     * importNamesBySymbol), and then uses the imported name instead of the identifier from the type
-     * expression, if any. Otherwise it'll use the identifier unchanged. This makes sure the
-     * identifier is not marked as stemming from a "type only" expression, causing it to be emitted
-     * and causing the import to be retained.
      */
     function entityNameToExpression(name: ts.EntityName): ts.Expression | undefined {
-      const sym = typeChecker.getSymbolAtLocation(name);
-      if (!sym) {
-        return undefined;
-      }
-      // Check if the entity name references a symbol that is an actual value. If it is not, it
-      // cannot be referenced by an expression, so return undefined.
-      let symToCheck = sym;
-      if (symToCheck.flags & ts.SymbolFlags.Alias) {
-        symToCheck = typeChecker.getAliasedSymbol(symToCheck);
-      }
-      if (!(symToCheck.flags & ts.SymbolFlags.Value)) {
-        return undefined;
-      }
-
       if (ts.isIdentifier(name)) {
-        // If there's a known import name for this symbol, use it so that the import will be
-        // retained and the value can be referenced.
-        const value = importNamesBySymbol.get(sym);
-        if (value) {
-          return value;
+        const typeSymbol = typeChecker.getSymbolAtLocation(name);
+        if (typeSymbol) {
+          parameterTypeSymbols.add(typeSymbol);
         }
 
-        // Otherwise this will be a locally declared name, just return that.
-        return name;
+        // Based on TS's strategy to allow the checker to reach this identifier
+        // tslint:disable-next-line:max-line-length
+        // https://github.com/microsoft/TypeScript/blob/7f47a08a5e9874f0f97a667bd81eebddec61247c/src/compiler/transformers/ts.ts#L2093
+        const exp = ts.getMutableClone(name);
+        exp.flags &= ~ts.NodeFlags.Synthesized;
+        ((exp as unknown) as { original: undefined }).original = undefined;
+        exp.parent = ts.getParseTreeNode(name.getSourceFile());
+
+        return exp;
       }
       const ref = entityNameToExpression(name.left);
       if (!ref) {
@@ -254,17 +236,13 @@ export function decoratorDownlevelTransformer(
       return ts.createPropertyAccess(ref, name.right);
     }
 
-    /**
-     * Transforms a constructor. Returns the transformed constructor and the list of parameter
-     * information collected, consisting of decorators and optional type.
-     */
-    function transformConstructor(
-      ctor: ts.ConstructorDeclaration,
-    ): [ts.ConstructorDeclaration, ParameterDecorationInfo[]] {
-      ctor = ts.visitEachChild(ctor, visitor, context);
+    function classMemberVisitor(node: ts.Node): ts.VisitResult<ts.Node> {
+      if (!ts.isConstructorDeclaration(node) || !node.body) {
+        return visitor(node);
+      }
 
       const parametersInfo: ParameterDecorationInfo[] = [];
-      for (const param of ctor.parameters) {
+      for (const param of node.parameters) {
         const paramInfo: ParameterDecorationInfo = { decorators: [], type: null };
 
         for (const decorator of param.decorators || []) {
@@ -280,98 +258,56 @@ export function decoratorDownlevelTransformer(
         parametersInfo.push(paramInfo);
       }
 
-      return [ctor, parametersInfo];
-    }
-
-    /**
-     * Transforms a single class declaration:
-     * - creates a ctorParameters property
-     */
-    function transformClassDeclaration(classDecl: ts.ClassDeclaration): ts.ClassDeclaration {
-      if (!classDecl.decorators || classDecl.decorators.length === 0) {
-        return classDecl;
-      }
-
-      const newMembers: ts.ClassElement[] = [];
-      let classParameters: ParameterDecorationInfo[] | null = null;
-
-      for (const member of classDecl.members) {
-        switch (member.kind) {
-          case ts.SyntaxKind.Constructor: {
-            const ctor = member as ts.ConstructorDeclaration;
-            if (!ctor.body) {
-              break;
-            }
-
-            const [newMember, parametersInfo] = transformConstructor(
-              member as ts.ConstructorDeclaration,
-            );
-            classParameters = parametersInfo;
-            newMembers.push(newMember);
-            continue;
-          }
-          default:
-            break;
-        }
-        newMembers.push(ts.visitEachChild(member, visitor, context));
-      }
-
-      const newClassDeclaration = ts.getMutableClone(classDecl);
-
-      if (classParameters) {
-        newMembers.push(
-          createCtorParametersClassProperty(diagnostics, entityNameToExpression, classParameters),
+      if (parametersInfo.length > 0) {
+        const ctorProperty = createCtorParametersClassProperty(
+          diagnostics,
+          entityNameToExpression,
+          parametersInfo,
         );
+
+        return [node, ctorProperty];
+      } else {
+        return node;
       }
-
-      newClassDeclaration.members = ts.setTextRange(
-        ts.createNodeArray(newMembers, newClassDeclaration.members.hasTrailingComma),
-        classDecl.members,
-      );
-
-      return newClassDeclaration;
     }
 
-    function visitor(node: ts.Node): ts.Node {
-      switch (node.kind) {
-        case ts.SyntaxKind.SourceFile: {
-          importNamesBySymbol = new Map<ts.Symbol, ts.Identifier>();
+    function visitor<T extends ts.Node>(node: T): ts.Node {
+      if (ts.isClassDeclaration(node)) {
+        return ts.updateClassDeclaration(
+          node,
+          node.decorators,
+          node.modifiers,
+          node.name,
+          node.typeParameters,
+          node.heritageClauses,
+          ts.visitNodes(node.members, classMemberVisitor),
+        );
+      } else {
+        return ts.visitEachChild(node, visitor, context);
+      }
+    }
 
-          return ts.visitEachChild(node, visitor, context);
-        }
-        case ts.SyntaxKind.ImportDeclaration: {
-          const impDecl = node as ts.ImportDeclaration;
-          if (impDecl.importClause) {
-            const importClause = impDecl.importClause;
-            const names = [];
-            if (importClause.name) {
-              names.push(importClause.name);
-            }
-            if (
-              importClause.namedBindings &&
-              importClause.namedBindings.kind === ts.SyntaxKind.NamedImports
-            ) {
-              const namedImports = importClause.namedBindings as ts.NamedImports;
-              names.push(...namedImports.elements.map(e => e.name));
-            }
-            for (const name of names) {
-              const sym = typeChecker.getSymbolAtLocation(name);
-              if (sym) {
-                importNamesBySymbol.set(sym, name);
-              }
+    return (sf: ts.SourceFile) => {
+      parameterTypeSymbols.clear();
+
+      return ts.visitEachChild(
+        visitor(sf) as ts.SourceFile,
+        function visitImports(node: ts.Node): ts.Node {
+          if (
+            (ts.isImportSpecifier(node) || ts.isNamespaceImport(node) || ts.isImportClause(node)) &&
+            node.name
+          ) {
+            const importSymbol = typeChecker.getSymbolAtLocation(node.name);
+            if (importSymbol && parameterTypeSymbols.has(importSymbol)) {
+              // Using a clone prevents TS from removing the import specifier
+              return ts.getMutableClone(node);
             }
           }
 
-          return ts.visitEachChild(node, visitor, context);
-        }
-        case ts.SyntaxKind.ClassDeclaration: {
-          return transformClassDeclaration(node as ts.ClassDeclaration);
-        }
-        default:
-          return ts.visitEachChild(node, visitor, context);
-      }
-    }
-
-    return (sf: ts.SourceFile) => visitor(sf) as ts.SourceFile;
+          return ts.visitEachChild(node, visitImports, context);
+        },
+        context,
+      );
+    };
   };
 }
