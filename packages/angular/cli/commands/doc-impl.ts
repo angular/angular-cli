@@ -19,9 +19,21 @@ export class DocCommand extends Command<DocCommandSchema> {
 
       return 0;
     }
-    let searchUrl = `https://angular.io/api?query=${options.keyword}`;
+
+    let domain = 'angular.io';
+
+    if (options.version) {
+      if (options.version == 'next') {
+        domain = 'next.angular.io';
+      } else {
+        domain = `v${options.version}.angular.io`;
+      }
+    }
+
+    let searchUrl = `https://${domain}/api?query=${options.keyword}`;
+
     if (options.search) {
-      searchUrl = `https://www.google.com/search?q=site%3Aangular.io+${options.keyword}`;
+      searchUrl = `https://www.google.com/search?q=site%3A${domain}+${options.keyword}`;
     }
 
     // We should wrap `open` in a new Promise because `open` is already resolved

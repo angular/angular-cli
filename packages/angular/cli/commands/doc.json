@@ -25,6 +25,21 @@
           "type": "boolean",
           "default": false,
           "description": "When true, searches all of angular.io. Otherwise, searches only API reference documentation."
+        },
+        "version" : {
+          "anyOf": [
+            {
+              "const" : 2
+            },
+            {
+              "type" : "integer",
+              "minimum": 4
+            },
+            {
+              "const": "next"
+            }
+          ],
+          "description": "Contains the version of Angular to use for the documentation."
         }
       },
       "required": [
