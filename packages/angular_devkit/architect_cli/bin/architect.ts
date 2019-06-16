@@ -9,16 +9,15 @@
 import { Architect, BuilderInfo, BuilderProgressState, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import {
-  experimental,
   json,
   logging,
-  normalize,
   schema,
   tags,
   terminal,
+  workspaces,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync } from 'fs';
 import * as minimist from 'minimist';
 import * as path from 'path';
 import { tap } from 'rxjs/operators';
@@ -82,7 +81,7 @@ interface BarInfo {
 
 async function _executeTarget(
   parentLogger: logging.Logger,
-  workspace: experimental.workspace.Workspace,
+  workspace: workspaces.WorkspaceDefinition,
   root: string,
   argv: minimist.ParsedArgs,
   registry: json.schema.SchemaRegistry,
@@ -213,16 +212,14 @@ async function main(args: string[]): Promise<number> {
   }
 
   const root = path.dirname(configFilePath);
-  const configContent = readFileSync(configFilePath, 'utf-8');
-  const workspaceJson = JSON.parse(configContent);
 
   const registry = new schema.CoreSchemaRegistry();
   registry.addPostTransform(schema.transforms.addUndefinedDefaults);
 
-  const host = new NodeJsSyncHost();
-  const workspace = new experimental.workspace.Workspace(normalize(root), host);
-
-  await workspace.loadWorkspaceFromJson(workspaceJson).toPromise();
+  const { workspace } = await workspaces.readWorkspace(
+    configFilePath,
+    workspaces.createWorkspaceHost(new NodeJsSyncHost()),
+  );
 
   // Clear the console.
   process.stdout.write('\u001Bc');
