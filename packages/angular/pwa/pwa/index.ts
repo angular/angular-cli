@@ -1,18 +1,11 @@
 /**
-* @license
-* Copyright Google Inc. All Rights Reserved.
-*
-* Use of this source code is governed by an MIT-style license that can be
-* found in the LICENSE file at https://angular.io/license
-*/
-import {
-  JsonParseMode,
-  experimental,
-  getSystemPath,
-  join,
-  normalize,
-  parseJson,
-} from '@angular-devkit/core';
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import { getSystemPath, join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -29,28 +22,6 @@ import { Readable, Writable } from 'stream';
 import { Schema as PwaOptions } from './schema';
 
 const RewritingStream = require('parse5-html-rewriting-stream');
-
-
-function getWorkspace(
-  host: Tree,
-): { path: string, workspace: experimental.workspace.WorkspaceSchema } {
-  const possibleFiles = [ '/angular.json', '/.angular.json' ];
-  const path = possibleFiles.filter(path => host.exists(path))[0];
-
-  const configBuffer = host.read(path);
-  if (configBuffer === null) {
-    throw new SchematicsException(`Could not find (${path})`);
-  }
-  const content = configBuffer.toString();
-
-  return {
-    path,
-    workspace: parseJson(
-      content,
-      JsonParseMode.Loose,
-    ) as {} as experimental.workspace.WorkspaceSchema,
-  };
-}
 
 function updateIndexFile(path: string): Rule {
   return (host: Tree) => {
@@ -111,40 +82,38 @@ function updateIndexFile(path: string): Rule {
   };
 }
 
-export default function (options: PwaOptions): Rule {
-  return (host: Tree) => {
+export default function(options: PwaOptions): Rule {
+  return async host => {
     if (!options.title) {
       options.title = options.project;
     }
-    const {path: workspacePath, workspace } = getWorkspace(host);
+
+    // Keep Bazel from failing due to deep import
+    const { getWorkspace, updateWorkspace } = require('@schematics/angular/utility/workspace');
+
+    const workspace = await getWorkspace(host);
 
     if (!options.project) {
       throw new SchematicsException('Option "project" is required.');
     }
 
-    const project = workspace.projects[options.project];
+    const project = workspace.projects.get(options.project);
     if (!project) {
       throw new SchematicsException(`Project is not defined in this workspace.`);
     }
 
-    if (project.projectType !== 'application') {
+    if (project.extensions['projectType'] !== 'application') {
       throw new SchematicsException(`PWA requires a project type of "application".`);
     }
 
     // Find all the relevant targets for the project
-    const projectTargets = project.targets || project.architect;
-    if (!projectTargets || Object.keys(projectTargets).length === 0) {
+    if (project.targets.size === 0) {
       throw new SchematicsException(`Targets are not defined for this project.`);
     }
 
     const buildTargets = [];
     const testTargets = [];
-    for (const targetName in projectTargets) {
-      const target = projectTargets[targetName];
-      if (!target) {
-        continue;
-      }
-
+    for (const target of project.targets.values()) {
       if (target.builder === '@angular-devkit/build-angular:browser') {
         buildTargets.push(target);
       } else if (target.builder === '@angular-devkit/build-angular:karma') {
@@ -156,21 +125,20 @@ export default function (options: PwaOptions): Rule {
     const assetEntry = join(normalize(project.root), 'src', 'manifest.webmanifest');
     for (const target of [...buildTargets, ...testTargets]) {
       if (target.options) {
-        if (target.options.assets) {
+        if (Array.isArray(target.options.assets)) {
           target.options.assets.push(assetEntry);
         } else {
-          target.options.assets = [ assetEntry ];
+          target.options.assets = [assetEntry];
         }
       } else {
-        target.options = { assets: [ assetEntry ] };
+        target.options = { assets: [assetEntry] };
       }
     }
-    host.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
 
     // Find all index.html files in build targets
     const indexFiles = new Set<string>();
     for (const target of buildTargets) {
-      if (target.options && target.options.index) {
+      if (target.options && typeof target.options.index === 'string') {
         indexFiles.add(target.options.index);
       }
 
@@ -179,7 +147,7 @@ export default function (options: PwaOptions): Rule {
       }
       for (const configName in target.configurations) {
         const configuration = target.configurations[configName];
-        if (configuration && configuration.index) {
+        if (configuration && typeof configuration.index === 'string') {
           indexFiles.add(configuration.index);
         }
       }
@@ -203,6 +171,7 @@ export default function (options: PwaOptions): Rule {
 
     // Chain the rules and return
     return chain([
+      updateWorkspace(workspace),
       externalSchematic('@schematics/angular', 'service-worker', swOptions),
       mergeWith(rootTemplateSource),
       mergeWith(assetsTemplateSource),
