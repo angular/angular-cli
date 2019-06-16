@@ -8,9 +8,8 @@
 import { Architect } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { TestingArchitectHost } from '@angular-devkit/architect/testing';
-import { experimental, join, normalize, schema } from '@angular-devkit/core';
+import { join, normalize, schema, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import * as fs from 'fs';
 import * as path from 'path';
 import { BuildResult } from './index';
 
@@ -24,14 +23,14 @@ describe('Webpack Builder basic test', () => {
 
   async function createArchitect(workspaceRoot: string) {
     vfHost = new NodeJsSyncHost();
-    const configContent = fs.readFileSync(path.join(workspaceRoot, 'angular.json'), 'utf-8');
-    const workspaceJson = JSON.parse(configContent);
 
     const registry = new schema.CoreSchemaRegistry();
     registry.addPostTransform(schema.transforms.addUndefinedDefaults);
 
-    const workspace = new experimental.workspace.Workspace(normalize(workspaceRoot), vfHost);
-    await workspace.loadWorkspaceFromJson(workspaceJson).toPromise();
+    const { workspace } = await workspaces.readWorkspace(
+      workspaceRoot,
+      workspaces.createWorkspaceHost(vfHost),
+    );
 
     testArchitectHost = new TestingArchitectHost(workspaceRoot, workspaceRoot,
       new WorkspaceNodeModulesArchitectHost(workspace, workspaceRoot));
