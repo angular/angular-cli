@@ -9,11 +9,11 @@ import { Architect } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { TestProjectHost, TestingArchitectHost } from '@angular-devkit/architect/testing';
 import {
-  experimental,
   join,
   normalize,
   schema,
   virtualFs,
+  workspaces,
 } from '@angular-devkit/core'; // tslint:disable-line:no-implicit-dependencies
 import { map, take, tap } from 'rxjs/operators';
 
@@ -33,7 +33,10 @@ describe('NgPackagr Builder', () => {
     const registry = new schema.CoreSchemaRegistry();
     registry.addPostTransform(schema.transforms.addUndefinedDefaults);
 
-    const workspace = await experimental.workspace.Workspace.fromPath(host, host.root(), registry);
+    const { workspace } = await workspaces.readWorkspace(
+      host.root(),
+      workspaces.createWorkspaceHost(host),
+    );
     const architectHost = new TestingArchitectHost(
       host.root(),
       host.root(),
