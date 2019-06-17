@@ -114,4 +114,17 @@ describe('Web Worker Schematic', () => {
     const { compilerOptions } = JSON.parse(tree.readContent(path));
     expect(compilerOptions.outDir).toBe('./out-tsc/worker');
   });
+
+  it('supports pre version 8 structure', async () => {
+    const workspace = JSON.parse(appTree.readContent('/angular.json'));
+    const tsConfigPath = '/projects/bar/src/tsconfig.app.json';
+    workspace.projects.bar.architect.build.options.tsConfig = tsConfigPath;
+    appTree.overwrite('/angular.json', JSON.stringify(workspace));
+    appTree.rename('projects/bar/tsconfig.app.json', tsConfigPath);
+
+    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
+      .toPromise();
+    const { exclude } = JSON.parse(tree.readContent(tsConfigPath));
+    expect(exclude).toContain('**/*.worker.ts');
+  });
 });
