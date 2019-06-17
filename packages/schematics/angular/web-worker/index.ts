@@ -5,7 +5,15 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, join, normalize, parseJsonAst, strings, tags } from '@angular-devkit/core';
+import {
+  JsonParseMode,
+  dirname,
+  join,
+  normalize,
+  parseJsonAst,
+  strings,
+  tags,
+} from '@angular-devkit/core';
 import {
   Rule, SchematicContext, SchematicsException, Tree,
   apply, applyTemplates, chain, mergeWith, move, noop, url,
@@ -23,7 +31,10 @@ function addConfig(options: WebWorkerOptions, root: string, tsConfigPath: string
     context.logger.debug('updating project configuration.');
 
     // Add worker glob exclusion to tsconfig.app.json.
-    const workerGlob = 'src/**/*.worker.ts';
+    // Projects pre version 8 should to have tsconfig.app.json inside their application
+    const isInSrc = dirname(normalize(tsConfigPath)).endsWith('src');
+    const workerGlob = `${isInSrc ? '' : 'src/'}**/*.worker.ts`;
+
     const buffer = host.read(tsConfigPath);
     if (buffer) {
       const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
