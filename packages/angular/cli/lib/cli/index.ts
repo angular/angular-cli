@@ -48,10 +48,30 @@ export default async function(options: { testing?: boolean, cliArgs: string[] })
     return 0;
   } catch (err) {
     if (err instanceof Error) {
-      logger.fatal(err.message);
-      if (err.stack) {
-        logger.fatal(err.stack);
+      try {
+        const fs = await import('fs');
+        const os = await import('os');
+        const tempDirectory = fs.mkdtempSync(fs.realpathSync(os.tmpdir()) + '/' + 'ng-');
+        const logPath = tempDirectory + '/angular-errors.log';
+        fs.appendFileSync(logPath, '[error] ' + (err.stack || err));
+
+        logger.fatal(
+          `An unhandled exception occurred: ${err.message}\n` +
+          `See "${logPath}" for further details.\n\n` +
+          'Please report with the contents of the log file at ' +
+          'https://github.com/angular/angular-cli/issues/new?template=1-bug-report.md',
+        );
+      } catch (e) {
+        logger.fatal(
+          `An unhandled exception occurred: ${err.message}\n` +
+          `Fatal error writing debug log file: ${e.message}`,
+        );
+        if (err.stack) {
+          logger.fatal(err.stack);
+        }
       }
+
+      return 127;
     } else if (typeof err === 'string') {
       logger.fatal(err);
     } else if (typeof err === 'number') {
