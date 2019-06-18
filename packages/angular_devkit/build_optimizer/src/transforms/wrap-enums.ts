@@ -63,7 +63,7 @@ function visitBlockStatements(
   // 'oIndex' is the original statement index; 'uIndex' is the updated statement index
   for (let oIndex = 0, uIndex = 0; oIndex < statements.length - 1; oIndex++, uIndex++) {
     const currentStatement = statements[oIndex];
-    let newStatement: ts.Statement | undefined;
+    let newStatement: ts.Statement[] | undefined;
     let oldStatementsLength = 0;
 
     // these can't contain an enum declaration
@@ -181,12 +181,15 @@ function visitBlockStatements(
       oIndex += classStatements.length - 1;
     }
 
-    if (newStatement) {
+    if (newStatement && newStatement.length > 0) {
       if (!updatedStatements) {
         updatedStatements = [...statements];
       }
 
-      updatedStatements.splice(uIndex, oldStatementsLength, newStatement);
+      updatedStatements.splice(uIndex, oldStatementsLength, ...newStatement);
+      // When having more than a single new statement
+      // we need to update the update Index
+      uIndex += (newStatement ? newStatement.length - 1 : 0);
     }
 
     const result = ts.visitNode(currentStatement, visitor);
@@ -531,7 +534,7 @@ function updateEnumIife(
   hostNode: ts.VariableStatement,
   iife: ts.CallExpression,
   exportAssignment?: ts.Expression,
-): ts.Statement {
+): ts.Statement[] {
   if (!ts.isParenthesizedExpression(iife.expression)
       || !ts.isFunctionExpression(iife.expression.expression)) {
     throw new Error('Invalid IIFE Structure');
@@ -583,7 +586,7 @@ function updateEnumIife(
       updatedIife);
   }
 
-  return updateHostNode(hostNode, value);
+  return [updateHostNode(hostNode, value)];
 }
 
 function createWrappedEnum(
@@ -592,7 +595,7 @@ function createWrappedEnum(
   statements: Array<ts.Statement>,
   literalInitializer: ts.ObjectLiteralExpression = ts.createObjectLiteral(),
   addExportModifier = false,
-): ts.Statement {
+): ts.Statement[] {
   const node = addExportModifier
     ? ts.updateVariableStatement(
       hostNode,
@@ -616,13 +619,13 @@ function createWrappedEnum(
     innerReturn,
   ]);
 
-  return updateHostNode(node, addPureComment(ts.createParen(iife)));
+  return [updateHostNode(node, addPureComment(ts.createParen(iife)))];
 }
 
 function createWrappedClass(
   hostNode: ts.ClassDeclaration | ts.VariableDeclaration,
   statements: ts.Statement[],
-): ts.Statement {
+): ts.Statement[] {
   const name = (hostNode.name as ts.Identifier).text;
 
   const updatedStatements = [...statements];
@@ -645,12 +648,30 @@ function createWrappedClass(
     ]),
   );
 
-  return ts.createVariableStatement(
-    hostNode.modifiers,
-    ts.createVariableDeclarationList([
-      ts.createVariableDeclaration(name, undefined, pureIife),
-    ],
-      ts.NodeFlags.Const,
-    ),
-  );
+  const modifiers = hostNode.modifiers;
+  const isDefault = !!modifiers
+    && modifiers.some(x => x.kind === ts.SyntaxKind.DefaultKeyword);
+
+  const newStatement: ts.Statement[] = [];
+  newStatement.push(
+    ts.createVariableStatement(
+      isDefault ? undefined : modifiers,
+      ts.createVariableDeclarationList([
+        ts.createVariableDeclaration(name, undefined, pureIife),
+      ],
+        ts.NodeFlags.Const,
+      ),
+    ));
+
+  if (isDefault) {
+    newStatement.push(
+      ts.createExportAssignment(
+        undefined,
+        undefined,
+        false,
+        ts.createIdentifier(name),
+      ));
+  }
+
+  return newStatement;
 }
