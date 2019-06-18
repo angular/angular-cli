@@ -19,7 +19,7 @@ import {
 } from '../angular-cli-files/models/webpack-configs';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
-import { Version } from '../utils/version';
+import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
 import { Schema as KarmaBuilderOptions } from './schema';
 
@@ -69,7 +69,7 @@ export function execute(
   } = {},
 ): Observable<BuilderOutput> {
   // Check Angular version.
-  Version.assertCompatibleAngularVersion(context.workspaceRoot);
+  assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
 
   return from(initialize(options, context, transforms.webpackConfiguration)).pipe(
     switchMap(([karma, webpackConfig]) => new Observable<BuilderOutput>(subscriber => {
