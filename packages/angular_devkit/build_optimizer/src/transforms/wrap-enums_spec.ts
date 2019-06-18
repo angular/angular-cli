@@ -17,6 +17,46 @@ const transform = (content: string) => transformJavascript(
 // tslint:disable:no-big-function
 describe('wrap enums and classes transformer', () => {
   describe('wraps class declarations', () => {
+    it('should wrap default exported classes', () => {
+      const defaultClass = tags.stripIndent`
+       export default class CustomComponentEffects {
+          constructor(_actions) {
+            this._actions = _actions;
+            this.doThis = this._actions;
+          }
+        }
+        CustomComponentEffects.decorators = [{ type: Injectable }];
+      `;
+
+      const namedClass = tags.stripIndent`
+        class CustomComponent {
+          constructor(_actions) {
+            this._actions = _actions;
+            this.doThis = this._actions;
+          }
+        }
+        CustomComponent.decorators = [{ type: Injectable }];
+      `;
+
+      const output = tags.stripIndent`
+        const CustomComponentEffects = /*@__PURE__*/ (() => {
+          ${defaultClass.replace('export default ', '')}
+
+          return CustomComponentEffects;
+        })();
+        export default CustomComponentEffects;
+
+        const CustomComponent = /*@__PURE__*/ (() => {
+          ${namedClass}
+
+          return CustomComponent;
+        })();
+      `;
+
+      const input = defaultClass + namedClass;
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
     it('should wrap tsickle emitted classes which followed by metadata', () => {
       const input = tags.stripIndent`
        class CustomComponentEffects {
@@ -169,6 +209,46 @@ describe('wrap enums and classes transformer', () => {
   });
 
   describe('wrap class expressions', () => {
+    it('should wrap default exported classes', () => {
+      const defaultClass = tags.stripIndent`
+        let Foo = class Foo {
+        };
+        Foo.bar = 'bar';
+        Foo = __decorate([
+            component()
+        ], Foo);
+        export default Foo;
+      `;
+
+      const namedClass = tags.stripIndent`
+        let AggregateColumnDirective = class AggregateColumnDirective {
+          constructor(viewContainerRef) { }
+        };
+        AggregateColumnDirective = __decorate([
+            Directive({}),
+            __metadata("design:paramtypes", [ViewContainerRef])
+        ], AggregateColumnDirective);
+      `;
+
+      const output = tags.stripIndent`
+        const Foo = /*@__PURE__*/ (() => {
+          ${defaultClass.replace('export default Foo;', '')}
+
+          return Foo;
+        })();
+        export default Foo;
+
+        const AggregateColumnDirective = /*@__PURE__*/ (() => {
+          ${namedClass}
+
+          return AggregateColumnDirective;
+        })();
+      `;
+
+      const input = defaultClass + namedClass;
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
     it('without property decorators in IIFE', () => {
       const input = tags.stripIndent`
           let AggregateColumnDirective = class AggregateColumnDirective {
