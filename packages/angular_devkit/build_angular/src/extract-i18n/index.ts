@@ -23,7 +23,7 @@ import {
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { statsErrorsToString, statsWarningsToString } from '../angular-cli-files/utilities/stats';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
-import { Version } from '../utils/version';
+import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
 import { Schema as ExtractI18nBuilderOptions } from './schema';
 
@@ -51,7 +51,7 @@ class InMemoryOutputPlugin {
 
 async function execute(options: ExtractI18nBuilderOptions, context: BuilderContext) {
   // Check Angular version.
-  Version.assertCompatibleAngularVersion(context.workspaceRoot);
+  assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
 
   const browserTarget = targetFromTargetString(options.browserTarget);
   const browserOptions = await context.validateOptions<JsonObject & BrowserBuilderOptions>(

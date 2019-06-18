@@ -24,7 +24,7 @@ import {
 } from '../angular-cli-files/models/webpack-configs';
 import { ExecutionTransformer } from '../transforms';
 import { NormalizedBrowserBuilderSchema, deleteOutputDir } from '../utils';
-import { Version } from '../utils/version';
+import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
 import { Schema as ServerBuilderOptions } from './schema';
 
@@ -46,7 +46,7 @@ export function execute(
   const root = context.workspaceRoot;
 
   // Check Angular version.
-  Version.assertCompatibleAngularVersion(context.workspaceRoot);
+  assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
 
   return from(buildServerWebpackConfig(options, context)).pipe(
     concatMap(async v => transforms.webpackConfiguration ? transforms.webpackConfiguration(v) : v),

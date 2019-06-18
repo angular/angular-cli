@@ -58,7 +58,7 @@ import {
 } from '../angular-cli-files/utilities/stats';
 import { ExecutionTransformer } from '../transforms';
 import { BuildBrowserFeatures, deleteOutputDir } from '../utils';
-import { Version } from '../utils/version';
+import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
 import { Schema as BrowserBuilderSchema } from './schema';
 
@@ -180,7 +180,7 @@ export function buildWebpackBrowser(
   const root = normalize(context.workspaceRoot);
 
   // Check Angular version.
-  Version.assertCompatibleAngularVersion(context.workspaceRoot);
+  assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
 
   const loggingFn = transforms.logging
     || createBrowserLoggingCallback(!!options.verbose, context.logger);
