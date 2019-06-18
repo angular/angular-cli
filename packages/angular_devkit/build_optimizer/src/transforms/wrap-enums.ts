@@ -299,11 +299,16 @@ function findTs2_3EnumIife(
     }
 
     const memberArgument = assignment.argumentExpression;
-    if (!memberArgument || !ts.isBinaryExpression(memberArgument)
-        || memberArgument.operatorToken.kind !== ts.SyntaxKind.FirstAssignment) {
-      return null;
+    // String enum
+    if (ts.isStringLiteral(memberArgument)) {
+      return [callExpression, exportExpression];
     }
 
+    // Non string enums
+    if (!ts.isBinaryExpression(memberArgument)
+      || memberArgument.operatorToken.kind !== ts.SyntaxKind.FirstAssignment) {
+      return null;
+    }
 
     if (!ts.isElementAccessExpression(memberArgument.left)) {
       return null;
