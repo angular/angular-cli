@@ -514,6 +514,27 @@ describe('wrap enums and classes transformer', () => {
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
 
+    it('wraps TS string enums in IIFE', () => {
+      const input = tags.stripIndent`
+        export var NotificationKind;
+        (function (NotificationKind) {
+            NotificationKind["NEXT"] = "N";
+            NotificationKind["ERROR"] = "E";
+            NotificationKind["COMPLETE"] = "C";
+        })(NotificationKind || (NotificationKind = {}));
+      `;
+      const output = tags.stripIndent`
+        export var NotificationKind = /*@__PURE__*/ (function (NotificationKind) {
+            NotificationKind["NEXT"] = "N";
+            NotificationKind["ERROR"] = "E";
+            NotificationKind["COMPLETE"] = "C";
+            return NotificationKind;
+        })({});
+      `;
+
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
     it('wraps tsickle enums in IIFE', () => {
       const input = tags.stripIndent`
         /** @enum {number} */
