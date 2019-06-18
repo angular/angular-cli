@@ -9669,10 +9669,10 @@ triple-beam@^1.2.0, triple-beam@^1.3.0:
   resolved "https://registry.yarnpkg.com/triple-beam/-/triple-beam-1.3.0.tgz#a595214c7298db8339eeeee083e4d10bd8cb8dd9"
   integrity sha512-XrHUvV5HpdLmIj4uVMxHggLbFSZYIn7HEWsqePZcI50pco+MPqJ50wMGY794X7AOOhxOBAjbkqfAbEe/QMp2Lw==
 
-ts-api-guardian@0.4.4:
-  version "0.4.4"
-  resolved "https://registry.yarnpkg.com/ts-api-guardian/-/ts-api-guardian-0.4.4.tgz#12dfcfa5c5d6c5a8cb2f1b7cc322b9510a81814c"
-  integrity sha512-nWJQRNSeV+er9/deUo/tdYD7Rm7tKOwbcexI8UbqrzC3uAGm2UWncZ9USK0i6kTvT5hCvhW5VNw76JQ8L7Aq8A==
+ts-api-guardian@0.4.6:
+  version "0.4.6"
+  resolved "https://registry.yarnpkg.com/ts-api-guardian/-/ts-api-guardian-0.4.6.tgz#ebd9a700b40de6ca4dbc5c468e322fe86476b6db"
+  integrity sha512-V+AVEe4HCi3j0mKrvSBNZN6zoY0eIw2r9vcWrqu4vhGlpASgPTSwuPHtxctx4qMBH5ieyqO6rf1LrQfsr8s5tw==
   dependencies:
     chalk "^2.3.1"
     diff "^3.5.0"
