@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { createProjectFromAsset } from '../../utils/assets';
 import { expectFileMatchToExist, expectFileToExist, expectFileToMatch } from '../../utils/fs';
 import { ng, noSilentNg, silentNpm } from '../../utils/process';
@@ -9,8 +10,8 @@ export default async function() {
 
   // Create new project from previous version files.
   // We must use the original NPM packages to force a real update.
-  // This also means that we can only truly test updates after a release.
   await createProjectFromAsset('7.0-project', true);
+  fs.writeFileSync('.npmrc', 'registry = http://localhost:4873', 'utf8');
 
   // Update the CLI.
   // Users of CLI <7.2 will see the following warnings:

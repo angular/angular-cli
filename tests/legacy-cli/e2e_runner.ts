@@ -2,8 +2,11 @@
 // have run already so it should be "safe", teehee.
 import { logging, terminal } from '@angular-devkit/core';
 import { createConsoleLogger } from '@angular-devkit/core/node';
+import { spawn } from 'child_process';
+import * as fs from 'fs';
 import * as glob from 'glob';
 import * as minimist from 'minimist';
+import * as os from 'os';
 import * as path from 'path';
 import { setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
@@ -11,6 +14,8 @@ import { gitClean } from './e2e/utils/git';
 const { blue, bold, green, red, yellow, white } = terminal;
 
 Error.stackTraceLimit = Infinity;
+
+// tslint:disable:no-global-tslint-disable no-console
 
 /**
  * Here's a short description of those flags:
@@ -149,6 +154,19 @@ if (testsToRun.length == allTests.length) {
 
 setGlobalVariable('argv', argv);
 
+// Setup local package registry
+const registryPath =
+  fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'angular-cli-e2e-registry-'));
+fs.copyFileSync(
+  path.join(__dirname, 'verdaccio.yaml'),
+  path.join(registryPath, 'verdaccio.yaml'),
+);
+const registryProcess = spawn(
+  'node',
+  [require.resolve('verdaccio/bin/verdaccio'), '-c', './verdaccio.yaml'],
+  { cwd: registryPath, stdio: 'inherit' },
+);
+
 testsToRun
   .reduce((previous, relativeName, testIndex) => {
     // Make sure this is a windows compatible path.
@@ -221,6 +239,10 @@ testsToRun
   }, Promise.resolve())
   .then(
     () => {
+      if (registryProcess) {
+        registryProcess.kill();
+      }
+
       console.log(green('Done.'));
       process.exit(0);
     },
@@ -229,6 +251,10 @@ testsToRun
       console.error(red(`Test "${currentFileName}" failed...`));
       console.error(red(err.message));
       console.error(red(err.stack));
+
+      if (registryProcess) {
+        registryProcess.kill();
+      }
 
       if (argv.debug) {
         console.log(`Current Directory: ${process.cwd()}`);

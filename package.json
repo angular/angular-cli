@@ -139,7 +139,8 @@
     "ts-api-guardian": "0.4.4",
     "ts-node": "^5.0.0",
     "tslint-no-circular-imports": "^0.7.0",
-    "tslint-sonarts": "1.9.0"
+    "tslint-sonarts": "1.9.0",
+    "verdaccio": "4.0.3"
   },
   "husky": {
     "hooks": {
