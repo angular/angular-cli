@@ -8,7 +8,7 @@
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { resolve } from 'path';
 import { Observable, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { defaultIfEmpty, switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
 import {
   getCommonConfig,
@@ -128,6 +128,7 @@ export function execute(
         }
       };
     })),
+    defaultIfEmpty({ success: false }),
   );
 }
 
