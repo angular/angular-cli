@@ -84,8 +84,12 @@ export class VersionCommand extends Command<VersionCommandSchema> {
     if (!__dirname.match(/node_modules/)) {
       let gitBranch = '??';
       try {
-        const gitRefName = '' + child_process.execSync('git symbolic-ref HEAD', {cwd: __dirname});
-        gitBranch = path.basename(gitRefName.replace('\n', ''));
+        const gitRefName = child_process.execSync('git rev-parse --abbrev-ref HEAD', {
+          cwd: __dirname,
+          encoding: 'utf8',
+          stdio: 'pipe',
+        });
+        gitBranch = gitRefName.replace('\n', '');
       } catch {
       }
 
