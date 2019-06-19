@@ -72,6 +72,10 @@ export class SchematicTestRunner {
   get logger(): logging.Logger { return this._logger; }
   get tasks(): TaskConfiguration[] { return [...this._engineHost.tasks]; }
 
+  registerCollection(collectionName: string, collectionPath: string) {
+    this._engineHost.registerCollection(collectionName, collectionPath);
+  }
+
   runSchematicAsync<SchematicSchemaT>(
     schematicName: string,
     opts?: SchematicSchemaT,
