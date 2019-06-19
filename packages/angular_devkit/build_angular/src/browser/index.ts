@@ -261,7 +261,7 @@ export function buildWebpackBrowser(
             })
             .pipe(
               map(() => ({ success: true })),
-              catchError(() => of({ success: false })),
+              catchError(error => of({ success: false, error: mapErrorToMessage(error) })),
             );
           } else {
             return of({ success });
@@ -276,7 +276,10 @@ export function buildWebpackBrowser(
               resolve(root, normalize(options.outputPath)),
               options.baseHref || '/',
               options.ngswConfigPath,
-            ).then(() => ({ success: true }), () => ({ success: false })));
+            ).then(
+              () => ({ success: true }),
+              error => ({ success: false, error: mapErrorToMessage(error) }),
+            ));
           } else {
             return of(buildEvent);
           }
@@ -289,6 +292,18 @@ export function buildWebpackBrowser(
       );
     }),
   );
+}
+
+function mapErrorToMessage(error: unknown): string | undefined {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === 'string') {
+    return error;
+  }
+
+  return undefined;
 }
 
 export default createBuilder<json.JsonObject & BrowserBuilderSchema>(buildWebpackBrowser);
