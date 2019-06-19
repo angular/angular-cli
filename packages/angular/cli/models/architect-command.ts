@@ -270,10 +270,14 @@ export abstract class ArchitectCommand<
         },
       );
 
-      const result = await run.output.toPromise();
+      const { error, success } = await run.output.toPromise();
       await run.stop();
 
-      return result.success ? 0 : 1;
+      if (error) {
+        this.logger.error(error);
+      }
+
+      return success ? 0 : 1;
     }
   }
 
