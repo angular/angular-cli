@@ -141,8 +141,6 @@ if (argv.ivy) {
     // Ivy doesn't support i18n externally at the moment.
     .filter(name => !name.includes('tests/i18n/'))
     .filter(name => !name.endsWith('tests/build/aot/aot-i18n.ts'))
-    // We don't have a library consumption story yet for Ivy.
-    .filter(name => !name.endsWith('tests/generate/library/library-consumption.ts'))
     // The additional lazy modules array does not work with Ivy because it's not needed.
     .filter(name => !name.endsWith('tests/build/dynamic-import.ts'))
     // We don't have a platform-server usage story yet for Ivy.
