@@ -10236,10 +10236,10 @@ webpack-subresource-integrity@1.1.0-rc.6:
   dependencies:
     webpack-core "^0.6.8"
 
-webpack@4.34.0:
-  version "4.34.0"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.34.0.tgz#a4c30129482f7b4ece4c0842002dedf2b56fab58"
-  integrity sha512-ry2IQy1wJjOefLe1uJLzn5tG/DdIKzQqNlIAd2L84kcaADqNvQDTBlo8UcCNyDaT5FiaB+16jhAkb63YeG3H8Q==
+webpack@4.35.0:
+  version "4.35.0"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.35.0.tgz#ad3f0f8190876328806ccb7a36f3ce6e764b8378"
+  integrity sha512-M5hL3qpVvtr8d4YaJANbAQBc4uT01G33eDpl/psRTBCfjxFTihdhin1NtAKB1ruDwzeVdcsHHV3NX+QsAgOosw==
   dependencies:
     "@webassemblyjs/ast" "1.8.5"
     "@webassemblyjs/helper-module-context" "1.8.5"
