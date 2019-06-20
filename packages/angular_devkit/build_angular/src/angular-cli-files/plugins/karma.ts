@@ -70,17 +70,15 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   successCb = config.buildWebpack.successCb;
   failureCb = config.buildWebpack.failureCb;
 
-  config.reporters.unshift('@angular-devkit/build-angular--event-reporter');
-
   // When using code-coverage, auto-add coverage-istanbul.
   config.reporters = config.reporters || [];
   if (options.codeCoverage && config.reporters.indexOf('coverage-istanbul') === -1) {
-    config.reporters.unshift('coverage-istanbul');
+    config.reporters.push('coverage-istanbul');
   }
 
   // Add a reporter that fixes sourcemap urls.
   if (normalizeSourceMaps(options.sourceMap).scripts) {
-    config.reporters.unshift('@angular-devkit/build-angular--sourcemap-reporter');
+    config.reporters.push('@angular-devkit/build-angular--sourcemap-reporter');
 
     // Code taken from https://github.com/tschaub/karma-source-map-support.
     // We can't use it directly because we need to add it conditionally in this file, and karma
@@ -93,6 +91,8 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
       { pattern: path.join(ksmsPath, 'client.js'), watched: false }
     ], true);
   }
+
+  config.reporters.push('@angular-devkit/build-angular--event-reporter');
 
   // Add webpack config.
   const webpackConfig = config.buildWebpack.webpackConfig;
