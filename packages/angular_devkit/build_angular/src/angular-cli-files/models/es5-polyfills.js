@@ -92,3 +92,5 @@ import 'core-js/modules/es.weak-map';
 import 'core-js/modules/es.set';
 import 'core-js/modules/web.dom-collections.iterator';
 import 'core-js/modules/es.promise';
+
+import 'core-js/modules/web.url';
