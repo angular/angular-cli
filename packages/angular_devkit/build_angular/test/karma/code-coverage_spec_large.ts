@@ -110,4 +110,21 @@ describe('Karma Builder code coverage', () => {
       expect(content).not.toContain('my-lib');
     }
   }, 120000);
+
+  it(`should fail when coverage is below threhold and 'emitWarning' is false`, async () => {
+    host.replaceInFile('karma.conf.js', 'fixWebpackSourcePaths: true',
+      `
+      fixWebpackSourcePaths: true,
+      thresholds: {
+        emitWarning: false,
+        global: {
+          statements: 200
+        }
+      }`,
+    );
+
+    const run = await architect.scheduleTarget(karmaTargetSpec, { codeCoverage: true });
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: false }));
+    await run.stop();
+  }, 120000);
 });
