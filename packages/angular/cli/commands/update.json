@@ -44,6 +44,7 @@
         },
         "migrateOnly": {
           "description": "Only perform a migration, does not update the installed version.",
+          "default": false,
           "type": "boolean"
         },
         "from": {
@@ -56,6 +57,7 @@
         },
         "allowDirty": {
           "description": "Whether to allow updating when the repository contains modified or untracked files.",
+          "default": false,
           "type": "boolean"
         }
       }
