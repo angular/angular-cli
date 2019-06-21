@@ -51,7 +51,7 @@ export function writeIndexHtml({
         deployUrl,
         sri,
         entrypoints: generateEntryPoints({ scripts, styles }),
-        files: filterAndMapBuildFiles(ES5BuildFiles, '.css'),
+        files: filterAndMapBuildFiles(ES2015BuildFiles, '.css'),
         noModuleFiles: filterAndMapBuildFiles(ES5BuildFiles, '.js'),
         moduleFiles: filterAndMapBuildFiles(ES2015BuildFiles, '.js'),
         loadOutputFile: async filePath => {
