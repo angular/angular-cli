@@ -23,10 +23,16 @@ export class DocCommand extends Command<DocCommandSchema> {
     let domain = 'angular.io';
 
     if (options.version) {
+      // version can either be a string containing "next"
       if (options.version == 'next') {
         domain = 'next.angular.io';
-      } else {
+      // or a number where version must be a valid Angular version (i.e. not 0, 1 or 3)
+      } else if (!isNaN(+options.version) && ![0, 1, 3].includes(+options.version)) {
         domain = `v${options.version}.angular.io`;
+      } else {
+        this.logger.error('Version should either be a number (2, 4, 5, 6...) or "next"');
+
+        return 0;
       }
     }
 
