@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { createConsoleLogger } from '@angular-devkit/core/node';
+import { normalize } from 'path';
 import { format } from 'util';
 import { runCommand } from '../../models/command-runner';
 import { colors, supportsColor } from '../../utilities/color';
@@ -65,7 +66,7 @@ export default async function(options: { testing?: boolean; cliArgs: string[] })
         const fs = await import('fs');
         const os = await import('os');
         const tempDirectory = fs.mkdtempSync(fs.realpathSync(os.tmpdir()) + '/' + 'ng-');
-        const logPath = tempDirectory + '/angular-errors.log';
+        const logPath = normalize(tempDirectory + '/angular-errors.log');
         fs.appendFileSync(logPath, '[error] ' + (err.stack || err));
 
         logger.fatal(
