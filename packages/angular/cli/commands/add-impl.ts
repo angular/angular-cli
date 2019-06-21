@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { analytics, tags, terminal } from '@angular-devkit/core';
+import { analytics, tags } from '@angular-devkit/core';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
 import { dirname, join } from 'path';
 import { intersects, prerelease, rcompare, satisfies, valid, validRange } from 'semver';
@@ -13,6 +13,7 @@ import { isPackageNameSafeForAnalytics } from '../models/analytics';
 import { Arguments } from '../models/interface';
 import { SchematicCommand } from '../models/schematic-command';
 import npmInstall from '../tasks/npm-install';
+import { colors } from '../utilities/color';
 import { getPackageManager } from '../utilities/package-manager';
 import {
   PackageManifest,
@@ -31,8 +32,8 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
   async run(options: AddCommandSchema & Arguments) {
     if (!options.collection) {
       this.logger.fatal(
-        `The "ng add" command requires a name argument to be specified eg. `
-        + `${terminal.yellow('ng add [name] ')}. For more details, use "ng help".`,
+        `The "ng add" command requires a name argument to be specified eg. ` +
+          `${colors.yellow('ng add [name] ')}. For more details, use "ng help".`,
       );
 
       return 1;
@@ -61,11 +62,10 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       // plus special cases for packages that did not have peer deps setup
       let packageMetadata;
       try {
-        packageMetadata = await fetchPackageMetadata(
-          packageIdentifier.name,
-          this.logger,
-          { registry: options.registry, usingYarn },
-        );
+        packageMetadata = await fetchPackageMetadata(packageIdentifier.name, this.logger, {
+          registry: options.registry,
+          usingYarn,
+        });
       } catch (e) {
         this.logger.error('Unable to fetch package metadata: ' + e.message);
 
@@ -79,16 +79,19 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
           // tslint:disable-next-line:no-any
           const semverOptions = { includePrerelease: true } as any;
 
-          if (version
-              && ((validRange(version) && intersects(version, '7', semverOptions))
-                  || (valid(version) && satisfies(version, '7', semverOptions)))) {
+          if (
+            version &&
+            ((validRange(version) && intersects(version, '7', semverOptions)) ||
+              (valid(version) && satisfies(version, '7', semverOptions)))
+          ) {
             packageIdentifier = npa.resolve('@angular/pwa', '0.12');
           }
         }
       } else if (!latestManifest || (await this.hasMismatchedPeer(latestManifest))) {
         // 'latest' is invalid so search for most recent matching package
-        const versionManifests = Array.from(packageMetadata.versions.values())
-          .filter(value => !prerelease(value.version));
+        const versionManifests = Array.from(packageMetadata.versions.values()).filter(
+          value => !prerelease(value.version),
+        );
 
         versionManifests.sort((a, b) => rcompare(a.version, b.version, true));
 
@@ -101,7 +104,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
         }
 
         if (!newIdentifier) {
-          this.logger.warn('Unable to find compatible package.  Using \'latest\'.');
+          this.logger.warn("Unable to find compatible package.  Using 'latest'.");
         } else {
           packageIdentifier = newIdentifier;
         }
@@ -111,11 +114,10 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
     let collectionName = packageIdentifier.name;
     if (!packageIdentifier.registry) {
       try {
-        const manifest = await fetchPackageManifest(
-          packageIdentifier,
-          this.logger,
-          { registry: options.registry, usingYarn },
-        );
+        const manifest = await fetchPackageManifest(packageIdentifier, this.logger, {
+          registry: options.registry,
+          usingYarn,
+        });
 
         collectionName = manifest.name;
 
@@ -129,12 +131,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       }
     }
 
-    await npmInstall(
-      packageIdentifier.raw,
-      this.logger,
-      this.packageManager,
-      this.workspace.root,
-    );
+    await npmInstall(packageIdentifier.raw, this.logger, this.packageManager, this.workspace.root);
 
     return this.executeSchematic(collectionName, options['--']);
   }
@@ -204,11 +201,10 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
   private async findProjectVersion(name: string): Promise<string | null> {
     let installedPackage;
     try {
-      installedPackage = require.resolve(
-        join(name, 'package.json'),
-        { paths: [this.workspace.root] },
-      );
-    } catch { }
+      installedPackage = require.resolve(join(name, 'package.json'), {
+        paths: [this.workspace.root],
+      });
+    } catch {}
 
     if (installedPackage) {
       try {
@@ -253,8 +249,10 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
           // tslint:disable-next-line:no-any
           const options = { includePrerelease: true } as any;
 
-          if (!intersects(version, peerIdentifier.rawSpec, options)
-              && !satisfies(version, peerIdentifier.rawSpec, options)) {
+          if (
+            !intersects(version, peerIdentifier.rawSpec, options) &&
+            !satisfies(version, peerIdentifier.rawSpec, options)
+          ) {
             return true;
           }
         } catch {
@@ -265,7 +263,6 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
         // type === 'tag' | 'file' | 'directory' | 'remote' | 'git'
         // Cannot accurately compare these as the tag/location may have changed since install
       }
-
     }
 
     return false;

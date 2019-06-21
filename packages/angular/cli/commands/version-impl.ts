@@ -5,12 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { terminal } from '@angular-devkit/core';
 import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Command } from '../models/command';
+import { colors } from '../utilities/color';
 import { findUp } from '../utilities/find-up';
 import { Schema as VersionCommandSchema } from './version';
 
@@ -45,40 +44,41 @@ export class VersionCommand extends Command<VersionCommandSchema> {
       : maybeNodeModules;
 
     const packageNames = [
-      ...Object.keys(pkg && pkg['dependencies'] || {}),
-      ...Object.keys(pkg && pkg['devDependencies'] || {}),
-      ...Object.keys(projPkg && projPkg['dependencies'] || {}),
-      ...Object.keys(projPkg && projPkg['devDependencies'] || {}),
-      ];
+      ...Object.keys((pkg && pkg['dependencies']) || {}),
+      ...Object.keys((pkg && pkg['devDependencies']) || {}),
+      ...Object.keys((projPkg && projPkg['dependencies']) || {}),
+      ...Object.keys((projPkg && projPkg['devDependencies']) || {}),
+    ];
 
     if (packageRoot != null) {
       // Add all node_modules and node_modules/@*/*
-      const nodePackageNames = fs.readdirSync(packageRoot)
-        .reduce<string[]>((acc, name) => {
-          if (name.startsWith('@')) {
-            return acc.concat(
-              fs.readdirSync(path.resolve(packageRoot, name))
-                .map(subName => name + '/' + subName),
-            );
-          } else {
-            return acc.concat(name);
-          }
-        }, []);
+      const nodePackageNames = fs.readdirSync(packageRoot).reduce<string[]>((acc, name) => {
+        if (name.startsWith('@')) {
+          return acc.concat(
+            fs.readdirSync(path.resolve(packageRoot, name)).map(subName => name + '/' + subName),
+          );
+        } else {
+          return acc.concat(name);
+        }
+      }, []);
 
       packageNames.push(...nodePackageNames);
     }
 
     const versions = packageNames
       .filter(x => patterns.some(p => p.test(x)))
-      .reduce((acc, name) => {
-        if (name in acc) {
+      .reduce(
+        (acc, name) => {
+          if (name in acc) {
+            return acc;
+          }
+
+          acc[name] = this.getVersion(name, packageRoot, maybeNodeModules);
+
           return acc;
-        }
-
-        acc[name] = this.getVersion(name, packageRoot, maybeNodeModules);
-
-        return acc;
-      }, {} as { [module: string]: string });
+        },
+        {} as { [module: string]: string },
+      );
 
     let ngCliVersion = pkg.version;
     if (!__dirname.match(/node_modules/)) {
@@ -90,8 +90,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
           stdio: 'pipe',
         });
         gitBranch = gitRefName.replace('\n', '');
-      } catch {
-      }
+      } catch {}
 
       ngCliVersion = `local (v${pkg.version}, branch: ${gitBranch})`;
     }
@@ -103,8 +102,10 @@ export class VersionCommand extends Command<VersionCommandSchema> {
       angularCoreVersion = versions['@angular/core'];
       if (angularCoreVersion) {
         for (const angularPackage of Object.keys(versions)) {
-          if (versions[angularPackage] == angularCoreVersion
-              && angularPackage.startsWith('@angular/')) {
+          if (
+            versions[angularPackage] == angularCoreVersion &&
+            angularPackage.startsWith('@angular/')
+          ) {
             angularSameAsCore.push(angularPackage.replace(/^@angular\//, ''));
             delete versions[angularPackage];
           }
@@ -125,36 +126,43 @@ export class VersionCommand extends Command<VersionCommandSchema> {
   / ___ \\| | | | (_| | |_| | | (_| | |      | |___| |___ | |
  /_/   \\_\\_| |_|\\__, |\\__,_|_|\\__,_|_|       \\____|_____|___|
                 |___/
-    `.split('\n').map(x => terminal.red(x)).join('\n');
+    `
+      .split('\n')
+      .map(x => colors.red(x))
+      .join('\n');
 
     this.logger.info(asciiArt);
-    this.logger.info(`
+    this.logger.info(
+      `
       Angular CLI: ${ngCliVersion}
       Node: ${process.versions.node}
       OS: ${process.platform} ${process.arch}
       Angular: ${angularCoreVersion}
-      ... ${angularSameAsCore.reduce<string[]>((acc, name) => {
-        // Perform a simple word wrap around 60.
-        if (acc.length == 0) {
-          return [name];
-        }
-        const line = (acc[acc.length - 1] + ', ' + name);
-        if (line.length > 60) {
-          acc.push(name);
-        } else {
-          acc[acc.length - 1] = line;
-        }
+      ... ${angularSameAsCore
+        .reduce<string[]>((acc, name) => {
+          // Perform a simple word wrap around 60.
+          if (acc.length == 0) {
+            return [name];
+          }
+          const line = acc[acc.length - 1] + ', ' + name;
+          if (line.length > 60) {
+            acc.push(name);
+          } else {
+            acc[acc.length - 1] = line;
+          }
 
-        return acc;
-      }, []).join('\n... ')}
+          return acc;
+        }, [])
+        .join('\n... ')}
 
       Package${namePad.slice(7)}Version
       -------${namePad.replace(/ /g, '-')}------------------
       ${Object.keys(versions)
-          .map(module => `${module}${namePad.slice(module.length)}${versions[module]}`)
-          .sort()
-          .join('\n')}
-    `.replace(/^ {6}/gm, ''));
+        .map(module => `${module}${namePad.slice(module.length)}${versions[module]}`)
+        .sort()
+        .join('\n')}
+    `.replace(/^ {6}/gm, ''),
+    );
   }
 
   private getVersion(
@@ -168,8 +176,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
 
         return modulePkg.version;
       }
-    } catch (_) {
-    }
+    } catch (_) {}
 
     try {
       if (cliNodeModules) {
@@ -177,8 +184,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
 
         return modulePkg.version + ' (cli-only)';
       }
-    } catch {
-    }
+    } catch {}
 
     return '<error>';
   }

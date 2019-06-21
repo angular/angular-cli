@@ -8,11 +8,12 @@
 import 'symbol-observable';
 // symbol polyfill must go first
 // tslint:disable-next-line:ordered-imports import-groups
-import { tags, terminal } from '@angular-devkit/core';
+import { tags } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import { SemVer } from 'semver';
 import { Duplex } from 'stream';
+import { colors } from '../utilities/color';
 import { isWarningEnabled } from '../utilities/config';
 
 const packageJson = require('../package.json');
@@ -39,7 +40,6 @@ function _fromPackageJson(cwd?: string) {
   return null;
 }
 
-
 // Check if we need to profile this CLI run.
 if (process.env['NG_CLI_PROFILING']) {
   let profiler: {
@@ -49,13 +49,15 @@ if (process.env['NG_CLI_PROFILING']) {
   try {
     profiler = require('v8-profiler-node8'); // tslint:disable-line:no-implicit-dependencies
   } catch (err) {
-    throw new Error(`Could not require 'v8-profiler-node8'. You must install it separetely with ` +
-      `'npm install v8-profiler-node8 --no-save'.\n\nOriginal error:\n\n${err}`);
+    throw new Error(
+      `Could not require 'v8-profiler-node8'. You must install it separetely with ` +
+        `'npm install v8-profiler-node8 --no-save'.\n\nOriginal error:\n\n${err}`,
+    );
   }
 
   profiler.startProfiling();
 
-  const exitHandler = (options: { cleanup?: boolean, exit?: boolean }) => {
+  const exitHandler = (options: { cleanup?: boolean; exit?: boolean }) => {
     if (options.cleanup) {
       const cpuProfile = profiler.stopProfiling();
       fs.writeFileSync(
@@ -93,7 +95,7 @@ try {
   }
 
   if (shouldWarn && isWarningEnabled('versionMismatch')) {
-    const warning = terminal.yellow(tags.stripIndents`
+    const warning = colors.yellow(tags.stripIndents`
     Your global Angular CLI version (${globalVersion}) is greater than your local
     version (${localVersion}). The local Angular CLI version is used.
 
@@ -101,10 +103,10 @@ try {
     `);
     // Don't show warning colorised on `ng completion`
     if (process.argv[2] !== 'completion') {
-        // eslint-disable-next-line no-console
+      // eslint-disable-next-line no-console
       console.error(warning);
     } else {
-        // eslint-disable-next-line no-console
+      // eslint-disable-next-line no-console
       console.error(warning);
       process.exit(1);
     }

@@ -7,8 +7,9 @@
  */
 
 // tslint:disable:no-global-tslint-disable no-any
-import { analytics, logging, strings, tags, terminal } from '@angular-devkit/core';
+import { analytics, logging, strings, tags } from '@angular-devkit/core';
 import * as path from 'path';
+import { colors } from '../utilities/color';
 import { getWorkspace } from '../utilities/config';
 import {
   Arguments,
@@ -17,7 +18,8 @@ import {
   CommandDescriptionMap,
   CommandScope,
   CommandWorkspace,
-  Option, SubCommandDescription,
+  Option,
+  SubCommandDescription,
 } from './interface';
 
 export interface BaseCommandOptions {
@@ -67,12 +69,8 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     const args = this.description.options.filter(x => x.positional !== undefined);
     const opts = this.description.options.filter(x => x.positional === undefined);
 
-    const argDisplay = args && args.length > 0
-      ? ' ' + args.map(a => `<${a.name}>`).join(' ')
-      : '';
-    const optionsDisplay = opts && opts.length > 0
-      ? ` [options]`
-      : ``;
+    const argDisplay = args && args.length > 0 ? ' ' + args.map(a => `<${a.name}>`).join(' ') : '';
+    const optionsDisplay = opts && opts.length > 0 ? ` [options]` : ``;
 
     this.logger.info(`usage: ng ${name}${argDisplay}${optionsDisplay}`);
     this.logger.info('');
@@ -94,7 +92,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     if (args.length > 0) {
       this.logger.info(`arguments:`);
       args.forEach(o => {
-        this.logger.info(`  ${terminal.cyan(o.name)}`);
+        this.logger.info(`  ${colors.cyan(o.name)}`);
         if (o.description) {
           this.logger.info(formatDescription(o.description));
         }
@@ -109,10 +107,11 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
         .filter(o => !o.hidden)
         .sort((a, b) => a.name.localeCompare(b.name))
         .forEach(o => {
-          const aliases = o.aliases && o.aliases.length > 0
-            ? '(' + o.aliases.map(a => `-${a}`).join(' ') + ')'
-            : '';
-          this.logger.info(`  ${terminal.cyan('--' + strings.dasherize(o.name))} ${aliases}`);
+          const aliases =
+            o.aliases && o.aliases.length > 0
+              ? '(' + o.aliases.map(a => `-${a}`).join(' ') + ')'
+              : '';
+          this.logger.info(`  ${colors.cyan('--' + strings.dasherize(o.name))} ${aliases}`);
           if (o.description) {
             this.logger.info(formatDescription(o.description));
           }
