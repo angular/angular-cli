@@ -5,9 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { terminal } from '@angular-devkit/core';
 import { Command } from '../models/command';
+import { colors } from '../utilities/color';
 import { Schema as AwesomeCommandSchema } from './easter-egg';
 
 function pickOne(of: string[]): string {
@@ -26,6 +25,6 @@ export class AwesomeCommand extends Command<AwesomeCommandSchema> {
       `I spy with my little eye a great developer!`,
       `Noop... already awesome.`,
     ]);
-    this.logger.info(terminal.green(phrase));
+    this.logger.info(colors.green(phrase));
   }
 }

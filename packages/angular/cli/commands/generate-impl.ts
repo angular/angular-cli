@@ -5,16 +5,15 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import { terminal } from '@angular-devkit/core';
 import { Arguments, SubCommandDescription } from '../models/interface';
 import { SchematicCommand } from '../models/schematic-command';
+import { colors } from '../utilities/color';
 import { parseJsonSchemaToSubCommandDescription } from '../utilities/json-schema';
 import { Schema as GenerateCommandSchema } from './generate';
 
 export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
   // Allows us to resolve aliases before reporting analytics
-  longSchematicName: string|undefined;
+  longSchematicName: string | undefined;
 
   async initialize(options: GenerateCommandSchema & Arguments) {
     // Fill up the schematics property of the command description.
@@ -114,7 +113,7 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
     const subcommand = this.description.options.filter(x => x.subcommands)[0];
     if (Object.keys((subcommand && subcommand.subcommands) || {}).length == 1) {
       this.logger.info(`\nTo see help for a schematic run:`);
-      this.logger.info(terminal.cyan(`  ng generate <schematic> --help`));
+      this.logger.info(colors.cyan(`  ng generate <schematic> --help`));
     }
 
     return 0;

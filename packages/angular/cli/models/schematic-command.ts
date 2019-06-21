@@ -13,7 +13,6 @@ import {
   schema,
   strings,
   tags,
-  terminal,
   virtualFs,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
@@ -28,6 +27,7 @@ import {
 import * as inquirer from 'inquirer';
 import * as systemPath from 'path';
 import { WorkspaceLoader } from '../models/workspace-loader';
+import { colors } from '../utilities/color';
 import {
   getProjectByCwd,
   getSchematicDefaults,
@@ -41,7 +41,6 @@ import { isPackageNameSafeForAnalytics } from './analytics';
 import { BaseCommandOptions, Command } from './command';
 import { Arguments, CommandContext, CommandDescription, Option } from './interface';
 import { parseArguments, parseFreeFormArguments } from './parser';
-
 
 export interface BaseSchematicSchema {
   debug?: boolean;
@@ -59,7 +58,6 @@ export interface RunSchematicOptions extends BaseSchematicSchema {
   showNothingDone?: boolean;
 }
 
-
 export class UnknownCollectionError extends Error {
   constructor(collectionName: string) {
     super(`Invalid collection (${collectionName}).`);
@@ -67,7 +65,7 @@ export class UnknownCollectionError extends Error {
 }
 
 export abstract class SchematicCommand<
-  T extends (BaseSchematicSchema & BaseCommandOptions),
+  T extends BaseSchematicSchema & BaseCommandOptions
 > extends Command<T> {
   readonly allowPrivateSchematics: boolean = false;
   readonly allowAdditionalArgs: boolean = false;
@@ -79,11 +77,7 @@ export abstract class SchematicCommand<
   protected collectionName = this.defaultCollectionName;
   protected schematicName?: string;
 
-  constructor(
-    context: CommandContext,
-    description: CommandDescription,
-    logger: logging.Logger,
-  ) {
+  constructor(context: CommandContext, description: CommandDescription, logger: logging.Logger) {
     super(context, description, logger);
   }
 
@@ -146,9 +140,7 @@ export abstract class SchematicCommand<
       const defaultCollection = this.getDefaultSchematicCollection();
       Object.keys(namesPerCollection).forEach(collectionName => {
         const isDefault = defaultCollection == collectionName;
-        this.logger.info(
-          `  Collection "${collectionName}"${isDefault ? ' (default)' : ''}:`,
-        );
+        this.logger.info(`  Collection "${collectionName}"${isDefault ? ' (default)' : ''}:`);
 
         namesPerCollection[collectionName].forEach(schematicName => {
           this.logger.info(`    ${schematicName}`);
@@ -178,15 +170,15 @@ export abstract class SchematicCommand<
 
       // Display <collectionName:schematicName> if this is not the default collectionName,
       // otherwise just show the schematicName.
-      const displayName = collectionName == this.getDefaultSchematicCollection()
-        ? schematicName
-        : schematicNames[0];
+      const displayName =
+        collectionName == this.getDefaultSchematicCollection() ? schematicName : schematicNames[0];
 
       const schematicOptions = subCommandOption.subcommands[schematicNames[0]].options;
       const schematicArgs = schematicOptions.filter(x => x.positional !== undefined);
-      const argDisplay = schematicArgs.length > 0
-        ? ' ' + schematicArgs.map(a => `<${strings.dasherize(a.name)}>`).join(' ')
-        : '';
+      const argDisplay =
+        schematicArgs.length > 0
+          ? ' ' + schematicArgs.map(a => `<${strings.dasherize(a.name)}>`).join(' ')
+          : '';
 
       this.logger.info(tags.oneLine`
         usage: ng ${this.description.name} ${displayName}${argDisplay}
@@ -229,11 +221,14 @@ export abstract class SchematicCommand<
     return options
       .filter(o => o.format === 'path')
       .map(o => o.name)
-      .reduce((acc, curr) => {
-        acc[curr] = workingDir;
+      .reduce(
+        (acc, curr) => {
+          acc[curr] = workingDir;
 
-        return acc;
-      }, {} as { [name: string]: string });
+          return acc;
+        },
+        {} as { [name: string]: string },
+      );
   }
 
   /*
@@ -247,15 +242,12 @@ export abstract class SchematicCommand<
     const { force, dryRun } = options;
     const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(this.workspace.root));
 
-    const workflow = new NodeWorkflow(
-        fsHost,
-        {
-          force,
-          dryRun,
-          packageManager: getPackageManager(this.workspace.root),
-          root: normalize(this.workspace.root),
-        },
-    );
+    const workflow = new NodeWorkflow(fsHost, {
+      force,
+      dryRun,
+      packageManager: getPackageManager(this.workspace.root),
+      root: normalize(this.workspace.root),
+    });
     workflow.engineHost.registerContextTransform(context => {
       // This is run by ALL schematics, so if someone uses `externalSchematics(...)` which
       // is safelisted, it would move to the right analytics (even if their own isn't).
@@ -281,8 +273,10 @@ export abstract class SchematicCommand<
     workflow.registry.addSmartDefaultProvider('projectName', () => {
       if (this._workspace) {
         try {
-          return this._workspace.getProjectByPath(normalize(process.cwd()))
-            || this._workspace.getDefaultProjectName();
+          return (
+            this._workspace.getProjectByPath(normalize(process.cwd())) ||
+            this._workspace.getDefaultProjectName()
+          );
         } catch (e) {
           if (e instanceof experimental.workspace.AmbiguousProjectPathException) {
             this.logger.warn(tags.oneLine`
@@ -320,16 +314,18 @@ export abstract class SchematicCommand<
               break;
             case 'list':
               question.type = !!definition.multiselect ? 'checkbox' : 'list';
-              question.choices = definition.items && definition.items.map(item => {
-                if (typeof item == 'string') {
-                  return item;
-                } else {
-                  return {
-                    name: item.label,
-                    value: item.value,
-                  };
-                }
-              });
+              question.choices =
+                definition.items &&
+                definition.items.map(item => {
+                  if (typeof item == 'string') {
+                    return item;
+                  } else {
+                    return {
+                      name: item.label,
+                      value: item.value,
+                    };
+                  }
+                });
               break;
             default:
               question.type = definition.type;
@@ -343,7 +339,7 @@ export abstract class SchematicCommand<
       });
     }
 
-    return this._workflow = workflow;
+    return (this._workflow = workflow);
   }
 
   protected getDefaultSchematicCollection(): string {
@@ -482,19 +478,19 @@ export abstract class SchematicCommand<
           break;
         case 'update':
           loggingQueue.push(tags.oneLine`
-            ${terminal.white('UPDATE')} ${eventPath} (${event.content.length} bytes)
+            ${colors.white('UPDATE')} ${eventPath} (${event.content.length} bytes)
           `);
           break;
         case 'create':
           loggingQueue.push(tags.oneLine`
-            ${terminal.green('CREATE')} ${eventPath} (${event.content.length} bytes)
+            ${colors.green('CREATE')} ${eventPath} (${event.content.length} bytes)
           `);
           break;
         case 'delete':
-          loggingQueue.push(`${terminal.yellow('DELETE')} ${eventPath}`);
+          loggingQueue.push(`${colors.yellow('DELETE')} ${eventPath}`);
           break;
         case 'rename':
-          loggingQueue.push(`${terminal.blue('RENAME')} ${eventPath} => ${event.to}`);
+          loggingQueue.push(`${colors.blue('RENAME')} ${eventPath} => ${event.to}`);
           break;
       }
     });
@@ -511,40 +507,41 @@ export abstract class SchematicCommand<
       }
     });
 
-    return new Promise<number | void>((resolve) => {
-      workflow.execute({
-        collection: collectionName,
-        schematic: schematicName,
-        options: input,
-        debug: debug,
-        logger: this.logger,
-        allowPrivate: this.allowPrivateSchematics,
-      })
-      .subscribe({
-        error: (err: Error) => {
-          // In case the workflow was not successful, show an appropriate error message.
-          if (err instanceof UnsuccessfulWorkflowExecution) {
-            // "See above" because we already printed the error.
-            this.logger.fatal('The Schematic workflow failed. See above.');
-          } else if (debug) {
-            this.logger.fatal(`An error occured:\n${err.message}\n${err.stack}`);
-          } else {
-            this.logger.fatal(err.message);
-          }
+    return new Promise<number | void>(resolve => {
+      workflow
+        .execute({
+          collection: collectionName,
+          schematic: schematicName,
+          options: input,
+          debug: debug,
+          logger: this.logger,
+          allowPrivate: this.allowPrivateSchematics,
+        })
+        .subscribe({
+          error: (err: Error) => {
+            // In case the workflow was not successful, show an appropriate error message.
+            if (err instanceof UnsuccessfulWorkflowExecution) {
+              // "See above" because we already printed the error.
+              this.logger.fatal('The Schematic workflow failed. See above.');
+            } else if (debug) {
+              this.logger.fatal(`An error occured:\n${err.message}\n${err.stack}`);
+            } else {
+              this.logger.fatal(err.message);
+            }
 
-          resolve(1);
-        },
-        complete: () => {
-          const showNothingDone = !(options.showNothingDone === false);
-          if (nothingDone && showNothingDone) {
-            this.logger.info('Nothing to be done.');
-          }
-          if (dryRun) {
-            this.logger.warn(`\nNOTE: The "dryRun" flag means no changes were made.`);
-          }
-          resolve();
-        },
-      });
+            resolve(1);
+          },
+          complete: () => {
+            const showNothingDone = !(options.showNothingDone === false);
+            if (nothingDone && showNothingDone) {
+              this.logger.info('Nothing to be done.');
+            }
+            if (dryRun) {
+              this.logger.warn(`\nNOTE: The "dryRun" flag means no changes were made.`);
+            }
+            resolve();
+          },
+        });
     });
   }
 
