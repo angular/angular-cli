@@ -88,11 +88,11 @@ export default function(
 
     if (options.packageName) {
       if (options.command === 'install') {
-        args.push(packageManagerProfile.commands.installPackage);
+        args.push(taskPackageManagerProfile.commands.installPackage);
       }
       args.push(options.packageName);
-    } else if (options.command === 'install' && packageManagerProfile.commands.installAll) {
-      args.push(packageManagerProfile.commands.installAll);
+    } else if (options.command === 'install' && taskPackageManagerProfile.commands.installAll) {
+      args.push(taskPackageManagerProfile.commands.installAll);
     }
 
     if (options.quiet && taskPackageManagerProfile.quietArgument) {
