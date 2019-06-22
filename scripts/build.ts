@@ -264,7 +264,7 @@ export default async function(
         }
 
         // Remove Bazel files from NPM.
-        if (fileName.endsWith('BUILD')) {
+        if (fileName === 'BUILD' || fileName === 'BUILD.bazel') {
           return false;
         }
 
