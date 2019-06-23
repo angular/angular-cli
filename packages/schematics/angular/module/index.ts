@@ -12,6 +12,7 @@ import {
   Tree,
   apply,
   applyTemplates,
+  asSource,
   chain,
   filter,
   mergeWith,
@@ -70,6 +71,8 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
 
 export default function (options: ModuleOptions): Rule {
   return async (host: Tree) => {
+    const pathFromProjectRoot = options.path;
+
     if (options.path === undefined) {
       options.path = await createDefaultPath(host, options.project as string);
     }
@@ -95,7 +98,7 @@ export default function (options: ModuleOptions): Rule {
     return chain([
       addDeclarationToNgModule(options),
       mergeWith(templateSource),
-      options.lintFix ? applyLintFix(options.path) : noop(),
+      options.lintFix ? applyLintFix(pathFromProjectRoot) : noop(),
     ]);
   };
 }

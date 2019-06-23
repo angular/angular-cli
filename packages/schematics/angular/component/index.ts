@@ -126,6 +126,8 @@ function buildSelector(options: ComponentOptions, projectPrefix: string) {
 
 export default function (options: ComponentOptions): Rule {
   return async (host: Tree) => {
+    const pathFromProjectRoot = options.path;
+
     const workspace = await getWorkspace(host);
     const project = workspace.projects.get(options.project as string);
 
@@ -165,7 +167,7 @@ export default function (options: ComponentOptions): Rule {
     return chain([
       addDeclarationToNgModule(options),
       mergeWith(templateSource),
-      options.lintFix ? applyLintFix(options.path) : noop(),
+      options.lintFix ? applyLintFix(pathFromProjectRoot) : noop(),
     ]);
   };
 }

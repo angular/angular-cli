@@ -26,6 +26,8 @@ import { Schema as InterfaceOptions } from './schema';
 
 export default function (options: InterfaceOptions): Rule {
   return async (host: Tree) => {
+    const pathFromProjectRoot = options.path;
+
     if (options.path === undefined) {
       options.path = await createDefaultPath(host, options.project as string);
     }
@@ -47,7 +49,7 @@ export default function (options: InterfaceOptions): Rule {
 
     return chain([
       mergeWith(templateSource),
-      options.lintFix ? applyLintFix(options.path) : noop(),
+      options.lintFix ? applyLintFix(pathFromProjectRoot) : noop(),
     ]);
   };
 }

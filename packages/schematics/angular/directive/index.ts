@@ -102,6 +102,8 @@ function buildSelector(options: DirectiveOptions, projectPrefix: string) {
 
 export default function (options: DirectiveOptions): Rule {
   return async (host: Tree) => {
+    const pathFromProjectRoot = options.path;
+
     const workspace = await getWorkspace(host);
     const project = workspace.projects.get(options.project as string);
     if (!project) {
@@ -137,7 +139,7 @@ export default function (options: DirectiveOptions): Rule {
     return chain([
       addDeclarationToNgModule(options),
       mergeWith(templateSource),
-      options.lintFix ? applyLintFix(options.path) : noop(),
+      options.lintFix ? applyLintFix(pathFromProjectRoot) : noop(),
     ]);
   };
 }

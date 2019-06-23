@@ -86,6 +86,8 @@ function addDeclarationToNgModule(options: PipeOptions): Rule {
 
 export default function (options: PipeOptions): Rule {
   return async (host: Tree) => {
+    const pathFromProjectRoot = options.path;
+
     if (options.path === undefined) {
       options.path = await createDefaultPath(host, options.project as string);
     }
@@ -112,7 +114,7 @@ export default function (options: PipeOptions): Rule {
     return chain([
       addDeclarationToNgModule(options),
       mergeWith(templateSource),
-      options.lintFix ? applyLintFix(options.path) : noop(),
+      options.lintFix ? applyLintFix(pathFromProjectRoot) : noop(),
     ]);
   };
 }
