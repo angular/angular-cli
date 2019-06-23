@@ -20,7 +20,7 @@ We create a file next to our project's `package.json` called `proxy.conf.json` w
 
 You can read more about what options are available [here](https://webpack.js.org/configuration/dev-server/#devserver-proxy).
 
-We can then add the `proxyConfig` option to the serve target:
+We can then add the `proxyConfig` option, which can be find in angular.json, to the serve target:
 
 ```json
 "architect": {
