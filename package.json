@@ -130,7 +130,7 @@
     "pidtree": "^0.3.0",
     "pidusage": "^2.0.17",
     "rxjs": "~6.4.0",
-    "semver": "6.1.1",
+    "semver": "6.1.2",
     "source-map": "^0.5.6",
     "source-map-support": "^0.5.0",
     "spdx-satisfies": "^4.0.0",
