@@ -10,9 +10,7 @@ export default async function() {
   }
 
   // Install global Angular CLI.
-  // --unsafe-perm is needed for circleci
-  // because of https://github.com/sass/node-sass/issues/2006
-  await silentNpm('install', '-g', packages['@angular/cli'].tar, '--unsafe-perm');
+  await silentNpm('install', '-g', packages['@angular/cli'].tar);
 
   try {
     await exec(process.platform.startsWith('win') ? 'where' : 'which', 'ng');
