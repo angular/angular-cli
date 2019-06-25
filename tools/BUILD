@@ -21,4 +21,17 @@ nodejs_binary(
         "--node_options=--preserve-symlinks",
     ],
 )
+
+platform(
+    name = "rbe_ubuntu1604-angular",
+    parents = ["@rbe_ubuntu1604_angular//config:platform"],
+    remote_execution_properties = """
+        {PARENT_REMOTE_EXECUTION_PROPERTIES}
+        properties: {
+            name: "dockerAddCapabilities"
+            value: "SYS_ADMIN"
+        }
+        """,
+)
+
 # @external_end

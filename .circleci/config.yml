@@ -71,6 +71,27 @@ anchor_6: &ignore_pull_requests
     branches:
       ignore:
         - /pull\/.*/
+anchor_7: &setup_bazel_remote_execution
+  run:
+    name: "Setup bazel RBE remote execution"
+    command: |
+      touch .bazelrc.user;
+      # We need ensure that the same default digest is used for encoding and decoding
+      # with openssl. Openssl versions might have different default digests which can
+      # cause decryption failures based on the openssl version. https://stackoverflow.com/a/39641378/4317734
+      openssl aes-256-cbc -d -in .circleci/gcp_token -md md5 -k "${CIRCLE_PROJECT_REPONAME}" -out /home/circleci/.gcp_credentials;
+      sudo bash -c "echo -e 'build --google_credentials=/home/circleci/.gcp_credentials' >> .bazelrc.user";
+      # Upload/don't upload local results to cache based on environment
+      if [[ -n "{$CIRCLE_PR_NUMBER}" ]]; then
+        sudo bash -c "echo -e 'build:remote --remote_upload_local_results=false\n' >> .bazelrc.user";
+        echo "Not uploading local build results to remote cache.";
+      else
+        sudo bash -c "echo -e 'build:remote --remote_upload_local_results=true\n' >> .bazelrc.user";
+        echo "Uploading local build results to remote cache.";
+      fi
+      # Enable remote builds
+      sudo bash -c "echo -e 'build --config=remote' >> .bazelrc.user";
+      echo "Reading from remote cache for bazel remote jobs.";
 
 # Job definitions
 version: 2.1
@@ -204,6 +225,7 @@ jobs:
     resource_class: xlarge
     steps:
       - attach_workspace: *attach_options
+      - *setup_bazel_remote_execution
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run: yarn bazel:test
 
