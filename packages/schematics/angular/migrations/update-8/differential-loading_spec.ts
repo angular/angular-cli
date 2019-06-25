@@ -9,7 +9,6 @@
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 
-
 describe('Migration to version 8', () => {
   describe('Migrate ES5 projects to enable differential loading', () => {
     const tsConfigPath = '/tsconfig.json';
@@ -17,9 +16,7 @@ describe('Migration to version 8', () => {
       compilerOptions: {
         module: 'es2015',
         moduleResolution: 'node',
-        typeRoots: [
-          'node_modules/@types',
-        ],
+        typeRoots: ['node_modules/@types'],
       },
     };
 
@@ -32,15 +29,18 @@ describe('Migration to version 8', () => {
 
     beforeEach(async () => {
       tree = new UnitTestTree(new EmptyTree());
-      tree = await schematicRunner.runExternalSchematicAsync(
-        require.resolve('../../collection.json'), 'ng-new',
-        {
-          name: 'migration-test',
-          version: '1.2.3',
-          directory: '.',
-        },
-        tree,
-      ).toPromise();
+      tree = await schematicRunner
+        .runExternalSchematicAsync(
+          require.resolve('../../collection.json'),
+          'ng-new',
+          {
+            name: 'migration-test',
+            version: '1.2.3',
+            directory: '.',
+          },
+          tree,
+        )
+        .toPromise();
       tree.overwrite(tsConfigPath, JSON.stringify(oldTsConfig, null, 2));
     });
 
@@ -81,24 +81,24 @@ describe('Migration to version 8', () => {
     });
 
     it(`should create 'downlevelIteration' property when doesn't exists`, () => {
-      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
       const compilerOptions = {
         ...oldTsConfig.compilerOptions,
       };
 
       tree.overwrite(tsConfigPath, JSON.stringify({ compilerOptions }, null, 2));
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
       const { downlevelIteration } = JSON.parse(tree2.readContent(tsConfigPath)).compilerOptions;
       expect(downlevelIteration).toBe(true);
     });
 
     it(`should update 'downlevelIteration' to true when it's false`, () => {
-      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
       const compilerOptions = {
         ...oldTsConfig.compilerOptions,
         downlevelIteration: false,
       };
 
       tree.overwrite(tsConfigPath, JSON.stringify({ compilerOptions }, null, 2));
+      const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
       const { downlevelIteration } = JSON.parse(tree2.readContent(tsConfigPath)).compilerOptions;
       expect(downlevelIteration).toBe(true);
     });
@@ -119,14 +119,18 @@ describe('Migration to version 8', () => {
     it(`should remove 'target' and 'module' from non workspace extended tsconfig.json`, () => {
       const appTsConfig = '/tsconfig.app.json';
       const specsTsConfig = '/tsconfig.spec.json';
-      const tsConfig = JSON.stringify({
-        extends: '../../tsconfig.json',
-        compilerOptions: {
-          moduleResolution: 'node',
-          target: 'es2015',
-          module: 'es2015',
+      const tsConfig = JSON.stringify(
+        {
+          extends: '../../tsconfig.json',
+          compilerOptions: {
+            moduleResolution: 'node',
+            target: 'es2015',
+            module: 'es2015',
+          },
         },
-      }, null, 2);
+        null,
+        2,
+      );
 
       tree.overwrite(appTsConfig, tsConfig);
       tree.overwrite(specsTsConfig, tsConfig);
@@ -136,21 +140,26 @@ describe('Migration to version 8', () => {
       expect(appCompilerOptions.target).toBeUndefined();
       expect(appCompilerOptions.module).toBeUndefined();
 
-      const { compilerOptions: specsCompilerOptions }
-        = JSON.parse(tree2.readContent(specsTsConfig));
+      const { compilerOptions: specsCompilerOptions } = JSON.parse(
+        tree2.readContent(specsTsConfig),
+      );
       expect(specsCompilerOptions.target).toBeUndefined();
       expect(specsCompilerOptions.module).toBeUndefined();
     });
 
     it(`should update 'target' and 'module' to non workspace non-extended tsconfig.json`, () => {
       const appTsConfig = '/tsconfig.app.json';
-      const tsConfig = JSON.stringify({
-        compilerOptions: {
-          moduleResolution: 'node',
-          target: 'es5',
-          module: 'es5',
+      const tsConfig = JSON.stringify(
+        {
+          compilerOptions: {
+            moduleResolution: 'node',
+            target: 'es5',
+            module: 'es5',
+          },
         },
-      }, null, 2);
+        null,
+        2,
+      );
 
       tree.overwrite(appTsConfig, tsConfig);
 
@@ -162,11 +171,15 @@ describe('Migration to version 8', () => {
 
     it(`should add 'target' and 'module' to non workspace non-extended tsconfig.json`, () => {
       const appTsConfig = '/tsconfig.app.json';
-      const tsConfig = JSON.stringify({
-        compilerOptions: {
-          moduleResolution: 'node',
+      const tsConfig = JSON.stringify(
+        {
+          compilerOptions: {
+            moduleResolution: 'node',
+          },
         },
-      }, null, 2);
+        null,
+        2,
+      );
 
       tree.overwrite(appTsConfig, tsConfig);
 
@@ -179,11 +192,7 @@ describe('Migration to version 8', () => {
     it(`should not update projects which browser builder is not 'build-angular:browser'`, () => {
       tree.delete('/browserslist');
       const config = JSON.parse(tree.readContent('angular.json'));
-      config
-        .projects['migration-test']
-        .architect
-        .build
-        .builder = '@dummy/builders:browser';
+      config.projects['migration-test'].architect.build.builder = '@dummy/builders:browser';
 
       tree.overwrite('angular.json', JSON.stringify(config));
       const tree2 = schematicRunner.runSchematic('migration-07', {}, tree.branch());
