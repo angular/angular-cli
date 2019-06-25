@@ -89,6 +89,7 @@ function createCtorParametersClassProperty(
   diagnostics: ts.Diagnostic[],
   entityNameToExpression: (n: ts.EntityName) => ts.Expression | undefined,
   ctorParameters: ParameterDecorationInfo[],
+  typeChecker: ts.TypeChecker,
 ): ts.PropertyDeclaration {
   const params: ts.Expression[] = [];
 
@@ -99,7 +100,7 @@ function createCtorParametersClassProperty(
     }
 
     const paramType = ctorParam.type
-      ? typeReferenceToExpression(entityNameToExpression, ctorParam.type)
+      ? typeReferenceToExpression(entityNameToExpression, ctorParam.type, typeChecker)
       : undefined;
     const members = [
       ts.createPropertyAssignment('type', paramType || ts.createIdentifier('undefined')),
@@ -147,6 +148,7 @@ function createCtorParametersClassProperty(
 function typeReferenceToExpression(
   entityNameToExpression: (n: ts.EntityName) => ts.Expression | undefined,
   node: ts.TypeNode,
+  typeChecker: ts.TypeChecker,
 ): ts.Expression | undefined {
   let kind = node.kind;
   if (ts.isLiteralTypeNode(node)) {
@@ -175,6 +177,19 @@ function typeReferenceToExpression(
       return ts.createIdentifier('Number');
     case ts.SyntaxKind.TypeReference:
       const typeRef = node as ts.TypeReferenceNode;
+      let typeSymbol = typeChecker.getSymbolAtLocation(typeRef.typeName);
+      if (typeSymbol && typeSymbol.flags & ts.SymbolFlags.Alias) {
+        typeSymbol = typeChecker.getAliasedSymbol(typeSymbol);
+      }
+
+      if (!typeSymbol || !(typeSymbol.flags & ts.SymbolFlags.Value)) {
+        return undefined;
+      }
+
+      const type = typeChecker.getTypeOfSymbolAtLocation(typeSymbol, typeRef);
+      if (!type || typeChecker.getSignaturesOfType(type, ts.SignatureKind.Construct).length === 0) {
+        return undefined;
+      }
 
       // Ignore any generic types, just return the base type.
       return entityNameToExpression(typeRef.typeName);
@@ -263,6 +278,7 @@ export function decoratorDownlevelTransformer(
           diagnostics,
           entityNameToExpression,
           parametersInfo,
+          typeChecker,
         );
 
         return [node, ctorProperty];
