@@ -9,6 +9,7 @@
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 
+// tslint:disable:no-big-function
 describe('Migration to version 8', () => {
   describe('Migrate ES5 projects to enable differential loading', () => {
     const tsConfigPath = '/tsconfig.json';
