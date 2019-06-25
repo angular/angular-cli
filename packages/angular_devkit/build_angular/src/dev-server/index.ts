@@ -6,22 +6,27 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {
-  BuilderContext,
-  createBuilder,
-  targetFromTargetString,
-} from '@angular-devkit/architect';
+import { BuilderContext, createBuilder, targetFromTargetString } from '@angular-devkit/architect';
 import {
   DevServerBuildOutput,
   WebpackLoggingCallback,
   runWebpackDevServer,
 } from '@angular-devkit/build-webpack';
-import { json, logging, tags } from '@angular-devkit/core';
+import {
+  experimental,
+  getSystemPath,
+  json,
+  logging,
+  normalize,
+  resolve,
+  tags,
+} from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { existsSync, readFileSync } from 'fs';
 import * as path from 'path';
 import { Observable, from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
+import * as ts from 'typescript';
 import * as url from 'url';
 import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
@@ -29,13 +34,11 @@ import { IndexHtmlWebpackPlugin } from '../angular-cli-files/plugins/index-html-
 import { checkPort } from '../angular-cli-files/utilities/check-port';
 import { IndexHtmlTransform } from '../angular-cli-files/utilities/index-file/write-index-html';
 import { generateEntryPoints } from '../angular-cli-files/utilities/package-chunk-sort';
-import {
-  buildBrowserWebpackConfigFromContext,
-  createBrowserLoggingCallback,
-} from '../browser';
+import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
+import { buildBrowserWebpackConfigFromContext, createBrowserLoggingCallback } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
-import { normalizeOptimization } from '../utils';
+import { BuildBrowserFeatures, normalizeOptimization } from '../utils';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { Schema } from './schema';
 const open = require('open');
@@ -58,7 +61,6 @@ export const devServerBuildOverriddenKeys: (keyof DevServerBuilderOptions)[] = [
   'deployUrl',
 ];
 
-
 export type DevServerBuilderOutput = DevServerBuildOutput & {
   baseUrl: string;
 };
@@ -74,9 +76,9 @@ export function serveWebpackBrowser(
   options: DevServerBuilderOptions,
   context: BuilderContext,
   transforms: {
-    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>,
-    logging?: WebpackLoggingCallback,
-    indexHtml?: IndexHtmlTransform,
+    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
+    logging?: WebpackLoggingCallback;
+    indexHtml?: IndexHtmlTransform;
   } = {},
 ): Observable<DevServerBuilderOutput> {
   // Check Angular version.
@@ -87,25 +89,29 @@ export function serveWebpackBrowser(
   let first = true;
   const host = new NodeJsSyncHost();
 
-  const loggingFn = transforms.logging
-    || createBrowserLoggingCallback(!!options.verbose, context.logger);
+  const loggingFn =
+    transforms.logging || createBrowserLoggingCallback(!!options.verbose, context.logger);
 
   async function setup(): Promise<{
-    browserOptions: json.JsonObject & BrowserBuilderSchema,
-    webpackConfig: webpack.Configuration,
-    webpackDevServerConfig: WebpackDevServer.Configuration,
-    port: number,
+    browserOptions: json.JsonObject & BrowserBuilderSchema;
+    webpackConfig: webpack.Configuration;
+    webpackDevServerConfig: WebpackDevServer.Configuration;
+    port: number;
+    workspace: experimental.workspace.Workspace;
   }> {
     // Get the browser configuration from the target name.
     const rawBrowserOptions = await context.getTargetOptions(browserTarget);
 
     // Override options we need to override, if defined.
     const overrides = (Object.keys(options) as (keyof DevServerBuilderOptions)[])
-    .filter(key => options[key] !== undefined && devServerBuildOverriddenKeys.includes(key))
-    .reduce<json.JsonObject & Partial<BrowserBuilderSchema>>((previous, key) => ({
-      ...previous,
-      [key]: options[key],
-    }), {});
+      .filter(key => options[key] !== undefined && devServerBuildOverriddenKeys.includes(key))
+      .reduce<json.JsonObject & Partial<BrowserBuilderSchema>>(
+        (previous, key) => ({
+          ...previous,
+          [key]: options[key],
+        }),
+        {},
+      );
 
     // In dev server we should not have budgets because of extra libs such as socks-js
     overrides.budgets = undefined;
@@ -126,22 +132,28 @@ export function serveWebpackBrowser(
     let webpackConfig = webpackConfigResult.config[0];
 
     const port = await checkPort(options.port || 0, options.host || 'localhost', 4200);
-    const webpackDevServerConfig = webpackConfig.devServer = buildServerConfig(
+    const webpackDevServerConfig = (webpackConfig.devServer = buildServerConfig(
       root,
       options,
       browserOptions,
       context.logger,
-    );
+    ));
 
     if (transforms.webpackConfiguration) {
       webpackConfig = await transforms.webpackConfiguration(webpackConfig);
     }
 
-    return { browserOptions, webpackConfig, webpackDevServerConfig, port };
+    return {
+      browserOptions,
+      webpackConfig,
+      webpackDevServerConfig,
+      port,
+      workspace: webpackConfigResult.workspace,
+    };
   }
 
   return from(setup()).pipe(
-    switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port }) => {
+    switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port, workspace }) => {
       options.port = port;
 
       // Resolve public host and client address.
@@ -171,25 +183,48 @@ export function serveWebpackBrowser(
           // tslint:disable-next-line:no-any
           apply: (compiler: any) => {
             compiler.hooks.afterEnvironment.tap('angular-cli', () => {
-              compiler.watchFileSystem = { watch: () => { } };
+              compiler.watchFileSystem = { watch: () => {} };
             });
           },
         });
       }
 
       if (browserOptions.index) {
-        const { scripts = [], styles = [], index, baseHref } = browserOptions;
+        const { scripts = [], styles = [], index, baseHref, tsConfig } = browserOptions;
+        const projectName = context.target
+          ? context.target.project
+          : workspace.getDefaultProjectName();
 
-        webpackConfig.plugins.push(new IndexHtmlWebpackPlugin({
-          input: path.resolve(root, index),
-          output: path.basename(index),
-          baseHref,
-          entrypoints: generateEntryPoints({ scripts, styles }),
-          deployUrl: browserOptions.deployUrl,
-          sri: browserOptions.subresourceIntegrity,
-          noModuleEntrypoints: ['polyfills-es5'],
-          postTransform: transforms.indexHtml,
-        }));
+        if (!projectName) {
+          throw new Error('Must either have a target from the context or a default project.');
+        }
+        const projectRoot = resolve(
+          workspace.root,
+          normalize(workspace.getProject(projectName).root),
+        );
+
+        const { options: compilerOptions } = readTsconfig(tsConfig, context.workspaceRoot);
+        const target = compilerOptions.target || ts.ScriptTarget.ES5;
+        const buildBrowserFeatures = new BuildBrowserFeatures(getSystemPath(projectRoot), target);
+
+        const entrypoints = generateEntryPoints({ scripts, styles });
+        const moduleEntrypoints = buildBrowserFeatures.isDifferentialLoadingNeeded()
+          ? entrypoints
+          : [];
+
+        webpackConfig.plugins.push(
+          new IndexHtmlWebpackPlugin({
+            input: path.resolve(root, index),
+            output: path.basename(index),
+            baseHref,
+            moduleEntrypoints,
+            entrypoints,
+            deployUrl: browserOptions.deployUrl,
+            sri: browserOptions.subresourceIntegrity,
+            noModuleEntrypoints: ['polyfills-es5'],
+            postTransform: transforms.indexHtml,
+          }),
+        );
       }
 
       const normalizedOptimization = normalizeOptimization(browserOptions.optimization);
@@ -235,7 +270,6 @@ export function serveWebpackBrowser(
   );
 }
 
-
 /**
  * Create a webpack configuration for the dev server.
  * @param workspaceRoot The root of the workspace. This comes from the context.
@@ -279,17 +313,19 @@ export function buildServerConfig(
     host: serverOptions.host,
     port: serverOptions.port,
     headers: { 'Access-Control-Allow-Origin': '*' },
-    historyApiFallback: !!browserOptions.index && {
-      index: `${servePath}/${path.basename(browserOptions.index)}`,
-      disableDotRule: true,
-      htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
-      rewrites: [
-        {
-          from: new RegExp(`^(?!${servePath})/.*`),
-          to: context => url.format(context.parsedUrl),
-        },
-      ],
-    } as WebpackDevServer.HistoryApiFallbackConfig,
+    historyApiFallback:
+      !!browserOptions.index &&
+      ({
+        index: `${servePath}/${path.basename(browserOptions.index)}`,
+        disableDotRule: true,
+        htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
+        rewrites: [
+          {
+            from: new RegExp(`^(?!${servePath})/.*`),
+            to: context => url.format(context.parsedUrl),
+          },
+        ],
+      } as WebpackDevServer.HistoryApiFallbackConfig),
     stats: false,
     compress: styles || scripts,
     watchOptions: {
@@ -388,8 +424,7 @@ function _addLiveReload(
   if (options.hmr) {
     const webpackHmrLink = 'https://webpack.js.org/guides/hot-module-replacement';
 
-    logger.warn(
-      tags.oneLine`NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.`);
+    logger.warn(tags.oneLine`NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.`);
 
     const showWarning = options.hmrWarning;
     if (showWarning) {
@@ -398,8 +433,7 @@ function _addLiveReload(
           but to take advantage of HMR additional application code is required'
           (not included in an Angular CLI project by default).'
           See ${webpackHmrLink}
-          for information on working with HMR for Webpack.`,
-      );
+          for information on working with HMR for Webpack.`);
       logger.warn(
         tags.oneLine`To disable this warning use "hmrWarning: false" under "serve"
            options in "angular.json".`,
@@ -493,9 +527,7 @@ function _findDefaultServePath(baseHref?: string, deployUrl?: string): string | 
   // normalize baseHref
   // for ng serve the starting base is always `/` so a relative
   // and root relative value are identical
-  const baseHrefParts = (baseHref || '')
-    .split('/')
-    .filter(part => part !== '');
+  const baseHrefParts = (baseHref || '').split('/').filter(part => part !== '');
   if (baseHref && !baseHref.endsWith('/')) {
     baseHrefParts.pop();
   }
@@ -513,6 +545,5 @@ function _findDefaultServePath(baseHref?: string, deployUrl?: string): string | 
   // Join together baseHref and deployUrl
   return `${normalizedBaseHref}${deployUrl || ''}`;
 }
-
 
 export default createBuilder<DevServerBuilderOptions, DevServerBuilderOutput>(serveWebpackBrowser);

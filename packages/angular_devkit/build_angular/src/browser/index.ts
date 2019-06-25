@@ -5,17 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {
-  BuilderContext,
-  BuilderOutput,
-  createBuilder,
-} from '@angular-devkit/architect';
+import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import {
   BuildResult,
   EmittedFiles,
   WebpackLoggingCallback,
   runWebpack,
- } from '@angular-devkit/build-webpack';
+} from '@angular-devkit/build-webpack';
 import {
   experimental,
   getSystemPath,
@@ -62,9 +58,10 @@ import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
 import { Schema as BrowserBuilderSchema } from './schema';
 
-export type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
-  outputPath: string;
-};
+export type BrowserBuilderOutput = json.JsonObject &
+  BuilderOutput & {
+    outputPath: string;
+  };
 
 export function createBrowserLoggingCallback(
   verbose: boolean,
@@ -92,7 +89,7 @@ export async function buildBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,
   context: BuilderContext,
   host: virtualFs.Host<fs.Stats> = new NodeJsSyncHost(),
-): Promise<{ workspace: experimental.workspace.Workspace, config: webpack.Configuration[] }> {
+): Promise<{ workspace: experimental.workspace.Workspace; config: webpack.Configuration[] }> {
   return generateBrowserWebpackConfigFromContext(
     options,
     context,
@@ -123,9 +120,7 @@ function getAnalyticsConfig(
 
     // The category is the builder name if it's an angular builder.
     return {
-      plugins: [
-        new NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category),
-      ],
+      plugins: [new NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category)],
     };
   }
 
@@ -145,7 +140,7 @@ async function initialize(
   context: BuilderContext,
   host: virtualFs.Host<fs.Stats>,
   webpackConfigurationTransform?: ExecutionTransformer<webpack.Configuration>,
-): Promise<{ workspace: experimental.workspace.Workspace, config: webpack.Configuration[] }> {
+): Promise<{ workspace: experimental.workspace.Workspace; config: webpack.Configuration[] }> {
   const { config, workspace } = await buildBrowserWebpackConfigFromContext(options, context, host);
 
   let transformedConfig;
@@ -171,9 +166,9 @@ export function buildWebpackBrowser(
   options: BrowserBuilderSchema,
   context: BuilderContext,
   transforms: {
-    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>,
-    logging?: WebpackLoggingCallback,
-    indexHtml?: IndexHtmlTransform,
+    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
+    logging?: WebpackLoggingCallback;
+    indexHtml?: IndexHtmlTransform;
   } = {},
 ) {
   const host = new NodeJsSyncHost();
@@ -182,13 +177,14 @@ export function buildWebpackBrowser(
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
 
-  const loggingFn = transforms.logging
-    || createBrowserLoggingCallback(!!options.verbose, context.logger);
+  const loggingFn =
+    transforms.logging || createBrowserLoggingCallback(!!options.verbose, context.logger);
 
   return from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
     switchMap(({ workspace, config: configs }) => {
       const projectName = context.target
-        ? context.target.project : workspace.getDefaultProjectName();
+        ? context.target.project
+        : workspace.getDefaultProjectName();
 
       if (!projectName) {
         throw new Error('Must either have a target from the context or a default project.');
@@ -201,12 +197,11 @@ export function buildWebpackBrowser(
 
       const tsConfig = readTsconfig(options.tsConfig, context.workspaceRoot);
       const target = tsConfig.options.target || ScriptTarget.ES5;
-      const buildBrowserFeatures = new BuildBrowserFeatures(
-        getSystemPath(projectRoot),
-        target,
-      );
+      const buildBrowserFeatures = new BuildBrowserFeatures(getSystemPath(projectRoot), target);
 
-      if (target > ScriptTarget.ES2015 && buildBrowserFeatures.isDifferentialLoadingNeeded()) {
+      const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded();
+
+      if (target > ScriptTarget.ES2015 && isDifferentialLoadingNeeded) {
         context.logger.warn(tags.stripIndent`
           WARNING: Using differential loading with targets ES5 and ES2016 or higher may
           cause problems. Browsers with support for ES2015 will load the ES2016+ scripts
@@ -217,14 +212,18 @@ export function buildWebpackBrowser(
       return from(configs).pipe(
         // the concurrency parameter (3rd parameter of mergeScan) is deliberately
         // set to 1 to make sure the build steps are executed in sequence.
-        mergeScan((lastResult, config) => {
-          // Make sure to only run the 2nd build step, if 1st one succeeded
-          if (lastResult.success) {
-            return runWebpack(config, context, { logging: loggingFn });
-          } else {
-            return of();
-          }
-        }, { success: true } as BuildResult, 1),
+        mergeScan(
+          (lastResult, config) => {
+            // Make sure to only run the 2nd build step, if 1st one succeeded
+            if (lastResult.success) {
+              return runWebpack(config, context, { logging: loggingFn });
+            } else {
+              return of();
+            }
+          },
+          { success: true } as BuildResult,
+          1,
+        ),
         bufferCount(configs.length),
         switchMap(buildEvents => {
           const success = buildEvents.every(r => r.success);
@@ -233,14 +232,19 @@ export function buildWebpackBrowser(
             let moduleFiles: EmittedFiles[] | undefined;
             let files: EmittedFiles[] | undefined;
 
-            const [ES5Result, ES2015Result] = buildEvents;
+            const [firstBuild, secondBuild] = buildEvents;
 
             if (buildEvents.length === 2) {
-              noModuleFiles = ES5Result.emittedFiles;
-              moduleFiles = ES2015Result.emittedFiles || [];
+              noModuleFiles = firstBuild.emittedFiles;
+              moduleFiles = secondBuild.emittedFiles || [];
+              files = moduleFiles.filter(x => x.extension === '.css');
+            } else if (options.watch && isDifferentialLoadingNeeded) {
+              // differential loading is not enabled in watch mode
+              // but we still want to use module type tags
+              moduleFiles = firstBuild.emittedFiles || [];
               files = moduleFiles.filter(x => x.extension === '.css');
             } else {
-              const { emittedFiles = [] } = ES5Result;
+              const { emittedFiles = [] } = firstBuild;
               files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
               noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
             }
@@ -258,8 +262,7 @@ export function buildWebpackBrowser(
               scripts: options.scripts,
               styles: options.styles,
               postTransform: transforms.indexHtml,
-            })
-            .pipe(
+            }).pipe(
               map(() => ({ success: true })),
               catchError(error => of({ success: false, error: mapErrorToMessage(error) })),
             );
@@ -269,26 +272,31 @@ export function buildWebpackBrowser(
         }),
         concatMap(buildEvent => {
           if (buildEvent.success && !options.watch && options.serviceWorker) {
-            return from(augmentAppWithServiceWorker(
-              host,
-              root,
-              projectRoot,
-              resolve(root, normalize(options.outputPath)),
-              options.baseHref || '/',
-              options.ngswConfigPath,
-            ).then(
-              () => ({ success: true }),
-              error => ({ success: false, error: mapErrorToMessage(error) }),
-            ));
+            return from(
+              augmentAppWithServiceWorker(
+                host,
+                root,
+                projectRoot,
+                resolve(root, normalize(options.outputPath)),
+                options.baseHref || '/',
+                options.ngswConfigPath,
+              ).then(
+                () => ({ success: true }),
+                error => ({ success: false, error: mapErrorToMessage(error) }),
+              ),
+            );
           } else {
             return of(buildEvent);
           }
         }),
-        map(event => ({
-          ...event,
-          // If we use differential loading, both configs have the same outputs
-          outputPath: path.resolve(context.workspaceRoot, options.outputPath),
-        } as BrowserBuilderOutput)),
+        map(
+          event =>
+            ({
+              ...event,
+              // If we use differential loading, both configs have the same outputs
+              outputPath: path.resolve(context.workspaceRoot, options.outputPath),
+            } as BrowserBuilderOutput),
+        ),
       );
     }),
   );

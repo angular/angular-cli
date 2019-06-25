@@ -20,6 +20,7 @@ export interface IndexHtmlWebpackPluginOptions {
   deployUrl?: string;
   sri: boolean;
   noModuleEntrypoints: string[];
+  moduleEntrypoints: string[];
   postTransform?: IndexHtmlTransform;
 }
 
@@ -37,7 +38,6 @@ function readFile(filename: string, compilation: compilation.Compilation): Promi
   });
 }
 
-
 export class IndexHtmlWebpackPlugin {
   private _options: IndexHtmlWebpackPluginOptions;
 
@@ -47,6 +47,7 @@ export class IndexHtmlWebpackPlugin {
       output: 'index.html',
       entrypoints: ['polyfills', 'main'],
       noModuleEntrypoints: [],
+      moduleEntrypoints: [],
       sri: false,
       ...options,
     };
@@ -56,23 +57,28 @@ export class IndexHtmlWebpackPlugin {
     compiler.hooks.emit.tapPromise('index-html-webpack-plugin', async compilation => {
       // Get input html file
       const inputContent = await readFile(this._options.input, compilation);
-      (compilation as compilation.Compilation & { fileDependencies: Set<string> })
-        .fileDependencies.add(this._options.input);
+      (compilation as compilation.Compilation & {
+        fileDependencies: Set<string>;
+      }).fileDependencies.add(this._options.input);
 
       // Get all files for selected entrypoints
       const files: FileInfo[] = [];
       const noModuleFiles: FileInfo[] = [];
+      const moduleFiles: FileInfo[] = [];
 
       for (const [entryName, entrypoint] of compilation.entrypoints) {
-        const entryFiles: FileInfo[] = (entrypoint && entrypoint.getFiles() || [])
-          .map((f: string): FileInfo => ({
+        const entryFiles: FileInfo[] = ((entrypoint && entrypoint.getFiles()) || []).map(
+          (f: string): FileInfo => ({
             name: entryName,
             file: f,
             extension: path.extname(f),
-          }));
+          }),
+        );
 
         if (this._options.noModuleEntrypoints.includes(entryName)) {
           noModuleFiles.push(...entryFiles);
+        } else if (this._options.moduleEntrypoints.includes(entryName)) {
+          moduleFiles.push(...entryFiles);
         } else {
           files.push(...entryFiles);
         }
@@ -88,6 +94,7 @@ export class IndexHtmlWebpackPlugin {
         files,
         noModuleFiles,
         loadOutputFile,
+        moduleFiles,
         entrypoints: this._options.entrypoints,
       });
 
