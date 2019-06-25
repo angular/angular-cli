@@ -79,6 +79,8 @@ ts_library(
 jasmine_node_test(
     name = "update_test",
     srcs = [":update_test_lib"],
+    # TODO: Audit tests to determine if tests can be run in RBE environments
+    local = True,
     deps = [
         "@npm//jasmine",
         "@npm//npm-registry-client",

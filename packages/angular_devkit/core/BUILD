@@ -70,6 +70,8 @@ ts_library(
 jasmine_node_test(
     name = "core_test",
     srcs = [":core_test_lib"],
+    # TODO: Audit tests to determine if tests can be run in RBE environments
+    local = True,
     deps = [
         "@npm//jasmine",
         "@npm//source-map",

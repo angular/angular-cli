@@ -6,3 +6,57 @@ build --strategy=TypeScriptCompile=worker
 build --watchfs
 
 test --test_output=errors
+
+################################
+# Remote Execution Setup       #
+################################
+
+ # Use the Angular team internal GCP instance for remote execution.
+build:remote --remote_instance_name=projects/internal-200822/instances/default_instance
+build:remote --project_id=internal-200822
+
+ # Setup the build strategy for various types of actions. Mixing "local" and "remote"
+# can cause unexpected results and we want to run everything remotely if possible.
+build:remote --spawn_strategy=remote
+build:remote --strategy=Javac=remote
+build:remote --strategy=Closure=remote
+build:remote --strategy=Genrule=remote
+build:remote --define=EXECUTOR=remote
+
+ # Setup the remote build execution servers.
+build:remote --remote_cache=remotebuildexecution.googleapis.com
+build:remote --remote_executor=remotebuildexecution.googleapis.com
+build:remote --tls_enabled=true
+build:remote --auth_enabled=true
+build:remote --remote_timeout=3600
+build:remote --jobs=50
+
+ # Setup the toolchain and platform for the remote build execution. The platform
+# is automatically configured by the "rbe_autoconfig" rule in the project workpsace.
+build:remote --host_javabase=@rbe_ubuntu1604_angular//java:jdk
+build:remote --javabase=@rbe_ubuntu1604_angular//java:jdk
+build:remote --host_java_toolchain=@bazel_tools//tools/jdk:toolchain_hostjdk8
+build:remote --java_toolchain=@bazel_tools//tools/jdk:toolchain_hostjdk8
+build:remote --crosstool_top=@rbe_ubuntu1604_angular//cc:toolchain
+build:remote --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
+build:remote --extra_toolchains=@rbe_ubuntu1604_angular//config:cc-toolchain
+build:remote --extra_execution_platforms=//tools:rbe_ubuntu1604-angular
+build:remote --host_platform=//tools:rbe_ubuntu1604-angular
+build:remote --platforms=//tools:rbe_ubuntu1604-angular
+
+  # Setup Build Event Service
+build:remote --bes_backend=buildeventservice.googleapis.com
+build:remote --bes_timeout=30s
+build:remote --bes_results_url="https://source.cloud.google.com/results/invocations/"
+
+ # Set remote caching settings
+build:remote --remote_accept_cached=true
+
+####################################################
+# User bazel configuration
+# NOTE: This needs to be the *last* entry in the config.
+####################################################
+
+# Load any settings which are specific to the current user. Needs to be *last* statement
+# in this config, as the user configuration should be able to overwrite flags from this file.
+try-import .bazelrc.user
