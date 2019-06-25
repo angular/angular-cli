@@ -80,3 +80,34 @@ rules_karma_dependencies()
 load("@io_bazel_rules_webtesting//web:repositories.bzl", "web_test_repositories")
 
 web_test_repositories()
+
+##########################
+# Remote Execution Setup #
+##########################
+# Bring in bazel_toolchains for RBE setup configuration.
+http_archive(
+    name = "bazel_toolchains",
+    sha256 = "142bcbd8cb751ce1193a1d7fef4e328493cd0a69cc0555183ad237f81418ba40",
+    strip_prefix = "bazel-toolchains-628224f6cf48e81116d0ee0bf65424eaa630d5b3",
+    urls = ["https://github.com/xingao267/bazel-toolchains/archive/628224f6cf48e81116d0ee0bf65424eaa630d5b3.tar.gz"],
+)
+
+load("@bazel_toolchains//rules:environments.bzl", "clang_env")
+load("@bazel_toolchains//rules:rbe_repo.bzl", "rbe_autoconfig")
+
+rbe_autoconfig(
+    name = "rbe_ubuntu1604_angular",
+    # The sha256 of marketplace.gcr.io/google/rbe-ubuntu16-04 container that is
+    # used by rbe_autoconfig() to pair toolchain configs in the @bazel_toolchains repo.
+    base_container_digest = "sha256:677c1317f14c6fd5eba2fd8ec645bfdc5119f64b3e5e944e13c89e0525cc8ad1",
+    # Note that if you change the `digest`, you might also need to update the
+    # `base_container_digest` to make sure marketplace.gcr.io/google/rbe-ubuntu16-04-webtest:<digest>
+    # and marketplace.gcr.io/google/rbe-ubuntu16-04:<base_container_digest> have
+    # the same Clang and JDK installed.
+    # Clang is needed because of the dependency on @com_google_protobuf.
+    # Java is needed for the Bazel's test executor Java tool.
+    digest = "sha256:74a8e9dca4781d5f277a7bd8e7ea7ed0f5906c79c9cd996205b6d32f090c62f3",
+    env = clang_env(),
+    registry = "marketplace.gcr.io",
+    repository = "google/rbe-ubuntu16-04-webtest",
+)
