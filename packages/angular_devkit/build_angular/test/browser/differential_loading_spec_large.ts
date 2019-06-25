@@ -18,7 +18,7 @@ describe('Browser Builder with differential loading', () => {
     await host.initialize().toPromise();
     // to trigger differential loading we need an non ever green browser
     host.writeMultipleFiles({
-      'browserslist': 'IE 10',
+      browserslist: 'IE 10',
     });
 
     architect = (await createArchitect(host.root())).architect;
@@ -59,8 +59,7 @@ describe('Browser Builder with differential loading', () => {
       'vendor-es5.js.map',
     ] as PathFragment[];
 
-    expect(Object.keys(files))
-      .toEqual(jasmine.arrayWithExactContents(expectedOutputs));
+    expect(Object.keys(files)).toEqual(jasmine.arrayWithExactContents(expectedOutputs));
   });
 
   it('deactivates differential loading for watch mode', async () => {
@@ -86,10 +85,8 @@ describe('Browser Builder with differential loading', () => {
       'vendor.js.map',
     ] as PathFragment[];
 
-    expect(Object.keys(files))
-      .toEqual(jasmine.arrayWithExactContents(expectedOutputs));
+    expect(Object.keys(files)).toEqual(jasmine.arrayWithExactContents(expectedOutputs));
   });
-
 
   it('emits the right ES formats', async () => {
     const { files } = await browserBuild(architect, host, target, { optimization: true });
@@ -104,5 +101,23 @@ describe('Browser Builder with differential loading', () => {
     expect(await files['polyfills-es5.js']).toContain('registerElementPatch');
     expect(await files['polyfills-es2015.js']).toContain('zone.js/dist/zone-evergreen');
     expect(await files['polyfills-es2015.js']).not.toContain('registerElementPatch');
+  });
+
+  it('adds `type="module"` when differential loading is needed', async () => {
+    host.writeMultipleFiles({
+      browserslist: `
+        last 1 chrome version
+        IE 9
+      `,
+    });
+
+    const { files } = await browserBuild(architect, host, target, { watch: true });
+    expect(await files['index.html']).toContain(
+      '<script src="runtime.js" type="module"></script>' +
+        '<script src="polyfills.js" type="module"></script>' +
+        '<script src="styles.js" type="module"></script>' +
+        '<script src="vendor.js" type="module"></script>' +
+        '<script src="main.js" type="module"></script>',
+    );
   });
 });
