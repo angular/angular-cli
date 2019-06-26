@@ -20,7 +20,7 @@ import { isTTY } from '../utilities/tty';
 const analyticsDebug = debug('ng:analytics'); // Generate analytics, including settings and users.
 const analyticsLogDebug = debug('ng:analytics:log'); // Actual logs of events.
 
-const BYTES_PER_MEGABYTES = 1024 * 1024;
+const BYTES_PER_GIGABYTES = 1024 * 1024 * 1024;
 
 let _defaultAngularCliPropertyCache: string;
 export const AnalyticsProperties = {
@@ -129,8 +129,8 @@ function _getCpuSpeed() {
  * @private
  */
 function _getRamSize() {
-  // Report in megabytes. Otherwise it's too much noise.
-  return Math.floor(os.totalmem() / BYTES_PER_MEGABYTES);
+  // Report in gigabytes (or closest). Otherwise it's too much noise.
+  return Math.round(os.totalmem() / BYTES_PER_GIGABYTES);
 }
 
 /**
@@ -287,7 +287,7 @@ export class UniversalAnalytics implements analytics.Analytics {
     // We set custom metrics for values we care about.
     this._dimensions[analytics.NgCliAnalyticsDimensions.CpuCount] = _getCpuCount();
     this._dimensions[analytics.NgCliAnalyticsDimensions.CpuSpeed] = _getCpuSpeed();
-    this._dimensions[analytics.NgCliAnalyticsDimensions.RamInMegabytes] = _getRamSize();
+    this._dimensions[analytics.NgCliAnalyticsDimensions.RamInGigabytes] = _getRamSize();
     this._dimensions[analytics.NgCliAnalyticsDimensions.NodeVersion] = _getNumericNodeVersion();
   }
 

@@ -43,7 +43,7 @@ Note: There's a limit of 20 custom dimensions.
 |:---:|:---|:---|
 | 1 | `CPU Count` | `number` |
 | 2 | `CPU Speed` | `number` |
-| 3 | `RAM (In MB)` | `number` |
+| 3 | `RAM (In GB)` | `number` |
 | 4 | `Node Version` | `number` |
 | 5 | `Flag: --style` | `string` |
 | 6 | `--collection` | `string` |
