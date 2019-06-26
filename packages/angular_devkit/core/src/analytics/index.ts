@@ -11,7 +11,6 @@ export * from './logging';
 export * from './multi';
 export * from './noop';
 
-
 /**
  * MAKE SURE TO KEEP THIS IN SYNC WITH THE TABLE AND CONTENT IN `/docs/design/analytics.md`.
  * WE LIST THOSE DIMENSIONS (AND MORE).
@@ -23,7 +22,7 @@ export * from './noop';
 export enum NgCliAnalyticsDimensions {
   CpuCount = 1,
   CpuSpeed = 2,
-  RamInMegabytes = 3,
+  RamInGigabytes = 3,
   NodeVersion = 4,
   NgAddCollection = 6,
   NgBuildBuildEventLog = 7,
@@ -53,7 +52,7 @@ export enum NgCliAnalyticsMetrics {
 export const NgCliAnalyticsDimensionsFlagInfo: { [name: string]: [string, string] } = {
   CpuCount: ['CPU Count', 'number'],
   CpuSpeed: ['CPU Speed', 'number'],
-  RamInMegabytes: ['RAM (In MB)', 'number'],
+  RamInGigabytes: ['RAM (In GB)', 'number'],
   NodeVersion: ['Node Version', 'number'],
   NgAddCollection: ['--collection', 'string'],
   NgBuildBuildEventLog: ['--buildEventLog', 'boolean'],
