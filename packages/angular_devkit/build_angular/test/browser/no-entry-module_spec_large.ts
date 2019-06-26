@@ -8,8 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { TestLogger } from '@angular-devkit/architect/testing';
-import { browserBuild, createArchitect, host } from '../utils';
-
+import { browserBuild, createArchitect, host, ivyEnabled } from '../utils';
 
 describe('Browser Builder no entry module', () => {
   const target = { project: 'app', target: 'build' };
@@ -30,6 +29,12 @@ describe('Browser Builder no entry module', () => {
   });
 
   it('reports warning when no bootstrap code', async () => {
+    if (ivyEnabled) {
+      pending('Does not apply to Ivy.');
+
+      return;
+    }
+
     host.replaceInFile('src/main.ts', /./g, '');
     host.appendToFile('src/main.ts', `import './app/app.module';`);
 

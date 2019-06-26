@@ -8,8 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { logging } from '@angular-devkit/core';
-import { createArchitect, host } from '../utils';
-
+import { createArchitect, host, ivyEnabled } from '../utils';
 
 describe('Browser Builder errors', () => {
   const targetSpec = { project: 'app', target: 'build' };
@@ -22,10 +21,14 @@ describe('Browser Builder errors', () => {
   afterEach(async () => host.restore().toPromise());
 
   it('shows error when files are not part of the compilation', async () => {
-    host.replaceInFile('src/tsconfig.app.json', '"compilerOptions": {', `
+    host.replaceInFile(
+      'src/tsconfig.app.json',
+      '"compilerOptions": {',
+      `
       "files": ["main.ts"],
       "compilerOptions": {
-    `);
+    `,
+    );
     const logger = new logging.Logger('');
     const logs: string[] = [];
     logger.subscribe(e => logs.push(e.message));
@@ -59,7 +62,11 @@ describe('Browser Builder errors', () => {
     const run = await architect.scheduleTarget(targetSpec, { aot: true }, { logger });
     const output = await run.result;
     expect(output.success).toBe(false);
-    expect(logs.join()).toContain('Function expressions are not supported in');
+    if (ivyEnabled) {
+      expect(logs.join()).toContain('selector must be a string');
+    } else {
+      expect(logs.join()).toContain('Function expressions are not supported in');
+    }
     await run.stop();
   });
 

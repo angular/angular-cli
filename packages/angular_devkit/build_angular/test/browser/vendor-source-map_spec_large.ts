@@ -7,9 +7,10 @@
  */
 import { Architect } from '@angular-devkit/architect';
 import * as path from 'path';
-import { browserBuild, createArchitect, host } from '../utils';
+import { browserBuild, createArchitect, host, ivyEnabled } from '../utils';
 
-describe('Browser Builder external source map', () => {
+// DISABLED_FOR_IVY   These should pass but are currently not supported
+(ivyEnabled ? xdescribe : describe)('Browser Builder external source map', () => {
   const target = { project: 'app', target: 'build' };
   let architect: Architect;
 

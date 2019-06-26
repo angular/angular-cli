@@ -9,8 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { BrowserBuilderOutput } from '../../src/browser';
-import { createArchitect, host } from '../utils';
-
+import { createArchitect, host, ivyEnabled } from '../utils';
 
 describe('Browser Builder AOT', () => {
   const targetSpec = { project: 'app', target: 'build' };
@@ -26,13 +25,17 @@ describe('Browser Builder AOT', () => {
     const overrides = { aot: true };
 
     const run = await architect.scheduleTarget(targetSpec, overrides);
-    const output = await run.result as BrowserBuilderOutput;
+    const output = (await run.result) as BrowserBuilderOutput;
 
     expect(output.success).toBe(true);
 
     const fileName = join(normalize(output.outputPath), 'main.js');
     const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
-    expect(content).toMatch(/platformBrowser.*bootstrapModuleFactory.*AppModuleNgFactory/);
+    if (ivyEnabled) {
+      expect(content).toContain('AppComponent.ngComponentDef');
+    } else {
+      expect(content).toMatch(/platformBrowser.*bootstrapModuleFactory.*AppModuleNgFactory/);
+    }
 
     await run.stop();
   });

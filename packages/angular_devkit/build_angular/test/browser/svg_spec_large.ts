@@ -7,7 +7,7 @@
  */
 import { Architect } from '@angular-devkit/architect';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { createArchitect, host, outputPath } from '../utils';
+import { createArchitect, host, ivyEnabled, outputPath } from '../utils';
 
 describe('Browser Builder allow svg', () => {
   const target = { project: 'app', target: 'build' };
@@ -48,19 +48,24 @@ describe('Browser Builder allow svg', () => {
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
 
     const exists = host.scopedSync().exists(join(outputPath, 'main.js'));
-    expect(exists).toBe(true, '\'main.js\' should exist');
+    expect(exists).toBe(true, '"main.js" should exist');
 
     if (exists) {
       const content = virtualFs.fileBufferToString(
         host.scopedSync().read(join(outputPath, 'main.js')),
       );
 
-      expect(content).toContain('":svg:svg"');
-      expect(host.scopedSync().exists(normalize('dist/app.component.svg')))
-        .toBe(false, 'should not copy app.component.svg to dist');
+      if (ivyEnabled) {
+        expect(content).toContain('ɵɵnamespaceSVG');
+      } else {
+        expect(content).toContain('":svg:svg"');
+      }
+      expect(host.scopedSync().exists(normalize('dist/app.component.svg'))).toBe(
+        false,
+        'should not copy app.component.svg to dist',
+      );
     }
 
     await run.stop();
   });
-
 });
