@@ -163,7 +163,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
       }
     }
 
-    this.analytics.pageview('/command/' + paths.join('/'), { dimensions });
+    this.analytics.pageview('/command/' + paths.join('/'), { dimensions, metrics });
   }
 
   abstract async run(options: T & Arguments): Promise<number | void>;
