@@ -5,13 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-import {
-  Architect,
-  BuilderOutput,
-  ScheduleOptions,
-  Target,
-} from '@angular-devkit/architect';
+import { Architect, BuilderOutput, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { TestProjectHost, TestingArchitectHost } from '@angular-devkit/architect/testing';
 import {
@@ -26,11 +20,16 @@ import {
 } from '@angular-devkit/core';
 import { BrowserBuilderOutput } from '../src/browser';
 
+export const ivyEnabled = process.argv.includes('--ivy');
+if (ivyEnabled) {
+  // tslint:disable-next-line:no-console
+  console.warn('********* IVY Enabled ***********');
+}
 
 const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
 export const workspaceRoot = join(
   devkitRoot,
-  'tests/angular_devkit/build_angular/hello-world-app/',
+  `tests/angular_devkit/build_angular/hello-world-app${ivyEnabled ? '-ivy' : ''}/`,
 );
 export const host = new TestProjectHost(workspaceRoot);
 export const outputPath: Path = normalize('dist');
@@ -41,7 +40,6 @@ export const extractI18nTargetSpec = { project: 'app', target: 'extract-i18n' };
 export const karmaTargetSpec = { project: 'app', target: 'test' };
 export const tslintTargetSpec = { project: 'app', target: 'lint' };
 export const protractorTargetSpec = { project: 'app-e2e', target: 'e2e' };
-
 
 export async function createArchitect(workspaceRoot: Path) {
   const registry = new schema.CoreSchemaRegistry();
@@ -69,7 +67,7 @@ export async function browserBuild(
   target: Target,
   overrides?: json.JsonObject,
   scheduleOptions?: ScheduleOptions,
-): Promise<{ output: BuilderOutput; files: { [file: string]: string } }> {
+): Promise<{ output: BuilderOutput; files: { [file: string]: Promise<string> } }> {
   const run = await architect.scheduleTarget(target, overrides, scheduleOptions);
   const output = (await run.result) as BrowserBuilderOutput;
   expect(output.success).toBe(true);

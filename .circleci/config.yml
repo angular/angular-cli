@@ -123,7 +123,18 @@ jobs:
     steps:
       - attach_workspace: *attach_options
       - run: yarn webdriver-update
-      - run: yarn test-large -- --full --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
+      - run: yarn test-large --full --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
+
+  test-large-ivy:
+    <<: *defaults
+    docker:
+      - image: *browsers_docker_image
+    resource_class: large
+    parallelism: 4
+    steps:
+      - attach_workspace: *attach_options
+      - run: yarn webdriver-update
+      - run: yarn test-large --ivy --full --glob="packages/angular_devkit/build_angular/test/browser/*_spec_large.ts" --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
   e2e-cli:
     <<: *defaults
@@ -290,6 +301,9 @@ workflows:
           requires:
             - test
       - test-large:
+          requires:
+            - build
+      - test-large-ivy:
           requires:
             - build
       - e2e-cli:

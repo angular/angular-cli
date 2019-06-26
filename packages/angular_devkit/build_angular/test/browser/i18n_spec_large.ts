@@ -8,10 +8,10 @@
 import { Architect } from '@angular-devkit/architect';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { BrowserBuilderOutput } from '../../src/browser';
-import { createArchitect, host } from '../utils';
+import { createArchitect, host, ivyEnabled } from '../utils';
 
-
-describe('Browser Builder i18n', () => {
+// DISABLED_FOR_IVY - These should pass but are currently not supported
+(ivyEnabled ? xdescribe : describe)('Browser Builder i18n', () => {
   const emptyTranslationFile = `
       <?xml version="1.0" encoding="UTF-8" ?>
       <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
@@ -48,8 +48,10 @@ describe('Browser Builder i18n', () => {
       `,
     });
 
-    host.appendToFile('src/app/app.component.html',
-      '<h1 i18n="An introduction header for this sample">Hello i18n!</h1>');
+    host.appendToFile(
+      'src/app/app.component.html',
+      '<h1 i18n="An introduction header for this sample">Hello i18n!</h1>',
+    );
 
     const overrides = {
       aot: true,
@@ -59,7 +61,7 @@ describe('Browser Builder i18n', () => {
     };
 
     const run = await architect.scheduleTarget(targetSpec, overrides);
-    const output = await run.result as BrowserBuilderOutput;
+    const output = (await run.result) as BrowserBuilderOutput;
     expect(output.success).toBe(true);
     const outputPath = output.outputPath;
     const fileName = join(normalize(outputPath), 'main.js');
@@ -82,7 +84,7 @@ describe('Browser Builder i18n', () => {
     host.appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
 
     const run = await architect.scheduleTarget(targetSpec, overrides);
-    const output = await run.result as BrowserBuilderOutput;
+    const output = (await run.result) as BrowserBuilderOutput;
     expect(output.success).toBe(true);
     const outputPath = output.outputPath;
     const fileName = join(normalize(outputPath), 'main.js');
@@ -105,7 +107,7 @@ describe('Browser Builder i18n', () => {
     host.appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
 
     const run = await architect.scheduleTarget(targetSpec, overrides);
-    const output = await run.result as BrowserBuilderOutput;
+    const output = (await run.result) as BrowserBuilderOutput;
     expect(output.success).toBe(false);
 
     await run.stop();
@@ -115,7 +117,7 @@ describe('Browser Builder i18n', () => {
     const overrides = { aot: true, i18nLocale: 'fr_FR' };
 
     const run = await architect.scheduleTarget(targetSpec, overrides);
-    const output = await run.result as BrowserBuilderOutput;
+    const output = (await run.result) as BrowserBuilderOutput;
     expect(output.success).toBe(true);
     const outputPath = output.outputPath;
     const fileName = join(normalize(outputPath), 'main.js');

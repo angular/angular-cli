@@ -1,0 +1,3 @@
+# Don't ignore node_modules, this project is not meant to be installed.
+# Also, ~ import path in styles does only looks in the first node_modules found.
+# /node_modules
