@@ -9,7 +9,7 @@
 // Use with CLI --no-progress flag for best results.
 // This should be false for commited code.
 const _benchmark = false;
-
+// tslint:disable:no-console
 export function time(label: string) {
   if (_benchmark) {
     console.time(label);

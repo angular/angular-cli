@@ -7,6 +7,7 @@
  */
 import 'symbol-observable';
 // symbol polyfill must go first
+// tslint:disable: no-console
 // tslint:disable-next-line:ordered-imports import-groups
 import { tags } from '@angular-devkit/core';
 import * as fs from 'fs';

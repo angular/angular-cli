@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// tslint:disable:no-console
 // tslint:disable:no-implicit-dependencies
 import { logging } from '@angular-devkit/core';
 import { spawnSync } from 'child_process';
@@ -26,17 +27,15 @@ require('source-map-support').install({
   hookRequire: true,
 });
 
-
 interface CoverageLocation {
   start: Position;
   end: Position;
 }
 
-type CoverageType = any;  // tslint:disable-line:no-any
+type CoverageType = any; // tslint:disable-line:no-any
 declare const global: {
   __coverage__: CoverageType;
 };
-
 
 function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
   const { status, error, stdout } = spawnSync(command, args, {
@@ -52,12 +51,10 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
   return stdout.toString('utf-8');
 }
 
-
 // Add the Istanbul (not Constantinople) reporter.
 const istanbulCollector = new Istanbul.Collector({});
 const istanbulReporter = new Istanbul.Reporter(undefined, 'coverage/');
 istanbulReporter.addAll(['json', 'lcov']);
-
 
 class IstanbulReporter implements jasmine.CustomReporter {
   // Update a location object from a SourceMap. Will ignore the location if the sourcemap does
@@ -126,48 +123,48 @@ class IstanbulReporter implements jasmine.CustomReporter {
   }
 }
 
-
 // Create a Jasmine runner and configure it.
 const runner = new Jasmine({ projectBaseDir: projectBaseDir });
 
 if (process.argv.indexOf('--spec-reporter') != -1) {
   runner.env.clearReporters();
-  runner.env.addReporter(new JasmineSpecReporter({
-    stacktrace: {
-      // Filter all JavaScript files that appear after a TypeScript file (callers) from the stack
-      // trace.
-      filter: (x: string) => {
-        return x.substr(0, x.indexOf('\n', x.indexOf('\n', x.lastIndexOf('.ts:')) + 1));
+  runner.env.addReporter(
+    new JasmineSpecReporter({
+      stacktrace: {
+        // Filter all JavaScript files that appear after a TypeScript file (callers) from the stack
+        // trace.
+        filter: (x: string) => {
+          return x.substr(0, x.indexOf('\n', x.indexOf('\n', x.lastIndexOf('.ts:')) + 1));
+        },
       },
-    },
-    spec: {
-      displayDuration: true,
-    },
-    suite: {
-      displayNumber: true,
-    },
-    summary: {
-      displayStacktrace: true,
-      displayErrorMessages: true,
-      displayDuration: true,
-    },
-  }));
+      spec: {
+        displayDuration: true,
+      },
+      suite: {
+        displayNumber: true,
+      },
+      summary: {
+        displayStacktrace: true,
+        displayErrorMessages: true,
+        displayDuration: true,
+      },
+    }),
+  );
 }
-
 
 // Manually set exit code (needed with custom reporters)
 runner.onComplete((success: boolean) => {
   process.exitCode = success ? 0 : 1;
 });
 
-
-glob.sync('packages/**/*.spec.ts')
+glob
+  .sync('packages/**/*.spec.ts')
   .filter(p => !/\/schematics\/.*\/(other-)?files\//.test(p))
   .forEach(path => {
     console.error(`Invalid spec file name: ${path}. You're using the old convention.`);
   });
 
-export default function (args: ParsedArgs, logger: logging.Logger) {
+export default function(args: ParsedArgs, logger: logging.Logger) {
   const specGlob = args.large ? '*_spec_large.ts' : '*_spec.ts';
   const regex = args.glob ? args.glob : `packages/**/${specGlob}`;
 
@@ -185,44 +182,56 @@ export default function (args: ParsedArgs, logger: logging.Logger) {
   }
 
   // Run the tests.
-  const allTests =
-    glob.sync(regex)
-      .map(p => relative(projectBaseDir, p));
+  const allTests = glob.sync(regex).map(p => relative(projectBaseDir, p));
 
   const tsConfigPath = join(__dirname, '../tsconfig.json');
   const tsConfig = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
-  const pattern = '^('
-                  + (tsConfig.config.exclude as string[])
-                    .map(ex => '('
-                      + ex.split(/[\/\\]/g).map(f => f
-                          .replace(/[\-\[\]{}()+?.^$|]/g, '\\$&')
-                          .replace(/^\*\*/g, '(.+?)?')
-                          .replace(/\*/g, '[^/\\\\]*'))
-                        .join('[\/\\\\]')
-                      + ')')
-                    .join('|')
-                  + ')($|/|\\\\)';
+  const pattern =
+    '^(' +
+    (tsConfig.config.exclude as string[])
+      .map(
+        ex =>
+          '(' +
+          ex
+            .split(/[\/\\]/g)
+            .map(f =>
+              f
+                .replace(/[\-\[\]{}()+?.^$|]/g, '\\$&')
+                .replace(/^\*\*/g, '(.+?)?')
+                .replace(/\*/g, '[^/\\\\]*'),
+            )
+            .join('[/\\\\]') +
+          ')',
+      )
+      .join('|') +
+    ')($|/|\\\\)';
   const excludeRe = new RegExp(pattern);
   let tests = allTests.filter(x => !excludeRe.test(x));
 
   if (!args.full) {
     // Find the point where this branch merged with master.
     const branch = _exec('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {}, logger).trim();
-    const masterRevList = _exec('git', ['rev-list', 'master'], {}, logger).trim().split('\n');
-    const branchRevList = _exec('git', ['rev-list', branch], {}, logger).trim().split('\n');
+    const masterRevList = _exec('git', ['rev-list', 'master'], {}, logger)
+      .trim()
+      .split('\n');
+    const branchRevList = _exec('git', ['rev-list', branch], {}, logger)
+      .trim()
+      .split('\n');
     const sha = branchRevList.find(s => masterRevList.includes(s));
 
     if (sha) {
       const diffFiles = [
         // Get diff between $SHA and HEAD.
         ..._exec('git', ['diff', sha, 'HEAD', '--name-only'], {}, logger)
-          .trim().split('\n'),
+          .trim()
+          .split('\n'),
         // And add the current status to it (so it takes the non-committed changes).
         ..._exec('git', ['status', '--short', '--show-stash'], {}, logger)
-          .split('\n').map(x => x.slice(2).trim()),
+          .split('\n')
+          .map(x => x.slice(2).trim()),
       ]
         .map(x => normalize(x))
-        .filter(x => x !== '.' && x !== '');  // Empty paths will be normalized to dot.
+        .filter(x => x !== '.' && x !== ''); // Empty paths will be normalized to dot.
 
       const diffPackages = new Set();
       for (const pkgName of Object.keys(packages)) {
@@ -239,12 +248,13 @@ export default function (args: ParsedArgs, logger: logging.Logger) {
       logger.info(JSON.stringify([...diffPackages], null, 2));
 
       // Remove the tests from packages that haven't changed.
-      tests = tests
-        .filter(p => Object.keys(packages).some(name => {
+      tests = tests.filter(p =>
+        Object.keys(packages).some(name => {
           const relativeRoot = relative(projectBaseDir, packages[name].root);
 
           return p.startsWith(relativeRoot) && diffPackages.has(name);
-        }));
+        }),
+      );
 
       logger.info(`Found ${tests.length} spec files, out of ${allTests.length}.`);
 
@@ -259,7 +269,7 @@ export default function (args: ParsedArgs, logger: logging.Logger) {
     // Remove tests that are not part of this shard.
     const shardId = args['shard'];
     const nbShards = args['nb-shards'] || 2;
-    tests = tests.filter((name, i) => (i % nbShards) == shardId);
+    tests = tests.filter((name, i) => i % nbShards == shardId);
   }
 
   return new Promise(resolve => {

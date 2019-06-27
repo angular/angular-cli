@@ -122,7 +122,9 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
         collectionName = manifest.name;
 
         if (await this.hasMismatchedPeer(manifest)) {
-          console.warn('Package has unmet peer dependencies. Adding the package may not succeed.');
+          this.logger.warn(
+            'Package has unmet peer dependencies. Adding the package may not succeed.',
+          );
         }
       } catch (e) {
         this.logger.error('Unable to fetch package manifest: ' + e.message);
