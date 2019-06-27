@@ -26,7 +26,7 @@ export class DocCommand extends Command<DocCommandSchema> {
       // version can either be a string containing "next"
       if (options.version == 'next') {
         domain = 'next.angular.io';
-      // or a number where version must be a valid Angular version (i.e. not 0, 1 or 3)
+        // or a number where version must be a valid Angular version (i.e. not 0, 1 or 3)
       } else if (!isNaN(+options.version) && ![0, 1, 3].includes(+options.version)) {
         domain = `v${options.version}.angular.io`;
       } else {
@@ -34,6 +34,14 @@ export class DocCommand extends Command<DocCommandSchema> {
 
         return 0;
       }
+    } else {
+      // we try to get the current Angular version of the project
+      // and use it if we can find it
+      try {
+        /* tslint:disable-next-line:no-implicit-dependencies */
+        const currentNgVersion = require('@angular/core').VERSION.major;
+        domain = `v${currentNgVersion}.angular.io`;
+      } catch (e) {}
     }
 
     let searchUrl = `https://${domain}/api?query=${options.keyword}`;
