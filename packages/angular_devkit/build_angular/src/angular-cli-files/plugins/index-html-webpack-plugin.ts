@@ -8,7 +8,11 @@
 import * as path from 'path';
 import { Compiler, compilation } from 'webpack';
 import { RawSource } from 'webpack-sources';
-import { FileInfo, augmentIndexHtml } from '../utilities/index-file/augment-index-html';
+import {
+  CrossOriginValue,
+  FileInfo,
+  augmentIndexHtml,
+} from '../utilities/index-file/augment-index-html';
 import { IndexHtmlTransform } from '../utilities/index-file/write-index-html';
 import { stripBom } from '../utilities/strip-bom';
 
@@ -22,6 +26,7 @@ export interface IndexHtmlWebpackPluginOptions {
   noModuleEntrypoints: string[];
   moduleEntrypoints: string[];
   postTransform?: IndexHtmlTransform;
+  crossOrigin?: CrossOriginValue;
 }
 
 function readFile(filename: string, compilation: compilation.Compilation): Promise<string> {
@@ -91,6 +96,7 @@ export class IndexHtmlWebpackPlugin {
         baseHref: this._options.baseHref,
         deployUrl: this._options.deployUrl,
         sri: this._options.sri,
+        crossOrigin: this._options.crossOrigin,
         files,
         noModuleFiles,
         loadOutputFile,

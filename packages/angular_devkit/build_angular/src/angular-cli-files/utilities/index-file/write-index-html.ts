@@ -13,7 +13,7 @@ import { map, switchMap } from 'rxjs/operators';
 import { ExtraEntryPoint } from '../../../browser/schema';
 import { generateEntryPoints } from '../package-chunk-sort';
 import { stripBom } from '../strip-bom';
-import { FileInfo, augmentIndexHtml } from './augment-index-html';
+import { CrossOriginValue, FileInfo, augmentIndexHtml } from './augment-index-html';
 
 type ExtensionFilter = '.js' | '.css';
 
@@ -30,6 +30,7 @@ export interface WriteIndexHtmlOptions {
   scripts?: ExtraEntryPoint[];
   styles?: ExtraEntryPoint[];
   postTransform?: IndexHtmlTransform;
+  crossOrigin?: CrossOriginValue;
 }
 
 export type IndexHtmlTransform = (content: string) => Promise<string>;
@@ -47,34 +48,34 @@ export function writeIndexHtml({
   scripts = [],
   styles = [],
   postTransform,
+  crossOrigin,
 }: WriteIndexHtmlOptions): Observable<void> {
-
-  return host.read(indexPath)
-    .pipe(
-      map(content => stripBom(virtualFs.fileBufferToString(content))),
-      switchMap(content => augmentIndexHtml({
+  return host.read(indexPath).pipe(
+    map(content => stripBom(virtualFs.fileBufferToString(content))),
+    switchMap(content =>
+      augmentIndexHtml({
         input: getSystemPath(outputPath),
         inputContent: content,
         baseHref,
         deployUrl,
+        crossOrigin,
         sri,
         entrypoints: generateEntryPoints({ scripts, styles }),
         files: filterAndMapBuildFiles(files, ['.js', '.css']),
         noModuleFiles: filterAndMapBuildFiles(noModuleFiles, '.js'),
         moduleFiles: filterAndMapBuildFiles(moduleFiles, '.js'),
         loadOutputFile: async filePath => {
-          return host.read(join(outputPath, filePath))
-            .pipe(
-              map(data => virtualFs.fileBufferToString(data)),
-            )
+          return host
+            .read(join(outputPath, filePath))
+            .pipe(map(data => virtualFs.fileBufferToString(data)))
             .toPromise();
         },
       }),
-      ),
-      switchMap(content => postTransform ? postTransform(content) : of(content)),
-      map(content => virtualFs.stringToFileBuffer(content)),
-      switchMap(content => host.write(join(outputPath, basename(indexPath)), content)),
-    );
+    ),
+    switchMap(content => (postTransform ? postTransform(content) : of(content))),
+    map(content => virtualFs.stringToFileBuffer(content)),
+    switchMap(content => host.write(join(outputPath, basename(indexPath)), content)),
+  );
 }
 
 function filterAndMapBuildFiles(

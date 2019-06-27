@@ -11,8 +11,9 @@ import { RawSource, ReplaceSource } from 'webpack-sources';
 
 const parse5 = require('parse5');
 
-
 export type LoadOutputFileFunctionType = (file: string) => Promise<string>;
+
+export type CrossOriginValue = 'none' | 'anonymous' | 'use-credentials';
 
 export interface AugmentIndexHtmlOptions {
   /* Input file name (e. g. index.html) */
@@ -22,6 +23,8 @@ export interface AugmentIndexHtmlOptions {
   baseHref?: string;
   deployUrl?: string;
   sri: boolean;
+  /** crossorigin attribute setting of elements that provide CORS support */
+  crossOrigin?: CrossOriginValue;
   /*
    * Files emitted by the build.
    * Js files will be added without 'nomodule' nor 'module'.
@@ -54,13 +57,12 @@ export interface FileInfo {
  * bundles for differential serving.
  */
 export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise<string> {
-  const {
-    loadOutputFile,
-    files,
-    noModuleFiles = [],
-    moduleFiles = [],
-    entrypoints,
-  } = params;
+  const { loadOutputFile, files, noModuleFiles = [], moduleFiles = [], entrypoints } = params;
+
+  let { crossOrigin = 'none' } = params;
+  if (params.sri && crossOrigin === 'none') {
+    crossOrigin = 'anonymous';
+  }
 
   const stylesheets = new Set<string>();
   const scripts = new Set<string>();
@@ -69,7 +71,9 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
   const mergedFiles = [...moduleFiles, ...noModuleFiles, ...files];
   for (const entrypoint of entrypoints) {
     for (const { extension, file, name } of mergedFiles) {
-      if (name !== entrypoint) { continue; }
+      if (name !== entrypoint) {
+        continue;
+      }
 
       switch (extension) {
         case '.js':
@@ -127,9 +131,13 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
 
   let scriptElements = '';
   for (const script of scripts) {
-    const attrs: { name: string, value: string | null }[] = [
+    const attrs: { name: string; value: string | null }[] = [
       { name: 'src', value: (params.deployUrl || '') + script },
     ];
+
+    if (crossOrigin !== 'none') {
+      attrs.push({ name: 'crossorigin', value: crossOrigin });
+    }
 
     // We want to include nomodule or module when a file is not common amongs all
     // such as runtime.js
@@ -154,15 +162,12 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
     }
 
     const attributes = attrs
-      .map(attr => attr.value === null ? attr.name : `${attr.name}="${attr.value}"`)
+      .map(attr => (attr.value === null ? attr.name : `${attr.name}="${attr.value}"`))
       .join(' ');
     scriptElements += `<script ${attributes}></script>`;
   }
 
-  indexSource.insert(
-    scriptInsertionPoint,
-    scriptElements,
-  );
+  indexSource.insert(scriptInsertionPoint, scriptElements);
 
   // Adjust base href if specified
   if (typeof params.baseHref == 'string') {
@@ -176,13 +181,9 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
     const baseFragment = treeAdapter.createDocumentFragment();
 
     if (!baseElement) {
-      baseElement = treeAdapter.createElement(
-        'base',
-        undefined,
-        [
-          { name: 'href', value: params.baseHref },
-        ],
-      );
+      baseElement = treeAdapter.createElement('base', undefined, [
+        { name: 'href', value: params.baseHref },
+      ]);
 
       treeAdapter.appendChild(baseFragment, baseElement);
       indexSource.insert(
@@ -218,6 +219,10 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
       { name: 'href', value: (params.deployUrl || '') + stylesheet },
     ];
 
+    if (crossOrigin !== 'none') {
+      attrs.push({ name: 'crossorigin', value: crossOrigin });
+    }
+
     if (params.sri) {
       const content = await loadOutputFile(stylesheet);
       attrs.push(..._generateSriAttributes(content));
@@ -227,10 +232,7 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
     treeAdapter.appendChild(styleElements, element);
   }
 
-  indexSource.insert(
-    styleInsertionPoint,
-    parse5.serialize(styleElements, { treeAdapter }),
-  );
+  indexSource.insert(styleInsertionPoint, parse5.serialize(styleElements, { treeAdapter }));
 
   return indexSource.source();
 }
@@ -241,8 +243,5 @@ function _generateSriAttributes(content: string) {
     .update(content, 'utf8')
     .digest('base64');
 
-  return [
-    { name: 'integrity', value: `${algo}-${hash}` },
-    { name: 'crossorigin', value: 'anonymous' },
-  ];
+  return [{ name: 'integrity', value: `${algo}-${hash}` }];
 }
