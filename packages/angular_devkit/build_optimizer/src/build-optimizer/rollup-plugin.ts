@@ -31,19 +31,27 @@ export default function optimizer(options: Options) {
 
   return {
     name: 'build-optimizer',
-    transform: (content: string, id: string): {code: string, map: RawSourceMap}|null => {
+    transform: (content: string, id: string): { code: string; map: RawSourceMap } | null => {
       const normalizedId = id.replace(/\\/g, '/');
-      const isSideEffectFree = options.sideEffectFreeModules &&
+      const isSideEffectFree =
+        options.sideEffectFreeModules &&
         options.sideEffectFreeModules.some(m => normalizedId.indexOf(m) >= 0);
-      const isAngularCoreFile = options.angularCoreModules &&
+      const isAngularCoreFile =
+        options.angularCoreModules &&
         options.angularCoreModules.some(m => normalizedId.indexOf(m) >= 0);
       const { content: code, sourceMap: map } = buildOptimizer({
-        content, inputFilePath: id, emitSourceMap: true, isSideEffectFree, isAngularCoreFile,
+        content,
+        inputFilePath: id,
+        emitSourceMap: true,
+        isSideEffectFree,
+        isAngularCoreFile,
       });
       if (!code) {
         if (DEBUG) {
-          console.error('no transforms produced by buildOptimizer for '
-             + path.relative(process.cwd(), id));
+          // tslint:disable-next-line: no-console
+          console.error(
+            'no transforms produced by buildOptimizer for ' + path.relative(process.cwd(), id),
+          );
         }
 
         return null;

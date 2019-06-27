@@ -13,6 +13,7 @@ import { colors, supportsColor } from '../../utilities/color';
 import { getWorkspaceRaw } from '../../utilities/config';
 import { getWorkspaceDetails } from '../../utilities/project';
 
+// tslint:disable: no-console
 export default async function(options: { testing?: boolean; cliArgs: string[] }) {
   const logger = createConsoleLogger(false, process.stdout, process.stderr, {
     info: s => (supportsColor ? s : colors.unstyle(s)),
@@ -95,6 +96,7 @@ export default async function(options: { testing?: boolean; cliArgs: string[] })
     }
 
     if (options.testing) {
+      // tslint:disable-next-line: no-debugger
       debugger;
       throw err;
     }

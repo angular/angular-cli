@@ -5,28 +5,18 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {
-  Path,
-  getSystemPath,
-  isAbsolute,
-  join,
-  normalize,
-  virtualFs,
-} from '@angular-devkit/core';
+import { Path, getSystemPath, isAbsolute, join, normalize, virtualFs } from '@angular-devkit/core';
 import { Stats } from 'fs';
 import * as ts from 'typescript';
 import { NgccProcessor } from './ngcc_processor';
 import { WebpackResourceLoader } from './resource_loader';
 import { workaroundResolve } from './utils';
 
-
 export interface OnErrorFn {
   (message: string): void;
 }
 
-
 const dev = Math.floor(Math.random() * 10000);
-
 
 export class WebpackCompilerHost implements ts.CompilerHost {
   private _syncHost: virtualFs.SyncDelegateHost;
@@ -37,12 +27,14 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   private _resourceLoader?: WebpackResourceLoader;
   private _sourceFileCache = new Map<string, ts.SourceFile>();
   private _virtualFileExtensions = [
-    '.js', '.js.map',
-    '.ngfactory.js', '.ngfactory.js.map',
-    '.ngstyle.js', '.ngstyle.js.map',
+    '.js',
+    '.js.map',
+    '.ngfactory.js',
+    '.ngfactory.js.map',
+    '.ngstyle.js',
+    '.ngstyle.js.map',
     '.ngsummary.json',
   ];
-
 
   constructor(
     private _options: ts.CompilerOptions,
@@ -58,8 +50,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   private get virtualFiles(): Path[] {
-    return [...(this._memoryHost.delegate as {} as { _cache: Map<Path, {}> })
-      ._cache.keys()];
+    return [...((this._memoryHost.delegate as {}) as { _cache: Map<Path, {}> })._cache.keys()];
   }
 
   denormalizePath(path: string) {
@@ -84,10 +75,12 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   getNgFactoryPaths(): string[] {
-    return this.virtualFiles
-      .filter(fileName => fileName.endsWith('.ngfactory.js') || fileName.endsWith('.ngstyle.js'))
-      // These paths are used by the virtual file system decorator so we must denormalize them.
-      .map(path => this.denormalizePath(path));
+    return (
+      this.virtualFiles
+        .filter(fileName => fileName.endsWith('.ngfactory.js') || fileName.endsWith('.ngstyle.js'))
+        // These paths are used by the virtual file system decorator so we must denormalize them.
+        .map(path => this.denormalizePath(path))
+    );
   }
 
   invalidate(fileName: string): void {
@@ -100,13 +93,15 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       if (exists) {
         this._changedFiles.add(fullPath);
       }
-    } catch { }
+    } catch {}
 
     // File doesn't exist anymore and is not a factory, so we should delete the related
     // virtual files.
-    if (!exists && fullPath.endsWith('.ts') && !(
-      fullPath.endsWith('.ngfactory.ts') || fullPath.endsWith('.shim.ngstyle.ts')
-    )) {
+    if (
+      !exists &&
+      fullPath.endsWith('.ts') &&
+      !(fullPath.endsWith('.ngfactory.ts') || fullPath.endsWith('.shim.ngstyle.ts'))
+    ) {
       this._virtualFileExtensions.forEach(ext => {
         const virtualFile = (fullPath.slice(0, -3) + ext) as Path;
         if (this._memoryHost.exists(virtualFile)) {
@@ -117,8 +112,10 @@ export class WebpackCompilerHost implements ts.CompilerHost {
 
     // In case resolveJsonModule and allowJs we also need to remove virtual emitted files
     // both if they exists or not.
-    if ((fullPath.endsWith('.js') || fullPath.endsWith('.json'))
-      && !/(\.(ngfactory|ngstyle)\.js|ngsummary\.json)$/.test(fullPath)) {
+    if (
+      (fullPath.endsWith('.js') || fullPath.endsWith('.json')) &&
+      !/(\.(ngfactory|ngstyle)\.js|ngsummary\.json)$/.test(fullPath)
+    ) {
       if (this._memoryHost.exists(fullPath)) {
         this._memoryHost.delete(fullPath);
       }
@@ -139,7 +136,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     let exists = false;
     try {
       exists = this._syncHost.isFile(p);
-    } catch { }
+    } catch {}
 
     return exists;
   }
@@ -178,11 +175,11 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     return {
       isFile: () => stats.isFile(),
       isDirectory: () => stats.isDirectory(),
-      isBlockDevice: () => stats.isBlockDevice && stats.isBlockDevice() || false,
-      isCharacterDevice: () => stats.isCharacterDevice && stats.isCharacterDevice() || false,
-      isFIFO: () => stats.isFIFO && stats.isFIFO() || false,
-      isSymbolicLink: () => stats.isSymbolicLink && stats.isSymbolicLink() || false,
-      isSocket: () => stats.isSocket && stats.isSocket() || false,
+      isBlockDevice: () => (stats.isBlockDevice && stats.isBlockDevice()) || false,
+      isCharacterDevice: () => (stats.isCharacterDevice && stats.isCharacterDevice()) || false,
+      isFIFO: () => (stats.isFIFO && stats.isFIFO()) || false,
+      isSymbolicLink: () => (stats.isSymbolicLink && stats.isSymbolicLink()) || false,
+      isSocket: () => (stats.isSocket && stats.isSocket()) || false,
       dev: stats.dev === undefined ? dev : stats.dev,
       ino: stats.ino === undefined ? Math.floor(Math.random() * 100000) : stats.ino,
       mode: stats.mode === undefined ? parseInt('777', 8) : stats.mode,
@@ -210,7 +207,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     let stats: virtualFs.Stats<Partial<Stats>> | Stats | null = null;
     try {
       stats = this._memoryHost.stat(p) || this._syncHost.stat(p);
-    } catch { }
+    } catch {}
 
     if (!stats) {
       return null;
@@ -344,8 +341,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   readResource(fileName: string) {
     this._readResourceFiles.add(fileName);
 
-    if (this.directTemplateLoading &&
-        (fileName.endsWith('.html') || fileName.endsWith('.svg'))) {
+    if (this.directTemplateLoading && (fileName.endsWith('.html') || fileName.endsWith('.svg'))) {
       return this.readFile(fileName);
     }
 
@@ -371,7 +367,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
         continue;
       }
       for (const resourcePath of this._resourceLoader.getAffectedResources(changedFile)) {
-          modifiedFiles.add(resourcePath);
+        modifiedFiles.add(resourcePath);
       }
     }
 
@@ -379,6 +375,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   trace(message: string) {
+    // tslint:disable-next-line: no-console
     console.log(message);
   }
 
@@ -407,20 +404,20 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     containingFile: string,
     redirectedReference?: ts.ResolvedProjectReference,
   ): (ts.ResolvedTypeReferenceDirective | undefined)[] {
-      return typeReferenceDirectiveNames.map(moduleName => {
-        const { resolvedTypeReferenceDirective } = ts.resolveTypeReferenceDirective(
-          moduleName,
-          workaroundResolve(containingFile),
-          this._options,
-          this,
-          redirectedReference,
-        );
+    return typeReferenceDirectiveNames.map(moduleName => {
+      const { resolvedTypeReferenceDirective } = ts.resolveTypeReferenceDirective(
+        moduleName,
+        workaroundResolve(containingFile),
+        this._options,
+        this,
+        redirectedReference,
+      );
 
-        if (this._options.enableIvy && resolvedTypeReferenceDirective && this.ngccProcessor) {
-          this.ngccProcessor.processModule(moduleName, resolvedTypeReferenceDirective);
-        }
+      if (this._options.enableIvy && resolvedTypeReferenceDirective && this.ngccProcessor) {
+        this.ngccProcessor.processModule(moduleName, resolvedTypeReferenceDirective);
+      }
 
-        return resolvedTypeReferenceDirective;
-      });
+      return resolvedTypeReferenceDirective;
+    });
   }
 }

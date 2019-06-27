@@ -63,6 +63,8 @@
     "no-eval": true,
     "no-any": true,
     "no-arg": true,
+    "no-debugger": true,
+    "no-console": true,
     "no-internal-module": true,
     "no-unused-expression": true,
     "no-var-keyword": true,

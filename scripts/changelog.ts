@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// tslint:disable:no-console
 // tslint:disable:no-implicit-dependencies
 import { JsonObject, logging } from '@angular-devkit/core';
 import * as fs from 'fs';
@@ -19,7 +20,6 @@ const gitRawCommits = require('git-raw-commits');
 const ghGot = require('gh-got');
 const through = require('through2');
 
-
 export interface ChangelogOptions {
   from: string;
   to?: string;
@@ -29,18 +29,17 @@ export interface ChangelogOptions {
   stdout?: boolean;
 }
 
-
 export default function(args: ChangelogOptions, logger: logging.Logger) {
   const commits: JsonObject[] = [];
   let toSha: string | null = null;
 
   const githubToken = (
-    args.githubToken
-    || (args.githubTokenFile && fs.readFileSync(args.githubTokenFile, 'utf-8'))
-    || ''
+    args.githubToken ||
+    (args.githubTokenFile && fs.readFileSync(args.githubTokenFile, 'utf-8')) ||
+    ''
   ).trim();
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     (gitRawCommits({
       from: args.from,
       to: args.to || 'HEAD',
@@ -50,36 +49,43 @@ export default function(args: ChangelogOptions, logger: logging.Logger) {
         logger.fatal('An error happened: ' + err.message);
         process.exit(1);
       })
-      .pipe(through((chunk: Buffer, enc: string, callback: Function) => {
-        // Replace github URLs with `@XYZ#123`
-        const commit = chunk.toString('utf-8')
-          .replace(/https?:\/\/github.com\/(.*?)\/issues\/(\d+)/g, '@$1#$2');
+      .pipe(
+        through((chunk: Buffer, enc: string, callback: Function) => {
+          // Replace github URLs with `@XYZ#123`
+          const commit = chunk
+            .toString('utf-8')
+            .replace(/https?:\/\/github.com\/(.*?)\/issues\/(\d+)/g, '@$1#$2');
 
-        callback(undefined, Buffer.from(commit));
-      }))
-      .pipe(conventionalCommitsParser({
-        headerPattern: /^(\w*)(?:\(([^)]*)\))?: (.*)$/,
-        headerCorrespondence: ['type', 'scope', 'subject'],
-        noteKeywords: ['BREAKING CHANGE'],
-        revertPattern: /^revert:\s([\s\S]*?)\s*This reverts commit (\w*)\./,
-        revertCorrespondence: [`header`, `hash`],
-      }))
-      .pipe(through.obj((chunk: JsonObject, _: string, cb: Function) => {
-        try {
-          const maybeTag = chunk.gitTags && (chunk.gitTags as string).match(/tag: (.*)/);
-          const tags = maybeTag && maybeTag[1].split(/,/g);
-          chunk['tags'] = tags;
+          callback(undefined, Buffer.from(commit));
+        }),
+      )
+      .pipe(
+        conventionalCommitsParser({
+          headerPattern: /^(\w*)(?:\(([^)]*)\))?: (.*)$/,
+          headerCorrespondence: ['type', 'scope', 'subject'],
+          noteKeywords: ['BREAKING CHANGE'],
+          revertPattern: /^revert:\s([\s\S]*?)\s*This reverts commit (\w*)\./,
+          revertCorrespondence: [`header`, `hash`],
+        }),
+      )
+      .pipe(
+        through.obj((chunk: JsonObject, _: string, cb: Function) => {
+          try {
+            const maybeTag = chunk.gitTags && (chunk.gitTags as string).match(/tag: (.*)/);
+            const tags = maybeTag && maybeTag[1].split(/,/g);
+            chunk['tags'] = tags;
 
-          if (tags && tags.find(x => x == args.to)) {
-            toSha = chunk.hash as string;
+            if (tags && tags.find(x => x == args.to)) {
+              toSha = chunk.hash as string;
+            }
+
+            commits.push(chunk);
+            cb();
+          } catch (err) {
+            cb(err);
           }
-
-          commits.push(chunk);
-          cb();
-        } catch (err) {
-          cb(err);
-        }
-      }))
+        }),
+      )
       .on('finish', resolve);
   })
     .then(() => {

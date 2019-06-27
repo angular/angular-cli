@@ -8,21 +8,13 @@
  */
 import { Architect, BuilderInfo, BuilderProgressState, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
-import {
-  json,
-  logging,
-  schema,
-  tags,
-  terminal,
-  workspaces,
-} from '@angular-devkit/core';
+import { json, logging, schema, tags, terminal, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import { existsSync } from 'fs';
 import * as minimist from 'minimist';
 import * as path from 'path';
 import { tap } from 'rxjs/operators';
 import { MultiProgressBar } from '../src/progress';
-
 
 function findUp(names: string | string[], from: string) {
   if (!Array.isArray(names)) {
@@ -64,20 +56,18 @@ function usage(logger: logging.Logger, exitCode = 0): never {
   `);
 
   process.exit(exitCode);
-  throw 0;  // The node typing sometimes don't have a never type for process.exit().
+  throw 0; // The node typing sometimes don't have a never type for process.exit().
 }
 
-function _targetStringFromTarget({project, target, configuration}: Target) {
+function _targetStringFromTarget({ project, target, configuration }: Target) {
   return `${project}:${target}${configuration !== undefined ? ':' + configuration : ''}`;
 }
-
 
 interface BarInfo {
   status?: string;
   builder: BuilderInfo;
   target?: Target;
 }
-
 
 async function _executeTarget(
   parentLogger: logging.Logger,
@@ -104,63 +94,64 @@ async function _executeTarget(
   const run = await architect.scheduleTarget(targetSpec, argv, { logger });
   const bars = new MultiProgressBar<number, BarInfo>(':name :bar (:current/:total) :status');
 
-  run.progress.subscribe(
-    update => {
-      const data = bars.get(update.id) || {
-        id: update.id,
-        builder: update.builder,
-        target: update.target,
-        status: update.status || '',
-        name: ((update.target ? _targetStringFromTarget(update.target) : update.builder.name)
-                + ' '.repeat(80)
-              ).substr(0, 40),
-      };
+  run.progress.subscribe(update => {
+    const data = bars.get(update.id) || {
+      id: update.id,
+      builder: update.builder,
+      target: update.target,
+      status: update.status || '',
+      name: (
+        (update.target ? _targetStringFromTarget(update.target) : update.builder.name) +
+        ' '.repeat(80)
+      ).substr(0, 40),
+    };
 
-      if (update.status !== undefined) {
-        data.status = update.status;
-      }
+    if (update.status !== undefined) {
+      data.status = update.status;
+    }
 
-      switch (update.state) {
-        case BuilderProgressState.Error:
-          data.status = 'Error: ' + update.error;
-          bars.update(update.id, data);
-          break;
+    switch (update.state) {
+      case BuilderProgressState.Error:
+        data.status = 'Error: ' + update.error;
+        bars.update(update.id, data);
+        break;
 
-        case BuilderProgressState.Stopped:
-          data.status = 'Done.';
-          bars.complete(update.id);
-          bars.update(update.id, data, update.total, update.total);
-          break;
+      case BuilderProgressState.Stopped:
+        data.status = 'Done.';
+        bars.complete(update.id);
+        bars.update(update.id, data, update.total, update.total);
+        break;
 
-        case BuilderProgressState.Waiting:
-          bars.update(update.id, data);
-          break;
+      case BuilderProgressState.Waiting:
+        bars.update(update.id, data);
+        break;
 
-        case BuilderProgressState.Running:
-          bars.update(update.id, data, update.current, update.total);
-          break;
-      }
+      case BuilderProgressState.Running:
+        bars.update(update.id, data, update.current, update.total);
+        break;
+    }
 
-      bars.render();
-    },
-  );
+    bars.render();
+  });
 
   // Wait for full completion of the builder.
   try {
-    const { success } = await run.output.pipe(
-      tap(result => {
-        if (result.success) {
-          parentLogger.info(terminal.green('SUCCESS'));
-        } else {
-          parentLogger.info(terminal.yellow('FAILURE'));
-        }
-        parentLogger.info('Result: ' + JSON.stringify({ ...result, info: undefined }, null, 4));
+    const { success } = await run.output
+      .pipe(
+        tap(result => {
+          if (result.success) {
+            parentLogger.info(terminal.green('SUCCESS'));
+          } else {
+            parentLogger.info(terminal.yellow('FAILURE'));
+          }
+          parentLogger.info('Result: ' + JSON.stringify({ ...result, info: undefined }, null, 4));
 
-        parentLogger.info('\nLogs:');
-        logs.forEach(l => parentLogger.next(l));
-        logs.splice(0);
-      }),
-    ).toPromise();
+          parentLogger.info('\nLogs:');
+          logs.forEach(l => parentLogger.next(l));
+          logs.splice(0);
+        }),
+      )
+      .toPromise();
 
     await run.stop();
     bars.terminate();
@@ -178,7 +169,6 @@ async function _executeTarget(
   }
 }
 
-
 async function main(args: string[]): Promise<number> {
   /** Parse the command line. */
   const argv = minimist(args, { boolean: ['help'] });
@@ -195,18 +185,15 @@ async function main(args: string[]): Promise<number> {
 
   // Load workspace configuration file.
   const currentPath = process.cwd();
-  const configFileNames = [
-    'angular.json',
-    '.angular.json',
-    'workspace.json',
-    '.workspace.json',
-  ];
+  const configFileNames = ['angular.json', '.angular.json', 'workspace.json', '.workspace.json'];
 
   const configFilePath = findUp(configFileNames, currentPath);
 
   if (!configFilePath) {
-    logger.fatal(`Workspace configuration file (${configFileNames.join(', ')}) cannot be found in `
-      + `'${currentPath}' or in parent directories.`);
+    logger.fatal(
+      `Workspace configuration file (${configFileNames.join(', ')}) cannot be found in ` +
+        `'${currentPath}' or in parent directories.`,
+    );
 
     return 3;
   }
@@ -227,10 +214,13 @@ async function main(args: string[]): Promise<number> {
   return await _executeTarget(logger, workspace, root, argv, registry);
 }
 
-main(process.argv.slice(2))
-  .then(code => {
+main(process.argv.slice(2)).then(
+  code => {
     process.exit(code);
-  }, err => {
+  },
+  err => {
+    // tslint:disable-next-line: no-console
     console.error('Error: ' + err.stack || err.message || err);
     process.exit(-1);
-  });
+  },
+);
