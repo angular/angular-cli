@@ -8,6 +8,7 @@
 
 // ES2015 symbol capabilities
 import 'core-js/modules/es.symbol';
+import 'core-js/modules/es.symbol.iterator';
 
 // ES2015 function capabilities
 import 'core-js/modules/es.function.bind';
