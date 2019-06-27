@@ -111,7 +111,17 @@ jobs:
           name: Validate Code Formatting
           command: |
             if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
-              npx prettier --check ".prettierrc" $(git log $CIRCLE_BRANCH --name-only --diff-filter=ACM --pretty="format:" --not $(git for-each-ref --format='%(refname)' refs/heads/ | grep -v "refs/heads/$CIRCLE_BRANCH") -- "*.js" "*.ts")
+              if [[ ! -z "$CIRCLE_COMPARE_URL" ]]; then
+                if [[ $CIRCLE_COMPARE_URL = *"commit"* ]]; then
+                  COMMIT_RANGE=$(echo $CIRCLE_COMPARE_URL | sed 's:^.*/commit/::g')~1
+                else
+                  COMMIT_RANGE=$(echo $CIRCLE_COMPARE_URL | sed 's:^.*/compare/::g')
+                fi
+                echo "diff: $COMMIT_RANGE"
+                CHANGES="$(git diff $COMMIT_RANGE --name-only)"
+                echo "file changed: $CHANGES"
+                npx prettier --check ".prettierrc" $CHANGES -- "*.js" "*.ts"
+              fi
             fi
 
   test:
@@ -206,7 +216,7 @@ jobs:
       - attach_workspace: *attach_options
       - run:
           name: Decrypt Credentials
-          # Note: when changing the image, you might have to re-encrypt the credentials with a 
+          # Note: when changing the image, you might have to re-encrypt the credentials with a
           # matching version of openssl.
           # See https://stackoverflow.com/a/43847627/2116927 for more info.
           command: |
@@ -253,11 +263,11 @@ jobs:
       - run: yarn test -- --full
       # Run partial e2e suite on PRs only. Master will run the full e2e suite with sharding.
       - run: if (Test-Path env:CIRCLE_PR_NUMBER) { node tests\legacy-cli\run_e2e.js "--glob=tests/{basic,ivy}/**" }
-             
+
   e2e-cli-win:
     <<: *defaults_win
     parallelism: 4
-    steps:     
+    steps:
       - checkout
       - *env_win
       # TODO: remove commands other than the e2e runner when workspaces on windows are well supported.
