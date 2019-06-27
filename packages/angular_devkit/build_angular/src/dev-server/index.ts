@@ -223,6 +223,7 @@ export function serveWebpackBrowser(
             sri: browserOptions.subresourceIntegrity,
             noModuleEntrypoints: ['polyfills-es5'],
             postTransform: transforms.indexHtml,
+            crossOrigin: browserOptions.crossOrigin,
           }),
         );
       }

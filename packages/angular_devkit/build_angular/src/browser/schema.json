@@ -319,6 +319,16 @@
     "webWorkerTsConfig": {
       "type": "string",
       "description": "TypeScript configuration for Web Worker modules."
+    },
+    "crossOrigin": {
+      "type": "string",
+      "description": "Define the crossorigin attribute setting of elements that provide CORS support.",
+      "default": "none",
+      "enum": [
+        "none",
+        "anonymous",
+        "use-credentials"
+      ]
     }
   },
   "additionalProperties": false,

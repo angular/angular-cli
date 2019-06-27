@@ -115,9 +115,8 @@ function getAnalyticsConfig(
     let category = 'build';
     if (context.builder) {
       // We already vetted that this is a "safe" package, otherwise the analytics would be noop.
-      category = context.builder.builderName.split(':')[1]
-              || context.builder.builderName
-              || 'build';
+      category =
+        context.builder.builderName.split(':')[1] || context.builder.builderName || 'build';
     }
 
     // The category is the builder name if it's an angular builder.
@@ -264,6 +263,7 @@ export function buildWebpackBrowser(
               scripts: options.scripts,
               styles: options.styles,
               postTransform: transforms.indexHtml,
+              crossOrigin: options.crossOrigin,
             }).pipe(
               map(() => ({ success: true })),
               catchError(error => of({ success: false, error: mapErrorToMessage(error) })),
