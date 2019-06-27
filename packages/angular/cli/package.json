@@ -38,7 +38,7 @@
     "npm-package-arg": "6.1.0",
     "open": "6.3.0",
     "pacote": "9.5.1",
-    "read-package-tree": "5.2.2",
+    "read-package-tree": "5.3.0",
     "semver": "6.1.2",
     "symbol-observable": "1.2.0",
     "universal-analytics": "^0.4.20",
