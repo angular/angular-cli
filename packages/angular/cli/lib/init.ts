@@ -15,6 +15,7 @@ import { SemVer } from 'semver';
 import { Duplex } from 'stream';
 import { colors } from '../utilities/color';
 import { isWarningEnabled } from '../utilities/config';
+import profileWrapFn from './profiler';
 
 const packageJson = require('../package.json');
 
@@ -137,11 +138,11 @@ try {
   standardInput = process.stdin;
 }
 
-cli({
+profileWrapFn(() => cli({
   cliArgs: process.argv.slice(2),
   inputStream: standardInput,
   outputStream: process.stdout,
-})
+}))
   .then((exitCode: number) => {
     process.exit(exitCode);
   })
