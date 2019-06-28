@@ -72,6 +72,7 @@ export function countOccurrences(source: string, match: string, wordBreak = fals
 class AnalyticsBuildStats {
   public errors: string[] = [];
   public numberOfNgOnInit = 0;
+  public numberOfComponents = 0;
   public initialChunkSize = 0;
   public totalChunkCount = 0;
   public totalChunkSize = 0;
@@ -107,6 +108,7 @@ export class NgBuildAnalyticsPlugin {
     const metrics: (string | number)[] = [];
     metrics[analytics.NgCliAnalyticsMetrics.BuildTime] = (endTime - startTime);
     metrics[analytics.NgCliAnalyticsMetrics.NgOnInitCount] = this._stats.numberOfNgOnInit;
+    metrics[analytics.NgCliAnalyticsMetrics.NgComponentCount] = this._stats.numberOfComponents;
     metrics[analytics.NgCliAnalyticsMetrics.InitialChunkSize] = this._stats.initialChunkSize;
     metrics[analytics.NgCliAnalyticsMetrics.TotalChunkCount] = this._stats.totalChunkCount;
     metrics[analytics.NgCliAnalyticsMetrics.TotalChunkSize] = this._stats.totalChunkSize;
@@ -141,10 +143,29 @@ export class NgBuildAnalyticsPlugin {
 
   protected _checkTsNormalModule(module: NormalModule) {
     if (module._source) {
+      // PLEASE REMEMBER:
       // We're dealing with ES5 _or_ ES2015 JavaScript at this point (we don't know for sure).
+
       // Just count the ngOnInit occurences. Comments/Strings/calls occurences should be sparse
       // so we just consider them within the margin of error. We do break on word break though.
       this._stats.numberOfNgOnInit += countOccurrences(module._source.source(), 'ngOnInit', true);
+
+      // Count the number of `Component({` strings (case sensitive), which happens in __decorate().
+      // This does not include View Engine AOT compilation, we use the ngfactory for it.
+      this._stats.numberOfComponents += countOccurrences(module._source.source(), ' Component({');
+      // For Ivy we just count ngComponentDef.
+      this._stats.numberOfComponents += countOccurrences(module._source.source(), 'ngComponentDef', true);
+    }
+  }
+
+  protected _checkNgFactoryNormalModule(module: NormalModule) {
+    if (module._source) {
+      // PLEASE REMEMBER:
+      // We're dealing with ES5 _or_ ES2015 JavaScript at this point (we don't know for sure).
+
+      // Count the number of `.ɵccf(` strings (case sensitive). They're calls to components
+      // factories.
+      this._stats.numberOfComponents += countOccurrences(module._source.source(), '.ɵccf(');
     }
   }
 
@@ -231,8 +252,10 @@ export class NgBuildAnalyticsPlugin {
     }
 
     // Check that it's a source file from the project.
-    if (module.constructor === NormalModule && module.resource.endsWith('.ts')) {
-      this._checkTsNormalModule(module as {} as NormalModule);
+    if (module.resource.endsWith('.ts')) {
+      this._checkTsNormalModule(module);
+    } else if (module.resource.endsWith('.ngfactory.js')) {
+      this._checkNgFactoryNormalModule(module);
     }
   }
 

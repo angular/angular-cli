@@ -30,7 +30,7 @@ export enum NgCliAnalyticsDimensions {
 }
 
 export enum NgCliAnalyticsMetrics {
-  UNUSED_1 = 1,
+  NgComponentCount = 1,
   UNUSED_2 = 2,
   UNUSED_3 = 3,
   UNUSED_4 = 4,
@@ -62,7 +62,7 @@ export const NgCliAnalyticsDimensionsFlagInfo: { [name: string]: [string, string
 // This table is used when generating the analytics.md file. It should match the enum above
 // or the validate-user-analytics script will fail.
 export const NgCliAnalyticsMetricsFlagInfo: { [name: string]: [string, string] } = {
-  UNUSED_1: ['UNUSED_1', 'none'],
+  NgComponentCount: ['NgComponentCount', 'number'],
   UNUSED_2: ['UNUSED_2', 'none'],
   UNUSED_3: ['UNUSED_3', 'none'],
   UNUSED_4: ['UNUSED_4', 'none'],
