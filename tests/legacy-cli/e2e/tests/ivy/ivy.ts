@@ -5,15 +5,27 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { expectFileToExist, replaceInFile } from '../../utils/fs';
 import { request } from '../../utils/http';
-import { killAllProcesses } from '../../utils/process';
+import { killAllProcesses, ng } from '../../utils/process';
 import { createProject, ngServe } from '../../utils/project';
 
 export default async function() {
   try {
     await createProject('ivy-project', '--enable-ivy');
 
+    // Add in a reference to a secondary entry-point to check that ngcc processes it correctly
+    await replaceInFile(
+      'src/app/app.module.ts',
+      `import { AppComponent } from './app.component';`,
+      `import { AppComponent } from './app.component';\nimport { HttpClientModule } from '@angular/common/http';`,
+    );
+    await replaceInFile('src/app/app.module.ts', `imports: [`, `imports: [\n    HttpClientModule,`);
+
     await ngServe('--prod');
+
+    // Check that @angular/common/http was processed by ngcc
+    await expectFileToExist('node_modules/@angular/common/http/http.d.ts.__ivy_ngcc_bak');
 
     // Verify the index.html
     const body = await request('http://localhost:4200/');
@@ -33,6 +45,6 @@ export default async function() {
       throw new Error('NgDevMode was not tree shaken away.');
     }
   } finally {
-    await killAllProcesses();
+    killAllProcesses();
   }
 }

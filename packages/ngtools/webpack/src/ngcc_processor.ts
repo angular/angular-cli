@@ -54,10 +54,7 @@ export class NgccProcessor {
     resolvedModule: ts.ResolvedModule | ts.ResolvedTypeReferenceDirective,
   ): void {
     const resolvedFileName = resolvedModule.resolvedFileName;
-    if (
-      !resolvedFileName
-      || moduleName.startsWith('.')
-      || this._processedModules.has(moduleName)) {
+    if (!resolvedFileName || moduleName.startsWith('.') || this._processedModules.has(moduleName)) {
       // Skip when module is unknown, relative or NGCC compiler is not found or already processed.
       return;
     }
@@ -97,25 +94,19 @@ export class NgccProcessor {
    */
   private tryResolvePackage(moduleName: string, resolvedFileName: string): string | undefined {
     try {
-      let packageJsonPath = path.resolve(resolvedFileName, '../package.json');
-      if (existsSync(packageJsonPath)) {
-        return packageJsonPath;
-      }
-
       // This is based on the logic in the NGCC compiler
       // tslint:disable-next-line:max-line-length
       // See: https://github.com/angular/angular/blob/b93c1dffa17e4e6900b3ab1b9e554b6da92be0de/packages/compiler-cli/src/ngcc/src/packages/dependency_host.ts#L85-L121
-      packageJsonPath = require.resolve(`${moduleName}/package.json`,
-        {
-          paths: [resolvedFileName],
-        },
-      );
-
-      return packageJsonPath;
+      return require.resolve(`${moduleName}/package.json`, {
+        paths: [resolvedFileName],
+      });
     } catch {
       // if it fails this might be a deep import which doesn't have a package.json
       // Ex: @angular/compiler/src/i18n/i18n_ast/package.json
-      return undefined;
+      // or local libraries which don't reside in node_modules
+      const packageJsonPath = path.resolve(resolvedFileName, '../package.json');
+
+      return existsSync(packageJsonPath) ? packageJsonPath : undefined;
     }
   }
 
@@ -138,10 +129,9 @@ class NgccLogger implements Logger {
   constructor(
     private readonly compilationWarnings: (Error | string)[],
     private readonly compilationErrors: (Error | string)[],
-  ) {
-  }
+  ) {}
 
-  debug(..._args: string[]) { }
+  debug(..._args: string[]) {}
 
   info(...args: string[]) {
     // Log to stderr because it's a progress-like info message.
