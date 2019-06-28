@@ -7,7 +7,7 @@
  */
 import { Architect, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
-import { experimental, json, schema, tags } from '@angular-devkit/core';
+import { json, schema, tags, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { BepJsonWriter } from '../utilities/bep';
 import { parseJsonSchemaToOptions } from '../utilities/json-schema';
@@ -15,7 +15,6 @@ import { isPackageNameSafeForAnalytics } from './analytics';
 import { BaseCommandOptions, Command } from './command';
 import { Arguments, Option } from './interface';
 import { parseArguments } from './parser';
-import { WorkspaceLoader } from './workspace-loader';
 
 export interface ArchitectCommandOptions extends BaseCommandOptions {
   project?: string;
@@ -25,11 +24,11 @@ export interface ArchitectCommandOptions extends BaseCommandOptions {
 }
 
 export abstract class ArchitectCommand<
-  T extends ArchitectCommandOptions = ArchitectCommandOptions,
-> extends Command<ArchitectCommandOptions> {
+  T extends ArchitectCommandOptions = ArchitectCommandOptions
+> extends Command<T> {
   protected _architect: Architect;
   protected _architectHost: WorkspaceNodeModulesArchitectHost;
-  protected _workspace: experimental.workspace.Workspace;
+  protected _workspace: workspaces.WorkspaceDefinition;
   protected _registry: json.schema.SchemaRegistry;
 
   // If this command supports running multiple targets.
@@ -37,15 +36,16 @@ export abstract class ArchitectCommand<
 
   target: string | undefined;
 
-  public async initialize(options: ArchitectCommandOptions & Arguments): Promise<void> {
+  public async initialize(options: T & Arguments): Promise<void> {
     await super.initialize(options);
 
     this._registry = new json.schema.CoreSchemaRegistry();
     this._registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
 
-    const workspaceLoader = new WorkspaceLoader(new NodeJsSyncHost());
-
-    const workspace = await workspaceLoader.loadWorkspace(this.workspace.root);
+    const { workspace } = await workspaces.readWorkspace(
+      this.workspace.root,
+      workspaces.createWorkspaceHost(new NodeJsSyncHost()),
+    );
     this._workspace = workspace;
 
     this._architectHost = new WorkspaceNodeModulesArchitectHost(workspace, this.workspace.root);
@@ -68,8 +68,8 @@ export abstract class ArchitectCommand<
     const commandLeftovers = options['--'];
     let projectName = options.project;
     const targetProjectNames: string[] = [];
-    for (const name of this._workspace.listProjectNames()) {
-      if (this._workspace.getProjectTargets(name)[this.target]) {
+    for (const [name, project] of this._workspace.projects) {
+      if (project.targets.has(this.target)) {
         targetProjectNames.push(name);
       }
     }
@@ -84,7 +84,7 @@ export abstract class ArchitectCommand<
 
     if (!projectName && commandLeftovers && commandLeftovers.length > 0) {
       const builderNames = new Set<string>();
-      const leftoverMap = new Map<string, { optionDefs: Option[], parsedOptions: Arguments }>();
+      const leftoverMap = new Map<string, { optionDefs: Option[]; parsedOptions: Arguments }>();
       let potentialProjectNames = new Set<string>(targetProjectNames);
       for (const name of targetProjectNames) {
         const builderName = await this._architectHost.getBuilderNameForTarget({
@@ -147,7 +147,7 @@ export abstract class ArchitectCommand<
     }
 
     if (!projectName && !this.multiTarget) {
-      const defaultProjectName = this._workspace.getDefaultProjectName();
+      const defaultProjectName = this._workspace.extensions['defaultProject'] as string;
       if (targetProjectNames.length === 1) {
         projectName = targetProjectNames[0];
       } else if (defaultProjectName && targetProjectNames.includes(defaultProjectName)) {
@@ -168,9 +168,12 @@ export abstract class ArchitectCommand<
     });
     const builderDesc = await this._architectHost.resolveBuilder(builderConf);
 
-    this.description.options.push(...(
-      await parseJsonSchemaToOptions(this._registry, builderDesc.optionSchema as json.JsonObject)
-    ));
+    this.description.options.push(
+      ...(await parseJsonSchemaToOptions(
+        this._registry,
+        builderDesc.optionSchema as json.JsonObject,
+      )),
+    );
 
     // Update options to remove analytics from options if the builder isn't safelisted.
     for (const o of this.description.options) {
@@ -199,11 +202,9 @@ export abstract class ArchitectCommand<
 
     let last = 1;
     let rebuild = false;
-    const run = await this._architect.scheduleTarget(
-      configuration,
-      overrides,
-      { logger: this.logger },
-    );
+    const run = await this._architect.scheduleTarget(configuration, overrides, {
+      logger: this.logger,
+    });
     await run.output.forEach(event => {
       last = event.success ? 0 : 1;
 
@@ -239,8 +240,8 @@ export abstract class ArchitectCommand<
     );
     const overrides = parseArguments(targetOptions, targetOptionArray, this.logger);
 
-    const allowAdditionalProperties = typeof builderDesc.optionSchema === 'object'
-      && builderDesc.optionSchema.additionalProperties;
+    const allowAdditionalProperties =
+      typeof builderDesc.optionSchema === 'object' && builderDesc.optionSchema.additionalProperties;
 
     if (overrides['--'] && !allowAdditionalProperties) {
       (overrides['--'] || []).forEach(additional => {
@@ -261,14 +262,10 @@ export abstract class ArchitectCommand<
         commandOptions.buildEventLog as string,
       );
     } else {
-      const run = await this._architect.scheduleTarget(
-        target,
-        overrides as json.JsonObject,
-        {
-          logger: this.logger,
-          analytics: isPackageNameSafeForAnalytics(builderConf) ? this.analytics : undefined,
-        },
-      );
+      const run = await this._architect.scheduleTarget(target, overrides as json.JsonObject, {
+        logger: this.logger,
+        analytics: isPackageNameSafeForAnalytics(builderConf) ? this.analytics : undefined,
+      });
 
       const { error, success } = await run.output.toPromise();
       await run.stop();
@@ -331,9 +328,12 @@ export abstract class ArchitectCommand<
   }
 
   private getProjectNamesByTarget(targetName: string): string[] {
-    const allProjectsForTargetName = this._workspace.listProjectNames().map(projectName =>
-      this._workspace.getProjectTargets(projectName)[targetName] ? projectName : null,
-    ).filter(x => !!x) as string[];
+    const allProjectsForTargetName: string[] = [];
+    for (const [name, project] of this._workspace.projects) {
+      if (project.targets.has(targetName)) {
+        allProjectsForTargetName.push(name);
+      }
+    }
 
     if (this.multiTarget) {
       // For multi target commands, we always list all projects that have the target.
@@ -341,7 +341,7 @@ export abstract class ArchitectCommand<
     } else {
       // For single target commands, we try the default project first,
       // then the full list if it has a single project, then error out.
-      const maybeDefaultProject = this._workspace.getDefaultProjectName();
+      const maybeDefaultProject = this._workspace.extensions['defaultProject'] as string;
       if (maybeDefaultProject && allProjectsForTargetName.includes(maybeDefaultProject)) {
         return [maybeDefaultProject];
       }

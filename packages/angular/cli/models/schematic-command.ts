@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
-  experimental,
   json,
   logging,
   normalize,
@@ -14,6 +13,7 @@ import {
   strings,
   tags,
   virtualFs,
+  workspaces,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { DryRunEvent, UnsuccessfulWorkflowExecution, workflow } from '@angular-devkit/schematics';
@@ -26,7 +26,6 @@ import {
 } from '@angular-devkit/schematics/tools';
 import * as inquirer from 'inquirer';
 import * as systemPath from 'path';
-import { WorkspaceLoader } from '../models/workspace-loader';
 import { colors } from '../utilities/color';
 import {
   getProjectByCwd,
@@ -70,7 +69,7 @@ export abstract class SchematicCommand<
   readonly allowPrivateSchematics: boolean = false;
   readonly allowAdditionalArgs: boolean = false;
   private _host = new NodeJsSyncHost();
-  private _workspace: experimental.workspace.Workspace;
+  private _workspace: workspaces.WorkspaceDefinition;
   protected _workflow: NodeWorkflow;
 
   private readonly defaultCollectionName = '@schematics/angular';
@@ -272,22 +271,23 @@ export abstract class SchematicCommand<
 
     workflow.registry.addSmartDefaultProvider('projectName', () => {
       if (this._workspace) {
-        try {
-          return (
-            this._workspace.getProjectByPath(normalize(process.cwd())) ||
-            this._workspace.getDefaultProjectName()
-          );
-        } catch (e) {
-          if (e instanceof experimental.workspace.AmbiguousProjectPathException) {
+        const projectNames = getProjectsByPath(this._workspace, process.cwd(), this.workspace.root);
+
+        if (projectNames.length === 1) {
+          return projectNames[0];
+        } else {
+          if (projectNames.length > 1) {
             this.logger.warn(tags.oneLine`
               Two or more projects are using identical roots.
               Unable to determine project using current working directory.
               Using default workspace project instead.
             `);
-
-            return this._workspace.getDefaultProjectName();
           }
-          throw e;
+
+          const defaultProjectName = this._workspace.extensions['defaultProject'];
+          if (typeof defaultProjectName === 'string' && defaultProjectName) {
+            return defaultProjectName;
+          }
         }
       }
 
@@ -560,10 +560,13 @@ export abstract class SchematicCommand<
     if (this._workspace) {
       return;
     }
-    const workspaceLoader = new WorkspaceLoader(this._host);
 
     try {
-      this._workspace = await workspaceLoader.loadWorkspace(this.workspace.root);
+      const { workspace } = await workspaces.readWorkspace(
+        this.workspace.root,
+        workspaces.createWorkspaceHost(this._host),
+      );
+      this._workspace = workspace;
     } catch (err) {
       if (!this.allowMissingWorkspace) {
         // Ignore missing workspace
@@ -571,4 +574,43 @@ export abstract class SchematicCommand<
       }
     }
   }
+}
+
+function getProjectsByPath(
+  workspace: workspaces.WorkspaceDefinition,
+  path: string,
+  root: string,
+): string[] {
+  if (workspace.projects.size === 1) {
+    return Array.from(workspace.projects.keys());
+  }
+
+  const isInside = (base: string, potential: string): boolean => {
+    const absoluteBase = systemPath.resolve(root, base);
+    const absolutePotential = systemPath.resolve(root, potential);
+    const relativePotential = systemPath.relative(absoluteBase, absolutePotential);
+    if (!relativePotential.startsWith('..') && !systemPath.isAbsolute(relativePotential)) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const projects = Array.from(workspace.projects.entries())
+    .map(([name, project]) => [systemPath.resolve(root, project.root), name] as [string, string])
+    .filter(tuple => isInside(tuple[0], path))
+    // Sort tuples by depth, with the deeper ones first. Since the first member is a path and
+    // we filtered all invalid paths, the longest will be the deepest (and in case of equality
+    // the sort is stable and the first declared project will win).
+    .sort((a, b) => b[0].length - a[0].length);
+
+  if (projects.length === 1) {
+    return [projects[0][1]];
+  } else if (projects.length > 1) {
+    const firstPath = projects[0][0];
+
+    return projects.filter(v => v[0] === firstPath).map(v => v[1]);
+  }
+
+  return [];
 }
