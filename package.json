@@ -122,7 +122,6 @@
     "karma-jasmine": "^2.0.1",
     "karma-jasmine-html-reporter": "^1.4.0",
     "license-checker": "^20.1.0",
-    "lint-staged": "^8.1.5",
     "minimatch": "^3.0.4",
     "minimist": "^1.2.0",
     "npm-registry-client": "8.6.0",
@@ -144,7 +143,6 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
       "pre-push": "node ./bin/devkit-admin hooks/pre-push"
     }
   }
