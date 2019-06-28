@@ -69,7 +69,7 @@ Note: There's a limit of 20 custom dimensions.
 <!--METRICS_TABLE_BEGIN-->
 | Id | Flag | Type |
 |:---:|:---|:---|
-| 1 | `UNUSED_1` | `none` |
+| 1 | `NgComponentCount` | `number` |
 | 2 | `UNUSED_2` | `none` |
 | 3 | `UNUSED_3` | `none` |
 | 4 | `UNUSED_4` | `none` |
