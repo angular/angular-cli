@@ -107,12 +107,6 @@ jobs:
     steps:
       - attach_workspace: *attach_options
       - run: yarn validate --ci
-      - run:
-          name: Validate Code Formatting
-          command: |
-            if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
-              npx prettier --check ".prettierrc" $(git log $CIRCLE_BRANCH --name-only --diff-filter=ACM --pretty="format:" --not $(git for-each-ref --format='%(refname)' refs/heads/ | grep -v "refs/heads/$CIRCLE_BRANCH") -- "*.js" "*.ts")
-            fi
 
   test:
     <<: *defaults
