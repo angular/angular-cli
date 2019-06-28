@@ -1,11 +1,13 @@
 ## TransferHttpCacheModule
 
-`TransferHttpCacheModule` installs a Http interceptor that avoids duplicate `HttpClient` requests
+`TransferHttpCacheModule` installs a Http interceptor that avoids duplicate `HttpClient` GET requests
 on the client, for requests that were already made when the application was rendered on the server
 side.
 
 When the module is installed in the application `NgModule`, it will intercept `HttpClient` requests
 on the server and store the response in the `TransferState` key-value store. This is transferred to the client, which then uses it to respond to the same `HttpClient` requests on the client.
+
+Any requests other than GET will prevent any further requests. You may alternatively use `BrowserTransferStateModule` to write your own behaviour for caching information.
 
 ### Usage
 
