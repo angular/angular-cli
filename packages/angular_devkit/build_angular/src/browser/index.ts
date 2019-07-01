@@ -236,8 +236,8 @@ export function buildWebpackBrowser(
             const [firstBuild, secondBuild] = buildEvents;
 
             if (buildEvents.length === 2) {
-              noModuleFiles = firstBuild.emittedFiles;
-              moduleFiles = secondBuild.emittedFiles || [];
+              moduleFiles = firstBuild.emittedFiles || [];
+              noModuleFiles = secondBuild.emittedFiles;
               files = moduleFiles.filter(x => x.extension === '.css');
             } else if (options.watch && isDifferentialLoadingNeeded) {
               // differential loading is not enabled in watch mode
