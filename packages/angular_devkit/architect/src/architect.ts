@@ -61,7 +61,8 @@ function _createJobHandlerFromBuilderInfo(
           // Validate v against the options schema.
           return registry.compile(info.optionSchema).pipe(
             concatMap(validation => validation(options)),
-            map(({ data, success, errors }) => {
+            map((validationResult: json.schema.SchemaValidatorResult) => {
+              const { data, success, errors } = validationResult;
               if (success) {
                 return { ...v, options: data } as BuilderInput;
               }
