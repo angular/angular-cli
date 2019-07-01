@@ -123,8 +123,11 @@ export class NgBuildAnalyticsPlugin {
   }
   protected _getDimensions(stats: Stats) {
     const dimensions: (string | number)[] = [];
-    // Adding commas before and after so the regex are easier to define.
-    dimensions[analytics.NgCliAnalyticsDimensions.BuildErrors] = `,${this._stats.errors.join()},`;
+
+    if (this._stats.errors.length) {
+      // Adding commas before and after so the regex are easier to define filters.
+      dimensions[analytics.NgCliAnalyticsDimensions.BuildErrors] = `,${this._stats.errors.join()},`;
+    }
 
     return dimensions;
   }
