@@ -1054,10 +1054,10 @@ ansi-colors@3.2.4:
   resolved "https://registry.yarnpkg.com/ansi-colors/-/ansi-colors-3.2.4.tgz#e3a3da4bfbae6c86a9c285625de124a234026fbf"
   integrity sha512-hHUXGagefjN2iRrID63xckIvotOXOojhQKWIPUZ4mNUZ9nLZW+7FMNoE1lOkEhNWYsx/7ysGIuJYCiMAA9FnrA==
 
-ansi-colors@4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/ansi-colors/-/ansi-colors-4.0.1.tgz#3dc29301836c6152f617a71466bde162a2e42582"
-  integrity sha512-1Qs1jdXEMSYwcVooLRfnCc5+e3365pw38v4AVkSsCxsjXRGKDTem5VLCl53SpHSpLnEy8O5DofJHZJELaRiJbg==
+ansi-colors@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/ansi-colors/-/ansi-colors-4.1.0.tgz#e1674bd61027c8c219b9edec929b6b57641b0c09"
+  integrity sha512-3NkLpm6I6kEgC8J0I9EZ0fouXc/mm5J9zqJFCgA2jGqmsL0O64I7Uvi3AmUMnnRqc6u7uLgVVnY4pyBQ03nCiw==
 
 ansi-colors@^3.0.0:
   version "3.2.1"
