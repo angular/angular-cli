@@ -21,6 +21,11 @@ export interface PublishArgs {
 
 
 function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
+  if (process.platform.startsWith('win')) {
+    args.unshift('/c', command);
+    command = 'cmd.exe';
+  }
+
   const { status, error, stderr, stdout } = spawnSync(command, args, { ...opts });
 
   if (status != 0) {
