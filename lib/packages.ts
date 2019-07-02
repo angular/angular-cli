@@ -164,8 +164,10 @@ function _getVersionFromGit(experimental: boolean): string {
   const hasLocalChanges = _exec(`git status --porcelain`) != '';
   const scmVersionTagRaw = _exec(`git describe --match v[0-9].[0-9].[0-9]* --abbrev=7 --tags`)
     .slice(1);
-  stableVersion = scmVersionTagRaw.replace(/-([0-9]+)-g/, '+$1.')
-    + (hasLocalChanges ? '.with-local-changes' : '');
+  stableVersion = scmVersionTagRaw.replace(/-([0-9]+)-g/, '+$1.');
+  if (hasLocalChanges) {
+    stableVersion += stableVersion.includes('+') ? '.with-local-changes' : '+with-local-changes';
+  }
 
   experimentalVersion = `0.${stableVersion.replace(/^(\d+)\.(\d+)/, (_, major, minor) => {
     return '' + (parseInt(major, 10) * 100 + parseInt(minor, 10));
