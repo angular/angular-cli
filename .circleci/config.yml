@@ -163,6 +163,8 @@ jobs:
     parallelism: 4
     steps:
       - attach_workspace: *attach_options
+      # Ensure latest npm version to support local package repository
+      - run: PATH=~/.npm-global/bin:$PATH npm install --global npm
       - run: PATH=~/.npm-global/bin:$PATH xvfb-run -a node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
   e2e-cli-ivy:
