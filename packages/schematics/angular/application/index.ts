@@ -382,6 +382,10 @@ export default function (options: ApplicationOptions): Rule {
       options.minimal ? noop() : schematic('e2e', e2eOptions),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
       options.lintFix ? applyLintFix(appDir) : noop(),
+      options.universal ? schematic('universal', {
+          clientProject: options.name,
+          skipInstall: options.skipPackageJson
+        }) : noop()
     ]);
   };
 }

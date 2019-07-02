@@ -93,6 +93,11 @@
       "type": "boolean",
       "default": false
     },
+    "universal": {
+      "description": "Sets up universal for the application.",
+      "type": "boolean",
+      "default": false
+    },
     "lintFix": {
       "type": "boolean",
       "default": false,

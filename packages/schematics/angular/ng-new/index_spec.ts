@@ -79,4 +79,15 @@ describe('Ng New Schematic', () => {
     const confContent = JSON.parse(tree.readContent('/bar/angular.json'));
     expect(confContent.projects.foo.e2e).toBeUndefined();
   });
+
+  it('should should set universal as well', async () => {
+    const options = { ...defaultOptions, universal: true };
+
+    const tree = await schematicRunner.runSchematicAsync('ng-new', options).toPromise();
+    const files = tree.files;
+    expect(files).toEqual(jasmine.arrayContaining([
+        '/bar/src/main.server.ts',
+        '/bar/src/app/app.server.module.ts',
+    ]));
+  });
 });

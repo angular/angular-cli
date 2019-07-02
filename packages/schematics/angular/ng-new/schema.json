@@ -155,6 +155,11 @@
       "type": "boolean",
       "default": false,
       "x-user-analytics": 14
+    },
+    "universal": {
+      "description": "Sets up universal for the application.",
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [
