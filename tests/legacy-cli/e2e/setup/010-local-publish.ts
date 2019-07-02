@@ -9,7 +9,16 @@ export default async function() {
   fs.writeFileSync('.npmrc', 'registry = http://localhost:4873', 'utf8');
 
   try {
-    const publishArgs = ['run', 'admin', '--', 'publish', '--versionCheck', 'false'];
+    const publishArgs = [
+      'run',
+      'admin',
+      '--',
+      'publish',
+      '--versionCheck',
+      'false',
+      '--branchCheck',
+      'false',
+    ];
     if (pre && pre.length > 0) {
       publishArgs.push('--tag');
       publishArgs.push('next');
