@@ -39,6 +39,11 @@
       "version": "8.0.0-beta.14",
       "factory": "./update-8/#updateLazyModulePaths",
       "description": "Update an Angular CLI project to version 8."
+    },
+    "migration-09": {
+      "version": "9.0.0-beta.0",
+      "factory": "./update-9",
+      "description": "Update an Angular CLI project to version 9."
     }
   }
 }
