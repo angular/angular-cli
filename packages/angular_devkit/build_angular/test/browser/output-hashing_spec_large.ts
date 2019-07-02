@@ -9,7 +9,11 @@
 import { Architect } from '@angular-devkit/architect';
 import { normalize } from '@angular-devkit/core';
 import {
-  browserBuild, createArchitect, host, lazyModuleFiles, lazyModuleStringImport,
+  browserBuild,
+  createArchitect,
+  host,
+  lazyModuleFiles,
+  lazyModuleStringImport,
 } from '../utils';
 
 describe('Browser Builder output hashing', () => {
@@ -28,13 +32,16 @@ describe('Browser Builder output hashing', () => {
     function generateFileHashMap(): Map<string, string> {
       const hashes = new Map<string, string>();
 
-      host.scopedSync().list(normalize('./dist')).forEach(name => {
-        const matches = name.match(OUTPUT_RE);
-        if (matches) {
-          const [, module, hash] = matches;
-          hashes.set(module, hash);
-        }
-      });
+      host
+        .scopedSync()
+        .list(normalize('./dist'))
+        .forEach(name => {
+          const matches = name.match(OUTPUT_RE);
+          if (matches) {
+            const [, module, hash] = matches;
+            hashes.set(module, hash);
+          }
+        });
 
       return hashes;
     }
@@ -48,7 +55,8 @@ describe('Browser Builder output hashing', () => {
         if (hash == oldHashes.get(module)) {
           if (shouldChange.includes(module)) {
             throw new Error(
-              `Module "${module}" did not change hash (${hash}), but was expected to.`);
+              `Module "${module}" did not change hash (${hash}), but was expected to.`,
+            );
           }
         } else if (!shouldChange.includes(module)) {
           throw new Error(`Module "${module}" changed hash (${hash}), but was not expected to.`);
@@ -153,11 +161,11 @@ describe('Browser Builder output hashing', () => {
     expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeFalsy();
   });
 
-  it('does not hash lazy styles', async () => {
+  it('does not hash non injected styles', async () => {
     const overrides = {
       outputHashing: 'all',
       extractCss: true,
-      styles: [{ input: 'src/styles.css', lazy: true }],
+      styles: [{ input: 'src/styles.css', inject: false }],
     };
 
     await browserBuild(architect, host, target, overrides);
@@ -168,12 +176,12 @@ describe('Browser Builder output hashing', () => {
     expect(host.scopedSync().exists(normalize('dist/styles.css.map'))).toBe(true);
   });
 
-  it('does not hash lazy styles when optimization is enabled', async () => {
+  it('does not hash non injected styles when optimization is enabled', async () => {
     const overrides = {
       outputHashing: 'all',
       extractCss: true,
       optimization: true,
-      styles: [{ input: 'src/styles.css', lazy: true }],
+      styles: [{ input: 'src/styles.css', inject: false }],
     };
 
     await browserBuild(architect, host, target, overrides);

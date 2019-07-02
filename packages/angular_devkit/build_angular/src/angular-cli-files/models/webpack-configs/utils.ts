@@ -23,32 +23,45 @@ export interface HashFormat {
 export function getOutputHashFormat(option: string, length = 20): HashFormat {
   /* tslint:disable:max-line-length */
   const hashFormats: { [option: string]: HashFormat } = {
-    none:    { chunk: '',                       extract: '',                         file: ''                 , script: '' },
-    media:   { chunk: '',                       extract: '',                         file: `.[hash:${length}]`, script: ''  },
-    bundles: { chunk: `.[chunkhash:${length}]`, extract: `.[contenthash:${length}]`, file: ''                 , script: `.[hash:${length}]`  },
-    all:     { chunk: `.[chunkhash:${length}]`, extract: `.[contenthash:${length}]`, file: `.[hash:${length}]`, script: `.[hash:${length}]`  },
+    none: { chunk: '', extract: '', file: '', script: '' },
+    media: { chunk: '', extract: '', file: `.[hash:${length}]`, script: '' },
+    bundles: {
+      chunk: `.[chunkhash:${length}]`,
+      extract: `.[contenthash:${length}]`,
+      file: '',
+      script: `.[hash:${length}]`,
+    },
+    all: {
+      chunk: `.[chunkhash:${length}]`,
+      extract: `.[contenthash:${length}]`,
+      file: `.[hash:${length}]`,
+      script: `.[hash:${length}]`,
+    },
   };
   /* tslint:enable:max-line-length */
   return hashFormats[option] || hashFormats['none'];
 }
 
-export type NormalizedEntryPoint = ExtraEntryPointClass & { bundleName: string };
+// todo: replace with Omit when we update to TS 3.5
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+export type NormalizedEntryPoint = Required<Omit<ExtraEntryPointClass, 'lazy'>>;
 
 export function normalizeExtraEntryPoints(
   extraEntryPoints: ExtraEntryPoint[],
-  defaultBundleName: string
+  defaultBundleName: string,
 ): NormalizedEntryPoint[] {
   return extraEntryPoints.map(entry => {
     let normalizedEntry;
-
     if (typeof entry === 'string') {
-      normalizedEntry = { input: entry, lazy: false, bundleName: defaultBundleName };
+      normalizedEntry = { input: entry, inject: true, bundleName: defaultBundleName };
     } else {
+      const { lazy, inject = true, ...newEntry } = entry;
+      const injectNormalized = entry.lazy !== undefined ? !entry.lazy : inject;
       let bundleName;
 
       if (entry.bundleName) {
         bundleName = entry.bundleName;
-      } else if (entry.lazy) {
+      } else if (!injectNormalized) {
         // Lazy entry points use the file name as bundle name.
         bundleName = basename(
           normalize(entry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')),
@@ -57,11 +70,11 @@ export function normalizeExtraEntryPoints(
         bundleName = defaultBundleName;
       }
 
-      normalizedEntry = {...entry, bundleName};
+      normalizedEntry = { ...newEntry, inject: injectNormalized, bundleName };
     }
 
     return normalizedEntry;
-  })
+  });
 }
 
 export function getSourceMapDevTool(
@@ -93,8 +106,9 @@ export function getEsVersionForFileName(
   scriptTargetOverride: ScriptTarget | undefined,
   esVersionInFileName = false,
 ): string {
-  return scriptTargetOverride && esVersionInFileName ?
-    '-' + ScriptTarget[scriptTargetOverride].toLowerCase() : '';
+  return scriptTargetOverride && esVersionInFileName
+    ? '-' + ScriptTarget[scriptTargetOverride].toLowerCase()
+    : '';
 }
 
 export function isPolyfillsEntry(name: string) {

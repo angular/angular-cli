@@ -11,7 +11,6 @@ import { Architect } from '@angular-devkit/architect';
 import { logging, normalize, tags } from '@angular-devkit/core';
 import { browserBuild, createArchitect, host } from '../utils';
 
-
 describe('Browser Builder styles', () => {
   const extensionsWithImportSupport = ['css', 'scss', 'less', 'styl'];
   const extensionsWithVariableSupport = ['scss', 'less', 'styl'];
@@ -32,9 +31,9 @@ describe('Browser Builder styles', () => {
   it('supports global styles', async () => {
     const styles = [
       'src/input-style.css',
-      { input: 'src/lazy-style.css', bundleName: 'lazy-style', lazy: true },
+      { input: 'src/lazy-style.css', bundleName: 'lazy-style', inject: false },
       { input: 'src/pre-rename-style.css', bundleName: 'renamed-style' },
-      { input: 'src/pre-rename-lazy-style.css', bundleName: 'renamed-lazy-style', lazy: true },
+      { input: 'src/pre-rename-lazy-style.css', bundleName: 'renamed-lazy-style', inject: false },
     ] as {};
     const cssMatches: { [path: string]: string } = {
       'styles.css': '.input-style',
@@ -43,8 +42,9 @@ describe('Browser Builder styles', () => {
       'renamed-lazy-style.css': '.pre-rename-lazy-style',
     };
     const cssIndexMatches: { [path: string]: string } = {
-      'index.html': '<link rel="stylesheet" href="styles.css">'
-        + '<link rel="stylesheet" href="renamed-style.css">',
+      'index.html':
+        '<link rel="stylesheet" href="styles.css">' +
+        '<link rel="stylesheet" href="renamed-style.css">',
     };
     const jsMatches: { [path: string]: string } = {
       'styles.js': '.input-style',
@@ -53,12 +53,13 @@ describe('Browser Builder styles', () => {
       'renamed-lazy-style.js': '.pre-rename-lazy-style',
     };
     const jsIndexMatches: { [path: string]: string } = {
-      'index.html': '<script src="runtime.js"></script>'
-        + '<script src="polyfills.js"></script>'
-        + '<script src="styles.js"></script>'
-        + '<script src="renamed-style.js"></script>'
-        + '<script src="vendor.js"></script>'
-        + '<script src="main.js"></script>',
+      'index.html':
+        '<script src="runtime.js"></script>' +
+        '<script src="polyfills.js"></script>' +
+        '<script src="styles.js"></script>' +
+        '<script src="renamed-style.js"></script>' +
+        '<script src="vendor.js"></script>' +
+        '<script src="main.js"></script>',
     };
 
     host.writeMultipleFiles({
@@ -144,16 +145,16 @@ describe('Browser Builder styles', () => {
       const matches: { [path: string]: RegExp } = {
         'styles.css': new RegExp(
           // The global style should be there
-          /p\s*{\s*background-color: #f00;\s*}(.|\n|\r)*/.source
-          // The global style via import should be there
-          + /body\s*{\s*background-color: #00f;\s*}/.source,
+          /p\s*{\s*background-color: #f00;\s*}(.|\n|\r)*/.source +
+            // The global style via import should be there
+            /body\s*{\s*background-color: #00f;\s*}/.source,
         ),
         'styles.css.map': /"mappings":".+"/,
         'main.js': new RegExp(
           // The component style should be there
-          /h1(.|\n|\r)*background:\s*#000(.|\n|\r)*/.source
-          // The component style via import should be there
-          + /.outer(.|\n|\r)*.inner(.|\n|\r)*background:\s*#[fF]+/.source,
+          /h1(.|\n|\r)*background:\s*#000(.|\n|\r)*/.source +
+            // The component style via import should be there
+            /.outer(.|\n|\r)*.inner(.|\n|\r)*background:\s*#[fF]+/.source,
         ),
       };
 
@@ -188,8 +189,11 @@ describe('Browser Builder styles', () => {
           @import "@angular/material/prebuilt-themes/indigo-pink.css";
         `,
       });
-      host.replaceInFile('src/app/app.component.ts', './app.component.css',
-        `./app.component.${ext}`);
+      host.replaceInFile(
+        'src/app/app.component.ts',
+        './app.component.css',
+        `./app.component.${ext}`,
+      );
 
       const overrides = {
         extractCss: true,
@@ -213,7 +217,6 @@ describe('Browser Builder styles', () => {
 
   extensionsWithVariableSupport.forEach(ext => {
     it(`supports ${ext} includePaths`, async () => {
-
       let variableAssignment = '';
       let variablereference = '';
       if (ext === 'scss') {
@@ -244,8 +247,11 @@ describe('Browser Builder styles', () => {
         'main.js': /h2.*{.*color: #f00;.*}/,
       };
 
-      host.replaceInFile('src/app/app.component.ts', './app.component.css',
-        `./app.component.${ext}`);
+      host.replaceInFile(
+        'src/app/app.component.ts',
+        './app.component.css',
+        `./app.component.${ext}`,
+      );
 
       const overrides = {
         extractCss: true,
@@ -291,7 +297,7 @@ describe('Browser Builder styles', () => {
         /* normal-comment */
         /*! important-comment */
         div { flex: 1 }`,
-      'browserslist': 'IE 10',
+      browserslist: 'IE 10',
     });
 
     const overrides = { extractCss: true, optimization: false };
@@ -299,8 +305,7 @@ describe('Browser Builder styles', () => {
     expect(await files['styles.css']).toContain(tags.stripIndents`
       /* normal-comment */
       /*! important-comment */
-      div { -ms-flex: 1; flex: 1 }`,
-    );
+      div { -ms-flex: 1; flex: 1 }`);
   });
 
   it(`minimizes css`, async () => {
@@ -345,14 +350,12 @@ describe('Browser Builder styles', () => {
     expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
     expect(main).toContain(`url('component-img-relative.png')`);
 
-    expect(host.scopedSync().exists(normalize('dist/assets/global-img-absolute.svg')))
-      .toBe(true);
-    expect(host.scopedSync().exists(normalize('dist/global-img-relative.png')))
-      .toBe(true);
-    expect(host.scopedSync().exists(normalize('dist/assets/component-img-absolute.svg')))
-      .toBe(true);
-    expect(host.scopedSync().exists(normalize('dist/component-img-relative.png')))
-      .toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/assets/global-img-absolute.svg'))).toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/global-img-relative.png'))).toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/assets/component-img-absolute.svg'))).toBe(
+      true,
+    );
+    expect(host.scopedSync().exists(normalize('dist/component-img-relative.png'))).toBe(true);
 
     // Check urls with deploy-url scheme are used as is.
     files = (await browserBuild(architect, host, target, {
@@ -456,14 +459,12 @@ describe('Browser Builder styles', () => {
     expect(styles).toContain(`url('global-img-relative.png')`);
     expect(main).toContain(`url('/assets/component-img-absolute.svg')`);
     expect(main).toContain(`url('component-img-relative.png')`);
-    expect(host.scopedSync().exists(normalize('dist/assets/global-img-absolute.svg')))
-      .toBe(true);
-    expect(host.scopedSync().exists(normalize('dist/global-img-relative.png')))
-      .toBe(true);
-    expect(host.scopedSync().exists(normalize('dist/assets/component-img-absolute.svg')))
-      .toBe(true);
-    expect(host.scopedSync().exists(normalize('dist/component-img-relative.png')))
-      .toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/assets/global-img-absolute.svg'))).toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/global-img-relative.png'))).toBe(true);
+    expect(host.scopedSync().exists(normalize('dist/assets/component-img-absolute.svg'))).toBe(
+      true,
+    );
+    expect(host.scopedSync().exists(normalize('dist/component-img-relative.png'))).toBe(true);
 
     // Check urls with deploy-url scheme are used as is.
     files = (await browserBuild(architect, host, target, {
