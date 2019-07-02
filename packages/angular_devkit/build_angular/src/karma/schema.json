@@ -258,7 +258,13 @@
             "lazy": {
               "type": "boolean",
               "description": "If the bundle will be lazy loaded.",
-              "default": false
+              "default": false,
+              "x-deprecated": "Use 'inject' option with 'false' value instead."
+            },
+            "inject": {
+              "type": "boolean",
+              "description": "If the bundle will be referenced in the HTML file.",
+              "default": true
             }
           },
           "additionalProperties": false,

@@ -34,7 +34,7 @@ const postcssImports = require('postcss-import');
  * require('node-sass')
  * require('sass-loader')
  */
-
+// tslint:disable-next-line:no-big-function
 export function getStylesConfig(wco: WebpackConfigOptions) {
   const { root, buildOptions } = wco;
   const entryPoints: { [key: string]: string[] } = {};
@@ -46,10 +46,10 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   // Determine hashing format.
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing as string);
 
-  const postcssPluginCreator = function (loader: webpack.loader.LoaderContext) {
+  const postcssPluginCreator = function(loader: webpack.loader.LoaderContext) {
     return [
       postcssImports({
-        resolve: (url: string) => url.startsWith('~') ? url.substr(1) : url,
+        resolve: (url: string) => (url.startsWith('~') ? url.substr(1) : url),
         load: (filename: string) => {
           return new Promise<string>((resolve, reject) => {
             loader.fs.readFile(filename, (err: Error, data: Buffer) => {
@@ -81,12 +81,14 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const includePaths: string[] = [];
   let lessPathOptions: { paths?: string[] } = {};
 
-  if (buildOptions.stylePreprocessorOptions
-    && buildOptions.stylePreprocessorOptions.includePaths
-    && buildOptions.stylePreprocessorOptions.includePaths.length > 0
+  if (
+    buildOptions.stylePreprocessorOptions &&
+    buildOptions.stylePreprocessorOptions.includePaths &&
+    buildOptions.stylePreprocessorOptions.includePaths.length > 0
   ) {
     buildOptions.stylePreprocessorOptions.includePaths.forEach((includePath: string) =>
-      includePaths.push(path.resolve(root, includePath)));
+      includePaths.push(path.resolve(root, includePath)),
+    );
     lessPathOptions = {
       paths: includePaths,
     };
@@ -105,8 +107,8 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         entryPoints[style.bundleName] = [resolvedPath];
       }
 
-      // Add lazy styles to the list.
-      if (style.lazy) {
+      // Add non injected styles to the list.
+      if (!style.inject) {
         chunkNames.push(style.bundleName);
       }
 
@@ -131,7 +133,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     try {
       // tslint:disable-next-line:no-implicit-dependencies
       fiber = require('fibers');
-    } catch { }
+    } catch {}
   }
 
   // set base rules to derive final rules from
@@ -139,38 +141,44 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     { test: /\.css$/, use: [] },
     {
       test: /\.scss$|\.sass$/,
-      use: [{
-        loader: 'sass-loader',
-        options: {
-          implementation: sassImplementation,
-          fiber,
-          sourceMap: cssSourceMap,
-          // bootstrap-sass requires a minimum precision of 8
-          precision: 8,
-          includePaths,
+      use: [
+        {
+          loader: 'sass-loader',
+          options: {
+            implementation: sassImplementation,
+            fiber,
+            sourceMap: cssSourceMap,
+            // bootstrap-sass requires a minimum precision of 8
+            precision: 8,
+            includePaths,
+          },
         },
-      }],
+      ],
     },
     {
       test: /\.less$/,
-      use: [{
-        loader: 'less-loader',
-        options: {
-          sourceMap: cssSourceMap,
-          javascriptEnabled: true,
-          ...lessPathOptions,
+      use: [
+        {
+          loader: 'less-loader',
+          options: {
+            sourceMap: cssSourceMap,
+            javascriptEnabled: true,
+            ...lessPathOptions,
+          },
         },
-      }],
+      ],
     },
     {
       test: /\.styl$/,
-      use: [{
-        loader: 'stylus-loader',
-        options: {
-          sourceMap: cssSourceMap,
-          paths: includePaths,
+      use: [
+        {
+          loader: 'stylus-loader',
+          options: {
+            sourceMap: cssSourceMap,
+            paths: includePaths,
+          },
         },
-      }],
+      ],
     },
   ];
 
@@ -194,28 +202,30 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
 
   // load global css as css files
   if (globalStylePaths.length > 0) {
-    rules.push(...baseRules.map(({ test, use }) => {
-      return {
-        include: globalStylePaths,
-        test,
-        use: [
-          buildOptions.extractCss ? MiniCssExtractPlugin.loader : 'style-loader',
-          RawCssLoader,
-          {
-            loader: 'postcss-loader',
-            options: {
-              ident: buildOptions.extractCss ? 'extracted' : 'embedded',
-              plugins: postcssPluginCreator,
-              sourceMap: cssSourceMap
-                && !buildOptions.extractCss
-                && !buildOptions.sourceMap.hidden
-                ? 'inline' : cssSourceMap,
+    rules.push(
+      ...baseRules.map(({ test, use }) => {
+        return {
+          include: globalStylePaths,
+          test,
+          use: [
+            buildOptions.extractCss ? MiniCssExtractPlugin.loader : 'style-loader',
+            RawCssLoader,
+            {
+              loader: 'postcss-loader',
+              options: {
+                ident: buildOptions.extractCss ? 'extracted' : 'embedded',
+                plugins: postcssPluginCreator,
+                sourceMap:
+                  cssSourceMap && !buildOptions.extractCss && !buildOptions.sourceMap.hidden
+                    ? 'inline'
+                    : cssSourceMap,
+              },
             },
-          },
-          ...(use as webpack.Loader[]),
-        ],
-      };
-    }));
+            ...(use as webpack.Loader[]),
+          ],
+        };
+      }),
+    );
   }
 
   if (buildOptions.extractCss) {

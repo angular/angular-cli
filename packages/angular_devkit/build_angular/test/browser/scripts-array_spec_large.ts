@@ -33,9 +33,9 @@ describe('Browser Builder scripts array', () => {
     'src/binput-script.js',
     'src/ainput-script.js',
     'src/cinput-script.js',
-    { input: 'src/lazy-script.js', bundleName: 'lazy-script', lazy: true },
+    { input: 'src/lazy-script.js', bundleName: 'lazy-script', inject: false },
     { input: 'src/pre-rename-script.js', bundleName: 'renamed-script' },
-    { input: 'src/pre-rename-lazy-script.js', bundleName: 'renamed-lazy-script', lazy: true },
+    { input: 'src/pre-rename-lazy-script.js', bundleName: 'renamed-lazy-script', inject: false },
   ];
 
   const target = { project: 'app', target: 'build' };
