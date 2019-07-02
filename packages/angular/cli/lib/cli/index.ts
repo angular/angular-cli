@@ -72,9 +72,7 @@ export default async function(options: { testing?: boolean; cliArgs: string[] })
 
         logger.fatal(
           `An unhandled exception occurred: ${err.message}\n` +
-            `See "${logPath}" for further details.\n\n` +
-            'Please report with the contents of the log file at ' +
-            'https://github.com/angular/angular-cli/issues/new?template=1-bug-report.md',
+            `See "${logPath}" for further details.`
         );
       } catch (e) {
         logger.fatal(
