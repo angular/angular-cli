@@ -8556,10 +8556,10 @@ sass-loader@7.1.0:
     pify "^3.0.0"
     semver "^5.5.0"
 
-sass@1.22.1:
-  version "1.22.1"
-  resolved "https://registry.yarnpkg.com/sass/-/sass-1.22.1.tgz#9dc3cb2ea37d12fec94ef5c0e1112055f23e5bc8"
-  integrity sha512-VsWrNdfIzCLbD2TO2bq9tCaUzEE0UUSGtP3r9IhHi8ypAPCb3FOVP99kMRil+ZROEcTnKReZcQP9vk6ArV2eLw==
+sass@1.22.2:
+  version "1.22.2"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.22.2.tgz#ed9abee7a3e409fe2ccfdc1b66c64c7c841e0c62"
+  integrity sha512-enuQuy/CbfrZLA2vOy9tB7CK7pP5bZllnMbr5nPGWCFelwt0EMUVGC11gsv9rybkWc8pp/NKVY/c5+AKyjbnXg==
   dependencies:
     chokidar ">=2.0.0 <4.0.0"
 
