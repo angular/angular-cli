@@ -509,7 +509,8 @@ export class SimpleScheduler<
       waitable,
 
       from(handler).pipe(
-        switchMap(handler => new Observable((subscriber: Observer<JobOutboundMessage<O>>) => {
+        switchMap(handler => new Observable<JobOutboundMessage<O>>(
+                      (subscriber: Observer<JobOutboundMessage<O>>) => {
           if (!handler) {
             throw new JobDoesNotExistException(name);
           }
