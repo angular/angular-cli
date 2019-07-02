@@ -24,6 +24,7 @@ ts_library(
     module_name = "@nguniversal/hapi-engine/schematics",
     tsconfig = ":tsconfig.json",
     deps = [
+        "@npm//@angular-devkit/core",
         "@npm//@angular-devkit/schematics",
         "@npm//@schematics/angular",
         "@npm//@types/jasmine",
@@ -56,6 +57,7 @@ ng_test_library(
     tsconfig = ":tsconfig.json",
     deps = [
         ":schematics",
+        "@npm//@angular-devkit/core",
         "@npm//@angular-devkit/schematics",
         "@npm//@schematics/angular",
     ],

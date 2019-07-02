@@ -9,6 +9,9 @@ module.exports = {
     // This is our Hapi server for Dynamic universal
     server: './<%= stripTsExtension(serverFileName) %>.ts'
   },
+  externals: {
+    './<%= getServerDistDirectory() %>/main': 'require("./server/main")'
+  },
   target: 'node',
   resolve: { extensions: ['.ts', '.js'] },
   optimization: {
@@ -20,6 +23,7 @@ module.exports = {
     filename: '[name].js'
   },
   module: {
+    noParse: /polyfills-.*\.js/,
     rules: [
       { test: /\.ts$/, loader: 'ts-loader' },
       {
