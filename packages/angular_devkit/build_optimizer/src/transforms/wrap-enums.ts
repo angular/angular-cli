@@ -659,7 +659,7 @@ function createWrappedClass(
       ts.createVariableDeclarationList([
         ts.createVariableDeclaration(name, undefined, pureIife),
       ],
-        ts.NodeFlags.Const,
+        ts.NodeFlags.Let,
       ),
     ));
 
