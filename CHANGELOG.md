@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="8.1.0"></a>
+# [8.1.0](https://github.com/angular/universal/compare/v8.0.0-rc.1...v8.1.0) (2019-07-03)
+
+
+### Bug Fixes
+
+* **express-engine:** add bundleDependencies and lazy-loading fixes ([#1167](https://github.com/angular/universal/issues/1167)) ([d8be7af](https://github.com/angular/universal/commit/d8be7af))
+* **hapi-engine:**  add bundleDependencies and lazy-loading fixes ([#1188](https://github.com/angular/universal/issues/1188)) ([e688092](https://github.com/angular/universal/commit/e688092))
+* **hapi-engine:** fix broken unit test ([6ef8e47](https://github.com/angular/universal/commit/6ef8e47))
+
+
+### Features
+
+* **hapi-engine:** add ModuleMapLoaderModule to the app server imports during ng-add ([#1143](https://github.com/angular/universal/issues/1143)) ([81af213](https://github.com/angular/universal/commit/81af213))
+
+
+
 <a name="7.1.1"></a>
 ## [7.1.1](https://github.com/angular/universal/compare/v7.1.0...v7.1.1) (2019-03-07)
 
