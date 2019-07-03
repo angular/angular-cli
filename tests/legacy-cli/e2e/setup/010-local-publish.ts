@@ -3,13 +3,14 @@ import { prerelease } from 'semver';
 import { packages } from '../../../../lib/packages';
 import { npm } from '../utils/process';
 
-export default async function() {
+export default async function () {
   const pre = prerelease(packages['@angular/cli'].version);
 
   fs.writeFileSync('.npmrc', 'registry = http://localhost:4873', 'utf8');
 
   try {
-    const publishArgs = ['run', 'admin', '--', 'publish', '--versionCheck', 'false'];
+    const publishArgs = ['run', 'admin', '--', 'publish', '--versionCheck', 'false',
+      '--branchCheck', 'false'];
     if (pre && pre.length > 0) {
       publishArgs.push('--tag');
       publishArgs.push('next');
