@@ -39,14 +39,14 @@ describe('wrap enums and classes transformer', () => {
       `;
 
       const output = tags.stripIndent`
-        const CustomComponentEffects = /*@__PURE__*/ (() => {
+        let CustomComponentEffects = /*@__PURE__*/ (() => {
           ${defaultClass.replace('export default ', '')}
 
           return CustomComponentEffects;
         })();
         export default CustomComponentEffects;
 
-        const CustomComponent = /*@__PURE__*/ (() => {
+        let CustomComponent = /*@__PURE__*/ (() => {
           ${namedClass}
 
           return CustomComponent;
@@ -78,7 +78,7 @@ describe('wrap enums and classes transformer', () => {
       `;
 
       const output = tags.stripIndent`
-        const CustomComponentEffects = /*@__PURE__*/ (() => {
+        let CustomComponentEffects = /*@__PURE__*/ (() => {
           ${input}
 
           return CustomComponentEffects;
@@ -104,7 +104,7 @@ describe('wrap enums and classes transformer', () => {
       `;
 
       const output = tags.stripIndent`
-        const ApplicationModule = /*@__PURE__*/ (() => {
+        let ApplicationModule = /*@__PURE__*/ (() => {
           ${input}
 
           return ApplicationModule;
@@ -131,7 +131,7 @@ describe('wrap enums and classes transformer', () => {
       `;
 
       const output = tags.stripIndent`
-        const CommonModule = /*@__PURE__*/ (() => {
+        let CommonModule = /*@__PURE__*/ (() => {
           ${input}
 
           return CommonModule;
@@ -154,7 +154,7 @@ describe('wrap enums and classes transformer', () => {
       `;
 
       const output = tags.stripIndent`
-          export const Foo = /*@__PURE__*/ (() => {
+          export let Foo = /*@__PURE__*/ (() => {
             ${input.replace('export ', '')}
 
             return Foo;
@@ -170,7 +170,7 @@ describe('wrap enums and classes transformer', () => {
         TemplateRef.__NG_ELEMENT_ID__ = () => SWITCH_TEMPLATE_REF_FACTORY(TemplateRef, ElementRef);
       `;
       const output = tags.stripIndent`
-      export const TemplateRef = /*@__PURE__*/ (() => {
+      export let TemplateRef = /*@__PURE__*/ (() => {
         class TemplateRef { }
         TemplateRef.__NG_ELEMENT_ID__ = () => SWITCH_TEMPLATE_REF_FACTORY(TemplateRef, ElementRef);
         return TemplateRef;
@@ -187,7 +187,7 @@ describe('wrap enums and classes transformer', () => {
       TemplateRef.somethingElse = true;
     `;
       const output = tags.stripIndent`
-      export const TemplateRef = /*@__PURE__*/ (() => {
+      export let TemplateRef = /*@__PURE__*/ (() => {
         class TemplateRef {
         }
         TemplateRef.__NG_ELEMENT_ID__ = () => SWITCH_TEMPLATE_REF_FACTORY(TemplateRef, ElementRef);
@@ -231,14 +231,14 @@ describe('wrap enums and classes transformer', () => {
       `;
 
       const output = tags.stripIndent`
-        const Foo = /*@__PURE__*/ (() => {
+        let Foo = /*@__PURE__*/ (() => {
           ${defaultClass.replace('export default Foo;', '')}
 
           return Foo;
         })();
         export default Foo;
 
-        const AggregateColumnDirective = /*@__PURE__*/ (() => {
+        let AggregateColumnDirective = /*@__PURE__*/ (() => {
           ${namedClass}
 
           return AggregateColumnDirective;
@@ -261,7 +261,7 @@ describe('wrap enums and classes transformer', () => {
       `;
 
       const output = tags.stripIndent`
-          const AggregateColumnDirective = /*@__PURE__*/ (() => {
+          let AggregateColumnDirective = /*@__PURE__*/ (() => {
             ${input}
 
             return AggregateColumnDirective;
@@ -293,7 +293,7 @@ describe('wrap enums and classes transformer', () => {
 
       const output = tags.stripIndent`
         var FooDirective_1;
-        const FooDirective = /*@__PURE__*/ (() => {
+        let FooDirective = /*@__PURE__*/ (() => {
             ${classContent}
 
             return FooDirective;
@@ -316,7 +316,7 @@ describe('wrap enums and classes transformer', () => {
       `;
 
       const output = tags.stripIndent`
-          const ChipList = /*@__PURE__*/ (() => {
+          let ChipList = /*@__PURE__*/ (() => {
             ${input}
             return ChipList;
           })();`;
@@ -349,7 +349,7 @@ describe('wrap enums and classes transformer', () => {
           ChipList = __decorate$4([NotifyPropertyChanges], ChipList);`;
 
       const output = tags.stripIndent`
-          const ChipList = /*@__PURE__*/ (() => {
+          let ChipList = /*@__PURE__*/ (() => {
             ${input}
             return ChipList;
           })();`;
@@ -394,7 +394,7 @@ describe('wrap enums and classes transformer', () => {
       const output = tags.stripIndent`
           const minutesMilliSeconds = 60000;
 
-          const AggregateColumnDirective = /*@__PURE__*/ (() => {
+          let AggregateColumnDirective = /*@__PURE__*/ (() => {
             ${firstClass}
 
             return AggregateColumnDirective;
@@ -403,7 +403,7 @@ describe('wrap enums and classes transformer', () => {
           const CSS = 'e-css';
           const PRIMARY = 'e-primary';
 
-          const ChipList = /*@__PURE__*/ (() => {
+          let ChipList = /*@__PURE__*/ (() => {
             ${secondClass}
 
             return ChipList;
