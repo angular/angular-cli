@@ -17,7 +17,7 @@ const routes: Routes = [
 const routes: Routes = [
   { path: 'lazy', loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule) },
   { path: '', component: HomeComponent },
-];	];
+];
 ```
 
 ## Problem upgrading to version 8
