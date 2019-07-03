@@ -17,6 +17,7 @@ export interface PublishArgs {
   tag?: string;
   branchCheck?: boolean;
   versionCheck?: boolean;
+  registry?: string;
 }
 
 
@@ -111,7 +112,15 @@ export default async function (args: PublishArgs, logger: logging.Logger) {
       .then(() => {
         logger.info(name);
 
-        return _exec('npm', ['publish'].concat(args.tag ? ['--tag', args.tag] : []), {
+        const publishArgs = ['publish'];
+        if (args.tag) {
+          publishArgs.push('--tag', args.tag);
+        }
+        if (args.registry) {
+          publishArgs.push('--registry', args.registry);
+        }
+
+        return _exec('npm', publishArgs, {
           cwd: pkg.dist,
         }, logger);
       })
