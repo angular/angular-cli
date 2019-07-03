@@ -9,6 +9,7 @@
 * [Getting Started with Universal](#getting-started)
     * w/ NodeJS Server
     * w/ ASP.NET Core Server
+* [Upgrading to Version 8](#version-8)
 * [Packages](#packages)
 * [Universal "Gotchas"](#universal-gotchas)
 * [Roadmap](#roadmap)
@@ -36,6 +37,8 @@ The Universal project is driven by community contributions. Please send us your 
   - **Installation**: Clone the above repo, `npm i && dotnet restore` *(VStudio will run these automatically when opening the project)*
   - Launch files included for both VSCode & VStudio to run/debug automatically (press F5).
 
+# Version 8
+Follow this upgrade guide if you are upgrading an exsiting Universal project to Angular version 8 - [Guide](/docs/v8-upgrade-guide.md)
 
 # Packages
 The packages from this repo are published as scoped packages under [@nguniversal](https://www.npmjs.com/search?q=%40nguniversal)
