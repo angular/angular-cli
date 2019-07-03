@@ -209,7 +209,7 @@ export function serveWebpackBrowser(
 
         const entrypoints = generateEntryPoints({ scripts, styles });
         const moduleEntrypoints = buildBrowserFeatures.isDifferentialLoadingNeeded()
-          ? entrypoints
+          ? generateEntryPoints({ scripts: [], styles })
           : [];
 
         webpackConfig.plugins.push(
