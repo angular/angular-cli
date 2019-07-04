@@ -116,7 +116,7 @@ function updateConfigFile(options: UniversalOptions) {
     const clientProject = workspace.projects.get(options.clientProject);
     if (clientProject) {
       const buildTarget = clientProject.targets.get('build');
-      const serverTarget = clientProject.targets.get('build');
+      const serverTarget = clientProject.targets.get('server');
 
       // We have to check if the project config has a server target, because
       // if the Universal step in this schematic isn't run, it can't be guaranteed
@@ -125,23 +125,13 @@ function updateConfigFile(options: UniversalOptions) {
         return;
       }
 
-      serverTarget.configurations = {
-        production: {
-          fileReplacements: [
-            {
-              replace: 'src/environments/environment.ts',
-              with: 'src/environments/environment.prod.ts'
-            }
-          ]
-        }
-      };
-
       serverTarget.options = {
         ...serverTarget.options,
         outputPath: SERVER_DIST,
       };
 
       buildTarget.options = {
+        ...buildTarget.options,
         outputPath: BROWSER_DIST,
       };
     }

@@ -131,8 +131,23 @@ describe('Universal Schematic', () => {
       .toPromise();
     const filePath = '/projects/bar/src/main.server.ts';
     const contents = tree.readContent(filePath);
-    console.log({contents});
     expect(contents).toContain('ngExpressEngine');
     expect(contents).toContain('provideModuleMap');
+  });
+
+  it('should update angular.json', async () => {
+    const tree = await schematicRunner
+      .runSchematicAsync('ng-add', defaultOptions, appTree)
+      .toPromise();
+    const contents = JSON.parse(tree.readContent('angular.json'));
+    const architect = contents.projects.bar.architect;
+    expect(architect.build.configurations.production).toBeDefined();
+    expect(architect.build.options.outputPath).toBe('dist/browser');
+    expect(architect.server.options.outputPath).toBe('dist/server');
+
+    const productionConfig = architect.server.configurations.production;
+    expect(productionConfig.fileReplacements).toBeDefined();
+    expect(productionConfig.optimization).toBeDefined();
+    expect(productionConfig.sourceMap).toBeDefined();
   });
 });
