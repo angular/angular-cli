@@ -12,8 +12,8 @@
 # fetched by the Webtesting rules. Therefore for jobs that run tests with Bazel, we don't need a
 # docker image with browsers pre-installed.
 # **NOTE**: If you change the the version of the docker images, also change the `cache_key` suffix.
-var_1: &docker_image circleci/node:10.12-browsers
-var_2: &cache_key v2-nguniversal-{{ .Branch }}-{{ checksum "yarn.lock" }}-node-10.12
+var_1: &docker_image circleci/node:10.16-browsers
+var_2: &cache_key v2-nguniversal-{{ .Branch }}-{{ checksum "yarn.lock" }}-node-10.16
 
 # Settings common to each job
 var_3: &job_defaults
@@ -57,12 +57,12 @@ var_8: &copy_bazel_config
   # Set up the CircleCI specific bazel configuration.
   run: sudo cp ./.circleci/bazel.rc /etc/bazel.bazelrc
 
-# Sets up a different Docker image that includes a moe recent Firefox version which
-# is needed for headless testing.
-var_9: &docker-firefox-image
-  # TODO(CaerusKaru): Temporarily use a image that includes Firefox 62 because the
-  # ngcontainer image does include an old Firefox version that does not support headless.
-  - image: circleci/node:11.4.0-browsers
+# Run a step to setup an environment variable.
+var_9: &setup_env_variables
+  run:
+    name: "Setup custom environment variables"
+    command: |
+      echo 'export CHROMEDRIVER_VERSION_ARG="--versions.chrome 75.0.3770.90"' >> $BASH_ENV # Redirect into $BASH_ENV
 
 # Attaches the release output which has been stored in the workspace to the current job.
 # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
@@ -137,10 +137,10 @@ jobs:
   # See comments inside the integration/run_tests.sh script.
   integration_test:
     <<: *job_defaults
-    docker: *docker-firefox-image
     steps:
     - *checkout_code
     - *restore_cache
+    - *setup_env_variables
     - *yarn_install
     - *attach_release_output
     - run: ./integration/run_tests.sh
