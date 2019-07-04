@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { BuildOptimizerWebpackPlugin } from '@angular-devkit/build-optimizer';
 import { tags } from '@angular-devkit/core';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
@@ -251,6 +252,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
 
   let buildOptimizerUseRule;
   if (buildOptions.buildOptimizer) {
+    extraPlugins.push(new BuildOptimizerWebpackPlugin());
     buildOptimizerUseRule = {
       use: [
         {
