@@ -1,5 +1,11 @@
 export declare function buildOptimizer(options: BuildOptimizerOptions): TransformJavascriptOutput;
 
+export declare const buildOptimizerLoaderPath: string;
+
+export declare class BuildOptimizerWebpackPlugin {
+    apply(compiler: Compiler): void;
+}
+
 export default function buildOptimizerLoader(this: webpack.loader.LoaderContext, content: string, previousSourceMap: RawSourceMap): void;
 
 export declare function getFoldFileTransformer(program: ts.Program): ts.TransformerFactory<ts.SourceFile>;

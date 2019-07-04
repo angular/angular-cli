@@ -186,7 +186,12 @@ export interface BuildOptimizerOptions {
 ## Webpack loader usage:
 
 ```typescript
+import { BuildOptimizerWebpackPlugin } from '@angular-devkit/build-optimizer';
+
 module.exports = {
+  plugins: [
+    new BuildOptimizerWebpackPlugin(),
+  ]
   module: {
     rules: [
       {

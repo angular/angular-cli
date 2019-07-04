@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export { default as buildOptimizerLoader } from './build-optimizer/webpack-loader';
+export { BuildOptimizerWebpackPlugin } from './build-optimizer/webpack-plugin';
 export { buildOptimizer } from './build-optimizer/build-optimizer';
 
 export { transformJavascript } from './helpers/transform-javascript';
