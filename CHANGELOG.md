@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="8.1.1"></a>
+## [8.1.1](https://github.com/angular/universal/compare/v8.1.0...v8.1.1) (2019-07-04)
+
+
+### Bug Fixes
+
+* **schematics:** ng add removes options from browser builder ([#1190](https://github.com/angular/universal/issues/1190)) ([10d68fc](https://github.com/angular/universal/commit/10d68fc)), closes [#1189](https://github.com/angular/universal/issues/1189) [#1189](https://github.com/angular/universal/issues/1189)
+
+
+
 <a name="8.1.0"></a>
 # [8.1.0](https://github.com/angular/universal/compare/v8.0.0-rc.1...v8.1.0) (2019-07-03)
 
