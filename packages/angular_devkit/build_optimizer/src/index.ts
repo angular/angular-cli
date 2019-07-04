@@ -5,7 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-export { default as buildOptimizerLoader } from './build-optimizer/webpack-loader';
+export {
+  default as buildOptimizerLoader,
+  buildOptimizerLoaderPath,
+} from './build-optimizer/webpack-loader';
 export { BuildOptimizerWebpackPlugin } from './build-optimizer/webpack-plugin';
 export { buildOptimizer } from './build-optimizer/build-optimizer';
 

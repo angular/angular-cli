@@ -5,7 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BuildOptimizerWebpackPlugin } from '@angular-devkit/build-optimizer';
+import {
+  BuildOptimizerWebpackPlugin,
+  buildOptimizerLoaderPath,
+} from '@angular-devkit/build-optimizer';
 import { tags } from '@angular-devkit/core';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
@@ -35,9 +38,6 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 // tslint:disable-next-line:no-any
 const g: any = typeof global !== 'undefined' ? global : {};
-export const buildOptimizerLoader: string = g['_DevKitIsLocal']
-  ? require.resolve('@angular-devkit/build-optimizer/src/build-optimizer/webpack-loader')
-  : '@angular-devkit/build-optimizer/webpack-loader';
 
 // tslint:disable-next-line:no-big-function
 export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
@@ -256,7 +256,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     buildOptimizerUseRule = {
       use: [
         {
-          loader: buildOptimizerLoader,
+          loader: buildOptimizerLoaderPath,
           options: { sourceMap: scriptsSourceMap },
         },
       ],

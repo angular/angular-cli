@@ -17,6 +17,8 @@ interface BuildOptimizerLoaderOptions {
   sourceMap: boolean;
 }
 
+export const buildOptimizerLoaderPath = __filename;
+
 const alwaysProcess = (path: string) =>
   // Always process TS files.
   path.endsWith('.ts') || path.endsWith('.tsx')
