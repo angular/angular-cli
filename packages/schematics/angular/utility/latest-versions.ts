@@ -13,10 +13,12 @@ export const latestVersions = {
   ZoneJs: '~0.9.1',
   TypeScript: '~3.4.3',
   TsLib: '^1.9.0',
+
   // The versions below must be manually updated when making a new devkit release.
   DevkitBuildAngular: '~0.801.0',
   DevkitBuildNgPackagr: '~0.801.0',
   DevkitBuildWebpack: '~0.801.0',
+  AngularPWA: '~0.801.0',
 
   tsickle: '^0.35.0',
   ngPackagr: '^5.1.0',
