@@ -7,12 +7,12 @@
  */
 
 import {SchematicTestRunner, UnitTestTree} from '@angular-devkit/schematics/testing';
-import {join} from 'path';
 import {Observable} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 
 /** Path to the collection file for the NgUniversal schematics */
-export const collectionPath = join(__dirname, '..', 'collection.json');
+export const collectionPath =
+  require.resolve('nguniversal/modules/express-engine/schematics/collection.json');
 
 /** Create a base app used for testing. */
 export function createTestApp(appOptions = {}): Observable<UnitTestTree> {
