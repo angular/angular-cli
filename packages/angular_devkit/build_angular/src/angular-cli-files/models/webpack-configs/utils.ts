@@ -95,6 +95,7 @@ export function getSourceMapDevTool(
   return new SourceMapDevToolPlugin({
     filename: inlineSourceMap ? undefined : '[file].map',
     include,
+    moduleFilenameTemplate: '[namespace]/[resource-path]',
     append: hiddenSourceMap ? false : undefined,
   });
 }
