@@ -417,11 +417,13 @@ function _addLiveReload(
 
   // If a custom path is provided the webpack dev server client drops the sockjs-node segment.
   // This adds it back so that behavior is consistent when using a custom URL path
+  let sockjsPath = '';
   if (clientAddress.pathname) {
-    clientAddress.pathname = path.posix.join(clientAddress.pathname, 'sockjs-node');
+      clientAddress.pathname = path.posix.join(clientAddress.pathname, 'sockjs-node');
+      sockjsPath = '&sockPath=' + clientAddress.pathname;
   }
 
-  const entryPoints = [`${webpackDevServerPath}?${url.format(clientAddress)}`];
+  const entryPoints = [`${webpackDevServerPath}?${url.format(clientAddress)}${sockjsPath}`];
   if (options.hmr) {
     const webpackHmrLink = 'https://webpack.js.org/guides/hot-module-replacement';
 
