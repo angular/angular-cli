@@ -55,7 +55,11 @@ import {
 import { ExecutionTransformer } from '../transforms';
 import { BuildBrowserFeatures, deleteOutputDir } from '../utils';
 import { assertCompatibleAngularVersion } from '../utils/version';
-import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
+import {
+  generateBrowserWebpackConfigFromContext,
+  getIndexInputFile,
+  getIndexOutputFile,
+} from '../utils/webpack-browser-config';
 import { Schema as BrowserBuilderSchema } from './schema';
 
 export type BrowserBuilderOutput = json.JsonObject &
@@ -252,8 +256,8 @@ export function buildWebpackBrowser(
 
             return writeIndexHtml({
               host,
-              outputPath: resolve(root, normalize(options.outputPath)),
-              indexPath: join(root, options.index),
+              outputPath: resolve(root, join(normalize(options.outputPath), getIndexOutputFile(options))),
+              indexPath: join(root, getIndexInputFile(options)),
               files,
               noModuleFiles,
               moduleFiles,

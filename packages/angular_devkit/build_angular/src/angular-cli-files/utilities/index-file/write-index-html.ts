@@ -7,7 +7,7 @@
  */
 
 import { EmittedFiles } from '@angular-devkit/build-webpack';
-import { Path, basename, getSystemPath, join, virtualFs } from '@angular-devkit/core';
+import { Path, dirname, getSystemPath, join, virtualFs } from '@angular-devkit/core';
 import { Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { ExtraEntryPoint } from '../../../browser/schema';
@@ -66,7 +66,7 @@ export function writeIndexHtml({
         moduleFiles: filterAndMapBuildFiles(moduleFiles, '.js'),
         loadOutputFile: async filePath => {
           return host
-            .read(join(outputPath, filePath))
+            .read(join(dirname(outputPath), filePath))
             .pipe(map(data => virtualFs.fileBufferToString(data)))
             .toPromise();
         },
@@ -74,7 +74,7 @@ export function writeIndexHtml({
     ),
     switchMap(content => (postTransform ? postTransform(content) : of(content))),
     map(content => virtualFs.stringToFileBuffer(content)),
-    switchMap(content => host.write(join(outputPath, basename(indexPath)), content)),
+    switchMap(content => host.write(outputPath, content)),
   );
 }
 

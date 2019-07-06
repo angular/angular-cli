@@ -208,3 +208,19 @@ export async function generateBrowserWebpackConfigFromContext(
 
   return { workspace, config };
 }
+
+export function getIndexOutputFile(options: BrowserBuilderSchema): string {
+  if (typeof options.index === 'string') {
+    return path.basename(options.index);
+  } else {
+    return options.index.output || 'index.html';
+  }
+}
+
+export function getIndexInputFile(options: BrowserBuilderSchema): string {
+  if (typeof options.index === 'string') {
+    return options.index;
+  } else {
+    return options.index.input;
+  }
+}
