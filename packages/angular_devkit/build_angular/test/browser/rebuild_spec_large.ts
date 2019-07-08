@@ -349,14 +349,6 @@ describe('Browser Builder rebuilds', () => {
   });
 
   it('rebuilds AOT factories', async () => {
-    // DISABLED_FOR_IVY - These should pass but require fixes for resource rebuilds
-    //                    https://github.com/angular/angular/pull/30954
-    if (ivyEnabled) {
-      pending('Broken in Ivy.');
-
-      return;
-    }
-
     host.writeMultipleFiles({
       'src/app/app.component.css': `
         @import './imported-styles.css';

@@ -91,7 +91,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     try {
       exists = this._syncHost.isFile(fullPath);
       if (exists) {
-        this._changedFiles.add(fullPath);
+        this._changedFiles.add(workaroundResolve(fullPath));
       }
     } catch {}
 
@@ -339,16 +339,15 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   readResource(fileName: string) {
-    this._readResourceFiles.add(fileName);
+    // These paths are meant to be used by the loader so we must denormalize them
+    const denormalizedFileName = workaroundResolve(fileName);
+    this._readResourceFiles.add(denormalizedFileName);
 
     if (this.directTemplateLoading && (fileName.endsWith('.html') || fileName.endsWith('.svg'))) {
       return this.readFile(fileName);
     }
 
     if (this._resourceLoader) {
-      // These paths are meant to be used by the loader so we must denormalize them.
-      const denormalizedFileName = this.denormalizePath(normalize(fileName));
-
       return this._resourceLoader.get(denormalizedFileName);
     } else {
       return this.readFile(fileName);
@@ -359,14 +358,15 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     const modifiedFiles = new Set<string>();
 
     for (const changedFile of this._changedFiles) {
-      if (this._readResourceFiles.has(changedFile)) {
-        modifiedFiles.add(changedFile);
+      const denormalizedFileName = workaroundResolve(changedFile);
+      if (this._readResourceFiles.has(denormalizedFileName)) {
+        modifiedFiles.add(denormalizedFileName);
       }
 
       if (!this._resourceLoader) {
         continue;
       }
-      for (const resourcePath of this._resourceLoader.getAffectedResources(changedFile)) {
+      for (const resourcePath of this._resourceLoader.getAffectedResources(denormalizedFileName)) {
         modifiedFiles.add(resourcePath);
       }
     }
