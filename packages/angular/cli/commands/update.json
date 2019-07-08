@@ -57,6 +57,11 @@
         "allowDirty": {
           "description": "Whether to allow updating when the repository contains modified or untracked files.",
           "type": "boolean"
+        },
+        "verbose": {
+          "description": "Display additional details about internal operations during execution.",
+          "type": "boolean",
+          "default": false
         }
       }
     }
