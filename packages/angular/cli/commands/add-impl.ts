@@ -11,7 +11,7 @@ import { dirname, join } from 'path';
 import { intersects, prerelease, rcompare, satisfies, valid, validRange } from 'semver';
 import { isPackageNameSafeForAnalytics } from '../models/analytics';
 import { Arguments } from '../models/interface';
-import { SchematicCommand } from '../models/schematic-command';
+import { RunSchematicOptions, SchematicCommand } from '../models/schematic-command';
 import npmInstall from '../tasks/npm-install';
 import { colors } from '../utilities/color';
 import { getPackageManager } from '../utilities/package-manager';
@@ -65,6 +65,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
         packageMetadata = await fetchPackageMetadata(packageIdentifier.name, this.logger, {
           registry: options.registry,
           usingYarn,
+          verbose: options.verbose,
         });
       } catch (e) {
         this.logger.error('Unable to fetch package metadata: ' + e.message);
@@ -116,6 +117,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       try {
         const manifest = await fetchPackageManifest(packageIdentifier, this.logger, {
           registry: options.registry,
+          verbose: options.verbose,
           usingYarn,
         });
 
@@ -174,12 +176,10 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
     collectionName: string,
     options: string[] = [],
   ): Promise<number | void> {
-    const runOptions = {
+    const runOptions: RunSchematicOptions = {
       schematicOptions: options,
-      workingDir: this.workspace.root,
       collectionName,
       schematicName: 'ng-add',
-      allowPrivate: true,
       dryRun: false,
       force: false,
     };
