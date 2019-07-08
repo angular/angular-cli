@@ -11,7 +11,6 @@ import * as path from 'path';
 import * as semver from 'semver';
 import { Arguments, Option } from '../models/interface';
 import { SchematicCommand } from '../models/schematic-command';
-import { findUp } from '../utilities/find-up';
 import { getPackageManager } from '../utilities/package-manager';
 import {
   PackageIdentifier,
@@ -134,6 +133,7 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
         additionalOptions: {
           force: options.force || false,
           next: options.next || false,
+          verbose: options.verbose || false,
           packageManager,
           packages: options.all ? Object.keys(rootDependencies) : [],
         },
@@ -240,6 +240,7 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
           package: packageName,
           collection: migrations,
           from: options.from,
+          verbose: options.verbose || false,
           to: options.to || packageNode.package.version,
         },
       });
@@ -286,7 +287,7 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
       try {
         // Metadata requests are internally cached; multiple requests for same name
         // does not result in additional network traffic
-        metadata = await fetchPackageMetadata(packageName, this.logger);
+        metadata = await fetchPackageMetadata(packageName, this.logger, { verbose: options.verbose });
       } catch (e) {
         this.logger.error(`Error fetching metadata for '${packageName}': ` + e.message);
 
@@ -339,6 +340,7 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
       dryRun: !!options.dryRun,
       showNothingDone: false,
       additionalOptions: {
+        verbose: options.verbose || false,
         force: options.force || false,
         packageManager,
         packages: packagesToUpdate,

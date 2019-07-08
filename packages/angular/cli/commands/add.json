@@ -30,6 +30,11 @@
               "format": "hostname"
             }
           ]
+        },
+        "verbose": {
+          "description": "Display additional details about internal operations during execution.",
+          "type": "boolean",
+          "default": false
         }
       },
       "required": [
