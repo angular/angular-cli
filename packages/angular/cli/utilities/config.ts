@@ -78,7 +78,18 @@ export function getWorkspace(
     new NodeJsSyncHost(),
   );
 
-  workspace.loadWorkspaceFromHost(file).subscribe();
+  let error: unknown;
+  workspace.loadWorkspaceFromHost(file).subscribe({
+    error: e => error = e,
+  });
+
+  if (error) {
+    throw new Error(
+      `Workspace config file cannot le loaded: ${configPath}`
+      + `\n${error instanceof Error ? error.message : error}`
+    )
+  }
+
   cachedWorkspaces.set(level, workspace);
 
   return workspace;
@@ -116,7 +127,7 @@ export function getWorkspaceRaw(
   const ast = parseJsonAst(content, JsonParseMode.Loose);
 
   if (ast.kind != 'object') {
-    throw new Error('Invalid JSON');
+    throw new Error(`Invalid JSON file: ${configPath}`);
   }
 
   return [ast, configPath];
