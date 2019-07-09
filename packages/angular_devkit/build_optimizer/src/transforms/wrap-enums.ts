@@ -104,46 +104,30 @@ function visitBlockStatements(
             // skip IIFE statement
             oIndex++;
           }
-        } else if (ts.isObjectLiteralExpression(initializer)
-                   && initializer.properties.length === 0) {
-          const enumStatements = findTs2_2EnumStatements(name, statements, oIndex + 1);
-          if (enumStatements.length > 0) {
-            // create wrapper and replace variable statement and enum member statements
-            oldStatementsLength = enumStatements.length + 1;
-            newStatement = createWrappedEnum(
-              name,
-              currentStatement,
-              enumStatements,
-              initializer,
-            );
-            // skip enum member declarations
-            oIndex += enumStatements.length;
-          }
-        } else if (ts.isObjectLiteralExpression(initializer)
-          && initializer.properties.length !== 0) {
-          const literalPropertyCount = initializer.properties.length;
-
+        } else if (ts.isObjectLiteralExpression(initializer)) {
           // tsickle es2015 enums first statement is an export declaration
           const isPotentialEnumExport = ts.isExportDeclaration(statements[oIndex + 1]);
           if (isPotentialEnumExport) {
             // skip the export
-            oIndex ++;
+            oIndex++;
           }
 
-          const enumStatements = findEnumNameStatements(name, statements, oIndex + 1);
-          if (enumStatements.length === literalPropertyCount) {
-            // create wrapper and replace variable statement and enum member statements
-            oldStatementsLength = enumStatements.length + (isPotentialEnumExport ? 2 : 1);
-            newStatement = createWrappedEnum(
-              name,
-              currentStatement,
-              enumStatements,
-              initializer,
-              isPotentialEnumExport,
-            );
-            // skip enum member declarations
-            oIndex += enumStatements.length;
+          const enumStatements = findStatements(name, statements, oIndex + 1);
+          if (!enumStatements) {
+            continue;
           }
+
+          // create wrapper and replace variable statement and enum member statements
+          oldStatementsLength = enumStatements.length + (isPotentialEnumExport ? 2 : 1);
+          newStatement = createWrappedEnum(
+            name,
+            currentStatement,
+            enumStatements,
+            initializer,
+            isPotentialEnumExport,
+          );
+          // skip enum member declarations
+          oIndex += enumStatements.length;
         } else if (
           ts.isClassExpression(initializer)
           || (
@@ -151,7 +135,7 @@ function visitBlockStatements(
             && ts.isClassExpression(initializer.right)
           )
         ) {
-          const classStatements = findClassStatements(name, statements, oIndex);
+          const classStatements = findStatements(name, statements, oIndex);
           if (!classStatements) {
             continue;
           }
@@ -167,7 +151,7 @@ function visitBlockStatements(
       }
     } else if (ts.isClassDeclaration(currentStatement)) {
       const name = (currentStatement.name as ts.Identifier).text;
-      const classStatements = findClassStatements(name, statements, oIndex);
+      const classStatements = findStatements(name, statements, oIndex);
       if (!classStatements) {
         continue;
       }
@@ -215,31 +199,43 @@ function findTs2_3EnumIife(
     return null;
   }
 
-  let expression = statement.expression;
-  while (ts.isParenthesizedExpression(expression)) {
-    expression = expression.expression;
-  }
-
+  const expression = statement.expression;
   if (!expression || !ts.isCallExpression(expression) || expression.arguments.length !== 1) {
     return null;
   }
 
   const callExpression = expression;
-  let exportExpression;
+  let exportExpression: ts.Expression | undefined;
 
-  let argument = expression.arguments[0];
-  if (!ts.isBinaryExpression(argument)) {
+  if (!ts.isParenthesizedExpression(callExpression.expression)) {
     return null;
   }
 
-  if (!ts.isIdentifier(argument.left) || argument.left.text !== name) {
+  const functionExpression = callExpression.expression.expression;
+  if (!ts.isFunctionExpression(functionExpression)) {
+    return null;
+  }
+
+  // The name of the parameter can be different than the name of the enum if it was renamed
+  // due to scope hoisting.
+  const parameter = functionExpression.parameters[0];
+  if (!ts.isIdentifier(parameter.name)) {
+    return null;
+  }
+  const parameterName = parameter.name.text;
+
+  let argument = callExpression.arguments[0];
+  if (
+    !ts.isBinaryExpression(argument)
+    || !ts.isIdentifier(argument.left)
+    || argument.left.text !== name
+  ) {
     return null;
   }
 
   let potentialExport = false;
   if (argument.operatorToken.kind === ts.SyntaxKind.FirstAssignment) {
-    if (!ts.isBinaryExpression(argument.right)
-        || argument.right.operatorToken.kind !== ts.SyntaxKind.BarBarToken) {
+    if (ts.isBinaryExpression(argument.right) && argument.right.operatorToken.kind !== ts.SyntaxKind.BarBarToken) {
       return null;
     }
 
@@ -259,175 +255,23 @@ function findTs2_3EnumIife(
     exportExpression = argument.left;
   }
 
-  expression = expression.expression;
-  while (ts.isParenthesizedExpression(expression)) {
-    expression = expression.expression;
-  }
-
-  if (!expression || !ts.isFunctionExpression(expression) || expression.parameters.length !== 1) {
-    return null;
-  }
-
-  const parameter = expression.parameters[0];
-  if (!ts.isIdentifier(parameter.name)) {
-    return null;
-  }
-
-  // The name of the parameter can be different than the name of the enum if it was renamed
-  // due to scope hoisting.
-  const parameterName = parameter.name.text;
-
-  // In TS 2.3 enums, the IIFE contains only expressions with a certain format.
-  // If we find any that is different, we ignore the whole thing.
-  for (let bodyIndex = 0; bodyIndex < expression.body.statements.length; ++bodyIndex) {
-    const bodyStatement = expression.body.statements[bodyIndex];
-
-    if (!ts.isExpressionStatement(bodyStatement) || !bodyStatement.expression) {
-      return null;
+  // Go through all the statements and check that all match the name
+  for (const statement of functionExpression.body.statements) {
+    if (
+      !ts.isExpressionStatement(statement)
+      || !ts.isBinaryExpression(statement.expression)
+      || !ts.isElementAccessExpression(statement.expression.left)
+    ) {
+      return null
     }
 
-    if (!ts.isBinaryExpression(bodyStatement.expression)
-        || bodyStatement.expression.operatorToken.kind !== ts.SyntaxKind.FirstAssignment) {
-      return null;
-    }
-
-    const assignment = bodyStatement.expression.left;
-    const value = bodyStatement.expression.right;
-    if (!ts.isElementAccessExpression(assignment) || !ts.isStringLiteral(value)) {
-      return null;
-    }
-
-    if (!ts.isIdentifier(assignment.expression) || assignment.expression.text !== parameterName) {
-      return null;
-    }
-
-    const memberArgument = assignment.argumentExpression;
-    // String enum
-    if (ts.isStringLiteral(memberArgument)) {
-      return [callExpression, exportExpression];
-    }
-
-    // Non string enums
-    if (!ts.isBinaryExpression(memberArgument)
-      || memberArgument.operatorToken.kind !== ts.SyntaxKind.FirstAssignment) {
-      return null;
-    }
-
-    if (!ts.isElementAccessExpression(memberArgument.left)) {
-      return null;
-    }
-
-    if (!ts.isIdentifier(memberArgument.left.expression)
-      || memberArgument.left.expression.text !== parameterName) {
-      return null;
-    }
-
-    if (!memberArgument.left.argumentExpression
-        || !ts.isStringLiteral(memberArgument.left.argumentExpression)) {
-      return null;
-    }
-
-    if (memberArgument.left.argumentExpression.text !== value.text) {
+    const leftExpression = statement.expression.left.expression;
+    if (!ts.isIdentifier(leftExpression) || leftExpression.text !== parameterName) {
       return null;
     }
   }
 
   return [callExpression, exportExpression];
-}
-
-// TS 2.2 enums have statements after the variable declaration, with index statements followed
-// by value statements.
-function findTs2_2EnumStatements(
-  name: string,
-  statements: ts.NodeArray<ts.Statement>,
-  statementOffset: number,
-): ts.Statement[] {
-  const enumValueStatements: ts.Statement[] = [];
-  const memberNames: string[] = [];
-
-  let index = statementOffset;
-  for (; index < statements.length; ++index) {
-    // Ensure all statements are of the expected format and using the right identifer.
-    // When we find a statement that isn't part of the enum, return what we collected so far.
-    const current = statements[index];
-    if (!ts.isExpressionStatement(current) || !ts.isBinaryExpression(current.expression)) {
-      break;
-    }
-
-    const property = current.expression.left;
-    if (!property || !ts.isPropertyAccessExpression(property)) {
-      break;
-    }
-
-    if (!ts.isIdentifier(property.expression) || property.expression.text !== name) {
-      break;
-    }
-
-    memberNames.push(property.name.text);
-    enumValueStatements.push(current);
-  }
-
-  if (enumValueStatements.length === 0) {
-    return [];
-  }
-
-  const enumNameStatements = findEnumNameStatements(name, statements, index, memberNames);
-  if (enumNameStatements.length !== enumValueStatements.length) {
-    return [];
-  }
-
-  return enumValueStatements.concat(enumNameStatements);
-}
-
-// Tsickle enums have a variable statement with indexes, followed by value statements.
-// See https://github.com/angular/devkit/issues/229#issuecomment-338512056 fore more information.
-function findEnumNameStatements(
-  name: string,
-  statements: ts.NodeArray<ts.Statement>,
-  statementOffset: number,
-  memberNames?: string[],
-): ts.Statement[] {
-  const enumStatements: ts.Statement[] = [];
-
-  for (let index = statementOffset; index < statements.length; ++index) {
-    // Ensure all statements are of the expected format and using the right identifer.
-    // When we find a statement that isn't part of the enum, return what we collected so far.
-    const current = statements[index];
-    if (!ts.isExpressionStatement(current) || !ts.isBinaryExpression(current.expression)) {
-      break;
-    }
-
-    const access = current.expression.left;
-    const value = current.expression.right;
-    if (!access || !ts.isElementAccessExpression(access) || !value || !ts.isStringLiteral(value)) {
-      break;
-    }
-
-    if (memberNames && !memberNames.includes(value.text)) {
-      break;
-    }
-
-    if (!ts.isIdentifier(access.expression) || access.expression.text !== name) {
-      break;
-    }
-
-    if (!access.argumentExpression || !ts.isPropertyAccessExpression(access.argumentExpression)) {
-      break;
-    }
-
-    const enumExpression = access.argumentExpression.expression;
-    if (!ts.isIdentifier(enumExpression) || enumExpression.text !== name) {
-      break;
-    }
-
-    if (value.text !== access.argumentExpression.name.text) {
-      break;
-    }
-
-    enumStatements.push(current);
-  }
-
-  return enumStatements;
 }
 
 function updateHostNode(
@@ -456,7 +300,7 @@ function updateHostNode(
 }
 
 /**
- * Find class expression or declaration statements.
+ * Find enums, class expression or declaration statements.
  *
  * The classExpressions block to wrap in an iife must
  * - end with an ExpressionStatement
@@ -468,7 +312,7 @@ function updateHostNode(
  Foo = __decorate([]);
  ```
  */
-function findClassStatements(
+function findStatements(
   name: string,
   statements: ts.NodeArray<ts.Statement>,
   statementIndex: number,
@@ -484,11 +328,11 @@ function findClassStatements(
     const expression = statement.expression;
 
     if (ts.isCallExpression(expression)) {
-    // Ex:
-    // setClassMetadata(FooClass, [{}], void 0);
-    // __decorate([propDecorator()], FooClass.prototype, "propertyName", void 0);
-    // __decorate([propDecorator()], FooClass, "propertyName", void 0);
-    // __decorate$1([propDecorator()], FooClass, "propertyName", void 0);
+      // Ex:
+      // setClassMetadata(FooClass, [{}], void 0);
+      // __decorate([propDecorator()], FooClass.prototype, "propertyName", void 0);
+      // __decorate([propDecorator()], FooClass, "propertyName", void 0);
+      // __decorate$1([propDecorator()], FooClass, "propertyName", void 0);
       const args = expression.arguments;
 
       if (args.length > 2) {
@@ -508,8 +352,9 @@ function findClassStatements(
         ? expression.left.left
         : expression.left;
 
-      const leftExpression = ts.isPropertyAccessExpression(node)
+      const leftExpression = ts.isPropertyAccessExpression(node) || ts.isElementAccessExpression(node)
         // Static Properties // Ex: Foo.bar = 'value';
+        // ENUM Property // Ex:  ChangeDetectionStrategy[ChangeDetectionStrategy.Default] = "Default";
         ? node.expression
         // Ex: FooClass = __decorate([Component()], FooClass);
         : node;
