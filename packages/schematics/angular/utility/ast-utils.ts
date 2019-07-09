@@ -622,8 +622,8 @@ export function addRouteDeclarationToModule(
 
   // Check if the route declarations array is
   // an inlined argument of RouterModule or a standalone variable
-  if (routesArg.kind === ts.SyntaxKind.ArrayLiteralExpression) {
-    routesArr = routesArg as ts.ArrayLiteralExpression;
+  if (ts.isArrayLiteralExpression(routesArg)) {
+    routesArr = routesArg;
   } else {
     const routesVarName = routesArg.getText();
     let routesVar;
@@ -642,8 +642,8 @@ export function addRouteDeclarationToModule(
         `to router module at line ${line} in ${fileToAdd}`,
       );
     }
-    const arrExpr = findNodes(routesVar, ts.SyntaxKind.ArrayLiteralExpression).pop();
-    routesArr = arrExpr as ts.ArrayLiteralExpression;
+
+    routesArr = findNodes(routesVar, ts.SyntaxKind.ArrayLiteralExpression, 1)[0] as ts.ArrayLiteralExpression;
   }
 
   const occurencesCount = routesArr.elements.length;
