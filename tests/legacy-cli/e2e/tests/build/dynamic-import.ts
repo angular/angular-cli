@@ -14,6 +14,10 @@ export default async function() {
     ];
   });
 
+  await updateJsonFile('tsconfig.app.json', tsConfig => {
+    tsConfig.files.push('src/app/lazy/lazy.module.ts');
+  });
+
   // Update the app component to use the lazy module
   await writeFile('src/app/app.component.ts', `
     import { Component, SystemJsNgModuleLoader } from '@angular/core';

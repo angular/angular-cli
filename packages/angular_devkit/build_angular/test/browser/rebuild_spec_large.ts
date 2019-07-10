@@ -15,7 +15,7 @@ import {
   host,
   ivyEnabled,
   lazyModuleFiles,
-  lazyModuleStringImport,
+  lazyModuleFnImport,
 } from '../utils';
 
 describe('Browser Builder rebuilds', () => {
@@ -84,7 +84,7 @@ describe('Browser Builder rebuilds', () => {
               // No lazy chunk should exist.
               if (!hasLazyChunk) {
                 phase = 2;
-                host.writeMultipleFiles({ ...lazyModuleFiles, ...lazyModuleStringImport });
+                host.writeMultipleFiles({ ...lazyModuleFiles, ...lazyModuleFnImport });
               }
               break;
 

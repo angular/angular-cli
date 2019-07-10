@@ -82,19 +82,19 @@ export default async function () {
     buildTarget['configurations']['production'] = { aot: true };
   });
 
-  // Test string import.
-  // Both Ivy and View Engine should support it.
-  await replaceLoadChildren(`'./lazy/lazy.module#LazyModule'`);
-  await ng('e2e');
-  await ng('e2e', '--prod');
-
   // Test `import()` style lazy load.
   // Both Ivy and View Engine should support it.
   await replaceLoadChildren(`() => import('./lazy/lazy.module').then(m => m.LazyModule)`);
 
-  // TODO: remove cast after https://github.com/angular/angular/pull/29832 is released.
-  await replaceInFile(appRoutingModulePath, '];', '] as Routes;');
+  await ng('e2e');
+  await ng('e2e', '--prod');
 
+  // Test string import.
+  // Both Ivy and View Engine should support it.
+  await updateJsonFile('tsconfig.app.json', tsConfig => {
+    tsConfig.files.push('src/app/lazy/lazy.module.ts');
+  });
+  await replaceLoadChildren(`'./lazy/lazy.module#LazyModule'`);
   await ng('e2e');
   await ng('e2e', '--prod');
 }

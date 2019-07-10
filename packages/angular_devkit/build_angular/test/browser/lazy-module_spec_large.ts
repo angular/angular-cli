@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { TestLogger } from '@angular-devkit/architect/testing';
+import { TestLogger, TestProjectHost } from '@angular-devkit/architect/testing';
 import { take, tap, timeout } from 'rxjs/operators';
 import {
   browserBuild,
@@ -30,6 +30,21 @@ describe('Browser Builder lazy modules', () => {
   });
   afterEach(async () => host.restore().toPromise());
 
+  function addLazyLoadedModulesInTsConfig(host: TestProjectHost, lazyModuleFiles: Record<string, string>) {
+    const files = [
+      ...Object.keys(lazyModuleFiles),
+      'main.ts',
+    ]
+    .map(f => '"' + f.replace('src/', '') + '"')
+    .join(', ');
+
+    host.replaceInFile(
+      'src/tsconfig.app.json',
+      '"main.ts"',
+      `${files}`,
+    );
+  }
+
   const cases: [string, Record<string, string>][] = [
     ['string', lazyModuleStringImport],
     ['function', lazyModuleFnImport],
@@ -39,6 +54,10 @@ describe('Browser Builder lazy modules', () => {
       it('supports lazy bundle for lazy routes with JIT', async () => {
         host.writeMultipleFiles(lazyModuleFiles);
         host.writeMultipleFiles(imports);
+
+        if (name === 'string') {
+          addLazyLoadedModulesInTsConfig(host, lazyModuleFiles);
+        }
 
         const { files } = await browserBuild(architect, host, target);
         expect('lazy-lazy-module.js' in files).toBe(true);
@@ -91,6 +110,7 @@ describe('Browser Builder lazy modules', () => {
       it('supports lazy bundle for lazy routes with AOT', async () => {
         host.writeMultipleFiles(lazyModuleFiles);
         host.writeMultipleFiles(imports);
+        addLazyLoadedModulesInTsConfig(host, lazyModuleFiles);
 
         const { files } = await browserBuild(architect, host, target, { aot: true });
         if (ivyEnabled) {
@@ -131,10 +151,13 @@ describe('Browser Builder lazy modules', () => {
   });
 
   it(`supports lazy bundle for System.import() calls`, async () => {
-    host.writeMultipleFiles({
+    const lazyfiles = {
       'src/lazy-module.ts': 'export const value = 42;',
       'src/main.ts': `declare var System: any; System.import('./lazy-module');`,
-    });
+    };
+
+    host.writeMultipleFiles(lazyfiles);
+    addLazyLoadedModulesInTsConfig(host, lazyfiles);
 
     const { files } = await browserBuild(architect, host, target);
     expect(files['lazy-module.js']).not.toBeUndefined();
@@ -199,6 +222,7 @@ describe('Browser Builder lazy modules', () => {
         }`,
     });
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
+    addLazyLoadedModulesInTsConfig(host, lazyModuleFiles);
 
     const { files } = await browserBuild(architect, host, target, {
       lazyModules: ['src/app/lazy/lazy.module'],
@@ -227,6 +251,7 @@ describe('Browser Builder lazy modules', () => {
         }`,
     });
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
+    addLazyLoadedModulesInTsConfig(host, lazyModuleFiles);
     const { files } = await browserBuild(architect, host, target, {
       lazyModules: ['src/app/lazy/lazy.module'],
       aot: true,

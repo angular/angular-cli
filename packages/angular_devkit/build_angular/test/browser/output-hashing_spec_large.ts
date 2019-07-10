@@ -13,7 +13,7 @@ import {
   createArchitect,
   host,
   lazyModuleFiles,
-  lazyModuleStringImport,
+  lazyModuleFnImport,
 } from '../utils';
 
 describe('Browser Builder output hashing', () => {
@@ -68,7 +68,7 @@ describe('Browser Builder output hashing', () => {
     let newHashes: Map<string, string>;
 
     host.writeMultipleFiles(lazyModuleFiles);
-    host.writeMultipleFiles(lazyModuleStringImport);
+    host.writeMultipleFiles(lazyModuleFnImport);
 
     const overrides = { outputHashing: 'all', extractCss: true };
 
@@ -79,7 +79,7 @@ describe('Browser Builder output hashing', () => {
     // Save the current hashes.
     oldHashes = generateFileHashMap();
     host.writeMultipleFiles(lazyModuleFiles);
-    host.writeMultipleFiles(lazyModuleStringImport);
+    host.writeMultipleFiles(lazyModuleFnImport);
 
     await browserBuild(architect, host, target, overrides);
     newHashes = generateFileHashMap();
@@ -117,7 +117,7 @@ describe('Browser Builder output hashing', () => {
   it('supports options', async () => {
     host.writeMultipleFiles({ 'src/styles.css': `h1 { background: url('./spectrum.png')}` });
     host.writeMultipleFiles(lazyModuleFiles);
-    host.writeMultipleFiles(lazyModuleStringImport);
+    host.writeMultipleFiles(lazyModuleFnImport);
 
     // We must do several builds instead of a single one in watch mode, so that the output
     // path is deleted on each run and only contains the most recent files.

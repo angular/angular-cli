@@ -23,11 +23,13 @@ describe('Browser Builder errors', () => {
   it('shows error when files are not part of the compilation', async () => {
     host.replaceInFile(
       'src/tsconfig.app.json',
-      '"compilerOptions": {',
-      `
-      "files": ["main.ts"],
-      "compilerOptions": {
-    `,
+      /,\r?\n?\s*"polyfills\.ts"/,
+      '',
+    );
+    host.replaceInFile(
+      'src/tsconfig.app.json',
+      '"**/*.ts"',
+      '"**/*.d.ts"',
     );
     const logger = new logging.Logger('');
     const logs: string[] = [];
