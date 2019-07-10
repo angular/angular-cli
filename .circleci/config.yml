@@ -12,14 +12,18 @@ version: 2.1
 # Variables
 
 ## IMPORTANT
-# If you change the cache key prefix, also sync the restore_cache fallback to match.
+# If you change the cache key prefix, also sync the fallback_cache_key fallback to match.
 # Keep the static part of the cache key as prefix to enable correct fallbacks.
+# Windows needs its own cache key because binaries in node_modules are different.
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
 var_1: &cache_key angular_devkit-0.11.0-{{ checksum "yarn.lock" }}
-var_2: &default_nodeversion "12.9"
-var_3: &attach_options
+var_2: &cache_key_fallback angular_devkit-0.11.0
+var_1_win: &cache_key_win angular_devkit-win-0.11.0-{{ checksum "yarn.lock" }}
+var_2_win: &cache_key_fallback_win angular_devkit-win-0.11.0
+var_3: &default_nodeversion "12.9"
+var_4: &attach_options
   at: .
-var_4: &ignore_pull_requests
+var_5: &ignore_pull_requests
   filters:
     branches:
       ignore:
@@ -60,24 +64,13 @@ executors:
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-commands
 commands:
   setup_windows:
-    steps:
-      - checkout
+    steps:     
       - run:
-          # Need to install node and yarn before, as the base windows image doesn't have anything.
-          # TODO: remove when CircleCI provides preconfigured node images/VMs.
+          # Need to install node and yarn before to ensure correct versions.
           name: Setup windows node environment
-          command: ./.circleci/windows-env.ps1
-      # TODO: remove commands other than the e2e runner when workspaces on windows are well supported.
-      - run:
-          name: Rebase PR on target branch
-          command: >
-            if (Test-Path env:CIRCLE_PR_NUMBER) {
-              git config user.name "angular-ci"
-              git config user.email "angular-ci"
-              node tools\rebase-pr.js angular/angular-cli $env:CIRCLE_PR_NUMBER }
+          command: ./.circleci/windows-env.ps1             
       - run: node --version
       - run: yarn --version
-      - run: yarn install --frozen-lockfile
 
   setup_bazel_rbe:
     parameters:
@@ -108,7 +101,7 @@ commands:
 
 # Job definitions
 jobs:
-  install:
+  setup:
     executor: action-executor
     steps:
       - checkout
@@ -127,8 +120,7 @@ jobs:
       - restore_cache:
           keys:
             - *cache_key
-            # This fallback should be the cache_key without variables.
-            - angular_devkit-0.11.0-
+            - *cache_key_fallback
       - run: yarn install --frozen-lockfile
       - persist_to_workspace:
           root: .
@@ -294,45 +286,60 @@ jobs:
   # Windows jobs
   # CircleCI support for Windows jobs is still in preview.
   # Docs: https://github.com/CircleCI-Public/windows-preview-docs
+  setup-and-build-win:
+    executor: windows-executor
+    steps:
+      - attach_workspace: *attach_options
+      - setup_windows              
+      - restore_cache:
+          keys:
+            - *cache_key_win
+            - *cache_key_fallback_win
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - save_cache:
+          key: *cache_key_win
+          paths:
+            # Get cache dir on windows via `yarn cache dir`
+            - C:\Users\circleci\AppData\Local\Yarn\Cache\v4
+      # Only jobs downstream from this one will see the updated workspace
+      # https://circleci.com/blog/deep-diving-into-circleci-workspaces/
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./*            
+
   test-win:
     executor: windows-executor
-    # Skipping cache and workspace for now because it takes 10x longer than on linux.
-    # TODO: when/if CircleCI makes them faster, use cache and workspaces fully.
-    # Notes:
-    # - windows needs its own cache key because binaries in node_modules are different.
-    # - windows might need its own workspace for the same reason.
-    # - get cache dir on windows via `yarn cache dir` (was `C:\Users\circleci\AppData\Local\Yarn\Cache\v4` last time)
     steps:
+      - attach_workspace: *attach_options
       - setup_windows
-      # Build and test should be on their own jobs, but restoring workspaces is too slow
-      # so we do it here.
-      - run: yarn build
       - run: yarn test --full
       # Run partial e2e suite on PRs only. Master will run the full e2e suite with sharding.
-      - run: if (Test-Path env:CIRCLE_PR_NUMBER) { node tests\legacy-cli\run_e2e.js "--glob=tests/basic/**" }
+      - run: if (Test-Path env:CIRCLE_PR_NUMBER) { node tests\legacy-cli\run_e2e.js "--glob=tests/{basic,ivy}/**" }
              
   e2e-cli-win:
     executor: windows-executor
     parallelism: 4
     steps:
       - setup_windows
-      - run: yarn build
       - run: node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
 
 workflows:
   version: 2
   default_workflow:
     jobs:
-      - install
+      # Linux jobs
+      - setup
       - lint:
           requires:
-            - install
+            - setup
       - validate:
           requires:
-            - install
+            - setup
       - build:
           requires:
-            - install
+            - setup
           filters:
             branches:
               ignore:
@@ -343,9 +350,6 @@ workflows:
       - test:
           requires:
             - build
-      - test-win:
-          requires:
-            - test
       - test-large:
           requires:
             - build
@@ -398,16 +402,33 @@ workflows:
           <<: *ignore_pull_requests
           requires:
             - e2e-cli
-      - e2e-cli-win:
-          <<: *ignore_pull_requests
-          requires:
-            - e2e-cli
       - test-browsers:
           requires:
             - build
       - flake-jail:
           requires:
+            - build            
+      
+      # Windows jobs
+      # These jobs only run after their non-windows counterparts finish successfully.
+      # This isn't strictly necessary as there is no artifact dependency, but helps economize
+      # CI resources by not attempting to build when we know it should fail.
+      - setup-and-build-win:
+          requires:
+            # The Linux setup job also does checkout and rebase, which we get via the workspace.
+            - setup
             - build
+      - test-win:
+          requires:
+            - setup-and-build-win
+            - test
+      - e2e-cli-win:
+          <<: *ignore_pull_requests
+          requires:
+            - setup-and-build-win
+            - e2e-cli
+      
+      # Publish jobs
       - snapshot_publish:
           <<: *ignore_pull_requests
           requires:
