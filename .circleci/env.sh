@@ -4,6 +4,7 @@
 readonly projectDir=$(realpath "$(dirname ${BASH_SOURCE[0]})/..")
 readonly envHelpersPath="$projectDir/.circleci/env-helpers.inc.sh";
 
+echo $BASH_ENV;
 # Load helpers and make them available everywhere (through `$BASH_ENV`).
 source $envHelpersPath;
 echo "source $envHelpersPath;" >> $BASH_ENV;

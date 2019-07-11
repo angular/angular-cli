@@ -212,6 +212,29 @@ jobs:
             PATH=~/.npm-global/bin:$PATH npm install --global npm
       - run: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
+  test-browsers:
+    executor:
+      name: test-executor
+    environment:
+      E2E_BROWSERS: true
+    steps:
+      - attach_workspace: *attach_options
+      - run:
+          name: Initialize Environment
+          command: ./.circleci/env.sh
+      - run:
+          name: Initialize Saucelabs
+          command: setSecretVar SAUCE_ACCESS_KEY $(echo $SAUCE_ACCESS_KEY | rev)
+      - run:
+          name: Start Saucelabs Tunnel
+          command: ./scripts/saucelabs/start-tunnel.sh
+          background: true
+        # Waits for the Saucelabs tunnel to be ready. This ensures that we don't run tests
+        # too early without Saucelabs not being ready.
+      - run: ./scripts/saucelabs/wait-for-tunnel.sh
+      - run: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts
+      - run: ./scripts/saucelabs/stop-tunnel.sh
+
   build:
     executor: action-executor
     steps:
@@ -289,77 +312,80 @@ workflows:
   default_workflow:
     jobs:
       - install
-      - lint:
+      # - lint:
+      #     requires:
+      #       - install
+      # - validate:
+      #     requires:
+      #       - install
+      # - build:
+      #     requires:
+      #       - install
+      #     filters:
+      #       branches:
+      #         ignore:
+      #         - /docs-preview/
+      # - build-bazel:
+      #     requires:
+      #       - build
+      # - test:
+      #     requires:
+      #       - build
+      # - test-win:
+      #     requires:
+      #       - test
+      # - test-large:
+      #     requires:
+      #       - build
+      # - test-large:
+      #     name: test-large-ivy
+      #     ivy: true
+      #     glob: "packages/angular_devkit/build_angular/test/browser/*_spec_large.ts"
+      #     requires:
+      #       - build
+      # - e2e-cli:
+      #     post-steps:
+      #       - store_artifacts:
+      #           path: /tmp/dist
+      #           destination: cli/new-production
+      #     requires:
+      #       - build
+      # - e2e-cli:
+      #     name: e2e-cli-ivy
+      #     ivy: true
+      #     requires:
+      #       - build
+      # - e2e-cli:
+      #     name: e2e-cli-ng-snapshots
+      #     snapshots: true
+      #     <<: *ignore_pull_requests
+      #     requires:
+      #       - e2e-cli
+      # - e2e-cli-node-10:
+      #     <<: *ignore_pull_requests
+      #     requires:
+      #       - e2e-cli
+      # - e2e-cli-win:
+      #     <<: *ignore_pull_requests
+      #     requires:
+      #       - e2e-cli
+      - test-browsers:
           requires:
             - install
-      - validate:
-          requires:
-            - install
-      - build:
-          requires:
-            - install
-          filters:
-            branches:
-              ignore:
-              - /docs-preview/
-      - build-bazel:
-          requires:
-            - build
-      - test:
-          requires:
-            - build
-      - test-win:
-          requires:
-            - test
-      - test-large:
-          requires:
-            - build
-      - test-large:
-          name: test-large-ivy
-          ivy: true
-          glob: "packages/angular_devkit/build_angular/test/browser/*_spec_large.ts"
-          requires:
-            - build
-      - e2e-cli:
-          post-steps:
-            - store_artifacts:
-                path: /tmp/dist
-                destination: cli/new-production
-          requires:
-            - build
-      - e2e-cli:
-          name: e2e-cli-ivy
-          ivy: true
-          requires:
-            - build
-      - e2e-cli:
-          name: e2e-cli-ng-snapshots
-          snapshots: true
-          <<: *ignore_pull_requests
-          requires:
-            - e2e-cli
-      - e2e-cli-node-10:
-          <<: *ignore_pull_requests
-          requires:
-            - e2e-cli
-      - e2e-cli-win:
-          <<: *ignore_pull_requests
-          requires:
-            - e2e-cli
-      - snapshot_publish:
-          <<: *ignore_pull_requests
-          requires:
-            - test
-            - build
-            - e2e-cli
-      - publish:
-          requires:
-            - test
-            - build
-            - e2e-cli
-            - snapshot_publish
-          filters:
-            tags:
-              only: /^v\d+/
-            branches:
-              ignore: /.*/
+      # - snapshot_publish:
+      #     <<: *ignore_pull_requests
+      #     requires:
+      #       - test
+      #       - build
+      #       - e2e-cli
+      # - publish:
+      #     requires:
+      #       - test
+      #       - build
+      #       - e2e-cli
+      #       - snapshot_publish
+      #     filters:
+      #       tags:
+      #         only: /^v\d+/
+      #       branches:
+      #         ignore: /.*/
