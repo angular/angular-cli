@@ -407,6 +407,20 @@ function _addLiveReload(
     webpackConfig.plugins = [];
   }
 
+  // Enable the internal node plugins but no individual shims
+  // This is needed to allow module specific rules to include node shims
+  // Only needed in dev server mode to support live reload capabilities in all package managers
+  if (webpackConfig.node === false) {
+    webpackConfig.node = {
+      global: false,
+      process: false,
+      __filename: false,
+      __dirname: false,
+      Buffer: false,
+      setImmediate: false,
+    };
+  }
+
   // This allows for live reload of page when changes are made to repo.
   // https://webpack.js.org/configuration/dev-server/#devserver-inline
   let webpackDevServerPath;
