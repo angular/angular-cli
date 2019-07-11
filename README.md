@@ -71,10 +71,11 @@ Moved to [/docs/gotchas.md](/docs/gotchas.md)
 ## In Progress
 - Better internal performance and stress tests
 - Make it easier to write unit tests for Universal components
-- Make it easier to support other 3rd part libraries like jQuery/d3 that aren't Universal aware
 - Node.js bridge protocol to communicate with different language backends - Django, Go, PHP etc.
 
 ## Planning
+- Static site rendering
+- Development server/watch mode builder with livereload for CLI
 - Full client rehydration strategy that reuses DOM elements/CSS rendered on the server
 
 # Upgrading from Angular2-Universal
