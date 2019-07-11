@@ -212,6 +212,29 @@ jobs:
             PATH=~/.npm-global/bin:$PATH npm install --global npm
       - run: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
+  test-browsers:
+    executor:
+      name: test-executor
+    environment:
+      E2E_BROWSERS: true
+    steps:
+      - attach_workspace: *attach_options
+      - run:
+          name: Initialize Environment
+          command: ./.circleci/env.sh
+      - run:
+          name: Initialize Saucelabs
+          command: setSecretVar SAUCE_ACCESS_KEY $(echo $SAUCE_ACCESS_KEY | rev)
+      - run:
+          name: Start Saucelabs Tunnel
+          command: ./scripts/saucelabs/start-tunnel.sh
+          background: true
+        # Waits for the Saucelabs tunnel to be ready. This ensures that we don't run tests
+        # too early without Saucelabs not being ready.
+      - run: ./scripts/saucelabs/wait-for-tunnel.sh
+      - run: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts
+      - run: ./scripts/saucelabs/stop-tunnel.sh
+
   build:
     executor: action-executor
     steps:
@@ -346,6 +369,9 @@ workflows:
           <<: *ignore_pull_requests
           requires:
             - e2e-cli
+      - test-browsers:
+          requires:
+            - build
       - snapshot_publish:
           <<: *ignore_pull_requests
           requires:
