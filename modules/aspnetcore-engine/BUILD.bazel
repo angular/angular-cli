@@ -24,7 +24,7 @@ ng_package(
     srcs = [
         ":package.json",
     ],
-    entry_point = "modules/aspnetcore-engine/index.js",
+    entry_point = ":index.ts",
     readme_md = ":README.md",
     tags = ["release"],
     deps = [

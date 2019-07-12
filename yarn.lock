@@ -55,10 +55,10 @@
   dependencies:
     tslib "^1.9.0"
 
-"@angular/bazel@8.0.0":
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/bazel/-/bazel-8.0.0.tgz#eead29b37f0fa6b469c735165a19d688a4a0106c"
-  integrity sha512-KnuE2yB9VBFetxoBVbnBqdYzeAw2O00ed9a+KPg1YZbbaXc7M5xXBALQ9jyohjDTBzUB5EQ4SrgTeccfJxjKIg==
+"@angular/bazel@^8.1.0":
+  version "8.1.1"
+  resolved "https://registry.yarnpkg.com/@angular/bazel/-/bazel-8.1.1.tgz#d4bbd4f312626953daf3262681cad5417dfa2b89"
+  integrity sha512-16sDRUuKMWR1HfOZy5nPQegUv34uk6aee7yCQ184BwZNOcWJYBGxhIX/mLS1qd9m9MeM9Bb6SR+jQBfjqz/ssQ==
   dependencies:
     "@angular-devkit/architect" "^0.800.0-beta.15"
     "@angular-devkit/core" "^8.0.0-beta.15"
@@ -147,71 +147,83 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@bazel/bazel-darwin_x64@0.24.1":
-  version "0.24.1"
-  resolved "https://registry.yarnpkg.com/@bazel/bazel-darwin_x64/-/bazel-darwin_x64-0.24.1.tgz#11479d0548d83fea22e664452d3e70c5f2edf94e"
-  integrity sha512-EF2WlPIQeq4zhkwwSCDJncG/rA1C2xnjUynabzB04KOxEBj0lveqYLgoCvs6L3Y+1vp2TQJmKGVEG6GpYb4uUA==
+"@bazel/bazel-darwin_x64@0.27.0":
+  version "0.27.0"
+  resolved "https://registry.yarnpkg.com/@bazel/bazel-darwin_x64/-/bazel-darwin_x64-0.27.0.tgz#83a03c92d52ae60e48e86a1ee697e69e12ddbdf6"
+  integrity sha512-CyavIbRKRa/55aMyfEM9hjbt4TVISfv7HLeymHTGTLWzS8uQokQ8W9tR/pgc7YJn8F0x64dd7nQKxhbYHM1Qfg==
 
-"@bazel/bazel-linux_x64@0.24.1":
-  version "0.24.1"
-  resolved "https://registry.yarnpkg.com/@bazel/bazel-linux_x64/-/bazel-linux_x64-0.24.1.tgz#59c61c4ed885fd7ceed1bc9d605db563a51b83bd"
-  integrity sha512-oFLpfUOzZK4VSOM49FMJjb5UOJ5HXpTZ+zBOVO0hfK+oAkRaRfZjQZoKm6wa67MxfvU4tP/LDWcw7uj6swaGLw==
+"@bazel/bazel-linux_x64@0.27.0":
+  version "0.27.0"
+  resolved "https://registry.yarnpkg.com/@bazel/bazel-linux_x64/-/bazel-linux_x64-0.27.0.tgz#2358292aa4901f526ba9b90874256f63d6d6608c"
+  integrity sha512-hO04v7C6M3Jf+qNlLE+IticZZKkkS7Nv6+pXDnENgFWrqLV2H93un6kNQnk83B0hP2cEqRQ8rw5yrIcqXNNuSQ==
 
-"@bazel/bazel-win32_x64@0.24.1":
-  version "0.24.1"
-  resolved "https://registry.yarnpkg.com/@bazel/bazel-win32_x64/-/bazel-win32_x64-0.24.1.tgz#ebc7b9958a5d0bb5ccca761852bcc750d07ec343"
-  integrity sha512-s+zFYNawvzDLnb0TBY4LmkT+8ZfjMJ6/dyVnH6w8Q24mevnJqTBflcPJUlXoLRCAtaK/S3+1KOfKPccIwDNDDg==
+"@bazel/bazel-win32_x64@0.27.0":
+  version "0.27.0"
+  resolved "https://registry.yarnpkg.com/@bazel/bazel-win32_x64/-/bazel-win32_x64-0.27.0.tgz#0e5e498de5ccccc9a6cf481cd46904ee938ab6c2"
+  integrity sha512-7hIGNhdgaxRt9ceSOCs3eSTtCNi4GXz3nu6OjfgSp+QiqLbW/iAVWa8M8vD5aemZ1BSHek4/LISdWUTncLJk+w==
 
-"@bazel/bazel@0.24.1":
-  version "0.24.1"
-  resolved "https://registry.yarnpkg.com/@bazel/bazel/-/bazel-0.24.1.tgz#15380c4d5945de47c7be1e3a83e9a8d1607aa33b"
-  integrity sha512-iTTUqdI2dX4S+fQOGbhr84jRRv9FbYr8GX3L69Z/HurgcDrgErOKo1LGtOuSYqZYaEvQ+ZpV0aP7OzaUsv59WA==
+"@bazel/bazel@^0.27.0":
+  version "0.27.0"
+  resolved "https://registry.yarnpkg.com/@bazel/bazel/-/bazel-0.27.0.tgz#4e72c8e1cbb4da41022b6de1afe28731f5f58e09"
+  integrity sha512-yIj64IkesNzjHsoeehQUMBOgrCK/JMSuon5CvBqo6+izPXAmt+OW05uqaLL/FPAYAFQ2mHxsYtDsPxsM8DUbqA==
   optionalDependencies:
-    "@bazel/bazel-darwin_x64" "0.24.1"
-    "@bazel/bazel-linux_x64" "0.24.1"
-    "@bazel/bazel-win32_x64" "0.24.1"
+    "@bazel/bazel-darwin_x64" "0.27.0"
+    "@bazel/bazel-linux_x64" "0.27.0"
+    "@bazel/bazel-win32_x64" "0.27.0"
 
-"@bazel/buildifier-darwin_x64@0.22.0":
-  version "0.22.0"
-  resolved "https://registry.yarnpkg.com/@bazel/buildifier-darwin_x64/-/buildifier-darwin_x64-0.22.0.tgz#00dde7ce03be8c550b3908dd91cf1fc0baef7ff7"
-  integrity sha512-tpJ6w3mmh8wBm/k5AidAZvjWm3Hge3ipSjGtxTfq/xgUCacAtGt219nwyAMs0CwLPuABLbcINQmmKtG5VpxK9A==
+"@bazel/buildifier-darwin_x64@0.25.1":
+  version "0.25.1"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier-darwin_x64/-/buildifier-darwin_x64-0.25.1.tgz#bcb8643ae46c6aa4f4981f59648ecd9087b30a11"
+  integrity sha512-9fD3tXYgSjpZCEUGFBadfwDw89b3z3acYLd8+a0F6Sb/9LB0jzXOCMzqFMA7m1b3wOh1ecgWOyT0TyPUDSLRkg==
 
-"@bazel/buildifier-linux_x64@0.22.0":
-  version "0.22.0"
-  resolved "https://registry.yarnpkg.com/@bazel/buildifier-linux_x64/-/buildifier-linux_x64-0.22.0.tgz#146c44bafbb1e4711725414582a49835d04b8618"
-  integrity sha512-qaE7QF2YHKOXFBk2QcwOBfA3Ipm08vP9ZK9Vxtubbq9O0MM5tWvfKI48VkfX6pg8QNXDJ+sBndznxQSSWstsWQ==
+"@bazel/buildifier-linux_x64@0.25.1":
+  version "0.25.1"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier-linux_x64/-/buildifier-linux_x64-0.25.1.tgz#50cc7c3b8f9dfa818ea6cc9f2ec761cbd39471ea"
+  integrity sha512-Wt2yA+yeimi6i0USHoE1T2EhRJwtKDBmDLQx2E8Q+QXysULLm4usMEIGPdQYbHqKyjL75jbwlwZTlm9EzdXgCg==
 
-"@bazel/buildifier@0.22.0":
-  version "0.22.0"
-  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-0.22.0.tgz#d1abc2ce4317ba71351276c6b1b9e1533abf8e3d"
-  integrity sha512-S+mrUwanR8HMcp92iEDk4D1oOLsVhCM42Hx0rqL1eVmXPwLYL+F/sIjeGTw/6BgxMEHVSl2M3CcTFAS0b60BTQ==
+"@bazel/buildifier-win32_x64@0.25.1":
+  version "0.25.1"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier-win32_x64/-/buildifier-win32_x64-0.25.1.tgz#d990afed296f65675c1406ae36580473cab65f4c"
+  integrity sha512-ak91iv940z04NJfEhWHMSudjlZK5PrpDNL8k/cmYowi1JSfYvCchfABiXWxfWURmvqgSGE+KV72xxZ0HLU60bw==
+
+"@bazel/buildifier@^0.25.1":
+  version "0.25.1"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-0.25.1.tgz#e29ab77802d99d70a891b9a471f62e80030fc326"
+  integrity sha512-d3+DgsGmQ3cSLCm99321cl+vKD/c3pNSQINCBnipmNeNd7UA3/UQ2Ibp6MXZslF8fMQDpuLxhhCFUOnFAoNWsw==
   optionalDependencies:
-    "@bazel/buildifier-darwin_x64" "0.22.0"
-    "@bazel/buildifier-linux_x64" "0.22.0"
+    "@bazel/buildifier-darwin_x64" "0.25.1"
+    "@bazel/buildifier-linux_x64" "0.25.1"
+    "@bazel/buildifier-win32_x64" "0.25.1"
 
-"@bazel/ibazel@0.10.1":
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/@bazel/ibazel/-/ibazel-0.10.1.tgz#cebcc5cf045fd0e7957e2c491b60094fce28667a"
-  integrity sha512-voH62lpUySr7ukobBqcqYYDWwIAPUpLURE/IFpejKZuomiyR3k/CqJYhWOcWmMwYTNUnONri27PF+j6BK/J2Gw==
+"@bazel/hide-bazel-files@^0.32.2":
+  version "0.32.2"
+  resolved "https://registry.yarnpkg.com/@bazel/hide-bazel-files/-/hide-bazel-files-0.32.2.tgz#a482855eafbccb56b1fce0d92ff922c2c6e0a90c"
+  integrity sha512-585XY53mhMZaCjEQJ+aDqkmydWZbuXsKrZsSpoW9YeAVEH0poQY3YhdyCPmMVBo7/l1mkrqpFuOK5BpECfwdtA==
 
-"@bazel/jasmine@0.27.12":
-  version "0.27.12"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-0.27.12.tgz#9319d1fb52723da8ec23d4ce507dc9eb202d4e31"
-  integrity sha512-olsKMLsfqA6F025EPn0glJal4DB0v4E2ISL+0Hu2piewAtjv8DARU0dxzyizgH1X20BooIlgq+ZL2cKdlXfMHg==
+"@bazel/ibazel@^0.10.3":
+  version "0.10.3"
+  resolved "https://registry.yarnpkg.com/@bazel/ibazel/-/ibazel-0.10.3.tgz#2e2b8a1d3e885946eac41db2b1aa6801fb319887"
+  integrity sha512-v1nXbMTHVlMM4z4uWp6XiRoHAyUlYggF1SOboLLWRp0+D22kWixqArWqnozLw2mOtnxr97BdLjluWiho6A8Hjg==
+
+"@bazel/jasmine@^0.32.2":
+  version "0.32.2"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-0.32.2.tgz#6375b5b0de3f352c2b2280c54878dd30915fc139"
+  integrity sha512-izF9hBcbTOj1VhJVeo8G479dXo9KlibX0N6Yag15GaIk1fibW4iRyTBC2fy4ihm31CYIId6Zd9AABVShd+1Sgw==
   dependencies:
     jasmine "~3.3.1"
-    v8-coverage "1.0.8"
+    jasmine-core "~3.3.0"
+    v8-coverage "1.0.9"
 
-"@bazel/karma@0.27.12":
-  version "0.27.12"
-  resolved "https://registry.yarnpkg.com/@bazel/karma/-/karma-0.27.12.tgz#a7c1648af93b4d376e4e3b6fc1c7006b4d79c092"
-  integrity sha512-LJAbNe8bR1vRLb8GqIbKzCpf8VMaTnM9jizxmsjkgdGjy9OgsseYbk6+70z1yx7s3QHPjj7JBqcx+d2yeXPo7g==
+"@bazel/karma@^0.32.2":
+  version "0.32.2"
+  resolved "https://registry.yarnpkg.com/@bazel/karma/-/karma-0.32.2.tgz#0f6adf0cf1970c50cfdcf9cb2b10a8d3e21731fe"
+  integrity sha512-iWb8aqE+llpZhlreDweM7llwnSAQ9QTYdz4VvIcZBGVD0KtHxHaKiqK4Zo4Qrmr9H0kcOhT7nvRBg3QOUJVrUw==
   dependencies:
     jasmine-core "2.8.0"
     karma "^4.0.0"
     karma-chrome-launcher "2.2.0"
     karma-firefox-launcher "1.1.0"
-    karma-jasmine "1.1.1"
+    karma-jasmine "2.0.1"
     karma-requirejs "1.1.0"
     karma-sauce-launcher "2.0.2"
     karma-sourcemap-loader "0.3.7"
@@ -219,10 +231,10 @@
     semver "5.6.0"
     tmp "0.0.33"
 
-"@bazel/typescript@0.27.12":
-  version "0.27.12"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-0.27.12.tgz#79a6468cd8da096c4da151fac658f7f801a59948"
-  integrity sha512-5cH+x7rvO8P9MCrd8YwJrTyzkET6MLajzngoV5yLDWwcokzs+b3yD9yoa5Vw3Dth2MdKRp+lyGMO7PwyAM3ebw==
+"@bazel/typescript@^0.32.2":
+  version "0.32.2"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-0.32.2.tgz#c296bb44cb6362a0e3a08ca88752852bc9591ecf"
+  integrity sha512-32zDyvHdYjIa63vtImhl6wy5ErOFVWPkjMT2T035D0UPSKI1tvENW/bRZ3QFlFHqfmJZRBpaI3GiUpO3vUvzmw==
   dependencies:
     protobufjs "6.8.8"
     semver "5.6.0"
@@ -3319,11 +3331,7 @@ karma-firefox-launcher@1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/karma-firefox-launcher/-/karma-firefox-launcher-1.1.0.tgz#2c47030452f04531eb7d13d4fc7669630bb93339"
 
-karma-jasmine@1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/karma-jasmine/-/karma-jasmine-1.1.1.tgz#6fe840e75a11600c9d91e84b33c458e1c46a3529"
-
-karma-jasmine@^2.0.1:
+karma-jasmine@2.0.1, karma-jasmine@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/karma-jasmine/-/karma-jasmine-2.0.1.tgz#26e3e31f2faf272dd80ebb0e1898914cc3a19763"
   integrity sha512-iuC0hmr9b+SNn1DaUD2QEYtUxkS1J+bSJSn7ejdEexs7P8EYvA1CWkEdrDQ+8jVH3AgWlCNwjYsT1chjcNW9lA==
@@ -3945,11 +3953,6 @@ node-pre-gyp@^0.12.0:
     rimraf "^2.6.1"
     semver "^5.3.0"
     tar "^4"
-
-node-uuid@^1.4.8:
-  version "1.4.8"
-  resolved "https://registry.yarnpkg.com/node-uuid/-/node-uuid-1.4.8.tgz#b040eb0923968afabf8d32fb1f17f1167fdab907"
-  integrity sha1-sEDrCSOWivq/jTL7HxfxFn/auQc=
 
 nopt@3.x:
   version "3.0.6"
@@ -4586,6 +4589,14 @@ read-pkg-up@^3.0.0:
   resolved "https://registry.yarnpkg.com/read-pkg-up/-/read-pkg-up-3.0.0.tgz#3ed496685dba0f8fe118d0691dc51f4a1ff96f07"
   dependencies:
     find-up "^2.0.0"
+    read-pkg "^3.0.0"
+
+read-pkg-up@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/read-pkg-up/-/read-pkg-up-4.0.0.tgz#1b221c6088ba7799601c808f91161c66e58f8978"
+  integrity sha512-6etQSH7nJGsK0RbG/2TeDzZFa8shjQ1um+SwQQ5cwKy0dhSXdOncEhb1CPpvQG4h7FyOV6EB6YlV0yJvZQNAkA==
+  dependencies:
+    find-up "^3.0.0"
     read-pkg "^3.0.0"
 
 read-pkg@^1.0.0, read-pkg@^1.1.0:
@@ -5494,16 +5505,15 @@ teamwork@3.x.x:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/teamwork/-/teamwork-3.0.3.tgz#0c08748efe00c32c1eaf1128ef7f07ba0c7cc4ea"
 
-test-exclude@^4.2.1:
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/test-exclude/-/test-exclude-4.2.3.tgz#a9a5e64474e4398339245a0a769ad7c2f4a97c20"
-  integrity sha512-SYbXgY64PT+4GAL2ocI3HwPa4Q4TBKm0cwAVeKOt/Aoc0gSpNRjJX8w0pA1LMKZ3LBmd8pYBqApFNQLII9kavA==
+test-exclude@^5.2.2:
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/test-exclude/-/test-exclude-5.2.3.tgz#c3d3e1e311eb7ee405e092dac10aefd09091eac0"
+  integrity sha512-M+oxtseCFO3EDtAaGH7iiej3CBkzXqFMbzqYAACdzKui4eZA+pq3tZEwChvOdNfa7xxy8BfbmgJSIr43cC/+2g==
   dependencies:
-    arrify "^1.0.1"
-    micromatch "^2.3.11"
-    object-assign "^4.1.0"
-    read-pkg-up "^1.0.1"
-    require-main-filename "^1.0.1"
+    glob "^7.1.3"
+    minimatch "^3.0.4"
+    read-pkg-up "^4.0.0"
+    require-main-filename "^2.0.0"
 
 text-extensions@^1.0.0:
   version "1.9.0"
@@ -5825,10 +5835,10 @@ uuid@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
 
-v8-coverage@1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/v8-coverage/-/v8-coverage-1.0.8.tgz#3393cb904cd064e2e56e747781641c75a6e7f52c"
-  integrity sha512-DWNS16h1LKyRMZsJ7+2KFUhA4hGbWUWTcUbDwnT6WMQKbolixY1KCSUaw2NVqtpwODGtqCWvHUjQjwfh562U0A==
+v8-coverage@1.0.9:
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/v8-coverage/-/v8-coverage-1.0.9.tgz#780889680c0fea0f587adf22e2b5f443b9434745"
+  integrity sha512-JolsCH1JDI2QULrxkAGZaovJPvg/Q0p20Uj0F5N8fPtYDtz38gNBRPQ/WVXlLLd3d8WHvKN96AfE4XFk4u0g2g==
   dependencies:
     debug "^3.1.0"
     foreground-child "^1.5.6"
@@ -5836,11 +5846,11 @@ v8-coverage@1.0.8:
     istanbul-lib-report "^1.1.3"
     istanbul-reports "^1.3.0"
     mkdirp "^0.5.1"
-    node-uuid "^1.4.8"
     rimraf "^2.6.2"
     signal-exit "^3.0.2"
     spawn-wrap "^1.4.2"
-    test-exclude "^4.2.1"
+    test-exclude "^5.2.2"
+    uuid "^3.3.2"
     v8-to-istanbul "1.2.0"
     yargs "^11.0.0"
 
