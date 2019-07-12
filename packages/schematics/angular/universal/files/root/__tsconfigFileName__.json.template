@@ -3,6 +3,9 @@
   "compilerOptions": {
     "outDir": "<%= outDir %>-server"
   },
+  "files": [
+    "src/main.server.ts"
+  ],
   "angularCompilerOptions": {
     "entryModule": "./<%= rootInSrc ? '' : 'src/' %><%= appDir %>/<%= stripTsExtension(rootModuleFileName) %>#<%= rootModuleClassName %>"
   }
