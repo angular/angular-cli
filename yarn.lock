@@ -7674,10 +7674,10 @@ package-json@^4.0.0:
     registry-url "^3.0.3"
     semver "^5.1.0"
 
-pacote@9.5.1:
-  version "9.5.1"
-  resolved "https://registry.yarnpkg.com/pacote/-/pacote-9.5.1.tgz#adb0d23daeef6d0b813ab5891d0c6459ccec998d"
-  integrity sha512-Zqvczvf/zZ7QNosdE9uTC7SRuvSs9tFqRkF6cJl+2HH7COBnx4BRAGpeXJlrbN+mM0CMHpbi620xdEHhCflghA==
+pacote@9.5.2:
+  version "9.5.2"
+  resolved "https://registry.yarnpkg.com/pacote/-/pacote-9.5.2.tgz#6132afe7a53bb6fa189df72572c87bb03ab2cc5f"
+  integrity sha512-KVxalD57jaHnWIBQKPeU/eFU4UoMqUOj3h5AXvVMp9oJd8BZvIdTm8qmazy4jpYBf7RX9xCFmeFcU3ebvrUSZQ==
   dependencies:
     bluebird "^3.5.3"
     cacache "^11.3.2"
