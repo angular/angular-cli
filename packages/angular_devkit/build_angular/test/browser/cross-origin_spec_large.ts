@@ -40,11 +40,11 @@ describe('Browser Builder crossOrigin', () => {
     expect(content).toBe(
       `<html><head><base href="/"></head>` +
         `<body><app-root></app-root>` +
-        `<script src="runtime.js" crossorigin="use-credentials"></script>` +
-        `<script src="polyfills.js" crossorigin="use-credentials"></script>` +
-        `<script src="styles.js" crossorigin="use-credentials"></script>` +
-        `<script src="vendor.js" crossorigin="use-credentials"></script>` +
-        `<script src="main.js" crossorigin="use-credentials"></script></body></html>`,
+        `<script src="runtime.js" crossorigin="use-credentials" defer></script>` +
+        `<script src="polyfills.js" crossorigin="use-credentials" defer></script>` +
+        `<script src="styles.js" crossorigin="use-credentials" defer></script>` +
+        `<script src="vendor.js" crossorigin="use-credentials" defer></script>` +
+        `<script src="main.js" crossorigin="use-credentials" defer></script></body></html>`,
     );
     await run.stop();
   });
@@ -59,11 +59,11 @@ describe('Browser Builder crossOrigin', () => {
     expect(content).toBe(
       `<html><head><base href="/"></head>` +
         `<body><app-root></app-root>` +
-        `<script src="runtime.js" crossorigin="anonymous"></script>` +
-        `<script src="polyfills.js" crossorigin="anonymous"></script>` +
-        `<script src="styles.js" crossorigin="anonymous"></script>` +
-        `<script src="vendor.js" crossorigin="anonymous"></script>` +
-        `<script src="main.js" crossorigin="anonymous"></script></body></html>`,
+        `<script src="runtime.js" crossorigin="anonymous" defer></script>` +
+        `<script src="polyfills.js" crossorigin="anonymous" defer></script>` +
+        `<script src="styles.js" crossorigin="anonymous" defer></script>` +
+        `<script src="vendor.js" crossorigin="anonymous" defer></script>` +
+        `<script src="main.js" crossorigin="anonymous" defer></script></body></html>`,
     );
     await run.stop();
   });
@@ -78,11 +78,11 @@ describe('Browser Builder crossOrigin', () => {
     expect(content).toBe(
       `<html><head><base href="/"></head>` +
         `<body><app-root></app-root>` +
-        `<script src="runtime.js"></script>` +
-        `<script src="polyfills.js"></script>` +
-        `<script src="styles.js"></script>` +
-        `<script src="vendor.js"></script>` +
-        `<script src="main.js"></script></body></html>`,
+        `<script src="runtime.js" defer></script>` +
+        `<script src="polyfills.js" defer></script>` +
+        `<script src="styles.js" defer></script>` +
+        `<script src="vendor.js" defer></script>` +
+        `<script src="main.js" defer></script></body></html>`,
     );
     await run.stop();
   });

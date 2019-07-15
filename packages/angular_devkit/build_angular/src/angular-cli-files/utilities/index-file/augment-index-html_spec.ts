@@ -41,9 +41,9 @@ describe('augment-index-html', () => {
           <link rel="stylesheet" href="styles.css">
         </head>
         <body>
-          <script src="runtime.js"></script>
-          <script src="polyfills.js"></script>
-          <script src="main.js"></script>
+          <script src="runtime.js" defer></script>
+          <script src="polyfills.js" defer></script>
+          <script src="main.js" defer></script>
         </body>
       </html>
     `);
@@ -84,10 +84,10 @@ describe('augment-index-html', () => {
         <body>
           <script src="runtime-es2015.js" type="module"></script>
           <script src="polyfills-es2015.js" type="module"></script>
-          <script src="runtime-es5.js" nomodule></script>
-          <script src="polyfills-es5.js" nomodule></script>
+          <script src="runtime-es5.js" nomodule defer></script>
+          <script src="polyfills-es5.js" nomodule defer></script>
           <script src="main-es2015.js" type="module"></script>
-          <script src="main-es5.js" nomodule></script>
+          <script src="main-es5.js" nomodule defer></script>
         </body>
       </html>
     `);
@@ -124,9 +124,9 @@ describe('augment-index-html', () => {
           <link rel="stylesheet" href="styles.css">
         </head>
         <body>
-          <script src="scripts.js"></script>
+          <script src="scripts.js" defer></script>
           <script src="main-es2015.js" type="module"></script>
-          <script src="main-es5.js" nomodule></script>
+          <script src="main-es5.js" nomodule defer></script>
         </body>
       </html>
     `);
