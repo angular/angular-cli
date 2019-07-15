@@ -14,7 +14,7 @@ import { findUp } from '../utilities/find-up';
 import { Schema as VersionCommandSchema } from './version';
 
 export class VersionCommand extends Command<VersionCommandSchema> {
-  public static aliases = ['v'];
+  public static aliases = ['v', '-v'];
 
   async run() {
     const pkg = require(path.resolve(__dirname, '..', 'package.json'));

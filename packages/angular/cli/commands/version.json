@@ -4,7 +4,7 @@
   "description": "Outputs Angular CLI version.",
   "$longDescription": "",
 
-  "$aliases": [ "v" ],
+  "$aliases": [ "v", "-v" ],
   "$scope": "all",
   "$impl": "./version-impl#VersionCommand",
 
