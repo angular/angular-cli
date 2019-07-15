@@ -129,6 +129,7 @@ export function createBuilder<
           ) {
             const run = await scheduleByName(builderName, options, {
               scheduler,
+              target: scheduleOptions.target,
               logger: scheduleOptions.logger || logger.createChild(''),
               workspaceRoot: i.workspaceRoot,
               currentDirectory: i.currentDirectory,
