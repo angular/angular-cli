@@ -33,14 +33,15 @@ exports.config = {
       version: '9.0',
       tunnelIdentifier,
     },
-    // TODO: Investigate. Failure:
-    // Failed: Error while running testForAngular: undefined is not an object (evaluating 'd.prototype[b].apply')
-    // {
-    //   browserName: 'safari',
-    //   platform: 'OS X 10.12',
-    //   version: '10.1',
-    //   tunnelIdentifier,
-    // },
+    {
+      browserName: 'safari',
+      platform: 'OS X 10.12',
+      version: '10.1',
+      // This specific version is needed as otherwise it will not pass
+      // See: https://github.com/angular/angular-cli/issues/15084
+      seleniumVersion: '3.4.0',
+      tunnelIdentifier,
+    },
     {
       browserName: 'safari',
       platform: 'macOS 10.13',
