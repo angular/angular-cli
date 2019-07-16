@@ -203,18 +203,6 @@ describe('Browser Builder styles', () => {
     });
   });
 
-  it(`supports material icons`, async () => {
-    const overrides = {
-      extractCss: true,
-      optimization: true,
-      styles: [
-        { input: '../../../../node_modules/material-design-icons/iconfont/material-icons.css' },
-      ],
-    };
-
-    await browserBuild(architect, host, target, overrides);
-  });
-
   extensionsWithVariableSupport.forEach(ext => {
     it(`supports ${ext} includePaths`, async () => {
       let variableAssignment = '';

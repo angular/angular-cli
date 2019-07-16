@@ -80,7 +80,6 @@
     "karma-coverage-istanbul-reporter": "~2.0.0",
     "karma-jasmine": "~2.0.1",
     "karma-jasmine-html-reporter": "^1.4.0",
-    "material-design-icons": "^3.0.1",
     "popper.js": "^1.14.1",
     "protractor": "~5.4.0",
     "zone.js": "^0.9.1"
