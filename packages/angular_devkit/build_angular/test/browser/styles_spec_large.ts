@@ -54,12 +54,12 @@ describe('Browser Builder styles', () => {
     };
     const jsIndexMatches: { [path: string]: string } = {
       'index.html':
-        '<script src="runtime.js"></script>' +
-        '<script src="polyfills.js"></script>' +
-        '<script src="styles.js"></script>' +
-        '<script src="renamed-style.js"></script>' +
-        '<script src="vendor.js"></script>' +
-        '<script src="main.js"></script>',
+        '<script src="runtime.js" defer></script>' +
+        '<script src="polyfills.js" defer></script>' +
+        '<script src="styles.js" defer></script>' +
+        '<script src="renamed-style.js" defer></script>' +
+        '<script src="vendor.js" defer></script>' +
+        '<script src="main.js" defer></script>',
     };
 
     host.writeMultipleFiles({

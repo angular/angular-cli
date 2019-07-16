@@ -18,22 +18,22 @@ export default async function () {
   await ng('build');
   await expectFileNotToExist('dist/test-project/polyfills-es5.js');
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
-    <script src="runtime.js"></script>
-    <script src="polyfills.js"></script>
-    <script src="styles.js"></script>
-    <script src="vendor.js"></script>
-    <script src="main.js"></script>
+    <script src="runtime.js" defer></script>
+    <script src="polyfills.js" defer></script>
+    <script src="styles.js" defer></script>
+    <script src="vendor.js" defer></script>
+    <script src="main.js" defer></script>
   `);
 
   await ng('build', `--es5BrowserSupport`);
   await expectFileToMatch('dist/test-project/polyfills-es5.js', 'core-js');
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
-    <script src="runtime.js"></script>
-    <script src="polyfills-es5.js" nomodule></script>
-    <script src="polyfills.js"></script>
-    <script src="styles.js"></script>
-    <script src="vendor.js"></script>
-    <script src="main.js"></script>
+    <script src="runtime.js" defer></script>
+    <script src="polyfills-es5.js" nomodule defer></script>
+    <script src="polyfills.js" defer></script>
+    <script src="styles.js" defer></script>
+    <script src="vendor.js" defer></script>
+    <script src="main.js" defer></script>
   `);
 
   await updateJsonFile('angular.json', workspaceJson => {
@@ -44,11 +44,11 @@ export default async function () {
   await ng('build');
   await expectFileToMatch('dist/test-project/polyfills-es5.js', 'core-js');
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
-    <script src="runtime.js"></script>
-    <script src="polyfills-es5.js" nomodule></script>
-    <script src="polyfills.js"></script>
-    <script src="styles.js"></script>
-    <script src="vendor.js"></script>
-    <script src="main.js"></script>
+    <script src="runtime.js" defer></script>
+    <script src="polyfills-es5.js" nomodule defer></script>
+    <script src="polyfills.js" defer></script>
+    <script src="styles.js" defer></script>
+    <script src="vendor.js" defer></script>
+    <script src="main.js" defer></script>
   `);
 }
