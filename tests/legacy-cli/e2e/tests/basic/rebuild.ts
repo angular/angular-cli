@@ -37,7 +37,7 @@ export default function() {
             FormsModule,
             HttpClientModule,
             RouterModule.forRoot([
-              { path: 'lazy', loadChildren: './lazy/lazy.module#LazyModule' }
+              { path: 'lazy', loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule) }
             ])
           ],
           providers: [],

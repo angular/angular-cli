@@ -15,9 +15,9 @@ export default function() {
       import { RouterModule } from '@angular/router';
     `))
     .then(() => replaceInFile('src/app/app.module.ts', 'imports: [', `imports: [
-      RouterModule.forRoot([{ path: "lazy", loadChildren: 'src/app/lazy/lazy.module#LazyModule' }]),
-      RouterModule.forRoot([{ path: "lazy1", loadChildren: './lazy/lazy.module#LazyModule' }]),
-      RouterModule.forRoot([{ path: "lazy2", loadChildren: './too/lazy/lazy.module#LazyModule' }]),
+      RouterModule.forRoot([{ path: "lazy", loadChildren: () => import('src/app/lazy/lazy.module').then(m => m.LazyModule) }]),
+      RouterModule.forRoot([{ path: "lazy1", loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule) }]),
+      RouterModule.forRoot([{ path: "lazy2", loadChildren: () => import('./too/lazy/lazy.module').then(m => m.LazyModule) }]),
     `))
     .then(() => ng('build', '--named-chunks'))
     .then(() => readdirSync('dist/test-project'))

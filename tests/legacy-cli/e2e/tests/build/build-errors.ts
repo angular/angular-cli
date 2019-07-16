@@ -50,6 +50,7 @@ export default function() {
       .then(() =>
         updateJsonFile('./tsconfig.app.json', configJson => {
           configJson.include = ['src/**/*.ts'];
+          configJson.exclude = ['**/**.spec.ts'];
           configJson.files = undefined;
         }),
       )

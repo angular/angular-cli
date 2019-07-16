@@ -52,6 +52,12 @@ export default function() {
           "module": "commonjs",
           "types": []
         },
+        "files": [
+          "src/main.server.ts"
+        ],
+        "include": [
+          "src/**/*.d.ts"
+        ],
         "angularCompilerOptions": {
           "entryModule": "src/app/app.server.module#AppServerModule"
         }

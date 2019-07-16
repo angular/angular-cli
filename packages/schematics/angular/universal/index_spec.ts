@@ -92,6 +92,9 @@ describe('Universal Schematic', () => {
         outDir: './out-tsc/app-server',
         module: 'commonjs',
       },
+      files: [
+        "src/main.server.ts"
+      ],
       angularCompilerOptions: {
         entryModule: './src/app/app.server.module#AppServerModule',
       },
@@ -113,6 +116,9 @@ describe('Universal Schematic', () => {
         outDir: '../../out-tsc/app-server',
         module: 'commonjs',
       },
+      files: [
+        "src/main.server.ts"
+      ],
       angularCompilerOptions: {
         entryModule: './src/app/app.server.module#AppServerModule',
       },

@@ -4,6 +4,9 @@
     "outDir": "<%= outDir %>-server",
     "module": "commonjs"
   },
+  "files": [
+    "src/main.server.ts"
+  ],
   "angularCompilerOptions": {
     "entryModule": "./<%= rootInSrc ? '' : 'src/' %><%= appDir %>/<%= stripTsExtension(rootModuleFileName) %>#<%= rootModuleClassName %>"
   }
