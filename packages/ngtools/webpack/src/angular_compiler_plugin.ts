@@ -71,7 +71,7 @@ import {
   MESSAGE_KIND,
   UpdateMessage,
 } from './type_checker_messages';
-import { flattenArray, forwardSlashPath, workaroundResolve } from './utils';
+import { flattenArray, formatSize, forwardSlashPath, workaroundResolve } from './utils';
 import {
   VirtualFileSystemDecorator,
   VirtualWatchFileSystemDecorator,
@@ -84,6 +84,12 @@ import {
 import { WebpackInputHost } from './webpack-input-host';
 
 const treeKill = require('tree-kill');
+
+/**
+ * The recommended maximum size of components styles in bytes.
+ */
+const stylesSizeLimit = 70 * 1024;
+const formattedStylesSizeLimit = formatSize(stylesSizeLimit);
 
 export class AngularCompilerPlugin {
   private _options: AngularCompilerPluginOptions;
@@ -130,6 +136,8 @@ export class AngularCompilerPlugin {
   private _logger: logging.Logger;
 
   private _mainFields: string[] = [];
+
+  private _stylesResources = new Set<string>();
 
   constructor(options: AngularCompilerPluginOptions) {
     this._options = Object.assign({}, options);
@@ -788,6 +796,24 @@ export class AngularCompilerPlugin {
     compiler.hooks.afterEmit.tap('angular-compiler', compilation => {
       // tslint:disable-next-line:no-any
       (compilation as any)._ngToolsWebpackPluginInstance = null;
+
+      // CSS size checks
+      const stylesSizeWarning: string[] = [];
+      this._stylesResources.forEach(fileName => {
+        const styleModule = compilation.modules.find(
+          x => typeof x.resource === 'string' && x.resource.replace(/\.shim\.ngstyle\.js$/, '') === fileName
+        );
+        const styleModuleSize = styleModule && styleModule.size();
+        if (styleModuleSize && styleModuleSize > stylesSizeLimit) {
+          stylesSizeWarning.push(
+            `${fileName} (${formatSize(styleModuleSize)}) component style size exceeds the recommended limit (${formattedStylesSizeLimit}).`,
+          );
+        }
+      })
+
+      if (stylesSizeWarning.length) {
+        compilation.warnings.push(...stylesSizeWarning);
+      }
     });
     compiler.hooks.done.tap('angular-compiler', () => {
       this._donePromise = null;
@@ -1176,15 +1202,19 @@ export class AngularCompilerPlugin {
       })
       .filter(x => x);
 
-    const resourceImports = findResources(sourceFile)
-      .map(resourcePath => resolve(dirname(resolvedFileName), normalize(resourcePath)));
+    const { templates, styles } = findResources(sourceFile);
+    const templatesImports = templates.map(resourcePath => resolve(dirname(resolvedFileName), normalize(resourcePath)));
+    const stylesImports = styles.map(resourcePath => resolve(dirname(resolvedFileName), normalize(resourcePath)));
 
     // These paths are meant to be used by the loader so we must denormalize them.
     const uniqueDependencies = new Set([
       ...esImports,
-      ...resourceImports,
+      ...stylesImports,
+      ...templatesImports,
       ...this.getResourceDependencies(this._compilerHost.denormalizePath(resolvedFileName)),
     ].map((p) => p && this._compilerHost.denormalizePath(p)));
+
+    stylesImports.forEach(f => this._stylesResources.add(this._compilerHost.denormalizePath(f)));
 
     return [...uniqueDependencies]
       .filter(x => !!x) as string[];

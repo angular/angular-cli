@@ -9,9 +9,10 @@ import * as ts from 'typescript';
 import { collectDeepNodes } from './ast_helpers';
 import { getResourceUrl } from './replace_resources';
 
-export function findResources(sourceFile: ts.SourceFile): string[] {
-  const resources: string[] = [];
+export function findResources(sourceFile: ts.SourceFile): { templates: string[]; styles: string[]} {
   const decorators = collectDeepNodes<ts.Decorator>(sourceFile, ts.SyntaxKind.Decorator);
+  const templates: string[] = [];
+  const styles: string[] = [];
 
   for (const node of decorators) {
     if (!ts.isCallExpression(node.expression)) {
@@ -38,7 +39,7 @@ export function findResources(sourceFile: ts.SourceFile): string[] {
             const url = getResourceUrl(node.initializer);
 
             if (url) {
-              resources.push(url);
+              templates.push(url);
             }
             break;
 
@@ -51,7 +52,7 @@ export function findResources(sourceFile: ts.SourceFile): string[] {
               const url = getResourceUrl(node);
 
               if (url) {
-                resources.push(url);
+                styles.push(url);
               }
 
               return node;
@@ -64,5 +65,5 @@ export function findResources(sourceFile: ts.SourceFile): string[] {
     );
   }
 
-  return resources;
+  return { templates, styles };
 }

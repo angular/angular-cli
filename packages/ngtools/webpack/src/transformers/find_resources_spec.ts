@@ -27,10 +27,12 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = findResources(ts.createSourceFile('temp.ts', input, ts.ScriptTarget.ES2015));
-      expect(result).toEqual([
-        './app.component.html',
+      expect(result.styles).toEqual([
         './app.component.css',
         './app.component.2.css',
+      ]);
+      expect(result.templates).toEqual([
+        './app.component.html',
       ]);
     });
 
@@ -43,7 +45,8 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = findResources(ts.createSourceFile('temp.ts', input, ts.ScriptTarget.ES2015));
-      expect(result).toEqual([]);
+      expect(result.styles).toEqual([]);
+      expect(result.templates).toEqual([]);
     });
   });
 });
