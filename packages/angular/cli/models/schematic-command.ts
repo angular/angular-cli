@@ -16,11 +16,17 @@ import {
   workspaces,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import { DryRunEvent, UnsuccessfulWorkflowExecution, workflow } from '@angular-devkit/schematics';
+import {
+  DryRunEvent,
+  UnsuccessfulWorkflowExecution,
+  formats,
+  workflow,
+} from '@angular-devkit/schematics';
 import {
   FileSystemCollection,
   FileSystemEngine,
   FileSystemSchematic,
+  FileSystemSchematicDescription,
   NodeWorkflow,
   validateOptionsWithSchema,
 } from '@angular-devkit/schematics/tools';
@@ -246,6 +252,7 @@ export abstract class SchematicCommand<
       dryRun,
       packageManager: getPackageManager(this.workspace.root),
       root: normalize(this.workspace.root),
+      registry: new schema.CoreSchemaRegistry(formats.standardFormats),
     });
     workflow.engineHost.registerContextTransform(context => {
       // This is run by ALL schematics, so if someone uses `externalSchematics(...)` which
@@ -261,15 +268,7 @@ export abstract class SchematicCommand<
       }
     });
 
-    workflow.engineHost.registerOptionsTransform(validateOptionsWithSchema(workflow.registry));
-
-    if (options.defaults) {
-      workflow.registry.addPreTransform(schema.transforms.addUndefinedDefaults);
-    } else {
-      workflow.registry.addPostTransform(schema.transforms.addUndefinedDefaults);
-    }
-
-    workflow.registry.addSmartDefaultProvider('projectName', () => {
+    const getProjectName = () => {
       if (this._workspace) {
         const projectNames = getProjectsByPath(this._workspace, process.cwd(), this.workspace.root);
 
@@ -292,7 +291,24 @@ export abstract class SchematicCommand<
       }
 
       return undefined;
-    });
+    };
+
+    workflow.engineHost.registerOptionsTransform(
+      <T extends {}>(schematic: FileSystemSchematicDescription, current: T) => ({
+        ...getSchematicDefaults(schematic.collection.name, schematic.name, getProjectName()),
+        ...current,
+      }),
+    );
+
+    if (options.defaults) {
+      workflow.registry.addPreTransform(schema.transforms.addUndefinedDefaults);
+    } else {
+      workflow.registry.addPostTransform(schema.transforms.addUndefinedDefaults);
+    }
+
+    workflow.engineHost.registerOptionsTransform(validateOptionsWithSchema(workflow.registry));
+
+    workflow.registry.addSmartDefaultProvider('projectName', getProjectName);
 
     if (options.interactive !== false && isTTY()) {
       workflow.registry.usePromptProvider((definitions: Array<schema.PromptDefinition>) => {

@@ -28,6 +28,7 @@ export declare type FileSystemCollection = Collection<FileSystemCollectionDescri
 export declare type FileSystemCollectionDesc = CollectionDescription<FileSystemCollectionDescription>;
 
 export interface FileSystemCollectionDescription {
+    readonly name: string;
     readonly path: string;
     readonly schematics: {
         [name: string]: FileSystemSchematicDesc;
@@ -92,9 +93,11 @@ export interface FileSystemSchematicDescription extends FileSystemSchematicJsonD
 
 export interface FileSystemSchematicJsonDescription {
     readonly aliases?: string[];
+    readonly collection: FileSystemCollectionDescription;
     readonly description: string;
     readonly extends?: string;
     readonly factory: string;
+    readonly name: string;
     readonly schema?: string;
 }
 
@@ -135,6 +138,7 @@ export declare class NodeWorkflow extends workflow.BaseWorkflow {
         dryRun?: boolean;
         root?: Path;
         packageManager?: string;
+        registry?: schema.CoreSchemaRegistry;
     });
 }
 

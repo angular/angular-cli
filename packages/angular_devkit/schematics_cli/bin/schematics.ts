@@ -7,8 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import 'symbol-observable';
 // symbol polyfill must go first
+import 'symbol-observable';
 // tslint:disable-next-line:ordered-imports import-groups
 import {
   JsonObject,
@@ -24,8 +24,9 @@ import {
   DryRunEvent,
   SchematicEngine,
   UnsuccessfulWorkflowExecution,
+  formats
 } from '@angular-devkit/schematics';
-import { NodeModulesEngineHost, NodeWorkflow } from '@angular-devkit/schematics/tools';
+import { NodeModulesEngineHost, NodeWorkflow, validateOptionsWithSchema } from '@angular-devkit/schematics/tools';
 import * as inquirer from 'inquirer';
 import * as minimist from 'minimist';
 
@@ -160,9 +161,12 @@ export async function main({
 
   /** Create a Virtual FS Host scoped to where the process is being run. **/
   const fsHost = new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(process.cwd()));
+  const registry = new schema.CoreSchemaRegistry(formats.standardFormats);
 
   /** Create the workflow that will be executed with this run. */
-  const workflow = new NodeWorkflow(fsHost, { force, dryRun });
+  const workflow = new NodeWorkflow(fsHost, { force, dryRun, registry });
+  registry.addPostTransform(schema.transforms.addUndefinedDefaults);
+  workflow.engineHost.registerOptionsTransform(validateOptionsWithSchema(registry));
 
   // Indicate to the user when nothing has been done. This is automatically set to off when there's
   // a new DryRunEvent.
