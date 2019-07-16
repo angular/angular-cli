@@ -1,7 +1,8 @@
 {
   "extends": "./<%= tsConfigExtends %>",
   "compilerOptions": {
-    "outDir": "<%= outDir %>-server"
+    "outDir": "<%= outDir %>-server",
+    "module": "commonjs"
   },
   "angularCompilerOptions": {
     "entryModule": "./<%= rootInSrc ? '' : 'src/' %><%= appDir %>/<%= stripTsExtension(rootModuleFileName) %>#<%= rootModuleClassName %>"
