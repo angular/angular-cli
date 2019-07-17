@@ -30,6 +30,7 @@ import { from, of } from 'rxjs';
 import { bufferCount, catchError, concatMap, map, mergeScan, switchMap } from 'rxjs/operators';
 import { ScriptTarget } from 'typescript';
 import * as webpack from 'webpack';
+import * as workerFarm from 'worker-farm';
 import { NgBuildAnalyticsPlugin } from '../../plugins/webpack/analytics';
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import {
@@ -54,7 +55,13 @@ import {
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
 import { ExecutionTransformer } from '../transforms';
-import { BuildBrowserFeatures, deleteOutputDir } from '../utils';
+import {
+  BuildBrowserFeatures,
+  deleteOutputDir,
+  fullDifferential,
+  normalizeOptimization,
+  normalizeSourceMaps,
+} from '../utils';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import {
   generateBrowserWebpackConfigFromContext,
@@ -168,6 +175,7 @@ async function initialize(
   return { config: transformedConfig || config, workspace };
 }
 
+// tslint:disable-next-line: no-big-function
 export function buildWebpackBrowser(
   options: BrowserBuilderSchema,
   context: BuilderContext,
@@ -187,6 +195,7 @@ export function buildWebpackBrowser(
     transforms.logging || createBrowserLoggingCallback(!!options.verbose, context.logger);
 
   return from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
+    // tslint:disable-next-line: no-big-function
     switchMap(({ workspace, config: configs }) => {
       const projectName = context.target
         ? context.target.project
@@ -231,50 +240,185 @@ export function buildWebpackBrowser(
           1,
         ),
         bufferCount(configs.length),
-        switchMap(buildEvents => {
+        switchMap(async buildEvents => {
+          configs.length = 0;
           const success = buildEvents.every(r => r.success);
-          if (success && options.index) {
+          if (success) {
             let noModuleFiles: EmittedFiles[] | undefined;
             let moduleFiles: EmittedFiles[] | undefined;
             let files: EmittedFiles[] | undefined;
 
-            const [firstBuild, secondBuild] = buildEvents;
-            if (isDifferentialLoadingNeeded) {
-              const scriptsEntryPointName = normalizeExtraEntryPoints(options.scripts || [], 'scripts')
-                .map(x => x.bundleName);
+            const scriptsEntryPointName = normalizeExtraEntryPoints(
+              options.scripts || [],
+              'scripts',
+            ).map(x => x.bundleName);
 
+            const [firstBuild, secondBuild] = buildEvents;
+            if (isDifferentialLoadingNeeded && (fullDifferential || options.watch)) {
               moduleFiles = firstBuild.emittedFiles || [];
-              files = moduleFiles.filter(x => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)));
+              files = moduleFiles.filter(
+                x => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)),
+              );
 
               if (buildEvents.length === 2) {
                 noModuleFiles = secondBuild.emittedFiles;
               }
+            } else if (isDifferentialLoadingNeeded && !fullDifferential) {
+              const { emittedFiles = [] } = firstBuild;
+              moduleFiles = [];
+              noModuleFiles = [];
+
+              // Common options for all bundle process actions
+              const sourceMapOptions = normalizeSourceMaps(options.sourceMap || false);
+              const actionOptions = {
+                optimize: normalizeOptimization(options.optimization).scripts,
+                sourceMaps: sourceMapOptions.scripts,
+                hiddenSourceMaps: sourceMapOptions.hidden,
+              };
+
+              const actions: {}[] = [];
+              const seen = new Set<string>();
+              for (const file of emittedFiles) {
+                // Scripts and non-javascript files are not processed
+                if (
+                  file.extension !== '.js' ||
+                  (file.name && scriptsEntryPointName.includes(file.name))
+                ) {
+                  if (files === undefined) {
+                    files = [];
+                  }
+                  files.push(file);
+                  continue;
+                }
+
+                // Ignore already processed files; emittedFiles can contain duplicates
+                if (seen.has(file.file)) {
+                  continue;
+                }
+                seen.add(file.file);
+
+                // All files at this point except ES5 polyfills are module scripts
+                const es5Polyfills = file.file.startsWith('polyfills-es5');
+                if (!es5Polyfills && !file.file.startsWith('polyfills-nomodule-es5')) {
+                  moduleFiles.push(file);
+                }
+                // If not optimizing then ES2015 polyfills do not need processing
+                // Unlike other module scripts, it is never downleveled
+                if (!actionOptions.optimize && file.file.startsWith('polyfills-es2015')) {
+                  continue;
+                }
+
+                // Retrieve the content/map for the file
+                // NOTE: Additional future optimizations will read directly from memory
+                let filename = path.resolve(getSystemPath(root), options.outputPath, file.file);
+                const code = fs.readFileSync(filename, 'utf8');
+                let map;
+                if (actionOptions.sourceMaps) {
+                  try {
+                    map = fs.readFileSync(filename + '.map', 'utf8');
+                    if (es5Polyfills) {
+                      fs.unlinkSync(filename + '.map');
+                    }
+                  } catch {}
+                }
+
+                if (es5Polyfills) {
+                  fs.unlinkSync(filename);
+                  filename = filename.replace('-es2015', '');
+                }
+
+                // ES2015 polyfills are only optimized; optimization check was performed above
+                if (file.file.startsWith('polyfills-es2015')) {
+                  actions.push({
+                    ...actionOptions,
+                    filename,
+                    code,
+                    map,
+                    optimizeOnly: true,
+                  });
+
+                  continue;
+                }
+
+                // Record the bundle processing action
+                // The runtime chunk gets special processing for lazy loaded files
+                actions.push({
+                  ...actionOptions,
+                  filename,
+                  code,
+                  map,
+                  runtime: file.file.startsWith('runtime'),
+                });
+
+                // Add the newly created ES5 bundles to the index as nomodule scripts
+                const newFilename = es5Polyfills
+                  ? file.file.replace('-es2015', '')
+                  : file.file.replace('es2015', 'es5');
+                noModuleFiles.push({ ...file, file: newFilename });
+              }
+
+              // Execute the bundle processing actions
+              context.logger.info('Generating ES5 bundles for differential loading...');
+              await new Promise<void>((resolve, reject) => {
+                const workerFile = require.resolve('../utils/process-bundle');
+                const workers = workerFarm(
+                  {
+                    maxRetries: 1,
+                  },
+                  path.extname(workerFile) !== '.ts'
+                    ? workerFile
+                    : require.resolve('../utils/process-bundle-bootstrap'),
+                  ['process'],
+                );
+                let completed = 0;
+                const workCallback = (error: Error | null) => {
+                  if (error) {
+                    workerFarm.end(workers);
+                    reject(error);
+                  } else if (++completed === actions.length) {
+                    workerFarm.end(workers);
+                    resolve();
+                  }
+                };
+
+                actions.forEach(action => workers['process'](action, workCallback));
+              });
+              context.logger.info('ES5 bundle generation complete.');
             } else {
               const { emittedFiles = [] } = firstBuild;
               files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
               noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
             }
 
-            return writeIndexHtml({
-              host,
-              outputPath: resolve(root, join(normalize(options.outputPath), getIndexOutputFile(options))),
-              indexPath: join(root, getIndexInputFile(options)),
-              files,
-              noModuleFiles,
-              moduleFiles,
-              baseHref: options.baseHref,
-              deployUrl: options.deployUrl,
-              sri: options.subresourceIntegrity,
-              scripts: options.scripts,
-              styles: options.styles,
-              postTransform: transforms.indexHtml,
-              crossOrigin: options.crossOrigin,
-            }).pipe(
-              map(() => ({ success: true })),
-              catchError(error => of({ success: false, error: mapErrorToMessage(error) })),
-            );
+            if (options.index) {
+              return writeIndexHtml({
+                host,
+                outputPath: resolve(
+                  root,
+                  join(normalize(options.outputPath), getIndexOutputFile(options)),
+                ),
+                indexPath: join(root, getIndexInputFile(options)),
+                files,
+                noModuleFiles,
+                moduleFiles,
+                baseHref: options.baseHref,
+                deployUrl: options.deployUrl,
+                sri: options.subresourceIntegrity,
+                scripts: options.scripts,
+                styles: options.styles,
+                postTransform: transforms.indexHtml,
+                crossOrigin: options.crossOrigin,
+              })
+                .pipe(
+                  map(() => ({ success: true })),
+                  catchError(error => of({ success: false, error: mapErrorToMessage(error) })),
+                )
+                .toPromise();
+            } else {
+              return { success };
+            }
           } else {
-            return of({ success });
+            return { success };
           }
         }),
         concatMap(buildEvent => {

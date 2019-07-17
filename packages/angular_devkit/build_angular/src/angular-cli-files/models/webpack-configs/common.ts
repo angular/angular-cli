@@ -23,7 +23,7 @@ import {
 } from 'webpack';
 import { RawSource } from 'webpack-sources';
 import { AssetPatternClass, ExtraEntryPoint } from '../../../browser/schema';
-import { BuildBrowserFeatures } from '../../../utils/build-browser-features';
+import { BuildBrowserFeatures, fullDifferential } from '../../../utils';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { NamedLazyChunksPlugin } from '../../plugins/named-chunks-plugin';
@@ -59,7 +59,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   const entryPoints: { [key: string]: string[] } = {};
 
   const targetInFileName = getEsVersionForFileName(
-    buildOptions.scriptTargetOverride,
+    fullDifferential ? buildOptions.scriptTargetOverride : tsConfig.options.target,
     buildOptions.esVersionInFileName,
   );
 
@@ -67,11 +67,15 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     entryPoints['main'] = [path.resolve(root, buildOptions.main)];
   }
 
+  let differentialLoadingNeeded = false;
   if (wco.buildOptions.platform !== 'server') {
     const buildBrowserFeatures = new BuildBrowserFeatures(
       projectRoot,
       tsConfig.options.target || ScriptTarget.ES5,
     );
+
+    differentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded();
+
     if ((buildOptions.scriptTargetOverride || tsConfig.options.target) === ScriptTarget.ES5) {
       if (
         buildOptions.es5BrowserSupport ||
@@ -90,15 +94,27 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
             : [noModuleScript];
         }
 
-        // For differential loading we don't need to generate a seperate polyfill file
+        // For full build differential loading we don't need to generate a seperate polyfill file
         // because they will be loaded exclusivly based on module and nomodule
-        const polyfillsChunkName = buildBrowserFeatures.isDifferentialLoadingNeeded()
-          ? 'polyfills'
-          : 'polyfills-es5';
+        const polyfillsChunkName =
+          fullDifferential && differentialLoadingNeeded ? 'polyfills' : 'polyfills-es5';
 
         entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
+        if (!fullDifferential && differentialLoadingNeeded) {
+          // Add zone.js legacy support to the es5 polyfills
+          // This is a noop execution-wise if zone-evergreen is not used.
+          entryPoints[polyfillsChunkName].push('zone.js/dist/zone-legacy');
+        }
         if (!buildOptions.aot) {
+          // If not performing a full differential build the JIT polyfills need to be added to ES5
+          if (!fullDifferential && differentialLoadingNeeded) {
+            entryPoints[polyfillsChunkName].push(path.join(__dirname, '..', 'jit-polyfills.js'));
+          }
           entryPoints[polyfillsChunkName].push(path.join(__dirname, '..', 'es5-jit-polyfills.js'));
+        }
+        // If not performing a full differential build the polyfills need to be added to ES5 bundle
+        if (!fullDifferential && buildOptions.polyfills) {
+          entryPoints[polyfillsChunkName].push(path.resolve(root, buildOptions.polyfills));
         }
       }
     }
@@ -316,11 +332,17 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     }
 
     const terserOptions = {
-      ecma: wco.supportES2015 ? 6 : 5,
+      // Use 5 if using bundle downleveling to ensure script bundles do not use ES2015+ features
+      // Script bundles are shared for differential loading
+      // Bundle processing will use the ES2015+ optimizations on the ES2015 bundles
+      ecma:
+        wco.supportES2015 &&
+        (!differentialLoadingNeeded || (differentialLoadingNeeded && fullDifferential))
+          ? 6
+          : 5,
       warnings: !!buildOptions.verbose,
       safari10: true,
       output: {
-        ascii_only: true,
         comments: false,
         webkit: true,
       },
@@ -339,7 +361,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
               global_defs: angularGlobalDefinitions,
             },
       // We also want to avoid mangling on server.
-      ...(buildOptions.platform == 'server' ? { mangle: false } : {}),
+      // Name mangling is handled within the browser builder
+      mangle:
+        buildOptions.platform !== 'server' &&
+        (!differentialLoadingNeeded || (differentialLoadingNeeded && fullDifferential)),
     };
 
     extraMinimizers.push(

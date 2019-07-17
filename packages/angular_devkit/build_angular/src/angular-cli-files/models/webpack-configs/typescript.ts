@@ -15,6 +15,7 @@ import {
   NgToolsLoader,
   PLATFORM
 } from '@ngtools/webpack';
+import { fullDifferential } from '../../../utils';
 import { WebpackConfigOptions, BuildOptions } from '../build-options';
 
 function _pluginOptionsOverrides(
@@ -32,7 +33,7 @@ function _pluginOptionsOverrides(
     }
   }
 
-  if (buildOptions.scriptTargetOverride) {
+  if (fullDifferential && buildOptions.scriptTargetOverride) {
     compilerOptions.target = buildOptions.scriptTargetOverride;
   }
 

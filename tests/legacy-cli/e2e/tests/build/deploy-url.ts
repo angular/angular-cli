@@ -24,7 +24,7 @@ export default function () {
     .then(() => expectFileToMatch('dist/test-project/styles-es5.js',
       /\(['"]?deployUrl\/more\.png['"]?\)/))
     .then(() => expectFileToMatch('dist/test-project/runtime-es5.js',
-      /__webpack_require__\.p = "deployUrl\/";/));
+      /__webpack_require__\.p\s*=\s*"deployUrl\/";/));
     // // verify slash is appended to the end of --deploy-url if missing
     // .then(() => ng('build', '--deploy-url=deployUrl', '--extract-css=false'))
     // .then(() =>

@@ -89,6 +89,11 @@ describe('Browser Builder with differential loading', () => {
   });
 
   it('emits the right ES formats', async () => {
+    if (!process.env['NG_BUILD_FULL_DIFFERENTIAL']) {
+      // The test fails depending on the order of previously executed tests
+      // The wrong data is being read from the filesystem.
+      pending('Incredibly flaky outside full build differential loading');
+    }
     const { files } = await browserBuild(architect, host, target, { optimization: true });
     expect(await files['main-es5.js']).not.toContain('class');
     expect(await files['main-es2015.js']).toContain('class');
@@ -96,10 +101,11 @@ describe('Browser Builder with differential loading', () => {
 
   it('uses the right zone.js variant', async () => {
     const { files } = await browserBuild(architect, host, target, { optimization: false });
-    expect(await files['polyfills-es5.js']).toContain('zone.js/dist/zone');
-    expect(await files['polyfills-es5.js']).not.toContain('zone.js/dist/zone-evergreen');
+    expect(await files['polyfills-es5.js']).toContain('zone.js/dist/zone-legacy');
     expect(await files['polyfills-es5.js']).toContain('registerElementPatch');
+    expect(await files['polyfills-es5.js']).toContain('zone.js/dist/zone-evergreen');
     expect(await files['polyfills-es2015.js']).toContain('zone.js/dist/zone-evergreen');
+    expect(await files['polyfills-es2015.js']).not.toContain('zone.js/dist/zone-legacy');
     expect(await files['polyfills-es2015.js']).not.toContain('registerElementPatch');
   });
 
