@@ -26,17 +26,34 @@ export default async function () {
   `);
   await ng('build');
   await expectFileToExist('dist/test-project/polyfills-nomodule-es5.js');
-  await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
-    <script src="polyfills-nomodule-es5.js" nomodule defer></script>
-    <script src="runtime-es2015.js" type="module"></script>
-    <script src="polyfills-es2015.js" type="module"></script>
-    <script src="runtime-es5.js" nomodule defer></script>
-    <script src="polyfills-es5.js" nomodule defer></script>
-    <script src="styles-es2015.js" type="module"></script>
-    <script src="styles-es5.js" nomodule defer></script>
-    <script src="vendor-es2015.js" type="module"></script>
-    <script src="main-es2015.js" type="module"></script>
-    <script src="vendor-es5.js" nomodule defer></script>
-    <script src="main-es5.js" nomodule defer></script>
-  `);
+
+  if (process.env['NG_BUILD_DIFFERENTIAL_FULL']) {
+    await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
+      <script src="polyfills-nomodule-es5.js" nomodule defer></script>
+      <script src="runtime-es2015.js" type="module"></script>
+      <script src="polyfills-es2015.js" type="module"></script>
+      <script src="runtime-es5.js" nomodule defer></script>
+      <script src="polyfills-es5.js" nomodule defer></script>
+      <script src="styles-es2015.js" type="module"></script>
+      <script src="styles-es5.js" nomodule defer></script>
+      <script src="vendor-es2015.js" type="module"></script>
+      <script src="main-es2015.js" type="module"></script>
+      <script src="vendor-es5.js" nomodule defer></script>
+      <script src="main-es5.js" nomodule defer></script>
+    `);
+  } else {
+    await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
+      <script src="polyfills-nomodule-es5.js" nomodule></script>
+      <script src="polyfills-es5.js" nomodule defer></script>
+      <script src="polyfills-es2015.js" type="module"></script>
+      <script src="styles-es2015.js" type="module"></script>
+      <script src="styles-es5.js" nomodule defer></script>
+      <script src="runtime-es2015.js" type="module"></script>
+      <script src="vendor-es2015.js" type="module"></script>
+      <script src="main-es2015.js" type="module"></script>
+      <script src="runtime-es5.js" nomodule defer></script>
+      <script src="vendor-es5.js" nomodule defer></script>
+      <script src="main-es5.js" nomodule defer></script>
+    `);
+  }
 }
