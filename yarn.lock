@@ -1561,6 +1561,11 @@ bluebird@^3.5.3:
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.3.tgz#7d01c6f9616c9a51ab0f8c549a79dfe6ec33efa7"
   integrity sha512-/qKPUQlaW1OyR51WeCPBvRnAlnZFUJkCSG5HzGnuIqhgyJtF+T94lFnn33eiazjRm2LAHVy2guNnaq48X9SJuw==
 
+bluebird@^3.5.5:
+  version "3.5.5"
+  resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.5.tgz#a8d0afd73251effbbd5fe384a77d73003c17a71f"
+  integrity sha512-5am6HnnfN+urzt4yfg7IgTbotDjIT/u8AJpEt0sIU9FtXfVeezXAPKswrG+xKUCOYAINpSdgZVDU6QFh+cuH3w==
+
 bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.4.0:
   version "4.11.8"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.8.tgz#2cde09eb5ee341f484746bb0309b3253b1b1442f"
@@ -1916,6 +1921,26 @@ cacache@^11.3.2:
     move-concurrently "^1.0.1"
     promise-inflight "^1.0.1"
     rimraf "^2.6.2"
+    ssri "^6.0.1"
+    unique-filename "^1.1.1"
+    y18n "^4.0.0"
+
+cacache@^12.0.0:
+  version "12.0.0"
+  resolved "https://registry.yarnpkg.com/cacache/-/cacache-12.0.0.tgz#1ed91cc306312a53ad688b1563ce4c416faec564"
+  integrity sha512-0baf1FhCp16LhN+xDJsOrSiaPDCTD3JegZptVmLDoEbFcT5aT+BeFGt3wcDU3olCP5tpTCXU5sv0+TsKWT9WGQ==
+  dependencies:
+    bluebird "^3.5.5"
+    chownr "^1.1.1"
+    figgy-pudding "^3.5.1"
+    glob "^7.1.4"
+    graceful-fs "^4.1.15"
+    lru-cache "^5.1.1"
+    mississippi "^3.0.0"
+    mkdirp "^0.5.1"
+    move-concurrently "^1.0.1"
+    promise-inflight "^1.0.1"
+    rimraf "^2.6.3"
     ssri "^6.0.1"
     unique-filename "^1.1.1"
     y18n "^4.0.0"
@@ -4525,7 +4550,7 @@ glob@7.0.x:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-glob@7.1.4:
+glob@7.1.4, glob@^7.1.4:
   version "7.1.4"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.4.tgz#aa608a2f6c577ad357e1ae5a5c26d9a8d1969255"
   integrity sha512-hkLPepehmnKk41pUGm3sYxoFs/umurYfYJCerbXEyFIWcAzvpipAgVkBqqT9RBKMGjnq6kMuyYwha6csxbiM1A==
@@ -6588,6 +6613,23 @@ make-fetch-happen@^4.0.1:
     socks-proxy-agent "^4.0.0"
     ssri "^6.0.0"
 
+make-fetch-happen@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/make-fetch-happen/-/make-fetch-happen-5.0.0.tgz#a8e3fe41d3415dd656fe7b8e8172e1fb4458b38d"
+  integrity sha512-nFr/vpL1Jc60etMVKeaLOqfGjMMb3tAHFVJWxHOFCFS04Zmd7kGlMxo0l1tzfhoQje0/UPnd0X8OeGUiXXnfPA==
+  dependencies:
+    agentkeepalive "^3.4.1"
+    cacache "^12.0.0"
+    http-cache-semantics "^3.8.1"
+    http-proxy-agent "^2.1.0"
+    https-proxy-agent "^2.2.1"
+    lru-cache "^5.1.1"
+    mississippi "^3.0.0"
+    node-fetch-npm "^2.0.2"
+    promise-retry "^1.1.1"
+    socks-proxy-agent "^4.0.0"
+    ssri "^6.0.0"
+
 mamacro@^0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/mamacro/-/mamacro-0.0.3.tgz#ad2c9576197c9f1abf308d0787865bd975a3f3e4"
@@ -7334,6 +7376,18 @@ npm-registry-fetch@^3.8.0:
     make-fetch-happen "^4.0.1"
     npm-package-arg "^6.1.0"
 
+npm-registry-fetch@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/npm-registry-fetch/-/npm-registry-fetch-4.0.0.tgz#5ef75845b605855c7964472542c25da172af8677"
+  integrity sha512-Jllq35Jag8dtv0M17ue74XtdQTyqKzuAYGiX9mAjOhkmNjib3bBUgK6mUY61+AHnXeSRobQkpY3/xIOS/omptw==
+  dependencies:
+    JSONStream "^1.3.4"
+    bluebird "^3.5.1"
+    figgy-pudding "^3.4.1"
+    lru-cache "^5.1.1"
+    make-fetch-happen "^5.0.0"
+    npm-package-arg "^6.1.0"
+
 npm-run-path@^2.0.0:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/npm-run-path/-/npm-run-path-2.0.2.tgz#35a9232dfa35d7067b4cb2ddf2357b1871536c5f"
@@ -7684,18 +7738,18 @@ package-json@^4.0.0:
     registry-url "^3.0.3"
     semver "^5.1.0"
 
-pacote@9.5.2:
-  version "9.5.2"
-  resolved "https://registry.yarnpkg.com/pacote/-/pacote-9.5.2.tgz#6132afe7a53bb6fa189df72572c87bb03ab2cc5f"
-  integrity sha512-KVxalD57jaHnWIBQKPeU/eFU4UoMqUOj3h5AXvVMp9oJd8BZvIdTm8qmazy4jpYBf7RX9xCFmeFcU3ebvrUSZQ==
+pacote@9.5.4:
+  version "9.5.4"
+  resolved "https://registry.yarnpkg.com/pacote/-/pacote-9.5.4.tgz#8baa26f3d1326d13dc2fe0fe84040a364ae30aad"
+  integrity sha512-nWr0ari6E+apbdoN0hToTKZElO5h4y8DGFa2pyNA5GQIdcP0imC96bA0bbPw1gpeguVIiUgHHaAlq/6xfPp8Qw==
   dependencies:
     bluebird "^3.5.3"
-    cacache "^11.3.2"
+    cacache "^12.0.0"
     figgy-pudding "^3.5.1"
     get-stream "^4.1.0"
     glob "^7.1.3"
     lru-cache "^5.1.1"
-    make-fetch-happen "^4.0.1"
+    make-fetch-happen "^5.0.0"
     minimatch "^3.0.4"
     minipass "^2.3.5"
     mississippi "^3.0.0"
@@ -7704,7 +7758,7 @@ pacote@9.5.2:
     npm-package-arg "^6.1.0"
     npm-packlist "^1.1.12"
     npm-pick-manifest "^2.2.3"
-    npm-registry-fetch "^3.8.0"
+    npm-registry-fetch "^4.0.0"
     osenv "^0.1.5"
     promise-inflight "^1.0.1"
     promise-retry "^1.1.1"
