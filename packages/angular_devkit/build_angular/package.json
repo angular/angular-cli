@@ -11,6 +11,8 @@
     "@angular-devkit/build-optimizer": "0.0.0",
     "@angular-devkit/build-webpack": "0.0.0",
     "@angular-devkit/core": "0.0.0",
+    "@babel/core": "7.5.5",
+    "@babel/preset-env": "7.5.5",
     "@ngtools/webpack": "0.0.0",
     "ajv": "6.10.2",
     "autoprefixer": "9.6.1",
@@ -40,6 +42,7 @@
     "sass": "1.22.9",
     "sass-loader": "7.1.0",
     "semver": "6.3.0",
+    "source-map": "0.7.3",
     "source-map-support": "0.5.13",
     "source-map-loader": "0.2.4",
     "speed-measure-webpack-plugin": "1.3.1",
@@ -47,6 +50,7 @@
     "stylus": "0.54.5",
     "stylus-loader": "3.0.2",
     "tree-kill": "1.2.1",
+    "terser": "4.1.3",
     "terser-webpack-plugin": "1.4.1",
     "webpack": "4.38.0",
     "webpack-dev-middleware": "3.7.0",
@@ -54,6 +58,7 @@
     "webpack-merge": "4.2.1",
     "webpack-sources": "1.4.1",
     "webpack-subresource-integrity": "1.1.0-rc.6",
+    "worker-farm": "1.7.0",
     "worker-plugin": "3.1.0"
   },
   "devDependencies": {

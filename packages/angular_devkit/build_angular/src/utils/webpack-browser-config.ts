@@ -23,7 +23,12 @@ import { WebpackConfigOptions } from '../angular-cli-files/models/build-options'
 import { getEsVersionForFileName } from '../angular-cli-files/models/webpack-configs';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
-import { NormalizedBrowserBuilderSchema, defaultProgress, normalizeBrowserSchema } from '../utils';
+import {
+  NormalizedBrowserBuilderSchema,
+  defaultProgress,
+  fullDifferential,
+  normalizeBrowserSchema,
+} from '../utils';
 import { BuildBrowserFeatures } from './build-browser-features';
 
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
@@ -61,7 +66,7 @@ export async function generateWebpackConfig(
 
   const scriptTargets = [scriptTarget];
 
-  if (differentialLoading) {
+  if (differentialLoading && fullDifferential) {
     scriptTargets.push(ts.ScriptTarget.ES5);
   }
 
@@ -71,7 +76,7 @@ export async function generateWebpackConfig(
     const supportES2015
       = scriptTarget !== ts.ScriptTarget.ES3 && scriptTarget !== ts.ScriptTarget.ES5;
 
-    if (differentialLoading) {
+    if (differentialLoading && fullDifferential) {
       buildOptions = {
         ...options,
         ...(
@@ -89,6 +94,8 @@ export async function generateWebpackConfig(
         esVersionInFileName: true,
         scriptTargetOverride: scriptTarget,
       };
+    } else if (differentialLoading && !fullDifferential) {
+      buildOptions = { ...options, esVersionInFileName: true, scriptTargetOverride: ts.ScriptTarget.ES5, es5BrowserSupport: undefined };
     }
 
     const wco: BrowserWebpackConfigOptions = {
@@ -119,7 +126,7 @@ export async function generateWebpackConfig(
 
     if (options.profile || process.env['NG_BUILD_PROFILING']) {
       const esVersionInFileName = getEsVersionForFileName(
-        wco.buildOptions.scriptTargetOverride,
+        fullDifferential ? buildOptions.scriptTargetOverride : tsConfig.options.target,
         wco.buildOptions.esVersionInFileName,
       );
 

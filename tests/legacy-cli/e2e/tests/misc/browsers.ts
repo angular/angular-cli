@@ -14,6 +14,12 @@ export default async function () {
     throw new Error('SauceLabs is not configured.');
   }
 
+  await replaceInFile(
+    'browserslist',
+    'not IE 9-11',
+    'Safari 9-10.1\nIE 9-11',
+  );
+
   await ng('build', '--prod');
 
   // Add Protractor configuration
