@@ -8,7 +8,9 @@
 
 // ES2015 symbol capabilities
 import 'core-js/modules/es.symbol';
+import 'core-js/modules/es.symbol.description';
 import 'core-js/modules/es.symbol.iterator';
+import 'core-js/modules/es.symbol.to-string-tag';
 
 // ES2015 function capabilities
 import 'core-js/modules/es.function.bind';
@@ -35,11 +37,13 @@ import 'core-js/modules/es.object.set-prototype-of';
 import 'core-js/modules/es.object.to-string';
 
 // ES2015 array capabilities
+import 'core-js/modules/es.array.concat';
 import 'core-js/modules/es.array.is-array';
 import 'core-js/modules/es.array.from';
 import 'core-js/modules/es.array.of';
 import 'core-js/modules/es.array.join';
 import 'core-js/modules/es.array.slice';
+import 'core-js/modules/es.array.splice';
 import 'core-js/modules/es.array.sort';
 import 'core-js/modules/es.array.for-each';
 import 'core-js/modules/es.array.map';
@@ -79,6 +83,10 @@ import 'core-js/modules/es.string.small';
 import 'core-js/modules/es.string.strike';
 import 'core-js/modules/es.string.sub';
 import 'core-js/modules/es.string.sup';
+import 'core-js/modules/es.string.match';
+import 'core-js/modules/es.string.replace';
+import 'core-js/modules/es.string.search';
+import 'core-js/modules/es.string.split';
 
 import 'core-js/modules/es.parse-int';
 import 'core-js/modules/es.parse-float';
@@ -91,5 +99,7 @@ import 'core-js/es/regexp';
 import 'core-js/modules/es.map';
 import 'core-js/modules/es.weak-map';
 import 'core-js/modules/es.set';
+import 'core-js/modules/web.dom-collections.for-each';
 import 'core-js/modules/web.dom-collections.iterator';
 import 'core-js/modules/es.promise';
+import 'core-js/modules/es.json.to-string-tag';
