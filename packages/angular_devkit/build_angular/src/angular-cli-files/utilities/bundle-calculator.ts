@@ -25,9 +25,11 @@ export function calculateSizes(budget: Budget, compilation: Compilation): Size[]
     allScript: AllScriptCalculator,
     any: AnyCalculator,
     anyScript: AnyScriptCalculator,
+    anyComponentStyle: AnyComponentStyleCalculator,
     bundle: BundleCalculator,
     initial: InitialCalculator,
   };
+
   const ctor = calculatorMap[budget.type];
   const calculator = new ctor(budget, compilation);
 
@@ -98,6 +100,20 @@ class AllCalculator extends Calculator {
       .reduce((total: number, size: number) => total + size, 0);
 
     return [{size, label: 'total'}];
+  }
+}
+
+/**
+ * Any components styles
+ */
+class AnyComponentStyleCalculator extends Calculator {
+  calculate() {
+    return Object.keys(this.compilation.assets)
+      .filter(key => key.endsWith('.css'))
+      .map(key => ({
+        size: this.compilation.assets[key].size(),
+        label: key,
+      }));
   }
 }
 

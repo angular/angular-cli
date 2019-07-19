@@ -64,6 +64,68 @@ describe('Browser Builder bundle budgets', () => {
     await run.stop();
   });
 
+  it(`shows warnings for large component css when using 'anyComponentStyle' when AOT`, async () => {
+    const overrides = {
+      aot: true,
+      optimization: true,
+      budgets: [{ type: 'anyComponentStyle', maximumWarning: '1b' }],
+    };
+
+    const cssContent = `
+      .foo { color: white; padding: 1px; }
+      .buz { color: white; padding: 2px; }
+      .bar { color: white; padding: 3px; }
+    `;
+
+    host.writeMultipleFiles({
+      'src/app/app.component.css': cssContent,
+      'src/assets/foo.css': cssContent,
+      'src/styles.css': cssContent,
+    });
+
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
+    const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
+    const output = await run.result;
+    expect(output.success).toBe(true);
+    expect(logs.length).toBe(2);
+    expect(logs.join()).toMatch(/WARNING.+app\.component\.css/);
+    await run.stop();
+  });
+
+  it(`shows error for large component css when using 'anyComponentStyle' when AOT`, async () => {
+    const overrides = {
+      aot: true,
+      optimization: true,
+      budgets: [{ type: 'anyComponentStyle', maximumError: '1b' }],
+    };
+
+    const cssContent = `
+      .foo { color: white; padding: 1px; }
+      .buz { color: white; padding: 2px; }
+      .bar { color: white; padding: 3px; }
+    `;
+
+    host.writeMultipleFiles({
+      'src/app/app.component.css': cssContent,
+      'src/assets/foo.css': cssContent,
+      'src/styles.css': cssContent,
+    });
+
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
+    const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
+    const output = await run.result;
+    expect(output.success).toBe(false);
+    expect(logs.length).toBe(2);
+    expect(logs.join()).toMatch(/ERROR.+app\.component\.css/);
+    await run.stop();
+  });
+
   describe(`should ignore '.map' files`, () => {
     it(`when 'bundle' budget`, async () => {
       const overrides = {
