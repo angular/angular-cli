@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Compiler, compilation } from 'webpack';
-import { Budget } from '../../browser/schema';
+import { Budget, Type } from '../../browser/schema';
 import { Size, calculateBytes, calculateSizes } from '../utilities/bundle-calculator';
 import { formatSize } from '../utilities/stats';
 
@@ -30,33 +30,28 @@ export class BundleBudgetPlugin {
 
   apply(compiler: Compiler): void {
     const { budgets } = this.options;
+
+    if (!budgets || budgets.length === 0) {
+      return;
+    }
+
+    compiler.hooks.compilation.tap('BundleBudgetPlugin', (compilation: compilation.Compilation) => {
+      compilation.hooks.afterOptimizeChunkAssets.tap('BundleBudgetPlugin', () => {
+        // In AOT compilations component styles get processed in child compilations.
+        // tslint:disable-next-line: no-any
+        const parentCompilation = (compilation.compiler as any).parentCompilation;
+        if (!parentCompilation) {
+          return;
+        }
+
+        const filteredBudgets = budgets.filter(budget => budget.type === Type.AnyComponentStyle);
+        this.runChecks(filteredBudgets, compilation);
+      });
+    });
+
     compiler.hooks.afterEmit.tap('BundleBudgetPlugin', (compilation: compilation.Compilation) => {
-      if (!budgets || budgets.length === 0) {
-        return;
-      }
-
-      budgets.map(budget => {
-        const thresholds = this.calculate(budget);
-
-        return {
-          budget,
-          thresholds,
-          sizes: calculateSizes(budget, compilation),
-        };
-      })
-        .forEach(budgetCheck => {
-          budgetCheck.sizes.forEach(size => {
-            this.checkMaximum(budgetCheck.thresholds.maximumWarning, size, compilation.warnings);
-            this.checkMaximum(budgetCheck.thresholds.maximumError, size, compilation.errors);
-            this.checkMinimum(budgetCheck.thresholds.minimumWarning, size, compilation.warnings);
-            this.checkMinimum(budgetCheck.thresholds.minimumError, size, compilation.errors);
-            this.checkMinimum(budgetCheck.thresholds.warningLow, size, compilation.warnings);
-            this.checkMaximum(budgetCheck.thresholds.warningHigh, size, compilation.warnings);
-            this.checkMinimum(budgetCheck.thresholds.errorLow, size, compilation.errors);
-            this.checkMaximum(budgetCheck.thresholds.errorHigh, size, compilation.errors);
-          });
-
-        });
+      const filteredBudgets = budgets.filter(budget => budget.type !== Type.AnyComponentStyle);
+      this.runChecks(filteredBudgets, compilation);
     });
   }
 
@@ -115,5 +110,26 @@ export class BundleBudgetPlugin {
     }
 
     return thresholds;
+  }
+
+  private runChecks(budgets: Budget[], compilation: compilation.Compilation) {
+    budgets
+      .map(budget => ({
+        budget,
+        thresholds: this.calculate(budget),
+        sizes: calculateSizes(budget, compilation),
+      }))
+      .forEach(budgetCheck => {
+        budgetCheck.sizes.forEach(size => {
+          this.checkMaximum(budgetCheck.thresholds.maximumWarning, size, compilation.warnings);
+          this.checkMaximum(budgetCheck.thresholds.maximumError, size, compilation.errors);
+          this.checkMinimum(budgetCheck.thresholds.minimumWarning, size, compilation.warnings);
+          this.checkMinimum(budgetCheck.thresholds.minimumError, size, compilation.errors);
+          this.checkMinimum(budgetCheck.thresholds.warningLow, size, compilation.warnings);
+          this.checkMaximum(budgetCheck.thresholds.warningHigh, size, compilation.warnings);
+          this.checkMinimum(budgetCheck.thresholds.errorLow, size, compilation.errors);
+          this.checkMaximum(budgetCheck.thresholds.errorHigh, size, compilation.errors);
+        });
+      });
   }
 }
