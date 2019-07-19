@@ -36,6 +36,23 @@ describe('Browser Builder source map', () => {
     expect(await files['styles.css.map']).not.toBeUndefined();
   });
 
+  it(`sourcemaps sources should not start with '/'`, async () => {
+    // If sourcemaps sources start with a '/' it will break VS code breakpoints
+    // Unless 'sourceMapPathOverrides' are provided
+    const overrides = {
+      sourceMap: true,
+    };
+
+    const { files } = await browserBuild(architect, host, target, overrides);
+    const mainJSMap = await files['main.js.map'];
+    expect(mainJSMap).not.toBeUndefined();
+
+    const sources: string[] = JSON.parse(mainJSMap).sources;
+    for (const source of sources) {
+      expect(source.startsWith('/')).toBe(false, `${source} started with an '/'.`);
+    }
+  });
+
   it('works with outputHashing', async () => {
     const { files } = await browserBuild(architect, host, target, {
       sourceMap: true,
