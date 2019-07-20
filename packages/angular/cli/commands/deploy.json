@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ng-cli://commands/deploy.json",
+  "description": "Invokes the deploy builder for a specified project. If no project is specified, the CLI will invoke the deploy builder for the default project in the workspace.",
+  "$longDescription": "./deploy-long.md",
+
+  "$aliases": [ "d" ],
+  "$scope": "in",
+  "$type": "architect",
+  "$impl": "./deploy-impl#DeployCommand",
+
+  "allOf": [
+    {
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "The name of the project to deploy.",
+          "$default": {
+            "$source": "argv",
+            "index": 0
+          }
+        }
+      },
+      "required": [
+      ]
+    },
+    {
+      "$ref": "./definitions.json#/definitions/base"
+    }
+  ]
+}

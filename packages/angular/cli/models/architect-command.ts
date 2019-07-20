@@ -35,6 +35,7 @@ export abstract class ArchitectCommand<
   protected multiTarget = false;
 
   target: string | undefined;
+  missingTargetError: string | undefined;
 
   public async initialize(options: T & Arguments): Promise<void> {
     await super.initialize(options);
@@ -75,11 +76,12 @@ export abstract class ArchitectCommand<
     }
 
     if (targetProjectNames.length === 0) {
-      throw new Error(`No projects support the '${this.target}' target.`);
+      throw new Error(this.missingTargetError || `No projects support the '${this.target}' target.`);
     }
 
     if (projectName && !targetProjectNames.includes(projectName)) {
-      throw new Error(`Project '${projectName}' does not support the '${this.target}' target.`);
+      throw new Error(this.missingTargetError ||
+        `Project '${projectName}' does not support the '${this.target}' target.`);
     }
 
     if (!projectName && commandLeftovers && commandLeftovers.length > 0) {
@@ -156,7 +158,7 @@ export abstract class ArchitectCommand<
         // This is a special case where we just return.
         return;
       } else {
-        throw new Error('Cannot determine project or target for command.');
+        throw new Error(this.missingTargetError || 'Cannot determine project or target for command.');
       }
     }
 
