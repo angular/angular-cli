@@ -10,7 +10,6 @@ import {updateJsonFile} from '../../utils/project';
 import {expectToFail} from '../../utils/utils';
 import {moveFile, copyFile, replaceInFile} from '../../utils/fs';
 
-// tslint:disable:max-line-length
 export default function () {
   // Should fail without updated webdriver
   return updateJsonFile('package.json', packageJson => {

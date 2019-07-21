@@ -54,7 +54,6 @@ describe('build-optimizer', () => {
         }());
         var RenderType_MdOption = ɵcrt({ encapsulation: 2, styles: styles_MdOption});
       `;
-      // tslint:disable:max-line-length
       const output = tags.oneLine`
         import { __extends } from "tslib";
         ${imports}

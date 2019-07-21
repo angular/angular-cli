@@ -556,7 +556,6 @@ function extractProjectsConfig(
 
       const e2eTargets: JsonObject = {};
 
-      // tslint:disable-next-line:max-line-length
       const protractorConfig = config && config.e2e && config.e2e.protractor && config.e2e.protractor.config
         ? config.e2e.protractor.config
         : '';

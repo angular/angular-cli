@@ -32,7 +32,6 @@ describe('import-tslib', () => {
   });
 
   it('replaces wrapped __extends', () => {
-    // tslint:disable:max-line-length
     const input = tags.stripIndent`
     export default function appGlobal() {
         var __extends = (this && this.__extends) || function (d, b) {
@@ -61,7 +60,6 @@ describe('import-tslib', () => {
           return c > 3 && r && Object.defineProperty(target, key, r), r;
       };
     `;
-    // tslint:enable:max-line-length
     const output = tags.stripIndent`
       import { __decorate } from "tslib";
     `;
@@ -71,13 +69,11 @@ describe('import-tslib', () => {
   });
 
   it('replaces __metadata', () => {
-    // tslint:disable:max-line-length
     const input = tags.stripIndent`
       var __metadata = (this && this.__metadata) || function (k, v) {
           if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
       };
     `;
-    // tslint:enable:max-line-length
     const output = tags.stripIndent`
       import { __metadata } from "tslib";
     `;

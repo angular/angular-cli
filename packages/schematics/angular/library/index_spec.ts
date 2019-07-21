@@ -17,7 +17,6 @@ function getJsonFileContent(tree: UnitTestTree, path: string) {
   return JSON.parse(tree.readContent(path));
 }
 
-// tslint:disable:max-line-length
 describe('Library Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/ng_packagr',

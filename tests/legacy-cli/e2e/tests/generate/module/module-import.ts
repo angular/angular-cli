@@ -2,7 +2,6 @@ import { join } from 'path';
 import { ng } from '../../../utils/process';
 import { expectFileToMatch } from '../../../utils/fs';
 
-// tslint:disable:max-line-length
 export default function () {
   const root = process.cwd();
   const modulePath = join(root, 'src', 'app', 'app.module.ts');

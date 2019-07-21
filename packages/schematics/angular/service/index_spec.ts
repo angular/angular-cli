@@ -10,7 +10,6 @@ import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as ServiceOptions } from './schema';
 
-// tslint:disable:max-line-length
 describe('Service Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',

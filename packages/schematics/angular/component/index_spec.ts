@@ -12,7 +12,6 @@ import { createAppModule } from '../utility/test';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { ChangeDetection, Schema as ComponentOptions, Style } from './schema';
 
-// tslint:disable:max-line-length
 describe('Component Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
@@ -273,7 +272,6 @@ describe('Component Schematic', () => {
     const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
     const content = tree.readContent('/projects/bar/src/app/app.module.ts');
     expect(content).toMatch(
-      // tslint:disable-next-line:max-line-length
       /import { TestComponentComponent } from '\.\/dir\/test-component\/test-component.component'/,
     );
   });
@@ -288,7 +286,6 @@ describe('Component Schematic', () => {
 
     const content = appTree.readContent('/projects/bar/src/app/admin/module/module.module.ts');
     expect(content).toMatch(
-      // tslint:disable-next-line:max-line-length
       /import { TestComponentComponent } from '..\/..\/other\/test-component\/test-component.component'/,
     );
   });

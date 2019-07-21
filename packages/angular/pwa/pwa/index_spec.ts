@@ -9,8 +9,6 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import * as path from 'path';
 import { Schema as PwaOptions } from './schema';
 
-
-// tslint:disable:max-line-length
 describe('PWA Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@angular/pwa',

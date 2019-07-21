@@ -52,12 +52,14 @@ describe('Constructor Parameter Transformer', () => {
       }
     `;
 
+    // tslint:disable:max-line-length
     const output = `
       import * as tslib_1 from "tslib";
       let RootProvidedService = class RootProvidedService { constructor() { } };
       RootProvidedService = tslib_1.__decorate([ Injectable({ providedIn: 'root' }) ], RootProvidedService);
       export { RootProvidedService }; export class MyService { constructor(v) { } } MyService.ctorParameters = () => [ { type: RootProvidedService } ];
     `;
+    // tslint:enable:max-line-length
 
     const result = transform(input);
 
