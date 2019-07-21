@@ -21,7 +21,6 @@ export interface HashFormat {
 }
 
 export function getOutputHashFormat(option: string, length = 20): HashFormat {
-  /* tslint:disable:max-line-length */
   const hashFormats: { [option: string]: HashFormat } = {
     none: { chunk: '', extract: '', file: '', script: '' },
     media: { chunk: '', extract: '', file: `.[hash:${length}]`, script: '' },
@@ -38,7 +37,6 @@ export function getOutputHashFormat(option: string, length = 20): HashFormat {
       script: `.[hash:${length}]`,
     },
   };
-  /* tslint:enable:max-line-length */
   return hashFormats[option] || hashFormats['none'];
 }
 

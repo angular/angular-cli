@@ -12,7 +12,6 @@ import { getFileContent } from '../utility/test';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as ApplicationOptions, Style, ViewEncapsulation } from './schema';
 
-// tslint:disable:max-line-length
 describe('Application Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',

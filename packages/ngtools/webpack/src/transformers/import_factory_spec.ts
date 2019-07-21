@@ -81,7 +81,6 @@ describe('@ngtools/webpack transformers', () => {
         }];
       `;
 
-      // tslint:disable: max-line-length
       const output = tags.stripIndent`
         const ɵ0 = () => import("./shared/path/to/lazy/lazy.module.ngfactory").then(m => m.LazyModuleNgFactory);
         const routes = [{
@@ -89,7 +88,6 @@ describe('@ngtools/webpack transformers', () => {
           loadChildren: ɵ0
         }];
       `;
-      // tslint:enable: max-line-length
 
       const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true);
       const transformer = importFactory(() => { }, () => program.getTypeChecker());

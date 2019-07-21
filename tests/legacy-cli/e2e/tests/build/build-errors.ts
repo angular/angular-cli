@@ -4,8 +4,6 @@ import { writeFile, appendToFile, readFile, replaceInFile } from '../../utils/fs
 import { getGlobalVariable } from '../../utils/env';
 import { expectToFail } from '../../utils/utils';
 
-// tslint:disable:max-line-length
-
 const extraErrors = [
   `Final loader didn't return a Buffer or String`,
   `doesn't contain a valid alias configuration`,

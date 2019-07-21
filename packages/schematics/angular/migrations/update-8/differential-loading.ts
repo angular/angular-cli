@@ -20,7 +20,6 @@ import {
   removePropertyInAstObject,
 } from '../../utility/json-utils';
 
-// tslint:disable-next-line:max-line-length
 const browserslistContent = `# This file is used by the build system to adjust CSS and JS output to support the specified browsers below.
 # For additional information regarding the format and rule options, please see:
 # https://github.com/browserslist/browserslist#queries

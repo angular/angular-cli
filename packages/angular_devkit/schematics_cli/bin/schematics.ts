@@ -24,7 +24,7 @@ import {
   DryRunEvent,
   SchematicEngine,
   UnsuccessfulWorkflowExecution,
-  formats
+  formats,
 } from '@angular-devkit/schematics';
 import { NodeModulesEngineHost, NodeWorkflow, validateOptionsWithSchema } from '@angular-devkit/schematics/tools';
 import * as inquirer from 'inquirer';

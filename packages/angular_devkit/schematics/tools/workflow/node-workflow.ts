@@ -34,7 +34,7 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
 
       force: options.force,
       dryRun: options.dryRun,
-      registry: options.registry
+      registry: options.registry,
     });
 
     engineHost.registerTaskExecutor(

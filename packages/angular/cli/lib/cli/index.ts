@@ -72,7 +72,7 @@ export default async function(options: { testing?: boolean; cliArgs: string[] })
 
         logger.fatal(
           `An unhandled exception occurred: ${err.message}\n` +
-            `See "${logPath}" for further details.`
+            `See "${logPath}" for further details.`,
         );
       } catch (e) {
         logger.fatal(

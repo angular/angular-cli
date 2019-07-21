@@ -19,7 +19,6 @@ export function downlevelConstructorParameters(
 
 // The following is sourced from tsickle with local modifications
 // Only the creation of `ctorParameters` is retained
-// tslint:disable-next-line:max-line-length
 // https://github.com/angular/tsickle/blob/0ceb7d6bc47f6945a6c4c09689f1388eb48f5c07/src/decorator_downlevel_transformer.ts
 //
 

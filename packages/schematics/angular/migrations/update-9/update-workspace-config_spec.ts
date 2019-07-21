@@ -28,28 +28,28 @@ const scriptsWithLazy = [
   { bundleName: 'two', input: 'two.js', lazy: true },
   { bundleName: 'tree', input: 'tree.js' },
   'four.js',
-]
+];
 
 const scriptsExpectWithLazy = [
   { bundleName: 'one', input: 'one.js' },
   { bundleName: 'two', inject: false, input: 'two.js' },
   { bundleName: 'tree', input: 'tree.js' },
   'four.js',
-]
+];
 
 const stylesWithLazy = [
   { bundleName: 'one', input: 'one.css', lazy: false },
   { bundleName: 'two', input: 'two.css', lazy: true },
   { bundleName: 'tree', input: 'tree.css' },
   'four.css',
-]
+];
 
 const stylesExpectWithLazy = [
   { bundleName: 'one', input: 'one.css' },
   { bundleName: 'two', inject: false, input: 'two.css' },
   { bundleName: 'tree', input: 'tree.css' },
   'four.css',
-]
+];
 
 const workspacePath = '/angular.json';
 

@@ -93,7 +93,7 @@ describe('Universal Schematic', () => {
         module: 'commonjs',
       },
       files: [
-        "src/main.server.ts"
+        'src/main.server.ts',
       ],
       angularCompilerOptions: {
         entryModule: './src/app/app.server.module#AppServerModule',
@@ -117,7 +117,7 @@ describe('Universal Schematic', () => {
         module: 'commonjs',
       },
       files: [
-        "src/main.server.ts"
+        'src/main.server.ts',
       ],
       angularCompilerOptions: {
         entryModule: './src/app/app.server.module#AppServerModule',

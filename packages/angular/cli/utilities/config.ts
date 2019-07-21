@@ -86,8 +86,8 @@ export function getWorkspace(
   if (error) {
     throw new Error(
       `Workspace config file cannot le loaded: ${configPath}`
-      + `\n${error instanceof Error ? error.message : error}`
-    )
+      + `\n${error instanceof Error ? error.message : error}`,
+    );
   }
 
   cachedWorkspaces.set(level, workspace);

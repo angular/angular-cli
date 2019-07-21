@@ -262,7 +262,7 @@ function findTs2_3EnumIife(
       || !ts.isBinaryExpression(statement.expression)
       || !ts.isElementAccessExpression(statement.expression.left)
     ) {
-      return null
+      return null;
     }
 
     const leftExpression = statement.expression.left.expression;

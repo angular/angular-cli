@@ -344,12 +344,10 @@ describe('ast utils', () => {
       const source = getTsSource(modulePath, moduleContent);
       const change = () => addRouteDeclarationToModule(source, './src/app', '');
       expect(change).toThrowError(
-        // tslint:disable-next-line:max-line-length
         `No route declaration array was found that corresponds to router module at line 11 in ./src/app`,
       );
     });
 
-    // tslint:disable-next-line:max-line-length
     it(`should throw an error, if the provided first argument of router module is not an identifier`, () => {
       const moduleContent = `
         import { BrowserModule } from '@angular/platform-browser';
@@ -372,7 +370,6 @@ describe('ast utils', () => {
       const source = getTsSource(modulePath, moduleContent);
       const change = () => addRouteDeclarationToModule(source, './src/app', '');
       expect(change).toThrowError(
-        // tslint:disable-next-line:max-line-length
         `No route declaration array was found that corresponds to router module at line 11 in ./src/app`,
       );
     });
@@ -439,7 +436,6 @@ describe('ast utils', () => {
       const output = applyChanges(modulePath, moduleContent, [changes]);
 
       expect(output).toMatch(
-        // tslint:disable-next-line:max-line-length
         /const routes = \[\r?\n?\s*{ path: 'foo', component: FooComponent },\r?\n?\s*{ path: 'bar', component: BarComponent }\r?\n?\s*\]/,
       );
     });
@@ -473,10 +469,11 @@ describe('ast utils', () => {
         './src/app', `{ path: 'bar', component: BarComponent }`,
       );
       const output = applyChanges(modulePath, moduleContent, [changes]);
+      // tslint:disable:max-line-length
       expect(output).toMatch(
-        // tslint:disable-next-line:max-line-length
         /const routes = \[\r?\n?\s*{ path: 'foo', component: FooComponent, canLoad: \[Guard\] },\r?\n?\s*{ path: 'bar', component: BarComponent }\r?\n?\s*\]/,
       );
+      // tslint:enable:max-line-length
     });
 
     it('should add a route to the routes argument of RouteModule', () => {

@@ -213,14 +213,12 @@ function _validateUpdatePackages(
       || peerErrors;
   });
 
-  // tslint:disable:max-line-length
   if (!force && peerErrors) {
     throw new SchematicsException(tags.stripIndents
       `Incompatible peer dependencies found.
       Peer dependency warnings when installing dependencies means that those dependencies might not work correctly together.
       You can use the '--force' option to ignore incompatible peer dependencies and instead address these warnings later.`);
   }
-  // tslint:enable:max-line-length
 }
 
 
