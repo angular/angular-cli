@@ -93,9 +93,11 @@ export function insertImport(source: ts.SourceFile, fileToEdit: string, symbolNa
  * @param node
  * @param kind
  * @param max The maximum number of items to return.
+ * @param recursive Continue looking for nodes of kind recursive until end
+ * the last child even when node of kind has been found.
  * @return all nodes of kind, or [] if none is found
  */
-export function findNodes(node: ts.Node, kind: ts.SyntaxKind, max = Infinity): ts.Node[] {
+export function findNodes(node: ts.Node, kind: ts.SyntaxKind, max = Infinity, recursive = false): ts.Node[] {
   if (!node || max == 0) {
     return [];
   }
@@ -105,7 +107,7 @@ export function findNodes(node: ts.Node, kind: ts.SyntaxKind, max = Infinity): t
     arr.push(node);
     max--;
   }
-  if (max > 0) {
+  if (max > 0 && (recursive || node.kind !== kind)) {
     for (const child of node.getChildren()) {
       findNodes(child, kind, max).forEach(node => {
         if (max > 0) {
