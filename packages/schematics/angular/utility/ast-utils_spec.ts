@@ -479,6 +479,41 @@ describe('ast utils', () => {
       );
     });
 
+    it('should add a route to the routes to the correct array when having nested object literal', () => {
+      const moduleContent = `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { AppComponent } from './app.component';
+
+        const routes = [
+            { path: 'foo', component: FooComponent, data: { path: 'test' }}
+        ];
+
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule,
+            RouterModule.forRoot(routes)
+          ],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+      `;
+
+      const source = getTsSource(modulePath, moduleContent);
+      const changes = addRouteDeclarationToModule(
+        source,
+        './src/app', `{ path: 'bar', component: BarComponent }`,
+      );
+      const output = applyChanges(modulePath, moduleContent, [changes]);
+      expect(output).toMatch(
+        // tslint:disable-next-line:max-line-length
+        /const routes = \[\r?\n?\s*{ path: 'foo', component: FooComponent, data: { path: 'test' }},\r?\n?\s*{ path: 'bar', component: BarComponent }\r?\n?\s*\]/,
+      );
+    });
+
     it('should add a route to the routes argument of RouteModule', () => {
       const moduleContent = `
         import { BrowserModule } from '@angular/platform-browser';
