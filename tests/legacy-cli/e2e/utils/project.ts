@@ -1,11 +1,10 @@
-import * as fs from 'fs-extra';
-import { readFile, writeFile, replaceInFile, prependToFile } from './fs';
-import { execAndWaitForOutputToMatch, npm, silentNpm, ng, git } from './process';
-import { getGlobalVariable } from './env';
-import { gitCommit } from './git';
+import * as fs from 'fs';
 import { prerelease } from 'semver';
 import { packages } from '../../../../lib/packages';
-
+import { getGlobalVariable } from './env';
+import { prependToFile, readFile, replaceInFile, writeFile } from './fs';
+import { gitCommit } from './git';
+import { execAndWaitForOutputToMatch, git, ng, npm, silentNpm } from './process';
 
 const tsConfigPath = 'tsconfig.json';
 
@@ -80,9 +79,9 @@ export async function prepareProjectForE2e(name) {
 
   if (argv['ng-snapshots'] || argv['ng-tag']) {
     await useSha();
-  } else {
-    await writeFile('.npmrc', 'registry=http://localhost:4873');
   }
+
+  await writeFile('.npmrc', 'registry=http://localhost:4873');
 
   console.log(
     `Project ${name} created... Installing npm.`,
