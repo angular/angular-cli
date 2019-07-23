@@ -8,9 +8,19 @@
 
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { WorkspaceTargets } from '../../utility/workspace-models';
+import { ANY_COMPONENT_STYLE_BUDGET } from './update-workspace-config';
 
-function readWorkspaceConfig(tree: UnitTestTree) {
-  return JSON.parse(tree.readContent('/angular.json'));
+// tslint:disable-next-line: no-any
+function getWorkspaceTargets(tree: UnitTestTree): any {
+  return JSON.parse(tree.readContent(workspacePath))
+    .projects['migration-test'].architect;
+}
+
+function updateWorkspaceTargets(tree: UnitTestTree, workspaceTargets: WorkspaceTargets) {
+  const config = JSON.parse(tree.readContent(workspacePath));
+  config.projects['migration-test'].architect = workspaceTargets;
+  tree.overwrite(workspacePath, JSON.stringify(config, undefined, 2));
 }
 
 const scriptsWithLazy = [
@@ -69,60 +79,95 @@ describe('Migration to version 9', () => {
         .toPromise();
     });
 
-    it('should update scripts in build target', () => {
-      let config = readWorkspaceConfig(tree);
-      let build = config.projects['migration-test'].architect.build;
-      build.options.scripts = scriptsWithLazy;
-      build.configurations.production.scripts = scriptsWithLazy;
+    describe('scripts and style options', () => {
+      it('should update scripts in build target', () => {
+        let config = getWorkspaceTargets(tree);
+        config.build.options.scripts = scriptsWithLazy;
+        config.build.configurations.production.scripts = scriptsWithLazy;
 
-      tree.overwrite(workspacePath, JSON.stringify(config));
-      const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
-      config = readWorkspaceConfig(tree2);
-      build = config.projects['migration-test'].architect.build;
-      expect(build.options.scripts).toEqual(scriptsExpectWithLazy);
-      expect(build.configurations.production.scripts).toEqual(scriptsExpectWithLazy);
+        updateWorkspaceTargets(tree, config);
+        const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
+        config = getWorkspaceTargets(tree2).build;
+        expect(config.options.scripts).toEqual(scriptsExpectWithLazy);
+        expect(config.configurations.production.scripts).toEqual(scriptsExpectWithLazy);
+      });
+
+      it('should update styles in build target', () => {
+        let config = getWorkspaceTargets(tree);
+        config.build.options.styles = stylesWithLazy;
+        config.build.configurations.production.styles = stylesWithLazy;
+
+        updateWorkspaceTargets(tree, config);
+        const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
+        config = getWorkspaceTargets(tree2).build;
+        expect(config.options.styles).toEqual(stylesExpectWithLazy);
+        expect(config.configurations.production.styles).toEqual(stylesExpectWithLazy);
+      });
+
+      it('should update scripts in test target', () => {
+        let config = getWorkspaceTargets(tree);
+        config.test.options.scripts = scriptsWithLazy;
+        config.test.configurations = { production: { scripts: scriptsWithLazy } };
+
+        updateWorkspaceTargets(tree, config);
+        const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
+        config = getWorkspaceTargets(tree2).test;
+        expect(config.options.scripts).toEqual(scriptsExpectWithLazy);
+        expect(config.configurations.production.scripts).toEqual(scriptsExpectWithLazy);
+      });
+
+      it('should update styles in test target', () => {
+        let config = getWorkspaceTargets(tree);
+        config.test.options.styles = stylesWithLazy;
+        config.test.configurations = { production: { styles: stylesWithLazy } };
+
+        updateWorkspaceTargets(tree, config);
+        const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
+        config = getWorkspaceTargets(tree2).test;
+        expect(config.options.styles).toEqual(stylesExpectWithLazy);
+        expect(config.configurations.production.styles).toEqual(stylesExpectWithLazy);
+      });
     });
 
-    it('should update styles in build target', () => {
-      let config = readWorkspaceConfig(tree);
-      let build = config.projects['migration-test'].architect.build;
-      build.options.styles = stylesWithLazy;
-      build.configurations.production.styles = stylesWithLazy;
+    describe('anyComponentStyle bundle budget', () => {
+      it('should not append budget when already exists', () => {
+        const defaultBudget = [
+          { type: 'initial', maximumWarning: '2mb', maximumError: '5mb' },
+          { type: 'anyComponentStyle', maximumWarning: '10kb', maximumError: '50kb' },
+        ];
 
-      tree.overwrite(workspacePath, JSON.stringify(config));
-      const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
-      config = readWorkspaceConfig(tree2);
-      build = config.projects['migration-test'].architect.build;
-      expect(build.options.styles).toEqual(stylesExpectWithLazy);
-      expect(build.configurations.production.styles).toEqual(stylesExpectWithLazy);
-    });
+        let config = getWorkspaceTargets(tree);
+        config.build.configurations.production.budgets = defaultBudget;
+        updateWorkspaceTargets(tree, config);
 
-    it('should update scripts in test target', () => {
-      let config = readWorkspaceConfig(tree);
-      let test = config.projects['migration-test'].architect.test;
-      test.options.scripts = scriptsWithLazy;
-      test.configurations = { production: { scripts: scriptsWithLazy } };
+        const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
+        config = getWorkspaceTargets(tree2).build;
+        expect(config.configurations.production.budgets).toEqual(defaultBudget);
+      });
 
-      tree.overwrite(workspacePath, JSON.stringify(config));
-      const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
-      config = readWorkspaceConfig(tree2);
-      test = config.projects['migration-test'].architect.test;
-      expect(test.options.scripts).toEqual(scriptsExpectWithLazy);
-      expect(test.configurations.production.scripts).toEqual(scriptsExpectWithLazy);
-    });
+      it('should append budget in build target', () => {
+        const defaultBudget = [{ type: 'initial', maximumWarning: '2mb', maximumError: '5mb' }];
+        let config = getWorkspaceTargets(tree);
+        config.build.configurations.production.budgets = defaultBudget;
+        updateWorkspaceTargets(tree, config);
 
-    it('should update styles in test target', () => {
-      let config = readWorkspaceConfig(tree);
-      let test = config.projects['migration-test'].architect.test;
-      test.options.styles = stylesWithLazy;
-      test.configurations = { production: { styles: stylesWithLazy } };
+        const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
+        config = getWorkspaceTargets(tree2).build;
+        expect(config.configurations.production.budgets).toEqual([
+          ...defaultBudget,
+          ANY_COMPONENT_STYLE_BUDGET,
+        ]);
+      });
 
-      tree.overwrite(workspacePath, JSON.stringify(config));
-      const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
-      config = readWorkspaceConfig(tree2);
-      test = config.projects['migration-test'].architect.test;
-      expect(test.options.styles).toEqual(stylesExpectWithLazy);
-      expect(test.configurations.production.styles).toEqual(stylesExpectWithLazy);
+      it('should add budget in build target', () => {
+        let config = getWorkspaceTargets(tree);
+        config.build.configurations.production.budgets = undefined;
+        updateWorkspaceTargets(tree, config);
+
+        const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
+        config = getWorkspaceTargets(tree2).build;
+        expect(config.configurations.production.budgets).toEqual([ANY_COMPONENT_STYLE_BUDGET]);
+      });
     });
   });
 });
