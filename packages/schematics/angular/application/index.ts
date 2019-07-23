@@ -223,6 +223,11 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
               type: 'initial',
               maximumWarning: '2mb',
               maximumError: '5mb',
+            },
+            {
+              type: 'anyComponentStyle',
+              maximumWarning: '6kb',
+              maximumError: '10kb',
             }],
           },
         },
