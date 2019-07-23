@@ -38,8 +38,8 @@ export interface BrowserBuilderBaseOptions {
     index?: string;
     polyfills: string;
     assets?: (object|string)[];
-    styles?: string[];
-    scripts?: string[];
+    styles?: (object|string)[];
+    scripts?: (object|string)[];
     sourceMap?: boolean;
 }
 

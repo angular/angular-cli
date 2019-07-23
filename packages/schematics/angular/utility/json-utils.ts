@@ -31,7 +31,7 @@ export function appendPropertyInAstObject(
     recorder.insertRight(commaIndex, ',');
     index = end.offset;
   }
-  const content = JSON.stringify(value, null, indent).replace(/\n/g, indentStr);
+  const content = _stringifyContent(value, indentStr);
   recorder.insertRight(
     index,
     (node.properties.length === 0 && indent ? '\n' : '')
@@ -84,7 +84,7 @@ export function insertPropertyInAstObjectInOrder(
   const insertIndex = insertAfterProp === null
     ? node.start.offset + 1
     : insertAfterProp.end.offset + 1;
-  const content = JSON.stringify(value, null, indent).replace(/\n/g, indentStr);
+  const content = _stringifyContent(value, indentStr);
   recorder.insertRight(
     insertIndex,
     indentStr
@@ -168,7 +168,7 @@ export function appendValueInAstArray(
     index,
     (node.elements.length === 0 && indent ? '\n' : '')
     + ' '.repeat(indent)
-    + JSON.stringify(value, null, indent).replace(/\n/g, indentStr)
+    + _stringifyContent(value, indentStr)
     + indentStr.slice(0, -indent),
   );
 }
@@ -190,4 +190,25 @@ export function findPropertyInAstObject(
 
 function _buildIndent(count: number): string {
   return count ? '\n' + ' '.repeat(count) : '';
+}
+
+function _stringifyContent(value: JsonValue, indentStr: string): string {
+  // TODO: Add snapshot tests
+  
+  // The 'space' value is 2, because we want to add 2 additional
+  // indents from the 'key' node.
+
+  // If we use the indent provided we will have double indents: 
+  // "budgets": [
+  //   {
+  //     "type": "initial",
+  //     "maximumWarning": "2mb",
+  //     "maximumError": "5mb"
+  //   },
+  //   {
+  //       "type": "anyComponentStyle",
+  //       'maximumWarning": "5kb"
+  //   }
+  // ]
+  return JSON.stringify(value, null, 2).replace(/\n/g, indentStr);
 }
