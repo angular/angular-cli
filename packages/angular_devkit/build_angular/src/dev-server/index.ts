@@ -324,7 +324,14 @@ export function buildServerConfig(
         rewrites: [
           {
             from: new RegExp(`^(?!${servePath})/.*`),
-            to: context => url.format(context.parsedUrl),
+            to: context => {
+              // redirect to index.html if root is called directly
+              if (context.parsedUrl.href === '/') {
+                return `${servePath}/${path.basename(browserOptions.index)}`;
+              }
+
+              return url.format(context.parsedUrl),
+            }
           },
         ],
       } as WebpackDevServer.HistoryApiFallbackConfig),
