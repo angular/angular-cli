@@ -39,7 +39,7 @@
     "open": "6.4.0",
     "pacote": "9.5.4",
     "read-package-tree": "5.3.1",
-    "semver": "6.2.0",
+    "semver": "6.3.0",
     "symbol-observable": "1.2.0",
     "universal-analytics": "^0.4.20",
     "uuid": "^3.3.2"
