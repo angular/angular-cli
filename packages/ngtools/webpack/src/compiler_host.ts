@@ -46,6 +46,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     private readonly cacheSourceFiles: boolean,
     private readonly directTemplateLoading = false,
     private readonly ngccProcessor?: NgccProcessor,
+    private readonly moduleResolutionCache?: ts.ModuleResolutionCache,
   ) {
     this._syncHost = new virtualFs.SyncDelegateHost(host);
     this._memoryHost = new virtualFs.SyncDelegateHost(new virtualFs.SimpleMemoryHost());
@@ -405,6 +406,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
         workaroundResolve(containingFile),
         this._options,
         this,
+        this.moduleResolutionCache,
       );
 
       if (this._options.enableIvy && resolvedModule && this.ngccProcessor) {

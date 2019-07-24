@@ -355,8 +355,6 @@ export class AngularCompilerPlugin {
       this._updateForkedTypeChecker(this._rootNames, this._getChangedCompilationFiles());
     }
 
-    // Use an identity function as all our paths are absolute already.
-    this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
     const oldTsProgram = this._getTsProgram();
 
     if (this._JitMode) {
@@ -721,6 +719,9 @@ export class AngularCompilerPlugin {
         );
       }
 
+      // Use an identity function as all our paths are absolute already.
+      this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
+
       // Create the webpack compiler host.
       const webpackCompilerHost = new WebpackCompilerHost(
         this._compilerOptions,
@@ -729,6 +730,7 @@ export class AngularCompilerPlugin {
         true,
         this._options.directTemplateLoading,
         ngccProcessor,
+        this._moduleResolutionCache,
       );
 
       // Create and set a new WebpackResourceLoader in AOT
