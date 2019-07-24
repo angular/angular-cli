@@ -8,7 +8,7 @@
 // tslint:disable:no-big-function
 import { Architect } from '@angular-devkit/architect';
 import { TestLogger } from '@angular-devkit/architect/testing';
-import { logging, normalize, virtualFs } from '@angular-devkit/core';
+import { join, logging, normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, take, takeWhile, tap } from 'rxjs/operators';
 import {
   createArchitect,
@@ -16,6 +16,7 @@ import {
   ivyEnabled,
   lazyModuleFiles,
   lazyModuleFnImport,
+  outputPath,
 } from '../utils';
 
 describe('Browser Builder rebuilds', () => {
@@ -475,6 +476,136 @@ describe('Browser Builder rebuilds', () => {
         take(2),
       )
       .toPromise();
+    await run.stop();
+  });
+
+  it('rebuilds AOT works with library HTML and CSS changes', async () => {
+    // DISABLED_FOR_IVY - Not yet supported under Ivy
+    if (ivyEnabled) {
+      pending('Not supported in Ivy');
+
+      return;
+    }
+
+    const overrides = { watch: true, aot: true, deleteOutputPath: false };
+    host.replaceInFile(
+      'tsconfig.json',
+      '"lib"',
+      `"paths": {
+        "lib": [
+          "dist/lib"
+        ],
+        "lib/*": [
+          "dist/lib/*"
+        ]
+      },
+      "lib"`,
+    );
+    host.writeMultipleFiles({
+      'src/app/app.module.ts': `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { LibModule } from 'lib';
+        import { AppComponent } from './app.component';
+
+        @NgModule({
+          declarations: [AppComponent],
+          imports: [BrowserModule, LibModule],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+      `,
+      'src/app/app.component.html': '<lib></lib>',
+      'dist/lib/package.json': `
+        {
+          "name": "lib",
+          "version": "0.0.1",
+          "es2015": "fesm2015/lib.js",
+          "typings": "lib.d.ts",
+          "metadata": "lib.metadata.json"
+        }
+      `,
+      'dist/lib/lib.metadata.json': `
+        {"__symbolic":"module","version":4,"metadata":{"LibComponent":{"__symbolic":"class",
+        "decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Component","line":3,"character":1},
+        "arguments":[{"selector":"lib","template":"<p>hello world</p>","styles":["p { color: #fff }"]}]}],"members":{"__ctor__":[{"__symbolic":"constructor"}],
+        "ngOnInit":[{"__symbolic":"method"}]}},"LibModule":{"__symbolic":"class","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference",
+        "module":"@angular/core","name":"NgModule","line":15,"character":1},"arguments":[{"declarations":[{"__symbolic":"reference","name":"LibComponent"}],
+        "imports":[],"exports":[{"__symbolic":"reference","name":"LibComponent"}]}]}],"members":{}}},"origins":{"LibComponent":"./lib","LibModule":"./lib"},
+        "importAs":"lib"}
+      `,
+      'dist/lib/lib.d.ts': `
+        import { OnInit } from '@angular/core';
+        export declare class LibComponent implements OnInit {
+            constructor();
+            ngOnInit(): void;
+        }
+        export declare class LibModule {}
+      `,
+      'dist/lib/fesm2015/lib.js': `
+        import { Component, NgModule } from '@angular/core';
+        class LibComponent {
+          constructor() { }
+          ngOnInit() { }
+        }
+        LibComponent.decorators = [
+          {
+            type: Component, args: [{
+              selector: 'lib',
+              template: '<p>hello world</p>',
+              styles: ['p { color: #fff }']
+            }]
+          }
+        ];
+        LibComponent.ctorParameters = () => [];
+        class LibModule {
+        }
+        LibModule.decorators = [
+          {
+            type: NgModule, args: [{
+              declarations: [LibComponent],
+              imports: [],
+              exports: [LibComponent]
+            }]
+          }
+        ];
+        export { LibComponent, LibModule };
+      `
+    });
+
+    let buildCount = 1;
+    const run = await architect.scheduleTarget(target, overrides);
+    await run.output.pipe(
+      debounceTime(1000),
+      tap(() => {
+        const content = virtualFs.fileBufferToString(
+          host.scopedSync().read(join(outputPath, 'main.js')),
+        );
+
+        switch (buildCount) {
+          case 1:
+              expect(content).toContain('hello world');
+              expect(content).toContain('color: #fff');
+
+              host.replaceInFile('dist/lib/fesm2015/lib.js', 'hello world', 'hello universe');
+              host.replaceInFile('dist/lib/fesm2015/lib.js', '#fff', '#000');
+              host.replaceInFile('dist/lib/lib.metadata.json', 'hello world', 'hello universe');
+              host.replaceInFile('dist/lib/lib.metadata.json', '#fff', '#000');
+            break;
+          case 2:
+            expect(content).not.toContain('hello world');
+            expect(content).not.toContain('color: #fff');
+
+            expect(content).toContain('hello universe');
+            expect(content).toContain('color: #000');
+            break;
+        }
+
+        buildCount++;
+      }),
+      tap((buildEvent) => expect(buildEvent.success).toBe(true)),
+      take(2),
+    ).toPromise();
     await run.stop();
   });
 });

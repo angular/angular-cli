@@ -112,6 +112,11 @@ export class AngularCompilerPlugin {
   // even whe only a single file gets updated.
   private _hadFullJitEmit: boolean | undefined;
   private _changedFileExtensions = new Set(['ts', 'tsx', 'html', 'css', 'js', 'json']);
+  private _ngSummaryFilesExtensions = [
+    '.d.ts',
+    '.ngfactory.d.ts',
+    '.ngsummary.json',
+  ];
 
   // Webpack plugin.
   private _firstRun = true;
@@ -371,12 +376,36 @@ export class AngularCompilerPlugin {
       timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ts.createProgram');
     } else {
       time('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
+
+      const oldProgram = (this._program as Program);
+      if (oldProgram && !this._compilerOptions.enableIvy) {
+        // This is a workaround as NGC doesn't offer a way to
+        // purge summary files for library dependencies.
+        // Note: NGTSC program doesn't implement 'getLibrarySummaries' method.
+        const originalGetLibrarySummaries = oldProgram.getLibrarySummaries;
+
+        oldProgram.getLibrarySummaries = () => {
+          const summaries = originalGetLibrarySummaries.call(this);
+          for (const file of this._compilerHost.getChangedFilePaths()) {
+            if (!file.endsWith('.metadata.json')) {
+              continue;
+            }
+
+            for (const ext of this._ngSummaryFilesExtensions) {
+              summaries.delete(file.replace('.metadata.json', ext));
+            }
+          }
+
+          return summaries;
+        };
+      }
+
       // Create the Angular program.
       this._program = createProgram({
         rootNames: this._rootNames,
         options: this._compilerOptions,
         host: this._compilerHost,
-        oldProgram: this._program as Program,
+        oldProgram,
       });
       timeEnd('AngularCompilerPlugin._createOrUpdateProgram.ng.createProgram');
 

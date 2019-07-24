@@ -88,6 +88,10 @@ export function ngcLoader(this: loader.LoaderContext) {
         this.addDependency(originalFile);
         const origDependencies = plugin.getDependencies(originalFile);
         origDependencies.forEach(dep => this.addDependency(dep));
+
+        // When having a library we need to add a dependency to the .metadata.json
+        // In case it changes overtime.
+        this.addDependency(sourceFileName.replace(ngFactoryRe, '.metadata.json'));
       }
 
       // NgStyle files depend on the style file they represent.
