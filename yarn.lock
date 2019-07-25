@@ -9147,10 +9147,10 @@ sass-loader@7.1.0:
     pify "^3.0.0"
     semver "^5.5.0"
 
-sass@1.22.8:
-  version "1.22.8"
-  resolved "https://registry.yarnpkg.com/sass/-/sass-1.22.8.tgz#835178085177d5a934fb0e25a0f958b4b5bbff65"
-  integrity sha512-5md/TfquFCQw+Wp9/FoQuEolVuVsJJZ6dQjfCRihCYcyr8xoQICIU0Nads9CVH8z9khd7k8AnwCcgH6L7t+SAg==
+sass@1.22.7:
+  version "1.22.7"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.22.7.tgz#5a1a77dc11aa659db4e782d238bf9f3d44a60546"
+  integrity sha512-ahREi0AdG7RTovSv14+yd1prQSfIvFcrDpOsth5EQf1+RM7SvOxsSttzNQaFmK1aa/k/3vyYwlYF5l0Xl+6c+g==
   dependencies:
     chokidar ">=2.0.0 <4.0.0"
 
