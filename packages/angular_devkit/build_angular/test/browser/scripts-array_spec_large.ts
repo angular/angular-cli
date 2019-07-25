@@ -93,7 +93,7 @@ describe('Browser Builder scripts array', () => {
 
     host.writeMultipleFiles(scripts);
     host.appendToFile('src/main.ts', '\nimport \'./input-script.js\';');
-    
+
     // Enable differential loading
     host.appendToFile('browserslist', '\nIE 10');
 

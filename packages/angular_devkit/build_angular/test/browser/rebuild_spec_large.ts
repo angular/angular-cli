@@ -495,10 +495,10 @@ describe('Browser Builder rebuilds', () => {
           case 1:
               expect(content).not.toContain('color: green');
               host.appendToFile('src/app/app.component.css', 'h1 { color: green; }');
-            break;
+              break;
           case 2:
               expect(content).toContain('color: green');
-            break;
+              break;
         }
 
         buildCount++;
@@ -525,10 +525,10 @@ describe('Browser Builder rebuilds', () => {
           case 1:
               expect(content).not.toContain('New Updated Content');
               host.appendToFile('src/app/app.component.html', 'New Updated Content');
-            break;
+              break;
           case 2:
               expect(content).toContain('New Updated Content');
-            break;
+              break;
         }
 
         buildCount++;

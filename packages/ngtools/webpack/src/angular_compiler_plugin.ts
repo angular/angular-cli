@@ -619,7 +619,7 @@ export class AngularCompilerPlugin {
 
       usedFiles.add(forwardSlashPath(compilationModule.resource));
 
-      // We need the below for dependencies which 
+      // We need the below for dependencies which
       // are not emitted such as type only TS files
       for (const dependency of compilationModule.buildInfo.fileDependencies) {
         usedFiles.add(forwardSlashPath(dependency));
