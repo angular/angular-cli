@@ -269,7 +269,9 @@ export function parseFreeFormArguments(args: string[]): Arguments {
     }
   }
 
-  parsedOptions['--'] = leftovers;
+  if (leftovers.length) {
+    parsedOptions['--'] = leftovers;
+  }
 
   return parsedOptions;
 }
