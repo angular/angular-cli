@@ -312,80 +312,80 @@ workflows:
   default_workflow:
     jobs:
       - install
-      - lint:
-          requires:
-            - install
-      - validate:
-          requires:
-            - install
-      - build:
-          requires:
-            - install
-          filters:
-            branches:
-              ignore:
-              - /docs-preview/
-      - build-bazel:
-          requires:
-            - build
-      - test:
-          requires:
-            - build
-      - test-win:
-          requires:
-            - test
-      - test-large:
-          requires:
-            - build
-      - test-large:
-          name: test-large-ivy
-          ivy: true
-          glob: "packages/angular_devkit/build_angular/test/browser/*_spec_large.ts"
-          requires:
-            - build
-      - e2e-cli:
-          post-steps:
-            - store_artifacts:
-                path: /tmp/dist
-                destination: cli/new-production
-          requires:
-            - build
-      - e2e-cli:
-          name: e2e-cli-ivy
-          ivy: true
-          requires:
-            - build
-      - e2e-cli:
-          name: e2e-cli-ng-snapshots
-          snapshots: true
-          <<: *ignore_pull_requests
-          requires:
-            - e2e-cli
-      - e2e-cli-node-10:
-          <<: *ignore_pull_requests
-          requires:
-            - e2e-cli
-      - e2e-cli-win:
-          <<: *ignore_pull_requests
-          requires:
-            - e2e-cli
+      # - lint:
+      #     requires:
+      #       - install
+      # - validate:
+      #     requires:
+      #       - install
+      # - build:
+      #     requires:
+      #       - install
+      #     filters:
+      #       branches:
+      #         ignore:
+      #         - /docs-preview/
+      # - build-bazel:
+      #     requires:
+      #       - build
+      # - test:
+      #     requires:
+      #       - build
+      # - test-win:
+      #     requires:
+      #       - test
+      # - test-large:
+      #     requires:
+      #       - build
+      # - test-large:
+      #     name: test-large-ivy
+      #     ivy: true
+      #     glob: "packages/angular_devkit/build_angular/test/browser/*_spec_large.ts"
+      #     requires:
+      #       - build
+      # - e2e-cli:
+      #     post-steps:
+      #       - store_artifacts:
+      #           path: /tmp/dist
+      #           destination: cli/new-production
+      #     requires:
+      #       - build
+      # - e2e-cli:
+      #     name: e2e-cli-ivy
+      #     ivy: true
+      #     requires:
+      #       - build
+      # - e2e-cli:
+      #     name: e2e-cli-ng-snapshots
+      #     snapshots: true
+      #     <<: *ignore_pull_requests
+      #     requires:
+      #       - e2e-cli
+      # - e2e-cli-node-10:
+      #     <<: *ignore_pull_requests
+      #     requires:
+      #       - e2e-cli
+      # - e2e-cli-win:
+      #     <<: *ignore_pull_requests
+      #     requires:
+      #       - e2e-cli
       - test-browsers:
           requires:
-            - build
-      - snapshot_publish:
-          <<: *ignore_pull_requests
-          requires:
-            - test
-            - build
-            - e2e-cli
-      - publish:
-          requires:
-            - test
-            - build
-            - e2e-cli
-            - snapshot_publish
-          filters:
-            tags:
-              only: /^v\d+/
-            branches:
-              ignore: /.*/
+            - install
+      # - snapshot_publish:
+      #     <<: *ignore_pull_requests
+      #     requires:
+      #       - test
+      #       - build
+      #       - e2e-cli
+      # - publish:
+      #     requires:
+      #       - test
+      #       - build
+      #       - e2e-cli
+      #       - snapshot_publish
+      #     filters:
+      #       tags:
+      #         only: /^v\d+/
+      #       branches:
+      #         ignore: /.*/

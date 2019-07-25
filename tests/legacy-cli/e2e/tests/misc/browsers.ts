@@ -1,7 +1,7 @@
 import * as express from 'express';
 import * as path from 'path';
 import { copyProjectAsset } from '../../utils/assets';
-import { replaceInFile } from '../../utils/fs';
+import { appendToFile, replaceInFile, writeFile, readFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 
 export default async function () {
@@ -14,6 +14,7 @@ export default async function () {
     throw new Error('SauceLabs is not configured.');
   }
 
+  //await writeFile('browserslist', 'last 1 chrome version');
   await ng('build', '--prod');
 
   // Add Protractor configuration
@@ -46,6 +47,8 @@ export default async function () {
 
   // Setup server
   const app = express();
+  replaceInFile('dist/test-project/index.html', /<script src="(\w|-)+\.js" type="module"><\/script>/g, '');
+  console.log(readFile('dist/test-project/index.html'));
   app.use(express.static(path.resolve('dist/test-project')));
   const server = app.listen(2000, 'localhost');
 

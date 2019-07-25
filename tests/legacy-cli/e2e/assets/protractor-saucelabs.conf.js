@@ -17,88 +17,88 @@ exports.config = {
   specs: ['./src/**/*.e2e-spec.ts'],
 
   multiCapabilities: [
-    {
-      browserName: 'chrome',
-      version: '41',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'chrome',
-      version: '75',
-      tunnelIdentifier,
-    },
+    // {
+    //   browserName: 'chrome',
+    //   version: '41',
+    //   tunnelIdentifier,
+    // },
+    // {
+    //   browserName: 'chrome',
+    //   version: '75',
+    //   tunnelIdentifier,
+    // },
+    // {
+    //   browserName: 'safari',
+    //   platform: 'OS X 10.11',
+    //   version: '9.0',
+    //   tunnelIdentifier,
+    // },
     {
       browserName: 'safari',
-      platform: 'OS X 10.11',
-      version: '9.0',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'safari',
-      platform: 'OS X 10.12',
+      platform: 'macOS 10.12',
       version: '10.1',
       // This specific version is needed as otherwise it will not pass
       // See: https://github.com/angular/angular-cli/issues/15084
       seleniumVersion: '3.4.0',
       tunnelIdentifier,
-    },
-    {
-      browserName: 'safari',
-      platform: 'macOS 10.13',
-      version: '11.1',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'safari',
-      platform: 'macOS 10.13',
-      version: '12.1',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'firefox',
-      version: '48',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'firefox',
-      version: '60',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'firefox',
-      version: '68',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'internet explorer',
-      platform: 'Windows 8',
-      version: '10',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'internet explorer',
-      platform: 'Windows 8.1',
-      version: '11',
-      tunnelIdentifier,
-    },
-    {
-      browserName: "MicrosoftEdge",
-      platform: 'Windows 10',
-      version: "14.14393",
-      tunnelIdentifier,
-    },
-    {
-      browserName: "MicrosoftEdge",
-      platform: 'Windows 10',
-      version: "17.17134",
-      tunnelIdentifier,
-    },
-    {
-      browserName: "MicrosoftEdge",
-      platform: 'Windows 10',
-      version: "18.17763",
-      tunnelIdentifier,
-    },
+   },
+    // {
+    //   browserName: 'safari',
+    //   platform: 'macOS 10.13',
+    //   version: '11.1',
+    //   tunnelIdentifier,
+    // },
+    // {
+    //   browserName: 'safari',
+    //   platform: 'macOS 10.13',
+    //   version: '12.1',
+    //   tunnelIdentifier,
+    // },
+    // {
+    //   browserName: 'firefox',
+    //   version: '48',
+    //   tunnelIdentifier,
+    // },
+    // {
+    //   browserName: 'firefox',
+    //   version: '60',
+    //   tunnelIdentifier,
+    // },
+    // {
+    //   browserName: 'firefox',
+    //   version: '68',
+    //   tunnelIdentifier,
+    // },
+    // {
+    //   browserName: 'internet explorer',
+    //   platform: 'Windows 8',
+    //   version: '10',
+    //   tunnelIdentifier,
+    // },
+    // {
+    //   browserName: 'internet explorer',
+    //   platform: 'Windows 8.1',
+    //   version: '11',
+    //   tunnelIdentifier,
+    // },
+    // {
+    //   browserName: "MicrosoftEdge",
+    //   platform: 'Windows 10',
+    //   version: "14.14393",
+    //   tunnelIdentifier,
+    // },
+    // {
+    //   browserName: "MicrosoftEdge",
+    //   platform: 'Windows 10',
+    //   version: "17.17134",
+    //   tunnelIdentifier,
+    // },
+    // {
+    //   browserName: "MicrosoftEdge",
+    //   platform: 'Windows 10',
+    //   version: "18.17763",
+    //   tunnelIdentifier,
+    // },
   ],
 
   baseUrl: 'http://localhost:2000/',
