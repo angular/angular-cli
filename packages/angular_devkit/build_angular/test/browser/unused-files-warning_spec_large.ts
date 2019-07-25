@@ -75,13 +75,13 @@ describe('Browser Builder unused files warnings', () => {
     }
 
     host.writeMultipleFiles({
-      'src/app/type.ts': 'export type MyType = number;'
+      'src/app/type.ts': 'export type MyType = number;',
     });
 
     host.replaceInFile(
       'src/app/app.component.ts',
       `'@angular/core';`,
-      `'@angular/core';\nimport { MyType } from './type';\n`
+      `'@angular/core';\nimport { MyType } from './type';\n`,
     );
 
     const logger = new TestLogger('unused-files-warnings');
@@ -126,14 +126,14 @@ describe('Browser Builder unused files warnings', () => {
 
               // Write a used file
               host.writeMultipleFiles({
-                'src/testing/type.ts': 'export type MyType = number;'
+                'src/testing/type.ts': 'export type MyType = number;',
               });
-              
+
               // touch file to trigger build
               host.replaceInFile(
                 'src/app/app.component.ts',
                 `'@angular/core';`,
-                `'@angular/core';\n`
+                `'@angular/core';\n`,
               );
               break;
 
@@ -144,7 +144,7 @@ describe('Browser Builder unused files warnings', () => {
               host.replaceInFile(
                 'src/app/app.component.ts',
                 `'@angular/core';`,
-                `'@angular/core';\nimport { MyType } from '../testing/type';`
+                `'@angular/core';\nimport { MyType } from '../testing/type';`,
               );
               break;
 

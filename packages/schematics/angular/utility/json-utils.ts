@@ -194,11 +194,11 @@ function _buildIndent(count: number): string {
 
 function _stringifyContent(value: JsonValue, indentStr: string): string {
   // TODO: Add snapshot tests
-  
+
   // The 'space' value is 2, because we want to add 2 additional
   // indents from the 'key' node.
 
-  // If we use the indent provided we will have double indents: 
+  // If we use the indent provided we will have double indents:
   // "budgets": [
   //   {
   //     "type": "initial",
