@@ -2,8 +2,6 @@ import * as path from 'path';
 import { getGlobalVariable } from '../../utils/env';
 import { exec, execAndWaitForOutputToMatch, silentNpm } from '../../utils/process';
 
-const packages = require('../../../../../lib/packages').packages;
-
 export default async function () {
   // setup
   const argv = getGlobalVariable('argv');
@@ -15,8 +13,7 @@ export default async function () {
   await silentNpm(
     'install',
     '-g',
-    packages['@angular-devkit/schematics-cli'].tar,
-    '--unsafe-perm',
+    '@angular-devkit/schematics-cli',
     '--registry=http://localhost:4873',
   );
   await exec(process.platform.startsWith('win') ? 'where' : 'which', 'schematics');
