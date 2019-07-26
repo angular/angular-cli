@@ -5,8 +5,6 @@ import {
   waitForAnyProcessOutputToMatch,
 } from '../../utils/process';
 
-const packages = require('../../../../../lib/packages').packages;
-
 export default async function() {
   // Create a temporary directory to install the CLI
   await createDir('../ask-analytics');
@@ -17,7 +15,7 @@ export default async function() {
     // Install the CLI with TTY force enabled
     const execution = execWithEnv(
       'npm',
-      ['install', packages['@angular/cli'].tar, '--registry=http://localhost:4873'],
+      ['install', '@angular/cli', '--registry=http://localhost:4873'],
       { ...process.env, 'NG_FORCE_TTY': '1' },
     );
 
