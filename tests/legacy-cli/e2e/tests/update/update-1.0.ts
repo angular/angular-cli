@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import { createProjectFromAsset } from '../../utils/assets';
 import { ng, silentNpm } from '../../utils/process';
 import { isPrereleaseCli, useBuiltPackages, useCIChrome, useCIDefaults } from '../../utils/project';
@@ -8,7 +7,6 @@ export default async function() {
   const extraUpdateArgs = (await isPrereleaseCli()) ? ['--next', '--force'] : [];
 
   await createProjectFromAsset('1.0-project');
-  fs.writeFileSync('.npmrc', 'registry = http://localhost:4873', 'utf8');
 
   await useCIChrome('.');
   await expectToFail(() => ng('build'));
