@@ -1,10 +1,11 @@
-import { ng } from '../../../utils/process';
 import { writeFile } from '../../../utils/fs';
+import { ng } from '../../../utils/process';
 
-export default function () {
-  return ng('generate', 'library', 'my-lib')
-    .then(() => ng('build', 'my-lib'))
-    .then(() => writeFile('./src/app/app.module.ts', `
+export default async function () {
+  await ng('generate', 'library', 'my-lib');
+  await ng('build', 'my-lib');
+
+  await writeFile('./src/app/app.module.ts', `
       import { BrowserModule } from '@angular/platform-browser';
       import { NgModule } from '@angular/core';
       import { MyLibModule } from 'my-lib';
@@ -23,8 +24,9 @@ export default function () {
         bootstrap: [AppComponent]
       })
       export class AppModule { }
-    `))
-    .then(() => writeFile('./src/app/app.component.ts', `
+    `);
+
+  await writeFile('./src/app/app.component.ts', `
       import { Component } from '@angular/core';
       import { MyLibService } from 'my-lib';
 
@@ -39,9 +41,35 @@ export default function () {
           console.log(myLibService);
         }
       }
-    `))
-    // Check that the build succeeds both with named project, unnammed (should build app), and prod.
-    .then(() => ng('build', 'test-project'))
-    .then(() => ng('build'))
-    .then(() => ng('build', '--prod'));
+    `);
+
+  await writeFile('e2e/src/app.e2e-spec.ts', `
+    import { browser, logging, element, by } from 'protractor';
+    import { AppPage } from './app.po';
+
+    describe('workspace-project App', () => {
+      let page: AppPage;
+
+      beforeEach(() => {
+        page = new AppPage();
+      });
+
+      it('should display text from library component', () => {
+        page.navigateTo();
+        expect(element(by.css('lib-my-lib p')).getText()).toEqual('my-lib works!');
+      });
+
+      afterEach(async () => {
+        // Assert that there are no errors emitted from the browser
+        const logs = await browser.manage().logs().get(logging.Type.BROWSER);
+        expect(logs).not.toContain(jasmine.objectContaining({
+          level: logging.Level.SEVERE,
+        }));
+      });
+    });
+  `);
+
+  // Check that the tests succeeds both with named project, unnammed (should test app), and prod.
+  await ng('e2e');
+  await ng('e2e', 'test-project', '--devServerTarget=test-project:serve:production');
 }
