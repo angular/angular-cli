@@ -14,10 +14,10 @@
     "ng-packagr": "^4.0.0 || ^5.0.0"
   },
   "devDependencies": {
-    "@angular/compiler": "~8.1.0",
-    "@angular/compiler-cli": "~8.1.0",
+    "@angular/compiler": "~8.2.0-rc.0",
+    "@angular/compiler-cli": "~8.2.0-rc.0",
     "@angular-devkit/core": "0.0.0",
-    "ng-packagr": "^5.1.0",
-    "tslib": "^1.9.0"
+    "ng-packagr": "^5.3.0",
+    "tslib": "^1.10.0"
   }
 }

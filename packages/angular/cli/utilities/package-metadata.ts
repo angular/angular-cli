@@ -191,7 +191,7 @@ export async function fetchPackageMetadata(
 
   if (response.versions) {
     for (const [version, manifest] of Object.entries(response.versions)) {
-      metadata.versions.set(version, normalizeManifest(manifest));
+      metadata.versions.set(version, normalizeManifest(manifest as {}));
     }
   }
 
