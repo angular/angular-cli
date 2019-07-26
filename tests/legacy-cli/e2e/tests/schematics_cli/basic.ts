@@ -12,7 +12,13 @@ export default async function () {
   }
 
   const startCwd = process.cwd();
-  await silentNpm('install', '-g', packages['@angular-devkit/schematics-cli'].tar, '--unsafe-perm');
+  await silentNpm(
+    'install',
+    '-g',
+    packages['@angular-devkit/schematics-cli'].tar,
+    '--unsafe-perm',
+    '--registry=http://localhost:4873',
+  );
   await exec(process.platform.startsWith('win') ? 'where' : 'which', 'schematics');
 
   // create blank schematic

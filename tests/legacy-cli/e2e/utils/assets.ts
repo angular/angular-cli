@@ -2,7 +2,7 @@ import {join} from 'path';
 import * as glob from 'glob';
 import {getGlobalVariable} from './env';
 import {relative} from 'path';
-import {copyFile} from './fs';
+import {copyFile, writeFile} from './fs';
 import {useBuiltPackages} from './project';
 import { git, silentNpm } from './process';
 
@@ -39,10 +39,12 @@ export function copyAssets(assetName: string) {
 }
 
 
-export function createProjectFromAsset(assetName: string, useNpmPackages = false) {
-  return Promise.resolve()
-    .then(() => copyAssets(assetName))
-    .then(dir => process.chdir(dir))
-    .then(() => useNpmPackages ? null : useBuiltPackages())
-    .then(() => silentNpm('install'));
+export async function createProjectFromAsset(assetName: string, useNpmPackages = false) {
+  const dir = await copyAssets(assetName);
+  process.chdir(dir);
+  if (!useNpmPackages) {
+    await useBuiltPackages();
+    await writeFile('.npmrc', 'registry = http://localhost:4873', 'utf8');
+  }
+  await silentNpm('install');
 }
