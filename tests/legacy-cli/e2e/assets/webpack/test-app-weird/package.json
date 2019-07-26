@@ -21,7 +21,7 @@
     "preprocess-loader": "^0.2.2",
     "raw-loader": "^0.5.1",
     "sass-loader": "^6.0.0",
-    "typescript": "~3.4.5",
+    "typescript": "~3.5.3",
     "webpack": "~4.0.1",
     "webpack-cli": "~2.0.9"
   }

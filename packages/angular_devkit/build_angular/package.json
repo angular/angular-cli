@@ -57,18 +57,19 @@
     "worker-plugin": "3.1.0"
   },
   "devDependencies": {
-    "@angular/animations": "~8.1.0",
+    "@angular/animations": "~8.2.0-rc.0",
     "@angular/cdk": "^8.0.0",
-    "@angular/common": "~8.1.0",
-    "@angular/compiler": "~8.1.0",
-    "@angular/compiler-cli": "~8.1.0",
-    "@angular/core": "~8.1.0",
+    "@angular/common": "~8.2.0-rc.0",
+    "@angular/compiler": "~8.2.0-rc.0",
+    "@angular/compiler-cli": "~8.2.0-rc.0",
+    "@angular/core": "~8.2.0-rc.0",
+    "@angular/forms": "~8.2.0-rc.0",
     "@angular/material": "^8.0.0",
-    "@angular/platform-browser": "~8.1.0",
-    "@angular/platform-browser-dynamic": "~8.1.0",
-    "@angular/platform-server": "~8.1.0",
-    "@angular/router": "~8.1.0",
-    "@angular/service-worker": "~8.1.0",
+    "@angular/platform-browser": "~8.2.0-rc.0",
+    "@angular/platform-browser-dynamic": "~8.2.0-rc.0",
+    "@angular/platform-server": "~8.2.0-rc.0",
+    "@angular/router": "~8.2.0-rc.0",
+    "@angular/service-worker": "~8.2.0-rc.0",
     "codelyzer": "^5.0.0",
     "bootstrap": "^4.0.0",
     "font-awesome": "^4.7.0",
@@ -86,6 +87,6 @@
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^8.0.0-beta.0 || ^8.1.0-beta.0 || ^8.2.0-beta.0 || ^8.3.0-beta.0 || ^8.4.0-beta.0 || >=9.0.0-beta < 9",
-    "typescript": ">=3.1 < 3.5"
+    "typescript": ">=3.1 < 3.6"
   }
 }

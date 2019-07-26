@@ -21,7 +21,7 @@
     "performance-now": "^0.2.0",
     "raw-loader": "^0.5.1",
     "sass-loader": "^6.0.3",
-    "typescript": "~3.4.5",
+    "typescript": "~3.5.3",
     "webpack": "~4.0.1",
     "webpack-cli": "~2.0.9"
   }

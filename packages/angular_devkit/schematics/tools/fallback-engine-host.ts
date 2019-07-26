@@ -94,7 +94,7 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
     // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/3989
     return ((observableOf(options) as any)
       .pipe(...this._hosts
-        .map(host => mergeMap(opt => host.transformOptions(schematic, opt, context))),
+        .map(host => mergeMap((opt: {}) => host.transformOptions(schematic, opt, context))),
       )
     ) as {} as Observable<ResultT>;
   }
