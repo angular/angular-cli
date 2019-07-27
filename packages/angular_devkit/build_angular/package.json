@@ -82,7 +82,7 @@
     "karma-jasmine-html-reporter": "^1.4.0",
     "popper.js": "^1.14.1",
     "protractor": "~5.4.0",
-    "zone.js": "^0.9.1"
+    "zone.js": "^0.10.0"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^8.0.0-beta.0 || ^8.1.0-beta.0 || ^8.2.0-beta.0 || ^8.3.0-beta.0 || ^8.4.0-beta.0 || >=9.0.0-beta < 9",
