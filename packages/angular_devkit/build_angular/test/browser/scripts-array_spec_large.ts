@@ -85,8 +85,8 @@ describe('Browser Builder scripts array', () => {
       'main.js': 'input-script',
       'index.html': '<script src="runtime.js" type="module"></script>'
         + '<script src="polyfills.js" type="module"></script>'
-        + '<script src="scripts.js" defer></script>'
-        + '<script src="renamed-script.js" defer></script>'
+        + '<script src="scripts.js"></script>'
+        + '<script src="renamed-script.js"></script>'
         + '<script src="vendor.js" type="module"></script>'
         + '<script src="main.js" type="module"></script>',
     };
