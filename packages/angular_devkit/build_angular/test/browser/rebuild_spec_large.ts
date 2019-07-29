@@ -77,6 +77,7 @@ describe('Browser Builder rebuilds', () => {
     const run = await architect.scheduleTarget(target, overrides);
     await run.output
       .pipe(
+        debounceTime(1000),
         tap(result => {
           expect(result.success).toBe(true, 'build should succeed');
           const hasLazyChunk = host.scopedSync().exists(normalize('dist/lazy-lazy-module.js'));
@@ -127,7 +128,7 @@ describe('Browser Builder rebuilds', () => {
     const run = await architect.scheduleTarget(target, overrides);
     await run.output
       .pipe(
-        debounceTime(500),
+        debounceTime(1000),
         tap(buildEvent => expect(buildEvent.success).toBe(true)),
         tap(() => host.appendToFile('src/app/app.component.css', ':host { color: blue; }')),
         take(2),
