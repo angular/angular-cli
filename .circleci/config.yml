@@ -340,7 +340,7 @@ workflows:
       - test-large:
           name: test-large-ivy
           ivy: true
-          glob: "packages/angular_devkit/build_angular/test/browser/*_spec_large.ts"
+          glob: "packages/angular_devkit/@(build_angular|build_ng_packagr)/@(src|test)/@(build|browser)/*_spec_large.ts"
           requires:
             - build
       - e2e-cli:
