@@ -17,7 +17,7 @@
     "@angular/compiler": "~8.2.0-rc.0",
     "@angular/compiler-cli": "~8.2.0-rc.0",
     "@angular-devkit/core": "0.0.0",
-    "ng-packagr": "^5.3.0",
+    "ng-packagr": "^5.4.0",
     "tslib": "^1.10.0"
   }
 }
