@@ -18,10 +18,16 @@ import {
 } from '@angular-devkit/core'; // tslint:disable-line:no-implicit-dependencies
 import { map, take, tap } from 'rxjs/operators';
 
+export const ivyEnabled = process.argv.includes('--ivy');
+if (ivyEnabled) {
+  // tslint:disable-next-line:no-console
+  console.warn('********* IVY Enabled ***********');
+}
+
 const devkitRoot = (global as unknown as { _DevKitRoot: string})._DevKitRoot;
 const workspaceRoot = join(
   normalize(devkitRoot),
-  'tests/angular_devkit/build_ng_packagr/ng-packaged/',
+  `tests/angular_devkit/build_ng_packagr/ng-packaged${ivyEnabled ? '-ivy' : ''}/`,
 );
 
 describe('NgPackagr Builder', () => {
@@ -59,6 +65,12 @@ describe('NgPackagr Builder', () => {
       host.scopedSync().read(normalize('./dist/lib/fesm5/lib.js')),
     );
     expect(content).toContain('lib works');
+
+    if (ivyEnabled) {
+      expect(content).toContain('ngComponentDef');
+    } else {
+      expect(content).not.toContain('ngComponentDef');
+    }
   });
 
   it('rebuilds on TS file changes', async () => {
