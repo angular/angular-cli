@@ -222,15 +222,6 @@ describe('Application Schematic', () => {
     expect(workspace.projects.foo.architect.build.options.aot).toEqual(false);
   });
 
-  it('should set AOT option to true for Ivy projects', async () => {
-    const options = { ...defaultOptions, enableIvy: true };
-
-    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
-      .toPromise();
-    const workspace = JSON.parse(tree.readContent('/angular.json'));
-    expect(workspace.projects.foo.architect.build.options.aot).toEqual(true);
-  });
-
   it('should set the right files, exclude, include in the tsconfig for VE projects', async () => {
     const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
       .toPromise();
@@ -241,18 +232,7 @@ describe('Application Schematic', () => {
     expect(tsConfig.include).toEqual(['src/**/*.ts']);
   });
 
-  it('should set the right files, exclude, include in the tsconfig for Ivy projects', async () => {
-    const options = { ...defaultOptions, enableIvy: true };
-    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
-      .toPromise();
-    const path = '/projects/foo/tsconfig.app.json';
-    const tsConfig = JSON.parse(tree.readContent(path));
-    expect(tsConfig.files).toEqual(['src/main.ts', 'src/polyfills.ts']);
-    expect(tsConfig.exclude).toBeUndefined();
-    expect(tsConfig.include).toEqual(['src/**/*.d.ts']);
-  });
-
-  describe(`update package.json`, () => {
+  describe('update package.json', () => {
     it(`should add build-angular to devDependencies`, async () => {
       const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
         .toPromise();
@@ -425,6 +405,32 @@ describe('Application Schematic', () => {
       expect(appTsConfig.extends).toEqual('../tsconfig.json');
       const specTsConfig = JSON.parse(tree.readContent('/foo/tsconfig.spec.json'));
       expect(specTsConfig.extends).toEqual('../tsconfig.json');
+    });
+  });
+
+  describe('IVY application', () => {
+    beforeEach(() => {
+      // Enable an Ivy workspace
+      const tsconfig = JSON.parse(workspaceTree.readContent('./tsconfig.json'));
+      tsconfig.angularCompilerOptions.enableIvy = true;
+      workspaceTree.overwrite('./tsconfig.json', JSON.stringify(tsconfig, undefined, 2));
+    });
+
+    it('should set the right files, exclude, include in the tsconfig for Ivy projects', async () => {
+      const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
+        .toPromise();
+      const path = '/projects/foo/tsconfig.app.json';
+      const tsConfig = JSON.parse(tree.readContent(path));
+      expect(tsConfig.files).toEqual(['src/main.ts', 'src/polyfills.ts']);
+      expect(tsConfig.exclude).toBeUndefined();
+      expect(tsConfig.include).toEqual(['src/**/*.d.ts']);
+    });
+
+    it('should set AOT option to true for Ivy projects', async () => {
+      const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
+        .toPromise();
+      const workspace = JSON.parse(tree.readContent('/angular.json'));
+      expect(workspace.projects.foo.architect.build.options.aot).toEqual(true);
     });
   });
 });

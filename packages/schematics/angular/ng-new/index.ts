@@ -40,13 +40,13 @@ export default function (options: NgNewOptions): Rule {
   const workspaceOptions: WorkspaceOptions = {
     name: options.name,
     version: options.version,
+    enableIvy: options.enableIvy,
     newProjectRoot: options.newProjectRoot || 'projects',
     minimal: options.minimal,
   };
   const applicationOptions: ApplicationOptions = {
     projectRoot: '',
     name: options.name,
-    enableIvy: options.enableIvy,
     inlineStyle: options.inlineStyle,
     inlineTemplate: options.inlineTemplate,
     prefix: options.prefix,

@@ -79,4 +79,11 @@ describe('Ng New Schematic', () => {
     const confContent = JSON.parse(tree.readContent('/bar/angular.json'));
     expect(confContent.projects.foo.e2e).toBeUndefined();
   });
+
+  it('should set AOT option to true for Ivy projects', async () => {
+    const options = { ...defaultOptions, enableIvy: true };
+    const tree = await schematicRunner.runSchematicAsync('ng-new', options).toPromise();
+    const workspace = JSON.parse(tree.readContent('/bar/angular.json'));
+    expect(workspace.projects.foo.architect.build.options.aot).toEqual(true);
+  });
 });

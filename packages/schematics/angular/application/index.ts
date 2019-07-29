@@ -39,7 +39,7 @@ import { latestVersions } from '../utility/latest-versions';
 import { applyLintFix } from '../utility/lint-fix';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { validateProjectName } from '../utility/validation';
-import { getWorkspace, updateWorkspace } from '../utility/workspace';
+import { getWorkspace, isIvyWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders, ProjectType } from '../utility/workspace-models';
 import { Schema as ApplicationOptions, Style } from './schema';
 
@@ -143,7 +143,7 @@ function mergeWithRootTsLint(parentHost: Tree) {
   };
 }
 
-function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rule {
+function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string, enableIvy: boolean): Rule {
   let projectRoot = appDir;
   if (projectRoot) {
     projectRoot += '/';
@@ -194,7 +194,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
           main: `${sourceRoot}/main.ts`,
           polyfills: `${sourceRoot}/polyfills.ts`,
           tsConfig: `${projectRoot}tsconfig.app.json`,
-          aot: !!options.enableIvy,
+          aot: enableIvy,
           assets: [
             `${sourceRoot}/favicon.ico`,
             `${sourceRoot}/assets`,
@@ -336,14 +336,17 @@ export default function (options: ApplicationOptions): Rule {
       rootSelector: appRootSelector,
     };
 
+    const enableIvy = isIvyWorkspace(host);
+
     return chain([
-      addAppToWorkspaceFile(options, appDir),
+      addAppToWorkspaceFile(options, appDir, enableIvy),
       mergeWith(
         apply(url('./files'), [
           options.minimal ? filter(minimalPathFilter) : noop(),
           applyTemplates({
             utils: strings,
             ...options,
+            enableIvy,
             relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(appDir),
             appName: options.name,
             isRootApp,

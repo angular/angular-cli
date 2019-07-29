@@ -17,8 +17,5 @@
   ]<% } %><% if (enableIvy) { %>
   "include": [
     "src/**/*.d.ts"
-  ],
-  "angularCompilerOptions": {
-    "enableIvy": true
-  }<% } %>
+  ]<% } %>
 }

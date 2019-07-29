@@ -5,8 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { virtualFs, workspaces } from '@angular-devkit/core';
+import { JsonParseMode, parseJsonAst, virtualFs, workspaces } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
+import { findPropertyInAstObject } from './json-utils';
 
 function createHost(tree: Tree): workspaces.WorkspaceHost {
   return {
@@ -87,4 +88,29 @@ export async function createDefaultPath(tree: Tree, projectName: string): Promis
   }
 
   return buildDefaultPath(project);
+}
+
+/**
+ * Returns `true` when the workspace root tsconfig is set to use Ivy
+ * as the Angular rendering engine.
+ */
+export function isIvyWorkspace(tree: Tree): boolean {
+  const buffer = tree.read('/tsconfig.json');
+  if (buffer) {
+    const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
+    if (tsCfgAst.kind !== 'object') {
+      return false;
+    }
+
+    const ngCompilerOptionsNode = findPropertyInAstObject(tsCfgAst, 'angularCompilerOptions');
+    if (!ngCompilerOptionsNode || ngCompilerOptionsNode.kind !== 'object') {
+      return false;
+    }
+
+    const enableIvy = findPropertyInAstObject(ngCompilerOptionsNode, 'enableIvy');
+
+    return !!enableIvy && enableIvy.kind === 'true';
+  }
+
+  return false;
 }

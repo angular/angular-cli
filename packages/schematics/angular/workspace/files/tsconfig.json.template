@@ -19,7 +19,8 @@
       "dom"
     ]
   },
-  "angularCompilerOptions": {
+  "angularCompilerOptions": {<% if (enableIvy) { %>
+    "enableIvy": true,<% } %>
     "fullTemplateTypeCheck": true,
     "strictInjectionParameters": true
   }
