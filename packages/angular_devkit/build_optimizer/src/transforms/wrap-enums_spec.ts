@@ -88,6 +88,37 @@ describe('wrap enums and classes transformer', () => {
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
 
+    it('should not wrap enum like which are inside of methods', () => {
+      const input = tags.stripIndent`
+        class LayoutDirective {
+          constructor(elRef) { }
+
+          applyStyleToElement(element, style, value) {
+            let styles = {};
+            if (typeof style === 'string') {
+                styles[style] = value;
+                style = styles;
+            }
+            styles = this.layoutConfig.disableVendorPrefixes ? style : applyCssPrefixes(style);
+            this._applyMultiValueStyleToElement(styles, element);
+          }
+        }
+        LayoutDirective.ctorParameters = () => [
+          { type: ElementRef }
+        ];
+      `;
+
+      const output = tags.stripIndent`
+        let LayoutDirective = /*@__PURE__*/ (() => {
+          ${input}
+
+          return LayoutDirective;
+        })();
+      `;
+
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
     it('should ClassDeclarations that are referenced with in CallExpressions', () => {
       const input = tags.stripIndent`
         class ApplicationModule {
@@ -435,6 +466,22 @@ describe('wrap enums and classes transformer', () => {
           return ChangeDetectionStrategy;
         }());
       `;
+
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should not wrap enum like object literal declarations', () => {
+      const input = tags.stripIndent`
+        const RendererStyleFlags3 = {
+            Important: 1,
+            DashCase: 2,
+        };
+        if (typeof RendererStyleFlags3 === 'object') {
+          RendererStyleFlags3[RendererStyleFlags3.Important] = 'DashCase';
+        }
+        RendererStyleFlags3[RendererStyleFlags3.Important] = 'Important';
+      `;
+      const output = input;
 
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
