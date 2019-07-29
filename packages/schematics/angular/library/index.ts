@@ -14,6 +14,7 @@ import {
   apply,
   applyTemplates,
   chain,
+  filter,
   mergeWith,
   move,
   noop,
@@ -26,7 +27,7 @@ import { latestVersions } from '../utility/latest-versions';
 import { applyLintFix } from '../utility/lint-fix';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { validateProjectName } from '../utility/validation';
-import { getWorkspace, updateWorkspace } from '../utility/workspace';
+import { getWorkspace, isIvyWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders, ProjectType } from '../utility/workspace-models';
 import { Schema as LibraryOptions } from './schema';
 
@@ -124,10 +125,11 @@ function addDependenciesToPackageJson() {
   };
 }
 
-function addAppToWorkspaceFile(
+function addLibToWorkspaceFile(
   options: LibraryOptions,
   projectRoot: string,
   projectName: string,
+  enableIvy: boolean,
 ): Rule {
   return updateWorkspace(workspace => {
     if (workspace.projects.size === 0) {
@@ -147,6 +149,11 @@ function addAppToWorkspaceFile(
             tsConfig: `${projectRoot}/tsconfig.lib.json`,
             project: `${projectRoot}/ng-package.json`,
           },
+          configurations: enableIvy ? {
+            production: {
+              tsConfig: `${projectRoot}/tsconfig.lib.prod.json`,
+            },
+          } : undefined,
         },
         test: {
           builder: Builders.Karma,
@@ -199,16 +206,18 @@ export default function (options: LibraryOptions): Rule {
     const folderName = `${scopeFolder}${strings.dasherize(options.name)}`;
     const projectRoot = join(normalize(newProjectRoot), folderName);
     const distRoot = `dist/${folderName}`;
-
     const sourceDir = `${projectRoot}/src/lib`;
+    const enableIvy = isIvyWorkspace(host);
 
     const templateSource = apply(url('./files'), [
+      enableIvy ? noop() : filter(f => !f.endsWith('tsconfig.lib.prod.json.template')),
       applyTemplates({
         ...strings,
         ...options,
         packageName,
         projectRoot,
         distRoot,
+        enableIvy,
         relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(projectRoot),
         prefix,
         angularLatestVersion: latestVersions.Angular.replace('~', '').replace('^', ''),
@@ -219,7 +228,7 @@ export default function (options: LibraryOptions): Rule {
 
     return chain([
       mergeWith(templateSource),
-      addAppToWorkspaceFile(options, projectRoot, projectName),
+      addLibToWorkspaceFile(options, projectRoot, projectName, enableIvy),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
       options.skipTsConfig ? noop() : updateTsConfig(packageName, distRoot),
       schematic('module', {

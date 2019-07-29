@@ -132,7 +132,7 @@ describe('Library Schematic', () => {
   });
 
   it('should handle a pascalCasedName', async () => {
-    const options = {...defaultOptions, name: 'pascalCasedName'};
+    const options = { ...defaultOptions, name: 'pascalCasedName' };
     const tree = await schematicRunner.runSchematicAsync('library', options, workspaceTree).toPromise();
     const config = getJsonFileContent(tree, '/angular.json');
     const project = config.projects.pascalCasedName;
@@ -316,5 +316,63 @@ describe('Library Schematic', () => {
     expect(appTsConfig.extends).toEqual('../tsconfig.json');
     const specTsConfig = JSON.parse(tree.readContent('/foo/tsconfig.spec.json'));
     expect(specTsConfig.extends).toEqual('../tsconfig.json');
+  });
+
+
+  describe('VE libraries', () => {
+    it(`should not create 'tsconfig.lib.prod.json' in VE workspaces`, async () => {
+      const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree)
+        .toPromise();
+
+      expect(tree.exists('/projects/foo/tsconfig.lib.prod.json')).toBeFalsy();
+    });
+
+    it(`should not add 'production' configuration in VE workspaces`, async () => {
+      const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree)
+        .toPromise();
+
+      const workspace = JSON.parse(tree.readContent('/angular.json'));
+      expect(workspace.projects.foo.architect.build.configurations).toBeUndefined();
+    });
+
+    it(`should add VE specific configuration in 'tsconfig.lib.json' in VE workspaces`, async () => {
+      const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree)
+        .toPromise();
+
+      const config = JSON.parse(tree.readContent('/projects/foo/tsconfig.lib.json'));
+      expect(config.angularCompilerOptions.strictMetadataEmit).toBeTruthy();
+    });
+
+  });
+  describe('IVY libraries', () => {
+    beforeEach(() => {
+      // Enable an Ivy workspace
+      const tsconfig = JSON.parse(workspaceTree.readContent('./tsconfig.json'));
+      tsconfig.angularCompilerOptions.enableIvy = true;
+      workspaceTree.overwrite('./tsconfig.json', JSON.stringify(tsconfig, undefined, 2));
+    });
+
+    it(`should create 'tsconfig.lib.prod.json'`, async () => {
+      const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree)
+        .toPromise();
+
+      expect(tree.exists('/projects/foo/tsconfig.lib.prod.json')).toBeTruthy();
+    });
+
+    it(`should add 'production' configuration in Ivy workspaces`, async () => {
+      const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree)
+        .toPromise();
+
+      const workspace = JSON.parse(tree.readContent('/angular.json'));
+      expect(workspace.projects.foo.architect.build.configurations.production).toBeDefined();
+    });
+
+    it(`should not add VE specific configuration in 'tsconfig.lib.json'`, async () => {
+      const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree)
+        .toPromise();
+
+      const config = JSON.parse(tree.readContent('/projects/foo/tsconfig.lib.json'));
+      expect(config.angularCompilerOptions.strictMetadataEmit).toBeUndefined();
+    });
   });
 });
