@@ -10,6 +10,9 @@ import * as ts from 'typescript';
 import { forwardSlashPath } from '../utils';
 
 
+// Check if a ts.Symbol is an alias.
+const isAlias = (symbol: ts.Symbol) => symbol.flags & ts.SymbolFlags.Alias;
+
 /**
  * Given this original source code:
  *
@@ -193,15 +196,26 @@ function replaceImport(
 
   // Try to resolve the import. It might be a reexport from somewhere and the ngfactory will only
   // be present next to the original module.
-  const exportedSymbol = typeChecker.getSymbolAtLocation(exportNameId);
+  let exportedSymbol = typeChecker.getSymbolAtLocation(exportNameId);
   if (!exportedSymbol) {
     return warnAndBail();
   }
+  // Named exports are also a declaration in the re-exporting module so we have to follow the
+  // re-exports to find the original symbol.
+  if (isAlias(exportedSymbol)) {
+    exportedSymbol = typeChecker.getAliasedSymbol(exportedSymbol);
+    if (!exportedSymbol) {
+      return warnAndBail();
+    }
+  }
+
+  // Find declarations of the original symbol so we can get their source file name.
   const exportedSymbolDecl = exportedSymbol.getDeclarations();
   if (!exportedSymbolDecl || exportedSymbolDecl.length === 0) {
     return warnAndBail();
   }
 
+  // Let's guess the first declaration is the one we want, because we don't have a better criteria.
   // Get the relative path from the containing module to the imported module.
   const relativePath = relative(dirname(fileName), exportedSymbolDecl[0].getSourceFile().fileName);
 
