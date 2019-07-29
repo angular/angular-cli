@@ -63,7 +63,7 @@ export function UpdateWorkspaceConfig(): Rule {
       const buildTarget = findPropertyInAstObject(architect, 'build');
       if (buildTarget && buildTarget.kind === 'object') {
         const builder = findPropertyInAstObject(buildTarget, 'builder');
-        // Projects who's build builder is not build-angular:browser
+        // Projects who's build builder is @angular-devkit/build-angular:browser
         if (builder && builder.kind === 'string' && builder.value === '@angular-devkit/build-angular:browser') {
           updateStyleOrScriptOption('styles', recorder, buildTarget);
           updateStyleOrScriptOption('scripts', recorder, buildTarget);
@@ -74,7 +74,7 @@ export function UpdateWorkspaceConfig(): Rule {
       const testTarget = findPropertyInAstObject(architect, 'test');
       if (testTarget && testTarget.kind === 'object') {
         const builder = findPropertyInAstObject(testTarget, 'builder');
-        // Projects who's build builder is not build-angular:browser
+        // Projects who's build builder is @angular-devkit/build-angular:karma
         if (builder && builder.kind === 'string' && builder.value === '@angular-devkit/build-angular:karma') {
           updateStyleOrScriptOption('styles', recorder, testTarget);
           updateStyleOrScriptOption('scripts', recorder, testTarget);
