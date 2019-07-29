@@ -9,11 +9,8 @@ import { getGlobalVariable } from '../../utils/env';
 import { appendToFile, prependToFile, readFile, replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
-import { expectToFail } from '../../utils/utils';
 
 export default async function () {
-  const argv = getGlobalVariable('argv');
-  const ivyProject = argv['ivy'];
   const projectName = 'test-project';
   const appRoutingModulePath = 'src/app/app-routing.module.ts';
 

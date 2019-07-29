@@ -17,7 +17,7 @@ export default async function() {
     await ng('e2e', '--prod');
 
     // View Engine (NGC) compilation should work after running NGCC from Webpack
-    await replaceInFile('tsconfig.app.json', '"enableIvy": true', '"enableIvy": false');
+    await replaceInFile('tsconfig.json', '"enableIvy": true', '"enableIvy": false');
 
     // verify that VE compilation works during runtime
     await ng('e2e', '--prod');

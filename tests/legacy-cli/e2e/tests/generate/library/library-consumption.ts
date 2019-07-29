@@ -1,10 +1,9 @@
+import { getGlobalVariable } from '../../../utils/env';
 import { writeFile } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
 
 export default async function () {
   await ng('generate', 'library', 'my-lib');
-  await ng('build', 'my-lib');
-
   await writeFile('./src/app/app.module.ts', `
       import { BrowserModule } from '@angular/platform-browser';
       import { NgModule } from '@angular/core';
@@ -68,6 +67,25 @@ export default async function () {
       });
     });
   `);
+
+  await runLibraryTests();
+
+  const argv = getGlobalVariable('argv');
+  const ivyProject = argv['ivy'];
+  if (ivyProject) {
+    // Library have --prod under Ivy. This is because for production users
+    // shouldn't ship Ivy verions of the libraries but rather VE.
+    await runLibraryTests(true);
+  }
+}
+
+async function runLibraryTests(libraryProdMode = false): Promise<void> {
+  const args = ['build', 'my-lib'];
+  if (libraryProdMode) {
+    args.push('--prod');
+  }
+
+  await ng(...args);
 
   // Check that the tests succeeds both with named project, unnammed (should test app), and prod.
   await ng('e2e');
