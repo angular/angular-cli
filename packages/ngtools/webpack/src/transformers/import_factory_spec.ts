@@ -64,9 +64,83 @@ describe('@ngtools/webpack transformers', () => {
       expect(warningCalled).toBeTruthy();
     });
 
-    it('should support resolving reexports', () => {
+    it('should support resolving * re-exports', () => {
       const additionalFiles: Record<string, string> = {
         'shared/index.ts': `
+          export * from './path/to/lazy/lazy.module';
+        `,
+        'shared/path/to/lazy/lazy.module.ts': `
+          export const LazyModule = {};
+        `,
+      };
+      const input = tags.stripIndent`
+        const ɵ0 = () => import('./shared').then(m => m.LazyModule);
+        const routes = [{
+          path: 'lazy',
+          loadChildren: ɵ0
+        }];
+      `;
+
+      const output = tags.stripIndent`
+        const ɵ0 = () => import("./shared/path/to/lazy/lazy.module.ngfactory").then(m => m.LazyModuleNgFactory);
+        const routes = [{
+          path: 'lazy',
+          loadChildren: ɵ0
+        }];
+      `;
+
+      const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true);
+      const transformer = importFactory(() => { }, () => program.getTypeChecker());
+      const result = transformTypescript(undefined, [transformer], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should support resolving named re-exports', () => {
+      const additionalFiles: Record<string, string> = {
+        'shared/index.ts': `
+          export { LazyModule } from './path/to/lazy/lazy.module';
+        `,
+        'shared/path/to/lazy/lazy.module.ts': `
+          export const LazyModule = {};
+        `,
+      };
+      const input = tags.stripIndent`
+        const ɵ0 = () => import('./shared').then(m => m.LazyModule);
+        const routes = [{
+          path: 'lazy',
+          loadChildren: ɵ0
+        }];
+      `;
+
+      const output = tags.stripIndent`
+        const ɵ0 = () => import("./shared/path/to/lazy/lazy.module.ngfactory").then(m => m.LazyModuleNgFactory);
+        const routes = [{
+          path: 'lazy',
+          loadChildren: ɵ0
+        }];
+      `;
+
+      const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true);
+      const transformer = importFactory(() => { }, () => program.getTypeChecker());
+      const result = transformTypescript(undefined, [transformer], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+
+    it('should support resolving re-export chains', () => {
+      const additionalFiles: Record<string, string> = {
+        'shared/index.ts': `
+          export { LazyModule } from './index2';
+        `,
+        'shared/index2.ts': `
+          export * from './index3';
+        `,
+        'shared/index3.ts': `
+          export { LazyModule } from './index4';
+        `,
+        'shared/index4.ts': `
           export * from './path/to/lazy/lazy.module';
         `,
         'shared/path/to/lazy/lazy.module.ts': `
