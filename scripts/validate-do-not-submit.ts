@@ -50,7 +50,10 @@ export default async function (argv: ValidateCommitsOptions, logger: logging.Log
   let errorCount = 0;
 
   for (const fileName of files) {
-    const diff = execSync(`git diff "${baseSha}..${sha}" -- "${fileName}"`).toString().trim();
+    const diff = execSync(`git diff "${baseSha}..${sha}" -- "${fileName}"`, {
+      // Increase the default buffer size by 100. Diffs can be quite large.
+      maxBuffer: 100 * 1024 * 1024,
+    }).toString().trim();
 
     // This does not trigger itself because of the `b` in `\bDO_`...
     if (diff.match(/\bDO_NOT_SUBMIT\b/)) {
