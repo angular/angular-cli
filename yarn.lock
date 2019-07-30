@@ -739,6 +739,13 @@
     "@types/uglify-js" "*"
     source-map "^0.6.0"
 
+"@verdaccio/commons-api@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@verdaccio/commons-api/-/commons-api-0.1.2.tgz#084c2c06b22e998ff3bab265de17397998953da3"
+  integrity sha512-BweLdqHGVpDPZf1BkFVOTb+OW+WQp8TiEFJ4EvVJkpngg9rgvK9MAdJF/NZorGuUIoVIPJmtNwf/fId/ya9Udw==
+  dependencies:
+    http-errors "1.7.3"
+
 "@verdaccio/file-locking@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@verdaccio/file-locking/-/file-locking-1.0.0.tgz#2f148612d9ce5c3c0dfd826151561b2aa887777d"
@@ -779,10 +786,10 @@
   resolved "https://registry.yarnpkg.com/@verdaccio/streams/-/streams-2.0.0.tgz#27f51d0cb19d5e49248860942092646e9a357967"
   integrity sha512-QW1LsYir3wNnqhSznbJlt0iqkcgve0LpXI8RkoTTBPrq3M6ei3Ys4iw+JQKFve3gmYw9O+w8lBiOLc1qvvsoVQ==
 
-"@verdaccio/ui-theme@0.1.11":
-  version "0.1.11"
-  resolved "https://registry.yarnpkg.com/@verdaccio/ui-theme/-/ui-theme-0.1.11.tgz#48e1bb9139c61016e143e57102bee8c8fbf0cb92"
-  integrity sha512-VxuqUOycaFRwZ7RV6etvGECELvgZ1iO8KFZJlLVUWvrv218mAULZVacKyJ6i8FbLvaqxnx7lEUIEBzhz7KX/Iw==
+"@verdaccio/ui-theme@0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@verdaccio/ui-theme/-/ui-theme-0.2.2.tgz#53a74e9a4c75a93fbe678c6f5cd2a31dcff77f1d"
+  integrity sha512-Y5AwR0or0gMPuRW5dn8taWNUOr23c4rHgTrh/Q8vjrvZdBs4gMQ/SGghQ/idMjv+Ksk/ch/wQzxt9ut6F1MxJg==
 
 "@webassemblyjs/ast@1.8.5":
   version "1.8.5"
@@ -3123,10 +3130,10 @@ dateformat@^3.0.0:
   resolved "https://registry.yarnpkg.com/dateformat/-/dateformat-3.0.3.tgz#a6e37499a4d9a9cf85ef5872044d62901c9889ae"
   integrity sha512-jyCETtSl3VMZMWeRo7iY1FL19ges1t55hMo5yaam4Jrsm5EPL89UQkoQRyiI+Yf4k8r2ZpdngkV8hr1lIdjb3Q==
 
-dayjs@1.8.14:
-  version "1.8.14"
-  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.8.14.tgz#43e4f62830c2c3342c3fcd25934dc9162dbe6f38"
-  integrity sha512-AVhDmRTe541iWirnoeFSSDDGvCT6HWaNQ4z2WmmzXMGZj6ph6ydao2teKq/eUtR43GPJXlYFD+C/SotG1P9wUQ==
+dayjs@1.8.15:
+  version "1.8.15"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.8.15.tgz#7121bc04e6a7f2621ed6db566be4a8aaf8c3913e"
+  integrity sha512-HYHCI1nohG52B45vCQg8Re3hNDZbMroWPkhz50yaX7Lu0ATyjGsTdoYZBpjED9ar6chqTx2dmSmM8A51mojnAg==
 
 debug@*:
   version "4.1.0"
@@ -3966,7 +3973,7 @@ express@4.16.4, express@^4.16.2:
     utils-merge "1.0.1"
     vary "~1.1.2"
 
-express@^4.17.1:
+express@4.17.1, express@^4.17.1:
   version "4.17.1"
   resolved "https://registry.yarnpkg.com/express/-/express-4.17.1.tgz#4491fc38605cf51f8629d39c2b5d026f98a4c134"
   integrity sha512-mHJ9O79RqluphRrcw2X/GTh3k9tVv8YcoyY4Kkh4WDMUYKRZUq0h1o0w2rrrxBqM7VoeUVqgb27xlEMXTnYt4g==
@@ -6527,15 +6534,15 @@ lodash@4.17.11, lodash@^4.16.6, lodash@^4.17.11, lodash@^4.17.5:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
   integrity sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==
 
+lodash@4.17.14, lodash@^4.17.12:
+  version "4.17.14"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.14.tgz#9ce487ae66c96254fe20b599f21b6816028078ba"
+  integrity sha512-mmKYbW3GLuJeX+iGP+Y7Gp1AiGHGbXHCOh/jZmrawMmsE7MS4znI3RL2FsjbqOyMayHInjOeykW7PEajUk1/xw==
+
 lodash@^4.17.10, lodash@^4.17.4, lodash@^4.2.1:
   version "4.17.10"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
   integrity sha512-UejweD1pDoXu+AD825lWwp4ZGtSwgnpZxb3JDViD7StjQz+Nb/6l093lx4OQ0foGWNRoc19mWy7BzL+UAK2iVg==
-
-lodash@^4.17.12:
-  version "4.17.14"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.14.tgz#9ce487ae66c96254fe20b599f21b6816028078ba"
-  integrity sha512-mmKYbW3GLuJeX+iGP+Y7Gp1AiGHGbXHCOh/jZmrawMmsE7MS4znI3RL2FsjbqOyMayHInjOeykW7PEajUk1/xw==
 
 lodash@^4.17.13, lodash@^4.17.14:
   version "4.17.15"
@@ -10935,10 +10942,10 @@ vary@^1, vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
 
-verdaccio-audit@1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/verdaccio-audit/-/verdaccio-audit-1.2.0.tgz#932485729a39f518bd4fd8d5688160cc5edafcbb"
-  integrity sha512-383K+EFqsc0kirh2mXrd7xCBzEIQBHlGZsJCT99W8UxKtdG1vyaHiPOe8wb7/aLENSOu7G7UFSMrad/F3oCrtw==
+verdaccio-audit@1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/verdaccio-audit/-/verdaccio-audit-1.2.1.tgz#24aca87c0cd2f3b576e123d2da8b53d620f836c6"
+  integrity sha512-kSQ4s3B0VgO43r7zOjteINzomeTEjaQwRwcNX0XDcm671pM+ZzPFEbv6VZ+vN75KdwCYmli5r8AUI9TMcj1JEg==
   dependencies:
     express "4.16.4"
     request "2.88.0"
@@ -10954,15 +10961,16 @@ verdaccio-htpasswd@2.0.0:
     http-errors "1.7.2"
     unix-crypt-td-js "1.0.0"
 
-verdaccio@4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-4.1.0.tgz#b80084baacf9cb59aa4469ae0a412fe797b146b7"
-  integrity sha512-l4MH9rhtMXq/WZsG3azcINJbd3jku4fvRJR/a6dGFR8qllO/aE1jE1wnL+CWUpa+YtiGOaeb3X5D4Y4mzx/9JQ==
+verdaccio@4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-4.2.0.tgz#eb15caf1f88569c980c35b769c9bae89b57a472a"
+  integrity sha512-tLnOJEl/6XxYBFsEfMxvI2CZ/XZ8ASgk4ACU0txG0SZTSHoJjgjYwng0YAQM0Rx8S9F+Mo93UIKmLQQiXTaNbA==
   dependencies:
+    "@verdaccio/commons-api" "0.1.2"
     "@verdaccio/local-storage" "2.2.1"
     "@verdaccio/readme" "1.0.4"
     "@verdaccio/streams" "2.0.0"
-    "@verdaccio/ui-theme" "0.1.11"
+    "@verdaccio/ui-theme" "0.2.2"
     JSONStream "1.3.5"
     async "3.1.0"
     body-parser "1.19.0"
@@ -10971,15 +10979,14 @@ verdaccio@4.1.0:
     compression "1.7.4"
     cookies "0.7.3"
     cors "2.8.5"
-    dayjs "1.8.14"
+    dayjs "1.8.15"
     envinfo "7.3.1"
-    express "4.16.4"
+    express "4.17.1"
     handlebars "4.1.2"
-    http-errors "1.7.3"
     js-yaml "3.13.1"
     jsonwebtoken "8.5.1"
     kleur "3.0.3"
-    lodash "4.17.11"
+    lodash "4.17.14"
     lunr-mutable-indexes "2.3.2"
     marked "0.7.0"
     mime "2.4.4"
@@ -10989,7 +10996,7 @@ verdaccio@4.1.0:
     pkginfo "0.4.1"
     request "2.87.0"
     semver "6.2.0"
-    verdaccio-audit "1.2.0"
+    verdaccio-audit "1.2.1"
     verdaccio-htpasswd "2.0.0"
 
 verror@1.10.0:

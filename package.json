@@ -140,7 +140,7 @@
     "ts-node": "^5.0.0",
     "tslint-no-circular-imports": "^0.7.0",
     "tslint-sonarts": "1.9.0",
-    "verdaccio": "4.1.0"
+    "verdaccio": "4.2.0"
   },
   "husky": {
     "hooks": {
