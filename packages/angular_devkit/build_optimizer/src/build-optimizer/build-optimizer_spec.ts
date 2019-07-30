@@ -99,6 +99,35 @@ describe('build-optimizer', () => {
       expect(tags.oneLine`${boOutput.content}`).toEqual(output);
       expect(boOutput.emitSkipped).toEqual(false);
     });
+
+    it('should not wrap classes which had all static properties dropped in IIFE', () => {
+      const classDeclaration = tags.oneLine`
+        import { Injectable } from '@angular/core';
+
+        class Platform {
+          constructor(_doc) {
+          }
+          init() {
+          }
+        }
+      `;
+      const input = tags.oneLine`
+        ${classDeclaration}
+
+        Platform.decorators = [
+            { type: Injectable }
+        ];
+
+        /** @nocollapse */
+        Platform.ctorParameters = () => [
+            { type: undefined, decorators: [{ type: Inject, args: [DOCUMENT] }] }
+        ];
+      `;
+
+      const boOutput = buildOptimizer({ content: input, isSideEffectFree: true });
+      expect(tags.oneLine`${boOutput.content}`).toEqual(classDeclaration);
+      expect(boOutput.emitSkipped).toEqual(false);
+    });
   });
 
 

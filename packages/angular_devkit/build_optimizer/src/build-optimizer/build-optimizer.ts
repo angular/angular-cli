@@ -149,7 +149,7 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     getTransforms.unshift(getImportTslibTransformer);
   }
 
-  getTransforms.unshift(getWrapEnumsTransformer);
+  getTransforms.push(getWrapEnumsTransformer);
 
   const transformJavascriptOpts: TransformJavascriptOptions = {
     content: content,
