@@ -58,10 +58,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "name",
-            "email"
-          ]
+          "required": ["name", "email"]
         }
       ],
       "default": true
@@ -102,8 +99,6 @@
     "routing": {
       "type": "boolean",
       "description": "When true, generates a routing module for the initial project.",
-      "default": false,
-      "x-prompt": "Would you like to add Angular routing?",
       "x-user-analytics": 17
     },
     "prefix": {
@@ -118,22 +113,28 @@
       "description": "The file extension or preprocessor to use for style files.",
       "type": "string",
       "default": "css",
-      "enum": [
-        "css",
-        "scss",
-        "sass",
-        "less",
-        "styl"
-      ],
+      "enum": ["css", "scss", "sass", "less", "styl"],
       "x-prompt": {
         "message": "Which stylesheet format would you like to use?",
         "type": "list",
         "items": [
-          { "value": "css",  "label": "CSS" },
-          { "value": "scss", "label": "SCSS   [ https://sass-lang.com/documentation/syntax#scss                ]" },
-          { "value": "sass", "label": "Sass   [ https://sass-lang.com/documentation/syntax#the-indented-syntax ]" },
-          { "value": "less", "label": "Less   [ http://lesscss.org                                             ]" },
-          { "value": "styl", "label": "Stylus [ http://stylus-lang.com                                         ]" }
+          { "value": "css", "label": "CSS" },
+          {
+            "value": "scss",
+            "label": "SCSS   [ https://sass-lang.com/documentation/syntax#scss                ]"
+          },
+          {
+            "value": "sass",
+            "label": "Sass   [ https://sass-lang.com/documentation/syntax#the-indented-syntax ]"
+          },
+          {
+            "value": "less",
+            "label": "Less   [ http://lesscss.org                                             ]"
+          },
+          {
+            "value": "styl",
+            "label": "Stylus [ http://stylus-lang.com                                         ]"
+          }
         ]
       },
       "x-user-analytics": 5
@@ -157,8 +158,5 @@
       "x-user-analytics": 14
     }
   },
-  "required": [
-    "name",
-    "version"
-  ]
+  "required": ["name", "version"]
 }
