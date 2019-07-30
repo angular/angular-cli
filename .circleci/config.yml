@@ -172,11 +172,11 @@ jobs:
         default: ""
     executor: test-executor
     resource_class: large
-    parallelism: 4
+    # parallelism: 4
     steps:
       - attach_workspace: *attach_options
       - run: yarn webdriver-update
-      - run: yarn test-large --full <<# parameters.ivy >>--ivy<</ parameters.ivy >> <<# parameters.glob >>--glob="<< parameters.glob >>"<</ parameters.glob >> --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
+      - run: yarn test-large --full <<# parameters.ivy >>--ivy<</ parameters.ivy >> <<# parameters.glob >>--glob="<< parameters.glob >>"<</ parameters.glob >> --nb-shards=4 --shard=2
 
   e2e-cli:
     parameters:
@@ -312,12 +312,12 @@ workflows:
   default_workflow:
     jobs:
       - install
-      - lint:
-          requires:
-            - install
-      - validate:
-          requires:
-            - install
+      # - lint:
+      #     requires:
+      #       - install
+      # - validate:
+      #     requires:
+      #       - install
       - build:
           requires:
             - install
@@ -325,74 +325,114 @@ workflows:
             branches:
               ignore:
               - /docs-preview/
-      - build-bazel:
-          requires:
-            - build
-      - test:
-          requires:
-            - build
-      - test-win:
-          requires:
-            - test
+      # - build-bazel:
+      #     requires:
+      #       - build
+      # - test:
+      #     requires:
+      #       - build
+      # - test-win:
+      #     requires:
+      #       - test
+      # - test-large:
+      #     requires:
+      #       - build
       - test-large:
+          name: test-large-0
           requires:
             - build
       - test-large:
-          name: test-large-ivy
-          ivy: true
-          glob: "packages/angular_devkit/build_angular/test/browser/*_spec_large.ts"
+          name: test-large-1
           requires:
             - build
-      - e2e-cli:
-          post-steps:
-            - store_artifacts:
-                path: /tmp/dist
-                destination: cli/new-production
+      - test-large:
+          name: test-large-2
           requires:
             - build
-      - e2e-cli:
-          name: e2e-cli-ivy
-          ivy: true
+      - test-large:
+          name: test-large-3
           requires:
             - build
-      - e2e-cli:
-          name: e2e-cli-ng-snapshots
-          snapshots: true
-          requires:
-            - e2e-cli
-          pre-steps:
-            - run:
-                name: Don't run expensive e2e snapshots tests for forks other than renovate-bot and angular
-                command: >
-                  if [[ "$CIRCLE_PR_USERNAME" != "renovate-bot" ]] &&
-                    [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
-                    circleci step halt
-                  fi
-      - e2e-cli-node-10:
-          <<: *ignore_pull_requests
-          requires:
-            - e2e-cli
-      - e2e-cli-win:
-          <<: *ignore_pull_requests
-          requires:
-            - e2e-cli
-      - test-browsers:
+      - test-large:
+          name: test-large-4
           requires:
             - build
-      - snapshot_publish:
-          <<: *ignore_pull_requests
+      - test-large:
+          name: test-large-5
           requires:
-            - test
             - build
-            - e2e-cli
-      - publish:
+      - test-large:
+          name: test-large-6
           requires:
-            - test
             - build
-            - e2e-cli
-            - snapshot_publish
-          filters:
-            tags:
-              only: /^v\d+/
-            branches:
-              ignore: /.*/
+      - test-large:
+          name: test-large-7
+          requires:
+            - build
+      - test-large:
+          name: test-large-8
+          requires:
+            - build
+      - test-large:
+          name: test-large-9
+          requires:
+            - build
+      # - test-large:
+      #     name: test-large-ivy
+      #     ivy: true
+      #     glob: "packages/angular_devkit/build_angular/test/browser/*_spec_large.ts"
+      #     requires:
+      #       - build
+      # - e2e-cli:
+      #     post-steps:
+      #       - store_artifacts:
+      #           path: /tmp/dist
+      #           destination: cli/new-production
+      #     requires:
+      #       - build
+      # - e2e-cli:
+      #     name: e2e-cli-ivy
+      #     ivy: true
+      #     requires:
+      #       - build
+      # - e2e-cli:
+      #     name: e2e-cli-ng-snapshots
+      #     snapshots: true
+      #     requires:
+      #       - e2e-cli
+      #     pre-steps:
+      #       - run:
+      #           name: Don't run expensive e2e snapshots tests for forks other than renovate-bot and angular
+      #           command: >
+      #             if [[ "$CIRCLE_PR_USERNAME" != "renovate-bot" ]] &&
+      #               [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
+      #               circleci step halt
+      #             fi
+      # - e2e-cli-node-10:
+      #     <<: *ignore_pull_requests
+      #     requires:
+      #       - e2e-cli
+      # - e2e-cli-win:
+      #     <<: *ignore_pull_requests
+      #     requires:
+      #       - e2e-cli
+      # - test-browsers:
+      #     requires:
+      #       - build
+      # - snapshot_publish:
+      #     <<: *ignore_pull_requests
+      #     requires:
+      #       - test
+      #       - build
+      #       - e2e-cli
+      # - publish:
+      #     requires:
+      #       - test
+      #       - build
+      #       - e2e-cli
+      #       - snapshot_publish
+      #     filters:
+      #       tags:
+      #         only: /^v\d+/
+      #       branches:
+      #         ignore: /.*/
