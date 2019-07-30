@@ -403,11 +403,11 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
           parser: { system: true },
         },
         {
-          test: /[\/\\]hot[\/\\]emitter.js$/,
+          test: /[\/\\]hot[\/\\]emitter\.js$/,
           parser: { node: { events: true } },
         },
         {
-          test: /[\/\\]webpack-dev-server[\/\\]client[\/\\]utils[\/\\]createSocketUrl.js$/,
+          test: /[\/\\]webpack-dev-server[\/\\]client[\/\\]utils[\/\\]createSocketUrl\.js$/,
           parser: { node: { querystring: true } },
         },
         {
@@ -416,7 +416,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         },
         {
           test: /\.js$/,
-          exclude: /(ngfactory|ngstyle).js$/,
+          exclude: /(ngfactory|ngstyle)\.js$/,
           enforce: 'pre',
           ...sourceMapUseRule,
         },
