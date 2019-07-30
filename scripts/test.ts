@@ -10,16 +10,13 @@
 import { logging } from '@angular-devkit/core';
 import { spawnSync } from 'child_process';
 import * as glob from 'glob';
-import * as Istanbul from 'istanbul';
 import 'jasmine';
 import { SpecReporter as JasmineSpecReporter } from 'jasmine-spec-reporter';
 import { ParsedArgs } from 'minimist';
 import { join, normalize, relative } from 'path';
-import { Position, SourceMapConsumer } from 'source-map';
 import * as ts from 'typescript';
 import { packages } from '../lib/packages';
 
-const codeMap = require('../lib/istanbul-local').codeMap;
 const Jasmine = require('jasmine');
 
 const knownFlakes = [
@@ -33,16 +30,6 @@ require('source-map-support').install({
   hookRequire: true,
 });
 
-interface CoverageLocation {
-  start: Position;
-  end: Position;
-}
-
-type CoverageType = any; // tslint:disable-line:no-any
-declare const global: {
-  __coverage__: CoverageType;
-};
-
 function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
   const { status, error, stdout } = spawnSync(command, args, {
     stdio: ['ignore', 'pipe', 'inherit'],
@@ -55,78 +42,6 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
   }
 
   return stdout.toString('utf-8');
-}
-
-// Add the Istanbul (not Constantinople) reporter.
-const istanbulCollector = new Istanbul.Collector({});
-const istanbulReporter = new Istanbul.Reporter(undefined, 'coverage/');
-istanbulReporter.addAll(['json', 'lcov']);
-
-class IstanbulReporter implements jasmine.CustomReporter {
-  // Update a location object from a SourceMap. Will ignore the location if the sourcemap does
-  // not have a valid mapping.
-  private _updateLocation(consumer: SourceMapConsumer, location: CoverageLocation) {
-    const start = consumer.originalPositionFor(location.start);
-    const end = consumer.originalPositionFor(location.end);
-
-    // Filter invalid original positions.
-    if (start.line !== null && start.column !== null) {
-      // Filter unwanted properties.
-      location.start = { line: start.line, column: start.column };
-    }
-    if (end.line !== null && end.column !== null) {
-      location.end = { line: end.line, column: end.column };
-    }
-  }
-
-  private _updateCoverageJsonSourceMap(coverageJson: CoverageType) {
-    // Update the coverageJson with the SourceMap.
-    for (const path of Object.keys(coverageJson)) {
-      const entry = codeMap.get(path);
-      if (!entry) {
-        continue;
-      }
-
-      const consumer = entry.map;
-      const coverage = coverageJson[path];
-
-      // Update statement maps.
-      for (const branchId of Object.keys(coverage.branchMap)) {
-        const branch = coverage.branchMap[branchId];
-        let line: number | null = null;
-        let column = 0;
-        do {
-          line = consumer.originalPositionFor({ line: branch.line, column: column++ }).line;
-        } while (line === null && column < 100);
-
-        branch.line = line;
-
-        for (const location of branch.locations) {
-          this._updateLocation(consumer, location);
-        }
-      }
-
-      for (const id of Object.keys(coverage.statementMap)) {
-        const location = coverage.statementMap[id];
-        this._updateLocation(consumer, location);
-      }
-
-      for (const id of Object.keys(coverage.fnMap)) {
-        const fn = coverage.fnMap[id];
-        fn.line = consumer.originalPositionFor({ line: fn.line, column: 0 }).line;
-        this._updateLocation(consumer, fn.loc);
-      }
-    }
-  }
-
-  jasmineDone(_runDetails: jasmine.RunDetails): void {
-    if (global.__coverage__) {
-      this._updateCoverageJsonSourceMap(global.__coverage__);
-      istanbulCollector.add(global.__coverage__);
-
-      istanbulReporter.write(istanbulCollector, true, () => {});
-    }
-  }
 }
 
 // Create a Jasmine runner and configure it.
@@ -173,10 +88,6 @@ glob
 export default function(args: ParsedArgs, logger: logging.Logger) {
   const specGlob = args.large ? '*_spec_large.ts' : '*_spec.ts';
   const regex = args.glob ? args.glob : `packages/**/${specGlob}`;
-
-  if (args['code-coverage']) {
-    runner.env.addReporter(new IstanbulReporter());
-  }
 
   if (args.large) {
     // Default timeout for large specs is 2.5 minutes.

@@ -18,7 +18,6 @@
     "master"
   ],
   "ignoreDeps": [
-    "source-map",
     "@types/node",
     "webpack-subresource-integrity"
   ],
