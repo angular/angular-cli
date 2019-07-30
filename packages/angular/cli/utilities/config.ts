@@ -85,7 +85,7 @@ export function getWorkspace(
 
   if (error) {
     throw new Error(
-      `Workspace config file cannot le loaded: ${configPath}`
+      `Workspace config file cannot be loaded: ${configPath}`
       + `\n${error instanceof Error ? error.message : error}`,
     );
   }
