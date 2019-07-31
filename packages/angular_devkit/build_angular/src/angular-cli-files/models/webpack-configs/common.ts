@@ -297,15 +297,22 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       ngI18nClosureMode: false,
     };
 
-    try {
-      // Try to load known global definitions from @angular/compiler-cli.
-      // tslint:disable-next-line:no-implicit-dependencies
-      const GLOBAL_DEFS_FOR_TERSER = require('@angular/compiler-cli').GLOBAL_DEFS_FOR_TERSER;
-      if (GLOBAL_DEFS_FOR_TERSER) {
-        angularGlobalDefinitions = GLOBAL_DEFS_FOR_TERSER;
+    // Try to load known global definitions from @angular/compiler-cli.
+    const GLOBAL_DEFS_FOR_TERSER = require('@angular/compiler-cli').GLOBAL_DEFS_FOR_TERSER;
+    if (GLOBAL_DEFS_FOR_TERSER) {
+      angularGlobalDefinitions = GLOBAL_DEFS_FOR_TERSER;
+    }
+
+    if (buildOptions.aot) {
+      // Also try to load AOT-only global definitions.
+      const GLOBAL_DEFS_FOR_TERSER_WITH_AOT =
+        require('@angular/compiler-cli').GLOBAL_DEFS_FOR_TERSER_WITH_AOT;
+      if (GLOBAL_DEFS_FOR_TERSER_WITH_AOT) {
+        angularGlobalDefinitions = {
+          ...angularGlobalDefinitions,
+          ...GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
+        };
       }
-    } catch {
-      // Do nothing, the default above will be used instead.
     }
 
     const terserOptions = {
