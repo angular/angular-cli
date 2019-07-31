@@ -26,8 +26,8 @@ ts_library(
     ),
     deps = [
         "@npm//@types/node",
-        "@npm//@types/source-map",
         "@npm//@types/webpack",
+        "@npm//source-map",
         "@npm//typescript",
     ],
 )
@@ -48,7 +48,7 @@ ts_library(
         "//packages/angular_devkit/core",
         "@npm//@types/jasmine",
         "@npm//@types/node",
-        "@npm//@types/source-map",
+        "@npm//source-map",
     ],
     # @external_end
 )

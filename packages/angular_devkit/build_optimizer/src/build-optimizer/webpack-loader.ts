@@ -6,12 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
-import * as webpack from 'webpack';  // tslint:disable-line:no-implicit-dependencies
+import * as webpack from 'webpack'; // tslint:disable-line:no-implicit-dependencies
 
 const loaderUtils = require('loader-utils');
 
 import { buildOptimizer } from './build-optimizer';
-
 
 interface BuildOptimizerLoaderOptions {
   sourceMap: boolean;
@@ -21,17 +20,25 @@ export const buildOptimizerLoaderPath = __filename;
 
 const alwaysProcess = (path: string) =>
   // Always process TS files.
-  path.endsWith('.ts') || path.endsWith('.tsx')
+  path.endsWith('.ts') ||
+  path.endsWith('.tsx') ||
   // Always process factory files.
-  || path.endsWith('.ngfactory.js') || path.endsWith('.ngstyle.js');
+  path.endsWith('.ngfactory.js') ||
+  path.endsWith('.ngstyle.js');
 
-export default function buildOptimizerLoader
-  (this: webpack.loader.LoaderContext, content: string, previousSourceMap: RawSourceMap) {
+export default function buildOptimizerLoader(
+  this: webpack.loader.LoaderContext,
+  content: string,
+  previousSourceMap: RawSourceMap,
+) {
   this.cacheable();
+  const callback = this.async();
+  if (!callback) {
+    throw new Error('Async loader support is required.');
+  }
 
-  const skipBuildOptimizer = this._module
-    && this._module.factoryMeta
-    && this._module.factoryMeta.skipBuildOptimizer;
+  const skipBuildOptimizer =
+    this._module && this._module.factoryMeta && this._module.factoryMeta.skipBuildOptimizer;
 
   if (!alwaysProcess(this.resourcePath) && skipBuildOptimizer) {
     // Skip loading processing this file with Build Optimizer if we determined in
@@ -56,9 +63,8 @@ export default function buildOptimizerLoader
     inputFilePath,
     outputFilePath,
     emitSourceMap: options.sourceMap,
-    isSideEffectFree: this._module
-      && this._module.factoryMeta
-      && this._module.factoryMeta.sideEffectFree,
+    isSideEffectFree:
+      this._module && this._module.factoryMeta && this._module.factoryMeta.sideEffectFree,
   });
 
   if (boOutput.emitSkipped || boOutput.content === null) {
@@ -89,10 +95,17 @@ export default function buildOptimizerLoader
       previousSourceMap.file = inputFilePath;
 
       // Chain the sourcemaps.
-      const consumer = new SourceMapConsumer(intermediateSourceMap);
-      const generator = SourceMapGenerator.fromSourceMap(consumer);
-      generator.applySourceMap(new SourceMapConsumer(previousSourceMap));
-      newSourceMap = generator.toJSON();
+      SourceMapConsumer.with(intermediateSourceMap, null, intermediate => {
+        return SourceMapConsumer.with(previousSourceMap, null, previous => {
+          const generator = SourceMapGenerator.fromSourceMap(intermediate);
+          generator.applySourceMap(previous);
+
+          return generator.toJSON();
+        });
+        // tslint:disable-next-line: no-any
+      }).then(map => callback(null, newContent, map as any), error => callback(error));
+
+      return;
     } else {
       // Otherwise just return our generated sourcemap.
       newSourceMap = intermediateSourceMap;
@@ -101,5 +114,5 @@ export default function buildOptimizerLoader
 
   // Webpack typings for previousSourceMap are wrong, they are JSON objects and not strings.
   // tslint:disable-next-line:no-any
-  this.callback(null, newContent, newSourceMap as any);
+  callback(null, newContent, newSourceMap as any);
 }
