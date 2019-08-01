@@ -11,7 +11,7 @@ import { debounceTime, take, tap } from 'rxjs/operators';
 import { BrowserBuilderOutput } from '../../src/browser/index';
 import { createArchitect, host, ivyEnabled } from '../utils';
 
-
+// tslint:disable-next-line:no-big-function
 describe('Browser Builder unused files warnings', () => {
   const warningMessageSuffix = `is part of the TypeScript compilation but it's unused`;
   const targetSpec = { project: 'app', target: 'build' };
@@ -157,6 +157,58 @@ describe('Browser Builder unused files warnings', () => {
           logger.clear();
         }),
         take(3),
+      )
+      .toPromise();
+    await run.stop();
+  });
+
+  it('should only show warning once per file', async () => {
+    if (!ivyEnabled) {
+      // TODO: https://github.com/angular/angular-cli/issues/15056
+      pending('Only supported in Ivy.');
+
+      return;
+    }
+
+    host.replaceInFile(
+      'src/tsconfig.app.json',
+      '"**/*.d.ts"',
+      '"**/*.d.ts", "testing/**/*.ts"',
+    );
+
+    // Write a used file
+    host.writeMultipleFiles({
+      'src/testing/type.ts': 'export type MyType = number;',
+    });
+
+    const logger = new TestLogger('unused-files-warnings');
+    let buildNumber = 0;
+    const run = await architect.scheduleTarget(targetSpec, { watch: true }, { logger });
+
+    await run.output
+      .pipe(
+        debounceTime(1000),
+        tap(buildEvent => {
+          expect(buildEvent.success).toBe(true);
+
+          buildNumber ++;
+          switch (buildNumber) {
+            case 1:
+              // The first should have type.ts as unused.
+              expect(logger.includes(`type.ts ${warningMessageSuffix}`)).toBe(true, `Case ${buildNumber} failed.`);
+
+              // touch a file to trigger a rebuild
+              host.appendToFile('src/main.ts', '');
+              break;
+            case 2:
+              // The second should should have type.ts as unused but shouldn't warn.
+              expect(logger.includes(warningMessageSuffix)).toBe(false, `Case ${buildNumber} failed.`);
+              break;
+          }
+
+          logger.clear();
+        }),
+        take(2),
       )
       .toPromise();
     await run.stop();
