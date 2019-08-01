@@ -111,6 +111,7 @@ export class AngularCompilerPlugin {
   // This is needed because if the first build fails we need to do a full emit
   // even whe only a single file gets updated.
   private _hadFullJitEmit: boolean | undefined;
+  private _unusedFiles = new Set<string>();
   private _changedFileExtensions = new Set(['ts', 'tsx', 'html', 'css', 'js', 'json']);
 
   // Webpack plugin.
@@ -626,12 +627,18 @@ export class AngularCompilerPlugin {
       }
     }
 
-    const unusedFilesWarning = program.getSourceFiles()
-      .filter(({ fileName }) => !fileExcludeRegExp.test(fileName) && !usedFiles.has(fileName))
-      .map(({ fileName }) => `${fileName} is part of the TypeScript compilation but it's unused.`);
+    const sourceFiles = program.getSourceFiles();
+    for (const { fileName } of sourceFiles) {
+      if (
+        fileExcludeRegExp.test(fileName)
+        || usedFiles.has(fileName)
+        || this._unusedFiles.has(fileName)
+      ) {
+        continue;
+      }
 
-    if (unusedFilesWarning.length) {
-      compilation.warnings.push(...unusedFilesWarning);
+      compilation.warnings.push(`${fileName} is part of the TypeScript compilation but it's unused.`);
+      this._unusedFiles.add(fileName);
     }
   }
 
