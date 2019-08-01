@@ -93,6 +93,11 @@ export function getSourceMapDevTool(
   return new SourceMapDevToolPlugin({
     filename: inlineSourceMap ? undefined : '[file].map',
     include,
+    // We want to set sourceRoot to  `webpack:///` for non
+    // inline sourcemaps as otherwise paths to sourcemaps will be broken in browser
+    // `webpack:///` is needed for Visual Studio breakpoints to work properly as currently
+    // there is no way to set the 'webRoot'
+    sourceRoot: inlineSourceMap ? '' : 'webpack:///',
     moduleFilenameTemplate: '[resource-path]',
     append: hiddenSourceMap ? false : undefined,
   });
