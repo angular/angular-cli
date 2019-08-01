@@ -445,4 +445,40 @@ describe('CoreSchemaRegistry', () => {
       .toPromise().then(done, done.fail);
   });
 
+  it('adds defaults to undefined properties', done => {
+    const registry = new CoreSchemaRegistry();
+    registry.addPostTransform(addUndefinedDefaults);
+    // tslint:disable-line:no-any
+    const data: any = {
+      bool: undefined,
+      str: undefined,
+      obj: {
+        num: undefined,
+      },
+    };
+
+    registry
+      .compile({
+        properties: {
+          bool: { type: 'boolean', default: true },
+          str: { type: 'string', default: 'someString' },
+          obj: {
+            properties: {
+              num: { type: 'number', default: 0 },
+            },
+          },
+        },
+      })
+      .pipe(
+        mergeMap(validator => validator(data)),
+        map(result => {
+          expect(result.success).toBe(true);
+          expect(data.bool).toBe(true);
+          expect(data.str).toBe('someString');
+          expect(data.obj.num).toBe(0);
+        }),
+      )
+      .toPromise().then(done, done.fail);
+  });
+
 });
