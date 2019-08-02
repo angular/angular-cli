@@ -22,25 +22,6 @@ export function testScrubFile(content: string) {
   return markers.some((marker) => content.indexOf(marker) !== -1);
 }
 
-const angularSpecifiers = [
-  // Class level decorators.
-  'Component',
-  'Directive',
-  'Injectable',
-  'NgModule',
-  'Pipe',
-
-  // Property level decorators.
-  'ContentChild',
-  'ContentChildren',
-  'HostBinding',
-  'HostListener',
-  'Input',
-  'Output',
-  'ViewChild',
-  'ViewChildren',
-];
-
 export function getScrubFileTransformer(program: ts.Program): ts.TransformerFactory<ts.SourceFile> {
   return scrubFileTransformer(program.getTypeChecker(), false);
 }
@@ -111,32 +92,17 @@ export function expect<T extends ts.Node>(node: ts.Node, kind: ts.SyntaxKind): T
   return node as T;
 }
 
-function nameOfSpecifier(node: ts.ImportSpecifier): string {
-  return node.name && node.name.text || '<unknown>';
-}
-
 function findAngularMetadata(node: ts.Node, isAngularCoreFile: boolean): ts.Node[] {
-  let specs: ts.Node[] = [];
+  const specs: ts.Node[] = [];
   // Find all specifiers from imports of `@angular/core`.
   ts.forEachChild(node, (child) => {
     if (child.kind === ts.SyntaxKind.ImportDeclaration) {
       const importDecl = child as ts.ImportDeclaration;
       if (isAngularCoreImport(importDecl, isAngularCoreFile)) {
-        specs.push(...collectDeepNodes<ts.ImportSpecifier>(node, ts.SyntaxKind.ImportSpecifier)
-          .filter((spec) => isAngularCoreSpecifier(spec)));
+        specs.push(...collectDeepNodes<ts.ImportSpecifier>(importDecl, ts.SyntaxKind.ImportSpecifier));
       }
     }
   });
-
-  // Check if the current module contains all know `@angular/core` specifiers.
-  // If it does, we assume it's a `@angular/core` FESM.
-  if (isAngularCoreFile) {
-    const localDecl = findAllDeclarations(node)
-      .filter((decl) => angularSpecifiers.indexOf((decl.name as ts.Identifier).text) !== -1);
-    if (localDecl.length === angularSpecifiers.length) {
-      specs = specs.concat(localDecl);
-    }
-  }
 
   return specs;
 }
@@ -175,10 +141,6 @@ function isAngularCoreImport(node: ts.ImportDeclaration, isAngularCoreFile: bool
   }
 
   return false;
-}
-
-function isAngularCoreSpecifier(node: ts.ImportSpecifier): boolean {
-  return angularSpecifiers.indexOf(nameOfSpecifier(node)) !== -1;
 }
 
 // Check if assignment is `Clazz.decorators = [...];`.
@@ -390,7 +352,6 @@ function pickDecorateNodesToRemove(
 ): ts.Node[] {
 
   const expr = expect<ts.BinaryExpression>(exprStmt.expression, ts.SyntaxKind.BinaryExpression);
-  const classId = expect<ts.Identifier>(expr.left, ts.SyntaxKind.Identifier);
   let callExpr: ts.CallExpression;
 
   if (expr.right.kind === ts.SyntaxKind.CallExpression) {
