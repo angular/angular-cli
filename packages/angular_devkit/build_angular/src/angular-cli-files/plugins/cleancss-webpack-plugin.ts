@@ -9,10 +9,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import * as CleanCSS from 'clean-css';
 import { Compiler, compilation } from 'webpack';
 import { RawSource, Source, SourceMapSource } from 'webpack-sources';
-
-const CleanCSS = require('clean-css');
 
 interface Chunk {
   files: string[];
@@ -73,10 +72,10 @@ export class CleanCssWebpackPlugin {
 
       const actions = files
         .filter(file => this._options.test(file))
-        .map(file => {
+        .map(async file => {
           const asset = compilation.assets[file] as Source;
           if (!asset) {
-            return Promise.resolve();
+            return;
           }
 
           let content: string;
@@ -90,44 +89,42 @@ export class CleanCssWebpackPlugin {
           }
 
           if (content.length === 0) {
-            return Promise.resolve();
+            return;
           }
 
-          return Promise.resolve()
-            .then(() => map ? cleancss.minify(content, map) : cleancss.minify(content))
-            .then((output: any) => {
-              let hasWarnings = false;
-              if (output.warnings && output.warnings.length > 0) {
-                compilation.warnings.push(...output.warnings);
-                hasWarnings = true;
-              }
+          const output = await cleancss.minify(content, map);
 
-              if (output.errors && output.errors.length > 0) {
-                output.errors
-                  .forEach((error: string) => compilation.errors.push(new Error(error)));
-                return;
-              }
+          let hasWarnings = false;
+          if (output.warnings && output.warnings.length > 0) {
+            compilation.warnings.push(...output.warnings);
+            hasWarnings = true;
+          }
 
-              // generally means invalid syntax so bail
-              if (hasWarnings && output.stats.minifiedSize === 0) {
-                return;
-              }
+          if (output.errors && output.errors.length > 0) {
+            output.errors
+              .forEach((error: string) => compilation.errors.push(new Error(error)));
+            return;
+          }
 
-              let newSource;
-              if (output.sourceMap) {
-                newSource = new SourceMapSource(
-                  output.styles,
-                  file,
-                  output.sourceMap.toString(),
-                  content,
-                  map,
-                );
-              } else {
-                newSource = new RawSource(output.styles);
-              }
+          // generally means invalid syntax so bail
+          if (hasWarnings && output.stats.minifiedSize === 0) {
+            return;
+          }
 
-              compilation.assets[file] = newSource;
-            });
+          let newSource;
+          if (output.sourceMap) {
+            newSource = new SourceMapSource(
+              output.styles,
+              file,
+              output.sourceMap.toString() as any,
+              content,
+              map,
+            );
+          } else {
+            newSource = new RawSource(output.styles);
+          }
+
+          compilation.assets[file] = newSource;
         });
 
       return Promise.all(actions);
