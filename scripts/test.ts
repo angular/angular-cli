@@ -22,6 +22,12 @@ import { packages } from '../lib/packages';
 const codeMap = require('../lib/istanbul-local').codeMap;
 const Jasmine = require('jasmine');
 
+const knownFlakes = [
+  // Rebuild tests in test-large are flakey if not run as the first suite.
+  // https://github.com/angular/angular-cli/pull/15204
+  'packages/angular_devkit/build_angular/test/browser/rebuild_spec_large.ts',
+];
+
 const projectBaseDir = join(__dirname, '..');
 require('source-map-support').install({
   hookRequire: true,
@@ -264,6 +270,9 @@ export default function(args: ParsedArgs, logger: logging.Logger) {
       }
     }
   }
+
+  // Filter in/out flakes according to the --flakey flag.
+  tests = tests.filter(test => !!args.flakey == knownFlakes.includes(test.replace(/[\/\\]/g, '/')));
 
   if (args.shard !== undefined) {
     // Remove tests that are not part of this shard.
