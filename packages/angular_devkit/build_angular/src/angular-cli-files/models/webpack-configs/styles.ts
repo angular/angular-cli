@@ -193,7 +193,13 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         options: {
           ident: 'embedded',
           plugins: postcssPluginCreator,
-          sourceMap: cssSourceMap && !buildOptions.sourceMap.hidden ? 'inline' : false,
+          sourceMap: cssSourceMap
+            // Never use component css sourcemap when style optimizations are on.
+            // It will just increase bundle size without offering good debug experience.
+            && !buildOptions.optimization.styles
+            // Inline all sourcemap types except hidden ones, which are the same as no sourcemaps
+            // for component css.
+            && !buildOptions.sourceMap.hidden ? 'inline' : false,
         },
       },
       ...(use as webpack.Loader[]),
