@@ -241,6 +241,16 @@ jobs:
       - attach_workspace: *attach_options
       - run: yarn build
 
+  # This is where we put all the misbehaving and flaky tests so we can fine-tune their conditions 
+  # and rerun them faster.
+  flake-jail:
+    executor: action-executor
+    steps:
+      - attach_workspace: *attach_options
+      - run: yarn webdriver-update
+      - run: yarn test-large --full --flakey
+      - run: yarn test-large --full --flakey --ivy=true
+
   build-bazel:
     executor: action-executor
     resource_class: xlarge
@@ -377,6 +387,9 @@ workflows:
           requires:
             - e2e-cli
       - test-browsers:
+          requires:
+            - build
+      - flake-jail:
           requires:
             - build
       - snapshot_publish:
