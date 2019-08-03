@@ -139,7 +139,7 @@ function addAppToWorkspaceFile(
       root: projectRoot,
       sourceRoot: `${projectRoot}/src`,
       projectType: ProjectType.Library,
-      prefix: options.prefix || 'lib',
+      prefix: options.prefix,
       targets: {
         build: {
           builder: Builders.NgPackagr,
@@ -178,7 +178,7 @@ export default function (options: LibraryOptions): Rule {
     if (!options.name) {
       throw new SchematicsException(`Invalid options, "name" is required.`);
     }
-    const prefix = options.prefix || 'lib';
+    const prefix = options.prefix;
 
     validateProjectName(options.name);
 

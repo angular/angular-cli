@@ -306,11 +306,6 @@ export default function (options: ApplicationOptions): Rule {
       throw new SchematicsException(`Invalid options, "name" is required.`);
     }
     validateProjectName(options.name);
-    options.prefix = options.prefix || 'app';
-    // This line and the one above shouldn't be needed, but at the moment they are.
-    // This is because the default value defined in the schema.json file is not
-    // correctly set when this schematic is run from another schematic.
-    options.style = options.style || Style.Css;
     const appRootSelector = `${options.prefix}-root`;
     const componentOptions: Partial<ComponentOptions> = !options.minimal ?
       {
