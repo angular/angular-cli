@@ -63,4 +63,32 @@ describe('Browser Builder AOT', () => {
     expect(logs.join()).toContain('WARNING in Invalid selector');
     await run.stop();
   });
+
+  it('shows error when component stylesheet contains SCSS syntax error', async () => {
+    const overrides = {
+      aot: true,
+    };
+
+    host.replaceInFile(
+      'src/app/app.component.ts',
+      'app.component.css',
+      'app.component.scss',
+    );
+
+    host.writeMultipleFiles({
+      'src/app/app.component.scss': `
+        .foo {
+      `,
+    });
+
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
+    const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
+    const output = await run.result;
+    expect(output.success).toBe(false);
+    expect(logs.join()).toContain(`Expected "}".`);
+    await run.stop();
+  });
 });
