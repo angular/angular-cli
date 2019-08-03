@@ -99,6 +99,12 @@ export class WebpackResourceLoader {
     // Compile and return a promise
     return new Promise((resolve, reject) => {
       childCompiler.compile((err: Error, childCompilation: any) => {
+        if (err) {
+          reject(err);
+
+          return;
+        }
+
         // Resolve / reject the promise
         const { warnings, errors } = childCompilation;
 
@@ -114,8 +120,6 @@ export class WebpackResourceLoader {
             .join('\n');
 
           reject(new Error('Child compilation failed:\n' + errorDetails));
-        } else if (err) {
-          reject(err);
         } else {
           Object.keys(childCompilation.assets).forEach(assetName => {
             // Add all new assets to the parent compilation, with the exception of
