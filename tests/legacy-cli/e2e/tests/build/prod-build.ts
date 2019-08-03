@@ -33,8 +33,8 @@ export default async function () {
   const argv = getGlobalVariable('argv');
   const ivyProject = argv['ivy'];
   const bootstrapRegExp = ivyProject
-    ? /bootstrapModule\([a-zA-Z]+\)\./
-    : /bootstrapModuleFactory\([a-zA-Z]+\)\./;
+    ? /bootstrapModule\([$]?[a-zA-Z]+\)\./
+    : /bootstrapModuleFactory\([$]?[a-zA-Z]+\)\./;
 
   await ng('build', '--prod');
   await expectFileToExist(join(process.cwd(), 'dist'));
