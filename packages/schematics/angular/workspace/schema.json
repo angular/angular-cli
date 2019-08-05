@@ -18,49 +18,6 @@
       "type": "string",
       "visible": "false"
     },
-    "skipInstall": {
-      "description": "When true, does not install packages for dependencies.",
-      "type": "boolean",
-      "default": false
-    },
-    "linkCli": {
-      "description": "When true, links the CLI to the global version (internal development only).",
-      "type": "boolean",
-      "default": false,
-      "visible": false
-    },
-    "skipGit": {
-      "description": "When true, does not initialize a git repository.",
-      "type": "boolean",
-      "default": false,
-      "alias": "g"
-    },
-    "commit": {
-      "description": "Initial repository commit information.",
-      "default": null,
-      "oneOf": [
-        { "type": "null" },
-        {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "email": {
-              "type": "string",
-              "format": "email"
-            },
-            "message": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "name",
-            "email"
-          ]
-        }
-      ]
-    },
     "version": {
       "type": "string",
       "description": "The version of the Angular CLI to use.",
