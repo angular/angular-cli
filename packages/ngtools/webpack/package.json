@@ -25,7 +25,7 @@
     "enhanced-resolve": "4.1.0",
     "rxjs": "6.4.0",
     "tree-kill": "1.2.1",
-    "webpack-sources": "1.4.1"
+    "webpack-sources": "1.4.3"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^8.0.0-beta.0 || ^8.1.0-beta.0 || ^8.2.0-beta.0 || ^8.3.0-beta.0 || ^8.4.0-beta.0 || >=9.0.0-beta < 9",
