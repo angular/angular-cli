@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularInterceptor",
+  "title": "Angular Interceptor Options Schema",
+  "type": "object",
+  "description": "Creates a new, generic interceptor definition in the given or default project.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the interceptor.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the interceptor?"
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path at which to create the interceptor, relative to the workspace root.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "flat": {
+      "type": "boolean",
+      "default": true,
+      "description": "When true (the default), creates files at the top level of the project."
+    },
+    "skipTests": {
+      "type": "boolean",
+      "description": "When true, does not create \"spec.ts\" test files for the new interceptor.",
+      "default": false,
+      "x-user-analytics": 12
+    },
+    "lintFix": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, applies lint fixes after generating the interceptor.",
+      "x-user-analytics": 15
+    }
+  },
+  "required": ["name"]
+}
