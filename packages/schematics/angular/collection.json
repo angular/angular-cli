@@ -60,6 +60,11 @@
       "description": "Create a guard.",
       "schema": "./guard/schema.json"
     },
+    "interceptor": {
+      "factory": "./interceptor",
+      "description": "Create an interceptor.",
+      "schema": "./interceptor/schema.json"
+    },
     "interface": {
       "aliases": [ "i" ],
       "factory": "./interface",
