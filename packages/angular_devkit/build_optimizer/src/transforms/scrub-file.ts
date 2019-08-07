@@ -93,7 +93,7 @@ export function expect<T extends ts.Node>(node: ts.Node, kind: ts.SyntaxKind): T
 }
 
 function findAngularMetadata(node: ts.Node, isAngularCoreFile: boolean): ts.Node[] {
-  const specs: ts.Node[] = [];
+  let specs: ts.Node[] = [];
   // Find all specifiers from imports of `@angular/core`.
   ts.forEachChild(node, (child) => {
     if (child.kind === ts.SyntaxKind.ImportDeclaration) {
@@ -103,6 +103,13 @@ function findAngularMetadata(node: ts.Node, isAngularCoreFile: boolean): ts.Node
       }
     }
   });
+
+  // If the current module is a Angular core file, we also consider all declarations in it to
+  // potentially be Angular metadata.
+  if (isAngularCoreFile) {
+    const localDecl = findAllDeclarations(node);
+    specs = specs.concat(localDecl);
+  }
 
   return specs;
 }
