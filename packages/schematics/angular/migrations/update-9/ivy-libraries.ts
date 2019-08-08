@@ -7,14 +7,14 @@
  */
 import { JsonParseMode, parseJsonAst } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
-import { getWorkspace, getWorkspacePath } from '../../utility/config';
+import { getWorkspacePath } from '../../utility/config';
 import {
   appendPropertyInAstObject,
   findPropertyInAstObject,
   insertPropertyInAstObjectInOrder,
 } from '../../utility/json-utils';
 import { Builders } from '../../utility/workspace-models';
-import { getTargets } from './utils';
+import { getTargets, getWorkspace } from './utils';
 
 /**
  * Updates a pre version 9 library to version 9 Ivy library.

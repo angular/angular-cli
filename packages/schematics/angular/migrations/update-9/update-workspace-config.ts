@@ -5,18 +5,17 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {
-  JsonAstObject,
-  JsonParseMode,
-  parseJsonAst,
-} from '@angular-devkit/core';
+import { JsonAstObject } from '@angular-devkit/core';
 import { Rule, Tree, UpdateRecorder } from '@angular-devkit/schematics';
+import { getWorkspacePath } from '../../utility/config';
 import {
   appendValueInAstArray,
   findPropertyInAstObject,
   insertPropertyInAstObjectInOrder,
   removePropertyInAstObject,
 } from '../../utility/json-utils';
+import { Builders } from '../../utility/workspace-models';
+import { getAllOptions, getTargets, getWorkspace } from './utils';
 
 export const ANY_COMPONENT_STYLE_BUDGET = {
   type: 'anyComponentStyle',
@@ -25,84 +24,25 @@ export const ANY_COMPONENT_STYLE_BUDGET = {
 
 export function UpdateWorkspaceConfig(): Rule {
   return (tree: Tree) => {
-    let workspaceConfigPath = 'angular.json';
-    let angularConfigContent = tree.read(workspaceConfigPath);
+    const workspacePath = getWorkspacePath(tree);
+    const workspace = getWorkspace(tree);
+    const recorder = tree.beginUpdate(workspacePath);
 
-    if (!angularConfigContent) {
-      workspaceConfigPath = '.angular.json';
-      angularConfigContent = tree.read(workspaceConfigPath);
-
-      if (!angularConfigContent) {
-        return;
-      }
+    for (const { target } of getTargets(workspace, 'build', Builders.Browser)) {
+      updateStyleOrScriptOption('styles', recorder, target);
+      updateStyleOrScriptOption('scripts', recorder, target);
+      addAnyComponentStyleBudget(recorder, target);
     }
 
-    const angularJson = parseJsonAst(angularConfigContent.toString(), JsonParseMode.Loose);
-    if (angularJson.kind !== 'object') {
-      return;
-    }
-
-    const projects = findPropertyInAstObject(angularJson, 'projects');
-    if (!projects || projects.kind !== 'object') {
-      return;
-    }
-
-    // For all projects
-    const recorder = tree.beginUpdate(workspaceConfigPath);
-    for (const project of projects.properties) {
-      const projectConfig = project.value;
-      if (projectConfig.kind !== 'object') {
-        break;
-      }
-
-      const architect = findPropertyInAstObject(projectConfig, 'architect');
-      if (!architect || architect.kind !== 'object') {
-        break;
-      }
-
-      const buildTarget = findPropertyInAstObject(architect, 'build');
-      if (buildTarget && buildTarget.kind === 'object') {
-        const builder = findPropertyInAstObject(buildTarget, 'builder');
-        // Projects who's build builder is not build-angular:browser
-        if (builder && builder.kind === 'string' && builder.value === '@angular-devkit/build-angular:browser') {
-          updateStyleOrScriptOption('styles', recorder, buildTarget);
-          updateStyleOrScriptOption('scripts', recorder, buildTarget);
-          addAnyComponentStyleBudget(recorder, buildTarget);
-        }
-      }
-
-      const testTarget = findPropertyInAstObject(architect, 'test');
-      if (testTarget && testTarget.kind === 'object') {
-        const builder = findPropertyInAstObject(testTarget, 'builder');
-        // Projects who's build builder is not build-angular:browser
-        if (builder && builder.kind === 'string' && builder.value === '@angular-devkit/build-angular:karma') {
-          updateStyleOrScriptOption('styles', recorder, testTarget);
-          updateStyleOrScriptOption('scripts', recorder, testTarget);
-        }
-      }
+    for (const { target } of getTargets(workspace, 'test', Builders.Karma)) {
+      updateStyleOrScriptOption('styles', recorder, target);
+      updateStyleOrScriptOption('scripts', recorder, target);
     }
 
     tree.commitUpdate(recorder);
 
     return tree;
   };
-}
-
-/**
- * Helper to retreive all the options in various configurations
- */
-function getAllOptions(builderConfig: JsonAstObject, configurationsOnly = false): JsonAstObject[] {
-  const options = [];
-  const configurations = findPropertyInAstObject(builderConfig, 'configurations');
-  if (configurations && configurations.kind === 'object') {
-    options.push(...configurations.properties.map(x => x.value));
-  }
-
-  if (!configurationsOnly) {
-    options.push(findPropertyInAstObject(builderConfig, 'options'));
-  }
-
-  return options.filter(o => o && o.kind === 'object') as JsonAstObject[];
 }
 
 function updateStyleOrScriptOption(property: 'scripts' | 'styles', recorder: UpdateRecorder, builderConfig: JsonAstObject) {
