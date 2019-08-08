@@ -6,18 +6,20 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { JsonAstObject, experimental } from '@angular-devkit/core';
+import { JsonAstObject, JsonParseMode, parseJsonAst } from '@angular-devkit/core';
+import { SchematicsException, Tree } from '@angular-devkit/schematics';
+import { getWorkspacePath } from '../../utility/config';
 import { findPropertyInAstObject } from '../../utility/json-utils';
 import { Builders, WorkspaceTargets } from '../../utility/workspace-models';
 
 /** Get all workspace targets which builder and target names matches the provided. */
 export function getTargets(
-  workspace: JsonAstObject | experimental.workspace.WorkspaceSchema,
+  workspace: JsonAstObject,
   targetName: Exclude<keyof WorkspaceTargets, number>,
   builderName: Builders,
 ): { target: JsonAstObject, project: JsonAstObject }[] {
   const projects = findPropertyInAstObject(workspace as JsonAstObject, 'projects');
-  if (!projects || projects.kind !== 'object') {
+  if (!projects || projects.kind !== 'object' || !projects.properties) {
     return [];
   }
 
@@ -51,4 +53,31 @@ export function getTargets(
   }
 
   return targets;
+}
+
+/** Helper to retreive all the options in various configurations. */
+export function getAllOptions(builderConfig: JsonAstObject, configurationsOnly = false): JsonAstObject[] {
+  const options = [];
+  const configurations = findPropertyInAstObject(builderConfig, 'configurations');
+  if (configurations && configurations.kind === 'object') {
+    options.push(...configurations.properties.map(x => x.value));
+  }
+
+  if (!configurationsOnly) {
+    options.push(findPropertyInAstObject(builderConfig, 'options'));
+  }
+
+  return options.filter(o => o && o.kind === 'object') as JsonAstObject[];
+}
+
+export function getWorkspace(host: Tree): JsonAstObject {
+  const path = getWorkspacePath(host);
+  const configBuffer = host.read(path);
+  if (!configBuffer) {
+    throw new SchematicsException(`Could not find (${path})`);
+  }
+
+  const content = configBuffer.toString();
+
+  return parseJsonAst(content, JsonParseMode.Loose) as JsonAstObject;
 }
