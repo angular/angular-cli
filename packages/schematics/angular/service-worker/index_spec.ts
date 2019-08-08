@@ -40,7 +40,7 @@ describe('Service Worker Schematic', () => {
   };
 
   beforeEach(async () => {
-    appTree = schematicRunner.runSchematic('workspace', workspaceOptions);
+    appTree = await schematicRunner.runSchematicAsync('workspace', workspaceOptions).toPromise();
     appTree = await schematicRunner.runSchematicAsync('application', appOptions, appTree)
       .toPromise();
   });

@@ -36,8 +36,8 @@ describe('Library Schematic', () => {
   };
 
   let workspaceTree: UnitTestTree;
-  beforeEach(() => {
-    workspaceTree = schematicRunner.runSchematic('workspace', workspaceOptions);
+  beforeEach(async () => {
+    workspaceTree = await schematicRunner.runSchematicAsync('workspace', workspaceOptions).toPromise();
   });
 
   it('should create files', async () => {
@@ -302,7 +302,7 @@ describe('Library Schematic', () => {
   });
 
   it(`should create correct paths when 'newProjectRoot' is blank`, async () => {
-    const workspaceTree = schematicRunner.runSchematic('workspace', { ...workspaceOptions, newProjectRoot: '' });
+    const workspaceTree = await schematicRunner.runSchematicAsync('workspace', { ...workspaceOptions, newProjectRoot: '' }).toPromise();
     const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree)
       .toPromise();
     const config = JSON.parse(tree.readContent('/angular.json'));

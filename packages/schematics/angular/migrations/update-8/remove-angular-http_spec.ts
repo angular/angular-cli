@@ -34,8 +34,8 @@ describe('Migration to version 8', () => {
       tree.create(packageJsonPath, JSON.stringify(packageJson, null, 2));
     });
 
-    it('should remove all dependencies on @angular/http', () => {
-      tree = schematicRunner.runSchematic('migration-07', defaultOptions, tree);
+    it('should remove all dependencies on @angular/http', async () => {
+      tree = await schematicRunner.runSchematicAsync('migration-07', defaultOptions, tree).toPromise();
       const packageJson = JSON.parse(tree.readContent(packageJsonPath));
       expect(packageJson.dependencies['@angular/http']).toBe(undefined);
       expect(packageJson.devDependencies['@angular/http']).toBe(undefined);

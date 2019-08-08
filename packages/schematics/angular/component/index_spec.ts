@@ -47,7 +47,7 @@ describe('Component Schematic', () => {
   };
   let appTree: UnitTestTree;
   beforeEach(async () => {
-    appTree = schematicRunner.runSchematic('workspace', workspaceOptions);
+    appTree = await schematicRunner.runSchematicAsync('workspace', workspaceOptions).toPromise();
     appTree = await schematicRunner
       .runSchematicAsync('application', appOptions, appTree)
       .toPromise();
@@ -167,7 +167,7 @@ describe('Component Schematic', () => {
     const options = { ...defaultOptions, module: '/projects/bar/src/app.moduleXXX.ts' };
     let thrownError: Error | null = null;
     try {
-      schematicRunner.runSchematic('component', options, appTree);
+      await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
     } catch (err) {
       thrownError = err;
     }
