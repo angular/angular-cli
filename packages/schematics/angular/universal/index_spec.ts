@@ -53,7 +53,7 @@ describe('Universal Schematic', () => {
   let appTree: UnitTestTree;
 
   beforeEach(async () => {
-    appTree = schematicRunner.runSchematic('workspace', workspaceOptions);
+    appTree = await schematicRunner.runSchematicAsync('workspace', workspaceOptions).toPromise();
     appTree = await schematicRunner.runSchematicAsync(
       'application',
       initialWorkspaceAppOptions,

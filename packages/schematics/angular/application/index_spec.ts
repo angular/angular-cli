@@ -33,8 +33,8 @@ describe('Application Schematic', () => {
   };
 
   let workspaceTree: UnitTestTree;
-  beforeEach(() => {
-    workspaceTree = schematicRunner.runSchematic('workspace', workspaceOptions);
+  beforeEach(async () => {
+    workspaceTree = await schematicRunner.runSchematicAsync('workspace', workspaceOptions).toPromise();
   });
 
   it('should create all files of an application', async () => {
@@ -408,7 +408,7 @@ describe('Application Schematic', () => {
     });
 
     it(`should create correct paths when 'newProjectRoot' is blank`, async () => {
-      const workspaceTree = schematicRunner.runSchematic('workspace', { ...workspaceOptions, newProjectRoot: '' });
+      const workspaceTree = await schematicRunner.runSchematicAsync('workspace', { ...workspaceOptions, newProjectRoot: '' }).toPromise();
       const options = { ...defaultOptions, projectRoot: undefined };
       const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
         .toPromise();

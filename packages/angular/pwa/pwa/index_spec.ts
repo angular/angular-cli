@@ -41,7 +41,7 @@ describe('PWA Schematic', () => {
   };
 
   beforeEach(async () => {
-    appTree = schematicRunner.runExternalSchematic('@schematics/angular', 'workspace', workspaceOptions);
+    appTree = await schematicRunner.runExternalSchematicAsync('@schematics/angular', 'workspace', workspaceOptions).toPromise();
     appTree = await schematicRunner.runExternalSchematicAsync(
       '@schematics/angular',
       'application',

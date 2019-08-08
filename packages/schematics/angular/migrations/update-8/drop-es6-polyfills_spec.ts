@@ -76,8 +76,8 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
       tree.overwrite(polyfillsPath, polyfills);
     });
 
-    it('should drop the es6 polyfills', () => {
-      tree = schematicRunner.runSchematic('migration-07', defaultOptions, tree);
+    it('should drop the es6 polyfills', async () => {
+      tree = await schematicRunner.runSchematicAsync('migration-07', defaultOptions, tree).toPromise();
       const polyfills = tree.readContent(polyfillsPath);
       expect(polyfills).not.toContain('core-js/es6/symbol');
       expect(polyfills).not.toContain('core-js/es6/set');
@@ -101,7 +101,7 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
       tree.overwrite('angular.json', JSON.stringify(originalContent));
       const polyfillPath = '/foo/src/polyfills.ts';
       tree.create(polyfillPath, polyfills);
-      tree = schematicRunner.runSchematic('migration-07', defaultOptions, tree);
+      tree = await schematicRunner.runSchematicAsync('migration-07', defaultOptions, tree).toPromise();
       const newPolyfills = tree.readContent(polyfillPath);
       expect(newPolyfills).not.toContain('core-js/es6/symbol');
       expect(newPolyfills).not.toContain('core-js/es6/set');

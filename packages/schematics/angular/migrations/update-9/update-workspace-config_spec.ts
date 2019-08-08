@@ -80,49 +80,49 @@ describe('Migration to version 9', () => {
     });
 
     describe('scripts and style options', () => {
-      it('should update scripts in build target', () => {
+      it('should update scripts in build target', async () => {
         let config = getWorkspaceTargets(tree);
         config.build.options.scripts = scriptsWithLazy;
         config.build.configurations.production.scripts = scriptsWithLazy;
 
         updateWorkspaceTargets(tree, config);
-        const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
+        const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
         config = getWorkspaceTargets(tree2).build;
         expect(config.options.scripts).toEqual(scriptsExpectWithLazy);
         expect(config.configurations.production.scripts).toEqual(scriptsExpectWithLazy);
       });
 
-      it('should update styles in build target', () => {
+      it('should update styles in build target', async () => {
         let config = getWorkspaceTargets(tree);
         config.build.options.styles = stylesWithLazy;
         config.build.configurations.production.styles = stylesWithLazy;
 
         updateWorkspaceTargets(tree, config);
-        const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
+        const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
         config = getWorkspaceTargets(tree2).build;
         expect(config.options.styles).toEqual(stylesExpectWithLazy);
         expect(config.configurations.production.styles).toEqual(stylesExpectWithLazy);
       });
 
-      it('should update scripts in test target', () => {
+      it('should update scripts in test target', async () => {
         let config = getWorkspaceTargets(tree);
         config.test.options.scripts = scriptsWithLazy;
         config.test.configurations = { production: { scripts: scriptsWithLazy } };
 
         updateWorkspaceTargets(tree, config);
-        const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
+        const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
         config = getWorkspaceTargets(tree2).test;
         expect(config.options.scripts).toEqual(scriptsExpectWithLazy);
         expect(config.configurations.production.scripts).toEqual(scriptsExpectWithLazy);
       });
 
-      it('should update styles in test target', () => {
+      it('should update styles in test target', async () => {
         let config = getWorkspaceTargets(tree);
         config.test.options.styles = stylesWithLazy;
         config.test.configurations = { production: { styles: stylesWithLazy } };
 
         updateWorkspaceTargets(tree, config);
-        const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
+        const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
         config = getWorkspaceTargets(tree2).test;
         expect(config.options.styles).toEqual(stylesExpectWithLazy);
         expect(config.configurations.production.styles).toEqual(stylesExpectWithLazy);
@@ -130,7 +130,7 @@ describe('Migration to version 9', () => {
     });
 
     describe('anyComponentStyle bundle budget', () => {
-      it('should not append budget when already exists', () => {
+      it('should not append budget when already exists', async () => {
         const defaultBudget = [
           { type: 'initial', maximumWarning: '2mb', maximumError: '5mb' },
           { type: 'anyComponentStyle', maximumWarning: '10kb', maximumError: '50kb' },
@@ -140,18 +140,18 @@ describe('Migration to version 9', () => {
         config.build.configurations.production.budgets = defaultBudget;
         updateWorkspaceTargets(tree, config);
 
-        const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
+        const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
         config = getWorkspaceTargets(tree2).build;
         expect(config.configurations.production.budgets).toEqual(defaultBudget);
       });
 
-      it('should append budget in build target', () => {
+      it('should append budget in build target', async () => {
         const defaultBudget = [{ type: 'initial', maximumWarning: '2mb', maximumError: '5mb' }];
         let config = getWorkspaceTargets(tree);
         config.build.configurations.production.budgets = defaultBudget;
         updateWorkspaceTargets(tree, config);
 
-        const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
+        const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
         config = getWorkspaceTargets(tree2).build;
         expect(config.configurations.production.budgets).toEqual([
           ...defaultBudget,
@@ -159,12 +159,12 @@ describe('Migration to version 9', () => {
         ]);
       });
 
-      it('should add budget in build target', () => {
+      it('should add budget in build target', async () => {
         let config = getWorkspaceTargets(tree);
         config.build.configurations.production.budgets = undefined;
         updateWorkspaceTargets(tree, config);
 
-        const tree2 = schematicRunner.runSchematic('migration-09', {}, tree.branch());
+        const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
         config = getWorkspaceTargets(tree2).build;
         expect(config.configurations.production.budgets).toEqual([ANY_COMPONENT_STYLE_BUDGET]);
       });

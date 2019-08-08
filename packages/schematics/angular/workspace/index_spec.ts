@@ -20,10 +20,10 @@ describe('Workspace Schematic', () => {
     version: '6.0.0',
   };
 
-  it('should create all files of a workspace', () => {
+  it('should create all files of a workspace', async () => {
     const options = { ...defaultOptions };
 
-    const tree = schematicRunner.runSchematic('workspace', options);
+    const tree = await schematicRunner.runSchematicAsync('workspace', options).toPromise();
     const files = tree.files;
     expect(files).toEqual(jasmine.arrayContaining([
       '/.editorconfig',
@@ -36,20 +36,20 @@ describe('Workspace Schematic', () => {
     ]));
   });
 
-  it('should set the name in package.json', () => {
-    const tree = schematicRunner.runSchematic('workspace', defaultOptions);
+  it('should set the name in package.json', async () => {
+    const tree = await schematicRunner.runSchematicAsync('workspace', defaultOptions).toPromise();
     const pkg = JSON.parse(tree.readContent('/package.json'));
     expect(pkg.name).toEqual('foo');
   });
 
-  it('should set the CLI version in package.json', () => {
-    const tree = schematicRunner.runSchematic('workspace', defaultOptions);
+  it('should set the CLI version in package.json', async () => {
+    const tree = await schematicRunner.runSchematicAsync('workspace', defaultOptions).toPromise();
     const pkg = JSON.parse(tree.readContent('/package.json'));
     expect(pkg.devDependencies['@angular/cli']).toMatch('6.0.0');
   });
 
-  it('should use the latest known versions in package.json', () => {
-    const tree = schematicRunner.runSchematic('workspace', defaultOptions);
+  it('should use the latest known versions in package.json', async () => {
+    const tree = await schematicRunner.runSchematicAsync('workspace', defaultOptions).toPromise();
     const pkg = JSON.parse(tree.readContent('/package.json'));
     expect(pkg.dependencies['@angular/core']).toEqual(latestVersions.Angular);
     expect(pkg.dependencies['rxjs']).toEqual(latestVersions.RxJs);
@@ -57,8 +57,8 @@ describe('Workspace Schematic', () => {
     expect(pkg.devDependencies['typescript']).toEqual(latestVersions.TypeScript);
   });
 
-  it('should create correct files when using minimal', () => {
-    const tree = schematicRunner.runSchematic('workspace', { ...defaultOptions, minimal: true });
+  it('should create correct files when using minimal', async () => {
+    const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, minimal: true }).toPromise();
     const files = tree.files;
     expect(files).toEqual(jasmine.arrayContaining([
       '/angular.json',

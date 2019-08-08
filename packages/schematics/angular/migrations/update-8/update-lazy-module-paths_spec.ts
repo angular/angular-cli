@@ -50,7 +50,7 @@ describe('Migration to version 8', () => {
     it('should replace the module path string', async () => {
       tree.create(lazyRoutePath, Buffer.from(lazyRoute));
 
-      schematicRunner.runSchematic('migration-08', {}, tree);
+      await schematicRunner.runSchematicAsync('migration-08', {}, tree).toPromise();
       await schematicRunner.engine.executePostTasks().toPromise();
 
       const routes = tree.readContent(lazyRoutePath);
@@ -63,7 +63,7 @@ describe('Migration to version 8', () => {
     it('should replace the module path string in a child path', async () => {
       tree.create(lazyRoutePath, Buffer.from(lazyChildRoute));
 
-      schematicRunner.runSchematic('migration-08', {}, tree);
+      await schematicRunner.runSchematicAsync('migration-08', {}, tree).toPromise();
       await schematicRunner.engine.executePostTasks().toPromise();
 
       const routes = tree.readContent(lazyRoutePath);
@@ -77,7 +77,7 @@ describe('Migration to version 8', () => {
     it('should replace the module path string when file has BOM', async () => {
       tree.create(lazyRoutePath, '\uFEFF' + Buffer.from(lazyRoute).toString());
 
-      schematicRunner.runSchematic('migration-08', {}, tree);
+      await schematicRunner.runSchematicAsync('migration-08', {}, tree).toPromise();
       await schematicRunner.engine.executePostTasks().toPromise();
 
       const routes = tree.readContent(lazyRoutePath);

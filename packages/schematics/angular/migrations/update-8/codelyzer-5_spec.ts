@@ -68,16 +68,16 @@ describe('Migration to version 8', () => {
       tree.create(tslintPath, JSON.stringify(tslintConfig, null, 2));
     });
 
-    it('should rename all previous rules', () => {
-      tree = schematicRunner.runSchematic('migration-07', defaultOptions, tree);
+    it('should rename all previous rules', async () => {
+      tree = await schematicRunner.runSchematicAsync('migration-07', defaultOptions, tree).toPromise();
       const tslint = JSON.parse(tree.readContent(tslintPath));
       for (const rule of renames) {
         expect(rule in tslint.rules).toBeTruthy(`Rule ${rule} not renamed`);
       }
     });
 
-    it('should update codelyzer\'s version', () => {
-      tree = schematicRunner.runSchematic('migration-07', defaultOptions, tree);
+    it('should update codelyzer\'s version', async () => {
+      tree = await schematicRunner.runSchematicAsync('migration-07', defaultOptions, tree).toPromise();
       const packageJson = JSON.parse(tree.readContent(packageJsonPath));
       expect(packageJson.devDependencies.codelyzer).toBe('^5.0.1');
     });
