@@ -22,7 +22,7 @@
     "clean-css": "4.2.1",
     "copy-webpack-plugin": "5.0.4",
     "core-js": "3.1.4",
-    "file-loader": "4.1.0",
+    "file-loader": "4.2.0",
     "glob": "7.1.4",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma-source-map-support": "1.4.0",
