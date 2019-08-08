@@ -7,12 +7,14 @@
  */
 
 import { Rule, chain } from '@angular-devkit/schematics';
+import { UpdateLibraries } from './ivy-libraries';
 import { UpdateWorkspaceConfig } from './update-workspace-config';
 
 export default function(): Rule {
   return () => {
     return chain([
       UpdateWorkspaceConfig(),
+      UpdateLibraries(),
     ]);
   };
 }
