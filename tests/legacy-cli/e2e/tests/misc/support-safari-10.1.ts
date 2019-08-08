@@ -27,7 +27,7 @@ export default async function () {
   await ng('build');
   await expectFileToExist('dist/test-project/polyfills-nomodule-es5.js');
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
-    <script src="polyfills-nomodule-es5.js" nomodule defer></script>
+    <script src="polyfills-nomodule-es5.js" nomodule></script>
     <script src="runtime-es2015.js" type="module"></script>
     <script src="polyfills-es2015.js" type="module"></script>
     <script src="runtime-es5.js" nomodule defer></script>
