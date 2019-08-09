@@ -8,10 +8,13 @@
 import { json, schema } from '@angular-devkit/core';
 import { timer } from 'rxjs';
 import { map, take, tap, toArray } from 'rxjs/operators';
+import { promisify } from 'util';
 import { TestingArchitectHost } from '../testing/testing-architect-host';
 import { BuilderOutput, BuilderRun } from './api';
 import { Architect } from './architect';
 import { createBuilder } from './create-builder';
+
+const flush = promisify(setImmediate);
 
 // tslint:disable-next-line:no-big-function
 describe('architect', () => {
@@ -81,6 +84,7 @@ describe('architect', () => {
   it('runs builders parallel', async () => {
     const run = await architect.scheduleBuilder('package:test', {});
     const run2 = await architect.scheduleBuilder('package:test', {});
+    await flush();
     expect(called).toBe(2);
     expect(await run.result).toEqual(jasmine.objectContaining({ success: true }));
     expect(await run2.result).toEqual(jasmine.objectContaining({ success: true }));
@@ -91,6 +95,7 @@ describe('architect', () => {
   it('runs targets parallel', async () => {
     const run = await architect.scheduleTarget(target1, {});
     const run2 = await architect.scheduleTarget(target1, {});
+    await flush();
     expect(called).toBe(2);
     expect(await run.result).toEqual(jasmine.objectContaining({ success: true }));
     expect(await run2.result).toEqual(jasmine.objectContaining({ success: true }));
@@ -164,6 +169,7 @@ describe('architect', () => {
       called++;
 
       for (let x = 0; x < 10; x++) {
+        await new Promise(setImmediate);
         context.reportRunning();
         yield { success: true };
         results++;
