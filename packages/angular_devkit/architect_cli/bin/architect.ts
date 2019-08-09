@@ -8,7 +8,7 @@
  */
 import { Architect, BuilderInfo, BuilderProgressState, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
-import { json, logging, schema, tags, terminal, workspaces } from '@angular-devkit/core';
+import { logging, schema, tags, terminal, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import { existsSync } from 'fs';
 import * as minimist from 'minimist';
@@ -55,8 +55,7 @@ function usage(logger: logging.Logger, exitCode = 0): never {
     Any additional option is passed the target, overriding existing options.
   `);
 
-  process.exit(exitCode);
-  throw 0; // The node typing sometimes don't have a never type for process.exit().
+  return process.exit(exitCode);
 }
 
 function _targetStringFromTarget({ project, target, configuration }: Target) {
@@ -74,7 +73,7 @@ async function _executeTarget(
   workspace: workspaces.WorkspaceDefinition,
   root: string,
   argv: minimist.ParsedArgs,
-  registry: json.schema.SchemaRegistry,
+  registry: schema.SchemaRegistry,
 ) {
   const architectHost = new WorkspaceNodeModulesArchitectHost(workspace, root);
   const architect = new Architect(architectHost, registry);

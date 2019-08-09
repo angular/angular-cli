@@ -15,10 +15,12 @@
   "dependencies": {
     "@angular-devkit/architect": "0.0.0",
     "@angular-devkit/core": "0.0.0",
-    "@types/progress": "^2.0.3",
     "minimist": "1.2.0",
-    "progress": "^2.0.3",
+    "progress": "2.0.3",
     "rxjs": "6.4.0",
     "symbol-observable": "1.2.0"
+  },
+  "devDependencies": {
+    "@types/progress": "2.0.3"
   }
 }
