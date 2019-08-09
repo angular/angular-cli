@@ -672,6 +672,7 @@ export class AngularCompilerPlugin {
           this._program = null;
           this._transformers = [];
           this._resourceLoader = undefined;
+          this._compilerHost.reset();
         }
       });
     });
