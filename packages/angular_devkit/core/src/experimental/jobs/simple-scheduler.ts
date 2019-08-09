@@ -306,7 +306,7 @@ export class SimpleScheduler<
     // Create the input channel by having a filter.
     const input = new Subject<JsonValue>();
     input.pipe(
-      switchMap(message => handler.pipe(
+      concatMap(message => handler.pipe(
         switchMap(handler => {
           if (handler === null) {
             throw new JobDoesNotExistException(name);
