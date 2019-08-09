@@ -378,6 +378,20 @@ workflows:
                     [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
                     circleci step halt
                   fi
+      - e2e-cli:
+          name: e2e-cli-ng-ivy-snapshots
+          snapshots: true
+          ivy: true
+          requires:
+            - e2e-cli
+          pre-steps:
+            - run:
+                name: Don't run expensive e2e snapshots tests for forks other than renovate-bot and angular
+                command: >
+                  if [[ "$CIRCLE_PR_USERNAME" != "renovate-bot" ]] &&
+                    [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
+                    circleci step halt
+                  fi
       - e2e-cli-node-10:
           <<: *ignore_pull_requests
           requires:
