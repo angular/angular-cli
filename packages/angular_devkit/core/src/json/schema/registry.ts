@@ -8,8 +8,8 @@
 import * as ajv from 'ajv';
 import * as http from 'http';
 import * as https from 'https';
-import { Observable, from, isObservable, of, throwError } from 'rxjs';
-import { concatMap, map, switchMap, tap } from 'rxjs/operators';
+import { Observable, from, isObservable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import * as Url from 'url';
 import { BaseException } from '../../exception/exception';
 import { PartiallyOrderedSet, deepCopy } from '../../utils';
@@ -126,22 +126,28 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     this._ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-06.json'));
   }
 
-  private _fetch(uri: string): Promise<JsonObject> {
+  private async _fetch(uri: string): Promise<JsonObject> {
     const maybeSchema = this._uriCache.get(uri);
 
     if (maybeSchema) {
-      return Promise.resolve(maybeSchema);
+      return maybeSchema;
     }
 
     // Try all handlers, one after the other.
-    for (const maybeHandler of this._uriHandlers) {
-      const handler = maybeHandler(uri);
-      if (handler) {
-        // The AJV API only understands Promises.
-        return from(handler).pipe(
-          tap(json => this._uriCache.set(uri, json)),
-        ).toPromise();
+    for (const handler of this._uriHandlers) {
+      let handlerResult = handler(uri);
+      if (handlerResult === null || handlerResult === undefined) {
+        continue;
       }
+
+      if (isObservable(handlerResult)) {
+        handlerResult = handlerResult.toPromise();
+      }
+
+      const value = await handlerResult;
+      this._uriCache.set(uri, value);
+
+      return value;
     }
 
     // If none are found, handle using http client.
@@ -244,61 +250,42 @@ export class CoreSchemaRegistry implements SchemaRegistry {
    * See: https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.appendix.B.2
    */
   flatten(schema: JsonObject): Observable<JsonObject> {
+    return from(this._flatten(schema));
+  }
+
+  private async _flatten(schema: JsonObject): Promise<JsonObject> {
     this._ajv.removeSchema(schema);
 
-    // Supports both synchronous and asynchronous compilation, by trying the synchronous
-    // version first, then if refs are missing this will fails.
-    // We also add any refs from external fetched schemas so that those will also be used
-    // in synchronous (if available).
-    let validator: Observable<ajv.ValidateFunction>;
-    try {
-      this._currentCompilationSchemaInfo = undefined;
-      validator = of(this._ajv.compile(schema)).pipe(
-        tap(() => this._currentCompilationSchemaInfo = undefined),
-      );
-    } catch (e) {
-      // Propagate the error.
-      if (!(e instanceof (ajv.MissingRefError as {} as Function))) {
-        return throwError(e);
-      }
+    this._currentCompilationSchemaInfo = undefined;
+    const validate = await this._ajv.compileAsync(schema);
 
-      this._currentCompilationSchemaInfo = undefined;
-      validator = from(this._ajv.compileAsync(schema)).pipe(
-        tap(() => this._currentCompilationSchemaInfo = undefined),
-      );
+    const self = this;
+
+    function visitor(
+      current: JsonObject | JsonArray,
+      pointer: JsonPointer,
+      parentSchema?: JsonObject | JsonArray,
+      index?: string,
+    ) {
+      if (current
+        && parentSchema
+        && index
+        && isJsonObject(current)
+        && current.hasOwnProperty('$ref')
+        && typeof current['$ref'] == 'string'
+      ) {
+        const resolved = self._resolver(current['$ref'] as string, validate);
+
+        if (resolved.schema) {
+          (parentSchema as JsonObject)[index] = resolved.schema;
+        }
+      }
     }
 
-    return validator.pipe(
-      switchMap(validate => {
-        const self = this;
+    const schemaCopy = deepCopy(validate.schema as JsonObject);
+    visitJsonSchema(schemaCopy, visitor);
 
-        function visitor(
-          current: JsonObject | JsonArray,
-          pointer: JsonPointer,
-          parentSchema?: JsonObject | JsonArray,
-          index?: string,
-        ) {
-          if (current
-            && parentSchema
-            && index
-            && isJsonObject(current)
-            && current.hasOwnProperty('$ref')
-            && typeof current['$ref'] == 'string'
-          ) {
-            const resolved = self._resolver(current['$ref'] as string, validate);
-
-            if (resolved.schema) {
-              (parentSchema as JsonObject)[index] = resolved.schema;
-            }
-          }
-        }
-
-        const schema = deepCopy(validate.schema as JsonObject);
-        visitJsonSchema(schema, visitor);
-
-        return of(schema);
-      }),
-    );
+    return schemaCopy;
   }
 
   /**
@@ -309,6 +296,12 @@ export class CoreSchemaRegistry implements SchemaRegistry {
    * @returns An Observable of the Validation function.
    */
   compile(schema: JsonSchema): Observable<SchemaValidator> {
+    return from(this._compile(schema)).pipe(
+      map(validate => (value, options) => from(validate(value, options))),
+    );
+  }
+
+  private async _compile(schema: JsonSchema) {
     const schemaInfo: SchemaInfo = {
       smartDefaultRecord: new Map<string, JsonObject>(),
       promptDefinitions: [],
@@ -316,138 +309,92 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
     this._ajv.removeSchema(schema);
 
-    // Supports both synchronous and asynchronous compilation, by trying the synchronous
-    // version first, then if refs are missing this will fails.
-    // We also add any refs from external fetched schemas so that those will also be used
-    // in synchronous (if available).
-    let validator: Observable<ajv.ValidateFunction>;
+    let validator: ajv.ValidateFunction;
     try {
       this._currentCompilationSchemaInfo = schemaInfo;
-      validator = of(this._ajv.compile(schema));
-    } catch (e) {
-      // Propagate the error.
-      if (!(e instanceof (ajv.MissingRefError as {} as Function))) {
-        return throwError(e);
-      }
-
-      try {
-        validator = from(this._ajv.compileAsync(schema));
-      } catch (e) {
-        return throwError(e);
-      }
+      validator = await this._ajv.compileAsync(schema);
+    } finally {
+      this._currentCompilationSchemaInfo = undefined;
     }
 
-    return validator
-      .pipe(
-        map(validate => (data: JsonValue, options?: SchemaValidatorOptions) => {
-          const validationOptions: SchemaValidatorOptions = {
-            withPrompts: true,
-            applyPostTransforms: true,
-            applyPreTransforms: true,
-            ...options,
-          };
-          const validationContext = {
-            promptFieldsWithValue: new Set<string>(),
-          };
+    const validate = async (data: JsonValue, options?: SchemaValidatorOptions) => {
+      const validationOptions: SchemaValidatorOptions = {
+        withPrompts: true,
+        applyPostTransforms: true,
+        applyPreTransforms: true,
+        ...options,
+      };
+      const validationContext = {
+        promptFieldsWithValue: new Set<string>(),
+      };
 
-          let result = of(data);
-          if (validationOptions.applyPreTransforms) {
-            // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/3989
-            result = (result as any).pipe(
-              ...[...this._pre].map(visitor => concatMap((data: JsonValue) => {
-                return visitJson(data, visitor, schema, this._resolver, validate);
-              })),
-            );
+      // Apply pre-validation transforms
+      if (validationOptions.applyPreTransforms) {
+        for (const visitor of this._pre.values()) {
+          data = await visitJson(data, visitor, schema, this._resolver, validator).toPromise();
+        }
+      }
+
+      // Apply smart defaults
+      await this._applySmartDefaults(data, schemaInfo.smartDefaultRecord);
+
+      // Apply prompts
+      if (validationOptions.withPrompts) {
+        const visitor: JsonVisitor = (value, pointer) => {
+          if (value !== undefined) {
+            validationContext.promptFieldsWithValue.add(pointer);
           }
 
-          return result.pipe(
-            switchMap(updateData => this._applySmartDefaults(
-              updateData,
-              schemaInfo.smartDefaultRecord,
-            )),
-            switchMap(updatedData => {
-              if (validationOptions.withPrompts === false) {
-                return of(updatedData);
-              }
+          return value;
+        };
+        if (typeof schema === 'object') {
+          await visitJson(data, visitor, schema, this._resolver, validator).toPromise();
+        }
 
-              const visitor: JsonVisitor = (value, pointer) => {
-                if (value !== undefined) {
-                  validationContext.promptFieldsWithValue.add(pointer);
-                }
+        const definitions = schemaInfo.promptDefinitions
+          .filter(def => !validationContext.promptFieldsWithValue.has(def.id));
 
-                return value;
-              };
-              if (schema === false || schema === true) {
-                return of(updatedData);
-              }
+        if (definitions.length > 0) {
+          await this._applyPrompts(data, definitions);
+        }
+      }
 
-              return visitJson(updatedData, visitor, schema, this._resolver, validate);
-            }),
-            switchMap(updatedData => {
-              if (validationOptions.withPrompts === false) {
-                return of(updatedData);
-              }
+      // Validate using ajv
+      const result = validator.call(validationContext, data);
+      let errors;
+      if (typeof result === 'boolean') {
+        // Synchronous result
+        if (!result) {
+          errors = validator.errors || [];
+        }
+      } else {
+        // Asynchronous result
+        try {
+          await result;
+        } catch (e) {
+          if ((e as AjvValidationError).ajv) {
+            errors = (e as AjvValidationError).errors || [];
+          } else {
+            throw e;
+          }
+        }
+      }
 
-              const definitions = schemaInfo.promptDefinitions
-                .filter(def => !validationContext.promptFieldsWithValue.has(def.id));
+      if (errors) {
+        return { data, success: false, errors } as SchemaValidatorResult;
+      }
 
-              if (this._promptProvider && definitions.length > 0) {
-                return from(this._applyPrompts(updatedData, definitions));
-              } else {
-                return of(updatedData);
-              }
-            }),
-            switchMap(updatedData => {
-              const result = validate.call(validationContext, updatedData);
+      // Apply post-validation transforms
+      if (validationOptions.applyPostTransforms) {
+        for (const visitor of this._post.values()) {
+          data = await visitJson(data, visitor, schema, this._resolver, validator).toPromise();
+        }
+      }
 
-              return typeof result === 'boolean'
-                ? of([updatedData, result])
-                : from((result as Promise<boolean>)
-                  .then(() => [updatedData, true])
-                  .catch((err: Error | AjvValidationError) => {
-                    if ((err as AjvValidationError).ajv) {
-                      validate.errors = (err as AjvValidationError).errors;
+      return { data, success: true } as SchemaValidatorResult;
+    };
 
-                      return Promise.resolve([updatedData, false]);
-                    }
-
-                    return Promise.reject(err);
-                  }));
-            }),
-            switchMap(([data, valid]) => {
-              if (valid) {
-                let result = of(data);
-
-                if (validationOptions.applyPostTransforms) {
-                  // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/3989
-                  result = (result as any).pipe(
-                    ...[...this._post].map(visitor => concatMap((data: JsonValue) => {
-                      return visitJson(data, visitor, schema, this._resolver, validate);
-                    })),
-                  );
-                }
-
-                return result.pipe(
-                  map(data => [data, valid]),
-                );
-              } else {
-                return of([data, valid]);
-              }
-            }),
-            map(([data, valid]) => {
-              if (valid) {
-                return { data, success: true } as SchemaValidatorResult;
-              }
-
-              return {
-                data,
-                success: false,
-                errors: (validate.errors || []),
-              } as SchemaValidatorResult;
-            }),
-          );
-        }),
-      );
+    return validate;
   }
 
   addFormat(format: SchemaFormat): void {
@@ -650,36 +597,31 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     });
   }
 
-  private _applyPrompts<T>(data: T, prompts: Array<PromptDefinition>): Observable<T> {
+  private async _applyPrompts(data: JsonValue, prompts: Array<PromptDefinition>): Promise<void> {
     const provider = this._promptProvider;
     if (!provider) {
-      return of(data);
+      return;
     }
 
-    return from(provider(prompts)).pipe(
-      map(answers => {
-        for (const path in answers) {
-          const pathFragments = path.split('/').map(pf => {
-            if (/^\d+$/.test(pf)) {
-              return pf;
-            } else {
-              return '\'' + pf + '\'';
-            }
-          });
-
-          CoreSchemaRegistry._set(
-            data,
-            pathFragments.slice(1),
-            answers[path] as {},
-            null,
-            undefined,
-            true,
-          );
+    const answers = await from(provider(prompts)).toPromise();
+    for (const path in answers) {
+      const pathFragments = path.split('/').map(pf => {
+        if (/^\d+$/.test(pf)) {
+          return pf;
+        } else {
+          return '\'' + pf + '\'';
         }
+      });
 
-        return data;
-      }),
-    );
+      CoreSchemaRegistry._set(
+        data,
+        pathFragments.slice(1),
+        answers[path] as {},
+        null,
+        undefined,
+        true,
+      );
+    }
   }
 
   private static _set(
@@ -742,32 +684,24 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     }
   }
 
-  private _applySmartDefaults<T>(
+  private async _applySmartDefaults<T>(
     data: T,
     smartDefaults: Map<string, JsonObject>,
-  ): Observable<T> {
-    // tslint:disable-next-line:no-any https://github.com/ReactiveX/rxjs/issues/3989
-    return (of(data) as any).pipe(
-      ...[...smartDefaults.entries()].map(([pointer, schema]) => {
-        return concatMap(data => {
-          const fragments = JSON.parse(pointer);
-          const source = this._sourceMap.get((schema as JsonObject).$source as string);
+  ): Promise<void> {
+    for (const [pointer, schema] of smartDefaults.entries()) {
+      const fragments = JSON.parse(pointer);
+      const source = this._sourceMap.get((schema as JsonObject).$source as string);
+      if (!source) {
+        continue;
+      }
 
-          let value = source ? source(schema) : of(undefined);
+      let value = source(schema);
+      if (isObservable(value)) {
+        value = await value.toPromise();
+      }
 
-          if (!isObservable(value)) {
-            value = of(value);
-          }
-
-          return (value as Observable<{}>).pipe(
-            // Synchronously set the new data at the proper JsonSchema path.
-            tap(x => CoreSchemaRegistry._set(data, fragments, x)),
-            // But return the data object.
-            map(() => data),
-          );
-        });
-      }),
-    );
+      CoreSchemaRegistry._set(data, fragments, value);
+    }
   }
 
   useXDeprecatedProvider(onUsage: (message: string) => void): void {
