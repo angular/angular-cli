@@ -371,4 +371,9 @@ export class SimpleMemoryHost implements Host<{}> {
   watch(path: Path, options?: HostWatchOptions): Observable<HostWatchEvent> | null {
     return this._watch(path, options);
   }
+
+  reset(): void {
+    this._cache.clear();
+    this._watchers.clear();
+  }
 }
