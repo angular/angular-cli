@@ -8,10 +8,13 @@
 // tslint:disable:no-big-function no-non-null-assertion
 import { EMPTY, Observable, of, timer } from 'rxjs';
 import { map, take, toArray } from 'rxjs/operators';
+import { promisify } from 'util';
 import { JobHandlerContext, JobOutboundMessage, JobOutboundMessageKind, JobState } from './api';
 import { createJobHandler } from './create-job-handler';
 import { SimpleJobRegistry } from './simple-registry';
 import { SimpleScheduler } from './simple-scheduler';
+
+const flush = promisify(setImmediate);
 
 describe('SimpleScheduler', () => {
   let registry: SimpleJobRegistry;
@@ -61,9 +64,11 @@ describe('SimpleScheduler', () => {
     expect(started).toBe(0);
 
     const p1 = job1.output.toPromise();
+    await flush();
     expect(started).toBe(1);
 
     const p2 = job2.output.toPromise();
+    await flush();
     expect(started).toBe(2);
     expect(finished).toBe(0);
 
@@ -186,10 +191,10 @@ describe('SimpleScheduler', () => {
       createJobHandler<number, number, number>((argument: number) => {
         started.push(argument);
 
-        return new Promise(resolve => setImmediate(() => {
+        return new Promise(resolve => setTimeout(() => {
           done.push(argument);
           resolve(argument);
-        }));
+        }, 10));
       }),
       { argument: true, output: true },
     );
@@ -204,29 +209,35 @@ describe('SimpleScheduler', () => {
 
     // Just subscribe to the last job in the lot.
     job6.outboundBus.subscribe();
+    await flush();
     // Expect the first one to start.
     expect(started).toEqual([1]);
     // Wait for the first one to finish.
     await job1.output.toPromise();
+    await flush();
     // Expect the second one to have started, and the first one to be done.
     expect(started).toEqual([1, 2]);
     expect(done).toEqual([1]);
 
     // Rinse and repeat.
     await job2.output.toPromise();
+    await flush();
     expect(started).toEqual([1, 2, 3]);
     expect(done).toEqual([1, 2]);
 
     await job3.output.toPromise();
+    await flush();
     expect(started).toEqual([1, 2, 3, 4]);
     expect(done).toEqual([1, 2, 3]);
 
     await job4.output.toPromise();
+    await flush();
     expect(started).toEqual([1, 2, 3, 4, 5]);
     expect(done).toEqual([1, 2, 3, 4]);
 
     // Just skip job 5.
     await job6.output.toPromise();
+    await flush();
     expect(done).toEqual(started);
   });
 
@@ -293,11 +304,11 @@ describe('SimpleScheduler', () => {
     const p10 = (scheduler.schedule('jobA', 10)).output.toPromise();
     const p11 = (scheduler.schedule('jobA', 11)).output.toPromise();
     const p12 = (scheduler.schedule('jobA', 12)).output.toPromise();
-    await Promise.resolve();
+    await flush();
 
     expect(done).toEqual([]);
     resume();
-    await Promise.resolve();
+    await flush();
     expect(done).not.toEqual([]);
     expect(await p10).toBe(10);
     expect(await p11).toBe(11);
