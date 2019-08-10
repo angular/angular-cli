@@ -18,7 +18,7 @@
     "autoprefixer": "9.6.1",
     "browserslist": "4.6.6",
     "caniuse-lite": "1.0.30000989",
-    "circular-dependency-plugin": "5.0.2",
+    "circular-dependency-plugin": "5.2.0",
     "clean-css": "4.2.1",
     "copy-webpack-plugin": "5.0.4",
     "core-js": "3.1.4",
