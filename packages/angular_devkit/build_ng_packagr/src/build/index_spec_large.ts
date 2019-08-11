@@ -18,11 +18,7 @@ import {
 } from '@angular-devkit/core'; // tslint:disable-line:no-implicit-dependencies
 import { map, take, tap } from 'rxjs/operators';
 
-export const ivyEnabled = process.argv.includes('--ivy');
-if (ivyEnabled) {
-  // tslint:disable-next-line:no-console
-  console.warn('********* IVY Enabled ***********');
-}
+const ivyEnabled = process.argv.includes('--ivy');
 
 const devkitRoot = (global as unknown as { _DevKitRoot: string})._DevKitRoot;
 const workspaceRoot = join(
