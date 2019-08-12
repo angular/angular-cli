@@ -28,6 +28,7 @@ ts_library(
         "@npm//@types/node",
         "@npm//@types/webpack",
         "@npm//source-map",
+        "@npm//tslib",
         "@npm//typescript",
     ],
 )
