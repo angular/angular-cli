@@ -22,7 +22,7 @@ import {
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { createDefaultPath } from '../utility/workspace';
-import { Schema as GuardOptions } from './schema';
+import { Implement as GuardInterface, Schema as GuardOptions } from './schema';
 
 
 export default function (options: GuardOptions): Rule {
@@ -31,19 +31,15 @@ export default function (options: GuardOptions): Rule {
       options.path = await createDefaultPath(host, options.project as string);
     }
 
-    if (options.implements === undefined) {
-      options.implements = [];
+    if (!options.implements) {
+      throw new SchematicsException('Option "implements" is required.');
     }
 
-    let implementations = '';
-    let implementationImports = '';
-    if (options.implements.length > 0) {
-      implementations = options.implements.join(', ');
-      implementationImports = `${implementations}, `;
-      // As long as we aren't in IE... ;)
-      if (options.implements.includes('CanLoad')) {
-        implementationImports = `${implementationImports}Route, UrlSegment, `;
-      }
+    const implementations = options.implements.join(', ');
+    let implementationImports = `${implementations}, `;
+    // As long as we aren't in IE... ;)
+    if (options.implements.includes(GuardInterface.CanLoad)) {
+      implementationImports = `${implementationImports}Route, UrlSegment, `;
     }
 
     const parsedPath = parseName(options.path, options.name);
