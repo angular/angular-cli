@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
+import { isHelperName } from '../helpers/ast-utils';
 
 /**
  * @deprecated From 0.9.0
@@ -88,16 +89,4 @@ function createTslibImport(
 
     return newNode;
   }
-}
-
-function isHelperName(name: string): boolean {
-  // TODO: there are more helpers than these, should we replace them all?
-  const tsHelpers = [
-    '__extends',
-    '__decorate',
-    '__metadata',
-    '__param',
-  ];
-
-  return tsHelpers.indexOf(name) !== -1;
 }

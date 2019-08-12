@@ -186,4 +186,28 @@ describe('prefix-functions', () => {
 
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
+
+  it(`doesn't add pure comments to tslib helpers`, () => {
+    const input = tags.stripIndent`
+    class LanguageState {
+
+    }
+
+    LanguageState.ctorParameters = () => [
+        { type: TranslateService },
+        { type: undefined, decorators: [{ type: Inject, args: [LANGUAGE_CONFIG,] }] }
+    ];
+
+    __decorate([
+        Action(CheckLanguage),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Object]),
+        __metadata("design:returntype", void 0)
+    ], LanguageState.prototype, "checkLanguage", null);
+    `;
+
+    const output = input;
+
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
 });

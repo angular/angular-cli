@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { addPureComment, hasPureComment } from '../helpers/ast-utils';
+import { addPureComment, hasPureComment, isHelperName } from '../helpers/ast-utils';
 
 export function getPrefixFunctionsTransformer(): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
@@ -44,10 +44,8 @@ export function findTopLevelFunctions(parentNode: ts.Node): Set<ts.Node> {
     // need to mark function calls inside them as pure.
     // Class static initializers in ES2015 are an exception we don't cover. They would need similar
     // processing as enums to prevent property setting from causing the class to be retained.
-    if (ts.isFunctionDeclaration(node)
-      || ts.isFunctionExpression(node)
-      || ts.isClassDeclaration(node)
-      || ts.isClassExpression(node)
+    if (ts.isFunctionLike(node)
+      || ts.isClassLike(node)
       || ts.isArrowFunction(node)
       || ts.isMethodDeclaration(node)
     ) {
@@ -78,9 +76,15 @@ export function findTopLevelFunctions(parentNode: ts.Node): Set<ts.Node> {
         topLevelFunctions.add(node);
       } else if (ts.isCallExpression(innerNode)) {
         let expression: ts.Expression = innerNode.expression;
+
+        if (ts.isIdentifier(expression) && isHelperName(expression.text)) {
+          return;
+        }
+
         while (expression && ts.isParenthesizedExpression(expression)) {
           expression = expression.expression;
         }
+
         if (expression) {
           if (ts.isFunctionExpression(expression)) {
             // Skip IIFE's with arguments

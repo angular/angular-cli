@@ -5,9 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import * as tslib from 'tslib';
 import * as ts from 'typescript';
 
 const pureFunctionComment = '@__PURE__';
+
+// We include only exports that start with '__' because tslib helpers
+// all start with a suffix of two underscores.
+const tslibHelpers = new Set<string>(Object.keys(tslib).filter(h => h.startsWith('__')));
 
 // Find all nodes from the AST in the subtree of node of SyntaxKind kind.
 export function collectDeepNodes<T extends ts.Node>(node: ts.Node, kind: ts.SyntaxKind): T[] {
@@ -40,4 +45,8 @@ export function hasPureComment(node: ts.Node): boolean {
   const leadingComment = ts.getSyntheticLeadingComments(node);
 
   return !!leadingComment && leadingComment.some(comment => comment.text === pureFunctionComment);
+}
+
+export function isHelperName(name: string): boolean {
+  return tslibHelpers.has(name);
 }
