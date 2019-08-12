@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { terminal } from '@angular-devkit/core';
 import * as ProgressBar from 'progress';
 import * as readline from 'readline';
 
@@ -14,7 +13,7 @@ export class MultiProgressBar<Key, T> {
 
   constructor(private _status: string, private _stream = process.stderr) {}
   private _add(id: Key, data: T): { data: T, bar: ProgressBar } {
-    const width = Math.min(80, terminal.getCapabilities(this._stream).columns || 80);
+    const width = Math.min(80, this._stream.columns || 80);
     const value = {
       data,
       bar: new ProgressBar(this._status, {
