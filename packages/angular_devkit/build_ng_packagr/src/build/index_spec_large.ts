@@ -9,18 +9,21 @@ import { Architect } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { TestProjectHost, TestingArchitectHost } from '@angular-devkit/architect/testing';
 import {
+  experimental,
+  getSystemPath,
   join,
   normalize,
   schema,
   virtualFs,
-  workspaces,
 } from '@angular-devkit/core'; // tslint:disable-line:no-implicit-dependencies
 import { map, take, tap } from 'rxjs/operators';
+
+const ivyEnabled = process.argv.includes('--ivy');
 
 const devkitRoot = (global as unknown as { _DevKitRoot: string})._DevKitRoot;
 const workspaceRoot = join(
   normalize(devkitRoot),
-  'tests/angular_devkit/build_ng_packagr/ng-packaged/',
+  `tests/angular_devkit/build_ng_packagr/ng-packaged${ivyEnabled ? '-ivy' : ''}/`,
 );
 
 describe('NgPackagr Builder', () => {
@@ -33,15 +36,14 @@ describe('NgPackagr Builder', () => {
     const registry = new schema.CoreSchemaRegistry();
     registry.addPostTransform(schema.transforms.addUndefinedDefaults);
 
-    const { workspace } = await workspaces.readWorkspace(
-      host.root(),
-      workspaces.createWorkspaceHost(host),
-    );
+    const workspaceSysPath = getSystemPath(host.root());
+    const workspace = await experimental.workspace.Workspace.fromPath(host, host.root(), registry);
     const architectHost = new TestingArchitectHost(
-      host.root(),
-      host.root(),
-      new WorkspaceNodeModulesArchitectHost(workspace, host.root()),
+      workspaceSysPath,
+      workspaceSysPath,
+      new WorkspaceNodeModulesArchitectHost(workspace, workspaceSysPath),
     );
+
     architect = new Architect(architectHost, registry);
   });
 
@@ -59,6 +61,12 @@ describe('NgPackagr Builder', () => {
       host.scopedSync().read(normalize('./dist/lib/fesm5/lib.js')),
     );
     expect(content).toContain('lib works');
+
+    if (ivyEnabled) {
+      expect(content).toContain('ngComponentDef');
+    } else {
+      expect(content).not.toContain('ngComponentDef');
+    }
   });
 
   it('rebuilds on TS file changes', async () => {

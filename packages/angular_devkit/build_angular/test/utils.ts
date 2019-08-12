@@ -21,10 +21,6 @@ import {
 import { BrowserBuilderOutput } from '../src/browser';
 
 export const ivyEnabled = process.argv.includes('--ivy');
-if (ivyEnabled) {
-  // tslint:disable-next-line:no-console
-  console.warn('********* IVY Enabled ***********');
-}
 
 const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
 export const workspaceRoot = join(

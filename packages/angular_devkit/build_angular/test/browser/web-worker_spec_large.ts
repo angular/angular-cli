@@ -77,11 +77,9 @@ describe('Browser Builder Web Worker support', () => {
           "outDir": "../out-tsc/worker",
           "types": []
         },
-        "exclude": [
-          "test.ts",
-          "**/*.spec.ts",
-          "**/*.worker.ts",
-          "app/dep.ts",
+        "files": [
+          "main.ts",
+          "polyfills.ts"
         ]
       }`,
   };

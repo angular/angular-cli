@@ -89,6 +89,11 @@ export default function(args: ParsedArgs, logger: logging.Logger) {
   const specGlob = args.large ? '*_spec_large.ts' : '*_spec.ts';
   const regex = args.glob ? args.glob : `packages/**/${specGlob}`;
 
+  if (args['ivy']) {
+    // tslint:disable-next-line:no-console
+    console.warn('********* IVY Enabled ***********');
+  }
+
   if (args.large) {
     // Default timeout for large specs is 2.5 minutes.
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
