@@ -159,19 +159,18 @@ export class WebpackResourceLoader {
     });
   }
 
-  private _evaluate({ outputName, source }: CompilationOutput): Promise<string> {
-    try {
+  private async _evaluate({ outputName, source }: CompilationOutput): Promise<string> {
       // Evaluate code
       const evaluatedSource = vm.runInNewContext(source, undefined, { filename: outputName });
-
-      if (typeof evaluatedSource == 'string') {
-        return Promise.resolve(evaluatedSource);
+      if (typeof evaluatedSource === 'object' && typeof evaluatedSource.default === 'string') {
+        return evaluatedSource.default;
       }
 
-      return Promise.reject('The loader "' + outputName + '" didn\'t return a string.');
-    } catch (e) {
-      return Promise.reject(e);
-    }
+      if (typeof evaluatedSource === 'string') {
+        return evaluatedSource;
+      }
+
+      throw new Error(`The loader "${outputName}" didn't return a string.`);
   }
 
   get(filePath: string): Promise<string> {

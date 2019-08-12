@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { tags } from '@angular-devkit/core';
 import * as ts from 'typescript';
 
 export function replaceResources(
@@ -37,11 +38,25 @@ export function replaceResources(
       return ts.visitEachChild(node, visitNode, context);
     };
 
-    return (sourceFile: ts.SourceFile) => (
-      shouldTransform(sourceFile.fileName)
-        ? ts.visitNode(sourceFile, visitNode)
-        : sourceFile
-    );
+    // emit helper for `import Name from "foo"`
+    const importDefaultHelper: ts.EmitHelper = {
+      name: 'typescript:commonjsimportdefault',
+      scoped: false,
+      text: tags.stripIndent`
+      var __importDefault = (this && this.__importDefault) || function (mod) {
+        return (mod && mod.__esModule) ? mod : { "default": mod };
+      };`,
+    };
+
+    return (sourceFile: ts.SourceFile) => {
+      if (shouldTransform(sourceFile.fileName)) {
+        context.requestEmitHelper(importDefaultHelper);
+
+        return ts.visitNode(sourceFile, visitNode);
+      }
+
+      return sourceFile;
+    };
   };
 }
 
@@ -171,16 +186,28 @@ function isComponentDecorator(node: ts.Node, typeChecker: ts.TypeChecker): node 
   return false;
 }
 
-function createRequireExpression(node: ts.Expression, loader = ''): ts.Expression {
+function createRequireExpression(node: ts.Expression, loader?: string): ts.Expression {
   const url = getResourceUrl(node, loader);
   if (!url) {
     return node;
   }
 
-  return ts.createCall(
+  const callExpression = ts.createCall(
     ts.createIdentifier('require'),
     undefined,
     [ts.createLiteral(url)],
+  );
+
+  return ts.createPropertyAccess(
+    ts.createCall(
+      ts.setEmitFlags(
+        ts.createIdentifier('__importDefault'),
+        ts.EmitFlags.HelperName | ts.EmitFlags.AdviseOnEmitNode,
+      ),
+      undefined,
+      [callExpression],
+    ),
+    'default',
   );
 }
 
