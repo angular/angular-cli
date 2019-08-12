@@ -153,7 +153,7 @@ export default function() {
       .then(() =>
         expectFileToMatch(
           'dist/test-project-server/index.html',
-          /<h2.*>Here are some links to help you start: <\/h2>/,
+          /<p.*>Here are some links to help you get started:<\/p>/,
         ),
       )
       .then(() =>
