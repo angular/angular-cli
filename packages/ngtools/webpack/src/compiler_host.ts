@@ -20,6 +20,7 @@ const dev = Math.floor(Math.random() * 10000);
 
 export class WebpackCompilerHost implements ts.CompilerHost {
   private _syncHost: virtualFs.SyncDelegateHost;
+  private _innerMemoryHost: virtualFs.SimpleMemoryHost;
   private _memoryHost: virtualFs.SyncDelegateHost;
   private _changedFiles = new Set<string>();
   private _readResourceFiles = new Set<string>();
@@ -49,12 +50,21 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     private readonly moduleResolutionCache?: ts.ModuleResolutionCache,
   ) {
     this._syncHost = new virtualFs.SyncDelegateHost(host);
-    this._memoryHost = new virtualFs.SyncDelegateHost(new virtualFs.SimpleMemoryHost());
+    this._innerMemoryHost = new virtualFs.SimpleMemoryHost();
+    this._memoryHost = new virtualFs.SyncDelegateHost(this._innerMemoryHost);
     this._basePath = normalize(basePath);
   }
 
   private get virtualFiles(): Path[] {
     return [...((this._memoryHost.delegate as {}) as { _cache: Map<Path, {}> })._cache.keys()];
+  }
+
+  reset() {
+    this._innerMemoryHost.reset();
+    this._changedFiles.clear();
+    this._readResourceFiles.clear();
+    this._sourceFileCache.clear();
+    this._resourceLoader = undefined;
   }
 
   denormalizePath(path: string) {

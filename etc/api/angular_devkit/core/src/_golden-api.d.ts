@@ -992,6 +992,7 @@ export declare class SimpleMemoryHost implements Host<{}> {
     list(path: Path): Observable<PathFragment[]>;
     read(path: Path): Observable<FileBuffer>;
     rename(from: Path, to: Path): Observable<void>;
+    reset(): void;
     stat(path: Path): Observable<Stats<{}> | null> | null;
     watch(path: Path, options?: HostWatchOptions): Observable<HostWatchEvent> | null;
     write(path: Path, content: FileBuffer): Observable<void>;
