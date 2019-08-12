@@ -12,7 +12,7 @@ nodejs_binary(
     data = [
         "quicktype_runner.js",
     ],
-    entry_point = "angular_cli/tools/quicktype_runner.js",
+    entry_point = "quicktype_runner.js",
     install_source_map_support = False,
     node_modules = "@npm//quicktype-core",
     templated_args = [
