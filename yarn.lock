@@ -11494,10 +11494,10 @@ verdaccio-htpasswd@2.0.0:
     http-errors "1.7.2"
     unix-crypt-td-js "1.0.0"
 
-verdaccio@4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-4.2.0.tgz#eb15caf1f88569c980c35b769c9bae89b57a472a"
-  integrity sha512-tLnOJEl/6XxYBFsEfMxvI2CZ/XZ8ASgk4ACU0txG0SZTSHoJjgjYwng0YAQM0Rx8S9F+Mo93UIKmLQQiXTaNbA==
+verdaccio@4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-4.2.1.tgz#3f9819f537de0301adfa0e291a1c2736343acbab"
+  integrity sha512-Xk65HJHVHl3RuScEk5P10vVgwPWEhlulXl9IehRHZM+7CPoEcw//WPA+JN4x+rzsVP/Ozt/gkiOONyJaUKP6Wg==
   dependencies:
     "@verdaccio/commons-api" "0.1.2"
     "@verdaccio/local-storage" "2.2.1"
@@ -11516,6 +11516,7 @@ verdaccio@4.2.0:
     envinfo "7.3.1"
     express "4.17.1"
     handlebars "4.1.2"
+    http-errors "1.7.3"
     js-yaml "3.13.1"
     jsonwebtoken "8.5.1"
     kleur "3.0.3"
