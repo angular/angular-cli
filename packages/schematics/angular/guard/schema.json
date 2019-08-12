@@ -55,8 +55,16 @@
       "description": "Specifies which interfaces to implement.",
       "uniqueItems": true,
       "items": {
-        "type": "string"
+        "enum": [
+          "CanActivate",
+          "CanActivateChild",
+          "CanLoad"
+        ]
       },
+      "default": [
+        "CanActivate"
+      ],
+      "minItems": 1,
       "x-prompt": {
         "message": "Which interfaces would you like to implement?",
         "type": "list",
