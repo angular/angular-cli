@@ -49,6 +49,8 @@ describe('Library Schematic', () => {
       '/projects/foo/package.json',
       '/projects/foo/README.md',
       '/projects/foo/tslint.json',
+      '/projects/foo/tsconfig.lib.json',
+      '/projects/foo/tsconfig.lib.prod.json',
       '/projects/foo/src/test.ts',
       '/projects/foo/src/my-index.ts',
       '/projects/foo/src/lib/foo.module.ts',
@@ -132,7 +134,7 @@ describe('Library Schematic', () => {
   });
 
   it('should handle a pascalCasedName', async () => {
-    const options = {...defaultOptions, name: 'pascalCasedName'};
+    const options = { ...defaultOptions, name: 'pascalCasedName' };
     const tree = await schematicRunner.runSchematicAsync('library', options, workspaceTree).toPromise();
     const config = getJsonFileContent(tree, '/angular.json');
     const project = config.projects.pascalCasedName;
@@ -316,5 +318,13 @@ describe('Library Schematic', () => {
     expect(appTsConfig.extends).toEqual('../tsconfig.json');
     const specTsConfig = JSON.parse(tree.readContent('/foo/tsconfig.spec.json'));
     expect(specTsConfig.extends).toEqual('../tsconfig.json');
+  });
+
+  it(`should add 'production' configuration`, async () => {
+    const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree)
+      .toPromise();
+
+    const workspace = JSON.parse(tree.readContent('/angular.json'));
+    expect(workspace.projects.foo.architect.build.configurations.production).toBeDefined();
   });
 });
