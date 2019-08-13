@@ -3,8 +3,6 @@ import { ng } from '../../../utils/process';
 
 export default async function () {
   await ng('generate', 'library', 'my-lib');
-  await ng('build', 'my-lib');
-
   await writeFile('./src/app/app.module.ts', `
       import { BrowserModule } from '@angular/platform-browser';
       import { NgModule } from '@angular/core';
@@ -68,6 +66,18 @@ export default async function () {
       });
     });
   `);
+
+  await runLibraryTests();
+  await runLibraryTests(true);
+}
+
+async function runLibraryTests(prodMode = false): Promise<void> {
+  const args = ['build', 'my-lib'];
+  if (prodMode) {
+    args.push('--prod');
+  }
+
+  await ng(...args);
 
   // Check that the tests succeeds both with named project, unnammed (should test app), and prod.
   await ng('e2e');

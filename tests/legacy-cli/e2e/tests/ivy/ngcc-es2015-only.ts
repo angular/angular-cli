@@ -4,7 +4,7 @@ import { createProject } from '../../utils/project';
 
 export default async function() {
   // Create a new project to avoid polluting node modules for other tests
-  await createProject('ivy-project-ngcc', '--enable-ivy');
+  await createProject('ivy-project-ngcc');
 
   const { stderr, stdout } = await ng('build', '--prod');
 
