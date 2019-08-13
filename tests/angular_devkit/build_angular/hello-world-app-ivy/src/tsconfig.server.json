@@ -10,7 +10,6 @@
     "main.server.ts"
   ],
   "angularCompilerOptions": {
-    "entryModule": "app/app.server.module#AppServerModule",
-    "enableIvy": true
+    "entryModule": "app/app.server.module#AppServerModule"
   }
 }

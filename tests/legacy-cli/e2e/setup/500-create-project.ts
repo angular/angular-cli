@@ -3,7 +3,7 @@ import { getGlobalVariable } from '../utils/env';
 import { expectFileToExist } from '../utils/fs';
 import { gitClean } from '../utils/git';
 import { ng } from '../utils/process';
-import { prepareProjectForE2e } from '../utils/project';
+import { prepareProjectForE2e, updateJsonFile } from '../utils/project';
 
 export default async function() {
   const argv = getGlobalVariable('argv');
@@ -18,13 +18,20 @@ export default async function() {
   } else {
     const extraArgs = [];
 
-    if (argv['ivy']) {
-      extraArgs.push('--enable-ivy');
-    }
-
     await ng('new', 'test-project', '--skip-install', ...extraArgs);
     await expectFileToExist(join(process.cwd(), 'test-project'));
     process.chdir('./test-project');
+
+    if (!argv['ivy']) {
+      await updateJsonFile('tsconfig.json', config => {
+        config.angularCompilerOptions.enableIvy = false;
+      });
+
+      // In VE non prod builds are non AOT by default
+      await updateJsonFile('angular.json', config => {
+        config.projects['test-project'].architect.build.options.aot = false;
+      });
+    }
   }
 
   await prepareProjectForE2e('test-project');
