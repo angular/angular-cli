@@ -48,7 +48,6 @@ Note: There's a limit of 20 custom dimensions.
 | 5 | `Flag: --style` | `string` |
 | 6 | `--collection` | `string` |
 | 7 | `--buildEventLog` | `boolean` |
-| 8 | `Flag: --enableIvy` | `boolean` |
 | 9 | `Flag: --inlineStyle` | `boolean` |
 | 10 | `Flag: --inlineTemplate` | `boolean` |
 | 11 | `Flag: --viewEncapsulation` | `string` |

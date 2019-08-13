@@ -12,7 +12,7 @@ import { createProject, ngServe } from '../../utils/project';
 
 export default async function() {
   try {
-    await createProject('ivy-project', '--enable-ivy');
+    await createProject('ivy-project');
 
     // Add in a reference to a secondary entry-point to check that ngcc processes it correctly
     await replaceInFile(

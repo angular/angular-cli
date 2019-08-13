@@ -7,18 +7,8 @@
   "files": [
     "src/main.ts",
     "src/polyfills.ts"
-  ],<% if (!enableIvy) { %>
-  "include": [
-    "src/**/*.ts"
   ],
-  "exclude": [
-    "src/test.ts",
-    "src/**/*.spec.ts"
-  ]<% } %><% if (enableIvy) { %>
   "include": [
     "src/**/*.d.ts"
-  ],
-  "angularCompilerOptions": {
-    "enableIvy": true
-  }<% } %>
+  ]
 }
