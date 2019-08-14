@@ -316,7 +316,6 @@ export declare class HostTree implements Tree {
     get(path: string): FileEntry | null;
     getDir(path: string): DirEntry;
     merge(other: Tree, strategy?: MergeStrategy): void;
-    optimize(): this;
     overwrite(path: string, content: Buffer | string): void;
     read(path: string): Buffer | null;
     rename(from: string, to: string): void;
