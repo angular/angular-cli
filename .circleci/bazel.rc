@@ -16,5 +16,8 @@ test --test_tag_filters=-manual
 # https://circleci.com/docs/2.0/configuration-reference/#resource_class
 build --local_resources=3072,2.0,1.0
 
+# More details on failures
+build --verbose_failures=true
+
 # Retry in the event of flakes
 test --flaky_test_attempts=2
