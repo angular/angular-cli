@@ -1,6 +1,3 @@
-// tslint:disable
-// TODO: cleanup this file, it's copied as is from Angular CLI.
-
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -8,14 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
 import * as CleanCSS from 'clean-css';
 import { Compiler, compilation } from 'webpack';
 import { RawSource, Source, SourceMapSource } from 'webpack-sources';
-
-interface Chunk {
-  files: string[];
-}
 
 export interface CleanCssWebpackPluginOptions {
   sourceMap: boolean;
@@ -23,15 +15,20 @@ export interface CleanCssWebpackPluginOptions {
 }
 
 function hook(
-  compiler: any,
-  action: (compilation: any, chunks: Array<Chunk>) => Promise<void | void[]>,
+  compiler: Compiler,
+  action: (
+    compilation: compilation.Compilation,
+    chunks: compilation.Chunk[],
+  ) => Promise<void | void[]>,
 ) {
-  compiler.hooks.compilation.tap('cleancss-webpack-plugin', (compilation: any) => {
-    compilation.hooks.optimizeChunkAssets.tapPromise(
-      'cleancss-webpack-plugin',
-      (chunks: Array<Chunk>) => action(compilation, chunks),
-    );
-  });
+  compiler.hooks.compilation.tap(
+    'cleancss-webpack-plugin',
+    (compilation: compilation.Compilation) => {
+      compilation.hooks.optimizeChunkAssets.tapPromise('cleancss-webpack-plugin', chunks =>
+        action(compilation, chunks),
+      );
+    },
+  );
 }
 
 export class CleanCssWebpackPlugin {
@@ -40,13 +37,13 @@ export class CleanCssWebpackPlugin {
   constructor(options: Partial<CleanCssWebpackPluginOptions>) {
     this._options = {
       sourceMap: false,
-      test: (file) => file.endsWith('.css'),
+      test: file => file.endsWith('.css'),
       ...options,
     };
   }
 
   apply(compiler: Compiler): void {
-    hook(compiler, (compilation: compilation.Compilation, chunks: Array<Chunk>) => {
+    hook(compiler, (compilation: compilation.Compilation, chunks: compilation.Chunk[]) => {
       const cleancss = new CleanCSS({
         compatibility: 'ie9',
         level: {
@@ -54,8 +51,8 @@ export class CleanCssWebpackPlugin {
             skipProperties: [
               'transition', // Fixes #12408
               'font', // Fixes #9648
-            ] 
-          }
+            ],
+          },
         },
         inline: false,
         returnPromise: true,
@@ -79,6 +76,7 @@ export class CleanCssWebpackPlugin {
           }
 
           let content: string;
+          // tslint:disable-next-line: no-any
           let map: any;
           if (this._options.sourceMap && asset.sourceAndMap) {
             const sourceAndMap = asset.sourceAndMap();
@@ -101,8 +99,8 @@ export class CleanCssWebpackPlugin {
           }
 
           if (output.errors && output.errors.length > 0) {
-            output.errors
-              .forEach((error: string) => compilation.errors.push(new Error(error)));
+            output.errors.forEach((error: string) => compilation.errors.push(new Error(error)));
+
             return;
           }
 
@@ -116,6 +114,7 @@ export class CleanCssWebpackPlugin {
             newSource = new SourceMapSource(
               output.styles,
               file,
+              // tslint:disable-next-line: no-any
               output.sourceMap.toString() as any,
               content,
               map,

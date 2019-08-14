@@ -13,7 +13,6 @@ import {
   compilation,
 } from 'webpack';
 import { Source } from 'webpack-sources';
-import Compilation = compilation.Compilation;
 
 const NormalModule = require('webpack/lib/NormalModule');
 
@@ -262,7 +261,7 @@ export class NgBuildAnalyticsPlugin {
     }
   }
 
-  protected _compilation(compiler: Compiler, compilation: Compilation) {
+  protected _compilation(compiler: Compiler, compilation: compilation.Compilation) {
     this._reset();
     compilation.hooks.succeedModule.tap('NgBuildAnalyticsPlugin', this._succeedModule.bind(this));
   }

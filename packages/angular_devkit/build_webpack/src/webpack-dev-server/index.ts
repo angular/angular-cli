@@ -47,7 +47,7 @@ export function runWebpackDevServer(
 
   const devServerConfig = options.devServerConfig || config.devServer || {};
   if (devServerConfig.stats) {
-    config.stats = devServerConfig.stats as webpack.Stats.ToStringOptionsObject;
+    config.stats = devServerConfig.stats;
   }
   // Disable stats reporting by the devserver, we have our own logger.
   devServerConfig.stats = false;

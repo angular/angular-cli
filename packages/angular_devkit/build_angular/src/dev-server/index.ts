@@ -315,19 +315,17 @@ export function buildServerConfig(
     host: serverOptions.host,
     port: serverOptions.port,
     headers: { 'Access-Control-Allow-Origin': '*' },
-    historyApiFallback:
-      !!browserOptions.index &&
-      ({
-        index: `${servePath}/${getIndexOutputFile(browserOptions)}`,
-        disableDotRule: true,
-        htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
-        rewrites: [
-          {
-            from: new RegExp(`^(?!${servePath})/.*`),
-            to: context => url.format(context.parsedUrl),
-          },
-        ],
-      } as WebpackDevServer.HistoryApiFallbackConfig),
+    historyApiFallback: !!browserOptions.index && {
+      index: `${servePath}/${getIndexOutputFile(browserOptions)}`,
+      disableDotRule: true,
+      htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
+      rewrites: [
+        {
+          from: new RegExp(`^(?!${servePath})/.*`),
+          to: context => url.format(context.parsedUrl),
+        },
+      ],
+    },
     stats: false,
     compress: styles || scripts,
     watchOptions: {
@@ -434,8 +432,8 @@ function _addLiveReload(
   // This adds it back so that behavior is consistent when using a custom URL path
   let sockjsPath = '';
   if (clientAddress.pathname) {
-      clientAddress.pathname = path.posix.join(clientAddress.pathname, 'sockjs-node');
-      sockjsPath = '&sockPath=' + clientAddress.pathname;
+    clientAddress.pathname = path.posix.join(clientAddress.pathname, 'sockjs-node');
+    sockjsPath = '&sockPath=' + clientAddress.pathname;
   }
 
   const entryPoints = [`${webpackDevServerPath}?${url.format(clientAddress)}${sockjsPath}`];
@@ -465,7 +463,7 @@ function _addLiveReload(
     }
   }
   if (typeof webpackConfig.entry !== 'object' || Array.isArray(webpackConfig.entry)) {
-    webpackConfig.entry = {} as webpack.Entry;
+    webpackConfig.entry = {};
   }
   if (!Array.isArray(webpackConfig.entry.main)) {
     webpackConfig.entry.main = [];
