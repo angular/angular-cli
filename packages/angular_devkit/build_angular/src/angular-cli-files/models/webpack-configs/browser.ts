@@ -78,12 +78,12 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
       splitChunks: {
         maxAsyncRequests: Infinity,
         cacheGroups: {
-          default: buildOptions.commonChunk && {
+          default: !!buildOptions.commonChunk && {
             chunks: 'async',
             minChunks: 2,
             priority: 10,
           },
-          common: buildOptions.commonChunk && {
+          common: !!buildOptions.commonChunk && {
             name: 'common',
             chunks: 'async',
             minChunks: 2,
@@ -91,7 +91,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
             priority: 5,
           },
           vendors: false,
-          vendor: buildOptions.vendorChunk && {
+          vendor: !!buildOptions.vendorChunk && {
             name: 'vendor',
             chunks: 'initial',
             enforce: true,
@@ -105,7 +105,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
           },
         },
       },
-    } as webpack.Options.Optimization,
+    },
     plugins: extraPlugins,
     node: false,
   };

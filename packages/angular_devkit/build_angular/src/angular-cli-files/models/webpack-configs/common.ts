@@ -18,7 +18,6 @@ import {
   Configuration,
   ContextReplacementPlugin,
   HashedModuleIdsPlugin,
-  Output,
   debug,
 } from 'webpack';
 import { RawSource } from 'webpack-sources';
@@ -408,8 +407,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       path: path.resolve(root, buildOptions.outputPath as string),
       publicPath: buildOptions.deployUrl,
       filename: `[name]${targetInFileName}${hashFormat.chunk}.js`,
-      // cast required until typings include `futureEmitAssets` property
-    } as Output,
+    },
     watch: buildOptions.watch,
     watchOptions: {
       poll: buildOptions.poll,

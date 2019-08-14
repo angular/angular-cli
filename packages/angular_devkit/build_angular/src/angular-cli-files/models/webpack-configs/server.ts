@@ -14,7 +14,7 @@ import { getSourceMapDevTool } from './utils';
  * Returns a partial specific to creating a bundle for node
  * @param wco Options which are include the build options and app config
  */
-export function getServerConfig(wco: WebpackConfigOptions) {
+export function getServerConfig(wco: WebpackConfigOptions): Configuration {
   const extraPlugins = [];
   if (wco.buildOptions.sourceMap) {
     const { scripts, styles, hidden } = wco.buildOptions.sourceMap;

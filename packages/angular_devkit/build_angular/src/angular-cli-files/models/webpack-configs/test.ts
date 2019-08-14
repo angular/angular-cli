@@ -101,7 +101,5 @@ export function getTestConfig(
         },
       },
     },
-    // Webpack typings don't yet include the function form for 'chunks',
-    // or the built-in vendors cache group.
-  } as {} as webpack.Configuration;
+  };
 }

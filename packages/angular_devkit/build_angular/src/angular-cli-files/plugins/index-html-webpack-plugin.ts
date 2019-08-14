@@ -62,9 +62,7 @@ export class IndexHtmlWebpackPlugin {
     compiler.hooks.emit.tapPromise('index-html-webpack-plugin', async compilation => {
       // Get input html file
       const inputContent = await readFile(this._options.input, compilation);
-      (compilation as compilation.Compilation & {
-        fileDependencies: Set<string>;
-      }).fileDependencies.add(this._options.input);
+      compilation.fileDependencies.add(this._options.input);
 
       // Get all files for selected entrypoints
       const files: FileInfo[] = [];
