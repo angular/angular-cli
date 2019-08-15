@@ -15,16 +15,11 @@
   "dependencies": {
     "@angular-devkit/core": "^<%= coreVersion %>",
     "@angular-devkit/schematics": "^<%= schematicsVersion %>",
-    "@types/jasmine": "^3.3.9",
-    "@types/node": "^8.0.31",
-    "jasmine": "^3.3.1",
-    "typescript": "3.5.3"
+    "typescript": "~3.5.3"
   },
-  "files": [
-    "src/**/files/",
-    "src/**/*.json",
-    "src/**/*.js",
-    "src/**/*.js.map",
-    "src/**/*.d.ts"
-  ]
+  "devDependencies": {
+    "@types/node": "~8.9.4",
+    "@types/jasmine": "~3.3.8",
+    "jasmine": "^3.4.0"
+  }
 }
