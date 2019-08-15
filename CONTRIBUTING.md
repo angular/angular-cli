@@ -106,7 +106,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
     git push origin my-fix-branch
     ```
 
-* In GitHub, send a pull request to `devkit:master`.
+* In GitHub, send a pull request to `angular/angular-cli:master`.
 * If we suggest changes then:
   * Make the required updates.
   * Re-run the Angular DevKit test suites to ensure tests are still passing.
