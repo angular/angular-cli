@@ -35,6 +35,73 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
     return {};
   }
 
+  async executeMigrations(
+    packageName: string,
+    collectionPath: string,
+    range: semver.Range,
+    commit = false,
+  ) {
+    const collection = this.getEngine().createCollection(collectionPath);
+
+    const migrations = [];
+    for (const name of collection.listSchematicNames()) {
+      const schematic = this.getEngine().createSchematic(name, collection);
+      const description = schematic.description as typeof schematic.description & {
+        version?: string;
+      };
+      if (!description.version) {
+        continue;
+      }
+
+      if (semver.satisfies(description.version, range, { includePrerelease: true })) {
+        migrations.push(description as typeof schematic.description & { version: string });
+      }
+    }
+
+    if (migrations.length === 0) {
+      return true;
+    }
+
+    const startingGitSha = this.findCurrentGitSha();
+
+    migrations.sort((a, b) => semver.compare(a.version, b.version) || a.name.localeCompare(b.name));
+
+    for (const migration of migrations) {
+      this.logger.info(
+        `** Executing migrations for version ${migration.version} of package '${packageName}' **`,
+      );
+
+      // TODO: run the schematic directly; most of the logic in the following is unneeded
+      const result = await this.runSchematic({
+        collectionName: migration.collection.name,
+        schematicName: migration.name,
+        force: false,
+        showNothingDone: false,
+      });
+
+      // 1 = failure
+      if (result === 1) {
+        if (startingGitSha !== null) {
+          const currentGitSha = this.findCurrentGitSha();
+          if (currentGitSha !== startingGitSha) {
+            this.logger.warn(`git HEAD was at ${startingGitSha} before migrations.`);
+          }
+        }
+
+        return false;
+      }
+
+      // Commit migration
+      if (commit) {
+        let message = `migrate workspace for ${packageName}@${migration.version}`;
+        if (migration.description) {
+          message += '\n' + migration.description;
+        }
+        this.createCommit([], message);
+      }
+    }
+  }
+
   // tslint:disable-next-line:no-big-function
   async run(options: UpdateCommandSchema & Arguments) {
     const packages: PackageIdentifier[] = [];
@@ -112,9 +179,9 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
       this.workspace.configFile &&
       oldConfigFileNames.includes(this.workspace.configFile)
     ) {
-          options.migrateOnly = true;
-          options.from = '1.0.0';
-        }
+      options.migrateOnly = true;
+      options.from = '1.0.0';
+    }
 
     this.logger.info('Collecting installed dependencies...');
 
@@ -149,6 +216,13 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
         this.logger.error(
           'A single package must be specified when using the "migrate-only" option.',
         );
+
+        return 1;
+      }
+
+      const from = coerceVersionNumber(options.from);
+      if (!from) {
+        this.logger.error(`"from" value [${options.from}] is not a valid version.`);
 
         return 1;
       }
@@ -230,20 +304,18 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
         }
       }
 
-      return this.runSchematic({
-        collectionName: '@schematics/update',
-        schematicName: 'migrate',
-        dryRun: !!options.dryRun,
-        force: false,
-        showNothingDone: false,
-        additionalOptions: {
-          package: packageName,
-          collection: migrations,
-          from: options.from,
-          verbose: options.verbose || false,
-          to: options.to || packageNode.package.version,
-        },
-      });
+      const migrationRange = new semver.Range(
+        '>' + from + ' <=' + (options.to || packageNode.package.version),
+      );
+
+      const result = await this.executeMigrations(
+        packageName,
+        migrations,
+        migrationRange,
+        !options.skipCommits,
+      );
+
+      return result ? 1 : 0;
     }
 
     const requests: {
@@ -287,7 +359,9 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
       try {
         // Metadata requests are internally cached; multiple requests for same name
         // does not result in additional network traffic
-        metadata = await fetchPackageMetadata(packageName, this.logger, { verbose: options.verbose });
+        metadata = await fetchPackageMetadata(packageName, this.logger, {
+          verbose: options.verbose,
+        });
       } catch (e) {
         this.logger.error(`Error fetching metadata for '${packageName}': ` + e.message);
 
@@ -366,9 +440,46 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
           return false;
         }
       }
-
-    } catch { }
+    } catch {}
 
     return true;
   }
+
+  createCommit(files: string[], message: string) {
+    try {
+      execSync('git add -A ' + files.join(' '), { encoding: 'utf8', stdio: 'pipe' });
+
+      execSync(`git commit --no-verify -m "${message}"`, { encoding: 'utf8', stdio: 'pipe' });
+    } catch (error) {}
+  }
+
+  findCurrentGitSha(): string | null {
+    try {
+      const result = execSync('git rev-parse HEAD', { encoding: 'utf8', stdio: 'pipe' });
+
+      return result.trim();
+    } catch {
+      return null;
+    }
+  }
+}
+
+function coerceVersionNumber(version: string): string | null {
+  if (!version.match(/^\d{1,30}\.\d{1,30}\.\d{1,30}/)) {
+    const match = version.match(/^\d{1,30}(\.\d{1,30})*/);
+
+    if (!match) {
+      return null;
+    }
+
+    if (!match[1]) {
+      version = version.substr(0, match[0].length) + '.0.0' + version.substr(match[0].length);
+    } else if (!match[2]) {
+      version = version.substr(0, match[0].length) + '.0' + version.substr(match[0].length);
+    } else {
+      return null;
+    }
+  }
+
+  return semver.valid(version);
 }
