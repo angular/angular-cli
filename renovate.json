@@ -43,7 +43,8 @@
     {
       "packagePatterns": [
         "^@bazel\/.*",
-        "^build_bazel.*"
+        "^build_bazel.*",
+        "^bazel_toolchains$"
       ],
       "groupName": "bazel",
       "pinVersions": false
