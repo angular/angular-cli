@@ -44,8 +44,7 @@
     },
     "verbose": {
       "type": "boolean",
-      "description": "Adds more details to output logging.",
-      "default": false
+      "description": "Adds more details to output logging."
     },
     "liveReload": {
       "type": "boolean",
@@ -117,7 +116,6 @@
     },
     "sourceMap": {
       "description": "Output sourcemaps.",
-      "default": true,
       "oneOf": [
         {
           "type": "object",
@@ -153,8 +151,7 @@
     "vendorSourceMap": {
       "type": "boolean",
       "description": "Resolve vendor packages sourcemaps.",
-      "x-deprecated": true,
-      "default": false
+      "x-deprecated": true
     },
     "evalSourceMap": {
       "type": "boolean",

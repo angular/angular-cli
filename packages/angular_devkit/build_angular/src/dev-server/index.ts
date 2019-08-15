@@ -46,7 +46,7 @@ const open = require('open');
 
 export type DevServerBuilderOptions = Schema & json.JsonObject;
 
-export const devServerBuildOverriddenKeys: (keyof DevServerBuilderOptions)[] = [
+const devServerBuildOverriddenKeys: (keyof DevServerBuilderOptions)[] = [
   'watch',
   'optimization',
   'aot',

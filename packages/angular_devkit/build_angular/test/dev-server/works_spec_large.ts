@@ -92,4 +92,14 @@ describe('Dev Server Builder', () => {
     expect(await response.text()).toContain('<title>HelloWorldApp</title>');
   });
 
+  it('should not generate sourcemaps when running prod build', async () => {
+    // Production builds have sourcemaps turned off.
+    const run = await architect.scheduleTarget({ ...target, configuration: 'production' });
+    runs.push(run);
+    const output = await run.result as DevServerBuilderOutput;
+    expect(output.success).toBe(true);
+    const hasSourceMaps = output.emittedFiles && output.emittedFiles.some(f => f.extension === '.map');
+    expect(hasSourceMaps).toBe(false, `Expected emitted files not to contain '.map' files.`);
+  });
+
 });
