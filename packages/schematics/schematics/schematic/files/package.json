@@ -19,5 +19,12 @@
     "@types/node": "^8.0.31",
     "jasmine": "^3.3.1",
     "typescript": "3.5.3"
-  }
+  },
+  "files": [
+    "src/**/files/",
+    "src/**/*.json",
+    "src/**/*.js",
+    "src/**/*.js.map",
+    "src/**/*.d.ts"
+  ]
 }
