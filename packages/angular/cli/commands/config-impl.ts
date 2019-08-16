@@ -28,7 +28,6 @@ import {
 } from '../utilities/config';
 import { Schema as ConfigCommandSchema, Value as ConfigCommandSchemaValue } from './config';
 
-
 function _validateBoolean(value: string) {
   if (('' + value).trim() === 'true') {
     return true;
@@ -71,8 +70,7 @@ function _validateAnalyticsSharingTracking(value: string) {
   return value;
 }
 
-
-const validCliPaths = new Map<string, ((arg: string) => JsonValue)>([
+const validCliPaths = new Map<string, (arg: string) => JsonValue>([
   ['cli.warnings.versionMismatch', _validateBoolean],
   ['cli.defaultCollection', _validateString],
   ['cli.packageManager', _validateString],
@@ -89,9 +87,9 @@ const validCliPaths = new Map<string, ((arg: string) => JsonValue)>([
  * @returns {(string|number)[]} The fragments for the string.
  * @private
  */
-function parseJsonPath(path: string): (string|number)[] {
+function parseJsonPath(path: string): (string | number)[] {
   const fragments = (path || '').split(/\./g);
-  const result: (string|number)[] = [];
+  const result: (string | number)[] = [];
 
   while (fragments.length > 0) {
     const fragment = fragments.shift();
@@ -109,7 +107,7 @@ function parseJsonPath(path: string): (string|number)[] {
       const indices = match[2]
         .slice(1, -1)
         .split('][')
-        .map(x => /^\d$/.test(x) ? +x : x.replace(/\"|\'/g, ''));
+        .map(x => (/^\d$/.test(x) ? +x : x.replace(/\"|\'/g, '')));
       result.push(...indices);
     }
   }
@@ -213,14 +211,12 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
       await this.validateScope(CommandScope.InProject);
     }
 
-    let config =
-      (getWorkspace(level) as {} as { _workspace: experimental.workspace.WorkspaceSchema });
+    let config = await getWorkspace(level);
 
     if (options.global && !config) {
       try {
         if (migrateLegacyGlobalConfig()) {
-          config =
-            (getWorkspace(level) as {} as { _workspace: experimental.workspace.WorkspaceSchema });
+          config = await getWorkspace(level);
           this.logger.info(tags.oneLine`
             We found a global configuration that was used in Angular CLI 1.
             It has been automatically migrated.`);
@@ -235,7 +231,10 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
         return 1;
       }
 
-      return this.get(config._workspace, options);
+      const workspace = ((config as {}) as { _workspace: experimental.workspace.WorkspaceSchema })
+        ._workspace;
+
+      return this.get(workspace, options);
     } else {
       return this.set(options);
     }
@@ -253,7 +252,7 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
         return 0;
       }
 
-      value = getValueFromPath(config as {} as JsonObject, options.jsonPath);
+      value = getValueFromPath((config as {}) as JsonObject, options.jsonPath);
     } else {
       value = config;
     }
@@ -271,7 +270,7 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
     return 0;
   }
 
-  private set(options: ConfigCommandSchema) {
+  private async set(options: ConfigCommandSchema) {
     if (!options.jsonPath || !options.jsonPath.trim()) {
       throw new Error('Invalid Path.');
     }
@@ -283,9 +282,11 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
       return 0;
     }
 
-    if (options.global
-        && !options.jsonPath.startsWith('schematics.')
-        && !validCliPaths.has(options.jsonPath)) {
+    if (
+      options.global &&
+      !options.jsonPath.startsWith('schematics.') &&
+      !validCliPaths.has(options.jsonPath)
+    ) {
       throw new Error('Invalid Path.');
     }
 
@@ -309,7 +310,7 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
     }
 
     try {
-      validateWorkspace(configValue);
+      await validateWorkspace(configValue);
     } catch (error) {
       this.logger.fatal(error.message);
 
@@ -321,5 +322,4 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
 
     return 0;
   }
-
 }

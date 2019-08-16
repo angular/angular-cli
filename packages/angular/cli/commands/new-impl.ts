@@ -20,7 +20,7 @@ export class NewCommand extends SchematicCommand<NewCommandSchema> {
     if (options.collection) {
       this.collectionName = options.collection;
     } else {
-      this.collectionName = this.parseCollectionName(options);
+      this.collectionName = await this.parseCollectionName(options);
     }
 
     return super.initialize(options);
@@ -43,7 +43,7 @@ export class NewCommand extends SchematicCommand<NewCommandSchema> {
     });
   }
 
-  private parseCollectionName(options: any): string {
+  private async parseCollectionName(options: any): Promise<string> {
     return options.collection || this.getDefaultSchematicCollection();
   }
 }

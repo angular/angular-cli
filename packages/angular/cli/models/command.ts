@@ -134,7 +134,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
         }
         break;
       case CommandScope.InProject:
-        if (!this.workspace.configFile || getWorkspace('local') === null) {
+        if (!this.workspace.configFile || (await getWorkspace('local')) === null) {
           this.logger.fatal(tags.oneLine`
             The ${this.description.name} command requires to be run in an Angular project, but a
             project definition could not be found.

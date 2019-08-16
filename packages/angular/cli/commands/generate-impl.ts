@@ -17,7 +17,7 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
 
   async initialize(options: GenerateCommandSchema & Arguments) {
     // Fill up the schematics property of the command description.
-    const [collectionName, schematicName] = this.parseSchematicInfo(options);
+    const [collectionName, schematicName] = await this.parseSchematicInfo(options);
     this.collectionName = collectionName;
     this.schematicName = schematicName;
 
@@ -45,7 +45,7 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
         continue;
       }
 
-      if (this.getDefaultSchematicCollection() == collectionName) {
+      if ((await this.getDefaultSchematicCollection()) == collectionName) {
         subcommands[name] = subcommand;
       } else {
         subcommands[`${collectionName}:${name}`] = subcommand;
@@ -78,7 +78,7 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
     paths: string[],
     options: GenerateCommandSchema & Arguments,
   ): Promise<void> {
-    const [collectionName, schematicName] = this.parseSchematicInfo(options);
+    const [collectionName, schematicName] = await this.parseSchematicInfo(options);
 
     if (!schematicName || !collectionName) {
       return;
@@ -91,8 +91,10 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
     );
   }
 
-  private parseSchematicInfo(options: { schematic?: string }): [string, string | undefined] {
-    let collectionName = this.getDefaultSchematicCollection();
+  private async parseSchematicInfo(options: {
+    schematic?: string;
+  }): Promise<[string, string | undefined]> {
+    let collectionName = await this.getDefaultSchematicCollection();
 
     let schematicName = options.schematic;
 

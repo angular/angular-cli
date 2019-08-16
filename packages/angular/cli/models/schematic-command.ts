@@ -88,7 +88,7 @@ export abstract class SchematicCommand<
 
   public async initialize(options: T & Arguments) {
     await this._loadWorkspace();
-    this.createWorkflow(options);
+    await this.createWorkflow(options);
 
     if (this.schematicName) {
       // Set the options.
@@ -142,7 +142,7 @@ export abstract class SchematicCommand<
         namesPerCollection[collectionName].push(schematicName);
       });
 
-      const defaultCollection = this.getDefaultSchematicCollection();
+      const defaultCollection = await this.getDefaultSchematicCollection();
       Object.keys(namesPerCollection).forEach(collectionName => {
         const isDefault = defaultCollection == collectionName;
         this.logger.info(`  Collection "${collectionName}"${isDefault ? ' (default)' : ''}:`);
@@ -176,7 +176,9 @@ export abstract class SchematicCommand<
       // Display <collectionName:schematicName> if this is not the default collectionName,
       // otherwise just show the schematicName.
       const displayName =
-        collectionName == this.getDefaultSchematicCollection() ? schematicName : schematicNames[0];
+        collectionName == (await this.getDefaultSchematicCollection())
+          ? schematicName
+          : schematicNames[0];
 
       const schematicOptions = subCommandOption.subcommands[schematicNames[0]].options;
       const schematicArgs = schematicOptions.filter(x => x.positional !== undefined);
@@ -239,7 +241,7 @@ export abstract class SchematicCommand<
   /*
    * Runtime hook to allow specifying customized workflow
    */
-  protected createWorkflow(options: BaseSchematicSchema): workflow.BaseWorkflow {
+  protected async createWorkflow(options: BaseSchematicSchema): Promise<workflow.BaseWorkflow> {
     if (this._workflow) {
       return this._workflow;
     }
@@ -250,7 +252,7 @@ export abstract class SchematicCommand<
     const workflow = new NodeWorkflow(fsHost, {
       force,
       dryRun,
-      packageManager: getPackageManager(this.workspace.root),
+      packageManager: await getPackageManager(this.workspace.root),
       root: normalize(this.workspace.root),
       registry: new schema.CoreSchemaRegistry(formats.standardFormats),
     });
@@ -293,12 +295,14 @@ export abstract class SchematicCommand<
       return undefined;
     };
 
-    workflow.engineHost.registerOptionsTransform(
-      <T extends {}>(schematic: FileSystemSchematicDescription, current: T) => ({
-        ...getSchematicDefaults(schematic.collection.name, schematic.name, getProjectName()),
-        ...current,
-      }),
-    );
+    const defaultOptionTransform = async (
+      schematic: FileSystemSchematicDescription,
+      current: {},
+    ) => ({
+      ...(await getSchematicDefaults(schematic.collection.name, schematic.name, getProjectName())),
+      ...current,
+    });
+    workflow.engineHost.registerOptionsTransform(defaultOptionTransform);
 
     if (options.defaults) {
       workflow.registry.addPreTransform(schema.transforms.addUndefinedDefaults);
@@ -358,8 +362,8 @@ export abstract class SchematicCommand<
     return (this._workflow = workflow);
   }
 
-  protected getDefaultSchematicCollection(): string {
-    let workspace = getWorkspace('local');
+  protected async getDefaultSchematicCollection(): Promise<string> {
+    let workspace = await getWorkspace('local');
 
     if (workspace) {
       const project = getProjectByCwd(workspace);
@@ -377,7 +381,7 @@ export abstract class SchematicCommand<
       }
     }
 
-    workspace = getWorkspace('global');
+    workspace = await getWorkspace('global');
     if (workspace && workspace.getCli()) {
       const value = workspace.getCli()['defaultCollection'];
       if (typeof value == 'string') {
@@ -473,7 +477,7 @@ export abstract class SchematicCommand<
 
     // Read the default values from the workspace.
     const projectName = input.project !== undefined ? '' + input.project : null;
-    const defaults = getSchematicDefaults(collectionName, schematicName, projectName);
+    const defaults = await getSchematicDefaults(collectionName, schematicName, projectName);
     input = {
       ...defaults,
       ...input,
