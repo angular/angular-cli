@@ -37,7 +37,7 @@
     "inquirer": "6.5.1",
     "npm-package-arg": "6.1.0",
     "open": "6.4.0",
-    "pacote": "9.5.5",
+    "pacote": "9.5.6",
     "read-package-tree": "5.3.1",
     "semver": "6.3.0",
     "symbol-observable": "1.2.0",
