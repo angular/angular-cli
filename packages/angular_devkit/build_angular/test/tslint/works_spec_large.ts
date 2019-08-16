@@ -9,13 +9,12 @@ import { Architect, Target } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { TestingArchitectHost } from '@angular-devkit/architect/testing';
 import {
-  experimental,
   logging,
   normalize,
   schema,
+  workspaces,
 } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import * as fs from 'fs';
+import { NodeJsAsyncHost } from '@angular-devkit/core/node';
 import * as path from 'path';
 
 const devkitRoot = (global as any)._DevKitRoot; // tslint:disable-line:no-any
@@ -30,16 +29,13 @@ describe('Tslint Target', () => {
   let architect: Architect;
 
   beforeEach(async () => {
-    const vfHost = new NodeJsSyncHost();
-    const configPath = path.join(workspaceRoot, 'angular.json');
-    const configContent = fs.readFileSync(configPath, 'utf-8');
-    const workspaceJson = JSON.parse(configContent);
-
     const registry = new schema.CoreSchemaRegistry();
     registry.addPostTransform(schema.transforms.addUndefinedDefaults);
 
-    const workspace = new experimental.workspace.Workspace(normalize(workspaceRoot), vfHost);
-    await workspace.loadWorkspaceFromJson(workspaceJson).toPromise();
+    const { workspace } = await workspaces.readWorkspace(
+      normalize(workspaceRoot),
+      workspaces.createWorkspaceHost(new NodeJsAsyncHost()),
+    );
 
     testArchitectHost = new TestingArchitectHost(
       workspaceRoot,
