@@ -9,12 +9,12 @@ import { Architect } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { TestProjectHost, TestingArchitectHost } from '@angular-devkit/architect/testing';
 import {
-  experimental,
   getSystemPath,
   join,
   normalize,
   schema,
   virtualFs,
+  workspaces,
 } from '@angular-devkit/core'; // tslint:disable-line:no-implicit-dependencies
 import { map, take, tap } from 'rxjs/operators';
 
@@ -37,7 +37,10 @@ describe('NgPackagr Builder', () => {
     registry.addPostTransform(schema.transforms.addUndefinedDefaults);
 
     const workspaceSysPath = getSystemPath(host.root());
-    const workspace = await experimental.workspace.Workspace.fromPath(host, host.root(), registry);
+    const { workspace } = await workspaces.readWorkspace(
+      workspaceSysPath,
+      workspaces.createWorkspaceHost(host),
+    );
     const architectHost = new TestingArchitectHost(
       workspaceSysPath,
       workspaceSysPath,
