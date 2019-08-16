@@ -99,7 +99,7 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
       }
     }
 
-    const packageManager = getPackageManager(this.workspace.root);
+    const packageManager = await getPackageManager(this.workspace.root);
     this.logger.info(`Using package manager: '${packageManager}'`);
 
     // Special handling for Angular CLI 1.x migrations

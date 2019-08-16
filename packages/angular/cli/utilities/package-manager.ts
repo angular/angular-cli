@@ -28,8 +28,8 @@ export function supportsNpm(): boolean {
   return supports('npm');
 }
 
-export function getPackageManager(root: string): string {
-  let packageManager = getConfiguredPackageManager();
+export async function getPackageManager(root: string): Promise<string> {
+  let packageManager = await getConfiguredPackageManager();
   if (packageManager) {
     return packageManager;
   }

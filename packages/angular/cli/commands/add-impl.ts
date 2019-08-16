@@ -27,7 +27,6 @@ const npa = require('npm-package-arg');
 export class AddCommand extends SchematicCommand<AddCommandSchema> {
   readonly allowPrivateSchematics = true;
   readonly allowAdditionalArgs = true;
-  readonly packageManager = getPackageManager(this.workspace.root);
 
   async run(options: AddCommandSchema & Arguments) {
     if (!options.collection) {
@@ -55,7 +54,8 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       return this.executeSchematic(packageIdentifier.name, options['--']);
     }
 
-    const usingYarn = this.packageManager === 'yarn';
+    const packageManager = await getPackageManager(this.workspace.root);
+    const usingYarn = packageManager === 'yarn';
 
     if (packageIdentifier.type === 'tag' && !packageIdentifier.rawSpec) {
       // only package name provided; search for viable version
@@ -135,7 +135,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       }
     }
 
-    await npmInstall(packageIdentifier.raw, this.logger, this.packageManager, this.workspace.root);
+    await npmInstall(packageIdentifier.raw, this.logger, packageManager, this.workspace.root);
 
     return this.executeSchematic(collectionName, options['--']);
   }

@@ -488,9 +488,9 @@ export async function promptProjectAnalytics(force = false): Promise<boolean> {
   return false;
 }
 
-export function hasGlobalAnalyticsConfiguration(): boolean {
+export async function hasGlobalAnalyticsConfiguration(): Promise<boolean> {
   try {
-    const globalWorkspace = getWorkspace('global');
+    const globalWorkspace = await getWorkspace('global');
     const analyticsConfig: string | undefined | null | { uid?: string } =
       globalWorkspace && globalWorkspace.getCli() && globalWorkspace.getCli()['analytics'];
 
@@ -508,7 +508,7 @@ export function hasGlobalAnalyticsConfiguration(): boolean {
  *
  * If any problem happens, it is considered the user has been opting out of analytics.
  */
-export function getGlobalAnalytics(): UniversalAnalytics | undefined {
+export async function getGlobalAnalytics(): Promise<UniversalAnalytics | undefined> {
   analyticsDebug('getGlobalAnalytics');
   const propertyId = AnalyticsProperties.AngularCliDefault;
 
@@ -527,7 +527,7 @@ export function getGlobalAnalytics(): UniversalAnalytics | undefined {
 
   // If anything happens we just keep the NOOP analytics.
   try {
-    const globalWorkspace = getWorkspace('global');
+    const globalWorkspace = await getWorkspace('global');
     const analyticsConfig: string | undefined | null | { uid?: string } =
       globalWorkspace && globalWorkspace.getCli() && globalWorkspace.getCli()['analytics'];
     analyticsDebug('Client Analytics config found: %j', analyticsConfig);
@@ -569,7 +569,7 @@ export function getGlobalAnalytics(): UniversalAnalytics | undefined {
  * Return the usage analytics sharing setting, which is either a property string (GA-XXXXXXX-XX),
  * or undefined if no sharing.
  */
-export function getSharedAnalytics(): UniversalAnalytics | undefined {
+export async function getSharedAnalytics(): Promise<UniversalAnalytics | undefined> {
   analyticsDebug('getSharedAnalytics');
 
   const envVarName = 'NG_CLI_ANALYTICS_SHARE';
@@ -583,7 +583,7 @@ export function getSharedAnalytics(): UniversalAnalytics | undefined {
 
   // If anything happens we just keep the NOOP analytics.
   try {
-    const globalWorkspace = getWorkspace('global');
+    const globalWorkspace = await getWorkspace('global');
     const analyticsConfig =
       globalWorkspace && globalWorkspace.getCli() && globalWorkspace.getCli()['analyticsSharing'];
 

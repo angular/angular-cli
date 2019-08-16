@@ -77,76 +77,79 @@ if (process.env['NG_CLI_PROFILING']) {
   process.on('uncaughtException', () => exitHandler({ exit: true }));
 }
 
-let cli;
-try {
-  const projectLocalCli = require.resolve('@angular/cli', { paths: [process.cwd()] });
-
-  // This was run from a global, check local version.
-  const globalVersion = new SemVer(packageJson['version']);
-  let localVersion;
-  let shouldWarn = false;
-
+(async () => {
+  let cli;
   try {
-    localVersion = _fromPackageJson();
-    shouldWarn = localVersion != null && globalVersion.compare(localVersion) > 0;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
-    shouldWarn = true;
-  }
+    const projectLocalCli = require.resolve('@angular/cli', { paths: [process.cwd()] });
 
-  if (shouldWarn && isWarningEnabled('versionMismatch')) {
-    const warning = colors.yellow(tags.stripIndents`
-    Your global Angular CLI version (${globalVersion}) is greater than your local
-    version (${localVersion}). The local Angular CLI version is used.
+    // This was run from a global, check local version.
+    const globalVersion = new SemVer(packageJson['version']);
+    let localVersion;
+    let shouldWarn = false;
 
-    To disable this warning use "ng config -g cli.warnings.versionMismatch false".
-    `);
-    // Don't show warning colorised on `ng completion`
-    if (process.argv[2] !== 'completion') {
+    try {
+      localVersion = _fromPackageJson();
+      shouldWarn = localVersion != null && globalVersion.compare(localVersion) > 0;
+    } catch (e) {
       // eslint-disable-next-line no-console
-      console.error(warning);
-    } else {
-      // eslint-disable-next-line no-console
-      console.error(warning);
-      process.exit(1);
+      console.error(e);
+      shouldWarn = true;
     }
+
+    if (shouldWarn && await isWarningEnabled('versionMismatch')) {
+      const warning = colors.yellow(tags.stripIndents`
+      Your global Angular CLI version (${globalVersion}) is greater than your local
+      version (${localVersion}). The local Angular CLI version is used.
+
+      To disable this warning use "ng config -g cli.warnings.versionMismatch false".
+      `);
+      // Don't show warning colorised on `ng completion`
+      if (process.argv[2] !== 'completion') {
+        // eslint-disable-next-line no-console
+        console.error(warning);
+      } else {
+        // eslint-disable-next-line no-console
+        console.error(warning);
+        process.exit(1);
+      }
+    }
+
+    // No error implies a projectLocalCli, which will load whatever
+    // version of ng-cli you have installed in a local package.json
+    cli = require(projectLocalCli);
+  } catch {
+    // If there is an error, resolve could not find the ng-cli
+    // library from a package.json. Instead, include it from a relative
+    // path to this script file (which is likely a globally installed
+    // npm package). Most common cause for hitting this is `ng new`
+    cli = require('./cli');
   }
 
-  // No error implies a projectLocalCli, which will load whatever
-  // version of ng-cli you have installed in a local package.json
-  cli = require(projectLocalCli);
-} catch {
-  // If there is an error, resolve could not find the ng-cli
-  // library from a package.json. Instead, include it from a relative
-  // path to this script file (which is likely a globally installed
-  // npm package). Most common cause for hitting this is `ng new`
-  cli = require('./cli');
-}
+  if ('default' in cli) {
+    cli = cli['default'];
+  }
 
-if ('default' in cli) {
-  cli = cli['default'];
-}
+  return cli;
+})().then(cli => {
+  // This is required to support 1.x local versions with a 6+ global
+  let standardInput;
+  try {
+    standardInput = process.stdin;
+  } catch (e) {
+    delete process.stdin;
+    process.stdin = new Duplex();
+    standardInput = process.stdin;
+  }
 
-// This is required to support 1.x local versions with a 6+ global
-let standardInput;
-try {
-  standardInput = process.stdin;
-} catch (e) {
-  delete process.stdin;
-  process.stdin = new Duplex();
-  standardInput = process.stdin;
-}
-
-cli({
-  cliArgs: process.argv.slice(2),
-  inputStream: standardInput,
-  outputStream: process.stdout,
-})
-  .then((exitCode: number) => {
-    process.exit(exitCode);
-  })
-  .catch((err: Error) => {
-    console.error('Unknown error: ' + err.toString());
-    process.exit(127);
+  return cli({
+    cliArgs: process.argv.slice(2),
+    inputStream: standardInput,
+    outputStream: process.stdout,
   });
+}).then((exitCode: number) => {
+  process.exit(exitCode);
+})
+.catch((err: Error) => {
+  console.error('Unknown error: ' + err.toString());
+  process.exit(127);
+});

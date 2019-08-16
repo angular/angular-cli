@@ -59,8 +59,8 @@ export interface CommandMapOptions {
  * @private
  */
 async function _createAnalytics(): Promise<analytics.Analytics> {
-  const config = getGlobalAnalytics();
-  const maybeSharedAnalytics = getSharedAnalytics();
+  const config = await getGlobalAnalytics();
+  const maybeSharedAnalytics = await getSharedAnalytics();
 
   if (config && maybeSharedAnalytics) {
     return new analytics.MultiAnalytics([config, maybeSharedAnalytics]);
