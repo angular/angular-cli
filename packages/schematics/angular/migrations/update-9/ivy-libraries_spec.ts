@@ -59,6 +59,8 @@ describe('Migration to version 9', () => {
           tree,
         )
         .toPromise();
+
+      tree.delete(libProdTsConfig);
     });
 
     it(`should add 'tsConfig' option in production when configurations doesn't exists`, async () => {
