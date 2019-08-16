@@ -164,7 +164,7 @@ jobs:
 
   test-large:
     parameters:
-      ivy:
+      ve:
         type: boolean
         default: false
       glob:
@@ -176,11 +176,11 @@ jobs:
     steps:
       - attach_workspace: *attach_options
       - run: yarn webdriver-update
-      - run: yarn test-large --full <<# parameters.ivy >>--ivy<</ parameters.ivy >> <<# parameters.glob >>--glob="<< parameters.glob >>"<</ parameters.glob >> --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
+      - run: yarn test-large --full <<# parameters.ve >>--ve<</ parameters.ve >> <<# parameters.glob >>--glob="<< parameters.glob >>"<</ parameters.glob >> --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
   e2e-cli:
     parameters:
-      ivy:
+      ve:
         type: boolean
         default: false
       snapshots:
@@ -195,7 +195,7 @@ jobs:
           command: ./.circleci/env.sh
       - run:
           name: Execute CLI E2E Tests
-          command: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.ivy >>--ivy<</ parameters.ivy >> <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >>
+          command: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.ve >>--ve<</ parameters.ve >> <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >>
 
   e2e-cli-node-10:
     executor:
@@ -232,7 +232,8 @@ jobs:
         # Waits for the Saucelabs tunnel to be ready. This ensures that we don't run tests
         # too early without Saucelabs not being ready.
       - run: ./scripts/saucelabs/wait-for-tunnel.sh
-      - run: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts
+      - run: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts --ve
+      - run: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts 
       - run: ./scripts/saucelabs/stop-tunnel.sh
 
   build:
@@ -249,7 +250,7 @@ jobs:
       - attach_workspace: *attach_options
       - run: yarn webdriver-update
       - run: yarn test-large --full --flakey
-      - run: yarn test-large --full --flakey --ivy=true
+      - run: yarn test-large --full --flakey --ve=true
 
   build-bazel:
     executor: action-executor
@@ -307,7 +308,7 @@ jobs:
       - run: yarn build
       - run: yarn test --full
       # Run partial e2e suite on PRs only. Master will run the full e2e suite with sharding.
-      - run: if (Test-Path env:CIRCLE_PR_NUMBER) { node tests\legacy-cli\run_e2e.js "--glob=tests/{basic,ivy}/**" }
+      - run: if (Test-Path env:CIRCLE_PR_NUMBER) { node tests\legacy-cli\run_e2e.js "--glob=tests/basic/**" }
              
   e2e-cli-win:
     executor: windows-executor
@@ -348,8 +349,8 @@ workflows:
           requires:
             - build
       - test-large:
-          name: test-large-ivy
-          ivy: true
+          name: test-large-ve
+          ve: true
           glob: "packages/angular_devkit/@(build_angular|build_ng_packagr)/@(src|test)/@(build|browser)/*_spec_large.ts"
           requires:
             - build
@@ -361,8 +362,8 @@ workflows:
           requires:
             - build
       - e2e-cli:
-          name: e2e-cli-ivy
-          ivy: true
+          name: e2e-cli-ve
+          ve: true
           requires:
             - build
       - e2e-cli:
@@ -379,9 +380,9 @@ workflows:
                     circleci step halt
                   fi
       - e2e-cli:
-          name: e2e-cli-ng-ivy-snapshots
+          name: e2e-cli-ng-ve-snapshots
           snapshots: true
-          ivy: true
+          ve: true
           requires:
             - e2e-cli
           pre-steps:

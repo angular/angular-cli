@@ -5,15 +5,19 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { getGlobalVariable } from '../../utils/env';
 import { expectFileToExist, replaceInFile } from '../../utils/fs';
 import { request } from '../../utils/http';
 import { killAllProcesses, ng } from '../../utils/process';
-import { createProject, ngServe } from '../../utils/project';
+import { ngServe } from '../../utils/project';
 
 export default async function() {
-  try {
-    await createProject('ivy-project');
+  if (getGlobalVariable('argv')['ve']) {
+    // Don't run this test for VE jobs. It only applies to Ivy.
+    return;
+  }
 
+  try {
     // Add in a reference to a secondary entry-point to check that ngcc processes it correctly
     await replaceInFile(
       'src/app/app.module.ts',

@@ -10,10 +10,11 @@ import { Architect } from '@angular-devkit/architect';
 import { getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core';
 import { take, tap } from 'rxjs/operators';
 import { BrowserBuilderOutput } from '../../src/browser';
-import { createArchitect, host } from '../utils';
+import { createArchitect, host, veEnabled } from '../utils';
 
 
-describe('Server Builder', () => {
+// DISABLED_FOR_IVY   These should pass but are currently not supported
+(veEnabled ? describe : xdescribe)('Server Builder', () => {
   const target = { project: 'app', target: 'server' };
   let architect: Architect;
 

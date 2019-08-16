@@ -7,7 +7,7 @@
  */
 import { Architect } from '@angular-devkit/architect';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { createArchitect, host, ivyEnabled, outputPath } from '../utils';
+import { createArchitect, host, outputPath, veEnabled } from '../utils';
 
 describe('Browser Builder allow svg', () => {
   const target = { project: 'app', target: 'build' };
@@ -55,7 +55,7 @@ describe('Browser Builder allow svg', () => {
         host.scopedSync().read(join(outputPath, 'main.js')),
       );
 
-      if (ivyEnabled) {
+      if (!veEnabled) {
         expect(content).toContain('ɵɵnamespaceSVG');
       } else {
         expect(content).toContain('":svg:svg"');

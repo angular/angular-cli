@@ -5,15 +5,17 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { ServerModule } from '@angular/platform-server';
 
+import { AppModule } from './app.module';
 import { AppComponent } from './app.component';
 
 @NgModule({
-  declarations: [AppComponent],
-  imports: [BrowserModule],
-  providers: [],
+  imports: [
+    AppModule,
+    ServerModule,
+  ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppServerModule {}

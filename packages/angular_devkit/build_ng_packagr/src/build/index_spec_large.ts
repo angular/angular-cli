@@ -18,12 +18,12 @@ import {
 } from '@angular-devkit/core'; // tslint:disable-line:no-implicit-dependencies
 import { map, take, tap } from 'rxjs/operators';
 
-const ivyEnabled = process.argv.includes('--ivy');
+const veEnabled = process.argv.includes('--ve');
 
 const devkitRoot = (global as unknown as { _DevKitRoot: string})._DevKitRoot;
 const workspaceRoot = join(
   normalize(devkitRoot),
-  `tests/angular_devkit/build_ng_packagr/ng-packaged${ivyEnabled ? '-ivy' : ''}/`,
+  `tests/angular_devkit/build_ng_packagr/ng-packaged${veEnabled ? '-ve' : ''}/`,
 );
 
 describe('NgPackagr Builder', () => {
@@ -65,10 +65,10 @@ describe('NgPackagr Builder', () => {
     );
     expect(content).toContain('lib works');
 
-    if (ivyEnabled) {
-      expect(content).toContain('ngComponentDef');
-    } else {
+    if (veEnabled) {
       expect(content).not.toContain('ngComponentDef');
+    } else {
+      expect(content).toContain('ngComponentDef');
     }
   });
 

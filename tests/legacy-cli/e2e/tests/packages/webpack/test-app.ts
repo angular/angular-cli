@@ -8,10 +8,10 @@ import { updateJsonFile } from '../../../utils/project';
 
 export default async function (skipCleaning: () => void) {
   const webpackCLIBin = normalize('node_modules/.bin/webpack-cli');
-  const isIvy = getGlobalVariable('argv')['ivy'];
+  const isVe = getGlobalVariable('argv')['ve'];
 
   await createProjectFromAsset('webpack/test-app');
-  if (!isIvy) {
+  if (isVe) {
     await updateJsonFile('tsconfig.json', config => {
       config.angularCompilerOptions.enableIvy = false;
     });
@@ -20,7 +20,7 @@ export default async function (skipCleaning: () => void) {
   await exec(webpackCLIBin);
 
   // Note: these sizes are without Build Optimizer or any advanced optimizations in the CLI.
-  await expectFileSizeToBeUnder('dist/app.main.js', (isIvy ? 565 : 483) * 1024);
+  await expectFileSizeToBeUnder('dist/app.main.js', (isVe ? 483 : 565) * 1024);
   await expectFileSizeToBeUnder('dist/0.app.main.js', 1 * 1024);
   await expectFileSizeToBeUnder('dist/1.app.main.js', 2 * 1024);
 
@@ -31,7 +31,7 @@ export default async function (skipCleaning: () => void) {
   // test the inclusion of metadata
   // This build also test resource URLs without ./
   await exec(webpackCLIBin, '--mode=development');
-  await expectFileToMatch('dist/app.main.js', `AppModule${isIvy ? '' : 'NgFactory'}`);
+  await expectFileToMatch('dist/app.main.js', `AppModule${isVe ? 'NgFactory' : ''}`);
 
   skipCleaning();
 }
