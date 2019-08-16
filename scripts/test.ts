@@ -89,9 +89,9 @@ export default function(args: ParsedArgs, logger: logging.Logger) {
   const specGlob = args.large ? '*_spec_large.ts' : '*_spec.ts';
   const regex = args.glob ? args.glob : `packages/**/${specGlob}`;
 
-  if (args['ivy']) {
+  if (args['ve']) {
     // tslint:disable-next-line:no-console
-    console.warn('********* IVY Enabled ***********');
+    console.warn('********* VE Enabled ***********');
   }
 
   if (args.large) {

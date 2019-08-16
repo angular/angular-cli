@@ -13,10 +13,10 @@ import { debounceTime, take, takeWhile, tap } from 'rxjs/operators';
 import {
   createArchitect,
   host,
-  ivyEnabled,
   lazyModuleFiles,
   lazyModuleFnImport,
   outputPath,
+  veEnabled,
 } from '../utils';
 
 describe('Browser Builder rebuilds', () => {
@@ -267,7 +267,7 @@ describe('Browser Builder rebuilds', () => {
 
   it('rebuilds after errors in AOT', async () => {
     // DISABLED_FOR_IVY - These should pass but are currently not supported
-    if (ivyEnabled) {
+    if (!veEnabled) {
       pending('Broken in Ivy');
 
       return;
@@ -282,7 +282,7 @@ describe('Browser Builder rebuilds', () => {
 
     const overrides = { watch: true, aot: true };
     const logger = new TestLogger('rebuild-aot-errors');
-    const staticAnalysisError = ivyEnabled
+    const staticAnalysisError = !veEnabled
       ? 'selector must be a string'
       : 'Function expressions are not supported in decorators';
     const syntaxError = 'Declaration or statement expected.';

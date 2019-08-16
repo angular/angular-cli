@@ -13,10 +13,10 @@ import {
   browserBuild,
   createArchitect,
   host,
-  ivyEnabled,
   lazyModuleFiles,
   lazyModuleFnImport,
   lazyModuleStringImport,
+  veEnabled,
 } from '../utils';
 
 // tslint:disable-next-line:no-big-function
@@ -64,14 +64,14 @@ describe('Browser Builder lazy modules', () => {
       });
 
       it('should show error when lazy route is invalid on watch mode AOT', async () => {
-        if (ivyEnabled && name === 'string') {
+        if (!veEnabled && name === 'string') {
           pending('Does not apply to Ivy.');
 
           return;
         }
 
         // DISABLED_FOR_IVY - These should pass but are currently not supported
-        if (ivyEnabled) {
+        if (!veEnabled) {
           pending('Broken in Ivy');
 
           return;
@@ -113,7 +113,7 @@ describe('Browser Builder lazy modules', () => {
         addLazyLoadedModulesInTsConfig(host, lazyModuleFiles);
 
         const { files } = await browserBuild(architect, host, target, { aot: true });
-        if (ivyEnabled) {
+        if (!veEnabled) {
           const data = await files['lazy-lazy-module.js'];
           expect(data).not.toBeUndefined('Lazy module output bundle does not exist');
           expect(data).toContain('LazyModule.ngModuleDef');
@@ -257,7 +257,7 @@ describe('Browser Builder lazy modules', () => {
       aot: true,
     });
 
-    if (ivyEnabled) {
+    if (!veEnabled) {
       const data = await files['src-app-lazy-lazy-module.js'];
       expect(data).not.toBeUndefined('Lazy module output bundle does not exist');
       expect(data).toContain('LazyModule.ngModuleDef');

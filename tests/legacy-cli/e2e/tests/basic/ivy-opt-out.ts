@@ -5,13 +5,18 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { getGlobalVariable } from '../../utils/env';
 import { request } from '../../utils/http';
 import { killAllProcesses, ng } from '../../utils/process';
-import { createProject, ngServe, updateJsonFile } from '../../utils/project';
+import { ngServe, updateJsonFile } from '../../utils/project';
 
 export default async function() {
+  if (getGlobalVariable('argv')['ve']) {
+    // Don't run this test for VE jobs. It only applies to Ivy.
+    return;
+  }
+
   try {
-    await createProject('ivy-project-opt-out');
     // trigger an Ivy builds to process packages with NGCC
     await ng('e2e', '--prod');
 

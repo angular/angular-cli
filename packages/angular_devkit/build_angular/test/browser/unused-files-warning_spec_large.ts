@@ -9,7 +9,7 @@ import { Architect } from '@angular-devkit/architect';
 import { TestLogger } from '@angular-devkit/architect/testing';
 import { debounceTime, take, tap } from 'rxjs/operators';
 import { BrowserBuilderOutput } from '../../src/browser/index';
-import { createArchitect, host, ivyEnabled } from '../utils';
+import { createArchitect, host, veEnabled } from '../utils';
 
 // tslint:disable-next-line:no-big-function
 describe('Browser Builder unused files warnings', () => {
@@ -25,7 +25,7 @@ describe('Browser Builder unused files warnings', () => {
   afterEach(async () => host.restore().toPromise());
 
   it('should not show warning when all files are used', async () => {
-    if (!ivyEnabled) {
+    if (veEnabled) {
       // TODO: https://github.com/angular/angular-cli/issues/15056
       pending('Only supported in Ivy.');
 
@@ -43,7 +43,7 @@ describe('Browser Builder unused files warnings', () => {
   });
 
   it('should show warning when some files are unused', async () => {
-    if (!ivyEnabled) {
+    if (veEnabled) {
       // TODO: https://github.com/angular/angular-cli/issues/15056
       pending('Only supported in Ivy.');
 
@@ -67,7 +67,7 @@ describe('Browser Builder unused files warnings', () => {
   });
 
   it('should not show warning when type files are used', async () => {
-    if (!ivyEnabled) {
+    if (veEnabled) {
       // TODO: https://github.com/angular/angular-cli/issues/15056
       pending('Only supported in Ivy.');
 
@@ -95,7 +95,7 @@ describe('Browser Builder unused files warnings', () => {
   });
 
   it('works for rebuilds', async () => {
-    if (!ivyEnabled) {
+    if (veEnabled) {
       // TODO: https://github.com/angular/angular-cli/issues/15056
       pending('Only supported in Ivy.');
 
@@ -163,7 +163,7 @@ describe('Browser Builder unused files warnings', () => {
   });
 
   it('should only show warning once per file', async () => {
-    if (!ivyEnabled) {
+    if (veEnabled) {
       // TODO: https://github.com/angular/angular-cli/issues/15056
       pending('Only supported in Ivy.');
 

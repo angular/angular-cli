@@ -6,5 +6,5 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export const environment = {
-  production: true,
+  production: true
 };

@@ -22,7 +22,7 @@ export default async function() {
     await expectFileToExist(join(process.cwd(), 'test-project'));
     process.chdir('./test-project');
 
-    if (!argv['ivy']) {
+    if (argv['ve']) {
       await updateJsonFile('tsconfig.json', config => {
         config.angularCompilerOptions.enableIvy = false;
       });

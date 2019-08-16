@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { logging } from '@angular-devkit/core';
-import { createArchitect, host, ivyEnabled } from '../utils';
+import { createArchitect, host, veEnabled } from '../utils';
 
 describe('Browser Builder errors', () => {
   const targetSpec = { project: 'app', target: 'build' };
@@ -64,7 +64,7 @@ describe('Browser Builder errors', () => {
     const run = await architect.scheduleTarget(targetSpec, { aot: true }, { logger });
     const output = await run.result;
     expect(output.success).toBe(false);
-    if (ivyEnabled) {
+    if (!veEnabled) {
       expect(logs.join()).toContain('selector must be a string');
     } else {
       expect(logs.join()).toContain('Function expressions are not supported in');

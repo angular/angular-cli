@@ -1,6 +1,7 @@
 import * as express from 'express';
 import * as path from 'path';
 import { copyProjectAsset } from '../../utils/assets';
+import { getGlobalVariable } from '../../utils/env';
 import { replaceInFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 
@@ -19,6 +20,15 @@ export default async function () {
     'not IE 9-11',
     'Safari 9-10.1\nIE 9-11',
   );
+
+  if (!getGlobalVariable('argv')['ve']) {
+    // Workaround for https://github.com/angular/angular/issues/32192
+    await replaceInFile(
+      'src/app/app.component.html',
+      /class="material-icons"/g,
+      '',
+    );
+  }
 
   await ng('build', '--prod');
 

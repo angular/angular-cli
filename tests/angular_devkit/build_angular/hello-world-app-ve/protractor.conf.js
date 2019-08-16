@@ -13,13 +13,15 @@ const { resolve } = require('path');
 
 exports.config = {
   allScriptsTimeout: 11000,
-  specs: ['./e2e/**/*.e2e-spec.ts'],
+  specs: [
+    './e2e/**/*.e2e-spec.ts'
+  ],
   capabilities: {
-    browserName: 'chrome',
+    'browserName': 'chrome',
     chromeOptions: {
       args: ['--headless', '--disable-gpu', '--window-size=800,600'],
-      binary: require('puppeteer').executablePath(),
-    },
+      binary: require('puppeteer').executablePath()
+    }
   },
   directConnect: true,
   baseUrl: 'http://localhost:4200/',
@@ -27,12 +29,12 @@ exports.config = {
   jasmineNodeOpts: {
     showColors: true,
     defaultTimeoutInterval: 30000,
-    print: function() {},
+    print: function () { }
   },
   onPrepare() {
     require('ts-node').register({
-      project: resolve(__dirname, './e2e/tsconfig.e2e.json'),
+      project: resolve(__dirname, './e2e/tsconfig.e2e.json')
     });
     jasmine.getEnv().addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
-  },
+  }
 };

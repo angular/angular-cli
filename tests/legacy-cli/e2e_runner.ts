@@ -28,7 +28,7 @@ Error.stackTraceLimit = Infinity;
  *   --ng-tag=TAG     Use a specific tag for build snapshots. Similar to ng-snapshots but point to a
  *                    tag instead of using the latest master.
  *   --ng-snapshots   Install angular snapshot builds in the test project.
- *   --ivy	          Use the Ivy compiler.
+ *   --ve             Use the View Engine compiler.
  *   --glob           Run tests matching this glob pattern (relative to tests/e2e/).
  *   --ignore         Ignore tests matching this glob pattern.
  *   --reuse=/path    Use a path instead of create a new project. That project should have been
@@ -42,7 +42,7 @@ Error.stackTraceLimit = Infinity;
  * If unnamed flags are passed in, the list of tests will be filtered to include only those passed.
  */
 const argv = minimist(process.argv.slice(2), {
-  boolean: ['debug', 'ng-snapshots', 'noglobal', 'nosilent', 'noproject', 'verbose', 'ivy'],
+  boolean: ['debug', 'ng-snapshots', 'noglobal', 'nosilent', 'noproject', 'verbose', 've'],
   string: ['devkit', 'glob', 'ignore', 'reuse', 'ng-tag', 'tmpdir', 'ng-version'],
 });
 
@@ -93,8 +93,8 @@ allTests = allTests
   // Disabled on rc.0 due to needed sync with devkit for changes.
   .filter(name => !name.endsWith('/service-worker.ts'));
 
-if (argv.ivy) {
-  // These tests are disabled on the Ivy-only CI job because:
+if (!argv.ve) {
+  // These tests are disabled on the Ivy CI jobs because:
   // - Ivy doesn't support the functionality yet
   // - The test itself is not applicable to Ivy
   // As we transition into using Ivy as the default this list should be reassessed.

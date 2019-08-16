@@ -20,12 +20,12 @@ import {
 } from '@angular-devkit/core';
 import { BrowserBuilderOutput } from '../src/browser';
 
-export const ivyEnabled = process.argv.includes('--ivy');
+export const veEnabled = process.argv.includes('--ve');
 
 const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
 export const workspaceRoot = join(
   devkitRoot,
-  `tests/angular_devkit/build_angular/hello-world-app${ivyEnabled ? '-ivy' : ''}/`,
+  `tests/angular_devkit/build_angular/hello-world-app${veEnabled ? '-ve' : ''}/`,
 );
 export const host = new TestProjectHost(workspaceRoot);
 export const outputPath: Path = normalize('dist');

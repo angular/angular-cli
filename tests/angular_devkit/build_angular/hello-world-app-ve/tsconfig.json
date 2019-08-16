@@ -8,7 +8,8 @@
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es5",
+    "target": "es2015",
+    "module": "esnext",
     "typeRoots": [
       "node_modules/@types"
     ],
@@ -16,5 +17,8 @@
       "es2017",
       "dom"
     ]
+  },
+  "angularCompilerOptions": {
+    "enableIvy": false
   }
 }

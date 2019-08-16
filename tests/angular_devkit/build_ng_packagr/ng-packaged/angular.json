@@ -11,6 +11,11 @@
           "options": {
             "project": "projects/lib/ng-package.json",
             "tsConfig": "projects/lib/tsconfig.lib.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/lib/tsconfig.lib.prod.json"
+            }
           }
         },
         "test": {

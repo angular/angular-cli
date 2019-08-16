@@ -8,10 +8,10 @@
 import { Architect } from '@angular-devkit/architect';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { BrowserBuilderOutput } from '../../src/browser';
-import { createArchitect, host, ivyEnabled } from '../utils';
+import { createArchitect, host, veEnabled } from '../utils';
 
 // DISABLED_FOR_IVY - These should pass but are currently not supported
-(ivyEnabled ? xdescribe : describe)('Browser Builder i18n', () => {
+(veEnabled ? describe : xdescribe)('Browser Builder i18n', () => {
   const emptyTranslationFile = `
       <?xml version="1.0" encoding="UTF-8" ?>
       <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
