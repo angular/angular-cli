@@ -114,5 +114,7 @@ function createTsConfig(tree: Tree, tsConfigPath: string) {
     },
   };
 
-  tree.create(tsConfigPath, JSON.stringify(tsConfigContent, undefined, 2));
+  if (!tree.exists(tsConfigPath)) {
+    tree.create(tsConfigPath, JSON.stringify(tsConfigContent, undefined, 2));
+  }
 }
