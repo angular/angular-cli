@@ -24,7 +24,10 @@ import {
   virtualFs,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
+import { createHash } from 'crypto';
+import * as findCacheDirectory from 'find-cache-dir';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import { from, of } from 'rxjs';
 import { bufferCount, catchError, concatMap, map, mergeScan, switchMap } from 'rxjs/operators';
@@ -62,6 +65,7 @@ import {
   normalizeOptimization,
   normalizeSourceMaps,
 } from '../utils';
+import { CacheKey, ProcessBundleOptions } from '../utils/process-bundle';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import {
   generateBrowserWebpackConfigFromContext,
@@ -69,6 +73,10 @@ import {
   getIndexOutputFile,
 } from '../utils/webpack-browser-config';
 import { Schema as BrowserBuilderSchema } from './schema';
+
+const cacache = require('cacache');
+const cacheDownlevelPath = findCacheDirectory({ name: 'angular-build-dl' });
+const packageVersion = require('../../package.json').version;
 
 export type BrowserBuilderOutput = json.JsonObject &
   BuilderOutput & {
@@ -240,6 +248,7 @@ export function buildWebpackBrowser(
           1,
         ),
         bufferCount(configs.length),
+        // tslint:disable-next-line: no-big-function
         switchMap(async buildEvents => {
           configs.length = 0;
           const success = buildEvents.every(r => r.success);
@@ -274,9 +283,10 @@ export function buildWebpackBrowser(
                 optimize: normalizeOptimization(options.optimization).scripts,
                 sourceMaps: sourceMapOptions.scripts,
                 hiddenSourceMaps: sourceMapOptions.hidden,
+                vendorSourceMaps: sourceMapOptions.vendor,
               };
 
-              const actions: {}[] = [];
+              const actions: ProcessBundleOptions[] = [];
               const seen = new Set<string>();
               for (const file of emittedFiles) {
                 // Scripts and non-javascript files are not processed
@@ -348,6 +358,7 @@ export function buildWebpackBrowser(
                   code,
                   map,
                   runtime: file.file.startsWith('runtime'),
+                  ignoreOriginal: es5Polyfills,
                 });
 
                 // Add the newly created ES5 bundles to the index as nomodule scripts
@@ -359,30 +370,133 @@ export function buildWebpackBrowser(
 
               // Execute the bundle processing actions
               context.logger.info('Generating ES5 bundles for differential loading...');
-              await new Promise<void>((resolve, reject) => {
-                const workerFile = require.resolve('../utils/process-bundle');
-                const workers = workerFarm(
-                  {
-                    maxRetries: 1,
-                  },
-                  path.extname(workerFile) !== '.ts'
-                    ? workerFile
-                    : require.resolve('../utils/process-bundle-bootstrap'),
-                  ['process'],
-                );
-                let completed = 0;
-                const workCallback = (error: Error | null) => {
-                  if (error) {
-                    workerFarm.end(workers);
-                    reject(error);
-                  } else if (++completed === actions.length) {
-                    workerFarm.end(workers);
-                    resolve();
-                  }
-                };
 
-                actions.forEach(action => workers['process'](action, workCallback));
-              });
+              const processActions: typeof actions = [];
+              const cacheActions: { src: string; dest: string }[] = [];
+              for (const action of actions) {
+                // Create base cache key with elements:
+                // * package version - different build-angular versions cause different final outputs
+                // * code length/hash - ensure cached version matches the same input code
+                const codeHash = createHash('sha1')
+                  .update(action.code)
+                  .digest('hex');
+                const baseCacheKey = `${packageVersion}|${action.code.length}|${codeHash}`;
+
+                // Postfix added to sourcemap cache keys when vendor sourcemaps are present
+                // Allows non-destructive caching of both variants
+                const SourceMapVendorPostfix =
+                  !!action.sourceMaps && action.vendorSourceMaps ? '|vendor' : '';
+
+                // Determine cache entries required based on build settings
+                const cacheKeys = [];
+
+                // If optimizing and the original is not ignored, add original as required
+                if ((action.optimize || action.optimizeOnly) && !action.ignoreOriginal) {
+                  cacheKeys[CacheKey.OriginalCode] = baseCacheKey + '|orig';
+
+                  // If sourcemaps are enabled, add original sourcemap as required
+                  if (action.sourceMaps) {
+                    cacheKeys[CacheKey.OriginalMap] =
+                      baseCacheKey + SourceMapVendorPostfix + '|orig-map';
+                  }
+                }
+                // If not only optimizing, add downlevel as required
+                if (!action.optimizeOnly) {
+                  cacheKeys[CacheKey.DownlevelCode] = baseCacheKey + '|dl';
+
+                  // If sourcemaps are enabled, add downlevel sourcemap as required
+                  if (action.sourceMaps) {
+                    cacheKeys[CacheKey.DownlevelMap] =
+                      baseCacheKey + SourceMapVendorPostfix + '|dl-map';
+                  }
+                }
+
+                // Attempt to get required cache entries
+                const cacheEntries = [];
+                for (const key of cacheKeys) {
+                  if (key) {
+                    cacheEntries.push(await cacache.get.info(cacheDownlevelPath, key));
+                  } else {
+                    cacheEntries.push(null);
+                  }
+                }
+
+                // Check if required cache entries are present
+                let cached = cacheKeys.length > 0;
+                for (let i = 0; i < cacheKeys.length; ++i) {
+                  if (cacheKeys[i] && !cacheEntries[i]) {
+                    cached = false;
+                    break;
+                  }
+                }
+
+                // If all required cached entries are present, use the cached entries
+                // Otherwise process the files
+                if (cached) {
+                  if (cacheEntries[CacheKey.OriginalCode]) {
+                    cacheActions.push({
+                      src: cacheEntries[CacheKey.OriginalCode].path,
+                      dest: action.filename,
+                    });
+                  }
+                  if (cacheEntries[CacheKey.OriginalMap]) {
+                    cacheActions.push({
+                      src: cacheEntries[CacheKey.OriginalMap].path,
+                      dest: action.filename + '.map',
+                    });
+                  }
+                  if (cacheEntries[CacheKey.DownlevelCode]) {
+                    cacheActions.push({
+                      src: cacheEntries[CacheKey.DownlevelCode].path,
+                      dest: action.filename.replace('es2015', 'es5'),
+                    });
+                  }
+                  if (cacheEntries[CacheKey.DownlevelMap]) {
+                    cacheActions.push({
+                      src: cacheEntries[CacheKey.DownlevelMap].path,
+                      dest: action.filename.replace('es2015', 'es5') + '.map',
+                    });
+                  }
+                } else {
+                  processActions.push({
+                    ...action,
+                    cacheKeys,
+                    cachePath: cacheDownlevelPath || undefined,
+                  });
+                }
+              }
+
+              for (const action of cacheActions) {
+                fs.copyFileSync(action.src, action.dest, fs.constants.COPYFILE_FICLONE);
+              }
+
+              if (processActions.length > 0) {
+                await new Promise<void>((resolve, reject) => {
+                  const workerFile = require.resolve('../utils/process-bundle');
+                  const workers = workerFarm(
+                    {
+                      maxRetries: 1,
+                    },
+                    path.extname(workerFile) !== '.ts'
+                      ? workerFile
+                      : require.resolve('../utils/process-bundle-bootstrap'),
+                    ['process'],
+                  );
+                  let completed = 0;
+                  const workCallback = (error: Error | null) => {
+                    if (error) {
+                      workerFarm.end(workers);
+                      reject(error);
+                    } else if (++completed === processActions.length) {
+                      workerFarm.end(workers);
+                      resolve();
+                    }
+                  };
+
+                  processActions.forEach(action => workers['process'](action, workCallback));
+                });
+              }
+
               context.logger.info('ES5 bundle generation complete.');
             } else {
               const { emittedFiles = [] } = firstBuild;
