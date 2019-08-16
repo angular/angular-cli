@@ -11,16 +11,28 @@ import { SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import { minify } from 'terser';
 
 const { transformAsync } = require('@babel/core');
+const cacache = require('cacache');
 
-interface ProcessBundleOptions {
+export interface ProcessBundleOptions {
   filename: string;
   code: string;
   map?: string;
-  sourceMaps: boolean;
-  hiddenSourceMaps: boolean;
-  runtime: boolean;
+  sourceMaps?: boolean;
+  hiddenSourceMaps?: boolean;
+  vendorSourceMaps?: boolean;
+  runtime?: boolean;
   optimize: boolean;
   optimizeOnly?: boolean;
+  ignoreOriginal?: boolean;
+  cacheKeys?: (string | null)[];
+  cachePath?: string;
+}
+
+export const enum CacheKey {
+  OriginalCode = 0,
+  OriginalMap = 1,
+  DownlevelCode = 2,
+  DownlevelMap = 3,
 }
 
 export function process(
@@ -31,6 +43,10 @@ export function process(
 }
 
 async function processWorker(options: ProcessBundleOptions): Promise<void> {
+  if (!options.cacheKeys) {
+    options.cacheKeys = [];
+  }
+
   // If no downlevelling required than just mangle code and return
   if (options.optimizeOnly) {
     return mangleOriginal(options);
@@ -139,7 +155,9 @@ async function processWorker(options: ProcessBundleOptions): Promise<void> {
     map = result.map;
 
     // Mangle original code
-    mangleOriginal(options);
+    if (!options.ignoreOriginal) {
+      await mangleOriginal(options);
+    }
   } else if (map) {
     map = JSON.stringify(map);
   }
@@ -149,13 +167,20 @@ async function processWorker(options: ProcessBundleOptions): Promise<void> {
       code += `\n//# sourceMappingURL=${path.basename(newFilePath)}.map`;
     }
 
+    if (options.cachePath && options.cacheKeys[CacheKey.DownlevelMap]) {
+      await cacache.put(options.cachePath, options.cacheKeys[CacheKey.DownlevelMap], map);
+    }
+
     fs.writeFileSync(newFilePath + '.map', map);
   }
 
+  if (options.cachePath && options.cacheKeys[CacheKey.DownlevelCode]) {
+    await cacache.put(options.cachePath, options.cacheKeys[CacheKey.DownlevelCode], code);
+  }
   fs.writeFileSync(newFilePath, code);
 }
 
-function mangleOriginal(options: ProcessBundleOptions): void {
+async function mangleOriginal(options: ProcessBundleOptions): Promise<void> {
   const resultOriginal = minify(options.code, {
     compress: false,
     ecma: 6,
@@ -176,8 +201,25 @@ function mangleOriginal(options: ProcessBundleOptions): void {
     throw resultOriginal.error;
   }
 
+  if (options.cachePath && options.cacheKeys && options.cacheKeys[CacheKey.OriginalCode]) {
+    await cacache.put(
+      options.cachePath,
+      options.cacheKeys[CacheKey.OriginalCode],
+      resultOriginal.code,
+    );
+  }
+
   fs.writeFileSync(options.filename, resultOriginal.code);
+
   if (resultOriginal.map) {
+    if (options.cachePath && options.cacheKeys && options.cacheKeys[CacheKey.OriginalMap]) {
+      await cacache.put(
+        options.cachePath,
+        options.cacheKeys[CacheKey.OriginalMap],
+        resultOriginal.map,
+      );
+    }
+
     fs.writeFileSync(options.filename + '.map', resultOriginal.map);
   }
 }
