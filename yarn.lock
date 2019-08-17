@@ -6950,10 +6950,10 @@ less-plugin-npm-import@^2.1.0:
     promise "~7.0.1"
     resolve "~1.1.6"
 
-less@3.9.0:
-  version "3.9.0"
-  resolved "https://registry.yarnpkg.com/less/-/less-3.9.0.tgz#b7511c43f37cf57dc87dffd9883ec121289b1474"
-  integrity sha512-31CmtPEZraNUtuUREYjSqRkeETFdyEHSEPAGq4erDlUXtda7pzNmctdljdIagSb589d/qXGWiiP31R5JVf+v0w==
+less@3.10.0:
+  version "3.10.0"
+  resolved "https://registry.yarnpkg.com/less/-/less-3.10.0.tgz#1150f727651908516fd4b47133a8469b29b6c5ce"
+  integrity sha512-+QCSP4vXVCXVqYSzqdT4eLoEK/hSFxFfD29E71+cRFKdLsCDMQ56yEU+fmpHebhmznA/9g9oXtvXN9foCOeIjg==
   dependencies:
     clone "^2.1.2"
   optionalDependencies:
