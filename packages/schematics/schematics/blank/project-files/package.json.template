@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@types/node": "~8.9.4",
-    "@types/jasmine": "~3.3.8",
+    "@types/jasmine": "~3.4.0",
     "jasmine": "^3.4.0"
   }
 }
