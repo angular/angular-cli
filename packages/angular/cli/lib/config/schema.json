@@ -1119,6 +1119,14 @@
               "type": "string",
               "description": "The URL that the browser client (or live-reload client, if enabled) should use to connect to the development server. Use for a complex dev server setup, such as one with reverse proxies."
             },
+            "allowedHosts": {
+              "type": "array",
+              "description": "Whitelist of hosts that are allowed to access the dev server.",
+              "default": [],
+              "items": {
+                "type": "string"
+              }
+            },
             "servePath": {
               "type": "string",
               "description": "The pathname where the app will be served."
