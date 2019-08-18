@@ -11,7 +11,7 @@ import { DevServerBuilderOutput } from '../../src/dev-server';
 import { createArchitect, host } from '../utils';
 
 
-describe('Dev Server Builder public host', () => {
+describe('Dev Server Builder allowed host', () => {
   // We have to spoof the host to a non-numeric one because Webpack Dev Server does not
   // check the hosts anymore when requests come from numeric IP addresses.
   const headers = { host: 'spoofy.mcspoofface' };
@@ -31,30 +31,8 @@ describe('Dev Server Builder public host', () => {
     await Promise.all(runs.map(r => r.stop()));
   });
 
-  it('works', async () => {
-    const run = await architect.scheduleTarget(target);
-    runs.push(run);
-    const output = await run.result as DevServerBuilderOutput;
-    expect(output.success).toBe(true);
-    expect(output.baseUrl).toBe('http://localhost:4200/');
-
-    const response = await fetch(`${output.baseUrl}`, { headers });
-    expect(await response.text()).toContain('Invalid Host header');
-  }, 30000);
-
   it('works',  async () => {
-    const run = await architect.scheduleTarget(target, { publicHost: headers.host });
-    runs.push(run);
-    const output = await run.result as DevServerBuilderOutput;
-    expect(output.success).toBe(true);
-    expect(output.baseUrl).toBe('http://localhost:4200/');
-
-    const response = await fetch(`${output.baseUrl}`, { headers });
-    expect(await response.text()).toContain('<title>HelloWorldApp</title>');
-  }, 30000);
-
-  it('works', async () => {
-    const run = await architect.scheduleTarget(target, { disableHostCheck: true });
+    const run = await architect.scheduleTarget(target, { allowedHosts: ['spoofy.mcspoofface'] });
     runs.push(run);
     const output = await run.result as DevServerBuilderOutput;
     expect(output.success).toBe(true);

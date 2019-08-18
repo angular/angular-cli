@@ -342,6 +342,7 @@ export function buildServerConfig(
     // inline is always false, because we add live reloading scripts in _addLiveReload when needed
     inline: false,
     public: serverOptions.publicHost,
+    allowedHosts: serverOptions.allowedHosts,
     disableHostCheck: serverOptions.disableHostCheck,
     publicPath: servePath,
     hot: serverOptions.hmr,
