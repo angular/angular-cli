@@ -87,7 +87,8 @@
     "universal": {
       "factory": "./universal",
       "description": "Create an Angular universal app.",
-      "schema": "./universal/schema.json"
+      "schema": "./universal/schema.json",
+      "hidden": true
     },
     "appShell": {
       "aliases": [ "app-shell" ],
