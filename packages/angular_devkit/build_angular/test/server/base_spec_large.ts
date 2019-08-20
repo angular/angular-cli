@@ -13,8 +13,7 @@ import { BrowserBuilderOutput } from '../../src/browser';
 import { createArchitect, host, veEnabled } from '../utils';
 
 
-// DISABLED_FOR_IVY   These should pass but are currently not supported
-(veEnabled ? describe : xdescribe)('Server Builder', () => {
+describe('Server Builder', () => {
   const target = { project: 'app', target: 'server' };
   let architect: Architect;
 
@@ -33,7 +32,12 @@ import { createArchitect, host, veEnabled } from '../utils';
 
     const fileName = join(outputPath, 'main.js');
     const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-    expect(content).toMatch(/AppServerModuleNgFactory/);
+
+    if (veEnabled) {
+      expect(content).toMatch(/AppServerModuleNgFactory/);
+    } else {
+      expect(content).toMatch(/AppServerModule\.ngModuleDef/);
+    }
 
     await run.stop();
   });
@@ -68,16 +72,10 @@ import { createArchitect, host, veEnabled } from '../utils';
 
   it('supports sourcemaps', async () => {
     const overrides = { sourceMap: true };
-
     const run = await architect.scheduleTarget(target, overrides);
     const output = await run.result as BrowserBuilderOutput;
     expect(output.success).toBe(true);
-
-    const fileName = join(outputPath, 'main.js');
-    const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-    expect(content).toMatch(/AppServerModuleNgFactory/);
     expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBeTruthy();
-
     await run.stop();
   });
 
@@ -144,7 +142,11 @@ import { createArchitect, host, veEnabled } from '../utils';
 
         const fileName = join(outputPath, 'main.js');
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
-        expect(content).toMatch(/AppServerModuleNgFactory/);
+        if (veEnabled) {
+          expect(content).toMatch(/AppServerModuleNgFactory/);
+        } else {
+          expect(content).toMatch(/AppServerModule\.ngModuleDef/);
+        }
       }),
       take(1),
     ).toPromise();
