@@ -105,6 +105,7 @@ if (!argv.ve) {
     // We don't have a platform-server usage story yet for Ivy.
     // It's contingent on lazy loading and factory shim considerations that are still being
     // discussed.
+    // Broken currently https://github.com/angular/angular-cli/issues/15383
     .filter(name => !name.endsWith('tests/build/platform-server.ts'))
     .filter(name => !name.endsWith('tests/build/build-app-shell.ts'))
     .filter(name => !name.endsWith('tests/build/build-app-shell-with-schematic.ts'));
