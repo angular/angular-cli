@@ -268,7 +268,7 @@ describe('Browser Builder rebuilds', () => {
   it('rebuilds after errors in AOT', async () => {
     // DISABLED_FOR_IVY - These should pass but are currently not supported
     if (!veEnabled) {
-      pending('Broken in Ivy');
+      pending('Broken in Ivy: https://github.com/angular/angular/issues/32214');
 
       return;
     }
