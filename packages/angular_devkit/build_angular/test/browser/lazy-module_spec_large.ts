@@ -45,6 +45,14 @@ describe('Browser Builder lazy modules', () => {
     );
   }
 
+  function hasMissingModuleError(logger: TestLogger) {
+    // TS type error when using import().
+    return logger.includes('Cannot find module') ||
+      // Webpack error when using import() on a rebuild.
+      // There is no TS error because the type checker is forked on rebuilds.
+      logger.includes('Module not found');
+  }
+
   const cases: [string, Record<string, string>][] = [
     ['string', lazyModuleStringImport],
     ['function', lazyModuleFnImport],
@@ -63,50 +71,6 @@ describe('Browser Builder lazy modules', () => {
         expect('lazy-lazy-module.js' in files).toBe(true);
       });
 
-      it('should show error when lazy route is invalid on watch mode AOT', async () => {
-        if (!veEnabled && name === 'string') {
-          pending('Does not apply to Ivy.');
-
-          return;
-        }
-
-        // DISABLED_FOR_IVY - These should pass but are currently not supported
-        if (!veEnabled) {
-          pending('Broken in Ivy');
-
-          return;
-        }
-
-        host.writeMultipleFiles(lazyModuleFiles);
-        host.writeMultipleFiles(imports);
-        host.replaceInFile('src/app/app.module.ts', 'lazy.module', 'invalid.module');
-
-        const logger = new TestLogger('rebuild-lazy-errors');
-        const overrides = { watch: true, aot: true };
-        const run = await architect.scheduleTarget(target, overrides, { logger });
-        await run.output
-          .pipe(
-            timeout(15000),
-            tap(buildEvent => expect(buildEvent.success).toBe(false)),
-            tap(() => {
-              // Webpack error when using loadchildren string syntax.
-              const hasMissingModuleError =
-                logger.includes('Could not resolve module') ||
-                // TS type error when using import().
-                logger.includes('Cannot find module') ||
-                // Webpack error when using import() on a rebuild.
-                // There is no TS error because the type checker is forked on rebuilds.
-                logger.includes('Module not found');
-              expect(hasMissingModuleError).toBe(true, 'Should show missing module error');
-              logger.clear();
-              host.appendToFile('src/main.ts', ' ');
-            }),
-            take(2),
-          )
-          .toPromise();
-        await run.stop();
-      });
-
       it('supports lazy bundle for lazy routes with AOT', async () => {
         host.writeMultipleFiles(lazyModuleFiles);
         host.writeMultipleFiles(imports);
@@ -123,6 +87,52 @@ describe('Browser Builder lazy modules', () => {
       });
     });
   }
+
+  // Errors for missing lazy routes are only supported with function syntax.
+  // `ngProgram.listLazyRoutes` will ignore invalid lazy routes in the route map.
+  describe(`Load children errors with function syntax`, () => {
+    it('should show error when lazy route is invalid', async () => {
+      host.writeMultipleFiles(lazyModuleFiles);
+      host.writeMultipleFiles(lazyModuleFnImport);
+      host.replaceInFile('src/app/app.module.ts', 'lazy.module', 'invalid.module');
+
+      const logger = new TestLogger('build-lazy-errors');
+      const run = await architect.scheduleTarget(target, {}, { logger });
+      const output = await run.result;
+      expect(output.success).toBe(false);
+      expect(hasMissingModuleError(logger)).toBe(true, 'Should show missing module error');
+    });
+
+    it('should show error when lazy route is invalid on watch mode AOT', async () => {
+      host.writeMultipleFiles(lazyModuleFiles);
+      host.writeMultipleFiles(lazyModuleFnImport);
+
+      let buildNumber = 0;
+      const logger = new TestLogger('rebuild-lazy-errors');
+      const overrides = { watch: true, aot: true };
+      const run = await architect.scheduleTarget(target, overrides, { logger });
+      await run.output
+        .pipe(
+          timeout(15000),
+          tap(buildEvent => {
+            buildNumber++;
+            switch (buildNumber) {
+              case 1:
+                expect(buildEvent.success).toBe(true);
+                host.replaceInFile('src/app/app.module.ts', 'lazy.module', 'invalid.module');
+                logger.clear();
+                break;
+              case 2:
+                expect(buildEvent.success).toBe(false);
+                break;
+            }
+          }),
+          take(2),
+        )
+        .toPromise();
+      await run.stop();
+    });
+  });
 
   it(`supports lazy bundle for import() calls`, async () => {
     host.writeMultipleFiles({
