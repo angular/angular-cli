@@ -596,7 +596,8 @@ export class AngularCompilerPlugin {
     // Only do the unused TS files checks when under Ivy
     // since previously we did include unused files in the compilation
     // See: https://github.com/angular/angular-cli/pull/15030
-    if (!this._compilerOptions.enableIvy) {
+    // Don't do checks for compilations with errors, since that can result in a partial compilation.
+    if (!this._compilerOptions.enableIvy || compilation.errors.length > 0) {
       return;
     }
 
