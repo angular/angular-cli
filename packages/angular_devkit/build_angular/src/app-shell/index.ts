@@ -15,12 +15,12 @@ import { JsonObject, experimental, join, normalize, resolve, schema } from '@ang
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
+import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
 import { BrowserBuilderOutput } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ServerBuilderOutput } from '../server';
 import { Schema as BuildWebpackAppShellSchema } from './schema';
-
 
 async function _renderUniversal(
   options: BuildWebpackAppShellSchema,
@@ -31,32 +31,9 @@ async function _renderUniversal(
   const browserIndexOutputPath = path.join(browserResult.outputPath || '', 'index.html');
   const indexHtml = fs.readFileSync(browserIndexOutputPath, 'utf8');
   const serverBundlePath = await _getServerModuleBundlePath(options, context, serverResult);
-
   const root = context.workspaceRoot;
 
-  // Initialize zone.js
-  const zonePackage = require.resolve('zone.js', { paths: [root] });
-  await import(zonePackage);
-
-  // Load platform server module renderer
-  const platformServerPackage = require.resolve('@angular/platform-server', { paths: [root] });
-  const renderModuleFactory = await import(platformServerPackage)
-    // tslint:disable-next-line:no-implicit-dependencies
-    .then((m: typeof import('@angular/platform-server')) => m.renderModuleFactory);
-
-  const AppServerModuleNgFactory = require(serverBundlePath).AppServerModuleNgFactory;
-  const outputIndexPath = options.outputIndexPath
-    ? path.join(root, options.outputIndexPath)
-    : browserIndexOutputPath;
-
-  // Render to HTML and overwrite the client index file.
-  const html = await renderModuleFactory(AppServerModuleNgFactory, {
-    document: indexHtml,
-    url: options.route,
-  });
-
-  fs.writeFileSync(outputIndexPath, html);
-
+  // Get browser target options.
   const browserTarget = targetFromTargetString(options.browserTarget);
   const rawBrowserOptions = await context.getTargetOptions(browserTarget);
   const browserBuilderName = await context.getBuilderNameForTarget(browserTarget);
@@ -64,6 +41,37 @@ async function _renderUniversal(
     rawBrowserOptions,
     browserBuilderName,
   );
+
+  // Determine if browser app was compiled using Ivy.
+  const { options: compilerOptions } = readTsconfig(browserOptions.tsConfig, context.workspaceRoot);
+  const ivy = compilerOptions.enableIvy;
+
+  // Initialize zone.js
+  const zonePackage = require.resolve('zone.js', { paths: [root] });
+  await import(zonePackage);
+
+  // Load platform server module renderer
+  const platformServerPackage = require.resolve('@angular/platform-server', { paths: [root] });
+  const renderOpts = {
+    document: indexHtml,
+    url: options.route,
+  };
+
+  // Render app to HTML using Ivy or VE
+  const html = await import(platformServerPackage)
+    // tslint:disable-next-line:no-implicit-dependencies
+    .then((m: typeof import('@angular/platform-server')) =>
+      ivy
+        ? m.renderModule(require(serverBundlePath).AppServerModule, renderOpts)
+        : m.renderModuleFactory(require(serverBundlePath).AppServerModuleNgFactory, renderOpts),
+    );
+
+  // Overwrite the client index file.
+  const outputIndexPath = options.outputIndexPath
+    ? path.join(root, options.outputIndexPath)
+    : browserIndexOutputPath;
+
+  fs.writeFileSync(outputIndexPath, html);
 
   if (browserOptions.serviceWorker) {
     const host = new NodeJsSyncHost();
@@ -81,10 +89,7 @@ async function _renderUniversal(
     if (!projectName) {
       throw new Error('Must either have a target from the context or a default project.');
     }
-    const projectRoot = resolve(
-      workspace.root,
-      normalize(workspace.getProject(projectName).root),
-    );
+    const projectRoot = resolve(workspace.root, normalize(workspace.getProject(projectName).root));
 
     await augmentAppWithServiceWorker(
       host,
@@ -98,7 +103,6 @@ async function _renderUniversal(
 
   return browserResult;
 }
-
 
 async function _getServerModuleBundlePath(
   options: BuildWebpackAppShellSchema,
@@ -121,7 +125,6 @@ async function _getServerModuleBundlePath(
   }
 }
 
-
 async function _appShellBuilder(
   options: JsonObject & BuildWebpackAppShellSchema,
   context: BuilderContext,
@@ -139,7 +142,7 @@ async function _appShellBuilder(
 
   try {
     const [browserResult, serverResult] = await Promise.all([
-      browserTargetRun.result as {} as BrowserBuilderOutput,
+      (browserTargetRun.result as {}) as BrowserBuilderOutput,
       serverTargetRun.result,
     ]);
 
@@ -154,12 +157,8 @@ async function _appShellBuilder(
     return { success: false, error: err.message };
   } finally {
     // Just be good citizens and stop those jobs.
-    await Promise.all([
-      browserTargetRun.stop(),
-      serverTargetRun.stop(),
-    ]);
+    await Promise.all([browserTargetRun.stop(), serverTargetRun.stop()]);
   }
 }
-
 
 export default createBuilder(_appShellBuilder);

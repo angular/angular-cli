@@ -13,6 +13,7 @@ import { createArchitect, host, veEnabled } from '../utils';
 
 
 // DISABLED_FOR_IVY   These should pass but are currently not supported
+// See https://github.com/angular/angular-cli/issues/15383 for details.
 (veEnabled ? describe : xdescribe)('AppShell Builder', () => {
   const target = { project: 'app', target: 'app-shell' };
   let architect: Architect;
