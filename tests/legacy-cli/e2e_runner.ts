@@ -99,8 +99,6 @@ if (!argv.ve) {
   // - The test itself is not applicable to Ivy
   // As we transition into using Ivy as the default this list should be reassessed.
   allTests = allTests
-    // The basic AOT check is different with Ivy and being checked in /experimental/ivy.ts.
-    .filter(name => !name.endsWith('tests/basic/aot.ts'))
     // Ivy doesn't support i18n externally at the moment.
     .filter(name => !name.includes('tests/i18n/'))
     .filter(name => !name.endsWith('tests/build/aot/aot-i18n.ts'))
