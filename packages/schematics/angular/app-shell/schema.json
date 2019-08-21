@@ -12,7 +12,8 @@
     },
     "universalProject": {
       "type": "string",
-      "description": "The name of related Universal app."
+      "description": "The name of related Universal app.",
+      "x-deprecated": "This option has no effect."
     },
     "route": {
       "type": "string",
@@ -98,7 +99,6 @@
     }
   },
   "required": [
-    "clientProject",
-    "universalProject"
+    "clientProject"
   ]
 }
