@@ -19,7 +19,6 @@ describe('App Shell Schematic', () => {
   const defaultOptions: AppShellOptions = {
     name: 'foo',
     clientProject: 'bar',
-    universalProject: 'universal',
   };
 
   const workspaceOptions: WorkspaceOptions = {
