@@ -1,7 +1,9 @@
 The command takes an optional project name, as specified in the `projects` section of the `angular.json` workspace configuration file.
 When a project name is not supplied, executes the `deploy` builder for the default project.
 
-The deploy builder defined in a deployment platform package is automatically added to a project's configuration when you add the package to the project.
+To use the `ng deploy` command, use `ng add` to add a package that implements deployment capabilities to your favorite platform.
+Adding the package automatically updates your workspace configuration, adding a deployment
+`CLI builder`(guide/cli-builder).
 For example:
 
 ```json
