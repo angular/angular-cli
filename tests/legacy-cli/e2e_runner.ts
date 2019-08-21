@@ -80,7 +80,6 @@ let allTests = glob
 
 // TODO: either update or remove these tests.
 allTests = allTests
-  .filter(name => !name.endsWith('/build-app-shell-with-schematic.ts'))
   // IS this test still valid? \/
   .filter(name => !name.endsWith('/module-id.ts'))
   // Do we want to support this?
