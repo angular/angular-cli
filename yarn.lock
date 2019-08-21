@@ -827,19 +827,19 @@
   resolved "https://registry.yarnpkg.com/@bazel/hide-bazel-files/-/hide-bazel-files-0.36.0.tgz#3fb7c7c5f579f46dd1efd1b3890f11351aa8e65c"
   integrity sha512-RgJWR1rOgyU4smruUK3MFA06DKt3AFCcfi9L8u/h11EjOrfLJgnzBJIGDXvW2zzhgnEJ9RRafOUHKN6blDksGg==
 
-"@bazel/jasmine@0.36.0":
-  version "0.36.0"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-0.36.0.tgz#26d5b455cdcf09b0000a5a7d50d672ef3a386388"
-  integrity sha512-1UEcHOtn+tqaibNJosGsNrDWvIc5KCrH3OlfYZ8g2Eg8wJ9LPLoKw2BPNz3QIqN2TNUSsjLwVE7HZU/PV3ktNQ==
+"@bazel/jasmine@0.36.1":
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-0.36.1.tgz#2069f8deb52a6ee206926936dbfd6829228962c2"
+  integrity sha512-gXCOeiHWNZzClMmYbKvdhS1ZC62inM2e+/w/Z0kOKDFSoSE9GnC6NuIK4vFlDOPjx0vGy2+ZCb/tezrgpqhp2A==
   dependencies:
     jasmine "~3.4.0"
     jasmine-core "~3.4.0"
     v8-coverage "1.0.9"
 
-"@bazel/karma@0.36.0":
-  version "0.36.0"
-  resolved "https://registry.yarnpkg.com/@bazel/karma/-/karma-0.36.0.tgz#276956d5db855aac02bae5848ff5de5cd8cd04a2"
-  integrity sha512-O6cXMOahJc8BB5MawEpa88mrRWnWNpsZsOI+nEZE9SI8YYx/vy2meG720wn1dzmkIcALznA1PRA0/kr8Ww50XA==
+"@bazel/karma@0.36.1":
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/@bazel/karma/-/karma-0.36.1.tgz#3d6e5e8772d2d2799d0b301020c1483ed3fe5de1"
+  integrity sha512-2zSW12BBJEqV1QYhPiwfTmObKCeyq3Gdox1b+2eYbyNw2HBlCHhWJs0FquGo63LLBn9XZhhk2H2IQmwhUOhx+w==
   dependencies:
     jasmine-core "2.8.0"
     karma "^4.0.0"
@@ -853,10 +853,10 @@
     semver "5.6.0"
     tmp "0.0.33"
 
-"@bazel/typescript@0.36.0":
-  version "0.36.0"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-0.36.0.tgz#e080255c4219a5e045fb6ae6aacce966c34e4628"
-  integrity sha512-/Kb/Uxi4nuJrbSAJTre0aE0D9BwIgEpsuwMJ/ThA25rlJ6Xl3UG4EYbgsrf66PZvznKOVdu6Jc8bVvhG3ldSPw==
+"@bazel/typescript@0.36.1":
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-0.36.1.tgz#de7994ed8eec90e0593525f62060a302fcf49ef1"
+  integrity sha512-TvItSk/aGakCmbrxTnbydKxq7bfYzMKqk9tNwHCzC8KqtTTyNuGTHisjqixw8G6jeSrms6vIkfH9YpYw9OHzRQ==
   dependencies:
     protobufjs "6.8.8"
     semver "5.6.0"
