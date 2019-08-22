@@ -59,7 +59,8 @@
           "CanActivate",
           "CanActivateChild",
           "CanLoad"
-        ]
+        ],
+        "type": "string"
       },
       "default": [
         "CanActivate"
