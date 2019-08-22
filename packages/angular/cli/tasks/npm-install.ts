@@ -16,6 +16,7 @@ export default async function(
   packageManager: string,
   projectRoot: string,
   save = true,
+  dev = false,
 ) {
   const installArgs: string[] = [];
   switch (packageManager) {
@@ -23,15 +24,30 @@ export default async function(
     case 'pnpm':
     case 'npm':
       installArgs.push('install');
+
+      if (dev && save) {
+        installArgs.push('--save-dev');
+      }
+
       break;
 
     case 'yarn':
       installArgs.push('add');
+
+      if (dev && save) {
+        installArgs.push('--dev');
+      }
+
       break;
 
     default:
       packageManager = 'npm';
       installArgs.push('install');
+
+      if (dev && save) {
+        installArgs.push('--save-dev');
+      }
+
       break;
   }
 

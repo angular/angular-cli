@@ -31,6 +31,11 @@
             }
           ]
         },
+        "dev": {
+          "description": "Install the package as dev dependency.",
+          "type": "boolean",
+          "default": false
+        },
         "verbose": {
           "description": "Display additional details about internal operations during execution.",
           "type": "boolean",

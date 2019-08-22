@@ -135,7 +135,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       }
     }
 
-    await npmInstall(packageIdentifier.raw, this.logger, packageManager, this.workspace.root);
+    await npmInstall(packageIdentifier.raw, this.logger, packageManager, this.workspace.root, true, options.dev);
 
     return this.executeSchematic(collectionName, options['--']);
   }
