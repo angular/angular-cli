@@ -11049,10 +11049,10 @@ stylus-loader@3.0.2:
     lodash.clonedeep "^4.5.0"
     when "~3.6.x"
 
-stylus@0.54.6:
-  version "0.54.6"
-  resolved "https://registry.yarnpkg.com/stylus/-/stylus-0.54.6.tgz#e8d0c540efd748075c763763f955946ab36f0f66"
-  integrity sha512-6s7jEoHKSdAaEtfOnGCNJWy7rcgxPf/pdSUUCusnfV6qO28OmmOLAUYeIJIgJlXWfWTwDO9ytRdd8KhxIdB4EQ==
+stylus@0.54.7:
+  version "0.54.7"
+  resolved "https://registry.yarnpkg.com/stylus/-/stylus-0.54.7.tgz#c6ce4793965ee538bcebe50f31537bfc04d88cd2"
+  integrity sha512-Yw3WMTzVwevT6ZTrLCYNHAFmanMxdylelL3hkWNgPMeTCpMwpV3nXjpOHuBXtFv7aiO2xRuQS6OoAdgkNcSNug==
   dependencies:
     css-parse "~2.0.0"
     debug "~3.1.0"
