@@ -29,11 +29,12 @@ export interface TargetDefinition {
   builder: string;
 }
 
-export type DefinitionCollectionListener<V> = (
+export type DefinitionCollectionListener<V extends object> = (
   name: string,
   action: 'add' | 'remove' | 'replace',
   newValue: V | undefined,
   oldValue: V | undefined,
+  collection: DefinitionCollection<V>,
 ) => void;
 
 class DefinitionCollection<V extends object> implements ReadonlyMap<string, V> {
@@ -50,7 +51,7 @@ class DefinitionCollection<V extends object> implements ReadonlyMap<string, V> {
     const value = this._map.get(key);
     const result = this._map.delete(key);
     if (result && value !== undefined && this._listener) {
-      this._listener(key, 'remove', undefined, value);
+      this._listener(key, 'remove', undefined, value, this);
     }
 
     return result;
@@ -61,7 +62,7 @@ class DefinitionCollection<V extends object> implements ReadonlyMap<string, V> {
     this._map.set(key, value);
 
     if (this._listener) {
-      this._listener(key, existing !== undefined ? 'replace' : 'add', value, existing);
+      this._listener(key, existing !== undefined ? 'replace' : 'add', value, existing, this);
     }
 
     return this;
