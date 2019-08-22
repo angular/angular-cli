@@ -1,9 +1,22 @@
-The `ng deploy` command is a shortcut for:
+The command takes an optional project name, as specified in the `projects` section of the `angular.json` workspace configuration file.
+When a project name is not supplied, executes the `deploy` builder for the default project.
 
-```
-ng run [PROJECT_NAME]:deploy
-```
+To use the `ng deploy` command, use `ng add` to add a package that implements deployment capabilities to your favorite platform.
+Adding the package automatically updates your workspace configuration, adding a deployment
+[CLI builder](guide/cli-builder).
+For example:
 
-It takes an optional project name, as specified in the `projects` section of the `angular.json` workspace configuration file.
-
-When a project name is not supplied, the CLI will execute the `deploy` builder for the default project.
+```json
+"projects": {
+     "my-project": {
+         ...
+        "architect": {
+            ...
+            "deploy": {
+                "builder": "@angular/fire:deploy",
+                "options": {}
+                }
+            }
+        }
+    }
+ ```
