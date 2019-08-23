@@ -28,8 +28,6 @@ export default async function() {
   // Should update tsconfig and src/browserslist via differential-loading.
   await expectFileToMatch('tsconfig.json', `"target": "es2015",`);
   await expectToFail(() => expectFileToExist('e2e/browserlist'));
-  // Should update the build-angular version.
-  await expectFileToMatch('package.json', `"@angular-devkit/build-angular": "~0.8`);
   // Should rename codelyzer rules.
   await expectFileToMatch('tslint.json', `use-lifecycle-interface`);
   // Unnecessary es6 polyfills should be removed via drop-es6-polyfills.
