@@ -710,4 +710,53 @@ describe('JSON ProjectDefinition Tracks Project Changes', () => {
       expect(change.value).toBe('valueA');
     }
   });
+
+  it('tracks target additions with no original target collection', async () => {
+    const original = stripIndent`
+      {
+        "version": 1,
+        // Comment
+        "schematics": {
+          "@angular/schematics:component": {
+            "prefix": "abc"
+          }
+        },
+        "projects": {
+          "p1": {
+            "root": "p1-root"
+          }
+        },
+        "x-foo": {
+          "is": ["good", "great", "awesome"]
+        },
+        "x-bar": 5,
+      }
+    `;
+    const host = createTestHost(original);
+
+    const workspace = await readJsonWorkspace('', host);
+
+    const project = workspace.projects.get('p1');
+    expect(project).not.toBeUndefined();
+    if (!project) {
+      return;
+    }
+
+    project.targets.add({
+      name: 't1',
+      builder: 't1-builder',
+    });
+
+    const metadata = getMetadata(workspace);
+
+    expect(metadata.hasChanges).toBeTruthy();
+    expect(metadata.changeCount).toBe(1);
+
+    const change = metadata.findChangesForPath('/projects/p1/targets')[0];
+    expect(change).not.toBeUndefined();
+    if (change) {
+      expect(change.op).toBe('add');
+      expect(change.type).toBe('targetcollection');
+    }
+  });
 });
