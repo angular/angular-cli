@@ -20,6 +20,6 @@ export const latestVersions = {
   DevkitBuildWebpack: '~0.803.0',
   AngularPWA: '~0.803.0',
 
-  tsickle: '^0.36.0',
+  tsickle: '^0.37.0',
   ngPackagr: '^5.4.0',
 };
