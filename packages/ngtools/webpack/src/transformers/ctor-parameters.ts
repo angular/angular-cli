@@ -287,7 +287,7 @@ export function decoratorDownlevelTransformer(
     }
 
     function visitor<T extends ts.Node>(node: T): ts.Node {
-      if (ts.isClassDeclaration(node)) {
+      if (ts.isClassDeclaration(node) && node.decorators && node.decorators.length > 0) {
         return ts.updateClassDeclaration(
           node,
           node.decorators,
