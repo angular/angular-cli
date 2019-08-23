@@ -213,17 +213,35 @@ function parseProject(
   }
 
   let collectionListener: DefinitionCollectionListener<TargetDefinition> | undefined;
-  if (context.trackChanges && targetsNode) {
-    const parentNode = targetsNode;
-    collectionListener = (name, action, newValue) => {
-      jsonMetadata.addChange(
-        action,
-        `/projects/${projectName}/targets/${escapeKey(name)}`,
-        parentNode,
-        newValue,
-        'target',
-      );
-    };
+  if (context.trackChanges) {
+    if (targetsNode) {
+      const parentNode = targetsNode;
+      collectionListener = (name, action, newValue) => {
+        jsonMetadata.addChange(
+          action,
+          `/projects/${projectName}/targets/${escapeKey(name)}`,
+          parentNode,
+          newValue,
+          'target',
+        );
+      };
+    } else {
+      let added = false;
+      collectionListener = (_name, action, _new, _old, collection) => {
+        if (added || action !== 'add') {
+          return;
+        }
+
+        jsonMetadata.addChange(
+          'add',
+          `/projects/${projectName}/targets`,
+          projectNode,
+          collection,
+          'targetcollection',
+        );
+        added = true;
+      };
+    }
   }
 
   const base = {

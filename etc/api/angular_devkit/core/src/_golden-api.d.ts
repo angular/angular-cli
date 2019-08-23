@@ -243,7 +243,7 @@ export declare function decamelize(str: string): string;
 
 export declare function deepCopy<T extends any>(value: T): T;
 
-export declare type DefinitionCollectionListener<V> = (name: string, action: 'add' | 'remove' | 'replace', newValue: V | undefined, oldValue: V | undefined) => void;
+export declare type DefinitionCollectionListener<V extends object> = (name: string, action: 'add' | 'remove' | 'replace', newValue: V | undefined, oldValue: V | undefined, collection: DefinitionCollection<V>) => void;
 
 export declare class DependencyNotFoundException extends BaseException {
     constructor();
