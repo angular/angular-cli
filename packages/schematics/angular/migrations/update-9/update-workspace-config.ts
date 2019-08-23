@@ -15,7 +15,7 @@ import {
   removePropertyInAstObject,
 } from '../../utility/json-utils';
 import { Builders } from '../../utility/workspace-models';
-import { getAllOptions, getTargets, getWorkspace } from './utils';
+import { getAllOptions, getTargets, getWorkspace, isIvyEnabled } from './utils';
 
 export const ANY_COMPONENT_STYLE_BUDGET = {
   type: 'anyComponentStyle',
@@ -32,6 +32,7 @@ export function UpdateWorkspaceConfig(): Rule {
       updateStyleOrScriptOption('styles', recorder, target);
       updateStyleOrScriptOption('scripts', recorder, target);
       addAnyComponentStyleBudget(recorder, target);
+      updateAotOption(tree, recorder, target);
     }
 
     for (const { target } of getTargets(workspace, 'test', Builders.Karma)) {
@@ -43,6 +44,41 @@ export function UpdateWorkspaceConfig(): Rule {
 
     return tree;
   };
+}
+
+function updateAotOption(tree: Tree, recorder: UpdateRecorder, builderConfig: JsonAstObject) {
+  const options = findPropertyInAstObject(builderConfig, 'options');
+  if (!options || options.kind !== 'object') {
+    return;
+  }
+
+
+  const tsConfig = findPropertyInAstObject(options, 'tsConfig');
+  // Do not add aot option if the users already opted out from Ivy.
+  if (tsConfig && tsConfig.kind === 'string' && !isIvyEnabled(tree, tsConfig.value)) {
+    return;
+  }
+
+  // Add aot to options.
+  const aotOption = findPropertyInAstObject(options, 'aot');
+
+  if (!aotOption) {
+    insertPropertyInAstObjectInOrder(recorder, options, 'aot', true, 12);
+
+    return;
+  }
+
+  if (aotOption.kind !== 'true') {
+    const { start, end } = aotOption;
+    recorder.remove(start.offset, end.offset - start.offset);
+    recorder.insertLeft(start.offset, 'true');
+  }
+
+  // Remove aot properties from other configurations as they are no redundant
+  const configOptions = getAllOptions(builderConfig, true);
+  for (const options of configOptions) {
+    removePropertyInAstObject(recorder, options, 'aot');
+  }
 }
 
 function updateStyleOrScriptOption(property: 'scripts' | 'styles', recorder: UpdateRecorder, builderConfig: JsonAstObject) {
@@ -75,12 +111,6 @@ function addAnyComponentStyleBudget(recorder: UpdateRecorder, builderConfig: Jso
   const options = getAllOptions(builderConfig, true);
 
   for (const option of options) {
-    const aotOption = findPropertyInAstObject(option, 'aot');
-    if (!aotOption || aotOption.kind !== 'true') {
-      // AnyComponentStyle only works for AOT
-      continue;
-    }
-
     const budgetOption = findPropertyInAstObject(option, 'budgets');
     if (!budgetOption) {
       // add

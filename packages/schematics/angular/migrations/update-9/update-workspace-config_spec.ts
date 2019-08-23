@@ -169,5 +169,84 @@ describe('Migration to version 9', () => {
         expect(config.configurations.production.budgets).toEqual([ANY_COMPONENT_STYLE_BUDGET]);
       });
     });
+
+    describe('aot option', () => {
+      it('should update aot option when false', async () => {
+        let config = getWorkspaceTargets(tree);
+        config.build.options.aot = false;
+        updateWorkspaceTargets(tree, config);
+
+        const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+        config = getWorkspaceTargets(tree2).build;
+        expect(config.options.aot).toBe(true);
+      });
+
+      it('should add aot option when not defined', async () => {
+        let config = getWorkspaceTargets(tree);
+        config.build.options.aot = undefined;
+        updateWorkspaceTargets(tree, config);
+
+        const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+        config = getWorkspaceTargets(tree2).build;
+        expect(config.options.aot).toBe(true);
+      });
+
+      it('should not aot option when opted-out of Ivy', async () => {
+        const tsConfig = JSON.stringify(
+          {
+            extends: './tsconfig.json',
+            angularCompilerOptions: {
+              enableIvy: false,
+            },
+          },
+          null,
+          2,
+        );
+
+        tree.overwrite('/tsconfig.app.json', tsConfig);
+
+        let config = getWorkspaceTargets(tree);
+        config.build.options.aot = false;
+        updateWorkspaceTargets(tree, config);
+
+        const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+        config = getWorkspaceTargets(tree2).build;
+        expect(config.options.aot).toBe(false);
+      });
+
+      it('should not aot option when opted-out of Ivy in workspace', async () => {
+        const tsConfig = JSON.stringify(
+          {
+            angularCompilerOptions: {
+              enableIvy: false,
+            },
+          },
+          null,
+          2,
+        );
+
+        tree.overwrite('/tsconfig.json', tsConfig);
+
+        let config = getWorkspaceTargets(tree);
+        config.build.options.aot = false;
+        updateWorkspaceTargets(tree, config);
+
+        const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+        config = getWorkspaceTargets(tree2).build;
+        expect(config.options.aot).toBe(false);
+      });
+
+      it('should remove aot option from production configuration', async () => {
+        let config = getWorkspaceTargets(tree);
+        config.build.options.aot = false;
+        config.build.configurations.production.aot = true;
+        updateWorkspaceTargets(tree, config);
+
+        const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+        config = getWorkspaceTargets(tree2).build;
+        expect(config.options.aot).toBe(true);
+        expect(config.configurations.production.aot).toBeUndefined();
+      });
+    });
   });
 });
