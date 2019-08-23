@@ -68,6 +68,60 @@ describe('import-tslib', () => {
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
+  it('replaces multiple __decorate', () => {
+    // tslint:disable:max-line-length
+    const input = tags.stripIndent`
+      var __decorate$1 = (this && this.__decorate) || function (decorators, target, key, desc) {
+          var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+          if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+          else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+          return c > 3 && r && Object.defineProperty(target, key, r), r;
+      };
+      var __decorate$2 = (this && this.__decorate) || function (decorators, target, key, desc) {
+        var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+        if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+        else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+        return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    `;
+    const output = tags.stripIndent`
+      import { __decorate as __decorate$1 } from "tslib";
+      import { __decorate as __decorate$2 } from "tslib";
+    `;
+
+    expect(testImportTslib(input)).toBeTruthy();
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
+
+  it('replaces multiple __decorate in CJS modules', () => {
+    // tslint:disable:max-line-length
+    const input = tags.stripIndent`
+      var __decorate$1 = (this && this.__decorate) || function (decorators, target, key, desc) {
+          var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+          if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+          else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+          return c > 3 && r && Object.defineProperty(target, key, r), r;
+      };
+      var __decorate$2 = (this && this.__decorate) || function (decorators, target, key, desc) {
+        var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+        if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+        else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+        return c > 3 && r && Object.defineProperty(target, key, r), r;
+      };
+
+      exports.meaning = 42;
+    `;
+    const output = tags.stripIndent`
+      var __decorate$1 = /*@__PURE__*/ require("tslib").__decorate;
+      var __decorate$2 = /*@__PURE__*/ require("tslib").__decorate;
+
+      exports.meaning = 42;
+    `;
+
+    expect(testImportTslib(input)).toBeTruthy();
+    expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+  });
+
   it('replaces __metadata', () => {
     const input = tags.stripIndent`
       var __metadata = (this && this.__metadata) || function (k, v) {
