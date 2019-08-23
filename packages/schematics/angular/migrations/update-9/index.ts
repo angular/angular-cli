@@ -7,7 +7,9 @@
  */
 
 import { Rule, chain } from '@angular-devkit/schematics';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { UpdateLibraries } from './ivy-libraries';
+import { updateDependencies } from './update-dependencies';
 import { UpdateWorkspaceConfig } from './update-workspace-config';
 
 export default function(): Rule {
@@ -15,6 +17,13 @@ export default function(): Rule {
     return chain([
       UpdateWorkspaceConfig(),
       UpdateLibraries(),
+      updateDependencies(),
+      (tree, context) => {
+        const packageChanges = tree.actions.some(a => a.path.endsWith('/package.json'));
+        if (packageChanges) {
+          context.addTask(new NodePackageInstallTask());
+        }
+      },
     ]);
   };
 }
