@@ -289,6 +289,11 @@ export function buildWebpackBrowser(
               const actions: ProcessBundleOptions[] = [];
               const seen = new Set<string>();
               for (const file of emittedFiles) {
+                // Assets are not processed nor injected into the index
+                if (file.asset) {
+                  continue;
+                }
+
                 // Scripts and non-javascript files are not processed
                 if (
                   file.extension !== '.js' ||
