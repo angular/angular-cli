@@ -13,6 +13,7 @@ export interface EmittedFiles {
   name?: string;
   file: string;
   initial: boolean;
+  asset?: boolean;
   extension: string;
 }
 
@@ -42,7 +43,7 @@ export function getEmittedFiles(compilation: webpack.compilation.Compilation): E
 
   // other all files
   for (const file of Object.keys(compilation.assets)) {
-    files.push({ file, extension: path.extname(file), initial: false });
+    files.push({ file, extension: path.extname(file), initial: false, asset: true });
   }
 
   // dedupe
