@@ -52,7 +52,7 @@
     "stylus": "0.54.7",
     "stylus-loader": "3.0.2",
     "tree-kill": "1.2.1",
-    "terser": "4.2.0",
+    "terser": "4.2.1",
     "terser-webpack-plugin": "1.4.1",
     "webpack": "4.39.2",
     "webpack-dev-middleware": "3.7.0",
