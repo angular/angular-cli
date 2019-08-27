@@ -50,3 +50,23 @@ export function hasPureComment(node: ts.Node): boolean {
 export function isHelperName(name: string): boolean {
   return tslibHelpers.has(name);
 }
+
+/**
+ * In FESM's when not using `importHelpers` there might be multiple in the same file.
+  @example
+  ```
+  var __decorate$1 = '';
+  var __decorate$2 = '';
+  ```
+ * @returns Helper name without the '$' and number suffix or `undefined` if it's not a helper.
+ */
+export function getCleanHelperName(name: string): string | undefined {
+  const parts = name.split('$');
+  const cleanName = parts[0];
+
+  if (parts.length > 2 || (parts.length === 2 && isNaN(+parts[1]))) {
+    return undefined;
+  }
+
+  return isHelperName(cleanName) ? cleanName : undefined;
+}
