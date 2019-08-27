@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { isHelperName } from '../helpers/ast-utils';
+import { getCleanHelperName } from '../helpers/ast-utils';
 
 /**
  * @deprecated From 0.9.0
@@ -35,14 +35,9 @@ export function getImportTslibTransformer(): ts.TransformerFactory<ts.SourceFile
 
           if (declarations.length === 1 && ts.isIdentifier(declarations[0].name)) {
             const name = declarations[0].name.text;
+            const helperName = getCleanHelperName(name);
 
-            // In FESM's when not using importHelpers there might be nultiple in the same file.
-            // Example:
-            // var __decorate$1 = '';
-            // var __decorate$2 = '';
-            const helperName = name.split(/\$\d+$/)[0];
-
-            if (isHelperName(helperName)) {
+            if (helperName) {
               // TODO: maybe add a few more checks, like checking the first part of the assignment.
               const alias = name === helperName ? undefined : name;
               const tslibImport = createTslibImport(helperName, alias, useRequire);

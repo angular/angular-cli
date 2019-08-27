@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { addPureComment, hasPureComment, isHelperName } from '../helpers/ast-utils';
+import { addPureComment, getCleanHelperName, hasPureComment } from '../helpers/ast-utils';
 
 export function getPrefixFunctionsTransformer(): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
@@ -77,7 +77,7 @@ export function findTopLevelFunctions(parentNode: ts.Node): Set<ts.Node> {
       } else if (ts.isCallExpression(innerNode)) {
         let expression: ts.Expression = innerNode.expression;
 
-        if (ts.isIdentifier(expression) && isHelperName(expression.text)) {
+        if (ts.isIdentifier(expression) && getCleanHelperName(expression.text)) {
           return;
         }
 
