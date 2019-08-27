@@ -177,7 +177,7 @@ describe('architect', () => {
 
   it('reports errors in the builder (async)', async () => {
     testArchitectHost.addBuilder('package:error', createBuilder(() => {
-      return new Promise((_, reject) => reject(new Error('Error async')));
+      return Promise.reject(new Error('Error async'));
     }));
 
     let run: BuilderRun | undefined = undefined;

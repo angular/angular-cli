@@ -35,6 +35,8 @@
     "no-unthrown-error": true,
     "no-use-of-empty-return-value": true,
     "no-useless-increment": true,
+    "no-invalid-await": true,
+    "prefer-promise-shorthand": true,
 
     //These rules are part of the code smell detection section of tslint-sonarts
     "no-dead-store": true,
