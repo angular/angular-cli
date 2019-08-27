@@ -42,7 +42,7 @@ export default async function (options: { verbose: boolean }, logger: logging.Lo
 
   logger.info('');
   logger.info('Running commit validation...');
-  error = await validateCommits({}, logger.createChild('validate-commits')) != 0
+  error = validateCommits({}, logger.createChild('validate-commits')) != 0
        || error;
 
   logger.info('');
