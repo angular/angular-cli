@@ -103,10 +103,8 @@ export abstract class SchematicCommand<
 
       // Remove any user analytics from schematics that are NOT part of our safelist.
       for (const o of this.description.options) {
-        if (o.userAnalytics) {
-          if (!isPackageNameSafeForAnalytics(this.collectionName)) {
-            o.userAnalytics = undefined;
-          }
+        if (o.userAnalytics && !isPackageNameSafeForAnalytics(this.collectionName)) {
+          o.userAnalytics = undefined;
         }
       }
     }

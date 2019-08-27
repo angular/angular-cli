@@ -549,18 +549,16 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           }
         }
 
-        if (type === 'list' && !items) {
-          if (Array.isArray(parentSchema.enum)) {
-            type = 'list';
-            items = [];
-            for (const value of parentSchema.enum) {
-              if (typeof value == 'string') {
-                items.push(value);
-              } else if (typeof value == 'object') {
-                // Invalid
-              } else {
-                items.push({ label: value.toString(), value });
-              }
+        if (type === 'list' && !items && Array.isArray(parentSchema.enum)) {
+          type = 'list';
+          items = [];
+          for (const value of parentSchema.enum) {
+            if (typeof value == 'string') {
+              items.push(value);
+            } else if (typeof value == 'object') {
+              // Invalid
+            } else {
+              items.push({ label: value.toString(), value });
             }
           }
         }
