@@ -33,7 +33,7 @@ export function getTestConfig(
   if (buildOptions.codeCoverage) {
     const codeCoverageExclude = buildOptions.codeCoverageExclude;
     const exclude: (string | RegExp)[] = [
-      /\.(e2e|spec)\.ts$/,
+      /\.(e2e|spec)\.tsx?$/,
       /node_modules/,
     ];
 
