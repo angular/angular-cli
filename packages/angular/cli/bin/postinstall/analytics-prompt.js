@@ -8,9 +8,12 @@ if ('NG_CLI_ANALYTICS' in process.env) {
 try {
   var analytics = require('../../models/analytics');
 
-  analytics.hasGlobalAnalyticsConfiguration().then(hasGlobalConfig => {
-    if (!hasGlobalConfig) {
-      return analytics.promptGlobalAnalytics();
-    }
-  });
+  analytics
+    .hasGlobalAnalyticsConfiguration()
+    .then(hasGlobalConfig => {
+      if (!hasGlobalConfig) {
+        return analytics.promptGlobalAnalytics();
+      }
+    })
+    .catch(() => {});
 } catch (_) {}
