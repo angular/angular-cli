@@ -44,7 +44,7 @@
   },
   "engines": {
     "node": ">=10.9.0 <13.0.0",
-    "yarn": ">=1.9.0 <2.0.0"
+    "yarn": ">=1.17.3 <2.0.0"
   },
   "author": "Angular Authors",
   "license": "MIT",
