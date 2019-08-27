@@ -64,7 +64,7 @@ import {
   normalizeSourceMaps,
 } from '../utils';
 import { manglingDisabled } from '../utils/mangle-options';
-import { CacheKey, ProcessBundleOptions } from '../utils/process-bundle';
+import { CacheKey, ProcessBundleOptions, ProcessBundleResult } from '../utils/process-bundle';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import {
   generateBrowserWebpackConfigFromContext,
@@ -269,11 +269,12 @@ export function buildWebpackBrowser(
 
               // Common options for all bundle process actions
               const sourceMapOptions = normalizeSourceMaps(options.sourceMap || false);
-              const actionOptions = {
+              const actionOptions: Partial<ProcessBundleOptions> = {
                 optimize: normalizeOptimization(options.optimization).scripts,
                 sourceMaps: sourceMapOptions.scripts,
                 hiddenSourceMaps: sourceMapOptions.hidden,
                 vendorSourceMaps: sourceMapOptions.vendor,
+                integrityAlgorithm: options.subresourceIntegrity ? 'sha384' : undefined,
               };
 
               const actions: ProcessBundleOptions[] = [];
@@ -303,8 +304,10 @@ export function buildWebpackBrowser(
                 seen.add(file.file);
 
                 // All files at this point except ES5 polyfills are module scripts
-                const es5Polyfills = file.file.startsWith('polyfills-es5');
-                if (!es5Polyfills && !file.file.startsWith('polyfills-nomodule-es5')) {
+                const es5Polyfills =
+                  file.file.startsWith('polyfills-es5') ||
+                  file.file.startsWith('polyfills-nomodule-es5');
+                if (!es5Polyfills) {
                   moduleFiles.push(file);
                 }
                 // If not optimizing then ES2015 polyfills do not need processing
@@ -339,6 +342,7 @@ export function buildWebpackBrowser(
                     filename,
                     code,
                     map,
+                    name: file.name,
                     optimizeOnly: true,
                   });
 
@@ -352,6 +356,7 @@ export function buildWebpackBrowser(
                   filename,
                   code,
                   map,
+                  name: file.name,
                   runtime: file.file.startsWith('runtime'),
                   ignoreOriginal: es5Polyfills,
                 });
@@ -367,15 +372,18 @@ export function buildWebpackBrowser(
               context.logger.info('Generating ES5 bundles for differential loading...');
 
               const processActions: typeof actions = [];
+              let processRuntimeAction: ProcessBundleOptions | undefined;
               const cacheActions: { src: string; dest: string }[] = [];
+              const processResults: ProcessBundleResult[] = [];
               for (const action of actions) {
                 // Create base cache key with elements:
                 // * package version - different build-angular versions cause different final outputs
                 // * code length/hash - ensure cached version matches the same input code
-                const codeHash = createHash('sha1')
+                const algorithm = action.integrityAlgorithm || 'sha1';
+                const codeHash = createHash(algorithm)
                   .update(action.code)
-                  .digest('hex');
-                let baseCacheKey = `${packageVersion}|${action.code.length}|${codeHash}`;
+                  .digest('base64');
+                let baseCacheKey = `${packageVersion}|${action.code.length}|${algorithm}-${codeHash}`;
                 if (manglingDisabled) {
                   baseCacheKey += '|MD';
                 }
@@ -430,31 +438,86 @@ export function buildWebpackBrowser(
 
                 // If all required cached entries are present, use the cached entries
                 // Otherwise process the files
-                if (cached) {
-                  if (cacheEntries[CacheKey.OriginalCode]) {
+                // If SRI is enabled always process the runtime bundle
+                // Lazy route integrity values are stored in the runtime bundle
+                if (action.integrityAlgorithm && action.runtime) {
+                  processRuntimeAction = action;
+                } else if (cached) {
+                  const result: ProcessBundleResult = { name: action.name };
+                  if (action.integrityAlgorithm) {
+                    result.integrity = `${action.integrityAlgorithm}-${codeHash}`;
+                  }
+
+                  let cacheEntry = cacheEntries[CacheKey.OriginalCode];
+                  if (cacheEntry) {
                     cacheActions.push({
-                      src: cacheEntries[CacheKey.OriginalCode].path,
+                      src: cacheEntry.path,
                       dest: action.filename,
                     });
+                    result.original = {
+                      filename: action.filename,
+                      size: cacheEntry.size,
+                      integrity: cacheEntry.metadata && cacheEntry.metadata.integrity,
+                    };
+
+                    cacheEntry = cacheEntries[CacheKey.OriginalMap];
+                    if (cacheEntry) {
+                      cacheActions.push({
+                        src: cacheEntry.path,
+                        dest: action.filename + '.map',
+                      });
+                      result.original.map = {
+                        filename: action.filename + '.map',
+                        size: cacheEntry.size,
+                      };
+                    }
+                  } else if (!action.ignoreOriginal) {
+                    // If the original wasn't processed (and therefore not cached), add info
+                    result.original = {
+                      filename: action.filename,
+                      size: Buffer.byteLength(action.code, 'utf8'),
+                      map:
+                        action.map === undefined
+                          ? undefined
+                          : {
+                              filename: action.filename + '.map',
+                              size: Buffer.byteLength(action.map, 'utf8'),
+                            },
+                    };
                   }
-                  if (cacheEntries[CacheKey.OriginalMap]) {
+
+                  cacheEntry = cacheEntries[CacheKey.DownlevelCode];
+                  if (cacheEntry) {
                     cacheActions.push({
-                      src: cacheEntries[CacheKey.OriginalMap].path,
-                      dest: action.filename + '.map',
-                    });
-                  }
-                  if (cacheEntries[CacheKey.DownlevelCode]) {
-                    cacheActions.push({
-                      src: cacheEntries[CacheKey.DownlevelCode].path,
+                      src: cacheEntry.path,
                       dest: action.filename.replace('es2015', 'es5'),
                     });
+                    result.downlevel = {
+                      filename: action.filename.replace('es2015', 'es5'),
+                      size: cacheEntry.size,
+                      integrity: cacheEntry.metadata && cacheEntry.metadata.integrity,
+                    };
+
+                    cacheEntry = cacheEntries[CacheKey.DownlevelMap];
+                    if (cacheEntry) {
+                      cacheActions.push({
+                        src: cacheEntry.path,
+                        dest: action.filename.replace('es2015', 'es5') + '.map',
+                      });
+                      result.downlevel.map = {
+                        filename: action.filename.replace('es2015', 'es5') + '.map',
+                        size: cacheEntry.size,
+                      };
+                    }
                   }
-                  if (cacheEntries[CacheKey.DownlevelMap]) {
-                    cacheActions.push({
-                      src: cacheEntries[CacheKey.DownlevelMap].path,
-                      dest: action.filename.replace('es2015', 'es5') + '.map',
-                    });
-                  }
+
+                  processResults.push(result);
+                } else if (action.runtime) {
+                  processRuntimeAction = {
+                    ...action,
+                    cacheKeys,
+                    cachePath: cacheDownlevelPath || undefined,
+                  };
                 } else {
                   processActions.push({
                     ...action,
@@ -506,11 +569,16 @@ export function buildWebpackBrowser(
                     ['process'],
                   );
                   let completed = 0;
-                  const workCallback = (error: Error | null) => {
+                  const workCallback = (error: Error | null, result: ProcessBundleResult) => {
                     if (error) {
                       workerFarm.end(workers);
                       reject(error);
-                    } else if (++completed === processActions.length) {
+
+                      return;
+                    }
+
+                    processResults.push(result);
+                    if (++completed === processActions.length) {
                       workerFarm.end(workers);
                       resolve();
                     }
@@ -518,6 +586,17 @@ export function buildWebpackBrowser(
 
                   processActions.forEach(action => workers['process'](action, workCallback));
                 });
+              }
+
+              // Runtime must be processed after all other files
+              if (processRuntimeAction) {
+                const runtimeOptions = {
+                  ...processRuntimeAction,
+                  runtimeData: processResults,
+                };
+                processResults.push(
+                  await import('../utils/process-bundle').then(m => m.processAsync(runtimeOptions)),
+                );
               }
 
               context.logger.info('ES5 bundle generation complete.');

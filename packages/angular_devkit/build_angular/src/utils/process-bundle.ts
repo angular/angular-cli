@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { SourceMapConsumer, SourceMapGenerator } from 'source-map';
@@ -18,15 +19,35 @@ export interface ProcessBundleOptions {
   filename: string;
   code: string;
   map?: string;
+  name?: string;
   sourceMaps?: boolean;
   hiddenSourceMaps?: boolean;
   vendorSourceMaps?: boolean;
   runtime?: boolean;
-  optimize: boolean;
+  optimize?: boolean;
   optimizeOnly?: boolean;
   ignoreOriginal?: boolean;
   cacheKeys?: (string | null)[];
   cachePath?: string;
+  integrityAlgorithm?: 'sha256' | 'sha384' | 'sha512';
+  runtimeData?: ProcessBundleResult[];
+}
+
+export interface ProcessBundleResult {
+  name?: string;
+  integrity?: string;
+  original?: ProcessBundleFile;
+  downlevel?: ProcessBundleFile;
+}
+
+export interface ProcessBundleFile {
+  filename: string;
+  size: number;
+  integrity?: string;
+  map?: {
+    filename: string;
+    size: number;
+  };
 }
 
 export const enum CacheKey {
@@ -38,19 +59,38 @@ export const enum CacheKey {
 
 export function process(
   options: ProcessBundleOptions,
-  callback: (error: Error | null, result?: {}) => void,
+  callback: (error: Error | null, result?: ProcessBundleResult) => void,
 ): void {
-  processWorker(options).then(() => callback(null, {}), error => callback(error));
+  processAsync(options).then(result => callback(null, result), error => callback(error));
 }
 
-async function processWorker(options: ProcessBundleOptions): Promise<void> {
+export async function processAsync(options: ProcessBundleOptions): Promise<ProcessBundleResult> {
   if (!options.cacheKeys) {
     options.cacheKeys = [];
   }
 
   // If no downlevelling required than just mangle code and return
   if (options.optimizeOnly) {
-    return mangleOriginal(options);
+    const result: ProcessBundleResult = { name: options.name };
+    if (options.integrityAlgorithm) {
+      result.integrity = generateIntegrityValue(options.integrityAlgorithm, options.code);
+    }
+
+    // Replace integrity hashes with updated values
+    // NOTE: This should eventually be a babel plugin
+    if (options.runtime && options.integrityAlgorithm && options.runtimeData) {
+      for (const data of options.runtimeData) {
+        if (!data.integrity || !data.original || !data.original.integrity) {
+          continue;
+        }
+
+        options.code = options.code.replace(data.integrity, data.original.integrity);
+      }
+    }
+
+    result.original = await mangleOriginal(options);
+
+    return result;
   }
 
   // if code size is larger than 500kB, manually handle sourcemaps with newer source-map package.
@@ -64,13 +104,15 @@ async function processWorker(options: ProcessBundleOptions): Promise<void> {
     filename: options.filename,
     inputSourceMap: !manualSourceMaps && options.map !== undefined && JSON.parse(options.map),
     babelrc: false,
-    // modules aren't needed since the bundles use webpacks custom module loading
+    // modules aren't needed since the bundles use webpack's custom module loading
     // loose generates more ES5-like code but does not strictly adhere to the ES2015 spec (Typescript is loose)
     // 'transform-typeof-symbol' generates slower code
     presets: [
       ['@babel/preset-env', { modules: false, loose: true, exclude: ['transform-typeof-symbol'] }],
     ],
-    minified: true,
+    minified: options.optimize,
+    // `false` ensures it is disabled and prevents large file warnings
+    compact: options.optimize || false,
     sourceMaps: options.sourceMaps,
   });
 
@@ -80,6 +122,18 @@ async function processWorker(options: ProcessBundleOptions): Promise<void> {
   // Extra spacing is intentional to align source line positions
   if (options.runtime) {
     code = code.replace('"-es2015.', '   "-es5.');
+
+    // Replace integrity hashes with updated values
+    // NOTE: This should eventually be a babel plugin
+    if (options.integrityAlgorithm && options.runtimeData) {
+      for (const data of options.runtimeData) {
+        if (!data.integrity || !data.downlevel || !data.downlevel.integrity) {
+          continue;
+        }
+
+        code = code.replace(data.integrity, data.downlevel.integrity);
+      }
+    }
   }
 
   if (options.sourceMaps && manualSourceMaps && options.map) {
@@ -128,12 +182,14 @@ async function processWorker(options: ProcessBundleOptions): Promise<void> {
     map.sourceRoot = sourceRoot;
   }
 
+  const result: ProcessBundleResult = { name: options.name };
+
   if (options.optimize) {
     // Note: Investigate converting the AST instead of re-parsing
     // estree -> terser is already supported; need babel -> estree/terser
 
     // Mangle downlevel code
-    const result = minify(code, {
+    const minifyOutput = minify(code, {
       compress: true,
       ecma: 5,
       mangle: !manglingDisabled,
@@ -148,16 +204,16 @@ async function processWorker(options: ProcessBundleOptions): Promise<void> {
       },
     });
 
-    if (result.error) {
-      throw result.error;
+    if (minifyOutput.error) {
+      throw minifyOutput.error;
     }
 
-    code = result.code;
-    map = result.map;
+    code = minifyOutput.code;
+    map = minifyOutput.map;
 
     // Mangle original code
     if (!options.ignoreOriginal) {
-      await mangleOriginal(options);
+      result.original = await mangleOriginal(options);
     }
   } else if (map) {
     map = JSON.stringify(map);
@@ -175,13 +231,33 @@ async function processWorker(options: ProcessBundleOptions): Promise<void> {
     fs.writeFileSync(newFilePath + '.map', map);
   }
 
+  result.downlevel = createFileEntry(newFilePath, code, map, options.integrityAlgorithm);
+
   if (options.cachePath && options.cacheKeys[CacheKey.DownlevelCode]) {
-    await cacache.put(options.cachePath, options.cacheKeys[CacheKey.DownlevelCode], code);
+    await cacache.put(options.cachePath, options.cacheKeys[CacheKey.DownlevelCode], code, {
+      metadata: { integrity: result.downlevel.integrity },
+    });
   }
   fs.writeFileSync(newFilePath, code);
+
+  // If original was not processed, add info
+  if (!result.original && !options.ignoreOriginal) {
+    result.original = createFileEntry(
+      options.filename,
+      options.code,
+      options.map,
+      options.integrityAlgorithm,
+    );
+  }
+
+  if (options.integrityAlgorithm) {
+    result.integrity = generateIntegrityValue(options.integrityAlgorithm, options.code);
+  }
+
+  return result;
 }
 
-async function mangleOriginal(options: ProcessBundleOptions): Promise<void> {
+async function mangleOriginal(options: ProcessBundleOptions): Promise<ProcessBundleFile> {
   const resultOriginal = minify(options.code, {
     compress: false,
     ecma: 6,
@@ -218,13 +294,55 @@ async function mangleOriginal(options: ProcessBundleOptions): Promise<void> {
     fs.writeFileSync(options.filename + '.map', resultOriginal.map);
   }
 
+  const fileResult = createFileEntry(
+    options.filename,
+    // tslint:disable-next-line: no-non-null-assertion
+    resultOriginal.code!,
+    resultOriginal.map as string,
+    options.integrityAlgorithm,
+  );
+
   if (options.cachePath && options.cacheKeys && options.cacheKeys[CacheKey.OriginalCode]) {
     await cacache.put(
       options.cachePath,
       options.cacheKeys[CacheKey.OriginalCode],
       resultOriginal.code,
+      {
+        metadata: { integrity: fileResult.integrity },
+      },
     );
   }
 
   fs.writeFileSync(options.filename, resultOriginal.code);
+
+  return fileResult;
+}
+
+function createFileEntry(
+  filename: string,
+  code: string,
+  map: string | undefined,
+  integrityAlgorithm?: string,
+): ProcessBundleFile {
+  return {
+    filename: filename,
+    size: Buffer.byteLength(code),
+    integrity: integrityAlgorithm && generateIntegrityValue(integrityAlgorithm, code),
+    map: !map
+      ? undefined
+      : {
+          filename: filename + '.map',
+          size: Buffer.byteLength(map),
+        },
+  };
+}
+
+function generateIntegrityValue(hashAlgorithm: string, code: string) {
+  return (
+    hashAlgorithm +
+    '-' +
+    createHash(hashAlgorithm)
+      .update(code)
+      .digest('base64')
+  );
 }
