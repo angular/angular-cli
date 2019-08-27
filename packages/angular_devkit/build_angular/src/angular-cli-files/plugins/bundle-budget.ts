@@ -56,22 +56,18 @@ export class BundleBudgetPlugin {
   }
 
   private checkMinimum(threshold: number | undefined, size: Size, messages: string[]) {
-    if (threshold) {
-      if (threshold > size.size) {
-        const sizeDifference = formatSize(threshold - size.size);
-        messages.push(`budgets, minimum exceeded for ${size.label}. `
-          + `Budget ${formatSize(threshold)} was not reached by ${sizeDifference}.`);
-      }
+    if (threshold && threshold > size.size) {
+      const sizeDifference = formatSize(threshold - size.size);
+      messages.push(`budgets, minimum exceeded for ${size.label}. `
+        + `Budget ${formatSize(threshold)} was not reached by ${sizeDifference}.`);
     }
   }
 
   private checkMaximum(threshold: number | undefined, size: Size, messages: string[]) {
-    if (threshold) {
-      if (threshold < size.size) {
-        const sizeDifference = formatSize(size.size - threshold);
-        messages.push(`budgets, maximum exceeded for ${size.label}. `
-          + `Budget ${formatSize(threshold)} was exceeded by ${sizeDifference}.`);
-      }
+    if (threshold && threshold < size.size) {
+      const sizeDifference = formatSize(size.size - threshold);
+      messages.push(`budgets, maximum exceeded for ${size.label}. `
+        + `Budget ${formatSize(threshold)} was exceeded by ${sizeDifference}.`);
     }
   }
 

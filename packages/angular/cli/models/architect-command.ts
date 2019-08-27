@@ -179,10 +179,8 @@ export abstract class ArchitectCommand<
 
     // Update options to remove analytics from options if the builder isn't safelisted.
     for (const o of this.description.options) {
-      if (o.userAnalytics) {
-        if (!isPackageNameSafeForAnalytics(builderConf)) {
-          o.userAnalytics = undefined;
-        }
+      if (o.userAnalytics && !isPackageNameSafeForAnalytics(builderConf)) {
+        o.userAnalytics = undefined;
       }
     }
   }

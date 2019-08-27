@@ -98,10 +98,8 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
 
     let schematicName = options.schematic;
 
-    if (schematicName) {
-      if (schematicName.includes(':')) {
-        [collectionName, schematicName] = schematicName.split(':', 2);
-      }
+    if (schematicName && schematicName.includes(':')) {
+      [collectionName, schematicName] = schematicName.split(':', 2);
     }
 
     return [collectionName, schematicName];
