@@ -91,8 +91,8 @@ function readOptions(
   }
 
   const defaultConfigLocations = [
-    path.join(globalPrefix, 'etc', baseFilename),
-    path.join(homedir(), dotFilename),
+    (!yarn && process.env.NPM_CONFIG_GLOBALCONFIG) || path.join(globalPrefix, 'etc', baseFilename),
+    (!yarn && process.env.NPM_CONFIG_USERCONFIG) || path.join(homedir(), dotFilename),
   ];
 
   const projectConfigLocations: string[] = [
