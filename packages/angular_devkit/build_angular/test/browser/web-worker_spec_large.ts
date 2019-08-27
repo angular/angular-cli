@@ -162,17 +162,8 @@ describe('Browser Builder Web Worker support', () => {
 
           case 2:
             workerContent = virtualFs.fileBufferToString(host.scopedSync().read(workerPath));
-            // TODO(filipesilva): Should this change? Check with Jason Miller.
-            // The worker changes name with each rebuild. But sometimes it also changes from 0 to
-            // 1 and then back to 0. It's hard to know where the updated content is, but it should
-            // be in one of these two.
-            const anotherWorkerPath = join(outputPath, '1.worker.js');
-            const anotherWorkerContent = virtualFs.fileBufferToString(
-              host.scopedSync().read(anotherWorkerPath));
             // Worker content should have changed.
-            expect(
-              workerContent.includes('baz') || anotherWorkerContent.includes('baz'),
-            ).toBeTruthy('Worker bundle did not contain updated content.');
+            expect(workerContent).toContain('baz');
             phase = 3;
             break;
         }
