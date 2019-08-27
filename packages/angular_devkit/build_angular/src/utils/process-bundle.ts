@@ -201,17 +201,11 @@ async function mangleOriginal(options: ProcessBundleOptions): Promise<void> {
     throw resultOriginal.error;
   }
 
-  if (options.cachePath && options.cacheKeys && options.cacheKeys[CacheKey.OriginalCode]) {
-    await cacache.put(
-      options.cachePath,
-      options.cacheKeys[CacheKey.OriginalCode],
-      resultOriginal.code,
-    );
-  }
-
-  fs.writeFileSync(options.filename, resultOriginal.code);
-
   if (resultOriginal.map) {
+    if (!options.hiddenSourceMaps) {
+      resultOriginal.code += `\n//# sourceMappingURL=${path.basename(options.filename)}.map`;
+    }
+
     if (options.cachePath && options.cacheKeys && options.cacheKeys[CacheKey.OriginalMap]) {
       await cacache.put(
         options.cachePath,
@@ -222,4 +216,14 @@ async function mangleOriginal(options: ProcessBundleOptions): Promise<void> {
 
     fs.writeFileSync(options.filename + '.map', resultOriginal.map);
   }
+
+  if (options.cachePath && options.cacheKeys && options.cacheKeys[CacheKey.OriginalCode]) {
+    await cacache.put(
+      options.cachePath,
+      options.cacheKeys[CacheKey.OriginalCode],
+      resultOriginal.code,
+    );
+  }
+
+  fs.writeFileSync(options.filename, resultOriginal.code);
 }
