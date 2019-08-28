@@ -396,6 +396,10 @@ export interface CliConfig {
            */
           showCircularDependencies?: boolean;
           /**
+           * Treat circular dependency warnings as errors on builds.
+           */
+          errorOnCircularDependencies?: boolean;
+          /**
            * Use a separate bundle containing code used across multiple bundles.
            */
           commonChunk?: boolean;

@@ -35,4 +35,20 @@ describe('Browser Builder circular dependency detection', () => {
     expect(logs.join()).toContain('Circular dependency detected');
     await run.stop();
   });
+
+  it('works with errors on', async () => {
+    host.appendToFile('src/app/app.component.ts',
+      `import { AppModule } from './app.module'; console.log(AppModule);`);
+
+    const overrides = { baseHref: '/myUrl', errorOnCircularDependencies: true };
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe(e => logs.push(e.message));
+
+    const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
+    const output = await run.result;
+    expect(output.success).toBe(false);
+    expect(logs.join()).toContain('Circular dependency detected');
+    await run.stop();
+  });
 });

@@ -187,6 +187,11 @@
       "description": "Show circular dependency warnings on builds.",
       "default": true
     },
+    "errorOnCircularDependencies": {
+      "type": "boolean",
+      "description": "Treat circular dependency warnings as errors on builds.",
+      "default": false
+    },
     "namedChunks": {
       "type": "boolean",
       "description": "Use file name for lazy loaded chunks.",

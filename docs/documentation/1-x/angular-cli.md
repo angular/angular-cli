@@ -24,6 +24,7 @@
   - *prefix* (`string`): The prefix to apply to generated selectors.
   - *serviceWorker* (`boolean`): Experimental support for a service worker from @angular/service-worker. Default is `false`.
   - *showCircularDependencies* (`boolean`): Show circular dependency warnings on builds. Default is `true`.
+  - *errorOnCircularDependencies* (`boolean`): Treat circular dependency warnings as errors on builds. Default is `false`.
   - *styles* (`string|array`): Global styles to be included in the build.
   - *stylePreprocessorOptions* : Options to pass to style preprocessors.
     - *includePaths* (`array`): Paths to include. Paths will be resolved to project root.

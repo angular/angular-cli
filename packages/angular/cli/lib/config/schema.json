@@ -817,6 +817,11 @@
               "description": "Show circular dependency warnings on builds.",
               "default": true
             },
+            "errorOnCircularDependencies": {
+              "type": "boolean",
+              "description": "Treat circular dependency warnings as errors on builds.",
+              "default": false
+            },
             "buildOptimizer": {
               "type": "boolean",
               "description": "Enables @angular-devkit/build-optimizer optimizations when using the 'aot' option.",
@@ -1776,6 +1781,11 @@
               "type": "boolean",
               "description": "Show circular dependency warnings on builds.",
               "default": true
+            },
+            "errorOnCircularDependencies": {
+              "type": "boolean",
+              "description": "Treat circular dependency warnings as errors on builds.",
+              "default": false
             },
             "namedChunks": {
               "type": "boolean",

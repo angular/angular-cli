@@ -51,6 +51,7 @@ export interface BuildOptions {
   preserveSymlinks?: boolean;
   extractLicenses?: boolean;
   showCircularDependencies?: boolean;
+  errorOnCircularDependencies?: boolean;
   buildOptimizer?: boolean;
   namedChunks?: boolean;
   subresourceIntegrity?: boolean;

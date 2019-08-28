@@ -230,11 +230,16 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   if (buildOptions.showCircularDependencies) {
-    extraPlugins.push(
-      new CircularDependencyPlugin({
-        exclude: /([\\\/]node_modules[\\\/])|(ngfactory\.js$)/,
-      }),
-    );
+    const circularDependencyOptions = {
+      exclude: /([\\\/]node_modules[\\\/])|(ngfactory\.js$)/,
+      failOnError: false,
+    };
+
+    if (buildOptions.errorOnCircularDependencies) {
+      circularDependencyOptions.failOnError = true;
+    }
+
+    extraPlugins.push(new CircularDependencyPlugin(circularDependencyOptions));
   }
 
   if (buildOptions.statsJson) {

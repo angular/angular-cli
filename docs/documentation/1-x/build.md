@@ -366,6 +366,16 @@ See https://github.com/angular/angular-cli/issues/7797 for details.
 </details>
 
 <details>
+  <summary>error-on-circular-dependencies</summary>
+  <p>
+    <code>--error-on-circular-dependencies</code> (aliases: <code>-ecd</code>)
+  </p>
+  <p>
+    Treat circular dependency warnings as errors on builds.
+  </p>
+</details>
+
+<details>
   <summary>build-optimizer</summary>
   <p>
     <code>--build-optimizer</code>
