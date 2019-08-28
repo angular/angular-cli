@@ -210,15 +210,15 @@ import { createArchitect, host, veEnabled } from '../utils';
       'e2e/app.e2e-spec.ts': `
         import { browser, by, element } from 'protractor';
 
-        it('should have ngsw in normal state', () => {
-          browser.get('/');
+        it('should have ngsw in normal state', async () => {
+          await browser.get('/');
           // Wait for service worker to load.
-          browser.sleep(2000);
-          browser.waitForAngularEnabled(false);
-          browser.get('/ngsw/state');
+          await browser.sleep(2000);
+          await browser.waitForAngularEnabled(false);
+          await browser.get('/ngsw/state');
           // Should have updated, and be in normal state.
-          expect(element(by.css('pre')).getText()).not.toContain('Last update check: never');
-          expect(element(by.css('pre')).getText()).toContain('Driver state: NORMAL');
+          expect(await element(by.css('pre')).getText()).not.toContain('Last update check: never');
+          expect(await element(by.css('pre')).getText()).toContain('Driver state: NORMAL');
         });
       `,
     });

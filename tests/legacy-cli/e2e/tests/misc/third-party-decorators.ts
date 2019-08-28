@@ -33,15 +33,15 @@ export default function () {
             page = new AppPage();
           });
 
-          it('should operate counter', () => {
-            page.navigateTo();
-            page.getIncrementButton().click();
-            page.getIncrementButton().click();
-            expect(page.getCounter()).toEqual('2');
-            page.getDecrementButton().click();
-            expect(page.getCounter()).toEqual('1');
-            page.getResetButton().click();
-            expect(page.getCounter()).toEqual('0');
+          it('should operate counter', async () => {
+            await page.navigateTo();
+            await page.getIncrementButton().click();
+            await page.getIncrementButton().click();
+            expect(await page.getCounter()).toEqual('2');
+            await page.getDecrementButton().click();
+            expect(await page.getCounter()).toEqual('1');
+            await page.getResetButton().click();
+            expect(await page.getCounter()).toEqual('0');
           });
         });
       `,

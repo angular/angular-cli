@@ -32,8 +32,8 @@ export default async function () {
     import { browser, logging } from 'protractor';
     describe('worker bundle', () => {
       it('should log worker messages', async () => {
-        const page = new AppPage();;
-        page.navigateTo();
+        const page = new AppPage();
+        await page.navigateTo();
         const logs = await browser.manage().logs().get(logging.Type.BROWSER);
         expect(logs.length).toEqual(1);
         expect(logs[0].message).toContain('page got message: worker response to hello');

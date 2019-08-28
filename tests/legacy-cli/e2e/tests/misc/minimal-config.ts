@@ -27,10 +27,10 @@ export default function () {
         import { browser, element, by } from 'protractor';
 
         describe('minimal project App', function() {
-          it('should display message saying app works', () => {
+          it('should display message saying app works', async () => {
             browser.ignoreSynchronization = true;
-            browser.get('/');
-            let el = element(by.css('app-root h1')).getText();
+            await browser.get('/');
+            let el = await element(by.css('app-root h1')).getText();
             expect(el).toEqual('app works!');
           });
         });

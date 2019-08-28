@@ -52,9 +52,9 @@ export default async function () {
         page = new AppPage();
       });
 
-      it('should display text from library component', () => {
-        page.navigateTo();
-        expect(element(by.css('lib-my-lib p')).getText()).toEqual('my-lib works!');
+      it('should display text from library component', async () => {
+        await page.navigateTo();
+        expect(await element(by.css('lib-my-lib p')).getText()).toEqual('my-lib works!');
       });
 
       afterEach(async () => {

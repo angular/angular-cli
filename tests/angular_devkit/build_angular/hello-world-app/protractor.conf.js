@@ -12,6 +12,7 @@ const { SpecReporter } = require('jasmine-spec-reporter');
 const { resolve } = require('path');
 
 exports.config = {
+  SELENIUM_PROMISE_MANAGER: false,
   allScriptsTimeout: 11000,
   specs: ['./e2e/**/*.e2e-spec.ts'],
   capabilities: {

@@ -13,6 +13,7 @@ exports.config = {
   sauceUser: process.env['SAUCE_USERNAME'],
   sauceKey: process.env['SAUCE_ACCESS_KEY'],
 
+  SELENIUM_PROMISE_MANAGER: false,
   allScriptsTimeout: 11000,
   specs: ['./src/**/*.e2e-spec.ts'],
 

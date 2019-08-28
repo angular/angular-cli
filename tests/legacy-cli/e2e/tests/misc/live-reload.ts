@@ -75,9 +75,9 @@ export default function temporarilyDisabledTest() { return Promise.resolve(); }
 //         import { browser } from 'protractor';
 
 //         describe('master-project App', function() {
-//           it('should wait', _ => {
-//             browser.get('/');
-//             browser.sleep(30000);
+//           it('should wait', async _ => {
+//             await browser.get('/');
+//             await browser.sleep(30000);
 //           });
 //         });
 //       `,
