@@ -23,7 +23,7 @@ import { getTargets, getWorkspace } from './utils';
  * - Creates a production configuration for VE compilations.
  * - Create a prod tsconfig for which disables Ivy and enables VE compilations.
  */
-export function UpdateLibraries(): Rule {
+export function updateLibraries(): Rule {
   return (tree: Tree) => {
     const workspacePath = getWorkspacePath(tree);
     const workspace = getWorkspace(tree);

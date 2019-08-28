@@ -22,7 +22,7 @@ export const ANY_COMPONENT_STYLE_BUDGET = {
   maximumWarning: '6kb',
 };
 
-export function UpdateWorkspaceConfig(): Rule {
+export function updateWorkspaceConfig(): Rule {
   return (tree: Tree) => {
     const workspacePath = getWorkspacePath(tree);
     const workspace = getWorkspace(tree);
