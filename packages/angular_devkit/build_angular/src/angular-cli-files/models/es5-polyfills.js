@@ -7,10 +7,7 @@
  */
 
 // ES2015 symbol capabilities
-import 'core-js/modules/es.symbol';
-import 'core-js/modules/es.symbol.description';
-import 'core-js/modules/es.symbol.iterator';
-import 'core-js/modules/es.symbol.to-string-tag';
+import 'core-js/es/symbol';
 
 // ES2015 function capabilities
 import 'core-js/modules/es.function.bind';
@@ -103,3 +100,5 @@ import 'core-js/modules/web.dom-collections.for-each';
 import 'core-js/modules/web.dom-collections.iterator';
 import 'core-js/modules/es.promise';
 import 'core-js/modules/es.json.to-string-tag';
+
+import 'regenerator-runtime/runtime';
