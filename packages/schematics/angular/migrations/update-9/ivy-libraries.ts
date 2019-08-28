@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, parseJsonAst } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
 import { getWorkspacePath } from '../../utility/config';
 import {
@@ -14,7 +13,7 @@ import {
   insertPropertyInAstObjectInOrder,
 } from '../../utility/json-utils';
 import { Builders } from '../../utility/workspace-models';
-import { getTargets, getWorkspace } from './utils';
+import { getTargets, getWorkspace, readJsonFileAsAstObject } from './utils';
 
 /**
  * Updates a pre version 9 library to version 9 Ivy library.
@@ -62,17 +61,7 @@ export function updateLibraries(): Rule {
       }
 
       // tsConfig for production already exists.
-      const tsConfigContent = tree.read(tsConfigOption.value);
-      if (!tsConfigContent) {
-        continue;
-      }
-
-      const tsConfigAst = parseJsonAst(tsConfigContent.toString(), JsonParseMode.Loose);
-      if (!tsConfigAst || tsConfigAst.kind !== 'object') {
-        // Invalid tsConfig
-        continue;
-      }
-
+      const tsConfigAst = readJsonFileAsAstObject(tree, tsConfigOption.value);
       const tsConfigRecorder = tree.beginUpdate(tsConfigOption.value);
       const ngCompilerOptions = findPropertyInAstObject(tsConfigAst, 'angularCompilerOptions');
       if (!ngCompilerOptions) {

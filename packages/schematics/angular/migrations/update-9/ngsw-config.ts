@@ -5,11 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, parseJsonAst } from '@angular-devkit/core';
-import { Rule, SchematicsException, Tree } from '@angular-devkit/schematics';
+import { Rule,  Tree } from '@angular-devkit/schematics';
 import { appendValueInAstArray, findPropertyInAstObject } from '../../utility/json-utils';
 import { Builders } from '../../utility/workspace-models';
-import { getAllOptions, getTargets, getWorkspace } from './utils';
+import { getAllOptions, getTargets, getWorkspace, readJsonFileAsAstObject } from './utils';
 
 
 /**
@@ -27,13 +26,7 @@ export function updateNGSWConfig(): Rule {
         }
 
         const path = ngswConfigPath.value;
-        const configBuffer = tree.read(path);
-        if (!configBuffer) {
-          throw new SchematicsException(`Could not find (${path})`);
-        }
-
-        const content = configBuffer.toString();
-        const ngswConfigAst = parseJsonAst(content, JsonParseMode.Loose);
+        const ngswConfigAst = readJsonFileAsAstObject(tree, path);
         if (!ngswConfigAst || ngswConfigAst.kind !== 'object') {
           continue;
         }

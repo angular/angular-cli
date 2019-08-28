@@ -72,14 +72,23 @@ export function getAllOptions(builderConfig: JsonAstObject, configurationsOnly =
 
 export function getWorkspace(host: Tree): JsonAstObject {
   const path = getWorkspacePath(host);
+
+  return readJsonFileAsAstObject(host, path);
+}
+
+export function readJsonFileAsAstObject(host: Tree, path: string): JsonAstObject {
   const configBuffer = host.read(path);
   if (!configBuffer) {
     throw new SchematicsException(`Could not find (${path})`);
   }
 
   const content = configBuffer.toString();
+  const astContent = parseJsonAst(content, JsonParseMode.Loose);
+  if (!astContent || astContent.kind !== 'object') {
+    throw new SchematicsException(`Invalid JSON AST Object (${path})`);
+  }
 
-  return parseJsonAst(content, JsonParseMode.Loose) as JsonAstObject;
+  return astContent;
 }
 
 export function isIvyEnabled(tree: Tree, tsConfigPath: string): boolean {

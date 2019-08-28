@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonAstObject, JsonParseMode, parseJsonAst } from '@angular-devkit/core';
+import { JsonAstObject } from '@angular-devkit/core';
 import { Rule, Tree, UpdateRecorder } from '@angular-devkit/schematics';
 import {
   findPropertyInAstObject,
@@ -13,7 +13,7 @@ import {
   removePropertyInAstObject,
 } from '../../utility/json-utils';
 import { Builders } from '../../utility/workspace-models';
-import { getAllOptions, getTargets, getWorkspace } from './utils';
+import { getAllOptions, getTargets, getWorkspace, readJsonFileAsAstObject } from './utils';
 
 
 /**
@@ -52,7 +52,7 @@ function updateTsConfig(tree: Tree, builderConfig: JsonAstObject, builderName: B
     }
 
     const tsConfigPath = tsConfigOption.value;
-    let tsConfigAst = getTsConfigAst(tree, tsConfigPath);
+    let tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
     if (!tsConfigAst) {
       continue;
     }
@@ -77,7 +77,7 @@ function updateTsConfig(tree: Tree, builderConfig: JsonAstObject, builderName: B
     if (builderName !== Builders.Karma) {
       // Note: we need to re-read the tsconfig after very commit because
       // otherwise the updates will be out of sync since we are ammending the same node.
-      tsConfigAst = getTsConfigAst(tree, tsConfigPath) as JsonAstObject;
+      tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
       const files = findPropertyInAstObject(tsConfigAst, 'files');
       const include = findPropertyInAstObject(tsConfigAst, 'include');
 
@@ -93,32 +93,17 @@ function updateTsConfig(tree: Tree, builderConfig: JsonAstObject, builderName: B
         tree.commitUpdate(recorder);
 
         if (builderName === Builders.Browser) {
-          tsConfigAst = getTsConfigAst(tree, tsConfigPath) as JsonAstObject;
+          tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
           recorder = tree.beginUpdate(tsConfigPath);
           insertPropertyInAstObjectInOrder(recorder, tsConfigAst, 'include', [`${rootSrc}**/*.d.ts`], 2);
           tree.commitUpdate(recorder);
         }
 
-        tsConfigAst = getTsConfigAst(tree, tsConfigPath) as JsonAstObject;
+        tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
         recorder = tree.beginUpdate(tsConfigPath);
         removePropertyInAstObject(recorder, tsConfigAst, 'exclude');
         tree.commitUpdate(recorder);
       }
     }
   }
-}
-
-function getTsConfigAst(tree: Tree, path: string): JsonAstObject | undefined {
-  const configBuffer = tree.read(path);
-  if (!configBuffer) {
-    return undefined;
-  }
-
-  const content = configBuffer.toString();
-  const tsConfigAst = parseJsonAst(content, JsonParseMode.Loose);
-  if (!tsConfigAst || tsConfigAst.kind !== 'object') {
-    return undefined;
-  }
-
-  return tsConfigAst;
 }
