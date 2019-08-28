@@ -1,20 +1,35 @@
-import {ng} from '../../utils/process';
-import {expectFileToExist} from '../../utils/fs';
-import {expectToFail} from '../../utils/utils';
+import * as fs from 'fs';
+import { expectFileToExist } from '../../utils/fs';
+import { ng } from '../../utils/process';
 
+export default async function() {
+  await ng('build', '--prod', '--output-hashing=none', '--source-map');
 
-export default function() {
-  // TODO(architect): Delete this test. It is now in devkit/build-angular.
+  await expectFileToExist('dist/test-project/main-es5.js.map');
 
-  return ng('build', '--source-map')
-    .then(() => expectFileToExist('dist/test-project/main-es5.js.map'))
+  const files = fs.readdirSync('./dist/test-project');
 
-    .then(() => ng('build', '--source-map', 'false'))
-    .then(() => expectToFail(() => expectFileToExist('dist/test-project/main-es5.js.map')))
+  let count = 0;
+  for (const file of files) {
+    if (!file.endsWith('.js')) {
+      continue;
+    }
 
-    .then(() => ng('build', '--optimization', '--output-hashing=none', '--source-map', 'false'))
-    .then(() => expectToFail(() => expectFileToExist('dist/test-project/main-es5.js.map')))
+    ++count;
 
-    .then(() => ng('build', '--optimization', '--output-hashing=none', '--source-map'))
-    .then(() => expectFileToExist('dist/test-project/main-es5.js.map'));
+    if (!files.includes(file + '.map')) {
+      throw new Error('Sourcemap not generated for ' + file);
+    }
+
+    const content = fs.readFileSync('./dist/test-project/' + file, 'utf8');
+    const lastLineIndex = content.lastIndexOf('\n');
+    const comment = lastLineIndex !== -1 && content.slice(lastLineIndex).trim();
+    if (comment !== `//# sourceMappingURL=${file}.map`) {
+      throw new Error('Sourcemap comment not generated for ' + file);
+    }
+  }
+
+  if (count < 6) {
+    throw new Error('Javascript file count is low');
+  }
 }
