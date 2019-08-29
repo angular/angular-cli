@@ -215,7 +215,6 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
             sourceMap: false,
             extractCss: true,
             namedChunks: false,
-            aot: true,
             extractLicenses: true,
             vendorChunk: false,
             buildOptimizer: true,

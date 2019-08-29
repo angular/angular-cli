@@ -29,7 +29,9 @@ export default async function() {
 
       // In VE non prod builds are non AOT by default
       await updateJsonFile('angular.json', config => {
-        config.projects['test-project'].architect.build.options.aot = false;
+        const build = config.projects['test-project'].architect.build;
+        build.options.aot = false;
+        build.configurations.production.aot = true;
       });
     }
   }
