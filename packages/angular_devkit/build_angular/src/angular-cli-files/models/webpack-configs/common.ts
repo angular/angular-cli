@@ -23,6 +23,7 @@ import {
 import { RawSource } from 'webpack-sources';
 import { AssetPatternClass, ExtraEntryPoint } from '../../../browser/schema';
 import { BuildBrowserFeatures, fullDifferential } from '../../../utils';
+import { manglingDisabled } from '../../../utils/mangle-options';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { NamedLazyChunksPlugin } from '../../plugins/named-chunks-plugin';
@@ -362,6 +363,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       // We also want to avoid mangling on server.
       // Name mangling is handled within the browser builder
       mangle:
+        !manglingDisabled &&
         buildOptions.platform !== 'server' &&
         (!differentialLoadingNeeded || (differentialLoadingNeeded && fullDifferential)),
     };
