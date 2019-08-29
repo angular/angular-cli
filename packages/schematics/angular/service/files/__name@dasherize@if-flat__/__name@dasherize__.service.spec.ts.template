@@ -7,7 +7,7 @@ describe('<%= classify(name) %>Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.get(<%= classify(name) %>Service);
+    service = TestBed.inject(<%= classify(name) %>Service);
   });
 
   it('should be created', () => {
