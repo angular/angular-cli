@@ -133,11 +133,10 @@ async function processWorker(options: ProcessBundleOptions): Promise<void> {
 
     // Mangle downlevel code
     const result = minify(code, {
-      compress: false,
+      compress: true,
       ecma: 5,
       mangle: !manglingDisabled,
       safari10: true,
-      toplevel: true,
       output: {
         ascii_only: true,
         webkit: true,
