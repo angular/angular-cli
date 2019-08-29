@@ -68,28 +68,6 @@ describe('Karma Builder', () => {
       await run.stop();
     });
 
-    beforeEach(() => {
-      host.writeMultipleFiles({
-        'src/app/services/test.service.spec.ts': `
-          describe('TestService', () => {
-            it('should succeed', () => {
-              expect(true).toBe(true);
-            });
-          });`,
-        'src/app/failing.service.spec.ts': `
-          describe('FailingService', () => {
-            it('should be ignored', () => {
-              expect(true).toBe(false);
-            });
-          });`,
-        'src/app/property.pipe.spec.ts': `
-          describe('PropertyPipe', () => {
-            it('should succeed', () => {
-              expect(true).toBe(true);
-            });
-          });`,
-      });
-    });
     [
       {
         test: 'relative path from workspace to spec',
@@ -119,8 +97,29 @@ describe('Karma Builder', () => {
         test: 'glob with spec suffix',
         input: ['**/*.pipe.spec.ts', '**/*.pipe.spec.ts', '**/*test.service.spec.ts'],
       },
-    ].forEach(options => {
-      it(`should work with ${options.test}`, async () => {
+    ].forEach((options, index) => {
+      it(`should work with ${options.test} (${index})`, async () => {
+        host.writeMultipleFiles({
+          'src/app/services/test.service.spec.ts': `
+            describe('TestService', () => {
+              it('should succeed', () => {
+                expect(true).toBe(true);
+              });
+            });`,
+          'src/app/failing.service.spec.ts': `
+            describe('FailingService', () => {
+              it('should be ignored', () => {
+                expect(true).toBe(false);
+              });
+            });`,
+          'src/app/property.pipe.spec.ts': `
+            describe('PropertyPipe', () => {
+              it('should succeed', () => {
+                expect(true).toBe(true);
+              });
+            });`,
+        });
+
         const overrides = {
           include: options.input,
         };
@@ -137,7 +136,7 @@ describe('Karma Builder', () => {
         await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
 
         await run.stop();
-      }, 30000);
+      });
     });
   });
 });
