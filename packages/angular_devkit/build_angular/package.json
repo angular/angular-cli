@@ -57,7 +57,7 @@
     "webpack": "4.39.3",
     "webpack-dev-middleware": "3.7.0",
     "webpack-dev-server": "3.8.0",
-    "webpack-merge": "4.2.1",
+    "webpack-merge": "4.2.2",
     "webpack-sources": "1.4.3",
     "webpack-subresource-integrity": "1.1.0-rc.6",
     "worker-farm": "1.7.0",

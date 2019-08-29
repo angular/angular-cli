@@ -10,7 +10,7 @@
     "@angular-devkit/architect": "0.0.0",
     "@angular-devkit/core": "0.0.0",
     "rxjs": "6.4.0",
-    "webpack-merge": "4.2.1"
+    "webpack-merge": "4.2.2"
   },
   "peerDependencies": {
     "webpack": "^4.6.0",
