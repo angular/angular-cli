@@ -23,6 +23,8 @@ const knownFlakes = [
   // Rebuild tests in test-large are flakey if not run as the first suite.
   // https://github.com/angular/angular-cli/pull/15204
   'packages/angular_devkit/build_angular/test/browser/rebuild_spec_large.ts',
+  // This is flaky with NGCC
+  'packages/angular_devkit/build_angular/test/karma/selected_spec_large.ts',
 ];
 
 const projectBaseDir = join(__dirname, '..');
