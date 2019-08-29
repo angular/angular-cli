@@ -45,8 +45,7 @@
     },
     "baseUrl": {
       "type": "string",
-      "description": "Base URL for protractor to connect to.",
-      "x-deprecated": "Use \"baseUrl\" in the Protractor config file instead."
+      "description": "Base URL for protractor to connect to."
     }
   },
   "additionalProperties": false,
