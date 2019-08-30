@@ -88,7 +88,7 @@ describe('Browser Builder AOT', () => {
     const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
     const output = await run.result;
     expect(output.success).toBe(false);
-    expect(logs.join()).toContain(`Expected "}".`);
+    expect(logs.join()).toContain('SassError: expected "}".');
     await run.stop();
   });
 });
