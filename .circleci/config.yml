@@ -246,6 +246,7 @@ jobs:
   # and rerun them faster.
   flake-jail:
     executor: test-executor
+    resource_class: medium
     steps:
       - attach_workspace: *attach_options
       - run: yarn webdriver-update
