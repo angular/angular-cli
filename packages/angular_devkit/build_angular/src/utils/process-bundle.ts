@@ -8,7 +8,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { SourceMapConsumer, SourceMapGenerator } from 'source-map';
-import { minify } from 'terser';
+import { ECMA, minify } from 'terser';
 import { manglingDisabled } from './mangle-options';
 
 const { transformAsync } = require('@babel/core');
@@ -27,6 +27,7 @@ export interface ProcessBundleOptions {
   ignoreOriginal?: boolean;
   cacheKeys?: (string | null)[];
   cachePath?: string;
+  ecma?: ECMA;
 }
 
 export const enum CacheKey {
@@ -183,7 +184,7 @@ async function processWorker(options: ProcessBundleOptions): Promise<void> {
 async function mangleOriginal(options: ProcessBundleOptions): Promise<void> {
   const resultOriginal = minify(options.code, {
     compress: false,
-    ecma: 6,
+    ecma: options.ecma || 6,
     mangle: !manglingDisabled,
     safari10: true,
     output: {

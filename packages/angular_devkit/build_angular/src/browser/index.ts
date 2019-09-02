@@ -288,20 +288,15 @@ export function buildWebpackBrowser(
 
               const actions: ProcessBundleOptions[] = [];
               const seen = new Set<string>();
+              files = [];
               for (const file of emittedFiles) {
                 // Assets are not processed nor injected into the index
                 if (file.asset) {
                   continue;
                 }
 
-                // Scripts and non-javascript files are not processed
-                if (
-                  file.extension !== '.js' ||
-                  (file.name && scriptsEntryPointName.includes(file.name))
-                ) {
-                  if (files === undefined) {
-                    files = [];
-                  }
+                // Non-javascript files are not processed
+                if (file.extension !== '.js') {
                   files.push(file);
                   continue;
                 }
@@ -312,14 +307,21 @@ export function buildWebpackBrowser(
                 }
                 seen.add(file.file);
 
+                const isScriptFile = file.name && scriptsEntryPointName.includes(file.name);
+                if (isScriptFile) {
+                  files.push(file);
+                }
+
+                // If not optimizing then ES2015 polyfills and Scripts do not need processing
+                // Unlike other module scripts, they are never downleveled
+                const isOptimizeOnlyFile = file.file.startsWith('polyfills-es2015') || isScriptFile;
+
                 // All files at this point except ES5 polyfills are module scripts
                 const es5Polyfills = file.file.startsWith('polyfills-es5');
-                if (!es5Polyfills && !file.file.startsWith('polyfills-nomodule-es5')) {
+                if (!isScriptFile && !es5Polyfills && !file.file.startsWith('polyfills-nomodule-es5')) {
                   moduleFiles.push(file);
                 }
-                // If not optimizing then ES2015 polyfills do not need processing
-                // Unlike other module scripts, it is never downleveled
-                if (!actionOptions.optimize && file.file.startsWith('polyfills-es2015')) {
+                if (!actionOptions.optimize && isOptimizeOnlyFile) {
                   continue;
                 }
 
@@ -342,14 +344,15 @@ export function buildWebpackBrowser(
                   filename = filename.replace('-es2015', '');
                 }
 
-                // ES2015 polyfills are only optimized; optimization check was performed above
-                if (file.file.startsWith('polyfills-es2015')) {
+                // ES2015 polyfills and scripts only needs to be optimized
+                if (isOptimizeOnlyFile) {
                   actions.push({
                     ...actionOptions,
                     filename,
                     code,
                     map,
                     optimizeOnly: true,
+                    ecma: isScriptFile ? 5 : 6,
                   });
 
                   continue;
