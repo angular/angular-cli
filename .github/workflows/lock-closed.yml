@@ -1,0 +1,14 @@
+name: Lock issues that are closed and inactive
+
+on:
+  schedule:
+  - cron: 0 */1 * * *
+
+jobs:
+  lock_closed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: angular/dev-infra/github-actions/lock-closed@a906938
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          locks-per-execution: 1
