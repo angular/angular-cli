@@ -1,15 +1,13 @@
 import { normalize } from 'path';
 import { getGlobalVariable } from '../../utils/env';
-import { expectFileToMatch, writeFile, appendToFile } from '../../utils/fs';
+import { expectFileToMatch, writeFile } from '../../utils/fs';
 import { exec, ng, silentNpm } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { readNgVersion } from '../../utils/version';
 
 export default async function () {
-  // Skip this test in Angular 2/4.
-  if (getGlobalVariable('argv').ng2 || getGlobalVariable('argv').ng4) {
-    return;
-  }
+  const argv = getGlobalVariable('argv');
+  const veEnabled = argv['ve'];
 
   await ng('add', '@nguniversal/express-engine', '--client-project', 'test-project');
 
@@ -21,28 +19,43 @@ export default async function () {
   });
 
   await silentNpm('install');
-  await appendToFile(
-    'src/main.server.ts',
-    `export { renderModuleFactory } from '@angular/platform-server';`,
-  );
+  if (veEnabled) {
+    await replaceInFile('src/main.server.ts', /renderModule/g, 'renderModuleFactory');
+    await writeFile(
+      './index.js',
+      ` require('zone.js/dist/zone-node');
+        const fs = require('fs');
+        const { AppServerModuleNgFactory, renderModuleFactory } = require('./dist/server/main');
+  
+        renderModuleFactory(AppServerModuleNgFactory, {
+          url: '/',
+          document: '<app-root></app-root>'
+        }).then(html => {
+          fs.writeFileSync('dist/server/index.html', html);
+        });
+        `,
+    );
+  } else {
+    await writeFile(
+      './index.js',
+      ` require('zone.js/dist/zone-node');
+        const fs = require('fs');
+        const { AppServerModule, renderModule } = require('./dist/server/main');
+  
+        renderModule(AppServerModule, {
+          url: '/',
+          document: '<app-root></app-root>'
+        }).then(html => {
+          fs.writeFileSync('dist/server/index.html', html);
+        });
+        `,
+    );
+  }
 
-  await writeFile(
-    './index.js',
-    ` require('zone.js/dist/zone-node');
-      const fs = require('fs');
-      const { AppServerModuleNgFactory, renderModuleFactory } = require('./dist/server/main');
-
-      renderModuleFactory(AppServerModuleNgFactory, {
-        url: '/',
-        document: '<app-root></app-root>'
-      }).then(html => {
-        fs.writeFileSync('dist/server/index.html', html);
-      });
-      `,
-  );
 
   await ng('run', 'test-project:server:production');
-  await expectFileToMatch('dist/server/main.js', /exports.*AppServerModuleNgFactory/);
+
+  await expectFileToMatch('dist/server/main.js', veEnabled ? /exports.*AppServerModuleNgFactory/ : /exports.*AppServerModule/);
   await exec(normalize('node'), 'index.js');
   await expectFileToMatch(
     'dist/server/index.html',
