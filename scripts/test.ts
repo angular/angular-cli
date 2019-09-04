@@ -8,7 +8,7 @@
 // tslint:disable:no-console
 // tslint:disable:no-implicit-dependencies
 import { logging } from '@angular-devkit/core';
-import { spawnSync } from 'child_process';
+import { execSync, spawnSync } from 'child_process';
 import * as glob from 'glob';
 import 'jasmine';
 import { SpecReporter as JasmineSpecReporter } from 'jasmine-spec-reporter';
@@ -23,8 +23,6 @@ const knownFlakes = [
   // Rebuild tests in test-large are flakey if not run as the first suite.
   // https://github.com/angular/angular-cli/pull/15204
   'packages/angular_devkit/build_angular/test/browser/rebuild_spec_large.ts',
-  // This is flaky with NGCC
-  'packages/angular_devkit/build_angular/test/karma/selected_spec_large.ts',
 ];
 
 const projectBaseDir = join(__dirname, '..');
@@ -94,6 +92,10 @@ export default function(args: ParsedArgs, logger: logging.Logger) {
   if (args['ve']) {
     // tslint:disable-next-line:no-console
     console.warn('********* VE Enabled ***********');
+  } else if (args.shard !== undefined) {
+    // CI is really flaky with NGCC
+    // This is a working around test order and isolation issues.
+    execSync('./node_modules/.bin/ivy-ngcc', { stdio: 'inherit' });
   }
 
   if (args.large) {
