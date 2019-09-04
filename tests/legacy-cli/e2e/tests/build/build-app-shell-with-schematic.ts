@@ -22,4 +22,7 @@ export default async function () {
   await silentNpm('install');
   await ng('run', 'test-project:app-shell');
   await expectFileToMatch('dist/test-project/index.html', /app-shell works!/);
+
+  await ng('run', 'test-project:app-shell:production');
+  await expectFileToMatch('dist/test-project/index.html', /app-shell works!/);
 }
