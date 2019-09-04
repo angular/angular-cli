@@ -10,6 +10,7 @@ import { Architect } from '@angular-devkit/architect';
 import { getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core';
 import { take, tap } from 'rxjs/operators';
 import { BrowserBuilderOutput } from '../../src/browser';
+import { BundleDependencies } from '../../src/server/schema';
 import { createArchitect, host, veEnabled } from '../utils';
 
 
@@ -85,6 +86,7 @@ describe('Server Builder', () => {
     });
 
     const run = await architect.scheduleTarget(target, {
+      bundleDependencies: BundleDependencies.None,
       sourceMap: {
         styles: false,
         scripts: true,
@@ -103,9 +105,10 @@ describe('Server Builder', () => {
 
     await run.stop();
   });
-  //
+
   it('supports component styles sourcemaps', async () => {
     const overrides = {
+      bundleDependencies: BundleDependencies.None,
       sourceMap: {
         styles: true,
         scripts: true,

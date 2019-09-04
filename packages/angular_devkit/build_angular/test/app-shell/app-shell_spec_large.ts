@@ -9,12 +9,9 @@
 import { Architect } from '@angular-devkit/architect/src/architect';
 import { getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core';
 import * as express from 'express'; // tslint:disable-line:no-implicit-dependencies
-import { createArchitect, host, veEnabled } from '../utils';
+import { createArchitect, host } from '../utils';
 
-
-// DISABLED_FOR_IVY   These should pass but are currently not supported
-// See https://github.com/angular/angular-cli/issues/15383 for details.
-(veEnabled ? describe : xdescribe)('AppShell Builder', () => {
+describe('AppShell Builder', () => {
   const target = { project: 'app', target: 'app-shell' };
   let architect: Architect;
 

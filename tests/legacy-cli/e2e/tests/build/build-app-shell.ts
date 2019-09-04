@@ -6,13 +6,7 @@ import { updateJsonFile } from '../../utils/project';
 import { readNgVersion } from '../../utils/version';
 
 export default function() {
-  // Skip this test in Angular 2/4.
-  if (getGlobalVariable('argv').ng2 || getGlobalVariable('argv').ng4) {
-    return Promise.resolve();
-  }
-
   let platformServerVersion = readNgVersion();
-  let httpVersion = readNgVersion();
 
   if (getGlobalVariable('argv')['ng-snapshots']) {
     platformServerVersion = 'github:angular/platform-server-builds';
@@ -78,6 +72,7 @@ export default function() {
       }
 
       export { AppServerModule } from './app/app.server.module';
+      export { renderModule${veProject ? 'Factory' : ''} } from '@angular/platform-server';
     `,
       ),
     )
