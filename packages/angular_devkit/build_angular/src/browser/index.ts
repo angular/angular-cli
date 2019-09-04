@@ -473,6 +473,11 @@ export function buildWebpackBrowser(
 
               for (const action of cacheActions) {
                 fs.copyFileSync(action.src, action.dest, fs.constants.COPYFILE_FICLONE);
+                if (process.platform !== 'win32') {
+                  // The cache writes entries as readonly and when using copyFile the permissions will also be copied.
+                  // See: https://github.com/npm/cacache/blob/073fbe1a9f789ba42d9a41de7b8429c93cf61579/lib/util/move-file.js#L36
+                  fs.chmodSync(action.dest, 0o644);
+                }
               }
 
               if (processActions.length > 0) {
