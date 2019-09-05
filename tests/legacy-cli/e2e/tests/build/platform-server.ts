@@ -20,13 +20,12 @@ export default async function () {
 
   await silentNpm('install');
   if (veEnabled) {
-    await replaceInFile('src/main.server.ts', /renderModule/g, 'renderModuleFactory');
     await writeFile(
       './index.js',
       ` require('zone.js/dist/zone-node');
         const fs = require('fs');
         const { AppServerModuleNgFactory, renderModuleFactory } = require('./dist/server/main');
-  
+
         renderModuleFactory(AppServerModuleNgFactory, {
           url: '/',
           document: '<app-root></app-root>'
@@ -41,7 +40,7 @@ export default async function () {
       ` require('zone.js/dist/zone-node');
         const fs = require('fs');
         const { AppServerModule, renderModule } = require('./dist/server/main');
-  
+
         renderModule(AppServerModule, {
           url: '/',
           document: '<app-root></app-root>'

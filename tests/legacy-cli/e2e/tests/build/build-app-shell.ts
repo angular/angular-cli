@@ -72,7 +72,7 @@ export default function() {
       }
 
       export { AppServerModule } from './app/app.server.module';
-      export { renderModule${veProject ? 'Factory' : ''} } from '@angular/platform-server';
+      export { renderModule, renderModuleFactory } from '@angular/platform-server';
     `,
       ),
     )
