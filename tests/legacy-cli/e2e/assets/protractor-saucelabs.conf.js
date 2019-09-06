@@ -101,6 +101,9 @@ exports.config = {
     },
   ],
 
+  // Only allow one session at a time to prevent over saturation of Saucelabs sessions.
+  maxSessions: 1,
+
   baseUrl: 'http://localhost:2000/',
   framework: 'jasmine',
   jasmineNodeOpts: {
