@@ -73,6 +73,11 @@ function addDependenciesAndScripts(options: UniversalOptions): Rule {
       name: 'express',
       version: 'EXPRESS_VERSION',
     });
+    addPackageJsonDependency(host, {
+      type: NodeDependencyType.Dev,
+      name: '@types/express',
+      version: 'EXPRESS_TYPES_VERSION',
+    });
 
     if (options.webpack) {
       addPackageJsonDependency(host, {
