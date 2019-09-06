@@ -44,6 +44,11 @@
       "version": "9.0.0-beta.0",
       "factory": "./update-9",
       "description": "Update an Angular CLI project to version 9."
+    },
+    "migration-10": {
+      "version": "9.0.0-next.6",
+      "factory": "./update-8/#updateLazyModulePaths",
+      "description": "Update lazy loading syntax to use dynamic imports."
     }
   }
 }
