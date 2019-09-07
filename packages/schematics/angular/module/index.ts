@@ -115,7 +115,12 @@ function addRouteDeclarationToNgModule(
 function getRoutingModulePath(host: Tree, options: ModuleOptions): Path | undefined {
   let path: Path | undefined;
   const modulePath = options.module as string;
-  const routingModuleName = modulePath.split('.')[0] + '-routing';
+  let routingModuleName = modulePath.split('.')[0] + '-routing';
+  // Fix routingModuleName 
+  // i.e. `/src/app/module/module-routing.module.ts` -> `/module/module-routing.module.ts`
+  if (options.path) {
+    routingModuleName = routingModuleName.replace(options.path, '');
+  }
   const { module, ...rest } = options;
 
   try {
