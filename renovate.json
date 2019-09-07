@@ -40,6 +40,13 @@
       "groupName": "angular",
       "pinVersions": false
     },
+   {
+      "packagePatterns": [
+        "^@babel\/.*"
+      ],
+      "groupName": "Babel",
+      "pinVersions": false
+    },
     {
       "packagePatterns": [
         "^@bazel\/.*",
