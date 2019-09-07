@@ -11,7 +11,7 @@
     "@angular-devkit/build-optimizer": "0.0.0",
     "@angular-devkit/build-webpack": "0.0.0",
     "@angular-devkit/core": "0.0.0",
-    "@babel/core": "7.5.5",
+    "@babel/core": "7.6.0",
     "@babel/preset-env": "7.5.5",
     "@ngtools/webpack": "0.0.0",
     "ajv": "6.10.2",
