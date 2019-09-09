@@ -24,7 +24,8 @@
     "test": {
       "type": "string",
       "format": "path",
-      "description": "The name of the test entry-point file."
+      "description": "The name of the test entry-point file.",
+      "x-deprecated": "This option has no effect."
     },
     "tsconfigFileName": {
       "type": "string",
@@ -35,7 +36,8 @@
       "type": "string",
       "format": "path",
       "description": "The name of the TypeScript configuration file for tests.",
-      "default": "tsconfig.spec"
+      "default": "tsconfig.spec",
+      "x-deprecated": "This option has no effect."
     },
     "appDir": {
       "type": "string",
