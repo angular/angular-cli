@@ -25,17 +25,6 @@ describe('Universal Schematic', () => {
     schematicRunner = new SchematicTestRunner('schematics', collectionPath);
   });
 
-  it('should add dependency: @nguniversal/module-map-ngfactory-loader',
-     async () => {
-       const tree = await schematicRunner
-                        .runSchematicAsync('ng-add', defaultOptions, appTree)
-                        .toPromise();
-       const filePath = '/package.json';
-       const contents = tree.readContent(filePath);
-       expect(contents).toMatch(
-           /\"@nguniversal\/module-map-ngfactory-loader\": \"/);
-     });
-
   it('should add dependency: @nguniversal/hapi-engine', async () => {
     const tree = await schematicRunner
                      .runSchematicAsync('ng-add', defaultOptions, appTree)
@@ -116,15 +105,6 @@ describe('Universal Schematic', () => {
     expect(contents).toMatch('');
   });
 
-  it('should add module map loader to server module imports', async () => {
-    const tree =
-        await schematicRunner.runSchematicAsync('ng-add', defaultOptions, appTree)
-            .toPromise();
-    const filePath = '/projects/bar/src/app/app.server.module.ts';
-    const contents = tree.readContent(filePath);
-    expect(contents).toContain('ModuleMapLoaderModule');
-  });
-
   it('should add exports to main server file', async () => {
     const tree = await schematicRunner
       .runSchematicAsync('ng-add', defaultOptions, appTree)
@@ -132,7 +112,6 @@ describe('Universal Schematic', () => {
     const filePath = '/projects/bar/src/main.server.ts';
     const contents = tree.readContent(filePath);
     expect(contents).toContain('ngHapiEngine');
-    expect(contents).toContain('provideModuleMap');
   });
 
   it('should update angular.json', async () => {
@@ -142,8 +121,8 @@ describe('Universal Schematic', () => {
     const contents = JSON.parse(tree.readContent('angular.json'));
     const architect = contents.projects.bar.architect;
     expect(architect.build.configurations.production).toBeDefined();
-    expect(architect.build.options.outputPath).toBe('dist/browser');
-    expect(architect.server.options.outputPath).toBe('dist/server');
+    expect(architect.build.options.outputPath).toBe('dist/bar/browser');
+    expect(architect.server.options.outputPath).toBe('dist/bar/server');
 
     const productionConfig = architect.server.configurations.production;
     expect(productionConfig.fileReplacements).toBeDefined();

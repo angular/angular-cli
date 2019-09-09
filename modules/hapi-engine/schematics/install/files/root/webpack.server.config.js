@@ -9,9 +9,9 @@ module.exports = {
     // This is our Hapi server for Dynamic universal
     server: './<%= stripTsExtension(serverFileName) %>.ts'
   },
-  externals: {
-    './<%= getServerDistDirectory() %>/main': 'require("./server/main")'
-  },
+  externals: [
+    './<%= getServerDistDirectory() %>/main'
+  ],
   target: 'node',
   resolve: { extensions: ['.ts', '.js'] },
   optimization: {

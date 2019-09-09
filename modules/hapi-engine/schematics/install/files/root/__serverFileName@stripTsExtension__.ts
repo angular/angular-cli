@@ -29,18 +29,15 @@ const server = new Server({ port: PORT, host: 'localhost' });
 const DIST_FOLDER = join(process.cwd(), 'dist');
 
 // * NOTE :: leave this as require() since this file is built Dynamically from webpack
-const {AppServerModuleNgFactory, LAZY_MODULE_MAP, ngHapiEngine, provideModuleMap} = require('./<%= clientProject %>-server/main');
+const {AppServerModule, ngHapiEngine} = require('./<%= getServerDistDirectory() %>/main');
 
 server.route({
   method: 'GET',
   path: '*',
   handler: (req: Request) =>
     ngHapiEngine({
-      bootstrap: AppServerModuleNgFactory,
+      bootstrap: AppServerModule,
       req,
-      providers: [
-        provideModuleMap(LAZY_MODULE_MAP)
-      ]
     })
 });
 
