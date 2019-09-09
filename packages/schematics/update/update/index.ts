@@ -717,6 +717,7 @@ function _addPeerDependencies(
   packages: Map<string, VersionRange>,
   allDependencies: ReadonlyMap<string, VersionRange>,
   npmPackageJson: NpmRepositoryPackageJson,
+  npmPackageJsonMap: Map<string, NpmRepositoryPackageJson>,
   logger: logging.LoggerApi,
 ): void {
   const maybePackage = packages.get(npmPackageJson.name);
@@ -737,9 +738,19 @@ function _addPeerDependencies(
   const error = false;
 
   for (const [peer, range] of Object.entries(packageJson.peerDependencies || {})) {
-    if (!packages.has(peer)) {
-      packages.set(peer, range as VersionRange);
+    if (packages.has(peer)) {
+      continue;
     }
+
+    const peerPackageJson = npmPackageJsonMap.get(peer);
+    if (peerPackageJson) {
+      const peerInfo = _buildPackageInfo(tree, packages, allDependencies, peerPackageJson, logger);
+      if (semver.satisfies(peerInfo.installed.version, range)) {
+        continue;
+      }
+    }
+
+    packages.set(peer, range as VersionRange);
   }
 
   if (error) {
@@ -860,7 +871,7 @@ export default function(options: UpdateSchema): Rule {
           lastPackagesSize = packages.size;
           npmPackageJsonMap.forEach((npmPackageJson) => {
             _addPackageGroup(tree, packages, allDependencies, npmPackageJson, logger);
-            _addPeerDependencies(tree, packages, allDependencies, npmPackageJson, logger);
+            _addPeerDependencies(tree, packages, allDependencies, npmPackageJson, npmPackageJsonMap, logger);
           });
         } while (packages.size > lastPackagesSize);
 
