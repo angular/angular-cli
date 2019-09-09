@@ -23,7 +23,7 @@ import {
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { addImportToModule, addRouteDeclarationToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
-import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
+import { MODULE_EXT, ROUTING_MODULE_EXT, buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { createDefaultPath } from '../utility/workspace';
@@ -112,17 +112,12 @@ function addRouteDeclarationToNgModule(
   };
 }
 
-function getRoutingModulePath(host: Tree, options: ModuleOptions): Path | undefined {
-  let path: Path | undefined;
-  const modulePath = options.module as string;
-  const routingModuleName = modulePath.split('.')[0] + '-routing';
-  const { module, ...rest } = options;
+function getRoutingModulePath(host: Tree, modulePath: string): Path | undefined {
+  const routingModulePath = modulePath.endsWith(ROUTING_MODULE_EXT)
+    ? modulePath
+    : modulePath.replace(MODULE_EXT, ROUTING_MODULE_EXT);
 
-  try {
-    path = findModuleFromOptions(host, { module: routingModuleName, ...rest });
-  } catch {}
-
-  return path;
+  return host.exists(routingModulePath) ? normalize(routingModulePath) : undefined;
 }
 
 function buildRoute(options: ModuleOptions, modulePath: string) {
@@ -143,16 +138,16 @@ export default function (options: ModuleOptions): Rule {
       options.module = findModuleFromOptions(host, options);
     }
 
-    const parsedPath = parseName(options.path, options.name);
-    options.name = parsedPath.name;
-    options.path = parsedPath.path;
-
     let routingModulePath: Path | undefined;
     const isLazyLoadedModuleGen = options.route && options.module;
     if (isLazyLoadedModuleGen) {
       options.routingScope = RoutingScope.Child;
-      routingModulePath = getRoutingModulePath(host, options);
+      routingModulePath = getRoutingModulePath(host, options.module as string);
     }
+
+    const parsedPath = parseName(options.path, options.name);
+    options.name = parsedPath.name;
+    options.path = parsedPath.path;
 
     const templateSource = apply(url('./files'), [
       options.routing || isLazyLoadedModuleGen && !!routingModulePath
