@@ -374,6 +374,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         sourceMap: scriptsSourceMap,
         parallel: true,
         cache: true,
+        extractComments: false,
         terserOptions,
       }),
     );
