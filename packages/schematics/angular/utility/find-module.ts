@@ -26,8 +26,8 @@ export interface ModuleOptions {
   routingModuleExt?: string;
 }
 
-const MODULE_EXT = '.module.ts';
-const ROUTING_MODULE_EXT = '-routing.module.ts';
+export const MODULE_EXT = '.module.ts';
+export const ROUTING_MODULE_EXT = '-routing.module.ts';
 
 /**
  * Find the module referred by a set of options passed to the schematics.
