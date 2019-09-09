@@ -40,12 +40,10 @@ export interface PackageManifest {
   peerDependencies: PackageDependencies;
   optionalDependencies: PackageDependencies;
 
-  'ng-add'?: {
-
-  };
+  'ng-add'?: {};
   'ng-update'?: {
-    migrations: string,
-    packageGroup: { [name: string]: string },
+    migrations: string;
+    packageGroup: { [name: string]: string };
   };
 }
 
@@ -61,12 +59,12 @@ function ensureNpmrc(logger: logging.LoggerApi, usingYarn: boolean, verbose: boo
   if (!npmrc) {
     try {
       npmrc = readOptions(logger, false, verbose);
-    } catch { }
+    } catch {}
 
     if (usingYarn) {
       try {
         npmrc = { ...npmrc, ...readOptions(logger, true, verbose) };
-      } catch { }
+      } catch {}
     }
   }
 }
@@ -95,9 +93,7 @@ function readOptions(
     (!yarn && process.env.NPM_CONFIG_USERCONFIG) || path.join(homedir(), dotFilename),
   ];
 
-  const projectConfigLocations: string[] = [
-    path.join(cwd, dotFilename),
-  ];
+  const projectConfigLocations: string[] = [path.join(cwd, dotFilename)];
   const root = path.parse(cwd).root;
   for (let curDir = path.dirname(cwd); curDir && curDir !== root; curDir = path.dirname(curDir)) {
     projectConfigLocations.unshift(path.join(curDir, dotFilename));
@@ -125,7 +121,7 @@ function readOptions(
         delete options.cafile;
         try {
           options.ca = readFileSync(cafile, 'utf8').replace(/\r?\n/, '\\n');
-        } catch { }
+        } catch {}
       }
     } else if (showPotentials) {
       logger.info(`Trying '${location}'...not found.`);
@@ -151,7 +147,7 @@ function normalizeManifest(rawManifest: {}): PackageManifest {
     peerDependencies: {},
     optionalDependencies: {},
     // tslint:disable-next-line:no-any
-    ...rawManifest as any,
+    ...(rawManifest as any),
   };
 }
 
@@ -173,14 +169,11 @@ export async function fetchPackageMetadata(
 
   ensureNpmrc(logger, usingYarn, verbose);
 
-  const response = await pacote.packument(
-    name,
-    {
-      'full-metadata': true,
-      ...npmrc,
-      ...(registry ? { registry } : {}),
-    },
-  );
+  const response = await pacote.packument(name, {
+    'full-metadata': true,
+    ...npmrc,
+    ...(registry ? { registry } : {}),
+  });
 
   // Normalize the response
   const metadata: PackageMetadata = {
@@ -227,14 +220,11 @@ export async function fetchPackageManifest(
 
   ensureNpmrc(logger, usingYarn, verbose);
 
-  const response = await pacote.manifest(
-    name,
-    {
-      'full-metadata': true,
-      ...npmrc,
-      ...(registry ? { registry } : {}),
-    },
-  );
+  const response = await pacote.manifest(name, {
+    'full-metadata': true,
+    ...npmrc,
+    ...(registry ? { registry } : {}),
+  });
 
   return normalizeManifest(response);
 }
