@@ -18,21 +18,21 @@ export interface PackageTreeNodeBase {
     dependencies?: Record<string, string>;
     devDependencies?: Record<string, string>;
     peerDependencies?: Record<string, string>;
+    optionalDependencies?: Record<string, string>;
     'ng-update'?: {
       migrations?: string;
     };
   };
+  parent?: PackageTreeNode;
   children: PackageTreeNode[];
 }
 
 export interface PackageTreeActual extends PackageTreeNodeBase {
   isLink: false;
-  parent?: PackageTreeActual;
 }
 
 export interface PackageTreeLink extends PackageTreeNodeBase {
   isLink: true;
-  parent: null;
   target: PackageTreeActual;
 }
 
@@ -52,25 +52,35 @@ export function readPackageTree(path: string): Promise<PackageTreeNode> {
   });
 }
 
-export function findNodeDependencies(root: PackageTreeNode, node = root) {
-  const actual = node.isLink ? node.target : node;
+export interface NodeDependency {
+  version: string;
+  node?: PackageTreeNode;
+}
 
+export function findNodeDependencies(node: PackageTreeNode) {
   const rawDeps: Record<string, string> = {
-    ...actual.package.dependencies,
-    ...actual.package.devDependencies,
-    ...actual.package.peerDependencies,
+    ...node.package.dependencies,
+    ...node.package.devDependencies,
+    ...node.package.peerDependencies,
+    ...node.package.optionalDependencies,
   };
 
   return Object.entries(rawDeps).reduce(
     (deps, [name, version]) => {
-      const depNode = root.children.find(child => {
-        return child.name === name && !child.isLink && child.parent === node;
-      }) as PackageTreeActual | undefined;
+      let dependencyNode;
+      let parent: PackageTreeNode | undefined | null = node;
+      while (!dependencyNode && parent) {
+        dependencyNode = parent.children.find(child => child.name === name);
+        parent = parent.parent;
+      }
 
-      deps[name] = depNode || version;
+      deps[name] = {
+        node: dependencyNode,
+        version,
+      };
 
       return deps;
     },
-    {} as Record<string, string | PackageTreeActual | undefined>,
+    Object.create(null) as Record<string, NodeDependency>,
   );
 }
