@@ -32,7 +32,7 @@ def ts_library(tsconfig = None, deps = [], testonly = False, **kwargs):
         **kwargs
     )
 
-NG_VERSION = "^8.0.0"
+NG_VERSION = "^9.0.0-next.5"
 RXJS_VERSION = "^6.4.0"
 HAPI_VERSION = "^17.0.0"
 EXPRESS_VERSION = "^4.15.2"
@@ -87,11 +87,14 @@ def ts_test_library(deps = [], tsconfig = None, **kwargs):
         **kwargs
     )
 
-def ng_module(tsconfig = None, testonly = False, deps = [], **kwargs):
+def ng_module(name, tsconfig = None, testonly = False, deps = [], bundle_dts = True, **kwargs):
     deps = deps + ["@npm//tslib", "@npm//@types/node"]
     if not tsconfig:
         tsconfig = _getDefaultTsConfig(testonly)
     _ng_module(
+        name = name,
+        flat_module_out_file = name,
+        bundle_dts = bundle_dts,
         tsconfig = tsconfig,
         testonly = testonly,
         deps = deps,

@@ -13,6 +13,7 @@
     "moduleResolution": "node"
   },
   "angularCompilerOptions": {
+    "enableIvy": false,
     "enableSummariesForJit": true
   },
   "include": [

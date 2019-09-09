@@ -76,27 +76,27 @@
     "bazel": "bazel"
   },
   "dependencies": {
-    "@angular/animations": "^8.1.0",
-    "@angular/common": "^8.1.0",
-    "@angular/compiler": "^8.1.0",
-    "@angular/compiler-cli": "^8.1.0",
-    "@angular/core": "^8.1.0",
-    "@angular/platform-browser": "^8.1.0",
-    "@angular/platform-browser-dynamic": "^8.1.0",
-    "@angular/platform-server": "^8.1.0",
+    "@angular/animations": "^9.0.0-next.5",
+    "@angular/common": "^9.0.0-next.5",
+    "@angular/compiler": "^9.0.0-next.5",
+    "@angular/compiler-cli": "^9.0.0-next.5",
+    "@angular/core": "^9.0.0-next.5",
+    "@angular/platform-browser": "^9.0.0-next.5",
+    "@angular/platform-browser-dynamic": "^9.0.0-next.5",
+    "@angular/platform-server": "^9.0.0-next.5",
     "rxjs": "^6.4.0",
-    "typescript": "^3.4.0"
+    "typescript": "~3.5.3"
   },
   "devDependencies": {
-    "@angular/bazel": "^8.1.0",
-    "@bazel/bazel": "^0.27.0",
+    "@angular/bazel": "^9.0.0-next.5",
+    "@bazel/bazel": "0.28.1",
     "@bazel/buildifier": "^0.25.1",
     "@bazel/hide-bazel-files": "^0.32.2",
     "@bazel/ibazel": "^0.10.3",
     "@bazel/jasmine": "^0.32.2",
     "@bazel/karma": "^0.32.2",
     "@bazel/typescript": "^0.32.2",
-    "@schematics/angular": "^8.0.0-rc.4",
+    "@schematics/angular": "^9.0.0-next.3",
     "@types/express": "^4.0.39",
     "@types/fs-extra": "^4.0.5",
     "@types/hapi": "^17.0.12",
@@ -136,6 +136,6 @@
     "uglify-js": "^2.8.14",
     "xhr2": "^0.1.4",
     "yarn": "^1.10.1",
-    "zone.js": "^0.9.1"
+    "zone.js": "^0.10.2"
   }
 }

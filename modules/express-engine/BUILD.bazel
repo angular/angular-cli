@@ -39,6 +39,7 @@ ng_module(
     srcs = glob([
         "testing/**/*.ts",
     ]),
+    module_name = "@nguniversal/express-engine/testing",
     deps = [
         ":express-engine",
         "@npm//@angular/platform-browser",

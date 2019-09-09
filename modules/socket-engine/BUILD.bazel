@@ -34,6 +34,7 @@ ng_module(
     srcs = glob([
         "testing/**/*.ts",
     ]),
+    module_name = "@nguniversal/socket-engine/testing",
     deps = [
         "@npm//@angular/platform-browser",
         "@npm//@angular/platform-server",

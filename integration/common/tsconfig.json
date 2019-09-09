@@ -1,9 +1,9 @@
 {
   "angularCompilerOptions": {
+    "enableIvy": false,
     "annotationsAs": "static fields",
     "annotateForClosureCompiler": true
   },
-
   "compilerOptions": {
     "module": "es2015",
     "moduleResolution": "node",
