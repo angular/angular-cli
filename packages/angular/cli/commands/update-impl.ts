@@ -20,13 +20,10 @@ import { getPackageManager } from '../utilities/package-manager';
 import {
   PackageIdentifier,
   PackageManifest,
+  PackageMetadata,
   fetchPackageMetadata,
 } from '../utilities/package-metadata';
-import {
-  PackageTreeActual,
-  findNodeDependencies,
-  readPackageTree,
-} from '../utilities/package-tree';
+import { PackageTreeNode, findNodeDependencies, readPackageTree } from '../utilities/package-tree';
 import { Schema as UpdateCommandSchema } from './update';
 
 const npa = require('npm-package-arg');
@@ -311,26 +308,26 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       }
 
       const packageName = packages[0].name;
-      let packageNode = rootDependencies[packageName];
-      if (typeof packageNode === 'string') {
+      const packageDependency = rootDependencies[packageName];
+      let packageNode = packageDependency && packageDependency.node;
+      if (packageDependency && !packageNode) {
         this.logger.error('Package found in package.json but is not installed.');
 
         return 1;
-      } else if (!packageNode) {
+      } else if (!packageDependency) {
         // Allow running migrations on transitively installed dependencies
         // There can technically be nested multiple versions
         // TODO: If multiple, this should find all versions and ask which one to use
         const child = packageTree.children.find(c => c.name === packageName);
         if (child) {
-          // A link represents a symlinked package so use the actual in this case
-          packageNode = child.isLink ? child.target : child;
+          packageNode = child;
         }
+      }
 
-        if (!packageNode) {
-          this.logger.error('Package is not installed.');
+      if (!packageNode) {
+        this.logger.error('Package is not installed.');
 
-          return 1;
-        }
+        return 1;
       }
 
       const updateMetadata = packageNode.package['ng-update'];
@@ -399,12 +396,12 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
 
     const requests: {
       identifier: PackageIdentifier;
-      node: PackageTreeActual | string;
+      node: PackageTreeNode | string;
     }[] = [];
 
     // Validate packages actually are part of the workspace
     for (const pkg of packages) {
-      const node = rootDependencies[pkg.name];
+      const node = rootDependencies[pkg.name] && rootDependencies[pkg.name].node;
       if (!node) {
         this.logger.error(`Package '${pkg.name}' is not a dependency.`);
 
