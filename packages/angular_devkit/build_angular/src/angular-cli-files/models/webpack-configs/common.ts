@@ -18,6 +18,7 @@ import {
   Configuration,
   ContextReplacementPlugin,
   HashedModuleIdsPlugin,
+  compilation,
   debug,
 } from 'webpack';
 import { RawSource } from 'webpack-sources';
@@ -146,34 +147,34 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing || 'none');
 
   // process global scripts
-  if (buildOptions.scripts.length > 0) {
-    const globalScriptsByBundleName = normalizeExtraEntryPoints(
-      buildOptions.scripts,
-      'scripts',
-    ).reduce((prev: { bundleName: string; paths: string[]; inject: boolean }[], curr) => {
-      const bundleName = curr.bundleName;
-      const resolvedPath = path.resolve(root, curr.input);
-      const existingEntry = prev.find(el => el.bundleName === bundleName);
-      if (existingEntry) {
-        if (existingEntry.inject && !curr.inject) {
-          // All entries have to be lazy for the bundle to be lazy.
-          throw new Error(
-            `The ${curr.bundleName} bundle is mixing injected and non-injected scripts.`,
-          );
-        }
-
-        existingEntry.paths.push(resolvedPath);
-      } else {
-        prev.push({
-          bundleName,
-          paths: [resolvedPath],
-          inject: curr.inject,
-        });
+  const globalScriptsByBundleName = normalizeExtraEntryPoints(
+    buildOptions.scripts,
+    'scripts',
+  ).reduce((prev: { bundleName: string; paths: string[]; inject: boolean }[], curr) => {
+    const bundleName = curr.bundleName;
+    const resolvedPath = path.resolve(root, curr.input);
+    const existingEntry = prev.find(el => el.bundleName === bundleName);
+    if (existingEntry) {
+      if (existingEntry.inject && !curr.inject) {
+        // All entries have to be lazy for the bundle to be lazy.
+        throw new Error(
+          `The ${curr.bundleName} bundle is mixing injected and non-injected scripts.`,
+        );
       }
 
-      return prev;
-    }, []);
+      existingEntry.paths.push(resolvedPath);
+    } else {
+      prev.push({
+        bundleName,
+        paths: [resolvedPath],
+        inject: curr.inject,
+      });
+    }
 
+    return prev;
+  }, []);
+
+  if (globalScriptsByBundleName.length > 0) {
     // Add a new asset for each entry.
     globalScriptsByBundleName.forEach(script => {
       // Lazy scripts don't get a hash, otherwise they can't be loaded by name.
@@ -321,8 +322,8 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
 
     if (buildOptions.aot) {
       // Also try to load AOT-only global definitions.
-      const GLOBAL_DEFS_FOR_TERSER_WITH_AOT =
-        require('@angular/compiler-cli').GLOBAL_DEFS_FOR_TERSER_WITH_AOT;
+      const GLOBAL_DEFS_FOR_TERSER_WITH_AOT = require('@angular/compiler-cli')
+        .GLOBAL_DEFS_FOR_TERSER_WITH_AOT;
       if (GLOBAL_DEFS_FOR_TERSER_WITH_AOT) {
         angularGlobalDefinitions = {
           ...angularGlobalDefinitions,
@@ -332,17 +333,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     }
 
     const terserOptions = {
-      // Use 5 if using bundle downleveling to ensure script bundles do not use ES2015+ features
-      // Script bundles are shared for differential loading
-      // Bundle processing will use the ES2015+ optimizations on the ES2015 bundles
-      ecma:
-        wco.supportES2015 &&
-        (!differentialLoadingNeeded || (differentialLoadingNeeded && fullDifferential))
-          ? 6
-          : 5,
       warnings: !!buildOptions.verbose,
       safari10: true,
       output: {
+        ecma: wco.supportES2015 ? 6 : 5,
         comments: false,
         webkit: true,
       },
@@ -351,10 +345,12 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       compress:
         buildOptions.platform == 'server'
           ? {
+              ecma: wco.supportES2015 ? 6 : 5,
               global_defs: angularGlobalDefinitions,
               keep_fnames: true,
             }
           : {
+              ecma: wco.supportES2015 ? 6 : 5,
               pure_getters: buildOptions.buildOptimizer,
               // PURE comments work best with 3 passes.
               // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
@@ -375,7 +371,31 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         parallel: true,
         cache: true,
         extractComments: false,
+        chunkFilter: (chunk: compilation.Chunk) =>
+          !globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
         terserOptions,
+      }),
+      // Script bundles are fully optimized here in one step since they are never downleveled.
+      // They are shared between ES2015 & ES5 outputs so must support ES5.
+      new TerserPlugin({
+        sourceMap: scriptsSourceMap,
+        parallel: true,
+        cache: true,
+        extractComments: false,
+        chunkFilter: (chunk: compilation.Chunk) =>
+          globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
+        terserOptions: {
+          ...terserOptions,
+          compress: {
+            ...terserOptions.compress,
+            ecma: 5,
+          },
+          output: {
+            ...terserOptions.output,
+            ecma: 5,
+          },
+          mangle: !manglingDisabled && buildOptions.platform !== 'server',
+        },
       }),
     );
   }
