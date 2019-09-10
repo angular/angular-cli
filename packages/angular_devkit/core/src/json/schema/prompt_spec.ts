@@ -262,7 +262,7 @@ describe('Prompt Provider', () => {
         .toPromise().then(done, done.fail);
     });
 
-    it('analyzes list with multiselect option and object items', done => {
+    it('analyzes list with true multiselect option and object items', done => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
 
@@ -301,6 +301,45 @@ describe('Prompt Provider', () => {
         .toPromise().then(done, done.fail);
     });
 
+    it('analyzes list with false multiselect option and object items', done => {
+      const registry = new CoreSchemaRegistry();
+      const data: any = {};
+
+      registry.usePromptProvider(async definitions => {
+        expect(definitions.length).toBe(1);
+        expect(definitions[0].type).toBe('list');
+        expect(definitions[0].multiselect).toBe(false);
+        expect(definitions[0].items).toEqual([
+          { 'value': 'one', 'label': 'one' },
+          { 'value': 'two', 'label': 'two' },
+        ]);
+
+        return { [definitions[0].id]: { 'value': 'one', 'label': 'one' } };
+      });
+
+      registry
+        .compile({
+          properties: {
+            test: {
+              type: 'array',
+              'x-prompt': {
+                'type': 'list',
+                'multiselect': false,
+                'items': [
+                  { 'value': 'one', 'label': 'one' },
+                  { 'value': 'two', 'label': 'two' },
+                ],
+                'message': 'test-message',
+              },
+            },
+          },
+        })
+        .pipe(
+          mergeMap(validator => validator(data)),
+        )
+        .toPromise().then(done, done.fail);
+    });
+
     it('analyzes list without multiselect option and object items', done => {
       const registry = new CoreSchemaRegistry();
       const data: any = {};
@@ -308,7 +347,7 @@ describe('Prompt Provider', () => {
       registry.usePromptProvider(async definitions => {
         expect(definitions.length).toBe(1);
         expect(definitions[0].type).toBe('list');
-        expect(definitions[0].multiselect).toBeUndefined();
+        expect(definitions[0].multiselect).toBe(true);
         expect(definitions[0].items).toEqual([
           { 'value': 'one', 'label': 'one' },
           { 'value': 'two', 'label': 'two' },
@@ -346,6 +385,7 @@ describe('Prompt Provider', () => {
       registry.usePromptProvider(async definitions => {
         expect(definitions.length).toBe(1);
         expect(definitions[0].type).toBe('list');
+        expect(definitions[0].multiselect).toBeFalsy();
         expect(definitions[0].items).toEqual([
           'one',
           'two',
@@ -368,6 +408,45 @@ describe('Prompt Provider', () => {
               'x-prompt': {
                 'message': 'test-message',
               },
+            },
+          },
+        })
+        .pipe(
+          mergeMap(validator => validator(data)),
+        )
+        .toPromise().then(done, done.fail);
+    });
+
+    it('analyzes enums WITHOUT explicit list type and multiselect', done => {
+      const registry = new CoreSchemaRegistry();
+      const data: any = {};
+
+      registry.usePromptProvider(async definitions => {
+        expect(definitions.length).toBe(1);
+        expect(definitions[0].type).toBe('list');
+        expect(definitions[0].multiselect).toBe(true);
+        expect(definitions[0].items).toEqual([
+          'one',
+          'two',
+          'three',
+        ]);
+
+        return {};
+      });
+
+      registry
+        .compile({
+          properties: {
+            test: {
+              type: 'array',
+              items: {
+                enum: [
+                  'one',
+                  'two',
+                  'three',
+                ],
+              },
+              'x-prompt': 'test-message',
             },
           },
         })

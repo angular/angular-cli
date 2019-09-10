@@ -798,7 +798,7 @@ export interface PromptDefinition {
     multiselect?: boolean;
     raw?: string | JsonObject;
     type: string;
-    validator?: (value: string) => boolean | string | Promise<boolean | string>;
+    validator?: (value: JsonValue) => boolean | string | Promise<boolean | string>;
 }
 
 export declare type PromptProvider = (definitions: Array<PromptDefinition>) => SubscribableOrPromise<{
