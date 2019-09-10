@@ -28,6 +28,7 @@ import {
   SmartDefaultProvider,
 } from './interface';
 import { JsonSchema } from './schema';
+import { getTypesOfSchema } from './utility';
 import { visitJson, visitJsonSchema } from './visitor';
 
 // This interface should be exported from ajv, but they only export the class and not the type.
@@ -539,26 +540,44 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           items = schema.items;
         }
 
+        const propertyTypes = getTypesOfSchema(parentSchema);
         if (!type) {
-          if (parentSchema.type === 'boolean') {
+          if (propertyTypes.size === 1 && propertyTypes.has('boolean')) {
             type = 'confirmation';
           } else if (Array.isArray(parentSchema.enum)) {
+            type = 'list';
+          } else if (
+            propertyTypes.size === 1 &&
+            propertyTypes.has('array') &&
+            parentSchema.items &&
+            Array.isArray((parentSchema.items as JsonObject).enum)
+          ) {
             type = 'list';
           } else {
             type = 'input';
           }
         }
 
-        if (type === 'list' && !items && Array.isArray(parentSchema.enum)) {
-          type = 'list';
-          items = [];
-          for (const value of parentSchema.enum) {
-            if (typeof value == 'string') {
-              items.push(value);
-            } else if (typeof value == 'object') {
-              // Invalid
-            } else {
-              items.push({ label: value.toString(), value });
+        let multiselect;
+        if (type === 'list') {
+          multiselect =
+            schema.multiselect === undefined
+              ? propertyTypes.size === 1 && propertyTypes.has('array')
+              : schema.multiselect;
+
+          const enumValues = multiselect
+            ? parentSchema.items && (parentSchema.items as JsonObject).enum
+            : parentSchema.enum;
+          if (!items && Array.isArray(enumValues)) {
+            items = [];
+            for (const value of enumValues) {
+              if (typeof value == 'string') {
+                items.push(value);
+              } else if (typeof value == 'object') {
+                // Invalid
+              } else {
+                items.push({ label: value.toString(), value });
+              }
             }
           }
         }
@@ -569,20 +588,13 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           message,
           raw: schema,
           items,
-          multiselect: type === 'list' ? schema.multiselect : false,
+          multiselect,
           default: typeof parentSchema.default == 'object' ? undefined : parentSchema.default,
-          async validator(data: string) {
-            const result = it.self.validate(parentSchema, data);
-            if (typeof result === 'boolean') {
-              return result;
-            } else {
-              try {
-                await result;
-
-                return true;
-              } catch {
-                return false;
-              }
+          async validator(data: JsonValue) {
+            try {
+              return await it.self.validate(parentSchema, data);
+            } catch {
+              return false;
             }
           },
         };
