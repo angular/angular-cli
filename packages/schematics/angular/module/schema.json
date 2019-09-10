@@ -41,7 +41,7 @@
     },
     "route": {
       "type": "string",
-      "description": "The route path for a lazy-loaded module. When supplied, creates a component in the new module using the route name, and adds the route to the `routes` array in the declaring module's routing module. Requires `--module` option."
+      "description": "The route path for a lazy-loaded module. When supplied, creates a component in the new module, and adds the route to that component in the `routes` array in the routing module specified in the `--module` option."
     },
     "flat": {
       "type": "boolean",
