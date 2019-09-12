@@ -1,0 +1,10 @@
+{
+  "$schema": "../../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "install": {
+      "description": "Adds Angular Universal to the application.",
+      "factory": "./install",
+      "schema": "./install/schema.json"
+    }
+  }
+}

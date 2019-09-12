@@ -24,6 +24,7 @@ ts_library(
     module_name = "@nguniversal/hapi-engine/schematics",
     tsconfig = ":tsconfig.json",
     deps = [
+        "//modules/common/schematics",
         "@npm//@angular-devkit/core",
         "@npm//@angular-devkit/schematics",
         "@npm//@schematics/angular",
@@ -45,7 +46,10 @@ npm_package(
 jasmine_node_test(
     name = "unit_tests",
     srcs = [":schematics_test_sources"],
-    data = [":schematics_assets"],
+    data = [
+        ":schematics_assets",
+        "//modules/common/schematics:npm_package",
+    ],
 )
 
 ng_test_library(
@@ -57,6 +61,7 @@ ng_test_library(
     tsconfig = ":tsconfig.json",
     deps = [
         ":schematics",
+        "//modules/common/schematics",
         "@npm//@angular-devkit/core",
         "@npm//@angular-devkit/schematics",
         "@npm//@schematics/angular",

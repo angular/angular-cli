@@ -43,47 +43,6 @@ describe('Universal Schematic', () => {
     expect(contents).toMatch(/\"hapi\": \"/);
   });
 
-  it('should add dependency: ts-loader', async () => {
-    const tree = await schematicRunner
-                     .runSchematicAsync('ng-add', defaultOptions, appTree)
-                     .toPromise();
-    const filePath = '/package.json';
-    const contents = tree.readContent(filePath);
-    expect(contents).toMatch(/\"ts-loader\": \"/);
-  });
-
-  it('should add dependency: webpack-cli', async () => {
-    const tree = await schematicRunner
-                     .runSchematicAsync('ng-add', defaultOptions, appTree)
-                     .toPromise();
-    const filePath = '/package.json';
-    const contents = tree.readContent(filePath);
-    expect(contents).toMatch(/\"webpack-cli\": \"/);
-  });
-
-  it('should not add dependency: ts-loader when webpack is false', async () => {
-    const noWebpack = Object.assign({}, defaultOptions);
-    noWebpack.webpack = false;
-    const tree =
-        await schematicRunner.runSchematicAsync('ng-add', noWebpack, appTree)
-            .toPromise();
-    const filePath = '/package.json';
-    const contents = tree.readContent(filePath);
-    expect(contents).not.toContain('ts-loader');
-  });
-
-  it('should not add dependency: webpack-cli when webpack is false',
-     async () => {
-       const noWebpack = Object.assign({}, defaultOptions);
-       noWebpack.webpack = false;
-       const tree =
-           await schematicRunner.runSchematicAsync('ng-add', noWebpack, appTree)
-               .toPromise();
-       const filePath = '/package.json';
-       const contents = tree.readContent(filePath);
-       expect(contents).not.toContain('webpack-cli');
-     });
-
   it('should install npm dependencies', async () => {
     await schematicRunner.runSchematicAsync('ng-add', defaultOptions, appTree)
         .toPromise();
@@ -93,40 +52,24 @@ describe('Universal Schematic', () => {
         .toBe('install');
   });
 
-  it('should not add Universal files', async () => {
-    const noUniversal = Object.assign({}, defaultOptions);
-    noUniversal.skipUniversal = true;
-
-    const tree =
-        await schematicRunner.runSchematicAsync('ng-add', noUniversal, appTree)
-            .toPromise();
-    const filePath = '/src/server.main.ts';
-    const contents = tree.readContent(filePath);
-    expect(contents).toMatch('');
-  });
-
-  it('should add exports to main server file', async () => {
+  it(`should update 'tsconfig.server.json' files with Express main file`, async () => {
     const tree = await schematicRunner
       .runSchematicAsync('ng-add', defaultOptions, appTree)
       .toPromise();
-    const filePath = '/projects/bar/src/main.server.ts';
-    const contents = tree.readContent(filePath);
-    expect(contents).toContain('ngHapiEngine');
+
+    const contents = JSON.parse(tree.readContent('/projects/bar/tsconfig.server.json'));
+    expect(contents.files).toEqual([
+      'src/main.server.ts',
+      'server.ts',
+    ]);
   });
 
-  it('should update angular.json', async () => {
+  it(`should add export to main file in 'server.ts'`, async () => {
     const tree = await schematicRunner
       .runSchematicAsync('ng-add', defaultOptions, appTree)
       .toPromise();
-    const contents = JSON.parse(tree.readContent('angular.json'));
-    const architect = contents.projects.bar.architect;
-    expect(architect.build.configurations.production).toBeDefined();
-    expect(architect.build.options.outputPath).toBe('dist/bar/browser');
-    expect(architect.server.options.outputPath).toBe('dist/bar/server');
 
-    const productionConfig = architect.server.configurations.production;
-    expect(productionConfig.fileReplacements).toBeDefined();
-    expect(productionConfig.sourceMap).toBeDefined();
-    expect(productionConfig.optimization).toBeDefined();
+    const content = tree.readContent('/projects/bar/server.ts');
+    expect(content).toContain(`export * from './src/main.server'`);
   });
 });

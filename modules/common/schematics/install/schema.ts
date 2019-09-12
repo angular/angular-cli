@@ -20,13 +20,9 @@ export interface Schema {
    */
   main?: string;
   /**
-   * The name of the Express server file.
+   * The name of the server file.
    */
   serverFileName?: string;
-  /**
-   * The port for the Express server.
-   */
-  serverPort?: number;
   /**
    * The name of the TypeScript configuration file.
    */

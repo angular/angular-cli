@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "id": "SchematicsExpressEngineInstall",
-  "title": "Express Engine Install Options Schema",
+  "id": "SchematicsCommonInstall",
+  "title": "Common Install Options Schema",
   "type": "object",
   "properties": {
     "clientProject": {
@@ -23,12 +23,7 @@
     "serverFileName": {
       "type": "string",
       "default": "server.ts",
-      "description": "The name of the Express server file."
-    },
-    "serverPort": {
-      "type": "number",
-      "default": 4000,
-      "description": "The port for the Express server."
+      "description": "The name of the server file."
     },
     "tsconfigFileName": {
       "type": "string",
@@ -60,6 +55,5 @@
   },
   "required": [
     "clientProject"
-  ],
-  "additionalProperties": false
+  ]
 }

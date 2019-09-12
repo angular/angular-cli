@@ -7,9 +7,7 @@ filegroup(
     srcs = glob([
         "**/files/**/*",
         "**/*.json",
-    ]) + [
-        "README.md",
-    ],
+    ]),
 )
 
 ts_library(
@@ -21,10 +19,9 @@ ts_library(
             "**/files/**/*",
         ],
     ),
-    module_name = "@nguniversal/express-engine/schematics",
+    module_name = "@nguniversal/common/schematics",
     tsconfig = ":tsconfig.json",
     deps = [
-        "//modules/common/schematics",
         "@npm//@angular-devkit/core",
         "@npm//@angular-devkit/schematics",
         "@npm//@schematics/angular",
@@ -34,7 +31,7 @@ ts_library(
     ],
 )
 
-# This package is intended to be combined into the main @nguniversal/express-engine package as a dep.
+# This package is intended to be combined into the main @nguniversal/common package as a dep.
 npm_package(
     name = "npm_package",
     srcs = [":schematics_assets"],
@@ -42,14 +39,10 @@ npm_package(
 )
 
 ### Testing rules
-
 jasmine_node_test(
     name = "unit_tests",
     srcs = [":schematics_test_sources"],
-    data = [
-        ":schematics_assets",
-        "//modules/common/schematics:npm_package",
-    ],
+    data = [":schematics_assets"],
 )
 
 ng_test_library(
@@ -61,7 +54,6 @@ ng_test_library(
     tsconfig = ":tsconfig.json",
     deps = [
         ":schematics",
-        "//modules/common/schematics",
         "@npm//@angular-devkit/core",
         "@npm//@angular-devkit/schematics",
         "@npm//@schematics/angular",

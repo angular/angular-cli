@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "./",
     "lib": ["es2017", "dom"],
     "module": "commonjs",
     "moduleResolution": "node",
@@ -12,7 +13,10 @@
     "types": [
       "jasmine",
       "node"
-    ]
+    ],
+    "paths": {
+      "@nguniversal/*": ["../../*"]
+    }
   },
   "exclude": [
     "**/*.spec.ts",
