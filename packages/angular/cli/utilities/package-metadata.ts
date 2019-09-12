@@ -50,7 +50,7 @@ export interface PackageManifest {
 export interface PackageMetadata {
   name: string;
   tags: { [tag: string]: PackageManifest | undefined };
-  versions: Map<string, PackageManifest>;
+  versions: Record<string, PackageManifest>;
 }
 
 let npmrc: { [key: string]: string };
@@ -179,18 +179,22 @@ export async function fetchPackageMetadata(
   const metadata: PackageMetadata = {
     name: response.name,
     tags: {},
-    versions: new Map(),
+    versions: {},
   };
 
   if (response.versions) {
     for (const [version, manifest] of Object.entries(response.versions)) {
-      metadata.versions.set(version, normalizeManifest(manifest as {}));
+      metadata.versions[version] = normalizeManifest(manifest as {});
     }
   }
 
   if (response['dist-tags']) {
+    // Store this for use with other npm utility packages
+    // tslint:disable-next-line: no-any
+    (metadata as any)['dist-tags'] = response['dist-tags'];
+
     for (const [tag, version] of Object.entries(response['dist-tags'])) {
-      const manifest = metadata.versions.get(version as string);
+      const manifest = metadata.versions[version as string];
       if (manifest) {
         metadata.tags[tag] = manifest;
       } else if (verbose) {
