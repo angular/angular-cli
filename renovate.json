@@ -18,8 +18,7 @@
     "master"
   ],
   "ignoreDeps": [
-    "@types/node",
-    "webpack-subresource-integrity"
+    "@types/node"
   ],
   "packageFiles": [
     "WORKSPACE",
