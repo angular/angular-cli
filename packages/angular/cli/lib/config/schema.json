@@ -847,8 +847,31 @@
               "default": false
             },
             "index": {
-              "type": "string",
-              "description": "The name of the index HTML file."
+              "description": "Configures the generation of the application's HTML index.",
+              "oneOf": [
+                {
+                  "type": "string",
+                  "description": "The path of a file to use for the application's HTML index. The filename of the specified path will be used for the generated file and will be created in the root of the application's configured output path."
+                },
+                {
+                  "type": "object",
+                  "description": "",
+                  "properties": {
+                    "input": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The path of a file to use for the application's generated HTML index."
+                    },
+                    "output": {
+                      "type": "string",
+                      "minLength": 1,
+                      "default": "index.html",
+                      "description": "The output path of the application's generated HTML index file. The full provided path will be used and will be considered relative to the application's configured output path."
+                    }
+                  },
+                  "required": ["input"]
+                }
+              ]
             },
             "statsJson": {
               "type": "boolean",
