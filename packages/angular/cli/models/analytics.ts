@@ -565,6 +565,67 @@ export async function getGlobalAnalytics(): Promise<UniversalAnalytics | undefin
   }
 }
 
+export async function hasWorkspaceAnalyticsConfiguration(): Promise<boolean> {
+  try {
+    const globalWorkspace = await getWorkspace('local');
+    const analyticsConfig: string | undefined | null | { uid?: string } = globalWorkspace
+      && globalWorkspace.getCli()
+      && globalWorkspace.getCli()['analytics'];
+
+    if (analyticsConfig !== undefined) {
+      return true;
+    }
+  } catch {}
+
+  return false;
+}
+
+/**
+ * Get the workspace analytics object for the user. This returns an instance of UniversalAnalytics,
+ * or undefined if analytics are disabled.
+ *
+ * If any problem happens, it is considered the user has been opting out of analytics.
+ */
+export async function getWorkspaceAnalytics(): Promise<UniversalAnalytics | undefined> {
+  analyticsDebug('getWorkspaceAnalytics');
+  try {
+    const globalWorkspace = await getWorkspace('local');
+    const analyticsConfig: string | undefined | null | { uid?: string } = globalWorkspace
+      && globalWorkspace.getCli()
+      && globalWorkspace.getCli()['analytics'];
+    analyticsDebug('Workspace Analytics config found: %j', analyticsConfig);
+
+    if (analyticsConfig === false) {
+      analyticsDebug('Analytics disabled. Ignoring all analytics.');
+
+      return undefined;
+    } else if (analyticsConfig === undefined || analyticsConfig === null) {
+      analyticsDebug('Analytics settings not found. Ignoring all analytics.');
+
+      return undefined;
+    } else {
+      let uid: string | undefined = undefined;
+      if (typeof analyticsConfig == 'string') {
+        uid = analyticsConfig;
+      } else if (typeof analyticsConfig == 'object' && typeof analyticsConfig['uid'] == 'string') {
+        uid = analyticsConfig['uid'];
+      }
+
+      analyticsDebug('client id: %j', uid);
+      if (uid == undefined) {
+        return undefined;
+      }
+
+      return new UniversalAnalytics(AnalyticsProperties.AngularCliDefault, uid);
+    }
+  } catch (err) {
+    analyticsDebug('Error happened during reading of analytics config: %s', err.message);
+
+    return undefined;
+  }
+
+}
+
 /**
  * Return the usage analytics sharing setting, which is either a property string (GA-XXXXXXX-XX),
  * or undefined if no sharing.
