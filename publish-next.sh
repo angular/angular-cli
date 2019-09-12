@@ -11,6 +11,7 @@ set -u -e -o pipefail
 NPM_PACKAGE_LABELS=`bazel query --output=label 'attr("tags", "\[.*release.*\]", //modules/...) intersect kind(".*_package", //modules/...)'`
 # build all npm packages in parallel
 bazel build --config=release $NPM_PACKAGE_LABELS
+
 # publish all packages in sequence to make it easier to spot any errors or warnings
 for packageLabel in $NPM_PACKAGE_LABELS; do
   echo "publishing $packageLabel"
