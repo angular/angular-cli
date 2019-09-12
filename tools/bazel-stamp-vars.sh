@@ -4,8 +4,6 @@
 
 set -u -e -E -o pipefail
 
-echo "Running: $0" >&2
-
 function onError {
   echo "Failed to execute: $0"
   echo ""
