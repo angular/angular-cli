@@ -67,10 +67,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
   return {
     devtool: false,
     resolve: {
-      mainFields: [
-        ...(wco.supportES2015 ? ['es2015'] : []),
-        'browser', 'module', 'main',
-      ],
+      mainFields: ['es2015', 'browser', 'module', 'main'],
     },
     output: {
       crossOriginLoading,
