@@ -30,8 +30,8 @@ test --test_output=errors
 # Show which actions are run under workers,
 # and print all the actions running in parallel.
 # Helps to demonstrate that bazel uses all the cores on the machine.
-build --experimental_ui
-test --experimental_ui
+build
+test
 
 #################################
 # Release configuration.        #
