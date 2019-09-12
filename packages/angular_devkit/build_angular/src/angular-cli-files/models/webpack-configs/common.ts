@@ -23,6 +23,7 @@ import {
   HashedModuleIdsPlugin,
   Plugin,
   Rule,
+  RuleSetLoader,
   compilation,
   debug,
 } from 'webpack';
@@ -330,17 +331,15 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     };
   }
 
-  let buildOptimizerUseRule;
+  let buildOptimizerUseRule: RuleSetLoader[] = [];
   if (buildOptions.buildOptimizer) {
     extraPlugins.push(new BuildOptimizerWebpackPlugin());
-    buildOptimizerUseRule = {
-      use: [
-        {
-          loader: buildOptimizerLoaderPath,
-          options: { sourceMap: scriptsSourceMap },
-        },
-      ],
-    };
+    buildOptimizerUseRule = [
+      {
+        loader: buildOptimizerLoaderPath,
+        options: { sourceMap: scriptsSourceMap },
+      },
+    ];
   }
 
   // Allow loaders to be in a node_modules nested inside the devkit/build-angular package.
@@ -519,13 +518,55 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
           parser: { system: true },
         },
         {
-          test: /\.js$/,
-          // Factory files are processed by BO in the rules added in typescript.ts.
-          exclude: /(ngfactory|ngstyle)\.js$/,
-          ...buildOptimizerUseRule,
+          test: /\.m?js$/,
+          exclude: [/[\/\\](?:core-js|\@babel|tslib)[\/\\]/, /(ngfactory|ngstyle)\.js$/],
+          use: [
+            ...(wco.supportES2015
+              ? []
+              : [
+                  {
+                    loader: require.resolve('babel-loader'),
+                    options: {
+                      babelrc: false,
+                      configFile: false,
+                      compact: false,
+                      cacheCompression: false,
+                      cacheDirectory: findCachePath('babel-webpack'),
+                      cacheIdentifier: JSON.stringify({
+                        buildAngular: require('../../../../package.json').version,
+                      }),
+                      presets: [
+                        [
+                          require.resolve('@babel/preset-env'),
+                          {
+                            bugfixes: true,
+                            modules: false,
+                            // Comparable behavior to tsconfig target of ES5
+                            targets: { ie: 9 },
+                            exclude: ['transform-typeof-symbol'],
+                          },
+                        ],
+                      ],
+                      plugins: [
+                        [
+                          require('@babel/plugin-transform-runtime').default,
+                          {
+                            useESModules: true,
+                            version: require('@babel/runtime/package.json').version,
+                            absoluteRuntime: path.dirname(
+                              require.resolve('@babel/runtime/package.json'),
+                            ),
+                          },
+                        ],
+                      ],
+                    },
+                  },
+                ]),
+            ...buildOptimizerUseRule,
+          ],
         },
         {
-          test: /\.js$/,
+          test: /\.m?js$/,
           exclude: /(ngfactory|ngstyle)\.js$/,
           enforce: 'pre',
           ...sourceMapUseRule,
@@ -535,10 +576,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     },
     optimization: {
       noEmitOnErrors: true,
-      minimizer: [
-        new HashedModuleIdsPlugin(),
-        ...extraMinimizers,
-      ],
+      minimizer: [new HashedModuleIdsPlugin(), ...extraMinimizers],
     },
     plugins: [
       // Always replace the context for the System.import in angular/core to prevent warnings.

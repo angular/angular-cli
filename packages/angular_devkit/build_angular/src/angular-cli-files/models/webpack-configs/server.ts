@@ -31,7 +31,7 @@ export function getServerConfig(wco: WebpackConfigOptions): Configuration {
 
   const config: Configuration = {
     resolve: {
-      mainFields: [...(wco.supportES2015 ? ['es2015'] : []), 'main', 'module'],
+      mainFields: ['es2015', 'main', 'module'],
     },
     target: 'node',
     output: {
