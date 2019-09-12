@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { isAbsolute } from 'path';
-import { Configuration } from 'webpack';
+import { Configuration, ContextReplacementPlugin } from 'webpack';
 import { WebpackConfigOptions } from '../build-options';
 import { getSourceMapDevTool } from './utils';
 
@@ -30,7 +30,12 @@ export function getServerConfig(wco: WebpackConfigOptions): Configuration {
     output: {
       libraryTarget: 'commonjs',
     },
-    plugins: extraPlugins,
+    plugins: [
+      // Fixes Critical dependency: the request of a dependency is an expression
+      new ContextReplacementPlugin(/@?hapi(\\|\/)/),
+      new ContextReplacementPlugin(/express(\\|\/)/),
+      ...extraPlugins,
+    ],
     node: false,
   };
 
