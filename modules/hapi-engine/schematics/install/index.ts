@@ -50,6 +50,21 @@ function addDependencies(options: UniversalOptions): Rule {
       name: 'inert',
       version: '^5.1.0',
     });
+    addPackageJsonDependency(host, {
+      type: NodeDependencyType.Default,
+      name: 'vision',
+      version: '^5.4.4',
+    });
+    addPackageJsonDependency(host, {
+      type: NodeDependencyType.Dev,
+      name: '@types/vision',
+      version: '^5.4.4',
+    });
+    addPackageJsonDependency(host, {
+      type: NodeDependencyType.Dev,
+      name: '@types/inert',
+      version: '^5.1.0',
+    });
     return host;
   };
 }

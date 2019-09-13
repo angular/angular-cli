@@ -1,8 +1,9 @@
 import 'zone.js/dist/zone-node';
 
 import { ngHapiEngine } from '@nguniversal/hapi-engine';
-import { Request, Server } from 'hapi';
-import * as Inert from 'inert';
+import * as inert from 'inert';
+import * as vision from 'vision';
+import { Request, Server, ResponseToolkit } from 'hapi';
 import { join } from 'path';
 
 import { AppServerModule } from './src/main.server';
@@ -10,30 +11,46 @@ import { AppServerModule } from './src/main.server';
 // Hapi server
 async function run(): Promise<void> {
   const port: string | number = process.env.PORT || 4000;
-  const server = new Server({ port, host: 'localhost' });
-  const distFolder = join(process.cwd(), 'dist/hapi-ve/browser');
-
-  server.route({
-    method: 'GET',
-    path: '/*',
-    handler: (req: Request) =>
-      ngHapiEngine({
-        bootstrap: AppServerModule,
-        req,
-      })
+  const distFolder = join(process.cwd(), 'dist/hapi-engine-ivy/browser');
+  const server = new Server({
+    port,
+    host: 'localhost',
+    routes: {
+      files: {
+        relativeTo: distFolder
+      }
+    },
   });
 
-  await server.register(Inert);
+  await server.register(vision);
+  server.views({
+    engines: {
+      html : {
+        compile: (document: string) => (req: Request) => ngHapiEngine({
+          bootstrap: AppServerModule,
+          document,
+          req,
+        })
+      }
+    },
+    path: distFolder,
+  });
 
-  // Client bundles will be statically served from the built/ directory.
   server.route({
     method: 'GET',
-    path: '/{file*}',
-    handler: {
-      directory: {
-        path: distFolder
-      }
-    }
+    path: '/{path*}',
+    handler: (req: Request, res: ResponseToolkit) =>
+      res.view('index', req)
+  });
+
+  await server.register(inert);
+
+  // Client bundles will be statically served from the dist directory.
+  server.route({
+    method: 'GET',
+    path: '/{filename}.{ext}',
+    handler: (req: Request, res: ResponseToolkit) =>
+      res.file(`${req.params.filename}.${req.params.ext}`)
   });
 
   await server.start();
@@ -46,10 +63,7 @@ async function run(): Promise<void> {
 declare const __non_webpack_require__: NodeRequire;
 const mainModule = __non_webpack_require__.main;
 if (mainModule && mainModule.filename === __filename) {
-  run().catch(error => {
-    console.error(`Error: ${error.toString()}`);
-    process.exit(1);
-  });
+  run();
 }
 
 export * from './src/main.server';

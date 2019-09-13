@@ -436,6 +436,20 @@
   dependencies:
     "@types/node" "*"
 
+"@types/hapi@*":
+  version "18.0.2"
+  resolved "https://registry.yarnpkg.com/@types/hapi/-/hapi-18.0.2.tgz#2c3ed843e1e7358486eccf64256e91f7918948b2"
+  integrity sha512-I3THPpOY0G0bXNLzyaqUzMIbqPrci21C1Vqlnek348SJq2Gp7TLSnQbwOb+v/xunxCTzY3o2fV3h7uffL3Ln0w==
+  dependencies:
+    "@types/boom" "*"
+    "@types/catbox" "*"
+    "@types/iron" "*"
+    "@types/joi" "*"
+    "@types/mimos" "*"
+    "@types/node" "*"
+    "@types/podium" "*"
+    "@types/shot" "*"
+
 "@types/hapi@^17.0.12":
   version "17.8.2"
   resolved "https://registry.yarnpkg.com/@types/hapi/-/hapi-17.8.2.tgz#667fbeff250c338dca9e6cc1779f5696c7c148ed"
@@ -448,6 +462,13 @@
     "@types/node" "*"
     "@types/podium" "*"
     "@types/shot" "*"
+
+"@types/inert@^5.1.2":
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/@types/inert/-/inert-5.1.2.tgz#2bb8bef3b2462f904c960654c9edfa39285a85c6"
+  integrity sha512-3IoSFLQWvhLfZ85kHas/F3iD/TyZPfeJbTsDjrwYljK1MgBGCB2OywAsyeA/YiJ62VbNXfXBwpD1/VbJPIZSGA==
+  dependencies:
+    "@types/hapi" "*"
 
 "@types/iron@*":
   version "5.0.1"
@@ -539,6 +560,14 @@
   resolved "https://registry.yarnpkg.com/@types/shot/-/shot-4.0.0.tgz#7545500c489b65c69b5bc5446ba4fef3bd26af92"
   dependencies:
     "@types/node" "*"
+
+"@types/vision@^5.3.6":
+  version "5.3.6"
+  resolved "https://registry.yarnpkg.com/@types/vision/-/vision-5.3.6.tgz#d696d007ca82254b955fd485bfae0f738d8ae617"
+  integrity sha512-Wo+9LNI9wGcHRShuZW+lbwwj+g6+dyTxtHtNpzfYl4iehYzvFVzGyNo1MgW4qTHQCFEYOirLHBlrutkIRE2TMw==
+  dependencies:
+    "@types/hapi" "*"
+    handlebars "^4.1.0"
 
 "@types/z-schema@3.16.31":
   version "3.16.31"
@@ -2594,6 +2623,17 @@ handlebars@^4.0.3:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.1.2.tgz#b6b37c1ced0306b221e094fc7aca3ec23b131b67"
   integrity sha512-nvfrjqvt9xQ8Z/w0ijewdD/vvWDTOweBUm96NTr66Wfvo1mJenBLwcYmPs3TIBP5ruzYGD7Hx/DaM9RmhroGPw==
+  dependencies:
+    neo-async "^2.6.0"
+    optimist "^0.6.1"
+    source-map "^0.6.1"
+  optionalDependencies:
+    uglify-js "^3.1.4"
+
+handlebars@^4.1.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.2.0.tgz#57ce8d2175b9bbb3d8b3cf3e4217b1aec8ddcb2e"
+  integrity sha512-Kb4xn5Qh1cxAKvQnzNWZ512DhABzyFNmsaJf3OAkWNa4NkaqWcNI8Tao8Tasi0/F4JD9oyG0YxuFyvyR57d+Gw==
   dependencies:
     neo-async "^2.6.0"
     optimist "^0.6.1"

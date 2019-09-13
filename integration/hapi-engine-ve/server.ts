@@ -1,41 +1,60 @@
 import 'zone.js/dist/zone-node';
 
-import { ngExpressEngine } from '@nguniversal/express-engine';
-import * as express from 'express';
+import { ngHapiEngine } from '@nguniversal/hapi-engine';
+import * as inert from 'inert';
+import * as vision from 'vision';
+import { Request, Server, ResponseToolkit } from 'hapi';
 import { join } from 'path';
 
 import { AppServerModuleNgFactory } from './src/main.server';
 
 // Hapi server
-function run() {
-  const app = express();
+async function run(): Promise<void> {
   const port: string | number = process.env.PORT || 4000;
   const distFolder = join(process.cwd(), 'dist/hapi-engine-ve/browser');
-
-  // Our Universal express-engine (found @ https://github.com/angular/universal/tree/master/modules/express-engine)
-  app.engine('html', ngExpressEngine({
-    bootstrap: AppServerModuleNgFactory,
-  }));
-
-  app.set('view engine', 'html');
-  app.set('views', distFolder);
-
-  // Example Express Rest API endpoints
-  // app.get('/api/**', (req, res) => { });
-  // Serve static files from /browser
-  app.get('*.*', express.static(distFolder, {
-    maxAge: '1y'
-  }));
-
-  // All regular routes use the Universal engine
-  app.get('*', (req, res) => {
-    res.render('index', { req });
+  const server = new Server({
+    port,
+    host: 'localhost',
+    routes: {
+      files: {
+        relativeTo: distFolder
+      }
+    },
   });
 
-  // Start up the Node server
-  app.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
+  await server.register(vision);
+  server.views({
+    engines: {
+      html : {
+        compile: (document: string) => (req: Request) => ngHapiEngine({
+          bootstrap: AppServerModuleNgFactory,
+          document,
+          req,
+        })
+      }
+    },
+    path: distFolder,
   });
+
+  server.route({
+    method: 'GET',
+    path: '/{path*}',
+    handler: (req: Request, res: ResponseToolkit) =>
+      res.view('index', req)
+  });
+
+  await server.register(inert);
+
+  // Client bundles will be statically served from the dist directory.
+  server.route({
+    method: 'GET',
+    path: '/{filename}.{ext}',
+    handler: (req: Request, res: ResponseToolkit) =>
+      res.file(`${req.params.filename}.${req.params.ext}`)
+  });
+
+  await server.start();
+  console.log(`Node Hapi server listening on http://localhost:${port}`);
 }
 
 // Webpack will replace 'require' with '__webpack_require__'
