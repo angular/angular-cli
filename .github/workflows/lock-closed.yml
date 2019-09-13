@@ -1,9 +1,9 @@
-name: Lock issues that are closed and inactive
+name: Lock Inactive Issues
 
 on:
   schedule:
-    # Run at the 40th minute of every hour
-    - cron: '40 * * * *'
+    # Run at 08:00 every day
+    - cron: '0 8 * * *'
 
 jobs:
   lock_closed:
