@@ -1,0 +1,58 @@
+{
+  "name": "universal-integration",
+  "version": "0.0.0",
+  "description": "Integration tests for @nguniversal",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal.git"
+  },
+  "scripts": {
+    "postinstall": "webdriver-manager update --gecko false --standalone false $CHROMEDRIVER_VERSION_ARG",
+    "ng": "ng",
+    "start": "ng serve",
+    "e2e": "ng e2e",
+    "test": "npm run build && npm run serve:test",
+    "serve:test": "concurrently \"npm run serve:ssr\" \"npm run e2e\" --kill-others --success first",
+    "serve:ssr": "node dist/hapi-engine-ve/server/main.js",
+    "build:ssr": "npm run build:client-and-server-bundles",
+    "build": "ng build --prod && ng run hapi-engine-ve:server:production"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "9.0.0-next.5",
+    "@angular/common": "9.0.0-next.5",
+    "@angular/compiler": "file:../../node_modules/@angular/compiler",
+    "@angular/core": "file:../../node_modules/@angular/core",
+    "@angular/forms": "9.0.0-next.5",
+    "@angular/platform-browser": "9.0.0-next.5",
+    "@angular/platform-browser-dynamic": "9.0.0-next.5",
+    "@angular/platform-server": "9.0.0-next.5",
+    "@angular/router": "9.0.0-next.5",
+    "@nguniversal/hapi-engine": "file:../../dist/mdules-dist/hapi-engine",
+    "hapi": "file:../../node_modules/hapi",
+    "inert": "5.1.0",
+    "rxjs": "file:../../node_modules/rxjs",
+    "zone.js": "file:../../node_modules/zone.js"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "0.900.0-next.4",
+    "@angular/cli": "9.0.0-next.4",
+    "@angular/compiler-cli": "file:../../node_modules/@angular/compiler-cli",
+    "@types/express": "file:../../node_modules/@types/express",
+    "@types/node": "file:../../node_modules/@types/node",
+    "@types/jasmine": "file:../../node_modules/@types/jasmine",
+    "codelyzer": "5.1.0",
+    "concurrently": "3.1.0",
+    "jasmine-core": "3.4.0",
+    "jasmine-spec-reporter": "4.2.1",
+    "karma": "4.2.0",
+    "karma-chrome-launcher": "3.1.0",
+    "karma-coverage-istanbul-reporter": "2.1.0",
+    "karma-jasmine": "2.0.1",
+    "karma-jasmine-html-reporter": "1.4.2",
+    "protractor": "file:../../node_modules/protractor",
+    "ts-node": "8.3.0",
+    "tslint": "5.18.0",
+    "typescript": "file:../../node_modules/typescript"
+  }
+}
