@@ -9,6 +9,9 @@
     "PR target: master-only"
   ],
   "timezone": "America/Tijuana",
+  "lockFileMaintenance": {
+    "enabled": true
+  },
   "schedule": [
     "after 10pm every weekday",
     "before 4am every weekday",
