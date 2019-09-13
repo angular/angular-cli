@@ -103,7 +103,6 @@
     "@types/inert": "^5.1.2",
     "@types/jasmine": "^2.8.6",
     "@types/node": "^9.4.6",
-    "@types/vision": "^5.3.6",
     "camelcase": "^4.1.0",
     "domino": "^2.1.2",
     "express": "^4.15.2",

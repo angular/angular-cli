@@ -32,8 +32,7 @@
     "hapi": "file:../../node_modules/hapi",
     "inert": "5.1.0",
     "rxjs": "file:../../node_modules/rxjs",
-    "zone.js": "file:../../node_modules/zone.js",
-    "vision": "5.4.4"
+    "zone.js": "file:../../node_modules/zone.js"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.900.0-next.4",
@@ -42,7 +41,6 @@
     "@types/inert": "file:../../node_modules/@types/inert",
     "@types/node": "file:../../node_modules/@types/node",
     "@types/jasmine": "file:../../node_modules/@types/jasmine",
-    "@types/vision": "file:../../node_modules/@types/vision",
     "codelyzer": "5.1.0",
     "concurrently": "3.1.0",
     "jasmine-core": "3.4.0",

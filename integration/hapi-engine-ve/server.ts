@@ -2,10 +2,9 @@ import 'zone.js/dist/zone-node';
 
 import { ngHapiEngine } from '@nguniversal/hapi-engine';
 import * as inert from 'inert';
-import * as vision from 'vision';
 import { Request, Server, ResponseToolkit } from 'hapi';
 import { join } from 'path';
-
+import { readFileSync } from 'fs';
 import { AppServerModuleNgFactory } from './src/main.server';
 
 // Hapi server
@@ -22,25 +21,16 @@ async function run(): Promise<void> {
     },
   });
 
-  await server.register(vision);
-  server.views({
-    engines: {
-      html : {
-        compile: (document: string) => (req: Request) => ngHapiEngine({
-          bootstrap: AppServerModuleNgFactory,
-          document,
-          req,
-        })
-      }
-    },
-    path: distFolder,
-  });
+  const document = readFileSync(join(distFolder, 'index.html'), 'utf-8');
 
   server.route({
     method: 'GET',
     path: '/{path*}',
-    handler: (req: Request, res: ResponseToolkit) =>
-      res.view('index', req)
+    handler: (req: Request) => ngHapiEngine({
+      bootstrap: AppServerModuleNgFactory,
+      document,
+      req,
+    })
   });
 
   await server.register(inert);
