@@ -91,6 +91,7 @@ describe('Universal Schematic', () => {
       compilerOptions: {
         outDir: './out-tsc/app-server',
         module: 'commonjs',
+        types: ['node'],
       },
       files: [
         'src/main.server.ts',
@@ -115,6 +116,7 @@ describe('Universal Schematic', () => {
       compilerOptions: {
         outDir: '../../out-tsc/app-server',
         module: 'commonjs',
+        types: ['node'],
       },
       files: [
         'src/main.server.ts',
