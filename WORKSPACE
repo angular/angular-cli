@@ -1,12 +1,15 @@
-workspace(name = "nguniversal")
+workspace(
+    name = "nguniversal",
+    managed_directories = {"@npm": ["node_modules"]},
+)
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # Add NodeJS rules (explicitly used for sass bundle rules)
 http_archive(
     name = "build_bazel_rules_nodejs",
-    sha256 = "6d4edbf28ff6720aedf5f97f9b9a7679401bf7fca9d14a0fff80f644a99992b4",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/0.32.2/rules_nodejs-0.32.2.tar.gz"],
+    sha256 = "0d9660cf0894f1fe1e9840818553e0080fbce0851169812d77a70bdb9981c946",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/0.37.0/rules_nodejs-0.37.0.tar.gz"],
 )
 
 # Setup the NodeJS toolchain
