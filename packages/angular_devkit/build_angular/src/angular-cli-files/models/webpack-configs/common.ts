@@ -332,11 +332,14 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       }
     }
 
+    // TODO: Investigate why this fails for some packages: wco.supportES2015 ? 6 : 5;
+    const terserEcma = 5;
+
     const terserOptions = {
       warnings: !!buildOptions.verbose,
       safari10: true,
       output: {
-        ecma: wco.supportES2015 ? 6 : 5,
+        ecma: terserEcma,
         comments: false,
         webkit: true,
       },
@@ -345,12 +348,12 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       compress:
         buildOptions.platform == 'server'
           ? {
-              ecma: wco.supportES2015 ? 6 : 5,
+              ecma: terserEcma,
               global_defs: angularGlobalDefinitions,
               keep_fnames: true,
             }
           : {
-              ecma: wco.supportES2015 ? 6 : 5,
+              ecma: terserEcma,
               pure_getters: buildOptions.buildOptimizer,
               // PURE comments work best with 3 passes.
               // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
