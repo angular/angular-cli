@@ -10,6 +10,7 @@ import { Rule, chain } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { updateLibraries } from './ivy-libraries';
 import { updateNGSWConfig } from './ngsw-config';
+import { removeTsickle } from './remove-tsickle';
 import { updateApplicationTsConfigs } from './update-app-tsconfigs';
 import { updateDependencies } from './update-dependencies';
 import { updateServerMainFile } from './update-server-main-file';
@@ -24,6 +25,7 @@ export default function(): Rule {
       updateApplicationTsConfigs(),
       updateDependencies(),
       updateServerMainFile(),
+      removeTsickle(),
       (tree, context) => {
         const packageChanges = tree.actions.some(a => a.path.endsWith('/package.json'));
         if (packageChanges) {
