@@ -7,7 +7,6 @@
  */
 import { Observable, of } from 'rxjs';
 import { JsonValue, experimental as core_experimental, schema } from '../../../src';
-import { ModuleNotFoundException, resolve } from '../../resolve';
 
 export class NodeModuleJobRegistry<MinimumArgumentValueT extends JsonValue = JsonValue,
   MinimumInputValueT extends JsonValue = JsonValue,
@@ -15,18 +14,12 @@ export class NodeModuleJobRegistry<MinimumArgumentValueT extends JsonValue = Jso
 > implements core_experimental.jobs.Registry<MinimumArgumentValueT,
   MinimumInputValueT,
   MinimumOutputValueT> {
-  public constructor(private _resolveLocal = true, private _resolveGlobal = false) {
-  }
 
   protected _resolve(name: string): string | null {
     try {
-      return resolve(name, {
-        checkLocal: this._resolveLocal,
-        checkGlobal: this._resolveGlobal,
-        basedir: __dirname,
-      });
+      return require.resolve(name);
     } catch (e) {
-      if (e instanceof ModuleNotFoundException) {
+      if (e.code === 'MODULE_NOT_FOUND') {
         return null;
       }
       throw e;
