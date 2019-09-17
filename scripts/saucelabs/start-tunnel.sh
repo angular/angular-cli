@@ -32,4 +32,4 @@ fi
 
 echo "Starting Sauce Connect. Passed arguments: ${sauceArgs}"
 
-${currentDir}/../../node_modules/sauce-connect/bin/sc -u ${SAUCE_USERNAME} -k ${SAUCE_ACCESS_KEY} ${sauceArgs}
+${currentDir}/../../node_modules/sauce-connect-proxy/bin/sc -u ${SAUCE_USERNAME} -k ${SAUCE_ACCESS_KEY} ${sauceArgs}

@@ -80,8 +80,8 @@
     "typescript": "3.5.3"
   },
   "devDependencies": {
-    "@angular/compiler": "~9.0.0-next.4",
-    "@angular/compiler-cli": "~9.0.0-next.4",
+    "@angular/compiler": "9.0.0-next.4",
+    "@angular/compiler-cli": "9.0.0-next.4",
     "@bazel/bazel": "0.29.0",
     "@bazel/buildifier": "0.28.0",
     "@bazel/jasmine": "0.37.0",
@@ -127,7 +127,7 @@
     "pidtree": "^0.3.0",
     "pidusage": "^2.0.17",
     "rxjs": "~6.4.0",
-    "sauce-connect": "https://saucelabs.com/downloads/sc-4.5.4-linux.tar.gz",
+    "sauce-connect-proxy": "https://saucelabs.com/downloads/sc-4.5.4-linux.tar.gz",
     "semver": "6.3.0",
     "source-map": "^0.7.3",
     "source-map-support": "^0.5.0",
