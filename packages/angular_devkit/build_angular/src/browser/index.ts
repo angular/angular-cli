@@ -471,7 +471,27 @@ export function buildWebpackBrowser(
                 }
               }
 
+              // Workaround Node.js issue prior to 10.16 with copyFile on macOS
+              // https://github.com/angular/angular-cli/issues/15544 & https://github.com/nodejs/node/pull/27241
+              let copyFileWorkaround = false;
+              if (process.platform === 'darwin') {
+                const version = process.versions.node.split('.').map(part => Number(part));
+                if (
+                  version[0] < 10 ||
+                  version[0] === 11 ||
+                  (version[0] === 10 && version[1] < 16)
+                ) {
+                  copyFileWorkaround = true;
+                }
+              }
+
               for (const action of cacheActions) {
+                if (copyFileWorkaround) {
+                  try {
+                    fs.unlinkSync(action.dest);
+                  } catch {}
+                }
+
                 fs.copyFileSync(action.src, action.dest, fs.constants.COPYFILE_FICLONE);
                 if (process.platform !== 'win32') {
                   // The cache writes entries as readonly and when using copyFile the permissions will also be copied.
