@@ -228,6 +228,7 @@ function _performUpdate(
   infoMap: Map<string, PackageInfo>,
   logger: logging.LoggerApi,
   migrateOnly: boolean,
+  migrateExternal: boolean,
 ): Observable<void> {
   const packageJsonContent = tree.read('/package.json');
   if (!packageJsonContent) {
@@ -292,6 +293,8 @@ function _performUpdate(
       installTask = [context.addTask(new NodePackageInstallTask())];
     }
 
+    const externalMigrations: {}[] = [];
+
     // Run the migrate schematics with the list of packages to use. The collection contains
     // version information and we need to do this post installation. Please note that the
     // migration COULD fail and leave side effects on disk.
@@ -307,6 +310,17 @@ function _performUpdate(
         : ''
       ) + target.updateMetadata.migrations;
 
+      if (migrateExternal) {
+        externalMigrations.push({
+          package: name,
+          collection,
+          from: installed.version,
+          to: target.version,
+        });
+
+        return;
+      }
+
       context.addTask(new RunSchematicTask('@schematics/update', 'migrate', {
           package: name,
           collection,
@@ -316,6 +330,11 @@ function _performUpdate(
         installTask,
       );
     });
+
+    if (externalMigrations.length > 0) {
+      // tslint:disable-next-line: no-any
+      (global as any).externalMigrations = externalMigrations;
+    }
   }
 
   return of<void>(undefined);
@@ -906,7 +925,7 @@ export default function(options: UpdateSchema): Rule {
           );
           _validateUpdatePackages(infoMap, !!options.force, sublog);
 
-          return _performUpdate(tree, context, infoMap, logger, !!options.migrateOnly);
+          return _performUpdate(tree, context, infoMap, logger, !!options.migrateOnly, !!options.migrateExternal);
         } else {
           return _usageMessage(options, infoMap, logger);
         }

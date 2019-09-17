@@ -136,6 +136,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       const description = schematic.description as typeof schematic.description & {
         version?: string;
       };
+      description.version = coerceVersionNumber(description.version) || undefined;
       if (!description.version) {
         continue;
       }
@@ -489,7 +490,36 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       force: options.force || false,
       packageManager,
       packages: packagesToUpdate,
+      migrateExternal: true,
     });
+
+    if (success && !options.skipCommits) {
+      this.createCommit('Angular CLI update\n' + packagesToUpdate.join('\n'), []);
+    }
+
+    // This is a temporary workaround to allow data to be passed back from the update schematic
+    // tslint:disable-next-line: no-any
+    const migrations = (global as any).externalMigrations as {
+      package: string;
+      collection: string;
+      from: string;
+      to: string;
+    }[];
+
+    if (success && migrations) {
+      for (const migration of migrations) {
+        const result = await this.executeMigrations(
+          migration.package,
+          migration.collection,
+          new semver.Range('>' + migration.from + ' <=' + migration.to),
+          !options.skipCommits,
+        );
+
+        if (!result) {
+          return 0;
+        }
+      }
+    }
 
     return success ? 0 : 1;
   }
@@ -536,7 +566,11 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
   }
 }
 
-function coerceVersionNumber(version: string): string | null {
+function coerceVersionNumber(version: string | undefined): string | null {
+  if (!version) {
+    return null;
+  }
+
   if (!version.match(/^\d{1,30}\.\d{1,30}\.\d{1,30}/)) {
     const match = version.match(/^\d{1,30}(\.\d{1,30})*/);
 
