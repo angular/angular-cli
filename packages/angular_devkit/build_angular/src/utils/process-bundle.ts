@@ -56,7 +56,8 @@ async function processWorker(options: ProcessBundleOptions): Promise<void> {
   // if code size is larger than 500kB, manually handle sourcemaps with newer source-map package.
   // babel currently uses an older version that still supports sync calls
   const codeSize = Buffer.byteLength(options.code, 'utf8');
-  const manualSourceMaps = codeSize >= 500 * 1024;
+  const mapSize = options.map ? Buffer.byteLength(options.map, 'utf8') : 0;
+  const manualSourceMaps = codeSize >= 500 * 1024 || mapSize >= 500 * 1024;
 
   // downlevel the bundle
   let { code, map } = await transformAsync(options.code, {
