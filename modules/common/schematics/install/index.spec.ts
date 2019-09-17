@@ -52,4 +52,20 @@ describe('Universal Schematic', () => {
       'server.ts',
     ]);
   });
+
+  it(`should work when server target already exists`, async () => {
+    let tree = await schematicRunner
+      .runExternalSchematicAsync('@schematics/angular', 'universal', defaultOptions, appTree)
+      .toPromise();
+
+    tree = await schematicRunner
+      .runSchematicAsync('install', defaultOptions, tree)
+      .toPromise();
+
+    const contents = JSON.parse(tree.readContent('/projects/bar/tsconfig.server.json'));
+    expect(contents.files).toEqual([
+      'src/main.server.ts',
+      'server.ts',
+    ]);
+  });
 });

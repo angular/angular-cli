@@ -10,6 +10,7 @@ import {
   externalSchematic,
   Rule,
   SchematicsException,
+  noop,
 } from '@angular-devkit/schematics';
 import {normalize, join, parseJsonAst, JsonParseMode} from '@angular-devkit/core';
 import {updateWorkspace} from '@schematics/angular/utility/workspace';
@@ -120,9 +121,13 @@ function updateServerTsConfigRule(options: UniversalOptions): Rule {
 }
 
 export default function (options: UniversalOptions): Rule {
-  return () => {
+  return async host => {
+    const clientProject = await getClientProject(host, options.clientProject);
+
     return chain([
-      externalSchematic('@schematics/angular', 'universal', options),
+      clientProject.targets.has('server')
+        ? noop()
+        : externalSchematic('@schematics/angular', 'universal', options),
       addScriptsRule(options),
       updateServerTsConfigRule(options),
       updateConfigFileRule(options),
