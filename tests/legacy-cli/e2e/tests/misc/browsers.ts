@@ -39,7 +39,7 @@ export default async function () {
   await replaceInFile(
     'e2e/src/app.e2e-spec.ts',
     'await browser.manage().logs().get(logging.Type.BROWSER)',
-    '[]',
+    '[] as any',
   );
 
   // Workaround defect in getText WebDriver implementation for Safari/Edge

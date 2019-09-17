@@ -10,6 +10,8 @@ export default async function () {
   const veEnabled = argv['ve'];
 
   await ng('add', '@nguniversal/express-engine', '--client-project', 'test-project');
+  // todo remove once https://github.com/angular/universal/pull/1229 is landed
+  await silentNpm('install', '@types/express', '--save-dev');
 
   await updateJsonFile('package.json', packageJson => {
     const dependencies = packageJson['dependencies'];

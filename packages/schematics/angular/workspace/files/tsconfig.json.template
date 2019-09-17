@@ -2,7 +2,12 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
-    "outDir": "./dist/out-tsc",
+    "outDir": "./dist/out-tsc",<% if (strict) { %>
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": true,<% } %>
     "sourceMap": true,
     "declaration": false,
     "downlevelIteration": true,

@@ -71,4 +71,16 @@ describe('Workspace Schematic', () => {
     expect(files).not.toContain('/tslint.json');
     expect(files).not.toContain('/.editorconfig');
   });
+
+  it('should not add strict compiler options when false', async () => {
+    const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, strict: false }).toPromise();
+    const { compilerOptions } = JSON.parse(tree.readContent('/tsconfig.json'));
+    expect(compilerOptions.strictNullChecks).not.toBeDefined();
+  });
+
+  it('should not add strict compiler options when true', async () => {
+    const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, strict: true }).toPromise();
+    const { compilerOptions } = JSON.parse(tree.readContent('/tsconfig.json'));
+    expect(compilerOptions.strictNullChecks).toBe(true);
+  });
 });
