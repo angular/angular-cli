@@ -66,6 +66,11 @@
         "npm",
         "yarn"
       ]
+    },
+    "migrateExternal": {
+      "type": "boolean",
+      "default": false,
+      "hidden": true
     }
   },
   "required": [
