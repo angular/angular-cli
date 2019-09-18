@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { experimental, json, workspaces } from '@angular-devkit/core';
-import { resolve } from '@angular-devkit/core/node';
 import * as path from 'path';
 import { BuilderInfo } from '../src';
 import { Schema as BuilderSchema } from '../src/builders-schema';
@@ -56,11 +55,8 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
       throw new Error('No builder name specified.');
     }
 
-    const packageJsonPath = resolve(packageName, {
-      basedir: this._root,
-      checkLocal: true,
-      checkGlobal: true,
-      resolvePackageJson: true,
+    const packageJsonPath = require.resolve(packageName + '/package.json', {
+      paths: [this._root],
     });
 
     const packageJson = require(packageJsonPath);

@@ -40,7 +40,6 @@ export declare class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
 }
 
 export declare class NodeModuleJobRegistry<MinimumArgumentValueT extends JsonValue = JsonValue, MinimumInputValueT extends JsonValue = JsonValue, MinimumOutputValueT extends JsonValue = JsonValue> implements core_experimental.jobs.Registry<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT> {
-    constructor(_resolveLocal?: boolean, _resolveGlobal?: boolean);
     protected _resolve(name: string): string | null;
     get<A extends MinimumArgumentValueT, I extends MinimumInputValueT, O extends MinimumOutputValueT>(name: core_experimental.jobs.JobName): Observable<core_experimental.jobs.JobHandler<A, I, O> | null>;
 }
