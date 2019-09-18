@@ -157,6 +157,22 @@ describe('App Shell Schematic', () => {
     expect(content).toMatch(/import { Routes, RouterModule } from \'@angular\/router\';/);
   });
 
+  it('should work after adding nguniversal', async () => {
+    let tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+      .toPromise();
+
+    // change main tsconfig to mimic ng add for nguniveral
+    const workspace = JSON.parse(appTree.readContent('/angular.json'));
+    workspace.projects.bar.architect.server.options.main = 'server.ts';
+    appTree.overwrite('angular.json', JSON.stringify(workspace, undefined, 2));
+
+    tree = await schematicRunner.runSchematicAsync('appShell', defaultOptions, tree)
+      .toPromise();
+    const filePath = '/projects/bar/src/app/app.server.module.ts';
+    const content = tree.readContent(filePath);
+    expect(content).toMatch(/import { Routes, RouterModule } from \'@angular\/router\';/);
+  });
+
   it('should define a server route', async () => {
     const tree = await schematicRunner.runSchematicAsync('appShell', defaultOptions, appTree)
       .toPromise();
