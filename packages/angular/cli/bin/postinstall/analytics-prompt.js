@@ -1,16 +1,14 @@
 'use strict';
-// This file is ES6 because it needs to be executed as is.
+// This file is ES5 because it needs to be executed as is.
 
-if ('NG_CLI_ANALYTICS' in process.env) {
+if (process.env['NG_CLI_ANALYTICS'] !== undefined) {
   return;
 }
 
-(async () => {
-  try {
-    const analytics = require('../../models/analytics');
+try {
+  var analytics = require('../../models/analytics');
 
-    if (!analytics.hasGlobalAnalyticsConfiguration()) {
-      await analytics.promptGlobalAnalytics();
-    }
-  } catch (_) {}
-})();
+  if (!analytics.hasGlobalAnalyticsConfiguration()) {
+    analytics.promptGlobalAnalytics().catch(function() { });
+  }
+} catch (_) {}
