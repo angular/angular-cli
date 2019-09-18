@@ -21,8 +21,11 @@ var_2: &cache_key_fallback angular_devkit-0.11.0
 var_1_win: &cache_key_win angular_devkit-win-0.11.0-{{ checksum "yarn.lock" }}
 var_2_win: &cache_key_fallback_win angular_devkit-win-0.11.0
 var_3: &default_nodeversion "12.1"
-var_4: &attach_options
-  at: .
+# Workspace initially persisted by the `setup` job, and then enhanced by `setup-and-build-win`.
+# https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
+# https://circleci.com/blog/deep-diving-into-circleci-workspaces/
+var_4: &workspace_location .
+# Filter to ignore pull requests on a given job.
 var_5: &ignore_pull_requests
   filters:
     branches:
@@ -63,6 +66,11 @@ executors:
 # Command Definitions
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-commands
 commands:
+  custom_attach_workspace:
+    description: Attach workspace at a predefined location
+    steps:
+      - attach_workspace:
+          at: *workspace_location
   setup_windows:
     steps:     
       - run:
@@ -123,7 +131,7 @@ jobs:
             - *cache_key_fallback
       - run: yarn install --frozen-lockfile
       - persist_to_workspace:
-          root: .
+          root: *workspace_location
           paths:
             - ./*
       - save_cache:
@@ -134,7 +142,7 @@ jobs:
   lint:
     executor: action-executor
     steps:
-      - attach_workspace: *attach_options
+      - custom_attach_workspace
       - run: yarn lint
       - run: 'yarn bazel:format -mode=check ||
               (echo "BUILD files not formatted. Please run ''yarn bazel:format''" ; exit 1)'
@@ -145,13 +153,13 @@ jobs:
   validate:
     executor: action-executor
     steps:
-      - attach_workspace: *attach_options
+      - custom_attach_workspace
       - run: yarn validate --ci
 
   test:
     executor: action-executor
     steps:
-      - attach_workspace: *attach_options
+      - custom_attach_workspace
       - run: yarn test --full
 
   test-large:
@@ -166,7 +174,7 @@ jobs:
     resource_class: large
     parallelism: 4
     steps:
-      - attach_workspace: *attach_options
+      - custom_attach_workspace
       - run: yarn webdriver-update
       - run: yarn test-large --full <<# parameters.ivy >>--ivy<</ parameters.ivy >> <<# parameters.glob >>--glob="<< parameters.glob >>"<</ parameters.glob >> --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
 
@@ -181,7 +189,7 @@ jobs:
     executor: test-executor
     parallelism: 4
     steps:
-      - attach_workspace: *attach_options
+      - custom_attach_workspace
       - run:
           name: Initialize Environment
           command: ./.circleci/env.sh
@@ -195,7 +203,7 @@ jobs:
       nodeversion: "10.12"
     parallelism: 4
     steps:
-      - attach_workspace: *attach_options
+      - custom_attach_workspace
       - run:
           name: Initialize Environment
           command: |
@@ -210,7 +218,7 @@ jobs:
     environment:
       E2E_BROWSERS: true
     steps:
-      - attach_workspace: *attach_options
+      - custom_attach_workspace
       - run:
           name: Initialize Environment
           command: ./.circleci/env.sh
@@ -230,7 +238,7 @@ jobs:
   build:
     executor: action-executor
     steps:
-      - attach_workspace: *attach_options
+      - custom_attach_workspace
       - run: yarn build
 
   # This is where we put all the misbehaving and flaky tests so we can fine-tune their conditions 
@@ -238,7 +246,7 @@ jobs:
   flake-jail:
     executor: action-executor
     steps:
-      - attach_workspace: *attach_options
+      - custom_attach_workspace
       - run: yarn webdriver-update
       - run: yarn test-large --full --flakey
       - run: yarn test-large --full --flakey --ivy=true
@@ -247,7 +255,7 @@ jobs:
     executor: action-executor
     resource_class: xlarge
     steps:
-      - attach_workspace: *attach_options
+      - custom_attach_workspace
       - setup_bazel_rbe
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run: yarn bazel:test
@@ -255,7 +263,7 @@ jobs:
   snapshot_publish:
     executor: action-executor
     steps:
-      - attach_workspace: *attach_options
+      - custom_attach_workspace
       - run:
           name: Decrypt Credentials
           # Note: when changing the image, you might have to re-encrypt the credentials with a 
@@ -271,7 +279,7 @@ jobs:
   publish:
     executor: action-executor
     steps:
-      - attach_workspace: *attach_options
+      - custom_attach_workspace
       - run:
           name: Decrypt Credentials
           command: |
@@ -287,7 +295,7 @@ jobs:
   setup-and-build-win:
     executor: windows-executor
     steps:
-      - attach_workspace: *attach_options
+      - custom_attach_workspace
       - setup_windows              
       - restore_cache:
           keys:
@@ -303,14 +311,14 @@ jobs:
       # Only jobs downstream from this one will see the updated workspace
       # https://circleci.com/blog/deep-diving-into-circleci-workspaces/
       - persist_to_workspace:
-          root: .
+          root: *workspace_location
           paths:
             - ./*            
 
   test-win:
     executor: windows-executor
     steps:
-      - attach_workspace: *attach_options
+      - custom_attach_workspace
       - setup_windows
       - run: yarn test --full
       # Run partial e2e suite on PRs only. Master will run the full e2e suite with sharding.
