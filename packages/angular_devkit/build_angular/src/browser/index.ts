@@ -13,7 +13,6 @@ import {
   runWebpack,
 } from '@angular-devkit/build-webpack';
 import {
-  experimental,
   getSystemPath,
   join,
   json,
@@ -108,7 +107,7 @@ export async function buildBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,
   context: BuilderContext,
   host: virtualFs.Host<fs.Stats> = new NodeJsSyncHost(),
-): Promise<{ workspace: experimental.workspace.Workspace; config: webpack.Configuration[] }> {
+): Promise<{ config: webpack.Configuration[], projectRoot: string, projectSourceRoot?: string }> {
   return generateBrowserWebpackConfigFromContext(
     options,
     context,
@@ -160,8 +159,12 @@ async function initialize(
   context: BuilderContext,
   host: virtualFs.Host<fs.Stats>,
   webpackConfigurationTransform?: ExecutionTransformer<webpack.Configuration>,
-): Promise<{ workspace: experimental.workspace.Workspace; config: webpack.Configuration[] }> {
-  const { config, workspace } = await buildBrowserWebpackConfigFromContext(options, context, host);
+): Promise<{ config: webpack.Configuration[]; projectRoot: string; projectSourceRoot?: string }> {
+  const { config, projectRoot, projectSourceRoot } = await buildBrowserWebpackConfigFromContext(
+    options,
+    context,
+    host,
+  );
 
   let transformedConfig;
   if (webpackConfigurationTransform) {
@@ -179,7 +182,7 @@ async function initialize(
     ).toPromise();
   }
 
-  return { config: transformedConfig || config, workspace };
+  return { config: transformedConfig || config, projectRoot, projectSourceRoot };
 }
 
 // tslint:disable-next-line: no-big-function
@@ -203,23 +206,10 @@ export function buildWebpackBrowser(
 
   return from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
     // tslint:disable-next-line: no-big-function
-    switchMap(({ workspace, config: configs }) => {
-      const projectName = context.target
-        ? context.target.project
-        : workspace.getDefaultProjectName();
-
-      if (!projectName) {
-        throw new Error('Must either have a target from the context or a default project.');
-      }
-
-      const projectRoot = resolve(
-        workspace.root,
-        normalize(workspace.getProject(projectName).root),
-      );
-
+    switchMap(({ config: configs, projectRoot }) => {
       const tsConfig = readTsconfig(options.tsConfig, context.workspaceRoot);
       const target = tsConfig.options.target || ScriptTarget.ES5;
-      const buildBrowserFeatures = new BuildBrowserFeatures(getSystemPath(projectRoot), target);
+      const buildBrowserFeatures = new BuildBrowserFeatures(projectRoot, target);
 
       const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded();
 
@@ -570,7 +560,7 @@ export function buildWebpackBrowser(
               augmentAppWithServiceWorker(
                 host,
                 root,
-                projectRoot,
+                normalize(projectRoot),
                 resolve(root, normalize(options.outputPath)),
                 options.baseHref || '/',
                 options.ngswConfigPath,

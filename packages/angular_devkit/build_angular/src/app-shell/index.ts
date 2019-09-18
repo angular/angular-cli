@@ -11,7 +11,7 @@ import {
   createBuilder,
   targetFromTargetString,
 } from '@angular-devkit/architect';
-import { JsonObject, experimental, join, normalize, resolve, schema } from '@angular-devkit/core';
+import { JsonObject, join, normalize, resolve, schema } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -81,21 +81,17 @@ async function _renderUniversal(
 
   if (browserOptions.serviceWorker) {
     const host = new NodeJsSyncHost();
-    // Create workspace.
-    const registry = new schema.CoreSchemaRegistry();
-    registry.addPostTransform(schema.transforms.addUndefinedDefaults);
 
-    const workspace = await experimental.workspace.Workspace.fromPath(
-      host,
-      normalize(context.workspaceRoot),
-      registry,
-    );
-    const projectName = context.target ? context.target.project : workspace.getDefaultProjectName();
-
+    const projectName = context.target && context.target.project;
     if (!projectName) {
-      throw new Error('Must either have a target from the context or a default project.');
+      throw new Error('The builder requires a target.');
     }
-    const projectRoot = resolve(workspace.root, normalize(workspace.getProject(projectName).root));
+
+    const projectMetadata = await context.getProjectMetadata(projectName);
+    const projectRoot = resolve(
+      normalize(context.workspaceRoot),
+      normalize((projectMetadata.root as string) || ''),
+    );
 
     await augmentAppWithServiceWorker(
       host,

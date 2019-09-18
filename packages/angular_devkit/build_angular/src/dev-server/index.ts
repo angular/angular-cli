@@ -13,12 +13,8 @@ import {
   runWebpackDevServer,
 } from '@angular-devkit/build-webpack';
 import {
-  experimental,
-  getSystemPath,
   json,
   logging,
-  normalize,
-  resolve,
   tags,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
@@ -98,7 +94,7 @@ export function serveWebpackBrowser(
     webpackConfig: webpack.Configuration;
     webpackDevServerConfig: WebpackDevServer.Configuration;
     port: number;
-    workspace: experimental.workspace.Workspace;
+    projectRoot: string;
   }> {
     // Get the browser configuration from the target name.
     const rawBrowserOptions = await context.getTargetOptions(browserTarget);
@@ -149,12 +145,12 @@ export function serveWebpackBrowser(
       webpackConfig,
       webpackDevServerConfig,
       port,
-      workspace: webpackConfigResult.workspace,
+      projectRoot: webpackConfigResult.projectRoot,
     };
   }
 
   return from(setup()).pipe(
-    switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port, workspace }) => {
+    switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port, projectRoot }) => {
       options.port = port;
 
       // Resolve public host and client address.
@@ -192,21 +188,9 @@ export function serveWebpackBrowser(
 
       if (browserOptions.index) {
         const { scripts = [], styles = [], baseHref, tsConfig } = browserOptions;
-        const projectName = context.target
-          ? context.target.project
-          : workspace.getDefaultProjectName();
-
-        if (!projectName) {
-          throw new Error('Must either have a target from the context or a default project.');
-        }
-        const projectRoot = resolve(
-          workspace.root,
-          normalize(workspace.getProject(projectName).root),
-        );
-
         const { options: compilerOptions } = readTsconfig(tsConfig, context.workspaceRoot);
         const target = compilerOptions.target || ts.ScriptTarget.ES5;
-        const buildBrowserFeatures = new BuildBrowserFeatures(getSystemPath(projectRoot), target);
+        const buildBrowserFeatures = new BuildBrowserFeatures(projectRoot, target);
 
         const entrypoints = generateEntryPoints({ scripts, styles });
         const moduleEntrypoints = buildBrowserFeatures.isDifferentialLoadingNeeded()
