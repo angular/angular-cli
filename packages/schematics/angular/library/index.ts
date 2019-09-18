@@ -104,11 +104,6 @@ function addDependenciesToPackageJson() {
         version: latestVersions.ngPackagr,
       },
       {
-        type: NodeDependencyType.Dev,
-        name: 'tsickle',
-        version: latestVersions.tsickle,
-      },
-      {
         type: NodeDependencyType.Default,
         name: 'tslib',
         version: latestVersions.TsLib,
