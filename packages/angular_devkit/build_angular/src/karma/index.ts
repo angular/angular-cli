@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import { experimental, getSystemPath, join } from '@angular-devkit/core';
+import { getSystemPath, join, normalize } from '@angular-devkit/core';
 import { dirname, resolve } from 'path';
 import { Observable, from } from 'rxjs';
 import { defaultIfEmpty, switchMap } from 'rxjs/operators';
@@ -40,8 +40,8 @@ async function initialize(
   context: BuilderContext,
   webpackConfigurationTransformer?: ExecutionTransformer<webpack.Configuration>,
   // tslint:disable-next-line:no-implicit-dependencies
-): Promise<[experimental.workspace.Workspace, typeof import('karma'), webpack.Configuration]> {
-  const { config, workspace } = await generateBrowserWebpackConfigFromContext(
+): Promise<[typeof import('karma'), webpack.Configuration]> {
+  const { config } = await generateBrowserWebpackConfigFromContext(
     // only two properties are missing:
     // * `outputPath` which is fixed for tests
     // * `budgets` which might be incorrect due to extra dev libs
@@ -60,7 +60,6 @@ async function initialize(
   const karma = await import('karma');
 
   return [
-    workspace,
     karma,
     webpackConfigurationTransformer ? await webpackConfigurationTransformer(config[0]) : config[0],
   ];
@@ -80,7 +79,7 @@ export function execute(
 
   return from(initialize(options, context, transforms.webpackConfiguration)).pipe(
     switchMap(
-      ([workspace, karma, webpackConfig]) =>
+      ([karma, webpackConfig]) =>
         new Observable<BuilderOutput>(subscriber => {
           const karmaOptions: KarmaConfigOptions = {};
 
@@ -111,12 +110,10 @@ export function execute(
             options.include &&
             options.include.length > 0
           ) {
-            const mainFilePath = getSystemPath(join(workspace.root, options.main));
-            const files = findTests(
-              options.include,
-              dirname(mainFilePath),
-              getSystemPath(workspace.root),
+            const mainFilePath = getSystemPath(
+              join(normalize(context.workspaceRoot), options.main),
             );
+            const files = findTests(options.include, dirname(mainFilePath), context.workspaceRoot);
             // early exit, no reason to start karma
             if (!files.length) {
               subscriber.error(
