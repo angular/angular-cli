@@ -15,6 +15,8 @@ export interface BuilderContext {
     workspaceRoot: string;
     addTeardown(teardown: () => (Promise<void> | void)): void;
     getBuilderNameForTarget(target: Target): Promise<string>;
+    getProjectMetadata(target: Target): Promise<json.JsonObject>;
+    getProjectMetadata(projectName: string): Promise<json.JsonObject>;
     getTargetOptions(target: Target): Promise<json.JsonObject>;
     reportProgress(current: number, total?: number, status?: string): void;
     reportRunning(): void;
