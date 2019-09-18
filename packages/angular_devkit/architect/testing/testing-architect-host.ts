@@ -104,6 +104,10 @@ export class TestingArchitectHost implements ArchitectHost {
     return maybeTarget.options;
   }
 
+  async getProjectMetadata(target: Target | string): Promise<json.JsonObject | null> {
+    return this._backendHost && this._backendHost.getProjectMetadata(target as string);
+  }
+
   async loadBuilder(info: BuilderInfo): Promise<Builder | null> {
     return this._builderImportMap.get(info.builderName)
         || (this._backendHost && this._backendHost.loadBuilder(info));

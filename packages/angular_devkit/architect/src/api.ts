@@ -197,6 +197,9 @@ export interface BuilderContext {
    */
   getTargetOptions(target: Target): Promise<json.JsonObject>;
 
+  getProjectMetadata(projectName: string): Promise<json.JsonObject>;
+  getProjectMetadata(target: Target): Promise<json.JsonObject>;
+
   /**
    * Resolves and return a builder name. The exact format of the name is up to the host,
    * so it should not be parsed to gather information (it's free form). This string can be

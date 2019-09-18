@@ -277,6 +277,30 @@ function _getTargetOptionsFactory(host: ArchitectHost) {
   );
 }
 
+function _getProjectMetadataFactory(host: ArchitectHost) {
+  return experimental.jobs.createJobHandler<Target, json.JsonValue, json.JsonObject>(
+    target => {
+      return host.getProjectMetadata(target).then(options => {
+        if (options === null) {
+          throw new Error(`Invalid target: ${JSON.stringify(target)}.`);
+        }
+
+        return options;
+      });
+    },
+    {
+      name: '..getProjectMetadata',
+      output: { type: 'object' },
+      argument: {
+        oneOf: [
+          { type: 'string' },
+          inputSchema.properties.target,
+        ],
+      },
+    },
+  );
+}
+
 function _getBuilderNameForTargetFactory(host: ArchitectHost) {
   return experimental.jobs.createJobHandler<Target, never, string>(async target => {
     const builderName = await host.getBuilderNameForTarget(target);
@@ -342,6 +366,7 @@ export class Architect {
     privateArchitectJobRegistry.register(_getTargetOptionsFactory(_host));
     privateArchitectJobRegistry.register(_getBuilderNameForTargetFactory(_host));
     privateArchitectJobRegistry.register(_validateOptionsFactory(_host, registry));
+    privateArchitectJobRegistry.register(_getProjectMetadataFactory(_host));
 
     const jobRegistry = new experimental.jobs.FallbackRegistry([
       new ArchitectTargetJobRegistry(_host, registry, this._jobCache, this._infoCache),

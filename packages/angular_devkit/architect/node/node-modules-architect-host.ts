@@ -113,6 +113,29 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
     };
   }
 
+  async getProjectMetadata(target: Target | string): Promise<json.JsonObject | null> {
+    const projectName = typeof target === 'string' ? target : target.project;
+
+    // NOTE: Remove conditional when deprecated support for experimental workspace API is removed.
+    if ('getProject' in this._workspace) {
+      return this._workspace.getProject(projectName) as unknown as json.JsonObject;
+    } else {
+      const projectDefinition = this._workspace.projects.get(projectName);
+      if (!projectDefinition) {
+        throw new Error('Project does not exist.');
+      }
+
+      const metadata = {
+        root: projectDefinition.root,
+        sourceRoot: projectDefinition.sourceRoot,
+        prefix: projectDefinition.prefix,
+        ...projectDefinition.extensions,
+      } as unknown as json.JsonObject;
+
+      return metadata;
+    }
+  }
+
   async loadBuilder(info: NodeModulesBuilderInfo): Promise<Builder> {
     const builder = (await import(info.import)).default;
     if (builder[BuilderSymbol]) {

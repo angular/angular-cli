@@ -25,6 +25,7 @@ import { Builder, BuilderSymbol, BuilderVersionSymbol } from './internal';
 import { scheduleByName, scheduleByTarget } from './schedule-by-name';
 
 
+// tslint:disable-next-line: no-big-function
 export function createBuilder<
   OptT extends json.JsonObject,
   OutT extends BuilderOutput = BuilderOutput,
@@ -143,6 +144,10 @@ export function createBuilder<
           async getTargetOptions(target: Target) {
             return scheduler.schedule<Target, json.JsonValue, json.JsonObject>(
                     '..getTargetOptions', target).output.toPromise();
+          },
+          async getProjectMetadata(target: Target | string) {
+            return scheduler.schedule<Target | string, json.JsonValue, json.JsonObject>(
+                    '..getProjectMetadata', target).output.toPromise();
           },
           async getBuilderNameForTarget(target: Target) {
             return scheduler.schedule<Target, json.JsonValue, string>(
