@@ -65,6 +65,7 @@ import {
   normalizeOptimization,
   normalizeSourceMaps,
 } from '../utils';
+import { manglingDisabled } from '../utils/mangle-options';
 import { CacheKey, ProcessBundleOptions } from '../utils/process-bundle';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import {
@@ -385,7 +386,10 @@ export function buildWebpackBrowser(
                 const codeHash = createHash('sha1')
                   .update(action.code)
                   .digest('hex');
-                const baseCacheKey = `${packageVersion}|${action.code.length}|${codeHash}`;
+                let baseCacheKey = `${packageVersion}|${action.code.length}|${codeHash}`;
+                if (manglingDisabled) {
+                  baseCacheKey += '|MD';
+                }
 
                 // Postfix added to sourcemap cache keys when vendor sourcemaps are present
                 // Allows non-destructive caching of both variants
