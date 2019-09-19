@@ -190,7 +190,7 @@ function _assignOption(
     const v = _coerce(value, option, parsedOptions[option.name]);
     if (v !== undefined) {
       if (parsedOptions[option.name] !== v) {
-        if (parsedOptions[option.name] !== undefined) {
+        if (parsedOptions[option.name] !== undefined && option.type !== OptionType.Array) {
           warnings.push(
             `Option ${JSON.stringify(option.name)} was already specified with value `
             + `${JSON.stringify(parsedOptions[option.name])}. The new value ${JSON.stringify(v)} `
