@@ -111,9 +111,9 @@ web_test_repositories()
 # Bring in bazel_toolchains for RBE setup configuration.
 http_archive(
     name = "bazel_toolchains",
-    sha256 = "ef95c8567ebf1bc7cebf77511de50d0da04a9be3b345727595e284c59a2787cf",
-    strip_prefix = "bazel-toolchains-0.29.4",
-    url = "https://github.com/bazelbuild/bazel-toolchains/archive/0.29.4.tar.gz",
+    sha256 = "22ca5b8115c8673ecb627a02b606529e813961e447933863fccdf325cc5f999f",
+    strip_prefix = "bazel-toolchains-0.29.5",
+    url = "https://github.com/bazelbuild/bazel-toolchains/archive/0.29.5.tar.gz",
 )
 
 load("@bazel_toolchains//rules:environments.bzl", "clang_env")
