@@ -8,15 +8,8 @@
 import * as fs from 'fs';
 import { Request, ResponseToolkit } from 'hapi';
 
-import { NgModuleFactory, Type, CompilerFactory, Compiler, StaticProvider } from '@angular/core';
-import { ResourceLoader } from '@angular/compiler';
-import {
-  INITIAL_CONFIG,
-  renderModuleFactory,
-  platformDynamicServer
-} from '@angular/platform-server';
-
-import { FileLoader } from './file-loader';
+import { NgModuleFactory, Type, StaticProvider } from '@angular/core';
+import { ɵCommonEngine as CommonEngine } from '@nguniversal/common/engine';
 import { REQUEST, RESPONSE } from '@nguniversal/hapi-engine/tokens';
 
 /**
@@ -43,34 +36,23 @@ export interface RenderOptions extends NgSetupOptions {
 const templateCache: { [key: string]: string } = {};
 
 /**
- * Map of Module Factories
+ * The CommonEngine with module to facory map in case of JIT.
  */
-const factoryCacheMap = new Map<Type<{}>, NgModuleFactory<{}>>();
+const commonEngine = new CommonEngine(undefined);
 
 /**
  * This is an express engine for handling Angular Applications
  */
-export function ngHapiEngine(options: RenderOptions) {
-
+export function ngHapiEngine(options: Readonly<RenderOptions>) {
   const req = options.req;
-  const compilerFactory: CompilerFactory = platformDynamicServer().injector.get(CompilerFactory);
-  const compiler: Compiler = compilerFactory.createCompiler([
-    {
-      providers: [
-        { provide: ResourceLoader, useClass: FileLoader, deps: [] }
-      ]
-    }
-  ]);
-
   if (req.raw.req.url === undefined) {
     return Promise.reject(new Error('url is undefined'));
   }
 
   const protocol = req.server.info.protocol;
   const filePath = <string> req.raw.req.url;
-  const url = `${protocol}://${req.info.host}${req.path}`;
 
-  options.providers = options.providers || [];
+  const renderOptions: RenderOptions = Object.assign({}, options);
 
   return new Promise((resolve, reject) => {
     const moduleOrFactory = options.bootstrap;
@@ -79,52 +61,13 @@ export function ngHapiEngine(options: RenderOptions) {
       return reject(new Error('You must pass in a NgModule or NgModuleFactory to be bootstrapped'));
     }
 
-    const extraProviders = options.providers!.concat(
-      options.providers!,
-      getReqProviders(options.req),
-      [
-        {
-          provide: INITIAL_CONFIG,
-          useValue: {
-            document: options.document || getDocument(filePath),
-            url: options.url || url
-          }
-        }
-      ]);
+    renderOptions.url = options.url || `${protocol}://${req.info.host}${req.path}`;
+    renderOptions.document = options.document || getDocument(filePath);
 
-    getFactory(moduleOrFactory, compiler)
-      .then(factory => renderModuleFactory(factory, {extraProviders}))
-      .then(resolve, reject);
-  });
-}
+    renderOptions.providers = options.providers || [];
+    renderOptions.providers = renderOptions.providers.concat(getReqProviders(options.req));
 
-/**
- * Get a factory from a bootstrapped module/ module factory
- */
-function getFactory(
-  moduleOrFactory: Type<{}> | NgModuleFactory<{}>, compiler: Compiler
-): Promise<NgModuleFactory<{}>> {
-  return new Promise<NgModuleFactory<{}>>((resolve, reject) => {
-    // If module has been compiled AoT
-    if (moduleOrFactory instanceof NgModuleFactory) {
-      resolve(moduleOrFactory);
-      return;
-    } else {
-      let moduleFactory = factoryCacheMap.get(moduleOrFactory);
-
-      // If module factory is cached
-      if (moduleFactory) {
-        resolve(moduleFactory);
-        return;
-      }
-
-      // Compile the module and cache it
-      compiler.compileModuleAsync(moduleOrFactory)
-        .then((factory) => {
-          factoryCacheMap.set(moduleOrFactory, factory);
-          resolve(factory);
-        }, reject);
-    }
+    commonEngine.render(renderOptions).then(resolve, reject);
   });
 }
 

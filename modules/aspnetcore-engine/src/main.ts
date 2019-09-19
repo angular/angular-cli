@@ -91,8 +91,8 @@ function _getUniversalData(doc: Document): UniversalData {
   };
 }
 
-export function ngAspnetCoreEngine(options: IEngineOptions): Promise<IEngineRenderResult> {
-
+export function ngAspnetCoreEngine(options: Readonly<IEngineOptions>)
+    : Promise<IEngineRenderResult> {
   if (!options.appSelector) {
     const selector = `" appSelector: '<${appSelector}></${appSelector}>' "`;
     throw new Error(`appSelector is required! Pass in ${selector},
@@ -119,9 +119,9 @@ export function ngAspnetCoreEngine(options: IEngineOptions): Promise<IEngineRend
         throw new Error('You must pass in a NgModule or NgModuleFactory to be bootstrapped');
       }
 
-      options.providers = options.providers || [];
+      let extraProviders = options.providers || [];
 
-      const extraProviders = options.providers.concat(getReqResProviders(options.request.origin,
+      extraProviders = extraProviders.concat(getReqResProviders(options.request.origin,
         options.request.data.request));
 
       getFactory(moduleOrFactory, compiler)

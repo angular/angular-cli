@@ -31,7 +31,7 @@ export class CommonEngine {
   private factoryCacheMap = new Map<Type<{}>, NgModuleFactory<{}>>();
   private templateCache: {[key: string]: string} = {};
 
-  constructor(private moduleOrFactory: Type<{}> | NgModuleFactory<{}>,
+  constructor(private moduleOrFactory?: Type<{}> | NgModuleFactory<{}>,
               private providers: StaticProvider[] = []) {}
 
   /**
@@ -53,14 +53,14 @@ export class CommonEngine {
       }
     ];
 
-    const factory = await this.getFactory();
+    const moduleOrFactory = this.moduleOrFactory || opts.bootstrap;
+    const factory = await this.getFactory(moduleOrFactory);
     return renderModuleFactory(factory, {extraProviders});
   }
 
   /** Return the factory for a given engine instance */
-  getFactory(): Promise<NgModuleFactory<{}>> {
+  getFactory(moduleOrFactory: Type<{}> | NgModuleFactory<{}>): Promise<NgModuleFactory<{}>> {
     // If module has been compiled AoT
-    const moduleOrFactory = this.moduleOrFactory;
     if (moduleOrFactory instanceof NgModuleFactory) {
       return Promise.resolve(moduleOrFactory);
     } else {

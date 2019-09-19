@@ -10,6 +10,7 @@ ng_module(
     ]),
     module_name = "@nguniversal/hapi-engine",
     deps = [
+        "//modules/common/engine",
         "//modules/hapi-engine/tokens",
         "@npm//@angular/platform-server",
         "@npm//@types/hapi",

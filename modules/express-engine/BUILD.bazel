@@ -10,6 +10,7 @@ ng_module(
     ]),
     module_name = "@nguniversal/express-engine",
     deps = [
+        "//modules/common/engine",
         "//modules/express-engine/tokens",
         "@npm//@angular/compiler",
         "@npm//@angular/core",

@@ -8,15 +8,8 @@
 import * as fs from 'fs';
 import { Request, Response } from 'express';
 
-import { NgModuleFactory, Type, CompilerFactory, Compiler, StaticProvider } from '@angular/core';
-import { ResourceLoader } from '@angular/compiler';
-import {
-  INITIAL_CONFIG,
-  renderModuleFactory,
-  platformDynamicServer
-} from '@angular/platform-server';
-
-import { FileLoader } from './file-loader';
+import { NgModuleFactory, Type, StaticProvider } from '@angular/core';
+import { ɵCommonEngine as CommonEngine } from '@nguniversal/common/engine';
 import { REQUEST, RESPONSE } from '@nguniversal/express-engine/tokens';
 
 /**
@@ -43,100 +36,38 @@ export interface RenderOptions extends NgSetupOptions {
 const templateCache: { [key: string]: string } = {};
 
 /**
- * Map of Module Factories
- */
-const factoryCacheMap = new Map<Type<{}>, NgModuleFactory<{}>>();
-
-/**
  * This is an express engine for handling Angular Applications
  */
-export function ngExpressEngine(setupOptions: NgSetupOptions) {
-
-  const compilerFactory: CompilerFactory = platformDynamicServer().injector.get(CompilerFactory);
-  const compiler: Compiler = compilerFactory.createCompiler([
-    {
-      providers: [
-        { provide: ResourceLoader, useClass: FileLoader, deps: [] }
-      ]
-    }
-  ]);
+export function ngExpressEngine(setupOptions: Readonly<NgSetupOptions>) {
+  const engine = new CommonEngine(setupOptions.bootstrap, setupOptions.providers);
 
   return function (filePath: string,
-                   options: RenderOptions,
+                   options: Readonly<RenderOptions>,
                    callback: (err?: Error | null, html?: string) => void) {
-
-    options.providers = options.providers || [];
-
     try {
-      const moduleOrFactory = options.bootstrap || setupOptions.bootstrap;
-
-      if (!moduleOrFactory) {
+      if (!setupOptions.bootstrap && !options.bootstrap) {
         throw new Error('You must pass in a NgModule or NgModuleFactory to be bootstrapped');
       }
 
-      setupOptions.providers = setupOptions.providers || [];
-
       const req = options.req;
-      const extraProviders = setupOptions.providers.concat(
-        options.providers,
-        getReqResProviders(options.req, options.res),
-        [
-          {
-            provide: INITIAL_CONFIG,
-            useValue: {
-              document: options.document || getDocument(filePath),
-              url: options.url || `${req.protocol}://${(req.get('host') || '')}${req.originalUrl}`
-            }
-          }
-        ]);
 
-      getFactory(moduleOrFactory, compiler)
-        .then(factory => {
-          return renderModuleFactory(factory, {
-            extraProviders
-          });
-        })
-        .then((html: string) => {
-          callback(null, html);
-        }, (err) => {
-          callback(err);
-        });
+      const renderOptions: RenderOptions = Object.assign({}, options);
+
+      renderOptions.url =
+        options.url || `${req.protocol}://${(req.get('host') || '')}${req.originalUrl}`;
+      renderOptions.document = options.document || getDocument(filePath);
+
+      renderOptions.providers = options.providers || [];
+      renderOptions.providers =
+        renderOptions.providers.concat(getReqResProviders(options.req, options.res));
+
+      engine.render(renderOptions)
+        .then(html => callback(null, html))
+        .catch(callback);
     } catch (err) {
       callback(err);
     }
   };
-}
-
-/**
- * Get a factory from a bootstrapped module/ module factory
- */
-function getFactory(
-  moduleOrFactory: Type<{}> | NgModuleFactory<{}>, compiler: Compiler
-): Promise<NgModuleFactory<{}>> {
-  return new Promise<NgModuleFactory<{}>>((resolve, reject) => {
-    // If module has been compiled AoT
-    if (moduleOrFactory instanceof NgModuleFactory) {
-      resolve(moduleOrFactory);
-      return;
-    } else {
-      let moduleFactory = factoryCacheMap.get(moduleOrFactory);
-
-      // If module factory is cached
-      if (moduleFactory) {
-        resolve(moduleFactory);
-        return;
-      }
-
-      // Compile the module and cache it
-      compiler.compileModuleAsync(moduleOrFactory)
-        .then((factory) => {
-          factoryCacheMap.set(moduleOrFactory, factory);
-          resolve(factory);
-        }, (err => {
-          reject(err);
-        }));
-    }
-  });
 }
 
 /**
