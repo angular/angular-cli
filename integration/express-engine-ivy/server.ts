@@ -6,33 +6,34 @@ import { join } from 'path';
 
 import { AppServerModule } from './src/main.server';
 
+// The Express app is exported so that it can be used by serverless Functions.
+export const app = express();
+const distFolder = join(process.cwd(), 'dist/express-engine-ivy/browser');
+
+// Our Universal express-engine (found @ https://github.com/angular/universal/tree/master/modules/express-engine)
+app.engine('html', ngExpressEngine({
+  bootstrap: AppServerModule,
+}));
+
+app.set('view engine', 'html');
+app.set('views', distFolder);
+
+// Example Express Rest API endpoints
+// app.get('/api/**', (req, res) => { });
+// Serve static files from /browser
+app.get('*.*', express.static(distFolder, {
+  maxAge: '1y'
+}));
+
+// All regular routes use the Universal engine
+app.get('*', (req, res) => {
+  res.render('index', { req });
+});
+
 // Express server
 function run() {
-  const app = express();
-  const port: string | number = process.env.PORT || 4000;
-  const distFolder = join(process.cwd(), 'dist/express-engine-ivy/browser');
-
-  // Our Universal express-engine (found @ https://github.com/angular/universal/tree/master/modules/express-engine)
-  app.engine('html', ngExpressEngine({
-    bootstrap: AppServerModule,
-  }));
-
-  app.set('view engine', 'html');
-  app.set('views', distFolder);
-
-  // Example Express Rest API endpoints
-  // app.get('/api/**', (req, res) => { });
-  // Serve static files from /browser
-  app.get('*.*', express.static(distFolder, {
-    maxAge: '1y'
-  }));
-
-  // All regular routes use the Universal engine
-  app.get('*', (req, res) => {
-    res.render('index', { req });
-  });
-
   // Start up the Node server
+  const port: string | number = process.env.PORT || 4000;
   app.listen(port, () => {
     console.log(`Node Express server listening on http://localhost:${port}`);
   });
