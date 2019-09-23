@@ -27,9 +27,8 @@ import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { createHash } from 'crypto';
 import * as findCacheDirectory from 'find-cache-dir';
 import * as fs from 'fs';
-import * as os from 'os';
 import * as path from 'path';
-import { from, of } from 'rxjs';
+import { Observable, from, of } from 'rxjs';
 import { bufferCount, catchError, concatMap, map, mergeScan, switchMap } from 'rxjs/operators';
 import { ScriptTarget } from 'typescript';
 import * as webpack from 'webpack';
@@ -192,7 +191,7 @@ export function buildWebpackBrowser(
     logging?: WebpackLoggingCallback;
     indexHtml?: IndexHtmlTransform;
   } = {},
-) {
+): Observable<BrowserBuilderOutput> {
   const host = new NodeJsSyncHost();
   const root = normalize(context.workspaceRoot);
 

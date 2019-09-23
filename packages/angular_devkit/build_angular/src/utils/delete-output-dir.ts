@@ -6,13 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Path, resolve, virtualFs } from '@angular-devkit/core';
-import { EMPTY } from 'rxjs';
-import { concatMap, last } from 'rxjs/operators';
+import { EMPTY, Observable } from 'rxjs';
+import { concatMap, last, map } from 'rxjs/operators';
 
 /**
  * Delete an output directory, but error out if it's the root of the project.
  */
-export function deleteOutputDir(root: Path, outputPath: Path, host: virtualFs.Host) {
+export function deleteOutputDir(root: Path, outputPath: Path, host: virtualFs.Host): Observable<void> {
   const resolvedOutputPath = resolve(root, outputPath);
   if (resolvedOutputPath === root) {
     throw new Error('Output path MUST not be project root directory!');
@@ -21,5 +21,6 @@ export function deleteOutputDir(root: Path, outputPath: Path, host: virtualFs.Ho
   return host.exists(resolvedOutputPath).pipe(
     concatMap(exists => exists ? host.delete(resolvedOutputPath) : EMPTY),
     last(null, null),
+    map(() => undefined),
   );
 }
