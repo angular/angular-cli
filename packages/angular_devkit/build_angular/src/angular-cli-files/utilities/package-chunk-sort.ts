@@ -27,11 +27,13 @@ export function generateEntryPoints(appConfig: {
 
   const entryPoints = [
     'polyfills-nomodule-es5',
+    'runtime',
     'polyfills-es5',
     'polyfills',
     'sw-register',
     ...extraEntryPoints(appConfig.styles, 'styles'),
     ...extraEntryPoints(appConfig.scripts, 'scripts'),
+    'vendor',
     'main',
   ];
 
