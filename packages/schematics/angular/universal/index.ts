@@ -62,10 +62,7 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
           production: {
             fileReplacements,
             sourceMap: false,
-            optimization: {
-              scripts: false,
-              styles: true,
-            },
+            optimization: true,
           },
         },
       });

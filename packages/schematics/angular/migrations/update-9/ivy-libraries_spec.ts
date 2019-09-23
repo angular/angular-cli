@@ -49,6 +49,7 @@ describe('Migration to version 9', () => {
           tree,
         )
         .toPromise();
+
       tree = await schematicRunner
         .runExternalSchematicAsync(
           require.resolve('../../collection.json'),

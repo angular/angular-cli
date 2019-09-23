@@ -248,5 +248,53 @@ describe('Migration to version 9', () => {
         expect(config.configurations.production.aot).toBeUndefined();
       });
     });
+
+    describe('server optimization option', () => {
+      beforeEach(async () => {
+        tree = await schematicRunner
+          .runExternalSchematicAsync(
+            require.resolve('../../collection.json'),
+            'universal',
+            {
+              clientProject: 'migration-test',
+            },
+            tree,
+          )
+          .toPromise();
+      });
+
+      it('should add optimization option when not defined', async () => {
+        let config = getWorkspaceTargets(tree);
+        config.server.configurations.production.optimization = undefined;
+        updateWorkspaceTargets(tree, config);
+
+        const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+        config = getWorkspaceTargets(tree2).server.configurations;
+        expect(config.production.optimization).toBe(true);
+      });
+
+      it('should set optimization to true when false', async () => {
+        let config = getWorkspaceTargets(tree);
+        config.server.configurations.production.optimization = false;
+        updateWorkspaceTargets(tree, config);
+
+        const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+        config = getWorkspaceTargets(tree2).server.configurations;
+        expect(config.production.optimization).toBe(true);
+      });
+
+      it('should set optimization to true when optimization is fine grained', async () => {
+        let config = getWorkspaceTargets(tree);
+        config.server.configurations.production.optimization = {
+          scripts: false,
+          styles: true,
+        };
+        updateWorkspaceTargets(tree, config);
+
+        const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+        config = getWorkspaceTargets(tree2).server.configurations;
+        expect(config.production.optimization).toBe(true);
+      });
+    });
   });
 });
