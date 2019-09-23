@@ -54,7 +54,7 @@ export default async function () {
   }
 
 
-  await ng('run', 'test-project:server:production');
+  await ng('run', 'test-project:server:production', '--optimization', 'false');
 
   await expectFileToMatch('dist/server/main.js', veEnabled ? /exports.*AppServerModuleNgFactory/ : /exports.*AppServerModule/);
   await exec(normalize('node'), 'index.js');

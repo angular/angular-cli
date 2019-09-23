@@ -40,6 +40,10 @@ export function updateWorkspaceConfig(): Rule {
       updateStyleOrScriptOption('scripts', recorder, target);
     }
 
+    for (const { target } of getTargets(workspace, 'server', Builders.Server)) {
+      updateOptimizationOption(recorder, target);
+    }
+
     tree.commitUpdate(recorder);
 
     return tree;
@@ -136,6 +140,25 @@ function addAnyComponentStyleBudget(recorder: UpdateRecorder, builderConfig: Jso
 
     if (!hasAnyComponentStyle) {
       appendValueInAstArray(recorder, budgetOption, ANY_COMPONENT_STYLE_BUDGET, 16);
+    }
+  }
+}
+
+function updateOptimizationOption(recorder: UpdateRecorder, builderConfig: JsonAstObject) {
+  const options = getAllOptions(builderConfig, true);
+
+  for (const option of options) {
+    const optimizationOption = findPropertyInAstObject(option, 'optimization');
+    if (!optimizationOption) {
+      // add
+      insertPropertyInAstObjectInOrder(recorder, option, 'optimization', true, 14);
+      continue;
+    }
+
+    if (optimizationOption.kind !== 'true') {
+      const { start, end } = optimizationOption;
+      recorder.remove(start.offset, end.offset - start.offset);
+      recorder.insertLeft(start.offset, 'true');
     }
   }
 }
