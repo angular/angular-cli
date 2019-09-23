@@ -60,6 +60,7 @@ describe('Webpack Builder basic test', () => {
 
       expect(output.success).toBe(true);
       expect(output.emittedFiles).toContain({
+        id: 'main',
         name: 'main',
         initial: true,
         file: 'bundle.js',
@@ -94,8 +95,8 @@ describe('Webpack Builder basic test', () => {
 
       expect(output.success).toBe(true);
       expect(output.emittedFiles).toContain(
-        { name: 'main', initial: true, file: 'main.js', extension: '.js' },
-        { name: 'polyfills', initial: true, file: 'polyfills.js', extension: '.js' },
+        { id: 'main', name: 'main', initial: true, file: 'main.js', extension: '.js' },
+        { id: 'polyfills', name: 'polyfills', initial: true, file: 'polyfills.js', extension: '.js' },
       );
 
       await run.stop();
