@@ -27,6 +27,7 @@ export interface WebpackFactory {
 
 export type BuildResult = BuilderOutput & {
   emittedFiles?: EmittedFiles[];
+  webpackStats?: webpack.Stats.ToJsonOutput;
 };
 
 export function runWebpack(
@@ -59,6 +60,7 @@ export function runWebpack(
 
         obs.next({
           success: !stats.hasErrors(),
+          webpackStats: stats.toJson(),
           emittedFiles: getEmittedFiles(stats.compilation),
         } as unknown as BuildResult);
 
