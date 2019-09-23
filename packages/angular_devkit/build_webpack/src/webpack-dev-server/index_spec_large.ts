@@ -61,6 +61,7 @@ describe('Dev Server Builder', () => {
 
     expect(output.success).toBe(true);
     expect(output.emittedFiles).toContain({
+      id: 'main',
       name: 'main',
       initial: true,
       file: 'bundle.js',

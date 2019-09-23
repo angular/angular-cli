@@ -10,6 +10,7 @@ import * as path from 'path';
 import * as webpack from 'webpack';
 
 export interface EmittedFiles {
+  id?: string;
   name?: string;
   file: string;
   initial: boolean;
@@ -20,19 +21,11 @@ export interface EmittedFiles {
 export function getEmittedFiles(compilation: webpack.compilation.Compilation): EmittedFiles[] {
   const files: EmittedFiles[] = [];
 
-  // entrypoints might have multiple outputs
-  // such as runtime.js
-  for (const [name, entrypoint] of compilation.entrypoints) {
-    const entryFiles: string[] = (entrypoint && entrypoint.getFiles()) || [];
-    for (const file of entryFiles) {
-      files.push({ name, file, extension: path.extname(file), initial: true });
-    }
-  }
-
   // adds all chunks to the list of emitted files such as lazy loaded modules
-  for (const chunk of Object.values(compilation.chunks)) {
+  for (const chunk of compilation.chunks as webpack.compilation.Chunk[]) {
     for (const file of chunk.files as string[]) {
       files.push({
+        id: chunk.id.toString(),
         name: chunk.name,
         file,
         extension: path.extname(file),
