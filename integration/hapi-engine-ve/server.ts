@@ -5,15 +5,15 @@ import * as inert from 'inert';
 import { Request, Server, ResponseToolkit } from 'hapi';
 import { join } from 'path';
 import { readFileSync } from 'fs';
+
 import { AppServerModuleNgFactory } from './src/main.server';
 
-// Hapi server
-async function run(): Promise<void> {
+// The Hapi server is exported so that it can be used by serverless functions.
+export async function app() {
   const port: string | number = process.env.PORT || 4000;
   const distFolder = join(process.cwd(), 'dist/hapi-engine-ve/browser');
   const server = new Server({
     port,
-    host: 'localhost',
     routes: {
       files: {
         relativeTo: distFolder
@@ -43,8 +43,13 @@ async function run(): Promise<void> {
       res.file(`${req.params.filename}.${req.params.ext}`)
   });
 
+  return server;
+}
+
+async function run(): Promise<void> {
+  const server = await app();
   await server.start();
-  console.log(`Node Hapi server listening on http://localhost:${port}`);
+  console.log(`Node Hapi server listening on http://${server.info.host}:${server.info.port}`);
 }
 
 // Webpack will replace 'require' with '__webpack_require__'
@@ -53,7 +58,10 @@ async function run(): Promise<void> {
 declare const __non_webpack_require__: NodeRequire;
 const mainModule = __non_webpack_require__.main;
 if (mainModule && mainModule.filename === __filename) {
-  run();
+  run().catch(error => {
+    console.error(`Error: ${error.toString()}`);
+    process.exit(1);
+  });
 }
 
 export * from './src/main.server';

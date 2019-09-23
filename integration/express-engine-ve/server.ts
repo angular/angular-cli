@@ -7,34 +7,40 @@ import { join } from 'path';
 import { AppServerModuleNgFactory } from './src/main.server';
 
 // The Express app is exported so that it can be used by serverless Functions.
-export const app = express();
-const distFolder = join(process.cwd(), 'dist/express-engine-ve/browser');
+export function app() {
+  const server = express();
+  const distFolder = join(process.cwd(), 'dist/express-engine-ve/browser');
 
-// Our Universal express-engine (found @ https://github.com/angular/universal/tree/master/modules/express-engine)
-app.engine('html', ngExpressEngine({
-  bootstrap: AppServerModuleNgFactory,
-}));
+  // Our Universal express-engine (found @ https://github.com/angular/universal/tree/master/modules/express-engine)
+  server.engine('html', ngExpressEngine({
+    bootstrap: AppServerModuleNgFactory,
+  }));
 
-app.set('view engine', 'html');
-app.set('views', distFolder);
+  server.set('view engine', 'html');
+  server.set('views', distFolder);
 
-// Example Express Rest API endpoints
-// app.get('/api/**', (req, res) => { });
-// Serve static files from /browser
-app.get('*.*', express.static(distFolder, {
-  maxAge: '1y'
-}));
+  // Example Express Rest API endpoints
+  // app.get('/api/**', (req, res) => { });
+  // Serve static files from /browser
+  server.get('*.*', express.static(distFolder, {
+    maxAge: '1y'
+  }));
 
-// All regular routes use the Universal engine
-app.get('*', (req, res) => {
-  res.render('index', { req });
-});
+  // All regular routes use the Universal engine
+  server.get('*', (req, res) => {
+    res.render('index', { req });
+  });
+
+  return server;
+}
 
 // Express server
 function run() {
-  // Start up the Node server
   const port: string | number = process.env.PORT || 4000;
-  app.listen(port, () => {
+
+  // Start up the Node server
+  const server = app();
+  server.listen(port, () => {
     console.log(`Node Express server listening on http://localhost:${port}`);
   });
 }

@@ -8,13 +8,12 @@ import { readFileSync } from 'fs';
 
 import { AppServerModule } from './src/<%= stripTsExtension(main) %>';
 
-// Hapi server
-async function run(): Promise<void> {
+// The Hapi server is exported so that it can be used by serverless functions.
+export async function app() {
   const port: string | number = process.env.PORT || <%= serverPort %>;
   const distFolder = join(process.cwd(), '<%= browserDistDirectory %>');
   const server = new Server({
     port,
-    host: 'localhost',
     routes: {
       files: {
         relativeTo: distFolder
@@ -44,8 +43,13 @@ async function run(): Promise<void> {
       res.file(`${req.params.filename}.${req.params.ext}`)
   });
 
+  return server;
+}
+
+async function run(): Promise<void> {
+  const server = await app();
   await server.start();
-  console.log(`Node Hapi server listening on http://localhost:${port}`);
+  console.log(`Node Hapi server listening on http://${server.info.host}:${server.info.port}`);
 }
 
 // Webpack will replace 'require' with '__webpack_require__'
