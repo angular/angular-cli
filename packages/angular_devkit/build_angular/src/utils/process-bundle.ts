@@ -19,7 +19,7 @@ export interface ProcessBundleOptions {
   filename: string;
   code: string;
   map?: string;
-  name?: string;
+  name: string;
   sourceMaps?: boolean;
   hiddenSourceMaps?: boolean;
   vendorSourceMaps?: boolean;
@@ -34,7 +34,7 @@ export interface ProcessBundleOptions {
 }
 
 export interface ProcessBundleResult {
-  name?: string;
+  name: string;
   integrity?: string;
   original?: ProcessBundleFile;
   downlevel?: ProcessBundleFile;
