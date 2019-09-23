@@ -14,6 +14,6 @@
   ],
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
-    "rxjs": "6.4.0"
+    "rxjs": "6.5.3"
   }
 }

@@ -126,7 +126,7 @@
     "pacote": "^9.2.3",
     "pidtree": "^0.3.0",
     "pidusage": "^2.0.17",
-    "rxjs": "~6.4.0",
+    "rxjs": "6.5.3",
     "sauce-connect-proxy": "https://saucelabs.com/downloads/sc-4.5.4-linux.tar.gz",
     "semver": "6.3.0",
     "source-map": "^0.7.3",
