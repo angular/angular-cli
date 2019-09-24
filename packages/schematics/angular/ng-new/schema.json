@@ -127,6 +127,11 @@
       "type": "boolean",
       "default": false,
       "x-user-analytics": 14
+    },
+    "strict": {
+      "description": "Creates a workspace with stricter TypeScript compiler options.",
+      "type": "boolean",
+      "default": false
     }
   },
   "required": ["name", "version"]
