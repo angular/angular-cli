@@ -17,6 +17,8 @@ export function testScrubFile(content: string) {
     '__decorate',
     'propDecorators',
     'ctorParameters',
+    'ɵsetClassMetadata',
+    'ɵɵsetNgModuleScope',
   ];
 
   return markers.some((marker) => content.indexOf(marker) !== -1);
@@ -51,7 +53,8 @@ function scrubFileTransformer(checker: ts.TypeChecker, isAngularCoreFile: boolea
         }
         const exprStmt = node as ts.ExpressionStatement;
         // Do checks that don't need the typechecker first and bail early.
-        if (isCtorParamsAssignmentExpression(exprStmt)) {
+        if (isIvyPrivateCallExpression(exprStmt)
+          || isCtorParamsAssignmentExpression(exprStmt)) {
           nodes.push(node);
         } else if (isDecoratorAssignmentExpression(exprStmt)) {
           nodes.push(...pickDecorationNodesToRemove(exprStmt, ngMetadata, checker));
@@ -304,6 +307,24 @@ function isAssignmentExpressionTo(exprStmt: ts.ExpressionStatement, name: string
     return false;
   }
   if (expr.operatorToken.kind !== ts.SyntaxKind.FirstAssignment) {
+    return false;
+  }
+
+  return true;
+}
+
+function isIvyPrivateCallExpression(exprStmt: ts.ExpressionStatement) {
+  const callExpr = exprStmt.expression;
+  if (!ts.isCallExpression(callExpr)) {
+    return false;
+  }
+  const propAccExpr = callExpr.expression;
+  if (!ts.isPropertyAccessExpression(propAccExpr)) {
+    return false;
+  }
+
+  if (propAccExpr.name.text != 'ɵsetClassMetadata'
+    && propAccExpr.name.text != 'ɵɵsetNgModuleScope') {
     return false;
   }
 
