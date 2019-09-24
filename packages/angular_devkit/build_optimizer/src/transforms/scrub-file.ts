@@ -50,20 +50,18 @@ function scrubFileTransformer(checker: ts.TypeChecker, isAngularCoreFile: boolea
           return ts.forEachChild(node, checkNodeForDecorators);
         }
         const exprStmt = node as ts.ExpressionStatement;
-        if (isDecoratorAssignmentExpression(exprStmt)) {
-          nodes.push(...pickDecorationNodesToRemove(exprStmt, ngMetadata, checker));
-        }
-        if (isDecorateAssignmentExpression(exprStmt, tslibImports, checker)) {
-          nodes.push(...pickDecorateNodesToRemove(exprStmt, tslibImports, ngMetadata, checker));
-        }
-        if (isAngularDecoratorMetadataExpression(exprStmt, ngMetadata, tslibImports, checker)) {
-          nodes.push(node);
-        }
-        if (isPropDecoratorAssignmentExpression(exprStmt)) {
-          nodes.push(...pickPropDecorationNodesToRemove(exprStmt, ngMetadata, checker));
-        }
+        // Do checks that don't need the typechecker first and bail early.
         if (isCtorParamsAssignmentExpression(exprStmt)) {
           nodes.push(node);
+        } else if (isDecoratorAssignmentExpression(exprStmt)) {
+          nodes.push(...pickDecorationNodesToRemove(exprStmt, ngMetadata, checker));
+        } else if (isDecorateAssignmentExpression(exprStmt, tslibImports, checker)) {
+          nodes.push(...pickDecorateNodesToRemove(exprStmt, tslibImports, ngMetadata, checker));
+        } else if (isAngularDecoratorMetadataExpression(exprStmt,
+          ngMetadata, tslibImports, checker)) {
+          nodes.push(node);
+        } else if (isPropDecoratorAssignmentExpression(exprStmt)) {
+          nodes.push(...pickPropDecorationNodesToRemove(exprStmt, ngMetadata, checker));
         }
       }
 
