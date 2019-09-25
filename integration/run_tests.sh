@@ -36,7 +36,7 @@ for testDir in $(ls | grep -v node_modules) ; do
     cd $testDir
     rm -rf dist
 
-    yarn install --cache-folder ../$cache
+    yarn install --cache-folder ../$cache --silent
     yarn test || exit 1
 
     # remove the temporary node modules directory to keep the source folder clean.
