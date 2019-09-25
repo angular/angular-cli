@@ -98,10 +98,9 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
     inputSourceMap: !manualSourceMaps && options.map !== undefined && JSON.parse(options.map),
     babelrc: false,
     // modules aren't needed since the bundles use webpack's custom module loading
-    // loose generates more ES5-like code but does not strictly adhere to the ES2015 spec (Typescript is loose)
     // 'transform-typeof-symbol' generates slower code
     presets: [
-      ['@babel/preset-env', { modules: false, loose: true, exclude: ['transform-typeof-symbol'] }],
+      ['@babel/preset-env', { modules: false, exclude: ['transform-typeof-symbol'] }],
     ],
     minified: options.optimize,
     // `false` ensures it is disabled and prevents large file warnings
