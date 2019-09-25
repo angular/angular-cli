@@ -5,6 +5,7 @@ filegroup(
     srcs = glob([
         "**/schema.json",
     ] + [
+        "package.json",
         "README.md",
         "builders.json",
     ]),

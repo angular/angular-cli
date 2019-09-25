@@ -37,13 +37,15 @@ RXJS_VERSION = "^6.4.0"
 HAPI_VERSION = "^17.0.0"
 EXPRESS_VERSION = "^4.15.2"
 EXPRESS_TYPES_VERSION = "^4.17.0"
+DEVKIT_CORE_VERSION = "^9.0.0-next.5"
+DEVKIT_ARCHITECT_VERSION = "^0.900.0-next.5"
 
 NGUNIVERSAL_SCOPED_PACKAGES = ["@nguniversal/%s" % p for p in [
     "aspnetcore-engine",
+    "builders",
     "common",
     "express-engine",
     "hapi-engine",
-    "module-map-ngfactory-loader",
 ]]
 
 PKG_GROUP_REPLACEMENTS = {
@@ -55,6 +57,8 @@ PKG_GROUP_REPLACEMENTS = {
     "HAPI_VERSION": HAPI_VERSION,
     "NG_VERSION": NG_VERSION,
     "RXJS_VERSION": RXJS_VERSION,
+    "DEVKIT_CORE_VERSION": DEVKIT_CORE_VERSION,
+    "DEVKIT_ARCHITECT_VERSION": DEVKIT_ARCHITECT_VERSION,
 }
 
 GLOBALS = {

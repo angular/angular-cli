@@ -14,8 +14,11 @@
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "^0.900.0-next.5",
-    "@angular-devkit/core": "^9.0.0-next.5",
-    "rxjs": "^6.5.3"
+    "@angular-devkit/architect": "DEVKIT_ARCHITECT_VERSION",
+    "@angular-devkit/core": "DEVKIT_CORE_VERSION",
+    "rxjs": "RXJS_VERSION"
+  },
+  "ng-update": {
+    "packageGroup": "NG_UPDATE_PACKAGE_GROUP"
   }
 }
