@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "SSR Dev Server Target",
+  "description": "SSR Dev Server target options for Build Facade.",
+  "type": "object",
+  "properties": {
+    "browserTarget": {
+      "type": "string",
+      "description": "Browser target to build."
+    },
+    "serverTarget": {
+      "type": "string",
+      "description": "Browser target to build."
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "browserTarget",
+    "serverTarget"
+  ]
+}

@@ -1,0 +1,33 @@
+load("//tools:defaults.bzl", "npm_package", "ts_library")
+
+filegroup(
+    name = "builders_assets",
+    srcs = glob([
+        "**/schema.json",
+    ] + [
+        "README.md",
+        "builders.json",
+    ]),
+)
+
+ts_library(
+    name = "builders",
+    srcs = glob(
+        ["**/*.ts"],
+        exclude = [
+            "**/*.spec.ts",
+        ],
+    ),
+    module_name = "@nguniversal/builders",
+    deps = [
+        "@npm//@angular-devkit/architect",
+        "@npm//@angular-devkit/core",
+        "@npm//rxjs",
+    ],
+)
+
+npm_package(
+    name = "npm_package",
+    srcs = [":builders_assets"],
+    deps = [":builders"],
+)

@@ -10,6 +10,14 @@
     "@angular-devkit/core" "8.0.0-beta.18"
     rxjs "6.4.0"
 
+"@angular-devkit/architect@^0.900.0-next.5":
+  version "0.900.0-next.5"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/architect/-/architect-0.900.0-next.5.tgz#6c99c502c942e4b7d6ae4fa77f5043e06968a254"
+  integrity sha512-jfNaxzRmD7qYgkY6UIltwVBxgdvBhriwoi9NBV+0G7bPB5gwBOqSPySfBHRvTMj2FMyhdxOgr5aPwYAG+OAnwg==
+  dependencies:
+    "@angular-devkit/core" "9.0.0-next.5"
+    rxjs "6.4.0"
+
 "@angular-devkit/core@8.0.0-beta.18", "@angular-devkit/core@^8.0.0-beta.15":
   version "8.0.0-beta.18"
   resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-8.0.0-beta.18.tgz#dfaa0786af0a7466467b8a9cd1fe745418690df0"
@@ -21,7 +29,7 @@
     rxjs "6.4.0"
     source-map "0.7.3"
 
-"@angular-devkit/core@9.0.0-next.5":
+"@angular-devkit/core@9.0.0-next.5", "@angular-devkit/core@^9.0.0-next.5":
   version "9.0.0-next.5"
   resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-9.0.0-next.5.tgz#776da1ca8e510376405cbcf56de9e87fb60ac12f"
   integrity sha512-DLFrLkf1YmjXRpH57wR/SH5Y7OmtqfPMoW0qxRV3HC+oNSmjCqv5W7EVWB55jfQ4SdJ5GQCt6x8MHiHL7gK4kg==

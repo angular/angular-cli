@@ -1,0 +1,21 @@
+{
+  "name": "@nguniversal/builders",
+  "version": "0.0.0-PLACEHOLDER",
+  "description": "Angular Universal builders package",
+  "license": "MIT",
+  "keywords": [
+    "ssr",
+    "universal",
+    "angular",
+    "builder",
+    "cli"
+  ],
+  "main": "src/index.js",
+  "typings": "src/index.d.ts",
+  "builders": "builders.json",
+  "dependencies": {
+    "@angular-devkit/architect": "^0.900.0-next.5",
+    "@angular-devkit/core": "^9.0.0-next.5",
+    "rxjs": "^6.5.3"
+  }
+}

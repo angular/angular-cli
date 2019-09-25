@@ -2,6 +2,7 @@
   "name": "nguniversal",
   "main": "index.js",
   "version": "9.0.0-next.2",
+  "private": true,
   "description": "Universal (isomorphic) JavaScript support for Angular",
   "homepage": "https://github.com/angular/universal",
   "license": "MIT",
@@ -46,6 +47,8 @@
     "typescript": "~3.5.3"
   },
   "devDependencies": {
+    "@angular-devkit/architect": "^0.900.0-next.5",
+    "@angular-devkit/core": "^9.0.0-next.5",
     "@angular/bazel": "9.0.0-next.5",
     "@bazel/bazel": "0.28.1",
     "@bazel/buildifier": "^0.25.1",
@@ -73,9 +76,9 @@
     "minimatch": "^3.0.4",
     "protractor": "5.4.2",
     "source-map-support": "^0.5.9",
+    "ts-node": "8.4.1",
     "tslib": "1.9.3",
     "tslint": "^5.18.0",
-    "ts-node": "8.4.1",
     "tsutils": "^2.21.2",
     "xhr2": "^0.1.4",
     "zone.js": "^0.10.2"
