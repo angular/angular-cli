@@ -250,6 +250,7 @@ export default function (options: UniversalOptions): Rule {
         ...strings,
         ...options as object,
         stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
+        hasLocalizePackage: !!getPackageJsonDependency(host, '@angular/localize'),
       }),
       move(join(normalize(clientProject.root), 'src')),
     ]);
