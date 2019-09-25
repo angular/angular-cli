@@ -312,6 +312,7 @@
       "items": {
         "type": "string"
       },
+      "x-deprecated": "'SystemJsNgModuleLoader' is deprecated, and this is part of its usage. Use 'import()' syntax instead.",
       "default": []
     },
     "budgets": {
