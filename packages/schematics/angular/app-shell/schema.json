@@ -8,7 +8,10 @@
   "properties": {
     "clientProject": {
       "type": "string",
-      "description": "The name of the related client app."
+      "description": "The name of the related client app.",
+      "$default": {
+        "$source": "projectName"
+      }
     },
     "universalProject": {
       "type": "string",
