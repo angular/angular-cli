@@ -6,7 +6,10 @@
   "properties": {
     "clientProject": {
       "type": "string",
-      "description": "Name of related client app."
+      "description": "Name of related client app.",
+      "$default": {
+        "$source": "projectName"
+      }
     },
     "appId": {
       "type": "string",
