@@ -1,4 +1,4 @@
-import { expectFileToMatch, moveDirectory } from '../../utils/fs';
+import { expectFileToMatch } from '../../utils/fs';
 import { ng } from '../../utils/process';
 
 
@@ -18,10 +18,4 @@ export default async function() {
   await expectFileToMatch('dist/test-project/index.html', /main-es2015\.[a-zA-Z0-9]{20}\.js/);
   await expectFileToMatch('dist/test-project/index.html', /main-es5\.[a-zA-Z0-9]{20}\.js/);
   await ng('build', '--prod', '--no-progress', 'test-project');
-
-  // Store the production build for artifact storage on CircleCI
-  if (process.env['CIRCLECI']) {
-    await ng('build', '--prod', '--output-hashing=none');
-    await moveDirectory('dist', '/tmp/dist');
-  }
 }
