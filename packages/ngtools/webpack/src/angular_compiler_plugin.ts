@@ -1012,7 +1012,12 @@ export class AngularCompilerPlugin {
           ));
         }
       } else if (this._platform === PLATFORM.Server) {
-        this._transformers.push(exportLazyModuleMap(isMainPath, getLazyRoutes));
+        // The export lazy module map is required only for string based lazy loading
+        // which is not supported in Ivy
+        if (!this._compilerOptions.enableIvy) {
+          this._transformers.push(exportLazyModuleMap(isMainPath, getLazyRoutes));
+        }
+
         if (this._useFactories) {
           this._transformers.push(
             exportNgFactory(isMainPath, getEntryModule),
