@@ -353,6 +353,11 @@
         "anonymous",
         "use-credentials"
       ]
+    },
+    "experimentalRollupPass": {
+      "type": "boolean",
+      "description": "Concatenate modules with Rollup before bundling them with Webpack.",
+      "default": false
     }
   },
   "additionalProperties": false,

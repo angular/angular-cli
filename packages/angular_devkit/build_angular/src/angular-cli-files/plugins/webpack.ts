@@ -20,3 +20,4 @@ export {
 
 import { join } from 'path';
 export const RawCssLoader = require.resolve(join(__dirname, 'raw-css-loader'));
+export const WebpackRollupLoader = require.resolve(join(__dirname, 'webpack-rollup-loader'));
