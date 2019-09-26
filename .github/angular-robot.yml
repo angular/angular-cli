@@ -43,12 +43,19 @@ merge:
     requiredStatuses:
       - "ci/circleci: build"
       - "ci/circleci: build-bazel"
-      - "ci/circleci: install"
+      - "ci/circleci: setup"
+      - "ci/circleci: setup-and-build-win"
       - "ci/circleci: lint"
       - "ci/circleci: validate"
       - "ci/circleci: test"
       - "ci/circleci: test-win"
       - "ci/circleci: test-large"
+      - "ci/circleci: test-large-ve"
+      - "ci/circleci: e2e-cli"
+      - "ci/circleci: e2e-cli-ve"
+      - "ci/circleci: test-browsers"
+      - "ci/angular: size"
+      - "cla/google"
 
   # the comment that will be added when the merge label is added despite failing checks, leave empty or set to false to disable
   # {{MERGE_LABEL}} will be replaced by the value of the mergeLabel option
