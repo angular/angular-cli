@@ -19,6 +19,7 @@ export function updateDependencies() {
       'zone.js': latestVersions.ZoneJs,
       'ng-packagr': latestVersions.ngPackagr,
       'web-animations-js': '^2.3.2',
+      'codelyzer': '^5.1.2',
     };
 
     for (const [name, version] of Object.entries(dependenciesToUpdate)) {
