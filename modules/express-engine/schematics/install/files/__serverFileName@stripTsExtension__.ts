@@ -35,7 +35,6 @@ export function app() {
   return server;
 }
 
-// Express server
 function run() {
   const port = process.env.PORT || <%= serverPort %>;
 
