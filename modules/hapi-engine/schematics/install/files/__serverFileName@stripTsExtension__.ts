@@ -10,7 +10,7 @@ import { AppServerModule } from './src/<%= stripTsExtension(main) %>';
 
 // The Hapi server is exported so that it can be used by serverless functions.
 export async function app() {
-  const port: string | number = process.env.PORT || <%= serverPort %>;
+  const port = process.env.PORT || <%= serverPort %>;
   const distFolder = join(process.cwd(), '<%= browserDistDirectory %>');
   const server = new Server({
     port,

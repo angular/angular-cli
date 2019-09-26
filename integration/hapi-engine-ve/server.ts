@@ -10,7 +10,7 @@ import { AppServerModuleNgFactory } from './src/main.server';
 
 // The Hapi server is exported so that it can be used by serverless functions.
 export async function app() {
-  const port: string | number = process.env.PORT || 4000;
+  const port = process.env.PORT || 4000;
   const distFolder = join(process.cwd(), 'dist/hapi-engine-ve/browser');
   const server = new Server({
     port,
