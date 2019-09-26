@@ -30,7 +30,7 @@
     "@types/node": "~8.9.4",<% if (!minimal) { %>
     "@types/jasmine": "~3.4.0",
     "@types/jasminewd2": "~2.0.3",
-    "codelyzer": "^5.1.0",
+    "codelyzer": "^5.1.2",
     "jasmine-core": "~3.4.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.2.0",
