@@ -330,6 +330,7 @@ jobs:
     executor: windows-executor
     parallelism: 4
     steps:
+      - custom_attach_workspace
       - setup_windows
       - run: node tests\legacy-cli\run_e2e.js --nb-shards=$env:CIRCLE_NODE_TOTAL --shard=$env:CIRCLE_NODE_INDEX
 
