@@ -1,6 +1,6 @@
-# Change Log
+# Change Log (DEPRECATED)
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+### SEE https://github.com/angular/universal/releases FOR RELEASE BASED CHANGELOG
 
 <a name="8.1.1"></a>
 ## [8.1.1](https://github.com/angular/universal/compare/v8.1.0...v8.1.1) (2019-07-04)
