@@ -57,14 +57,7 @@ export const enum CacheKey {
   DownlevelMap = 3,
 }
 
-export function process(
-  options: ProcessBundleOptions,
-  callback: (error: Error | null, result?: ProcessBundleResult) => void,
-): void {
-  processAsync(options).then(result => callback(null, result), error => callback(error));
-}
-
-export async function processAsync(options: ProcessBundleOptions): Promise<ProcessBundleResult> {
+export async function process(options: ProcessBundleOptions): Promise<ProcessBundleResult> {
   if (!options.cacheKeys) {
     options.cacheKeys = [];
   }
