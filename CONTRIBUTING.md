@@ -185,7 +185,7 @@ Must be one of the following:
 
 ### Scope
 The scope could be anything specifying place of the commit change. For example
-`Compiler`, `ElementInjector`, etc.
+`express-engine`, `common`, etc.
 
 ### Subject
 The subject contains succinct description of the change:
