@@ -144,7 +144,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     if (!exists) {
       // At this point we're only looking at resource files (html/css/scss/etc).
       // If the original was deleted, we should delete the virtual files too.
-      // If the original it wasn't deleted we should leave them to be overwritten, because webpack
+      // If the original wasn't deleted we should leave them to be overwritten, because webpack
       // might begin the loading process before our plugin has re-emitted them.
       for (const ext of this._virtualStyleFileExtensions) {
         const virtualFile = (fullPath + ext) as Path;
