@@ -27,6 +27,7 @@
     "find-cache-dir": "3.0.0",
     "glob": "7.1.4",
     "istanbul-instrumenter-loader": "3.0.1",
+    "jest-worker": "24.9.0",
     "karma-source-map-support": "1.4.0",
     "less": "3.9.0",
     "less-loader": "5.0.0",
@@ -61,7 +62,6 @@
     "webpack-merge": "4.2.1",
     "webpack-sources": "1.4.3",
     "webpack-subresource-integrity": "1.1.0-rc.6",
-    "worker-farm": "1.7.0",
     "worker-plugin": "3.2.0"
   },
   "devDependencies": {
