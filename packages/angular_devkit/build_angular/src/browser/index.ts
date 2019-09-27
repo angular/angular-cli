@@ -449,20 +449,17 @@ export function buildWebpackBrowser(
 
                 // Attempt to get required cache entries
                 const cacheEntries = [];
+                let cached = cacheKeys.length > 0;
                 for (const key of cacheKeys) {
                   if (key) {
-                    cacheEntries.push(await cacache.get.info(cacheDownlevelPath, key));
+                    const entry = await cacache.get.info(cacheDownlevelPath, key);
+                    if (!entry) {
+                      cached = false;
+                      break;
+                    }
+                    cacheEntries.push(entry);
                   } else {
                     cacheEntries.push(null);
-                  }
-                }
-
-                // Check if required cache entries are present
-                let cached = cacheKeys.length > 0;
-                for (let i = 0; i < cacheKeys.length; ++i) {
-                  if (cacheKeys[i] && !cacheEntries[i]) {
-                    cached = false;
-                    break;
                   }
                 }
 
