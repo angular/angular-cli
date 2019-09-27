@@ -31,7 +31,6 @@ import { Observable, from, of } from 'rxjs';
 import { bufferCount, catchError, concatMap, map, mergeScan, switchMap } from 'rxjs/operators';
 import { ScriptTarget } from 'typescript';
 import * as webpack from 'webpack';
-import * as workerFarm from 'worker-farm';
 import { NgBuildAnalyticsPlugin } from '../../plugins/webpack/analytics';
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import {
@@ -78,6 +77,7 @@ import {
   getIndexInputFile,
   getIndexOutputFile,
 } from '../utils/webpack-browser-config';
+import { ActionExecutor } from './action-executor';
 import { Schema as BrowserBuilderSchema } from './schema';
 
 const cacache = require('cacache');
@@ -115,7 +115,7 @@ export async function buildBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,
   context: BuilderContext,
   host: virtualFs.Host<fs.Stats> = new NodeJsSyncHost(),
-): Promise<{ config: webpack.Configuration[], projectRoot: string, projectSourceRoot?: string }> {
+): Promise<{ config: webpack.Configuration[]; projectRoot: string; projectSourceRoot?: string }> {
   return generateBrowserWebpackConfigFromContext(
     options,
     context,
@@ -587,35 +587,25 @@ export function buildWebpackBrowser(
               }
 
               if (processActions.length > 0) {
-                await new Promise<void>((resolve, reject) => {
-                  const workerFile = require.resolve('../utils/process-bundle');
-                  const workers = workerFarm(
-                    {
-                      maxRetries: 1,
-                    },
-                    path.extname(workerFile) !== '.ts'
-                      ? workerFile
-                      : require.resolve('../utils/process-bundle-bootstrap'),
-                    ['process'],
+                const workerFile = require.resolve('../utils/process-bundle');
+                const executor = new ActionExecutor<
+                  ProcessBundleOptions & { size: number },
+                  ProcessBundleResult
+                >(
+                  path.extname(workerFile) !== '.ts'
+                    ? workerFile
+                    : require.resolve('../utils/process-bundle-bootstrap'),
+                  'process',
+                );
+
+                try {
+                  const results = await executor.executeAll(
+                    processActions.map(a => ({ ...a, size: a.code.length })),
                   );
-                  let completed = 0;
-                  const workCallback = (error: Error | null, result: ProcessBundleResult) => {
-                    if (error) {
-                      workerFarm.end(workers);
-                      reject(error);
-
-                      return;
-                    }
-
-                    processResults.push(result);
-                    if (++completed === processActions.length) {
-                      workerFarm.end(workers);
-                      resolve();
-                    }
-                  };
-
-                  processActions.forEach(action => workers['process'](action, workCallback));
-                });
+                  results.forEach(result => processResults.push(result));
+                } finally {
+                  executor.stop();
+                }
               }
 
               // Runtime must be processed after all other files
@@ -625,7 +615,7 @@ export function buildWebpackBrowser(
                   runtimeData: processResults,
                 };
                 processResults.push(
-                  await import('../utils/process-bundle').then(m => m.processAsync(runtimeOptions)),
+                  await import('../utils/process-bundle').then(m => m.process(runtimeOptions)),
                 );
               }
 
