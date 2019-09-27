@@ -93,16 +93,13 @@ describe('Constructor Parameter Transformer', () => {
     expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
   });
 
-  // The current testing infrastructure does not support this test
-  // Aliased TS symbols are resolved to 'unknown'
-  xit('records class name of root-provided injectable in imported module', () => {
+  it('records class name of root-provided injectable in imported module', () => {
     const rootProvided = {
-      'root-provided-service': `
+      'root-provided-service.ts': `
         @Injectable({
           providedIn: 'root'
         })
         export class RootProvidedService {
-
           constructor() { }
         }
       `,
@@ -117,7 +114,17 @@ describe('Constructor Parameter Transformer', () => {
       }
     `;
 
-    const output = `export class MyService { constructor(v) { } } MyService.ctorParameters = () => [ { type: RootProvidedService } ];`;
+    const output = `
+      import * as tslib_1 from "tslib";
+      import { RootProvidedService } from './root-provided-service';
+
+      let MyService = class MyService {
+        constructor(v) { }
+      };
+      MyService.ctorParameters = () => [ { type: RootProvidedService } ];
+      MyService = tslib_1.__decorate([ Injectable() ], MyService);
+      export { MyService };
+    `;
 
     const result = transform(input, rootProvided);
 
