@@ -132,4 +132,21 @@ describe('augment-index-html', () => {
     `);
     });
 
+  it('should add lang attribute', async () => {
+    const source = augmentIndexHtml({
+      ...indexGeneratorOptions,
+      lang: 'fr',
+    });
+
+    const html = await source;
+    expect(html).toEqual(oneLineHtml`
+        <html lang="fr">
+          <head>
+            <base href="/">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
 });

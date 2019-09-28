@@ -42,6 +42,8 @@ export interface AugmentIndexHtmlOptions {
   loadOutputFile: LoadOutputFileFunctionType;
   /** Used to sort the inseration of files in the HTML file */
   entrypoints: string[];
+  /** Used to set the document default locale */
+  lang?: string;
 }
 
 export interface FileInfo {
@@ -56,6 +58,7 @@ export interface FileInfo {
  * after processing several configurations in order to build different sets of
  * bundles for differential serving.
  */
+// tslint:disable-next-line: no-big-function
 export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise<string> {
   const { loadOutputFile, files, noModuleFiles = [], moduleFiles = [], entrypoints } = params;
 
@@ -91,8 +94,10 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
   const document = parse5.parse(params.inputContent, { treeAdapter, locationInfo: true });
   let headElement;
   let bodyElement;
+  let htmlElement;
   for (const docChild of document.childNodes) {
     if (docChild.tagName === 'html') {
+      htmlElement = docChild;
       for (const htmlChild of docChild.childNodes) {
         if (htmlChild.tagName === 'head') {
           headElement = htmlChild;
@@ -240,6 +245,33 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
   }
 
   indexSource.insert(styleInsertionPoint, parse5.serialize(styleElements, { treeAdapter }));
+
+  // Adjust document locale if specified
+  if (typeof params.lang == 'string') {
+
+    const htmlFragment = treeAdapter.createDocumentFragment();
+
+    let langAttribute;
+    for (const attribute of htmlElement.attrs) {
+      if (attribute.name === 'lang') {
+        langAttribute = attribute;
+      }
+    }
+    if (langAttribute) {
+      langAttribute.value = params.lang;
+    } else {
+      htmlElement.attrs.push({ name: 'lang', value: params.lang });
+    }
+    // we want only openning tag
+    htmlElement.childNodes = [];
+
+    treeAdapter.appendChild(htmlFragment, htmlElement);
+    indexSource.replace(
+      htmlElement.__location.startTag.startOffset,
+      htmlElement.__location.startTag.endOffset - 1,
+      parse5.serialize(htmlFragment, { treeAdapter }).replace('</html>', ''),
+    );
+  }
 
   return indexSource.source();
 }

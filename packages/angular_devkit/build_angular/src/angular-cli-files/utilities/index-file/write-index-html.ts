@@ -31,6 +31,7 @@ export interface WriteIndexHtmlOptions {
   styles?: ExtraEntryPoint[];
   postTransform?: IndexHtmlTransform;
   crossOrigin?: CrossOriginValue;
+  lang?: string;
 }
 
 export type IndexHtmlTransform = (content: string) => Promise<string>;
@@ -49,6 +50,7 @@ export function writeIndexHtml({
   styles = [],
   postTransform,
   crossOrigin,
+  lang,
 }: WriteIndexHtmlOptions): Observable<void> {
   return host.read(indexPath).pipe(
     map(content => stripBom(virtualFs.fileBufferToString(content))),
@@ -70,6 +72,7 @@ export function writeIndexHtml({
             .pipe(map(data => virtualFs.fileBufferToString(data)))
             .toPromise();
         },
+        lang: lang,
       }),
     ),
     switchMap(content => (postTransform ? postTransform(content) : of(content))),

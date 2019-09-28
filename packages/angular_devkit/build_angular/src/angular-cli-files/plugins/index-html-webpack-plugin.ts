@@ -27,6 +27,7 @@ export interface IndexHtmlWebpackPluginOptions {
   moduleEntrypoints: string[];
   postTransform?: IndexHtmlTransform;
   crossOrigin?: CrossOriginValue;
+  lang?: string;
 }
 
 function readFile(filename: string, compilation: compilation.Compilation): Promise<string> {
@@ -100,6 +101,7 @@ export class IndexHtmlWebpackPlugin {
         loadOutputFile,
         moduleFiles,
         entrypoints: this._options.entrypoints,
+        lang: this._options.lang,
       });
 
       if (this._options.postTransform) {

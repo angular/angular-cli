@@ -708,6 +708,7 @@ export function buildWebpackBrowser(
                 styles: options.styles,
                 postTransform: transforms.indexHtml,
                 crossOrigin: options.crossOrigin,
+                lang: options.i18nLocale,
               })
                 .pipe(
                   map(() => ({ success: true })),
