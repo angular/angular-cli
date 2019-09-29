@@ -58,11 +58,9 @@ function scrubFileTransformer(checker: ts.TypeChecker, isAngularCoreFile: boolea
           nodes.push(node);
         } else if (isDecoratorAssignmentExpression(exprStmt)) {
           nodes.push(...pickDecorationNodesToRemove(exprStmt, ngMetadata, checker));
-        } else if (isDecorateAssignmentExpression(exprStmt, tslibImports, checker)) {
+        } else if (isDecorateAssignmentExpression(exprStmt, tslibImports, checker)
+          || isAngularDecoratorExpression(exprStmt, ngMetadata, tslibImports, checker)) {
           nodes.push(...pickDecorateNodesToRemove(exprStmt, tslibImports, ngMetadata, checker));
-        } else if (isAngularDecoratorMetadataExpression(exprStmt,
-          ngMetadata, tslibImports, checker)) {
-          nodes.push(node);
         } else if (isPropDecoratorAssignmentExpression(exprStmt)) {
           nodes.push(...pickPropDecorationNodesToRemove(exprStmt, ngMetadata, checker));
         }
@@ -218,7 +216,7 @@ function isDecorateAssignmentExpression(
 }
 
 // Check if expression is `__decorate([smt, __metadata("design:type", Object)], ...)`.
-function isAngularDecoratorMetadataExpression(
+function isAngularDecoratorExpression(
   exprStmt: ts.ExpressionStatement,
   ngMetadata: ts.Node[],
   tslibImports: ts.NamespaceImport[],
@@ -240,27 +238,19 @@ function isAngularDecoratorMetadataExpression(
   }
   const decorateArray = callExpr.arguments[0] as ts.ArrayLiteralExpression;
   // Check first array entry for Angular decorators.
-  if (decorateArray.elements[0].kind !== ts.SyntaxKind.CallExpression) {
-    return false;
-  }
-  const decoratorCall = decorateArray.elements[0] as ts.CallExpression;
-  if (decoratorCall.expression.kind !== ts.SyntaxKind.Identifier) {
-    return false;
-  }
-  const decoratorId = decoratorCall.expression as ts.Identifier;
-  if (!identifierIsMetadata(decoratorId, ngMetadata, checker)) {
-    return false;
-  }
-  // Check second array entry for __metadata call.
-  if (decorateArray.elements[1].kind !== ts.SyntaxKind.CallExpression) {
-    return false;
-  }
-  const metadataCall = decorateArray.elements[1] as ts.CallExpression;
-  if (!isTslibHelper(metadataCall, '__metadata', tslibImports, checker)) {
+  if (decorateArray.elements.length === 0 || !ts.isCallExpression(decorateArray.elements[0])) {
     return false;
   }
 
-  return true;
+  return decorateArray.elements.some(decoratorCall => {
+    if (!ts.isCallExpression(decoratorCall) || !ts.isIdentifier(decoratorCall.expression)) {
+      return false;
+    }
+
+    const decoratorId = decoratorCall.expression;
+
+    return identifierIsMetadata(decoratorId, ngMetadata, checker);
+  });
 }
 
 // Check if assignment is `Clazz.propDecorators = [...];`.
@@ -359,16 +349,19 @@ function pickDecorateNodesToRemove(
   ngMetadata: ts.Node[],
   checker: ts.TypeChecker,
 ): ts.Node[] {
+  let callExpr: ts.CallExpression | undefined;
+  if (ts.isCallExpression(exprStmt.expression)) {
+    callExpr = exprStmt.expression;
+  } else if (ts.isBinaryExpression(exprStmt.expression)) {
+    const expr = exprStmt.expression;
+    if (ts.isCallExpression(expr.right)) {
+      callExpr = expr.right;
+    } else if (ts.isBinaryExpression(expr.right) && ts.isCallExpression(expr.right.right)) {
+      callExpr = expr.right.right;
+    }
+  }
 
-  const expr = expect<ts.BinaryExpression>(exprStmt.expression, ts.SyntaxKind.BinaryExpression);
-  let callExpr: ts.CallExpression;
-
-  if (expr.right.kind === ts.SyntaxKind.CallExpression) {
-    callExpr = expect<ts.CallExpression>(expr.right, ts.SyntaxKind.CallExpression);
-  } else if (expr.right.kind === ts.SyntaxKind.BinaryExpression) {
-    const innerExpr = expr.right as ts.BinaryExpression;
-    callExpr = expect<ts.CallExpression>(innerExpr.right, ts.SyntaxKind.CallExpression);
-  } else {
+  if (!callExpr) {
     return [];
   }
 
@@ -400,10 +393,6 @@ function pickDecorateNodesToRemove(
     if (el.arguments[0].kind !== ts.SyntaxKind.StringLiteral) {
       return false;
     }
-    const metadataTypeId = el.arguments[0] as ts.StringLiteral;
-    if (metadataTypeId.text !== 'design:paramtypes') {
-      return false;
-    }
 
     return true;
   });
@@ -421,6 +410,7 @@ function pickDecorateNodesToRemove(
 
     return true;
   });
+
   ngDecoratorCalls.push(...metadataCalls, ...paramCalls);
 
   // If all decorators are metadata decorators then return the whole `Class = __decorate([...])'`
