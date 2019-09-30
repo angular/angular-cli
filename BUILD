@@ -4,7 +4,7 @@
 # found in the LICENSE file at https://angular.io/license
 package(default_visibility = ["//visibility:public"])
 
-licenses(["notice"])  # MIT License
+licenses(["notice"])
 
 exports_files([
     "LICENSE",
