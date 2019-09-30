@@ -149,7 +149,7 @@ describe('Universal Schematic', () => {
     expect(targets.server).toBeDefined();
     expect(targets.server.builder).toBeDefined();
     const opts = targets.server.options;
-    expect(opts.outputPath).toEqual('dist/bar-server');
+    expect(opts.outputPath).toEqual('dist/bar/server');
     expect(opts.main).toEqual('projects/bar/src/main.server.ts');
     expect(opts.tsConfig).toEqual('projects/bar/tsconfig.server.json');
     const configurations = targets.server.configurations;
@@ -159,6 +159,16 @@ describe('Universal Schematic', () => {
     expect(fileReplacements.length).toEqual(1);
     expect(fileReplacements[0].replace).toEqual('projects/bar/src/environments/environment.ts');
     expect(fileReplacements[0].with).toEqual('projects/bar/src/environments/environment.prod.ts');
+  });
+
+  it('should update workspace with a build target outputPath', async () => {
+    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+      .toPromise();
+    const filePath = '/angular.json';
+    const contents = tree.readContent(filePath);
+    const config = JSON.parse(contents.toString());
+    const targets = config.projects.bar.architect;
+    expect(targets.build.options.outputPath).toEqual('dist/bar/browser');
   });
 
   it('should add a server transition to BrowerModule import', async () => {
