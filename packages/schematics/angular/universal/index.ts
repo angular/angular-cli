@@ -49,12 +49,16 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
         fileReplacements = buildTarget.configurations.production.fileReplacements;
       }
 
+      if (buildTarget && buildTarget.options) {
+        buildTarget.options.outputPath = `dist/${options.clientProject}/browser`;
+      }
+
       const mainPath = options.main as string;
       clientProject.targets.add({
         name: 'server',
         builder: Builders.Server,
         options: {
-          outputPath: `dist/${options.clientProject}-server`,
+          outputPath: `dist/${options.clientProject}/server`,
           main: join(normalize(clientProject.root), 'src', mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts'),
           tsConfig: join(tsConfigDirectory, `${options.tsconfigFileName}.json`),
         },
