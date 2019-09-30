@@ -160,7 +160,7 @@ export class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
 
   list(path: Path): Observable<PathFragment[]> {
     return _callFs(fs.readdir, getSystemPath(path)).pipe(
-      map(names => names.map(name => fragment(name))),
+      map((names: string[]) => names.map(name => fragment(name))),
     );
   }
 
