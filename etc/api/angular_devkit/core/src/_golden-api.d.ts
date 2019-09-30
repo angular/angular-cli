@@ -618,6 +618,7 @@ export declare enum NgCliAnalyticsDimensions {
     NodeVersion = 4,
     NgAddCollection = 6,
     NgBuildBuildEventLog = 7,
+    NgIvyEnabled = 8,
     BuildErrors = 20
 }
 
