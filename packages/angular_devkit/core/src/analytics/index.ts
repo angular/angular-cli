@@ -26,6 +26,7 @@ export enum NgCliAnalyticsDimensions {
   NodeVersion = 4,
   NgAddCollection = 6,
   NgBuildBuildEventLog = 7,
+  NgIvyEnabled = 8,
   BuildErrors = 20,
 }
 
@@ -56,6 +57,7 @@ export const NgCliAnalyticsDimensionsFlagInfo: { [name: string]: [string, string
   NodeVersion: ['Node Version', 'number'],
   NgAddCollection: ['--collection', 'string'],
   NgBuildBuildEventLog: ['--buildEventLog', 'boolean'],
+  NgIvyEnabled: ['Ivy Enabled', 'boolean'],
   BuildErrors: ['Build Errors (comma separated)', 'string'],
 };
 

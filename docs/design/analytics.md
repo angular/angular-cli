@@ -28,8 +28,7 @@ To create a new dimension (tracking a new flag):
    defined on GA.
 1. Use the ID of the dimension as the `x-user-analytics` value in the `schema.json` file.
 1. Add a new row to the table below in the same PR as the one adding the dimension to the code.
-1. New dimensions PRs need to be approved by [bradgreen@google.com](mailto:bradgreen@google.com),
-   [stephenfluin@google.com](mailto:stephenfluin@google.com) and
+1. New dimensions PRs need to be approved by [stephenfluin@google.com](mailto:stephenfluin@google.com) and
    [iminar@google.com](mailto:iminar@google.com). **This is not negotiable.**
 
 **DO NOT ADD `x-user-analytics` FOR VALUES THAT ARE USER IDENTIFIABLE (PII), FOR EXAMPLE A
@@ -48,6 +47,7 @@ Note: There's a limit of 20 custom dimensions.
 | 5 | `Flag: --style` | `string` |
 | 6 | `--collection` | `string` |
 | 7 | `--buildEventLog` | `boolean` |
+| 8 | `Ivy Enabled` | `boolean` |
 | 9 | `Flag: --inlineStyle` | `boolean` |
 | 10 | `Flag: --inlineTemplate` | `boolean` |
 | 11 | `Flag: --viewEncapsulation` | `string` |
