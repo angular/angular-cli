@@ -34,9 +34,7 @@ function addScriptsRule(options: UniversalOptions): Rule {
     pkg.scripts = {
       ...pkg.scripts,
       'serve:ssr': `node ${serverDist}/main.js`,
-      'build:ssr': 'npm run build:client-and-server-bundles',
-      // tslint:disable-next-line: max-line-length
-      'build:client-and-server-bundles': `ng build --prod && ng run ${options.clientProject}:server:production`,
+      'build:ssr': `ng build --prod && ng run ${options.clientProject}:server:production`,
     };
 
     host.overwrite(pkgPath, JSON.stringify(pkg, null, 2));
