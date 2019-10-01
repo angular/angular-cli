@@ -543,13 +543,11 @@ export function buildWebpackBrowser(
                   processRuntimeAction = {
                     ...action,
                     cacheKeys,
-                    cachePath: cacheDownlevelPath || undefined,
                   };
                 } else {
                   processActions.push({
                     ...action,
                     cacheKeys,
-                    cachePath: cacheDownlevelPath || undefined,
                   });
                 }
               }
@@ -593,6 +591,7 @@ export function buildWebpackBrowser(
                     ? workerFile
                     : require.resolve('../utils/process-bundle-bootstrap'),
                   'process',
+                  { cachePath: cacheDownlevelPath },
                 );
 
                 try {

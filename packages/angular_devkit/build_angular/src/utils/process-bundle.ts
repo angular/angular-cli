@@ -5,14 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { transformAsync } from '@babel/core';
 import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
-import { SourceMapConsumer, SourceMapGenerator } from 'source-map';
+import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import { minify } from 'terser';
 import { manglingDisabled } from './mangle-options';
 
-const { transformAsync } = require('@babel/core');
 const cacache = require('cacache');
 
 export interface ProcessBundleOptions {
@@ -28,7 +28,6 @@ export interface ProcessBundleOptions {
   optimizeOnly?: boolean;
   ignoreOriginal?: boolean;
   cacheKeys?: (string | null)[];
-  cachePath?: string;
   integrityAlgorithm?: 'sha256' | 'sha384' | 'sha512';
   runtimeData?: ProcessBundleResult[];
 }
@@ -57,180 +56,124 @@ export const enum CacheKey {
   DownlevelMap = 3,
 }
 
+let cachePath: string | undefined;
+
+export function setup(options: { cachePath: string }): void {
+  cachePath = options.cachePath;
+}
+
+async function cachePut(content: string, key: string | null, integrity?: string): Promise<void> {
+  if (cachePath && key) {
+    await cacache.put(cachePath, key, content, {
+      metadata: { integrity },
+    });
+  }
+}
+
 export async function process(options: ProcessBundleOptions): Promise<ProcessBundleResult> {
   if (!options.cacheKeys) {
     options.cacheKeys = [];
   }
 
-  // If no downlevelling required than just mangle code and return
-  if (options.optimizeOnly) {
-    const result: ProcessBundleResult = { name: options.name };
-    if (options.integrityAlgorithm) {
-      result.integrity = generateIntegrityValue(options.integrityAlgorithm, options.code);
-    }
-
-    // Replace integrity hashes with updated values
-    // NOTE: This should eventually be a babel plugin
-    if (options.runtime && options.integrityAlgorithm && options.runtimeData) {
-      for (const data of options.runtimeData) {
-        if (!data.integrity || !data.original || !data.original.integrity) {
-          continue;
-        }
-
-        options.code = options.code.replace(data.integrity, data.original.integrity);
-      }
-    }
-
-    result.original = await mangleOriginal(options);
-
-    return result;
+  const result: ProcessBundleResult = { name: options.name };
+  if (options.integrityAlgorithm) {
+    // Store unmodified code integrity value -- used for SRI value replacement
+    result.integrity = generateIntegrityValue(options.integrityAlgorithm, options.code);
   }
+
+  // Runtime chunk requires specialized handling
+  if (options.runtime) {
+    return { ...result, ...(await processRuntime(options)) };
+  }
+
+  const basePath = path.dirname(options.filename);
+  const filename = path.basename(options.filename);
+  const downlevelFilename = filename.replace('es2015', 'es5');
+  const downlevel = !options.optimizeOnly;
 
   // if code size is larger than 500kB, manually handle sourcemaps with newer source-map package.
   // babel currently uses an older version that still supports sync calls
-  const codeSize = Buffer.byteLength(options.code, 'utf8');
-  const mapSize = options.map ? Buffer.byteLength(options.map, 'utf8') : 0;
+  const codeSize = Buffer.byteLength(options.code);
+  const mapSize = options.map ? Buffer.byteLength(options.map) : 0;
   const manualSourceMaps = codeSize >= 500 * 1024 || mapSize >= 500 * 1024;
 
-  // downlevel the bundle
-  let { code, map } = await transformAsync(options.code, {
-    filename: options.filename,
-    inputSourceMap: !manualSourceMaps && options.map !== undefined && JSON.parse(options.map),
-    babelrc: false,
-    // modules aren't needed since the bundles use webpack's custom module loading
-    // 'transform-typeof-symbol' generates slower code
-    presets: [
-      ['@babel/preset-env', { modules: false, exclude: ['transform-typeof-symbol'] }],
-    ],
-    minified: options.optimize,
-    // `false` ensures it is disabled and prevents large file warnings
-    compact: options.optimize || false,
-    sourceMaps: options.sourceMaps,
-  });
+  const sourceCode = options.code;
+  const sourceMap = options.map ? JSON.parse(options.map) : undefined;
 
-  const newFilePath = options.filename.replace('es2015', 'es5');
-
-  // Adjust lazy loaded scripts to point to the proper variant
-  // Extra spacing is intentional to align source line positions
-  if (options.runtime) {
-    code = code.replace('"-es2015.', '   "-es5.');
-
-    // Replace integrity hashes with updated values
-    // NOTE: This should eventually be a babel plugin
-    if (options.integrityAlgorithm && options.runtimeData) {
-      for (const data of options.runtimeData) {
-        if (!data.integrity || !data.downlevel || !data.downlevel.integrity) {
-          continue;
-        }
-
-        code = code.replace(data.integrity, data.downlevel.integrity);
-      }
-    }
-  }
-
-  if (options.sourceMaps && manualSourceMaps && options.map) {
-    const generator = new SourceMapGenerator();
-    let sourceRoot;
-    await SourceMapConsumer.with(options.map, null, originalConsumer => {
-      sourceRoot = 'sourceRoot' in originalConsumer ? originalConsumer.sourceRoot : undefined;
-
-      return SourceMapConsumer.with(map, null, newConsumer => {
-        newConsumer.eachMapping(mapping => {
-          if (mapping.originalLine === null) {
-            return;
-          }
-
-          const originalPosition = originalConsumer.originalPositionFor({
-            line: mapping.originalLine,
-            column: mapping.originalColumn,
-          });
-
-          if (
-            originalPosition.line === null ||
-            originalPosition.column === null ||
-            originalPosition.source === null
-          ) {
-            return;
-          }
-
-          generator.addMapping({
-            generated: {
-              line: mapping.generatedLine,
-              column: mapping.generatedColumn,
-            },
-            name: originalPosition.name || undefined,
-            original: {
-              line: originalPosition.line,
-              column: originalPosition.column,
-            },
-            source: originalPosition.source,
-          });
-        });
-      });
+  let downlevelCode;
+  let downlevelMap;
+  if (downlevel) {
+    // Downlevel the bundle
+    const transformResult = await transformAsync(sourceCode, {
+      filename: options.filename,
+      inputSourceMap: manualSourceMaps ? undefined : sourceMap,
+      babelrc: false,
+      // modules aren't needed since the bundles use webpack's custom module loading
+      // 'transform-typeof-symbol' generates slower code
+      presets: [['@babel/preset-env', { modules: false, exclude: ['transform-typeof-symbol'] }]],
+      minified: options.optimize,
+      // `false` ensures it is disabled and prevents large file warnings
+      compact: options.optimize || false,
+      sourceMaps: !!sourceMap,
     });
 
-    map = generator.toJSON();
-    map.file = path.basename(newFilePath);
-    map.sourceRoot = sourceRoot;
-  }
+    if (!transformResult || !transformResult.code) {
+      throw new Error(`Unknown error occurred processing bundle for "${options.filename}".`);
+    }
+    downlevelCode = transformResult.code;
 
-  const result: ProcessBundleResult = { name: options.name };
+    if (manualSourceMaps && sourceMap && transformResult.map) {
+      downlevelMap = await mergeSourcemaps(sourceMap, transformResult.map);
+    } else {
+      // undefined is needed here to normalize the property type
+      downlevelMap = transformResult.map || undefined;
+    }
+  }
 
   if (options.optimize) {
-    // Note: Investigate converting the AST instead of re-parsing
-    // estree -> terser is already supported; need babel -> estree/terser
-
-    // Mangle downlevel code
-    const minifyOutput = minify(code, {
-      compress: true,
-      ecma: 5,
-      mangle: !manglingDisabled,
-      safari10: true,
-      output: {
-        ascii_only: true,
-        webkit: true,
-      },
-      sourceMap: options.sourceMaps && {
-        filename: path.basename(newFilePath),
-        content: map,
-      },
-    });
-
-    if (minifyOutput.error) {
-      throw minifyOutput.error;
+    if (downlevelCode) {
+      const minifyResult = terserMangle(downlevelCode, {
+        filename: downlevelFilename,
+        map: downlevelMap,
+        compress: true,
+      });
+      downlevelCode = minifyResult.code;
+      downlevelMap = minifyResult.map;
     }
 
-    code = minifyOutput.code;
-    map = minifyOutput.map;
-
-    // Mangle original code
     if (!options.ignoreOriginal) {
       result.original = await mangleOriginal(options);
     }
-  } else if (map) {
-    map = JSON.stringify(map);
   }
 
-  if (map) {
-    if (!options.hiddenSourceMaps) {
-      code += `\n//# sourceMappingURL=${path.basename(newFilePath)}.map`;
+  if (downlevelCode) {
+    const downlevelPath = path.join(basePath, downlevelFilename);
+
+    let mapContent;
+    if (downlevelMap) {
+      if (!options.hiddenSourceMaps) {
+        downlevelCode += `\n//# sourceMappingURL=${downlevelFilename}.map`;
+      }
+
+      mapContent = JSON.stringify(downlevelMap);
+      await cachePut(mapContent, options.cacheKeys[CacheKey.DownlevelMap]);
+      fs.writeFileSync(downlevelPath + '.map', mapContent);
     }
 
-    if (options.cachePath && options.cacheKeys[CacheKey.DownlevelMap]) {
-      await cacache.put(options.cachePath, options.cacheKeys[CacheKey.DownlevelMap], map);
-    }
+    result.downlevel = createFileEntry(
+      downlevelFilename,
+      downlevelCode,
+      mapContent,
+      options.integrityAlgorithm,
+    );
 
-    fs.writeFileSync(newFilePath + '.map', map);
+    await cachePut(
+      downlevelCode,
+      options.cacheKeys[CacheKey.DownlevelCode],
+      result.downlevel.integrity,
+    );
+    fs.writeFileSync(downlevelPath, downlevelCode);
   }
-
-  result.downlevel = createFileEntry(newFilePath, code, map, options.integrityAlgorithm);
-
-  if (options.cachePath && options.cacheKeys[CacheKey.DownlevelCode]) {
-    await cacache.put(options.cachePath, options.cacheKeys[CacheKey.DownlevelCode], code, {
-      metadata: { integrity: result.downlevel.integrity },
-    });
-  }
-  fs.writeFileSync(newFilePath, code);
 
   // If original was not processed, add info
   if (!result.original && !options.ignoreOriginal) {
@@ -242,72 +185,136 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
     );
   }
 
-  if (options.integrityAlgorithm) {
-    result.integrity = generateIntegrityValue(options.integrityAlgorithm, options.code);
-  }
-
   return result;
 }
 
+async function mergeSourcemaps(first: RawSourceMap, second: RawSourceMap) {
+  const sourceRoot = first.sourceRoot;
+  const generator = new SourceMapGenerator();
+
+  // sourcemap package adds the sourceRoot to all position source paths if not removed
+  delete first.sourceRoot;
+
+  await SourceMapConsumer.with(first, null, originalConsumer => {
+    return SourceMapConsumer.with(second, null, newConsumer => {
+      newConsumer.eachMapping(mapping => {
+        if (mapping.originalLine === null) {
+          return;
+        }
+        const originalPosition = originalConsumer.originalPositionFor({
+          line: mapping.originalLine,
+          column: mapping.originalColumn,
+        });
+        if (
+          originalPosition.line === null ||
+          originalPosition.column === null ||
+          originalPosition.source === null
+        ) {
+          return;
+        }
+        generator.addMapping({
+          generated: {
+            line: mapping.generatedLine,
+            column: mapping.generatedColumn,
+          },
+          name: originalPosition.name || undefined,
+          original: {
+            line: originalPosition.line,
+            column: originalPosition.column,
+          },
+          source: originalPosition.source,
+        });
+      });
+    });
+  });
+
+  const map = generator.toJSON();
+  map.file = second.file;
+  map.sourceRoot = sourceRoot;
+
+  // Put the sourceRoot back
+  if (sourceRoot) {
+    first.sourceRoot = sourceRoot;
+  }
+
+  return map;
+}
+
 async function mangleOriginal(options: ProcessBundleOptions): Promise<ProcessBundleFile> {
-  const resultOriginal = minify(options.code, {
-    compress: false,
+  const result = terserMangle(options.code, {
+    filename: path.basename(options.filename),
+    map: options.map ? JSON.parse(options.map) : undefined,
     ecma: 6,
+  });
+
+  let mapContent;
+  if (result.map) {
+    if (!options.hiddenSourceMaps) {
+      result.code += `\n//# sourceMappingURL=${path.basename(options.filename)}.map`;
+    }
+
+    mapContent = JSON.stringify(result.map);
+
+    await cachePut(
+      mapContent,
+      (options.cacheKeys && options.cacheKeys[CacheKey.OriginalMap]) || null,
+    );
+    fs.writeFileSync(options.filename + '.map', mapContent);
+  }
+
+  const fileResult = createFileEntry(
+    options.filename,
+    result.code,
+    mapContent,
+    options.integrityAlgorithm,
+  );
+
+  await cachePut(
+    result.code,
+    (options.cacheKeys && options.cacheKeys[CacheKey.OriginalCode]) || null,
+    fileResult.integrity,
+  );
+  fs.writeFileSync(options.filename, result.code);
+
+  return fileResult;
+}
+
+function terserMangle(
+  code: string,
+  options: { filename?: string; map?: RawSourceMap; compress?: boolean; ecma?: 5 | 6 } = {},
+) {
+  // Note: Investigate converting the AST instead of re-parsing
+  // estree -> terser is already supported; need babel -> estree/terser
+
+  // Mangle downlevel code
+  const minifyOutput = minify(code, {
+    compress: options.compress || false,
+    ecma: options.ecma || 5,
     mangle: !manglingDisabled,
     safari10: true,
     output: {
       ascii_only: true,
       webkit: true,
     },
-    sourceMap: options.sourceMaps &&
-      options.map !== undefined && {
-        filename: path.basename(options.filename),
-        content: JSON.parse(options.map),
-      },
+    sourceMap:
+      !!options.map &&
+      ({
+        filename: options.filename,
+        // terser uses an old version of the sourcemap typings
+        // tslint:disable-next-line: no-any
+        content: options.map as any,
+        asObject: true,
+        // typings don't include asObject option
+        // tslint:disable-next-line: no-any
+      } as any),
   });
 
-  if (resultOriginal.error) {
-    throw resultOriginal.error;
+  if (minifyOutput.error) {
+    throw minifyOutput.error;
   }
 
-  if (resultOriginal.map) {
-    if (!options.hiddenSourceMaps) {
-      resultOriginal.code += `\n//# sourceMappingURL=${path.basename(options.filename)}.map`;
-    }
-
-    if (options.cachePath && options.cacheKeys && options.cacheKeys[CacheKey.OriginalMap]) {
-      await cacache.put(
-        options.cachePath,
-        options.cacheKeys[CacheKey.OriginalMap],
-        resultOriginal.map,
-      );
-    }
-
-    fs.writeFileSync(options.filename + '.map', resultOriginal.map);
-  }
-
-  const fileResult = createFileEntry(
-    options.filename,
-    // tslint:disable-next-line: no-non-null-assertion
-    resultOriginal.code!,
-    resultOriginal.map as string,
-    options.integrityAlgorithm,
-  );
-
-  if (options.cachePath && options.cacheKeys && options.cacheKeys[CacheKey.OriginalCode]) {
-    await cacache.put(
-      options.cachePath,
-      options.cacheKeys[CacheKey.OriginalCode],
-      resultOriginal.code,
-      {
-        metadata: { integrity: fileResult.integrity },
-      },
-    );
-  }
-
-  fs.writeFileSync(options.filename, resultOriginal.code);
-
-  return fileResult;
+  // tslint:disable-next-line: no-non-null-assertion
+  return { code: minifyOutput.code!, map: minifyOutput.map as RawSourceMap | undefined };
 }
 
 function createFileEntry(
@@ -337,4 +344,93 @@ function generateIntegrityValue(hashAlgorithm: string, code: string) {
       .update(code)
       .digest('base64')
   );
+}
+
+// The webpack runtime chunk is already ES5.
+// However, two variants are still needed due to lazy routing and SRI differences
+// NOTE: This should eventually be a babel plugin
+async function processRuntime(
+  options: ProcessBundleOptions,
+): Promise<Partial<ProcessBundleResult>> {
+  let originalCode = options.code;
+  let downlevelCode = options.code;
+
+  // Replace integrity hashes with updated values
+  if (options.integrityAlgorithm && options.runtimeData) {
+    for (const data of options.runtimeData) {
+      if (!data.integrity) {
+        continue;
+      }
+
+      if (data.original && data.original.integrity) {
+        originalCode = originalCode.replace(data.integrity, data.original.integrity);
+      }
+      if (data.downlevel && data.downlevel.integrity) {
+        downlevelCode = downlevelCode.replace(data.integrity, data.downlevel.integrity);
+      }
+    }
+  }
+
+  // Adjust lazy loaded scripts to point to the proper variant
+  // Extra spacing is intentional to align source line positions
+  downlevelCode = downlevelCode.replace('"-es2015.', '   "-es5.');
+
+  const downlevelFilePath = options.filename.replace('es2015', 'es5');
+  let downlevelMap;
+  let result;
+  if (options.optimize) {
+    const minifiyResults = terserMangle(downlevelCode, {
+      filename: path.basename(downlevelFilePath),
+      map: options.map === undefined ? undefined : JSON.parse(options.map),
+    });
+    downlevelCode = minifiyResults.code;
+    downlevelMap = JSON.stringify(minifiyResults.map);
+
+    result = {
+      original: await mangleOriginal({ ...options, code: originalCode }),
+      downlevel: createFileEntry(
+        downlevelFilePath,
+        downlevelCode,
+        downlevelMap,
+        options.integrityAlgorithm,
+      ),
+    };
+  } else {
+    if (options.map) {
+      const rawMap = JSON.parse(options.map) as RawSourceMap;
+      rawMap.file = path.basename(downlevelFilePath);
+      downlevelMap = JSON.stringify(rawMap);
+    }
+
+    result = {
+      original: createFileEntry(
+        options.filename,
+        originalCode,
+        options.map,
+        options.integrityAlgorithm,
+      ),
+      downlevel: createFileEntry(
+        downlevelFilePath,
+        downlevelCode,
+        downlevelMap,
+        options.integrityAlgorithm,
+      ),
+    };
+  }
+
+  if (downlevelMap) {
+    await cachePut(
+      downlevelMap,
+      (options.cacheKeys && options.cacheKeys[CacheKey.DownlevelMap]) || null,
+    );
+    fs.writeFileSync(downlevelFilePath + '.map', downlevelMap);
+    downlevelCode += `\n//# sourceMappingURL=${path.basename(downlevelFilePath)}.map`;
+  }
+  await cachePut(
+    downlevelCode,
+    (options.cacheKeys && options.cacheKeys[CacheKey.DownlevelCode]) || null,
+  );
+  fs.writeFileSync(downlevelFilePath, downlevelCode);
+
+  return result;
 }
