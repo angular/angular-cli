@@ -64,6 +64,7 @@ import {
   normalizeOptimization,
   normalizeSourceMaps,
 } from '../utils';
+import { I18nOptions, createI18nOptions } from '../utils/i18n-options';
 import { manglingDisabled } from '../utils/mangle-options';
 import {
   CacheKey,
@@ -167,12 +168,22 @@ async function initialize(
   context: BuilderContext,
   host: virtualFs.Host<fs.Stats>,
   webpackConfigurationTransform?: ExecutionTransformer<webpack.Configuration>,
-): Promise<{ config: webpack.Configuration[]; projectRoot: string; projectSourceRoot?: string }> {
+): Promise<{
+  config: webpack.Configuration[];
+  projectRoot: string;
+  projectSourceRoot?: string;
+  i18n: I18nOptions;
+}> {
   const { config, projectRoot, projectSourceRoot } = await buildBrowserWebpackConfigFromContext(
     options,
     context,
     host,
   );
+
+  // target is verified in the above call
+  // tslint:disable-next-line: no-non-null-assertion
+  const metadata = await context.getProjectMetadata(context.target!);
+  const i18n = createI18nOptions(metadata);
 
   let transformedConfig;
   if (webpackConfigurationTransform) {
@@ -190,7 +201,7 @@ async function initialize(
     ).toPromise();
   }
 
-  return { config: transformedConfig || config, projectRoot, projectSourceRoot };
+  return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n };
 }
 
 // tslint:disable-next-line: no-big-function
@@ -211,7 +222,7 @@ export function buildWebpackBrowser(
 
   return from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
     // tslint:disable-next-line: no-big-function
-    switchMap(({ config: configs, projectRoot }) => {
+    switchMap(({ config: configs, projectRoot, i18n }) => {
       const tsConfig = readTsconfig(options.tsConfig, context.workspaceRoot);
       const target = tsConfig.options.target || ScriptTarget.ES5;
       const buildBrowserFeatures = new BuildBrowserFeatures(projectRoot, target);
@@ -591,7 +602,7 @@ export function buildWebpackBrowser(
                     ? workerFile
                     : require.resolve('../utils/process-bundle-bootstrap'),
                   'process',
-                  { cachePath: cacheDownlevelPath },
+                  { cachePath: cacheDownlevelPath, i18n },
                 );
 
                 try {
