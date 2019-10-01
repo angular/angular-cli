@@ -91,8 +91,8 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       } else if (!latestManifest || (await this.hasMismatchedPeer(latestManifest))) {
         // 'latest' is invalid so search for most recent matching package
         const versionManifests = Object.values(packageMetadata.versions).filter(
-          value => !prerelease(value.version),
-        );
+          (value: PackageManifest) => !prerelease(value.version),
+        ) as PackageManifest[];
 
         versionManifests.sort((a, b) => rcompare(a.version, b.version, true));
 

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
+  JsonAstArray,
   JsonParseMode,
   dirname,
   join,
@@ -46,9 +47,9 @@ function addConfig(options: WebWorkerOptions, root: string, tsConfigPath: string
         throw new SchematicsException('Invalid tsconfig "exclude" property; expected an array.');
       }
 
-      if (filesAstNode && !filesAstNode.value.includes(workerGlob)) {
+      if (filesAstNode && !(filesAstNode as JsonAstArray).value.includes(workerGlob)) {
         const recorder = host.beginUpdate(tsConfigPath);
-        appendValueInAstArray(recorder, filesAstNode, workerGlob);
+        appendValueInAstArray(recorder, filesAstNode as JsonAstArray, workerGlob);
         host.commitUpdate(recorder);
       }
     }

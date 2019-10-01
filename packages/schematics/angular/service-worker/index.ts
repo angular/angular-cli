@@ -131,7 +131,7 @@ export default function (options: ServiceWorkerOptions): Rule {
     let buildConfiguration;
     if (options.configuration && buildTarget.configurations) {
       buildConfiguration =
-        buildTarget.configurations[options.configuration] as BrowserBuilderOptions | undefined;
+        buildTarget.configurations[options.configuration] as unknown as BrowserBuilderOptions | undefined;
     }
 
     const config = buildConfiguration || buildOptions;
