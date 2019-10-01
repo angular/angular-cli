@@ -33,7 +33,7 @@ ts_library(
         "//packages/angular_devkit/core:node",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tools",
-        # @typings: es2017.object
+        # @node_module: typescript:es2017.object
         "@npm//@types/debug",
         "@npm//@types/node",
         "@npm//@types/inquirer",

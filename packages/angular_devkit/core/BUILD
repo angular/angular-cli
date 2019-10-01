@@ -39,11 +39,11 @@ ts_library(
         "@npm//magic-string",
         "@npm//rxjs",
         "@npm//source-map",
-        # @typings: es2015.core
-        # @typings: es2015.proxy
-        # @typings: es2015.reflect
-        # @typings: es2015.symbol.wellknown
-        # @typings: es2016.array.include
+        # @node_module: typescript:es2015.core
+        # @node_module: typescript:es2015.proxy
+        # @node_module: typescript:es2015.reflect
+        # @node_module: typescript:es2015.symbol.wellknown
+        # @node_module: typescript:es2016.array.include
     ],
 )
 
@@ -139,12 +139,11 @@ jasmine_node_test(
     # TODO: Audit tests to determine if tests can be run in RBE environments
     local = True,
     deps = [
-        "@npm//temp",
         "@npm//chokidar",
+        "@npm//temp",
         # @node_module: ajv
         # @node_module: fast_json_stable_stringify
         # @node_module: magic_string
-        # @node_module: temp
     ],
 )
 
