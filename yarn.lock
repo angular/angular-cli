@@ -40,6 +40,17 @@
     rxjs "6.4.0"
     source-map "0.7.3"
 
+"@angular-devkit/core@9.0.0-next.6":
+  version "9.0.0-next.6"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-9.0.0-next.6.tgz#f8e47cb966177ccdd69c568689aa01c80bd1bc6d"
+  integrity sha512-01sSgdLcd0vIHNyiNQi77UZc6R9Pdp79tj/oCtWrqomtNgtyp4uNis5gP77PUCAYErtDUYznUb3Fh4oXeMrinw==
+  dependencies:
+    ajv "6.10.2"
+    fast-json-stable-stringify "2.0.0"
+    magic-string "0.25.3"
+    rxjs "6.5.3"
+    source-map "0.7.3"
+
 "@angular-devkit/schematics@8.0.0-beta.18", "@angular-devkit/schematics@^8.0.0-beta.15":
   version "8.0.0-beta.18"
   resolved "https://registry.yarnpkg.com/@angular-devkit/schematics/-/schematics-8.0.0-beta.18.tgz#97dece6eaddd331516a94da985f33add21b76f5c"
@@ -55,6 +66,14 @@
   dependencies:
     "@angular-devkit/core" "9.0.0-next.5"
     rxjs "6.4.0"
+
+"@angular-devkit/schematics@^9.0.0-next.5":
+  version "9.0.0-next.6"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/schematics/-/schematics-9.0.0-next.6.tgz#6b3a80b6793d9d95c3e6f4ccab522d94bc8579bc"
+  integrity sha512-4O6mwmXVaC/zroP38IfetocrkeZpiztaqzyWeD7BhB/ZacfhY6Pa/+Yqu116UdKsY6DEhoHCSfRWSaj0YRnlsQ==
+  dependencies:
+    "@angular-devkit/core" "9.0.0-next.6"
+    rxjs "6.5.3"
 
 "@angular/animations@^9.0.0-next.8":
   version "9.0.0-next.8"
@@ -4241,7 +4260,7 @@ rxjs@6.4.0:
   dependencies:
     tslib "^1.9.0"
 
-rxjs@^6.5.3:
+rxjs@6.5.3, rxjs@^6.5.3:
   version "6.5.3"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.5.3.tgz#510e26317f4db91a7eb1de77d9dd9ba0a4899a3a"
   integrity sha512-wuYsAYYFdWTAnAaPoKGNhfpWwKZbJW+HgAJ+mImp+Epl7BG8oNWBCTyRM8gba9k4lk8BgWdoYm21Mo/RYhhbgA==

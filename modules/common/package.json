@@ -14,7 +14,6 @@
   "ng-update": {
     "packageGroup": "NG_UPDATE_PACKAGE_GROUP"
   },
-  "schematics": "./schematics/collection.json",
   "repository": {
     "type": "git",
     "url": "https://github.com/angular/universal"

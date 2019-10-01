@@ -18,10 +18,29 @@ import {
   findPropertyInAstObject,
   appendValueInAstArray,
 } from '@schematics/angular/utility/json-utils';
-import {Schema as UniversalOptions} from './schema';
-import {stripTsExtension, getDistPaths, getClientProject} from './utils';
+import {Schema as UniversalOptions} from '@schematics/angular/universal/schema';
+import {stripTsExtension, getDistPaths, getClientProject} from '../utils';
 
-function addScriptsRule(options: UniversalOptions): Rule {
+export interface AddUniversalOptions extends UniversalOptions {
+  serverFileName?: string;
+}
+
+export function addUniversalCommonRule(options: AddUniversalOptions): Rule {
+  return async host => {
+    const clientProject = await getClientProject(host, options.clientProject);
+
+    return chain([
+      clientProject.targets.has('server')
+        ? noop()
+        : externalSchematic('@schematics/angular', 'universal', options),
+      addScriptsRule(options),
+      updateServerTsConfigRule(options),
+      updateConfigFileRule(options),
+    ]);
+  };
+}
+
+function addScriptsRule(options: AddUniversalOptions): Rule {
   return async host => {
     const pkgPath = '/package.json';
     const buffer = host.read(pkgPath);
@@ -41,7 +60,7 @@ function addScriptsRule(options: UniversalOptions): Rule {
   };
 }
 
-function updateConfigFileRule(options: UniversalOptions): Rule {
+function updateConfigFileRule(options: AddUniversalOptions): Rule {
   return host => {
     return updateWorkspace((async workspace => {
       const clientProject = workspace.projects.get(options.clientProject);
@@ -77,7 +96,7 @@ function updateConfigFileRule(options: UniversalOptions): Rule {
   };
 }
 
-function updateServerTsConfigRule(options: UniversalOptions): Rule {
+function updateServerTsConfigRule(options: AddUniversalOptions): Rule {
   return async host => {
     const clientProject = await getClientProject(host, options.clientProject);
     const serverTarget = clientProject.targets.get('server');
@@ -115,20 +134,5 @@ function updateServerTsConfigRule(options: UniversalOptions): Rule {
 
       host.commitUpdate(recorder);
     }
-  };
-}
-
-export default function (options: UniversalOptions): Rule {
-  return async host => {
-    const clientProject = await getClientProject(host, options.clientProject);
-
-    return chain([
-      clientProject.targets.has('server')
-        ? noop()
-        : externalSchematic('@schematics/angular', 'universal', options),
-      addScriptsRule(options),
-      updateServerTsConfigRule(options),
-      updateConfigFileRule(options),
-    ]);
   };
 }

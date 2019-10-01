@@ -9,7 +9,6 @@ import {strings} from '@angular-devkit/core';
 import {
   apply,
   chain,
-  externalSchematic,
   mergeWith,
   Rule,
   SchematicContext,
@@ -28,7 +27,8 @@ import {
   getClientProject,
   stripTsExtension,
   getDistPaths,
-} from '@nguniversal/common/schematics/install/utils';
+} from '@nguniversal/common/schematics/utils';
+import {addUniversalCommonRule} from '@nguniversal/common/schematics/add';
 
 function addDependencies(options: UniversalOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
@@ -69,14 +69,9 @@ export default function (options: UniversalOptions): Rule {
       move(clientProject.root)
     ]);
 
-    // Under bazel the collection needs to be resolved differently
-    const ngCommonUniversalCollection = process.env.BAZEL_TARGET
-      ? require.resolve('nguniversal/modules/common/schematics/npm_package/collection.json')
-      : '@nguniversal/common';
-
     return chain([
       mergeWith(rootSource),
-      externalSchematic(ngCommonUniversalCollection, 'install', options),
+      addUniversalCommonRule(options),
       addDependencies(options),
     ]);
   };

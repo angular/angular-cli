@@ -49,6 +49,7 @@
   "devDependencies": {
     "@angular-devkit/architect": "^0.900.0-next.5",
     "@angular-devkit/core": "^9.0.0-next.5",
+    "@angular-devkit/schematics": "^9.0.0-next.5",
     "@angular/bazel": "^9.0.0-next.8",
     "@bazel/bazel": "0.28.1",
     "@bazel/buildifier": "^0.25.1",

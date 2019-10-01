@@ -10,11 +10,12 @@ import {SchematicTestRunner} from '@angular-devkit/schematics/testing';
 
 import {collectionPath, createTestApp} from '../testing/test-app';
 
-import {Schema as UniversalOptions} from './schema';
+import {addUniversalCommonRule, AddUniversalOptions} from './index';
 
-describe('Universal Schematic', () => {
-  const defaultOptions: UniversalOptions = {
+describe('Add Schematic Rule', () => {
+  const defaultOptions: AddUniversalOptions = {
     clientProject: 'bar',
+    serverFileName: 'server.ts',
   };
 
   let schematicRunner: SchematicTestRunner;
@@ -27,9 +28,8 @@ describe('Universal Schematic', () => {
 
   it('should update angular.json', async () => {
     const tree = await schematicRunner
-      .runSchematicAsync('install', defaultOptions, appTree)
-      .toPromise();
-    const contents = JSON.parse(tree.readContent('angular.json'));
+      .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
+    const contents = JSON.parse(tree.read('angular.json')!.toString());
     const architect = contents.projects.bar.architect;
     expect(architect.build.configurations.production).toBeDefined();
     expect(architect.build.options.outputPath).toBe('dist/bar/browser');
@@ -43,10 +43,9 @@ describe('Universal Schematic', () => {
 
   it(`should update 'tsconfig.server.json' files with main file`, async () => {
     const tree = await schematicRunner
-      .runSchematicAsync('install', defaultOptions, appTree)
-      .toPromise();
+      .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
 
-    const contents = JSON.parse(tree.readContent('/projects/bar/tsconfig.server.json'));
+    const contents = JSON.parse(tree.read('/projects/bar/tsconfig.server.json')!.toString());
     expect(contents.files).toEqual([
       'src/main.server.ts',
       'server.ts',
@@ -54,15 +53,14 @@ describe('Universal Schematic', () => {
   });
 
   it(`should work when server target already exists`, async () => {
-    let tree = await schematicRunner
+    appTree = await schematicRunner
       .runExternalSchematicAsync('@schematics/angular', 'universal', defaultOptions, appTree)
       .toPromise();
 
-    tree = await schematicRunner
-      .runSchematicAsync('install', defaultOptions, tree)
-      .toPromise();
+    const tree = await schematicRunner
+      .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
 
-    const contents = JSON.parse(tree.readContent('/projects/bar/tsconfig.server.json'));
+    const contents = JSON.parse(tree.read('/projects/bar/tsconfig.server.json')!.toString());
     expect(contents.files).toEqual([
       'src/main.server.ts',
       'server.ts',
