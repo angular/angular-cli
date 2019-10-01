@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import * as stableStringify from 'fast-json-stable-stringify';
 import {
   JsonAstArray,
   JsonAstKeyValue,
@@ -13,8 +14,6 @@ import {
   JsonObject,
   JsonValue,
 } from '../../json';
-
-const stableStringify = require('fast-json-stable-stringify');
 
 interface CacheEntry {
   value?: JsonValue;
