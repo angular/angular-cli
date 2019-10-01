@@ -35,7 +35,6 @@ ts_library(
         "//packages/angular_devkit/schematics:tools",
         # @typings: es2017.object
         "@npm//@types/debug",
-        "@npm//debug",
         "@npm//@types/node",
         "@npm//@types/inquirer",
         "@npm//@types/semver",

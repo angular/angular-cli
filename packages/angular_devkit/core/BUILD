@@ -33,11 +33,11 @@ ts_library(
     # The attribute below is needed in g3 to turn off strict typechecking
     # strict_checks = False,
     deps = [
-        "@npm//rxjs",
-        "@npm//@types/node",
         "@npm//@types/fast-json-stable-stringify",
+        "@npm//@types/node",
         "@npm//ajv",
         "@npm//magic-string",
+        "@npm//rxjs",
         "@npm//source-map",
         # @typings: es2015.core
         # @typings: es2015.proxy
@@ -80,8 +80,10 @@ jasmine_node_test(
     # TODO: Audit tests to determine if tests can be run in RBE environments
     local = True,
     deps = [
-        "@npm//jasmine",
-        "@npm//source-map",
+        # @node_module: ajv
+        # @node_module: fast_json_stable_stringify
+        # @node_module: magic_string
+        # @node_module: source_map
     ],
 )
 
@@ -137,11 +139,12 @@ jasmine_node_test(
     # TODO: Audit tests to determine if tests can be run in RBE environments
     local = True,
     deps = [
-        "@npm//chokidar",
-        "@npm//jasmine",
-        "@npm//source-map",
         "@npm//temp",
-        "@npm//tslint",
+        "@npm//chokidar",
+        # @node_module: ajv
+        # @node_module: fast_json_stable_stringify
+        # @node_module: magic_string
+        # @node_module: temp
     ],
 )
 
