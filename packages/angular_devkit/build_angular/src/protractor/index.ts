@@ -92,7 +92,7 @@ async function execute(
     await updateWebdriver();
   }
 
-  let baseUrl;
+  let baseUrl = options.baseUrl;
   let server;
   if (options.devServerTarget) {
     const target = targetFromTargetString(options.devServerTarget);
