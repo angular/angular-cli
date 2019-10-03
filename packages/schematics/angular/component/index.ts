@@ -49,15 +49,18 @@ function addDeclarationToNgModule(options: ComponentOptions): Rule {
       return host;
     }
 
+    options.type = !!options.type ? options.type : 'Component';
+
     const modulePath = options.module;
     const source = readIntoSourceFile(host, modulePath);
 
     const componentPath = `/${options.path}/`
                           + (options.flat ? '' : strings.dasherize(options.name) + '/')
                           + strings.dasherize(options.name)
-                          + '.component';
+                          + '.'
+                          + strings.dasherize(options.type);
     const relativePath = buildRelativePath(modulePath, componentPath);
-    const classifiedName = strings.classify(`${options.name}Component`);
+    const classifiedName = strings.classify(options.name) + strings.classify(options.type);
     const declarationChanges = addDeclarationToModule(source,
                                                       modulePath,
                                                       classifiedName,
@@ -77,7 +80,7 @@ function addDeclarationToNgModule(options: ComponentOptions): Rule {
 
       const exportRecorder = host.beginUpdate(modulePath);
       const exportChanges = addExportToModule(source, modulePath,
-                                              strings.classify(`${options.name}Component`),
+                                              strings.classify(options.name) + strings.classify(options.type),
                                               relativePath);
 
       for (const change of exportChanges) {
@@ -95,7 +98,7 @@ function addDeclarationToNgModule(options: ComponentOptions): Rule {
       const entryComponentRecorder = host.beginUpdate(modulePath);
       const entryComponentChanges = addEntryComponentToModule(
         source, modulePath,
-        strings.classify(`${options.name}Component`),
+        strings.classify(options.name) + strings.classify(options.type),
         relativePath);
 
       for (const change of entryComponentChanges) {

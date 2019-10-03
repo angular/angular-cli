@@ -88,6 +88,11 @@
       ],
       "x-user-analytics": 5
     },
+    "type": {
+      "type": "string",
+      "description": "Adds a developer-defined type to the filename, in the format \"name.type.ts\".",
+      "default": "Component"
+    },
     "spec": {
       "type": "boolean",
       "description": "When true (the default), generates a  \"spec.ts\" test file for the new component.",

@@ -24,6 +24,7 @@ describe('Component Schematic', () => {
     inlineTemplate: false,
     changeDetection: ChangeDetection.Default,
     style: Style.Css,
+    type: 'Component',
     skipTests: false,
     module: undefined,
     export: false,
@@ -254,6 +255,17 @@ describe('Component Schematic', () => {
     expect(content).toMatch(/styleUrls: \['.\/foo.component.sass/);
     expect(tree.files).toContain('/projects/bar/src/app/foo/foo.component.sass');
     expect(tree.files).not.toContain('/projects/bar/src/app/foo/foo.component.css');
+  });
+
+  it('should respect the type option', async () => {
+    const options = { ...defaultOptions, type: 'Route' };
+    const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.route.ts');
+    const testContent = tree.readContent('/projects/bar/src/app/foo/foo.route.spec.ts');
+    expect(content).toContain('export class FooRoute implements OnInit');
+    expect(testContent).toContain('describe(\'FooRoute\'');
+    expect(tree.files).toContain('/projects/bar/src/app/foo/foo.route.css');
+    expect(tree.files).toContain('/projects/bar/src/app/foo/foo.route.html');
   });
 
   it('should use the module flag even if the module is a routing module', async () => {
