@@ -11,7 +11,6 @@ import {
   TransformJavascriptOutput,
   transformJavascript,
 } from '../helpers/transform-javascript';
-import { getImportTslibTransformer, testImportTslib } from '../transforms/import-tslib';
 import { getPrefixClassesTransformer, testPrefixClasses } from '../transforms/prefix-classes';
 import { getPrefixFunctionsTransformer } from '../transforms/prefix-functions';
 import {
@@ -109,8 +108,6 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     selectedGetScrubFileTransformer = getScrubFileTransformerForCore;
   }
 
-  const isWebpackBundle = content.indexOf('__webpack_require__') !== -1;
-
   // Determine which transforms to apply.
   const getTransforms = [];
 
@@ -133,20 +130,8 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
     typeCheck = true;
   }
 
-  // tests are not needed for fast path
-  // usage will be expanded once transformers are verified safe
-  const ignoreTest = !options.emitSourceMap && !typeCheck;
-
   if (testPrefixClasses(content)) {
     getTransforms.unshift(getPrefixClassesTransformer);
-  }
-
-  // This transform introduces import/require() calls, but this won't work properly on libraries
-  // built with Webpack. These libraries use __webpack_require__() calls instead, which will break
-  // with a new import that wasn't part of it's original module list.
-  // We ignore this transform for such libraries.
-  if (!isWebpackBundle && (ignoreTest || testImportTslib(content))) {
-    getTransforms.unshift(getImportTslibTransformer);
   }
 
   getTransforms.push(getWrapEnumsTransformer);
