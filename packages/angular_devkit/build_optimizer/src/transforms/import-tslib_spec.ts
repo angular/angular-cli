@@ -8,7 +8,7 @@
 // tslint:disable-next-line:no-implicit-dependencies
 import { tags } from '@angular-devkit/core';
 import { transformJavascript } from '../helpers/transform-javascript';
-import { getImportTslibTransformer, testImportTslib } from './import-tslib';
+import { getImportTslibTransformer } from './import-tslib';
 
 
 const transform = (content: string) => transformJavascript(
@@ -27,7 +27,6 @@ describe('import-tslib', () => {
       import { __extends } from "tslib";
     `;
 
-    expect(testImportTslib(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -46,7 +45,6 @@ describe('import-tslib', () => {
       export default function appGlobal() { }
     `;
 
-    expect(testImportTslib(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -64,7 +62,6 @@ describe('import-tslib', () => {
       import { __decorate } from "tslib";
     `;
 
-    expect(testImportTslib(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -89,7 +86,6 @@ describe('import-tslib', () => {
       import { __decorate as __decorate$2 } from "tslib";
     `;
 
-    expect(testImportTslib(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -118,7 +114,6 @@ describe('import-tslib', () => {
       exports.meaning = 42;
     `;
 
-    expect(testImportTslib(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -132,7 +127,6 @@ describe('import-tslib', () => {
       import { __metadata } from "tslib";
     `;
 
-    expect(testImportTslib(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 
@@ -147,7 +141,6 @@ describe('import-tslib', () => {
       import { __param } from "tslib";
     `;
 
-    expect(testImportTslib(input)).toBeTruthy();
     expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
   });
 

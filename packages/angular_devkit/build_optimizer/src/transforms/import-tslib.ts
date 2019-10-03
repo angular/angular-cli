@@ -9,15 +9,6 @@ import * as ts from 'typescript';
 import { getCleanHelperName } from '../helpers/ast-utils';
 
 /**
- * @deprecated From 0.9.0
- */
-export function testImportTslib(content: string) {
-  const regex = /var (__extends|__decorate|__metadata|__param)(\$\d+)? = \(.*\r?\n\s+(.*\r?\n)*\s*\};/;
-
-  return regex.test(content);
-}
-
-/**
  * @deprecated From 0.900.0
  */
 export function getImportTslibTransformer(): ts.TransformerFactory<ts.SourceFile> {
