@@ -17,6 +17,9 @@ export function testImportTslib(content: string) {
   return regex.test(content);
 }
 
+/**
+ * @deprecated From 0.900.0
+ */
 export function getImportTslibTransformer(): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
 

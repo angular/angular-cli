@@ -22,11 +22,6 @@ describe('build-optimizer', () => {
     it('applies scrub-file and prefix-functions to side-effect free modules', () => {
       const input = tags.stripIndent`
         ${imports}
-        var __extends = (this && this.__extends) || function (d, b) {
-            for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-            function __() { this.constructor = d; }
-            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-        };
         var ChangeDetectionStrategy;
         (function (ChangeDetectionStrategy) {
           ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
@@ -55,7 +50,6 @@ describe('build-optimizer', () => {
         var RenderType_MdOption = ɵcrt({ encapsulation: 2, styles: styles_MdOption});
       `;
       const output = tags.oneLine`
-        import { __extends } from "tslib";
         ${imports}
         var ChangeDetectionStrategy = /*@__PURE__*/ (function (ChangeDetectionStrategy) {
           ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
