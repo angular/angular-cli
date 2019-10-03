@@ -78,7 +78,7 @@ export abstract class SchematicCommand<
   private _workspace: workspaces.WorkspaceDefinition;
   protected _workflow: NodeWorkflow;
 
-  private readonly defaultCollectionName = '@schematics/angular';
+  protected defaultCollectionName = '@schematics/angular';
   protected collectionName = this.defaultCollectionName;
   protected schematicName?: string;
 
