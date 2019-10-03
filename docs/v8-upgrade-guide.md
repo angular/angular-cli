@@ -22,7 +22,7 @@ const routes: Routes = [
 
 ## Problem upgrading to version 8
 
-`ng update` automatically comnverts all lazy loaded route configs to the dynamic import syntax. However if the project was
+`ng update` automatically converts all lazy loaded route configs to the dynamic import syntax. However if the project was
 already in Angular Universal mode you would get the following error on the server when you navigate to a lazy loaded route.
 
 ```
