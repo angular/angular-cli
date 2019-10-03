@@ -41,6 +41,14 @@ describe('Add Schematic Rule', () => {
     expect(productionConfig.optimization).toBeDefined();
   });
 
+  it('should add scripts to package.json', async () => {
+    const tree = await schematicRunner
+      .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
+    const {scripts} = JSON.parse(tree.read('package.json')!.toString());
+    expect(scripts['build:ssr']).toBe('ng build --prod && ng run test-app:server:production');
+    expect(scripts['serve:ssr']).toBe('node dist/test-app/server/main.js');
+  });
+
   it(`should update 'tsconfig.server.json' files with main file`, async () => {
     const tree = await schematicRunner
       .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();

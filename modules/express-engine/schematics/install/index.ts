@@ -26,7 +26,7 @@ import {
 import {
   getProject,
   stripTsExtension,
-  getDistPaths,
+  getOutputPath,
 } from '@nguniversal/common/schematics/utils';
 import {addUniversalCommonRule} from '@nguniversal/common/schematics/add';
 
@@ -57,14 +57,14 @@ function addDependencies(options: UniversalOptions): Rule {
 export default function (options: UniversalOptions): Rule {
   return async (host: Tree) => {
     const clientProject = await getProject(host, options.clientProject);
-    const {browser} = await getDistPaths(host, options.clientProject);
+    const browserDistDirectory = await getOutputPath(host, options.clientProject, 'build');
 
     const rootSource = apply(url('./files'), [
       template({
         ...strings,
         ...options,
         stripTsExtension,
-        browserDistDirectory: browser
+        browserDistDirectory,
       }),
       move(clientProject.root)
     ]);

@@ -12,14 +12,13 @@ import {
   SchematicsException,
   noop,
 } from '@angular-devkit/schematics';
-import {normalize, join, parseJsonAst, JsonParseMode} from '@angular-devkit/core';
-import {updateWorkspace} from '@schematics/angular/utility/workspace';
+import {parseJsonAst, JsonParseMode} from '@angular-devkit/core';
 import {
   findPropertyInAstObject,
   appendValueInAstArray,
 } from '@schematics/angular/utility/json-utils';
 import {Schema as UniversalOptions} from '@schematics/angular/universal/schema';
-import {stripTsExtension, getDistPaths, getProject} from '../utils';
+import {stripTsExtension, getOutputPath, getProject} from '../utils';
 
 export interface AddUniversalOptions extends UniversalOptions {
   serverFileName?: string;
@@ -35,7 +34,6 @@ export function addUniversalCommonRule(options: AddUniversalOptions): Rule {
         : externalSchematic('@schematics/angular', 'universal', options),
       addScriptsRule(options),
       updateServerTsConfigRule(options),
-      updateConfigFileRule(options),
     ]);
   };
 }
@@ -48,7 +46,7 @@ function addScriptsRule(options: AddUniversalOptions): Rule {
       throw new SchematicsException('Could not find package.json');
     }
 
-    const {server: serverDist} = await getDistPaths(host, options.clientProject);
+    const serverDist = await getOutputPath(host, options.clientProject, 'server');
     const pkg = JSON.parse(buffer.toString());
     pkg.scripts = {
       ...pkg.scripts,
@@ -57,42 +55,6 @@ function addScriptsRule(options: AddUniversalOptions): Rule {
     };
 
     host.overwrite(pkgPath, JSON.stringify(pkg, null, 2));
-  };
-}
-
-function updateConfigFileRule(options: AddUniversalOptions): Rule {
-  return host => {
-    return updateWorkspace((async workspace => {
-      const clientProject = workspace.projects.get(options.clientProject);
-      if (clientProject) {
-        const buildTarget = clientProject.targets.get('build');
-        const serverTarget = clientProject.targets.get('server');
-
-        // We have to check if the project config has a server target, because
-        // if the Universal step in this schematic isn't run, it can't be guaranteed
-        // to exist
-        if (!serverTarget || !buildTarget) {
-          return;
-        }
-
-        const distPaths = await getDistPaths(host, options.clientProject);
-
-        serverTarget.options = {
-          ...serverTarget.options,
-          outputPath: distPaths.server,
-        };
-
-        serverTarget.options.main = join(
-          normalize(clientProject.root),
-          stripTsExtension(options.serverFileName) + '.ts',
-        );
-
-        buildTarget.options = {
-          ...buildTarget.options,
-          outputPath: distPaths.browser,
-        };
-      }
-    })) as unknown as Rule;
   };
 }
 
@@ -138,5 +100,19 @@ function updateServerTsConfigRule(options: AddUniversalOptions): Rule {
 
       host.commitUpdate(recorder);
     }
+  };
+}
+
+export default function (options: UniversalOptions): Rule {
+  return async host => {
+    const clientProject = await getProject(host, options.clientProject);
+
+    return chain([
+      clientProject.targets.has('server')
+        ? noop()
+        : externalSchematic('@schematics/angular', 'universal', options),
+      addScriptsRule(options),
+      updateServerTsConfigRule(options),
+    ]);
   };
 }

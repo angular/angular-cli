@@ -7,7 +7,7 @@
  */
 
 import {Tree} from '@angular-devkit/schematics/src/tree/interface';
-import {workspaces, join, normalize} from '@angular-devkit/core';
+import {workspaces} from '@angular-devkit/core';
 import {getWorkspace} from '@schematics/angular/utility/workspace';
 import {SchematicsException} from '@angular-devkit/schematics';
 
@@ -29,24 +29,24 @@ export function stripTsExtension(file: string): string {
   return file.replace(/\.ts$/, '');
 }
 
-export async function getDistPaths(host: Tree, clientProjectName: string): Promise<{
-  browser: string;
-  server: string;
-}> {
+export async function getOutputPath(
+  host: Tree,
+  projectName: string,
+  target: 'server' | 'build',
+): Promise<string> {
   // Generate new output paths
-  const clientProject = await getProject(host, clientProjectName);
-  const clientBuildTarget = clientProject.targets.get('build');
-  if (!clientBuildTarget || !clientBuildTarget.options) {
-    throw new SchematicsException(`Cannot find 'options' for ${clientProjectName} build target.`);
+  const project = await getProject(host, projectName);
+  const serverTarget = project.targets.get(target);
+  if (!serverTarget || !serverTarget.options) {
+    throw new SchematicsException
+      (`Cannot find 'options' for ${projectName} ${target} target.`);
   }
 
-  const clientBuildOptions = clientBuildTarget.options;
-  const clientOutputPath = normalize(
-    typeof clientBuildOptions.outputPath === 'string' ? clientBuildOptions.outputPath : 'dist'
-  );
+  const { outputPath } = serverTarget.options;
+  if (typeof outputPath !== 'string') {
+    throw new SchematicsException
+      (`outputPath for ${projectName} ${target} target is not a string.`);
+  }
 
-  return {
-    browser: join(clientOutputPath, 'browser'),
-    server: join(clientOutputPath, 'server'),
-  };
+  return outputPath;
 }
