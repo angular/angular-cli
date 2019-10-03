@@ -17,11 +17,7 @@ export class NewCommand extends SchematicCommand<NewCommandSchema> {
   schematicName = 'ng-new';
 
   async initialize(options: NewCommandSchema & Arguments) {
-    if (options.collection) {
-      this.collectionName = options.collection;
-    } else {
-      this.collectionName = await this.parseCollectionName(options);
-    }
+    this.collectionName = options.collection || await this.getDefaultSchematicCollection();
 
     return super.initialize(options);
   }
@@ -43,7 +39,4 @@ export class NewCommand extends SchematicCommand<NewCommandSchema> {
     });
   }
 
-  private async parseCollectionName(options: any): Promise<string> {
-    return options.collection || this.getDefaultSchematicCollection();
-  }
 }
