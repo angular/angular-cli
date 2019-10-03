@@ -24,7 +24,7 @@ import {
   NodeDependencyType,
 } from '@schematics/angular/utility/dependencies';
 import {
-  getClientProject,
+  getProject,
   stripTsExtension,
   getDistPaths,
 } from '@nguniversal/common/schematics/utils';
@@ -56,7 +56,7 @@ function addDependencies(options: UniversalOptions): Rule {
 
 export default function (options: UniversalOptions): Rule {
   return async (host: Tree) => {
-    const clientProject = await getClientProject(host, options.clientProject);
+    const clientProject = await getProject(host, options.clientProject);
     const {browser} = await getDistPaths(host, options.clientProject);
 
     const rootSource = apply(url('./files'), [

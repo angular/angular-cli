@@ -19,7 +19,7 @@ import {
   appendValueInAstArray,
 } from '@schematics/angular/utility/json-utils';
 import {Schema as UniversalOptions} from '@schematics/angular/universal/schema';
-import {stripTsExtension, getDistPaths, getClientProject} from '../utils';
+import {stripTsExtension, getDistPaths, getProject} from '../utils';
 
 export interface AddUniversalOptions extends UniversalOptions {
   serverFileName?: string;
@@ -27,7 +27,7 @@ export interface AddUniversalOptions extends UniversalOptions {
 
 export function addUniversalCommonRule(options: AddUniversalOptions): Rule {
   return async host => {
-    const clientProject = await getClientProject(host, options.clientProject);
+    const clientProject = await getProject(host, options.clientProject);
 
     return chain([
       clientProject.targets.has('server')
@@ -98,7 +98,7 @@ function updateConfigFileRule(options: AddUniversalOptions): Rule {
 
 function updateServerTsConfigRule(options: AddUniversalOptions): Rule {
   return async host => {
-    const clientProject = await getClientProject(host, options.clientProject);
+    const clientProject = await getProject(host, options.clientProject);
     const serverTarget = clientProject.targets.get('server');
     if (!serverTarget || !serverTarget.options) {
       return;
@@ -123,7 +123,11 @@ function updateServerTsConfigRule(options: AddUniversalOptions): Rule {
 
     const filesAstNode = findPropertyInAstObject(tsConfigAst, 'files');
 
-    if (filesAstNode && filesAstNode.kind === 'array') {
+    const serverFilePath = stripTsExtension(options.serverFileName) + '.ts';
+    if (
+      filesAstNode &&
+      filesAstNode.kind === 'array' &&
+      !filesAstNode.elements.some(({ text }) => text === serverFilePath)) {
       const recorder = host.beginUpdate(tsConfigPath);
 
       appendValueInAstArray(

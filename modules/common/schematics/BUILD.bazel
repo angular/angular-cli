@@ -25,9 +25,7 @@ ts_library(
         "@npm//@angular-devkit/core",
         "@npm//@angular-devkit/schematics",
         "@npm//@schematics/angular",
-        "@npm//@types/jasmine",
         "@npm//rxjs",
-        "@npm//typescript",
     ],
 )
 

@@ -11,18 +11,18 @@ import {workspaces, join, normalize} from '@angular-devkit/core';
 import {getWorkspace} from '@schematics/angular/utility/workspace';
 import {SchematicsException} from '@angular-devkit/schematics';
 
-export async function getClientProject(
+export async function getProject(
   host: Tree,
   projectName: string,
 ): Promise<workspaces.ProjectDefinition> {
   const workspace = await getWorkspace(host);
-  const clientProject = workspace.projects.get(projectName);
+  const project = workspace.projects.get(projectName);
 
-  if (!clientProject || clientProject.extensions.projectType !== 'application') {
+  if (!project || project.extensions.projectType !== 'application') {
     throw new SchematicsException(`Universal requires a project type of 'application'.`);
   }
 
-  return clientProject as unknown as workspaces.ProjectDefinition;
+  return project;
 }
 
 export function stripTsExtension(file: string): string {
@@ -34,7 +34,7 @@ export async function getDistPaths(host: Tree, clientProjectName: string): Promi
   server: string;
 }> {
   // Generate new output paths
-  const clientProject = await getClientProject(host, clientProjectName);
+  const clientProject = await getProject(host, clientProjectName);
   const clientBuildTarget = clientProject.targets.get('build');
   if (!clientBuildTarget || !clientBuildTarget.options) {
     throw new SchematicsException(`Cannot find 'options' for ${clientProjectName} build target.`);

@@ -14,7 +14,7 @@ import {addUniversalCommonRule, AddUniversalOptions} from './index';
 
 describe('Add Schematic Rule', () => {
   const defaultOptions: AddUniversalOptions = {
-    clientProject: 'bar',
+    clientProject: 'test-app',
     serverFileName: 'server.ts',
   };
 
@@ -22,7 +22,7 @@ describe('Add Schematic Rule', () => {
   let appTree: Tree;
 
   beforeEach(async () => {
-    appTree = await createTestApp().toPromise();
+    appTree = await createTestApp();
     schematicRunner = new SchematicTestRunner('schematics', collectionPath);
   });
 
@@ -30,10 +30,10 @@ describe('Add Schematic Rule', () => {
     const tree = await schematicRunner
       .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
     const contents = JSON.parse(tree.read('angular.json')!.toString());
-    const architect = contents.projects.bar.architect;
+    const architect = contents.projects['test-app'].architect;
     expect(architect.build.configurations.production).toBeDefined();
-    expect(architect.build.options.outputPath).toBe('dist/bar/browser');
-    expect(architect.server.options.outputPath).toBe('dist/bar/server');
+    expect(architect.build.options.outputPath).toBe('dist/test-app/browser');
+    expect(architect.server.options.outputPath).toBe('dist/test-app/server');
 
     const productionConfig = architect.server.configurations.production;
     expect(productionConfig.fileReplacements).toBeDefined();
@@ -45,7 +45,7 @@ describe('Add Schematic Rule', () => {
     const tree = await schematicRunner
       .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
 
-    const contents = JSON.parse(tree.read('/projects/bar/tsconfig.server.json')!.toString());
+    const contents = JSON.parse(tree.read('/projects/test-app/tsconfig.server.json')!.toString());
     expect(contents.files).toEqual([
       'src/main.server.ts',
       'server.ts',
@@ -60,7 +60,7 @@ describe('Add Schematic Rule', () => {
     const tree = await schematicRunner
       .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
 
-    const contents = JSON.parse(tree.read('/projects/bar/tsconfig.server.json')!.toString());
+    const contents = JSON.parse(tree.read('/projects/test-app/tsconfig.server.json')!.toString());
     expect(contents.files).toEqual([
       'src/main.server.ts',
       'server.ts',

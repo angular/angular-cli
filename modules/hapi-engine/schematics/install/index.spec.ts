@@ -14,14 +14,14 @@ import {Schema as UniversalOptions} from './schema';
 
 describe('Universal Schematic', () => {
   const defaultOptions: UniversalOptions = {
-    clientProject: 'bar',
+    clientProject: 'test-app',
   };
 
   let schematicRunner: SchematicTestRunner;
   let appTree: Tree;
 
   beforeEach(async () => {
-    appTree = await createTestApp().toPromise();
+    appTree = await createTestApp();
     schematicRunner = new SchematicTestRunner('schematics', collectionPath);
   });
 
@@ -57,7 +57,7 @@ describe('Universal Schematic', () => {
       .runSchematicAsync('ng-add', defaultOptions, appTree)
       .toPromise();
 
-    const contents = JSON.parse(tree.readContent('/projects/bar/tsconfig.server.json'));
+    const contents = JSON.parse(tree.readContent('/projects/test-app/tsconfig.server.json'));
     expect(contents.files).toEqual([
       'src/main.server.ts',
       'server.ts',
@@ -69,7 +69,7 @@ describe('Universal Schematic', () => {
       .runSchematicAsync('ng-add', defaultOptions, appTree)
       .toPromise();
 
-    const content = tree.readContent('/projects/bar/server.ts');
+    const content = tree.readContent('/projects/test-app/server.ts');
     expect(content).toContain(`export * from './src/main.server'`);
   });
 });

@@ -6,6 +6,6 @@
       "factory": "./install",
       "schema": "./install/schema.json",
       "aliases": ["express-engine-shell"]
-    },
+    }
   }
 }
