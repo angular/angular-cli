@@ -30,12 +30,7 @@ The Universal project is driven by community contributions. Please send us your 
 
 # Getting Started
 
-[* **NodeJS** :: Example repo](https://github.com/angular/universal-starter)
-  - Minimal universal example
-
-[* ASP.NET Core :: Universal Starter repo](https://github.com/MarkPieszak/aspnetcore-angular2-universal)
-  - **Installation**: Clone the above repo, `npm i && dotnet restore` *(VStudio will run these automatically when opening the project)*
-  - Launch files included for both VSCode & VStudio to run/debug automatically (press F5).
+[Angular Universdal Guide](https://angular.io/guide/universal)
 
 # Version 8
 Follow this upgrade guide if you are upgrading an exsiting Universal project to Angular version 8 - [Guide](/docs/v8-upgrade-guide.md)
