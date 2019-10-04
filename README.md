@@ -30,7 +30,7 @@ The Universal project is driven by community contributions. Please send us your 
 
 # Getting Started
 
-[Angular Universdal Guide](https://angular.io/guide/universal)
+[Angular Universal Guide](https://angular.io/guide/universal)
 
 # Version 8
 Follow this upgrade guide if you are upgrading an exsiting Universal project to Angular version 8 - [Guide](/docs/v8-upgrade-guide.md)
