@@ -11,7 +11,6 @@
 * [Packages](#packages)
 * [Universal "Gotchas"](#universal-gotchas)
 * [Roadmap](#roadmap)
-* [Upgrading from Angular2-Universal](#upgrading-from-angular2-universal)
 * [Preboot](#preboot)
 * [What's in a name?](#whats-in-a-name)
 * [Universal Team](#universal-team)
