@@ -82,7 +82,7 @@ function loadPackageJson(p: string) {
       // Overwrite engines to a common default.
       case 'engines':
         pkg['engines'] = {
-          'node': '>= 10.9.0',
+          'node': '>= 10.13.0',
           'npm': '>= 6.11.0',
           'pnpm': '>= 3.2.0',
           'yarn': '>= 1.13.0',
