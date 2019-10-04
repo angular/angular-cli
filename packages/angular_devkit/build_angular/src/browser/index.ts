@@ -66,9 +66,7 @@ import {
   normalizeOptimization,
   normalizeSourceMaps,
 } from '../utils';
-import { manglingDisabled } from '../utils/mangle-options';
 import {
-  CacheKey,
   ProcessBundleFile,
   ProcessBundleOptions,
   ProcessBundleResult,
@@ -79,7 +77,7 @@ import {
   getIndexInputFile,
   getIndexOutputFile,
 } from '../utils/webpack-browser-config';
-import { ActionExecutor } from './action-executor';
+import { BundleActionExecutor } from './action-executor';
 import { Schema as BrowserBuilderSchema } from './schema';
 
 const cacache = require('cacache');
@@ -349,7 +347,8 @@ export function buildWebpackBrowser(
                 }
                 // If not optimizing then ES2015 polyfills do not need processing
                 // Unlike other module scripts, it is never downleveled
-                if (!actionOptions.optimize && file.file.startsWith('polyfills-es2015')) {
+                const es2015Polyfills = file.file.startsWith('polyfills-es2015');
+                if (!actionOptions.optimize && es2015Polyfills) {
                   continue;
                 }
 
@@ -372,22 +371,6 @@ export function buildWebpackBrowser(
                   filename = filename.replace('-es2015', '');
                 }
 
-                // ES2015 polyfills are only optimized; optimization check was performed above
-                if (file.file.startsWith('polyfills-es2015')) {
-                  actions.push({
-                    ...actionOptions,
-                    filename,
-                    code,
-                    map,
-                    // id is always present for non-assets
-                    // tslint:disable-next-line: no-non-null-assertion
-                    name: file.id!,
-                    optimizeOnly: true,
-                  });
-
-                  continue;
-                }
-
                 // Record the bundle processing action
                 // The runtime chunk gets special processing for lazy loaded files
                 actions.push({
@@ -400,7 +383,13 @@ export function buildWebpackBrowser(
                   name: file.id!,
                   runtime: file.file.startsWith('runtime'),
                   ignoreOriginal: es5Polyfills,
+                  optimizeOnly: es2015Polyfills,
                 });
+
+                // ES2015 polyfills are only optimized; optimization check was performed above
+                if (es2015Polyfills) {
+                  continue;
+                }
 
                 // Add the newly created ES5 bundles to the index as nomodule scripts
                 const newFilename = es5Polyfills
@@ -414,205 +403,28 @@ export function buildWebpackBrowser(
 
               const processActions: typeof actions = [];
               let processRuntimeAction: ProcessBundleOptions | undefined;
-              const cacheActions: { src: string; dest: string }[] = [];
               const processResults: ProcessBundleResult[] = [];
               for (const action of actions) {
-                // Create base cache key with elements:
-                // * package version - different build-angular versions cause different final outputs
-                // * code length/hash - ensure cached version matches the same input code
-                const algorithm = action.integrityAlgorithm || 'sha1';
-                const codeHash = createHash(algorithm)
-                  .update(action.code)
-                  .digest('base64');
-                let baseCacheKey = `${packageVersion}|${action.code.length}|${algorithm}-${codeHash}`;
-                if (manglingDisabled) {
-                  baseCacheKey += '|MD';
-                }
-
-                // Postfix added to sourcemap cache keys when vendor sourcemaps are present
-                // Allows non-destructive caching of both variants
-                const SourceMapVendorPostfix =
-                  !!action.sourceMaps && action.vendorSourceMaps ? '|vendor' : '';
-
-                // Determine cache entries required based on build settings
-                const cacheKeys = [];
-
-                // If optimizing and the original is not ignored, add original as required
-                if ((action.optimize || action.optimizeOnly) && !action.ignoreOriginal) {
-                  cacheKeys[CacheKey.OriginalCode] = baseCacheKey + '|orig';
-
-                  // If sourcemaps are enabled, add original sourcemap as required
-                  if (action.sourceMaps) {
-                    cacheKeys[CacheKey.OriginalMap] =
-                      baseCacheKey + SourceMapVendorPostfix + '|orig-map';
-                  }
-                }
-                // If not only optimizing, add downlevel as required
-                if (!action.optimizeOnly) {
-                  cacheKeys[CacheKey.DownlevelCode] = baseCacheKey + '|dl';
-
-                  // If sourcemaps are enabled, add downlevel sourcemap as required
-                  if (action.sourceMaps) {
-                    cacheKeys[CacheKey.DownlevelMap] =
-                      baseCacheKey + SourceMapVendorPostfix + '|dl-map';
-                  }
-                }
-
-                // Attempt to get required cache entries
-                const cacheEntries = [];
-                let cached = cacheKeys.length > 0;
-                for (const key of cacheKeys) {
-                  if (key) {
-                    const entry = await cacache.get.info(cacheDownlevelPath, key);
-                    if (!entry) {
-                      cached = false;
-                      break;
-                    }
-                    cacheEntries.push(entry);
-                  } else {
-                    cacheEntries.push(null);
-                  }
-                }
-
-                // If all required cached entries are present, use the cached entries
-                // Otherwise process the files
                 // If SRI is enabled always process the runtime bundle
                 // Lazy route integrity values are stored in the runtime bundle
                 if (action.integrityAlgorithm && action.runtime) {
                   processRuntimeAction = action;
-                } else if (cached) {
-                  const result: ProcessBundleResult = { name: action.name };
-                  if (action.integrityAlgorithm) {
-                    result.integrity = `${action.integrityAlgorithm}-${codeHash}`;
-                  }
-
-                  let cacheEntry = cacheEntries[CacheKey.OriginalCode];
-                  if (cacheEntry) {
-                    cacheActions.push({
-                      src: cacheEntry.path,
-                      dest: action.filename,
-                    });
-                    result.original = {
-                      filename: action.filename,
-                      size: cacheEntry.size,
-                      integrity: cacheEntry.metadata && cacheEntry.metadata.integrity,
-                    };
-
-                    cacheEntry = cacheEntries[CacheKey.OriginalMap];
-                    if (cacheEntry) {
-                      cacheActions.push({
-                        src: cacheEntry.path,
-                        dest: action.filename + '.map',
-                      });
-                      result.original.map = {
-                        filename: action.filename + '.map',
-                        size: cacheEntry.size,
-                      };
-                    }
-                  } else if (!action.ignoreOriginal) {
-                    // If the original wasn't processed (and therefore not cached), add info
-                    result.original = {
-                      filename: action.filename,
-                      size: Buffer.byteLength(action.code, 'utf8'),
-                      map:
-                        action.map === undefined
-                          ? undefined
-                          : {
-                              filename: action.filename + '.map',
-                              size: Buffer.byteLength(action.map, 'utf8'),
-                            },
-                    };
-                  }
-
-                  cacheEntry = cacheEntries[CacheKey.DownlevelCode];
-                  if (cacheEntry) {
-                    cacheActions.push({
-                      src: cacheEntry.path,
-                      dest: action.filename.replace('es2015', 'es5'),
-                    });
-                    result.downlevel = {
-                      filename: action.filename.replace('es2015', 'es5'),
-                      size: cacheEntry.size,
-                      integrity: cacheEntry.metadata && cacheEntry.metadata.integrity,
-                    };
-
-                    cacheEntry = cacheEntries[CacheKey.DownlevelMap];
-                    if (cacheEntry) {
-                      cacheActions.push({
-                        src: cacheEntry.path,
-                        dest: action.filename.replace('es2015', 'es5') + '.map',
-                      });
-                      result.downlevel.map = {
-                        filename: action.filename.replace('es2015', 'es5') + '.map',
-                        size: cacheEntry.size,
-                      };
-                    }
-                  }
-
-                  processResults.push(result);
-                } else if (action.runtime) {
-                  processRuntimeAction = {
-                    ...action,
-                    cacheKeys,
-                  };
                 } else {
-                  processActions.push({
-                    ...action,
-                    cacheKeys,
-                  });
+                  processActions.push(action);
                 }
               }
 
-              // Workaround Node.js issue prior to 10.16 with copyFile on macOS
-              // https://github.com/angular/angular-cli/issues/15544 & https://github.com/nodejs/node/pull/27241
-              let copyFileWorkaround = false;
-              if (process.platform === 'darwin') {
-                const version = process.versions.node.split('.').map(part => Number(part));
-                if (
-                  version[0] < 10 ||
-                  version[0] === 11 ||
-                  (version[0] === 10 && version[1] < 16)
-                ) {
-                  copyFileWorkaround = true;
-                }
-              }
+              const executor = new BundleActionExecutor(
+                { cachePath: cacheDownlevelPath },
+                options.subresourceIntegrity ? 'sha384' : undefined,
+              );
 
-              for (const action of cacheActions) {
-                if (copyFileWorkaround) {
-                  try {
-                    fs.unlinkSync(action.dest);
-                  } catch {}
+              try {
+                for await (const result of executor.processAll(processActions)) {
+                  processResults.push(result);
                 }
-
-                fs.copyFileSync(action.src, action.dest, fs.constants.COPYFILE_FICLONE);
-                if (process.platform !== 'win32') {
-                  // The cache writes entries as readonly and when using copyFile the permissions will also be copied.
-                  // See: https://github.com/npm/cacache/blob/073fbe1a9f789ba42d9a41de7b8429c93cf61579/lib/util/move-file.js#L36
-                  fs.chmodSync(action.dest, 0o644);
-                }
-              }
-
-              if (processActions.length > 0) {
-                const workerFile = require.resolve('../utils/process-bundle');
-                const executor = new ActionExecutor<
-                  ProcessBundleOptions & { size: number },
-                  ProcessBundleResult
-                >(
-                  path.extname(workerFile) !== '.ts'
-                    ? workerFile
-                    : require.resolve('../utils/process-bundle-bootstrap'),
-                  'process',
-                  { cachePath: cacheDownlevelPath },
-                );
-
-                try {
-                  const results = await executor.executeAll(
-                    processActions.map(a => ({ ...a, size: a.code.length })),
-                  );
-                  results.forEach(result => processResults.push(result));
-                } finally {
-                  executor.stop();
-                }
+              } finally {
+                executor.stop();
               }
 
               // Runtime must be processed after all other files
