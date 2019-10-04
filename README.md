@@ -7,8 +7,6 @@
 # Table of Contents
 * [Introduction](#introduction)
 * [Getting Started with Universal](#getting-started)
-    * w/ NodeJS Server
-    * w/ ASP.NET Core Server
 * [Upgrading to Version 8](#version-8)
 * [Packages](#packages)
 * [Universal "Gotchas"](#universal-gotchas)
@@ -72,11 +70,6 @@ Moved to [/docs/gotchas.md](/docs/gotchas.md)
 - Static site rendering
 - Development server/watch mode builder with livereload for CLI
 - Full client rehydration strategy that reuses DOM elements/CSS rendered on the server
-
-# Upgrading from Angular2-Universal
-If you're coming from the original `angular2-universal` (2.x) here are some helpful steps for porting your application to Angular 4 & platform-server.
-
-[Go here to find the guide](/docs/angular2-universal-migration.md)
 
 # Preboot
 Control server-rendered page and transfer state before client-side web app loads to the client-side-app. [Repo](https://github.com/angular/preboot)
