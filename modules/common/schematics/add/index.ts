@@ -12,13 +12,14 @@ import {
   SchematicsException,
   noop,
 } from '@angular-devkit/schematics';
-import {parseJsonAst, JsonParseMode} from '@angular-devkit/core';
+import {parseJsonAst, JsonParseMode, normalize, join} from '@angular-devkit/core';
 import {
   findPropertyInAstObject,
   appendValueInAstArray,
 } from '@schematics/angular/utility/json-utils';
 import {Schema as UniversalOptions} from '@schematics/angular/universal/schema';
 import {stripTsExtension, getOutputPath, getProject} from '../utils';
+import {updateWorkspace} from '@schematics/angular/utility/workspace';
 
 export interface AddUniversalOptions extends UniversalOptions {
   serverFileName?: string;
@@ -34,6 +35,7 @@ export function addUniversalCommonRule(options: AddUniversalOptions): Rule {
         : externalSchematic('@schematics/angular', 'universal', options),
       addScriptsRule(options),
       updateServerTsConfigRule(options),
+      updateWorkspaceConfigRule(options),
     ]);
   };
 }
@@ -55,6 +57,23 @@ function addScriptsRule(options: AddUniversalOptions): Rule {
     };
 
     host.overwrite(pkgPath, JSON.stringify(pkg, null, 2));
+  };
+}
+
+function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
+  return () => {
+    return updateWorkspace(workspace => {
+      const project = workspace.projects.get(options.clientProject);
+      if (!project) {
+        return;
+      }
+
+      const serverTarget = project.targets.get('server');
+      serverTarget.options.main = join(
+        normalize(project.root),
+        stripTsExtension(options.serverFileName) + '.ts',
+      );
+    });
   };
 }
 
@@ -100,19 +119,5 @@ function updateServerTsConfigRule(options: AddUniversalOptions): Rule {
 
       host.commitUpdate(recorder);
     }
-  };
-}
-
-export default function (options: UniversalOptions): Rule {
-  return async host => {
-    const clientProject = await getProject(host, options.clientProject);
-
-    return chain([
-      clientProject.targets.has('server')
-        ? noop()
-        : externalSchematic('@schematics/angular', 'universal', options),
-      addScriptsRule(options),
-      updateServerTsConfigRule(options),
-    ]);
   };
 }

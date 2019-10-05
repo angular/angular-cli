@@ -34,6 +34,7 @@ describe('Add Schematic Rule', () => {
     expect(architect.build.configurations.production).toBeDefined();
     expect(architect.build.options.outputPath).toBe('dist/test-app/browser');
     expect(architect.server.options.outputPath).toBe('dist/test-app/server');
+    expect(architect.server.options.main).toBe('projects/test-app/server.ts');
 
     const productionConfig = architect.server.configurations.production;
     expect(productionConfig.fileReplacements).toBeDefined();
