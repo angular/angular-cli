@@ -17,6 +17,7 @@ type PackageManagerProfile = {
   commands: {
     installAll?: string;
     installPackage: string;
+    installGlobalPackage: Array<string>;
   },
 };
 
@@ -26,18 +27,21 @@ const packageManagers: { [name: string]: PackageManagerProfile } = {
     commands: {
       installAll: 'install',
       installPackage: 'install',
+      installGlobalPackage: ['install', '--global'],
     },
   },
   'cnpm': {
     commands: {
       installAll: 'install',
       installPackage: 'install',
+      installGlobalPackage: ['install', '--global'],
     },
-   },
+  },
   'yarn': {
     quietArgument: '--silent',
     commands: {
       installPackage: 'add',
+      installGlobalPackage: ['global', 'add'],
     },
   },
   'pnpm': {
@@ -45,6 +49,7 @@ const packageManagers: { [name: string]: PackageManagerProfile } = {
     commands: {
       installAll: 'install',
       installPackage: 'install',
+      installGlobalPackage: ['install', '--global'],
     },
   },
 };
@@ -88,7 +93,11 @@ export default function(
 
     if (options.packageName) {
       if (options.command === 'install') {
-        args.push(taskPackageManagerProfile.commands.installPackage);
+        if (options.global) {
+          args.push(...taskPackageManagerProfile.commands.installGlobalPackage);
+        } else {
+          args.push(taskPackageManagerProfile.commands.installPackage);
+        }
       }
       args.push(options.packageName);
     } else if (options.command === 'install' && taskPackageManagerProfile.commands.installAll) {
