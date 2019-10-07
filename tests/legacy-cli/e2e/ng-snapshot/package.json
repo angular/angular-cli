@@ -9,6 +9,7 @@
     "@angular/core": "github:angular/core-builds#e05a7ec0414fe552ac3632d3735927e026157db3",
     "@angular/forms": "github:angular/forms-builds#e3910afb6188c86e9f51c615e24e3e65587142f5",
     "@angular/language-service": "github:angular/language-service-builds#5f99caab4c5bcfbdd8aecafc9c70d8c7ce703004",
+    "@angular/localize": "github:angular/localize-builds#838dec9a95dd7ecb4431627a99c6a91aa41cd78e",
     "@angular/platform-browser": "github:angular/platform-browser-builds#16497ae98fc072c69910e3042e622980645340ad",
     "@angular/platform-browser-dynamic": "github:angular/platform-browser-dynamic-builds#73fe229bcd3b0e644b946296805939757a2b9f83",
     "@angular/router": "github:angular/router-builds#f9822e15092516892cb3817ec3bf6524c0188adc"
