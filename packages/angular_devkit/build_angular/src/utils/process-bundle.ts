@@ -161,7 +161,7 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
     }
 
     result.downlevel = createFileEntry(
-      downlevelFilename,
+      path.join(basePath, downlevelFilename),
       downlevelCode,
       mapContent,
       options.integrityAlgorithm,
