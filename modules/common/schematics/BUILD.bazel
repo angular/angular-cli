@@ -26,6 +26,7 @@ ts_library(
         "@npm//@angular-devkit/schematics",
         "@npm//@schematics/angular",
         "@npm//rxjs",
+        "@npm//typescript",
     ],
 )
 

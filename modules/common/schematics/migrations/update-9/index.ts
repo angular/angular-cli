@@ -11,12 +11,16 @@ import {
   SchematicsException,
   chain,
   externalSchematic,
+  noop,
 } from '@angular-devkit/schematics';
+import * as ts from 'typescript';
 import {getWorkspace} from '@schematics/angular/utility/workspace';
 import {NodePackageInstallTask} from '@angular-devkit/schematics/tasks';
 import {Builders} from '@schematics/angular/utility/workspace-models';
-import {normalize, join} from '@angular-devkit/core';
+import {normalize, join, Path} from '@angular-devkit/core';
 import {Schema as UniversalOptions} from '@schematics/angular/universal/schema';
+import {getDecoratorMetadata, getMetadataField} from '@schematics/angular/utility/ast-utils';
+import {removePackageJsonDependency} from '@schematics/angular/utility/dependencies';
 
 export function version9UpdateRule(collectionPath: string): Rule {
   return async host => {
@@ -97,13 +101,118 @@ function updateProjectsStructureRule(collectionPath: string): Rule {
         skipInstall: true,
       };
 
-      if (!collectionPath) {
-        continue;
-      }
       // Run the install schematic again so that we re-create the entire stucture.
-      installRules.push(externalSchematic(collectionPath, 'ng-add', installOptions));
+      installRules.push(
+        removeModuleMapNgfactoryLoaderRule(normalize(projectDefinition.sourceRoot)),
+        collectionPath
+          ? externalSchematic(collectionPath, 'ng-add', installOptions)
+          : noop(),
+      );
     }
 
     return chain(installRules);
+  };
+}
+
+function removeModuleMapNgfactoryLoaderRule(sourceRoot: Path): Rule {
+  return tree => {
+    const moduleMapLoaderPackageName = '@nguniversal/module-map-ngfactory-loader';
+
+    // Strip BOM as otherwise TSC methods (Ex: getWidth) will return an offset which
+    // which breaks the CLI UpdateRecorder.
+    // See: https://github.com/angular/angular/pull/30719
+    const createSourceFile = (path: string) => ts.createSourceFile(
+      path,
+      tree.read(path).toString().replace(/^\uFEFF/, ''),
+      ts.ScriptTarget.Latest,
+      true,
+    );
+
+    // Update main.server file
+    const mainServerPath = join(sourceRoot, 'main.server.ts');
+    if (tree.exists(mainServerPath)) {
+      const recorder = tree.beginUpdate(mainServerPath);
+
+      // Remove exports of '@nguniversal/module-map-ngfactory-loader'
+      createSourceFile(mainServerPath)
+        .statements
+        .filter(s => (
+          ts.isExportDeclaration(s) &&
+          s.moduleSpecifier &&
+          ts.isStringLiteral(s.moduleSpecifier) &&
+          s.moduleSpecifier.text === moduleMapLoaderPackageName
+        ))
+        .forEach(node => {
+          const index = node.getFullStart();
+          const length = node.getFullWidth();
+          recorder.remove(index, length);
+        });
+      tree.commitUpdate(recorder);
+    }
+
+    // Update app.server.module file
+    const appServerModule = join(sourceRoot, 'app/app.server.module.ts');
+    if (tree.exists(appServerModule)) {
+      const recorder = tree.beginUpdate(appServerModule);
+      const appServerSourceFile = createSourceFile(appServerModule);
+
+      // Remove imports of '@nguniversal/module-map-ngfactory-loader'
+      appServerSourceFile
+        .statements
+        .filter(s => (
+          ts.isImportDeclaration(s) &&
+          s.moduleSpecifier &&
+          ts.isStringLiteral(s.moduleSpecifier) &&
+          s.moduleSpecifier.text === moduleMapLoaderPackageName
+        ))
+        .forEach(node => {
+          const index = node.getFullStart();
+          const length = node.getFullWidth();
+          recorder.remove(index, length);
+        });
+
+
+      // Create a TS printer to get the text
+      const printer = ts.createPrinter();
+
+      // Remove 'ModuleMapLoaderModule' from 'NgModule' imports
+      getDecoratorMetadata(appServerSourceFile, 'NgModule', '@angular/core')
+        .forEach((metadata: ts.ObjectLiteralExpression) => {
+          const matchingProperties = getMetadataField(metadata, 'imports');
+
+          if (!matchingProperties) {
+            return;
+          }
+
+          const assignment = matchingProperties[0] as ts.PropertyAssignment;
+          if (!ts.isArrayLiteralExpression(assignment.initializer)) {
+            return;
+          }
+
+          const arrayLiteral = assignment.initializer;
+          const newImports = arrayLiteral.elements
+            .filter(n => !(ts.isIdentifier(n) && n.text === 'ModuleMapLoaderModule'));
+
+          if (arrayLiteral.elements.length !== newImports.length) {
+            const newImportsText = printer.printNode(
+              ts.EmitHint.Unspecified,
+              ts.updateArrayLiteral(arrayLiteral, newImports),
+              appServerSourceFile,
+            );
+
+            const index = arrayLiteral.getStart();
+            const length = arrayLiteral.getWidth();
+
+            recorder
+              .remove(index, length)
+              .insertLeft(index, newImportsText);
+          }
+        });
+
+      tree.commitUpdate(recorder);
+    }
+
+    // Remove package dependency
+    removePackageJsonDependency(tree, moduleMapLoaderPackageName);
   };
 }
