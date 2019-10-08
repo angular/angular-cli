@@ -8,22 +8,13 @@
 import { createHash } from 'crypto';
 import * as findCacheDirectory from 'find-cache-dir';
 import * as fs from 'fs';
+import { copyFile } from '../utils/copy-file';
 import { manglingDisabled } from '../utils/mangle-options';
 import { CacheKey, ProcessBundleOptions, ProcessBundleResult } from '../utils/process-bundle';
 
 const cacache = require('cacache');
 const cacheDownlevelPath = findCacheDirectory({ name: 'angular-build-dl' });
 const packageVersion = require('../../package.json').version;
-
-// Workaround Node.js issue prior to 10.16 with copyFile on macOS
-// https://github.com/angular/angular-cli/issues/15544 & https://github.com/nodejs/node/pull/27241
-let copyFileWorkaround = false;
-if (process.platform === 'darwin') {
-  const version = process.versions.node.split('.').map(part => Number(part));
-  if (version[0] < 10 || version[0] === 11 || (version[0] === 10 && version[1] < 16)) {
-    copyFileWorkaround = true;
-  }
-}
 
 export interface CacheEntry {
   path: string;
@@ -35,17 +26,8 @@ export class BundleActionCache {
   constructor(private readonly integrityAlgorithm?: string) {}
 
   static copyEntryContent(entry: CacheEntry | string, dest: fs.PathLike): void {
-    if (copyFileWorkaround) {
-      try {
-        fs.unlinkSync(dest);
-      } catch {}
-    }
+    copyFile(typeof entry === 'string' ? entry : entry.path, dest);
 
-    fs.copyFileSync(
-      typeof entry === 'string' ? entry : entry.path,
-      dest,
-      fs.constants.COPYFILE_FICLONE,
-    );
     if (process.platform !== 'win32') {
       // The cache writes entries as readonly and when using copyFile the permissions will also be copied.
       // See: https://github.com/npm/cacache/blob/073fbe1a9f789ba42d9a41de7b8429c93cf61579/lib/util/move-file.js#L36
