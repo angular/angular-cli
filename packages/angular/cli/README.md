@@ -164,8 +164,15 @@ You can find more details about changes between versions in [the Releases tab on
 git clone https://github.com/angular/angular-cli.git
 yarn
 npm run build
-cd dist/@angular/cli
-npm link
+npm link dist/@angular/cli
+# if you wish to work with angular-devkit schematics, you also need
+npm link dist/@angular-devkit/schematics
+npm link dist/@angular-devkit/schematics-cli
+# these need to be run after each npm run build
+# in addition, npm link of schematics-cli installs the published copy of @angular-devkit/schematics into node_modules
+# To induce the schematics command to use the locally compiled version of @angular-devkit/schematics:
+(cd dist/@angular-devkit/schematics-cli; npm link @angular-devkit/schematics)
+# Similar commands may be needed to work with other angular-devkit packages.
 ```
 
 `npm link` is very similar to `npm install -g` except that instead of downloading the package
