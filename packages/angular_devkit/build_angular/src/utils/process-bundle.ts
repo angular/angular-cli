@@ -5,12 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { transformAsync } from '@babel/core';
 import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import { minify } from 'terser';
+import { ScriptTarget, transpileModule } from 'typescript';
+import { SourceMapSource } from 'webpack-sources';
 import { manglingDisabled } from './mangle-options';
 
 const cacache = require('cacache');
@@ -91,11 +92,10 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
   const downlevelFilename = filename.replace('es2015', 'es5');
   const downlevel = !options.optimizeOnly;
 
-  // if code size is larger than 500kB, manually handle sourcemaps with newer source-map package.
-  // babel currently uses an older version that still supports sync calls
+  // if code size is larger than 1 MB, manually handle sourcemaps with newer source-map package.
   const codeSize = Buffer.byteLength(options.code);
   const mapSize = options.map ? Buffer.byteLength(options.map) : 0;
-  const manualSourceMaps = codeSize >= 500 * 1024 || mapSize >= 500 * 1024;
+  const manualSourceMaps = codeSize >= 1024 * 1024 || mapSize >= 1024 * 1024;
 
   const sourceCode = options.code;
   const sourceMap = options.map ? JSON.parse(options.map) : undefined;
@@ -104,29 +104,31 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
   let downlevelMap;
   if (downlevel) {
     // Downlevel the bundle
-    const transformResult = await transformAsync(sourceCode, {
-      filename: options.filename,
-      inputSourceMap: manualSourceMaps ? undefined : sourceMap,
-      babelrc: false,
-      // modules aren't needed since the bundles use webpack's custom module loading
-      // 'transform-typeof-symbol' generates slower code
-      presets: [['@babel/preset-env', { modules: false, exclude: ['transform-typeof-symbol'] }]],
-      minified: options.optimize,
-      // `false` ensures it is disabled and prevents large file warnings
-      compact: options.optimize || false,
-      sourceMaps: !!sourceMap,
+    const transformResult = transpileModule(sourceCode, {
+      fileName: downlevelFilename,
+      compilerOptions: {
+        sourceMap: !!sourceMap,
+        target: ScriptTarget.ES5,
+      },
     });
 
-    if (!transformResult || !transformResult.code) {
-      throw new Error(`Unknown error occurred processing bundle for "${options.filename}".`);
-    }
-    downlevelCode = transformResult.code;
+    downlevelCode = transformResult.outputText;
 
-    if (manualSourceMaps && sourceMap && transformResult.map) {
-      downlevelMap = await mergeSourcemaps(sourceMap, transformResult.map);
-    } else {
-      // undefined is needed here to normalize the property type
-      downlevelMap = transformResult.map || undefined;
+    if (sourceMap && transformResult.sourceMapText) {
+      if (manualSourceMaps) {
+        downlevelMap = await mergeSourcemaps(sourceMap, JSON.parse(transformResult.sourceMapText));
+      } else {
+        // More accurate but significantly more costly
+        const tempSource = new SourceMapSource(
+          transformResult.outputText,
+          downlevelFilename,
+          JSON.parse(transformResult.sourceMapText),
+          sourceCode,
+          sourceMap,
+        );
+
+        downlevelMap = tempSource.map();
+      }
     }
   }
 
