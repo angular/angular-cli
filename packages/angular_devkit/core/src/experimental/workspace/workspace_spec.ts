@@ -17,7 +17,7 @@ import {
   Workspace,
   WorkspaceNotYetLoadedException,
 } from './workspace';
-import { WorkspaceProject, WorkspaceSchema, WorkspaceTool } from './workspace-schema';
+import { WorkspaceSchema, WorkspaceTool } from './workspace-schema';
 
 
 describe('Workspace', () => {
@@ -57,6 +57,12 @@ describe('Workspace', () => {
         projectType: 'application',
         prefix: 'app',
         cli: {},
+        i18n: {
+          sourceLocale: 'en-US',
+          locales: {
+            'fr': 'src/locale/messages.fr.xlf',
+          },
+        },
         schematics: {
           '@schematics/angular': {
             '*': {

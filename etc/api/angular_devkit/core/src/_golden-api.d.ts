@@ -1251,12 +1251,18 @@ export declare class WorkspaceNotYetLoadedException extends BaseException {
 export interface WorkspaceProject {
     architect?: WorkspaceTool;
     cli?: WorkspaceTool;
+    i18n?: WorkspaceProjectI18n;
     prefix: string;
     projectType: "application" | "library";
     root: string;
     schematics?: WorkspaceTool;
     sourceRoot?: string;
     targets?: WorkspaceTool;
+}
+
+export interface WorkspaceProjectI18n {
+    locales: Record<string, string>;
+    sourceLocale?: string;
 }
 
 export interface WorkspaceSchema {

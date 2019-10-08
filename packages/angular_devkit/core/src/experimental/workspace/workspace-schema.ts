@@ -82,6 +82,10 @@ export interface WorkspaceProject {
    * Tool options.
    */
   targets?: WorkspaceTool;
+  /**
+   * i18n options.
+   */
+  i18n?: WorkspaceProjectI18n;
 }
 /**
  * Architect options.
@@ -92,4 +96,15 @@ export interface WorkspaceTool {
    */
   $schema?: string;
   [k: string]: any;
+}
+
+export interface WorkspaceProjectI18n {
+  /**
+   * Specifies the source language of the application.
+   */
+  sourceLocale?: string;
+  /**
+   * Localization file to use for i18n.
+   */
+  locales: Record<string, string>;
 }
