@@ -194,7 +194,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   // process asset entries
-  if (buildOptions.assets) {
+  if (
+    buildOptions.assets &&
+    (fullDifferential || buildOptions.watch || !differentialLoadingNeeded)
+  ) {
     const copyWebpackPluginPatterns = buildOptions.assets.map((asset: AssetPatternClass) => {
       // Resolve input paths relative to workspace root and add slash at the end.
       asset.input = path.resolve(root, asset.input).replace(/\\/g, '/');
