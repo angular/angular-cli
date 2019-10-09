@@ -7,13 +7,13 @@ import { Component, OnInit<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }
       <%= dasherize(name) %> works!
     </p>
   `,<% } else { %>
-  templateUrl: './<%= dasherize(name) %>.component.html',<% } if(inlineStyle) { %>
+  templateUrl: './<%= dasherize(name) %>.<%= dasherize(type) %>.html',<% } if(inlineStyle) { %>
   styles: []<% } else { %>
-  styleUrls: ['./<%= dasherize(name) %>.component.<%= style %>']<% } %><% if(!!viewEncapsulation) { %>,
+  styleUrls: ['./<%= dasherize(name) %>.<%= dasherize(type) %>.<%= style %>']<% } %><% if(!!viewEncapsulation) { %>,
   encapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } if (changeDetection !== 'Default') { %>,
   changeDetection: ChangeDetectionStrategy.<%= changeDetection %><% } %>
 })
-export class <%= classify(name) %>Component implements OnInit {
+export class <%= classify(name) %><%= classify(type) %> implements OnInit {
 
   constructor() { }
 
