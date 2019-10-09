@@ -100,8 +100,7 @@ if (!argv.ve) {
   // As we transition into using Ivy as the default this list should be reassessed.
   allTests = allTests
     // Ivy doesn't support i18n externally at the moment.
-    .filter(name => !name.includes('tests/i18n/'))
-    .filter(name => !name.endsWith('tests/build/aot/aot-i18n.ts'))
+    .filter(name => !name.endsWith('tests/build/aot/aot-i18n.ts'));
 }
 
 const shardId = 'shard' in argv ? argv['shard'] : null;

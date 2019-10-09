@@ -68,6 +68,12 @@ function _createAotPlugin(
       i18nInFormat: buildOptions.i18nFormat,
     };
 
+  const compilerOptions = options.compilerOptions || {};
+  if (i18nExtract) {
+    // Extraction of i18n is still using the legacy VE pipeline
+    compilerOptions.enableIvy = false;
+  }
+
   const additionalLazyModules: { [module: string]: string } = {};
   if (buildOptions.lazyModules) {
     for (const lazyModule of buildOptions.lazyModules) {
@@ -92,6 +98,7 @@ function _createAotPlugin(
     logger: wco.logger,
     directTemplateLoading: true,
     ...options,
+    compilerOptions,
   };
 
   pluginOptions = _pluginOptionsOverrides(buildOptions, pluginOptions);
