@@ -15,7 +15,7 @@
     "@babel/preset-env": "7.6.3",
     "@ngtools/webpack": "0.0.0",
     "ajv": "6.10.2",
-    "autoprefixer": "9.6.1",
+    "autoprefixer": "9.6.4",
     "browserslist": "4.7.0",
     "cacache": "13.0.1",
     "caniuse-lite": "1.0.30000999",
