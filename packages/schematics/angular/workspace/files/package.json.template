@@ -7,7 +7,8 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "postinstall": "ivy-ngcc --properties es2015 --create-ivy-entry-points"
   },
   "private": true,
   "dependencies": {
