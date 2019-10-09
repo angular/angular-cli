@@ -8,11 +8,10 @@
 import { Architect } from '@angular-devkit/architect';
 import { TestLogger } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { createArchitect, extractI18nTargetSpec, host, veEnabled } from '../utils';
+import { createArchitect, extractI18nTargetSpec, host } from '../utils';
 
 
-// DISABLED_FOR_IVY   These should pass but are currently not supported
-(veEnabled ? describe : xdescribe)('Extract i18n Target', () => {
+describe('Extract i18n Target', () => {
   const extractionFile = join(normalize('src'), 'messages.xlf');
   let architect: Architect;
 
