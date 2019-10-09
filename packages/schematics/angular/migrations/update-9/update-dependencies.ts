@@ -5,12 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Tree } from '@angular-devkit/schematics';
+import { Rule } from '@angular-devkit/schematics';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../../utility/dependencies';
 import { latestVersions } from '../../utility/latest-versions';
 
-export function updateDependencies() {
-  return (host: Tree) => {
+export function updateDependencies(): Rule {
+  return host => {
     const dependenciesToUpdate: Record<string, string> = {
       '@angular/pwa': latestVersions.AngularPWA,
       '@angular-devkit/build-angular': latestVersions.DevkitBuildAngular,

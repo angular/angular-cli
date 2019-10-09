@@ -8,6 +8,7 @@
 
 import { Rule, chain } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
+import { addTsLib } from './add-tslib';
 import { updateLibraries } from './ivy-libraries';
 import { updateNGSWConfig } from './ngsw-config';
 import { removeTsickle } from './remove-tsickle';
@@ -26,6 +27,7 @@ export default function(): Rule {
       updateDependencies(),
       updateServerMainFile(),
       removeTsickle(),
+      addTsLib(),
       (tree, context) => {
         const packageChanges = tree.actions.some(a => a.path.endsWith('/package.json'));
         if (packageChanges) {
