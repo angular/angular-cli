@@ -61,9 +61,11 @@ import {
   BuildBrowserFeatures,
   deleteOutputDir,
   fullDifferential,
+  normalizeAssetPatterns,
   normalizeOptimization,
   normalizeSourceMaps,
 } from '../utils';
+import { copyAssets } from '../utils/copy-assets';
 import { I18nOptions, createI18nOptions } from '../utils/i18n-options';
 import { manglingDisabled } from '../utils/mangle-options';
 import {
@@ -216,13 +218,14 @@ export function buildWebpackBrowser(
 ): Observable<BrowserBuilderOutput> {
   const host = new NodeJsSyncHost();
   const root = normalize(context.workspaceRoot);
+  const baseOutputPath = path.resolve(context.workspaceRoot, options.outputPath);
 
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
 
   return from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
     // tslint:disable-next-line: no-big-function
-    switchMap(({ config: configs, projectRoot, i18n }) => {
+    switchMap(({ config: configs, projectRoot, projectSourceRoot, i18n }) => {
       const tsConfig = readTsconfig(options.tsConfig, context.workspaceRoot);
       const target = tsConfig.options.target || ScriptTarget.ES5;
       const buildBrowserFeatures = new BuildBrowserFeatures(projectRoot, target);
@@ -355,7 +358,7 @@ export function buildWebpackBrowser(
 
                 // Retrieve the content/map for the file
                 // NOTE: Additional future optimizations will read directly from memory
-                let filename = path.resolve(getSystemPath(root), options.outputPath, file.file);
+                let filename = path.join(baseOutputPath, file.file);
                 const code = fs.readFileSync(filename, 'utf8');
                 let map;
                 if (actionOptions.sourceMaps) {
@@ -628,6 +631,27 @@ export function buildWebpackBrowser(
 
               context.logger.info('ES5 bundle generation complete.');
 
+              // Copy assets
+              if (options.assets) {
+                try {
+                  await copyAssets(
+                    normalizeAssetPatterns(
+                      options.assets,
+                      new virtualFs.SyncDelegateHost(host),
+                      root,
+                      normalize(projectRoot),
+                      projectSourceRoot === undefined ? undefined : normalize(projectSourceRoot),
+                    ),
+                    [baseOutputPath],
+                    context.workspaceRoot,
+                  );
+                } catch (err) {
+                  context.logger.error('Unable to copy assets: ' + err.message);
+
+                  return { success: false };
+                }
+              }
+
               type ArrayElement<A> = A extends ReadonlyArray<infer T> ? T : never;
               function generateBundleInfoStats(
                 id: string | number,
@@ -703,10 +727,7 @@ export function buildWebpackBrowser(
             if (options.index) {
               return writeIndexHtml({
                 host,
-                outputPath: resolve(
-                  root,
-                  join(normalize(options.outputPath), getIndexOutputFile(options)),
-                ),
+                outputPath: join(normalize(baseOutputPath), getIndexOutputFile(options)),
                 indexPath: join(root, getIndexInputFile(options)),
                 files,
                 noModuleFiles,
@@ -739,7 +760,7 @@ export function buildWebpackBrowser(
                 host,
                 root,
                 normalize(projectRoot),
-                resolve(root, normalize(options.outputPath)),
+                normalize(baseOutputPath),
                 options.baseHref || '/',
                 options.ngswConfigPath,
               ).then(
@@ -756,7 +777,7 @@ export function buildWebpackBrowser(
             ({
               ...event,
               // If we use differential loading, both configs have the same outputs
-              outputPath: path.resolve(context.workspaceRoot, options.outputPath),
+              outputPath: baseOutputPath,
             } as BrowserBuilderOutput),
         ),
       );
