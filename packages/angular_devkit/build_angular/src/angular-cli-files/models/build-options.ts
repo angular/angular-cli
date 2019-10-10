@@ -18,7 +18,7 @@ import {
   I18NMissingTranslation,
   OptimizationClass,
   SourceMapClass,
-  translateLocales,
+  TranslateLocales,
 } from '../../browser/schema';
 import { NormalizedFileReplacement } from '../../utils/normalize-file-replacements';
 
@@ -45,7 +45,7 @@ export interface BuildOptions {
   i18nFormat?: string;
   /** @deprecated since version 9. Use 'translateLocales' instead.*/
   i18nLocale?: string;
-  translateLocales?: translateLocales;
+  translateLocales?: TranslateLocales;
   i18nMissingTranslation?: I18NMissingTranslation;
   extractCss?: boolean;
   bundleDependencies?: 'none' | 'all';

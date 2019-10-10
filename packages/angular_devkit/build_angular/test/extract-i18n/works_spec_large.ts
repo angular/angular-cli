@@ -122,7 +122,7 @@ describe('Extract i18n Target', () => {
   it('supports i18n format', async () => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
     const extractionFile = join(normalize('src'), 'messages.xmb');
-    const overrides = { i18nFormat: 'xmb' };
+    const overrides = { format: 'xmb' };
 
     const run = await architect.scheduleTarget(extractI18nTargetSpec, overrides);
 
