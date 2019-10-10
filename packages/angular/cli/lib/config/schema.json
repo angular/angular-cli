@@ -781,8 +781,8 @@
               "description": "Log progress to the console while building.",
               "default": true
             },
-            "translateLocales": {
-              "$ref": "#/definitions/buildersOptions/translateLocales"
+            "localize": {
+              "$ref": "#/definitions/buildersOptions/localize"
             },
             "i18nMissingTranslation": {
               "$ref": "#/definitions/buildersOptions/missingTranslation"
@@ -1806,8 +1806,8 @@
               "description": "Log progress to the console while building.",
               "default": true
             },
-            "translateLocales": {
-              "$ref": "#/definitions/buildersOptions/translateLocales"
+            "localize": {
+              "$ref": "#/definitions/buildersOptions/localize"
             },
             "i18nFile": {
               "type": "string",
@@ -2023,7 +2023,7 @@
         "enum": ["warning", "error", "ignore"],
         "default": "warning"
       },
-      "translateLocales": {
+      "localize": {
         "oneOf": [
           {
             "type": "boolean",

@@ -16,9 +16,9 @@ import {
   Budget,
   ExtraEntryPoint,
   I18NMissingTranslation,
+  Localize,
   OptimizationClass,
   SourceMapClass,
-  TranslateLocales,
 } from '../../browser/schema';
 import { NormalizedFileReplacement } from '../../utils/normalize-file-replacements';
 
@@ -43,9 +43,9 @@ export interface BuildOptions {
   i18nFile?: string;
   /** @deprecated since version 9. No longer needed as the format will be determined automatically.*/
   i18nFormat?: string;
-  /** @deprecated since version 9. Use 'translateLocales' instead.*/
+  /** @deprecated since version 9. Use 'localize' instead.*/
   i18nLocale?: string;
-  translateLocales?: TranslateLocales;
+  localize?: Localize;
   i18nMissingTranslation?: I18NMissingTranslation;
   extractCss?: boolean;
   bundleDependencies?: 'none' | 'all';

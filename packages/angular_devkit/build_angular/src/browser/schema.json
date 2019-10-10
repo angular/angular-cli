@@ -191,7 +191,7 @@
     "i18nLocale": {
       "type": "string",
       "description": "Locale to use for i18n.",
-      "x-deprecated": "Use 'translateLocales' instead."
+      "x-deprecated": "Use 'localize' instead."
     },
     "i18nMissingTranslation": {
       "type": "string",
@@ -199,7 +199,7 @@
       "enum": ["warning", "error", "ignore"],
       "default": "warning"
     },
-    "translateLocales": {
+    "localize": {
       "oneOf": [
         {
           "type": "boolean",
