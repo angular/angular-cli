@@ -1,74 +1,122 @@
-import { appendToFile, createDir, expectFileToMatch, writeFile } from '../../../utils/fs';
+import * as express from 'express';
+import { resolve } from 'path';
+import { getGlobalVariable } from '../../../utils/env';
+import { appendToFile, copyFile, expectFileToExist, expectFileToMatch, replaceInFile, writeFile } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
 import { expectToFail } from '../../../utils/utils';
 
 export default async function () {
-  const enDir = 'dist/test-project';
-  const frDist = `${enDir}-fr`;
-  const deDir = `${enDir}-de`;
+  const baseDir = 'dist/test-project';
+  const enDir = `${baseDir}/en`;
+  const frDist = `${baseDir}/fr`;
+  const deDir = `${baseDir}/de`;
+
+  // Set configurations for each locale.
+  const langTranslations = [
+    { lang: 'en', translation: 'Hello i18n!', outputPath: enDir },
+    { lang: 'fr', translation: 'Bonjour i18n!', outputPath: frDist },
+    { lang: 'de', translation: 'Hallo i18n!', outputPath: deDir },
+  ];
 
   await updateJsonFile('angular.json', workspaceJson => {
     const appArchitect = workspaceJson.projects['test-project'].architect;
     const browserConfigs = appArchitect['build'].configurations;
-    browserConfigs['fr'] = {
-      outputPath: frDist,
-      aot: true,
-      i18nFile: 'src/locale/messages.fr.xlf',
-      i18nFormat: 'xlf',
-      i18nLocale: 'fr',
-    };
-    browserConfigs['de'] = {
-      outputPath: deDir,
-      aot: true,
-      i18nFile: 'src/locale/messages.de.xlf',
-      i18nFormat: 'xlf',
-      i18nLocale: 'de',
-    };
+    const serveConfigs = appArchitect['serve'].configurations;
+    const e2eConfigs = appArchitect['e2e'].configurations;
+
+    // Make default builds prod.
+    appArchitect['build'].options.optimization = true;
+    appArchitect['build'].options.buildOptimizer = true;
+    appArchitect['build'].options.aot = true;
+    appArchitect['build'].options.fileReplacements = [{
+      replace: 'src/environments/environment.ts',
+      with: 'src/environments/environment.prod.ts',
+    }];
+
+    for (const { lang, outputPath } of langTranslations) {
+      if (lang == 'en') {
+        browserConfigs[lang] = { outputPath };
+      } else {
+        browserConfigs[lang] = {
+          outputPath,
+          i18nFile: `src/locale/messages.${lang}.xlf`,
+          i18nFormat: `xlf`,
+          i18nLocale: lang,
+        };
+      }
+      serveConfigs[lang] = { browserTarget: `test-project:build:${lang}` };
+      e2eConfigs[lang] = {
+        specs: [`./src/app.${lang}.e2e-spec.ts`],
+        devServerTarget: `test-project:serve:${lang}`,
+      };
+    }
   });
 
-  await createDir('src/locale');
-  await writeFile('src/locale/messages.fr.xlf', `
-    <?xml version="1.0" encoding="UTF-8" ?>
-      <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-        <file source-language="en" datatype="plaintext" original="ng2.template">
-          <body>
-            <trans-unit id="8def8481e91291a52f9baa31cbdb313e6a6ca02b" datatype="html">
-              <source>Hello i18n!</source>
-              <target>Bonjour i18n!</target>
-              <note priority="1" from="description">An introduction header for this sample</note>
-            </trans-unit>
-          </body>
-        </file>
-      </xliff>`);
-  await writeFile('src/locale/messages.de.xlf', `
-    <?xml version="1.0" encoding="UTF-8" ?>
-      <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-        <file source-language="en" datatype="plaintext" original="ng2.template">
-          <body>
-            <trans-unit id="8def8481e91291a52f9baa31cbdb313e6a6ca02b" datatype="html">
-              <source>Hello i18n!</source>
-              <target>Hallo i18n!</target>
-              <note priority="1" from="description">An introduction header for this sample</note>
-            </trans-unit>
-          </body>
-        </file>
-      </xliff>`);
-  await appendToFile('src/app/app.component.html',
+  // Add e2e specs for each lang.
+  for (const { lang, translation } of langTranslations) {
+    await writeFile(`./src/app.${lang}.e2e-spec.ts`, `
+      import { browser, logging, element, by } from 'protractor';
+
+      describe('workspace-project App', () => {
+        it('should display welcome message', () => {
+          browser.get(browser.baseUrl);
+          expect(element(by.css('h1')).getText()).toEqual('${translation}');
+        });
+
+        afterEach(async () => {
+          // Assert that there are no errors emitted from the browser
+          const logs = await browser.manage().logs().get(logging.Type.BROWSER);
+          expect(logs).not.toContain(jasmine.objectContaining({
+            level: logging.Level.SEVERE,
+          } as logging.Entry));
+        });
+      });
+    `);
+  }
+
+  // Add a translatable element.
+  await writeFile('src/app/app.component.html',
     '<h1 i18n="An introduction header for this sample">Hello i18n!</h1>');
-  await ng('build', '--configuration=fr');
-  await expectFileToMatch(`${frDist}/main-es5.js`, /Bonjour i18n!/);
-  await expectFileToMatch(`${frDist}/main-es2015.js`, /Bonjour i18n!/);
-  await ng('build', '--configuration=de');
-  await expectFileToMatch(`${deDir}/main-es5.js`, /Hallo i18n!/);
-  await expectFileToMatch(`${deDir}/main-es2015.js`, /Hallo i18n!/);
-  await ng('build', '--aot');
-  await expectToFail(() => expectFileToMatch(`${enDir}/main-es5.js`, /Bonjour i18n!/));
-  await expectToFail(() => expectFileToMatch(`${enDir}/main-es2015.js`, /Bonjour i18n!/));
-  await expectToFail(() => expectFileToMatch(`${enDir}/main-es5.js`, /Hallo i18n!/));
-  await expectToFail(() => expectFileToMatch(`${enDir}/main-es2015.js`, /Hallo i18n!/));
-  await expectFileToMatch(`${enDir}/main-es2015.js`, /Hello i18n!/);
-  await expectFileToMatch(`${enDir}/main-es5.js`, /Hello i18n!/);
+
+  // Extract the translation messages and copy them for each language.
+  await ng('xi18n', '--output-path=src/locale');
+  await expectFileToExist('src/locale/messages.xlf');
+  await expectFileToMatch('src/locale/messages.xlf', `source-language="en"`);
+  await expectFileToMatch('src/locale/messages.xlf', `An introduction header for this sample`);
+
+  for (const { lang, translation } of langTranslations) {
+    if (lang != 'en') {
+      await copyFile('src/locale/messages.xlf', `src/locale/messages.${lang}.xlf`);
+      await replaceInFile(`src/locale/messages.${lang}.xlf`, '<source>Hello i18n!</source>',
+        `<source>Hello i18n!</source>\n<target>${translation}</target>`);
+    }
+  }
+
+  for (const { lang, translation, outputPath } of langTranslations) {
+    // Build each locale and verify the output.
+    await ng('build', `--configuration=${lang}`);
+    await expectFileToMatch(`${outputPath}/main-es5.js`, translation);
+    await expectFileToMatch(`${outputPath}/main-es2015.js`, translation);
+
+    // E2E to verify the output runs and is correct.
+    if (getGlobalVariable('argv')['ve']) {
+      await ng('e2e', `--configuration=${lang}`);
+    } else {
+      // Ivy i18n doesn't yet work with `ng serve` so we must use a separate server.
+      const app = express();
+      app.use(express.static(resolve(outputPath)));
+      const server = app.listen(4200, 'localhost');
+      try {
+        // Execute without a devserver.
+        await ng('e2e', '--devServerTarget=');
+      } finally {
+        server.close();
+      }
+    }
+  }
+
+  // Verify missing translation behaviour.
   await appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
   await ng('build', '--configuration=fr', '--i18n-missing-translation', 'ignore');
   await expectFileToMatch(`${frDist}/main-es5.js`, /Other content/);
