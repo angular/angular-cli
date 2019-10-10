@@ -296,5 +296,76 @@ describe('Migration to version 9', () => {
         expect(config.production.optimization).toBe(true);
       });
     });
+
+    describe('i18n configuration', () => {
+      function getI18NConfig(localId: string): object {
+        return {
+          outputPath: `dist/my-project-${localId}/`,
+          i18nFile: `src/locale/messages.${localId}.xlf`,
+          i18nFormat: 'xlf',
+          i18nLocale: localId,
+        };
+      }
+
+      describe('when i18n builder options are set', () => {
+        it(`should add 'localize' option in configuration`, async () => {
+          let config = getWorkspaceTargets(tree);
+          config.build.options.aot = false;
+          config.build.options = getI18NConfig('fr');
+          config.build.configurations.de = getI18NConfig('de');
+          updateWorkspaceTargets(tree, config);
+
+          const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+          config = getWorkspaceTargets(tree2).build;
+          expect(config.options.localize).toEqual(['fr']);
+          expect(config.configurations.de.localize).toEqual(['de']);
+        });
+
+        it(`should add i18n 'sourceLocale' project config when 'extract-i18n' 'i18nLocale' is defined`, async () => {
+          const config = getWorkspaceTargets(tree);
+          config.build.options.aot = false;
+          config.build.options = getI18NConfig('fr');
+          config['extract-i18n'].options.i18nLocale = 'en-GB';
+          config.build.configurations.de = getI18NConfig('de');
+          updateWorkspaceTargets(tree, config);
+
+          const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+          const projectConfig = JSON.parse(tree2.readContent(workspacePath)).projects['migration-test'];
+          expect(projectConfig.i18n.sourceLocale).toBe('en-GB');
+          expect(projectConfig.i18n.locales).toBeDefined();
+        });
+
+        it(`should add i18n 'locales' project config`, async () => {
+          const config = getWorkspaceTargets(tree);
+          config.build.options.aot = false;
+          config.build.options = getI18NConfig('fr');
+          config.build.configurations.de = getI18NConfig('de');
+          updateWorkspaceTargets(tree, config);
+
+          const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+          const projectConfig = JSON.parse(tree2.readContent(workspacePath)).projects['migration-test'];
+          expect(projectConfig.i18n.sourceLocale).toBeUndefined();
+          expect(projectConfig.i18n.locales).toEqual({
+            de: 'src/locale/messages.de.xlf',
+            fr: 'src/locale/messages.fr.xlf',
+          });
+        });
+      });
+
+      describe('when i18n builder options are not set', () => {
+        it(`should not add 'localize' option`, async () => {
+          const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+          const config = getWorkspaceTargets(tree2).build;
+          expect(config.options.localize).toBeUndefined();
+          expect(config.configurations.production.localize).toBeUndefined();
+        });
+
+        it('should not add i18n project config', async () => {
+          const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+          const projectConfig = JSON.parse(tree2.readContent(workspacePath)).projects['migration-test'];
+          expect(projectConfig.i18n).toBeUndefined();
+        });
+      });
+    });
   });
 });

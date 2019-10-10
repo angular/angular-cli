@@ -12,7 +12,36 @@ import { getWorkspacePath } from '../../utility/config';
 import { findPropertyInAstObject } from '../../utility/json-utils';
 import { Builders, WorkspaceTargets } from '../../utility/workspace-models';
 
-/** Get all workspace targets which builder and target names matches the provided. */
+/** Get a project target which builder and target names matches the provided. */
+export function getProjectTarget(
+  project: JsonAstObject,
+  targetName: Exclude<keyof WorkspaceTargets, number>,
+  builderName: Builders,
+): JsonAstObject | undefined {
+  const projectRoot = findPropertyInAstObject(project, 'root');
+  if (!projectRoot || projectRoot.kind !== 'string') {
+    return undefined;
+  }
+
+  const architect = findPropertyInAstObject(project, 'architect');
+  if (!architect || architect.kind !== 'object') {
+    return undefined;
+  }
+
+  const target = findPropertyInAstObject(architect, targetName);
+  if (!target || target.kind !== 'object') {
+    return undefined;
+  }
+
+  const builder = findPropertyInAstObject(target, 'builder');
+  // Projects who's build builder is @angular-devkit/build-ng-packagr
+  if (builder && builder.kind === 'string' && builder.value === builderName) {
+    return target;
+  }
+
+  return undefined;
+}
+
 export function getTargets(
   workspace: JsonAstObject,
   targetName: Exclude<keyof WorkspaceTargets, number>,
@@ -30,24 +59,8 @@ export function getTargets(
       continue;
     }
 
-    const projectRoot = findPropertyInAstObject(projectConfig, 'root');
-    if (!projectRoot || projectRoot.kind !== 'string') {
-      continue;
-    }
-
-    const architect = findPropertyInAstObject(projectConfig, 'architect');
-    if (!architect || architect.kind !== 'object') {
-      continue;
-    }
-
-    const target = findPropertyInAstObject(architect, targetName);
-    if (!target || target.kind !== 'object') {
-      continue;
-    }
-
-    const builder = findPropertyInAstObject(target, 'builder');
-    // Projects who's build builder is @angular-devkit/build-ng-packagr
-    if (builder && builder.kind === 'string' && builder.value === builderName) {
+    const target = getProjectTarget(projectConfig, targetName, builderName);
+    if (target) {
       targets.push({ target, project: projectConfig });
     }
   }
