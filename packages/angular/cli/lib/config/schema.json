@@ -781,8 +781,8 @@
               "description": "Log progress to the console while building.",
               "default": true
             },
-            "inlineLocales": {
-              "$ref": "#/definitions/buildersOptions/inlineLocales"
+            "translateLocales": {
+              "$ref": "#/definitions/buildersOptions/translateLocales"
             },
             "i18nMissingTranslation": {
               "$ref": "#/definitions/buildersOptions/missingTranslation"
@@ -1791,8 +1791,8 @@
               "description": "Log progress to the console while building.",
               "default": true
             },
-            "inlineLocales": {
-              "$ref": "#/definitions/buildersOptions/inlineLocales"
+            "translateLocales": {
+              "$ref": "#/definitions/buildersOptions/translateLocales"
             },
             "i18nFile": {
               "type": "string",
@@ -2008,15 +2008,15 @@
         "enum": ["warning", "error", "ignore"],
         "default": "warning"
       },
-      "inlineLocales": {
+      "translateLocales": {
         "oneOf": [
           {
             "type": "boolean",
-            "description": "Bundle all locales in the final bundle."
+            "description": "Translate all locales."
           },
           {
             "type": "array",
-            "description": "List of locales ID's to inline.",
+            "description": "List of locales ID's to translate.",
             "minItems": 1,
             "items": {
               "type": "string",
