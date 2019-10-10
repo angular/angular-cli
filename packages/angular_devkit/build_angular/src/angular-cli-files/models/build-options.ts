@@ -88,6 +88,8 @@ export interface BuildOptions {
 
   /* When specified it will be used instead of the script target in the tsconfig.json. */
   scriptTargetOverride?: ScriptTarget;
+
+  experimentalRollupPass?: boolean;
 }
 
 export interface WebpackTestOptions extends BuildOptions {
