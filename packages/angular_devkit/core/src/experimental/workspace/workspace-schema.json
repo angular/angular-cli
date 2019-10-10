@@ -90,13 +90,31 @@
         "targets": {
           "$ref": "#/definitions/tool",
           "default": {}
+        },
+        "i18n": {
+          "$ref": "#/definitions/i18n",
+          "default": {}
         }
       },
       "additionalProperties": false,
       "required": [
         "root",
         "projectType"
-      ]
+      ],
+      "if": {
+        "properties": {
+          "projectType": {
+            "const": "library"
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "required": [
+            "i18n"
+          ]
+        }
+      }
     },
     "tool": {
       "type": "object",
@@ -108,6 +126,27 @@
         }
       },
       "additionalProperties": true
+    },
+    "i18n": {
+      "type": "object",
+      "properties": {
+        "sourceLocale": {
+          "type": "string",
+          "description": "Specifies the source language of the application.",
+          "default": "en-US"
+        },
+        "locales": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-z]{2}(-[a-zA-Z]{2,})?$": {
+              "type": "string",
+              "description": "Localization file to use for i18n."
+            }
+          }
+        }
+      },
+      "additionalProperties": false
     }
   }
 }

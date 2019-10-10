@@ -342,6 +342,9 @@
           "type": "string",
           "description": "Root of the project files."
         },
+        "i18n": {
+          "$ref": "#/definitions/project/definitions/i18n"
+        },
         "sourceRoot": {
           "type": "string",
           "description": "The root of the source files, assets and index.html file structure."
@@ -398,6 +401,28 @@
         "^[a-z]{1,3}-.*": {}
       },
       "definitions": {
+        "i18n": {
+          "description": "Project i18n options",
+          "type": "object",
+          "properties": {
+            "sourceLocale": {
+              "type": "string",
+              "description": "Specifies the source language of the application.",
+              "default": "en-US"
+            },
+            "locales": {
+              "type": "object",
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[a-z]{2}(-[a-zA-Z]{2,})?$": {
+                  "type": "string",
+                  "description": "Localization file to use for i18n"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
         "target": {
           "oneOf": [
             {
@@ -756,21 +781,26 @@
               "description": "Log progress to the console while building.",
               "default": true
             },
+            "localize": {
+              "$ref": "#/definitions/buildersOptions/localize"
+            },
+            "i18nMissingTranslation": {
+              "$ref": "#/definitions/buildersOptions/missingTranslation"
+            },
             "i18nFile": {
               "type": "string",
-              "description": "Localization file to use for i18n."
+              "description": "Localization file to use for i18n.",
+              "x-deprecated": "Deprecated since 9.0"
             },
             "i18nFormat": {
               "type": "string",
-              "description": "Format of the localization file specified with --i18n-file."
+              "description": "Format of the localization file specified with --i18n-file.",
+              "x-deprecated": "Deprecated since 9.0"
             },
             "i18nLocale": {
               "type": "string",
-              "description": "Locale to use for i18n."
-            },
-            "i18nMissingTranslation": {
-              "type": "string",
-              "description": "How to handle missing translations for i18n."
+              "description": "Locale to use for i18n.",
+              "x-deprecated": "Deprecated since 9.0"
             },
             "extractCss": {
               "type": "boolean",
@@ -1281,7 +1311,7 @@
               "type": "string",
               "description": "Target to extract from."
             },
-            "i18nFormat": {
+            "format": {
               "type": "string",
               "description": "Output format for the generated file.",
               "default": "xlf",
@@ -1294,9 +1324,24 @@
                 "xliff2"
               ]
             },
+            "i18nFormat": {
+              "type": "string",
+              "description": "Output format for the generated file.",
+              "default": "xlf",
+              "x-deprecated": "Use 'format' option instead.",
+              "enum": [
+                "xmb",
+                "xlf",
+                "xlif",
+                "xliff",
+                "xlf2",
+                "xliff2"
+              ]
+            },
             "i18nLocale": {
               "type": "string",
-              "description": "Specifies the source language of the application."
+              "description": "Specifies the source language of the application.",
+              "x-deprecated": "Use 'i18n' project level sub-option 'sourceLocale' instead."
             },
             "progress": {
               "type": "boolean",
@@ -1761,21 +1806,26 @@
               "description": "Log progress to the console while building.",
               "default": true
             },
+            "localize": {
+              "$ref": "#/definitions/buildersOptions/localize"
+            },
             "i18nFile": {
               "type": "string",
-              "description": "Localization file to use for i18n."
+              "description": "Localization file to use for i18n.",
+              "x-deprecated": "Deprecated since 9.0"
             },
             "i18nFormat": {
               "type": "string",
-              "description": "Format of the localization file specified with --i18n-file."
+              "description": "Format of the localization file specified with --i18n-file.",
+              "x-deprecated": "Deprecated since 9.0"
             },
             "i18nLocale": {
               "type": "string",
-              "description": "Locale to use for i18n."
+              "description": "Locale to use for i18n.",
+              "x-deprecated": "Deprecated since 9.0"
             },
             "i18nMissingTranslation": {
-              "type": "string",
-              "description": "How to handle missing translations for i18n."
+              "$ref": "#/definitions/buildersOptions/missingTranslation"
             },
             "outputHashing": {
               "type": "string",
@@ -1964,6 +2014,31 @@
           },
           "additionalProperties": false
         }
+      }
+    },
+    "buildersOptions": {
+      "missingTranslation": {
+        "type": "string",
+        "description": "How to handle missing translations for i18n.",
+        "enum": ["warning", "error", "ignore"],
+        "default": "warning"
+      },
+      "localize": {
+        "oneOf": [
+          {
+            "type": "boolean",
+            "description": "Translate all locales."
+          },
+          {
+            "type": "array",
+            "description": "List of locales ID's to translate.",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z]{2}(-[a-zA-Z]{2,})?$"
+            }
+          }
+        ]
       }
     }
   }

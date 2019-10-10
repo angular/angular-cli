@@ -15,6 +15,8 @@ import {
   AssetPatternClass,
   Budget,
   ExtraEntryPoint,
+  I18NMissingTranslation,
+  Localize,
   OptimizationClass,
   SourceMapClass,
 } from '../../browser/schema';
@@ -27,9 +29,9 @@ export interface BuildOptions {
   resourcesOutputPath?: string;
   aot?: boolean;
   sourceMap: SourceMapClass;
-  /** @deprecated use sourceMap instead */
+  /** @deprecated since version 8. use sourceMap instead. */
   vendorSourceMap?: boolean;
-  /** @deprecated  */
+  /** @deprecated since version 8 */
   evalSourceMap?: boolean;
   vendorChunk?: boolean;
   commonChunk?: boolean;
@@ -37,16 +39,19 @@ export interface BuildOptions {
   deployUrl?: string;
   verbose?: boolean;
   progress?: boolean;
+  /** @deprecated since version 9. Use 'locales' object in the project metadata instead.*/
   i18nFile?: string;
+  /** @deprecated since version 9. No longer needed as the format will be determined automatically.*/
   i18nFormat?: string;
+  /** @deprecated since version 9. Use 'localize' instead.*/
   i18nLocale?: string;
-  i18nMissingTranslation?: string;
+  localize?: Localize;
+  i18nMissingTranslation?: I18NMissingTranslation;
   extractCss?: boolean;
   bundleDependencies?: 'none' | 'all';
   watch?: boolean;
   outputHashing?: string;
   poll?: number;
-  app?: string;
   deleteOutputPath?: boolean;
   preserveSymlinks?: boolean;
   extractLicenses?: boolean;
@@ -56,10 +61,12 @@ export interface BuildOptions {
   subresourceIntegrity?: boolean;
   serviceWorker?: boolean;
   webWorkerTsConfig?: string;
+  /** @deprecated since version 8 **/
   skipAppShell?: boolean;
   statsJson: boolean;
   forkTypeChecker: boolean;
   profile?: boolean;
+  /** @deprecated since version 8 **/
   es5BrowserSupport?: boolean;
 
   main: string;
