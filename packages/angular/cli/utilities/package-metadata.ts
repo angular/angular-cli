@@ -18,6 +18,8 @@ export interface PackageDependencies {
   [dependency: string]: string;
 }
 
+export type NgAddSaveDepedency = 'dependencies' | 'devDependencies' | boolean;
+
 export interface PackageIdentifier {
   type: 'git' | 'tag' | 'version' | 'range' | 'file' | 'directory' | 'remote';
   name: string;
@@ -39,8 +41,9 @@ export interface PackageManifest {
   devDependencies: PackageDependencies;
   peerDependencies: PackageDependencies;
   optionalDependencies: PackageDependencies;
-
-  'ng-add'?: {};
+  'ng-add'?: {
+    save?: NgAddSaveDepedency;
+  };
   'ng-update'?: {
     migrations: string;
     packageGroup: { [name: string]: string };

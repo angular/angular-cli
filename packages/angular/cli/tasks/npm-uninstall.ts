@@ -9,58 +9,43 @@
 import { logging } from '@angular-devkit/core';
 import { spawn } from 'child_process';
 import { colors } from '../utilities/color';
-import { NgAddSaveDepedency } from '../utilities/package-metadata';
 
 export default async function(
   packageName: string,
   logger: logging.Logger,
   packageManager: string,
-  save: NgAddSaveDepedency = true,
 ) {
   const installArgs: string[] = [];
   switch (packageManager) {
     case 'cnpm':
     case 'pnpm':
     case 'npm':
-      installArgs.push('install');
+      installArgs.push('uninstall');
       break;
 
     case 'yarn':
-      installArgs.push('add');
+      installArgs.push('remove');
       break;
 
     default:
       packageManager = 'npm';
-      installArgs.push('install');
+      installArgs.push('uninstall');
       break;
   }
 
-  logger.info(colors.green(`Installing packages for tooling via ${packageManager}.`));
+  installArgs.push(packageName, '--quiet');
 
-  if (packageName) {
-    installArgs.push(packageName);
-  }
-
-  if (!save) {
-    // IMP: yarn doesn't have a no-save option
-    installArgs.push('--no-save');
-  }
-
-  if (save === 'devDependencies') {
-    installArgs.push(packageManager === 'yarn' ? '--dev' : '--save-dev');
-  }
-
-  installArgs.push('--quiet');
+  logger.info(colors.green(`Uninstalling packages for tooling via ${packageManager}.`));
 
   await new Promise((resolve, reject) => {
     spawn(packageManager, installArgs, { stdio: 'inherit', shell: true }).on(
       'close',
       (code: number) => {
         if (code === 0) {
-          logger.info(colors.green(`Installed packages for tooling via ${packageManager}.`));
+          logger.info(colors.green(`Uninstalling packages for tooling via ${packageManager}.`));
           resolve();
         } else {
-          reject('Package install failed, see above.');
+          reject('Package uninstallation failed, see above.');
         }
       },
     );
