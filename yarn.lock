@@ -2544,7 +2544,7 @@ bytes@3.1.0:
   resolved "https://registry.yarnpkg.com/bytes/-/bytes-3.1.0.tgz#f6cf7933a360e0588fa9fde85651cdc7f805d1f6"
   integrity sha512-zauLjrfCG+xvoyaqLoV8bLVXXNGC4JqlxFCutSDWA6fJrTo2ZuvLYTqZ7aHBLZSMOopbzwv8f+wZcVzfVTI2Dg==
 
-cacache@13.0.1, cacache@^13.0.0:
+cacache@13.0.1, cacache@^13.0.1:
   version "13.0.1"
   resolved "https://registry.yarnpkg.com/cacache/-/cacache-13.0.1.tgz#a8000c21697089082f85287a1aec6e382024a71c"
   integrity sha512-5ZvAxd05HDDU+y9BVvcqYu2LLXmPnQ0hW62h32g4xBTgL/MppR4/04NHfj/ycM2y6lmTnbw6HVi+1eN0Psba6w==
@@ -10118,18 +10118,18 @@ term-size@^1.2.0:
   dependencies:
     execa "^0.7.0"
 
-terser-webpack-plugin@2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/terser-webpack-plugin/-/terser-webpack-plugin-2.1.2.tgz#2b9b8147a6f18918348200800cf9560c50f701bb"
-  integrity sha512-MF/C4KABwqYOfRDi87f7gG07GP7Wj/kyiX938UxIGIO6l5mkh8XJL7xtS0hX/CRdVQaZI7ThGUPZbznrCjsGpg==
+terser-webpack-plugin@2.1.3:
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/terser-webpack-plugin/-/terser-webpack-plugin-2.1.3.tgz#85430da71ba88a60072bf659589eafaf6a00dc22"
+  integrity sha512-z5Utx0TxmirZvRNL1GC795tlDM+bO83ZfcbtkL1y1VLoWtZ7S2a9+HFCLnabSRE/Yjsu4zCEX6U6CIRo4dVmcQ==
   dependencies:
-    cacache "^13.0.0"
+    cacache "^13.0.1"
     find-cache-dir "^3.0.0"
     jest-worker "^24.9.0"
     schema-utils "^2.4.1"
     serialize-javascript "^2.1.0"
     source-map "^0.6.1"
-    terser "^4.3.4"
+    terser "^4.3.8"
     webpack-sources "^1.4.3"
 
 terser-webpack-plugin@^1.4.1:
@@ -10147,7 +10147,7 @@ terser-webpack-plugin@^1.4.1:
     webpack-sources "^1.4.0"
     worker-farm "^1.7.0"
 
-terser@4.3.8, terser@^4.1.2, terser@^4.3.4:
+terser@4.3.8, terser@^4.1.2, terser@^4.3.8:
   version "4.3.8"
   resolved "https://registry.yarnpkg.com/terser/-/terser-4.3.8.tgz#707f05f3f4c1c70c840e626addfdb1c158a17136"
   integrity sha512-otmIRlRVmLChAWsnSFNO0Bfk6YySuBp6G9qrHiJwlLDd4mxe2ta4sjI7TzIR+W1nBMjilzrMcPOz9pSusgx3hQ==
