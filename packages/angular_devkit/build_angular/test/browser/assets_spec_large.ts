@@ -28,6 +28,7 @@ describe('Browser Builder assets', () => {
       './src/folder/.gitkeep': '',
       './src/string-file-asset.txt': 'string-file-asset.txt',
       './src/string-folder-asset/file.txt': 'string-folder-asset.txt',
+      './src/nested/nested/file.txt': 'nested-file.txt',
       './src/glob-asset.txt': 'glob-asset.txt',
       './src/folder/folder-asset.txt': 'folder-asset.txt',
       './src/output-asset.txt': 'output-asset.txt',
@@ -35,6 +36,7 @@ describe('Browser Builder assets', () => {
     const matches: { [path: string]: string } = {
       './dist/string-file-asset.txt': 'string-file-asset.txt',
       './dist/string-folder-asset/file.txt': 'string-folder-asset.txt',
+      './dist/nested/nested/file.txt': 'nested-file.txt',
       './dist/glob-asset.txt': 'glob-asset.txt',
       './dist/folder/folder-asset.txt': 'folder-asset.txt',
       './dist/output-folder/output-asset.txt': 'output-asset.txt',
@@ -43,6 +45,7 @@ describe('Browser Builder assets', () => {
 
     const overrides = {
       assets: [
+        'src/nested',
         'src/string-file-asset.txt',
         'src/string-folder-asset',
         { glob: 'glob-asset.txt', input: 'src/', output: '/' },
