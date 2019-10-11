@@ -100,16 +100,26 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
     if (targetSpec === undefined) {
       return null;
     }
-    if (
-      target.configuration
-      && !(targetSpec['configurations'] && targetSpec['configurations'][target.configuration])
-    ) {
-      throw new Error(`Configuration '${target.configuration}' is not set in the workspace.`);
+
+    let additionalOptions = {};
+
+    if (target.configuration) {
+      const configurations = target.configuration.split(',').map(c => c.trim());
+      for (const configuration of configurations) {
+        if (!(targetSpec['configurations'] && targetSpec['configurations'][configuration])) {
+          throw new Error(`Configuration '${configuration}' is not set in the workspace.`);
+        } else {
+          additionalOptions = {
+            ...additionalOptions,
+            ...targetSpec['configurations'][configuration],
+          };
+        }
+      }
     }
 
     return {
       ...targetSpec['options'],
-      ...(target.configuration ? targetSpec['configurations'][target.configuration] : 0),
+      ...additionalOptions,
     };
   }
 
