@@ -13,9 +13,11 @@ import { isPackageNameSafeForAnalytics } from '../models/analytics';
 import { Arguments } from '../models/interface';
 import { RunSchematicOptions, SchematicCommand } from '../models/schematic-command';
 import npmInstall from '../tasks/npm-install';
+import npmUninstall from '../tasks/npm-uninstall';
 import { colors } from '../utilities/color';
 import { getPackageManager } from '../utilities/package-manager';
 import {
+  NgAddSaveDepedency,
   PackageManifest,
   fetchPackageManifest,
   fetchPackageMetadata,
@@ -113,31 +115,39 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
     }
 
     let collectionName = packageIdentifier.name;
-    if (!packageIdentifier.registry) {
-      try {
-        const manifest = await fetchPackageManifest(packageIdentifier, this.logger, {
-          registry: options.registry,
-          verbose: options.verbose,
-          usingYarn,
-        });
+    let dependencyType: NgAddSaveDepedency | undefined;
 
-        collectionName = manifest.name;
+    try {
+      const manifest = await fetchPackageManifest(packageIdentifier, this.logger, {
+        registry: options.registry,
+        verbose: options.verbose,
+        usingYarn,
+      });
 
-        if (await this.hasMismatchedPeer(manifest)) {
-          this.logger.warn(
-            'Package has unmet peer dependencies. Adding the package may not succeed.',
-          );
-        }
-      } catch (e) {
-        this.logger.error('Unable to fetch package manifest: ' + e.message);
+      dependencyType = manifest['ng-add'] && manifest['ng-add'].save;
+      collectionName = manifest.name;
 
-        return 1;
+      if (await this.hasMismatchedPeer(manifest)) {
+        this.logger.warn(
+          'Package has unmet peer dependencies. Adding the package may not succeed.',
+        );
       }
+    } catch (e) {
+      this.logger.error('Unable to fetch package manifest: ' + e.message);
+
+      return 1;
     }
 
-    await npmInstall(packageIdentifier.raw, this.logger, packageManager, this.workspace.root);
+    await npmInstall(packageIdentifier.raw, this.logger, packageManager, dependencyType);
 
-    return this.executeSchematic(collectionName, options['--']);
+    const schematicResult = await this.executeSchematic(collectionName, options['--']);
+
+    if (dependencyType === false) {
+      // Uninstall the package if it was not meant to be retained.
+      return npmUninstall(packageIdentifier.raw, this.logger, packageManager);
+    }
+
+    return schematicResult;
   }
 
   async reportAnalytics(

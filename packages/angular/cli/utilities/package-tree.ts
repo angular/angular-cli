@@ -5,6 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
+
+import { NgAddSaveDepedency } from './package-metadata';
+
 export interface PackageTreeNodeBase {
   name: string;
   path: string;
@@ -21,6 +25,9 @@ export interface PackageTreeNodeBase {
     optionalDependencies?: Record<string, string>;
     'ng-update'?: {
       migrations?: string;
+    };
+    'ng-add'?: {
+      save?: NgAddSaveDepedency;
     };
   };
   parent?: PackageTreeNode;
