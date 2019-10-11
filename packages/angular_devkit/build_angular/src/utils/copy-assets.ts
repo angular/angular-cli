@@ -30,6 +30,7 @@ export async function copyAssets(
       cwd,
       dot: true,
       ignore: entry.ignore ? defaultIgnore.concat(entry.ignore) : defaultIgnore,
+      nodir: true,
     });
 
     for (const file of files) {
@@ -43,8 +44,7 @@ export async function copyAssets(
         const dest = path.join(base, entry.output, filePath);
         const dir = path.dirname(dest);
         if (!fs.existsSync(dir)) {
-          // tslint:disable-next-line: no-any
-          fs.mkdirSync(dir, { recursive: true } as any);
+          fs.mkdirSync(dir, { recursive: true });
         }
         copyFile(src, dest);
       }
