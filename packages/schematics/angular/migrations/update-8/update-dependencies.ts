@@ -12,7 +12,7 @@ import { latestVersions } from '../../utility/latest-versions';
 export function updateDependencies() {
   return (host: Tree) => {
     const dependenciesToUpdate: Record<string, string> = {
-      '@angular/pwa': latestVersions.AngularPWA,
+      '@angular/pwa': '^0.803.9',
       '@angular-devkit/build-angular': latestVersions.DevkitBuildAngular,
       '@angular-devkit/build-ng-packagr': latestVersions.DevkitBuildNgPackagr,
       '@angular-devkit/build-webpack': latestVersions.DevkitBuildWebpack,

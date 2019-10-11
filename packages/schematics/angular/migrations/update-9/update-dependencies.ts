@@ -6,13 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Rule } from '@angular-devkit/schematics';
-import { addPackageJsonDependency, getPackageJsonDependency } from '../../utility/dependencies';
+import {
+  addPackageJsonDependency,
+  getPackageJsonDependency,
+  removePackageJsonDependency,
+} from '../../utility/dependencies';
 import { latestVersions } from '../../utility/latest-versions';
 
 export function updateDependencies(): Rule {
   return host => {
     const dependenciesToUpdate: Record<string, string> = {
-      '@angular/pwa': latestVersions.AngularPWA,
       '@angular-devkit/build-angular': latestVersions.DevkitBuildAngular,
       '@angular-devkit/build-ng-packagr': latestVersions.DevkitBuildNgPackagr,
       '@angular-devkit/build-webpack': latestVersions.DevkitBuildWebpack,
@@ -35,5 +38,8 @@ export function updateDependencies(): Rule {
         overwrite: true,
       });
     }
+
+    // `@angular/pwa` package is only needed when running `ng-add`.
+    removePackageJsonDependency(host, '@angular/pwa');
   };
 }
