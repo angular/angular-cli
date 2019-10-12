@@ -262,8 +262,8 @@ export function useCIChrome(projectDir: string) {
     .then(() => {
       if (fs.existsSync(protractorConf)) {
         return replaceInFile(protractorConf,
-          `'browserName': 'chrome'`,
-          `'browserName': 'chrome',
+          `browserName: 'chrome'`,
+          `browserName: 'chrome',
           chromeOptions: {
             args: ['--headless'],
             binary: require('puppeteer').executablePath()
@@ -279,11 +279,11 @@ export function useCIChrome(projectDir: string) {
           .then(() => replaceInFile(karmaConf,
             `browsers: ['Chrome']`,
             `browsers: ['Chrome'],
-          customLaunchers: {
-            ChromeHeadlessCI: {
-              base: 'ChromeHeadless',
+            customLaunchers: {
+              ChromeHeadlessCI: {
+                base: 'ChromeHeadless',
+              }
             }
-          }
         `));
       }
     });
