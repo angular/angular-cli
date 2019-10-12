@@ -10,11 +10,8 @@ import { getSystemPath, json, normalize, resolve } from '@angular-devkit/core';
 import { Observable, from, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
-import { ArchitectPlugin } from '../plugins/architect';
 import { EmittedFiles, getEmittedFiles } from '../utils';
 import { Schema as RealWebpackBuilderSchema } from './schema';
-
-const webpackMerge = require('webpack-merge');
 
 export type WebpackBuilderSchema = json.JsonObject & RealWebpackBuilderSchema;
 
@@ -41,12 +38,6 @@ export function runWebpack(
   const createWebpack = options.webpackFactory || (config => of(webpack(config)));
   const log: WebpackLoggingCallback = options.logging
     || ((stats, config) => context.logger.info(stats.toString(config.stats)));
-
-  config = webpackMerge(config, {
-    plugins: [
-      new ArchitectPlugin(context),
-    ],
-  });
 
   return createWebpack(config).pipe(
     switchMap(webpackCompiler => new Observable<BuildResult>(obs => {
