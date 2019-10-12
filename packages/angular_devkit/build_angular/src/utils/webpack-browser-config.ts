@@ -106,6 +106,8 @@ export async function generateWebpackConfig(
     } else if (differentialLoading && !fullDifferential) {
       buildOptions = {
         ...options,
+        // Under downlevel differential loading we copy the assets outside of webpack.
+        assets: [],
         esVersionInFileName: true,
         scriptTargetOverride: ts.ScriptTarget.ES5,
         es5BrowserSupport: undefined,

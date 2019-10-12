@@ -40,8 +40,6 @@ const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
-// tslint:disable-next-line:no-any
-const g: any = typeof global !== 'undefined' ? global : {};
 
 // tslint:disable-next-line:no-big-function
 export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
@@ -242,10 +240,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   // process asset entries
-  if (
-    buildOptions.assets &&
-    (fullDifferential || buildOptions.watch || !differentialLoadingNeeded)
-  ) {
+  if (buildOptions.assets.length) {
     const copyWebpackPluginPatterns = buildOptions.assets.map((asset: AssetPatternClass) => {
       // Resolve input paths relative to workspace root and add slash at the end.
       asset.input = path.resolve(root, asset.input).replace(/\\/g, '/');

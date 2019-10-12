@@ -13,17 +13,14 @@ import {
   runWebpack,
 } from '@angular-devkit/build-webpack';
 import {
-  getSystemPath,
   join,
   json,
   logging,
   normalize,
-  resolve,
   tags,
   virtualFs,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import { createHash } from 'crypto';
 import * as findCacheDirectory from 'find-cache-dir';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -81,9 +78,7 @@ import {
 import { BundleActionExecutor } from './action-executor';
 import { Schema as BrowserBuilderSchema } from './schema';
 
-const cacache = require('cacache');
 const cacheDownlevelPath = findCacheDirectory({ name: 'angular-build-dl' });
-const packageVersion = require('../../package.json').version;
 
 export type BrowserBuilderOutput = json.JsonObject &
   BuilderOutput & {
