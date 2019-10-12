@@ -12,13 +12,9 @@ import { Observable, from, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
-import { ArchitectPlugin } from '../plugins/architect';
 import { getEmittedFiles } from '../utils';
 import { BuildResult, WebpackFactory, WebpackLoggingCallback } from '../webpack';
 import { Schema as WebpackDevServerBuilderSchema } from './schema';
-
-const webpackMerge = require('webpack-merge');
-
 
 export type DevServerBuildOutput = BuildResult & {
   port: number;
@@ -38,12 +34,6 @@ export function runWebpackDevServer(
   const createWebpack = options.webpackFactory || (config => of(webpack(config)));
   const log: WebpackLoggingCallback = options.logging
     || ((stats, config) => context.logger.info(stats.toString(config.stats)));
-
-  config = webpackMerge(config, {
-    plugins: [
-      new ArchitectPlugin(context),
-    ],
-  });
 
   const devServerConfig = options.devServerConfig || config.devServer || {};
   if (devServerConfig.stats) {
