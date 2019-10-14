@@ -63,6 +63,18 @@ async function execute(options: ExtractI18nBuilderOptions, context: BuilderConte
     options.format = options.i18nFormat;
   }
 
+  switch (options.format) {
+    case Format.Xlf:
+    case Format.Xlif:
+    case Format.Xliff:
+      options.format = Format.Xlf;
+      break;
+    case Format.Xlf2:
+    case Format.Xliff2:
+      options.format = Format.Xlf2;
+      break;
+  }
+
   // We need to determine the outFile name so that AngularCompiler can retrieve it.
   let outFile = options.outFile || getI18nOutfile(options.format);
   if (options.outputPath) {
