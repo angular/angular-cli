@@ -551,6 +551,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
 
   checkCleanGit() {
     try {
+      const topLevel = execSync('git rev-parse --show-toplevel', { encoding: 'utf8', stdio: 'pipe' });
       const result = execSync('git status --porcelain', { encoding: 'utf8', stdio: 'pipe' });
       if (result.trim().length === 0) {
         return true;
@@ -560,7 +561,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       for (const entry of result.split('\n')) {
         const relativeEntry = path.relative(
           path.resolve(this.workspace.root),
-          path.resolve(entry.slice(3).trim()),
+          path.resolve(topLevel.trim(), entry.slice(3).trim()),
         );
 
         if (!relativeEntry.startsWith('..') && !path.isAbsolute(relativeEntry)) {
