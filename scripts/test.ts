@@ -95,7 +95,7 @@ export default function(args: ParsedArgs, logger: logging.Logger) {
   } else if (args.shard !== undefined) {
     // CI is really flaky with NGCC
     // This is a working around test order and isolation issues.
-    execSync('./node_modules/.bin/ivy-ngcc', { stdio: 'inherit' });
+    execSync('./node_modules/.bin/ngcc', { stdio: 'inherit' });
   }
 
   if (args.large) {
