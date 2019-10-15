@@ -12,7 +12,8 @@
   "peerDependencies": {
     "@angular/common": "NG_VERSION",
     "@angular/core": "NG_VERSION",
-    "@angular/platform-server": "NG_VERSION"
+    "@angular/platform-server": "NG_VERSION",
+    "tslib": "TSLIB_VERSION"
   },
   "ng-update": {
     "packageGroup": "NG_UPDATE_PACKAGE_GROUP"

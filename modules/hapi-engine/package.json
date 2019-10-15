@@ -12,7 +12,8 @@
     "@angular/common": "NG_VERSION",
     "@angular/core": "NG_VERSION",
     "@angular/platform-server": "NG_VERSION",
-    "hapi": "HAPI_VERSION"
+    "hapi": "HAPI_VERSION",
+    "tslib": "TSLIB_VERSION"
   },
   "dependencies": {
     "@nguniversal/common": "0.0.0-PLACEHOLDER"

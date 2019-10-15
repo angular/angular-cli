@@ -19,7 +19,8 @@
   "peerDependencies": {
     "@angular/common": "NG_VERSION",
     "@angular/core": "NG_VERSION",
-    "rxjs": "RXJS_VERSION"
+    "rxjs": "RXJS_VERSION",
+    "tslib": "TSLIB_VERSION"
   },
   "ng-update": {
     "packageGroup": "NG_UPDATE_PACKAGE_GROUP"
