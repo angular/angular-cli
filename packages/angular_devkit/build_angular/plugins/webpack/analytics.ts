@@ -164,7 +164,7 @@ export class NgBuildAnalyticsPlugin {
 
       // Check whether this is an Ivy app so that it can reported as part of analytics.
       if (!this._stats.isIvy) {
-        if (numIvyComponents > 0 || module._source.source().includes('ngModuleDef')) {
+        if (numIvyComponents > 0 || module._source.source().includes('ɵmod')) {
           this._stats.isIvy = true;
         }
       }
