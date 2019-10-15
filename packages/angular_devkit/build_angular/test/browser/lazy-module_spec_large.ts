@@ -80,7 +80,7 @@ describe('Browser Builder lazy modules', () => {
         if (!veEnabled) {
           const data = await files['lazy-lazy-module.js'];
           expect(data).not.toBeUndefined('Lazy module output bundle does not exist');
-          expect(data).toContain('LazyModule.ngModuleDef');
+          expect(data).toContain('LazyModule.ɵmod');
         } else {
           expect(files['lazy-lazy-module-ngfactory.js']).not.toBeUndefined();
         }
@@ -270,7 +270,7 @@ describe('Browser Builder lazy modules', () => {
     if (!veEnabled) {
       const data = await files['src-app-lazy-lazy-module.js'];
       expect(data).not.toBeUndefined('Lazy module output bundle does not exist');
-      expect(data).toContain('LazyModule.ngModuleDef');
+      expect(data).toContain('LazyModule.ɵmod');
     } else {
       expect(files['src-app-lazy-lazy-module-ngfactory.js']).not.toBeUndefined();
     }

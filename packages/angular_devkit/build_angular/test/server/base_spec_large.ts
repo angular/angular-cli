@@ -37,7 +37,7 @@ describe('Server Builder', () => {
     if (veEnabled) {
       expect(content).toMatch(/AppServerModuleNgFactory/);
     } else {
-      expect(content).toMatch(/AppServerModule\.ngModuleDef/);
+      expect(content).toMatch(/AppServerModule\.ɵmod/);
     }
 
     await run.stop();
@@ -148,7 +148,7 @@ describe('Server Builder', () => {
         if (veEnabled) {
           expect(content).toMatch(/AppServerModuleNgFactory/);
         } else {
-          expect(content).toMatch(/AppServerModule\.ngModuleDef/);
+          expect(content).toMatch(/AppServerModule\.ɵmod/);
         }
       }),
       take(1),

@@ -124,7 +124,7 @@ describe('wrap enums and classes transformer', () => {
         class ApplicationModule {
             constructor(appRef) { }
         }
-        ApplicationModule.ngModuleDef = ɵɵdefineNgModule({ type: ApplicationModule });
+        ApplicationModule.ɵmod = ɵɵdefineNgModule({ type: ApplicationModule });
         /*@__PURE__*/ setClassMetadata(ApplicationModule, [{
                 type: NgModule,
                 args: [{ providers: APPLICATION_MODULE_PROVIDERS }]
@@ -148,7 +148,7 @@ describe('wrap enums and classes transformer', () => {
     it('with nested static properties in IIFE', () => {
       const input = tags.stripIndent`
         class CommonModule { }
-        CommonModule.ngModuleDef = defineNgModule({
+        CommonModule.ɵmod = defineNgModule({
             type: CommonModule
         }), CommonModule.ngInjectorDef = defineInjector({
             factory: function (t) {
