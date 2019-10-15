@@ -59,24 +59,30 @@ function addDependencies(options: UniversalOptions): Rule {
   };
 }
 
-export default function (options: UniversalOptions): Rule {
-  return async (host: Tree) => {
+function addServerFile(options: UniversalOptions): Rule {
+  return async host => {
     const clientProject = await getProject(host, options.clientProject);
     const browserDistDirectory = await getOutputPath(host, options.clientProject, 'build');
 
-    const rootSource = apply(url('./files'), [
-      template({
-        ...strings,
-        ...options,
-        stripTsExtension,
-        browserDistDirectory,
-      }),
-      move(clientProject.root)
-    ]);
+    return mergeWith(
+        apply(url('./files'), [
+        template({
+          ...strings,
+          ...options,
+          stripTsExtension,
+          browserDistDirectory,
+        }),
+        move(clientProject.root)
+      ])
+    );
+  };
+}
 
+export default function (options: UniversalOptions): Rule {
+  return () => {
     return chain([
-      mergeWith(rootSource),
       addUniversalCommonRule(options),
+      addServerFile(options),
       addDependencies(options),
     ]);
   };

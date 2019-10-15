@@ -72,4 +72,14 @@ describe('Universal Schematic', () => {
     const content = tree.readContent('/projects/test-app/server.ts');
     expect(content).toContain(`export * from './src/main.server'`);
   });
+
+  it(`should add correct value to 'distFolder'`, async () => {
+    const tree = await schematicRunner
+      .runSchematicAsync('ng-add', defaultOptions, appTree)
+      .toPromise();
+
+    const content = tree.readContent('/projects/test-app/server.ts');
+    expect(content)
+      .toContain(`const distFolder = join(process.cwd(), 'dist/test-app/browser');`);
+  });
 });
