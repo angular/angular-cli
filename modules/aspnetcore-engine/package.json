@@ -16,6 +16,9 @@
     "ssr",
     "universal"
   ],
+  "engines": {
+    "node": ">=10.13.0 <13.0.0"
+  },
   "peerDependencies": {
     "@angular/common": "NG_VERSION",
     "@angular/core": "NG_VERSION",

@@ -17,7 +17,7 @@
     "engine-strict": true
   },
   "engines": {
-    "node": ">= 8.9.x"
+    "node": ">=10.13.0 <13.0.0"
   },
   "scripts": {
     "postinstall": "ngc -p ./angular-metadata.tsconfig.json",
