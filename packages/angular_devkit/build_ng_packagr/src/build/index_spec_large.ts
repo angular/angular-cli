@@ -66,9 +66,9 @@ describe('NgPackagr Builder', () => {
     expect(content).toContain('lib works');
 
     if (veEnabled) {
-      expect(content).not.toContain('ngComponentDef');
+      expect(content).not.toContain('ɵcmp');
     } else {
-      expect(content).toContain('ngComponentDef');
+      expect(content).toContain('ɵcmp');
     }
   });
 

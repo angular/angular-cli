@@ -41,7 +41,7 @@ export default async function() {
     const mainUrl = mainUrlMatch && mainUrlMatch[1];
     const main = await request('http://localhost:4200/' + mainUrl);
 
-    if (main.match(/ngComponentDef\s*=/)) {
+    if (main.match(/ɵcmp\s*=/)) {
       throw new Error('Loaded Ivy but expected View Engine applicatiom.');
     }
 
