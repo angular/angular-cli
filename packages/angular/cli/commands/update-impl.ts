@@ -59,7 +59,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     options = {},
   ): Promise<{ success: boolean; files: Set<string> }> {
     let error = false;
-    const logs: string[] = [];
+    let logs: string[] = [];
     const files = new Set<string>();
 
     const reporterSubscription = this.workflow.reporter.subscribe(event => {
@@ -96,6 +96,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         if (!error) {
           // Output the logging queue, no error happened.
           logs.forEach(log => this.logger.info(log));
+          logs = [];
         }
       }
     });
