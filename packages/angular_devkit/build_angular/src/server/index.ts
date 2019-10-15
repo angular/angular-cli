@@ -106,5 +106,5 @@ async function buildServerWebpackConfig(
     ],
   );
 
-  return config[0];
+  return config;
 }

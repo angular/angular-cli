@@ -86,9 +86,6 @@ export interface BuildOptions {
   /* Append script target version to filename. */
   esVersionInFileName?: boolean;
 
-  /* When specified it will be used instead of the script target in the tsconfig.json. */
-  scriptTargetOverride?: ScriptTarget;
-
   experimentalRollupPass?: boolean;
 }
 
@@ -106,4 +103,5 @@ export interface WebpackConfigOptions<T = BuildOptions> {
   tsConfig: ParsedConfiguration;
   tsConfigPath: string;
   supportES2015: boolean;
+  differentialLoadingMode?: boolean;
 }

@@ -10,12 +10,6 @@ import * as browserslist from 'browserslist';
 import { feature, features } from 'caniuse-lite';
 import * as ts from 'typescript';
 
-const fullDifferentialEnv = process.env['NG_BUILD_DIFFERENTIAL_FULL'];
-export const fullDifferential =
-  fullDifferentialEnv !== undefined &&
-  fullDifferentialEnv !== '0' &&
-  fullDifferentialEnv.toLowerCase() !== 'false';
-
 export class BuildBrowserFeatures {
   private readonly _supportedBrowsers: string[];
   private readonly _es6TargetOrLater: boolean;

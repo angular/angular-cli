@@ -15,7 +15,6 @@ import {
   NgToolsLoader,
   PLATFORM
 } from '@ngtools/webpack';
-import { fullDifferential } from '../../../utils';
 import { WebpackConfigOptions, BuildOptions } from '../build-options';
 
 function _pluginOptionsOverrides(
@@ -31,10 +30,6 @@ function _pluginOptionsOverrides(
     for (const replacement of buildOptions.fileReplacements) {
       hostReplacementPaths[replacement.replace] = replacement.with;
     }
-  }
-
-  if (fullDifferential && buildOptions.scriptTargetOverride) {
-    compilerOptions.target = buildOptions.scriptTargetOverride;
   }
 
   if (buildOptions.preserveSymlinks) {

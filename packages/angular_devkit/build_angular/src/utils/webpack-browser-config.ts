@@ -24,7 +24,6 @@ import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import {
   NormalizedBrowserBuilderSchema,
   defaultProgress,
-  fullDifferential,
   normalizeBrowserSchema,
 } from '../utils';
 import { BuildBrowserFeatures } from './build-browser-features';
@@ -42,7 +41,7 @@ export async function generateWebpackConfig(
   options: NormalizedBrowserBuilderSchema,
   webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[],
   logger: logging.LoggerApi,
-): Promise<webpack.Configuration[]> {
+): Promise<webpack.Configuration> {
   // Ensure Build Optimizer is only used with AOT.
   if (options.buildOptimizer && !options.aot) {
     throw new Error(`The 'buildOptimizer' option cannot be used without 'aot'.`);
@@ -75,90 +74,63 @@ export async function generateWebpackConfig(
     !options.watch &&
     buildBrowserFeatures.isDifferentialLoadingNeeded();
 
-  const scriptTargets = [scriptTarget];
-
-  if (differentialLoading && fullDifferential) {
-    scriptTargets.push(ts.ScriptTarget.ES5);
+  let buildOptions: NormalizedBrowserBuilderSchema = { ...options };
+  if (differentialLoading) {
+    buildOptions = {
+      ...options,
+      // Under downlevel differential loading we copy the assets outside of webpack.
+      assets: [],
+      esVersionInFileName: true,
+      es5BrowserSupport: undefined,
+    };
   }
 
-  // For differential loading, we can have several targets
-  return scriptTargets.map(scriptTarget => {
-    let buildOptions: NormalizedBrowserBuilderSchema = { ...options };
-    const supportES2015 =
-      scriptTarget !== ts.ScriptTarget.ES3 && scriptTarget !== ts.ScriptTarget.ES5;
+  const supportES2015 = scriptTarget !== ts.ScriptTarget.JSON && scriptTarget > ts.ScriptTarget.ES5;
+  const wco: BrowserWebpackConfigOptions = {
+    root: workspaceRoot,
+    logger: logger.createChild('webpackConfigOptions'),
+    projectRoot,
+    sourceRoot,
+    buildOptions,
+    tsConfig,
+    tsConfigPath,
+    supportES2015,
+    differentialLoadingMode: differentialLoading,
+  };
 
-    if (differentialLoading && fullDifferential) {
-      buildOptions = {
-        ...options,
-        ...// FIXME: we do create better webpack config composition to achieve the below
-        // When DL is enabled and supportES2015 is true it means that we are on the second build
-        // This also means that we don't need to include styles and assets multiple times
-        (supportES2015
-          ? {}
-          : {
-              styles: options.extractCss ? [] : options.styles,
-              assets: [],
-            }),
-        es5BrowserSupport: undefined,
-        esVersionInFileName: true,
-        scriptTargetOverride: scriptTarget,
-      };
-    } else if (differentialLoading && !fullDifferential) {
-      buildOptions = {
-        ...options,
-        // Under downlevel differential loading we copy the assets outside of webpack.
-        assets: [],
-        esVersionInFileName: true,
-        scriptTargetOverride: ts.ScriptTarget.ES5,
-        es5BrowserSupport: undefined,
-      };
+  wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);
+
+  const partials = webpackPartialGenerator(wco);
+  const webpackConfig = webpackMerge(partials) as webpack.Configuration;
+
+  if (supportES2015) {
+    if (!webpackConfig.resolve) {
+      webpackConfig.resolve = {};
     }
-
-    const wco: BrowserWebpackConfigOptions = {
-      root: workspaceRoot,
-      logger: logger.createChild('webpackConfigOptions'),
-      projectRoot,
-      sourceRoot,
-      buildOptions,
-      tsConfig,
-      tsConfigPath,
-      supportES2015,
-    };
-
-    wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);
-
-    const partials = webpackPartialGenerator(wco);
-    const webpackConfig = webpackMerge(partials) as webpack.Configuration;
-
-    if (supportES2015) {
-      if (!webpackConfig.resolve) {
-        webpackConfig.resolve = {};
-      }
-      if (!webpackConfig.resolve.alias) {
-        webpackConfig.resolve.alias = {};
-      }
-      webpackConfig.resolve.alias['zone.js/dist/zone'] = 'zone.js/dist/zone-evergreen';
+    if (!webpackConfig.resolve.alias) {
+      webpackConfig.resolve.alias = {};
     }
+    webpackConfig.resolve.alias['zone.js/dist/zone'] = 'zone.js/dist/zone-evergreen';
+  }
 
-    if (options.profile || process.env['NG_BUILD_PROFILING']) {
-      const esVersionInFileName = getEsVersionForFileName(
-        fullDifferential ? buildOptions.scriptTargetOverride : tsConfig.options.target,
-        wco.buildOptions.esVersionInFileName,
-      );
+  if (options.profile || process.env['NG_BUILD_PROFILING']) {
+    const esVersionInFileName = getEsVersionForFileName(
+      tsConfig.options.target,
+      wco.buildOptions.esVersionInFileName,
+    );
 
-      const smp = new SpeedMeasurePlugin({
-        outputFormat: 'json',
-        outputTarget: path.resolve(
-          workspaceRoot,
-          `speed-measure-plugin${esVersionInFileName}.json`,
-        ),
-      });
+    const smp = new SpeedMeasurePlugin({
+      outputFormat: 'json',
+      outputTarget: path.resolve(
+        workspaceRoot,
+        `speed-measure-plugin${esVersionInFileName}.json`,
+      ),
+    });
 
-      return smp.wrap(webpackConfig);
-    }
+    return smp.wrap(webpackConfig);
+  }
 
-    return webpackConfig;
-  });
+  return webpackConfig;
 }
 
 export async function generateBrowserWebpackConfigFromContext(
@@ -166,7 +138,7 @@ export async function generateBrowserWebpackConfigFromContext(
   context: BuilderContext,
   webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[],
   host: virtualFs.Host<fs.Stats> = new NodeJsSyncHost(),
-): Promise<{ config: webpack.Configuration[]; projectRoot: string; projectSourceRoot?: string }> {
+): Promise<{ config: webpack.Configuration; projectRoot: string; projectSourceRoot?: string }> {
   const projectName = context.target && context.target.project;
   if (!projectName) {
     throw new Error('The builder requires a target.');

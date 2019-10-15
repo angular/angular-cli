@@ -126,7 +126,7 @@ export function serveWebpackBrowser(
     );
 
     // No differential loading for dev-server, hence there is just one config
-    let webpackConfig = webpackConfigResult.config[0];
+    let webpackConfig = webpackConfigResult.config;
 
     const port = await checkPort(options.port || 0, options.host || 'localhost', 4200);
     const webpackDevServerConfig = (webpackConfig.devServer = buildServerConfig(
