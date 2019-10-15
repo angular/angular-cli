@@ -32,7 +32,7 @@ describe('Browser Builder AOT', () => {
     const fileName = join(normalize(output.outputPath), 'main.js');
     const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
     if (!veEnabled) {
-      expect(content).toContain('AppComponent.ngComponentDef');
+      expect(content).toContain('AppComponent.ɵcmp');
     } else {
       expect(content).toMatch(/platformBrowser.*bootstrapModuleFactory.*AppModuleNgFactory/);
     }
