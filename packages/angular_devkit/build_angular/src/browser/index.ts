@@ -7,7 +7,6 @@
  */
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import {
-  BuildResult,
   EmittedFiles,
   WebpackLoggingCallback,
   runWebpack,
@@ -25,7 +24,7 @@ import * as findCacheDirectory from 'find-cache-dir';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Observable, from, of } from 'rxjs';
-import { bufferCount, catchError, concatMap, map, mergeScan, switchMap } from 'rxjs/operators';
+import { catchError, concatMap, map, switchMap } from 'rxjs/operators';
 import { ScriptTarget } from 'typescript';
 import * as webpack from 'webpack';
 import { NgBuildAnalyticsPlugin } from '../../plugins/webpack/analytics';
@@ -57,7 +56,6 @@ import { ExecutionTransformer } from '../transforms';
 import {
   BuildBrowserFeatures,
   deleteOutputDir,
-  fullDifferential,
   normalizeAssetPatterns,
   normalizeOptimization,
   normalizeSourceMaps,
@@ -111,7 +109,7 @@ export async function buildBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,
   context: BuilderContext,
   host: virtualFs.Host<fs.Stats> = new NodeJsSyncHost(),
-): Promise<{ config: webpack.Configuration[]; projectRoot: string; projectSourceRoot?: string }> {
+): Promise<{ config: webpack.Configuration; projectRoot: string; projectSourceRoot?: string }> {
   return generateBrowserWebpackConfigFromContext(
     options,
     context,
@@ -164,7 +162,7 @@ async function initialize(
   host: virtualFs.Host<fs.Stats>,
   webpackConfigurationTransform?: ExecutionTransformer<webpack.Configuration>,
 ): Promise<{
-  config: webpack.Configuration[];
+  config: webpack.Configuration;
   projectRoot: string;
   projectSourceRoot?: string;
   i18n: I18nOptions;
@@ -182,10 +180,7 @@ async function initialize(
 
   let transformedConfig;
   if (webpackConfigurationTransform) {
-    transformedConfig = [];
-    for (const c of config) {
-      transformedConfig.push(await webpackConfigurationTransform(c));
-    }
+    transformedConfig = await webpackConfigurationTransform(config);
   }
 
   if (options.deleteOutputPath) {
@@ -218,7 +213,7 @@ export function buildWebpackBrowser(
 
   return from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
     // tslint:disable-next-line: no-big-function
-    switchMap(({ config: configs, projectRoot, projectSourceRoot, i18n }) => {
+    switchMap(({ config, projectRoot, projectSourceRoot, i18n }) => {
       const tsConfig = readTsconfig(options.tsConfig, context.workspaceRoot);
       const target = tsConfig.options.target || ScriptTarget.ES5;
       const buildBrowserFeatures = new BuildBrowserFeatures(projectRoot, target);
@@ -233,40 +228,23 @@ export function buildWebpackBrowser(
         `);
       }
 
-      const useBundleDownleveling =
-        isDifferentialLoadingNeeded && !(fullDifferential || options.watch);
+      const useBundleDownleveling = isDifferentialLoadingNeeded && !options.watch;
       const startTime = Date.now();
 
-      return from(configs).pipe(
-        // the concurrency parameter (3rd parameter of mergeScan) is deliberately
-        // set to 1 to make sure the build steps are executed in sequence.
-        mergeScan(
-          (lastResult, config) => {
-            // Make sure to only run the 2nd build step, if 1st one succeeded
-            if (lastResult.success) {
-              return runWebpack(config, context, {
-                logging:
-                  transforms.logging ||
-                  (useBundleDownleveling
-                    ? () => {}
-                    : createBrowserLoggingCallback(!!options.verbose, context.logger)),
-              });
-            } else {
-              return of();
-            }
-          },
-          { success: true } as BuildResult,
-          1,
-        ),
-        bufferCount(configs.length),
+      return runWebpack(config, context, {
+        logging:
+          transforms.logging ||
+          (useBundleDownleveling
+            ? () => {}
+            : createBrowserLoggingCallback(!!options.verbose, context.logger)),
+      }).pipe(
         // tslint:disable-next-line: no-big-function
-        switchMap(async buildEvents => {
-          configs.length = 0;
-          const success = buildEvents.every(r => r.success);
+        concatMap(async buildEvent => {
+          const { webpackStats, success, emittedFiles = [] } = buildEvent;
+
           if (!success && useBundleDownleveling) {
             // If using bundle downleveling then there is only one build
             // If it fails show any diagnostic messages and bail
-            const webpackStats = buildEvents[0].webpackStats;
             if (webpackStats && webpackStats.warnings.length > 0) {
               context.logger.warn(statsWarningsToString(webpackStats, { colors: true }));
             }
@@ -285,18 +263,12 @@ export function buildWebpackBrowser(
               'scripts',
             ).map(x => x.bundleName);
 
-            const [firstBuild, secondBuild] = buildEvents;
-            if (isDifferentialLoadingNeeded && (fullDifferential || options.watch)) {
-              moduleFiles = firstBuild.emittedFiles || [];
+            if (isDifferentialLoadingNeeded && options.watch) {
+              moduleFiles = emittedFiles;
               files = moduleFiles.filter(
                 x => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)),
               );
-
-              if (buildEvents.length === 2) {
-                noModuleFiles = secondBuild.emittedFiles;
-              }
-            } else if (isDifferentialLoadingNeeded && !fullDifferential) {
-              const { emittedFiles = [], webpackStats } = firstBuild;
+            } else if (isDifferentialLoadingNeeded) {
               moduleFiles = [];
               noModuleFiles = [];
 
@@ -526,7 +498,6 @@ export function buildWebpackBrowser(
                 context.logger.error(statsErrorsToString(webpackStats, { colors: true }));
               }
             } else {
-              const { emittedFiles = [] } = firstBuild;
               files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
               noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
             }

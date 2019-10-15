@@ -61,7 +61,7 @@ async function initialize(
 
   return [
     karma,
-    webpackConfigurationTransformer ? await webpackConfigurationTransformer(config[0]) : config[0],
+    webpackConfigurationTransformer ? await webpackConfigurationTransformer(config) : config,
   ];
 }
 
