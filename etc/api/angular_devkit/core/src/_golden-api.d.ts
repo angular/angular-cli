@@ -689,7 +689,7 @@ export declare function parseJsonPointer(pointer: JsonPointer): string[];
 export declare class PartiallyOrderedSet<T> implements Set<T> {
     readonly [Symbol.toStringTag]: 'Set';
     readonly size: number;
-    [Symbol.iterator](): IterableIterator<T>;
+    [Symbol.iterator](): Generator<T, void, unknown>;
     protected _checkCircularDependencies(item: T, deps: Set<T>): void;
     add(item: T, deps?: (Set<T> | T[])): this;
     clear(): void;

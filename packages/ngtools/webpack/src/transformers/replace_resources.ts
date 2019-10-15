@@ -39,8 +39,10 @@ export function replaceResources(
     };
 
     // emit helper for `import Name from "foo"`
-    const importDefaultHelper: ts.EmitHelper = {
+    // importName is marked as an internal property but is needed for the tslib import.
+    const importDefaultHelper: ts.UnscopedEmitHelper & { importName?: string; } = {
       name: 'typescript:commonjsimportdefault',
+      importName: '__importDefault',
       scoped: false,
       text: tags.stripIndent`
       var __importDefault = (this && this.__importDefault) || function (mod) {

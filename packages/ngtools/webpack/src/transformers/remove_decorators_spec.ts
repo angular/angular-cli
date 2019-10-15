@@ -57,14 +57,14 @@ describe('@ngtools/webpack transformers', () => {
         }
       `;
       const output = `
-        import * as tslib_1 from "tslib";
+        import { __decorate } from "tslib";
         import { Component } from 'another-lib';
         let AppComponent = class AppComponent {
             constructor() {
                 this.title = 'app';
             }
         };
-        AppComponent = tslib_1.__decorate([
+        AppComponent = __decorate([
             Component({
                 selector: 'app-root',
                 templateUrl: './app.component.html',
@@ -105,7 +105,7 @@ describe('@ngtools/webpack transformers', () => {
         }
       `;
       const output = tags.stripIndent`
-        import * as tslib_1 from "tslib";
+        import { __decorate } from "tslib";
         import { AnotherDecorator } from 'another-lib';
 
         export class AppComponent {
@@ -117,7 +117,7 @@ describe('@ngtools/webpack transformers', () => {
             console.log('run');
           }
         }
-        tslib_1.__decorate([
+        __decorate([
           AnotherDecorator()
         ], AppComponent.prototype, "onEscape", null);
       `;
@@ -148,7 +148,7 @@ describe('@ngtools/webpack transformers', () => {
         }
       `;
       const output = tags.stripIndent`
-        import * as tslib_1 from "tslib";
+        import { __decorate } from "tslib";
         import { AnotherDecorator } from 'another-lib';
 
         let AppComponent = class AppComponent {
@@ -156,7 +156,7 @@ describe('@ngtools/webpack transformers', () => {
               this.title = 'app';
           }
         };
-        AppComponent = tslib_1.__decorate([
+        AppComponent = __decorate([
           AnotherDecorator()
         ], AppComponent);
         export { AppComponent };
