@@ -7284,10 +7284,10 @@ neo-async@^2.5.0, neo-async@^2.6.0, neo-async@^2.6.1:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.1.tgz#ac27ada66167fa8849a6addd837f6b189ad2081c"
   integrity sha512-iyam8fBuCUpWeKPGpaNMetEocMt364qkCsfL9JuhjXX6dRnguRVOfk2GZaDpPjcOKiiXCPINZC1GczQ7iTq3Zw==
 
-ng-packagr@~5.6.0:
-  version "5.6.1"
-  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-5.6.1.tgz#c3664134d28289383a2bd95f09efa685432ffea6"
-  integrity sha512-Z7pOtjlWQe9eBGq6iDSWqBzpxq7IXO8tZssCZDv6v+6IvsgWVxbIndDr7g6IZyVJQriliCRjFQ70w3XoX4dSKw==
+ng-packagr@~5.7.0:
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-5.7.0.tgz#3a450d2264724a900dbf6270a8b4c5439eb1f236"
+  integrity sha512-/75eqAyk2ef8J0aMLl7XCx1QXmqUUTsQDu+fNCFDIYpkpWBh0C8Rkdd72hMLPv3MMo63pfaNeiMXa0zzpQINyA==
   dependencies:
     ajv "^6.10.2"
     autoprefixer "^9.6.0"
