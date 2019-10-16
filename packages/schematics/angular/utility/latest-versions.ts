@@ -8,17 +8,17 @@
 
 export const latestVersions = {
   // These versions should be kept up to date with latest Angular peer dependencies.
-  Angular: '~8.2.9',
+  Angular: '~8.2.11',
   RxJs: '~6.4.0',
   ZoneJs: '~0.9.1',
   TypeScript: '~3.5.3',
   TsLib: '^1.10.0',
 
   // The versions below must be manually updated when making a new devkit release.
-  DevkitBuildAngular: '~0.803.9',
-  DevkitBuildNgPackagr: '~0.803.9',
-  DevkitBuildWebpack: '~0.803.9',
-  AngularPWA: '~0.803.9',
+  DevkitBuildAngular: '~0.803.10',
+  DevkitBuildNgPackagr: '~0.803.10',
+  DevkitBuildWebpack: '~0.803.10',
+  AngularPWA: '~0.803.10',
 
   tsickle: '^0.37.0',
   ngPackagr: '^5.4.0',
