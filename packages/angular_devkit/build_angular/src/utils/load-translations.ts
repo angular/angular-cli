@@ -30,7 +30,7 @@ export async function createTranslationLoader(): Promise<TranslationLoader> {
 
     for (const [format, parser] of Object.entries(parsers)) {
       if (parser.canParse(path, content)) {
-        return { format, translation: parser.parse(path, content) };
+        return { format, translation: parser.parse(path, content).translations };
       }
     }
 

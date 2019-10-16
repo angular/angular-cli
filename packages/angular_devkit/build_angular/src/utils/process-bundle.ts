@@ -5,15 +5,18 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { transformAsync } from '@babel/core';
+import { NodePath, parseSync, transformAsync, traverse, types } from '@babel/core';
 import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import { minify } from 'terser';
+import * as v8 from 'v8';
+import { I18nOptions } from './i18n-options';
 import { manglingDisabled } from './mangle-options';
 
 const cacache = require('cacache');
+const deserialize = ((v8 as unknown) as { deserialize(buffer: Buffer): unknown }).deserialize;
 
 export interface ProcessBundleOptions {
   filename: string;
@@ -57,9 +60,14 @@ export const enum CacheKey {
 }
 
 let cachePath: string | undefined;
+let i18n: I18nOptions | undefined;
 
-export function setup(options: { cachePath: string }): void {
+export function setup(data: number[] | { cachePath: string; i18n: I18nOptions }): void {
+  const options = Array.isArray(data)
+    ? (deserialize(Buffer.from(data)) as { cachePath: string; i18n: I18nOptions })
+    : data;
   cachePath = options.cachePath;
+  i18n = options.i18n;
 }
 
 async function cachePut(content: string, key: string | null, integrity?: string): Promise<void> {
@@ -433,4 +441,132 @@ async function processRuntime(
   fs.writeFileSync(downlevelFilePath, downlevelCode);
 
   return result;
+}
+
+export interface InlineOptions {
+  filename: string;
+  code: string;
+  es5: boolean;
+  outputPath: string;
+  missingTranslation?: 'warning' | 'error' | 'ignore';
+}
+
+interface LocalizePosition {
+  start: number;
+  end: number;
+  messageParts: TemplateStringsArray;
+  expressions: types.Expression[];
+}
+
+const localizeName = '$localize';
+
+export async function inlineLocales(options: InlineOptions) {
+  if (!i18n || i18n.inlineLocales.size === 0) {
+    return { file: options.filename, diagnostics: [], count: 0 };
+  }
+
+  if (!options.code.includes(localizeName)) {
+    for (const locale of i18n.inlineLocales) {
+      fs.writeFileSync(path.join(options.outputPath, locale, options.filename), options.code);
+    }
+
+    return { file: options.filename, diagnostics: [], count: 0 };
+  }
+
+  const { default: MagicString } = await import('magic-string');
+  const { default: generate } = await import('@babel/generator');
+  const utils = await import(
+    // tslint:disable-next-line: trailing-comma
+    '@angular/localize/src/tools/src/translate/source_files/source_file_utils'
+  );
+  const localizeDiag = await import('@angular/localize/src/tools/src/diagnostics');
+
+  const diagnostics = new localizeDiag.Diagnostics();
+
+  const positions = findLocalizePositions(options, utils);
+  const content = new MagicString(options.code);
+
+  for (const locale of i18n.inlineLocales) {
+    const isSourceLocale = locale === i18n.sourceLocale;
+    // tslint:disable-next-line: no-any
+    const translations: any = isSourceLocale ? {} : i18n.locales[locale].translation || {};
+    for (const position of positions) {
+      const translated = utils.translate(
+        diagnostics,
+        translations,
+        position.messageParts,
+        position.expressions,
+        isSourceLocale ? 'ignore' : options.missingTranslation || 'warning',
+      );
+
+      const expression = utils.buildLocalizeReplacement(translated[0], translated[1]);
+      const { code } = generate(expression);
+
+      content.overwrite(position.start, position.end, code);
+    }
+
+    const output = content.toString();
+    fs.writeFileSync(path.join(options.outputPath, locale, options.filename), output);
+  }
+
+  return { file: options.filename, diagnostics: diagnostics.messages, count: positions.length };
+}
+
+function findLocalizePositions(
+  options: InlineOptions,
+  utils: typeof import('@angular/localize/src/tools/src/translate/source_files/source_file_utils'),
+): LocalizePosition[] {
+  const ast = parseSync(options.code, { babelrc: false });
+  if (!ast) {
+    throw new Error(`Unknown error occurred inlining file "${options.filename}"`);
+  }
+
+  const positions: LocalizePosition[] = [];
+
+  if (options.es5) {
+    traverse(ast, {
+      CallExpression(path: NodePath<types.CallExpression>) {
+        const callee = path.get('callee');
+        if (
+          callee.isIdentifier() &&
+          callee.node.name === localizeName
+        ) {
+          const messageParts = utils.unwrapMessagePartsFromLocalizeCall(path);
+          const expressions = utils.unwrapSubstitutionsFromLocalizeCall(path.node);
+          positions.push({
+            // tslint:disable-next-line: no-non-null-assertion
+            start: path.node.start!,
+            // tslint:disable-next-line: no-non-null-assertion
+            end: path.node.end!,
+            messageParts,
+            expressions,
+          });
+        }
+      },
+    });
+  } else {
+    const traverseFast = ((types as unknown) as {
+      traverseFast: (node: types.Node, enter: (node: types.Node) => void) => void;
+    }).traverseFast;
+
+    traverseFast(ast, node => {
+      if (
+        node.type === 'TaggedTemplateExpression' &&
+        types.isIdentifier(node.tag) &&
+        node.tag.name === localizeName
+      ) {
+        const messageParts = utils.unwrapMessagePartsFromTemplateLiteral(node.quasi.quasis);
+        positions.push({
+          // tslint:disable-next-line: no-non-null-assertion
+          start: node.start!,
+          // tslint:disable-next-line: no-non-null-assertion
+          end: node.end!,
+          messageParts,
+          expressions: node.quasi.expressions,
+        });
+      }
+    });
+  }
+
+  return positions;
 }
