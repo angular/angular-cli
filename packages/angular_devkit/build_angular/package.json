@@ -97,7 +97,7 @@
     "zone.js": "^0.10.0"
   },
   "peerDependencies": {
-    "@angular/compiler-cli": "^8.0.0-beta.0 || ^8.1.0-beta.0 || ^8.2.0-beta.0 || ^8.3.0-beta.0 || ^8.4.0-beta.0 || >=9.0.0-beta < 9",
-    "typescript": ">=3.1 < 3.7"
+    "@angular/compiler-cli": ">=9.0.0-beta < 10",
+    "typescript": ">=3.6 < 3.7"
   }
 }
