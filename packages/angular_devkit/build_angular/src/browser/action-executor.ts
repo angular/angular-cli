@@ -8,8 +8,24 @@
 import JestWorker from 'jest-worker';
 import * as os from 'os';
 import * as path from 'path';
-import { ProcessBundleOptions, ProcessBundleResult } from '../utils/process-bundle';
+import * as v8 from 'v8';
+import { InlineOptions, ProcessBundleOptions, ProcessBundleResult } from '../utils/process-bundle';
 import { BundleActionCache } from './action-cache';
+
+const hasThreadSupport = (() => {
+  try {
+    require('worker_threads');
+
+    return true;
+  } catch {
+    return false;
+  }
+})();
+
+// This is used to normalize serialization messaging across threads and processes
+// Threads use the structured clone algorithm which handles more types
+// Processes use JSON which is much more limited
+const serialize = ((v8 as unknown) as { serialize(value: unknown): Buffer }).serialize;
 
 let workerFile = require.resolve('../utils/process-bundle');
 workerFile =
@@ -41,8 +57,8 @@ export class BundleActionExecutor {
 
     // larger files are processed in a separate process to limit memory usage in the main process
     return (this.largeWorker = new JestWorker(workerFile, {
-      exposedMethods: ['process'],
-      setupArgs: [this.workerOptions],
+      exposedMethods: ['process', 'inlineLocales'],
+      setupArgs: [[...serialize(this.workerOptions)]],
     }));
   }
 
@@ -54,11 +70,10 @@ export class BundleActionExecutor {
     // small files are processed in a limited number of threads to improve speed
     // The limited number also prevents a large increase in memory usage for an otherwise short operation
     return (this.smallWorker = new JestWorker(workerFile, {
-      exposedMethods: ['process'],
-      setupArgs: [this.workerOptions],
+      exposedMethods: ['process', 'inlineLocales'],
+      setupArgs: hasThreadSupport ? [this.workerOptions] : [[...serialize(this.workerOptions)]],
       numWorkers: os.cpus().length < 2 ? 1 : 2,
-      // Will automatically fallback to processes if not supported
-      enableWorkerThreads: true,
+      enableWorkerThreads: hasThreadSupport,
     }));
   }
 
@@ -71,7 +86,7 @@ export class BundleActionExecutor {
     }
   }
 
-  async process(action: ProcessBundleOptions) {
+  async process(action: ProcessBundleOptions): Promise<ProcessBundleResult> {
     const cacheKeys = this.cache.generateCacheKeys(action);
     action.cacheKeys = cacheKeys;
 
@@ -86,10 +101,27 @@ export class BundleActionExecutor {
     return this.executeAction<ProcessBundleResult>('process', action);
   }
 
-  async *processAll(actions: Iterable<ProcessBundleOptions>) {
-    const executions = new Map<Promise<ProcessBundleResult>, Promise<ProcessBundleResult>>();
+  processAll(actions: Iterable<ProcessBundleOptions>): AsyncIterable<ProcessBundleResult> {
+    return BundleActionExecutor.executeAll(actions, action => this.process(action));
+  }
+
+  async inline(
+    action: InlineOptions,
+  ): Promise<{ file: string; diagnostics: { type: string; message: string }[]; count: number; }> {
+    return this.executeAction('inlineLocales', action);
+  }
+
+  inlineAll(actions: Iterable<InlineOptions>) {
+    return BundleActionExecutor.executeAll(actions, action => this.inline(action));
+  }
+
+  private static async *executeAll<I, O>(
+    actions: Iterable<I>,
+    executor: (action: I) => Promise<O>,
+  ): AsyncIterable<O> {
+    const executions = new Map<Promise<O>, Promise<O>>();
     for (const action of actions) {
-      const execution = this.process(action);
+      const execution = executor(action);
       executions.set(
         execution,
         execution.then(result => {
@@ -105,7 +137,7 @@ export class BundleActionExecutor {
     }
   }
 
-  stop() {
+  stop(): void {
     if (this.largeWorker) {
       this.largeWorker.end();
     }
