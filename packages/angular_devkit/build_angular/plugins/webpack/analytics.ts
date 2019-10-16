@@ -69,7 +69,6 @@ export function countOccurrences(source: string, match: string, wordBreak = fals
  * Holder of statistics related to the build.
  */
 class AnalyticsBuildStats {
-  public isIvy = false;
   public errors: string[] = [];
   public numberOfNgOnInit = 0;
   public numberOfComponents = 0;
@@ -96,7 +95,9 @@ export class NgBuildAnalyticsPlugin {
     protected _projectRoot: string,
     protected _analytics: analytics.Analytics,
     protected _category: string,
-  ) {}
+    private _isIvy: boolean,
+  ) {
+  }
 
   protected _reset() {
     this._stats = new AnalyticsBuildStats();
@@ -129,7 +130,7 @@ export class NgBuildAnalyticsPlugin {
       dimensions[analytics.NgCliAnalyticsDimensions.BuildErrors] = `,${this._stats.errors.join()},`;
     }
 
-    dimensions[analytics.NgCliAnalyticsDimensions.NgIvyEnabled] = this._stats.isIvy;
+    dimensions[analytics.NgCliAnalyticsDimensions.NgIvyEnabled] = this._isIvy;
 
     return dimensions;
   }
@@ -159,13 +160,7 @@ export class NgBuildAnalyticsPlugin {
       // This does not include View Engine AOT compilation, we use the ngfactory for it.
       this._stats.numberOfComponents += countOccurrences(module._source.source(), ' Component({');
       // For Ivy we just count ɵcmp.
-      const numIvyComponents = countOccurrences(module._source.source(), 'ɵcmp', true);
-      this._stats.numberOfComponents += numIvyComponents;
-
-      // Check whether this is an Ivy app so that it can reported as part of analytics.
-      if (!this._stats.isIvy && numIvyComponents > 0) {
-        this._stats.isIvy = true;
-      }
+      this._stats.numberOfComponents += countOccurrences(module._source.source(), '.ɵcmp', true);
     }
   }
 
