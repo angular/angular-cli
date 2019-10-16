@@ -25,10 +25,6 @@ export default async function() {
   }
   await npm('install', `${localizeVersion}`);
 
-  // Temporarily add the localize "polyfill" -- release version will not need this
-  // TODO: Remove after next framework release
-  await appendToFile('src/polyfills.ts', '\nimport "@angular/localize/init";');
-
   const baseDir = 'dist/test-project';
 
   // Set configurations for each locale.
@@ -108,6 +104,8 @@ export default async function() {
   for (const { lang, translation } of langTranslations) {
     await expectFileToMatch(`${baseDir}/${lang}/main-es5.js`, translation);
     await expectFileToMatch(`${baseDir}/${lang}/main-es2015.js`, translation);
+    await expectToFail(() => expectFileToMatch(`${baseDir}/${lang}/main-es5.js`, '$localize'));
+    await expectToFail(() => expectFileToMatch(`${baseDir}/${lang}/main-es2015.js`, '$localize'));
 
     // Ivy i18n doesn't yet work with `ng serve` so we must use a separate server.
     const app = express();
