@@ -17,6 +17,8 @@
     "rootDir": "."
   },
   "angularCompilerOptions": {
+    "enableIvy": true,
+    "disableTypeScriptVersionCheck": true
     "genDir": "app/generated/",
     "entryModule": "app/app.module#AppModule"
   }
