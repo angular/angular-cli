@@ -459,28 +459,13 @@ export function buildWebpackBrowser(
 
                 const diagnostics = new localizeDiag.Diagnostics();
                 const translationFilePaths = [];
-                let copySourceLocale = false;
+                let handleSourceLocale = false;
                 for (const locale of i18n.inlineLocales) {
                   if (locale === i18n.sourceLocale) {
-                    copySourceLocale = true;
+                    handleSourceLocale = true;
                     continue;
                   }
                   translationFilePaths.push(i18n.locales[locale].file);
-                }
-
-                if (copySourceLocale) {
-                  await copyAssets(
-                    [
-                      {
-                        glob: '**/*',
-                        // tslint:disable-next-line: no-non-null-assertion
-                        input: webpackStats.outputPath!,
-                        output: i18n.sourceLocale,
-                      },
-                    ],
-                    [baseOutputPath],
-                    '',
-                  );
                 }
 
                 if (translationFilePaths.length > 0) {
@@ -503,6 +488,7 @@ export function buildWebpackBrowser(
                         path.join(baseOutputPath, locale, relativePath),
                       diagnostics,
                       missingTranslation: options.i18nMissingTranslation || 'warning',
+                      sourceLocale: handleSourceLocale ? i18n.sourceLocale : undefined,
                     });
                   } catch (err) {
                     context.logger.error('Localized bundle generation failed: ' + err.message);
