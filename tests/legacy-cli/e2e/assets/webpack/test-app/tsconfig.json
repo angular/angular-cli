@@ -18,6 +18,8 @@
     "rootDir": "."
   },
   "angularCompilerOptions": {
+    "enableIvy": true,
+    "disableTypeScriptVersionCheck": true,
     "genDir": "./app/ngfactory",
     "entryModule": "app/app.module#AppModule"
   }
