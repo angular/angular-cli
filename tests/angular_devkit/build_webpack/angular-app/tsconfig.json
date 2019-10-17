@@ -18,10 +18,7 @@
     ]
   },
   "angularCompilerOptions": {
-    // TODO: debug this problem.
-    // This should really be true but was getting the error below on every second build.
-    // `ERROR in Cannot read property 'incrementalState' of null`
-    "enableIvy": false,
+    "enableIvy": true,
     "disableTypeScriptVersionCheck": true
   }
 }

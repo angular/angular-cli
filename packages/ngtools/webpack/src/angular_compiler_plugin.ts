@@ -91,7 +91,7 @@ export class AngularCompilerPlugin {
   // TS compilation.
   private _compilerOptions: CompilerOptions;
   private _rootNames: string[];
-  private _program: (ts.Program | Program) | null;
+  private _program: (ts.Program | Program) | undefined;
   private _compilerHost: WebpackCompilerHost & CompilerHost;
   private _moduleResolutionCache: ts.ModuleResolutionCache;
   private _resourceLoader?: WebpackResourceLoader;
@@ -673,7 +673,7 @@ export class AngularCompilerPlugin {
         // only present for webpack 4.23.0+, assume true otherwise
         const watchMode = rootCompiler.watchMode === undefined ? true : rootCompiler.watchMode;
         if (!watchMode) {
-          this._program = null;
+          this._program = undefined;
           this._transformers = [];
           this._resourceLoader = undefined;
           this._compilerHost.reset();
@@ -1385,7 +1385,7 @@ export class AngularCompilerPlugin {
       } else {
         errMsg = e.stack;
         // It is not a syntax error we might have a program with unknown state, discard it.
-        this._program = null;
+        this._program = undefined;
         code = UNKNOWN_ERROR_CODE;
       }
       allDiagnostics.push(
