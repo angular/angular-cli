@@ -13,9 +13,15 @@ import { colors, supportsColor } from '../../utilities/color';
 import { getWorkspaceRaw } from '../../utilities/config';
 import { getWorkspaceDetails } from '../../utilities/project';
 
+const debugEnv = process.env['NG_DEBUG'];
+const isDebug =
+  debugEnv !== undefined &&
+  debugEnv !== '0' &&
+  debugEnv.toLowerCase() !== 'false';
+
 // tslint:disable: no-console
 export default async function(options: { testing?: boolean; cliArgs: string[] }) {
-  const logger = createConsoleLogger(false, process.stdout, process.stderr, {
+  const logger = createConsoleLogger(isDebug, process.stdout, process.stderr, {
     info: s => (supportsColor ? s : colors.unstyle(s)),
     debug: s => (supportsColor ? s : colors.unstyle(s)),
     warn: s => (supportsColor ? colors.bold.yellow(s) : colors.unstyle(s)),
