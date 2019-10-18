@@ -23,6 +23,7 @@ export function updateDependencies(): Rule {
       'ng-packagr': latestVersions.ngPackagr,
       'web-animations-js': '^2.3.2',
       'codelyzer': '^5.1.2',
+      '@types/node': '^12.11.1',
     };
 
     for (const [name, version] of Object.entries(dependenciesToUpdate)) {
