@@ -79,4 +79,12 @@ describe('Ng New Schematic', () => {
     const confContent = JSON.parse(tree.readContent('/bar/angular.json'));
     expect(confContent.projects.foo.e2e).toBeUndefined();
   });
+
+  it('should add packageManager option in angular.json', async () => {
+    const tree = await schematicRunner
+      .runSchematicAsync('ng-new', { ...defaultOptions, packageManager: 'npm' })
+      .toPromise();
+    const { cli } = JSON.parse(tree.readContent('/bar/angular.json'));
+    expect(cli.packageManager).toBe('npm');
+  });
 });

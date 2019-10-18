@@ -28,7 +28,7 @@ import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as NgNewOptions } from './schema';
 
 
-export default function (options: NgNewOptions): Rule {
+export default function(options: NgNewOptions): Rule {
   if (!options.name) {
     throw new SchematicsException(`Invalid options, "name" is required.`);
   }
@@ -43,6 +43,7 @@ export default function (options: NgNewOptions): Rule {
     newProjectRoot: options.newProjectRoot,
     minimal: options.minimal,
     strict: options.strict,
+    packageManager: options.packageManager,
   };
   const applicationOptions: ApplicationOptions = {
     projectRoot: '',
@@ -71,7 +72,12 @@ export default function (options: NgNewOptions): Rule {
     (_host: Tree, context: SchematicContext) => {
       let packageTask;
       if (!options.skipInstall) {
-        packageTask = context.addTask(new NodePackageInstallTask(options.directory));
+        packageTask = context.addTask(
+          new NodePackageInstallTask({
+            workingDirectory: options.directory,
+            packageManager: options.packageManager,
+          }),
+        );
         if (options.linkCli) {
           packageTask = context.addTask(
             new NodePackageLinkTask('@angular/cli', options.directory),
