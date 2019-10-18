@@ -51,7 +51,7 @@ import {
   normalizeSourceMaps,
 } from '../utils';
 import { copyAssets } from '../utils/copy-assets';
-import { I18nOptions, createI18nOptions } from '../utils/i18n-options';
+import { I18nOptions, createI18nOptions, mergeDeprecatedI18nOptions } from '../utils/i18n-options';
 import { createTranslationLoader } from '../utils/load-translations';
 import {
   InlineOptions,
@@ -163,8 +163,20 @@ async function initialize(
     throw new Error('The builder requires a target.');
   }
 
+  const tsConfig = readTsconfig(options.tsConfig, context.workspaceRoot);
+  const usingIvy = tsConfig.options.enableIvy !== false;
   const metadata = await context.getProjectMetadata(context.target);
   const i18n = createI18nOptions(metadata, options.localize);
+
+  // Until 11.0, support deprecated i18n options when not using new localize option
+  // i18nFormat is automatically calculated
+  if (options.localize === undefined && usingIvy) {
+    mergeDeprecatedI18nOptions(i18n, options.i18nLocale, options.i18nFile);
+  } else if (options.localize !== undefined && !usingIvy) {
+    options.localize = undefined;
+
+    context.logger.warn(`Option 'localize' is not supported with View Engine.`);
+  }
 
   if (i18n.inlineLocales.size > 0) {
     // Load locales
@@ -283,8 +295,14 @@ export function buildWebpackBrowser(
 
             return { success };
           } else if (success) {
-            if (!fs.existsSync(baseOutputPath)) {
-              fs.mkdirSync(baseOutputPath, { recursive: true });
+            const outputPaths =
+              i18n.shouldInline && !i18n.flatOutput
+                ? [...i18n.inlineLocales].map(l => path.join(baseOutputPath, l))
+                : [baseOutputPath];
+            for (const outputPath of outputPaths) {
+              if (!fs.existsSync(outputPath)) {
+                fs.mkdirSync(outputPath, { recursive: true });
+              }
             }
 
             let noModuleFiles: EmittedFiles[] | undefined;
@@ -475,13 +493,6 @@ export function buildWebpackBrowser(
 
                   let hasErrors = false;
                   try {
-                    for (const locale of i18n.inlineLocales) {
-                      const localeOutputPath = path.join(baseOutputPath, locale);
-                      if (!fs.existsSync(localeOutputPath)) {
-                        fs.mkdirSync(localeOutputPath, { recursive: true });
-                      }
-                    }
-
                     for await (const result of executor.inlineAll(inlineActions)) {
                       if (options.verbose) {
                         context.logger.info(
@@ -499,9 +510,6 @@ export function buildWebpackBrowser(
                     }
 
                     // Copy any non-processed files into the output locations
-                    const outputPaths = [...i18n.inlineLocales].map(l =>
-                      path.join(baseOutputPath, l),
-                    );
                     await copyAssets(
                       [
                         {
@@ -510,7 +518,7 @@ export function buildWebpackBrowser(
                           input: webpackStats.outputPath!,
                           output: '',
                           ignore: [...processedFiles].map(f =>
-                          // tslint:disable-next-line: no-non-null-assertion
+                            // tslint:disable-next-line: no-non-null-assertion
                             path.relative(webpackStats.outputPath!, f),
                           ),
                         },
@@ -546,9 +554,6 @@ export function buildWebpackBrowser(
 
               // Copy assets
               if (options.assets) {
-                const outputPaths = i18n.shouldInline
-                  ? [...i18n.inlineLocales].map(l => path.join(baseOutputPath, l))
-                  : [baseOutputPath];
                 try {
                   await copyAssets(
                     normalizeAssetPatterns(
@@ -640,10 +645,6 @@ export function buildWebpackBrowser(
             }
 
             if (options.index) {
-              const outputPaths = i18n.shouldInline
-                ? [...i18n.inlineLocales].map(l => path.join(baseOutputPath, l))
-                : [baseOutputPath];
-
               for (const outputPath of outputPaths) {
                 try {
                   await generateIndex(

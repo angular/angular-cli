@@ -464,10 +464,16 @@ export async function inlineLocales(options: InlineOptions) {
   if (!i18n || i18n.inlineLocales.size === 0) {
     return { file: options.filename, diagnostics: [], count: 0 };
   }
+  if (i18n.flatOutput && i18n.inlineLocales.size > 1) {
+    throw new Error('Flat output is only supported when inlining one locale.');
+  }
 
   if (!options.code.includes(localizeName)) {
     for (const locale of i18n.inlineLocales) {
-      fs.writeFileSync(path.join(options.outputPath, locale, options.filename), options.code);
+      fs.writeFileSync(
+        path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename),
+        options.code,
+      );
     }
 
     return { file: options.filename, diagnostics: [], count: 0 };
@@ -506,7 +512,10 @@ export async function inlineLocales(options: InlineOptions) {
     }
 
     const output = content.toString();
-    fs.writeFileSync(path.join(options.outputPath, locale, options.filename), output);
+    fs.writeFileSync(
+      path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename),
+      output,
+    );
   }
 
   return { file: options.filename, diagnostics: diagnostics.messages, count: positions.length };

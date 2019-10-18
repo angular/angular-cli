@@ -11,6 +11,7 @@ export interface I18nOptions {
   inlineLocales: Set<string>;
   sourceLocale: string;
   locales: Record<string, { file: string; format?: string; translation?: unknown }>;
+  flatOutput?: boolean;
   readonly shouldInline: boolean;
 }
 
@@ -75,6 +76,24 @@ export function createI18nOptions(
       }
 
       i18n.inlineLocales.add(locale);
+    }
+  }
+
+  return i18n;
+}
+
+export function mergeDeprecatedI18nOptions(i18n: I18nOptions, i18nLocale: string | undefined, i18nFile: string | undefined): I18nOptions {
+  if (i18nFile !== undefined && i18nLocale === undefined) {
+    throw new Error(`Option 'i18nFile' cannot be used without the 'i18nLocale' option.`);
+  }
+
+  if (i18nLocale !== undefined) {
+    i18n.inlineLocales.clear();
+    i18n.inlineLocales.add(i18nLocale);
+
+    if (i18nFile !== undefined) {
+      i18n.locales[i18nLocale] = { file: i18nFile };
+      i18n.flatOutput = true;
     }
   }
 
