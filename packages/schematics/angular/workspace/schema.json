@@ -36,6 +36,11 @@
       "description": "Creates a workspace with stricter TypeScript compiler options.",
       "type": "boolean",
       "default": false
+    },
+    "packageManager": {
+      "description": "The package manager used to install dependencies.",
+      "type": "string",
+      "enum": ["npm", "yarn", "pnpm", "cnpm"]
     }
   },
   "required": [
