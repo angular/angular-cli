@@ -1,8 +1,7 @@
-import { createDir, writeFile } from '../../utils/fs';
-import { expectToFail } from '../../utils/utils';
 import { getGlobalVariable } from '../../utils/env';
+import { createDir, writeFile } from '../../utils/fs';
 import { ng, silentGit } from '../../utils/process';
-import { prepareProjectForE2e } from '../../utils/project'
+import { prepareProjectForE2e } from '../../utils/project';
 
 export default async function() {
   process.chdir(getGlobalVariable('tmp-root'));
@@ -19,8 +18,8 @@ export default async function() {
   await writeFile('../added.ts', 'console.log(\'created\');\n');
   await silentGit('add', '../added.ts');
 
-  const { message } = await expectToFail(() => ng('update', '--all'));
-  if (message && message.includes('Repository is not clean.')) {
+  const { stderr } = await ng('update', '--all', '--force');
+  if (stderr && stderr.includes('Repository is not clean.')) {
     throw new Error('Expected clean repository');
   }
 }
