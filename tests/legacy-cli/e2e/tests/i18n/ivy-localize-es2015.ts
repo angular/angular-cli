@@ -4,6 +4,7 @@ import { getGlobalVariable } from '../../utils/env';
 import {
   appendToFile,
   copyFile,
+  expectFileNotToExist,
   expectFileToExist,
   expectFileToMatch,
   replaceInFile,
@@ -24,6 +25,12 @@ export default async function() {
     localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
   }
   await npm('install', `${localizeVersion}`);
+
+  await writeFile('browserslist', 'Chrome 65');
+  await updateJsonFile('tsconfig.json', config => {
+    config.compilerOptions.target = 'es2015';
+    config.angularCompilerOptions.disableTypeScriptVersionCheck = true;
+  });
 
   const baseDir = 'dist/test-project';
 
@@ -102,10 +109,9 @@ export default async function() {
   // Build each locale and verify the output.
   await ng('build', '--i18n-missing-translation', 'error');
   for (const { lang, translation } of langTranslations) {
-    await expectFileToMatch(`${baseDir}/${lang}/main-es5.js`, translation);
-    await expectFileToMatch(`${baseDir}/${lang}/main-es2015.js`, translation);
-    await expectToFail(() => expectFileToMatch(`${baseDir}/${lang}/main-es5.js`, '$localize'));
-    await expectToFail(() => expectFileToMatch(`${baseDir}/${lang}/main-es2015.js`, '$localize'));
+    await expectFileToMatch(`${baseDir}/${lang}/main.js`, translation);
+    await expectToFail(() => expectFileToMatch(`${baseDir}/${lang}/main.js`, '$localize'));
+    await expectFileNotToExist(`${baseDir}/${lang}/main-es5.js`);
 
     // Ivy i18n doesn't yet work with `ng serve` so we must use a separate server.
     const app = express();
@@ -143,7 +149,6 @@ export default async function() {
   // Verify missing translation behaviour.
   await appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
   await ng('build', '--i18n-missing-translation', 'ignore');
-  await expectFileToMatch(`${baseDir}/fr/main-es5.js`, /Other content/);
-  await expectFileToMatch(`${baseDir}/fr/main-es2015.js`, /Other content/);
+  await expectFileToMatch(`${baseDir}/fr/main.js`, /Other content/);
   await expectToFail(() => ng('build', '--i18n-missing-translation', 'error'));
 }
