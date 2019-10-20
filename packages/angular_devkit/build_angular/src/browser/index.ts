@@ -473,6 +473,9 @@ export function buildWebpackBrowser(
                       inlineActions.push({
                         filename: path.basename(result.original.filename),
                         code: fs.readFileSync(result.original.filename, 'utf8'),
+                        map:
+                          result.original.map &&
+                          fs.readFileSync(result.original.map.filename, 'utf8'),
                         outputPath: baseOutputPath,
                         es5: false,
                         missingTranslation: options.i18nMissingTranslation,
@@ -483,6 +486,9 @@ export function buildWebpackBrowser(
                       inlineActions.push({
                         filename: path.basename(result.downlevel.filename),
                         code: fs.readFileSync(result.downlevel.filename, 'utf8'),
+                        map:
+                          result.downlevel.map &&
+                          fs.readFileSync(result.downlevel.map.filename, 'utf8'),
                         outputPath: baseOutputPath,
                         es5: true,
                         missingTranslation: options.i18nMissingTranslation,
