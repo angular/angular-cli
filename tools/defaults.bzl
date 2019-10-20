@@ -4,10 +4,10 @@ load("@npm_angular_bazel//:index.bzl", _ng_module = "ng_module", _ng_package = "
 load("@build_bazel_rules_nodejs//:defs.bzl", _npm_package = "npm_package")
 load("@npm_bazel_jasmine//:index.bzl", _jasmine_node_test = "jasmine_node_test")
 load(
-    "@npm_bazel_typescript//:defs.bzl",
+    "@npm_bazel_typescript//:index.bzl",
     _ts_library = "ts_library",
 )
-load("@npm_bazel_karma//:defs.bzl", _ts_web_test_suite = "ts_web_test_suite")
+load("@npm_bazel_karma//:index.bzl", _ts_web_test_suite = "ts_web_test_suite")
 
 DEFAULT_TSCONFIG_BUILD = "//modules:bazel-tsconfig-build.json"
 DEFAULT_TSCONFIG_TEST = "//modules:bazel-tsconfig-test"

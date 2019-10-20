@@ -1,4 +1,4 @@
-load("@npm_bazel_typescript//:defs.bzl", "ts_config")
+load("@npm_bazel_typescript//:index.bzl", "ts_config")
 load("//tools:defaults.bzl", "npm_package", "ts_library")
 
 ts_config(
