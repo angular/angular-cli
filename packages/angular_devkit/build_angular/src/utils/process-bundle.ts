@@ -12,6 +12,7 @@ import * as path from 'path';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import { minify } from 'terser';
 import * as v8 from 'v8';
+import { SourceMapSource } from 'webpack-sources';
 import { I18nOptions } from './i18n-options';
 import { manglingDisabled } from './mangle-options';
 
@@ -131,7 +132,7 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
     downlevelCode = transformResult.code;
 
     if (manualSourceMaps && sourceMap && transformResult.map) {
-      downlevelMap = await mergeSourcemaps(sourceMap, transformResult.map);
+      downlevelMap = await mergeSourceMapsFast(sourceMap, transformResult.map);
     } else {
       // undefined is needed here to normalize the property type
       downlevelMap = transformResult.map || undefined;
@@ -196,7 +197,28 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
   return result;
 }
 
-async function mergeSourcemaps(first: RawSourceMap, second: RawSourceMap) {
+function mergeSourceMaps(
+  inputCode: string,
+  inputSourceMap: RawSourceMap,
+  resultCode: string,
+  resultSourceMap: RawSourceMap,
+  filename: string,
+): RawSourceMap {
+  // More accurate but significantly more costly
+
+  // The last argument is not yet in the typings
+  // tslint:disable-next-line: no-any
+  return new (SourceMapSource as any)(
+    resultCode,
+    filename,
+    resultSourceMap,
+    inputCode,
+    inputSourceMap,
+    true,
+  ).map();
+}
+
+async function mergeSourceMapsFast(first: RawSourceMap, second: RawSourceMap) {
   const sourceRoot = first.sourceRoot;
   const generator = new SourceMapGenerator();
 
@@ -446,6 +468,7 @@ async function processRuntime(
 export interface InlineOptions {
   filename: string;
   code: string;
+  map?: string;
   es5: boolean;
   outputPath: string;
   missingTranslation?: 'warning' | 'error' | 'ignore';
@@ -469,14 +492,7 @@ export async function inlineLocales(options: InlineOptions) {
   }
 
   if (!options.code.includes(localizeName)) {
-    for (const locale of i18n.inlineLocales) {
-      fs.writeFileSync(
-        path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename),
-        options.code,
-      );
-    }
-
-    return { file: options.filename, diagnostics: [], count: 0 };
+    return inlineCopyOnly(options);
   }
 
   const { default: MagicString } = await import('magic-string');
@@ -490,7 +506,12 @@ export async function inlineLocales(options: InlineOptions) {
   const diagnostics = new localizeDiag.Diagnostics();
 
   const positions = findLocalizePositions(options, utils);
+  if (positions.length === 0) {
+    return inlineCopyOnly(options);
+  }
+
   const content = new MagicString(options.code);
+  const inputMap = options.map && JSON.parse(options.map) as RawSourceMap;
 
   for (const locale of i18n.inlineLocales) {
     const isSourceLocale = locale === i18n.sourceLocale;
@@ -512,13 +533,44 @@ export async function inlineLocales(options: InlineOptions) {
     }
 
     const output = content.toString();
-    fs.writeFileSync(
-      path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename),
-      output,
+    const outputPath = path.join(
+      options.outputPath,
+      i18n.flatOutput ? '' : locale,
+      options.filename,
     );
+    fs.writeFileSync(outputPath, output);
+
+    if (inputMap) {
+      const contentMap = content.generateMap();
+      const outputMap = mergeSourceMaps(
+        options.code,
+        inputMap,
+        output,
+        contentMap,
+        options.filename,
+      );
+
+      fs.writeFileSync(outputPath + '.map', JSON.stringify(outputMap));
+    }
   }
 
   return { file: options.filename, diagnostics: diagnostics.messages, count: positions.length };
+}
+
+function inlineCopyOnly(options: InlineOptions) {
+  if (!i18n) {
+    throw new Error('i18n options are missing');
+  }
+
+  for (const locale of i18n.inlineLocales) {
+    const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);
+    fs.writeFileSync(outputPath, options.code);
+    if (options.map) {
+      fs.writeFileSync(outputPath + '.map', options.map);
+    }
+  }
+
+  return { file: options.filename, diagnostics: [], count: 0 };
 }
 
 function findLocalizePositions(
@@ -536,10 +588,7 @@ function findLocalizePositions(
     traverse(ast, {
       CallExpression(path: NodePath<types.CallExpression>) {
         const callee = path.get('callee');
-        if (
-          callee.isIdentifier() &&
-          callee.node.name === localizeName
-        ) {
+        if (callee.isIdentifier() && callee.node.name === localizeName) {
           const messageParts = utils.unwrapMessagePartsFromLocalizeCall(path);
           const expressions = utils.unwrapSubstitutionsFromLocalizeCall(path.node);
           positions.push({
