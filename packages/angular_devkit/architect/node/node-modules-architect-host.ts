@@ -7,6 +7,7 @@
  */
 import { experimental, json, workspaces } from '@angular-devkit/core';
 import * as path from 'path';
+import * as v8 from 'v8';
 import { BuilderInfo } from '../src';
 import { Schema as BuilderSchema } from '../src/builders-schema';
 import { Target } from '../src/input-schema';
@@ -17,6 +18,16 @@ export type NodeModulesBuilderInfo = BuilderInfo & {
   import: string;
 };
 
+function clone(obj: unknown): unknown {
+  const serialize = ((v8 as unknown) as { serialize(value: unknown): Buffer }).serialize;
+  const deserialize = ((v8 as unknown) as { deserialize(buffer: Buffer): unknown }).deserialize;
+
+  try {
+    return deserialize(serialize(obj));
+  } catch {
+    return JSON.parse(JSON.stringify(obj));
+  }
+}
 
 // TODO: create a base class for all workspace related hosts.
 export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModulesBuilderInfo> {
@@ -117,10 +128,12 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
       }
     }
 
-    return {
+    const options = {
       ...targetSpec['options'],
       ...additionalOptions,
     };
+
+    return clone(options) as json.JsonObject;
   }
 
   async getProjectMetadata(target: Target | string): Promise<json.JsonObject | null> {
@@ -139,7 +152,7 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
         root: projectDefinition.root,
         sourceRoot: projectDefinition.sourceRoot,
         prefix: projectDefinition.prefix,
-        ...projectDefinition.extensions,
+        ...clone(projectDefinition.extensions),
       } as unknown as json.JsonObject;
 
       return metadata;
