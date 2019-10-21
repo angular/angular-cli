@@ -9,7 +9,6 @@ import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/ar
 import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
 import { join, json, logging, normalize, tags, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import * as findCacheDirectory from 'find-cache-dir';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -50,7 +49,9 @@ import {
   normalizeOptimization,
   normalizeSourceMaps,
 } from '../utils';
+import { findCachePath } from '../utils/cache-path';
 import { copyAssets } from '../utils/copy-assets';
+import { cachingDisabled } from '../utils/environment-options';
 import { emittedFilesToInlineOptions } from '../utils/i18n-inlining';
 import { I18nOptions, createI18nOptions, mergeDeprecatedI18nOptions } from '../utils/i18n-options';
 import { createTranslationLoader } from '../utils/load-translations';
@@ -69,7 +70,7 @@ import {
 import { BundleActionExecutor } from './action-executor';
 import { Schema as BrowserBuilderSchema } from './schema';
 
-const cacheDownlevelPath = findCacheDirectory({ name: 'angular-build-dl' });
+const cacheDownlevelPath = cachingDisabled ? undefined : findCachePath('angular-build-dl');
 
 export type BrowserBuilderOutput = json.JsonObject &
   BuilderOutput & {

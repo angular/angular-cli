@@ -13,8 +13,8 @@ import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map'
 import { minify } from 'terser';
 import * as v8 from 'v8';
 import { SourceMapSource } from 'webpack-sources';
+import { manglingDisabled } from './environment-options';
 import { I18nOptions } from './i18n-options';
-import { manglingDisabled } from './mangle-options';
 
 const cacache = require('cacache');
 const deserialize = ((v8 as unknown) as { deserialize(buffer: Buffer): unknown }).deserialize;

@@ -26,7 +26,8 @@ import {
 import { RawSource } from 'webpack-sources';
 import { AssetPatternClass, ExtraEntryPoint } from '../../../browser/schema';
 import { BuildBrowserFeatures } from '../../../utils';
-import { manglingDisabled } from '../../../utils/mangle-options';
+import { findCachePath } from '../../../utils/cache-path';
+import { cachingDisabled, manglingDisabled } from '../../../utils/environment-options';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { NamedLazyChunksPlugin } from '../../plugins/named-chunks-plugin';
@@ -411,7 +412,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       new TerserPlugin({
         sourceMap: scriptsSourceMap,
         parallel: true,
-        cache: true,
+        cache: !cachingDisabled && findCachePath('terser-webpack'),
         extractComments: false,
         chunkFilter: (chunk: compilation.Chunk) =>
           !globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
@@ -422,7 +423,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       new TerserPlugin({
         sourceMap: scriptsSourceMap,
         parallel: true,
-        cache: true,
+        cache: !cachingDisabled && findCachePath('terser-webpack'),
         extractComments: false,
         chunkFilter: (chunk: compilation.Chunk) =>
           globalScriptsByBundleName.some(s => s.bundleName === chunk.name),

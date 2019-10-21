@@ -9,6 +9,7 @@ import JestWorker from 'jest-worker';
 import * as os from 'os';
 import * as path from 'path';
 import * as v8 from 'v8';
+import { I18nOptions } from '../utils/i18n-options';
 import { InlineOptions, ProcessBundleOptions, ProcessBundleResult } from '../utils/process-bundle';
 import { BundleActionCache } from './action-cache';
 
@@ -36,14 +37,16 @@ workerFile =
 export class BundleActionExecutor {
   private largeWorker?: JestWorker;
   private smallWorker?: JestWorker;
-  private cache: BundleActionCache;
+  private cache?: BundleActionCache;
 
   constructor(
-    private workerOptions: unknown,
+    private workerOptions: { cachePath?: string; i18n: I18nOptions },
     integrityAlgorithm?: string,
     private readonly sizeThreshold = 32 * 1024,
   ) {
-    this.cache = new BundleActionCache(integrityAlgorithm);
+    if (workerOptions.cachePath) {
+      this.cache = new BundleActionCache(workerOptions.cachePath, integrityAlgorithm);
+    }
   }
 
   private static executeMethod<O>(worker: JestWorker, method: string, input: unknown): Promise<O> {
@@ -87,16 +90,18 @@ export class BundleActionExecutor {
   }
 
   async process(action: ProcessBundleOptions): Promise<ProcessBundleResult> {
-    const cacheKeys = this.cache.generateCacheKeys(action);
-    action.cacheKeys = cacheKeys;
+    if (this.cache) {
+      const cacheKeys = this.cache.generateCacheKeys(action);
+      action.cacheKeys = cacheKeys;
 
-    // Try to get cached data, if it fails fallback to processing
-    try {
-      const cachedResult = await this.cache.getCachedBundleResult(action);
-      if (cachedResult) {
-        return cachedResult;
-      }
-    } catch {}
+      // Try to get cached data, if it fails fallback to processing
+      try {
+        const cachedResult = await this.cache.getCachedBundleResult(action);
+        if (cachedResult) {
+          return cachedResult;
+        }
+      } catch {}
+    }
 
     return this.executeAction<ProcessBundleResult>('process', action);
   }
@@ -107,7 +112,7 @@ export class BundleActionExecutor {
 
   async inline(
     action: InlineOptions,
-  ): Promise<{ file: string; diagnostics: { type: string; message: string }[]; count: number; }> {
+  ): Promise<{ file: string; diagnostics: { type: string; message: string }[]; count: number }> {
     return this.executeAction('inlineLocales', action);
   }
 
