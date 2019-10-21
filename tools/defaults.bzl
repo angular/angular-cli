@@ -34,7 +34,7 @@ def ts_library(tsconfig = None, deps = [], testonly = False, **kwargs):
 
 NG_VERSION = "^9.0.0-next.10"
 RXJS_VERSION = "^6.5.3"
-HAPI_VERSION = "^17.0.0"
+HAPI_VERSION = "^18.4.0"
 EXPRESS_VERSION = "^4.15.2"
 EXPRESS_TYPES_VERSION = "^4.17.0"
 DEVKIT_CORE_VERSION = "^9.0.0-next.9"
@@ -78,7 +78,7 @@ GLOBALS = {
     "@nguniversal/hapi-engine/tokens": "nguniversal.hapiEngine.tokens",
     "express": "express",
     "fs": "fs",
-    "hapi": "hapi",
+    "@hapi/hapi": "hapi.hapi",
     "rxjs": "rxjs",
     "rxjs/operators": "rxjs.operators",
     "tslib": "tslib",
@@ -150,12 +150,12 @@ def npm_package(name, replacements = {}, **kwargs):
 def ng_web_test_suite(deps = [], srcs = [], **kwargs):
     _ts_web_test_suite(
         # Required for running the compiled ng modules that use TypeScript import helpers.
-        srcs = ["@npm//node_modules/tslib:tslib.js"] + srcs,
+        srcs = ["@npm//:node_modules/tslib/tslib.js"] + srcs,
         # Depend on our custom test initialization script. This needs to be the first dependency.
         deps = ["//test:angular_test_init"] + deps,
         bootstrap = [
-            "@npm//node_modules/zone.js:dist/zone-testing-bundle.js",
-            "@npm//node_modules/reflect-metadata:Reflect.js",
+            "@npm//:node_modules/zone.js/dist/zone-testing-bundle.js",
+            "@npm//:node_modules/reflect-metadata/Reflect.js",
         ],
         **kwargs
     )

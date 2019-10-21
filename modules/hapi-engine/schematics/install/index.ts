@@ -42,18 +42,23 @@ function addDependencies(options: UniversalOptions): Rule {
     });
     addPackageJsonDependency(host, {
       type: NodeDependencyType.Default,
-      name: 'hapi',
+      name: '@hapi/hapi',
       version: 'HAPI_VERSION',
     });
     addPackageJsonDependency(host, {
+      type: NodeDependencyType.Dev,
+      name: '@types/hapi__hapi',
+      version: '^18.2.5',
+    });
+    addPackageJsonDependency(host, {
       type: NodeDependencyType.Default,
-      name: 'inert',
-      version: '^5.1.0',
+      name: '@hapi/inert',
+      version: '^5.2.0',
     });
     addPackageJsonDependency(host, {
       type: NodeDependencyType.Dev,
-      name: '@types/inert',
-      version: '^5.1.0',
+      name: '@types/hapi__inert',
+      version: '^5.2.0',
     });
     return host;
   };

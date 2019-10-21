@@ -34,13 +34,13 @@ describe('Universal Schematic', () => {
     expect(contents).toMatch(/\"@nguniversal\/hapi-engine\": \"/);
   });
 
-  it('should add dependency: hapi', async () => {
+  it('should add dependency: @hapi/hapi', async () => {
     const tree = await schematicRunner
                      .runSchematicAsync('ng-add', defaultOptions, appTree)
                      .toPromise();
     const filePath = '/package.json';
     const contents = tree.readContent(filePath);
-    expect(contents).toMatch(/\"hapi\": \"/);
+    expect(contents).toMatch(/\"@hapi\/hapi\": \"/);
   });
 
   it('should install npm dependencies', async () => {

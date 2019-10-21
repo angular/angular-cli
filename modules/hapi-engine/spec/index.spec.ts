@@ -1,6 +1,6 @@
 import {destroyPlatform, getPlatform} from '@angular/core';
 import {ngHapiEngine} from '@nguniversal/hapi-engine';
-import {ServerInjectResponse, Request, Server} from 'hapi';
+import {ServerInjectResponse, Request, Server} from '@hapi/hapi';
 import {ExampleModuleNgFactory} from '../testing/example.ngfactory';
 import 'zone.js';
 

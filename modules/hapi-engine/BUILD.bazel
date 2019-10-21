@@ -13,7 +13,7 @@ ng_module(
         "//modules/common/engine",
         "//modules/hapi-engine/tokens",
         "@npm//@angular/platform-server",
-        "@npm//@types/hapi",
+        "@npm//@types/hapi__hapi",
     ],
 )
 
@@ -55,9 +55,9 @@ ng_test_library(
         ":testing",
         "@npm//@angular/platform-browser",
         "@npm//@angular/platform-server",
-        "@npm//@types/hapi",
+        "@npm//@hapi/hapi",
+        "@npm//@types/hapi__hapi",
         "@npm//domino",
-        "@npm//hapi",
         "@npm//xhr2",
         "@npm//zone.js",
     ],

@@ -1,8 +1,8 @@
 import 'zone.js/dist/zone-node';
 
 import { ngHapiEngine } from '@nguniversal/hapi-engine';
-import * as inert from 'inert';
-import { Request, Server, ResponseToolkit } from 'hapi';
+import * as inert from '@hapi/inert';
+import { Request, Server, ResponseToolkit } from '@hapi/hapi';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 

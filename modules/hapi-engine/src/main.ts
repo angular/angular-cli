@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as fs from 'fs';
-import { Request, ResponseToolkit } from 'hapi';
+import { Request, ResponseToolkit } from '@hapi/hapi';
 
 import { NgModuleFactory, Type, StaticProvider } from '@angular/core';
 import { ɵCommonEngine as CommonEngine } from '@nguniversal/common/engine';
