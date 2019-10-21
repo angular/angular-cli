@@ -6,14 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { createHash } from 'crypto';
-import * as findCacheDirectory from 'find-cache-dir';
 import * as fs from 'fs';
 import { copyFile } from '../utils/copy-file';
-import { manglingDisabled } from '../utils/mangle-options';
+import { manglingDisabled } from '../utils/environment-options';
 import { CacheKey, ProcessBundleOptions, ProcessBundleResult } from '../utils/process-bundle';
 
 const cacache = require('cacache');
-const cacheDownlevelPath = findCacheDirectory({ name: 'angular-build-dl' });
 const packageVersion = require('../../package.json').version;
 
 export interface CacheEntry {
@@ -23,7 +21,7 @@ export interface CacheEntry {
 }
 
 export class BundleActionCache {
-  constructor(private readonly integrityAlgorithm?: string) {}
+  constructor(private readonly cachePath: string, private readonly integrityAlgorithm?: string) {}
 
   static copyEntryContent(entry: CacheEntry | string, dest: fs.PathLike): void {
     copyFile(typeof entry === 'string' ? entry : entry.path, dest);
@@ -88,7 +86,7 @@ export class BundleActionCache {
     const cacheEntries = [];
     for (const key of cacheKeys) {
       if (key) {
-        const entry = await cacache.get.info(cacheDownlevelPath, key);
+        const entry = await cacache.get.info(this.cachePath, key);
         if (!entry) {
           return false;
         }
