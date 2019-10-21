@@ -221,6 +221,16 @@ async function initialize(
     host,
   );
 
+  if (i18n.shouldInline) {
+    if (!config.resolve) {
+      config.resolve = {};
+    }
+    if (!config.resolve.alias) {
+      config.resolve.alias = {};
+    }
+    config.resolve.alias['@angular/localize/init'] = require.resolve('./empty.js');
+  }
+
   let transformedConfig;
   if (webpackConfigurationTransform) {
     transformedConfig = await webpackConfigurationTransform(config);
