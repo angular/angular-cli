@@ -83,8 +83,6 @@ import {
 } from './webpack';
 import { WebpackInputHost } from './webpack-input-host';
 
-const treeKill = require('tree-kill');
-
 export class AngularCompilerPlugin {
   private _options: AngularCompilerPluginOptions;
 
@@ -570,8 +568,10 @@ export class AngularCompilerPlugin {
   }
 
   private _killForkedTypeChecker() {
-    if (this._typeCheckerProcess && this._typeCheckerProcess.pid) {
-      treeKill(this._typeCheckerProcess.pid, 'SIGTERM');
+    if (this._typeCheckerProcess && !this._typeCheckerProcess.killed) {
+      try {
+        this._typeCheckerProcess.kill();
+      } catch {}
       this._typeCheckerProcess = null;
     }
   }
