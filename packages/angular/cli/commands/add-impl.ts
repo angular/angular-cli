@@ -12,7 +12,7 @@ import { intersects, prerelease, rcompare, satisfies, valid, validRange } from '
 import { isPackageNameSafeForAnalytics } from '../models/analytics';
 import { Arguments } from '../models/interface';
 import { RunSchematicOptions, SchematicCommand } from '../models/schematic-command';
-import npmInstall from '../tasks/npm-install';
+import { installPackage } from '../tasks/install-package';
 import { colors } from '../utilities/color';
 import { getPackageManager } from '../utilities/package-manager';
 import {
@@ -135,7 +135,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       }
     }
 
-    await npmInstall(packageIdentifier.raw, this.logger, this.packageManager, this.workspace.root);
+    installPackage(packageIdentifier.raw, this.logger, this.packageManager);
 
     return this.executeSchematic(collectionName, options['--']);
   }

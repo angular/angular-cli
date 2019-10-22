@@ -38,11 +38,11 @@ ts_library(
         "@npm//debug",
         "@npm//@types/node",
         "@npm//@types/inquirer",
+        "@npm//@types/rimraf",
         "@npm//@types/semver",
         "@npm//@types/universal-analytics",
         "@npm//@types/uuid",
         "@npm//ansi-colors",
-        "@npm//rxjs",
     ],
 )
 
@@ -53,6 +53,7 @@ ts_library(
         ":add_schema",
         ":analytics_schema",
         ":build_schema",
+        ":cli_schema",
         ":config_schema",
         ":deploy_schema",
         ":deprecated_schema",
@@ -70,6 +71,11 @@ ts_library(
         ":version_schema",
         ":xi18n_schema",
     ],
+)
+
+ts_json_schema(
+    name = "cli_schema",
+    src = "lib/config/schema.json",
 )
 
 ts_json_schema(
