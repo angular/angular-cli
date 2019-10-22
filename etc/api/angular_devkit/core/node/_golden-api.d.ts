@@ -48,7 +48,7 @@ export interface ProcessOutput {
     write(buffer: string | Buffer): boolean;
 }
 
-export declare function resolve(x: string, options: ResolveOptions): string;
+export declare function resolve(packageName: string, options: ResolveOptions): string;
 
 export interface ResolveOptions {
     basedir: string;

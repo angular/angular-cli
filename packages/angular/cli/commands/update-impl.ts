@@ -13,14 +13,17 @@ import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as semver from 'semver';
+import { PackageManager } from '../lib/config/schema';
 import { Command } from '../models/command';
 import { Arguments } from '../models/interface';
+import { runTempPackageBin } from '../tasks/install-package';
 import { colors } from '../utilities/color';
 import { getPackageManager } from '../utilities/package-manager';
 import {
   PackageIdentifier,
   PackageManifest,
   PackageMetadata,
+  fetchPackageManifest,
   fetchPackageMetadata,
 } from '../utilities/package-metadata';
 import { PackageTreeNode, findNodeDependencies, readPackageTree } from '../utilities/package-tree';
@@ -38,22 +41,23 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
   public readonly allowMissingWorkspace = true;
 
   private workflow: NodeWorkflow;
+  private packageManager: PackageManager;
 
   async initialize() {
+    this.packageManager = await getPackageManager(this.workspace.root);
     this.workflow = new NodeWorkflow(
       new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(this.workspace.root)),
       {
-        packageManager: await getPackageManager(this.workspace.root),
+        packageManager: this.packageManager,
         root: normalize(this.workspace.root),
       },
     );
-
     this.workflow.engineHost.registerOptionsTransform(
       validateOptionsWithSchema(this.workflow.registry),
     );
   }
 
-  async executeSchematic(
+  private async executeSchematic(
     collection: string,
     schematic: string,
     options = {},
@@ -127,7 +131,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     }
   }
 
-  async executeMigrations(
+  private async executeMigrations(
     packageName: string,
     collectionPath: string,
     range: semver.Range,
@@ -190,6 +194,21 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
 
   // tslint:disable-next-line:no-big-function
   async run(options: UpdateCommandSchema & Arguments) {
+    // Check if the current installed CLI version is older than the latest version.
+    if (await this.checkCLILatestVersion(options.verbose)) {
+      this.logger.warn(
+        'The installed Angular CLI version is older than the latest published version.\n' +
+        'Installing a temporary version to perform the update.',
+      );
+
+      return runTempPackageBin(
+        '@angular/cli@latest',
+        this.logger,
+        this.packageManager,
+        process.argv.slice(2),
+      );
+    }
+
     const packages: PackageIdentifier[] = [];
     for (const request of options['--'] || []) {
       try {
@@ -252,8 +271,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       }
     }
 
-    const packageManager = await getPackageManager(this.workspace.root);
-    this.logger.info(`Using package manager: '${packageManager}'`);
+    this.logger.info(`Using package manager: '${this.packageManager}'`);
 
     // Special handling for Angular CLI 1.x migrations
     if (
@@ -293,7 +311,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         force: options.force || false,
         next: options.next || false,
         verbose: options.verbose || false,
-        packageManager,
+        packageManager: this.packageManager,
         packages: options.all ? Object.keys(rootDependencies) : [],
       });
 
@@ -513,7 +531,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     const { success } = await this.executeSchematic('@schematics/update', 'update', {
       verbose: options.verbose || false,
       force: options.force || false,
-      packageManager,
+      packageManager: this.packageManager,
       packages: packagesToUpdate,
       migrateExternal: true,
     });
@@ -549,7 +567,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     return success ? 0 : 1;
   }
 
-  checkCleanGit() {
+  private checkCleanGit(): boolean {
     try {
       const topLevel = execSync('git rev-parse --show-toplevel', { encoding: 'utf8', stdio: 'pipe' });
       const result = execSync('git status --porcelain', { encoding: 'utf8', stdio: 'pipe' });
@@ -573,7 +591,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     return true;
   }
 
-  createCommit(message: string, files: string[]) {
+  private createCommit(message: string, files: string[]) {
     try {
       execSync('git add -A ' + files.join(' '), { encoding: 'utf8', stdio: 'pipe' });
 
@@ -581,7 +599,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     } catch (error) {}
   }
 
-  findCurrentGitSha(): string | null {
+  private findCurrentGitSha(): string | null {
     try {
       const result = execSync('git rev-parse HEAD', { encoding: 'utf8', stdio: 'pipe' });
 
@@ -589,6 +607,25 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     } catch {
       return null;
     }
+  }
+
+  /**
+   * Checks if the current installed CLI version is older than the latest version.
+   * @returns `true` when the installed version is older.
+  */
+  private async checkCLILatestVersion(verbose = false): Promise<boolean> {
+    const { version: installedCLIVersion } = require('../package.json');
+
+    const LatestCLIManifest = await fetchPackageManifest(
+      '@angular/cli@latest',
+      this.logger,
+      {
+        verbose,
+        usingYarn: this.packageManager === PackageManager.Yarn,
+      },
+    );
+
+    return semver.lt(installedCLIVersion, LatestCLIManifest.version);
   }
 }
 

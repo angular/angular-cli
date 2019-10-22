@@ -120,15 +120,15 @@ export function setResolveHook(
 
 /**
  * Resolve a package using a logic similar to npm require.resolve, but with more options.
- * @param x The package name to resolve.
+ * @param packageName The package name to resolve.
  * @param options A list of options. See documentation of those options.
  * @returns {string} Path to the index to include, or if `resolvePackageJson` option was
  *                   passed, a path to that file.
  * @throws {ModuleNotFoundException} If no module with that name was found anywhere.
  */
-export function resolve(x: string, options: ResolveOptions): string {
+export function resolve(packageName: string, options: ResolveOptions): string {
   if (_resolveHook) {
-    const maybe = _resolveHook(x, options);
+    const maybe = _resolveHook(packageName, options);
     if (maybe) {
       return maybe;
     }
@@ -141,9 +141,9 @@ export function resolve(x: string, options: ResolveOptions): string {
 
   options.paths = options.paths || [];
 
-  if (/^(?:\.\.?(?:\/|$)|\/|([A-Za-z]:)?[/\\])/.test(x)) {
-    let res = path.resolve(basePath, x);
-    if (x === '..' || x.slice(-1) === '/') {
+  if (/^(?:\.\.?(?:\/|$)|\/|([A-Za-z]:)?[\/\\])/.test(packageName)) {
+    let res = path.resolve(basePath, packageName);
+    if (packageName === '..' || packageName.slice(-1) === '/') {
       res += '/';
     }
 
@@ -152,7 +152,7 @@ export function resolve(x: string, options: ResolveOptions): string {
       return m;
     }
   } else {
-    const n = loadNodeModulesSync(x, basePath);
+    const n = loadNodeModulesSync(packageName, basePath);
     if (n) {
       return n;
     }
@@ -165,7 +165,7 @@ export function resolve(x: string, options: ResolveOptions): string {
       const localDir = path.dirname(caller);
       if (localDir !== options.basedir) {
         try {
-          return resolve(x, {
+          return resolve(packageName, {
             ...options,
             checkLocal: false,
             checkGlobal: false,
@@ -186,7 +186,7 @@ export function resolve(x: string, options: ResolveOptions): string {
     const globalDir = path.dirname(_getGlobalNodeModules());
     if (globalDir !== options.basedir) {
       try {
-        return resolve(x, {
+        return resolve(packageName, {
           ...options,
           checkLocal: false,
           checkGlobal: false,
@@ -201,7 +201,7 @@ export function resolve(x: string, options: ResolveOptions): string {
     }
   }
 
-  throw new ModuleNotFoundException(x, basePath);
+  throw new ModuleNotFoundException(packageName, basePath);
 
   function loadAsFileSync(x: string): string | null {
     if (isFile(x)) {
@@ -245,11 +245,11 @@ export function resolve(x: string, options: ResolveOptions): string {
   function loadNodeModulesSync(x: string, start: string): string | null {
     const dirs = nodeModulesPaths(start, options);
     for (const dir of dirs) {
-      const m = loadAsFileSync(path.join(dir, '/', x));
+      const m = loadAsFileSync(path.join(dir, x));
       if (m) {
         return m;
       }
-      const n = loadAsDirectorySync(path.join(dir, '/', x));
+      const n = loadAsDirectorySync(path.join(dir, x));
       if (n) {
         return n;
       }
@@ -300,6 +300,12 @@ export function resolve(x: string, options: ResolveOptions): string {
         return path.join(prefix, aPath, moduleDir);
       }));
     }, []);
+
+    if (process.env.NG_TEMP_MODULES_DIR) {
+      // When running from a temporary installations, node_modules have to be resolved
+      // differently and they should be prefered over others.
+      dirs.unshift(process.env.NG_TEMP_MODULES_DIR);
+    }
 
     return opts && opts.paths ? dirs.concat(opts.paths) : dirs;
   }

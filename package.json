@@ -103,6 +103,7 @@
     "@types/minimist": "^1.2.0",
     "@types/node": "10.12.30",
     "@types/request": "^2.47.1",
+    "@types/rimraf": "^2.0.2",
     "@types/semver": "^6.0.0",
     "@types/webpack": "^4.32.1",
     "@types/webpack-dev-server": "^3.1.7",

@@ -9,11 +9,11 @@ import { analytics, tags } from '@angular-devkit/core';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
 import { dirname, join } from 'path';
 import { intersects, prerelease, rcompare, satisfies, valid, validRange } from 'semver';
+import { PackageManager } from '../lib/config/schema';
 import { isPackageNameSafeForAnalytics } from '../models/analytics';
 import { Arguments } from '../models/interface';
 import { RunSchematicOptions, SchematicCommand } from '../models/schematic-command';
-import npmInstall from '../tasks/npm-install';
-import npmUninstall from '../tasks/npm-uninstall';
+import { installPackage, installTempPackage } from '../tasks/install-package';
 import { colors } from '../utilities/color';
 import { getPackageManager } from '../utilities/package-manager';
 import {
@@ -57,7 +57,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
     }
 
     const packageManager = await getPackageManager(this.workspace.root);
-    const usingYarn = packageManager === 'yarn';
+    const usingYarn = packageManager === PackageManager.Yarn;
 
     if (packageIdentifier.type === 'tag' && !packageIdentifier.rawSpec) {
       // only package name provided; search for viable version
@@ -115,7 +115,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
     }
 
     let collectionName = packageIdentifier.name;
-    let dependencyType: NgAddSaveDepedency | undefined;
+    let savePackage: NgAddSaveDepedency | undefined;
 
     try {
       const manifest = await fetchPackageManifest(packageIdentifier, this.logger, {
@@ -124,7 +124,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
         usingYarn,
       });
 
-      dependencyType = manifest['ng-add'] && manifest['ng-add'].save;
+      savePackage = manifest['ng-add'] && manifest['ng-add'].save;
       collectionName = manifest.name;
 
       if (await this.hasMismatchedPeer(manifest)) {
@@ -138,16 +138,13 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
       return 1;
     }
 
-    await npmInstall(packageIdentifier.raw, this.logger, packageManager, dependencyType);
-
-    const schematicResult = await this.executeSchematic(collectionName, options['--']);
-
-    if (dependencyType === false) {
-      // Uninstall the package if it was not meant to be retained.
-      return npmUninstall(packageIdentifier.raw, this.logger, packageManager);
+    if (savePackage === false) {
+      installTempPackage(packageIdentifier.raw, this.logger, packageManager);
+    } else {
+      installPackage(packageIdentifier.raw, this.logger, packageManager, savePackage);
     }
 
-    return schematicResult;
+    return this.executeSchematic(collectionName, options['--']);
   }
 
   async reportAnalytics(
