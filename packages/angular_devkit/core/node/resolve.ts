@@ -12,6 +12,7 @@ import { isFile } from './fs';
 
 /**
  * Exception thrown when a module could not be resolved.
+ * @deprecated since version 8. Use `MODULE_NOT_FOUND` Node error code instead.
  */
 export class ModuleNotFoundException extends BaseException {
   public readonly code: string;
@@ -70,6 +71,7 @@ function _getGlobalNodeModules() {
 }
 
 
+/** @deprecated since version 8. Use `require.resolve` instead. */
 export interface ResolveOptions {
   /**
    * The basedir to use from which to resolve.
@@ -111,6 +113,7 @@ export interface ResolveOptions {
 
 
 let _resolveHook: ((x: string, options: ResolveOptions) => string | null) | null = null;
+/** @deprecated since version 8. Use `require.resolve` instead. */
 export function setResolveHook(
   hook: ((x: string, options: ResolveOptions) => string | null) | null,
 ) {
@@ -125,6 +128,7 @@ export function setResolveHook(
  * @returns {string} Path to the index to include, or if `resolvePackageJson` option was
  *                   passed, a path to that file.
  * @throws {ModuleNotFoundException} If no module with that name was found anywhere.
+ * @deprecated since version 8. Use `require.resolve` instead.
  */
 export function resolve(x: string, options: ResolveOptions): string {
   if (_resolveHook) {
