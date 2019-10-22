@@ -5,7 +5,7 @@
 
 licenses(["notice"])  # MIT
 
-load("@npm_bazel_typescript//:defs.bzl", "ts_library")
+load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 # @external_begin
 load("@build_bazel_rules_nodejs//:defs.bzl", "npm_package")
