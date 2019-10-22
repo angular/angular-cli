@@ -43,7 +43,7 @@ with NPM 5.5.1 or higher.
 
 **BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
 
-### Install Globablly
+### Install Globally
 ```bash
 npm install -g @angular/cli
 ```
