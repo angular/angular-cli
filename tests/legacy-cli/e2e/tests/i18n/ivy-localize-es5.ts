@@ -109,8 +109,9 @@ export default async function() {
   await ng('build', '--i18n-missing-translation', 'error');
   for (const { lang, translation } of langTranslations) {
     await expectFileToMatch(`${baseDir}/${lang}/main.js`, translation);
-    await expectToFail(() => expectFileToMatch(`${baseDir}/${lang}/main.js`, '$localize'));
+    await expectToFail(() => expectFileToMatch(`${baseDir}/${lang}/main.js`, '$localize`'));
     await expectFileNotToExist(`${baseDir}/${lang}/main-es2015.js`);
+    await expectFileToMatch(`${baseDir}/${lang}/main.js`, lang);
 
     // Ivy i18n doesn't yet work with `ng serve` so we must use a separate server.
     const app = express();

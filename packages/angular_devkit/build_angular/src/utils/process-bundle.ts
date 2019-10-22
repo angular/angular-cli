@@ -472,6 +472,7 @@ export interface InlineOptions {
   es5: boolean;
   outputPath: string;
   missingTranslation?: 'warning' | 'error' | 'ignore';
+  setLocale?: boolean;
 }
 
 interface LocalizePosition {
@@ -491,7 +492,8 @@ export async function inlineLocales(options: InlineOptions) {
     throw new Error('Flat output is only supported when inlining one locale.');
   }
 
-  if (!options.code.includes(localizeName)) {
+  const hasLocalizeName = options.code.includes(localizeName);
+  if (!hasLocalizeName && !options.setLocale) {
     return inlineCopyOnly(options);
   }
 
@@ -506,13 +508,13 @@ export async function inlineLocales(options: InlineOptions) {
   const diagnostics = new localizeDiag.Diagnostics();
 
   const positions = findLocalizePositions(options, utils);
-  if (positions.length === 0) {
+  if (positions.length === 0 && !options.setLocale) {
     return inlineCopyOnly(options);
   }
 
-  const content = new MagicString(options.code);
-  const inputMap = options.map && JSON.parse(options.map) as RawSourceMap;
-
+  let content = new MagicString(options.code);
+  const inputMap = options.map && (JSON.parse(options.map) as RawSourceMap);
+  let contentClone;
   for (const locale of i18n.inlineLocales) {
     const isSourceLocale = locale === i18n.sourceLocale;
     // tslint:disable-next-line: no-any
@@ -530,6 +532,12 @@ export async function inlineLocales(options: InlineOptions) {
       const { code } = generate(expression);
 
       content.overwrite(position.start, position.end, code);
+    }
+
+    if (options.setLocale) {
+      const setLocaleText = `var $localize=Object.assign(void 0===$localize?{}:$localize,{locale:"${locale}"});`;
+      contentClone = content.clone();
+      content.prepend(setLocaleText);
     }
 
     const output = content.toString();
@@ -552,6 +560,11 @@ export async function inlineLocales(options: InlineOptions) {
 
       fs.writeFileSync(outputPath + '.map', JSON.stringify(outputMap));
     }
+
+    if (contentClone) {
+      content = contentClone;
+      contentClone = undefined;
+    }
   }
 
   return { file: options.filename, diagnostics: diagnostics.messages, count: positions.length };
@@ -563,7 +576,11 @@ function inlineCopyOnly(options: InlineOptions) {
   }
 
   for (const locale of i18n.inlineLocales) {
-    const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);
+    const outputPath = path.join(
+      options.outputPath,
+      i18n.flatOutput ? '' : locale,
+      options.filename,
+    );
     fs.writeFileSync(outputPath, options.code);
     if (options.map) {
       fs.writeFileSync(outputPath + '.map', options.map);
@@ -588,7 +605,11 @@ function findLocalizePositions(
     traverse(ast, {
       CallExpression(path: NodePath<types.CallExpression>) {
         const callee = path.get('callee');
-        if (callee.isIdentifier() && callee.node.name === localizeName) {
+        if (
+          callee.isIdentifier() &&
+          callee.node.name === localizeName &&
+          utils.isGlobalIdentifier(callee)
+        ) {
           const messageParts = utils.unwrapMessagePartsFromLocalizeCall(path);
           const expressions = utils.unwrapSubstitutionsFromLocalizeCall(path.node);
           positions.push({
