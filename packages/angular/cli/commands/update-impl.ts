@@ -8,8 +8,10 @@
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as semver from 'semver';
 import { Arguments, Option } from '../models/interface';
 import { SchematicCommand } from '../models/schematic-command';
+import { runTempPackageBin } from '../tasks/install-package';
 import { getPackageManager } from '../utilities/package-manager';
 import {
   PackageIdentifier,
@@ -30,6 +32,7 @@ const oldConfigFileNames = ['.angular-cli.json', 'angular-cli.json'];
 
 export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
   public readonly allowMissingWorkspace = true;
+  private readonly packageManager = getPackageManager(this.workspace.root);
 
   async parseArguments(_schematicOptions: string[], _schema: Option[]): Promise<Arguments> {
     return {};
@@ -37,6 +40,21 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
 
   // tslint:disable-next-line:no-big-function
   async run(options: UpdateCommandSchema & Arguments) {
+    // Check if the current installed CLI version is older than the latest version.
+    if (await this.checkCLILatestVersion(options.verbose)) {
+      this.logger.warn(
+        'The installed Angular CLI version is older than the latest published version.\n' +
+        'Installing a temporary version to perform the update.',
+      );
+
+      return runTempPackageBin(
+        '@angular/cli@latest',
+        this.logger,
+        this.packageManager,
+        process.argv.slice(2),
+      );
+    }
+
     const packages: PackageIdentifier[] = [];
     for (const request of options['--'] || []) {
       try {
@@ -99,8 +117,7 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
       }
     }
 
-    const packageManager = getPackageManager(this.workspace.root);
-    this.logger.info(`Using package manager: '${packageManager}'`);
+    this.logger.info(`Using package manager: '${this.packageManager}'`);
 
     // Special handling for Angular CLI 1.x migrations
     if (
@@ -134,7 +151,7 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
           force: options.force || false,
           next: options.next || false,
           verbose: options.verbose || false,
-          packageManager,
+          packageManager: this.packageManager,
           packages: options.all ? Object.keys(rootDependencies) : [],
         },
       });
@@ -351,7 +368,7 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
       additionalOptions: {
         verbose: options.verbose || false,
         force: options.force || false,
-        packageManager,
+        packageManager: this.packageManager,
         packages: packagesToUpdate,
       },
     });
@@ -380,5 +397,29 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
     } catch { }
 
     return true;
+  }
+
+    /**
+   * Checks if the current installed CLI version is older than the latest version.
+   * @returns `true` when the installed version is older.
+  */
+  private async checkCLILatestVersion(verbose = false): Promise<boolean> {
+    const { version: installedCLIVersion } = require('../package.json');
+
+    const LatestCLIManifest = await fetchPackageMetadata(
+      '@angular/cli',
+      this.logger,
+      {
+        verbose,
+        usingYarn: this.packageManager === 'yarn',
+      },
+    );
+
+    const latest = LatestCLIManifest.tags['latest'];
+    if (!latest) {
+      return false;
+    }
+
+    return semver.lt(installedCLIVersion, latest.version);
   }
 }

@@ -19,17 +19,15 @@ import { isWarningEnabled } from '../utilities/config';
 
 const packageJson = require('../package.json');
 
-function _fromPackageJson(cwd?: string) {
-  cwd = cwd || process.cwd();
-
+function _fromPackageJson(cwd = process.cwd()): SemVer | null {
   do {
     const packageJsonPath = path.join(cwd, 'node_modules/@angular/cli/package.json');
     if (fs.existsSync(packageJsonPath)) {
       const content = fs.readFileSync(packageJsonPath, 'utf-8');
       if (content) {
-        const json = JSON.parse(content);
-        if (json['version']) {
-          return new SemVer(json['version']);
+        const { version } = JSON.parse(content);
+        if (version) {
+          return new SemVer(version);
         }
       }
     }
@@ -78,50 +76,64 @@ if (process.env['NG_CLI_PROFILING']) {
 }
 
 let cli;
-try {
-  const projectLocalCli = require.resolve('@angular/cli', { paths: [process.cwd()] });
+const disableVersionCheckEnv = process.env['NG_DISABLE_VERSION_CHECK'];
+/**
+ * Disable CLI version mismatch checks and forces usage of the invoked CLI
+ * instead of invoking the local installed version.
+ */
+const disableVersionCheck =
+  disableVersionCheckEnv !== undefined &&
+  disableVersionCheckEnv !== '0' &&
+  disableVersionCheckEnv.toLowerCase() !== 'false';
 
-  // This was run from a global, check local version.
-  const globalVersion = new SemVer(packageJson['version']);
-  let localVersion;
-  let shouldWarn = false;
-
-  try {
-    localVersion = _fromPackageJson();
-    shouldWarn = localVersion != null && globalVersion.compare(localVersion) > 0;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
-    shouldWarn = true;
-  }
-
-  if (shouldWarn && isWarningEnabled('versionMismatch')) {
-    const warning = colors.yellow(tags.stripIndents`
-    Your global Angular CLI version (${globalVersion}) is greater than your local
-    version (${localVersion}). The local Angular CLI version is used.
-
-    To disable this warning use "ng config -g cli.warnings.versionMismatch false".
-    `);
-    // Don't show warning colorised on `ng completion`
-    if (process.argv[2] !== 'completion') {
-      // eslint-disable-next-line no-console
-      console.error(warning);
-    } else {
-      // eslint-disable-next-line no-console
-      console.error(warning);
-      process.exit(1);
-    }
-  }
-
-  // No error implies a projectLocalCli, which will load whatever
-  // version of ng-cli you have installed in a local package.json
-  cli = require(projectLocalCli);
-} catch {
-  // If there is an error, resolve could not find the ng-cli
-  // library from a package.json. Instead, include it from a relative
-  // path to this script file (which is likely a globally installed
-  // npm package). Most common cause for hitting this is `ng new`
+if (disableVersionCheck) {
   cli = require('./cli');
+} else {
+  try {
+    const projectLocalCli = require.resolve('@angular/cli', { paths: [process.cwd()] });
+
+    // This was run from a global, check local version.
+    const globalVersion = new SemVer(packageJson['version']);
+    let localVersion;
+    let shouldWarn = false;
+
+    try {
+      localVersion = _fromPackageJson();
+      shouldWarn = localVersion != null && globalVersion.compare(localVersion) > 0;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      shouldWarn = true;
+    }
+
+    if (shouldWarn && isWarningEnabled('versionMismatch')) {
+      const warning = colors.yellow(tags.stripIndents`
+      Your global Angular CLI version (${globalVersion}) is greater than your local
+      version (${localVersion}). The local Angular CLI version is used.
+
+      To disable this warning use "ng config -g cli.warnings.versionMismatch false".
+      `);
+      // Don't show warning colorised on `ng completion`
+      if (process.argv[2] !== 'completion') {
+        // eslint-disable-next-line no-console
+        console.error(warning);
+      } else {
+        // eslint-disable-next-line no-console
+        console.error(warning);
+        process.exit(1);
+      }
+    }
+
+    // No error implies a projectLocalCli, which will load whatever
+    // version of ng-cli you have installed in a local package.json
+    cli = require(projectLocalCli);
+  } catch {
+    // If there is an error, resolve could not find the ng-cli
+    // library from a package.json. Instead, include it from a relative
+    // path to this script file (which is likely a globally installed
+    // npm package). Most common cause for hitting this is `ng new`
+    cli = require('./cli');
+  }
 }
 
 if ('default' in cli) {
