@@ -36,6 +36,7 @@ export function emittedFilesToInlineOptions(
       es5,
       outputPath,
       missingTranslation,
+      setLocale: emittedFile.name === 'main',
     };
     originalFiles.push(originalPath);
 

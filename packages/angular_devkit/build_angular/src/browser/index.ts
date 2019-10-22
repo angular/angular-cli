@@ -355,6 +355,7 @@ export function buildWebpackBrowser(
                 integrityAlgorithm: options.subresourceIntegrity ? 'sha384' : undefined,
               };
 
+              let mainChunkId;
               const actions: ProcessBundleOptions[] = [];
               const seen = new Set<string>();
               for (const file of emittedFiles) {
@@ -380,6 +381,11 @@ export function buildWebpackBrowser(
                   continue;
                 }
                 seen.add(file.file);
+
+                if (file.name === 'main') {
+                  // tslint:disable-next-line: no-non-null-assertion
+                  mainChunkId = file.id!.toString();
+                }
 
                 // All files at this point except ES5 polyfills are module scripts
                 const es5Polyfills =
@@ -497,6 +503,7 @@ export function buildWebpackBrowser(
                         outputPath: baseOutputPath,
                         es5: false,
                         missingTranslation: options.i18nMissingTranslation,
+                        setLocale: result.name === mainChunkId,
                       });
                       processedFiles.add(result.original.filename);
                     }
@@ -510,6 +517,7 @@ export function buildWebpackBrowser(
                         outputPath: baseOutputPath,
                         es5: true,
                         missingTranslation: options.i18nMissingTranslation,
+                        setLocale: result.name === mainChunkId,
                       });
                       processedFiles.add(result.downlevel.filename);
                     }
