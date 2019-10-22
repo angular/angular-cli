@@ -32,12 +32,6 @@
       "default": true,
       "description": "When true (the default), creates files at the top level of the project."
     },
-    "spec": {
-      "type": "boolean",
-      "default": true,
-      "description": "When true (the default), generates a  \"spec.ts\" test file for the new service.",
-      "x-deprecated": "Use \"skipTests\" instead."
-    },
     "skipTests": {
       "type": "boolean",
       "description": "When true, does not create \"spec.ts\" test files for the new service.",

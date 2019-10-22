@@ -19,7 +19,7 @@ describe('Class Schematic', () => {
   const defaultOptions: ClassOptions = {
     name: 'foo',
     type: '',
-    spec: false,
+    skipTests: true,
     project: 'bar',
   };
 
@@ -55,7 +55,7 @@ describe('Class Schematic', () => {
   it('should create the class and spec file', async () => {
     const options = {
       ...defaultOptions,
-      spec: true,
+      skipTests: false,
     };
     const tree = await schematicRunner.runSchematicAsync('class', options, appTree)
       .toPromise();
