@@ -30,7 +30,7 @@
     "@angular/router": "file:../../node_modules/@angular/router",
     "@nguniversal/hapi-engine": "file:../../dist/modules-dist/hapi-engine",
     "@hapi/hapi": "file:../../node_modules/@hapi/hapi",
-    "@hapi/inert": "5.2.0",
+    "@hapi/inert": "5.2.2",
     "rxjs": "file:../../node_modules/rxjs",
     "zone.js": "file:../../node_modules/zone.js"
   },
