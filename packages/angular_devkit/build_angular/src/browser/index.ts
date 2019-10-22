@@ -168,6 +168,7 @@ async function initialize(
   const tsConfig = readTsconfig(options.tsConfig, context.workspaceRoot);
   const usingIvy = tsConfig.options.enableIvy !== false;
   const metadata = await context.getProjectMetadata(context.target);
+  const projectRoot = path.join(context.workspaceRoot, (metadata.root as string) || '');
   const i18n = createI18nOptions(metadata, options.localize);
 
   // Until 11.0, support deprecated i18n options when not using new localize option
@@ -180,18 +181,18 @@ async function initialize(
     context.logger.warn(`Option 'localize' is not supported with View Engine.`);
   }
 
-  if (i18n.inlineLocales.size > 0) {
+  if (i18n.shouldInline) {
     // Load locales
     const loader = await createTranslationLoader();
 
     const usedFormats = new Set<string>();
     for (const [locale, desc] of Object.entries(i18n.locales)) {
       if (i18n.inlineLocales.has(locale)) {
-        const result = loader(desc.file);
+        const result = loader(path.join(projectRoot, desc.file));
 
         usedFormats.add(result.format);
-        if (usedFormats.size > 1) {
-          // This limitation is technically only for legacy message id support
+        if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
+          // This limitation is only for legacy message id support (defaults to true as of 9.0)
           throw new Error(
             'Localization currently only supports using one type of translation file format for the entire application.',
           );
@@ -215,13 +216,14 @@ async function initialize(
     options.outputPath = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'angular-cli-'));
   }
 
-  const { config, projectRoot, projectSourceRoot } = await buildBrowserWebpackConfigFromContext(
+  const { config, projectSourceRoot } = await buildBrowserWebpackConfigFromContext(
     options,
     context,
     host,
   );
 
   if (i18n.shouldInline) {
+    // Remove localize "polyfill"
     if (!config.resolve) {
       config.resolve = {};
     }
