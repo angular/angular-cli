@@ -39,7 +39,7 @@
     "@angular-devkit/core": "^9.0.0-next.10",
     "@angular-devkit/schematics": "^9.0.0-next.10",
     "@angular/animations": "^9.0.0-next.11",
-    "@angular/bazel": "9.0.0-next.11",
+    "@angular/bazel": "9.0.0-next.12",
     "@angular/common": "^9.0.0-next.11",
     "@angular/compiler": "^9.0.0-next.11",
     "@angular/compiler-cli": "^9.0.0-next.11",
