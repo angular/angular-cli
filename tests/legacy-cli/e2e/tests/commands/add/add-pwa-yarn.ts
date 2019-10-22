@@ -5,6 +5,9 @@ import { ng } from '../../../utils/process';
 export default async function () {
     // forcibly remove in case another test doesn't clean itself up
     await rimraf('node_modules/@angular/pwa');
+
+    // set yarn as package manager
+    await ng('config', 'cli.packageManager', 'yarn');
     await ng('add', '@angular/pwa');
     await expectFileToExist(join(process.cwd(), 'src/manifest.webmanifest'));
 

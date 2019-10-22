@@ -8,6 +8,7 @@
 import { execSync } from 'child_process';
 import { existsSync } from 'fs';
 import { join } from 'path';
+import { PackageManager } from '../lib/config/schema';
 import { getConfiguredPackageManager } from './config';
 
 function supports(name: string): boolean {
@@ -28,8 +29,8 @@ export function supportsNpm(): boolean {
   return supports('npm');
 }
 
-export async function getPackageManager(root: string): Promise<string> {
-  let packageManager = await getConfiguredPackageManager();
+export async function getPackageManager(root: string): Promise<PackageManager> {
+  let packageManager = await getConfiguredPackageManager() as PackageManager | null;
   if (packageManager) {
     return packageManager;
   }
@@ -40,16 +41,16 @@ export async function getPackageManager(root: string): Promise<string> {
   const hasNpmLock = existsSync(join(root, 'package-lock.json'));
 
   if (hasYarn && hasYarnLock && !hasNpmLock) {
-    packageManager = 'yarn';
+    packageManager = PackageManager.Yarn;
   } else if (hasNpm && hasNpmLock && !hasYarnLock) {
-    packageManager = 'npm';
+    packageManager = PackageManager.Npm;
   } else if (hasYarn && !hasNpm) {
-    packageManager = 'yarn';
+    packageManager = PackageManager.Yarn;
   } else if (hasNpm && !hasYarn) {
-    packageManager = 'npm';
+    packageManager = PackageManager.Npm;
   }
 
   // TODO: This should eventually inform the user of ambiguous package manager usage.
   //       Potentially with a prompt to choose and optionally set as the default.
-  return packageManager || 'npm';
+  return packageManager || PackageManager.Npm;
 }

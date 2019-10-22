@@ -19,17 +19,15 @@ import { isWarningEnabled } from '../utilities/config';
 
 const packageJson = require('../package.json');
 
-function _fromPackageJson(cwd?: string) {
-  cwd = cwd || process.cwd();
-
+function _fromPackageJson(cwd = process.cwd()): SemVer | null {
   do {
     const packageJsonPath = path.join(cwd, 'node_modules/@angular/cli/package.json');
     if (fs.existsSync(packageJsonPath)) {
       const content = fs.readFileSync(packageJsonPath, 'utf-8');
       if (content) {
-        const json = JSON.parse(content);
-        if (json['version']) {
-          return new SemVer(json['version']);
+        const { version } = JSON.parse(content);
+        if (version) {
+          return new SemVer(version);
         }
       }
     }
@@ -78,6 +76,20 @@ if (process.env['NG_CLI_PROFILING']) {
 }
 
 (async () => {
+  const disableVersionCheckEnv = process.env['NG_DISABLE_VERSION_CHECK'];
+  /**
+   * Disable CLI version mismatch checks and forces usage of the invoked CLI
+   * instead of invoking the local installed version.
+   */
+  const disableVersionCheck =
+    disableVersionCheckEnv !== undefined &&
+    disableVersionCheckEnv !== '0' &&
+    disableVersionCheckEnv.toLowerCase() !== 'false';
+
+  if (disableVersionCheck) {
+    return (await import('./cli')).default;
+  }
+
   let cli;
   try {
     const projectLocalCli = require.resolve('@angular/cli', { paths: [process.cwd()] });
@@ -116,13 +128,13 @@ if (process.env['NG_CLI_PROFILING']) {
 
     // No error implies a projectLocalCli, which will load whatever
     // version of ng-cli you have installed in a local package.json
-    cli = require(projectLocalCli);
+    cli = await import(projectLocalCli);
   } catch {
     // If there is an error, resolve could not find the ng-cli
     // library from a package.json. Instead, include it from a relative
     // path to this script file (which is likely a globally installed
     // npm package). Most common cause for hitting this is `ng new`
-    cli = require('./cli');
+    cli = await import('./cli');
   }
 
   if ('default' in cli) {
