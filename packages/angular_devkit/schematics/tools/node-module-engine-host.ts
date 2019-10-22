@@ -10,8 +10,7 @@ import {
   InvalidJsonCharacterException,
   UnexpectedEndOfInputException,
 } from '@angular-devkit/core';
-import * as core from '@angular-devkit/core/node';
-import { dirname, join, resolve as resolvePath } from 'path';
+import { dirname, extname, join, resolve } from 'path';
 import { RuleFactory } from '../src';
 import {
   FileSystemCollectionDesc,
@@ -27,7 +26,6 @@ import {
 } from './file-system-engine-host-base';
 import { readJsonFile } from './file-system-utility';
 
-
 export class NodePackageDoesNotSupportSchematics extends BaseException {
   constructor(name: string) {
     super(`Package ${JSON.stringify(name)} was found but does not support schematics.`);
@@ -41,71 +39,30 @@ export class NodePackageDoesNotSupportSchematics extends BaseException {
 export class NodeModulesEngineHost extends FileSystemEngineHostBase {
   constructor() { super(); }
 
-  protected _resolvePackageJson(name: string, basedir = process.cwd()) {
-    return core.resolve(name, {
-      basedir,
-      checkLocal: true,
-      checkGlobal: true,
-      resolvePackageJson: true,
-    });
-  }
-
-  protected _resolvePath(name: string, basedir = process.cwd()) {
-    // Allow relative / absolute paths.
-    if (name.startsWith('.') || name.startsWith('/')) {
-      return resolvePath(basedir, name);
-    } else {
-      // If it's a file inside a package, resolve the package then return the file...
-      if (name.split('/').length > (name[0] == '@' ? 2 : 1)) {
-        const rest = name.split('/');
-        const packageName = rest.shift() + (name[0] == '@' ? '/' + rest.shift() : '');
-
-        return resolvePath(core.resolve(packageName, {
-          basedir,
-          checkLocal: true,
-          checkGlobal: true,
-          resolvePackageJson: true,
-        }), '..', ...rest);
-      }
-
-      return core.resolve(name, {
-        basedir,
-        checkLocal: true,
-        checkGlobal: true,
-      });
-    }
-  }
-
   protected _resolveCollectionPath(name: string): string {
     let collectionPath: string | undefined = undefined;
-
-    if (name.replace(/\\/g, '/').split('/').length > (name[0] == '@' ? 2 : 1)) {
-      try {
-        collectionPath = this._resolvePath(name, process.cwd());
-      } catch {
-      }
+    if (name.startsWith('.') || name.startsWith('/')) {
+      name = resolve(name);
     }
 
-    if (!collectionPath) {
-      let packageJsonPath = this._resolvePackageJson(name, process.cwd());
-      // If it's a file, use it as is. Otherwise append package.json to it.
-      if (!core.fs.isFile(packageJsonPath)) {
-        packageJsonPath = join(packageJsonPath, 'package.json');
-      }
+    if (extname(name)) {
+      // When having an extension let's just resolve the provided path.
+      collectionPath = require.resolve(name);
+    } else {
+      const packageJsonPath = require.resolve(join(name, 'package.json'));
+      const { schematics } = require(packageJsonPath);
 
-      const pkgJsonSchematics = require(packageJsonPath)['schematics'];
-      if (!pkgJsonSchematics || typeof pkgJsonSchematics != 'string') {
+      if (!schematics || typeof schematics !== 'string') {
         throw new NodePackageDoesNotSupportSchematics(name);
       }
-      collectionPath = this._resolvePath(pkgJsonSchematics, dirname(packageJsonPath));
+
+      collectionPath = resolve(dirname(packageJsonPath), schematics);
     }
 
     try {
-      if (collectionPath) {
-        readJsonFile(collectionPath);
+      readJsonFile(collectionPath);
 
-        return collectionPath;
-      }
+      return collectionPath;
     } catch (e) {
       if (
         e instanceof InvalidJsonCharacterException || e instanceof UnexpectedEndOfInputException

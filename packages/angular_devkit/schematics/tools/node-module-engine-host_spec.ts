@@ -14,7 +14,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { NodeModulesEngineHost } from './node-module-engine-host';
 
-const TMP_DIR = process.env['$TEST_TMPDIR'] || os.tmpdir();
+const TMP_DIR = process.env['TEST_TMPDIR'] || os.tmpdir();
 
 describe('NodeModulesEngineHost', () => {
   let tmpDir!: string;
@@ -47,8 +47,16 @@ describe('NodeModulesEngineHost', () => {
     const engineHost = new NodeModulesEngineHost();
     const engine = new SchematicEngine(engineHost);
 
+    // Under Bazel 'require.resolve' is patched to use Bazel resolutions from the MANIFEST FILES.
+    // Adding a temporary file won't be enough to make Bazel aware of this file.
+    // We provide the full path here just to verify that the underlying logic works
+    let prefix = '';
+    if (process.env['BAZEL_TARGET']) {
+      prefix = path.join(process.cwd(), 'node_modules');
+    }
+
     expect(() => {
-      engine.createCollection(path.join('@angular/core', './schematics/migrations.json'));
+      engine.createCollection(path.join(prefix, '@angular/core', './schematics/migrations.json'));
     }).not.toThrow();
   });
 });
