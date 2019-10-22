@@ -134,16 +134,6 @@
               "description": "Flag to skip the module import.",
               "default": false
             },
-            "spec": {
-              "type": "boolean",
-              "description": "Specifies if a spec file is generated.",
-              "default": true
-            },
-            "styleext": {
-              "description": "The file extension to be used for style files.",
-              "type": "string",
-              "default": "css"
-            },
             "style": {
               "description": "The file extension or preprocessor to use for style files.",
               "type": "string",
@@ -199,11 +189,6 @@
               "description": "Flag to skip the module import.",
               "default": false
             },
-            "spec": {
-              "type": "boolean",
-              "description": "Specifies if a spec file is generated.",
-              "default": true
-            },
             "skipTests": {
               "type": "boolean",
               "description": "When true, does not create test files.",
@@ -251,11 +236,6 @@
               "default": true,
               "description": "Flag to indicate if a directory is created."
             },
-            "spec": {
-              "type": "boolean",
-              "description": "Specifies if a spec file is generated.",
-              "default": true
-            },
             "skipTests": {
               "type": "boolean",
               "description": "When true, does not create test files.",
@@ -270,11 +250,6 @@
               "type": "boolean",
               "default": true,
               "description": "Flag to indicate if a directory is created."
-            },
-            "spec": {
-              "type": "boolean",
-              "description": "Specifies if a spec file is generated.",
-              "default": true
             },
             "skipTests": {
               "type": "boolean",
@@ -302,11 +277,6 @@
         "@schematics/angular:class": {
           "type": "object",
           "properties": {
-            "spec": {
-              "type": "boolean",
-              "description": "Specifies if a spec file is generated.",
-              "default": true
-            },
             "skipTests": {
               "type": "boolean",
               "description": "When true, does not create test files.",

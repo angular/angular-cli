@@ -143,13 +143,6 @@ export default function (options: ComponentOptions): Rule {
     options.path = parsedPath.path;
     options.selector = options.selector || buildSelector(options, project && project.prefix || '');
 
-    // todo remove these when we remove the deprecations
-    options.style = (
-      options.style && options.style !== Style.Css
-        ? options.style : options.styleext as Style
-    ) || Style.Css;
-    options.skipTests = options.skipTests || !options.spec;
-
     validateName(options.name);
     validateHtmlSelector(options.selector);
 

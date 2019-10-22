@@ -19,7 +19,6 @@ describe('Pipe Schematic', () => {
   );
   const defaultOptions: PipeOptions = {
     name: 'foo',
-    spec: true,
     module: undefined,
     export: false,
     flat: true,

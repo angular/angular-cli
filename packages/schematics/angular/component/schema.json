@@ -69,12 +69,6 @@
         }
       ]
     },
-    "styleext": {
-      "description": "The file extension to use for style files.",
-      "type": "string",
-      "default": "css",
-      "x-deprecated": "Use \"style\" instead."
-    },
     "style": {
       "description": "The file extension or preprocessor to use for style files.",
       "type": "string",
@@ -92,12 +86,6 @@
       "type": "string",
       "description": "Adds a developer-defined type to the filename, in the format \"name.type.ts\".",
       "default": "Component"
-    },
-    "spec": {
-      "type": "boolean",
-      "description": "When true (the default), generates a  \"spec.ts\" test file for the new component.",
-      "default": true,
-      "x-deprecated": "Use \"skipTests\" instead."
     },
     "skipTests": {
       "type": "boolean",
