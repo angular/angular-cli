@@ -2,9 +2,10 @@ import * as express from 'express';
 import { resolve } from 'path';
 import { getGlobalVariable } from '../../../utils/env';
 import { appendToFile, copyFile, expectFileToExist, expectFileToMatch, replaceInFile, writeFile } from '../../../utils/fs';
-import { ng } from '../../../utils/process';
+import { ng, npm } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
 import { expectToFail } from '../../../utils/utils';
+import { readNgVersion } from '../../../utils/version';
 
 export default async function () {
   const baseDir = 'dist/test-project';
@@ -18,6 +19,16 @@ export default async function () {
     { lang: 'fr', translation: 'Bonjour i18n!', outputPath: frDist },
     { lang: 'de', translation: 'Hallo i18n!', outputPath: deDir },
   ];
+
+  if (!getGlobalVariable('argv')['ve']) {
+    let localizeVersion = '@angular/localize@' + readNgVersion();
+    if (getGlobalVariable('argv')['ng-snapshots']) {
+      localizeVersion = require('../../../ng-snapshot/package.json').dependencies['@angular/localize'];
+    }
+    await npm('install', localizeVersion);
+
+    await appendToFile('src/polyfills.ts', `\nimport '@angular/localize/init';`);
+  }
 
   await updateJsonFile('angular.json', workspaceJson => {
     const appArchitect = workspaceJson.projects['test-project'].architect;
@@ -88,8 +99,11 @@ export default async function () {
   for (const { lang, translation } of langTranslations) {
     if (lang != 'en') {
       await copyFile('src/locale/messages.xlf', `src/locale/messages.${lang}.xlf`);
-      await replaceInFile(`src/locale/messages.${lang}.xlf`, '<source>Hello i18n!</source>',
-        `<source>Hello i18n!</source>\n<target>${translation}</target>`);
+      await replaceInFile(
+        `src/locale/messages.${lang}.xlf`,
+        '<source>Hello i18n!</source>',
+        `<source>Hello i18n!</source>\n<target>${translation}</target>`,
+      );
     }
   }
 
@@ -109,7 +123,7 @@ export default async function () {
       const server = app.listen(4200, 'localhost');
       try {
         // Execute without a devserver.
-        await ng('e2e', '--devServerTarget=');
+        await ng('e2e', `--configuration=${lang}`, '--devServerTarget=');
       } finally {
         server.close();
       }
