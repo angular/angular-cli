@@ -651,9 +651,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/fs-extra@^4.0.5":
-  version "4.0.8"
-  resolved "http://registry.npmjs.org/@types/fs-extra/-/fs-extra-4.0.8.tgz#6957ddaf9173195199cb96da3db44c74700463d2"
+"@types/fs-extra@^8.0.0":
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-8.0.1.tgz#a2378d6e7e8afea1564e44aafa2e207dadf77686"
+  integrity sha512-J00cVDALmi/hJOYsunyT52Hva5TnJeKP5yd1r+mH/ZU0mbYZflR0Z5kw5kITtKTRYMhm1JMClOFYdHnQszEvqw==
   dependencies:
     "@types/node" "*"
 
