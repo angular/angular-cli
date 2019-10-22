@@ -1,4 +1,4 @@
-load("@npm_bazel_typescript//:defs.bzl", "ts_library")
+load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 # files fetched on 2019-03-05 from
 # https://github.com/Microsoft/TypeScript/tree/v3.3.3333
