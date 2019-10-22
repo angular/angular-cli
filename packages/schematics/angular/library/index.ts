@@ -211,6 +211,7 @@ export default function (options: LibraryOptions): Rule {
         relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(projectRoot),
         prefix,
         angularLatestVersion: latestVersions.Angular.replace('~', '').replace('^', ''),
+        tsLibLatestVersion: latestVersions.TsLib.replace('~', '').replace('^', ''),
         folderName,
       }),
       move(projectRoot),
