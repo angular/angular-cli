@@ -26,7 +26,7 @@
     "core-js": "3.3.3",
     "file-loader": "4.2.0",
     "find-cache-dir": "3.0.0",
-    "glob": "7.1.4",
+    "glob": "7.1.5",
     "istanbul-instrumenter-loader": "3.0.1",
     "jest-worker": "24.9.0",
     "karma-source-map-support": "1.4.0",
