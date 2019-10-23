@@ -108,8 +108,6 @@ export declare class InvalidCollectionJsonException extends BaseException {
 export declare class NodeModulesEngineHost extends FileSystemEngineHostBase {
     constructor();
     protected _resolveCollectionPath(name: string): string;
-    protected _resolvePackageJson(name: string, basedir?: string): string;
-    protected _resolvePath(name: string, basedir?: string): string;
     protected _resolveReferenceString(refString: string, parentPath: string): {
         ref: RuleFactory<{}>;
         path: string;
