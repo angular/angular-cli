@@ -67,7 +67,6 @@ export declare abstract class FileSystemEngineHostBase implements FileSystemEngi
     getSchematicRuleFactory<OptionT extends object>(schematic: FileSystemSchematicDesc, _collection: FileSystemCollectionDesc): RuleFactory<OptionT>;
     hasTaskExecutor(name: string): boolean;
     listSchematicNames(collection: FileSystemCollectionDesc): string[];
-    listSchematics(collection: FileSystemCollection): string[];
     registerContextTransform(t: ContextTransform): void;
     registerOptionsTransform<T extends object, R extends object>(t: OptionTransform<T, R>): void;
     registerTaskExecutor<T>(factory: TaskExecutorFactory<T>, options?: T): void;

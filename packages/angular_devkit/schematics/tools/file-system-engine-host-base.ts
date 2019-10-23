@@ -124,12 +124,6 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
   private _contextTransforms: ContextTransform[] = [];
   private _taskFactories = new Map<string, () => Observable<TaskExecutor>>();
 
-  /**
-   * @deprecated Use `listSchematicNames`.
-   */
-  listSchematics(collection: FileSystemCollection): string[] {
-    return this.listSchematicNames(collection.description);
-  }
   listSchematicNames(collection: FileSystemCollectionDesc) {
     const schematics: string[] = [];
     for (const key of Object.keys(collection.schematics)) {

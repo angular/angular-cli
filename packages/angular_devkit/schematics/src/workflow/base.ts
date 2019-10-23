@@ -16,7 +16,6 @@ import { HostSink } from '../sink/host';
 import { Sink } from '../sink/sink';
 import { HostTree } from '../tree/host-tree';
 import { Tree } from '../tree/interface';
-import { optimize } from '../tree/static';
 import {
   LifeCycleEvent,
   RequiredWorkflowExecutionContext,
@@ -165,7 +164,6 @@ export abstract class BaseWorkflow implements Workflow {
       of(new HostTree(this._host)),
       { logger: context.logger },
     ).pipe(
-      map(tree => optimize(tree)),
       concatMap((tree: Tree) => {
         // Process all sinks.
         return concat(

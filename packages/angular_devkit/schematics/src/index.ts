@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { FilePredicate, MergeStrategy, Tree as TreeInterface } from './tree/interface';
-import { branch, empty, merge, optimize, partition } from './tree/static';
+import { branch, empty, merge, partition } from './tree/static';
 
 
 export { SchematicsException } from './exception/exception';
@@ -28,7 +28,6 @@ export * from './tree/host-tree';
 export { UpdateRecorder } from './tree/interface';
 export * from './engine/schematic';
 export * from './sink/dryrun';
-export * from './sink/filesystem';
 export * from './sink/host';
 export * from './sink/sink';
 
@@ -58,5 +57,5 @@ export const Tree: TreeConstructor = {
   partition(tree: TreeInterface, predicate: FilePredicate<boolean>) {
     return partition(tree, predicate);
   },
-  optimize(tree: TreeInterface) { return optimize(tree); },
+  optimize(tree: TreeInterface) { return tree; },
 };
