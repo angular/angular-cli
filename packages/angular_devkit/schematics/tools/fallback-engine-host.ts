@@ -109,15 +109,6 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
     return result;
   }
 
-  /**
-   * @deprecated Use `listSchematicNames`.
-   */
-  listSchematics(
-    collection: Collection<FallbackCollectionDescription, FallbackSchematicDescription>,
-  ): string[] {
-    return this.listSchematicNames(collection.description);
-  }
-
   listSchematicNames(collection: CollectionDescription<FallbackCollectionDescription>): string[] {
     const allNames = new Set<string>();
     this._hosts.forEach(host => {

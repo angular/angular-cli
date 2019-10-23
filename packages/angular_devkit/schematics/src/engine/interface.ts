@@ -77,10 +77,6 @@ export type SchematicDescription<CollectionMetadataT extends object,
  */
 export interface EngineHost<CollectionMetadataT extends object, SchematicMetadataT extends object> {
   createCollectionDescription(name: string): CollectionDescription<CollectionMetadataT>;
-  /**
-   * @deprecated Use `listSchematicNames`.
-   */
-  listSchematics(collection: Collection<CollectionMetadataT, SchematicMetadataT>): string[];
   listSchematicNames(collection: CollectionDescription<CollectionMetadataT>): string[];
 
   createSchematicDescription(

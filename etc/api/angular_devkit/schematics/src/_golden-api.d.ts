@@ -176,7 +176,6 @@ export declare class DryRunSink extends HostSink {
     protected _fileDoesNotExistExceptionSet: Set<string>;
     protected _subject: Subject<DryRunEvent>;
     readonly reporter: Observable<DryRunEvent>;
-    constructor(dir: string, force?: boolean);
     constructor(host: virtualFs.Host, force?: boolean);
     _done(): Observable<void>;
     protected _fileAlreadyExistException(path: string): void;
@@ -215,7 +214,6 @@ export interface EngineHost<CollectionMetadataT extends object, SchematicMetadat
     getSchematicRuleFactory<OptionT extends object>(schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>, collection: CollectionDescription<CollectionMetadataT>): RuleFactory<OptionT>;
     hasTaskExecutor(name: string): boolean;
     listSchematicNames(collection: CollectionDescription<CollectionMetadataT>): string[];
-    listSchematics(collection: Collection<CollectionMetadataT, SchematicMetadataT>): string[];
     transformContext(context: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>): TypedSchematicContext<CollectionMetadataT, SchematicMetadataT> | void;
     transformOptions<OptionT extends object, ResultT extends object>(schematic: SchematicDescription<CollectionMetadataT, SchematicMetadataT>, options: OptionT, context?: TypedSchematicContext<CollectionMetadataT, SchematicMetadataT>): Observable<ResultT>;
 }
@@ -244,10 +242,6 @@ export declare type FileOperator = (entry: FileEntry) => FileEntry | null;
 
 export interface FilePredicate<T> {
     (path: Path, entry?: Readonly<FileEntry> | null): T;
-}
-
-export declare class FileSystemSink extends HostSink {
-    constructor(dir: string, force?: boolean);
 }
 
 export declare type FileVisitor = FilePredicate<void>;

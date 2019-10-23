@@ -9,7 +9,6 @@
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { HostSink } from '@angular-devkit/schematics';
 import { HostCreateTree, HostTree } from '../tree/host-tree';
-import { optimize } from '../tree/static';
 
 
 describe('FileSystemSink', () => {
@@ -34,7 +33,7 @@ describe('FileSystemSink', () => {
 
     const outputHost = new virtualFs.test.TestHost();
     const sink = new HostSink(outputHost);
-    sink.commit(optimize(tree))
+    sink.commit(tree)
         .toPromise()
         .then(() => {
           const tmpFiles = outputHost.files.sort();
@@ -57,7 +56,7 @@ describe('FileSystemSink', () => {
 
       const outputHost = new virtualFs.test.TestHost();
       const sink = new HostSink(outputHost);
-      sink.commit(optimize(tree))
+      sink.commit(tree)
           .toPromise()
           .then(done, done.fail);
     });
@@ -70,7 +69,7 @@ describe('FileSystemSink', () => {
       tree.rename('/file0', '/file1');
 
       const sink = new HostSink(host);
-      sink.commit(optimize(tree))
+      sink.commit(tree)
           .toPromise()
           .then(() => {
             expect(host.sync.exists(normalize('/file0'))).toBe(false);
@@ -88,7 +87,7 @@ describe('FileSystemSink', () => {
       tree.rename('/sub/directory/file2', '/another-directory/file2');
 
       const sink = new HostSink(host);
-      sink.commit(optimize(tree))
+      sink.commit(tree)
           .toPromise()
           .then(() => {
             expect(host.sync.exists(normalize('/sub/directory/file2'))).toBe(false);
@@ -106,7 +105,7 @@ describe('FileSystemSink', () => {
       tree.create('/file0', 'hello');
 
       const sink = new HostSink(host);
-      sink.commit(optimize(tree))
+      sink.commit(tree)
           .toPromise()
           .then(() => {
             expect(host.sync.read(normalize('/file0')).toString()).toBe('hello');
@@ -128,7 +127,7 @@ describe('FileSystemSink', () => {
       expect(tree.exists('/file0')).toBeTruthy();
 
       const sink = new HostSink(host);
-      sink.commit(optimize(tree))
+      sink.commit(tree)
           .toPromise()
           .then(() => {
             expect(host.sync.read(normalize('/file0')).toString()).toBe('hello');
