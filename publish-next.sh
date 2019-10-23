@@ -15,5 +15,5 @@ bazel build --config=release $NPM_PACKAGE_LABELS
 # publish all packages in sequence to make it easier to spot any errors or warnings
 for packageLabel in $NPM_PACKAGE_LABELS; do
   echo "publishing $packageLabel"
-  bazel run -- ${packageLabel}.publish --access public --tag next
+  bazel run --config=release -- ${packageLabel}.publish --access public --tag next
 done

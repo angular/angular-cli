@@ -41,6 +41,7 @@ test
 # Configures script to do version stamping.
 # See https://docs.bazel.build/versions/master/user-manual.html#flag--workspace_status_command
 build:release --workspace_status_command="node ./tools/bazel-stamp-vars.js"
+run:release --workspace_status_command="node ./tools/bazel-stamp-vars.js"
 
 ###############################
 # Typescript / Angular / Sass #
