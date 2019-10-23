@@ -40,7 +40,7 @@ export default function (options: NgNewOptions): Rule {
   const workspaceOptions: WorkspaceOptions = {
     name: options.name,
     version: options.version,
-    newProjectRoot: options.newProjectRoot || 'projects',
+    newProjectRoot: options.newProjectRoot,
     minimal: options.minimal,
     strict: options.strict,
   };
