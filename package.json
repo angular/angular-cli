@@ -65,7 +65,7 @@
     "@types/node": "^12.11.1",
     "domino": "^2.1.2",
     "express": "^4.15.2",
-    "jasmine-core": "^2.11.0",
+    "jasmine-core": "^3.0.0",
     "karma": "^4.1.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^2.0.1",
