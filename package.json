@@ -67,7 +67,7 @@
     "express": "^4.15.2",
     "jasmine-core": "^3.0.0",
     "karma": "^4.1.0",
-    "karma-chrome-launcher": "^2.2.0",
+    "karma-chrome-launcher": "^3.0.0",
     "karma-jasmine": "^2.0.1",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-typescript": "^4.1.0",
