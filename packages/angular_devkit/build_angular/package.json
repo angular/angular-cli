@@ -46,7 +46,7 @@
     "regenerator-runtime": "0.13.3",
     "rollup": "1.25.1",
     "rxjs": "6.5.3",
-    "sass": "1.23.0",
+    "sass": "1.23.1",
     "sass-loader": "8.0.0",
     "semver": "6.3.0",
     "source-map": "0.7.3",
