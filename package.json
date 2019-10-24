@@ -26,6 +26,8 @@
     "bazel:test": "bazel test //...",
     "build": "npm run admin -- build",
     "build-tsc": "tsc -p tsconfig.json",
+    "debug:test": "node --inspect-brk ./bin/devkit-admin test",
+    "debug:test-large": "node --inspect-brk ./bin/devkit-admin test --large --spec-reporter",
     "fix": "npm run admin -- lint --fix",
     "lint": "npm run admin -- lint",
     "templates": "node ./bin/devkit-admin templates",
