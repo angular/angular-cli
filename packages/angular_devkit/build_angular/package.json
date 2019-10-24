@@ -61,7 +61,7 @@
     "terser-webpack-plugin": "2.2.1",
     "webpack": "4.41.2",
     "webpack-dev-middleware": "3.7.2",
-    "webpack-dev-server": "3.8.2",
+    "webpack-dev-server": "3.9.0",
     "webpack-merge": "4.2.2",
     "webpack-sources": "1.4.3",
     "webpack-subresource-integrity": "1.3.4",
