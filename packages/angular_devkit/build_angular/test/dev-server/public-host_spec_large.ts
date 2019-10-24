@@ -14,7 +14,7 @@ import { createArchitect, host } from '../utils';
 describe('Dev Server Builder public host', () => {
   // We have to spoof the host to a non-numeric one because Webpack Dev Server does not
   // check the hosts anymore when requests come from numeric IP addresses.
-  const headers = { host: 'http://spoofy.mcspoofface' };
+  const headers = { host: 'spoofy.mcspoofface' };
 
   const target = { project: 'app', target: 'serve' };
   let architect: Architect;
