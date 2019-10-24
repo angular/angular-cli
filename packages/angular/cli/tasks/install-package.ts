@@ -82,10 +82,14 @@ export function installTempPackage(
   logger: logging.Logger,
   packageManager: PackageManager = PackageManager.Npm,
 ): string {
-  const tempPath = mkdtempSync(join(realpathSync(tmpdir()), '.ng-temp-packages-'));
+  const tempPath = mkdtempSync(join(realpathSync(tmpdir()), 'angular-cli-packages-'));
 
   // clean up temp directory on process exit
-  process.on('exit', () => rimraf.sync(tempPath));
+  process.on('exit', () => {
+    try {
+      rimraf.sync(tempPath);
+    } catch { }
+  });
 
   // setup prefix/global modules path
   const packageManagerArgs = getPackageManagerArguments(packageManager);

@@ -9,9 +9,9 @@ import JestWorker from 'jest-worker';
 import * as os from 'os';
 import * as path from 'path';
 import * as v8 from 'v8';
-import { I18nOptions } from '../utils/i18n-options';
-import { InlineOptions, ProcessBundleOptions, ProcessBundleResult } from '../utils/process-bundle';
 import { BundleActionCache } from './action-cache';
+import { I18nOptions } from './i18n-options';
+import { InlineOptions, ProcessBundleOptions, ProcessBundleResult } from './process-bundle';
 
 const hasThreadSupport = (() => {
   try {
@@ -28,10 +28,10 @@ const hasThreadSupport = (() => {
 // Processes use JSON which is much more limited
 const serialize = ((v8 as unknown) as { serialize(value: unknown): Buffer }).serialize;
 
-let workerFile = require.resolve('../utils/process-bundle');
+let workerFile = require.resolve('./process-bundle');
 workerFile =
   path.extname(workerFile) === '.ts'
-    ? require.resolve('../utils/process-bundle-bootstrap')
+    ? require.resolve('./process-bundle-bootstrap')
     : workerFile;
 
 export class BundleActionExecutor {

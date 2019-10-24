@@ -10,7 +10,6 @@ import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devki
 import { join, json, logging, normalize, tags, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
-import * as os from 'os';
 import * as path from 'path';
 import { Observable, from, of } from 'rxjs';
 import { concatMap, map, switchMap } from 'rxjs/operators';
@@ -49,12 +48,13 @@ import {
   normalizeOptimization,
   normalizeSourceMaps,
 } from '../utils';
+import { BundleActionExecutor } from '../utils/action-executor';
 import { findCachePath } from '../utils/cache-path';
 import { copyAssets } from '../utils/copy-assets';
 import { cachingDisabled } from '../utils/environment-options';
-import { emittedFilesToInlineOptions } from '../utils/i18n-inlining';
-import { I18nOptions, createI18nOptions, mergeDeprecatedI18nOptions } from '../utils/i18n-options';
-import { createTranslationLoader } from '../utils/load-translations';
+import { i18nInlineEmittedFiles } from '../utils/i18n-inlining';
+import { I18nOptions } from '../utils/i18n-options';
+import { ensureOutputPaths } from '../utils/output-paths';
 import {
   InlineOptions,
   ProcessBundleFile,
@@ -63,11 +63,12 @@ import {
 } from '../utils/process-bundle';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import {
+  BrowserWebpackConfigOptions,
   generateBrowserWebpackConfigFromContext,
+  generateI18nBrowserWebpackConfigFromContext,
   getIndexInputFile,
   getIndexOutputFile,
 } from '../utils/webpack-browser-config';
-import { BundleActionExecutor } from './action-executor';
 import { Schema as BrowserBuilderSchema } from './schema';
 
 const cacheDownlevelPath = cachingDisabled ? undefined : findCachePath('angular-build-dl');
@@ -99,23 +100,53 @@ export function createBrowserLoggingCallback(
   };
 }
 
+// todo: the below should be cleaned once dev-server support the new i18n
+interface ConfigFromContextReturn {
+  config: webpack.Configuration;
+  projectRoot: string;
+  projectSourceRoot?: string;
+}
+
+export async function buildBrowserWebpackConfigFromContext(
+  options: BrowserBuilderSchema,
+  context: BuilderContext,
+  host: virtualFs.Host<fs.Stats>,
+  i18n: boolean,
+): Promise<ConfigFromContextReturn & { i18n: I18nOptions }>;
+export async function buildBrowserWebpackConfigFromContext(
+  options: BrowserBuilderSchema,
+  context: BuilderContext,
+  host?: virtualFs.Host<fs.Stats>,
+): Promise<ConfigFromContextReturn>;
 export async function buildBrowserWebpackConfigFromContext(
   options: BrowserBuilderSchema,
   context: BuilderContext,
   host: virtualFs.Host<fs.Stats> = new NodeJsSyncHost(),
-): Promise<{ config: webpack.Configuration; projectRoot: string; projectSourceRoot?: string }> {
+  i18n = false,
+): Promise<ConfigFromContextReturn & { i18n?: I18nOptions }> {
+  const webpackPartialGenerator = (wco: BrowserWebpackConfigOptions) => [
+    getCommonConfig(wco),
+    getBrowserConfig(wco),
+    getStylesConfig(wco),
+    getStatsConfig(wco),
+    getAnalyticsConfig(wco, context),
+    getCompilerConfig(wco),
+    wco.buildOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
+  ];
+
+  if (i18n) {
+    return generateI18nBrowserWebpackConfigFromContext(
+      options,
+      context,
+      webpackPartialGenerator,
+      host,
+    );
+  }
+
   return generateBrowserWebpackConfigFromContext(
     options,
     context,
-    wco => [
-      getCommonConfig(wco),
-      getBrowserConfig(wco),
-      getStylesConfig(wco),
-      getStatsConfig(wco),
-      getAnalyticsConfig(wco, context),
-      getCompilerConfig(wco),
-      wco.buildOptions.webWorkerTsConfig ? getWorkerConfig(wco) : {},
-    ],
+    webpackPartialGenerator,
     host,
   );
 }
@@ -161,77 +192,13 @@ async function initialize(
   projectSourceRoot?: string;
   i18n: I18nOptions;
 }> {
-  if (!context.target) {
-    throw new Error('The builder requires a target.');
-  }
-
-  const tsConfig = readTsconfig(options.tsConfig, context.workspaceRoot);
-  const usingIvy = tsConfig.options.enableIvy !== false;
-  const metadata = await context.getProjectMetadata(context.target);
-  const projectRoot = path.join(context.workspaceRoot, (metadata.root as string) || '');
-  const i18n = createI18nOptions(metadata, options.localize);
-
-  // Until 11.0, support deprecated i18n options when not using new localize option
-  // i18nFormat is automatically calculated
-  if (options.localize === undefined && usingIvy) {
-    mergeDeprecatedI18nOptions(i18n, options.i18nLocale, options.i18nFile);
-  } else if (options.localize !== undefined && !usingIvy) {
-    options.localize = undefined;
-
-    context.logger.warn(`Option 'localize' is not supported with View Engine.`);
-  }
-
-  if (i18n.shouldInline) {
-    // Load locales
-    const loader = await createTranslationLoader();
-
-    const usedFormats = new Set<string>();
-    for (const [locale, desc] of Object.entries(i18n.locales)) {
-      if (i18n.inlineLocales.has(locale)) {
-        const result = loader(path.join(projectRoot, desc.file));
-
-        usedFormats.add(result.format);
-        if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
-          // This limitation is only for legacy message id support (defaults to true as of 9.0)
-          throw new Error(
-            'Localization currently only supports using one type of translation file format for the entire application.',
-          );
-        }
-
-        desc.format = result.format;
-        desc.translation = result.translation;
-      }
-    }
-
-    // Legacy message id's require the format of the translations
-    if (usedFormats.size > 0) {
-      options.i18nFormat = [...usedFormats][0];
-    }
-  }
-
   const originalOutputPath = options.outputPath;
-
-  // If inlining store the output in a temporary location to facilitate post-processing
-  if (i18n.shouldInline) {
-    options.outputPath = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'angular-cli-'));
-  }
-
-  const { config, projectSourceRoot } = await buildBrowserWebpackConfigFromContext(
+  const { config, projectRoot, projectSourceRoot, i18n } = await buildBrowserWebpackConfigFromContext(
     options,
     context,
     host,
+    true,
   );
-
-  if (i18n.shouldInline) {
-    // Remove localize "polyfill"
-    if (!config.resolve) {
-      config.resolve = {};
-    }
-    if (!config.resolve.alias) {
-      config.resolve.alias = {};
-    }
-    config.resolve.alias['@angular/localize/init'] = require.resolve('./empty.js');
-  }
 
   let transformedConfig;
   if (webpackConfigurationTransform) {
@@ -239,11 +206,10 @@ async function initialize(
   }
 
   if (options.deleteOutputPath) {
-    await deleteOutputDir(
-      normalize(context.workspaceRoot),
-      normalize(originalOutputPath),
-      host,
-    ).toPromise();
+    deleteOutputDir(
+      context.workspaceRoot,
+      originalOutputPath,
+    );
   }
 
   return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n };
@@ -312,15 +278,7 @@ export function buildWebpackBrowser(
 
             return { success };
           } else if (success) {
-            const outputPaths =
-              i18n.shouldInline && !i18n.flatOutput
-                ? [...i18n.inlineLocales].map(l => path.join(baseOutputPath, l))
-                : [baseOutputPath];
-            for (const outputPath of outputPaths) {
-              if (!fs.existsSync(outputPath)) {
-                fs.mkdirSync(outputPath, { recursive: true });
-              }
-            }
+            const outputPaths = ensureOutputPaths(baseOutputPath, i18n);
 
             let noModuleFiles: EmittedFiles[] | undefined;
             let moduleFiles: EmittedFiles[] | undefined;
@@ -586,14 +544,6 @@ export function buildWebpackBrowser(
                 }
               } finally {
                 executor.stop();
-
-                if (i18n.shouldInline) {
-                  try {
-                    // Remove temporary directory used for i18n processing
-                    // tslint:disable-next-line: no-non-null-assertion
-                    await host.delete(normalize(webpackStats.outputPath!)).toPromise();
-                  } catch {}
-                }
               }
 
               // Copy assets
@@ -785,70 +735,6 @@ function generateIndex(
     crossOrigin: options.crossOrigin,
     lang: options.i18nLocale,
   }).toPromise();
-}
-
-async function i18nInlineEmittedFiles(
-  context: BuilderContext,
-  emittedFiles: EmittedFiles[],
-  i18n: I18nOptions,
-  baseOutputPath: string,
-  outputPaths: string[],
-  scriptsEntryPointName: string[],
-  emittedPath: string,
-  es5: boolean,
-  missingTranslation: 'error' | 'warning' | 'ignore' | undefined,
-) {
-  const executor = new BundleActionExecutor({ i18n });
-  let hasErrors = false;
-  try {
-    const { options, originalFiles: processedFiles } = emittedFilesToInlineOptions(
-      emittedFiles,
-      scriptsEntryPointName,
-      emittedPath,
-      baseOutputPath,
-      es5,
-      missingTranslation,
-    );
-
-    for await (const result of executor.inlineAll(options)) {
-      for (const diagnostic of result.diagnostics) {
-        if (diagnostic.type === 'error') {
-          hasErrors = true;
-          context.logger.error(diagnostic.message);
-        } else {
-          context.logger.warn(diagnostic.message);
-        }
-      }
-    }
-
-    // Copy any non-processed files into the output locations
-    await copyAssets(
-      [
-        {
-          glob: '**/*',
-          input: emittedPath,
-          output: '',
-          ignore: [...processedFiles].map(f => path.relative(emittedPath, f)),
-        },
-      ],
-      outputPaths,
-      '',
-    );
-  } catch (err) {
-    context.logger.error('Localized bundle generation failed: ' + err.message);
-
-    return false;
-  } finally {
-    executor.stop();
-  }
-
-  context.logger.info(`Localized bundle generation ${hasErrors ? 'failed' : 'complete'}.`);
-
-  if (hasErrors) {
-    return false;
-  }
-
-  return true;
 }
 
 function mapErrorToMessage(error: unknown): string | undefined {
