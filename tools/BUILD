@@ -11,15 +11,10 @@ nodejs_binary(
     name = "quicktype_runner",
     data = [
         "quicktype_runner.js",
+        "@npm//quicktype-core",
     ],
     entry_point = "quicktype_runner.js",
     install_source_map_support = False,
-    node_modules = "@npm//quicktype-core",
-    templated_args = [
-        # Needed so that node doesn't walk back to the source directory.
-        # From there, the relative imports would point to .ts files.
-        "--node_options=--preserve-symlinks",
-    ],
 )
 
 platform(
