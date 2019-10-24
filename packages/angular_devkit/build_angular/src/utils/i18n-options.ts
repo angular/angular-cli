@@ -5,7 +5,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { json } from '@angular-devkit/core';
+import { BuilderContext } from '@angular-devkit/architect';
+import { json, virtualFs } from '@angular-devkit/core';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import * as rimraf from 'rimraf';
+import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
+import { Schema as BrowserBuilderSchema } from '../browser/schema';
+import { Schema as ServerBuilderSchema } from '../server/schema';
+import { createTranslationLoader } from './load-translations';
 
 export interface I18nOptions {
   inlineLocales: Set<string>;
@@ -82,7 +91,80 @@ export function createI18nOptions(
   return i18n;
 }
 
-export function mergeDeprecatedI18nOptions(i18n: I18nOptions, i18nLocale: string | undefined, i18nFile: string | undefined): I18nOptions {
+export async function configureI18nBuild<T extends BrowserBuilderSchema | ServerBuilderSchema>(
+  context: BuilderContext,
+  host: virtualFs.Host<fs.Stats>,
+  options: T,
+): Promise<{
+  buildOptions: T,
+  i18n: I18nOptions,
+}> {
+  if (!context.target) {
+    throw new Error('The builder requires a target.');
+  }
+
+  const buildOptions = { ... options };
+
+  const tsConfig = readTsconfig(buildOptions.tsConfig, context.workspaceRoot);
+  const usingIvy = tsConfig.options.enableIvy !== false;
+  const metadata = await context.getProjectMetadata(context.target);
+  const i18n = createI18nOptions(metadata, buildOptions.localize);
+
+  // Until 11.0, support deprecated i18n options when not using new localize option
+  // i18nFormat is automatically calculated
+  if (buildOptions.localize === undefined && usingIvy) {
+    mergeDeprecatedI18nOptions(i18n, buildOptions.i18nLocale, buildOptions.i18nFile);
+  } else if (buildOptions.localize !== undefined && !usingIvy) {
+    buildOptions.localize = undefined;
+
+    context.logger.warn(`Option 'localize' is not supported with View Engine.`);
+  }
+
+  if (i18n.inlineLocales.size > 0) {
+    // Load locales
+    const loader = await createTranslationLoader();
+    const projectRoot = path.join(context.workspaceRoot, (metadata.root as string) || '');
+    const usedFormats = new Set<string>();
+    for (const [locale, desc] of Object.entries(i18n.locales)) {
+      if (i18n.inlineLocales.has(locale)) {
+        const result = loader(path.join(projectRoot, desc.file));
+
+        usedFormats.add(result.format);
+        if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
+          // This limitation is only for legacy message id support (defaults to true as of 9.0)
+          throw new Error(
+            'Localization currently only supports using one type of translation file format for the entire application.',
+          );
+        }
+
+        desc.format = result.format;
+        desc.translation = result.translation;
+      }
+    }
+
+    // Legacy message id's require the format of the translations
+    if (usedFormats.size > 0) {
+      buildOptions.i18nFormat = [...usedFormats][0];
+    }
+  }
+
+  // If inlining store the output in a temporary location to facilitate post-processing
+  if (i18n.shouldInline) {
+    const tempPath = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'angular-cli-i18n-'));
+    buildOptions.outputPath = tempPath;
+
+    // Remove temporary directory used for i18n processing
+    process.on('exit', () => {
+      try {
+        rimraf.sync(tempPath);
+      } catch { }
+    });
+  }
+
+  return { buildOptions, i18n };
+}
+
+function mergeDeprecatedI18nOptions(i18n: I18nOptions, i18nLocale: string | undefined, i18nFile: string | undefined): I18nOptions {
   if (i18nFile !== undefined && i18nLocale === undefined) {
     throw new Error(`Option 'i18nFile' cannot be used without the 'i18nLocale' option.`);
   }

@@ -93,7 +93,11 @@ allTests = allTests
   // Disabled on rc.0 due to needed sync with devkit for changes.
   .filter(name => !name.endsWith('/service-worker.ts'));
 
-if (!argv.ve) {
+if (argv.ve) {
+  // Remove Ivy specific tests
+  allTests = allTests
+    .filter(name => !name.includes('tests/i18n/ivy-localize-'));
+} else {
   // These tests are disabled on the Ivy CI jobs because:
   // - Ivy doesn't support the functionality yet
   // - The test itself is not applicable to Ivy

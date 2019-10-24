@@ -7,9 +7,9 @@
  */
 import { createHash } from 'crypto';
 import * as fs from 'fs';
-import { copyFile } from '../utils/copy-file';
-import { manglingDisabled } from '../utils/environment-options';
-import { CacheKey, ProcessBundleOptions, ProcessBundleResult } from '../utils/process-bundle';
+import { copyFile } from './copy-file';
+import { manglingDisabled } from './environment-options';
+import { CacheKey, ProcessBundleOptions, ProcessBundleResult } from './process-bundle';
 
 const cacache = require('cacache');
 const packageVersion = require('../../package.json').version;

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { NodePath, parseSync, transformAsync, traverse, types } from '@babel/core';
+import { NodePath, ParseResult, parseSync, transformAsync, traverse, types } from '@babel/core';
 import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -454,7 +454,9 @@ async function processRuntime(
       (options.cacheKeys && options.cacheKeys[CacheKey.DownlevelMap]) || null,
     );
     fs.writeFileSync(downlevelFilePath + '.map', downlevelMap);
-    downlevelCode += `\n//# sourceMappingURL=${path.basename(downlevelFilePath)}.map`;
+    if (!options.hiddenSourceMaps) {
+      downlevelCode += `\n//# sourceMappingURL=${path.basename(downlevelFilePath)}.map`;
+    }
   }
   await cachePut(
     downlevelCode,
@@ -594,13 +596,29 @@ function findLocalizePositions(
   options: InlineOptions,
   utils: typeof import('@angular/localize/src/tools/src/translate/source_files/source_file_utils'),
 ): LocalizePosition[] {
-  const ast = parseSync(options.code, { babelrc: false });
+  let ast: ParseResult | undefined | null;
+
+  try {
+    ast = parseSync(options.code, {
+      babelrc: false,
+      sourceType: 'script',
+    });
+  } catch (error) {
+    if (error.message) {
+      // Make the error more readable.
+      // Same errors will contain the full content of the file as the error message
+      // Which makes it hard to find the actual error message.
+      const index = error.message.indexOf(')\n');
+      const msg = index !== -1 ? error.message.substr(0, index + 1) : error.message;
+      throw new Error(`${msg}\nAn error occurred inlining file "${options.filename}"`);
+    }
+  }
+
   if (!ast) {
     throw new Error(`Unknown error occurred inlining file "${options.filename}"`);
   }
 
   const positions: LocalizePosition[] = [];
-
   if (options.es5) {
     traverse(ast, {
       CallExpression(path: NodePath<types.CallExpression>) {
