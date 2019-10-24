@@ -60,7 +60,6 @@ function emittedFilesToInlineOptions(
   return { options, originalFiles };
 }
 
-
 export async function i18nInlineEmittedFiles(
   context: BuilderContext,
   emittedFiles: EmittedFiles[],
