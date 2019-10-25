@@ -15,10 +15,6 @@ import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
 
 export default async function() {
-  if (getGlobalVariable('argv').ve) {
-    return;
-  }
-
   let localizeVersion = '@angular/localize@' + readNgVersion();
   if (getGlobalVariable('argv')['ng-snapshots']) {
     localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
@@ -36,7 +32,6 @@ export default async function() {
   const langTranslations = [
     { lang: 'en-US', translation: 'Hello i18n!' },
     { lang: 'fr', translation: 'Bonjour i18n!' },
-    { lang: 'de', translation: 'Hallo i18n!' },
   ];
 
   await updateJsonFile('angular.json', workspaceJson => {

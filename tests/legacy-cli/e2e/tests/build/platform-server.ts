@@ -9,7 +9,7 @@ export default async function () {
   const argv = getGlobalVariable('argv');
   const veEnabled = argv['ve'];
 
-  await ng('add', '@nguniversal/express-engine@9.0.0-next.5');
+  await ng('add', '@nguniversal/express-engine@9.0.0-next.6');
 
   await updateJsonFile('package.json', packageJson => {
     const dependencies = packageJson['dependencies'];
