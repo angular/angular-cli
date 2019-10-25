@@ -12,6 +12,7 @@
     "@angular/localize": "github:angular/localize-builds#33c7636c27a4f147607cf5a9dbf8cc1f7235da99",
     "@angular/platform-browser": "github:angular/platform-browser-builds#ce1e659ca1354adb43047933dcd4197cbd96174f",
     "@angular/platform-browser-dynamic": "github:angular/platform-browser-dynamic-builds#d8664790dc89a1d30cf18788479cd5ccb1fb5ee6",
+    "@angular/platform-server": "github:angular/platform-server-builds#278e7555b936edf9d9292f75e67ba5b233bd285a",
     "@angular/router": "github:angular/router-builds#f75458fdef2ef233080332e0a96f4d0cbfad93e9"
   }
 }

@@ -11,7 +11,7 @@ export default async function () {
   await updateJsonFile('package.json', packageJson => {
     const dependencies = packageJson['dependencies'];
     dependencies['@angular/platform-server'] = getGlobalVariable('argv')['ng-snapshots']
-      ? 'github:angular/platform-server-builds'
+      ? require('../../ng-snapshot/package.json').dependencies['@angular/platform-server']
       : readNgVersion();
   });
 

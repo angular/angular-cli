@@ -9,7 +9,8 @@ export default function() {
   let platformServerVersion = readNgVersion();
 
   if (getGlobalVariable('argv')['ng-snapshots']) {
-    platformServerVersion = 'github:angular/platform-server-builds';
+    platformServerVersion = require('../../ng-snapshot/package.json')
+      .dependencies['@angular/platform-server'];
   }
 
   return Promise.resolve()
