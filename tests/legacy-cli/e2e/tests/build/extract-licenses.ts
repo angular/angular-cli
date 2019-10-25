@@ -1,12 +1,19 @@
-import {join} from 'path';
-import {expectFileToExist} from '../../utils/fs';
-import {expectToFail} from '../../utils/utils';
-import {ng} from '../../utils/process';
+import { expectFileToExist, expectFileToMatch } from '../../utils/fs';
+import { ng } from '../../utils/process';
+import { expectToFail } from '../../utils/utils';
 
-export default function() {
-  // TODO(architect): Delete this test. It is now in devkit/build-angular.
+export default async function() {
+  // Licenses should be left intact if extraction is disabled
+  await ng('build', '--prod', '--extract-licenses=false', '--output-hashing=none');
 
-  return ng('build', '--prod', '--extract-licenses=false')
-    .then(() => expectFileToExist(join(process.cwd(), 'dist')))
-    .then(() => expectToFail(() => expectFileToExist('dist/test-project/3rdpartylicenses.txt')));
+  await expectToFail(() => expectFileToExist('dist/test-project/3rdpartylicenses.txt'));
+  await expectFileToMatch('dist/test-project/main-es2015.js', '@license');
+  await expectFileToMatch('dist/test-project/main-es5.js', '@license');
+
+  // Licenses should be removed if extraction is enabled
+  await ng('build', '--prod', '--extract-licenses', '--output-hashing=none');
+
+  await expectFileToExist('dist/test-project/3rdpartylicenses.txt');
+  await expectToFail(() => expectFileToMatch('dist/test-project/main-es2015.js', '@license'));
+  await expectToFail(() => expectFileToMatch('dist/test-project/main-es5.js', '@license'));
 }

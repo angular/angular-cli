@@ -130,6 +130,7 @@ describe('Browser Builder bundle budgets', () => {
     it(`when 'bundle' budget`, async () => {
       const overrides = {
         optimization: true,
+        extractLicenses: true,
         budgets: [{ type: 'bundle', name: 'main', maximumError: '3Kb' }],
       };
 
