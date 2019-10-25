@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { expectFileToExist, readFile, rimraf } from '../../../utils/fs';
-import { ng } from '../../../utils/process';
+import { ng, npm } from '../../../utils/process';
 
 export default async function () {
     // forcibly remove in case another test doesn't clean itself up
@@ -18,4 +18,11 @@ export default async function () {
     if (hasPWADep) {
         throw new Error(`Expected 'package.json' not to contain a dependency on '@angular/pwa'.`);
     }
+
+    // 'yarn' will nuke the entire node_modules when it is triggered during the above tests.
+    // Let's restore the previous node_modules state by re-installing using 'npm'
+    // and run 'webdriver-update'. Otherwise, we will start seeing errors in CI like:
+    // Error: Could not find update-config.json. Run 'webdriver-manager update' to download binaries.
+    await npm('install');
+    await npm('run', 'webdriver-update');
 }

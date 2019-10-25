@@ -24,7 +24,6 @@ export default async function() {
     localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
   }
   await npm('install', `${localizeVersion}`);
-  await npm('run', 'webdriver-update');
 
   await updateJsonFile('tsconfig.json', config => {
     config.compilerOptions.target = 'es2015';
