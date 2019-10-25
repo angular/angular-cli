@@ -9,23 +9,34 @@ import {
   replaceInFile,
   writeFile,
 } from '../../utils/fs';
-import { ng, npm } from '../../utils/process';
+import { ng, silentNpm } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
 
-export default async function () {
-  let localizeVersion = '@angular/localize@' + readNgVersion();
-  if (getGlobalVariable('argv')['ng-snapshots']) {
-    localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
-  }
+const snapshots = require('../../ng-snapshot/package.json');
 
-  await npm('install', `${localizeVersion}`);
+export default async function () {
+  const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
+
+  await updateJsonFile('package.json', packageJson => {
+    const dependencies = packageJson['dependencies'];
+    dependencies['@angular/localize'] = isSnapshotBuild
+      ? snapshots.dependencies['@angular/localize']
+      : readNgVersion();
+  });
 
   // Add universal to the project
-  await ng('add', '@nguniversal/express-engine@9.0.0-next.6');
+  await ng('add', '@nguniversal/express-engine@9.0.0-next.6', '--skip-install');
 
-  await npm('run', 'webdriver-update');
+  if (isSnapshotBuild) {
+    await updateJsonFile('package.json', packageJson => {
+      const dependencies = packageJson['dependencies'];
+      dependencies['@angular/platform-server'] = snapshots.dependencies['@angular/platform-server'];
+    });
+  }
+
+  await silentNpm('install');
 
   const serverbaseDir = 'dist/test-project/server';
   const serverBuildArgs = ['run', 'test-project:server'];
@@ -34,7 +45,6 @@ export default async function () {
   const langTranslations = [
     { lang: 'en-US', translation: 'Hello i18n!' },
     { lang: 'fr', translation: 'Bonjour i18n!' },
-    { lang: 'de', translation: 'Hallo i18n!' },
   ];
 
   await updateJsonFile('angular.json', workspaceJson => {
