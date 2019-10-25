@@ -16,6 +16,7 @@ export interface NodePackageTaskFactoryOptions {
 export interface NodePackageTaskOptions {
   command: string;
   quiet?: boolean;
+  hideOutput?: boolean;
   workingDirectory?: string;
   packageName?: string;
   packageManager?: string;

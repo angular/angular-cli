@@ -13,10 +13,12 @@ export class NodePackageInstallTaskOptions {
   packageName: string;
   workingDirectory: string;
   quiet: boolean;
+  hideOutput: boolean;
 }
 
 export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePackageTaskOptions> {
   quiet = true;
+  hideOutput = true;
   workingDirectory?: string;
   packageManager?: string;
   packageName?: string;
@@ -29,6 +31,9 @@ export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePa
     } else if (typeof options === 'object') {
       if (options.quiet != undefined) {
         this.quiet = options.quiet;
+      }
+      if (options.hideOutput != undefined) {
+        this.hideOutput = options.hideOutput;
       }
       if (options.workingDirectory != undefined) {
         this.workingDirectory = options.workingDirectory;
@@ -48,6 +53,7 @@ export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePa
       options: {
         command: 'install',
         quiet: this.quiet,
+        hideOutput: this.hideOutput,
         workingDirectory: this.workingDirectory,
         packageManager: this.packageManager,
         packageName: this.packageName,
