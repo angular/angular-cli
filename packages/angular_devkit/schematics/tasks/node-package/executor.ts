@@ -77,10 +77,9 @@ export default function(
       taskPackageManagerName = options.packageManager;
     }
 
-    const outputStream = process.stdout;
-    const errorStream = process.stderr;
+    const bufferedOutput: {stream: NodeJS.WriteStream, data: Buffer}[] = [];
     const spawnOptions: SpawnOptions = {
-      stdio:  [ process.stdin, outputStream, errorStream ],
+      stdio: !!options.hideOutput ? 'pipe' : 'inherit',
       shell: true,
       cwd: path.join(rootDirectory, options.workingDirectory || ''),
     };
@@ -100,16 +99,29 @@ export default function(
     }
 
     return new Observable(obs => {
-      spawn(taskPackageManagerName, args, spawnOptions)
+      // tslint:disable-next-line: no-console
+      console.log('Installing packages...');
+      const childProcess = spawn(taskPackageManagerName, args, spawnOptions)
         .on('close', (code: number) => {
           if (code === 0) {
+            // tslint:disable-next-line: no-console
+            console.log('Packages installed successfully.');
             obs.next();
             obs.complete();
           } else {
+            if (options.hideOutput) {
+              bufferedOutput.forEach(({ stream, data }) => stream.write(data));
+            }
             const message = 'Package install failed, see above.';
             obs.error(new Error(message));
           }
       });
+      if (options.hideOutput) {
+        childProcess.stdout.on('data', (data: Buffer) =>
+          bufferedOutput.push({ stream: process.stdout, data: data }));
+        childProcess.stderr.on('data', (data: Buffer) =>
+          bufferedOutput.push({ stream: process.stderr, data: data }));
+      }
     });
 
   };
