@@ -136,7 +136,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     collectionPath: string,
     range: semver.Range,
     commit = false,
-  ) {
+  ): Promise<boolean> {
     const collection = this.workflow.engine.createCollection(collectionPath);
 
     const migrations = [];
@@ -190,6 +190,8 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         this.createCommit(message, []);
       }
     }
+
+    return true;
   }
 
   // tslint:disable-next-line:no-big-function
@@ -419,14 +421,14 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         '>' + from + ' <=' + (options.to || packageNode.package.version),
       );
 
-      const result = await this.executeMigrations(
+      const success = await this.executeMigrations(
         packageName,
         migrations,
         migrationRange,
         !options.skipCommits,
       );
 
-      return result ? 1 : 0;
+      return success ? 0 : 1;
     }
 
     const requests: {
