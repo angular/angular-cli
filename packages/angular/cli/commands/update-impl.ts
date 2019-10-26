@@ -41,14 +41,14 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
   // tslint:disable-next-line:no-big-function
   async run(options: UpdateCommandSchema & Arguments) {
     // Check if the current installed CLI version is older than the latest version.
-    if (await this.checkCLILatestVersion(options.verbose)) {
+    if (await this.checkCLILatestVersion(options.verbose, options.next)) {
       this.logger.warn(
         'The installed Angular CLI version is older than the latest published version.\n' +
         'Installing a temporary version to perform the update.',
       );
 
       return runTempPackageBin(
-        '@angular/cli@latest',
+        `@angular/cli@${options.next ? 'next' : 'latest'}`,
         this.logger,
         this.packageManager,
         process.argv.slice(2),
@@ -403,7 +403,7 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
    * Checks if the current installed CLI version is older than the latest version.
    * @returns `true` when the installed version is older.
   */
-  private async checkCLILatestVersion(verbose = false): Promise<boolean> {
+  private async checkCLILatestVersion(verbose = false, next = false): Promise<boolean> {
     const { version: installedCLIVersion } = require('../package.json');
 
     const LatestCLIManifest = await fetchPackageMetadata(
@@ -415,7 +415,7 @@ export class UpdateCommand extends SchematicCommand<UpdateCommandSchema> {
       },
     );
 
-    const latest = LatestCLIManifest.tags['latest'];
+    const latest = LatestCLIManifest.tags[next ? 'next' : 'latest'];
     if (!latest) {
       return false;
     }
