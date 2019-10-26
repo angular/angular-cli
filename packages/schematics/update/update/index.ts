@@ -120,12 +120,12 @@ function _validateForwardPeerDependencies(
     logger.debug(`Checking forward peer ${peer}...`);
     const maybePeerInfo = infoMap.get(peer);
     if (!maybePeerInfo) {
-      logger.error([
+      logger.warn([
         `Package ${JSON.stringify(name)} has a missing peer dependency of`,
         `${JSON.stringify(peer)} @ ${JSON.stringify(range)}.`,
       ].join(' '));
 
-      return true;
+      return false;
     }
 
     const peerVersion = maybePeerInfo.target && maybePeerInfo.target.packageJson.version
