@@ -114,6 +114,7 @@ function _validateForwardPeerDependencies(
   infoMap: Map<string, PackageInfo>,
   peers: {[name: string]: string},
   logger: logging.LoggerApi,
+  next: boolean,
 ): boolean {
   for (const [peer, range] of Object.entries(peers)) {
     logger.debug(`Checking forward peer ${peer}...`);
@@ -132,7 +133,7 @@ function _validateForwardPeerDependencies(
       : maybePeerInfo.installed.version;
 
     logger.debug(`  Range intersects(${range}, ${peerVersion})...`);
-    if (!semver.satisfies(peerVersion, range)) {
+    if (!semver.satisfies(peerVersion, range, { includePrerelease: next || undefined })) {
       logger.error([
         `Package ${JSON.stringify(name)} has an incompatible peer dependency to`,
         `${JSON.stringify(peer)} (requires ${JSON.stringify(range)},`,
@@ -152,6 +153,7 @@ function _validateReversePeerDependencies(
   version: string,
   infoMap: Map<string, PackageInfo>,
   logger: logging.LoggerApi,
+  next: boolean,
 ) {
   for (const [installed, installedInfo] of infoMap.entries()) {
     const installedLogger = logger.createChild(installed);
@@ -168,7 +170,7 @@ function _validateReversePeerDependencies(
       // Override the peer version range if it's whitelisted.
       const extendedRange = _updatePeerVersion(infoMap, peer, range);
 
-      if (!semver.satisfies(version, extendedRange)) {
+      if (!semver.satisfies(version, extendedRange, { includePrerelease: next || undefined })) {
         logger.error([
           `Package ${JSON.stringify(installed)} has an incompatible peer dependency to`,
           `${JSON.stringify(name)} (requires`,
@@ -187,6 +189,7 @@ function _validateReversePeerDependencies(
 function _validateUpdatePackages(
   infoMap: Map<string, PackageInfo>,
   force: boolean,
+  next: boolean,
   logger: logging.LoggerApi,
 ): void {
   logger.debug('Updating the following packages:');
@@ -207,9 +210,9 @@ function _validateUpdatePackages(
     logger.debug(`${name}...`);
 
     const peers = target.packageJson.peerDependencies || {};
-    peerErrors = _validateForwardPeerDependencies(name, infoMap, peers, pkgLogger) || peerErrors;
+    peerErrors = _validateForwardPeerDependencies(name, infoMap, peers, pkgLogger, next) || peerErrors;
     peerErrors
-      = _validateReversePeerDependencies(name, target.version, infoMap, pkgLogger)
+      = _validateReversePeerDependencies(name, target.version, infoMap, pkgLogger, next)
       || peerErrors;
   });
 
@@ -923,7 +926,7 @@ export default function(options: UpdateSchema): Rule {
             logger.createChild(''),
             'warn',
           );
-          _validateUpdatePackages(infoMap, !!options.force, sublog);
+          _validateUpdatePackages(infoMap, !!options.force, !!options.next, sublog);
 
           return _performUpdate(tree, context, infoMap, logger, !!options.migrateOnly, !!options.migrateExternal);
         } else {
