@@ -64,12 +64,12 @@ const ignoredPackages = [
   // Us.
   '@angular/devkit-repo@0.0.0',  // Hey, that's us!
   // * Development only
-  'spdx-license-ids@3.0.1',  // CC0 but it's content only (index.json, no code) and not distributed.
+  'spdx-license-ids@3.0.5',  // CC0 but it's content only (index.json, no code) and not distributed.
   'tslint-sonarts@1.9.0', // LGPL-3.0 but only used as a tool, not linked in the build.
 
   // * Broken license fields
   'bitsyntax@0.0.4', // MIT but no license field in package.json
-  'pako@1.0.6', // MIT but broken license in package.json
+  'pako@1.0.10', // MIT but broken license in package.json
   'true-case-path@1.0.2', // Apache-2.0 but broken license in package.json
   'uws@9.14.0', // zlib license
 
