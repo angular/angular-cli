@@ -166,10 +166,12 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
 
     migrations.sort((a, b) => semver.compare(a.version, b.version) || a.name.localeCompare(b.name));
 
+    this.logger.info(
+      colors.cyan(`** Executing migrations of package '${packageName}' **\n`),
+    );
+
     for (const migration of migrations) {
-      this.logger.info(
-        `** Executing migrations for version ${migration.version} of package '${packageName}' **`,
-      );
+      this.logger.info(`${colors.symbols.pointer}  ${migration.description.replace(/\. /g, '.\n   ')}`);
 
       const result = await this.executeSchematic(migration.collection.name, migration.name);
       if (!result.success) {
@@ -179,6 +181,8 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
             this.logger.warn(`git HEAD was at ${startingGitSha} before migrations.`);
           }
         }
+
+        this.logger.error(`${colors.symbols.cross}  Migration failed. See above for further details.\n`);
 
         return false;
       }
@@ -192,6 +196,8 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         // TODO: Use result.files once package install tasks are accounted
         this.createCommit(message, []);
       }
+
+      this.logger.info(colors.green(`${colors.symbols.check}  Migration succeeded.\n`));
     }
 
     return true;
@@ -265,11 +271,11 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     if (!statusCheck && !this.checkCleanGit()) {
       if (options.allowDirty) {
         this.logger.warn(
-          'Repository is not clean.  Update changes will be mixed with pre-existing changes.',
+          'Repository is not clean. Update changes will be mixed with pre-existing changes.',
         );
       } else {
         this.logger.error(
-          'Repository is not clean.  Please commit or stash any changes before updating.',
+          'Repository is not clean. Please commit or stash any changes before updating.',
         );
 
         return 2;
