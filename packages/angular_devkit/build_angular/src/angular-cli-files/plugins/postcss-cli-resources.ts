@@ -31,6 +31,7 @@ export interface PostcssCliResourcesOptions {
   rebaseRootRelative?: boolean;
   filename: string;
   loader: webpack.loader.LoaderContext;
+  emitFile: boolean;
 }
 
 async function resolve(
@@ -53,6 +54,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
     rebaseRootRelative = false,
     filename,
     loader,
+    emitFile,
   } = options;
 
   const dedupeSlashes = (url: string) => url.replace(/\/\/+/g, '/');
@@ -134,7 +136,9 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
         }
 
         loader.addDependency(result);
-        loader.emitFile(outputPath, content, undefined);
+        if (emitFile) {
+          loader.emitFile(outputPath, content, undefined);
+        }
 
         let outputUrl = outputPath.replace(/\\/g, '/');
         if (hash || search) {
