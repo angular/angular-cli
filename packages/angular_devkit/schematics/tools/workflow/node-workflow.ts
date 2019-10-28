@@ -25,9 +25,10 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
       root?: Path;
       packageManager?: string;
       registry?: schema.CoreSchemaRegistry;
+      resolvePaths?: string[],
     },
   ) {
-    const engineHost = new NodeModulesEngineHost();
+    const engineHost = new NodeModulesEngineHost(options.resolvePaths);
     super({
       host,
       engineHost,
