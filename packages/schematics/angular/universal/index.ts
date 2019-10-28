@@ -36,7 +36,7 @@ import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/d
 import { findBootstrapModuleCall, findBootstrapModulePath } from '../utility/ng-ast-utils';
 import { targetBuildNotFoundError } from '../utility/project-targets';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
-import { BrowserBuilderOptions, Builders } from '../utility/workspace-models';
+import { BrowserBuilderOptions, Builders, OutputHashing } from '../utility/workspace-models';
 import { Schema as UniversalOptions } from './schema';
 
 function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): Rule {
@@ -53,6 +53,20 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
         buildTarget.options.outputPath = `dist/${options.clientProject}/browser`;
       }
 
+      // In case the browser builder hashes the assets
+      // we need to add this setting to the server builder
+      // as otherwise when assets it will be requested twice.
+      // One for the server which will be unhashed, and other on the client which will be hashed.
+      let outputHashing: OutputHashing | undefined;
+      if (buildTarget && buildTarget.configurations && buildTarget.configurations.production) {
+        switch (buildTarget.configurations.production.outputHashing as OutputHashing) {
+          case 'all':
+          case 'media':
+            outputHashing = 'media';
+            break;
+        }
+      }
+
       const mainPath = options.main as string;
       clientProject.targets.add({
         name: 'server',
@@ -64,6 +78,7 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
         },
         configurations: {
           production: {
+            outputHashing,
             fileReplacements,
             sourceMap: false,
             optimization: true,

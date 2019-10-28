@@ -155,6 +155,7 @@ describe('Universal Schematic', () => {
     const configurations = targets.server.configurations;
     expect(configurations.production).toBeDefined();
     expect(configurations.production.fileReplacements).toBeDefined();
+    expect(configurations.production.outputHashing).toBe('media');
     const fileReplacements = targets.server.configurations.production.fileReplacements;
     expect(fileReplacements.length).toEqual(1);
     expect(fileReplacements[0].replace).toEqual('projects/bar/src/environments/environment.ts');
