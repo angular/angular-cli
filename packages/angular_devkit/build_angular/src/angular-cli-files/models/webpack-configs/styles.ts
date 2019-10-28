@@ -72,6 +72,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
         loader,
         rebaseRootRelative: buildOptions.rebaseRootRelativeCssUrls,
         filename: `[name]${hashFormat.file}.[ext]`,
+        emitFile: buildOptions.platform !== 'server',
       }),
       autoprefixer(),
     ];
