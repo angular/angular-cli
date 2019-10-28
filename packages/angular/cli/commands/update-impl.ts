@@ -50,6 +50,9 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       {
         packageManager: this.packageManager,
         root: normalize(this.workspace.root),
+        // __dirname -> favor @schematics/update from this package
+        // Otherwise, use packages from the active workspace (migrations)
+        resolvePaths: [__dirname, this.workspace.root],
       },
     );
     this.workflow.engineHost.registerOptionsTransform(

@@ -105,7 +105,7 @@ export declare class InvalidCollectionJsonException extends BaseException {
 }
 
 export declare class NodeModulesEngineHost extends FileSystemEngineHostBase {
-    constructor();
+    constructor(paths?: string[] | undefined);
     protected _resolveCollectionPath(name: string): string;
     protected _resolveReferenceString(refString: string, parentPath: string): {
         ref: RuleFactory<{}>;
@@ -136,6 +136,7 @@ export declare class NodeWorkflow extends workflow.BaseWorkflow {
         root?: Path;
         packageManager?: string;
         registry?: schema.CoreSchemaRegistry;
+        resolvePaths?: string[];
     });
 }
 

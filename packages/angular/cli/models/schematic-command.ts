@@ -253,6 +253,11 @@ export abstract class SchematicCommand<
       packageManager: await getPackageManager(this.workspace.root),
       root: normalize(this.workspace.root),
       registry: new schema.CoreSchemaRegistry(formats.standardFormats),
+      resolvePaths: !!this.workspace.configFile
+        // Workspace
+        ? [process.cwd(), this.workspace.root]
+        // Global
+        : [__dirname, process.cwd()],
     });
     workflow.engineHost.registerContextTransform(context => {
       // This is run by ALL schematics, so if someone uses `externalSchematics(...)` which

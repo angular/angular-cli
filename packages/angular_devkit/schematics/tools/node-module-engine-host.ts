@@ -37,7 +37,7 @@ export class NodePackageDoesNotSupportSchematics extends BaseException {
  * A simple EngineHost that uses NodeModules to resolve collections.
  */
 export class NodeModulesEngineHost extends FileSystemEngineHostBase {
-  constructor() { super(); }
+  constructor(private readonly paths?: string[]) { super(); }
 
   protected _resolveCollectionPath(name: string): string {
     let collectionPath: string | undefined = undefined;
@@ -47,9 +47,9 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
 
     if (extname(name)) {
       // When having an extension let's just resolve the provided path.
-      collectionPath = require.resolve(name);
+      collectionPath = require.resolve(name, { paths: this.paths });
     } else {
-      const packageJsonPath = require.resolve(join(name, 'package.json'));
+      const packageJsonPath = require.resolve(join(name, 'package.json'), { paths: this.paths });
       const { schematics } = require(packageJsonPath);
 
       if (!schematics || typeof schematics !== 'string') {
