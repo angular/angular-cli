@@ -129,6 +129,7 @@
     "minimatch": "^3.0.4",
     "minimist": "^1.2.0",
     "npm-registry-client": "8.6.0",
+    "ora": "^4.0.2",
     "pacote": "^9.2.3",
     "pidtree": "^0.3.0",
     "pidusage": "^2.0.17",
