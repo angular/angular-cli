@@ -116,6 +116,7 @@ function _validateForwardPeerDependencies(
   logger: logging.LoggerApi,
   next: boolean,
 ): boolean {
+  let validationFailed = false;
   for (const [peer, range] of Object.entries(peers)) {
     logger.debug(`Checking forward peer ${peer}...`);
     const maybePeerInfo = infoMap.get(peer);
@@ -125,7 +126,7 @@ function _validateForwardPeerDependencies(
         `${JSON.stringify(peer)} @ ${JSON.stringify(range)}.`,
       ].join(' '));
 
-      return false;
+      continue;
     }
 
     const peerVersion = maybePeerInfo.target && maybePeerInfo.target.packageJson.version
@@ -140,11 +141,12 @@ function _validateForwardPeerDependencies(
         `would install ${JSON.stringify(peerVersion)})`,
       ].join(' '));
 
-      return true;
+      validationFailed = true;
+      continue;
     }
   }
 
-  return false;
+  return validationFailed;
 }
 
 
