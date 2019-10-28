@@ -91,6 +91,7 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node",
         "@npm//@types/node",
+        "@npm//ora",
         "@npm//rxjs",
         "@npm//tslint",
         "@npm//typescript",

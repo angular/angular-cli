@@ -7,9 +7,10 @@
  */
 import { BaseException } from '@angular-devkit/core';
 import { SpawnOptions, spawn } from 'child_process';
+import * as ora from 'ora';
 import * as path from 'path';
 import { Observable } from 'rxjs';
-import { TaskExecutor } from '../../src';
+import { TaskExecutor, UnsuccessfulWorkflowExecution } from '../../src';
 import { NodePackageTaskFactoryOptions, NodePackageTaskOptions } from './options';
 
 type PackageManagerProfile = {
@@ -99,21 +100,24 @@ export default function(
     }
 
     return new Observable(obs => {
-      // tslint:disable-next-line: no-console
-      console.log('Installing packages...');
+      const spinner = ora({
+        text: 'Installing packages...',
+        // Workaround for https://github.com/sindresorhus/ora/issues/136.
+        discardStdin: process.platform != 'win32',
+      }).start();
       const childProcess = spawn(taskPackageManagerName, args, spawnOptions)
         .on('close', (code: number) => {
           if (code === 0) {
-            // tslint:disable-next-line: no-console
-            console.log('Packages installed successfully.');
+            spinner.succeed('Packages installed successfully.');
+            spinner.stop();
             obs.next();
             obs.complete();
           } else {
             if (options.hideOutput) {
               bufferedOutput.forEach(({ stream, data }) => stream.write(data));
             }
-            const message = 'Package install failed, see above.';
-            obs.error(new Error(message));
+            spinner.fail('Package install failed, see above.');
+            obs.error(new UnsuccessfulWorkflowExecution());
           }
       });
       if (options.hideOutput) {
