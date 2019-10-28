@@ -362,4 +362,37 @@ describe('@schematics/update', () => {
       }),
     ).toPromise().then(done, done.fail);
   }, 45000);
+
+  it('validates peer dependencies', done => {
+    const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
+    const packageJson = JSON.parse(content);
+    const dependencies = packageJson['dependencies'];
+    // TODO: when we start using a local npm registry for test packages, add a package that includes
+    // a optional peer dependency and a non-optional one for this test. Use it instead of
+    // @angular-devkit/build-angular, whose optional peerdep is @angular/localize and non-optional
+    // are typescript and @angular/compiler-cli.
+    dependencies['@angular-devkit/build-angular'] = '0.900.0-next.1';
+    host.sync.write(
+      normalize('/package.json'),
+      virtualFs.stringToFileBuffer(JSON.stringify(packageJson)),
+    );
+
+    const messages: string[] = [];
+    schematicRunner.logger.subscribe(x => messages.push(x.message));
+    const hasPeerdepMsg = (dep: string) =>
+      messages.some(str => str.includes(`missing peer dependency of "${dep}"`));
+
+    schematicRunner.runSchematicAsync('update', {
+      packages: ['@angular-devkit/build-angular'],
+      next: true,
+    }, appTree).pipe(
+      map(() => {
+        expect(hasPeerdepMsg('@angular/compiler-cli'))
+          .toBeTruthy(`Should show @angular/compiler-cli message.`);
+        expect(hasPeerdepMsg('typescript')).toBeTruthy(`Should show typescript message.`);
+        expect(hasPeerdepMsg('@angular/localize'))
+          .toBeFalsy(`Should not show @angular/localize message.`);
+      }),
+    ).toPromise().then(done, done.fail);
+  }, 45000);
 });
