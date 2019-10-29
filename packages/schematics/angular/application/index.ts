@@ -345,6 +345,7 @@ export default function (options: ApplicationOptions): Rule {
             relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(appDir),
             appName: options.name,
             isRootApp,
+            dot: '.',
           }),
           isRootApp ? mergeWithRootTsLint(host) : noop(),
           move(appDir),

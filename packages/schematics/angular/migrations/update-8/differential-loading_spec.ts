@@ -43,6 +43,7 @@ describe('Migration to version 8', () => {
         )
         .toPromise();
       tree.overwrite(tsConfigPath, JSON.stringify(oldTsConfig, null, 2));
+      tree.rename('.browserslistrc', 'browserslist');
     });
 
     it(`should update 'target' to es2015 when property exists`, async () => {
