@@ -140,7 +140,7 @@ export async function generateI18nBrowserWebpackConfigFromContext(
   webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[],
   host: virtualFs.Host<fs.Stats> = new NodeJsSyncHost(),
 ): Promise<{ config: webpack.Configuration; projectRoot: string; projectSourceRoot?: string, i18n: I18nOptions }> {
-  const { buildOptions, i18n } = await configureI18nBuild(context, host, options);
+  const { buildOptions, i18n } = await configureI18nBuild(context, options);
   const result = await generateBrowserWebpackConfigFromContext(buildOptions, context, webpackPartialGenerator, host);
   const config = result.config;
 
