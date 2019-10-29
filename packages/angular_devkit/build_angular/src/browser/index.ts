@@ -143,12 +143,7 @@ export async function buildBrowserWebpackConfigFromContext(
     );
   }
 
-  return generateBrowserWebpackConfigFromContext(
-    options,
-    context,
-    webpackPartialGenerator,
-    host,
-  );
+  return generateBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host);
 }
 
 function getAnalyticsConfig(
@@ -193,12 +188,12 @@ async function initialize(
   i18n: I18nOptions;
 }> {
   const originalOutputPath = options.outputPath;
-  const { config, projectRoot, projectSourceRoot, i18n } = await buildBrowserWebpackConfigFromContext(
-    options,
-    context,
-    host,
-    true,
-  );
+  const {
+    config,
+    projectRoot,
+    projectSourceRoot,
+    i18n,
+  } = await buildBrowserWebpackConfigFromContext(options, context, host, true);
 
   let transformedConfig;
   if (webpackConfigurationTransform) {
@@ -206,10 +201,7 @@ async function initialize(
   }
 
   if (options.deleteOutputPath) {
-    deleteOutputDir(
-      context.workspaceRoot,
-      originalOutputPath,
-    );
+    deleteOutputDir(context.workspaceRoot, originalOutputPath);
   }
 
   return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n };
@@ -672,28 +664,26 @@ export function buildWebpackBrowser(
                 }
               }
             }
+
+            if (!options.watch && options.serviceWorker) {
+              for (const outputPath of outputPaths) {
+                try {
+                  await augmentAppWithServiceWorker(
+                    host,
+                    root,
+                    normalize(projectRoot),
+                    normalize(outputPath),
+                    options.baseHref || '/',
+                    options.ngswConfigPath,
+                  );
+                } catch (err) {
+                  return { success: false, error: mapErrorToMessage(err) };
+                }
+              }
+            }
           }
 
           return { success };
-        }),
-        concatMap(buildEvent => {
-          if (buildEvent.success && !options.watch && options.serviceWorker) {
-            return from(
-              augmentAppWithServiceWorker(
-                host,
-                root,
-                normalize(projectRoot),
-                normalize(baseOutputPath),
-                options.baseHref || '/',
-                options.ngswConfigPath,
-              ).then(
-                () => ({ success: true }),
-                error => ({ success: false, error: mapErrorToMessage(error) }),
-              ),
-            );
-          } else {
-            return of(buildEvent);
-          }
         }),
         map(
           event =>
