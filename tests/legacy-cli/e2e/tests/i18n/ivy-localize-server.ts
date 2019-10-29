@@ -1,5 +1,4 @@
 import * as express from 'express';
-import * as http from "http";
 import { join } from 'path';
 import { getGlobalVariable } from '../../utils/env';
 import {

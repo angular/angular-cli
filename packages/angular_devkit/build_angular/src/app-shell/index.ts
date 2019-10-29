@@ -11,7 +11,7 @@ import {
   createBuilder,
   targetFromTargetString,
 } from '@angular-devkit/architect';
-import { JsonObject, join, normalize, resolve, schema } from '@angular-devkit/core';
+import { JsonObject, join, normalize, resolve } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -27,11 +27,6 @@ async function _renderUniversal(
   browserResult: BrowserBuilderOutput,
   serverResult: ServerBuilderOutput,
 ): Promise<BrowserBuilderOutput> {
-  const browserIndexOutputPath = path.join(browserResult.outputPath || '', 'index.html');
-  const indexHtml = fs.readFileSync(browserIndexOutputPath, 'utf8');
-  const serverBundlePath = await _getServerModuleBundlePath(options, context, serverResult);
-  const root = context.workspaceRoot;
-
   // Get browser target options.
   const browserTarget = targetFromTargetString(options.browserTarget);
   const rawBrowserOptions = await context.getTargetOptions(browserTarget);
@@ -42,65 +37,72 @@ async function _renderUniversal(
   );
 
   // Initialize zone.js
+  const root = context.workspaceRoot;
   const zonePackage = require.resolve('zone.js', { paths: [root] });
   await import(zonePackage);
 
-  const {
-    AppServerModule,
-    AppServerModuleNgFactory,
-    renderModule,
-    renderModuleFactory,
-  } = await import(serverBundlePath);
-
-  let renderModuleFn: (module: unknown, options: {}) => Promise<string>;
-  let AppServerModuleDef: unknown;
-
-  if (renderModuleFactory && AppServerModuleNgFactory) {
-    renderModuleFn = renderModuleFactory;
-    AppServerModuleDef = AppServerModuleNgFactory;
-  } else if (renderModule && AppServerModule) {
-    renderModuleFn = renderModule;
-    AppServerModuleDef = AppServerModule;
-  } else {
-    throw new Error(`renderModule method and/or AppServerModule were not exported from: ${serverBundlePath}.`);
+  const host = new NodeJsSyncHost();
+  const projectName = context.target && context.target.project;
+  if (!projectName) {
+    throw new Error('The builder requires a target.');
   }
 
-  // Load platform server module renderer
-  const renderOpts = {
-    document: indexHtml,
-    url: options.route,
-  };
+  const projectMetadata = await context.getProjectMetadata(projectName);
+  const projectRoot = resolve(
+    normalize(root),
+    normalize((projectMetadata.root as string) || ''),
+  );
 
-  const html = await renderModuleFn(AppServerModuleDef, renderOpts);
-  // Overwrite the client index file.
-  const outputIndexPath = options.outputIndexPath
-    ? path.join(root, options.outputIndexPath)
-    : browserIndexOutputPath;
+  for (const outputPath of browserResult.outputPaths) {
+    const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
+    const browserIndexOutputPath = path.join(outputPath, 'index.html');
+    const indexHtml = fs.readFileSync(browserIndexOutputPath, 'utf8');
+    const serverBundlePath = await _getServerModuleBundlePath(options, context, serverResult, localeDirectory);
 
-  fs.writeFileSync(outputIndexPath, html);
+    const {
+      AppServerModule,
+      AppServerModuleNgFactory,
+      renderModule,
+      renderModuleFactory,
+    } = await import(serverBundlePath);
 
-  if (browserOptions.serviceWorker) {
-    const host = new NodeJsSyncHost();
+    let renderModuleFn: (module: unknown, options: {}) => Promise<string>;
+    let AppServerModuleDef: unknown;
 
-    const projectName = context.target && context.target.project;
-    if (!projectName) {
-      throw new Error('The builder requires a target.');
+    if (renderModuleFactory && AppServerModuleNgFactory) {
+      renderModuleFn = renderModuleFactory;
+      AppServerModuleDef = AppServerModuleNgFactory;
+    } else if (renderModule && AppServerModule) {
+      renderModuleFn = renderModule;
+      AppServerModuleDef = AppServerModule;
+    } else {
+      throw new Error(`renderModule method and/or AppServerModule were not exported from: ${serverBundlePath}.`);
     }
 
-    const projectMetadata = await context.getProjectMetadata(projectName);
-    const projectRoot = resolve(
-      normalize(context.workspaceRoot),
-      normalize((projectMetadata.root as string) || ''),
-    );
+    // Load platform server module renderer
+    const renderOpts = {
+      document: indexHtml,
+      url: options.route,
+    };
 
-    await augmentAppWithServiceWorker(
-      host,
-      normalize(root),
-      projectRoot,
-      join(normalize(root), browserOptions.outputPath),
-      browserOptions.baseHref || '/',
-      browserOptions.ngswConfigPath,
-    );
+    const html = await renderModuleFn(AppServerModuleDef, renderOpts);
+    // Overwrite the client index file.
+    const outputIndexPath = options.outputIndexPath
+      ? path.join(root, options.outputIndexPath)
+      : browserIndexOutputPath;
+
+    fs.writeFileSync(outputIndexPath, html);
+
+    if (browserOptions.serviceWorker) {
+      await augmentAppWithServiceWorker(
+        host,
+        normalize(root),
+        projectRoot,
+        normalize(outputPath),
+        browserOptions.baseHref || '/',
+        browserOptions.ngswConfigPath,
+      );
+    }
   }
 
   return browserResult;
@@ -110,11 +112,18 @@ async function _getServerModuleBundlePath(
   options: BuildWebpackAppShellSchema,
   context: BuilderContext,
   serverResult: ServerBuilderOutput,
+  browserLocaleDirectory: string,
 ) {
   if (options.appModuleBundle) {
     return path.join(context.workspaceRoot, options.appModuleBundle);
   } else {
-    const outputPath = serverResult.outputPath || '/';
+    const { baseOutputPath = '' } = serverResult;
+    const outputPath = path.join(baseOutputPath, browserLocaleDirectory);
+
+    if (!fs.existsSync(outputPath)) {
+      throw new Error(`Could not find server output directory: ${outputPath}.`);
+    }
+
     const files = fs.readdirSync(outputPath, 'utf8');
     const re = /^main\.(?:[a-zA-Z0-9]{20}\.)?(?:bundle\.)?js$/;
     const maybeMain = files.filter(x => re.test(x))[0];
@@ -140,15 +149,17 @@ async function _appShellBuilder(
     watch: false,
     serviceWorker: false,
   });
-  const serverTargetRun = await context.scheduleTarget(serverTarget, {});
+  const serverTargetRun = await context.scheduleTarget(serverTarget, {
+    watch: false,
+  });
 
   try {
     const [browserResult, serverResult] = await Promise.all([
-      (browserTargetRun.result as {}) as BrowserBuilderOutput,
-      serverTargetRun.result,
+      browserTargetRun.result as unknown as BrowserBuilderOutput,
+      serverTargetRun.result as unknown as ServerBuilderOutput,
     ]);
 
-    if (browserResult.success === false || browserResult.outputPath === undefined) {
+    if (browserResult.success === false || browserResult.baseOutputPath === undefined) {
       return browserResult;
     } else if (serverResult.success === false) {
       return serverResult;

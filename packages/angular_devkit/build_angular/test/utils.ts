@@ -76,8 +76,8 @@ export async function browserBuild(
   const output = (await run.result) as BrowserBuilderOutput;
   expect(output.success).toBe(true);
 
-  expect(output.outputPath).not.toBeUndefined();
-  const outputPath = normalize(output.outputPath);
+  expect(output.outputPaths[0]).not.toBeUndefined();
+  const outputPath = normalize(output.outputPaths[0]);
 
   const fileNames = await host.list(outputPath).toPromise();
   const files = fileNames.reduce((acc: { [name: string]: Promise<string> }, path) => {

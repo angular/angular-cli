@@ -32,7 +32,12 @@ import { Schema as ServerBuilderOptions } from './schema';
 
 // If success is true, outputPath should be set.
 export type ServerBuilderOutput = json.JsonObject & BuilderOutput & {
-  outputPath?: string;
+  baseOutputPath: string;
+  outputPaths: string[];
+  /**
+   * @deprecated in version 9. Use 'outputPaths' instead.
+   */
+  outputPath: string;
 };
 
 export { ServerBuilderOptions };
@@ -52,6 +57,7 @@ export function execute(
   const tsConfig = readTsconfig(options.tsConfig, root);
   const target = tsConfig.options.target || ScriptTarget.ES5;
   const baseOutputPath = path.resolve(root, options.outputPath);
+  let outputPaths: undefined | string[];
 
   return from(initialize(options, context, transforms.webpackConfiguration)).pipe(
     concatMap(({ config, i18n }) => {
@@ -66,7 +72,7 @@ export function execute(
             throw new Error('Webpack stats build result is required.');
           }
 
-          const outputPaths = ensureOutputPaths(baseOutputPath, i18n);
+          outputPaths = ensureOutputPaths(baseOutputPath, i18n);
 
           const success = await i18nInlineEmittedFiles(
             context,
@@ -92,7 +98,9 @@ export function execute(
 
       return {
         ...output,
-        outputPath: path.resolve(root, options.outputPath),
+        baseOutputPath,
+        outputPath: baseOutputPath,
+        outputPaths: outputPaths || [baseOutputPath],
       } as ServerBuilderOutput;
     }),
   );
