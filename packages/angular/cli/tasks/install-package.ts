@@ -155,6 +155,7 @@ export function runTempPackageBin(
     env: {
       ...process.env,
       NG_DISABLE_VERSION_CHECK: 'true',
+      NG_CLI_ANALYTICS: 'false',
     },
   });
 
