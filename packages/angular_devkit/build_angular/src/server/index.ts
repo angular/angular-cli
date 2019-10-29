@@ -7,11 +7,9 @@
  */
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { runWebpack } from '@angular-devkit/build-webpack';
-import { json, virtualFs } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import * as fs from 'fs';
+import { json } from '@angular-devkit/core';
 import * as path from 'path';
-import { Observable, from, of } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
 import { ScriptTarget } from 'typescript';
 import * as webpack from 'webpack';
@@ -46,17 +44,16 @@ export function execute(
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
   } = {},
 ): Observable<ServerBuilderOutput> {
-  const host = new NodeJsSyncHost();
   const root = context.workspaceRoot;
 
   // Check Angular version.
-  assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
+  assertCompatibleAngularVersion(root, context.logger);
 
-  const tsConfig = readTsconfig(options.tsConfig, context.workspaceRoot);
+  const tsConfig = readTsconfig(options.tsConfig, root);
   const target = tsConfig.options.target || ScriptTarget.ES5;
-  const baseOutputPath = path.resolve(context.workspaceRoot, options.outputPath);
+  const baseOutputPath = path.resolve(root, options.outputPath);
 
-  return from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
+  return from(initialize(options, context, transforms.webpackConfiguration)).pipe(
     concatMap(({ config, i18n }) => {
       return runWebpack(config, context).pipe(
         concatMap(async output => {
@@ -108,7 +105,6 @@ export default createBuilder<json.JsonObject & ServerBuilderOptions, ServerBuild
 async function initialize(
   options: ServerBuilderOptions,
   context: BuilderContext,
-  host: virtualFs.Host<fs.Stats>,
   webpackConfigurationTransform?: ExecutionTransformer<webpack.Configuration>,
 ): Promise<{
   config: webpack.Configuration;

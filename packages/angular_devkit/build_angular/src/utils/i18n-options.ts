@@ -93,7 +93,6 @@ export function createI18nOptions(
 
 export async function configureI18nBuild<T extends BrowserBuilderSchema | ServerBuilderSchema>(
   context: BuilderContext,
-  host: virtualFs.Host<fs.Stats>,
   options: T,
 ): Promise<{
   buildOptions: T,
