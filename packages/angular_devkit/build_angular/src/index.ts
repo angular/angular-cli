@@ -50,6 +50,11 @@ export {
 } from './karma';
 
 export {
+  execute as executeProtractorBuilder,
+  ProtractorBuilderOptions,
+} from './protractor';
+
+export {
   execute as executeServerBuilder,
   ServerBuilderOptions,
   ServerBuilderOutput,
