@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext } from '@angular-devkit/architect';
-import { json, virtualFs } from '@angular-devkit/core';
+import { json } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -93,17 +93,16 @@ export function createI18nOptions(
 
 export async function configureI18nBuild<T extends BrowserBuilderSchema | ServerBuilderSchema>(
   context: BuilderContext,
-  host: virtualFs.Host<fs.Stats>,
   options: T,
 ): Promise<{
-  buildOptions: T,
-  i18n: I18nOptions,
+  buildOptions: T;
+  i18n: I18nOptions;
 }> {
   if (!context.target) {
     throw new Error('The builder requires a target.');
   }
 
-  const buildOptions = { ... options };
+  const buildOptions = { ...options };
 
   const tsConfig = readTsconfig(buildOptions.tsConfig, context.workspaceRoot);
   const usingIvy = tsConfig.options.enableIvy !== false;
@@ -115,9 +114,39 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
   if (buildOptions.localize === undefined && usingIvy) {
     mergeDeprecatedI18nOptions(i18n, buildOptions.i18nLocale, buildOptions.i18nFile);
   } else if (buildOptions.localize !== undefined && !usingIvy) {
-    buildOptions.localize = undefined;
+    if (
+      buildOptions.localize === true ||
+      (Array.isArray(buildOptions.localize) && buildOptions.localize.length > 1)
+    ) {
+      throw new Error(
+        `Localization with multiple locales in one build is not supported with View Engine.`,
+      );
+    }
 
-    context.logger.warn(`Option 'localize' is not supported with View Engine.`);
+    if (buildOptions.i18nLocale !== undefined) {
+      context.logger.warn(
+        `Option 'localize' and deprecated 'i18nLocale' found.  Using 'localize'.`,
+      );
+    }
+    if (buildOptions.i18nFormat !== undefined) {
+      context.logger.warn(
+        `Option 'localize' and deprecated 'i18nFormat' found.  Using 'localize'.`,
+      );
+    }
+    if (buildOptions.i18nFile !== undefined) {
+      context.logger.warn(
+        `Option 'localize' and deprecated 'i18nFile' found.  Using 'localize'.`,
+      );
+    }
+
+    if (
+      buildOptions.localize === false ||
+      (Array.isArray(buildOptions.localize) && buildOptions.localize.length === 0)
+    ) {
+      buildOptions.i18nFile = undefined;
+      buildOptions.i18nLocale = undefined;
+      buildOptions.i18nFormat = undefined;
+    }
   }
 
   if (i18n.inlineLocales.size > 0) {
@@ -151,6 +180,12 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
     // transform to register the locale directly in the output bundle.
     if (i18n.inlineLocales.size === 1) {
       buildOptions.i18nLocale = [...i18n.inlineLocales][0];
+
+      // Provide support for using the Ivy i18n options with VE
+      // i18nFormat and i18nLocale are set above
+      if (buildOptions.i18nLocale !== i18n.sourceLocale) {
+        buildOptions.i18nFile = i18n.locales[buildOptions.i18nLocale].file;
+      }
     }
   }
 
@@ -163,14 +198,18 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
     process.on('exit', () => {
       try {
         rimraf.sync(tempPath);
-      } catch { }
+      } catch {}
     });
   }
 
   return { buildOptions, i18n };
 }
 
-function mergeDeprecatedI18nOptions(i18n: I18nOptions, i18nLocale: string | undefined, i18nFile: string | undefined): I18nOptions {
+function mergeDeprecatedI18nOptions(
+  i18n: I18nOptions,
+  i18nLocale: string | undefined,
+  i18nFile: string | undefined,
+): I18nOptions {
   if (i18nFile !== undefined && i18nLocale === undefined) {
     throw new Error(`Option 'i18nFile' cannot be used without the 'i18nLocale' option.`);
   }
