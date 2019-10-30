@@ -14,9 +14,26 @@ export default async function () {
 
   // Set configurations for each locale.
   const langTranslations = [
-    { lang: 'en', translation: 'Hello i18n!', outputPath: enDir },
-    { lang: 'fr', translation: 'Bonjour i18n!', outputPath: frDist },
-    { lang: 'de', translation: 'Hallo i18n!', outputPath: deDir },
+    {
+      lang: 'en', outputPath: enDir,
+      translation: { hello: 'Hello i18n!', plural: 'Updated 3 minutes ago' },
+    },
+    {
+      lang: 'fr', outputPath: frDist,
+      translation: { hello: 'Bonjour i18n!', plural: 'Mis à jour Il y a 3 minutes' },
+      pluralTargets: {
+        text: '<target>Mis à jour <x id="ICU" equiv-text="{minutes, plural, =0 {...} =1 {...} other {...}}"/></target>',
+        interpolation: '<target>{VAR_PLURAL, plural, =0 {juste maintenant} =1 {il y a une minute} other {Il y a <x id="INTERPOLATION" equiv-text="{{minutes}}"/> minutes} }</target>',
+      },
+    },
+    {
+      lang: 'de', outputPath: deDir,
+      translation: { hello: 'Hallo i18n!', plural: 'Aktualisiert vor 3 Minuten' },
+      pluralTargets: {
+        text: '<target>Aktualisiert <x id="ICU" equiv-text="{minutes, plural, =0 {...} =1 {...} other {...}}"/></target>',
+        interpolation: '<target>{VAR_PLURAL, plural, =0 {gerade jetzt} =1 {vor einer Minute} other {vor <x id="INTERPOLATION" equiv-text="{{minutes}}"/> Minuten} }</target>',
+      },
+    },
   ];
 
   await updateJsonFile('angular.json', workspaceJson => {
@@ -61,7 +78,12 @@ export default async function () {
       describe('workspace-project App', () => {
         it('should display welcome message', () => {
           browser.get(browser.baseUrl);
-          expect(element(by.css('h1')).getText()).toEqual('${translation}');
+          expect(element(by.css('h1')).getText()).toEqual('${translation.hello}');
+        });
+
+        it('should display pluralized message', () => {
+          browser.get(browser.baseUrl);
+          expect(element(by.css('h2')).getText()).toEqual('${translation.plural}');
         });
 
         afterEach(async () => {
@@ -75,9 +97,11 @@ export default async function () {
     `);
   }
 
-  // Add a translatable element.
+  // Add translatable elements.
   await writeFile('src/app/app.component.html',
-    '<h1 i18n="An introduction header for this sample">Hello i18n!</h1>');
+    '<h1 i18n="An introduction header for this sample">Hello i18n!</h1>\n' +
+    '<h2 i18n>Updated {minutes, plural, =0 {just now} =1 {one minute ago} other {{{minutes}} minutes ago}}</h2>');
+  await replaceInFile('src/app/app.component.ts', `title = 'latest-app'`, 'minutes = 3');
 
   // Extract the translation messages and copy them for each language.
   await ng('xi18n', '--output-path=src/locale');
@@ -85,19 +109,26 @@ export default async function () {
   await expectFileToMatch('src/locale/messages.xlf', `source-language="en-US"`);
   await expectFileToMatch('src/locale/messages.xlf', `An introduction header for this sample`);
 
-  for (const { lang, translation } of langTranslations) {
+  const helloSrc = '<source>Hello i18n!</source>';
+  const pluralTextSrc = '<source>Updated <x id="ICU" equiv-text="{minutes, plural, =0 {...} =1 {...} other {...}}"/></source>';
+  const pluralInterpolationSrc = '<source>{VAR_PLURAL, plural, =0 {just now} =1 {one minute ago} other {<x id="INTERPOLATION" equiv-text="{{minutes}}"/> minutes ago} }</source>';
+  for (const { lang, translation, pluralTargets } of langTranslations) {
     if (lang != 'en') {
       await copyFile('src/locale/messages.xlf', `src/locale/messages.${lang}.xlf`);
-      await replaceInFile(`src/locale/messages.${lang}.xlf`, '<source>Hello i18n!</source>',
-        `<source>Hello i18n!</source>\n<target>${translation}</target>`);
+      await replaceInFile(`src/locale/messages.${lang}.xlf`, helloSrc,
+        `${helloSrc}\n<target>${translation.hello}</target>`);
+      await replaceInFile(`src/locale/messages.${lang}.xlf`, pluralTextSrc,
+        `${pluralTextSrc}\n${pluralTargets.text}`);
+      await replaceInFile(`src/locale/messages.${lang}.xlf`, pluralInterpolationSrc,
+        `${pluralInterpolationSrc}\n${pluralTargets.interpolation}`);
     }
   }
 
   for (const { lang, translation, outputPath } of langTranslations) {
     // Build each locale and verify the output.
     await ng('build', `--configuration=${lang}`);
-    await expectFileToMatch(`${outputPath}/main-es5.js`, translation);
-    await expectFileToMatch(`${outputPath}/main-es2015.js`, translation);
+    await expectFileToMatch(`${outputPath}/main-es5.js`, translation.hello);
+    await expectFileToMatch(`${outputPath}/main-es2015.js`, translation.hello);
 
     // E2E to verify the output runs and is correct.
     if (getGlobalVariable('argv')['ve']) {
