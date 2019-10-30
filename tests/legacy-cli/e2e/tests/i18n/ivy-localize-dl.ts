@@ -28,8 +28,14 @@ export default async function () {
     await expectFileToMatch(`${outputPath}/main-es2015.js`, translation.helloPartial);
     await expectToFail(() => expectFileToMatch(`${outputPath}/main-es5.js`, '$localize`'));
     await expectToFail(() => expectFileToMatch(`${outputPath}/main-es2015.js`, '$localize`'));
+
+    // Verify the locale ID is present
     await expectFileToMatch(`${outputPath}/main-es5.js`, lang);
     await expectFileToMatch(`${outputPath}/main-es2015.js`, lang);
+
+    // Verify the locale data is registered using the global files
+    await expectFileToMatch(`${outputPath}/main-es5.js`, '.ng.common.locales');
+    await expectFileToMatch(`${outputPath}/main-es2015.js`, '.ng.common.locales');
 
     const server = externalServer(outputPath);
     try {
@@ -39,6 +45,11 @@ export default async function () {
       server.close();
     }
   }
+
+  // Verify deprecated locale data registration is not present
+  await ng('build', '--configuration=fr', '--optimization=false');
+  await expectToFail(() => expectFileToMatch(`${baseDir}/fr/main-es5.js`, 'registerLocaleData('));
+  await expectToFail(() => expectFileToMatch(`${baseDir}/fr/main-es2015.js`, 'registerLocaleData('));
 
   // Verify missing translation behaviour.
   await appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
