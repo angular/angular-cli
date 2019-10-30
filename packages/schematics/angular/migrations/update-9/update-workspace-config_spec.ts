@@ -297,7 +297,7 @@ describe('Migration to version 9', () => {
       });
     });
 
-    describe('i18n configuration', () => {
+    xdescribe('i18n configuration', () => {
       function getI18NConfig(localId: string): object {
         return {
           outputPath: `dist/my-project-${localId}/`,
