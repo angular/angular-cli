@@ -19,7 +19,10 @@ import { createTranslationLoader } from './load-translations';
 export interface I18nOptions {
   inlineLocales: Set<string>;
   sourceLocale: string;
-  locales: Record<string, { file: string; format?: string; translation?: unknown }>;
+  locales: Record<
+    string,
+    { file: string; format?: string; translation?: unknown; dataPath?: string }
+  >;
   flatOutput?: boolean;
   readonly shouldInline: boolean;
 }
@@ -127,9 +130,16 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
   }
 
   if (i18n.inlineLocales.size > 0) {
+    const projectRoot = path.join(context.workspaceRoot, (metadata.root as string) || '');
+    const localeDataBasePath = findLocaleDataBasePath(projectRoot);
+    if (!localeDataBasePath) {
+      throw new Error(
+        `Unable to find locale data within '@angular/common'. Please ensure '@angular/common' is installed.`,
+      );
+    }
+
     // Load locales
     const loader = await createTranslationLoader();
-    const projectRoot = path.join(context.workspaceRoot, (metadata.root as string) || '');
     const usedFormats = new Set<string>();
     for (const [locale, desc] of Object.entries(i18n.locales)) {
       if (i18n.inlineLocales.has(locale) && desc.file) {
@@ -145,18 +155,21 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
 
         desc.format = result.format;
         desc.translation = result.translation;
+
+        const localeDataPath = findLocaleDataPath(locale, localeDataBasePath);
+        if (!localeDataPath) {
+          context.logger.warn(
+            `Locale data for '${locale}' cannot be found.  No locale data will be included for this locale.`,
+          );
+        } else {
+          desc.dataPath = localeDataPath;
+        }
       }
     }
 
     // Legacy message id's require the format of the translations
     if (usedFormats.size > 0) {
       buildOptions.i18nFormat = [...usedFormats][0];
-    }
-
-    // If only one locale is specified set the deprecated option to enable the webpack plugin
-    // transform to register the locale directly in the output bundle.
-    if (i18n.inlineLocales.size === 1) {
-      buildOptions.i18nLocale = [...i18n.inlineLocales][0];
     }
   }
 
@@ -201,4 +214,31 @@ function mergeDeprecatedI18nOptions(
   }
 
   return i18n;
+}
+
+function findLocaleDataBasePath(projectRoot: string): string | null {
+  try {
+    const commonPath = path.dirname(
+      require.resolve('@angular/common/package.json', { paths: [projectRoot] }),
+    );
+    const localesPath = path.join(commonPath, 'locales/global');
+
+    if (!fs.existsSync(localesPath)) {
+      return null;
+    }
+
+    return localesPath;
+  } catch {
+    return null;
+  }
+}
+
+function findLocaleDataPath(locale: string, basePath: string): string | null {
+  const localeDataPath = path.join(basePath, locale + '.js');
+
+  if (!fs.existsSync(localeDataPath)) {
+    return null;
+  }
+
+  return localeDataPath;
 }
