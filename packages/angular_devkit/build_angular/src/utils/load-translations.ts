@@ -10,20 +10,7 @@ import * as fs from 'fs';
 export type TranslationLoader = (path: string) => { translation: unknown; format: string };
 
 export async function createTranslationLoader(): Promise<TranslationLoader> {
-  const parsers = {
-    json: new (await import(
-      // tslint:disable-next-line:trailing-comma
-      '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json/simple_json_translation_parser'
-    )).SimpleJsonTranslationParser(),
-    xlf: new (await import(
-      // tslint:disable-next-line:trailing-comma
-      '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff1/xliff1_translation_parser'
-    )).Xliff1TranslationParser(),
-    xlf2: new (await import(
-      // tslint:disable-next-line:trailing-comma
-      '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2/xliff2_translation_parser'
-    )).Xliff2TranslationParser(),
-  };
+  const parsers = await importParsers();
 
   return (path: string) => {
     const content = fs.readFileSync(path, 'utf8');
@@ -36,4 +23,41 @@ export async function createTranslationLoader(): Promise<TranslationLoader> {
 
     throw new Error('Unsupported translation file format.');
   };
+}
+
+async function importParsers() {
+  try {
+    return {
+      json: new (await import(
+        // tslint:disable-next-line:trailing-comma
+        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json/simple_json_translation_parser'
+      )).SimpleJsonTranslationParser(),
+      xlf: new (await import(
+        // tslint:disable-next-line:trailing-comma
+        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff1/xliff1_translation_parser'
+      )).Xliff1TranslationParser(),
+      xlf2: new (await import(
+        // tslint:disable-next-line:trailing-comma
+        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2/xliff2_translation_parser'
+      )).Xliff2TranslationParser(),
+    };
+  } catch {
+    return {
+      json: new (await import(
+        // @ts-ignore
+        // tslint:disable-next-line:trailing-comma
+        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json_translation_parser'
+      )).SimpleJsonTranslationParser(),
+      xlf: new (await import(
+        // @ts-ignore
+        // tslint:disable-next-line:trailing-comma
+        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff1_translation_parser'
+      )).Xliff1TranslationParser(),
+      xlf2: new (await import(
+        // @ts-ignore
+        // tslint:disable-next-line:trailing-comma
+        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2_translation_parser'
+      )).Xliff2TranslationParser(),
+    };
+  }
 }
