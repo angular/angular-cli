@@ -95,14 +95,21 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
   context: BuilderContext,
   options: T,
 ): Promise<{
-  buildOptions: T,
-  i18n: I18nOptions,
+  buildOptions: T;
+  i18n: I18nOptions;
 }> {
   if (!context.target) {
     throw new Error('The builder requires a target.');
   }
 
-  const buildOptions = { ... options };
+  const buildOptions = { ...options };
+
+  if (
+    buildOptions.localize === true ||
+    (Array.isArray(buildOptions.localize) && buildOptions.localize.length > 1)
+  ) {
+    throw new Error('Using the localize option for multiple locales is temporarily disabled.');
+  }
 
   const tsConfig = readTsconfig(buildOptions.tsConfig, context.workspaceRoot);
   const usingIvy = tsConfig.options.enableIvy !== false;
@@ -162,14 +169,18 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
     process.on('exit', () => {
       try {
         rimraf.sync(tempPath);
-      } catch { }
+      } catch {}
     });
   }
 
   return { buildOptions, i18n };
 }
 
-function mergeDeprecatedI18nOptions(i18n: I18nOptions, i18nLocale: string | undefined, i18nFile: string | undefined): I18nOptions {
+function mergeDeprecatedI18nOptions(
+  i18n: I18nOptions,
+  i18nLocale: string | undefined,
+  i18nFile: string | undefined,
+): I18nOptions {
   if (i18nFile !== undefined && i18nLocale === undefined) {
     throw new Error(`Option 'i18nFile' cannot be used without the 'i18nLocale' option.`);
   }

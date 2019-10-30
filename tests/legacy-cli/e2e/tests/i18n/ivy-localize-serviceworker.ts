@@ -14,6 +14,9 @@ import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
 
 export default async function() {
+  // TEMP: disable pending i18n updates
+  return;
+
   let localizeVersion = '@angular/localize@' + readNgVersion();
   if (getGlobalVariable('argv')['ng-snapshots']) {
     localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
@@ -62,7 +65,7 @@ export default async function() {
     appArchitect['build'].options.serviceWorker = true;
 
     // Enable localization for all locales
-    appArchitect['build'].options.localize = true;
+    // appArchitect['build'].options.localize = true;
 
     // Add locale definitions to the project
     // tslint:disable-next-line: no-any

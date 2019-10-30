@@ -14,6 +14,9 @@ import { readNgVersion } from '../../utils/version';
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
+  // TEMP: disable pending i18n updates
+  return;
+
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
 
   await updateJsonFile('package.json', packageJson => {
