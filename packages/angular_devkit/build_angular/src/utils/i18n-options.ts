@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext } from '@angular-devkit/architect';
-import { json, virtualFs } from '@angular-devkit/core';
+import { json } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -25,6 +25,7 @@ export interface I18nOptions {
   >;
   flatOutput?: boolean;
   readonly shouldInline: boolean;
+  veCompatLocale?: string;
 }
 
 export function createI18nOptions(
@@ -116,9 +117,32 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
   if (buildOptions.localize === undefined && usingIvy) {
     mergeDeprecatedI18nOptions(i18n, buildOptions.i18nLocale, buildOptions.i18nFile);
   } else if (buildOptions.localize !== undefined && !usingIvy) {
-    buildOptions.localize = undefined;
+    if (
+      buildOptions.localize === true ||
+      (Array.isArray(buildOptions.localize) && buildOptions.localize.length > 1)
+    ) {
+      throw new Error(
+        `Localization with multiple locales in one build is not supported with View Engine.`,
+      );
+    }
 
-    context.logger.warn(`Option 'localize' is not supported with View Engine.`);
+    for (const deprecatedOption of ['i18nLocale', 'i18nFormat', 'i18nFile']) {
+      // tslint:disable-next-line: no-any
+      if (typeof (buildOptions as any)[deprecatedOption] !== 'undefined') {
+        context.logger.warn(
+          `Option 'localize' and deprecated '${deprecatedOption}' found.  Using 'localize'.`,
+        );
+      }
+    }
+
+    if (
+      buildOptions.localize === false ||
+      (Array.isArray(buildOptions.localize) && buildOptions.localize.length === 0)
+    ) {
+      buildOptions.i18nFile = undefined;
+      buildOptions.i18nLocale = undefined;
+      buildOptions.i18nFormat = undefined;
+    }
   }
 
   // Clear deprecated options when using Ivy to prevent unintended behavior
@@ -179,6 +203,21 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
     // Legacy message id's require the format of the translations
     if (usedFormats.size > 0) {
       buildOptions.i18nFormat = [...usedFormats][0];
+    }
+
+    // Provide support for using the Ivy i18n options with VE
+    if (!usingIvy) {
+      i18n.veCompatLocale = buildOptions.i18nLocale = [...i18n.inlineLocales][0];
+
+      if (buildOptions.i18nLocale !== i18n.sourceLocale) {
+        buildOptions.i18nFile = i18n.locales[buildOptions.i18nLocale].file;
+      }
+
+      // Clear inline locales to prevent any new i18n related processing
+      i18n.inlineLocales.clear();
+
+      // Update the output path to include the locale to mimic Ivy localize behavior
+      buildOptions.outputPath = path.join(buildOptions.outputPath, buildOptions.i18nLocale);
     }
   }
 
