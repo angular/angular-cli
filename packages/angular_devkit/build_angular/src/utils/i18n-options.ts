@@ -80,7 +80,7 @@ export function createI18nOptions(
     Object.keys(i18n.locales).forEach(locale => i18n.inlineLocales.add(locale));
   } else if (inline) {
     for (const locale of inline) {
-      if (!i18n.locales[locale]) {
+      if (!i18n.locales[locale] && i18n.sourceLocale !== locale) {
         throw new Error(`Requested inline locale '${locale}' is not defined for the project.`);
       }
 
@@ -145,6 +145,12 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
     // Legacy message id's require the format of the translations
     if (usedFormats.size > 0) {
       buildOptions.i18nFormat = [...usedFormats][0];
+    }
+
+    // If only one locale is specified set the deprecated option to enable the webpack plugin
+    // transform to register the locale directly in the output bundle.
+    if (i18n.inlineLocales.size === 1) {
+      buildOptions.i18nLocale = [...i18n.inlineLocales][0];
     }
   }
 

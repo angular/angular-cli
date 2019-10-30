@@ -39,6 +39,7 @@ export default async function() {
     const appArchitect = appProject.architect || appProject.targets;
     const serveConfigs = appArchitect['serve'].configurations;
     const e2eConfigs = appArchitect['e2e'].configurations;
+    const buildConfigs = appArchitect['build'].configurations;
 
     // Make default builds prod.
     appArchitect['build'].options.optimization = true;
@@ -63,6 +64,8 @@ export default async function() {
       } else {
         i18n.locales[lang] = `src/locale/messages.${lang}.xlf`;
       }
+
+      buildConfigs[lang] = { localize: [lang] };
       serveConfigs[lang] = { browserTarget: `test-project:build:${lang}` };
       e2eConfigs[lang] = {
         specs: [`./src/app.${lang}.e2e-spec.ts`],
@@ -141,6 +144,11 @@ export default async function() {
       server.close();
     }
   }
+
+  // Verify locale data registration (currently only for single locale builds)
+  await ng('build', '--optimization', 'false', '-c', 'fr', '--i18n-missing-translation', 'error');
+  await expectFileToMatch(`${baseDir}/fr/main-es5.js`, 'registerLocaleData');
+  await expectFileToMatch(`${baseDir}/fr/main-es2015.js`, 'registerLocaleData');
 
   // Verify missing translation behaviour.
   await appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
