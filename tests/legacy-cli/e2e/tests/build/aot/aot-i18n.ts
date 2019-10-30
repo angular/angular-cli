@@ -36,6 +36,8 @@ export default async function () {
     },
   ];
 
+  await replaceInFile('src/app/app.component.ts', `title = 'test-project';`, `title = 'test-project';minutes=3;`);
+
   await updateJsonFile('angular.json', workspaceJson => {
     const appArchitect = workspaceJson.projects['test-project'].architect;
     const browserConfigs = appArchitect['build'].configurations;

@@ -32,9 +32,10 @@ export default async function() {
 
   // Set configurations for each locale.
   const langTranslations = [
-    { lang: 'en-US', translation: 'Hello i18n!' },
+    // TODO: re-enable all locales once localeData support is added.
+    // { lang: 'en-US', translation: 'Hello i18n!' },
+    // { lang: 'de', translation: 'Hallo i18n!' },
     { lang: 'fr', translation: 'Bonjour i18n!' },
-    { lang: 'de', translation: 'Hallo i18n!' },
   ];
 
   await updateJsonFile('angular.json', workspaceJson => {
@@ -55,7 +56,11 @@ export default async function() {
     ];
 
     // Enable localization for all locales
-    appArchitect['build'].options.localize = true;
+    // TODO: re-enable all locales once localeData support is added.
+    // appArchitect['build'].options.localize = true;
+    appArchitect['build'].options.localize = ['fr'];
+    // Always error on missing translations.
+    appArchitect['build'].options.i18nMissingTranslation = 'error';
 
     // Add locale definitions to the project
     // tslint:disable-next-line: no-any
@@ -102,8 +107,7 @@ export default async function() {
     }
   }
 
-  // Build each locale and verify the output.
-  await ng('build', '--i18n-missing-translation', 'error');
+  await ng('build');
   for (const { lang, translation } of langTranslations) {
     await expectFileToMatch(`${baseDir}/${lang}/main.js`, translation);
     await expectToFail(() => expectFileToMatch(`${baseDir}/${lang}/main.js`, '$localize`'));
@@ -147,5 +151,5 @@ export default async function() {
   await appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
   await ng('build', '--i18n-missing-translation', 'ignore');
   await expectFileToMatch(`${baseDir}/fr/main.js`, /Other content/);
-  await expectToFail(() => ng('build', '--i18n-missing-translation', 'error'));
+  await expectToFail(() => ng('build'));
 }
