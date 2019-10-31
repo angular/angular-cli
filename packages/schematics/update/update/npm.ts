@@ -129,7 +129,7 @@ export function getNpmPackageJson(
   const resultPromise: Promise<NpmRepositoryPackageJson> = pacote.packument(
     packageName,
     {
-      'full-metadata': true,
+      fullMetadata: true,
       ...npmrc,
       ...(options && options.registryUrl ? { registry: options.registryUrl } : {}),
     },
