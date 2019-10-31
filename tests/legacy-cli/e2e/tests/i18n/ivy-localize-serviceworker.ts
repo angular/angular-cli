@@ -15,6 +15,7 @@ import { readNgVersion } from '../../utils/version';
 
 export default async function() {
   // TEMP: disable pending i18n updates
+  // TODO: when re-enabling, use setupI18nConfig and helpers like other i18n tests.
   return;
 
   let localizeVersion = '@angular/localize@' + readNgVersion();
