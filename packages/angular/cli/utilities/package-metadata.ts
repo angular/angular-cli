@@ -173,7 +173,7 @@ export async function fetchPackageMetadata(
   ensureNpmrc(logger, usingYarn, verbose);
 
   const response = await pacote.packument(name, {
-    'full-metadata': true,
+    fullMetadata: true,
     ...npmrc,
     ...(registry ? { registry } : {}),
   });
@@ -228,7 +228,7 @@ export async function fetchPackageManifest(
   ensureNpmrc(logger, usingYarn, verbose);
 
   const response = await pacote.manifest(name, {
-    'full-metadata': true,
+    fullMetadata: true,
     ...npmrc,
     ...(registry ? { registry } : {}),
   });
