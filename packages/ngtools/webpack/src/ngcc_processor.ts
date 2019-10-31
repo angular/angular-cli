@@ -7,7 +7,7 @@
  */
 
 import { Logger, PathMappings, process as mainNgcc } from '@angular/compiler-cli/ngcc';
-import { existsSync } from 'fs';
+import { accessSync, constants, existsSync } from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
 import { InputFileSystem } from 'webpack';
@@ -61,6 +61,17 @@ export class NgccProcessor {
 
     const packageJsonPath = this.tryResolvePackage(moduleName, resolvedFileName);
     if (!packageJsonPath) {
+      // add it to processed so the second time round we skip this.
+      this._processedModules.add(moduleName);
+
+      return;
+    }
+
+    // If the package.json is read only we should skip calling NGCC.
+    // With Bazel when running under sandbox the filesystem is read-only.
+    try {
+      accessSync(packageJsonPath, constants.W_OK);
+    } catch {
       // add it to processed so the second time round we skip this.
       this._processedModules.add(moduleName);
 
