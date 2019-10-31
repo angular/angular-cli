@@ -27,36 +27,38 @@ export async function createTranslationLoader(): Promise<TranslationLoader> {
 
 async function importParsers() {
   try {
+    // In @angular/localize version 9.0.0-next.15 the parsers were located in the below locations.
     return {
       json: new (await import(
-        // tslint:disable-next-line:trailing-comma no-implicit-dependencies
-        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json/simple_json_translation_parser'
-      )).SimpleJsonTranslationParser(),
-      xlf: new (await import(
-        // tslint:disable-next-line:trailing-comma no-implicit-dependencies
-        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff1/xliff1_translation_parser'
-      )).Xliff1TranslationParser(),
-      xlf2: new (await import(
-        // tslint:disable-next-line:trailing-comma no-implicit-dependencies
-        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2/xliff2_translation_parser'
-      )).Xliff2TranslationParser(),
-    };
-  } catch {
-    return {
-      json: new (await import(
-        // @ts-ignore
         // tslint:disable-next-line:trailing-comma no-implicit-dependencies
         '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json_translation_parser'
       )).SimpleJsonTranslationParser(),
       xlf: new (await import(
-        // @ts-ignore
         // tslint:disable-next-line:trailing-comma no-implicit-dependencies
         '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff1_translation_parser'
       )).Xliff1TranslationParser(),
       xlf2: new (await import(
-        // @ts-ignore
         // tslint:disable-next-line:trailing-comma no-implicit-dependencies
         '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2_translation_parser'
+      )).Xliff2TranslationParser(),
+    };
+  } catch {
+    // Prior to @angular/localize version 9.0.0-next.15 the parsers were located in the below locations.
+    return {
+      json: new (await import(
+        // @ts-ignore
+        // tslint:disable-next-line:trailing-comma no-implicit-dependencies
+        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json/simple_json_translation_parser'
+      )).SimpleJsonTranslationParser(),
+      xlf: new (await import(
+        // @ts-ignore
+        // tslint:disable-next-line:trailing-comma no-implicit-dependencies
+        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff1/xliff1_translation_parser'
+      )).Xliff1TranslationParser(),
+      xlf2: new (await import(
+        // @ts-ignore
+        // tslint:disable-next-line:trailing-comma no-implicit-dependencies
+        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2/xliff2_translation_parser'
       )).Xliff2TranslationParser(),
     };
   }
