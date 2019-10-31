@@ -171,7 +171,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     );
 
     for (const migration of migrations) {
-      this.logger.info(`${colors.symbols.pointer}  ${migration.description.replace(/\. /g, '.\n   ')}`);
+      this.logger.info(`${colors.symbols.pointer} ${migration.description.replace(/\. /g, '.\n  ')}`);
 
       const result = await this.executeSchematic(migration.collection.name, migration.name);
       if (!result.success) {
@@ -182,7 +182,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
           }
         }
 
-        this.logger.error(`${colors.symbols.cross}  Migration failed. See above for further details.\n`);
+        this.logger.error(`${colors.symbols.cross} Migration failed. See above for further details.\n`);
 
         return false;
       }
@@ -197,7 +197,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         this.createCommit(message, []);
       }
 
-      this.logger.info(colors.green(`${colors.symbols.check}  Migration succeeded.\n`));
+      this.logger.info(colors.green(`${colors.symbols.check} Migration succeeded.\n`));
     }
 
     return true;
