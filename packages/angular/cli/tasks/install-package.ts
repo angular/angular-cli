@@ -24,6 +24,8 @@ interface PackageManagerOptions {
   silent: string;
   install: string;
   prefix: string;
+  noBinLinks: string;
+  noLockfile: string;
 }
 
 export function installPackage(
@@ -31,7 +33,7 @@ export function installPackage(
   logger: logging.Logger,
   packageManager: PackageManager = PackageManager.Npm,
   extraArgs: string[] = [],
-  global = false,
+  cwd = process.cwd(),
 ) {
   const packageManagerArgs = getPackageManagerArguments(packageManager);
 
@@ -39,17 +41,10 @@ export function installPackage(
     packageManagerArgs.install,
     packageName,
     packageManagerArgs.silent,
+    packageManagerArgs.noBinLinks,
   ];
 
   logger.info(colors.green(`Installing packages for tooling via ${packageManager}.`));
-
-  if (global) {
-    if (packageManager === PackageManager.Yarn) {
-      installArgs.unshift('global');
-    } else {
-      installArgs.push('--global');
-    }
-  }
 
   const { status } = spawnSync(
     packageManager,
@@ -60,6 +55,7 @@ export function installPackage(
     {
       stdio: 'inherit',
       shell: true,
+      cwd,
     },
   );
 
@@ -82,13 +78,6 @@ export function installTempPackage(
 
   // setup prefix/global modules path
   const packageManagerArgs = getPackageManagerArguments(packageManager);
-  const installArgs: string[] = [
-    packageManagerArgs.prefix,
-    tempPath,
-  ];
-
-  installPackage(packageName, logger, packageManager, installArgs, true);
-
   let tempNodeModules: string;
   if (packageManager !== PackageManager.Yarn && process.platform !== 'win32') {
     // Global installs on Unix systems go to {prefix}/lib/node_modules.
@@ -97,6 +86,15 @@ export function installTempPackage(
   } else {
     tempNodeModules = join(tempPath, 'node_modules');
   }
+
+  const installArgs: string[] = [
+    packageManagerArgs.prefix,
+    // Yarn will no append 'node_modules' to the path
+    packageManager === PackageManager.Yarn ? tempNodeModules : tempPath,
+    packageManagerArgs.noLockfile,
+  ];
+
+  installPackage(packageName, logger, packageManager, installArgs, tempPath);
 
   // Needed to resolve schematics from this location since we use a custom
   // resolve strategy in '@angular/devkit-core/node'
@@ -165,11 +163,15 @@ function getPackageManagerArguments(packageManager: PackageManager): PackageMana
     ? {
       silent: '--silent',
       install: 'add',
-      prefix: '--global-folder',
+      prefix: '--modules-folder',
+      noBinLinks: '--no-bin-links',
+      noLockfile: '--no-lockfile',
     }
     : {
       silent: '--quiet',
       install: 'install',
       prefix: '--prefix',
+      noBinLinks: '--no-bin-links',
+      noLockfile: '--no-package-lock',
     };
 }
