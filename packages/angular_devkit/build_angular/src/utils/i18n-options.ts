@@ -81,7 +81,7 @@ export function createI18nOptions(
   } else if (inline) {
     for (const locale of inline) {
       if (!i18n.locales[locale] && i18n.sourceLocale !== locale) {
-        throw new Error(`Requested inline locale '${locale}' is not defined for the project.`);
+        throw new Error(`Requested locale '${locale}' is not defined for the project.`);
       }
 
       i18n.inlineLocales.add(locale);
@@ -132,7 +132,7 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
     const projectRoot = path.join(context.workspaceRoot, (metadata.root as string) || '');
     const usedFormats = new Set<string>();
     for (const [locale, desc] of Object.entries(i18n.locales)) {
-      if (i18n.inlineLocales.has(locale)) {
+      if (i18n.inlineLocales.has(locale) && desc.file) {
         const result = loader(path.join(projectRoot, desc.file));
 
         usedFormats.add(result.format);
@@ -191,8 +191,13 @@ function mergeDeprecatedI18nOptions(
 
     if (i18nFile !== undefined) {
       i18n.locales[i18nLocale] = { file: i18nFile };
-      i18n.flatOutput = true;
+    } else {
+      // If no file, treat the locale as the source locale
+      // This mimics deprecated behavior
+      i18n.sourceLocale = i18nLocale;
     }
+
+    i18n.flatOutput = true;
   }
 
   return i18n;
