@@ -26,6 +26,8 @@ interface PackageManagerOptions {
   saveDev: string;
   install: string;
   prefix: string;
+  noBinLinks: string;
+  noLockfile: string;
 }
 
 export function installPackage(
@@ -34,7 +36,7 @@ export function installPackage(
   packageManager: PackageManager = PackageManager.Npm,
   save: Exclude<NgAddSaveDepedency, false> = true,
   extraArgs: string[] = [],
-  global = false,
+  cwd = process.cwd(),
 ) {
   const packageManagerArgs = getPackageManagerArguments(packageManager);
 
@@ -42,20 +44,13 @@ export function installPackage(
     packageManagerArgs.install,
     packageName,
     packageManagerArgs.silent,
+    packageManagerArgs.noBinLinks,
   ];
 
   logger.info(colors.green(`Installing packages for tooling via ${packageManager}.`));
 
   if (save === 'devDependencies') {
     installArgs.push(packageManagerArgs.saveDev);
-  }
-
-  if (global) {
-    if (packageManager === PackageManager.Yarn) {
-      installArgs.unshift('global');
-    } else {
-      installArgs.push('--global');
-    }
   }
 
   const { status } = spawnSync(
@@ -67,6 +62,7 @@ export function installPackage(
     {
       stdio: 'inherit',
       shell: true,
+      cwd,
     },
   );
 
@@ -93,21 +89,15 @@ export function installTempPackage(
 
   // setup prefix/global modules path
   const packageManagerArgs = getPackageManagerArguments(packageManager);
+  const tempNodeModules = join(tempPath, 'node_modules');
   const installArgs: string[] = [
     packageManagerArgs.prefix,
-    tempPath,
+    // Yarn will no append 'node_modules' to the path
+    packageManager === PackageManager.Yarn ? tempNodeModules : tempPath,
+    packageManagerArgs.noLockfile,
   ];
 
-  installPackage(packageName, logger, packageManager, true, installArgs, true);
-
-  let tempNodeModules: string;
-  if (packageManager !== PackageManager.Yarn && process.platform !== 'win32') {
-    // Global installs on Unix systems go to {prefix}/lib/node_modules.
-    // Global installs on Windows go to {prefix}/node_modules (that is, no lib folder.)
-    tempNodeModules = join(tempPath, 'lib', 'node_modules');
-  } else {
-    tempNodeModules = join(tempPath, 'node_modules');
-  }
+  installPackage(packageName, logger, packageManager, true, installArgs, tempPath);
 
   return tempNodeModules;
 }
@@ -172,12 +162,16 @@ function getPackageManagerArguments(packageManager: PackageManager): PackageMana
       silent: '--silent',
       saveDev: '--dev',
       install: 'add',
-      prefix: '--global-folder',
+      prefix: '--modules-folder',
+      noBinLinks: '--no-bin-links',
+      noLockfile: '--no-lockfile',
     }
     : {
       silent: '--quiet',
       saveDev: '--save-dev',
       install: 'install',
       prefix: '--prefix',
+      noBinLinks: '--no-bin-links',
+      noLockfile: '--no-package-lock',
     };
 }
