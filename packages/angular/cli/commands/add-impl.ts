@@ -18,6 +18,7 @@ import { colors } from '../utilities/color';
 import { getPackageManager } from '../utilities/package-manager';
 import {
   NgAddSaveDepedency,
+  PackageIdentifier,
   PackageManifest,
   fetchPackageManifest,
   fetchPackageMetadata,
@@ -50,10 +51,26 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
     }
 
     if (packageIdentifier.registry && this.isPackageInstalled(packageIdentifier.name)) {
-      // Already installed so just run schematic
-      this.logger.info('Skipping installation: Package already installed');
+      let validVersion = false;
+      const installedVersion = await this.findProjectVersion(packageIdentifier.name);
+      if (installedVersion) {
+        if (packageIdentifier.type === 'range') {
+          validVersion = satisfies(installedVersion, packageIdentifier.fetchSpec);
+        } else if (packageIdentifier.type === 'version') {
+          const v1 = valid(packageIdentifier.fetchSpec);
+          const v2 = valid(installedVersion);
+          validVersion = v1 !== null && v1 === v2;
+        } else if (!packageIdentifier.rawSpec) {
+          validVersion = true;
+        }
+      }
 
-      return this.executeSchematic(packageIdentifier.name, options['--']);
+      if (validVersion) {
+        // Already installed so just run schematic
+        this.logger.info('Skipping installation: Package already installed');
+
+        return this.executeSchematic(packageIdentifier.name, options['--']);
+      }
     }
 
     const packageManager = await getPackageManager(this.workspace.root);
