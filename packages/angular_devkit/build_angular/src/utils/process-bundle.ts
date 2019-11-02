@@ -502,9 +502,10 @@ export async function inlineLocales(options: InlineOptions) {
   const { default: MagicString } = await import('magic-string');
   const { default: generate } = await import('@babel/generator');
   const utils = await import(
-    // tslint:disable-next-line: trailing-comma
+    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
     '@angular/localize/src/tools/src/translate/source_files/source_file_utils'
   );
+  // tslint:disable-next-line: no-implicit-dependencies
   const localizeDiag = await import('@angular/localize/src/tools/src/diagnostics');
 
   const diagnostics = new localizeDiag.Diagnostics();
@@ -594,6 +595,7 @@ function inlineCopyOnly(options: InlineOptions) {
 
 function findLocalizePositions(
   options: InlineOptions,
+  // tslint:disable-next-line: no-implicit-dependencies
   utils: typeof import('@angular/localize/src/tools/src/translate/source_files/source_file_utils'),
 ): LocalizePosition[] {
   let ast: ParseResult | undefined | null;
