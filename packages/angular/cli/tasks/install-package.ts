@@ -8,12 +8,7 @@
 
 import { logging } from '@angular-devkit/core';
 import { spawnSync } from 'child_process';
-import {
-  existsSync,
-  mkdtempSync,
-  readFileSync,
-  realpathSync,
-} from 'fs';
+import { existsSync, mkdtempSync, readFileSync, realpathSync } from 'fs';
 import { tmpdir } from 'os';
 import { join, resolve } from 'path';
 import * as rimraf from 'rimraf';
@@ -53,21 +48,18 @@ export function installPackage(
     installArgs.push(packageManagerArgs.saveDev);
   }
 
-  const { status } = spawnSync(
-    packageManager,
-    [
-      ...installArgs,
-      ...extraArgs,
-    ],
-    {
-      stdio: 'inherit',
-      shell: true,
-      cwd,
-    },
-  );
+  const { status, stderr } = spawnSync(packageManager, [...installArgs, ...extraArgs], {
+    stdio: 'pipe',
+    encoding: 'utf8',
+    cwd,
+  });
 
   if (status !== 0) {
-    throw new Error('Package install failed, see above.');
+    let errors = stderr.trim();
+    if (errors.length) {
+      errors += '\n';
+    }
+    throw new Error(errors + `Package install failed${errors.length ? ', see above' : ''}.`);
   }
 
   logger.info(colors.green(`Installed packages for tooling via ${packageManager}.`));
@@ -84,7 +76,7 @@ export function installTempPackage(
   process.on('exit', () => {
     try {
       rimraf.sync(tempPath);
-    } catch { }
+    } catch {}
   });
 
   // setup prefix/global modules path
@@ -134,10 +126,7 @@ export function runTempPackageBin(
     throw new Error(`Cannot locate bin for temporary package: ${packageNameNoVersion}.`);
   }
 
-  const argv = [
-    binPath,
-    ...args,
-  ];
+  const argv = [binPath, ...args];
 
   const { status, error } = spawnSync('node', argv, {
     stdio: 'inherit',
@@ -159,19 +148,19 @@ export function runTempPackageBin(
 function getPackageManagerArguments(packageManager: PackageManager): PackageManagerOptions {
   return packageManager === PackageManager.Yarn
     ? {
-      silent: '--silent',
-      saveDev: '--dev',
-      install: 'add',
-      prefix: '--modules-folder',
-      noBinLinks: '--no-bin-links',
-      noLockfile: '--no-lockfile',
-    }
+        silent: '--silent',
+        saveDev: '--dev',
+        install: 'add',
+        prefix: '--modules-folder',
+        noBinLinks: '--no-bin-links',
+        noLockfile: '--no-lockfile',
+      }
     : {
-      silent: '--quiet',
-      saveDev: '--save-dev',
-      install: 'install',
-      prefix: '--prefix',
-      noBinLinks: '--no-bin-links',
-      noLockfile: '--no-package-lock',
-    };
+        silent: '--quiet',
+        saveDev: '--save-dev',
+        install: 'install',
+        prefix: '--prefix',
+        noBinLinks: '--no-bin-links',
+        noLockfile: '--no-package-lock',
+      };
 }
