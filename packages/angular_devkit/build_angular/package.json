@@ -101,7 +101,6 @@
   },
   "peerDependencies": {
     "@angular/compiler-cli": ">=9.0.0-beta < 10",
-    "@angular/localize": "^9.0.0-next.11",
     "typescript": ">=3.6 < 3.7"
   },
   "peerDependenciesMeta": {
