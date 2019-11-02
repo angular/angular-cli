@@ -162,8 +162,6 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       return true;
     }
 
-    const startingGitSha = this.findCurrentGitSha();
-
     migrations.sort((a, b) => semver.compare(a.version, b.version) || a.name.localeCompare(b.name));
 
     this.logger.info(
@@ -175,13 +173,6 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
 
       const result = await this.executeSchematic(migration.collection.name, migration.name);
       if (!result.success) {
-        if (startingGitSha !== null) {
-          const currentGitSha = this.findCurrentGitSha();
-          if (currentGitSha !== startingGitSha) {
-            this.logger.warn(`git HEAD was at ${startingGitSha} before migrations.`);
-          }
-        }
-
         this.logger.error(`${colors.symbols.cross} Migration failed. See above for further details.\n`);
 
         return false;
