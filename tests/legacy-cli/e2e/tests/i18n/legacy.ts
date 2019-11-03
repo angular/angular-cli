@@ -215,17 +215,15 @@ export default async function () {
     await expectFileToMatch(`${outputPath}/main-es5.js`, translation.helloPartial);
     await expectFileToMatch(`${outputPath}/main-es2015.js`, translation.helloPartial);
 
-    // E2E to verify the output runs and is correct.
-    if (getGlobalVariable('argv')['ve']) {
-      await ng('e2e', `--configuration=${lang}`);
-    } else {
-      const server = externalServer(outputPath);
-      try {
-        // Execute without a devserver.
-        await ng('e2e', `--configuration=${lang}`, '--devServerTarget=');
-      } finally {
-        server.close();
-      }
+    // Execute Application E2E tests with dev server
+    await ng('e2e', `--configuration=${lang}`, '--port=0');
+
+    // Execute Application E2E tests for a production build without dev server
+    const server = externalServer(outputPath);
+    try {
+      await ng('e2e', `--configuration=${lang}`, '--devServerTarget=');
+    } finally {
+      server.close();
     }
   }
 

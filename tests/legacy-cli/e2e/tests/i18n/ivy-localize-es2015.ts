@@ -26,9 +26,12 @@ export default async function() {
     await expectFileNotToExist(`${outputPath}/main-es5.js`);
     await expectFileToMatch(`${outputPath}/main.js`, lang);
 
+    // Execute Application E2E tests with dev server
+    await ng('e2e', `--configuration=${lang}`, '--port=0');
+
+    // Execute Application E2E tests for a production build without dev server
     const server = externalServer(outputPath);
     try {
-      // Execute without a devserver.
       await ng('e2e', `--configuration=${lang}`, '--devServerTarget=');
     } finally {
       server.close();

@@ -355,7 +355,7 @@ export function buildWebpackBrowser(
                 }
                 seen.add(file.file);
 
-                if (file.name === 'main') {
+                if (file.name === 'vendor' || (!mainChunkId && file.name === 'main')) {
                   // tslint:disable-next-line: no-non-null-assertion
                   mainChunkId = file.id!.toString();
                 }
