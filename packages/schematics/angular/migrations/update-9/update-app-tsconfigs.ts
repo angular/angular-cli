@@ -74,6 +74,8 @@ function updateTsConfig(tree: Tree, builderConfig: JsonAstObject, builderName: B
     }
 
     // Add stricter file inclusions to avoid unused file warning during compilation
+    const rootInSrc = tsConfigPath.includes('src/');
+    const rootSrc = rootInSrc ? '' : 'src/';
     if (builderName !== Builders.Karma) {
       // Note: we need to re-read the tsconfig after very commit because
       // otherwise the updates will be out of sync since we are ammending the same node.
@@ -81,26 +83,29 @@ function updateTsConfig(tree: Tree, builderConfig: JsonAstObject, builderName: B
       const files = findPropertyInAstObject(tsConfigAst, 'files');
       const include = findPropertyInAstObject(tsConfigAst, 'include');
 
-      if (!files && !include) {
-        const rootInSrc = tsConfigPath.includes('src/');
-        const rootSrc = rootInSrc ? '' : 'src/';
+      recorder = tree.beginUpdate(tsConfigPath);
+      if (include && include.kind === 'array') {
+        const tsInclude = include.elements.find(({ value }) => typeof value === 'string' && value.endsWith('**/*.ts'));
+        if (tsInclude) {
+          const { start, end } = tsInclude;
+          recorder.remove(start.offset, end.offset - start.offset);
+          // Replace ts includes with d.ts
+          recorder.insertLeft(start.offset, tsInclude.text.replace('.ts', '.d.ts'));
+        }
+      } else {
+        insertPropertyInAstObjectInOrder(recorder, tsConfigAst, 'include', [`${rootSrc}**/*.d.ts`], 2);
+      }
+
+      tree.commitUpdate(recorder);
+
+      if (!files) {
+        tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
+        recorder = tree.beginUpdate(tsConfigPath);
+
         const files = builderName === Builders.Server
           ? [`${rootSrc}main.server.ts`]
           : [`${rootSrc}main.ts`, `${rootSrc}polyfills.ts`];
-
-        recorder = tree.beginUpdate(tsConfigPath);
         insertPropertyInAstObjectInOrder(recorder, tsConfigAst, 'files', files, 2);
-        tree.commitUpdate(recorder);
-
-        if (builderName === Builders.Browser) {
-          tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
-          recorder = tree.beginUpdate(tsConfigPath);
-          insertPropertyInAstObjectInOrder(recorder, tsConfigAst, 'include', [`${rootSrc}**/*.d.ts`], 2);
-          tree.commitUpdate(recorder);
-        }
-
-        tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
-        recorder = tree.beginUpdate(tsConfigPath);
         removePropertyInAstObject(recorder, tsConfigAst, 'exclude');
         tree.commitUpdate(recorder);
       }

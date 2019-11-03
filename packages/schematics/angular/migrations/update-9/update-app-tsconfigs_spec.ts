@@ -64,7 +64,7 @@ describe('Migration to version 9', () => {
       expect(include).toEqual(['src/**/*.d.ts']);
     });
 
-    it('should not update apps tsConfig when tsconfig has include', async () => {
+    it('should update apps tsConfig when tsconfig has include', async () => {
       const tsConfigContent = {
         ...defaultTsConfigOptions,
         include: ['foo.ts'],
@@ -74,8 +74,39 @@ describe('Migration to version 9', () => {
 
       const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
       const { files, include } = JSON.parse(tree2.readContent('tsconfig.app.json'));
-      expect(files).toEqual(undefined);
+      expect(files).toEqual(['src/main.ts', 'src/polyfills.ts']);
       expect(include).toEqual(['foo.ts']);
+    });
+
+    it(`should update include '**/*.ts' in apps tsConfig to '**/*.d.ts'`, async () => {
+      const tsConfigContent = {
+        ...defaultTsConfigOptions,
+        include: ['src/**/*.ts'],
+        exclude: ['test.ts'],
+      };
+
+      overrideJsonFile(tree, 'tsconfig.app.json', tsConfigContent);
+
+      const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+      const { files, include, exclude } = JSON.parse(tree2.readContent('tsconfig.app.json'));
+      expect(files).toEqual(['src/main.ts', 'src/polyfills.ts']);
+      expect(include).toEqual(['src/**/*.d.ts']);
+      expect(exclude).toBeUndefined();
+    });
+
+    it(`should update include '**/*.ts' in apps tsConfig to '**/*.d.ts' when includes contains multiple elements`, async () => {
+      const tsConfigContent = {
+        ...defaultTsConfigOptions,
+        include: ['foo.ts', 'src/**/*.ts'],
+      };
+
+      overrideJsonFile(tree, 'tsconfig.app.json', tsConfigContent);
+
+      const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+      const { files, include, exclude } = JSON.parse(tree2.readContent('tsconfig.app.json'));
+      expect(files).toEqual(['src/main.ts', 'src/polyfills.ts']);
+      expect(include).toEqual(['foo.ts', 'src/**/*.d.ts']);
+      expect(exclude).toBeUndefined();
     });
 
     it(`should remove angularCompilerOptions when enableIvy is true and it's the only option`, async () => {
