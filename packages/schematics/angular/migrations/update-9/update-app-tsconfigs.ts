@@ -7,6 +7,7 @@
  */
 import { JsonAstObject } from '@angular-devkit/core';
 import { Rule, Tree, UpdateRecorder } from '@angular-devkit/schematics';
+import { posix } from 'path';
 import {
   findPropertyInAstObject,
   insertPropertyInAstObjectInOrder,
@@ -74,38 +75,47 @@ function updateTsConfig(tree: Tree, builderConfig: JsonAstObject, builderName: B
     }
 
     // Add stricter file inclusions to avoid unused file warning during compilation
-    const rootInSrc = tsConfigPath.includes('src/');
-    const rootSrc = rootInSrc ? '' : 'src/';
     if (builderName !== Builders.Karma) {
       // Note: we need to re-read the tsconfig after very commit because
       // otherwise the updates will be out of sync since we are ammending the same node.
       tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
-      const files = findPropertyInAstObject(tsConfigAst, 'files');
       const include = findPropertyInAstObject(tsConfigAst, 'include');
 
-      recorder = tree.beginUpdate(tsConfigPath);
       if (include && include.kind === 'array') {
         const tsInclude = include.elements.find(({ value }) => typeof value === 'string' && value.endsWith('**/*.ts'));
         if (tsInclude) {
           const { start, end } = tsInclude;
+          recorder = tree.beginUpdate(tsConfigPath);
           recorder.remove(start.offset, end.offset - start.offset);
           // Replace ts includes with d.ts
           recorder.insertLeft(start.offset, tsInclude.text.replace('.ts', '.d.ts'));
+          tree.commitUpdate(recorder);
         }
-      } else {
-        insertPropertyInAstObjectInOrder(recorder, tsConfigAst, 'include', [`${rootSrc}**/*.d.ts`], 2);
       }
 
-      tree.commitUpdate(recorder);
-
+      const files = findPropertyInAstObject(tsConfigAst, 'files');
       if (!files) {
-        tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
-        recorder = tree.beginUpdate(tsConfigPath);
+        const newFiles: string[] = [];
 
-        const files = builderName === Builders.Server
-          ? [`${rootSrc}main.server.ts`]
-          : [`${rootSrc}main.ts`, `${rootSrc}polyfills.ts`];
-        insertPropertyInAstObjectInOrder(recorder, tsConfigAst, 'files', files, 2);
+        const mainOption = findPropertyInAstObject(option, 'main');
+        if (mainOption && mainOption.kind === 'string') {
+          newFiles.push(posix.relative(posix.dirname(tsConfigPath), mainOption.value));
+        }
+
+        const polyfillsOption = findPropertyInAstObject(option, 'polyfills');
+        if (polyfillsOption && polyfillsOption.kind === 'string') {
+          newFiles.push(posix.relative(posix.dirname(tsConfigPath), polyfillsOption.value));
+        }
+
+        if (newFiles.length) {
+          recorder = tree.beginUpdate(tsConfigPath);
+          tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
+          insertPropertyInAstObjectInOrder(recorder, tsConfigAst, 'files', newFiles, 2);
+          tree.commitUpdate(recorder);
+        }
+
+        recorder = tree.beginUpdate(tsConfigPath);
+        tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
         removePropertyInAstObject(recorder, tsConfigAst, 'exclude');
         tree.commitUpdate(recorder);
       }
