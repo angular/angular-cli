@@ -78,14 +78,7 @@ export function installTempPackage(
 
   // setup prefix/global modules path
   const packageManagerArgs = getPackageManagerArguments(packageManager);
-  let tempNodeModules: string;
-  if (packageManager !== PackageManager.Yarn && process.platform !== 'win32') {
-    // Global installs on Unix systems go to {prefix}/lib/node_modules.
-    // Global installs on Windows go to {prefix}/node_modules (that is, no lib folder.)
-    tempNodeModules = join(tempPath, 'lib', 'node_modules');
-  } else {
-    tempNodeModules = join(tempPath, 'node_modules');
-  }
+  const tempNodeModules = join(tempPath, 'node_modules');
 
   const installArgs: string[] = [
     packageManagerArgs.prefix,
