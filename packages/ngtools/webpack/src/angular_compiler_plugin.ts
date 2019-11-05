@@ -1258,8 +1258,10 @@ export class AngularCompilerPlugin {
     if (!this._resourceLoader) {
       return [];
     }
+    // The source loader uses TS-style forward slash paths for all platforms.
+    const resolvedFileName = forwardSlashPath(fileName);
 
-    return this._resourceLoader.getResourceDependencies(fileName);
+    return this._resourceLoader.getResourceDependencies(resolvedFileName);
   }
 
   // This code mostly comes from `performCompilation` in `@angular/compiler-cli`.
