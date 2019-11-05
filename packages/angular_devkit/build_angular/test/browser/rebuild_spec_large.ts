@@ -21,6 +21,9 @@ import {
 
 describe('Browser Builder rebuilds', () => {
   const target = { project: 'app', target: 'build' };
+  // Rebuild tests are especially sensitive to time between writes due to file watcher
+  // behaviour. Give them a while.
+  const rebuildDebounceTime = 3000;
   let architect: Architect;
 
   beforeEach(async () => {
@@ -77,7 +80,7 @@ describe('Browser Builder rebuilds', () => {
     const run = await architect.scheduleTarget(target, overrides);
     await run.output
       .pipe(
-        debounceTime(1000),
+        debounceTime(rebuildDebounceTime),
         tap(result => {
           expect(result.success).toBe(true, 'build should succeed');
           const hasLazyChunk = host.scopedSync().exists(normalize('dist/lazy-lazy-module.js'));
@@ -128,7 +131,7 @@ describe('Browser Builder rebuilds', () => {
     const run = await architect.scheduleTarget(target, overrides);
     await run.output
       .pipe(
-        debounceTime(1000),
+        debounceTime(rebuildDebounceTime),
         tap(buildEvent => expect(buildEvent.success).toBe(true)),
         tap(() => host.appendToFile('src/app/app.component.css', ':host { color: blue; }')),
         take(2),
@@ -158,7 +161,7 @@ describe('Browser Builder rebuilds', () => {
     const run = await architect.scheduleTarget(target, overrides, { logger });
     await run.output
       .pipe(
-        debounceTime(1000),
+        debounceTime(rebuildDebounceTime),
         tap(buildEvent => {
           buildNumber += 1;
           switch (buildNumber) {
@@ -211,7 +214,7 @@ describe('Browser Builder rebuilds', () => {
     const run = await architect.scheduleTarget(target, overrides);
     await run.output
       .pipe(
-        debounceTime(1000),
+        debounceTime(rebuildDebounceTime),
         tap(buildEvent => expect(buildEvent.success).toBe(true)),
         tap(() => host.writeMultipleFiles({ 'src/type.ts': `export type MyType = string;` })),
         take(2),
@@ -234,7 +237,7 @@ describe('Browser Builder rebuilds', () => {
     const run = await architect.scheduleTarget(target, overrides, { logger });
     await run.output
       .pipe(
-        debounceTime(1000),
+        debounceTime(rebuildDebounceTime),
         tap(buildEvent => {
           buildNumber++;
           switch (buildNumber) {
@@ -291,7 +294,7 @@ describe('Browser Builder rebuilds', () => {
     const run = await architect.scheduleTarget(target, overrides, { logger });
     await run.output
       .pipe(
-        debounceTime(1000),
+        debounceTime(rebuildDebounceTime),
         tap(buildEvent => {
           buildNumber += 1;
           switch (buildNumber) {
@@ -365,7 +368,7 @@ describe('Browser Builder rebuilds', () => {
     const run = await architect.scheduleTarget(target, overrides);
     await run.output
       .pipe(
-        debounceTime(1000),
+        debounceTime(rebuildDebounceTime),
         tap(buildEvent => {
           buildNumber += 1;
           const fileName = './dist/main.js';
@@ -455,7 +458,7 @@ describe('Browser Builder rebuilds', () => {
     const run = await architect.scheduleTarget(target, overrides);
     await run.output
       .pipe(
-        debounceTime(1000),
+        debounceTime(rebuildDebounceTime),
         tap(buildEvent => {
           buildNumber += 1;
           switch (buildNumber) {
@@ -486,7 +489,7 @@ describe('Browser Builder rebuilds', () => {
     let buildCount = 1;
     const run = await architect.scheduleTarget(target, overrides);
     await run.output.pipe(
-      debounceTime(1000),
+      debounceTime(rebuildDebounceTime),
       tap(() => {
         const content = virtualFs.fileBufferToString(
           host.scopedSync().read(join(outputPath, 'main.js')),
@@ -516,7 +519,7 @@ describe('Browser Builder rebuilds', () => {
     let buildCount = 1;
     const run = await architect.scheduleTarget(target, overrides);
     await run.output.pipe(
-      debounceTime(1000),
+      debounceTime(rebuildDebounceTime),
       tap(() => {
         const content = virtualFs.fileBufferToString(
           host.scopedSync().read(join(outputPath, 'main.js')),
