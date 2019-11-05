@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonAstObject } from '@angular-devkit/core';
+import { JsonAstObject, logging } from '@angular-devkit/core';
 import { Rule, Tree, UpdateRecorder } from '@angular-devkit/schematics';
 import { posix } from 'path';
 import {
@@ -16,33 +16,32 @@ import {
 import { Builders } from '../../utility/workspace-models';
 import { getAllOptions, getTargets, getWorkspace, readJsonFileAsAstObject } from './utils';
 
-
 /**
  * Update the tsconfig files for applications
  * - Removes enableIvy: true
  * - Sets stricter file inclusions
  */
 export function updateApplicationTsConfigs(): Rule {
-  return (tree: Tree) => {
+  return (tree, context) => {
     const workspace = getWorkspace(tree);
 
     for (const { target } of getTargets(workspace, 'build', Builders.Browser)) {
-      updateTsConfig(tree, target, Builders.Browser);
+      updateTsConfig(tree, target, Builders.Browser, context.logger);
     }
 
     for (const { target } of getTargets(workspace, 'server', Builders.Server)) {
-      updateTsConfig(tree, target, Builders.Server);
+      updateTsConfig(tree, target, Builders.Server, context.logger);
     }
 
     for (const { target } of getTargets(workspace, 'test', Builders.Karma)) {
-      updateTsConfig(tree, target, Builders.Karma);
+      updateTsConfig(tree, target, Builders.Karma, context.logger);
     }
 
     return tree;
   };
 }
 
-function updateTsConfig(tree: Tree, builderConfig: JsonAstObject, builderName: Builders) {
+function updateTsConfig(tree: Tree, builderConfig: JsonAstObject, builderName: Builders, logger: logging.LoggerApi) {
   const options = getAllOptions(builderConfig);
   for (const option of options) {
     let recorder: UpdateRecorder;
@@ -55,6 +54,7 @@ function updateTsConfig(tree: Tree, builderConfig: JsonAstObject, builderName: B
     const tsConfigPath = tsConfigOption.value;
     let tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
     if (!tsConfigAst) {
+      logger.warn(`Cannot find file: ${tsConfigPath}`);
       continue;
     }
 
@@ -78,7 +78,10 @@ function updateTsConfig(tree: Tree, builderConfig: JsonAstObject, builderName: B
     if (builderName !== Builders.Karma) {
       // Note: we need to re-read the tsconfig after very commit because
       // otherwise the updates will be out of sync since we are ammending the same node.
-      tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
+
+      // we are already checking that tsconfig exists above!
+      // tslint:disable-next-line: no-non-null-assertion
+      tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath) !;
       const include = findPropertyInAstObject(tsConfigAst, 'include');
 
       if (include && include.kind === 'array') {
@@ -109,13 +112,15 @@ function updateTsConfig(tree: Tree, builderConfig: JsonAstObject, builderName: B
 
         if (newFiles.length) {
           recorder = tree.beginUpdate(tsConfigPath);
-          tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
+          // tslint:disable-next-line: no-non-null-assertion
+          tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath) !;
           insertPropertyInAstObjectInOrder(recorder, tsConfigAst, 'files', newFiles, 2);
           tree.commitUpdate(recorder);
         }
 
         recorder = tree.beginUpdate(tsConfigPath);
-        tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
+        // tslint:disable-next-line: no-non-null-assertion
+        tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath) !;
         removePropertyInAstObject(recorder, tsConfigAst, 'exclude');
         tree.commitUpdate(recorder);
       }

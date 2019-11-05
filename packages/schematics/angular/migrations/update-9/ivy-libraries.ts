@@ -23,7 +23,8 @@ import { getTargets, getWorkspace, readJsonFileAsAstObject } from './utils';
  * - Create a prod tsconfig for which disables Ivy and enables VE compilations.
  */
 export function updateLibraries(): Rule {
-  return (tree: Tree) => {
+  return (tree, context) => {
+    const logger = context.logger;
     const workspacePath = getWorkspacePath(tree);
     const workspace = getWorkspace(tree);
 
@@ -61,8 +62,14 @@ export function updateLibraries(): Rule {
       }
 
       // tsConfig for production already exists.
-      const tsConfigAst = readJsonFileAsAstObject(tree, tsConfigOption.value);
-      const tsConfigRecorder = tree.beginUpdate(tsConfigOption.value);
+      const tsConfigPath = tsConfigOption.value;
+      const tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
+      if (!tsConfigAst) {
+        logger.warn(`Cannot find file: ${tsConfigPath}`);
+        continue;
+      }
+
+      const tsConfigRecorder = tree.beginUpdate(tsConfigPath);
       const ngCompilerOptions = findPropertyInAstObject(tsConfigAst, 'angularCompilerOptions');
       if (!ngCompilerOptions) {
         // Add angularCompilerOptions to the production tsConfig

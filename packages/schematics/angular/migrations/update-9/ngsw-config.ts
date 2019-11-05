@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Rule,  Tree } from '@angular-devkit/schematics';
+import { Rule } from '@angular-devkit/schematics';
 import { appendValueInAstArray, findPropertyInAstObject } from '../../utility/json-utils';
 import { Builders } from '../../utility/workspace-models';
 import { getAllOptions, getTargets, getWorkspace, readJsonFileAsAstObject } from './utils';
@@ -15,13 +15,15 @@ import { getAllOptions, getTargets, getWorkspace, readJsonFileAsAstObject } from
  * Update ngsw-config.json to fix issue https://github.com/angular/angular-cli/pull/15277
  */
 export function updateNGSWConfig(): Rule {
-  return (tree: Tree) => {
+  return (tree, context) => {
     const workspace = getWorkspace(tree);
+    const logger = context.logger;
 
     for (const { target } of getTargets(workspace, 'build', Builders.Browser)) {
       for (const options of getAllOptions(target)) {
         const ngswConfigPath = findPropertyInAstObject(options, 'ngswConfigPath');
         if (!ngswConfigPath || ngswConfigPath.kind !== 'string') {
+          logger.warn(`Cannot find file: ${ngswConfigPath}`);
           continue;
         }
 

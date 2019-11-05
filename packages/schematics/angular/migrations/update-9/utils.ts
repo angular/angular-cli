@@ -85,11 +85,15 @@ export function getAllOptions(builderConfig: JsonAstObject, configurationsOnly =
 
 export function getWorkspace(host: Tree): JsonAstObject {
   const path = getWorkspacePath(host);
+  const content = readJsonFileAsAstObject(host, path);
+  if (!content) {
+    throw new SchematicsException(`Could not find (${path})`);
+  }
 
-  return readJsonFileAsAstObject(host, path);
+  return content;
 }
 
-export function readJsonFileAsAstObject(host: Tree, path: string): JsonAstObject {
+export function readJsonFileAsAstObject(host: Tree, path: string): JsonAstObject | undefined {
   const configBuffer = host.read(path);
   if (!configBuffer) {
     throw new SchematicsException(`Could not find (${path})`);
