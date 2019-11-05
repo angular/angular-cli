@@ -251,7 +251,7 @@ jobs:
       - custom_attach_workspace
       - run: yarn webdriver-update
       - run: yarn test-large --full --flakey
-      - run: yarn test-large --full --flakey --ve=true
+      - run: yarn test-large --full --flakey --ve
 
   build-bazel:
     executor: action-executor
