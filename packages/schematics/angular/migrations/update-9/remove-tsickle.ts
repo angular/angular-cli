@@ -5,20 +5,19 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, parseJsonAst } from '@angular-devkit/core';
-import { Rule, Tree } from '@angular-devkit/schematics';
+import { Rule } from '@angular-devkit/schematics';
 import { removePackageJsonDependency } from '../../utility/dependencies';
 import { findPropertyInAstObject, removePropertyInAstObject } from '../../utility/json-utils';
 import { Builders } from '../../utility/workspace-models';
-import { getAllOptions, getTargets, getWorkspace } from './utils';
+import { getAllOptions, getTargets, getWorkspace, readJsonFileAsAstObject } from './utils';
 
 /**
  * Remove tsickle from libraries
  */
 export function removeTsickle(): Rule {
-  return (tree: Tree) => {
+  return (tree, context) => {
     removePackageJsonDependency(tree, 'tsickle');
-
+    const logger = context.logger;
     const workspace = getWorkspace(tree);
 
     for (const { target } of getTargets(workspace, 'build', Builders.NgPackagr)) {
@@ -28,20 +27,18 @@ export function removeTsickle(): Rule {
           continue;
         }
 
-        const tsConfigContent = tree.read(tsConfigOption.value);
-        if (!tsConfigContent) {
-          continue;
-        }
+        const tsConfigPath = tsConfigOption.value;
+        const tsConfigAst = readJsonFileAsAstObject(tree, tsConfigPath);
+        if (!tsConfigAst) {
+          logger.warn(`Cannot find file: ${tsConfigPath}`);
 
-        const tsConfigAst = parseJsonAst(tsConfigContent.toString(), JsonParseMode.Loose);
-        if (!tsConfigAst || tsConfigAst.kind !== 'object') {
           continue;
         }
 
         const ngCompilerOptions = findPropertyInAstObject(tsConfigAst, 'angularCompilerOptions');
         if (ngCompilerOptions && ngCompilerOptions.kind === 'object') {
           // remove annotateForClosureCompiler option
-          const recorder = tree.beginUpdate(tsConfigOption.value);
+          const recorder = tree.beginUpdate(tsConfigPath);
           removePropertyInAstObject(recorder, ngCompilerOptions, 'annotateForClosureCompiler');
           tree.commitUpdate(recorder);
         }
