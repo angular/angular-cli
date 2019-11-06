@@ -33,8 +33,8 @@ export function elideImports(
   const imports: ts.ImportDeclaration[] = [];
 
   ts.forEachChild(sourceFile, function visit(node) {
-    // Skip removed nodes
-    if (removedNodes.includes(node)) {
+    // Skip type references and removed nodes. We consider both unused.
+    if (node.kind == ts.SyntaxKind.TypeReference || removedNodes.includes(node)) {
       return;
     }
 

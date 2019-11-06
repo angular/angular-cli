@@ -33,6 +33,19 @@ describe('@ngtools/webpack transformers', () => {
       `,
     };
 
+    it('should remove unused imports', () => {
+      const input = tags.stripIndent`
+        import { promise } from './const';
+        import { take } from './const';
+        const unused = promise;
+      `;
+
+      const { program, compilerHost } = createTypescriptContext(input, additionalFiles);
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual('');
+    });
+
     it('should remove unused aliased imports', () => {
       const input = tags.stripIndent`
         import { promise as fromPromise } from './const';
@@ -188,7 +201,7 @@ describe('@ngtools/webpack transformers', () => {
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('should only drop unused default imports when named and default', () => {
+    it('should only drop unused default imports when named and default (1)', () => {
       const input = tags.stripIndent`
         import promise, { promise as fromPromise } from './const';
         const used = fromPromise;
@@ -206,7 +219,7 @@ describe('@ngtools/webpack transformers', () => {
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('should only drop unused named imports when named and default', () => {
+    it('should only drop unused named imports when named and default (2)', () => {
       const input = tags.stripIndent`
         import promise, { promise as fromPromise, take } from './const';
         const used = fromPromise;
@@ -224,7 +237,7 @@ describe('@ngtools/webpack transformers', () => {
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('should only drop default imports when having named and default', () => {
+    it('should only drop default imports when having named and default (3)', () => {
       const input = tags.stripIndent`
         import promise, { fromPromise } from './const';
         const used = promise;
