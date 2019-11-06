@@ -40,26 +40,19 @@ export function installPackage(
 
   logger.info(colors.green(`Installing packages for tooling via ${packageManager}.`));
 
-  const { status, stderr } = spawnSync(
-    packageManager,
-    [
-      ...installArgs,
-      ...extraArgs,
-    ],
-    {
-      stdio: 'pipe',
-      encoding: 'utf8',
-      shell: true,
-      cwd,
-    },
-  );
+  const { status, stderr, stdout } = spawnSync(packageManager, [...installArgs, ...extraArgs], {
+    stdio: 'pipe',
+    encoding: 'utf8',
+    shell: true,
+    cwd,
+  });
 
   if (status !== 0) {
-    let errors = stderr.trim();
-    if (errors.length) {
-      errors += '\n';
+    let error = (stderr || stdout).trim();
+    if (error) {
+      error += '\n';
     }
-    throw new Error(errors + `Package install failed${errors.length ? ', see above' : ''}.`);
+    throw new Error(error + `Package install failed${error ? ', see above' : ''}.`);
   }
 
   logger.info(colors.green(`Installed packages for tooling via ${packageManager}.`));
