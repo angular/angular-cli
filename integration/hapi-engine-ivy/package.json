@@ -14,6 +14,7 @@
     "test": "npm run build && npm run serve:test",
     "serve:test": "concurrently \"npm run serve:ssr\" \"npm run e2e\" --kill-others --success first",
     "serve:ssr": "node dist/hapi-engine-ivy/server/main.js",
+    "serve:ssr-dev-server": "ng run hapi-engine-ivy:ssr-serve",
     "build:ssr": "npm run build:client-and-server-bundles",
     "build": "ng build --prod && ng run hapi-engine-ivy:server:production"
   },
@@ -42,6 +43,7 @@
     "@types/hapi__inert": "^5.2.0",
     "@types/node": "file:../../node_modules/@types/node",
     "@types/jasmine": "file:../../node_modules/@types/jasmine",
+    "@nguniversal/builders": "file:../../dist/modules-dist/builders",
     "codelyzer": "5.2.0",
     "concurrently": "5.0.0",
     "jasmine-core": "3.5.0",

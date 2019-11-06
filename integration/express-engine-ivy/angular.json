@@ -95,6 +95,19 @@
             }
           }
         },
+        "ssr-serve": {
+          "builder": "@nguniversal/builders:ssr-dev-server",
+          "options": {
+            "browserTarget": "express-engine-ivy:build",
+            "serverTarget": "express-engine-ivy:server"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "express-engine-ivy:build:production",
+              "serverTarget": "express-engine-ivy:server:production"
+            }
+          }
+        },        
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {

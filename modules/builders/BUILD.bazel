@@ -38,5 +38,6 @@ ts_library(
 npm_package(
     name = "npm_package",
     srcs = [":builders_assets"],
+    tags = ["release"],
     deps = [":builders"],
 )

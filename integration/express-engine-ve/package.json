@@ -14,6 +14,7 @@
     "test": "npm run build && npm run serve:test",
     "serve:test": "concurrently \"npm run serve:ssr\" \"npm run e2e\" --kill-others --success first",
     "serve:ssr": "node dist/express-engine-ve/server/main.js",
+    "serve:ssr-dev-server": "ng run express-engine-ve:ssr-serve",
     "build:ssr": "npm run build:client-and-server-bundles",
     "build": "ng build --prod && ng run express-engine-ve:server:production"
   },
@@ -40,6 +41,7 @@
     "@types/express": "file:../../node_modules/@types/express",
     "@types/node": "file:../../node_modules/@types/node",
     "@types/jasmine": "file:../../node_modules/@types/jasmine",
+    "@nguniversal/builders": "file:../../dist/modules-dist/builders",
     "codelyzer": "5.2.0",
     "concurrently": "5.0.0",
     "jasmine-core": "3.5.0",
