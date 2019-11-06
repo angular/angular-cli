@@ -10,10 +10,7 @@ import {
   SchematicContext,
   SchematicsException,
   Tree,
-  apply,
   chain,
-  empty,
-  mergeWith,
   move,
   noop,
   schematic,
@@ -62,13 +59,9 @@ export default function(options: NgNewOptions): Rule {
   };
 
   return chain([
-    mergeWith(
-      apply(empty(), [
-        schematic('workspace', workspaceOptions),
-        options.createApplication ? schematic('application', applicationOptions) : noop,
-        move(options.directory),
-      ]),
-    ),
+    schematic('workspace', workspaceOptions),
+    options.createApplication ? schematic('application', applicationOptions) : noop,
+    move(options.directory),
     (_host: Tree, context: SchematicContext) => {
       let packageTask;
       if (!options.skipInstall) {
