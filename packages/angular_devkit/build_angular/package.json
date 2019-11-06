@@ -37,7 +37,7 @@
     "magic-string": "0.25.4",
     "mini-css-extract-plugin": "0.8.0",
     "minimatch": "3.0.4",
-    "parse5": "4.0.0",
+    "parse5": "5.1.1",
     "open": "7.0.0",
     "postcss": "7.0.21",
     "postcss-import": "12.0.1",
