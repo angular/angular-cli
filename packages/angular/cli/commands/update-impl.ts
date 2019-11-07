@@ -139,6 +139,9 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     }
   }
 
+  /**
+   * @return Whether or not the migrations were performed successfully.
+   */
   private async executeMigrations(
     packageName: string,
     collectionPath: string,
@@ -183,17 +186,22 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         return false;
       }
 
+      this.logger.info(colors.green(`${colors.symbols.check} Migration succeeded.`));
+
       // Commit migration
       if (commit) {
-        let message = `${packageName} migration - ${migration.name}`;
-        if (migration.description) {
-          message += '\n' + migration.description;
+        const commitPrefix = `${packageName} migration - ${migration.name}`;
+        const commitMessage = migration.description
+          ? `${commitPrefix}\n${migration.description}`
+          : commitPrefix;
+        const committed = this.commit(commitMessage);
+        if (!committed) {
+          // Failed to commit, something went wrong. Abort the update.
+          return false;
         }
-        // TODO: Use result.files once package install tasks are accounted
-        this.createCommit(message, []);
       }
 
-      this.logger.info(colors.green(`${colors.symbols.check} Migration succeeded.\n`));
+      this.logger.info(''); // Extra trailing newline.
     }
 
     return true;
@@ -556,7 +564,11 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     });
 
     if (success && options.createCommits) {
-      this.createCommit('Angular CLI update\n' + packagesToUpdate.join('\n'), []);
+      const committed = this.commit(
+          `Angular CLI update for packages - ${packagesToUpdate.join(', ')}`);
+      if (!committed) {
+        return 1;
+      }
     }
 
     // This is a temporary workaround to allow data to be passed back from the update schematic
@@ -590,6 +602,52 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     return success ? 0 : 1;
   }
 
+  /**
+   * @return Whether or not the commit was successful.
+   */
+  private commit(message: string): boolean {
+    // Check if a commit is needed.
+    let commitNeeded: boolean;
+    try {
+      commitNeeded = hasChangesToCommit();
+    } catch (err) {
+      this.logger.error(`  Failed to read Git tree:\n${err.stderr}`);
+
+      return false;
+    }
+
+    if (!commitNeeded) {
+      this.logger.info('  No changes to commit after migration.');
+
+      return true;
+    }
+
+    // Commit changes and abort on error.
+    try {
+      createCommit(message);
+    } catch (err) {
+      this.logger.error(
+        `Failed to commit update (${message}):\n${err.stderr}`);
+
+      return false;
+    }
+
+    // Notify user of the commit.
+    const hash = findCurrentGitSha();
+    const shortMessage = message.split('\n')[0];
+    if (hash) {
+      this.logger.info(`  Committed migration step (${getShortHash(hash)}): ${
+          shortMessage}.`);
+    } else {
+      // Commit was successful, but reading the hash was not. Something weird happened,
+      // but nothing that would stop the update. Just log the weirdness and continue.
+      this.logger.info(`  Committed migration step: ${shortMessage}.`);
+      this.logger.warn('  Failed to look up hash of most recent commit, continuing anyways.');
+    }
+
+    return true;
+  }
+
   private checkCleanGit(): boolean {
     try {
       const topLevel = execSync('git rev-parse --show-toplevel', { encoding: 'utf8', stdio: 'pipe' });
@@ -614,24 +672,6 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     return true;
   }
 
-  private createCommit(message: string, files: string[]) {
-    try {
-      execSync('git add -A ' + files.join(' '), { encoding: 'utf8', stdio: 'pipe' });
-
-      execSync(`git commit --no-verify -m "${message}"`, { encoding: 'utf8', stdio: 'pipe' });
-    } catch (error) {}
-  }
-
-  private findCurrentGitSha(): string | null {
-    try {
-      const result = execSync('git rev-parse HEAD', { encoding: 'utf8', stdio: 'pipe' });
-
-      return result.trim();
-    } catch {
-      return null;
-    }
-  }
-
   /**
    * Checks if the current installed CLI version is older than the latest version.
    * @returns `true` when the installed version is older.
@@ -650,6 +690,47 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
 
     return semver.lt(installedCLIVersion, LatestCLIManifest.version);
   }
+}
+
+/**
+ * @return Whether or not the working directory has Git changes to commit.
+ */
+function hasChangesToCommit(): boolean {
+  // List all modified files not covered by .gitignore.
+  const files = execSync('git ls-files -m -d -o --exclude-standard').toString();
+
+  // If any files are returned, then there must be something to commit.
+  return files !== '';
+}
+
+/**
+ * Precondition: Must have pending changes to commit, they do not need to be staged.
+ * Postcondition: The Git working tree is committed and the repo is clean.
+ * @param message The commit message to use.
+ */
+function createCommit(message: string) {
+  // Stage entire working tree for commit.
+  execSync('git add -A', { encoding: 'utf8', stdio: 'pipe' });
+
+  // Commit with the message passed via stdin to avoid bash escaping issues.
+  execSync('git commit --no-verify -F -', { encoding: 'utf8', stdio: 'pipe', input: message });
+}
+
+/**
+ * @return The Git SHA hash of the HEAD commit. Returns null if unable to retrieve the hash.
+ */
+function findCurrentGitSha(): string | null {
+  try {
+    const hash = execSync('git rev-parse HEAD', {encoding: 'utf8', stdio: 'pipe'});
+
+    return hash.trim();
+  } catch {
+    return null;
+  }
+}
+
+function getShortHash(commitHash: string): string {
+  return commitHash.slice(0, 9);
 }
 
 function coerceVersionNumber(version: string | undefined): string | null {
