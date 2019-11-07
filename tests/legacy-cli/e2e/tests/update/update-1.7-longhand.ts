@@ -9,8 +9,7 @@ export default async function() {
   await createProjectFromAsset('1.7-project');
 
   await expectToFail(() => ng('build'));
-  // Turn off git commits ('-C') per migration to avoid breaking E2E cleanup process
-  await ng('update', '@angular/cli', '--migrate-only', '--from=1.7.1', '-C');
+  await ng('update', '@angular/cli', '--migrate-only', '--from=1.7.1');
   await useBuiltPackages();
   await silentNpm('install');
   await ng('update', '@angular/core', ...extraUpdateArgs);
