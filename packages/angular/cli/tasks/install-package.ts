@@ -48,18 +48,18 @@ export function installPackage(
     installArgs.push(packageManagerArgs.saveDev);
   }
 
-  const { status, stderr, stdout } = spawnSync(packageManager, [...installArgs, ...extraArgs], {
+  const { status, stderr, stdout, error } = spawnSync(packageManager, [...installArgs, ...extraArgs], {
     stdio: 'pipe',
     encoding: 'utf8',
     cwd,
   });
 
   if (status !== 0) {
-    let error = (stderr || stdout).trim();
-    if (error) {
-      error += '\n';
+    let errorMessage = ((error && error.message) || stderr || stdout || '').trim();
+    if (errorMessage) {
+      errorMessage += '\n';
     }
-    throw new Error(error + `Package install failed${error ? ', see above' : ''}.`);
+    throw new Error(errorMessage + `Package install failed${errorMessage ? ', see above' : ''}.`);
   }
 
   logger.info(colors.green(`Installed packages for tooling via ${packageManager}.`));
