@@ -425,7 +425,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         packageName,
         migrations,
         migrationRange,
-        !options.skipCommits,
+        options.createCommits,
       );
 
       return success ? 0 : 1;
@@ -539,7 +539,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       migrateExternal: true,
     });
 
-    if (success && !options.skipCommits) {
+    if (success && options.createCommits) {
       this.createCommit('Angular CLI update\n' + packagesToUpdate.join('\n'), []);
     }
 
@@ -558,7 +558,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
           migration.package,
           migration.collection,
           new semver.Range('>' + migration.from + ' <=' + migration.to),
-          !options.skipCommits,
+          options.createCommits,
         );
 
         if (!result) {
