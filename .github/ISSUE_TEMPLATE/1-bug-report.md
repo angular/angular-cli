@@ -17,7 +17,7 @@ Existing issues often contain information about workarounds, resolution, or prog
 ### Command (mark with an `x`)
 <!-- Can you pin-point the command or commands that are effected by this bug? -->
 <!-- ✍️edit: -->
-```
+
 - [ ] new
 - [ ] build
 - [ ] serve
@@ -33,7 +33,7 @@ Existing issues often contain information about workarounds, resolution, or prog
 - [ ] help
 - [ ] version
 - [ ] doc
-```
+
 
 ### Is this a regression?
 
