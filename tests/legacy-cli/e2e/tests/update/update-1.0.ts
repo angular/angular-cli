@@ -10,8 +10,7 @@ export default async function() {
 
   await useCIChrome('.');
   await expectToFail(() => ng('build'));
-  // Turn off git commits ('-C') per migration to avoid breaking E2E cleanup process
-  await ng('update', '@angular/cli', '-C');
+  await ng('update', '@angular/cli');
   await useBuiltPackages();
   await silentNpm('install');
   await ng('update', '@angular/core', ...extraUpdateArgs);
