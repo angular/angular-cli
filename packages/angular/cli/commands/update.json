@@ -63,8 +63,8 @@
           "type": "boolean",
           "default": false
         },
-        "skipCommits": {
-          "description": "Do not create source control commits for updates and migrations.",
+        "createCommits": {
+          "description": "Create source control commits for updates and migrations.",
           "type": "boolean",
           "default": false,
           "aliases": ["C"]
