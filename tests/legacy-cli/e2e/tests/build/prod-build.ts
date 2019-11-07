@@ -57,8 +57,8 @@ export default async function () {
     verifySize(mainES5Path, 184470);
     verifySize(mainES2015Path, 163627);
   } else {
-    verifySize(mainES5Path, 148031);
-    verifySize(mainES2015Path, 137494);
+    verifySize(mainES5Path, 163321);
+    verifySize(mainES2015Path, 141032);
   }
 
   // Check that the process didn't change local files.
