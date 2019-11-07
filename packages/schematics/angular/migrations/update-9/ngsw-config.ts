@@ -23,13 +23,13 @@ export function updateNGSWConfig(): Rule {
       for (const options of getAllOptions(target)) {
         const ngswConfigPath = findPropertyInAstObject(options, 'ngswConfigPath');
         if (!ngswConfigPath || ngswConfigPath.kind !== 'string') {
-          logger.warn(`Cannot find file: ${ngswConfigPath}`);
           continue;
         }
 
         const path = ngswConfigPath.value;
         const ngswConfigAst = readJsonFileAsAstObject(tree, path);
         if (!ngswConfigAst || ngswConfigAst.kind !== 'object') {
+          logger.warn(`Cannot find file: ${ngswConfigPath}`);
           continue;
         }
 
