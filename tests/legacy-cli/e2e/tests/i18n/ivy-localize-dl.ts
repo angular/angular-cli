@@ -1,11 +1,10 @@
 import { appendToFile, expectFileToMatch } from '../../utils/fs';
-import { ng } from '../../utils/process';
+import { execAndWaitForOutputToMatch, killAllProcesses, ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { baseDir, externalServer, langTranslations, setupI18nConfig } from './legacy';
 
-
-export default async function () {
+export default async function() {
   // Setup i18n tests and config.
   await setupI18nConfig();
 
@@ -37,9 +36,12 @@ export default async function () {
     // await expectFileToMatch(`${outputPath}/main-es5.js`, '.ng.common.locales');
     // await expectFileToMatch(`${outputPath}/main-es2015.js`, '.ng.common.locales');
 
+    // Execute Application E2E tests with dev server
+    await ng('e2e', `--configuration=${lang}`, '--port=0');
+
+    // Execute Application E2E tests for a production build without dev server
     const server = externalServer(outputPath);
     try {
-      // Execute without a devserver.
       await ng('e2e', `--configuration=${lang}`, '--devServerTarget=');
     } finally {
       server.close();
@@ -57,4 +59,9 @@ export default async function () {
   await expectFileToMatch(`${baseDir}/fr/main-es5.js`, /Other content/);
   await expectFileToMatch(`${baseDir}/fr/main-es2015.js`, /Other content/);
   await expectToFail(() => ng('build'));
+  try {
+    await execAndWaitForOutputToMatch('ng', ['serve', '--port=0'], /No translation found for/);
+  } finally {
+    killAllProcesses();
+  }
 }

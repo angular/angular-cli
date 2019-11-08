@@ -25,7 +25,7 @@ export const langTranslations = [
     translation: {
       helloPartial: 'Bonjour',
       hello: 'Bonjour i18n!',
-      plural: 'Mis à jour Il y a 3 minutes',
+      plural: 'Mis à jour il y a 3 minutes',
       date: 'janvier',
     },
     translationReplacements: [
@@ -34,7 +34,7 @@ export const langTranslations = [
       ['Updated', 'Mis à jour'],
       ['just now', 'juste maintenant'],
       ['one minute ago', 'il y a une minute'],
-      ['other {', 'other {Il y a'],
+      [/other {/g, 'other {il y a '],
       ['minutes ago', 'minutes'],
     ],
   },
@@ -52,7 +52,7 @@ export const langTranslations = [
       ['Updated', 'Aktualisiert'],
       ['just now', 'gerade jetzt'],
       ['one minute ago', 'vor einer Minute'],
-      ['other {', 'other {vor'],
+      [/other {/g, 'other {vor '],
       ['minutes ago', 'Minuten'],
     ],
   },
@@ -91,12 +91,12 @@ export async function setupI18nConfig(useLocalize = true) {
 
   // Add e2e specs for each lang.
   for (const { lang, translation } of langTranslations) {
-    await writeFile(`./src/app.${lang}.e2e-spec.ts`, `
+    await writeFile(`./e2e/src/app.${lang}.e2e-spec.ts`, `
       import { browser, logging, element, by } from 'protractor';
 
       describe('workspace-project App', () => {
         const getParagraph = (name: string) => element(by.css('app-root p#' + name)).getText();
-        beforeEach(() => browser.get(browser.baseUrl););
+        beforeEach(() => browser.get(browser.baseUrl));
         afterEach(async () => {
           // Assert that there are no errors emitted from the browser
           const logs = await browser.manage().logs().get(logging.Type.BROWSER);
@@ -112,7 +112,7 @@ export async function setupI18nConfig(useLocalize = true) {
           expect(getParagraph('locale')).toEqual('${lang}'));
 
         it('should display localized date', () =>
-          expect(getParagraph('date')).toEqual('${translation.plural}'));
+          expect(getParagraph('date')).toEqual('${translation.date}'));
 
         it('should display pluralized message', () =>
           expect(getParagraph('plural')).toEqual('${translation.plural}'));
@@ -190,13 +190,13 @@ export async function setupI18nConfig(useLocalize = true) {
     if (lang != sourceLocale) {
       await copyFile('src/locale/messages.xlf', `src/locale/messages.${lang}.xlf`);
       for (const replacements of translationReplacements) {
-        await replaceInFile(`src/locale/messages.${lang}.xlf`, replacements[0], replacements[1]);
+        await replaceInFile(`src/locale/messages.${lang}.xlf`, replacements[0], replacements[1] as string);
       }
     }
   }
 
-  if (useLocalize) {
-    // Install the localize package.
+  // Install the localize package if using ivy
+  if (!getGlobalVariable('argv')['ve']) {
     let localizeVersion = '@angular/localize@' + readNgVersion();
     if (getGlobalVariable('argv')['ng-snapshots']) {
       localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
@@ -209,23 +209,28 @@ export default async function () {
   // Setup i18n tests and config.
   await setupI18nConfig(false);
 
+  // Legacy option usage with the en-US locale needs $localize when using ivy
+  // Legacy usage did not need to process en-US and typically no i18nLocale options were present
+  // This will currently be the overwhelmingly common scenario for users updating existing projects
+  if (!getGlobalVariable('argv')['ve']) {
+    await appendToFile('src/polyfills.ts', `import '@angular/localize/init';`);
+  }
+
   // Build each locale and verify the output.
   for (const { lang, translation, outputPath } of langTranslations) {
     await ng('build', `--configuration=${lang}`);
     await expectFileToMatch(`${outputPath}/main-es5.js`, translation.helloPartial);
     await expectFileToMatch(`${outputPath}/main-es2015.js`, translation.helloPartial);
 
-    // E2E to verify the output runs and is correct.
-    if (getGlobalVariable('argv')['ve']) {
-      await ng('e2e', `--configuration=${lang}`);
-    } else {
-      const server = externalServer(outputPath);
-      try {
-        // Execute without a devserver.
-        await ng('e2e', `--configuration=${lang}`, '--devServerTarget=');
-      } finally {
-        server.close();
-      }
+    // Execute Application E2E tests with dev server
+    await ng('e2e', `--configuration=${lang}`, '--port=0');
+
+    // Execute Application E2E tests for a production build without dev server
+    const server = externalServer(outputPath);
+    try {
+      await ng('e2e', `--configuration=${lang}`, '--devServerTarget=');
+    } finally {
+      server.close();
     }
   }
 
