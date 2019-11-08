@@ -589,7 +589,12 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           raw: schema,
           items,
           multiselect,
-          default: typeof parentSchema.default == 'object' ? undefined : parentSchema.default,
+          default:
+            typeof parentSchema.default == 'object' &&
+            parentSchema.default !== null &&
+            !Array.isArray(parentSchema.default)
+              ? undefined
+              : parentSchema.default as string[],
           async validator(data: JsonValue) {
             try {
               return await it.self.validate(parentSchema, data);
