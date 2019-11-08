@@ -50,6 +50,7 @@ export function installPackage(
 
   const { status, stderr, stdout, error } = spawnSync(packageManager, [...installArgs, ...extraArgs], {
     stdio: 'pipe',
+    shell: true,
     encoding: 'utf8',
     cwd,
   });
