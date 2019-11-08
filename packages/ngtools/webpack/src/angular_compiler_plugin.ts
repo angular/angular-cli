@@ -981,8 +981,11 @@ export class AngularCompilerPlugin {
       // This is required to support forwardRef in ES2015 due to TDZ issues
       this._transformers.push(downlevelConstructorParameters(getTypeChecker));
     } else {
-      // Remove unneeded angular decorators.
-      this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
+      if (!this._compilerOptions.enableIvy) {
+        // Remove unneeded angular decorators in VE.
+        // In Ivy they are removed in ngc directly.
+        this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
+      }
       // Import ngfactory in loadChildren import syntax
       if (this._useFactories) {
         // Only transform imports to use factories with View Engine.
