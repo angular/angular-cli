@@ -250,6 +250,10 @@ export function serveWebpackBrowser(
             }
           }
 
+          if (buildEvent.success) {
+            context.logger.info(': Compiled successfully.');
+          }
+
           return { ...buildEvent, baseUrl: serverAddress } as DevServerBuilderOutput;
         }),
       );
@@ -299,7 +303,7 @@ export function buildServerConfig(
   const servePath = buildServePath(serverOptions, browserOptions, logger);
   const { styles, scripts } = normalizeOptimization(browserOptions.optimization);
 
-  const config: WebpackDevServer.Configuration = {
+  const config: WebpackDevServer.Configuration & { logLevel: string} = {
     host: serverOptions.host,
     port: serverOptions.port,
     headers: { 'Access-Control-Allow-Origin': '*' },
@@ -332,6 +336,7 @@ export function buildServerConfig(
     publicPath: servePath,
     hot: serverOptions.hmr,
     contentBase: false,
+    logLevel: 'silent',
   };
 
   if (serverOptions.ssl) {
