@@ -32,7 +32,10 @@ export function addUniversalCommonRule(options: AddUniversalOptions): Rule {
     return chain([
       clientProject.targets.has('server')
         ? noop()
-        : externalSchematic('@schematics/angular', 'universal', options),
+        : externalSchematic('@schematics/angular', 'universal', {
+          ...options,
+          skipInstall: true
+        }),
       addScriptsRule(options),
       updateServerTsConfigRule(options),
       updateWorkspaceConfigRule(options),

@@ -46,7 +46,7 @@ describe('Universal Schematic', () => {
   it('should install npm dependencies', async () => {
     await schematicRunner.runSchematicAsync('ng-add', defaultOptions, appTree)
         .toPromise();
-    expect(schematicRunner.tasks.length).toBe(2);
+    expect(schematicRunner.tasks.length).toBe(1);
     expect(schematicRunner.tasks[0].name).toBe('node-package');
     expect((schematicRunner.tasks[0].options as {command: string}).command)
         .toBe('install');
