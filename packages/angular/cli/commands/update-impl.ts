@@ -37,6 +37,11 @@ const pickManifest = require('npm-pick-manifest') as (
 
 const oldConfigFileNames = ['.angular-cli.json', 'angular-cli.json'];
 
+const NG_VERSION_9_POST_MSG = colors.cyan(
+  '\nYour project has been updated to Angular version 9!\n' +
+  'For more info, please see: https://v9.angular.io/guide/updating-to-version-9',
+);
+
 export class UpdateCommand extends Command<UpdateCommandSchema> {
   public readonly allowMissingWorkspace = true;
 
@@ -428,7 +433,18 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         options.createCommits,
       );
 
-      return success ? 0 : 1;
+      if (success) {
+        if (
+          packageName === '@angular/core'
+          && (options.to || packageNode.package.version).split('.')[0] === '9'
+        ) {
+          this.logger.info(NG_VERSION_9_POST_MSG);
+        }
+
+        return 0;
+      }
+
+      return 1;
     }
 
     const requests: {
@@ -564,6 +580,10 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         if (!result) {
           return 0;
         }
+      }
+
+      if (migrations.some(m => m.package === '@angular/core' && m.to.split('.')[0] === '9')) {
+        this.logger.info(NG_VERSION_9_POST_MSG);
       }
     }
 
