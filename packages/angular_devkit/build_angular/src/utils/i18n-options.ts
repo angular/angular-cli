@@ -145,6 +145,16 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
       if (i18n.inlineLocales.has(locale) && desc.file) {
         const result = loader(path.join(projectRoot, desc.file));
 
+        for (const diagnostics of result.diagnostics.messages) {
+          if (diagnostics.type === 'error') {
+            throw new Error(
+              `Error parsing translation file '${desc.file}': ${diagnostics.message}`,
+            );
+          } else {
+            context.logger.warn(`WARNING [${desc.file}]: ${diagnostics.message}`);
+          }
+        }
+
         usedFormats.add(result.format);
         if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
           // This limitation is only for legacy message id support (defaults to true as of 9.0)
