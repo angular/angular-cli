@@ -7,17 +7,26 @@
  */
 import * as fs from 'fs';
 
-export type TranslationLoader = (path: string) => { translation: unknown; format: string };
+export type TranslationLoader = (
+  path: string,
+) => {
+  translation: unknown;
+  format: string;
+  // tslint:disable-next-line: no-implicit-dependencies
+  diagnostics: import('@angular/localize/src/tools/src/diagnostics').Diagnostics;
+};
 
 export async function createTranslationLoader(): Promise<TranslationLoader> {
-  const parsers = await importParsers();
+  const { parsers, diagnostics } = await importParsers();
 
   return (path: string) => {
     const content = fs.readFileSync(path, 'utf8');
 
     for (const [format, parser] of Object.entries(parsers)) {
       if (parser.canParse(path, content)) {
-        return { format, translation: parser.parse(path, content).translations };
+        const result = parser.parse(path, content);
+
+        return { format, translation: result.translations, diagnostics };
       }
     }
 
@@ -27,8 +36,11 @@ export async function createTranslationLoader(): Promise<TranslationLoader> {
 
 async function importParsers() {
   try {
-    // In @angular/localize version 9.0.0-next.15 the parsers were located in the below locations.
-    return {
+    // tslint:disable-next-line: no-implicit-dependencies
+    const localizeDiag = await import('@angular/localize/src/tools/src/diagnostics');
+    const diagnostics = new localizeDiag.Diagnostics();
+
+    const parsers = {
       json: new (await import(
         // tslint:disable-next-line:trailing-comma no-implicit-dependencies
         '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json_translation_parser'
@@ -41,25 +53,17 @@ async function importParsers() {
         // tslint:disable-next-line:trailing-comma no-implicit-dependencies
         '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2_translation_parser'
       )).Xliff2TranslationParser(),
+      // The name ('xmb') needs to match the AOT compiler option
+      xmb: new (await import(
+        // tslint:disable-next-line:trailing-comma no-implicit-dependencies
+        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xtb_translation_parser'
+      )).XtbTranslationParser(diagnostics),
     };
+
+    return { parsers, diagnostics };
   } catch {
-    // Prior to @angular/localize version 9.0.0-next.15 the parsers were located in the below locations.
-    return {
-      json: new (await import(
-        // @ts-ignore
-        // tslint:disable-next-line:trailing-comma no-implicit-dependencies
-        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json/simple_json_translation_parser'
-      )).SimpleJsonTranslationParser(),
-      xlf: new (await import(
-        // @ts-ignore
-        // tslint:disable-next-line:trailing-comma no-implicit-dependencies
-        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff1/xliff1_translation_parser'
-      )).Xliff1TranslationParser(),
-      xlf2: new (await import(
-        // @ts-ignore
-        // tslint:disable-next-line:trailing-comma no-implicit-dependencies
-        '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2/xliff2_translation_parser'
-      )).Xliff2TranslationParser(),
-    };
+    throw new Error(
+      `Unable to load translation file parsers. Please ensure '@angular/localize' is installed.`,
+    );
   }
 }
