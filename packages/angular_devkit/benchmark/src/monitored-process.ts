@@ -37,7 +37,7 @@ export class LocalMonitoredProcess implements MonitoredProcess {
   run(): Observable<number> {
     return new Observable(obs => {
       const { cmd, cwd, args } = this.command;
-      const spawnOptions: SpawnOptions = { cwd: cwd, shell: true };
+      const spawnOptions: SpawnOptions = { cwd };
 
       // Spawn the process.
       const childProcess = spawn(cmd, args, spawnOptions);
