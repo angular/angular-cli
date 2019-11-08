@@ -87,7 +87,7 @@ describe('Migration to version 9', () => {
 
       tree.create(ngswConfigPath, ngswConfig);
 
-      const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+      const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
       const { assetGroups } = JSON.parse(tree2.readContent(ngswConfigPath));
       expect(assetGroups[0].resources.files).toEqual([
         '/favicon.ico',
@@ -127,7 +127,7 @@ describe('Migration to version 9', () => {
 
       tree.create(ngswConfigPath, ngswConfig);
 
-      const tree2 = await schematicRunner.runSchematicAsync('migration-09', {}, tree.branch()).toPromise();
+      const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
       const { assetGroups } = JSON.parse(tree2.readContent(ngswConfigPath));
       expect(assetGroups[0].resources.files).toEqual([
         '/manifest.webmanifest',

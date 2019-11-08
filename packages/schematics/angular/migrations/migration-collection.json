@@ -40,15 +40,15 @@
       "factory": "./update-8/#updateLazyModulePaths",
       "description": "Update an Angular CLI project to version 8."
     },
-    "migration-09": {
+    "workspace-version-9": {
       "version": "9.0.0-beta.0",
       "factory": "./update-9",
-      "description": "Update an Angular CLI project to version 9."
+      "description": "Angular Workspace migration. Update an Angular CLI workspace to version 9."
     },
-    "migration-10": {
+    "lazy-loading-syntax": {
       "version": "9.0.0-next.6",
       "factory": "./update-8/#updateLazyModulePaths",
-      "description": "Update lazy loading syntax to use dynamic imports."
+      "description": "Lazy loading syntax migration. Update lazy loading syntax to use dynamic imports."
     }
   }
 }
