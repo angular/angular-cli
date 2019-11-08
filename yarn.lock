@@ -3314,10 +3314,10 @@ core-js-compat@^3.1.1:
     browserslist "^4.7.1"
     semver "^6.3.0"
 
-core-js@3.3.6:
-  version "3.3.6"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.3.6.tgz#6ad1650323c441f45379e176ed175c0d021eac92"
-  integrity sha512-u4oM8SHwmDuh5mWZdDg9UwNVq5s1uqq6ZDLLIs07VY+VJU91i3h4f3K/pgFvtUQPGdeStrZ+odKyfyt4EnKHfA==
+core-js@3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.4.0.tgz#29ea478601789c72f2978e9bb98f43546f89d3aa"
+  integrity sha512-lQxb4HScV71YugF/X28LtePZj9AB7WqOpcB+YztYxusvhrgZiQXPmCYfPC5LHsw/+ScEtDbXU3xbqH3CjBRmYA==
 
 core-js@^2.2.0, core-js@^2.4.0:
   version "2.6.10"
