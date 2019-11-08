@@ -97,14 +97,6 @@ if (argv.ve) {
   // Remove Ivy specific tests
   allTests = allTests
     .filter(name => !name.includes('tests/i18n/ivy-localize-'));
-} else {
-  // These tests are disabled on the Ivy CI jobs because:
-  // - Ivy doesn't support the functionality yet
-  // - The test itself is not applicable to Ivy
-  // As we transition into using Ivy as the default this list should be reassessed.
-  allTests = allTests
-    // Ivy doesn't support i18n externally at the moment.
-    .filter(name => !name.endsWith('tests/build/aot/aot-i18n.ts'));
 }
 
 const shardId = 'shard' in argv ? argv['shard'] : null;

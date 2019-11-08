@@ -10,6 +10,9 @@ import { langTranslations, setupI18nConfig } from './legacy';
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
+  // TODO: Re-enable pending further Ivy/Universal/i18n work
+  return;
+
   // Setup i18n tests and config.
   await setupI18nConfig();
 
