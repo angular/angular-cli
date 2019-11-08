@@ -119,17 +119,20 @@ export class VersionCommand extends Command<VersionCommandSchema> {
     const namePad = ' '.repeat(
       Object.keys(versions).sort((a, b) => b.length - a.length)[0].length + 3,
     );
-    const asciiArt = `
-     _                      _                 ____ _     ___
-    / \\   _ __   __ _ _   _| | __ _ _ __     / ___| |   |_ _|
-   / △ \\ | '_ \\ / _\` | | | | |/ _\` | '__|   | |   | |    | |
-  / ___ \\| | | | (_| | |_| | | (_| | |      | |___| |___ | |
- /_/   \\_\\_| |_|\\__, |\\__,_|_|\\__,_|_|       \\____|_____|___|
-                |___/
-    `
-      .split('\n')
-      .map(x => colors.red(x))
-      .join('\n');
+
+    const asciiArt = [
+      '',
+      ` MMP"""""""MM                            dP                      MM'""""'YMM M""MMMMMMMM M""M   `,
+      " M' .mmmm  MM                            88                      M' .mmm. `M M  MMMMMMMM M  M   ",
+      ' M         `M 88d888b. .d8888b. dP    dP 88 .d8888b. 88d888b.    M  MMMMMooM M  MMMMMMMM M  M   ',
+      " M  MMMMM  MM 88'  `88 88'  `88 88    88 88 88'  `88 88'  `88    M  MMMMMMMM M  MMMMMMMM M  M   ",
+      " M  MMMMM  MM 88    88 88.  .88 88.  .88 88 88.  .88 88          M. `MMM' .M M  MMMMMMMM M  M   ",
+      " M  MMMMM  MM dP    dP `8888P88 `88888P' dP `88888P8 dP          MM.     .dM M         M M  M   ",
+      ' MMMMMMMMMMMM               .88                                  MMMMMMMMMMM MMMMMMMMMMM MMMM   ',
+      '                        d8888P                                                                  ',
+    ]
+    .map(x => colors.red(x))
+    .join('\n');
 
     this.logger.info(asciiArt);
     this.logger.info(
