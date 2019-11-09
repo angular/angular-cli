@@ -96,7 +96,7 @@ export function getWorkspace(host: Tree): JsonAstObject {
 export function readJsonFileAsAstObject(host: Tree, path: string): JsonAstObject | undefined {
   const configBuffer = host.read(path);
   if (!configBuffer) {
-    throw new SchematicsException(`Could not find (${path})`);
+    return undefined;
   }
 
   const content = configBuffer.toString();
