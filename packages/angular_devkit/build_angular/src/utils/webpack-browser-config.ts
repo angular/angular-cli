@@ -107,6 +107,7 @@ export async function generateWebpackConfig(
       tsConfig,
       tsConfigPath,
       supportES2015,
+      differentialLoadingMode: differentialLoading && !fullDifferential,
     };
 
     wco.buildOptions.progress = defaultProgress(wco.buildOptions.progress);
