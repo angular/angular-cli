@@ -16,7 +16,7 @@ export default async function () {
   }
 
   await replaceInFile(
-    'browserslist',
+    '.browserslistrc',
     'not IE 9-11',
     'Safari 9-10.1\nIE 9-11',
   );

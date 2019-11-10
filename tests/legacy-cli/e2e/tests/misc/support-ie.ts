@@ -14,7 +14,7 @@ export default async function () {
       appArchitect.build.options.es5BrowserSupport = false;
   });
 
-  await writeFile('browserslist', 'last 2 Chrome versions');
+  await writeFile('.browserslistrc', 'last 2 Chrome versions');
   await ng('build');
   await expectFileNotToExist('dist/test-project/polyfills-es5.js');
   await expectFileToMatch('dist/test-project/index.html', oneLineTrim`

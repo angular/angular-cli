@@ -105,16 +105,16 @@ describe('Migration to version 8', () => {
     });
 
     it(`should create browserslist file if it doesn't exist`, async () => {
-      tree.delete('/browserslist');
+      tree.delete('/.browserslistrc');
       const tree2 = await schematicRunner.runSchematicAsync('migration-07', {}, tree.branch()).toPromise();
-      expect(tree2.exists('/browserslist')).toBe(true);
+      expect(tree2.exists('/.browserslistrc')).toBe(true);
     });
 
     it('should move browserslist file if it exists in the sourceRoot', async () => {
       tree.create('/src/browserslist', 'last 2 Chrome versions');
-      tree.delete('/browserslist');
+      tree.delete('/.browserslistrc');
       const tree2 = await schematicRunner.runSchematicAsync('migration-07', {}, tree.branch()).toPromise();
-      expect(tree2.exists('/browserslist')).toBe(true);
+      expect(tree2.exists('/.browserslistrc')).toBe(true);
     });
 
     it(`should remove 'target' and 'module' from non workspace extended tsconfig.json`, async () => {
@@ -191,17 +191,17 @@ describe('Migration to version 8', () => {
     });
 
     it(`should not update projects which browser builder is not 'build-angular:browser'`, async () => {
-      tree.delete('/browserslist');
+      tree.delete('/.browserslistrc');
       const config = JSON.parse(tree.readContent('angular.json'));
       config.projects['migration-test'].architect.build.builder = '@dummy/builders:browser';
 
       tree.overwrite('angular.json', JSON.stringify(config));
       const tree2 = await schematicRunner.runSchematicAsync('migration-07', {}, tree.branch()).toPromise();
-      expect(tree2.exists('/browserslist')).toBe(false);
+      expect(tree2.exists('/.browserslistrc')).toBe(false);
     });
 
     it(`should move 'browserslist' to root when 'sourceRoot' is not defined`, async () => {
-      tree.rename('/browserslist', '/src/browserslist');
+      tree.rename('/.browserslistrc', '/src/browserslist');
       expect(tree.exists('/src/browserslist')).toBe(true);
 
       const config = JSON.parse(tree.readContent('angular.json'));
@@ -210,7 +210,7 @@ describe('Migration to version 8', () => {
       tree.overwrite('angular.json', JSON.stringify(config));
       const tree2 = await schematicRunner.runSchematicAsync('migration-07', {}, tree.branch()).toPromise();
       expect(tree2.exists('/src/browserslist')).toBe(false);
-      expect(tree2.exists('/browserslist')).toBe(true);
+      expect(tree2.exists('/.browserslistrc')).toBe(true);
     });
   });
 });

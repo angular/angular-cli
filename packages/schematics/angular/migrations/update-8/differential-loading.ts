@@ -86,7 +86,7 @@ export function updateES5Projects(): Rule {
         updateTsConfig(tree, testConfig.options.tsConfig);
       }
 
-      const browserslistPath = join(normalize(project.root), 'browserslist');
+      const browserslistPath = join(normalize(project.root), '.browserslistrc');
 
       // Move the CLI 7 style browserlist to root if it's there.
       const sourceRoot = project.sourceRoot === 'string'
