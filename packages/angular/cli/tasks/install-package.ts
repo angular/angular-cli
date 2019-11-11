@@ -40,6 +40,7 @@ export function installPackage(
     packageManagerArgs.install,
     packageName,
     packageManagerArgs.silent,
+    packageManagerArgs.noLockfile,
   ];
 
   logger.info(colors.green(`Installing packages for tooling via ${packageManager}.`));
@@ -158,7 +159,6 @@ function getPackageManagerArguments(packageManager: PackageManager): PackageMana
     case PackageManager.Yarn:
       return {
         silent: '--silent',
-        saveDev: '--dev',
         install: 'add',
         prefix: '--modules-folder',
         noLockfile: '--no-lockfile',
@@ -166,7 +166,6 @@ function getPackageManagerArguments(packageManager: PackageManager): PackageMana
     case PackageManager.Pnpm:
       return {
         silent: '--silent',
-        saveDev: '--save-dev',
         install: 'add',
         prefix: '--prefix',
         noLockfile: '--no-lockfile',
@@ -174,7 +173,6 @@ function getPackageManagerArguments(packageManager: PackageManager): PackageMana
     default:
       return {
         silent: '--quiet',
-        saveDev: '--save-dev',
         install: 'install',
         prefix: '--prefix',
         noLockfile: '--no-package-lock',

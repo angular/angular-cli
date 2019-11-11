@@ -64,7 +64,9 @@
       "default": "npm",
       "enum": [
         "npm",
-        "yarn"
+        "yarn",
+        "cnpm",
+        "pnpm"
       ]
     }
   },
