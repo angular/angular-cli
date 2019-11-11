@@ -24,7 +24,6 @@ interface PackageManagerOptions {
   silent: string;
   install: string;
   prefix: string;
-  noBinLinks: string;
   noLockfile: string;
 }
 
@@ -41,7 +40,6 @@ export function installPackage(
     packageManagerArgs.install,
     packageName,
     packageManagerArgs.silent,
-    packageManagerArgs.noBinLinks,
   ];
 
   logger.info(colors.green(`Installing packages for tooling via ${packageManager}.`));
@@ -154,17 +152,17 @@ export function runTempPackageBin(
 function getPackageManagerArguments(packageManager: PackageManager): PackageManagerOptions {
   return packageManager === PackageManager.Yarn
     ? {
-      silent: '--silent',
-      install: 'add',
-      prefix: '--modules-folder',
-      noBinLinks: '--no-bin-links',
-      noLockfile: '--no-lockfile',
-    }
+        silent: '--silent',
+        saveDev: '--dev',
+        install: 'add',
+        prefix: '--modules-folder',
+        noLockfile: '--no-lockfile',
+      }
     : {
-      silent: '--quiet',
-      install: 'install',
-      prefix: '--prefix',
-      noBinLinks: '--no-bin-links',
-      noLockfile: '--no-package-lock',
-    };
+        silent: '--quiet',
+        saveDev: '--save-dev',
+        install: 'install',
+        prefix: '--prefix',
+        noLockfile: '--no-package-lock',
+      };
 }
