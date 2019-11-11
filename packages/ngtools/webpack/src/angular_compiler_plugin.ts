@@ -611,7 +611,7 @@ export class AngularCompilerPlugin {
     //   JS file example `@angular/core/core.ngfactory.ts`.
     // - .d.ts files might not have a correspondent JS file due to bundling.
     // - __ng_typecheck__.ts will never be requested.
-    const fileExcludeRegExp = /(\.(d|ngfactory|ngstyle)\.ts|ng_typecheck__\.ts)$/;
+    const fileExcludeRegExp = /(\.(d|ngfactory|ngstyle|ngsummary)\.ts|ng_typecheck__\.ts)$/;
 
     const usedFiles = new Set<string>();
     for (const compilationModule of compilation.modules) {
