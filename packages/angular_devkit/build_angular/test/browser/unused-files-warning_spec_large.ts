@@ -94,6 +94,36 @@ describe('Browser Builder unused files warnings', () => {
     await run.stop();
   });
 
+  it('should not show warning when type files are used transitively', async () => {
+    if (veEnabled) {
+      // TODO: https://github.com/angular/angular-cli/issues/15056
+      pending('Only supported in Ivy.');
+
+      return;
+    }
+
+    host.writeMultipleFiles({
+      'src/app/type.ts':
+        `import {Myinterface} from './interface'; export type MyType = Myinterface;`,
+      'src/app/interface.ts': 'export interface Myinterface {nbr: number;}',
+    });
+
+    host.replaceInFile(
+      'src/app/app.component.ts',
+      `'@angular/core';`,
+      `'@angular/core';\nimport { MyType } from './type';\n`,
+    );
+
+    const logger = new TestLogger('unused-files-warnings');
+    const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
+    expect(logger.includes(warningMessageSuffix)).toBe(false);
+    logger.clear();
+
+    await run.stop();
+  });
+
   it('works for rebuilds', async () => {
     if (veEnabled) {
       // TODO: https://github.com/angular/angular-cli/issues/15056
