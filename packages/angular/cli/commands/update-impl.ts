@@ -212,7 +212,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     // Check if the current installed CLI version is older than the latest version.
     if (await this.checkCLILatestVersion(options.verbose, options.next)) {
       this.logger.warn(
-        'The installed Angular CLI version is older than the latest published version.\n' +
+        `The installed Angular CLI version is older than the latest ${options.next ? 'pre-release' : 'stable'} version.\n` +
         'Installing a temporary version to perform the update.',
       );
 
