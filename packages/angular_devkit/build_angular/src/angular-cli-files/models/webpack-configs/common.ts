@@ -479,6 +479,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     watch: buildOptions.watch,
     watchOptions: {
       poll: buildOptions.poll,
+      ignored: buildOptions.poll === undefined ? undefined : /[\\\/]node_modules[\\\/]/,
     },
     performance: {
       hints: false,
