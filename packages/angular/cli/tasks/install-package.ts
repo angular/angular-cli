@@ -72,7 +72,11 @@ export function installTempPackage(
   const tempPath = mkdtempSync(join(realpathSync(tmpdir()), '.ng-temp-packages-'));
 
   // clean up temp directory on process exit
-  process.on('exit', () => rimraf.sync(tempPath));
+  process.on('exit', () => {
+    try {
+      rimraf.sync(tempPath);
+    } catch { }
+  });
 
   // setup prefix/global modules path
   const packageManagerArgs = getPackageManagerArguments(packageManager);
@@ -150,19 +154,30 @@ export function runTempPackageBin(
 }
 
 function getPackageManagerArguments(packageManager: PackageManager): PackageManagerOptions {
-  return packageManager === PackageManager.Yarn
-    ? {
+  switch (packageManager) {
+    case PackageManager.Yarn:
+      return {
         silent: '--silent',
         saveDev: '--dev',
         install: 'add',
         prefix: '--modules-folder',
         noLockfile: '--no-lockfile',
-      }
-    : {
+      };
+    case PackageManager.Pnpm:
+      return {
+        silent: '--silent',
+        saveDev: '--save-dev',
+        install: 'add',
+        prefix: '--prefix',
+        noLockfile: '--no-lockfile',
+      };
+    default:
+      return {
         silent: '--quiet',
         saveDev: '--save-dev',
         install: 'install',
         prefix: '--prefix',
         noLockfile: '--no-package-lock',
       };
+  }
 }
