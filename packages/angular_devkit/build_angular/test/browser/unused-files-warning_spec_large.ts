@@ -66,6 +66,40 @@ describe('Browser Builder unused files warnings', () => {
     await run.stop();
   });
 
+  it('should not show warning when excluded files are unused', async () => {
+    if (veEnabled) {
+      // TODO: https://github.com/angular/angular-cli/issues/15056
+      pending('Only supported in Ivy.');
+
+      return;
+    }
+
+    const ignoredFiles = {
+      'src/file.d.ts': 'export type MyType = number;',
+      'src/file.ngsummary.ts': 'export const hello = 42;',
+      'src/file.ngfactory.ts': 'export const hello = 42;',
+      'src/file.ngstyle.ts': 'export const hello = 42;',
+      'src/file.ng_typecheck__.ts': 'export const hello = 42;',
+    };
+
+    host.writeMultipleFiles(ignoredFiles);
+
+    host.replaceInFile(
+      'src/tsconfig.app.json',
+      '"main.ts"',
+      `"main.ts", ${Object.keys(ignoredFiles).map(f => `"${f.replace('src/', '')}"`).join(',')}`,
+    );
+
+    const logger = new TestLogger('unused-files-warnings');
+    const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
+    const output = await run.result as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
+    expect(logger.includes(warningMessageSuffix)).toBe(false);
+    logger.clear();
+
+    await run.stop();
+  });
+
   it('should not show warning when type files are used', async () => {
     if (veEnabled) {
       // TODO: https://github.com/angular/angular-cli/issues/15056
