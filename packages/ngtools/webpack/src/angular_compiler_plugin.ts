@@ -613,31 +613,26 @@ export class AngularCompilerPlugin {
     // - __ng_typecheck__.ts will never be requested.
     const fileExcludeRegExp = /(\.(d|ngfactory|ngstyle|ngsummary)\.ts|ng_typecheck__\.ts)$/;
 
-    const usedFiles = new Set<string>();
-    for (const compilationModule of compilation.modules) {
-      if (!compilationModule.resource) {
-        continue;
+    // Start with a set of all the source file names we care about.
+    const unusedSourceFileNames = new Set(
+      program.getSourceFiles()
+        .map(x => this._compilerHost.denormalizePath(x.fileName))
+        .filter(f => !(fileExcludeRegExp.test(f) || this._unusedFiles.has(f))),
+    );
+    // This function removes a source file name and all its dependencies from the set.
+    const removeSourceFile = (fileName: string) => {
+      if (unusedSourceFileNames.has(fileName)) {
+        unusedSourceFileNames.delete(fileName);
+        this.getDependencies(fileName, false).forEach(f => removeSourceFile(f));
       }
+    };
 
-      usedFiles.add(forwardSlashPath(compilationModule.resource));
+    // Go over all the modules in the webpack compilation and remove them from the set.
+    compilation.modules.forEach(m => m.resource ? removeSourceFile(m.resource) : null);
 
-      // We need the below for dependencies which
-      // are not emitted such as type only TS files
-      for (const dependency of compilationModule.buildInfo.fileDependencies) {
-        usedFiles.add(forwardSlashPath(dependency));
-      }
-    }
-
-    const sourceFiles = program.getSourceFiles();
-    for (const { fileName } of sourceFiles) {
-      if (
-        fileExcludeRegExp.test(fileName)
-        || usedFiles.has(fileName)
-        || this._unusedFiles.has(fileName)
-      ) {
-        continue;
-      }
-
+    // Anything that remains is unused, because it wasn't referenced directly or transitively
+    // on the files in the compilation.
+    for (const fileName of unusedSourceFileNames) {
       compilation.warnings.push(
         `${fileName} is part of the TypeScript compilation but it's unused.\n` +
         `Add only entry points to the 'files' or 'include' properties in your tsconfig.`,
@@ -1207,7 +1202,7 @@ export class AngularCompilerPlugin {
     return { outputText, sourceMap, errorDependencies };
   }
 
-  getDependencies(fileName: string): string[] {
+  getDependencies(fileName: string, includeResources = true): string[] {
     const resolvedFileName = this._compilerHost.resolve(fileName);
     const sourceFile = this._compilerHost.getSourceFile(resolvedFileName, ts.ScriptTarget.Latest);
     if (!sourceFile) {
@@ -1241,14 +1236,19 @@ export class AngularCompilerPlugin {
       })
       .filter(x => x) as string[];
 
-    const resourceImports = findResources(sourceFile)
-      .map(resourcePath => resolve(dirname(resolvedFileName), normalize(resourcePath)));
+    let resourceImports: string[] = [], resourceDependencies: string[] = [];
+    if (includeResources) {
+      resourceImports = findResources(sourceFile)
+        .map(resourcePath => resolve(dirname(resolvedFileName), normalize(resourcePath)));
+      resourceDependencies =
+        this.getResourceDependencies(this._compilerHost.denormalizePath(resolvedFileName));
+    }
 
     // These paths are meant to be used by the loader so we must denormalize them.
     const uniqueDependencies = new Set([
       ...esImports,
       ...resourceImports,
-      ...this.getResourceDependencies(this._compilerHost.denormalizePath(resolvedFileName)),
+      ...resourceDependencies,
     ].map((p) => p && this._compilerHost.denormalizePath(p)));
 
     return [...uniqueDependencies];
