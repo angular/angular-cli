@@ -21,7 +21,6 @@ interface PackageManagerOptions {
   saveDev: string;
   install: string;
   prefix: string;
-  noBinLinks: string;
   noLockfile: string;
 }
 
@@ -39,7 +38,6 @@ export function installPackage(
     packageManagerArgs.install,
     packageName,
     packageManagerArgs.silent,
-    packageManagerArgs.noBinLinks,
   ];
 
   logger.info(colors.green(`Installing packages for tooling via ${packageManager}.`));
@@ -153,7 +151,6 @@ function getPackageManagerArguments(packageManager: PackageManager): PackageMana
         saveDev: '--dev',
         install: 'add',
         prefix: '--modules-folder',
-        noBinLinks: '--no-bin-links',
         noLockfile: '--no-lockfile',
       }
     : {
@@ -161,7 +158,6 @@ function getPackageManagerArguments(packageManager: PackageManager): PackageMana
         saveDev: '--save-dev',
         install: 'install',
         prefix: '--prefix',
-        noBinLinks: '--no-bin-links',
         noLockfile: '--no-package-lock',
       };
 }
