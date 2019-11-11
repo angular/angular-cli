@@ -75,7 +75,7 @@ export function installTempPackage(
   process.on('exit', () => {
     try {
       rimraf.sync(tempPath);
-    } catch {}
+    } catch { }
   });
 
   // setup prefix/global modules path
@@ -145,19 +145,30 @@ export function runTempPackageBin(
 }
 
 function getPackageManagerArguments(packageManager: PackageManager): PackageManagerOptions {
-  return packageManager === PackageManager.Yarn
-    ? {
+  switch (packageManager) {
+    case PackageManager.Yarn:
+      return {
         silent: '--silent',
         saveDev: '--dev',
         install: 'add',
         prefix: '--modules-folder',
         noLockfile: '--no-lockfile',
-      }
-    : {
+      };
+    case PackageManager.Pnpm:
+      return {
+        silent: '--silent',
+        saveDev: '--save-dev',
+        install: 'add',
+        prefix: '--prefix',
+        noLockfile: '--no-lockfile',
+      };
+    default:
+      return {
         silent: '--quiet',
         saveDev: '--save-dev',
         install: 'install',
         prefix: '--prefix',
         noLockfile: '--no-package-lock',
       };
+  }
 }
