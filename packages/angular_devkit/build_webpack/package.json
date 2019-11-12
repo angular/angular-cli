@@ -18,5 +18,8 @@
   "devDependencies": {
     "webpack": "4.41.2",
     "webpack-dev-server": "^3.1.4"
+  },
+  "publishConfig":{
+    "registry":"https://wombat-dressing-room.appspot.com"
   }
 }

@@ -16,5 +16,8 @@
     "@angular-devkit/core": "0.0.0",
     "ora": "4.0.2",
     "rxjs": "6.5.3"
+  },
+  "publishConfig":{
+    "registry":"https://wombat-dressing-room.appspot.com"
   }
 }

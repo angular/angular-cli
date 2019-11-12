@@ -22,5 +22,8 @@
   },
   "devDependencies": {
     "@types/progress": "2.0.3"
+  },
+  "publishConfig":{
+    "registry":"https://wombat-dressing-room.appspot.com"
   }
 }

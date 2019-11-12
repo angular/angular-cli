@@ -16,5 +16,8 @@
   },
   "devDependencies": {
     "seedrandom": "^2.4.4"
+  },
+  "publishConfig":{
+    "registry":"https://wombat-dressing-room.appspot.com"
   }
 }

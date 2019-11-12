@@ -14,5 +14,8 @@
     "tslib": "1.10.0",
     "typescript": "3.6.4",
     "webpack-sources": "1.4.3"
+  },
+  "publishConfig":{
+    "registry":"https://wombat-dressing-room.appspot.com"
   }
 }

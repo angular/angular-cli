@@ -108,5 +108,8 @@
     "@angular/localize": {
       "optional": true
     }
+  },
+  "publishConfig":{
+    "registry":"https://wombat-dressing-room.appspot.com"
   }
 }

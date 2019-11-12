@@ -19,5 +19,8 @@
     "semver": "6.3.0",
     "semver-intersect": "1.4.0",
     "rxjs": "6.5.3"
+  },
+  "publishConfig":{
+    "registry":"https://wombat-dressing-room.appspot.com"
   }
 }

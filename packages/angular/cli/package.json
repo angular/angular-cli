@@ -54,5 +54,8 @@
       "@angular-devkit/build-ng-packagr": "0.0.0",
       "@angular-devkit/build-webpack": "0.0.0"
     }
+  },
+  "publishConfig":{
+    "registry":"https://wombat-dressing-room.appspot.com"
   }
 }
