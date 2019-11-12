@@ -17,14 +17,22 @@ import buildSchema from './build-schema';
 const minimatch = require('minimatch');
 const tar = require('tar');
 
-const gitIgnore = fs.readFileSync(path.join(__dirname, '../.gitignore'), 'utf-8')
-  .split('\n')
+const gitIgnoreFiles = fs.readFileSync(path.join(__dirname, '../.gitignore'), 'utf-8')
+  .split('\n');
+const gitIgnore = gitIgnoreFiles
   .map(line => line.replace(/#.*/, ''))
+  .filter((line) => !line.startsWith('!'))
   .filter(line => !line.match(/^\s*$/));
+const gitIgnoreExcept = gitIgnoreFiles
+  .filter((line) => line.startsWith('!'))
+  .map((line) => line.substr(1));
 
-
-function _gitIgnoreMatch(p: string) {
+function _gitIgnoreMatch(p: string): boolean {
   p = path.relative(path.dirname(__dirname), p);
+
+  if (gitIgnoreExcept.some((line) => minimatch(p, line))) {
+    return false;
+  }
 
   return gitIgnore.some(line => minimatch(p, line));
 }
