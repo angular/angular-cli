@@ -186,7 +186,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         return false;
       }
 
-      this.logger.info(colors.green(`${colors.symbols.check} Migration succeeded.`));
+      this.logger.info('  Migration completed.');
 
       // Commit migration
       if (commit) {
