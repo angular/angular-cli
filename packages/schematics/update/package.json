@@ -15,7 +15,7 @@
     "@angular-devkit/schematics": "0.0.0",
     "@yarnpkg/lockfile": "1.1.0",
     "ini": "1.3.5",
-    "pacote": "10.1.1",
+    "pacote": "10.1.2",
     "semver": "6.3.0",
     "semver-intersect": "1.4.0",
     "rxjs": "6.5.3"

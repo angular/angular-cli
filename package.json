@@ -130,7 +130,7 @@
     "minimist": "^1.2.0",
     "npm-registry-client": "8.6.0",
     "ora": "^4.0.2",
-    "pacote": "10.1.1",
+    "pacote": "10.1.2",
     "pidtree": "^0.3.0",
     "pidusage": "^2.0.17",
     "rxjs": "6.5.3",
