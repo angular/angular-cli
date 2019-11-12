@@ -44,16 +44,114 @@ analyze your code.
 # Getting Started - Local Development
 
 ## Installation
+
 To get started locally, follow these instructions:
 
 1. If you haven't done it already, [make a fork of this repo](https://github.com/angular/angular-cli/fork).
 1. Clone to your local computer using `git`.
 1. Make sure that you have Node 10.13 or later installed. See instructions [here](https://nodejs.org/en/download/).
 1. Make sure that you have `yarn` installed; see instructions [here](https://yarnpkg.com/lang/en/docs/install/).
-1. Run `yarn` (no arguments) from the root of your clone of this project.
-1. Run `yarn link` to add all custom scripts we use to your global install.
+1. Run `yarn` (no arguments) from the root of your clone of this project to install dependencies.
+
+## Building and Installing the CLI
+
+To make a local build:
+
+```shell
+yarn build --local
+```
+
+This generates a number of tarballs in the `dist/` directory. To actually use
+the locally built tools, switch to another repository reproducing the specific
+issue you want to fix (or just generate a local repo with `ng new`). Then
+install the locally built packages:
+
+```shell
+cd "${EXAMPLE_ANGULAR_PROJECT_REPO}"
+npm install -D ${CLI_REPO}/dist/*.tgz
+```
+
+Builds of this example project will use tooling created from the previous local
+build and include any local changes. When using the CLI, it will automatically
+check for a local install and use that if present. This means you can just run:
+
+```shell
+npm install -g @angular/cli
+```
+
+to get a global install of the latest CLI release. Then running any `ng` command
+in the example project will automatically find and use the local build of the
+CLI.
+
+Note: If you are testing `ng update`, be aware that installing all the tarballs
+will also update the framework (`@angular/core`) to the latest version. In this
+case, simply install the CLI alone with
+`npm install -D ${CLI_REPO}/dist/_angular_cli.tgz`, that way the rest of the
+project remains to be upgraded with `ng update`.
+
+## Debugging
+
+To debug an invocation of the CLI, [build and install the CLI for an example
+project](#building-and-installing-the-cli), then run the desired `ng` command
+as:
+
+```shell
+node --inspect-brk node_modules/.bin/ng ...
+```
+
+This will trigger a breakpoint as the CLI starts up. You can connect to this
+using the supported mechanisms for your IDE, but the simplest option is to open
+Chrome to [chrome://inspect](chrome://inspect) and then click on the `inspect`
+link for the `node_modules/.bin/ng` Node target.
+
+Unfortunately, the CLI dynamically `require()`'s other files mid-execution, so
+the debugger is not aware of all the source code files before hand. As a result,
+it is tough to put breakpoints on files before the CLI loads them. The easiest
+workaround is to use the `debugger;` statement to stop execution in the file you
+are interested in, and then you should be able to step around and set breakpoints
+as expected.
+
+## Testing
+
+There are three different test suites which can be run locally:
+
+* Unit tests
+  * Run: `yarn test --full`
+  * Debug: `yarn debug:test --full`
+* Large tests
+  * Run: `yarn test-large --full`
+  * Debug: `yarn debug:test-large --full`
+* End to end tests
+  * Run: `node tests/legacy-cli/run_e2e.js`
+  * Run subset of tests: `node tests/legacy-cli/run_e2e.js tests/legacy-cli/e2e/tests/i18n/ivy-localize-*`
+
+When running the debug commands, Node will stop and wait for a debugger to
+attach. You can attach your IDE to the debugger to stop on breakpoints and step through the code. Also see [IDE Specific Usage](#ide-specific-usage) for a
+simpler debug story.
+
+When debugging a specific test, change `describe()` or `it()` to `fdescribe()`
+and `fit()` to focus execution to just that one test. This will keep the output clean and speed up execution by not running irrelevant tests.
+
+## IDE Specific Usage
+
+Some additional tips for developing in specific IDEs.
+
+### Intellij IDEA / WebStorm
+
+To load the project in Intellij products, simply `Open` the repository folder.
+Do **not** `Import Project`, because that will overwrite the existing
+configuration.
+
+Once opened, the editor should automatically detect run configurations in the
+workspace. Use the drop down to choose which one to run and then click the `Run`
+button to start it. When executing a debug target, make sure to click the
+`Debug` icon to automatically attach the debugger (if you click `Run`, Node will
+wait forever for a debugger to attach).
+
+![Intellij IDEA run configurations](docs/images/run-configurations.png)
 
 ## Creating New Packages
+
 Adding a package to this repository means running two separate commands:
 
 1. `schematics devkit:package PACKAGE_NAME`. This will update the `.monorepo` file, and create the

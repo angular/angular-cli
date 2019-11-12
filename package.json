@@ -33,8 +33,6 @@
     "templates": "node ./bin/devkit-admin templates",
     "test": "node ./bin/devkit-admin test",
     "test-large": "node ./bin/devkit-admin test --large --spec-reporter",
-    "test-cli-e2e": "node ./tests/legacy-cli/run_e2e",
-    "test:watch": "nodemon --watch packages -e ts ./bin/devkit-admin test",
     "validate": "node ./bin/devkit-admin validate",
     "validate-commits": "./bin/devkit-admin validate-commits",
     "preinstall": "node ./tools/yarn/check-yarn.js",
