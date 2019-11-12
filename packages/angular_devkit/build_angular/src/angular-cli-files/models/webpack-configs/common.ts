@@ -284,8 +284,20 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       new (class {
         apply(compiler: Compiler) {
           compiler.hooks.emit.tap('angular-cli-stats', compilation => {
-            const data = JSON.stringify(compilation.getStats().toJson('verbose'));
-            compilation.assets[`stats${targetInFileName}.json`] = new RawSource(data);
+            const data = compilation.getStats().toJson('verbose');
+
+            // HACK: Rewrite polyfills asset to remove `es2015` from name, as it was renamed after
+            // compilation from Webpack. Otherwise bundle analyzers are not able to find the file.
+            // See: https://github.com/angular/angular-cli/issues/15915.
+            const updatedData = {
+              ...data,
+              assets: !data.assets ? undefined : data.assets.map(({ name, ...rest }) => ({
+                name: name.replace('polyfills-es5-es2015', 'polyfills-es5'),
+                ...rest,
+              })),
+            };
+
+            compilation.assets[`stats${targetInFileName}.json`] = new RawSource(JSON.stringify(updatedData));
           });
         }
       })(),
