@@ -243,9 +243,11 @@ export function useCIDefaults(projectName = 'test-project') {
     }
   })
     .then(() => updateJsonFile('package.json', json => {
-      // Use matching versions of Chrome and Webdriver.
+      // Use matching versions of Chromium and ChromeDriver.
+      // https://github.com/GoogleChrome/puppeteer/releases
+      // http://chromedriver.chromium.org/downloads
       json['scripts']['webdriver-update'] = 'webdriver-manager update' +
-        ` --standalone false --gecko false --versions.chrome 2.45`; // Supports Chrome v70-72
+        ` --standalone false --gecko false --versions.chrome 79.0.3945.16`; // Supports Chrome 79
 
     }))
     .then(() => npm('run', 'webdriver-update'));
@@ -258,8 +260,10 @@ export function useCIChrome(projectDir: string) {
 
   return Promise.resolve()
     .then(() => updateJsonFile('package.json', json => {
-      // Use matching versions of Chrome and Webdriver.
-      json['devDependencies']['puppeteer'] = '1.11.0'; // Chromium 72.0.3618.0 (r609904)
+      // Use matching versions of Chromium (via puppeteer) and ChromeDriver.
+      // https://github.com/GoogleChrome/puppeteer/releases
+      // http://chromedriver.chromium.org/downloads
+      json['devDependencies']['puppeteer'] = '2.0.0'; // Chromium 79.0.3942.0 (r706915)
       json['devDependencies']['karma-chrome-launcher'] = '~2.2.0'; // Minimum for ChromeHeadless.
     }))
     // Use Pupeteer in protractor if a config is found on the project.
