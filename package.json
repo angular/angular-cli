@@ -38,7 +38,8 @@
     "validate": "node ./bin/devkit-admin validate",
     "validate-commits": "./bin/devkit-admin validate-commits",
     "preinstall": "node ./tools/yarn/check-yarn.js",
-    "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 2.45"
+    "//webdriver-update-README": "ChromeDriver version must match Puppeteer Chromium version, see https://github.com/GoogleChrome/puppeteer/releases http://chromedriver.chromium.org/downloads",
+    "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 79.0.3945.16"
   },
   "repository": {
     "type": "git",
@@ -75,7 +76,7 @@
     "glob": "^7.0.3",
     "node-fetch": "^2.2.0",
     "prettier": "^1.16.4",
-    "puppeteer": "1.12.2",
+    "puppeteer": "2.0.0",
     "quicktype-core": "^6.0.15",
     "temp": "^0.9.0",
     "tslint": "^5.15.0",
