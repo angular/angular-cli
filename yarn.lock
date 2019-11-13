@@ -163,7 +163,12 @@
     "@bazel/buildifier-linux_x64" "0.29.0"
     "@bazel/buildifier-win32_x64" "0.29.0"
 
-"@bazel/hide-bazel-files@^0.39.0", "@bazel/hide-bazel-files@latest":
+"@bazel/hide-bazel-files@^0.40.0":
+  version "0.40.0"
+  resolved "https://registry.yarnpkg.com/@bazel/hide-bazel-files/-/hide-bazel-files-0.40.0.tgz#710d658580d97bdf6472829abf49e4bdf8d9aeb3"
+  integrity sha512-1Ew6r/i0J2H6h31Uo+ZkLFpV7l4gysdJSbCUueqbWlT8g+UHJuPtdMtPEDij1aI29ZrUbs7w4P0DTxMvOvgjwg==
+
+"@bazel/hide-bazel-files@latest":
   version "0.39.0"
   resolved "https://registry.yarnpkg.com/@bazel/hide-bazel-files/-/hide-bazel-files-0.39.0.tgz#6e29519ce264776d09e76d8e8ad4198eac53b7d0"
   integrity sha512-BpubXqH1bgnrLArinERhMkdZBZOv0gYvVBC49FQeLmgDBYGAtYU3uDdFz5qBCkQHRSzfSXPpl66FsZaGXge1pQ==
@@ -173,19 +178,19 @@
   resolved "https://registry.yarnpkg.com/@bazel/ibazel/-/ibazel-0.10.3.tgz#2e2b8a1d3e885946eac41db2b1aa6801fb319887"
   integrity sha512-v1nXbMTHVlMM4z4uWp6XiRoHAyUlYggF1SOboLLWRp0+D22kWixqArWqnozLw2mOtnxr97BdLjluWiho6A8Hjg==
 
-"@bazel/jasmine@^0.39.0":
-  version "0.39.0"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-0.39.0.tgz#a567ceabd6caf3e8b14b92d4c28a2535f3a13dd7"
-  integrity sha512-wGEsXtS8NmnOObbouEKDj1awgpbrg/e+K1LKLaX6zhn37gozUfc+LZdgWhMiY3hLVm22ofdz8qhjIe9nz7uN7w==
+"@bazel/jasmine@^0.40.0":
+  version "0.40.0"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-0.40.0.tgz#50820683e011153737eb3fc451ba5c05cc07034f"
+  integrity sha512-PQzLDu2hhNPNQutgWVTl8KT31QLGS4BJFKR8a3quTxNiZci/mSqJ/sdC9oF61f//vtj46uODesl/BpPZBYAT4g==
   dependencies:
     jasmine "~3.4.0"
     jasmine-core "~3.4.0"
     v8-coverage "1.0.9"
 
-"@bazel/karma@^0.39.0":
-  version "0.39.0"
-  resolved "https://registry.yarnpkg.com/@bazel/karma/-/karma-0.39.0.tgz#1e37cf8364f0be0967b9d93f32659ebcb2015e6d"
-  integrity sha512-tbVl4hZhKm4z99GolgvkZNzcK3Th5XpfCIoC2Ygn+WLD+Z5cKEyFp5F/ga2MY1QVPtChY6EKFWkFvxTIxwehFg==
+"@bazel/karma@^0.40.0":
+  version "0.40.0"
+  resolved "https://registry.yarnpkg.com/@bazel/karma/-/karma-0.40.0.tgz#5d6b669355d173dea02e9b5d21ff41db91ceb3fd"
+  integrity sha512-xRbUU3vg2KUmCTYBkHsvdDEy6vhtmWICiE/s0vikb4c3lCY5UtY/Y9fmoflhNHjOgjnncEFS8J4uMaWn5rZmhg==
   dependencies:
     jasmine-core "2.8.0"
     karma "~4.1.0"
@@ -199,10 +204,10 @@
     semver "5.6.0"
     tmp "0.0.33"
 
-"@bazel/typescript@^0.39.0":
-  version "0.39.0"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-0.39.0.tgz#9e4feef3038c94419b15fbe88eef467f0f076056"
-  integrity sha512-CVzfPXNKVSlxKEo8RyEAGSLf8UHJwpkcNy+Yntpr+TlxLDgMEiXRRoqSf6r3woTbsDDiNW9o6//BK1z+sZYR/Q==
+"@bazel/typescript@^0.40.0":
+  version "0.40.0"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-0.40.0.tgz#4f70d1365ee28fb8c1fd430a25034b74deecada9"
+  integrity sha512-826LXZYVlvcf9zNNcywzGprMUgCFqcwCeM/VLp+xG8/q6idJpqCBxABfJy2U6iZ8qIg5+wlxgYkOcmAZBfKMfA==
   dependencies:
     protobufjs "6.8.8"
     semver "5.6.0"
