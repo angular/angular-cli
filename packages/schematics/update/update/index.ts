@@ -14,6 +14,7 @@ import {
   Tree,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
+import * as npa from 'npm-package-arg';
 import { Observable, from as observableFrom, of } from 'rxjs';
 import { map, mergeMap, reduce, switchMap } from 'rxjs/operators';
 import * as semver from 'semver';
@@ -788,7 +789,7 @@ function _addPeerDependencies(
 }
 
 
-function _getAllDependencies(tree: Tree): Map<string, VersionRange> {
+function _getAllDependencies(tree: Tree): Array<readonly [string, VersionRange]> {
   const packageJsonContent = tree.read('/package.json');
   if (!packageJsonContent) {
     throw new SchematicsException('Could not find a package.json. Are you in a Node project?');
@@ -801,11 +802,11 @@ function _getAllDependencies(tree: Tree): Map<string, VersionRange> {
     throw new SchematicsException('package.json could not be parsed: ' + e.message);
   }
 
-  return new Map<string, VersionRange>([
-    ...Object.entries(packageJson.peerDependencies || {}),
-    ...Object.entries(packageJson.devDependencies || {}),
-    ...Object.entries(packageJson.dependencies || {}),
-  ] as [string, VersionRange][]);
+  return [
+    ...Object.entries(packageJson.peerDependencies || {}) as Array<[string, VersionRange]>,
+    ...Object.entries(packageJson.devDependencies || {}) as Array<[string, VersionRange]>,
+    ...Object.entries(packageJson.dependencies || {}) as Array<[string, VersionRange]>,
+  ];
 }
 
 function _formatVersion(version: string | undefined) {
@@ -826,6 +827,16 @@ function _formatVersion(version: string | undefined) {
   return version;
 }
 
+/**
+ * Returns whether or not the given package specifier (the value string in a
+ * `package.json` dependency) is hosted in the NPM registry.
+ * @throws When the specifier cannot be parsed.
+ */
+function isPkgFromRegistry(name: string, specifier: string): boolean {
+  const result = npa.resolve(name, specifier);
+
+  return !!result.registry;
+}
 
 export default function(options: UpdateSchema): Rule {
   if (!options.packages) {
@@ -847,14 +858,23 @@ export default function(options: UpdateSchema): Rule {
 
   options.from = _formatVersion(options.from);
   options.to = _formatVersion(options.to);
+  const usingYarn = options.packageManager === 'yarn';
 
   return (tree: Tree, context: SchematicContext) => {
     const logger = context.logger;
-    const allDependencies = _getAllDependencies(tree);
-    const packages = _buildPackageList(options, allDependencies, logger);
-    const usingYarn = options.packageManager === 'yarn';
+    const npmDeps = new Map(_getAllDependencies(tree).filter(([name, specifier]) => {
+      try {
+        return isPkgFromRegistry(name, specifier);
+      } catch {
+        // Abort on failure because package.json is malformed.
+        throw new SchematicsException(
+          `Failed to parse dependency "${name}" with specifier "${specifier}"`
+              + ` from package.json. Is the specifier malformed?`);
+      }
+    }));
+    const packages = _buildPackageList(options, npmDeps, logger);
 
-    return observableFrom([...allDependencies.keys()]).pipe(
+    return observableFrom(npmDeps.keys()).pipe(
       // Grab all package.json from the npm repository. This requires a lot of HTTP calls so we
       // try to parallelize as many as possible.
       mergeMap(depName => getNpmPackageJson(
@@ -899,8 +919,8 @@ export default function(options: UpdateSchema): Rule {
         do {
           lastPackagesSize = packages.size;
           npmPackageJsonMap.forEach((npmPackageJson) => {
-            _addPackageGroup(tree, packages, allDependencies, npmPackageJson, logger);
-            _addPeerDependencies(tree, packages, allDependencies, npmPackageJson, npmPackageJsonMap, logger);
+            _addPackageGroup(tree, packages, npmDeps, npmPackageJson, logger);
+            _addPeerDependencies(tree, packages, npmDeps, npmPackageJson, npmPackageJsonMap, logger);
           });
         } while (packages.size > lastPackagesSize);
 
@@ -909,7 +929,7 @@ export default function(options: UpdateSchema): Rule {
         npmPackageJsonMap.forEach((npmPackageJson) => {
           packageInfoMap.set(
             npmPackageJson.name,
-            _buildPackageInfo(tree, packages, allDependencies, npmPackageJson, logger),
+            _buildPackageInfo(tree, packages, npmDeps, npmPackageJson, logger),
           );
         });
 

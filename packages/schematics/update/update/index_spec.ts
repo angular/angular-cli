@@ -8,9 +8,10 @@
 // tslint:disable:no-big-function
 
 import { normalize, virtualFs } from '@angular-devkit/core';
-import { HostTree } from '@angular-devkit/schematics';
+import { HostTree, SchematicsException } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import { map } from 'rxjs/operators';
+import { EMPTY } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import * as semver from 'semver';
 import { angularMajorCompatGuarantee } from './index';
 
@@ -74,6 +75,45 @@ describe('@schematics/update', () => {
       }),
     ).toPromise().then(done, done.fail);
   }, 45000);
+
+  it('ignores dependencies not hosted on the NPM registry', done => {
+    const tree = new UnitTestTree(new HostTree(new virtualFs.test.TestHost({
+      '/package.json': `{
+        "name": "blah",
+        "dependencies": {
+          "@angular-devkit-tests/update-base": "file:update-base-1.0.0.tgz"
+        }
+      }`,
+    })));
+
+    schematicRunner.runSchematicAsync('update', { all: true }, tree).pipe(
+      map(t => {
+        const packageJson = JSON.parse(t.readContent('/package.json'));
+        expect(packageJson['dependencies']['@angular-devkit-tests/update-base'])
+            .toBe('file:update-base-1.0.0.tgz');
+      }),
+    ).toPromise().then(done, done.fail);
+  }, 45000);
+
+  it('emits SchematicsException when given an invalid dependency', done => {
+    const tree = new UnitTestTree(new HostTree(new virtualFs.test.TestHost({
+      '/package.json': `{
+        "name": "blah",
+        "dependencies": {
+          "//": "'abc://' is not a valid protocol for NPM.",
+          "@angular-devkit-tests/update-base": "abc://foo.tgz"
+        }
+      }`,
+    })));
+
+    schematicRunner.runSchematicAsync('update', { all: true }, tree).pipe(
+      catchError(err => {
+        expect(err instanceof SchematicsException).toBe(true);
+
+        return EMPTY;
+      }),
+    ).toPromise().then(done, done.fail);
+  });
 
   it('respects existing tilde and caret ranges', done => {
     // Add ranges.
