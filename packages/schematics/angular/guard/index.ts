@@ -35,8 +35,10 @@ export default function (options: GuardOptions): Rule {
       throw new SchematicsException('Option "implements" is required.');
     }
 
-    const implementations = options.implements.join(', ');
-    let implementationImports = `${implementations}, `;
+    const implementations = options.implements
+      .map(implement => implement === 'CanDeactivate' ? 'CanDeactivate<unknown>' : implement)
+      .join(', ');
+    let implementationImports = `${options.implements.join(', ')}, `;
     // As long as we aren't in IE... ;)
     if (options.implements.includes(GuardInterface.CanLoad)) {
       implementationImports = `${implementationImports}Route, UrlSegment, `;
