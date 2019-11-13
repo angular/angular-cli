@@ -11,7 +11,8 @@
     "rxjs": "6.5.3"
   },
   "peerDependencies": {
-    "ng-packagr": "^9.0.0-rc.0"
+    "ng-packagr": "^9.0.0-rc.0",
+    "tsickle": "~0.37.1"
   },
   "devDependencies": {
     "@angular/compiler": "9.0.0-rc.1",
@@ -19,5 +20,10 @@
     "@angular-devkit/core": "0.0.0",
     "ng-packagr": "~9.0.0-rc.0",
     "tslib": "^1.10.0"
+  },
+  "peerDependenciesMeta": {
+    "tsickle": {
+      "optional": true
+    }
   }
 }
