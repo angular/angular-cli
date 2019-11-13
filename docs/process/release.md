@@ -39,6 +39,29 @@ Say the following PR is merged;
 
 Only the first 2 commits should be cherry picked to the patch branch, as the last 3 are related to a new feature.
 
+Cherry picking is done by checking out the patch branch and cherry picking the new commit onto it.
+The patch branch is simply named as a version number, with a X in the relevant spot, such as `9.0.x`.
+This should be done after merging to master.
+
+```shell
+# Make sure commit to upstream/master is present in local repo.
+git fetch upstream master
+
+# Check out patch branch from upstream.
+git fetch upstream <patch branch>
+git checkout <patch branch>
+
+# Cherry pick the commit. Use the hash from the commit which was merged
+# into upstream/master, which should be known to your local repo.
+git cherry-pick -x <commit hash from master>
+
+# Resolve merge conflicts if necessary...
+# Or abort and ask author to submit a separate commit targeting patch-only.
+
+# Push changes.
+git push upstream <patch branch>
+```
+
 # Release
 
 ## Before releasing
