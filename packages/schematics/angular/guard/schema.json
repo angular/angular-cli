@@ -59,6 +59,7 @@
         "enum": [
           "CanActivate",
           "CanActivateChild",
+          "CanDeactivate",
           "CanLoad"
         ],
         "type": "string"
