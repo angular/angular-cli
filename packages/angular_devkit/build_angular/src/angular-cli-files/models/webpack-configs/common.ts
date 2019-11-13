@@ -15,10 +15,12 @@ import * as path from 'path';
 import { RollupOptions } from 'rollup';
 import { ScriptTarget } from 'typescript';
 import {
+  ChunkData,
   Compiler,
   Configuration,
   ContextReplacementPlugin,
   HashedModuleIdsPlugin,
+  Plugin,
   Rule,
   compilation,
   debug,
@@ -57,10 +59,12 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     throw new Error('Cannot locate node_modules directory.');
   }
 
-  // tslint:disable-next-line:no-any
-  const extraPlugins: any[] = [];
+  const extraPlugins: Plugin[] = [];
   const extraRules: Rule[] = [];
   const entryPoints: { [key: string]: string[] } = {};
+
+  // determine hashing format
+  const hashFormat = getOutputHashFormat(buildOptions.outputHashing || 'none');
 
   const targetInFileName = getEsVersionForFileName(
     tsConfig.options.target,
@@ -146,6 +150,28 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
           // Add zone.js legacy support to the es5 polyfills
           // This is a noop execution-wise if zone-evergreen is not used.
           entryPoints[polyfillsChunkName].push('zone.js/dist/zone-legacy');
+
+          // Since the chunkFileName option schema does not allow the function overload, add a plugin
+          // that changes the name of the ES5 polyfills chunk to not include ES2015.
+          extraPlugins.push({
+            apply(compiler) {
+              compiler.hooks.compilation.tap('build-angular', compilation => {
+                // Webpack typings do not contain MainTemplate assetPath hook
+                // The webpack.Compilation assetPath hook is a noop in 4.x so the template must be used
+                // tslint:disable-next-line: no-any
+                (compilation.mainTemplate.hooks as any).assetPath.tap(
+                  'build-angular',
+                  (filename: string, data: ChunkData) => {
+                    const isMap = filename && filename.endsWith('.map');
+
+                    return data.chunk && data.chunk.name === 'polyfills-es5'
+                      ? `polyfills-es5${hashFormat.chunk}.js${isMap ? '.map' : ''}`
+                      : filename;
+                  },
+                );
+              });
+            },
+          });
         }
         if (!buildOptions.aot) {
           if (differentialLoadingMode) {
@@ -182,9 +208,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       }),
     );
   }
-
-  // determine hashing format
-  const hashFormat = getOutputHashFormat(buildOptions.outputHashing || 'none');
 
   // process global scripts
   const globalScriptsByBundleName = normalizeExtraEntryPoints(
