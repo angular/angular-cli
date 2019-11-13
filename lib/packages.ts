@@ -30,6 +30,7 @@ export interface PackageInfo {
   packageJson: JsonObject;
   dependencies: string[];
   reverseDependencies: string[];
+  publishConfig: {registry: string};
 
   snapshot: boolean;
   snapshotRepo: string;
@@ -224,6 +225,7 @@ export const packages: PackageMap =
         bin,
         name,
         packageJson,
+        publishConfig: packageJson.publishConfig,
 
         snapshot: !!monorepoPackages[name].snapshotRepo,
         snapshotRepo: monorepoPackages[name].snapshotRepo,

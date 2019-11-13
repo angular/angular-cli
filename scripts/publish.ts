@@ -108,6 +108,10 @@ export default async function (args: PublishArgs, logger: logging.Logger) {
       return acc;
     }
 
+    if (args.registry) {
+      delete pkg.publishConfig;
+    }
+
     return acc
       .then(() => {
         logger.info(name);
