@@ -7,12 +7,11 @@ import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
 
-
 // Configurations for each locale.
 export const baseDir = 'dist/test-project';
 export const langTranslations = [
   {
-    lang: 'en-US', outputPath: `${baseDir}/en`,
+    lang: 'en-US', outputPath: `${baseDir}/en-US`,
     translation: {
       helloPartial: 'Hello',
       hello: 'Hello i18n!',
@@ -59,7 +58,6 @@ export const langTranslations = [
 ];
 export const sourceLocale = langTranslations[0].lang;
 export const externalServer = (outputPath: string) => {
-  // Ivy i18n doesn't yet work with `ng serve` so we must use a separate server.
   const app = express();
   app.use(express.static(resolve(outputPath)));
 
@@ -142,9 +140,7 @@ export async function setupI18nConfig(useLocalize = true) {
 
     if (useLocalize) {
       // Enable localization for all locales
-      // TODO: re-enable all locales once localeData support is added.
-      // appArchitect['build'].options.localize = true;
-      appArchitect['build'].options.localize = ['fr'];
+      appArchitect['build'].options.localize = true;
     }
 
     // Add i18n config items (app, build, serve, e2e).
