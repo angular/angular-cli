@@ -341,7 +341,9 @@ export class HostTree implements Tree {
         throw new ContentHasMutatedException(path);
       } else {
         const newContent = record.apply(entry.content);
-        this.overwrite(path, newContent);
+        if (!newContent.equals(entry.content)) {
+          this.overwrite(path, newContent);
+        }
       }
     } else {
       throw new InvalidUpdateRecordException();
