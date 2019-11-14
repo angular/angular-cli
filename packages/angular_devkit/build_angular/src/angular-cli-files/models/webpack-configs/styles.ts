@@ -21,19 +21,6 @@ const autoprefixer = require('autoprefixer');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const postcssImports = require('postcss-import');
 
-/**
- * Enumerate loaders and their dependencies from this file to let the dependency validator
- * know they are used.
- *
- * require('style-loader')
- * require('postcss-loader')
- * require('stylus')
- * require('stylus-loader')
- * require('less')
- * require('less-loader')
- * require('node-sass')
- * require('sass-loader')
- */
 // tslint:disable-next-line:no-big-function
 export function getStylesConfig(wco: WebpackConfigOptions) {
   const { root, buildOptions } = wco;
@@ -138,7 +125,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       test: /\.scss$|\.sass$/,
       use: [
         {
-          loader: 'sass-loader',
+          loader: require.resolve('sass-loader'),
           options: {
             implementation: sassImplementation,
             sourceMap: cssSourceMap,
@@ -155,7 +142,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       test: /\.less$/,
       use: [
         {
-          loader: 'less-loader',
+          loader: require.resolve('less-loader'),
           options: {
             sourceMap: cssSourceMap,
             javascriptEnabled: true,
@@ -168,7 +155,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       test: /\.styl$/,
       use: [
         {
-          loader: 'stylus-loader',
+          loader: require.resolve('stylus-loader'),
           options: {
             sourceMap: cssSourceMap,
             paths: includePaths,
@@ -183,9 +170,9 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
     exclude: globalStylePaths,
     test,
     use: [
-      { loader: 'raw-loader' },
+      { loader: require.resolve('raw-loader') },
       {
-        loader: 'postcss-loader',
+        loader: require.resolve('postcss-loader'),
         options: {
           ident: 'embedded',
           plugins: postcssPluginCreator,
@@ -210,10 +197,10 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
           include: globalStylePaths,
           test,
           use: [
-            buildOptions.extractCss ? MiniCssExtractPlugin.loader : 'style-loader',
+            buildOptions.extractCss ? MiniCssExtractPlugin.loader : require.resolve('style-loader'),
             RawCssLoader,
             {
-              loader: 'postcss-loader',
+              loader: require.resolve('postcss-loader'),
               options: {
                 ident: buildOptions.extractCss ? 'extracted' : 'embedded',
                 plugins: postcssPluginCreator,
