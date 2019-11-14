@@ -140,17 +140,43 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
   }
 
   /**
+   * @return Whether or not the migration was performed successfully.
+   */
+  private async executeMigration(
+    packageName: string,
+    collectionPath: string,
+    migrationName: string,
+    commit?: boolean,
+  ): Promise<boolean> {
+    const collection = this.workflow.engine.createCollection(collectionPath);
+    const name = collection.listSchematicNames().find(name => name === migrationName);
+    if (!name) {
+      this.logger.error(`Cannot find migration '${migrationName}' in '${packageName}'.`);
+
+      return false;
+    }
+
+    const schematic = this.workflow.engine.createSchematic(name, collection);
+
+    this.logger.info(
+      colors.cyan(`** Executing '${migrationName}' of package '${packageName}' **\n`),
+    );
+
+    return this.executePackageMigrations([schematic.description], packageName, commit);
+  }
+
+  /**
    * @return Whether or not the migrations were performed successfully.
    */
   private async executeMigrations(
     packageName: string,
     collectionPath: string,
     range: semver.Range,
-    commit = false,
+    commit?: boolean,
   ): Promise<boolean> {
     const collection = this.workflow.engine.createCollection(collectionPath);
-
     const migrations = [];
+
     for (const name of collection.listSchematicNames()) {
       const schematic = this.workflow.engine.createSchematic(name, collection);
       const description = schematic.description as typeof schematic.description & {
@@ -166,16 +192,21 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       }
     }
 
+    migrations.sort((a, b) => semver.compare(a.version, b.version) || a.name.localeCompare(b.name));
+
     if (migrations.length === 0) {
       return true;
     }
-
-    migrations.sort((a, b) => semver.compare(a.version, b.version) || a.name.localeCompare(b.name));
 
     this.logger.info(
       colors.cyan(`** Executing migrations of package '${packageName}' **\n`),
     );
 
+    return this.executePackageMigrations(migrations, packageName, commit);
+  }
+
+  // tslint:disable-next-line: no-any
+  private async executePackageMigrations(migrations: any[], packageName: string, commit = false): Promise<boolean> {
     for (const migration of migrations) {
       this.logger.info(`${colors.symbols.pointer} ${migration.description.replace(/\. /g, '.\n  ')}`);
 
@@ -240,6 +271,10 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
           this.logger.error(`Duplicate package '${packageIdentifier.name}' specified.`);
 
           return 1;
+        }
+
+        if (options.migrateOnly && packageIdentifier.rawSpec) {
+          this.logger.warn('Package specifier has no effect when using "migrate-only" option.');
         }
 
         // If next option is used and no specifier supplied, use next tag
@@ -334,21 +369,14 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     }
 
     if (options.migrateOnly) {
-      if (!options.from) {
-        this.logger.error('"from" option is required when using the "migrate-only" option.');
+      if (!options.from && typeof options.migrateOnly !== 'string') {
+        this.logger.error('"from" option is required when using the "migrate-only" option without a migration name.');
 
         return 1;
       } else if (packages.length !== 1) {
         this.logger.error(
           'A single package must be specified when using the "migrate-only" option.',
         );
-
-        return 1;
-      }
-
-      const from = coerceVersionNumber(options.from);
-      if (!from) {
-        this.logger.error(`"from" value [${options.from}] is not a valid version.`);
 
         return 1;
       }
@@ -430,16 +458,33 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         }
       }
 
-      const migrationRange = new semver.Range(
-        '>' + from + ' <=' + (options.to || packageNode.package.version),
-      );
+      let success = false;
+      if (typeof options.migrateOnly == 'string') {
+        success = await this.executeMigration(
+          packageName,
+          migrations,
+          options.migrateOnly,
+          options.createCommits,
+        );
+      } else {
+        const from = coerceVersionNumber(options.from);
+        if (!from) {
+          this.logger.error(`"from" value [${options.from}] is not a valid version.`);
 
-      const success = await this.executeMigrations(
-        packageName,
-        migrations,
-        migrationRange,
-        options.createCommits,
-      );
+          return 1;
+        }
+
+        const migrationRange = new semver.Range(
+          '>' + from + ' <=' + (options.to || packageNode.package.version),
+        );
+
+        success = await this.executeMigrations(
+          packageName,
+          migrations,
+          migrationRange,
+          options.createCommits,
+        );
+      }
 
       if (success) {
         if (
