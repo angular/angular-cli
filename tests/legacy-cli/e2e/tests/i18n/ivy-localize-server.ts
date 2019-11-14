@@ -32,9 +32,6 @@ export default async function () {
   const serverbaseDir = 'dist/test-project/server';
   const serverBuildArgs = ['run', 'test-project:server'];
 
-  // TODO: re-enable all locales once localeData support is added.
-  const tempLangTranslations = langTranslations.filter(l => l.lang == 'fr');
-
   // Add server-specific config.
   await updateJsonFile('angular.json', workspaceJson => {
     const appProject = workspaceJson.projects['test-project'];
@@ -106,7 +103,7 @@ export default async function () {
   await ng('build');
   await ng(...serverBuildArgs);
 
-  for (const { lang, translation } of tempLangTranslations) {
+  for (const { lang, translation } of langTranslations) {
     await expectFileToMatch(`${serverbaseDir}/${lang}/main.js`, translation.helloPartial);
     await expectToFail(() => expectFileToMatch(`${serverbaseDir}/${lang}/main.js`, '$localize`'));
 
