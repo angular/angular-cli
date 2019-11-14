@@ -301,7 +301,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     sourceMapUseRule = {
       use: [
         {
-          loader: 'source-map-loader',
+          loader: require.resolve('source-map-loader'),
         },
       ],
     };
@@ -490,7 +490,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       rules: [
         {
           test: /\.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)$/,
-          loader: 'file-loader',
+          loader: require.resolve('file-loader'),
           options: {
             name: `[name]${hashFormat.file}.[ext]`,
             // Re-use emitted files from browser builder on the server.
