@@ -33,8 +33,8 @@ export default async function() {
     await expectFileToMatch(`${outputPath}/main-es2015.js`, lang);
 
     // Verify the locale data is registered using the global files
-    // await expectFileToMatch(`${outputPath}/main-es5.js`, '.ng.common.locales');
-    // await expectFileToMatch(`${outputPath}/main-es2015.js`, '.ng.common.locales');
+    await expectFileToMatch(`${outputPath}/main-es5.js`, '.ng.common.locales');
+    await expectFileToMatch(`${outputPath}/main-es2015.js`, '.ng.common.locales');
 
     // Execute Application E2E tests with dev server
     await ng('e2e', `--configuration=${lang}`, '--port=0');
@@ -49,9 +49,9 @@ export default async function() {
   }
 
   // Verify deprecated locale data registration is not present
-  // await ng('build', '--configuration=fr', '--optimization=false');
-  // await expectToFail(() => expectFileToMatch(`${baseDir}/fr/main-es5.js`, 'registerLocaleData('));
-  // await expectToFail(() => expectFileToMatch(`${baseDir}/fr/main-es2015.js`, 'registerLocaleData('));
+  await ng('build', '--configuration=fr', '--optimization=false');
+  await expectToFail(() => expectFileToMatch(`${baseDir}/fr/main-es5.js`, 'registerLocaleData('));
+  await expectToFail(() => expectFileToMatch(`${baseDir}/fr/main-es2015.js`, 'registerLocaleData('));
 
   // Verify missing translation behaviour.
   await appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
