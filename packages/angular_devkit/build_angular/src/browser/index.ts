@@ -11,7 +11,7 @@ import { join, json, logging, normalize, tags, virtualFs } from '@angular-devkit
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Observable, from, of } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { concatMap, map, switchMap } from 'rxjs/operators';
 import { ScriptTarget } from 'typescript';
 import * as webpack from 'webpack';
@@ -256,6 +256,7 @@ export function buildWebpackBrowser(
       const startTime = Date.now();
 
       return runWebpack(config, context, {
+        webpackFactory: require('webpack') as typeof webpack,
         logging:
           transforms.logging ||
           (useBundleDownleveling

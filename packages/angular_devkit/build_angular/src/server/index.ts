@@ -61,7 +61,9 @@ export function execute(
 
   return from(initialize(options, context, transforms.webpackConfiguration)).pipe(
     concatMap(({ config, i18n }) => {
-      return runWebpack(config, context).pipe(
+      return runWebpack(config, context, {
+        webpackFactory: require('webpack') as typeof webpack,
+      }).pipe(
         concatMap(async output => {
           const { emittedFiles = [], webpackStats } = output;
           if (!output.success || !i18n.shouldInline) {
