@@ -14,12 +14,9 @@ export default async function() {
     config.angularCompilerOptions.disableTypeScriptVersionCheck = true;
   });
 
-  // TODO: re-enable all locales once localeData support is added.
-  const tempLangTranslations = langTranslations.filter(l => l.lang == 'fr');
-
   // Build each locale and verify the output.
   await ng('build');
-  for (const { lang, outputPath, translation } of tempLangTranslations) {
+  for (const { lang, outputPath, translation } of langTranslations) {
     await expectFileToMatch(`${outputPath}/main.js`, translation.helloPartial);
     await expectToFail(() => expectFileToMatch(`${outputPath}/main.js`, '$localize`'));
     await expectFileNotToExist(`${outputPath}/main-es2015.js`);
