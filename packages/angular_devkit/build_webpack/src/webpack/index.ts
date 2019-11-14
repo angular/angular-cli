@@ -7,7 +7,7 @@
  */
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { getSystemPath, json, normalize, resolve } from '@angular-devkit/core';
-import { Observable, from, of } from 'rxjs';
+import { Observable, from, isObservable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
 import { EmittedFiles, getEmittedFiles } from '../utils';
@@ -19,7 +19,7 @@ export interface WebpackLoggingCallback {
   (stats: webpack.Stats, config: webpack.Configuration): void;
 }
 export interface WebpackFactory {
-  (config: webpack.Configuration): Observable<webpack.Compiler>;
+  (config: webpack.Configuration): Observable<webpack.Compiler> | webpack.Compiler;
 }
 
 export type BuildResult = BuilderOutput & {
@@ -35,7 +35,18 @@ export function runWebpack(
     webpackFactory?: WebpackFactory,
   } = {},
 ): Observable<BuildResult> {
-  const createWebpack = options.webpackFactory || (config => of(webpack(config)));
+  const createWebpack = (c: webpack.Configuration) => {
+    if (options.webpackFactory) {
+      const result = options.webpackFactory(c);
+      if (isObservable(result)) {
+        return result;
+      } else {
+        return of(result);
+      }
+    } else {
+      return of(webpack(c));
+    }
+  };
   const log: WebpackLoggingCallback = options.logging
     || ((stats, config) => context.logger.info(stats.toString(config.stats)));
 
