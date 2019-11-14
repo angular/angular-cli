@@ -65,25 +65,27 @@ async function createI18nPlugins(
 
   const diagnostics = new localizeDiag.Diagnostics();
 
-  if (translation) {
-    const es2015 = await import(
-      // tslint:disable-next-line: trailing-comma no-implicit-dependencies
-      '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'
-    );
-    plugins.push(
-      // tslint:disable-next-line: no-any
-      es2015.makeEs2015TranslatePlugin(diagnostics, translation as any, { missingTranslation }),
-    );
+  const es2015 = await import(
+    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
+    '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'
+  );
+  plugins.push(
+    // tslint:disable-next-line: no-any
+    es2015.makeEs2015TranslatePlugin(diagnostics, (translation || {}) as any, {
+      missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
+    }),
+  );
 
-    const es5 = await import(
-      // tslint:disable-next-line: trailing-comma no-implicit-dependencies
-      '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'
-    );
-    plugins.push(
-      // tslint:disable-next-line: no-any
-      es5.makeEs5TranslatePlugin(diagnostics, translation as any, { missingTranslation }),
-    );
-  }
+  const es5 = await import(
+    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
+    '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'
+  );
+  plugins.push(
+    // tslint:disable-next-line: no-any
+    es5.makeEs5TranslatePlugin(diagnostics, (translation || {}) as any, {
+      missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
+    }),
+  );
 
   const inlineLocale = await import(
     // tslint:disable-next-line: trailing-comma no-implicit-dependencies
@@ -173,13 +175,28 @@ export function serveWebpackBrowser(
       }
 
       const locale = [...i18n.inlineLocales][0];
-      const translation = i18n.locales[locale] && i18n.locales[locale].translation;
+      const localeDescription = i18n.locales[locale] && i18n.locales[locale];
 
       const { plugins, diagnostics } = await createI18nPlugins(
         locale,
-        translation,
+        localeDescription && localeDescription.translation,
         browserOptions.i18nMissingTranslation,
       );
+
+      // Modify main entrypoint to include locale data
+      if (
+        localeDescription &&
+        localeDescription.dataPath &&
+        typeof config.entry === 'object' &&
+        !Array.isArray(config.entry) &&
+        config.entry['main']
+      ) {
+        if (Array.isArray(config.entry['main'])) {
+          config.entry['main'].unshift(localeDescription.dataPath);
+        } else {
+          config.entry['main'] = [localeDescription.dataPath, config.entry['main']];
+        }
+      }
 
       // Get the insertion point for the i18n babel loader rule
       // This is currently dependent on the rule order/construction in common.ts
@@ -212,7 +229,6 @@ export function serveWebpackBrowser(
       // Add a plugin to inject the i18n diagnostics
       // tslint:disable-next-line: no-non-null-assertion
       webpackConfig.plugins!.push({
-        // tslint:disable-next-line:no-any
         apply: (compiler: webpack.Compiler) => {
           compiler.hooks.thisCompilation.tap('build-angular', compilation => {
             compilation.hooks.finishModules.tap('build-angular', () => {

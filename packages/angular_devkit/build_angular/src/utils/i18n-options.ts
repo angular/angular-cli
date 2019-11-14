@@ -121,6 +121,13 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
     context.logger.warn(`Option 'localize' is not supported with View Engine.`);
   }
 
+  // Clear deprecated options when using Ivy to prevent unintended behavior
+  if (usingIvy) {
+    buildOptions.i18nFile = undefined;
+    buildOptions.i18nFormat = undefined;
+    buildOptions.i18nLocale = undefined;
+  }
+
   if (i18n.inlineLocales.size > 0) {
     const projectRoot = path.join(context.workspaceRoot, (metadata.root as string) || '');
     const localeDataBasePath = findLocaleDataBasePath(projectRoot);
