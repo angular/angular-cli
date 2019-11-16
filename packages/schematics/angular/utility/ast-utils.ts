@@ -649,20 +649,38 @@ export function addRouteDeclarationToModule(
     routesArr = findNodes(routesVar, ts.SyntaxKind.ArrayLiteralExpression, 1)[0] as ts.ArrayLiteralExpression;
   }
 
-  const occurencesCount = routesArr.elements.length;
+  const occurrencesCount = routesArr.elements.length;
   const text = routesArr.getFullText(source);
 
   let route: string = routeLiteral;
-  if (occurencesCount > 0) {
-    const identation = text.match(/\r?\n(\r?)\s*/) || [];
-    route = `,${identation[0] || ' '}${routeLiteral}`;
+  let insertPos = routesArr.elements.pos;
+
+  if (occurrencesCount > 0) {
+    const lastRouteLiteral = [...routesArr.elements].pop() as ts.Expression;
+    const lastRouteIsWildcard = ts.isObjectLiteralExpression(lastRouteLiteral)
+      && lastRouteLiteral
+        .properties
+        .some(n => (
+          ts.isPropertyAssignment(n)
+          && ts.isIdentifier(n.name)
+          && n.name.text === 'path'
+          && ts.isStringLiteral(n.initializer)
+          && n.initializer.text === '**'
+        ));
+
+    const indentation = text.match(/\r?\n(\r?)\s*/) || [];
+    const routeText = `${indentation[0] || ' '}${routeLiteral}`;
+
+    // Add the new route before the wildcard route
+    // otherwise we'll always redirect to the wildcard route
+    if (lastRouteIsWildcard) {
+      insertPos = lastRouteLiteral.pos;
+      route = `${routeText},`;
+    } else {
+      insertPos = lastRouteLiteral.end;
+      route = `,${routeText}`;
+    }
   }
 
-  return insertAfterLastOccurrence(
-    routesArr.elements as unknown as ts.Node[],
-    route,
-    fileToAdd,
-    routesArr.elements.pos,
-    ts.SyntaxKind.ObjectLiteralExpression,
-  );
+  return new InsertChange(fileToAdd, insertPos, route);
 }
