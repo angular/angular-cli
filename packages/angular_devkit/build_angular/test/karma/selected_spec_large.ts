@@ -42,7 +42,7 @@ describe('Karma Builder', () => {
         }
       });
 
-      const mockedRequireContext = '{ keys: () => ({ map: (_a) => { } }) };';
+      const mockedRequireContext = 'Object.assign(() => { }, { keys: () => [] as string[] })';
       const regex = /require\.context\(.*/;
       host.replaceInFile('src/test.ts', regex, mockedRequireContext);
 
@@ -66,6 +66,29 @@ describe('Karma Builder', () => {
         );
 
       await run.stop();
+    });
+
+    it('should work with test.ts that filters found keys', async () => {
+      // the replacement below is only to prove a point that resulting test.ts file will compile!
+      host.replaceInFile('src/test.ts', 'context.keys().map(context);', 'context.keys().filter(k => !!k).map(context);');
+
+      const overrides = {
+        include: ['src/app/app.component.spec.ts'],
+      };
+      const logger = new logging.Logger('test');
+      logger.subscribe(m => {
+        if (m.level === 'error') {
+          fail(m);
+        }
+      });
+      const run = await architect.scheduleTarget(karmaTargetSpec, overrides, {
+        logger,
+      });
+
+      await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
+
+      await run.stop();
+
     });
 
     [
