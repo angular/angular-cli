@@ -8,6 +8,7 @@
 
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { latestVersions } from '../../utility/latest-versions';
 import { WorkspaceTargets } from '../../utility/workspace-models';
 import { ANY_COMPONENT_STYLE_BUDGET } from './update-workspace-config';
 
@@ -297,7 +298,7 @@ describe('Migration to version 9', () => {
       });
     });
 
-    xdescribe('i18n configuration', () => {
+    describe('i18n configuration', () => {
       function getI18NConfig(localId: string): object {
         return {
           outputPath: `dist/my-project-${localId}/`,
@@ -308,6 +309,17 @@ describe('Migration to version 9', () => {
       }
 
       describe('when i18n builder options are set', () => {
+        it(`should add '@angular/localize' as a dependency`, async () => {
+          const config = getWorkspaceTargets(tree);
+          config.build.options = getI18NConfig('fr');
+          config.build.configurations.de = getI18NConfig('de');
+          updateWorkspaceTargets(tree, config);
+
+          const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
+          const { dependencies } = JSON.parse(tree2.readContent('/package.json'));
+          expect(dependencies['@angular/localize']).toBe(latestVersions.Angular);
+        });
+
         it(`should add 'localize' option in configuration`, async () => {
           let config = getWorkspaceTargets(tree);
           config.build.options.aot = false;
@@ -319,6 +331,50 @@ describe('Migration to version 9', () => {
           config = getWorkspaceTargets(tree2).build;
           expect(config.options.localize).toEqual(['fr']);
           expect(config.configurations.de.localize).toEqual(['de']);
+        });
+
+        it(`should add 'localize' option in main options`, async () => {
+          let config = getWorkspaceTargets(tree);
+          config.build.options.aot = false;
+          config.build.configurations.de = getI18NConfig('de');
+          config['extract-i18n'].options.i18nFormat = 'xmb';
+          config['extract-i18n'].options.i18nLocale = 'en-GB';
+          updateWorkspaceTargets(tree, config);
+
+          const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
+          config = getWorkspaceTargets(tree2).build;
+          expect(config.options.localize).toEqual(['en-GB']);
+          expect(config.configurations.de.localize).toEqual(['de']);
+        });
+
+        it('should remove deprecated i18n options', async () => {
+          let config = getWorkspaceTargets(tree);
+          config.build.options.aot = false;
+          config.build.options = getI18NConfig('fr');
+          config.build.configurations.de = getI18NConfig('de');
+          updateWorkspaceTargets(tree, config);
+
+          const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
+          config = getWorkspaceTargets(tree2).build;
+          expect(config.options.i18nFormat).toBeUndefined();
+          expect(config.options.i18nFile).toBeUndefined();
+          expect(config.options.i18nLocale).toBeUndefined();
+          expect(config.configurations.de.i18nFormat).toBeUndefined();
+          expect(config.configurations.de.i18nFile).toBeUndefined();
+          expect(config.configurations.de.i18nLocale).toBeUndefined();
+        });
+
+        it('should remove deprecated extract-i18n options', async () => {
+          let config = getWorkspaceTargets(tree);
+          config['extract-i18n'].options.i18nFormat = 'xmb';
+          config['extract-i18n'].options.i18nLocale = 'en-GB';
+          updateWorkspaceTargets(tree, config);
+
+          const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
+          config = getWorkspaceTargets(tree2)['extract-i18n'];
+          expect(config.options.i18nFormat).toBeUndefined();
+          expect(config.options.i18nLocale).toBeUndefined();
+          expect(config.options.format).toBe('xmb');
         });
 
         it(`should add i18n 'sourceLocale' project config when 'extract-i18n' 'i18nLocale' is defined`, async () => {
