@@ -83,7 +83,7 @@
   "devDependencies": {
     "@angular/compiler": "9.0.0-rc.2",
     "@angular/compiler-cli": "9.0.0-rc.2",
-    "@bazel/bazel": "1.0.0",
+    "@bazel/bazel": "1.1.0",
     "@bazel/buildifier": "0.29.0",
     "@bazel/jasmine": "0.39.0",
     "@bazel/karma": "0.39.0",
