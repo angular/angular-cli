@@ -107,6 +107,7 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
     const transformResult = transpileModule(sourceCode, {
       fileName: downlevelFilename,
       compilerOptions: {
+        downlevelIteration: true,
         sourceMap: !!sourceMap,
         target: ScriptTarget.ES5,
       },
