@@ -26,7 +26,7 @@ describe('Browser Builder with differential loading', () => {
 
   afterEach(async () => host.restore().toPromise());
 
-  it('emits all the neccessary files', async () => {
+  it('emits all the neccessary files for default configuration', async () => {
     const { files } = await browserBuild(architect, host, target);
 
     const expectedOutputs = [
@@ -55,6 +55,48 @@ describe('Browser Builder with differential loading', () => {
 
       'vendor-es2015.js',
       'vendor-es2015.js.map',
+      'vendor-es5.js',
+      'vendor-es5.js.map',
+    ] as PathFragment[];
+
+    expect(Object.keys(files)).toEqual(jasmine.arrayWithExactContents(expectedOutputs));
+  });
+
+  it('emits all the neccessary files for target of ES2016', async () => {
+    host.replaceInFile(
+      'tsconfig.json',
+      '"target": "es2015",',
+      `"target": "es2016",`,
+    );
+
+    const { files } = await browserBuild(architect, host, target);
+
+    const expectedOutputs = [
+      'favicon.ico',
+      'index.html',
+
+      'main-es2016.js',
+      'main-es2016.js.map',
+      'main-es5.js',
+      'main-es5.js.map',
+
+      'polyfills-es2016.js',
+      'polyfills-es2016.js.map',
+      'polyfills-es5.js',
+      'polyfills-es5.js.map',
+
+      'runtime-es2016.js',
+      'runtime-es2016.js.map',
+      'runtime-es5.js',
+      'runtime-es5.js.map',
+
+      'styles-es2016.js',
+      'styles-es2016.js.map',
+      'styles-es5.js',
+      'styles-es5.js.map',
+
+      'vendor-es2016.js',
+      'vendor-es2016.js.map',
       'vendor-es5.js',
       'vendor-es5.js.map',
     ] as PathFragment[];
