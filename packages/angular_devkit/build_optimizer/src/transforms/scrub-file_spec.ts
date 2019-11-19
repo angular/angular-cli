@@ -722,14 +722,14 @@ describe('scrub-file', () => {
       `;
       const input = tags.stripIndent`
         ${output}
-        /*@__PURE__*/ i0.ɵsetClassMetadata(Clazz, [{
+        /*@__PURE__*/ (function () { i0.ɵsetClassMetadata(Clazz, [{
                 type: Component,
                 args: [{
                         selector: 'app-lazy',
                         template: 'very lazy',
                         styles: []
                     }]
-            }], null, null);
+            }], null, null); })();
       `;
 
       expect(testScrubFile(input)).toBeTruthy();
