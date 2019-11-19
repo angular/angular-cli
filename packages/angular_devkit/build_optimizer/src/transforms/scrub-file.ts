@@ -18,7 +18,6 @@ export function testScrubFile(content: string) {
     'propDecorators',
     'ctorParameters',
     'ɵsetClassMetadata',
-    'ɵɵsetNgModuleScope',
   ];
 
   return markers.some((marker) => content.indexOf(marker) !== -1);
@@ -313,8 +312,7 @@ function isIvyPrivateCallExpression(exprStmt: ts.ExpressionStatement) {
     return false;
   }
 
-  if (propAccExpr.name.text != 'ɵsetClassMetadata'
-    && propAccExpr.name.text != 'ɵɵsetNgModuleScope') {
+  if (propAccExpr.name.text != 'ɵsetClassMetadata') {
     return false;
   }
 
