@@ -27,6 +27,7 @@ import {
   getWorkerConfig,
   normalizeExtraEntryPoints,
 } from '../angular-cli-files/models/webpack-configs';
+import { ThresholdSeverity, checkBudgets } from '../angular-cli-files/utilities/bundle-calculator';
 import {
   IndexHtmlTransform,
   writeIndexHtml,
@@ -604,35 +605,30 @@ export function buildWebpackBrowser(
               }
 
               let bundleInfoText = '';
-              const processedNames = new Set<string>();
               for (const result of processResults) {
-                processedNames.add(result.name);
+                const chunk = webpackStats.chunks
+                    && webpackStats.chunks.find((chunk) => chunk.id.toString() === result.name);
 
-                const chunk =
-                  webpackStats &&
-                  webpackStats.chunks &&
-                  webpackStats.chunks.find(c => result.name === c.id.toString());
                 if (result.original) {
                   bundleInfoText +=
                     '\n' + generateBundleInfoStats(result.name, result.original, chunk);
                 }
+
                 if (result.downlevel) {
                   bundleInfoText +=
                     '\n' + generateBundleInfoStats(result.name, result.downlevel, chunk);
                 }
               }
 
-              if (webpackStats && webpackStats.chunks) {
-                for (const chunk of webpackStats.chunks) {
-                  if (processedNames.has(chunk.id.toString())) {
-                    continue;
-                  }
-
-                  const asset =
+              const unprocessedChunks = webpackStats.chunks && webpackStats.chunks
+                  .filter((chunk) => !processResults
+                      .find((result) => chunk.id.toString() === result.name),
+                  ) || [];
+              for (const chunk of unprocessedChunks) {
+                const asset =
                     webpackStats.assets && webpackStats.assets.find(a => a.name === chunk.files[0]);
-                  bundleInfoText +=
-                    '\n' + generateBundleStats({ ...chunk, size: asset && asset.size }, true);
-                }
+                bundleInfoText +=
+                  '\n' + generateBundleStats({ ...chunk, size: asset && asset.size }, true);
               }
 
               bundleInfoText +=
@@ -643,11 +639,30 @@ export function buildWebpackBrowser(
                   true,
                 );
               context.logger.info(bundleInfoText);
+
+              // Check for budget errors and display them to the user.
+              const budgets = options.budgets || [];
+              for (const {severity, message} of checkBudgets(budgets, webpackStats)) {
+                switch (severity) {
+                  case ThresholdSeverity.Warning:
+                    webpackStats.warnings.push(message);
+                    break;
+                  case ThresholdSeverity.Error:
+                    webpackStats.errors.push(message);
+                    break;
+                  default:
+                    assertNever(severity);
+                    break;
+                }
+              }
+
               if (webpackStats && webpackStats.warnings.length > 0) {
                 context.logger.warn(statsWarningsToString(webpackStats, { colors: true }));
               }
               if (webpackStats && webpackStats.errors.length > 0) {
                 context.logger.error(statsErrorsToString(webpackStats, { colors: true }));
+
+                return { success: false };
               }
             } else {
               files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
@@ -787,6 +802,11 @@ function mapErrorToMessage(error: unknown): string | undefined {
   }
 
   return undefined;
+}
+
+function assertNever(input: never): never {
+  throw new Error(`Unexpected call to assertNever() with input: ${
+      JSON.stringify(input, null /* replacer */, 4 /* tabSize */)}`);
 }
 
 export default createBuilder<json.JsonObject & BrowserBuilderSchema>(buildWebpackBrowser);
