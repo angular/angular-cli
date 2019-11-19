@@ -46,7 +46,7 @@ export class WebpackResourceLoader {
     return this._reverseDependencies.get(file) || [];
   }
 
-  private _compile(filePath: string): Promise<CompilationOutput> {
+  private async _compile(filePath: string): Promise<CompilationOutput> {
 
     if (!this._parentCompilation) {
       throw new Error('WebpackResourceLoader cannot be used without parentCompilation');
@@ -97,66 +97,58 @@ export class WebpackResourceLoader {
     });
 
     // Compile and return a promise
-    return new Promise((resolve, reject) => {
+    const childCompilation = await new Promise<any>((resolve, reject) => {
       childCompiler.compile((err: Error, childCompilation: any) => {
         if (err) {
           reject(err);
-
-          return;
-        }
-
-        // Resolve / reject the promise
-        const { warnings, errors } = childCompilation;
-
-        if (warnings && warnings.length) {
-          this._parentCompilation.warnings.push(...warnings);
-        }
-
-        if (errors && errors.length) {
-          this._parentCompilation.errors.push(...errors);
-
-          const errorDetails = errors
-            .map((error: any) => error.message + (error.error ? ':\n' + error.error : ''))
-            .join('\n');
-
-          reject(new Error('Child compilation failed:\n' + errorDetails));
         } else {
-          Object.keys(childCompilation.assets).forEach(assetName => {
-            // Add all new assets to the parent compilation, with the exception of
-            // the file we're loading and its sourcemap.
-            if (
-              assetName !== filePath
-              && assetName !== `${filePath}.map`
-              && this._parentCompilation.assets[assetName] == undefined
-            ) {
-              this._parentCompilation.assets[assetName] = childCompilation.assets[assetName];
-            }
-          });
-
-          // Save the dependencies for this resource.
-          this._fileDependencies.set(filePath, childCompilation.fileDependencies);
-          for (const file of childCompilation.fileDependencies) {
-            const entry = this._reverseDependencies.get(file);
-            if (entry) {
-              entry.push(filePath);
-            } else {
-              this._reverseDependencies.set(file, [filePath]);
-            }
-          }
-
-          const compilationHash = childCompilation.fullHash;
-          const maybeSource = this._cachedSources.get(compilationHash);
-          if (maybeSource) {
-            resolve({ outputName: filePath, source: maybeSource });
-          } else {
-            const source = childCompilation.assets[filePath].source();
-            this._cachedSources.set(compilationHash, source);
-
-            resolve({ outputName: filePath, source });
-          }
+          resolve(childCompilation);
         }
       });
     });
+
+    // Propagate warnings to parent compilation.
+    const { warnings, errors } = childCompilation;
+    if (warnings && warnings.length) {
+      this._parentCompilation.warnings.push(...warnings);
+    }
+    if (errors && errors.length) {
+      this._parentCompilation.errors.push(...errors);
+    }
+
+    Object.keys(childCompilation.assets).forEach(assetName => {
+      // Add all new assets to the parent compilation, with the exception of
+      // the file we're loading and its sourcemap.
+      if (
+        assetName !== filePath
+        && assetName !== `${filePath}.map`
+        && this._parentCompilation.assets[assetName] == undefined
+      ) {
+        this._parentCompilation.assets[assetName] = childCompilation.assets[assetName];
+      }
+    });
+
+    // Save the dependencies for this resource.
+    this._fileDependencies.set(filePath, childCompilation.fileDependencies);
+    for (const file of childCompilation.fileDependencies) {
+      const entry = this._reverseDependencies.get(file);
+      if (entry) {
+        entry.push(filePath);
+      } else {
+        this._reverseDependencies.set(file, [filePath]);
+      }
+    }
+
+    const compilationHash = childCompilation.fullHash;
+    const maybeSource = this._cachedSources.get(compilationHash);
+    if (maybeSource) {
+      return { outputName: filePath, source: maybeSource };
+    } else {
+      const source = childCompilation.assets[filePath].source();
+      this._cachedSources.set(compilationHash, source);
+
+      return { outputName: filePath, source };
+    }
   }
 
   private async _evaluate({ outputName, source }: CompilationOutput): Promise<string> {

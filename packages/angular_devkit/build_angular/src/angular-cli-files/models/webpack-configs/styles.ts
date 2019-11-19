@@ -9,6 +9,7 @@
 import * as path from 'path';
 import * as webpack from 'webpack';
 import {
+  AnyComponentStyleBudgetChecker,
   PostcssCliResources,
   RawCssLoader,
   RemoveHashPlugin,
@@ -26,7 +27,9 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   const { root, buildOptions } = wco;
   const entryPoints: { [key: string]: string[] } = {};
   const globalStylePaths: string[] = [];
-  const extraPlugins = [];
+  const extraPlugins: webpack.Plugin[] = [
+    new AnyComponentStyleBudgetChecker(buildOptions.budgets),
+  ];
 
   const cssSourceMap = buildOptions.sourceMap.styles;
 
