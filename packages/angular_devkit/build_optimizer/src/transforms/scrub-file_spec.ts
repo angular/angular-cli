@@ -735,20 +735,5 @@ describe('scrub-file', () => {
       expect(testScrubFile(input)).toBeTruthy();
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
-
-    it('removes ɵɵsetNgModuleScope call', () => {
-      const output = tags.stripIndent`
-        import { CommonModule } from '@angular/common';
-        import * as i0 from "@angular/core";
-        ${clazz}
-      `;
-      const input = tags.stripIndent`
-        ${output}
-        /*@__PURE__*/ i0.ɵɵsetNgModuleScope(Clazz, { declarations: [], imports: [CommonModule] });
-      `;
-
-      expect(testScrubFile(input)).toBeTruthy();
-      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
-    });
   });
 });
