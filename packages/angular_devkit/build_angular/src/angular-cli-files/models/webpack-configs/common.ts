@@ -553,10 +553,14 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       noEmitOnErrors: true,
       minimizer: [
         new HashedModuleIdsPlugin(),
-        // TODO: check with Mike what this feature needs.
-        new BundleBudgetPlugin({ budgets: buildOptions.budgets }),
         ...extraMinimizers,
-      ],
+      ].concat(differentialLoadingMode ? [
+        // Budgets are computed after differential builds, not via a plugin.
+        // https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/build_angular/src/browser/index.ts
+      ] : [
+        // Non differential builds should be computed here, as a plugin.
+        new BundleBudgetPlugin({ budgets: buildOptions.budgets }),
+      ]),
     },
     plugins: [
       // Always replace the context for the System.import in angular/core to prevent warnings.
