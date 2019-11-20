@@ -73,7 +73,7 @@
     "karma-typescript": "^4.1.0",
     "minimatch": "^3.0.4",
     "protractor": "5.4.2",
-    "rollup": "~1.25.0",
+    "rollup": "~1.27.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
