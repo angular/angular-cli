@@ -1,7 +1,3 @@
-> Hans Larsen (hansl@google.com)  
-> June 8th, 2018  
-
-
 # Setting Up Local Repository
 
 1. Clone the Angular-CLI repo. A local copy works just fine.
@@ -20,12 +16,24 @@ Caretaker calendar can be found [here](https://calendar.google.com/calendar?cid=
 TBD
 
 ## Merging PRs
-TBD
+
+The list of PRs which are currently ready to merge (approved with passing status checks) can
+be found with [this search](https://github.com/angular/angular-cli/pulls?q=is%3Apr+is%3Aopen+review%3Aapproved+status%3Asuccess).
+This list should be checked daily and any ready PRs should be merged. For each
+PR, check the `PR target` label to understand where it should be merged to. If
+`master` is targetted, then click "Rebase and Merge". If the PR also targets a
+patch branch, see [Maintaining Patch Branches](#maintaining-patch-branches).
+Whatever the target, rebasing should be used over merging to avoid cluttering
+the Git history with merge commits.
 
 ### Maintaining Patch Branches
-Everytime a PR is merged, commits need to be cherry-picked to an associated branch;
-* the latest patch branch (e.g. `1.2.x` or `1.3.x-rc.0`) should also be updated by cherry-picking all _applicable_
-  commits to it. `fix()`, `docs()`, `refactor()` and 
+
+When a PR is merged, if the `PR target` label includes a branch other than
+`master`, commits will need to be cherry-picked to an associated branch. In
+particular, the `patch` target simply refers to the latest patch branch (eg.
+`1.2.x` or `1.3.x-rc.0`). This branch should be updated by cherry-picking all
+_applicable_ commits to it, such as those with messages beginning with `fix()`,
+`docs()`, or `refactor()`.
 
 Say the following PR is merged;
 
@@ -54,6 +62,7 @@ git checkout <patch branch>
 # Cherry pick the commit. Use the hash from the commit which was merged
 # into upstream/master, which should be known to your local repo.
 git cherry-pick -x <commit hash from master>
+# If you have multiple cherry picks, you can do them all here.
 
 # Resolve merge conflicts if necessary...
 # Or abort and ask author to submit a separate commit targeting patch-only.
@@ -61,6 +70,16 @@ git cherry-pick -x <commit hash from master>
 # Push changes.
 git push upstream <patch branch>
 ```
+
+If you get a `bad revision` error when cherry picking, make sure you are using
+the commit hash used when merged into `master`, _not_ the hash listed in the PR.
+Also verify that you have fetched `master` from `upstream` since that commit was
+merged.
+
+If the commit is not merged to `master` (because it targets `patch only` for
+instance), then you will need to fetch the contributor's branch for your local
+Git instance to have knowledge of the commit being cherry picked onto the patch
+branch.
 
 # Release
 
@@ -88,10 +107,10 @@ git push upstream && git push upstream --tags
 
 **It is a good idea to wait for CI to be green on the patch branch and tag before doing the release.**
 
-Check out the patch tag (e.g. `v6.7.8`), then run: 
+Check out the patch tag (e.g. `v6.7.8`), then run:
 ```sh
 devkit-admin publish
-``` 
+```
 
 Check out the minor tag (e.g. `v6.8.0-beta.0`), then run:
 ```bash
@@ -123,7 +142,7 @@ For example, running the following command will output the release notes on stdo
 
 ```bash
 devkit-admin changelog --from=v1.2.3 --to=v1.2.4
-``` 
+```
 
 Copy paste the output (you can use `| pbcopy` on MacOS or `|xclip` on Linux) and create the release notes on github for the tag just
 released. If you have an API token for GitHub you can create a draft automatically by using the `--githubToken` flag.
