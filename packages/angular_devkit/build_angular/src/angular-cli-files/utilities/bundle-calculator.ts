@@ -169,7 +169,7 @@ class BundleCalculator extends Calculator {
 }
 
 /**
- * The sum of all initial chunks (marked as initial by webpack).
+ * The sum of all initial chunks (marked as initial).
  */
 class InitialCalculator extends Calculator {
   calculate() {
