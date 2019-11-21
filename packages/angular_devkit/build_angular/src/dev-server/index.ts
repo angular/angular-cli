@@ -219,6 +219,9 @@ export function serveWebpackBrowser(
               compact: false,
               cacheCompression: false,
               plugins,
+              parserOpts: {
+                plugins: ['dynamicImport'],
+              },
             },
           },
         ],
