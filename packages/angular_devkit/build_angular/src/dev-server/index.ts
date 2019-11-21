@@ -367,6 +367,9 @@ async function setupLocalize(
             translationIntegrity: localeDescription && localeDescription.integrity,
           }),
           plugins,
+          parserOpts: {
+            plugins: ['dynamicImport'],
+          },
         },
       },
     ],

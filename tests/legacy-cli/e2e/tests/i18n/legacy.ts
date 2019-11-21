@@ -57,6 +57,7 @@ export const langTranslations = [
   },
 ];
 export const sourceLocale = langTranslations[0].lang;
+
 export const externalServer = (outputPath: string) => {
   const app = express();
   app.use(express.static(resolve(outputPath)));
@@ -85,6 +86,13 @@ export async function setupI18nConfig(useLocalize = true) {
     <p id="locale">{{ locale }}</p>
     <p id="date">{{ jan | date : 'LLLL' }}</p>
     <p id="plural" i18n>Updated {minutes, plural, =0 {just now} =1 {one minute ago} other {{{minutes}} minutes ago}}</p>
+  `);
+
+  // Add a dynamic import to ensure syntax is supported
+  // ng serve support: https://github.com/angular/angular-cli/issues/16248
+  await writeFile('src/app/dynamic.ts', `export const abc = 5;`);
+  await appendToFile('src/app/app.component.ts', `
+    (async () => { await import('./dynamic'); })();
   `);
 
   // Add e2e specs for each lang.
