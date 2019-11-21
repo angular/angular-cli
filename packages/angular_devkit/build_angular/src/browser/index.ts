@@ -27,6 +27,7 @@ import {
   getWorkerConfig,
   normalizeExtraEntryPoints,
 } from '../angular-cli-files/models/webpack-configs';
+import { markAsyncChunksNonInitial } from '../angular-cli-files/utilities/async-chunks';
 import { ThresholdSeverity, checkBudgets } from '../angular-cli-files/utilities/bundle-calculator';
 import {
   IndexHtmlTransform,
@@ -266,10 +267,18 @@ export function buildWebpackBrowser(
       }).pipe(
         // tslint:disable-next-line: no-big-function
         concatMap(async buildEvent => {
-          const { webpackStats, success, emittedFiles = [] } = buildEvent;
-          if (!webpackStats) {
+          const { webpackStats: webpackRawStats, success, emittedFiles = [] } = buildEvent;
+          if (!webpackRawStats) {
             throw new Error('Webpack stats build result is required.');
           }
+
+          // Fix incorrectly set `initial` value on chunks.
+          const extraEntryPoints = normalizeExtraEntryPoints(options.styles || [], 'styles')
+              .concat(normalizeExtraEntryPoints(options.scripts || [], 'scripts'));
+          const webpackStats = {
+            ...webpackRawStats,
+            chunks: markAsyncChunksNonInitial(webpackRawStats, extraEntryPoints),
+          };
 
           if (!success && useBundleDownleveling) {
             // If using bundle downleveling then there is only one build
