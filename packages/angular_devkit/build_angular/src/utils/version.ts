@@ -59,9 +59,10 @@ export function assertCompatibleAngularVersion(projectRoot: string, logger: logg
 
   const cliMajor = new SemVer(angularCliPkgJson['version']).major;
   // e.g. CLI 8.0 supports '>=8.0.0 <9.0.0', including pre-releases (betas, rcs, snapshots)
-  // of both 8 and 9.
+  // of both 8 and 9. Also allow version "0.0.0" for integration testing in the angular/angular
+  // repository with the generated development @angular/core npm package which is versioned "0.0.0".
   const supportedAngularSemver =
-    `^${cliMajor}.0.0-beta || ` + `>=${cliMajor}.0.0 <${cliMajor + 1}.0.0`;
+    `0.0.0 || ^${cliMajor}.0.0-beta || ` + `>=${cliMajor}.0.0 <${cliMajor + 1}.0.0`;
 
   const angularVersion = new SemVer(angularPkgJson['version']);
   const rxjsVersion = new SemVer(rxjsPkgJson['version']);
