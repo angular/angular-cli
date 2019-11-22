@@ -128,7 +128,6 @@ function addProjectI18NOptions(
 function addBuilderI18NOptions(recorder: UpdateRecorder, builderConfig: JsonAstObject, projectConfig: JsonAstObject) {
   const options = getAllOptions(builderConfig);
 
-  let hasi18n = false;
   for (const option of options) {
     const localeId = findPropertyInAstObject(option, 'i18nLocale');
     if (localeId && localeId.kind === 'string') {
@@ -146,37 +145,6 @@ function addBuilderI18NOptions(recorder: UpdateRecorder, builderConfig: JsonAstO
     if (i18nFormat) {
       removePropertyInAstObject(recorder, option, 'i18nFormat');
     }
-
-    hasi18n = !!(hasi18n || i18nFormat || i18nFile || localeId);
-  }
-
-  if (hasi18n) {
-    const options = findPropertyInAstObject(builderConfig, 'options');
-    if (!options || options.kind !== 'object') {
-      return;
-    }
-
-    // Don't add localize option of it's already present in the main options
-    if (findPropertyInAstObject(options, 'i18nLocale') || findPropertyInAstObject(options, 'localize')) {
-      return;
-    }
-
-    // Get sourceLocale from extract-i18n builder
-    const extractI18nConfig = getProjectTarget(projectConfig, 'extract-i18n', Builders.ExtractI18n);
-    let sourceLocale: string | undefined;
-
-    if (extractI18nConfig && extractI18nConfig.kind === 'object') {
-      const i18nOptions = getAllOptions(extractI18nConfig);
-      sourceLocale = i18nOptions
-        .map(o => {
-          const sourceLocale = findPropertyInAstObject(o, 'i18nLocale');
-
-          return sourceLocale && sourceLocale.value;
-        })
-        .find(x => !!x) as string;
-    }
-
-    insertPropertyInAstObjectInOrder(recorder, options, 'localize', [sourceLocale || 'en-US'], 12);
   }
 }
 
