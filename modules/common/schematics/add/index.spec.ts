@@ -35,11 +35,17 @@ describe('Add Schematic Rule', () => {
     expect(architect.build.options.outputPath).toBe('dist/test-app/browser');
     expect(architect.server.options.outputPath).toBe('dist/test-app/server');
     expect(architect.server.options.main).toBe('projects/test-app/server.ts');
+    expect(architect['serve-ssr'].options.serverTarget).toBe('test-app:server');
+    expect(architect['serve-ssr'].options.browserTarget).toBe('test-app:build');
 
     const productionConfig = architect.server.configurations.production;
     expect(productionConfig.fileReplacements).toBeDefined();
     expect(productionConfig.sourceMap).toBeDefined();
     expect(productionConfig.optimization).toBeDefined();
+
+    const productionServeSSRConfig = architect['serve-ssr'].configurations.production;
+    expect(productionServeSSRConfig.serverTarget).toBe('test-app:server:production');
+    expect(productionServeSSRConfig.browserTarget).toBe('test-app:build:production');
   });
 
   it('should add scripts to package.json', async () => {
@@ -48,6 +54,14 @@ describe('Add Schematic Rule', () => {
     const {scripts} = JSON.parse(tree.read('package.json')!.toString());
     expect(scripts['build:ssr']).toBe('ng build --prod && ng run test-app:server:production');
     expect(scripts['serve:ssr']).toBe('node dist/test-app/server/main.js');
+    expect(scripts['serve:ssr:dev']).toBe('ng run test-app:serve-ssr');
+  });
+
+  it('should add devDependency: @nguniversal/builders', async () => {
+    const tree = await schematicRunner
+      .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
+    const {devDependencies} = JSON.parse(tree.read('package.json')!.toString());
+    expect(Object.keys(devDependencies)).toContain('@nguniversal/builders');
   });
 
   it(`should update 'tsconfig.server.json' files with main file`, async () => {

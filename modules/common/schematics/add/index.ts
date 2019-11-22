@@ -18,8 +18,12 @@ import {
   appendValueInAstArray,
 } from '@schematics/angular/utility/json-utils';
 import {Schema as UniversalOptions} from '@schematics/angular/universal/schema';
-import {stripTsExtension, getOutputPath, getProject} from '../utils';
 import {updateWorkspace} from '@schematics/angular/utility/workspace';
+import {addPackageJsonDependency, NodeDependencyType} from '@schematics/angular/utility/dependencies';
+
+import {stripTsExtension, getOutputPath, getProject} from '../utils';
+
+const SERVE_SSR_TARGET_NAME = 'serve-ssr';
 
 export interface AddUniversalOptions extends UniversalOptions {
   serverFileName?: string;
@@ -39,6 +43,7 @@ export function addUniversalCommonRule(options: AddUniversalOptions): Rule {
       addScriptsRule(options),
       updateServerTsConfigRule(options),
       updateWorkspaceConfigRule(options),
+      addDependencies(),
     ]);
   };
 }
@@ -55,6 +60,7 @@ function addScriptsRule(options: AddUniversalOptions): Rule {
     const pkg = JSON.parse(buffer.toString());
     pkg.scripts = {
       ...pkg.scripts,
+      'serve:ssr:dev': `ng run ${options.clientProject}:${SERVE_SSR_TARGET_NAME}`,
       'serve:ssr': `node ${serverDist}/main.js`,
       'build:ssr': `ng build --prod && ng run ${options.clientProject}:server:production`,
     };
@@ -66,7 +72,8 @@ function addScriptsRule(options: AddUniversalOptions): Rule {
 function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
   return () => {
     return updateWorkspace(workspace => {
-      const project = workspace.projects.get(options.clientProject);
+      const projectName = options.clientProject;
+      const project = workspace.projects.get(projectName);
       if (!project) {
         return;
       }
@@ -76,6 +83,26 @@ function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
         normalize(project.root),
         stripTsExtension(options.serverFileName) + '.ts',
       );
+
+      const serveSSRTarget = project.targets.get(SERVE_SSR_TARGET_NAME);
+      if (serveSSRTarget) {
+        return;
+      }
+
+      project.targets.add({
+        name: SERVE_SSR_TARGET_NAME,
+        builder: '@nguniversal/builders:ssr-dev-server',
+        options: {
+          browserTarget: `${projectName}:build`,
+          serverTarget: `${projectName}:server`,
+        },
+        configurations: {
+          production: {
+            browserTarget: `${projectName}:build:production`,
+            serverTarget: `${projectName}:server:production`,
+          },
+        },
+      });
     });
   };
 }
@@ -122,5 +149,17 @@ function updateServerTsConfigRule(options: AddUniversalOptions): Rule {
 
       host.commitUpdate(recorder);
     }
+  };
+}
+
+function addDependencies(): Rule {
+  return host => {
+    addPackageJsonDependency(host, {
+      name: '@nguniversal/builders',
+      type: NodeDependencyType.Dev,
+      version: '^0.0.0-PLACEHOLDER',
+    });
+
+    return host;
   };
 }

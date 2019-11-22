@@ -38,7 +38,7 @@ function addDependencies(options: UniversalOptions): Rule {
     addPackageJsonDependency(host, {
       type: NodeDependencyType.Default,
       name: '@nguniversal/express-engine',
-      version: '0.0.0-PLACEHOLDER',
+      version: '^0.0.0-PLACEHOLDER',
     });
     addPackageJsonDependency(host, {
       type: NodeDependencyType.Default,
