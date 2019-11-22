@@ -333,20 +333,6 @@ describe('Migration to version 9', () => {
           expect(config.configurations.de.localize).toEqual(['de']);
         });
 
-        it(`should add 'localize' option in main options`, async () => {
-          let config = getWorkspaceTargets(tree);
-          config.build.options.aot = false;
-          config.build.configurations.de = getI18NConfig('de');
-          config['extract-i18n'].options.i18nFormat = 'xmb';
-          config['extract-i18n'].options.i18nLocale = 'en-GB';
-          updateWorkspaceTargets(tree, config);
-
-          const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
-          config = getWorkspaceTargets(tree2).build;
-          expect(config.options.localize).toEqual(['en-GB']);
-          expect(config.configurations.de.localize).toEqual(['de']);
-        });
-
         it('should remove deprecated i18n options', async () => {
           let config = getWorkspaceTargets(tree);
           config.build.options.aot = false;
