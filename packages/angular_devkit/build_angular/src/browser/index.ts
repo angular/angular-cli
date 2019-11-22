@@ -651,13 +651,15 @@ export function buildWebpackBrowser(
 
               // Check for budget errors and display them to the user.
               const budgets = options.budgets || [];
-              for (const {severity, message} of checkBudgets(budgets, webpackStats)) {
+              const budgetFailures = checkBudgets(budgets, webpackStats, processResults);
+              for (const {severity, message} of budgetFailures) {
+                const msg = `budgets: ${message}`;
                 switch (severity) {
                   case ThresholdSeverity.Warning:
-                    webpackStats.warnings.push(message);
+                    webpackStats.warnings.push(msg);
                     break;
                   case ThresholdSeverity.Error:
-                    webpackStats.errors.push(message);
+                    webpackStats.errors.push(msg);
                     break;
                   default:
                     assertNever(severity);
