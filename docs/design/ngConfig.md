@@ -2,7 +2,7 @@
 
 ## Goals
 
-Currently, a project scaffolded with the CLI have no way of specifying options and configurations affecting their projects. There are ways to affect the build (with the `angular-cli-build.js` file), but the following questions cannot be answered without actual project options:
+Currently, a project scaffolded with the CLI has no way of specifying options and configurations affecting their projects. There are ways to affect the build (with the `angular-cli-build.js` file), but the following questions cannot be answered without actual project options:
 
 * Where in my directory is my karma.conf file?
 * What is my firebase database URL?
@@ -27,7 +27,7 @@ The project `.angular-cli.json` goes into the project root. The global configura
 
 ## Structure
 
-The structure should be defined by a JSON schema (see [here](http://json-schema.org/)). The schema will be used to generate the `d.ts`, but that file will be kept in the file system along the schema for IDEs.
+The structure should be defined by a JSON schema (see [here](http://json-schema.org/)). The schema will be used to generate the `d.ts`, but that file will be kept in the file system along with the schema for IDEs.
 
 Every PR that would change the schema should include the update to the `d.ts`.
 
@@ -70,7 +70,7 @@ A model should be created that will include loading and saving the configuration
 
 **The model should be part of the project and created on the `project` object.**
 
-That model can be used internally by the tool to get information. It will include a proxy handler that throws if an operation doesn't respect the schema. It will also sets values on globals and locals depending on which branches you access.
+That model can be used internally by the tool to get information. It will include a proxy handler that throws if an operation doesn't respect the schema. It will also set values on globals and locals depending on which branches you access.
 
 A simple API would return the TypeScript interface:
 
@@ -82,7 +82,7 @@ class Config {
 }
 ```
 
-The `local` and `global` getters return proxies that respect the JSON Schema defined for the Angular config. These proxies allow users to not worry about the existence of values; those values will only be created on disc when they are setted.
+The `local` and `global` getters return proxies that respect the JSON Schema defined for the Angular config. These proxies allow users to not worry about the existence of values; those values will only be created on disc when they are set.
 
 Also, `local` will always defer to the same key-path in `global` if a value isn't available. If a value is set and the parent exists in `global`, it should be created to `local` such that it's saved locally to the project. The proxies only care about the end points of `local` and `global`, not the existence of a parent in either.
 
