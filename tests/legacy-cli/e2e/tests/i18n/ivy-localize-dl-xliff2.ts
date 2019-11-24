@@ -6,8 +6,13 @@ import { baseDir, externalServer, langTranslations, setupI18nConfig } from './le
 
 export default async function() {
   // Setup i18n tests and config.
-  await setupI18nConfig();
+  await setupI18nConfig(true, 'xlf2');
 
+  // Execute the tests
+  await executeTest();
+}
+
+export async function executeTest() {
   // Ensure a DL build is used.
   await updateJsonFile('tsconfig.json', config => {
     config.compilerOptions.target = 'es2015';
@@ -45,7 +50,9 @@ export default async function() {
   // Verify deprecated locale data registration is not present
   await ng('build', '--configuration=fr', '--optimization=false');
   await expectToFail(() => expectFileToMatch(`${baseDir}/fr/main-es5.js`, 'registerLocaleData('));
-  await expectToFail(() => expectFileToMatch(`${baseDir}/fr/main-es2015.js`, 'registerLocaleData('));
+  await expectToFail(() =>
+    expectFileToMatch(`${baseDir}/fr/main-es2015.js`, 'registerLocaleData('),
+  );
 
   // Verify missing translation behaviour.
   await appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
