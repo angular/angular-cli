@@ -166,7 +166,7 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
     const usedFormats = new Set<string>();
     for (const [locale, desc] of Object.entries(i18n.locales)) {
       if (i18n.inlineLocales.has(locale) && desc.file) {
-        const result = loader(path.join(projectRoot, desc.file));
+        const result = loader(path.join(context.workspaceRoot, desc.file));
 
         for (const diagnostics of result.diagnostics.messages) {
           if (diagnostics.type === 'error') {
