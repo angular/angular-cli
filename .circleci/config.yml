@@ -160,7 +160,9 @@ workflows:
     - build
     - bazel-lint
     - lint
-    - build-packages-dist
+    - build-packages-dist:
+        requires:
+        - build
     - integration_test:
         requires:
         - build-packages-dist
