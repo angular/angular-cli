@@ -14,7 +14,7 @@
     "test": "npm run build && npm run serve:test",
     "serve:test": "concurrently \"npm run serve:ssr\" \"npm run e2e\" --kill-others --success first",
     "serve:ssr": "node dist/express-engine-ve/server/main.js",
-    "serve:ssr-dev-server": "ng run express-engine-ve:ssr-serve",
+    "serve:ssr:dev": "ng run express-engine-ve:serve-ssr:production",
     "build:ssr": "npm run build:client-and-server-bundles",
     "build": "ng build --prod && ng run express-engine-ve:server:production"
   },

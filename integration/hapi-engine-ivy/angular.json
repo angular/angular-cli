@@ -138,6 +138,19 @@
             "protractorConfig": "e2e/protractor.conf.js"
           }
         },
+        "serve-ssr": {
+          "builder": "@nguniversal/builders:ssr-dev-server",
+          "options": {
+            "browserTarget": "hapi-engine-ivy:build",
+            "serverTarget": "hapi-engine-ivy:server"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "hapi-engine-ivy:build:production",
+              "serverTarget": "hapi-engine-ivy:server:production"
+            }
+          }
+        },
         "server": {
           "builder": "@angular-devkit/build-angular:server",
           "options": {
@@ -146,19 +159,6 @@
             "main": "server.ts",
             "tsConfig": "tsconfig.server.json"
           },
-          "ssr-serve": {
-            "builder": "@nguniversal/builders:ssr-dev-server",
-            "options": {
-              "browserTarget": "hapi-engine-ivy:build",
-              "serverTarget": "hapi-engine-ivy:server"
-            },
-            "configurations": {
-              "production": {
-                "browserTarget": "hapi-engine-ivy:build:production",
-                "serverTarget": "hapi-engine-ivy:server:production"
-              }
-            }
-          },           
           "configurations": {
             "production": {
               "fileReplacements": [

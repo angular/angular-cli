@@ -6,11 +6,28 @@
   "properties": {
     "browserTarget": {
       "type": "string",
-      "description": "Browser target to build."
+      "description": "Browser target to build.",
+      "pattern": ".+:.+(:.+)?"
     },
     "serverTarget": {
       "type": "string",
-      "description": "Browser target to build."
+      "description": "Server target to build.",
+      "pattern": ".+:.+(:.+)?"
+    },
+    "port": {
+      "type": "number",
+      "default": 4200,
+      "description": "Port to start the development server at. Default is 4200. Pass 0 to get a dynamically assigned port."
+    },
+    "open": {
+      "type": "boolean",
+      "description": "Opens the url in default browser.",
+      "default": false,
+      "alias": "o"
+    },
+    "progress": {
+      "type": "boolean",
+      "description": "Log progress to the console while building."
     }
   },
   "additionalProperties": false,

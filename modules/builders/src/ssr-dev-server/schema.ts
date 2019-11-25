@@ -12,4 +12,16 @@ export interface Schema {
 
   /** Server target to build. */
   serverTarget: string;
+
+  /**
+   * Port to start the sync server at.
+   * Default is 4200. Pass 0 to get a dynamically assigned port.
+   */
+  port: number;
+
+  /** Log progress to the console while building. */
+  progress: boolean;
+
+  /** Opens the url in default browser. */
+  open: boolean;
 }

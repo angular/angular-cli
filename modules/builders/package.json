@@ -16,7 +16,9 @@
   "dependencies": {
     "@angular-devkit/architect": "DEVKIT_ARCHITECT_VERSION",
     "@angular-devkit/core": "DEVKIT_CORE_VERSION",
-    "rxjs": "RXJS_VERSION"
+    "browser-sync": "^2.26.7",
+    "rxjs": "RXJS_VERSION",
+    "tree-kill": "^1.2.1"
   },
   "ng-update": {
     "packageGroup": "NG_UPDATE_PACKAGE_GROUP"

@@ -11,9 +11,9 @@ import {browser, by, element} from 'protractor';
 import {verifyNoBrowserErrors} from './util';
 
 describe('Hello world E2E Tests', () => {
-  it('should display: Hello world!', () => {
+  it('should display: Hello world!', async () => {
     // Load the page without waiting for Angular since it is not bootstrapped automatically.
-    browser.driver.get(browser.baseUrl);
+    await browser.driver.get(browser.baseUrl);
 
     const style = browser.driver.findElement(by.css('style[ng-transition="hlw"]'));
     expect(style.getText()).not.toBeNull();
@@ -23,7 +23,7 @@ describe('Hello world E2E Tests', () => {
     expect(serverDiv.getText()).toMatch('Hello world!');
 
     // Bootstrap the client side app.
-    browser.executeScript('doBootstrap()');
+    await browser.executeScript('doBootstrap()');
 
     // Retest the contents after the client bootstraps.
     expect(element(by.css('div')).getText()).toMatch('Hello world!');
@@ -36,9 +36,9 @@ describe('Hello world E2E Tests', () => {
     verifyNoBrowserErrors();
   });
 
-  it('should populate window.location', () => {
+  it('should populate window.location', async () => {
     // Load the page without waiting for Angular since it is not bootstrapped automatically.
-    browser.driver.get(browser.baseUrl);
+    await browser.driver.get(browser.baseUrl);
 
     // Test the contents from the server.
     const serverDiv = browser.driver.findElement(by.css('span.href-check'));

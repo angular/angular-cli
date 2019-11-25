@@ -8,12 +8,20 @@
 
 import {browser, by, element} from 'protractor';
 
-import {verifyNoBrowserErrors} from './util';
+import {verifyNoBrowserErrors, waitForAppRootElement} from './util';
 
 describe('Hello world E2E Tests', () => {
-  it('should display: Hello world!', () => {
+  beforeAll(async () => {
+    await browser.driver.wait(
+      waitForAppRootElement(),
+      6000 * 2,
+      'Server should have started in 2 minutes',
+    );
+  });
+
+  it('should display: Hello world!', async () => {
     // Load the page without waiting for Angular since it is not bootstrapped automatically.
-    browser.driver.get(browser.baseUrl);
+    await browser.driver.get(browser.baseUrl);
 
     const style = browser.driver.findElement(by.css('style[ng-transition="hlw"]'));
     expect(style.getText()).not.toBeNull();
@@ -23,7 +31,7 @@ describe('Hello world E2E Tests', () => {
     expect(serverDiv.getText()).toMatch('Hello world!');
 
     // Bootstrap the client side app.
-    browser.executeScript('doBootstrap()');
+    await browser.executeScript('doBootstrap()');
 
     // Retest the contents after the client bootstraps.
     expect(element(by.css('div')).getText()).toMatch('Hello world!');
@@ -36,13 +44,13 @@ describe('Hello world E2E Tests', () => {
     verifyNoBrowserErrors();
   });
 
-  it('should populate window.location', () => {
+  it('should populate window.location', async () => {
     // Load the page without waiting for Angular since it is not bootstrapped automatically.
-    browser.driver.get(browser.baseUrl);
+    await browser.driver.get(browser.baseUrl);
 
     // Test the contents from the server.
     const serverDiv = browser.driver.findElement(by.css('span.href-check'));
-    expect(serverDiv.getText()).toMatch('http://localhost:4000');
+    expect(serverDiv.getText()).toMatch('//localhost:4200');
 
     // Make sure there were no client side errors.
     verifyNoBrowserErrors();

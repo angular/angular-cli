@@ -31,7 +31,10 @@ ts_library(
     deps = [
         "@npm//@angular-devkit/architect",
         "@npm//@angular-devkit/core",
+        "@npm//@types/browser-sync",
+        "@npm//browser-sync",
         "@npm//rxjs",
+        "@npm//tree-kill",
     ],
 )
 

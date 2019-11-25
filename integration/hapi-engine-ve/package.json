@@ -14,7 +14,7 @@
     "test": "npm run build && npm run serve:test",
     "serve:test": "concurrently \"npm run serve:ssr\" \"npm run e2e\" --kill-others --success first",
     "serve:ssr": "node dist/hapi-engine-ve/server/main.js",
-    "serve:ssr-dev-server": "ng run hapi-engine-ve:ssr-serve",
+    "serve:ssr:dev": "ng run hapi-engine-ve:serve-ssr:production",
     "build:ssr": "npm run build:client-and-server-bundles",
     "build": "ng build --prod && ng run hapi-engine-ve:server:production"
   },
