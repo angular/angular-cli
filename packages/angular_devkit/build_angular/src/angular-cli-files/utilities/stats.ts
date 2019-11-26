@@ -39,6 +39,7 @@ export function generateBundleStats(
   const g = (x: string) => (colors ? bold(green(x)) : x);
   const y = (x: string) => (colors ? bold(yellow(x)) : x);
 
+  const id = info.id ? y(info.id.toString()) : '';
   const size = typeof info.size === 'number' ? ` ${formatSize(info.size)}` : '';
   const files = info.files.map(f => path.basename(f)).join(', ');
   const names = info.names ? ` (${info.names.join(', ')})` : '';
@@ -47,7 +48,7 @@ export function generateBundleStats(
     .map(f => (f && (info as any)[f] ? g(` [${f}]`) : ''))
     .join('');
 
-  return `chunk {${y(info.id.toString())}} ${g(files)}${names}${size} ${initial}${flags}`;
+  return `chunk {${id}} ${g(files)}${names}${size} ${initial}${flags}`;
 }
 
 export function generateBuildStats(hash: string, time: number, colors: boolean): string {

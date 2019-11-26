@@ -331,11 +331,23 @@ export function buildWebpackBrowser(
 
               let mainChunkId;
               const actions: ProcessBundleOptions[] = [];
+              let workerReplacements: [string, string][] | undefined;
               const seen = new Set<string>();
               for (const file of emittedFiles) {
                 // Assets are not processed nor injected into the index
                 if (file.asset) {
-                  continue;
+                  // WorkerPlugin adds worker files to assets
+                  if (file.file.endsWith('.worker.js')) {
+                    if (!workerReplacements) {
+                      workerReplacements = [];
+                    }
+                    workerReplacements.push([
+                      file.file,
+                      file.file.replace(/\-es20\d{2}/, '-es5'),
+                    ]);
+                  } else {
+                    continue;
+                  }
                 }
 
                 // Scripts and non-javascript files are not processed
@@ -431,7 +443,7 @@ export function buildWebpackBrowser(
                 if (action.integrityAlgorithm && action.runtime) {
                   processRuntimeAction = action;
                 } else {
-                  processActions.push(action);
+                  processActions.push({ replacements: workerReplacements, ...action });
                 }
               }
 
