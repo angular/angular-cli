@@ -25,7 +25,7 @@
     "clean-css": "4.2.1",
     "copy-webpack-plugin": "5.0.5",
     "core-js": "3.4.3",
-    "file-loader": "4.2.0",
+    "file-loader": "5.0.2",
     "find-cache-dir": "3.1.0",
     "glob": "7.1.6",
     "istanbul-instrumenter-loader": "3.0.1",
