@@ -5,7 +5,15 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { NodePath, ParseResult, parseSync, transformAsync, traverse, types } from '@babel/core';
+import {
+  NodePath,
+  ParseResult,
+  PluginObj,
+  parseSync,
+  transformAsync,
+  traverse,
+  types,
+} from '@babel/core';
 import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -34,6 +42,7 @@ export interface ProcessBundleOptions {
   cacheKeys?: (string | null)[];
   integrityAlgorithm?: 'sha256' | 'sha384' | 'sha512';
   runtimeData?: ProcessBundleResult[];
+  replacements?: [string, string][];
 }
 
 export interface ProcessBundleResult {
@@ -120,6 +129,7 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
       // modules aren't needed since the bundles use webpack's custom module loading
       // 'transform-typeof-symbol' generates slower code
       presets: [['@babel/preset-env', { modules: false, exclude: ['transform-typeof-symbol'] }]],
+      plugins: options.replacements ? [createReplacePlugin(options.replacements)] : [],
       minified: options.optimize,
       // `false` ensures it is disabled and prevents large file warnings
       compact: options.optimize || false,
@@ -465,6 +475,20 @@ async function processRuntime(
   fs.writeFileSync(downlevelFilePath, downlevelCode);
 
   return result;
+}
+
+function createReplacePlugin(replacements: [string, string][]): PluginObj {
+  return {
+    visitor: {
+      StringLiteral(path: NodePath<types.StringLiteral>) {
+        for (const replacement of replacements) {
+          if (path.node.value === replacement[0]) {
+            path.replaceWith(types.stringLiteral(replacement[1]));
+          }
+        }
+      },
+    },
+  };
 }
 
 export interface InlineOptions {
