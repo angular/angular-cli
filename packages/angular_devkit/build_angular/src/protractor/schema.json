@@ -10,7 +10,8 @@
     },
     "devServerTarget": {
       "type": "string",
-      "description": "Dev server target to run tests against."
+      "description": "Dev server target to run tests against.",
+      "pattern": "^([^:\\s]+:[^:\\s]+(:[^\\s]+)?)?$"
     },
     "specs": {
       "type": "array",
