@@ -2,17 +2,17 @@
   "description": "snapshot versions of Angular for e2e testing",
   "private": true,
   "dependencies": {
-    "@angular/animations": "github:angular/animations-builds#01f292dba4c8c26a9cbdfcc5c4511c6be4126b0c",
-    "@angular/common": "github:angular/common-builds#64c2629d4906f79745019dc522b291b1dfcffddc",
-    "@angular/compiler": "github:angular/compiler-builds#f1ae9b5729813ff9110a2807437ad1ecf5a9914a",
-    "@angular/compiler-cli": "github:angular/compiler-cli-builds#d33a18c76e8abf1a875e4a298fc89be46b21bc4a",
-    "@angular/core": "github:angular/core-builds#13db2076f804a43ee2e4f429239f7cbe1eacfb31",
-    "@angular/forms": "github:angular/forms-builds#d70f75a695539dcfa59bd238ea7ae6817624cab9",
-    "@angular/language-service": "github:angular/language-service-builds#a367ee138a20e03df34dd583508605c32ff4a787",
-    "@angular/localize": "github:angular/localize-builds#be95c7297784d1897244d0328a1edb211f288757",
-    "@angular/platform-browser": "github:angular/platform-browser-builds#6406cb2cfef79d2e08a1e4746f275ac97bcadecb",
-    "@angular/platform-browser-dynamic": "github:angular/platform-browser-dynamic-builds#d1de4036718c558f86025460a2b1eed99773a3dc",
-    "@angular/platform-server": "github:angular/platform-server-builds#8f45d6411f005097ff4d5c8ccafbf969d2a69c31",
-    "@angular/router": "github:angular/router-builds#7b9ecc6c4d313704aef1cecc993e8850f71a625b"
+    "@angular/animations": "github:angular/animations-builds#7ce8862bfc16f895d2fbee2b04356a8debcec0e6",
+    "@angular/common": "github:angular/common-builds#a496f03109e1f6f1ce1c1b1b1fef8acba581df23",
+    "@angular/compiler": "github:angular/compiler-builds#7d1fa061597f2713ea62bab70ed68c5e0512b7f8",
+    "@angular/compiler-cli": "github:angular/compiler-cli-builds#5deeb654103a6176f9545f71bc37d39e75eec921",
+    "@angular/core": "github:angular/core-builds#73862d13eac7b3a655c7b17afe77a2e494b03ff2",
+    "@angular/forms": "github:angular/forms-builds#b9686214c99abfec12554fc34c09a7cee19407c0",
+    "@angular/language-service": "github:angular/language-service-builds#6ceaf12229e168e4555c140a743bd6ebfc198099",
+    "@angular/localize": "github:angular/localize-builds#4f89fe35212cc74c6740fc8ae366869708d158f5",
+    "@angular/platform-browser": "github:angular/platform-browser-builds#4cb24ec37a592072b55cf61308bbb3aaf2e22f1d",
+    "@angular/platform-browser-dynamic": "github:angular/platform-browser-dynamic-builds#cf22426666578277d9426bf93621774cf476fd35",
+    "@angular/platform-server": "github:angular/platform-server-builds#85088bd4d25fa313814a68fd4b32ac173d778e42",
+    "@angular/router": "github:angular/router-builds#2f3b09d691c16bc5177e5f58632a6ae5a57ec471"
   }
 }
