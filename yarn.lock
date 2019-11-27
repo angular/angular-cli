@@ -164,7 +164,12 @@
     "@bazel/buildifier-linux_x64" "0.29.0"
     "@bazel/buildifier-win32_x64" "0.29.0"
 
-"@bazel/hide-bazel-files@^0.41.0", "@bazel/hide-bazel-files@latest":
+"@bazel/hide-bazel-files@^0.42.0":
+  version "0.42.1"
+  resolved "https://registry.yarnpkg.com/@bazel/hide-bazel-files/-/hide-bazel-files-0.42.1.tgz#974d2b96578d885fec89c9a5912c00e9b7ed7cf8"
+  integrity sha512-PidYsso58ThOrBmoUL/3T7F6lvilSrohzwnzxhg1u5YSuPy7GfnUYYkOHsxEfYfPzoJNG0ud0A06E6A8KdqNxQ==
+
+"@bazel/hide-bazel-files@latest":
   version "0.41.0"
   resolved "https://registry.yarnpkg.com/@bazel/hide-bazel-files/-/hide-bazel-files-0.41.0.tgz#19de0490bb658b317f64e6b5e029e66e5c56b8e1"
   integrity sha512-RKDZ02VfA1Xpz9DJ5MP+PPXqz7mG/zDLFmYY+QXo9RGpRUEHX0/c50rio0mdd94IgheUypSKfdGRhdQnea/nFw==
@@ -174,26 +179,26 @@
   resolved "https://registry.yarnpkg.com/@bazel/ibazel/-/ibazel-0.10.3.tgz#2e2b8a1d3e885946eac41db2b1aa6801fb319887"
   integrity sha512-v1nXbMTHVlMM4z4uWp6XiRoHAyUlYggF1SOboLLWRp0+D22kWixqArWqnozLw2mOtnxr97BdLjluWiho6A8Hjg==
 
-"@bazel/jasmine@^0.41.0":
-  version "0.41.0"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-0.41.0.tgz#4e9c1622b6ceacdcf12740098d8c99fc3cff6bfb"
-  integrity sha512-vbZaTx05Ab5ZbJ1TDHjwWvtrDYBh4miXVJBdFeSZtquLQ0FQb9iNdMTuDHkEF9aq6nqG+rnjUoQjjmDLC/uRkg==
+"@bazel/jasmine@^0.42.0":
+  version "0.42.1"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-0.42.1.tgz#d26b4aee19e064805d45865e8a65798cbfa4b4e7"
+  integrity sha512-cXIUe1AOwY/2Q+C4JO1F24V4rfmYt/h4WDC52T/ZMD13F6ZUsuLrQqL5TKgzYaRP3fWNfphAt00+9QVsIkrs/g==
   dependencies:
     jasmine "~3.4.0"
     jasmine-core "~3.4.0"
     v8-coverage "1.0.9"
 
-"@bazel/karma@^0.41.0":
-  version "0.41.0"
-  resolved "https://registry.yarnpkg.com/@bazel/karma/-/karma-0.41.0.tgz#1ad3b48d8b5cf1e08ed266872c18344c8bd63e94"
-  integrity sha512-L23VC9EUFmrMCYJAT9qPnyezM5IErCJ8URpmXfRo/7IUJ04/l4vQeiyi4iNY7+zw9lbGf2I8seGaPFJrFtxdoQ==
+"@bazel/karma@^0.42.0":
+  version "0.42.1"
+  resolved "https://registry.yarnpkg.com/@bazel/karma/-/karma-0.42.1.tgz#f255e3181341592064cd2d0c70d72a3f3ea0ae5f"
+  integrity sha512-VRu/MXc5eqqVKILJeirR3EqJFGnrFkmG1XlcuhbGL1+eo+7pY3BUhdFXdihagXZG8QPDXlHbkY7GNOghAdl6DA==
   dependencies:
     tmp "0.1.0"
 
-"@bazel/typescript@^0.41.0":
-  version "0.41.0"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-0.41.0.tgz#b767c4972cc42fd76c118f21e83e98860afdc249"
-  integrity sha512-i+PXf5BR7aUEA49V+D8OatHonNCDm2MhtjFwEJ7yKKLTPEm4riHWSDASNuOi4iAAe+EB8eKe1Fxh8iSjh/hm4A==
+"@bazel/typescript@^0.42.0":
+  version "0.42.1"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-0.42.1.tgz#afa4c2e3de7ef60777fd7cd1828d1af57d09afb0"
+  integrity sha512-fObLUXlI3E9ZdGjCIGzXX6VkEo3x417PZvpIUBrVI3YONhbMoqAERB2yD4Mp8waoFKKu7ePnKCmoCWEa7PSTtA==
   dependencies:
     protobufjs "6.8.8"
     semver "5.6.0"
@@ -1495,7 +1500,7 @@ chalk@^2.0.0, chalk@^2.3.0, chalk@^2.4.2:
     escape-string-regexp "^1.0.5"
     supports-color "^5.3.0"
 
-chokidar@^2.1.1:
+chokidar@^2.0.4, chokidar@^2.1.1, chokidar@^2.1.2:
   version "2.1.8"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-2.1.8.tgz#804b3a7b6a99358c3c5c61e71d8728f041cff917"
   integrity sha512-ZmZUazfOzf0Nve7duiCKD23PFSCs4JPoYyccjUFF3aQkQadqBhfzhjkwBH2mNOG9cTBwhamM37EIsIkZw3nRgg==
@@ -2544,12 +2549,14 @@ fresh@0.5.2, fresh@^0.5.2:
   resolved "https://registry.yarnpkg.com/fresh/-/fresh-0.5.2.tgz#3d8cadd90d976569fa835ab1f8e4b23a105605a7"
   integrity sha1-PYyt2Q2XZWn6g1qx+OSyOhBWBac=
 
-fs-access@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/fs-access/-/fs-access-1.0.1.tgz#d6a87f262271cefebec30c553407fb995da8777a"
-  integrity sha1-1qh/JiJxzv6+wwxVNAf7mV2od3o=
+fs-extra@3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-3.0.1.tgz#3794f378c58b342ea7dbbb23095109c4b3b62291"
+  integrity sha1-N5TzeMWLNC6n27sjCVEJxLO2IpE=
   dependencies:
-    null-check "^1.0.0"
+    graceful-fs "^4.1.2"
+    jsonfile "^3.0.0"
+    universalify "^0.1.0"
 
 fs-extra@^7.0.1, fs-extra@~7.0.1:
   version "7.0.1"
@@ -3670,7 +3677,7 @@ lodash.memoize@~3.0.3:
   resolved "https://registry.yarnpkg.com/lodash.memoize/-/lodash.memoize-3.0.4.tgz#2dcbd2c287cbc0a55cc42328bd0c736150d53e3f"
   integrity sha1-LcvSwofLwKVcxCMovQxzYVDVPj8=
 
-lodash@^4.17.0, lodash@^4.17.11, lodash@^4.17.14, lodash@~4.17.15:
+lodash@^4.17.0, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.14, lodash@~4.17.15:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
@@ -4872,12 +4879,7 @@ require-main-filename@^2.0.0:
   resolved "https://registry.yarnpkg.com/require-main-filename/-/require-main-filename-2.0.0.tgz#d0b329ecc7cc0f61649f62215be69af54aa8989b"
   integrity sha512-NKN5kMDylKuldxYLSUfrbo5Tuzh4hd+2E8NPPX02mZtn1VuREQToYe/ZdlJy+J3uCpfaiGF05e7B8W0iXbQHmg==
 
-requirejs@2.3.5:
-  version "2.3.5"
-  resolved "https://registry.yarnpkg.com/requirejs/-/requirejs-2.3.5.tgz#617b9acbbcb336540ef4914d790323a8d4b861b0"
-  integrity sha512-svnO+aNcR/an9Dpi44C7KSAy5fFGLtmPbaaCeQaklUz8BQhS64tWWIIlvEA5jrWICzlO/X9KSzSeXFnZdBu8nw==
-
-requires-port@^1.0.0:
+requires-port@1.x.x, requires-port@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
   integrity sha1-kl0mAdOaxIXgkc8NpcbmlNw9yv8=
