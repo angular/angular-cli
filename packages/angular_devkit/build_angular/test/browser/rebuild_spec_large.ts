@@ -315,13 +315,6 @@ describe('Browser Builder rebuilds', () => {
   });
 
   it('rebuilds after errors in AOT', async () => {
-    // DISABLED_FOR_IVY - These should pass but are currently not supported
-    if (!veEnabled) {
-      pending('Broken in Ivy: https://github.com/angular/angular/issues/32214');
-
-      return;
-    }
-
     // Save the original contents of `./src/app/app.component.ts`.
     const origContent = virtualFs.fileBufferToString(
       host.scopedSync().read(normalize('src/app/app.component.ts')),
@@ -329,7 +322,10 @@ describe('Browser Builder rebuilds', () => {
     // Add a major static analysis error on a non-main file to the initial build.
     host.replaceInFile('./src/app/app.component.ts', `'app-root'`, `(() => 'app-root')()`);
 
-    const overrides = { watch: true, aot: true };
+    // `selector must be a string` errors on VE are part of the emit result, but on Ivy they only
+    // show up in getNgSemanticDiagnostics. Since getNgSemanticDiagnostics is only called on the
+    // type checker, we must disable it to get a failing fourth build with Ivy.
+    const overrides = { watch: true, aot: true, forkTypeChecker: veEnabled };
     const logger = new TestLogger('rebuild-aot-errors');
     const staticAnalysisError = !veEnabled
       ? 'selector must be a string'
@@ -346,16 +342,18 @@ describe('Browser Builder rebuilds', () => {
           switch (buildNumber) {
             case 1:
               // The first build should error out with a static analysis error.
-              expect(buildEvent.success).toBe(false);
-              expect(logger.includes(staticAnalysisError)).toBe(true);
+              expect(buildEvent.success).toBe(false, 'First build should not succeed.');
+              expect(logger.includes(staticAnalysisError)).toBe(true,
+                'First build should have static analysis error.');
               logger.clear();
               // Fix the static analysis error.
               host.writeMultipleFiles({ 'src/app/app.component.ts': origContent });
               break;
 
             case 2:
-              expect(buildEvent.success).toBe(true);
-              expect(logger.includes(staticAnalysisError)).toBe(false);
+              expect(buildEvent.success).toBe(true, 'Second build should succeed.');
+              expect(logger.includes(staticAnalysisError)).toBe(false,
+                'Second build should not have static analysis error.');
               logger.clear();
               // Add an syntax error to a non-main file.
               host.appendToFile('src/app/app.component.ts', `]]]`);
@@ -363,9 +361,11 @@ describe('Browser Builder rebuilds', () => {
 
             case 3:
               // The third build should have TS syntax error.
-              expect(buildEvent.success).toBe(false);
-              expect(logger.includes(syntaxError)).toBe(true);
-              expect(logger.includes(staticAnalysisError)).toBe(false);
+              expect(buildEvent.success).toBe(false, 'Third build should not succeed.');
+              expect(logger.includes(syntaxError)).toBe(true,
+                'Third build should have syntax analysis error.');
+              expect(logger.includes(staticAnalysisError)).toBe(false,
+                'Third build should not have static analysis error.');
               logger.clear();
               // Fix the syntax error, but add the static analysis error again.
               host.writeMultipleFiles({
@@ -377,9 +377,11 @@ describe('Browser Builder rebuilds', () => {
               break;
 
             case 4:
-              expect(buildEvent.success).toBe(false);
-              expect(logger.includes(syntaxError)).toBe(false);
-              expect(logger.includes(staticAnalysisError)).toBe(true);
+              expect(buildEvent.success).toBe(false, 'Fourth build should not succeed.');
+              expect(logger.includes(syntaxError)).toBe(false,
+                'Fourth build should not have syntax analysis error.');
+              expect(logger.includes(staticAnalysisError)).toBe(true,
+                'Fourth build should have static analysis error.');
               logger.clear();
               // Restore the file to a error-less state.
               host.writeMultipleFiles({ 'src/app/app.component.ts': origContent });
@@ -387,9 +389,11 @@ describe('Browser Builder rebuilds', () => {
 
             case 5:
               // The fifth build should have everything fixed..
-              expect(buildEvent.success).toBe(true);
-              expect(logger.includes(syntaxError)).toBe(false);
-              expect(logger.includes(staticAnalysisError)).toBe(false);
+              expect(buildEvent.success).toBe(true, 'Fifth build should succeed.');
+              expect(logger.includes(syntaxError)).toBe(false,
+                'Fifth build should not have syntax analysis error.');
+              expect(logger.includes(staticAnalysisError)).toBe(false,
+                'Fifth build should not have static analysis error.');
               break;
           }
         }),
