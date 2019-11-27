@@ -92,10 +92,11 @@ export default function(args: ParsedArgs, logger: logging.Logger) {
   if (args['ve']) {
     // tslint:disable-next-line:no-console
     console.warn('********* VE Enabled ***********');
-  } else if (args.shard !== undefined) {
+  } else {
     // CI is really flaky with NGCC
     // This is a working around test order and isolation issues.
-    execSync('./node_modules/.bin/ngcc', { stdio: 'inherit' });
+    console.warn('********* Running ngcc ***********');
+    execSync('yarn ngcc', { stdio: 'inherit' });
   }
 
   if (args.large) {
