@@ -11,6 +11,7 @@ import {
   JsonObject,
   JsonParseMode,
   experimental,
+  isJsonObject,
   normalize,
   parseJson,
   parseJsonAst,
@@ -213,7 +214,7 @@ export function migrateLegacyGlobalConfig(): boolean {
     if (existsSync(legacyGlobalConfigPath)) {
       const content = readFileSync(legacyGlobalConfigPath, 'utf-8');
       const legacy = parseJson(content, JsonParseMode.Loose);
-      if (!legacy || typeof legacy != 'object' || Array.isArray(legacy)) {
+      if (!isJsonObject(legacy)) {
         return false;
       }
 
@@ -224,16 +225,13 @@ export function migrateLegacyGlobalConfig(): boolean {
         cli['packageManager'] = legacy.packageManager;
       }
 
-      if (legacy.defaults && typeof legacy.defaults == 'object' && !Array.isArray(legacy.defaults)
-          && legacy.defaults.schematics && typeof legacy.defaults.schematics == 'object'
-          && !Array.isArray(legacy.defaults.schematics)
-          && typeof legacy.defaults.schematics.collection == 'string') {
+      if (isJsonObject(legacy.defaults)
+        && isJsonObject(legacy.defaults.schematics)
+        && typeof legacy.defaults.schematics.collection == 'string') {
         cli['defaultCollection'] = legacy.defaults.schematics.collection;
       }
 
-      if (legacy.warnings && typeof legacy.warnings == 'object'
-          && !Array.isArray(legacy.warnings)) {
-
+      if (isJsonObject(legacy.warnings)) {
         const warnings: JsonObject = {};
         if (typeof legacy.warnings.versionMismatch == 'boolean') {
           warnings['versionMismatch'] = legacy.warnings.versionMismatch;
@@ -265,7 +263,7 @@ function getLegacyPackageManager(): string | null {
       const content = readFileSync(legacyGlobalConfigPath, 'utf-8');
 
       const legacy = parseJson(content, JsonParseMode.Loose);
-      if (!legacy || typeof legacy != 'object' || Array.isArray(legacy)) {
+      if (!isJsonObject(legacy)) {
         return null;
       }
 
@@ -294,7 +292,7 @@ export async function getSchematicDefaults(
       result = { ...result, ...(schematicObject as {}) };
     }
     const collectionObject = workspace.getSchematics()[collection];
-    if (typeof collectionObject == 'object' && !Array.isArray(collectionObject)) {
+    if (isJsonObject(collectionObject)) {
       result = { ...result, ...(collectionObject[schematic] as {}) };
     }
 
@@ -309,7 +307,7 @@ export async function getSchematicDefaults(
         result = { ...result, ...(schematicObject as {}) };
       }
       const collectionObject = workspace.getSchematics()[collection];
-      if (typeof collectionObject == 'object' && !Array.isArray(collectionObject)) {
+      if (isJsonObject(collectionObject)) {
         result = { ...result, ...(collectionObject[schematic] as {}) };
       }
     }
@@ -321,7 +319,7 @@ export async function getSchematicDefaults(
         result = { ...result, ...(schematicObject as {}) };
       }
       const collectionObject = workspace.getProjectSchematics(project)[collection];
-      if (typeof collectionObject == 'object' && !Array.isArray(collectionObject)) {
+      if (isJsonObject(collectionObject)) {
         result = { ...result, ...(collectionObject[schematic] as {}) };
       }
     }
@@ -337,7 +335,7 @@ export async function isWarningEnabled(warning: string): Promise<boolean> {
     const project = getProjectByCwd(workspace);
     if (project && workspace.getProjectCli(project)) {
       const warnings = workspace.getProjectCli(project)['warnings'];
-      if (typeof warnings == 'object' && !Array.isArray(warnings)) {
+      if (isJsonObject(warnings)) {
         const value = warnings[warning];
         if (typeof value == 'boolean') {
           return value;
@@ -346,7 +344,7 @@ export async function isWarningEnabled(warning: string): Promise<boolean> {
     }
     if (workspace.getCli()) {
       const warnings = workspace.getCli()['warnings'];
-      if (typeof warnings == 'object' && !Array.isArray(warnings)) {
+      if (isJsonObject(warnings)) {
         const value = warnings[warning];
         if (typeof value == 'boolean') {
           return value;
@@ -358,7 +356,7 @@ export async function isWarningEnabled(warning: string): Promise<boolean> {
   workspace = await getWorkspace('global');
   if (workspace && workspace.getCli()) {
     const warnings = workspace.getCli()['warnings'];
-    if (typeof warnings == 'object' && !Array.isArray(warnings)) {
+    if (isJsonObject(warnings)) {
       const value = warnings[warning];
       if (typeof value == 'boolean') {
         return value;
