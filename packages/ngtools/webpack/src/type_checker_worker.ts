@@ -7,7 +7,7 @@
  */
 import * as process from 'process';
 import { time, timeEnd } from './benchmark';
-import { CancellationToken } from './gather_diagnostics';
+import { CancellationToken } from './diagnostics';
 import {
   AUTO_START_ARG,
   TypeChecker,

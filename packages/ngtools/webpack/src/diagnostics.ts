@@ -5,9 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Diagnostic, Diagnostics, Program } from '@angular/compiler-cli';
+import {
+  CompilerHost, Diagnostic, Diagnostics,
+  Program, formatDiagnostics, isNgDiagnostic,
+} from '@angular/compiler-cli';
 import * as ts from 'typescript';
 import { time, timeEnd } from './benchmark';
+import { WebpackCompilerHost } from './compiler_host';
 
 export enum DiagnosticMode {
   Syntactic = 1 << 0,
@@ -101,4 +105,58 @@ export function gatherDiagnostics(
   }
 
   return allDiagnostics;
+}
+
+export function reportDiagnostics(
+  diagnostics: Diagnostics,
+  compilerHost: WebpackCompilerHost & CompilerHost,
+  reportError: (msg: string) => void,
+  reportWarning: (msg: string) => void,
+) {
+  const tsErrors = [];
+  const tsWarnings = [];
+  const ngErrors = [];
+  const ngWarnings = [];
+
+  for (const diagnostic of diagnostics) {
+    switch (diagnostic.category) {
+      case ts.DiagnosticCategory.Error:
+        if (isNgDiagnostic(diagnostic)) {
+          ngErrors.push(diagnostic);
+        } else {
+          tsErrors.push(diagnostic);
+        }
+        break;
+      case ts.DiagnosticCategory.Message:
+      case ts.DiagnosticCategory.Suggestion:
+      // Warnings?
+      case ts.DiagnosticCategory.Warning:
+        if (isNgDiagnostic(diagnostic)) {
+          ngWarnings.push(diagnostic);
+        } else {
+          tsWarnings.push(diagnostic);
+        }
+        break;
+    }
+  }
+
+  if (tsErrors.length > 0) {
+    const message = ts.formatDiagnosticsWithColorAndContext(tsErrors, compilerHost);
+    reportError(message);
+  }
+
+  if (tsWarnings.length > 0) {
+    const message = ts.formatDiagnosticsWithColorAndContext(tsWarnings, compilerHost);
+    reportWarning(message);
+  }
+
+  if (ngErrors.length > 0) {
+    const message = formatDiagnostics(ngErrors);
+    reportError(message);
+  }
+
+  if (ngWarnings.length > 0) {
+    const message = formatDiagnostics(ngWarnings);
+    reportWarning(message);
+  }
 }
