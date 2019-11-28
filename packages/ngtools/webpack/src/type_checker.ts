@@ -18,7 +18,10 @@ import {
 import * as ts from 'typescript';
 import { time, timeEnd } from './benchmark';
 import { WebpackCompilerHost } from './compiler_host';
-import { CancellationToken, DiagnosticMode, gatherDiagnostics } from './gather_diagnostics';
+import {
+  CancellationToken, DiagnosticMode,
+  gatherDiagnostics, reportDiagnostics,
+} from './diagnostics';
 import { LogMessage, TypeCheckerMessage } from './type_checker_messages';
 
 
@@ -106,21 +109,12 @@ export class TypeChecker {
 
     // Report diagnostics.
     if (!cancellationToken.isCancellationRequested()) {
-      const errors = allDiagnostics.filter((d) => d.category === ts.DiagnosticCategory.Error);
-      const warnings = allDiagnostics.filter((d) => d.category === ts.DiagnosticCategory.Warning);
-
-      if (errors.length > 0) {
-        const message = formatDiagnostics(errors);
-        this.sendMessage(new LogMessage('error', 'ERROR in ' + message));
-      } else {
-        // Reset the changed file tracker only if there are no errors.
-        this._compilerHost.resetChangedFileTracker();
-      }
-
-      if (warnings.length > 0) {
-        const message = formatDiagnostics(warnings);
-        this.sendMessage(new LogMessage('warn', 'WARNING in ' + message));
-      }
+      reportDiagnostics(
+        allDiagnostics,
+        this._compilerHost,
+        msg => this.sendMessage(new LogMessage('error', 'ERROR in ' + msg)),
+        msg => this.sendMessage(new LogMessage('warn', 'WARNING in ' + msg)),
+      );
     }
   }
 
