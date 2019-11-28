@@ -22,6 +22,9 @@ export default async function() {
     await expectFileNotToExist(`${outputPath}/main-es2015.js`);
     await expectFileToMatch(`${outputPath}/main.js`, lang);
 
+    // Verify the HTML lang attribute is present
+    await expectFileToMatch(`${outputPath}/index.html`, `lang="${lang}"`);
+
     // Execute Application E2E tests with dev server
     await ng('e2e', `--configuration=${lang}`, '--port=0');
 

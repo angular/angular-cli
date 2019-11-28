@@ -57,7 +57,7 @@ export function execute(
   const tsConfig = readTsconfig(options.tsConfig, root);
   const target = tsConfig.options.target || ScriptTarget.ES5;
   const baseOutputPath = path.resolve(root, options.outputPath);
-  let outputPaths: undefined | string[];
+  let outputPaths: undefined | Map<string, string>;
 
   return from(initialize(options, context, transforms.webpackConfiguration)).pipe(
     concatMap(({ config, i18n }) => {
@@ -81,7 +81,7 @@ export function execute(
             emittedFiles,
             i18n,
             baseOutputPath,
-            outputPaths,
+            Array.from(outputPaths.values()),
             [],
             // tslint:disable-next-line: no-non-null-assertion
             webpackStats.outputPath!,

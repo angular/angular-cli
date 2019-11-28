@@ -31,6 +31,9 @@ export async function executeTest() {
     await expectFileToMatch(`${outputPath}/vendor-es5.js`, lang);
     await expectFileToMatch(`${outputPath}/vendor-es2015.js`, lang);
 
+    // Verify the HTML lang attribute is present
+    await expectFileToMatch(`${outputPath}/index.html`, `lang="${lang}"`);
+
     // Verify the locale data is registered using the global files
     await expectFileToMatch(`${outputPath}/vendor-es5.js`, '.ng.common.locales');
     await expectFileToMatch(`${outputPath}/vendor-es2015.js`, '.ng.common.locales');
