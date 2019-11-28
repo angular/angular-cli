@@ -181,7 +181,7 @@ export async function setupI18nConfig(useLocalize = true, format: keyof typeof f
     for (const { lang, outputPath } of langTranslations) {
       if (!useLocalize) {
         if (lang == sourceLocale) {
-          buildConfigs[lang] = { outputPath };
+          buildConfigs[lang] = { outputPath, i18nLocale: lang };
         } else {
           buildConfigs[lang] = {
             outputPath,
@@ -261,6 +261,9 @@ export default async function () {
     await ng('build', `--configuration=${lang}`);
     await expectFileToMatch(`${outputPath}/main-es5.js`, translation.helloPartial);
     await expectFileToMatch(`${outputPath}/main-es2015.js`, translation.helloPartial);
+
+    // Verify the HTML lang attribute is present
+    await expectFileToMatch(`${outputPath}/index.html`, `lang="${lang}"`);
 
     // Execute Application E2E tests with dev server
     await ng('e2e', `--configuration=${lang}`, '--port=0');
