@@ -28,7 +28,7 @@
     "@angular/compiler-cli": "<%= latestVersions.Angular %>",
     "@angular/language-service": "<%= latestVersions.Angular %>",
     "@types/node": "^12.11.1",<% if (!minimal) { %>
-    "@types/jasmine": "~3.4.0",
+    "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
     "codelyzer": "^5.1.2",
     "jasmine-core": "~3.5.0",
