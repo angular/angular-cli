@@ -8017,10 +8017,10 @@ package-json@^6.3.0:
     registry-url "^5.0.0"
     semver "^6.2.0"
 
-pacote@10.1.5:
-  version "10.1.5"
-  resolved "https://registry.yarnpkg.com/pacote/-/pacote-10.1.5.tgz#ff612df2980dcce37acb0556b50e17969f36c701"
-  integrity sha512-IIPOldAcvqGQdITIOEyBpKIuWHhQ1oCfaU4BHJAeyZ11DtLWNDAo8P8W/wYEw7hPPboKdge1kD4es9vhEHCXeA==
+pacote@10.2.0:
+  version "10.2.0"
+  resolved "https://registry.yarnpkg.com/pacote/-/pacote-10.2.0.tgz#5a1b8674a1ee7e0912d57389e41151a81e1de6ab"
+  integrity sha512-gezxRsBmUAQ/tPT6js8wSsPTyeIr6rky7KkTKmBzvvAuapm2b8sNK+gjHwOat8DjXpKiN84yp20MzFEzNRH1YA==
   dependencies:
     cacache "^13.0.1"
     chownr "^1.1.3"
