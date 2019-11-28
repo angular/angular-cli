@@ -37,6 +37,9 @@ export default async function() {
     await expectFileToMatch(`${outputPath}/main.js`, translation.helloPartial);
     await expectToFail(() => expectFileToMatch(`${outputPath}/main.js`, '$localize`'));
 
+    // Verify the HTML lang attribute is present
+    await expectFileToMatch(`${outputPath}/index.html`, `lang="${lang}"`);
+
     // Execute Application E2E tests with dev server
     await ng('e2e', `--configuration=${lang}`, '--port=0');
 

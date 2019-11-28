@@ -230,7 +230,7 @@ export function buildWebpackBrowser(
   const host = new NodeJsSyncHost();
   const root = normalize(context.workspaceRoot);
   const baseOutputPath = path.resolve(context.workspaceRoot, options.outputPath);
-  let outputPaths: undefined | string[];
+  let outputPaths: undefined | Map<string, string>;
 
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
@@ -304,7 +304,7 @@ export function buildWebpackBrowser(
                   emittedFiles,
                   i18n,
                   baseOutputPath,
-                  outputPaths,
+                  Array.from(outputPaths.values()),
                   scriptsEntryPointName,
                   // tslint:disable-next-line: no-non-null-assertion
                   webpackStats.outputPath!,
@@ -529,7 +529,7 @@ export function buildWebpackBrowser(
                           ),
                         },
                       ],
-                      outputPaths,
+                      Array.from(outputPaths.values()),
                       '',
                     );
                   } catch (err) {
@@ -561,7 +561,7 @@ export function buildWebpackBrowser(
                       normalize(projectRoot),
                       projectSourceRoot === undefined ? undefined : normalize(projectSourceRoot),
                     ),
-                    outputPaths,
+                    Array.from(outputPaths.values()),
                     context.workspaceRoot,
                   );
                 } catch (err) {
@@ -646,7 +646,7 @@ export function buildWebpackBrowser(
                   emittedFiles,
                   i18n,
                   baseOutputPath,
-                  outputPaths,
+                  Array.from(outputPaths.values()),
                   scriptsEntryPointName,
                   // tslint:disable-next-line: no-non-null-assertion
                   webpackStats.outputPath!,
@@ -660,7 +660,7 @@ export function buildWebpackBrowser(
             }
 
             if (options.index) {
-              for (const outputPath of outputPaths) {
+              for (const [locale, outputPath] of outputPaths.entries()) {
                 try {
                   await generateIndex(
                     outputPath,
@@ -670,6 +670,8 @@ export function buildWebpackBrowser(
                     noModuleFiles,
                     moduleFiles,
                     transforms.indexHtml,
+                    // i18nLocale is used when Ivy is disabled
+                    locale || options.i18nLocale,
                   );
                 } catch (err) {
                   return { success: false, error: mapErrorToMessage(err) };
@@ -678,7 +680,7 @@ export function buildWebpackBrowser(
             }
 
             if (!options.watch && options.serviceWorker) {
-              for (const outputPath of outputPaths) {
+              for (const outputPath of outputPaths.values()) {
                 try {
                   await augmentAppWithServiceWorker(
                     host,
@@ -703,7 +705,7 @@ export function buildWebpackBrowser(
               ...event,
               baseOutputPath,
               outputPath: baseOutputPath,
-              outputPaths: outputPaths || [baseOutputPath],
+              outputPaths: outputPaths && Array.from(outputPaths.values()) || [baseOutputPath],
             } as BrowserBuilderOutput),
         ),
       );
@@ -719,6 +721,7 @@ function generateIndex(
   noModuleFiles: EmittedFiles[] | undefined,
   moduleFiles: EmittedFiles[] | undefined,
   transformer?: IndexHtmlTransform,
+  locale?: string,
 ): Promise<void> {
   const host = new NodeJsSyncHost();
 
@@ -736,7 +739,7 @@ function generateIndex(
     styles: options.styles,
     postTransform: transformer,
     crossOrigin: options.crossOrigin,
-    lang: options.i18nLocale,
+    lang: locale,
   }).toPromise();
 }
 
