@@ -277,7 +277,15 @@ export function serveWebpackBrowser(
         `);
       }
 
-      return runWebpackDevServer(webpackConfig, context, { logging: loggingFn }).pipe(
+      return runWebpackDevServer(
+        webpackConfig,
+        context,
+        {
+          logging: loggingFn,
+          webpackFactory: require('webpack') as typeof webpack,
+          webpackDevServerFactory: require('webpack-dev-server') as typeof WebpackDevServer,
+        },
+      ).pipe(
         map(buildEvent => {
           // Resolve serve address.
           const serverAddress = url.format({
