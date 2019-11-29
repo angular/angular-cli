@@ -277,7 +277,14 @@ export function serveWebpackBrowser(
         `);
       }
 
-      return runWebpackDevServer(webpackConfig, context, { logging: loggingFn }).pipe(
+      return runWebpackDevServer(
+        webpackConfig,
+        context,
+        {
+          logging: loggingFn,
+          webpackFactory: require('webpack') as typeof webpack,
+        },
+      ).pipe(
         map(buildEvent => {
           // Resolve serve address.
           const serverAddress = url.format({
@@ -442,7 +449,7 @@ export function buildServerConfig(
   const servePath = buildServePath(serverOptions, browserOptions, logger);
   const { styles, scripts } = normalizeOptimization(browserOptions.optimization);
 
-  const config: WebpackDevServer.Configuration & { logLevel: string} = {
+  const config: WebpackDevServer.Configuration & { logLevel: string } = {
     host: serverOptions.host,
     port: serverOptions.port,
     headers: { 'Access-Control-Allow-Origin': '*' },
