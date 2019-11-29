@@ -11,8 +11,8 @@ const routes: Routes = [
 @NgModule({
   declarations: [],
   imports: [<% if (commonModule) { %>
-    CommonModule<%= routing || lazyRouteWithRouteModule ? ',' : '' %><% } %><% if (routing || lazyRouteWithRouteModule) { %>
-    <%= classify(name) %>RoutingModule<% } %><%= lazyRouteWithoutRouteModule ? ',' : '' %><% if (lazyRouteWithoutRouteModule) { %>
+    CommonModule<% } %><% if (routing || lazyRouteWithRouteModule) { %>,
+    <%= classify(name) %>RoutingModule<% } %><% if (lazyRouteWithoutRouteModule) { %>,
     RouterModule.forChild(routes)<% } %>
   ]
 })

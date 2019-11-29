@@ -139,7 +139,7 @@ export default function (options: ModuleOptions): Rule {
     }
 
     let routingModulePath: Path | undefined;
-    const isLazyLoadedModuleGen = options.route && options.module;
+    const isLazyLoadedModuleGen = !!(options.route && options.module);
     if (isLazyLoadedModuleGen) {
       options.routingScope = RoutingScope.Child;
       routingModulePath = getRoutingModulePath(host, options.module as string);
@@ -150,7 +150,7 @@ export default function (options: ModuleOptions): Rule {
     options.path = parsedPath.path;
 
     const templateSource = apply(url('./files'), [
-      options.routing || isLazyLoadedModuleGen && !!routingModulePath
+      options.routing || (isLazyLoadedModuleGen && routingModulePath)
         ? noop()
         : filter(path => !path.endsWith('-routing.module.ts.template')),
       applyTemplates({
@@ -158,7 +158,7 @@ export default function (options: ModuleOptions): Rule {
         'if-flat': (s: string) => options.flat ? '' : s,
         lazyRoute: isLazyLoadedModuleGen,
         lazyRouteWithoutRouteModule: isLazyLoadedModuleGen && !routingModulePath,
-        lazyRouteWithRouteModule: isLazyLoadedModuleGen && routingModulePath,
+        lazyRouteWithRouteModule: isLazyLoadedModuleGen && !!routingModulePath,
         ...options,
       }),
       move(parsedPath.path),
