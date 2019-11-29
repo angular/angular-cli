@@ -16,6 +16,8 @@ import { getEmittedFiles } from '../utils';
 import { BuildResult, WebpackFactory, WebpackLoggingCallback } from '../webpack';
 import { Schema as WebpackDevServerBuilderSchema } from './schema';
 
+export type WebpackDevServerFactory = typeof WebpackDevServer;
+
 export type DevServerBuildOutput = BuildResult & {
   port: number;
   family: string;
@@ -29,6 +31,7 @@ export function runWebpackDevServer(
     devServerConfig?: WebpackDevServer.Configuration,
     logging?: WebpackLoggingCallback,
     webpackFactory?: WebpackFactory,
+    webpackDevServerFactory?: WebpackDevServerFactory,
   } = {},
 ): Observable<DevServerBuildOutput> {
   const createWebpack = (c: webpack.Configuration) => {
@@ -43,6 +46,18 @@ export function runWebpackDevServer(
       return of(webpack(c));
     }
   };
+
+  const createWebpackDevServer = (
+    webpack: webpack.Compiler | webpack.MultiCompiler,
+    config: WebpackDevServer.Configuration,
+  ) => {
+    if (options.webpackDevServerFactory) {
+      return new options.webpackDevServerFactory(webpack, config);
+    }
+
+    return new WebpackDevServer(webpack, config);
+  };
+
   const log: WebpackLoggingCallback = options.logging
     || ((stats, config) => context.logger.info(stats.toString(config.stats)));
 
@@ -55,7 +70,7 @@ export function runWebpackDevServer(
 
   return createWebpack(config).pipe(
     switchMap(webpackCompiler => new Observable<DevServerBuildOutput>(obs => {
-      const server = new WebpackDevServer(webpackCompiler, devServerConfig);
+      const server = createWebpackDevServer(webpackCompiler, devServerConfig);
       let result: DevServerBuildOutput;
 
       webpackCompiler.hooks.done.tap('build-webpack', (stats) => {
