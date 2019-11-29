@@ -283,6 +283,7 @@ export function serveWebpackBrowser(
         {
           logging: loggingFn,
           webpackFactory: require('webpack') as typeof webpack,
+          webpackDevServerFactory: require('webpack-dev-server') as typeof WebpackDevServer,
         },
       ).pipe(
         map(buildEvent => {
