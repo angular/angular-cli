@@ -97,7 +97,7 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
 
   const basePath = path.dirname(options.filename);
   const filename = path.basename(options.filename);
-  const downlevelFilename = filename.replace('es2015', 'es5');
+  const downlevelFilename = filename.replace(/\-es20\d{2}/, '-es5');
   const downlevel = !options.optimizeOnly;
 
   // if code size is larger than 500kB, manually handle sourcemaps with newer source-map package.
@@ -403,9 +403,9 @@ async function processRuntime(
 
   // Adjust lazy loaded scripts to point to the proper variant
   // Extra spacing is intentional to align source line positions
-  downlevelCode = downlevelCode.replace('"-es2015.', '   "-es5.');
+  downlevelCode = downlevelCode.replace(/"\-es20\d{2}\./, '   "-es5.');
 
-  const downlevelFilePath = options.filename.replace('es2015', 'es5');
+  const downlevelFilePath = options.filename.replace(/\-es20\d{2}/, '-es5');
   let downlevelMap;
   let result;
   if (options.optimize) {

@@ -81,14 +81,14 @@
     "typescript": "3.6.4"
   },
   "devDependencies": {
-    "@angular/compiler": "9.0.0-rc.1",
-    "@angular/compiler-cli": "9.0.0-rc.1",
-    "@bazel/bazel": "1.0.0",
+    "@angular/compiler": "9.0.0-rc.3",
+    "@angular/compiler-cli": "9.0.0-rc.3",
+    "@bazel/bazel": "1.2.0",
     "@bazel/buildifier": "0.29.0",
-    "@bazel/jasmine": "0.39.0",
-    "@bazel/karma": "0.39.0",
-    "@bazel/labs": "0.39.0",
-    "@bazel/typescript": "0.39.0",
+    "@bazel/jasmine": "0.42.1",
+    "@bazel/karma": "0.42.1",
+    "@bazel/labs": "0.42.1",
+    "@bazel/typescript": "0.42.1",
     "@types/babel__core": "7.1.3",
     "@types/browserslist": "^4.4.0",
     "@types/caniuse-lite": "^1.0.0",
@@ -99,11 +99,12 @@
     "@types/find-cache-dir": "^2.0.0",
     "@types/glob": "^7.0.0",
     "@types/inquirer": "^0.0.44",
-    "@types/jasmine": "~3.4.0",
+    "@types/jasmine": "~3.5.0",
     "@types/karma": "^3.0.2",
     "@types/loader-utils": "^1.1.3",
     "@types/minimist": "^1.2.0",
     "@types/node": "10.12.30",
+    "@types/npm-package-arg": "^6.1.0",
     "@types/request": "^2.47.1",
     "@types/rimraf": "^2.0.2",
     "@types/semver": "^6.0.0",
@@ -129,7 +130,7 @@
     "minimist": "^1.2.0",
     "npm-registry-client": "8.6.0",
     "ora": "^4.0.2",
-    "pacote": "10.1.3",
+    "pacote": "10.1.5",
     "pidtree": "^0.3.0",
     "pidusage": "^2.0.17",
     "rxjs": "6.5.3",
@@ -145,7 +146,7 @@
     "ts-node": "^5.0.0",
     "tslint-no-circular-imports": "^0.7.0",
     "tslint-sonarts": "1.9.0",
-    "verdaccio": "4.3.4"
+    "verdaccio": "4.3.5"
   },
   "husky": {
     "hooks": {

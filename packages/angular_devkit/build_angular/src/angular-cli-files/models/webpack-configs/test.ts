@@ -12,15 +12,6 @@ import * as webpack from 'webpack';
 import { WebpackConfigOptions, WebpackTestOptions } from '../build-options';
 import { getSourceMapDevTool, isPolyfillsEntry } from './utils';
 
-
-/**
- * Enumerate loaders and their dependencies from this file to let the dependency validator
- * know they are used.
- *
- * require('istanbul-instrumenter-loader')
- *
- */
-
 export function getTestConfig(
   wco: WebpackConfigOptions<WebpackTestOptions>,
 ): webpack.Configuration {
@@ -48,7 +39,7 @@ export function getTestConfig(
 
     extraRules.push({
       test: /\.(jsx?|tsx?)$/,
-      loader: 'istanbul-instrumenter-loader',
+      loader: require.resolve('istanbul-instrumenter-loader'),
       options: { esModules: true },
       enforce: 'post',
       exclude,

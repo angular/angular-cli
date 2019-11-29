@@ -11,7 +11,7 @@ import { join, json, logging, normalize, tags, virtualFs } from '@angular-devkit
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Observable, from, of } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { concatMap, map, switchMap } from 'rxjs/operators';
 import { ScriptTarget } from 'typescript';
 import * as webpack from 'webpack';
@@ -256,6 +256,7 @@ export function buildWebpackBrowser(
       const startTime = Date.now();
 
       return runWebpack(config, context, {
+        webpackFactory: require('webpack') as typeof webpack,
         logging:
           transforms.logging ||
           (useBundleDownleveling
@@ -369,7 +370,7 @@ export function buildWebpackBrowser(
                 }
                 // If not optimizing then ES2015 polyfills do not need processing
                 // Unlike other module scripts, it is never downleveled
-                const es2015Polyfills = file.file.startsWith('polyfills-es2015');
+                const es2015Polyfills = file.file.startsWith('polyfills-es20');
                 if (!actionOptions.optimize && es2015Polyfills) {
                   continue;
                 }
@@ -391,7 +392,7 @@ export function buildWebpackBrowser(
 
                 if (es5Polyfills) {
                   fs.unlinkSync(filename);
-                  filename = filename.replace('-es2015', '');
+                  filename = filename.replace(/\-es20\d{2}/, '');
                 }
 
                 // Record the bundle processing action
@@ -416,8 +417,8 @@ export function buildWebpackBrowser(
 
                 // Add the newly created ES5 bundles to the index as nomodule scripts
                 const newFilename = es5Polyfills
-                  ? file.file.replace('-es2015', '')
-                  : file.file.replace('es2015', 'es5');
+                  ? file.file.replace(/\-es20\d{2}/, '')
+                  : file.file.replace(/\-es20\d{2}/, '-es5');
                 noModuleFiles.push({ ...file, file: newFilename });
               }
 

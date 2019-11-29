@@ -148,7 +148,7 @@ export class BundleActionCache {
     cacheEntry = entries[CacheKey.DownlevelCode];
     if (cacheEntry) {
       result.downlevel = {
-        filename: action.filename.replace('es2015', 'es5'),
+        filename: action.filename.replace(/\-es20\d{2}/, '-es5'),
         size: cacheEntry.size,
         integrity: cacheEntry.integrity,
       };
@@ -158,7 +158,7 @@ export class BundleActionCache {
       cacheEntry = entries[CacheKey.DownlevelMap];
       if (cacheEntry) {
         result.downlevel.map = {
-          filename: action.filename.replace('es2015', 'es5') + '.map',
+          filename: action.filename.replace(/\-es20\d{2}/, '-es5') + '.map',
           size: cacheEntry.size,
         };
 

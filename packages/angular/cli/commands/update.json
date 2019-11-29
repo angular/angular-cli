@@ -44,7 +44,15 @@
         },
         "migrateOnly": {
           "description": "Only perform a migration, does not update the installed version.",
-          "type": "boolean"
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "description": "The name of the migration to run."
+            }
+          ]
         },
         "from": {
           "description": "Version from which to migrate from. Only available with a single package being updated, and only on migration only.",

@@ -8,7 +8,7 @@
 import { BuilderContext, createBuilder } from '@angular-devkit/architect';
 import { getSystemPath, json, normalize, resolve } from '@angular-devkit/core';
 import * as net from 'net';
-import { Observable, from, of } from 'rxjs';
+import { Observable, from, isObservable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
@@ -31,7 +31,18 @@ export function runWebpackDevServer(
     webpackFactory?: WebpackFactory,
   } = {},
 ): Observable<DevServerBuildOutput> {
-  const createWebpack = options.webpackFactory || (config => of(webpack(config)));
+  const createWebpack = (c: webpack.Configuration) => {
+    if (options.webpackFactory) {
+      const result = options.webpackFactory(c);
+      if (isObservable(result)) {
+        return result;
+      } else {
+        return of(result);
+      }
+    } else {
+      return of(webpack(c));
+    }
+  };
   const log: WebpackLoggingCallback = options.logging
     || ((stats, config) => context.logger.info(stats.toString(config.stats)));
 

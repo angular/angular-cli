@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { JsonParseMode, isJsonObject, parseJson } from '@angular-devkit/core';
 import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -21,7 +22,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
     let projPkg;
     try {
       projPkg = require(path.resolve(this.workspace.root, 'package.json'));
-    } catch (exception) {
+    } catch {
       projPkg = undefined;
     }
 
@@ -137,6 +138,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
       Angular CLI: ${ngCliVersion}
       Node: ${process.versions.node}
       OS: ${process.platform} ${process.arch}
+
       Angular: ${angularCoreVersion}
       ... ${angularSameAsCore
         .reduce<string[]>((acc, name) => {
@@ -154,6 +156,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
           return acc;
         }, [])
         .join('\n... ')}
+      Ivy Workspace: ${projPkg ? this.getIvyWorkspace() : ''}
 
       Package${namePad.slice(7)}Version
       -------${namePad.replace(/ /g, '-')}------------------
@@ -176,7 +179,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
 
         return modulePkg.version;
       }
-    } catch (_) {}
+    } catch {}
 
     try {
       if (cliNodeModules) {
@@ -187,5 +190,23 @@ export class VersionCommand extends Command<VersionCommandSchema> {
     } catch {}
 
     return '<error>';
+  }
+
+  private getIvyWorkspace(): string {
+    try {
+      const content = fs.readFileSync(path.resolve(this.workspace.root, 'tsconfig.json'), 'utf-8');
+      const tsConfig = parseJson(content, JsonParseMode.Loose);
+      if (!isJsonObject(tsConfig)) {
+        return '<error>';
+      }
+
+      const { angularCompilerOptions } = tsConfig;
+
+      return isJsonObject(angularCompilerOptions) && angularCompilerOptions.enableIvy === false
+        ? 'No'
+        : 'Yes';
+    } catch {
+      return '<error>';
+    }
   }
 }

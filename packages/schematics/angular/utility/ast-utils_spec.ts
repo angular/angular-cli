@@ -440,6 +440,40 @@ describe('ast utils', () => {
       );
     });
 
+    it('should add a route before the last wildcard path', () => {
+      const moduleContent = `
+        import { BrowserModule } from '@angular/platform-browser';
+        import { NgModule } from '@angular/core';
+        import { AppComponent } from './app.component';
+        const routes = [
+          { path: '**', component: FooComponent }
+        ];
+        @NgModule({
+          declarations: [
+            AppComponent
+          ],
+          imports: [
+            BrowserModule,
+            RouterModule.forRoot(routes)
+          ],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule { }
+      `;
+
+      const source = getTsSource(modulePath, moduleContent);
+      const changes = addRouteDeclarationToModule(
+        source,
+        './src/app',
+        `{ path: 'bar', component: BarComponent }`,
+      );
+      const output = applyChanges(modulePath, moduleContent, [changes]);
+
+      expect(output).toMatch(
+        /const routes = \[\r?\n?\s*{ path: 'bar', component: BarComponent },\r?\n?\s*{ path: '\*\*', component: FooComponent }\r?\n?\s*\]/,
+      );
+    });
+
     it('should add a route to the routes to the correct array when having guards', () => {
       const moduleContent = `
         import { BrowserModule } from '@angular/platform-browser';

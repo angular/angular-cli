@@ -21,6 +21,18 @@ const isDebug =
 
 // tslint:disable: no-console
 export default async function(options: { testing?: boolean; cliArgs: string[] }) {
+  // This node version check ensures that the requirements of the project instance of the CLI are met
+  const version = process.versions.node.split('.').map(part => Number(part));
+  if (version[0] < 10 || version[0] === 11 || (version[0] === 10 && version[1] < 13)) {
+    process.stderr.write(
+      `Node.js version ${process.version} detected.\n` +
+      'The Angular CLI requires a minimum Node.js version of either v10.13 or v12.0.\n\n' +
+      'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
+    );
+
+    return 3;
+  }
+
   const logger = createConsoleLogger(isDebug, process.stdout, process.stderr, {
     info: s => (supportsColor ? s : colors.unstyle(s)),
     debug: s => (supportsColor ? s : colors.unstyle(s)),

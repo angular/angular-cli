@@ -222,6 +222,52 @@ describe('Browser Builder rebuilds', () => {
       .toPromise();
   });
 
+  it('rebuilds on transitive type-only file changes', async () => {
+    if (veEnabled) {
+      // TODO: https://github.com/angular/angular-cli/issues/15056
+      pending('Only supported in Ivy.');
+
+      return;
+    }
+    host.writeMultipleFiles({
+      'src/interface1.ts': `
+        import { Interface2 } from './interface2';
+        export interface Interface1 extends Interface2 { }
+      `,
+      'src/interface2.ts': `
+        import { Interface3 } from './interface3';
+        export interface Interface2 extends Interface3 { }
+      `,
+      'src/interface3.ts': `export interface Interface3 { nbr: number; }`,
+    });
+    host.appendToFile('src/main.ts', `
+      import { Interface1 } from './interface1';
+      const something: Interface1 = { nbr: 43 };
+    `);
+
+    const overrides = { watch: true };
+    const run = await architect.scheduleTarget(target, overrides);
+    let buildNumber = 0;
+    await run.output
+      .pipe(
+        debounceTime(rebuildDebounceTime),
+        tap(buildEvent => expect(buildEvent.success).toBe(true)),
+        tap(() => {
+          // NOTE: this only works for transitive type deps after the first build, and only if the
+          // typedep file was there on the previous build.
+          // Make sure the first rebuild is triggered on a direct dep (typedep or not).
+          buildNumber++;
+          if (buildNumber < 4) {
+            host.appendToFile(`src/interface${buildNumber}.ts`, `export type MyType = string;`);
+          } else {
+            host.appendToFile(`src/typings.d.ts`, `export type MyType = string;`);
+          }
+        }),
+        take(5),
+      )
+      .toPromise();
+  });
+
   it('rebuilds after errors in JIT', async () => {
     const origContent = virtualFs.fileBufferToString(
       host.scopedSync().read(normalize('src/app/app.component.ts')),
