@@ -34,6 +34,9 @@ export async function executeTest() {
     // Verify the HTML lang attribute is present
     await expectFileToMatch(`${outputPath}/index.html`, `lang="${lang}"`);
 
+    // Verify the HTML base HREF attribute is present
+    await expectFileToMatch(`${outputPath}/index.html`, `href="/${lang}/"`);
+
     // Verify the locale data is registered using the global files
     await expectFileToMatch(`${outputPath}/vendor-es5.js`, '.ng.common.locales');
     await expectFileToMatch(`${outputPath}/vendor-es2015.js`, '.ng.common.locales');
@@ -42,9 +45,14 @@ export async function executeTest() {
     await ng('e2e', `--configuration=${lang}`, '--port=0');
 
     // Execute Application E2E tests for a production build without dev server
-    const server = externalServer(outputPath);
+    const server = externalServer(outputPath, `/${lang}/`);
     try {
-      await ng('e2e', `--configuration=${lang}`, '--devServerTarget=');
+      await ng(
+        'e2e',
+        `--configuration=${lang}`,
+        '--devServerTarget=',
+        `--baseUrl=http://localhost:4200/${lang}/`,
+      );
     } finally {
       server.close();
     }
