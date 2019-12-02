@@ -350,6 +350,42 @@ describe('Migration to version 9', () => {
           expect(config.configurations.de.i18nLocale).toBeUndefined();
         });
 
+        it('should remove baseHref option when used with i18n options and no main base href', async () => {
+          let config = getWorkspaceTargets(tree);
+          config.build.configurations.fr = { ...getI18NConfig('fr'), baseHref: '/fr/' };
+          config.build.configurations.de = { ...getI18NConfig('de'), baseHref: '/abc/' };
+          updateWorkspaceTargets(tree, config);
+
+          const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
+          config = getWorkspaceTargets(tree2).build;
+          expect(config.configurations.fr.baseHref).toBeUndefined();
+          expect(config.configurations.de.baseHref).toBeUndefined();
+        });
+
+        it('should keep baseHref option when not used with i18n options', async () => {
+          let config = getWorkspaceTargets(tree);
+          config.build.options = getI18NConfig('fr');
+          config.build.configurations.de = getI18NConfig('de');
+          config.build.configurations.staging = { baseHref: '/de/' };
+          updateWorkspaceTargets(tree, config);
+
+          const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
+          config = getWorkspaceTargets(tree2).build;
+          expect(config.configurations.staging.baseHref).toBe('/de/');
+        });
+
+        it('should keep baseHref options when used with i18n options and main baseHref option', async () => {
+          let config = getWorkspaceTargets(tree);
+          config.build.options = { baseHref: '/my-app/' };
+          config.build.configurations.de = { ...getI18NConfig('de'), baseHref: '/de/' };
+          updateWorkspaceTargets(tree, config);
+
+          const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
+          config = getWorkspaceTargets(tree2).build;
+          expect(config.options.baseHref).toBe('/my-app/');
+          expect(config.configurations.de.baseHref).toBe('/de/');
+        });
+
         it('should remove deprecated extract-i18n options', async () => {
           let config = getWorkspaceTargets(tree);
           config['extract-i18n'].options.i18nFormat = 'xmb';
@@ -379,8 +415,7 @@ describe('Migration to version 9', () => {
 
         it(`should add i18n 'locales' project config`, async () => {
           const config = getWorkspaceTargets(tree);
-          config.build.options.aot = false;
-          config.build.options = getI18NConfig('fr');
+          config.build.configurations.fr = getI18NConfig('fr');
           config.build.configurations.de = getI18NConfig('de');
           updateWorkspaceTargets(tree, config);
 
@@ -388,8 +423,39 @@ describe('Migration to version 9', () => {
           const projectConfig = JSON.parse(tree2.readContent(workspacePath)).projects['migration-test'];
           expect(projectConfig.i18n.sourceLocale).toBeUndefined();
           expect(projectConfig.i18n.locales).toEqual({
-            de: 'src/locale/messages.de.xlf',
+            de: { translation: 'src/locale/messages.de.xlf', baseHref: '' },
+            fr: { translation: 'src/locale/messages.fr.xlf', baseHref: '' },
+          });
+        });
+
+        it(`should add i18n 'locales' project config when using baseHref options`, async () => {
+          const config = getWorkspaceTargets(tree);
+          config.build.configurations.fr = { ...getI18NConfig('fr'), baseHref: '/fr/' };
+          config.build.configurations.de = { ...getI18NConfig('de'), baseHref: '/abc/' };
+          updateWorkspaceTargets(tree, config);
+
+          const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
+          const projectConfig = JSON.parse(tree2.readContent(workspacePath)).projects['migration-test'];
+          expect(projectConfig.i18n.sourceLocale).toBeUndefined();
+          expect(projectConfig.i18n.locales).toEqual({
+            de: { translation: 'src/locale/messages.de.xlf', baseHref: '/abc/' },
             fr: 'src/locale/messages.fr.xlf',
+          });
+        });
+
+        it(`should add i18n 'locales' project config when using baseHref options and main base href`, async () => {
+          const config = getWorkspaceTargets(tree);
+          config.build.options = { baseHref: '/my-app/' };
+          config.build.configurations.fr = { ...getI18NConfig('fr'), baseHref: '/fr/' };
+          config.build.configurations.de = { ...getI18NConfig('de'), baseHref: '/abc/' };
+          updateWorkspaceTargets(tree, config);
+
+          const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
+          const projectConfig = JSON.parse(tree2.readContent(workspacePath)).projects['migration-test'];
+          expect(projectConfig.i18n.sourceLocale).toBeUndefined();
+          expect(projectConfig.i18n.locales).toEqual({
+            de: { translation: 'src/locale/messages.de.xlf', baseHref: '' },
+            fr: { translation: 'src/locale/messages.fr.xlf', baseHref: '' },
           });
         });
       });
