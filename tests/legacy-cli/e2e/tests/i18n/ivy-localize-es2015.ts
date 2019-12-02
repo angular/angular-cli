@@ -29,9 +29,14 @@ export default async function() {
     await ng('e2e', `--configuration=${lang}`, '--port=0');
 
     // Execute Application E2E tests for a production build without dev server
-    const server = externalServer(outputPath);
+    const server = externalServer(outputPath, `/${lang}/`);
     try {
-      await ng('e2e', `--configuration=${lang}`, '--devServerTarget=');
+      await ng(
+        'e2e',
+        `--configuration=${lang}`,
+        '--devServerTarget=',
+        `--baseUrl=http://localhost:4200/${lang}/`,
+      );
     } finally {
       server.close();
     }
