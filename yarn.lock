@@ -3430,10 +3430,10 @@ core-js-compat@^3.1.1:
     browserslist "^4.7.2"
     semver "^6.3.0"
 
-core-js@3.4.3:
-  version "3.4.3"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.4.3.tgz#09ea102412a368d5f73d24f082e41ac90c633a49"
-  integrity sha512-BVvHidX8uAmLCYPfLpXTEex7jz1uZJ1mW+shhIsBdA716O8Fg6TOwSgenSyO/bvEtnGdOTpKRZPSh4bSVI1k9w==
+core-js@3.4.7:
+  version "3.4.7"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.4.7.tgz#57c35937da80fe494fbc3adcf9cf3dc00eb86b34"
+  integrity sha512-qaPVGw30J1wQ0GR3GvoPqlGf9GZfKKF4kFC7kiHlcsPTqH3txrs9crCp3ZiMAXuSenhz89Jnl4GZs/67S5VOSg==
 
 core-js@^2.4.0:
   version "2.6.10"
