@@ -56,9 +56,9 @@ export const langTranslations = [
 ];
 export const sourceLocale = langTranslations[0].lang;
 
-export const externalServer = (outputPath: string) => {
+export const externalServer = (outputPath: string, baseUrl = '/') => {
   const app = express();
-  app.use(express.static(resolve(outputPath)));
+  app.use(baseUrl, express.static(resolve(outputPath)));
 
   // call .close() on the return value to close the server.
   return app.listen(4200, 'localhost');

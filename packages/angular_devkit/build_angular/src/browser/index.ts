@@ -673,6 +673,16 @@ export function buildWebpackBrowser(
 
             if (options.index) {
               for (const [locale, outputPath] of outputPaths.entries()) {
+                let localeBaseHref;
+                if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
+                  localeBaseHref = path.posix.join(
+                    options.baseHref || '',
+                    i18n.locales[locale].baseHref === undefined
+                      ? `/${locale}/`
+                      : i18n.locales[locale].baseHref,
+                  );
+                }
+
                 try {
                   await generateIndex(
                     outputPath,
@@ -684,6 +694,7 @@ export function buildWebpackBrowser(
                     transforms.indexHtml,
                     // i18nLocale is used when Ivy is disabled
                     locale || options.i18nLocale,
+                    localeBaseHref || options.baseHref,
                   );
                 } catch (err) {
                   return { success: false, error: mapErrorToMessage(err) };
@@ -734,6 +745,7 @@ function generateIndex(
   moduleFiles: EmittedFiles[] | undefined,
   transformer?: IndexHtmlTransform,
   locale?: string,
+  baseHref?: string,
 ): Promise<void> {
   const host = new NodeJsSyncHost();
 
@@ -744,7 +756,7 @@ function generateIndex(
     files,
     noModuleFiles,
     moduleFiles,
-    baseHref: options.baseHref,
+    baseHref,
     deployUrl: options.deployUrl,
     sri: options.subresourceIntegrity,
     scripts: options.scripts,

@@ -131,17 +131,57 @@
       "type": "object",
       "properties": {
         "sourceLocale": {
-          "type": "string",
-          "description": "Specifies the source language of the application.",
-          "default": "en-US"
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Specifies the source locale of the application.",
+              "default": "en-US",
+              "pattern": "^[a-z]{2}(-[a-zA-Z]{2,})?$"
+            },
+            {
+              "type": "object",
+              "description": "Localization options to use for the source locale",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "description": "Specifies the locale code of the source locale",
+                  "pattern": "^[a-z]{2}(-[a-zA-Z]{2,})?$"
+                },
+                "baseHref": {
+                  "type": "string",
+                  "description": "HTML base HREF to use for the locale (defaults to the locale code)"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
         },
         "locales": {
           "type": "object",
           "additionalProperties": false,
           "patternProperties": {
             "^[a-z]{2}(-[a-zA-Z]{2,})?$": {
-              "type": "string",
-              "description": "Localization file to use for i18n."
+              "oneOf": [
+                {
+                  "type": "string",
+                  "description": "Localization file to use for i18n"
+                },
+                {
+                  "type": "object",
+                  "description": "Localization options to use for the locale",
+                  "properties": {
+                    "translation": {
+                      "type": "string",
+                      "description": "Localization file to use for i18n"
+                    },
+                    "baseHref": {
+                      "type": "string",
+                      "description": "HTML base HREF to use for the locale (defaults to the locale code)"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
             }
           }
         }
