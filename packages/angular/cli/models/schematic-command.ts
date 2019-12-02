@@ -513,7 +513,8 @@ export abstract class SchematicCommand<
           loggingQueue.push(`${colors.yellow('DELETE')} ${eventPath}`);
           break;
         case 'rename':
-          loggingQueue.push(`${colors.blue('RENAME')} ${eventPath} => ${event.to}`);
+          const eventToPath = event.to.startsWith('/') ? event.to.substr(1) : event.to;
+          loggingQueue.push(`${colors.blue('RENAME')} ${eventPath} => ${eventToPath}`);
           break;
       }
     });
