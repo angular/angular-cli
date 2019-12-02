@@ -97,7 +97,8 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
           files.add(eventPath);
           break;
         case 'rename':
-          logs.push(`${colors.blue('RENAME')} ${eventPath} => ${event.to}`);
+          const eventToPath = event.to.startsWith('/') ? event.to.substr(1) : event.to;
+          logs.push(`${colors.blue('RENAME')} ${eventPath} => ${eventToPath}`);
           files.add(eventPath);
           break;
       }
