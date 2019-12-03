@@ -208,9 +208,6 @@ describe('Library Schematic', () => {
       expect(tsConfigJson.compilerOptions.paths.foo).toBeTruthy();
       expect(tsConfigJson.compilerOptions.paths.foo.length).toEqual(1);
       expect(tsConfigJson.compilerOptions.paths.foo[0]).toEqual('dist/foo');
-      expect(tsConfigJson.compilerOptions.paths['foo/*']).toBeTruthy();
-      expect(tsConfigJson.compilerOptions.paths['foo/*'].length).toEqual(1);
-      expect(tsConfigJson.compilerOptions.paths['foo/*'][0]).toEqual('dist/foo/*');
     });
 
     it(`should append to existing paths mappings`, async () => {
