@@ -142,7 +142,16 @@ async function startBrowserSync(
   const bsPort = port || await getAvailablePort();
 
   const instance = browserSync.init({
-    proxy: `localhost:${nodeServerPort}`,
+    proxy: {
+      target: `localhost:${nodeServerPort}`,
+      proxyRes: [
+        proxyRes => {
+          if ('headers' in proxyRes) {
+            proxyRes.headers['cache-control'] = undefined;
+          }
+        },
+      ]
+    },
     port: bsPort,
     ui: false,
     server: false,
