@@ -89,17 +89,18 @@ export default function(args: ParsedArgs, logger: logging.Logger) {
   const specGlob = args.large ? '*_spec_large.ts' : '*_spec.ts';
   const regex = args.glob ? args.glob : `packages/**/${specGlob}`;
 
-  if (args['ve']) {
-    // tslint:disable-next-line:no-console
-    console.warn('********* VE Enabled ***********');
-  } else {
-    // CI is really flaky with NGCC
-    // This is a working around test order and isolation issues.
-    console.warn('********* Running ngcc ***********');
-    execSync('yarn ngcc', { stdio: 'inherit' });
-  }
-
   if (args.large) {
+    if (args['ve']) {
+      // tslint:disable-next-line:no-console
+      console.warn('********* VE Enabled ***********');
+    } else {
+      console.warn('********* Ivy Enabled ***********');
+      // CI is really flaky with NGCC
+      // This is a working around test order and isolation issues.
+      console.warn('********* Running ngcc ***********');
+      execSync('yarn ngcc', { stdio: 'inherit' });
+    }
+
     // Default timeout for large specs is 2.5 minutes.
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
   }
