@@ -103,15 +103,21 @@ export function execute(
       if (!builderOutput.success) {
         return of(builderOutput);
       }
+
+      let result: Observable<BuilderOutput> | undefined;
       if (!bsInstance) {
-        return from(startBrowserSync(nodeServerPort, options, context.logger)).pipe(
+        result = from(startBrowserSync(nodeServerPort, options, context.logger)).pipe(
           tap(instance => bsInstance = instance),
           mapTo(builderOutput)
         );
       } else {
         bsInstance.reload();
-        return of(builderOutput);
+        result = of(builderOutput);
       }
+
+      context.logger.info('\nCompiled successfully.');
+
+      return result;
     }),
     catchError(error => of({
       success: false,
