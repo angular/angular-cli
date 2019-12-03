@@ -59,16 +59,16 @@ Moved to [/docs/gotchas.md](/docs/gotchas.md)
 - Material 2 works on Universal
 - Write documentation for core API
 - Support [AppShell](https://developers.google.com/web/updates/2015/11/app-shell) use cases
+- Development server/watch mode builder with livereload for CLI
 
 ## In Progress
+- Static site rendering
+
+## Planning
+- Full client rehydration strategy that reuses DOM elements/CSS rendered on the server
 - Better internal performance and stress tests
 - Make it easier to write unit tests for Universal components
 - Node.js bridge protocol to communicate with different language backends - Django, Go, PHP etc.
-
-## Planning
-- Static site rendering
-- Development server/watch mode builder with livereload for CLI
-- Full client rehydration strategy that reuses DOM elements/CSS rendered on the server
 
 # Preboot
 Control server-rendered page and transfer state before client-side web app loads to the client-side-app. [Repo](https://github.com/angular/preboot)
