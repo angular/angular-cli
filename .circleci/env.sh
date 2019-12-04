@@ -19,8 +19,8 @@ setPublicVar PROJECT_ROOT "$projectDir";
 ####################################################################################################
 # Define SauceLabs environment variables for CircleCI.
 ####################################################################################################
-setPublicVar SAUCE_USERNAME "angular-ci";
-setSecretVar SAUCE_ACCESS_KEY "9b988f434ff8-fbca-8aa4-4ae3-35442987";
+setPublicVar SAUCE_USERNAME "angular-tooling";
+setSecretVar SAUCE_ACCESS_KEY "8c4ffce86ae6-c419-8ef4-0513-54267305";
 setPublicVar SAUCE_LOG_FILE /tmp/angular/sauce-connect.log
 setPublicVar SAUCE_READY_FILE /tmp/angular/sauce-connect-ready-file.lock
 setPublicVar SAUCE_PID_FILE /tmp/angular/sauce-connect-pid-file.lock
