@@ -141,12 +141,12 @@ export function reportDiagnostics(
   }
 
   if (tsErrors.length > 0) {
-    const message = ts.formatDiagnosticsWithColorAndContext(tsErrors, compilerHost);
+    const message = formatDiagnostics(tsErrors);
     reportError(message);
   }
 
   if (tsWarnings.length > 0) {
-    const message = ts.formatDiagnosticsWithColorAndContext(tsWarnings, compilerHost);
+    const message = formatDiagnostics(tsWarnings);
     reportWarning(message);
   }
 
