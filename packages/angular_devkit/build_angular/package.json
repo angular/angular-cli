@@ -20,7 +20,7 @@
     "babel-loader": "8.0.6",
     "browserslist": "4.8.0",
     "cacache": "13.0.1",
-    "caniuse-lite": "1.0.30001013",
+    "caniuse-lite": "1.0.30001015",
     "circular-dependency-plugin": "5.2.0",
     "clean-css": "4.2.1",
     "copy-webpack-plugin": "5.0.5",
