@@ -703,14 +703,24 @@ export function buildWebpackBrowser(
             }
 
             if (!options.watch && options.serviceWorker) {
-              for (const outputPath of outputPaths.values()) {
+              for (const [locale, outputPath] of outputPaths.entries()) {
+                let localeBaseHref;
+                if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
+                  localeBaseHref = path.posix.join(
+                    options.baseHref || '',
+                    i18n.locales[locale].baseHref === undefined
+                      ? `/${locale}/`
+                      : i18n.locales[locale].baseHref,
+                  );
+                }
+
                 try {
                   await augmentAppWithServiceWorker(
                     host,
                     root,
                     normalize(projectRoot),
                     normalize(outputPath),
-                    options.baseHref || '/',
+                    localeBaseHref || options.baseHref || '/',
                     options.ngswConfigPath,
                   );
                 } catch (err) {
