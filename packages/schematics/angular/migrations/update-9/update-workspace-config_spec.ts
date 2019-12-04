@@ -383,7 +383,7 @@ describe('Migration to version 9', () => {
           const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
           config = getWorkspaceTargets(tree2).build;
           expect(config.options.baseHref).toBe('/my-app/');
-          expect(config.configurations.de.baseHref).toBe('/de/');
+          expect(config.configurations.de.baseHref).toBe('/');
         });
 
         it('should remove deprecated extract-i18n options', async () => {
@@ -454,8 +454,8 @@ describe('Migration to version 9', () => {
           const projectConfig = JSON.parse(tree2.readContent(workspacePath)).projects['migration-test'];
           expect(projectConfig.i18n.sourceLocale).toBeUndefined();
           expect(projectConfig.i18n.locales).toEqual({
-            de: { translation: 'src/locale/messages.de.xlf', baseHref: '' },
-            fr: { translation: 'src/locale/messages.fr.xlf', baseHref: '' },
+            de: { translation: 'src/locale/messages.de.xlf', baseHref: '/abc/' },
+            fr: 'src/locale/messages.fr.xlf',
           });
         });
       });

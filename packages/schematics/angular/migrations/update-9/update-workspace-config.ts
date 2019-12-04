@@ -70,14 +70,6 @@ function addProjectI18NOptions(
     return;
   }
 
-  const mainOptions = findPropertyInAstObject(browserConfig, 'options');
-  const mainBaseHref =
-    mainOptions &&
-    mainOptions.kind === 'object' &&
-    findPropertyInAstObject(mainOptions, 'baseHref');
-  const hasMainBaseHref =
-    !!mainBaseHref && mainBaseHref.kind === 'string' && mainBaseHref.value !== '/';
-
   // browser builder options
   let locales: Record<string, string | { translation: string; baseHref: string }> | undefined;
   const options = getAllOptions(browserConfig);
@@ -97,9 +89,7 @@ function addProjectI18NOptions(
 
     const baseHref = findPropertyInAstObject(option, 'baseHref');
     let baseHrefValue;
-    // if the main options has a non-default base href, the i18n configuration
-    // for the locale baseHref is disabled to more obviously mimic existing behavior
-    if (baseHref && !hasMainBaseHref) {
+    if (baseHref) {
       if (baseHref.kind === 'string' && baseHref.value !== `/${localIdValue}/`) {
         baseHrefValue = baseHref.value;
       }
@@ -187,11 +177,15 @@ function addBuilderI18NOptions(recorder: UpdateRecorder, builderConfig: JsonAstO
     }
 
     // localize base HREF values are controlled by the i18n configuration
-    // except if the main options has a non-default base href, the i18n configuration
-    // for the locale baseHref is disabled in that case to more obviously mimic existing behavior
     const baseHref = findPropertyInAstObject(option, 'baseHref');
-    if (localeId && i18nFile && baseHref && !hasMainBaseHref) {
+    if (localeId && i18nFile && baseHref) {
       removePropertyInAstObject(recorder, option, 'baseHref');
+
+      // if the main option set has a non-default base href,
+      // ensure that the augmented base href has the correct base value
+      if (hasMainBaseHref) {
+        insertPropertyInAstObjectInOrder(recorder, option, 'baseHref', '/', 12);
+      }
     }
   }
 }
