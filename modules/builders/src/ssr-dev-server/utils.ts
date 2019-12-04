@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { exec, ExecOptions } from 'child_process';
+import { spawn, SpawnOptions } from 'child_process';
 import { Observable } from 'rxjs';
 import * as treeKill from 'tree-kill';
 import { createServer, AddressInfo } from 'net';
@@ -24,18 +24,29 @@ export function getAvailablePort(): Promise<number> {
   });
 }
 
-export function execAsObservable(command: string, options: ExecOptions):
-  Observable<{ stdout: string, stderr: string }> {
+export function spawnAsObservable(
+  command: string,
+  args: string[] = [],
+  options: SpawnOptions = {}
+): Observable<{ stdout?: string, stderr?: string }> {
   return new Observable(obs => {
-    const proc = exec(command, options, (err, stdout, stderr) => {
-      if (err) {
-        obs.error(err);
-        return;
-      }
+    const proc = spawn(command, args, options);
+    if (!proc) {
+      obs.error(new Error(`${command} cannot be spawned.`));
+      return;
+    }
 
-      obs.next({ stdout, stderr });
-      obs.complete();
-    });
+    if (proc.stdout) {
+      proc.stdout.on('data', data => obs.next({ stdout: data.toString() }));
+    }
+
+    if (proc.stderr) {
+      proc.stderr.on('data', data => obs.next({ stderr: data.toString() }));
+    }
+
+    proc
+      .on('error', err => obs.error(err))
+      .on('close', () => obs.complete());
 
     return () => {
       if (!proc.killed) {

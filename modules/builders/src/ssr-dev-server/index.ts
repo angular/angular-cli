@@ -30,10 +30,17 @@ import {
   catchError,
   startWith,
   mapTo,
+  ignoreElements,
 } from 'rxjs/operators';
-import { getAvailablePort, execAsObservable } from './utils';
+import { getAvailablePort, spawnAsObservable } from './utils';
 import * as browserSync from 'browser-sync';
 import { join } from 'path';
+
+/** Log messages to ignore and not rely to the logger */
+const IGNORED_STDOUT_MESSAGES = [
+  'server listening on',
+  'Angular is running in the development mode. Call enableProdMode() to enable the production mode.'
+];
 
 export type SSRDevServerBuilderOptions = Schema & json.JsonObject;
 
@@ -77,7 +84,7 @@ export function execute(
           if (!s.success) {
             return of(s);
           }
-          return startNodeServer(s, nodeServerPort).pipe(
+          return startNodeServer(s, nodeServerPort, context.logger).pipe(
             mapTo(s),
             catchError(err => {
               context.logger.error(`A server error has occurred.\n${mapErrorToMessage(err)}`);
@@ -126,16 +133,29 @@ export function execute(
   );
 }
 
-function startNodeServer(serverOutput: BuilderOutput, port: number): Observable<void> {
+function startNodeServer(
+  serverOutput: BuilderOutput,
+  port: number,
+  logger: logging.LoggerApi,
+): Observable<void> {
   const outputPath = serverOutput.outputPath as string;
   const path = join(outputPath, 'main.js');
   const env = { ...process.env, PORT: '' + port };
 
-  return execAsObservable(`node ${path}`, { env })
+  return spawnAsObservable('node', [`"${path}"`], { env, shell: true })
     .pipe(
       // Emit a signal after the process has been started
+      tap(({ stderr, stdout }) => {
+        if (stderr) {
+          logger.error(stderr);
+        }
+
+        if (stdout && !IGNORED_STDOUT_MESSAGES.some(x => stdout.includes(x))) {
+          logger.info(stdout);
+        }
+      }),
+      ignoreElements(),
       startWith(undefined),
-      mapTo(undefined),
     );
 }
 
