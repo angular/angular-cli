@@ -8,8 +8,8 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
     name = "build_bazel_rules_nodejs",
-    sha256 = "c612d6b76eaa17540e8b8c806e02701ed38891460f9ba3303f4424615437887a",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/0.42.1/rules_nodejs-0.42.1.tar.gz"],
+    sha256 = "16fc00ab0d1e538e88f084272316c0693a2e9007d64f45529b82f6230aedb073",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/0.42.2/rules_nodejs-0.42.2.tar.gz"],
 )
 
 # We use protocol buffers for the Build Event Protocol
@@ -116,9 +116,9 @@ web_test_repositories()
 # Bring in bazel_toolchains for RBE setup configuration.
 http_archive(
     name = "bazel_toolchains",
-    sha256 = "c969f09ffb8ca202692c68b17727fe5c1a8d94cd320e6d62e6c06c75e7d2b723",
-    strip_prefix = "bazel-toolchains-1.2.1",
-    url = "https://github.com/bazelbuild/bazel-toolchains/archive/1.2.1.tar.gz",
+    sha256 = "ca8aa49ceb47e9bee04dd67f0bec0b010032b37ebbe67147b535237e801d9a87",
+    strip_prefix = "bazel-toolchains-1.2.2",
+    url = "https://github.com/bazelbuild/bazel-toolchains/archive/1.2.2.tar.gz",
 )
 
 load("@bazel_toolchains//rules:environments.bzl", "clang_env")
