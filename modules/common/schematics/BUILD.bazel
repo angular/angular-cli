@@ -15,6 +15,7 @@ ts_library(
     srcs = glob(
         ["**/*.ts"],
         exclude = [
+            "testing/**/*",
             "**/*.spec.ts",
             "**/files/**/*",
         ],
@@ -47,7 +48,10 @@ jasmine_node_test(
 ng_test_library(
     name = "schematics_test_sources",
     srcs = glob(
-        ["**/*.spec.ts"],
+        [
+            "testing/*.ts",
+            "**/*.spec.ts",
+        ],
         exclude = ["**/files/**/*"],
     ),
     tsconfig = ":tsconfig.json",
