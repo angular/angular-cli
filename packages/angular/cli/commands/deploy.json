@@ -4,7 +4,6 @@
   "description": "Invokes the deploy builder for a specified project or for the default project in the workspace.",
   "$longDescription": "./deploy-long.md",
 
-  "$aliases": [ "d" ],
   "$scope": "in",
   "$type": "architect",
   "$impl": "./deploy-impl#DeployCommand",
