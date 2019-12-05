@@ -39,7 +39,7 @@ export function getServerConfig(wco: WebpackConfigOptions): Configuration {
     node: false,
   };
 
-  if (wco.buildOptions.bundleDependencies == 'none') {
+  if (!wco.buildOptions.bundleDependencies) {
     config.externals = [
       /^@angular/,
       (context: string, request: string, callback: (error?: null, result?: string) => void) => {

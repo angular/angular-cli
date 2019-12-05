@@ -15,7 +15,7 @@ export default async function() {
     appArchitect['server'] = {
       builder: '@angular-devkit/build-angular:server',
       options: {
-        bundleDependencies: 'none',
+        bundleDependencies: false,
         outputPath: 'dist/test-project-server',
         main: 'src/main.server.ts',
         tsConfig: 'tsconfig.server.json',

@@ -218,12 +218,19 @@
       "x-deprecated": "Since version 9. This option has no effect on server platform."
     },
     "bundleDependencies": {
-      "type": "string",
       "description": "Available on server platform only. Which external dependencies to bundle into the module. By default, all of node_modules will be bundled.",
-      "default": "all",
-      "enum": [
-        "none",
-        "all"
+      "default": true,
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string",
+          "enum": [
+            "none",
+            "all"
+          ]
+        }
       ]
     },
     "statsJson": {
