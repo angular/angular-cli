@@ -164,10 +164,10 @@ async function startBrowserSync(
   options: SSRDevServerBuilderOptions,
   logger: logging.LoggerApi,
 ): Promise<browserSync.BrowserSyncInstance> {
-  const { port, open } = options;
+  const { port, open, host } = options;
   const bsPort = port || await getAvailablePort();
 
-  const instance = browserSync.init({
+  const bs = browserSync.init({
     proxy: {
       target: `localhost:${nodeServerPort}`,
       proxyRes: [
@@ -178,6 +178,7 @@ async function startBrowserSync(
         },
       ]
     },
+    host,
     port: bsPort,
     ui: false,
     server: false,
@@ -187,14 +188,15 @@ async function startBrowserSync(
     open,
   });
 
+  const url = `http://${host}:${bsPort}`;
   logger.info(tags.oneLine`
     **
-    Angular Universal Live Development Server is listening on http://localhost:${bsPort},
-    open your browser on http://localhost:${bsPort}
+    Angular Universal Live Development Server is listening on ${url},
+    open your browser on ${url}
     **
   `);
 
-  return instance;
+  return bs;
 }
 
 function mapErrorToMessage(error: unknown): string {
