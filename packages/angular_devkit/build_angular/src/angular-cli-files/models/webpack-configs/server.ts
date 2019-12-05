@@ -24,7 +24,9 @@ export function getServerConfig(wco: WebpackConfigOptions): Configuration {
   const extraPlugins = [];
   if (sourceMap) {
     const { scripts, styles, hidden } = sourceMap;
-    extraPlugins.push(getSourceMapDevTool(scripts || false, styles || false, hidden || false));
+    if (scripts || styles) {
+      extraPlugins.push(getSourceMapDevTool(scripts, styles, hidden));
+    }
   }
 
   const config: Configuration = {
