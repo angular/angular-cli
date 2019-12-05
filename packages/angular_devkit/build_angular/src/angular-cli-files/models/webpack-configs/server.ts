@@ -15,10 +15,15 @@ import { getSourceMapDevTool } from './utils';
  * @param wco Options which are include the build options and app config
  */
 export function getServerConfig(wco: WebpackConfigOptions): Configuration {
-  const extraPlugins = [];
-  if (wco.buildOptions.sourceMap) {
-    const { scripts, styles, hidden } = wco.buildOptions.sourceMap;
+  const {
+    sourceMap,
+    bundleDependencies,
+    externalDependencies = [],
+  } = wco.buildOptions;
 
+  const extraPlugins = [];
+  if (sourceMap) {
+    const { scripts, styles, hidden } = sourceMap;
     extraPlugins.push(getSourceMapDevTool(scripts || false, styles || false, hidden || false));
   }
 
@@ -39,13 +44,17 @@ export function getServerConfig(wco: WebpackConfigOptions): Configuration {
     node: false,
   };
 
-  if (!wco.buildOptions.bundleDependencies) {
+  if (bundleDependencies) {
+    config.externals = [...externalDependencies];
+  } else {
     config.externals = [
-      /^@angular/,
+      ...externalDependencies,
       (context: string, request: string, callback: (error?: null, result?: string) => void) => {
         // Absolute & Relative paths are not externals
-        if (/^\.{0,2}\//.test(request) || isAbsolute(request)) {
-          return callback();
+        if (request.startsWith('./') || isAbsolute(request)) {
+          callback();
+
+          return;
         }
 
         try {

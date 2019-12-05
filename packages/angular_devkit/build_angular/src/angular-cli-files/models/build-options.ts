@@ -10,7 +10,6 @@
 
 import { logging } from '@angular-devkit/core';
 import { ParsedConfiguration } from '@angular/compiler-cli';
-import { ScriptTarget } from 'typescript';
 import {
   AssetPatternClass,
   Budget,
@@ -49,6 +48,7 @@ export interface BuildOptions {
   i18nMissingTranslation?: I18NMissingTranslation;
   extractCss?: boolean;
   bundleDependencies?: boolean;
+  externalDependencies?: string[];
   watch?: boolean;
   outputHashing?: string;
   poll?: number;
