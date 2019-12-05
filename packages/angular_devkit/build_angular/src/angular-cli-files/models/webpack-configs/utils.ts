@@ -76,8 +76,8 @@ export function normalizeExtraEntryPoints(
 }
 
 export function getSourceMapDevTool(
-  scriptsSourceMap: boolean,
-  stylesSourceMap: boolean,
+  scriptsSourceMap: boolean | undefined,
+  stylesSourceMap: boolean | undefined,
   hiddenSourceMap = false,
   inlineSourceMap = false,
 ): SourceMapDevToolPlugin {
