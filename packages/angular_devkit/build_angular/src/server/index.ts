@@ -120,10 +120,19 @@ async function initialize(
   config: webpack.Configuration;
   i18n: I18nOptions;
 }> {
+  let bundleDependencies: boolean | undefined;
+  if (typeof options.bundleDependencies === 'string') {
+    bundleDependencies = options.bundleDependencies === 'all';
+    context.logger.warn(`Option 'bundleDependencies' string value is deprecated since version 9. Use a boolean value instead.`);
+  } else {
+    bundleDependencies = options.bundleDependencies;
+  }
+
   const originalOutputPath = options.outputPath;
   const { config, i18n } = await generateI18nBrowserWebpackConfigFromContext(
     {
       ...options,
+      bundleDependencies,
       buildOptimizer: false,
       aot: true,
       platform: 'server',
