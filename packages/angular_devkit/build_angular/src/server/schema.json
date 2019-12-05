@@ -218,7 +218,7 @@
       "x-deprecated": "Since version 9. This option has no effect on server platform."
     },
     "bundleDependencies": {
-      "description": "Available on server platform only. Which external dependencies to bundle into the module. By default, all of node_modules will be bundled.",
+      "description": "Which external dependencies to bundle into the bundle. By default, all of node_modules will be bundled.",
       "default": true,
       "oneOf": [
         {
@@ -232,6 +232,14 @@
           ]
         }
       ]
+    },
+    "externalDependencies": {
+      "description": "Exclude the listed external dependencies from being bundled into the bundle. Instead, the created bundle relies on these dependencies to be available during runtime.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
     },
     "statsJson": {
       "type": "boolean",

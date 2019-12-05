@@ -1889,6 +1889,14 @@
                 }
               ]
             },
+            "externalDependencies": {
+              "description": "Exclude the listed external dependencies from being bundled into the bundle. Instead, the created bundle relies on these dependencies to be available during runtime.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": []
+            },
             "statsJson": {
               "type": "boolean",
               "description": "Generates a 'stats.json' file which can be analyzed using tools such as 'webpack-bundle-analyzer'.",
