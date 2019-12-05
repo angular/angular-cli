@@ -4,7 +4,6 @@
   "description": "Opens the official Angular documentation (angular.io) in a browser, and searches for a given keyword.",
   "$longDescription": "",
 
-  "$aliases": [ "d" ],
   "$type": "native",
   "$impl": "./doc-impl#DocCommand",
 
