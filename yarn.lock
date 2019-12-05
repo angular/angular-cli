@@ -7992,10 +7992,10 @@ package-json@^6.3.0:
     registry-url "^5.0.0"
     semver "^6.2.0"
 
-pacote@10.2.0:
-  version "10.2.0"
-  resolved "https://registry.yarnpkg.com/pacote/-/pacote-10.2.0.tgz#5a1b8674a1ee7e0912d57389e41151a81e1de6ab"
-  integrity sha512-gezxRsBmUAQ/tPT6js8wSsPTyeIr6rky7KkTKmBzvvAuapm2b8sNK+gjHwOat8DjXpKiN84yp20MzFEzNRH1YA==
+pacote@10.2.1:
+  version "10.2.1"
+  resolved "https://registry.yarnpkg.com/pacote/-/pacote-10.2.1.tgz#4107f72eeaaacb47eb68952ed31c050bab9d3f94"
+  integrity sha512-sPHVOF7uKY8yDivKYimb5l3D8BvNNjR+9FmzkThOTtftkddGY/C6uENVkgc3HQtOpCX8R2qztkSAOI369bgLEA==
   dependencies:
     cacache "^13.0.1"
     chownr "^1.1.3"
