@@ -32,7 +32,8 @@ export default async function() {
   );
 
   // Execute the application's tests with emitDecoratorMetadata disabled (default)
-  await ng('test', '--no-watch');
+  // JIT mode required since AOT compiles the metadata
+  await ng('test', '--no-watch', '--aot=false');
 
   // Turn on emitDecoratorMetadata
   await replaceInFile(
@@ -42,5 +43,6 @@ export default async function() {
   );
 
   // Execute the application's tests with emitDecoratorMetadata enabled
-  await expectToFail(() => ng('test', '--no-watch'));
+  // JIT mode required since AOT compiles the metadata
+  await expectToFail(() => ng('test', '--no-watch', '--aot=false'));
 }
