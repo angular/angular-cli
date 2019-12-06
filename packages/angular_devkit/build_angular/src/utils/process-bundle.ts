@@ -126,9 +126,15 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
       filename: options.filename,
       inputSourceMap: manualSourceMaps ? undefined : sourceMap,
       babelrc: false,
-      // modules aren't needed since the bundles use webpack's custom module loading
-      // 'transform-typeof-symbol' generates slower code
-      presets: [['@babel/preset-env', { modules: false, exclude: ['transform-typeof-symbol'] }]],
+      presets: [[
+        require.resolve('@babel/preset-env'),
+        {
+          // modules aren't needed since the bundles use webpack's custom module loading
+          modules: false,
+          // 'transform-typeof-symbol' generates slower code
+          exclude: ['transform-typeof-symbol'],
+        },
+      ]],
       plugins: options.replacements ? [createReplacePlugin(options.replacements)] : [],
       minified: options.optimize,
       // `false` ensures it is disabled and prevents large file warnings
