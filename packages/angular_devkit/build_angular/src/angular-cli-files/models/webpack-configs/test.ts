@@ -83,13 +83,8 @@ export function getTestConfig(
           vendors: false,
           vendor: {
             name: 'vendor',
-            chunks: 'initial',
-            test: (module: { nameForCondition?: () => string }, chunks: { name: string }[]) => {
-              const moduleName = module.nameForCondition ? module.nameForCondition() : '';
-
-              return /[\\/]node_modules[\\/]/.test(moduleName)
-                && !chunks.some(({ name }) => isPolyfillsEntry(name));
-            },
+            test: /[\\/]node_modules[\\/]/,
+            chunks: ({name}) => !isPolyfillsEntry(name),
           },
         },
       },

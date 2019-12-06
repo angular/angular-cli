@@ -113,9 +113,9 @@ export class VirtualWatchFileSystemDecorator extends NodeWatchFileSystem {
   }
 
   watch(
-    files: string[],
-    dirs: string[],
-    missing: string[],
+    files: IterableIterator<string>,
+    dirs: IterableIterator<string>,
+    missing: IterableIterator<string>,
     startTime: number | undefined,
     options: {},
     callback: any,  // tslint:disable-line:no-any
@@ -169,38 +169,43 @@ export class VirtualWatchFileSystemDecorator extends NodeWatchFileSystem {
       );
     };
 
-    const mapReplacements = (original: string[]): string[] => {
-      if (!this._replacements) {
-        return original;
-      }
-      const replacements = this._replacements;
+    function* mapReplacements(
+      original: IterableIterator<string>,
+      replacements: Map<Path, Path> | ((path: Path) => Path) | undefined,
+    ): IterableIterator<string> {
+      if (!replacements) {
+        yield* original;
 
-      return original.map(file => {
+        return;
+      }
+
+      const { value: file, done } = original.next();
+      while (!done) {
         if (typeof replacements === 'function') {
           const replacement = getSystemPath(replacements(normalize(file)));
           if (replacement !== file) {
             reverseReplacements.set(replacement, file);
           }
 
-          return replacement;
+          yield replacement;
         } else {
           const replacement = replacements.get(normalize(file));
           if (replacement) {
             const fullReplacement = getSystemPath(replacement);
             reverseReplacements.set(fullReplacement, file);
 
-            return fullReplacement;
+            yield fullReplacement;
           } else {
-            return file;
+            yield file;
           }
         }
-      });
-    };
+      }
+    }
 
     const watcher = super.watch(
-      mapReplacements(files),
-      mapReplacements(dirs),
-      mapReplacements(missing),
+      mapReplacements(files, this._replacements),
+      mapReplacements(dirs, this._replacements),
+      mapReplacements(missing, this._replacements),
       startTime,
       options,
       newCallback,

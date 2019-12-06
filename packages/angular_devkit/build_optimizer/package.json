@@ -13,6 +13,6 @@
     "source-map": "0.7.3",
     "tslib": "1.10.0",
     "typescript": "3.6.4",
-    "webpack-sources": "1.4.3"
+    "webpack-sources": "2.0.0-beta.8"
   }
 }

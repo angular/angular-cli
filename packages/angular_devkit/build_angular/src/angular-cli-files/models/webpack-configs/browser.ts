@@ -93,15 +93,9 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
           vendors: false,
           vendor: !!buildOptions.vendorChunk && {
             name: 'vendor',
-            chunks: 'initial',
             enforce: true,
-            test: (module: { nameForCondition?: Function }, chunks: Array<{ name: string }>) => {
-              const moduleName = module.nameForCondition ? module.nameForCondition() : '';
-
-              return /[\\/]node_modules[\\/]/.test(moduleName)
-                && !chunks.some(({ name }) => isPolyfillsEntry(name)
-                  || globalStylesBundleNames.includes(name));
-            },
+            test: /[\\/]node_modules[\\/]/,
+            chunks: ({ name }) => !isPolyfillsEntry(name) || !globalStylesBundleNames.includes(name),
           },
         },
       },

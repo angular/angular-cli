@@ -19,7 +19,7 @@ export class NamedLazyChunksPlugin {
     compiler.hooks.compilation.tap('named-lazy-chunks-plugin', compilation => {
       // The dependencyReference hook isn't in the webpack typings so we have to type it as any.
       // tslint:disable-next-line: no-any
-      (compilation.hooks as any).dependencyReference.tap('named-lazy-chunks-plugin',
+      (compilation.hooks as any).dependencyReferencedExports.tap('named-lazy-chunks-plugin',
         // tslint:disable-next-line: no-any
         (_: any, dependency: any) => {
           if (

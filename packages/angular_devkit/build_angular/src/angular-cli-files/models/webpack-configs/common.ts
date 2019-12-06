@@ -14,12 +14,12 @@ import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
 import { RollupOptions } from 'rollup';
 import { ScriptTarget } from 'typescript';
+
 import {
   ChunkData,
   Compiler,
   Configuration,
   ContextReplacementPlugin,
-  HashedModuleIdsPlugin,
   Plugin,
   Rule,
   compilation,
@@ -39,10 +39,10 @@ import { findAllNodeModules, findUp } from '../../utilities/find-up';
 import { WebpackConfigOptions } from '../build-options';
 import { getEsVersionForFileName, getOutputHashFormat, normalizeExtraEntryPoints } from './utils';
 
-const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
+const webpack = require('webpack');
 
 // tslint:disable-next-line:no-big-function
 export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
@@ -291,7 +291,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   if (buildOptions.progress) {
-    extraPlugins.push(new ProgressPlugin({ profile: buildOptions.verbose }));
+    extraPlugins.push(new webpack.ProgressPlugin({ profile: buildOptions.verbose }));
   }
 
   if (buildOptions.showCircularDependencies) {
@@ -495,7 +495,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     context: projectRoot,
     entry: entryPoints,
     output: {
-      futureEmitAssets: true,
       path: path.resolve(root, buildOptions.outputPath as string),
       publicPath: buildOptions.deployUrl,
       filename: `[name]${targetInFileName}${hashFormat.chunk}.js`,
@@ -541,19 +540,19 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
           exclude: /(ngfactory|ngstyle)\.js$/,
           ...buildOptimizerUseRule,
         },
-        {
+        sourceMapUseRule ? {
           test: /\.js$/,
           exclude: /(ngfactory|ngstyle)\.js$/,
           enforce: 'pre',
           ...sourceMapUseRule,
-        },
+        } : {},
         ...extraRules,
       ],
     },
     optimization: {
       noEmitOnErrors: true,
       minimizer: [
-        new HashedModuleIdsPlugin(),
+        new webpack.ids.HashedModuleIdsPlugin(),
         ...extraMinimizers,
       ].concat(differentialLoadingMode ? [
         // Budgets are computed after differential builds, not via a plugin.

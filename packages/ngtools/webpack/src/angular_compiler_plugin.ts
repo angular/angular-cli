@@ -918,8 +918,6 @@ export class AngularCompilerPlugin {
                 } catch { }
               }
             }
-
-            return request;
           },
         );
       });
