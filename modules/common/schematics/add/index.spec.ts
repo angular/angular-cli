@@ -54,7 +54,7 @@ describe('Add Schematic Rule', () => {
     const {scripts} = JSON.parse(tree.read('package.json')!.toString());
     expect(scripts['build:ssr']).toBe('ng build --prod && ng run test-app:server:production');
     expect(scripts['serve:ssr']).toBe('node dist/test-app/server/main.js');
-    expect(scripts['serve:ssr:dev']).toBe('ng run test-app:serve-ssr');
+    expect(scripts['dev:ssr']).toBe('ng run test-app:serve-ssr');
   });
 
   it('should add devDependency: @nguniversal/builders', async () => {

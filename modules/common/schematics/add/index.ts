@@ -60,7 +60,7 @@ function addScriptsRule(options: AddUniversalOptions): Rule {
     const pkg = JSON.parse(buffer.toString());
     pkg.scripts = {
       ...pkg.scripts,
-      'serve:ssr:dev': `ng run ${options.clientProject}:${SERVE_SSR_TARGET_NAME}`,
+      'dev:ssr': `ng run ${options.clientProject}:${SERVE_SSR_TARGET_NAME}`,
       'serve:ssr': `node ${serverDist}/main.js`,
       'build:ssr': `ng build --prod && ng run ${options.clientProject}:server:production`,
     };
