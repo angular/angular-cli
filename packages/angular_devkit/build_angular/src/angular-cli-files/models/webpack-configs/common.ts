@@ -489,6 +489,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       alias,
     },
     resolveLoader: {
+      symlinks: !buildOptions.preserveSymlinks,
       modules: loaderNodeModules,
     },
     context: projectRoot,
