@@ -4,6 +4,11 @@
   "description": "Karma target options for Build Facade.",
   "type": "object",
   "properties": {
+    "aot": {
+      "type": "boolean",
+      "description": "Build using Ahead of Time compilation.",
+      "default": false
+    },
     "main": {
       "type": "string",
       "description": "The name of the main entry-point file."

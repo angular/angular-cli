@@ -93,6 +93,7 @@
         "test": {
           "builder": "../../../../packages/angular_devkit/build_angular:karma",
           "options": {
+            "aot": true,
             "main": "src/test.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",

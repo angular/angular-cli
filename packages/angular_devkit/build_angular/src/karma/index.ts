@@ -12,6 +12,7 @@ import { Observable, from } from 'rxjs';
 import { defaultIfEmpty, switchMap } from 'rxjs/operators';
 import * as webpack from 'webpack';
 import {
+  getAotConfig,
   getCommonConfig,
   getNonAotConfig,
   getStylesConfig,
@@ -47,13 +48,24 @@ async function initialize(
     // * `budgets` which might be incorrect due to extra dev libs
     { ...((options as unknown) as BrowserBuilderOptions), outputPath: '', budgets: undefined },
     context,
-    wco => [
-      getCommonConfig(wco),
-      getStylesConfig(wco),
-      getNonAotConfig(wco),
-      getTestConfig(wco),
-      getWorkerConfig(wco),
-    ],
+    wco => {
+      let useAot = false;
+      if (options.aot) {
+        if (wco.tsConfig.options.enableIvy === false) {
+          context.logger.warn('AOT is not supported when Ivy is disabled. Using JIT compilation.');
+        } else {
+          useAot = true;
+        }
+      }
+
+      return [
+        getCommonConfig(wco),
+        getStylesConfig(wco),
+        useAot ? getAotConfig(wco) : getNonAotConfig(wco),
+        getTestConfig(wco),
+        getWorkerConfig(wco),
+      ];
+    },
   );
 
   // tslint:disable-next-line:no-implicit-dependencies
