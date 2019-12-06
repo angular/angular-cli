@@ -252,6 +252,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
       test: options.minimal ? undefined : {
         builder: Builders.Karma,
         options: {
+          aot: true,
           main: `${sourceRoot}/test.ts`,
           polyfills: `${sourceRoot}/polyfills.ts`,
           tsConfig: `${projectRoot}tsconfig.spec.json`,
