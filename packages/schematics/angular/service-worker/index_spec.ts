@@ -10,7 +10,7 @@ import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as ServiceWorkerOptions } from './schema';
 
-
+// tslint:disable-next-line:no-big-function
 describe('Service Worker Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
@@ -90,6 +90,64 @@ describe('Service Worker Schematic', () => {
   });
 
   it('should add the SW import to the NgModule imports', async () => {
+    const tree = await schematicRunner.runSchematicAsync('service-worker', defaultOptions, appTree)
+      .toPromise();
+    const pkgText = tree.readContent('/projects/bar/src/app/app.module.ts');
+    const expectedText = 'ServiceWorkerModule.register(\'ngsw-worker.js\', { enabled: environment.production })';
+    expect(pkgText).toContain(expectedText);
+  });
+
+  it('should add the SW import to the NgModule imports with aliased environment', async () => {
+    const moduleContent = `
+      import { BrowserModule } from '@angular/platform-browser';
+      import { NgModule } from '@angular/core';
+
+      import { AppComponent } from './app.component';
+      import { environment as env } from '../environments/environment';
+
+      @NgModule({
+        declarations: [
+          AppComponent
+        ],
+        imports: [
+          BrowserModule
+        ],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule {}
+    `;
+
+    appTree.overwrite('/projects/bar/src/app/app.module.ts', moduleContent);
+
+    const tree = await schematicRunner.runSchematicAsync('service-worker', defaultOptions, appTree)
+      .toPromise();
+    const pkgText = tree.readContent('/projects/bar/src/app/app.module.ts');
+    const expectedText = 'ServiceWorkerModule.register(\'ngsw-worker.js\', { enabled: env.production })';
+    expect(pkgText).toContain(expectedText);
+  });
+
+  it('should add the SW import to the NgModule imports with existing environment', async () => {
+    const moduleContent = `
+      import { BrowserModule } from '@angular/platform-browser';
+      import { NgModule } from '@angular/core';
+
+      import { AppComponent } from './app.component';
+      import { environment } from '../environments/environment';
+
+      @NgModule({
+        declarations: [
+          AppComponent
+        ],
+        imports: [
+          BrowserModule
+        ],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule {}
+    `;
+
+    appTree.overwrite('/projects/bar/src/app/app.module.ts', moduleContent);
+
     const tree = await schematicRunner.runSchematicAsync('service-worker', defaultOptions, appTree)
       .toPromise();
     const pkgText = tree.readContent('/projects/bar/src/app/app.module.ts');
@@ -188,5 +246,4 @@ describe('Service Worker Schematic', () => {
     expect(projects.foo.architect.build.configurations.production.ngswConfigPath)
       .toBe('ngsw-config.json');
   });
-
 });
