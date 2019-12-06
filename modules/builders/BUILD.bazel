@@ -1,5 +1,5 @@
 load("@npm_bazel_typescript//:index.bzl", "ts_config")
-load("//tools:defaults.bzl", "npm_package", "ts_library")
+load("//tools:defaults.bzl", "jasmine_node_test", "ng_test_library", "npm_package", "ts_library")
 
 ts_config(
     name = "bazel-tsconfig-build",
@@ -43,4 +43,21 @@ npm_package(
     srcs = [":builders_assets"],
     tags = ["release"],
     deps = [":builders"],
+)
+
+ng_test_library(
+    name = "unit_test_lib",
+    srcs = glob([
+        "**/*.spec.ts",
+    ]),
+    deps = [
+        ":builders",
+        "@npm//@angular-devkit/architect",
+        "@npm//@angular-devkit/core",
+    ],
+)
+
+jasmine_node_test(
+    name = "unit_test",
+    srcs = [":unit_test_lib"],
 )
