@@ -61,7 +61,12 @@ executors:
     resource_class: windows.medium
     shell: powershell.exe -ExecutionPolicy Bypass
     machine:
-      image: windows-server-2019
+      # Windows preview image that includes the following:
+      # - Visual Studio 2019 build tools
+      # - Node 12
+      # - yarn 1.17
+      # - Python 3 3.7.4
+      image: windows-server-2019-vs2019:201908-02
 
 # Command Definitions
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-commands
@@ -76,7 +81,7 @@ commands:
       - run:
           # Need to install node and yarn before to ensure correct versions.
           name: Setup windows node environment
-          command: ./.circleci/windows-env.ps1             
+          command: ./.circleci/windows-env.ps1
       - run: node --version
       - run: yarn --version
 
@@ -298,7 +303,7 @@ jobs:
     executor: windows-executor
     steps:
       - custom_attach_workspace
-      - setup_windows              
+      - setup_windows
       - restore_cache:
           keys:
             - *cache_key_win
@@ -315,7 +320,7 @@ jobs:
       - persist_to_workspace:
           root: *workspace_location
           paths:
-            - ./*            
+            - ./*
 
   test-win:
     executor: windows-executor
@@ -416,7 +421,7 @@ workflows:
             - build
       - flake-jail:
           requires:
-            - build            
+            - build
       
       # Windows jobs
       # These jobs only run after their non-windows counterparts finish successfully.
