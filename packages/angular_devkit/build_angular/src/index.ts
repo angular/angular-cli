@@ -44,6 +44,11 @@ export {
 } from './dev-server';
 
 export {
+  execute as executeExtractI18nBuilder,
+  ExtractI18nBuilderOptions,
+} from './extract-i18n';
+
+export {
   execute as executeKarmaBuilder,
   KarmaBuilderOptions,
   KarmaConfigOptions,
