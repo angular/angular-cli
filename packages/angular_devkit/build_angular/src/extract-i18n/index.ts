@@ -25,7 +25,9 @@ import { Schema as BrowserBuilderOptions } from '../browser/schema';
 import { createI18nOptions } from '../utils/i18n-options';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
-import { Format, Schema as ExtractI18nBuilderOptions } from './schema';
+import { Format, Schema } from './schema';
+
+export type ExtractI18nBuilderOptions = Schema & JsonObject;
 
 function getI18nOutfile(format: string | undefined) {
   switch (format) {
@@ -49,7 +51,7 @@ class InMemoryOutputPlugin {
   }
 }
 
-async function execute(options: ExtractI18nBuilderOptions, context: BuilderContext) {
+export async function execute(options: ExtractI18nBuilderOptions, context: BuilderContext) {
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
 
