@@ -301,7 +301,7 @@ describe('Migration to version 9', () => {
     describe('i18n configuration', () => {
       function getI18NConfig(localId: string): object {
         return {
-          outputPath: `dist/my-project-${localId}/`,
+          outputPath: `dist/my-project/${localId}/`,
           i18nFile: `src/locale/messages.${localId}.xlf`,
           i18nFormat: 'xlf',
           i18nLocale: localId,
@@ -360,6 +360,38 @@ describe('Migration to version 9', () => {
           config = getWorkspaceTargets(tree2).build;
           expect(config.configurations.fr.baseHref).toBeUndefined();
           expect(config.configurations.de.baseHref).toBeUndefined();
+        });
+
+        it('should remove outputPath option when used with i18n options and contains locale code', async () => {
+          let config = getWorkspaceTargets(tree);
+          config.build.options.outputPath = 'dist';
+          config.build.configurations.fr = { ...getI18NConfig('fr'), outputPath: 'dist/fr' };
+          config.build.configurations.de = { ...getI18NConfig('de'), outputPath: '/dist/de/' };
+          updateWorkspaceTargets(tree, config);
+
+          const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
+          config = getWorkspaceTargets(tree2).build;
+          expect(config.configurations.fr.outputPath).toBe('dist');
+          expect(config.configurations.de.outputPath).toBe('/dist');
+        });
+
+        it('should keep old i18n options except format when output path is not supported', async () => {
+          let config = getWorkspaceTargets(tree);
+          config.build.options.outputPath = 'dist';
+          config.build.configurations.fr = { ...getI18NConfig('fr'), outputPath: 'dist/abc' };
+          config.build.configurations.de = { ...getI18NConfig('de'), outputPath: '/dist/123' };
+          updateWorkspaceTargets(tree, config);
+
+          const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
+          config = getWorkspaceTargets(tree2).build;
+          expect(config.configurations.fr.outputPath).toBe('dist/abc');
+          expect(config.configurations.fr.i18nFormat).toBeUndefined();
+          expect(config.configurations.fr.i18nFile).toBeDefined();
+          expect(config.configurations.fr.i18nLocale).toBe('fr');
+          expect(config.configurations.de.outputPath).toBe('/dist/123');
+          expect(config.configurations.de.i18nFormat).toBeUndefined();
+          expect(config.configurations.de.i18nFile).toBeDefined();
+          expect(config.configurations.de.i18nLocale).toBe('de');
         });
 
         it('should keep baseHref option when not used with i18n options', async () => {
