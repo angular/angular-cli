@@ -148,7 +148,8 @@ describe('Prerender Builder', () => {
 
     it('should throw if no routes are given', async () => {
       options.routes = [];
-      const expectedError = new Error('No routes found. options.routes must contain at least one route to render.');
+      const expectedError = new Error(
+        'No routes found. Specify routes to render using `prerender.options.routes` in angular.json.');
       await expectAsync(
         PrerenderModule._prerender(options, context)
       ).toBeRejectedWith(expectedError);

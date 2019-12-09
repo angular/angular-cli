@@ -129,7 +129,7 @@ export async function _prerender(
   context: BuilderContext
 ): Promise<BuilderOutput> {
   if (!options.routes || options.routes.length === 0) {
-    throw new Error('No routes found. options.routes must contain at least one route to render.');
+    throw new Error('No routes found. Specify routes to render using `prerender.options.routes` in angular.json.');
   }
   const browserTarget = targetFromTargetString(options.browserTarget);
   const serverTarget = targetFromTargetString(options.serverTarget);
