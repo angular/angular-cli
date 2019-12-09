@@ -5,8 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonAstObject } from '@angular-devkit/core';
+import { JsonAstObject, logging } from '@angular-devkit/core';
 import { Rule, Tree, UpdateRecorder } from '@angular-devkit/schematics';
+import { posix } from 'path';
 import { getWorkspacePath } from '../../utility/config';
 import { NodeDependencyType, addPackageJsonDependency, getPackageJsonDependency } from '../../utility/dependencies';
 import {
@@ -25,23 +26,23 @@ export const ANY_COMPONENT_STYLE_BUDGET = {
 };
 
 export function updateWorkspaceConfig(): Rule {
-  return (tree: Tree) => {
+  return (tree, context) => {
     const workspacePath = getWorkspacePath(tree);
     const workspace = getWorkspace(tree);
     const recorder = tree.beginUpdate(workspacePath);
 
-    for (const { target, project } of getTargets(workspace, 'build', Builders.Browser)) {
+    for (const { target } of getTargets(workspace, 'build', Builders.Browser)) {
       updateStyleOrScriptOption('styles', recorder, target);
       updateStyleOrScriptOption('scripts', recorder, target);
       addAnyComponentStyleBudget(recorder, target);
       updateAotOption(tree, recorder, target);
-      addBuilderI18NOptions(recorder, target, project);
+      addBuilderI18NOptions(recorder, target, context.logger);
     }
 
-    for (const { target, project } of getTargets(workspace, 'test', Builders.Karma)) {
+    for (const { target } of getTargets(workspace, 'test', Builders.Karma)) {
       updateStyleOrScriptOption('styles', recorder, target);
       updateStyleOrScriptOption('scripts', recorder, target);
-      addBuilderI18NOptions(recorder, target, project);
+      addBuilderI18NOptions(recorder, target, context.logger);
     }
 
     for (const { target } of getTargets(workspace, 'server', Builders.Server)) {
@@ -148,7 +149,11 @@ function addProjectI18NOptions(
   }
 }
 
-function addBuilderI18NOptions(recorder: UpdateRecorder, builderConfig: JsonAstObject, projectConfig: JsonAstObject) {
+function addBuilderI18NOptions(
+  recorder: UpdateRecorder,
+  builderConfig: JsonAstObject,
+  logger: logging.LoggerApi,
+) {
   const options = getAllOptions(builderConfig);
   const mainOptions = findPropertyInAstObject(builderConfig, 'options');
   const mainBaseHref =
@@ -160,31 +165,75 @@ function addBuilderI18NOptions(recorder: UpdateRecorder, builderConfig: JsonAstO
 
   for (const option of options) {
     const localeId = findPropertyInAstObject(option, 'i18nLocale');
+    const i18nFile = findPropertyInAstObject(option, 'i18nFile');
+
+    // The format is always auto-detected now
+    const i18nFormat = findPropertyInAstObject(option, 'i18nFormat');
+    if (i18nFormat) {
+      removePropertyInAstObject(recorder, option, 'i18nFormat');
+    }
+
+    const outputPath = findPropertyInAstObject(option, 'outputPath');
+    if (
+      localeId &&
+      localeId.kind === 'string' &&
+      i18nFile &&
+      outputPath &&
+      outputPath.kind === 'string'
+    ) {
+      // This first block was intended to remove the redundant output path field
+      // but due to defects in the recorder, removing the option will cause malformed json
+      // if (
+      //   mainOutputPathValue &&
+      //   outputPath.value.match(
+      //     new RegExp(`[/\\\\]?${mainOutputPathValue}[/\\\\]${localeId.value}[/\\\\]?$`),
+      //   )
+      // ) {
+      //   removePropertyInAstObject(recorder, option, 'outputPath');
+      // } else
+      if (outputPath.value.match(new RegExp(`[/\\\\]${localeId.value}[/\\\\]?$`))) {
+        const newOutputPath = outputPath.value.replace(
+          new RegExp(`[/\\\\]${localeId.value}[/\\\\]?$`),
+          '',
+        );
+        const { start, end } = outputPath;
+        recorder.remove(start.offset, end.offset - start.offset);
+        recorder.insertLeft(start.offset, `"${newOutputPath}"`);
+      } else {
+        logger.warn(
+          `Output path value "${outputPath.value}" for locale "${localeId.value}" is not supported with the new localization system. ` +
+            `With the current value, the localized output would be written to "${posix.join(
+              outputPath.value,
+              localeId.value,
+            )}". ` +
+            `Keeping existing options for the target configuration of locale "${localeId.value}".`,
+        );
+
+        continue;
+      }
+    }
+
     if (localeId && localeId.kind === 'string') {
       // add new localize option
       insertPropertyInAstObjectInOrder(recorder, option, 'localize', [localeId.value], 12);
       removePropertyInAstObject(recorder, option, 'i18nLocale');
     }
 
-    const i18nFile = findPropertyInAstObject(option, 'i18nFile');
     if (i18nFile) {
       removePropertyInAstObject(recorder, option, 'i18nFile');
-    }
-
-    const i18nFormat = findPropertyInAstObject(option, 'i18nFormat');
-    if (i18nFormat) {
-      removePropertyInAstObject(recorder, option, 'i18nFormat');
     }
 
     // localize base HREF values are controlled by the i18n configuration
     const baseHref = findPropertyInAstObject(option, 'baseHref');
     if (localeId && i18nFile && baseHref) {
-      removePropertyInAstObject(recorder, option, 'baseHref');
-
       // if the main option set has a non-default base href,
       // ensure that the augmented base href has the correct base value
       if (hasMainBaseHref) {
-        insertPropertyInAstObjectInOrder(recorder, option, 'baseHref', '/', 12);
+        const { start, end } = baseHref;
+        recorder.remove(start.offset, end.offset - start.offset);
+        recorder.insertLeft(start.offset, `"/"`);
+      } else {
+        removePropertyInAstObject(recorder, option, 'baseHref');
       }
     }
   }
