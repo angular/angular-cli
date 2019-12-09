@@ -202,40 +202,46 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
     const loader = await createTranslationLoader();
     const usedFormats = new Set<string>();
     for (const [locale, desc] of Object.entries(i18n.locales)) {
-      if (i18n.inlineLocales.has(locale) && desc.file) {
-        const result = loader(path.join(context.workspaceRoot, desc.file));
+      if (!i18n.inlineLocales.has(locale)) {
+        continue;
+      }
 
-        for (const diagnostics of result.diagnostics.messages) {
-          if (diagnostics.type === 'error') {
-            throw new Error(
-              `Error parsing translation file '${desc.file}': ${diagnostics.message}`,
-            );
-          } else {
-            context.logger.warn(`WARNING [${desc.file}]: ${diagnostics.message}`);
-          }
-        }
+      const localeDataPath = findLocaleDataPath(locale, localeDataBasePath);
+      if (!localeDataPath) {
+        context.logger.warn(
+          `Locale data for '${locale}' cannot be found.  No locale data will be included for this locale.`,
+        );
+      } else {
+        desc.dataPath = localeDataPath;
+      }
 
-        usedFormats.add(result.format);
-        if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
-          // This limitation is only for legacy message id support (defaults to true as of 9.0)
+      if (!desc.file) {
+        continue;
+      }
+
+      const result = loader(path.join(context.workspaceRoot, desc.file));
+
+      for (const diagnostics of result.diagnostics.messages) {
+        if (diagnostics.type === 'error') {
           throw new Error(
-            'Localization currently only supports using one type of translation file format for the entire application.',
-          );
-        }
-
-        desc.format = result.format;
-        desc.translation = result.translation;
-        desc.integrity = result.integrity;
-
-        const localeDataPath = findLocaleDataPath(locale, localeDataBasePath);
-        if (!localeDataPath) {
-          context.logger.warn(
-            `Locale data for '${locale}' cannot be found.  No locale data will be included for this locale.`,
+            `Error parsing translation file '${desc.file}': ${diagnostics.message}`,
           );
         } else {
-          desc.dataPath = localeDataPath;
+          context.logger.warn(`WARNING [${desc.file}]: ${diagnostics.message}`);
         }
       }
+
+      usedFormats.add(result.format);
+      if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
+        // This limitation is only for legacy message id support (defaults to true as of 9.0)
+        throw new Error(
+          'Localization currently only supports using one type of translation file format for the entire application.',
+        );
+      }
+
+      desc.format = result.format;
+      desc.translation = result.translation;
+      desc.integrity = result.integrity;
     }
 
     // Legacy message id's require the format of the translations
