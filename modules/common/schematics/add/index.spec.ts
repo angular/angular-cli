@@ -37,6 +37,8 @@ describe('Add Schematic Rule', () => {
     expect(architect.server.options.main).toBe('projects/test-app/server.ts');
     expect(architect['serve-ssr'].options.serverTarget).toBe('test-app:server');
     expect(architect['serve-ssr'].options.browserTarget).toBe('test-app:build');
+    expect(architect['prerender'].options.serverTarget).toBe('test-app:server:production');
+    expect(architect['prerender'].options.browserTarget).toBe('test-app:build:production');
 
     const productionConfig = architect.server.configurations.production;
     expect(productionConfig.fileReplacements).toBeDefined();
@@ -55,6 +57,7 @@ describe('Add Schematic Rule', () => {
     expect(scripts['build:ssr']).toBe('ng build --prod && ng run test-app:server:production');
     expect(scripts['serve:ssr']).toBe('node dist/test-app/server/main.js');
     expect(scripts['dev:ssr']).toBe('ng run test-app:serve-ssr');
+    expect(scripts['prerender']).toBe('ng run test-app:prerender');
   });
 
   it('should add devDependency: @nguniversal/builders', async () => {

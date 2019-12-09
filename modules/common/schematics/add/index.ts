@@ -24,6 +24,7 @@ import {addPackageJsonDependency, NodeDependencyType} from '@schematics/angular/
 import {stripTsExtension, getOutputPath, getProject} from '../utils';
 
 const SERVE_SSR_TARGET_NAME = 'serve-ssr';
+const PRERENDER_TARGET_NAME = 'prerender';
 
 export interface AddUniversalOptions extends UniversalOptions {
   serverFileName?: string;
@@ -63,6 +64,7 @@ function addScriptsRule(options: AddUniversalOptions): Rule {
       'dev:ssr': `ng run ${options.clientProject}:${SERVE_SSR_TARGET_NAME}`,
       'serve:ssr': `node ${serverDist}/main.js`,
       'build:ssr': `ng build --prod && ng run ${options.clientProject}:server:production`,
+      'prerender': `ng run ${options.clientProject}:${PRERENDER_TARGET_NAME}`,
     };
 
     host.overwrite(pkgPath, JSON.stringify(pkg, null, 2));
@@ -102,6 +104,21 @@ function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
             serverTarget: `${projectName}:server:production`,
           },
         },
+      });
+
+      const prerenderTarget = project.targets.get(PRERENDER_TARGET_NAME);
+      if (prerenderTarget) {
+        return;
+      }
+
+      project.targets.add({
+        name: PRERENDER_TARGET_NAME,
+        builder: '@nguniversal/builders:prerender',
+        options: {
+          browserTarget: `${projectName}:build:production`,
+          serverTarget: `${projectName}:server:production`,
+          routes: []
+        }
       });
     });
   };
