@@ -169,9 +169,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
   abstract async run(options: T & Arguments): Promise<number | void>;
 
   async validateAndRun(options: T & Arguments): Promise<number | void> {
-    if (!(options.help === true || options.help === 'json' || options.help === 'JSON')) {
-      await this.validateScope();
-    }
+    await this.validateScope();
     await this.initialize(options);
 
     if (options.help === true) {

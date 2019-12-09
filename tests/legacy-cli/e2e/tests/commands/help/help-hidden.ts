@@ -14,7 +14,7 @@ export default function() {
         `);
       }
     })
-    .then(() => silentNg('--help', 'new'))
+    .then(() => silentNg('--help', 'generate'))
     .then(({ stdout }) => {
       if (stdout.match(/--link-cli/)) {
         throw new Error(oneLine`

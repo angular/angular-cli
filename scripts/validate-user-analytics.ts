@@ -95,12 +95,25 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
 
   const commands = require('../packages/angular/cli/commands.json');
   const ngPath = path.join(newProjectRoot, 'node_modules/.bin/ng');
-  for (const commandName of Object.keys(commands)) {
-    const options = { cwd: newProjectRoot };
-    const childLogger = logger.createChild(commandName);
-    const stdout = _exec(ngPath, [commandName, '--help=json'], options, childLogger);
-    commandDescription[commandName] = JSON.parse(stdout.trim());
+  const options = { cwd: newProjectRoot };
+
+  function execCommands(commands: string[]) {
+    for (const commandName of commands) {
+      const childLogger = logger.createChild(commandName);
+      const stdout = _exec(ngPath, [commandName, '--help=json'], options, childLogger);
+      commandDescription[commandName] = JSON.parse(stdout.trim());
+    }
   }
+
+  const commandsToRunInAProject = Object.keys(commands).filter(commandName => commandName !== 'new');
+  // `ng new` is the only command that's required to run outside of an Angular project
+  const commandsToRunOutsideOfAProject = ['new'];
+
+  execCommands(commandsToRunInAProject);
+  const angularJsonPath = path.join(newProjectRoot, 'angular.json');
+  // Remove `angular.json` to ensure `ng new` is runnable in the same directory
+  fs.unlinkSync(angularJsonPath);
+  execCommands(commandsToRunOutsideOfAProject);
 
   function _checkOptionsForAnalytics(options: Option[]) {
     for (const option of options) {
