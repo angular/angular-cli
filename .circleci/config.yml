@@ -57,16 +57,14 @@ executors:
     resource_class: xlarge
 
   windows-executor:
+    # Same as https://circleci.com/orbs/registry/orb/circleci/windows, but named.
     working_directory: ~/ng
     resource_class: windows.medium
     shell: powershell.exe -ExecutionPolicy Bypass
     machine:
-      # Windows preview image that includes the following:
-      # - Visual Studio 2019 build tools
-      # - Node 12
-      # - yarn 1.17
-      # - Python 3 3.7.4
-      image: windows-server-2019-vs2019:201908-02
+      # Contents of this image:
+      # https://circleci.com/docs/2.0/hello-world-windows/#software-pre-installed-in-the-windows-image
+      image: windows-server-2019-vs2019:stable
 
 # Command Definitions
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-commands
@@ -77,11 +75,10 @@ commands:
       - attach_workspace:
           at: *workspace_location
   setup_windows:
-    steps:     
-      - run:
-          # Need to install node and yarn before to ensure correct versions.
-          name: Setup windows node environment
-          command: ./.circleci/windows-env.ps1
+    steps:
+      - run: nvm install 12.1.0
+      - run: nvm use 12.1.0
+      - run: npm install -g yarn@1.17.3
       - run: node --version
       - run: yarn --version
 
