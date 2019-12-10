@@ -18,7 +18,7 @@ TBD
 ## Merging PRs
 
 The list of PRs which are currently ready to merge (approved with passing status checks) can
-be found with [this search](https://github.com/angular/angular-cli/pulls?q=is%3Apr+is%3Aopen+review%3Aapproved+status%3Asuccess).
+be found with [this search](https://github.com/angular/angular-cli/pulls?q=is%3Apr+is%3Aopen+label%3A%22PR+action%3A+merge%22).
 This list should be checked daily and any ready PRs should be merged. For each
 PR, check the `PR target` label to understand where it should be merged to. If
 `master` is targetted, then click "Rebase and Merge". If the PR also targets a
