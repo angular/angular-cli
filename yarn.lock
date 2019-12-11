@@ -919,31 +919,31 @@
   resolved "https://registry.yarnpkg.com/@bazel/hide-bazel-files/-/hide-bazel-files-0.39.1.tgz#90b14d5031a903e78e1abfe740662c92292cc1c8"
   integrity sha512-nmILMfF8wD3hR3+r0MUCqPahgBYszLKFBcrbnmYthG6Oujgy1NpYMjeWj7Hjt3pJMkT1MgQP/VipLu2gQyMc0Q==
 
-"@bazel/jasmine@0.42.2":
-  version "0.42.2"
-  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-0.42.2.tgz#38e0d715e519e7ce4bce7d55b3e8accb2aad8217"
-  integrity sha512-OgxX84wPeWlHi4O2m0ezH9gTGx+wp3MR7QcC46PIIjWKL4W4L0Buss0R9AJeNTtxpjfv+8hfrDUI0bf2ZEIIjQ==
+"@bazel/jasmine@0.42.3":
+  version "0.42.3"
+  resolved "https://registry.yarnpkg.com/@bazel/jasmine/-/jasmine-0.42.3.tgz#c27c3fb3ac861a9d9da1190e1906818ac5143dc9"
+  integrity sha512-O7hs+TZT+J+pPgDJZh0RhwMpMDpbZoU1Qd5jSk8xWyfuNK1T6iCq5YkPS641kE/yk/07x3cDE+9xpBmW1gsJzg==
   dependencies:
     jasmine "~3.4.0"
     jasmine-core "~3.4.0"
     v8-coverage "1.0.9"
 
-"@bazel/karma@0.42.2":
-  version "0.42.2"
-  resolved "https://registry.yarnpkg.com/@bazel/karma/-/karma-0.42.2.tgz#24e2cf150a5da1fbdeb9382822b0ba7e662455a1"
-  integrity sha512-fNrZ8fIHTFwr7DGKtZLFLZxV/7+txZfiHH6bDN73qOId91RY7rr82BHgZx/iDQqnaKCW0+o9i2gPqu7lutVc8g==
+"@bazel/karma@0.42.3":
+  version "0.42.3"
+  resolved "https://registry.yarnpkg.com/@bazel/karma/-/karma-0.42.3.tgz#6a5c2fd4ac66f1d6ee3a0d46346f41d356143de1"
+  integrity sha512-NAlmxOVyWiP4nYCdGnI2nkhQsb5FDF7g+pPPprOSKFTLbXPE+S3K/VfgBk6XvB1P/X3mTugbiC9HG24BSwP8WA==
   dependencies:
     tmp "0.1.0"
 
-"@bazel/labs@0.42.2":
-  version "0.42.2"
-  resolved "https://registry.yarnpkg.com/@bazel/labs/-/labs-0.42.2.tgz#dc328ee38686c4b3690896211d6ffe43e8d6d40b"
-  integrity sha512-KUhxbbr5oIy4gjjg2E4HUJelGFs25OyurGZzzY9ARJFcIWCVzSlm3J4KBFyuyVwqOqP6xqVeufZ3ER/zs2tqog==
+"@bazel/labs@0.42.3":
+  version "0.42.3"
+  resolved "https://registry.yarnpkg.com/@bazel/labs/-/labs-0.42.3.tgz#ed97d2ad3abd2bd961f212ed6b66e1fb409739ad"
+  integrity sha512-dWTr8czg96i7rGQI6Jg/l5JsikWNWQCusDJ5db256NFKL+lbB6ii16+4zjKw/Ge3YmcMNZBP3481+4ahRCzTkA==
 
-"@bazel/typescript@0.42.2":
-  version "0.42.2"
-  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-0.42.2.tgz#6c8e2187e9f7f937650c8b4e2350dc7d46284cb1"
-  integrity sha512-9HS8W6Wv74zhjvyP2rwym05TwzB8/c3Pxxi4gfjwjwxaDAIZCQfC8UGSRxeCm5t0JNz485W1/0WScoACjcASCQ==
+"@bazel/typescript@0.42.3":
+  version "0.42.3"
+  resolved "https://registry.yarnpkg.com/@bazel/typescript/-/typescript-0.42.3.tgz#224d44bb32aa7b36908e01b2c58f68a0d22fe5b1"
+  integrity sha512-6cnB50Zu6avGZbBruV51YNLrYtze+bWocnK49tdCkvu9qNTUISZpKgzpOwXUFj81zjNp9ffStWR1qPasTAJDxw==
   dependencies:
     protobufjs "6.8.8"
     semver "5.6.0"
