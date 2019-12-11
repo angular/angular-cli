@@ -36,7 +36,7 @@ exports.config = {
     jasmine.getEnv().addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
     serverDaemon = exec('node static-server');
     execSync(
-      'ng run express-engine-ivy-prerender:prerender --routes=pikachu',
+      'ng run express-engine-ivy-prerender:prerender --routes=pokemon/pikachu',
       { stdio: 'inherit' },
     );
   },

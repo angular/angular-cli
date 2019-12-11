@@ -12,6 +12,6 @@ export class PokedexComponent {
   pokemonObservable: Observable<any>;
   constructor(private http: HttpClient, private router: Router) {
     // This request will use the In-memory Db in PokemonService.
-    this.pokemonObservable = http.get<any>('api/pokemon' + router.url);
+    this.pokemonObservable = http.get<any>('api' + router.url);
   }
 }

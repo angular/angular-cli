@@ -206,15 +206,15 @@ describe('Prerender Builder', () => {
       options.routes = ['route1', 'route2'];
       await PrerenderModule._renderUniversal(options, context, browserResult, serverResult);
       expect(mkdirSyncSpy.calls.allArgs()).toEqual([
-        ['dist/browser/route1'],
-        ['dist/browser/route2'],
+        ['dist/browser/route1', { recursive: true }],
+        ['dist/browser/route2', { recursive: true }],
       ]);
     });
 
     it('should write to "index/index.html" for route "/"', async () => {
       await PrerenderModule._renderUniversal(options, context, browserResult, serverResult);
       expect(mkdirSyncSpy.calls.allArgs()).toEqual([
-        ['dist/browser/index'],
+        ['dist/browser/index', { recursive: true }],
       ]);
       expect(writeFileSyncSpy.calls.allArgs()).toEqual([
         ['dist/browser/index/index.html', RENDERED_HTML],

@@ -62,7 +62,7 @@ export async function _renderUniversal(
       // There will never conflicting output folders
       // because items in options.routes must be unique.
       try {
-        fs.mkdirSync(outputFolderPath);
+        fs.mkdirSync(outputFolderPath, { recursive: true });
         fs.writeFileSync(outputIndexPath, html);
         const bytes = Buffer.byteLength(html).toFixed(0);
         context.logger.info(

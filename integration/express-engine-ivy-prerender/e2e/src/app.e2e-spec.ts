@@ -7,8 +7,8 @@ describe('workspace-project App', () => {
     page = new AppPage();
   });
 
-  it('should have prerendered /pikachu', async () => {
-    page.navigateTo('pikachu');
+  it('should have prerendered /pokemon/pikachu', async () => {
+    page.navigateTo('pokemon/pikachu');
     expect(await page.getTitleText()).toEqual('pikachu');
   });
 
