@@ -10,7 +10,7 @@ import { Stats } from 'fs';
 import * as ts from 'typescript';
 import { NgccProcessor } from './ngcc_processor';
 import { WebpackResourceLoader } from './resource_loader';
-import { workaroundResolve } from './utils';
+import { forwardSlashPath, workaroundResolve } from './utils';
 
 export interface OnErrorFn {
   (message: string): void;
@@ -100,6 +100,11 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   invalidate(fileName: string): void {
     const fullPath = this.resolve(fileName);
     this._sourceFileCache.delete(fullPath);
+
+    if (this.ngccProcessor) {
+      // Delete the ngcc processor cache using the TS-format file names.
+      this.ngccProcessor.invalidate(forwardSlashPath(fileName));
+    }
 
     let exists = false;
     try {
