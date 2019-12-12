@@ -158,7 +158,9 @@ describe('Prerender Builder', () => {
 
   describe('#_renderUniversal', () => {
     const INITIAL_HTML = '<html></html>';
+    const MARKED_HTML = INITIAL_HTML + '<!-- This page was prerendered with Angular Universal -->';
     const RENDERED_HTML = '<html>[Rendered Content]</html>';
+
     let renderModuleFnSpy: jasmine.Spy;
     let readFileSyncSpy: jasmine.Spy;
     let mkdirSyncSpy: jasmine.Spy;
@@ -196,9 +198,9 @@ describe('Prerender Builder', () => {
       options.routes = ['route1', 'route2', 'route3'];
       await PrerenderModule._renderUniversal(options, context, browserResult, serverResult);
       expect(renderModuleFnSpy.calls.allArgs()).toEqual([
-        [emptyFn, {document: INITIAL_HTML, url: 'route1'}],
-        [emptyFn, {document: INITIAL_HTML, url: 'route2'}],
-        [emptyFn, {document: INITIAL_HTML, url: 'route3'}],
+        [emptyFn, {document: MARKED_HTML, url: 'route1'}],
+        [emptyFn, {document: MARKED_HTML, url: 'route2'}],
+        [emptyFn, {document: MARKED_HTML, url: 'route3'}],
       ]);
     });
 
