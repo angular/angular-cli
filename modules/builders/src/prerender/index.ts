@@ -55,9 +55,14 @@ export async function _renderUniversal(
       };
       const html = await renderModuleFn(AppServerModuleDef, renderOpts);
 
-      const outputFolderName = route === '/' ? 'index' : route;
-      const outputFolderPath = path.join(outputPath, outputFolderName);
+      const outputFolderPath = path.join(outputPath, route);
       const outputIndexPath = path.join(outputFolderPath, 'index.html');
+
+      // This case happens when we are prerendering "/".
+      if (browserIndexOutputPath === outputIndexPath) {
+        const browserIndexOutputPathOriginal = path.join(outputPath, 'index.original.html');
+        fs.writeFileSync(browserIndexOutputPathOriginal, indexHtml);
+      }
 
       // There will never conflicting output folders
       // because items in options.routes must be unique.

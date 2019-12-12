@@ -211,13 +211,11 @@ describe('Prerender Builder', () => {
       ]);
     });
 
-    it('should write to "index/index.html" for route "/"', async () => {
+    it('should save index.html as index.original.html when caching route "/"', async () => {
       await PrerenderModule._renderUniversal(options, context, browserResult, serverResult);
-      expect(mkdirSyncSpy.calls.allArgs()).toEqual([
-        ['dist/browser/index', { recursive: true }],
-      ]);
       expect(writeFileSyncSpy.calls.allArgs()).toEqual([
-        ['dist/browser/index/index.html', RENDERED_HTML],
+        ['dist/browser/index.original.html', INITIAL_HTML],
+        ['dist/browser/index.html', RENDERED_HTML],
       ]);
     });
 
@@ -234,6 +232,7 @@ describe('Prerender Builder', () => {
       mkdirSyncSpy.and.callFake(() => {
         throw new Error('Test mkdirSync error.');
       });
+      spyOn(context.logger, 'error');
       await expectAsync(
         PrerenderModule._renderUniversal(
           options,
@@ -243,7 +242,7 @@ describe('Prerender Builder', () => {
         )
       ).not.toBeRejected();
       expect(mkdirSyncSpy).toHaveBeenCalled();
-      expect(writeFileSyncSpy).not.toHaveBeenCalled();
+      expect(context.logger.error).toHaveBeenCalled();
     });
   });
 
