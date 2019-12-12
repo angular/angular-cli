@@ -14,6 +14,7 @@ import { updateNGSWConfig } from './ngsw-config';
 import { removeTsickle } from './remove-tsickle';
 import { updateApplicationTsConfigs } from './update-app-tsconfigs';
 import { updateDependencies } from './update-dependencies';
+import { updateI18nConfig } from './update-i18n';
 import { updateServerMainFile } from './update-server-main-file';
 import { updateWorkspaceConfig } from './update-workspace-config';
 
@@ -21,6 +22,7 @@ export default function(): Rule {
   return () => {
     return chain([
       updateWorkspaceConfig(),
+      updateI18nConfig(),
       updateLibraries(),
       updateNGSWConfig(),
       updateApplicationTsConfigs(),
