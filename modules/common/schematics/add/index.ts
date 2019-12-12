@@ -118,7 +118,12 @@ function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
           browserTarget: `${projectName}:build:production`,
           serverTarget: `${projectName}:server:production`,
           routes: []
-        }
+        },
+        // Add a dummy production config to be consistent with other targets.
+        configurations: {
+          production: {
+          },
+        },
       });
     });
   };
