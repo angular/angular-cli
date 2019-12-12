@@ -23,8 +23,8 @@ function hook(
 ) {
   compiler.hooks.compilation.tap(
     'cleancss-webpack-plugin',
-    (compilation: compilation.Compilation) => {
-      compilation.hooks.optimizeChunkAssets.tapPromise('cleancss-webpack-plugin', chunks =>
+    (compilation: compilation.Compilation): any => {
+      compilation.hooks.optimizeChunkAssets.tapPromise('cleancss-webpack-plugin', (chunks: any): any =>
         action(compilation, chunks),
       );
     },

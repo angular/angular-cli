@@ -121,7 +121,7 @@ export class ArchitectPlugin {
 
     // On the start of a new compilation, maybe reset the counters (and update the total), then
     // listen to all hooks we're interested in.
-    compiler.hooks.compilation.tap('ArchitectPlugin', compilation => {
+    compiler.hooks.compilation.tap('ArchitectPlugin', (compilation): any => {
       const hooks = hookSafelist;
       if (reset) {
         reset = false;
@@ -135,7 +135,7 @@ export class ArchitectPlugin {
       update('Preparing...');
 
       compilation.hooks.buildModule.tap('ArchitectPlugin', buildModule);
-      compilation.hooks.failedModule.tap('ArchitectPlugin', failedModule);
+      compilation.hooks.failedModule.tap('ArchitectPlugin', failedModule as any);
       compilation.hooks.succeedModule.tap('ArchitectPlugin', succeedModule);
 
       for (const name of hooks) {

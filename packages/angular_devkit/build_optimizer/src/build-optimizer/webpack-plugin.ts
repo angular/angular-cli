@@ -11,7 +11,7 @@ import { Compiler } from 'webpack';  // tslint:disable-line:no-implicit-dependen
 export class BuildOptimizerWebpackPlugin {
   apply(compiler: Compiler) {
     compiler.hooks.normalModuleFactory.tap('BuildOptimizerWebpackPlugin', nmf => {
-      nmf.hooks.module.tap('BuildOptimizerWebpackPlugin', (module, data) => {
+      nmf.hooks.module.tap('BuildOptimizerWebpackPlugin', (module: any, data: any) => {
         const resolveData = data.resourceResolveData;
         if (resolveData && resolveData.descriptionFileData) {
           // Only TS packages should use Build Optimizer.

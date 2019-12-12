@@ -389,7 +389,7 @@ async function setupLocalize(
   // tslint:disable-next-line: no-non-null-assertion
   webpackConfig.plugins!.push({
     apply: (compiler: webpack.Compiler) => {
-      compiler.hooks.thisCompilation.tap('build-angular', compilation => {
+      compiler.hooks.thisCompilation.tap('build-angular', (compilation: any): any => {
         compilation.hooks.finishModules.tap('build-angular', () => {
           if (!diagnostics) {
             return;

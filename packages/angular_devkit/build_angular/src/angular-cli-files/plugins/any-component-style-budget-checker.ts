@@ -23,7 +23,7 @@ export class AnyComponentStyleBudgetChecker implements Plugin {
   }
 
   apply(compiler: Compiler) {
-    compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
+    compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation): any => {
       compilation.hooks.afterOptimizeChunkAssets.tap(PLUGIN_NAME, () => {
         // In AOT compilations component styles get processed in child compilations.
         // tslint:disable-next-line: no-any

@@ -16,7 +16,7 @@ const Template = require('webpack/lib/Template');
 export class NamedLazyChunksPlugin {
   constructor() { }
   apply(compiler: Compiler): void {
-    compiler.hooks.compilation.tap('named-lazy-chunks-plugin', compilation => {
+    compiler.hooks.compilation.tap('named-lazy-chunks-plugin', (compilation: any): any => {
       // The dependencyReference hook isn't in the webpack typings so we have to type it as any.
       // tslint:disable-next-line: no-any
       (compilation.hooks as any).dependencyReferencedExports.tap('named-lazy-chunks-plugin',

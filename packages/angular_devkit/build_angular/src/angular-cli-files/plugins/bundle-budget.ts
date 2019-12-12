@@ -24,6 +24,21 @@ export class BundleBudgetPlugin {
       return;
     }
 
+    // tslint:disable-next-line: no-any
+    compiler.hooks.compilation.tap('BundleBudgetPlugin', (compilation: compilation.Compilation): any => {
+      compilation.hooks.afterOptimizeChunkAssets.tap('BundleBudgetPlugin', () => {
+        // In AOT compilations component styles get processed in child compilations.
+        // tslint:disable-next-line: no-any
+        const parentCompilation = (compilation.compiler as any).parentCompilation;
+        if (!parentCompilation) {
+          return;
+        }
+
+        const filteredBudgets = budgets.filter(budget => budget.type === Type.AnyComponentStyle);
+        this.runChecks(filteredBudgets, compilation);
+      });
+    });
+
     compiler.hooks.afterEmit.tap('BundleBudgetPlugin', (compilation: compilation.Compilation) => {
       this.runChecks(budgets, compilation);
     });

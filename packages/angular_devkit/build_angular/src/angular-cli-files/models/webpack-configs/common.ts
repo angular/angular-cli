@@ -155,11 +155,11 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
           // that changes the name of the ES5 polyfills chunk to not include ES2015.
           extraPlugins.push({
             apply(compiler) {
-              compiler.hooks.compilation.tap('build-angular', compilation => {
+              compiler.hooks.compilation.tap('build-angular', (compilation: any): any => {
                 // Webpack typings do not contain MainTemplate assetPath hook
                 // The webpack.Compilation assetPath hook is a noop in 4.x so the template must be used
                 // tslint:disable-next-line: no-any
-                (compilation.mainTemplate.hooks as any).assetPath.tap(
+                (compilation.hooks as any).assetPath.tap(
                   'build-angular',
                   (filename: string, data: ChunkData) => {
                     const isMap = filename && filename.endsWith('.map');
@@ -168,7 +168,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
                       ? `polyfills-es5${hashFormat.chunk}.js${isMap ? '.map' : ''}`
                       : filename;
                   },
-                );
+                )
               });
             },
           });

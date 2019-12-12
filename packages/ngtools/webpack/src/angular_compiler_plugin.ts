@@ -675,7 +675,7 @@ export class AngularCompilerPlugin {
     });
 
     // cleanup if not watching
-    compiler.hooks.thisCompilation.tap('angular-compiler', compilation => {
+    compiler.hooks.thisCompilation.tap('angular-compiler', (compilation): any => {
       compilation.hooks.finishModules.tap('angular-compiler', () => {
         this._checkUnusedFiles(compilation);
 
@@ -803,7 +803,7 @@ export class AngularCompilerPlugin {
         // We resolve symbolic links in order to get the real path that would be used in webpack.
         const angularCoreResourceRoot = fs.realpathSync(path.dirname(angularCorePackagePath));
 
-        cmf.hooks.afterResolve.tapPromise('angular-compiler', async result => {
+        cmf.hooks.afterResolve.tapPromise('angular-compiler', async (result: any) => {
           // Alter only existing request from Angular or the additional lazy module resources.
           const isLazyModuleResource = (resource: string) =>
             resource.startsWith(angularCoreResourceRoot) ||
@@ -861,7 +861,9 @@ export class AngularCompilerPlugin {
       'angular-compiler',
       compilation => this._donePromise = this._make(compilation),
     );
-    compiler.hooks.invalid.tap('angular-compiler', () => this._firstRun = false);
+    compiler.hooks.invalid.tap('angular-compiler', (): any => {
+      this._firstRun = false
+    });
     compiler.hooks.afterEmit.tap('angular-compiler', compilation => {
       // tslint:disable-next-line:no-any
       (compilation as any)._ngToolsWebpackPluginInstance = null;

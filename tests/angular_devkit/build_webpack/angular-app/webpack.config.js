@@ -25,7 +25,7 @@ module.exports = {
   ],
   module: {
     rules: [
-      { test: /\.scss$/, loaders: ['raw-loader', 'sass-loader'] },
+      { test: /\.scss$/, loader: ['raw-loader', 'sass-loader'] },
       { test: /\.css$/, loader: 'raw-loader' },
       { test: /\.html$/, loader: 'raw-loader' },
       // require.resolve is required only because of the monorepo structure here.
