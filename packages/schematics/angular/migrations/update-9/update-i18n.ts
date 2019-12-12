@@ -21,23 +21,63 @@ import { getAllOptions, getProjectTarget, getTargets, getWorkspace } from './uti
 
 export function updateI18nConfig(): Rule {
   return (tree, context) => {
+    // this is whole process of partial change writing and repeat loading/looping is only necessary
+    // to workaround underlying issues with the recorder and ast helper functions
+
     const workspacePath = getWorkspacePath(tree);
-    const workspace = getWorkspace(tree);
-    const recorder = tree.beginUpdate(workspacePath);
+    let workspaceAst = getWorkspace(tree);
 
-    for (const { target } of getTargets(workspace, 'build', Builders.Browser)) {
+    // Update extract targets
+    const extractTargets = getTargets(workspaceAst, 'extract-i18n', Builders.ExtractI18n);
+    if (extractTargets.length > 0) {
+      const recorder = tree.beginUpdate(workspacePath);
+
+      for (const { target, project } of extractTargets) {
+        addProjectI18NOptions(recorder, tree, target, project);
+        removeExtracti18nDeprecatedOptions(recorder, target);
+      }
+
+      tree.commitUpdate(recorder);
+
+      // workspace was changed so need to reload
+      workspaceAst = getWorkspace(tree);
+    }
+
+    // Update base HREF values for existing configurations
+    let recorder = tree.beginUpdate(workspacePath);
+    for (const { target } of getTargets(workspaceAst, 'build', Builders.Browser)) {
+      updateBaseHrefs(recorder, target);
+    }
+    for (const { target } of getTargets(workspaceAst, 'test', Builders.Karma)) {
+      updateBaseHrefs(recorder, target);
+    }
+    tree.commitUpdate(recorder);
+
+    // Remove i18n format option
+    workspaceAst = getWorkspace(tree);
+    recorder = tree.beginUpdate(workspacePath);
+    for (const { target } of getTargets(workspaceAst, 'build', Builders.Browser)) {
+      removeFormatOption(recorder, target);
+    }
+    for (const { target } of getTargets(workspaceAst, 'test', Builders.Karma)) {
+      removeFormatOption(recorder, target);
+    }
+    tree.commitUpdate(recorder);
+
+    // Add new i18n options to build target configurations
+    workspaceAst = getWorkspace(tree);
+    recorder = tree.beginUpdate(workspacePath);
+    for (const { target } of getTargets(workspaceAst, 'build', Builders.Browser)) {
       addBuilderI18NOptions(recorder, target, context.logger);
     }
+    tree.commitUpdate(recorder);
 
-    for (const { target } of getTargets(workspace, 'test', Builders.Karma)) {
+    // Add new i18n options to test target configurations
+    workspaceAst = getWorkspace(tree);
+    recorder = tree.beginUpdate(workspacePath);
+    for (const { target } of getTargets(workspaceAst, 'test', Builders.Karma)) {
       addBuilderI18NOptions(recorder, target, context.logger);
     }
-
-    for (const { target, project } of getTargets(workspace, 'extract-i18n', Builders.ExtractI18n)) {
-      addProjectI18NOptions(recorder, tree, target, project);
-      removeExtracti18nDeprecatedOptions(recorder, target);
-    }
-
     tree.commitUpdate(recorder);
 
     return tree;
@@ -139,23 +179,10 @@ function addBuilderI18NOptions(
   logger: logging.LoggerApi,
 ) {
   const options = getAllOptions(builderConfig);
-  const mainOptions = findPropertyInAstObject(builderConfig, 'options');
-  const mainBaseHref =
-    mainOptions &&
-    mainOptions.kind === 'object' &&
-    findPropertyInAstObject(mainOptions, 'baseHref');
-  const hasMainBaseHref =
-    !!mainBaseHref && mainBaseHref.kind === 'string' && mainBaseHref.value !== '/';
 
   for (const option of options) {
     const localeId = findPropertyInAstObject(option, 'i18nLocale');
     const i18nFile = findPropertyInAstObject(option, 'i18nFile');
-
-    // The format is always auto-detected now
-    const i18nFormat = findPropertyInAstObject(option, 'i18nFormat');
-    if (i18nFormat) {
-      removePropertyInAstObject(recorder, option, 'i18nFormat');
-    }
 
     const outputPath = findPropertyInAstObject(option, 'outputPath');
     if (
@@ -165,16 +192,6 @@ function addBuilderI18NOptions(
       outputPath &&
       outputPath.kind === 'string'
     ) {
-      // This first block was intended to remove the redundant output path field
-      // but due to defects in the recorder, removing the option will cause malformed json
-      // if (
-      //   mainOutputPathValue &&
-      //   outputPath.value.match(
-      //     new RegExp(`[/\\\\]?${mainOutputPathValue}[/\\\\]${localeId.value}[/\\\\]?$`),
-      //   )
-      // ) {
-      //   removePropertyInAstObject(recorder, option, 'outputPath');
-      // } else
       if (outputPath.value.match(new RegExp(`[/\\\\]${localeId.value}[/\\\\]?$`))) {
         const newOutputPath = outputPath.value.replace(
           new RegExp(`[/\\\\]${localeId.value}[/\\\\]?$`),
@@ -206,6 +223,40 @@ function addBuilderI18NOptions(
     if (i18nFile) {
       removePropertyInAstObject(recorder, option, 'i18nFile');
     }
+  }
+}
+
+function removeFormatOption(
+  recorder: UpdateRecorder,
+  builderConfig: JsonAstObject,
+) {
+  const options = getAllOptions(builderConfig);
+
+  for (const option of options) {
+    // The format is always auto-detected now
+    const i18nFormat = findPropertyInAstObject(option, 'i18nFormat');
+    if (i18nFormat) {
+      removePropertyInAstObject(recorder, option, 'i18nFormat');
+    }
+  }
+}
+
+function updateBaseHrefs(
+  recorder: UpdateRecorder,
+  builderConfig: JsonAstObject,
+) {
+  const options = getAllOptions(builderConfig);
+  const mainOptions = findPropertyInAstObject(builderConfig, 'options');
+  const mainBaseHref =
+    mainOptions &&
+    mainOptions.kind === 'object' &&
+    findPropertyInAstObject(mainOptions, 'baseHref');
+  const hasMainBaseHref =
+    !!mainBaseHref && mainBaseHref.kind === 'string' && mainBaseHref.value !== '/';
+
+  for (const option of options) {
+    const localeId = findPropertyInAstObject(option, 'i18nLocale');
+    const i18nFile = findPropertyInAstObject(option, 'i18nFile');
 
     // localize base HREF values are controlled by the i18n configuration
     const baseHref = findPropertyInAstObject(option, 'baseHref');
