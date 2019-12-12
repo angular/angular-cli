@@ -9302,10 +9302,10 @@ rollup@1.25.2:
     "@types/node" "*"
     acorn "^7.1.0"
 
-rollup@1.27.10:
-  version "1.27.10"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-1.27.10.tgz#e0814c1401e7658b679d617d3511f0a4ffaea019"
-  integrity sha512-5PjBSKney8zLu7tTn/y4iVBL3OyK+G9rA/wfkcY78bZ9kAMtgNqb8nOfR5KpoDYyt8Vs5o2o8DyDjf9RpwYbAg==
+rollup@1.27.11:
+  version "1.27.11"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-1.27.11.tgz#95d190432e3edbcf757d921857df01ad1596ef97"
+  integrity sha512-ENXdvXk8tjtkNTvIvjRzOEu+vv54va7PiDR7VwP8TD+In6J87gKzzFmQMawQixEL2y9rsPEgomUS7ZVkq47Tww==
   dependencies:
     "@types/estree" "*"
     "@types/node" "*"
