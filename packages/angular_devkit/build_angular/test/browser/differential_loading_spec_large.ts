@@ -99,9 +99,9 @@ describe('Browser Builder with differential loading', () => {
       'vendor-es2016.js.map',
       'vendor-es5.js',
       'vendor-es5.js.map',
-    ] as PathFragment[];
+    ].sort((a, b) => a.localeCompare(b)) as PathFragment[];
 
-    expect(Object.keys(files)).toEqual(jasmine.arrayWithExactContents(expectedOutputs));
+    expect(Object.keys(files).sort((a, b) => a.localeCompare(b))).toEqual(jasmine.arrayWithExactContents(expectedOutputs));
   });
 
   it('deactivates differential loading for watch mode', async () => {

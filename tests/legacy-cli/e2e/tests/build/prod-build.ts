@@ -54,10 +54,10 @@ export default async function () {
 
   // Size checks in bytes
   if (ivyProject) {
-    verifySize(mainES5Path, 167355);
+    verifySize(mainES5Path, 173355);
     verifySize(mainES2015Path, 149806);
   } else {
-    verifySize(mainES5Path, 184470);
+    verifySize(mainES5Path, 184770);
     verifySize(mainES2015Path, 163627);
   }
 
