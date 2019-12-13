@@ -5,13 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { transformAsync } from '@babel/core';
 import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import { minify } from 'terser';
-import { ScriptTarget, transpileModule } from 'typescript';
-import { SourceMapSource } from 'webpack-sources';
 import { manglingDisabled } from './mangle-options';
 
 const cacache = require('cacache');
@@ -104,32 +103,37 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
   let downlevelMap;
   if (downlevel) {
     // Downlevel the bundle
-    const transformResult = transpileModule(sourceCode, {
-      fileName: downlevelFilename,
-      compilerOptions: {
-        downlevelIteration: true,
-        sourceMap: !!sourceMap,
-        target: ScriptTarget.ES5,
-      },
+    const transformResult = await transformAsync(sourceCode, {
+      filename: options.filename,
+      inputSourceMap: manualSourceMaps ? undefined : sourceMap,
+      babelrc: false,
+      presets: [
+        [
+          require.resolve('@babel/preset-env'),
+          {
+            // modules aren't needed since the bundles use webpack's custom module loading
+            modules: false,
+            // 'transform-typeof-symbol' generates slower code
+            exclude: ['transform-typeof-symbol'],
+          },
+        ],
+      ],
+      minified: options.optimize,
+      // `false` ensures it is disabled and prevents large file warnings
+      compact: options.optimize || false,
+      sourceMaps: !!sourceMap,
     });
 
-    downlevelCode = transformResult.outputText;
+    if (!transformResult || !transformResult.code) {
+      throw new Error(`Unknown error occurred processing bundle for "${options.filename}".`);
+    }
+    downlevelCode = transformResult.code;
 
-    if (sourceMap && transformResult.sourceMapText) {
-      if (manualSourceMaps) {
-        downlevelMap = await mergeSourcemaps(sourceMap, JSON.parse(transformResult.sourceMapText));
-      } else {
-        // More accurate but significantly more costly
-        const tempSource = new SourceMapSource(
-          transformResult.outputText,
-          downlevelFilename,
-          JSON.parse(transformResult.sourceMapText),
-          sourceCode,
-          sourceMap,
-        );
-
-        downlevelMap = tempSource.map();
-      }
+    if (manualSourceMaps && sourceMap && transformResult.map) {
+      downlevelMap = await mergeSourcemaps(sourceMap, transformResult.map);
+    } else {
+      // undefined is needed here to normalize the property type
+      downlevelMap = transformResult.map || undefined;
     }
   }
 
