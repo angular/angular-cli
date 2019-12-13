@@ -489,7 +489,7 @@ function createReplacePlugin(replacements: [string, string][]): PluginObj {
       StringLiteral(path: NodePath<types.StringLiteral>) {
         for (const replacement of replacements) {
           if (path.node.value === replacement[0]) {
-            path.replaceWith(types.stringLiteral(replacement[1]));
+            path.node.value = replacement[1];
           }
         }
       },
