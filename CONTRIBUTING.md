@@ -110,14 +110,21 @@ Before you submit your Pull Request (PR) consider the following guidelines:
 * If we suggest changes then:
   * Make the required updates.
   * Re-run the Angular DevKit test suites to ensure tests are still passing.
-  * Rebase your branch and force push to your GitHub repository (this will update your Pull Request):
+* Once your PR is approved and you are done with any follow up changes:
+  * Rebase to the current master to pre-emptively address any merge conflicts.
 
     ```shell
     git rebase master -i
     git push -f
     ```
+  * Add the `PR action: merge` label and the correct
+[target label](https://github.com/angular/angular/blob/master/docs/TRIAGE_AND_LABELS.md#pr-target)
+    (if PR author has the project collaborator status, or else the last reviewer
+    should do this).
+  * The current caretaker will merge the PR to the target branch(es) within 1-2
+    business days.
 
-That's it! Thank you for your contribution!
+That's it! 🎉 Thank you for your contribution!
 
 #### After your pull request is merged
 
@@ -301,12 +308,12 @@ yarn bazel run //etc/api:angular_devkit_core_api.accept
 **Note**: In some cases we use aliased symbols to create namespaces.
 
 Example:
-```javascript 
+```javascript
 import * as foo from './foo';
 
 export { foo };
 ```
-There are currently not supported by the API guardian. 
+There are currently not supported by the API guardian.
 To overcome this limitation we created `_golden-api.ts` in certain packages.
 
 When adding a new API, it might be the case that you need to add it to `_golden-api.ts`.
