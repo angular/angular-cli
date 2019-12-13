@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BaseException, normalize, template as templateImpl } from '@angular-devkit/core';
+import { TextDecoder } from 'util';
 import { FileOperator, Rule } from '../engine/interface';
 import { FileEntry } from '../tree/interface';
 import { chain, composeFileOperators, forEach, when } from './base';
 import { rename } from './rename';
-import { isBinary } from './utils/is-binary';
 
 
 export const TEMPLATE_FILENAME_RE = /\.template$/;
@@ -48,18 +48,26 @@ export interface PathTemplateOptions {
   pipeSeparator?: string;
 }
 
+const decoder = new TextDecoder('utf-8', { fatal: true });
 
 export function applyContentTemplate<T>(options: T): FileOperator {
   return (entry: FileEntry) => {
-    const {path, content} = entry;
-    if (isBinary(content)) {
-      return entry;
-    }
+    const { path, content } = entry;
 
-    return {
-      path: path,
-      content: Buffer.from(templateImpl(content.toString('utf-8'), {})(options)),
-    };
+    try {
+      const decodedContent = decoder.decode(content);
+
+      return {
+        path,
+        content: Buffer.from(templateImpl(decodedContent, {})(options)),
+      };
+    } catch (e) {
+      if (e.code === 'ERR_ENCODING_INVALID_ENCODED_DATA') {
+        return entry;
+      }
+
+      throw e;
+    }
   };
 }
 
