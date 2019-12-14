@@ -22,7 +22,7 @@ exports.config = {
     }
   },
   directConnect: true,
-  baseUrl: 'http://localhost:3000/',
+  baseUrl: 'http://localhost:4000/',
   framework: 'jasmine',
   jasmineNodeOpts: {
     showColors: true,
@@ -34,13 +34,5 @@ exports.config = {
       project: require('path').join(__dirname, './tsconfig.json')
     });
     jasmine.getEnv().addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
-    serverDaemon = exec('node static-server');
-    execSync(
-      'ng run express-engine-ivy-prerender:prerender --routes=pokemon/pikachu',
-      { stdio: 'inherit' },
-    );
-  },
-  onComplete() {
-    serverDaemon.kill();
-  },
+  }
 };

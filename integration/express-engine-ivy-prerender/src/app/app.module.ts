@@ -6,12 +6,14 @@ import { PokemonService } from './pokemon.service';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { PokedexComponent } from './pokedex/pokedex.component';
+import { PokedexComponent } from './pokedex.component';
+import { HomepageComponent } from './homepage.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    PokedexComponent
+    PokedexComponent,
+    HomepageComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

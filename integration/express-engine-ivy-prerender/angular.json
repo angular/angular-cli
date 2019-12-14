@@ -178,7 +178,7 @@
           "options": {
             "webdriverUpdate": false,
             "protractorConfig": "e2e/protractor.conf.js",
-            "baseUrl": "http://localhost:3000"
+            "baseUrl": "http://localhost:4000"
           }
         }
       }

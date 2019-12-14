@@ -1,8 +1,10 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { PokedexComponent } from './pokedex/pokedex.component';
+import { PokedexComponent } from './pokedex.component';
+import { HomepageComponent } from './homepage.component';
 
 const routes: Routes = [
+  { path: '', component: HomepageComponent },
   { path: '**', component: PokedexComponent },
 ];
 

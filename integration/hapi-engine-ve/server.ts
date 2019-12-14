@@ -4,7 +4,7 @@ import { ngHapiEngine } from '@nguniversal/hapi-engine';
 import * as inert from '@hapi/inert';
 import { Request, Server, ResponseToolkit } from '@hapi/hapi';
 import { join } from 'path';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 
 import { AppServerModuleNgFactory } from './src/main.server';
 
@@ -21,7 +21,8 @@ export async function app() {
     },
   });
 
-  const document = readFileSync(join(distFolder, 'index.html'), 'utf-8');
+  const indexHtml = existsSync(join(distFolder, 'index.original.html')) ? 'index.original.html' : 'index.html';
+  const document = readFileSync(join(distFolder, indexHtml), 'utf-8');
 
   server.route({
     method: 'GET',
