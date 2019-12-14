@@ -5,6 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
+import { join, normalize } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
 import { getWorkspacePath } from '../../utility/config';
 import {
@@ -36,7 +38,7 @@ export function updateLibraries(): Rule {
       }
 
       const configurations = findPropertyInAstObject(target, 'configurations');
-      const tsConfig = `${projectRoot.value}/tsconfig.lib.prod.json`;
+      const tsConfig = join(normalize(projectRoot.value), 'tsconfig.lib.prod.json');
 
       if (!configurations || configurations.kind !== 'object') {
         // Configurations doesn't exist.
