@@ -12,16 +12,24 @@ import {
   SchematicsException,
   noop,
 } from '@angular-devkit/schematics';
-import {parseJsonAst, JsonParseMode, normalize, join} from '@angular-devkit/core';
+import { parseJsonAst, JsonParseMode, normalize, join, dirname } from '@angular-devkit/core';
 import {
   findPropertyInAstObject,
   appendValueInAstArray,
 } from '@schematics/angular/utility/json-utils';
-import {Schema as UniversalOptions} from '@schematics/angular/universal/schema';
-import {updateWorkspace} from '@schematics/angular/utility/workspace';
-import {addPackageJsonDependency, NodeDependencyType} from '@schematics/angular/utility/dependencies';
+import { Schema as UniversalOptions } from '@schematics/angular/universal/schema';
+import { updateWorkspace } from '@schematics/angular/utility/workspace';
+import { addPackageJsonDependency, NodeDependencyType } from '@schematics/angular/utility/dependencies';
+import * as ts from 'typescript';
 
-import {stripTsExtension, getOutputPath, getProject} from '../utils';
+import {
+  stripTsExtension,
+  getOutputPath,
+  getProject,
+  findImport,
+  addInitialNavigation,
+  getImportOfIdentifier,
+} from '../utils';
 
 const SERVE_SSR_TARGET_NAME = 'serve-ssr';
 const PRERENDER_TARGET_NAME = 'prerender';
@@ -44,6 +52,7 @@ export function addUniversalCommonRule(options: AddUniversalOptions): Rule {
       addScriptsRule(options),
       updateServerTsConfigRule(options),
       updateWorkspaceConfigRule(options),
+      routingInitialNavigationRule(options),
       addDependencies(),
     ]);
   };
@@ -171,6 +180,96 @@ function updateServerTsConfigRule(options: AddUniversalOptions): Rule {
 
       host.commitUpdate(recorder);
     }
+  };
+}
+
+function routingInitialNavigationRule(options: UniversalOptions): Rule {
+  return async host => {
+    const clientProject = await getProject(host, options.clientProject);
+    const serverTarget = clientProject.targets.get('server');
+    if (!serverTarget || !serverTarget.options) {
+      return;
+    }
+
+    const tsConfigPath = serverTarget.options.tsConfig;
+    if (!tsConfigPath || typeof tsConfigPath !== 'string' || !host.exists(tsConfigPath)) {
+      // No tsconfig path
+      return;
+    }
+
+    const parseConfigHost: ts.ParseConfigHost = {
+      useCaseSensitiveFileNames: ts.sys.useCaseSensitiveFileNames,
+      readDirectory: ts.sys.readDirectory,
+      fileExists: function (fileName: string): boolean {
+        return host.exists(fileName);
+      },
+      readFile: function (fileName: string): string {
+        return host.read(fileName).toString();
+      },
+    };
+    const { config } = ts.readConfigFile(tsConfigPath, parseConfigHost.readFile);
+    const parsed = ts.parseJsonConfigFileContent(
+      config,
+      parseConfigHost,
+      dirname(normalize(tsConfigPath)),
+    );
+    const tsHost = ts.createCompilerHost(parsed.options, true);
+    // Strip BOM as otherwise TSC methods (Ex: getWidth) will return an offset,
+    // which breaks the CLI UpdateRecorder.
+    // See: https://github.com/angular/angular/pull/30719
+    tsHost.readFile = function (fileName: string): string {
+      return host.read(fileName).toString().replace(/^\uFEFF/, '');
+    };
+    tsHost.directoryExists = function (directoryName: string): boolean {
+      const dir = host.getDir(directoryName);
+      return !!(dir.subdirs.length || dir.subfiles.length);
+    };
+    tsHost.fileExists = function (fileName: string): boolean {
+      return host.exists(fileName);
+    };
+    tsHost.getCurrentDirectory = function () {
+      return host.root.path;
+    };
+
+    const program = ts.createProgram(parsed.fileNames, parsed.options, tsHost);
+    const typeChecker = program.getTypeChecker();
+    const sourceFiles = program.getSourceFiles().filter(
+      f => !f.isDeclarationFile && !program.isSourceFileFromExternalLibrary(f));
+    const printer = ts.createPrinter();
+    const routerModule = 'RouterModule';
+    const routerSource = '@angular/router';
+
+    sourceFiles.forEach(sourceFile => {
+      const routerImport = findImport(sourceFile, routerSource, routerModule);
+      if (!routerImport) {
+        return;
+      }
+
+      let routerModuleNode: ts.CallExpression;
+      ts.forEachChild(sourceFile, function visitNode(node: ts.Node) {
+        if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) &&
+          ts.isIdentifier(node.expression.expression) && node.expression.name.text === 'forRoot') {
+          const imp = getImportOfIdentifier(typeChecker, node.expression.expression);
+
+          if (imp && imp.name === routerModule && imp.importModule === routerSource) {
+            routerModuleNode = node;
+          }
+        }
+
+        ts.forEachChild(node, visitNode);
+      });
+
+      if (routerModuleNode) {
+        const print = printer.printNode(
+          ts.EmitHint.Unspecified, addInitialNavigation(routerModuleNode),
+          sourceFile);
+
+        const recorder = host.beginUpdate(sourceFile.fileName);
+        recorder.remove(routerModuleNode.getStart(), routerModuleNode.getWidth());
+        recorder.insertRight(routerModuleNode.getStart(), print);
+        host.commitUpdate(recorder);
+      }
+    });
   };
 }
 

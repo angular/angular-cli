@@ -22,7 +22,10 @@ describe('Add Schematic Rule', () => {
   let appTree: Tree;
 
   beforeEach(async () => {
-    appTree = await createTestApp();
+    appTree = await createTestApp({
+      routing: true,
+    });
+
     schematicRunner = new SchematicTestRunner('schematics', collectionPath);
   });
 
@@ -91,5 +94,38 @@ describe('Add Schematic Rule', () => {
       'src/main.server.ts',
       'server.ts',
     ]);
+  });
+
+  it(`should set 'initialNavigation' to enabled`, async () => {
+    const routerPath = '/projects/test-app/src/app/app-routing.module.ts';
+    const tree = await schematicRunner
+      .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
+    expect(tree.read(routerPath)!.toString())
+      .toMatch(/forRoot\(routes, \{\n\s*initialNavigation: 'enabled'\n\s*\}\)/);
+  });
+
+  it(`should not set 'initialNavigation' to enabled when it's specified`, async () => {
+    const routerPath = '/projects/test-app/src/app/app-routing.module.ts';
+    const modifiedContent = appTree.read(routerPath)!.toString().replace(
+      'forRoot(routes)',
+      `forRoot(routes, { initialNavigation: 'disabled' })`,
+    );
+    appTree.overwrite(routerPath, modifiedContent);
+    const tree = await schematicRunner
+      .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
+    expect(tree.read(routerPath)!.toString()).toBe(modifiedContent);
+  });
+
+  it(`should append 'initialNavigation' when forRoot options are defined`, async () => {
+    const routerPath = '/projects/test-app/src/app/app-routing.module.ts';
+    const modifiedContent = appTree.read(routerPath)!.toString().replace(
+      'forRoot(routes)',
+      `forRoot(routes, { enableTracing: true })`,
+    );
+    appTree.overwrite(routerPath, modifiedContent);
+    const tree = await schematicRunner
+      .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
+      expect(tree.read(routerPath)!.toString())
+        .toContain(`RouterModule.forRoot(routes, { enableTracing: true, initialNavigation: 'enabled' })`);
   });
 });

@@ -173,6 +173,7 @@
           }
         }
       }
-    }},
+    }
+  },
   "defaultProject": "hapi-engine-ve"
 }
