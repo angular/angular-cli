@@ -36,6 +36,7 @@ Follow this upgrade guide if you are upgrading an exsiting Universal project to 
 The packages from this repo are published as scoped packages under [@nguniversal](https://www.npmjs.com/search?q=%40nguniversal)
 
 - [@nguniversal/common](/modules/common/README.md)
+- [@nguniversal/builders](/modules/builders/README.md)
 - [@nguniversal/express-engine](/modules/express-engine/README.md)
 - [@nguniversal/aspnetcore-engine](/modules/aspnetcore-engine/README.md)
 - [@nguniversal/hapi-engine](/modules/hapi-engine/README.md)
