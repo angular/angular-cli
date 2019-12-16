@@ -19,7 +19,6 @@ ng_package(
     srcs = [":package.json"],
     entry_point = ":index.ts",
     readme_md = ":README.md",
-    tags = ["release"],
     deps = [":module-map-ngfactory-loader"],
 )
 
