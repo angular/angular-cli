@@ -61,7 +61,7 @@
     "tree-kill": "1.2.2",
     "terser": "4.4.2",
     "terser-webpack-plugin": "2.2.3",
-    "webpack": "4.41.2",
+    "webpack": "4.41.3",
     "webpack-dev-middleware": "3.7.2",
     "webpack-dev-server": "3.9.0",
     "webpack-merge": "4.2.2",
