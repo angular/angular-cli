@@ -18,7 +18,7 @@
     "npm-package-arg": "^7.0.0",
     "pacote": "10.2.1",
     "rxjs": "6.5.3",
-    "semver": "6.3.0",
+    "semver": "7.1.1",
     "semver-intersect": "1.4.0"
   }
 }

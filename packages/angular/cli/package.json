@@ -41,7 +41,7 @@
     "pacote": "10.2.1",
     "read-package-tree": "5.3.1",
     "rimraf": "3.0.0",
-    "semver": "6.3.0",
+    "semver": "7.1.1",
     "symbol-observable": "1.2.0",
     "universal-analytics": "^0.4.20",
     "uuid": "^3.3.2"
