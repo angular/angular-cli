@@ -51,7 +51,7 @@
     "@bazel/bazel": "1.2.0",
     "@bazel/buildifier": "^0.29.0",
     "@bazel/hide-bazel-files": "^0.42.0",
-    "@bazel/ibazel": "^0.10.3",
+    "@bazel/ibazel": "^0.11.0",
     "@bazel/jasmine": "^0.42.0",
     "@bazel/karma": "^0.42.0",
     "@bazel/typescript": "^0.42.0",
