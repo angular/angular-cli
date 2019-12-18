@@ -23,6 +23,7 @@ ts_library(
     srcs = glob(
         ["**/*.ts"],
         exclude = [
+            "testing/**",
             "**/*.spec.ts",
         ],
     ),
@@ -45,19 +46,49 @@ npm_package(
     deps = [":builders"],
 )
 
+### Testing rules
+jasmine_node_test(
+    name = "unit_tests",
+    srcs = [":unit_test_lib"],
+    data = [
+        "@npm//@angular/cli",
+        "@npm//@angular-devkit/build-angular",
+        "@npm//@angular/core",
+        "@npm//@angular/router",
+        "@npm//@angular/common",
+        "@npm//@angular/compiler-cli",
+        "@npm//@angular/compiler",
+        "@npm//@angular/platform-browser",
+        "@npm//@angular/platform-browser-dynamic",
+        "@npm//@types/node",
+        "@npm//browser-sync",
+        "@npm//express",
+        "@npm//rxjs",
+        "@npm//shelljs",
+        "@npm//node-fetch",
+        "@npm//zone.js",
+        "//modules/express-engine:npm_package",
+        ":npm_package",
+    ] + glob([
+        "testing/hello-world-app/**/*",
+    ]),
+)
+
 ng_test_library(
     name = "unit_test_lib",
-    srcs = glob([
-        "**/*.spec.ts",
-    ]),
+    srcs = glob(
+        [
+            "testing/*.ts",
+            "**/*.spec.ts",
+        ],
+        exclude = ["testing/hello-world-app/**/*"],
+    ),
     deps = [
         ":builders",
         "@npm//@angular-devkit/architect",
         "@npm//@angular-devkit/core",
+        "@npm//@types/browser-sync",
+        "@npm//@types/shelljs",
+        "@npm//rxjs",
     ],
-)
-
-jasmine_node_test(
-    name = "unit_test",
-    srcs = [":unit_test_lib"],
 )

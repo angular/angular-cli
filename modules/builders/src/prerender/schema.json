@@ -17,6 +17,7 @@
       "type": "array",
       "description": "The routes to render.",
       "items": {
+        "minItems": 1,
         "type": "string",
         "uniqueItems": true
       },

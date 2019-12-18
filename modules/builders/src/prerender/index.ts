@@ -7,43 +7,38 @@
  */
 
 import { BuilderOutput, createBuilder, BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
-import { JsonObject } from '@angular-devkit/core';
-import { Schema as BuildWebpackPrerenderSchema } from './schema';
-
+import { json } from '@angular-devkit/core';
 import { Buffer } from 'buffer';
 import * as fs from 'fs';
 import * as path from 'path';
 
-export type BuilderOutputWithPaths = JsonObject & BuilderOutput & {
+import { Schema } from './schema';
+
+export type PrerenderBuilderOptions = Schema & json.JsonObject;
+
+export type PrerenderBuilderOutput = BuilderOutput & {
   baseOutputPath: string;
   outputPaths: string[];
   outputPath: string;
 };
 
 /**
- * A wrapper for import to make unit tests possible.
- */
-export function _importWrapper(importPath: string) {
-  return import(importPath);
-}
-
-/**
  * Renders each route in options.routes and writes them to
  * <route>/index.html for each output path in the browser result.
  */
-export async function _renderUniversal(
-  options: BuildWebpackPrerenderSchema,
+async function _renderUniversal(
+  options: Schema,
   context: BuilderContext,
-  browserResult: BuilderOutputWithPaths,
-  serverResult: BuilderOutputWithPaths,
-): Promise<BuilderOutputWithPaths> {
+  browserResult: PrerenderBuilderOutput,
+  serverResult: PrerenderBuilderOutput,
+): Promise<PrerenderBuilderOutput> {
   // We need to render the routes for each locale from the browser output.
   for (const outputPath of browserResult.outputPaths) {
     const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
     const browserIndexOutputPath = path.join(outputPath, 'index.html');
     const indexHtml = fs.readFileSync(browserIndexOutputPath, 'utf8');
     const { AppServerModuleDef, renderModuleFn } =
-      await exports._getServerModuleBundle(serverResult, localeDirectory);
+      await _getServerModuleBundle(serverResult, localeDirectory);
 
     context.logger.info(`\nPrerendering ${options.routes.length} route(s) to ${outputPath}`);
 
@@ -73,7 +68,7 @@ export async function _renderUniversal(
         context.logger.info(
           `CREATE ${outputIndexPath} (${bytes} bytes)`
         );
-      } catch (e) {
+      } catch {
         context.logger.error(`Unable to render ${outputIndexPath}`);
       }
     }
@@ -88,8 +83,8 @@ export async function _renderUniversal(
  *
  * Throws if no app module bundle is found.
  */
-export async function _getServerModuleBundle(
-  serverResult: BuilderOutputWithPaths,
+async function _getServerModuleBundle(
+  serverResult: PrerenderBuilderOutput,
   browserLocaleDirectory: string,
 ) {
   const { baseOutputPath = '' } = serverResult;
@@ -104,7 +99,7 @@ export async function _getServerModuleBundle(
     AppServerModuleNgFactory,
     renderModule,
     renderModuleFactory,
-  } = await exports._importWrapper(serverBundlePath);
+  } = await import(serverBundlePath);
 
   if (renderModuleFactory && AppServerModuleNgFactory) {
     // Happens when in ViewEngine mode.
@@ -129,19 +124,17 @@ export async function _getServerModuleBundle(
  * and writes them to prerender/<route>/index.html for each output path in
  * the browser result.
  */
-export async function _prerender(
-  options: JsonObject & BuildWebpackPrerenderSchema,
+export async function execute(
+  options: PrerenderBuilderOptions,
   context: BuilderContext
-): Promise<BuilderOutput> {
-  if (!options.routes || options.routes.length === 0) {
-    throw new Error('No routes found. Specify routes to render using `prerender.options.routes` in angular.json.');
-  }
+): Promise<PrerenderBuilderOutput | BuilderOutput> {
   const browserTarget = targetFromTargetString(options.browserTarget);
   const serverTarget = targetFromTargetString(options.serverTarget);
 
   const browserTargetRun = await context.scheduleTarget(browserTarget, {
     watch: false,
     serviceWorker: false,
+    // todo: handle service worker augmentation
   });
   const serverTargetRun = await context.scheduleTarget(serverTarget, {
     watch: false,
@@ -149,8 +142,8 @@ export async function _prerender(
 
   try {
     const [browserResult, serverResult] = await Promise.all([
-      browserTargetRun.result as unknown as BuilderOutputWithPaths,
-      serverTargetRun.result as unknown as BuilderOutputWithPaths,
+      browserTargetRun.result as unknown as PrerenderBuilderOutput,
+      serverTargetRun.result as unknown as PrerenderBuilderOutput,
     ]);
 
     if (browserResult.success === false || browserResult.baseOutputPath === undefined) {
@@ -160,7 +153,7 @@ export async function _prerender(
       return serverResult;
     }
 
-    return await exports._renderUniversal(options, context, browserResult, serverResult);
+    return await _renderUniversal(options, context, browserResult, serverResult);
   } catch (e) {
     return { success: false, error: e.message };
   } finally {
@@ -168,4 +161,4 @@ export async function _prerender(
   }
 }
 
-export default createBuilder(_prerender);
+export default createBuilder(execute);

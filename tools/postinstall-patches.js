@@ -52,5 +52,3 @@ ls('node_modules/@types').filter(f => f.startsWith('hapi__')).forEach(pkg => {
     echo('}').toEnd(typingsFile);
   }
 });
-
-log('===== finished running the postinstall-patches.js script =====');

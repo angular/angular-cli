@@ -7,9 +7,10 @@
  */
 
 import { spawn, SpawnOptions } from 'child_process';
-import { Observable } from 'rxjs';
+import { Observable, throwError, timer } from 'rxjs';
 import * as treeKill from 'tree-kill';
-import { createServer, AddressInfo } from 'net';
+import { createServer, AddressInfo, createConnection } from 'net';
+import { retryWhen, mergeMap } from 'rxjs/operators';
 
 export function getAvailablePort(): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -54,4 +55,37 @@ export function spawnAsObservable(
       }
     };
   });
+}
+
+export function waitUntilServerIsListening(
+  port: number,
+  host?: string,
+): Observable<undefined> {
+  const allowedErrorCodes = [
+    'ECONNREFUSED',
+    'ECONNRESET',
+  ];
+
+  return new Observable<undefined>(obs => {
+    const client = createConnection({ host, port }, () => {
+      obs.next(undefined);
+      obs.complete();
+    })
+    .on('error', err => obs.error(err));
+
+    return () => {
+      if (!client.destroyed) {
+        client.destroy();
+      }
+    };
+  })
+  .pipe(
+    retryWhen(err => err.pipe(
+      mergeMap((error, attempts) => {
+        return attempts > 10 || !allowedErrorCodes.includes(error.code)
+          ? throwError(error)
+          : timer(100 * (attempts * 1));
+      }),
+    ))
+  );
 }

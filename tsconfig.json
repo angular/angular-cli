@@ -16,7 +16,7 @@
     "typeRoots": [
       "node_modules/@types"
     ],
-    "types": ["tslib", "jasmine", "node"],
+    "types": ["tslib", "jasmine", "node", "shelljs"],
     "lib": [
       "dom",
       "es6",
@@ -33,7 +33,8 @@
     "bazel-out",
     "dist",
     "node_modules",
-    "**/*/node_modules"
+    "**/*/node_modules",
+    "**/hello-world-app"
   ],
   "compileOnSave": false,
   "buildOnSave": false,

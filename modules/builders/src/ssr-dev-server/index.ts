@@ -15,15 +15,14 @@ import {
 import { json, tags, logging } from '@angular-devkit/core';
 import {
   Observable,
-  from,
   of,
-  NEVER,
   combineLatest,
   zip,
+  from,
+  EMPTY,
 } from 'rxjs';
 import { Schema } from './schema';
 import {
-  debounceTime,
   switchMap,
   map,
   tap,
@@ -31,10 +30,15 @@ import {
   startWith,
   mapTo,
   ignoreElements,
+  finalize,
+  concatMap,
+  debounce,
+  debounceTime,
 } from 'rxjs/operators';
-import { getAvailablePort, spawnAsObservable } from './utils';
 import * as browserSync from 'browser-sync';
 import { join } from 'path';
+
+import { getAvailablePort, spawnAsObservable, waitUntilServerIsListening } from './utils';
 
 /** Log messages to ignore and not rely to the logger */
 const IGNORED_STDOUT_MESSAGES = [
@@ -42,14 +46,19 @@ const IGNORED_STDOUT_MESSAGES = [
   'Angular is running in the development mode. Call enableProdMode() to enable the production mode.'
 ];
 
+
 export type SSRDevServerBuilderOptions = Schema & json.JsonObject;
+export type SSRDevServerBuilderOutput = BuilderOutput & {
+  baseUrl?: string;
+};
 
 export function execute(
   options: SSRDevServerBuilderOptions,
   context: BuilderContext,
-): Observable<BuilderOutput> {
+): Observable<SSRDevServerBuilderOutput> {
   const browserTarget = targetFromTargetString(options.browserTarget);
   const serverTarget = targetFromTargetString(options.serverTarget);
+  const getBaseUrl = (bs: browserSync.BrowserSyncInstance) => `${bs.getOption('scheme')}://${bs.getOption('host')}:${bs.getOption('port')}`;
 
   const browserTargetRun = context.scheduleTarget(browserTarget, {
     extractCss: true,
@@ -63,6 +72,8 @@ export function execute(
     progress: options.progress,
   });
 
+  const bsInstance = browserSync.create();
+
   context.logger.error(tags.stripIndents`
   ****************************************************************************************
   This is a simple server for use in testing or debugging Angular applications locally.
@@ -72,7 +83,6 @@ export function execute(
   ****************************************************************************************
  `);
 
-  let bsInstance: browserSync.BrowserSyncInstance | undefined;
   return zip(
     browserTargetRun,
     serverTargetRun,
@@ -88,48 +98,68 @@ export function execute(
             mapTo(s),
             catchError(err => {
               context.logger.error(`A server error has occurred.\n${mapErrorToMessage(err)}`);
-              return NEVER;
+              return EMPTY;
             }),
           );
         }));
 
-      return combineLatest(br.output, server$, of(nodeServerPort)).pipe(
+      return combineLatest(br.output, server$).pipe(
         // This is needed so that if both server and browser emit close to each other
         // we only emit once. This typically happens on the first build.
-        debounceTime(100),
+        debounceTime(120),
+        map(([b, s]) => ([{
+          success: b.success && s.success,
+          error: b.error || s.error,
+        }, nodeServerPort] as [SSRDevServerBuilderOutput, number])),
+        tap(([builderOutput]) => {
+          if (builderOutput.success) {
+            context.logger.info('\nCompiled successfully.');
+          }
+        }),
+        debounce(([builderOutput]) => builderOutput.success
+        ? waitUntilServerIsListening(nodeServerPort)
+        : EMPTY)
       );
     }),
-    map(([b, s, nodeServerPort]) => ([
-      {
-        success: b.success && s.success,
-        error: b.error || s.error,
-      },
-      nodeServerPort,
-    ] as [BuilderOutput, number])),
-    switchMap(([builderOutput, nodeServerPort]) => {
+    concatMap(([builderOutput, nodeServerPort]) => {
       if (!builderOutput.success) {
         return of(builderOutput);
       }
 
-      let result: Observable<BuilderOutput> | undefined;
-      if (!bsInstance) {
-        result = from(startBrowserSync(nodeServerPort, options, context.logger)).pipe(
-          tap(instance => bsInstance = instance),
-          mapTo(builderOutput)
-        );
-      } else {
+      if (bsInstance.active) {
         bsInstance.reload();
-        result = of(builderOutput);
+        return of(builderOutput);
+      } else {
+        return from(initBrowserSync(bsInstance, nodeServerPort, options))
+          .pipe(
+            tap(bs => {
+              const baseUrl = getBaseUrl(bs);
+              context.logger.info(tags.oneLine`
+                **
+                Angular Universal Live Development Server is listening on ${baseUrl},
+                open your browser on ${baseUrl}
+                **
+              `);
+            }),
+            mapTo(builderOutput),
+          );
       }
-
-      context.logger.info('\nCompiled successfully.');
-
-      return result;
+    }),
+    map(builderOutput => ({
+      success: builderOutput.success,
+      error: builderOutput.error,
+      baseUrl: bsInstance && getBaseUrl(bsInstance),
+    } as SSRDevServerBuilderOutput)),
+    finalize(() => {
+      if (bsInstance) {
+        bsInstance.exit();
+        bsInstance.cleanup();
+      }
     }),
     catchError(error => of({
       success: false,
       error: mapErrorToMessage(error),
-    }))
+    })),
   );
 }
 
@@ -144,7 +174,6 @@ function startNodeServer(
 
   return spawnAsObservable('node', [`"${path}"`], { env, shell: true })
     .pipe(
-      // Emit a signal after the process has been started
       tap(({ stderr, stdout }) => {
         if (stderr) {
           logger.error(stderr);
@@ -155,48 +184,52 @@ function startNodeServer(
         }
       }),
       ignoreElements(),
+      // Emit a signal after the process has been started
       startWith(undefined),
     );
 }
 
-async function startBrowserSync(
+async function initBrowserSync(
+  browserSyncInstance: browserSync.BrowserSyncInstance,
   nodeServerPort: number,
   options: SSRDevServerBuilderOptions,
-  logger: logging.LoggerApi,
 ): Promise<browserSync.BrowserSyncInstance> {
+  if (browserSyncInstance.active) {
+    return browserSyncInstance;
+  }
+
   const { port, open, host } = options;
   const bsPort = port || await getAvailablePort();
 
-  const bs = browserSync.init({
-    proxy: {
-      target: `localhost:${nodeServerPort}`,
-      proxyRes: [
-        proxyRes => {
-          if ('headers' in proxyRes) {
-            proxyRes.headers['cache-control'] = undefined;
-          }
+  return new Promise((resolve, reject) => {
+    browserSyncInstance
+      .init({
+        proxy: {
+          target: `localhost:${nodeServerPort}`,
+          proxyRes: [
+            proxyRes => {
+              if ('headers' in proxyRes) {
+                proxyRes.headers['cache-control'] = undefined;
+              }
+            },
+          ]
         },
-      ]
-    },
-    host,
-    port: bsPort,
-    ui: false,
-    server: false,
-    notify: false,
-    ghostMode: false,
-    logLevel: 'silent',
-    open,
+        host,
+        port: bsPort,
+        ui: false,
+        server: false,
+        notify: false,
+        ghostMode: false,
+        logLevel: 'silent',
+        open,
+      }, (error, bs) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(bs);
+        }
+      });
   });
-
-  const url = `http://${host}:${bsPort}`;
-  logger.info(tags.oneLine`
-    **
-    Angular Universal Live Development Server is listening on ${url},
-    open your browser on ${url}
-    **
-  `);
-
-  return bs;
 }
 
 function mapErrorToMessage(error: unknown): string {

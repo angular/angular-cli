@@ -6,4 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-export * from './ssr-dev-server/index';
+export {
+  execute as executeSSRDevServerBuilder,
+  SSRDevServerBuilderOptions,
+  SSRDevServerBuilderOutput,
+} from './ssr-dev-server';
+
+export {
+  execute as executePrerenderBuilder,
+  PrerenderBuilderOptions,
+  PrerenderBuilderOutput,
+} from './prerender';
