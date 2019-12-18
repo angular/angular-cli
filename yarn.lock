@@ -7680,7 +7680,16 @@ npm-packlist@^1.1.6, npm-packlist@^1.4.6:
     ignore-walk "^3.0.1"
     npm-bundled "^1.0.1"
 
-npm-pick-manifest@4.0.0, npm-pick-manifest@^4.0.0:
+npm-pick-manifest@5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/npm-pick-manifest/-/npm-pick-manifest-5.0.0.tgz#2163877aec513b6b634cfc855960ac8259130df0"
+  integrity sha512-YUW9xObM7Y1OkQ/gSmU5VQyI3vCkG5lwOrdycw0dpj9/3dE8h9CKY8tVyHTIp50+mV8jOAGH4m4Lts7zz2rN4Q==
+  dependencies:
+    figgy-pudding "^3.5.1"
+    npm-package-arg "^8.0.0"
+    semver "^7.0.0"
+
+npm-pick-manifest@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/npm-pick-manifest/-/npm-pick-manifest-4.0.0.tgz#5e1b392a2a6310378b9bab32332597030ca073ce"
   integrity sha512-SsYReLe/16UgSL6GKX6GO4o3RVBthVy1uuHq6kZ9mkPeQXpOHbrLZoV13i8fr3LQtET+pLPSfD13e4RIYfkX5Q==
