@@ -13,10 +13,6 @@ import * as path from 'path';
 import { Configuration, ILinterOptions, Linter, findFormatter } from 'tslint';
 import * as ts from 'typescript';
 
-// Excluded (regexes) of the files to not lint. Generated files should not be linted.
-// TODO: when moved to using bazel for the build system, this won't be needed.
-const excluded = [/^dist-schema[\\\/].*/, /.*\/third_party\/.*/];
-
 function _buildRules(logger: logging.Logger) {
   const tsConfigPath = path.join(__dirname, '../etc/rules/tsconfig.json');
   const configFile = ts.readConfigFile(tsConfigPath, ts.sys.readFile);
@@ -52,11 +48,6 @@ export default async function(options: ParsedArgs, logger: logging.Logger) {
   const tsLintPath = path.join(__dirname, '../tslint.json');
   const tsLintConfig = Configuration.loadConfigurationFromPath(tsLintPath);
 
-  // Remove comments from the configuration, ie. keys that starts with "//".
-  [...tsLintConfig.rules.keys()]
-    .filter(x => x.startsWith('//'))
-    .forEach(key => tsLintConfig.rules.delete(key));
-
   // Console is used directly by tslint, and when finding a rule that doesn't exist it's considered
   // a warning by TSLint but _only_ shown on the console and impossible to see through the API.
   // In order to see any warnings that happen from TSLint itself, we hook into console.warn() and
@@ -69,11 +60,6 @@ export default async function(options: ParsedArgs, logger: logging.Logger) {
   };
 
   program.getRootFileNames().forEach(fileName => {
-    const filePath = path.relative(process.cwd(), fileName).replace(/\\/g, '/');
-    if (excluded.some(x => x.test(filePath))) {
-      return;
-    }
-
     linter.lint(fileName, ts.sys.readFile(fileName) || '', tsLintConfig);
   });
 
