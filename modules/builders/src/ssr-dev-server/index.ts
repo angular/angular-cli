@@ -34,6 +34,7 @@ import {
   concatMap,
   debounce,
   debounceTime,
+  delay,
 } from 'rxjs/operators';
 import * as browserSync from 'browser-sync';
 import { join } from 'path';
@@ -172,8 +173,10 @@ function startNodeServer(
   const path = join(outputPath, 'main.js');
   const env = { ...process.env, PORT: '' + port };
 
-  return spawnAsObservable('node', [`"${path}"`], { env, shell: true })
+  return of(null)
     .pipe(
+      delay(0), // Avoid EADDRINUSE error since it will cause the kill event to be finish.
+      switchMap(() => spawnAsObservable('node', [`"${path}"`], { env, shell: true })),
       tap(({ stderr, stdout }) => {
         if (stderr) {
           logger.error(stderr);
