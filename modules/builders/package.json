@@ -17,6 +17,7 @@
     "@angular-devkit/architect": "DEVKIT_ARCHITECT_VERSION",
     "@angular-devkit/core": "DEVKIT_CORE_VERSION",
     "browser-sync": "^2.26.7",
+    "http-proxy-middleware": "^0.20.0",
     "rxjs": "RXJS_VERSION",
     "tree-kill": "^1.2.1"
   },

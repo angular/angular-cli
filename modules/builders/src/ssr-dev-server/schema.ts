@@ -27,4 +27,10 @@ export interface Schema {
 
   /** Opens the url in default browser. */
   open?: boolean;
+
+  /**
+   * The URL that the browser client should use to connect to the development server.
+   * Use for a complex dev server setup, such as one with reverse proxies.
+   */
+  publicHost?: string;
 }
