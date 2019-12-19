@@ -59,25 +59,23 @@ export class CommonEngine {
   }
 
   /** Return the factory for a given engine instance */
-  getFactory(moduleOrFactory: Type<{}> | NgModuleFactory<{}>): Promise<NgModuleFactory<{}>> {
+  async getFactory(moduleOrFactory: Type<{}> | NgModuleFactory<{}>): Promise<NgModuleFactory<{}>> {
     // If module has been compiled AoT
     if (moduleOrFactory instanceof NgModuleFactory) {
-      return Promise.resolve(moduleOrFactory);
+      return moduleOrFactory;
     } else {
       // we're in JIT mode
       let moduleFactory = this.factoryCacheMap.get(moduleOrFactory);
 
       // If module factory is cached
       if (moduleFactory) {
-        return Promise.resolve(moduleFactory);
+        return moduleFactory;
       }
 
       // Compile the module and cache it
-      return this.getCompiler().compileModuleAsync(moduleOrFactory)
-        .then((factory) => {
-          this.factoryCacheMap.set(moduleOrFactory, factory);
-          return factory;
-        });
+      const factory = await this.getCompiler().compileModuleAsync(moduleOrFactory);
+      this.factoryCacheMap.set(moduleOrFactory, factory);
+      return factory;
     }
   }
 

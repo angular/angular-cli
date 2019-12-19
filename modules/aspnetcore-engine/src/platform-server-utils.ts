@@ -28,7 +28,7 @@ import {
   INITIAL_CONFIG,
   PlatformState
 } from '@angular/platform-server';
-import {filter, take} from 'rxjs/operators';
+import {first} from 'rxjs/operators';
 
 interface PlatformOptions {
   document?: string;
@@ -51,42 +51,37 @@ function _getPlatform(
   ]);
 }
 
-function _render<T>(platform: PlatformRef,
+async function _render<T>(platform: PlatformRef,
                     moduleRefPromise: Promise<NgModuleRef<T>>): Promise<ModuleRenderResult<T>> {
-  return moduleRefPromise.then(moduleRef => {
-    const transitionId = moduleRef.injector.get(ɵTRANSITION_ID, null);
-    if (!transitionId) {
-      throw new Error(
-        `renderModule[Factory]() requires the use of BrowserModule.withServerTransition() to ensure
+  const moduleRef = await moduleRefPromise;
+  const transitionId = moduleRef.injector.get(ɵTRANSITION_ID, null);
+  if (!transitionId) {
+    throw new Error(`renderModule[Factory]() requires the use of BrowserModule.withServerTransition() to ensure
   the server-rendered app can be properly bootstrapped into a client app.`);
+  }
+
+  const applicationRef = moduleRef.injector.get(ApplicationRef);
+  await applicationRef.isStable
+    .pipe(
+      first(isStable => isStable),
+    ).toPromise();
+
+  const platformState = platform.injector.get(PlatformState);
+  // Run any BEFORE_APP_SERIALIZED callbacks just before rendering to string.
+  const callbacks = moduleRef.injector.get(BEFORE_APP_SERIALIZED, null);
+  if (callbacks) {
+    for (const callback of callbacks) {
+      try {
+        callback();
+      } catch (e) {
+        // Ignore exceptions.
+        console.warn('Ignoring BEFORE_APP_SERIALIZED Exception: ', e);
+      }
     }
-    const applicationRef: ApplicationRef = moduleRef.injector.get(ApplicationRef);
-    return applicationRef.isStable
-      .pipe(
-        filter((isStable: boolean) => isStable),
-        take(1)
-      ).toPromise()
-      .then(() => {
-        const platformState = platform.injector.get(PlatformState);
-
-        // Run any BEFORE_APP_SERIALIZED callbacks just before rendering to string.
-        const callbacks = moduleRef.injector.get(BEFORE_APP_SERIALIZED, null);
-        if (callbacks) {
-          for (const callback of callbacks) {
-            try {
-              callback();
-            } catch (e) {
-              // Ignore exceptions.
-              console.warn('Ignoring BEFORE_APP_SERIALIZED Exception: ', e);
-            }
-          }
-        }
-
-        const output = platformState.renderToString();
-        platform.destroy();
-        return { html: output, moduleRef };
-      });
-  });
+  }
+  const output = platformState.renderToString();
+  platform.destroy();
+  return { html: output, moduleRef };
 }
 
 /**

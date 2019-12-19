@@ -91,8 +91,8 @@ function _getUniversalData(doc: Document): UniversalData {
   };
 }
 
-export function ngAspnetCoreEngine(options: Readonly<IEngineOptions>)
-    : Promise<IEngineRenderResult> {
+export async function ngAspnetCoreEngine(options: Readonly<IEngineOptions>)
+  : Promise<IEngineRenderResult> {
   if (!options.appSelector) {
     const selector = `" appSelector: '<${appSelector}></${appSelector}>' "`;
     throw new Error(`appSelector is required! Pass in ${selector},
@@ -111,52 +111,37 @@ export function ngAspnetCoreEngine(options: Readonly<IEngineOptions>)
     }
   ]);
 
-  return new Promise((resolve, reject) => {
+  const moduleOrFactory = options.ngModule;
+  if (!moduleOrFactory) {
+    throw new Error('You must pass in a NgModule or NgModuleFactory to be bootstrapped');
+  }
 
-    try {
-      const moduleOrFactory = options.ngModule;
-      if (!moduleOrFactory) {
-        throw new Error('You must pass in a NgModule or NgModuleFactory to be bootstrapped');
-      }
+  const extraProviders = [
+    ...(options.providers || []),
+    getReqResProviders(options.request.origin, options.request.data.request),
+  ];
 
-      let extraProviders = options.providers || [];
-
-      extraProviders = extraProviders.concat(getReqResProviders(options.request.origin,
-        options.request.data.request));
-
-      getFactory(moduleOrFactory, compiler)
-        .then(factory => {
-          return renderModuleFactory(factory, {
-            document: options.document || options.appSelector,
-            url: options.url || options.request.absoluteUrl,
-            extraProviders: extraProviders
-          });
-        })
-        .then(result => {
-          const doc = result.moduleRef.injector.get(DOCUMENT);
-          const universalData = _getUniversalData(doc);
-
-          resolve({
-            html: universalData.appNode,
-            moduleRef: result.moduleRef,
-            globals: {
-              styles: universalData.styles,
-              title: universalData.title,
-              scripts: universalData.scripts,
-              meta: universalData.meta,
-              links: universalData.links
-            }
-          });
-        }, (err) => {
-          reject(err);
-        });
-
-    } catch (ex) {
-      reject(ex);
-    }
-
+  const factory = await getFactory(moduleOrFactory, compiler);
+  const result = await renderModuleFactory(factory, {
+    document: options.document || options.appSelector,
+    url: options.url || options.request.absoluteUrl,
+    extraProviders,
   });
 
+  const doc = result.moduleRef.injector.get(DOCUMENT);
+  const universalData = _getUniversalData(doc);
+
+  return {
+    html: universalData.appNode,
+    moduleRef: result.moduleRef,
+    globals: {
+      styles: universalData.styles,
+      title: universalData.title,
+      scripts: universalData.scripts,
+      meta: universalData.meta,
+      links: universalData.links
+    }
+  };
 }
 
 /**
@@ -178,32 +163,22 @@ function getReqResProviders(origin: string, request: string): StaticProvider[] {
 
 /* @internal */
 const factoryCacheMap = new Map<Type<{}>, NgModuleFactory<{}>>();
-function getFactory(
+async function getFactory(
   moduleOrFactory: Type<{}> | NgModuleFactory<{}>, compiler: Compiler
 ): Promise<NgModuleFactory<{}>> {
-
-  return new Promise<NgModuleFactory<{}>>((resolve, reject) => {
-    // If module has been compiled AoT
-    if (moduleOrFactory instanceof NgModuleFactory) {
-      resolve(moduleOrFactory);
-      return;
-    } else {
-      let moduleFactory = factoryCacheMap.get(moduleOrFactory);
-
-      // If module factory is cached
-      if (moduleFactory) {
-        resolve(moduleFactory);
-        return;
-      }
-
-      // Compile the module and cache it
-      compiler.compileModuleAsync(moduleOrFactory)
-        .then((factory) => {
-          factoryCacheMap.set(moduleOrFactory, factory);
-          resolve(factory);
-        }, (err => {
-          reject(err);
-        }));
+  // If module has been compiled AoT
+  if (moduleOrFactory instanceof NgModuleFactory) {
+    return moduleOrFactory;
+  } else {
+    let moduleFactory = factoryCacheMap.get(moduleOrFactory);
+    // If module factory is cached
+    if (moduleFactory) {
+      return moduleFactory;
     }
-  });
+
+    // Compile the module and cache it
+    const factory = await compiler.compileModuleAsync(moduleOrFactory);
+    factoryCacheMap.set(moduleOrFactory, factory);
+    return factory;
+  }
 }
