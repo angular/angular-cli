@@ -14,7 +14,7 @@ import {
 import { latestVersions } from '../../utility/latest-versions';
 
 export function updateDependencies(): Rule {
-  return host => {
+  return (host, context) => {
     const dependenciesToUpdate: Record<string, string> = {
       '@angular-devkit/build-angular': latestVersions.DevkitBuildAngular,
       '@angular-devkit/build-ng-packagr': latestVersions.DevkitBuildNgPackagr,
@@ -42,5 +42,17 @@ export function updateDependencies(): Rule {
 
     // `@angular/pwa` package is only needed when running `ng-add`.
     removePackageJsonDependency(host, '@angular/pwa');
+
+    // Check for @angular-devkit/schematics and @angular-devkit/core
+    for (const name of ['@angular-devkit/schematics', '@angular-devkit/core']) {
+      const current = getPackageJsonDependency(host, name);
+      if (current) {
+        context.logger.info(
+          `Package "${name}" found in the workspace package.json. ` +
+            'This package typically does not need to be installed manually. ' +
+            'If it is not being used by project code, it can be removed from the package.json.',
+        );
+      }
+    }
   };
 }
