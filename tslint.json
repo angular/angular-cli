@@ -9,6 +9,13 @@
     "dist/etc/rules",
     "node_modules/tslint-sonarts/lib/rules"
   ],
+  "linterOptions": {
+    "format": "codeFrame",
+    "exclude": [
+      "dist-schema/**",
+      "**/third_party/**"
+    ]
+  },
   "rules": {
     // ==================================================================================================
     // custom rules defined in etc/rules/**
