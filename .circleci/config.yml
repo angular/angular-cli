@@ -15,7 +15,7 @@
 #             (Using the tag in not necessary when pinning by ID, but include it anyway for documentation purposes.)
 # **NOTE 2**: If you change the version of the docker images, also change the `cache_key` suffix.
 var_1: &docker_image circleci/node:10.16-browsers@sha256:d2a96fe1cbef51257ee626b5f645e64dade3e886f00ba9cb7e8ea65b4efe8db1
-var_2: &cache_key v2-nguniversal-{{ checksum "yarn.lock" }}-{{ checksum "WORKSPACE" }}-node-10.16
+var_2: &cache_key v7-nguniversal-{{ checksum "yarn.lock" }}-{{ checksum "WORKSPACE" }}-node-10.16
 
 # Settings common to each job
 var_3: &job_defaults
@@ -45,6 +45,7 @@ var_6: &save_cache
     paths:
     - "node_modules"
     - "~/bazel_repository_cache"
+    - "~/bazel_disk_cache"
 
 # Job step that ensures that the node module dependencies are installed and up-to-date. We use
 # Yarn with the frozen lockfile option in order to make sure that lock file and package.json are
@@ -120,7 +121,7 @@ jobs:
     steps:
     - *checkout_code
     - *restore_cache
-    - *yarn_install
+    - *copy_bazel_config
 
     - run: scripts/build-modules-dist.sh
 
@@ -143,7 +144,6 @@ jobs:
     - *checkout_code
     - *restore_cache
     - *setup_env_variables
-    - *yarn_install
     - *attach_release_output
     - run: ./integration/run_tests.sh
 

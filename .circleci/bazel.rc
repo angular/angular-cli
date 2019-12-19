@@ -1,13 +1,23 @@
+# Echo all the configuration settings and their source
+build --announce_rc
+
+# Don't be spammy in the logs
+build --noshow_progress
+
 # Bazel configuration that will be copied to /etc/bazel.bazelrc in CircleCI containers.
 # This allows us adding specific configuration flags for builds within CircleCI.
 # See more: https://docs.bazel.build/versions/master/user-manual.html#where-are-the-bazelrc-files
 
 # Save downloaded repositories in a location that can be cached by CircleCI. This helps us
 # speeding up the analysis time significantly with Bazel managed node dependencies on the CI.
-build --experimental_repository_cache=/home/circleci/bazel_repository_cache
+build --repository_cache=/home/circleci/bazel_repository_cache
 
 # Retry in the event of flakes, eg. https://circleci.com/gh/angular/universal/1768
 test --flaky_test_attempts=2
 
 # More details on failures
 build --verbose_failures=true
+
+# Setup disk cache
+build --disk_cache=/home/circleci/bazel_disk_cache
+test --disk_cache=/home/circleci/bazel_disk_cache
