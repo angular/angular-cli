@@ -342,12 +342,12 @@ workflows:
     jobs:
       # Linux jobs
       - setup
-      - lint:
-          requires:
-            - setup
-      - validate:
-          requires:
-            - setup
+      # - lint:
+      #     requires:
+      #       - setup
+      # - validate:
+      #     requires:
+      #       - setup
       - build:
           requires:
             - setup
@@ -358,102 +358,102 @@ workflows:
       - build-bazel:
           requires:
             - build
-      - test:
-          requires:
-            - build
-      - test-large:
-          requires:
-            - build
-      - test-large:
-          name: test-large-ve
-          ve: true
-          glob: "packages/angular_devkit/@(build_angular|build_ng_packagr)/@(src|test)/@(build|browser)/*_spec_large.ts"
-          requires:
-            - build
-      - e2e-cli:
-          post-steps:
-            - store_artifacts:
-                path: /tmp/dist
-                destination: cli/new-production
-          requires:
-            - build
-      - e2e-cli:
-          name: e2e-cli-ve
-          ve: true
-          requires:
-            - build
-      - e2e-cli:
-          name: e2e-cli-ng-snapshots
-          snapshots: true
-          requires:
-            - e2e-cli
-          pre-steps:
-            - run:
-                name: Don't run expensive e2e snapshots tests for forks other than renovate-bot and angular
-                command: >
-                  if [[ "$CIRCLE_PR_USERNAME" != "renovate-bot" ]] &&
-                    [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
-                    circleci step halt
-                  fi
-      - e2e-cli:
-          name: e2e-cli-ng-ve-snapshots
-          snapshots: true
-          ve: true
-          requires:
-            - e2e-cli
-          pre-steps:
-            - run:
-                name: Don't run expensive e2e snapshots tests for forks other than renovate-bot and angular
-                command: >
-                  if [[ "$CIRCLE_PR_USERNAME" != "renovate-bot" ]] &&
-                    [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
-                    circleci step halt
-                  fi
-      - e2e-cli-node-10:
-          <<: *ignore_pull_requests
-          requires:
-            - e2e-cli
-      - test-browsers:
-          requires:
-            - build
-      - flake-jail:
-          requires:
-            - build
+      # - test:
+      #     requires:
+      #       - build
+      # - test-large:
+      #     requires:
+      #       - build
+      # - test-large:
+      #     name: test-large-ve
+      #     ve: true
+      #     glob: "packages/angular_devkit/@(build_angular|build_ng_packagr)/@(src|test)/@(build|browser)/*_spec_large.ts"
+      #     requires:
+      #       - build
+      # - e2e-cli:
+      #     post-steps:
+      #       - store_artifacts:
+      #           path: /tmp/dist
+      #           destination: cli/new-production
+      #     requires:
+      #       - build
+      # - e2e-cli:
+      #     name: e2e-cli-ve
+      #     ve: true
+      #     requires:
+      #       - build
+      # - e2e-cli:
+      #     name: e2e-cli-ng-snapshots
+      #     snapshots: true
+      #     requires:
+      #       - e2e-cli
+      #     pre-steps:
+      #       - run:
+      #           name: Don't run expensive e2e snapshots tests for forks other than renovate-bot and angular
+      #           command: >
+      #             if [[ "$CIRCLE_PR_USERNAME" != "renovate-bot" ]] &&
+      #               [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
+      #               circleci step halt
+      #             fi
+      # - e2e-cli:
+      #     name: e2e-cli-ng-ve-snapshots
+      #     snapshots: true
+      #     ve: true
+      #     requires:
+      #       - e2e-cli
+      #     pre-steps:
+      #       - run:
+      #           name: Don't run expensive e2e snapshots tests for forks other than renovate-bot and angular
+      #           command: >
+      #             if [[ "$CIRCLE_PR_USERNAME" != "renovate-bot" ]] &&
+      #               [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
+      #               circleci step halt
+      #             fi
+      # - e2e-cli-node-10:
+      #     <<: *ignore_pull_requests
+      #     requires:
+      #       - e2e-cli
+      # - test-browsers:
+      #     requires:
+      #       - build
+      # - flake-jail:
+      #     requires:
+      #       - build
       
-      # Windows jobs
-      # These jobs only run after their non-windows counterparts finish successfully.
-      # This isn't strictly necessary as there is no artifact dependency, but helps economize
-      # CI resources by not attempting to build when we know it should fail.
-      - setup-and-build-win:
-          requires:
-            # The Linux setup job also does checkout and rebase, which we get via the workspace.
-            - setup
-            - build
-      - test-win:
-          requires:
-            - setup-and-build-win
-            - test
-      - e2e-cli-win:
-          <<: *ignore_pull_requests
-          requires:
-            - setup-and-build-win
-            - e2e-cli
-      
-      # Publish jobs
-      - snapshot_publish:
-          <<: *ignore_pull_requests
-          requires:
-            - test
-            - build
-            - e2e-cli
-      - publish:
-          requires:
-            - test
-            - build
-            - e2e-cli
-            - snapshot_publish
-          filters:
-            tags:
-              only: /^v\d+/
-            branches:
-              ignore: /.*/
+      # # Windows jobs
+      # # These jobs only run after their non-windows counterparts finish successfully.
+      # # This isn't strictly necessary as there is no artifact dependency, but helps economize
+      # # CI resources by not attempting to build when we know it should fail.
+      # - setup-and-build-win:
+      #     requires:
+      #       # The Linux setup job also does checkout and rebase, which we get via the workspace.
+      #       - setup
+      #       - build
+      # - test-win:
+      #     requires:
+      #       - setup-and-build-win
+      #       - test
+      # - e2e-cli-win:
+      #     <<: *ignore_pull_requests
+      #     requires:
+      #       - setup-and-build-win
+      #       - e2e-cli
+       
+      # # Publish jobs
+      # - snapshot_publish:
+      #     <<: *ignore_pull_requests
+      #     requires:
+      #       - test
+      #       - build
+      #       - e2e-cli
+      # - publish:
+      #     requires:
+      #       - test
+      #       - build
+      #       - e2e-cli
+      #       - snapshot_publish
+      #     filters:
+      #       tags:
+      #         only: /^v\d+/
+      #       branches:
+      #         ignore: /.*/

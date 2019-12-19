@@ -78,7 +78,7 @@ jasmine_node_test(
     name = "core_test",
     srcs = [":core_test_lib"],
     # TODO: Audit tests to determine if tests can be run in RBE environments
-    local = True,
+    # local = True,
     deps = [
         # @node_module: ajv
         # @node_module: fast_json_stable_stringify
@@ -137,7 +137,7 @@ jasmine_node_test(
     name = "node_test",
     srcs = [":node_test_lib"],
     # TODO: Audit tests to determine if tests can be run in RBE environments
-    local = True,
+    # local = True,
     deps = [
         "@npm//chokidar",
         "@npm//temp",
