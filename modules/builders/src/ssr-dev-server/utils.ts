@@ -32,11 +32,6 @@ export function spawnAsObservable(
 ): Observable<{ stdout?: string, stderr?: string }> {
   return new Observable(obs => {
     const proc = spawn(command, args, options);
-    if (!proc) {
-      obs.error(new Error(`${command} cannot be spawned.`));
-      return;
-    }
-
     if (proc.stdout) {
       proc.stdout.on('data', data => obs.next({ stdout: data.toString() }));
     }
@@ -47,7 +42,13 @@ export function spawnAsObservable(
 
     proc
       .on('error', err => obs.error(err))
-      .on('close', () => obs.complete());
+      .on('close', code => {
+        if (code !== 0) {
+          obs.error(new Error(`${command} exited with ${code} code.`));
+        }
+
+        obs.complete();
+      });
 
     return () => {
       if (!proc.killed) {
