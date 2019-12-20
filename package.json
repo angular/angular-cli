@@ -51,7 +51,7 @@
     "@angular/platform-browser-dynamic": "^9.0.0-rc.6",
     "@angular/platform-server": "^9.0.0-rc.6",
     "@angular/router": "^9.0.0-rc.6",
-    "@bazel/bazel": "1.2.0",
+    "@bazel/bazel": "2.0.0",
     "@bazel/buildifier": "^0.29.0",
     "@bazel/hide-bazel-files": "^0.42.0",
     "@bazel/ibazel": "^0.11.0",
