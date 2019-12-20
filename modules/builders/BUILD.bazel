@@ -1,11 +1,4 @@
-load("@npm_bazel_typescript//:index.bzl", "ts_config")
 load("//tools:defaults.bzl", "jasmine_node_test", "ng_test_library", "npm_package", "ts_library")
-
-ts_config(
-    name = "bazel-tsconfig-build",
-    src = "bazel-tsconfig-build.json",
-    deps = ["//modules:bazel-tsconfig-build.json"],
-)
 
 filegroup(
     name = "builders_assets",
@@ -28,7 +21,7 @@ ts_library(
         ],
     ),
     module_name = "@nguniversal/builders",
-    tsconfig = ":bazel-tsconfig-build",
+    tsconfig = ":tsconfig.json",
     deps = [
         "@npm//@angular-devkit/architect",
         "@npm//@angular-devkit/core",
@@ -85,6 +78,7 @@ ng_test_library(
         ],
         exclude = ["testing/hello-world-app/**/*"],
     ),
+    tsconfig = ":tsconfig.json",
     deps = [
         ":builders",
         "@npm//@angular-devkit/architect",
