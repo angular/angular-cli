@@ -241,6 +241,28 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
 
   // tslint:disable-next-line:no-big-function
   async run(options: UpdateCommandSchema & Arguments) {
+    // Check if the @angular-devkit/schematics package can be resolved from the workspace root
+    // This works around issues with packages containing migrations that cannot directly depend on the package
+    // This check can be removed once the schematic runtime handles this situation
+    try {
+      require.resolve('@angular-devkit/schematics', { paths: [this.workspace.root] });
+    } catch (e) {
+      if (e.code === 'MODULE_NOT_FOUND') {
+        this.logger.fatal(
+          'The "@angular-devkit/schematics" package cannot be resolved from the workspace root directory. ' +
+            'This may be due to an unsupported node modules structure.\n' +
+            'Please remove both the "node_modules" directory and the package lock file; and then reinstall.\n' +
+            'If this does not correct the problem, ' +
+            'please temporarily install the "@angular-devkit/schematics" package within the workspace. ' +
+            'It can be removed once the update is complete.',
+        );
+
+        return 1;
+      }
+
+      throw e;
+    }
+
     // Check if the current installed CLI version is older than the latest version.
     if (await this.checkCLILatestVersion(options.verbose, options.next)) {
       this.logger.warn(
