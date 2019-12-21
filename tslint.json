@@ -3,11 +3,36 @@
     "./tools/tslint-rules/"
   ],
   "rules": {
-    "max-line-length": [true, 100],
+    "max-line-length": [
+      true,
+      100
+    ],
     // Disable this flag because of SHA tslint#48b0c597f9257712c7d1f04b55ed0aa60e333f6a
     // TSLint now shows warnings if types for properties are inferred. This rule needs to be
     // disabled because all properties need to have explicit types set to work for Dgeni.
     "no-inferrable-types": false,
+    "arrow-return-shorthand": true,
+    "no-duplicate-imports": true,
+    "no-angle-bracket-type-assertion": true,
+    "no-conditional-assignment": true,
+    "no-non-null-assertion": true,
+    "no-unnecessary-qualifier": true,
+    "no-string-throw": true,
+    "encoding": true,
+    "no-floating-promises": true,
+    "no-import-side-effect": [
+      true,
+      {
+        "ignore-module": "^(?!rxjs\/)"
+      }
+    ],
+    "align": [
+      true,
+      "elements",
+      "members",
+      "parameters",
+      "statements"
+    ],
     "class-name": true,
     "comment-format": [
       true,
@@ -15,32 +40,60 @@
     ],
     "indent": [
       true,
-      "spaces"
+      "spaces",
+      2
     ],
+    "array-type": [
+      true,
+      "array-simple"
+    ],
+    "deprecation": {
+      "severity": "warning"
+    },
     "eofline": true,
+    "import-spacing": false,
+    "match-default-export-name": true,
+    "newline-before-return": true,
+    "no-consecutive-blank-lines": [
+      true,
+      2
+    ],
     "no-duplicate-variable": true,
     "no-eval": true,
     "no-arg": true,
-    "no-internal-module": true,
-    "no-trailing-whitespace": true,
     "no-bitwise": true,
     "no-shadowed-variable": true,
+    "no-debugger": true,
+    "no-console": true,
+    "no-internal-module": true,
+    "no-trailing-whitespace": true,
     "no-unused-expression": true,
     "no-var-keyword": true,
-    "no-debugger": true,
     "one-line": [
       true,
       "check-catch",
       "check-else",
+      "check-finally",
       "check-open-brace",
       "check-whitespace"
     ],
+    "ordered-imports": [
+      true,
+      {
+        "import-sources-order": "lowercase-last",
+        "named-imports-order": "lowercase-last"
+      }
+    ],
+    "prefer-const": true,
     "quotemark": [
       true,
       "single",
       "avoid-escape"
     ],
-    "semicolon": true,
+    "semicolon": [
+      true,
+      "always"
+    ],
     "typedef-whitespace": [
       true,
       {
@@ -56,33 +109,52 @@
       true,
       "ban-keywords",
       "check-format",
-      "allow-leading-underscore"
+      "allow-leading-underscore",
+      "allow-pascal-case"
     ],
     "whitespace": [
       true,
       "check-branch",
       "check-decl",
+      "check-module",
+      "check-preblock",
       "check-operator",
       "check-separator",
       "check-type",
-      "check-preblock"
+      "check-typecast"
     ],
     // Bans jasmine helper functions that will prevent the CI from properly running tests.
     "ban": [
       true,
-      ["fit"],
-      ["fdescribe"],
-      ["xit"],
-      ["xdescribe"],
-      {"name": "Object.assign", "message": "Use the spread operator instead."}
+      [
+        "fit"
+      ],
+      [
+        "fdescribe"
+      ],
+      [
+        "xit"
+      ],
+      [
+        "xdescribe"
+      ],
+      {
+        "name": "Object.assign",
+        "message": "Use the spread operator instead."
+      }
     ],
     // Disallows importing the whole RxJS library. Submodules can be still imported.
     // Avoids inconsistent linebreak styles in source files. Forces developers to use LF linebreaks.
-    "linebreak-style": [true, "LF"],
+    "linebreak-style": [
+      true,
+      "LF"
+    ],
     // Namespaces are no allowed, because of Closure compiler.
     "no-namespace": true,
-    "jsdoc-format": [true, "check-multiline-start"],
-
+    "jsdoc-format": [
+      true,
+      "check-multiline-start"
+    ],
     // Custom Rules
     "ts-loader": true,
     "no-exposed-todo": true,
@@ -97,9 +169,12 @@
     "deletion-target": true
   },
   "linterOptions": {
+    "format": "codeFrame",
     "exclude": [
       // Exclude schematic template files that can't be linted.
-      "**/schematics/**/files/**/*"
+      "**/schematics/**/files/**/*",
+      "**/node_modules/**/*",
+      "**/hello-world-app/**/*"
     ]
   }
 }

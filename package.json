@@ -21,7 +21,7 @@
   },
   "scripts": {
     "postinstall": "ngc -p ./angular-metadata.tsconfig.json && node --preserve-symlinks --preserve-symlinks-main ./tools/postinstall-patches.js && yarn ngcc",
-    "lint": "tslint -c tslint.json '+(modules|tools)/**/*.ts' --exclude '**/+(node_modules|hello-world-app)/**/*'",
+    "lint": "tslint -c tslint.json '+(modules|tools)/**/*.ts' -p tsconfig.json",
     "build": "npm run bazel:build",
     "prebuildifier": "bazel build --noshow_progress @com_github_bazelbuild_buildtools//buildifier",
     "bazel:format": "find . -type f \\( -name \"*.bzl\" -or -name BUILD -or -name BUILD.bazel -or -name WORKSPACE \\) ! -path \"*/node_modules/*\" | xargs buildifier -v",
