@@ -20,7 +20,7 @@ import {
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { addSymbolToNgModuleMetadata, insertImport, isImported } from '../utility/ast-utils';
+import { addSymbolToNgModuleMetadata, getEnvironmentExportName, insertImport, isImported } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
 import { getAppModulePath } from '../utility/ng-ast-utils';
@@ -71,10 +71,16 @@ function updateAppModule(mainPath: string): Rule {
     // add import for environments
     // import { environment } from '../environments/environment';
     moduleSource = getTsSourceFile(host, modulePath);
-    importModule = 'environment';
+    const environmentExportName = getEnvironmentExportName(moduleSource);
+    // if environemnt import already exists then use the found one
+    // otherwise use the default name
+    importModule = environmentExportName || 'environment';
     // TODO: dynamically find environments relative path
     importPath = '../environments/environment';
-    if (!isImported(moduleSource, importModule, importPath)) {
+
+    if (!environmentExportName) {
+      // if environment import was not found then insert the new one
+      // with default path and default export name
       const change = insertImport(moduleSource, modulePath, importModule, importPath);
       if (change) {
         const recorder = host.beginUpdate(modulePath);
@@ -85,7 +91,7 @@ function updateAppModule(mainPath: string): Rule {
 
     // register SW in app module
     const importText =
-      `ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })`;
+      `ServiceWorkerModule.register('ngsw-worker.js', { enabled: ${importModule}.production })`;
     moduleSource = getTsSourceFile(host, modulePath);
     const metadataChanges = addSymbolToNgModuleMetadata(
       moduleSource, modulePath, 'imports', importText);
