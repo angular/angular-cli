@@ -575,6 +575,50 @@ export function isImported(source: ts.SourceFile,
 }
 
 /**
+ * This function returns the name of the environment export
+ * whether this export is aliased or not. If the environment file
+ * is not imported, then it will return `null`.
+ */
+export function getEnvironmentExportName(source: ts.SourceFile): string | null {
+  // Initial value is `null` as we don't know yet if the user
+  // has imported `environment` into the root module or not.
+  let environmentExportName: string | null = null;
+
+  const allNodes = getSourceNodes(source);
+
+  allNodes
+    .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
+    .filter(
+      (declaration: ts.ImportDeclaration) =>
+        declaration.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral &&
+        declaration.importClause !== undefined,
+    )
+    .map((declaration: ts.ImportDeclaration) =>
+      // If `importClause` property is defined then the first
+      // child will be `NamedImports` object (or `namedBindings`).
+      (declaration.importClause as ts.ImportClause).getChildAt(0),
+    )
+    // Find those `NamedImports` object that contains `environment` keyword
+    // in its text. E.g. `{ environment as env }`.
+    .filter((namedImports: ts.NamedImports) => namedImports.getText().includes('environment'))
+    .forEach((namedImports: ts.NamedImports) => {
+      for (const specifier of namedImports.elements) {
+        // `propertyName` is defined if the specifier
+        // has an aliased import.
+        const name = specifier.propertyName || specifier.name;
+
+        // Find specifier that contains `environment` keyword in its text.
+        // Whether it's `environment` or `environment as env`.
+        if (name.text.includes('environment')) {
+          environmentExportName = specifier.name.text;
+        }
+      }
+    });
+
+  return environmentExportName;
+}
+
+/**
  * Returns the RouterModule declaration from NgModule metadata, if any.
  */
 export function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression | undefined {
