@@ -13,6 +13,10 @@
       "description": "Server target to use for prerendering the app.",
       "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
     },
+    "routesFile": {
+      "type": "string",
+      "description": "The path to a file containing routes separated by newlines."
+    },
     "routes": {
       "type": "array",
       "description": "The routes to render.",
@@ -26,8 +30,11 @@
   },
   "required": [
     "browserTarget",
-    "serverTarget",
-    "routes"
+    "serverTarget"
+  ],
+  "anyOf": [
+    { "required": ["routes"] },
+    { "required": ["routesFile"] }
   ],
   "additionalProperties": false
 }

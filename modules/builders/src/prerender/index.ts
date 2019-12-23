@@ -13,25 +13,70 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { Schema } from './schema';
+import { getRoutes } from './utils';
 
 export type PrerenderBuilderOptions = Schema & json.JsonObject;
 
-export type PrerenderBuilderOutput = BuilderOutput & {
+export type PrerenderBuilderOutput = BuilderOutput;
+
+type BuildBuilderOutput = BuilderOutput & {
   baseOutputPath: string;
   outputPaths: string[];
   outputPath: string;
 };
+
+type ScheduleBuildsOutput = BuilderOutput & {
+  serverResult?: BuildBuilderOutput;
+  browserResult?: BuildBuilderOutput;
+};
+
+/**
+ * Schedules the server and browser builds and returns their results if both builds are successful.
+ */
+async function _scheduleBuilds(
+  options: PrerenderBuilderOptions,
+  context: BuilderContext
+): Promise<ScheduleBuildsOutput> {
+  const browserTarget = targetFromTargetString(options.browserTarget);
+  const serverTarget = targetFromTargetString(options.serverTarget);
+
+  const browserTargetRun = await context.scheduleTarget(browserTarget, {
+    watch: false,
+    serviceWorker: false,
+    // todo: handle service worker augmentation
+  });
+  const serverTargetRun = await context.scheduleTarget(serverTarget, {
+    watch: false,
+  });
+
+  try {
+    const [browserResult, serverResult] = await Promise.all([
+      browserTargetRun.result as unknown as BuildBuilderOutput,
+      serverTargetRun.result as unknown as BuildBuilderOutput,
+    ]);
+
+    const success =
+      browserResult.success && serverResult.success && browserResult.baseOutputPath !== undefined;
+    const error = browserResult.error || serverResult.error as string;
+
+    return { success, error, browserResult, serverResult };
+  } catch (e) {
+    return { success: false, error: e.message };
+  } finally {
+    await Promise.all([browserTargetRun.stop(), serverTargetRun.stop()]);
+  }
+}
 
 /**
  * Renders each route in options.routes and writes them to
  * <route>/index.html for each output path in the browser result.
  */
 async function _renderUniversal(
-  options: Schema,
+  routes: string[],
   context: BuilderContext,
-  browserResult: PrerenderBuilderOutput,
-  serverResult: PrerenderBuilderOutput,
-): Promise<PrerenderBuilderOutput> {
+  browserResult: BuildBuilderOutput,
+  serverResult: BuildBuilderOutput,
+): Promise<BuildBuilderOutput> {
   // We need to render the routes for each locale from the browser output.
   for (const outputPath of browserResult.outputPaths) {
     const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
@@ -40,10 +85,10 @@ async function _renderUniversal(
     const { AppServerModuleDef, renderModuleFn } =
       await _getServerModuleBundle(serverResult, localeDirectory);
 
-    context.logger.info(`\nPrerendering ${options.routes.length} route(s) to ${outputPath}`);
+    context.logger.info(`\nPrerendering ${routes.length} route(s) to ${outputPath}`);
 
     // Render each route and write them to <route>/index.html.
-    for (const route of options.routes) {
+    for (const route of routes) {
       const renderOpts = {
         document: indexHtml + '<!-- This page was prerendered with Angular Universal -->',
         url: route,
@@ -59,8 +104,6 @@ async function _renderUniversal(
         fs.writeFileSync(browserIndexOutputPathOriginal, indexHtml);
       }
 
-      // There will never conflicting output folders
-      // because items in options.routes must be unique.
       try {
         fs.mkdirSync(outputFolderPath, { recursive: true });
         fs.writeFileSync(outputIndexPath, html);
@@ -84,7 +127,7 @@ async function _renderUniversal(
  * Throws if no app module bundle is found.
  */
 async function _getServerModuleBundle(
-  serverResult: PrerenderBuilderOutput,
+  serverResult: BuildBuilderOutput,
   browserLocaleDirectory: string,
 ) {
   const { baseOutputPath = '' } = serverResult;
@@ -127,38 +170,18 @@ async function _getServerModuleBundle(
 export async function execute(
   options: PrerenderBuilderOptions,
   context: BuilderContext
-): Promise<PrerenderBuilderOutput | BuilderOutput> {
-  const browserTarget = targetFromTargetString(options.browserTarget);
-  const serverTarget = targetFromTargetString(options.serverTarget);
-
-  const browserTargetRun = await context.scheduleTarget(browserTarget, {
-    watch: false,
-    serviceWorker: false,
-    // todo: handle service worker augmentation
-  });
-  const serverTargetRun = await context.scheduleTarget(serverTarget, {
-    watch: false,
-  });
-
-  try {
-    const [browserResult, serverResult] = await Promise.all([
-      browserTargetRun.result as unknown as PrerenderBuilderOutput,
-      serverTargetRun.result as unknown as PrerenderBuilderOutput,
-    ]);
-
-    if (browserResult.success === false || browserResult.baseOutputPath === undefined) {
-      return browserResult;
-    }
-    if (serverResult.success === false) {
-      return serverResult;
-    }
-
-    return await _renderUniversal(options, context, browserResult, serverResult);
-  } catch (e) {
-    return { success: false, error: e.message };
-  } finally {
-    await Promise.all([browserTargetRun.stop(), serverTargetRun.stop()]);
+): Promise<PrerenderBuilderOutput> {
+  const routes = getRoutes(context.workspaceRoot, options.routesFile, options.routes);
+  if (!routes.length) {
+    throw new Error('No routes found.');
   }
+  const result = await _scheduleBuilds(options, context);
+  const { success, error, browserResult, serverResult } = result;
+  if (!success || !browserResult || !serverResult) {
+    return { success, error } as BuilderOutput;
+  }
+
+  return _renderUniversal(routes, context, browserResult, serverResult);
 }
 
 export default createBuilder(execute);

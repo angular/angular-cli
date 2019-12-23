@@ -28,12 +28,20 @@ describe('Prerender Builder', () => {
     await host.restore().toPromise();
   });
 
-  it('fails with error when no routes are provided', async () => {
+  it('fails with error when .routes nor .routesFile are defined', async () => {
     const run = await architect.scheduleTarget(target);
     await expectAsync(run.result)
       .toBeRejectedWith(
-        jasmine.objectContaining({ message: jasmine.stringMatching(`Data path "" should have required property 'routes'.`) })
+        jasmine.objectContaining({ message: jasmine.stringMatching(/Data path "" should match some schema in anyOf./) })
       );
+    await run.stop();
+  });
+
+  it('fails with error when no routes are provided', async () => {
+    const run = await architect.scheduleTarget(target, { routes: [] });
+    await expectAsync(run.result).toBeRejectedWith(
+      jasmine.objectContaining({ message: jasmine.stringMatching(/No routes found/)})
+    );
     await run.stop();
   });
 
@@ -71,6 +79,52 @@ describe('Prerender Builder', () => {
     );
 
     expect(content).toContain('<router-outlet');
+    await run.stop();
+  });
+
+  it('should generate output for routes when provided with a file', async () => {
+    await host.write(
+      join(host.root(), 'routes-file.txt'),
+      virtualFs.stringToFileBuffer(
+        ['/foo', '/foo/bar'].join('\n')
+      ),
+    ).toPromise();
+    const run = await architect.scheduleTarget(target, {
+      routes: ['/foo', '/'],
+      routesFile: './routes-file.txt',
+    });
+    const output = await run.result;
+    expect(output.success).toBe(true);
+
+    const fooContent = virtualFs.fileBufferToString(
+      host.scopedSync().read(join(outputPathBrowser, 'foo/index.html'))
+    );
+    const fooBarContent = virtualFs.fileBufferToString(
+      host.scopedSync().read(join(outputPathBrowser, 'foo/bar/index.html'))
+    );
+    const appContent = virtualFs.fileBufferToString(
+      host.scopedSync().read(join(outputPathBrowser, 'index.html'))
+    );
+
+    expect(appContent).toContain('app app is running!');
+    expect(appContent).toContain('This page was prerendered with Angular Universal');
+
+    expect(fooContent).toContain('foo works!');
+    expect(fooContent).toContain('This page was prerendered with Angular Universal');
+
+    expect(fooBarContent).toContain('foo-bar works!');
+    expect(fooBarContent).toContain('This page was prerendered with Angular Universal');
+
+    await run.stop();
+  });
+
+  it('should halt execution if a route file is given but does not exist.', async () => {
+    const run = await architect.scheduleTarget(target, {
+      routesFile: './nonexistent-file.txt',
+    });
+    await expectAsync(run.result).toBeRejectedWith(
+      jasmine.objectContaining({ message: jasmine.stringMatching(/no such file or directory/)})
+    );
     await run.stop();
   });
 });
