@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { getRoutes } from './utils';
 import * as fs from 'fs';
+import { getRoutes } from './utils';
 
 describe('Prerender Builder Utils', () => {
   describe('#getRoutes', () => {

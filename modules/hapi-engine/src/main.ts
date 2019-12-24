@@ -5,10 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import * as fs from 'fs';
 import { Request, ResponseToolkit } from '@hapi/hapi';
+import * as fs from 'fs';
 
-import { NgModuleFactory, Type, StaticProvider } from '@angular/core';
+import { NgModuleFactory, StaticProvider, Type } from '@angular/core';
 import { ɵCommonEngine as CommonEngine } from '@nguniversal/common/engine';
 import { REQUEST, RESPONSE } from '@nguniversal/hapi-engine/tokens';
 
@@ -50,7 +50,7 @@ export function ngHapiEngine(options: Readonly<RenderOptions>) {
   }
 
   const protocol = req.server.info.protocol;
-  const filePath = <string> req.raw.req.url;
+  const filePath = req.raw.req.url as string;
 
   const renderOptions: RenderOptions = Object.assign({}, options);
 
@@ -85,6 +85,7 @@ function getReqProviders(req: Request): StaticProvider[] {
     provide: RESPONSE,
     useValue: req.raw.res
   });
+
   return providers;
 }
 

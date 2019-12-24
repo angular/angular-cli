@@ -1,7 +1,7 @@
-import * as path from 'path';
-import * as ts from 'typescript';
-import * as Lint from 'tslint';
 import * as minimatch from 'minimatch';
+import * as path from 'path';
+import * as Lint from 'tslint';
+import * as ts from 'typescript';
 
 const ERROR_MESSAGE = 'Uses of RxJS patch imports are forbidden.';
 

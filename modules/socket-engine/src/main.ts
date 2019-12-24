@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { NgModuleFactory, StaticProvider, Type } from '@angular/core';
 import { ɵCommonEngine as CommonEngine,
   ɵRenderOptions as RenderOptions } from '@nguniversal/common/engine';
-import { NgModuleFactory, Type, StaticProvider } from '@angular/core';
 import * as net from 'net';
 
 export interface SocketEngineServer {
@@ -42,8 +42,11 @@ export function startSocketEngine(
           socket.write(JSON.stringify({html, id: renderOptions.id} as SocketEngineResponse));
         } catch (error) {
           // send the error down to the client then rethrow it
-          socket.write(JSON.stringify({html: null,
-            id: renderOptions.id, error: error.toString()} as SocketEngineResponse));
+          socket.write(JSON.stringify({
+            html: null,
+            id: renderOptions.id,
+            error: error.toString(),
+          } as SocketEngineResponse));
         }
       });
     });

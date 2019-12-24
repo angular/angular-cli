@@ -1,8 +1,8 @@
 import 'zone.js';
 
-import {ngExpressEngine} from '@nguniversal/express-engine';
+import { ngExpressEngine } from '@nguniversal/express-engine';
 
-import {SOME_TOKEN} from '../testing/mock.server.module';
+import { SOME_TOKEN } from '../testing/mock.server.module';
 import {
   MockServerModuleNgFactory,
   RequestServerModuleNgFactory,

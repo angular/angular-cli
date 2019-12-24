@@ -5,10 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {Component, Inject, InjectionToken, NgModule} from '@angular/core';
-import {BrowserModule} from '@angular/platform-browser';
-import {ServerModule} from '@angular/platform-server';
-import {REQUEST} from '@nguniversal/express-engine/tokens';
+import { Component, Inject, InjectionToken, NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { ServerModule } from '@angular/platform-server';
+import { REQUEST } from '@nguniversal/express-engine/tokens';
 
 @Component({selector: 'root', template: 'some template'})
 export class MockComponent {

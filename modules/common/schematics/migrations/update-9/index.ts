@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { Path, join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -13,14 +14,13 @@ import {
   externalSchematic,
   noop,
 } from '@angular-devkit/schematics';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
+import { Schema as UniversalOptions } from '@schematics/angular/universal/schema';
+import { getDecoratorMetadata, getMetadataField } from '@schematics/angular/utility/ast-utils';
+import { removePackageJsonDependency } from '@schematics/angular/utility/dependencies';
+import { getWorkspace } from '@schematics/angular/utility/workspace';
+import { Builders } from '@schematics/angular/utility/workspace-models';
 import * as ts from 'typescript';
-import {getWorkspace} from '@schematics/angular/utility/workspace';
-import {NodePackageInstallTask} from '@angular-devkit/schematics/tasks';
-import {Builders} from '@schematics/angular/utility/workspace-models';
-import {normalize, join, Path} from '@angular-devkit/core';
-import {Schema as UniversalOptions} from '@schematics/angular/universal/schema';
-import {getDecoratorMetadata, getMetadataField} from '@schematics/angular/utility/ast-utils';
-import {removePackageJsonDependency} from '@schematics/angular/utility/dependencies';
 
 export function version9UpdateRule(collectionPath: string): Rule {
   return async host => {

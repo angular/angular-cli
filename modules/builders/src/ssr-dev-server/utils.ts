@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { spawn, SpawnOptions } from 'child_process';
+import { SpawnOptions, spawn } from 'child_process';
+import { AddressInfo, createConnection, createServer } from 'net';
 import { Observable, throwError, timer } from 'rxjs';
+import { mergeMap, retryWhen } from 'rxjs/operators';
 import * as treeKill from 'tree-kill';
-import { createServer, AddressInfo, createConnection } from 'net';
-import { retryWhen, mergeMap } from 'rxjs/operators';
 
 export function getAvailablePort(): Promise<number> {
   return new Promise((resolve, reject) => {

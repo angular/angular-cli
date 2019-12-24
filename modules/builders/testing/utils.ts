@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
-import { TestingArchitectHost, TestProjectHost } from '@angular-devkit/architect/testing';
+import { TestProjectHost, TestingArchitectHost } from '@angular-devkit/architect/testing';
 import {
   Path,
   getSystemPath,
@@ -16,13 +16,13 @@ import {
   schema,
   workspaces,
 } from '@angular-devkit/core';
-import { mkdirSync, symlinkSync, existsSync } from 'fs';
+import { existsSync, mkdirSync, symlinkSync } from 'fs';
 import * as path from 'path';
 import { cp } from 'shelljs';
 
 // Add link from src -> tmp hello-world-app
 const templateRoot = path.join(
-  process.env.TEST_TMPDIR!,
+  process.env.TEST_TMPDIR as string,
   `hello-world-app-${Math.random().toString(36).slice(2)}`,
 );
 
@@ -39,7 +39,7 @@ cp(
 // link node packages
 symlinkSync(
   path.join(require.resolve('npm/node_modules/@angular/core/package.json'), '../../../'),
-  path.join(process.env.TEST_TMPDIR!, 'node_modules'),
+  path.join(process.env.TEST_TMPDIR as string, 'node_modules'),
   'junction'
 );
 

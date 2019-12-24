@@ -1,7 +1,7 @@
-import * as ts from 'typescript';
+import * as path from 'path';
 import * as Lint from 'tslint';
 import * as utils from 'tsutils';
-import * as path from 'path';
+import * as ts from 'typescript';
 
 /**
  * Rule ensuring that deletion targets have not expired.
@@ -18,7 +18,7 @@ export class Rule extends Lint.Rules.AbstractRule {
 
         if (!hasDeletionTarget && commentText.indexOf('@deprecated') > -1) {
           ctx.addFailure(pos, end, '@deprecated marker has to have a @deletion-target.');
-        } if (hasDeletionTarget) {
+        } else if (hasDeletionTarget) {
           const version = commentText.match(/\d+\.\d+\.\d+/);
 
           if (!version) {
@@ -57,6 +57,7 @@ export class Rule extends Lint.Rules.AbstractRule {
   /** Converts a version string into an object. */
   private _parseVersion(version: string) {
     const [major = 0, minor = 0, patch = 0] = version.split('.').map(segment => parseInt(segment));
+
     return {major, minor, patch};
   }
 }

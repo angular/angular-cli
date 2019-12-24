@@ -5,13 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {Tree} from '@angular-devkit/schematics';
-import {SchematicTestRunner} from '@angular-devkit/schematics/testing';
+import { Tree } from '@angular-devkit/schematics';
+import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
 
-import {collectionPath, createTestApp} from '../testing/test-app';
+import { collectionPath, createTestApp } from '../testing/test-app';
 
-import {addUniversalCommonRule, AddUniversalOptions} from './index';
+import { AddUniversalOptions, addUniversalCommonRule } from './index';
 
+// tslint:disable: no-non-null-assertion
 describe('Add Schematic Rule', () => {
   const defaultOptions: AddUniversalOptions = {
     clientProject: 'test-app',
@@ -125,7 +126,7 @@ describe('Add Schematic Rule', () => {
     appTree.overwrite(routerPath, modifiedContent);
     const tree = await schematicRunner
       .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
-      expect(tree.read(routerPath)!.toString())
+    expect(tree.read(routerPath)!.toString())
         .toContain(`RouterModule.forRoot(routes, { enableTracing: true, initialNavigation: 'enabled' })`);
   });
 });

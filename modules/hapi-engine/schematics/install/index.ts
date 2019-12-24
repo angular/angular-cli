@@ -5,30 +5,30 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {strings} from '@angular-devkit/core';
+import { strings } from '@angular-devkit/core';
 import {
+  Rule,
+  SchematicContext,
+  Tree,
   apply,
   chain,
   mergeWith,
-  Rule,
-  SchematicContext,
-  template,
-  Tree,
   move,
+  template,
   url,
 } from '@angular-devkit/schematics';
-import {NodePackageInstallTask} from '@angular-devkit/schematics/tasks';
-import {Schema as UniversalOptions} from './schema';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
+import { addUniversalCommonRule } from '@nguniversal/common/schematics/add';
 import {
-  addPackageJsonDependency,
-  NodeDependencyType,
-} from '@schematics/angular/utility/dependencies';
-import {
+  getOutputPath,
   getProject,
   stripTsExtension,
-  getOutputPath,
 } from '@nguniversal/common/schematics/utils';
-import {addUniversalCommonRule} from '@nguniversal/common/schematics/add';
+import {
+  NodeDependencyType,
+  addPackageJsonDependency,
+} from '@schematics/angular/utility/dependencies';
+import { Schema as UniversalOptions } from './schema';
 
 function addDependencies(options: UniversalOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
@@ -60,6 +60,7 @@ function addDependencies(options: UniversalOptions): Rule {
       name: '@types/hapi__inert',
       version: '^5.2.0',
     });
+
     return host;
   };
 }

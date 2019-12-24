@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {Tree} from '@angular-devkit/schematics/src/tree/interface';
-import {workspaces} from '@angular-devkit/core';
-import {getWorkspace} from '@schematics/angular/utility/workspace';
-import {SchematicsException} from '@angular-devkit/schematics';
+import { workspaces } from '@angular-devkit/core';
+import { SchematicsException } from '@angular-devkit/schematics';
+import { Tree } from '@angular-devkit/schematics/src/tree/interface';
+import { getWorkspace } from '@schematics/angular/utility/workspace';
 import * as ts from 'typescript';
 
 export async function getProject(
@@ -53,8 +53,8 @@ export async function getOutputPath(
 }
 
 export function findImport(sourceFile: ts.SourceFile,
-                    moduleName: string,
-                    symbolName: string): ts.NamedImports | null {
+                           moduleName: string,
+                           symbolName: string): ts.NamedImports | null {
   // Only look through the top-level imports.
   for (const node of sourceFile.statements) {
     if (!ts.isImportDeclaration(node) || !ts.isStringLiteral(node.moduleSpecifier) ||
@@ -136,5 +136,6 @@ export function addInitialNavigation(node: ts.CallExpression): ts.CallExpression
     ]))
     : ts.createObjectLiteral([initialNavigationProperty], true);
   const args = [node.arguments[0], routerOptions];
+
   return ts.createCall(node.expression, node.typeArguments, args);
 }

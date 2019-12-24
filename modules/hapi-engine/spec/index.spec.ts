@@ -1,8 +1,8 @@
-import {destroyPlatform, getPlatform} from '@angular/core';
-import {ngHapiEngine} from '@nguniversal/hapi-engine';
-import {ServerInjectResponse, Request, Server} from '@hapi/hapi';
-import {ExampleModuleNgFactory} from '../testing/example.ngfactory';
+import { destroyPlatform, getPlatform } from '@angular/core';
+import { Request, Server, ServerInjectResponse } from '@hapi/hapi';
+import { ngHapiEngine } from '@nguniversal/hapi-engine';
 import 'zone.js';
+import { ExampleModuleNgFactory } from '../testing/example.ngfactory';
 
 describe('test runner', () => {
 

@@ -1,6 +1,6 @@
+import { HttpParams } from '@angular/common/http';
 import { ɵTransferHttpCacheInterceptor as TransferHttpCacheInterceptor } from '@nguniversal/common';
 import { of } from 'rxjs';
-import { HttpParams } from '@angular/common/http';
 
 function mockAppRef(): any {
   return {

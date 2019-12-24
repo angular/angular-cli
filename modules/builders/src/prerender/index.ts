@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuilderOutput, createBuilder, BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
+import { BuilderContext, BuilderOutput, createBuilder, targetFromTargetString } from '@angular-devkit/architect';
 import { json } from '@angular-devkit/core';
 import { Buffer } from 'buffer';
 import * as fs from 'fs';
@@ -116,6 +116,7 @@ async function _renderUniversal(
       }
     }
   }
+
   return browserResult;
 }
 

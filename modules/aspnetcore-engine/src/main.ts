@@ -5,12 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import {Type, NgModuleFactory, CompilerFactory, Compiler, StaticProvider} from '@angular/core';
-import { platformDynamicServer } from '@angular/platform-server';
 import { DOCUMENT } from '@angular/common';
 import { ResourceLoader } from '@angular/compiler';
+import { Compiler, CompilerFactory, NgModuleFactory, StaticProvider, Type } from '@angular/core';
+import { platformDynamicServer } from '@angular/platform-server';
 
-import { REQUEST, ORIGIN_URL } from '@nguniversal/aspnetcore-engine/tokens';
+import { ORIGIN_URL, REQUEST } from '@nguniversal/aspnetcore-engine/tokens';
 import { FileLoader } from './file-loader';
 import { IEngineOptions } from './interfaces/engine-options';
 import { IEngineRenderResult } from './interfaces/engine-render-result';
@@ -37,7 +37,9 @@ function _getUniversalData(doc: Document): UniversalData {
   const META: string[] = [];
   const LINKS: string[] = [];
 
+  // tslint:disable-next-line: no-non-null-assertion
   for (let i = 0; i < doc.head!.children.length; i++) {
+    // tslint:disable-next-line: no-non-null-assertion
     const element = doc.head!.children[i];
     const tagName = element.tagName.toUpperCase();
 
@@ -83,6 +85,7 @@ function _getUniversalData(doc: Document): UniversalData {
 
   return {
     title: doc.title,
+    // tslint:disable-next-line: no-non-null-assertion
     appNode: doc.querySelector(appSelector)!.outerHTML,
     scripts: SCRIPTS.join('\n'),
     styles: STYLES.join('\n'),
@@ -158,6 +161,7 @@ function getReqResProviders(origin: string, request: string): StaticProvider[] {
       useValue: request
     }
   ];
+
   return providers;
 }
 
@@ -170,7 +174,7 @@ async function getFactory(
   if (moduleOrFactory instanceof NgModuleFactory) {
     return moduleOrFactory;
   } else {
-    let moduleFactory = factoryCacheMap.get(moduleOrFactory);
+    const moduleFactory = factoryCacheMap.get(moduleOrFactory);
     // If module factory is cached
     if (moduleFactory) {
       return moduleFactory;
@@ -179,6 +183,7 @@ async function getFactory(
     // Compile the module and cache it
     const factory = await compiler.compileModuleAsync(moduleOrFactory);
     factoryCacheMap.set(moduleOrFactory, factory);
+
     return factory;
   }
 }

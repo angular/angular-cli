@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import * as fs from 'fs';
 import { ResourceLoader } from '@angular/compiler';
+import * as fs from 'fs';
 
 /** ResourceLoader implementation for loading files */
 export class FileLoader implements ResourceLoader {

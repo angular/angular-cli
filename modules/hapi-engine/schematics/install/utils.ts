@@ -6,14 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
+import { getSourceNodes } from '@schematics/angular/utility/ast-utils';
 import * as ts from 'typescript';
-import {getSourceNodes} from '@schematics/angular/utility/ast-utils';
 
 export function getTsSourceText(host: Tree, path: string): string {
   const buffer = host.read(path);
   if (!buffer) {
     throw new SchematicsException(`Could not read file (${path}).`);
   }
+
   return buffer.toString();
 }
 
@@ -55,7 +56,9 @@ export function findAppServerModulePath(host: Tree, mainPath: string): string {
     throw new SchematicsException('Could not find app server module export');
   }
 
+  // tslint:disable-next-line: no-non-null-assertion
   const moduleSpecifier = exportDeclaration.moduleSpecifier!.getText();
+
   return moduleSpecifier.substring(1, moduleSpecifier.length - 1);
 }
 

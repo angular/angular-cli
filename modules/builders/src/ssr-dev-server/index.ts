@@ -7,39 +7,39 @@
  */
 
 import {
+  BuilderContext,
   BuilderOutput,
   createBuilder,
-  BuilderContext,
   targetFromTargetString,
 } from '@angular-devkit/architect';
-import { json, tags, logging } from '@angular-devkit/core';
+import { json, logging, tags } from '@angular-devkit/core';
+import * as browserSync from 'browser-sync';
+import * as proxy from 'http-proxy-middleware';
+import { join } from 'path';
 import {
-  Observable,
-  of,
-  combineLatest,
-  zip,
-  from,
   EMPTY,
+  Observable,
+  combineLatest,
+  from,
+  of,
+  zip,
 } from 'rxjs';
-import { Schema } from './schema';
 import {
-  switchMap,
-  map,
-  tap,
   catchError,
-  startWith,
-  mapTo,
-  ignoreElements,
-  finalize,
   concatMap,
   debounce,
   debounceTime,
   delay,
+  finalize,
+  ignoreElements,
+  map,
+  mapTo,
+  startWith,
+  switchMap,
+  tap,
 } from 'rxjs/operators';
-import * as browserSync from 'browser-sync';
-import { join } from 'path';
 import * as url from 'url';
-import * as proxy from 'http-proxy-middleware';
+import { Schema } from './schema';
 
 import { getAvailablePort, spawnAsObservable, waitUntilServerIsListening } from './utils';
 
@@ -97,23 +97,28 @@ export function execute(
           if (!s.success) {
             return of(s);
           }
+
           return startNodeServer(s, nodeServerPort, context.logger).pipe(
             mapTo(s),
             catchError(err => {
               context.logger.error(`A server error has occurred.\n${mapErrorToMessage(err)}`);
+
               return EMPTY;
             }),
           );
         }));
 
-      return combineLatest(br.output, server$).pipe(
+      return combineLatest([br.output, server$]).pipe(
         // This is needed so that if both server and browser emit close to each other
         // we only emit once. This typically happens on the first build.
         debounceTime(120),
-        map(([b, s]) => ([{
-          success: b.success && s.success,
-          error: b.error || s.error,
-        }, nodeServerPort] as [SSRDevServerBuilderOutput, number])),
+        map(([b, s]) => ([
+          {
+            success: b.success && s.success,
+            error: b.error || s.error,
+          },
+          nodeServerPort,
+        ] as [SSRDevServerBuilderOutput, number])),
         tap(([builderOutput]) => {
           if (builderOutput.success) {
             context.logger.info('\nCompiled successfully.');
@@ -131,6 +136,7 @@ export function execute(
 
       if (bsInstance.active) {
         bsInstance.reload();
+
         return of(builderOutput);
       } else {
         return from(initBrowserSync(bsInstance, nodeServerPort, options))

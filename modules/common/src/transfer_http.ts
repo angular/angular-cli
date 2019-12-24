@@ -11,19 +11,19 @@ import {
   HttpHandler,
   HttpHeaders,
   HttpInterceptor,
+  HttpParams,
   HttpRequest,
-  HttpResponse,
-  HttpParams
+  HttpResponse
 } from '@angular/common/http';
-import {ApplicationRef, Injectable, NgModule} from '@angular/core';
+import { ApplicationRef, Injectable, NgModule } from '@angular/core';
 import {
   BrowserTransferStateModule,
+  StateKey,
   TransferState,
-  makeStateKey,
-  StateKey
+  makeStateKey
 } from '@angular/platform-browser';
-import {Observable, of as observableOf} from 'rxjs';
-import {tap, take, filter} from 'rxjs/operators';
+import { Observable, of as observableOf } from 'rxjs';
+import { filter, take, tap } from 'rxjs/operators';
 
 export interface TransferHttpResponse {
   body?: any | null;
@@ -34,10 +34,11 @@ export interface TransferHttpResponse {
 }
 
 function getHeadersMap(headers: HttpHeaders) {
-  const headersMap: {[name: string]: string[]} = {};
+  const headersMap: Record<string, string[] | null> = {};
   for (const key of headers.keys()) {
-    headersMap[key] = headers.getAll(key)!;
+    headersMap[key] = headers.getAll(key);
   }
+
   return headersMap;
 }
 
@@ -55,12 +56,14 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
     // make the params encoded same as a url so it's easy to identify
     const encodedParams = params.keys().sort().map(k => `${k}=${params.get(k)}`).join('&');
     const key = (method === 'GET' ? 'G.' : 'H.') + url + '?' + encodedParams;
+
     return makeStateKey<TransferHttpResponse>(key);
   }
 
   constructor(appRef: ApplicationRef, private transferState: TransferState) {
     // Stop using the cache if the application has stabilized, indicating initial rendering is
     // complete.
+    // tslint:disable-next-line: no-floating-promises
     appRef.isStable
       .pipe(
         filter((isStable: boolean) => isStable),
@@ -86,6 +89,7 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
     if (this.transferState.hasKey(storeKey)) {
       // Request found in cache. Respond using it.
       const response = this.transferState.get(storeKey, {} as TransferHttpResponse);
+
       return observableOf(new HttpResponse<any>({
         body: response.body,
         headers: new HttpHeaders(response.headers),
@@ -96,16 +100,17 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
     } else {
       // Request not found in cache. Make the request and cache it.
       const httpEvent = next.handle(req);
+
       return httpEvent
         .pipe(
-          tap((event: HttpEvent<any>) => {
+          tap((event: HttpEvent<unknown>) => {
             if (event instanceof HttpResponse) {
               this.transferState.set(storeKey, {
                 body: event.body,
                 headers: getHeadersMap(event.headers),
                 status: event.status,
                 statusText: event.statusText,
-                url: event.url!,
+                url: event.url || '',
               });
             }
           })

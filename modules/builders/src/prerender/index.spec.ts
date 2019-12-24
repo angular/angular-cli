@@ -7,8 +7,8 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { createArchitect, host, outputPathBrowser } from '../../testing/utils';
 import { join, virtualFs } from '@angular-devkit/core';
+import { createArchitect, host, outputPathBrowser } from '../../testing/utils';
 
 describe('Prerender Builder', () => {
   const target = { project: 'app', target: 'prerender' };

@@ -7,9 +7,9 @@
  */
 
 
-import {Rule, SchematicsException} from '@angular-devkit/schematics';
-import {getPackageJsonDependency} from '@schematics/angular/utility/dependencies';
-import {version9UpdateRule} from '@nguniversal/common/schematics/migrations/update-9';
+import { Rule, SchematicsException } from '@angular-devkit/schematics';
+import { version9UpdateRule } from '@nguniversal/common/schematics/migrations/update-9';
+import { getPackageJsonDependency } from '@schematics/angular/utility/dependencies';
 
 export default function (): Rule {
   return async host => {
@@ -18,6 +18,7 @@ export default function (): Rule {
     }
 
     const collectionPath = require.resolve('../../collection.json');
+
     return version9UpdateRule(collectionPath);
   };
 }

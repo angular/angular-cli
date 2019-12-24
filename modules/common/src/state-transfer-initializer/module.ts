@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 
 export function domContentLoadedFactory(doc: Document) {
   return () => new Promise ((resolve, _reject) => {

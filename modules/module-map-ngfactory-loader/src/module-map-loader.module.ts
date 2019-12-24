@@ -6,14 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
+  ModuleWithProviders,
   NgModule,
   NgModuleFactoryLoader,
-  ModuleWithProviders,
   StaticProvider
 } from '@angular/core';
 
-import { ModuleMapNgFactoryLoader, MODULE_MAP } from './module-map-ngfactory-loader';
-import {ModuleMap} from './module-map';
+import { ModuleMap } from './module-map';
+import { MODULE_MAP, ModuleMapNgFactoryLoader } from './module-map-ngfactory-loader';
 
 /**
  * Helper function for getting the providers object for the MODULE_MAP

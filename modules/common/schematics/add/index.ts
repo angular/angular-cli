@@ -5,30 +5,30 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { JsonParseMode, dirname, join, normalize, parseJsonAst } from '@angular-devkit/core';
 import {
-  chain,
-  externalSchematic,
   Rule,
   SchematicsException,
+  chain,
+  externalSchematic,
   noop,
 } from '@angular-devkit/schematics';
-import { parseJsonAst, JsonParseMode, normalize, join, dirname } from '@angular-devkit/core';
-import {
-  findPropertyInAstObject,
-  appendValueInAstArray,
-} from '@schematics/angular/utility/json-utils';
 import { Schema as UniversalOptions } from '@schematics/angular/universal/schema';
+import { NodeDependencyType, addPackageJsonDependency } from '@schematics/angular/utility/dependencies';
+import {
+  appendValueInAstArray,
+  findPropertyInAstObject,
+} from '@schematics/angular/utility/json-utils';
 import { updateWorkspace } from '@schematics/angular/utility/workspace';
-import { addPackageJsonDependency, NodeDependencyType } from '@schematics/angular/utility/dependencies';
 import * as ts from 'typescript';
 
 import {
-  stripTsExtension,
+  addInitialNavigation,
+  findImport,
+  getImportOfIdentifier,
   getOutputPath,
   getProject,
-  findImport,
-  addInitialNavigation,
-  getImportOfIdentifier,
+  stripTsExtension,
 } from '../utils';
 
 const SERVE_SSR_TARGET_NAME = 'serve-ssr';

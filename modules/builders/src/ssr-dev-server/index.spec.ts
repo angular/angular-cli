@@ -7,12 +7,12 @@
  */
 
 import { Architect, BuilderRun } from '@angular-devkit/architect';
-import { debounceTime, take, concatMap, retryWhen, mergeMap } from 'rxjs/operators';
 import * as browserSync from 'browser-sync';
+import { concatMap, debounceTime, mergeMap, retryWhen, take } from 'rxjs/operators';
 
+import { from, throwError, timer } from 'rxjs';
 import { createArchitect, host } from '../../testing/utils';
 import { SSRDevServerBuilderOutput } from './index';
-import { from, throwError, timer } from 'rxjs';
 
 // todo check why it resolves to mjs
 // [ERR_REQUIRE_ESM]: Must use import to load ES Module
@@ -46,7 +46,7 @@ describe('Serve SSR Builder', () => {
     expect(output.success).toBe(true);
     expect(output.baseUrl).toBe('http://localhost:4200');
 
-    const response = await from(fetch(output.baseUrl!)).pipe(
+    const response = await from(fetch(output.baseUrl as string)).pipe(
       retryWhen(err => err.pipe(
         mergeMap((error, attempts) => {
           return attempts > 10 || error.code !== 'ECONNRESET'
@@ -81,7 +81,7 @@ describe('Serve SSR Builder', () => {
         concatMap(async (output, index) => {
           expect(output.baseUrl).toBe('http://localhost:7001');
           expect(output.success).toBe(true, `index: ${index}`);
-          const response = await fetch(output.baseUrl!);
+          const response = await fetch(output.baseUrl as string);
           const text = await response.text();
 
           switch (index) {

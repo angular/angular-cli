@@ -6,15 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
+  Compiler,
+  Inject,
   Injectable,
-  NgModuleFactoryLoader,
   InjectionToken,
   NgModuleFactory,
-  Inject,
-  Type,
-  Compiler
+  NgModuleFactoryLoader,
+  Type
 } from '@angular/core';
-import {ModuleMap} from './module-map';
+import { ModuleMap } from './module-map';
 
 /**
  * Token used by the ModuleMapNgFactoryLoader to load modules
@@ -37,7 +37,7 @@ export class ModuleMapNgFactoryLoader implements NgModuleFactoryLoader {
     }
 
     return offlineMode ?
-      this.loadFactory(<NgModuleFactory<any>> type) : this.loadAndCompile(<Type<any>> type);
+      this.loadFactory(type as NgModuleFactory<any>) : this.loadAndCompile(type as Type<any>);
   }
 
   private loadFactory(factory: NgModuleFactory<any>): Promise<NgModuleFactory<any>> {

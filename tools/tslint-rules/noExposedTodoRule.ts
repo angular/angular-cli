@@ -1,6 +1,6 @@
-import * as ts from 'typescript';
 import * as Lint from 'tslint';
 import * as utils from 'tsutils';
+import * as ts from 'typescript';
 
 const ERROR_MESSAGE =
     'A TODO may only appear in inline (//) style comments. ' +

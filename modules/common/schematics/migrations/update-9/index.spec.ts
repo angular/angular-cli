@@ -7,9 +7,10 @@
  */
 
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { collectionPath, createTestApp } from '../../testing/test-app';
 import { version9UpdateRule } from './index';
-import { createTestApp, collectionPath } from '../../testing/test-app';
 
+// tslint:disable: no-non-null-assertion
 describe('Migration to version 9', () => {
   const schematicRunner = new SchematicTestRunner(
     'migrations',

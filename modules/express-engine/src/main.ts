@@ -5,10 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import * as fs from 'fs';
 import { Request, Response } from 'express';
+import * as fs from 'fs';
 
-import { NgModuleFactory, Type, StaticProvider } from '@angular/core';
+import { NgModuleFactory, StaticProvider, Type } from '@angular/core';
 import { ɵCommonEngine as CommonEngine } from '@nguniversal/common/engine';
 import { REQUEST, RESPONSE } from '@nguniversal/express-engine/tokens';
 
@@ -86,6 +86,7 @@ function getReqResProviders(req: Request, res?: Response): StaticProvider[] {
       useValue: res
     });
   }
+
   return providers;
 }
 

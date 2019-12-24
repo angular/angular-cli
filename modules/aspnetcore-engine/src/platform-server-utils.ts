@@ -20,15 +20,15 @@ import {
   StaticProvider,
   Type
 } from '@angular/core';
-import {ɵTRANSITION_ID} from '@angular/platform-browser';
+import { ɵTRANSITION_ID } from '@angular/platform-browser';
 import {
-  platformDynamicServer,
-  platformServer,
   BEFORE_APP_SERIALIZED,
   INITIAL_CONFIG,
-  PlatformState
+  PlatformState,
+  platformDynamicServer,
+  platformServer
 } from '@angular/platform-server';
-import {first} from 'rxjs/operators';
+import { first } from 'rxjs/operators';
 
 interface PlatformOptions {
   document?: string;
@@ -45,14 +45,17 @@ function _getPlatform(
   platformFactory: (extraProviders: StaticProvider[]) => PlatformRef,
   options: PlatformOptions): PlatformRef {
   const extraProviders = options.extraProviders ? options.extraProviders : [];
+
   return platformFactory([
     { provide: INITIAL_CONFIG, useValue: { document: options.document, url: options.url } },
     extraProviders
   ]);
 }
 
-async function _render<T>(platform: PlatformRef,
-                    moduleRefPromise: Promise<NgModuleRef<T>>): Promise<ModuleRenderResult<T>> {
+async function _render<T>(
+  platform: PlatformRef,
+  moduleRefPromise: Promise<NgModuleRef<T>>,
+): Promise<ModuleRenderResult<T>> {
   const moduleRef = await moduleRefPromise;
   const transitionId = moduleRef.injector.get(ɵTRANSITION_ID, null);
   if (!transitionId) {
@@ -75,12 +78,14 @@ async function _render<T>(platform: PlatformRef,
         callback();
       } catch (e) {
         // Ignore exceptions.
+        // tslint:disable-next-line: no-console
         console.warn('Ignoring BEFORE_APP_SERIALIZED Exception: ', e);
       }
     }
   }
   const output = platformState.renderToString();
   platform.destroy();
+
   return { html: output, moduleRef };
 }
 
@@ -100,6 +105,7 @@ export function renderModule<T>(
   module: Type<T>, options: { document?: string, url?: string, extraProviders?: StaticProvider[] }):
   Promise<ModuleRenderResult<T>> {
   const platform = _getPlatform(platformDynamicServer, options);
+
   return _render(platform, platform.bootstrapModule(module));
 }
 
@@ -117,5 +123,6 @@ export function renderModuleFactory<T>(
   options: { document?: string, url?: string, extraProviders?: StaticProvider[] }):
   Promise<ModuleRenderResult<T>> {
   const platform = _getPlatform(platformServer, options);
+
   return _render(platform, platform.bootstrapModuleFactory(moduleFactory));
 }
