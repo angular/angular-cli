@@ -33,9 +33,9 @@ ts_library(
     # The attribute below is needed in g3 to turn off strict typechecking
     # strict_checks = False,
     deps = [
-        "@npm//@types/fast-json-stable-stringify",
         "@npm//@types/node",
         "@npm//ajv",
+        "@npm//fast-json-stable-stringify",
         "@npm//magic-string",
         "@npm//rxjs",
         "@npm//source-map",
