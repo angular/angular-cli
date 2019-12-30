@@ -15,98 +15,91 @@
 #             (Using the tag in not necessary when pinning by ID, but include it anyway for documentation purposes.)
 # **NOTE 2**: If you change the version of the docker images, also change the `cache_key` suffix.
 var_1: &docker_image circleci/node:10.16-browsers@sha256:d2a96fe1cbef51257ee626b5f645e64dade3e886f00ba9cb7e8ea65b4efe8db1
-var_2: &cache_key v7-nguniversal-{{ checksum "yarn.lock" }}-{{ checksum "WORKSPACE" }}-node-10.16
+var_2: &cache_key v8-nguniversal-{{ checksum "yarn.lock" }}-{{ checksum "WORKSPACE" }}-node-10.16
+var_3: &cache_key_fallback v8-nguniversal-
 
-# Settings common to each job
-var_3: &job_defaults
-  working_directory: ~/ng
-  docker:
-  - image: *docker_image
-
-# Job step for checking out the source code from GitHub. This also ensures that the source code
-# is rebased on top of master.
-var_4: &checkout_code
-  checkout:
-    # After checkout, rebase on top of master. By default, PRs are not rebased on top of master,
-    # which we want. See https://discuss.circleci.com/t/1662
-    post: git pull --ff-only origin "refs/pull/${CI_PULL_REQUEST//*pull\//}/merge"
-
-# Restores the cache that could be available for the current Yarn lock file. The cache usually
-# includes the node modules and the Bazel repository cache.
-var_5: &restore_cache
-  restore_cache:
-    key: *cache_key
-
-# Saves the cache for the current Yarn lock file. We store the node modules and the Bazel
-# repository cache in order to make subsequent builds faster.
-var_6: &save_cache
-  save_cache:
-    key: *cache_key
-    paths:
-    - "node_modules"
-    - "~/bazel_repository_cache"
-    - "~/bazel_disk_cache"
-
-# Job step that ensures that the node module dependencies are installed and up-to-date. We use
-# Yarn with the frozen lockfile option in order to make sure that lock file and package.json are
-# in sync. Unlike in Travis, we don't need to manually purge the node modules if stale because
-# CircleCI automatically discards the cache if the checksum of the lock file has changed.
-var_7: &yarn_install
-  run: yarn install --frozen-lockfile --non-interactive
-
-# Copies the Bazel config which is specifically for CircleCI to a location where Bazel picks it
-# up and merges it with the project-wide bazel configuration (tools/bazel.rc)
-var_8: &copy_bazel_config
-  # Set up the CircleCI specific bazel configuration.
-  run: sudo cp ./.circleci/bazel.rc /etc/bazel.bazelrc
-
-# Run a step to setup an environment variable.
-var_9: &setup_env_variables
-  run:
-    name: "Setup custom environment variables"
-    command: |
-      echo 'export CHROMEDRIVER_VERSION_ARG="--versions.chrome 75.0.3770.90"' >> $BASH_ENV # Redirect into $BASH_ENV
-
-# Attaches the release output which has been stored in the workspace to the current job.
+# Workspace initially persisted by the `setup` job.
 # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
-var_10: &attach_release_output
-  attach_workspace:
-    at: dist
+# https://circleci.com/blog/deep-diving-into-circleci-workspaces/
+var_5: &workspace_location ~/
 
-version: 2
+version: 2.1
+
+# Executor Definitions
+# https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors
+executors:
+  action-executor:
+    docker:
+      - image: *docker_image
+    working_directory: ~/ng
+
+# Command Definitions
+# https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-commands
+commands:
+  custom_attach_workspace:
+    description: Attach workspace at a predefined location
+    steps:
+      - attach_workspace:
+          at: *workspace_location
+
+  copy-bazel-config:
+    description: Copy Bazel config
+    steps:
+      # Copies the Bazel config which is specifically for CircleCI to a location where Bazel picks it
+      # up and merges it with the project-wide bazel configuration (tools/bazel.rc)
+      # Set up the CircleCI specific bazel configuration.
+      - run: sudo cp ./.circleci/bazel.rc /etc/bazel.bazelrc
 
 jobs:
+  setup:
+    executor: action-executor
+    steps:
+      # After checkout, rebase on top of master. By default, PRs are not rebased on top of master,
+      # which we want. See https://discuss.circleci.com/t/1662
+      - checkout:
+          post: git pull --ff-only origin "refs/pull/${CI_PULL_REQUEST//*pull\//}/merge"
+      - restore_cache:
+          keys:
+            - *cache_key
+            - *cache_key_fallback
+      - run: yarn install --frozen-lockfile --non-interactive
+      # Reduces ~25mb from being persisted to the workspace
+      - run: rm -rf .git
+      - persist_to_workspace:
+          root: *workspace_location
+          paths:
+            - ng
+            - .cache/yarn
+            - bazel_repository_cache
+            - bazel_disk_cache
+
   build:
-    <<: *job_defaults
+    executor: action-executor
     resource_class: xlarge
     steps:
-    - *checkout_code
-    - *restore_cache
-    - *copy_bazel_config
-    - *yarn_install
-
-    - run: yarn bazel test //...
-
-    # Note: We want to save the cache in this job because the workspace cache also
-    # includes the Bazel repository cache that will be updated in this job.
-    - *save_cache
+      - custom_attach_workspace
+      - copy-bazel-config
+      - run: yarn bazel test //...
+      - persist_to_workspace:
+          root: *workspace_location
+          paths:
+            - bazel_repository_cache
+            - bazel_disk_cache
 
   lint:
-    <<: *job_defaults
+    executor: action-executor
     steps:
-    - *checkout_code
-    - *restore_cache
-    - *yarn_install
-
-    # Enforce that BUILD files are formatted. Note that this uses the version of buildifier
-    # from the docker image above - take care that you use the same version when you run
-    # buildifier locally on your change.
-    - run: 'yarn bazel:format -mode=check ||
-                (echo "BUILD files not formatted. Please run ''yarn bazel:format''" ; exit 1)'
-    # Run the skylark linter to check our Bazel rules
-    - run: 'yarn bazel:lint ||
-                (echo -e "\n.bzl files have lint errors. Please run ''yarn bazel:lint-fix''"; exit 1)'
-    - run: yarn lint
+      - custom_attach_workspace
+      - copy-bazel-config
+      # Enforce that BUILD files are formatted. Note that this uses the version of buildifier
+      # from the docker image above - take care that you use the same version when you run
+      # buildifier locally on your change.
+      - run: 'yarn bazel:format -mode=check ||
+                  (echo "BUILD files not formatted. Please run ''yarn bazel:format''" ; exit 1)'
+      # Run the skylark linter to check our Bazel rules
+      - run: 'yarn bazel:lint ||
+                  (echo -e "\n.bzl files have lint errors. Please run ''yarn bazel:lint-fix''"; exit 1)'
+      - run: yarn lint
 
   # This job exists only for backwards-compatibility with old scripts and tests
   # that rely on the pre-Bazel dist/modules-dist layout.
@@ -116,21 +109,22 @@ jobs:
   # starts.
   # No new jobs should depend on this one.
   build-packages-dist:
-    <<: *job_defaults
+    executor: action-executor
     resource_class: xlarge
     steps:
-    - *checkout_code
-    - *restore_cache
-    - *copy_bazel_config
-
-    - run: scripts/build-modules-dist.sh
-
-    # Save the npm packages from //modules/... for other workflow jobs to read
-    # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
-    - persist_to_workspace:
-        root: dist
-        paths:
-        - modules-dist
+      - custom_attach_workspace
+      - copy-bazel-config
+      - run: scripts/build-modules-dist.sh
+      - save_cache:
+          key: *cache_key
+          paths:
+            - ~/.cache/yarn
+            - ~/bazel_repository_cache
+            - ~/bazel_disk_cache
+      - persist_to_workspace:
+          root: *workspace_location
+          paths:
+            - ng/dist
 
   # We run the integration tests outside of Bazel for now.
   # They are a separate workflow job so that they can be easily re-run.
@@ -139,33 +133,33 @@ jobs:
   # need to re-run manually should be alleviated.
   # See comments inside the integration/run_tests.sh script.
   integration_test:
-    <<: *job_defaults
+    executor: action-executor
     steps:
-    - *checkout_code
-    - *restore_cache
-    - *setup_env_variables
-    - *attach_release_output
-    - run: ./integration/run_tests.sh
-
-  # TODO(CaerusKaru): remove this step
-  bazel-lint:
-    <<: *job_defaults
-    steps:
-    - run: exit 0
+      - custom_attach_workspace
+      # Run a step to setup an environment variable.
+      - run:
+          name: "Setup custom environment variables"
+          command: |
+            echo 'export CHROMEDRIVER_VERSION_ARG="--versions.chrome 75.0.3770.90"' >> $BASH_ENV # Redirect into $BASH_ENV
+      - run: ./integration/run_tests.sh
 
 workflows:
   version: 2
   default_workflow:
     jobs:
-    - build
-    - bazel-lint
-    - lint
+    - setup
+    - build:
+        requires:
+          - setup
+    - lint:
+        requires:
+          - setup
     - build-packages-dist:
         requires:
-        - build
+          - build
     - integration_test:
         requires:
-        - build-packages-dist
+          - build-packages-dist
 
 general:
   branches:
