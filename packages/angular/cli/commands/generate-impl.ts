@@ -14,6 +14,7 @@ import { Schema as GenerateCommandSchema } from './generate';
 export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
   // Allows us to resolve aliases before reporting analytics
   longSchematicName: string | undefined;
+  readonly allowAdditionalArgs = true;
 
   async initialize(options: GenerateCommandSchema & Arguments) {
     // Fill up the schematics property of the command description.
