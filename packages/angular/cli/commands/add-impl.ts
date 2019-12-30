@@ -18,7 +18,6 @@ import { colors } from '../utilities/color';
 import { getPackageManager } from '../utilities/package-manager';
 import {
   NgAddSaveDepedency,
-  PackageIdentifier,
   PackageManifest,
   fetchPackageManifest,
   fetchPackageMetadata,
@@ -29,7 +28,6 @@ const npa = require('npm-package-arg');
 
 export class AddCommand extends SchematicCommand<AddCommandSchema> {
   readonly allowPrivateSchematics = true;
-  readonly allowAdditionalArgs = true;
 
   async run(options: AddCommandSchema & Arguments) {
     if (!options.collection) {

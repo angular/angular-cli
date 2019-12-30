@@ -6,7 +6,15 @@ export default async function () {
   // forcibly remove in case another test doesn't clean itself up
   await rimraf('node_modules/@angular/material');
 
-  await ng('add', '@angular/material');
+  try {
+    await ng('add', '@angular/material', '--unknown');
+  } catch (error) {
+    if (!(error.message && error.message.includes(`Unknown option: '--unknown'`))) {
+      throw error;
+    }
+  }
+
+  await ng('add', '@angular/material', '--theme', 'custom', '--verbose');
   await expectFileToMatch('package.json', /@angular\/material/);
 
   const output1 = await ng('add', '@angular/material');
