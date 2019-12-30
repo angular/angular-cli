@@ -73,7 +73,6 @@ export abstract class SchematicCommand<
   T extends BaseSchematicSchema & BaseCommandOptions
 > extends Command<T> {
   readonly allowPrivateSchematics: boolean = false;
-  readonly allowAdditionalArgs: boolean = false;
   private _host = new NodeJsSyncHost();
   private _workspace: workspaces.WorkspaceDefinition;
   protected _workflow: NodeWorkflow;
@@ -466,8 +465,10 @@ export abstract class SchematicCommand<
       args = await this.parseArguments(schematicOptions || [], o);
     }
 
-    // ng-add is special because we don't know all possible options at this point
-    if (args['--'] && !this.allowAdditionalArgs) {
+    const allowAdditionalProperties =
+      typeof schematic.description.schemaJson === 'object' && schematic.description.schemaJson.additionalProperties;
+
+    if (args['--'] && !allowAdditionalProperties) {
       args['--'].forEach(additional => {
         this.logger.fatal(`Unknown option: '${additional.split(/=/)[0]}'`);
       });
