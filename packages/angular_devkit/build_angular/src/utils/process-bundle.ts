@@ -115,7 +115,7 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
   const mapSize = options.map ? Buffer.byteLength(options.map) : 0;
   const manualSourceMaps = codeSize >= 500 * 1024 || mapSize >= 500 * 1024;
   const sourceCode = options.code;
-  const sourceMap = options.map ? JSON.parse(options.map) : undefined;
+  const sourceMap = options.map ? JSON.parse(options.map) : false;
 
   let downlevelCode;
   let downlevelMap;
@@ -123,7 +123,8 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
     // Downlevel the bundle
     const transformResult = await transformAsync(sourceCode, {
       filename: options.filename,
-      inputSourceMap: manualSourceMaps ? undefined : sourceMap,
+      // using false ensures that babel will NOT search and process sourcemap comments (large memory usage)
+      inputSourceMap: manualSourceMaps ? false : sourceMap,
       babelrc: false,
       presets: [[
         require.resolve('@babel/preset-env'),
