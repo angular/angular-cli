@@ -50,38 +50,43 @@ export class BundleActionCache {
   }
 
   generateCacheKeys(action: ProcessBundleOptions): string[] {
+    // Postfix added to sourcemap cache keys when vendor, hidden sourcemaps are present
+    // Allows non-destructive caching of both variants
+    const sourceMapVendorPostfix = action.sourceMaps && action.vendorSourceMaps ? '|vendor' : '';
+
+    // sourceMappingURL is added at the very end which causes the code to be the same when sourcemaps are enabled/disabled
+    // When using hiddenSourceMaps we can omit the postfix since sourceMappingURL will not be added.
+    const sourceMapPostFix = action.sourceMaps && !action.hiddenSourceMaps ? '|sourcemap' : '';
+
     const baseCacheKey = this.generateBaseCacheKey(action.code);
 
-    // Postfix added to sourcemap cache keys when vendor sourcemaps are present
-    // Allows non-destructive caching of both variants
-    const SourceMapVendorPostfix = !!action.sourceMaps && action.vendorSourceMaps ? '|vendor' : '';
-
     // Determine cache entries required based on build settings
-    const cacheKeys = [];
+    const cacheKeys: string[] = [];
 
     // If optimizing and the original is not ignored, add original as required
-    if ((action.optimize || action.optimizeOnly) && !action.ignoreOriginal) {
-      cacheKeys[CacheKey.OriginalCode] = baseCacheKey + '|orig';
+    if (!action.ignoreOriginal) {
+      cacheKeys[CacheKey.OriginalCode] = baseCacheKey + sourceMapPostFix + '|orig';
 
       // If sourcemaps are enabled, add original sourcemap as required
       if (action.sourceMaps) {
-        cacheKeys[CacheKey.OriginalMap] = baseCacheKey + SourceMapVendorPostfix + '|orig-map';
+        cacheKeys[CacheKey.OriginalMap] = baseCacheKey + sourceMapVendorPostfix + '|orig-map';
       }
     }
+
     // If not only optimizing, add downlevel as required
     if (!action.optimizeOnly) {
-      cacheKeys[CacheKey.DownlevelCode] = baseCacheKey + '|dl';
+      cacheKeys[CacheKey.DownlevelCode] = baseCacheKey + sourceMapPostFix + '|dl';
 
       // If sourcemaps are enabled, add downlevel sourcemap as required
       if (action.sourceMaps) {
-        cacheKeys[CacheKey.DownlevelMap] = baseCacheKey + SourceMapVendorPostfix + '|dl-map';
+        cacheKeys[CacheKey.DownlevelMap] = baseCacheKey + sourceMapVendorPostfix + '|dl-map';
       }
     }
 
     return cacheKeys;
   }
 
-  async getCacheEntries(cacheKeys: (string | null)[]): Promise<(CacheEntry | null)[] | false> {
+  async getCacheEntries(cacheKeys: (string | undefined)[]): Promise<(CacheEntry | null)[] | false> {
     // Attempt to get required cache entries
     const cacheEntries = [];
     for (const key of cacheKeys) {
