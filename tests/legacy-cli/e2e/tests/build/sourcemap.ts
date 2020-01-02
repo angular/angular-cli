@@ -2,10 +2,17 @@ import * as fs from 'fs';
 import { expectFileToExist } from '../../utils/fs';
 import { ng } from '../../utils/process';
 
-export default async function() {
+export default async function () {
   await ng('build', '--prod', '--output-hashing=none', '--source-map');
+  await testForSourceMaps(6);
 
+  await ng('build', '--output-hashing=none', '--source-map');
+  await testForSourceMaps(8);
+}
+
+async function testForSourceMaps(expectedNumberOfFiles: number): Promise <void> {
   await expectFileToExist('dist/test-project/main-es5.js.map');
+  await expectFileToExist('dist/test-project/main-es2015.js.map');
 
   const files = fs.readdirSync('./dist/test-project');
 
@@ -29,7 +36,7 @@ export default async function() {
     }
   }
 
-  if (count < 6) {
-    throw new Error('Javascript file count is low');
+  if (count < expectedNumberOfFiles) {
+    throw new Error(`Javascript file count is low. Expected ${expectedNumberOfFiles} but found ${count}`);
   }
 }
