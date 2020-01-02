@@ -5,10 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
 export * from './webpack';
 export * from './webpack-dev-server';
-
-export * from './plugins/architect';
-
 export { EmittedFiles } from './utils';
