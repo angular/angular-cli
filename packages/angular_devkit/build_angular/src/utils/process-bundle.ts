@@ -39,7 +39,7 @@ export interface ProcessBundleOptions {
   optimize?: boolean;
   optimizeOnly?: boolean;
   ignoreOriginal?: boolean;
-  cacheKeys?: (string | null)[];
+  cacheKeys?: (string | undefined)[];
   integrityAlgorithm?: 'sha256' | 'sha384' | 'sha512';
   runtimeData?: ProcessBundleResult[];
   replacements?: [string, string][];
@@ -80,9 +80,9 @@ export function setup(data: number[] | { cachePath: string; i18n: I18nOptions })
   i18n = options.i18n;
 }
 
-async function cachePut(content: string, key: string | null, integrity?: string): Promise<void> {
+async function cachePut(content: string, key: string | undefined, integrity?: string): Promise<void> {
   if (cachePath && key) {
-    await cacache.put(cachePath, key, content, {
+    await cacache.put(cachePath, key || null, content, {
       metadata: { integrity },
     });
   }
@@ -114,7 +114,6 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
   const codeSize = Buffer.byteLength(options.code);
   const mapSize = options.map ? Buffer.byteLength(options.map) : 0;
   const manualSourceMaps = codeSize >= 500 * 1024 || mapSize >= 500 * 1024;
-
   const sourceCode = options.code;
   const sourceMap = options.map ? JSON.parse(options.map) : undefined;
 
@@ -155,59 +154,21 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
     }
   }
 
-  if (options.optimize) {
-    if (downlevelCode) {
-      const minifyResult = terserMangle(downlevelCode, {
-        filename: downlevelFilename,
-        map: downlevelMap,
-        compress: true,
-      });
-      downlevelCode = minifyResult.code;
-      downlevelMap = minifyResult.map;
-    }
-
-    if (!options.ignoreOriginal) {
-      result.original = await mangleOriginal(options);
-    }
-  }
-
   if (downlevelCode) {
-    const downlevelPath = path.join(basePath, downlevelFilename);
-
-    let mapContent;
-    if (downlevelMap) {
-      if (!options.hiddenSourceMaps) {
-        downlevelCode += `\n//# sourceMappingURL=${downlevelFilename}.map`;
-      }
-
-      mapContent = JSON.stringify(downlevelMap);
-      await cachePut(mapContent, options.cacheKeys[CacheKey.DownlevelMap]);
-      fs.writeFileSync(downlevelPath + '.map', mapContent);
-    }
-
-    result.downlevel = createFileEntry(
-      path.join(basePath, downlevelFilename),
-      downlevelCode,
-      mapContent,
-      options.integrityAlgorithm,
-    );
-
-    await cachePut(
-      downlevelCode,
-      options.cacheKeys[CacheKey.DownlevelCode],
-      result.downlevel.integrity,
-    );
-    fs.writeFileSync(downlevelPath, downlevelCode);
+    result.downlevel = await processBundle({
+      ...options,
+      code: downlevelCode,
+      map: downlevelMap,
+      filename: path.join(basePath, downlevelFilename),
+      isOriginal: false,
+    });
   }
 
-  // If original was not processed, add info
   if (!result.original && !options.ignoreOriginal) {
-    result.original = createFileEntry(
-      options.filename,
-      options.code,
-      options.map,
-      options.integrityAlgorithm,
-    );
+    result.original = await processBundle({
+      ...options,
+      isOriginal: true,
+    });
   }
 
   return result;
@@ -286,41 +247,74 @@ async function mergeSourceMapsFast(first: RawSourceMap, second: RawSourceMap) {
   return map;
 }
 
-async function mangleOriginal(options: ProcessBundleOptions): Promise<ProcessBundleFile> {
-  const result = terserMangle(options.code, {
-    filename: path.basename(options.filename),
-    map: options.map ? JSON.parse(options.map) : undefined,
-    ecma: 6,
-  });
+async function processBundle(
+  options: Omit<ProcessBundleOptions, 'map'> & { isOriginal: boolean; map?: string | RawSourceMap },
+): Promise<ProcessBundleFile> {
+  const {
+    optimize,
+    isOriginal,
+    code,
+    map,
+    filename: filepath,
+    hiddenSourceMaps,
+    cacheKeys = [],
+    integrityAlgorithm,
+   } = options;
 
-  let mapContent;
+  const rawMap = typeof map === 'string' ? JSON.parse(map) as RawSourceMap : map;
+  const filename = path.basename(filepath);
+
+  let result: {
+    code: string,
+    map: RawSourceMap | undefined,
+  };
+
+  if (optimize) {
+    result = terserMangle(code, {
+      filename,
+      map: rawMap,
+      compress: !isOriginal, // We only compress bundles which are downlevelled.
+      ecma: isOriginal ? 6 : 5,
+    });
+  } else {
+    if (rawMap) {
+      rawMap.file = filename;
+    }
+
+    result = {
+      map: rawMap,
+      code,
+    };
+  }
+
+  let mapContent: string | undefined;
   if (result.map) {
-    if (!options.hiddenSourceMaps) {
-      result.code += `\n//# sourceMappingURL=${path.basename(options.filename)}.map`;
+    if (!hiddenSourceMaps) {
+      result.code += `\n//# sourceMappingURL=${filename}.map`;
     }
 
     mapContent = JSON.stringify(result.map);
 
     await cachePut(
       mapContent,
-      (options.cacheKeys && options.cacheKeys[CacheKey.OriginalMap]) || null,
+      cacheKeys[isOriginal ? CacheKey.OriginalMap : CacheKey.DownlevelMap],
     );
-    fs.writeFileSync(options.filename + '.map', mapContent);
+    fs.writeFileSync(filepath + '.map', mapContent);
   }
 
   const fileResult = createFileEntry(
-    options.filename,
+    filepath,
     result.code,
     mapContent,
-    options.integrityAlgorithm,
+    integrityAlgorithm,
   );
 
   await cachePut(
     result.code,
-    (options.cacheKeys && options.cacheKeys[CacheKey.OriginalCode]) || null,
+    cacheKeys[isOriginal ? CacheKey.OriginalCode : CacheKey.DownlevelCode],
     fileResult.integrity,
   );
-  fs.writeFileSync(options.filename, result.code);
+  fs.writeFileSync(filepath, result.code);
 
   return fileResult;
 }
@@ -421,66 +415,19 @@ async function processRuntime(
   // Extra spacing is intentional to align source line positions
   downlevelCode = downlevelCode.replace(/"\-es20\d{2}\./, '   "-es5.');
 
-  const downlevelFilePath = options.filename.replace(/\-es20\d{2}/, '-es5');
-  let downlevelMap;
-  let result;
-  if (options.optimize) {
-    const minifiyResults = terserMangle(downlevelCode, {
-      filename: path.basename(downlevelFilePath),
-      map: options.map === undefined ? undefined : JSON.parse(options.map),
-    });
-    downlevelCode = minifiyResults.code;
-    downlevelMap = JSON.stringify(minifiyResults.map);
-
-    result = {
-      original: await mangleOriginal({ ...options, code: originalCode }),
-      downlevel: createFileEntry(
-        downlevelFilePath,
-        downlevelCode,
-        downlevelMap,
-        options.integrityAlgorithm,
-      ),
-    };
-  } else {
-    if (options.map) {
-      const rawMap = JSON.parse(options.map) as RawSourceMap;
-      rawMap.file = path.basename(downlevelFilePath);
-      downlevelMap = JSON.stringify(rawMap);
-    }
-
-    result = {
-      original: createFileEntry(
-        options.filename,
-        originalCode,
-        options.map,
-        options.integrityAlgorithm,
-      ),
-      downlevel: createFileEntry(
-        downlevelFilePath,
-        downlevelCode,
-        downlevelMap,
-        options.integrityAlgorithm,
-      ),
-    };
-  }
-
-  if (downlevelMap) {
-    await cachePut(
-      downlevelMap,
-      (options.cacheKeys && options.cacheKeys[CacheKey.DownlevelMap]) || null,
-    );
-    fs.writeFileSync(downlevelFilePath + '.map', downlevelMap);
-    if (!options.hiddenSourceMaps) {
-      downlevelCode += `\n//# sourceMappingURL=${path.basename(downlevelFilePath)}.map`;
-    }
-  }
-  await cachePut(
-    downlevelCode,
-    (options.cacheKeys && options.cacheKeys[CacheKey.DownlevelCode]) || null,
-  );
-  fs.writeFileSync(downlevelFilePath, downlevelCode);
-
-  return result;
+  return {
+    original: await processBundle({
+      ...options,
+      code: originalCode,
+      isOriginal: true,
+    }),
+    downlevel: await processBundle({
+      ...options,
+      code: downlevelCode,
+      filename: options.filename.replace(/\-es20\d{2}/, '-es5'),
+      isOriginal: false,
+    }),
+  };
 }
 
 function createReplacePlugin(replacements: [string, string][]): PluginObj {
