@@ -3,6 +3,10 @@ import { expectFileToExist } from '../../utils/fs';
 import { ng } from '../../utils/process';
 
 export default async function () {
+  // The below is needed to cache bundles and verify that sourcemaps are generated
+  // corretly when output-hashing is disabled.
+  await ng('build', '--output-hashing=bundles', '--source-map');
+
   await ng('build', '--prod', '--output-hashing=none', '--source-map');
   await testForSourceMaps(6);
 
