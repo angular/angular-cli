@@ -42,6 +42,16 @@ const NG_VERSION_9_POST_MSG = colors.cyan(
   'For more info, please see: https://v9.angular.io/guide/updating-to-version-9',
 );
 
+/**
+ * Disable CLI version mismatch checks and forces usage of the invoked CLI
+ * instead of invoking the local installed version.
+ */
+const disableVersionCheckEnv = process.env['NG_DISABLE_VERSION_CHECK'];
+const disableVersionCheck =
+  disableVersionCheckEnv !== undefined &&
+  disableVersionCheckEnv !== '0' &&
+  disableVersionCheckEnv.toLowerCase() !== 'false';
+
 export class UpdateCommand extends Command<UpdateCommandSchema> {
   public readonly allowMissingWorkspace = true;
 
@@ -264,7 +274,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     }
 
     // Check if the current installed CLI version is older than the latest version.
-    if (await this.checkCLILatestVersion(options.verbose, options.next)) {
+    if (!disableVersionCheck && await this.checkCLILatestVersion(options.verbose, options.next)) {
       this.logger.warn(
         `The installed Angular CLI version is older than the latest ${options.next ? 'pre-release' : 'stable'} version.\n` +
         'Installing a temporary version to perform the update.',
