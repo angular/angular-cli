@@ -38,7 +38,7 @@ describe('Prerender Builder', () => {
   });
 
   it('fails with error when no routes are provided', async () => {
-    const run = await architect.scheduleTarget(target, { routes: [] });
+    const run = await architect.scheduleTarget(target, { routes: [], guessRoutes: false });
     await expectAsync(run.result).toBeRejectedWith(
       jasmine.objectContaining({ message: jasmine.stringMatching(/No routes found/)})
     );
@@ -125,6 +125,38 @@ describe('Prerender Builder', () => {
     await expectAsync(run.result).toBeRejectedWith(
       jasmine.objectContaining({ message: jasmine.stringMatching(/no such file or directory/)})
     );
+    await run.stop();
+  });
+
+  it('should guess routes to prerender when guessRoutes is set to true.', async () => {
+    const run = await architect.scheduleTarget(target, {
+      routes: ['/foo'],
+      guessRoutes: true,
+    });
+
+    const output = await run.result;
+
+    const fooContent = virtualFs.fileBufferToString(
+      host.scopedSync().read(join(outputPathBrowser, 'foo/index.html'))
+    );
+    const fooBarContent = virtualFs.fileBufferToString(
+      host.scopedSync().read(join(outputPathBrowser, 'foo/bar/index.html'))
+    );
+    const appContent = virtualFs.fileBufferToString(
+      host.scopedSync().read(join(outputPathBrowser, 'index.html'))
+    );
+
+    expect(output.success).toBe(true);
+
+    expect(appContent).toContain('app app is running!');
+    expect(appContent).toContain('This page was prerendered with Angular Universal');
+
+    expect(fooContent).toContain('foo works!');
+    expect(fooContent).toContain('This page was prerendered with Angular Universal');
+
+    expect(fooBarContent).toContain('foo-bar works!');
+    expect(fooBarContent).toContain('This page was prerendered with Angular Universal');
+
     await run.stop();
   });
 });

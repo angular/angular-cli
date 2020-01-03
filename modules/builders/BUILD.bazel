@@ -28,6 +28,7 @@ ts_library(
         "@npm//@types/browser-sync",
         "@npm//@types/http-proxy-middleware",
         "@npm//browser-sync",
+        "@npm//guess-parser",
         "@npm//http-proxy-middleware",
         "@npm//rxjs",
         "@npm//tree-kill",
@@ -85,6 +86,7 @@ ng_test_library(
         "@npm//@angular-devkit/core",
         "@npm//@types/browser-sync",
         "@npm//@types/shelljs",
+        "@npm//guess-parser",
         "@npm//rxjs",
     ],
 )

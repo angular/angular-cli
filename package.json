@@ -72,6 +72,7 @@
     "browser-sync": "^2.26.7",
     "domino": "^2.1.2",
     "express": "^4.15.2",
+    "guess-parser": "^0.4.12",
     "http-proxy-middleware": "^0.20.0",
     "jasmine-core": "^3.0.0",
     "karma": "^4.1.0",

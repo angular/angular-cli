@@ -6,33 +6,77 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import * as Architect from '@angular-devkit/architect';
+import { NullLogger } from '@angular-devkit/core/src/logger';
 import * as fs from 'fs';
+import * as guessParser from 'guess-parser';
+import { RoutingModule } from 'guess-parser/dist/common/interfaces';
+import 'jasmine';
+
+import { PrerenderBuilderOptions } from './models';
 import { getRoutes, shardArray } from './utils';
+
 
 describe('Prerender Builder Utils', () => {
   describe('#getRoutes', () => {
-    const WORKSPACE_ROOT = '/path/to/angular/json';
     const ROUTES_FILE = './routes.txt';
     const ROUTES_FILE_CONTENT = ['/route1', '/route1', '/route2', '/route3'].join('\n');
     const ROUTES = ['/route3', '/route3', '/route4'];
+    const GUESSED_ROUTES = [{ path: '/route4' }, { path: '/route5' }, { path: '/**' }, { path: '/user/:id' }];
+
+    const CONTEXT = {
+      workspaceRoot: '/path/to/angular/json',
+      getTargetOptions: () => ({ tsConfig: 'tsconfig.app.json' }),
+      logger: new NullLogger(),
+    } as unknown as Architect.BuilderContext;
+
+    let parseAngularRoutesSpy: jasmine.Spy;
+    let loggerErrorSpy: jasmine.Spy;
 
     beforeEach(() => {
       spyOn(fs, 'readFileSync').and.returnValue(ROUTES_FILE_CONTENT);
+      spyOn(Architect, 'targetFromTargetString').and.returnValue({} as Architect.Target);
+      parseAngularRoutesSpy = spyOn(guessParser, 'parseAngularRoutes')
+        .and.returnValue(GUESSED_ROUTES as RoutingModule[]);
+      loggerErrorSpy = spyOn(CONTEXT.logger, 'error');
     });
 
-    it('Should return the deduped union of options.routes and options.routesFile - routes and routesFile defined', () => {
-      const routes = getRoutes(WORKSPACE_ROOT, ROUTES_FILE, ROUTES);
-      expect(routes).toEqual(['/route1', '/route2', '/route3', '/route4']);
+    it('Should return the union of the routes from routes, routesFile, and the extracted routes without any parameterized routes', async () => {
+      const options = {
+        routes: ROUTES,
+        routesFile: ROUTES_FILE,
+        guessRoutes: true,
+      } as unknown as PrerenderBuilderOptions;
+      const routes = await getRoutes(options, CONTEXT);
+      expect(routes).toContain('/route1');
+      expect(routes).toContain('/route2');
+      expect(routes).toContain('/route3');
+      expect(routes).toContain('/route4');
+      expect(routes).toContain('/route5');
     });
 
-    it('Should return the deduped union of options.routes and options.routesFile - only routes defined', () => {
-      const routes = getRoutes(WORKSPACE_ROOT, undefined, ROUTES);
-      expect(routes).toEqual(['/route3', '/route4']);
+    it('Should return only the given routes', async () => {
+      const options = { routes: ROUTES } as PrerenderBuilderOptions;
+      const routes = await getRoutes(options, CONTEXT);
+      expect(routes).toContain('/route3');
+      expect(routes).toContain('/route4');
     });
 
-    it('Should return the deduped union of options.routes and options.routesFile - only routes file defined', () => {
-      const routes = getRoutes(WORKSPACE_ROOT, ROUTES_FILE, undefined);
-      expect(routes).toEqual(['/route1', '/route2', '/route3']);
+    it('Should return the routes from the routesFile', async () => {
+      const options = { routesFile: ROUTES_FILE } as PrerenderBuilderOptions;
+      const routes = await getRoutes(options, CONTEXT);
+      expect(routes).toContain('/route1');
+      expect(routes).toContain('/route2');
+      expect(routes).toContain('/route3');
+    });
+
+    it('Should catch errors thrown by parseAngularRoutes', async () => {
+      const options = { routes: ROUTES, guessRoutes: true } as PrerenderBuilderOptions;
+      parseAngularRoutesSpy.and.throwError('Test Error');
+      const routes = await getRoutes(options, CONTEXT);
+      expect(routes).toContain('/route3');
+      expect(routes).toContain('/route4');
+      expect(loggerErrorSpy).toHaveBeenCalled();
     });
   });
 

@@ -7,18 +7,15 @@
  */
 
 import { BuilderContext, BuilderOutput, createBuilder, targetFromTargetString } from '@angular-devkit/architect';
-import { json } from '@angular-devkit/core';
 import { fork } from 'child_process';
-
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { Schema } from './schema';
+import { PrerenderBuilderOptions, PrerenderBuilderOutput } from './models';
 import { getRoutes, shardArray } from './utils';
 
-export type PrerenderBuilderOptions = Schema & json.JsonObject;
-
-export type PrerenderBuilderOutput = BuilderOutput;
+export type PrerenderBuilderOptions = PrerenderBuilderOptions;
+export type PrerenderBuilderOutput = PrerenderBuilderOutput;
 
 type BuildBuilderOutput = BuilderOutput & {
   baseOutputPath: string;
@@ -101,7 +98,7 @@ async function _parallelRenderRoutes(
 }
 
 /**
- * Renders each route in options.routes and writes them to
+ * Renders each route and writes them to
  * <route>/index.html for each output path in the browser result.
  */
 async function _renderUniversal(
@@ -147,10 +144,11 @@ export async function execute(
   options: PrerenderBuilderOptions,
   context: BuilderContext
 ): Promise<PrerenderBuilderOutput> {
-  const routes = getRoutes(context.workspaceRoot, options.routesFile, options.routes);
+  const routes = await getRoutes(options, context);
   if (!routes.length) {
     throw new Error('No routes found.');
   }
+
   const result = await _scheduleBuilds(options, context);
   const { success, error, browserResult, serverResult } = result;
   if (!success || !browserResult || !serverResult) {

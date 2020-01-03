@@ -27,6 +27,11 @@
       },
       "default": []
     },
+    "guessRoutes": {
+      "type": "boolean",
+      "description": "Whether or not the builder should extract routes and guess which paths to render.",
+      "default": true
+    },
     "numProcesses": {
       "type": "number",
       "description": "The number of cpus to use. Defaults to all but one.",

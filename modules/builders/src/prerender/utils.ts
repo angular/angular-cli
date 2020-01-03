@@ -6,28 +6,50 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
 import * as fs from 'fs';
+import { parseAngularRoutes } from 'guess-parser';
 import * as os from 'os';
 import * as path from 'path';
 
-/**
- * Returns the concatenation of options.routes and the contents of options.routesFile.
- */
-export function getRoutes(
-  workspaceRoot: string,
-  routesFile?: string,
-  routes: string[] = [],
-): string[] {
-  let routesFileResult: string[] = [];
-  if (routesFile) {
-    const routesFilePath = path.resolve(workspaceRoot, routesFile);
+import { PrerenderBuilderOptions } from './models';
 
-    routesFileResult = fs.readFileSync(routesFilePath, 'utf8')
-      .split(/\r?\n/)
-      .filter(v => !!v);
+/**
+ * Returns the union of routes, the contents of routesFile if given,
+ * and the static routes extracted if guessRoutes is set to true.
+ */
+export async function getRoutes(
+  options: PrerenderBuilderOptions,
+  context: BuilderContext,
+): Promise<string[]> {
+  let routes: string[] = options.routes ? options.routes : [];
+
+  if (options.routesFile) {
+    const routesFilePath = path.resolve(context.workspaceRoot, options.routesFile);
+    routes = routes.concat(
+      fs.readFileSync(routesFilePath, 'utf8')
+        .split(/\r?\n/)
+        .filter(v => !!v)
+    );
   }
 
-  return [...new Set([...routesFileResult, ...routes])];
+  if (options.guessRoutes) {
+    const browserTarget = targetFromTargetString(options.browserTarget);
+    const { tsConfig } = await context.getTargetOptions(browserTarget);
+    if (tsConfig) {
+      try {
+        routes = routes.concat(
+          parseAngularRoutes(path.join(context.workspaceRoot, tsConfig as string))
+            .map(routeObj => routeObj.path)
+            .filter(route => !route.includes('*') && !route.includes(':'))
+        );
+      } catch (e) {
+        context.logger.error('Unable to extract routes from application.', e);
+      }
+    }
+  }
+
+  return [...new Set(routes)];
 }
 
 /**

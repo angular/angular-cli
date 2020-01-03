@@ -12,6 +12,10 @@ export interface Schema {
    */
   browserTarget: string;
   /**
+   * Whether or not the builder should extract routes and guess which paths to render.
+   */
+  guessRoutes?: boolean;
+  /**
    * The number of cpus to use. Defaults to all but one.
    */
   numProcesses?: number;
