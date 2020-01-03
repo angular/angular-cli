@@ -25,7 +25,9 @@ export function getEmittedFiles(compilation: webpack.compilation.Compilation): E
   for (const chunk of compilation.chunks as webpack.compilation.Chunk[]) {
     for (const file of chunk.files as string[]) {
       files.push({
-        id: chunk.id.toString(),
+        // The id is guaranteed to exist at this point in the compilation process
+        // tslint:disable-next-line: no-non-null-assertion
+        id: chunk.id!.toString(),
         name: chunk.name,
         file,
         extension: path.extname(file),
