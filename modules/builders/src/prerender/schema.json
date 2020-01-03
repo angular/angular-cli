@@ -26,6 +26,11 @@
         "uniqueItems": true
       },
       "default": []
+    },
+    "numProcesses": {
+      "type": "number",
+      "description": "The number of cpus to use. Defaults to all but one.",
+      "minimum": 1
     }
   },
   "required": [
