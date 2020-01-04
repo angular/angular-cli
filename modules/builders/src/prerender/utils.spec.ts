@@ -20,7 +20,12 @@ describe('Prerender Builder Utils', () => {
     const ROUTES_FILE = './routes.txt';
     const ROUTES_FILE_CONTENT = ['/route1', '/route1', '/route2', '/route3'].join('\n');
     const ROUTES = ['/route3', '/route3', '/route4'];
-    const GUESSED_ROUTES = [{ path: '/route4' }, { path: '/route5' }, { path: '/**' }, { path: '/user/:id' }];
+    const GUESSED_ROUTES: any = [
+      { path: '/route4' },
+      { path: '/route5' },
+      { path: '/**' },
+      { path: '/user/:id' },
+    ];
 
     const CONTEXT = {
       workspaceRoot: '/path/to/angular/json',
@@ -46,34 +51,44 @@ describe('Prerender Builder Utils', () => {
         guessRoutes: true,
       } as PrerenderBuilderOptions;
       const routes = await getRoutes(options, CONTEXT);
-      expect(routes).toContain('/route1');
-      expect(routes).toContain('/route2');
-      expect(routes).toContain('/route3');
-      expect(routes).toContain('/route4');
-      expect(routes).toContain('/route5');
+      expect(routes).toEqual(
+        jasmine.arrayContaining([
+          '/route1',
+          '/route2',
+          '/route3',
+          '/route4',
+          '/route5',
+        ])
+      );
     });
 
     it('Should return only the given routes', async () => {
       const options = { routes: ROUTES } as PrerenderBuilderOptions;
       const routes = await getRoutes(options, CONTEXT);
-      expect(routes).toContain('/route3');
-      expect(routes).toContain('/route4');
+      expect(routes).toEqual(jasmine.arrayContaining([
+        '/route3',
+        '/route4',
+      ]));
     });
 
     it('Should return the routes from the routesFile', async () => {
       const options = { routesFile: ROUTES_FILE } as PrerenderBuilderOptions;
       const routes = await getRoutes(options, CONTEXT);
-      expect(routes).toContain('/route1');
-      expect(routes).toContain('/route2');
-      expect(routes).toContain('/route3');
+      expect(routes).toEqual(jasmine.arrayContaining([
+        '/route1',
+        '/route2',
+        '/route3',
+      ]));
     });
 
     it('Should catch errors thrown by parseAngularRoutes', async () => {
       const options = { routes: ROUTES, guessRoutes: true } as PrerenderBuilderOptions;
       parseAngularRoutesSpy.and.throwError('Test Error');
       const routes = await getRoutes(options, CONTEXT);
-      expect(routes).toContain('/route3');
-      expect(routes).toContain('/route4');
+      expect(routes).toEqual(jasmine.arrayContaining([
+        '/route3',
+        '/route4',
+      ]));
       expect(loggerErrorSpy).toHaveBeenCalled();
     });
   });
