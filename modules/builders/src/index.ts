@@ -14,6 +14,8 @@ export {
 
 export {
   execute as executePrerenderBuilder,
+} from './prerender';
+export {
   PrerenderBuilderOptions,
   PrerenderBuilderOutput,
-} from './prerender';
+} from './prerender/models';

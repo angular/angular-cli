@@ -14,9 +14,6 @@ import * as path from 'path';
 import { PrerenderBuilderOptions, PrerenderBuilderOutput } from './models';
 import { getRoutes, shardArray } from './utils';
 
-export type PrerenderBuilderOptions = PrerenderBuilderOptions;
-export type PrerenderBuilderOutput = PrerenderBuilderOutput;
-
 type BuildBuilderOutput = BuilderOutput & {
   baseOutputPath: string;
   outputPaths: string[];

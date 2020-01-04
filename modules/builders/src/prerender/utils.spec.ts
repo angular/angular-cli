@@ -7,11 +7,9 @@
  */
 
 import * as Architect from '@angular-devkit/architect';
-import { NullLogger } from '@angular-devkit/core/src/logger';
+import { logging } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as guessParser from 'guess-parser';
-import { RoutingModule } from 'guess-parser/dist/common/interfaces';
-import 'jasmine';
 
 import { PrerenderBuilderOptions } from './models';
 import { getRoutes, shardArray } from './utils';
@@ -27,7 +25,7 @@ describe('Prerender Builder Utils', () => {
     const CONTEXT = {
       workspaceRoot: '/path/to/angular/json',
       getTargetOptions: () => ({ tsConfig: 'tsconfig.app.json' }),
-      logger: new NullLogger(),
+      logger: new logging.NullLogger(),
     } as unknown as Architect.BuilderContext;
 
     let parseAngularRoutesSpy: jasmine.Spy;
@@ -37,7 +35,7 @@ describe('Prerender Builder Utils', () => {
       spyOn(fs, 'readFileSync').and.returnValue(ROUTES_FILE_CONTENT);
       spyOn(Architect, 'targetFromTargetString').and.returnValue({} as Architect.Target);
       parseAngularRoutesSpy = spyOn(guessParser, 'parseAngularRoutes')
-        .and.returnValue(GUESSED_ROUTES as RoutingModule[]);
+        .and.returnValue(GUESSED_ROUTES);
       loggerErrorSpy = spyOn(CONTEXT.logger, 'error');
     });
 
@@ -46,7 +44,7 @@ describe('Prerender Builder Utils', () => {
         routes: ROUTES,
         routesFile: ROUTES_FILE,
         guessRoutes: true,
-      } as unknown as PrerenderBuilderOptions;
+      } as PrerenderBuilderOptions;
       const routes = await getRoutes(options, CONTEXT);
       expect(routes).toContain('/route1');
       expect(routes).toContain('/route2');

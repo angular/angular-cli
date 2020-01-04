@@ -22,7 +22,7 @@ export async function getRoutes(
   options: PrerenderBuilderOptions,
   context: BuilderContext,
 ): Promise<string[]> {
-  let routes: string[] = options.routes ? options.routes : [];
+  let routes = options.routes || [];
 
   if (options.routesFile) {
     const routesFilePath = path.resolve(context.workspaceRoot, options.routesFile);
@@ -36,10 +36,10 @@ export async function getRoutes(
   if (options.guessRoutes) {
     const browserTarget = targetFromTargetString(options.browserTarget);
     const { tsConfig } = await context.getTargetOptions(browserTarget);
-    if (tsConfig) {
+    if (typeof tsConfig === 'string') {
       try {
         routes = routes.concat(
-          parseAngularRoutes(path.join(context.workspaceRoot, tsConfig as string))
+          parseAngularRoutes(path.join(context.workspaceRoot, tsConfig))
             .map(routeObj => routeObj.path)
             .filter(route => !route.includes('*') && !route.includes(':'))
         );
@@ -56,9 +56,9 @@ export async function getRoutes(
  * Evenly shards items in an array.
  * e.g. shardArray([1, 2, 3, 4], 2) => [[1, 2], [3, 4]]
  */
-export function shardArray<T>(items: T[], numProcesses: number = os.cpus().length - 1): T[][] {
+export function shardArray<T>(items: T[], maxNoOfShards = os.cpus().length - 1): T[][] {
   const shardedArray = [];
-  const numShards = Math.min(numProcesses, items.length);
+  const numShards = Math.min(maxNoOfShards, items.length);
   for (let i = 0; i < numShards; i++) {
     shardedArray.push(
       items.filter((_, index) => index % numShards === i)
