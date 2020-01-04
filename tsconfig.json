@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "strict": true,
-    "target": "es5",
+    "target": "es2015",
     "module": "commonjs",
     "moduleResolution": "node",
     "declaration": true,
@@ -16,7 +16,7 @@
     "typeRoots": [
       "node_modules/@types"
     ],
-    "types": ["tslib", "jasmine", "node", "shelljs"],
+    "types": ["jasmine", "node", "shelljs"],
     "lib": [
       "dom",
       "es6",

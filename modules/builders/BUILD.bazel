@@ -21,7 +21,7 @@ ts_library(
         ],
     ),
     module_name = "@nguniversal/builders",
-    tsconfig = ":tsconfig.json",
+    tsconfig = ":bazel-tsconfig-build.json",
     deps = [
         "@npm//@angular-devkit/architect",
         "@npm//@angular-devkit/core",
@@ -79,7 +79,6 @@ ng_test_library(
         ],
         exclude = ["testing/hello-world-app/**/*"],
     ),
-    tsconfig = ":tsconfig.json",
     deps = [
         ":builders",
         "@npm//@angular-devkit/architect",
