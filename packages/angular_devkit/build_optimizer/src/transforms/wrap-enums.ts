@@ -322,7 +322,15 @@ function findStatements(
 
   for (let index = statementIndex + 1; index < statements.length; ++index) {
     const statement = statements[index];
+
     if (!ts.isExpressionStatement(statement)) {
+      // The below is a workaround for NGCC as TS will never emit an EmptyStatement.
+      // See: https://github.com/angular/angular-cli/issues/16509#issuecomment-570198398
+      if (ts.isEmptyStatement(statement)) {
+        count++;
+        continue;
+      }
+
       break;
     }
 

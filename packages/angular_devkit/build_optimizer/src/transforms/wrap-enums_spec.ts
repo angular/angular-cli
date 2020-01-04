@@ -88,6 +88,36 @@ describe('wrap enums and classes transformer', () => {
       expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
     });
 
+    it('should wrap classes which contain EmptyStatement', () => {
+      const input = tags.stripIndent`
+        let JigsawTrustedHtml = JigsawTrustedHtml_1 = class JigsawTrustedHtml {
+          constructor(_sanitizer, zone) {
+          }
+          static _getContext(magicNumber) {
+            return JigsawTrustedHtml_1._contexts[magicNumber];
+          }
+        };
+        JigsawTrustedHtml.ɵfac = function JigsawTrustedHtml_Factory(t) { };
+        // NGCC outputs an empty statement sometimes like the below:
+        // https://github.com/angular/angular-cli/issues/16509#issuecomment-570198398
+        JigsawTrustedHtml.ɵdir = ɵngcc0.ɵɵdefineDirective(); ;
+        JigsawTrustedHtml.ctorParameters = () => [
+          { type: DomSanitizer },
+          { type: NgZone }
+        ];
+      `;
+
+      const output = tags.stripIndent`
+        let JigsawTrustedHtml = /*@__PURE__*/ (() => {
+          ${input}
+
+          return JigsawTrustedHtml;
+        })();
+      `;
+
+      expect(tags.oneLine`${transform(input)}`).toEqual(tags.oneLine`${output}`);
+    });
+
     it('should not wrap enum like which are inside of methods', () => {
       const input = tags.stripIndent`
         class LayoutDirective {
