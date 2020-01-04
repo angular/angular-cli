@@ -143,7 +143,7 @@ export async function execute(
 ): Promise<PrerenderBuilderOutput> {
   const routes = await getRoutes(options, context);
   if (!routes.length) {
-    throw new Error('No routes found.');
+    throw new Error(`Could not find any routes to prerender.`);
   }
 
   const result = await _scheduleBuilds(options, context);

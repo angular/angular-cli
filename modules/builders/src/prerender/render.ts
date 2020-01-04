@@ -76,7 +76,7 @@ async function getServerBundle(bundlePath: string) {
       }
     } catch (e) {
       if (process.send) {
-        process.send({ success: false, error: e, outputIndexPath });
+        process.send({ success: false, error: e.message, outputIndexPath });
       }
     }
   }
