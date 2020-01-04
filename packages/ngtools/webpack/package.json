@@ -23,7 +23,7 @@
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
     "enhanced-resolve": "4.1.1",
-    "rxjs": "6.5.3",
+    "rxjs": "6.5.4",
     "webpack-sources": "1.4.3"
   },
   "peerDependencies": {
