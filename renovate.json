@@ -31,7 +31,7 @@
   ],
   "major": {
     "devDependencies": {
-      "enabled": false
+      "enabled": true
     }
   },
   "packageRules": [
