@@ -1,7 +1,7 @@
 # Build System
 
 Angular CLI includes a first-party build system for Angular applications distributed as `@angular-devkit/build-angular`.
-This build system is responsible for creating a standalone application from user source files and third-party dependencies.
+This build system is responsible for creating a standalone single-page application (SPA) from user source files and third-party dependencies.
 
 `@angular-devkit/build-angular` itself integrates with the rest of Angular CLI by being an [Architect builder](https://angular.io/guide/cli-builder).
 This document describes a top level view of the functionality in `@angular-devkit/build-angular`, referred as just the "build system".
@@ -17,13 +17,22 @@ Many tools are used in this process, and most of these steps happen within a [We
 We maintain a number of Webpack-centric plugins in this repository, some of these are public but most are private since they are very specific to our setup.
 
 
+## Overview diagram
+
+Below is a diagram of processing sources go through.
+It's not strictly accurate because some options remove certain processing stages while adding others.
+This diagram doesn't show these conditionals and only shows the possible processing steps.
+Relative paths, such as `./raw-css-loader.ts`, refer to internal plugins, while other names usually refer to public npm packages.
+
+![Overview diagram](https://g.gravizo.com/source/svg?https://raw.githubusercontent.com/angular/angular-cli/master/docs/design/build-system-overview.dot)
+
 ## Loading and processing sources
 
 Sources for Angular CLI browser apps are comprised of TypeScript files, style sheets, assets, scripts, and third party dependencies.
 A given build will load these sources from disk, process them, and bundle them together.
 
 
-### TypeScript
+### TypeScript and Ahead-Of-Time Compilation
 
 Angular builds rely heavily on TypeScript-specific functionality for [Ahead-of-Time template compilation](https://angular.io/guide/aot-compiler) (AOT).
 Outside Angular CLI, this is performed by the Angular Compiler (`ngc`), provided by `@angular/compiler-cli`.
@@ -34,7 +43,8 @@ During compilation we also perform a number of code transformations using TypeSc
 
 AOT compilation requires loading HTML and CSS resources, referenced on Angular Components, as standalone strings with no external dependencies.
 However, Webpack compilations operate on the basis of modules and references between them.
-To obtain the standalone string we compile resources using a separate Webpack child compilation then extract the results.
+It's not possible to get the full compilation result for a given resource before the end of the compilation in webpack.
+To obtain the standalone string for a HTML/CSS resource we compile it using a separate Webpack child compilation then extract the results.
 These child compilations inherit configuration and access to the same files as the parent compilation, but have their own compilation life cycle and complete independently.
 
 The build system allows specifying replacements for specific files by replacing what path is loaded from the virtual file system.
@@ -47,8 +57,6 @@ Global stylesheets are injected into the `index.html` file, while component styl
 
 The build system supports plain CSS stylesheets as well as the Sass, LESS and Stylus CSS pre-processors.
 Stylesheet processing functionality is provided by `sass-loader`, `less-loader`, `stylus-loader`, `postcss-loader`, `postcss-import`, augmented in the build system by custom webpack plugins.
-
-todo: style resources
 
 
 ### Assets
@@ -72,8 +80,9 @@ Stylesheet third party dependencies are treated mostly the same as sources.
 JavaScript third party dependencies suffer a more involved process.
 They are first resolved to a folder in `node_modules` via [Node Module Resolution](https://nodejs.org/api/modules.html#modules_modules).
 A given module might have several different entry points, for instance one for use in NodeJS and another one for using in the browser.
-Each entry point is listed in under a name pointing at a js file in that module's `package.json`.
-We use `es2015 > browser > module > main` a priority list, where the first key matched name determines which entry point to use.
+Although `package.json` only officially supports listing one entry point under the `main` key, it's common for npm packages to list [other entry points](https://2ality.com/2017/04/setting-up-multi-platform-packages.html).
+Each entry point is listed in under a key in that module's `package.json` whose value is a string containing a relative file path.
+We use `es2015 > browser > module > main` a priority list of keys, where the first key matched name determines which entry point to use.
 For instance, for a module that has both `browser` and `main` entry points, we pick `browser`.
 
 Once the actual JavaScript file is determined, it is loaded into the compilation together with it's source map.
@@ -122,13 +131,13 @@ Large projects can also opt-out of AOT compilation for faster rebuilds.
 Angular CLI focuses on enabling tree-shaking (removing unused modules) and dead code elimination (removing unused module code).
 These two categories have high potential for size reduction because of network effects: removing code can lead to more code being removed.
 
-The main tool we use to achieve this goal are the compression capabilities of [Terser](https://github.com/terser/terser).
+The main tool we use to achieve this goal are the dead code elimination capabilities of [Terser](https://github.com/terser/terser).
 We also use Terser's mangling, by which names, but not properties, are renamed to shorter forms.
 The main characteristics of Terser to keep in mind is that it operates via static analysis and does not support the indirection introduced by module loading.
 Thus the rest of the pipeline is directed towards providing Terser with code that can be removed via static analysis in large single modules scopes.
 
 To this end we developed [@angular-devkit/build-optimizer](https://github.com/angular/angular-cli/tree/master/packages/angular_devkit/build_optimizer), a post-processing tool for TS code.
-Build Optimizer searches for code patterns produced by the TypeScript and Angular compiler that are known to inhibit dead code elimination, and converts them into equivalent structures that enable it instead.
+Build Optimizer searches for code patterns produced by the TypeScript and Angular compiler that are known to inhibit dead code elimination, and converts them into equivalent structures that enable it instead (the link above contains some examples).
 It also adds Terser [annotations](https://github.com/terser/terser#annotations) marking top-level functions as free from side effects for libraries that have the `sideEffects` flag set to false in `package.json`.
 
 Webpack itself also contains two major features that enable tree-shaking and dead code elimination: [`sideEffects` flag](https://github.com/webpack/webpack/tree/master/examples/side-effects) support and [module concatenation](https://webpack.js.org/plugins/module-concatenation-plugin/).

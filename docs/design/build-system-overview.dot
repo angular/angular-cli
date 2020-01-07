@@ -1,0 +1,16 @@
+digraph G {
+  node [shape=rectangle];
+  "assets array" -> "copy-webpack-plugin";
+  "*.ts" -> "@ngtools/webpack" -> "@angular-devkit/build-optimizer";
+  "*.js" -> "source-map-loader" -> "@angular-devkit/build-optimizer";
+  "@angular-devkit/build-optimizer" -> "webpack module concatenation" -> "webpack bundling" -> "terser-webpack-plugin";
+  "scripts array" -> "terser-webpack-plugin";
+  "*.css" -> "postcss-loader with postcss-import, ./postcss-cli-resources.ts, autoprefixer";
+  "*.scss\|sass" -> "sass-loader" -> "postcss-loader with postcss-import, ./postcss-cli-resources.ts, autoprefixer";
+  "*.less" -> "less-loader" -> "postcss-loader with postcss-import, ./postcss-cli-resources.ts, autoprefixer";
+  "*.styl" -> "stylus-loader" -> "postcss-loader with postcss-import, ./postcss-cli-resources.ts, autoprefixer";
+  "postcss-loader with postcss-import, ./postcss-cli-resources.ts, autoprefixer" -> "raw-loader" [label="component style?"] -> "./optimize-css-webpack-plugin.ts";
+  "raw-loader" -> "./optimize-css-webpack-plugin.ts"
+  "postcss-loader with postcss-import, ./postcss-cli-resources.ts, autoprefixer" -> "style-loader, ./raw-css-loader.ts, and mini-css-extract-plugin" [label="global style?"];
+  "style-loader, ./raw-css-loader.ts, and mini-css-extract-plugin" -> "./optimize-css-webpack-plugin.ts"
+}
