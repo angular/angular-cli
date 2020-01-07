@@ -156,15 +156,45 @@ Aside from tree-shaking, scripts and styles (as defined in the sources above) al
 
 ## Post-processing steps
 
-There are some steps that are meant to operate over existing whole applications and thus happen after the webpack compilation finishes and outputs files.
+There are some steps that are meant to operate over whole applications and thus happen after the compilation finishes and outputs files.
+The steps are described in the order in which they are executed during a build.
+The execution order was determined based on the complexity of the step with a primary goal of minimizing the repetition of computationally expensive operations.
 
-The fist step is differential loading, where we take code that is targeting modern browsers and produces from it a compatible version for older browsers.
-`index.html` is then modified in such a way that both modern and older browsers only load their corresponding scripts.
-This is the first step because it's also the most resource intensive one, and performing it later in the pipeline would multiply the work done.
+### Differential Loading
+Differential loading is a strategy that allows your web application to support multiple browsers, but only load the necessary code that the browser needs.
+When differential loading is enabled, the CLI generates two distinct variants of application bundles.
+
+* The first contains ES2015 syntax, takes advantage of built-in support in modern browsers, ships fewer polyfills, and results in a smaller total size.
+* The second contains code in the older ES5 syntax, along with all necessary polyfills for Angular to function. This results in a larger total size, but supports older browsers.
+
+This process as designed has the advantage that only one full compilation of the application in ES2015 syntax is required.
+This removes a large amount of otherwise unnecessary and duplicate processing such as module resolution and dead code elimination.
+It also guarantees that the application is ES5 compliant including third-party code.
+The two variants of application bundles are created by the following steps:
+1) A full build of the application is performed using an ES2015 output target.
+The application's global stylesheets, scripts, and assets are also processed during this step via the full build.  These elements are reused for both of application variants.
+2) A copy of the JavaScript output application files are transformed (commonly referred to as down-leveled) to ES5 compatible syntax.
+ES2015+ syntax elements such as classes are converted into functionally equivalent ES5 code structures.
+3) An additional ES5-only polyfills file is generated that contains the required Angular polyfills for ES5-only browsers.
+4) A single index HTML file is created that references both application variants and is designed to only load the appropriate files for each browser.
+
+To support loading the file sets in the appropriate browsers, the HTML `script` element's `type` and `nomodule` attributes are leveraged.
+Browsers will only load a script with a known type.
+The ES2015 files are referenced using a type of `module` which is only supported on browsers that support ES2015+ code.
+Since browsers that do not support ES2015+ code also do not support the `module` script type, these scripts are ignored for browsers that cannot parse and execute the ES2015 code.
+Browsers that support the `module` script type also support the `nomodule` attribute.
+This attribute instructs a browser that supports module scripts to ignore the script with the attribute.  There is one browser exception in this case: Safari 10.1.
+This browser supports module scripts but does not support the `nomodule` attribute.
+To support this case, a special polyfill script is included to provide a workaround for the browser.
+This arrangement of script elements ensures that ES5-only browsers will only execute the ES5 script files and browsers that support ES2015+ will only execute the ES2015 script files.
+
+### Localization (i18n)
 
 The second of these post-processing steps is build-time localization.
 The final js bundles are processed using `@angular/localize`, replacing any locale-specific translations.
 This sort of localization produces one application for each locale, each in their own folders.
+
+### Service Worker
 
 The third and last post-processing step is the creation of a [service worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API).
 A listing of final application files is taken, fingerprinted according to their content, and added to the service worker manifest.
