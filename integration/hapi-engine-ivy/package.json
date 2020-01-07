@@ -36,8 +36,8 @@
     "zone.js": "file:../../node_modules/zone.js"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.900.0-next.10",
-    "@angular/cli": "^9.0.0-next.10",
+    "@angular-devkit/build-angular": "file:../../node_modules/@angular-devkit/build-angular",
+    "@angular/cli": "file:../../node_modules/@angular/cli",
     "@angular/compiler-cli": "file:../../node_modules/@angular/compiler-cli",
     "@types/hapi__hapi": "^18.2.5",
     "@types/hapi__inert": "^5.2.0",
