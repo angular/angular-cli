@@ -126,7 +126,7 @@
     "karma": "~4.4.1",
     "karma-jasmine": "~3.0.1",
     "karma-jasmine-html-reporter": "^1.4.0",
-    "license-checker": "^20.1.0",
+    "license-checker": "^25.0.0",
     "minimatch": "^3.0.4",
     "minimist": "^1.2.0",
     "npm-registry-client": "8.6.0",
