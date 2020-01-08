@@ -31,8 +31,8 @@ import { BuildBrowserFeatures } from '../../../utils';
 import { findCachePath } from '../../../utils/cache-path';
 import { cachingDisabled, manglingDisabled } from '../../../utils/environment-options';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
-import { CleanCssWebpackPlugin } from '../../plugins/cleancss-webpack-plugin';
 import { NamedLazyChunksPlugin } from '../../plugins/named-chunks-plugin';
+import { OptimizeCssWebpackPlugin } from '../../plugins/optimize-css-webpack-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 import { WebpackRollupLoader } from '../../plugins/webpack';
 import { findAllNodeModules, findUp } from '../../utilities/find-up';
@@ -363,7 +363,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   const extraMinimizers = [];
   if (stylesOptimization) {
     extraMinimizers.push(
-      new CleanCssWebpackPlugin({
+      new OptimizeCssWebpackPlugin({
         sourceMap: stylesSourceMap,
         // component styles retain their original file name
         test: file => /\.(?:css|scss|sass|less|styl)$/.test(file),

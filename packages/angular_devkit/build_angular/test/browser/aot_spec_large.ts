@@ -40,30 +40,6 @@ describe('Browser Builder AOT', () => {
     await run.stop();
   });
 
-  it('shows warnings for component styles', async () => {
-    const overrides = {
-      aot: true,
-      optimization: true,
-    };
-
-    host.writeMultipleFiles({
-      'src/app/app.component.css': `
-        .foo { color: white; padding: 1px; };
-        .buz { color: white; padding: 2px; };
-      `,
-    });
-
-    const logger = new logging.Logger('');
-    const logs: string[] = [];
-    logger.subscribe(e => logs.push(e.message));
-
-    const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
-    const output = await run.result;
-    expect(output.success).toBe(true);
-    expect(logs.join()).toContain('WARNING in Invalid selector');
-    await run.stop();
-  });
-
   it('shows error when component stylesheet contains SCSS syntax error', async () => {
     const overrides = {
       aot: true,
