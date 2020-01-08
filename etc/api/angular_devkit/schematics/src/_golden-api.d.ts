@@ -7,7 +7,7 @@ export interface ActionBase {
 }
 
 export declare class ActionList implements Iterable<Action> {
-    readonly length: number;
+    get length(): number;
     [Symbol.iterator](): IterableIterator<Action>;
     protected _action(action: Partial<Action>): void;
     create(path: Path, content: Buffer): void;
@@ -46,12 +46,12 @@ export declare abstract class BaseWorkflow implements Workflow {
     protected _lifeCycle: Subject<LifeCycleEvent>;
     protected _registry: schema.CoreSchemaRegistry;
     protected _reporter: Subject<DryRunEvent>;
-    readonly context: Readonly<WorkflowExecutionContext>;
-    readonly engine: Engine<{}, {}>;
-    readonly engineHost: EngineHost<{}, {}>;
-    readonly lifeCycle: Observable<LifeCycleEvent>;
-    readonly registry: schema.SchemaRegistry;
-    readonly reporter: Observable<DryRunEvent>;
+    get context(): Readonly<WorkflowExecutionContext>;
+    get engine(): Engine<{}, {}>;
+    get engineHost(): EngineHost<{}, {}>;
+    get lifeCycle(): Observable<LifeCycleEvent>;
+    get registry(): schema.SchemaRegistry;
+    get reporter(): Observable<DryRunEvent>;
     constructor(options: BaseWorkflowOptions);
     protected _createSinks(): Sink[];
     execute(options: Partial<WorkflowExecutionContext> & RequiredWorkflowExecutionContext): Observable<void>;
@@ -91,8 +91,8 @@ export declare type CollectionDescription<CollectionMetadataT extends object> = 
 
 export declare class CollectionImpl<CollectionT extends object, SchematicT extends object> implements Collection<CollectionT, SchematicT> {
     readonly baseDescriptions?: CollectionDescription<CollectionT>[] | undefined;
-    readonly description: CollectionDescription<CollectionT>;
-    readonly name: string;
+    get description(): CollectionDescription<CollectionT>;
+    get name(): string;
     constructor(_description: CollectionDescription<CollectionT>, _engine: SchematicEngine<CollectionT, SchematicT>, baseDescriptions?: CollectionDescription<CollectionT>[] | undefined);
     createSchematic(name: string, allowPrivate?: boolean): Schematic<CollectionT, SchematicT>;
     listSchematicNames(): string[];
@@ -113,8 +113,8 @@ export interface CreateFileAction extends ActionBase {
 
 export declare class DelegateTree implements Tree {
     protected _other: Tree;
-    readonly actions: Action[];
-    readonly root: DirEntry;
+    get actions(): Action[];
+    get root(): DirEntry;
     constructor(_other: Tree);
     apply(action: Action, strategy?: MergeStrategy): void;
     beginUpdate(path: string): UpdateRecorder;
@@ -265,8 +265,8 @@ export declare class HostDirEntry implements DirEntry {
     protected _tree: Tree;
     readonly parent: DirEntry | null;
     readonly path: Path;
-    readonly subdirs: PathFragment[];
-    readonly subfiles: PathFragment[];
+    get subdirs(): PathFragment[];
+    get subfiles(): PathFragment[];
     constructor(parent: DirEntry | null, path: Path, _host: virtualFs.SyncDelegateHost, _tree: Tree);
     dir(name: PathFragment): DirEntry;
     file(name: PathFragment): FileEntry | null;
@@ -292,8 +292,8 @@ export declare class HostSink extends SimpleSinkBase {
 
 export declare class HostTree implements Tree {
     protected _backend: virtualFs.ReadonlyHost<{}>;
-    readonly actions: Action[];
-    readonly root: DirEntry;
+    get actions(): Action[];
+    get root(): DirEntry;
     constructor(_backend?: virtualFs.ReadonlyHost<{}>);
     protected _normalizePath(path: string): Path;
     protected _willCreate(path: Path): boolean;
@@ -442,8 +442,8 @@ export declare type SchematicDescription<CollectionMetadataT extends object, Sch
 
 export declare class SchematicEngine<CollectionT extends object, SchematicT extends object> implements Engine<CollectionT, SchematicT> {
     protected _workflow?: Workflow | undefined;
-    readonly defaultMergeStrategy: MergeStrategy;
-    readonly workflow: Workflow | null;
+    get defaultMergeStrategy(): MergeStrategy;
+    get workflow(): Workflow | null;
     constructor(_host: EngineHost<CollectionT, SchematicT>, _workflow?: Workflow | undefined);
     createCollection(name: string): Collection<CollectionT, SchematicT>;
     createContext(schematic: Schematic<CollectionT, SchematicT>, parent?: Partial<TypedSchematicContext<CollectionT, SchematicT>>, executionOptions?: Partial<ExecutionOptions>): TypedSchematicContext<CollectionT, SchematicT>;
@@ -459,8 +459,8 @@ export declare class SchematicEngineConflictingException extends BaseException {
 }
 
 export declare class SchematicImpl<CollectionT extends object, SchematicT extends object> implements Schematic<CollectionT, SchematicT> {
-    readonly collection: Collection<CollectionT, SchematicT>;
-    readonly description: SchematicDescription<CollectionT, SchematicT>;
+    get collection(): Collection<CollectionT, SchematicT>;
+    get description(): SchematicDescription<CollectionT, SchematicT>;
     constructor(_description: SchematicDescription<CollectionT, SchematicT>, _factory: RuleFactory<{}>, _collection: Collection<CollectionT, SchematicT>, _engine: Engine<CollectionT, SchematicT>);
     call<OptionT extends object>(options: OptionT, host: Observable<Tree>, parentContext?: Partial<TypedSchematicContext<CollectionT, SchematicT>>, executionOptions?: Partial<ExecutionOptions>): Observable<Tree>;
 }
