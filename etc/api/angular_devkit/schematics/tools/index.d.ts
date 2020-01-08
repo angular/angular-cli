@@ -13,9 +13,9 @@ export declare class CollectionMissingSchematicsMapException extends BaseExcepti
 export declare type ContextTransform = (context: FileSystemSchematicContext) => FileSystemSchematicContext;
 
 export declare class ExportStringRef<T> {
-    readonly module: string;
-    readonly path: string;
-    readonly ref: T | undefined;
+    get module(): string;
+    get path(): string;
+    get ref(): T | undefined;
     constructor(ref: string, parentPath?: string, inner?: boolean);
 }
 
@@ -116,7 +116,7 @@ export declare class NodeModulesEngineHost extends FileSystemEngineHostBase {
 }
 
 export declare class NodeModulesTestEngineHost extends NodeModulesEngineHost {
-    readonly tasks: TaskConfiguration<{}>[];
+    get tasks(): TaskConfiguration<{}>[];
     protected _resolveCollectionPath(name: string): string;
     clearTasks(): void;
     registerCollection(name: string, path: string): void;
@@ -128,8 +128,8 @@ export declare class NodePackageDoesNotSupportSchematics extends BaseException {
 }
 
 export declare class NodeWorkflow extends workflow.BaseWorkflow {
-    readonly engine: FileSystemEngine;
-    readonly engineHost: NodeModulesEngineHost;
+    get engine(): FileSystemEngine;
+    get engineHost(): NodeModulesEngineHost;
     constructor(host: virtualFs.Host, options: {
         force?: boolean;
         dryRun?: boolean;
@@ -158,4 +158,4 @@ export declare class SchematicNameCollisionException extends BaseException {
     constructor(name: string);
 }
 
-export declare function validateOptionsWithSchema(registry: schema.SchemaRegistry): <T extends {}>(schematic: FileSystemSchematicDescription, options: T, context?: import("@angular-devkit/schematics").TypedSchematicContext<import("@angular-devkit/schematics/tools/tools/description").FileSystemCollectionDescription, FileSystemSchematicDescription> | undefined) => Observable<T>;
+export declare function validateOptionsWithSchema(registry: schema.SchemaRegistry): <T extends {}>(schematic: FileSystemSchematicDescription, options: T, context?: FileSystemSchematicContext | undefined) => Observable<T>;
