@@ -139,7 +139,7 @@
     "semver": "6.3.0",
     "source-map": "^0.7.3",
     "source-map-support": "^0.5.0",
-    "spdx-satisfies": "^4.0.0",
+    "spdx-satisfies": "^5.0.0",
     "tar": "^5.0.0",
     "through2": "^2.0.3",
     "tree-kill": "^1.2.0",
