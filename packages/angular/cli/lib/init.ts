@@ -76,6 +76,14 @@ if (process.env['NG_CLI_PROFILING']) {
 }
 
 (async () => {
+  /**
+   * Disable Browserslist old data warning as otherwise with every release we'd need to update this dependency
+   * which is cumbersome considering we pin versions and the warning is not user actionable.
+   * `Browserslist: caniuse-lite is outdated. Please run next command `npm update`
+   * See: https://github.com/browserslist/browserslist/blob/819c4337456996d19db6ba953014579329e9c6e1/node.js#L324
+   */
+  process.env.BROWSERSLIST_IGNORE_OLD_DATA = '1';
+
   const disableVersionCheckEnv = process.env['NG_DISABLE_VERSION_CHECK'];
   /**
    * Disable CLI version mismatch checks and forces usage of the invoked CLI
