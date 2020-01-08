@@ -7,7 +7,6 @@
  */
 import 'symbol-observable';
 // symbol polyfill must go first
-// tslint:disable: no-console
 // tslint:disable-next-line:ordered-imports import-groups
 import { tags } from '@angular-devkit/core';
 import * as fs from 'fs';
@@ -111,7 +110,7 @@ if (process.env['NG_CLI_PROFILING']) {
       localVersion = _fromPackageJson();
       shouldWarn = localVersion != null && globalVersion.compare(localVersion) > 0;
     } catch (e) {
-      // eslint-disable-next-line no-console
+      // tslint:disable-next-line no-console
       console.error(e);
       shouldWarn = true;
     }
@@ -125,10 +124,10 @@ if (process.env['NG_CLI_PROFILING']) {
       `);
       // Don't show warning colorised on `ng completion`
       if (process.argv[2] !== 'completion') {
-        // eslint-disable-next-line no-console
+        // tslint:disable-next-line no-console
         console.error(warning);
       } else {
-        // eslint-disable-next-line no-console
+        // tslint:disable-next-line no-console
         console.error(warning);
         process.exit(1);
       }
@@ -170,6 +169,7 @@ if (process.env['NG_CLI_PROFILING']) {
   process.exit(exitCode);
 })
 .catch((err: Error) => {
+  // tslint:disable-next-line no-console
   console.error('Unknown error: ' + err.toString());
   process.exit(127);
 });
