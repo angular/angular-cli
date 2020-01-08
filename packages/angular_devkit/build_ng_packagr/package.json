@@ -12,7 +12,7 @@
   },
   "peerDependencies": {
     "ng-packagr": "^9.0.0-rc.0",
-    "tsickle": "~0.37.1"
+    "tsickle": "~0.38.0"
   },
   "devDependencies": {
     "@angular/compiler": "9.0.0-rc.7",
