@@ -46,7 +46,7 @@
     "raw-loader": "4.0.0",
     "regenerator-runtime": "0.13.3",
     "rimraf": "3.0.0",
-    "rollup": "1.27.14",
+    "rollup": "1.29.0",
     "rxjs": "6.5.4",
     "sass": "1.24.2",
     "sass-loader": "8.0.0",
