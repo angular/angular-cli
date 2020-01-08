@@ -5,11 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import * as CleanCSS from 'clean-css';
+import * as cssNano from 'cssnano';
+import { ProcessOptions, Result } from 'postcss';
 import { Compiler, compilation } from 'webpack';
 import { RawSource, Source, SourceMapSource } from 'webpack-sources';
 
-export interface CleanCssWebpackPluginOptions {
+export interface OptimizeCssWebpackPluginOptions {
   sourceMap: boolean;
   test: (file: string) => boolean;
 }
@@ -22,19 +23,19 @@ function hook(
   ) => Promise<void | void[]>,
 ) {
   compiler.hooks.compilation.tap(
-    'cleancss-webpack-plugin',
+    'optimize-css-webpack-plugin',
     (compilation: compilation.Compilation) => {
-      compilation.hooks.optimizeChunkAssets.tapPromise('cleancss-webpack-plugin', chunks =>
+      compilation.hooks.optimizeChunkAssets.tapPromise('optimize-css-webpack-plugin', chunks =>
         action(compilation, chunks),
       );
     },
   );
 }
 
-export class CleanCssWebpackPlugin {
-  private readonly _options: CleanCssWebpackPluginOptions;
+export class OptimizeCssWebpackPlugin {
+  private readonly _options: OptimizeCssWebpackPluginOptions;
 
-  constructor(options: Partial<CleanCssWebpackPluginOptions>) {
+  constructor(options: Partial<OptimizeCssWebpackPluginOptions>) {
     this._options = {
       sourceMap: false,
       test: file => file.endsWith('.css'),
@@ -44,21 +45,6 @@ export class CleanCssWebpackPlugin {
 
   apply(compiler: Compiler): void {
     hook(compiler, (compilation: compilation.Compilation, chunks: compilation.Chunk[]) => {
-      const cleancss = new CleanCSS({
-        compatibility: 'ie9',
-        level: {
-          2: {
-            skipProperties: [
-              'transition', // Fixes #12408
-              'font', // Fixes #9648
-            ],
-          },
-        },
-        inline: false,
-        returnPromise: true,
-        sourceMap: this._options.sourceMap,
-      });
-
       const files: string[] = [...compilation.additionalChunkAssets];
 
       chunks.forEach(chunk => {
@@ -90,37 +76,40 @@ export class CleanCssWebpackPlugin {
             return;
           }
 
-          const output = await cleancss.minify(content, map);
+          const cssNanoOptions: cssNano.CssNanoOptions = {
+            preset: 'default',
+          };
 
-          let hasWarnings = false;
-          if (output.warnings && output.warnings.length > 0) {
-            compilation.warnings.push(...output.warnings);
-            hasWarnings = true;
-          }
+          const postCssOptions: ProcessOptions = {
+            from: file,
+            map: map && { annotation: false, prev: map },
+          };
 
-          if (output.errors && output.errors.length > 0) {
-            output.errors.forEach((error: string) => compilation.errors.push(new Error(error)));
+          const output = await new Promise<Result>((resolve, reject) => {
+            // the last parameter is not in the typings
+            // tslint:disable-next-line: no-any
+            (cssNano.process as any)(content, postCssOptions, cssNanoOptions)
+              .then(resolve)
+              .catch(reject);
+          });
 
-            return;
-          }
-
-          // generally means invalid syntax so bail
-          if (hasWarnings && output.stats.minifiedSize === 0) {
-            return;
+          const warnings = output.warnings();
+          if (warnings.length) {
+            compilation.warnings.push(...warnings.map(({ text }) => text));
           }
 
           let newSource;
-          if (output.sourceMap) {
+          if (output.map) {
             newSource = new SourceMapSource(
-              output.styles,
+              output.css,
               file,
               // tslint:disable-next-line: no-any
-              output.sourceMap.toString() as any,
+              output.map.toString() as any,
               content,
               map,
             );
           } else {
-            newSource = new RawSource(output.styles);
+            newSource = new RawSource(output.css);
           }
 
           compilation.assets[file] = newSource;
