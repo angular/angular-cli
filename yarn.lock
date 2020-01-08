@@ -6677,10 +6677,10 @@ levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-license-checker@^20.1.0:
-  version "20.2.0"
-  resolved "https://registry.yarnpkg.com/license-checker/-/license-checker-20.2.0.tgz#edb2605fd714514ed16e7eeee5b88a41900241d2"
-  integrity sha512-bseotvz8lfzEY7siilsJhQd2K/z+IF9aeJ+ZscieyZ70S6Ql2iJdVp1IfnL6gkdU4ny5JctT5Y2lFCQerSCfGA==
+license-checker@^25.0.0:
+  version "25.0.1"
+  resolved "https://registry.yarnpkg.com/license-checker/-/license-checker-25.0.1.tgz#4d14504478a5240a857bb3c21cd0491a00d761fa"
+  integrity sha512-mET5AIwl7MR2IAKYYoVBBpV0OnkKQ1xGj2IMMeEFIs42QAkEVjRtFZGWmQ28WeU7MP779iAgOaOy93Mn44mn6g==
   dependencies:
     chalk "^2.4.1"
     debug "^3.1.0"
@@ -6688,10 +6688,9 @@ license-checker@^20.1.0:
     nopt "^4.0.1"
     read-installed "~4.0.3"
     semver "^5.5.0"
-    spdx "^0.5.1"
     spdx-correct "^3.0.0"
+    spdx-expression-parse "^3.0.0"
     spdx-satisfies "^4.0.0"
-    strip-ansi "^4.0.0"
     treeify "^1.1.0"
 
 license-webpack-plugin@2.1.3:
@@ -9995,11 +9994,6 @@ spdx-correct@^3.0.0:
     spdx-expression-parse "^3.0.0"
     spdx-license-ids "^3.0.0"
 
-spdx-exceptions@^1.0.0:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/spdx-exceptions/-/spdx-exceptions-1.0.5.tgz#9d21ac4da4bdb71d060fb74e5a67531d032cbba6"
-  integrity sha1-nSGsTaS9tx0GD7dOWmdTHQMsu6Y=
-
 spdx-exceptions@^2.1.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/spdx-exceptions/-/spdx-exceptions-2.2.0.tgz#2ea450aee74f2a89bfb94519c07fcd6f41322977"
@@ -10012,11 +10006,6 @@ spdx-expression-parse@^3.0.0:
   dependencies:
     spdx-exceptions "^2.1.0"
     spdx-license-ids "^3.0.0"
-
-spdx-license-ids@^1.0.0:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-1.2.2.tgz#c9df7a3424594ade6bd11900d596696dc06bac57"
-  integrity sha1-yd96NCRZSt5r0RkA1ZZpbcBrrFc=
 
 spdx-license-ids@^3.0.0:
   version "3.0.5"
@@ -10036,14 +10025,6 @@ spdx-satisfies@^4.0.0:
     spdx-compare "^1.0.0"
     spdx-expression-parse "^3.0.0"
     spdx-ranges "^2.0.0"
-
-spdx@^0.5.1:
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/spdx/-/spdx-0.5.2.tgz#76a428b9b97e7904ef83e62a4af0d06fdb50c265"
-  integrity sha512-WQbfCQT2uKLsDllnO9ItpcGUiiF1O/ZvBGCyqFZRg122HgiZubpwpZiM7BkmH19HC3XR3Z+DFMGJNzXSPebG8A==
-  dependencies:
-    spdx-exceptions "^1.0.0"
-    spdx-license-ids "^1.0.0"
 
 spdy-transport@^3.0.0:
   version "3.0.0"
