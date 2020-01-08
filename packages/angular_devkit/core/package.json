@@ -15,6 +15,6 @@
     "source-map": "0.7.3"
   },
   "devDependencies": {
-    "seedrandom": "^2.4.4"
+    "seedrandom": "^3.0.0"
   }
 }
