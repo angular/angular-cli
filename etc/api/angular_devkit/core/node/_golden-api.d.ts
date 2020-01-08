@@ -12,7 +12,7 @@ export declare class ModuleNotFoundException extends BaseException {
 }
 
 export declare class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
-    readonly capabilities: virtualFs.HostCapabilities;
+    get capabilities(): virtualFs.HostCapabilities;
     delete(path: Path): Observable<void>;
     exists(path: Path): Observable<boolean>;
     isDirectory(path: Path): Observable<boolean>;
@@ -26,7 +26,7 @@ export declare class NodeJsAsyncHost implements virtualFs.Host<fs.Stats> {
 }
 
 export declare class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
-    readonly capabilities: virtualFs.HostCapabilities;
+    get capabilities(): virtualFs.HostCapabilities;
     delete(path: Path): Observable<void>;
     exists(path: Path): Observable<boolean>;
     isDirectory(path: Path): Observable<boolean>;
