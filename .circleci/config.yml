@@ -61,7 +61,9 @@ executors:
     resource_class: windows.medium
     shell: powershell.exe -ExecutionPolicy Bypass
     machine:
-      image: windows-server-2019
+      # Contents of this image:
+      # https://circleci.com/docs/2.0/hello-world-windows/#software-pre-installed-in-the-windows-image
+      image: windows-server-2019-vs2019:stable
 
 # Command Definitions
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-commands
@@ -72,11 +74,10 @@ commands:
       - attach_workspace:
           at: *workspace_location
   setup_windows:
-    steps:     
-      - run:
-          # Need to install node and yarn before to ensure correct versions.
-          name: Setup windows node environment
-          command: ./.circleci/windows-env.ps1             
+    steps:
+      - run: nvm install 12.1.0
+      - run: nvm use 12.1.0
+      - run: npm install -g yarn@1.17.3
       - run: node --version
       - run: yarn --version
 
