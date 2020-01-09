@@ -20,7 +20,6 @@ export function getTestConfig(
   const extraRules: webpack.Rule[] = [];
   const extraPlugins: webpack.Plugin[] = [];
 
-  // if (buildOptions.codeCoverage && CliConfig.fromProject()) {
   if (buildOptions.codeCoverage) {
     const codeCoverageExclude = buildOptions.codeCoverageExclude;
     const exclude: (string | RegExp)[] = [
@@ -39,7 +38,7 @@ export function getTestConfig(
 
     extraRules.push({
       test: /\.(jsx?|tsx?)$/,
-      loader: require.resolve('istanbul-instrumenter-loader'),
+      loader: require.resolve('coverage-istanbul-loader'),
       options: { esModules: true },
       enforce: 'post',
       exclude,
