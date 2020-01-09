@@ -1,7 +1,7 @@
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
-# files fetched on 2019-03-05 from
-# https://github.com/Microsoft/TypeScript/tree/v3.3.3333
+# files fetched on 2020-01-09 from
+# https://github.com/Microsoft/TypeScript/tree/v3.7.4
 licenses(["notice"])  # Apache 2.0
 
 ts_library(
