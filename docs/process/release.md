@@ -1,5 +1,6 @@
 # Release Steps
 - Login as `angular` npm account
+- Update Angular deps in `package.json`, `tools/defaults.bzl` and run `yarn install` to update the yarn.lock file - [Example Commit](https://github.com/angular/universal/commit/bf252680e41ff41d57db6172cb0532aea646b32c)
 - Update the version in `package.json` - [Example Commit](https://github.com/angular/universal/commit/fccca4b49f198fb9b6a52877db58909ebb419369)
 - Create a release commit
 ```sh
