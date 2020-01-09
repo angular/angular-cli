@@ -27,6 +27,7 @@ ts_library(
     deps = [
         "@npm//@types/node",
         "@npm//@types/webpack",
+        "@npm//@types/webpack-sources",
         "@npm//source-map",
         "@npm//tslib",
         "@npm//typescript",
