@@ -124,7 +124,7 @@
     "jasmine": "^3.3.1",
     "jasmine-spec-reporter": "^4.2.1",
     "karma": "~4.4.1",
-    "karma-jasmine": "~3.0.1",
+    "karma-jasmine": "~3.1.0",
     "karma-jasmine-html-reporter": "^1.4.0",
     "license-checker": "^25.0.0",
     "minimatch": "^3.0.4",
