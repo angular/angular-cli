@@ -61,6 +61,7 @@ import {
 } from './transformers';
 import { collectDeepNodes } from './transformers/ast_helpers';
 import { downlevelConstructorParameters } from './transformers/ctor-parameters';
+import { removeIvyJitSupportCalls } from './transformers/remove-ivy-jit-support-calls';
 import {
   AUTO_START_ARG,
 } from './type_checker';
@@ -1002,6 +1003,15 @@ export class AngularCompilerPlugin {
         // Remove unneeded angular decorators in VE.
         // In Ivy they are removed in ngc directly.
         this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
+      } else {
+        // Default for both options is to emit (undefined means true)
+        const removeClassMetadata = this._options.emitClassMetadata === false;
+        const removeNgModuleScope = this._options.emitNgModuleScope === false;
+        if (removeClassMetadata || removeNgModuleScope) {
+          this._transformers.push(
+            removeIvyJitSupportCalls(removeClassMetadata, removeNgModuleScope, getTypeChecker),
+          );
+        }
       }
       // Import ngfactory in loadChildren import syntax
       if (this._useFactories) {
