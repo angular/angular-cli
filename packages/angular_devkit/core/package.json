@@ -10,7 +10,7 @@
   "dependencies": {
     "ajv": "6.10.2",
     "fast-json-stable-stringify": "2.1.0",
-    "magic-string": "0.25.5",
+    "magic-string": "0.25.6",
     "rxjs": "6.5.4",
     "source-map": "0.7.3"
   },
