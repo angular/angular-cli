@@ -6135,7 +6135,7 @@ jasmine@2.8.0:
     glob "^7.0.6"
     jasmine-core "~2.8.0"
 
-jasmine@^3.3.1, jasmine@^3.5.0:
+jasmine@^3.3.1:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-3.5.0.tgz#7101eabfd043a1fc82ac24e0ab6ec56081357f9e"
   integrity sha512-DYypSryORqzsGoMazemIHUfMkXM7I7easFaxAvNM3Mr6Xz3Fy36TupTrAOxZWN8MVKEU5xECv22J4tUQf3uBzQ==
@@ -6378,12 +6378,11 @@ karma-jasmine-html-reporter@^1.4.0:
   resolved "https://registry.yarnpkg.com/karma-jasmine-html-reporter/-/karma-jasmine-html-reporter-1.4.2.tgz#16d100fd701271192d27fd28ddc90b710ad36fff"
   integrity sha512-7g0gPj8+9JepCNJR9WjDyQ2RkZ375jpdurYQyAYv8PorUCadepl8vrD6LmMqOGcM17cnrynBawQYZHaumgDjBw==
 
-karma-jasmine@~3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/karma-jasmine/-/karma-jasmine-3.0.1.tgz#55a13cc7878f67ece42a2fdb1210a301ed9783b4"
-  integrity sha512-LOCtzyOQq5NUH6OSH77mQv0bG0ua3oX3Im3AVRB7JC8YEa8tW4UDpFgM3rZ/YtJO9OhUO+awa3zuRj/+WA2qyA==
+karma-jasmine@~3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/karma-jasmine/-/karma-jasmine-3.1.0.tgz#e234e2a50bcf4d040c79b8b1826465f783590245"
+  integrity sha512-IVGbC8gap5x5NNCEOsAE77ic8rZtHDt6wmO0fFC5yT5FeB8qKnGTeud2mtKyQ41xl7vZkZ7ZxKr4wMGR6tWN+A==
   dependencies:
-    jasmine "^3.5.0"
     jasmine-core "^3.5.0"
 
 karma-source-map-support@1.4.0:
