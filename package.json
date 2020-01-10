@@ -136,7 +136,7 @@
     "spdx-satisfies": "^4.0.0",
     "tar": "^4.4.4",
     "through2": "^2.0.3",
-    "tree-kill": "^1.2.0",
+    "tree-kill": "^1.2.2",
     "ts-api-guardian": "0.4.6",
     "ts-node": "^5.0.0",
     "tslint-no-circular-imports": "^0.7.0",

@@ -19,6 +19,6 @@
     "pidusage": "2.0.17",
     "pidtree": "0.3.0",
     "rxjs": "6.4.0",
-    "tree-kill": "^1.2.0"
+    "tree-kill": "^1.2.2"
   }
 }
