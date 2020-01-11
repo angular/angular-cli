@@ -44,7 +44,7 @@
     "semver": "7.1.1",
     "symbol-observable": "1.2.0",
     "universal-analytics": "0.4.20",
-    "uuid": "3.3.2"
+    "uuid": "3.3.3"
   },
   "ng-update": {
     "migrations": "@schematics/angular/migrations/migration-collection.json",
