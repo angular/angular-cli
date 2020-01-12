@@ -105,7 +105,7 @@ export interface Option {
    * accepted will only be either 'hello' or true (not false or any other string).
    * This mean that prefixing with `no-` will not work on this field.
    */
-  enum?: Value[];
+  enums?: Value[];
 
   /**
    * If this option maps to a subcommand in the parent command, will contain all the subcommands
@@ -138,11 +138,6 @@ export interface Option {
   hidden?: boolean;
 
   /**
-   * Default value of this option.
-   */
-  default?: string | number | boolean;
-
-  /**
    * If this option can be used as an argument, the position of the argument. Otherwise omitted.
    */
   positional?: number;
@@ -152,11 +147,6 @@ export interface Option {
    * or a string to show the user as a notice.
    */
   deprecated?: boolean | string;
-
-  /**
-   * Smart default object.
-   */
-  $default?: OptionSmartDefault;
 
   /**
    * Whether or not to report this option to the Angular Team, and which custom field to use.

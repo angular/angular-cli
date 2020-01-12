@@ -45,7 +45,7 @@ import { isTTY } from '../utilities/tty';
 import { isPackageNameSafeForAnalytics } from './analytics';
 import { BaseCommandOptions, Command } from './command';
 import { Arguments, CommandContext, CommandDescription, Option } from './interface';
-import { parseArguments, parseFreeFormArguments } from './parser';
+import { parseArguments } from './parser';
 
 export interface BaseSchematicSchema {
   debug?: boolean;
@@ -395,7 +395,7 @@ export abstract class SchematicCommand<
   }
 
   protected async runSchematic(options: RunSchematicOptions) {
-    const { schematicOptions, debug, dryRun } = options;
+    const { schematicOptions = [], debug, dryRun } = options;
     let { collectionName, schematicName } = options;
 
     let nothingDone = true;
@@ -455,14 +455,13 @@ export abstract class SchematicCommand<
     }
 
     // Set the options of format "path".
-    let o: Option[] | null = null;
+    let o: Option[] | undefined;
     let args: Arguments;
-
     if (!schematic.description.schemaJson) {
-      args = await this.parseFreeFormArguments(schematicOptions || []);
+      args = await this.parseArguments(schematicOptions);
     } else {
       o = await parseJsonSchemaToOptions(workflow.registry, schematic.description.schemaJson);
-      args = await this.parseArguments(schematicOptions || [], o);
+      args = await this.parseArguments(schematicOptions, o);
     }
 
     const allowAdditionalProperties =
@@ -570,13 +569,9 @@ export abstract class SchematicCommand<
     });
   }
 
-  protected async parseFreeFormArguments(schematicOptions: string[]) {
-    return parseFreeFormArguments(schematicOptions);
-  }
-
   protected async parseArguments(
     schematicOptions: string[],
-    options: Option[] | null,
+    options?: Option[],
   ): Promise<Arguments> {
     return parseArguments(schematicOptions, options, this.logger);
   }

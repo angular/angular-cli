@@ -299,8 +299,7 @@ export class ConfigCommand extends Command<ConfigCommandSchema> {
 
     // TODO: Modify & save without destroying comments
     const configValue = config.value;
-
-    const value = normalizeValue(options.value || '', options.jsonPath);
+    const value = normalizeValue(options.value === undefined ? '' : options.value, options.jsonPath);
     const result = setValueFromPath(configValue, options.jsonPath, value);
 
     if (result === undefined) {

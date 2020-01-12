@@ -111,6 +111,7 @@
     "@types/webpack": "^4.32.1",
     "@types/webpack-dev-server": "^3.1.7",
     "@types/webpack-sources": "^0.1.5",
+    "@types/yargs-parser": "~13.1.0",
     "@yarnpkg/lockfile": "1.1.0",
     "ajv": "6.10.2",
     "ansi-colors": "3.2.4",
@@ -147,7 +148,8 @@
     "ts-node": "^5.0.0",
     "tslint-no-circular-imports": "^0.7.0",
     "tslint-sonarts": "1.9.0",
-    "verdaccio": "4.4.1"
+    "verdaccio": "4.4.1",
+    "yargs-parser": "16.1.0"
   },
   "husky": {
     "hooks": {

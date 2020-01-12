@@ -41,6 +41,7 @@ ts_library(
         "@npm//@types/semver",
         "@npm//@types/universal-analytics",
         "@npm//@types/uuid",
+        "@npm//@types/yargs-parser",
         "@npm//ansi-colors",
     ],
 )

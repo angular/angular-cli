@@ -214,27 +214,6 @@ export async function parseJsonSchemaToOptions(
       }
     }) as Value[];
 
-    let defaultValue: string | number | boolean | undefined = undefined;
-    if (current.default !== undefined) {
-      switch (types[0]) {
-        case 'string':
-          if (typeof current.default == 'string') {
-            defaultValue = current.default;
-          }
-          break;
-        case 'number':
-          if (typeof current.default == 'number') {
-            defaultValue = current.default;
-          }
-          break;
-        case 'boolean':
-          if (typeof current.default == 'boolean') {
-            defaultValue = current.default;
-          }
-          break;
-      }
-    }
-
     const type = types[0];
     const $default = current.$default;
     const $defaultIndex = (json.isJsonObject($default) && $default['$source'] == 'argv')
@@ -262,8 +241,7 @@ export async function parseJsonSchemaToOptions(
       name,
       description: '' + (current.description === undefined ? '' : current.description),
       ...types.length == 1 ? { type } : { type, types },
-      ...defaultValue !== undefined ? { default: defaultValue } : {},
-      ...enumValues && enumValues.length > 0 ? { enum: enumValues } : {},
+      ...enumValues && enumValues.length > 0 ? { enums: enumValues } : {},
       required,
       aliases,
       ...format !== undefined ? { format } : {},
