@@ -84,7 +84,6 @@ function loadPackageJson(p: string) {
         pkg['engines'] = {
           'node': '>= 10.13.0',
           'npm': '>= 6.11.0',
-          'pnpm': '>= 3.2.0',
           'yarn': '>= 1.13.0',
         };
         break;
