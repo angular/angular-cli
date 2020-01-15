@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
-require('./ng-update-message');
-require('./analytics-prompt');
+// These should not fail but if they do they should not block installation of the package
+try {
+  require('./ng-update-message');
+  require('./analytics-prompt');
+} catch (_) {}
