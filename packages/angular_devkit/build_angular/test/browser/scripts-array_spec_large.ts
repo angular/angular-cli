@@ -175,4 +175,16 @@ describe('Browser Builder scripts array', () => {
     expect(logs.join('\n')).toMatch(/\(renamed-script\) 78 bytes.*\[entry].*\[rendered]/);
     expect(logs.join('\n')).toMatch(/\(renamed-lazy-script\) 88 bytes.*\[entry].*\[rendered]/);
   });
+
+  it(`should error when a script doesn't exist`, async () => {
+    await expectAsync(browserBuild(
+      architect,
+      host,
+      target,
+      {
+        scripts: ['./invalid.js'],
+      },
+    ))
+      .toBeRejectedWithError(`Script file ./invalid.js does not exist.`);
+  });
 });

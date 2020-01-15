@@ -11,6 +11,7 @@ import {
 } from '@angular-devkit/build-optimizer';
 import { tags } from '@angular-devkit/core';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
+import { existsSync } from 'fs';
 import * as path from 'path';
 import { RollupOptions } from 'rollup';
 import { ScriptTarget } from 'typescript';
@@ -214,14 +215,19 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     buildOptions.scripts,
     'scripts',
   ).reduce((prev: { bundleName: string; paths: string[]; inject: boolean }[], curr) => {
-    const bundleName = curr.bundleName;
-    const resolvedPath = path.resolve(root, curr.input);
+    const { bundleName, inject, input } = curr;
+    const resolvedPath = path.resolve(root, input);
+
+    if (!existsSync(resolvedPath)) {
+      throw new Error(`Script file ${input} does not exist.`);
+    }
+
     const existingEntry = prev.find(el => el.bundleName === bundleName);
     if (existingEntry) {
-      if (existingEntry.inject && !curr.inject) {
+      if (existingEntry.inject && !inject) {
         // All entries have to be lazy for the bundle to be lazy.
         throw new Error(
-          `The ${curr.bundleName} bundle is mixing injected and non-injected scripts.`,
+          `The ${bundleName} bundle is mixing injected and non-injected scripts.`,
         );
       }
 
@@ -229,8 +235,8 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     } else {
       prev.push({
         bundleName,
+        inject,
         paths: [resolvedPath],
-        inject: curr.inject,
       });
     }
 
