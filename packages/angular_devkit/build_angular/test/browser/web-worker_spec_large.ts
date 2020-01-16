@@ -9,7 +9,8 @@
 import { Architect } from '@angular-devkit/architect';
 import { TestLogger } from '@angular-devkit/architect/testing';
 import { join, virtualFs } from '@angular-devkit/core';
-import { debounceTime, takeWhile, tap } from 'rxjs/operators';
+import { timer } from 'rxjs';
+import { debounceTime, map, switchMap, takeWhile, tap } from 'rxjs/operators';
 import { browserBuild, createArchitect, host, outputPath } from '../utils';
 
 
@@ -140,15 +141,14 @@ describe('Browser Builder Web Worker support', () => {
     const workerPath = join(outputPath, '0.worker.js');
     let workerContent = '';
 
-    const run = await architect.scheduleTarget(target, overrides);
-    await run.output.pipe(
-      // Wait for files to be written to disk.
-      // FIXME: Not quite sure why such a long 'debounceTime' is needed.
-      // Anything under `2500` is a constant failure locally when using
-      // 'fdescribe' and this tests doesn't run as first one and is also rather flaky on CI.
-      // It seems that the outputted files contents don't get updated in time.
-      debounceTime(2500),
-      tap((buildEvent) => expect(buildEvent.success).toBe(true, 'build should succeed')),
+    // The current linux-based CI environments may not fully settled in regards to filesystem
+    // changes from previous tests which reuse the same directory and fileset.
+    // The initial delay helps mitigate false positive rebuild triggers in such scenarios.
+    const { run } = await timer(1000).pipe(
+      switchMap(() => architect.scheduleTarget(target, overrides)),
+      switchMap(run => run.output.pipe(map(output => ({ run, output })))),
+      debounceTime(500),
+      tap(({ output }) => expect(output.success).toBe(true, 'build should succeed')),
       tap(() => {
         switch (phase) {
           case 1:
