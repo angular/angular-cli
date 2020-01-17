@@ -198,8 +198,7 @@
     },
     "preserveSymlinks": {
       "type": "boolean",
-      "description": "Do not use the real path when resolving modules.",
-      "default": false
+      "description": "Do not use the real path when resolving modules. If unset then will default to `true` if NodeJS option --preserve-symlinks is set."
     },
     "extractLicenses": {
       "type": "boolean",

@@ -480,8 +480,7 @@
             },
             "preserveSymlinks": {
               "description": "Do not use the real path when resolving modules.",
-              "type": "boolean",
-              "default": false
+              "type": "boolean"
             },
             "showCircularDependencies": {
               "description": "Show circular dependency warnings on builds.",
