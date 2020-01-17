@@ -27,6 +27,12 @@
       },
       "x-prompt": "What name would you like to use for the component?"
     },
+    "displayBlock": {
+      "description": "Specifies if the style will contain `:host { display: block; }`.",
+      "type": "boolean",
+      "default": false,
+      "alias": "b"
+    },
     "inlineStyle": {
       "description": "When true, includes styles inline in the component.ts file. Only CSS styles can be included inline. By default, an external styles file is created and referenced in the component.ts file.",
       "type": "boolean",
