@@ -86,6 +86,12 @@
               "default": "Default",
               "alias": "c"
             },
+            "displayBlock": {
+              "description": "Specifies if the style will contain `:host { display: block; }`.",
+              "type": "boolean",
+              "default": false,
+              "alias": "b"
+            },
             "entryComponent": {
               "type": "boolean",
               "default": false,

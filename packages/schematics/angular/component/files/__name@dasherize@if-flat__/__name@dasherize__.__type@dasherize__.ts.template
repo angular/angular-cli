@@ -8,7 +8,13 @@ import { Component, OnInit<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }
     </p>
   `,<% } else { %>
   templateUrl: './<%= dasherize(name) %>.<%= dasherize(type) %>.html',<% } if(inlineStyle) { %>
-  styles: []<% } else { %>
+  styles: [<% if(displayBlock){ %>
+    `
+      :host {
+        display: block;
+      }
+    `<% } %>
+  ],<% } else { %>
   styleUrls: ['./<%= dasherize(name) %>.<%= dasherize(type) %>.<%= style %>']<% } %><% if(!!viewEncapsulation) { %>,
   encapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } if (changeDetection !== 'Default') { %>,
   changeDetection: ChangeDetectionStrategy.<%= changeDetection %><% } %>
