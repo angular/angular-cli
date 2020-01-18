@@ -122,15 +122,9 @@ if (process.env['NG_CLI_PROFILING']) {
 
       To disable this warning use "ng config -g cli.warnings.versionMismatch false".
       `);
-      // Don't show warning colorised on `ng completion`
-      if (process.argv[2] !== 'completion') {
-        // tslint:disable-next-line no-console
-        console.error(warning);
-      } else {
-        // tslint:disable-next-line no-console
-        console.error(warning);
-        process.exit(1);
-      }
+
+      // tslint:disable-next-line: no-console
+      console.error(warning);
     }
 
     // No error implies a projectLocalCli, which will load whatever
@@ -166,10 +160,10 @@ if (process.env['NG_CLI_PROFILING']) {
     outputStream: process.stdout,
   });
 }).then((exitCode: number) => {
-  process.exit(exitCode);
+  process.exitCode = exitCode;
 })
 .catch((err: Error) => {
   // tslint:disable-next-line no-console
   console.error('Unknown error: ' + err.toString());
-  process.exit(127);
+  process.exitCode = 127;
 });

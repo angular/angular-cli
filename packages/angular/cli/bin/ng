@@ -22,7 +22,7 @@ if (version[0] < 10 || version[0] === 11 || (version[0] === 10 && version[1] < 1
     'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
   );
 
-  process.exit(3);
+  process.exitCode = 3;
+} else {
+  require('../lib/init');
 }
-
-require('../lib/init');
