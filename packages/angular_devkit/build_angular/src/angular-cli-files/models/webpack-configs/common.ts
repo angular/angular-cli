@@ -36,7 +36,7 @@ import { NamedLazyChunksPlugin } from '../../plugins/named-chunks-plugin';
 import { OptimizeCssWebpackPlugin } from '../../plugins/optimize-css-webpack-plugin';
 import { ScriptsWebpackPlugin } from '../../plugins/scripts-webpack-plugin';
 import { WebpackRollupLoader } from '../../plugins/webpack';
-import { findAllNodeModules, findUp } from '../../utilities/find-up';
+import { findAllNodeModules } from '../../utilities/find-up';
 import { WebpackConfigOptions } from '../build-options';
 import { getEsVersionForFileName, getOutputHashFormat, normalizeExtraEntryPoints } from './utils';
 
@@ -54,11 +54,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     scripts: scriptsSourceMap,
     vendor: vendorSourceMap,
   } = buildOptions.sourceMap;
-
-  const nodeModules = findUp('node_modules', projectRoot);
-  if (!nodeModules) {
-    throw new Error('Cannot locate node_modules directory.');
-  }
 
   const extraPlugins: Plugin[] = [];
   const extraRules: Rule[] = [];
@@ -363,7 +358,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       ? 'rxjs/_esm2015/path-mapping'
       : 'rxjs/_esm5/path-mapping';
     const rxPaths = require(require.resolve(rxjsPathMappingImport, { paths: [projectRoot] }));
-    alias = rxPaths(nodeModules);
+    alias = rxPaths();
   } catch {}
 
   const extraMinimizers = [];
