@@ -25,12 +25,13 @@ var_3: &default_nodeversion "12.9"
 # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
 # https://circleci.com/blog/deep-diving-into-circleci-workspaces/
 var_4: &workspace_location .
-# Filter to ignore pull requests on a given job.
-var_5: &ignore_pull_requests
+# Filter to only release branches on a given job.
+var_5: &only_release_branches
   filters:
     branches:
-      ignore:
-        - /pull\/.*/
+      only:
+        - master
+        - /\d+\.\d+\.x/
 
 # Executor Definitions
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors
@@ -404,7 +405,7 @@ workflows:
                 - /renovate\/.+/
                 - master
       - e2e-cli-node-10:
-          <<: *ignore_pull_requests
+          <<: *only_release_branches
           requires:
             - e2e-cli
       - test-browsers:
@@ -428,14 +429,14 @@ workflows:
             - setup-and-build-win
             - test
       - e2e-cli-win:
-          <<: *ignore_pull_requests
+          <<: *only_release_branches
           requires:
             - setup-and-build-win
             - e2e-cli
       
       # Publish jobs
       - snapshot_publish:
-          <<: *ignore_pull_requests
+          <<: *only_release_branches
           requires:
             - test
             - build
