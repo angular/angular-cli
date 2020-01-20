@@ -192,7 +192,7 @@ export default function (options: LibraryOptions): Rule {
     const folderName = `${scopeFolder}${strings.dasherize(options.name)}`;
     const projectRoot = join(normalize(newProjectRoot), folderName);
     const distRoot = `dist/${folderName}`;
-    const pathImportLib = `${distRoot}/${folderName.replace('/','-')}`;
+    const pathImportLib = `${distRoot}/${folderName.replace('/', '-')}`;
     const sourceDir = `${projectRoot}/src/lib`;
 
     const templateSource = apply(url('./files'), [
