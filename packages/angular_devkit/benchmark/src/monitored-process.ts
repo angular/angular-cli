@@ -31,14 +31,21 @@ export class LocalMonitoredProcess implements MonitoredProcess {
   stats$: Observable<AggregatedProcessStats> = this.stats.asObservable();
   stdout$: Observable<Buffer> = this.stdout.asObservable();
   stderr$: Observable<Buffer> = this.stderr.asObservable();
+  private elapsedTimer: number;
 
-  constructor(private command: Command) { }
+  constructor(
+    private command: Command,
+    private useProcessTime = true,
+  ) { }
 
   run(): Observable<number> {
     return new Observable(obs => {
       const { cmd, cwd, args } = this.command;
-      const spawnOptions: SpawnOptions = { cwd };
+      const spawnOptions: SpawnOptions = { cwd, shell: true };
 
+      if (!this.useProcessTime) {
+        this.resetElapsedTimer();
+      }
       // Spawn the process.
       const childProcess = spawn(cmd, args, spawnOptions);
 
@@ -63,7 +70,14 @@ export class LocalMonitoredProcess implements MonitoredProcess {
           }
 
           return {
-            processes, cpu, memory, pid, ppid, ctime, elapsed, timestamp,
+            processes,
+            cpu,
+            memory,
+            pid,
+            ppid,
+            ctime,
+            elapsed: this.useProcessTime ? elapsed : (Date.now() - this.elapsedTimer),
+            timestamp,
           } as AggregatedProcessStats;
         }),
         tap(stats => this.stats.next(stats)),
@@ -100,7 +114,15 @@ export class LocalMonitoredProcess implements MonitoredProcess {
       processExitCb = killChildProcess;
 
       // Cleanup on unsubscription.
-      return () => childProcess.kill();
+      return killChildProcess;
     });
+  }
+
+  resetElapsedTimer() {
+    if (this.useProcessTime) {
+      throw new Error(`Cannot reset elapsed timer when using process time. Set 'useProcessTime' to false.`);
+    }
+
+    this.elapsedTimer = Date.now();
   }
 }

@@ -12,5 +12,6 @@ export * from './default-reporter';
 export * from './default-stats-capture';
 export * from './monitored-process';
 export * from './run-benchmark';
+export * from './run-benchmark-watch';
 export * from './utils';
 export * from './main';

@@ -13,7 +13,7 @@ import { cumulativeMovingAverage, max } from './utils';
 
 
 export const defaultStatsCapture: Capture = (
-  process: MonitoredProcess,
+  stats: Observable<AggregatedProcessStats>,
 ): Observable<MetricGroup> => {
   type Accumulator = {
     elapsed: number,
@@ -34,7 +34,7 @@ export const defaultStatsCapture: Capture = (
     peakMemory: 0,
   };
 
-  return process.stats$.pipe(
+  return stats.pipe(
     reduce<AggregatedProcessStats, Accumulator>((acc, val, idx) => ({
       elapsed: val.elapsed,
       avgProcesses: cumulativeMovingAverage(acc.avgProcesses, val.processes, idx),
