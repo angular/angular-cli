@@ -391,7 +391,7 @@ workflows:
           filters:
             branches:
               only:
-                - /renovate\/.+/
+                - renovate/angular
                 - master
       - e2e-cli:
           name: e2e-cli-ng-ve-snapshots
@@ -402,7 +402,7 @@ workflows:
           filters:
             branches:
               only:
-                - /renovate\/.+/
+                - renovate/angular
                 - master
       - e2e-cli-node-10:
           <<: *only_release_branches
