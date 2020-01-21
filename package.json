@@ -112,7 +112,7 @@
     "@types/webpack-dev-server": "^3.1.7",
     "@types/webpack-sources": "^0.1.5",
     "@yarnpkg/lockfile": "1.1.0",
-    "ajv": "6.10.2",
+    "ajv": "6.11.0",
     "ansi-colors": "3.2.4",
     "common-tags": "^1.8.0",
     "conventional-changelog": "^3.0.0",
