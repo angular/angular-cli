@@ -102,7 +102,7 @@ describe('Add Schematic Rule', () => {
     const tree = await schematicRunner
       .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
     expect(tree.read(routerPath)!.toString())
-      .toMatch(/forRoot\(routes, \{\n\s*initialNavigation: 'enabled'\n\s*\}\)/);
+      .toMatch(/forRoot\(routes, \{\r?\n\s*initialNavigation: 'enabled'\r?\n\s*\}\)/);
   });
 
   it(`should not set 'initialNavigation' to enabled when it's specified`, async () => {
