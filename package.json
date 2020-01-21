@@ -35,6 +35,10 @@
     "ngcc": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points",
     "bazel": "bazel"
   },
+  "resolutions": {
+    "@types/hapi__boom": "7.4.1",
+    "@types/hapi__iron": "5.1.0"
+  },
   "devDependencies": {
     "@angular-devkit/architect": "^0.900.0-rc.10",
     "@angular-devkit/build-angular": "^0.900.0-rc.10",
