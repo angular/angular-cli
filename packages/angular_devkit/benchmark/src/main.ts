@@ -16,6 +16,7 @@ import { Command } from '../src/command';
 import { defaultReporter } from '../src/default-reporter';
 import { defaultStatsCapture } from '../src/default-stats-capture';
 import { runBenchmark } from '../src/run-benchmark';
+import { runBenchmarkWatch } from './run-benchmark-watch';
 
 
 export interface MainOptions {
@@ -47,6 +48,9 @@ export async function main({
         --output-file             File to output benchmark log to.
         --overwrite-output-file   If the output file should be overwritten rather than appended to.
         --prefix                  Logging prefix.
+        --watch-matcher           Text to match in stdout to mark an iteration complete.
+        --watch-timeout           The maximum time in 'ms' to wait for the text specified in the matcher to be matched. Default is 10000.
+        --watch-script            Script to run before each watch iteration.
 
     Example:
         benchmark --iterations=3 -- node my-script.js
@@ -63,12 +67,19 @@ export async function main({
     'output-file': string | null;
     cwd: string;
     prefix: string;
+    'watch-timeout': number;
+    'watch-matcher'?: string;
+    'watch-script'?: string;
     '--': string[] | null;
   }
 
   // Parse the command line.
   const argv = minimist(args, {
     boolean: ['help', 'verbose', 'overwrite-output-file'],
+    string: [
+      'watch-matcher',
+      'watch-script',
+    ],
     default: {
       'exit-code': 0,
       'iterations': 5,
@@ -76,6 +87,7 @@ export async function main({
       'output-file': null,
       'cwd': process.cwd(),
       'prefix': '[benchmark]',
+      'watch-timeout': 10000,
     },
     '--': true,
   }) as {} as BenchmarkCliArgv;
@@ -127,6 +139,29 @@ export async function main({
 
   const commandArgv = argv['--'];
 
+  const {
+    'watch-timeout': watchTimeout,
+    'watch-matcher': watchMatcher,
+    'watch-script': watchScript,
+    'exit-code': exitCode,
+    'output-file': outFile,
+    iterations,
+    retries,
+   } = argv;
+
+  // Exit early if we can't find the command to benchmark.
+  if (watchMatcher && !watchScript) {
+    logger.fatal(`Cannot use --watch-matcher without specifying --watch-script.`);
+
+    return 1;
+  }
+
+  if (!watchMatcher && watchScript) {
+    logger.fatal(`Cannot use --watch-script without specifying --watch-matcher.`);
+
+    return 1;
+  }
+
   // Exit early if we can't find the command to benchmark.
   if (!commandArgv || !Array.isArray(argv['--']) || (argv['--'] as Array<string>).length < 1) {
     logger.fatal(`Missing command, see benchmark --help for help.`);
@@ -135,32 +170,42 @@ export async function main({
   }
 
   // Setup file logging.
-  if (argv['output-file'] !== null) {
+  if (outFile !== null) {
     if (argv['overwrite-output-file']) {
-      writeFileSync(argv['output-file'] as string, '');
+      writeFileSync(outFile, '');
     }
     logger.pipe(filter(entry => (entry.level != 'debug' || argv['verbose'])))
-      .subscribe(entry => appendFileSync(argv['output-file'] as string, `${entry.message}\n`));
+      .subscribe(entry => appendFileSync(outFile, `${entry.message}\n`));
   }
 
   // Run benchmark on given command, capturing stats and reporting them.
-  const exitCode = argv['exit-code'];
   const cmd = commandArgv[0];
   const cmdArgs = commandArgv.slice(1);
   const command = new Command(cmd, cmdArgs, argv['cwd'], exitCode);
   const captures = [defaultStatsCapture];
   const reporters = [defaultReporter(logger)];
-  const iterations = argv['iterations'];
-  const retries = argv['retries'];
 
   logger.info(`Benchmarking process over ${iterations} iterations, with up to ${retries} retries.`);
   logger.info(`  ${command.toString()}`);
 
-  let res;
   try {
-    res = await runBenchmark(
-      { command, captures, reporters, iterations, retries, logger },
-    ).pipe(toArray()).toPromise();
+    let res$;
+    if (watchMatcher && watchScript) {
+      res$ = runBenchmarkWatch({
+        command, captures, reporters, iterations, retries, logger,
+        watchCommand: new Command('node', [watchScript]), watchMatcher, watchTimeout,
+      });
+    } else {
+      res$ = runBenchmark(
+        { command, captures, reporters, iterations, retries, logger },
+      );
+    }
+
+    const res = await res$.pipe(toArray()).toPromise();
+    if (res.length === 0) {
+      return 1;
+    }
+
   } catch (error) {
     if (error.message) {
       logger.fatal(error.message);
@@ -168,10 +213,6 @@ export async function main({
       logger.fatal(error);
     }
 
-    return 1;
-  }
-
-  if (res.length === 0) {
     return 1;
   }
 

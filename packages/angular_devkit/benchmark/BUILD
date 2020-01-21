@@ -45,6 +45,9 @@ ts_library(
         "src/test/exit-code-one.js",
         "src/test/fibonacci.js",
         "src/test/test-script.js",
+        "src/test/watch-test-cmd.js",
+        "src/test/watch-test-file.txt",
+        "src/test/watch-test-script.js",
     ],
     # @external_begin
     tsconfig = "//:tsconfig-test.json",
