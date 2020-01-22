@@ -1,4 +1,4 @@
-const { watchFile } = require('fs');
+const { watch } = require('fs');
 
 console.log('Complete');
-watchFile(require.resolve('./watch-test-file.txt'), () => console.log('Complete'));
+watch(require.resolve('./watch-test-file.txt'), () => console.log('Complete'));
