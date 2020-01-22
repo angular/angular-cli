@@ -101,6 +101,26 @@ git tag 'vXX'
 git push upstream && git push upstream --tags
 ```
 
+### Authenticating
+
+**This can ONLY be done by a Google employee.**
+
+Log in to [NPM](https://npmjs.com/) to the `angular` account in order to
+publish. This account is protected by two factor authentication (2FA).
+
+Run `npm login`:
+
+1. For username, use `angular`.
+1. For password, use the value stored [here](http://go/ng-npm-pass).
+1. For email, use `devops+npm@angular.io`.
+1. For two-factor code, you'll need to set up the account.
+    * Use an authenticator app such as [Google Authenticator](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2).
+    * Add a new account and enter the text key from [here](http://go/ng-npm-2fa).
+    * The app will start showing two-factor codes, enter one into the
+        `npm login` prompt.
+
+Once sucessfully logged in, it is time to publish.
+
 ### Publishing
 
 **This can ONLY be done by a Google employee.**
