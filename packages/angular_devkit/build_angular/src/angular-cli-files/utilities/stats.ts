@@ -64,8 +64,9 @@ export function statsToString(json: any, statsConfig: any) {
   const changedChunksStats = json.chunks
     .filter((chunk: any) => chunk.rendered)
     .map((chunk: any) => {
-      const asset = json.assets.filter((x: any) => x.name == chunk.files[0])[0];
-      return generateBundleStats({ ...chunk, size: asset && asset.size }, colors);
+      const assets = json.assets.filter((asset: any) => chunk.files.indexOf(asset.name) != -1);
+      const summedSize = assets.filter((asset: any) => !asset.name.endsWith(".map")).reduce((total: number, asset: any) => { return total + asset.size }, 0);
+      return generateBundleStats({ ...chunk, size: summedSize }, colors);
     });
 
   const unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
