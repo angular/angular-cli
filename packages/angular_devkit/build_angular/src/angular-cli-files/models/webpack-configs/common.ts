@@ -404,6 +404,9 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       safari10: true,
       output: {
         ecma: terserEcma,
+        // For differential loading, this is handled in the bundle processing.
+        // This should also work with just true but the experimental rollup support breaks without this check.
+        ascii_only: !differentialLoadingMode,
         // default behavior (undefined value) is to keep only important comments (licenses, etc.)
         comments: !buildOptions.extractLicenses && undefined,
         webkit: true,
