@@ -79,4 +79,17 @@ describe('Browser Builder optimization level', () => {
     expect(await files['main.js']).toContain('color: white');
     expect(await files['styles.css']).toContain('color: white');
   });
+
+  it('outputs ASCII only content', async () => {
+    const overrides = { aot: true, optimization: true };
+
+    host.writeMultipleFiles({
+      'src/app/app.component.html': `<p>€€€</p>`,
+    });
+
+    const { files } = await browserBuild(architect, host, target, overrides);
+    expect(await files['main.js']).not.toContain('ɵ');
+    expect(await files['main.js']).not.toContain('€€€');
+    expect(await files['main.js']).toContain('\\u20ac\\u20ac\\u20ac');
+  });
 });
