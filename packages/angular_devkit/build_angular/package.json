@@ -29,7 +29,7 @@
     "file-loader": "5.0.2",
     "find-cache-dir": "3.2.0",
     "glob": "7.1.6",
-    "jest-worker": "24.9.0",
+    "jest-worker": "25.1.0",
     "karma-source-map-support": "1.4.0",
     "less": "3.10.3",
     "less-loader": "5.0.0",
