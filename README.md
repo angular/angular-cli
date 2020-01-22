@@ -81,11 +81,11 @@ We believe that using the word "universal" is correct when referring to a JavaSc
 - [PatrickJS](https://twitter.com/gdi2290) and [Jeff Whelpley](https://twitter.com/jeffwhelpley) - Founders of the Angular Universal project. (Universal rendering is also called [PatrickJS-ing](https://twitter.com/jeffbcross/status/846512930971516928))
 - [Mark Pieszak](https://twitter.com/MarkPieszak) - Contributor and Evangelist, ASP.NET Core Engine
 - [Jason Jean](https://github.com/FrozenPandaz) - Express engine and Universal support for CLI
-- [Wassim Chegham](https://twitter.com/manekinekko) - Contributor and Evangelist, Hapi engine developer. 
+- [Wassim Chegham](https://twitter.com/manekinekko) - Contributor and Evangelist, Hapi engine developer.
   - [Angular for the rest of us](https://medium.com/google-developer-experts/angular-universal-for-the-rest-of-us-922ca8bac84)
   - [Angular outside the browser](http://slides.com/wassimchegham/angular2-universal#/)
 - [Jeff Cross](https://twitter.com/jeffbcross) - Evangelist and performance consultant
-- [Vikram Subramanian](https://twitter.com/vikerman) and [Alex Rickabaugh](https://github.com/alxhub) - Angular Core API
+- [Keen Yee Liau](https://twitter.com/liauky) and [Alex Rickabaugh](https://github.com/alxhub) - Angular Core API
 
 # License
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](/LICENSE)

@@ -1,16 +1,16 @@
-/modules/aspnetcore-engine/*                           @MarkPieszak @vikerman
+/modules/aspnetcore-engine/*                           @MarkPieszak @kyliau
 /modules/builders                                      @alan-agius4
-/modules/common/*                                      @vikerman @CaerusKaru
-/modules/express-engine/*                              @vikerman @FrozenPandaz
-/modules/hapi-engine/*                                 @vikerman @CaerusKaru
-/modules/module-map-ngfactory-loader                   @vikerman @Toxicable @FrozenPandaz
+/modules/common/*                                      @kyliau @CaerusKaru
+/modules/express-engine/*                              @kyliau @FrozenPandaz
+/modules/hapi-engine/*                                 @kyliau @CaerusKaru
+/modules/module-map-ngfactory-loader                   @kyliau @Toxicable @FrozenPandaz
 
 # Tooling
-/scripts/**                                        @CaerusKaru @vikerman
-/integration/**                                    @CaerusKaru @vikerman
-/tools/**                                          @CaerusKaru @vikerman
+/scripts/**                                        @CaerusKaru @kyliau
+/integration/**                                    @CaerusKaru @kyliau
+/tools/**                                          @CaerusKaru @kyliau
 
 # Misc
-/*                                                 @vikerman
-/.github/**                                        @vikerman
-/modules/*                                         @vikerman
+/*                                                 @kyliau
+/.github/**                                        @kyliau
+/modules/*                                         @kyliau
