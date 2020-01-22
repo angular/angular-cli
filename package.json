@@ -96,7 +96,7 @@
     "tslib": "~1.10.0",
     "tslint": "^5.18.0",
     "tsutils": "^3.0.0",
-    "typescript": "~3.6.4",
+    "typescript": "~3.7.4",
     "xhr2": "^0.2.0",
     "zone.js": "^0.10.2"
   }
