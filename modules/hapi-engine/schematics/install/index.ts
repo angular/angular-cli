@@ -48,7 +48,7 @@ function addDependencies(options: UniversalOptions): Rule {
     addPackageJsonDependency(host, {
       type: NodeDependencyType.Dev,
       name: '@types/hapi__hapi',
-      version: '^18.2.5',
+      version: '^19.0.0',
     });
     addPackageJsonDependency(host, {
       type: NodeDependencyType.Default,
