@@ -74,8 +74,10 @@ $ benchmark -- node fibonacci.js 40
 
 ## Example in watch mode
 
+`watch-script` accepts a node script when using the CLI. When using the API you can provide a `Command` instance. 
+
 ```
-benchmark --verbose --watch-timeout=10000 --watch-matcher="Compiled successfully" --watch-script  watch-script.js -- ng serve
+benchmark --verbose --watch-timeout 10000 --watch-matcher "Compiled successfully" --watch-script watch-script.js -- ng serve
 [benchmark] Benchmarking process over 5 iterations, with up to 5 retries.
 [benchmark]   ng serve (at D:\sandbox\latest-project)
 [benchmark] Process Stats

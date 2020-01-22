@@ -24,7 +24,7 @@ class MockWriteStream {
   }
 }
 
-fdescribe('benchmark binary', () => {
+describe('benchmark binary', () => {
   const benchmarkScript = require.resolve(join(__dirname, './test/fibonacci.js'));
   const exitCodeOneScript = require.resolve(join(__dirname, './test/exit-code-one.js'));
   const benchmarkWatchScript = require.resolve(join(__dirname, './test/watch-test-cmd.js'));
@@ -179,7 +179,7 @@ fdescribe('benchmark binary', () => {
   it('should error when watch-timeout is exceeded', async () => {
     const args = [
       '--watch-timeout',
-      '20',
+      '250',
       '--watch-matcher',
       'Wrong Match',
       '--watch-script',
@@ -191,5 +191,5 @@ fdescribe('benchmark binary', () => {
     const res = await main({ args, stdout, stderr });
     expect(stderr.lines).toContain('[benchmark] Timeout has occurred\n');
     expect(res).toEqual(1);
-  });
+  }, 30000);
 });
