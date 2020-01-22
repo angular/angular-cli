@@ -125,8 +125,8 @@ export function execute(
           }
         }),
         debounce(([builderOutput]) => builderOutput.success
-        ? waitUntilServerIsListening(nodeServerPort)
-        : EMPTY)
+          ? waitUntilServerIsListening(nodeServerPort)
+          : EMPTY)
       );
     }),
     concatMap(([builderOutput, nodeServerPort]) => {
@@ -214,6 +214,9 @@ async function initBrowserSync(
   const bsOptions: browserSync.Options = {
     proxy: {
       target: `localhost:${nodeServerPort}`,
+      proxyOptions: {
+        xfwd: true
+      },
       proxyRes: [
         proxyRes => {
           if ('headers' in proxyRes) {
@@ -221,7 +224,8 @@ async function initBrowserSync(
           }
         },
       ]
-    },
+      // proxyOptions is not in the typings
+    } as browserSync.ProxyOptions & { proxyOptions: { xfwd: boolean } },
     host,
     port: bsPort,
     ui: false,
@@ -247,13 +251,13 @@ async function initBrowserSync(
     const path = hasPathname ? pathname + defaultSocketIoPath : defaultSocketIoPath;
 
     bsOptions.socket = {
-        namespace,
-        path,
-        domain: url.format({
-            protocol,
-            hostname,
-            port,
-        }),
+      namespace,
+      path,
+      domain: url.format({
+        protocol,
+        hostname,
+        port,
+      }),
     };
 
     // When having a pathname we also need to create a reverse proxy because socket.io
@@ -278,12 +282,12 @@ async function initBrowserSync(
 
   return new Promise((resolve, reject) => {
     browserSyncInstance.init(bsOptions, (error, bs) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(bs);
-        }
-      });
+      if (error) {
+        reject(error);
+      } else {
+        resolve(bs);
+      }
+    });
   });
 }
 

@@ -40,6 +40,26 @@ describe('Serve SSR Builder', () => {
   });
 
   it('works', async () => {
+    host.writeMultipleFiles({
+      'src/app/app.component.ts': `
+      import { Component, Optional, Inject } from '@angular/core';
+      import { REQUEST } from '@nguniversal/express-engine/tokens';
+      import { Request } from 'express';
+
+      @Component({
+        selector: 'app-root',
+        template: '{{ headers | json }}',
+      })
+      export class AppComponent {
+        headers: any;
+
+        constructor(@Optional() @Inject(REQUEST) private request: Request) {
+          this.headers = this.request.headers;
+        }
+      }
+      `
+    });
+
     const run = await architect.scheduleTarget(target);
     runs.push(run);
     const output = await run.result as SSRDevServerBuilderOutput;
@@ -54,8 +74,9 @@ describe('Serve SSR Builder', () => {
             : timer(200);
         }),
       )),
-    ).toPromise();
-    expect(await (response as any).text()).toContain('app is running!');
+    ).toPromise() as any;
+
+    expect(await response.text()).toContain(`"x-forwarded-host": "localhost:4200"`);
   });
 
   it('works with port 0', async () => {
