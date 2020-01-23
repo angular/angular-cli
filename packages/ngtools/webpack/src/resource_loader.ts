@@ -11,6 +11,7 @@
 import * as path from 'path';
 import * as vm from 'vm';
 import { RawSource } from 'webpack-sources';
+import { forwardSlashPath } from './utils';
 
 const NodeTemplatePlugin = require('webpack/lib/node/NodeTemplatePlugin');
 const NodeTargetPlugin = require('webpack/lib/node/NodeTargetPlugin');
@@ -26,8 +27,8 @@ interface CompilationOutput {
 export class WebpackResourceLoader {
   private _parentCompilation: any;
   private _context: string;
-  private _fileDependencies = new Map<string, string[]>();
-  private _reverseDependencies = new Map<string, string[]>();
+  private _fileDependencies = new Map<string, Set<string>>();
+  private _reverseDependencies = new Map<string, Set<string>>();
   private _cachedSources = new Map<string, string>();
   private _cachedEvaluatedSources = new Map<string, RawSource>();
 
@@ -129,13 +130,14 @@ export class WebpackResourceLoader {
     });
 
     // Save the dependencies for this resource.
-    this._fileDependencies.set(filePath, childCompilation.fileDependencies);
+    this._fileDependencies.set(filePath, new Set(childCompilation.fileDependencies));
     for (const file of childCompilation.fileDependencies) {
-      const entry = this._reverseDependencies.get(file);
+      const resolvedFile = forwardSlashPath(file);
+      const entry = this._reverseDependencies.get(resolvedFile);
       if (entry) {
-        entry.push(filePath);
+        entry.add(filePath);
       } else {
-        this._reverseDependencies.set(file, [filePath]);
+        this._reverseDependencies.set(resolvedFile, new Set([filePath]));
       }
     }
 
