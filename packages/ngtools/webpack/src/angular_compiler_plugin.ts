@@ -1215,12 +1215,18 @@ export class AngularCompilerPlugin {
       })
       .filter(x => x) as string[];
 
-    let resourceImports: string[] = [], resourceDependencies: string[] = [];
+    let resourceImports: string[] = [];
+    const resourceDependencies: string[] = [];
     if (includeResources) {
       resourceImports = findResources(sourceFile)
         .map(resourcePath => resolve(dirname(resolvedFileName), normalize(resourcePath)));
-      resourceDependencies =
-        this.getResourceDependencies(this._compilerHost.denormalizePath(resolvedFileName));
+
+      for (const resource of resourceImports) {
+        for (const dep of this.getResourceDependencies(
+            this._compilerHost.denormalizePath(resource))) {
+          resourceDependencies.push(dep);
+        }
+      }
     }
 
     // These paths are meant to be used by the loader so we must denormalize them.
@@ -1233,7 +1239,7 @@ export class AngularCompilerPlugin {
     return [...uniqueDependencies];
   }
 
-  getResourceDependencies(fileName: string): string[] {
+  getResourceDependencies(fileName: string) {
     if (!this._resourceLoader) {
       return [];
     }
