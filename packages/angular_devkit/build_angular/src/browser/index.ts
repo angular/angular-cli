@@ -565,7 +565,7 @@ export function buildWebpackBrowser(
                   }
                 }
               } finally {
-                executor.stop();
+                await executor.stop();
               }
 
               // Copy assets
