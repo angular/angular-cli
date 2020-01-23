@@ -458,7 +458,7 @@ describe('Browser Builder rebuilds', () => {
               expect(content).toContain('CSS_REBUILD_STRING');
               // Change the component css import.
               host.appendToFile(
-                'src/app/app.component.css',
+                'src/app/imported-styles.css',
                 'CSS_DEP_REBUILD_STRING {color: #f00;}',
               );
               break;
