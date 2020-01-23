@@ -17,7 +17,7 @@ import {
 import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
-import { RawSourceMap } from 'source-map';
+import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import { minify } from 'terser';
 import * as v8 from 'v8';
 import { SourceMapSource } from 'webpack-sources';
@@ -26,6 +26,9 @@ import { I18nOptions } from './i18n-options';
 
 const cacache = require('cacache');
 const deserialize = ((v8 as unknown) as { deserialize(buffer: Buffer): unknown }).deserialize;
+
+// If code size is larger than 500KB, consider lower fidelity but faster sourcemap merge
+const FAST_SOURCEMAP_THRESHOLD = 500 * 1024;
 
 export interface ProcessBundleOptions {
   filename: string;
@@ -143,12 +146,18 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
     downlevelCode = transformResult.code;
 
     if (sourceMap && transformResult.map) {
-      downlevelMap = mergeSourceMaps(
+      // String length is used as an estimate for byte length
+      const fastSourceMaps = sourceCode.length > FAST_SOURCEMAP_THRESHOLD;
+
+      downlevelMap = await mergeSourceMaps(
         sourceCode,
         sourceMap,
         downlevelCode,
         transformResult.map,
         filename,
+        // When not optimizing, the sourcemaps are significantly less complex
+        // and can use the higher fidelity merge
+        !!options.optimize && fastSourceMaps,
       );
     }
   }
@@ -173,14 +182,19 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
   return result;
 }
 
-// SourceMapSource produces high-quality sourcemaps
-function mergeSourceMaps(
+async function mergeSourceMaps(
   inputCode: string,
   inputSourceMap: RawSourceMap,
   resultCode: string,
   resultSourceMap: RawSourceMap,
   filename: string,
-): RawSourceMap {
+  fast = false,
+): Promise<RawSourceMap> {
+  if (fast) {
+    return mergeSourceMapsFast(inputSourceMap, resultSourceMap);
+  }
+
+  // SourceMapSource produces high-quality sourcemaps
   // The last argument is not yet in the typings
   // tslint:disable-next-line: no-any
   return new (SourceMapSource as any)(
@@ -191,6 +205,58 @@ function mergeSourceMaps(
     inputSourceMap,
     true,
   ).map();
+}
+
+async function mergeSourceMapsFast(first: RawSourceMap, second: RawSourceMap) {
+  const sourceRoot = first.sourceRoot;
+  const generator = new SourceMapGenerator();
+
+  // sourcemap package adds the sourceRoot to all position source paths if not removed
+  delete first.sourceRoot;
+
+  await SourceMapConsumer.with(first, null, originalConsumer => {
+    return SourceMapConsumer.with(second, null, newConsumer => {
+      newConsumer.eachMapping(mapping => {
+        if (mapping.originalLine === null) {
+          return;
+        }
+        const originalPosition = originalConsumer.originalPositionFor({
+          line: mapping.originalLine,
+          column: mapping.originalColumn,
+        });
+        if (
+          originalPosition.line === null ||
+          originalPosition.column === null ||
+          originalPosition.source === null
+        ) {
+          return;
+        }
+        generator.addMapping({
+          generated: {
+            line: mapping.generatedLine,
+            column: mapping.generatedColumn,
+          },
+          name: originalPosition.name || undefined,
+          original: {
+            line: originalPosition.line,
+            column: originalPosition.column,
+          },
+          source: originalPosition.source,
+        });
+      });
+    });
+  });
+
+  const map = generator.toJSON();
+  map.file = second.file;
+  map.sourceRoot = sourceRoot;
+
+  // Put the sourceRoot back
+  if (sourceRoot) {
+    first.sourceRoot = sourceRoot;
+  }
+
+  return map;
 }
 
 async function processBundle(
@@ -220,7 +286,7 @@ async function processBundle(
   }
 
   if (optimize) {
-    result = terserMangle(code, {
+    result = await terserMangle(code, {
       filename,
       map: rawMap,
       compress: !isOriginal, // We only compress bundles which are downlevelled.
@@ -265,7 +331,7 @@ async function processBundle(
   return fileResult;
 }
 
-function terserMangle(
+async function terserMangle(
   code: string,
   options: { filename?: string; map?: RawSourceMap; compress?: boolean; ecma?: 5 | 6 } = {},
 ) {
@@ -301,12 +367,13 @@ function terserMangle(
 
   let outputMap;
   if (options.map && minifyOutput.map) {
-    outputMap = mergeSourceMaps(
+    outputMap = await mergeSourceMaps(
       code,
       options.map,
       outputCode,
       minifyOutput.map as unknown as RawSourceMap,
       options.filename || '0',
+      code.length > FAST_SOURCEMAP_THRESHOLD,
     );
   }
 
@@ -479,7 +546,7 @@ export async function inlineLocales(options: InlineOptions) {
       // If locale data is provided, load it and prepend to file
       const localeDataPath = i18n.locales[locale] && i18n.locales[locale].dataPath;
       if (localeDataPath) {
-        const localDataContent = loadLocaleData(localeDataPath, true);
+        const localDataContent = await loadLocaleData(localeDataPath, true);
         // The semicolon ensures that there is no syntax error between statements
         content.prepend(localDataContent + ';');
       }
@@ -501,6 +568,7 @@ export async function inlineLocales(options: InlineOptions) {
         output,
         contentMap,
         options.filename,
+        options.code.length > FAST_SOURCEMAP_THRESHOLD,
       );
 
       fs.writeFileSync(outputPath + '.map', JSON.stringify(outputMap));
@@ -612,13 +680,13 @@ function findLocalizePositions(
   return positions;
 }
 
-function loadLocaleData(path: string, optimize: boolean): string {
+async function loadLocaleData(path: string, optimize: boolean): Promise<string> {
   // The path is validated during option processing before the build starts
   const content = fs.readFileSync(path, 'utf8');
 
   // NOTE: This can be removed once the locale data files are preprocessed in the framework
   if (optimize) {
-    const result = terserMangle(content, {
+    const result = await terserMangle(content, {
       compress: true,
       ecma: 5,
     });
