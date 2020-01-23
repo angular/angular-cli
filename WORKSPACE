@@ -8,17 +8,17 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 # Add NodeJS rules (explicitly used for sass bundle rules)
 http_archive(
     name = "build_bazel_rules_nodejs",
-    sha256 = "a54b2511d6dae42c1f7cdaeb08144ee2808193a088004fc3b464a04583d5aa2e",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/0.42.3/rules_nodejs-0.42.3.tar.gz"],
+    sha256 = "c97bf38546c220fa250ff2cc052c1a9eac977c662c1fc23eda797b0ce8e70a43",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/1.1.0/rules_nodejs-1.1.0.tar.gz"],
 )
 
 # Setup the NodeJS toolchain
-load("@build_bazel_rules_nodejs//:defs.bzl", "check_bazel_version", "node_repositories", "yarn_install")
+load("@build_bazel_rules_nodejs//:index.bzl", "check_bazel_version", "node_repositories", "yarn_install")
 
 node_repositories()
 
-# The minimum bazel version to use with this repo is 0.27.0
-check_bazel_version(minimum_bazel_version = "0.27.0")
+# The minimum bazel version to use with this repo is 1.1.0
+check_bazel_version(minimum_bazel_version = "1.1.0")
 
 node_repositories(
     # For deterministic builds, specify explicit NodeJS and Yarn versions.
@@ -50,7 +50,7 @@ load("@npm_bazel_typescript//:index.bzl", "ts_setup_workspace")
 
 ts_setup_workspace()
 
-# Transitive dep of @npm_angular_bazel - should be removed
+# Transitive dep of @npm_bazel_karma
 http_archive(
     name = "io_bazel_rules_webtesting",
     sha256 = "9bb461d5ef08e850025480bab185fd269242d4e533bca75bfb748001ceb343c3",

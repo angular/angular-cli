@@ -1,4 +1,4 @@
-load("//tools:defaults.bzl", "jasmine_node_test", "ng_test_library", "npm_package", "ts_library")
+load("//tools:defaults.bzl", "jasmine_node_test", "ng_test_library", "pkg_npm", "ts_library")
 
 filegroup(
     name = "builders_assets",
@@ -35,7 +35,7 @@ ts_library(
     ],
 )
 
-npm_package(
+pkg_npm(
     name = "npm_package",
     srcs = [":builders_assets"],
     tags = ["release"],

@@ -23,7 +23,7 @@ ng_package(
     name = "npm_package",
     srcs = [":package.json"],
     entry_point = ":index.ts",
-    packages = ["//modules/common/schematics:npm_package"],
+    nested_packages = ["//modules/common/schematics:npm_package"],
     readme_md = ":README.md",
     tags = ["release"],
     deps = [

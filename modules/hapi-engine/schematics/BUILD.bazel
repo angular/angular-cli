@@ -1,4 +1,4 @@
-load("//tools:defaults.bzl", "jasmine_node_test", "ng_test_library", "npm_package", "ts_library")
+load("//tools:defaults.bzl", "jasmine_node_test", "ng_test_library", "pkg_npm", "ts_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -36,7 +36,7 @@ ts_library(
 )
 
 # This package is intended to be combined into the main @nguniversal/hapi-engine package as a dep.
-npm_package(
+pkg_npm(
     name = "npm_package",
     srcs = [":schematics_assets"],
     deps = [":schematics"],

@@ -24,7 +24,7 @@ readonly bin=$(${bazel_bin} info bazel-bin)
 
 function buildTargetPackages() {
   # List of targets to build, e.g. core, common, compiler, etc.
-  targets=$(${bazel_bin} query --output=label 'attr("tags", "\[.*release\]", //modules/...) intersect kind(".*_package", //modules/...)')
+  targets=$(${bazel_bin} query --output=label 'attr("tags", "\[.*release\]", //modules/...) intersect kind("pkg_npm|ng_package", //modules/...)')
 
   # Path to the output directory into which we copy the npm packages.
   dest_path="$1"
