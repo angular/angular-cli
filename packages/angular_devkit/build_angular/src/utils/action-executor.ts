@@ -142,12 +142,12 @@ export class BundleActionExecutor {
     }
   }
 
-  stop(): void {
+  async stop(): Promise<void> {
     if (this.largeWorker) {
-      this.largeWorker.end();
+      await this.largeWorker.end();
     }
     if (this.smallWorker) {
-      this.smallWorker.end();
+      await this.smallWorker.end();
     }
   }
 }

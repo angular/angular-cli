@@ -112,7 +112,7 @@ export async function i18nInlineEmittedFiles(
 
     return false;
   } finally {
-    executor.stop();
+    await executor.stop();
   }
 
   if (hasErrors) {
