@@ -43,6 +43,7 @@ executors:
     docker:
       - image: circleci/node:<< parameters.nodeversion >>
     working_directory: ~/ng
+    resource_class: small
 
   test-executor:
     parameters:
@@ -54,7 +55,7 @@ executors:
     working_directory: ~/ng
     environment:
       NPM_CONFIG_PREFIX: ~/.npm-global
-    resource_class: xlarge
+    resource_class: large
 
   windows-executor:
     working_directory: ~/ng
@@ -112,6 +113,7 @@ commands:
 jobs:
   setup:
     executor: action-executor
+    resource_class: medium
     steps:
       - checkout
       - run:
@@ -172,7 +174,6 @@ jobs:
         type: string
         default: ""
     executor: test-executor
-    resource_class: large
     parallelism: 4
     steps:
       - custom_attach_workspace
@@ -188,7 +189,7 @@ jobs:
         type: boolean
         default: false
     executor: test-executor
-    parallelism: 4
+    parallelism: 6
     steps:
       - custom_attach_workspace
       - run:
@@ -218,6 +219,7 @@ jobs:
       name: test-executor
     environment:
       E2E_BROWSERS: true
+    resource_class: medium
     steps:
       - custom_attach_workspace
       - run:
@@ -254,7 +256,7 @@ jobs:
 
   build-bazel:
     executor: action-executor
-    resource_class: xlarge
+    resource_class: large
     steps:
       - custom_attach_workspace
       - setup_bazel_rbe
@@ -263,6 +265,7 @@ jobs:
 
   snapshot_publish:
     executor: action-executor
+    resource_class: medium
     steps:
       - custom_attach_workspace
       - run:
