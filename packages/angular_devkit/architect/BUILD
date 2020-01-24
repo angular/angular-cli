@@ -8,7 +8,7 @@ licenses(["notice"])  # MIT
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 # @external_begin
-load("@build_bazel_rules_nodejs//:defs.bzl", "npm_package")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
 
 # @external_end
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
@@ -104,7 +104,7 @@ ts_library(
 )
 
 # @external_begin
-npm_package(
+pkg_npm(
     name = "npm_package",
     deps = [
         ":architect",

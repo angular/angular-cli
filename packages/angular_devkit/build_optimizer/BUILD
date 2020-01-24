@@ -7,7 +7,7 @@ licenses(["notice"])  # MIT
 
 load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
-load("@build_bazel_rules_nodejs//:defs.bzl", "npm_package")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -64,7 +64,7 @@ jasmine_node_test(
     ],
 )
 
-npm_package(
+pkg_npm(
     name = "npm_package",
     deps = [
         ":build_optimizer",
