@@ -56,7 +56,7 @@ export async function getRoutes(
  * Evenly shards items in an array.
  * e.g. shardArray([1, 2, 3, 4], 2) => [[1, 2], [3, 4]]
  */
-export function shardArray<T>(items: T[], maxNoOfShards = os.cpus().length - 1): T[][] {
+export function shardArray<T>(items: T[], maxNoOfShards = (os.cpus().length - 1) || 1): T[][] {
   const shardedArray = [];
   const numShards = Math.min(maxNoOfShards, items.length);
   for (let i = 0; i < numShards; i++) {
