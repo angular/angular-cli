@@ -13,7 +13,7 @@ export default async function () {
             const dependencies = packageJson['dependencies'];
             // Angular material adds dependencies on other Angular packages
             // Iterate over all of the packages to update them to the snapshot version.
-            for (const { name, version } of Object.entries[snapshots.dependencies]) {
+            for (const [name, version] of Object.entries(snapshots.dependencies)) {
                 if (name in dependencies) {
                     dependencies[name] = version;
                 }
