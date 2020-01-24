@@ -388,22 +388,28 @@ workflows:
           snapshots: true
           requires:
             - e2e-cli
-          filters:
-            branches:
-              only:
-                - renovate/angular
-                - master
+          pre-steps:
+            - run:
+                name: Don't run expensive e2e snapshots tests for forks other than renovate-bot and angular
+                command: >
+                  if [[ "$CIRCLE_PR_USERNAME" != "renovate-bot" ]] &&
+                    [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
+                    circleci step halt
+                  fi
       - e2e-cli:
           name: e2e-cli-ng-ve-snapshots
           snapshots: true
           ve: true
           requires:
             - e2e-cli
-          filters:
-            branches:
-              only:
-                - renovate/angular
-                - master
+          pre-steps:
+            - run:
+                name: Don't run expensive e2e snapshots tests for forks other than renovate-bot and angular
+                command: >
+                  if [[ "$CIRCLE_PR_USERNAME" != "renovate-bot" ]] &&
+                    [[ "$CIRCLE_PROJECT_USERNAME" != "angular" || $CIRCLE_BRANCH != "master" ]]; then
+                    circleci step halt
+                  fi
       - e2e-cli-node-10:
           <<: *only_release_branches
           requires:
