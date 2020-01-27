@@ -57,7 +57,7 @@ describe('Pipe Schematic', () => {
     expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo.pipe'/);
     expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooPipe\r?\n/m);
     const fileContent = tree.readContent('/projects/bar/src/app/foo.pipe.ts');
-    expect(fileContent).toContain('transform(value: any, ...args: any[])');
+    expect(fileContent).toContain('transform(value: unknown, ...args: unknown[])');
   });
 
   it('should import into a specified module', async () => {
