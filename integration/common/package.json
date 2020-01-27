@@ -29,7 +29,7 @@
     "babel-core": "^6.23.1",
     "babel-loader": "^6.4.0",
     "babel-preset-es2015": "^6.22.0",
-    "concurrently": "5.0.2",
+    "concurrently": "5.1.0",
     "protractor": "file:../../node_modules/protractor",
     "raw-loader": "^0.5.1",
     "webpack": "^2.2.1"
