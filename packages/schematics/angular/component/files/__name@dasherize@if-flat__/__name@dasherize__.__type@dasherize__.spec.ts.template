@@ -7,7 +7,7 @@ describe('<%= classify(name) %><%= classify(type) %>', () => {
   let fixture: ComponentFixture<<%= classify(name) %><%= classify(type) %>>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       declarations: [ <%= classify(name) %><%= classify(type) %> ]
     })
     .compileComponents();
