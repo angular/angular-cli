@@ -137,11 +137,35 @@ Check out the minor tag (e.g. `v6.8.0-beta.0`), then run:
 devkit-admin publish --tag next
 ```
 
+### Release Notes
+
+`devkit-admin changelog` takes `from` and `to` arguments which are any valid git
+ref.
+
+For example, running the following command will output the release notes on
+stdout between v1.2.3 and 1.2.4:
+
+```bash
+devkit-admin changelog --from=v1.2.3 --to=v1.2.4
+```
+
+Copy the output (you can use `| pbcopy` on MacOS or `|xclip` on Linux) and
+paste the release notes on [GitHub](https://github.com/angular/angular-cli/releases)
+for the tag just released.
+
+If you have an API token for GitHub you can create a draft automatically by
+using the `--githubToken` flag. You just then have to confirm the draft.
+
+> **Tags containing `beta` or `rc` should be marked as pre-release.**
+
 ### Microsite Publishing
 
-**This can ONLY be done by a Google employee.**
+The [microsite](https://cli.angular.io/) is the landing page for Angular CLI and
+is a one-page static page.
 
-**You will need firebase access to our cli-angular-io firebase site. If you don't have it, escalate.**
+> **This can ONLY be done by a Google employee.**
+>
+> **You will need firebase access to our cli-angular-io firebase site. If you don't have it, escalate.**
 
 Check out if changes were made to the microsite:
 
@@ -151,22 +175,10 @@ git log v8.0.0-beta.0..HEAD --oneline etc/cli.angular.io | wc -l
 
 If the number is 0 you can ignore the rest of this section.
 
-To publish, go to the `etc/cli.angular.io` directory and run `firebase deploy`. You might have to `firebase login` first. If you don't have the firebase CLI installed, you can install it using `npm install --global firebase-tools` (or use your package manager of choice).
+To publish, go to the
+[`angular-cli/etc/cli.angular.io`](https://github.com/angular/angular-cli/tree/master/etc/cli.angular.io)
+directory and run `firebase deploy`. You might have to `firebase login` first.
+If you don't have the firebase CLI installed, you can install it using
+`npm install --global firebase-tools` (or use your package manager of choice).
 
-This is detailed in `etc/cli.angular.io/README.md`.
-
-### Release Notes
-
-`devkit-admin changelog` takes `from` and `to` arguments which are any valid git ref.
-For example, running the following command will output the release notes on stdout between v1.2.3 and 1.2.4:
-
-```bash
-devkit-admin changelog --from=v1.2.3 --to=v1.2.4
-```
-
-Copy paste the output (you can use `| pbcopy` on MacOS or `|xclip` on Linux) and create the release notes on github for the tag just
-released. If you have an API token for GitHub you can create a draft automatically by using the `--githubToken` flag.
-You just have then to confirm the draft.
-
-**Tags containing `beta` or `rc` should be marked as pre-release.**
-
+This is detailed in [`etc/cli.angular.io/README.md`](https://github.com/angular/angular-cli/blob/master/etc/cli.angular.io/README.md).
