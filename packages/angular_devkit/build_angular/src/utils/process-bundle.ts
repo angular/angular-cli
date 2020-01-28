@@ -125,6 +125,7 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
       // tslint:disable-next-line: no-any
       inputSourceMap: false as any,
       babelrc: false,
+      configFile: false,
       presets: [[
         require.resolve('@babel/preset-env'),
         {
@@ -613,6 +614,7 @@ function findLocalizePositions(
   try {
     ast = parseSync(options.code, {
       babelrc: false,
+      configFile: false,
       sourceType: 'script',
       filename: options.filename,
     });
