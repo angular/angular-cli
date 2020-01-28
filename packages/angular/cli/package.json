@@ -40,7 +40,7 @@
     "open": "7.0.0",
     "pacote": "10.3.1",
     "read-package-tree": "5.3.1",
-    "rimraf": "3.0.0",
+    "rimraf": "3.0.1",
     "semver": "7.1.1",
     "symbol-observable": "1.2.0",
     "universal-analytics": "0.4.20",
