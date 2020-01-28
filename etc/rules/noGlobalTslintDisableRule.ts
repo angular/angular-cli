@@ -5,6 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// tslint:disable-next-line: no-global-tslint-disable
+// tslint:disable: no-implicit-dependencies
 import * as path from 'path';
 import * as Lint from 'tslint';
 import * as ts from 'typescript';
