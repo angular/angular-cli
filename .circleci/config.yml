@@ -80,11 +80,17 @@ jobs:
       - custom_attach_workspace
       - copy-bazel-config
       - run: yarn bazel test //...
+      - run: scripts/build-modules-dist.sh
+      - save_cache:
+          key: *cache_key
+          paths:
+            - ~/.cache/yarn
+            - ~/bazel_repository_cache
+            - ~/bazel_disk_cache
       - persist_to_workspace:
           root: *workspace_location
           paths:
-            - bazel_repository_cache
-            - bazel_disk_cache
+            - ng/dist
 
   lint:
     executor: action-executor
@@ -100,31 +106,6 @@ jobs:
       - run: 'yarn bazel:lint ||
                   (echo -e "\n.bzl files have lint errors. Please run ''yarn bazel:lint-fix''"; exit 1)'
       - run: yarn lint
-
-  # This job exists only for backwards-compatibility with old scripts and tests
-  # that rely on the pre-Bazel dist/modules-dist layout.
-  # It duplicates some work with the job above: we build the bazel packages
-  # twice. Even though we have a remote cache, these jobs will typically run in
-  # parallel so up-to-date outputs will not be available at the time the build
-  # starts.
-  # No new jobs should depend on this one.
-  build-packages-dist:
-    executor: action-executor
-    resource_class: xlarge
-    steps:
-      - custom_attach_workspace
-      - copy-bazel-config
-      - run: scripts/build-modules-dist.sh
-      - save_cache:
-          key: *cache_key
-          paths:
-            - ~/.cache/yarn
-            - ~/bazel_repository_cache
-            - ~/bazel_disk_cache
-      - persist_to_workspace:
-          root: *workspace_location
-          paths:
-            - ng/dist
 
   # We run the integration tests outside of Bazel for now.
   # They are a separate workflow job so that they can be easily re-run.
@@ -154,12 +135,9 @@ workflows:
     - lint:
         requires:
           - setup
-    - build-packages-dist:
-        requires:
-          - build
     - integration_test:
         requires:
-          - build-packages-dist
+          - build
 
 general:
   branches:
