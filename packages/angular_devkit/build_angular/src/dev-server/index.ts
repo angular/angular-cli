@@ -366,6 +366,7 @@ async function setupLocalize(
         loader: require.resolve('babel-loader'),
         options: {
           babelrc: false,
+          configFile: false,
           compact: false,
           cacheCompression: false,
           cacheDirectory: findCachePath('babel-loader'),
