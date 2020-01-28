@@ -614,6 +614,7 @@ function findLocalizePositions(
     ast = parseSync(options.code, {
       babelrc: false,
       sourceType: 'script',
+      filename: options.filename,
     });
   } catch (error) {
     if (error.message) {
