@@ -113,7 +113,7 @@
     "@types/webpack-sources": "^0.1.5",
     "@yarnpkg/lockfile": "1.1.0",
     "ajv": "6.11.0",
-    "ansi-colors": "3.2.4",
+    "ansi-colors": "4.1.1",
     "common-tags": "^1.8.0",
     "conventional-changelog": "^3.0.0",
     "conventional-commits-parser": "^3.0.0",
