@@ -11,6 +11,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { packages } from '../lib/packages';
 
+// tslint:disable: no-implicit-dependencies
 const temp = require('temp');
 
 function die(message = 'Unknown error.') {

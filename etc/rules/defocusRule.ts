@@ -12,6 +12,8 @@
  * MIT - https://github.com/Sergiioo/tslint-defocus/blob/master/LICENSE
  */
 
+// tslint:disable-next-line: no-global-tslint-disable
+// tslint:disable: no-implicit-dependencies
 import * as Lint from 'tslint';
 import * as ts from 'typescript';
 
