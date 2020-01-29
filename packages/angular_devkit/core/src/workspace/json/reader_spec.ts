@@ -28,7 +28,7 @@ const basicFile = stripIndent`
   "x-bar": 5,
 }`;
 
-const representativeFile = readFileSync(__dirname + '/test/angular.json', 'utf8');
+const representativeFile = readFileSync(require.resolve(__dirname + '/test/angular.json'), 'utf8');
 
 function createTestHost(content: string, onWrite?: (path: string, data: string) => void) {
   return {

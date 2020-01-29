@@ -30,7 +30,7 @@ const basicFile = stripIndent`
   "x-bar": 5,
 }`;
 
-const representativeFile = readFileSync(__dirname + '/test/angular.json', 'utf8');
+const representativeFile = readFileSync(require.resolve(__dirname + '/test/angular.json'), 'utf8');
 
 function createTestCaseHost(inputData = '') {
   const host = {
@@ -39,7 +39,8 @@ function createTestCaseHost(inputData = '') {
     },
     async writeFile(path: string, data: string) {
       try {
-        const testCase = readFileSync(join(__dirname, 'test', 'cases', path) + '.json', 'utf8');
+        const testCase = readFileSync(
+          require.resolve(join(__dirname, 'test', 'cases', path) + '.json'), 'utf8');
         expect(data).toEqual(testCase);
       } catch (e) {
         fail(`Unable to load test case '${path}': ${e.message || e}`);

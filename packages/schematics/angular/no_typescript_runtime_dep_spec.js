@@ -9,7 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const pkg = path.join('packages', 'schematics', 'angular');
+const pkg = path.dirname(require.resolve(__filename));
 describe('@schematics/angular javascript code', () => {
   fs.readdirSync(pkg).forEach(d => {
     const dir = path.join(pkg, d);
@@ -21,10 +21,10 @@ describe('@schematics/angular javascript code', () => {
           const file = path.join(subdir, f);
           if (fs.statSync(file).isDirectory()) {
             check(file);
-          } else if (file.endsWith('.js')) {
+          } else if (file.endsWith('.ts')) {
             const content = fs.readFileSync(file, { encoding: 'utf-8' });
-            if (content.indexOf('require("typescript")') >= 0) {
-              fail(`${file} has a typescript require`);
+            if (content.indexOf(`from 'typescript'`) >= 0) {
+              fail(`${file} has a typescript import`);
             }
           }
         });

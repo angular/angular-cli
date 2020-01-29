@@ -56,7 +56,7 @@ ts_library(
             "src/**/*_spec_large.ts",
         ],
     ),
-    data = [
+    data = glob(["src/workspace/json/test/**/*.json"]) + [
         "src/experimental/workspace/test/test-workspace.json",
         "src/experimental/workspace/workspace-schema.json",
     ],
