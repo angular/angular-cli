@@ -8,7 +8,7 @@
 import { createHash } from 'crypto';
 import * as fs from 'fs';
 import { copyFile } from './copy-file';
-import { manglingDisabled } from './environment-options';
+import { allowMangle } from './environment-options';
 import { CacheKey, ProcessBundleOptions, ProcessBundleResult } from './process-bundle';
 
 const cacache = require('cacache');
@@ -42,7 +42,7 @@ export class BundleActionCache {
       .update(content)
       .digest('base64');
     let baseCacheKey = `${packageVersion}|${content.length}|${algorithm}-${codeHash}`;
-    if (manglingDisabled) {
+    if (!allowMangle) {
       baseCacheKey += '|MD';
     }
 

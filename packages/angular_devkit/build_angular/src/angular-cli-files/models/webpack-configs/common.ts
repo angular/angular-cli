@@ -30,7 +30,12 @@ import { RawSource } from 'webpack-sources';
 import { AssetPatternClass, ExtraEntryPoint } from '../../../browser/schema';
 import { BuildBrowserFeatures } from '../../../utils';
 import { findCachePath } from '../../../utils/cache-path';
-import { beautifyEnabled, cachingDisabled, manglingDisabled, minifyDisabled } from '../../../utils/environment-options';
+import {
+  allowMangle,
+  allowMinify,
+  cachingDisabled,
+  shouldBeautify,
+} from '../../../utils/environment-options';
 import { BundleBudgetPlugin } from '../../plugins/bundle-budget';
 import { NamedLazyChunksPlugin } from '../../plugins/named-chunks-plugin';
 import { OptimizeCssWebpackPlugin } from '../../plugins/optimize-css-webpack-plugin';
@@ -410,12 +415,12 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         // default behavior (undefined value) is to keep only important comments (licenses, etc.)
         comments: !buildOptions.extractLicenses && undefined,
         webkit: true,
-        beautify: beautifyEnabled,
+        beautify: shouldBeautify,
       },
       // On server, we don't want to compress anything. We still set the ngDevMode = false for it
       // to remove dev code, and ngI18nClosureMode to remove Closure compiler i18n code
       compress:
-        !minifyDisabled &&
+        allowMinify &&
         (buildOptions.platform == 'server'
           ? {
               ecma: terserEcma,
@@ -432,7 +437,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
             }),
       // We also want to avoid mangling on server.
       // Name mangling is handled within the browser builder
-      mangle: !manglingDisabled && buildOptions.platform !== 'server' && !differentialLoadingMode,
+      mangle: allowMangle && buildOptions.platform !== 'server' && !differentialLoadingMode,
     };
 
     extraMinimizers.push(
@@ -456,7 +461,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
           globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
         terserOptions: {
           ...terserOptions,
-          compress: !minifyDisabled && {
+          compress: allowMinify && {
             ...terserOptions.compress,
             ecma: 5,
           },
@@ -464,7 +469,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
             ...terserOptions.output,
             ecma: 5,
           },
-          mangle: !manglingDisabled && buildOptions.platform !== 'server',
+          mangle: allowMangle && buildOptions.platform !== 'server',
         },
       }),
     );

@@ -21,7 +21,7 @@ import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map'
 import { minify } from 'terser';
 import * as v8 from 'v8';
 import { SourceMapSource } from 'webpack-sources';
-import { beautifyEnabled, manglingDisabled, minifyDisabled } from './environment-options';
+import { allowMangle, allowMinify, shouldBeautify } from './environment-options';
 import { I18nOptions } from './i18n-options';
 
 const cacache = require('cacache');
@@ -136,8 +136,8 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
         },
       ]],
       plugins: options.replacements ? [createReplacePlugin(options.replacements)] : [],
-      minified: !minifyDisabled && !!options.optimize,
-      compact: !beautifyEnabled && !!options.optimize,
+      minified: allowMinify && !!options.optimize,
+      compact: !shouldBeautify && !!options.optimize,
       sourceMaps: !!sourceMap,
     });
 
@@ -341,14 +341,14 @@ async function terserMangle(
 
   // Mangle downlevel code
   const minifyOutput = minify(options.filename ? { [options.filename]: code } : code, {
-    compress: !minifyDisabled && !!options.compress,
+    compress: allowMinify && !!options.compress,
     ecma: options.ecma || 5,
-    mangle: !manglingDisabled,
+    mangle: allowMangle,
     safari10: true,
     output: {
       ascii_only: true,
       webkit: true,
-      beautify: beautifyEnabled,
+      beautify: shouldBeautify,
     },
     sourceMap:
       !!options.map &&
