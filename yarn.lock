@@ -2462,7 +2462,16 @@ browserify-zlib@^0.2.0:
   dependencies:
     pako "~1.0.5"
 
-browserslist@4.8.5, browserslist@^4.0.0, browserslist@^4.7.0, browserslist@^4.8.2, browserslist@^4.8.3:
+browserslist@4.8.6:
+  version "4.8.6"
+  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.8.6.tgz#96406f3f5f0755d272e27a66f4163ca821590a7e"
+  integrity sha512-ZHao85gf0eZ0ESxLfCp73GG9O/VTytYDIkIiZDlURppLTI9wErSM/5yAKEq6rcUdxBLjMELmrYUJGg5sxGKMHg==
+  dependencies:
+    caniuse-lite "^1.0.30001023"
+    electron-to-chromium "^1.3.341"
+    node-releases "^1.1.47"
+
+browserslist@^4.0.0, browserslist@^4.7.0, browserslist@^4.8.2, browserslist@^4.8.3:
   version "4.8.5"
   resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.8.5.tgz#691af4e327ac877b25e7a3f7ee869c4ef36cdea3"
   integrity sha512-4LMHuicxkabIB+n9874jZX/az1IaZ5a+EUuvD7KFOu9x/Bd5YHyO0DIz2ls/Kl8g0ItS4X/ilEgf4T1Br0lgSg==
@@ -2739,7 +2748,7 @@ caniuse-api@^3.0.0:
     lodash.memoize "^4.1.2"
     lodash.uniq "^4.5.0"
 
-caniuse-lite@1.0.30001023, caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001020, caniuse-lite@^1.0.30001022:
+caniuse-lite@1.0.30001023, caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001020, caniuse-lite@^1.0.30001022, caniuse-lite@^1.0.30001023:
   version "1.0.30001023"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001023.tgz#b82155827f3f5009077bdd2df3d8968bcbcc6fc4"
   integrity sha512-C5TDMiYG11EOhVOA62W1p3UsJ2z4DsHtMBQtjzp3ZsUglcQn62WOUgW0y795c7A5uZ+GCEIvzkMatLIlAsbNTA==
@@ -4186,6 +4195,11 @@ electron-to-chromium@^1.3.338:
   version "1.3.340"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.340.tgz#5d4fe78e984d4211194cf5a52e08069543da146f"
   integrity sha512-hRFBAglhcj5iVYH+o8QU0+XId1WGoc0VGowJB1cuJAt3exHGrivZvWeAO5BRgBZqwZtwxjm8a5MQeGoT/Su3ww==
+
+electron-to-chromium@^1.3.341:
+  version "1.3.342"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.342.tgz#138317aa7399e268735b9269fe374a8566425090"
+  integrity sha512-An/MLhGLIG/g7lZ5vqs4lar96zv74agd3ZcADDHLpjAa16T7Y/pO/33Q31JOwpmHeyjithtHtUcn7XLuaz78lw==
 
 elliptic@^6.0.0:
   version "6.5.2"
@@ -7718,7 +7732,7 @@ node-pre-gyp@*:
     semver "^5.3.0"
     tar "^4.4.2"
 
-node-releases@^1.1.46:
+node-releases@^1.1.46, node-releases@^1.1.47:
   version "1.1.47"
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.47.tgz#c59ef739a1fd7ecbd9f0b7cf5b7871e8a8b591e4"
   integrity sha512-k4xjVPx5FpwBUj0Gw7uvFOTF4Ep8Hok1I6qjwL3pLfwe7Y0REQSAqOwwv9TWBCUtMHxcXfY4PgRLRozcChvTcA==
