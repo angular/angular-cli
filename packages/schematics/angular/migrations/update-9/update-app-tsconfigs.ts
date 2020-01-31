@@ -7,14 +7,20 @@
  */
 import { JsonAstObject, logging } from '@angular-devkit/core';
 import { Rule, Tree, UpdateRecorder } from '@angular-devkit/schematics';
-import { posix } from 'path';
+import { dirname, relative } from 'path';
 import {
   findPropertyInAstObject,
   insertPropertyInAstObjectInOrder,
   removePropertyInAstObject,
 } from '../../utility/json-utils';
 import { Builders } from '../../utility/workspace-models';
-import { getAllOptions, getTargets, getWorkspace, readJsonFileAsAstObject } from './utils';
+import {
+  forwardSlashPath,
+  getAllOptions,
+  getTargets,
+  getWorkspace,
+  readJsonFileAsAstObject,
+} from './utils';
 
 /**
  * Update the tsconfig files for applications
@@ -107,15 +113,18 @@ function updateTsConfig(tree: Tree, builderConfig: JsonAstObject, builderName: B
       const files = findPropertyInAstObject(tsConfigAst, 'files');
       if (!files) {
         const newFiles: string[] = [];
+        const tsConfigDir = dirname(forwardSlashPath(tsConfigPath));
 
         const mainOption = findPropertyInAstObject(option, 'main');
         if (mainOption && mainOption.kind === 'string') {
-          newFiles.push(posix.relative(posix.dirname(tsConfigPath), mainOption.value));
+          newFiles.push(
+            forwardSlashPath(relative(tsConfigDir, forwardSlashPath(mainOption.value))));
         }
 
         const polyfillsOption = findPropertyInAstObject(option, 'polyfills');
         if (polyfillsOption && polyfillsOption.kind === 'string') {
-          newFiles.push(posix.relative(posix.dirname(tsConfigPath), polyfillsOption.value));
+          newFiles.push(
+            forwardSlashPath(relative(tsConfigDir, forwardSlashPath(polyfillsOption.value))));
         }
 
         if (newFiles.length) {
