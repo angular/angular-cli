@@ -8,6 +8,7 @@
 
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { getWorkspaceTargets, updateWorkspaceTargets } from './update-workspace-config_spec';
 
 // tslint:disable-next-line: no-any
 function overrideJsonFile(tree: UnitTestTree, path: string, newContent: object) {
@@ -60,6 +61,32 @@ describe('Migration to version 9', () => {
       overrideJsonFile(tree, 'tsconfig.app.json', defaultTsConfigOptions);
       const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
       const { exclude, files } = JSON.parse(tree2.readContent('tsconfig.app.json'));
+      expect(exclude).toBeUndefined();
+      expect(files).toEqual(['src/main.ts', 'src/polyfills.ts']);
+    });
+
+    it('should resolve paths correctly even if they are using windows separators', async () => {
+      const tree2 = await schematicRunner
+        .runExternalSchematicAsync(
+          require.resolve('../../collection.json'),
+          'application',
+          {
+            name: 'another-app',
+          },
+          tree,
+        )
+        .toPromise();
+
+      const tsCfgPath = 'projects/another-app/tsconfig.app.json';
+      overrideJsonFile(tree2, tsCfgPath, defaultTsConfigOptions);
+      const config = getWorkspaceTargets(tree2, 'another-app');
+      config.build.options.main = 'projects\\another-app\\src\\main.ts';
+      config.build.options.polyfills = 'projects\\another-app\\src\\polyfills.ts';
+      config.build.options.tsConfig = 'projects\\another-app\\tsconfig.app.json';
+      updateWorkspaceTargets(tree2, config, 'another-app');
+
+      const tree3 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree2.branch()).toPromise();
+      const { exclude, files } = JSON.parse(tree3.readContent(tsCfgPath));
       expect(exclude).toBeUndefined();
       expect(files).toEqual(['src/main.ts', 'src/polyfills.ts']);
     });
