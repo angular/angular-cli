@@ -14,6 +14,7 @@ import { ScriptTarget } from 'typescript';
 import {
   AssetPatternClass,
   Budget,
+  CrossOrigin,
   ExtraEntryPoint,
   OptimizationClass,
   SourceMapClass,
@@ -53,6 +54,7 @@ export interface BuildOptions {
   showCircularDependencies?: boolean;
   buildOptimizer?: boolean;
   namedChunks?: boolean;
+  crossOrigin?: CrossOrigin;
   subresourceIntegrity?: boolean;
   serviceWorker?: boolean;
   webWorkerTsConfig?: string;
