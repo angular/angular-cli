@@ -13,14 +13,17 @@ import { WorkspaceTargets } from '../../utility/workspace-models';
 import { ANY_COMPONENT_STYLE_BUDGET } from './update-workspace-config';
 
 // tslint:disable-next-line: no-any
-function getWorkspaceTargets(tree: UnitTestTree): any {
-  return JSON.parse(tree.readContent(workspacePath))
-    .projects['migration-test'].architect;
+export function getWorkspaceTargets(tree: UnitTestTree, project = 'migration-test'): any {
+  return JSON.parse(tree.readContent(workspacePath)).projects[project].architect;
 }
 
-function updateWorkspaceTargets(tree: UnitTestTree, workspaceTargets: WorkspaceTargets) {
+export function updateWorkspaceTargets(
+  tree: UnitTestTree,
+  workspaceTargets: WorkspaceTargets,
+  project = 'migration-test',
+) {
   const config = JSON.parse(tree.readContent(workspacePath));
-  config.projects['migration-test'].architect = workspaceTargets;
+  config.projects[project].architect = workspaceTargets;
   tree.overwrite(workspacePath, JSON.stringify(config, undefined, 2));
 }
 

@@ -144,3 +144,9 @@ export function isIvyEnabled(tree: Tree, tsConfigPath: string): boolean {
 
   return true;
 }
+
+// TS represents paths internally with '/' and expects paths to be in this format.
+// angular.json expects paths with '/', but doesn't enforce them.
+export function forwardSlashPath(path: string) {
+  return path.replace(/\\/g, '/');
+}
