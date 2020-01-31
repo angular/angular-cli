@@ -13,6 +13,7 @@ import { ParsedConfiguration } from '@angular/compiler-cli';
 import {
   AssetPatternClass,
   Budget,
+  CrossOrigin,
   ExtraEntryPoint,
   I18NMissingTranslation,
   Localize,
@@ -58,6 +59,7 @@ export interface BuildOptions {
   showCircularDependencies?: boolean;
   buildOptimizer?: boolean;
   namedChunks?: boolean;
+  crossOrigin?: CrossOrigin;
   subresourceIntegrity?: boolean;
   serviceWorker?: boolean;
   webWorkerTsConfig?: string;

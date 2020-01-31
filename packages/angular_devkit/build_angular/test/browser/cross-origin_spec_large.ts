@@ -86,4 +86,20 @@ describe('Browser Builder crossOrigin', () => {
     );
     await run.stop();
   });
+
+  it('works for lazy chunks', async () => {
+    host.writeMultipleFiles({
+      'src/lazy-module.ts': 'export const value = 100;',
+      'src/main.ts': `import('./lazy-module');`,
+    });
+
+    const overrides = { crossOrigin: CrossOrigin.UseCredentials };
+    const run = await architect.scheduleTarget(targetSpec, overrides);
+    const output = (await run.result) as BrowserBuilderOutput;
+    expect(output.success).toBe(true);
+
+    const fileName = join(normalize(output.outputPath), 'runtime.js');
+    const content = virtualFs.fileBufferToString(await host.read(normalize(fileName)).toPromise());
+    expect(content).toContain('script.crossOrigin = "use-credentials"');
+  });
 });
