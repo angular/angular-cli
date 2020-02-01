@@ -8,8 +8,8 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 # Add NodeJS rules (explicitly used for sass bundle rules)
 http_archive(
     name = "build_bazel_rules_nodejs",
-    sha256 = "6bcef105e75cac3c5f8212e0d0431b6ec1aaa1963e093b0091474ab98ecf29d2",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/1.2.2/rules_nodejs-1.2.2.tar.gz"],
+    sha256 = "9473b207f1c5a61b603442cbfeeea8aaf2aa62870673fce2a1c52087f6ff4dc9",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/1.2.4/rules_nodejs-1.2.4.tar.gz"],
 )
 
 # Setup the NodeJS toolchain
