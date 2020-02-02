@@ -74,7 +74,7 @@ You can read more about publishing on npm here:
 https://docs.npmjs.com/getting-started/publishing-npm-packages
 
 
-## Why do I need to build the library everytime I make changes?
+## Why do I need to build the library every time I make changes?
 
 Running `ng build my-lib` every time you change a file is bothersome and takes time.
 In `Angular CLI` version `6.2` an incremental builds functionality has been added to improve the experience of library developers. 
