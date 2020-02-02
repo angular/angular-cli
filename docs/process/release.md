@@ -119,7 +119,7 @@ Run `npm login`:
     * The app will start showing two-factor codes, enter one into the
         `npm login` prompt.
 
-Once sucessfully logged in, it is time to publish.
+Once successfully logged in, it is time to publish.
 
 ### Publishing
 

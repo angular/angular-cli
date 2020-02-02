@@ -237,7 +237,7 @@ To capture a CPU profiling, you can:
     * on Windows: ̀̀`setx NG_CLI_PROFILING my-profile`
 
 Then, just run the ng command on which you want to capture a CPU profile.
-You will then obtain a `my-profile.cpuprofile` file in the folder from wich you ran the ng command.
+You will then obtain a `my-profile.cpuprofile` file in the folder from which you ran the ng command.
 
 You can use the Chrome Devtools to process it. To do so:
 1. open `chrome://inspect/#devices` in Chrome
