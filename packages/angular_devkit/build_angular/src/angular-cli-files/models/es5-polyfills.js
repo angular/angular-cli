@@ -95,10 +95,6 @@ import 'core-js/es/date';
 import 'core-js/modules/es.regexp.constructor';
 import 'core-js/modules/es.regexp.to-string';
 import 'core-js/modules/es.regexp.flags';
-import 'core-js/modules/es.string.match';
-import 'core-js/modules/es.string.replace';
-import 'core-js/modules/es.string.search';
-import 'core-js/modules/es.string.split';
 
 import 'core-js/modules/es.map';
 import 'core-js/modules/es.weak-map';
