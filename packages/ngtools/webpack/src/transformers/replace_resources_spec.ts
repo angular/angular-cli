@@ -15,8 +15,7 @@ function transform(
   directTemplateLoading = true,
   importHelpers = true,
 ) {
-  const { program, compilerHost } =
-    createTypescriptContext(input, undefined, undefined, importHelpers);
+  const { program, compilerHost } = createTypescriptContext(input, undefined, undefined, { importHelpers });
   const getTypeChecker = () => program.getTypeChecker();
   const transformer = replaceResources(
     () => shouldTransform, getTypeChecker, directTemplateLoading);
