@@ -69,7 +69,7 @@ const ignoredPackages = [
   'tslint-sonarts@1.9.0', // LGPL-3.0 but only used as a tool, not linked in the build.
 
   // * Broken license fields
-  'pako@1.0.10', // MIT but broken license in package.json
+  'pako@1.0.11', // MIT but broken license in package.json
 
   // * Other
   'font-awesome@4.7.0', // (OFL-1.1 AND MIT)
