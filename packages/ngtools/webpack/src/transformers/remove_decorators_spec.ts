@@ -11,7 +11,7 @@ import { createTypescriptContext, transformTypescript } from './ast_helpers';
 import { removeDecorators } from './remove_decorators';
 
 describe('@ngtools/webpack transformers', () => {
-  describe('decorator_remover', () => {
+  describe('remove_decorators', () => {
     it('should remove Angular decorators', () => {
       const input = tags.stripIndent`
         import { Component } from '@angular/core';
