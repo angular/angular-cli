@@ -46,6 +46,7 @@ export interface ProcessBundleOptions {
   integrityAlgorithm?: 'sha256' | 'sha384' | 'sha512';
   runtimeData?: ProcessBundleResult[];
   replacements?: [string, string][];
+  supportedBrowsers?: string [] | Record<string, string>;
 }
 
 export interface ProcessBundleResult {
@@ -129,6 +130,8 @@ export async function process(options: ProcessBundleOptions): Promise<ProcessBun
       presets: [[
         require.resolve('@babel/preset-env'),
         {
+          // browserslist-compatible query or object of minimum environment versions to support
+          targets: options.supportedBrowsers,
           // modules aren't needed since the bundles use webpack's custom module loading
           modules: false,
           // 'transform-typeof-symbol' generates slower code
