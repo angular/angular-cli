@@ -243,7 +243,6 @@ export function buildWebpackBrowser(
       const tsConfig = readTsconfig(options.tsConfig, context.workspaceRoot);
       const target = tsConfig.options.target || ScriptTarget.ES5;
       const buildBrowserFeatures = new BuildBrowserFeatures(projectRoot, target);
-
       const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded();
 
       if (target > ScriptTarget.ES2015 && isDifferentialLoadingNeeded) {
@@ -471,6 +470,7 @@ export function buildWebpackBrowser(
                   const runtimeOptions = {
                     ...processRuntimeAction,
                     runtimeData: processResults,
+                    supportedBrowsers: buildBrowserFeatures.supportedBrowsers,
                   };
                   processResults.push(
                     await import('../utils/process-bundle').then(m => m.process(runtimeOptions)),

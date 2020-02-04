@@ -11,14 +11,14 @@ import { feature, features } from 'caniuse-lite';
 import * as ts from 'typescript';
 
 export class BuildBrowserFeatures {
-  private readonly _supportedBrowsers: string[];
   private readonly _es6TargetOrLater: boolean;
+  readonly supportedBrowsers: string[];
 
   constructor(
     private projectRoot: string,
     private scriptTarget: ts.ScriptTarget,
   ) {
-    this._supportedBrowsers = browserslist(undefined, { path: this.projectRoot });
+    this.supportedBrowsers = browserslist(undefined, { path: this.projectRoot });
     this._es6TargetOrLater = this.scriptTarget > ts.ScriptTarget.ES5;
   }
 
@@ -53,7 +53,7 @@ export class BuildBrowserFeatures {
       'ios_saf 10.3',
     ];
 
-    return this._supportedBrowsers.some(browser => safariBrowsers.includes(browser));
+    return this.supportedBrowsers.some(browser => safariBrowsers.includes(browser));
   }
 
   /**
@@ -71,7 +71,7 @@ export class BuildBrowserFeatures {
 
     const data = feature(features[featureId]);
 
-    return !this._supportedBrowsers
+    return !this.supportedBrowsers
       .some(browser => {
         const [agentId, version] = browser.split(' ');
 
