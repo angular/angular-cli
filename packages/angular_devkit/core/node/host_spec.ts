@@ -108,4 +108,20 @@ describe('NodeJsSyncHost', () => {
       .then(done, done.fail);
   }, 30000);
 
+  linuxOnlyIt('rename to a non-existing dir', done => {
+
+    Promise.resolve()
+      .then(() => fs.mkdirSync(root + '/rename'))
+      .then(() => fs.writeFileSync(root + '/rename/a.txt', 'hello world'))
+      .then(() => {
+        host.rename(normalize('/rename/a.txt'), normalize('/rename/b/c/d/a.txt'));
+        if (fs.existsSync(root + '/rename/b/c/d/a.txt')) {
+          const resContent = host.read(normalize('/rename/b/c/d/a.txt'));
+          const content = virtualFs.fileBufferToString(resContent);
+          expect(content).toEqual('hello world');
+        }
+      })
+      .then(done, done.fail);
+  }, 30000);
+
 });
