@@ -428,6 +428,7 @@ export function buildWebpackBrowser(
                 const runtimeOptions = {
                   ...processRuntimeAction,
                   runtimeData: processResults,
+                  supportedBrowsers: buildBrowserFeatures.supportedBrowsers,
                 };
                 processResults.push(
                   await import('../utils/process-bundle').then(m => m.process(runtimeOptions)),
