@@ -38,7 +38,7 @@ export function makeTransform(
       // replace_resources), but may not be true for new transforms.
       if (getTypeChecker && removeOps.length + replaceOps.length > 0) {
         const removedNodes = removeOps.concat(replaceOps).map(op => op.target);
-        removeOps.push(...elideImports(sf, removedNodes, getTypeChecker));
+        removeOps.push(...elideImports(sf, removedNodes, getTypeChecker, context.getCompilerOptions()));
       }
 
       const visitor: ts.Visitor = node => {

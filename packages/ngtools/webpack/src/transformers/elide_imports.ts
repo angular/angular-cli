@@ -19,6 +19,7 @@ export function elideImports(
   sourceFile: ts.SourceFile,
   removedNodes: ts.Node[],
   getTypeChecker: () => ts.TypeChecker,
+  compilerOptions: ts.CompilerOptions,
 ): TransformOperation[] {
   const ops: TransformOperation[] = [];
 
@@ -33,8 +34,8 @@ export function elideImports(
   const imports: ts.ImportDeclaration[] = [];
 
   ts.forEachChild(sourceFile, function visit(node) {
-    // Skip type references and removed nodes. We consider both unused.
-    if (node.kind == ts.SyntaxKind.TypeReference || removedNodes.includes(node)) {
+    // Skip removed nodes.
+    if (removedNodes.includes(node)) {
       return;
     }
 
@@ -46,17 +47,48 @@ export function elideImports(
     }
 
     let symbol: ts.Symbol | undefined;
+    if (ts.isTypeReferenceNode(node)) {
+      if (!compilerOptions.emitDecoratorMetadata) {
+        // Skip and mark as unused if emitDecoratorMetadata is disabled.
+        return;
+      }
 
-    switch (node.kind) {
-      case ts.SyntaxKind.Identifier:
+      const parent = node.parent;
+      let isTypeReferenceForDecoratoredNode = false;
+
+      switch (parent.kind) {
+        case ts.SyntaxKind.GetAccessor:
+        case ts.SyntaxKind.PropertyDeclaration:
+        case ts.SyntaxKind.MethodDeclaration:
+          isTypeReferenceForDecoratoredNode = !!parent.decorators?.length;
+          break;
+        case ts.SyntaxKind.Parameter:
+          // - A constructor parameter can be decorated or the class itself is decorated.
+          // - The parent of the parameter is decorated example a method declaration or a set accessor.
+          // In all cases we need the type reference not to be elided.
+          isTypeReferenceForDecoratoredNode = !!(parent.decorators?.length ||
+            (ts.isSetAccessor(parent.parent) && !!parent.parent.decorators?.length) ||
+            (ts.isConstructorDeclaration(parent.parent) && !!parent.parent.parent.decorators?.length));
+          break;
+      }
+      if (isTypeReferenceForDecoratoredNode) {
         symbol = typeChecker.getSymbolAtLocation(node);
-        break;
-      case ts.SyntaxKind.ExportSpecifier:
-        symbol = typeChecker.getExportSpecifierLocalTargetSymbol(node as ts.ExportSpecifier);
-        break;
-      case ts.SyntaxKind.ShorthandPropertyAssignment:
-        symbol = typeChecker.getShorthandAssignmentValueSymbol(node);
-        break;
+      } else {
+        // If type reference is not for Decorator skip and marked as unused.
+        return;
+      }
+    } else {
+      switch (node.kind) {
+        case ts.SyntaxKind.Identifier:
+          symbol = typeChecker.getSymbolAtLocation(node);
+          break;
+        case ts.SyntaxKind.ExportSpecifier:
+          symbol = typeChecker.getExportSpecifierLocalTargetSymbol(node as ts.ExportSpecifier);
+          break;
+        case ts.SyntaxKind.ShorthandPropertyAssignment:
+          symbol = typeChecker.getShorthandAssignmentValueSymbol(node);
+          break;
+      }
     }
 
     if (symbol) {
