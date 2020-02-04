@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as fs from 'fs';
+import * as path from 'path';
 import { Observable, concat, from as observableFrom, of, throwError } from 'rxjs';
 import {
   concatMap,
@@ -316,6 +317,8 @@ export class NodeJsSyncHost implements virtualFs.Host<fs.Stats> {
       // TODO: remove this try+catch when issue https://github.com/ReactiveX/rxjs/issues/3740 is
       // fixed.
       try {
+        if(!fs.existsSync(src_1.getSystemPath(path.parse(to).dir)))
+          fs.mkdirSync(src_1.getSystemPath(path.parse(to).dir), { recursive: true })
         fs.renameSync(getSystemPath(from), getSystemPath(to));
         obs.next();
         obs.complete();
