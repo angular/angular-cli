@@ -18,7 +18,7 @@
     "autoprefixer": "9.6.1",
     "browserslist": "4.8.6",
     "cacache": "12.0.2",
-    "caniuse-lite": "1.0.30001019",
+    "caniuse-lite": "1.0.30001024",
     "circular-dependency-plugin": "5.2.0",
     "clean-css": "4.2.1",
     "coverage-istanbul-loader": "2.0.3",
