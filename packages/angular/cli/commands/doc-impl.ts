@@ -47,7 +47,7 @@ export class DocCommand extends Command<DocCommandSchema> {
     let searchUrl = `https://${domain}/api?query=${options.keyword}`;
 
     if (options.search) {
-      searchUrl = `https://${domain}/?search=${options.keyword}`;
+      searchUrl = `https://${domain}/docs?search=${options.keyword}`;
     }
 
     // We should wrap `open` in a new Promise because `open` is already resolved
