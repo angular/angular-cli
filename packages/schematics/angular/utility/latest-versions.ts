@@ -8,16 +8,18 @@
 
 export const latestVersions = {
   // These versions should be kept up to date with latest Angular peer dependencies.
-  Angular: '~9.0.0-rc.14',
+  Angular: '~9.0.0',
   RxJs: '~6.5.4',
   ZoneJs: '~0.10.2',
   TypeScript: '~3.7.5',
   TsLib: '^1.10.0',
 
   // The versions below must be manually updated when making a new devkit release.
-  DevkitBuildAngular: '~0.900.0-rc.14',
-  DevkitBuildNgPackagr: '~0.900.0-rc.14',
-  DevkitBuildWebpack: '~0.900.0-rc.14',
+  // For our e2e tests, these versions must match the latest tag present on the branch.
+  // During RC periods they will not match the latest RC though, and should not be updated.
+  DevkitBuildAngular: '~0.900.0',
+  DevkitBuildNgPackagr: '~0.900.0',
+  DevkitBuildWebpack: '~0.900.0',
 
-  ngPackagr: '^9.0.0-rc.8',
+  ngPackagr: '^9.0.0',
 };
