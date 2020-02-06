@@ -39,21 +39,15 @@ function runProtractor(root: string, options: ProtractorBuilderOptions): Promise
 async function updateWebdriver() {
   // The webdriver-manager update command can only be accessed via a deep import.
   const webdriverDeepImport = 'webdriver-manager/built/lib/cmds/update';
-  const importOptions = [
-    // When using npm, webdriver is within protractor/node_modules.
-    `protractor/node_modules/${webdriverDeepImport}`,
-    // When using yarn, webdriver is found as a root module.
-    webdriverDeepImport,
-  ];
 
   let path;
-  for (const importOption of importOptions) {
-    try {
-      path = require.resolve(importOption);
-    } catch (error) {
-      if (error.code !== 'MODULE_NOT_FOUND') {
-        throw error;
-      }
+  try {
+    const protractorPath = require.resolve('protractor');
+
+    path = require.resolve(webdriverDeepImport, { paths: [protractorPath] });
+  } catch (error) {
+    if (error.code !== 'MODULE_NOT_FOUND') {
+      throw error;
     }
   }
 
