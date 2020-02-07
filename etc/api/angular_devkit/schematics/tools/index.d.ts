@@ -135,6 +135,7 @@ export declare class NodeWorkflow extends workflow.BaseWorkflow {
         dryRun?: boolean;
         root?: Path;
         packageManager?: string;
+        packageRegistry?: string;
         registry?: schema.CoreSchemaRegistry;
         resolvePaths?: string[];
     });

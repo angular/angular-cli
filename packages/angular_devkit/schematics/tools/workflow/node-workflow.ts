@@ -24,6 +24,7 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
       dryRun?: boolean;
       root?: Path;
       packageManager?: string;
+      packageRegistry?: string;
       registry?: schema.CoreSchemaRegistry;
       resolvePaths?: string[],
     },
@@ -44,6 +45,7 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
         allowPackageManagerOverride: true,
         packageManager: options.packageManager,
         rootDirectory: options.root && getSystemPath(options.root),
+        registry: options.packageRegistry,
       },
     );
     engineHost.registerTaskExecutor(
