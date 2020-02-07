@@ -53,6 +53,7 @@ export interface BaseSchematicSchema {
   force?: boolean;
   interactive?: boolean;
   defaults?: boolean;
+  packageRegistry?: string;
 }
 
 export interface RunSchematicOptions extends BaseSchematicSchema {
@@ -250,6 +251,7 @@ export abstract class SchematicCommand<
       force,
       dryRun,
       packageManager: await getPackageManager(this.workspace.root),
+      packageRegistry: options.packageRegistry,
       root: normalize(this.workspace.root),
       registry: new schema.CoreSchemaRegistry(formats.standardFormats),
       resolvePaths: !!this.workspace.configFile
