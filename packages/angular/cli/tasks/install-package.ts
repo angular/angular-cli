@@ -68,6 +68,7 @@ export function installTempPackage(
   packageName: string,
   logger: logging.Logger,
   packageManager: PackageManager = PackageManager.Npm,
+  extraArgs?: string[],
 ): string {
   const tempPath = mkdtempSync(join(realpathSync(tmpdir()), 'angular-cli-packages-'));
 
@@ -100,6 +101,7 @@ export function installTempPackage(
   // Yarn will not append 'node_modules' to the path
   const prefixPath = packageManager === PackageManager.Yarn ? tempNodeModules : tempPath;
   const installArgs: string[] = [
+    ...(extraArgs || []),
     `${packageManagerArgs.prefix}="${prefixPath}"`,
     packageManagerArgs.noLockfile,
   ];
