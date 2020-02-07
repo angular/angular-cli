@@ -7,8 +7,8 @@
  */
 import { tags } from '@angular-devkit/core';  // tslint:disable-line:no-implicit-dependencies
 import * as ts from 'typescript';
-import { createTypescriptContext, transformTypescript } from './ast_helpers';
 import { removeIvyJitSupportCalls } from './remove-ivy-jit-support-calls';
+import { createTypescriptContext, transformTypescript } from './spec_helpers';
 
 function transform(
   input: string,
