@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { tags } from '@angular-devkit/core';  // tslint:disable-line:no-implicit-dependencies
-import { createTypescriptContext, transformTypescript } from './ast_helpers';
 import { replaceResources } from './replace_resources';
+import { createTypescriptContext, transformTypescript } from './spec_helpers';
 
 function transform(
   input: string,
