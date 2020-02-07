@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { tags } from '@angular-devkit/core';
-import { createTypescriptContext, transformTypescript } from './ast_helpers';
 import { importFactory } from './import_factory';
+import { createTypescriptContext, transformTypescript } from './spec_helpers';
 
 describe('@ngtools/webpack transformers', () => {
   describe('import_factory', () => {

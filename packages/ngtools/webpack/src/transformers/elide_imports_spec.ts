@@ -8,9 +8,10 @@
 // tslint:disable:no-big-function
 import { tags } from '@angular-devkit/core';  // tslint:disable-line:no-implicit-dependencies
 import * as ts from 'typescript';
-import { createTypescriptContext, getLastNode, transformTypescript } from './ast_helpers';
+import { getLastNode } from './ast_helpers';
 import { RemoveNodeOperation } from './interfaces';
 import { makeTransform } from './make_transform';
+import { createTypescriptContext, transformTypescript } from './spec_helpers';
 
 describe('@ngtools/webpack transformers', () => {
   describe('elide_imports', () => {

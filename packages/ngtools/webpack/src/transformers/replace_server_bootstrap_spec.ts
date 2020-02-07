@@ -7,8 +7,8 @@
  */
 // tslint:disable:no-big-function
 import { tags } from '@angular-devkit/core';  // tslint:disable-line:no-implicit-dependencies
-import { createTypescriptContext, transformTypescript } from './ast_helpers';
 import { replaceServerBootstrap } from './replace_server_bootstrap';
+import { createTypescriptContext, transformTypescript } from './spec_helpers';
 
 describe('@ngtools/webpack transformers', () => {
   describe('replace_server_bootstrap', () => {

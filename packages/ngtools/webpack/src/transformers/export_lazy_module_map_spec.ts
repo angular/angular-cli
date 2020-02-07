@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { tags } from '@angular-devkit/core';  // tslint:disable-line:no-implicit-dependencies
-import { transformTypescript } from './ast_helpers';
 import { exportLazyModuleMap } from './export_lazy_module_map';
+import { transformTypescript } from './spec_helpers';
 
 describe('@ngtools/webpack transformers', () => {
   describe('export_lazy_module_map', () => {
