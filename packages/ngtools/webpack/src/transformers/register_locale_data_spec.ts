@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { tags } from '@angular-devkit/core';  // tslint:disable-line:no-implicit-dependencies
-import { transformTypescript } from './ast_helpers';
 import { registerLocaleData } from './register_locale_data';
+import { transformTypescript } from './spec_helpers';
 
 describe('@ngtools/webpack transformers', () => {
   describe('register_locale_data', () => {
