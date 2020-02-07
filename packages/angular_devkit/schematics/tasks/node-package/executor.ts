@@ -13,13 +13,13 @@ import { Observable } from 'rxjs';
 import { TaskExecutor, UnsuccessfulWorkflowExecution } from '../../src';
 import { NodePackageTaskFactoryOptions, NodePackageTaskOptions } from './options';
 
-type PackageManagerProfile = {
+interface PackageManagerProfile {
   quietArgument?: string;
   commands: {
     installAll?: string;
     installPackage: string;
-  },
-};
+  };
+}
 
 const packageManagers: { [name: string]: PackageManagerProfile } = {
   'npm': {
@@ -97,6 +97,10 @@ export default function(
 
     if (options.quiet && taskPackageManagerProfile.quietArgument) {
       args.push(taskPackageManagerProfile.quietArgument);
+    }
+
+    if (factoryOptions.registry) {
+      args.push(`--registry="${factoryOptions.registry}"`);
     }
 
     return new Observable(obs => {
