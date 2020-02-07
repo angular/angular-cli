@@ -97,10 +97,10 @@ export function installTempPackage(
   // setup prefix/global modules path
   const packageManagerArgs = getPackageManagerArguments(packageManager);
   const tempNodeModules = join(tempPath, 'node_modules');
+  // Yarn will not append 'node_modules' to the path
+  const prefixPath = packageManager === PackageManager.Yarn ? tempNodeModules : tempPath;
   const installArgs: string[] = [
-    packageManagerArgs.prefix,
-    // Yarn will no append 'node_modules' to the path
-    packageManager === PackageManager.Yarn ? tempNodeModules : tempPath,
+    `${packageManagerArgs.prefix}="${prefixPath}"`,
     packageManagerArgs.noLockfile,
   ];
 
