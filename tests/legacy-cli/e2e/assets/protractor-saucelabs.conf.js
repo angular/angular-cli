@@ -19,33 +19,17 @@ exports.config = {
   multiCapabilities: [
     {
       browserName: 'chrome',
-      version: '41',
+      version: '80',
       tunnelIdentifier,
     },
     {
-      browserName: 'chrome',
-      version: '75',
+      browserName: 'firefox',
+      version: '72',
       tunnelIdentifier,
     },
     {
-      browserName: 'safari',
-      platform: 'OS X 10.11',
-      version: '9.0',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'safari',
-      platform: 'OS X 10.12',
-      version: '10.1',
-      // This specific version is needed as otherwise it will not pass
-      // See: https://github.com/angular/angular-cli/issues/15084
-      seleniumVersion: '3.4.0',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'safari',
-      platform: 'macOS 10.13',
-      version: '11.1',
+      browserName: 'firefox',
+      version: '68', // Latest Firefox ESR version
       tunnelIdentifier,
     },
     {
@@ -55,18 +39,9 @@ exports.config = {
       tunnelIdentifier,
     },
     {
-      browserName: 'firefox',
-      version: '48',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'firefox',
-      version: '60',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'firefox',
-      version: '68',
+      browserName: 'safari',
+      platform: 'macOS 10.15',
+      version: '13.0',
       tunnelIdentifier,
     },
     {
@@ -79,12 +54,6 @@ exports.config = {
       browserName: 'internet explorer',
       platform: 'Windows 8.1',
       version: '11',
-      tunnelIdentifier,
-    },
-    {
-      browserName: "MicrosoftEdge",
-      platform: 'Windows 10',
-      version: "14.14393",
       tunnelIdentifier,
     },
     {
