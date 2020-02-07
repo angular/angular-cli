@@ -357,7 +357,7 @@ export function* checkThresholds(thresholds: IterableIterator<Threshold>, size: 
           continue;
         }
 
-        const sizeDifference = formatSize(threshold.limit - size);
+        const sizeDifference = formatSize(size - threshold.limit);
         yield {
           severity: threshold.severity,
           message: `Exceeded maximum budget for ${label}. Budget ${
