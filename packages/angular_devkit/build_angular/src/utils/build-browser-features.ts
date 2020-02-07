@@ -38,25 +38,6 @@ export class BuildBrowserFeatures {
   }
 
   /**
-   * Safari 10.1 and iOS Safari 10.3 supports modules,
-   * but does not support the `nomodule` attribute.
-   * While return `true`, when support for Safari 10.1 and iOS Safari 10.3
-   * is required and in differential loading is enabled.
-   */
-  isNoModulePolyfillNeeded(): boolean {
-    if (!this.isDifferentialLoadingNeeded()) {
-      return false;
-    }
-
-    const safariBrowsers = [
-      'safari 10.1',
-      'ios_saf 10.3',
-    ];
-
-    return this.supportedBrowsers.some(browser => safariBrowsers.includes(browser));
-  }
-
-  /**
    * True, when a browser feature is supported partially or fully.
    */
   isFeatureSupported(featureId: string): boolean {
