@@ -17,6 +17,7 @@ import {
   mergeWith,
   move,
   noop,
+  rename,
   url,
 } from '@angular-devkit/schematics';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
@@ -47,9 +48,9 @@ function addDeclarationToNgModule(options: DirectiveOptions): Rule {
     const directivePath = `/${options.path}/`
                           + (options.flat ? '' : strings.dasherize(options.name) + '/')
                           + strings.dasherize(options.name)
-                          + '.directive';
+                          + (!options.noSuffix ? '.directive' : '');
     const relativePath = buildRelativePath(modulePath, directivePath);
-    const classifiedName = strings.classify(`${options.name}Directive`);
+    const classifiedName = strings.classify(options.name) + (!options.noSuffix ? 'Directive' : '');
     const declarationChanges = addDeclarationToModule(source,
                                                       modulePath,
                                                       classifiedName,
@@ -104,6 +105,8 @@ export default function (options: DirectiveOptions): Rule {
   return async (host: Tree) => {
     const workspace = await getWorkspace(host);
     const project = workspace.projects.get(options.project as string);
+    const regType = new RegExp('.directive.');
+
     if (!project) {
       throw new SchematicsException(`Invalid project name (${options.project})`);
     }
@@ -118,6 +121,7 @@ export default function (options: DirectiveOptions): Rule {
     options.name = parsedPath.name;
     options.path = parsedPath.path;
     options.selector = options.selector || buildSelector(options, project.prefix || '');
+    options.noSuffix = options.noSuffix || (project && project.noSuffix ? project.noSuffix : false);
 
     validateHtmlSelector(options.selector);
 
@@ -128,6 +132,7 @@ export default function (options: DirectiveOptions): Rule {
         'if-flat': (s: string) => options.flat ? '' : s,
         ...options,
       }),
+      options.noSuffix ? rename(name => !!name.match(regType), (name) => name.replace(regType, '.')) : noop(),
       move(parsedPath.path),
     ]);
 

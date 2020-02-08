@@ -8,7 +8,7 @@ import {
 import { Observable } from 'rxjs';
 
 @Injectable()
-export class <%= classify(name) %>Interceptor implements HttpInterceptor {
+export class <%= classify(name) %><%= !noSuffix ? 'Interceptor' : '' %> implements HttpInterceptor {
 
   constructor() {}
 

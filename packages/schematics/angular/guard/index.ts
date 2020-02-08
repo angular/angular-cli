@@ -17,16 +17,18 @@ import {
   mergeWith,
   move,
   noop,
+  rename,
   url,
 } from '@angular-devkit/schematics';
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
-import { createDefaultPath } from '../utility/workspace';
+import { createDefaultPath, getWorkspace } from '../utility/workspace';
 import { Implement as GuardInterface, Schema as GuardOptions } from './schema';
-
 
 export default function (options: GuardOptions): Rule {
   return async (host: Tree) => {
+    const workspace = await getWorkspace(host);
+    const project = workspace.projects.get(options.project as string);
     if (options.path === undefined) {
       options.path = await createDefaultPath(host, options.project as string);
     }
@@ -35,6 +37,7 @@ export default function (options: GuardOptions): Rule {
       throw new SchematicsException('Option "implements" is required.');
     }
 
+    const regType = new RegExp('.guard.');
     const implementations = options.implements
       .map(implement => implement === 'CanDeactivate' ? 'CanDeactivate<unknown>' : implement)
       .join(', ');
@@ -50,6 +53,7 @@ export default function (options: GuardOptions): Rule {
 
     // todo remove these when we remove the deprecations
     options.skipTests = options.skipTests || !options.spec;
+    options.noSuffix = options.noSuffix || (project && project.noSuffix ? project.noSuffix : false);
 
     const templateSource = apply(url('./files'), [
       options.skipTests ? filter(path => !path.endsWith('.spec.ts.template')) : noop(),
@@ -59,6 +63,7 @@ export default function (options: GuardOptions): Rule {
         ...strings,
         ...options,
       }),
+      options.noSuffix ? rename(name => !!name.match(regType), (name) => name.replace(regType, '.')) : noop(),
       move(parsedPath.path + (options.flat ? '' : '/' + strings.dasherize(options.name))),
     ]);
 

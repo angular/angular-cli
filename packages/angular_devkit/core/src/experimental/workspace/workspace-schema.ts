@@ -67,6 +67,10 @@ export interface WorkspaceProject {
    */
   prefix: string;
   /**
+   * The Suffix remove from generated files.
+   */
+  noSuffix?: boolean;
+  /**
    * Tool options.
    */
   cli?: WorkspaceTool;

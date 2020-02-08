@@ -1,16 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 
-import { <%= classify(name) %>Interceptor } from './<%= dasherize(name) %>.interceptor';
+import { <%= classify(name) %><%= !noSuffix ? 'Interceptor' : '' %> } from './<%= dasherize(name) %><%= !noSuffix ? '.interceptor' : '' %>';
 
-describe('<%= classify(name) %>Interceptor', () => {
+describe('<%= classify(name) %><%= !noSuffix ? 'Interceptor' : '' %>', () => {
   beforeEach(() => TestBed.configureTestingModule({
     providers: [
-      <%= classify(name) %>Interceptor
+      <%= classify(name) %><%= !noSuffix ? 'Interceptor' : '' %>
       ]
   }));
 
   it('should be created', () => {
-    const interceptor: <%= classify(name) %>Interceptor = TestBed.inject(<%= classify(name) %>Interceptor);
+    const interceptor: <%= classify(name) %><%= !noSuffix ? 'Interceptor' : '' %> = TestBed.inject(<%= classify(name) %><%= !noSuffix ? 'Interceptor' : '' %>);
     expect(interceptor).toBeTruthy();
   });
 });

@@ -19,6 +19,7 @@ describe('Service Schematic', () => {
     name: 'foo',
     flat: false,
     project: 'bar',
+    noSuffix: false,
   };
 
   const workspaceOptions: WorkspaceOptions = {
@@ -48,6 +49,16 @@ describe('Service Schematic', () => {
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.service.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo/foo.service.ts');
+  });
+
+  it('should create a service without suffix', async () => {
+    const options = { ...defaultOptions, name: 'hello', noSuffix: true };
+
+    const tree = await schematicRunner.runSchematicAsync('service', options, appTree)
+      .toPromise();
+    const files = tree.files;
+    expect(files).toContain('/projects/bar/src/app/hello/hello.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/hello/hello.ts');
   });
 
   it('service should be tree-shakeable', async () => {

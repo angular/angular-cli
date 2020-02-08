@@ -75,6 +75,11 @@
           "type": "string",
           "description": "The prefix to apply to generated selectors."
         },
+        "noSuffix": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, removes suffix from the generated files."
+        },
         "cli": {
           "$ref": "#/definitions/tool",
           "default": {}

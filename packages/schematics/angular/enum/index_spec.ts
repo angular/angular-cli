@@ -19,6 +19,7 @@ describe('Enum Schematic', () => {
   const defaultOptions: EnumOptions = {
     name: 'foo',
     project: 'bar',
+    noSuffix: false,
   };
 
   const workspaceOptions: WorkspaceOptions = {
@@ -47,6 +48,14 @@ describe('Enum Schematic', () => {
       .toPromise();
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo.enum.ts');
+  });
+
+  it('should create an enumeration without suffix', async () => {
+    const options = {...defaultOptions, noSuffix: true, name: 'hero'};
+    const tree = await schematicRunner.runSchematicAsync('enum', options, appTree)
+      .toPromise();
+    const files = tree.files;
+    expect(files).toContain('/projects/bar/src/app/hero.ts');
   });
 
   it('should create an enumeration', async () => {

@@ -28,6 +28,7 @@ describe('Component Schematic', () => {
     type: 'Component',
     skipTests: false,
     module: undefined,
+    noSuffix: false,
     export: false,
     project: 'bar',
   };
@@ -70,6 +71,23 @@ describe('Component Schematic', () => {
     const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
     expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo\/foo.component'/);
     expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooComponent\r?\n/m);
+  });
+
+  it('should create a component without suffix', async () => {
+    const options = { ...defaultOptions, noSuffix: true, name: 'hello' };
+    const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
+    const files = tree.files;
+    expect(files).toEqual(
+      jasmine.arrayContaining([
+        '/projects/bar/src/app/hello/hello.css',
+        '/projects/bar/src/app/hello/hello.html',
+        '/projects/bar/src/app/hello/hello.spec.ts',
+        '/projects/bar/src/app/hello/hello.ts',
+      ]),
+    );
+    const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
+    expect(moduleContent).toMatch(/import.*Hello.*from '.\/hello\/hello'/);
+    expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+Hello\r?\n/m);
   });
 
   it('should set change detection to OnPush', async () => {

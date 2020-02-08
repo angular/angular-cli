@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class <%= classify(name) %>Guard implements <%= implementations %> {
+export class <%= classify(name) %><%= !noSuffix ? 'Guard' : '' %> implements <%= implementations %> {
   <% if (implements.includes('CanActivate')) { %>canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {

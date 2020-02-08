@@ -15,6 +15,7 @@ import {
   mergeWith,
   move,
   noop,
+  rename,
   url,
 } from '@angular-devkit/schematics';
 import { applyLintFix } from '../utility/lint-fix';
@@ -29,6 +30,7 @@ export default function (options: EnumOptions): Rule {
       options.path = await createDefaultPath(host, options.project as string);
     }
 
+    const regType = new RegExp('.enum.');
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
@@ -38,6 +40,7 @@ export default function (options: EnumOptions): Rule {
         ...strings,
         ...options,
       }),
+      options.noSuffix ? rename(name => !!name.match(regType), (name) => name.replace(regType, '.')) : noop(),
       move(parsedPath.path),
     ]);
 

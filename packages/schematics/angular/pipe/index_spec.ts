@@ -23,6 +23,7 @@ describe('Pipe Schematic', () => {
     export: false,
     flat: true,
     project: 'bar',
+    noSuffix: false,
   };
 
   const workspaceOptions: WorkspaceOptions = {
@@ -57,6 +58,20 @@ describe('Pipe Schematic', () => {
     expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo.pipe'/);
     expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooPipe\r?\n/m);
     const fileContent = tree.readContent('/projects/bar/src/app/foo.pipe.ts');
+    expect(fileContent).toContain('transform(value: unknown, ...args: unknown[])');
+  });
+
+  it('should create a pipe without suffix', async () => {
+    const options = { ...defaultOptions, name: 'hello', noSuffix: true };
+
+    const tree = await schematicRunner.runSchematicAsync('pipe', options, appTree).toPromise();
+    const files = tree.files;
+    expect(files).toContain('/projects/bar/src/app/hello.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/hello.ts');
+    const moduleContent = getFileContent(tree, '/projects/bar/src/app/app.module.ts');
+    expect(moduleContent).toMatch(/import.*Hello.*from '.\/hello'/);
+    expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+Hello\r?\n/m);
+    const fileContent = tree.readContent('/projects/bar/src/app/hello.ts');
     expect(fileContent).toContain('transform(value: unknown, ...args: unknown[])');
   });
 

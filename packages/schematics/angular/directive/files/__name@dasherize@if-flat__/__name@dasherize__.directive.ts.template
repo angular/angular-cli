@@ -3,7 +3,7 @@ import { Directive } from '@angular/core';
 @Directive({
   selector: '[<%= selector %>]'
 })
-export class <%= classify(name) %>Directive {
+export class <%= classify(name) %><%= !noSuffix ? 'Directive' : '' %> {
 
   constructor() { }
 

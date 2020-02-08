@@ -17,6 +17,7 @@ import {
   mergeWith,
   move,
   noop,
+  rename,
   url,
 } from '@angular-devkit/schematics';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
@@ -57,10 +58,10 @@ function addDeclarationToNgModule(options: ComponentOptions): Rule {
     const componentPath = `/${options.path}/`
                           + (options.flat ? '' : strings.dasherize(options.name) + '/')
                           + strings.dasherize(options.name)
-                          + '.'
-                          + strings.dasherize(options.type);
+                          + (!options.noSuffix ? '.' : '')
+                          + (!options.noSuffix ? strings.dasherize(options.type) : '');
     const relativePath = buildRelativePath(modulePath, componentPath);
-    const classifiedName = strings.classify(options.name) + strings.classify(options.type);
+    const classifiedName = strings.classify(options.name) + (!options.noSuffix ? strings.classify(options.type) : '');
     const declarationChanges = addDeclarationToModule(source,
                                                       modulePath,
                                                       classifiedName,
@@ -131,6 +132,7 @@ export default function (options: ComponentOptions): Rule {
   return async (host: Tree) => {
     const workspace = await getWorkspace(host);
     const project = workspace.projects.get(options.project as string);
+    const regType = new RegExp('.' + options.type + '.', 'i');
 
     if (options.path === undefined && project) {
       options.path = buildDefaultPath(project);
@@ -142,6 +144,7 @@ export default function (options: ComponentOptions): Rule {
     options.name = parsedPath.name;
     options.path = parsedPath.path;
     options.selector = options.selector || buildSelector(options, project && project.prefix || '');
+    options.noSuffix = options.noSuffix || (project && project.noSuffix ? project.noSuffix : false);
 
     validateName(options.name);
     validateHtmlSelector(options.selector);
@@ -155,6 +158,7 @@ export default function (options: ComponentOptions): Rule {
         'if-flat': (s: string) => options.flat ? '' : s,
         ...options,
       }),
+      options.noSuffix ? rename(name => !!name.match(regType), (name) => name.replace(regType, '.')) : noop(),
       move(parsedPath.path),
     ]);
 

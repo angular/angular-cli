@@ -1,8 +1,8 @@
-import { <%= classify(name) %>Pipe } from './<%= dasherize(name) %>.pipe';
+import { <%= classify(name) %><%= !noSuffix ? 'Pipe' : '' %> } from './<%= dasherize(name) %><%= !noSuffix ? '.pipe' : '' %>';
 
-describe('<%= classify(name) %>Pipe', () => {
+describe('<%= classify(name) %><%= !noSuffix ? 'Pipe' : '' %>', () => {
   it('create an instance', () => {
-    const pipe = new <%= classify(name) %>Pipe();
+    const pipe = new <%= classify(name) %><%= !noSuffix ? 'Pipe' : '' %>();
     expect(pipe).toBeTruthy();
   });
 });

@@ -56,6 +56,7 @@ describe('Workspace', () => {
         sourceRoot: 'projects/app/src',
         projectType: 'application',
         prefix: 'app',
+        noSuffix: false,
         cli: {},
         i18n: {
           sourceLocale: 'en-US',

@@ -130,6 +130,11 @@
               "description": "The prefix to apply to generated selectors.",
               "alias": "p"
             },
+            "noSuffix": {
+              "type": "boolean",
+              "default": false,
+              "description": "When true, removes suffix from the generated files."
+            },
             "selector": {
               "type": "string",
               "format": "html-selector",
@@ -313,6 +318,11 @@
           "type": "string",
           "format": "html-selector",
           "description": "The prefix to apply to generated selectors."
+        },
+        "noSuffix": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, remove suffix from the generated files."
         },
         "root": {
           "type": "string",

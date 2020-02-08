@@ -17,6 +17,7 @@ import {
   mergeWith,
   move,
   noop,
+  rename,
   url,
 } from '@angular-devkit/schematics';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
@@ -25,9 +26,8 @@ import { InsertChange } from '../utility/change';
 import { buildRelativePath, findModuleFromOptions } from '../utility/find-module';
 import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
-import { createDefaultPath } from '../utility/workspace';
+import { createDefaultPath, getWorkspace } from '../utility/workspace';
 import { Schema as PipeOptions } from './schema';
-
 
 function addDeclarationToNgModule(options: PipeOptions): Rule {
   return (host: Tree) => {
@@ -46,10 +46,12 @@ function addDeclarationToNgModule(options: PipeOptions): Rule {
     const pipePath = `/${options.path}/`
                      + (options.flat ? '' : strings.dasherize(options.name) + '/')
                      + strings.dasherize(options.name)
-                     + '.pipe';
+                     + (!options.noSuffix ? '.pipe' : '');
+
     const relativePath = buildRelativePath(modulePath, pipePath);
+    const classifiedName = strings.classify(options.name) + (!options.noSuffix ? 'Pipe' : '');
     const changes = addDeclarationToModule(source, modulePath,
-                                           strings.classify(`${options.name}Pipe`),
+                                           classifiedName,
                                            relativePath);
     const recorder = host.beginUpdate(modulePath);
     for (const change of changes) {
@@ -86,12 +88,16 @@ function addDeclarationToNgModule(options: PipeOptions): Rule {
 
 export default function (options: PipeOptions): Rule {
   return async (host: Tree) => {
+    const workspace = await getWorkspace(host);
+    const project = workspace.projects.get(options.project as string);
     if (options.path === undefined) {
       options.path = await createDefaultPath(host, options.project as string);
     }
 
     options.module = findModuleFromOptions(host, options);
+    options.noSuffix = options.noSuffix || (project && project.noSuffix ? project.noSuffix : false);
 
+    const regType = new RegExp('.pipe.');
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
@@ -103,6 +109,7 @@ export default function (options: PipeOptions): Rule {
         'if-flat': (s: string) => options.flat ? '' : s,
         ...options,
       }),
+      options.noSuffix ? rename(name => !!name.match(regType), (name) => name.replace(regType, '.')) : noop(),
       move(parsedPath.path),
     ]);
 

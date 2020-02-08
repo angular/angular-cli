@@ -19,6 +19,7 @@ export interface ProjectDefinition {
 
   root: string;
   prefix?: string;
+  noSuffix?: boolean;
   sourceRoot?: string;
 }
 

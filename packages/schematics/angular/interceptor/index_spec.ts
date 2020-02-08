@@ -19,6 +19,7 @@ describe('Interceptor Schematic', () => {
     name: 'foo',
     flat: false,
     project: 'bar',
+    noSuffix: false,
   };
 
   const workspaceOptions: WorkspaceOptions = {
@@ -48,6 +49,16 @@ describe('Interceptor Schematic', () => {
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.interceptor.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo/foo.interceptor.ts');
+  });
+
+  it('should create an interceptor without suffix', async () => {
+    const options = { ...defaultOptions, name: 'hello', noSuffix: true };
+
+    const tree = await schematicRunner.runSchematicAsync('interceptor', options, appTree)
+      .toPromise();
+    const files = tree.files;
+    expect(files).toContain('/projects/bar/src/app/hello/hello.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/hello/hello.ts');
   });
 
   it('should respect the skipTests flag', async () => {

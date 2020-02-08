@@ -20,6 +20,7 @@ describe('Directive Schematic', () => {
     module: undefined,
     export: false,
     prefix: 'app',
+    noSuffix: false,
     flat: true,
     project: 'bar',
   };
@@ -56,6 +57,19 @@ describe('Directive Schematic', () => {
     const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
     expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo.directive'/);
     expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooDirective\r?\n/m);
+  });
+
+  it('should create a directive without suffix', async () => {
+    const options = { ...defaultOptions, name: 'hello', noSuffix: true };
+
+    const tree = await schematicRunner.runSchematicAsync('directive', options, appTree)
+      .toPromise();
+    const files = tree.files;
+    expect(files).toContain('/projects/bar/src/app/hello.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/hello.ts');
+    const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
+    expect(moduleContent).toMatch(/import.*Hello.*from '.\/hello'/);
+    expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+Hello\r?\n/m);
   });
 
   it('should create respect the flat flag', async () => {

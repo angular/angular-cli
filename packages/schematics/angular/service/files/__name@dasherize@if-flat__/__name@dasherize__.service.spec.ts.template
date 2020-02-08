@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { <%= classify(name) %>Service } from './<%= dasherize(name) %>.service';
+import { <%= classify(name) %><%= !noSuffix ? 'Service' : '' %> } from './<%= dasherize(name) %><%= !noSuffix ? '.service' : '' %>';
 
-describe('<%= classify(name) %>Service', () => {
-  let service: <%= classify(name) %>Service;
+describe('<%= classify(name) %><%= !noSuffix ? 'Service' : '' %>', () => {
+  let service: <%= classify(name) %><%= !noSuffix ? 'Service' : '' %>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(<%= classify(name) %>Service);
+    service = TestBed.inject(<%= classify(name) %><%= !noSuffix ? 'Service' : '' %>);
   });
 
   it('should be created', () => {

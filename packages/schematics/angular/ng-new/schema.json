@@ -104,6 +104,11 @@
       "default": "app",
       "alias": "p"
     },
+    "noSuffix": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, removes suffix from the generated files."
+    },
     "style": {
       "description": "The file extension or preprocessor to use for style files.",
       "type": "string",

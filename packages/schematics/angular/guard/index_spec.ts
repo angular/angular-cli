@@ -19,6 +19,7 @@ describe('Guard Schematic', () => {
     name: 'foo',
     flat: true,
     project: 'bar',
+    noSuffix: false,
   };
   const workspaceOptions: WorkspaceOptions = {
     name: 'workspace',
@@ -47,6 +48,15 @@ describe('Guard Schematic', () => {
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo.guard.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo.guard.ts');
+  });
+
+  it('should create a guard without suffix', async () => {
+    const options = { ...defaultOptions, noSuffix: true, name: 'hero' };
+    const tree = await schematicRunner.runSchematicAsync('guard', options, appTree)
+      .toPromise();
+    const files = tree.files;
+    expect(files).toContain('/projects/bar/src/app/hero.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/hero.ts');
   });
 
   it('should respect the skipTests flag', async () => {

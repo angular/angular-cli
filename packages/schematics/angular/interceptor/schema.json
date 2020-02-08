@@ -43,6 +43,11 @@
       "default": false,
       "description": "When true, applies lint fixes after generating the interceptor.",
       "x-user-analytics": 15
+    },
+    "noSuffix": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, removes suffix from the generated interceptor."
     }
   },
   "required": ["name"]

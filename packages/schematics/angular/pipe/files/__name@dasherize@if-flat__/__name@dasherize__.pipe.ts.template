@@ -3,7 +3,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
   name: '<%= camelize(name) %>'
 })
-export class <%= classify(name) %>Pipe implements PipeTransform {
+export class <%= classify(name) %><%= !noSuffix ? 'Pipe' : '' %> implements PipeTransform {
 
   transform(value: unknown, ...args: unknown[]): unknown {
     return null;

@@ -1,8 +1,8 @@
-import { <%= classify(name) %>Directive } from './<%= dasherize(name) %>.directive';
+import { <%= classify(name) %><%= !noSuffix ? 'Directive' : '' %> } from './<%= dasherize(name) %><%= !noSuffix ? '.directive' : '' %>';
 
-describe('<%= classify(name) %>Directive', () => {
+describe('<%= classify(name) %><%= !noSuffix ? 'Directive' : '' %>', () => {
   it('should create an instance', () => {
-    const directive = new <%= classify(name) %>Directive();
+    const directive = new <%= classify(name) %><%= !noSuffix ? 'Directive' : '' %>();
     expect(directive).toBeTruthy();
   });
 });
