@@ -38,7 +38,7 @@
     "npm-package-arg": "8.0.0",
     "npm-pick-manifest": "5.0.0",
     "open": "7.0.2",
-    "pacote": "10.3.1",
+    "pacote": "10.3.2",
     "read-package-tree": "5.3.1",
     "rimraf": "3.0.1",
     "semver": "7.1.2",
