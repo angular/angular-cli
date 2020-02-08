@@ -8344,6 +8344,33 @@ pacote@10.3.1:
     tar "^6.0.0"
     which "^2.0.2"
 
+pacote@10.3.2:
+  version "10.3.2"
+  resolved "https://registry.yarnpkg.com/pacote/-/pacote-10.3.2.tgz#4a98c9457a816255581c9cf99e89065fbc341034"
+  integrity sha512-Hem2RkLAHhNaJSbhjouhbCAXlinNsv9W75s6JNxv9GypIjFkHtxCBoV6+GYBPttVOpZqnTAHmYRLs8yc2X2Dnw==
+  dependencies:
+    "@npmcli/installed-package-contents" "^1.0.5"
+    cacache "^14.0.0"
+    chownr "^1.1.3"
+    fs-minipass "^2.1.0"
+    infer-owner "^1.0.4"
+    lru-cache "^5.1.1"
+    minipass "^3.0.1"
+    minipass-fetch "^1.2.1"
+    mkdirp "^1.0.3"
+    npm-package-arg "^8.0.0"
+    npm-packlist "^2.0.3"
+    npm-pick-manifest "^5.0.0"
+    npm-registry-fetch "^6.0.0"
+    osenv "^0.1.5"
+    promise-inflight "^1.0.1"
+    promise-retry "^1.1.1"
+    read-package-json-fast "^1.1.3"
+    semver "^7.1.1"
+    ssri "^7.1.0"
+    tar "^6.0.0"
+    which "^2.0.2"
+
 pako@^0.2.5:
   version "0.2.9"
   resolved "https://registry.yarnpkg.com/pako/-/pako-0.2.9.tgz#f3f7522f4ef782348da8161bad9ecfd51bf83a75"
