@@ -17,12 +17,23 @@ import * as url from 'url';
 import { runModuleAsObservableFork } from '../utils';
 import { Schema as ProtractorBuilderOptions } from './schema';
 
+interface JasmineNodeOpts {
+  jasmineNodeOpts: {
+    grep?: string;
+    invertGrep?: boolean;
+  };
+}
+
 function runProtractor(root: string, options: ProtractorBuilderOptions): Promise<BuilderOutput> {
-  const additionalProtractorConfig: Partial<ProtractorBuilderOptions> = {
+  const additionalProtractorConfig: Partial<ProtractorBuilderOptions> & Partial<JasmineNodeOpts> = {
     elementExplorer: options.elementExplorer,
     baseUrl: options.baseUrl,
     specs: options.specs && options.specs.length ? options.specs : undefined,
     suite: options.suite,
+    jasmineNodeOpts: {
+      grep: options.grep,
+      invertGrep: options.invertGrep,
+    },
   };
 
   // TODO: Protractor manages process.exit itself, so this target will allways quit the
