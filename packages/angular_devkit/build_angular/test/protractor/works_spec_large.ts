@@ -97,4 +97,37 @@ describe('Protractor Builder', () => {
     await run.stop();
   }, 30000);
 
+  it('supports running tests by pattern', async () => {
+    host.writeMultipleFiles({
+      'e2e/app.e2e-spec.ts': `
+        it('should succeed', () => expect(true).toBeTruthy());
+        it('should fail', () => expect(false).toBeTruthy());
+      `,
+    });
+
+    const overrides = { grep: 'succeed' };
+
+    const run = await architect.scheduleTarget(protractorTargetSpec, overrides);
+
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
+
+    await run.stop();
+  }, 30000);
+
+  it('supports running tests excluding a pattern', async () => {
+    host.writeMultipleFiles({
+      'e2e/app.e2e-spec.ts': `
+        it('should succeed', () => expect(true).toBeTruthy());
+        it('should fail', () => expect(false).toBeTruthy());
+      `,
+    });
+
+    const overrides = { grep: 'fail', invertGrep: true };
+
+    const run = await architect.scheduleTarget(protractorTargetSpec, overrides);
+
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: true }));
+
+    await run.stop();
+  }, 30000);
 });

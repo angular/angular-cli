@@ -13,6 +13,15 @@
       "description": "Dev server target to run tests against.",
       "pattern": "^([^:\\s]+:[^:\\s]+(:[^\\s]+)?)?$"
     },
+    "grep": {
+      "type": "string",
+      "description": "Execute specs whose names match the pattern, which is internally compiled to a RegExp."
+    },
+    "invertGrep": {
+      "type": "boolean",
+      "description": "Invert the selection specified by the 'grep' option.",
+      "default": false
+    },
     "specs": {
       "type": "array",
       "description": "Override specs in the protractor config.",
