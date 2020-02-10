@@ -54,7 +54,7 @@ export default createServerRenderer(params => {
     // Platform-server provider configuration
     const setupOptions: IEngineOptions = {
       appSelector: '<app></app>',
-      ngModule: ServerAppModule,
+      ngModule: AppServerModule,
       request: params,
       providers: [
         /* Other providers you want to pass into the App would go here
