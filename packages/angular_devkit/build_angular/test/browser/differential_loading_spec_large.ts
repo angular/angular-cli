@@ -104,6 +104,48 @@ describe('Browser Builder with differential loading', () => {
     expect(Object.keys(files)).toEqual(jasmine.arrayWithExactContents(expectedOutputs));
   });
 
+  it('emits all the neccessary files for target of ESNext', async () => {
+    host.replaceInFile(
+      'tsconfig.json',
+      '"target": "es2015",',
+      `"target": "esnext",`,
+    );
+
+    const { files } = await browserBuild(architect, host, target);
+
+    const expectedOutputs = [
+      'favicon.ico',
+      'index.html',
+
+      'main-esnext.js',
+      'main-esnext.js.map',
+      'main-es5.js',
+      'main-es5.js.map',
+
+      'polyfills-esnext.js',
+      'polyfills-esnext.js.map',
+      'polyfills-es5.js',
+      'polyfills-es5.js.map',
+
+      'runtime-esnext.js',
+      'runtime-esnext.js.map',
+      'runtime-es5.js',
+      'runtime-es5.js.map',
+
+      'styles-esnext.js',
+      'styles-esnext.js.map',
+      'styles-es5.js',
+      'styles-es5.js.map',
+
+      'vendor-esnext.js',
+      'vendor-esnext.js.map',
+      'vendor-es5.js',
+      'vendor-es5.js.map',
+    ] as PathFragment[];
+
+    expect(Object.keys(files)).toEqual(jasmine.arrayWithExactContents(expectedOutputs));
+  });
+
   it('deactivates differential loading for watch mode', async () => {
     const { files } = await browserBuild(architect, host, target, { watch: true });
 
