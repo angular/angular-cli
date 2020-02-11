@@ -10,7 +10,7 @@ import {
   createBuilder,
   targetFromTargetString,
 } from '@angular-devkit/architect';
-import { WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
+import { BuildResult, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
 import { JsonObject } from '@angular-devkit/core';
 import * as path from 'path';
 import * as webpack from 'webpack';
@@ -51,7 +51,10 @@ class InMemoryOutputPlugin {
   }
 }
 
-export async function execute(options: ExtractI18nBuilderOptions, context: BuilderContext) {
+export async function execute(
+  options: ExtractI18nBuilderOptions,
+  context: BuilderContext,
+): Promise<BuildResult> {
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
 
