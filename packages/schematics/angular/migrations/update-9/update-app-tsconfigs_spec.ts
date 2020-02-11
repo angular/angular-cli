@@ -60,9 +60,10 @@ describe('Migration to version 9', () => {
     it('should update apps tsConfig with stricter files inclusions', async () => {
       overrideJsonFile(tree, 'tsconfig.app.json', defaultTsConfigOptions);
       const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
-      const { exclude, files } = JSON.parse(tree2.readContent('tsconfig.app.json'));
+      const { exclude, files, include } = JSON.parse(tree2.readContent('tsconfig.app.json'));
       expect(exclude).toBeUndefined();
       expect(files).toEqual(['src/main.ts', 'src/polyfills.ts']);
+      expect(include).toEqual(['src/**/*.d.ts']);
     });
 
     it('should resolve paths correctly even if they are using windows separators', async () => {
