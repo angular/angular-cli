@@ -145,14 +145,16 @@ export async function generateI18nBrowserWebpackConfigFromContext(
   const config = result.config;
 
   if (i18n.shouldInline) {
-    // Remove localize "polyfill"
-    if (!config.resolve) {
-      config.resolve = {};
+    // Remove localize "polyfill" if in AOT mode
+    if (buildOptions.aot) {
+      if (!config.resolve) {
+        config.resolve = {};
+      }
+      if (!config.resolve.alias) {
+        config.resolve.alias = {};
+      }
+      config.resolve.alias['@angular/localize/init'] = require.resolve('./empty.js');
     }
-    if (!config.resolve.alias) {
-      config.resolve.alias = {};
-    }
-    config.resolve.alias['@angular/localize/init'] = require.resolve('./empty.js');
 
     // Update file hashes to include translation file content
     const i18nHash = Object.values(i18n.locales).reduce(
