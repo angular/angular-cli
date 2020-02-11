@@ -49,6 +49,11 @@
       "version": "9.0.0-next.6",
       "factory": "./update-8/#updateLazyModulePaths",
       "description": "Lazy loading syntax migration. Update lazy loading syntax to use dynamic imports."
+    },
+    "schematic-options-9": {
+      "version": "9.0.2",
+      "factory": "./update-9/schematic-options",
+      "description": "Replace deprecated 'styleext' and 'spec' Angular schematic options."
     }
   }
 }
