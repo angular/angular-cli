@@ -387,7 +387,8 @@
                   "type": "string",
                   "description": "Specifies the source locale of the application.",
                   "default": "en-US",
-                  "pattern": "^[a-z]{2}(-[a-zA-Z]{2,})?$"
+                  "$comment": "IETF BCP 47 language tag (simplified)",
+                  "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?$"
                 },
                 {
                   "type": "object",
@@ -396,7 +397,7 @@
                     "code": {
                       "type": "string",
                       "description": "Specifies the locale code of the source locale",
-                      "pattern": "^[a-z]{2}(-[a-zA-Z]{2,})?$"
+                      "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?$"
                     },
                     "baseHref": {
                       "type": "string",
