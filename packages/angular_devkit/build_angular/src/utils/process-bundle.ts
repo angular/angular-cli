@@ -27,8 +27,8 @@ import { I18nOptions } from './i18n-options';
 const cacache = require('cacache');
 const deserialize = ((v8 as unknown) as { deserialize(buffer: Buffer): unknown }).deserialize;
 
-// If code size is larger than 500KB, consider lower fidelity but faster sourcemap merge
-const FAST_SOURCEMAP_THRESHOLD = 500 * 1024;
+// If code size is larger than 1MB, consider lower fidelity but faster sourcemap merge
+const FAST_SOURCEMAP_THRESHOLD = 1024 * 1024;
 
 export interface ProcessBundleOptions {
   filename: string;
@@ -254,6 +254,25 @@ async function mergeSourceMapsFast(first: RawSourceMap, second: RawSourceMap) {
   const map = generator.toJSON();
   map.file = second.file;
   map.sourceRoot = sourceRoot;
+
+  // Add source content if present
+  if (first.sourcesContent) {
+    // Source content array is based on index of sources
+    const sourceContentMap = new Map<string, number>();
+    for (let i = 0; i < first.sources.length; i++) {
+      // make paths "absolute" so they can be compared (`./a.js` and `a.js` are equivalent)
+      sourceContentMap.set(path.resolve('/', first.sources[i]), i);
+    }
+    map.sourcesContent = [];
+    for (let i = 0; i < map.sources.length; i++) {
+      const contentIndex = sourceContentMap.get(path.resolve('/', map.sources[i]));
+      if (contentIndex === undefined) {
+        map.sourcesContent.push('');
+      } else {
+        map.sourcesContent.push(first.sourcesContent[contentIndex]);
+      }
+    }
+  }
 
   // Put the sourceRoot back
   if (sourceRoot) {
