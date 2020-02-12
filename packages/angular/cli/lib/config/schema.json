@@ -151,6 +151,11 @@
               "enum": ["Emulated", "Native", "None", "ShadowDom"],
               "type": "string",
               "alias": "v"
+            },
+            "skipTests": {
+              "type": "boolean",
+              "description": "When true, does not create test files.",
+              "default": false
             }
           }
         },
