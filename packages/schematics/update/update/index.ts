@@ -784,7 +784,7 @@ function _addPeerDependencies(
   }
 
   if (error) {
-    throw new SchematicsException('An error occured, see above.');
+    throw new SchematicsException('An error occurred, see above.');
   }
 }
 

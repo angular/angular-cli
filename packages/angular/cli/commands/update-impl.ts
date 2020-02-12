@@ -78,6 +78,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
   private async executeSchematic(
     collection: string,
     schematic: string,
+    verbose: boolean,
     options = {},
   ): Promise<{ success: boolean; files: Set<string> }> {
     let error = false;
@@ -144,6 +145,9 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
         this.logger.error('The update failed. See above.');
       } else {
         this.logger.fatal(e.message);
+        if (verbose) {
+          this.logger.fatal(e.stack || e);
+        }
       }
 
       return { success: false, files };
@@ -157,6 +161,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     packageName: string,
     collectionPath: string,
     migrationName: string,
+    verbose: boolean,
     commit?: boolean,
   ): Promise<boolean> {
     const collection = this.workflow.engine.createCollection(collectionPath);
@@ -173,7 +178,8 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       colors.cyan(`** Executing '${migrationName}' of package '${packageName}' **\n`),
     );
 
-    return this.executePackageMigrations([schematic.description], packageName, commit);
+    return this.executePackageMigrations(
+        [schematic.description], packageName, verbose, commit);
   }
 
   /**
@@ -183,6 +189,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     packageName: string,
     collectionPath: string,
     range: semver.Range,
+    verbose: boolean,
     commit?: boolean,
   ): Promise<boolean> {
     const collection = this.workflow.engine.createCollection(collectionPath);
@@ -213,15 +220,17 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       colors.cyan(`** Executing migrations of package '${packageName}' **\n`),
     );
 
-    return this.executePackageMigrations(migrations, packageName, commit);
+    return this.executePackageMigrations(migrations, packageName, verbose, commit);
   }
 
   // tslint:disable-next-line: no-any
-  private async executePackageMigrations(migrations: any[], packageName: string, commit = false): Promise<boolean> {
+  private async executePackageMigrations(migrations: any[], packageName: string,
+                                         verbose: boolean, commit = false): Promise<boolean> {
     for (const migration of migrations) {
       this.logger.info(`${colors.symbols.pointer} ${migration.description.replace(/\. /g, '.\n  ')}`);
 
-      const result = await this.executeSchematic(migration.collection.name, migration.name);
+      const result = await this.executeSchematic(
+          migration.collection.name, migration.name, verbose);
       if (!result.success) {
         this.logger.error(`${colors.symbols.cross} Migration failed. See above for further details.\n`);
 
@@ -273,8 +282,10 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       throw e;
     }
 
+    const verbose = options.verbose || false;
+
     // Check if the current installed CLI version is older than the latest version.
-    if (!disableVersionCheck && await this.checkCLILatestVersion(options.verbose, options.next)) {
+    if (!disableVersionCheck && await this.checkCLILatestVersion(verbose, options.next)) {
       this.logger.warn(
         `The installed local Angular CLI version is older than the latest ${options.next ? 'pre-release' : 'stable'} version.\n` +
         'Installing a temporary version to perform the update.',
@@ -390,10 +401,10 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       }
     } else if (packages.length === 0) {
       // Show status
-      const { success } = await this.executeSchematic('@schematics/update', 'update', {
+      const { success } = await this.executeSchematic('@schematics/update', 'update', verbose, {
+        verbose,
         force: options.force || false,
         next: options.next || false,
-        verbose: options.verbose || false,
         packageManager: this.packageManager,
         packages: options.all ? Object.keys(rootDependencies) : [],
       });
@@ -497,6 +508,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
           packageName,
           migrations,
           options.migrateOnly,
+          verbose,
           options.createCommits,
         );
       } else {
@@ -515,6 +527,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
           packageName,
           migrations,
           migrationRange,
+          verbose,
           options.createCommits,
         );
       }
@@ -570,9 +583,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       try {
         // Metadata requests are internally cached; multiple requests for same name
         // does not result in additional network traffic
-        metadata = await fetchPackageMetadata(packageName, this.logger, {
-          verbose: options.verbose,
-        });
+        metadata = await fetchPackageMetadata(packageName, this.logger, {verbose});
       } catch (e) {
         this.logger.error(`Error fetching metadata for '${packageName}': ` + e.message);
 
@@ -632,8 +643,8 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       return 0;
     }
 
-    const { success } = await this.executeSchematic('@schematics/update', 'update', {
-      verbose: options.verbose || false,
+    const { success } = await this.executeSchematic('@schematics/update', 'update', verbose, {
+      verbose,
       force: options.force || false,
       next: !!options.next,
       packageManager: this.packageManager,
@@ -664,6 +675,7 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
           migration.package,
           migration.collection,
           new semver.Range('>' + migration.from + ' <=' + migration.to),
+          verbose,
           options.createCommits,
         );
 
