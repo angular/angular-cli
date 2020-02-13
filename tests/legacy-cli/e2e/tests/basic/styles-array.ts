@@ -38,7 +38,7 @@ export default async function() {
   await expectFileToMatch(
     'dist/test-project/index.html',
     oneLineTrim`
-      <link rel="stylesheet" href="styles.css">
+      <link rel="stylesheet" href="styles.css"/>
       <link rel="stylesheet" href="renamed-style.css">
     `,
   );

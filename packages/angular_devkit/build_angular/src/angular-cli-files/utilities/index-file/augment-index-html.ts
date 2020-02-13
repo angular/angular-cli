@@ -244,7 +244,7 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
     treeAdapter.appendChild(styleElements, element);
   }
 
-  indexSource.insert(styleInsertionPoint, parse5.serialize(styleElements, { treeAdapter }));
+  indexSource.insert(styleInsertionPoint, parse5.serialize(styleElements, { treeAdapter }).replace('>', '/>'));
 
   // Adjust document locale if specified
   if (typeof params.lang == 'string') {

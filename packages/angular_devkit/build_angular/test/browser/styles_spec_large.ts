@@ -43,7 +43,7 @@ describe('Browser Builder styles', () => {
     };
     const cssIndexMatches: { [path: string]: string } = {
       'index.html':
-        '<link rel="stylesheet" href="styles.css">' +
+        '<link rel="stylesheet" href="styles.css"/>' +
         '<link rel="stylesheet" href="renamed-style.css">',
     };
     const jsMatches: { [path: string]: string } = {

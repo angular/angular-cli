@@ -38,7 +38,7 @@ describe('augment-index-html', () => {
     expect(html).toEqual(oneLineHtml`
       <html>
         <head><base href="/">
-          <link rel="stylesheet" href="styles.css">
+          <link rel="stylesheet" href="styles.css"/>
         </head>
         <body>
           <script src="runtime.js" defer></script>
@@ -79,7 +79,7 @@ describe('augment-index-html', () => {
       <html>
         <head>
           <base href="/">
-          <link rel="stylesheet" href="styles.css">
+          <link rel="stylesheet" href="styles.css"/>
         </head>
         <body>
           <script src="runtime-es2015.js" type="module"></script>
@@ -121,7 +121,7 @@ describe('augment-index-html', () => {
       <html>
         <head>
           <base href="/">
-          <link rel="stylesheet" href="styles.css">
+          <link rel="stylesheet" href="styles.css"/>
         </head>
         <body>
           <script src="scripts.js" defer></script>
