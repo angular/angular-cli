@@ -11,9 +11,10 @@ import {
   PluginObj,
   parseSync,
   transformAsync,
-  traverse,
+  transformFromAstSync,
   types,
 } from '@babel/core';
+import templateBuilder from '@babel/template';
 import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -490,6 +491,59 @@ function createReplacePlugin(replacements: [string, string][]): PluginObj {
   };
 }
 
+async function createI18nPlugins(
+  locale: string,
+  translation: unknown | undefined,
+  missingTranslation: 'error' | 'warning' | 'ignore',
+  localeDataContent: string | undefined,
+) {
+  const plugins = [];
+  // tslint:disable-next-line: no-implicit-dependencies
+  const localizeDiag = await import('@angular/localize/src/tools/src/diagnostics');
+
+  const diagnostics = new localizeDiag.Diagnostics();
+
+  const es2015 = await import(
+    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
+    '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'
+  );
+  plugins.push(
+    // tslint:disable-next-line: no-any
+    es2015.makeEs2015TranslatePlugin(diagnostics, (translation || {}) as any, {
+      missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
+    }),
+  );
+
+  const es5 = await import(
+    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
+    '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'
+  );
+  plugins.push(
+    // tslint:disable-next-line: no-any
+    es5.makeEs5TranslatePlugin(diagnostics, (translation || {}) as any, {
+      missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
+    }),
+  );
+
+  const inlineLocale = await import(
+    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
+    '@angular/localize/src/tools/src/translate/source_files/locale_plugin'
+  );
+  plugins.push(inlineLocale.makeLocalePlugin(locale));
+
+  if (localeDataContent) {
+    plugins.push({
+      visitor: {
+        Program(path: NodePath<types.Program>) {
+          path.unshiftContainer('body', templateBuilder.ast(localeDataContent));
+        },
+      },
+    });
+  }
+
+  return { diagnostics, plugins };
+}
+
 export interface InlineOptions {
   filename: string;
   code: string;
@@ -498,13 +552,6 @@ export interface InlineOptions {
   outputPath: string;
   missingTranslation?: 'warning' | 'error' | 'ignore';
   setLocale?: boolean;
-}
-
-interface LocalizePosition {
-  start: number;
-  end: number;
-  messageParts: TemplateStringsArray;
-  expressions: types.Expression[];
 }
 
 const localizeName = '$localize';
@@ -522,117 +569,7 @@ export async function inlineLocales(options: InlineOptions) {
     return inlineCopyOnly(options);
   }
 
-  const { default: MagicString } = await import('magic-string');
-  const { default: generate } = await import('@babel/generator');
-  const utils = await import(
-    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
-    '@angular/localize/src/tools/src/translate/source_files/source_file_utils'
-  );
-  // tslint:disable-next-line: no-implicit-dependencies
-  const localizeDiag = await import('@angular/localize/src/tools/src/diagnostics');
-
-  const diagnostics = new localizeDiag.Diagnostics();
-
-  const positions = findLocalizePositions(options, utils);
-  if (positions.length === 0 && !options.setLocale) {
-    return inlineCopyOnly(options);
-  }
-
-  // tslint:disable-next-line: no-any
-  let content = new MagicString(options.code, { filename: options.filename } as any);
-  const inputMap = options.map && (JSON.parse(options.map) as RawSourceMap);
-  let contentClone;
-  for (const locale of i18n.inlineLocales) {
-    const isSourceLocale = locale === i18n.sourceLocale;
-    // tslint:disable-next-line: no-any
-    const translations: any = isSourceLocale ? {} : i18n.locales[locale].translation || {};
-    for (const position of positions) {
-      const translated = utils.translate(
-        diagnostics,
-        translations,
-        position.messageParts,
-        position.expressions,
-        isSourceLocale ? 'ignore' : options.missingTranslation || 'warning',
-      );
-
-      const expression = utils.buildLocalizeReplacement(translated[0], translated[1]);
-      const { code } = generate(expression);
-
-      content.overwrite(position.start, position.end, code);
-    }
-
-    if (options.setLocale) {
-      const setLocaleText = `var $localize=Object.assign(void 0===$localize?{}:$localize,{locale:"${locale}"});`;
-      contentClone = content.clone();
-      content.prepend(setLocaleText);
-
-      // If locale data is provided, load it and prepend to file
-      const localeDataPath = i18n.locales[locale] && i18n.locales[locale].dataPath;
-      if (localeDataPath) {
-        const localDataContent = await loadLocaleData(localeDataPath, true);
-        // The semicolon ensures that there is no syntax error between statements
-        content.prepend(localDataContent + ';');
-      }
-    }
-
-    const output = content.toString();
-    const outputPath = path.join(
-      options.outputPath,
-      i18n.flatOutput ? '' : locale,
-      options.filename,
-    );
-    fs.writeFileSync(outputPath, output);
-
-    if (inputMap) {
-      const contentMap = content.generateMap();
-      const outputMap = mergeSourceMaps(
-        options.code,
-        inputMap,
-        output,
-        contentMap,
-        options.filename,
-        options.code.length > FAST_SOURCEMAP_THRESHOLD,
-      );
-
-      fs.writeFileSync(outputPath + '.map', JSON.stringify(outputMap));
-    }
-
-    if (contentClone) {
-      content = contentClone;
-      contentClone = undefined;
-    }
-  }
-
-  return { file: options.filename, diagnostics: diagnostics.messages, count: positions.length };
-}
-
-function inlineCopyOnly(options: InlineOptions) {
-  if (!i18n) {
-    throw new Error('i18n options are missing');
-  }
-
-  for (const locale of i18n.inlineLocales) {
-    const outputPath = path.join(
-      options.outputPath,
-      i18n.flatOutput ? '' : locale,
-      options.filename,
-    );
-    fs.writeFileSync(outputPath, options.code);
-    if (options.map) {
-      fs.writeFileSync(outputPath + '.map', options.map);
-    }
-  }
-
-  return { file: options.filename, diagnostics: [], count: 0 };
-}
-
-function findLocalizePositions(
-  options: InlineOptions,
-  // tslint:disable-next-line: no-implicit-dependencies
-  utils: typeof import('@angular/localize/src/tools/src/translate/source_files/source_file_utils'),
-): LocalizePosition[] {
   let ast: ParseResult | undefined | null;
-
   try {
     ast = parseSync(options.code, {
       babelrc: false,
@@ -655,54 +592,88 @@ function findLocalizePositions(
     throw new Error(`Unknown error occurred inlining file "${options.filename}"`);
   }
 
-  const positions: LocalizePosition[] = [];
-  if (options.es5) {
-    traverse(ast, {
-      CallExpression(path: NodePath<types.CallExpression>) {
-        const callee = path.get('callee');
-        if (
-          callee.isIdentifier() &&
-          callee.node.name === localizeName &&
-          utils.isGlobalIdentifier(callee)
-        ) {
-          const messageParts = utils.unwrapMessagePartsFromLocalizeCall(path);
-          const expressions = utils.unwrapSubstitutionsFromLocalizeCall(path.node);
-          positions.push({
-            // tslint:disable-next-line: no-non-null-assertion
-            start: path.node.start!,
-            // tslint:disable-next-line: no-non-null-assertion
-            end: path.node.end!,
-            messageParts,
-            expressions,
-          });
-        }
-      },
-    });
-  } else {
-    const traverseFast = ((types as unknown) as {
-      traverseFast: (node: types.Node, enter: (node: types.Node) => void) => void;
-    }).traverseFast;
-
-    traverseFast(ast, node => {
-      if (
-        node.type === 'TaggedTemplateExpression' &&
-        types.isIdentifier(node.tag) &&
-        node.tag.name === localizeName
-      ) {
-        const messageParts = utils.unwrapMessagePartsFromTemplateLiteral(node.quasi.quasis);
-        positions.push({
-          // tslint:disable-next-line: no-non-null-assertion
-          start: node.start!,
-          // tslint:disable-next-line: no-non-null-assertion
-          end: node.end!,
-          messageParts,
-          expressions: node.quasi.expressions,
-        });
+  const diagnostics = [];
+  const inputMap = options.map && (JSON.parse(options.map) as RawSourceMap);
+  for (const locale of i18n.inlineLocales) {
+    const isSourceLocale = locale === i18n.sourceLocale;
+    // tslint:disable-next-line: no-any
+    const translations: any = isSourceLocale ? {} : i18n.locales[locale].translation || {};
+    let localeDataContent;
+    if (options.setLocale) {
+      // If locale data is provided, load it and prepend to file
+      const localeDataPath = i18n.locales[locale]?.dataPath;
+      if (localeDataPath) {
+        localeDataContent = await loadLocaleData(localeDataPath, true);
       }
+    }
+
+    const { diagnostics: localeDiagnostics, plugins } = await createI18nPlugins(
+      locale,
+      translations,
+      isSourceLocale ? 'ignore' : options.missingTranslation || 'warning',
+      localeDataContent,
+    );
+    const transformResult = await transformFromAstSync(ast, options.code, {
+      filename: options.filename,
+      // using false ensures that babel will NOT search and process sourcemap comments (large memory usage)
+      // The types do not include the false option even though it is valid
+      // tslint:disable-next-line: no-any
+      inputSourceMap: false as any,
+      babelrc: false,
+      configFile: false,
+      plugins,
+      compact: !shouldBeautify,
+      sourceMaps: !!inputMap,
     });
+
+    diagnostics.push(...localeDiagnostics.messages);
+
+    if (!transformResult || !transformResult.code) {
+      throw new Error(`Unknown error occurred processing bundle for "${options.filename}".`);
+    }
+
+    const outputPath = path.join(
+      options.outputPath,
+      i18n.flatOutput ? '' : locale,
+      options.filename,
+    );
+    fs.writeFileSync(outputPath, transformResult.code);
+
+    if (inputMap && transformResult.map) {
+      const outputMap = mergeSourceMaps(
+        options.code,
+        inputMap,
+        transformResult.code,
+        transformResult.map,
+        options.filename,
+        options.code.length > FAST_SOURCEMAP_THRESHOLD,
+      );
+
+      fs.writeFileSync(outputPath + '.map', JSON.stringify(outputMap));
+    }
   }
 
-  return positions;
+  return { file: options.filename, diagnostics };
+}
+
+function inlineCopyOnly(options: InlineOptions) {
+  if (!i18n) {
+    throw new Error('i18n options are missing');
+  }
+
+  for (const locale of i18n.inlineLocales) {
+    const outputPath = path.join(
+      options.outputPath,
+      i18n.flatOutput ? '' : locale,
+      options.filename,
+    );
+    fs.writeFileSync(outputPath, options.code);
+    if (options.map) {
+      fs.writeFileSync(outputPath + '.map', options.map);
+    }
+  }
+
+  return { file: options.filename, diagnostics: [], count: 0 };
 }
 
 async function loadLocaleData(path: string, optimize: boolean): Promise<string> {

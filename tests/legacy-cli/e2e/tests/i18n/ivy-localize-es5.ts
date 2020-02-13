@@ -20,7 +20,10 @@ export default async function() {
     await expectFileToMatch(`${outputPath}/main.js`, translation.helloPartial);
     await expectToFail(() => expectFileToMatch(`${outputPath}/main.js`, '$localize`'));
     await expectFileNotToExist(`${outputPath}/main-es2015.js`);
-    await expectFileToMatch(`${outputPath}/main.js`, lang);
+
+    // Ensure locale is inlined (@angular/localize plugin inlines `$localize.locale` references)
+    // The only reference in a new application is in @angular/core
+    await expectFileToMatch(`${outputPath}/vendor.js`, lang);
 
     // Verify the HTML lang attribute is present
     await expectFileToMatch(`${outputPath}/index.html`, `lang="${lang}"`);
