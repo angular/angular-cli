@@ -83,6 +83,8 @@ describe('parseArguments', () => {
     '--arr=a --arr=b --arr c d': { arr: ['a', 'b', 'c'], p1: 'd' },
     '--arr=1 --arr --arr c d': { arr: ['1', '', 'c'], p1: 'd' },
     '--arr=1 --arr --arr c d e': { arr: ['1', '', 'c'], p1: 'd', p2: 'e' },
+    '--arr=a,b d': { arr: ['a', 'b'], p1: 'd' },
+    '--arr a,b d': { arr: ['a', 'b'], p1: 'd' },
     '--str=1': { str: '1' },
     '--str=': { str: '' },
     '--str ': { str: '' },
