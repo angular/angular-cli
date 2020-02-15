@@ -68,7 +68,7 @@ function _coerceType(str: string | undefined, type: OptionType, v?: Value): Valu
       } else if (!str) {
         return [''];
       } else {
-        return [...str.split(',')];
+        return str.replace(/[\'\"\[\]]/g, '').split(',');
       }
 
     default:
