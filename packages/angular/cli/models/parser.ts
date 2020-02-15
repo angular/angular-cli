@@ -63,11 +63,13 @@ function _coerceType(str: string | undefined, type: OptionType, v?: Value): Valu
       }
 
     case OptionType.Array:
-      return Array.isArray(v)
-        ? v.concat(str || '')
-        : v === undefined
-          ? [str || '']
-          : [v + '', str || ''];
+      if (Array.isArray(v)) {
+        return v.concat(str || '');
+      } else if (!str) {
+        return [''];
+      } else {
+        return [...str.split(',')];
+      }
 
     default:
       return undefined;
