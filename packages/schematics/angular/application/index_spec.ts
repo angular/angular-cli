@@ -184,6 +184,19 @@ describe('Application Schematic', () => {
     expect(architect.e2e).not.toBeDefined();
   });
 
+  it('minimal=true should configure the schematics options for components', async () => {
+    const options = { ...defaultOptions, minimal: true };
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
+    const config = JSON.parse(tree.readContent('/angular.json'));
+    const schematics = config.projects.foo.schematics;
+    expect(schematics['@schematics/angular:component']).toEqual({
+      inlineTemplate: true,
+      inlineStyle: true,
+      skipTests: true,
+    });
+  });
+
   it('should create correct files when using minimal', async () => {
     const options = { ...defaultOptions, minimal: true };
     const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
