@@ -35,8 +35,11 @@
   }
 
   .toolbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 60px;
-    margin: -8px;
     display: flex;
     align-items: center;
     background-color: #1976d2;
@@ -59,7 +62,7 @@
 
   .content {
     display: flex;
-    margin: 32px auto;
+    margin: 82px auto 32px;
     padding: 0 16px;
     max-width: 960px;
     flex-direction: column;
