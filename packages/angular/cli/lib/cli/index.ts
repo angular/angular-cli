@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { createConsoleLogger } from '@angular-devkit/core/node';
-import { normalize } from 'path';
 import { format } from 'util';
 import { runCommand } from '../../models/command-runner';
 import { colors, supportsColor } from '../../utilities/color';
 import { getWorkspaceRaw } from '../../utilities/config';
+import { writeErrorToLogFile } from '../../utilities/log-file';
 import { getWorkspaceDetails } from '../../utilities/project';
 
 const debugEnv = process.env['NG_DEBUG'];
@@ -82,12 +82,7 @@ export default async function(options: { testing?: boolean; cliArgs: string[] })
   } catch (err) {
     if (err instanceof Error) {
       try {
-        const fs = await import('fs');
-        const os = await import('os');
-        const tempDirectory = fs.mkdtempSync(fs.realpathSync(os.tmpdir()) + '/' + 'ng-');
-        const logPath = normalize(tempDirectory + '/angular-errors.log');
-        fs.appendFileSync(logPath, '[error] ' + (err.stack || err));
-
+        const logPath = writeErrorToLogFile(err);
         logger.fatal(
           `An unhandled exception occurred: ${err.message}\n` +
             `See "${logPath}" for further details.`,
