@@ -195,7 +195,7 @@ describe('Migration to version 9', () => {
         expect(config.options.aot).toBe(true);
       });
 
-      it('should not aot option when opted-out of Ivy', async () => {
+      it('should not add aot option when opted-out of Ivy', async () => {
         const tsConfig = JSON.stringify(
           {
             extends: './tsconfig.json',
@@ -218,7 +218,7 @@ describe('Migration to version 9', () => {
         expect(config.options.aot).toBe(false);
       });
 
-      it('should not aot option when opted-out of Ivy in workspace', async () => {
+      it('should not add aot option when opted-out of Ivy in workspace', async () => {
         const tsConfig = JSON.stringify(
           {
             angularCompilerOptions: {
