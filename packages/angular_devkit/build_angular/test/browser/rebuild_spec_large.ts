@@ -268,6 +268,41 @@ describe('Browser Builder rebuilds', () => {
       .toPromise();
   });
 
+  it('rebuilds on transitive non node package DTS file changes', async () => {
+    host.writeMultipleFiles({
+      'src/interface1.d.ts': `
+        import { Interface2 } from './interface2';
+        export interface Interface1 extends Interface2 { }
+      `,
+      'src/interface2.d.ts': `
+        import { Interface3 } from './interface3';
+        export interface Interface2 extends Interface3 { }
+      `,
+      'src/interface3.d.ts': `export interface Interface3 { nbr: number; }`,
+    });
+    host.appendToFile('src/main.ts', `
+      import { Interface1 } from './interface1';
+      const something: Interface1 = { nbr: 43 };
+    `);
+
+    const overrides = { watch: true };
+    const run = await architect.scheduleTarget(target, overrides);
+    let buildNumber = 0;
+    await run.output
+      .pipe(
+        debounceTime(rebuildDebounceTime),
+        tap(buildEvent => expect(buildEvent.success).toBe(true)),
+        tap(() => {
+          buildNumber++;
+          if (buildNumber === 1) {
+            host.appendToFile('src/interface3.d.ts', 'export declare type MyType = string;');
+          }
+        }),
+        take(2),
+      )
+      .toPromise();
+  });
+
   it('rebuilds after errors in JIT', async () => {
     const origContent = virtualFs.fileBufferToString(
       host.scopedSync().read(normalize('src/app/app.component.ts')),
