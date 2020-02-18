@@ -8509,7 +8509,14 @@ pidtree@0.3.0, pidtree@^0.3.0:
   resolved "https://registry.yarnpkg.com/pidtree/-/pidtree-0.3.0.tgz#f6fada10fccc9f99bf50e90d0b23d72c9ebc2e6b"
   integrity sha512-9CT4NFlDcosssyg8KVFltgokyKZIFjoBxw8CTGy+5F38Y1eQWrt8tRayiUOXE+zVKQnYu5BR8JjCtvK3BcnBhg==
 
-pidusage@2.0.17, pidusage@^2.0.17:
+pidusage@2.0.18:
+  version "2.0.18"
+  resolved "https://registry.yarnpkg.com/pidusage/-/pidusage-2.0.18.tgz#9ccef35df5508a5a4b0838c712ea9b79609aff34"
+  integrity sha512-Y/VfKfh3poHjMEINxU+gJTeVOBjiThQeFAmzR7z56HSNiMx+etl+yBhk42nRPciPYt/VZl8DQLVXNC6P5vH11A==
+  dependencies:
+    safe-buffer "^5.1.2"
+
+pidusage@^2.0.17:
   version "2.0.17"
   resolved "https://registry.yarnpkg.com/pidusage/-/pidusage-2.0.17.tgz#6b4a2b4a09026f0e9828f7e5627837e4c0672581"
   integrity sha512-N8X5v18rBmlBoArfS83vrnD0gIFyZkXEo7a5pAS2aT0i2OLVymFb2AzVg+v8l/QcXnE1JwZcaXR8daJcoJqtjw==
