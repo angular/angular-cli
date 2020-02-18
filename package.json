@@ -108,7 +108,7 @@
     "conventional-commits-parser": "^3.0.0",
     "debug": "^4.1.1",
     "fast-json-stable-stringify": "2.1.0",
-    "gh-got": "^8.0.1",
+    "gh-got": "^9.0.0",
     "git-raw-commits": "^2.0.0",
     "glob": "^7.0.3",
     "husky": "^4.0.10",
