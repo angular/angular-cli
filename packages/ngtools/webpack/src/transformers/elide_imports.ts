@@ -39,6 +39,13 @@ export function elideImports(
       return;
     }
 
+    // Consider types for 'implements' as unused.
+    // A HeritageClause token can also be an 'AbstractKeyword'
+    // which in that case we should not elide the import.
+    if (ts.isHeritageClause(node) && node.token === ts.SyntaxKind.ImplementsKeyword) {
+      return;
+    }
+
     // Record import and skip
     if (ts.isImportDeclaration(node)) {
       imports.push(node);
