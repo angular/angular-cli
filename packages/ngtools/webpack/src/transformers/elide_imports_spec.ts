@@ -317,6 +317,27 @@ describe('@ngtools/webpack transformers', () => {
       });
     });
 
+    it(`should remove import for 'ExpressionWithTypeArguments' implements token`, () => {
+      const input = tags.stripIndent`
+        import { Bar, Buz, Unused } from './bar';
+
+        export class Foo extends Bar implements Buz { }
+
+        ${dummyNode}
+      `;
+
+      const output = tags.stripIndent`
+        import { Bar } from './bar';
+
+        export class Foo extends Bar { }
+      `;
+
+      const { program, compilerHost } = createTypescriptContext(input);
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
     describe('should not elide imports decorator type references when emitDecoratorMetadata is true', () => {
       const extraCompilerOptions: ts.CompilerOptions = {
          emitDecoratorMetadata: true,
