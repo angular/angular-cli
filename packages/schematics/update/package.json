@@ -16,7 +16,7 @@
     "@yarnpkg/lockfile": "1.1.0",
     "ini": "1.3.5",
     "npm-package-arg": "^8.0.0",
-    "pacote": "10.3.2",
+    "pacote": "11.0.0",
     "rxjs": "6.5.4",
     "semver": "7.1.3",
     "semver-intersect": "1.4.0"
