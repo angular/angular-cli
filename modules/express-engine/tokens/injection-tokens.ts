@@ -7,6 +7,7 @@
  */
 import { InjectionToken } from '@angular/core';
 import { Request, Response } from 'express';
+import { ParamsDictionary } from 'express-serve-static-core';
 
-export const REQUEST = new InjectionToken<Request>('REQUEST');
+export const REQUEST = new InjectionToken<Request<ParamsDictionary>>('REQUEST');
 export const RESPONSE = new InjectionToken<Response>('RESPONSE');

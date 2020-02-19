@@ -13,5 +13,6 @@ ng_module(
     deps = [
         "@npm//@angular/core",
         "@npm//@types/express",
+        "@npm//@types/express-serve-static-core",
     ],
 )

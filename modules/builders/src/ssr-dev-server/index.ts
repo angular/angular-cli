@@ -14,7 +14,7 @@ import {
 } from '@angular-devkit/architect';
 import { json, logging, tags } from '@angular-devkit/core';
 import * as browserSync from 'browser-sync';
-import * as proxy from 'http-proxy-middleware';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 import { join } from 'path';
 import {
   EMPTY,
@@ -266,7 +266,7 @@ async function initBrowserSync(
       // Remove leading slash
       bsOptions.scriptPath = p => p.substring(1),
       bsOptions.middleware = [
-        proxy(defaultSocketIoPath, {
+        createProxyMiddleware(defaultSocketIoPath, {
           target: url.format({
             protocol: 'http',
             hostname: host,
@@ -275,7 +275,7 @@ async function initBrowserSync(
           }),
           ws: true,
           logLevel: 'silent',
-        }),
+        }) as any,
       ];
     }
   }
