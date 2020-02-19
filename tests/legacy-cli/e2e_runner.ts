@@ -79,7 +79,7 @@ let allTests = glob
   .sort();
 
 // TODO: either update or remove these tests.
-allTests = allTests
+allTests = allTests.filter(x => x.endsWith('script-target.ts'))
   // IS this test still valid? \/
   .filter(name => !name.endsWith('/module-id.ts'))
   // Do we want to support this?
