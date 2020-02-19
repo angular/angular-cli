@@ -145,7 +145,7 @@
     "tslint-no-circular-imports": "^0.7.0",
     "tslint-sonarts": "1.9.0",
     "typescript": "3.7.5",
-    "verdaccio": "4.4.2"
+    "verdaccio": "4.4.3"
   },
   "husky": {
     "hooks": {
