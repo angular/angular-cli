@@ -234,8 +234,6 @@ async function initBrowserSync(
     ghostMode: false,
     logLevel: 'silent',
     open,
-    // Remove leading slash
-    scriptPath: path => path.substring(1),
   };
 
   const publicHostNormalized = publicHost && publicHost.endsWith('/')
@@ -265,6 +263,8 @@ async function initBrowserSync(
     // However users will typically have a reverse proxy that will redirect all matching requests
     // ex: http://testinghost.com/ssr -> http://localhost:4200 which will result in a 404.
     if (hasPathname) {
+      // Remove leading slash
+      bsOptions.scriptPath = p => p.substring(1),
       bsOptions.middleware = [
         proxy(defaultSocketIoPath, {
           target: url.format({
