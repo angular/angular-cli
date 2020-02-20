@@ -12,6 +12,7 @@ import * as v8 from 'v8';
 import { BundleActionCache } from './action-cache';
 import { I18nOptions } from './i18n-options';
 import { InlineOptions, ProcessBundleOptions, ProcessBundleResult } from './process-bundle';
+import { maxWorkers } from './workers';
 
 const hasThreadSupport = (() => {
   try {
@@ -62,6 +63,7 @@ export class BundleActionExecutor {
     return (this.largeWorker = new JestWorker(workerFile, {
       exposedMethods: ['process', 'inlineLocales'],
       setupArgs: [[...serialize(this.workerOptions)]],
+      numWorkers: maxWorkers,
     }));
   }
 

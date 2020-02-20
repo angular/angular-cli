@@ -16,3 +16,4 @@ export * from './normalize-source-maps';
 export * from './normalize-optimization';
 export * from './normalize-builder-schema';
 export * from './url';
+export * from './workers';
