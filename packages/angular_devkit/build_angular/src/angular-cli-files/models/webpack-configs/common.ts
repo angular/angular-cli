@@ -12,7 +12,6 @@ import {
 import { tags } from '@angular-devkit/core';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import { existsSync } from 'fs';
-import { cpus } from 'os';
 import * as path from 'path';
 import { RollupOptions } from 'rollup';
 import { ScriptTarget } from 'typescript';
@@ -28,8 +27,8 @@ import {
   debug,
 } from 'webpack';
 import { RawSource } from 'webpack-sources';
-import { AssetPatternClass, ExtraEntryPoint } from '../../../browser/schema';
-import { BuildBrowserFeatures } from '../../../utils';
+import { AssetPatternClass } from '../../../browser/schema';
+import { BuildBrowserFeatures, maxWorkers } from '../../../utils';
 import { findCachePath } from '../../../utils/cache-path';
 import {
   allowMangle,
@@ -428,16 +427,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       mangle: allowMangle && buildOptions.platform !== 'server' && !differentialLoadingMode,
     };
 
-    // Use up to 7 CPUs for Terser workers, but no more.
-    // Some environments, like CircleCI, report a large number of CPUs but trying to use them
-    // Will cause `Error: Call retries were exceeded` errors.
-    // https://github.com/webpack-contrib/terser-webpack-plugin/issues/143
-    const maxCpus = Math.min(cpus().length, 7);
-
     extraMinimizers.push(
       new TerserPlugin({
         sourceMap: scriptsSourceMap,
-        parallel: maxCpus,
+        parallel: maxWorkers,
         cache: !cachingDisabled && findCachePath('terser-webpack'),
         extractComments: false,
         chunkFilter: (chunk: compilation.Chunk) =>
@@ -448,7 +441,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       // They are shared between ES2015 & ES5 outputs so must support ES5.
       new TerserPlugin({
         sourceMap: scriptsSourceMap,
-        parallel: maxCpus,
+        parallel: maxWorkers,
         cache: !cachingDisabled && findCachePath('terser-webpack'),
         extractComments: false,
         chunkFilter: (chunk: compilation.Chunk) =>
