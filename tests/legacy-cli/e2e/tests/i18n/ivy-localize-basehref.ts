@@ -100,4 +100,11 @@ export default async function() {
       server.close();
     }
   }
+
+  // Test absolute base href.
+  await ng('build', '--base-href', 'http://www.domain.com/');
+  for (const { lang, outputPath } of langTranslations) {
+    // Verify the HTML base HREF attribute is present
+    await expectFileToMatch(`${outputPath}/index.html`, `href="http://www.domain.com${baseHrefs[lang] || '/'}"`);
+  }
 }
