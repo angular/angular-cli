@@ -72,6 +72,7 @@ import {
   getIndexOutputFile,
 } from '../utils/webpack-browser-config';
 import { Schema as BrowserBuilderSchema } from './schema';
+import {formatNumber} from "@angular/common";
 
 const cacheDownlevelPath = cachingDisabled ? undefined : findCachePath('angular-build-dl');
 
@@ -453,6 +454,7 @@ export function buildWebpackBrowser(
               const executor = new BundleActionExecutor(
                 { cachePath: cacheDownlevelPath, i18n },
                 options.subresourceIntegrity ? 'sha384' : undefined,
+                isNaN(options.parallel) ? undefined : Number(options.parallel)
               );
 
               // Execute the bundle processing actions

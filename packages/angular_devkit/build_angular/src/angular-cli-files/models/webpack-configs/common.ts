@@ -12,7 +12,6 @@ import {
 import { tags } from '@angular-devkit/core';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import { existsSync } from 'fs';
-import { cpus } from 'os';
 import * as path from 'path';
 import { RollupOptions } from 'rollup';
 import { ScriptTarget } from 'typescript';
@@ -29,7 +28,7 @@ import {
 } from 'webpack';
 import { RawSource } from 'webpack-sources';
 import { AssetPatternClass, ExtraEntryPoint } from '../../../browser/schema';
-import { BuildBrowserFeatures } from '../../../utils';
+import {BuildBrowserFeatures, maxWorkers} from '../../../utils';
 import { findCachePath } from '../../../utils/cache-path';
 import {
   allowMangle,
@@ -432,7 +431,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     // Some environments, like CircleCI, report a large number of CPUs but trying to use them
     // Will cause `Error: Call retries were exceeded` errors.
     // https://github.com/webpack-contrib/terser-webpack-plugin/issues/143
-    const maxCpus = Math.min(cpus().length, 7);
+    let maxCpus: number | boolean = maxWorkers;
+    if (buildOptions.parallel !== undefined) {
+      maxCpus = buildOptions.parallel;
+    }
 
     extraMinimizers.push(
       new TerserPlugin({

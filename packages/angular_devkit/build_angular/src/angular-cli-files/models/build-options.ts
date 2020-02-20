@@ -89,6 +89,7 @@ export interface BuildOptions {
   esVersionInFileName?: boolean;
 
   experimentalRollupPass?: boolean;
+  parallel?: boolean|number;
 }
 
 export interface WebpackTestOptions extends BuildOptions {

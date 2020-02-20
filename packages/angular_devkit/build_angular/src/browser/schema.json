@@ -376,6 +376,19 @@
         "use-credentials"
       ]
     },
+    "parallel": {
+      "description": "Define how many parallel node threads will run simultaneous",
+      "default": true,
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "type": "boolean"
+        }
+      ]
+    },
     "experimentalRollupPass": {
       "type": "boolean",
       "description": "Concatenate modules with Rollup before bundling them with Webpack.",
