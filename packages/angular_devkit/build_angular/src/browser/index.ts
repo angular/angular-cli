@@ -454,7 +454,7 @@ export function buildWebpackBrowser(
               const executor = new BundleActionExecutor(
                 { cachePath: cacheDownlevelPath, i18n },
                 options.subresourceIntegrity ? 'sha384' : undefined,
-                isNaN(options.parallel) ? undefined : Number(options.parallel)
+                options.parallel && !isNaN(options.parallel) ? Number(options.parallel) : undefined
               );
 
               // Execute the bundle processing actions
