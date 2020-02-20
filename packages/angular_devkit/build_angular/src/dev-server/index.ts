@@ -62,16 +62,21 @@ const devServerBuildOverriddenKeys: (keyof DevServerBuilderOptions)[] = [
   'deployUrl',
 ];
 
+/**
+ * @experimental Direct usage of this type is considered experimental.
+ */
 export type DevServerBuilderOutput = DevServerBuildOutput & {
   baseUrl: string;
 };
 
 /**
- * Reusable implementation of the build angular webpack dev server builder.
+ * Reusable implementation of the Angular Webpack development server builder.
  * @param options Dev Server options.
  * @param context The build context.
  * @param transforms A map of transforms that can be used to hook into some logic (such as
  *     transforming webpack configuration before passing it to webpack).
+ *
+ * @experimental Direct usage of this function is considered experimental.
  */
 // tslint:disable-next-line: no-big-function
 export function serveWebpackBrowser(
