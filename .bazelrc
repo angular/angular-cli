@@ -7,7 +7,7 @@
 # https://github.com/bazelbuild/rules_typescript/issues/12 which affects the common case of
 # having `tsconfig.json` in the WORKSPACE directory. Instead, you should run
 # `bazel info output_base` to find out where the outputs went.
-build --symlink_prefix=/
+build --symlink_prefix=dist/
 
 # Performance: avoid stat'ing input files
 build --watchfs
