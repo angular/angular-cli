@@ -49,6 +49,7 @@ import {
   normalizeAssetPatterns,
   normalizeOptimization,
   normalizeSourceMaps,
+  urlJoin,
 } from '../utils';
 import { BundleActionExecutor } from '../utils/action-executor';
 import { findCachePath } from '../utils/cache-path';
@@ -695,11 +696,9 @@ export function buildWebpackBrowser(
               for (const [locale, outputPath] of outputPaths.entries()) {
                 let localeBaseHref;
                 if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
-                  localeBaseHref = path.posix.join(
+                  localeBaseHref = urlJoin(
                     options.baseHref || '',
-                    i18n.locales[locale].baseHref === undefined
-                      ? `/${locale}/`
-                      : i18n.locales[locale].baseHref,
+                    i18n.locales[locale].baseHref ?? `/${locale}/`,
                   );
                 }
 
@@ -726,11 +725,9 @@ export function buildWebpackBrowser(
               for (const [locale, outputPath] of outputPaths.entries()) {
                 let localeBaseHref;
                 if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
-                  localeBaseHref = path.posix.join(
+                  localeBaseHref = urlJoin(
                     options.baseHref || '',
-                    i18n.locales[locale].baseHref === undefined
-                      ? `/${locale}/`
-                      : i18n.locales[locale].baseHref,
+                    i18n.locales[locale].baseHref ?? `/${locale}/`,
                   );
                 }
 
