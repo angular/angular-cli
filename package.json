@@ -37,7 +37,8 @@
   },
   "resolutions": {
     "@types/hapi__boom": "7.4.1",
-    "@types/hapi__iron": "5.1.0"
+    "@types/hapi__iron": "5.1.0",
+    "@types/node": "^12.11.1"
   },
   "devDependencies": {
     "@angular-devkit/architect": "^0.900.0",
