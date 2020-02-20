@@ -160,7 +160,7 @@
           "type": "object",
           "additionalProperties": false,
           "patternProperties": {
-            "^[a-z]{2}(-[a-zA-Z]{2,})?$": {
+            "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?$": {
               "oneOf": [
                 {
                   "type": "string",
