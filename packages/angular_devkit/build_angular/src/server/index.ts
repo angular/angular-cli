@@ -31,7 +31,9 @@ import {
 import { JsonCompilationStats, webpackStatsLogger } from '../webpack/utils/stats';
 import { Schema as ServerBuilderOptions } from './schema';
 
-// If success is true, outputPath should be set.
+/**
+ * @experimental Direct usage of this type is considered experimental.
+ */
 export type ServerBuilderOutput = json.JsonObject & BuilderOutput & {
   baseOutputPath: string;
   outputPaths: string[];
@@ -43,6 +45,9 @@ export type ServerBuilderOutput = json.JsonObject & BuilderOutput & {
 
 export { ServerBuilderOptions };
 
+/**
+ * @experimental Direct usage of this function is considered experimental.
+ */
 export function execute(
   options: ServerBuilderOptions,
   context: BuilderContext,

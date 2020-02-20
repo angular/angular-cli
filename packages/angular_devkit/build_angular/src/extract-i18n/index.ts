@@ -121,6 +121,9 @@ class NoEmitPlugin {
   }
 }
 
+/**
+ * @experimental Direct usage of this function is considered experimental.
+ */
 export async function execute(
   options: ExtractI18nBuilderOptions,
   context: BuilderContext,

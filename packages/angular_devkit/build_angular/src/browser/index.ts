@@ -79,6 +79,9 @@ import { Schema as BrowserBuilderSchema } from './schema';
 
 const cacheDownlevelPath = cachingDisabled ? undefined : findCachePath('angular-build-dl');
 
+/**
+ * @experimental Direct usage of this type is considered experimental.
+ */
 export type BrowserBuilderOutput = json.JsonObject &
   BuilderOutput & {
     baseOutputPath: string;
@@ -186,6 +189,9 @@ async function initialize(
   return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n };
 }
 
+/**
+ * @experimental Direct usage of this function is considered experimental.
+ */
 // tslint:disable-next-line: no-big-function
 export function buildWebpackBrowser(
   options: BrowserBuilderSchema,

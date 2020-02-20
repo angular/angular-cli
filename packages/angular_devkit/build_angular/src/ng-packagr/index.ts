@@ -26,6 +26,9 @@ async function initialize(
   return packager;
 }
 
+/**
+ * @experimental Direct usage of this function is considered experimental.
+ */
 export function execute(
   options: NgPackagrBuilderOptions,
   context: BuilderContext,
