@@ -17,12 +17,12 @@ git push upstream && git push upstream --tags
 - Publish
 ```sh
 # For release with 'next' tag
-./publish-next.sh
+./publish.sh next
 ```
 
 ```sh
 # For release with 'latest' tag
-./publish.sh
+./publish.sh latest
 ```
 
 # Release Changelog

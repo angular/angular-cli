@@ -1,19 +1,22 @@
-
 #!/usr/bin/env bash
 
-set -u -e -o pipefail
+source $(dirname $0)/scripts/package-builder.sh
 
-# Use for BETA and RC releases
-# Query Bazel for npm_package and ng_package rules
-# Publish them to npm (tagged next)
+readonly tag="$1"
 
-# query for all npm packages to be released as part of the framework release
-NPM_PACKAGE_LABELS=`bazel query --output=label 'attr("tags", "\[.*release.*\]", //modules/...) intersect kind(".*_package", //modules/...)'`
-# build all npm packages in parallel
-bazel build --config=release $NPM_PACKAGE_LABELS
+if [[ $tag != 'latest' && $tag != 'next' ]]; then
+  echo "Invalid tag: ${tag}. Must be either 'latest' or 'next'"
+  exit 1
+fi
 
-# publish all packages in sequence to make it easier to spot any errors or warnings
-for packageLabel in $NPM_PACKAGE_LABELS; do
-  echo "publishing $packageLabel"
-  bazel run --config=release -- ${packageLabel}.publish --access public --tag latest
+# Build the npm packages
+buildTargetPackages "dist/modules-dist" "legacy" "Production"
+
+# Publish all packages to NPM
+for target in $(getAllPackages); do
+  echo "=============================================="
+  echo "Publishing ${target}"
+  echo "=============================================="
+  ${bazel_bin} run --config=release "${target}.publish" -- \
+    --access public --tag "${tag}"
 done
