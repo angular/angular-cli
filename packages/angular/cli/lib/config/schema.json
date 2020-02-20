@@ -417,7 +417,7 @@
               "type": "object",
               "additionalProperties": false,
               "patternProperties": {
-                "^[a-z]{2}(-[a-zA-Z]{2,})?$": {
+                "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?$": {
                   "oneOf": [
                     {
                       "type": "string",
@@ -2077,11 +2077,11 @@
           },
           {
             "type": "array",
-            "description": "List of locales ID's to translate.",
+            "description": "List of locales to translate.",
             "minItems": 1,
             "items": {
               "type": "string",
-              "pattern": "^[a-z]{2}(-[a-zA-Z]{2,})?$"
+              "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?$"
             }
           }
         ]
