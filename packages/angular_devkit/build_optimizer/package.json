@@ -9,7 +9,7 @@
     "build-optimizer": "./src/build-optimizer/cli.js"
   },
   "dependencies": {
-    "loader-utils": "1.2.3",
+    "loader-utils": "1.4.0",
     "source-map": "0.7.3",
     "tslib": "1.10.0",
     "typescript": "3.6.4",
