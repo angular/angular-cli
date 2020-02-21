@@ -8,6 +8,7 @@
 // tslint:disable:no-console
 // tslint:disable:no-implicit-dependencies
 import { JsonObject, logging } from '@angular-devkit/core';
+import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as semver from 'semver';
@@ -29,7 +30,16 @@ export interface ChangelogOptions {
   stdout?: boolean;
 }
 
-export default function(args: ChangelogOptions, logger: logging.Logger) {
+function exec(command: string, input?: string): string {
+  return execSync(command, {
+    encoding: 'utf8',
+    stdio: 'pipe',
+    input,
+    maxBuffer: 10 * 1024 * 1024,
+  }).trim();
+}
+
+export default async function(args: ChangelogOptions, logger: logging.Logger) {
   const commits: JsonObject[] = [];
   let toSha: string | null = null;
 
@@ -38,6 +48,35 @@ export default function(args: ChangelogOptions, logger: logging.Logger) {
     (args.githubTokenFile && fs.readFileSync(args.githubTokenFile, 'utf-8')) ||
     ''
   ).trim();
+
+  // Validate and scrub commit range options
+  const from = exec(`git rev-parse --verify "${args.from.replace(/"/g, '')}"`);
+  if (!from) {
+    logger.error(`"from" value [${args.from}] is invalid.`);
+
+    return;
+  }
+  const to = exec(`git rev-parse --verify "${args.to?.replace(/"/g, '') || 'HEAD'}"`);
+  if (!to) {
+    logger.error(`"to" value [${args.to}] is invalid.`);
+
+    return;
+  }
+
+  // Collect patch identifiers for cherry-pick exclusion
+  const cherryPicked = new Set<string>();
+  const patchIds = new Map<string, string>();
+  const hashes = exec(`git rev-list ${from}...${to}`).split(/\s+/);
+  for (const hash of hashes) {
+    const [patchId] = exec('git patch-id', exec('git show ' + hash)).split(/\s+/);
+    const existing = patchIds.get(patchId);
+    if (existing) {
+      cherryPicked.add(existing);
+      cherryPicked.add(hash);
+    } else {
+      patchIds.set(patchId, hash);
+    }
+  }
 
   return new Promise(resolve => {
     (gitRawCommits({
@@ -78,8 +117,9 @@ export default function(args: ChangelogOptions, logger: logging.Logger) {
             if (tags && tags.find(x => x == args.to)) {
               toSha = chunk.hash as string;
             }
-
-            commits.push(chunk);
+            if (!cherryPicked.has(chunk.hash as string)) {
+              commits.push(chunk);
+            }
             cb();
           } catch (err) {
             cb(err);
