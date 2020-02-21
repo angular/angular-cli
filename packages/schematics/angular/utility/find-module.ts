@@ -100,8 +100,9 @@ export function findModule(host: Tree, generateDir: string,
     if (filteredMatches.length == 1) {
       return join(dir.path, filteredMatches[0]);
     } else if (filteredMatches.length > 1) {
-      throw new Error('More than one module matches. Use skip-import option to skip importing '
-        + 'the component into the closest module.');
+      throw new Error('More than one module matches. Use --module flag to explicitly '
+        + 'specify which NgModule to import the component into or use skip-import option '
+        + 'to skip importing the component into the closest module.');
     }
 
     dir = dir.parent;
