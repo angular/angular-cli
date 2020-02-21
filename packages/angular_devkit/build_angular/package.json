@@ -96,7 +96,7 @@
     "karma-jasmine-html-reporter": "^1.4.0",
     "popper.js": "^1.14.1",
     "protractor": "~5.4.0",
-    "tslib": "~1.10.0",
+    "tslib": "~1.11.0",
     "zone.js": "^0.10.0"
   },
   "peerDependencies": {

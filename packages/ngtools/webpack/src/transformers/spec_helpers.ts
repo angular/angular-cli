@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { virtualFs } from '@angular-devkit/core';
-import { readFileSync, readdirSync } from 'fs';
+import { readFileSync, readdirSync, statSync } from 'fs';
 import { dirname, join } from 'path';
 import * as ts from 'typescript';
 import { WebpackCompilerHost } from '../compiler_host';
@@ -126,7 +126,8 @@ function loadTypeScriptLibFiles(): Record<string, string> {
 
 function loadTsLibFiles(): Record<string, string> {
   const libFolderPath = dirname(require.resolve('tslib/package.json'));
-  const libFolderFiles = readdirSync(libFolderPath);
+  const libFolderFiles = readdirSync(libFolderPath)
+    .filter(p => statSync(join(libFolderPath, p)).isFile());
 
   // Return a map of the lib names to their content.
   const libs: Record<string, string> = {};
