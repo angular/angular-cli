@@ -297,6 +297,17 @@ describe('Component Schematic', () => {
     expect(tree.files).toContain('/projects/bar/src/app/foo/foo.route.html');
   });
 
+  it('should allow empty string in the type option', async () => {
+    const options = { ...defaultOptions, type: '' };
+    const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.ts');
+    const testContent = tree.readContent('/projects/bar/src/app/foo/foo.spec.ts');
+    expect(content).toContain('export class Foo implements OnInit');
+    expect(testContent).toContain("describe('Foo'");
+    expect(tree.files).toContain('/projects/bar/src/app/foo/foo.css');
+    expect(tree.files).toContain('/projects/bar/src/app/foo/foo.html');
+  });
+
   it('should use the module flag even if the module is a routing module', async () => {
     const routingFileName = 'app-routing.module.ts';
     const routingModulePath = `/projects/bar/src/app/${routingFileName}`;
