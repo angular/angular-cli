@@ -309,6 +309,24 @@ describe('Browser Builder styles', () => {
     expect(await files['styles.css']).toContain('/*! important-comment */div{flex:1}');
   });
 
+  it('supports autoprefixer grid comments in SCSS with optimization true', async () => {
+    host.writeMultipleFiles({
+      'src/styles.scss': tags.stripIndents`
+        /* autoprefixer grid: autoplace */
+        .css-grid-container {
+          display: grid;
+          row-gap: 10px;
+          grid-template-columns: 100px;
+        }
+      `,
+      browserslist: 'IE 10',
+    });
+
+    const overrides = { extractCss: true, optimization: true, styles: ['src/styles.scss'] };
+    const { files } = await browserBuild(architect, host, target, overrides);
+    expect(await files['styles.css']).toContain('-ms-grid-columns:100px;');
+  });
+
   // TODO: consider making this a unit test in the url processing plugins.
   it(`supports baseHref/deployUrl in resource urls without rebaseRootRelativeCssUrls`, async () => {
     // Use a large image for the relative ref so it cannot be inlined.
