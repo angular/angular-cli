@@ -25,7 +25,7 @@
     "circular-dependency-plugin": "5.2.0",
     "coverage-istanbul-loader": "2.0.3",
     "copy-webpack-plugin": "5.1.1",
-    "core-js": "3.6.0",
+    "core-js": "3.6.4",
     "file-loader": "4.2.0",
     "find-cache-dir": "3.0.0",
     "glob": "7.1.5",
