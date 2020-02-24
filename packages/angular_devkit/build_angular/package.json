@@ -26,7 +26,7 @@
     "coverage-istanbul-loader": "2.0.3",
     "copy-webpack-plugin": "5.1.1",
     "core-js": "3.6.4",
-    "file-loader": "5.0.2",
+    "file-loader": "5.1.0",
     "find-cache-dir": "3.3.0",
     "glob": "7.1.6",
     "jest-worker": "25.1.0",
