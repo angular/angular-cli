@@ -470,7 +470,7 @@ export class AngularCompilerPlugin {
       time('AngularCompilerPlugin._listLazyRoutesFromProgram.createProgram');
       ngProgram = createProgram({
         rootNames: this._rootNames,
-        options: { ...this._compilerOptions, genDir: '', collectAllErrors: true },
+        options: { ...this._compilerOptions, genDir: '', collectAllErrors: true, enableIvy: false },
         host: this._compilerHost,
       });
       timeEnd('AngularCompilerPlugin._listLazyRoutesFromProgram.createProgram');
