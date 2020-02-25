@@ -174,6 +174,13 @@ function typeReferenceToExpression(
     case ts.SyntaxKind.NumberKeyword:
     case ts.SyntaxKind.NumericLiteral:
       return ts.createIdentifier('Number');
+    case ts.SyntaxKind.UnionType:
+      const childTypeNodes = (node as ts.UnionTypeNode).types.filter(t => t.kind !== ts.SyntaxKind.NullKeyword);
+
+      return childTypeNodes.length === 1
+        ? typeReferenceToExpression(entityNameToExpression, childTypeNodes[0], typeChecker)
+        : undefined;
+
     case ts.SyntaxKind.TypeReference:
       const typeRef = node as ts.TypeReferenceNode;
       let typeSymbol = typeChecker.getSymbolAtLocation(typeRef.typeName);

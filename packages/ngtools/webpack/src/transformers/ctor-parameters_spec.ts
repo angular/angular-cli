@@ -17,6 +17,7 @@ function transform(input: string, additionalFiles?: Record<string, string>) {
   return result;
 }
 
+// tslint:disable-next-line: no-big-function
 describe('Constructor Parameter Transformer', () => {
   it('records class name in same module', () => {
     const input = `
@@ -208,6 +209,42 @@ describe('Constructor Parameter Transformer', () => {
     `;
 
     const result = transform(input, injectedModule);
+
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
+
+  it('should work with union type and nullable argument', () => {
+    const input = `
+      @Injectable()
+      export class ProvidedService {
+        constructor() { }
+      }
+
+      @Injectable()
+      export class LibService {
+        constructor(
+            @Optional() private service: ProvidedService | null,
+        ) {
+        }
+      }
+    `;
+
+    const output = `
+      import { __decorate, __param } from "tslib";
+
+      let ProvidedService = class ProvidedService { constructor() { } };
+      ProvidedService = __decorate([ Injectable() ], ProvidedService);
+      export { ProvidedService };
+
+      let LibService = class LibService {
+        constructor(service) { this.service = service; }
+      };
+      LibService.ctorParameters = () => [ { type: ProvidedService, decorators: [{ type: Optional }] } ];
+      LibService = __decorate([ Injectable(), __param(0, Optional()) ], LibService);
+      export { LibService };
+    `;
+
+    const result = transform(input);
 
     expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
   });
