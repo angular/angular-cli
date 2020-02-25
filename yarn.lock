@@ -8095,10 +8095,10 @@ npm-registry-fetch@^7.0.0:
     minizlib "^2.0.0"
     npm-package-arg "^8.0.0"
 
-npm-registry-fetch@^7.0.1:
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/npm-registry-fetch/-/npm-registry-fetch-7.0.1.tgz#62ce40812805807ced44ff7497b4b41d3691123c"
-  integrity sha512-gUogvusj0xfJSJtK7K+MiGT2NwdqJEknmpAq+OnV7dKLM1TlGEDjJD9Jf20PLiMk1qQfvbwHUKie/lX49xpbjQ==
+npm-registry-fetch@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/npm-registry-fetch/-/npm-registry-fetch-8.0.0.tgz#65bb51dd2b9634b8363019aac9c76c003e5c5eaf"
+  integrity sha512-975WwLvZjX97y9UWWQ8nAyr7bw02s9xKPHqvEm5T900LQsB1HXb8Gb9ebYtCBLSX+K8gSOrO5KS/9yV/naLZmQ==
   dependencies:
     "@npmcli/ci-detect" "^1.0.0"
     lru-cache "^5.1.1"
@@ -8503,10 +8503,10 @@ pacote@11.0.0:
     tar "^6.0.0"
     which "^2.0.2"
 
-pacote@11.0.1:
-  version "11.0.1"
-  resolved "https://registry.yarnpkg.com/pacote/-/pacote-11.0.1.tgz#1db10296602e636167359b7ae19693ad2a322646"
-  integrity sha512-lmIXslnRgt150tqHslo/7iC26W/Y7JrvReQrYHdSAkFQ7QiTvxyHCotKDdaJdZ3WBlzuwucNlApnCieSqTNuGg==
+pacote@11.1.0:
+  version "11.1.0"
+  resolved "https://registry.yarnpkg.com/pacote/-/pacote-11.1.0.tgz#2285e37594c42588436549148a941ca6e282d425"
+  integrity sha512-JcMmHiK6h6rcncj2HLayiyJZg28iJXJafXcmEGw2NjKH3WE8ZgSwyMZs7+f+aliPD57PDhB31IEgUtLXp0YZxA==
   dependencies:
     "@npmcli/installed-package-contents" "^1.0.5"
     cacache "^15.0.0"
@@ -8520,7 +8520,7 @@ pacote@11.0.1:
     npm-package-arg "^8.0.0"
     npm-packlist "^2.1.0"
     npm-pick-manifest "^6.0.0"
-    npm-registry-fetch "^7.0.1"
+    npm-registry-fetch "^8.0.0"
     osenv "^0.1.5"
     promise-inflight "^1.0.1"
     promise-retry "^1.1.1"
