@@ -164,7 +164,13 @@ export async function main({
   const registry = new schema.CoreSchemaRegistry(formats.standardFormats);
 
   /** Create the workflow that will be executed with this run. */
-  const workflow = new NodeWorkflow(fsHost, { force, dryRun, registry });
+  const workflow = new NodeWorkflow(fsHost, {
+    force,
+    dryRun,
+    registry,
+    resolvePaths: [process.cwd(), __dirname],
+  });
+
   registry.addPostTransform(schema.transforms.addUndefinedDefaults);
   workflow.engineHost.registerOptionsTransform(validateOptionsWithSchema(registry));
 
