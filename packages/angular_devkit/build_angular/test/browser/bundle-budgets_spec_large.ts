@@ -11,6 +11,7 @@ import { createArchitect, host } from '../utils';
 
 
 describe('Browser Builder bundle budgets', () => {
+  const cssExtensions = ['css', 'scss', 'less', 'styl'];
   const targetSpec = { project: 'app', target: 'build' };
   let architect: Architect;
 
@@ -64,66 +65,84 @@ describe('Browser Builder bundle budgets', () => {
     await run.stop();
   });
 
-  it(`shows warnings for large component css when using 'anyComponentStyle' when AOT`, async () => {
-    const overrides = {
-      aot: true,
-      optimization: true,
-      budgets: [{ type: 'anyComponentStyle', maximumWarning: '1b' }],
-    };
+  cssExtensions.forEach(ext => {
+    it(`shows warnings for large component ${ext} when using 'anyComponentStyle' when AOT`, async () => {
+      const overrides = {
+        aot: true,
+        optimization: true,
+        budgets: [{ type: 'anyComponentStyle', maximumWarning: '1b' }],
+        styles: [`src/styles.${ext}`],
+      };
 
-    const cssContent = `
-      .foo { color: white; padding: 1px; }
-      .buz { color: white; padding: 2px; }
-      .bar { color: white; padding: 3px; }
-    `;
+      const cssContent = `
+        .foo { color: white; padding: 1px; }
+        .buz { color: white; padding: 2px; }
+        .bar { color: white; padding: 3px; }
+      `;
 
-    host.writeMultipleFiles({
-      'src/app/app.component.css': cssContent,
-      'src/assets/foo.css': cssContent,
-      'src/styles.css': cssContent,
+      host.writeMultipleFiles({
+        [`src/app/app.component.${ext}`]: cssContent,
+        [`src/assets/foo.${ext}`]: cssContent,
+        [`src/styles.${ext}`]: cssContent,
+      });
+
+      host.replaceInFile(
+        'src/app/app.component.ts',
+        './app.component.css',
+        `./app.component.${ext}`,
+      );
+
+      const logger = new logging.Logger('');
+      const logs: string[] = [];
+      logger.subscribe(e => logs.push(e.message));
+
+      const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
+      const output = await run.result;
+      expect(output.success).toBe(true);
+      expect(logs.length).toBe(2);
+      expect(logs.join()).toMatch(`WARNING.+app\.component\.${ext}`);
+      await run.stop();
     });
-
-    const logger = new logging.Logger('');
-    const logs: string[] = [];
-    logger.subscribe(e => logs.push(e.message));
-
-    const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
-    const output = await run.result;
-    expect(output.success).toBe(true);
-    expect(logs.length).toBe(2);
-    expect(logs.join()).toMatch(/WARNING.+app\.component\.css/);
-    await run.stop();
   });
 
-  it(`shows error for large component css when using 'anyComponentStyle' when AOT`, async () => {
-    const overrides = {
-      aot: true,
-      optimization: true,
-      budgets: [{ type: 'anyComponentStyle', maximumError: '1b' }],
-    };
+  cssExtensions.forEach(ext => {
+    it(`shows error for large component ${ext} when using 'anyComponentStyle' when AOT`, async () => {
+      const overrides = {
+        aot: true,
+        optimization: true,
+        budgets: [{ type: 'anyComponentStyle', maximumError: '1b' }],
+        styles: [`src/styles.${ext}`],
+      };
 
-    const cssContent = `
-      .foo { color: white; padding: 1px; }
-      .buz { color: white; padding: 2px; }
-      .bar { color: white; padding: 3px; }
-    `;
+      const cssContent = `
+        .foo { color: white; padding: 1px; }
+        .buz { color: white; padding: 2px; }
+        .bar { color: white; padding: 3px; }
+      `;
 
-    host.writeMultipleFiles({
-      'src/app/app.component.css': cssContent,
-      'src/assets/foo.css': cssContent,
-      'src/styles.css': cssContent,
+      host.writeMultipleFiles({
+        [`src/app/app.component.${ext}`]: cssContent,
+        [`src/assets/foo.${ext}`]: cssContent,
+        [`src/styles.${ext}`]: cssContent,
+      });
+
+      host.replaceInFile(
+        'src/app/app.component.ts',
+        './app.component.css',
+        `./app.component.${ext}`,
+      );
+
+      const logger = new logging.Logger('');
+      const logs: string[] = [];
+      logger.subscribe(e => logs.push(e.message));
+
+      const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
+      const output = await run.result;
+      expect(output.success).toBe(false);
+      expect(logs.length).toBe(2);
+      expect(logs.join()).toMatch(`ERROR.+app\.component\.${ext}`);
+      await run.stop();
     });
-
-    const logger = new logging.Logger('');
-    const logs: string[] = [];
-    logger.subscribe(e => logs.push(e.message));
-
-    const run = await architect.scheduleTarget(targetSpec, overrides, { logger });
-    const output = await run.result;
-    expect(output.success).toBe(false);
-    expect(logs.length).toBe(2);
-    expect(logs.join()).toMatch(/ERROR.+app\.component\.css/);
-    await run.stop();
   });
 
   describe(`should ignore '.map' files`, () => {
