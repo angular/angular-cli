@@ -10,7 +10,7 @@ import {
   InvalidJsonCharacterException,
   UnexpectedEndOfInputException,
 } from '@angular-devkit/core';
-import { dirname, extname, join, resolve } from 'path';
+import { dirname, join, resolve } from 'path';
 import { RuleFactory } from '../src';
 import {
   FileSystemCollectionDesc,
@@ -39,25 +39,66 @@ export class NodePackageDoesNotSupportSchematics extends BaseException {
 export class NodeModulesEngineHost extends FileSystemEngineHostBase {
   constructor(private readonly paths?: string[]) { super(); }
 
-  protected _resolveCollectionPath(name: string): string {
-    let collectionPath: string | undefined = undefined;
-    if (name.startsWith('.') || name.startsWith('/')) {
-      name = resolve(name);
+  private resolve(name: string, requester?: string, references = new Set<string>()): string {
+    if (requester) {
+      if (references.has(requester)) {
+        references.add(requester);
+        throw new Error(
+          'Circular schematic reference detected: ' + JSON.stringify(Array.from(references)),
+        );
+      } else {
+        references.add(requester);
+      }
     }
 
-    if (extname(name)) {
-      // When having an extension let's just resolve the provided path.
-      collectionPath = require.resolve(name, { paths: this.paths });
-    } else {
-      const packageJsonPath = require.resolve(join(name, 'package.json'), { paths: this.paths });
+    const relativeBase = requester ? dirname(requester) : process.cwd();
+    let collectionPath: string | undefined = undefined;
+
+    if (name.startsWith('.')) {
+      name = resolve(relativeBase, name);
+    }
+
+    const resolveOptions = {
+      paths: requester ? [dirname(requester), ...(this.paths || [])] : this.paths,
+    };
+
+    // Try to resolve as a package
+    try {
+      const packageJsonPath = require.resolve(join(name, 'package.json'), resolveOptions);
       const { schematics } = require(packageJsonPath);
 
       if (!schematics || typeof schematics !== 'string') {
         throw new NodePackageDoesNotSupportSchematics(name);
       }
 
-      collectionPath = resolve(dirname(packageJsonPath), schematics);
+      collectionPath = this.resolve(schematics, packageJsonPath, references);
+    } catch (e) {
+      if (e.code !== 'MODULE_NOT_FOUND') {
+        throw e;
+      }
     }
+
+    // If not a package, try to resolve as a file
+    if (!collectionPath) {
+      try {
+        collectionPath = require.resolve(name, resolveOptions);
+      } catch (e) {
+        if (e.code !== 'MODULE_NOT_FOUND') {
+          throw e;
+        }
+      }
+    }
+
+    // If not a package or a file, error
+    if (!collectionPath) {
+      throw new CollectionCannotBeResolvedException(name);
+    }
+
+    return collectionPath;
+  }
+
+  protected _resolveCollectionPath(name: string): string {
+    const collectionPath = this.resolve(name);
 
     try {
       readJsonFile(collectionPath);
@@ -68,10 +109,10 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
         e instanceof InvalidJsonCharacterException || e instanceof UnexpectedEndOfInputException
       ) {
         throw new InvalidCollectionJsonException(name, collectionPath, e);
+      } else {
+        throw e;
       }
     }
-
-    throw new CollectionCannotBeResolvedException(name);
   }
 
   protected _resolveReferenceString(refString: string, parentPath: string) {
