@@ -144,7 +144,7 @@
     "tslint": "^5.15.0",
     "tslint-no-circular-imports": "^0.7.0",
     "tslint-sonarts": "1.9.0",
-    "typescript": "3.7.5",
+    "typescript": "3.8.2",
     "verdaccio": "4.4.4"
   },
   "husky": {
