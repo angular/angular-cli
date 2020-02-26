@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import * as path from 'path';
 import { Compiler, Plugin } from 'webpack';
 import { Budget, Type } from '../../../src/browser/schema';
 import { ThresholdSeverity, calculateThresholds, checkThresholds } from '../utilities/bundle-calculator';
@@ -32,8 +33,16 @@ export class AnyComponentStyleBudgetChecker implements Plugin {
           return;
         }
 
+        const cssExtensions = [
+          '.css',
+          '.scss',
+          '.less',
+          '.styl',
+          '.sass',
+        ];
+
         const componentStyles = Object.keys(compilation.assets)
-            .filter((name) => name.endsWith('.css'))
+            .filter((name) => cssExtensions.includes(path.extname(name)))
             .map((name) => ({
               size: compilation.assets[name].size(),
               label: name,
