@@ -149,12 +149,13 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
                 // tslint:disable-next-line: no-any
                 (compilation.mainTemplate.hooks as any).assetPath.tap(
                   'build-angular',
-                  (filename: string, data: ChunkData) => {
-                    const isMap = filename && filename.endsWith('.map');
+                (filename: string | ((data: ChunkData) => string), data: ChunkData) => {
+                    const assetName = typeof filename === 'function' ? filename(data) : filename;
+                    const isMap = assetName && assetName.endsWith('.map');
 
                     return data.chunk && data.chunk.name === 'polyfills-es5'
                       ? `polyfills-es5${hashFormat.chunk}.js${isMap ? '.map' : ''}`
-                      : filename;
+                      : assetName;
                   },
                 );
               });
