@@ -80,7 +80,7 @@ export function updateServerMainFile(): Rule {
       // Add missing exports
       if (platformServerExports.length) {
         const { exportClause } = platformServerExports[0] as ts.ExportDeclaration;
-        if (!exportClause) {
+        if (!exportClause || ts.isNamespaceExport(exportClause)) {
           continue;
         }
 
