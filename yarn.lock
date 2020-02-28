@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@angular/animations@9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/animations/-/animations-9.0.2.tgz#f20a5c93bd37a1e286722c58361bb8e9ac1af0f7"
-  integrity sha512-vj4N8nSLytQI45TtGy2tJb0Yc7uqlyap+qhghc+jdyG41w18KQUnIneEWKOfHWnp8VJEfzgzaY7zr/1QPlxWgA==
+"@angular/animations@9.0.4":
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/@angular/animations/-/animations-9.0.4.tgz#c95c601dfb8fc4e96aee577c9c0f6cf18b64e5d7"
+  integrity sha512-zTCgrIAA9FYPMbqqpQnoNltiLR58q0FMfzP2t96q/1tjyVy/Y/IaNgVQ7eL0HeQ0nG6IAzQ1HVx8Xeneg4Yj5Q==
 
 "@angular/cdk@9.1.0":
   version "9.1.0"
@@ -14,15 +14,15 @@
   optionalDependencies:
     parse5 "^5.0.0"
 
-"@angular/common@9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/common/-/common-9.0.2.tgz#767c659b4a34c478009a40373ca1ebb84091c0b4"
-  integrity sha512-KYOov8fg5WX/bAMkemlcAZxqiq/6ga1BoxjaiZXBj07KDq8i5Nwcm6RmNkeDByCuXd2UHVm1w5t897wEUi6fnw==
+"@angular/common@9.0.4":
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/@angular/common/-/common-9.0.4.tgz#7d168b22c5c43e72112d0a19242eca22b62bb4f3"
+  integrity sha512-F3qoYrceEdCd5SlgObcbSIIdKfRXgyTBO2gbbArQHFe4GvewkH3isTn5uqAF6sfJlb7rXWZGrD6C3d9brw/fEw==
 
-"@angular/compiler-cli@9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-9.0.2.tgz#41868d23f2d062e072c9cff267c835151d237e8c"
-  integrity sha512-2AAZr1jX72OG9k1viVShiDGAwV9PZEcoDt80PXkUjLTUwWxicuSBKYauph47PzK/qzqWhdbvMbh8wCWHSLq0Qg==
+"@angular/compiler-cli@9.0.4":
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-9.0.4.tgz#1dec287ef3c6428f1837b8176d74993e83db08c4"
+  integrity sha512-fcln3gJCV88r1CoCASIathOd7kpLJ1c8l4t6P1CQG/MCocxMvVa8bI5LRKTcQ5VTnR46Ne9+5HegIRPk7EePBQ==
   dependencies:
     canonical-path "1.0.0"
     chokidar "^3.0.0"
@@ -34,27 +34,28 @@
     reflect-metadata "^0.1.2"
     semver "^6.3.0"
     source-map "^0.6.1"
+    sourcemap-codec "^1.4.8"
     yargs "13.1.0"
 
-"@angular/compiler@9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-9.0.2.tgz#be238eb2e575e2945f8e88c4ae09d99b280b797d"
-  integrity sha512-IWlKn5v3y7k1Z2K2wfNNzbn9xgA4fFlWyPe9QpdS8iy6/bPe5GfKhHbMYIza5eIhPXDN93zdEptiAIXGP3kLBQ==
+"@angular/compiler@9.0.4":
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-9.0.4.tgz#038c9cdbf76f1cce47bd1b355c7d212cc89b18f9"
+  integrity sha512-+Ku8RUU00yHaKVkVw6YIfM3c5Gmvas5gJcEleiagkLbc1f/jKk1cY4gaUP6xn4TLypFM7NQglneWd+E+8wh0hQ==
 
-"@angular/core@9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/core/-/core-9.0.2.tgz#250093b6a4d3137e2cc30e73e6cee919f1386165"
-  integrity sha512-ccVPR6RZo2s9O9phO0TJ60QZ0WA7qfUMzo0xnpBW0XGcbTzLEn9upvs+0PX64f9UpnHz/MQo0wsqYvTLuoz7Yw==
+"@angular/core@9.0.4":
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/@angular/core/-/core-9.0.4.tgz#6baa5ec6c594b47de541e47f4aa37241adec393a"
+  integrity sha512-6RqQb1GO2uglSlgiGbxhvy8plztZtABCWLRn0X+T1PnrxoqgxqA5WkKJjGxao+1M/ECW1V0fw4Xy7DE6KvAJwQ==
 
-"@angular/forms@9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/forms/-/forms-9.0.2.tgz#917e8f85a2f358bbcdf1b1946b7afa6f5460b5ed"
-  integrity sha512-qXEth7yeCd+5i6QyvllXnh/Rkzh16raFX5nfI7mgKHjWMik15Ua8wkVhDX9b5gizWeEyZtZcMGsTbbOQy0Ft3Q==
+"@angular/forms@9.0.4":
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/@angular/forms/-/forms-9.0.4.tgz#31edac9917e592695a5c12b846e93dbda6afc510"
+  integrity sha512-WyfZ2u2JzGrwkxQmfxHvZMoYHEGfoUL+JlSXa2Sy3T/FPGNckHzIzggqweJij/qGjabWLabZDla4vak42f+4PA==
 
-"@angular/localize@9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/localize/-/localize-9.0.2.tgz#0139ad35fda754b8730fae20c87feb1a85457a9e"
-  integrity sha512-Dd/aNZXPSVIU5+AuX25Qm8fBCN95eL9fad6K+tNY+hdF6ruz8u2R4AVTHtTKtM6gzWeG8rJ/rt+7qh667HV09A==
+"@angular/localize@9.0.4":
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/@angular/localize/-/localize-9.0.4.tgz#3858305a6afba4955370c3f8495e405e993c4c00"
+  integrity sha512-jQ8lyYAFp/ZXkmkOHQX/VIqhEGESCCPRsLIjDRH2LoBSiY7oh8nvc+MQaDrl5EsfSMdnK9wmDp0cp1Isg31sVQ==
   dependencies:
     "@babel/core" "7.8.3"
     glob "7.1.2"
@@ -65,33 +66,33 @@
   resolved "https://registry.yarnpkg.com/@angular/material/-/material-9.1.0.tgz#550cbf7f6a9ce679b77435278faebfc4f2a3b2ed"
   integrity sha512-KjA1ARoZ1vBg4jUH1y39muynxAFvkD8QZFGKH8Nh4zXW5pOP/7NyjokxXsNx5qSBCq/6ac2xBxCrCYJN7HmoDw==
 
-"@angular/platform-browser-dynamic@9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/platform-browser-dynamic/-/platform-browser-dynamic-9.0.2.tgz#1ed55756abd29830c2952f07c5fdea6be0b33acc"
-  integrity sha512-RJa+Y83hIFcf7pFcbbaCi7M5Y9nUUcQVuazWbQtiUe+BY5pikyug4RsF2B10pctcxb6LFLElfmkvatmmwEQ9aQ==
+"@angular/platform-browser-dynamic@9.0.4":
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/@angular/platform-browser-dynamic/-/platform-browser-dynamic-9.0.4.tgz#343bd43fe00a279a737e02c16dd8790dc0da93a8"
+  integrity sha512-9vAn2QH07khuF4n7kyMJzgE6l30Yxg1AGd8GtOfa/4nbna+EZxFVYOkto9bpv4uEwDr9o7QrFLplko9a8xs7kg==
 
-"@angular/platform-browser@9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/platform-browser/-/platform-browser-9.0.2.tgz#159456404b35f4c86ecf64ecc2b427389ede057d"
-  integrity sha512-RMivdtJtspYLH/96AzLwLj3v0O9ck0sL6R1uh5JacfBkmedqJzmLn+AOxTdjaGdIpFtw9tisT+0Aw/nkG14vlA==
+"@angular/platform-browser@9.0.4":
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/@angular/platform-browser/-/platform-browser-9.0.4.tgz#03853b435c3b964660727ac9d7e15912c920cdb8"
+  integrity sha512-mbiqmw0rDGPxEgKVgDuK7yZvtgjJmzpMGBYAMwkQ9YIE0SoA5XP0NvZiFkHZqDXwLgCv2IJ/kvkhfCBwnBKCXQ==
 
-"@angular/platform-server@9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/platform-server/-/platform-server-9.0.2.tgz#cc663d204251c7ef400531ebc9be0195c70c0f1d"
-  integrity sha512-GXpEKMACf648vEGt5n/5XXHWd5Tf5D/x4sjbPCasgZ4uIrtSy3SDrJrQl8rxvFQkv804eBnC5CH9ckEFj8g9QQ==
+"@angular/platform-server@9.0.4":
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/@angular/platform-server/-/platform-server-9.0.4.tgz#a9f9ec32e1ad384b200369cc09b70096aa73d625"
+  integrity sha512-c7B4Ui3dkvwIFKDoqt+Qu2+syHYmnkbGBJq4oi1qh/bilm2lh2wz6zxnlzaVfXwk7C8vUnL80C8E3yCLcTNgiw==
   dependencies:
     domino "^2.1.2"
     xhr2 "^0.1.4"
 
-"@angular/router@9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/router/-/router-9.0.2.tgz#f33a56b16966eabdb7b24ae484d9577d47fe117f"
-  integrity sha512-jDKq9K0pOgaMtocg7VCfIQX8jTyBSb+0hjOcj6kXQVCcmnxeBzGPRX2THQyFkyzG8owTBZlHIrJA3H2thDU2LQ==
+"@angular/router@9.0.4":
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/@angular/router/-/router-9.0.4.tgz#1d15496eff2f47e09bb1d9c44592a2c44d0f63c1"
+  integrity sha512-03A8RpjtqB02y1DWgCPfhCprdCCkhEYU0Fo3qWCHnpa02ikejzKxyjoJyrVU/AMNbljOj5ZMcpSfyj07aPp4tQ==
 
-"@angular/service-worker@9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@angular/service-worker/-/service-worker-9.0.2.tgz#803eb7356b1dbe9032a8a3bffb248646a2ca6b89"
-  integrity sha512-IDC9DNoLwv23UGcWil7ppF7cxjooFthBq7OBUnqAv2fRTovNjvqhwsNYGL+pBLiBmEUwmuw3UGV0DgUJzdiguw==
+"@angular/service-worker@9.0.4":
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/@angular/service-worker/-/service-worker-9.0.4.tgz#b871bdbb4e291cb6d1c420d2941ea401c6b17869"
+  integrity sha512-eWuK4COhLlWSFutvOkYBQ9iq3ArTPEdR0nI5kB8youQIrUAM2CLcTMeA0VjHxR6mTSiFI9I/3WVYLlH1iixWNA==
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.8.3":
   version "7.8.3"
@@ -10510,7 +10511,7 @@ source-map@^0.6.0, source-map@^0.6.1, source-map@~0.6.0, source-map@~0.6.1:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
   integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
 
-sourcemap-codec@^1.4.4:
+sourcemap-codec@^1.4.4, sourcemap-codec@^1.4.8:
   version "1.4.8"
   resolved "https://registry.yarnpkg.com/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz#ea804bd94857402e6992d05a38ef1ae35a9ab4c4"
   integrity sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==
