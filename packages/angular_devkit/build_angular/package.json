@@ -18,7 +18,7 @@
     "ajv": "6.12.0",
     "autoprefixer": "9.7.4",
     "babel-loader": "8.0.6",
-    "browserslist": "4.8.6",
+    "browserslist": "4.9.1",
     "cacache": "15.0.0",
     "caniuse-lite": "1.0.30001023",
     "cssnano": "4.1.10",
