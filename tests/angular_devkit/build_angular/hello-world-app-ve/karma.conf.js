@@ -19,6 +19,7 @@ module.exports = function (config) {
       require('karma-chrome-launcher'),
       require('karma-jasmine-html-reporter'),
       require('karma-coverage-istanbul-reporter'),
+      require('karma-sabarivka-reporter'),
       require('@angular-devkit/build-angular/plugins/karma')
     ],
     client:{
@@ -28,6 +29,9 @@ module.exports = function (config) {
       dir: path.join(__dirname, 'coverage'),
       reports: [ 'html', 'lcovonly' ],
       fixWebpackSourcePaths: true
+    },
+    coverageReporter: {
+      include: []
     },
     reporters: ['progress', 'kjhtml'],
     port: 9876,

@@ -70,10 +70,15 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   successCb = config.buildWebpack.successCb;
   failureCb = config.buildWebpack.failureCb;
 
-  // When using code-coverage, auto-add coverage-istanbul.
+  // When using code-coverage, auto-add coverage-istanbul & karma-sabarivka-reporter.
   config.reporters = config.reporters || [];
-  if (options.codeCoverage && config.reporters.indexOf('coverage-istanbul') === -1) {
-    config.reporters.push('coverage-istanbul');
+  if (options.codeCoverage) {
+    if (config.reporters.indexOf('coverage-istanbul') === -1) {
+      config.reporters.push('coverage-istanbul');
+    }
+    if (config.reporters.indexOf('sabarivka') === -1 || config.reporters.indexOf('karma-sabarivka-reporter') === -1) {
+      config.reporters.push('karma-sabarivka-reporter');
+    }
   }
 
   // Add a reporter that fixes sourcemap urls.

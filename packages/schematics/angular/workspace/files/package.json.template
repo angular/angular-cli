@@ -38,6 +38,7 @@
     "karma-coverage-istanbul-reporter": "~2.1.0",
     "karma-jasmine": "~3.0.1",
     "karma-jasmine-html-reporter": "^1.4.2",
+    "karma-sabarivka-reporter": "~3.0.2",
     "protractor": "~5.4.3",<% } %>
     "ts-node": "~8.3.0",
     "tslint": "~5.18.0",
