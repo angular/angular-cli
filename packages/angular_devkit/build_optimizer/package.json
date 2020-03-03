@@ -12,7 +12,7 @@
     "loader-utils": "1.4.0",
     "source-map": "0.7.3",
     "tslib": "1.11.1",
-    "typescript": "3.8.2",
+    "typescript": "3.8.3",
     "webpack-sources": "1.4.3"
   }
 }
