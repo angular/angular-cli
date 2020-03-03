@@ -17,7 +17,7 @@ npm i --S @nguniversal/aspnetcore-engine
 
 # Usage
 
-> Things have changed since the previous ASP.NET Core & Angular Universal useage. We're no longer using TagHelpers, but now invoking the **main.server** file from the **Home Controller** *itself*, and passing all the data down to .NET.
+> Things have changed since the previous ASP.NET Core & Angular Universal usage. We're no longer using TagHelpers, but now invoking the **main.server** file from the **Home Controller** *itself*, and passing all the data down to .NET.
 
 Within our main.server file, things haven't changed much, you still have your `createServerRenderer()` function that's being exported (this is what's called within the Node process) which is expecting a `Promise` to be returned.
 
