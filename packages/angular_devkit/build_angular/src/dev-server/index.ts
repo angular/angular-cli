@@ -551,19 +551,39 @@ function _addLiveReload(
     webpackConfig.plugins = [];
   }
 
-  // Enable the internal node plugins but no individual shims
-  // This is needed to allow module specific rules to include node shims
+  // Workaround node shim hoisting issues with live reload client
   // Only needed in dev server mode to support live reload capabilities in all package managers
-  if (webpackConfig.node === false) {
-    webpackConfig.node = {
-      global: false,
-      process: false,
-      __filename: false,
-      __dirname: false,
-      Buffer: false,
-      setImmediate: false,
-    };
+  const webpackPath = path.dirname(require.resolve('webpack/package.json'));
+  const nodeLibsBrowserPath = require.resolve('node-libs-browser', { paths: [webpackPath] });
+  const nodeLibsBrowser = require(nodeLibsBrowserPath);
+  webpackConfig.plugins.push(
+    new webpack.NormalModuleReplacementPlugin(
+      /^events|url|querystring$/,
+      (resource: { issuer?: string; request: string }) => {
+        if (!resource.issuer) {
+          return;
+        }
+        if (/[\/\\]hot[\/\\]emitter\.js$/.test(resource.issuer)) {
+          if (resource.request === 'events') {
+            resource.request = nodeLibsBrowser.events;
+          }
+        } else if (
+          /[\/\\]webpack-dev-server[\/\\]client[\/\\]utils[\/\\]createSocketUrl\.js$/.test(
+            resource.issuer,
+          )
+        ) {
+          switch (resource.request) {
+            case 'url':
+              resource.request = nodeLibsBrowser.url;
+              break;
+            case 'querystring':
+              resource.request = nodeLibsBrowser.querystring;
+              break;
+          }
   }
+      },
+    ),
+  );
 
   // This allows for live reload of page when changes are made to repo.
   // https://webpack.js.org/configuration/dev-server/#devserver-inline
