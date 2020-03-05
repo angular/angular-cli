@@ -142,3 +142,7 @@ common --experimental_allow_incremental_repository_updates
 # Load any settings which are specific to the current user. Needs to be *last* statement
 # in this config, as the user configuration should be able to overwrite flags from this file.
 try-import .bazelrc.user
+
+# Enable runfiles even on Windows.
+# Architect resolves output files from data files, and this isn't possible without runfile support.
+test --enable_runfiles
