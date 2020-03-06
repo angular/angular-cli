@@ -777,6 +777,8 @@ export class AngularCompilerPlugin {
           this._basePath,
           this._compilerOptions,
         );
+
+        ngccProcessor.process();
       }
 
       // Use an identity function as all our paths are absolute already.
