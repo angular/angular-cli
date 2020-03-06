@@ -23,7 +23,7 @@
     "caniuse-lite": "^1.0.30001032",
     "cssnano": "4.1.10",
     "circular-dependency-plugin": "5.2.0",
-    "coverage-istanbul-loader": "2.0.3",
+    "coverage-istanbul-loader": "3.0.0",
     "copy-webpack-plugin": "5.1.1",
     "core-js": "3.6.4",
     "file-loader": "5.1.0",
