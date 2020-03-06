@@ -675,7 +675,7 @@
               "type": "object",
               "properties": {
                 "includePaths": {
-                  "description": "Paths to include. Paths will be resolved to project root.",
+                  "description": "Paths to include. Paths will be resolved to workspace root. (Not project root!)",
                   "type": "array",
                   "items": {
                     "type": "string"
@@ -1430,7 +1430,7 @@
               "type": "object",
               "properties": {
                 "includePaths": {
-                  "description": "Paths to include. Paths will be resolved to project root.",
+                  "description": "Paths to include. Paths will be resolved to workspace root. (Not project root!)",
                   "type": "array",
                   "items": {
                     "type": "string"
@@ -1722,7 +1722,7 @@
               "type": "object",
               "properties": {
                 "includePaths": {
-                  "description": "Paths to include. Paths will be resolved to project root.",
+                  "description": "Paths to include. Paths will be resolved to workspace root. (Not project root!)",
                   "type": "array",
                   "items": {
                     "type": "string"
