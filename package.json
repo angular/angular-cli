@@ -84,7 +84,7 @@
     "karma-chrome-launcher": "^3.0.0",
     "karma-jasmine": "^3.0.0",
     "karma-sourcemap-loader": "^0.3.7",
-    "karma-typescript": "^4.1.0",
+    "karma-typescript": "^5.0.0",
     "minimatch": "^3.0.4",
     "node-fetch": "^2.2.0",
     "protractor": "5.4.3",
