@@ -21,8 +21,5 @@
     "rxjs": "RXJS_VERSION",
     "tree-kill": "^1.2.1",
     "guess-parser": "^0.4.12"
-  },
-  "ng-update": {
-    "packageGroup": "NG_UPDATE_PACKAGE_GROUP"
   }
 }

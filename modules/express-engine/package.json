@@ -24,7 +24,8 @@
   "schematics": "./schematics/collection.json",
   "ng-update": {
     "migrations": "./schematics/migrations/migration-collection.json",
-    "packageGroup": "NG_UPDATE_PACKAGE_GROUP"
+    "packageGroup": "NG_UPDATE_PACKAGE_GROUP",
+    "packageGroupName": "@nguniversal/express-engine"
   },
   "repository": {
     "type": "git",

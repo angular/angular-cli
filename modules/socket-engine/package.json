@@ -17,7 +17,8 @@
     "tslib": "TSLIB_VERSION"
   },
   "ng-update": {
-    "packageGroup": "NG_UPDATE_PACKAGE_GROUP"
+    "packageGroup": "NG_UPDATE_PACKAGE_GROUP",
+    "packageGroupName": "@nguniversal/socket-engine"
   },
   "repository": {
     "type": "git",
