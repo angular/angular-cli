@@ -24,6 +24,8 @@ ts_library(
             "src/**/*_benchmark.ts",
         ],
     ),
+    module_name = "@angular-devkit/build-optimizer",
+    module_root = "src/index.d.ts",
     deps = [
         "@npm//@types/node",
         "@npm//@types/webpack",
