@@ -15,8 +15,7 @@
 #             (Using the tag in not necessary when pinning by ID, but include it anyway for documentation purposes.)
 # **NOTE 2**: If you change the version of the docker images, also change the `cache_key` suffix.
 var_1: &docker_image circleci/node:10.16-browsers@sha256:d2a96fe1cbef51257ee626b5f645e64dade3e886f00ba9cb7e8ea65b4efe8db1
-var_2: &cache_key v8-nguniversal-{{ checksum "yarn.lock" }}-{{ checksum "WORKSPACE" }}-node-10.16
-var_3: &cache_key_fallback v8-nguniversal-
+var_2: &cache_key v1-nguniversal-{{ checksum "yarn.lock" }}-{{ checksum "WORKSPACE" }}-node-10.16
 
 # Workspace initially persisted by the `setup` job.
 # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
@@ -61,7 +60,6 @@ jobs:
       - restore_cache:
           keys:
             - *cache_key
-            - *cache_key_fallback
       - run: yarn install --frozen-lockfile --non-interactive
       # Reduces ~25mb from being persisted to the workspace
       - run: rm -rf .git
