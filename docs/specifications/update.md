@@ -63,7 +63,7 @@ The schematic performs the following steps, in order:
 
 ## Library Developers
 
-Libraries are responsible for defining their own update schematics. The `ng update` tool will update the package.json, and if it detects am `"ng-update"` key in package.json of the library, will run the update schematic on it (with version information metadata).
+Libraries are responsible for defining their own update schematics. The `ng update` tool will update the package.json, and if it detects the `"ng-update"` key in package.json of the library, will run the update schematic on it (with version information metadata).
 
 If a library does not define the `"ng-update"` key in their package.json, they are considered not supporting the update workflow and `ng update` is basically equivalent to `npm install`.
 
