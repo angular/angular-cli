@@ -92,26 +92,24 @@ export function execute(
     getAvailablePort(),
   ).pipe(
     switchMap(([br, sr, nodeServerPort]) => {
-      const server$ = sr.output.pipe(
-        switchMap(s => {
-          if (!s.success) {
-            return of(s);
+      return combineLatest([br.output, sr.output]).pipe(
+        // This is needed so that if both server and browser emit close to each other
+        // we only emit once. This typically happens on the first build.
+        debounceTime(120),
+        switchMap(([b, s]) => {
+          if (!s.success || !b.success) {
+            return of([b, s]);
           }
 
           return startNodeServer(s, nodeServerPort, context.logger).pipe(
-            mapTo(s),
+            mapTo([b, s]),
             catchError(err => {
               context.logger.error(`A server error has occurred.\n${mapErrorToMessage(err)}`);
 
               return EMPTY;
             }),
           );
-        }));
-
-      return combineLatest([br.output, server$]).pipe(
-        // This is needed so that if both server and browser emit close to each other
-        // we only emit once. This typically happens on the first build.
-        debounceTime(120),
+        }),
         map(([b, s]) => ([
           {
             success: b.success && s.success,
@@ -265,18 +263,18 @@ async function initBrowserSync(
     if (hasPathname) {
       // Remove leading slash
       bsOptions.scriptPath = p => p.substring(1),
-      bsOptions.middleware = [
-        createProxyMiddleware(defaultSocketIoPath, {
-          target: url.format({
-            protocol: 'http',
-            hostname: host,
-            port: bsPort,
-            pathname: path,
-          }),
-          ws: true,
-          logLevel: 'silent',
-        }) as any,
-      ];
+        bsOptions.middleware = [
+          createProxyMiddleware(defaultSocketIoPath, {
+            target: url.format({
+              protocol: 'http',
+              hostname: host,
+              port: bsPort,
+              pathname: path,
+            }),
+            ws: true,
+            logLevel: 'silent',
+          }) as any,
+        ];
     }
   }
 
