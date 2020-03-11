@@ -60,7 +60,7 @@ async function importParsers() {
       xmb: new (await import(
         // tslint:disable-next-line:trailing-comma no-implicit-dependencies
         '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xtb_translation_parser'
-      )).XtbTranslationParser(diagnostics),
+      )).XtbTranslationParser(),
     };
 
     return { parsers, diagnostics };

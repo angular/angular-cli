@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Logger, PathMappings, process as mainNgcc } from '@angular/compiler-cli/ngcc';
+import { LogLevel, Logger, PathMappings, process as mainNgcc } from '@angular/compiler-cli/ngcc';
 import { spawnSync } from 'child_process';
 import { accessSync, constants, existsSync } from 'fs';
 import * as path from 'path';
@@ -180,6 +180,8 @@ export class NgccProcessor {
 }
 
 class NgccLogger implements Logger {
+  level = LogLevel.info;
+
   constructor(
     private readonly compilationWarnings: (Error | string)[],
     private readonly compilationErrors: (Error | string)[],
