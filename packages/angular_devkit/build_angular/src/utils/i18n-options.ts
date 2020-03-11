@@ -338,10 +338,13 @@ function findLocaleDataBasePath(projectRoot: string): string | null {
 }
 
 function findLocaleDataPath(locale: string, basePath: string): string | null {
-  const localeDataPath = path.join(basePath, locale + '.js');
+  // Remove private use subtags
+  const scrubbedLocale = locale.replace(/-x(-[a-zA-Z0-9]{1,8})+$/, '');
+
+  const localeDataPath = path.join(basePath, scrubbedLocale + '.js');
 
   if (!fs.existsSync(localeDataPath)) {
-    if (locale === 'en-US') {
+    if (scrubbedLocale === 'en-US') {
       // fallback to known existing en-US locale data as of 9.0
       return findLocaleDataPath('en-US-POSIX', basePath);
     }
