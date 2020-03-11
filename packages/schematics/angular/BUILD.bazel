@@ -12,7 +12,7 @@ load("//tools:ts_json_schema.bzl", "ts_json_schema")
 package(default_visibility = ["//visibility:public"])
 
 # Create a list of Tuple("path/file.json", "path_file") to be used as rules
-ALL_SCHEMA_TARGETS_PAIR = [
+ALL_SCHEMA_TARGETS = [
     (
         x,
         x.replace("/", "_").replace("-", "_").replace(".json", ""),
@@ -26,10 +26,8 @@ ALL_SCHEMA_TARGETS_PAIR = [
         name = name,
         src = src,
     )
-    for (src, name) in ALL_SCHEMA_TARGETS_PAIR
+    for (src, name) in ALL_SCHEMA_TARGETS
 ]
-
-ALL_SCHEMA_DEPS = [":" + name for (_, name) in ALL_SCHEMA_TARGETS_PAIR]
 
 ts_library(
     name = "angular",
@@ -45,10 +43,13 @@ ts_library(
             # Exclude test helpers.
             "utility/test/**/*.ts",
         ],
-    ),
+    ) + [
+      "//packages/schematics/angular:" + src.replace(".json", ".ts") 
+      for (src, _) in ALL_SCHEMA_TARGETS
+    ],
     module_name = "@schematics/angular",
     # strict_checks = False,
-    deps = ALL_SCHEMA_DEPS + [
+    deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tasks",
@@ -87,7 +88,7 @@ ts_library(
     ),
     # @external_begin
     tsconfig = "//:tsconfig-test.json",
-    deps = ALL_SCHEMA_DEPS + [
+    deps = [
         ":angular",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node_testing",
