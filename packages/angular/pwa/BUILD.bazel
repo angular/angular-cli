@@ -24,9 +24,10 @@ ts_library(
             "**/*_spec.ts",
             "**/*_spec_large.ts",
         ],
-    ),
+    ) + [
+      "//packages/angular/pwa:pwa/schema.ts",
+    ],
     deps = [
-        ":pwa_schema",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "@npm//@types/node",

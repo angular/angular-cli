@@ -22,10 +22,11 @@ ts_library(
             "blank/project-files/**",
             "blank/schematic-files/**",
         ],
-    ),
+    ) + [
+      "//packages/schematics/schematics:blank/schema.ts",
+      "//packages/schematics/schematics:schematic/schema.ts",
+    ],
     deps = [
-        ":blank_schema",
-        ":schematic_schema",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tasks",

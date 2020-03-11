@@ -20,10 +20,11 @@ ts_library(
             "**/*_spec_large.ts",
             "**/*_benchmark.ts",
         ],
-    ),
+    ) + [
+      "//packages/schematics/update:update/schema.ts",
+      "//packages/schematics/update:migrate/schema.ts",
+    ],
     deps = [
-        ":migrate_schema",
-        ":update_schema",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:tasks",
