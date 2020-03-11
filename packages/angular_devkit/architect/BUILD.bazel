@@ -5,6 +5,7 @@
 
 licenses(["notice"])  # MIT
 
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 # @external_begin
@@ -109,5 +110,13 @@ pkg_npm(
         ":architect",
         ":testing",
     ],
+)
+
+pkg_tar(
+    name = "npm_package_archive",
+    srcs = [":npm_package"],
+    extension = "tar.gz",
+    strip_prefix = "./npm_package",
+    tags = ["manual"],
 )
 # @external_end
