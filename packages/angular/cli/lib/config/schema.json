@@ -393,7 +393,7 @@
                   "description": "Specifies the source locale of the application.",
                   "default": "en-US",
                   "$comment": "IETF BCP 47 language tag (simplified)",
-                  "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?$"
+                  "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$"
                 },
                 {
                   "type": "object",
@@ -402,7 +402,7 @@
                     "code": {
                       "type": "string",
                       "description": "Specifies the locale code of the source locale",
-                      "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?$"
+                      "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$"
                     },
                     "baseHref": {
                       "type": "string",
@@ -417,7 +417,7 @@
               "type": "object",
               "additionalProperties": false,
               "patternProperties": {
-                "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?$": {
+                "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$": {
                   "oneOf": [
                     {
                       "type": "string",
@@ -2081,7 +2081,7 @@
             "minItems": 1,
             "items": {
               "type": "string",
-              "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?$"
+              "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$"
             }
           }
         ]

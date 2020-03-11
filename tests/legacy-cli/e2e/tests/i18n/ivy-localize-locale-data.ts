@@ -43,4 +43,18 @@ export default async function() {
     throw new Error('locale data not found warning shown');
   }
 
+  // Update angular.json
+  await updateJsonFile('angular.json', workspaceJson => {
+    const appProject = workspaceJson.projects['test-project'];
+    // tslint:disable-next-line: no-any
+    const i18n: Record<string, any> = appProject.i18n;
+
+    i18n.sourceLocale = 'en-x-abc';
+    appProject.architect['build'].options.localize = ['en-x-abc'];
+  });
+
+  const { stderr: err3 } = await ng('build');
+  if (err3.includes(`Locale data for 'en-x-abc' cannot be found.  No locale data will be included for this locale.`)) {
+    throw new Error('locale data not found warning shown');
+  }
 }
