@@ -15,7 +15,7 @@
   "dependencies": {
     "@angular-devkit/architect": "0.0.0",
     "@angular-devkit/core": "0.0.0",
-    "minimist": "1.2.0",
+    "minimist": "1.2.3",
     "progress": "2.0.3",
     "rxjs": "6.5.4",
     "symbol-observable": "1.2.0"
