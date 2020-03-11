@@ -2,91 +2,71 @@
 #
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
-
-licenses(["notice"])  # MIT
+package(default_visibility = ["//visibility:public"])
 
 load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
-load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
-package(default_visibility = ["//visibility:public"])
+licenses(["notice"])
+
 
 ts_library(
-    name = "update",
+    name = "tools",
     srcs = glob(
         include = ["**/*.ts"],
         exclude = [
             "**/*_spec.ts",
-            "**/*_spec_large.ts",
             "**/*_benchmark.ts",
+            "test/**/*.ts",
         ],
-    ) + [
-      "//packages/schematics/update:update/schema.ts",
-      "//packages/schematics/update:migrate/schema.ts",
-    ],
+    ),
+    module_name = "@angular-devkit/schematics/tools",
+    module_root = "index.d.ts",
+    # The attribute below is needed in g3 to turn off strict typechecking
+    # strict_checks = False,
     deps = [
-        "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/tasks",
+        "//packages/angular_devkit/schematics/tasks/node",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
         "@npm//@types/node",
-        "@npm//@types/npm-package-arg",
-        "@npm//@types/semver",
-        "@npm//npm-package-arg",
         "@npm//rxjs",
-        "@npm//semver",
     ],
-)
-
-ts_json_schema(
-    name = "update_schema",
-    src = "update/schema.json",
-)
-
-ts_json_schema(
-    name = "migrate_schema",
-    src = "migrate/schema.json",
 )
 
 ts_library(
-    name = "update_test_lib",
+    name = "tools_test_lib",
     testonly = True,
     srcs = glob(
         include = [
             "**/*_spec.ts",
             "**/*_spec_large.ts",
-        ],
-    ),
-    data = glob(
-        include = [
-            "**/*.json",
+            "test/**/*.ts",
         ],
     ),
     # @external_begin
     tsconfig = "//:tsconfig-test.json",
+    # @external_end
     deps = [
-        ":update",
-        "//packages/angular_devkit/core",
+        ":tools",
         "//packages/angular_devkit/schematics",
+        "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/testing",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
+        "//tests/angular_devkit/schematics/tools/file-system-engine-host:file_system_engine_host_test_lib",
         "@npm//@types/jasmine",
         "@npm//@types/node",
-        "@npm//@types/semver",
-        "@npm//@yarnpkg/lockfile",
-        "@npm//ini",
-        "@npm//pacote",
         "@npm//rxjs",
     ],
-    # @external_end
 )
 
 jasmine_node_test(
-    name = "update_test",
-    srcs = [":update_test_lib"],
-    # TODO: Audit tests to determine if tests can be run in RBE environments
-    local = True,
+    name = "tools_test",
+    srcs = [":tools_test_lib"],
     deps = [
         "@npm//jasmine",
-        "@npm//npm-registry-client",
         "@npm//source-map",
     ],
 )

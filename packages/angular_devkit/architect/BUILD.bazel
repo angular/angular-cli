@@ -37,27 +37,6 @@ ts_json_schema(
 )
 
 ts_library(
-    name = "node",
-    srcs = glob(
-        include = ["node/**/*.ts"],
-        exclude = [
-            "**/*_spec.ts",
-            "**/*_spec_large.ts",
-        ],
-    ),
-    module_name = "@angular-devkit/architect/node",
-    module_root = "node/index.d.ts",
-    # strict_checks = False,
-    deps = [
-        ":architect",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core:node",
-        "@npm//@types/node",
-        "@npm//rxjs",
-    ],
-)
-
-ts_library(
     name = "architect",
     srcs = glob(
         include = ["src/**/*.ts"],
@@ -77,27 +56,7 @@ ts_library(
     module_root = "src/index.d.ts",
     deps = [
         "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core:node",
-        "@npm//@types/node",
-        "@npm//rxjs",
-    ],
-)
-
-ts_library(
-    name = "testing",
-    srcs = glob(
-        include = ["testing/**/*.ts"],
-        exclude = [
-            "**/*_spec.ts",
-            "**/*_spec_large.ts",
-        ],
-    ),
-    module_name = "@angular-devkit/architect/testing",
-    module_root = "testing/index.d.ts",
-    deps = [
-        ":architect",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core:node",
+        "//packages/angular_devkit/core/node",
         "@npm//@types/node",
         "@npm//rxjs",
     ],
@@ -108,7 +67,8 @@ pkg_npm(
     name = "npm_package",
     deps = [
         ":architect",
-        ":testing",
+        "//packages/angular_devkit/architect/node",
+        "//packages/angular_devkit/architect/testing",
     ],
 )
 

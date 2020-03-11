@@ -25,7 +25,7 @@ ts_library(
         "//packages/angular_devkit/schematics",
         # ":testing",
         # "//packages/angular_devkit/core",
-        # "//packages/angular_devkit/core:node",
+        # "//packages/angular_devkit/core/node",
         # "@npm//rxjs",
         #
         "@npm//@types/jasmine",

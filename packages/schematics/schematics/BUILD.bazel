@@ -29,7 +29,7 @@ ts_library(
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics:tasks",
+        "//packages/angular_devkit/schematics/tasks",
         "@npm//@types/node",
         "@npm//rxjs",
     ],
@@ -72,7 +72,7 @@ ts_json_schema(
 #         ":schematics",
 #         "//packages/angular_devkit/core",
 #         "//packages/angular_devkit/schematics",
-#         "//packages/angular_devkit/schematics:testing",
+#         "//packages/angular_devkit/schematics/testing",
 #         "@npm//rxjs",
 #
 #         "@npm//@types/node",

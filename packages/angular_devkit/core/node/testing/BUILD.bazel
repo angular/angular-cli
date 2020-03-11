@@ -6,32 +6,27 @@ package(default_visibility = ["//visibility:public"])
 
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
-licenses(["notice"])
+licenses(["notice"])  # MIT License
 
-# @angular-devkit/schematics-cli
 
 ts_library(
-    name = "schematics_cli",
+    name = "testing",
     srcs = glob(
-        include = ["bin/**/*.ts"],
+        include = ["**/*.ts"],
         exclude = [
-            "bin/**/*_spec.ts",
-            "bin/**/*_spec_large.ts",
-            "bin/**/*_benchmark.ts",
+            "**/*_spec.ts",
+            "**/*_spec_large.ts",
+            "**/*_benchmark.ts",
         ],
     ),
-    module_name = "@angular-devkit/schematics-cli",
-    module_root = "bin",
+    module_name = "@angular-devkit/core/node/testing",
+    module_root = "index.d.ts",
     # The attribute below is needed in g3 to turn off strict typechecking
     # strict_checks = False,
     deps = [
         "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
-        "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics/tasks",
-        "//packages/angular_devkit/schematics/tools",
-        "@npm//@types/inquirer",
-        "@npm//@types/minimist",
+        "//packages/angular_devkit/core/node:node",
+        "@npm//@types/jasmine",
         "@npm//@types/node",
         "@npm//rxjs",
     ],

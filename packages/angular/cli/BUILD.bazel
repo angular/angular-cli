@@ -48,11 +48,11 @@ ts_library(
     # strict_checks = False,
     deps = [
         "//packages/angular_devkit/architect",
-        "//packages/angular_devkit/architect:node",
+        "//packages/angular_devkit/architect/node",
         "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core:node",
+        "//packages/angular_devkit/core/node",
         "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics:tools",
+        "//packages/angular_devkit/schematics/tools",
         # @node_module: typescript:es2017.object
         "@npm//@types/debug",
         "@npm//@types/node",

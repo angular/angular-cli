@@ -8,30 +8,20 @@ load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 licenses(["notice"])
 
-# @angular-devkit/schematics-cli
 
 ts_library(
-    name = "schematics_cli",
+    name = "testing",
     srcs = glob(
-        include = ["bin/**/*.ts"],
-        exclude = [
-            "bin/**/*_spec.ts",
-            "bin/**/*_spec_large.ts",
-            "bin/**/*_benchmark.ts",
-        ],
+        include = ["**/*.ts"],
     ),
-    module_name = "@angular-devkit/schematics-cli",
-    module_root = "bin",
-    # The attribute below is needed in g3 to turn off strict typechecking
-    # strict_checks = False,
+    module_name = "@angular-devkit/schematics/testing",
+    module_root = "index.d.ts",
     deps = [
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/tasks",
+        "//packages/angular_devkit/schematics/tasks/node",
         "//packages/angular_devkit/schematics/tools",
-        "@npm//@types/inquirer",
-        "@npm//@types/minimist",
+        "//packages/angular_devkit/core",
         "@npm//@types/node",
         "@npm//rxjs",
     ],
