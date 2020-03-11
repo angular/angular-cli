@@ -4,57 +4,68 @@
 # found in the LICENSE file at https://angular.io/license
 package(default_visibility = ["//visibility:public"])
 
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
-# @external_begin
-load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
-# @external_end
-
 licenses(["notice"])
 
-# @angular-devkit/schematics
 
 ts_library(
-    name = "schematics",
+    name = "tasks",
     srcs = glob(
-        include = ["src/**/*.ts"],
+        include = ["**/*.ts"],
         exclude = [
-            "src/**/*_spec.ts",
-            "src/**/*_spec_large.ts",
-            "src/**/*_benchmark.ts",
+            "node/**/*.ts",
+            "**/*_spec.ts",
+            "**/*_benchmark.ts",
+            "tslint-fix/test/**/*",
         ],
     ),
-    module_name = "@angular-devkit/schematics",
-    module_root = "src/index.d.ts",
+    module_name = "@angular-devkit/schematics/tasks",
+    module_root = "index.d.ts",
     # The attribute below is needed in g3 to turn off strict typechecking
     # strict_checks = False,
     deps = [
+        "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",  # TODO: get rid of this for 6.0
+        "//packages/angular_devkit/core/node",
         "@npm//@types/node",
+        "@npm//ora",
         "@npm//rxjs",
+        "@npm//tslint",
+        "@npm//typescript",
     ],
 )
 
 ts_library(
-    name = "schematics_test_lib",
+    name = "tasks_test_lib",
     testonly = True,
     srcs = glob(
         include = [
-            "src/**/*_spec.ts",
-            "src/**/*_spec_large.ts",
+            "**/*_spec.ts",
+            "**/*_spec_large.ts",
+            "tslint-fix/test/**/*.ts",
         ],
+        exclude = [
+            "node/**/*.ts",
+        ],        
     ),
+    data = [
+        "tslint-fix/test/collection.json",
+        "tslint-fix/test/rules/customRuleRule.js",
+    ],
+    # The attribute below is needed in g3 to turn off strict typechecking
+    # strict_checks = False,
     # @external_begin
     tsconfig = "//:tsconfig-test.json",
     # @external_end
     deps = [
-        ":schematics",
+        ":tasks",
+        "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/testing",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
+        "//packages/angular_devkit/core/node/testing",
         "@npm//@types/jasmine",
         "@npm//@types/node",
         "@npm//rxjs",
@@ -62,30 +73,10 @@ ts_library(
 )
 
 jasmine_node_test(
-    name = "schematics_test",
-    srcs = [":schematics_test_lib"],
+    name = "tasks_test",
+    srcs = [":tasks_test_lib"],
     deps = [
         "@npm//jasmine",
         "@npm//source-map",
     ],
 )
-
-# @external_begin
-pkg_npm(
-    name = "npm_package",
-    deps = [
-        ":schematics",
-        "//packages/angular_devkit/schematics/tasks",
-        "//packages/angular_devkit/schematics/testing",
-        "//packages/angular_devkit/schematics/tools",
-    ],
-)
-
-pkg_tar(
-    name = "npm_package_archive",
-    srcs = [":npm_package"],
-    extension = "tar.gz",
-    strip_prefix = "./npm_package",
-    tags = ["manual"],
-)
-# @external_end

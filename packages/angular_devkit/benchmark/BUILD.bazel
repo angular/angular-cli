@@ -26,7 +26,7 @@ ts_library(
     module_root = "src/index.d.ts",
     deps = [
         "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core:node",
+        "//packages/angular_devkit/core/node",
         "@npm//@types/minimist",
         "@npm//@types/node",
         "@npm//rxjs",
@@ -55,7 +55,7 @@ ts_library(
     deps = [
         ":benchmark",
         "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core:node",
+        "//packages/angular_devkit/core/node",
         "@npm//@types/jasmine",
         "@npm//@types/node",
         "@npm//rxjs",
