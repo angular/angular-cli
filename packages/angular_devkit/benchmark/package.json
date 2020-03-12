@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@angular-devkit/core": "0.0.0",
-    "minimist": "1.2.3",
+    "minimist": "1.2.4",
     "pidusage": "2.0.18",
     "pidtree": "0.3.0",
     "rxjs": "6.5.4",
