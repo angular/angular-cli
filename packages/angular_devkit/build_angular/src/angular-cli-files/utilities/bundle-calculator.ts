@@ -167,17 +167,16 @@ abstract class Calculator {
     } else {
       // No differential builds, get the chunk size by summing its assets.
       return chunk.files
-          .filter((file) => !file.endsWith('.map'))
-          .map((file: string) => {
+          .filter(file => !file.endsWith('.map'))
+          .map(file => {
             const asset = this.assets.find((asset) => asset.name === file);
             if (!asset) {
               throw new Error(`Could not find asset for file: ${file}`);
             }
 
-            return asset;
+            return asset.size;
           })
-          .map((asset) => asset.size)
-          .reduce((l, r) => l + r);
+          .reduce((l, r) => l + r, 0);
     }
   }
 }
@@ -197,8 +196,8 @@ class BundleCalculator extends Calculator {
     const buildSizes = Object.values(DifferentialBuildType).map((buildType) => {
       const size = this.chunks
           .filter(chunk => chunk.names.indexOf(budgetName) !== -1)
-          .map((chunk) => this.calculateChunkSize(chunk, buildType))
-          .reduce((l, r) => l + r);
+          .map(chunk => this.calculateChunkSize(chunk, buildType))
+          .reduce((l, r) => l + r, 0);
 
       return {size, label: `${this.budget.name}-${buildType}`};
     });
@@ -223,8 +222,8 @@ class InitialCalculator extends Calculator {
         label: `initial-${buildType}`,
         size: this.chunks
             .filter(chunk => chunk.initial)
-            .map((chunk) => this.calculateChunkSize(chunk, buildType))
-            .reduce((l, r) => l + r),
+            .map(chunk => this.calculateChunkSize(chunk, buildType))
+            .reduce((l, r) => l + r, 0),
       };
     });
 
@@ -244,7 +243,7 @@ class InitialCalculator extends Calculator {
 class AllScriptCalculator extends Calculator {
   calculate() {
     const size = this.assets
-      .filter((asset) => asset.name.endsWith('.js'))
+      .filter(asset => asset.name.endsWith('.js'))
       .map(asset => asset.size)
       .reduce((total: number, size: number) => total + size, 0);
 
