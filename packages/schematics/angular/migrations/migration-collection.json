@@ -54,6 +54,11 @@
       "version": "9.0.2",
       "factory": "./update-9/schematic-options",
       "description": "Replace deprecated 'styleext' and 'spec' Angular schematic options."
+    },
+    "tslint-version-6": {
+      "version": "10.0.0-beta.0",
+      "factory": "./update-10/update-tslint",
+      "description": "Update tslint to version 6."
     }
   }
 }
