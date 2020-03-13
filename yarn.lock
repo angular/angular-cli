@@ -945,19 +945,6 @@
   resolved "https://registry.yarnpkg.com/@npmcli/ci-detect/-/ci-detect-1.2.0.tgz#0df142a1ac3bba6cbf2e9da1a6994cd898e32c95"
   integrity sha512-JtktVH7ASBVIWsQTFlFpeOzhBJskvoBCTfeeRhhZy7ybATcUvwiwotZ8j5rkqUUyB69lIy/AvboiiiGBjYBKBA==
 
-"@npmcli/git@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@npmcli/git/-/git-1.0.1.tgz#b99b75b8784dfa30db5b37965b2e76fec5a480a7"
-  integrity sha512-686TE8b/zjY7S45uGzUNre8TZNAwhaTOqWWkn2nSIht2ZE/PUeTPBwuiY8bkLMHzhZJjPRa03MQYHtlIcO0kxg==
-  dependencies:
-    "@npmcli/promise-spawn" "^1.1.0"
-    mkdirp "^1.0.3"
-    npm-pick-manifest "^6.0.0"
-    promise-inflight "^1.0.1"
-    promise-retry "^1.1.1"
-    unique-filename "^1.1.1"
-    which "^2.0.2"
-
 "@npmcli/git@^2.0.1":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@npmcli/git/-/git-2.0.1.tgz#d7ecaa9c945de6bb1af5a7e6ea634771193c168b"
@@ -8446,35 +8433,6 @@ package-json@^6.3.0:
     registry-url "^5.0.0"
     semver "^6.2.0"
 
-pacote@11.1.1:
-  version "11.1.1"
-  resolved "https://registry.yarnpkg.com/pacote/-/pacote-11.1.1.tgz#dc0db0635d86e0a34fbf163f5d745f07739d6296"
-  integrity sha512-oQ6vCUTFnYTs28UuQ/hqDl2Q+xfXNWGvoU8y6veWWRm6MjCsmFRmMiFBZFSTmWLdmuasnOunkZeoUHYTKyyCng==
-  dependencies:
-    "@npmcli/git" "^1.0.1"
-    "@npmcli/installed-package-contents" "^1.0.5"
-    "@npmcli/promise-spawn" "^1.1.0"
-    cacache "^15.0.0"
-    chownr "^1.1.4"
-    fs-minipass "^2.1.0"
-    infer-owner "^1.0.4"
-    lru-cache "^5.1.1"
-    minipass "^3.0.1"
-    minipass-fetch "^1.2.1"
-    mkdirp "^1.0.3"
-    npm-package-arg "^8.0.0"
-    npm-packlist "^2.1.0"
-    npm-pick-manifest "^6.0.0"
-    npm-registry-fetch "^8.0.0"
-    osenv "^0.1.5"
-    promise-inflight "^1.0.1"
-    promise-retry "^1.1.1"
-    read-package-json-fast "^1.1.3"
-    semver "^7.1.3"
-    ssri "^8.0.0"
-    tar "^6.0.1"
-    which "^2.0.2"
-
 pacote@11.1.2:
   version "11.1.2"
   resolved "https://registry.yarnpkg.com/pacote/-/pacote-11.1.2.tgz#a3d0f8ba6f7976b70b8bb84d153b275a20d84cfa"
@@ -10018,10 +9976,10 @@ rollup@1.31.1:
     "@types/node" "*"
     acorn "^7.1.0"
 
-rollup@2.0.5:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.0.5.tgz#55b8c0d62360a095e322ac7425b13ac5a97edcb4"
-  integrity sha512-bECGz+RYpw3NYCvLnABu3REUROYbnZsfQZA37ekm/KlgKt/fyxBNN4waBnlLwzx4r6jNBs56SbTn7PEgJjw3fQ==
+rollup@2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.0.6.tgz#865d6bb15a28cff3429ea1dc57236013661cb9de"
+  integrity sha512-P42IlI6a/bxh52ed8hEXXe44LcHfep2f26OZybMJPN1TTQftibvQEl3CWeOmJrzqGbFxOA000QXDWO9WJaOQpA==
   optionalDependencies:
     fsevents "~2.1.2"
 
