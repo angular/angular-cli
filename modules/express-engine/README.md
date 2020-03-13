@@ -12,6 +12,8 @@ To use it, set the engine and then route requests to it
 import * as express from 'express';
 import { ngExpressEngine } from '@nguniversal/express-engine';
 
+const app = express();
+
 // Set the engine
 app.engine('html', ngExpressEngine({
   bootstrap: ServerAppModule // Give it a module to bootstrap
