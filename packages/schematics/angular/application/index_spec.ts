@@ -378,7 +378,7 @@ describe('Application Schematic', () => {
       const content = JSON.parse(tree.readContent('/tslint.json'));
       expect(content.extends).toMatch('tslint:recommended');
       expect(content.rules['component-selector'][2]).toMatch('app');
-      expect(content.rules['trailing-comma']).toBeDefined();
+      expect(content.rules['no-console']).toBeDefined();
     });
 
     it(`should create correct paths when 'newProjectRoot' is blank`, async () => {
