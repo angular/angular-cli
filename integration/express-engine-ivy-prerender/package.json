@@ -31,7 +31,7 @@
     "@angular/platform-server": "file:../../node_modules/@angular/platform-server",
     "@angular/router": "file:../../node_modules/@angular/router",
     "@nguniversal/express-engine": "file:../../dist/modules-dist/express-engine",
-    "angular-in-memory-web-api": "^0.9.0",
+    "angular-in-memory-web-api": "^0.10.0",
     "express": "file:../../node_modules/express",
     "rxjs": "file:../../node_modules/rxjs",
     "zone.js": "file:../../node_modules/zone.js"
