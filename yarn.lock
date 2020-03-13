@@ -945,19 +945,6 @@
   resolved "https://registry.yarnpkg.com/@npmcli/ci-detect/-/ci-detect-1.2.0.tgz#0df142a1ac3bba6cbf2e9da1a6994cd898e32c95"
   integrity sha512-JtktVH7ASBVIWsQTFlFpeOzhBJskvoBCTfeeRhhZy7ybATcUvwiwotZ8j5rkqUUyB69lIy/AvboiiiGBjYBKBA==
 
-"@npmcli/git@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@npmcli/git/-/git-1.0.1.tgz#b99b75b8784dfa30db5b37965b2e76fec5a480a7"
-  integrity sha512-686TE8b/zjY7S45uGzUNre8TZNAwhaTOqWWkn2nSIht2ZE/PUeTPBwuiY8bkLMHzhZJjPRa03MQYHtlIcO0kxg==
-  dependencies:
-    "@npmcli/promise-spawn" "^1.1.0"
-    mkdirp "^1.0.3"
-    npm-pick-manifest "^6.0.0"
-    promise-inflight "^1.0.1"
-    promise-retry "^1.1.1"
-    unique-filename "^1.1.1"
-    which "^2.0.2"
-
 "@npmcli/git@^2.0.1":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@npmcli/git/-/git-2.0.1.tgz#d7ecaa9c945de6bb1af5a7e6ea634771193c168b"
@@ -8007,13 +7994,12 @@ npm-normalize-package-bin@^1.0.0, npm-normalize-package-bin@^1.0.1:
   resolved "https://registry.yarnpkg.com/npm-normalize-package-bin/-/npm-normalize-package-bin-1.0.1.tgz#6e79a41f23fd235c0623218228da7d9c23b8f6e2"
   integrity sha512-EPfafl6JL5/rU+ot6P3gRSCpPDW5VmIzX959Ob1+ySFUuuYHWHekXpwdUZcKP5C+DS4GEtdJluwBjnsNDl+fSA==
 
-npm-package-arg@8.0.0, npm-package-arg@^8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/npm-package-arg/-/npm-package-arg-8.0.0.tgz#b519989b569efffa1fa050fb22a3c3c322d4bcc5"
-  integrity sha512-JgqZHCEUKvhX7EehLNdySiuB227a0QYra9wpZOkW+jvwsRYKkce7y5Rv2axkxScJU1EP+L32jT2PLhQz7IWHlw==
+npm-package-arg@8.0.1:
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/npm-package-arg/-/npm-package-arg-8.0.1.tgz#9d76f8d7667b2373ffda60bb801a27ef71e3e270"
+  integrity sha512-/h5Fm6a/exByzFSTm7jAyHbgOqErl9qSNJDQF32Si/ZzgwT2TERVxRxn3Jurw1wflgyVVAxnFR4fRHPM7y1ClQ==
   dependencies:
     hosted-git-info "^3.0.2"
-    osenv "^0.1.5"
     semver "^7.0.0"
     validate-npm-package-name "^3.0.0"
 
@@ -8025,6 +8011,16 @@ npm-package-arg@8.0.0, npm-package-arg@^8.0.0:
     hosted-git-info "^2.7.1"
     osenv "^0.1.5"
     semver "^5.6.0"
+    validate-npm-package-name "^3.0.0"
+
+npm-package-arg@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/npm-package-arg/-/npm-package-arg-8.0.0.tgz#b519989b569efffa1fa050fb22a3c3c322d4bcc5"
+  integrity sha512-JgqZHCEUKvhX7EehLNdySiuB227a0QYra9wpZOkW+jvwsRYKkce7y5Rv2axkxScJU1EP+L32jT2PLhQz7IWHlw==
+  dependencies:
+    hosted-git-info "^3.0.2"
+    osenv "^0.1.5"
+    semver "^7.0.0"
     validate-npm-package-name "^3.0.0"
 
 npm-packlist@^2.1.0:
@@ -8445,35 +8441,6 @@ package-json@^6.3.0:
     registry-auth-token "^4.0.0"
     registry-url "^5.0.0"
     semver "^6.2.0"
-
-pacote@11.1.1:
-  version "11.1.1"
-  resolved "https://registry.yarnpkg.com/pacote/-/pacote-11.1.1.tgz#dc0db0635d86e0a34fbf163f5d745f07739d6296"
-  integrity sha512-oQ6vCUTFnYTs28UuQ/hqDl2Q+xfXNWGvoU8y6veWWRm6MjCsmFRmMiFBZFSTmWLdmuasnOunkZeoUHYTKyyCng==
-  dependencies:
-    "@npmcli/git" "^1.0.1"
-    "@npmcli/installed-package-contents" "^1.0.5"
-    "@npmcli/promise-spawn" "^1.1.0"
-    cacache "^15.0.0"
-    chownr "^1.1.4"
-    fs-minipass "^2.1.0"
-    infer-owner "^1.0.4"
-    lru-cache "^5.1.1"
-    minipass "^3.0.1"
-    minipass-fetch "^1.2.1"
-    mkdirp "^1.0.3"
-    npm-package-arg "^8.0.0"
-    npm-packlist "^2.1.0"
-    npm-pick-manifest "^6.0.0"
-    npm-registry-fetch "^8.0.0"
-    osenv "^0.1.5"
-    promise-inflight "^1.0.1"
-    promise-retry "^1.1.1"
-    read-package-json-fast "^1.1.3"
-    semver "^7.1.3"
-    ssri "^8.0.0"
-    tar "^6.0.1"
-    which "^2.0.2"
 
 pacote@11.1.2:
   version "11.1.2"
