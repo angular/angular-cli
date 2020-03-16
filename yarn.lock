@@ -921,10 +921,10 @@
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.2.tgz#26520bf09abe4a5644cd5414e37125a8954241dd"
   integrity sha512-tsAQNx32a8CoFhjhijUIhI4kccIAgmGhy8LZMZgGfmXcpMbPRUqn5LWmgRttILi6yeGmBJd2xsPkFMs0PzgPCw==
 
-"@jsdevtools/coverage-istanbul-loader@3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@jsdevtools/coverage-istanbul-loader/-/coverage-istanbul-loader-3.0.0.tgz#2e8b8ce7af34786000794e850693b90866465c11"
-  integrity sha512-NhRFmiDaBZehB0t9Ce1FJGnmF6QLfduZQUyoTasCeSFRup1mKJ8JhAZzYuJhjixy475KLRWxMW9oLLOiLim2NQ==
+"@jsdevtools/coverage-istanbul-loader@3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@jsdevtools/coverage-istanbul-loader/-/coverage-istanbul-loader-3.0.3.tgz#102e414b02ae2f0b3c7fd45a705601e1fd4867c5"
+  integrity sha512-TAdNkeGB5Fe4Og+ZkAr1Kvn9by2sfL44IAHFtxlh1BA1XJ5cLpO9iSNki5opWESv3l3vSHsZ9BNKuqFKbEbFaA==
   dependencies:
     convert-source-map "^1.7.0"
     istanbul-lib-instrument "^4.0.1"
