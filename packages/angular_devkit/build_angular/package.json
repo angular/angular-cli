@@ -15,7 +15,7 @@
     "@babel/generator": "7.8.6",
     "@babel/preset-env": "7.8.6",
     "@babel/template": "7.8.6",
-    "@jsdevtools/coverage-istanbul-loader": "3.0.0",
+    "@jsdevtools/coverage-istanbul-loader": "3.0.3",
     "@ngtools/webpack": "0.0.0",
     "ajv": "6.12.0",
     "autoprefixer": "9.7.4",
