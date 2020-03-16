@@ -2020,7 +2020,7 @@
             "format": {
               "type": "string",
               "description": "Output format (prose, json, stylish, verbose, pmd, msbuild, checkstyle, vso, fileslist, codeFrame).",
-              "default": "prose",
+              "default": "stylish",
               "anyOf": [
                 {
                   "enum": [
