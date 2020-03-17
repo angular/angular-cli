@@ -123,7 +123,7 @@
     "node-fetch": "^2.2.0",
     "npm-registry-client": "8.6.0",
     "ora": "^4.0.2",
-    "pacote": "11.1.2",
+    "pacote": "11.1.4",
     "pidtree": "^0.3.0",
     "pidusage": "^2.0.17",
     "prettier": "^1.16.4",
@@ -145,7 +145,7 @@
     "tslint-no-circular-imports": "^0.7.0",
     "tslint-sonarts": "1.9.0",
     "typescript": "3.8.3",
-    "verdaccio": "4.4.4"
+    "verdaccio": "4.5.1"
   },
   "husky": {
     "hooks": {
