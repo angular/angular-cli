@@ -9827,10 +9827,10 @@ tree-kill@1.2.2, tree-kill@^1.2.1:
   resolved "https://registry.yarnpkg.com/tree-kill/-/tree-kill-1.2.2.tgz#4ca09a9092c88b73a7cdc5e8a01b507b0790a0cc"
   integrity sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==
 
-ts-node@8.6.2:
-  version "8.6.2"
-  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.6.2.tgz#7419a01391a818fbafa6f826a33c1a13e9464e35"
-  integrity sha512-4mZEbofxGqLL2RImpe3zMJukvEvcO1XP8bj8ozBPySdCUXEcU5cIRwR0aM3R+VoZq7iXc8N86NC0FspGRqP4gg==
+ts-node@8.7.0:
+  version "8.7.0"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.7.0.tgz#266186947596bef9f3a034687595b30e31b20976"
+  integrity sha512-s659CsHrsxaRVDEleuOkGvbsA0rWHtszUNEt1r0CgAFN5ZZTQtDzpsluS7W5pOGJIa1xZE8R/zK4dEs+ldFezg==
   dependencies:
     arg "^4.1.0"
     diff "^4.0.1"
