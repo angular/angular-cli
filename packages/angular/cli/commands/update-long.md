@@ -10,8 +10,8 @@ To update from one major version to another, use the format
 `ng update @angular/cli@^<major_version> @angular/core@^<major_version>`.
 
 We recommend that you always update to the latest patch version, as it contains fixes we released since the initial major release.
-For example, use the following command to take the latest 7.x.x version and use that to update.
+For example, use the following command to take the latest 9.x.x version and use that to update.
 
-`ng update @angular/cli@^7 @angular/core@^7`
+`ng update @angular/cli@^9 @angular/core@^9`
 
 For detailed information and guidance on updating your application, see the interactive [Angular Update Guide](https://update.angular.io/).
