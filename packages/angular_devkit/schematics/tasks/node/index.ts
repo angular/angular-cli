@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { TaskExecutorFactory } from '../../src';
-import { NodePackageName, NodePackageTaskFactoryOptions } from '../node-package/options';
+import { NodePackageName, NodePackageTaskFactoryOptions } from '../package-manager/options';
 import {
   RepositoryInitializerName,
   RepositoryInitializerTaskFactoryOptions,
@@ -17,7 +17,7 @@ import { TslintFixName } from '../tslint-fix/options';
 export class BuiltinTaskExecutor {
   static readonly NodePackage: TaskExecutorFactory<NodePackageTaskFactoryOptions> = {
     name: NodePackageName,
-    create: (options) => import('../node-package/executor').then(mod => mod.default(options)),
+    create: (options) => import('../package-manager/executor').then(mod => mod.default(options)),
   };
   static readonly RepositoryInitializer:
     TaskExecutorFactory<RepositoryInitializerTaskFactoryOptions> = {
