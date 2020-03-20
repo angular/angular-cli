@@ -22,7 +22,13 @@ import * as path from 'path';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import { minify } from 'terser';
 import * as v8 from 'v8';
-import { SourceMapSource } from 'webpack-sources';
+import {
+  ConcatSource,
+  OriginalSource,
+  ReplaceSource,
+  Source,
+  SourceMapSource,
+} from 'webpack-sources';
 import { allowMangle, allowMinify, shouldBeautify } from './environment-options';
 import { I18nOptions } from './i18n-options';
 
@@ -48,7 +54,7 @@ export interface ProcessBundleOptions {
   integrityAlgorithm?: 'sha256' | 'sha384' | 'sha512';
   runtimeData?: ProcessBundleResult[];
   replacements?: [string, string][];
-  supportedBrowsers?: string [] | Record<string, string>;
+  supportedBrowsers?: string[] | Record<string, string>;
 }
 
 export interface ProcessBundleResult {
@@ -665,7 +671,7 @@ export async function inlineLocales(options: InlineOptions) {
     fs.writeFileSync(outputPath, transformResult.code);
 
     if (inputMap && transformResult.map) {
-      const outputMap = mergeSourceMaps(
+      const outputMap = await mergeSourceMaps(
         options.code,
         inputMap,
         transformResult.code,
@@ -686,7 +692,6 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
     return { file: options.filename, diagnostics: [], count: 0 };
   }
 
-  const { default: MagicString } = await import('magic-string');
   const { default: generate } = await import('@babel/generator');
   const utils = await import(
     // tslint:disable-next-line: trailing-comma no-implicit-dependencies
@@ -702,11 +707,21 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
     return inlineCopyOnly(options);
   }
 
-  // tslint:disable-next-line: no-any
-  let content = new MagicString(options.code, { filename: options.filename } as any);
   const inputMap = options.map && (JSON.parse(options.map) as RawSourceMap);
-  let contentClone;
+  // Cleanup source root otherwise it will be added to each source entry
+  const mapSourceRoot = inputMap && inputMap.sourceRoot;
+  if (inputMap) {
+    delete inputMap.sourceRoot;
+  }
+
   for (const locale of i18n.inlineLocales) {
+    const content = new ReplaceSource(
+      inputMap
+        ? // tslint:disable-next-line: no-any
+          new SourceMapSource(options.code, options.filename, inputMap as any)
+        : new OriginalSource(options.code, options.filename),
+    );
+
     const isSourceLocale = locale === i18n.sourceLocale;
     // tslint:disable-next-line: no-any
     const translations: any = isSourceLocale ? {} : i18n.locales[locale].translation || {};
@@ -722,48 +737,41 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
       const expression = utils.buildLocalizeReplacement(translated[0], translated[1]);
       const { code } = generate(expression);
 
-      content.overwrite(position.start, position.end, code);
+      content.replace(position.start, position.end - 1, code);
     }
 
+    let outputSource: Source = content;
     if (options.setLocale) {
-      const setLocaleText = `var $localize=Object.assign(void 0===$localize?{}:$localize,{locale:"${locale}"});`;
-      contentClone = content.clone();
-      content.prepend(setLocaleText);
+      const setLocaleText = `var $localize=Object.assign(void 0===$localize?{}:$localize,{locale:"${locale}"});\n`;
 
       // If locale data is provided, load it and prepend to file
+      let localeDataSource: Source | null = null;
       const localeDataPath = i18n.locales[locale] && i18n.locales[locale].dataPath;
       if (localeDataPath) {
-        const localDataContent = await loadLocaleData(localeDataPath, true);
-        // The semicolon ensures that there is no syntax error between statements
-        content.prepend(localDataContent + ';');
+        const localeDataContent = await loadLocaleData(localeDataPath, true);
+        localeDataSource = new OriginalSource(localeDataContent, path.basename(localeDataPath));
       }
+
+      outputSource = localeDataSource
+        // The semicolon ensures that there is no syntax error between statements
+        ? new ConcatSource(setLocaleText, localeDataSource, ';\n', content)
+        : new ConcatSource(setLocaleText, content);
     }
 
-    const output = content.toString();
+    const { source: outputCode, map: outputMap } = outputSource.sourceAndMap();
     const outputPath = path.join(
       options.outputPath,
       i18n.flatOutput ? '' : locale,
       options.filename,
     );
-    fs.writeFileSync(outputPath, output);
+    fs.writeFileSync(outputPath, outputCode);
 
-    if (inputMap) {
-      const contentMap = content.generateMap();
-      const outputMap = mergeSourceMaps(
-        options.code,
-        inputMap,
-        output,
-        contentMap,
-        options.filename,
-        options.code.length > FAST_SOURCEMAP_THRESHOLD,
-      );
-
+    if (inputMap && outputMap) {
+      outputMap.file = options.filename;
+      if (mapSourceRoot) {
+        outputMap.sourceRoot = mapSourceRoot;
+      }
       fs.writeFileSync(outputPath + '.map', JSON.stringify(outputMap));
-    }
-
-    if (contentClone) {
-      content = contentClone;
-      contentClone = undefined;
     }
   }
 
