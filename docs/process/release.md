@@ -81,6 +81,20 @@ instance), then you will need to fetch the contributor's branch for your local
 Git instance to have knowledge of the commit being cherry picked onto the patch
 branch.
 
+### Maintaining LTS branches
+
+Releases that are under Long Term Support (LTS) are listed on [angular.io](https://angular.io/guide/releases#support-policy-and-schedule).
+
+Since there could be more than one LTS branch at any one time, PR authors who want to
+merge commits into LTS branches must open a pull request against the specific base branch they'd like to target.
+
+In general, cherry picks for LTS should only be done if it meets one of the criteria below:
+
+1. It addresses a critical security vulnerability.
+2. It fixes a breaking change in the external environment.  
+   For example, this could happen if one of the dependencies is deleted from NPM.
+3. It fixes a legitimate failure on CI for a particular LTS branch.
+
 # Release
 
 ## Before releasing
