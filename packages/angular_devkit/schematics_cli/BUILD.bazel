@@ -5,6 +5,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
 
 licenses(["notice"])
 
@@ -20,19 +21,46 @@ ts_library(
             "bin/**/*_benchmark.ts",
         ],
     ),
-    module_name = "@angular-devkit/schematics-cli",
-    module_root = "bin",
     # The attribute below is needed in g3 to turn off strict typechecking
     # strict_checks = False,
+    data = glob(["**/*.json"]),
+    module_name = "@angular-devkit/schematics-cli",
+    module_root = "bin/schematics.d.ts",
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/tools",
+        "//packages/schematics/schematics",
         "@npm//@types/inquirer",
         "@npm//@types/minimist",
         "@npm//@types/node",
+        "@npm//inquirer",
+        "@npm//minimist",
         "@npm//rxjs",
+        "@npm//symbol-observable",
     ],
+)
+
+ts_library(
+    name = "schematics_cli_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "bin/**/*_spec.ts",
+        ],
+    ),
+    # strict_checks = False,
+    tsconfig = "//:tsconfig-test.json",
+    deps = [
+        ":schematics_cli",
+        "@npm//@types/jasmine",
+        "@npm//@types/node",
+    ],
+)
+
+jasmine_node_test(
+    name = "schematics_cli_test",
+    srcs = [":schematics_cli_test_lib"],
 )
