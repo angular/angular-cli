@@ -26,10 +26,11 @@ ts_library(
             "src/**/*_benchmark.ts",
         ],
     ),
-    module_name = "@angular-devkit/schematics",
-    module_root = "src/index.d.ts",
     # The attribute below is needed in g3 to turn off strict typechecking
     # strict_checks = False,
+    data = glob(["**/*.json"]),
+    module_name = "@angular-devkit/schematics",
+    module_root = "src/index.d.ts",
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",  # TODO: get rid of this for 6.0
