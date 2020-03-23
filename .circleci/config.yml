@@ -149,6 +149,7 @@ jobs:
       # Run the skylark linter to check our Bazel rules
       - run: 'yarn bazel:lint ||
               (echo -e "\n.bzl files have lint errors. Please run ''yarn bazel:lint-fix''"; exit 1)'
+      - run: yarn -s ts-circular-deps:check
 
   validate:
     executor: action-executor
