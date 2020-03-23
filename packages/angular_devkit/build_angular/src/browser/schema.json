@@ -380,6 +380,14 @@
       "type": "boolean",
       "description": "Concatenate modules with Rollup before bundling them with Webpack.",
       "default": false
+    },
+    "allowedCommonJsDependencies": {
+      "description": "A list of CommonJS packages that are allowed to be used without a built time warning.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
     }
   },
   "additionalProperties": false,

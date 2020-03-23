@@ -7,6 +7,7 @@
  */
 import { LicenseWebpackPlugin } from 'license-webpack-plugin';
 import * as webpack from 'webpack';
+import { CommonJsUsageWarnPlugin } from '../../plugins/webpack';
 import { WebpackConfigOptions } from '../build-options';
 import { getSourceMapDevTool, isPolyfillsEntry, normalizeExtraEntryPoints } from './utils';
 
@@ -23,12 +24,14 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
     vendorChunk,
     commonChunk,
     styles,
+    allowedCommonJsDependencies,
+    optimization,
   } = buildOptions;
 
   const extraPlugins = [];
 
   let isEval = false;
-  const { styles: stylesOptimization, scripts: scriptsOptimization } = buildOptions.optimization;
+  const { styles: stylesOptimization, scripts: scriptsOptimization } = optimization;
   const {
     styles: stylesSourceMap,
     scripts: scriptsSourceMap,
@@ -123,7 +126,12 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
         },
       },
     },
-    plugins: extraPlugins,
+    plugins: [
+      new CommonJsUsageWarnPlugin({
+        allowedDepedencies: allowedCommonJsDependencies,
+      }),
+      ...extraPlugins,
+    ],
     node: false,
   };
 }
