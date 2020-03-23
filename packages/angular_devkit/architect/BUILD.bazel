@@ -6,6 +6,7 @@
 licenses(["notice"])  # MIT
 
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 # @external_begin
@@ -60,6 +61,32 @@ ts_library(
         "@npm//@types/node",
         "@npm//rxjs",
     ],
+)
+
+ts_library(
+    name = "architect_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "src/**/*_spec.ts",
+            "src/**/*_spec_large.ts",
+        ],
+    ),
+    # strict_checks = False,
+    tsconfig = "//:tsconfig-test.json",
+    deps = [
+        ":architect",
+        "//packages/angular_devkit/architect/testing",
+        "//packages/angular_devkit/core",
+        "@npm//@types/jasmine",
+        "@npm//@types/node",
+        "@npm//rxjs",
+    ],
+)
+
+jasmine_node_test(
+    name = "architect_test",
+    srcs = [":architect_test_lib"],
 )
 
 # @external_begin
