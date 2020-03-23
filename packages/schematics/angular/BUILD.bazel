@@ -47,8 +47,18 @@ ts_library(
       "//packages/schematics/angular:" + src.replace(".json", ".ts") 
       for (src, _) in ALL_SCHEMA_TARGETS
     ],
-    module_name = "@schematics/angular",
     # strict_checks = False,
+    data = glob(
+        include = [
+            "collection.json",
+            "package.json",
+            "migrations/migration-collection.json",
+            "*/schema.json",
+            "*/files/**/*",
+            "*/other-files/**/*",
+        ],
+    ),
+    module_name = "@schematics/angular",
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
@@ -77,13 +87,6 @@ ts_library(
             "**/*_spec.ts",
             "**/*_spec_large.ts",
             "utility/test/**/*.ts",
-        ],
-    ),
-    data = glob(
-        include = [
-            "**/*.json",
-            "*/files/**",
-            "*/other-files/**",
         ],
     ),
     # @external_begin
