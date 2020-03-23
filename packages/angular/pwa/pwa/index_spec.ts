@@ -12,7 +12,7 @@ import { Schema as PwaOptions } from './schema';
 describe('PWA Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@angular/pwa',
-    path.join(__dirname, '../collection.json'),
+    require.resolve(path.join(__dirname, '../collection.json')),
   );
   const defaultOptions: PwaOptions = {
     project: 'bar',
