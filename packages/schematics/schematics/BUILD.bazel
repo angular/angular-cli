@@ -26,6 +26,18 @@ ts_library(
       "//packages/schematics/schematics:blank/schema.ts",
       "//packages/schematics/schematics:schematic/schema.ts",
     ],
+    data = glob(
+        include = [
+            "collection.json",
+            "package.json",
+            "blank/schema.json",
+            "blank/project-files/**/*",
+            "blank/schematic-files/**/*",
+            "schematic/schema.json",
+            "schematic/files/**/*",
+        ],
+    ),
+    module_name = "@schematics/schematics",
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
