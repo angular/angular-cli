@@ -29,8 +29,8 @@ import { I18nOptions } from './i18n-options';
 const cacache = require('cacache');
 const deserialize = ((v8 as unknown) as { deserialize(buffer: Buffer): unknown }).deserialize;
 
-// If code size is larger than 1MB, consider lower fidelity but faster sourcemap merge
-const FAST_SOURCEMAP_THRESHOLD = 1024 * 1024;
+// If code size is larger than 500KB, consider lower fidelity but faster sourcemap merge
+const FAST_SOURCEMAP_THRESHOLD = 500 * 1024;
 
 export interface ProcessBundleOptions {
   filename: string;
