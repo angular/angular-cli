@@ -44,7 +44,7 @@ export default async function() {
   await silentNpm('install');
 
   // Update Angular.
-  await ng('update', '@angular/core', ...extraUpdateArgs);
+  await ng('update', '@angular/core@8', ...extraUpdateArgs);
 
   // Run CLI commands.
   await ng('generate', 'component', 'my-comp');
