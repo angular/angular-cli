@@ -6,6 +6,7 @@
 licenses(["notice"])  # MIT
 
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 package(default_visibility = ["//visibility:public"])
@@ -220,4 +221,28 @@ ts_json_schema(
     data = [
         "commands/definitions.json",
     ],
+)
+
+ts_library(
+    name = "angular-cli_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "**/*_spec.ts",
+            "**/*_spec_large.ts",
+        ],
+    ),
+    # strict_checks = False,
+    tsconfig = "//:tsconfig-test.json",
+    deps = [
+        ":angular-cli",
+        "//packages/angular_devkit/core",
+        "@npm//@types/jasmine",
+        "@npm//@types/node",
+    ],
+)
+
+jasmine_node_test(
+    name = "angular-cli_test",
+    srcs = [":angular-cli_test_lib"],
 )
