@@ -53,7 +53,7 @@ export function normalizeBrowserSchema(
     fileReplacements: normalizeFileReplacements(options.fileReplacements || [], syncHost, root),
     optimization: normalizeOptimization(options.optimization),
     sourceMap: normalizedSourceMapOptions,
-
+    preserveSymlinks: options.preserveSymlinks === undefined ? process.execArgv.includes('--preserve-symlinks') : options.preserveSymlinks,
     statsJson: options.statsJson || false,
     forkTypeChecker: options.forkTypeChecker || false,
     budgets: options.budgets || [],
