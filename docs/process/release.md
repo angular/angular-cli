@@ -18,7 +18,7 @@ TBD
 ## Merging PRs
 
 The list of PRs which are currently ready to merge (approved with passing status checks) can
-be found with [this search](https://github.com/angular/angular-cli/pulls?q=is%3Apr+is%3Aopen+label%3A%22PR+action%3A+merge%22).
+be found with [this search](https://github.com/angular/angular-cli/pulls?q=is%3Apr+is%3Aopen+label%3A%22PR+action%3A+merge%22+-is%3Adraft).
 This list should be checked daily and any ready PRs should be merged. For each
 PR, check the `PR target` label to understand where it should be merged to. If
 `master` is targetted, then click "Rebase and Merge". If the PR also targets a
@@ -101,7 +101,7 @@ In general, cherry picks for LTS should only be done if it meets one of the crit
 
 Make sure the CI is green.
 
-Consider if you need to update `packages/schematics/angular/utility/latest-versions.ts` to reflect changes in dependent versions.
+Consider if you need to update [`packages/schematics/angular/utility/latest-versions.ts`](https://github.com/angular/angular-cli/blob/master/packages/schematics/angular/utility/latest-versions.ts) to reflect changes in dependent versions.
 
 ## Shepparding
 
