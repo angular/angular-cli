@@ -87,8 +87,8 @@ export interface BuildOptions {
 
   /* Append script target version to filename. */
   esVersionInFileName?: boolean;
-
   experimentalRollupPass?: boolean;
+  allowedCommonJsDependencies?: string[];
 }
 
 export interface WebpackTestOptions extends BuildOptions {

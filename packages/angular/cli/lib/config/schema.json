@@ -974,6 +974,13 @@
                 "anonymous",
                 "use-credentials"
               ]
+            },
+            "allowedCommonJsDependencies": {
+              "description": "A list of CommonJS packages that are allowed to be used without a built time warning.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           "additionalProperties": false,
