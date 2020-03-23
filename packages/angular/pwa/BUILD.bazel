@@ -6,6 +6,7 @@
 licenses(["notice"])  # MIT
 
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 package(default_visibility = ["//visibility:public"])
@@ -27,10 +28,20 @@ ts_library(
     ) + [
       "//packages/angular/pwa:pwa/schema.ts",
     ],
+    data = glob(
+        include = [
+            "collection.json",
+            "package.json",
+            "pwa/schema.json",
+            "pwa/files/**/*",
+        ],
+    ),
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
+        "//packages/schematics/angular",
         "@npm//@types/node",
+        "@npm//parse5-html-rewriting-stream",
         "@npm//rxjs",
     ],
 )
@@ -38,4 +49,28 @@ ts_library(
 ts_json_schema(
     name = "pwa_schema",
     src = "pwa/schema.json",
+)
+
+ts_library(
+    name = "pwa_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "pwa/**/*_spec.ts",
+            "pwa/**/*_spec_large.ts",
+        ],
+    ),
+    # strict_checks = False,
+    tsconfig = "//:tsconfig-test.json",
+    deps = [
+        ":pwa",
+        "//packages/angular_devkit/schematics/testing",
+        "@npm//@types/jasmine",
+        "@npm//@types/node",
+    ],
+)
+
+jasmine_node_test(
+    name = "pwa_test",
+    srcs = [":pwa_test_lib"],
 )
