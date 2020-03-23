@@ -8,7 +8,7 @@
 // Protractor configuration file, see link for more information
 // https://github.com/angular/protractor/blob/master/lib/config.ts
 
-const { SpecReporter } = require('jasmine-spec-reporter');
+const { SpecReporter, StacktraceOption } = require('jasmine-spec-reporter');
 const { resolve } = require('path');
 
 exports.config = {
@@ -35,6 +35,10 @@ exports.config = {
     require('ts-node').register({
       project: resolve(__dirname, './e2e/tsconfig.e2e.json')
     });
-    jasmine.getEnv().addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
+    jasmine.getEnv().addReporter(new SpecReporter({
+      spec: {
+        displayStacktrace: StacktraceOption.PRETTY
+      }
+    }));
   }
 };

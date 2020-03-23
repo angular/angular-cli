@@ -11,7 +11,7 @@ import { logging } from '@angular-devkit/core';
 import { execSync, spawnSync } from 'child_process';
 import * as glob from 'glob';
 import 'jasmine';
-import { SpecReporter as JasmineSpecReporter } from 'jasmine-spec-reporter';
+import { SpecReporter as JasmineSpecReporter, StacktraceOption } from 'jasmine-spec-reporter';
 import { ParsedArgs } from 'minimist';
 import { join, normalize, relative } from 'path';
 import * as ts from 'typescript';
@@ -66,7 +66,7 @@ if (process.argv.indexOf('--spec-reporter') != -1) {
         displayNumber: true,
       },
       summary: {
-        displayStacktrace: true,
+        displayStacktrace: StacktraceOption.PRETTY,
         displayErrorMessages: true,
         displayDuration: true,
       },
