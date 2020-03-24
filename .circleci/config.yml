@@ -335,7 +335,7 @@ jobs:
 
 workflows:
   version: 2
-  default_workflow:
+  commits:
     jobs:
       # Linux jobs
       - setup
@@ -454,3 +454,28 @@ workflows:
               only: /^v\d+/
             branches:
               ignore: /.*/
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - 8.3.x
+    jobs:
+      - setup
+      - build:
+          requires:
+            - setup
+      - test:
+          requires:
+            - build
+      - test-large:
+          requires:
+            - build
+      - test-browsers:
+          requires:
+            - build
+      - e2e-cli:
+          requires:
+            - build
