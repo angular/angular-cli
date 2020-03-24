@@ -15,7 +15,7 @@
 var_1: &docker_image angular/ngcontainer:0.7.0
 var_2: &cache_key angular_devkit-{{ checksum "yarn.lock" }}-0.7.0
 var_3: &node_8_docker_image angular/ngcontainer:0.3.3
-var_3: &node_12_docker_image circleci/node:12.1-browsers
+var_4: &node_12_docker_image circleci/node:12.1-browsers
 
 # Settings common to each job
 anchor_1: &defaults
