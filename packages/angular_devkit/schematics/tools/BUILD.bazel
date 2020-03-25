@@ -9,7 +9,6 @@ load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 licenses(["notice"])
 
-
 ts_library(
     name = "tools",
     srcs = glob(
@@ -25,11 +24,11 @@ ts_library(
     # The attribute below is needed in g3 to turn off strict typechecking
     # strict_checks = False,
     deps = [
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/tasks/node",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
         "@npm//@types/node",
         "@npm//rxjs",
     ],
@@ -50,11 +49,11 @@ ts_library(
     # @external_end
     deps = [
         ":tools",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/testing",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
         "//tests/angular_devkit/schematics/tools/file-system-engine-host:file_system_engine_host_test_lib",
         "@npm//@types/jasmine",
         "@npm//@types/node",

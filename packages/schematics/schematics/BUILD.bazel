@@ -23,8 +23,8 @@ ts_library(
             "blank/schematic-files/**",
         ],
     ) + [
-      "//packages/schematics/schematics:blank/schema.ts",
-      "//packages/schematics/schematics:schematic/schema.ts",
+        "//packages/schematics/schematics:blank/schema.ts",
+        "//packages/schematics/schematics:schematic/schema.ts",
     ],
     data = glob(
         include = [

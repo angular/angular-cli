@@ -9,7 +9,6 @@ load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 licenses(["notice"])  # MIT License
 
-
 ts_library(
     name = "node",
     srcs = glob(
@@ -42,7 +41,7 @@ ts_library(
         ],
         exclude = [
             "testing/**/*.ts",
-        ],        
+        ],
     ),
     # @external_begin
     tsconfig = "//:tsconfig-test.json",

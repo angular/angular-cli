@@ -68,7 +68,7 @@ ts_library(
     # @external_end
     deps = [
         ":core",
-        "//packages/angular_devkit/core/node:node",
+        "//packages/angular_devkit/core/node",
         "@npm//@types/jasmine",
         "@npm//@types/node",
         "@npm//rxjs",
@@ -93,8 +93,8 @@ pkg_npm(
     name = "npm_package",
     deps = [
         ":core",
-        "//packages/angular_devkit/core/node:node",
-        "//packages/angular_devkit/core/node/testing:testing",
+        "//packages/angular_devkit/core/node",
+        "//packages/angular_devkit/core/node/testing",
     ],
 )
 

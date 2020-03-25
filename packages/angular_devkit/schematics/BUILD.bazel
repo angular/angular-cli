@@ -53,9 +53,9 @@ ts_library(
     # @external_end
     deps = [
         ":schematics",
-        "//packages/angular_devkit/schematics/testing",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
+        "//packages/angular_devkit/schematics/testing",
         "@npm//@types/jasmine",
         "@npm//@types/node",
         "@npm//rxjs",

@@ -8,7 +8,6 @@ load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 licenses(["notice"])
 
-
 ts_library(
     name = "testing",
     srcs = glob(
@@ -17,11 +16,11 @@ ts_library(
     module_name = "@angular-devkit/schematics/testing",
     module_root = "index.d.ts",
     deps = [
+        "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/tasks/node",
         "//packages/angular_devkit/schematics/tools",
-        "//packages/angular_devkit/core",
         "@npm//@types/node",
         "@npm//rxjs",
     ],
