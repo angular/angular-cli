@@ -16,7 +16,7 @@ ts_library(
     name = "webpack",
     srcs = glob(
         include = [
-          "src/**/*.ts",
+            "src/**/*.ts",
         ],
         exclude = [
             "src/**/*_spec.ts",
@@ -25,12 +25,12 @@ ts_library(
     ),
     data = glob(
         include = [
-          "src/type_checker_bootstrap.js",
-          "package.json",
+            "src/type_checker_bootstrap.js",
+            "package.json",
         ],
     ),
     module_name = "@ngtools/webpack",
-    module_root = "src/index.d.ts",    
+    module_root = "src/index.d.ts",
     deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",

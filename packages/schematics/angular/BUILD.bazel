@@ -44,8 +44,8 @@ ts_library(
             "utility/test/**/*.ts",
         ],
     ) + [
-      "//packages/schematics/angular:" + src.replace(".json", ".ts") 
-      for (src, _) in ALL_SCHEMA_TARGETS
+        "//packages/schematics/angular:" + src.replace(".json", ".ts")
+        for (src, _) in ALL_SCHEMA_TARGETS
     ],
     # strict_checks = False,
     data = glob(
@@ -98,8 +98,8 @@ ts_library(
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/testing",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
-        "@npm//@types/node",
         "@npm//@types/jasmine",
+        "@npm//@types/node",
         "@npm//rxjs",
         "@npm//tslint",
     ],

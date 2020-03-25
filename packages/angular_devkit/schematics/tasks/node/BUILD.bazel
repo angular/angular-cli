@@ -22,10 +22,10 @@ ts_library(
     # The attribute below is needed in g3 to turn off strict typechecking
     # strict_checks = False,
     deps = [
-        "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
+        "//packages/angular_devkit/schematics",
+        "//packages/angular_devkit/schematics/tasks",
         "@npm//@types/node",
         "@npm//rxjs",
     ],

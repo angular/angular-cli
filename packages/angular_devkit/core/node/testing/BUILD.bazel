@@ -8,7 +8,6 @@ load("@npm_bazel_typescript//:index.bzl", "ts_library")
 
 licenses(["notice"])  # MIT License
 
-
 ts_library(
     name = "testing",
     srcs = glob(
@@ -25,7 +24,7 @@ ts_library(
     # strict_checks = False,
     deps = [
         "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node:node",
+        "//packages/angular_devkit/core/node",
         "@npm//@types/jasmine",
         "@npm//@types/node",
         "@npm//rxjs",

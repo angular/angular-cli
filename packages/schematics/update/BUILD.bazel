@@ -21,8 +21,8 @@ ts_library(
             "**/*_benchmark.ts",
         ],
     ) + [
-      "//packages/schematics/update:update/schema.ts",
-      "//packages/schematics/update:migrate/schema.ts",
+        "//packages/schematics/update:update/schema.ts",
+        "//packages/schematics/update:migrate/schema.ts",
     ],
     deps = [
         "//packages/angular_devkit/core",

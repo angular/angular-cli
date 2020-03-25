@@ -25,6 +25,12 @@ ts_library(
             "src/**/*_benchmark.ts",
         ],
     ),
+    data = glob(
+        include = [
+            "package.json",
+            "webpack-loader/package.json",
+        ],
+    ),
     module_name = "@angular-devkit/build-optimizer",
     module_root = "src/index.d.ts",
     deps = [
@@ -35,12 +41,6 @@ ts_library(
         "@npm//tslib",
         "@npm//typescript",
     ],
-    data = glob(
-        include = [
-          "package.json",
-          "webpack-loader/package.json",
-        ],
-    ),    
 )
 
 ts_library(
