@@ -37,6 +37,7 @@ export class NgccProcessor {
     private readonly compilationErrors: (Error | string)[],
     private readonly basePath: string,
     private readonly compilerOptions: ts.CompilerOptions,
+    private readonly tsConfigPath: string,
   ) {
     this._logger = new NgccLogger(this.compilationWarnings, this.compilationErrors);
     this._nodeModulesDirectory = this.findNodeModulesDirectory(this.basePath);
@@ -82,6 +83,8 @@ export class NgccProcessor {
         '--first-only', /** compileAllFormats */
         '--create-ivy-entry-points', /** createNewEntryPointFormats */
         '--async',
+        '--tsconfig', /** tsConfigPath */
+        this.tsConfigPath,
       ],
       {
         stdio: ['inherit', process.stderr, process.stderr],
@@ -127,7 +130,10 @@ export class NgccProcessor {
       compileAllFormats: false,
       createNewEntryPointFormats: true,
       logger: this._logger,
+      // Path mappings are not longer required since NGCC 9.1
+      // We keep using them to be backward compatible with NGCC 9.0
       pathMappings: this._pathMappings,
+      tsConfigPath: this.tsConfigPath,
     });
     timeEnd(timeLabel);
 
