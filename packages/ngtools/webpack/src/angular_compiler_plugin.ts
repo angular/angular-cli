@@ -776,6 +776,7 @@ export class AngularCompilerPlugin {
           this._errors,
           this._basePath,
           this._compilerOptions,
+          this._tsConfigPath,
         );
 
         ngccProcessor.process();
