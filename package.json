@@ -124,7 +124,7 @@
     "npm-registry-client": "8.6.0",
     "ora": "^4.0.2",
     "pacote": "11.1.4",
-    "pidtree": "^0.3.0",
+    "pidtree": "^0.4.0",
     "pidusage": "^2.0.17",
     "prettier": "^2.0.0",
     "puppeteer": "2.1.1",
