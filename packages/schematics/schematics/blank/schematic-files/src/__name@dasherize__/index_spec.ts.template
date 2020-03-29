@@ -6,11 +6,13 @@ import * as path from 'path';
 const collectionPath = path.join(__dirname, '../collection.json');
 
 
-describe('<%= dasherize(name) %>', async () => {
-  it('works', () => {
+describe('<%= dasherize(name) %>', () => {
+  it('works', async () => {
     const runner = new SchematicTestRunner('schematics', collectionPath);
     const tree = await runner.runSchematicAsync('<%= dasherize(name) %>', {}, Tree.empty());
 
-    expect(tree.files).toEqual([]);
+    tree.subscribe((testTree: UnitTestTree) => {
+      expect(testTree.files).toEqual([]);
+    });
   });
 });
