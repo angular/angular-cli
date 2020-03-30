@@ -554,6 +554,9 @@ export abstract class SchematicCommand<
               this.logger.fatal(`An error occured:\n${err.message}\n${err.stack}`);
             } else {
               this.logger.fatal(err.message);
+              if (err.stack) {
+                this.logger.fatal(err.stack);
+              }
             }
 
             resolve(1);

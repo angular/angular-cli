@@ -87,6 +87,9 @@ export class AnalyticsCommand extends Command<AnalyticsCommandSchema> {
       }
     } catch (err) {
       this.logger.fatal(err.message);
+      if (err.stack) {
+        this.logger.fatal(err.stack);
+      }
 
       return 1;
     }
