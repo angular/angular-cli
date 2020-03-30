@@ -62,12 +62,12 @@ function ensureNpmrc(logger: logging.LoggerApi, usingYarn: boolean, verbose: boo
   if (!npmrc) {
     try {
       npmrc = readOptions(logger, false, verbose);
-    } catch {}
+    } catch { }
 
     if (usingYarn) {
       try {
         npmrc = { ...npmrc, ...readOptions(logger, true, verbose) };
-      } catch {}
+      } catch { }
     }
   }
 }
@@ -106,7 +106,7 @@ function readOptions(
     logger.info(`Locating potential ${baseFilename} files:`);
   }
 
-  let options: { [key: string]: string } = {};
+  const options: Record<string, string> = {};
   for (const location of [...defaultConfigLocations, ...projectConfigLocations]) {
     if (existsSync(location)) {
       if (showPotentials) {
@@ -114,17 +114,37 @@ function readOptions(
       }
 
       const data = readFileSync(location, 'utf8');
-      options = {
-        ...options,
-        ...(yarn ? lockfile.parse(data) : ini.parse(data)),
-      };
+      // Normalize RC options that are needed by 'npm-registry-fetch'.
+      // See: https://github.com/npm/npm-registry-fetch/blob/ebddbe78a5f67118c1f7af2e02c8a22bcaf9e850/index.js#L99-L126
+      for (const [key, value] of Object.entries<string>(yarn ? lockfile.parse(data) : ini.parse(data))) {
+        switch (key) {
+          case 'noproxy':
+            options['noProxy'] = value;
+            break;
+          case 'maxsockets':
+            options['maxSockets'] = value;
+            break;
+          case 'https-proxy':
+            options['httpsProxy'] = value;
+            break;
+          case 'strict-ssl':
+            options['strictSSL'] = value;
+            break;
+          case 'local-address':
+            options['localAddress'] = value;
+            break;
+          default:
+            options[key] = value;
+            break;
+        }
+      }
 
       if (options.cafile) {
         const cafile = path.resolve(path.dirname(location), options.cafile);
         delete options.cafile;
         try {
           options.ca = readFileSync(cafile, 'utf8').replace(/\r?\n/, '\\n');
-        } catch {}
+        } catch { }
       }
     } else if (showPotentials) {
       logger.info(`Trying '${location}'...not found.`);
