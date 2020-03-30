@@ -31,8 +31,17 @@ export interface CommonJsUsageWarnPluginOptions {
 export class CommonJsUsageWarnPlugin {
   private shownWarnings = new Set<string>();
 
-  constructor(private options: CommonJsUsageWarnPluginOptions = {}) {
+  // Allow the below depedency for HMR
+  // tslint:disable-next-line: max-line-length
+  // https://github.com/angular/angular-cli/blob/1e258317b1f6ec1e957ee3559cc3b28ba602f3ba/packages/angular_devkit/build_angular/src/dev-server/index.ts#L605-L638
+  private allowedDepedencies = [
+    'webpack/hot/dev-server',
+  ];
 
+  constructor(private options: CommonJsUsageWarnPluginOptions = {}) {
+    if (this.options.allowedDepedencies) {
+      this.allowedDepedencies.push(...this.options.allowedDepedencies);
+    }
   }
 
   apply(compiler: Compiler) {
@@ -48,7 +57,7 @@ export class CommonJsUsageWarnPlugin {
             continue;
           }
 
-          if (this.options.allowedDepedencies?.includes(rawRequest)) {
+          if (this.allowedDepedencies?.includes(rawRequest)) {
             // Skip as this module is allowed even if it's a CommonJS.
             continue;
           }
@@ -69,7 +78,9 @@ export class CommonJsUsageWarnPlugin {
             }
 
             // Only show warnings for modules from main entrypoint.
-            if (mainIssuer?.name === 'main') {
+            // And if the issuer request is not from 'webpack-dev-server', as 'webpack-dev-server'
+            // will require CommonJS libraries for live reloading such as 'sockjs-node'.
+            if (mainIssuer?.name === 'main' && !issuer?.userRequest?.includes('webpack-dev-server')) {
               const warning = `${issuer?.userRequest} depends on ${rawRequest}. CommonJS or AMD dependencies can cause optimization bailouts.`;
 
               // Avoid showing the same warning multiple times when in 'watch' mode.
