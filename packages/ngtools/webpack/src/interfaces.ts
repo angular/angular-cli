@@ -34,12 +34,20 @@ export interface AngularCompilerPluginOptions {
   skipCodeGeneration?: boolean;
   hostReplacementPaths?: { [path: string]: string } | ((path: string) => string);
   forkTypeChecker?: boolean;
+
+  /** @deprecated since version 9 - When using Ivy this option has no effect as i18n is no longer part of the TypeScript compilation. */
   i18nInFile?: string;
+  /** @deprecated since version 9 - When using Ivy this option has no effect as i18n is no longer part of the TypeScript compilation. */
   i18nInFormat?: string;
+  /** @deprecated since version 9 - When using Ivy this option has no effect as i18n is no longer part of the TypeScript compilation. */
   i18nOutFile?: string;
+  /** @deprecated since version 9 - When using Ivy this option has no effect as i18n is no longer part of the TypeScript compilation. */
   i18nOutFormat?: string;
+  /** @deprecated since version 9 - When using Ivy this option has no effect as i18n is no longer part of the TypeScript compilation. */
   locale?: string;
+  /** @deprecated since version 9 - When using Ivy this option has no effect as i18n is no longer part of the TypeScript compilation. */
   missingTranslation?: string;
+
   platform?: PLATFORM;
   nameLazyFiles?: boolean;
   logger?: logging.Logger;
