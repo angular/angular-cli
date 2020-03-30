@@ -17,7 +17,7 @@
     "@angular-devkit/core": "0.0.0",
     "minimist": "1.2.5",
     "pidusage": "2.0.18",
-    "pidtree": "0.3.0",
+    "pidtree": "0.4.0",
     "rxjs": "6.5.4",
     "tree-kill": "^1.2.0"
   }
