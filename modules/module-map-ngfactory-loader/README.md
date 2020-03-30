@@ -1,3 +1,8 @@
+# Deprecation Notice
+The string form of `loadChildren` is deprecated, this package is part of its implementation and is no longer needed if not using string form lazy loading.
+
+See: https://angular.io/api/router/LoadChildren for more details.
+
 # Module Map NgFactory Loader
 
 This is a NgFactory Loader which uses a map of modules instead of resolving modules lazily.
