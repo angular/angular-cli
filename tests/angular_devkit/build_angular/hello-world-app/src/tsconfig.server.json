@@ -3,7 +3,6 @@
   "compilerOptions": {
     "outDir": "../dist-server",
     "baseUrl": "./",
-    "module": "commonjs",
     "types": []
   },
   "files": [

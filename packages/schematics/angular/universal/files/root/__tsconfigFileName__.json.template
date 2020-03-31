@@ -2,7 +2,6 @@
   "extends": "./<%= tsConfigExtends %>",
   "compilerOptions": {
     "outDir": "<%= outDir %>-server",
-    "module": "commonjs",
     "types": [
       "node"
     ]
