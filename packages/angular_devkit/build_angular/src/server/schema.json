@@ -213,8 +213,7 @@
     "namedChunks": {
       "type": "boolean",
       "description": "Use file name for lazy loaded chunks.",
-      "default": true,
-      "x-deprecated": "Since version 9. This option has no effect on server platform."
+      "default": true
     },
     "bundleDependencies": {
       "description": "Which external dependencies to bundle into the bundle. By default, all of node_modules will be bundled.",
