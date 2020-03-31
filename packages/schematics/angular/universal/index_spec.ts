@@ -91,7 +91,6 @@ describe('Universal Schematic', () => {
       extends: './tsconfig.app.json',
       compilerOptions: {
         outDir: './out-tsc/app-server',
-        module: 'commonjs',
         types: ['node'],
       },
       files: [
@@ -116,7 +115,6 @@ describe('Universal Schematic', () => {
       extends: './tsconfig.app.json',
       compilerOptions: {
         outDir: '../../out-tsc/app-server',
-        module: 'commonjs',
         types: ['node'],
       },
       files: [

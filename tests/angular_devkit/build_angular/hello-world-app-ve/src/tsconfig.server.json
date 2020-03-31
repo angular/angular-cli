@@ -2,7 +2,6 @@
   "extends": "./tsconfig.app.json",
   "compilerOptions": {
     "outDir": "../dist-server",
-    "module": "commonjs",
     "types": []
   },
   "files": [
