@@ -594,7 +594,7 @@ function isTslibHelper(
   checker: ts.TypeChecker,
 ) {
 
-  let callExprIdent = callExpr.expression as ts.Identifier | ts.PrivateIdentifier;
+  let callExprIdent = callExpr.expression as ts.Identifier;
 
   if (callExpr.expression.kind !== ts.SyntaxKind.Identifier) {
     if (callExpr.expression.kind === ts.SyntaxKind.PropertyAccessExpression) {

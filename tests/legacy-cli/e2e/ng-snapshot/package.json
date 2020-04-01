@@ -12,6 +12,7 @@
     "@angular/language-service": "github:angular/language-service-builds#e4c45a027958642903873913bdeb5a321b1a2220",
     "@angular/localize": "github:angular/localize-builds#00aca0caa37113b01dd270c31fcb1c3009807539",
     "@angular/material": "github:angular/material2-builds#261ff75b8acdbfda3d69c65a30898df029816f32",
+    "@angular/material-moment-adapter": "github:angular/material-moment-adapter-builds#93f405e88f0360127bf2419941ec133dac84b4a5",
     "@angular/platform-browser": "github:angular/platform-browser-builds#2f6d4dd67601a7589783a226b8145837dd3c963c",
     "@angular/platform-browser-dynamic": "github:angular/platform-browser-dynamic-builds#609599de331caf8bc05f6e522823c2f07162772d",
     "@angular/platform-server": "github:angular/platform-server-builds#f4b83463f893b894a9984446782086f9bde8b240",
