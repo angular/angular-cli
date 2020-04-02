@@ -95,7 +95,7 @@ describe('Browser Builder scripts array', () => {
     host.appendToFile('src/main.ts', '\nimport \'./input-script.js\';');
 
     // Enable differential loading
-    host.appendToFile('browserslist', '\nIE 10');
+    host.appendToFile('.browserslistrc', '\nIE 10');
 
     // Remove styles so we don't have to account for them in the index.html order check.
     const { files } = await browserBuild(architect, host, target, {
