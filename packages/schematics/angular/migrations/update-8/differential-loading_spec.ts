@@ -105,14 +105,12 @@ describe('Migration to version 8', () => {
     });
 
     it(`should create browserslist file if it doesn't exist`, async () => {
-      tree.delete('/browserslist');
       const tree2 = await schematicRunner.runSchematicAsync('migration-07', {}, tree.branch()).toPromise();
       expect(tree2.exists('/browserslist')).toBe(true);
     });
 
     it('should move browserslist file if it exists in the sourceRoot', async () => {
       tree.create('/src/browserslist', 'last 2 Chrome versions');
-      tree.delete('/browserslist');
       const tree2 = await schematicRunner.runSchematicAsync('migration-07', {}, tree.branch()).toPromise();
       expect(tree2.exists('/browserslist')).toBe(true);
     });
@@ -191,7 +189,6 @@ describe('Migration to version 8', () => {
     });
 
     it(`should not update projects which browser builder is not 'build-angular:browser'`, async () => {
-      tree.delete('/browserslist');
       const config = JSON.parse(tree.readContent('angular.json'));
       config.projects['migration-test'].architect.build.builder = '@dummy/builders:browser';
 
@@ -201,8 +198,7 @@ describe('Migration to version 8', () => {
     });
 
     it(`should move 'browserslist' to root when 'sourceRoot' is not defined`, async () => {
-      tree.rename('/browserslist', '/src/browserslist');
-      expect(tree.exists('/src/browserslist')).toBe(true);
+      tree.create('/src/browserslist', 'content');
 
       const config = JSON.parse(tree.readContent('angular.json'));
       config.projects['migration-test'].sourceRoot = undefined;
