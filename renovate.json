@@ -85,7 +85,8 @@
         "^@bazel\/.*",
         "^build_bazel.*",
         "^@angular\/.*"
-      ]
+      ],
+      "enabled": false
     }
   ]
 }
