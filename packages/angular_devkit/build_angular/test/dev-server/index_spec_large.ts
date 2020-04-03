@@ -18,7 +18,7 @@ describe('Dev Server Builder index', () => {
 
   it(`adds 'type="module"' when differential loading is needed`, async () => {
     host.writeMultipleFiles({
-      browserslist: `
+      '.browserslistrc': `
         last 1 chrome version
         IE 10
       `,
@@ -41,7 +41,7 @@ describe('Dev Server Builder index', () => {
 
   it(`does not add 'type="module"' to custom scripts when differential loading is needed`, async () => {
     host.writeMultipleFiles({
-      browserslist: `
+      '.browserslistrc': `
         last 1 chrome version
         IE 10
       `,
@@ -85,7 +85,7 @@ describe('Dev Server Builder index', () => {
 
   it(`doesn't 'type="module"' when differential loading is not needed`, async () => {
     host.writeMultipleFiles({
-      browserslist: `
+      '.browserslistrc': `
         last 1 chrome version
       `,
     });

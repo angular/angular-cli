@@ -285,7 +285,7 @@ describe('Browser Builder styles', () => {
         /* normal-comment */
         /*! important-comment */
         div { flex: 1 }`,
-      browserslist: 'IE 10',
+      '.browserslistrc': 'IE 10',
     });
 
     const overrides = { extractCss: true, optimization: false };
@@ -319,7 +319,7 @@ describe('Browser Builder styles', () => {
           grid-template-columns: 100px;
         }
       `,
-      browserslist: 'IE 10',
+      '.browserslistrc': 'IE 10',
     });
 
     const overrides = { extractCss: true, optimization: true, styles: ['src/styles.scss'] };

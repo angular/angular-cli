@@ -3,7 +3,7 @@ import { ng } from '../../utils/process';
 
 export default async function() {
   // Ensure an ES2015 build is used in test
-  await writeFile('browserslist', 'Chrome 65');
+  await writeFile('.browserslistrc', 'Chrome 65');
 
   await ng('generate', 'service', 'user');
 
