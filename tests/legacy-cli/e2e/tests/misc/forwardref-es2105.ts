@@ -4,7 +4,7 @@ import { expectToFail } from '../../utils/utils';
 
 export default async function() {
   // Ensure an ES2015 build is used in test
-  await writeFile('browserslist', 'Chrome 65');
+  await writeFile('.browserslistrc', 'Chrome 65');
 
   // Update the application to use a forward reference
   await replaceInFile(

@@ -18,7 +18,7 @@ describe('Browser Builder with differential loading', () => {
     await host.initialize().toPromise();
     // to trigger differential loading we need an non ever green browser
     host.writeMultipleFiles({
-      browserslist: 'IE 10',
+      '.browserslistrc': 'IE 10',
     });
 
     architect = (await createArchitect(host.root())).architect;
@@ -193,7 +193,7 @@ describe('Browser Builder with differential loading', () => {
 
   it('adds `type="module"` when differential loading is needed', async () => {
     host.writeMultipleFiles({
-      browserslist: `
+      '.browserslistrc': `
         last 1 chrome version
         IE 9
       `,

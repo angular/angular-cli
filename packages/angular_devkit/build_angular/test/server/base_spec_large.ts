@@ -57,7 +57,7 @@ describe('Server Builder', () => {
     // the below is needed because of different code paths
     // for polyfills if differential loading is needed
     host.writeMultipleFiles({
-      'browserslist': 'IE 10',
+      '.browserslistrc': 'IE 10',
     });
 
     const run = await architect.scheduleTarget(target);

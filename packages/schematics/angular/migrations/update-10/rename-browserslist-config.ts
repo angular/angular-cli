@@ -8,15 +8,13 @@
 import { Path, join } from '@angular-devkit/core';
 import { DirEntry, Rule } from '@angular-devkit/schematics';
 
-function visit(directory: DirEntry): Path[] {
-  const files: Path[] = [];
-
+function* visit(directory: DirEntry): IterableIterator<string> {
   for (const path of directory.subfiles) {
     if (path !== 'browserslist') {
       continue;
     }
 
-    files.push(join(directory.path, path));
+    yield join(directory.path, path);
   }
 
   for (const path of directory.subdirs) {
@@ -24,10 +22,8 @@ function visit(directory: DirEntry): Path[] {
       continue;
     }
 
-    files.push(...visit(directory.dir(path)));
+    yield* visit(directory.dir(path));
   }
-
-  return files;
 }
 
 export default function (): Rule {
