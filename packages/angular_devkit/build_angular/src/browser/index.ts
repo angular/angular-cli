@@ -497,6 +497,9 @@ export function buildWebpackBrowser(
                         setLocale: result.name === mainChunkId,
                       });
                       processedFiles.add(result.original.filename);
+                      if (result.original.map) {
+                        processedFiles.add(result.original.map.filename);
+                      }
                     }
                     if (result.downlevel) {
                       inlineActions.push({
@@ -511,6 +514,9 @@ export function buildWebpackBrowser(
                         setLocale: result.name === mainChunkId,
                       });
                       processedFiles.add(result.downlevel.filename);
+                      if (result.downlevel.map) {
+                        processedFiles.add(result.downlevel.map.filename);
+                      }
                     }
                   }
 
