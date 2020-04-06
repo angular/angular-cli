@@ -116,9 +116,9 @@ export default async function (args: PublishArgs, logger: logging.Logger) {
         if (args.tag) {
           publishArgs.push('--tag', args.tag);
         }
-        if (args.registry) {
-          publishArgs.push('--registry', args.registry);
-        }
+
+        // If no registry is provided, the wombat proxy should be used.
+        publishArgs.push('--registry', args.registry || 'https://wombat-dressing-room.appspot.com');
 
         return _exec('npm', publishArgs, {
           cwd: pkg.dist,
