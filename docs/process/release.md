@@ -119,21 +119,18 @@ git push upstream && git push upstream --tags
 
 **This can ONLY be done by a Google employee.**
 
-Log in to [NPM](https://npmjs.com/) to the `angular` account in order to
-publish. This account is protected by two factor authentication (2FA).
+Log in to the Wombat publishing service using your own github and google.com
+account to publish.  This enforces the loging is done using 2Factor auth.
 
-Run `npm login`:
+Run `npm login --registry https://wombat-dressing-room.appspot.com`:
 
-1. For username, use `angular`.
-1. For password, use the value stored [here](http://go/ng-npm-pass).
-1. For email, use `devops+npm@angular.io`.
-1. For two-factor code, you'll need to set up the account.
-    * Use an authenticator app such as [Google Authenticator](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2).
-    * Add a new account and enter the text key from [here](http://go/ng-npm-2fa).
-    * The app will start showing two-factor codes, enter one into the
-        `npm login` prompt.
+1. In the new browser tab, the registry app will ask you to connect with GitHub to create a token
+1. After connecting with github, you will be redirected to create a token
+1. Upon redirect, an auth token is added to your ~/.npmrc for the proxy
 
-Once successfully logged in, it is time to publish.
+After closing the tab, you have successfully logged in, it is time to publish.
+
+**NOTE: After publishing, remove the token added to your `~/.npmrc` file to logout.**
 
 ### Publishing
 
