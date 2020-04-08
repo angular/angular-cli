@@ -164,7 +164,7 @@ function _getVersionFromGit(experimental: boolean): string {
   }
 
   const hasLocalChanges = _exec(`git status --porcelain`) != '';
-  const scmVersionTagRaw = _exec(`git describe --match v[0-9].[0-9].[0-9]* --abbrev=7 --tags`)
+  const scmVersionTagRaw = _exec(`git describe --match v[0-9]*.[0-9]*.[0-9]* --abbrev=7 --tags`)
     .slice(1);
   stableVersion = scmVersionTagRaw.replace(/-([0-9]+)-g/, '+$1.');
   if (hasLocalChanges) {
