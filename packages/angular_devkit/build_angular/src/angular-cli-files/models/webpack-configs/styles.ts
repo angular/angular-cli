@@ -11,7 +11,6 @@ import * as webpack from 'webpack';
 import {
   AnyComponentStyleBudgetChecker,
   PostcssCliResources,
-  RawCssLoader,
   RemoveHashPlugin,
   SuppressExtractedTextChunksWebpackPlugin,
 } from '../../plugins/webpack';
@@ -206,7 +205,13 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
           test,
           use: [
             buildOptions.extractCss ? MiniCssExtractPlugin.loader : require.resolve('style-loader'),
-            RawCssLoader,
+            {
+              loader: require.resolve('css-loader'),
+              options: {
+                url: false,
+                sourceMap: cssSourceMap,
+              },
+            },
             {
               loader: require.resolve('postcss-loader'),
               options: {
