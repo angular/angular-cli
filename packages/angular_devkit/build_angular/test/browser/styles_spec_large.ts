@@ -603,4 +603,40 @@ describe('Browser Builder styles', () => {
     const { output } = await browserBuild(architect, host, target, overrides);
     expect(output.success).toBe(true);
   });
+
+  extensionsWithImportSupport.forEach(ext => {
+    it(`retains declarations order in ${ext} files with extractCss when using @import`, async () => {
+      host.writeMultipleFiles({
+        [`src/styles-one.${ext}`]: tags.stripIndents`
+            .one {
+              color: #fff;
+            }
+          `,
+        [`src/styles-two.${ext}`]: tags.stripIndents`
+            .two {
+              color: #fff;
+            }
+          `,
+        // LESS doesn't support css imports by default.
+        // See: https://github.com/less/less.js/issues/3188#issuecomment-374690630
+        [`src/styles-three.${ext}`]: tags.stripIndents`
+            @import ${ext === 'less' ? ' (css) ' : ''}url("https://fonts.googleapis.com/css?family=Roboto:400");
+            .three {
+              color: #fff;
+            }
+          `,
+      });
+
+      const overrides = {
+        extractCss: true,
+        styles: [
+          `src/styles-one.${ext}`,
+          `src/styles-two.${ext}`,
+          `src/styles-three.${ext}`,
+        ],
+      };
+      const { files } = await browserBuild(architect, host, target, overrides);
+      expect(await files['styles.css']).toMatch(/\.one(.|\n|\r)*\.two(.|\n|\r)*\.three/);
+    });
+  });
 });
