@@ -271,6 +271,11 @@ export default async function(
           return true;
         }
 
+        // Ignore in package test files.
+        if (fileName.startsWith('test/') || fileName.startsWith('test\\')) {
+          return false;
+        }
+
         // Remove Bazel files from NPM.
         if (fileName === 'BUILD' || fileName === 'BUILD.bazel') {
           return false;
