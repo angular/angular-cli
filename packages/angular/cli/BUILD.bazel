@@ -5,8 +5,10 @@
 
 licenses(["notice"])  # MIT
 
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
 load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 package(default_visibility = ["//visibility:public"])
@@ -249,4 +251,19 @@ ts_library(
 jasmine_node_test(
     name = "angular-cli_test",
     srcs = [":angular-cli_test_lib"],
+)
+
+pkg_npm(
+    name = "npm_package",
+    deps = [
+        ":angular-cli",
+    ],
+)
+
+pkg_tar(
+    name = "npm_package_archive",
+    srcs = [":npm_package"],
+    extension = "tar.gz",
+    strip_prefix = "./npm_package",
+    tags = ["manual"],
 )
