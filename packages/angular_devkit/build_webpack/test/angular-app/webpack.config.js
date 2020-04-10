@@ -8,7 +8,7 @@ const projectRoot = path.resolve(__dirname, './');
 module.exports = {
   mode: 'development',
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js'],
   },
   entry: {
     main: path.resolve(projectRoot, './src/main.ts'),
@@ -25,11 +25,9 @@ module.exports = {
   ],
   module: {
     rules: [
-      { test: /\.scss$/, loaders: ['raw-loader', 'sass-loader'] },
       { test: /\.css$/, loader: 'raw-loader' },
       { test: /\.html$/, loader: 'raw-loader' },
-      // require.resolve is required only because of the monorepo structure here.
-      { test: /\.ts$/, loader: require.resolve('@ngtools/webpack') }
+      { test: /\.ts$/, loader: '@ngtools/webpack' },
     ]
   },
   devServer: {

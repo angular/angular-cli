@@ -58,6 +58,7 @@
     "node_modules/**/*",
     "packages/_/devkit/**/*files/**/*",
     "packages/schematics/*/*/*files/**/*",
+    "packages/angular_devkit/*/test/**/*",
     "tmp/**/*",
     "scripts/patches/**/*",
     "tests/**/*",
