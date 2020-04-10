@@ -30,7 +30,7 @@ The Universal project is driven by community contributions. Please send us your 
 [Angular Universal Guide](https://angular.io/guide/universal)
 
 # Version 8
-Follow this upgrade guide if you are upgrading an exsiting Universal project to Angular version 8 - [Guide](/docs/v8-upgrade-guide.md)
+Follow this upgrade guide if you are upgrading an existing Universal project to Angular version 8 - [Guide](/docs/v8-upgrade-guide.md)
 
 # Packages
 The packages from this repo are published as scoped packages under [@nguniversal](https://www.npmjs.com/search?q=%40nguniversal)
