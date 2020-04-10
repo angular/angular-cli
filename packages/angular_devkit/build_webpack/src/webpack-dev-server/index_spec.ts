@@ -14,8 +14,6 @@ import fetch from 'node-fetch';  // tslint:disable-line:no-implicit-dependencies
 import * as path from 'path';
 import { DevServerBuildOutput } from './index';
 
-const devkitRoot = (global as any)._DevKitRoot; // tslint:disable-line:no-any
-
 
 describe('Dev Server Builder', () => {
   let testArchitectHost: TestingArchitectHost;
@@ -41,7 +39,9 @@ describe('Dev Server Builder', () => {
   }
 
   beforeEach(async () => {
-    await createArchitect(path.join(devkitRoot, 'tests/angular_devkit/build_webpack/basic-app/'));
+    const ngJsonPath = path.join(__dirname, '../../test/basic-app/angular.json');
+    const workspaceRoot = path.dirname(require.resolve(ngJsonPath));
+    await createArchitect(workspaceRoot);
   });
 
   it('works', async () => {

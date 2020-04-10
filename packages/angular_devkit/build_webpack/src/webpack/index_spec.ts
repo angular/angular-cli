@@ -9,11 +9,9 @@ import { Architect } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { TestingArchitectHost } from '@angular-devkit/architect/testing';
 import { join, normalize, schema, workspaces } from '@angular-devkit/core';
-import { NodeJsSyncHost } from '@angular-devkit/core/node';
+import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import * as path from 'path';
 import { BuildResult } from './index';
-
-const devkitRoot = (global as any)._DevKitRoot; // tslint:disable-line:no-any
 
 
 describe('Webpack Builder basic test', () => {
@@ -38,7 +36,8 @@ describe('Webpack Builder basic test', () => {
   }
 
   describe('basic app', () => {
-    const workspaceRoot = path.join(devkitRoot, 'tests/angular_devkit/build_webpack/basic-app/');
+    const ngJsonPath = path.join(__dirname, '../../test/basic-app/angular.json');
+    const workspaceRoot = path.dirname(require.resolve(ngJsonPath));
     const outputPath = join(normalize(workspaceRoot), 'dist');
 
     beforeEach(async () => {
@@ -72,15 +71,17 @@ describe('Webpack Builder basic test', () => {
   });
 
   describe('Angular app', () => {
-    const workspaceRoot = path.join(devkitRoot, 'tests/angular_devkit/build_webpack/angular-app/');
-    const outputPath = join(normalize(workspaceRoot), 'dist/');
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
+    const ngJsonPath = path.join(__dirname, '../../test/angular-app/angular.json');
+    const workspaceRoot = path.dirname(require.resolve(ngJsonPath));
+    const outputPath = join(normalize(workspaceRoot), 'dist');
 
     beforeEach(async () => {
       await createArchitect(workspaceRoot);
     });
 
     it('works', async () => {
-      const run = await architect.scheduleTarget({ project: 'app', target: 'build-webpack' });
+      const run = await architect.scheduleTarget({ project: 'app', target: 'build-webpack' }, {}, {logger: createConsoleLogger()});
       const output = await run.result;
 
       expect(output.success).toBe(true);
