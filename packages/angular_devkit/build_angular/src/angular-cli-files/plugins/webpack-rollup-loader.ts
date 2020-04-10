@@ -14,7 +14,7 @@
  * See https://github.com/erikdesjardins/webpack-rollup-loader/blob/10fb020f997a146725963b202d79290c8798a7a0/LICENSE for full license.
  */
 
-import { VirtualFileSystemDecorator } from '@ngtools/webpack/src/virtual_file_system_decorator';
+import { VirtualFileSystemDecorator } from '@ngtools/webpack';
 import { dirname, join } from 'path';
 import { OutputAsset, OutputChunk, rollup } from 'rollup';
 import { RawSourceMap } from 'source-map';

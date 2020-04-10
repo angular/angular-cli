@@ -19,6 +19,7 @@ export {
   AssetPattern,
   AssetPatternClass as AssetPatternObject,
   Budget,
+  CrossOrigin,
   ExtraEntryPoint,
   ExtraEntryPointClass as ExtraEntryPointObject,
   FileReplacement,

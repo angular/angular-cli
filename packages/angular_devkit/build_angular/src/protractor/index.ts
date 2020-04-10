@@ -70,7 +70,8 @@ async function updateWebdriver() {
   }
 
   // tslint:disable-next-line:max-line-length no-implicit-dependencies
-  const webdriverUpdate = await import(path) as typeof import ('webdriver-manager/built/lib/cmds/update');
+  const webdriverUpdate = await import(path);
+  // const webdriverUpdate = await import(path) as typeof import ('webdriver-manager/built/lib/cmds/update');
 
   // run `webdriver-manager update --standalone false --gecko false --quiet`
   // if you change this, update the command comment in prev line
