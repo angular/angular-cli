@@ -228,7 +228,7 @@ jobs:
 
   test:
     executor: test-executor
-    resource_class: large
+    resource_class: xlarge
     steps:
       - custom_attach_workspace
       - setup_bazel_rbe
@@ -239,7 +239,7 @@ jobs:
 
   integration:
     executor: test-executor
-    resource_class: large
+    resource_class: xlarge
     steps:
       - custom_attach_workspace
       - run: 
