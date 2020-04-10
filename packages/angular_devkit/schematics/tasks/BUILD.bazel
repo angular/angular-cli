@@ -20,6 +20,8 @@ ts_library(
             "tslint-fix/test/**/*",
         ],
     ),
+    devmode_module = "commonjs",
+    devmode_target = "es2018",
     module_name = "@angular-devkit/schematics/tasks",
     module_root = "index.d.ts",
     # The attribute below is needed in g3 to turn off strict typechecking
@@ -53,6 +55,8 @@ ts_library(
         "tslint-fix/test/collection.json",
         "tslint-fix/test/rules/customRuleRule.js",
     ],
+    devmode_module = "commonjs",
+    devmode_target = "es2018",
     # The attribute below is needed in g3 to turn off strict typechecking
     # strict_checks = False,
     # @external_begin

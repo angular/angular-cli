@@ -18,6 +18,8 @@ ts_library(
             "**/*_benchmark.ts",
         ],
     ),
+    devmode_module = "commonjs",
+    devmode_target = "es2018",
     module_name = "@angular-devkit/core/node/testing",
     module_root = "index.d.ts",
     # The attribute below is needed in g3 to turn off strict typechecking
