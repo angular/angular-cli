@@ -13,6 +13,8 @@ ts_library(
     srcs = [
         "bin/architect.ts",
     ] + glob(["src/**/*.ts"]),
+    devmode_module = "commonjs",
+    devmode_target = "es2018",
     module_name = "@angular-devkit/architect-cli",
     deps = [
         "//packages/angular_devkit/architect",

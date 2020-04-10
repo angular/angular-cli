@@ -36,11 +36,7 @@ export class TestingArchitectHost implements ArchitectHost {
     this._builderMap.set(builderName, { builderName, description, optionSchema });
   }
   async addBuilderFromPackage(packageName: string) {
-    // f1 const is a temporary workaround for a TS bug with UMDs.
-    // See microsoft/TypeScript#36780. Should be removed when
-    // https://github.com/bazelbuild/rules_typescript/pull/492 goes in.
-    const f1 = packageName + '/package.json';
-    const packageJson = await import(f1);
+    const packageJson = await import(packageName + '/package.json');
     if (!('builders' in packageJson)) {
       throw new Error('Invalid package.json, builders key not found.');
     }
@@ -60,13 +56,8 @@ export class TestingArchitectHost implements ArchitectHost {
       const b = builders[builderName];
       // TODO: remove this check as v1 is not supported anymore.
       if (!b.implementation) { continue; }
-      // f2 and f3 consts are a temporary workaround for a TS bug with UMDs.
-      // See microsoft/TypeScript#36780. Should be removed when
-      // https://github.com/bazelbuild/rules_typescript/pull/492 goes in.
-      const f2 = builderJsonPath + '/../' + b.implementation;
-      const handler = (await import(f2)).default;
-      const f3 = builderJsonPath + '/../' + b.schema;
-      const optionsSchema = await import(f3);
+      const handler = (await import(builderJsonPath + '/../' + b.implementation)).default;
+      const optionsSchema = await import(builderJsonPath + '/../' + b.schema);
       this.addBuilder(`${packageJson.name}:${builderName}`, handler, b.description, optionsSchema);
     }
   }

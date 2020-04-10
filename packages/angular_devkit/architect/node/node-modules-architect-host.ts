@@ -143,11 +143,7 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
   }
 
   async loadBuilder(info: NodeModulesBuilderInfo): Promise<Builder> {
-    // f1 const is a temporary workaround for a TS bug with UMDs.
-    // See microsoft/TypeScript#36780. Should be removed when
-    // https://github.com/bazelbuild/rules_typescript/pull/492 goes in.
-    const f1 = info.import;
-    const builder = (await import(f1)).default;
+    const builder = (await import(info.import)).default;
     if (builder[BuilderSymbol]) {
       return builder;
     }
