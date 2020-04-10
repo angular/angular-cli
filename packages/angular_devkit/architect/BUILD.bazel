@@ -53,6 +53,8 @@ ts_library(
     ],
     # strict_checks = False,
     data = glob(["**/*.json"]),
+    devmode_module = "commonjs",
+    devmode_target = "es2018",
     module_name = "@angular-devkit/architect",
     module_root = "src/index.d.ts",
     deps = [
@@ -72,6 +74,8 @@ ts_library(
             "src/**/*_spec_large.ts",
         ],
     ),
+    devmode_module = "commonjs",
+    devmode_target = "es2018",
     # strict_checks = False,
     tsconfig = "//:tsconfig-test.json",
     deps = [

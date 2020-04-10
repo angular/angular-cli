@@ -36,14 +36,16 @@ load("@npm_ts_api_guardian//:index.bzl", "ts_api_guardian_test")
     ),
     # We don't want to analyse these exports nor add them to the golden files
     # in most cases it's because Ts API Guardian doesn't support Symbol Aliases.
+    # Note: $ must be escaped to $$ because these patterns will be executed by shell
+    # and $ has a special meaning there.
     strip_export_pattern = [
         # @angular-devkit/architect
-        "^BuilderProgressState$",
+        "^BuilderProgressState$$",
         # @angular-devkit/schematics
-        "^workflow$",
-        "^formats$",
+        "^workflow$$",
+        "^formats$$",
         # @angular-devkit/build-optimizer
-        "^buildOptimizerLoader$",
+        "^buildOptimizerLoader$$",
     ],
     # At the moment using this will ignore a big change
     use_angular_tag_rules = False,

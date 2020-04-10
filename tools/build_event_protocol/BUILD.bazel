@@ -14,6 +14,8 @@ ts_proto_library(
 ts_library(
     name = "parse_bep",
     srcs = ["parse_bep.ts"],
+    devmode_module = "commonjs",
+    devmode_target = "es2018",
     deps = [
         ":build_event_stream",
         "@npm//@types/node",

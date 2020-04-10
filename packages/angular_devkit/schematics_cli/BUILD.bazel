@@ -24,6 +24,8 @@ ts_library(
     # The attribute below is needed in g3 to turn off strict typechecking
     # strict_checks = False,
     data = glob(["**/*.json"]),
+    devmode_module = "commonjs",
+    devmode_target = "es2018",
     module_name = "@angular-devkit/schematics-cli",
     module_root = "bin/schematics.d.ts",
     deps = [
@@ -51,6 +53,8 @@ ts_library(
             "bin/**/*_spec.ts",
         ],
     ),
+    devmode_module = "commonjs",
+    devmode_target = "es2018",
     # strict_checks = False,
     tsconfig = "//:tsconfig-test.json",
     deps = [

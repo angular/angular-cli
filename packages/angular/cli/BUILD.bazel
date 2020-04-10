@@ -45,6 +45,8 @@ ts_library(
         "**/*.json",
         "**/*.md",
     ]),
+    devmode_module = "commonjs",
+    devmode_target = "es2018",
     module_name = "@angular/cli",
     # strict_checks = False,
     deps = [
@@ -232,6 +234,8 @@ ts_library(
             "**/*_spec_large.ts",
         ],
     ),
+    devmode_module = "commonjs",
+    devmode_target = "es2018",
     # strict_checks = False,
     tsconfig = "//:tsconfig-test.json",
     deps = [

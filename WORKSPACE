@@ -8,8 +8,8 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
     name = "build_bazel_rules_nodejs",
-    sha256 = "b6670f9f43faa66e3009488bbd909bc7bc46a5a9661a33f6bc578068d1837f37",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/1.3.0/rules_nodejs-1.3.0.tar.gz"],
+    sha256 = "7b96a7ce4d40e57d629b435eb948d17037d0c346d5b27aecc55078291b75699b",
+    urls = ["https://github.com/aspect-dev/rules_nodejs-builds/raw/1.5.0+1361843f/build_bazel_rules_nodejs-labs-snapshot.tar.gz"],
 )
 
 # We use protocol buffers for the Build Event Protocol
@@ -52,29 +52,17 @@ Try running `yarn bazel` instead.
 #   - 0.32.1 remove override of @bazel/tsetse & exclude typescript lib declarations in node_module_library transitive_declarations
 #   - 0.32.2 resolves bug in @bazel/hide-bazel-files postinstall step
 #   - 0.34.0 introduces protractor rule
-check_rules_nodejs_version(minimum_version_string = "0.34.0")
+check_rules_nodejs_version(minimum_version_string = "1.5.0")
 
 # Setup the Node.js toolchain
 node_repositories(
     node_repositories = {
-        "10.16.0-darwin_amd64": ("node-v10.16.0-darwin-x64.tar.gz", "node-v10.16.0-darwin-x64", "6c009df1b724026d84ae9a838c5b382662e30f6c5563a0995532f2bece39fa9c"),
-        "10.16.0-linux_amd64": ("node-v10.16.0-linux-x64.tar.xz", "node-v10.16.0-linux-x64", "1827f5b99084740234de0c506f4dd2202a696ed60f76059696747c34339b9d48"),
-        "10.16.0-windows_amd64": ("node-v10.16.0-win-x64.zip", "node-v10.16.0-win-x64", "aa22cb357f0fb54ccbc06b19b60e37eefea5d7dd9940912675d3ed988bf9a059"),
+        "12.14.1-darwin_amd64": ("node-v12.14.1-darwin-x64.tar.gz", "node-v12.14.1-darwin-x64", "0be10a28737527a1e5e3784d3ad844d742fe8b0718acd701fd48f718fd3af78f"),
+        "12.14.1-linux_amd64": ("node-v12.14.1-linux-x64.tar.xz", "node-v12.14.1-linux-x64", "07cfcaa0aa9d0fcb6e99725408d9e0b07be03b844701588e3ab5dbc395b98e1b"),
+        "12.14.1-windows_amd64": ("node-v12.14.1-win-x64.zip", "node-v12.14.1-win-x64", "1f96ccce3ba045ecea3f458e189500adb90b8bc1a34de5d82fc10a5bf66ce7e3"),
     },
-    node_version = "10.16.0",
+    node_version = "12.14.1",
     package_json = ["//:package.json"],
-    yarn_repositories = {
-        "1.17.3": ("yarn-v1.17.3.tar.gz", "yarn-v1.17.3", "e3835194409f1b3afa1c62ca82f561f1c29d26580c9e220c36866317e043c6f3"),
-    },
-    # yarn 1.13.0 under Bazel has a regression on Windows that causes build errors on rebuilds:
-    # ```
-    # ERROR: Source forest creation failed: C:/.../fyuc5c3n/execroot/angular/external (Directory not empty)
-    # ```
-    # See https://github.com/angular/angular/pull/29431 for more information.
-    # It possible that versions of yarn past 1.13.0 do not have this issue, however, before
-    # advancing this version we need to test manually on Windows that the above error does not
-    # happen as the issue is not caught by CI.
-    yarn_version = "1.17.3",
 )
 
 yarn_install(
@@ -83,7 +71,6 @@ yarn_install(
         "//:tools/yarn/check-yarn.js",
     ],
     package_json = "//:package.json",
-    symlink_node_modules = False,
     yarn_lock = "//:yarn.lock",
 )
 

@@ -29,6 +29,8 @@ ts_library(
     data = glob(["**/*.json"]) + [
         "//packages/angular_devkit/core/third_party/github.com/chalk/supports-color",
     ],
+    devmode_module = "commonjs",
+    devmode_target = "es2018",
     module_name = "@angular-devkit/core",
     module_root = "src/index.d.ts",
     # The attribute below is needed in g3 to turn off strict typechecking
@@ -61,6 +63,8 @@ ts_library(
         "src/experimental/workspace/test/test-workspace.json",
         "src/experimental/workspace/workspace-schema.json",
     ],
+    devmode_module = "commonjs",
+    devmode_target = "es2018",
     # The attribute below is needed in g3 to turn off strict typechecking
     # strict_checks = False,
     # @external_begin
