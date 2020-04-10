@@ -53,9 +53,7 @@ export interface AngularCompilerPluginOptions {
   logger?: logging.Logger;
   directTemplateLoading?: boolean;
 
-  /* @internal */
   emitClassMetadata?: boolean;
-  /* @internal */
   emitNgModuleScope?: boolean;
 
   /**
