@@ -22,7 +22,6 @@ ts_library(
         include = ["src/**/*.ts"],
         exclude = [
             "src/**/*_spec.ts",
-            "src/**/*_spec_large.ts",
             "src/**/*_benchmark.ts",
         ],
     ),
@@ -53,12 +52,7 @@ ts_library(
 ts_library(
     name = "core_test_lib",
     testonly = True,
-    srcs = glob(
-        include = [
-            "src/**/*_spec.ts",
-            "src/**/*_spec_large.ts",
-        ],
-    ),
+    srcs = glob(["src/**/*_spec.ts"]),
     data = glob(["src/workspace/json/test/**/*.json"]) + [
         "src/experimental/workspace/test/test-workspace.json",
         "src/experimental/workspace/workspace-schema.json",

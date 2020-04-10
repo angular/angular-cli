@@ -550,11 +550,7 @@ export class AngularCompilerPlugin {
   }
 
   private _createForkedTypeChecker() {
-    // Bootstrap type checker is using local CLI.
-    const g: any = typeof global !== 'undefined' ? global : {};  // tslint:disable-line:no-any
-    const typeCheckerFile: string = g['_DevKitIsLocal']
-      ? './type_checker_bootstrap.js'
-      : './type_checker_worker.js';
+    const typeCheckerFile = './type_checker_worker.js';
 
     const debugArgRegex = /--inspect(?:-brk|-port)?|--debug(?:-brk|-port)/;
 

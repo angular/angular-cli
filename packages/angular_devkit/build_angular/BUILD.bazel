@@ -302,7 +302,7 @@ LARGE_SPECS = {
         ],
     },
     "browser": {
-        "shards": 30,
+        "shards": 50,
         "size": "large",
         "flaky": True,
         "extra_deps": [
@@ -359,7 +359,7 @@ LARGE_SPECS = {
         name = "build_angular_" + spec + "_test",
         size = LARGE_SPECS[spec].get("size", "medium"),
         flaky = LARGE_SPECS[spec].get("flaky", False),
-        shard_count = LARGE_SPECS[spec].get("shards", 1),
+        shard_count = LARGE_SPECS[spec].get("shards", 2),
         # These tests are resource intensive and should not be over-parallized as they will
         # compete for the resources of other parallel tests slowing everything down.
         # Ask Bazel to allocate multiple CPUs for these tests with "cpu:n" tag.

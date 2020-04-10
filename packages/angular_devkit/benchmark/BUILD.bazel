@@ -18,7 +18,6 @@ ts_library(
         include = ["src/**/*.ts"],
         exclude = [
             "src/**/*_spec.ts",
-            "src/**/*_spec_large.ts",
             "src/**/*_benchmark.ts",
         ],
     ),
@@ -38,12 +37,7 @@ ts_library(
 ts_library(
     name = "benchmark_test_lib",
     testonly = True,
-    srcs = glob(
-        include = [
-            "src/**/*_spec.ts",
-            "src/**/*_spec_large.ts",
-        ],
-    ),
+    srcs = glob(["src/**/*_spec.ts"]),
     data = [
         "src/test/exit-code-one.js",
         "src/test/fibonacci.js",

@@ -44,7 +44,6 @@ ts_library(
     srcs = glob(
         include = [
             "**/*_spec.ts",
-            "**/*_spec_large.ts",
             "tslint-fix/test/**/*.ts",
         ],
         exclude = [
