@@ -19,7 +19,6 @@ ts_library(
         include = ["**/*.ts"],
         exclude = [
             "**/*_spec.ts",
-            "**/*_spec_large.ts",
             "**/*_benchmark.ts",
         ],
     ) + [
@@ -54,17 +53,14 @@ ts_json_schema(
 ts_library(
     name = "update_test_lib",
     testonly = True,
-    srcs = glob(
-        include = [
-            "**/*_spec.ts",
-            "**/*_spec_large.ts",
-        ],
-    ),
+    srcs = glob(["**/*_spec.ts"]),
     data = glob(
         include = [
             "**/*.json",
         ],
     ),
+    devmode_module = "commonjs",
+    devmode_target = "es2018",
     # @external_begin
     tsconfig = "//:tsconfig-test.json",
     deps = [

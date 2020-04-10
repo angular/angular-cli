@@ -16,7 +16,6 @@ ts_library(
         exclude = [
             "testing/**/*.ts",
             "**/*_spec.ts",
-            "**/*_spec_large.ts",
             "**/*_benchmark.ts",
         ],
     ),
@@ -39,7 +38,6 @@ ts_library(
     srcs = glob(
         include = [
             "**/*_spec.ts",
-            "**/*_spec_large.ts",
         ],
         exclude = [
             "testing/**/*.ts",

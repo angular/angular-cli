@@ -13,10 +13,7 @@ ts_library(
     name = "testing",
     srcs = glob(
         include = ["**/*.ts"],
-        exclude = [
-            "**/*_spec.ts",
-            "**/*_spec_large.ts",
-        ],
+        exclude = ["**/*_spec.ts"],
     ),
     devmode_module = "commonjs",
     devmode_target = "es2018",

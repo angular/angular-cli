@@ -41,10 +41,7 @@ ts_library(
     name = "architect",
     srcs = glob(
         include = ["src/**/*.ts"],
-        exclude = [
-            "**/*_spec.ts",
-            "**/*_spec_large.ts",
-        ],
+        exclude = ["**/*_spec.ts"],
     ) + [
         "//packages/angular_devkit/architect:src/input-schema.ts",
         "//packages/angular_devkit/architect:src/output-schema.ts",
@@ -68,12 +65,7 @@ ts_library(
 ts_library(
     name = "architect_test_lib",
     testonly = True,
-    srcs = glob(
-        include = [
-            "src/**/*_spec.ts",
-            "src/**/*_spec_large.ts",
-        ],
-    ),
+    srcs = glob(["src/**/*_spec.ts"]),
     devmode_module = "commonjs",
     devmode_target = "es2018",
     # strict_checks = False,

@@ -23,7 +23,6 @@ ts_library(
         exclude = [
             "pwa/files/**/*",
             "**/*_spec.ts",
-            "**/*_spec_large.ts",
         ],
     ) + [
         "//packages/angular/pwa:pwa/schema.ts",
@@ -56,12 +55,7 @@ ts_json_schema(
 ts_library(
     name = "pwa_test_lib",
     testonly = True,
-    srcs = glob(
-        include = [
-            "pwa/**/*_spec.ts",
-            "pwa/**/*_spec_large.ts",
-        ],
-    ),
+    srcs = glob(["pwa/**/*_spec.ts"]),
     devmode_module = "commonjs",
     devmode_target = "es2018",
     # strict_checks = False,

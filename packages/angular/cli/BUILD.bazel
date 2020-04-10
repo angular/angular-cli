@@ -17,10 +17,7 @@ ts_library(
     name = "angular-cli",
     srcs = glob(
         ["**/*.ts"],
-        exclude = [
-            "**/*_spec.ts",
-            "**/*_spec_large.ts",
-        ],
+        exclude = ["**/*_spec.ts"],
     ) + [
         "//packages/angular/cli:lib/config/schema.ts",
         "//packages/angular/cli:commands/analytics.ts",
@@ -44,6 +41,7 @@ ts_library(
         "//packages/angular/cli:commands/xi18n.ts",
     ],
     data = glob([
+        "bin/**/*",
         "**/*.json",
         "**/*.md",
     ]),
@@ -230,12 +228,7 @@ ts_json_schema(
 ts_library(
     name = "angular-cli_test_lib",
     testonly = True,
-    srcs = glob(
-        include = [
-            "**/*_spec.ts",
-            "**/*_spec_large.ts",
-        ],
-    ),
+    srcs = glob(["**/*_spec.ts"]),
     devmode_module = "commonjs",
     devmode_target = "es2018",
     # strict_checks = False,

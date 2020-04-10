@@ -21,7 +21,6 @@ ts_library(
             # from jasmine_node_test.
             "src/**/cli.ts",
             "src/**/*_spec.ts",
-            "src/**/*_spec_large.ts",
             "src/**/*_benchmark.ts",
         ],
     ),
@@ -48,12 +47,7 @@ ts_library(
 ts_library(
     name = "build_optimizer_test_lib",
     testonly = True,
-    srcs = glob(
-        include = [
-            "src/**/*_spec.ts",
-            "src/**/*_spec_large.ts",
-        ],
-    ),
+    srcs = glob(["src/**/*_spec.ts"]),
     devmode_module = "commonjs",
     devmode_target = "es2018",
     # @external_begin
