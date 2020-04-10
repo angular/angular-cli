@@ -264,6 +264,7 @@ LARGE_SPECS = {
         "extra_deps": [
             "@npm//@types/express",
             "@npm//@types/node-fetch",
+            "@npm//css-loader",
             "@npm//express",
             "@npm//node-fetch",
         ],
@@ -307,6 +308,7 @@ LARGE_SPECS = {
             "@npm//@angular/animations",
             "@npm//@angular/material",
             "@npm//bootstrap",
+            "@npm//css-loader",
             "@npm//font-awesome",
             "@npm//jquery",
             "@npm//popper.js",
