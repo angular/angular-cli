@@ -23,7 +23,7 @@ export default async function (_options: {}, logger: logging.Logger) {
     }
 
     // There should be at least one BUILD file next to each package.json.
-    if (!existsSync(join(pkg.root, 'BUILD'))) {
+    if (!existsSync(join(pkg.root, 'BUILD')) && !existsSync(join(pkg.root, 'BUILD.bazel'))) {
       logger.error(tags.oneLine`
         The package ${JSON.stringify(pkgName)} does not have a BUILD file associated to it. You
         must either set an exception or make sure it can be built using Bazel.
