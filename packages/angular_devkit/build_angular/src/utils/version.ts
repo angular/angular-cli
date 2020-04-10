@@ -44,12 +44,9 @@ export function assertCompatibleAngularVersion(projectRoot: string, logger: logg
       throw new Error();
     }
   } catch {
-    logger.error(tags.stripIndents`
-      Cannot determine versions of "@angular/cli".
-      This likely means your local installation is broken. Please reinstall your packages.
-    `);
-
-    process.exit(2);
+    // Not using @angular-devkit/build-angular with @angular/cli is ok too.
+    // In this case we don't provide as many version checks.
+    return;
   }
 
   if (angularCliPkgJson['version'] === '0.0.0') {

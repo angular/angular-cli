@@ -8,15 +8,11 @@
 
 
 import { TestProjectHost } from '@angular-devkit/architect/testing';
-import { getSystemPath, join } from '@angular-devkit/core';
+import { getSystemPath, join, normalize } from '@angular-devkit/core';
 import { ScriptTarget } from 'typescript';
 import { BuildBrowserFeatures } from './build-browser-features';
 
-const devkitRoot = (global as any)._DevKitRoot; // tslint:disable-line:no-any
-const workspaceRoot = join(
-  devkitRoot,
-  'tests/angular_devkit/build_angular/hello-world-app/');
-
+const workspaceRoot = join(normalize(__dirname), '../../test/build-browser-features/');
 const host = new TestProjectHost(workspaceRoot);
 
 describe('BuildBrowserFeatures', () => {
