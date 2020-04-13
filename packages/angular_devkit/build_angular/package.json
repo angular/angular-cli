@@ -49,7 +49,7 @@
     "regenerator-runtime": "0.13.5",
     "rimraf": "3.0.2",
     "rollup": "2.6.1",
-    "rxjs": "6.5.4",
+    "rxjs": "6.5.5",
     "sass": "1.26.3",
     "sass-loader": "8.0.2",
     "semver": "7.3.2",

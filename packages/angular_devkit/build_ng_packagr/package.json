@@ -8,7 +8,7 @@
   "builders": "builders.json",
   "dependencies": {
     "@angular-devkit/architect": "0.0.0",
-    "rxjs": "6.5.4"
+    "rxjs": "6.5.5"
   },
   "peerDependencies": {
     "ng-packagr": "^9.0.0",
