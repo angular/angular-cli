@@ -85,7 +85,7 @@
     "@types/glob": "^7.0.3",
     "@types/inquirer": "^0.0.44",
     "@types/jasmine": "~3.5.0",
-    "@types/karma": "^4.0.0",
+    "@types/karma": "^5.0.0",
     "@types/loader-utils": "^1.1.3",
     "@types/minimist": "^1.2.0",
     "@types/node": "10.12.30",
