@@ -39,7 +39,10 @@
           "options": {
             "progress": false,
             "outputPath": "dist/express-engine-ivy-prerender/browser",
-            "index": "src/index.html",
+            "index": {
+              "input": "src/index.html",
+              "output": "src/home.html"
+            },
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",

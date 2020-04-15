@@ -7,12 +7,13 @@
  */
 
 import * as Architect from '@angular-devkit/architect';
+import { BrowserBuilderOptions } from '@angular-devkit/build-angular';
 import { logging } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as guessParser from 'guess-parser';
 
 import { PrerenderBuilderOptions } from './models';
-import { getRoutes, shardArray } from './utils';
+import { getIndexOutputFile, getRoutes, shardArray } from './utils';
 
 
 describe('Prerender Builder Utils', () => {
@@ -118,6 +119,19 @@ describe('Prerender Builder Utils', () => {
     it('Should not shard more than the total number of items in the array', () => {
       const result = shardArray(ARRAY, 7);
       expect(result).toEqual([[0], [1], [2], [3], [4]]);
+    });
+  });
+
+  describe('#getIndexOutputFile', () => {
+    it('Should return only the file name when index is a string', () => {
+      const options = { index: 'src/home.html' } as BrowserBuilderOptions;
+      expect(getIndexOutputFile(options)).toBe('home.html');
+    });
+
+    it('Should return full file path when index is an object', () => {
+      const options =
+        { index: { input: 'src/index.html', output: 'src/home.html' } } as BrowserBuilderOptions;
+      expect(getIndexOutputFile(options)).toBe('src/home.html');
     });
   });
 });

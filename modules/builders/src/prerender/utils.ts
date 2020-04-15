@@ -7,6 +7,7 @@
  */
 
 import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
+import { BrowserBuilderOptions } from '@angular-devkit/build-angular';
 import * as fs from 'fs';
 import { parseAngularRoutes } from 'guess-parser';
 import * as os from 'os';
@@ -66,4 +67,15 @@ export function shardArray<T>(items: T[], maxNoOfShards = (os.cpus().length - 1)
   }
 
   return shardedArray;
+}
+
+/**
+ * Returns the name of the index file outputted by the browser builder.
+ */
+export function getIndexOutputFile(options: BrowserBuilderOptions): string {
+  if (typeof options.index === 'string') {
+    return path.basename(options.index);
+  } else {
+    return options.index.output || 'index.html';
+  }
 }

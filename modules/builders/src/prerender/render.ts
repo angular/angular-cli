@@ -11,6 +11,7 @@ import * as path from 'path';
 
 const [
   indexHtml,
+  indexFile,
   serverBundlePath,
   browserOutputPath,
   ...routes
@@ -50,7 +51,7 @@ async function getServerBundle(bundlePath: string) {
  */
 (async () => {
   const { renderModuleFn, AppServerModuleDef } = await getServerBundle(serverBundlePath);
-  const browserIndexOutputPath = path.join(browserOutputPath, 'index.html');
+  const browserIndexOutputPath = path.join(browserOutputPath, indexFile);
   for (const route of routes) {
     const renderOpts = {
       document: indexHtml + '<!-- This page was prerendered with Angular Universal -->',

@@ -7,12 +7,13 @@
  */
 
 import { BuilderContext, BuilderOutput, createBuilder, targetFromTargetString } from '@angular-devkit/architect';
+import { BrowserBuilderOptions } from '@angular-devkit/build-angular';
 import { fork } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
 import { PrerenderBuilderOptions, PrerenderBuilderOutput } from './models';
-import { getRoutes, shardArray } from './utils';
+import { getIndexOutputFile, getRoutes, shardArray } from './utils';
 
 type BuildBuilderOutput = BuilderOutput & {
   baseOutputPath: string;
@@ -67,6 +68,7 @@ async function _parallelRenderRoutes(
   context: BuilderContext,
   indexHtml: string,
   outputPath: string,
+  indexFile: string,
   serverBundlePath: string,
   ): Promise<void> {
   const workerFile = path.join(__dirname, 'render.js');
@@ -74,6 +76,7 @@ async function _parallelRenderRoutes(
     new Promise((resolve, reject) => {
       fork(workerFile, [
         indexHtml,
+        indexFile,
         serverBundlePath,
         outputPath,
         ...routes,
@@ -103,12 +106,15 @@ async function _renderUniversal(
   context: BuilderContext,
   browserResult: BuildBuilderOutput,
   serverResult: BuildBuilderOutput,
+  browserOptions: BrowserBuilderOptions,
   numProcesses?: number,
 ): Promise<BuildBuilderOutput> {
+  // Users can specify a different base html file e.g. "src/home.html"
+  const indexFile = getIndexOutputFile(browserOptions);
   // We need to render the routes for each locale from the browser output.
   for (const outputPath of browserResult.outputPaths) {
-    const browserIndexOutputPath = path.join(outputPath, 'index.html');
-    const indexHtml = fs.readFileSync(browserIndexOutputPath, 'utf8');
+    const browserIndexInputPath = path.join(outputPath, indexFile);
+    const indexHtml = fs.readFileSync(browserIndexInputPath, 'utf8');
 
     const { baseOutputPath = '' } = serverResult;
     const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
@@ -125,6 +131,7 @@ async function _renderUniversal(
       context,
       indexHtml,
       outputPath,
+      indexFile,
       serverBundlePath,
     );
   }
@@ -152,7 +159,18 @@ export async function execute(
     return { success, error } as BuilderOutput;
   }
 
-  return _renderUniversal(routes, context, browserResult, serverResult, options.numProcesses);
+  const browserTarget = targetFromTargetString(options.browserTarget);
+  const browserOptions =
+      await context.getTargetOptions(browserTarget) as unknown as BrowserBuilderOptions;
+
+  return _renderUniversal(
+    routes,
+    context,
+    browserResult,
+    serverResult,
+    browserOptions,
+    options.numProcesses,
+  );
 }
 
 export default createBuilder(execute);
