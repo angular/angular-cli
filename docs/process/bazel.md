@@ -42,6 +42,27 @@ Since the requirement is quite lax on Linux but quite strict on windows, what en
 happening is that lack of `require.resolve` calls go unnoticed until someone tries to run
 things on Windows, at which point it breaks.
 
+## Debugging jasmine_node_test
+
+On Linux, Bazel tests will run under a sandbox for isolation.
+You can turn off this sandbox by adding the [`local = True`](https://docs.bazel.build/versions/master/be/common-definitions.html#common-attributes-tests) attribute to the rule.
+
+Then you will find the intermediate test files in `bazel-out/k8-fastbuild/bin`, followed by the test target path.
+
+Tests that are sharded, via the `shard_count` attribute, can fail if you reduce the number of tests or focus only a few.
+This will cause some shards to execute 0 tests, which makes the exit with an error code.
+
+
+Tests that are marked as flaky, via the `flaky` attribute, will repeat when they fail.
+This will cause any focused test to be repeated multiple time, since the presence of focused tests
+causes jasmine to exit with a non-zero exit code.
+
+While testing, you can remove the `shard_count` attribute to prevent sharding and the `flaky`
+attribute to prevent repetition.
+
+NB: For a few tests, sandbox is required as otherwise the rules_nodejs linker symlinks will conflict
+with the yarn workspace symlinks in node_modules.
+
 ## Issues
 
 1. Yarn workspaces is not compatible with Bazel-managed deps
