@@ -126,7 +126,7 @@
     "npm-registry-client": "8.6.0",
     "ora": "^4.0.2",
     "pacote": "11.1.4",
-    "parse5-html-rewriting-stream": "5.1.1",
+    "parse5-html-rewriting-stream": "6.0.0",
     "pidtree": "^0.3.0",
     "pidusage": "^2.0.17",
     "prettier": "^2.0.0",
