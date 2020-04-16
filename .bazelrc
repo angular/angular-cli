@@ -125,6 +125,11 @@ build:remote --bes_results_url="https://source.cloud.google.com/results/invocati
  # Set remote caching settings
 build:remote --remote_accept_cached=true
 
+# Force remote executions to consider the entire run as linux.
+# This is required for OSX cross-platform RBE.
+build:remote --cpu=k8
+build:remote --host_cpu=k8
+
 ###############################
 # NodeJS rules settings
 # These settings are required for rules_nodejs
