@@ -9,11 +9,6 @@ export default async function () {
     compilerOptions['target'] = 'es5';
   });
 
-  await updateJsonFile('angular.json', workspaceJson => {
-      const appArchitect = workspaceJson.projects['test-project'].architect;
-      appArchitect.build.options.es5BrowserSupport = false;
-  });
-
   await writeFile('.browserslistrc', 'last 2 Chrome versions');
   await ng('build');
   await expectFileNotToExist('dist/test-project/polyfills-es5.js');
@@ -25,21 +20,6 @@ export default async function () {
     <script src="main.js" defer></script>
   `);
 
-  await ng('build', `--es5BrowserSupport`);
-  await expectFileToMatch('dist/test-project/polyfills-es5.js', 'core-js');
-  await expectFileToMatch('dist/test-project/index.html', oneLineTrim`
-    <script src="runtime.js" defer></script>
-    <script src="polyfills-es5.js" nomodule defer></script>
-    <script src="polyfills.js" defer></script>
-    <script src="styles.js" defer></script>
-    <script src="vendor.js" defer></script>
-    <script src="main.js" defer></script>
-  `);
-
-  await updateJsonFile('angular.json', workspaceJson => {
-    const appArchitect = workspaceJson.projects['test-project'].architect;
-    appArchitect.build.options.es5BrowserSupport = undefined;
-  });
   await writeFile('.browserslistrc', 'IE 10');
   await ng('build');
   await expectFileToMatch('dist/test-project/polyfills-es5.js', 'core-js');
