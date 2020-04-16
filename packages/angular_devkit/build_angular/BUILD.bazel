@@ -261,8 +261,8 @@ LARGE_SPECS = {
             "@npm//puppeteer",
             "@npm//ts-node",
         ],
-        # NB: must be run locally because webdriver manager uses an absolute path to chromedriver
-        "tags": ["local"],
+        # NB: does not run on rbe because webdriver manager uses an absolute path to chromedriver
+        "tags": ["no-remote-exec"],
     },
     "dev-server": {
         "extra_deps": [
@@ -290,8 +290,8 @@ LARGE_SPECS = {
             "@npm//puppeteer",
             "@npm//ts-node",
         ],
-        # NB: must be run locally because webdriver manager uses an absolute path to chromedriver
-        "tags": ["local"],
+        # NB: does not run on rbe because webdriver manager uses an absolute path to chromedriver
+        "tags": ["no-remote-exec"],
         # NB: multiple shards will compete for port 4200 so limiting to 1
         "shards": 1,
     },
