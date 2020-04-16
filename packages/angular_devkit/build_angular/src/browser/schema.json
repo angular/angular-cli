@@ -350,11 +350,6 @@
       "default": false,
       "x-deprecated": "Use \"NG_BUILD_PROFILING\" environment variable instead."
     },
-    "es5BrowserSupport": {
-      "description": "Enables conditionally loaded ES2015 polyfills.",
-      "type": "boolean",
-      "x-deprecated": "This will be determined from the list of supported browsers specified in the 'browserslist' file."
-    },
     "rebaseRootRelativeCssUrls": {
       "description": "Change root relative URLs in stylesheets to include base HREF and deploy URL. Use only for compatibility and transition. The behavior of this option is non-standard and will be removed in the next major release.",
       "type": "boolean",

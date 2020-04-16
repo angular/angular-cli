@@ -950,11 +950,6 @@
               },
               "default": []
             },
-            "es5BrowserSupport": {
-              "description": "Enables conditionally loaded ES2015 polyfills.",
-              "type": "boolean",
-              "default": false
-            },
             "rebaseRootRelativeCssUrls": {
               "description": "Change root relative URLs in stylesheets to include base HREF and deploy URL. Use only for compatibility and transition. The behavior of this option is non-standard and will be removed in the next major release.",
               "type": "boolean",

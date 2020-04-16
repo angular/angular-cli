@@ -82,7 +82,6 @@ export async function generateWebpackConfig(
       // Under downlevel differential loading we copy the assets outside of webpack.
       assets: [],
       esVersionInFileName: true,
-      es5BrowserSupport: undefined,
     };
   }
 

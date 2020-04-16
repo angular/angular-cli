@@ -130,10 +130,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         tsConfig.options.target || ScriptTarget.ES5,
       );
 
-      if (
-        buildOptions.es5BrowserSupport ||
-        (buildOptions.es5BrowserSupport === undefined && buildBrowserFeatures.isEs5SupportNeeded())
-      ) {
+      if (buildBrowserFeatures.isEs5SupportNeeded()) {
         const polyfillsChunkName = 'polyfills-es5';
         entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
         if (differentialLoadingMode) {

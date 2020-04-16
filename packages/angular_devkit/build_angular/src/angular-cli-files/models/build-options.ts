@@ -68,8 +68,6 @@ export interface BuildOptions {
   statsJson: boolean;
   forkTypeChecker: boolean;
   profile?: boolean;
-  /** @deprecated since version 8 **/
-  es5BrowserSupport?: boolean;
 
   main: string;
   polyfills?: string;
