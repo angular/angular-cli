@@ -261,6 +261,8 @@ LARGE_SPECS = {
             "@npm//puppeteer",
             "@npm//ts-node",
         ],
+        # NB: must be run locally because webdriver manager uses an absolute path to chromedriver
+        "tags": ["local"],
     },
     "dev-server": {
         "extra_deps": [
@@ -288,6 +290,10 @@ LARGE_SPECS = {
             "@npm//puppeteer",
             "@npm//ts-node",
         ],
+        # NB: must be run locally because webdriver manager uses an absolute path to chromedriver
+        "tags": ["local"],
+        # NB: multiple shards will compete for port 4200 so limiting to 1
+        "shards": 1,
     },
     "tslint": {
         "extra_deps": [
@@ -363,7 +369,7 @@ LARGE_SPECS = {
         # These tests are resource intensive and should not be over-parallized as they will
         # compete for the resources of other parallel tests slowing everything down.
         # Ask Bazel to allocate multiple CPUs for these tests with "cpu:n" tag.
-        tags = ["cpu:2"],
+        tags = ["cpu:2"] + LARGE_SPECS[spec].get("tags", []),
         templated_args = ["--nobazel_patch_module_resolver"],
         deps = [":build_angular_" + spec + "_test_lib"],
     )
