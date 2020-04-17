@@ -112,6 +112,9 @@ As commits are cherry-picked when PRs are merged, creating the release should be
 ```bash
 git commit -a -m 'release: vXX'
 git tag 'vXX'
+
+# Make sure to run these commands together, as missing tags can cause CI
+# failures.
 git push upstream && git push upstream --tags
 ```
 
@@ -138,29 +141,31 @@ After closing the tab, you have successfully logged in, it is time to publish.
 
 **It is a good idea to wait for CI to be green on the patch branch and tag before doing the release.**
 
-Check out the patch tag (e.g. `v6.7.8`), then run:
-```sh
-devkit-admin publish
+Check out the patch branch (e.g. `9.1.x`), then run:
+```bash
+yarn # Reload dependencies
+yarn admin publish
 ```
 
-Check out the minor tag (e.g. `v6.8.0-beta.0`), then run:
+If also publishing a prerelease, check out `master`, then run:
 ```bash
-devkit-admin publish --tag next
+yarn # Reload dependencies
+yarn admin publish --tag next
 ```
 
 ### Release Notes
 
-`devkit-admin changelog` takes `from` and `to` arguments which are any valid git
+`yarn run -s admin changelog` takes `from` and `to` arguments which are any valid git
 ref.
 
 For example, running the following command will output the release notes on
 stdout between v1.2.3 and 1.2.4:
 
 ```bash
-devkit-admin changelog --from=v1.2.3 --to=v1.2.4
+yarn run -s admin changelog --from=v1.2.3 --to=v1.2.4
 ```
 
-Copy the output (you can use `| pbcopy` on MacOS or `|xclip` on Linux) and
+Copy the output (you can use `| pbcopy` on MacOS or `| xclip` on Linux) and
 paste the release notes on [GitHub](https://github.com/angular/angular-cli/releases)
 for the tag just released.
 
