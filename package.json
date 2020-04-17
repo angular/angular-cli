@@ -80,7 +80,7 @@
     "guess-parser": "^0.4.12",
     "http-proxy-middleware": "^1.0.0",
     "jasmine-core": "^3.0.0",
-    "karma": "^4.1.0",
+    "karma": "^5.0.0",
     "karma-chrome-launcher": "^3.0.0",
     "karma-jasmine": "^3.0.0",
     "karma-sourcemap-loader": "^0.3.7",
