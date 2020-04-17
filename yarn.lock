@@ -6695,11 +6695,6 @@ minimist@^1.2.0, minimist@^1.2.5:
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
   integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
 
-minimist@~0.0.1:
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-0.0.10.tgz#de3f98543dbf96082be48ad1a0c7cda836301dcf"
-  integrity sha1-3j+YVD2/lggr5IrRoMfNqDYwHc8=
-
 minipass-collect@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/minipass-collect/-/minipass-collect-1.0.2.tgz#22b813bf745dc6edba2576b940022ad6edc8c617"
@@ -7277,14 +7272,6 @@ opn@^5.5.0:
   integrity sha512-PqHpggC9bLV0VeWcdKhkpxY+3JTzetLSqTCWL/z/tFIbI6G8JCjondXklT1JinczLz2Xib62sSp0T/gKT4KksA==
   dependencies:
     is-wsl "^1.1.0"
-
-optimist@~0.6.0:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/optimist/-/optimist-0.6.1.tgz#da3ea74686fa21a19a111c326e90eb15a0196686"
-  integrity sha1-2j6nRob6IaGaERwybpDrFaAZZoY=
-  dependencies:
-    minimist "~0.0.1"
-    wordwrap "~0.0.2"
 
 optionator@^0.8.1:
   version "0.8.3"
@@ -8088,10 +8075,10 @@ protobufjs@6.8.8:
     "@types/node" "^10.1.0"
     long "^4.0.0"
 
-protractor@5.4.3:
-  version "5.4.3"
-  resolved "https://registry.yarnpkg.com/protractor/-/protractor-5.4.3.tgz#35f050741e404a45868618ea648745d89af31683"
-  integrity sha512-7pMAolv8Ah1yJIqaorDTzACtn3gk7BamVKPTeO5lqIGOrfosjPgXFx/z1dqSI+m5EeZc2GMJHPr5DYlodujDNA==
+protractor@5.4.4:
+  version "5.4.4"
+  resolved "https://registry.yarnpkg.com/protractor/-/protractor-5.4.4.tgz#b241466aaf83b76bc2c58df67deb9a5cdfc61529"
+  integrity sha512-BaL4vePgu3Vfa/whvTUAlgaCAId4uNSGxIFSCXMgj7LMYENPWLp85h5RBi9pdpX/bWQ8SF6flP7afmi2TC4eHw==
   dependencies:
     "@types/q" "^0.0.32"
     "@types/selenium-webdriver" "^3.0.0"
@@ -8101,13 +8088,13 @@ protractor@5.4.3:
     glob "^7.0.3"
     jasmine "2.8.0"
     jasminewd2 "^2.1.0"
-    optimist "~0.6.0"
     q "1.4.1"
     saucelabs "^1.5.0"
     selenium-webdriver "3.6.0"
     source-map-support "~0.4.0"
     webdriver-js-extender "2.1.0"
     webdriver-manager "^12.0.6"
+    yargs "^12.0.5"
 
 proxy-addr@~2.0.5:
   version "2.0.6"
@@ -10649,11 +10636,6 @@ wordwrap@^1.0.0:
   resolved "https://registry.yarnpkg.com/wordwrap/-/wordwrap-1.0.0.tgz#27584810891456a4171c8d0226441ade90cbcaeb"
   integrity sha1-J1hIEIkUVqQXHI0CJkQa3pDLyus=
 
-wordwrap@~0.0.2:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/wordwrap/-/wordwrap-0.0.3.tgz#a3d5da6cd5c0bc0008d37234bbaf1bed63059107"
-  integrity sha1-o9XabNXAvAAI03I0u68b7WMFkQc=
-
 worker-farm@^1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/worker-farm/-/worker-farm-1.7.0.tgz#26a94c5391bbca926152002f69b84a4bf772e5a8"
@@ -10821,7 +10803,7 @@ yargs-parser@^9.0.2:
   dependencies:
     camelcase "^4.1.0"
 
-yargs@12.0.5:
+yargs@12.0.5, yargs@^12.0.5:
   version "12.0.5"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-12.0.5.tgz#05f5997b609647b64f66b81e3b4b10a368e7ad13"
   integrity sha512-Lhz8TLaYnxq/2ObqHDql8dX8CJi97oHxrjUcYtzKbbykPtVW9WB+poxI+NM2UIzsMgNCZTIf0AQwsjK5yMAqZw==
