@@ -99,4 +99,11 @@ describe('Application Schematic', () => {
       expect(e2eOptions.devServerTarget).toEqual('foo:serve');
     });
   });
+
+  it('should add an e2e script in package.json', async () => {
+    const tree = await schematicRunner.runSchematicAsync('e2e', defaultOptions, applicationTree)
+      .toPromise();
+    const pkg = JSON.parse(tree.readContent('/package.json'));
+    expect(pkg.scripts['e2e']).toBe('ng e2e');
+  });
 });

@@ -17,10 +17,22 @@ import {
   move,
   url,
 } from '@angular-devkit/schematics';
+import { JSONFile } from '../utility/json-file';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
 import { Schema as E2eOptions } from './schema';
+
+function addScriptsToPackageJson(): Rule {
+  return host => {
+    const pkgJson = new JSONFile(host, 'package.json');
+    const e2eScriptPath = ['scripts', 'e2e'];
+
+    if (!pkgJson.get(e2eScriptPath)) {
+      pkgJson.modify(e2eScriptPath, 'ng e2e', false);
+    }
+  };
+}
 
 export default function (options: E2eOptions): Rule {
   return async (host: Tree) => {
@@ -65,6 +77,7 @@ export default function (options: E2eOptions): Rule {
           }),
           move(root),
         ])),
+      addScriptsToPackageJson(),
     ]);
   };
 }
