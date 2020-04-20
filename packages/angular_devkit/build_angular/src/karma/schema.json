@@ -101,17 +101,6 @@
         }
       ]
     },
-    "vendorSourceMap": {
-      "type": "boolean",
-      "description": "Resolve vendor packages sourcemaps.",
-      "x-deprecated": true,
-      "default": false
-    },
-    "evalSourceMap": {
-      "type": "boolean",
-      "description": "Output in-file eval sourcemaps.",
-      "x-deprecated": true
-    },
     "progress": {
       "type": "boolean",
       "description": "Log progress to the console while building."

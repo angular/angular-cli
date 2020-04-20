@@ -19,6 +19,7 @@ function isPresent(variable: string | undefined): variable is string {
   return typeof variable === 'string' && variable !== '';
 }
 
+// Optimization and mangling
 const debugOptimizeVariable = process.env['NG_BUILD_DEBUG_OPTIMIZE'];
 const debugOptimize = (() => {
   if (!isPresent(debugOptimizeVariable) || isDisabled(debugOptimizeVariable)) {
@@ -64,6 +65,7 @@ export const allowMangle = isPresent(mangleVariable)
 export const shouldBeautify = debugOptimize.beautify;
 export const allowMinify = debugOptimize.minify;
 
+// Build cache
 const cacheVariable = process.env['NG_BUILD_CACHE'];
 export const cachingDisabled = isPresent(cacheVariable) && isDisabled(cacheVariable);
 export const cachingBasePath = (() => {
@@ -76,3 +78,7 @@ export const cachingBasePath = (() => {
 
   return cacheVariable;
 })();
+
+// Build profiling
+const profilingVariable = process.env['NG_BUILD_PROFILING'];
+export const profilingEnabled = isPresent(profilingVariable) && isEnabled(profilingVariable);

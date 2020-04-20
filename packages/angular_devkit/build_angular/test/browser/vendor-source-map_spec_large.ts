@@ -34,21 +34,6 @@ describe('Browser Builder external source map', () => {
     expect(hasTsSourcePaths).toBe(true, `vendor.js.map should have '.ts' extentions`);
   });
 
-  it(`works when using deprecated 'vendorSourceMap'`, async () => {
-    const overrides = {
-      sourceMap: {
-        scripts: true,
-        styles: true,
-      },
-      vendorSourceMap: true,
-    };
-
-    const { files } = await browserBuild(architect, host, target, overrides);
-    const sourcePaths: string[] = JSON.parse(await files['vendor.js.map']).sources;
-    const hasTsSourcePaths = sourcePaths.some(p => path.extname(p) == '.ts');
-    expect(hasTsSourcePaths).toBe(true, `vendor.js.map should have '.ts' extentions`);
-  });
-
   it('does not map sourcemaps from external library when disabled', async () => {
     const overrides = {
       sourceMap: {

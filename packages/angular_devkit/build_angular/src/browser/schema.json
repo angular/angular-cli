@@ -139,18 +139,6 @@
         }
       ]
     },
-    "vendorSourceMap": {
-      "type": "boolean",
-      "description": "Resolve vendor packages sourcemaps.",
-      "x-deprecated": true,
-      "default": false
-    },
-    "evalSourceMap": {
-      "type": "boolean",
-      "description": "Output in-file eval sourcemaps.",
-      "default": false,
-      "x-deprecated": true
-    },
     "vendorChunk": {
       "type": "boolean",
       "description": "Use a separate bundle containing only vendor libraries.",
@@ -284,12 +272,6 @@
       "type": "string",
       "description": "Path to ngsw-config.json."
     },
-    "skipAppShell": {
-      "type": "boolean",
-      "description": "Flag to prevent building an app shell.",
-      "default": false,
-      "x-deprecated": true
-    },
     "index": {
       "description": "Configures the generation of the application's HTML index.",
       "oneOf": [
@@ -343,12 +325,6 @@
         "$ref": "#/definitions/budget"
       },
       "default": []
-    },
-    "profile": {
-      "type": "boolean",
-      "description": "Output profile events for Chrome profiler.",
-      "default": false,
-      "x-deprecated": "Use \"NG_BUILD_PROFILING\" environment variable instead."
     },
     "rebaseRootRelativeCssUrls": {
       "description": "Change root relative URLs in stylesheets to include base HREF and deploy URL. Use only for compatibility and transition. The behavior of this option is non-standard and will be removed in the next major release.",

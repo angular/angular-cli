@@ -105,18 +105,6 @@
         }
       ]
     },
-    "vendorSourceMap": {
-      "type": "boolean",
-      "description": "Resolve vendor packages sourcemaps.",
-      "x-deprecated": true,
-      "default": false
-    },
-    "evalSourceMap": {
-      "type": "boolean",
-      "description": "Output in-file eval sourcemaps.",
-      "default": false,
-      "x-deprecated": true
-    },
     "vendorChunk": {
       "type": "boolean",
       "description": "Use a separate bundle containing only vendor libraries.",

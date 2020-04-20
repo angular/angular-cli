@@ -765,16 +765,6 @@
                 }
               ]
             },
-            "vendorSourceMap": {
-              "type": "boolean",
-              "description": "Resolve vendor packages sourcemaps.",
-              "default": false
-            },
-            "evalSourceMap": {
-              "type": "boolean",
-              "description": "Output in-file eval sourcemaps.",
-              "default": false
-            },
             "vendorChunk": {
               "type": "boolean",
               "description": "Use a separate bundle containing only vendor libraries.",
@@ -891,11 +881,6 @@
             "ngswConfigPath": {
               "type": "string",
               "description": "Path to ngsw-config.json."
-            },
-            "skipAppShell": {
-              "type": "boolean",
-              "description": "Flag to prevent building an app shell.",
-              "default": false
             },
             "index": {
               "description": "Configures the generation of the application's HTML index.",
@@ -1289,15 +1274,6 @@
                   "type": "boolean"
                 }
               ]
-            },
-            "vendorSourceMap": {
-              "type": "boolean",
-              "description": "When true, resolve vendor packages sourcemaps.",
-              "default": false
-            },
-            "evalSourceMap": {
-              "type": "boolean",
-              "description": "When true, output in-file eval sourcemaps."
             },
             "vendorChunk": {
               "type": "boolean",
@@ -1806,16 +1782,6 @@
                   "type": "boolean"
                 }
               ]
-            },
-            "vendorSourceMap": {
-              "type": "boolean",
-              "description": "Resolve vendor packages sourcemaps.",
-              "default": false
-            },
-            "evalSourceMap": {
-              "type": "boolean",
-              "description": "Output in-file eval sourcemaps.",
-              "default": false
             },
             "vendorChunk": {
               "type": "boolean",

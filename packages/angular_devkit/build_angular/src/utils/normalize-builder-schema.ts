@@ -43,9 +43,7 @@ export function normalizeBrowserSchema(
   options: BrowserBuilderSchema,
 ): NormalizedBrowserBuilderSchema {
   const syncHost = new virtualFs.SyncDelegateHost(host);
-
   const normalizedSourceMapOptions = normalizeSourceMaps(options.sourceMap || false);
-  normalizedSourceMapOptions.vendor = normalizedSourceMapOptions.vendor || options.vendorSourceMap;
 
   return {
     ...options,

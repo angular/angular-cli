@@ -70,15 +70,6 @@ describe('Browser Builder source map', () => {
     expect(files['main.js.map']).toBeUndefined();
   });
 
-  it('supports eval source map', async () => {
-    const { files } = await browserBuild(architect, host, target, {
-      sourceMap: true, evalSourceMap: true,
-    });
-
-    expect(files['main.js.map']).toBeUndefined();
-    expect(await files['main.js']).toContain('eval("function webpackEmptyAsyncContext');
-  });
-
   it('supports hidden sourcemaps', async () => {
     const overrides = {
       sourceMap: {
