@@ -74,10 +74,6 @@ export declare abstract class FileSystemEngineHostBase implements FileSystemEngi
     transformOptions<OptionT extends object, ResultT extends object>(schematic: FileSystemSchematicDesc, options: OptionT, context?: FileSystemSchematicContext): Observable<ResultT>;
 }
 
-export declare class FileSystemHost extends virtualFs.ScopedHost<{}> {
-    constructor(dir: string);
-}
-
 export declare type FileSystemSchematic = Schematic<FileSystemCollectionDescription, FileSystemSchematicDescription>;
 
 export declare type FileSystemSchematicContext = TypedSchematicContext<FileSystemCollectionDescription, FileSystemSchematicDescription>;
