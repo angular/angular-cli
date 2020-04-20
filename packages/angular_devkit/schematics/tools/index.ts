@@ -8,7 +8,6 @@
 export * from './description';
 export * from './export-ref';
 export * from './file-system-engine-host-base';
-export * from './file-system-host';
 
 export * from './workflow/node-workflow';
 
