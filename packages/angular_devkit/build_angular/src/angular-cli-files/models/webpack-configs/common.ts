@@ -34,6 +34,7 @@ import {
   allowMangle,
   allowMinify,
   cachingDisabled,
+  profilingEnabled,
   shouldBeautify,
 } from '../../../utils/environment-options';
 import {
@@ -189,7 +190,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     }
   }
 
-  if (buildOptions.profile || process.env['NG_BUILD_PROFILING']) {
+  if (profilingEnabled) {
     extraPlugins.push(
       new debug.ProfilingPlugin({
         outputPath: path.resolve(root, `chrome-profiler-events${targetInFileName}.json`),

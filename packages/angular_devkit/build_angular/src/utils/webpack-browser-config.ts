@@ -27,6 +27,7 @@ import {
   normalizeBrowserSchema,
 } from '../utils';
 import { BuildBrowserFeatures } from './build-browser-features';
+import { profilingEnabled } from './environment-options';
 import { I18nOptions, configureI18nBuild } from './i18n-options';
 
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
@@ -113,7 +114,7 @@ export async function generateWebpackConfig(
     webpackConfig.resolve.alias['zone.js/dist/zone'] = 'zone.js/dist/zone-evergreen';
   }
 
-  if (options.profile || process.env['NG_BUILD_PROFILING']) {
+  if (profilingEnabled) {
     const esVersionInFileName = getEsVersionForFileName(
       tsConfig.options.target,
       wco.buildOptions.esVersionInFileName,

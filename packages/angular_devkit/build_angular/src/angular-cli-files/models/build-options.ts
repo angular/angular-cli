@@ -29,10 +29,6 @@ export interface BuildOptions {
   resourcesOutputPath?: string;
   aot?: boolean;
   sourceMap: SourceMapClass;
-  /** @deprecated since version 8. use sourceMap instead. */
-  vendorSourceMap?: boolean;
-  /** @deprecated since version 8 */
-  evalSourceMap?: boolean;
   vendorChunk?: boolean;
   commonChunk?: boolean;
   baseHref?: string;
@@ -63,11 +59,8 @@ export interface BuildOptions {
   subresourceIntegrity?: boolean;
   serviceWorker?: boolean;
   webWorkerTsConfig?: string;
-  /** @deprecated since version 8 **/
-  skipAppShell?: boolean;
   statsJson: boolean;
   forkTypeChecker: boolean;
-  profile?: boolean;
 
   main: string;
   polyfills?: string;

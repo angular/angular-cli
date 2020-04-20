@@ -45,8 +45,6 @@ const devServerBuildOverriddenKeys: (keyof DevServerBuilderOptions)[] = [
   'optimization',
   'aot',
   'sourceMap',
-  'vendorSourceMap',
-  'evalSourceMap',
   'vendorChunk',
   'commonChunk',
   'baseHref',
