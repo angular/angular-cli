@@ -86,6 +86,13 @@ describe('readJsonWorkpace Parsing', () => {
     );
   });
 
+  it(`doesn't remove falsy values when using the spread operator`, async () => {
+    const host = createTestHost(representativeFile);
+    const workspace = await readJsonWorkspace('', host);
+    const prodConfig = workspace.projects.get('my-app')!.targets.get('build')!.configurations!.production!;
+    expect({ ...prodConfig }).toEqual(prodConfig);
+  });
+
   it('parses extensions only into extensions object', async () => {
     const host = createTestHost(representativeFile);
 
