@@ -350,6 +350,14 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
 
   if (buildOptions.namedChunks && !isWebpackFiveOrHigher()) {
     extraPlugins.push(new NamedLazyChunksPlugin());
+
+    // Provide full names for lazy routes that use the deprecated string format
+    extraPlugins.push(
+      new ContextReplacementPlugin(
+        /\@angular[\\\/]core[\\\/]/,
+        (data: { chunkName?: string }) => (data.chunkName = '[request]'),
+      ),
+    );
   }
 
   if (!differentialLoadingMode) {

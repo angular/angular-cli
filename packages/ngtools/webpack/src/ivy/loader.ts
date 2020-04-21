@@ -15,10 +15,6 @@ export function angularWebpackLoader(
   // tslint:disable-next-line: no-any
   map: any,
 ) {
-  if (this.loaderIndex !== this.loaders.length - 1) {
-    this.emitWarning('The Angular Webpack loader does not support chaining prior to the loader.');
-  }
-
   const callback = this.async();
   if (!callback) {
     throw new Error('Invalid webpack version');
