@@ -32,11 +32,34 @@ export class WebpackResourceLoader {
   private _cachedSources = new Map<string, string>();
   private _cachedEvaluatedSources = new Map<string, RawSource>();
 
-  constructor() {}
+  private buildTimestamp?: number;
+  public changedFiles = new Set<string>();
 
-  update(parentCompilation: any) {
+  update(parentCompilation: import('webpack').compilation.Compilation) {
     this._parentCompilation = parentCompilation;
     this._context = parentCompilation.context;
+
+    // Update changed file list
+    if (this.buildTimestamp !== undefined) {
+      this.changedFiles.clear();
+      for (const [file, time] of parentCompilation.fileTimestamps) {
+        if (this.buildTimestamp < time) {
+          this.changedFiles.add(file);
+        }
+      }
+    }
+    this.buildTimestamp = Date.now();
+  }
+
+  getModifiedResourceFiles() {
+    const modifiedResources = new Set<string>();
+    for (const changedFile of this.changedFiles) {
+      this.getAffectedResources(
+        changedFile,
+      ).forEach((affected: string) => modifiedResources.add(affected));
+    }
+
+    return modifiedResources;
   }
 
   getResourceDependencies(filePath: string) {
@@ -45,6 +68,10 @@ export class WebpackResourceLoader {
 
   getAffectedResources(file: string) {
     return this._reverseDependencies.get(file) || [];
+  }
+
+  setAffectedResources(file: string, resources: Iterable<string>) {
+    this._reverseDependencies.set(file, new Set(resources));
   }
 
   private async _compile(filePath: string): Promise<CompilationOutput> {
