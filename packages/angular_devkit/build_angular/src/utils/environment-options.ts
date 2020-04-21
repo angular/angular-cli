@@ -82,3 +82,8 @@ export const cachingBasePath = (() => {
 // Build profiling
 const profilingVariable = process.env['NG_BUILD_PROFILING'];
 export const profilingEnabled = isPresent(profilingVariable) && isEnabled(profilingVariable);
+
+// Legacy Webpack plugin with Ivy
+const legacyIvyVariable = process.env['NG_BUILD_IVY_LEGACY'];
+export const legacyIvyPluginEnabled =
+  isPresent(legacyIvyVariable) && !isDisabled(legacyIvyVariable);
