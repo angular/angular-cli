@@ -14,3 +14,5 @@ export const NgToolsLoader = __filename;
 
 // We shouldn't need to export this, but webpack-rollup-loader uses it.
 export type { VirtualFileSystemDecorator } from './virtual_file_system_decorator';
+
+export * as ivy from './ivy';
