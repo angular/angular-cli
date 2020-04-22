@@ -259,6 +259,17 @@ describe('Browser Builder styles', () => {
   it(`supports font-awesome imports`, async () => {
     host.writeMultipleFiles({
       'src/styles.scss': `
+        @import "font-awesome/scss/font-awesome";
+      `,
+    });
+
+    const overrides = { extractCss: true, styles: [`src/styles.scss`] };
+    await browserBuild(architect, host, target, overrides);
+  }, 30000);
+
+  it(`supports font-awesome imports (tilde)`, async () => {
+    host.writeMultipleFiles({
+      'src/styles.scss': `
         $fa-font-path: "~font-awesome/fonts";
         @import "~font-awesome/scss/font-awesome";
       `,
@@ -576,6 +587,31 @@ describe('Browser Builder styles', () => {
     });
 
     await browserBuild(architect, host, target, overrides);
+  });
+
+  it('causes equal failure for tilde and tilde-slash url()', async () => {
+    host.writeMultipleFiles({
+      'src/styles.css': `
+        body {
+          background-image: url('~/does-not-exist.jpg');
+        }
+      `,
+    });
+
+    const overrides = { extractCss: true, optimization: true };
+    const run = await architect.scheduleTarget(target, overrides);
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: false }));
+
+    host.writeMultipleFiles({
+      'src/styles.css': `
+        body {
+          background-image: url('~does-not-exist.jpg');
+        }
+      `,
+    });
+
+    const run2 = await architect.scheduleTarget(target, overrides);
+    await expectAsync(run2.result).toBeResolvedTo(jasmine.objectContaining({ success: false }));
   });
 
   it('supports Protocol-relative Url', async () => {
