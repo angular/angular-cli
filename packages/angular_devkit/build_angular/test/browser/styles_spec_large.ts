@@ -282,15 +282,23 @@ describe('Browser Builder styles', () => {
   it(`uses autoprefixer`, async () => {
     host.writeMultipleFiles({
       'src/styles.css': tags.stripIndents`
+        @import url(imported-styles.css);
         /* normal-comment */
         /*! important-comment */
         div { flex: 1 }`,
+      'src/imported-styles.css': tags.stripIndents`
+        /* normal-comment */
+        /*! important-comment */
+        section { flex: 1 }`,
       '.browserslistrc': 'IE 10',
     });
 
     const overrides = { extractCss: true, optimization: false };
     const { files } = await browserBuild(architect, host, target, overrides);
     expect(await files['styles.css']).toContain(tags.stripIndents`
+      /* normal-comment */
+      /*! important-comment */
+      section { -ms-flex: 1; flex: 1 }
       /* normal-comment */
       /*! important-comment */
       div { -ms-flex: 1; flex: 1 }`);
