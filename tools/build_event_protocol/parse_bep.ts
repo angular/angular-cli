@@ -17,7 +17,7 @@
 import * as fs from 'fs';
 import { Observable, Subject } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { build_event_stream as bes } from './build_event_stream';
+import {BuildEvent} from 'angular_cli/third_party/github.com/bazelbuild/bazel/src/main/java/com/google/devtools/build/lib/buildeventstream/proto/build_event_stream_pb';
 
 function updateUi(s: string, ...more: Array<{}>) {
   console.error('-->', s, ...more);
@@ -31,40 +31,43 @@ type payloadType = 'unknown'|'progress'|'started'|'unstructuredCommandLine'|
     'testResult'|'testSummary'|'buildFinished'|'buildToolLogs'|'buildMetrics';
 
 function filterType(s: payloadType) {
-  return filter((evt: bes.BuildEvent) => {
-    if (!evt.id) {
+  return filter((evt: BuildEvent) => {
+    const id = evt.getId();
+    if (!id) {
       throw new Error(`expected BuildEvent to contain id
         ${JSON.stringify(evt)}`);
     }
-    return Object.keys(evt.id)[0] === s;
+    return Object.keys(id)[0] === s;
   });
 }
 
 async function main(argv: string[]): Promise<0|1> {
-  const s = new Subject<bes.BuildEvent>();
-  const o: Observable<bes.BuildEvent> = s.asObservable();
+  const s = new Subject<BuildEvent>();
+  const o: Observable<BuildEvent> = s.asObservable();
   o.pipe(filterType('testSummary')).subscribe({
-    next: (evt: bes.BuildEvent) => {
-      if (!evt.id || !evt.id.testSummary || !evt.testSummary) {
+    next: (evt: BuildEvent) => {
+      const id = evt.getId();
+      if (!id || !id.getTestSummary() || !evt.getTestSummary()) {
         throw new Error(
             `expected BuildEvent to contain id, testSummary, id.testSummary
         ${JSON.stringify(evt)}`);
       }
       updateUi('Test result', {
-        label: evt.id.testSummary.label,
-        overallStatus: evt.testSummary.overallStatus,
+        label: id.getTestSummary()!.getLabel(),
+        overallStatus: evt.getTestSummary()!.getOverallStatus(),
       });
     }
   });
 
   o.pipe(filterType('buildFinished')).subscribe({
-    next: (evt: bes.BuildEvent) => {
-      if (!evt.finished || !evt.finished.exitCode) {
+    next: (evt: BuildEvent) => {
+      const finished = evt.getFinished();
+      if (!finished || !finished.getExitCode()) {
         throw new Error(
             `expected BuildEvent to contain finished, finished.exitCode
           ${JSON.stringify(evt)}`);
       }
-      const exitName = evt.finished.exitCode.name;
+      const exitName = finished.getExitCode()!.getName();
       switch (exitName) {
         case 'SUCCESS':
           updateUi('Thumbs up');
