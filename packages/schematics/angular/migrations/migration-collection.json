@@ -69,6 +69,11 @@
       "version": "10.0.0-beta.1",
       "factory": "./update-10/update-dependencies",
       "description": "Workspace dependencies updates."
+    },
+    "remove-es5-browser-support-option": {
+      "version": "10.0.0-beta.2",
+      "factory": "./update-10/remove-es5-browser-support",
+      "description": "Remove deprecated 'es5BrowserSupport' browser builder option. The inclusion for ES5 polyfills will be determined from the browsers listed in the browserslist configuration."
     }
   }
 }

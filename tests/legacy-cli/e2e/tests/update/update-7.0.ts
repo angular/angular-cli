@@ -11,6 +11,9 @@ export default async function() {
   // Create new project from previous version files.
   // We must use the original NPM packages to force a real update.
   await createProjectFromAsset('7.0-project', true);
+  // Update to version 8, to use the self update CLI feature.
+  await ng('update', '@angular/cli@8');
+
   fs.writeFileSync('.npmrc', 'registry = http://localhost:4873', 'utf8');
 
   // Update the CLI.
