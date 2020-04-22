@@ -647,4 +647,53 @@ describe('Browser Builder styles', () => {
       expect(await files['styles.css']).toMatch(/\.one(.|\n|\r)*\.two(.|\n|\r)*\.three/);
     });
   });
+
+  extensionsWithImportSupport.forEach(ext => {
+    it(`adjusts relative resource URLs when using @import in ${ext} (global)`, async () => {
+      host.copyFile('src/spectrum.png', './src/more-styles/images/global-img-relative.png');
+      host.writeMultipleFiles({
+        [`src/styles-one.${ext}`]: tags.stripIndents`
+            @import "more-styles/styles-two.${ext}";
+          `,
+        [`src/more-styles/styles-two.${ext}`]: tags.stripIndents`
+            .two {
+              background-image: url(images/global-img-relative.png);
+            }
+          `,
+      });
+
+      const overrides = {
+        sourceMap: false,
+        extractCss: true,
+        styles: [
+          `src/styles-one.${ext}`,
+        ],
+      };
+      const { files } = await browserBuild(architect, host, target, overrides);
+      expect(await files['styles.css']).toContain('\'global-img-relative.png\'');
+    });
+
+    it(`adjusts relative resource URLs when using @import in ${ext} (component)`, async () => {
+      host.copyFile('src/spectrum.png', './src/app/images/component-img-relative.png');
+      host.writeMultipleFiles({
+        [`src/app/styles/component-styles.${ext}`]: `
+            div { background-image: url(../images/component-img-relative.png); }
+          `,
+        [`src/app/app.component.${ext}`]: `
+            @import "styles/component-styles.${ext}";
+          `,
+      });
+
+      host.replaceInFile(
+        'src/app/app.component.ts',
+        './app.component.css',
+        `./app.component.${ext}`,
+      );
+
+      const overrides = {
+        sourceMap: false,
+      };
+      await browserBuild(architect, host, target, overrides);
+    });
+  });
 });

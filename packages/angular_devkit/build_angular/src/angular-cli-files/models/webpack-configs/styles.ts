@@ -127,10 +127,16 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       test: /\.scss$|\.sass$/,
       use: [
         {
+          loader: require.resolve('resolve-url-loader'),
+          options: {
+            sourceMap: cssSourceMap,
+          },
+        },
+        {
           loader: require.resolve('sass-loader'),
           options: {
             implementation: sassImplementation,
-            sourceMap: cssSourceMap,
+            sourceMap: true,
             sassOptions: {
               // bootstrap-sass requires a minimum precision of 8
               precision: 8,
@@ -162,9 +168,15 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
       test: /\.styl$/,
       use: [
         {
-          loader: require.resolve('stylus-loader'),
+          loader: require.resolve('resolve-url-loader'),
           options: {
             sourceMap: cssSourceMap,
+          },
+        },
+        {
+          loader: require.resolve('stylus-loader'),
+          options: {
+            sourceMap: { comment: false },
             paths: includePaths,
           },
         },
