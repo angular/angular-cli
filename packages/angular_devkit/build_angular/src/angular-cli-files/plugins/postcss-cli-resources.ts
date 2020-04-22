@@ -81,11 +81,7 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
       return cachedUrl;
     }
 
-    if (inputUrl.startsWith('~')) {
-      inputUrl = inputUrl.substr(1);
-    }
-
-    if (inputUrl.startsWith('/')) {
+    if (rebaseRootRelative && inputUrl.startsWith('/')) {
       let outputUrl = '';
       if (deployUrl.match(/:\/\//) || deployUrl.startsWith('/')) {
         // If deployUrl is absolute or root relative, ignore baseHref & use deployUrl as is.
@@ -101,6 +97,10 @@ export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResou
       resourceCache.set(cacheKey, outputUrl);
 
       return outputUrl;
+    }
+
+    if (inputUrl.startsWith('~')) {
+      inputUrl = inputUrl.substr(1);
     }
 
     const { pathname, hash, search } = url.parse(inputUrl.replace(/\\/g, '/'));
