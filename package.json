@@ -130,7 +130,7 @@
     "pidtree": "^0.3.0",
     "pidusage": "^2.0.17",
     "prettier": "^2.0.0",
-    "puppeteer": "2.1.1",
+    "puppeteer": "3.0.1",
     "quicktype-core": "^6.0.15",
     "raw-loader": "4.0.0",
     "rxjs": "6.5.5",
