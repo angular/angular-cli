@@ -8,7 +8,7 @@ load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_binary")
 
 ts_proto_library(
     name = "build_event_stream",
-    deps = ["//third_party/github.com/bazelbuild/bazel/src/main/java/com/google/devtools/build/lib/buildeventstream/proto"],
+    proto = "//third_party/github.com/bazelbuild/bazel/src/main/java/com/google/devtools/build/lib/buildeventstream/proto",
 )
 
 ts_library(
