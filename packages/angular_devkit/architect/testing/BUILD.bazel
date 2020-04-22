@@ -3,9 +3,9 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
 
-licenses(["notice"])  # MIT
-
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
+
+licenses(["notice"])  # MIT
 
 package(default_visibility = ["//visibility:public"])
 

@@ -1,9 +1,3 @@
-# Copyright Google Inc. All Rights Reserved.
-#
-# Use of this source code is governed by an MIT-style license that can be
-# found in the LICENSE file at https://angular.io/license
-package(default_visibility = ["//visibility:public"])
-
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
@@ -11,6 +5,12 @@ load("@npm_bazel_typescript//:index.bzl", "ts_library")
 # @external_begin
 load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
 # @external_end
+
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # MIT License
 
