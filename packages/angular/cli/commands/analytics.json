@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "ng-cli://commands/analytics.json",
-  "description": "Configures the gathering of Angular CLI usage metrics. See https://v8.angular.io/cli/usage-analytics-gathering.",
+  "description": "Configures the gathering of Angular CLI usage metrics. See https://angular.io/cli/usage-analytics-gathering.",
   "$longDescription": "./analytics-long.md",
 
   "$aliases": [],
