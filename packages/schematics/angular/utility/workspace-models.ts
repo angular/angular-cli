@@ -74,15 +74,20 @@ export interface LibraryBuilderOptions {
 }
 
 export interface ServerBuilderOptions {
-    outputPath: string;
-    tsConfig: string;
-    main: string;
-    fileReplacements?: FileReplacements[];
-    optimization?: {
-        scripts?: boolean;
-        styles?: boolean;
-    };
-    sourceMap?: boolean;
+  outputPath: string;
+  tsConfig: string;
+  main: string;
+  fileReplacements?: FileReplacements[];
+  optimization?: {
+    scripts?: boolean;
+    styles?: boolean;
+  };
+  sourceMap?: boolean | {
+    scripts?: boolean;
+    styles?: boolean;
+    hidden?: boolean;
+    vendor?: boolean;
+  };
 }
 
 export interface AppShellBuilderOptions {
