@@ -50,7 +50,7 @@
     "rimraf": "3.0.2",
     "rollup": "2.7.2",
     "rxjs": "6.5.5",
-    "sass": "1.26.3",
+    "sass": "1.26.5",
     "sass-loader": "8.0.2",
     "semver": "7.3.2",
     "source-map": "0.7.3",
