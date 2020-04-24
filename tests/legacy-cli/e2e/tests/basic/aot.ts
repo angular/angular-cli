@@ -6,14 +6,10 @@ export default async function () {
   await ng('build', '--aot=true');
 
   if (getGlobalVariable('argv')['ve']) {
-    await expectFileToMatch('dist/test-project/main-es5.js',
-      /platformBrowser.*bootstrapModuleFactory.*AppModuleNgFactory/);
-    await expectFileToMatch('dist/test-project/main-es2015.js',
+    await expectFileToMatch('dist/test-project/main.js',
       /platformBrowser.*bootstrapModuleFactory.*AppModuleNgFactory/);
   } else {
-    await expectFileToMatch('dist/test-project/main-es5.js',
-      /platformBrowser.*bootstrapModule.*AppModule/);
-    await expectFileToMatch('dist/test-project/main-es2015.js',
+    await expectFileToMatch('dist/test-project/main.js',
       /platformBrowser.*bootstrapModule.*AppModule/);
   }
 }

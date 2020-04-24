@@ -10,7 +10,7 @@ import { appendToFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { langTranslations, setupI18nConfig } from './legacy';
 
-const OUTPUT_RE = /^(?<name>(?:main|vendor|\d+)\-(?:es2015|es5))\.(?<hash>[a-z0-9]+)\.js$/i;
+const OUTPUT_RE = /^(?<name>(?:main|vendor|\d+))\.(?<hash>[a-z0-9]+)\.js$/i;
 
 export default async function() {
   // Setup i18n tests and config.

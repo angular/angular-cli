@@ -133,6 +133,11 @@
       "type": "boolean",
       "default": false
     },
+    "legacyBrowsers": {
+      "type": "boolean",
+      "description": "Add support for legacy browsers like Internet Explorer using differential loading.",
+      "default": false
+    },
     "packageManager": {
       "description": "The package manager used to install dependencies.",
       "type": "string",

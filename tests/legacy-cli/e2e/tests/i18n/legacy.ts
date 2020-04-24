@@ -259,8 +259,7 @@ export default async function () {
   // Build each locale and verify the output.
   for (const { lang, translation, outputPath } of langTranslations) {
     await ng('build', `--configuration=${lang}`);
-    await expectFileToMatch(`${outputPath}/main-es5.js`, translation.helloPartial);
-    await expectFileToMatch(`${outputPath}/main-es2015.js`, translation.helloPartial);
+    await expectFileToMatch(`${outputPath}/main.js`, translation.helloPartial);
 
     // Verify the HTML lang attribute is present
     await expectFileToMatch(`${outputPath}/index.html`, `lang="${lang}"`);
@@ -280,7 +279,6 @@ export default async function () {
   // Verify missing translation behaviour.
   await appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
   await ng('build', '--configuration=fr', '--i18n-missing-translation', 'ignore');
-  await expectFileToMatch(`${baseDir}/fr/main-es5.js`, /Other content/);
-  await expectFileToMatch(`${baseDir}/fr/main-es2015.js`, /Other content/);
+  await expectFileToMatch(`${baseDir}/fr/main.js`, /Other content/);
   await expectToFail(() => ng('build', '--configuration=fr'));
 }

@@ -59,16 +59,16 @@ export default function () {
     // files were created successfully
     .then(() => ng('build', '--extract-css'))
     .then(() => expectFileToMatch('dist/test-project/styles.css', /h1\s*{\s*color: red;\s*}/))
-    .then(() => expectFileToMatch('dist/test-project/main-es2015.js', /h2.*{.*color: red;.*}/))
+    .then(() => expectFileToMatch('dist/test-project/main.js', /h2.*{.*color: red;.*}/))
     .then(() => expectFileToMatch('dist/test-project/styles.css', /h3\s*{\s*color: #008000;\s*}/))
-    .then(() => expectFileToMatch('dist/test-project/main-es2015.js', /h4.*{.*color: #008000;.*}/))
+    .then(() => expectFileToMatch('dist/test-project/main.js', /h4.*{.*color: #008000;.*}/))
     .then(() => expectFileToMatch('dist/test-project/styles.css', /h5\s*{\s*color: #ADDADD;\s*}/))
-    .then(() => expectFileToMatch('dist/test-project/main-es2015.js', /h6.*{.*color: #ADDADD;.*}/))
+    .then(() => expectFileToMatch('dist/test-project/main.js', /h6.*{.*color: #ADDADD;.*}/))
     .then(() => ng('build', '--extract-css', '--aot'))
     .then(() => expectFileToMatch('dist/test-project/styles.css', /h1\s*{\s*color: red;\s*}/))
-    .then(() => expectFileToMatch('dist/test-project/main-es5.js', /h2.*{.*color: red;.*}/))
+    .then(() => expectFileToMatch('dist/test-project/main.js', /h2.*{.*color: red;.*}/))
     .then(() => expectFileToMatch('dist/test-project/styles.css', /h3\s*{\s*color: #008000;\s*}/))
-    .then(() => expectFileToMatch('dist/test-project/main-es5.js', /h4.*{.*color: #008000;.*}/))
+    .then(() => expectFileToMatch('dist/test-project/main.js', /h4.*{.*color: #008000;.*}/))
     .then(() => expectFileToMatch('dist/test-project/styles.css', /h5\s*{\s*color: #ADDADD;\s*}/))
-    .then(() => expectFileToMatch('dist/test-project/main-es5.js', /h6.*{.*color: #ADDADD;.*}/));
+    .then(() => expectFileToMatch('dist/test-project/main.js', /h6.*{.*color: #ADDADD;.*}/));
 }

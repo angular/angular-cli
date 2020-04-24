@@ -10,8 +10,7 @@ export default function() {
 
   return ng('build', '--output-path', 'build-output')
     .then(() => expectFileToExist('./build-output/index.html'))
-    .then(() => expectFileToExist('./build-output/main-es5.js'))
-    .then(() => expectFileToExist('./build-output/main-es2015.js'))
+    .then(() => expectFileToExist('./build-output/main.js'))
     .then(() => expectToFail(expectGitToBeClean))
     .then(() => updateJsonFile('angular.json', workspaceJson => {
       const appArchitect = workspaceJson.projects['test-project'].architect;
@@ -19,7 +18,6 @@ export default function() {
     }))
     .then(() => ng('build'))
     .then(() => expectFileToExist('./config-build-output/index.html'))
-    .then(() => expectFileToExist('./config-build-output/main-es5.js'))
-    .then(() => expectFileToExist('./config-build-output/main-es2015.js'))
+    .then(() => expectFileToExist('./config-build-output/main.js'))
     .then(() => expectToFail(expectGitToBeClean));
 }

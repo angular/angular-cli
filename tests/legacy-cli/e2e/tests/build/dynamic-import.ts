@@ -46,7 +46,7 @@ export default async function() {
   // Build and look for the split lazy module
   await ng('build');
   for (const file of fs.readdirSync('./dist/test-project')) {
-    if (file === 'src-app-lazy-lazy-module-es5.js') {
+    if (file === 'src-app-lazy-lazy-module.js') {
       // Lazy module chunk was found and succesfully split
       return;
     }

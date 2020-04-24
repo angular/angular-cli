@@ -15,42 +15,26 @@ export default async function () {
   // use image with file size >10KB to prevent inlining
   await copyProjectAsset('images/spectrum.png', './src/assets/image.png');
   await ng('build', '--output-hashing=all');
-  await expectFileToMatch('dist/test-project/index.html', /runtime-es2015\.[0-9a-f]{20}\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /main-es2015\.[0-9a-f]{20}\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /runtime-es5\.[0-9a-f]{20}\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /main-es5\.[0-9a-f]{20}\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /styles-es5\.[0-9a-f]{20}\.(css|js)/);
-  await expectFileToMatch('dist/test-project/index.html', /styles-es2015\.[0-9a-f]{20}\.(css|js)/);
-  await verifyMedia(/styles-es5\.[0-9a-f]{20}\.(css|js)/, /image\.[0-9a-f]{20}\.png/);
-  await verifyMedia(/styles-es2015\.[0-9a-f]{20}\.(css|js)/, /image\.[0-9a-f]{20}\.png/);
+  await expectFileToMatch('dist/test-project/index.html', /runtime\.[0-9a-f]{20}\.js/);
+  await expectFileToMatch('dist/test-project/index.html', /main\.[0-9a-f]{20}\.js/);
+  await expectFileToMatch('dist/test-project/index.html', /styles\.[0-9a-f]{20}\.(css|js)/);
+  await verifyMedia(/styles\.[0-9a-f]{20}\.(css|js)/, /image\.[0-9a-f]{20}\.png/);
 
   await ng('build', '--output-hashing=none');
-  await expectFileToMatch('dist/test-project/index.html', /runtime-es2015\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /runtime-es5\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /main-es5\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /main-es2015\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /styles-es5\.(css|js)/);
-  await expectFileToMatch('dist/test-project/index.html', /styles-es2015\.(css|js)/);
-  await verifyMedia(/styles-es5\.(css|js)/, /image\.png/);
-  await verifyMedia(/styles-es2015\.(css|js)/, /image\.png/);
+  await expectFileToMatch('dist/test-project/index.html', /runtime\.js/);
+  await expectFileToMatch('dist/test-project/index.html', /main\.js/);
+  await expectFileToMatch('dist/test-project/index.html', /styles\.(css|js)/);
+  await verifyMedia(/styles\.(css|js)/, /image\.png/);
 
   await ng('build', '--output-hashing=media');
-  await expectFileToMatch('dist/test-project/index.html', /runtime-es2015\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /main-es2015\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /runtime-es5\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /main-es5\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /styles-es5\.(css|js)/);
-  await expectFileToMatch('dist/test-project/index.html', /styles-es2015\.(css|js)/);
-  await verifyMedia(/styles-es5\.(css|js)/, /image\.[0-9a-f]{20}\.png/);
-  await verifyMedia(/styles-es2015\.(css|js)/, /image\.[0-9a-f]{20}\.png/);
+  await expectFileToMatch('dist/test-project/index.html', /runtime\.js/);
+  await expectFileToMatch('dist/test-project/index.html', /main\.js/);
+  await expectFileToMatch('dist/test-project/index.html', /styles\.(css|js)/);
+  await verifyMedia(/styles\.(css|js)/, /image\.[0-9a-f]{20}\.png/);
 
   await ng('build', '--output-hashing=bundles');
-  await expectFileToMatch('dist/test-project/index.html', /runtime-es2015\.[0-9a-f]{20}\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /main-es2015\.[0-9a-f]{20}\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /runtime-es5\.[0-9a-f]{20}\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /main-es5\.[0-9a-f]{20}\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /styles-es5\.[0-9a-f]{20}\.(css|js)/);
-  await expectFileToMatch('dist/test-project/index.html', /styles-es2015\.[0-9a-f]{20}\.(css|js)/);
-  await verifyMedia(/styles-es5\.[0-9a-f]{20}\.(css|js)/, /image\.png/);
-  await verifyMedia(/styles-es2015\.[0-9a-f]{20}\.(css|js)/, /image\.png/);
+  await expectFileToMatch('dist/test-project/index.html', /runtime\.[0-9a-f]{20}\.js/);
+  await expectFileToMatch('dist/test-project/index.html', /main\.[0-9a-f]{20}\.js/);
+  await expectFileToMatch('dist/test-project/index.html', /styles\.[0-9a-f]{20}\.(css|js)/);
+  await verifyMedia(/styles\.[0-9a-f]{20}\.(css|js)/, /image\.png/);
 }

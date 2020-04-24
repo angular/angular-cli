@@ -9,21 +9,16 @@ export default async function () {
     return;
   }
 
-  // These tests should be moved to the default when we use ng5 in new projects.
-  return Promise.resolve()
-    // tests for register_locale_data transformer
-    .then(() => ng('build', '--aot', '--i18n-locale=fr'))
-    .then(() => expectFileToMatch('dist/test-project/main-es5.js', /registerLocaleData/))
-    .then(() => expectFileToMatch('dist/test-project/main-es5.js', /angular_common_locales_fr/))
-    .then(() => expectFileToMatch('dist/test-project/main-es2015.js', /registerLocaleData/))
-    .then(() => expectFileToMatch('dist/test-project/main-es2015.js', /angular_common_locales_fr/))
-    .then(() => expectFileToMatch('dist/test-project/index.html', /lang="fr"/))
-    .then(() => rimraf('dist'))
-    .then(() => ng('build', '--aot', '--i18n-locale=fr_FR'))
-    .then(() => expectFileToMatch('dist/test-project/main-es2015.js', /registerLocaleData/))
-    .then(() => expectFileToMatch('dist/test-project/main-es2015.js', /angular_common_locales_fr/))
-    .then(() => expectFileToMatch('dist/test-project/main-es5.js', /registerLocaleData/))
-    .then(() => expectFileToMatch('dist/test-project/main-es5.js', /angular_common_locales_fr/))
-    .then(() => expectFileToMatch('dist/test-project/index.html', /lang="fr_FR"/))
-    .then(() => rimraf('dist'));
+  // tests for register_locale_data transformer
+  await ng('build', '--aot', '--i18n-locale=fr');
+  await expectFileToMatch('dist/test-project/main.js', /registerLocaleData/);
+  await expectFileToMatch('dist/test-project/main.js', /angular_common_locales_fr/);
+  await expectFileToMatch('dist/test-project/index.html', /lang="fr"/);
+
+  await rimraf('dist');
+  await ng('build', '--aot', '--i18n-locale=fr_FR');
+  await expectFileToMatch('dist/test-project/main.js', /registerLocaleData/);
+  await expectFileToMatch('dist/test-project/main.js', /angular_common_locales_fr/);
+  await expectFileToMatch('dist/test-project/index.html', /lang="fr_FR"/);
+  await rimraf('dist');
 }

@@ -7,13 +7,11 @@ export default async function() {
   await ng('build', '--prod', '--extract-licenses=false', '--output-hashing=none');
 
   await expectToFail(() => expectFileToExist('dist/test-project/3rdpartylicenses.txt'));
-  await expectFileToMatch('dist/test-project/main-es2015.js', '@license');
-  await expectFileToMatch('dist/test-project/main-es5.js', '@license');
+  await expectFileToMatch('dist/test-project/main.js', '@license');
 
   // Licenses should be removed if extraction is enabled
   await ng('build', '--prod', '--extract-licenses', '--output-hashing=none');
 
   await expectFileToExist('dist/test-project/3rdpartylicenses.txt');
-  await expectToFail(() => expectFileToMatch('dist/test-project/main-es2015.js', '@license'));
-  await expectToFail(() => expectFileToMatch('dist/test-project/main-es5.js', '@license'));
+  await expectToFail(() => expectFileToMatch('dist/test-project/main.js', '@license'));
 }

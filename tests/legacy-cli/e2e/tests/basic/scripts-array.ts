@@ -1,5 +1,3 @@
-// TODO(architect): edit the architect config instead of the cli config.
-
 import { oneLineTrim } from 'common-tags';
 import { appendToFile, expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
 import { ng } from '../../utils/process';
@@ -53,40 +51,15 @@ export default async function () {
   await expectFileToMatch('dist/test-project/renamed-lazy-script.js', 'pre-rename-lazy-script');
 
   // index.html lists the right bundles
-  if (process.env['NG_BUILD_DIFFERENTIAL_FULL']) {
-    await expectFileToMatch(
-      'dist/test-project/index.html',
-      oneLineTrim`
-      <script src="runtime-es2015.js" type="module"></script>
-      <script src="polyfills-es2015.js" type="module"></script>
-      <script src="runtime-es5.js" nomodule defer></script>
-      <script src="polyfills-es5.js" nomodule defer></script>
-      <script src="scripts.js" defer></script>
-      <script src="renamed-script.js" defer></script>
-      <script src="vendor-es2015.js" type="module"></script>
-      <script src="main-es2015.js" type="module"></script>
-      <script src="vendor-es5.js" nomodule defer></script>
-      <script src="main-es5.js" nomodule defer></script>
-    `,
-    );
-  } else {
-    await expectFileToMatch(
-      'dist/test-project/index.html',
-      oneLineTrim`
-      <script src="runtime-es2015.js" type="module"></script>
-      <script src="runtime-es5.js" nomodule defer></script>
-      <script src="polyfills-es5.js" nomodule defer></script>
-      <script src="polyfills-es2015.js" type="module"></script>
-      <script src="scripts.js" defer></script>
-      <script src="renamed-script.js" defer></script>
-      <script src="vendor-es2015.js" type="module"></script>
-      <script src="vendor-es5.js" nomodule defer></script>
-      <script src="main-es2015.js" type="module"></script>
-      <script src="main-es5.js" nomodule defer></script>
-    `,
-    );
-  }
-  // Ensure scripts can be separately imported from the app.
-  await expectFileToMatch('dist/test-project/main-es5.js', /console\.log\((['"])string\-script\1\);/);
-  await expectFileToMatch('dist/test-project/main-es2015.js', /console\.log\((['"])string\-script\1\);/);
+  await expectFileToMatch(
+    'dist/test-project/index.html',
+    oneLineTrim`
+    <script src="runtime.js" defer></script>
+    <script src="polyfills.js" defer></script>
+    <script src="scripts.js" defer></script>
+    <script src="renamed-script.js" defer></script>
+    <script src="vendor.js" defer></script>
+    <script src="main.js" defer></script>
+  `,
+  );
 }
