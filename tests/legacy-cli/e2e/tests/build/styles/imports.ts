@@ -56,9 +56,9 @@ export default function () {
         .then(() => expectToFail(() =>
           expectFileToMatch('dist/test-project/styles.css', '"mappings":""')))
         // verify component styles
-        .then(() => expectFileToMatch('dist/test-project/main-es5.js',
+        .then(() => expectFileToMatch('dist/test-project/main.js',
           /.outer.*.inner.*background:\s*#[fF]+/))
-        .then(() => expectFileToMatch('dist/test-project/main-es5.js',
+        .then(() => expectFileToMatch('dist/test-project/main.js',
           /h1.*background:\s*#000+/))
         // Also check imports work on ng test
         .then(() => ng('test', '--watch=false'))

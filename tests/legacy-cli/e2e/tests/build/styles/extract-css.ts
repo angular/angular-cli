@@ -44,19 +44,11 @@ export default function() {
         expectFileToMatch('dist/test-project/renamed-lazy-style.css', '.pre-rename-lazy-style'),
       )
       // there are no js entry points for css only bundles
-      .then(() => expectToFail(() => expectFileToExist('dist/test-project/style-es5.js')))
-      .then(() => expectToFail(() => expectFileToExist('dist/test-project/lazy-style-es5.js')))
-      .then(() => expectToFail(() => expectFileToExist('dist/test-project/renamed-style-es5.js')))
+      .then(() => expectToFail(() => expectFileToExist('dist/test-project/style.js')))
+      .then(() => expectToFail(() => expectFileToExist('dist/test-project/lazy-style.js')))
+      .then(() => expectToFail(() => expectFileToExist('dist/test-project/renamed-style.js')))
       .then(() =>
-        expectToFail(() => expectFileToExist('dist/test-project/renamed-lazy-style-es5.js')),
-      )
-      .then(() => expectToFail(() => expectFileToExist('dist/test-project/style-es2015.js')))
-      .then(() => expectToFail(() => expectFileToExist('dist/test-project/lazy-style-es2015.js')))
-      .then(() =>
-        expectToFail(() => expectFileToExist('dist/test-project/renamed-style-es2015.js')),
-      )
-      .then(() =>
-        expectToFail(() => expectFileToExist('dist/test-project/renamed-lazy-style-es2015.js')),
+        expectToFail(() => expectFileToExist('dist/test-project/renamed-lazy-style.js')),
       )
       // index.html lists the right bundles
       .then(() =>
@@ -71,31 +63,23 @@ export default function() {
       .then(() => expectToFail(() => expectFileToMatch(
         'dist/test-project/index.html',
         oneLineTrim`
-          <script src="styles-es2015.js" type="module"></script>
-          <script src="styles-es5.js" nomodule defer></script>
-          <script src="renamed-style-es2015.js" type="module"></script>
-          <script src="renamed-style-es5.js" nomodule defer></script>
+          <script src="styles.js" defer></script>
+          <script src="renamed-style.js" defer></script>
         `)),
       )
       // also check when css isn't extracted
       .then(() => ng('build', '--no-extract-css'))
       // files were created successfully
-      .then(() => expectFileToMatch('dist/test-project/styles-es5.js', '.string-style'))
-      .then(() => expectFileToMatch('dist/test-project/styles-es5.js', '.input-style'))
-      .then(() => expectFileToMatch('dist/test-project/lazy-style-es5.js', '.lazy-style'))
-      .then(() => expectFileToMatch('dist/test-project/renamed-style-es5.js', '.pre-rename-style'))
+      .then(() => expectFileToMatch('dist/test-project/styles.js', '.string-style'))
+      .then(() => expectFileToMatch('dist/test-project/styles.js', '.input-style'))
+      .then(() => expectFileToMatch('dist/test-project/lazy-style.js', '.lazy-style'))
+      .then(() => expectFileToMatch('dist/test-project/renamed-style.js', '.pre-rename-style'))
       .then(() =>
-        expectFileToMatch('dist/test-project/renamed-lazy-style-es5.js', '.pre-rename-lazy-style'),
-      )
-      .then(() => expectFileToMatch('dist/test-project/styles-es2015.js', '.string-style'))
-      .then(() => expectFileToMatch('dist/test-project/styles-es2015.js', '.input-style'))
-      .then(() => expectFileToMatch('dist/test-project/lazy-style-es2015.js', '.lazy-style'))
-      .then(() =>
-        expectFileToMatch('dist/test-project/renamed-style-es2015.js', '.pre-rename-style'),
+        expectFileToMatch('dist/test-project/renamed-lazy-style.js', '.pre-rename-lazy-style'),
       )
       .then(() =>
         expectFileToMatch(
-          'dist/test-project/renamed-lazy-style-es2015.js',
+          'dist/test-project/renamed-lazy-style.js',
           '.pre-rename-lazy-style',
         ),
       )
@@ -104,10 +88,8 @@ export default function() {
         expectFileToMatch(
           'dist/test-project/index.html',
           oneLineTrim`
-            <script src="styles-es2015.js" type="module"></script>
-            <script src="styles-es5.js" nomodule defer></script>
-            <script src="renamed-style-es2015.js" type="module"></script>
-            <script src="renamed-style-es5.js" nomodule defer></script>
+            <script src="styles.js" defer></script>
+            <script src="renamed-style.js" defer></script>
           `,
         ),
       )

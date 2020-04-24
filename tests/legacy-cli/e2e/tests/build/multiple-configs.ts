@@ -42,30 +42,30 @@ export default async function () {
   // Test the base configuration.
   await ng('build');
   await expectFileToExist('dist/test-project/favicon.ico');
-  await expectFileToExist('dist/test-project/main-es2015.js.map');
-  await expectFileToExist('dist/test-project/styles-es2015.js');
-  await expectFileToExist('dist/test-project/vendor-es2015.js');
+  await expectFileToExist('dist/test-project/main.js.map');
+  await expectFileToExist('dist/test-project/styles.js');
+  await expectFileToExist('dist/test-project/vendor.js');
   // Test that --prod extracts css.
   await ng('build', '--prod');
   await expectFileToExist('dist/test-project/styles.css');
   // But using a config overrides prod.
   await ng('build', '--prod', '--configuration=three');
-  await expectFileToExist('dist/test-project/styles-es2015.js');
+  await expectFileToExist('dist/test-project/styles.js');
   await expectToFail(() => expectFileToExist('dist/test-project/styles.css'));
   // Use two configurations.
   await ng('build', '--configuration=one,two', '--vendor-chunk=false');
   await expectToFail(() => expectFileToExist('dist/test-project/favicon.ico'));
-  await expectToFail(() => expectFileToExist('dist/test-project/main-es2015.js.map'));
+  await expectToFail(() => expectFileToExist('dist/test-project/main.js.map'));
   // Use two configurations and two overrides, one of which overrides a config.
   await ng('build', '--configuration=one,two', '--vendor-chunk=false', '--sourceMap=true');
   await expectToFail(() => expectFileToExist('dist/test-project/favicon.ico'));
-  await expectFileToExist('dist/test-project/main-es2015.js.map');
-  await expectToFail(() => expectFileToExist('dist/test-project/vendor-es2015.js'));
+  await expectFileToExist('dist/test-project/main.js.map');
+  await expectToFail(() => expectFileToExist('dist/test-project/vendor.js'));
   // Use three configurations and a override, and prod at the end.
   await ng('build', '--configuration=one,two,three', '--vendor-chunk=false', '--prod');
   await expectToFail(() => expectFileToExist('dist/test-project/favicon.ico'));
-  await expectToFail(() => expectFileToExist('dist/test-project/main-es2015.js.map'));
-  await expectToFail(() => expectFileToExist('dist/test-project/vendor-es2015.js'));
-  await expectFileToExist('dist/test-project/styles-es2015.js');
+  await expectToFail(() => expectFileToExist('dist/test-project/main.js.map'));
+  await expectToFail(() => expectFileToExist('dist/test-project/vendor.js'));
+  await expectFileToExist('dist/test-project/styles.js');
   await expectToFail(() => expectFileToExist('dist/test-project/styles.css'));
 }

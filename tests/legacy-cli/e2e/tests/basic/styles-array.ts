@@ -1,4 +1,3 @@
-// TODO(architect): edit the architect config instead of the cli config.
 import { oneLineTrim } from 'common-tags';
 import { expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
 import { ng } from '../../utils/process';
@@ -42,34 +41,4 @@ export default async function() {
       <link rel="stylesheet" href="renamed-style.css">
     `,
   );
-
-  if (process.env['NG_BUILD_DIFFERENTIAL_FULL']) {
-    await expectFileToMatch(
-      'dist/test-project/index.html',
-      oneLineTrim`
-        <script src="runtime-es2015.js" type="module"></script>
-        <script src="polyfills-es2015.js" type="module"></script>
-        <script src="runtime-es5.js" nomodule defer></script>
-        <script src="polyfills-es5.js" nomodule defer></script>
-        <script src="vendor-es2015.js" type="module"></script>
-        <script src="main-es2015.js" type="module"></script>
-        <script src="vendor-es5.js" nomodule defer></script>
-        <script src="main-es5.js" nomodule defer></script>
-      `,
-    );
-  } else {
-    await expectFileToMatch(
-      'dist/test-project/index.html',
-      oneLineTrim`
-        <script src="runtime-es2015.js" type="module"></script>
-        <script src="runtime-es5.js" nomodule defer></script>
-        <script src="polyfills-es5.js" nomodule defer></script>
-        <script src="polyfills-es2015.js" type="module"></script>
-        <script src="vendor-es2015.js" type="module"></script>
-        <script src="vendor-es5.js" nomodule defer></script>
-        <script src="main-es2015.js" type="module"></script>
-        <script src="main-es5.js" nomodule defer></script>
-      `,
-    );
-  }
 }

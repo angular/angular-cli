@@ -16,6 +16,13 @@ export default async function () {
   const projectTsConfig = 'tsconfig.json';
   const workerTsConfig = 'tsconfig.worker.json';
 
+  // Enable Differential loading to run both size checks
+  await replaceInFile(
+    '.browserslistrc',
+    'not IE 9-11',
+    'IE 9-11',
+  );
+
   await ng('generate', 'web-worker', 'app');
   await expectFileToExist(workerPath);
   await expectFileToExist(projectTsConfig);

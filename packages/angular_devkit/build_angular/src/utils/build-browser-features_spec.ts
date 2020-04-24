@@ -25,7 +25,7 @@ describe('BuildBrowserFeatures', () => {
   afterEach(async () => host.restore().toPromise());
 
   describe('isDifferentialLoadingNeeded', () => {
-    it('should be true for for IE 9-11 and ES2015', () => {
+    it('should be true for IE 9-11 and ES2015', () => {
       host.writeMultipleFiles({
         '.browserslistrc': 'IE 9-11',
       });

@@ -3,10 +3,10 @@ import { ng } from '../../utils/process';
 
 export default async function () {
   await ng('build', '--prod', '--output-hashing=none', '--source-map', 'false');
-  await testForSourceMaps(6);
+  await testForSourceMaps(3);
 
   await ng('build', '--output-hashing=none', '--source-map', 'false');
-  await testForSourceMaps(8);
+  await testForSourceMaps(4);
 }
 
 async function testForSourceMaps(expectedNumberOfFiles: number): Promise <void> {

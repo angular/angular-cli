@@ -8,7 +8,7 @@
 import { expectFileToMatch } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
-import { externalServer, langTranslations, setupI18nConfig } from './legacy';
+import { langTranslations, setupI18nConfig } from './legacy';
 
 export default async function() {
   // Setup i18n tests and config.
@@ -33,12 +33,10 @@ export default async function() {
       continue;
     }
 
-    await expectFileToMatch(`${outputPath}/vendor-es5.js`, lang);
-    await expectFileToMatch(`${outputPath}/vendor-es2015.js`, lang);
+    await expectFileToMatch(`${outputPath}/vendor.js`, lang);
 
     // Verify the locale data is registered using the global files
-    await expectFileToMatch(`${outputPath}/vendor-es5.js`, '.ng.common.locales');
-    await expectFileToMatch(`${outputPath}/vendor-es2015.js`, '.ng.common.locales');
+    await expectFileToMatch(`${outputPath}/vendor.js`, '.ng.common.locales');
 
     // Verify the HTML lang attribute is present
     await expectFileToMatch(`${outputPath}/index.html`, `lang="${lang}"`);

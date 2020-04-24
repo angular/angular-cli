@@ -1,8 +1,15 @@
 import * as fs from 'fs';
-import { expectFileToExist } from '../../utils/fs';
+import { expectFileToExist, replaceInFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 
 export default async function () {
+  // Enable Differential loading to run both size checks
+  await replaceInFile(
+    '.browserslistrc',
+    'not IE 9-11',
+    'IE 9-11',
+  );
+
   // The below is needed to cache bundles and verify that sourcemaps are generated
   // corretly when output-hashing is disabled.
   await ng('build', '--output-hashing=bundles', '--source-map');
