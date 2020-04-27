@@ -5,7 +5,7 @@
 
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
-load("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("//tools:defaults.bzl", "ts_library")
 
 # @external_begin
 load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
@@ -50,8 +50,6 @@ ts_library(
     ],
     # strict_checks = False,
     data = glob(["**/*.json"]),
-    devmode_module = "commonjs",
-    devmode_target = "es2018",
     module_name = "@angular-devkit/architect",
     module_root = "src/index.d.ts",
     deps = [
@@ -66,16 +64,11 @@ ts_library(
     name = "architect_test_lib",
     testonly = True,
     srcs = glob(["src/**/*_spec.ts"]),
-    devmode_module = "commonjs",
-    devmode_target = "es2018",
     # strict_checks = False,
-    tsconfig = "//:tsconfig-test.json",
     deps = [
         ":architect",
         "//packages/angular_devkit/architect/testing",
         "//packages/angular_devkit/core",
-        "@npm//@types/jasmine",
-        "@npm//@types/node",
         "@npm//rxjs",
     ],
 )

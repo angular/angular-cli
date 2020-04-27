@@ -3,13 +3,13 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
 
-licenses(["notice"])  # MIT
-
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
-load("@npm_bazel_typescript//:index.bzl", "ts_library")
 load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
 load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+load("//tools:defaults.bzl", "ts_library")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
+
+licenses(["notice"])  # MIT
 
 package(default_visibility = ["//visibility:public"])
 
@@ -84,8 +84,6 @@ ts_library(
             "src/**/*.html",
         ],
     ),
-    devmode_module = "commonjs",
-    devmode_target = "es2018",
     module_name = "@angular-devkit/build-angular",
     module_root = "src/index.d.ts",
     deps = [
@@ -191,16 +189,11 @@ ts_library(
         ],
     ),
     data = glob(["test/**/*"]),
-    devmode_module = "commonjs",
-    devmode_target = "es2018",
     # strict_checks = False,
-    tsconfig = "//:tsconfig-test.json",
     deps = [
         ":build_angular",
         "//packages/angular_devkit/architect/testing",
         "//packages/angular_devkit/core",
-        "@npm//@types/jasmine",
-        "@npm//@types/node",
         "@npm//@types/webpack",
         "@npm//typescript",
         "@npm//webpack",
@@ -234,8 +227,6 @@ ts_library(
     testonly = True,
     srcs = [":src/test-utils.ts"],
     data = glob(["test/**/*"]),
-    devmode_module = "commonjs",
-    devmode_target = "es2018",
     tsconfig = "//:tsconfig-test.json",
     deps = [
         ":build_angular",
@@ -244,8 +235,6 @@ ts_library(
         "//packages/angular_devkit/architect/testing",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
-        "@npm//@types/jasmine",
-        "@npm//@types/node",
     ],
 )
 
@@ -327,8 +316,6 @@ LARGE_SPECS = {
         name = "build_angular_" + spec + "_test_lib",
         testonly = True,
         srcs = glob(["src/" + spec + "/**/*_spec.ts"]),
-        devmode_module = "commonjs",
-        devmode_target = "es2018",
         tsconfig = "//:tsconfig-test.json",
         deps = [
             # Dependencies needed to compile and run the specs themselves.
@@ -339,8 +326,6 @@ LARGE_SPECS = {
             "//packages/angular_devkit/architect/testing",
             "//packages/angular_devkit/core",
             "//packages/angular_devkit/core/node",
-            "@npm//@types/jasmine",
-            "@npm//@types/node",
 
             # Base dependencies for the application in hello-world-app.
             # Some tests also require extra dependencies.

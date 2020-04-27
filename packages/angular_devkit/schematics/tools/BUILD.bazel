@@ -1,13 +1,13 @@
 load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
-load("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("//tools:defaults.bzl", "ts_library")
 
 # Copyright Google Inc. All Rights Reserved.
 #
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
-package(default_visibility = ["//visibility:public"])
-
 licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
 
 ts_library(
     name = "tools",
@@ -19,8 +19,6 @@ ts_library(
             "test/**/*.ts",
         ],
     ),
-    devmode_module = "commonjs",
-    devmode_target = "es2018",
     module_name = "@angular-devkit/schematics/tools",
     module_root = "index.d.ts",
     # The attribute below is needed in g3 to turn off strict typechecking
@@ -45,11 +43,6 @@ ts_library(
             "test/**/*.ts",
         ],
     ),
-    devmode_module = "commonjs",
-    devmode_target = "es2018",
-    # @external_begin
-    tsconfig = "//:tsconfig-test.json",
-    # @external_end
     deps = [
         ":tools",
         "//packages/angular_devkit/core",
@@ -58,8 +51,6 @@ ts_library(
         "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/testing",
         "//tests/angular_devkit/schematics/tools/file-system-engine-host:file_system_engine_host_test_lib",
-        "@npm//@types/jasmine",
-        "@npm//@types/node",
         "@npm//rxjs",
     ],
 )

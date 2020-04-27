@@ -5,8 +5,8 @@
 
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
-load("@npm_bazel_typescript//:index.bzl", "ts_library")
 load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+load("//tools:defaults.bzl", "ts_library")
 
 licenses(["notice"])  # MIT
 
@@ -21,8 +21,6 @@ ts_library(
             "src/**/*_benchmark.ts",
         ],
     ),
-    devmode_module = "commonjs",
-    devmode_target = "es2018",
     module_name = "@angular-devkit/benchmark",
     module_root = "src/index.d.ts",
     deps = [
@@ -46,16 +44,11 @@ ts_library(
         "src/test/watch-test-file.txt",
         "src/test/watch-test-script.js",
     ],
-    devmode_module = "commonjs",
-    devmode_target = "es2018",
     # @external_begin
-    tsconfig = "//:tsconfig-test.json",
     deps = [
         ":benchmark",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
-        "@npm//@types/jasmine",
-        "@npm//@types/node",
         "@npm//rxjs",
     ],
     # @external_end
