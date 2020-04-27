@@ -3,8 +3,10 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
 
-load("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("//tools:defaults.bzl", "ts_library")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
+
+licenses(["notice"])  # MIT
 
 licenses(["notice"])  # MIT
 
@@ -36,8 +38,6 @@ ts_library(
             "schematic/files/**/*",
         ],
     ),
-    devmode_module = "commonjs",
-    devmode_target = "es2018",
     module_name = "@schematics/schematics",
     deps = [
         "//packages/angular_devkit/core",

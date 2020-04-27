@@ -3,7 +3,9 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
 
-load("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("//tools:defaults.bzl", "ts_library")
+
+licenses(["notice"])  # MIT
 
 licenses(["notice"])  # MIT
 
@@ -15,8 +17,6 @@ ts_library(
         include = ["**/*.ts"],
         exclude = ["**/*_spec.ts"],
     ),
-    devmode_module = "commonjs",
-    devmode_target = "es2018",
     module_name = "@angular-devkit/architect/testing",
     module_root = "index.d.ts",
     deps = [

@@ -1,4 +1,4 @@
-load("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("//tools:defaults.bzl", "ts_library")
 
 # files fetched on 2020-01-09 from
 # https://github.com/Microsoft/TypeScript/tree/v3.7.4
@@ -8,8 +8,6 @@ ts_library(
     name = "TypeScript",
     srcs = ["lib/typescript.d.ts"],
     data = ["lib/typescript.js"],
-    devmode_module = "commonjs",
-    devmode_target = "es2018",
     module_name = "typescript",
     module_root = "lib/typescript.d.ts",
     visibility = ["//packages/schematics/angular:__subpackages__"],

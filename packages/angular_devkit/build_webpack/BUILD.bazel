@@ -3,13 +3,13 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
 
-licenses(["notice"])  # MIT
-
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
-load("@npm_bazel_typescript//:index.bzl", "ts_library")
 load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+load("//tools:defaults.bzl", "ts_library")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
+
+licenses(["notice"])  # MIT
 
 package(default_visibility = ["//visibility:public"])
 
@@ -43,8 +43,6 @@ ts_library(
             "src/webpack-dev-server/schema.json",
         ],
     ),
-    devmode_module = "commonjs",
-    devmode_target = "es2018",
     module_name = "@angular-devkit/build-webpack",
     module_root = "src/index.d.ts",
     deps = [
@@ -73,9 +71,6 @@ ts_library(
             "test/**/*",
         ],
     ),
-    devmode_module = "commonjs",
-    devmode_target = "es2018",
-    tsconfig = "//:tsconfig-test.json",
     deps = [
         ":build_webpack",
         "//packages/angular_devkit/architect",
@@ -90,8 +85,6 @@ ts_library(
         "@npm//@angular/core",
         "@npm//@angular/platform-browser",
         "@npm//@angular/platform-browser-dynamic",
-        "@npm//@types/jasmine",
-        "@npm//@types/node",
         "@npm//@types/node-fetch",
         "@npm//node-fetch",
         "@npm//raw-loader",
