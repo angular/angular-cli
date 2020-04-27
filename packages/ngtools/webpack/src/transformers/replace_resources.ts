@@ -17,7 +17,7 @@ export function replaceResources(
   return (context: ts.TransformationContext) => {
     const typeChecker = getTypeChecker();
 
-    const visitNode: ts.Visitor = (node: ts.Decorator) => {
+    const visitNode: ts.Visitor = (node: ts.Node) => {
       if (ts.isClassDeclaration(node)) {
         const decorators = ts.visitNodes(
           node.decorators,
