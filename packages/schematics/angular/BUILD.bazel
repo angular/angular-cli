@@ -21,7 +21,13 @@ ALL_SCHEMA_TARGETS = [
         x,
         x.replace("/", "_").replace("-", "_").replace(".json", ""),
     )
-    for x in glob(["*/schema.json"])
+    for x in glob(
+        include = ["*/schema.json"],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    )
 ]
 
 # Create all the targets.
@@ -45,6 +51,8 @@ ts_library(
             "*/other-files/**/*.ts",
             # Exclude test helpers.
             "utility/test/**/*.ts",
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
         ],
     ) + [
         "//packages/schematics/angular:" + src.replace(".json", ".ts")
@@ -59,6 +67,10 @@ ts_library(
             "*/schema.json",
             "*/files/**/*",
             "*/other-files/**/*",
+        ],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
         ],
     ),
     module_name = "@schematics/angular",
@@ -91,6 +103,10 @@ ts_library(
         include = [
             "**/*_spec.ts",
             "utility/test/**/*.ts",
+        ],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
         ],
     ),
     # @external_begin

@@ -22,6 +22,8 @@ ts_library(
             "schematic/files/**",
             "blank/project-files/**",
             "blank/schematic-files/**",
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
         ],
     ) + [
         "//packages/schematics/schematics:blank/schema.ts",

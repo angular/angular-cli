@@ -35,14 +35,12 @@ ts_library(
         "//packages/angular_devkit/build_webpack:src/webpack/schema.ts",
         "//packages/angular_devkit/build_webpack:src/webpack-dev-server/schema.ts",
     ],
-    data = glob(
-        include = [
-            "package.json",
-            "builders.json",
-            "src/webpack/schema.json",
-            "src/webpack-dev-server/schema.json",
-        ],
-    ),
+    data = [
+        "builders.json",
+        "package.json",
+        "src/webpack-dev-server/schema.json",
+        "src/webpack/schema.json",
+    ],
     module_name = "@angular-devkit/build-webpack",
     module_root = "src/index.d.ts",
     deps = [

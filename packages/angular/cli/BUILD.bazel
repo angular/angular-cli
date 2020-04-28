@@ -18,8 +18,12 @@ package(default_visibility = ["//visibility:public"])
 ts_library(
     name = "angular-cli",
     srcs = glob(
-        ["**/*.ts"],
-        exclude = ["**/*_spec.ts"],
+        include = ["**/*.ts"],
+        exclude = [
+            "**/*_spec.ts",
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
     ) + [
         "//packages/angular/cli:lib/config/schema.ts",
         "//packages/angular/cli:commands/analytics.ts",
@@ -42,11 +46,17 @@ ts_library(
         "//packages/angular/cli:commands/run.ts",
         "//packages/angular/cli:commands/xi18n.ts",
     ],
-    data = glob([
-        "bin/**/*",
-        "**/*.json",
-        "**/*.md",
-    ]),
+    data = glob(
+        include = [
+            "bin/**/*",
+            "**/*.json",
+            "**/*.md",
+        ],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ),
     module_name = "@angular/cli",
     # strict_checks = False,
     deps = [
@@ -228,7 +238,13 @@ ts_json_schema(
 ts_library(
     name = "angular-cli_test_lib",
     testonly = True,
-    srcs = glob(["**/*_spec.ts"]),
+    srcs = glob(
+        include = ["**/*_spec.ts"],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ),
     # strict_checks = False,
     deps = [
         ":angular-cli",

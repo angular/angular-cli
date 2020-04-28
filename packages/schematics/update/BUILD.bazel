@@ -22,6 +22,8 @@ ts_library(
         exclude = [
             "**/*_spec.ts",
             "**/*_benchmark.ts",
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
         ],
     ) + [
         "//packages/schematics/update:update/schema.ts",
@@ -53,10 +55,20 @@ ts_json_schema(
 ts_library(
     name = "update_test_lib",
     testonly = True,
-    srcs = glob(["**/*_spec.ts"]),
+    srcs = glob(
+        include = ["**/*_spec.ts"],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ),
     data = glob(
         include = [
             "**/*.json",
+        ],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
         ],
     ),
     # @external_begin

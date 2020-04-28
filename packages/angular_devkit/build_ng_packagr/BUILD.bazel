@@ -26,13 +26,11 @@ ts_library(
     ) + [
         "//packages/angular_devkit/build_ng_packagr:src/build/schema.ts",
     ],
-    data = glob(
-        include = [
-            "package.json",
-            "builders.json",
-            "src/build/schema.json",
-        ],
-    ),
+    data = [
+        "builders.json",
+        "package.json",
+        "src/build/schema.json",
+    ],
     module_name = "@angular-devkit/build-ng-packagr",
     module_root = "src/index.d.ts",
     deps = [

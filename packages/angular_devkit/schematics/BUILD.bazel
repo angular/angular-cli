@@ -27,7 +27,13 @@ ts_library(
     ),
     # The attribute below is needed in g3 to turn off strict typechecking
     # strict_checks = False,
-    data = glob(["**/*.json"]),
+    data = glob(
+        include = ["**/*.json"],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ),
     module_name = "@angular-devkit/schematics",
     module_root = "src/index.d.ts",
     deps = [
