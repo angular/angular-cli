@@ -25,6 +25,8 @@ ts_library(
         exclude = [
             "pwa/files/**/*",
             "**/*_spec.ts",
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
         ],
     ) + [
         "//packages/angular/pwa:pwa/schema.ts",

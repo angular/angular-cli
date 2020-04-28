@@ -25,7 +25,11 @@ ts_library(
             "src/**/*_benchmark.ts",
         ],
     ),
-    data = glob(["**/*.json"]) + [
+    data = glob(
+        include = ["**/*.json"],
+        # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+        exclude = ["node_modules/**"],
+    ) + [
         "//packages/angular_devkit/core/third_party/github.com/chalk/supports-color",
     ],
     module_name = "@angular-devkit/core",
