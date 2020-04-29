@@ -693,10 +693,28 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
   }
 
   const { default: generate } = await import('@babel/generator');
-  const utils = await import(
-    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
-    '@angular/localize/src/tools/src/translate/source_files/source_file_utils'
-  );
+
+  // Remove the below try/catch before v10 RC
+  // tslint:disable-next-line: trailing-comma no-implicit-dependencies
+  let utils: typeof import('@angular/localize/src/tools/src/translate/source_files/source_file_utils');
+  try {
+    utils = await import(
+      // @ts-ignore
+      // tslint:disable-next-line: trailing-comma no-implicit-dependencies
+      '@angular/localize/src/tools/source_file_utils'
+    );
+  } catch {
+    utils = await import(
+      // tslint:disable-next-line: trailing-comma no-implicit-dependencies
+      '@angular/localize/src/tools/src/translate/source_files/source_file_utils'
+    );
+  }
+
+  // const utils = await import(
+  //   // tslint:disable-next-line: trailing-comma no-implicit-dependencies
+  //   '@angular/localize/src/tools/source_file_utils'
+  // );
+
   // tslint:disable-next-line: no-implicit-dependencies
   const localizeDiag = await import('@angular/localize/src/tools/src/diagnostics');
 
