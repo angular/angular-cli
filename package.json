@@ -57,7 +57,7 @@
     "@angular/platform-server": "^9.1.0-next.4",
     "@angular/router": "^9.1.0-next.4",
     "@bazel/bazel": "2.1.0",
-    "@bazel/buildifier": "^2.0.0",
+    "@bazel/buildifier": "^3.0.0",
     "@bazel/hide-bazel-files": "~1.6.0",
     "@bazel/ibazel": "^0.13.0",
     "@bazel/jasmine": "~1.6.0",
