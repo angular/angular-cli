@@ -69,7 +69,7 @@
     "@angular/compiler": "9.1.2",
     "@angular/compiler-cli": "9.1.2",
     "@bazel/bazel": "2.1.0",
-    "@bazel/buildifier": "2.2.1",
+    "@bazel/buildifier": "3.0.0",
     "@bazel/jasmine": "1.6.0",
     "@bazel/karma": "1.6.0",
     "@bazel/labs": "1.6.0",
