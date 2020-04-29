@@ -328,12 +328,6 @@ workflows:
             branches:
               ignore:
               - /docs-preview/
-      - test:
-          requires:
-            - build
-      - integration:
-          requires:
-            - build
       - e2e-cli:
           post-steps:
             - store_artifacts:
@@ -372,6 +366,17 @@ workflows:
           requires:
             - e2e-cli
       - test-browsers:
+          requires:
+            - build
+
+      # Bazel jobs
+      # These jobs only really depend on Setup, but the build job is very quick to run (~35s) and
+      # will catch any build errors before proceeding to the more lengthy and resource intensive 
+      # Bazel jobs.
+      - test:
+          requires:
+            - build
+      - integration:
           requires:
             - build
       
