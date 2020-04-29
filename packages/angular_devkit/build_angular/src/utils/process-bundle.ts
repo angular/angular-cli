@@ -511,11 +511,11 @@ function createReplacePlugin(replacements: [string, string][]): PluginObj {
 
 const USE_LOCALIZE_PLUGINS = false;
 
-async function createI18nPlugins(
+export async function createI18nPlugins(
   locale: string,
   translation: unknown | undefined,
   missingTranslation: 'error' | 'warning' | 'ignore',
-  localeDataContent: string | undefined,
+  localeDataContent?: string,
 ) {
   const plugins = [];
   // tslint:disable-next-line: no-implicit-dependencies
@@ -693,10 +693,15 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
   }
 
   const { default: generate } = await import('@babel/generator');
-  const utils = await import(
-    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
-    '@angular/localize/src/tools/src/translate/source_files/source_file_utils'
+
+  // In Angular v10.0.0 the `source_file_utils` file was moved.
+  // (Remember to remove the `tryImport()` function when only one import path is required.)
+  // tslint:disable-next-line: no-implicit-dependencies
+  const utils = await tryImport<typeof import('@angular/localize/src/tools/src/translate/source_files/source_file_utils')>(
+    '@angular/localize/src/tools/src/source_file_utils',
+    '@angular/localize/src/tools/src/translate/source_files/source_file_utils',
   );
+
   // tslint:disable-next-line: no-implicit-dependencies
   const localizeDiag = await import('@angular/localize/src/tools/src/diagnostics');
 
@@ -776,6 +781,17 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
   }
 
   return { file: options.filename, diagnostics: diagnostics.messages, count: positions.length };
+}
+
+async function tryImport<T>(...importPaths: string[]): Promise<T> {
+  for (const importPath of importPaths) {
+    try {
+      return await import(importPath);
+    } catch {
+      // Do nothing
+    }
+  }
+  throw new Error('Unable to import from any of these paths:\n' + importPaths.map(p => ` - ${p}`).join('\n'));
 }
 
 function inlineCopyOnly(options: InlineOptions) {

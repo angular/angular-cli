@@ -33,6 +33,7 @@ import { ExecutionTransformer } from '../transforms';
 import { BuildBrowserFeatures, normalizeOptimization } from '../utils';
 import { findCachePath } from '../utils/cache-path';
 import { I18nOptions } from '../utils/i18n-options';
+import { createI18nPlugins } from '../utils/process-bundle';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { getIndexInputFile, getIndexOutputFile } from '../utils/webpack-browser-config';
 import { Schema } from './schema';
@@ -53,48 +54,6 @@ const devServerBuildOverriddenKeys: (keyof DevServerBuilderOptions)[] = [
   'verbose',
   'deployUrl',
 ];
-
-async function createI18nPlugins(
-  locale: string,
-  translation: unknown | undefined,
-  missingTranslation?: 'error' | 'warning' | 'ignore',
-) {
-  const plugins = [];
-  // tslint:disable-next-line: no-implicit-dependencies
-  const localizeDiag = await import('@angular/localize/src/tools/src/diagnostics');
-
-  const diagnostics = new localizeDiag.Diagnostics();
-
-  const es2015 = await import(
-    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
-    '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'
-  );
-  plugins.push(
-    // tslint:disable-next-line: no-any
-    es2015.makeEs2015TranslatePlugin(diagnostics, (translation || {}) as any, {
-      missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
-    }),
-  );
-
-  const es5 = await import(
-    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
-    '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'
-  );
-  plugins.push(
-    // tslint:disable-next-line: no-any
-    es5.makeEs5TranslatePlugin(diagnostics, (translation || {}) as any, {
-      missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
-    }),
-  );
-
-  const inlineLocale = await import(
-    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
-    '@angular/localize/src/tools/src/translate/source_files/locale_plugin'
-  );
-  plugins.push(inlineLocale.makeLocalePlugin(locale));
-
-  return { diagnostics, plugins };
-}
 
 export type DevServerBuilderOutput = DevServerBuildOutput & {
   baseUrl: string;
@@ -328,7 +287,7 @@ async function setupLocalize(
   const { plugins, diagnostics } = await createI18nPlugins(
     locale,
     localeDescription && localeDescription.translation,
-    browserOptions.i18nMissingTranslation,
+    browserOptions.i18nMissingTranslation || 'ignore',
   );
 
   // Modify main entrypoint to include locale data
