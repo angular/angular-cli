@@ -233,7 +233,7 @@ jobs:
         # too early without Saucelabs not being ready.
       - run: ./scripts/saucelabs/wait-for-tunnel.sh
       - run: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts --ve
-      - run: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts 
+      - run: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e ./tests/legacy-cli/e2e/tests/misc/browsers.ts
       - run: ./scripts/saucelabs/stop-tunnel.sh
 
   build:
@@ -242,7 +242,7 @@ jobs:
       - custom_attach_workspace
       - run: yarn build
 
-  # This is where we put all the misbehaving and flaky tests so we can fine-tune their conditions 
+  # This is where we put all the misbehaving and flaky tests so we can fine-tune their conditions
   # and rerun them faster.
   flake-jail:
     executor: test-executor
@@ -269,7 +269,7 @@ jobs:
       - custom_attach_workspace
       - run:
           name: Decrypt Credentials
-          # Note: when changing the image, you might have to re-encrypt the credentials with a 
+          # Note: when changing the image, you might have to re-encrypt the credentials with a
           # matching version of openssl.
           # See https://stackoverflow.com/a/43847627/2116927 for more info.
           command: |
@@ -325,7 +325,7 @@ jobs:
       - run: yarn test --full
       # Run partial e2e suite on PRs only. Master will run the full e2e suite with sharding.
       - run: if (Test-Path env:CIRCLE_PR_NUMBER) { node tests\legacy-cli\run_e2e.js "--glob=tests/{basic,ivy}/**" }
-             
+
   e2e-cli-win:
     executor: windows-executor
     parallelism: 4
@@ -385,11 +385,6 @@ workflows:
           snapshots: true
           requires:
             - e2e-cli
-          filters:
-            branches:
-              only:
-                - renovate/angular
-                - master
       - e2e-cli:
           name: e2e-cli-ng-ve-snapshots
           snapshots: true
@@ -411,7 +406,7 @@ workflows:
       - flake-jail:
           requires:
             - build
-      
+
       # Windows jobs
       # These jobs only run after their non-windows counterparts finish successfully.
       # This isn't strictly necessary as there is no artifact dependency, but helps economize
@@ -430,7 +425,7 @@ workflows:
           requires:
             - setup-and-build-win
             - e2e-cli
-      
+
       # Publish jobs
       - snapshot_publish:
           <<: *only_release_branches
