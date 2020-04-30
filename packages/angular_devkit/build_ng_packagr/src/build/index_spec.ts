@@ -50,7 +50,7 @@ describe('NgPackagr Builder', () => {
 
     // Set AOT compilation to use VE if needed.
     if (veEnabled) {
-      host.replaceInFile('tsconfig.json', `"enableIvy": true,`, `"enableIvy": false,`);
+      host.replaceInFile('tsconfig.base.json', `"enableIvy": true,`, `"enableIvy": false,`);
     }
   });
 

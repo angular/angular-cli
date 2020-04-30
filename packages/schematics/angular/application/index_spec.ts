@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable:no-big-function
+import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { latestVersions } from '../utility/latest-versions';
 import { getFileContent } from '../utility/test';
@@ -74,6 +75,19 @@ describe('Application Schematic', () => {
     expect(workspace.defaultProject).toBe('foo');
   });
 
+  it('should add references in solution style tsconfig', async () => {
+    const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
+      .toPromise();
+
+    // tslint:disable-next-line:no-any
+    const { references } = parseJson(tree.readContent('/tsconfig.json').toString(), JsonParseMode.Loose) as any;
+    expect(references).toEqual([
+      { path: './projects/foo/tsconfig.app.json' },
+      { path: './projects/foo/tsconfig.spec.json' },
+      { path: './projects/foo/e2e/tsconfig.json' },
+    ]);
+  });
+
   it('should set the prefix to app if none is set', async () => {
     const options = { ...defaultOptions };
 
@@ -138,10 +152,10 @@ describe('Application Schematic', () => {
       .toPromise();
     let path = '/projects/foo/tsconfig.app.json';
     let content = tree.readContent(path);
-    expect(content).toMatch('../../tsconfig.json');
+    expect(content).toMatch('../../tsconfig.base.json');
     path = '/projects/foo/tsconfig.spec.json';
     content = tree.readContent(path);
-    expect(content).toMatch('../../tsconfig.json');
+    expect(content).toMatch('../../tsconfig.base.json');
     const specTsConfig = JSON.parse(content);
     expect(specTsConfig.files).toEqual(['src/test.ts', 'src/polyfills.ts']);
   });
@@ -371,9 +385,9 @@ describe('Application Schematic', () => {
       const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
         .toPromise();
       const appTsConfig = JSON.parse(tree.readContent('/tsconfig.app.json'));
-      expect(appTsConfig.extends).toEqual('./tsconfig.json');
+      expect(appTsConfig.extends).toEqual('./tsconfig.base.json');
       const specTsConfig = JSON.parse(tree.readContent('/tsconfig.spec.json'));
-      expect(specTsConfig.extends).toEqual('./tsconfig.json');
+      expect(specTsConfig.extends).toEqual('./tsconfig.base.json');
       expect(specTsConfig.files).toEqual(['src/test.ts', 'src/polyfills.ts']);
     });
 
@@ -414,9 +428,9 @@ describe('Application Schematic', () => {
       expect(buildOpt.tsConfig).toEqual('foo/tsconfig.app.json');
 
       const appTsConfig = JSON.parse(tree.readContent('/foo/tsconfig.app.json'));
-      expect(appTsConfig.extends).toEqual('../tsconfig.json');
+      expect(appTsConfig.extends).toEqual('../tsconfig.base.json');
       const specTsConfig = JSON.parse(tree.readContent('/foo/tsconfig.spec.json'));
-      expect(specTsConfig.extends).toEqual('../tsconfig.json');
+      expect(specTsConfig.extends).toEqual('../tsconfig.base.json');
     });
   });
 
