@@ -28,8 +28,7 @@ export default async function() {
     'src/app/app-routing.module.ts',
     `loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule)`,
   );
-  // Should update tsconfig and src/browserslist via differential-loading.
-  await expectFileToMatch('tsconfig.json', `"target": "es2015",`);
+
   await expectToFail(() => expectFileToExist('e2e/browserlist'));
   // Should rename codelyzer rules.
   await expectFileToMatch('tslint.json', `use-lifecycle-interface`);

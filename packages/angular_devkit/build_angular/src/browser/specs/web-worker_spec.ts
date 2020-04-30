@@ -57,7 +57,7 @@ describe('Browser Builder Web Worker support', () => {
     // tests, and integration with other build targets.
     './src/tsconfig.worker.json': `
       {
-        "extends": "../tsconfig.json",
+        "extends": "../tsconfig.base.json",
         "compilerOptions": {
           "outDir": "../out-tsc/worker",
           "lib": [
@@ -73,7 +73,7 @@ describe('Browser Builder Web Worker support', () => {
     // Alter the app tsconfig to not include *.worker.ts files.
     './src/tsconfig.app.json': `
       {
-        "extends": "../tsconfig.json",
+        "extends": "../tsconfig.base.json",
         "compilerOptions": {
           "outDir": "../out-tsc/worker",
           "types": []

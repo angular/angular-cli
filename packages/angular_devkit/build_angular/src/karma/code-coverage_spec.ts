@@ -87,7 +87,7 @@ describe('Karma Builder code coverage', () => {
 
     host.writeMultipleFiles(files);
 
-    host.replaceInFile('tsconfig.json', /"baseUrl": ".\/",/, `
+    host.replaceInFile('tsconfig.base.json', /"baseUrl": ".\/",/, `
       "baseUrl": "./",
       "paths": {
         "my-lib": [

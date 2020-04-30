@@ -194,7 +194,7 @@ export class VersionCommand extends Command<VersionCommandSchema> {
 
   private getIvyWorkspace(): string {
     try {
-      const content = fs.readFileSync(path.resolve(this.workspace.root, 'tsconfig.json'), 'utf-8');
+      const content = fs.readFileSync(path.resolve(this.workspace.root, 'tsconfig.base.json'), 'utf-8');
       const tsConfig = parseJson(content, JsonParseMode.Loose);
       if (!isJsonObject(tsConfig)) {
         return '<error>';

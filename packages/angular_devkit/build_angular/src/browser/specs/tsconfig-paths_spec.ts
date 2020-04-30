@@ -22,7 +22,7 @@ describe('Browser Builder tsconfig paths', () => {
 
   it('works', async () => {
     host.replaceInFile('src/app/app.module.ts', './app.component', '@root/app/app.component');
-    host.replaceInFile('tsconfig.json', /"baseUrl": ".\/",/, `
+    host.replaceInFile('tsconfig.base.json', /"baseUrl": ".\/",/, `
       "baseUrl": "./",
       "paths": {
         "@root/*": [
@@ -40,7 +40,7 @@ describe('Browser Builder tsconfig paths', () => {
       'src/app/shared/meaning.ts': 'export var meaning = 42;',
       'src/app/shared/index.ts': `export * from './meaning'`,
     });
-    host.replaceInFile('tsconfig.json', /"baseUrl": ".\/",/, `
+    host.replaceInFile('tsconfig.base.json', /"baseUrl": ".\/",/, `
       "baseUrl": "./",
       "paths": {
         "@shared": [

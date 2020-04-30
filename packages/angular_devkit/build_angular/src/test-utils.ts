@@ -55,7 +55,7 @@ export async function createArchitect(workspaceRoot: Path) {
 
   // Set AOT compilation to use VE if needed.
   if (veEnabled) {
-    host.replaceInFile('tsconfig.json', `"enableIvy": true,`, `"enableIvy": false,`);
+    host.replaceInFile('tsconfig.base.json', `"enableIvy": true,`, `"enableIvy": false,`);
   }
 
   return {

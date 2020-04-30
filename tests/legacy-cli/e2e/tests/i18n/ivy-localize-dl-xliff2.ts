@@ -20,7 +20,7 @@ export async function executeTest() {
     'IE 9-11',
   );
 
-  await updateJsonFile('tsconfig.json', config => {
+  await updateJsonFile('tsconfig.base.json', config => {
     config.compilerOptions.target = 'es2015';
     if (!config.angularCompilerOptions) {
       config.angularCompilerOptions = {};

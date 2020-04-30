@@ -64,7 +64,7 @@ describe('Browser Builder with differential loading', () => {
 
   it('emits all the neccessary files for target of ES2016', async () => {
     host.replaceInFile(
-      'tsconfig.json',
+      'tsconfig.base.json',
       '"target": "es2015",',
       `"target": "es2016",`,
     );
@@ -106,7 +106,7 @@ describe('Browser Builder with differential loading', () => {
 
   it('emits all the neccessary files for target of ESNext', async () => {
     host.replaceInFile(
-      'tsconfig.json',
+      'tsconfig.base.json',
       '"target": "es2015",',
       `"target": "esnext",`,
     );

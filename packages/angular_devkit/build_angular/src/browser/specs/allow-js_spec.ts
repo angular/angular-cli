@@ -29,7 +29,7 @@ describe('Browser Builder allow js', () => {
     });
 
     host.replaceInFile(
-      'tsconfig.json',
+      'tsconfig.base.json',
       '"target": "es2015"',
       '"target": "es5", "allowJs": true',
     );
@@ -54,7 +54,7 @@ describe('Browser Builder allow js', () => {
     });
 
     host.replaceInFile(
-      'tsconfig.json',
+      'tsconfig.base.json',
       '"target": "es2015"',
       '"target": "es5", "allowJs": true',
     );
@@ -81,7 +81,7 @@ describe('Browser Builder allow js', () => {
     });
 
     host.replaceInFile(
-      'tsconfig.json',
+      'tsconfig.base.json',
       '"target": "es2015"',
       '"target": "es5", "allowJs": true',
     );

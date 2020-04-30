@@ -38,6 +38,7 @@ import { findPropertyInAstObject, insertPropertyInAstObjectInOrder } from '../ut
 import { latestVersions } from '../utility/latest-versions';
 import { applyLintFix } from '../utility/lint-fix';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
+import { addTsConfigProjectReferences, verifyBaseTsConfigExists } from '../utility/tsconfig';
 import { validateProjectName } from '../utility/validation';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders, ProjectType } from '../utility/workspace-models';
@@ -311,7 +312,6 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
     });
   });
 }
-
 function minimalPathFilter(path: string): boolean {
   const toRemoveList = /(test.ts|tsconfig.spec.json|karma.conf.js|tslint.json).template$/;
 
@@ -319,11 +319,14 @@ function minimalPathFilter(path: string): boolean {
 }
 
 export default function (options: ApplicationOptions): Rule {
-  return async (host: Tree, context: SchematicContext) => {
+  return async (host: Tree) => {
     if (!options.name) {
       throw new SchematicsException(`Invalid options, "name" is required.`);
     }
+
     validateProjectName(options.name);
+    verifyBaseTsConfigExists(host);
+
     const appRootSelector = `${options.prefix}-root`;
     const componentOptions: Partial<ComponentOptions> = !options.minimal ?
       {
@@ -344,7 +347,7 @@ export default function (options: ApplicationOptions): Rule {
     const newProjectRoot = workspace.extensions.newProjectRoot as (string | undefined) || '';
     const isRootApp = options.projectRoot !== undefined;
     const appDir = isRootApp
-      ? options.projectRoot as string
+      ? normalize(options.projectRoot || '')
       : join(normalize(newProjectRoot), options.name);
     const sourceDir = `${appDir}/src/app`;
 
@@ -402,6 +405,10 @@ export default function (options: ApplicationOptions): Rule {
           }),
           move(sourceDir),
         ]), MergeStrategy.Overwrite),
+      addTsConfigProjectReferences([
+        join(appDir, 'tsconfig.app.json'),
+        join(appDir, 'tsconfig.spec.json'),
+      ]),
       options.minimal ? noop() : schematic('e2e', e2eOptions),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
       options.lintFix ? applyLintFix(appDir) : noop(),
