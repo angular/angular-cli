@@ -2,6 +2,7 @@
   "name": "@nguniversal/builders",
   "version": "0.0.0-PLACEHOLDER",
   "description": "Angular Universal builders package",
+  "homepage": "https://github.com/angular/universal#readme",
   "license": "MIT",
   "keywords": [
     "ssr",
@@ -10,6 +11,13 @@
     "builder",
     "cli"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/universal"
+  },
+  "bugs": {
+    "url": "https://github.com/angular/universal/issues"
+  },
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
