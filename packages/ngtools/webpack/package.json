@@ -32,8 +32,8 @@
     "webpack": "^4.0.0"
   },
   "devDependencies": {
-    "@angular/compiler": "9.1.2",
-    "@angular/compiler-cli": "9.1.2",
+    "@angular/compiler": "9.1.4",
+    "@angular/compiler-cli": "9.1.4",
     "typescript": "3.8.3",
     "webpack": "4.42.1"
   }
