@@ -15,8 +15,8 @@
     "tsickle": "~0.37.1 || ~0.38.0"
   },
   "devDependencies": {
-    "@angular/compiler": "9.1.2",
-    "@angular/compiler-cli": "9.1.2",
+    "@angular/compiler": "9.1.4",
+    "@angular/compiler-cli": "9.1.4",
     "@angular-devkit/core": "0.0.0",
     "ng-packagr": "~9.1.0",
     "tslib": "^1.10.0"
