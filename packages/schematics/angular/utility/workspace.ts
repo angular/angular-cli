@@ -7,6 +7,7 @@
  */
 import { virtualFs, workspaces } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
+import { ProjectType } from './workspace-models';
 
 function createHost(tree: Tree): workspaces.WorkspaceHost {
   return {
@@ -74,7 +75,7 @@ export async function getWorkspace(tree: Tree, path = '/') {
  */
 export function buildDefaultPath(project: workspaces.ProjectDefinition): string {
   const root = project.sourceRoot ? `/${project.sourceRoot}/` : `/${project.root}/src/`;
-  const projectDirName = project.extensions['projectType'] === 'application' ? 'app' : 'lib';
+  const projectDirName = project.extensions['projectType'] === ProjectType.Application ? 'app' : 'lib';
 
   return `${root}${projectDirName}`;
 }
