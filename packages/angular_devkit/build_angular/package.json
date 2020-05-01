@@ -69,7 +69,7 @@
     "webpack-dev-server": "3.10.3",
     "webpack-merge": "4.2.2",
     "webpack-sources": "1.4.3",
-    "webpack-subresource-integrity": "1.4.0",
+    "webpack-subresource-integrity": "1.4.1",
     "worker-plugin": "4.0.2"
   },
   "peerDependencies": {
