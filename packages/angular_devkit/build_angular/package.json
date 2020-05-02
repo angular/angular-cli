@@ -67,7 +67,7 @@
     "webpack-merge": "4.2.2",
     "webpack-sources": "1.4.3",
     "webpack-subresource-integrity": "1.4.0",
-    "worker-plugin": "4.0.2"
+    "worker-plugin": "4.0.3"
   },
   "devDependencies": {
     "@angular/animations": "9.1.0-rc.2",
