@@ -12171,10 +12171,10 @@ worker-farm@^1.7.0:
   dependencies:
     errno "~0.1.7"
 
-worker-plugin@4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/worker-plugin/-/worker-plugin-4.0.2.tgz#0456dd7af1c0de64591326fd8a08c5d9f2b5b27a"
-  integrity sha512-V+1zSZMOOKk+uBzKyNIODLQLsx59zSIOaI75J1EMS0iR1qy+KQR3y/pQ3T0vIhvPfDFapGRMsoMvQNEL3okqSA==
+worker-plugin@4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/worker-plugin/-/worker-plugin-4.0.3.tgz#7c42e600d5931ad154d3d5f187a32446df64db0f"
+  integrity sha512-7hFDYWiKcE3yHZvemsoM9lZis/PzurHAEX1ej8PLCu818Rt6QqUAiDdxHPCKZctzmhqzPpcFSgvMCiPbtooqAg==
   dependencies:
     loader-utils "^1.1.0"
 
