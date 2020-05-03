@@ -391,7 +391,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const output = tags.stripIndent`
-        import { __decorate, __importDefault } from "tslib";
+        import { __decorate } from "tslib";
         import { Component } from 'foo';
 
         let AppComponent = class AppComponent {
@@ -451,6 +451,37 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = transform(input, false);
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should not emit import default helper if no changes are made', () => {
+      const input = tags.stripIndent`
+        import { Component } from '@angular/core';
+
+        @Component({
+          selector: 'app-root'
+        })
+        export class AppComponent {
+          title = 'app';
+        }
+      `;
+      const output = tags.stripIndent`
+        import { __decorate } from "tslib";
+        import { Component } from '@angular/core';
+        let AppComponent = class AppComponent {
+            constructor() {
+                this.title = 'app';
+            }
+        };
+        AppComponent = __decorate([
+          Component({
+                selector: 'app-root'
+            })
+        ], AppComponent);
+        export { AppComponent };
+      `;
+
+      const result = transform(input);
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
   });
