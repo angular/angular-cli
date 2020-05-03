@@ -5,23 +5,32 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { tags } from '@angular-devkit/core';
 import * as ts from 'typescript';
+
+// emit helper for `import Name from "foo"`
+// importName is marked as an internal property but is needed for the tslib import.
+const importDefaultHelper: ts.UnscopedEmitHelper & { importName?: string } = {
+  name: 'typescript:commonjsimportdefault',
+  importName: '__importDefault',
+  scoped: false,
+  text: `
+    var __importDefault = (this && this.__importDefault) || function (mod) {
+      return (mod && mod.__esModule) ? mod : { "default": mod };
+    };`,
+};
 
 export function replaceResources(
   shouldTransform: (fileName: string) => boolean,
   getTypeChecker: () => ts.TypeChecker,
   directTemplateLoading = false,
 ): ts.TransformerFactory<ts.SourceFile> {
-
   return (context: ts.TransformationContext) => {
     const typeChecker = getTypeChecker();
 
     const visitNode: ts.Visitor = (node: ts.Node) => {
       if (ts.isClassDeclaration(node)) {
-        const decorators = ts.visitNodes(
-          node.decorators,
-          (node: ts.Decorator) => visitDecorator(node, typeChecker, directTemplateLoading),
+        const decorators = ts.visitNodes(node.decorators, (node: ts.Decorator) =>
+          visitDecorator(context, node, typeChecker, directTemplateLoading),
         );
 
         return ts.updateClassDeclaration(
@@ -38,22 +47,8 @@ export function replaceResources(
       return ts.visitEachChild(node, visitNode, context);
     };
 
-    // emit helper for `import Name from "foo"`
-    // importName is marked as an internal property but is needed for the tslib import.
-    const importDefaultHelper: ts.UnscopedEmitHelper & { importName?: string; } = {
-      name: 'typescript:commonjsimportdefault',
-      importName: '__importDefault',
-      scoped: false,
-      text: tags.stripIndent`
-      var __importDefault = (this && this.__importDefault) || function (mod) {
-        return (mod && mod.__esModule) ? mod : { "default": mod };
-      };`,
-    };
-
     return (sourceFile: ts.SourceFile) => {
       if (shouldTransform(sourceFile.fileName)) {
-        context.requestEmitHelper(importDefaultHelper);
-
         return ts.visitNode(sourceFile, visitNode);
       }
 
@@ -63,9 +58,11 @@ export function replaceResources(
 }
 
 function visitDecorator(
+  context: ts.TransformationContext,
   node: ts.Decorator,
   typeChecker: ts.TypeChecker,
-  directTemplateLoading: boolean): ts.Decorator {
+  directTemplateLoading: boolean,
+): ts.Decorator {
   if (!isComponentDecorator(node, typeChecker)) {
     return node;
   }
@@ -85,10 +82,8 @@ function visitDecorator(
   const styleReplacements: ts.Expression[] = [];
 
   // visit all properties
-  let properties = ts.visitNodes(
-    objectExpression.properties,
-    (node: ts.ObjectLiteralElementLike) =>
-      visitComponentMetadata(node, styleReplacements, directTemplateLoading),
+  let properties = ts.visitNodes(objectExpression.properties, (node: ts.ObjectLiteralElementLike) =>
+    visitComponentMetadata(context, node, styleReplacements, directTemplateLoading),
   );
 
   // replace properties with updated properties
@@ -103,16 +98,14 @@ function visitDecorator(
 
   return ts.updateDecorator(
     node,
-    ts.updateCall(
-      decoratorFactory,
-      decoratorFactory.expression,
-      decoratorFactory.typeArguments,
-      [ts.updateObjectLiteral(objectExpression, properties)],
-    ),
+    ts.updateCall(decoratorFactory, decoratorFactory.expression, decoratorFactory.typeArguments, [
+      ts.updateObjectLiteral(objectExpression, properties),
+    ]),
   );
 }
 
 function visitComponentMetadata(
+  context: ts.TransformationContext,
   node: ts.ObjectLiteralElementLike,
   styleReplacements: ts.Expression[],
   directTemplateLoading: boolean,
@@ -124,14 +117,17 @@ function visitComponentMetadata(
   const name = node.name.text;
   switch (name) {
     case 'moduleId':
-
       return undefined;
 
     case 'templateUrl':
       return ts.updatePropertyAssignment(
         node,
         ts.createIdentifier('template'),
-        createRequireExpression(node.initializer, directTemplateLoading ? '!raw-loader!' : ''),
+        createRequireExpression(
+          context,
+          node.initializer,
+          directTemplateLoading ? '!raw-loader!' : '',
+        ),
       );
 
     case 'styles':
@@ -141,16 +137,15 @@ function visitComponentMetadata(
       }
 
       const isInlineStyles = name === 'styles';
-      const styles = ts.visitNodes(
-        node.initializer.elements,
-        (node: ts.Expression) => {
-          if (!ts.isStringLiteral(node) && !ts.isNoSubstitutionTemplateLiteral(node)) {
-            return node;
-          }
+      const styles = ts.visitNodes(node.initializer.elements, (node: ts.Expression) => {
+        if (!ts.isStringLiteral(node) && !ts.isNoSubstitutionTemplateLiteral(node)) {
+          return node;
+        }
 
-          return isInlineStyles ? ts.createLiteral(node.text) : createRequireExpression(node);
-        },
-      );
+        return isInlineStyles
+          ? ts.createLiteral(node.text)
+          : createRequireExpression(context, node);
+      });
 
       // Styles should be placed first
       if (isInlineStyles) {
@@ -188,17 +183,21 @@ function isComponentDecorator(node: ts.Node, typeChecker: ts.TypeChecker): node 
   return false;
 }
 
-function createRequireExpression(node: ts.Expression, loader?: string): ts.Expression {
+function createRequireExpression(
+  context: ts.TransformationContext,
+  node: ts.Expression,
+  loader?: string,
+): ts.Expression {
   const url = getResourceUrl(node, loader);
   if (!url) {
     return node;
   }
 
-  const callExpression = ts.createCall(
-    ts.createIdentifier('require'),
-    undefined,
-    [ts.createLiteral(url)],
-  );
+  context.requestEmitHelper(importDefaultHelper);
+
+  const callExpression = ts.createCall(ts.createIdentifier('require'), undefined, [
+    ts.createLiteral(url),
+  ]);
 
   return ts.createPropertyAccess(
     ts.createCall(
