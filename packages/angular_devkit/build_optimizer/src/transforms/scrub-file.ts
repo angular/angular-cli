@@ -8,9 +8,6 @@
 import * as ts from 'typescript';
 import { collectDeepNodes } from '../helpers/ast-utils';
 
-/**
- * @deprecated From 0.9.0
- */
 export function testScrubFile(content: string) {
   const markers = [
     'decorators',
