@@ -354,7 +354,7 @@ LARGE_SPECS = {
         # These tests are resource intensive and should not be over-parallized as they will
         # compete for the resources of other parallel tests slowing everything down.
         # Ask Bazel to allocate multiple CPUs for these tests with "cpu:n" tag.
-        tags = ["cpu:2"] + LARGE_SPECS[spec].get("tags", []),
+        tags = ["cpu:2", "local"] + LARGE_SPECS[spec].get("tags", []),
         templated_args = ["--nobazel_patch_module_resolver"],
         deps = [":build_angular_" + spec + "_test_lib"],
     )

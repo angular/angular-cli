@@ -1,4 +1,5 @@
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
 load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
 load("//tools:defaults.bzl", "ts_library")
 
@@ -16,6 +17,17 @@ licenses(["notice"])  # MIT License
 
 # @angular-devkit/core
 
+copy_to_bin(
+    name = "core_data",
+    srcs = glob(
+        include = ["**/*.json"],
+        # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+        exclude = ["node_modules/**"],
+    ) + [
+        "//packages/angular_devkit/core/third_party/github.com/chalk/supports-color",
+    ],
+)
+
 ts_library(
     name = "core",
     srcs = glob(
@@ -25,13 +37,7 @@ ts_library(
             "src/**/*_benchmark.ts",
         ],
     ),
-    data = glob(
-        include = ["**/*.json"],
-        # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
-        exclude = ["node_modules/**"],
-    ) + [
-        "//packages/angular_devkit/core/third_party/github.com/chalk/supports-color",
-    ],
+    data = [":core_data"],
     module_name = "@angular-devkit/core",
     module_root = "src/index.d.ts",
     # The attribute below is needed in g3 to turn off strict typechecking

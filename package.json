@@ -54,17 +54,6 @@
     "url": "https://github.com/angular/angular-cli/issues"
   },
   "homepage": "https://github.com/angular/angular-cli",
-  "workspaces": {
-    "packages": [
-      "packages/angular/*",
-      "packages/angular_devkit/*",
-      "packages/ngtools/*",
-      "packages/schematics/*"
-    ],
-    "nohoist": [
-      "@angular/compiler-cli"
-    ]
-  },
   "devDependencies": {
     "@angular/animations": "9.1.4",
     "@angular/cdk": "9.2.2",
