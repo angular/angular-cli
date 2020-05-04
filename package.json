@@ -101,7 +101,7 @@
     "@types/express": "^4.16.0",
     "@types/find-cache-dir": "^3.0.0",
     "@types/glob": "^7.1.1",
-    "@types/inquirer": "^0.0.44",
+    "@types/inquirer": "^6.0.0",
     "@types/jasmine": "~3.5.0",
     "@types/karma": "^5.0.0",
     "@types/license-checker-webpack-plugin": "^0.0.2",
