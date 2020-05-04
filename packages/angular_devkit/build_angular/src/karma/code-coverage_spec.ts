@@ -118,10 +118,19 @@ describe('Karma Builder code coverage', () => {
       thresholds: {
         emitWarning: false,
         global: {
-          statements: 200
-        }
+          statements: 100,
+          lines: 100,
+          branches: 100,
+          functions: 100
+        },
       }`,
     );
+
+    host.appendToFile('src/app/app.component.ts', `
+      export function nonCovered(): boolean {
+        return true;
+      }
+    `);
 
     const run = await architect.scheduleTarget(karmaTargetSpec, { codeCoverage: true });
     await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: false }));

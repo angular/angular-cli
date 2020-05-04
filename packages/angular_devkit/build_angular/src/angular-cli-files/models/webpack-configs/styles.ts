@@ -158,8 +158,10 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
           loader: require.resolve('less-loader'),
           options: {
             sourceMap: cssSourceMap,
-            javascriptEnabled: true,
-            ...lessPathOptions,
+            lessOptions: {
+              javascriptEnabled: true,
+              ...lessPathOptions,
+            },
           },
         },
       ],
