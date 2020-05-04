@@ -50,6 +50,18 @@ export async function executeTest() {
     await expectFileToMatch(`${outputPath}/vendor-es5.js`, '.ng.common.locales');
     await expectFileToMatch(`${outputPath}/vendor-es2015.js`, '.ng.common.locales');
 
+    // Verify the locale data is browser compatible
+    await expectToFail(() => expectFileToMatch(`${outputPath}/vendor-es5.js`, /\bconst\b/));
+    await expectFileToMatch(`${outputPath}/vendor-es2015.js`, /\bconst\b/);
+
+    // Verify locale data comments are removed in production
+    await expectToFail(() =>
+      expectFileToMatch(`${outputPath}/vendor-es5.js`, '// See angular/tools/gulp-tasks/cldr/extract.js'),
+    );
+    await expectToFail(() =>
+      expectFileToMatch(`${outputPath}/vendor-es2015.js`, '// See angular/tools/gulp-tasks/cldr/extract.js'),
+    );
+
     // Execute Application E2E tests with dev server
     await ng('e2e', `--configuration=${lang}`, '--port=0');
 
