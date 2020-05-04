@@ -89,38 +89,6 @@ export class SchematicTestRunner {
       .pipe(map(tree => new UnitTestTree(tree)));
   }
 
-  /**
-   * @deprecated Since v8.0.0 - Use {@link SchematicTestRunner.runSchematicAsync} instead.
-   * All schematics can potentially be async.
-   * This synchronous variant will fail if the schematic, any of its rules, or any schematics
-   * it calls are async.
-   */
-  runSchematic<SchematicSchemaT>(
-    schematicName: string,
-    opts?: SchematicSchemaT,
-    tree?: Tree,
-  ): UnitTestTree {
-    const schematic = this._collection.createSchematic(schematicName, true);
-
-    let result: UnitTestTree | null = null;
-    let error;
-    const host = observableOf(tree || new HostTree);
-    this._engineHost.clearTasks();
-
-    schematic.call(opts || {}, host, { logger: this._logger })
-      .subscribe(t => result = new UnitTestTree(t), e => error = e);
-
-    if (error) {
-      throw error;
-    }
-
-    if (result === null) {
-      throw new Error('Schematic is async, please use runSchematicAsync');
-    }
-
-    return result;
-  }
-
   runExternalSchematicAsync<SchematicSchemaT>(
     collectionName: string,
     schematicName: string,
@@ -134,35 +102,6 @@ export class SchematicTestRunner {
 
     return schematic.call(opts || {}, host, { logger: this._logger })
       .pipe(map(tree => new UnitTestTree(tree)));
-  }
-
-  /**
-   * @deprecated Since v8.0.0 - Use {@link SchematicTestRunner.runExternalSchematicAsync} instead.
-   * All schematics can potentially be async.
-   * This synchronous variant will fail if the schematic, any of its rules, or any schematics
-   * it calls are async.
-   */
-  runExternalSchematic<SchematicSchemaT>(
-    collectionName: string,
-    schematicName: string,
-    opts?: SchematicSchemaT,
-    tree?: Tree,
-  ): UnitTestTree {
-    const externalCollection = this._engine.createCollection(collectionName);
-    const schematic = externalCollection.createSchematic(schematicName, true);
-
-    let result: UnitTestTree | null = null;
-    const host = observableOf(tree || new HostTree);
-    this._engineHost.clearTasks();
-
-    schematic.call(opts || {}, host, { logger: this._logger })
-      .subscribe(t => result = new UnitTestTree(t));
-
-    if (result === null) {
-      throw new Error('Schematic is async, please use runSchematicAsync');
-    }
-
-    return result;
   }
 
   callRule(rule: Rule, tree: Tree, parentContext?: Partial<SchematicContext>): Observable<Tree> {
