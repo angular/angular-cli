@@ -14,8 +14,6 @@ export { buildOptimizer } from './build-optimizer/build-optimizer';
 
 export { transformJavascript } from './helpers/transform-javascript';
 
-export { getFoldFileTransformer } from './transforms/class-fold';
-export { getImportTslibTransformer } from './transforms/import-tslib';
 export { getPrefixClassesTransformer } from './transforms/prefix-classes';
 export { getPrefixFunctionsTransformer } from './transforms/prefix-functions';
 export {
