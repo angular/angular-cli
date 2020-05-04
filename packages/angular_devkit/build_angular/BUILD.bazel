@@ -135,7 +135,6 @@ ts_library(
         "@npm//jest-worker",
         "@npm//karma",
         "@npm//karma-source-map-support",
-        "@npm//less",
         "@npm//less-loader",
         "@npm//license-checker-webpack-plugin",
         "@npm//loader-utils",
