@@ -9,7 +9,7 @@
 import { workspaces } from '@angular-devkit/core';
 import { Rule } from '@angular-devkit/schematics';
 import { updateWorkspace } from '../../utility/workspace';
-import { ProjectType } from '../../utility/workspace-models';
+import { Builders, ProjectType } from '../../utility/workspace-models';
 
 export default function (): Rule {
   return updateWorkspace(workspace => {
@@ -25,6 +25,14 @@ export default function (): Rule {
           continue;
         }
 
+        let extraOptionsToRemove = {};
+        if (target.builder === Builders.Server) {
+          extraOptionsToRemove = {
+            vendorChunk: undefined,
+            commonChunk: undefined,
+          };
+        }
+
         // Check options
         if (target.options) {
           target.options = {
@@ -32,6 +40,7 @@ export default function (): Rule {
             evalSourceMap: undefined,
             skipAppShell: undefined,
             profile: undefined,
+            ...extraOptionsToRemove,
           };
         }
 
@@ -46,6 +55,7 @@ export default function (): Rule {
             evalSourceMap: undefined,
             skipAppShell: undefined,
             profile: undefined,
+            ...extraOptionsToRemove,
           };
         }
       }
