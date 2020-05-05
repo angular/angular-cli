@@ -96,7 +96,7 @@ function _passesSpdx(licenses: string[], accepted: string[]) {
 
 export default function (_options: {}, logger: logging.Logger): Promise<number> {
   return new Promise(resolve => {
-    checker.init({ start: path.join(__dirname, '..') }, (err: Error, json: JsonObject) => {
+    checker.init({ start: path.join(__dirname, '..'), excludePrivatePackages: true }, (err: Error, json: JsonObject) => {
       if (err) {
         logger.fatal(`Something happened:\n${err.message}`);
         resolve(1);
