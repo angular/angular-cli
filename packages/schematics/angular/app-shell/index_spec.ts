@@ -17,7 +17,6 @@ describe('App Shell Schematic', () => {
     require.resolve('../collection.json'),
   );
   const defaultOptions: AppShellOptions = {
-    name: 'foo',
     clientProject: 'bar',
   };
 
