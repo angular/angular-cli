@@ -6,6 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/scripts" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/packages" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/.yarn" />
       <excludeFolder url="file://$MODULE_DIR$/tests/legacy-cli/e2e/assets/1.7-project/dist" />
       <excludeFolder url="file://$MODULE_DIR$/tests/legacy-cli/e2e/assets/1.7-project/tmp" />
       <excludeFolder url="file://$MODULE_DIR$/third_party" />
