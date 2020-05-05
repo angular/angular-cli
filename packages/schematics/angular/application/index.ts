@@ -179,6 +179,34 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
   }
 
   const sourceRoot = join(normalize(projectRoot), 'src');
+  let budgets = [];
+  if (options.strict) {
+    budgets = [
+      {
+        type: 'initial',
+        maximumWarning: '500kb',
+        maximumError: '1mb',
+      },
+      {
+        type: 'anyComponentStyle',
+        maximumWarning: '2kb',
+        maximumError: '4kb',
+      },
+    ];
+  } else {
+    budgets = [
+      {
+        type: 'initial',
+        maximumWarning: '2mb',
+        maximumError: '5mb',
+      },
+      {
+        type: 'anyComponentStyle',
+        maximumWarning: '6kb',
+        maximumError: '10kb',
+      },
+    ];
+  }
 
   const project = {
     root: normalize(projectRoot),
@@ -219,17 +247,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
             extractLicenses: true,
             vendorChunk: false,
             buildOptimizer: true,
-            budgets: [
-            {
-              type: 'initial',
-              maximumWarning: '2mb',
-              maximumError: '5mb',
-            },
-            {
-              type: 'anyComponentStyle',
-              maximumWarning: '6kb',
-              maximumError: '10kb',
-            }],
+            budgets,
           },
         },
       },
