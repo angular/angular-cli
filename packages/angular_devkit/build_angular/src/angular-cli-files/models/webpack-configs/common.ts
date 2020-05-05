@@ -194,7 +194,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   if (profilingEnabled) {
     extraPlugins.push(
       new debug.ProfilingPlugin({
-        outputPath: path.resolve(root, `chrome-profiler-events${targetInFileName}.json`),
+        outputPath: path.resolve(root, 'chrome-profiler-events.json'),
       }),
     );
   }
@@ -303,7 +303,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         apply(compiler: Compiler) {
           compiler.hooks.emit.tap('angular-cli-stats', compilation => {
             const data = JSON.stringify(compilation.getStats().toJson('verbose'));
-            compilation.assets[`stats${targetInFileName}.json`] = new RawSource(data);
+            compilation.assets['stats.json'] = new RawSource(data);
           });
         }
       })(),
