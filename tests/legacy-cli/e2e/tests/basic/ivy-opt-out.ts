@@ -22,7 +22,9 @@ export default async function() {
 
     // View Engine (NGC) compilation should work after running NGCC from Webpack
     await updateJsonFile('tsconfig.json', config => {
-      config.angularCompilerOptions.enableIvy = false;
+      const { angularCompilerOptions = {} } = config;
+      angularCompilerOptions.enableIvy = false;
+      config.angularCompilerOptions = angularCompilerOptions;
     });
 
     // verify that VE compilation works during runtime

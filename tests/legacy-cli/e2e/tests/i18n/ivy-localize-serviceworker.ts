@@ -34,6 +34,9 @@ export default async function() {
 
   await updateJsonFile('tsconfig.json', config => {
     config.compilerOptions.target = 'es2015';
+    if (!config.angularCompilerOptions) {
+      config.angularCompilerOptions = {};
+    }
     config.angularCompilerOptions.disableTypeScriptVersionCheck = true;
   });
 

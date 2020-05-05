@@ -106,6 +106,11 @@
       "description": "When true, applies lint fixes after generating the application.",
       "x-user-analytics": 15
     },
+    "strict": {
+      "description": "Creates an application with stricter build optimization options.",
+      "type": "boolean",
+      "default": false
+    },
     "legacyBrowsers": {
       "type": "boolean",
       "description": "Add support for legacy browsers like Internet Explorer using differential loading.",

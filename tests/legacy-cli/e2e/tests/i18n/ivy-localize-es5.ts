@@ -11,6 +11,9 @@ export default async function() {
   // Ensure a es5 build is used.
   await updateJsonFile('tsconfig.json', config => {
     config.compilerOptions.target = 'es5';
+    if (!config.angularCompilerOptions) {
+      config.angularCompilerOptions = {};
+    }
     config.angularCompilerOptions.disableTypeScriptVersionCheck = true;
   });
 

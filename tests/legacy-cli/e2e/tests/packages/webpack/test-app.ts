@@ -13,7 +13,9 @@ export default async function (skipCleaning: () => void) {
   await createProjectFromAsset('webpack/test-app');
   if (isVe) {
     await updateJsonFile('tsconfig.json', config => {
-      config.angularCompilerOptions.enableIvy = false;
+      const { angularCompilerOptions = {} } = config;
+      angularCompilerOptions.enableIvy = false;
+      config.angularCompilerOptions = angularCompilerOptions;
     });
   }
 
