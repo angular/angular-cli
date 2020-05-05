@@ -148,13 +148,7 @@ function addUniversalTarget(options: AppShellOptions): Rule {
     };
 
     // Delete non-universal options.
-    delete universalOptions.universalProject;
     delete universalOptions.route;
-    delete universalOptions.name;
-    delete universalOptions.outDir;
-    delete universalOptions.root;
-    delete universalOptions.index;
-    delete universalOptions.sourceDir;
 
     return schematic('universal', universalOptions);
   };
