@@ -10,7 +10,17 @@
 
 The caretaker should triage issues, merge PR, and sheppard the release.
 
-Caretaker calendar can be found [here](https://calendar.google.com/calendar?cid=Z29vZ2xlLmNvbV9zZjlvODF0NGE4NzE5ZmtiMnBoZnA4MGk2Z0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t).
+Caretaker calendar can be found [here](https://calendar.google.com/calendar/embed?src=angular.io_jf53juok1lhpm84hv6bo6fmgbc%40group.calendar.google.com&ctz=America%2FLos_Angeles).
+
+Each shift consists of two caretakers. The primary caretaker is responsible for
+merging PRs to master and patch whereas the secondary caretaker is responsible
+for the release. Primary-secondary pairs are as follows:
+
+Primary | Secondary
+--------|----------
+Alan    | Doug
+Charles | Keen
+Filipe  | Minko
 
 ## Triaging Issues
 TBD
