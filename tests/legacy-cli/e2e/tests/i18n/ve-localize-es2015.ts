@@ -24,7 +24,7 @@ export default async function() {
   // Ensure a ES2015 build is used.
   await writeFile('.browserslistrc', 'Chrome 65');
   await updateJsonFile('tsconfig.json', config => {
-    config.compilerOptions.target = 'es2015';
+    config.compilerOptions.target = 'es2016';
     config.angularCompilerOptions.disableTypeScriptVersionCheck = true;
   });
 

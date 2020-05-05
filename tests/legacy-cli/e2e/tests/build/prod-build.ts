@@ -47,13 +47,13 @@ export default async function () {
   await expectFileToExist(join(process.cwd(), 'dist'));
   // Check for cache busting hash script src
   await expectFileToMatch('dist/test-project/index.html', /main-es5\.[0-9a-f]{20}\.js/);
-  await expectFileToMatch('dist/test-project/index.html', /main-es2015\.[0-9a-f]{20}\.js/);
+  await expectFileToMatch('dist/test-project/index.html', /main-es2016\.[0-9a-f]{20}\.js/);
   await expectFileToMatch('dist/test-project/index.html', /styles\.[0-9a-f]{20}\.css/);
   await expectFileToMatch('dist/test-project/3rdpartylicenses.txt', /MIT/);
 
   const indexContent = await readFile('dist/test-project/index.html');
   const mainES5Path = indexContent.match(/src="(main-es5\.[a-z0-9]{0,32}\.js)"/)[1];
-  const mainES2015Path = indexContent.match(/src="(main-es2015\.[a-z0-9]{0,32}\.js)"/)[1];
+  const mainES2015Path = indexContent.match(/src="(main-es2016\.[a-z0-9]{0,32}\.js)"/)[1];
 
   // Content checks
   await expectFileToMatch(`dist/test-project/${mainES5Path}`, bootstrapRegExp);

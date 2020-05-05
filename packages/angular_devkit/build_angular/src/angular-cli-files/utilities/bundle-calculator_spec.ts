@@ -126,7 +126,7 @@ describe('bundle-calculator', () => {
         {
           name: '0',
           original: {
-            filename: 'foo-es2015.js',
+            filename: 'foo-es2016.js',
             size: 1.25 * KB,
           },
           downlevel: {
@@ -141,7 +141,7 @@ describe('bundle-calculator', () => {
       expect(failures.length).toBe(2);
       expect(failures).toContain({
         severity: ThresholdSeverity.Error,
-        message: jasmine.stringMatching('Exceeded maximum budget for foo-es2015.'),
+        message: jasmine.stringMatching('Exceeded maximum budget for foo-es2016.'),
       });
       expect(failures).toContain({
         severity: ThresholdSeverity.Error,
@@ -170,7 +170,7 @@ describe('bundle-calculator', () => {
           name: '0',
           // Individual builds are under budget, but combined they are over.
           original: {
-            filename: 'foo-es2015.js',
+            filename: 'foo-es2016.js',
             size: 0.5 * KB,
           },
           downlevel: {
@@ -240,7 +240,7 @@ describe('bundle-calculator', () => {
           name: '0',
           // Individual builds are under budget, but combined they are over.
           original: {
-            filename: 'initial-es2015.js',
+            filename: 'initial-es2016.js',
             size: 1.25 * KB,
           },
           downlevel: {
@@ -255,7 +255,7 @@ describe('bundle-calculator', () => {
       expect(failures.length).toBe(2);
       expect(failures).toContain({
         severity: ThresholdSeverity.Error,
-        message: jasmine.stringMatching('Exceeded maximum budget for initial-es2015.'),
+        message: jasmine.stringMatching('Exceeded maximum budget for initial-es2016.'),
       });
       expect(failures).toContain({
         severity: ThresholdSeverity.Error,
@@ -283,7 +283,7 @@ describe('bundle-calculator', () => {
           name: '0',
           // Individual builds are under budget, but combined they are over.
           original: {
-            filename: 'initial-es2015.js',
+            filename: 'initial-es2016.js',
             size: 0.5 * KB,
           },
           downlevel: {

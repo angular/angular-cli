@@ -33,28 +33,28 @@ describe('Browser Builder with differential loading', () => {
       'favicon.ico',
       'index.html',
 
-      'main-es2015.js',
-      'main-es2015.js.map',
+      'main-es2016.js',
+      'main-es2016.js.map',
       'main-es5.js',
       'main-es5.js.map',
 
-      'polyfills-es2015.js',
-      'polyfills-es2015.js.map',
+      'polyfills-es2016.js',
+      'polyfills-es2016.js.map',
       'polyfills-es5.js',
       'polyfills-es5.js.map',
 
-      'runtime-es2015.js',
-      'runtime-es2015.js.map',
+      'runtime-es2016.js',
+      'runtime-es2016.js.map',
       'runtime-es5.js',
       'runtime-es5.js.map',
 
-      'styles-es2015.js',
-      'styles-es2015.js.map',
+      'styles-es2016.js',
+      'styles-es2016.js.map',
       'styles-es5.js',
       'styles-es5.js.map',
 
-      'vendor-es2015.js',
-      'vendor-es2015.js.map',
+      'vendor-es2016.js',
+      'vendor-es2016.js.map',
       'vendor-es5.js',
       'vendor-es5.js.map',
     ] as PathFragment[];
@@ -178,7 +178,7 @@ describe('Browser Builder with differential loading', () => {
       vendorChunk: false,
     });
     expect(await files['main-es5.js']).not.toContain('const ');
-    expect(await files['main-es2015.js']).toContain('const ');
+    expect(await files['main-es2016.js']).toContain('const ');
   });
 
   it('uses the right zone.js variant', async () => {
@@ -186,9 +186,9 @@ describe('Browser Builder with differential loading', () => {
     expect(await files['polyfills-es5.js']).toContain('zone.js/dist/zone-legacy');
     expect(await files['polyfills-es5.js']).toContain('registerElementPatch');
     expect(await files['polyfills-es5.js']).toContain('zone.js/dist/zone-evergreen');
-    expect(await files['polyfills-es2015.js']).toContain('zone.js/dist/zone-evergreen');
-    expect(await files['polyfills-es2015.js']).not.toContain('zone.js/dist/zone-legacy');
-    expect(await files['polyfills-es2015.js']).not.toContain('registerElementPatch');
+    expect(await files['polyfills-es2016.js']).toContain('zone.js/dist/zone-evergreen');
+    expect(await files['polyfills-es2016.js']).not.toContain('zone.js/dist/zone-legacy');
+    expect(await files['polyfills-es2016.js']).not.toContain('registerElementPatch');
   });
 
   it('adds `type="module"` when differential loading is needed', async () => {

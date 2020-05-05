@@ -29,7 +29,6 @@ export default async function() {
     `loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule)`,
   );
   // Should update tsconfig and src/browserslist via differential-loading.
-  await expectFileToMatch('tsconfig.json', `"target": "es2015",`);
   await expectToFail(() => expectFileToExist('e2e/browserlist'));
   // Should rename codelyzer rules.
   await expectFileToMatch('tslint.json', `use-lifecycle-interface`);
@@ -57,5 +56,5 @@ export default async function() {
   // Verify project now creates bundles for differential loading.
   await noSilentNg('build', '--prod');
   await expectFileMatchToExist('dist/seven-oh-project/', /main-es5\.[0-9a-f]{20}\.js/);
-  await expectFileMatchToExist('dist/seven-oh-project/', /main-es2015\.[0-9a-f]{20}\.js/);
+  await expectFileMatchToExist('dist/seven-oh-project/', /main-es2016\.[0-9a-f]{20}\.js/);
 }

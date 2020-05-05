@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "es2015",
+    "target": "es2016",
     "declaration": true,
     "inlineSources": true,
     "types": [],

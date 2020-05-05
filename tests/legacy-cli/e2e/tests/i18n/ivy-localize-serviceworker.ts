@@ -33,7 +33,7 @@ export default async function() {
   await npm('install', `${serviceWorkerVersion}`);
 
   await updateJsonFile('tsconfig.json', config => {
-    config.compilerOptions.target = 'es2015';
+    config.compilerOptions.target = 'es2016';
     config.angularCompilerOptions.disableTypeScriptVersionCheck = true;
   });
 
@@ -140,11 +140,11 @@ export default async function() {
   await ng('build', '--i18n-missing-translation', 'error');
   for (const { lang, translation } of langTranslations) {
     await expectFileToMatch(`${baseDir}/${lang}/main-es5.js`, translation);
-    await expectFileToMatch(`${baseDir}/${lang}/main-es2015.js`, translation);
+    await expectFileToMatch(`${baseDir}/${lang}/main-es2016.js`, translation);
     await expectToFail(() => expectFileToMatch(`${baseDir}/${lang}/main-es5.js`, '$localize`'));
-    await expectToFail(() => expectFileToMatch(`${baseDir}/${lang}/main-es2015.js`, '$localize`'));
+    await expectToFail(() => expectFileToMatch(`${baseDir}/${lang}/main-es2016.js`, '$localize`'));
     await expectFileToMatch(`${baseDir}/${lang}/main-es5.js`, lang);
-    await expectFileToMatch(`${baseDir}/${lang}/main-es2015.js`, lang);
+    await expectFileToMatch(`${baseDir}/${lang}/main-es2016.js`, lang);
 
     // Expect service worker configuration to be present
     await expectFileToExist(`${baseDir}/${lang}/ngsw.json`);

@@ -32,7 +32,8 @@ export enum ThresholdSeverity {
 }
 
 enum DifferentialBuildType {
-  ORIGINAL = 'es2015',
+  // FIXME: this should match the actual file suffix and not hardcoded.
+  ORIGINAL = 'es2016',
   DOWNLEVEL = 'es5',
 }
 

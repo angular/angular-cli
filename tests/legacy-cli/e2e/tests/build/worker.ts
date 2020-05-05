@@ -32,18 +32,18 @@ export default async function () {
   await ng('build');
   await expectFileToExist('dist/test-project/0-es5.worker.js');
   await expectFileToMatch('dist/test-project/main-es5.js', '0-es5.worker.js');
-  await expectToFail(() => expectFileToMatch('dist/test-project/main-es5.js', '0-es2015.worker.js'));
-  await expectFileToExist('dist/test-project/0-es2015.worker.js');
-  await expectFileToMatch('dist/test-project/main-es2015.js', '0-es2015.worker.js');
-  await expectToFail(() => expectFileToMatch('dist/test-project/main-es2015.js', '0-es5.worker.js'));
+  await expectToFail(() => expectFileToMatch('dist/test-project/main-es5.js', '0-es2016.worker.js'));
+  await expectFileToExist('dist/test-project/0-es2016.worker.js');
+  await expectFileToMatch('dist/test-project/main-es2016.js', '0-es2016.worker.js');
+  await expectToFail(() => expectFileToMatch('dist/test-project/main-es2016.js', '0-es5.worker.js'));
 
   await ng('build', '--prod', '--output-hashing=none');
   await expectFileToExist('dist/test-project/0-es5.worker.js');
   await expectFileToMatch('dist/test-project/main-es5.js', '0-es5.worker.js');
-  await expectToFail(() => expectFileToMatch('dist/test-project/main-es5.js', '0-es2015.worker.js'));
-  await expectFileToExist('dist/test-project/0-es2015.worker.js');
-  await expectFileToMatch('dist/test-project/main-es2015.js', '0-es2015.worker.js');
-  await expectToFail(() => expectFileToMatch('dist/test-project/main-es2015.js', '0-es5.worker.js'));
+  await expectToFail(() => expectFileToMatch('dist/test-project/main-es5.js', '0-es2016.worker.js'));
+  await expectFileToExist('dist/test-project/0-es2016.worker.js');
+  await expectFileToMatch('dist/test-project/main-es2016.js', '0-es2016.worker.js');
+  await expectToFail(() => expectFileToMatch('dist/test-project/main-es2016.js', '0-es5.worker.js'));
 
   // console.warn has to be used because chrome only captures warnings and errors by default
   // https://github.com/angular/protractor/issues/2207
