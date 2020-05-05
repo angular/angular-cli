@@ -24,7 +24,6 @@ import {
   Program,
   SOURCE,
   UNKNOWN_ERROR_CODE,
-  VERSION,
   createCompilerHost,
   createProgram,
   formatDiagnostics,
@@ -154,11 +153,6 @@ export class AngularCompilerPlugin {
     const tsProgram = this._getTsProgram();
 
     return tsProgram ? tsProgram.getTypeChecker() : null;
-  }
-
-  /** @deprecated  From 8.0.2 */
-  static isSupported() {
-    return VERSION && parseInt(VERSION.major) >= 8;
   }
 
   private _setupOptions(options: AngularCompilerPluginOptions) {
