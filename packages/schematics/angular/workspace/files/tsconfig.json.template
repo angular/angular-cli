@@ -3,11 +3,10 @@
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",<% if (strict) { %>
-    "noImplicitAny": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noFallthroughCasesInSwitch": true,
-    "strictNullChecks": true,<% } %>
+    "noFallthroughCasesInSwitch": true,<% } %>
     "sourceMap": true,
     "declaration": false,
     "downlevelIteration": true,
@@ -20,9 +19,9 @@
       "es2018",
       "dom"
     ]
-  },
+  }<% if (strict) { %>,
   "angularCompilerOptions": {
-    "fullTemplateTypeCheck": true,
-    "strictInjectionParameters": true
-  }
+    "strictInjectionParameters": true,
+    "strictTemplates": true
+  }<% } %>
 }

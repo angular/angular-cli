@@ -118,20 +118,21 @@
       "x-user-analytics": 12
     },
     "createApplication": {
-      "description": "When true (the default), creates a new initial app project in the src folder of the new workspace. When false, creates an empty workspace with no initial app. You can then use the generate application command so that all apps are created in the projects folder.",
+      "description": "When true (the default), creates a new initial application project in the src folder of the new workspace. When false, creates an empty workspace with no initial app. You can then use the generate application command so that all apps are created in the projects folder.",
       "type": "boolean",
       "default": true
     },
     "minimal": {
-      "description": "When true, creates a project without any testing frameworks. (Use for learning purposes only.)",
+      "description": "When true, creates a workspace without any testing frameworks. (Use for learning purposes only.)",
       "type": "boolean",
       "default": false,
       "x-user-analytics": 14
     },
     "strict": {
-      "description": "Creates a workspace with stricter TypeScript compiler options.",
+      "description": "Creates a workspace with stricter type checking and build optimization options.",
       "type": "boolean",
-      "default": false
+      "default": false,
+      "x-prompt": "Create a workspace with stricter type checking and more efficient production optimizations?"
     },
     "legacyBrowsers": {
       "type": "boolean",

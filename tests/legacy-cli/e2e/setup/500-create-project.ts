@@ -24,7 +24,9 @@ export default async function() {
 
     if (argv['ve']) {
       await updateJsonFile('tsconfig.json', config => {
-        config.angularCompilerOptions.enableIvy = false;
+        const { angularCompilerOptions = {} } = config;
+        angularCompilerOptions.enableIvy = false;
+        config.angularCompilerOptions = angularCompilerOptions;
       });
 
       // In VE non prod builds are non AOT by default

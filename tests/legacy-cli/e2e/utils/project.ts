@@ -43,6 +43,9 @@ export async function createProject(name: string, ...args: string[]) {
     // Disable the TS version check to make TS updates easier.
     // Only VE does it, but on Ivy the i18n extraction uses VE.
     await updateJsonFile('tsconfig.json', config => {
+      if (!config.angularCompilerOptions) {
+        config.angularCompilerOptions = {};
+      }
       config.angularCompilerOptions.disableTypeScriptVersionCheck = true;
     });
   }

@@ -33,7 +33,7 @@
       "x-user-analytics": 14
     },
     "strict": {
-      "description": "Creates a workspace with stricter TypeScript compiler options.",
+      "description": "Creates a workspace with stricter type checking options.",
       "type": "boolean",
       "default": false
     },

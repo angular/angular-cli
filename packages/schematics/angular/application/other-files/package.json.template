@@ -1,0 +1,6 @@
+{
+  "name": "<%= utils.dasherize(name) %>",
+  "private": true,
+  "description": "This is a special package.json file that is not used by package managers. It is however used to tell the tools and bundlers whether the code under this directory is free of code with non-local side-effect. Any code that does have non-local side-effects can't be well optimized (tree-shaken) and will result in unnecessary increased payload size. It should be safe to set this option to 'false' for new applications, but existing code bases could be broken when built with the production config if the application code does contain non-local side-effects that the application depends on.",
+  "sideEffects": <%= !strict %>
+}

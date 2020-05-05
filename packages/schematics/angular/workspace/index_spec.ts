@@ -74,13 +74,15 @@ describe('Workspace Schematic', () => {
 
   it('should not add strict compiler options when false', async () => {
     const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, strict: false }).toPromise();
-    const { compilerOptions } = JSON.parse(tree.readContent('/tsconfig.json'));
-    expect(compilerOptions.strictNullChecks).not.toBeDefined();
+    const { compilerOptions, angularCompilerOptions } = JSON.parse(tree.readContent('/tsconfig.json'));
+    expect(compilerOptions.strict).toBeUndefined();
+    expect(angularCompilerOptions).toBeUndefined();
   });
 
   it('should not add strict compiler options when true', async () => {
     const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, strict: true }).toPromise();
-    const { compilerOptions } = JSON.parse(tree.readContent('/tsconfig.json'));
-    expect(compilerOptions.strictNullChecks).toBe(true);
+    const { compilerOptions, angularCompilerOptions } = JSON.parse(tree.readContent('/tsconfig.json'));
+    expect(compilerOptions.strict).toBe(true);
+    expect(angularCompilerOptions.strictTemplates).toBe(true);
   });
 });
