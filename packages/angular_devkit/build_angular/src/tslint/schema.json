@@ -79,6 +79,11 @@
       "items": {
         "type": "string"
       }
+    },
+    "parallel": {
+      "type": "boolean",
+      "description": "Run multiple lint operations in parallel.",
+      "default": false
     }
   },
   "additionalProperties": false,

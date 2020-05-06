@@ -74,3 +74,12 @@ ng lint [project]
     Output format (prose, json, stylish, verbose, pmd, msbuild, checkstyle, vso, fileslist, codeFrame).
   </p>
 </details>
+<details>
+  <summary>parallel</summary>
+  <p>
+    <code>--parallel</code>
+  </p>
+  <p>
+    Run multiple lint operations in parallel.
+  </p>
+</details>

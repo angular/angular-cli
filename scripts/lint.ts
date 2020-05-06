@@ -59,9 +59,15 @@ export default async function(options: ParsedArgs, logger: logging.Logger) {
     oldWarn(...args);
   };
 
-  program.getRootFileNames().forEach(fileName => {
-    linter.lint(fileName, ts.sys.readFile(fileName) || '', tsLintConfig);
-  });
+  const rootFileNames = program.getRootFileNames();
+
+  if (options.parallel) {
+    await Promise.all(rootFileNames.map((fileName) => linter.lint(fileName, ts.sys.readFile(fileName) || '', tsLintConfig)));
+  } else {
+    rootFileNames.forEach(fileName => {
+      linter.lint(fileName, ts.sys.readFile(fileName) || '', tsLintConfig);
+    });
+  }
 
   console.warn = oldWarn;
 
