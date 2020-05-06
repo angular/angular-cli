@@ -93,6 +93,9 @@ describe('Browser Builder service worker', () => {
             '/favicon.ico',
             '/index.html',
           ],
+          cacheQueryOptions: {
+            ignoreVary: true,
+          },
           patterns: [],
         },
         {
@@ -103,6 +106,9 @@ describe('Browser Builder service worker', () => {
             '/assets/folder-asset.txt',
             '/spectrum.png',
           ],
+          cacheQueryOptions: {
+            ignoreVary: true,
+          },
           patterns: [],
         },
       ],
@@ -152,6 +158,9 @@ describe('Browser Builder service worker', () => {
             '/foo/bar/index.html',
           ],
           patterns: [],
+          cacheQueryOptions: {
+            ignoreVary: true,
+          },
         },
         {
           name: 'assets',
@@ -161,6 +170,9 @@ describe('Browser Builder service worker', () => {
             '/foo/bar/assets/folder-asset.txt',
           ],
           patterns: [],
+          cacheQueryOptions: {
+            ignoreVary: true,
+          },
         },
       ],
       dataGroups: [],

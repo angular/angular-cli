@@ -694,14 +694,8 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
 
   const { default: generate } = await import('@babel/generator');
 
-  // In Angular v10.0.0 the `source_file_utils` file was moved.
-  // (Remember to remove the `tryImport()` function when only one import path is required.)
   // tslint:disable-next-line: no-implicit-dependencies
-  const utils = await tryImport<typeof import('@angular/localize/src/tools/src/translate/source_files/source_file_utils')>(
-    '@angular/localize/src/tools/src/source_file_utils',
-    '@angular/localize/src/tools/src/translate/source_files/source_file_utils',
-  );
-
+  const utils = await import('@angular/localize/src/tools/src/source_file_utils');
   // tslint:disable-next-line: no-implicit-dependencies
   const localizeDiag = await import('@angular/localize/src/tools/src/diagnostics');
 
@@ -783,17 +777,6 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
   return { file: options.filename, diagnostics: diagnostics.messages, count: positions.length };
 }
 
-async function tryImport<T>(...importPaths: string[]): Promise<T> {
-  for (const importPath of importPaths) {
-    try {
-      return await import(importPath);
-    } catch {
-      // Do nothing
-    }
-  }
-  throw new Error('Unable to import from any of these paths:\n' + importPaths.map(p => ` - ${p}`).join('\n'));
-}
-
 function inlineCopyOnly(options: InlineOptions) {
   if (!i18n) {
     throw new Error('i18n options are missing');
@@ -818,7 +801,7 @@ function findLocalizePositions(
   ast: ParseResult,
   options: InlineOptions,
   // tslint:disable-next-line: no-implicit-dependencies
-  utils: typeof import('@angular/localize/src/tools/src/translate/source_files/source_file_utils'),
+  utils: typeof import('@angular/localize/src/tools/src/source_file_utils'),
 ): LocalizePosition[] {
   const positions: LocalizePosition[] = [];
   if (options.es5) {
