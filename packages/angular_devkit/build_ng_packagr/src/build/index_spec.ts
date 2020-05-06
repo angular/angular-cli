@@ -63,9 +63,9 @@ describe('NgPackagr Builder', () => {
 
     await run.stop();
 
-    expect(host.scopedSync().exists(normalize('./dist/lib/fesm5/lib.js'))).toBe(true);
+    expect(host.scopedSync().exists(normalize('./dist/lib/fesm2015/lib.js'))).toBe(true);
     const content = virtualFs.fileBufferToString(
-      host.scopedSync().read(normalize('./dist/lib/fesm5/lib.js')),
+      host.scopedSync().read(normalize('./dist/lib/fesm2015/lib.js')),
     );
     expect(content).toContain('lib works');
 
@@ -99,7 +99,7 @@ describe('NgPackagr Builder', () => {
     await run.output.pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       map(() => {
-        const fileName = './dist/lib/fesm5/lib.js';
+        const fileName = './dist/lib/fesm2015/lib.js';
         const content = virtualFs.fileBufferToString(
           host.scopedSync().read(normalize(fileName)),
         );
