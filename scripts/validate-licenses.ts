@@ -42,6 +42,7 @@ const licensesWhitelist = [
   // Have a full copyright grant. Validated by opensource team.
   'Unlicense',
   'CC0-1.0',
+  '0BSD',
 
   // Combinations.
   '(AFL-2.1 OR BSD-2-Clause)',
