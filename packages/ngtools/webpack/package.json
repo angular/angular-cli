@@ -27,13 +27,13 @@
     "webpack-sources": "1.4.3"
   },
   "peerDependencies": {
-    "@angular/compiler-cli": ">=9.0.0 < 10",
+    "@angular/compiler-cli": ">=10.0.0-next.0 < 11",
     "typescript": ">=3.6 < 3.9",
     "webpack": "^4.0.0"
   },
   "devDependencies": {
-    "@angular/compiler": "9.1.4",
-    "@angular/compiler-cli": "9.1.4",
+    "@angular/compiler": "10.0.0-next.5",
+    "@angular/compiler-cli": "10.0.0-next.5",
     "typescript": "3.8.3",
     "webpack": "4.42.1"
   }
