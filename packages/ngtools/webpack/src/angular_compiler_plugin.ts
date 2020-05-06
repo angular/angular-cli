@@ -633,8 +633,8 @@ export class AngularCompilerPlugin {
     // Exclude the following files from unused checks
     // - ngfactories & ngstyle might not have a correspondent
     //   JS file example `@angular/core/core.ngfactory.ts`.
-    // - __ng_typecheck__.ts will never be requested.
-    const fileExcludeRegExp = /(\.(ngfactory|ngstyle|ngsummary)\.ts|ng_typecheck__\.ts)$/;
+    // - ngtypecheck.ts and __ng_typecheck__.ts are used for type-checking in Ivy.
+    const fileExcludeRegExp = /(\.(ngfactory|ngstyle|ngsummary|ngtypecheck)\.ts|ng_typecheck__\.ts)$/;
 
     // Start all the source file names we care about.
     // Ignore matches to the regexp above, files we've already reported once before, and
