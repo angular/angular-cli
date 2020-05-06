@@ -27,7 +27,7 @@
       "./node_modules/@types"
     ],
     "types": [
-      "node"
+      "node/v12"
     ],
     "paths": {
       "@_/benchmark": [ "./packages/_/benchmark/src/index" ],

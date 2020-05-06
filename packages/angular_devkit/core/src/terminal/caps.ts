@@ -7,7 +7,6 @@
  */
 import ReadableStream = NodeJS.ReadableStream;
 import WriteStream = NodeJS.WriteStream;
-import Socket = NodeJS.Socket;
 const supportsColor = require('../../third_party/github.com/chalk/supports-color');
 
 /**
@@ -76,7 +75,7 @@ function _getColumns() {
 
 
 function _createCapabilities(
-  stream: Socket,
+  stream: WriteStream,
   isTerminalStream: boolean,
   level: 0|1|2|3 = supportsColor.stdout.level,
 ): StreamCapabilities {
@@ -96,7 +95,7 @@ function _createCapabilities(
 
 
 export function getCapabilities(
-  stream: Socket,
+  stream: WriteStream,
   isTerminalStream = !!stream.isTTY,
 ): StreamCapabilities {
   let maybeCaps = streamMap.get(stream);

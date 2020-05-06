@@ -169,7 +169,7 @@ export function serveWebpackBrowser(
           publicHost = `${options.ssl ? 'https' : 'http'}://${publicHost}`;
         }
         clientAddress = url.parse(publicHost);
-        options.publicHost = clientAddress.host;
+        options.publicHost = clientAddress.host ?? undefined;
       }
 
       // Add live reload config.

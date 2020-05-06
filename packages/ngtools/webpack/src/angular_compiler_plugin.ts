@@ -565,7 +565,7 @@ export class AngularCompilerPlugin {
 
     // Handle child messages.
     this._typeCheckerProcess.on('message', message => {
-      switch (message.kind) {
+      switch ((message as {kind: MESSAGE_KIND}).kind) {
         case MESSAGE_KIND.Log:
           const logMessage = message as LogMessage;
           this._logger.log(logMessage.level, `\n${logMessage.message}`);

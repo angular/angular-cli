@@ -92,6 +92,9 @@ export function runWebpackDevServer(
             obs.error(err);
           } else {
             const address = this.address();
+            if (address === null) {
+              throw new Error('Server is not listening');
+            }
             result = {
               success: true,
               port: typeof address === 'string' ? 0 : address.port,

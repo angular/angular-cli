@@ -156,7 +156,7 @@ if (process.env['NG_CLI_PROFILING']) {
     standardInput = process.stdin;
   } catch (e) {
     delete process.stdin;
-    process.stdin = new Duplex();
+    process.stdin = new Duplex() as NodeJS.ReadStream;
     standardInput = process.stdin;
   }
 
