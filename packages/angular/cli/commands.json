@@ -8,8 +8,6 @@
   "e2e": "./commands/e2e.json",
   "make-this-awesome": "./commands/easter-egg.json",
   "generate": "./commands/generate.json",
-  "get": "./commands/deprecated.json",
-  "set": "./commands/deprecated.json",
   "help": "./commands/help.json",
   "lint": "./commands/lint.json",
   "new": "./commands/new.json",
