@@ -17,8 +17,20 @@ function getBuildTarget(tree: UnitTestTree): BuilderTarget<Builders.Browser, Jso
 function createWorkSpaceConfig(tree: UnitTestTree) {
   const angularConfig: WorkspaceSchema = {
     version: 1,
+    cli: {
+      warnings: {
+        versionMismatch: false,
+        typescriptMismatch: true,
+      },
+    },
     projects: {
       app: {
+        cli: {
+          warnings: {
+            versionMismatch: false,
+            typescriptMismatch: true,
+          },
+        },
         root: '',
         sourceRoot: 'src',
         projectType: ProjectType.Application,
@@ -119,5 +131,19 @@ describe(`Migration to update 'angular.json'`, () => {
       scripts: true,
       styles: false,
     });
+  });
+
+  it(`should remove root level 'typescriptMismatch'`, async () => {
+    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const config = JSON.parse(newTree.readContent('/angular.json')).cli.warnings;
+    expect(config.typescriptMismatch).toBeUndefined();
+    expect(config.versionMismatch).toBeFalse();
+  });
+
+  it(`should remove project level 'typescriptMismatch'`, async () => {
+    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const config = JSON.parse(newTree.readContent('/angular.json')).projects.app.cli.warnings;
+    expect(config.typescriptMismatch).toBeUndefined();
+    expect(config.versionMismatch).toBeFalse();
   });
 });

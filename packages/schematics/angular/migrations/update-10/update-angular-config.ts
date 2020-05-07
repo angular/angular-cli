@@ -6,14 +6,20 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { workspaces } from '@angular-devkit/core';
+import { JsonObject, JsonValue, isJsonObject, workspaces } from '@angular-devkit/core';
 import { Rule } from '@angular-devkit/schematics';
 import { updateWorkspace } from '../../utility/workspace';
 import { Builders, ProjectType } from '../../utility/workspace-models';
 
 export default function (): Rule {
   return updateWorkspace(workspace => {
+    // Remove deprecated CLI root level options
+    removeDeprecatedCLIOptions(workspace.extensions);
+
     for (const [, project] of workspace.projects) {
+      // Project level
+      removeDeprecatedCLIOptions(project.extensions);
+
       if (project.extensions.projectType !== ProjectType.Application) {
         // Only interested in application projects since these changes only effects application builders
         continue;
@@ -103,4 +109,14 @@ function updateVendorSourceMap(options: TargetOptions): TargetOptions {
     ...options,
     vendorSourceMap: undefined,
   };
+}
+
+function removeDeprecatedCLIOptions(extensions: Record<string, JsonValue | undefined>) {
+  const cliOptions = extensions?.cli;
+  if (cliOptions && isJsonObject(cliOptions) && isJsonObject(cliOptions.warnings)) {
+    (cliOptions.warnings as Partial<JsonObject>) = {
+      ...cliOptions.warnings,
+      typescriptMismatch: undefined,
+    };
+  }
 }

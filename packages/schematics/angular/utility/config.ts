@@ -455,26 +455,7 @@ export interface CliConfig {
    * Allow people to disable console warnings.
    */
   warnings?: {
-      /**
-       * Show a warning when the user enabled the --hmr option.
-       */
-      hmrWarning?: boolean;
-      /**
-       * Show a warning when the node version is incompatible.
-       */
-      nodeDeprecation?: boolean;
-      /**
-       * Show a warning when the user installed angular-cli.
-       */
-      packageDeprecation?: boolean;
-      /**
-       * Show a warning when the global version is newer than the local one.
-       */
       versionMismatch?: boolean;
-      /**
-       * Show a warning when the TypeScript version is incompatible
-       */
-      typescriptMismatch?: boolean;
   };
 }
 
