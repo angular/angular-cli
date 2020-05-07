@@ -1,0 +1,15 @@
+{
+  "extends": "./<%= tsConfigExtends %>",
+  "compilerOptions": {
+    "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/server",
+    "types": [
+      "node"
+    ]
+  },
+  "files": [
+    "src/<%= stripTsExtension(main) %>.ts"
+  ],
+  "angularCompilerOptions": {
+    "entryModule": "./<%= rootInSrc ? '' : 'src/' %><%= appDir %>/<%= stripTsExtension(rootModuleFileName) %>#<%= rootModuleClassName %>"
+  }
+}

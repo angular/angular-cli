@@ -32,6 +32,7 @@ describe('Workspace Schematic', () => {
       '/package.json',
       '/README.md',
       '/tsconfig.json',
+      '/tsconfig.base.json',
       '/tslint.json',
     ]));
   });
@@ -66,6 +67,7 @@ describe('Workspace Schematic', () => {
       '/package.json',
       '/README.md',
       '/tsconfig.json',
+      '/tsconfig.base.json',
     ]));
 
     expect(files).not.toContain('/tslint.json');
@@ -74,14 +76,14 @@ describe('Workspace Schematic', () => {
 
   it('should not add strict compiler options when false', async () => {
     const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, strict: false }).toPromise();
-    const { compilerOptions, angularCompilerOptions } = JSON.parse(tree.readContent('/tsconfig.json'));
+    const { compilerOptions, angularCompilerOptions } = JSON.parse(tree.readContent('/tsconfig.base.json'));
     expect(compilerOptions.strict).toBeUndefined();
     expect(angularCompilerOptions).toBeUndefined();
   });
 
   it('should not add strict compiler options when true', async () => {
     const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, strict: true }).toPromise();
-    const { compilerOptions, angularCompilerOptions } = JSON.parse(tree.readContent('/tsconfig.json'));
+    const { compilerOptions, angularCompilerOptions } = JSON.parse(tree.readContent('/tsconfig.base.json'));
     expect(compilerOptions.strict).toBe(true);
     expect(angularCompilerOptions.strictTemplates).toBe(true);
   });

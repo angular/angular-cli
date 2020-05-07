@@ -6,7 +6,7 @@ import { prependToFile, readFile, replaceInFile, writeFile } from './fs';
 import { gitCommit } from './git';
 import { execAndWaitForOutputToMatch, git, ng, npm, silentNpm } from './process';
 
-const tsConfigPath = 'tsconfig.json';
+const tsConfigPath = 'tsconfig.base.json';
 
 
 export function updateJsonFile(filePath: string, fn: (json: any) => any | void) {

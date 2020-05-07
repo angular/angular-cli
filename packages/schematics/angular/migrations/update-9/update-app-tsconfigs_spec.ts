@@ -55,6 +55,9 @@ describe('Migration to version 9', () => {
           tree,
         )
         .toPromise();
+
+      // Pre version 9 - tsconfig.json was the base tsconfig file.
+      tree.overwrite('tsconfig.json', tree.readContent('tsconfig.base.json'));
     });
 
     it('should update apps tsConfig with stricter files inclusions', async () => {

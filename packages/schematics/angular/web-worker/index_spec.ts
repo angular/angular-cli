@@ -5,11 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as WebWorkerOptions } from './schema';
-
 
 describe('Web Worker Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
@@ -134,7 +134,7 @@ describe('Web Worker Schematic', () => {
     appTree.overwrite('/angular.json', JSON.stringify(workspace));
 
     const oldTsConfig = {
-      extends: '../../../tsconfig.json',
+      extends: '../../../tsconfig.base.json',
       include: [
         '**/*.ts',
       ],
@@ -149,5 +149,19 @@ describe('Web Worker Schematic', () => {
       .toPromise();
     const { exclude } = JSON.parse(tree.readContent(tsConfigPath));
     expect(exclude).toContain('**/*.worker.ts');
+  });
+
+  it('should add reference in solution style tsconfig', async () => {
+    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
+      .toPromise();
+
+    // tslint:disable-next-line:no-any
+    const { references } = parseJson(tree.readContent('/tsconfig.json').toString(), JsonParseMode.Loose) as any;
+    expect(references).toEqual([
+      { path: './projects/bar/tsconfig.app.json' },
+      { path: './projects/bar/tsconfig.spec.json' },
+      { path: './projects/bar/e2e/tsconfig.json' },
+      { path: './projects/bar/tsconfig.worker.json' },
+    ]);
   });
 });

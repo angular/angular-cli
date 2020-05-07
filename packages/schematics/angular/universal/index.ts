@@ -6,12 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
-  JsonParseMode,
   Path,
   basename,
   join,
   normalize,
-  parseJson,
   strings,
 } from '@angular-devkit/core';
 import {
@@ -34,7 +32,9 @@ import { findNode, getDecoratorMetadata } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
 import { findBootstrapModuleCall, findBootstrapModulePath } from '../utility/ng-ast-utils';
+import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
+import { addTsConfigProjectReferences, verifyBaseTsConfigExists } from '../utility/tsconfig';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { BrowserBuilderOptions, Builders, OutputHashing } from '../utility/workspace-models';
 import { Schema as UniversalOptions } from './schema';
@@ -68,13 +68,15 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
       }
 
       const mainPath = options.main as string;
+      const serverTsConfig = join(tsConfigDirectory, 'tsconfig.server.json');
+
       clientProject.targets.add({
         name: 'server',
         builder: Builders.Server,
         options: {
           outputPath: `dist/${options.clientProject}/server`,
           main: join(normalize(clientProject.root), 'src', mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts'),
-          tsConfig: join(tsConfigDirectory, `${options.tsconfigFileName}.json`),
+          tsConfig: serverTsConfig,
         },
         configurations: {
           production: {
@@ -85,6 +87,12 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
           },
         },
       });
+
+      const lintTarget = clientProject.targets.get('lint');
+      if (lintTarget && lintTarget.options && Array.isArray(lintTarget.options.tsConfig)) {
+        lintTarget.options.tsConfig =
+          lintTarget.options.tsConfig.concat(serverTsConfig);
+      }
     }
   });
 }
@@ -218,23 +226,6 @@ function addDependencies(): Rule {
   };
 }
 
-function getTsConfigOutDir(host: Tree, tsConfigPath: string): string {
-  const tsConfigBuffer = host.read(tsConfigPath);
-  if (!tsConfigBuffer) {
-    throw new SchematicsException(`Could not read ${tsConfigPath}`);
-  }
-  const tsConfigContent = tsConfigBuffer.toString();
-  const tsConfig = parseJson(tsConfigContent, JsonParseMode.Loose);
-  if (tsConfig === null || typeof tsConfig !== 'object' || Array.isArray(tsConfig) ||
-    tsConfig.compilerOptions === null || typeof tsConfig.compilerOptions !== 'object' ||
-    Array.isArray(tsConfig.compilerOptions)) {
-    throw new SchematicsException(`Invalid tsconfig - ${tsConfigPath}`);
-  }
-  const outDir = tsConfig.compilerOptions.outDir;
-
-  return outDir as string;
-}
-
 export default function (options: UniversalOptions): Rule {
   return async (host: Tree, context: SchematicContext) => {
     const workspace = await getWorkspace(host);
@@ -248,10 +239,11 @@ export default function (options: UniversalOptions): Rule {
     if (!clientBuildTarget) {
       throw targetBuildNotFoundError();
     }
+
+    verifyBaseTsConfigExists(host);
+
     const clientBuildOptions =
       (clientBuildTarget.options || {}) as unknown as BrowserBuilderOptions;
-
-    const outDir = getTsConfigOutDir(host, clientBuildOptions.tsConfig);
 
     const clientTsConfig = normalize(clientBuildOptions.tsConfig);
     const tsConfigExtends = basename(clientTsConfig);
@@ -279,8 +271,8 @@ export default function (options: UniversalOptions): Rule {
         ...strings,
         ...options as object,
         stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
-        outDir,
         tsConfigExtends,
+        relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(tsConfigDirectory),
         rootInSrc,
       }),
       move(tsConfigDirectory),
@@ -293,6 +285,9 @@ export default function (options: UniversalOptions): Rule {
       updateConfigFile(options, tsConfigDirectory),
       wrapBootstrapCall(clientBuildOptions.main),
       addServerTransition(options, clientBuildOptions.main, clientProject.root),
+      addTsConfigProjectReferences([
+        join(tsConfigDirectory, 'tsconfig.server.json'),
+      ]),
     ]);
   };
 }

@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
@@ -79,6 +80,19 @@ describe('Application Schematic', () => {
       .toPromise();
     const content = tree.readContent('/projects/foo/e2e/src/app.po.ts');
     expect(content).toMatch(/🌮-🌯/);
+  });
+
+  it('should add reference in solution style tsconfig', async () => {
+    const tree = await schematicRunner.runSchematicAsync('e2e', defaultOptions, applicationTree)
+      .toPromise();
+
+    // tslint:disable-next-line:no-any
+    const { references } = parseJson(tree.readContent('/tsconfig.json').toString(), JsonParseMode.Loose) as any;
+    expect(references).toEqual([
+      { path: './projects/foo/tsconfig.app.json' },
+      { path: './projects/foo/tsconfig.spec.json' },
+      { path: './projects/foo/e2e/tsconfig.json' },
+    ]);
   });
 
   describe('workspace config', () => {
