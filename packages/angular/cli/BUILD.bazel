@@ -31,7 +31,6 @@ ts_library(
         "//packages/angular/cli:commands/build.ts",
         "//packages/angular/cli:commands/deploy.ts",
         "//packages/angular/cli:commands/config.ts",
-        "//packages/angular/cli:commands/deprecated.ts",
         "//packages/angular/cli:commands/doc.ts",
         "//packages/angular/cli:commands/e2e.ts",
         "//packages/angular/cli:commands/easter-egg.ts",
@@ -118,14 +117,6 @@ ts_json_schema(
 ts_json_schema(
     name = "config_schema",
     src = "commands/config.json",
-    data = [
-        "commands/definitions.json",
-    ],
-)
-
-ts_json_schema(
-    name = "deprecated_schema",
-    src = "commands/deprecated.json",
     data = [
         "commands/definitions.json",
     ],
