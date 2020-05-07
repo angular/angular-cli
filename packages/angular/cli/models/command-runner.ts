@@ -15,7 +15,6 @@ import {
   strings,
   tags,
 } from '@angular-devkit/core';
-import * as debug from 'debug';
 import { readFileSync } from 'fs';
 import { join, resolve } from 'path';
 import { parseJsonSchemaToCommandDescription } from '../utilities/json-schema';
@@ -29,8 +28,6 @@ import {
 import { Command } from './command';
 import { CommandDescription, CommandWorkspace } from './interface';
 import * as parser from './parser';
-
-const analyticsDebug = debug('ng:analytics:commands');
 
 // NOTE: Update commands.json if changing this.  It's still deep imported in one CI validation
 const standardCommands = {
