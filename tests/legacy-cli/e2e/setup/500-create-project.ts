@@ -23,7 +23,7 @@ export default async function() {
     process.chdir('./test-project');
 
     if (argv['ve']) {
-      await updateJsonFile('tsconfig.json', config => {
+      await updateJsonFile('tsconfig.base.json', config => {
         const { angularCompilerOptions = {} } = config;
         angularCompilerOptions.enableIvy = false;
         config.angularCompilerOptions = angularCompilerOptions;

@@ -18,6 +18,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
+import { addTsConfigProjectReferences, verifyBaseTsConfigExists } from '../utility/tsconfig';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
 import { Schema as E2eOptions } from './schema';
@@ -30,6 +31,8 @@ export default function (options: E2eOptions): Rule {
     if (!project) {
       throw new SchematicsException(`Project name "${appProject}" doesn't not exist.`);
     }
+
+    verifyBaseTsConfigExists(host);
 
     const root = join(normalize(project.root), 'e2e');
 
@@ -47,10 +50,11 @@ export default function (options: E2eOptions): Rule {
       },
     });
 
+    const e2eTsConfig = `${root}/tsconfig.json`;
     const lintTarget = project.targets.get('lint');
     if (lintTarget && lintTarget.options && Array.isArray(lintTarget.options.tsConfig)) {
       lintTarget.options.tsConfig =
-        lintTarget.options.tsConfig.concat(`${root}/tsconfig.json`);
+        lintTarget.options.tsConfig.concat(e2eTsConfig);
     }
 
     return chain([
@@ -64,6 +68,9 @@ export default function (options: E2eOptions): Rule {
           }),
           move(root),
         ])),
+      addTsConfigProjectReferences([
+        e2eTsConfig,
+      ]),
     ]);
   };
 }

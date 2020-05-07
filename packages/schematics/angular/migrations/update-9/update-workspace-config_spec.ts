@@ -8,7 +8,6 @@
 
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import { latestVersions } from '../../utility/latest-versions';
 import { WorkspaceTargets } from '../../utility/workspace-models';
 import { ANY_COMPONENT_STYLE_BUDGET } from './update-workspace-config';
 
@@ -81,6 +80,19 @@ describe('Migration to version 9', () => {
           tree,
         )
         .toPromise();
+
+      // Pre version 9 - tsconfig.json was the base tsconfig file.
+      tree.overwrite('tsconfig.json', tree.readContent('tsconfig.base.json'));
+
+      const tsConfig = JSON.stringify(
+        {
+          extends: './tsconfig.json',
+        },
+        null,
+        2,
+      );
+
+      tree.overwrite('tsconfig.app.json', tsConfig);
     });
 
     describe('scripts and style options', () => {

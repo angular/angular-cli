@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Schema as ApplicationOptions, Style } from '../application/schema';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
@@ -90,7 +91,7 @@ describe('Universal Schematic', () => {
     expect(JSON.parse(contents)).toEqual({
       extends: './tsconfig.app.json',
       compilerOptions: {
-        outDir: './out-tsc/app-server',
+        outDir: './out-tsc/server',
         types: ['node'],
       },
       files: [
@@ -114,7 +115,7 @@ describe('Universal Schematic', () => {
     expect(JSON.parse(contents)).toEqual({
       extends: './tsconfig.app.json',
       compilerOptions: {
-        outDir: '../../out-tsc/app-server',
+        outDir: '../../out-tsc/server',
         types: ['node'],
       },
       files: [
@@ -257,5 +258,22 @@ describe('Universal Schematic', () => {
     const filePath = '/projects/bar/src/main.server.ts';
     const contents = tree.readContent(filePath);
     expect(contents).toContain('@angular/localize/init');
+  });
+
+  it('should add reference in solution style tsconfig', async () => {
+    const tree = await schematicRunner.runSchematicAsync('universal', workspaceUniversalOptions, appTree)
+      .toPromise();
+
+    // tslint:disable-next-line:no-any
+    const { references } = parseJson(tree.readContent('/tsconfig.json').toString(), JsonParseMode.Loose) as any;
+    expect(references).toEqual([
+      { path: './tsconfig.app.json' },
+      { path: './tsconfig.spec.json' },
+      { path: './e2e/tsconfig.json' },
+      { path: './projects/bar/tsconfig.app.json' },
+      { path: './projects/bar/tsconfig.spec.json' },
+      { path: './projects/bar/e2e/tsconfig.json' },
+      { path: './tsconfig.server.json' },
+    ]);
   });
 });

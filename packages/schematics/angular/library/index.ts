@@ -25,6 +25,7 @@ import { NodeDependencyType, addPackageJsonDependency } from '../utility/depende
 import { latestVersions } from '../utility/latest-versions';
 import { applyLintFix } from '../utility/lint-fix';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
+import { addTsConfigProjectReferences, verifyBaseTsConfigExists } from '../utility/tsconfig';
 import { validateProjectName } from '../utility/validation';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders, ProjectType } from '../utility/workspace-models';
@@ -58,9 +59,9 @@ function updateJsonFile<T>(host: Tree, path: string, callback: UpdateJsonFn<T>):
 function updateTsConfig(packageName: string, ...paths: string[]) {
 
   return (host: Tree) => {
-    if (!host.exists('tsconfig.json')) { return host; }
+    if (!host.exists('tsconfig.base.json')) { return host; }
 
-    return updateJsonFile(host, 'tsconfig.json', (tsconfig: TsConfigPartialType) => {
+    return updateJsonFile(host, 'tsconfig.base.json', (tsconfig: TsConfigPartialType) => {
       if (!tsconfig.compilerOptions.paths) {
         tsconfig.compilerOptions.paths = {};
       }
@@ -73,7 +74,6 @@ function updateTsConfig(packageName: string, ...paths: string[]) {
 }
 
 function addDependenciesToPackageJson() {
-
   return (host: Tree) => {
     [
       {
@@ -174,6 +174,7 @@ export default function (options: LibraryOptions): Rule {
     const prefix = options.prefix;
 
     validateProjectName(options.name);
+    verifyBaseTsConfigExists(host);
 
     // If scoped project (i.e. "@foo/bar"), convert projectDir to "foo/bar".
     const projectName = options.name;
@@ -239,6 +240,10 @@ export default function (options: LibraryOptions): Rule {
         path: sourceDir,
         project: options.name,
       }),
+      addTsConfigProjectReferences([
+        `${projectRoot}/tsconfig.lib.json`,
+        `${projectRoot}/tsconfig.spec.json`,
+      ]),
       options.lintFix ? applyLintFix(sourceDir) : noop(),
       (_tree: Tree, context: SchematicContext) => {
         if (!options.skipPackageJson && !options.skipInstall) {
