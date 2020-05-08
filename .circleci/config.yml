@@ -178,7 +178,7 @@ jobs:
   e2e-cli-node-10:
     executor:
       name: test-executor
-      nodeversion: "10.16"
+      nodeversion: "10.20"
     parallelism: 4
     steps:
       - custom_attach_workspace
