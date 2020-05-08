@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { RawSourceMap } from 'source-map';
-import * as ts from 'typescript';
+import * as ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 
 
 export interface TransformJavascriptOptions {
