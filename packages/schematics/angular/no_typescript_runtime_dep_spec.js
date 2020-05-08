@@ -21,9 +21,9 @@ describe('@schematics/angular javascript code', () => {
           const file = path.join(subdir, f);
           if (fs.statSync(file).isDirectory()) {
             check(file);
-          } else if (file.endsWith('.ts')) {
+          } else if (file.endsWith('.js')) {
             const content = fs.readFileSync(file, { encoding: 'utf-8' });
-            if (content.indexOf(`from 'typescript'`) >= 0) {
+            if (content.includes(`require("typescript")`) || content.includes(`require('typescript')`)) {
               fail(`${file} has a typescript import`);
             }
           }
