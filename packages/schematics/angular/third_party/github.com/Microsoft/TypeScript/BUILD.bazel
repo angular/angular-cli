@@ -8,7 +8,5 @@ ts_library(
     name = "TypeScript",
     srcs = ["lib/typescript.d.ts"],
     data = ["lib/typescript.js"],
-    module_name = "typescript",
-    module_root = "lib/typescript.d.ts",
     visibility = ["//packages/schematics/angular:__subpackages__"],
 )
