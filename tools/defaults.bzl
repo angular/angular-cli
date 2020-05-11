@@ -32,7 +32,7 @@ def ts_library(tsconfig = None, deps = [], testonly = False, **kwargs):
         **kwargs
     )
 
-NG_VERSION = "^9.1.0"
+NG_VERSION = "^10.0.0-next.0"
 RXJS_VERSION = "^6.5.3"
 HAPI_VERSION = "^18.4.0"
 EXPRESS_VERSION = "^4.15.2"
