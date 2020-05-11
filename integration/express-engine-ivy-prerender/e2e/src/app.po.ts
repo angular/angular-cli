@@ -1,8 +1,8 @@
-import { browser, by, element, logging } from 'protractor';
+import { browser } from 'protractor';
 
 export class AppPage {
   navigateTo(route: string) {
-    browser.get(browser.baseUrl + route);
+    return browser.get(browser.baseUrl + route);
   }
 
   async isPrerendered() {

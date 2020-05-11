@@ -15,8 +15,8 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     chromeOptions: {
-      args: ['--no-sandbox'],
-      binary: process.env.CHROME_BIN,
+      args: ['--headless'],
+      binary: require('puppeteer').executablePath(),
     }
   },
   directConnect: true,
