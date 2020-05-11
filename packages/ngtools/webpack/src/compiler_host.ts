@@ -359,7 +359,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   getCanonicalFileName(fileName: string): string {
-    const path = this.resolve(fileName);
+    const path = workaroundResolve(this.resolve(fileName));
 
     return this.useCaseSensitiveFileNames() ? path : path.toLowerCase();
   }
