@@ -181,7 +181,7 @@ export default function (options: LibraryOptions): Rule {
     let scopeName = null;
     if (/^@.*\/.*/.test(options.name)) {
       const [scope, name] = options.name.split('/');
-      scopeName = scope.replace(/^@/, '');
+      scopeName = scope;
       options.name = name;
     }
 
