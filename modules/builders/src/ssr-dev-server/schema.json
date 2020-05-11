@@ -37,6 +37,11 @@
     "progress": {
       "type": "boolean",
       "description": "Log progress to the console while building."
+    },
+    "inspect": {
+      "type": "boolean",
+      "description": "Launch the development server in inspector mode and listen on address and port '127.0.0.1:9229'.",
+      "default": false
     }
   },
   "additionalProperties": false,

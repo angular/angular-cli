@@ -101,7 +101,7 @@ export function execute(
             return of([b, s]);
           }
 
-          return startNodeServer(s, nodeServerPort, context.logger).pipe(
+          return startNodeServer(s, nodeServerPort, context.logger, !!options.inspect).pipe(
             mapTo([b, s]),
             catchError(err => {
               context.logger.error(`A server error has occurred.\n${mapErrorToMessage(err)}`);
@@ -122,7 +122,7 @@ export function execute(
             context.logger.info('\nCompiled successfully.');
           }
         }),
-        debounce(([builderOutput]) => builderOutput.success
+        debounce(([builderOutput]) => builderOutput.success && !options.inspect
           ? waitUntilServerIsListening(nodeServerPort)
           : EMPTY)
       );
@@ -174,15 +174,21 @@ function startNodeServer(
   serverOutput: BuilderOutput,
   port: number,
   logger: logging.LoggerApi,
+  inspectMode = false,
 ): Observable<void> {
   const outputPath = serverOutput.outputPath as string;
   const path = join(outputPath, 'main.js');
   const env = { ...process.env, PORT: '' + port };
 
+  const args = [`"${path}"`];
+  if (inspectMode) {
+    args.unshift('--inspect-brk');
+  }
+
   return of(null)
     .pipe(
       delay(0), // Avoid EADDRINUSE error since it will cause the kill event to be finish.
-      switchMap(() => spawnAsObservable('node', [`"${path}"`], { env, shell: true })),
+      switchMap(() => spawnAsObservable('node', args, { env, shell: true })),
       tap(({ stderr, stdout }) => {
         if (stderr) {
           logger.error(stderr);
