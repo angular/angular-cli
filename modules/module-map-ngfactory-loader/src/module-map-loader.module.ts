@@ -44,7 +44,7 @@ export class ModuleMapLoaderModule {
    *
    * @param moduleMap Map to use as a value for MODULE_MAP
    */
-  static withMap(moduleMap: ModuleMap): ModuleWithProviders {
+  static withMap(moduleMap: ModuleMap): ModuleWithProviders<ModuleMapLoaderModule> {
     return {
       ngModule: ModuleMapLoaderModule,
       providers: [
