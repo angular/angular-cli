@@ -45,7 +45,7 @@
     "openPage": {
       "type": "string",
       "description": "Opens the given url in default browser if \"open\" is true.",
-      "default": "",
+      "default": null,
       "alias": "op"
     },
     "verbose": {
