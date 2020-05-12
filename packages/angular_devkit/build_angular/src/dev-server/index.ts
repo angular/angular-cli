@@ -248,7 +248,7 @@ export function serveWebpackBrowser(
           const serverAddress = url.format({
             protocol: options.ssl ? 'https' : 'http',
             hostname: options.host === '0.0.0.0' ? 'localhost' : options.host,
-            pathname: webpackDevServerConfig.publicPath,
+            pathname: 'string' === typeof options.openPage ? options.openPage : webpackDevServerConfig.publicPath,
             port: buildEvent.port,
           });
 
