@@ -1166,6 +1166,12 @@
               "default": false,
               "alias": "o"
             },
+            "openPage": {
+              "type": "string",
+              "description": "When set, open the given live-reload URL in default browser.",
+              "default": null,
+              "alias": "op"
+            },
             "liveReload": {
               "type": "boolean",
               "description": "When true, reload the page on change using live-reload.",
