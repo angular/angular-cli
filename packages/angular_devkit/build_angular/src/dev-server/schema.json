@@ -42,6 +42,12 @@
       "default": false,
       "alias": "o"
     },
+    "openPage": {
+      "type": "string",
+      "description": "Opens the given url in default browser if \"open\" is true.",
+      "default": "",
+      "alias": "op"
+    },
     "verbose": {
       "type": "boolean",
       "description": "Adds more details to output logging."
