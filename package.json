@@ -86,7 +86,7 @@
     "@babel/preset-env": "7.9.6",
     "@babel/runtime": "7.9.6",
     "@babel/template": "7.8.6",
-    "@bazel/bazel": "2.1.0",
+    "@bazel/bazelisk": "1.4.0",
     "@bazel/buildifier": "3.0.0",
     "@bazel/jasmine": "1.6.0",
     "@bazel/karma": "1.6.0",
