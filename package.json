@@ -89,7 +89,7 @@
     "node-fetch": "^2.2.0",
     "protractor": "5.4.4",
     "puppeteer": "~3.0.4",
-    "rollup": "~1.31.0",
+    "rollup": "~2.10.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-sourcemaps": "^0.6.0",
