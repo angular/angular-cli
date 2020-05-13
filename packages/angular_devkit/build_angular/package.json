@@ -75,7 +75,7 @@
   },
   "peerDependencies": {
     "@angular/compiler-cli": ">=10.0.0-next.0 < 11",
-    "typescript": ">=3.6 < 3.9"
+    "typescript": ">=3.9 < 3.10"
   },
   "peerDependenciesMeta": {
     "@angular/localize": {
