@@ -52,7 +52,7 @@
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage-istanbul-reporter": "3.0.2",
     "karma-jasmine": "3.1.1",
-    "karma-jasmine-html-reporter": "1.5.3",
+    "karma-jasmine-html-reporter": "1.5.4",
     "protractor": "file:../../node_modules/protractor",
     "puppeteer":  "file:../../node_modules/puppeteer",
     "ts-node": "8.10.1",
