@@ -117,6 +117,10 @@
         }
       ]
     },
+    "buildOptimizer": {
+      "type": "boolean",
+      "description": "Enables '@angular-devkit/build-optimizer' optimizations when using the 'aot' option."
+    },
     "aot": {
       "type": "boolean",
       "description": "Build using Ahead of Time compilation.",

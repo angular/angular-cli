@@ -44,6 +44,7 @@ export type DevServerBuilderOptions = Schema & json.JsonObject;
 const devServerBuildOverriddenKeys: (keyof DevServerBuilderOptions)[] = [
   'watch',
   'optimization',
+  'buildOptimizer',
   'aot',
   'sourceMap',
   'vendorChunk',
