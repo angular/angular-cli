@@ -33,7 +33,7 @@ load("@build_bazel_rules_nodejs//:index.bzl", "check_bazel_version", "check_rule
 check_bazel_version(
     message = """
 You no longer need to install Bazel on your machine.
-Angular has a dependency on the @bazel/bazel package which supplies it.
+Angular has a dependency on the @bazel/bazelisk package which supplies it.
 Try running `yarn bazel` instead.
     (If you did run that, check that you've got a fresh `yarn install`)
 """,
