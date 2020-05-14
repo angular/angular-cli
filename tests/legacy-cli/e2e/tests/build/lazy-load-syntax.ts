@@ -86,8 +86,13 @@ export default async function () {
   await ng('e2e');
   await ng('e2e', '--prod');
 
+  if (!(getGlobalVariable('argv')['ve'])) {
+    // Only applicable to VE. Does not apply to Ivy.
+    return;
+  }
+
   // Test string import.
-  // Both Ivy and View Engine should support it.
+  // View Engine should support it.
   await updateJsonFile('tsconfig.app.json', tsConfig => {
     tsConfig.files.push('src/app/lazy/lazy.module.ts');
   });
