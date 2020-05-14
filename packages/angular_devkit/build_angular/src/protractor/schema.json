@@ -38,7 +38,8 @@
     "elementExplorer": {
       "type": "boolean",
       "description": "Start Protractor's Element Explorer for debugging.",
-      "default": false
+      "default": false,
+      "x-deprecated": "This option has no effect. See: https://github.com/angular/protractor/blob/master/docs/debugging.md#enabled-control-flow for alternative methods."
     },
     "webdriverUpdate": {
       "type": "boolean",
