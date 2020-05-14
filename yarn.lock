@@ -8218,10 +8218,10 @@ protoduck@^5.0.1:
   dependencies:
     genfun "^5.0.0"
 
-protractor@5.4.4:
-  version "5.4.4"
-  resolved "https://registry.yarnpkg.com/protractor/-/protractor-5.4.4.tgz#b241466aaf83b76bc2c58df67deb9a5cdfc61529"
-  integrity sha512-BaL4vePgu3Vfa/whvTUAlgaCAId4uNSGxIFSCXMgj7LMYENPWLp85h5RBi9pdpX/bWQ8SF6flP7afmi2TC4eHw==
+protractor@7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/protractor/-/protractor-7.0.0.tgz#c3e263608bd72e2c2dc802b11a772711a4792d03"
+  integrity sha512-UqkFjivi4GcvUQYzqGYNe0mLzfn5jiLmO8w9nMhQoJRLhy2grJonpga2IWhI6yJO30LibWXJJtA4MOIZD2GgZw==
   dependencies:
     "@types/q" "^0.0.32"
     "@types/selenium-webdriver" "^3.0.0"
@@ -8236,8 +8236,8 @@ protractor@5.4.4:
     selenium-webdriver "3.6.0"
     source-map-support "~0.4.0"
     webdriver-js-extender "2.1.0"
-    webdriver-manager "^12.0.6"
-    yargs "^12.0.5"
+    webdriver-manager "^12.1.7"
+    yargs "^15.3.1"
 
 proxy-addr@~2.0.5:
   version "2.0.6"
@@ -10658,7 +10658,7 @@ webdriver-js-extender@2.1.0:
     "@types/selenium-webdriver" "^3.0.0"
     selenium-webdriver "^3.0.1"
 
-webdriver-manager@^12.0.6:
+webdriver-manager@^12.1.7:
   version "12.1.7"
   resolved "https://registry.yarnpkg.com/webdriver-manager/-/webdriver-manager-12.1.7.tgz#ed4eaee8f906b33c146e869b55e850553a1b1162"
   integrity sha512-XINj6b8CYuUYC93SG3xPkxlyUc3IJbD6Vvo75CVGuG9uzsefDzWQrhz0Lq8vbPxtb4d63CZdYophF8k8Or/YiA==
@@ -11040,7 +11040,7 @@ yargs-parser@^9.0.2:
   dependencies:
     camelcase "^4.1.0"
 
-yargs@12.0.5, yargs@^12.0.5:
+yargs@12.0.5:
   version "12.0.5"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-12.0.5.tgz#05f5997b609647b64f66b81e3b4b10a368e7ad13"
   integrity sha512-Lhz8TLaYnxq/2ObqHDql8dX8CJi97oHxrjUcYtzKbbykPtVW9WB+poxI+NM2UIzsMgNCZTIf0AQwsjK5yMAqZw==
