@@ -26,7 +26,6 @@ interface JasmineNodeOpts {
 
 function runProtractor(root: string, options: ProtractorBuilderOptions): Promise<BuilderOutput> {
   const additionalProtractorConfig: Partial<ProtractorBuilderOptions> & Partial<JasmineNodeOpts> = {
-    elementExplorer: options.elementExplorer,
     baseUrl: options.baseUrl,
     specs: options.specs && options.specs.length ? options.specs : undefined,
     suite: options.suite,
