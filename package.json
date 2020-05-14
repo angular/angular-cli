@@ -17,7 +17,8 @@
     "engine-strict": true
   },
   "engines": {
-    "node": ">=10.13.0 <13.0.0"
+    "node": ">=10.13.0 <13.0.0",
+    "yarn": ">=1.0.0"
   },
   "scripts": {
     "postinstall": "ngc -p ./angular-metadata.tsconfig.json && node --preserve-symlinks --preserve-symlinks-main ./tools/postinstall-patches.js && yarn ngcc",

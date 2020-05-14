@@ -9,7 +9,7 @@
     "universal"
   ],
   "engines": {
-    "node": ">=10.13.0 <13.0.0"
+    "node": ">=10.13.0"
   },
   "peerDependencies": {
     "@nguniversal/common": "0.0.0-PLACEHOLDER",
