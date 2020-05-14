@@ -31,9 +31,16 @@ export default function (): Rule {
           continue;
         }
 
-        let extraOptionsToRemove = {};
+        let optionsToRemove: Record<string, undefined> = {
+          evalSourceMap: undefined,
+          skipAppShell: undefined,
+          profile: undefined,
+          elementExplorer: undefined,
+        };
+
         if (target.builder === Builders.Server) {
-          extraOptionsToRemove = {
+          optionsToRemove = {
+            ...optionsToRemove,
             vendorChunk: undefined,
             commonChunk: undefined,
           };
@@ -43,10 +50,7 @@ export default function (): Rule {
         if (target.options) {
           target.options = {
             ...updateVendorSourceMap(target.options),
-            evalSourceMap: undefined,
-            skipAppShell: undefined,
-            profile: undefined,
-            ...extraOptionsToRemove,
+            ...optionsToRemove,
           };
         }
 
@@ -58,10 +62,7 @@ export default function (): Rule {
         for (const configurationName of Object.keys(target.configurations)) {
           target.configurations[configurationName] = {
             ...updateVendorSourceMap(target.configurations[configurationName]),
-            evalSourceMap: undefined,
-            skipAppShell: undefined,
-            profile: undefined,
-            ...extraOptionsToRemove,
+            ...optionsToRemove,
           };
         }
       }

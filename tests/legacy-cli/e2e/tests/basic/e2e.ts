@@ -57,13 +57,6 @@ export default function () {
           },
     `, `allScriptsTimeout: 11000,`
     ))
-    // Should start up Element Explorer
-    .then(() => execAndWaitForOutputToMatch('ng', ['e2e', 'test-project', '--element-explorer'],
-      /Element Explorer/))
-    .then(() => killAllProcesses(), (err: any) => {
-      killAllProcesses();
-      throw err;
-    })
     // Should run side-by-side with `ng serve`
     .then(() => execAndWaitForOutputToMatch('ng', ['serve'],
       /: Compiled successfully./))

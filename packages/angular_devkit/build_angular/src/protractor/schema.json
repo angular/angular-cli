@@ -35,11 +35,6 @@
       "type": "string",
       "description": "Override suite in the protractor config."
     },
-    "elementExplorer": {
-      "type": "boolean",
-      "description": "Start Protractor's Element Explorer for debugging.",
-      "default": false
-    },
     "webdriverUpdate": {
       "type": "boolean",
       "description": "Try to update webdriver.",
