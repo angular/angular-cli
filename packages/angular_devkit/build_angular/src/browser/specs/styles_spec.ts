@@ -305,6 +305,9 @@ describe('Browser Builder styles', () => {
       '.browserslistrc': 'IE 10',
     });
 
+    // Set to target to ES5 to avoid differential loading and unnecessary testing time
+    host.replaceInFile('tsconfig.json', '"target": "es2015"', '"target": "es5"');
+
     const overrides = { extractCss: true, optimization: false };
     const { files } = await browserBuild(architect, host, target, overrides);
     expect(await files['styles.css']).toContain(tags.stripIndents`
@@ -341,6 +344,9 @@ describe('Browser Builder styles', () => {
       `,
       '.browserslistrc': 'IE 10',
     });
+
+    // Set target to ES5 to avoid differential loading and unnecessary testing time
+    host.replaceInFile('tsconfig.json', '"target": "es2015"', '"target": "es5"');
 
     const overrides = { extractCss: true, optimization: true, styles: ['src/styles.scss'] };
     const { files } = await browserBuild(architect, host, target, overrides);
