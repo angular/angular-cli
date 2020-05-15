@@ -570,7 +570,7 @@ export function buildWebpackBrowser(
                   }
                 }
               } finally {
-                await executor.stop();
+                executor.stop();
               }
 
               // Copy assets
