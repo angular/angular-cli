@@ -81,7 +81,8 @@ export class CommonJsUsageWarnPlugin {
             // And if the issuer request is not from 'webpack-dev-server', as 'webpack-dev-server'
             // will require CommonJS libraries for live reloading such as 'sockjs-node'.
             if (mainIssuer?.name === 'main' && !issuer?.userRequest?.includes('webpack-dev-server')) {
-              const warning = `${issuer?.userRequest} depends on ${rawRequest}. CommonJS or AMD dependencies can cause optimization bailouts.`;
+              const warning = `${issuer?.userRequest} depends on ${rawRequest}. CommonJS or AMD dependencies can cause optimization bailouts.\n` +
+                'For more info see: https://web.dev/commonjs-larger-bundles';
 
               // Avoid showing the same warning multiple times when in 'watch' mode.
               if (!this.shownWarnings.has(warning)) {
