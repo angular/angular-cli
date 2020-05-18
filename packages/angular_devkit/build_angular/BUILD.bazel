@@ -138,7 +138,7 @@ ts_library(
         "@npm//karma",
         "@npm//karma-source-map-support",
         "@npm//less-loader",
-        "@npm//license-checker-webpack-plugin",
+        "@npm//license-webpack-plugin",
         "@npm//loader-utils",
         "@npm//mini-css-extract-plugin",
         "@npm//minimatch",

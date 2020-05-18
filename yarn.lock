@@ -7286,6 +7286,14 @@ license-checker@^25.0.0:
     spdx-satisfies "^4.0.0"
     treeify "^1.1.0"
 
+license-webpack-plugin@2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/license-webpack-plugin/-/license-webpack-plugin-2.2.0.tgz#5c964380d7d0e0c27c349d86a6f856c82924590e"
+  integrity sha512-XPsdL/0brSHf+7dXIlRqotnCQ58RX2au6otkOg4U3dm8uH+Ka/fW4iukEs95uXm+qKe/SBs+s1Ll/aQddKG+tg==
+  dependencies:
+    "@types/webpack-sources" "^0.1.5"
+    webpack-sources "^1.2.0"
+
 lie@~3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/lie/-/lie-3.3.0.tgz#dcf82dee545f46074daf200c7c1c5a08e0f40f6a"
@@ -12777,7 +12785,7 @@ webpack-merge@4.2.2:
   dependencies:
     lodash "^4.17.15"
 
-webpack-sources@1.4.3, webpack-sources@^1.1.0, webpack-sources@^1.3.0, webpack-sources@^1.4.0, webpack-sources@^1.4.1, webpack-sources@^1.4.3:
+webpack-sources@1.4.3, webpack-sources@^1.1.0, webpack-sources@^1.2.0, webpack-sources@^1.3.0, webpack-sources@^1.4.0, webpack-sources@^1.4.1, webpack-sources@^1.4.3:
   version "1.4.3"
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-1.4.3.tgz#eedd8ec0b928fbf1cbfe994e22d2d890f330a933"
   integrity sha512-lgTS3Xhv1lCOKo7SA5TjKXMjpSM4sBjNV5+q2bqesbSPs5FjGmU6jjtBSkX9b4qW87vDIsCIlUPOEhbZrMdjeQ==

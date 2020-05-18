@@ -5,13 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import * as LicenseCheckerWebpackPlugin from 'license-checker-webpack-plugin';
 import * as webpack from 'webpack';
 import { CommonJsUsageWarnPlugin } from '../../plugins/webpack';
 import { WebpackConfigOptions } from '../build-options';
 import { getSourceMapDevTool, isPolyfillsEntry, normalizeExtraEntryPoints } from './utils';
 
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
+const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
 
 
 export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configuration {
@@ -41,7 +41,12 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
   }
 
   if (extractLicenses) {
-    extraPlugins.push(new LicenseCheckerWebpackPlugin({
+    extraPlugins.push(new LicenseWebpackPlugin({
+      stats: {
+        warnings: false,
+        errors: false,
+      },
+      perChunkOutput: false,
       outputFilename: '3rdpartylicenses.txt',
     }));
   }
