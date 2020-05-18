@@ -86,12 +86,20 @@ export function statsToString(json: any, statsConfig: any) {
   }
 }
 
+// TODO(#16193): Don't emit this warning in the first place rather than just suppressing it.
+const ERRONEOUS_WARNINGS = [
+  /multiple assets emit different content.*3rdpartylicenses\.txt/i,
+];
 export function statsWarningsToString(json: any, statsConfig: any) {
   const colors = statsConfig.colors;
   const rs = (x: string) => colors ? reset(x) : x;
   const y = (x: string) => colors ? bold(yellow(x)) : x;
 
-  return rs('\n' + json.warnings.map((warning: any) => y(`WARNING in ${warning}`)).join('\n\n'));
+  return rs('\n' + json.warnings
+      .map((warning: any) => `${warning}`)
+      .filter((warning: string) => !ERRONEOUS_WARNINGS.some((erroneous) => erroneous.test(warning)))
+      .map((warning: string) => y(`WARNING in ${warning}`))
+      .join('\n\n'));
 }
 
 export function statsErrorsToString(json: any, statsConfig: any) {
