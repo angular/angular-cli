@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@angular/animations/-/animations-10.0.0-next.8.tgz#f66336729ebc8ab6db3f15a7318f790e16657ac0"
   integrity sha512-4OehZCEJSESGI3Zcf7zLlFE5K3/4CTG9wb5PVcjWA8Ru2bizPQBbROi/Cj2zi9I24/pvZyLz584ZbG3QEZD6/w==
 
-"@angular/cdk@9.2.3":
-  version "9.2.3"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-9.2.3.tgz#e0f7d4eaeca429346e15bd258966fbb5a5f4ed0b"
-  integrity sha512-tQr/yt8GNGsZ/DTT+PMq7XdRmL56hwVCyf8F12JQAawutSLfTfMb+S1lpN7L/0Pb/L5JBuCfG2HmXK7vHo02gw==
+"@angular/cdk@9.2.4":
+  version "9.2.4"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-9.2.4.tgz#8413958bd275e4c34be3b96f56444671dd30ba93"
+  integrity sha512-iw2+qHMXHYVC6K/fttHeNHIieSKiTEodVutZoOEcBu9rmRTGbLB26V/CRsfIRmA1RBk+uFYWc6UQZnMC3RdnJQ==
   optionalDependencies:
     parse5 "^5.0.0"
 
@@ -61,10 +61,10 @@
     glob "7.1.2"
     yargs "15.3.0"
 
-"@angular/material@9.2.3":
-  version "9.2.3"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-9.2.3.tgz#86d6239fd497ee4c4b75002401824481539bcab9"
-  integrity sha512-QJltLNp8a/eoozPgkFLISEWgdlX9q9+fZaLJ8c9tHEp2IT5sFYBFHf8dPl0pUyxgOXkS/0HD43I1qki71/T7Kw==
+"@angular/material@9.2.4":
+  version "9.2.4"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-9.2.4.tgz#2666ef606fbb88d60f8e2f18c5e4f94a3dd572d8"
+  integrity sha512-LkoTXE6B0slvMhvfZDdPWaz4yaYLkaAp5VSPunI9pxGsPxzqEV9e210wC1/sjG/76Nk8Ep7/2z9XKac8Q9bMwA==
 
 "@angular/platform-browser-dynamic@10.0.0-next.8":
   version "10.0.0-next.8"
