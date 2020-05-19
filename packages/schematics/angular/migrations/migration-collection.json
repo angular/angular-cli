@@ -94,6 +94,11 @@
       "version": "10.0.0-beta.6",
       "factory": "./update-10/update-angular-config",
       "description": "Remove various deprecated builders options from 'angular.json'."
+    },
+    "tslint-add-deprecation-rule": {
+      "version": "10.0.0-beta.7",
+      "factory": "./update-10/add-deprecation-rule-tslint",
+      "description": "Adds the tslint deprecation rule to tslint JSON configuration files."
     }
   }
 }
