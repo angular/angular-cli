@@ -1,12 +1,13 @@
 import { getGlobalVariable } from '../../utils/env';
 import { replaceInFile } from '../../utils/fs';
 import { ng, silentNpm } from '../../utils/process';
-import { updateJsonFile } from '../../utils/project';
+import { isPrereleaseCli, updateJsonFile } from '../../utils/project';
 
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
-  await ng('add', '@angular/material');
+  const tag = await isPrereleaseCli() ?  '@next' : '';
+  await ng('add', `@angular/material${tag}`);
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
   if (isSnapshotBuild) {

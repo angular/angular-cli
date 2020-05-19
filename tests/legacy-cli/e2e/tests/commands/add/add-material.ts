@@ -1,20 +1,23 @@
 import { expectFileToMatch, rimraf } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
+import { isPrereleaseCli } from '../../../utils/project';
 
 
 export default async function () {
   // forcibly remove in case another test doesn't clean itself up
   await rimraf('node_modules/@angular/material');
 
+  const tag = await isPrereleaseCli() ?  '@next' : '';
+
   try {
-    await ng('add', '@angular/material', '--unknown');
+    await ng('add', `@angular/material${tag}`, '--unknown');
   } catch (error) {
     if (!(error.message && error.message.includes(`Unknown option: '--unknown'`))) {
       throw error;
     }
   }
 
-  await ng('add', '@angular/material', '--theme', 'custom', '--verbose');
+  await ng('add',  `@angular/material${tag}`, '--theme', 'custom', '--verbose');
   await expectFileToMatch('package.json', /@angular\/material/);
 
   const output1 = await ng('add', '@angular/material');
