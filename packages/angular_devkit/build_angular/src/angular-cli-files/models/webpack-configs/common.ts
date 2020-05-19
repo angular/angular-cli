@@ -24,7 +24,6 @@ import {
   Plugin,
   Rule,
   RuleSetLoader,
-  compilation,
   debug,
 } from 'webpack';
 import { RawSource } from 'webpack-sources';
@@ -40,6 +39,7 @@ import {
 } from '../../../utils/environment-options';
 import {
   BundleBudgetPlugin,
+  DedupeModuleResolvePlugin,
   NamedLazyChunksPlugin,
   OptimizeCssWebpackPlugin,
   ScriptsWebpackPlugin,
@@ -475,7 +475,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       extensions: ['.ts', '.tsx', '.mjs', '.js'],
       symlinks: !buildOptions.preserveSymlinks,
       modules: [wco.tsConfig.options.baseUrl || projectRoot, 'node_modules'],
-      plugins: [PnpWebpackPlugin],
+      plugins: [
+        PnpWebpackPlugin,
+        new DedupeModuleResolvePlugin({ verbose: buildOptions.verbose }),
+      ],
     },
     resolveLoader: {
       symlinks: !buildOptions.preserveSymlinks,
