@@ -15,7 +15,7 @@ import {
 } from './json-utils';
 
 
-const pkgJsonPath = '/package.json';
+const PKG_JSON_PATH = '/package.json';
 export enum NodeDependencyType {
   Default = 'dependencies',
   Dev = 'devDependencies',
@@ -30,8 +30,8 @@ export interface NodeDependency {
   overwrite?: boolean;
 }
 
-export function addPackageJsonDependency(tree: Tree, dependency: NodeDependency): void {
-  const packageJsonAst = _readPackageJson(tree);
+export function addPackageJsonDependency(tree: Tree, dependency: NodeDependency, pkgJsonPath = PKG_JSON_PATH): void {
+  const packageJsonAst = _readPackageJson(tree, pkgJsonPath);
   const depsNode = findPropertyInAstObject(packageJsonAst, dependency.type);
   const recorder = tree.beginUpdate(pkgJsonPath);
   if (!depsNode) {
@@ -63,8 +63,8 @@ export function addPackageJsonDependency(tree: Tree, dependency: NodeDependency)
   tree.commitUpdate(recorder);
 }
 
-export function removePackageJsonDependency(tree: Tree, name: string): void {
-  const packageJson = _readPackageJson(tree);
+export function removePackageJsonDependency(tree: Tree, name: string, pkgJsonPath = PKG_JSON_PATH): void {
+  const packageJson = _readPackageJson(tree, pkgJsonPath);
   const recorder = tree.beginUpdate(pkgJsonPath);
   [
     NodeDependencyType.Default,
@@ -81,8 +81,8 @@ export function removePackageJsonDependency(tree: Tree, name: string): void {
   tree.commitUpdate(recorder);
 }
 
-export function getPackageJsonDependency(tree: Tree, name: string): NodeDependency | null {
-  const packageJson = _readPackageJson(tree);
+export function getPackageJsonDependency(tree: Tree, name: string, pkgJsonPath = PKG_JSON_PATH): NodeDependency | null {
+  const packageJson = _readPackageJson(tree, pkgJsonPath);
   let dep: NodeDependency | null = null;
   [
     NodeDependencyType.Default,
@@ -110,16 +110,16 @@ export function getPackageJsonDependency(tree: Tree, name: string): NodeDependen
   return dep;
 }
 
-function _readPackageJson(tree: Tree): JsonAstObject {
+function _readPackageJson(tree: Tree, pkgJsonPath: string): JsonAstObject {
   const buffer = tree.read(pkgJsonPath);
   if (buffer === null) {
-    throw new SchematicsException('Could not read package.json.');
+    throw new SchematicsException(`Could not read ${pkgJsonPath}.`);
   }
   const content = buffer.toString();
 
   const packageJson = parseJsonAst(content, JsonParseMode.Strict);
   if (packageJson.kind != 'object') {
-    throw new SchematicsException('Invalid package.json. Was expecting an object');
+    throw new SchematicsException(`Invalid ${pkgJsonPath}. Was expecting an object.`);
   }
 
   return packageJson;

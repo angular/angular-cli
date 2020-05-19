@@ -18,6 +18,7 @@ export default function (): Rule {
       'karma': '~5.0.0',
       'protractor': '~7.0.0',
       'ng-packagr': latestVersions.ngPackagr,
+      'tslib': '^2.0.0',
     };
 
     for (const [name, version] of Object.entries(dependenciesToUpdate)) {
