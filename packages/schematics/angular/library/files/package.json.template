@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "peerDependencies": {
     "@angular/common": "^<%= angularLatestVersion %>",
-    "@angular/core": "^<%= angularLatestVersion %>",
+    "@angular/core": "^<%= angularLatestVersion %>"
+  },
+  "dependencies": {
     "tslib": "^<%= tsLibLatestVersion %>"
   }
 }
