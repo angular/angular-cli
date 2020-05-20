@@ -30,7 +30,7 @@ export default async function () {
     `);
 
     const { stderr } = await ng('build', '--verbose', '--no-vendor-chunk');
-    if (!/\[DedupeModuleResolvePlugin\]:.+\/node_modules\/tslib-1-copy -> .+\/node_modules\/tslib-1/.test(stderr)) {
+    if (!/\[DedupeModuleResolvePlugin\]:.+tslib-1-copy -> .+tslib-1/.test(stderr)) {
         throw new Error('Expected stderr to contain [DedupeModuleResolvePlugin] log for tslib.');
     }
 
