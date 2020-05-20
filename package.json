@@ -118,7 +118,7 @@
     "@types/rimraf": "^3.0.0",
     "@types/semver": "^7.0.0",
     "@types/universal-analytics": "^0.4.2",
-    "@types/uuid": "^7.0.0",
+    "@types/uuid": "^8.0.0",
     "@types/webpack": "^4.32.1",
     "@types/webpack-dev-server": "^3.1.7",
     "@types/webpack-sources": "^0.1.5",
