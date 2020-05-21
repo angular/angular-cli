@@ -15,11 +15,11 @@
     "@angular/common": "NG_VERSION",
     "@angular/core": "NG_VERSION",
     "@angular/platform-server": "NG_VERSION",
-    "express": "EXPRESS_VERSION",
-    "tslib": "TSLIB_VERSION"
+    "express": "EXPRESS_VERSION"
   },
   "dependencies": {
-    "@nguniversal/common": "0.0.0-PLACEHOLDER"
+    "@nguniversal/common": "0.0.0-PLACEHOLDER",
+    "tslib": "TSLIB_VERSION"
   },
   "schematics": "./schematics/collection.json",
   "ng-update": {

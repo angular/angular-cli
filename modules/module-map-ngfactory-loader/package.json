@@ -12,11 +12,13 @@
   "engines": {
     "node": ">=10.13.0"
   },
+  "dependencies": {
+    "tslib": "TSLIB_VERSION"
+  },
   "peerDependencies": {
     "@angular/common": "NG_VERSION",
     "@angular/core": "NG_VERSION",
-    "@angular/platform-server": "NG_VERSION",
-    "tslib": "TSLIB_VERSION"
+    "@angular/platform-server": "NG_VERSION"
   },
   "ng-update": {
     "packageGroup": "NG_UPDATE_PACKAGE_GROUP"
