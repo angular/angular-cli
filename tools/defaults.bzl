@@ -7,7 +7,6 @@ load(
     "@npm_bazel_typescript//:index.bzl",
     _ts_library = "ts_library",
 )
-load("@npm_bazel_karma//:index.bzl", _karma_web_test_suite = "karma_web_test_suite")
 
 DEFAULT_TSCONFIG_BUILD = "//modules:bazel-tsconfig-build.json"
 DEFAULT_TSCONFIG_TEST = "//modules:bazel-tsconfig-test"
@@ -84,15 +83,6 @@ GLOBALS = {
     "tslib": "tslib",
 }
 
-# TODO(Toxicable): when a better api for defaults is avilable use that instead of these macros
-def ts_test_library(deps = [], tsconfig = None, **kwargs):
-    local_deps = deps
-    ts_library(
-        testonly = 1,
-        deps = local_deps,
-        **kwargs
-    )
-
 def ng_module(name, tsconfig = None, testonly = False, deps = [], bundle_dts = True, **kwargs):
     deps = deps + ["@npm//tslib", "@npm//@types/node"]
     if not tsconfig:
@@ -127,8 +117,12 @@ def ng_test_library(deps = [], tsconfig = None, **kwargs):
         "@npm//@types/jasmine",
     ] + deps
 
+    if not tsconfig:
+        tsconfig = _getDefaultTsConfig(1)
+
     ts_library(
         testonly = 1,
+        tsconfig = tsconfig,
         deps = local_deps,
         **kwargs
     )
@@ -142,18 +136,5 @@ def pkg_npm(name, substitutions = {}, **kwargs):
     _pkg_npm(
         name = name,
         substitutions = dict(substitutions, **PKG_GROUP_REPLACEMENTS),
-        **kwargs
-    )
-
-def ng_web_test_suite(deps = [], srcs = [], **kwargs):
-    _karma_web_test_suite(
-        # Required for running the compiled ng modules that use TypeScript import helpers.
-        srcs = ["@npm//:node_modules/tslib/tslib.js"] + srcs,
-        # Depend on our custom test initialization script. This needs to be the first dependency.
-        deps = ["//test:angular_test_init"] + deps,
-        bootstrap = [
-            "@npm//:node_modules/zone.js/dist/zone-testing-bundle.js",
-            "@npm//:node_modules/reflect-metadata/Reflect.js",
-        ],
         **kwargs
     )
