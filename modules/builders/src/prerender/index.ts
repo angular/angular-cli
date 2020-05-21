@@ -70,7 +70,7 @@ async function _parallelRenderRoutes(
   outputPath: string,
   indexFile: string,
   serverBundlePath: string,
-  ): Promise<void> {
+): Promise<void> {
   const workerFile = path.join(__dirname, 'render.js');
   const childProcesses = shardedRoutes.map(routes =>
     new Promise((resolve, reject) => {
@@ -148,7 +148,13 @@ export async function execute(
   options: PrerenderBuilderOptions,
   context: BuilderContext
 ): Promise<PrerenderBuilderOutput> {
-  const routes = await getRoutes(options, context);
+  const browserTarget = targetFromTargetString(options.browserTarget);
+  const browserOptions =
+    await context.getTargetOptions(browserTarget) as unknown as BrowserBuilderOptions;
+  const tsConfigPath =
+    typeof browserOptions.tsConfig === 'string' ? browserOptions.tsConfig : undefined;
+
+  const routes = await getRoutes(options, tsConfigPath, context);
   if (!routes.length) {
     throw new Error(`Could not find any routes to prerender.`);
   }
@@ -158,10 +164,6 @@ export async function execute(
   if (!success || !browserResult || !serverResult) {
     return { success, error } as BuilderOutput;
   }
-
-  const browserTarget = targetFromTargetString(options.browserTarget);
-  const browserOptions =
-      await context.getTargetOptions(browserTarget) as unknown as BrowserBuilderOptions;
 
   return _renderUniversal(
     routes,

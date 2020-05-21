@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import * as Architect from '@angular-devkit/architect';
+import { BuilderContext } from '@angular-devkit/architect';
 import { BrowserBuilderOptions } from '@angular-devkit/build-angular';
 import { logging } from '@angular-devkit/core';
 import * as fs from 'fs';
@@ -28,18 +28,17 @@ describe('Prerender Builder Utils', () => {
       { path: '/user/:id' },
     ];
 
+    const TSCONFIG_PATH = 'tsconfig.app.json';
     const CONTEXT = {
       workspaceRoot: '/path/to/angular/json',
-      getTargetOptions: () => ({ tsConfig: 'tsconfig.app.json' }),
       logger: new logging.NullLogger(),
-    } as unknown as Architect.BuilderContext;
+    } as unknown as BuilderContext;
 
     let parseAngularRoutesSpy: jasmine.Spy;
     let loggerErrorSpy: jasmine.Spy;
 
     beforeEach(() => {
       spyOn(fs, 'readFileSync').and.returnValue(ROUTES_FILE_CONTENT);
-      spyOn(Architect, 'targetFromTargetString').and.returnValue({} as Architect.Target);
       parseAngularRoutesSpy = spyOn(guessParser, 'parseAngularRoutes')
         .and.returnValue(GUESSED_ROUTES);
       loggerErrorSpy = spyOn(CONTEXT.logger, 'error');
@@ -51,7 +50,7 @@ describe('Prerender Builder Utils', () => {
         routesFile: ROUTES_FILE,
         guessRoutes: true,
       } as PrerenderBuilderOptions;
-      const routes = await getRoutes(options, CONTEXT);
+      const routes = await getRoutes(options, TSCONFIG_PATH, CONTEXT);
       expect(routes).toEqual(
         jasmine.arrayContaining([
           '/route1',
@@ -65,7 +64,7 @@ describe('Prerender Builder Utils', () => {
 
     it('Should return only the given routes', async () => {
       const options = { routes: ROUTES } as PrerenderBuilderOptions;
-      const routes = await getRoutes(options, CONTEXT);
+      const routes = await getRoutes(options, TSCONFIG_PATH, CONTEXT);
       expect(routes).toEqual(jasmine.arrayContaining([
         '/route3',
         '/route4',
@@ -74,7 +73,7 @@ describe('Prerender Builder Utils', () => {
 
     it('Should return the routes from the routesFile', async () => {
       const options = { routesFile: ROUTES_FILE } as PrerenderBuilderOptions;
-      const routes = await getRoutes(options, CONTEXT);
+      const routes = await getRoutes(options, TSCONFIG_PATH, CONTEXT);
       expect(routes).toEqual(jasmine.arrayContaining([
         '/route1',
         '/route2',
@@ -85,7 +84,7 @@ describe('Prerender Builder Utils', () => {
     it('Should catch errors thrown by parseAngularRoutes', async () => {
       const options = { routes: ROUTES, guessRoutes: true } as PrerenderBuilderOptions;
       parseAngularRoutesSpy.and.throwError('Test Error');
-      const routes = await getRoutes(options, CONTEXT);
+      const routes = await getRoutes(options, TSCONFIG_PATH, CONTEXT);
       expect(routes).toEqual(jasmine.arrayContaining([
         '/route3',
         '/route4',

@@ -6,13 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
+import { BuilderContext } from '@angular-devkit/architect';
 import { BrowserBuilderOptions } from '@angular-devkit/build-angular';
 import * as fs from 'fs';
 import { parseAngularRoutes } from 'guess-parser';
 import * as os from 'os';
 import * as path from 'path';
-
 import { PrerenderBuilderOptions } from './models';
 
 /**
@@ -21,12 +20,13 @@ import { PrerenderBuilderOptions } from './models';
  */
 export async function getRoutes(
   options: PrerenderBuilderOptions,
+  tsConfigPath: string | undefined,
   context: BuilderContext,
 ): Promise<string[]> {
   let routes = options.routes || [];
-
+  const { logger, workspaceRoot } = context;
   if (options.routesFile) {
-    const routesFilePath = path.resolve(context.workspaceRoot, options.routesFile);
+    const routesFilePath = path.join(workspaceRoot, options.routesFile);
     routes = routes.concat(
       fs.readFileSync(routesFilePath, 'utf8')
         .split(/\r?\n/)
@@ -34,19 +34,15 @@ export async function getRoutes(
     );
   }
 
-  if (options.guessRoutes) {
-    const browserTarget = targetFromTargetString(options.browserTarget);
-    const { tsConfig } = await context.getTargetOptions(browserTarget);
-    if (typeof tsConfig === 'string') {
-      try {
-        routes = routes.concat(
-          parseAngularRoutes(path.join(context.workspaceRoot, tsConfig))
-            .map(routeObj => routeObj.path)
-            .filter(route => !route.includes('*') && !route.includes(':'))
-        );
-      } catch (e) {
-        context.logger.error('Unable to extract routes from application.', e);
-      }
+  if (options.guessRoutes && tsConfigPath) {
+    try {
+      routes = routes.concat(
+        parseAngularRoutes(path.join(workspaceRoot, tsConfigPath))
+          .map(routeObj => routeObj.path)
+          .filter(route => !route.includes('*') && !route.includes(':'))
+      );
+    } catch (e) {
+      logger.error('Unable to extract routes from application.', e);
     }
   }
 
