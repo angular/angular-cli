@@ -72,7 +72,7 @@ export class UnknownCollectionError extends Error {
 
 export abstract class SchematicCommand<
   T extends BaseSchematicSchema & BaseCommandOptions
-> extends Command<T> {
+  > extends Command<T> {
   readonly allowPrivateSchematics: boolean = false;
   private _host = new NodeJsSyncHost();
   private _workspace: workspaces.WorkspaceDefinition;
@@ -481,8 +481,11 @@ export abstract class SchematicCommand<
     const pathOptions = o ? this.setPathOptions(o, workingDir) : {};
     let input = { ...pathOptions, ...args };
 
+    const workspace = await getWorkspace('local');
+    const defaultProjectName = workspace?.getDefaultProjectName();
+
     // Read the default values from the workspace.
-    const projectName = input.project !== undefined ? '' + input.project : null;
+    const projectName = input.project !== undefined ? '' + input.project : defaultProjectName;
     const defaults = await getSchematicDefaults(collectionName, schematicName, projectName);
     input = {
       ...defaults,
