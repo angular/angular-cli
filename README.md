@@ -116,21 +116,14 @@ as expected.
 There are three different test suites which can be run locally:
 
 * Unit tests
-  * Run: `yarn test --full`
-  * Debug: `yarn debug:test --full`
+  * Run: `yarn bazel:test`
 * Large tests
-  * Run: `yarn test-large --full`
-  * Debug: `yarn debug:test-large --full`
+  * Run: `yarn bazel:integration`
 * End to end tests
   * Run: `node tests/legacy-cli/run_e2e.js`
   * Run subset of tests: `node tests/legacy-cli/run_e2e.js tests/legacy-cli/e2e/tests/i18n/ivy-localize-*`
 
-When running the debug commands, Node will stop and wait for a debugger to
-attach. You can attach your IDE to the debugger to stop on breakpoints and step through the code. Also see [IDE Specific Usage](#ide-specific-usage) for a
-simpler debug story.
-
-When debugging a specific test, change `describe()` or `it()` to `fdescribe()`
-and `fit()` to focus execution to just that one test. This will keep the output clean and speed up execution by not running irrelevant tests.
+You can find more info about [debugging tests with Bazel in the docs](docs/process/bazel.md#debugging-jasmine_node_test).
 
 ## IDE Specific Usage
 
