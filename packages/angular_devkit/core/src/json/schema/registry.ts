@@ -7,6 +7,7 @@
  */
 import * as ajv from 'ajv';
 import * as http from 'http';
+import * as https from 'https';
 import { Observable, from, isObservable, of, throwError } from 'rxjs';
 import { concatMap, map, switchMap, tap } from 'rxjs/operators';
 import * as Url from 'url';
@@ -144,7 +145,9 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
     // If none are found, handle using http client.
     return new Promise<JsonObject>((resolve, reject) => {
-      http.get(uri, res => {
+      const url = new Url.URL(uri);
+      const client = url.protocol === 'https:' ? https : http;
+      client.get(url, res => {
         if (!res.statusCode || res.statusCode >= 300) {
           // Consume the rest of the data to free memory.
           res.resume();
