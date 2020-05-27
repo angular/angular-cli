@@ -30,7 +30,7 @@ describe('CoreSchemaRegistry', () => {
             },
           },
           tslint: {
-            $ref: 'http://json.schemastore.org/tslint#',
+            $ref: 'https://json.schemastore.org/tslint#',
           },
         },
       })
