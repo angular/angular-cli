@@ -37,6 +37,7 @@ describe('Browser Builder commonjs warning', () => {
     expect(output.success).toBe(true);
     const logMsg = logs.join();
     expect(logMsg).toMatch(/WARNING in.+app\.component\.ts depends on bootstrap\. CommonJS or AMD dependencies/);
+    expect(logMsg).toMatch(/To disable this warning add "bootstrap" to the "allowedCommonJsDependencies" option/);
     expect(logMsg).not.toContain('jquery', 'Should not warn on transitive CommonJS packages which parent is also CommonJS.');
     await run.stop();
   });
