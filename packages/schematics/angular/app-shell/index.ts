@@ -237,7 +237,11 @@ function addServerRoutes(options: AppShellOptions): Rule {
     if (!clientServerOptions) {
       throw new SchematicsException('Server target does not contain options.');
     }
-    const modulePath = getServerModulePath(host, clientProject.sourceRoot || 'src', options.main as string);
+    const sourceRoot= clientProject.sourceRoot || 'src'
+    const serverPath= options.appDir ?
+     `${sourceRoot}/${options.appDir}`:
+    sourceRoot;
+    const modulePath = getServerModulePath(host, serverPath, options.main as string);
     if (modulePath === null) {
       throw new SchematicsException('Universal/server module not found.');
     }
