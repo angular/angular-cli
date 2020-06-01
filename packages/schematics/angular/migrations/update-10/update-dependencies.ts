@@ -16,6 +16,7 @@ export default function (): Rule {
   return (host, context) => {
     const dependenciesToUpdate: Record<string, string> = {
       'karma': '~5.0.0',
+      'karma-jasmine': '~3.3.0',
       'protractor': '~7.0.0',
       'ng-packagr': latestVersions.ngPackagr,
       'tslib': '^2.0.0',
