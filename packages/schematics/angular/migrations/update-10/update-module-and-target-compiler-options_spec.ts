@@ -131,11 +131,23 @@ describe('Migration to update target and module compiler options', () => {
     expect(target).toBe('es2018');
   });
 
-
   it(`should remove module in 'tsconfig.server.json'`, async () => {
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
-    const { module, target } = readJsonFile(newTree, 'src/tsconfig.server.json').compilerOptions;
+    const { module } = readJsonFile(newTree, 'src/tsconfig.server.json').compilerOptions;
     expect(module).toBeUndefined();
-    expect(target).toBeUndefined();
+  });
+
+  it(`should add target in 'tsconfig.server.json'`, async () => {
+    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const { target } = readJsonFile(newTree, 'src/tsconfig.server.json').compilerOptions;
+    expect(target).toBe('es2016');
+  });
+
+  it(`should update target to es2016 in 'tsconfig.server.json'`, async () => {
+    tree.delete('src/tsconfig.server.json');
+    createJsonFile(tree, 'src/tsconfig.server.json', { compilerOptions: { module: 'commonjs', target: 'es5' } });
+    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    const { target } = readJsonFile(newTree, 'src/tsconfig.server.json').compilerOptions;
+    expect(target).toBe('es2016');
   });
 });
