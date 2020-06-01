@@ -42,7 +42,8 @@
           "instance-method"
         ]
       }
-    ],
+    ],<% if (strict) { %>
+    "no-any": true,<% } %>
     "no-console": [
       true,
       "debug",
@@ -82,6 +83,7 @@
         "named": "never"
       }
     },
+    "typedef": [true, "call-signature"],
     "typedef-whitespace": {
       "options": [
         {
