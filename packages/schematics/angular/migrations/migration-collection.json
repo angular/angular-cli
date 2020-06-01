@@ -80,11 +80,6 @@
       "factory": "./update-10/side-effects-package-json",
       "description": "Create a special 'package.json' file that is used to tell the tools and bundlers whether the code under the app directory is free of code with non-local side-effect."
     },
-    "update-module-and-target-compiler-options": {
-      "version": "10.0.0-beta.3",
-      "factory": "./update-10/update-module-and-target-compiler-options",
-      "description": "Update 'module' and 'target' TypeScript compiler options."
-    },
     "update-angular-config": {
       "version": "10.0.0-beta.6",
       "factory": "./update-10/update-angular-config",
@@ -109,6 +104,11 @@
       "version": "10.0.0-beta.7",
       "factory": "./update-10/solution-style-tsconfig",
       "description": "Adding \"Solution Style\" tsconfig.json. This improves developer experience using editors powered by TypeScript’s language server."
+    },
+    "update-module-and-target-compiler-options": {
+      "version": "10.0.0-rc.1",
+      "factory": "./update-10/update-module-and-target-compiler-options",
+      "description": "Update 'module' and 'target' TypeScript compiler options."
     }
   }
 }

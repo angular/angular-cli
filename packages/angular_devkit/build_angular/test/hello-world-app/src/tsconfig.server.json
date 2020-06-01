@@ -2,6 +2,7 @@
   "extends": "./tsconfig.app.json",
   "compilerOptions": {
     "outDir": "../dist-server",
+    "target": "es2016",
     "baseUrl": "./",
     "types": []
   },

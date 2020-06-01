@@ -7,7 +7,7 @@
  */
 import { dirname, join, normalize } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
-import { findPropertyInAstObject, removePropertyInAstObject } from '../../utility/json-utils';
+import { appendPropertyInAstObject, findPropertyInAstObject, removePropertyInAstObject } from '../../utility/json-utils';
 import { getWorkspace } from '../../utility/workspace';
 import { Builders } from '../../utility/workspace-models';
 import { readJsonFileAsAstObject } from '../update-9/utils';
@@ -68,6 +68,10 @@ export default function (): Rule {
                 // This ensures that lazy-loaded works on the server.
                 newModule: false,
               });
+
+              updateModuleAndTarget(host, p, {
+                newTarget: 'es2016',
+              });
             });
             break;
           case Builders.Karma:
@@ -102,7 +106,10 @@ function updateModuleAndTarget(host: Tree, tsConfigPath: string, replacements: M
   const recorder = host.beginUpdate(tsConfigPath);
   if (newTarget) {
     const targetAst = findPropertyInAstObject(compilerOptionsAst, 'target');
-    if (targetAst?.kind === 'string' && oldTarget === targetAst.value.toLowerCase()) {
+
+    if (!targetAst && !oldTarget) {
+      appendPropertyInAstObject(recorder, compilerOptionsAst, 'target', newTarget, 4);
+    } else if (targetAst?.kind === 'string' && (!oldTarget || oldTarget === targetAst.value.toLowerCase())) {
       const offset = targetAst.start.offset + 1;
       recorder.remove(offset, targetAst.value.length);
       recorder.insertLeft(offset, newTarget);
