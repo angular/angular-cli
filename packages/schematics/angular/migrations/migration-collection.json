@@ -96,7 +96,7 @@
       "description": "Update library projects to use tslib version 2 as a direct dependency."
     },
     "update-workspace-dependencies": {
-      "version": "10.0.0-beta.7",
+      "version": "10.0.0-rc.1",
       "factory": "./update-10/update-dependencies",
       "description": "Workspace dependencies updates."
     },
