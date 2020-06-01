@@ -2090,10 +2090,10 @@
   dependencies:
     "@types/webpack" "*"
 
-"@types/loader-utils@^1.1.3":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@types/loader-utils/-/loader-utils-1.1.3.tgz#82b9163f2ead596c68a8c03e450fbd6e089df401"
-  integrity sha512-euKGFr2oCB3ASBwG39CYJMR3N9T0nanVqXdiH7Zu/Nqddt6SmFRxytq/i2w9LQYNQekEtGBz+pE3qG6fQTNvRg==
+"@types/loader-utils@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/loader-utils/-/loader-utils-2.0.0.tgz#4c7aa141f1159db082e50bd4d2533784afd30aed"
+  integrity sha512-PgtyFIgMv47sTWD5W5qBAJf+hczK10lts3ZGrwKroX5ex6HRMaMABMjfShmsg7foiGW+l6ZuU0MTIVr7wRs8YA==
   dependencies:
     "@types/node" "*"
     "@types/webpack" "*"
