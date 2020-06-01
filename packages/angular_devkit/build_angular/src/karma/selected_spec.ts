@@ -62,7 +62,7 @@ describe('Karma Builder', () => {
       expect(lastErrorLogEntry && lastErrorLogEntry.message)
         // tslint:disable-next-line:max-line-length
         .toContain(
-          "The 'include' option requires that the 'main' file for tests include the line below:",
+          "The 'include' option requires that the 'main' file for tests includes the below line:",
         );
 
       await run.stop();
