@@ -39,7 +39,7 @@ function* visitExtendedJsonFiles(directory: DirEntry): IterableIterator<[string,
   }
 
   for (const path of directory.subdirs) {
-    if (path === 'node_modules') {
+    if (path === 'node_modules' || path.startsWith('.')) {
       continue;
     }
 
