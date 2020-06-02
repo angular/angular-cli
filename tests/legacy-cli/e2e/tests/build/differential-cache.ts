@@ -36,6 +36,11 @@ function validateHashes(
 }
 
 export default async function() {
+  // Skip on CI due to large variability of performance
+  if (process.env['CI']) {
+    return;
+  }
+
   let oldHashes: Map<string, string>;
   let newHashes: Map<string, string>;
 
