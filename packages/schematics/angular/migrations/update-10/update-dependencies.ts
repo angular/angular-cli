@@ -15,8 +15,13 @@ import { latestVersions } from '../../utility/latest-versions';
 export default function (): Rule {
   return (host, context) => {
     const dependenciesToUpdate: Record<string, string> = {
+      'jasmine-core': '~3.5.0',
+      'jasmine-spec-reporter': '~5.0.0',
       'karma': '~5.0.0',
+      'karma-chrome-launcher': '~3.1.0',
+      'karma-coverage-istanbul-reporter': '~3.0.2',
       'karma-jasmine': '~3.3.0',
+      'karma-jasmine-html-reporter': '^1.5.0',
       'protractor': '~7.0.0',
       'ng-packagr': latestVersions.ngPackagr,
       'tslib': '^2.0.0',
