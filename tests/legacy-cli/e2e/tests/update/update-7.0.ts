@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import { createProjectFromAsset } from '../../utils/assets';
 import { expectFileMatchToExist, expectFileToExist, expectFileToMatch } from '../../utils/fs';
 import { ng, noSilentNg, silentNpm } from '../../utils/process';
@@ -6,21 +5,8 @@ import { isPrereleaseCli, useBuiltPackages, useCIChrome, useCIDefaults } from '.
 import { expectToFail } from '../../utils/utils';
 
 export default async function() {
-  const extraUpdateArgs = (await isPrereleaseCli()) ? ['--next', '--force'] : [];
-
-  // Create new project from previous version files.
-  // We must use the original NPM packages to force a real update.
-  await createProjectFromAsset('7.0-project', true);
-  // Update to version 8, to use the self update CLI feature.
-  await ng('update', '@angular/cli@8');
-
-  fs.writeFileSync('.npmrc', 'registry = http://localhost:4873', 'utf8');
-
-  // Update the CLI.
-  // Users of CLI <7.2 will see the following warnings:
-  //   packageGroup metadata of package @angular/cli is malformed. Ignoring.
-  // This is expected since the format changed in 7.2.
-  await ng('update', '@angular/cli', ...extraUpdateArgs);
+  await createProjectFromAsset('7.0-project');
+  await ng('update', '@angular/cli', '--migrate-only', '--from=7');
 
   // Test CLI migrations.
   // Should update the lazy route syntax via update-lazy-module-paths.
@@ -44,6 +30,7 @@ export default async function() {
   await silentNpm('install');
 
   // Update Angular.
+  const extraUpdateArgs = (await isPrereleaseCli()) ? ['--next', '--force'] : [];
   await ng('update', '@angular/core', ...extraUpdateArgs);
 
   // Run CLI commands.
