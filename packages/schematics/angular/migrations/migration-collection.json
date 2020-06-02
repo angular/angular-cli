@@ -95,11 +95,6 @@
       "factory": "./update-10/update-libraries-tslib",
       "description": "Update library projects to use tslib version 2 as a direct dependency."
     },
-    "update-workspace-dependencies": {
-      "version": "10.0.0-rc.1",
-      "factory": "./update-10/update-dependencies",
-      "description": "Workspace dependencies updates."
-    },
     "solution-style-tsconfig": {
       "version": "10.0.0-beta.7",
       "factory": "./update-10/solution-style-tsconfig",
@@ -109,6 +104,11 @@
       "version": "10.0.0-rc.1",
       "factory": "./update-10/update-module-and-target-compiler-options",
       "description": "Update 'module' and 'target' TypeScript compiler options."
+    },
+    "update-workspace-dependencies": {
+      "version": "10.0.0-rc.2",
+      "factory": "./update-10/update-dependencies",
+      "description": "Workspace dependencies updates."
     }
   }
 }
