@@ -77,7 +77,7 @@
     "@types/babel__core": "7.1.6",
     "@types/browserslist": "^4.4.0",
     "@types/caniuse-lite": "^1.0.0",
-    "@types/copy-webpack-plugin": "^5.0.0",
+    "@types/copy-webpack-plugin": "^6.0.0",
     "@types/cssnano": "^4.0.0",
     "@types/debug": "^4.1.2",
     "@types/express": "^4.16.0",
