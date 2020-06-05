@@ -276,4 +276,43 @@ describe('Constructor Parameter Transformer', () => {
 
     expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
   });
+
+  it('should allow unused imports to be elided', () => {
+    const otherFiles = {
+      'material.ts': `
+        export class MatDialog {
+          constructor() { }
+        }
+        export class MatButton {
+          constructor() { }
+        }
+      `,
+    };
+
+    const input = `
+      import {MatDialog, MatButton} from './material';
+
+      @Directive()
+      export class AppComp {
+        constructor(button: MatButton) {}
+      }
+    `;
+
+    const output = `
+      import { __decorate } from "tslib";
+      import { MatButton } from './material';
+
+      let AppComp = /** @class */ (() => {
+        let AppComp = class AppComp { constructor(button) { } };
+        AppComp.ctorParameters = () => [ { type: MatButton } ];
+        AppComp = __decorate([ Directive() ], AppComp);
+        return AppComp;
+      })();
+      export { AppComp };
+    `;
+
+    const result = transform(input, otherFiles);
+
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 });

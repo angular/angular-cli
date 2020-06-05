@@ -293,7 +293,7 @@ export function decoratorDownlevelTransformer(
       }
     }
 
-    function visitor<T extends ts.Node>(node: T): ts.Node {
+    function visitor(node: ts.Node): ts.VisitResult<ts.Node> {
       if (ts.isClassDeclaration(node) && node.decorators && node.decorators.length > 0) {
         return ts.updateClassDeclaration(
           node,
@@ -309,27 +309,59 @@ export function decoratorDownlevelTransformer(
       }
     }
 
+    function isParameterTypeSymbol(name: ts.Identifier): boolean {
+      const importSymbol = typeChecker.getSymbolAtLocation(name);
+
+      return !!importSymbol && parameterTypeSymbols.has(importSymbol);
+    }
+
+    function getDisconnectedClone<T extends ts.Node>(node: T): T {
+      const clone = ts.getMutableClone(node);
+      ((clone as unknown) as { original: undefined }).original = undefined;
+
+      return clone;
+    }
+
     return (sf: ts.SourceFile) => {
       parameterTypeSymbols.clear();
 
-      return ts.visitEachChild(
-        visitor(sf) as ts.SourceFile,
-        function visitImports(node: ts.Node): ts.Node {
-          if (
-            (ts.isImportSpecifier(node) || ts.isNamespaceImport(node) || ts.isImportClause(node)) &&
-            node.name
-          ) {
-            const importSymbol = typeChecker.getSymbolAtLocation(node.name);
-            if (importSymbol && parameterTypeSymbols.has(importSymbol)) {
-              // Using a clone prevents TS from removing the import specifier
-              return ts.getMutableClone(node);
-            }
-          }
+      const updatedSourceFile = ts.visitEachChild(sf, visitor, context);
 
-          return ts.visitEachChild(node, visitImports, context);
-        },
-        context,
-      );
+      // Using a clone prevents TS from removing the import.
+      // Only the specific import part should be cloned to ensure that the rest of the import
+      // declaration can be elided.
+      ts.forEachChild(updatedSourceFile, (node) => {
+        if (!ts.isImportDeclaration(node) || !node.importClause) {
+          return;
+        }
+
+        if (node.importClause.name) {
+          if (isParameterTypeSymbol(node.importClause.name)) {
+            node.importClause = getDisconnectedClone(node.importClause);
+          }
+        } else if (node.importClause.namedBindings) {
+          if (ts.isNamespaceImport(node.importClause.namedBindings)) {
+            if (isParameterTypeSymbol(node.importClause.namedBindings.name)) {
+              node.importClause.namedBindings = getDisconnectedClone(
+                node.importClause.namedBindings,
+              );
+            }
+          } else {
+            node.importClause.namedBindings.elements = ts.visitNodes(
+              node.importClause.namedBindings.elements,
+              (node: ts.ImportSpecifier) => {
+                if (isParameterTypeSymbol(node.name)) {
+                  return getDisconnectedClone(node);
+                } else {
+                  return node;
+                }
+              },
+            );
+          }
+        }
+      });
+
+      return updatedSourceFile;
     };
   };
 }
