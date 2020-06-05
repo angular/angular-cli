@@ -94,9 +94,9 @@ describe('Browser Builder assets', () => {
     const output = await run.result as BrowserBuilderOutput;
     expect(output.success).toBe(true);
 
-    expect(host.scopedSync().exists(normalize('./dist/folder/asset.txt'))).toBe(true);
-    expect(host.scopedSync().exists(normalize('./dist/folder/asset-ignored.txt'))).toBe(false);
-    expect(host.scopedSync().exists(normalize('./dist/folder/.gitkeep'))).toBe(false);
+    expect(host.scopedSync().exists(normalize('./dist/folder/asset.txt'))).toBe(true, `asset.txt doesn't exist.`);
+    expect(host.scopedSync().exists(normalize('./dist/folder/asset-ignored.txt'))).toBe(false, 'asset-ignored.txt exists.');
+    expect(host.scopedSync().exists(normalize('./dist/folder/.gitkeep'))).toBe(false, '.gitkeep exists.');
 
     await run.stop();
   });
