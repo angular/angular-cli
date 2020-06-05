@@ -32,7 +32,7 @@
     cacache "15.0.0"
     caniuse-lite "^1.0.30001032"
     circular-dependency-plugin "5.2.0"
-    copy-webpack-plugin "5.1.1"
+    copy-webpack-plugin "6.0.1"
     core-js "3.6.4"
     cssnano "4.1.10"
     file-loader "6.0.0"
