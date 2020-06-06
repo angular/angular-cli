@@ -32,12 +32,9 @@ describe('Constructor Parameter Transformer', () => {
     const output = `
       import { __decorate } from "tslib";
       export class ClassInject { } ;
-      let MyService = /** @class */ (() => {
-        let MyService = class MyService { constructor(v) { } };
-        MyService.ctorParameters = () => [ { type: ClassInject } ];
-        MyService = __decorate([ Injectable() ], MyService);
-        return MyService;
-      })();
+      let MyService = class MyService { constructor(v) { } };
+      MyService.ctorParameters = () => [ { type: ClassInject } ];
+      MyService = __decorate([ Injectable() ], MyService);
       export { MyService };
     `;
 
@@ -83,19 +80,12 @@ describe('Constructor Parameter Transformer', () => {
 
     const output = `
       import { __decorate } from "tslib";
-
-      let RootProvidedService = /** @class */ (() => {
-        let RootProvidedService = class RootProvidedService { constructor() { } };
-        RootProvidedService = __decorate([ Injectable({ providedIn: 'root' }) ], RootProvidedService);
-        return RootProvidedService;
-      })();
+      let RootProvidedService = class RootProvidedService { constructor() { } };
+      RootProvidedService = __decorate([ Injectable({ providedIn: 'root' }) ], RootProvidedService);
       export { RootProvidedService };
-      let MyService = /** @class */ (() => {
-        let MyService = class MyService { constructor(v) { } };
-        MyService.ctorParameters = () => [ { type: RootProvidedService } ];
-        MyService = __decorate([ Injectable() ], MyService);
-        return MyService;
-      })();
+      let MyService = class MyService { constructor(v) { } };
+      MyService.ctorParameters = () => [ { type: RootProvidedService } ];
+      MyService = __decorate([ Injectable() ], MyService);
       export { MyService };
     `;
 
@@ -128,12 +118,12 @@ describe('Constructor Parameter Transformer', () => {
     const output = `
       import { __decorate } from "tslib";
       import { RootProvidedService } from './root-provided-service';
-      let MyService = /** @class */ (() => {
-        let MyService = class MyService { constructor(v) { } };
-        MyService.ctorParameters = () => [ { type: RootProvidedService } ];
-        MyService = __decorate([ Injectable() ], MyService);
-        return MyService;
-      })();
+
+      let MyService = class MyService {
+        constructor(v) { }
+      };
+      MyService.ctorParameters = () => [ { type: RootProvidedService } ];
+      MyService = __decorate([ Injectable() ], MyService);
       export { MyService };
     `;
 
@@ -156,11 +146,9 @@ describe('Constructor Parameter Transformer', () => {
     const output = `
       import { __decorate, __param } from "tslib";
       export const INTERFACE_INJECT = new InjectionToken('interface-inject');
-      let MyService = /** @class */ (() => {
-        let MyService = class MyService { constructor(v) { } }; MyService.ctorParameters = () => [ { type: undefined, decorators: [{ type: Inject, args: [INTERFACE_INJECT,] }] } ];
-        MyService = __decorate([ Injectable(), __param(0, Inject(INTERFACE_INJECT)) ], MyService);
-        return MyService;
-      })();
+      let MyService = class MyService { constructor(v) { } };
+      MyService.ctorParameters = () => [ { type: undefined, decorators: [{ type: Inject, args: [INTERFACE_INJECT,] }] } ];
+      MyService = __decorate([ Injectable(), __param(0, Inject(INTERFACE_INJECT)) ], MyService);
       export { MyService };
     `;
 
@@ -183,12 +171,9 @@ describe('Constructor Parameter Transformer', () => {
     const output = `
       import { __decorate, __param } from "tslib";
       export const INTERFACE_INJECT = new InjectionToken('interface-inject');
-      let MyService = /** @class */ (() => {
-        let MyService = class MyService { constructor(v) { } };
-        MyService.ctorParameters = () => [ { type: undefined, decorators: [{ type: Inject, args: [INTERFACE_INJECT,] }] } ];
-        MyService = __decorate([ Injectable(), __param(0, Inject(INTERFACE_INJECT)) ], MyService);
-        return MyService;
-      })();
+      let MyService = class MyService { constructor(v) { } };
+      MyService.ctorParameters = () => [ { type: undefined, decorators: [{ type: Inject, args: [INTERFACE_INJECT,] }] } ];
+      MyService = __decorate([ Injectable(), __param(0, Inject(INTERFACE_INJECT)) ], MyService);
       export { MyService };
     `;
 
@@ -217,12 +202,9 @@ describe('Constructor Parameter Transformer', () => {
     const output = `
       import { __decorate, __param } from "tslib";
       import { INTERFACE_INJECT } from './module-inject';
-      let MyService = /** @class */ (() => {
-        let MyService = class MyService { constructor(v) { } };
-        MyService.ctorParameters = () => [ { type: undefined, decorators: [{ type: Inject, args: [INTERFACE_INJECT,] }] } ];
-        MyService = __decorate([ Injectable(), __param(0, Inject(INTERFACE_INJECT)) ], MyService);
-        return MyService;
-      })();
+      let MyService = class MyService { constructor(v) { } };
+      MyService.ctorParameters = () => [ { type: undefined, decorators: [{ type: Inject, args: [INTERFACE_INJECT,] }] } ];
+      MyService = __decorate([ Injectable(), __param(0, Inject(INTERFACE_INJECT)) ], MyService);
       export { MyService };
     `;
 
@@ -250,25 +232,15 @@ describe('Constructor Parameter Transformer', () => {
     const output = `
       import { __decorate, __param } from "tslib";
 
-      let ProvidedService = /** @class */ (() => {
-        let ProvidedService = class ProvidedService {
-          constructor() { }
-        };
-        ProvidedService = __decorate([ Injectable() ], ProvidedService);
-        return ProvidedService;
-      })();
+      let ProvidedService = class ProvidedService { constructor() { } };
+      ProvidedService = __decorate([ Injectable() ], ProvidedService);
       export { ProvidedService };
 
-      let LibService = /** @class */ (() => {
-        let LibService = class LibService {
-          constructor(service) {
-            this.service = service;
-          }
-        };
-        LibService.ctorParameters = () => [ { type: ProvidedService, decorators: [{ type: Optional }] } ];
-        LibService = __decorate([ Injectable(), __param(0, Optional()) ], LibService);
-        return LibService;
-      })();
+      let LibService = class LibService {
+        constructor(service) { this.service = service; }
+      };
+      LibService.ctorParameters = () => [ { type: ProvidedService, decorators: [{ type: Optional }] } ];
+      LibService = __decorate([ Injectable(), __param(0, Optional()) ], LibService);
       export { LibService };
     `;
 
