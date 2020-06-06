@@ -59,22 +59,18 @@ describe('@ngtools/webpack transformers', () => {
       const output = `
         import { __decorate } from "tslib";
         import { Component } from 'another-lib';
-
-        let AppComponent = /** @class */ (() => {
-          let AppComponent = class AppComponent {
+        let AppComponent = class AppComponent {
             constructor() {
-              this.title = 'app';
+                this.title = 'app';
             }
-          };
-          AppComponent = __decorate([
-              Component({
+        };
+        AppComponent = __decorate([
+            Component({
                 selector: 'app-root',
                 templateUrl: './app.component.html',
                 styleUrls: ['./app.component.css']
-              })
-            ], AppComponent);
-          return AppComponent;
-        })();
+            })
+        ], AppComponent);
         export { AppComponent };
       `;
 
@@ -112,21 +108,18 @@ describe('@ngtools/webpack transformers', () => {
         import { __decorate } from "tslib";
         import { AnotherDecorator } from 'another-lib';
 
-        let AppComponent = /** @class */ (() => {
-          class AppComponent {
-            constructor() {
+        export class AppComponent {
+          constructor() {
               this.title = 'app';
-            }
-            onEscape() {
-              console.log('run');
-            }
           }
-          __decorate([
-            AnotherDecorator()
-          ], AppComponent.prototype, "onEscape", null);
-          return AppComponent;
-        })();
-        export { AppComponent };
+
+          onEscape() {
+            console.log('run');
+          }
+        }
+        __decorate([
+          AnotherDecorator()
+        ], AppComponent.prototype, "onEscape", null);
       `;
 
       const { program, compilerHost } = createTypescriptContext(input);
@@ -158,17 +151,14 @@ describe('@ngtools/webpack transformers', () => {
         import { __decorate } from "tslib";
         import { AnotherDecorator } from 'another-lib';
 
-        let AppComponent = /** @class */ (() => {
-          let AppComponent = class AppComponent {
-            constructor() {
+        let AppComponent = class AppComponent {
+          constructor() {
               this.title = 'app';
-            }
-          };
-          AppComponent = __decorate([
-            AnotherDecorator()
-          ], AppComponent);
-          return AppComponent;
-        })();
+          }
+        };
+        AppComponent = __decorate([
+          AnotherDecorator()
+        ], AppComponent);
         export { AppComponent };
       `;
 

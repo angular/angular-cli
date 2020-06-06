@@ -326,10 +326,8 @@ describe('@ngtools/webpack transformers', () => {
           import { __decorate } from "tslib";
           import { Decorator } from './decorator';
 
-          let Foo = /** @class */ (() => {
-            let Foo = class Foo { constructor(param) { } };
-            Foo = __decorate([ Decorator() ], Foo); return Foo;
-          })();
+          let Foo = class Foo { constructor(param) { } };
+          Foo = __decorate([ Decorator() ], Foo);
           export { Foo };
         `;
 
@@ -365,11 +363,8 @@ describe('@ngtools/webpack transformers', () => {
           import { Decorator } from './decorator';
           import { Service } from './service';
 
-          let Foo = /** @class */ (() => {
-            let Foo = class Foo { constructor(param) { } };
-            Foo = __decorate([ Decorator(), __metadata("design:paramtypes", [Service]) ], Foo);
-            return Foo;
-          })();
+          let Foo = class Foo { constructor(param) { } };
+          Foo = __decorate([ Decorator(), __metadata("design:paramtypes", [Service]) ], Foo);
           export { Foo };
         `;
 
@@ -394,13 +389,11 @@ describe('@ngtools/webpack transformers', () => {
         const output = tags.stripIndent`
           import { __decorate, __metadata } from "tslib";
           import { Decorator } from './decorator';
+
           import { Service } from './service';
-          let Foo = /** @class */ (() => {
-            class Foo { }
-            __decorate([ Decorator(), __metadata("design:type", Service) ], Foo.prototype, "foo", void 0);
-            return Foo;
-          })();
-          export { Foo };
+
+          export class Foo { }
+          __decorate([ Decorator(), __metadata("design:type", Service) ], Foo.prototype, "foo", void 0);
         `;
 
         const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions);
@@ -431,13 +424,8 @@ describe('@ngtools/webpack transformers', () => {
           import { Decorator } from './decorator';
           import { Service } from './service';
 
-          let Foo = /** @class */ (() => {
-            class Foo { set name(f) { this._foo = f; } }
-            __decorate([ Decorator(), __metadata("design:type", Service), __metadata("design:paramtypes", [Service]) ], Foo.prototype, "name", null);
-            return Foo;
-          })();
-
-          export { Foo };
+          export class Foo { set name(f) { this._foo = f; } }
+          __decorate([ Decorator(), __metadata("design:type", Service), __metadata("design:paramtypes", [Service]) ], Foo.prototype, "name", null);
         `;
 
         const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions);
@@ -468,12 +456,8 @@ describe('@ngtools/webpack transformers', () => {
           import { Decorator } from './decorator';
           import { Service } from './service';
 
-          let Foo = /** @class */ (() => {
-            class Foo { get name() { return this._foo; } }
-            __decorate([ Decorator(), __metadata("design:type", Service), __metadata("design:paramtypes", []) ], Foo.prototype, "name", null);
-            return Foo;
-          })();
-          export { Foo };
+          export class Foo { get name() { return this._foo; } }
+         __decorate([ Decorator(), __metadata("design:type", Service), __metadata("design:paramtypes", []) ], Foo.prototype, "name", null);
         `;
 
         const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions);
@@ -502,12 +486,9 @@ describe('@ngtools/webpack transformers', () => {
           import { Decorator } from './decorator';
           import { Service } from './service';
 
-          let Foo = /** @class */ (() => {
-            class Foo { name() { return undefined; } }
-            __decorate([ Decorator(), __metadata("design:type", Function), __metadata("design:paramtypes", []), __metadata("design:returntype", Service) ], Foo.prototype, "name", null);
-            return Foo;
-          })();
-          export { Foo };
+          export class Foo { name() { return undefined; } }
+          __decorate([ Decorator(), __metadata("design:type", Function),
+          __metadata("design:paramtypes", []), __metadata("design:returntype", Service) ], Foo.prototype, "name", null);
         `;
 
         const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions);
@@ -536,12 +517,10 @@ describe('@ngtools/webpack transformers', () => {
           import { Decorator } from './decorator';
           import { Service } from './service';
 
-          let Foo = /** @class */ (() => {
-            class Foo { name(f) { } }
-            __decorate([ Decorator(), __metadata("design:type", Function), __metadata("design:paramtypes", [Service]), __metadata("design:returntype", void 0) ], Foo.prototype, "name", null);
-            return Foo;
-          })();
-          export { Foo };
+          export class Foo { name(f) { } }
+
+          __decorate([ Decorator(), __metadata("design:type", Function), __metadata("design:paramtypes", [Service]),
+          __metadata("design:returntype", void 0) ], Foo.prototype, "name", null);
         `;
 
         const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, extraCompilerOptions);
