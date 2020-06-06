@@ -11,7 +11,7 @@ export const latestVersions = {
   Angular: '~10.0.0-rc.0',
   RxJs: '~6.5.4',
   ZoneJs: '~0.10.2',
-  TypeScript: '~3.9.2',
+  TypeScript: '~3.9.5',
   TsLib: '^2.0.0',
 
   // The versions below must be manually updated when making a new devkit release.
