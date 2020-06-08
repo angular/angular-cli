@@ -57,7 +57,7 @@
     "@angular/platform-browser-dynamic": "^10.0.0-rc.0",
     "@angular/platform-server": "^10.0.0-rc.0",
     "@angular/router": "^10.0.0-rc.0",
-    "@bazel/bazel": "2.1.0",
+    "@bazel/bazelisk": "1.5.0",
     "@bazel/buildifier": "^3.0.0",
     "@bazel/hide-bazel-files": "~1.7.0",
     "@bazel/ibazel": "^0.13.0",
@@ -97,7 +97,7 @@
     "tslib": "~2.0.0",
     "tslint": "^6.0.0",
     "tsutils": "^3.0.0",
-    "typescript": "~3.9.3",
+    "typescript": "~3.9.5",
     "xhr2": "^0.2.0",
     "zone.js": "^0.10.2"
   }
