@@ -85,6 +85,7 @@ export class NgccProcessor {
         '--async',
         '--tsconfig', /** tsConfigPath */
         this.tsConfigPath,
+        '--use-program-dependencies',
       ],
       {
         stdio: ['inherit', process.stderr, process.stderr],
