@@ -78,8 +78,10 @@ export class OptimizeCssWebpackPlugin {
 
           const cssNanoOptions: cssNano.CssNanoOptions = {
             preset: ['default', {
-              // Disable SVG optimization, as this can cause optimizations which are not compatible in all browsers.
+              // Disable SVG optimizations, as this can cause optimizations which are not compatible in all browsers.
               svgo: false,
+              // Disable `calc` optimizations, due to several issues. #16910, #16875, #17890
+              calc: false,
             }],
           };
 
