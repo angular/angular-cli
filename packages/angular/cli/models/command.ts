@@ -113,7 +113,8 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
               : '';
           this.logger.info(`  ${colors.cyan('--' + strings.dasherize(o.name))} ${aliases}`);
           if (o.description) {
-            this.logger.info(formatDescription(o.description));
+            const defaultValue = o.default !== undefined ? ` (default: ${o.default})` : '';
+            this.logger.info(formatDescription(o.description) + defaultValue);
           }
         });
     }
