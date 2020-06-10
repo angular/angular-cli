@@ -9,7 +9,7 @@ import { readFileSync, existsSync } from 'fs';
 import { AppServerModule } from './src/<%= stripTsExtension(main) %>';
 
 // The Hapi server is exported so that it can be used by serverless functions.
-export async function app() {
+export async function app(): Promise<void> {
   const port = process.env.PORT || <%= serverPort %>;
   const distFolder = join(process.cwd(), '<%= browserDistDirectory %>');
   const server = new Server({
