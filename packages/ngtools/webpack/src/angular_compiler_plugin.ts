@@ -112,6 +112,7 @@ export class AngularCompilerPlugin {
   private _typeDeps = new Set<string>();
   private _changedFileExtensions = new Set(['ts', 'tsx', 'html', 'css', 'js', 'json']);
   private _nodeModulesRegExp = /[\\\/]node_modules[\\\/]/;
+  private _ngccProcessor: NgccProcessor | undefined;
 
   // Webpack plugin.
   private _firstRun = true;
@@ -714,6 +715,7 @@ export class AngularCompilerPlugin {
           this._program = undefined;
           this._transformers = [];
           this._resourceLoader = undefined;
+          this._ngccProcessor = undefined;
           this._compilerHost.reset();
         }
       });
@@ -757,9 +759,8 @@ export class AngularCompilerPlugin {
         }
       }
 
-      let ngccProcessor: NgccProcessor | undefined;
       if (this._compilerOptions.enableIvy) {
-        ngccProcessor = new NgccProcessor(
+        this._ngccProcessor = new NgccProcessor(
           this._mainFields,
           compilerWithFileSystems.inputFileSystem,
           this._warnings,
@@ -769,7 +770,7 @@ export class AngularCompilerPlugin {
           this._tsConfigPath,
         );
 
-        ngccProcessor.process();
+        this._ngccProcessor.process();
       }
 
       // Use an identity function as all our paths are absolute already.
@@ -782,7 +783,7 @@ export class AngularCompilerPlugin {
         host,
         true,
         this._options.directTemplateLoading,
-        ngccProcessor,
+        this._ngccProcessor,
         this._moduleResolutionCache,
       );
 
@@ -887,7 +888,13 @@ export class AngularCompilerPlugin {
       'angular-compiler',
       compilation => this._donePromise = this._make(compilation),
     );
-    compiler.hooks.invalid.tap('angular-compiler', () => this._firstRun = false);
+    compiler.hooks.invalid.tap('angular-compiler', () => {
+      this._firstRun = false;
+
+      if (this._ngccProcessor) {
+        this._ngccProcessor.isSyncModeEnabled = true;
+      }
+    });
     compiler.hooks.afterEmit.tap('angular-compiler', compilation => {
       // tslint:disable-next-line:no-any
       (compilation as any)._ngToolsWebpackPluginInstance = null;

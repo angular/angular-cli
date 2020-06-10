@@ -30,6 +30,8 @@ export class NgccProcessor {
   private _nodeModulesDirectory: string;
   private _pathMappings: PathMappings | undefined;
 
+  isSyncModeEnabled = false;
+
   constructor(
     private readonly propertiesToConsider: string[],
     private readonly inputFileSystem: InputFileSystem,
@@ -105,8 +107,12 @@ export class NgccProcessor {
     resolvedModule: ts.ResolvedModule | ts.ResolvedTypeReferenceDirective,
   ): void {
     const resolvedFileName = resolvedModule.resolvedFileName;
-    if (!resolvedFileName || moduleName.startsWith('.')
-      || this._processedModules.has(resolvedFileName)) {
+    if (
+      !this.isSyncModeEnabled ||
+      !resolvedFileName ||
+      moduleName.startsWith('.') ||
+      this._processedModules.has(resolvedFileName)
+    ) {
       // Skip when module is unknown, relative or NGCC compiler is not found or already processed.
       return;
     }
