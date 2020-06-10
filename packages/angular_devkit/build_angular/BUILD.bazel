@@ -282,7 +282,7 @@ LARGE_SPECS = {
         "extra_deps": [
             "@npm//karma",
             "@npm//karma-chrome-launcher",
-            "@npm//karma-coverage-istanbul-reporter",
+            "@npm//karma-coverage",
             "@npm//karma-jasmine",
             "@npm//karma-jasmine-html-reporter",
             "@npm//puppeteer",

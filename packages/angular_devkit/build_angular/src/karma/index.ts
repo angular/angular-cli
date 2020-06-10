@@ -155,7 +155,10 @@ export function execute(
           // Complete the observable once the Karma server returns.
           const karmaServer = new karma.Server(
             transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions,
-            () => subscriber.complete(),
+            (exitCode: number) => {
+              subscriber.next({ success: exitCode === 0 });
+              subscriber.complete();
+            },
           );
           // karma typings incorrectly define start's return value as void
           // tslint:disable-next-line:no-use-of-empty-return-value
