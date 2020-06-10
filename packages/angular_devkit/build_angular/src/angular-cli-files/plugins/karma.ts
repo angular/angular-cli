@@ -88,12 +88,32 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
 
   config.reporters.unshift('@angular-devkit/build-angular--event-reporter');
 
-  // When using code-coverage, auto-add coverage-istanbul.
-  config.reporters = config.reporters || [];
-  if (options.codeCoverage && config.reporters.indexOf('coverage-istanbul') === -1) {
-    config.reporters.unshift('coverage-istanbul');
+  // When using code-coverage, auto-add karma-coverage.
+  if (options.codeCoverage) {
+    config.plugins = config.plugins || [];
+    config.reporters = config.reporters || [];
+    const {plugins, reporters} = config;
+    const hasCoveragePlugin = plugins.some((p: {}) => 'reporter:coverage' in p);
+    const hasIstanbulPlugin = plugins.some((p: {}) => 'reporter:coverage-istanbul' in p);
+    const hasCoverageReporter = reporters.includes('coverage');
+    const hasIstanbulReporter = reporters.includes('coverage-istanbul');
+    if (hasCoveragePlugin && !hasCoverageReporter) {
+      reporters.push('coverage');
+    }
+    else if (hasIstanbulPlugin && !hasIstanbulReporter) {
+      // coverage-istanbul is deprecated in favor of karma-coverage
+      reporters.push('coverage-istanbul');
+    }
+    else {
+      throw new Error('karma-coverage must be installed in order to run code coverage');
+    }
+    if (hasIstanbulPlugin) {
+      logger.warn(`'karma-coverage-istanbul-reporter' usage has been deprecated since version 11.\n` +
+       `Please install 'karma-coverage' and update 'karma.conf.js.' ` +
+       'For more info, see https://github.com/karma-runner/karma-coverage/blob/master/README.md');
+    }
   }
-    
+
   // Add webpack config.
   const webpackConfig = config.buildWebpack.webpackConfig;
   const webpackMiddlewareConfig = {
@@ -188,7 +208,7 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
       logger.error(statsErrorsToString(json, statsConfig));
       lastCompilationHash = undefined;
       // Emit a failure build event if there are compilation errors.
-      failureCb && failureCb();
+      failureCb();
     } else if (stats.hash != lastCompilationHash) {
       // Refresh karma only when there are no webpack errors, and if the compilation changed.
       lastCompilationHash = stats.hash;
@@ -269,9 +289,9 @@ const eventReporter: any = function (this: any, baseReporterDecorator: any, conf
 
   this.onRunComplete = function (_browsers: any, results: any) {
     if (results.exitCode === 0) {
-      successCb && successCb();
+      successCb();
     } else {
-      failureCb && failureCb();
+      failureCb();
     }
   }
 
