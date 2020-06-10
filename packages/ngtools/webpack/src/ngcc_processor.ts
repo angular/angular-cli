@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { LogLevel, Logger, PathMappings, process as mainNgcc } from '@angular/compiler-cli/ngcc';
+import { LogLevel, Logger, process as mainNgcc } from '@angular/compiler-cli/ngcc';
 import { spawnSync } from 'child_process';
 import { accessSync, constants, existsSync } from 'fs';
 import * as path from 'path';
@@ -28,7 +28,6 @@ export class NgccProcessor {
   private _processedModules = new Set<string>();
   private _logger: NgccLogger;
   private _nodeModulesDirectory: string;
-  private _pathMappings: PathMappings | undefined;
 
   constructor(
     private readonly propertiesToConsider: string[],
@@ -36,19 +35,10 @@ export class NgccProcessor {
     private readonly compilationWarnings: (Error | string)[],
     private readonly compilationErrors: (Error | string)[],
     private readonly basePath: string,
-    private readonly compilerOptions: ts.CompilerOptions,
     private readonly tsConfigPath: string,
   ) {
     this._logger = new NgccLogger(this.compilationWarnings, this.compilationErrors);
     this._nodeModulesDirectory = this.findNodeModulesDirectory(this.basePath);
-
-    const { baseUrl, paths } = this.compilerOptions;
-    if (baseUrl && paths) {
-      this._pathMappings = {
-        baseUrl,
-        paths,
-      };
-    }
   }
 
   /** Process the entire node modules tree. */
@@ -130,9 +120,6 @@ export class NgccProcessor {
       compileAllFormats: false,
       createNewEntryPointFormats: true,
       logger: this._logger,
-      // Path mappings are not longer required since NGCC 9.1
-      // We keep using them to be backward compatible with NGCC 9.0
-      pathMappings: this._pathMappings,
       tsConfigPath: this.tsConfigPath,
     });
     timeEnd(timeLabel);
