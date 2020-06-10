@@ -29,6 +29,7 @@ import {
   formatDiagnostics,
   readConfiguration,
 } from '@angular/compiler-cli';
+import { constructorParametersDownlevelTransform } from '@angular/compiler-cli/src/tooling';
 import { ChildProcess, ForkOptions, fork } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -59,7 +60,6 @@ import {
   replaceServerBootstrap,
 } from './transformers';
 import { collectDeepNodes } from './transformers/ast_helpers';
-import { downlevelConstructorParameters } from './transformers/ctor-parameters';
 import { removeIvyJitSupportCalls } from './transformers/remove-ivy-jit-support-calls';
 import {
   AUTO_START_ARG,
@@ -244,6 +244,11 @@ export class AngularCompilerPlugin {
       this._compilerOptions.i18nInMissingTranslations =
         options.missingTranslation as 'error' | 'warning' | 'ignore';
     }
+
+    // For performance, disable AOT decorator downleveling transformer for applications in the CLI.
+    // The transformer is not needed for VE or Ivy in this plugin since Angular decorators are removed.
+    // While the transformer would make no changes, it would still need to walk each source file AST.
+    this._compilerOptions.annotationsAs = 'decorators' as 'decorators';
 
     // Process forked type checker options.
     if (options.forkTypeChecker !== undefined) {
@@ -1021,7 +1026,13 @@ export class AngularCompilerPlugin {
         replaceResources(isAppPath, getTypeChecker, this._options.directTemplateLoading));
       // Downlevel constructor parameters for DI support
       // This is required to support forwardRef in ES2015 due to TDZ issues
-      this._transformers.push(downlevelConstructorParameters(getTypeChecker));
+      // This wrapper is needed here due to the program not being available until after the transformers are created.
+      const downlevelFactory: ts.TransformerFactory<ts.SourceFile> = (context) => {
+        const factory = constructorParametersDownlevelTransform(this._getTsProgram() as ts.Program);
+
+        return factory(context);
+      };
+      this._transformers.push(downlevelFactory);
     } else {
       if (!this._compilerOptions.enableIvy) {
         // Remove unneeded angular decorators in VE.
