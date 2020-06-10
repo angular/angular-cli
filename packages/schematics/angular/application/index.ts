@@ -179,6 +179,14 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
     });
   }
 
+  if (options.strict) {
+    if (!('@schematics/angular:application' in schematics)) {
+      schematics['@schematics/angular:application'] = {};
+    }
+
+    (schematics['@schematics/angular:application'] as JsonObject).strict = true;
+  }
+
   const sourceRoot = join(normalize(projectRoot), 'src');
   let budgets = [];
   if (options.strict) {
