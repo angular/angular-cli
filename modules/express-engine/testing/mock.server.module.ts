@@ -8,7 +8,7 @@
 import { Component, Inject, InjectionToken, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ServerModule } from '@angular/platform-server';
-import { REQUEST } from '@nguniversal/express-engine/tokens';
+import { REQUEST, RESPONSE } from '@nguniversal/express-engine/tokens';
 
 @Component({selector: 'root', template: 'some template'})
 export class MockComponent {
@@ -33,6 +33,19 @@ export class RequestComponent {
   bootstrap: [RequestComponent],
 })
 export class RequestServerModule {
+}
+
+@Component({selector: 'root', template: `statusCode:{{_res.statusCode}}`})
+export class ResponseComponent {
+  constructor(@Inject(RESPONSE) public readonly _res: any) {}
+}
+
+@NgModule({
+  imports: [BrowserModule.withServerTransition({appId: 'mock'}), ServerModule],
+  declarations: [ResponseComponent],
+  bootstrap: [ResponseComponent],
+})
+export class ResponseServerModule {
 }
 
 export const SOME_TOKEN = new InjectionToken<string>('SOME_TOKEN');

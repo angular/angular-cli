@@ -50,6 +50,7 @@ export function ngExpressEngine(setupOptions: Readonly<NgSetupOptions>) {
       }
 
       const req = options.req;
+      const res = options.res || req.res;
 
       const renderOptions: RenderOptions = Object.assign({}, options);
 
@@ -58,8 +59,7 @@ export function ngExpressEngine(setupOptions: Readonly<NgSetupOptions>) {
       renderOptions.document = options.document || getDocument(filePath);
 
       renderOptions.providers = options.providers || [];
-      renderOptions.providers =
-        renderOptions.providers.concat(getReqResProviders(options.req, options.res));
+      renderOptions.providers = renderOptions.providers.concat(getReqResProviders(req, res));
 
       engine.render(renderOptions)
         .then(html => callback(null, html))

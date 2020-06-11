@@ -6,6 +6,7 @@ import { SOME_TOKEN } from '../testing/mock.server.module';
 import {
   MockServerModuleNgFactory,
   RequestServerModuleNgFactory,
+  ResponseServerModuleNgFactory,
   TokenServerModuleNgFactory
 } from '../testing/mock.server.module.ngfactory';
 
@@ -49,6 +50,27 @@ describe('test runner', () => {
         throw err;
       }
       expect(html).toContain('url:http://localhost:4200');
+      done();
+    });
+  });
+
+  it('should be able to inject RESPONSE token', (done) => {
+    const someStatusCode = 400;
+    ngExpressEngine({bootstrap: ResponseServerModuleNgFactory})(null as any as string, {
+      req: {
+        get: () => 'localhost',
+        res : {
+          statusCode: someStatusCode
+        }
+      } as any,
+      // TODO this shouldn't be required
+      bootstrap: ResponseServerModuleNgFactory,
+      document: '<root></root>'
+    }, (err, html) => {
+      if (err) {
+        throw err;
+      }
+      expect(html).toContain(`statusCode:${someStatusCode}`);
       done();
     });
   });
