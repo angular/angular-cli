@@ -59,7 +59,8 @@ describe('Web Worker Schematic', () => {
     const path = '/projects/bar/tsconfig.worker.json';
     expect(tree.exists(path)).toEqual(true);
 
-    const { compilerOptions } = JSON.parse(tree.readContent(path));
+    // tslint:disable-next-line: no-any
+    const { compilerOptions } = parseJson(tree.readContent(path).toString(), JsonParseMode.Loose) as any;
     expect(compilerOptions.outDir).toBe('../../out-tsc/worker');
   });
 
@@ -123,7 +124,8 @@ describe('Web Worker Schematic', () => {
     const path = '/tsconfig.worker.json';
     expect(tree.exists(path)).toEqual(true);
 
-    const { compilerOptions } = JSON.parse(tree.readContent(path));
+    // tslint:disable-next-line: no-any
+    const { compilerOptions } = parseJson(tree.readContent(path).toString(), JsonParseMode.Loose) as any;
     expect(compilerOptions.outDir).toBe('./out-tsc/worker');
   });
 

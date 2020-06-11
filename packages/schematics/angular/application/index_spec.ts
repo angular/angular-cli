@@ -13,6 +13,11 @@ import { getFileContent } from '../utility/test';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as ApplicationOptions, Style, ViewEncapsulation } from './schema';
 
+// tslint:disable-next-line: no-any
+function readJsonFile(tree: UnitTestTree, path: string): any {
+  return parseJson(tree.readContent(path).toString(), JsonParseMode.Loose);
+}
+
 describe('Application Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
@@ -79,8 +84,7 @@ describe('Application Schematic', () => {
     const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
       .toPromise();
 
-    // tslint:disable-next-line:no-any
-    const { references } = parseJson(tree.readContent('/tsconfig.json').toString(), JsonParseMode.Loose) as any;
+    const { references } = readJsonFile(tree, '/tsconfig.json');
     expect(references).toEqual([
       { path: './projects/foo/tsconfig.app.json' },
       { path: './projects/foo/tsconfig.spec.json' },
@@ -147,17 +151,20 @@ describe('Application Schematic', () => {
     expect(content).toContain(`import { enableProdMode, ViewEncapsulation } from '@angular/core'`);
   });
 
-  it('should set the right paths in the tsconfig files', async () => {
+  it('should set the right paths in the tsconfig.app.json', async () => {
     const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
       .toPromise();
-    let path = '/projects/foo/tsconfig.app.json';
-    let content = tree.readContent(path);
-    expect(content).toMatch('../../tsconfig.base.json');
-    path = '/projects/foo/tsconfig.spec.json';
-    content = tree.readContent(path);
-    expect(content).toMatch('../../tsconfig.base.json');
-    const specTsConfig = JSON.parse(content);
-    expect(specTsConfig.files).toEqual(['src/test.ts', 'src/polyfills.ts']);
+    const { files, extends: _extends } = readJsonFile(tree, '/projects/foo/tsconfig.app.json');
+    expect(files).toEqual(['src/main.ts', 'src/polyfills.ts']);
+    expect(_extends).toBe('../../tsconfig.base.json');
+  });
+
+  it('should set the right paths in the tsconfig.spec.json', async () => {
+    const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
+      .toPromise();
+    const { files, extends: _extends } = readJsonFile(tree, '/projects/foo/tsconfig.spec.json');
+    expect(files).toEqual(['src/test.ts', 'src/polyfills.ts']);
+    expect(_extends).toBe('../../tsconfig.base.json');
   });
 
   it('should set the right path and prefix in the tslint file', async () => {
@@ -384,9 +391,9 @@ describe('Application Schematic', () => {
       const options = { ...defaultOptions, projectRoot: '' };
       const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
         .toPromise();
-      const appTsConfig = JSON.parse(tree.readContent('/tsconfig.app.json'));
+      const appTsConfig = readJsonFile(tree, '/tsconfig.app.json');
       expect(appTsConfig.extends).toEqual('./tsconfig.base.json');
-      const specTsConfig = JSON.parse(tree.readContent('/tsconfig.spec.json'));
+      const specTsConfig = readJsonFile(tree, '/tsconfig.spec.json');
       expect(specTsConfig.extends).toEqual('./tsconfig.base.json');
       expect(specTsConfig.files).toEqual(['src/test.ts', 'src/polyfills.ts']);
     });
@@ -427,9 +434,9 @@ describe('Application Schematic', () => {
       expect(buildOpt.polyfills).toEqual('foo/src/polyfills.ts');
       expect(buildOpt.tsConfig).toEqual('foo/tsconfig.app.json');
 
-      const appTsConfig = JSON.parse(tree.readContent('/foo/tsconfig.app.json'));
+      const appTsConfig = readJsonFile(tree, '/foo/tsconfig.app.json');
       expect(appTsConfig.extends).toEqual('../tsconfig.base.json');
-      const specTsConfig = JSON.parse(tree.readContent('/foo/tsconfig.spec.json'));
+      const specTsConfig = readJsonFile(tree, '/foo/tsconfig.spec.json');
       expect(specTsConfig.extends).toEqual('../tsconfig.base.json');
     });
   });
