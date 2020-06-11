@@ -12,7 +12,8 @@ const tsConfigPath = 'tsconfig.base.json';
 export function updateJsonFile(filePath: string, fn: (json: any) => any | void) {
   return readFile(filePath)
     .then(tsConfigJson => {
-      const tsConfig = JSON.parse(tsConfigJson);
+      // Remove single and multiline comments
+      const tsConfig = JSON.parse(tsConfigJson.replace(/\/\*\s(.|\n|\r)*\s\*\/|\/\/.*/g, ''));
       const result = fn(tsConfig) || tsConfig;
 
       return writeFile(filePath, JSON.stringify(result, null, 2));
