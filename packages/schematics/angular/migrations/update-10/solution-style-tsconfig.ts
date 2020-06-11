@@ -10,9 +10,13 @@ import { DirEntry, Rule, chain } from '@angular-devkit/schematics';
 import { findPropertyInAstObject } from '../../utility/json-utils';
 import { getWorkspace } from '../../utility/workspace';
 
-const SOLUTIONS_TS_CONFIG_HEADER = '// This is a "Solution Style" tsconfig.json file, and is used by editors and TypeScript’s' +
-  'language server to improve development experience.\n' +
-  '// It is not intended to be used to perform a compilation.\n';
+const SOLUTIONS_TS_CONFIG_HEADER = `/*
+  This is a "Solution Style" tsconfig.json file, and is used by editors and TypeScript’s language server to improve development experience.
+  It is not intended to be used to perform a compilation.
+
+  To learn more about this file see: https://angular.io/config/solution-tsconfig.
+*/
+`;
 
 function* visitExtendedJsonFiles(directory: DirEntry): IterableIterator<[string, JsonAstString]> {
   for (const path of directory.subfiles) {

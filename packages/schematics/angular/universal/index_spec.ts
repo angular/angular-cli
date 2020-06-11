@@ -87,8 +87,9 @@ describe('Universal Schematic', () => {
       .toPromise();
     const filePath = '/tsconfig.server.json';
     expect(tree.exists(filePath)).toEqual(true);
-    const contents = tree.readContent(filePath);
-    expect(JSON.parse(contents)).toEqual({
+    // tslint:disable-next-line: no-any
+    const contents = parseJson(tree.readContent(filePath).toString(), JsonParseMode.Loose) as any;
+    expect(contents).toEqual({
       extends: './tsconfig.app.json',
       compilerOptions: {
         outDir: './out-tsc/server',
@@ -112,8 +113,9 @@ describe('Universal Schematic', () => {
       .toPromise();
     const filePath = '/projects/bar/tsconfig.server.json';
     expect(tree.exists(filePath)).toEqual(true);
-    const contents = tree.readContent(filePath);
-    expect(JSON.parse(contents)).toEqual({
+    // tslint:disable-next-line: no-any
+    const contents = parseJson(tree.readContent(filePath).toString(), JsonParseMode.Loose) as any;
+    expect(contents).toEqual({
       extends: './tsconfig.app.json',
       compilerOptions: {
         outDir: '../../out-tsc/server',

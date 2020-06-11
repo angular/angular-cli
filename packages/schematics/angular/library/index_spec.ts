@@ -14,8 +14,9 @@ import { latestVersions } from '../utility/latest-versions';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as GenerateLibrarySchema } from './schema';
 
-function getJsonFileContent(tree: UnitTestTree, path: string) {
-  return JSON.parse(tree.readContent(path));
+// tslint:disable-next-line: no-any
+function getJsonFileContent(tree: UnitTestTree, path: string): any {
+  return parseJson(tree.readContent(path).toString(), JsonParseMode.Loose);
 }
 
 describe('Library Schematic', () => {
@@ -264,13 +265,13 @@ describe('Library Schematic', () => {
     const pkgJson = JSON.parse(tree.readContent(pkgJsonPath));
     expect(pkgJson.name).toEqual(scopedName);
 
-    const tsConfigJson = JSON.parse(tree.readContent('/projects/myscope/mylib/tsconfig.spec.json'));
+    const tsConfigJson = getJsonFileContent(tree, '/projects/myscope/mylib/tsconfig.spec.json');
     expect(tsConfigJson.extends).toEqual('../../../tsconfig.base.json');
 
     const cfg = JSON.parse(tree.readContent('/angular.json'));
     expect(cfg.projects['@myscope/mylib']).toBeDefined();
 
-    const rootTsCfg = JSON.parse(tree.readContent('/tsconfig.base.json'));
+    const rootTsCfg = getJsonFileContent(tree, '/tsconfig.base.json');
     expect(rootTsCfg.compilerOptions.paths['@myscope/mylib']).toEqual(['dist/myscope/mylib/myscope-mylib', 'dist/myscope/mylib']);
 
     const karmaConf = getFileContent(tree, '/projects/myscope/mylib/karma.conf.js');
@@ -307,16 +308,16 @@ describe('Library Schematic', () => {
     const workspaceTree = await schematicRunner.runSchematicAsync('workspace', { ...workspaceOptions, newProjectRoot: '' }).toPromise();
     const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree)
       .toPromise();
-    const config = JSON.parse(tree.readContent('/angular.json'));
+    const config = getJsonFileContent(tree, '/angular.json');
     const project = config.projects.foo;
     expect(project.root).toEqual('foo');
     const buildOpt = project.architect.build.options;
     expect(buildOpt.project).toEqual('foo/ng-package.json');
     expect(buildOpt.tsConfig).toEqual('foo/tsconfig.lib.json');
 
-    const appTsConfig = JSON.parse(tree.readContent('/foo/tsconfig.lib.json'));
+    const appTsConfig = getJsonFileContent(tree, '/foo/tsconfig.lib.json');
     expect(appTsConfig.extends).toEqual('../tsconfig.base.json');
-    const specTsConfig = JSON.parse(tree.readContent('/foo/tsconfig.spec.json'));
+    const specTsConfig = getJsonFileContent(tree, '/foo/tsconfig.spec.json');
     expect(specTsConfig.extends).toEqual('../tsconfig.base.json');
   });
 
@@ -333,7 +334,7 @@ describe('Library Schematic', () => {
       .toPromise();
 
     // tslint:disable-next-line:no-any
-    const { references } = parseJson(tree.readContent('/tsconfig.json').toString(), JsonParseMode.Loose) as any;
+    const { references } = getJsonFileContent(tree, '/tsconfig.json');
     expect(references).toEqual([
       { path: './projects/foo/tsconfig.lib.json' },
       { path: './projects/foo/tsconfig.spec.json' },

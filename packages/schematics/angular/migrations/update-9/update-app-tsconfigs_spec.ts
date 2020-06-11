@@ -6,11 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { JsonParseMode, JsonValue, parseJson } from '@angular-devkit/core';
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { getWorkspaceTargets, updateWorkspaceTargets } from './update-workspace-config_spec';
 
 // tslint:disable-next-line: no-any
+function readJsonFile(tree: UnitTestTree, path: string): any {
+  return parseJson(tree.readContent(path).toString(), JsonParseMode.Loose);
+}
+
 function overrideJsonFile(tree: UnitTestTree, path: string, newContent: object) {
   tree.overwrite(path, JSON.stringify(newContent, undefined, 2));
 }
@@ -63,7 +68,7 @@ describe('Migration to version 9', () => {
     it('should update apps tsConfig with stricter files inclusions', async () => {
       overrideJsonFile(tree, 'tsconfig.app.json', defaultTsConfigOptions);
       const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
-      const { exclude, files, include } = JSON.parse(tree2.readContent('tsconfig.app.json'));
+      const { exclude, files, include } = readJsonFile(tree2 , 'tsconfig.app.json');
       expect(exclude).toBeUndefined();
       expect(files).toEqual(['src/main.ts', 'src/polyfills.ts']);
       expect(include).toEqual(['src/**/*.d.ts']);
@@ -90,7 +95,7 @@ describe('Migration to version 9', () => {
       updateWorkspaceTargets(tree2, config, 'another-app');
 
       const tree3 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree2.branch()).toPromise();
-      const { exclude, files } = JSON.parse(tree3.readContent(tsCfgPath));
+      const { exclude, files } = readJsonFile(tree3, tsCfgPath);
       expect(exclude).toBeUndefined();
       expect(files).toEqual(['src/main.ts', 'src/polyfills.ts']);
     });
@@ -104,7 +109,7 @@ describe('Migration to version 9', () => {
       overrideJsonFile(tree, 'tsconfig.app.json', tsConfigContent);
 
       const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
-      const { files, include } = JSON.parse(tree2.readContent('tsconfig.app.json'));
+      const { files, include } = readJsonFile(tree2, 'tsconfig.app.json');
       expect(files).toEqual(['src/main.ts', 'src/polyfills.ts']);
       expect(include).toEqual(['foo.ts']);
     });
@@ -119,7 +124,7 @@ describe('Migration to version 9', () => {
       overrideJsonFile(tree, 'tsconfig.app.json', tsConfigContent);
 
       const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
-      const { files, include, exclude } = JSON.parse(tree2.readContent('tsconfig.app.json'));
+      const { files, include, exclude } = readJsonFile(tree2, 'tsconfig.app.json');
       expect(files).toEqual(['src/main.ts', 'src/polyfills.ts']);
       expect(include).toEqual(['src/**/*.d.ts']);
       expect(exclude).toBeUndefined();
@@ -134,7 +139,7 @@ describe('Migration to version 9', () => {
       overrideJsonFile(tree, 'tsconfig.app.json', tsConfigContent);
 
       const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
-      const { files, include, exclude } = JSON.parse(tree2.readContent('tsconfig.app.json'));
+      const { files, include, exclude } = readJsonFile(tree2, 'tsconfig.app.json');
       expect(files).toEqual(['src/main.ts', 'src/polyfills.ts']);
       expect(include).toEqual(['foo.ts', 'src/**/*.d.ts']);
       expect(exclude).toBeUndefined();
@@ -143,7 +148,7 @@ describe('Migration to version 9', () => {
     it(`should remove angularCompilerOptions when enableIvy is true and it's the only option`, async () => {
       overrideJsonFile(tree, 'tsconfig.app.json', defaultTsConfigOptions);
       const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
-      const { angularCompilerOptions } = JSON.parse(tree2.readContent('tsconfig.app.json'));
+      const { angularCompilerOptions } = readJsonFile(tree2, 'tsconfig.app.json');
       expect(angularCompilerOptions).toBeUndefined();
     });
 
@@ -158,7 +163,7 @@ describe('Migration to version 9', () => {
 
       overrideJsonFile(tree, 'tsconfig.app.json', tsConfigContent);
       const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
-      const { angularCompilerOptions } = JSON.parse(tree2.readContent('tsconfig.app.json'));
+      const { angularCompilerOptions } = readJsonFile(tree2, 'tsconfig.app.json');
       expect(angularCompilerOptions.enableIvy).toBeUndefined();
       expect(angularCompilerOptions.fullTemplateTypeCheck).toBe(true);
     });
@@ -174,7 +179,7 @@ describe('Migration to version 9', () => {
 
       overrideJsonFile(tree, 'tsconfig.app.json', tsConfigContent);
       const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
-      const { angularCompilerOptions } = JSON.parse(tree2.readContent('tsconfig.app.json'));
+      const { angularCompilerOptions } = readJsonFile(tree2, 'tsconfig.app.json');
       expect(angularCompilerOptions.enableIvy).toBe(false);
       expect(angularCompilerOptions.fullTemplateTypeCheck).toBe(true);
     });
@@ -190,10 +195,10 @@ describe('Migration to version 9', () => {
 
       overrideJsonFile(tree, 'tsconfig.app.json', tsConfigContent);
       const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
-      const { compilerOptions } = JSON.parse(tree2.readContent('tsconfig.app.json'));
+      const { compilerOptions } = readJsonFile(tree2, 'tsconfig.app.json');
       expect(compilerOptions.module).toBeUndefined();
 
-      const { compilerOptions: workspaceCompilerOptions } = JSON.parse(tree2.readContent('tsconfig.json'));
+      const { compilerOptions: workspaceCompilerOptions } = readJsonFile(tree2, 'tsconfig.json');
       expect(workspaceCompilerOptions.module).toBe('esnext');
     });
 
@@ -209,7 +214,7 @@ describe('Migration to version 9', () => {
 
       overrideJsonFile(tree, 'tsconfig.app.json', tsConfigContent);
       const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
-      const { compilerOptions } = JSON.parse(tree2.readContent('tsconfig.app.json'));
+      const { compilerOptions } = readJsonFile(tree2, 'tsconfig.app.json');
       expect(compilerOptions.module).toBe('esnext');
     });
 
@@ -238,7 +243,7 @@ describe('Migration to version 9', () => {
 
       overrideJsonFile(tree, 'tsconfig.server.json', tsConfigContent);
       const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
-      const { compilerOptions } = JSON.parse(tree2.readContent('tsconfig.server.json'));
+      const { compilerOptions } = readJsonFile(tree2, 'tsconfig.server.json');
       expect(compilerOptions.module).toBe('commonjs');
     });
 
@@ -250,7 +255,7 @@ describe('Migration to version 9', () => {
 
       overrideJsonFile(tree, 'tsconfig.json', tsConfigContent);
       const tree2 = await schematicRunner.runSchematicAsync('workspace-version-9', {}, tree.branch()).toPromise();
-      const { compilerOptions } = JSON.parse(tree2.readContent('tsconfig.json'));
+      const { compilerOptions } = readJsonFile(tree2, 'tsconfig.json');
       expect(compilerOptions.module).toBe('esnext');
     });
   });
