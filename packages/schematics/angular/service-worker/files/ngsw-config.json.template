@@ -11,7 +11,8 @@
           "/index.html",
           "/manifest.webmanifest",
           "/*.css",
-          "/*.js"
+          "/*.js",
+          "!/*-es5*.js"
         ]
       }
     }, {
@@ -21,7 +22,8 @@
       "resources": {
         "files": [
           "/assets/**",
-          "<%= resourcesOutputPath %>/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)"
+          "<%= resourcesOutputPath %>/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)",
+          "/*-es5*.js"
         ]
       }
     }
