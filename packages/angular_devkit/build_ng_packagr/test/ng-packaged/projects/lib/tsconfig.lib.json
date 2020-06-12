@@ -3,12 +3,18 @@
   "compilerOptions": {
     "target": "es2015",
     "declaration": true,
+    "declarationMap": true,
     "inlineSources": true,
     "types": [],
     "lib": [
       "dom",
       "es2018"
     ]
+  },
+  "angularCompilerOptions": {
+    "skipTemplateCodegen": true,
+    "strictMetadataEmit": true,
+    "enableResourceInlining": true
   },
   "exclude": [
     "src/test.ts",
