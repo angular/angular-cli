@@ -27,8 +27,8 @@ export function insertImport(source: ts.SourceFile, fileToEdit: string, symbolNa
   const relevantImports = allImports.filter(node => {
     // StringLiteral of the ImportDeclaration is the import file (fileName in this case).
     const importFiles = node.getChildren()
-      .filter(child => child.kind === ts.SyntaxKind.StringLiteral)
-      .map(n => (n as ts.StringLiteral).text);
+      .filter(ts.isStringLiteral)
+      .map(n => n.text);
 
     return importFiles.filter(file => file === fileName).length === 1;
   });
@@ -64,8 +64,8 @@ export function insertImport(source: ts.SourceFile, fileToEdit: string, symbolNa
   }
 
   // no such import declaration exists
-  const useStrict = findNodes(rootNode, ts.SyntaxKind.StringLiteral)
-    .filter((n: ts.StringLiteral) => n.text === 'use strict');
+  const useStrict = findNodes(rootNode, ts.isStringLiteral)
+    .filter((n) => n.text === 'use strict');
   let fallbackPos = 0;
   if (useStrict.length > 0) {
     fallbackPos = useStrict[0].end;
@@ -97,19 +97,42 @@ export function insertImport(source: ts.SourceFile, fileToEdit: string, symbolNa
  * the last child even when node of kind has been found.
  * @return all nodes of kind, or [] if none is found
  */
-export function findNodes(node: ts.Node, kind: ts.SyntaxKind, max = Infinity, recursive = false): ts.Node[] {
+export function findNodes(node: ts.Node, kind: ts.SyntaxKind, max?: number, recursive?: boolean): ts.Node[];
+
+/**
+ * Find all nodes from the AST in the subtree that satisfy a type guard.
+ * @param node
+ * @param guard
+ * @param max The maximum number of items to return.
+ * @param recursive Continue looking for nodes of kind recursive until end
+ * the last child even when node of kind has been found.
+ * @return all nodes that satisfy the type guard, or [] if none is found
+ */
+export function findNodes<T extends ts.Node>(node: ts.Node, guard: (node: ts.Node) => node is T, max?: number, recursive?: boolean): T[];
+
+export function findNodes<T extends ts.Node>(
+  node: ts.Node,
+  kindOrGuard: ts.SyntaxKind | ((node: ts.Node) => node is T),
+  max = Infinity,
+  recursive = false,
+): T[] {
   if (!node || max == 0) {
     return [];
   }
 
-  const arr: ts.Node[] = [];
-  if (node.kind === kind) {
+  const test =
+    typeof kindOrGuard === 'function'
+      ? kindOrGuard
+      : (node: ts.Node): node is T => node.kind === kindOrGuard;
+
+  const arr: T[] = [];
+  if (test(node)) {
     arr.push(node);
     max--;
   }
-  if (max > 0 && (recursive || node.kind !== kind)) {
+  if (max > 0 && (recursive || !test(node))) {
     for (const child of node.getChildren()) {
-      findNodes(child, kind, max).forEach(node => {
+      findNodes(child, test, max).forEach((node) => {
         if (max > 0) {
           arr.push(node);
         }
@@ -271,10 +294,9 @@ function _angularImportsFromNode(node: ts.ImportDeclaration,
 
 export function getDecoratorMetadata(source: ts.SourceFile, identifier: string,
                                      module: string): ts.Node[] {
-  const angularImports: {[name: string]: string}
-    = findNodes(source, ts.SyntaxKind.ImportDeclaration)
-    .map((node: ts.ImportDeclaration) => _angularImportsFromNode(node, source))
-    .reduce((acc: {[name: string]: string}, current: {[name: string]: string}) => {
+  const angularImports = findNodes(source, ts.isImportDeclaration)
+    .map((node) => _angularImportsFromNode(node, source))
+    .reduce((acc, current) => {
       for (const key of Object.keys(current)) {
         acc[key] = current[key];
       }
@@ -351,10 +373,10 @@ export function getMetadataField(
   metadataField: string,
 ): ts.ObjectLiteralElement[] {
   return node.properties
-    .filter(prop => ts.isPropertyAssignment(prop))
+    .filter(ts.isPropertyAssignment)
     // Filter out every fields that's not "metadataField". Also handles string literals
     // (but not expressions).
-    .filter(({ name }: ts.PropertyAssignment) => {
+    .filter(({ name }) => {
       return (ts.isIdentifier(name) || ts.isStringLiteral(name))
         && name.getText() === metadataField;
     });
@@ -556,17 +578,17 @@ export function isImported(source: ts.SourceFile,
                            importPath: string): boolean {
   const allNodes = getSourceNodes(source);
   const matchingNodes = allNodes
-    .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
-    .filter((imp: ts.ImportDeclaration) => imp.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral)
-    .filter((imp: ts.ImportDeclaration) => {
-      return (imp.moduleSpecifier as ts.StringLiteral).text === importPath;
-    })
-    .filter((imp: ts.ImportDeclaration) => {
+    .filter(ts.isImportDeclaration)
+    .filter(
+      (imp) => ts.isStringLiteral(imp.moduleSpecifier) && imp.moduleSpecifier.text === importPath,
+    )
+    .filter((imp) => {
       if (!imp.importClause) {
         return false;
       }
-      const nodes = findNodes(imp.importClause, ts.SyntaxKind.ImportSpecifier)
-        .filter(n => n.getText() === classifiedName);
+      const nodes = findNodes(imp.importClause, ts.isImportSpecifier).filter(
+        (n) => n.getText() === classifiedName,
+      );
 
       return nodes.length > 0;
     });
@@ -587,21 +609,22 @@ export function getEnvironmentExportName(source: ts.SourceFile): string | null {
   const allNodes = getSourceNodes(source);
 
   allNodes
-    .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
+    .filter(ts.isImportDeclaration)
     .filter(
-      (declaration: ts.ImportDeclaration) =>
+      (declaration) =>
         declaration.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral &&
         declaration.importClause !== undefined,
     )
-    .map((declaration: ts.ImportDeclaration) =>
+    .map((declaration) =>
       // If `importClause` property is defined then the first
       // child will be `NamedImports` object (or `namedBindings`).
       (declaration.importClause as ts.ImportClause).getChildAt(0),
     )
     // Find those `NamedImports` object that contains `environment` keyword
     // in its text. E.g. `{ environment as env }`.
-    .filter((namedImports: ts.NamedImports) => namedImports.getText().includes('environment'))
-    .forEach((namedImports: ts.NamedImports) => {
+    .filter(ts.isNamedImports)
+    .filter((namedImports) => namedImports.getText().includes('environment'))
+    .forEach((namedImports) => {
       for (const specifier of namedImports.elements) {
         // `propertyName` is defined if the specifier
         // has an aliased import.
@@ -676,10 +699,10 @@ export function addRouteDeclarationToModule(
     let routesVar;
     if (routesArg.kind === ts.SyntaxKind.Identifier) {
       routesVar = source.statements
-        .filter((s: ts.Statement) => s.kind === ts.SyntaxKind.VariableStatement)
-        .find((v: ts.VariableStatement) => {
+        .filter(ts.isVariableStatement)
+        .find((v) => {
           return v.declarationList.declarations[0].name.getText() === routesVarName;
-        }) as ts.VariableStatement | undefined;
+        });
     }
 
     if (!routesVar) {
