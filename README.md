@@ -7,7 +7,6 @@
 # Table of Contents
 * [Introduction](#introduction)
 * [Getting Started with Universal](#getting-started)
-* [Upgrading to Version 8](#version-8)
 * [Packages](#packages)
 * [Universal "Gotchas"](#universal-gotchas)
 * [Roadmap](#roadmap)
@@ -28,9 +27,6 @@ The Universal project is driven by community contributions. Please send us your 
 # Getting Started
 
 [Angular Universal Guide](https://angular.io/guide/universal)
-
-# Version 8
-Follow this upgrade guide if you are upgrading an existing Universal project to Angular version 8 - [Guide](/docs/v8-upgrade-guide.md)
 
 # Packages
 The packages from this repo are published as scoped packages under [@nguniversal](https://www.npmjs.com/search?q=%40nguniversal)
@@ -60,9 +56,6 @@ Moved to [/docs/gotchas.md](/docs/gotchas.md)
 - Write documentation for core API
 - Support [AppShell](https://developers.google.com/web/updates/2015/11/app-shell) use cases
 - Development server/watch mode builder with livereload for CLI
-
-## In Progress
-- Static site rendering
 
 ## Planning
 - Full client rehydration strategy that reuses DOM elements/CSS rendered on the server
