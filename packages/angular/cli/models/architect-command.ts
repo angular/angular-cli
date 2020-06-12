@@ -66,8 +66,12 @@ export abstract class ArchitectCommand<
       return;
     }
 
-    const commandLeftovers = options['--'];
     let projectName = options.project;
+    if (projectName && !this._workspace.projects.has(projectName)) {
+      throw new Error(`Project '${projectName}' does not exist.`);
+    }
+
+    const commandLeftovers = options['--'];
     const targetProjectNames: string[] = [];
     for (const [name, project] of this._workspace.projects) {
       if (project.targets.has(this.target)) {
