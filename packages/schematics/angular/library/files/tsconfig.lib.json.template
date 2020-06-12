@@ -4,6 +4,7 @@
     "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/lib",
     "target": "es2015",
     "declaration": true,
+    "declarationMap": true,
     "inlineSources": true,
     "types": [],
     "lib": [
