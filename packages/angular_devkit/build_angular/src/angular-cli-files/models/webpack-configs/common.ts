@@ -374,13 +374,13 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         (!differentialLoadingNeeded || (differentialLoadingNeeded && fullDifferential)),
     };
 
+    const globalScriptsNames = globalScriptsByBundleName.map(s => s.bundleName);
     extraMinimizers.push(
       new TerserPlugin({
         sourceMap: scriptsSourceMap,
         parallel: true,
         cache: true,
-        chunkFilter: (chunk: compilation.Chunk) =>
-          !globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
+        exclude: globalScriptsNames,
         terserOptions,
       }),
       // Script bundles are fully optimized here in one step since they are never downleveled.
@@ -389,8 +389,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         sourceMap: scriptsSourceMap,
         parallel: true,
         cache: true,
-        chunkFilter: (chunk: compilation.Chunk) =>
-          globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
+        include: globalScriptsNames,
         terserOptions: {
           ...terserOptions,
           compress: {
