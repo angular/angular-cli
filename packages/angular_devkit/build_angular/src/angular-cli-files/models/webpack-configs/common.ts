@@ -434,14 +434,14 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       mangle: allowMangle && buildOptions.platform !== 'server' && !differentialLoadingMode,
     };
 
+    const globalScriptsNames = globalScriptsByBundleName.map(s => s.bundleName);
     extraMinimizers.push(
       new TerserPlugin({
         sourceMap: scriptsSourceMap,
         parallel: maxWorkers,
         cache: !cachingDisabled && findCachePath('terser-webpack'),
         extractComments: false,
-        chunkFilter: (chunk: compilation.Chunk) =>
-          !globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
+        exclude: globalScriptsNames,
         terserOptions,
       }),
       // Script bundles are fully optimized here in one step since they are never downleveled.
@@ -451,8 +451,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
         parallel: maxWorkers,
         cache: !cachingDisabled && findCachePath('terser-webpack'),
         extractComments: false,
-        chunkFilter: (chunk: compilation.Chunk) =>
-          globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
+        include: globalScriptsNames,
         terserOptions: {
           ...terserOptions,
           compress: allowMinify && {
