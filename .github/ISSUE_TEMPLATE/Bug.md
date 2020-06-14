@@ -1,3 +1,15 @@
+<--
+**NOTE**: If you provide an incomplete template, the Universal team is liable to close your issue sight on scene.
+Please provide _as much detail as possible_ in as minimal a reproduction as possible. This means no third-party
+libraries, no application-specific code, etc. Essentially, we're looking for an `ng new` project with maybe one
+additional file/change. If this is not possible, please look deeper into your issue or post it to StackOverflow 
+for support. This is a bug/feature tracker, meaning that something is actively _missing or broken_ in Angular Universal.
+Anything else does not belong on this forum.
+
+For very common issues when using Angular Universal, please see [this doc](docs/gotchas.md). This includes
+issues for `window is not defined` and other hiccups when adopting Angular Universal for the first time.
+-->
+
 ---
 name: 🐞 Bug Report
 about: Something is broken in Angular Universal
@@ -12,11 +24,10 @@ about: Something is broken in Angular Universal
 - [ ] common
 - [ ] express-engine
 - [ ] hapi-engine
-- [ ] module-map-ngfactory-loader
 
 ### Is this a regression?
 
-<!-- Did this behavior use to work in the previous version? -->
+<!-- Did this behavior used to work in the previous version? -->
 <!-- ✍️--> Yes, the previous version in which this bug was not present was: ....
 
 ### Description
