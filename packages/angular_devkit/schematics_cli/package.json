@@ -18,7 +18,7 @@
     "@angular-devkit/core": "0.0.0",
     "@angular-devkit/schematics": "0.0.0",
     "@schematics/schematics": "0.0.0",
-    "inquirer": "7.1.0",
+    "inquirer": "7.2.0",
     "minimist": "1.2.5",
     "rxjs": "6.5.5",
     "symbol-observable": "1.2.0"
