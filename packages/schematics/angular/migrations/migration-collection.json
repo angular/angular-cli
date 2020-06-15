@@ -75,11 +75,6 @@
       "factory": "./update-9/schematic-options",
       "description": "Replace deprecated 'styleext' and 'spec' Angular schematic options."
     },
-    "side-effects-package-json": {
-      "version": "10.0.0-beta.3",
-      "factory": "./update-10/side-effects-package-json",
-      "description": "Create a special 'package.json' file that is used to tell the tools and bundlers whether the code under the app directory is free of code with non-local side-effect."
-    },
     "update-angular-config": {
       "version": "10.0.0-beta.6",
       "factory": "./update-10/update-angular-config",
