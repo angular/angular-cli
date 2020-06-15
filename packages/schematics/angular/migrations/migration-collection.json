@@ -58,12 +58,12 @@
     "tslint-version-6": {
       "version": "10.0.0-beta.0",
       "factory": "./update-10/update-tslint",
-      "description": "Update tslint to version 6."
+      "description": "Update tslint to version 6 and adjust rules to maintain existing behavior."
     },
     "rename-browserslist-config": {
       "version": "10.0.0-beta.0",
       "factory": "./update-10/rename-browserslist-config",
-      "description": "Update Browserslist configurations to '.browserslistrc'."
+      "description": "Update Browserslist configuration file name to '.browserslistrc' from deprecated 'browserslist'."
     },
     "remove-es5-browser-support-option": {
       "version": "10.0.0-beta.2",
@@ -73,37 +73,37 @@
     "schematic-options-10": {
       "version": "10.0.0-beta.2",
       "factory": "./update-9/schematic-options",
-      "description": "Replace deprecated 'styleext' and 'spec' Angular schematic options."
+      "description": "Replace deprecated and removed 'styleext' and 'spec' Angular schematic options with 'style' and 'skipTests', respectively."
     },
     "update-angular-config": {
       "version": "10.0.0-beta.6",
       "factory": "./update-10/update-angular-config",
-      "description": "Remove various deprecated builders options from 'angular.json'."
+      "description": "Remove deprecated options from 'angular.json' that are no longer present in v10."
     },
     "tslint-add-deprecation-rule": {
       "version": "10.0.0-beta.7",
       "factory": "./update-10/add-deprecation-rule-tslint",
-      "description": "Adds the tslint deprecation rule to tslint JSON configuration files."
+      "description": "Add the tslint deprecation rule to tslint JSON configuration files."
     },
     "update-libraries-tslib": {
       "version": "10.0.0-beta.7",
       "factory": "./update-10/update-libraries-tslib",
-      "description": "Update library projects to use tslib version 2 as a direct dependency."
+      "description": "Update library projects to use tslib version 2 as a direct dependency. Read more about this here: https://v10.angular.io/guide/migration-update-libraries-tslib"
     },
     "solution-style-tsconfig": {
       "version": "10.0.0-beta.7",
       "factory": "./update-10/solution-style-tsconfig",
-      "description": "Adding \"Solution Style\" tsconfig.json. This improves developer experience using editors powered by TypeScript’s language server."
+      "description": "Add \"Solution Style\" TypeScript configuration file support. This improves developer experience using editors powered by TypeScript’s language server. Read more about this here: https://v10.angular.io/guide/migration-solution-style-tsconfig"
     },
     "update-module-and-target-compiler-options": {
       "version": "10.0.0-rc.1",
       "factory": "./update-10/update-module-and-target-compiler-options",
-      "description": "Update 'module' and 'target' TypeScript compiler options."
+      "description": "Update 'module' and 'target' TypeScript compiler options. Read more about this here: https://v10.angular.io/guide/migration-update-module-and-target-compiler-options"
     },
     "update-workspace-dependencies": {
       "version": "10.0.0-rc.2",
       "factory": "./update-10/update-dependencies",
-      "description": "Workspace dependencies updates."
+      "description": "Update workspace dependencies to match a new v10 project."
     }
   }
 }
