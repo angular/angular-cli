@@ -310,13 +310,12 @@ describe('Application Schematic', () => {
     expect(content.sideEffects).toBe(false);
   });
 
-  it('sideEffects property should be false when not in strict mode', async () => {
+  it('sideEffects package.json should not exist when not in strict mode', async () => {
     const options = { ...defaultOptions, projectRoot: '', strict: false };
 
     const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
       .toPromise();
-    const content = JSON.parse(tree.readContent('/src/app/package.json'));
-    expect(content.sideEffects).toBe(true);
+    expect(tree.exists('/src/app/package.json')).toBeFalse();
   });
 
   describe('custom projectRoot', () => {
