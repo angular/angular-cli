@@ -399,6 +399,9 @@ export default function (options: ApplicationOptions): Rule {
       }),
       mergeWith(
         apply(url('./other-files'), [
+          options.strict
+            ? noop()
+            : filter(path => path !== '/package.json.template'),
           componentOptions.inlineTemplate
             ? filter(path => !path.endsWith('.html.template'))
             : noop(),
