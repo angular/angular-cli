@@ -129,7 +129,7 @@ export function findNodes(node: ts.Node, kind: ts.SyntaxKind, max = Infinity, re
 /**
  * Get all the nodes from a source.
  * @param sourceFile The source file object.
- * @returns {Observable<ts.Node>} An observable of all the nodes in the source.
+ * @returns {Array<ts.Node>} An array of all the nodes in the source.
  */
 export function getSourceNodes(sourceFile: ts.SourceFile): ts.Node[] {
   const nodes: ts.Node[] = [sourceFile];
