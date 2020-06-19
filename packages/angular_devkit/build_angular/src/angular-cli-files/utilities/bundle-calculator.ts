@@ -275,7 +275,7 @@ class AnyScriptCalculator extends Calculator {
       .filter(asset => asset.name.endsWith('.js'))
       .map(asset => ({
         size: asset.size,
-        label: asset.name,
+        label: `${asset.name} `,
       }));
   }
 }
@@ -289,7 +289,7 @@ class AnyCalculator extends Calculator {
       .filter(asset => !asset.name.endsWith('.map'))
       .map(asset => ({
         size: asset.size,
-        label: asset.name,
+        label: `${asset.name} `,
       }));
   }
 }
@@ -360,7 +360,7 @@ export function* checkThresholds(thresholds: IterableIterator<Threshold>, size: 
         const sizeDifference = formatSize(size - threshold.limit);
         yield {
           severity: threshold.severity,
-          message: `Exceeded maximum budget for ${label} . Budget ${
+          message: `Exceeded maximum budget for ${label}. Budget ${
             formatSize(threshold.limit)} was not met by ${
             sizeDifference} with a total of ${formatSize(size)}.`,
         };
@@ -374,7 +374,7 @@ export function* checkThresholds(thresholds: IterableIterator<Threshold>, size: 
         const sizeDifference = formatSize(threshold.limit - size);
         yield {
           severity: threshold.severity,
-          message: `Failed to meet minimum budget for ${label} . Budget ${
+          message: `Failed to meet minimum budget for ${label}. Budget ${
             formatSize(threshold.limit)} was not met by ${
             sizeDifference} with a total of ${formatSize(size)}.`,
         };
@@ -403,14 +403,14 @@ function getDifferentialBuildResult(
  * Preconditions: All the sizes should be equivalent, or else they represent
  * differential builds.
  */
-function mergeDifferentialBuildSizes(buildSizes: Size[], margeLabel: string): Size[] {
+function mergeDifferentialBuildSizes(buildSizes: Size[], mergeLabel: string): Size[] {
   if (buildSizes.length === 0) {
     return [];
   }
 
   // Only one size.
   return [{
-    label: margeLabel,
+    label: mergeLabel,
     size: buildSizes[0].size,
   }];
 }
