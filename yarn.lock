@@ -12736,10 +12736,10 @@ terser-webpack-plugin@3.0.0:
     terser "^4.6.13"
     webpack-sources "^1.4.3"
 
-terser-webpack-plugin@3.0.5:
-  version "3.0.5"
-  resolved "https://registry.yarnpkg.com/terser-webpack-plugin/-/terser-webpack-plugin-3.0.5.tgz#f048cfbddd6098b10a8737f3165344529656daad"
-  integrity sha512-pyHUyfQUZB3ciYL81GgXzDh8Qb3fGED77xDjZVSFYSN1cQnWgC51OMPKj7vBWVZx0GGuYhpa9+Vz2KxkzXWhBA==
+terser-webpack-plugin@3.0.6:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/terser-webpack-plugin/-/terser-webpack-plugin-3.0.6.tgz#db0a108bbdd3680d72c9b491fbabad09ba207b99"
+  integrity sha512-z3HLOOPUHkCNGkeEHqqiMAIy1pjpHwS1o+i6Zn0Ws3EAvHJj46737efNNEvJ0Vx9BdDQM83d56qySDJOSORA0A==
   dependencies:
     cacache "^15.0.4"
     find-cache-dir "^3.3.1"
@@ -12748,7 +12748,7 @@ terser-webpack-plugin@3.0.5:
     schema-utils "^2.6.6"
     serialize-javascript "^4.0.0"
     source-map "^0.6.1"
-    terser "^4.6.13"
+    terser "^4.8.0"
     webpack-sources "^1.4.3"
 
 terser-webpack-plugin@^1.4.3:
@@ -12775,7 +12775,7 @@ terser@4.6.11:
     source-map "~0.6.1"
     source-map-support "~0.5.12"
 
-terser@4.8.0:
+terser@4.8.0, terser@^4.8.0:
   version "4.8.0"
   resolved "https://registry.yarnpkg.com/terser/-/terser-4.8.0.tgz#63056343d7c70bb29f3af665865a46fe03a0df17"
   integrity sha512-EAPipTNeWsb/3wLPeup1tVPaXfIaU68xMnVdPafIL1TV05OhASArYyIfFvnvJCNrR2NIOvDVNNTFRa+Re2MWyw==
