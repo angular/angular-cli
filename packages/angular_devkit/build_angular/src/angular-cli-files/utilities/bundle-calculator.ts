@@ -360,7 +360,7 @@ export function* checkThresholds(thresholds: IterableIterator<Threshold>, size: 
         const sizeDifference = formatSize(size - threshold.limit);
         yield {
           severity: threshold.severity,
-          message: `Exceeded maximum budget for ${label}. Budget ${
+          message: `Exceeded maximum budget for ${label} . Budget ${
             formatSize(threshold.limit)} was not met by ${
             sizeDifference} with a total of ${formatSize(size)}.`,
         };
@@ -374,7 +374,7 @@ export function* checkThresholds(thresholds: IterableIterator<Threshold>, size: 
         const sizeDifference = formatSize(threshold.limit - size);
         yield {
           severity: threshold.severity,
-          message: `Failed to meet minimum budget for ${label}. Budget ${
+          message: `Failed to meet minimum budget for ${label} . Budget ${
             formatSize(threshold.limit)} was not met by ${
             sizeDifference} with a total of ${formatSize(size)}.`,
         };
