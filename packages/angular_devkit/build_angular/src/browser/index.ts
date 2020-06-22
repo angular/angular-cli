@@ -201,12 +201,31 @@ async function initialize(
   i18n: I18nOptions;
 }> {
   const originalOutputPath = options.outputPath;
+
+  // Assets are processed directly by the builder except when watching
+  const adjustedOptions = options.watch ? options : { ...options, assets: [] };
+
   const {
     config,
     projectRoot,
     projectSourceRoot,
     i18n,
-  } = await buildBrowserWebpackConfigFromContext(options, context, host, true);
+  } = await buildBrowserWebpackConfigFromContext(adjustedOptions, context, host, true);
+
+  // Validate asset option values if processed directly
+  if (options.assets?.length && !adjustedOptions.assets?.length) {
+    normalizeAssetPatterns(
+      options.assets,
+      new virtualFs.SyncDelegateHost(host),
+      normalize(context.workspaceRoot),
+      normalize(projectRoot),
+      projectSourceRoot === undefined ? undefined : normalize(projectSourceRoot),
+    ).forEach(({ output }) => {
+      if (output.startsWith('..')) {
+        throw new Error('An asset cannot be written to a location outside of the output path.');
+      }
+    });
+  }
 
   let transformedConfig;
   if (webpackConfigurationTransform) {
@@ -573,27 +592,6 @@ export function buildWebpackBrowser(
                 executor.stop();
               }
 
-              // Copy assets
-              if (options.assets) {
-                try {
-                  await copyAssets(
-                    normalizeAssetPatterns(
-                      options.assets,
-                      new virtualFs.SyncDelegateHost(host),
-                      root,
-                      normalize(projectRoot),
-                      projectSourceRoot === undefined ? undefined : normalize(projectSourceRoot),
-                    ),
-                    Array.from(outputPaths.values()),
-                    context.workspaceRoot,
-                  );
-                } catch (err) {
-                  context.logger.error('Unable to copy assets: ' + err.message);
-
-                  return { success: false };
-                }
-              }
-
               type ArrayElement<A> = A extends ReadonlyArray<infer T> ? T : never;
               function generateBundleInfoStats(
                 id: string | number,
@@ -695,6 +693,27 @@ export function buildWebpackBrowser(
                 if (!success) {
                   return { success: false };
                 }
+              }
+            }
+
+            // Copy assets
+            if (!options.watch && options.assets) {
+              try {
+                await copyAssets(
+                  normalizeAssetPatterns(
+                    options.assets,
+                    new virtualFs.SyncDelegateHost(host),
+                    root,
+                    normalize(projectRoot),
+                    projectSourceRoot === undefined ? undefined : normalize(projectSourceRoot),
+                  ),
+                  Array.from(outputPaths.values()),
+                  context.workspaceRoot,
+                );
+              } catch (err) {
+                context.logger.error('Unable to copy assets: ' + err.message);
+
+                return { success: false };
               }
             }
 
