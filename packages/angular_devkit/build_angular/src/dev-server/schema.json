@@ -6,7 +6,7 @@
   "properties": {
     "browserTarget": {
       "type": "string",
-      "description": "Target to serve.",
+      "description": "Build target to serve in the format of project-name:builder:config. Useful for when there are additional alternate configurations (such as stable, or archive that are used by AIO).",
       "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
     },
     "port": {
