@@ -7995,10 +7995,10 @@ less-loader@6.0.0:
     loader-utils "^2.0.0"
     schema-utils "^2.6.6"
 
-less-loader@6.1.1:
-  version "6.1.1"
-  resolved "https://registry.yarnpkg.com/less-loader/-/less-loader-6.1.1.tgz#cb17cc2b7acba46e5d6932416e0ba8fa5964fcfe"
-  integrity sha512-K8WPJLbQZPszy4RD9Tsruyre4zrvEo8kE4yFfg7Gnr2H4DuYBxmNACul4UOy3wlEMBHeBElLmVLZaxaSGuL5Bw==
+less-loader@6.1.2:
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/less-loader/-/less-loader-6.1.2.tgz#793f2ab76dea3c4fca6a27f3effceab16fc3cd9a"
+  integrity sha512-80g+EURm8H98wirYTNnIJMxVnJU9NYIXRs7rxsghL8C+UyuGzsqDXPgQcLUrNlItMwUviYeBfSOEyULI6iza+g==
   dependencies:
     clone "^2.1.2"
     less "^3.11.3"
