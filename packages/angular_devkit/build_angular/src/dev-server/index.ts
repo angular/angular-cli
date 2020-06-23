@@ -414,7 +414,6 @@ export function buildServerConfig(
     headers: { 'Access-Control-Allow-Origin': '*' },
     historyApiFallback: !!browserOptions.index && {
       index: `${servePath}/${getIndexOutputFile(browserOptions)}`,
-      disableDotRule: true,
       htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
       rewrites: [
         {
