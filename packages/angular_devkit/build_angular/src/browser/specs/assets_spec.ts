@@ -113,10 +113,8 @@ describe('Browser Builder assets', () => {
     };
 
     const run = await architect.scheduleTarget(targetSpec, overrides);
-    try {
-      await run.result;
-      expect('THE ABOVE LINE SHOULD THROW').toBe('');
-    } catch {}
+
+    await expectAsync(run.result).toBeRejected();
 
     // The node_modules folder must be deleted, otherwise code that tries to find the
     // node_modules folder will hit this one and can fail.
@@ -135,10 +133,8 @@ describe('Browser Builder assets', () => {
     };
 
     const run = await architect.scheduleTarget(targetSpec, overrides);
-    try {
-      await run.result;
-      expect('THE ABOVE LINE SHOULD THROW').toBe('');
-    } catch {}
+
+    await expectAsync(run.result).toBeRejected();
 
     // The node_modules folder must be deleted, otherwise code that tries to find the
     // node_modules folder will hit this one and can fail.
