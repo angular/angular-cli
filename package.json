@@ -157,6 +157,7 @@
     "jasmine-spec-reporter": "~5.0.0",
     "jest-worker": "26.0.0",
     "jquery": "^3.3.1",
+    "jsonc-parser": "2.2.1",
     "karma": "~5.0.0",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage-istanbul-reporter": "~3.0.0",
