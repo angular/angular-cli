@@ -14,8 +14,8 @@ interface NormalModuleFactoryRequest {
   relativePath: string;
   path: string;
   descriptionFileData: {
-    name: string;
-    version: string;
+    name?: string;
+    version?: string;
   };
   descriptionFileRoot: string;
   descriptionFilePath: string;
@@ -42,6 +42,11 @@ export class DedupeModuleResolvePlugin {
       .getHook('before-described-relative')
       .tapPromise('DedupeModuleResolvePlugin', async (request: NormalModuleFactoryRequest) => {
         if (request.relativePath !== '.') {
+          return;
+        }
+
+        // Only try to dedupe modules which have a name and a version
+        if (!request.descriptionFileData.name || !request.descriptionFileData.version) {
           return;
         }
 
