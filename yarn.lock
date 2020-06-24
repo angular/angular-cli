@@ -1621,10 +1621,10 @@
   resolved "https://registry.yarnpkg.com/@bazel/bazelisk/-/bazelisk-1.5.0.tgz#61f583ed93be138b47be7180403938ea4057f54b"
   integrity sha512-qhOGN1WmfZYNJXGrRL/0byii9hX5FBomMv3WWI2OEL2+Bxm4t/bR3zMxN3xwQX1C8meSSrAfKGSzxVOZfpJsOg==
 
-"@bazel/buildifier@3.2.1":
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-3.2.1.tgz#5f0176b11f159d72d05d3bae6047a038a778fb8e"
-  integrity sha512-rMN3OA3QYUwVj0LaN1Krc9sU46sRVV+S2aybEdtX3n9JGc0H8hxRl1DIurB6ELAFidFZBbNW3cR32p51cYuMHw==
+"@bazel/buildifier@3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-3.3.0.tgz#9c78a5efcea4a38abffdfb18eb8cf9a27babee66"
+  integrity sha512-Jaraa7jLW1OQBoWtTe2XDiuZwsg/YbWvCTys6nYXXRtNIkyoN6I/YZS4RlZj3nD7XlTMFk0yQD6+jpRpXhB6ZQ==
 
 "@bazel/jasmine@1.7.0":
   version "1.7.0"
