@@ -22,5 +22,5 @@ export const latestVersions = {
   DevkitBuildNgPackagr: '~0.1000.0-rc.0',
   DevkitBuildWebpack: '~0.1000.0-rc.0',
 
-  ngPackagr: '^10.0.0-next.2',
+  ngPackagr: '^10.0.0',
 };
