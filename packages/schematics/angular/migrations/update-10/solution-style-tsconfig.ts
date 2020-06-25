@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonAstString, JsonParseMode, dirname, join, normalize, parseJsonAst, resolve } from '@angular-devkit/core';
+import { JsonAstNode, JsonAstString, JsonParseMode, dirname, join, normalize, parseJsonAst, resolve } from '@angular-devkit/core';
 import { DirEntry, Rule, chain } from '@angular-devkit/schematics';
 import { findPropertyInAstObject } from '../../utility/json-utils';
 import { getWorkspace } from '../../utility/workspace';
@@ -25,11 +25,18 @@ function* visitExtendedJsonFiles(directory: DirEntry): IterableIterator<[string,
     }
 
     const entry = directory.file(path);
-    if (!entry) {
+    const content = entry?.content.toString();
+    if (!content) {
       continue;
     }
 
-    const jsonAst = parseJsonAst(entry.content.toString(), JsonParseMode.Loose);
+    let jsonAst: JsonAstNode;
+    try {
+      jsonAst = parseJsonAst(content, JsonParseMode.Loose);
+    } catch {
+      throw new Error(`Invalid JSON AST Object (${path})`);
+    }
+
     if (jsonAst.kind !== 'object') {
       continue;
     }

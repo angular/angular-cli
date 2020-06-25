@@ -114,4 +114,10 @@ describe('Migration to create "Solution Style" tsconfig', () => {
       ],
     });
   });
+
+  it('should not error out when a JSON file is a blank', async () => {
+    tree.create('blank.json', '');
+    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+    expect(readJsonFile(newTree, 'src/tsconfig.json').extends).toEqual('./../tsconfig.base.json');
+  });
 });
