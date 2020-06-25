@@ -41,7 +41,7 @@ exports.config = {
     {
       browserName: 'safari',
       platform: 'macOS 10.15',
-      version: '13.0',
+      version: '13.1',
       tunnelIdentifier,
     },
     {
