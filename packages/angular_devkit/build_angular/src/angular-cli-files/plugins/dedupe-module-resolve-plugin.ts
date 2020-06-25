@@ -19,6 +19,8 @@ interface NormalModuleFactoryRequest {
   };
   descriptionFileRoot: string;
   descriptionFilePath: string;
+  directory?: boolean;
+  file?: boolean;
 }
 
 export interface DedupeModuleResolvePluginOptions {
@@ -45,7 +47,13 @@ export class DedupeModuleResolvePlugin {
           return;
         }
 
-        // Only try to dedupe modules which have a name and a version
+        // When either of these properties is undefined. It typically means it's a link.
+        // In which case we shouldn't try to dedupe it.
+        if (request.file === undefined || request.directory === undefined) {
+          return;
+        }
+
+        // Empty name or versions are no valid primary entrypoints of a library
         if (!request.descriptionFileData.name || !request.descriptionFileData.version) {
           return;
         }
