@@ -6,7 +6,7 @@ import { updateJsonFile } from '../../utils/project';
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
-  await ng('add', '@angular/material');
+  await ng('add', '@angular/material@9');
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
   if (isSnapshotBuild) {
@@ -26,7 +26,7 @@ export default async function () {
 
     await silentNpm('install');
   } else {
-    await silentNpm('install', '@angular/material-moment-adapter');
+    await silentNpm('install', '@angular/material-moment-adapter@9');
   }
 
   await silentNpm('install', 'moment');
