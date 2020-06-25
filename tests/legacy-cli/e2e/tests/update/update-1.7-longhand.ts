@@ -12,6 +12,6 @@ export default async function() {
   await ng('update', '@angular/cli', '--migrate-only', '--from=1.7.1');
   await useBuiltPackages();
   await silentNpm('install');
-  await ng('update', '@angular/core', ...extraUpdateArgs);
+  await ng('update', '@angular/core@9', ...extraUpdateArgs);
   await ng('build');
 }
