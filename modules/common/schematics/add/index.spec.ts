@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
 
@@ -75,8 +76,12 @@ describe('Add Schematic Rule', () => {
     const tree = await schematicRunner
       .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
 
-    const contents = JSON.parse(tree.read('/projects/test-app/tsconfig.server.json')!.toString());
-    expect(contents.files).toEqual([
+    const { files } = parseJson(
+      tree.read('/projects/test-app/tsconfig.server.json')!.toString(),
+      JsonParseMode.Loose,
+    ) as any;
+
+    expect(files).toEqual([
       'src/main.server.ts',
       'server.ts',
     ]);
@@ -89,9 +94,12 @@ describe('Add Schematic Rule', () => {
 
     const tree = await schematicRunner
       .callRule(addUniversalCommonRule(defaultOptions), appTree).toPromise();
+    const { files } = parseJson(
+      tree.read('/projects/test-app/tsconfig.server.json')!.toString(),
+      JsonParseMode.Loose,
+    ) as any;
 
-    const contents = JSON.parse(tree.read('/projects/test-app/tsconfig.server.json')!.toString());
-    expect(contents.files).toEqual([
+    expect(files).toEqual([
       'src/main.server.ts',
       'server.ts',
     ]);

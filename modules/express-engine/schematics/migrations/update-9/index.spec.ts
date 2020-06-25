@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { createTestApp } from '../../testing/test-app';
 
@@ -60,8 +61,12 @@ describe('Migration to version 9', () => {
     const newTree =
       await schematicRunner.runSchematicAsync('update-9', {}, tree.branch()).toPromise();
 
-    const contents = JSON.parse(newTree.readContent('/projects/test-app/tsconfig.server.json'));
-    expect(contents.files).toEqual([
+    const { files } = parseJson(
+      newTree.readContent('/projects/test-app/tsconfig.server.json'),
+      JsonParseMode.Loose,
+    ) as any;
+
+    expect(files).toEqual([
       'src/main.server.ts',
       'server.ts',
     ]);
@@ -131,9 +136,12 @@ describe('Migration to version 9', () => {
       const newTree =
         await schematicRunner.runSchematicAsync('update-9', {}, tree.branch()).toPromise();
 
-      const contents =
-        JSON.parse(newTree.readContent('/projects/test-app-two/tsconfig.server.json'));
-      expect(contents.files).toEqual([
+      const { files } = parseJson(
+        newTree.readContent('/projects/test-app-two/tsconfig.server.json'),
+        JsonParseMode.Loose,
+      ) as any;
+
+      expect(files).toEqual([
         'src/main.server.ts',
         'server.ts',
       ]);
