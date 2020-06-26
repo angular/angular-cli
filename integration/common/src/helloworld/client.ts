@@ -12,6 +12,6 @@ import {enableProdMode} from '@angular/core';
 import {platformBrowser} from '@angular/platform-browser';
 import {HelloWorldModuleNgFactory} from './app.ngfactory';
 
-window['doBootstrap'] = function() {
+(window as any)['doBootstrap'] = function() {
   platformBrowser().bootstrapModuleFactory(HelloWorldModuleNgFactory);
 };

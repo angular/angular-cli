@@ -8,7 +8,7 @@ if (environment.production) {
   enableProdMode();
 }
 
-window['doBootstrap'] = () => {
+(window as any)['doBootstrap'] = () => {
   platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.error(err));
 };

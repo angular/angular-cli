@@ -3,6 +3,10 @@
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,
     "downlevelIteration": true,
@@ -10,7 +14,6 @@
     "module": "esnext",
     "moduleResolution": "node",
     "importHelpers": true,
-    "skipLibCheck": true,
     "target": "es2015",
     "typeRoots": [
       "node_modules/@types"
