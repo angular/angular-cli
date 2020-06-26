@@ -6,12 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
-  JsonAstArray,
-  JsonParseMode,
   dirname,
   join,
   normalize,
-  parseJsonAst,
   strings,
   tags,
 } from '@angular-devkit/core';
@@ -19,7 +16,7 @@ import {
   Rule, SchematicContext, SchematicsException, Tree,
   apply, applyTemplates, chain, mergeWith, move, noop, url,
 } from '@angular-devkit/schematics';
-import { appendValueInAstArray, findPropertyInAstObject } from '../utility/json-utils';
+import { JSONFile } from '../utility/json-file';
 import { parseName } from '../utility/parse-name';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { addTsConfigProjectReferences, verifyBaseTsConfigExists } from '../utility/tsconfig';
@@ -37,21 +34,11 @@ function addConfig(options: WebWorkerOptions, root: string, tsConfigPath: string
     const isInSrc = dirname(normalize(tsConfigPath)).endsWith('src');
     const workerGlob = `${isInSrc ? '' : 'src/'}**/*.worker.ts`;
 
-    const buffer = host.read(tsConfigPath);
-    if (buffer) {
-      const tsCfgAst = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
-      if (tsCfgAst.kind != 'object') {
-        throw new SchematicsException('Invalid tsconfig. Was expecting an object');
-      }
-      const filesAstNode = findPropertyInAstObject(tsCfgAst, 'exclude');
-      if (filesAstNode && filesAstNode.kind != 'array') {
-        throw new SchematicsException('Invalid tsconfig "exclude" property; expected an array.');
-      }
-
-      if (filesAstNode && !(filesAstNode as JsonAstArray).value.includes(workerGlob)) {
-        const recorder = host.beginUpdate(tsConfigPath);
-        appendValueInAstArray(recorder, filesAstNode as JsonAstArray, workerGlob);
-        host.commitUpdate(recorder);
+    const  json = new JSONFile(host, tsConfigPath);
+    if (!json.error) {
+      const exclude = json.get(['exclude']);
+      if (exclude && Array.isArray(exclude) && !exclude.includes(workerGlob)) {
+        json.modify(['exclude'], [...exclude, workerGlob]);
       }
     }
 

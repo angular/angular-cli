@@ -9,6 +9,7 @@ import {
   JsonAstObject,
   JsonObject,
   JsonParseMode,
+  JsonValue,
   join,
   normalize,
   parseJsonAst,
@@ -34,7 +35,7 @@ import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { Schema as ComponentOptions } from '../component/schema';
 import { Schema as E2eOptions } from '../e2e/schema';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
-import { findPropertyInAstObject, insertPropertyInAstObjectInOrder } from '../utility/json-utils';
+import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { applyLintFix } from '../utility/lint-fix';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
@@ -99,48 +100,19 @@ function mergeWithRootTsLint(parentHost: Tree) {
       return;
     }
 
-    const rootTslintConfig = readTsLintConfig(parentHost, tsLintPath);
-    const appTslintConfig = readTsLintConfig(host, tsLintPath);
+    const rootTslintConfig = new JSONFile(parentHost, tsLintPath);
+    const appTslintConfig = new JSONFile(host, tsLintPath);
 
-    const recorder = host.beginUpdate(tsLintPath);
-    rootTslintConfig.properties.forEach(prop => {
-      if (findPropertyInAstObject(appTslintConfig, prop.key.value)) {
-        // property already exists. Skip!
-        return;
+    for (const [pKey, pValue] of Object.entries(rootTslintConfig.get([]) as Record<string, JsonValue>)) {
+      if (typeof pValue !== 'object' || Array.isArray(pValue)) {
+        appTslintConfig.modify([pKey], pValue);
+        continue;
       }
 
-      insertPropertyInAstObjectInOrder(
-        recorder,
-        appTslintConfig,
-        prop.key.value,
-        prop.value.value,
-        2,
-      );
-    });
-
-    const rootRules = findPropertyInAstObject(rootTslintConfig, 'rules');
-    const appRules = findPropertyInAstObject(appTslintConfig, 'rules');
-
-    if (!appRules || appRules.kind !== 'object' || !rootRules || rootRules.kind !== 'object') {
-      // rules are not valid. Skip!
-      return;
+      for (const [key, value] of Object.entries(rootTslintConfig.get([pKey]) as Record<string, JsonObject>)) {
+        appTslintConfig.modify([pKey, key], value);
+      }
     }
-
-    rootRules.properties.forEach(prop => {
-      insertPropertyInAstObjectInOrder(
-        recorder,
-        appRules,
-        prop.key.value,
-        prop.value.value,
-        4,
-      );
-    });
-
-    host.commitUpdate(recorder);
-
-    // this shouldn't be needed but at the moment without this formatting is not correct.
-    const content = readTsLintConfig(host, tsLintPath);
-    host.overwrite(tsLintPath, JSON.stringify(content.value, undefined, 2));
   };
 }
 
