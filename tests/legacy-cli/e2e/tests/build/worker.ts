@@ -19,8 +19,8 @@ export default async function () {
   // Enable Differential loading to run both size checks
   await replaceInFile(
     '.browserslistrc',
-    'not IE 9-11',
-    'IE 9-11',
+    'not IE 11',
+    'IE 11',
   );
 
   await ng('generate', 'web-worker', 'app');

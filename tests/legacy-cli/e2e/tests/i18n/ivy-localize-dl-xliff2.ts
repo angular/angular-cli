@@ -16,8 +16,8 @@ export async function executeTest() {
   // Ensure a DL build is used.
   await replaceInFile(
     '.browserslistrc',
-    'not IE 9-11',
-    'IE 9-11',
+    'not IE 11',
+    'IE 11',
   );
 
   await updateJsonFile('tsconfig.base.json', config => {
