@@ -42,23 +42,22 @@ export function ngExpressEngine(setupOptions: Readonly<NgSetupOptions>) {
   const engine = new CommonEngine(setupOptions.bootstrap, setupOptions.providers);
 
   return function (filePath: string,
-                   options: Readonly<RenderOptions>,
+                   options: object,
                    callback: (err?: Error | null, html?: string) => void) {
     try {
-      if (!setupOptions.bootstrap && !options.bootstrap) {
+      const renderOptions = { ...options } as RenderOptions;
+      if (!setupOptions.bootstrap && !renderOptions.bootstrap) {
         throw new Error('You must pass in a NgModule or NgModuleFactory to be bootstrapped');
       }
 
-      const req = options.req;
-      const res = options.res || req.res;
-
-      const renderOptions: RenderOptions = Object.assign({}, options);
+      const req = renderOptions.req;
+      const res = renderOptions.res || req.res;
 
       renderOptions.url =
-        options.url || `${req.protocol}://${(req.get('host') || '')}${req.originalUrl}`;
-      renderOptions.document = options.document || getDocument(filePath);
+      renderOptions.url || `${req.protocol}://${(req.get('host') || '')}${req.originalUrl}`;
+      renderOptions.document = renderOptions.document || getDocument(filePath);
 
-      renderOptions.providers = options.providers || [];
+      renderOptions.providers = renderOptions.providers || [];
       renderOptions.providers = renderOptions.providers.concat(getReqResProviders(req, res));
 
       engine.render(renderOptions)
