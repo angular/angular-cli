@@ -308,7 +308,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       new (class {
         apply(compiler: Compiler) {
           compiler.hooks.emit.tap('angular-cli-stats', compilation => {
-            const data = JSON.stringify(compilation.getStats().toJson('verbose'));
+            const data = JSON.stringify(compilation.getStats().toJson('verbose'), undefined, 2);
             compilation.assets['stats.json'] = new RawSource(data);
           });
         }
