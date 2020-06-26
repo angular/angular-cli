@@ -7,10 +7,9 @@
  */
 import { dirname, join, normalize } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
-import { appendPropertyInAstObject, findPropertyInAstObject, removePropertyInAstObject } from '../../utility/json-utils';
+import { JSONFile } from '../../utility/json-file';
 import { getWorkspace } from '../../utility/workspace';
 import { Builders } from '../../utility/workspace-models';
-import { readJsonFileAsAstObject } from '../update-9/utils';
 
 
 interface ModuleAndTargetReplamenent {
@@ -91,41 +90,26 @@ export default function (): Rule {
 }
 
 function updateModuleAndTarget(host: Tree, tsConfigPath: string, replacements: ModuleAndTargetReplamenent) {
-  const jsonAst = readJsonFileAsAstObject(host, tsConfigPath);
-  if (!jsonAst) {
-    return;
-  }
-
-  const compilerOptionsAst = findPropertyInAstObject(jsonAst, 'compilerOptions');
-  if (compilerOptionsAst?.kind !== 'object') {
+  const json = new JSONFile(host, tsConfigPath);
+  if (json.error) {
     return;
   }
 
   const { oldTarget, newTarget, newModule, oldModule } = replacements;
-
-  const recorder = host.beginUpdate(tsConfigPath);
   if (newTarget) {
-    const targetAst = findPropertyInAstObject(compilerOptionsAst, 'target');
+    const target = json.get(['compilerOptions', 'target']);
 
-    if (!targetAst && !oldTarget) {
-      appendPropertyInAstObject(recorder, compilerOptionsAst, 'target', newTarget, 4);
-    } else if (targetAst?.kind === 'string' && (!oldTarget || oldTarget === targetAst.value.toLowerCase())) {
-      const offset = targetAst.start.offset + 1;
-      recorder.remove(offset, targetAst.value.length);
-      recorder.insertLeft(offset, newTarget);
+    if ((typeof target === 'string' && (!oldTarget || oldTarget === target.toLowerCase())) || !target) {
+      json.modify(['compilerOptions', 'target'], newTarget);
     }
   }
 
   if (newModule === false) {
-    removePropertyInAstObject(recorder, compilerOptionsAst, 'module');
+    json.remove(['compilerOptions', 'module']);
   } else if (newModule) {
-    const moduleAst = findPropertyInAstObject(compilerOptionsAst, 'module');
-    if (moduleAst?.kind === 'string' && oldModule === moduleAst.value.toLowerCase()) {
-      const offset = moduleAst.start.offset + 1;
-      recorder.remove(offset, moduleAst.value.length);
-      recorder.insertLeft(offset, newModule);
+    const module = json.get(['compilerOptions', 'module']);
+    if (typeof module === 'string' && oldModule === module.toLowerCase()) {
+      json.modify(['compilerOptions', 'module'], newModule);
     }
   }
-
-  host.commitUpdate(recorder);
 }

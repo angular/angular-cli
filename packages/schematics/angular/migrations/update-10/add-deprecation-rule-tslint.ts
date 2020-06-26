@@ -5,11 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonAstObject, JsonValue } from '@angular-devkit/core';
+import { JsonValue } from '@angular-devkit/core';
 import { Rule } from '@angular-devkit/schematics';
 import { getPackageJsonDependency } from '../../utility/dependencies';
-import { findPropertyInAstObject, insertPropertyInAstObjectInOrder, removePropertyInAstObject } from '../../utility/json-utils';
-import { readJsonFileAsAstObject } from '../update-9/utils';
+import { JSONFile } from '../../utility/json-file';
 
 const TSLINT_CONFIG_PATH = '/tslint.json';
 const RULES_TO_ADD: Record<string, JsonValue> = {
@@ -32,33 +31,23 @@ export default function (): Rule {
     }
 
     // Update tslint config.
-    const tslintJsonAst = readJsonFileAsAstObject(tree, TSLINT_CONFIG_PATH);
-    if (!tslintJsonAst) {
+    const json = new JSONFile(tree, TSLINT_CONFIG_PATH);
+    if (json.error) {
       const config = ['tslint.js', 'tslint.yaml'].find(c => tree.exists(c));
       if (config) {
-        logger.warn(`Skipping: Expected a JSON configuration file but found "${config}".`);
+        logger.warn(`Expected a JSON configuration file but found "${config}".`);
       } else {
-        logger.warn('Skipping: Cannot find "tslint.json" configuration file.');
+        logger.warn('Cannot find "tslint.json" configuration file.');
       }
 
       return;
     }
 
     for (const [name, value] of Object.entries(RULES_TO_ADD)) {
-      const tslintJsonAst = readJsonFileAsAstObject(tree, TSLINT_CONFIG_PATH) as JsonAstObject;
-      const rulesAst = findPropertyInAstObject(tslintJsonAst, 'rules');
-      if (rulesAst?.kind !== 'object') {
-        break;
+      const ruleName = ['rules', name];
+      if (json.get(ruleName) === undefined) {
+        json.modify(ruleName, value);
       }
-
-      if (findPropertyInAstObject(rulesAst, name)) {
-        // Skip as rule already exists.
-        continue;
-      }
-
-      const recorder = tree.beginUpdate(TSLINT_CONFIG_PATH);
-      insertPropertyInAstObjectInOrder(recorder, rulesAst, name, value, 4);
-      tree.commitUpdate(recorder);
     }
   };
 }
