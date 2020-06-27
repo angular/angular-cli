@@ -1,6 +1,6 @@
 <--
-**NOTE**: If you provide an incomplete template, the Universal team is liable to close your issue sight on scene.
-Please provide _as much detail as possible_ in as minimal a reproduction as possible. This means no third-party
+Please follow the below issue template. Issues not following the issue template will be closed.
+Please provide _as much detail as possible_ in as minimal a reproduction as possible. This means no/only one third-party
 libraries, no application-specific code, etc. Essentially, we're looking for an `ng new` project with maybe one
 additional file/change. If this is not possible, please look deeper into your issue or post it to StackOverflow 
 for support. This is a bug/feature tracker, meaning that something is actively _missing or broken_ in Angular Universal.

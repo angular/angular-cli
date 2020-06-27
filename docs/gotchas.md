@@ -11,7 +11,7 @@ destroyed until the next render. Next, the server environment inherently does no
 same capabilities as the browser (and has some that likewise the browser does not). For
 instance, the server does not have any concept of cookies. You can polyfill this and other
 functionality, but there is no perfect solution for this. In later sections, we'll walk
-through potential mitigations to reduce the error plane when rendering on the server.
+through potential mitigations to reduce the scope of errors when rendering on the server.
 
 Please also note the goal of SSR: improved initial render time for your application. This
 means that anything that has the potential to reduce the speed of your application in this
@@ -25,7 +25,7 @@ variables in the server environment. This is because the Universal project uses
 [domino](https://github.com/fgnass/domino) as the server DOM rendering engine. As a result,
 there is certain functionality that won't be present or supported on the server. This
 includes the `window` and `document` global objects, cookies, certain HTML elements (like canvas),
-and several others. There is no exhaustive list, so please be cognizant of the fact that if you
+and several others. There is no exhaustive list, so please be aware of the fact that if you
 see an error like this, where a previously-accessible global is not defined, it's likely because
 that global is not available through domino.
 
@@ -76,8 +76,12 @@ often invocations of the global `window` element are to get window size, or some
 However, on the server, there is no concept of "screen", and so this functionality is rarely needed.
 
 You may read online and elsewhere that the recommended approach is to use `isPlatformBrowser` or
-`isPlatformServer`. This guidance is **incorrect**. Instead, you should use Angular's Dependency Injection (DI)
-in order to remove the offending code and drop in a replacement at runtime. Here's an example:
+`isPlatformServer`. This guidance is **incorrect**. This is because you wind up creating platform-specific
+code branches in your application code. This not only increases the size of your application unnecessarily,
+but it also adds complexity that then has to be maintained. By separating code into separate platform-specific
+modules and implementations, your base code can remain about business logic, and platform-specific exceptions
+are handled as they should be: on a case-by-case abstraction basis. This can be accomplished using Angular's Dependency 
+Injection (DI) in order to remove the offending code and drop in a replacement at runtime. Here's an example:
 
 ```ts
 // window-service.ts
