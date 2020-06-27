@@ -225,7 +225,7 @@ longer than needed on the server could result in suboptimal rendering.
 > It may be worth brushing up on the JavaScript event loop and learning the difference between microtasks
 > and macrotasks, if you don't know it already. [Here's](https://javascript.info/event-loop) a good reference.
 
-## My X, Y, Z won't finish before render!
+## My HTTP, Firebase, WebSocket, etc. won't finish before render!
 
 Similarly to the above section on waiting for macrotasks to complete, the flip-side is that the platform will
 not wait for microtasks to complete before finishing the render. In Angular Universal, we have patched the
