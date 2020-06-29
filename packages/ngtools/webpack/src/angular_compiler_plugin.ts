@@ -32,6 +32,7 @@ import {
 import { constructorParametersDownlevelTransform } from '@angular/compiler-cli/src/tooling';
 import { ChildProcess, ForkOptions, fork } from 'child_process';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import * as ts from 'typescript';
 import { Compiler, compilation } from 'webpack';
@@ -81,6 +82,7 @@ import {
   NormalModuleFactoryRequest,
 } from './webpack';
 import { WebpackInputHost } from './webpack-input-host';
+import { DependencyFinder } from './dependencyFinder';
 
 export class AngularCompilerPlugin {
   private _options: AngularCompilerPluginOptions;
@@ -762,19 +764,14 @@ export class AngularCompilerPlugin {
         }
       }
 
-      let ngccProcessor: NgccProcessor | undefined;
-      if (this._compilerOptions.enableIvy) {
-        ngccProcessor = new NgccProcessor(
+      const ngccProcessor = this._compilerOptions.enableIvy ? new NgccProcessor(
           this._mainFields,
           compilerWithFileSystems.inputFileSystem,
           this._warnings,
           this._errors,
           this._basePath,
           this._tsConfigPath,
-        );
-
-        ngccProcessor.process();
-      }
+        ) : undefined;
 
       // Use an identity function as all our paths are absolute already.
       this._moduleResolutionCache = ts.createModuleResolutionCache(this._basePath, x => x);
@@ -801,6 +798,15 @@ export class AngularCompilerPlugin {
         options: this._compilerOptions,
         tsHost: webpackCompilerHost,
       }) as CompilerHost & WebpackCompilerHost;
+
+      if (ngccProcessor !== undefined) {
+        const entryPointsListPath = path.resolve(os.tmpdir(), '__entry_point_list.json');
+        const entryPointsList = this._computeInitialEntryPointsList();
+        console.log(entryPointsListPath, entryPointsList);
+        fs.writeFileSync(entryPointsListPath, JSON.stringify(entryPointsList));
+        ngccProcessor.process(entryPointsListPath);
+        fs.unlinkSync(entryPointsListPath);
+      }
 
       // Resolve mainPath if provided.
       if (this._options.mainPath) {
@@ -954,6 +960,17 @@ export class AngularCompilerPlugin {
         );
       });
     });
+  }
+
+  private _computeInitialEntryPointsList(): string[] {
+    const config = readConfiguration(this._tsConfigPath);
+    const finder = new DependencyFinder(this._compilerHost, config.options.target || ts.ScriptTarget.ES2015);
+    for (const rootName of this._rootNames) {
+      console.log('processing', rootName);
+      finder.collectDependencies(this._compilerHost.resolve(rootName));
+    }
+
+    return Array.from(finder.dependencies.values());
   }
 
   private async _make(compilation: compilation.Compilation) {

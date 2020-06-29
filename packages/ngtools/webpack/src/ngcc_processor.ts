@@ -42,7 +42,7 @@ export class NgccProcessor {
   }
 
   /** Process the entire node modules tree. */
-  process() {
+  process(entryPointListPath: string) {
     // Under Bazel when running in sandbox mode parts of the filesystem is read-only.
     if (process.env.BAZEL_TARGET) {
       return;
@@ -68,6 +68,8 @@ export class NgccProcessor {
         require.resolve('@angular/compiler-cli/ngcc/main-ngcc.js'),
         '--source', /** basePath */
         this._nodeModulesDirectory,
+        '--entry-points-file',
+        entryPointListPath,
         '--properties', /** propertiesToConsider */
         ...this.propertiesToConsider,
         '--first-only', /** compileAllFormats */

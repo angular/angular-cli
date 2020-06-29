@@ -420,7 +420,7 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   resolveModuleNames(
     moduleNames: string[],
     containingFile: string,
-  ): (ts.ResolvedModule | undefined)[] {
+  ): (ts.ResolvedModuleFull | undefined)[] {
     return moduleNames.map(moduleName => {
       const { resolvedModule } = ts.resolveModuleName(
         moduleName,
