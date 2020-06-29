@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { getGlobalVariable } from '../../utils/env';
-import { exec, execAndWaitForOutputToMatch, silentNpm } from '../../utils/process';
+import { exec, silentNpm } from '../../utils/process';
 import { rimraf } from '../../utils/fs';
 
 export default async function () {
@@ -22,16 +22,13 @@ export default async function () {
   const schematicPath = path.join(startCwd, 'test-schematic');
 
   try {
-    // create blank schematic
+    // create schematic
     await exec('schematics', 'schematic', '--name', 'test-schematic');
 
-    process.chdir(path.join(startCwd, 'test-schematic'));
-    await execAndWaitForOutputToMatch(
-      'schematics',
-      ['.:', '--list-schematics'],
-      /my-full-schematic/,
-    );
+    process.chdir(schematicPath);
 
+    await silentNpm('install');
+    await silentNpm('test');
   } finally {
     // restore path
     process.chdir(startCwd);
