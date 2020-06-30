@@ -23,7 +23,7 @@ interface ModuleAndTargetReplamenent {
 export default function (): Rule {
   return async host => {
     // Workspace level tsconfig
-    updateModuleAndTarget(host, 'tsconfig.json', {
+    updateModuleAndTarget(host, 'tsconfig.base.json', {
       oldModule: 'esnext',
       newModule: 'es2020',
     });
