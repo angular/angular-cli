@@ -21,7 +21,10 @@ describe('Browser Builder commonjs warning', () => {
     architect = (await createArchitect(host.root())).architect;
 
     // Add a Common JS dependency
-    host.appendToFile('src/app/app.component.ts', `import 'bootstrap';`);
+    host.appendToFile('src/app/app.component.ts', `
+      import 'bootstrap';
+      import 'zone.js/dist/zone-error';
+    `);
 
     // Create logger
     logger = new logging.Logger('');
@@ -45,6 +48,7 @@ describe('Browser Builder commonjs warning', () => {
     const overrides = {
       allowedCommonJsDependencies: [
         'bootstrap',
+        'zone.js',
       ],
     };
 

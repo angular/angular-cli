@@ -34,14 +34,10 @@ export class CommonJsUsageWarnPlugin {
   // Allow the below depedency for HMR
   // tslint:disable-next-line: max-line-length
   // https://github.com/angular/angular-cli/blob/1e258317b1f6ec1e957ee3559cc3b28ba602f3ba/packages/angular_devkit/build_angular/src/dev-server/index.ts#L605-L638
-  private allowedDepedencies = [
-    'webpack/hot/dev-server',
-  ];
+  private allowedDepedencies = new Set<string>(['webpack/hot/dev-server']);
 
   constructor(private options: CommonJsUsageWarnPluginOptions = {}) {
-    if (this.options.allowedDepedencies) {
-      this.allowedDepedencies.push(...this.options.allowedDepedencies);
-    }
+    this.options.allowedDepedencies?.forEach(d => this.allowedDepedencies.add(d));
   }
 
   apply(compiler: Compiler) {
@@ -57,7 +53,10 @@ export class CommonJsUsageWarnPlugin {
             continue;
           }
 
-          if (this.allowedDepedencies?.includes(rawRequest)) {
+          if (
+            this.allowedDepedencies.has(rawRequest) ||
+            this.allowedDepedencies.has(this.rawRequestToPackageName(rawRequest))
+          ) {
             // Skip as this module is allowed even if it's a CommonJS.
             continue;
           }
@@ -67,7 +66,8 @@ export class CommonJsUsageWarnPlugin {
 
             // Check if it's parent issuer is also a CommonJS dependency.
             // In case it is skip as an warning will be show for the parent CommonJS dependency.
-            if (this.hasCommonJsDependencies(issuer?.issuer?.dependencies ?? [])) {
+            const parentDependencies = issuer?.issuer?.dependencies;
+            if (parentDependencies && this.hasCommonJsDependencies(parentDependencies)) {
               continue;
             }
 
@@ -98,6 +98,14 @@ export class CommonJsUsageWarnPlugin {
 
   private hasCommonJsDependencies(dependencies: unknown[]): boolean {
     return dependencies.some(d => d instanceof CommonJsRequireDependency || d instanceof AMDDefineDependency);
+  }
+
+  private rawRequestToPackageName(rawRequest: string): string {
+    return rawRequest.startsWith('@')
+      // Scoped request ex: @angular/common/locale/en -> @angular/common
+      ? rawRequest.split('/', 2).join('/')
+      // Non-scoped request ex: lodash/isEmpty -> lodash
+      : rawRequest.split('/', 1)[0];
   }
 
 }
