@@ -667,7 +667,9 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
       for (const migration of migrations) {
         const result = await this.executeMigrations(
           migration.package,
-          migration.collection,
+          // Resolve the collection from the workspace root, as otherwise it will be resolved from the temp
+          // installed CLI version.
+          require.resolve(migration.collection, { paths: [this.workspace.root] }),
           new semver.Range('>' + migration.from + ' <=' + migration.to),
           options.createCommits,
         );
