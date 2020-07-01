@@ -101,7 +101,7 @@ merge commits into LTS branches must open a pull request against the specific ba
 In general, cherry picks for LTS should only be done if it meets one of the criteria below:
 
 1. It addresses a critical security vulnerability.
-2. It fixes a breaking change in the external environment.  
+2. It fixes a breaking change in the external environment.
    For example, this could happen if one of the dependencies is deleted from NPM.
 3. It fixes a legitimate failure on CI for a particular LTS branch.
 
@@ -122,9 +122,20 @@ As commits are cherry-picked when PRs are merged, creating the release should be
 ```bash
 git commit -a -m 'release: vXX'
 git tag 'vXX'
+```
 
-# Make sure to run these commands together, as missing tags can cause CI
-# failures.
+The package versions we are about to publish are derived from the git tag that
+we just created. Double check that the versions are correct by running the
+following command.
+
+```bash
+yarn admin packages --version
+```
+
+Now push the commit and the tag to the upstream repository.
+**Make sure to run these commands together, as missing tags can cause CI failures.**
+
+```bash
 git push upstream && git push upstream --tags
 ```
 
@@ -151,7 +162,10 @@ After closing the tab, you have successfully logged in, it is time to publish.
 
 **It is a good idea to wait for CI to be green on the patch branch and tag before doing the release.**
 
-Check out the patch branch (e.g. `9.1.x`), then run:
+For the first release of a major version, follow the instructions in
+[Publishing a Major Version](#publishing-a-major-version) section.
+
+For non-major release, check out the patch branch (e.g. `9.1.x`), then run:
 ```bash
 yarn # Reload dependencies
 yarn admin publish
@@ -208,3 +222,23 @@ If you don't have the firebase CLI installed, you can install it using
 `npm install --global firebase-tools` (or use your package manager of choice).
 
 This is detailed in [`etc/cli.angular.io/README.md`](https://github.com/angular/angular-cli/blob/master/etc/cli.angular.io/README.md).
+
+## Publishing a Major Version
+
+For the first release of a major version, say `v10.0.0`, checkout the major branch
+(i.e. `10.0.x`), then run:
+
+```bash
+yarn # Reload dependencies
+yarn admin publish --tag next # a major release is always tagged as next initially
+```
+
+Confirm with downstream repositories (Components, etc) that everything is ok.
+Once the release is stable, wait for Framework to retag their packages, then
+retag the CLI packages as `latest`.
+The command below will automatically retag stable packages as well as experimental
+packages.
+
+```bash
+yarn admin dist-tag --version 10.0.0 --tag latest
+```
