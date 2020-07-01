@@ -154,25 +154,27 @@ export default function (argv: ValidateCommitsOptions, logger: logging.Logger) {
     }
 
     const [type, scope] = subject.slice(1);
+    const validTypes = Object.keys(types).join(', ');
+    const validScopes = Object.keys(packages).join(', ');
     if (!(type in types)) {
-      _invalid(sha, message, 'has an unknown type. You can use wip: to avoid this.');
+      _invalid(sha, message, `has an unknown type. Valid types are [${validTypes}]. You can use wip: to avoid this.`);
       continue;
     }
     switch (types[type].scope) {
       case Scope.Either:
         if (scope && !packages[scope]) {
-          _invalid(sha, message, 'has a scope that does not exist');
+          _invalid(sha, message, `has a scope that does not exist. Valid scopes are [${validScopes}].`);
           continue;
         }
         break;
 
       case Scope.MustHave:
         if (!scope) {
-          _invalid(sha, message, 'should always have a scope');
+          _invalid(sha, message, `should always have a scope. Valid scopes are [${validScopes}].`);
           continue;
         }
         if (!packages[scope]) {
-          _invalid(sha, message, 'has a scope that does not exist');
+          _invalid(sha, message, `has a scope that does not exist. Valid scopes are [${validScopes}].`);
           continue;
         }
         break;
