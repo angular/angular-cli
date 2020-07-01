@@ -20,12 +20,6 @@ describe('Browser Builder commonjs warning', () => {
     await host.initialize().toPromise();
     architect = (await createArchitect(host.root())).architect;
 
-    // Add a Common JS dependency
-    host.appendToFile('src/app/app.component.ts', `
-      import 'bootstrap';
-      import 'zone.js/dist/zone-error';
-    `);
-
     // Create logger
     logger = new logging.Logger('');
     logs = [];
@@ -35,16 +29,27 @@ describe('Browser Builder commonjs warning', () => {
   afterEach(async () => host.restore().toPromise());
 
   it('should show warning when depending on a Common JS bundle', async () => {
+    // Add a Common JS dependency
+    host.appendToFile('src/app/app.component.ts', `
+      import 'bootstrap';
+    `);
+
     const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
     const output = await run.result;
     expect(output.success).toBe(true);
     const logMsg = logs.join();
-    expect(logMsg).toMatch(/WARNING in.+app\.component\.ts depends on bootstrap\. CommonJS or AMD dependencies/);
+    expect(logMsg).toMatch(/WARNING in.+app\.component\.ts depends on 'bootstrap'\. CommonJS or AMD dependencies/);
     expect(logMsg).not.toContain('jquery', 'Should not warn on transitive CommonJS packages which parent is also CommonJS.');
     await run.stop();
   });
 
   it('should not show warning when depending on a Common JS bundle which is allowed', async () => {
+    // Add a Common JS dependency
+    host.appendToFile('src/app/app.component.ts', `
+      import 'bootstrap';
+      import 'zone.js/dist/zone-error';
+    `);
+
     const overrides = {
       allowedCommonJsDependencies: [
         'bootstrap',
@@ -56,6 +61,22 @@ describe('Browser Builder commonjs warning', () => {
     const output = await run.result;
     expect(output.success).toBe(true);
     expect(logs.join()).not.toContain('WARNING');
+    await run.stop();
+  });
+
+  it(`should show warning when importing non global '@angular/common/locale' data`, async () => {
+    // Add a Common JS dependency
+    host.appendToFile('src/app/app.component.ts', `
+      import '@angular/common/locales/fr';
+    `);
+
+    const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
+    const output = await run.result;
+    expect(output.success).toBe(true);
+
+    const logMsg = logs.join();
+    expect(logMsg).toMatch(/WARNING in.+app\.component\.ts depends on '@angular\/common\/locales\/fr'/);
+    expect(logMsg).toContain(`Did you mean to import '@angular/common/locales/global/fr'`);
     await run.stop();
   });
 });

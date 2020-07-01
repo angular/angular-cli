@@ -81,8 +81,16 @@ export class CommonJsUsageWarnPlugin {
             // And if the issuer request is not from 'webpack-dev-server', as 'webpack-dev-server'
             // will require CommonJS libraries for live reloading such as 'sockjs-node'.
             if (mainIssuer?.name === 'main' && !issuer?.userRequest?.includes('webpack-dev-server')) {
-              const warning = `${issuer?.userRequest} depends on ${rawRequest}. CommonJS or AMD dependencies can cause optimization bailouts.\n` +
-                'For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies';
+              let warning = `${issuer?.userRequest} depends on '${rawRequest}'.`;
+
+              if (rawRequest.startsWith('@angular/common/locales')) {
+                warning += `\nWhen using the 'localize' option this import is not needed. ` +
+                  `Did you mean to import '${rawRequest.replace(/locales(\/extra)?\//, 'locales/global/')}'?\n` +
+                  'For more info see: https://angular.io/guide/i18n#import-global-variants-of-the-locale-data';
+              } else {
+                warning += ' CommonJS or AMD dependencies can cause optimization bailouts.\n' +
+                  'For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies';
+              }
 
               // Avoid showing the same warning multiple times when in 'watch' mode.
               if (!this.shownWarnings.has(warning)) {
