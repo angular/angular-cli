@@ -171,13 +171,21 @@ function _getVersionFromGit(experimental: boolean): string {
     stableVersion += stableVersion.includes('+') ? '.with-local-changes' : '+with-local-changes';
   }
 
-  experimentalVersion = `0.${stableVersion.replace(/^(\d+)\.(\d+)/, (_, major, minor) => {
-    return '' + (parseInt(major, 10) * 100 + parseInt(minor, 10));
-  })}`;
+  experimentalVersion = stableToExperimentalVersion(stableVersion);
 
   return experimental ? experimentalVersion : stableVersion;
 }
 
+/**
+ * Convert a stable version to its experimental equivalent. For example,
+ *   stable = 10.2.3, experimental = 0.1002.3
+ * @param stable Must begin with d+.d+ where d is a 0-9 digit.
+ */
+export function stableToExperimentalVersion(stable: string): string {
+  return `0.${stable.replace(/^(\d+)\.(\d+)/, (_, major, minor) => {
+    return '' + (parseInt(major, 10) * 100 + parseInt(minor, 10));
+  })}`;
+}
 
 // All the supported packages. Go through the packages directory and create a map of
 // name => PackageInfo. This map is partial as it lacks some information that requires the
