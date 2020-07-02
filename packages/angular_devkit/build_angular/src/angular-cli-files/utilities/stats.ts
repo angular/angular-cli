@@ -94,8 +94,12 @@ export function statsWarningsToString(json: any, statsConfig: any) {
   const colors = statsConfig.colors;
   const rs = (x: string) => colors ? reset(x) : x;
   const y = (x: string) => colors ? bold(yellow(x)) : x;
+  const warnings = [...json.warnings];
+  if (json.children) {
+    warnings.push(...json.children.map((c: any) => c.warnings));
+  }
 
-  return rs('\n' + json.warnings
+  return rs('\n' + warnings
       .map((warning: any) => `${warning}`)
       .filter((warning: string) => !ERRONEOUS_WARNINGS.some((erroneous) => erroneous.test(warning)))
       .map((warning: string) => y(`WARNING in ${warning}`))
@@ -106,6 +110,18 @@ export function statsErrorsToString(json: any, statsConfig: any) {
   const colors = statsConfig.colors;
   const rs = (x: string) => colors ? reset(x) : x;
   const r = (x: string) => colors ? bold(red(x)) : x;
+  const errors = [...json.errors];
+  if (json.children) {
+    errors.push(...json.children.map((c: any) => c.errors));
+  }
 
-  return rs('\n' + json.errors.map((error: any) => r(`ERROR in ${error}`)).join('\n'));
+  return rs('\n' + errors.map((error: any) => r(`ERROR in ${error}`)).join('\n'));
+}
+
+export function statsHasErrors(json: any): boolean {
+  return json.errors.length > 0 || !!json.children?.some((c: any) => c.errors.length);
+}
+
+export function statsHasWarnings(json: any): boolean {
+  return json.warnings.length > 0 || !!json.children?.some((c: any) => c.warnings.length);
 }
