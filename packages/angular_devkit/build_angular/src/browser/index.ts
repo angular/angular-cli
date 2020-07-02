@@ -39,6 +39,8 @@ import {
   generateBuildStats,
   generateBundleStats,
   statsErrorsToString,
+  statsHasErrors,
+  statsHasWarnings,
   statsToString,
   statsWarningsToString,
 } from '../angular-cli-files/utilities/stats';
@@ -302,10 +304,10 @@ export function buildWebpackBrowser(
           if (!success && useBundleDownleveling) {
             // If using bundle downleveling then there is only one build
             // If it fails show any diagnostic messages and bail
-            if (webpackStats && webpackStats.warnings.length > 0) {
+            if (statsHasWarnings(webpackStats)) {
               context.logger.warn(statsWarningsToString(webpackStats, { colors: true }));
             }
-            if (webpackStats && webpackStats.errors.length > 0) {
+            if (statsHasErrors(webpackStats)) {
               context.logger.error(statsErrorsToString(webpackStats, { colors: true }));
             }
 
@@ -662,14 +664,13 @@ export function buildWebpackBrowser(
                     break;
                   default:
                     assertNever(severity);
-                    break;
                 }
               }
 
-              if (webpackStats && webpackStats.warnings.length > 0) {
+              if (statsHasWarnings(webpackStats)) {
                 context.logger.warn(statsWarningsToString(webpackStats, { colors: true }));
               }
-              if (webpackStats && webpackStats.errors.length > 0) {
+              if (statsHasErrors(webpackStats)) {
                 context.logger.error(statsErrorsToString(webpackStats, { colors: true }));
 
                 return { success: false };
