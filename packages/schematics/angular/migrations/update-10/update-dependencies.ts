@@ -16,6 +16,7 @@ import { latestVersions } from '../../utility/latest-versions';
 export default function (): Rule {
   return (host, context) => {
     const dependenciesToUpdate: Record<string, string> = {
+      'codelyzer': '^6.0.0',
       'jasmine-core': '~3.5.0',
       'jasmine-spec-reporter': '~5.0.0',
       'karma': '~5.0.0',
