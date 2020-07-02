@@ -17,7 +17,7 @@
     "ini": "1.3.5",
     "npm-package-arg": "^8.0.0",
     "pacote": "9.5.12",
-    "rxjs": "6.5.5",
+    "rxjs": "6.6.0",
     "semver": "7.3.2",
     "semver-intersect": "1.4.0"
   }
