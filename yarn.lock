@@ -9118,7 +9118,7 @@ napi-macros@~2.0.0:
   resolved "https://registry.yarnpkg.com/napi-macros/-/napi-macros-2.0.0.tgz#2b6bae421e7b96eb687aa6c77a7858640670001b"
   integrity sha512-A0xLykHtARfueITVDernsAWdtIMbOJgKgcluwENp3AlsKN/PloyO10HtmoqnFAQAcxPkgZN7wdfPfEd0zNGxbg==
 
-native-request@^1.0.5:
+native-request@1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/native-request/-/native-request-1.0.5.tgz#da67637c0a0ed0758243d1a688d647612f2d5a0a"
   integrity sha512-7wU3DvBGAJQxWuMR3F62zrhB7hxNj2DdlC/eBVrCgavc6+ZpFZOqS/PsR7QyUPLMkFk0GvvzoeeOAZGLLnObnA==
@@ -13343,13 +13343,13 @@ unique-string@^2.0.0:
   dependencies:
     crypto-random-string "^2.0.0"
 
-universal-analytics@0.4.21:
-  version "0.4.21"
-  resolved "https://registry.yarnpkg.com/universal-analytics/-/universal-analytics-0.4.21.tgz#fbdf87455c0389666a2b22f707a422eb84ca0616"
-  integrity sha512-8V37z6iO4qIgC3SYKwGGYGbFTc+mkz3WYLwc8TxIFbwAwckWsEIomETLQdrnAsGFInRQz5DyolBEYgSCDRlh2Q==
+universal-analytics@0.4.22:
+  version "0.4.22"
+  resolved "https://registry.yarnpkg.com/universal-analytics/-/universal-analytics-0.4.22.tgz#f9800342ce1e8454fdb1032a095a4c40c84c293d"
+  integrity sha512-g8ce+HGPbQN0rGK4rgagt1CbZ/wHmcElzXECMwkelgTY5BrtGLuGGVVGIaH23pKFRRfJybcd0SjSDRTLoiYSRg==
   dependencies:
     debug "^4.1.1"
-    native-request "^1.0.5"
+    native-request "1.0.5"
     uuid "^8.0.0"
 
 universalify@^0.1.0:
