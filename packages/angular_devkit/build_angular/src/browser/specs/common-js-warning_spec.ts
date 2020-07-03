@@ -64,7 +64,7 @@ describe('Browser Builder commonjs warning', () => {
     await run.stop();
   });
 
-  it(`should show warning when importing non global '@angular/common/locale' data`, async () => {
+  it(`should not show warning when importing non global local data '@angular/common/locale/fr'`, async () => {
     // Add a Common JS dependency
     host.appendToFile('src/app/app.component.ts', `
       import '@angular/common/locales/fr';
@@ -74,9 +74,7 @@ describe('Browser Builder commonjs warning', () => {
     const output = await run.result;
     expect(output.success).toBe(true);
 
-    const logMsg = logs.join();
-    expect(logMsg).toMatch(/WARNING in.+app\.component\.ts depends on '@angular\/common\/locales\/fr'/);
-    expect(logMsg).toContain(`Did you mean to import '@angular/common/locales/global/fr'`);
+    expect(logs.join()).not.toContain('WARNING');
     await run.stop();
   });
 });
