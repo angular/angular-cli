@@ -132,7 +132,7 @@
     "cacache": "15.0.0",
     "caniuse-lite": "1.0.30001032",
     "circular-dependency-plugin": "5.2.0",
-    "codelyzer": "^5.0.0",
+    "codelyzer": "^6.0.0",
     "common-tags": "^1.8.0",
     "conventional-changelog": "^3.0.0",
     "conventional-commits-parser": "^3.0.0",
