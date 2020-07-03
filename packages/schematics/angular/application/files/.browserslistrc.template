@@ -11,7 +11,7 @@
 last 1 Chrome version
 last 1 Firefox version
 last 2 Edge major versions
-last 2 Safari major version
+last 2 Safari major versions
 last 2 iOS major versions
 Firefox ESR<% if (legacyBrowsers) { %>
 IE 9-10 # Angular support for IE 9-10 has been deprecated and will be removed as of Angular v11.
