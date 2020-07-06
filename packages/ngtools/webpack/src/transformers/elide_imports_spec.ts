@@ -28,6 +28,7 @@ describe('@ngtools/webpack transformers', () => {
 
     const additionalFiles: Record<string, string> = {
       'const.ts': `
+        export const animations = [];
         export const promise = () => null;
         export const take = () => null;
         export default promise;
@@ -527,6 +528,44 @@ describe('@ngtools/webpack transformers', () => {
         const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
 
         expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+      });
+
+      describe('NGTSC - ShorthandPropertyAssignment to PropertyAssignment', () => {
+        const transformShorthandPropertyAssignment = (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
+          const visit: ts.Visitor = node => {
+            if (ts.isShorthandPropertyAssignment(node)) {
+              return ts.createPropertyAssignment(node.name, node.name);
+            }
+
+            return ts.visitEachChild(node, child => visit(child), context);
+          };
+
+          return node => ts.visitNode(node, visit);
+        };
+
+        it('should not elide import when ShorthandPropertyAssignment is transformed to PropertyAssignment', () => {
+          const input = tags.stripIndent`
+            import { animations } from './const';
+            const used = {
+              animations
+            }
+
+            ${dummyNode}
+          `;
+
+          const output = tags.stripIndent`
+            import { animations } from './const';
+            const used = { animations: animations };
+          `;
+
+          const { program, compilerHost } = createTypescriptContext(input, additionalFiles);
+          const result = transformTypescript(undefined, [
+            transformShorthandPropertyAssignment,
+            transformer(program),
+          ], program, compilerHost);
+
+          expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+        });
       });
     });
   });
