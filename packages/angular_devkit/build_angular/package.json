@@ -22,7 +22,7 @@
     "circular-dependency-plugin": "5.2.0",
     "clean-css": "4.2.1",
     "coverage-istanbul-loader": "2.0.3",
-    "copy-webpack-plugin": "6.0.2",
+    "copy-webpack-plugin": "6.0.3",
     "core-js": "3.6.4",
     "file-loader": "4.2.0",
     "find-cache-dir": "3.0.0",
