@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonAstNode, JsonAstString, JsonParseMode, dirname, join, normalize, parseJsonAst, resolve } from '@angular-devkit/core';
+import { JsonAstNode, JsonAstString, JsonParseMode, dirname, join, logging, normalize, parseJsonAst, resolve } from '@angular-devkit/core';
 import { DirEntry, Rule, chain } from '@angular-devkit/schematics';
 import { findPropertyInAstObject } from '../../utility/json-utils';
 import { getWorkspace } from '../../utility/workspace';
@@ -18,7 +18,7 @@ const SOLUTIONS_TS_CONFIG_HEADER = `/*
 */
 `;
 
-function* visitExtendedJsonFiles(directory: DirEntry): IterableIterator<[string, JsonAstString]> {
+function* visitExtendedJsonFiles(directory: DirEntry, logger: logging.LoggerApi): IterableIterator<[string, JsonAstString]> {
   for (const path of directory.subfiles) {
     if (!path.endsWith('.json')) {
       continue;
@@ -33,8 +33,16 @@ function* visitExtendedJsonFiles(directory: DirEntry): IterableIterator<[string,
     let jsonAst: JsonAstNode;
     try {
       jsonAst = parseJsonAst(content, JsonParseMode.Loose);
-    } catch {
-      throw new Error(`Invalid JSON AST Object (${path})`);
+    } catch (error) {
+      let jsonFilePath = `${join(directory.path, path)}`;
+      jsonFilePath = jsonFilePath.startsWith('/') ? jsonFilePath.substr(1) : jsonFilePath;
+
+      const msg = error instanceof Error ? error.message : error;
+      logger.warn(
+        `Failed to parse "${jsonFilePath}" as JSON AST Object. ${msg}\n` +
+        'If this is a TypeScript configuration file you will need to update the "extends" value manually.',
+      );
+      continue;
     }
 
     if (jsonAst.kind !== 'object') {
@@ -54,12 +62,12 @@ function* visitExtendedJsonFiles(directory: DirEntry): IterableIterator<[string,
       continue;
     }
 
-    yield* visitExtendedJsonFiles(directory.dir(path));
+    yield* visitExtendedJsonFiles(directory.dir(path), logger);
   }
 }
 
 function updateTsconfigExtendsRule(): Rule {
-  return host => {
+  return (host, context) => {
     if (!host.exists('tsconfig.json')) {
       return;
     }
@@ -68,7 +76,7 @@ function updateTsconfigExtendsRule(): Rule {
     host.rename('tsconfig.json', 'tsconfig.base.json');
 
     // Iterate over all tsconfig files and change the extends from 'tsconfig.json' 'tsconfig.base.json'
-    for (const [tsconfigPath, extendsAst] of visitExtendedJsonFiles(host.root)) {
+    for (const [tsconfigPath, extendsAst] of visitExtendedJsonFiles(host.root, context.logger)) {
       const tsConfigDir = dirname(normalize(tsconfigPath));
       if ('/tsconfig.json' !== resolve(tsConfigDir, normalize(extendsAst.value))) {
         // tsconfig extends doesn't refer to the workspace tsconfig path.
