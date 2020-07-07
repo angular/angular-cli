@@ -120,4 +120,15 @@ describe('Migration to create "Solution Style" tsconfig', () => {
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
     expect(readJsonFile(newTree, 'src/tsconfig.json').extends).toEqual('./../tsconfig.base.json');
   });
+
+  it('should show warning with full path when parsing invalid JSON', async () => {
+    const logs: string[] = [];
+    schematicRunner.logger.subscribe(m => logs.push(m.message));
+
+    tree.create('src/invalid/error.json', '{ invalid }');
+    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
+
+    expect(readJsonFile(newTree, 'src/tsconfig.tsc.json').extends).toEqual('./tsconfig.json');
+    expect(logs.join('\n')).toContain('Failed to parse "src/invalid/error.json" as JSON AST Object. Invalid JSON character');
+  });
 });
