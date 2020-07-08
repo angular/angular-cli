@@ -80,7 +80,6 @@ GLOBALS = {
     "@hapi/hapi": "hapi.hapi",
     "rxjs": "rxjs",
     "rxjs/operators": "rxjs.operators",
-    "tslib": "tslib",
 }
 
 def ng_module(name, tsconfig = None, testonly = False, deps = [], bundle_dts = True, **kwargs):
@@ -127,10 +126,12 @@ def ng_test_library(deps = [], tsconfig = None, **kwargs):
         **kwargs
     )
 
-def ng_package(globals = {}, **kwargs):
+def ng_package(globals = {}, deps = [], **kwargs):
     globals = dict(globals, **GLOBALS)
-
-    _ng_package(globals = globals, substitutions = PKG_GROUP_REPLACEMENTS, **kwargs)
+    deps = deps + [
+        "@npm//tslib",
+    ]
+    _ng_package(globals = globals, deps = deps, substitutions = PKG_GROUP_REPLACEMENTS, **kwargs)
 
 def pkg_npm(name, substitutions = {}, **kwargs):
     _pkg_npm(
