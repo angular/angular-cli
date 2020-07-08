@@ -247,7 +247,7 @@ jobs:
   # This is where we put all the misbehaving and flaky tests so we can fine-tune their conditions 
   # and rerun them faster.
   flake-jail:
-    executor: action-executor
+    executor: test-executor
     steps:
       - custom_attach_workspace
       - run: yarn webdriver-update
