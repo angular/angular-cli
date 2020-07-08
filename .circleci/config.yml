@@ -247,7 +247,7 @@ jobs:
   # This is where we put all the misbehaving and flaky tests so we can fine-tune their conditions 
   # and rerun them faster.
   flake-jail:
-    executor: action-executor
+    executor: test-executor
     steps:
       - custom_attach_workspace
       - run: yarn webdriver-update
@@ -317,7 +317,7 @@ jobs:
       - persist_to_workspace:
           root: *workspace_location
           paths:
-            - ./*            
+            - ./*
 
   test-win:
     executor: windows-executor
@@ -418,7 +418,7 @@ workflows:
             - build
       - flake-jail:
           requires:
-            - build            
+            - build
       
       # Windows jobs
       # These jobs only run after their non-windows counterparts finish successfully.
