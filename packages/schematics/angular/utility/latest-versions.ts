@@ -8,7 +8,7 @@
 
 export const latestVersions = {
   // These versions should be kept up to date with latest Angular peer dependencies.
-  Angular: '~10.0.3',
+  Angular: '~10.0.2',
   RxJs: '~6.5.5',
   ZoneJs: '~0.10.3',
   TypeScript: '~3.9.5',
@@ -18,9 +18,9 @@ export const latestVersions = {
   // For our e2e tests, these versions must match the latest tag present on the branch.
   // During RC periods they will not match the latest RC until there's a new git tag, and
   // should not be updated.
-  DevkitBuildAngular: '~0.1000.2',
-  DevkitBuildNgPackagr: '~0.1000.2',
-  DevkitBuildWebpack: '~0.1000.2',
+  DevkitBuildAngular: '~0.1000.1',
+  DevkitBuildNgPackagr: '~0.1000.1',
+  DevkitBuildWebpack: '~0.1000.1',
 
   ngPackagr: '^10.0.0',
 };
