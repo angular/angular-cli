@@ -18,7 +18,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
-import { addTsConfigProjectReferences, verifyBaseTsConfigExists } from '../utility/tsconfig';
+import { verifyBaseTsConfigExists } from '../utility/tsconfig';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
 import { Schema as E2eOptions } from './schema';
@@ -68,9 +68,6 @@ export default function (options: E2eOptions): Rule {
           }),
           move(root),
         ])),
-      addTsConfigProjectReferences([
-        e2eTsConfig,
-      ]),
     ]);
   };
 }
