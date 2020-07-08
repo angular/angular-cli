@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as path from 'path';
 import { getGlobalVariable } from '../../utils/env';
 import { exec, silentNpm } from '../../utils/process';
@@ -10,11 +11,12 @@ export default async function () {
     return;
   }
 
+  fs.writeFileSync('.npmrc', 'registry = http://localhost:4873', 'utf8');
+
   await silentNpm(
     'install',
     '-g',
     '@angular-devkit/schematics-cli',
-    '--registry=http://localhost:4873',
   );
   await exec(process.platform.startsWith('win') ? 'where' : 'which', 'schematics');
 
