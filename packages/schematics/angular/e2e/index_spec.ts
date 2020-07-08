@@ -82,19 +82,6 @@ describe('Application Schematic', () => {
     expect(content).toMatch(/🌮-🌯/);
   });
 
-  it('should add reference in solution style tsconfig', async () => {
-    const tree = await schematicRunner.runSchematicAsync('e2e', defaultOptions, applicationTree)
-      .toPromise();
-
-    // tslint:disable-next-line:no-any
-    const { references } = parseJson(tree.readContent('/tsconfig.json').toString(), JsonParseMode.Loose) as any;
-    expect(references).toEqual([
-      { path: './projects/foo/tsconfig.app.json' },
-      { path: './projects/foo/tsconfig.spec.json' },
-      { path: './projects/foo/e2e/tsconfig.json' },
-    ]);
-  });
-
   describe('workspace config', () => {
     it('should add e2e targets for the app', async () => {
       const tree = await schematicRunner.runSchematicAsync('e2e', defaultOptions, applicationTree)
