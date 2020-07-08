@@ -88,7 +88,6 @@ describe('Application Schematic', () => {
     expect(references).toEqual([
       { path: './projects/foo/tsconfig.app.json' },
       { path: './projects/foo/tsconfig.spec.json' },
-      { path: './projects/foo/e2e/tsconfig.json' },
     ]);
   });
 

@@ -162,7 +162,6 @@ describe('Web Worker Schematic', () => {
     expect(references).toEqual([
       { path: './projects/bar/tsconfig.app.json' },
       { path: './projects/bar/tsconfig.spec.json' },
-      { path: './projects/bar/e2e/tsconfig.json' },
       { path: './projects/bar/tsconfig.worker.json' },
     ]);
   });

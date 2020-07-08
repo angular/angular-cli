@@ -273,10 +273,8 @@ describe('Universal Schematic', () => {
     expect(references).toEqual([
       { path: './tsconfig.app.json' },
       { path: './tsconfig.spec.json' },
-      { path: './e2e/tsconfig.json' },
       { path: './projects/bar/tsconfig.app.json' },
       { path: './projects/bar/tsconfig.spec.json' },
-      { path: './projects/bar/e2e/tsconfig.json' },
       { path: './tsconfig.server.json' },
     ]);
   });
