@@ -12,6 +12,7 @@
 import { logging } from '@angular-devkit/core';
 import { execSync } from 'child_process';
 import { packages, stableToExperimentalVersion } from '../lib/packages';
+import { wombat } from '../lib/registries';
 
 interface DistTagOptions {
   /**
@@ -24,10 +25,15 @@ interface DistTagOptions {
    * experimental packages.
    */
   version: string;
+
   /**
    * Tag is usually "latest" or "next", but could also be "v10-lts" for example.
    */
   tag: string;
+
+  /** The package registry to tag. */
+  registry: string;
+
   /**
    * If true, prints the help message.
    */
@@ -50,7 +56,7 @@ Usage:
 
     return;
   }
-  const {version, tag} = args;
+  const {version, tag, registry: registryArg} = args;
   if (!version || version.startsWith('v')) {
     throw new Error('Version must be specified in format d+.d+.d+');
   }
@@ -60,11 +66,12 @@ Usage:
   if (!tag) {
     throw new Error('Tag must be non-empty, for example: latest, next, v10-lts, etc');
   }
+  const registry = registryArg ?? wombat;
   const publicPackages = Object.values(packages).filter(p => !p.private);
   for (const {name, experimental} of publicPackages) {
     const actualVersion = experimental ? stableToExperimentalVersion(version) : version;
     // See https://docs.npmjs.com/cli/dist-tag for documentation
-    const cmd = `npm dist-tag add '${name}@${actualVersion}' '${tag}'`;
+    const cmd = `npm dist-tag add '${name}@${actualVersion}' '${tag}' --registry '${registry}'`;
     logger.debug(cmd);  // print debug output by specifying --verbose
     const output = execSync(cmd, { encoding: 'utf8' });
     logger.info(output.trim());
