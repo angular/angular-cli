@@ -23,6 +23,11 @@ const knownFlakes = [
   // Rebuild tests in test-large are flakey if not run as the first suite.
   // https://github.com/angular/angular-cli/pull/15204
   'packages/angular_devkit/build_angular/test/browser/rebuild_spec_large.ts',
+
+  // App-shell builder imports zone.js, which patches the global promises.
+  // In some cases this will causes flakiness in tests that run after this one.
+  // We must run this test at the very last.
+  'packages/angular_devkit/build_angular/test/app-shell/app-shell_spec_large.ts',
 ];
 
 const projectBaseDir = join(__dirname, '..');
@@ -188,7 +193,12 @@ export default function(args: ParsedArgs, logger: logging.Logger) {
   }
 
   // Filter in/out flakes according to the --flakey flag.
-  tests = tests.filter(test => !!args.flakey == knownFlakes.includes(test.replace(/[\/\\]/g, '/')));
+  tests = tests.map(p => p.replace(/[\/\\]/g, '/')).filter(test => !!args.flakey == knownFlakes.includes(test));
+
+  // Order flakey tests are defined in the known flakes array.
+  if (args.flakey) {
+    tests.sort((a, b) => knownFlakes.indexOf(a) - knownFlakes.indexOf(b));
+  }
 
   if (args.shard !== undefined) {
     // Remove tests that are not part of this shard.
