@@ -20,7 +20,6 @@ export interface PublishArgs {
   registry?: string;
 }
 
-
 function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
   if (process.platform.startsWith('win')) {
     args.unshift('/c', command);
@@ -52,7 +51,8 @@ function _branchCheck(args: PublishArgs, logger: logging.Logger) {
     case 'master':
       if (args.tag !== 'next') {
         throw new Error(tags.oneLine`
-          Releasing from master requires a next tag. Use --branchCheck=false to skip this check.
+          Releasing from master requires a next tag. Use --no-branchCheck to
+          skip this check.
         `);
       }
   }
@@ -75,7 +75,7 @@ function _versionCheck(args: PublishArgs, logger: logging.Logger) {
   if (betaOrRc && args.tag !== 'next') {
     throw new Error(tags.oneLine`
       Releasing version ${JSON.stringify(version)} requires a next tag.
-      Use --versionCheck=false to skip this check.
+      Use --no-versionCheck to skip this check.
     `);
   }
 
@@ -90,10 +90,11 @@ function _versionCheck(args: PublishArgs, logger: logging.Logger) {
 }
 
 export default async function (args: PublishArgs, logger: logging.Logger) {
-  if (args.branchCheck === undefined || args.branchCheck === true) {
+  if (args.branchCheck ?? true) {
     _branchCheck(args, logger);
   }
-  if (args.versionCheck === undefined || args.versionCheck === true) {
+
+  if (args.versionCheck ?? true) {
     _versionCheck(args, logger);
   }
 

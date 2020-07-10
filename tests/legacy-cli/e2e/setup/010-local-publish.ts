@@ -8,8 +8,8 @@ export default async function() {
     'admin',
     '--',
     'publish',
-    '--versionCheck=false',
-    '--branchCheck=false',
+    '--no-versionCheck',
+    '--no-branchCheck',
     '--registry=http://localhost:4873',
   ];
 
