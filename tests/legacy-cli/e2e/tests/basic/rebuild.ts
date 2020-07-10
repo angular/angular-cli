@@ -97,6 +97,34 @@ export default function() {
         `
       })
     ]))
+    .then(() => Promise.all([
+      waitForAnyProcessOutputToMatch(validBundleRegEx, 20000),
+      writeMultipleFiles({
+        'src/app/app.module.ts': `
+
+          import { BrowserModule } from '@angular/platform-browser';
+          import { NgModule } from '@angular/core';
+
+          import { AppComponent } from './app.component';
+
+          @NgModule({
+            declarations: [
+              AppComponent
+            ],
+            imports: [
+              BrowserModule
+            ],
+            providers: [],
+            bootstrap: [AppComponent]
+          })
+          export class AppModule { }
+
+          console.log('$$_E2E_GOLDEN_VALUE_1');
+          export let X = '$$_E2E_GOLDEN_VALUE_2';
+          console.log('File changed with no import/export changes');
+        `,
+      }),
+    ]))
     .then(() => wait(2000))
     .then(() => request('http://localhost:4200/main.js'))
     .then((body) => {
@@ -110,7 +138,7 @@ export default function() {
         throw new Error('Expected golden value 3.');
       }
     })
-    .then(() => killAllProcesses(), (err: any) => {
+    .then(() => killAllProcesses(), (err: unknown) => {
       killAllProcesses();
       throw err;
     });
