@@ -15,6 +15,7 @@ import build from './build';
 
 export interface PublishArgs {
   tag?: string;
+  tagCheck?: boolean;
   branchCheck?: boolean;
   versionCheck?: boolean;
   registry?: string;
@@ -39,6 +40,24 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
   } else {
     return stdout.toString();
   }
+}
+
+/** Returns whether or not the given tag is valid to be used. */
+function _tagCheck(tag: string) {
+  if (tag === 'latest') {
+    return; // Valid
+  }
+  if (tag === 'next') {
+    return; // Valid
+  }
+  if (/v\d+-lts/.test(tag)) {
+    return; // Valid
+  }
+
+  throw new Error(tags.oneLine`
+    --tag should be "latest", "next", or "vX-lts". Use \`--no-tagCheck false\`
+    to skip this check if necessary.
+  `);
 }
 
 
@@ -90,6 +109,18 @@ function _versionCheck(args: PublishArgs, logger: logging.Logger) {
 }
 
 export default async function (args: PublishArgs, logger: logging.Logger) {
+  const { tag } = args;
+  if (!tag) {
+    // NPM requires that all releases have a tag associated, defaulting to
+    // `latest`, so there is no way to allow a publish without a tag.
+    // https://github.com/npm/npm/issues/10625#issuecomment-162106553
+    throw new Error('--tag is required.');
+  }
+
+  if (args.tagCheck ?? true) {
+    _tagCheck(tag);
+  }
+
   if (args.branchCheck ?? true) {
     _branchCheck(args, logger);
   }
@@ -97,6 +128,9 @@ export default async function (args: PublishArgs, logger: logging.Logger) {
   if (args.versionCheck ?? true) {
     _versionCheck(args, logger);
   }
+
+  // If no registry is provided, the wombat proxy should be used.
+  const registry = args.registry ?? wombat;
 
   logger.info('Building...');
   await build({}, logger.createChild('build'));
@@ -113,13 +147,7 @@ export default async function (args: PublishArgs, logger: logging.Logger) {
       .then(() => {
         logger.info(name);
 
-        const publishArgs = ['publish'];
-        if (args.tag) {
-          publishArgs.push('--tag', args.tag);
-        }
-
-        // If no registry is provided, the wombat proxy should be used.
-        publishArgs.push('--registry', args.registry ?? wombat);
+        const publishArgs = [ 'publish', '--tag', tag, '--registry', registry ];
 
         return _exec('npm', publishArgs, {
           cwd: pkg.dist,
