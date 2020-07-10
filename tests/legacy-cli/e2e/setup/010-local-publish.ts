@@ -16,6 +16,8 @@ export default async function() {
   const pre = prerelease(packages['@angular/cli'].version);
   if (pre && pre.length > 0) {
     publishArgs.push('--tag', 'next');
+  } else {
+    publishArgs.push('--tag', 'latest');
   }
 
   await npm(...publishArgs);
