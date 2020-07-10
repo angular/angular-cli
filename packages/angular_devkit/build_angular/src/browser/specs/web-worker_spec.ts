@@ -147,7 +147,7 @@ describe('Browser Builder Web Worker support', () => {
     const { run } = await timer(1000).pipe(
       switchMap(() => architect.scheduleTarget(target, overrides)),
       switchMap(run => run.output.pipe(map(output => ({ run, output })))),
-      debounceTime(500),
+      debounceTime(1000),
       tap(({ output }) => expect(output.success).toBe(true, 'build should succeed')),
       tap(() => {
         switch (phase) {
