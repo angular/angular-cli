@@ -96,23 +96,16 @@ function readTsLintConfig(host: Tree, path: string): JsonAstObject {
 function mergeWithRootTsLint(parentHost: Tree) {
   return (host: Tree) => {
     const tsLintPath = '/tslint.json';
+    const rulesPath = ['rules'];
     if (!host.exists(tsLintPath)) {
       return;
     }
 
-    const rootTslintConfig = new JSONFile(parentHost, tsLintPath);
-    const appTslintConfig = new JSONFile(host, tsLintPath);
-
-    for (const [pKey, pValue] of Object.entries(rootTslintConfig.get([]) as Record<string, JsonValue>)) {
-      if (typeof pValue !== 'object' || Array.isArray(pValue)) {
-        appTslintConfig.modify([pKey], pValue);
-        continue;
-      }
-
-      for (const [key, value] of Object.entries(rootTslintConfig.get([pKey]) as Record<string, JsonObject>)) {
-        appTslintConfig.modify([pKey, key], value);
-      }
-    }
+    const rootTsLintFile = new JSONFile(parentHost, tsLintPath);
+    const rootRules = rootTsLintFile.get(rulesPath) as {};
+    const appRules = new JSONFile(host, tsLintPath).get(rulesPath) as {};
+    rootTsLintFile.modify(rulesPath, { ...rootRules, ...appRules });
+    host.overwrite(tsLintPath, rootTsLintFile.content);
   };
 }
 
