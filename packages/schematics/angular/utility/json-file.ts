@@ -10,11 +10,12 @@ import { JsonValue } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
 import { Node, applyEdits, findNodeAtLocation, getNodeValue, modify, parseTree } from 'jsonc-parser';
 
+export type InsertionIndex = (properties: string[]) => number;
 export type JSONPath = (string | number)[];
 
 /** @internal */
 export class JSONFile {
-  private content: string;
+  content: string;
   error: undefined | Error;
 
   constructor(
@@ -50,10 +51,13 @@ export class JSONFile {
     return node === undefined ? undefined : getNodeValue(node);
   }
 
-  modify(jsonPath: JSONPath, value: JsonValue | undefined, getInsertionIndex?: (properties: string[]) => number): void {
-    if (!getInsertionIndex) {
+  modify(jsonPath: JSONPath, value: JsonValue | undefined, insertInOrder?: InsertionIndex | false): void {
+    let getInsertionIndex: InsertionIndex | undefined;
+    if (insertInOrder === undefined) {
       const property = jsonPath.slice(-1)[0];
       getInsertionIndex = properties => [...properties, property].sort().findIndex(p => p === property);
+    } else if (insertInOrder !== false) {
+      getInsertionIndex = insertInOrder;
     }
 
     const edits = modify(
