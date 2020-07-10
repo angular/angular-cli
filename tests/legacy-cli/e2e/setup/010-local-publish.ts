@@ -8,14 +8,16 @@ export default async function() {
     'admin',
     '--',
     'publish',
-    '--versionCheck=false',
-    '--branchCheck=false',
+    '--no-versionCheck',
+    '--no-branchCheck',
     '--registry=http://localhost:4873',
   ];
 
   const pre = prerelease(packages['@angular/cli'].version);
   if (pre && pre.length > 0) {
     publishArgs.push('--tag', 'next');
+  } else {
+    publishArgs.push('--tag', 'latest');
   }
 
   await npm(...publishArgs);
