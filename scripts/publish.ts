@@ -10,8 +10,8 @@ import { logging, tags } from '@angular-devkit/core';
 import { spawnSync } from 'child_process';
 import * as semver from 'semver';
 import { packages } from '../lib/packages';
+import { wombat } from '../lib/registries';
 import build from './build';
-
 
 export interface PublishArgs {
   tag?: string;
@@ -118,7 +118,7 @@ export default async function (args: PublishArgs, logger: logging.Logger) {
         }
 
         // If no registry is provided, the wombat proxy should be used.
-        publishArgs.push('--registry', args.registry || 'https://wombat-dressing-room.appspot.com');
+        publishArgs.push('--registry', args.registry ?? wombat);
 
         return _exec('npm', publishArgs, {
           cwd: pkg.dist,
