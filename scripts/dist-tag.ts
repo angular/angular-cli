@@ -37,7 +37,7 @@ interface DistTagOptions {
 /**
  * This function adds a tag to all public packages in the CLI repo.
  */
-export default function(args: DistTagOptions, logger: logging.Logger) {
+export default function(args: Partial<DistTagOptions>, logger: logging.Logger) {
   if (args.help) {
     logger.info(`dist-tag adds a tag to all public packages in the CLI repo.
 
