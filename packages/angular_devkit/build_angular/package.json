@@ -23,7 +23,7 @@
     "autoprefixer": "9.8.4",
     "babel-loader": "8.1.0",
     "browserslist": "^4.9.1",
-    "cacache": "15.0.4",
+    "cacache": "15.0.5",
     "caniuse-lite": "^1.0.30001032",
     "circular-dependency-plugin": "5.2.0",
     "copy-webpack-plugin": "6.0.3",
