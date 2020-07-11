@@ -17,7 +17,7 @@
     "@babel/preset-env": "7.10.2",
     "@babel/runtime": "7.10.2",
     "@babel/template": "7.10.1",
-    "@jsdevtools/coverage-istanbul-loader": "3.0.3",
+    "@jsdevtools/coverage-istanbul-loader": "3.0.4",
     "@ngtools/webpack": "0.0.0",
     "ajv": "6.12.3",
     "autoprefixer": "9.8.4",
