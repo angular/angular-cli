@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-<% if (lazyRoute) { %>
+import { Routes, RouterModule } from '@angular/router';<% if (lazyRoute) { %>
+
 import { <%= classify(name) %>Component } from './<%= dasherize(name) %>.component';<% } %>
 
 const routes: Routes = [<% if (lazyRoute) { %>{ path: '', component: <%= classify(name) %>Component }<% } %>];
