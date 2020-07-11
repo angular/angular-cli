@@ -1726,6 +1726,17 @@
     merge-source-map "^1.1.0"
     schema-utils "^2.6.4"
 
+"@jsdevtools/coverage-istanbul-loader@3.0.4":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@jsdevtools/coverage-istanbul-loader/-/coverage-istanbul-loader-3.0.4.tgz#cc0228488e893b4cba87daafa4bf76ff9530d63a"
+  integrity sha512-EfpNJnsbgGkHbmBq2dvUaaTGiQ93BuWtvHZv/v5djxmTZ8/VsjRuD5kTGHG1oMX4tj6FDrm675ZTBkXKOnlK/g==
+  dependencies:
+    convert-source-map "^1.7.0"
+    istanbul-lib-instrument "^4.0.3"
+    loader-utils "^2.0.0"
+    merge-source-map "^1.1.0"
+    schema-utils "^2.7.0"
+
 "@mark.probst/unicode-properties@~1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@mark.probst/unicode-properties/-/unicode-properties-1.1.0.tgz#5caafeab4737df93163d6d288007df33f9939b80"
@@ -7600,7 +7611,7 @@ istanbul-lib-coverage@^3.0.0:
   resolved "https://registry.yarnpkg.com/istanbul-lib-coverage/-/istanbul-lib-coverage-3.0.0.tgz#f5944a37c70b550b02a78a5c3b2055b280cec8ec"
   integrity sha512-UiUIqxMgRDET6eR+o5HbfRYP1l0hqkWOs7vNxC/mggutCMUIhWMm8gAHb8tHlyfD3/l6rlgNA5cKdDzEAf6hEg==
 
-istanbul-lib-instrument@^4.0.1:
+istanbul-lib-instrument@^4.0.1, istanbul-lib-instrument@^4.0.3:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/istanbul-lib-instrument/-/istanbul-lib-instrument-4.0.3.tgz#873c6fff897450118222774696a3f28902d77c1d"
   integrity sha512-BXgQl9kf4WTCPCCpmFGoJkz/+uhvm7h7PFKUYxh7qarQd3ER33vHG//qaE8eN25l07YqZPpHXU9I09l/RD5aGQ==
