@@ -82,7 +82,7 @@
     "minimatch": "^3.0.4",
     "node-fetch": "^2.2.0",
     "protractor": "7.0.0",
-    "puppeteer": "~5.0.0",
+    "puppeteer": "~5.1.0",
     "rollup": "~2.21.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
