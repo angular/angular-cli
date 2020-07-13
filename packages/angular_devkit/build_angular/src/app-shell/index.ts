@@ -34,10 +34,6 @@ async function _renderUniversal(
 
   const root = context.workspaceRoot;
 
-  // Initialize zone.js
-  const zonePackage = require.resolve('zone.js', { paths: [root] });
-  await import(zonePackage);
-
   // Load platform server module renderer
   const platformServerPackage = require.resolve('@angular/platform-server', { paths: [root] });
   const renderModuleFactory = await import(platformServerPackage)
@@ -49,13 +45,27 @@ async function _renderUniversal(
     ? path.join(root, options.outputIndexPath)
     : browserIndexOutputPath;
 
-  // Render to HTML and overwrite the client index file.
-  const html = await renderModuleFactory(AppServerModuleNgFactory, {
-    document: indexHtml,
-    url: options.route,
-  });
+  try {
+    const zonePackage = require.resolve('zone.js', { paths: [root] });
+    // Initialize zone.js
+    await import(zonePackage);
 
-  fs.writeFileSync(outputIndexPath, html);
+    // Render to HTML and overwrite the client index file.
+    const html = await renderModuleFactory(AppServerModuleNgFactory, {
+      document: indexHtml,
+      url: options.route,
+    });
+
+    fs.writeFileSync(outputIndexPath, html);
+  } finally {
+    // Restore the original Promise
+    // Note: the below will no longer work in Zone.Js 0.11.x
+    // tslint:disable-next-line: no-any
+    const Zone = (global as any)['Zone'];
+    // tslint:disable-next-line: no-any
+    (global as any)[Zone.__symbol__('ZoneAwarePromise')] = undefined;
+    global.Promise.prototype.then = global.Promise.prototype[Zone.__symbol__('then')];
+  }
 
   const browserTarget = targetFromTargetString(options.browserTarget);
   const rawBrowserOptions = await context.getTargetOptions(browserTarget);
@@ -160,6 +170,5 @@ async function _appShellBuilder(
     ]);
   }
 }
-
 
 export default createBuilder(_appShellBuilder);
