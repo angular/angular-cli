@@ -64,24 +64,24 @@ describe('Karma Builder', () => {
         }
        `,
       'src/app/app.component.spec.ts': `
-        import { TestBed, async } from '@angular/core/testing';
+        import { TestBed } from '@angular/core/testing';
         import { AppComponent } from './app.component';
 
         describe('AppComponent', () => {
-          beforeEach(async(() => {
-            TestBed.configureTestingModule({
+          beforeEach(async () => {
+            await TestBed.configureTestingModule({
               imports: [
               ],
               declarations: [
                 AppComponent
               ]
             }).compileComponents();
-          }));
+          });
 
-          it('should not contain text that is hidden via css', async(() => {
+          it('should not contain text that is hidden via css', () => {
             const fixture = TestBed.createComponent(AppComponent);
             expect(fixture.nativeElement.innerText).not.toContain('Hello World');
-          }));
+          });
         });`,
     });
 
@@ -143,13 +143,13 @@ describe('Karma Builder', () => {
           }
         }`,
       'src/app/app.component.spec.ts': `
-        import { TestBed, async } from '@angular/core/testing';
+        import { TestBed } from '@angular/core/testing';
         import { HttpClientModule } from '@angular/common/http';
         import { AppComponent } from './app.component';
 
         describe('AppComponent', () => {
-          beforeEach(async(() => {
-            TestBed.configureTestingModule({
+          beforeEach(async () => {
+            await TestBed.configureTestingModule({
               imports: [
                 HttpClientModule
               ],
@@ -157,13 +157,13 @@ describe('Karma Builder', () => {
                 AppComponent
               ]
             }).compileComponents();
-          }));
+          });
 
-          it('should create the app', async(() => {
+          it('should create the app', () => {
             const fixture = TestBed.createComponent(AppComponent);
             const app = fixture.debugElement.componentInstance;
             expect(app).toBeTruthy();
-          }));
+          });
         });`,
     });
 

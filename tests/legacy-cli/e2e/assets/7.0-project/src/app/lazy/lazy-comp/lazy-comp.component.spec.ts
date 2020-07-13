@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LazyCompComponent } from './lazy-comp.component';
 
@@ -6,12 +6,12 @@ describe('LazyCompComponent', () => {
   let component: LazyCompComponent;
   let fixture: ComponentFixture<LazyCompComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ LazyCompComponent ]
     })
     .compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LazyCompComponent);
