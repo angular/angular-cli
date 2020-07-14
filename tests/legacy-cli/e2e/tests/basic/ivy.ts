@@ -42,7 +42,7 @@ export default async function() {
     const mainUrl = mainUrlMatch && mainUrlMatch[1];
     const main = await request('http://localhost:4200/' + mainUrl);
 
-    if (!main.match(/ɵcmp\s*=/) && !main.match(/\\u0275cmp\s*=/)) {
+    if (!main.match(/,decls:\d{0,3},vars:\d{0,3},consts/)) {
       throw new Error('Ivy could not be found.');
     }
     if (main.match(/ngDevMode/)) {
