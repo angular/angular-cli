@@ -108,7 +108,6 @@ export class AngularCompilerPlugin {
   // This is needed because if the first build fails we need to do a full emit
   // even whe only a single file gets updated.
   private _hadFullJitEmit: boolean | undefined;
-  private _unusedFiles = new Set<string>();
   private _typeDeps = new Set<string>();
   private _changedFileExtensions = new Set(['ts', 'tsx', 'html', 'css', 'js', 'json']);
   private _nodeModulesRegExp = /[\\\/]node_modules[\\\/]/;
@@ -620,11 +619,7 @@ export class AngularCompilerPlugin {
     }
   }
 
-  private _checkUnusedFiles(compilation: compilation.Compilation) {
-    // Only do the unused TS files checks when under Ivy
-    // since previously we did include unused files in the compilation
-    // See: https://github.com/angular/angular-cli/pull/15030
-    // Don't do checks for compilations with errors, since that can result in a partial compilation.
+  private _findTypeDependencies(compilation: compilation.Compilation) {
     if (!this._compilerOptions.enableIvy || compilation.errors.length > 0) {
       return;
     }
@@ -646,39 +641,21 @@ export class AngularCompilerPlugin {
     // node_modules.
     const sourceFiles = program.getSourceFiles()
       .map(x => this._compilerHost.denormalizePath(x.fileName))
-      .filter(f => !(fileExcludeRegExp.test(f) || this._unusedFiles.has(f)
-        || this._nodeModulesRegExp.test(f)));
+      .filter(f => !(fileExcludeRegExp.test(f) || this._nodeModulesRegExp.test(f)));
 
-    // Make a set with the sources, but exclude .d.ts files since those are type-only.
-    const unusedSourceFileNames = new Set(sourceFiles.filter(f => !f.endsWith('.d.ts')));
     // Separately keep track of type-only deps.
     const typeDepFileNames = new Set(sourceFiles);
 
     // This function removes a source file name and all its dependencies from the set.
     const removeSourceFile = (fileName: string, originalModule = false) => {
-      if (unusedSourceFileNames.has(fileName) || (originalModule && typeDepFileNames.has(fileName))) {
-        unusedSourceFileNames.delete(fileName);
-        if (originalModule) {
-          typeDepFileNames.delete(fileName);
-        }
+      if (originalModule && typeDepFileNames.has(fileName)) {
+        typeDepFileNames.delete(fileName);
         this.getDependencies(fileName, false).forEach(f => removeSourceFile(f));
       }
     };
 
     // Go over all the modules in the webpack compilation and remove them from the sets.
     compilation.modules.forEach(m => m.resource ? removeSourceFile(m.resource, true) : null);
-
-    // Anything that remains is unused, because it wasn't referenced directly or transitively
-    // on the files in the compilation.
-    for (const fileName of unusedSourceFileNames) {
-      compilation.warnings.push(
-        `${fileName} is part of the TypeScript compilation but it's unused.\n` +
-        `Add only entry points to the 'files' or 'include' properties in your tsconfig.`,
-      );
-      this._unusedFiles.add(fileName);
-      // Remove the truly unused from the type dep list.
-      typeDepFileNames.delete(fileName);
-    }
 
     // At this point we know what the type deps are.
     // These are the TS files that weren't part of the compilation modules, aren't unused, but were
@@ -705,7 +682,7 @@ export class AngularCompilerPlugin {
     // cleanup if not watching
     compiler.hooks.thisCompilation.tap('angular-compiler', compilation => {
       compilation.hooks.finishModules.tap('angular-compiler', () => {
-        this._checkUnusedFiles(compilation);
+        this._findTypeDependencies(compilation);
 
         let rootCompiler = compiler;
         while (rootCompiler.parentCompilation) {
