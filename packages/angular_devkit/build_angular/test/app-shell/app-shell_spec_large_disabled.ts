@@ -5,11 +5,20 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+// tslint:disable-next-line: no-global-tslint-disable
 // tslint:disable:no-big-function
 import { Architect } from '@angular-devkit/architect/src/architect';
 import { getSystemPath, join, normalize, virtualFs } from '@angular-devkit/core';
 import * as express from 'express'; // tslint:disable-line:no-implicit-dependencies
 import { createArchitect, host } from '../utils';
+
+// This test is excluded by default and will need to be run explicitly.
+// This is because App-Shell builder uses zone.js which patched the global Promise
+// Currently there is no clean way to unload zone.js which causes tests that run after
+// this to be extremly flaky.
+
+// To run this test use:
+// yarn test-large --full --glob packages/angular_devkit/build_angular/test/app-shell/app-shell_spec_large_disabled.ts
 
 describe('AppShell Builder', () => {
   const target = { project: 'app', target: 'app-shell' };

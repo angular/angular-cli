@@ -252,6 +252,8 @@ jobs:
       - run: yarn webdriver-update
       - run: yarn test-large --full --flakey --ve
       - run: yarn test-large --full --flakey
+      - run: yarn test-large --full --glob packages/angular_devkit/build_angular/test/app-shell/app-shell_spec_large_disabled.ts --ve
+      - run: yarn test-large --full --glob packages/angular_devkit/build_angular/test/app-shell/app-shell_spec_large_disabled.ts
 
   build-bazel:
     executor: action-executor
