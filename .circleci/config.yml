@@ -247,12 +247,14 @@ jobs:
   # This is where we put all the misbehaving and flaky tests so we can fine-tune their conditions 
   # and rerun them faster.
   flake-jail:
-    executor: action-executor
+    executor: test-executor
     steps:
       - custom_attach_workspace
       - run: yarn webdriver-update
       - run: yarn test-large --full --flakey
       - run: yarn test-large --full --flakey --ivy=true
+      - run: yarn test-large --full --glob packages/angular_devkit/build_angular/test/app-shell/app-shell_spec_large_disabled.ts
+      - run: yarn test-large --full --glob packages/angular_devkit/build_angular/test/app-shell/app-shell_spec_large_disabled.ts --ivy=true
 
   build-bazel:
     executor: action-executor
@@ -418,7 +420,7 @@ workflows:
             - build
       - flake-jail:
           requires:
-            - build            
+            - build
       
       # Windows jobs
       # These jobs only run after their non-windows counterparts finish successfully.
