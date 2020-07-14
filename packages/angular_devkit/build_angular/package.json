@@ -15,7 +15,7 @@
     "autoprefixer": "9.1.5",
     "circular-dependency-plugin": "5.0.2",
     "clean-css": "4.2.1",
-    "copy-webpack-plugin": "4.5.4",
+    "copy-webpack-plugin": "6.0.3",
     "file-loader": "2.0.0",
     "glob": "7.1.3",
     "istanbul": "0.4.5",
