@@ -9,6 +9,9 @@
 
 version: 2.1
 
+orbs:
+  browser-tools: circleci/browser-tools@1.0.1
+
 # Variables
 
 ## IMPORTANT
@@ -38,7 +41,7 @@ executors:
         type: string
         default: *default_nodeversion
     docker:
-      - image: circleci/node:<< parameters.nodeversion >>
+      - image: cimg/node:<< parameters.nodeversion >>
     working_directory: ~/ng
     resource_class: small
 
@@ -48,7 +51,7 @@ executors:
         type: string
         default: *default_nodeversion
     docker:
-      - image: circleci/node:<< parameters.nodeversion >>-browsers
+      - image: cimg/node:<< parameters.nodeversion >>
     working_directory: ~/ng
     environment:
       NPM_CONFIG_PREFIX: ~/.npm-global
@@ -106,6 +109,15 @@ commands:
             # Enable remote builds
             sudo bash -c "echo -e 'build --config=remote' >> .bazelrc.user";
             echo "Reading from remote cache for bazel remote jobs.";
+
+  install_python:
+    steps:
+      - run:
+          name: "Install Python 2"
+          command: |
+            sudo apt-get update > /dev/null 2>&1
+            sudo apt-get install -y python
+            python --version
 
 # Job definitions
 jobs:
@@ -168,6 +180,7 @@ jobs:
     parallelism: 6
     steps:
       - custom_attach_workspace
+      - browser-tools/install-chrome
       - run:
           name: Initialize Environment
           command: ./.circleci/env.sh
@@ -182,6 +195,7 @@ jobs:
     parallelism: 4
     steps:
       - custom_attach_workspace
+      - browser-tools/install-chrome
       - run:
           name: Initialize Environment
           command: |
@@ -226,6 +240,7 @@ jobs:
     resource_class: xlarge
     steps:
       - custom_attach_workspace
+      - browser-tools/install-chrome
       - setup_bazel_rbe
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run: yarn bazel:test
@@ -235,6 +250,7 @@ jobs:
     resource_class: xlarge
     steps:
       - custom_attach_workspace
+      - install_python
       - run: 
           command: yarn bazel:integration
 
