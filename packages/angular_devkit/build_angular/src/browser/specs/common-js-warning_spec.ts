@@ -77,4 +77,24 @@ describe('Browser Builder commonjs warning', () => {
     expect(logs.join()).not.toContain('WARNING');
     await run.stop();
   });
+
+  it('should not show warning in JIT for templateUrl and styleUrl when using paths', async () => {
+    host.replaceInFile('tsconfig.base.json', /"baseUrl": ".\/",/, `
+      "baseUrl": "./",
+      "paths": {
+        "@app/*": [
+          "src/app/*"
+        ]
+      },
+    `);
+
+    host.replaceInFile('src/app/app.module.ts', './app.component', '@app/app.component');
+
+    const run = await architect.scheduleTarget(targetSpec, { aot: false }, { logger });
+    const output = await run.result;
+    expect(output.success).toBe(true);
+
+    expect(logs.join()).not.toContain('WARNING');
+    await run.stop();
+  });
 });

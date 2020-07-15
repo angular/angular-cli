@@ -14,6 +14,8 @@ import { Compiler, compilation } from 'webpack';
 const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequireDependency');
 const AMDDefineDependency = require('webpack/lib/dependencies/AMDDefineDependency');
 
+const STYLES_TEMPLATE_URL_REGEXP = /\.(html|svg|css|sass|less|styl|scss)$/;
+
 // The below is extended because there are not in the typings
 interface WebpackModule extends compilation.Module {
   name?: string;
@@ -21,6 +23,10 @@ interface WebpackModule extends compilation.Module {
   dependencies: unknown[];
   issuer: WebpackModule | null;
   userRequest?: string;
+}
+
+interface CommonJsRequireDependencyType {
+  request: string;
 }
 
 export interface CommonJsUsageWarnPluginOptions {
@@ -61,7 +67,7 @@ export class CommonJsUsageWarnPlugin {
             continue;
           }
 
-          if (this.hasCommonJsDependencies(dependencies)) {
+          if (this.hasCommonJsDependencies(dependencies, true)) {
             // Dependency is CommonsJS or AMD.
 
             // Check if it's parent issuer is also a CommonJS dependency.
@@ -97,8 +103,23 @@ export class CommonJsUsageWarnPlugin {
     });
   }
 
-  private hasCommonJsDependencies(dependencies: unknown[]): boolean {
-    return dependencies.some(d => d instanceof CommonJsRequireDependency || d instanceof AMDDefineDependency);
+  private hasCommonJsDependencies(dependencies: unknown[], checkForStylesAndTemplatesCJS = false): boolean {
+    for (const dep of dependencies) {
+      if (dep instanceof CommonJsRequireDependency) {
+        if (checkForStylesAndTemplatesCJS && STYLES_TEMPLATE_URL_REGEXP.test((dep as CommonJsRequireDependencyType).request)) {
+          // Skip in case it's a template or stylesheet
+          continue;
+        }
+
+        return true;
+      }
+
+      if (dep instanceof AMDDefineDependency) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private rawRequestToPackageName(rawRequest: string): string {
