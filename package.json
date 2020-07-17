@@ -221,7 +221,7 @@
     "tslint": "^6.0.0",
     "tslint-no-circular-imports": "^0.7.0",
     "tslint-sonarts": "1.9.0",
-    "typescript": "3.9.6",
+    "typescript": "3.9.7",
     "verdaccio": "4.5.1",
     "webpack": "4.42.1",
     "webpack-dev-middleware": "3.7.2",
