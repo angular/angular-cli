@@ -544,6 +544,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
                       cacheIdentifier: JSON.stringify({
                         buildAngular: require('../../../../package.json').version,
                       }),
+                      sourceType: 'unambiguous',
                       presets: [
                         [
                           require.resolve('@babel/preset-env'),
