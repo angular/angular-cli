@@ -383,7 +383,7 @@ export default function (options: ApplicationOptions): Rule {
         ]), MergeStrategy.Overwrite),
       addTsConfigProjectReferences([
         join(appDir, 'tsconfig.app.json'),
-        join(appDir, 'tsconfig.spec.json'),
+        ... options.minimal ? [] : [join(appDir, 'tsconfig.spec.json')],
       ]),
       options.minimal ? noop() : schematic('e2e', e2eOptions),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
