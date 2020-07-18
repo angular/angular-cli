@@ -527,6 +527,13 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
           parser: { system: true },
         },
         {
+          // Mark files inside `rxjs/add` as containing side effects.
+          // If this is fixed upstream and the fixed version becomes the minimum
+          // supported version, this can be removed.
+          test: /[\/\\]rxjs[\/\\]add[\/\\].+\.js$/,
+          sideEffects: true,
+        },
+        {
           test: /\.m?js$/,
           exclude: [/[\/\\](?:core-js|\@babel|tslib)[\/\\]/, /(ngfactory|ngstyle)\.js$/],
           use: [
