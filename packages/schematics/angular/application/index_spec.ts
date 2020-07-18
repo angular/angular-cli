@@ -91,6 +91,17 @@ describe('Application Schematic', () => {
     ]);
   });
 
+  it('minimal=true should add correct reference in tsconfig', async () => {
+    const options = { ...defaultOptions, minimal: true };
+    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
+      .toPromise();
+
+    const { references } = readJsonFile(tree, '/tsconfig.json');
+    expect(references).toEqual([
+      { path: './projects/foo/tsconfig.app.json' },
+    ]);
+  });
+
   it('should set the prefix to app if none is set', async () => {
     const options = { ...defaultOptions };
 
