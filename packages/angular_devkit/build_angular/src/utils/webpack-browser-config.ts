@@ -158,7 +158,7 @@ export async function generateI18nBrowserWebpackConfigFromContext(
 
     // Update file hashes to include translation file content
     const i18nHash = Object.values(i18n.locales).reduce(
-      (data, locale) => data + (locale.integrity || ''),
+      (data, locale) => data + locale.files.map((file) => file.integrity || '').join('|'),
       '',
     );
     if (!config.plugins) {

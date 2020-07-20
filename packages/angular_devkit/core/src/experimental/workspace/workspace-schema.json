@@ -167,12 +167,32 @@
                   "description": "Localization file to use for i18n"
                 },
                 {
+                  "type": "array",
+                  "description": "Localization files to use for i18n",
+                  "items": {
+                    "type": "string",
+                    "uniqueItems": true
+                  }
+                },
+                {
                   "type": "object",
                   "description": "Localization options to use for the locale",
                   "properties": {
                     "translation": {
-                      "type": "string",
-                      "description": "Localization file to use for i18n"
+                      "oneOf": [
+                        {
+                          "type": "string",
+                          "description": "Localization file to use for i18n"
+                        },
+                        {
+                          "type": "array",
+                          "description": "Localization files to use for i18n",
+                          "items": {
+                            "type": "string",
+                            "uniqueItems": true
+                          }
+                        }
+                      ]
                     },
                     "baseHref": {
                       "type": "string",
