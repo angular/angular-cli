@@ -38,7 +38,7 @@
           "type": "boolean"
         },
         "next": {
-          "description": "Use the latest version, including beta and RCs.",
+          "description": "Use the prerelease version, including beta and RCs.",
           "default": false,
           "type": "boolean"
         },
