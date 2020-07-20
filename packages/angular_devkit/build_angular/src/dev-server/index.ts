@@ -287,14 +287,13 @@ async function setupLocalize(
   const localeDescription = i18n.locales[locale];
   const { plugins, diagnostics } = await createI18nPlugins(
     locale,
-    localeDescription && localeDescription.translation,
+    localeDescription?.translation,
     browserOptions.i18nMissingTranslation || 'ignore',
   );
 
   // Modify main entrypoint to include locale data
   if (
-    localeDescription &&
-    localeDescription.dataPath &&
+    localeDescription?.dataPath &&
     typeof webpackConfig.entry === 'object' &&
     !Array.isArray(webpackConfig.entry) &&
     webpackConfig.entry['main']
@@ -321,7 +320,7 @@ async function setupLocalize(
           cacheIdentifier: JSON.stringify({
             buildAngular: require('../../package.json').version,
             locale,
-            translationIntegrity: localeDescription && localeDescription.integrity,
+            translationIntegrity: localeDescription?.files.map((file) => file.integrity),
           }),
           plugins,
         },
