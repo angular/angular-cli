@@ -40,7 +40,7 @@
     "loader-utils": "2.0.0",
     "mini-css-extract-plugin": "0.9.0",
     "minimatch": "3.0.4",
-    "open": "7.0.4",
+    "open": "7.1.0",
     "parse5": "4.0.0",
     "pnp-webpack-plugin": "1.6.4",
     "postcss": "7.0.32",
