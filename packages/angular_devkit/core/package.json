@@ -8,7 +8,7 @@
     "core"
   ],
   "dependencies": {
-    "ajv": "6.10.2",
+    "ajv": "6.12.3",
     "fast-json-stable-stringify": "2.0.0",
     "magic-string": "0.25.3",
     "rxjs": "6.4.0",
