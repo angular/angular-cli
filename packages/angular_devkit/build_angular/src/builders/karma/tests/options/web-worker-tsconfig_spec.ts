@@ -30,7 +30,7 @@ describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
         }`,
         'src/app/app.worker.ts': `
         /// <reference lib="webworker" />
-  
+
         const prefix: string = 'Data: ';
         addEventListener('message', ({ data }) => {
           postMessage(prefix + data);
@@ -52,13 +52,9 @@ describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
         import { AppComponent } from './app.component';
 
         describe('AppComponent', () => {
-          beforeEach(async () => {
-            await TestBed.configureTestingModule({
-              declarations: [
-                AppComponent
-              ]
-            }).compileComponents();
-          });
+          beforeEach(() => TestBed.configureTestingModule({
+            declarations: [AppComponent]
+          }));
 
           it('worker should be defined', () => {
             const fixture = TestBed.createComponent(AppComponent);
@@ -82,13 +78,9 @@ describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
         import { AppComponent } from './app.component';
 
         describe('AppComponent', () => {
-          beforeEach(async () => {
-            await TestBed.configureTestingModule({
-              declarations: [
-                AppComponent
-              ]
-            }).compileComponents();
-          });
+          beforeEach(() => TestBed.configureTestingModule({
+            declarations: [AppComponent]
+          }));
 
           it('worker should throw', () => {
             expect(() => TestBed.createComponent(AppComponent))

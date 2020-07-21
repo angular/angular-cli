@@ -30,11 +30,9 @@ export default async function () {
       import { AppComponent } from './app.component';
 
       describe('AppComponent', () => {
-        beforeEach(async () => {
-          await TestBed.configureTestingModule({
-            declarations: [ AppComponent ]
-          }).compileComponents();
-        });
+        beforeEach(() => TestBed.configureTestingModule({
+          declarations: [AppComponent]
+        }));
 
         it('should have access to string-script.js', () => {
           let app = TestBed.createComponent(AppComponent).debugElement.componentInstance;

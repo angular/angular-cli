@@ -14,12 +14,9 @@ describe('LibComponent', () => {
   let component: LibComponent;
   let fixture: ComponentFixture<LibComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ LibComponent ]
-    })
-    .compileComponents();
-  });
+  beforeEach(() => TestBed.configureTestingModule({
+    declarations: [LibComponent]
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LibComponent);

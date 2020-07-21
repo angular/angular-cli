@@ -6,12 +6,10 @@ describe('<%= classify(name) %><%= classify(type) %>', () => {
   let component: <%= classify(name) %><%= classify(type) %>;
   let fixture: ComponentFixture<<%= classify(name) %><%= classify(type) %>>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      <%= standalone ? 'imports' : 'declarations' %>: [ <%= classify(name) %><%= classify(type) %> ]
-    })
-    .compileComponents();
-
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      <%= standalone ? 'imports' : 'declarations' %>: [<%= classify(name) %><%= classify(type) %>]
+    });
     fixture = TestBed.createComponent(<%= classify(name) %><%= classify(type) %>);
     component = fixture.componentInstance;
     fixture.detectChanges();
