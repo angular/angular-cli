@@ -76,7 +76,7 @@ function _getColumns() {
 
 
 function _createCapabilities(
-  stream: Socket,
+  stream: NodeJS.WriteStream,
   isTerminalStream: boolean,
   level: 0|1|2|3 = supportsColor.stdout.level,
 ): StreamCapabilities {
@@ -96,7 +96,7 @@ function _createCapabilities(
 
 
 export function getCapabilities(
-  stream: Socket,
+  stream: NodeJS.WriteStream,
   isTerminalStream = !!stream.isTTY,
 ): StreamCapabilities {
   let maybeCaps = streamMap.get(stream);

@@ -147,7 +147,7 @@ export class AddCommand extends SchematicCommand<AddCommandSchema> {
         usingYarn,
       });
 
-      savePackage = manifest['ng-add'] && manifest['ng-add'].save;
+      savePackage = manifest['ng-add']?.save;
       collectionName = manifest.name;
 
       if (await this.hasMismatchedPeer(manifest)) {

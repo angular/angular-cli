@@ -8,8 +8,6 @@ load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])  # MIT
 
-licenses(["notice"])  # MIT
-
 package(default_visibility = ["//visibility:public"])
 
 ts_library(
@@ -26,8 +24,11 @@ ts_library(
             "node_modules/**",
         ],
     ) + [
+        # @external_begin
+        # These files are generated from the JSON schema
         "//packages/schematics/schematics:blank/schema.ts",
         "//packages/schematics/schematics:schematic/schema.ts",
+        # @external_end
     ],
     data = glob(
         include = [
