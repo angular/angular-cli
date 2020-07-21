@@ -155,7 +155,6 @@ if (process.env['NG_CLI_PROFILING']) {
   try {
     standardInput = process.stdin;
   } catch (e) {
-    delete process.stdin;
     process.stdin = new Duplex();
     standardInput = process.stdin;
   }
