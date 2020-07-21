@@ -121,7 +121,7 @@ As commits are cherry-picked when PRs are merged, creating the release should be
 
 ```bash
 git commit -a -m 'release: vXX'
-git tag 'vXX'
+git tag -a 'vXX' -m 'release: tag vXX'
 ```
 
 The package versions we are about to publish are derived from the git tag that
@@ -132,11 +132,11 @@ following command.
 yarn admin packages --version
 ```
 
-Now push the commit and the tag to the upstream repository.
-**Make sure to run these commands together, as missing tags can cause CI failures.**
+Now push the commit and the tag to the upstream repository. **Make sure to use
+`--follow-tags, as tags need to be pushed immediately or CI may fail!**
 
 ```bash
-git push upstream && git push upstream --tags
+git push upstream --follow-tags
 ```
 
 ### Authenticating
