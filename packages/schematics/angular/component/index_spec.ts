@@ -431,7 +431,7 @@ describe('Component Schematic', () => {
     const options = { ...defaultOptions, standalone: true };
     const tree = await schematicRunner.runSchematic('component', options, appTree);
     const testContent = tree.readContent('/projects/bar/src/app/foo/foo.component.spec.ts');
-    expect(testContent).toContain('imports: [ FooComponent ]');
+    expect(testContent).toContain('imports: [FooComponent]');
     expect(testContent).not.toContain('declarations');
   });
 });

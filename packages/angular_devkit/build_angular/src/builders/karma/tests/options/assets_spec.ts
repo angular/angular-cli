@@ -23,7 +23,7 @@ describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
             import { NgModule } from '@angular/core';
             import { HttpClientModule } from '@angular/common/http';
             import { AppComponent } from './app.component';
-    
+
             @NgModule({
               declarations: [
                 AppComponent
@@ -40,7 +40,7 @@ describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
         './src/app/app.component.ts': `
             import { Component } from '@angular/core';
             import { HttpClient } from '@angular/common/http';
-    
+
             @Component({
               selector: 'app-root',
               template: '<p *ngFor="let asset of assets">{{ asset.content }}</p>'
@@ -62,19 +62,13 @@ describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
             import { TestBed } from '@angular/core/testing';
             import { HttpClientModule } from '@angular/common/http';
             import { AppComponent } from './app.component';
-    
+
             describe('AppComponent', () => {
-              beforeEach(async () => {
-                await TestBed.configureTestingModule({
-                  imports: [
-                    HttpClientModule
-                  ],
-                  declarations: [
-                    AppComponent
-                  ]
-                }).compileComponents();
-              });
-    
+              beforeEach(() => TestBed.configureTestingModule({
+                imports: [HttpClientModule],
+                declarations: [AppComponent]
+              }));
+
               it('should create the app', () => {
                 const fixture = TestBed.createComponent(AppComponent);
                 const app = fixture.debugElement.componentInstance;
