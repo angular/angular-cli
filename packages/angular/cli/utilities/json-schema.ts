@@ -35,10 +35,8 @@ function _getEnumFromValue<E, T extends E[keyof E]>(
     return defaultValue;
   }
 
-  if (Object.values(enumeration).indexOf(value) !== -1) {
-    // TODO: this should be unknown
-    // tslint:disable-next-line:no-any
-    return value as any as T;
+  if (Object.values(enumeration).includes(value)) {
+    return value as unknown as T;
   }
 
   return defaultValue;

@@ -267,7 +267,8 @@ export async function main({
       return argv._;
     }
   });
-  delete parsedArgs._;
+
+  parsedArgs._  = [];
 
   // Add prompts.
   if (argv['interactive'] && isTTY()) {

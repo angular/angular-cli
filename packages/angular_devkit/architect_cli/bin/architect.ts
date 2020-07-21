@@ -84,7 +84,7 @@ async function _executeTarget(
   const targetSpec = { project, target, configuration };
 
   delete argv['help'];
-  delete argv['_'];
+  argv['_'] = [];
 
   const logger = new logging.Logger('jobs');
   const logs: logging.LogEntry[] = [];

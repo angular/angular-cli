@@ -139,12 +139,7 @@ function _getRamSize() {
  * @private
  */
 function _getNodeVersion() {
-  // We use any here because p.release is a new Node construct in Node 10 (and our typings are the
-  // minimal version of Node we support).
-  const p = process as any; // tslint:disable-line:no-any
-  const name =
-    (typeof p.release == 'object' && typeof p.release.name == 'string' && p.release.name) ||
-    process.argv0;
+  const name = process.release.name || process.argv0;
 
   return name + ' ' + process.version;
 }
@@ -590,9 +585,7 @@ export async function getWorkspaceAnalytics(): Promise<UniversalAnalytics | unde
   analyticsDebug('getWorkspaceAnalytics');
   try {
     const globalWorkspace = await getWorkspace('local');
-    const analyticsConfig: string | undefined | null | { uid?: string } = globalWorkspace
-      && globalWorkspace.getCli()
-      && globalWorkspace.getCli()['analytics'];
+    const analyticsConfig: string | undefined | null | { uid?: string } = globalWorkspace?.getCli()['analytics'];
     analyticsDebug('Workspace Analytics config found: %j', analyticsConfig);
 
     if (analyticsConfig === false) {
@@ -645,8 +638,7 @@ export async function getSharedAnalytics(): Promise<UniversalAnalytics | undefin
   // If anything happens we just keep the NOOP analytics.
   try {
     const globalWorkspace = await getWorkspace('global');
-    const analyticsConfig =
-      globalWorkspace && globalWorkspace.getCli() && globalWorkspace.getCli()['analyticsSharing'];
+    const analyticsConfig = globalWorkspace?.getCli()['analyticsSharing'];
 
     if (!analyticsConfig || !analyticsConfig.tracking || !analyticsConfig.uuid) {
       return undefined;
