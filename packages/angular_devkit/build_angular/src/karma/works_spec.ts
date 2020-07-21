@@ -68,15 +68,10 @@ describe('Karma Builder', () => {
         import { AppComponent } from './app.component';
 
         describe('AppComponent', () => {
-          beforeEach(async () => {
-            await TestBed.configureTestingModule({
-              imports: [
-              ],
-              declarations: [
-                AppComponent
-              ]
-            }).compileComponents();
-          });
+          beforeEach(() => TestBed.configureTestingModule({
+            imports: [],
+            declarations: [AppComponent]
+          }));
 
           it('should not contain text that is hidden via css', () => {
             const fixture = TestBed.createComponent(AppComponent);
@@ -148,16 +143,10 @@ describe('Karma Builder', () => {
         import { AppComponent } from './app.component';
 
         describe('AppComponent', () => {
-          beforeEach(async () => {
-            await TestBed.configureTestingModule({
-              imports: [
-                HttpClientModule
-              ],
-              declarations: [
-                AppComponent
-              ]
-            }).compileComponents();
-          });
+          beforeEach(() => TestBed.configureTestingModule({
+            imports: [HttpClientModule],
+            declarations: [AppComponent]
+          }));
 
           it('should create the app', () => {
             const fixture = TestBed.createComponent(AppComponent);

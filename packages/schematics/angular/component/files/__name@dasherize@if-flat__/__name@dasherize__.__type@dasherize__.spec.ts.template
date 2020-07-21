@@ -6,12 +6,9 @@ describe('<%= classify(name) %><%= classify(type) %>', () => {
   let component: <%= classify(name) %><%= classify(type) %>;
   let fixture: ComponentFixture<<%= classify(name) %><%= classify(type) %>>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ <%= classify(name) %><%= classify(type) %> ]
-    })
-    .compileComponents();
-  });
+  beforeEach(() => TestBed.configureTestingModule({
+    declarations: [<%= classify(name) %><%= classify(type) %>]
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(<%= classify(name) %><%= classify(type) %>);

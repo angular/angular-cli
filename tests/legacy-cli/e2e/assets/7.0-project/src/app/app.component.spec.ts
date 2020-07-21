@@ -3,16 +3,10 @@ import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [
-        AppComponent
-      ],
-      imports: [
-        RouterModule.forRoot([])
-      ],
-    }).compileComponents();
-  });
+  beforeEach(() => TestBed.configureTestingModule({
+    declarations: [AppComponent],
+    imports: [RouterModule.forRoot([])]
+  }));
 
   it('should create the app', () => {
     const fixture = TestBed.createComponent(AppComponent);

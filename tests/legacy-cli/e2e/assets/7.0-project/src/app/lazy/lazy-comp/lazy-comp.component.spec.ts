@@ -6,12 +6,9 @@ describe('LazyCompComponent', () => {
   let component: LazyCompComponent;
   let fixture: ComponentFixture<LazyCompComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ LazyCompComponent ]
-    })
-    .compileComponents();
-  });
+  beforeEach(() => TestBed.configureTestingModule({
+    declarations: [LazyCompComponent]
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LazyCompComponent);
