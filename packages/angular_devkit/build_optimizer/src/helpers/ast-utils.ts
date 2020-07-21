@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as tslib from 'tslib';
-import * as ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import * as ts from 'typescript';
 
 const pureFunctionComment = '@__PURE__';
 
