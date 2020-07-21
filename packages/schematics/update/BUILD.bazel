@@ -3,13 +3,14 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
 
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
-load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
 load("//tools:defaults.bzl", "ts_library")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
-licenses(["notice"])  # MIT
+# @external_begin
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+# @external_end
 
 licenses(["notice"])  # MIT
 
@@ -98,6 +99,7 @@ jasmine_node_test(
     ],
 )
 
+# @external_begin
 pkg_npm(
     name = "npm_package",
     deps = [
@@ -112,3 +114,4 @@ pkg_tar(
     strip_prefix = "./npm_package",
     tags = ["manual"],
 )
+# @external_end

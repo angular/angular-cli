@@ -3,13 +3,14 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
 
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
-load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 load("//tools:defaults.bzl", "ts_library")
 
-licenses(["notice"])  # MIT
+# @external_begin
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
+# @external_end
 
 licenses(["notice"])  # MIT
 
@@ -25,6 +26,8 @@ ts_library(
             "node_modules/**",
         ],
     ) + [
+        # @external_begin
+        # These files are generated from the JSON schema
         "//packages/angular/cli:lib/config/schema.ts",
         "//packages/angular/cli:commands/analytics.ts",
         "//packages/angular/cli:commands/add.ts",
@@ -44,6 +47,7 @@ ts_library(
         "//packages/angular/cli:commands/version.ts",
         "//packages/angular/cli:commands/run.ts",
         "//packages/angular/cli:commands/xi18n.ts",
+        # @external_end
     ],
     data = glob(
         include = [
@@ -65,10 +69,9 @@ ts_library(
         "//packages/angular_devkit/core/node",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/tools",
-        # @node_module: typescript:es2017.object
         "@npm//@types/debug",
-        "@npm//@types/node",
         "@npm//@types/inquirer",
+        "@npm//@types/node",
         "@npm//@types/rimraf",
         "@npm//@types/semver",
         "@npm//@types/universal-analytics",
@@ -248,6 +251,7 @@ jasmine_node_test(
     srcs = [":angular-cli_test_lib"],
 )
 
+# @external_begin
 pkg_npm(
     name = "npm_package",
     deps = [
@@ -262,3 +266,4 @@ pkg_tar(
     strip_prefix = "./npm_package",
     tags = ["manual"],
 )
+# @external_end

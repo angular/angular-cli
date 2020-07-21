@@ -1,8 +1,8 @@
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
 load("//tools:defaults.bzl", "ts_library")
 
 # @external_begin
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
 # @external_end
 
@@ -42,12 +42,11 @@ ts_library(
         "@npm//fast-json-stable-stringify",
         "@npm//magic-string",
         "@npm//rxjs",
-        "@npm//source-map",
-        # @node_module: typescript:es2015.core
+        "@npm//source-map",  # @external
         # @node_module: typescript:es2015.proxy
         # @node_module: typescript:es2015.reflect
         # @node_module: typescript:es2015.symbol.wellknown
-        # @node_module: typescript:es2016.array.include
+        # @typings: source_map
     ],
 )
 

@@ -9,8 +9,6 @@ load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])  # MIT
 
-licenses(["notice"])  # MIT
-
 package(default_visibility = ["//visibility:public"])
 
 ts_library(

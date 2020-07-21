@@ -41,10 +41,10 @@ ts_library(
         "@npm//@types/inquirer",
         "@npm//@types/minimist",
         "@npm//@types/node",
-        "@npm//inquirer",
-        "@npm//minimist",
+        "@npm//inquirer",  # @external
+        "@npm//minimist",  # @external
         "@npm//rxjs",
-        "@npm//symbol-observable",
+        "@npm//symbol-observable",  # @external
     ],
 )
 

@@ -27,10 +27,12 @@ def ts_library(
 
     _ts_library(
         name = name,
-        tsconfig = tsconfig,
         testonly = testonly,
         deps = deps,
+        # @external_begin
+        tsconfig = tsconfig,
         devmode_module = devmode_module,
         devmode_target = devmode_target,
+        # @external_end
         **kwargs
     )
