@@ -34,12 +34,12 @@ ts_library(
     module_name = "@angular-devkit/build-optimizer",
     module_root = "src/index.d.ts",
     deps = [
-        "//packages/angular_devkit/build_optimizer/third_party/github.com/Microsoft/TypeScript",
         "@npm//@types/node",
         "@npm//@types/webpack",
         "@npm//@types/webpack-sources",
         "@npm//source-map",
         "@npm//tslib",
+        "@npm//typescript",
     ],
 )
 
@@ -50,9 +50,9 @@ ts_library(
     # @external_begin
     deps = [
         ":build_optimizer",
-        "//packages/angular_devkit/build_optimizer/third_party/github.com/Microsoft/TypeScript",
         "//packages/angular_devkit/core",
         "@npm//source-map",
+        "@npm//typescript",
     ],
     # @external_end
 )
@@ -63,15 +63,6 @@ jasmine_node_test(
     deps = [
         "@npm//jasmine",
         "@npm//source-map",
-    ],
-)
-
-jasmine_node_test(
-    name = "no_typescript_runtime_dep_test",
-    srcs = ["no_typescript_runtime_dep_spec.js"],
-    deps = [
-        ":build_optimizer",
-        "@npm//jasmine",
     ],
 )
 
