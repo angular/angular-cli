@@ -42,20 +42,7 @@ When a PR is merged, if the `PR target` label includes a branch other than
 `master`, commits will need to be cherry-picked to an associated branch. In
 particular, the `patch` target simply refers to the latest patch branch (eg.
 `1.2.x` or `1.3.x-rc.0`). This branch should be updated by cherry-picking all
-_applicable_ commits to it, such as those with messages beginning with `fix()`,
-`docs()`, or `refactor()`.
-
-Say the following PR is merged;
-
-```text
-* fix(@angular/cli): fix path when doing stuff
-* refactor(@angular-devkit/core): replace Fizz with Buzz
-* feat(@angular-devkit/core): add new feature
-* fix(@angular-devkit/core): fix something related to new feature
-* refactor(@angular-devkit/core): move stuff to new feature
-```
-
-Only the first 2 commits should be cherry picked to the patch branch, as the last 3 are related to a new feature.
+commits from the PR to it.
 
 Cherry picking is done by checking out the patch branch and cherry picking the new commit onto it.
 The patch branch is simply named as a version number, with a X in the relevant spot, such as `9.0.x`.
