@@ -30,11 +30,6 @@
     "packages/**/package.json",
     "tests/legacy-cli/e2e/ng-snapshot/package.json"
   ],
-  "major": {
-    "devDependencies": {
-      "enabled": true
-    }
-  },
   "packageRules": [
     {
       "packagePatterns": [
@@ -72,19 +67,6 @@
       "updateTypes": [
         "minor",
         "major"
-      ],
-      "enabled": false
-    },
-    {
-      "depTypeList": ["devDependencies"],
-      "updateTypes": ["patch", "minor"],
-      "groupName": "non-major devDependencies",
-      "excludePackagePatterns": [
-        "typescript",
-        "bazel_toolchains",
-        "^@bazel\/.*",
-        "^build_bazel.*",
-        "^@angular\/.*"
       ],
       "enabled": false
     }
