@@ -6,8 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { existsSync } from 'fs';
-import * as path from 'path';
 import { Observable, of, throwError } from 'rxjs';
 import { concatMap, first, map, tap } from 'rxjs/operators';
 import { BaseException } from '../../exception';

@@ -7,7 +7,7 @@
  */
 import { logging, schema, virtualFs } from '@angular-devkit/core';
 import { EMPTY, Observable, Subject, concat, from, of, throwError } from 'rxjs';
-import { concatMap, defaultIfEmpty, ignoreElements, last, map, tap } from 'rxjs/operators';
+import { concatMap, defaultIfEmpty, ignoreElements, last, tap } from 'rxjs/operators';
 import { Engine, EngineHost, SchematicEngine } from '../engine';
 import { UnsuccessfulWorkflowExecution } from '../exception/exception';
 import { standardFormats } from '../formats';

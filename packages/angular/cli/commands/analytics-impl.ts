@@ -29,7 +29,7 @@ export class AnalyticsCommand extends Command<AnalyticsCommandSchema> {
         return 1;
       } else {
         // No argument were passed.
-        await this.printHelp(options);
+        await this.printHelp();
 
         return 2;
       }
@@ -70,7 +70,7 @@ export class AnalyticsCommand extends Command<AnalyticsCommandSchema> {
               break;
 
             default:
-              await this.printHelp(options);
+              await this.printHelp();
 
               return 3;
           }
@@ -81,7 +81,7 @@ export class AnalyticsCommand extends Command<AnalyticsCommandSchema> {
           break;
 
         default:
-          await this.printHelp(options);
+          await this.printHelp();
 
           return 4;
       }

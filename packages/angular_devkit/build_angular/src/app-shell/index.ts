@@ -11,7 +11,7 @@ import {
   createBuilder,
   targetFromTargetString,
 } from '@angular-devkit/architect';
-import { JsonObject, join, normalize, resolve } from '@angular-devkit/core';
+import { JsonObject, normalize, resolve } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import * as path from 'path';

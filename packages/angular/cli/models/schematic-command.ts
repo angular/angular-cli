@@ -110,8 +110,8 @@ export abstract class SchematicCommand<
     }
   }
 
-  public async printHelp(options: T & Arguments) {
-    await super.printHelp(options);
+  public async printHelp() {
+    await super.printHelp();
     this.logger.info('');
 
     const subCommandOption = this.description.options.filter(x => x.subcommands)[0];

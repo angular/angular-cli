@@ -193,7 +193,7 @@ export abstract class ArchitectCommand<
     return await this.runArchitectTarget(options);
   }
 
-  protected async runBepTarget<T>(
+  protected async runBepTarget(
     command: string,
     configuration: Target,
     overrides: json.JsonObject,

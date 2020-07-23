@@ -7,7 +7,6 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { TestLogger } from '@angular-devkit/architect/testing';
 import { logging } from '@angular-devkit/core';
 import { browserBuild, createArchitect, host } from '../../test-utils';
 

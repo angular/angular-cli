@@ -14,7 +14,7 @@ import * as path from 'path';
 import * as ts from 'typescript';
 
 const distRoot = path.join(__dirname, '../dist');
-const { versions: monorepoVersions, packages: monorepoPackages } = require('../.monorepo.json');
+const { packages: monorepoPackages } = require('../.monorepo.json');
 
 
 export interface PackageInfo {

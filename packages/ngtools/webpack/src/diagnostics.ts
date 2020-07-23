@@ -109,7 +109,6 @@ export function gatherDiagnostics(
 
 export function reportDiagnostics(
   diagnostics: Diagnostics,
-  compilerHost: WebpackCompilerHost & CompilerHost,
   reportError: (msg: string) => void,
   reportWarning: (msg: string) => void,
 ) {

@@ -49,7 +49,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     return;
   }
 
-  async printHelp(options: T & Arguments): Promise<number> {
+  async printHelp(): Promise<number> {
     await this.printHelpUsage();
     await this.printHelpOptions();
 
@@ -175,7 +175,7 @@ export abstract class Command<T extends BaseCommandOptions = BaseCommandOptions>
     await this.initialize(options);
 
     if (options.help === true) {
-      return this.printHelp(options);
+      return this.printHelp();
     } else if (options.help === 'json' || options.help === 'JSON') {
       return this.printJsonHelp(options);
     } else {

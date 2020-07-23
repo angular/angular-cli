@@ -294,7 +294,6 @@ export class SimpleScheduler<
     handler: Observable<JobHandlerWithExtra | null>,
     inboundBus: Observer<JobInboundMessage<I>>,
     outboundBus: Observable<JobOutboundMessage<O>>,
-    options: ScheduleJobOptions,
   ): Job<A, I, O> {
     const schemaRegistry = this._schemaRegistry;
 
@@ -541,6 +540,6 @@ export class SimpleScheduler<
       ),
     );
 
-    return this._createJob(name, argument, handler, inboundBus, outboundBus, options);
+    return this._createJob(name, argument, handler, inboundBus, outboundBus);
   }
 }

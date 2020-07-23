@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';

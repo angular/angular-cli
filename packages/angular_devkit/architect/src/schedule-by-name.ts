@@ -7,7 +7,7 @@
  */
 import { analytics, experimental, json, logging } from '@angular-devkit/core';
 import { EMPTY, Subscription } from 'rxjs';
-import { catchError, first, ignoreElements, map, share, shareReplay, tap } from 'rxjs/operators';
+import { catchError, first, ignoreElements, map, shareReplay } from 'rxjs/operators';
 import {
   BuilderInfo,
   BuilderInput,

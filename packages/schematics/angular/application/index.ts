@@ -6,13 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
-  JsonAstObject,
   JsonObject,
-  JsonParseMode,
-  JsonValue,
   join,
   normalize,
-  parseJsonAst,
   strings,
 } from '@angular-devkit/core';
 import {
@@ -71,20 +67,6 @@ function addDependenciesToPackageJson(options: ApplicationOptions) {
 
     return host;
   };
-}
-
-function readTsLintConfig(host: Tree, path: string): JsonAstObject {
-  const buffer = host.read(path);
-  if (!buffer) {
-    throw new SchematicsException(`Could not read ${path}.`);
-  }
-
-  const config = parseJsonAst(buffer.toString(), JsonParseMode.Loose);
-  if (config.kind !== 'object') {
-    throw new SchematicsException(`Invalid ${path}. Was expecting an object.`);
-  }
-
-  return config;
 }
 
 /**

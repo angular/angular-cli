@@ -61,7 +61,7 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
 
   public async run(options: GenerateCommandSchema & Arguments) {
     if (!this.schematicName || !this.collectionName) {
-      return this.printHelp(options);
+      return this.printHelp();
     }
 
     return this.runSchematic({
@@ -105,8 +105,8 @@ export class GenerateCommand extends SchematicCommand<GenerateCommandSchema> {
     return [collectionName, schematicName];
   }
 
-  public async printHelp(options: GenerateCommandSchema & Arguments) {
-    await super.printHelp(options);
+  public async printHelp() {
+    await super.printHelp();
 
     this.logger.info('');
     // Find the generate subcommand.

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { JsonParseMode, JsonValue, parseJson } from '@angular-devkit/core';
+import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { getWorkspaceTargets, updateWorkspaceTargets } from './update-workspace-config_spec';
