@@ -166,7 +166,7 @@
     "karma-source-map-support": "1.4.0",
     "less-loader": "6.0.0",
     "license-checker": "^25.0.0",
-    "license-checker-webpack-plugin": "0.1.4",
+    "license-checker-webpack-plugin": "0.1.5",
     "loader-utils": "2.0.0",
     "mini-css-extract-plugin": "0.9.0",
     "minimatch": "3.0.4",
