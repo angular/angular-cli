@@ -166,7 +166,14 @@ jobs:
     executor: action-executor
     steps:
       - custom_attach_workspace
-      - run: yarn validate --ci
+      - run:
+          name: Validate Commit Messages
+          command: yarn -s admin validate-commits --base <<pipeline.git.base_revision>> --head <<pipeline.git.revision>>
+      - run:
+          name: Validate "do not submit" Commits
+          command: yarn -s admin validate-do-not-submit --base <<pipeline.git.base_revision>> --head <<pipeline.git.revision>>
+      - run:
+          command: yarn -s admin validate --ci
 
   e2e-cli:
     parameters:
