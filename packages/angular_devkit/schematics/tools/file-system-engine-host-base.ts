@@ -35,7 +35,6 @@ import {
   UnregisteredTaskException,
 } from '../src';
 import {
-  FileSystemCollection,
   FileSystemCollectionDesc,
   FileSystemEngineHost,
   FileSystemSchematicContext,

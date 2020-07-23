@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Path, join } from '@angular-devkit/core';
+import { join } from '@angular-devkit/core';
 import { DirEntry, Rule } from '@angular-devkit/schematics';
 
 function* visit(directory: DirEntry): IterableIterator<string> {

@@ -13,7 +13,6 @@ import {
   Program,
   createCompilerHost,
   createProgram,
-  formatDiagnostics,
 } from '@angular/compiler-cli';
 import * as ts from 'typescript';
 import { time, timeEnd } from './benchmark';
@@ -111,7 +110,6 @@ export class TypeChecker {
     if (!cancellationToken.isCancellationRequested()) {
       reportDiagnostics(
         allDiagnostics,
-        this._compilerHost,
         msg => this.sendMessage(new LogMessage('error', 'ERROR in ' + msg)),
         msg => this.sendMessage(new LogMessage('warn', 'WARNING in ' + msg)),
       );

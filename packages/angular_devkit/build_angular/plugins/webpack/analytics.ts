@@ -122,7 +122,7 @@ export class NgBuildAnalyticsPlugin {
 
     return metrics;
   }
-  protected _getDimensions(stats: Stats) {
+  protected _getDimensions() {
     const dimensions: (string | number | boolean)[] = [];
 
     if (this._stats.errors.length) {
@@ -136,13 +136,13 @@ export class NgBuildAnalyticsPlugin {
   }
 
   protected _reportBuildMetrics(stats: Stats) {
-    const dimensions = this._getDimensions(stats);
+    const dimensions = this._getDimensions();
     const metrics = this._getMetrics(stats);
     this._analytics.event(this._category, 'build', { dimensions, metrics });
   }
 
   protected _reportRebuildMetrics(stats: Stats) {
-    const dimensions = this._getDimensions(stats);
+    const dimensions = this._getDimensions();
     const metrics = this._getMetrics(stats);
     this._analytics.event(this._category, 'rebuild', { dimensions, metrics });
   }

@@ -82,14 +82,12 @@ describe('chain', () => {
 describe('apply', () => {
   it('works with simple rules', done => {
     const rulesCalled: Tree[] = [];
-    let sourceCalled = false;
-
     const tree0 = empty();
     const tree1 = empty();
     const tree2 = empty();
     const tree3 = empty();
 
-    const source: Source = () => (sourceCalled = true, tree0);
+    const source: Source = () => tree0;
     const rule0: Rule = (tree: Tree) => (rulesCalled[0] = tree, tree1);
     const rule1: Rule = (tree: Tree) => (rulesCalled[1] = tree, tree2);
     const rule2: Rule = (tree: Tree) => (rulesCalled[2] = tree, tree3);
@@ -108,14 +106,12 @@ describe('apply', () => {
 
   it('works with observable rules', done => {
     const rulesCalled: Tree[] = [];
-    let sourceCalled = false;
-
     const tree0 = empty();
     const tree1 = empty();
     const tree2 = empty();
     const tree3 = empty();
 
-    const source: Source = () => (sourceCalled = true, tree0);
+    const source: Source = () => tree0;
     const rule0: Rule = (tree: Tree) => (rulesCalled[0] = tree, observableOf(tree1));
     const rule1: Rule = (tree: Tree) => (rulesCalled[1] = tree, observableOf(tree2));
     const rule2: Rule = (tree: Tree) => (rulesCalled[2] = tree, tree3);

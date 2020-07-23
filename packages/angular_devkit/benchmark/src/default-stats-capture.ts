@@ -8,7 +8,7 @@
 
 import { Observable } from 'rxjs';
 import { map, reduce } from 'rxjs/operators';
-import { AggregatedProcessStats, Capture, MetricGroup, MonitoredProcess } from './interfaces';
+import { AggregatedProcessStats, Capture, MetricGroup } from './interfaces';
 import { cumulativeMovingAverage, max } from './utils';
 
 

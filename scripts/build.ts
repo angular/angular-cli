@@ -196,12 +196,6 @@ function _build(logger: logging.Logger) {
 }
 
 
-async function _bazel(logger: logging.Logger) {
-  // TODO: undo this when we fully support bazel on windows.
-  // logger.info('Bazel build...');
-  // _exec('bazel', ['build', '//packages/...'], {}, logger);
-}
-
 // tslint:disable-next-line:no-big-function
 export default async function(
   argv: { local?: boolean, snapshot?: boolean },
@@ -210,7 +204,6 @@ export default async function(
   _clean(logger);
 
   const sortedPackages = _sortPackages();
-  await _bazel(logger);
   await buildSchema({}, logger);
   _build(logger);
 

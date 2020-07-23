@@ -71,7 +71,6 @@ export namespace strategy {
     O extends JsonValue = JsonValue,
   >(replayMessages = false): JobStrategy<A, I, O> {
     let inboundBus = new Subject<JobInboundMessage<I>>();
-    let runContext: JobHandlerContext | null = null;
     let run: Observable<JobOutboundMessage<O>> | null = null;
     let state: JobOutboundMessage<O> | null = null;
 
@@ -108,7 +107,6 @@ export namespace strategy {
           ),
           replayMessages ? shareReplay() : share(),
         );
-        runContext = context;
 
         return run;
       };

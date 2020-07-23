@@ -33,7 +33,7 @@ import { applyLintFix } from '../utility/lint-fix';
 import { parseName } from '../utility/parse-name';
 import { validateHtmlSelector, validateName } from '../utility/validation';
 import { buildDefaultPath, getWorkspace } from '../utility/workspace';
-import { Schema as ComponentOptions, Style } from './schema';
+import { Schema as ComponentOptions } from './schema';
 
 function readIntoSourceFile(host: Tree, modulePath: string): ts.SourceFile {
   const text = host.read(modulePath);

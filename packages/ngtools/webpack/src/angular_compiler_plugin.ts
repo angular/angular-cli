@@ -1144,7 +1144,6 @@ export class AngularCompilerPlugin {
     // Report any diagnostics.
     reportDiagnostics(
       diagnostics,
-      this._compilerHost,
       msg => this._errors.push(new Error(msg)),
       msg => this._warnings.push(msg),
     );

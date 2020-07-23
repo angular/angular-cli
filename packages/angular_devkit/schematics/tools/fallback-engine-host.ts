@@ -9,7 +9,6 @@ import { Observable, of as observableOf, throwError } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { Url } from 'url';
 import {
-  Collection,
   CollectionDescription,
   EngineHost,
   RuleFactory,
