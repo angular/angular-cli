@@ -278,19 +278,6 @@ jobs:
           command: |
             yarn admin snapshots --verbose --githubTokenFile=${HOME}/github_token
 
-  publish:
-    executor: action-executor
-    steps:
-      - custom_attach_workspace
-      - run:
-          name: Decrypt Credentials
-          command: |
-            openssl aes-256-cbc -d -in .circleci/npm_token -k "${KEY}" -out ~/.npmrc
-      - run:
-          name: Deployment to NPM
-          command: |
-            yarn admin publish --verbose
-
   # Windows jobs
   # CircleCI support for Windows jobs is still in preview.
   # Docs: https://github.com/CircleCI-Public/windows-preview-docs
@@ -429,14 +416,3 @@ workflows:
             - build
             - test
             - e2e-cli
-      - publish:
-          requires:
-            - build
-            - test
-            - e2e-cli
-            - snapshot_publish
-          filters:
-            tags:
-              only: /^v\d+/
-            branches:
-              ignore: /.*/
