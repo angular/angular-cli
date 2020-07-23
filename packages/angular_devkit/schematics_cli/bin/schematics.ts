@@ -81,7 +81,7 @@ function _listSchematics(collectionName: string, logger: logging.Logger) {
 
 function _createPromptProvider(): schema.PromptProvider {
   return (definitions: Array<schema.PromptDefinition>) => {
-    const questions: inquirer.Questions = definitions.map(definition => {
+    const questions: inquirer.QuestionCollection = definitions.map(definition => {
       const question: inquirer.Question = {
         name: definition.id,
         message: definition.message,
