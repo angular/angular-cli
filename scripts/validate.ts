@@ -15,7 +15,7 @@ import validateDoNotSubmit from './validate-do-not-submit';
 import validateLicenses from './validate-licenses';
 import validateUserAnalytics from './validate-user-analytics';
 
-export default async function (options: { verbose: boolean }, logger: logging.Logger) {
+export default async function (options: { verbose: boolean; ci: boolean }, logger: logging.Logger) {
   let error = false;
 
   if (execSync(`git status --porcelain`).toString()) {
@@ -40,15 +40,17 @@ export default async function (options: { verbose: boolean }, logger: logging.Lo
     error = true;
   }
 
-  logger.info('');
-  logger.info('Running commit validation...');
-  error = validateCommits({}, logger.createChild('validate-commits')) != 0
-       || error;
+  if (!options.ci) {
+    logger.info('');
+    logger.info('Running commit validation...');
+    error = validateCommits({}, logger.createChild('validate-commits')) != 0
+        || error;
 
-  logger.info('');
-  logger.info(`Running DO_NOT${''}_SUBMIT validation...`);
-  error = await validateDoNotSubmit({}, logger.createChild('validate-do-not-submit')) != 0
-       || error;
+    logger.info('');
+    logger.info(`Running DO_NOT${''}_SUBMIT validation...`);
+    error = await validateDoNotSubmit({}, logger.createChild('validate-do-not-submit')) != 0
+        || error;
+  }
 
   logger.info('');
   logger.info('Running license validation...');
