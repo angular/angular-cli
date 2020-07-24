@@ -17,6 +17,7 @@ export default async function () {
     'install',
     '-g',
     '@angular-devkit/schematics-cli',
+    '--registry=http://localhost:4873',
   );
   await exec(process.platform.startsWith('win') ? 'where' : 'which', 'schematics');
 
