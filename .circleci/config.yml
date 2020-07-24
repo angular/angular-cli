@@ -42,6 +42,7 @@ executors:
         default: *default_nodeversion
     docker:
       - image: cimg/node:<< parameters.nodeversion >>
+    working_directory: ~/ng
     resource_class: small
 
   test-executor:
@@ -51,12 +52,14 @@ executors:
         default: *default_nodeversion
     docker:
       - image: cimg/node:<< parameters.nodeversion >>
+    working_directory: ~/ng
     environment:
       NPM_CONFIG_PREFIX: ~/.npm-global
     resource_class: large
 
   windows-executor:
     # Same as https://circleci.com/orbs/registry/orb/circleci/windows, but named.
+    working_directory: ~/ng
     resource_class: windows.medium
     shell: powershell.exe -ExecutionPolicy Bypass
     machine:
@@ -121,7 +124,6 @@ jobs:
   setup:
     executor: action-executor
     resource_class: medium
-    working_directory: /mnt/ramdisk
     steps:
       - checkout
       - run:
