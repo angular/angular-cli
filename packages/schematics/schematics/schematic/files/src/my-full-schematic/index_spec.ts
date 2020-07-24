@@ -8,10 +8,10 @@ const collectionPath = path.join(__dirname, '../collection.json');
 
 
 describe('my-full-schematic', () => {
-  it('requires required option', () => {
+  it('requires required option', async () => {
     // We test that
     const runner = new SchematicTestRunner('schematics', collectionPath);
-    expectAsync(runner.runSchematicAsync('my-full-schematic', {}, Tree.empty()).toPromise()).toBeRejected();
+    await expectAsync(runner.runSchematicAsync('my-full-schematic', {}, Tree.empty()).toPromise()).toBeRejected();
   });
 
   it('works', async () => {
