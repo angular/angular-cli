@@ -9,9 +9,6 @@
 
 version: 2.1
 
-orbs:
-  browser-tools: circleci/browser-tools@1.0.1
-
 # Variables
 
 ## IMPORTANT
@@ -116,6 +113,16 @@ commands:
             sudo apt-get install -y python
             python --version
 
+  install_chrome:
+    steps:
+      - run:
+          name: "Install Google Chrome"
+          command: |
+            wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+            sudo apt-get update > /dev/null 2>&1
+            sudo apt install ./google-chrome-stable_current_amd64.deb
+            google-chrome --version
+
 # Job definitions
 jobs:
   setup:
@@ -185,7 +192,7 @@ jobs:
     parallelism: 6
     steps:
       - custom_attach_workspace
-      - browser-tools/install-chrome
+      - install_chrome
       - run:
           name: Initialize Environment
           command: ./.circleci/env.sh
@@ -200,7 +207,7 @@ jobs:
     parallelism: 4
     steps:
       - custom_attach_workspace
-      - browser-tools/install-chrome
+      - install_chrome
       - run:
           name: Initialize Environment
           command: |
@@ -245,7 +252,7 @@ jobs:
     resource_class: xlarge
     steps:
       - custom_attach_workspace
-      - browser-tools/install-chrome
+      - install_chrome
       - setup_bazel_rbe
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run: yarn bazel:test
