@@ -168,10 +168,10 @@ jobs:
       - custom_attach_workspace
       - run:
           name: Validate Commit Messages
-          command: yarn -s admin validate-commits --base <<pipeline.git.base_revision>> --head <<pipeline.git.revision>>
+          command: yarn -s admin validate-commits
       - run:
           name: Validate "do not submit" Commits
-          command: yarn -s admin validate-do-not-submit --base <<pipeline.git.base_revision>> --head <<pipeline.git.revision>>
+          command: yarn -s admin validate-do-not-submit
       - run:
           command: yarn -s admin validate --ci
 
