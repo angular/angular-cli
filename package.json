@@ -153,7 +153,7 @@
     "husky": "^4.0.10",
     "inquirer": "7.1.0",
     "jasmine": "^3.3.1",
-    "jasmine-core": "~3.5.0",
+    "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",
     "jest-worker": "26.0.0",
     "jquery": "^3.3.1",
