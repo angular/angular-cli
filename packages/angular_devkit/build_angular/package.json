@@ -27,7 +27,7 @@
     "circular-dependency-plugin": "5.2.0",
     "copy-webpack-plugin": "6.0.3",
     "core-js": "3.6.4",
-    "css-loader": "3.6.0",
+    "css-loader": "4.0.0",
     "cssnano": "4.1.10",
     "file-loader": "6.0.0",
     "find-cache-dir": "3.3.1",
