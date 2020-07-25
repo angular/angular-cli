@@ -151,7 +151,7 @@
     "git-raw-commits": "^2.0.0",
     "glob": "7.1.6",
     "husky": "^4.0.10",
-    "inquirer": "7.1.0",
+    "inquirer": "7.3.3",
     "jasmine": "^3.3.1",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",
