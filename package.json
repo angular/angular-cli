@@ -130,7 +130,7 @@
     "bootstrap": "^4.0.0",
     "browserslist": "4.13.0",
     "cacache": "15.0.0",
-    "caniuse-lite": "1.0.30001106",
+    "caniuse-lite": "1.0.30001107",
     "circular-dependency-plugin": "5.2.0",
     "codelyzer": "^6.0.0",
     "common-tags": "^1.8.0",
