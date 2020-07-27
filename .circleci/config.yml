@@ -193,7 +193,7 @@ jobs:
           command: ./.circleci/env.sh
       - run:
           name: Execute CLI E2E Tests
-          command: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.ve >>--ve<</ parameters.ve >> <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >>
+          command: PATH=~/.npm-global/bin:$PATH node ./tests/legacy-cli/run_e2e --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX} <<# parameters.ve >>--ve<</ parameters.ve >> <<# parameters.snapshots >>--ng-snapshots<</ parameters.snapshots >> --tmpdir=/mnt/ramdisk
 
   e2e-cli-node-10:
     executor:
