@@ -51,14 +51,22 @@ export default function (): Rule {
 
     // Check for @angular-devkit/schematics and @angular-devkit/core
     for (const name of ['@angular-devkit/schematics', '@angular-devkit/core']) {
-      const current = getPackageJsonDependency(host, name);
-      if (current) {
+      if (getPackageJsonDependency(host, name)) {
         context.logger.info(
           `Package "${name}" found in the workspace package.json. ` +
             'This package typically does not need to be installed manually. ' +
             'If it is not being used by project code, it can be removed from the package.json.',
         );
       }
+    }
+
+    if (getPackageJsonDependency(host, 'rxjs-compat')) {
+      context.logger.info(
+        `Package "rxjs-compat" found in the workspace package.json. ` +
+        'This package typically was used during migration from RxJs version 5 to 6 during the Angular 5 ' +
+        'timeframe and may no longer be needed.\n' +
+        'Read more about this: https://rxjs-dev.firebaseapp.com/guide/v6/migration',
+      );
     }
   };
 }
