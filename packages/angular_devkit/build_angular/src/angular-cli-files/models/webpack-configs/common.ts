@@ -16,14 +16,12 @@ import * as path from 'path';
 import { RollupOptions } from 'rollup';
 import { ScriptTarget } from 'typescript';
 import {
-  ChunkData,
   Compiler,
   Configuration,
   ContextReplacementPlugin,
-  HashedModuleIdsPlugin,
-  Plugin,
-  Rule,
   RuleSetLoader,
+  RuleSetRule,
+  compilation,
   debug,
 } from 'webpack';
 import { RawSource } from 'webpack-sources';
@@ -64,9 +62,9 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     vendor: vendorSourceMap,
   } = buildOptions.sourceMap;
 
-  const extraPlugins: Plugin[] = [];
-  const extraRules: Rule[] = [];
-  const entryPoints: { [key: string]: string[] } = {};
+  const extraPlugins: { apply(compiler: Compiler): void }[] = [];
+  const extraRules: RuleSetRule[] = [];
+  const entryPoints: { [key: string]: [string, ...string[]] } = {};
 
   // determine hashing format
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing || 'none');
@@ -150,7 +148,10 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
                 // tslint:disable-next-line: no-any
                 (compilation.mainTemplate.hooks as any).assetPath.tap(
                   'build-angular',
-                  (filename: string | ((data: ChunkData) => string), data: ChunkData) => {
+                  (
+                    filename: string | ((data: { chunk: compilation.Chunk }) => string),
+                    data: { chunk: compilation.Chunk },
+                  ) => {
                     const assetName = typeof filename === 'function' ? filename(data) : filename;
                     const isMap = assetName && assetName.endsWith('.map');
 
@@ -177,17 +178,21 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     }
 
     if (buildOptions.polyfills) {
-      entryPoints['polyfills'] = [
-        ...(entryPoints['polyfills'] || []),
-        path.resolve(root, buildOptions.polyfills),
-      ];
+      const projectPolyfills = path.resolve(root, buildOptions.polyfills);
+      if (entryPoints['polyfills']) {
+        entryPoints['polyfills'].push(projectPolyfills);
+      } else {
+        entryPoints['polyfills'] = [projectPolyfills];
+      }
     }
 
     if (!buildOptions.aot) {
-      entryPoints['polyfills'] = [
-        ...(entryPoints['polyfills'] || []),
-        path.join(__dirname, '..', 'jit-polyfills.js'),
-      ];
+      const jitPolyfills = path.join(__dirname, '..', 'jit-polyfills.js');
+      if (entryPoints['polyfills']) {
+        entryPoints['polyfills'].push(jitPolyfills);
+      } else {
+        entryPoints['polyfills'] = [jitPolyfills];
+      }
     }
   }
 
@@ -592,8 +597,9 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       ],
     },
     optimization: {
+      minimizer: extraMinimizers,
+      moduleIds: 'hashed',
       noEmitOnErrors: true,
-      minimizer: [new HashedModuleIdsPlugin(), ...extraMinimizers],
     },
     plugins: [
       // Always replace the context for the System.import in angular/core to prevent warnings.

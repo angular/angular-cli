@@ -88,7 +88,11 @@ export class IndexHtmlWebpackPlugin {
         }
       }
 
-      const loadOutputFile = (name: string) => compilation.assets[name].source();
+      const loadOutputFile = async (name: string) => {
+        const data = compilation.assets[name].source();
+
+        return typeof data === 'string' ? data : data.toString();
+      };
       let indexSource = await augmentIndexHtml({
         input: this._options.input,
         inputContent,

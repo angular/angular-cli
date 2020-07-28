@@ -24,11 +24,11 @@ const postcssImports = require('postcss-import');
 // tslint:disable-next-line:no-big-function
 export function getStylesConfig(wco: WebpackConfigOptions) {
   const { root, buildOptions } = wco;
-  const entryPoints: { [key: string]: string[] } = {};
+  const entryPoints: { [key: string]: [string, ...string[]] } = {};
   const globalStylePaths: string[] = [];
-  const extraPlugins: webpack.Plugin[] = [
-    new AnyComponentStyleBudgetChecker(buildOptions.budgets),
-  ];
+  const extraPlugins: { apply(compiler: webpack.Compiler): void }[] = [];
+
+  extraPlugins.push(new AnyComponentStyleBudgetChecker(buildOptions.budgets));
 
   const cssSourceMap = buildOptions.sourceMap.styles;
 
