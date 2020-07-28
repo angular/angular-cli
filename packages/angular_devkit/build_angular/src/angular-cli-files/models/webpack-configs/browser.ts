@@ -62,7 +62,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
   const globalStylesBundleNames = normalizeExtraEntryPoints(styles, 'styles')
     .map(style => style.bundleName);
 
-  let crossOriginLoading: string | false = false;
+  let crossOriginLoading: 'anonymous' | 'use-credentials' | false = false;
   if (subresourceIntegrity && crossOrigin === 'none') {
     crossOriginLoading = 'anonymous';
   } else if (crossOrigin !== 'none') {

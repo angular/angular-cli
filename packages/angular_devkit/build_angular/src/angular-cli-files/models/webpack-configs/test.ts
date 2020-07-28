@@ -17,8 +17,8 @@ export function getTestConfig(
 ): webpack.Configuration {
   const { root, buildOptions, sourceRoot: include } = wco;
 
-  const extraRules: webpack.Rule[] = [];
-  const extraPlugins: webpack.Plugin[] = [];
+  const extraRules: webpack.RuleSetRule[] = [];
+  const extraPlugins: { apply(compiler: webpack.Compiler): void }[] = [];
 
   if (buildOptions.codeCoverage) {
     const codeCoverageExclude = buildOptions.codeCoverageExclude;

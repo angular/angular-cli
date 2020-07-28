@@ -7,7 +7,7 @@
  */
 
 import * as path from 'path';
-import { Compiler, Plugin } from 'webpack';
+import { Compiler } from 'webpack';
 import { Budget, Type } from '../../../src/browser/schema';
 import { ThresholdSeverity, calculateThresholds, checkThresholds } from '../utilities/bundle-calculator';
 
@@ -17,7 +17,7 @@ const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';
  * Check budget sizes for component styles by emitting a warning or error if a
  * budget is exceeded by a particular component's styles.
  */
-export class AnyComponentStyleBudgetChecker implements Plugin {
+export class AnyComponentStyleBudgetChecker {
   private readonly budgets: Budget[];
   constructor(budgets: Budget[]) {
     this.budgets = budgets.filter((budget) => budget.type === Type.AnyComponentStyle);
