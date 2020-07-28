@@ -70,15 +70,9 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
   successCb = config.buildWebpack.successCb;
   failureCb = config.buildWebpack.failureCb;
 
-  // When using code-coverage, auto-add coverage-istanbul.
-  config.reporters = config.reporters || [];
-  if (options.codeCoverage && config.reporters.indexOf('coverage-istanbul') === -1) {
-    config.reporters.push('coverage-istanbul');
-  }
-
   // Add a reporter that fixes sourcemap urls.
   if (normalizeSourceMaps(options.sourceMap).scripts) {
-    config.reporters.push('@angular-devkit/build-angular--sourcemap-reporter');
+    config.reporters.unshift('@angular-devkit/build-angular--sourcemap-reporter');
 
     // Code taken from https://github.com/tschaub/karma-source-map-support.
     // We can't use it directly because we need to add it conditionally in this file, and karma
@@ -92,8 +86,14 @@ const init: any = (config: any, emitter: any, customFileHandlers: any) => {
     ], true);
   }
 
-  config.reporters.push('@angular-devkit/build-angular--event-reporter');
+  config.reporters.unshift('@angular-devkit/build-angular--event-reporter');
 
+  // When using code-coverage, auto-add coverage-istanbul.
+  config.reporters = config.reporters || [];
+  if (options.codeCoverage && config.reporters.indexOf('coverage-istanbul') === -1) {
+    config.reporters.unshift('coverage-istanbul');
+  }
+    
   // Add webpack config.
   const webpackConfig = config.buildWebpack.webpackConfig;
   const webpackMiddlewareConfig = {
@@ -284,16 +284,13 @@ eventReporter.$inject = ['baseReporterDecorator', 'config'];
 // Strip the server address and webpack scheme (webpack://) from error log.
 const sourceMapReporter: any = function (this: any, baseReporterDecorator: any, config: any) {
   baseReporterDecorator(this);
-
   muteDuplicateReporterLogging(this, config);
 
-  const urlRegexp = /http:\/\/localhost:\d+\/_karma_webpack_\/webpack:\//gi;
+  const urlRegexp = /http:\/\/localhost:\d+\/_karma_webpack_\/(webpack:\/)?/gi;
 
   this.onSpecComplete = function (_browser: any, result: any) {
-    if (!result.success && result.log.length > 0) {
-      result.log.forEach((log: string, idx: number) => {
-        result.log[idx] = log.replace(urlRegexp, '');
-      });
+    if (!result.success) {
+      result.log = result.log.map((l: string) => l.replace(urlRegexp, ''));
     }
   };
 
