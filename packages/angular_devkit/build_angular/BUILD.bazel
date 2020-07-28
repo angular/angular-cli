@@ -147,6 +147,7 @@ ts_library(
         "@npm//minimatch",
         "@npm//open",
         "@npm//parse5",
+        "@npm//parse5-htmlparser2-tree-adapter",
         "@npm//pnp-webpack-plugin",
         "@npm//postcss",
         "@npm//postcss-import",
