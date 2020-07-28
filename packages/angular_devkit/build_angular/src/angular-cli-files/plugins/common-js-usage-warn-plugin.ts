@@ -9,6 +9,7 @@
 
 import { isAbsolute } from 'path';
 import { Compiler, compilation } from 'webpack';
+import { addWarning } from '../../utils/webpack-diagnostics';
 
 // Webpack doesn't export these so the deep imports can potentially break.
 const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequireDependency');
@@ -93,7 +94,7 @@ export class CommonJsUsageWarnPlugin {
 
               // Avoid showing the same warning multiple times when in 'watch' mode.
               if (!this.shownWarnings.has(warning)) {
-                compilation.warnings.push(warning);
+                addWarning(compilation, warning);
                 this.shownWarnings.add(warning);
               }
             }

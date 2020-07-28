@@ -36,6 +36,7 @@ import { I18nOptions } from '../utils/i18n-options';
 import { createI18nPlugins } from '../utils/process-bundle';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { getIndexInputFile, getIndexOutputFile } from '../utils/webpack-browser-config';
+import { addError, addWarning } from '../utils/webpack-diagnostics';
 import { Schema } from './schema';
 const open = require('open');
 
@@ -354,9 +355,9 @@ async function setupLocalize(
           }
           for (const diagnostic of diagnostics.messages) {
             if (diagnostic.type === 'error') {
-              compilation.errors.push(diagnostic.message);
+              addError(compilation, diagnostic.message);
             } else {
-              compilation.warnings.push(diagnostic.message);
+              addWarning(compilation, diagnostic.message);
             }
           }
           diagnostics.messages.length = 0;
