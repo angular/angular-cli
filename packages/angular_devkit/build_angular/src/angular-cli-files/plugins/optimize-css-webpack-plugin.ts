@@ -9,6 +9,7 @@ import * as cssNano from 'cssnano';
 import { ProcessOptions, Result } from 'postcss';
 import { Compiler, compilation } from 'webpack';
 import { RawSource, Source, SourceMapSource } from 'webpack-sources';
+import { addWarning } from '../../utils/webpack-diagnostics';
 
 export interface OptimizeCssWebpackPluginOptions {
   sourceMap: boolean;
@@ -99,9 +100,8 @@ export class OptimizeCssWebpackPlugin {
               .catch(reject);
           });
 
-          const warnings = output.warnings();
-          if (warnings.length) {
-            compilation.warnings.push(...warnings.map(({ text }) => text));
+          for (const { text } of output.warnings()) {
+            addWarning(compilation, text);
           }
 
           let newSource;

@@ -9,6 +9,7 @@
 import * as path from 'path';
 import { Compiler } from 'webpack';
 import { Budget, Type } from '../../../src/browser/schema';
+import { addError, addWarning } from '../../utils/webpack-diagnostics';
 import { ThresholdSeverity, calculateThresholds, checkThresholds } from '../utilities/bundle-calculator';
 
 const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';
@@ -53,10 +54,10 @@ export class AnyComponentStyleBudgetChecker {
           for (const { severity, message } of checkThresholds(thresholds[Symbol.iterator](), size, label)) {
             switch (severity) {
               case ThresholdSeverity.Warning:
-                compilation.warnings.push(message);
+                addWarning(compilation, message);
                 break;
               case ThresholdSeverity.Error:
-                compilation.errors.push(message);
+                addError(compilation, message);
                 break;
               default:
                 assertNever(severity);

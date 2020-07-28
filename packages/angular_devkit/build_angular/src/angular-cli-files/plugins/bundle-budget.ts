@@ -8,6 +8,7 @@
 import { Compiler } from 'webpack';
 import { Budget } from '../../browser/schema';
 import { ProcessBundleResult } from '../../utils/process-bundle';
+import { addError, addWarning } from '../../utils/webpack-diagnostics';
 import { ThresholdSeverity, checkBudgets } from '../utilities/bundle-calculator';
 
 export interface BundleBudgetPluginOptions {
@@ -33,10 +34,10 @@ export class BundleBudgetPlugin {
       for (const { severity, message } of checkBudgets(budgets, stats, processResults)) {
         switch (severity) {
           case ThresholdSeverity.Warning:
-            compilation.warnings.push(`budgets: ${message}`);
+            addWarning(compilation, `budgets: ${message}`);
             break;
           case ThresholdSeverity.Error:
-            compilation.errors.push(`budgets: ${message}`);
+            addError(compilation, `budgets: ${message}`);
             break;
         }
       }
