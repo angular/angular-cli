@@ -91,7 +91,7 @@ export function getSourceMapDevTool(
     // inline sourcemaps as otherwise paths to sourcemaps will be broken in browser
     // `webpack:///` is needed for Visual Studio breakpoints to work properly as currently
     // there is no way to set the 'webRoot'
-    sourceRoot: inlineSourceMap ? '' : 'webpack:///',
+    sourceRoot: 'webpack:///',
     moduleFilenameTemplate: '[resource-path]',
     append: hiddenSourceMap ? false : undefined,
     exclude: vendorSourceMap ? undefined : /vendor.*\.js/,
