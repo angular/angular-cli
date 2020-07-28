@@ -489,7 +489,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       ],
       plugins: [PnpWebpackPlugin.moduleLoader(module)],
     },
-    context: projectRoot,
+    context: root,
     entry: entryPoints,
     output: {
       futureEmitAssets: true,
