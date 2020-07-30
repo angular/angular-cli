@@ -11,7 +11,7 @@ export default async function () {
     return;
   }
 
-  fs.writeFileSync('.npmrc', 'registry = http://localhost:4873', 'utf8');
+  process.env['NPM_CONFIG_REGISTRY'] = 'http://localhost:4873';
 
   await silentNpm(
     'install',
