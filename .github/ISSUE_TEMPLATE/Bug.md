@@ -1,3 +1,8 @@
+---
+name: 🐞 Bug Report
+about: Something is broken in Angular Universal
+---
+
 <--
 Please follow the below issue template. Issues not following the issue template will be closed.
 Please provide _as much detail as possible_ in as minimal a reproduction as possible. This means no/only one third-party
@@ -9,11 +14,6 @@ Anything else does not belong on this forum.
 For very common issues when using Angular Universal, please see [this doc](docs/gotchas.md). This includes
 issues for `window is not defined` and other hiccups when adopting Angular Universal for the first time.
 -->
-
----
-name: 🐞 Bug Report
-about: Something is broken in Angular Universal
----
 
 # 🐞 Bug report
 
