@@ -353,12 +353,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     ];
   }
 
-  // Allow loaders to be in a node_modules nested inside the devkit/build-angular package.
-  // This is important in case loaders do not get hoisted.
-  // If this file moves to another location, alter potentialNodeModules as well.
-  const loaderNodeModules = findAllNodeModules(__dirname, projectRoot);
-  loaderNodeModules.unshift('node_modules');
-
   const extraMinimizers = [];
   if (stylesOptimization) {
     extraMinimizers.push(
@@ -485,7 +479,12 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     resolve: {
       extensions: ['.ts', '.tsx', '.mjs', '.js'],
       symlinks: !buildOptions.preserveSymlinks,
-      modules: [wco.tsConfig.options.baseUrl || projectRoot, 'node_modules'],
+      modules: [
+        wco.tsConfig.options.baseUrl || projectRoot,
+        // Prefer workspace level node_modules
+        path.resolve(root, 'node_modules'),
+        'node_modules',
+      ],
       plugins: [
         PnpWebpackPlugin,
         new DedupeModuleResolvePlugin({ verbose: buildOptions.verbose }),
@@ -493,14 +492,20 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     },
     resolveLoader: {
       symlinks: !buildOptions.preserveSymlinks,
-      modules: loaderNodeModules,
+      modules: [
+        // Allow loaders to be in a node_modules nested inside the devkit/build-angular package.
+        // This is important in case loaders do not get hoisted.
+        // If this file moves to another location, alter potentialNodeModules as well.
+        ...findAllNodeModules(__dirname, root),
+        'node_modules',
+      ],
       plugins: [PnpWebpackPlugin.moduleLoader(module)],
     },
     context: projectRoot,
     entry: entryPoints,
     output: {
       futureEmitAssets: true,
-      path: path.resolve(root, buildOptions.outputPath as string),
+      path: path.resolve(root, buildOptions.outputPath),
       publicPath: buildOptions.deployUrl,
       filename: `[name]${targetInFileName}${hashFormat.chunk}.js`,
     },

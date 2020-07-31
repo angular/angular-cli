@@ -42,7 +42,7 @@ export class DedupeModuleResolvePlugin {
   apply(resolver: any) {
     resolver
       .getHook('before-described-relative')
-      .tapPromise('DedupeModuleResolvePlugin', async (request: NormalModuleFactoryRequest) => {
+      .tap('DedupeModuleResolvePlugin', (request: NormalModuleFactoryRequest) => {
         if (request.relativePath !== '.') {
           return;
         }
