@@ -12,12 +12,12 @@ import {
   Stats,
   compilation,
 } from 'webpack';
-import { Source } from 'webpack-sources';
+import { OriginalSource } from 'webpack-sources';
 
 const NormalModule = require('webpack/lib/NormalModule');
 
 interface NormalModule extends Module {
-  _source?: Source | null;
+  _source?: OriginalSource | null;
   resource?: string;
 }
 

@@ -8,7 +8,7 @@
 import * as cssNano from 'cssnano';
 import { ProcessOptions, Result } from 'postcss';
 import { Compiler, compilation } from 'webpack';
-import { RawSource, Source, SourceMapSource } from 'webpack-sources';
+import { OriginalSource, RawSource, SourceMapSource } from 'webpack-sources';
 import { addWarning } from '../../utils/webpack-diagnostics';
 
 export interface OptimizeCssWebpackPluginOptions {
@@ -58,7 +58,7 @@ export class OptimizeCssWebpackPlugin {
       const actions = files
         .filter(file => this._options.test(file))
         .map(async file => {
-          const asset = compilation.assets[file] as Source;
+          const asset = compilation.assets[file] as OriginalSource;
           if (!asset) {
             return;
           }
