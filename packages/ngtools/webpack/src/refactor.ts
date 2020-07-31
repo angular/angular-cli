@@ -19,11 +19,35 @@ import { forwardSlashPath } from './utils';
  * @param max The maximum number of items to return.
  * @return all nodes of kind, or [] if none is found
  */
-// TODO: replace this with collectDeepNodes and add limits to collectDeepNodes
-export function findAstNodes<T extends ts.Node>(
+export function findAstNodes(
   node: ts.Node | null,
   sourceFile: ts.SourceFile,
   kind: ts.SyntaxKind,
+  recursive?: boolean,
+  max?: number,
+): ts.Node[];
+
+/**
+ * Find all nodes from the AST in the subtree of node of SyntaxKind kind.
+ * @param node The root node to check, or null if the whole tree should be searched.
+ * @param sourceFile The source file where the node is.
+ * @param guard
+ * @param recursive Whether to go in matched nodes to keep matching.
+ * @param max The maximum number of items to return.
+ * @return all nodes of kind, or [] if none is found
+ */
+export function findAstNodes<T extends ts.Node>(
+  node: ts.Node | null,
+  sourceFile: ts.SourceFile,
+  guard: (node: ts.Node) => node is T,
+  recursive?: boolean,
+  max?: number,
+): T[];
+
+export function findAstNodes<T extends ts.Node>(
+  node: ts.Node | null,
+  sourceFile: ts.SourceFile,
+  kindOrGuard: ts.SyntaxKind | ((node: ts.Node) => node is T),
   recursive = false,
   max = Infinity,
 ): T[] {
@@ -35,23 +59,28 @@ export function findAstNodes<T extends ts.Node>(
     node = sourceFile;
   }
 
+  const test =
+    typeof kindOrGuard === 'function'
+      ? kindOrGuard
+      : (node: ts.Node): node is T => node.kind === kindOrGuard;
+
   const arr: T[] = [];
-  if (node.kind === kind) {
+  if (test(node)) {
     // If we're not recursively looking for children, stop here.
     if (!recursive) {
       return [node as T];
     }
 
-    arr.push(node as T);
+    arr.push(node);
     max--;
   }
 
   if (max > 0) {
     for (const child of node.getChildren(sourceFile)) {
-      findAstNodes(child, sourceFile, kind, recursive, max)
-        .forEach((node: ts.Node) => {
+      findAstNodes(child, sourceFile, test, recursive, max)
+        .forEach((node) => {
           if (max > 0) {
-            arr.push(node as T);
+            arr.push(node);
           }
           max--;
         });

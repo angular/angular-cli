@@ -27,7 +27,7 @@ export function findResources(sourceFile: ts.SourceFile): string[] {
 
     ts.visitNodes(
       (args[0] as ts.ObjectLiteralExpression).properties,
-      (node: ts.ObjectLiteralElementLike) => {
+      (node) => {
         if (!ts.isPropertyAssignment(node) || ts.isComputedPropertyName(node.name)) {
           return node;
         }
@@ -47,7 +47,7 @@ export function findResources(sourceFile: ts.SourceFile): string[] {
               return node;
             }
 
-            ts.visitNodes(node.initializer.elements, (node: ts.Expression) => {
+            ts.visitNodes(node.initializer.elements, (node) => {
               const url = getResourceUrl(node);
 
               if (url) {

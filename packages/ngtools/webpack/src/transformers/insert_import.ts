@@ -69,12 +69,13 @@ export function insertImport(
   // Find all imports.
   const allImports = collectDeepNodes(sourceFile, ts.SyntaxKind.ImportDeclaration);
   const maybeImports = allImports
-    .filter((node: ts.ImportDeclaration) => {
+    .filter(ts.isImportDeclaration)
+    .filter((node) => {
       // Filter all imports that do not match the modulePath.
       return node.moduleSpecifier.kind == ts.SyntaxKind.StringLiteral
         && (node.moduleSpecifier as ts.StringLiteral).text == modulePath;
     })
-    .filter((node: ts.ImportDeclaration) => {
+    .filter((node) => {
       // Filter out import statements that are either `import 'XYZ'` or `import * as X from 'XYZ'`.
       const clause = node.importClause as ts.ImportClause;
       if (!clause || clause.name || !clause.namedBindings) {
@@ -83,7 +84,7 @@ export function insertImport(
 
       return clause.namedBindings.kind == ts.SyntaxKind.NamedImports;
     })
-    .map((node: ts.ImportDeclaration) => {
+    .map((node) => {
       // Return the `{ ... }` list of the named import.
       return (node.importClause as ts.ImportClause).namedBindings as ts.NamedImports;
     });
