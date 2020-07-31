@@ -20,7 +20,7 @@ export default async function() {
     );
 
     // Check if the prompt is shown
-    await waitForAnyProcessOutputToMatch(/Would you like to share anonymous usage data/);
+    await waitForAnyProcessOutputToMatch(/Would you like to share anonymous usage data/, 60000);
 
   } finally {
     killAllProcesses();
