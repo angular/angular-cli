@@ -18,7 +18,7 @@ export function workaroundResolve(path: Path | string): string {
 }
 
 export function flattenArray<T>(value: Array<T | T[]>): T[] {
-  return [].concat.apply([], value);
+  return ([] as T[]).concat.apply([], value);
 }
 
 // TS represents paths internally with '/' and expects paths to be in this format.
