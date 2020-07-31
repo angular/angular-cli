@@ -110,11 +110,11 @@ function getBootstrapComponentPath(
   const componentSymbol = arrLiteral.elements[0].getText();
 
   const relativePath = getSourceNodes(moduleSource)
-    .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
+    .filter(ts.isImportDeclaration)
     .filter(imp => {
       return findNode(imp, ts.SyntaxKind.Identifier, componentSymbol);
     })
-    .map((imp: ts.ImportDeclaration) => {
+    .map(imp => {
       const pathStringLiteral = imp.moduleSpecifier as ts.StringLiteral;
 
       return pathStringLiteral.text;
@@ -205,8 +205,8 @@ function addRouterModule(mainPath: string): Rule {
 function getMetadataProperty(metadata: ts.Node, propertyName: string): ts.PropertyAssignment {
   const properties = (metadata as ts.ObjectLiteralExpression).properties;
   const property = properties
-    .filter(prop => prop.kind === ts.SyntaxKind.PropertyAssignment)
-    .filter((prop: ts.PropertyAssignment) => {
+    .filter(ts.isPropertyAssignment)
+    .filter((prop) => {
       const name = prop.name;
       switch (name.kind) {
         case ts.SyntaxKind.Identifier:
