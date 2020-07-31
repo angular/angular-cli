@@ -21,7 +21,7 @@ import {
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { addSymbolToNgModuleMetadata, getEnvironmentExportName, insertImport, isImported } from '../utility/ast-utils';
-import { InsertChange } from '../utility/change';
+import { applyToUpdateRecorder } from '../utility/change';
 import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
 import { getAppModulePath } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
@@ -63,7 +63,7 @@ function updateAppModule(mainPath: string): Rule {
       const change = insertImport(moduleSource, modulePath, importModule, importPath);
       if (change) {
         const recorder = host.beginUpdate(modulePath);
-        recorder.insertLeft((change as InsertChange).pos, (change as InsertChange).toAdd);
+        applyToUpdateRecorder(recorder, [change]);
         host.commitUpdate(recorder);
       }
     }
@@ -84,7 +84,7 @@ function updateAppModule(mainPath: string): Rule {
       const change = insertImport(moduleSource, modulePath, importModule, importPath);
       if (change) {
         const recorder = host.beginUpdate(modulePath);
-        recorder.insertLeft((change as InsertChange).pos, (change as InsertChange).toAdd);
+        applyToUpdateRecorder(recorder, [change]);
         host.commitUpdate(recorder);
       }
     }
@@ -97,9 +97,7 @@ function updateAppModule(mainPath: string): Rule {
       moduleSource, modulePath, 'imports', importText);
     if (metadataChanges) {
       const recorder = host.beginUpdate(modulePath);
-      metadataChanges.forEach((change: InsertChange) => {
-        recorder.insertRight(change.pos, change.toAdd);
-      });
+      applyToUpdateRecorder(recorder, metadataChanges);
       host.commitUpdate(recorder);
     }
 
