@@ -57,24 +57,21 @@ export function findLazyRoutes(
   }
   const sf: ts.SourceFile = sourceFile;
 
-  return findAstNodes(null, sourceFile, ts.SyntaxKind.ObjectLiteralExpression, true)
+  return findAstNodes(null, sourceFile, ts.isObjectLiteralExpression, true)
     // Get all their property assignments.
-    .map((node: ts.ObjectLiteralExpression) => {
-      return findAstNodes(node, sf, ts.SyntaxKind.PropertyAssignment, false);
-    })
+    .map((node) => findAstNodes(node, sf, ts.isPropertyAssignment, false))
     // Take all `loadChildren` elements.
-    .reduce((acc: ts.PropertyAssignment[], props: ts.PropertyAssignment[]) => {
+    .reduce((acc, props) => {
       return acc.concat(props.filter(literal => {
         return _getContentOfKeyLiteral(sf, literal.name) == 'loadChildren';
       }));
     }, [])
     // Get only string values.
-    .filter((node: ts.PropertyAssignment) => node.initializer.kind == ts.SyntaxKind.StringLiteral)
-    // Get the string value.
-    .map((node: ts.PropertyAssignment) => (node.initializer as ts.StringLiteral).text)
+    .map((node) => node.initializer)
+    .filter(ts.isStringLiteral)
     // Map those to either [path, absoluteModulePath], or [path, null] if the module pointing to
     // does not exist.
-    .map((routePath: string) => {
+    .map(({ text: routePath }) => {
       const moduleName = routePath.split('#')[0];
       const compOptions = (program && program.getCompilerOptions()) || compilerOptions || {};
       const resolvedModuleName: ts.ResolvedModuleWithFailedLookupLocations = moduleName[0] == '.'
@@ -87,11 +84,11 @@ export function findLazyRoutes(
           && host.fileExists(resolvedModuleName.resolvedModule.resolvedFileName)) {
         return [routePath, resolvedModuleName.resolvedModule.resolvedFileName];
       } else {
-        return [routePath, null];
+        return [routePath, null] as [string, null];
       }
     })
     // Reduce to the LazyRouteMap map.
-    .reduce((acc: LazyRouteMap, [routePath, resolvedModuleName]: [string, string | null]) => {
+    .reduce((acc: LazyRouteMap, [routePath, resolvedModuleName]) => {
       if (resolvedModuleName) {
         acc[routePath] = resolvedModuleName;
       }

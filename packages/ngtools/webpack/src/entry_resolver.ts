@@ -8,7 +8,7 @@
 
 import { Path, join } from '@angular-devkit/core';
 import * as ts from 'typescript';
-import { TypeScriptFileRefactor } from './refactor';
+import { TypeScriptFileRefactor, findAstNodes } from './refactor';
 
 
 function _recursiveSymbolExportLookup(refactor: TypeScriptFileRefactor,
@@ -16,8 +16,8 @@ function _recursiveSymbolExportLookup(refactor: TypeScriptFileRefactor,
                                       host: ts.CompilerHost,
                                       program: ts.Program): string | null {
   // Check this file.
-  const hasSymbol = refactor.findAstNodes(null, ts.SyntaxKind.ClassDeclaration)
-    .some((cd: ts.ClassDeclaration) => {
+  const hasSymbol = findAstNodes(null, refactor.sourceFile, ts.isClassDeclaration)
+    .some((cd) => {
       return cd.name != undefined && cd.name.text == symbolName;
     });
   if (hasSymbol) {
@@ -69,8 +69,8 @@ function _recursiveSymbolExportLookup(refactor: TypeScriptFileRefactor,
 
         // Create the source and verify that the symbol is at least a class.
         const source = new TypeScriptFileRefactor(module, host, program);
-        const hasSymbol = source.findAstNodes(null, ts.SyntaxKind.ClassDeclaration)
-          .some((cd: ts.ClassDeclaration) => {
+        const hasSymbol = findAstNodes(null, source.sourceFile, ts.isClassDeclaration)
+          .some((cd) => {
             return cd.name != undefined && cd.name.text == symbolName;
           });
 

@@ -29,8 +29,10 @@ export function replaceResources(
 
     const visitNode: ts.Visitor = (node: ts.Node) => {
       if (ts.isClassDeclaration(node)) {
-        const decorators = ts.visitNodes(node.decorators, (node: ts.Decorator) =>
-          visitDecorator(context, node, typeChecker, directTemplateLoading),
+        const decorators = ts.visitNodes(node.decorators, (node) =>
+          ts.isDecorator(node)
+            ? visitDecorator(context, node, typeChecker, directTemplateLoading)
+            : node,
         );
 
         return ts.updateClassDeclaration(
@@ -82,8 +84,10 @@ function visitDecorator(
   const styleReplacements: ts.Expression[] = [];
 
   // visit all properties
-  let properties = ts.visitNodes(objectExpression.properties, (node: ts.ObjectLiteralElementLike) =>
-    visitComponentMetadata(context, node, styleReplacements, directTemplateLoading),
+  let properties = ts.visitNodes(objectExpression.properties, (node) =>
+    ts.isObjectLiteralElementLike(node)
+      ? visitComponentMetadata(context, node, styleReplacements, directTemplateLoading)
+      : node,
   );
 
   // replace properties with updated properties
@@ -137,7 +141,7 @@ function visitComponentMetadata(
       }
 
       const isInlineStyles = name === 'styles';
-      const styles = ts.visitNodes(node.initializer.elements, (node: ts.Expression) => {
+      const styles = ts.visitNodes(node.initializer.elements, (node) => {
         if (!ts.isStringLiteral(node) && !ts.isNoSubstitutionTemplateLiteral(node)) {
           return node;
         }
@@ -161,7 +165,7 @@ function visitComponentMetadata(
   }
 }
 
-export function getResourceUrl(node: ts.Expression, loader = ''): string | null {
+export function getResourceUrl(node: ts.Node, loader = ''): string | null {
   // only analyze strings
   if (!ts.isStringLiteral(node) && !ts.isNoSubstitutionTemplateLiteral(node)) {
     return null;
