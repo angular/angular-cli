@@ -260,7 +260,7 @@ function extractProjectsConfig(
       const outDir = app.outDir || defaults.outDir;
       const appRoot = app.root || defaults.appRoot;
 
-      function _mapAssets(asset: string | JsonObject) {
+      function _mapAssets(asset: string | { glob?: string; input?: string; output?: string; allowOutsideOutDir?: boolean}) {
         if (typeof asset === 'string') {
           return normalize(appRoot + '/' + asset);
         } else {
@@ -268,6 +268,13 @@ function extractProjectsConfig(
             logger.warn(tags.oneLine`
               Asset with input '${asset.input}' was not migrated because it
               uses the 'allowOutsideOutDir' option which is not supported in Angular CLI 6.
+            `);
+
+            return null;
+          } else if (!asset.glob) {
+            logger.warn(tags.oneLine`
+              Asset with input '${asset.input}' was not migrated because it
+              does not contain a glob property.
             `);
 
             return null;
