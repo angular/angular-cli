@@ -40,6 +40,12 @@
       "alias": "s",
       "x-user-analytics": 9
     },
+    "includeStyles": {
+      "description": "Specifies if the component should include a styles property",
+      "type": "boolean",
+      "default": true,
+      "alias": "is"
+    },
     "inlineTemplate": {
       "description": "When true, includes template inline in the component.ts file. By default, an external template file is created and referenced in the component.ts file.",
       "type": "boolean",

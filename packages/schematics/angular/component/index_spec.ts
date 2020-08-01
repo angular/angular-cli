@@ -249,6 +249,15 @@ describe('Component Schematic', () => {
     expect(tree.files).not.toContain('/projects/bar/src/app/foo/foo.component.css');
   });
 
+  it('should respect the includeStyles option', async () => {
+    const options = { ...defaultOptions, includeStyles: false };
+    const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(content).not.toMatch(/styles: \[/);
+    expect(content).not.toMatch(/styleUrls: /);
+    expect(tree.files).not.toContain('/projects/bar/src/app/foo/foo.component.css');
+  });
+
   it('should respect the displayBlock option when inlineStyle is `false`', async () => {
     const options = { ...defaultOptions, displayBlock: true };
     const tree = await schematicRunner.runSchematicAsync('component', options, appTree).toPromise();
