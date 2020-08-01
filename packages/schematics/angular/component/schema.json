@@ -142,6 +142,12 @@
       "default": false,
       "description": "When true, applies lint fixes after generating the component.",
       "x-user-analytics": 15
+    },
+    "includeStyles": {
+      "description": "Specifies if the component should include styles",
+      "type": "boolean",
+      "default": true,
+      "alias": "is"
     }
   },
   "required": [
