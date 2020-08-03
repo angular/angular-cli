@@ -212,7 +212,7 @@
     "symbol-observable": "1.2.0",
     "tar": "^6.0.0",
     "temp": "^0.9.0",
-    "terser": "4.6.11",
+    "terser": "5.0.0",
     "terser-webpack-plugin": "3.0.8",
     "through2": "^4.0.0",
     "tree-kill": "1.2.2",
