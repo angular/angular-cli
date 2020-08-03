@@ -10,9 +10,6 @@ import { Configuration } from 'webpack';
 import { WebpackConfigOptions } from '../build-options';
 import { getTypescriptWorkerPlugin } from './typescript';
 
-const WorkerPlugin = require('worker-plugin');
-
-
 export function getWorkerConfig(wco: WebpackConfigOptions): Configuration {
   const { buildOptions } = wco;
 
@@ -25,6 +22,7 @@ export function getWorkerConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   const workerTsConfigPath = resolve(wco.root, buildOptions.webWorkerTsConfig);
+  const WorkerPlugin = require('worker-plugin');
 
   return {
     plugins: [new WorkerPlugin({

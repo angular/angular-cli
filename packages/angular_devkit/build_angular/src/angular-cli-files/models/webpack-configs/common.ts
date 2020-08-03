@@ -47,8 +47,6 @@ import { findAllNodeModules } from '../../utilities/find-up';
 import { WebpackConfigOptions } from '../build-options';
 import { getEsVersionForFileName, getOutputHashFormat, normalizeExtraEntryPoints } from './utils';
 
-const ProgressPlugin = require('webpack/lib/ProgressPlugin');
-const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
 
@@ -297,10 +295,12 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
   }
 
   if (buildOptions.progress) {
+    const ProgressPlugin = require('webpack/lib/ProgressPlugin');
     extraPlugins.push(new ProgressPlugin({ profile: buildOptions.verbose }));
   }
 
   if (buildOptions.showCircularDependencies) {
+    const CircularDependencyPlugin = require('circular-dependency-plugin');
     extraPlugins.push(
       new CircularDependencyPlugin({
         exclude: /([\\\/]node_modules[\\\/])|(ngfactory\.js$)/,
