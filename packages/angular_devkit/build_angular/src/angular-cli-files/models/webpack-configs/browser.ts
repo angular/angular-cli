@@ -8,7 +8,7 @@
 import * as webpack from 'webpack';
 import { CommonJsUsageWarnPlugin } from '../../plugins/webpack';
 import { WebpackConfigOptions } from '../build-options';
-import { getSourceMapDevTool, isPolyfillsEntry, normalizeExtraEntryPoints } from './utils';
+import { getSourceMapDevTool } from './utils';
 
 export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configuration {
   const { buildOptions } = wco;
@@ -18,7 +18,6 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
     extractLicenses,
     vendorChunk,
     commonChunk,
-    styles,
     allowedCommonJsDependencies,
   } = buildOptions;
 
@@ -57,9 +56,6 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
     ));
   }
 
-  const globalStylesBundleNames = normalizeExtraEntryPoints(styles, 'styles')
-    .map(style => style.bundleName);
-
   let crossOriginLoading: 'anonymous' | 'use-credentials' | false = false;
   if (subresourceIntegrity && crossOrigin === 'none') {
     crossOriginLoading = 'anonymous';
@@ -93,17 +89,11 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
             priority: 5,
           },
           vendors: false,
-          vendor: !!vendorChunk && {
+          defaultVendors: !!vendorChunk && {
             name: 'vendor',
-            chunks: 'initial',
+            chunks: (chunk) => chunk.name === 'main',
             enforce: true,
-            test: (module: { nameForCondition?: Function }, chunks: Array<{ name: string }>) => {
-              const moduleName = module.nameForCondition ? module.nameForCondition() : '';
-
-              return /[\\/]node_modules[\\/]/.test(moduleName)
-                && !chunks.some(({ name }) => isPolyfillsEntry(name)
-                  || globalStylesBundleNames.includes(name));
-            },
+            test: /[\\/]node_modules[\\/]/,
           },
         },
       },

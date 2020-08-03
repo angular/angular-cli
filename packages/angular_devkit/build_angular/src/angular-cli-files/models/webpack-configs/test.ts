@@ -74,18 +74,14 @@ export function getTestConfig(
     plugins: extraPlugins,
     optimization: {
       splitChunks: {
-        chunks: ((chunk: { name: string }) => !isPolyfillsEntry(chunk.name)),
+        chunks: (chunk) => !isPolyfillsEntry(chunk.name),
         cacheGroups: {
           vendors: false,
-          vendor: {
+          defaultVendors: {
             name: 'vendor',
-            chunks: 'initial',
-            test: (module: { nameForCondition?: () => string }, chunks: { name: string }[]) => {
-              const moduleName = module.nameForCondition ? module.nameForCondition() : '';
-
-              return /[\\/]node_modules[\\/]/.test(moduleName)
-                && !chunks.some(({ name }) => isPolyfillsEntry(name));
-            },
+            chunks: (chunk) => chunk.name === 'main',
+            enforce: true,
+            test: /[\\/]node_modules[\\/]/,
           },
         },
       },
