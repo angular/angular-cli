@@ -335,7 +335,7 @@ async function processBundle(
       filename,
       map: rawMap,
       compress: !isOriginal, // We only compress bundles which are downlevelled.
-      ecma: isOriginal ? 6 : 5,
+      ecma: isOriginal ? 2015 : 5,
     });
   } else {
     result = {
@@ -378,18 +378,18 @@ async function processBundle(
 
 async function terserMangle(
   code: string,
-  options: { filename?: string; map?: RawSourceMap; compress?: boolean; ecma?: 5 | 6 } = {},
+  options: { filename?: string; map?: RawSourceMap; compress?: boolean; ecma?: 5 | 2015 } = {},
 ) {
   // Note: Investigate converting the AST instead of re-parsing
   // estree -> terser is already supported; need babel -> estree/terser
 
   // Mangle downlevel code
-  const minifyOutput = minify(options.filename ? { [options.filename]: code } : code, {
+  const minifyOutput = await minify(options.filename ? { [options.filename]: code } : code, {
     compress: allowMinify && !!options.compress,
     ecma: options.ecma || 5,
     mangle: allowMangle,
     safari10: true,
-    output: {
+    format: {
       ascii_only: true,
       webkit: true,
       beautify: shouldBeautify,
@@ -402,10 +402,6 @@ async function terserMangle(
         // tslint:disable-next-line: no-any
       } as any),
   });
-
-  if (minifyOutput.error) {
-    throw minifyOutput.error;
-  }
 
   // tslint:disable-next-line: no-non-null-assertion
   const outputCode = minifyOutput.code!;
