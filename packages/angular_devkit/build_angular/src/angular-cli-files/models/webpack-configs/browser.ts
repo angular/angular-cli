@@ -10,10 +10,6 @@ import { CommonJsUsageWarnPlugin } from '../../plugins/webpack';
 import { WebpackConfigOptions } from '../build-options';
 import { getSourceMapDevTool, isPolyfillsEntry, normalizeExtraEntryPoints } from './utils';
 
-const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
-const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
-
-
 export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configuration {
   const { buildOptions } = wco;
   const {
@@ -35,12 +31,14 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
   } = buildOptions.sourceMap;
 
   if (subresourceIntegrity) {
+    const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
     extraPlugins.push(new SubresourceIntegrityPlugin({
       hashFuncNames: ['sha384'],
     }));
   }
 
   if (extractLicenses) {
+    const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
     extraPlugins.push(new LicenseWebpackPlugin({
       stats: {
         warnings: false,
