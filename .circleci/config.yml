@@ -250,7 +250,9 @@ jobs:
       - browser-tools/install-chrome
       - setup_bazel_rbe
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
-      - run: yarn bazel:test
+      - run:
+          command: yarn bazel:test
+          no_output_timeout: 20m
 
   integration:
     executor: test-executor
@@ -260,6 +262,7 @@ jobs:
       - install_python
       - run: 
           command: yarn bazel:integration
+          no_output_timeout: 20m
 
   snapshot_publish:
     executor: action-executor
