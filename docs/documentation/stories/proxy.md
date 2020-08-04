@@ -2,7 +2,7 @@
 
 # Proxy To Backend
 
-Using the [proxying support](https://webpack.js.org/configuration/dev-server/#devserver-proxy) in webpack's dev server we can highjack certain URLs and send them to a backend server.
+Using the [proxying support](https://webpack.js.org/configuration/dev-server/#devserver-proxy) in webpack's dev server we can hijack certain URLs and send them to a backend server.
 We do this by passing a file to `--proxy-config`
 
 Say we have a server running on `http://localhost:3000/api` and we want all calls to `http://localhost:4200/api` to go to that server.
