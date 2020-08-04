@@ -26,8 +26,8 @@ should be tagged with tag `angular-cli` or `angular-devkit`.
 
 StackOverflow is a much better place to ask questions since:
 
-- there are thousands of people willing to help on StackOverflow
-- questions and answers stay available for public viewing so your question / answer might help someone else
+- There are thousands of people willing to help on StackOverflow.
+- Questions and answers stay available for public viewing so your question / answer might help someone else.
 - StackOverflow's voting system assures that the best answers are prominently visible.
 
 To save your and our time we will be systematically closing all the issues that are requests for
