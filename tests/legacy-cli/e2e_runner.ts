@@ -2,7 +2,7 @@
 // have run already so it should be "safe", teehee.
 import { logging, terminal } from '@angular-devkit/core';
 import { createConsoleLogger } from '@angular-devkit/core/node';
-import { spawn } from 'child_process';
+import { fork } from 'child_process';
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as minimist from 'minimist';
@@ -139,16 +139,10 @@ if (testsToRun.length == allTests.length) {
 setGlobalVariable('argv', argv);
 
 // Setup local package registry
-const registryPath =
-  fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'angular-cli-e2e-registry-'));
-fs.copyFileSync(
-  path.join(__dirname, 'verdaccio.yaml'),
-  path.join(registryPath, 'verdaccio.yaml'),
-);
-const registryProcess = spawn(
-  'node',
-  [require.resolve('verdaccio/bin/verdaccio'), '-c', './verdaccio.yaml'],
-  { cwd: registryPath, stdio: 'inherit' },
+const registryProcess = fork(
+  require.resolve('verdaccio/bin/verdaccio'),
+  ['-c', path.join(__dirname, 'verdaccio.yaml')],
+  { stdio: 'inherit' },
 );
 
 testsToRun

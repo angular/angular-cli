@@ -2076,7 +2076,7 @@
   resolved "https://registry.yarnpkg.com/@verdaccio/streams/-/streams-9.7.1.tgz#dea568efbe7e93618f61b6846b419e527e621859"
   integrity sha512-zs0YNfK8isiJQrcM9EGjFNbgTQ+HU7oUzGYxXsx/MA9JGAkSIAoAmf6ndRrzeSLUVF9/MyTufP8BCH3Z9Vf1aQ==
 
-"@verdaccio/streams@^9.7.1":
+"@verdaccio/streams@^9.7.1", "@verdaccio/streams@^9.7.2":
   version "9.7.2"
   resolved "https://registry.yarnpkg.com/@verdaccio/streams/-/streams-9.7.2.tgz#cd5448470d725e221629adb84c74af7dfd8c9678"
   integrity sha512-SoCG1btVFPxOcrs8w9wLJCfe8nfE6EaEXCXyRwGbh+Sr3NLEG0R8JOugGJbuSE+zIRuUs5JaUKjzSec+JKLvZw==
@@ -8294,18 +8294,18 @@ mem@^4.0.0:
     mimic-fn "^2.0.0"
     p-is-promise "^2.0.0"
 
-memory-fs@^0.4.1:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/memory-fs/-/memory-fs-0.4.1.tgz#3a9a20b8462523e447cfbc7e8bb80ed667bfc552"
-  integrity sha1-OpoguEYlI+RHz7x+i7gO1me/xVI=
+memory-fs@0.5.0, memory-fs@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/memory-fs/-/memory-fs-0.5.0.tgz#324c01288b88652966d161db77838720845a8e3c"
+  integrity sha512-jA0rdU5KoQMC0e6ppoNRtpp6vjFq6+NY7r8hywnC7V+1Xj/MtHwGIbB1QaK/dunyjWteJzmkpd7ooeWg10T7GA==
   dependencies:
     errno "^0.1.3"
     readable-stream "^2.0.1"
 
-memory-fs@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/memory-fs/-/memory-fs-0.5.0.tgz#324c01288b88652966d161db77838720845a8e3c"
-  integrity sha512-jA0rdU5KoQMC0e6ppoNRtpp6vjFq6+NY7r8hywnC7V+1Xj/MtHwGIbB1QaK/dunyjWteJzmkpd7ooeWg10T7GA==
+memory-fs@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/memory-fs/-/memory-fs-0.4.1.tgz#3a9a20b8462523e447cfbc7e8bb80ed667bfc552"
+  integrity sha1-OpoguEYlI+RHz7x+i7gO1me/xVI=
   dependencies:
     errno "^0.1.3"
     readable-stream "^2.0.1"
@@ -13246,6 +13246,13 @@ verdaccio-audit@9.7.1:
     express "4.17.1"
     request "2.88.0"
 
+verdaccio-auth-memory@^9.7.2:
+  version "9.7.2"
+  resolved "https://registry.yarnpkg.com/verdaccio-auth-memory/-/verdaccio-auth-memory-9.7.2.tgz#e95ef1f64df9a0a30bcf727eb8f704c4033c945c"
+  integrity sha512-pxFGUk91kAJPrmjRIzHRn/cnLmyuN925nA1iH2Bf6kdP9E0uEGK/pRjMh8BuXWFLsGe9E6N7HR86cub1/qcrzA==
+  dependencies:
+    "@verdaccio/commons-api" "^9.7.1"
+
 verdaccio-htpasswd@9.7.1:
   version "9.7.1"
   resolved "https://registry.yarnpkg.com/verdaccio-htpasswd/-/verdaccio-htpasswd-9.7.1.tgz#999c99227cbf94f2f08ec280798e396e87ef9e11"
@@ -13256,6 +13263,15 @@ verdaccio-htpasswd@9.7.1:
     bcryptjs "2.4.3"
     http-errors "1.8.0"
     unix-crypt-td-js "1.1.4"
+
+verdaccio-memory@^9.7.2:
+  version "9.7.2"
+  resolved "https://registry.yarnpkg.com/verdaccio-memory/-/verdaccio-memory-9.7.2.tgz#1a46f6b6086762dee6b05371f3a73d4cad045454"
+  integrity sha512-HKUbbgY147dOV4GhOoC/iVTl87RPVKN7dLX/EBSH23TwR/tClQdGduRLy9yeqc/0iouGc0GXm2IWK/1qoBuy4w==
+  dependencies:
+    "@verdaccio/commons-api" "^9.7.1"
+    "@verdaccio/streams" "^9.7.2"
+    memory-fs "0.5.0"
 
 verdaccio@4.8.0:
   version "4.8.0"
