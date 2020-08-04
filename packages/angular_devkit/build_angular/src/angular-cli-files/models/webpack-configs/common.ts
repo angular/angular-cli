@@ -237,23 +237,19 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     return prev;
   }, []);
 
-  if (globalScriptsByBundleName.length > 0) {
     // Add a new asset for each entry.
-    globalScriptsByBundleName.forEach(script => {
-      // Lazy scripts don't get a hash, otherwise they can't be loaded by name.
-      const hash = script.inject ? hashFormat.script : '';
-      const bundleName = script.bundleName;
+  for (const script of globalScriptsByBundleName) {
+    // Lazy scripts don't get a hash, otherwise they can't be loaded by name.
+    const hash = script.inject ? hashFormat.script : '';
+    const bundleName = script.bundleName;
 
-      extraPlugins.push(
-        new ScriptsWebpackPlugin({
-          name: bundleName,
-          sourceMap: scriptsSourceMap,
-          filename: `${path.basename(bundleName)}${hash}.js`,
-          scripts: script.paths,
-          basePath: projectRoot,
-        }),
-      );
-    });
+    extraPlugins.push(new ScriptsWebpackPlugin({
+      name: bundleName,
+      sourceMap: scriptsSourceMap,
+      filename: `${path.basename(bundleName)}${hash}.js`,
+      scripts: script.paths,
+      basePath: projectRoot,
+    }));
   }
 
   // process asset entries
@@ -352,12 +348,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       },
     ];
   }
-
-  // Allow loaders to be in a node_modules nested inside the devkit/build-angular package.
-  // This is important in case loaders do not get hoisted.
-  // If this file moves to another location, alter potentialNodeModules as well.
-  const loaderNodeModules = findAllNodeModules(__dirname, projectRoot);
-  loaderNodeModules.unshift('node_modules');
 
   const extraMinimizers = [];
   if (stylesOptimization) {
@@ -493,14 +483,20 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     },
     resolveLoader: {
       symlinks: !buildOptions.preserveSymlinks,
-      modules: loaderNodeModules,
+      modules: [
+        // Allow loaders to be in a node_modules nested inside the devkit/build-angular package.
+        // This is important in case loaders do not get hoisted.
+        // If this file moves to another location, alter potentialNodeModules as well.
+        'node_modules',
+        ...findAllNodeModules(__dirname, projectRoot),
+      ],
       plugins: [PnpWebpackPlugin.moduleLoader(module)],
     },
     context: projectRoot,
     entry: entryPoints,
     output: {
       futureEmitAssets: true,
-      path: path.resolve(root, buildOptions.outputPath as string),
+      path: path.resolve(root, buildOptions.outputPath),
       publicPath: buildOptions.deployUrl,
       filename: `[name]${targetInFileName}${hashFormat.chunk}.js`,
     },
