@@ -25,7 +25,7 @@ const spdxSatisfies = require('spdx-satisfies');
  * - Public Domain
  *    Same as CC0, it is not a valid license.
  */
-const licensesWhitelist = [
+const allowedLicenses = [
   // Regular valid open source licenses supported by Google.
   'MIT',
   'ISC',
@@ -114,7 +114,7 @@ export default function (_options: {}, logger: logging.Logger): Promise<number> 
               .map(x => x.replace(/\*$/, ''))
               .map(x => x in licenseReplacements ? licenseReplacements[x] : x),
           }))
-          .filter(pkg => !_passesSpdx(pkg.licenses, licensesWhitelist))
+          .filter(pkg => !_passesSpdx(pkg.licenses, allowedLicenses))
           .filter(pkg => !ignoredPackages.find(ignored => ignored === pkg.id));
 
         // Report packages with bad licenses
