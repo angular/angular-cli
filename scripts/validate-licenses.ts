@@ -43,6 +43,7 @@ const allowedLicenses = [
   'Unlicense',
   'CC0-1.0',
   '0BSD',
+  'Public Domain',
 
   // Combinations.
   '(AFL-2.1 OR BSD-2-Clause)',
