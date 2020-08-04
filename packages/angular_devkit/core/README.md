@@ -144,7 +144,7 @@ import { workspaces } from '@angular-devkit/core';
 
 async function demonstrate() {
     const host = workspaces.createWorkspaceHost(new NodeJsSyncHost());
-    const workspace = await workspaces.readWorkspace('path/to/workspace/directory/', host);
+    const { workspace } = await workspaces.readWorkspace('path/to/workspace/directory/', host);
 
     const project = workspace.projects.get('my-app');
     if (!project) {
