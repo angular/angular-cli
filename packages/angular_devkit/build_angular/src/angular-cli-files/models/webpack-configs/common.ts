@@ -327,15 +327,13 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
     extraPlugins.push(new BundleBudgetPlugin({ budgets: buildOptions.budgets }));
   }
 
-  let sourceMapUseRule;
   if ((scriptsSourceMap || stylesSourceMap) && vendorSourceMap) {
-    sourceMapUseRule = {
-      use: [
-        {
-          loader: require.resolve('source-map-loader'),
-        },
-      ],
-    };
+    extraRules.push({
+      test: /\.m?js$/,
+      exclude: /(ngfactory|ngstyle)\.js$/,
+      enforce: 'pre',
+      loader: require.resolve('source-map-loader'),
+    });
   }
 
   let buildOptimizerUseRule: RuleSetLoader[] = [];
@@ -582,12 +580,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
                 ]),
             ...buildOptimizerUseRule,
           ],
-        },
-        {
-          test: /\.m?js$/,
-          exclude: /(ngfactory|ngstyle)\.js$/,
-          enforce: 'pre',
-          ...sourceMapUseRule,
         },
         ...extraRules,
       ],

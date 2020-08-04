@@ -121,7 +121,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
   }
 
   // set base rules to derive final rules from
-  const baseRules: webpack.RuleSetRule[] = [
+  const baseRules: { test: RegExp, use: webpack.RuleSetLoader[] }[] = [
     { test: /\.css$/, use: [] },
     {
       test: /\.scss$|\.sass$/,
@@ -206,7 +206,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
             && !buildOptions.sourceMap.hidden ? 'inline' : false,
         },
       },
-      ...(use as webpack.Loader[]),
+      ...use,
     ],
   }));
 
@@ -237,7 +237,7 @@ export function getStylesConfig(wco: WebpackConfigOptions) {
                     : cssSourceMap,
               },
             },
-            ...(use as webpack.Loader[]),
+            ...use,
           ],
         };
       }),

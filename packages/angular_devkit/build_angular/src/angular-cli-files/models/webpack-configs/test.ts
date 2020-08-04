@@ -15,25 +15,27 @@ import { getSourceMapDevTool, isPolyfillsEntry } from './utils';
 export function getTestConfig(
   wco: WebpackConfigOptions<WebpackTestOptions>,
 ): webpack.Configuration {
-  const { root, buildOptions, sourceRoot: include } = wco;
+  const {
+    buildOptions: { codeCoverage, codeCoverageExclude, main, sourceMap },
+    root,
+    sourceRoot,
+  } = wco;
 
   const extraRules: webpack.RuleSetRule[] = [];
   const extraPlugins: { apply(compiler: webpack.Compiler): void }[] = [];
 
-  if (buildOptions.codeCoverage) {
-    const codeCoverageExclude = buildOptions.codeCoverageExclude;
+  if (codeCoverage) {
     const exclude: (string | RegExp)[] = [
       /\.(e2e|spec)\.tsx?$/,
       /node_modules/,
     ];
 
     if (codeCoverageExclude) {
-      codeCoverageExclude.forEach((excludeGlob: string) => {
-        const excludeFiles = glob
+      for (const excludeGlob of codeCoverageExclude) {
+        glob
           .sync(path.join(root, excludeGlob), { nodir: true })
-          .map(file => path.normalize(file));
-        exclude.push(...excludeFiles);
-      });
+          .forEach((file) => exclude.push(path.normalize(file)));
+      }
     }
 
     extraRules.push({
@@ -42,21 +44,17 @@ export function getTestConfig(
       options: { esModules: true },
       enforce: 'post',
       exclude,
-      include,
+      include: sourceRoot,
     });
   }
 
-  if (wco.buildOptions.sourceMap) {
-    const { styles, scripts } = wco.buildOptions.sourceMap;
-
-    if (styles || scripts) {
-      extraPlugins.push(getSourceMapDevTool(
-        scripts,
-        styles,
-        false,
-        true,
-      ));
-    }
+  if (sourceMap.scripts || sourceMap.styles) {
+    extraPlugins.push(getSourceMapDevTool(
+      sourceMap.scripts,
+      sourceMap.styles,
+      false,
+      true,
+    ));
   }
 
   return {
@@ -64,9 +62,9 @@ export function getTestConfig(
     resolve: {
       mainFields: ['es2015', 'browser', 'module', 'main'],
     },
-    devtool: buildOptions.sourceMap ? false : 'eval',
+    devtool: false,
     entry: {
-      main: path.resolve(root, buildOptions.main),
+      main: path.resolve(root, main),
     },
     module: {
       rules: extraRules,
