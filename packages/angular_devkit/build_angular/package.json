@@ -74,7 +74,7 @@
     "worker-plugin": "4.0.3"
   },
   "peerDependencies": {
-    "@angular/compiler-cli": ">=10.0.0-next.0 < 11",
+    "@angular/compiler-cli": ">=10.1.0-next.0 < 11",
     "typescript": ">=3.9 < 3.10"
   },
   "peerDependenciesMeta": {
