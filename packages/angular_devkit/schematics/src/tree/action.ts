@@ -32,10 +32,11 @@ export class ActionList implements Iterable<Action> {
   private _actions: Action[] = [];
 
   protected _action(action: Partial<Action>) {
-    this._actions.push(Object.assign({
+    this._actions.push({
+      ...action as Action,
       id: _id++,
-      parent: this._actions[this._actions.length - 1] || 0,
-    }, action) as Action);
+      parent: this._actions[this._actions.length - 1]?.id ?? 0,
+    });
   }
 
   create(path: Path, content: Buffer) {
