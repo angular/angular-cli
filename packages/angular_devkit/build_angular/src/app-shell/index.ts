@@ -20,6 +20,8 @@ import { BrowserBuilderOutput } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ServerBuilderOutput } from '../server';
 import { Schema as BuildWebpackAppShellSchema } from './schema';
+import { runWebpack } from '@angular-devkit/build-webpack';
+import { getHtmlConfig } from '../angular-cli-files/models/webpack-configs/html';
 
 async function _renderUniversal(
   options: BuildWebpackAppShellSchema,
@@ -92,6 +94,8 @@ async function _renderUniversal(
       : browserIndexOutputPath;
 
     fs.writeFileSync(outputIndexPath, html);
+
+    await runWebpack(getHtmlConfig(outputIndexPath), context).toPromise();
 
     if (browserOptions.serviceWorker) {
       await augmentAppWithServiceWorker(

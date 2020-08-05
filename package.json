@@ -138,6 +138,7 @@
     "conventional-commits-parser": "^3.0.0",
     "copy-webpack-plugin": "6.0.3",
     "core-js": "3.6.4",
+    "critters-webpack-plugin": "2.5.0",
     "css-loader": "4.2.0",
     "cssnano": "4.1.10",
     "debug": "^4.1.1",
