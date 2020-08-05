@@ -5,29 +5,47 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
 import { Compiler } from 'webpack';
 import { addWarning } from '../../utils/webpack-diagnostics';
 
-interface AfterResolveResult {
-  request: string;
+interface ResourceData {
+  relativePath: string;
   resource: string;
-  context: {
-    issuer: string;
-  };
-  resourceResolveData: {
-    relativePath: string;
-    descriptionFileRoot: string;
-    descriptionFilePath: string;
-    descriptionFileData: {
-      name?: string;
-      version?: string;
-    };
-  };
+  packageName?: string;
+  packageVersion?: string;
 }
 
 export interface DedupeModuleResolvePluginOptions {
   verbose?: boolean;
+}
+
+// tslint:disable-next-line: no-any
+function getResourceData(resolveData: any): ResourceData {
+  if (resolveData.createData) {
+    // Webpack 5+
+    const {
+      descriptionFileData,
+      relativePath,
+      resource,
+    } = resolveData.createData.resourceResolveData;
+
+    return {
+      packageName: descriptionFileData.name,
+      packageVersion: descriptionFileData.version,
+      relativePath,
+      resource,
+    };
+  } else {
+    // Webpack 4
+    const { resource, resourceResolveData } = resolveData;
+
+    return {
+      packageName: resourceResolveData.descriptionFileData.name,
+      packageVersion: resourceResolveData.descriptionFileData.version,
+      relativePath: resourceResolveData.relativePath,
+      resource: resource,
+    };
+  }
 }
 
 /**
@@ -46,41 +64,40 @@ export class DedupeModuleResolvePlugin {
 
   apply(compiler: Compiler) {
     compiler.hooks.compilation.tap('DedupeModuleResolvePlugin', (compilation, { normalModuleFactory }) => {
-      normalModuleFactory.hooks.afterResolve.tap('DedupeModuleResolvePlugin', (result: AfterResolveResult | undefined) => {
+      normalModuleFactory.hooks.afterResolve.tap('DedupeModuleResolvePlugin', (result) => {
         if (!result) {
           return;
         }
 
-        const { resource, request, resourceResolveData } = result;
-        const { descriptionFileData, relativePath } = resourceResolveData;
+        const { packageName, packageVersion, relativePath, resource } = getResourceData(result);
 
         // Empty name or versions are no valid primary  entrypoints of a library
-        if (!descriptionFileData.name || !descriptionFileData.version) {
+        if (!packageName || !packageVersion) {
           return;
         }
 
-        const moduleId = descriptionFileData.name + '@' + descriptionFileData.version + ':' + relativePath;
+        const moduleId = packageName + '@' + packageVersion + ':' + relativePath;
         const prevResolvedModule = this.modules.get(moduleId);
 
         if (!prevResolvedModule) {
           // This is the first time we visit this module.
           this.modules.set(moduleId, {
             resource,
-            request,
+            request: result.request,
           });
 
           return;
         }
 
         const { resource: prevResource, request: prevRequest } = prevResolvedModule;
-        if (result.resource === prevResource) {
+        if (resource === prevResource) {
           // No deduping needed.
           // Current path and previously resolved path are the same.
           return;
         }
 
         if (this.options?.verbose) {
-          addWarning(compilation, `[DedupeModuleResolvePlugin]: ${result.resource} -> ${prevResource}`);
+          addWarning(compilation, `[DedupeModuleResolvePlugin]: ${resource} -> ${prevResource}`);
         }
 
         // Alter current request with previously resolved module.
