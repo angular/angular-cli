@@ -120,7 +120,7 @@ yarn admin packages --version
 ```
 
 Now push the commit and the tag to the upstream repository. **Make sure to use
-`--follow-tags, as tags need to be pushed immediately or CI may fail!**
+`--follow-tags`, as tags need to be pushed immediately or CI may fail!**
 
 ```bash
 git push upstream --follow-tags
