@@ -476,7 +476,6 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       modules: [wco.tsConfig.options.baseUrl || projectRoot, 'node_modules'],
       plugins: [
         PnpWebpackPlugin,
-        new DedupeModuleResolvePlugin({ verbose: buildOptions.verbose }),
       ],
     },
     resolveLoader: {
@@ -594,6 +593,7 @@ export function getCommonConfig(wco: WebpackConfigOptions): Configuration {
       // https://github.com/angular/angular/issues/11580
       // With VE the correct context is added in @ngtools/webpack, but Ivy doesn't need it at all.
       new ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)/),
+      new DedupeModuleResolvePlugin({ verbose: buildOptions.verbose }),
       ...extraPlugins,
     ],
   };

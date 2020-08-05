@@ -32,10 +32,10 @@ export default async function () {
   const { stderr } = await ng('build', '--verbose', '--no-vendor-chunk', '--no-progress');
   const outFile = 'dist/test-project/main.js';
 
-  if (/\[DedupeModuleResolvePlugin\]:.+tslib-1-copy -> .+tslib-1/.test(stderr)) {
+  if (/\[DedupeModuleResolvePlugin\]:.+tslib-1-copy\/.+ -> .+tslib-1\/.+/.test(stderr)) {
     await expectFileToMatch(outFile, './node_modules/tslib-1/tslib.es6.js');
     await expectToFail(() => expectFileToMatch(outFile, './node_modules/tslib-1-copy/tslib.es6.js'));
-  } else if (/\[DedupeModuleResolvePlugin\]:.+tslib-1 -> .+tslib-1-copy/.test(stderr)) {
+  } else if (/\[DedupeModuleResolvePlugin\]:.+tslib-1\/.+ -> .+tslib-1-copy\/.+/.test(stderr)) {
     await expectFileToMatch(outFile, './node_modules/tslib-1-copy/tslib.es6.js');
     await expectToFail(() => expectFileToMatch(outFile, './node_modules/tslib-1/tslib.es6.js'));
   } else {
