@@ -35,7 +35,7 @@ interface BenchmarkResult {
 }
 
 class BenchmarkReporter extends JasmineSpecReporter implements jasmine.CustomReporter {
-  private _stats: BenchmarkResult | null;
+  private _stats: BenchmarkResult | null = null;
 
   constructor() {
     super({
