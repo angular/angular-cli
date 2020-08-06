@@ -7,8 +7,10 @@
  */
 import { Architect } from '@angular-devkit/architect';
 import { normalize, virtualFs } from '@angular-devkit/core';
+import { debounceTime, take, tap } from 'rxjs/operators';
 import { createArchitect, host } from '../../test-utils';
 
+// tslint:disable-next-line: no-big-function
 describe('Browser Builder service worker', () => {
   const manifest = {
     index: '/index.html',
@@ -120,6 +122,60 @@ describe('Browser Builder service worker', () => {
         '/spectrum.png': '8d048ece46c0f3af4b598a95fd8e4709b631c3c0',
       },
     }));
+
+    await run.stop();
+  });
+
+  it('works in watch mode', async () => {
+    host.writeMultipleFiles({
+      'src/ngsw-config.json': JSON.stringify(manifest),
+      'src/assets/folder-asset.txt': 'folder-asset.txt',
+      'src/styles.css': `body { background: url(./spectrum.png); }`,
+    });
+
+    const overrides = { serviceWorker: true, watch: true };
+    const run = await architect.scheduleTarget(target, overrides);
+    let buildNumber = 0;
+
+    await run.output
+      .pipe(
+        debounceTime(3000),
+        tap(buildEvent => {
+          expect(buildEvent.success).toBeTrue();
+
+          const ngswJsonPath = normalize('dist/ngsw.json');
+          expect(host.scopedSync().exists(ngswJsonPath)).toBeTrue();
+          const ngswJson = JSON.parse(virtualFs.fileBufferToString(host.scopedSync().read(ngswJsonPath)));
+
+          const hashTableEntries = Object.keys(ngswJson.hashTable);
+
+          buildNumber += 1;
+          switch (buildNumber) {
+            case 1:
+              expect(hashTableEntries).toEqual([
+                '/assets/folder-asset.txt',
+                '/favicon.ico',
+                '/index.html',
+                '/spectrum.png',
+              ]);
+
+              host.copyFile('src/assets/folder-asset.txt', 'src/assets/folder-new-asset.txt');
+              break;
+
+            case 2:
+              expect(hashTableEntries).toEqual([
+                '/assets/folder-asset.txt',
+                '/assets/folder-new-asset.txt',
+                '/favicon.ico',
+                '/index.html',
+                '/spectrum.png',
+              ]);
+              break;
+          }
+        }),
+        take(2),
+      )
+      .toPromise();
 
     await run.stop();
   });
