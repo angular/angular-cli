@@ -86,23 +86,24 @@ export class AngularCompilerPlugin {
   private _options: AngularCompilerPluginOptions;
 
   // TS compilation.
-  private _compilerOptions: CompilerOptions;
-  private _rootNames: string[];
+  // The majority of these are initialized in _setupOptions which is called from the constructor.
+  private _compilerOptions!: CompilerOptions;
+  private _rootNames!: string[];
   private _program: (ts.Program | Program) | undefined;
-  private _compilerHost: WebpackCompilerHost & CompilerHost;
-  private _moduleResolutionCache: ts.ModuleResolutionCache;
+  private _compilerHost!: WebpackCompilerHost & CompilerHost;
+  private _moduleResolutionCache!: ts.ModuleResolutionCache;
   private _resourceLoader?: WebpackResourceLoader;
   private _discoverLazyRoutes = true;
   private _useFactories = false;
   // Contains `moduleImportPath#exportName` => `fullModulePath`.
   private _lazyRoutes: LazyRouteMap = {};
-  private _tsConfigPath: string;
-  private _entryModule: string | null;
+  private _tsConfigPath!: string;
+  private _entryModule: string | null = null;
   private _mainPath: string | undefined;
-  private _basePath: string;
+  private _basePath!: string;
   private _transformers: ts.TransformerFactory<ts.SourceFile>[] = [];
   private _platformTransformers: ts.TransformerFactory<ts.SourceFile>[] | null = null;
-  private _platform: PLATFORM;
+  private _platform!: PLATFORM;
   private _JitMode = false;
   private _emitSkipped = true;
   // This is needed because if the first build fails we need to do a full emit
@@ -115,15 +116,15 @@ export class AngularCompilerPlugin {
 
   // Webpack plugin.
   private _firstRun = true;
-  private _donePromise: Promise<void> | null;
-  private _normalizedLocale: string | null;
+  private _donePromise: Promise<void> | null = null;
+  private _normalizedLocale: string | null = null;
   private _warnings: (string | Error)[] = [];
   private _errors: (string | Error)[] = [];
-  private _contextElementDependencyConstructor: ContextElementDependencyConstructor;
+  private _contextElementDependencyConstructor!: ContextElementDependencyConstructor;
 
   // TypeChecker process.
   private _forkTypeChecker = true;
-  private _typeCheckerProcess: ChildProcess | null;
+  private _typeCheckerProcess: ChildProcess | null = null;
   private _forkedTypeCheckerInitialized = false;
 
   // Logging.
@@ -133,6 +134,7 @@ export class AngularCompilerPlugin {
 
   constructor(options: AngularCompilerPluginOptions) {
     this._options = Object.assign({}, options);
+    this._logger = options.logger || createConsoleLogger();
     this._setupOptions(this._options);
   }
 
@@ -157,7 +159,6 @@ export class AngularCompilerPlugin {
 
   private _setupOptions(options: AngularCompilerPluginOptions) {
     time('AngularCompilerPlugin._setupOptions');
-    this._logger = options.logger || createConsoleLogger();
 
     // Fill in the missing options.
     if (!options.hasOwnProperty('tsConfigPath')) {

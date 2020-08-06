@@ -126,7 +126,6 @@ export class TypeScriptFileRefactor {
 
     if (_program) {
       fileName = forwardSlashPath(resolve(fileName, _host, _program.getCompilerOptions()));
-      this._fileName = fileName;
 
       if (source) {
         sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true);
@@ -149,6 +148,7 @@ export class TypeScriptFileRefactor {
       throw new Error('Must have a source file to refactor.');
     }
 
+    this._fileName = fileName;
     this._sourceFile = sourceFile;
   }
 
