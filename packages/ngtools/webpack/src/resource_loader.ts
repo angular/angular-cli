@@ -26,7 +26,7 @@ interface CompilationOutput {
 
 export class WebpackResourceLoader {
   private _parentCompilation: any;
-  private _context: string;
+  private _context = '';
   private _fileDependencies = new Map<string, Set<string>>();
   private _reverseDependencies = new Map<string, Set<string>>();
   private _cachedSources = new Map<string, string>();
