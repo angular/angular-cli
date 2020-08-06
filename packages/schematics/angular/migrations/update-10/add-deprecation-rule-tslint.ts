@@ -31,8 +31,10 @@ export default function (): Rule {
     }
 
     // Update tslint config.
-    const json = new JSONFile(tree, TSLINT_CONFIG_PATH);
-    if (json.error) {
+    let json;
+    try {
+      json = new JSONFile(tree, TSLINT_CONFIG_PATH);
+    } catch {
       const config = ['tslint.js', 'tslint.yaml'].find(c => tree.exists(c));
       if (config) {
         logger.warn(`Expected a JSON configuration file but found "${config}".`);

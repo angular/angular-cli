@@ -16,7 +16,6 @@ export type JSONPath = (string | number)[];
 /** @internal */
 export class JSONFile {
   content: string;
-  error: undefined | Error;
 
   constructor(
     private readonly host: Tree,
@@ -26,7 +25,7 @@ export class JSONFile {
     if (buffer) {
       this.content = buffer.toString();
     } else {
-      this.error = new Error(`Could not read ${path}.`);
+      throw new Error(`Could not read '${path}'.`);
     }
   }
 
