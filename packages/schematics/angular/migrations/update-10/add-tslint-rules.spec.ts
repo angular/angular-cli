@@ -8,7 +8,7 @@
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 
-describe('Migration of tslint to version 6', () => {
+describe('Migration add new tslint rules', () => {
   const schematicRunner = new SchematicTestRunner(
     'migrations',
     require.resolve('../migration-collection.json'),
@@ -16,17 +16,9 @@ describe('Migration of tslint to version 6', () => {
 
   let tree: UnitTestTree;
   const TSLINT_PATH = '/tslint.json';
-  const PACKAGE_JSON_PATH = '/package.json';
-
-  const PACKAGE_JSON = {
-    devDependencies: {
-      tslint: '~6.1.0',
-    },
-  };
 
   beforeEach(() => {
     tree = new UnitTestTree(new EmptyTree());
-    tree.create(PACKAGE_JSON_PATH, JSON.stringify(PACKAGE_JSON, null, 2));
   });
 
   it('should add new rules', async () => {
@@ -40,9 +32,10 @@ describe('Migration of tslint to version 6', () => {
     };
     tree.create(TSLINT_PATH, JSON.stringify(config, null, 2));
 
-    const newTree = await schematicRunner.runSchematicAsync('tslint-add-deprecation-rule', {}, tree).toPromise();
+    const newTree = await schematicRunner.runSchematicAsync('add-tslint-rules', {}, tree).toPromise();
     const { rules } = JSON.parse(newTree.readContent(TSLINT_PATH));
     expect(rules['deprecation'].severity).toBe('warning');
+    expect(rules['typedef']).toEqual([true, 'call-signature']);
   });
 
   it('should not update already present rules', async () => {
@@ -57,7 +50,7 @@ describe('Migration of tslint to version 6', () => {
     };
     tree.create(TSLINT_PATH, JSON.stringify(config, null, 2));
 
-    const newTree = await schematicRunner.runSchematicAsync('tslint-add-deprecation-rule', {}, tree).toPromise();
+    const newTree = await schematicRunner.runSchematicAsync('add-tslint-rules', {}, tree).toPromise();
     const { rules } = JSON.parse(newTree.readContent(TSLINT_PATH));
     expect(rules['deprecation']).toBe(false);
   });
@@ -76,7 +69,7 @@ describe('Migration of tslint to version 6', () => {
     };
     tree.create(TSLINT_PATH, JSON.stringify(config, null, 2));
 
-    const newTree = await schematicRunner.runSchematicAsync('tslint-add-deprecation-rule', {}, tree).toPromise();
+    const newTree = await schematicRunner.runSchematicAsync('add-tslint-rules', {}, tree).toPromise();
     const { rules } = JSON.parse(newTree.readContent(TSLINT_PATH));
     expect(rules['deprecation'].severity).toBe('error');
   });

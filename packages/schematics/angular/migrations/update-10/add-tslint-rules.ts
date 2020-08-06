@@ -15,6 +15,7 @@ const RULES_TO_ADD: Record<string, JsonValue> = {
   deprecation: {
     severity: 'warning',
   },
+  typedef: [true, 'call-signature'],
 };
 
 export default function (): Rule {
