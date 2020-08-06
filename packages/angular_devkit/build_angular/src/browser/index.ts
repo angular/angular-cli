@@ -747,7 +747,7 @@ export function buildWebpackBrowser(
               }
             }
 
-            if (!options.watch && options.serviceWorker) {
+            if (options.serviceWorker) {
               for (const [locale, outputPath] of outputPaths.entries()) {
                 let localeBaseHref;
                 if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
