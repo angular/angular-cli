@@ -20,12 +20,20 @@ interface ModuleAndTargetReplamenent {
 }
 
 export default function (): Rule {
-  return async host => {
+  return async (host, { logger }) => {
     // Workspace level tsconfig
-    updateModuleAndTarget(host, 'tsconfig.base.json', {
-      oldModule: 'esnext',
-      newModule: 'es2020',
-    });
+    try {
+      updateModuleAndTarget(host, 'tsconfig.base.json', {
+        oldModule: 'esnext',
+        newModule: 'es2020',
+      });
+    } catch (error) {
+      logger.warn(
+        `Unable to update 'tsconfig.base.json' module option from 'esnext' to 'es2020': ${
+          error.message || error
+        }`,
+      );
+    }
 
     const workspace = await getWorkspace(host);
     // Find all tsconfig which are refereces used by builders
@@ -35,10 +43,18 @@ export default function (): Rule {
         if (target.builder === Builders.Protractor && typeof target.options?.protractorConfig === 'string') {
           const tsConfigPath = join(dirname(normalize(target.options.protractorConfig)), 'tsconfig.json');
 
-          updateModuleAndTarget(host, tsConfigPath, {
-            oldTarget: 'es5',
-            newTarget: 'es2018',
-          });
+          try {
+            updateModuleAndTarget(host, tsConfigPath, {
+              oldTarget: 'es5',
+              newTarget: 'es2018',
+            });
+          } catch (error) {
+            logger.warn(
+              `Unable to update '${tsConfigPath}' target option from 'es5' to 'es2018': ${
+                error.message || error
+              }`,
+            );
+          }
 
           continue;
         }
@@ -60,27 +76,51 @@ export default function (): Rule {
         switch (target.builder as Builders) {
           case Builders.Server:
             uniqueTsConfigs.forEach(p => {
-              updateModuleAndTarget(host, p, {
-                oldModule: 'commonjs',
-                // False will remove the module
-                // NB: For server we no longer use commonjs because it is bundled using webpack which has it's own module system.
-                // This ensures that lazy-loaded works on the server.
-                newModule: false,
-              });
+              try {
+                updateModuleAndTarget(host, p, {
+                  oldModule: 'commonjs',
+                  // False will remove the module
+                  // NB: For server we no longer use commonjs because it is bundled using webpack which has it's own module system.
+                  // This ensures that lazy-loaded works on the server.
+                  newModule: false,
+                });
+              } catch (error) {
+                logger.warn(
+                  `Unable to remove '${p}' module option (was 'commonjs'): ${
+                    error.message || error
+                  }`,
+                );
+              }
 
-              updateModuleAndTarget(host, p, {
-                newTarget: 'es2016',
-              });
+              try {
+                updateModuleAndTarget(host, p, {
+                  newTarget: 'es2016',
+                });
+              } catch (error) {
+                logger.warn(
+                  `Unable to update '${p}' target option to 'es2016': ${
+                    error.message || error
+                  }`,
+                );
+              }
             });
             break;
           case Builders.Karma:
           case Builders.Browser:
           case Builders.NgPackagr:
             uniqueTsConfigs.forEach(p => {
-              updateModuleAndTarget(host, p, {
-                oldModule: 'esnext',
-                newModule: 'es2020',
-              });
+              try {
+                updateModuleAndTarget(host, p, {
+                  oldModule: 'esnext',
+                  newModule: 'es2020',
+                });
+              } catch (error) {
+                logger.warn(
+                  `Unable to update '${p}' module option from 'esnext' to 'es2020': ${
+                    error.message || error
+                  }`,
+                );
+              }
             });
             break;
         }
@@ -91,9 +131,6 @@ export default function (): Rule {
 
 function updateModuleAndTarget(host: Tree, tsConfigPath: string, replacements: ModuleAndTargetReplamenent) {
   const json = new JSONFile(host, tsConfigPath);
-  if (json.error) {
-    return;
-  }
 
   const { oldTarget, newTarget, newModule, oldModule } = replacements;
   if (newTarget) {

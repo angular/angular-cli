@@ -34,13 +34,13 @@ function addConfig(options: WebWorkerOptions, root: string, tsConfigPath: string
     const isInSrc = dirname(normalize(tsConfigPath)).endsWith('src');
     const workerGlob = `${isInSrc ? '' : 'src/'}**/*.worker.ts`;
 
-    const  json = new JSONFile(host, tsConfigPath);
-    if (!json.error) {
+    try {
+      const json = new JSONFile(host, tsConfigPath);
       const exclude = json.get(['exclude']);
       if (exclude && Array.isArray(exclude) && !exclude.includes(workerGlob)) {
         json.modify(['exclude'], [...exclude, workerGlob]);
       }
-    }
+    } catch {}
 
     return mergeWith(
       apply(url('./files/worker-tsconfig'), [
