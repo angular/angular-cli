@@ -108,10 +108,17 @@ export async function generateWebpackConfig(
     if (!webpackConfig.resolve) {
       webpackConfig.resolve = {};
     }
-    if (!webpackConfig.resolve.alias) {
-      webpackConfig.resolve.alias = {};
+    if (Array.isArray(webpackConfig.resolve.alias)) {
+      webpackConfig.resolve.alias.push({
+        alias: 'zone.js/dist/zone',
+        name: 'zone.js/dist/zone-evergreen',
+      });
+    } else {
+      if (!webpackConfig.resolve.alias) {
+        webpackConfig.resolve.alias = {};
+      }
+      webpackConfig.resolve.alias['zone.js/dist/zone'] = 'zone.js/dist/zone-evergreen';
     }
-    webpackConfig.resolve.alias['zone.js/dist/zone'] = 'zone.js/dist/zone-evergreen';
   }
 
   if (profilingEnabled) {
@@ -150,10 +157,17 @@ export async function generateI18nBrowserWebpackConfigFromContext(
       if (!config.resolve) {
         config.resolve = {};
       }
-      if (!config.resolve.alias) {
-        config.resolve.alias = {};
+      if (Array.isArray(config.resolve.alias)) {
+        config.resolve.alias.push({
+          alias: '@angular/localize/init',
+          name: require.resolve('./empty.js'),
+        });
+      } else {
+        if (!config.resolve.alias) {
+          config.resolve.alias = {};
+        }
+        config.resolve.alias['@angular/localize/init'] = require.resolve('./empty.js');
       }
-      config.resolve.alias['@angular/localize/init'] = require.resolve('./empty.js');
     }
 
     // Update file hashes to include translation file content
@@ -165,7 +179,7 @@ export async function generateI18nBrowserWebpackConfigFromContext(
       config.plugins = [];
     }
     config.plugins.push({
-      apply(compiler) {
+      apply(compiler: webpack.Compiler) {
         compiler.hooks.compilation.tap('build-angular', compilation => {
           // Webpack typings do not contain template hashForChunk hook
           // tslint:disable-next-line: no-any

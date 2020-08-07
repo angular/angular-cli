@@ -115,13 +115,15 @@ export function execute(
               return;
             }
 
+            // Get the rules and ensure the Webpack configuration is setup properly
+            const rules = webpackConfig.module?.rules || [];
             if (!webpackConfig.module) {
-              webpackConfig.module = { rules: [] };
+              webpackConfig.module = { rules };
             } else if (!webpackConfig.module.rules) {
-              webpackConfig.module.rules = [];
+              webpackConfig.module.rules = rules;
             }
 
-            webpackConfig.module.rules.unshift({
+            rules.unshift({
               test: mainFilePath,
               use: {
                 // cannot be a simple path as it differs between environments

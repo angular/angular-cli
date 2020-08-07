@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Compiler, compilation } from 'webpack';
+import { Compiler } from 'webpack';
 import { HashFormat } from '../models/webpack-configs/utils';
 
 
@@ -20,8 +20,8 @@ export class RemoveHashPlugin {
 
   apply(compiler: Compiler): void {
     compiler.hooks.compilation.tap('remove-hash-plugin', compilation => {
-      const mainTemplate = compilation.mainTemplate as compilation.MainTemplate & {
-        hooks: compilation.CompilationHooks;
+      const mainTemplate = compilation.mainTemplate as typeof compilation.mainTemplate & {
+        hooks: typeof compilation['hooks'];
       };
 
       mainTemplate.hooks.assetPath.tap('remove-hash-plugin',
