@@ -9,6 +9,7 @@ import { readFileSync } from 'fs';
 import {
   TransformJavascriptOptions,
   TransformJavascriptOutput,
+  TransformerFactoryCreator,
   transformJavascript,
 } from '../helpers/transform-javascript';
 import { getPrefixClassesTransformer, testPrefixClasses } from '../transforms/prefix-classes';
@@ -109,7 +110,7 @@ export function buildOptimizer(options: BuildOptimizerOptions): TransformJavascr
   }
 
   // Determine which transforms to apply.
-  const getTransforms = [];
+  const getTransforms: TransformerFactoryCreator[] = [];
 
   let typeCheck = false;
   if (options.isSideEffectFree || originalFilePath && isKnownSideEffectFree(originalFilePath)) {

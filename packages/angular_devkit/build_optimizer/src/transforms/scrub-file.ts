@@ -20,17 +20,22 @@ export function testScrubFile(content: string) {
   return markers.some((marker) => content.indexOf(marker) !== -1);
 }
 
-export function getScrubFileTransformer(program: ts.Program): ts.TransformerFactory<ts.SourceFile> {
-  return scrubFileTransformer(program.getTypeChecker(), false);
+export function getScrubFileTransformer(program?: ts.Program): ts.TransformerFactory<ts.SourceFile> {
+  return scrubFileTransformer(program, false);
 }
 
 export function getScrubFileTransformerForCore(
-  program: ts.Program,
+  program?: ts.Program,
 ): ts.TransformerFactory<ts.SourceFile> {
-  return scrubFileTransformer(program.getTypeChecker(), true);
+  return scrubFileTransformer(program, true);
 }
 
-function scrubFileTransformer(checker: ts.TypeChecker, isAngularCoreFile: boolean) {
+function scrubFileTransformer(program: ts.Program | undefined, isAngularCoreFile: boolean) {
+  if (!program) {
+    throw new Error('scrubFileTransformer requires a TypeScript Program.');
+  }
+  const checker = program.getTypeChecker();
+
   return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {
 
     const transformer: ts.Transformer<ts.SourceFile> = (sf: ts.SourceFile) => {
