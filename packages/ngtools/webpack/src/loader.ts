@@ -27,7 +27,8 @@ export function ngcLoader(this: loader.LoaderContext) {
 
   time(timeLabel);
 
-  const plugin = this._compilation._ngToolsWebpackPluginInstance;
+  const plugin = (this._compilation as { _ngToolsWebpackPluginInstance?: AngularCompilerPlugin })
+    ._ngToolsWebpackPluginInstance;
   if (!plugin) {
     throw new Error('The AngularCompilerPlugin was not found. '
                   + 'The @ngtools/webpack loader requires the plugin.');
