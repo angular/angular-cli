@@ -54,7 +54,7 @@ export class TransferHttpCacheInterceptor implements HttpInterceptor {
 
   private makeCacheKey(method: string, url: string, params: HttpParams): StateKey<string> {
     // make the params encoded same as a url so it's easy to identify
-    const encodedParams = params.keys().sort().map(k => `${k}=${params.get(k)}`).join('&');
+    const encodedParams = params.keys().sort().map(k => `${k}=${params.getAll(k)}`).join('&');
     const key = (method === 'GET' ? 'G.' : 'H.') + url + '?' + encodedParams;
 
     return makeStateKey<TransferHttpResponse>(key);

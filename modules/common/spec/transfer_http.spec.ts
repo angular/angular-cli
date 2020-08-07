@@ -36,5 +36,11 @@ describe('TransferHttp', () => {
         new HttpParams().append('b', 'foo').append('a', 'bar'));
       expect(key1).toEqual(key2);
     });
+    it('should encode arrays in url params', () => {
+      const interceptor = new TransferHttpCacheInterceptor(mockAppRef(), mockTransferState());
+      const key = interceptor['makeCacheKey']('GET', 'https://google.com/api',
+        new HttpParams().append('b', 'xyz').append('a', 'foo').append('a', 'bar'));
+      expect(key).toEqual('G.https://google.com/api?a=foo,bar&b=xyz');
+    });
   });
 });
