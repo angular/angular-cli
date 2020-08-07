@@ -36,7 +36,7 @@ export default async function() {
 
   // Turn on emitDecoratorMetadata
   await replaceInFile(
-    'tsconfig.base.json',
+    'tsconfig.json',
     '"experimentalDecorators": true',
     '"experimentalDecorators": true, "emitDecoratorMetadata": true',
   );

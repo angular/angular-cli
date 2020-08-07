@@ -13,7 +13,7 @@ import { expectToFail } from '../../utils/utils';
 export default async function () {
   const workerPath = join('src', 'app', 'app.worker.ts');
   const snippetPath = join('src', 'app', 'app.component.ts');
-  const projectTsConfig = 'tsconfig.base.json';
+  const projectTsConfig = 'tsconfig.json';
   const workerTsConfig = 'tsconfig.worker.json';
 
   // Enable Differential loading to run both size checks

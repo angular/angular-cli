@@ -29,7 +29,7 @@ describe('Browser Builder resolve json module', () => {
     });
 
     host.replaceInFile(
-      'tsconfig.base.json',
+      'tsconfig.json',
       '"target": "es2015"',
       '"target": "es5", "resolveJsonModule": true',
     );

@@ -41,7 +41,7 @@ describe('Karma Builder', () => {
   });
 
   it('supports ES2015 target', async () => {
-    host.replaceInFile('tsconfig.base.json', '"target": "es5"', '"target": "es2015"');
+    host.replaceInFile('tsconfig.json', '"target": "es5"', '"target": "es2015"');
 
     const run = await architect.scheduleTarget(karmaTargetSpec);
 

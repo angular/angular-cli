@@ -28,7 +28,7 @@ export default async function() {
   await writeMultipleFiles({
     './tsconfig.server.json': `
       {
-        "extends": "./tsconfig.base.json",
+        "extends": "./tsconfig.json",
         "compilerOptions": {
           "outDir": "../dist-server",
           "baseUrl": "./",
