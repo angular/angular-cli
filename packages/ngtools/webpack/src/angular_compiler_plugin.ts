@@ -276,6 +276,14 @@ export class AngularCompilerPlugin {
       );
     }
 
+    if (this._compilerOptions.strictMetadataEmit) {
+      this._warnings.push(
+        new Error(
+          `Using Angular compiler option 'strictMetadataEmit' for applications might cause undefined behavior.`,
+        ),
+      );
+    }
+
     if (this._discoverLazyRoutes === false && this.options.additionalLazyModules
       && Object.keys(this.options.additionalLazyModules).length > 0) {
       this._warnings.push(
