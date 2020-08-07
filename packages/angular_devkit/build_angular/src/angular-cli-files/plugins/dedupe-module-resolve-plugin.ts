@@ -7,6 +7,7 @@
  */
 
 import { Compiler } from 'webpack';
+import { addWarning } from '../../utils/webpack-diagnostics';
 
 interface AfterResolveResult {
   request: string;
@@ -43,10 +44,9 @@ export class DedupeModuleResolvePlugin {
 
   constructor(private options?: DedupeModuleResolvePluginOptions) { }
 
-  // tslint:disable-next-line: no-any
   apply(compiler: Compiler) {
-    compiler.hooks.normalModuleFactory.tap('DedupeModuleResolvePlugin', nmf => {
-      nmf.hooks.afterResolve.tap('DedupeModuleResolvePlugin', (result: AfterResolveResult | undefined) => {
+    compiler.hooks.compilation.tap('DedupeModuleResolvePlugin', (compilation, { normalModuleFactory }) => {
+      normalModuleFactory.hooks.afterResolve.tap('DedupeModuleResolvePlugin', (result: AfterResolveResult | undefined) => {
         if (!result) {
           return;
         }
@@ -80,8 +80,7 @@ export class DedupeModuleResolvePlugin {
         }
 
         if (this.options?.verbose) {
-          // tslint:disable-next-line: no-console
-          console.warn(`[DedupeModuleResolvePlugin]: ${result.resource} -> ${prevResource}`);
+          addWarning(compilation, `[DedupeModuleResolvePlugin]: ${result.resource} -> ${prevResource}`);
         }
 
         // Alter current request with previously resolved module.
