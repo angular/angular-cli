@@ -8,7 +8,7 @@
 import * as cssNano from 'cssnano';
 import { ProcessOptions, Result } from 'postcss';
 import { Compiler, compilation } from 'webpack';
-import { OriginalSource, RawSource, SourceMapSource } from 'webpack-sources';
+import { RawSource, SourceMapSource } from 'webpack-sources';
 import { addWarning } from '../../utils/webpack-diagnostics';
 
 export interface OptimizeCssWebpackPluginOptions {
@@ -58,20 +58,24 @@ export class OptimizeCssWebpackPlugin {
       const actions = files
         .filter(file => this._options.test(file))
         .map(async file => {
-          const asset = compilation.assets[file] as OriginalSource;
+          const asset = compilation.assets[file];
           if (!asset) {
             return;
           }
 
-          let content: string;
+          let content: string | Buffer;
           // tslint:disable-next-line: no-any
           let map: any;
           if (this._options.sourceMap && asset.sourceAndMap) {
-            const sourceAndMap = asset.sourceAndMap();
+            const sourceAndMap = asset.sourceAndMap({});
             content = sourceAndMap.source;
             map = sourceAndMap.map;
           } else {
             content = asset.source();
+          }
+
+          if (typeof content !== 'string') {
+            content = content.toString();
           }
 
           if (content.length === 0) {
