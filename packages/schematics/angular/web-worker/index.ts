@@ -19,7 +19,6 @@ import {
 import { JSONFile } from '../utility/json-file';
 import { parseName } from '../utility/parse-name';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
-import { addTsConfigProjectReferences, verifyBaseTsConfigExists } from '../utility/tsconfig';
 import { buildDefaultPath, getWorkspace, updateWorkspace } from '../utility/workspace';
 import { BrowserBuilderOptions, LintBuilderOptions } from '../utility/workspace-models';
 import { Schema as WebWorkerOptions } from './schema';
@@ -118,8 +117,6 @@ export default function (options: WebWorkerOptions): Rule {
       throw new SchematicsException(`Web Worker requires a project type of "application".`);
     }
 
-    verifyBaseTsConfigExists(host);
-
     const projectTarget = project.targets.get(options.target);
     if (!projectTarget) {
       throw new Error(`Target is not defined for this project.`);
@@ -160,9 +157,6 @@ export default function (options: WebWorkerOptions): Rule {
       options.snippet ? addSnippet(options) : noop(),
       // Add the worker.
       mergeWith(templateSource),
-      addTsConfigProjectReferences([
-        `${root}/tsconfig.worker.json`,
-      ]),
     ]);
   };
 }

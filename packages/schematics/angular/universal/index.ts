@@ -34,7 +34,6 @@ import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/d
 import { findBootstrapModuleCall, findBootstrapModulePath } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
-import { addTsConfigProjectReferences, verifyBaseTsConfigExists } from '../utility/tsconfig';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { BrowserBuilderOptions, Builders, OutputHashing } from '../utility/workspace-models';
 import { Schema as UniversalOptions } from './schema';
@@ -240,8 +239,6 @@ export default function (options: UniversalOptions): Rule {
       throw targetBuildNotFoundError();
     }
 
-    verifyBaseTsConfigExists(host);
-
     const clientBuildOptions =
       (clientBuildTarget.options || {}) as unknown as BrowserBuilderOptions;
 
@@ -285,9 +282,6 @@ export default function (options: UniversalOptions): Rule {
       updateConfigFile(options, tsConfigDirectory),
       wrapBootstrapCall(clientBuildOptions.main),
       addServerTransition(options, clientBuildOptions.main, clientProject.root),
-      addTsConfigProjectReferences([
-        join(tsConfigDirectory, 'tsconfig.server.json'),
-      ]),
     ]);
   };
 }

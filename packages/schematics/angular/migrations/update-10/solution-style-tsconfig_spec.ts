@@ -79,16 +79,16 @@ describe('Migration to create "Solution Style" tsconfig', () => {
     createJsonFile(tree, 'src/tsconfig.worker.json', { extends: './../tsconfig.json', compilerOptions });
   });
 
-  it(`should rename 'tsconfig.json' to 'tsconfig.base.json'`, async () => {
+  it(`should rename 'tsconfig.json' to 'tsconfig.json'`, async () => {
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
-    expect(newTree.exists('tsconfig.base.json')).toBeTrue();
+    expect(newTree.exists('tsconfig.json')).toBeTrue();
   });
 
-  it(`should update extends from 'tsconfig.json' to 'tsconfig.base.json'`, async () => {
+  it(`should update extends from 'tsconfig.json' to 'tsconfig.json'`, async () => {
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
-    expect(readJsonFile(newTree, 'src/tsconfig.json').extends).toEqual('./../tsconfig.base.json');
-    expect(readJsonFile(newTree, 'src/tsconfig.spec.json').extends).toEqual('./../tsconfig.base.json');
-    expect(readJsonFile(newTree, 'src/tsconfig.worker.json').extends).toEqual('./../tsconfig.base.json');
+    expect(readJsonFile(newTree, 'src/tsconfig.json').extends).toEqual('./../tsconfig.json');
+    expect(readJsonFile(newTree, 'src/tsconfig.spec.json').extends).toEqual('./../tsconfig.json');
+    expect(readJsonFile(newTree, 'src/tsconfig.worker.json').extends).toEqual('./../tsconfig.json');
   });
 
   it('should not update extends if not extended the root tsconfig', async () => {
@@ -118,7 +118,7 @@ describe('Migration to create "Solution Style" tsconfig', () => {
   it('should not error out when a JSON file is a blank', async () => {
     tree.create('blank.json', '');
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
-    expect(readJsonFile(newTree, 'src/tsconfig.json').extends).toEqual('./../tsconfig.base.json');
+    expect(readJsonFile(newTree, 'src/tsconfig.json').extends).toEqual('./../tsconfig.json');
   });
 
   it('should show warning with full path when parsing invalid JSON', async () => {

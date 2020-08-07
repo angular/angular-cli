@@ -73,9 +73,9 @@ function updateTsconfigExtendsRule(): Rule {
     }
 
     // Rename workspace tsconfig to base tsconfig.
-    host.rename('tsconfig.json', 'tsconfig.base.json');
+    host.rename('tsconfig.json', 'tsconfig.json');
 
-    // Iterate over all tsconfig files and change the extends from 'tsconfig.json' 'tsconfig.base.json'
+    // Iterate over all tsconfig files and change the extends from 'tsconfig.json' 'tsconfig.json'
     for (const [tsconfigPath, extendsAst] of visitExtendedJsonFiles(host.root, context.logger)) {
       const tsConfigDir = dirname(normalize(tsconfigPath));
       if ('/tsconfig.json' !== resolve(tsConfigDir, normalize(extendsAst.value))) {
@@ -127,7 +127,7 @@ export default function (): Rule {
   return (host, context) => {
     const logger = context.logger;
 
-    if (host.exists('tsconfig.base.json')) {
+    if (host.exists('tsconfig.json')) {
       logger.info('Migration has already been executed.');
 
       return;

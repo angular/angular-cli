@@ -18,7 +18,6 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
-import { verifyBaseTsConfigExists } from '../utility/tsconfig';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
 import { Schema as E2eOptions } from './schema';
@@ -31,8 +30,6 @@ export default function (options: E2eOptions): Rule {
     if (!project) {
       throw new SchematicsException(`Project name "${appProject}" doesn't not exist.`);
     }
-
-    verifyBaseTsConfigExists(host);
 
     const root = join(normalize(project.root), 'e2e');
 
