@@ -52,7 +52,7 @@ export function runWebpack(
 
   return createWebpack(config).pipe(
     switchMap(webpackCompiler => new Observable<BuildResult>(obs => {
-      const callback: webpack.Compiler.Handler = (err, stats) => {
+      const callback = (err: Error | undefined, stats: webpack.Stats) => {
         if (err) {
           return obs.error(err);
         }
