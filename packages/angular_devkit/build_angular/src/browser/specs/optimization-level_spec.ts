@@ -27,7 +27,7 @@ describe('Browser Builder optimization level', () => {
   });
 
   it('tsconfig target changes optimizations to use ES2015', async () => {
-    host.replaceInFile('tsconfig.base.json', '"target": "es5"', '"target": "es2015"');
+    host.replaceInFile('tsconfig.json', '"target": "es5"', '"target": "es2015"');
 
     const overrides = { optimization: true };
     const { files } = await browserBuild(architect, host, target, overrides);

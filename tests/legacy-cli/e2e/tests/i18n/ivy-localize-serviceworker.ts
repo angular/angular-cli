@@ -32,7 +32,7 @@ export default async function() {
   }
   await npm('install', `${serviceWorkerVersion}`);
 
-  await updateJsonFile('tsconfig.base.json', config => {
+  await updateJsonFile('tsconfig.json', config => {
     config.compilerOptions.target = 'es2015';
     if (!config.angularCompilerOptions) {
       config.angularCompilerOptions = {};

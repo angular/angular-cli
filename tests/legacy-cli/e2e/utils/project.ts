@@ -6,7 +6,7 @@ import { prependToFile, readFile, replaceInFile, writeFile } from './fs';
 import { gitCommit } from './git';
 import { execAndWaitForOutputToMatch, git, ng, npm, silentNpm } from './process';
 
-const tsConfigPath = 'tsconfig.base.json';
+const tsConfigPath = 'tsconfig.json';
 
 
 export function updateJsonFile(filePath: string, fn: (json: any) => any | void) {
@@ -40,10 +40,10 @@ export async function createProject(name: string, ...args: string[]) {
   await ng('new', name, '--skip-install', ...extraArgs, ...args);
   process.chdir(name);
 
-  if (fs.existsSync('tsconfig.base.json')) {
+  if (fs.existsSync('tsconfig.json')) {
     // Disable the TS version check to make TS updates easier.
     // Only VE does it, but on Ivy the i18n extraction uses VE.
-    await updateJsonFile('tsconfig.base.json', config => {
+    await updateJsonFile('tsconfig.json', config => {
       if (!config.angularCompilerOptions) {
         config.angularCompilerOptions = {};
       }
@@ -102,7 +102,7 @@ export async function prepareProjectForE2e(name) {
   );
   // Force sourcemaps to be from the root of the filesystem.
   await updateJsonFile(
-    'tsconfig.base.json',
+    'tsconfig.json',
     json => {
       json[
         'compilerOptions'

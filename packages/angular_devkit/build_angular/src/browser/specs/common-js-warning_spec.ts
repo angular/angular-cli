@@ -79,7 +79,7 @@ describe('Browser Builder commonjs warning', () => {
   });
 
   it('should not show warning in JIT for templateUrl and styleUrl when using paths', async () => {
-    host.replaceInFile('tsconfig.base.json', /"baseUrl": ".\/",/, `
+    host.replaceInFile('tsconfig.json', /"baseUrl": ".\/",/, `
       "baseUrl": "./",
       "paths": {
         "@app/*": [

@@ -6,7 +6,7 @@ export default function () {
   // TypeError: Assignment to constant variable.
   return;
 
-  return updateJsonFile('tsconfig.base.json', configJson => {
+  return updateJsonFile('tsconfig.json', configJson => {
     const compilerOptions = configJson['compilerOptions'];
     compilerOptions['target'] = 'es2015';
   })
