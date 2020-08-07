@@ -329,12 +329,15 @@ async function setupLocalize(
     ],
   };
 
+  // Get the rules and ensure the Webpack configuration is setup properly
+  const rules = webpackConfig.module?.rules || [];
   if (!webpackConfig.module) {
-    webpackConfig.module = { rules: [] };
+    webpackConfig.module = { rules };
   } else if (!webpackConfig.module.rules) {
-    webpackConfig.module.rules = [];
+    webpackConfig.module.rules = rules;
   }
-  webpackConfig.module.rules.push(i18nRule);
+
+  rules.push(i18nRule);
 
   // Add a plugin to inject the i18n diagnostics
   // tslint:disable-next-line: no-non-null-assertion
