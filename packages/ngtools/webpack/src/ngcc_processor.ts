@@ -12,7 +12,6 @@ import { createHash } from 'crypto';
 import { accessSync, constants, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { InputFileSystem } from 'webpack';
 import { time, timeEnd } from './benchmark';
 
 // We cannot create a plugin for this, because NGTSC requires addition type
@@ -32,7 +31,7 @@ export class NgccProcessor {
 
   constructor(
     private readonly propertiesToConsider: string[],
-    private readonly inputFileSystem: InputFileSystem,
+    private readonly fileWatchPurger: (path: string) => void,
     private readonly compilationWarnings: (Error | string)[],
     private readonly compilationErrors: (Error | string)[],
     private readonly basePath: string,
@@ -192,9 +191,7 @@ export class NgccProcessor {
 
     // Purge this file from cache, since NGCC add new mainFields. Ex: module_ivy_ngcc
     // which are unknown in the cached file.
-
-    // tslint:disable-next-line:no-any
-    (this.inputFileSystem as any).purge(packageJsonPath);
+    this.fileWatchPurger(packageJsonPath);
 
     this._processedModules.add(resolvedFileName);
   }
