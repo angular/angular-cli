@@ -35,7 +35,6 @@ import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { applyLintFix } from '../utility/lint-fix';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
-import { addTsConfigProjectReferences, verifyBaseTsConfigExists } from '../utility/tsconfig';
 import { validateProjectName } from '../utility/validation';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders, ProjectType } from '../utility/workspace-models';
@@ -280,7 +279,6 @@ export default function (options: ApplicationOptions): Rule {
     }
 
     validateProjectName(options.name);
-    verifyBaseTsConfigExists(host);
 
     const appRootSelector = `${options.prefix}-root`;
     const componentOptions: Partial<ComponentOptions> = !options.minimal ?
@@ -363,10 +361,6 @@ export default function (options: ApplicationOptions): Rule {
           }),
           move(sourceDir),
         ]), MergeStrategy.Overwrite),
-      addTsConfigProjectReferences([
-        join(appDir, 'tsconfig.app.json'),
-        ... options.minimal ? [] : [join(appDir, 'tsconfig.spec.json')],
-      ]),
       options.minimal ? noop() : schematic('e2e', e2eOptions),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
       options.lintFix ? applyLintFix(appDir) : noop(),

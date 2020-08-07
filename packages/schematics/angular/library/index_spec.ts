@@ -202,11 +202,11 @@ describe('Library Schematic', () => {
     });
   });
 
-  describe(`update tsconfig.base.json`, () => {
+  describe(`update tsconfig.json`, () => {
     it(`should add paths mapping to empty tsconfig`, async () => {
       const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
 
-      const tsConfigJson = getJsonFileContent(tree, 'tsconfig.base.json');
+      const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
       expect(tsConfigJson.compilerOptions.paths.foo).toBeTruthy();
       expect(tsConfigJson.compilerOptions.paths.foo.length).toEqual(2);
       expect(tsConfigJson.compilerOptions.paths.foo[0]).toEqual('dist/foo/foo');
@@ -214,7 +214,7 @@ describe('Library Schematic', () => {
     });
 
     it(`should append to existing paths mappings`, async () => {
-      workspaceTree.overwrite('tsconfig.base.json', JSON.stringify({
+      workspaceTree.overwrite('tsconfig.json', JSON.stringify({
         compilerOptions: {
           paths: {
             'unrelated': ['./something/else.ts'],
@@ -224,7 +224,7 @@ describe('Library Schematic', () => {
       }));
       const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree).toPromise();
 
-      const tsConfigJson = getJsonFileContent(tree, 'tsconfig.base.json');
+      const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
       expect(tsConfigJson.compilerOptions.paths.foo).toBeTruthy();
       expect(tsConfigJson.compilerOptions.paths.foo.length).toEqual(3);
       expect(tsConfigJson.compilerOptions.paths.foo[1]).toEqual('dist/foo/foo');
@@ -237,7 +237,7 @@ describe('Library Schematic', () => {
         skipTsConfig: true,
       }, workspaceTree).toPromise();
 
-      const tsConfigJson = getJsonFileContent(tree, 'tsconfig.base.json');
+      const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
       expect(tsConfigJson.compilerOptions.paths).toBeUndefined();
     });
   });
@@ -266,12 +266,12 @@ describe('Library Schematic', () => {
     expect(pkgJson.name).toEqual(scopedName);
 
     const tsConfigJson = getJsonFileContent(tree, '/projects/myscope/mylib/tsconfig.spec.json');
-    expect(tsConfigJson.extends).toEqual('../../../tsconfig.base.json');
+    expect(tsConfigJson.extends).toEqual('../../../tsconfig.json');
 
     const cfg = JSON.parse(tree.readContent('/angular.json'));
     expect(cfg.projects['@myscope/mylib']).toBeDefined();
 
-    const rootTsCfg = getJsonFileContent(tree, '/tsconfig.base.json');
+    const rootTsCfg = getJsonFileContent(tree, '/tsconfig.json');
     expect(rootTsCfg.compilerOptions.paths['@myscope/mylib']).toEqual(['dist/myscope/mylib/myscope-mylib', 'dist/myscope/mylib']);
 
     const karmaConf = getFileContent(tree, '/projects/myscope/mylib/karma.conf.js');
@@ -316,9 +316,9 @@ describe('Library Schematic', () => {
     expect(buildOpt.tsConfig).toEqual('foo/tsconfig.lib.json');
 
     const appTsConfig = getJsonFileContent(tree, '/foo/tsconfig.lib.json');
-    expect(appTsConfig.extends).toEqual('../tsconfig.base.json');
+    expect(appTsConfig.extends).toEqual('../tsconfig.json');
     const specTsConfig = getJsonFileContent(tree, '/foo/tsconfig.spec.json');
-    expect(specTsConfig.extends).toEqual('../tsconfig.base.json');
+    expect(specTsConfig.extends).toEqual('../tsconfig.json');
   });
 
   it(`should add 'production' configuration`, async () => {
@@ -327,17 +327,5 @@ describe('Library Schematic', () => {
 
     const workspace = JSON.parse(tree.readContent('/angular.json'));
     expect(workspace.projects.foo.architect.build.configurations.production).toBeDefined();
-  });
-
-  it('should add reference in solution style tsconfig', async () => {
-    const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree)
-      .toPromise();
-
-    // tslint:disable-next-line:no-any
-    const { references } = getJsonFileContent(tree, '/tsconfig.json');
-    expect(references).toEqual([
-      { path: './projects/foo/tsconfig.lib.json' },
-      { path: './projects/foo/tsconfig.spec.json' },
-    ]);
   });
 });

@@ -91,7 +91,7 @@ describe('Migration to update target and module compiler options', () => {
     const compilerOptions = { target: 'es2015', module: 'esnext' };
 
     // Workspace
-    createJsonFile(tree, 'tsconfig.base.json', { compilerOptions });
+    createJsonFile(tree, 'tsconfig.json', { compilerOptions });
 
     // Application
     createJsonFile(tree, 'src/tsconfig.app.json', { compilerOptions });
@@ -106,19 +106,19 @@ describe('Migration to update target and module compiler options', () => {
     createJsonFile(tree, 'src/tsconfig.server.json', { compilerOptions: { module: 'commonjs' } });
   });
 
-  it(`should update module and target in workspace 'tsconfig.base.json'`, async () => {
+  it(`should update module and target in workspace 'tsconfig.json'`, async () => {
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
-    const { module } = readJsonFile(newTree, 'tsconfig.base.json').compilerOptions;
+    const { module } = readJsonFile(newTree, 'tsconfig.json').compilerOptions;
     expect(module).toBe('es2020');
   });
 
-  it(`should update module and target in 'tsconfig.base.json' which is referenced in option`, async () => {
+  it(`should update module and target in 'tsconfig.json' which is referenced in option`, async () => {
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
     const { module } = readJsonFile(newTree, 'src/tsconfig.spec.json').compilerOptions;
     expect(module).toBe('es2020');
   });
 
-  it(`should update module and target in 'tsconfig.base.json' which is referenced in a configuration`, async () => {
+  it(`should update module and target in 'tsconfig.json' which is referenced in a configuration`, async () => {
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
     const { module } = readJsonFile(newTree, 'src/tsconfig.app.prod.json').compilerOptions;
     expect(module).toBe('es2020');

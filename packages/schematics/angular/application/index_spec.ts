@@ -80,28 +80,6 @@ describe('Application Schematic', () => {
     expect(workspace.defaultProject).toBe('foo');
   });
 
-  it('should add references in solution style tsconfig', async () => {
-    const tree = await schematicRunner.runSchematicAsync('application', defaultOptions, workspaceTree)
-      .toPromise();
-
-    const { references } = readJsonFile(tree, '/tsconfig.json');
-    expect(references).toEqual([
-      { path: './projects/foo/tsconfig.app.json' },
-      { path: './projects/foo/tsconfig.spec.json' },
-    ]);
-  });
-
-  it('minimal=true should add correct reference in tsconfig', async () => {
-    const options = { ...defaultOptions, minimal: true };
-    const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
-      .toPromise();
-
-    const { references } = readJsonFile(tree, '/tsconfig.json');
-    expect(references).toEqual([
-      { path: './projects/foo/tsconfig.app.json' },
-    ]);
-  });
-
   it('should set the prefix to app if none is set', async () => {
     const options = { ...defaultOptions };
 
@@ -166,7 +144,7 @@ describe('Application Schematic', () => {
       .toPromise();
     const { files, extends: _extends } = readJsonFile(tree, '/projects/foo/tsconfig.app.json');
     expect(files).toEqual(['src/main.ts', 'src/polyfills.ts']);
-    expect(_extends).toBe('../../tsconfig.base.json');
+    expect(_extends).toBe('../../tsconfig.json');
   });
 
   it('should set the right paths in the tsconfig.spec.json', async () => {
@@ -174,7 +152,7 @@ describe('Application Schematic', () => {
       .toPromise();
     const { files, extends: _extends } = readJsonFile(tree, '/projects/foo/tsconfig.spec.json');
     expect(files).toEqual(['src/test.ts', 'src/polyfills.ts']);
-    expect(_extends).toBe('../../tsconfig.base.json');
+    expect(_extends).toBe('../../tsconfig.json');
   });
 
   it('should set the right path and prefix in the tslint file', async () => {
@@ -401,9 +379,9 @@ describe('Application Schematic', () => {
       const tree = await schematicRunner.runSchematicAsync('application', options, workspaceTree)
         .toPromise();
       const appTsConfig = readJsonFile(tree, '/tsconfig.app.json');
-      expect(appTsConfig.extends).toEqual('./tsconfig.base.json');
+      expect(appTsConfig.extends).toEqual('./tsconfig.json');
       const specTsConfig = readJsonFile(tree, '/tsconfig.spec.json');
-      expect(specTsConfig.extends).toEqual('./tsconfig.base.json');
+      expect(specTsConfig.extends).toEqual('./tsconfig.json');
       expect(specTsConfig.files).toEqual(['src/test.ts', 'src/polyfills.ts']);
     });
 
@@ -447,9 +425,9 @@ describe('Application Schematic', () => {
       expect(buildOpt.tsConfig).toEqual('foo/tsconfig.app.json');
 
       const appTsConfig = readJsonFile(tree, '/foo/tsconfig.app.json');
-      expect(appTsConfig.extends).toEqual('../tsconfig.base.json');
+      expect(appTsConfig.extends).toEqual('../tsconfig.json');
       const specTsConfig = readJsonFile(tree, '/foo/tsconfig.spec.json');
-      expect(specTsConfig.extends).toEqual('../tsconfig.base.json');
+      expect(specTsConfig.extends).toEqual('../tsconfig.json');
     });
   });
 

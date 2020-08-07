@@ -136,7 +136,7 @@ describe('Web Worker Schematic', () => {
     appTree.overwrite('/angular.json', JSON.stringify(workspace));
 
     const oldTsConfig = {
-      extends: '../../../tsconfig.base.json',
+      extends: '../../../tsconfig.json',
       include: [
         '**/*.ts',
       ],
@@ -151,18 +151,5 @@ describe('Web Worker Schematic', () => {
       .toPromise();
     const { exclude } = JSON.parse(tree.readContent(tsConfigPath));
     expect(exclude).toContain('**/*.worker.ts');
-  });
-
-  it('should add reference in solution style tsconfig', async () => {
-    const tree = await schematicRunner.runSchematicAsync('web-worker', defaultOptions, appTree)
-      .toPromise();
-
-    // tslint:disable-next-line:no-any
-    const { references } = parseJson(tree.readContent('/tsconfig.json').toString(), JsonParseMode.Loose) as any;
-    expect(references).toEqual([
-      { path: './projects/bar/tsconfig.app.json' },
-      { path: './projects/bar/tsconfig.spec.json' },
-      { path: './projects/bar/tsconfig.worker.json' },
-    ]);
   });
 });

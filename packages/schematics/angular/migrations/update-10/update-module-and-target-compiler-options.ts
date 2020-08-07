@@ -23,13 +23,13 @@ export default function (): Rule {
   return async (host, { logger }) => {
     // Workspace level tsconfig
     try {
-      updateModuleAndTarget(host, 'tsconfig.base.json', {
+      updateModuleAndTarget(host, 'tsconfig.json', {
         oldModule: 'esnext',
         newModule: 'es2020',
       });
     } catch (error) {
       logger.warn(
-        `Unable to update 'tsconfig.base.json' module option from 'esnext' to 'es2020': ${
+        `Unable to update 'tsconfig.json' module option from 'esnext' to 'es2020': ${
           error.message || error
         }`,
       );

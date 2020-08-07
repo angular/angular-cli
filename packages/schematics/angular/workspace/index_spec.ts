@@ -33,7 +33,6 @@ describe('Workspace Schematic', () => {
       '/package.json',
       '/README.md',
       '/tsconfig.json',
-      '/tsconfig.base.json',
       '/tslint.json',
     ]));
   });
@@ -68,7 +67,6 @@ describe('Workspace Schematic', () => {
       '/package.json',
       '/README.md',
       '/tsconfig.json',
-      '/tsconfig.base.json',
     ]));
 
     expect(files).not.toContain('/tslint.json');
@@ -79,7 +77,7 @@ describe('Workspace Schematic', () => {
     const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, strict: false }).toPromise();
     const { compilerOptions, angularCompilerOptions } =
       // tslint:disable-next-line: no-any
-      parseJson(tree.readContent('tsconfig.base.json').toString(), JsonParseMode.Loose) as any;
+      parseJson(tree.readContent('tsconfig.json').toString(), JsonParseMode.Loose) as any;
     expect(compilerOptions.strict).toBeUndefined();
     expect(angularCompilerOptions).toBeUndefined();
   });
@@ -88,7 +86,7 @@ describe('Workspace Schematic', () => {
     const tree = await schematicRunner.runSchematicAsync('workspace', { ...defaultOptions, strict: true }).toPromise();
     const { compilerOptions, angularCompilerOptions } =
       // tslint:disable-next-line: no-any
-      parseJson(tree.readContent('tsconfig.base.json').toString(), JsonParseMode.Loose) as any;
+      parseJson(tree.readContent('tsconfig.json').toString(), JsonParseMode.Loose) as any;
     expect(compilerOptions.strict).toBe(true);
     expect(angularCompilerOptions.strictTemplates).toBe(true);
   });

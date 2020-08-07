@@ -82,7 +82,7 @@ describe('Migration to version 9', () => {
         .toPromise();
 
       // Pre version 9 - tsconfig.json was the base tsconfig file.
-      tree.overwrite('tsconfig.json', tree.readContent('tsconfig.base.json'));
+      tree.overwrite('tsconfig.json', tree.readContent('tsconfig.json'));
 
       const tsConfig = JSON.stringify(
         {

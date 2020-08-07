@@ -263,19 +263,4 @@ describe('Universal Schematic', () => {
     const contents = tree.readContent(filePath);
     expect(contents).toContain('@angular/localize/init');
   });
-
-  it('should add reference in solution style tsconfig', async () => {
-    const tree = await schematicRunner.runSchematicAsync('universal', workspaceUniversalOptions, appTree)
-      .toPromise();
-
-    // tslint:disable-next-line:no-any
-    const { references } = parseJson(tree.readContent('/tsconfig.json').toString(), JsonParseMode.Loose) as any;
-    expect(references).toEqual([
-      { path: './tsconfig.app.json' },
-      { path: './tsconfig.spec.json' },
-      { path: './projects/bar/tsconfig.app.json' },
-      { path: './projects/bar/tsconfig.spec.json' },
-      { path: './tsconfig.server.json' },
-    ]);
-  });
 });
