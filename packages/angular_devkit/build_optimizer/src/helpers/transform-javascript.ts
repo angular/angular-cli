@@ -8,6 +8,9 @@
 import { RawSourceMap } from 'source-map';
 import * as ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 
+export type TransformerFactoryCreator = (
+  program?: ts.Program,
+) => ts.TransformerFactory<ts.SourceFile>;
 
 export interface TransformJavascriptOptions {
   content: string;
@@ -16,7 +19,7 @@ export interface TransformJavascriptOptions {
   emitSourceMap?: boolean;
   strict?: boolean;
   typeCheck?: boolean;
-  getTransforms: Array<(program?: ts.Program) => ts.TransformerFactory<ts.SourceFile>>;
+  getTransforms: TransformerFactoryCreator[];
 }
 
 export interface TransformJavascriptOutput {
@@ -110,7 +113,8 @@ export function transformJavascript(
       };
     }
 
-    const transforms = getTransforms.map((getTf) => getTf(undefined));
+    // All fast path transformers do not use a program
+    const transforms = getTransforms.map((getTf) => getTf(/* program */ undefined));
 
     const result = ts.transform(tempSourceFile, transforms, tsOptions);
     if (result.transformed.length === 0 || result.transformed[0] === tempSourceFile) {
