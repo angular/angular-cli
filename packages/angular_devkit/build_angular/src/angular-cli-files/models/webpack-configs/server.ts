@@ -53,7 +53,7 @@ export function getServerConfig(wco: WebpackConfigOptions): Configuration {
       ...externalDependencies,
       (context: string, request: string, callback: (error?: null, result?: string) => void) => {
         // Absolute & Relative paths are not externals
-        if (request.startsWith('./') || isAbsolute(request)) {
+        if (request.startsWith('.') || isAbsolute(request)) {
           callback();
 
           return;
