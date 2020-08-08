@@ -175,7 +175,7 @@
     "node-fetch": "^2.2.0",
     "npm-registry-client": "8.6.0",
     "open": "7.0.3",
-    "ora": "^4.0.2",
+    "ora": "^5.0.0",
     "pacote": "11.1.4",
     "parse5": "6.0.1",
     "parse5-html-rewriting-stream": "6.0.1",
