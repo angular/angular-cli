@@ -56,9 +56,9 @@ export class SchematicImpl<CollectionT extends object, SchematicT extends object
       .pipe(
         first(),
         concatMap(tree => this._engine.transformOptions(this, options, context).pipe(
-          map(o => [tree, o]),
+          map(o => [tree, o] as [Tree, OptionT]),
         )),
-        concatMap(([tree, transformedOptions]: [Tree, OptionT]) => {
+        concatMap(([tree, transformedOptions]) => {
           let input: Tree;
           let scoped = false;
           if (executionOptions && executionOptions.scope) {

@@ -34,10 +34,7 @@ export function empty(): Source {
  */
 export function chain(rules: Rule[]): Rule {
   return (tree, context) => {
-    return rules.reduce(
-      (acc: Tree | Observable<Tree>, curr: Rule) => callRule(curr, acc, context),
-      tree,
-    );
+    return rules.reduce<Tree | Observable<Tree>>((acc, curr) => callRule(curr, acc, context), tree);
   };
 }
 
