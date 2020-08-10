@@ -8,7 +8,7 @@
 
 import { JsonValue } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
-import { Node, applyEdits, findNodeAtLocation, getNodeValue, modify, parseTree } from 'jsonc-parser';
+import { Node, ParseError, applyEdits, findNodeAtLocation, getNodeValue, modify, parseTree, printParseErrorCode } from 'jsonc-parser';
 
 export type InsertionIndex = (properties: string[]) => number;
 export type JSONPath = (string | number)[];
@@ -35,7 +35,12 @@ export class JSONFile {
       return this._jsonAst;
     }
 
-    this._jsonAst = parseTree(this.content);
+    const errors: ParseError[] = [];
+    this._jsonAst = parseTree(this.content, errors);
+    if (errors.length) {
+      const { error, offset } = errors[0];
+      throw new Error(`Failed to parse "${this.path}" as JSON AST Object. ${printParseErrorCode(error)} at location: ${offset}.`);
+    }
 
     return this._jsonAst;
   }
