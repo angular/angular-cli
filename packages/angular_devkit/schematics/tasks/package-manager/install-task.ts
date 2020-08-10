@@ -8,12 +8,13 @@
 import { TaskConfiguration, TaskConfigurationGenerator } from '../../src';
 import { NodePackageName, NodePackageTaskOptions } from './options';
 
+// TODO: This should be an interface but that would change the public API
 export class NodePackageInstallTaskOptions {
-  packageManager: string;
-  packageName: string;
-  workingDirectory: string;
-  quiet: boolean;
-  hideOutput: boolean;
+  packageManager!: string;
+  packageName!: string;
+  workingDirectory!: string;
+  quiet!: boolean;
+  hideOutput!: boolean;
 }
 
 export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePackageTaskOptions> {
