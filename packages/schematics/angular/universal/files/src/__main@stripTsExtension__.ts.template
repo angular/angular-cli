@@ -11,5 +11,5 @@ if (environment.production) {
   enableProdMode();
 }
 
-export { <%= rootModuleClassName %> } from './app/<%= stripTsExtension(rootModuleFileName) %>';
+export { <%= rootModuleClassName %> } from './<%= appDir + '/' + stripTsExtension(rootModuleFileName) %>';
 export { renderModule, renderModuleFactory } from '@angular/platform-server';

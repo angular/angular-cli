@@ -284,6 +284,7 @@ function addServerRoutes(options: AppShellOptions): Rule {
 function addShellComponent(options: AppShellOptions): Rule {
   const componentOptions: ComponentOptions = {
     name: 'app-shell',
+    path: options.appDir === 'app' ? undefined :  options.appDir,
     module: options.rootModuleFileName,
     project: options.clientProject,
   };

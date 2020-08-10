@@ -198,4 +198,16 @@ describe('App Shell Schematic', () => {
     const content = tree.readContent('/projects/bar/src/app/app.server.module.ts');
     expect(content).toMatch(/app\-shell\.component/);
   });
+
+  it('should create the shell component with appDir option provided', async () => {
+    const defaultOptions: AppShellOptions = {
+      clientProject: 'bar',
+      appDir: '/projects/bar/src/app/server',
+    };
+    const tree = await schematicRunner.runSchematicAsync('appShell', defaultOptions, appTree)
+      .toPromise();
+    expect(tree.exists('/projects/bar/src/app/app-shell/app-shell.component.ts')).toBe(true);
+    const content = tree.readContent('/projects/bar/src/app/server/app.server.module.ts');
+    expect(content).toMatch(/app\-shell\.component/);
+  });
 });

@@ -278,4 +278,15 @@ describe('Universal Schematic', () => {
       { path: './tsconfig.server.json' },
     ]);
   });
+
+  it('should create a root module file', async () => {
+    const defaultOptions: UniversalOptions = {
+      clientProject: 'bar',
+      appDir: 'app/server',
+    };
+    const tree = await schematicRunner.runSchematicAsync('universal', defaultOptions, appTree)
+      .toPromise();
+    const filePath = '/projects/bar/src/app/server/app.server.module.ts';
+    expect(tree.exists(filePath)).toEqual(true);
+  });
 });
