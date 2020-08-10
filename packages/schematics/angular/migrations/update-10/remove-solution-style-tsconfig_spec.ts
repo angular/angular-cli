@@ -10,8 +10,8 @@ import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Builders, ProjectType, WorkspaceSchema } from '../../utility/workspace-models';
 
-describe('Migration to create "Solution Style" tsconfig', () => {
-  const schematicName = 'solution-style-tsconfig';
+describe('Migration to remove "Solution Style" tsconfig', () => {
+  const schematicName = 'remove-solution-style-tsconfig';
 
   const schematicRunner = new SchematicTestRunner(
     'migrations',
@@ -70,49 +70,32 @@ describe('Migration to create "Solution Style" tsconfig', () => {
 
     // Create tsconfigs
     const compilerOptions = { target: 'es2015' };
-    createJsonFile(tree, 'tsconfig.json', { compilerOptions });
+    createJsonFile(tree, 'tsconfig.json', { files: [] });
+    createJsonFile(tree, 'tsconfig.base.json', { compilerOptions });
     createJsonFile(tree, 'tsconfig.common.json', { compilerOptions });
     createJsonFile(tree, 'src/tsconfig.json', { extends: './../tsconfig.json', compilerOptions });
-    createJsonFile(tree, 'src/tsconfig.tsc.json', { extends: './tsconfig.json', compilerOptions });
+    createJsonFile(tree, 'src/tsconfig.base.json', { extends: './../tsconfig.json', compilerOptions });
+    createJsonFile(tree, 'src/tsconfig.tsc.json', { extends: './tsconfig.base.json', compilerOptions });
     createJsonFile(tree, 'src/tsconfig.app.json', { extends: './../tsconfig.common.json', compilerOptions });
     createJsonFile(tree, 'src/tsconfig.spec.json', { extends: './../tsconfig.json', compilerOptions });
     createJsonFile(tree, 'src/tsconfig.worker.json', { extends: './../tsconfig.json', compilerOptions });
   });
 
-  it(`should rename 'tsconfig.json' to 'tsconfig.json'`, async () => {
+  it(`should rename 'tsconfig.base.json' to 'tsconfig.json'`, async () => {
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
-    expect(newTree.exists('tsconfig.json')).toBeTrue();
+    expect(readJsonFile(newTree, 'tsconfig.json')['compilerOptions']).toBeTruthy();
+    expect(newTree.exists('tsconfig.base.json')).toBeFalse();
   });
 
-  it(`should update extends from 'tsconfig.json' to 'tsconfig.json'`, async () => {
+  it(`should update extends from 'tsconfig.base.json' to 'tsconfig.json'`, async () => {
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
-    expect(readJsonFile(newTree, 'src/tsconfig.json').extends).toEqual('./../tsconfig.json');
     expect(readJsonFile(newTree, 'src/tsconfig.spec.json').extends).toEqual('./../tsconfig.json');
     expect(readJsonFile(newTree, 'src/tsconfig.worker.json').extends).toEqual('./../tsconfig.json');
   });
 
   it('should not update extends if not extended the root tsconfig', async () => {
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
-    expect(readJsonFile(newTree, 'src/tsconfig.tsc.json').extends).toEqual('./tsconfig.json');
-  });
-
-  it('should add project referenced to root level tsconfig', async () => {
-    const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
-
-    expect(readJsonFile(newTree, 'tsconfig.json')).toEqual({
-      files: [],
-      references: [
-        {
-          path: './src/tsconfig.app.json',
-        },
-        {
-          path: './src/tsconfig.worker.json',
-        },
-        {
-          path: './src/tsconfig.spec.json',
-        },
-      ],
-    });
+    expect(readJsonFile(newTree, 'src/tsconfig.tsc.json').extends).toEqual('./tsconfig.base.json');
   });
 
   it('should not error out when a JSON file is a blank', async () => {
@@ -125,10 +108,10 @@ describe('Migration to create "Solution Style" tsconfig', () => {
     const logs: string[] = [];
     schematicRunner.logger.subscribe(m => logs.push(m.message));
 
-    tree.create('src/invalid/error.json', '{ invalid }');
+    tree.create('src/invalid/error.json', `{ "extends": "./../../tsconfig.base.json", invalid }`);
     const newTree = await schematicRunner.runSchematicAsync(schematicName, {}, tree).toPromise();
 
-    expect(readJsonFile(newTree, 'src/tsconfig.tsc.json').extends).toEqual('./tsconfig.json');
-    expect(logs.join('\n')).toContain('Failed to parse "src/invalid/error.json" as JSON AST Object. Invalid JSON character');
+    expect(readJsonFile(newTree, 'src/tsconfig.spec.json').extends).toEqual('./../tsconfig.json');
+    expect(logs.join('\n')).toContain('Failed to parse "/src/invalid/error.json" as JSON AST Object. InvalidSymbol at location: 43.');
   });
 });
