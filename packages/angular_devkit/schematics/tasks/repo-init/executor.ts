@@ -20,7 +20,7 @@ export default function(
 ): TaskExecutor<RepositoryInitializerTaskOptions> {
   const rootDirectory = factoryOptions.rootDirectory || process.cwd();
 
-  return async (options: RepositoryInitializerTaskOptions, context: SchematicContext) => {
+  return async (options: RepositoryInitializerTaskOptions = {}, context: SchematicContext) => {
     const authorName = options.authorName;
     const authorEmail = options.authorEmail;
 

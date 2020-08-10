@@ -81,7 +81,7 @@ function _listAllFiles(root: string): string[] {
 
 
 export default function (): TaskExecutor<TslintFixTaskOptions> {
-  return async (options: TslintFixTaskOptions, context: SchematicContext) => {
+  return async (options: TslintFixTaskOptions = {}, context: SchematicContext) => {
     const root = process.cwd();
     const tslint = await import('tslint'); // tslint:disable-line:no-implicit-dependencies
 

@@ -67,7 +67,7 @@ export default function(
 
   const rootDirectory = factoryOptions.rootDirectory || process.cwd();
 
-  return (options: NodePackageTaskOptions) => {
+  return (options: NodePackageTaskOptions = { command: 'install' }) => {
     let taskPackageManagerProfile = packageManagerProfile;
     let taskPackageManagerName = packageManagerName;
     if (factoryOptions.allowPackageManagerOverride && options.packageManager) {

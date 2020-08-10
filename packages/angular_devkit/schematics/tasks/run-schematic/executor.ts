@@ -10,7 +10,13 @@ import { RunSchematicTaskOptions } from './options';
 
 
 export default function(): TaskExecutor<RunSchematicTaskOptions<{}>> {
-  return (options: RunSchematicTaskOptions<{}>, context: SchematicContext) => {
+  return (options: RunSchematicTaskOptions<{}> | undefined, context: SchematicContext) => {
+    if (!options?.name) {
+      throw new Error(
+        'RunSchematicTask requires an options object with a non-empty name property.',
+      );
+    }
+
     const maybeWorkflow = context.engine.workflow;
     const collection = options.collection || context.schematic.collection.description.name;
 
