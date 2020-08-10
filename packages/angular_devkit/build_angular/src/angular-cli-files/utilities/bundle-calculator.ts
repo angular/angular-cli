@@ -415,6 +415,6 @@ function mergeDifferentialBuildSizes(buildSizes: Size[], mergeLabel: string): Si
 }
 
 /** Returns whether or not all items in the list are equivalent to each other. */
-function allEquivalent(items: number[] | string[]): boolean {
-  return new Set([...items]).size < 2;
+function allEquivalent<T>(items: Iterable<T>): boolean {
+  return new Set(items).size < 2;
 }
