@@ -119,7 +119,8 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
       collection: FileSystemCollectionDesc,
       desc: Partial<FileSystemSchematicDesc>): FileSystemSchematicDesc;
 
-  private _transforms: OptionTransform<{}, {}>[] = [];
+  // tslint:disable-next-line:no-any
+  private _transforms: OptionTransform<any, any>[] = [];
   private _contextTransforms: ContextTransform[] = [];
   private _taskFactories = new Map<string, () => Observable<TaskExecutor>>();
 
@@ -274,10 +275,16 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
     switch (url.protocol) {
       case null:
       case 'file:':
-        return (context: FileSystemSchematicContext) => {
+        return (context) => {
+          // Check if context has necessary FileSystemSchematicContext path property
+          const fileDescription = context.schematic.description as { path?: string };
+          if (fileDescription.path === undefined) {
+            throw new Error('Unsupported schematic context. Expected a FileSystemSchematicContext.');
+          }
+
           // Resolve all file:///a/b/c/d from the schematic's own path, and not the current
           // path.
-          const root = normalize(resolve(context.schematic.description.path, url.path || ''));
+          const root = normalize(resolve(fileDescription.path, url.path || ''));
 
           return new HostCreateTree(new virtualFs.ScopedHost(new NodeJsSyncHost(), root));
         };
