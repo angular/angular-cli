@@ -90,11 +90,6 @@
       "factory": "./update-10/update-libraries-tslib",
       "description": "Update library projects to use tslib version 2 as a direct dependency. Read more about this here: https://v10.angular.io/guide/migration-update-libraries-tslib"
     },
-    "solution-style-tsconfig": {
-      "version": "10.0.0-beta.7",
-      "factory": "./update-10/solution-style-tsconfig",
-      "description": "Add \"Solution Style\" TypeScript configuration file support. This improves developer experience using editors powered by TypeScript’s language server. Read more about this here: https://v10.angular.io/guide/migration-solution-style-tsconfig"
-    },
     "update-workspace-dependencies": {
       "version": "10.0.0-rc.2",
       "factory": "./update-10/update-dependencies",
@@ -104,6 +99,11 @@
       "version": "10.0.1",
       "factory": "./update-10/update-module-and-target-compiler-options",
       "description": "Update 'module' and 'target' TypeScript compiler options. Read more about this here: https://v10.angular.io/guide/migration-update-module-and-target-compiler-options"
+    },
+    "remove-solution-style-tsconfig": {
+      "version": "10.1.0-next.5",
+      "factory": "./update-10/remove-solution-style-tsconfig",
+      "description": "Removing \"Solution Style\" TypeScript configuration file support."
     }
   }
 }
