@@ -8,6 +8,7 @@
 import { Architect } from '@angular-devkit/architect';
 import { BrowserBuilderOutput } from '@angular-devkit/build-angular';
 import { join, normalize, relative, virtualFs } from '@angular-devkit/core';
+import { Observable } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 import { createArchitect, host } from '../../test-utils';
 
@@ -91,8 +92,8 @@ describe('Browser Builder allow js', () => {
     let buildCount = 1;
     const run = await architect.scheduleTarget(targetSpec, overrides);
 
-    await run.output.pipe(
-      tap((output: BrowserBuilderOutput) => {
+    await (run.output as Observable<BrowserBuilderOutput>).pipe(
+      tap(output => {
         const path = relative(host.root(), join(normalize(output.outputPath), 'main.js'));
         const content = virtualFs.fileBufferToString(
           host.scopedSync().read(path),
