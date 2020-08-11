@@ -42,17 +42,14 @@ export default async function(options: { testing?: boolean; cliArgs: string[] })
   });
 
   // Redirect console to logger
-  console.log = function() {
-    logger.info(format.apply(null, arguments));
+  console.info = console.log = function(...args) {
+    logger.info(format(...args));
   };
-  console.info = function() {
-    logger.info(format.apply(null, arguments));
+  console.warn = function(...args) {
+    logger.warn(format(...args));
   };
-  console.warn = function() {
-    logger.warn(format.apply(null, arguments));
-  };
-  console.error = function() {
-    logger.error(format.apply(null, arguments));
+  console.error = function(...args) {
+    logger.error(format(...args));
   };
 
   let projectDetails = getWorkspaceDetails();

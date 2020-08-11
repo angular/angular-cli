@@ -115,7 +115,7 @@ function getValueFromPath<T extends JsonArray | JsonObject>(
   const fragments = parseJsonPath(path);
 
   try {
-    return fragments.reduce((value: JsonValue, current: string | number) => {
+    return fragments.reduce((value: JsonValue | undefined, current: string | number) => {
       if (value == undefined || typeof value != 'object') {
         return undefined;
       } else if (typeof current == 'string' && !Array.isArray(value)) {
@@ -139,7 +139,7 @@ function setValueFromPath<T extends JsonArray | JsonObject>(
   const fragments = parseJsonPath(path);
 
   try {
-    return fragments.reduce((value: JsonValue, current: string | number, index: number) => {
+    return fragments.reduce((value: JsonValue | undefined, current: string | number, index: number) => {
       if (value == undefined || typeof value != 'object') {
         return undefined;
       } else if (typeof current == 'string' && !Array.isArray(value)) {
