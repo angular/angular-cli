@@ -113,6 +113,7 @@
     "@types/node": "10.12.30",
     "@types/node-fetch": "^2.1.6",
     "@types/npm-package-arg": "^6.1.0",
+    "@types/pidusage": "^2.0.1",
     "@types/progress": "^2.0.3",
     "@types/request": "^2.47.1",
     "@types/rimraf": "^3.0.0",
