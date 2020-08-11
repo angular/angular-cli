@@ -241,7 +241,7 @@ export class NgBuildAnalyticsPlugin {
    * Reports a succeed module.
    * @private
    */
-  protected _succeedModule(mod: Module) {
+  protected _succeedModule(mod: compilation.Module) {
     // Only report NormalModule instances.
     if (mod.constructor !== NormalModule) {
       return;
