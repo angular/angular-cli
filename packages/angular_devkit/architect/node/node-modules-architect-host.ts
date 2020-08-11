@@ -129,7 +129,7 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
 
     const projectDefinition = this._workspace.projects.get(projectName);
     if (!projectDefinition) {
-      throw new Error('Project does not exist.');
+      throw new Error(`Project "${projectName}" does not exist.`);
     }
 
     const metadata = ({
@@ -154,7 +154,7 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
   private findProjectTarget(target: Target) {
     const projectDefinition = this._workspace.projects.get(target.project);
     if (!projectDefinition) {
-      throw new Error('Project does not exist.');
+      throw new Error(`Project "${target.project}" does not exist.`);
     }
 
     return projectDefinition.targets.get(target.target);
