@@ -32,7 +32,7 @@
     "file-loader": "6.0.0",
     "find-cache-dir": "3.3.1",
     "glob": "7.1.6",
-    "jest-worker": "26.2.1",
+    "jest-worker": "26.3.0",
     "karma-source-map-support": "1.4.0",
     "less-loader": "6.2.0",
     "license-webpack-plugin": "2.3.0",
