@@ -114,7 +114,8 @@ function calculateSizes(
   }
 
   type NonComponentStyleBudgetTypes = Exclude<Budget['type'], Type.AnyComponentStyle>;
-  const calculatorMap: Record<NonComponentStyleBudgetTypes, { new(...args: unknown[]): Calculator }> = {
+  type CalculatorTypes = { new(budget: Budget, chunks: Chunk[], assets: Asset[], processResults: ProcessBundleResult[]): Calculator };
+  const calculatorMap: Record<NonComponentStyleBudgetTypes, CalculatorTypes> = {
     all: AllCalculator,
     allScript: AllScriptCalculator,
     any: AnyCalculator,
