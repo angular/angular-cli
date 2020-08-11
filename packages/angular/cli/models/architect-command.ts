@@ -26,10 +26,10 @@ export interface ArchitectCommandOptions extends BaseCommandOptions {
 export abstract class ArchitectCommand<
   T extends ArchitectCommandOptions = ArchitectCommandOptions
 > extends Command<T> {
-  protected _architect: Architect;
-  protected _architectHost: WorkspaceNodeModulesArchitectHost;
-  protected _workspace: workspaces.WorkspaceDefinition;
-  protected _registry: json.schema.SchemaRegistry;
+  protected _architect!: Architect;
+  protected _architectHost!: WorkspaceNodeModulesArchitectHost;
+  protected _workspace!: workspaces.WorkspaceDefinition;
+  protected _registry!: json.schema.SchemaRegistry;
 
   // If this command supports running multiple targets.
   protected multiTarget = false;

@@ -75,8 +75,8 @@ export abstract class SchematicCommand<
 > extends Command<T> {
   readonly allowPrivateSchematics: boolean = false;
   private _host = new NodeJsSyncHost();
-  private _workspace: workspaces.WorkspaceDefinition;
-  protected _workflow: NodeWorkflow;
+  private _workspace: workspaces.WorkspaceDefinition | undefined;
+  protected _workflow!: NodeWorkflow;
 
   protected defaultCollectionName = '@schematics/angular';
   protected collectionName = this.defaultCollectionName;

@@ -55,9 +55,8 @@ const disableVersionCheck =
 
 export class UpdateCommand extends Command<UpdateCommandSchema> {
   public readonly allowMissingWorkspace = true;
-
-  private workflow: NodeWorkflow;
-  private packageManager: PackageManager;
+  private workflow!: NodeWorkflow;
+  private packageManager = PackageManager.Npm;
 
   async initialize() {
     this.packageManager = await getPackageManager(this.workspace.root);

@@ -12,7 +12,6 @@ import { Schema as Xi18nCommandSchema } from './xi18n';
 
 export class Xi18nCommand extends ArchitectCommand<Xi18nCommandSchema> {
   public readonly target = 'extract-i18n';
-  public readonly multiTarget: true;
 
   public async run(options: Xi18nCommandSchema & Arguments) {
     const version = process.version.substr(1).split('.');
