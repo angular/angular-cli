@@ -41,7 +41,7 @@ export function runBenchmark({
   let aggregatedMetricGroups: MetricGroup[] = [];
 
   // Run the process and captures, wait for both to finish, and average out the metrics.
-  return new Observable(obs => {
+  return new Observable<[LocalMonitoredProcess, ...Observable<MetricGroup>[]]>(obs => {
     const monitoredProcess = new LocalMonitoredProcess(command);
     const metric$ = captures.map(capture => capture(monitoredProcess.stats$));
     obs.next([monitoredProcess, ...metric$]);

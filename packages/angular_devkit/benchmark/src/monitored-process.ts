@@ -6,14 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { SpawnOptions, spawn } from 'child_process';
+import * as pidusage from 'pidusage';
 import { Observable, Subject, from, timer } from 'rxjs';
 import { concatMap, map, onErrorResumeNext, tap } from 'rxjs/operators';
 import { Command } from './command';
 import { AggregatedProcessStats, MonitoredProcess } from './interfaces';
-const pidusage = require('pidusage');
+
 const pidtree = require('pidtree');
 const treeKill = require('tree-kill');
-
 
 // Cleanup when the parent process exits.
 const defaultProcessExitCb = () => { };
@@ -28,10 +28,11 @@ export class LocalMonitoredProcess implements MonitoredProcess {
   private stdout = new Subject<Buffer>();
   private stderr = new Subject<Buffer>();
   private pollingRate = 100;
+  private elapsedTimer = 0;
+
   stats$: Observable<AggregatedProcessStats> = this.stats.asObservable();
   stdout$: Observable<Buffer> = this.stdout.asObservable();
   stderr$: Observable<Buffer> = this.stderr.asObservable();
-  private elapsedTimer: number;
 
   constructor(
     private command: Command,
@@ -52,24 +53,27 @@ export class LocalMonitoredProcess implements MonitoredProcess {
       // Emit output and stats.
       childProcess.stdout.on('data', (data: Buffer) => this.stdout.next(data));
       childProcess.stderr.on('data', (data: Buffer) => this.stderr.next(data));
+
       const statsSubs = timer(0, this.pollingRate).pipe(
-        concatMap(() => from(pidtree(childProcess.pid, { root: true }))),
+        concatMap(() => from(pidtree(childProcess.pid, { root: true }) as Promise<number[]>)),
         concatMap((pids: number[]) => from(pidusage(pids, { maxage: 5 * this.pollingRate }))),
-        map((statsByProcess: { [key: string]: AggregatedProcessStats }) => {
+        map(statsByProcess => {
           // Ignore the spawned shell in the total process number.
           const pids = Object.keys(statsByProcess)
             .filter(pid => pid != childProcess.pid.toString());
           const processes = pids.length;
           // We want most stats from the parent process.
           const { pid, ppid, ctime, elapsed, timestamp } = statsByProcess[childProcess.pid];
+
           // CPU and memory should be agreggated.
-          let cpu = 0, memory = 0;
+          let cpu = 0;
+          let memory = 0;
           for (const pid of pids) {
             cpu += statsByProcess[pid].cpu;
             memory += statsByProcess[pid].memory;
           }
 
-          return {
+          const stats: AggregatedProcessStats = {
             processes,
             cpu,
             memory,
@@ -78,7 +82,9 @@ export class LocalMonitoredProcess implements MonitoredProcess {
             ctime,
             elapsed: this.useProcessTime ? elapsed : (Date.now() - this.elapsedTimer),
             timestamp,
-          } as AggregatedProcessStats;
+          };
+
+          return stats;
         }),
         tap(stats => this.stats.next(stats)),
         onErrorResumeNext(),
