@@ -46,7 +46,11 @@ async function resolve(
   }
 }
 
-export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResourcesOptions) => {
+export default postcss.plugin('postcss-cli-resources', (options: PostcssCliResourcesOptions | undefined) => {
+  if (!options) {
+    throw new Error('No options were specified to "postcss-cli-resources".');
+  }
+
   const {
     deployUrl = '',
     baseHref = '',
