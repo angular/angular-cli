@@ -41,6 +41,10 @@
       "description": "Specifies the source language of the application.",
       "x-deprecated": "Use 'i18n' project level sub-option 'sourceLocale' instead."
     },
+    "ivy": {
+      "type": "boolean",
+      "description": "Use Ivy compiler to extract translations."
+    },
     "progress": {
       "type": "boolean",
       "description": "Log progress to the console.",

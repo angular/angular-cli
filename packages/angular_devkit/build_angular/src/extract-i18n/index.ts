@@ -12,7 +12,10 @@ import {
 } from '@angular-devkit/architect';
 import { BuildResult, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
 import { JsonObject } from '@angular-devkit/core';
+import type { ɵParsedMessage as LocalizeMessage } from '@angular/localize';
+import * as fs from 'fs';
 import * as path from 'path';
+import { gte as semverGte } from 'semver';
 import * as webpack from 'webpack';
 import {
   getAotConfig,
@@ -41,6 +44,32 @@ function getI18nOutfile(format: string | undefined) {
       return 'messages.xlf';
     default:
       throw new Error(`Unsupported format "${format}"`);
+  }
+}
+
+async function getSerializer(format: Format, sourceLocale: string, basePath: string, useLegacyIds = true) {
+  switch (format) {
+    case Format.Xmb:
+      const { XmbTranslationSerializer } =
+      await import('@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer');
+
+      // tslint:disable-next-line: no-any
+      return new XmbTranslationSerializer(basePath as any, useLegacyIds);
+    case Format.Xlf:
+    case Format.Xlif:
+    case Format.Xliff:
+      const { Xliff1TranslationSerializer } =
+        await import('@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer');
+
+      // tslint:disable-next-line: no-any
+      return new Xliff1TranslationSerializer(sourceLocale, basePath as any, useLegacyIds);
+    case Format.Xlf2:
+    case Format.Xliff2:
+      const { Xliff2TranslationSerializer } =
+        await import('@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer');
+
+      // tslint:disable-next-line: no-any
+      return new Xliff2TranslationSerializer(sourceLocale, basePath as any, useLegacyIds);
   }
 }
 
@@ -78,6 +107,9 @@ export async function execute(
     case Format.Xliff2:
       options.format = Format.Xlf2;
       break;
+    case undefined:
+      options.format = Format.Xlf;
+      break;
   }
 
   // We need to determine the outFile name so that AngularCompiler can retrieve it.
@@ -87,21 +119,24 @@ export async function execute(
     outFile = path.join(options.outputPath, outFile);
   }
 
-  const projectName = context.target && context.target.project;
-  if (!projectName) {
+  if (!context.target || !context.target.project) {
     throw new Error('The builder requires a target.');
   }
-  // target is verified in the above call
-  // tslint:disable-next-line: no-non-null-assertion
-  const metadata = await context.getProjectMetadata(context.target!);
+
+  const metadata = await context.getProjectMetadata(context.target);
   const i18n = createI18nOptions(metadata);
 
-  const { config } = await generateBrowserWebpackConfigFromContext(
+  let usingIvy = false;
+  const ivyMessages: LocalizeMessage[] = [];
+  const { config, projectRoot } = await generateBrowserWebpackConfigFromContext(
     {
       ...browserOptions,
       optimization: {
         scripts: false,
         styles: false,
+      },
+      sourceMap: {
+        scripts: true,
       },
       buildOptimizer: false,
       i18nLocale: options.i18nLocale || i18n.sourceLocale,
@@ -115,14 +150,69 @@ export async function execute(
       deleteOutputPath: false,
     },
     context,
-    wco => [
-      { plugins: [new InMemoryOutputPlugin()] },
-      getCommonConfig(wco),
-      getAotConfig(wco, true),
-      getStylesConfig(wco),
-      getStatsConfig(wco),
-    ],
+    (wco) => {
+      const isIvyApplication = wco.tsConfig.options.enableIvy !== false;
+
+      // Ivy-based extraction is currently opt-in
+      if (options.ivy) {
+        if (!isIvyApplication) {
+          context.logger.warn(
+            'Ivy extraction enabled but application is not Ivy enabled. Extraction may fail.',
+          );
+        }
+        usingIvy = true;
+      } else if (isIvyApplication) {
+        context.logger.warn(
+          'Ivy extraction not enabled but application is Ivy enabled. ' +
+          'If the extraction fails, the `--ivy` flag will enable Ivy extraction.',
+        );
+      }
+
+      const partials = [
+        { plugins: [new InMemoryOutputPlugin()] },
+        getCommonConfig(wco),
+        // Only use VE extraction if not using Ivy
+        getAotConfig(wco, !usingIvy),
+        getStylesConfig(wco),
+        getStatsConfig(wco),
+      ];
+
+      // Add Ivy application file extractor support
+      if (usingIvy) {
+        partials.unshift({
+          module: {
+            rules: [
+              {
+                test: /\.ts$/,
+                loader: require.resolve('./ivy-extract-loader'),
+                options: {
+                  messageHandler: (messages: LocalizeMessage[]) => ivyMessages.push(...messages),
+                },
+              },
+            ],
+          },
+        });
+      }
+
+      return partials;
+    },
   );
+
+  if (usingIvy) {
+    let validLocalizePackage = false;
+    try {
+      const { version: localizeVersion } = require('@angular/localize/package.json');
+      validLocalizePackage = semverGte(localizeVersion, '10.1.0-next.0', { includePrerelease: true });
+    } catch {}
+
+    if (!validLocalizePackage) {
+      context.logger.error(
+        "Ivy extraction requires the '@angular/localize' package version 10.1.0 or higher.",
+      );
+
+      return { success: false };
+    }
+  }
 
   const logging: WebpackLoggingCallback = (stats, config) => {
     const json = stats.toJson({ errors: true, warnings: true });
@@ -136,10 +226,39 @@ export async function execute(
     }
   };
 
-  return runWebpack(config, context, {
+  const webpackResult = await runWebpack(config, context, {
     logging,
     webpackFactory: await import('webpack'),
   }).toPromise();
+
+  // Complete if using VE
+  if (!usingIvy) {
+    return webpackResult;
+  }
+
+  // Nothing to process if the Webpack build failed
+  if (!webpackResult.success) {
+    return webpackResult;
+  }
+
+  // Serialize all extracted messages
+  const serializer = await getSerializer(
+    options.format,
+    i18n.sourceLocale,
+    config.context || projectRoot,
+  );
+  const content = serializer.serialize(ivyMessages);
+
+  // Ensure directory exists
+  const outputPath = path.dirname(outFile);
+  if (!fs.existsSync(outputPath)) {
+    fs.mkdirSync(outputPath, { recursive: true });
+  }
+
+  // Write translation file
+  fs.writeFileSync(outFile, content);
+
+  return webpackResult;
 }
 
 export default createBuilder<JsonObject & ExtractI18nBuilderOptions>(execute);
