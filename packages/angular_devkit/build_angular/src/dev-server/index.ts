@@ -562,11 +562,10 @@ function _addLiveReload(
     const showWarning = options.hmrWarning;
     if (showWarning) {
       logger.info(tags.stripIndents`
-          The project will still live reload when HMR is enabled,
-          but to take advantage of HMR additional application code is required'
-          (not included in an Angular CLI project by default).'
-          See ${webpackHmrLink}
-          for information on working with HMR for Webpack.`);
+          The project will still live reload when HMR is enabled, but to take full advantage of HMR
+          additional application code which is not included by default in an Angular CLI project is required.
+
+          See ${webpackHmrLink} for information on working with HMR for Webpack.`);
       logger.warn(
         tags.oneLine`To disable this warning use "hmrWarning: false" under "serve"
            options in "angular.json".`,
