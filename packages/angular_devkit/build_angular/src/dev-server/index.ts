@@ -22,6 +22,7 @@ import * as ts from 'typescript';
 import * as url from 'url';
 import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
+import { normalizeExtraEntryPoints } from '../angular-cli-files/models/webpack-configs/utils';
 import { IndexHtmlWebpackPlugin } from '../angular-cli-files/plugins/index-html-webpack-plugin';
 import { checkPort } from '../angular-cli-files/utilities/check-port';
 import { IndexHtmlTransform } from '../angular-cli-files/utilities/index-file/write-index-html';
@@ -175,7 +176,7 @@ export function serveWebpackBrowser(
 
       // Add live reload config.
       if (options.liveReload) {
-        _addLiveReload(options, browserOptions, webpackConfig, clientAddress, context.logger);
+        _addLiveReload(root, options, browserOptions, webpackConfig, clientAddress, context.logger);
       } else if (options.hmr) {
         context.logger.warn('Live reload is disabled. HMR option ignored.');
       }
@@ -493,6 +494,7 @@ export function buildServePath(
  * @private
  */
 function _addLiveReload(
+  root: string,
   options: DevServerBuilderOptions,
   browserOptions: BrowserBuilderSchema,
   webpackConfig: webpack.Configuration,
@@ -557,7 +559,6 @@ function _addLiveReload(
   const entryPoints = [`${webpackDevServerPath}?${url.format(clientAddress)}${sockjsPath}`];
   if (options.hmr) {
     const webpackHmrLink = 'https://webpack.js.org/guides/hot-module-replacement';
-
     logger.warn(tags.oneLine`NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.`);
 
     const showWarning = options.hmrWarning;
@@ -574,11 +575,15 @@ function _addLiveReload(
       );
     }
     entryPoints.push('webpack/hot/dev-server');
-    webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
-    if (browserOptions.extractCss) {
-      logger.warn(tags.oneLine`NOTICE: (HMR) does not allow for CSS hot reload
-                when used together with '--extract-css'.`);
+    if (browserOptions.styles?.length) {
+      // When HMR is enabled we need to add the css paths as part of the entrypoints
+      // because otherwise no JS bundle will contain the HMR accept code.
+      const normalizedStyles = normalizeExtraEntryPoints(browserOptions.styles, 'styles')
+        .map(style => path.resolve(root, style.input));
+      entryPoints.push(...normalizedStyles);
     }
+
+    webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
   }
   if (typeof webpackConfig.entry !== 'object' || Array.isArray(webpackConfig.entry)) {
     webpackConfig.entry = {};
