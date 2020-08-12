@@ -162,7 +162,7 @@ export class SimpleScheduler<
           argumentV: this._schemaRegistry.compile(description.argument).pipe(shareReplay(1)),
           inputV: this._schemaRegistry.compile(description.input).pipe(shareReplay(1)),
           outputV: this._schemaRegistry.compile(description.output).pipe(shareReplay(1)),
-        });
+        }) as JobHandlerWithExtra;
         this._internalJobDescriptionMap.set(name, handlerWithExtra);
 
         return of(handlerWithExtra);
@@ -419,7 +419,7 @@ export class SimpleScheduler<
 
     const output = outboundBus.pipe(
       filter(x => x.kind == JobOutboundMessageKind.Output),
-      map((x: JobOutboundMessageOutput<O>) => x.value),
+      map((x) => (x as JobOutboundMessageOutput<O>).value),
       shareReplay(1),
     );
 
@@ -444,7 +444,7 @@ export class SimpleScheduler<
         let maybeObservable = channels.get(name);
         if (!maybeObservable) {
           const s = new Subject<T>();
-          channelsSubject.set(name, s);
+          channelsSubject.set(name, s as unknown as Subject<JsonValue>);
           channels.set(name, s.asObservable());
 
           maybeObservable = s.asObservable();
@@ -535,7 +535,7 @@ export class SimpleScheduler<
 
               return handler(argument, context);
             }),
-          ).subscribe(subscriber);
+          ).subscribe(subscriber as Observer<JobOutboundMessage<JsonValue>>);
         })),
       ),
     );

@@ -33,7 +33,8 @@ describe('strategy.serialize()', () => {
           resolve(input.reduce((a, c) => a + c, 0));
         }, 10),
       );
-    })), {
+      // tslint:disable-next-line:no-any
+    }) as any), {
       argument: { items: { type: 'number' } },
       output: { type: 'number' },
       name: 'add',
@@ -82,7 +83,8 @@ describe('strategy.serialize()', () => {
           resolve(input.reduce((a, c) => a + c, 0));
         }, 10),
       );
-    })), {
+      // tslint:disable-next-line:no-any
+    }) as any), {
       argument: { items: { type: 'number' } },
       output: { type: 'number' },
       name: 'add',
@@ -96,7 +98,8 @@ describe('strategy.serialize()', () => {
           resolve(input.reduce((a, c) => a + c, 100));
         }, 10),
       );
-    })), {
+      // tslint:disable-next-line:no-any
+    }) as any), {
       argument: { items: { type: 'number' } },
       output: { type: 'number' },
       name: 'add100',
@@ -153,7 +156,8 @@ describe('strategy.reuse()', () => {
           resolve(input.reduce((a, c) => a + c, 0));
         }, 10),
       );
-    })), {
+      // tslint:disable-next-line:no-any
+    }) as any), {
       argument: { items: { type: 'number' } },
       output: { type: 'number' },
       name: 'add',
@@ -220,7 +224,8 @@ describe('strategy.memoize()', () => {
           resolve(input.reduce((a, c) => a + c, 0));
         }, 10),
       );
-    })), {
+      // tslint:disable-next-line:no-any
+    }) as any), {
       argument: { items: { type: 'number' } },
       output: { type: 'number' },
       name: 'add',

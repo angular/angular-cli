@@ -34,7 +34,7 @@ export class SimpleJobRegistry<
     I extends MinimumInputValueT = MinimumInputValueT,
     O extends MinimumOutputValueT = MinimumOutputValueT,
   >(name: JobName): Observable<JobHandler<A, I, O> | null> {
-    return of(this._jobNames.get(name) as (JobHandler<A, I, O> | null) || null);
+    return of(this._jobNames.get(name) as unknown as (JobHandler<A, I, O> | null) || null);
   }
 
   /**
@@ -132,7 +132,9 @@ export class SimpleJobRegistry<
       input,
     };
 
-    this._jobNames.set(name, Object.assign(handler.bind(undefined), { jobDescription }));
+    const jobHandler = Object.assign(handler.bind(undefined), { jobDescription }) as
+        unknown as JobHandler<MinimumArgumentValueT, MinimumInputValueT, MinimumOutputValueT>;
+    this._jobNames.set(name, jobHandler);
   }
 
   /**
