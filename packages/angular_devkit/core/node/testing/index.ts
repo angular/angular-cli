@@ -15,7 +15,7 @@ import { NodeJsSyncHost } from '../host';
  * A Sync Scoped Host that creates a temporary directory and scope to it.
  */
 export class TempScopedNodeJsSyncHost extends virtualFs.ScopedHost<fs.Stats> {
-  protected _sync: virtualFs.SyncDelegateHost<fs.Stats>;
+  protected _sync?: virtualFs.SyncDelegateHost<fs.Stats>;
   protected _root: Path;
 
   constructor() {
@@ -30,8 +30,8 @@ export class TempScopedNodeJsSyncHost extends virtualFs.ScopedHost<fs.Stats> {
     const sync = this.sync;
     function _visit(p: Path): Path[] {
       return sync.list(p)
-        .map((fragment: PathFragment) => join(p, fragment))
-        .reduce((files: Path[], path: PathFragment) => {
+        .map((fragment) => join(p, fragment))
+        .reduce((files, path) => {
           if (sync.isDirectory(path)) {
             return files.concat(_visit(path));
           } else {
