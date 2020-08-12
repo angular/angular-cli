@@ -47,6 +47,7 @@ export interface BuildOptions {
   bundleDependencies?: boolean;
   externalDependencies?: string[];
   watch?: boolean;
+  hmr?: boolean;
   outputHashing?: string;
   poll?: number;
   deleteOutputPath?: boolean;
