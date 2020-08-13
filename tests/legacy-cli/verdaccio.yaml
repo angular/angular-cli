@@ -1,13 +1,20 @@
 storage: ./storage
 
 auth:
-  htpasswd:
-    file: ./htpasswd
-    max_users: -1
+  auth-memory:
+    users: {}
 
 uplinks:
   npmjs:
     url: https://registry.npmjs.org/
+    cache: false
+    maxage: 20m
+    max_fails: 32
+    timeout: 60s
+    agent_options:
+      keepAlive: true
+      maxSockets: 32
+      maxFreeSockets: 8
 
 packages:
   '@angular/{cli,pwa}':
@@ -25,6 +32,10 @@ packages:
   '@schematics/{angular,schematics,update}':
     access: $all
     publish: $all
+
+  '@*/*':
+    access: $all
+    proxy: npmjs
 
   '**':
     access: $all
