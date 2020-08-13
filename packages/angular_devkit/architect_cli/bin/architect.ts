@@ -202,6 +202,9 @@ async function main(args: string[]): Promise<number> {
   const registry = new schema.CoreSchemaRegistry();
   registry.addPostTransform(schema.transforms.addUndefinedDefaults);
 
+  // Show usage of deprecated options
+  registry.useXDeprecatedProvider(msg => logger.warn(msg));
+
   const { workspace } = await workspaces.readWorkspace(
     configFilePath,
     workspaces.createWorkspaceHost(new NodeJsSyncHost()),

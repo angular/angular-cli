@@ -42,6 +42,7 @@ export abstract class ArchitectCommand<
 
     this._registry = new json.schema.CoreSchemaRegistry();
     this._registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
+    this._registry.useXDeprecatedProvider(msg => this.logger.warn(msg));
 
     const { workspace } = await workspaces.readWorkspace(
       this.workspace.root,
