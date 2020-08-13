@@ -28,6 +28,7 @@ interface WebpackModule extends compilation.Module {
 
 interface CommonJsRequireDependencyType {
   request: string;
+  module: WebpackModule | null;
 }
 
 export interface CommonJsUsageWarnPluginOptions {
@@ -74,7 +75,7 @@ export class CommonJsUsageWarnPlugin {
             // Check if it's parent issuer is also a CommonJS dependency.
             // In case it is skip as an warning will be show for the parent CommonJS dependency.
             const parentDependencies = issuer?.issuer?.dependencies;
-            if (parentDependencies && this.hasCommonJsDependencies(parentDependencies)) {
+            if (parentDependencies && this.hasCommonJsDependencies(parentDependencies, false, true)) {
               continue;
             }
 
@@ -104,9 +105,13 @@ export class CommonJsUsageWarnPlugin {
     });
   }
 
-  private hasCommonJsDependencies(dependencies: unknown[], checkForStylesAndTemplatesCJS = false): boolean {
+  private hasCommonJsDependencies(dependencies: unknown[], checkForStylesAndTemplatesCJS = false, parentDeps = false): boolean {
     for (const dep of dependencies) {
-      if (dep instanceof CommonJsRequireDependency) {
+      if (
+        dep instanceof CommonJsRequireDependency ||
+        // In case if a parent dep is imported as an ES6 module, but has CommonJS imports.
+        (parentDeps && (dep as CommonJsRequireDependencyType).module?.dependencies.some(d => d instanceof CommonJsRequireDependency))
+      ) {
         if (checkForStylesAndTemplatesCJS && STYLES_TEMPLATE_URL_REGEXP.test((dep as CommonJsRequireDependencyType).request)) {
           // Skip in case it's a template or stylesheet
           continue;
