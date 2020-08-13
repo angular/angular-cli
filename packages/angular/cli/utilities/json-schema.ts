@@ -248,11 +248,6 @@ export async function parseJsonSchemaToOptions(
     const visible = current.visible === undefined || current.visible === true;
     const hidden = !!current.hidden || !visible;
 
-    // Deprecated is set only if it's true or a string.
-    const xDeprecated = current['x-deprecated'];
-    const deprecated = (xDeprecated === true || typeof xDeprecated == 'string')
-      ? xDeprecated : undefined;
-
     const xUserAnalytics = current['x-user-analytics'];
     const userAnalytics = typeof xUserAnalytics == 'number' ? xUserAnalytics : undefined;
 
@@ -267,7 +262,6 @@ export async function parseJsonSchemaToOptions(
       ...format !== undefined ? { format } : {},
       hidden,
       ...userAnalytics ? { userAnalytics } : {},
-      ...deprecated !== undefined ? { deprecated } : {},
       ...positional !== undefined ? { positional } : {},
     };
 
