@@ -259,7 +259,6 @@ export async function main({
     parsedArgs[key] = argv2[key];
   }
 
-
   // Show usage of deprecated options
   workflow.registry.useXDeprecatedProvider(msg => logger.warn(msg));
 
