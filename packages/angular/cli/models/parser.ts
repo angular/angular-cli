@@ -199,11 +199,6 @@ function _assignOption(
         }
 
         parsedOptions[option.name] = v;
-
-        if (option.deprecated !== undefined && option.deprecated !== false) {
-          warnings.push(`Option ${JSON.stringify(option.name)} is deprecated${
-            typeof option.deprecated == 'string' ? ': ' + option.deprecated : '.'}`);
-        }
       }
     } else {
       let error = `Argument ${key} could not be parsed using value ${JSON.stringify(value)}.`;

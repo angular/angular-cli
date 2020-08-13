@@ -171,43 +171,6 @@ describe('parseArguments', () => {
     });
   });
 
-  it('handles deprecation', () => {
-    const options = [
-      { name: 'bool', aliases: [], type: OptionType.Boolean, description: '' },
-      { name: 'depr', aliases: [], type: OptionType.Boolean, description: '', deprecated: true },
-      { name: 'deprM', aliases: [], type: OptionType.Boolean, description: '', deprecated: 'ABCD' },
-    ];
-
-    const logger = new logging.Logger('');
-    const messages: string[] = [];
-
-    logger.subscribe(entry => messages.push(entry.message));
-
-    let result = parseArguments(['--bool'], options, logger);
-    expect(result).toEqual({ bool: true });
-    expect(messages).toEqual([]);
-
-    result = parseArguments(['--depr'], options, logger);
-    expect(result).toEqual({ depr: true });
-    expect(messages.length).toEqual(1);
-    expect(messages[0]).toMatch(/\bdepr\b/);
-    messages.shift();
-
-    result = parseArguments(['--depr', '--bool'], options, logger);
-    expect(result).toEqual({ depr: true, bool: true });
-    expect(messages.length).toEqual(1);
-    expect(messages[0]).toMatch(/\bdepr\b/);
-    messages.shift();
-
-    result = parseArguments(['--depr', '--bool', '--deprM'], options, logger);
-    expect(result).toEqual({ depr: true, deprM: true, bool: true });
-    expect(messages.length).toEqual(2);
-    expect(messages[0]).toMatch(/\bdepr\b/);
-    expect(messages[1]).toMatch(/\bdeprM\b/);
-    expect(messages[1]).toMatch(/\bABCD\b/);
-    messages.shift();
-  });
-
   it('handles a flag being added multiple times', () => {
     const options = [
       { name: 'bool', aliases: [], type: OptionType.Boolean, description: '' },

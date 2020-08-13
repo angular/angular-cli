@@ -317,6 +317,7 @@ export abstract class SchematicCommand<
     workflow.engineHost.registerOptionsTransform(validateOptionsWithSchema(workflow.registry));
 
     workflow.registry.addSmartDefaultProvider('projectName', getProjectName);
+    workflow.registry.useXDeprecatedProvider(msg => this.logger.warn(msg));
 
     if (options.interactive !== false && isTTY()) {
       workflow.registry.usePromptProvider((definitions: Array<schema.PromptDefinition>) => {
