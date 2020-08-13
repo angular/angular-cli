@@ -817,17 +817,17 @@
             "i18nFile": {
               "type": "string",
               "description": "Localization file to use for i18n.",
-              "x-deprecated": "Deprecated since 9.0"
+              "x-deprecated": "Deprecated since 9.0."
             },
             "i18nFormat": {
               "type": "string",
               "description": "Format of the localization file specified with --i18n-file.",
-              "x-deprecated": "Deprecated since 9.0"
+              "x-deprecated": "Deprecated since 9.0."
             },
             "i18nLocale": {
               "type": "string",
               "description": "Locale to use for i18n.",
-              "x-deprecated": "Deprecated since 9.0"
+              "x-deprecated": "Deprecated since 9.0."
             },
             "extractCss": {
               "type": "boolean",
