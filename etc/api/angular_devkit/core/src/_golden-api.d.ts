@@ -226,6 +226,7 @@ export declare class CoreSchemaRegistry implements SchemaRegistry {
     flatten(schema: JsonObject): Observable<JsonObject>;
     registerUriHandler(handler: UriHandler): void;
     usePromptProvider(provider: PromptProvider): void;
+    useXDeprecatedProvider(onUsage: (message: string) => void): void;
 }
 
 export declare function createWorkspaceHost(host: virtualFs.Host): WorkspaceHost;
@@ -904,6 +905,7 @@ export interface SchemaRegistry {
     compile(schema: Object): Observable<SchemaValidator>;
     flatten(schema: JsonObject | string): Observable<JsonObject>;
     usePromptProvider(provider: PromptProvider): void;
+    useXDeprecatedProvider(onUsage: (message: string) => void): void;
 }
 
 export declare class SchemaValidationException extends BaseException {
