@@ -12651,6 +12651,13 @@ verdaccio-audit@9.7.3:
     express "4.17.1"
     request "2.88.2"
 
+verdaccio-auth-memory@^9.7.2:
+  version "9.7.2"
+  resolved "https://registry.yarnpkg.com/verdaccio-auth-memory/-/verdaccio-auth-memory-9.7.2.tgz#e95ef1f64df9a0a30bcf727eb8f704c4033c945c"
+  integrity sha512-pxFGUk91kAJPrmjRIzHRn/cnLmyuN925nA1iH2Bf6kdP9E0uEGK/pRjMh8BuXWFLsGe9E6N7HR86cub1/qcrzA==
+  dependencies:
+    "@verdaccio/commons-api" "^9.7.1"
+
 verdaccio-htpasswd@9.7.2:
   version "9.7.2"
   resolved "https://registry.yarnpkg.com/verdaccio-htpasswd/-/verdaccio-htpasswd-9.7.2.tgz#ba14a29b65658b3f4c7e2042c3fcf20e697401a6"
