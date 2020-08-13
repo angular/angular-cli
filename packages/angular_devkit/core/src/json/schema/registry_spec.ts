@@ -481,4 +481,35 @@ describe('CoreSchemaRegistry', () => {
       .toPromise().then(done, done.fail);
   });
 
+  it('adds deprecated options usage', done => {
+    const registry = new CoreSchemaRegistry();
+    const deprecatedMessages: string[] = [];
+    registry.useXDeprecatedProvider(m => deprecatedMessages.push(m));
+
+    const data = {
+      foo: true,
+      bar: true,
+      bat: true,
+    };
+
+    registry
+      .compile({
+        properties: {
+          foo: { type: 'boolean', 'x-deprecated': 'Use bar instead.' },
+          bar: { type: 'boolean', 'x-deprecated': true },
+          buz: { type: 'boolean', 'x-deprecated': true },
+          bat: { type: 'boolean', 'x-deprecated': false },
+        },
+      })
+      .pipe(
+        mergeMap(validator => validator(data)),
+        map(result => {
+          expect(deprecatedMessages.length).toBe(2);
+          expect(deprecatedMessages[0]).toBe('Option "foo" is deprecated: Use bar instead.');
+          expect(deprecatedMessages[1]).toBe('Option "bar" is deprecated.');
+          expect(result.success).toBe(true, result.errors);
+        }),
+      )
+      .toPromise().then(done, done.fail);
+});
 });

@@ -259,6 +259,10 @@ export async function main({
     parsedArgs[key] = argv2[key];
   }
 
+
+  // Show usage of deprecated options
+  workflow.registry.useXDeprecatedProvider(msg => logger.warn(msg));
+
   // Pass the rest of the arguments as the smart default "argv". Then delete it.
   workflow.registry.addSmartDefaultProvider('argv', (schema: JsonObject) => {
     if ('index' in schema) {
