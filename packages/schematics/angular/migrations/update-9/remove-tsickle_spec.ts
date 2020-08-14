@@ -8,6 +8,7 @@
 
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { Builders } from '../../utility/workspace-models';
 
 // tslint:disable:no-big-function
 describe('Migration to version 9', () => {
@@ -43,6 +44,8 @@ describe('Migration to version 9', () => {
           tree,
         )
         .toPromise();
+
+      tree.overwrite('/angular.json', tree.readContent('/angular.json').replace(Builders.NgPackagr, Builders.DeprecatedNgPackagr));
     });
 
     it(`should remove 'annotateForClosureCompiler' from library tsconfig`, async () => {

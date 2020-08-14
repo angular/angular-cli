@@ -107,7 +107,7 @@ export default function (): Rule {
             break;
           case Builders.Karma:
           case Builders.Browser:
-          case Builders.NgPackagr:
+          case Builders.DeprecatedNgPackagr:
             uniqueTsConfigs.forEach(p => {
               try {
                 updateModuleAndTarget(host, p, {

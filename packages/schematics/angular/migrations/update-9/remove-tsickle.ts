@@ -20,7 +20,7 @@ export function removeTsickle(): Rule {
     const logger = context.logger;
     const workspace = getWorkspace(tree);
 
-    for (const { target } of getTargets(workspace, 'build', Builders.NgPackagr)) {
+    for (const { target } of getTargets(workspace, 'build', Builders.DeprecatedNgPackagr)) {
       for (const options of getAllOptions(target)) {
         const tsConfigOption = findPropertyInAstObject(options, 'tsConfig');
         if (!tsConfigOption || tsConfigOption.kind !== 'string') {

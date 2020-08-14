@@ -31,7 +31,7 @@ export function updateLibraries(): Rule {
     const workspace = getWorkspace(tree);
 
     const recorder = tree.beginUpdate(workspacePath);
-    for (const { target, project } of getTargets(workspace, 'build', Builders.NgPackagr)) {
+    for (const { target, project } of getTargets(workspace, 'build', Builders.DeprecatedNgPackagr)) {
       const projectRoot = findPropertyInAstObject(project, 'root');
       if (!projectRoot || projectRoot.kind !== 'string') {
         break;
