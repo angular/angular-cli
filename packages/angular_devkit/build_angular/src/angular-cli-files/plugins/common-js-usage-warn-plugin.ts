@@ -20,12 +20,10 @@ const STYLES_TEMPLATE_URL_REGEXP = /\.(html|svg|css|sass|less|styl|scss)$/;
 interface WebpackModule extends compilation.Module {
   name?: string;
   rawRequest?: string;
-  dependencies: unknown[];
+  dependencies: WebpackModule[];
   issuer: WebpackModule | null;
+  module: WebpackModule | null;
   userRequest?: string;
-}
-
-interface CommonJsRequireDependencyType {
   request: string;
 }
 
@@ -58,22 +56,22 @@ export class CommonJsUsageWarnPlugin {
             this.allowedDepedencies.has(this.rawRequestToPackageName(rawRequest)) ||
             rawRequest.startsWith('@angular/common/locales/')
           ) {
-          /**
-           * Skip when:
-           * - module is absolute or relative.
-           * - module is allowed even if it's a CommonJS.
-           * - module is a locale imported from '@angular/common'.
-           */
+            /**
+             * Skip when:
+             * - module is absolute or relative.
+             * - module is allowed even if it's a CommonJS.
+             * - module is a locale imported from '@angular/common'.
+             */
             continue;
           }
 
-          if (this.hasCommonJsDependencies(dependencies, true)) {
+          if (this.hasCommonJsDependencies(dependencies)) {
             // Dependency is CommonsJS or AMD.
 
             // Check if it's parent issuer is also a CommonJS dependency.
             // In case it is skip as an warning will be show for the parent CommonJS dependency.
             const parentDependencies = issuer?.issuer?.dependencies;
-            if (parentDependencies && this.hasCommonJsDependencies(parentDependencies)) {
+            if (parentDependencies && this.hasCommonJsDependencies(parentDependencies, true)) {
               continue;
             }
 
@@ -103,10 +101,10 @@ export class CommonJsUsageWarnPlugin {
     });
   }
 
-  private hasCommonJsDependencies(dependencies: unknown[], checkForStylesAndTemplatesCJS = false): boolean {
+  private hasCommonJsDependencies(dependencies: WebpackModule[], checkParentModules = false): boolean {
     for (const dep of dependencies) {
       if (dep instanceof CommonJsRequireDependency) {
-        if (checkForStylesAndTemplatesCJS && STYLES_TEMPLATE_URL_REGEXP.test((dep as CommonJsRequireDependencyType).request)) {
+        if (STYLES_TEMPLATE_URL_REGEXP.test(dep.request)) {
           // Skip in case it's a template or stylesheet
           continue;
         }
@@ -115,6 +113,10 @@ export class CommonJsUsageWarnPlugin {
       }
 
       if (dep instanceof AMDDefineDependency) {
+        return true;
+      }
+
+      if (checkParentModules && dep.module && this.hasCommonJsDependencies(dep.module.dependencies)) {
         return true;
       }
     }
