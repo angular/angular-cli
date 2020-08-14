@@ -75,10 +75,14 @@
   },
   "peerDependencies": {
     "@angular/compiler-cli": ">=10.1.0-next.0 < 11",
+    "ng-packagr": "^10.0.0",
     "typescript": ">=3.9 < 3.10"
   },
   "peerDependenciesMeta": {
     "@angular/localize": {
+      "optional": true
+    },
+    "ng-packagr": {
       "optional": true
     }
   }

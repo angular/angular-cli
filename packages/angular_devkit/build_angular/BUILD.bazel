@@ -56,6 +56,11 @@ ts_json_schema(
     src = "src/tslint/schema.json",
 )
 
+ts_json_schema(
+    name = "ng_packagr_schema",
+    src = "src/ng-packagr/schema.json",
+)
+
 ts_library(
     name = "build_angular",
     srcs = glob(
@@ -77,6 +82,7 @@ ts_library(
         "//packages/angular_devkit/build_angular:src/protractor/schema.ts",
         "//packages/angular_devkit/build_angular:src/server/schema.ts",
         "//packages/angular_devkit/build_angular:src/tslint/schema.ts",
+        "//packages/angular_devkit/build_angular:src/ng-packagr/schema.ts",
     ],
     data = glob(
         include = [
@@ -145,6 +151,7 @@ ts_library(
         "@npm//loader-utils",
         "@npm//mini-css-extract-plugin",
         "@npm//minimatch",
+        "@npm//ng-packagr",
         "@npm//open",
         "@npm//parse5",
         "@npm//parse5-htmlparser2-tree-adapter",
@@ -302,6 +309,7 @@ LARGE_SPECS = {
             "@npm//@angular/platform-server",
         ],
     },
+    "ng-packagr": {},
     "browser": {
         "shards": 50,
         "size": "large",
