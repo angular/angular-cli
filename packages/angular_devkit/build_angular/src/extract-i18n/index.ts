@@ -20,7 +20,7 @@ import {
   getStatsConfig,
   getStylesConfig,
 } from '../angular-cli-files/models/webpack-configs';
-import { statsErrorsToString, statsWarningsToString } from '../angular-cli-files/utilities/stats';
+import { statsErrorsToString, statsHasErrors, statsHasWarnings, statsWarningsToString } from '../angular-cli-files/utilities/stats';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
 import { createI18nOptions } from '../utils/i18n-options';
 import { assertCompatibleAngularVersion } from '../utils/version';
@@ -127,11 +127,11 @@ export async function execute(
   const logging: WebpackLoggingCallback = (stats, config) => {
     const json = stats.toJson({ errors: true, warnings: true });
 
-    if (stats.hasWarnings()) {
+    if (statsHasWarnings(json)) {
       context.logger.warn(statsWarningsToString(json, config.stats));
     }
 
-    if (stats.hasErrors()) {
+    if (statsHasErrors(json)) {
       context.logger.error(statsErrorsToString(json, config.stats));
     }
   };
