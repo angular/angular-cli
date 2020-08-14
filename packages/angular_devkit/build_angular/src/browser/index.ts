@@ -101,10 +101,10 @@ export function createBrowserLoggingCallback(
       logger.info(statsToString(json, config.stats));
     }
 
-    if (stats.hasWarnings()) {
+    if (statsHasWarnings(json)) {
       logger.warn(statsWarningsToString(json, config.stats));
     }
-    if (stats.hasErrors()) {
+    if (statsHasErrors(json)) {
       logger.error(statsErrorsToString(json, config.stats));
     }
   };

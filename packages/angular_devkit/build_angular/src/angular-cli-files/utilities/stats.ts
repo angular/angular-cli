@@ -87,10 +87,11 @@ export function statsToString(json: any, statsConfig: any) {
 }
 
 // TODO(#16193): Don't emit this warning in the first place rather than just suppressing it.
-const ERRONEOUS_WARNINGS = [
+const ERRONEOUS_WARNINGS_FILTER = (warning: string) => ![
   /multiple assets emit different content.*3rdpartylicenses\.txt/i,
-];
-export function statsWarningsToString(json: any, statsConfig: any) {
+].some(msg => msg.test(warning));
+
+export function statsWarningsToString(json: any, statsConfig: any): string {
   const colors = statsConfig.colors;
   const rs = (x: string) => colors ? reset(x) : x;
   const y = (x: string) => colors ? bold(yellow(x)) : x;
@@ -104,12 +105,12 @@ export function statsWarningsToString(json: any, statsConfig: any) {
 
   return rs('\n' + warnings
     .map((warning: any) => `${warning}`)
-    .filter((warning: string) => !ERRONEOUS_WARNINGS.some((erroneous) => erroneous.test(warning)))
+    .filter(ERRONEOUS_WARNINGS_FILTER)
     .map((warning: string) => y(`WARNING in ${warning}`))
     .join('\n\n'));
 }
 
-export function statsErrorsToString(json: any, statsConfig: any) {
+export function statsErrorsToString(json: any, statsConfig: any): string {
   const colors = statsConfig.colors;
   const rs = (x: string) => colors ? reset(x) : x;
   const r = (x: string) => colors ? bold(red(x)) : x;
@@ -120,6 +121,7 @@ export function statsErrorsToString(json: any, statsConfig: any) {
       .reduce((a: string[], b: string[]) => [...a, ...b], [])
     );
   }
+
   return rs('\n' + errors
     .map((error: any) => r(`ERROR in ${error}`))
     .join('\n\n')
@@ -127,9 +129,10 @@ export function statsErrorsToString(json: any, statsConfig: any) {
 }
 
 export function statsHasErrors(json: any): boolean {
-  return json.errors.length > 0 || !!json.children?.some((c: any) => c.errors.length);
+  return json.errors.length || !!json.children?.some((c: any) => c.errors.length);
 }
 
 export function statsHasWarnings(json: any): boolean {
-  return json.warnings.length > 0 || !!json.children?.some((c: any) => c.warnings.length);
+  return json.warnings.filter(ERRONEOUS_WARNINGS_FILTER).length ||
+    !!json.children?.some((c: any) => c.warnings.filter(ERRONEOUS_WARNINGS_FILTER).length);
 }
