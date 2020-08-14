@@ -8,7 +8,7 @@
 
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import { WorkspaceTargets } from '../../utility/workspace-models';
+import { Builders, WorkspaceTargets } from '../../utility/workspace-models';
 
 // tslint:disable-next-line: no-any
 function getWorkspaceTargets(tree: UnitTestTree): any {
@@ -61,6 +61,7 @@ describe('Migration to version 9', () => {
         )
         .toPromise();
 
+      tree.overwrite('/angular.json', tree.readContent('/angular.json').replace(Builders.NgPackagr, Builders.DeprecatedNgPackagr));
       tree.delete(libProdTsConfig);
     });
 

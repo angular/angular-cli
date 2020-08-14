@@ -167,8 +167,6 @@ describe('Library Schematic', () => {
 
       const packageJson = getJsonFileContent(tree, 'package.json');
       expect(packageJson.devDependencies['ng-packagr']).toEqual(latestVersions.ngPackagr);
-      expect(packageJson.devDependencies['@angular-devkit/build-ng-packagr'])
-        .toEqual(latestVersions.DevkitBuildNgPackagr);
     });
 
     it('should use the latest known versions in package.json', async () => {
@@ -327,5 +325,13 @@ describe('Library Schematic', () => {
 
     const workspace = JSON.parse(tree.readContent('/angular.json'));
     expect(workspace.projects.foo.architect.build.configurations.production).toBeDefined();
+  });
+
+  it(`should add 'ng-packagr' builder`, async () => {
+    const tree = await schematicRunner.runSchematicAsync('library', defaultOptions, workspaceTree)
+      .toPromise();
+
+    const workspace = JSON.parse(tree.readContent('/angular.json'));
+    expect(workspace.projects.foo.architect.build.builder).toBe('@angular-devkit/build-angular:ng-packagr');
   });
 });
