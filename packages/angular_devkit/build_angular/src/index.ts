@@ -58,3 +58,8 @@ export {
   ServerBuilderOptions,
   ServerBuilderOutput,
 } from './server';
+
+export {
+  execute as executeNgPackagrBuilder,
+  NgPackagrBuilderOptions,
+} from './ng-packagr';

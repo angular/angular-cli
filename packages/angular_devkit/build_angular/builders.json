@@ -4,22 +4,22 @@
     "app-shell": {
       "implementation": "./src/app-shell",
       "schema": "./src/app-shell/schema.json",
-      "description": "Build a server app and a browser app, then render the index.html and use it for the browser output."
+      "description": "Build a server application and a browser application, then render the index.html and use it for the browser output."
     },
     "browser": {
       "implementation": "./src/browser",
       "schema": "./src/browser/schema.json",
-      "description": "Build a browser app."
+      "description": "Build a browser application."
     },
     "dev-server": {
       "implementation": "./src/dev-server",
       "schema": "./src/dev-server/schema.json",
-      "description": "Serve a browser app."
+      "description": "Serve a browser application."
     },
     "extract-i18n": {
       "implementation": "./src/extract-i18n",
       "schema": "./src/extract-i18n/schema.json",
-      "description": "Extract i18n strings from a browser app."
+      "description": "Extract i18n strings from a browser application."
     },
     "karma": {
       "implementation": "./src/karma",
@@ -34,12 +34,17 @@
     "tslint": {
       "implementation": "./src/tslint",
       "schema": "./src/tslint/schema.json",
-      "description": "Run tslint over a TS project."
+      "description": "Run tslint over a TypeScript project."
     },
     "server": {
       "implementation": "./src/server",
       "schema": "./src/server/schema.json",
       "description": "Build a server Angular application."
+    },
+    "ng-packagr": {
+      "implementation": "./src/ng-packagr",
+      "schema": "./src/ng-packagr/schema.json",
+      "description": "Build a library with ng-packagr."
     }
   }
 }
