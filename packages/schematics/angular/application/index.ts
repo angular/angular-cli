@@ -179,6 +179,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
           polyfills: `${sourceRoot}/polyfills.ts`,
           tsConfig: `${projectRoot}tsconfig.app.json`,
           aot: true,
+          extractCss: true,
           assets: [
             `${sourceRoot}/favicon.ico`,
             `${sourceRoot}/assets`,
@@ -197,7 +198,6 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
             optimization: true,
             outputHashing: 'all',
             sourceMap: false,
-            extractCss: true,
             namedChunks: false,
             extractLicenses: true,
             vendorChunk: false,
