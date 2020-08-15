@@ -7,8 +7,8 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "noUnusedParameters": false,  // The linter is used for these.
-    "noUnusedLocals": false,  // The linter is used for these.
+    "noUnusedParameters": false,
+    "noUnusedLocals": false,
     "outDir": "./dist",
     "rootDir": ".",
     "skipLibCheck": true,
