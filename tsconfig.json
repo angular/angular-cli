@@ -45,7 +45,6 @@
       "@angular-devkit/build-angular": [ "./packages/angular_devkit/build_angular/src/index" ],
       "@angular-devkit/build-webpack": [ "./packages/angular_devkit/build_webpack/src/index" ],
       "@ngtools/webpack": [ "./packages/ngtools/webpack/src/index" ],
-      "@ngtools/webpack/*": [ "./packages/ngtools/webpack/*" ],
       "@schematics/angular": [ "./packages/schematics/angular/index" ]
     }
   },
@@ -53,19 +52,19 @@
     "suppressTsconfigOverrideWarnings": true
   },
   "exclude": [
-    "bazel-*/**/*",
+    "bazel-out/**/*",
     "dist/**/*",
-    "etc/cli.angular.io",
-    "node_modules/**/*",
+    "dist-schema/**",
+    "etc/api/**/*",
+    "etc/cli.angular.io/**/*",
+    "**/node_modules/**/*",
+    "**/third_party/**/*",
     "packages/_/devkit/**/*files/**/*",
     "packages/schematics/*/*/*files/**/*",
     "packages/angular_devkit/*/test/**/*",
-    "tmp/**/*",
-    "scripts/patches/**/*",
     "tests/**/*",
     "tools/**/*",
     "benchmark/**/*",
-    "etc/api/**/*",
-    "integration/**"
+    "integration/**/*"
   ]
 }
