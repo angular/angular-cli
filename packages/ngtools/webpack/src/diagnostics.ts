@@ -6,12 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {
-  CompilerHost, Diagnostic, Diagnostics,
+  Diagnostic, Diagnostics,
   Program, formatDiagnostics, isNgDiagnostic,
 } from '@angular/compiler-cli';
 import * as ts from 'typescript';
 import { time, timeEnd } from './benchmark';
-import { WebpackCompilerHost } from './compiler_host';
 
 export enum DiagnosticMode {
   Syntactic = 1 << 0,

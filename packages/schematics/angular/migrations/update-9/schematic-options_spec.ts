@@ -36,15 +36,6 @@ describe('Migration to version 9', () => {
     });
 
     describe('schematic options', () => {
-      function getI18NConfig(localId: string): object {
-        return {
-          outputPath: `dist/my-project/${localId}/`,
-          i18nFile: `src/locale/messages.${localId}.xlf`,
-          i18nFormat: 'xlf',
-          i18nLocale: localId,
-        };
-      }
-
       it('should replace styleext with style', async () => {
         const workspace = JSON.parse(tree.readContent(workspacePath));
         workspace.schematics = {
