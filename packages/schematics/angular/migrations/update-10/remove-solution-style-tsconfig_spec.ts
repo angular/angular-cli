@@ -73,12 +73,12 @@ describe('Migration to remove "Solution Style" tsconfig', () => {
     createJsonFile(tree, 'tsconfig.json', { files: [] });
     createJsonFile(tree, 'tsconfig.base.json', { compilerOptions });
     createJsonFile(tree, 'tsconfig.common.json', { compilerOptions });
-    createJsonFile(tree, 'src/tsconfig.json', { extends: './../tsconfig.json', compilerOptions });
-    createJsonFile(tree, 'src/tsconfig.base.json', { extends: './../tsconfig.json', compilerOptions });
+    createJsonFile(tree, 'src/tsconfig.json', { extends: './../tsconfig.base.json', compilerOptions });
+    createJsonFile(tree, 'src/tsconfig.base.json', { extends: './../tsconfig.base.json', compilerOptions });
     createJsonFile(tree, 'src/tsconfig.tsc.json', { extends: './tsconfig.base.json', compilerOptions });
     createJsonFile(tree, 'src/tsconfig.app.json', { extends: './../tsconfig.common.json', compilerOptions });
-    createJsonFile(tree, 'src/tsconfig.spec.json', { extends: './../tsconfig.json', compilerOptions });
-    createJsonFile(tree, 'src/tsconfig.worker.json', { extends: './../tsconfig.json', compilerOptions });
+    createJsonFile(tree, 'src/tsconfig.spec.json', { extends: './../tsconfig.base.json', compilerOptions });
+    createJsonFile(tree, 'src/tsconfig.worker.json', { extends: './../tsconfig.base.json', compilerOptions });
   });
 
   it(`should rename 'tsconfig.base.json' to 'tsconfig.json'`, async () => {
