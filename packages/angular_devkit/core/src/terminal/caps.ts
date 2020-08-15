@@ -7,7 +7,6 @@
  */
 import ReadableStream = NodeJS.ReadableStream;
 import WriteStream = NodeJS.WriteStream;
-import Socket = NodeJS.Socket;
 const supportsColor = require('../../third_party/github.com/chalk/supports-color');
 
 /**
