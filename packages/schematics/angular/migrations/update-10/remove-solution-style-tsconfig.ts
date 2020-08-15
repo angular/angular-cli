@@ -35,8 +35,7 @@ export default function (): Rule {
   return (host, context) => {
     const logger = context.logger;
 
-    const tsConfig = new JSONFile(host, 'tsconfig.json');
-    const files = tsConfig.get(['files']);
+    const files = new JSONFile(host, 'tsconfig.json').get(['files']);
     if (!(Array.isArray(files) && files.length === 0)) {
       logger.info('Migration has already been executed.');
 
@@ -51,16 +50,15 @@ export default function (): Rule {
     // Iterate over all tsconfig files and change the extends from 'tsconfig.base.json' to 'tsconfig.json'.
     const extendsJsonPath = ['extends'];
     for (const path of visitExtendedJsonFiles(host.root)) {
-      const tsConfigDir = dirname(normalize(path));
-      let tsConfigJson;
 
       try {
-        tsConfigJson = new JSONFile(host, path);
+        const tsConfigDir = dirname(normalize(path));
+        const tsConfigJson = new JSONFile(host, path);
         const extendsValue = tsConfigJson.get(extendsJsonPath);
 
         if (typeof extendsValue === 'string' && '/tsconfig.base.json' === resolve(tsConfigDir, normalize(extendsValue))) {
           // tsconfig extends the workspace tsconfig path.
-          tsConfig.modify(extendsJsonPath, extendsValue.replace('tsconfig.base.json', 'tsconfig.json'));
+          tsConfigJson.modify(extendsJsonPath, extendsValue.replace('tsconfig.base.json', 'tsconfig.json'));
         }
       } catch (error) {
         logger.warn(
