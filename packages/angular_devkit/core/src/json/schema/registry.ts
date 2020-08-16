@@ -447,8 +447,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
   }
 
   addFormat(format: SchemaFormat): void {
-    // tslint:disable-next-line:no-any
-    const validate = (data: any) => {
+    const validate = (data: unknown) => {
       const result = format.formatter.validate(data);
 
       if (typeof result == 'boolean') {
