@@ -105,7 +105,7 @@ Chrome to [chrome://inspect](chrome://inspect) and then click on the `inspect`
 link for the `node_modules/.bin/ng` Node target.
 
 Unfortunately, the CLI dynamically `require()`'s other files mid-execution, so
-the debugger is not aware of all the source code files before hand. As a result,
+the debugger is not aware of all the source code files beforehand. As a result,
 it is tough to put breakpoints on files before the CLI loads them. The easiest
 workaround is to use the `debugger;` statement to stop execution in the file you
 are interested in, and then you should be able to step around and set breakpoints
