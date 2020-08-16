@@ -51,9 +51,7 @@ export class NodeModuleJobRegistry<MinimumArgumentValueT extends JsonValue = Jso
       return of(null);
     }
 
-    // TODO: this should be unknown
-    // tslint:disable-next-line:no-any
-    function _getValue(...fields: any[]) {
+    function _getValue(...fields: unknown[]) {
       return fields.find(x => schema.isJsonSchema(x)) || true;
     }
 

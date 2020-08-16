@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { clean } from '../../utils';
-import { JsonObject, isJsonObject } from '../interface';
+import { JsonObject, JsonValue, isJsonObject } from '../interface';
 
 /**
  * A specialized interface for JsonSchema (to come). JsonSchemas are also JsonObject.
@@ -16,10 +16,8 @@ import { JsonObject, isJsonObject } from '../interface';
 export type JsonSchema = JsonObject | boolean;
 
 
-// TODO: this should be unknown
-// tslint:disable-next-line:no-any
-export function isJsonSchema(value: any): value is JsonSchema {
-  return isJsonObject(value) || value === false || value === true;
+export function isJsonSchema(value: unknown): value is JsonSchema {
+  return isJsonObject(value as JsonValue) || value === false || value === true;
 }
 
 /**
