@@ -9,34 +9,37 @@ export default async function () {
     // These are the default options, that we'll overwrite in subsequent configs.
     // extractCss defaults to false
     // sourceMap defaults to true
-    appArchitect['options'] = {
-      outputPath: 'dist/latest-project',
-      index: 'src/index.html',
-      main: 'src/main.ts',
-      polyfills: 'src/polyfills.ts',
-      tsConfig: 'tsconfig.app.json',
-      assets: [
-        'src/favicon.ico',
-        'src/assets',
-      ],
-      'styles': [
-        'src/styles.css',
-      ],
-      'scripts': [],
+    appArchitect['build'] = {
+      ...appArchitect['build'],
+      options: {
+        ...appArchitect['build'].options,
+        extractCss: false,
+        assets: [
+          'src/favicon.ico',
+          'src/assets',
+        ],
+        styles: [
+          'src/styles.css',
+        ],
+        scripts: [],
+      },
+      configurations: {
+        production: {
+          extractCss: true,
+        },
+        one: {
+          assets: [],
+        },
+        two: {
+          sourceMap: false,
+        },
+        three: {
+          extractCss: false, // Defaults to false when not set.
+        },
+      },
     };
-    const browserConfigs = appArchitect['build'].configurations;
-    browserConfigs['production'] = {
-      extractCss: true,
-    };
-    browserConfigs['one'] = {
-      assets: [],
-    };
-    browserConfigs['two'] = {
-      sourceMap: false,
-    };
-    browserConfigs['three'] = {
-      extractCss: false, // Defaults to false when not set.
-    };
+
+    return workspaceJson;
   });
 
   // Test the base configuration.
