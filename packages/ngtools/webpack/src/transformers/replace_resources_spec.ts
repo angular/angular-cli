@@ -42,8 +42,12 @@ describe('@ngtools/webpack transformers', () => {
         }
       `;
       const output = tags.stripIndent`
-        import { __decorate, __importDefault } from "tslib";
+        import { __decorate } from "tslib";
+        import __NG_CLI_RESOURCE__0 from "!raw-loader!./app.component.html";
+        import __NG_CLI_RESOURCE__1 from "./app.component.css";
+        import __NG_CLI_RESOURCE__2 from "./app.component.2.css";
         import { Component } from '@angular/core';
+
         let AppComponent = class AppComponent {
             constructor() {
                 this.title = 'app';
@@ -52,57 +56,14 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = __decorate([
             Component({
                 selector: 'app-root',
-                template: __importDefault(require("!raw-loader!./app.component.html")).default,
-                styles: [__importDefault(require("./app.component.css")).default, __importDefault(require("./app.component.2.css")).default]
+                template: __NG_CLI_RESOURCE__0,
+                styles: [__NG_CLI_RESOURCE__1, __NG_CLI_RESOURCE__2]
             })
         ], AppComponent);
         export { AppComponent };
       `;
 
       const result = transform(input);
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
-
-    it(`should replace resources and add helper when 'importHelpers' is false`, () => {
-      const input = tags.stripIndent`
-        import { Component } from '@angular/core';
-
-        @Component({
-          selector: 'app-root',
-          templateUrl: './app.component.html',
-          styleUrls: ['./app.component.css', './app.component.2.css']
-        })
-        export class AppComponent {
-          title = 'app';
-        }
-      `;
-      const output = tags.stripIndent`
-        var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) { var c = arguments.length, r = c < 3 ? target : desc === null
-        ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d; if (typeof Reflect === "object"
-        && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-        else for (var i = decorators.length - 1; i >= 0; i--)
-        if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r; return c > 3 && r && Object.defineProperty(target, key, r), r; };
-
-        var __importDefault = (this && this.__importDefault) || function (mod) { return (mod && mod.__esModule) ? mod : { "default": mod }; };
-
-        import { Component } from '@angular/core';
-
-        let AppComponent = class AppComponent {
-            constructor() {
-                this.title = 'app';
-            }
-        };
-        AppComponent = __decorate([
-            Component({
-                selector: 'app-root',
-                template: __importDefault(require("!raw-loader!./app.component.html")).default,
-                styles: [__importDefault(require("./app.component.css")).default, __importDefault(require("./app.component.2.css")).default]
-            })
-        ], AppComponent);
-        export { AppComponent };
-      `;
-
-      const result = transform(input, undefined, undefined, false);
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
@@ -123,7 +84,10 @@ describe('@ngtools/webpack transformers', () => {
           }
         `;
         const output = tags.stripIndent`
-          import { __decorate, __importDefault } from "tslib";
+          import { __decorate } from "tslib";
+          import __NG_CLI_RESOURCE__0 from "./app.component.html";
+          import __NG_CLI_RESOURCE__1 from "./app.component.css";
+          import __NG_CLI_RESOURCE__2 from "./app.component.2.css";
           import { Component } from '@angular/core';
           let AppComponent = class AppComponent {
               constructor() {
@@ -133,8 +97,8 @@ describe('@ngtools/webpack transformers', () => {
           AppComponent = __decorate([
               Component({
                   selector: 'app-root',
-                  template: __importDefault(require("./app.component.html")).default,
-                  styles: [__importDefault(require("./app.component.css")).default, __importDefault(require("./app.component.2.css")).default]
+                  template: __NG_CLI_RESOURCE__0,
+                  styles: [__NG_CLI_RESOURCE__1, __NG_CLI_RESOURCE__2]
               })
           ], AppComponent);
           export { AppComponent };
@@ -158,7 +122,8 @@ describe('@ngtools/webpack transformers', () => {
         }
       `;
       const output = tags.stripIndent`
-        import { __decorate, __importDefault } from "tslib";
+        import { __decorate } from "tslib";
+        import __NG_CLI_RESOURCE__0 from "!raw-loader!./app.component.svg";
         import { Component } from '@angular/core';
         let AppComponent = class AppComponent {
             constructor() {
@@ -168,7 +133,7 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = __decorate([
             Component({
                 selector: 'app-root',
-                template: __importDefault(require("!raw-loader!./app.component.svg")).default
+                template: __NG_CLI_RESOURCE__0
             })
         ], AppComponent);
         export { AppComponent };
@@ -193,8 +158,11 @@ describe('@ngtools/webpack transformers', () => {
         }
       `;
       const output = tags.stripIndent`
-        import { __decorate, __importDefault } from "tslib";
+        import { __decorate } from "tslib";
+        import __NG_CLI_RESOURCE__0 from "!raw-loader!./app.component.html";
+        import __NG_CLI_RESOURCE__1 from "./app.component.css";
         import { Component } from '@angular/core';
+
         let AppComponent = class AppComponent {
             constructor() {
                 this.title = 'app';
@@ -203,8 +171,8 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = __decorate([
             Component({
                 selector: 'app-root',
-                template: __importDefault(require("!raw-loader!./app.component.html")).default,
-                styles: ["a { color: red }", __importDefault(require("./app.component.css")).default]
+                template: __NG_CLI_RESOURCE__0,
+                styles: ["a { color: red }", __NG_CLI_RESOURCE__1]
             })
         ], AppComponent);
         export { AppComponent };
@@ -228,7 +196,11 @@ describe('@ngtools/webpack transformers', () => {
         }
       `;
       const output = `
-        import { __decorate, __importDefault } from "tslib";
+        import { __decorate } from "tslib";
+        import __NG_CLI_RESOURCE__0 from "!raw-loader!./app.component.html";
+        import __NG_CLI_RESOURCE__1 from "./app.component.css";
+        import __NG_CLI_RESOURCE__2 from "./app.component.2.css";
+
         import { Component } from '@angular/core';
         let AppComponent = class AppComponent {
             constructor() {
@@ -238,8 +210,8 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = __decorate([
             Component({
                 selector: 'app-root',
-                template: __importDefault(require("!raw-loader!./app.component.html")).default,
-                styles: [__importDefault(require("./app.component.css")).default, __importDefault(require("./app.component.2.css")).default]
+                template: __NG_CLI_RESOURCE__0,
+                styles: [__NG_CLI_RESOURCE__1, __NG_CLI_RESOURCE__2]
             })
         ], AppComponent);
         export { AppComponent };
@@ -263,8 +235,12 @@ describe('@ngtools/webpack transformers', () => {
         }
       `;
       const output = tags.stripIndent`
-        import { __decorate, __importDefault } from "tslib";
+        import { __decorate } from "tslib";
+        import __NG_CLI_RESOURCE__0 from "!raw-loader!./app.component.html";
+        import __NG_CLI_RESOURCE__1 from "./app.component.css";
+        import __NG_CLI_RESOURCE__2 from "./app.component.2.css";
         import { Component as NgComponent } from '@angular/core';
+
         let AppComponent = class AppComponent {
             constructor() {
                 this.title = 'app';
@@ -273,8 +249,8 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = __decorate([
           NgComponent({
                 selector: 'app-root',
-                template: __importDefault(require("!raw-loader!./app.component.html")).default,
-                styles: [__importDefault(require("./app.component.css")).default, __importDefault(require("./app.component.2.css")).default]
+                template: __NG_CLI_RESOURCE__0,
+                styles: [__NG_CLI_RESOURCE__1, __NG_CLI_RESOURCE__2]
             })
         ], AppComponent);
         export { AppComponent };
@@ -302,7 +278,11 @@ describe('@ngtools/webpack transformers', () => {
         }
       `;
       const output = tags.stripIndent`
-        import { __decorate, __importDefault } from "tslib";
+        import { __decorate } from "tslib";
+        import __NG_CLI_RESOURCE__0 from "!raw-loader!./app.component.html";
+        import __NG_CLI_RESOURCE__1 from "./app.component.css";
+        import __NG_CLI_RESOURCE__2 from "./app.component.2.css";
+
         import * as ng from '@angular/core';
         let AppComponent = class AppComponent {
             constructor() {
@@ -312,8 +292,8 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = __decorate([
           ng.Component({
                 selector: 'app-root',
-                template: __importDefault(require("!raw-loader!./app.component.html")).default,
-                styles: [__importDefault(require("./app.component.css")).default, __importDefault(require("./app.component.2.css")).default]
+                template: __NG_CLI_RESOURCE__0,
+                styles: [__NG_CLI_RESOURCE__1, __NG_CLI_RESOURCE__2]
             })
         ], AppComponent);
         export { AppComponent };
@@ -343,7 +323,10 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const output = tags.stripIndent`
-        import { __decorate, __importDefault } from "tslib";
+        import { __decorate } from "tslib";
+        import __NG_CLI_RESOURCE__0 from "!raw-loader!./app.component.html";
+        import __NG_CLI_RESOURCE__1 from "./app.component.css";
+
         import { Component } from '@angular/core';
 
         let AppComponent = class AppComponent {
@@ -360,8 +343,8 @@ describe('@ngtools/webpack transformers', () => {
         AppComponent = __decorate([
             Component({
                 selector: 'app-root',
-                template: __importDefault(require("!raw-loader!./app.component.html")).default,
-                styles: [__importDefault(require("./app.component.css")).default]
+                template: __NG_CLI_RESOURCE__0,
+                styles: [__NG_CLI_RESOURCE__1]
             })
         ], AppComponent);
         export { AppComponent };
