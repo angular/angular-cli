@@ -7,18 +7,6 @@
  */
 import * as ts from 'typescript';
 
-// emit helper for `import Name from "foo"`
-// importName is marked as an internal property but is needed for the tslib import.
-const importDefaultHelper: ts.UnscopedEmitHelper & { importName?: string } = {
-  name: 'typescript:commonjsimportdefault',
-  importName: '__importDefault',
-  scoped: false,
-  text: `
-    var __importDefault = (this && this.__importDefault) || function (mod) {
-      return (mod && mod.__esModule) ? mod : { "default": mod };
-    };`,
-};
-
 export function replaceResources(
   shouldTransform: (fileName: string) => boolean,
   getTypeChecker: () => ts.TypeChecker,
@@ -26,12 +14,13 @@ export function replaceResources(
 ): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext) => {
     const typeChecker = getTypeChecker();
+    const resourceImportDeclarations: ts.ImportDeclaration[] = [];
 
     const visitNode: ts.Visitor = (node: ts.Node) => {
       if (ts.isClassDeclaration(node)) {
-        const decorators = ts.visitNodes(node.decorators, (node) =>
+        const decorators = ts.visitNodes(node.decorators, node =>
           ts.isDecorator(node)
-            ? visitDecorator(context, node, typeChecker, directTemplateLoading)
+            ? visitDecorator(node, typeChecker, directTemplateLoading, resourceImportDeclarations)
             : node,
         );
 
@@ -50,20 +39,35 @@ export function replaceResources(
     };
 
     return (sourceFile: ts.SourceFile) => {
-      if (shouldTransform(sourceFile.fileName)) {
-        return ts.visitNode(sourceFile, visitNode);
+      if (!shouldTransform(sourceFile.fileName)) {
+        return sourceFile;
       }
 
-      return sourceFile;
+      const updatedSourceFile = ts.visitNode(sourceFile, visitNode);
+      if (resourceImportDeclarations.length) {
+        // Add resource imports
+        return ts.updateSourceFileNode(
+          updatedSourceFile,
+          ts.setTextRange(
+            ts.createNodeArray([
+              ...resourceImportDeclarations,
+              ...updatedSourceFile.statements,
+            ]),
+            updatedSourceFile.statements,
+          ),
+        );
+      }
+
+      return updatedSourceFile;
     };
   };
 }
 
 function visitDecorator(
-  context: ts.TransformationContext,
   node: ts.Decorator,
   typeChecker: ts.TypeChecker,
   directTemplateLoading: boolean,
+  resourceImportDeclarations: ts.ImportDeclaration[],
 ): ts.Decorator {
   if (!isComponentDecorator(node, typeChecker)) {
     return node;
@@ -84,9 +88,9 @@ function visitDecorator(
   const styleReplacements: ts.Expression[] = [];
 
   // visit all properties
-  let properties = ts.visitNodes(objectExpression.properties, (node) =>
+  let properties = ts.visitNodes(objectExpression.properties, node =>
     ts.isObjectLiteralElementLike(node)
-      ? visitComponentMetadata(context, node, styleReplacements, directTemplateLoading)
+      ? visitComponentMetadata(node, styleReplacements, directTemplateLoading, resourceImportDeclarations)
       : node,
   );
 
@@ -109,10 +113,10 @@ function visitDecorator(
 }
 
 function visitComponentMetadata(
-  context: ts.TransformationContext,
   node: ts.ObjectLiteralElementLike,
   styleReplacements: ts.Expression[],
   directTemplateLoading: boolean,
+  resourceImportDeclarations: ts.ImportDeclaration[],
 ): ts.ObjectLiteralElementLike | undefined {
   if (!ts.isPropertyAssignment(node) || ts.isComputedPropertyName(node.name)) {
     return node;
@@ -124,16 +128,16 @@ function visitComponentMetadata(
       return undefined;
 
     case 'templateUrl':
+      const importName = createResourceImport(node.initializer, directTemplateLoading ? '!raw-loader!' : '', resourceImportDeclarations);
+      if (!importName) {
+        return node;
+      }
+
       return ts.updatePropertyAssignment(
         node,
         ts.createIdentifier('template'),
-        createRequireExpression(
-          context,
-          node.initializer,
-          directTemplateLoading ? '!raw-loader!' : '',
-        ),
+        importName,
       );
-
     case 'styles':
     case 'styleUrls':
       if (!ts.isArrayLiteralExpression(node.initializer)) {
@@ -141,14 +145,16 @@ function visitComponentMetadata(
       }
 
       const isInlineStyles = name === 'styles';
-      const styles = ts.visitNodes(node.initializer.elements, (node) => {
+      const styles = ts.visitNodes(node.initializer.elements, node => {
         if (!ts.isStringLiteral(node) && !ts.isNoSubstitutionTemplateLiteral(node)) {
           return node;
         }
 
-        return isInlineStyles
-          ? ts.createLiteral(node.text)
-          : createRequireExpression(context, node);
+        if (isInlineStyles) {
+          return ts.createLiteral(node.text);
+        }
+
+        return createResourceImport(node, undefined, resourceImportDeclarations) || node;
       });
 
       // Styles should be placed first
@@ -159,10 +165,31 @@ function visitComponentMetadata(
       }
 
       return undefined;
-
     default:
       return node;
   }
+}
+
+export function createResourceImport(
+  node: ts.Node,
+  loader: string |  undefined,
+  resourceImportDeclarations: ts.ImportDeclaration[],
+): ts.Identifier | null {
+  const url = getResourceUrl(node, loader);
+  if (!url) {
+    return null;
+  }
+
+  const importName = ts.createIdentifier(`__NG_CLI_RESOURCE__${resourceImportDeclarations.length}`);
+
+  resourceImportDeclarations.push(ts.createImportDeclaration(
+    undefined,
+    undefined,
+    ts.createImportClause(importName, undefined),
+    ts.createLiteral(url),
+  ));
+
+  return importName;
 }
 
 export function getResourceUrl(node: ts.Node, loader = ''): string | null {
@@ -185,35 +212,6 @@ function isComponentDecorator(node: ts.Node, typeChecker: ts.TypeChecker): node 
   }
 
   return false;
-}
-
-function createRequireExpression(
-  context: ts.TransformationContext,
-  node: ts.Expression,
-  loader?: string,
-): ts.Expression {
-  const url = getResourceUrl(node, loader);
-  if (!url) {
-    return node;
-  }
-
-  context.requestEmitHelper(importDefaultHelper);
-
-  const callExpression = ts.createCall(ts.createIdentifier('require'), undefined, [
-    ts.createLiteral(url),
-  ]);
-
-  return ts.createPropertyAccess(
-    ts.createCall(
-      ts.setEmitFlags(
-        ts.createIdentifier('__importDefault'),
-        ts.EmitFlags.HelperName | ts.EmitFlags.AdviseOnEmitNode,
-      ),
-      undefined,
-      [callExpression],
-    ),
-    'default',
-  );
 }
 
 interface DecoratorOrigin {
