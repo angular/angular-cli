@@ -15,8 +15,6 @@ import { addWarning } from '../../utils/webpack-diagnostics';
 const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequireDependency');
 const AMDDefineDependency = require('webpack/lib/dependencies/AMDDefineDependency');
 
-const STYLES_TEMPLATE_URL_REGEXP = /\.(html|svg|css|sass|less|styl|scss)$/;
-
 // The below is extended because there are not in the typings
 interface WebpackModule extends compilation.Module {
   name?: string;
@@ -104,16 +102,7 @@ export class CommonJsUsageWarnPlugin {
 
   private hasCommonJsDependencies(dependencies: WebpackModule[], checkParentModules = false): boolean {
     for (const dep of dependencies) {
-      if (dep instanceof CommonJsRequireDependency) {
-        if (STYLES_TEMPLATE_URL_REGEXP.test(dep.request)) {
-          // Skip in case it's a template or stylesheet
-          continue;
-        }
-
-        return true;
-      }
-
-      if (dep instanceof AMDDefineDependency) {
+      if (dep instanceof CommonJsRequireDependency || dep instanceof AMDDefineDependency) {
         return true;
       }
 
