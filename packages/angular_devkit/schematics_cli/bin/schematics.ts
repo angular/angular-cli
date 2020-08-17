@@ -22,11 +22,10 @@ import {
 import { NodeJsSyncHost, ProcessOutput, createConsoleLogger } from '@angular-devkit/core/node';
 import {
   DryRunEvent,
-  SchematicEngine,
   UnsuccessfulWorkflowExecution,
   formats,
 } from '@angular-devkit/schematics';
-import { NodeModulesEngineHost, NodeWorkflow, validateOptionsWithSchema } from '@angular-devkit/schematics/tools';
+import { NodeWorkflow, validateOptionsWithSchema } from '@angular-devkit/schematics/tools';
 import * as inquirer from 'inquirer';
 import * as minimist from 'minimist';
 
@@ -64,12 +63,10 @@ export interface MainOptions {
 }
 
 
-function _listSchematics(collectionName: string, logger: logging.Logger) {
+function _listSchematics(workflow: NodeWorkflow, collectionName: string, logger: logging.Logger) {
   try {
-    const engineHost = new NodeModulesEngineHost();
-    const engine = new SchematicEngine(engineHost);
-    const collection = engine.createCollection(collectionName);
-    logger.info(engine.listSchematicNames(collection).join('\n'));
+    const collection = workflow.engine.createCollection(collectionName);
+    logger.info(collection.listSchematicNames().join('\n'));
   } catch (error) {
     logger.fatal(error.message);
 
@@ -140,18 +137,8 @@ export async function main({
     collection: collectionName,
     schematic: schematicName,
   } = parseSchematicName(argv._.shift() || null);
+
   const isLocalCollection = collectionName.startsWith('.') || collectionName.startsWith('/');
-
-  /** If the user wants to list schematics, we simply show all the schematic names. */
-  if (argv['list-schematics']) {
-    return _listSchematics(collectionName, logger);
-  }
-
-  if (!schematicName) {
-    logger.info(getUsage());
-
-    return 1;
-  }
 
   /** Gather the arguments for later use. */
   const debug: boolean = argv.debug === null ? isLocalCollection : argv.debug;
@@ -170,6 +157,17 @@ export async function main({
     registry,
     resolvePaths: [process.cwd(), __dirname],
   });
+
+  /** If the user wants to list schematics, we simply show all the schematic names. */
+  if (argv['list-schematics']) {
+    return _listSchematics(workflow, collectionName, logger);
+  }
+
+  if (!schematicName) {
+    logger.info(getUsage());
+
+    return 1;
+  }
 
   registry.addPostTransform(schema.transforms.addUndefinedDefaults);
   workflow.engineHost.registerOptionsTransform(validateOptionsWithSchema(registry));
