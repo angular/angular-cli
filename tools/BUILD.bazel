@@ -14,7 +14,6 @@ nodejs_binary(
         "@npm//quicktype-core",
     ],
     entry_point = "quicktype_runner.js",
-    install_source_map_support = False,
 )
 
 platform(

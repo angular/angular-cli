@@ -2,8 +2,8 @@
 #
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
-load("@npm_bazel_labs//:index.bzl", "ts_proto_library")
-load("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("@npm//@bazel/labs//:index.bzl", "ts_proto_library")
+load("@npm//@bazel/typescript:index.bzl", "ts_library")
 load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_binary")
 
 ts_proto_library(

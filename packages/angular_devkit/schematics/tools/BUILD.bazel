@@ -1,4 +1,4 @@
-load("@npm_bazel_jasmine//:index.bzl", "jasmine_node_test")
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
 load("//tools:defaults.bzl", "ts_library")
 
 # Copyright Google Inc. All Rights Reserved.
