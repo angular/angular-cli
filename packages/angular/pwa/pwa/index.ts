@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { getSystemPath, join, normalize } from '@angular-devkit/core';
+import { join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -18,6 +18,7 @@ import {
   template,
   url,
 } from '@angular-devkit/schematics';
+import { getWorkspace, updateWorkspace } from '@schematics/angular/utility/workspace';
 import { Readable, Writable } from 'stream';
 import { Schema as PwaOptions } from './schema';
 
@@ -31,7 +32,6 @@ function updateIndexFile(path: string): Rule {
     }
 
     const rewriter = new RewritingStream();
-
     let needsNoScript = true;
     rewriter.on('startTag', (startTag: { tagName: string }) => {
       if (startTag.tagName === 'noscript') {
@@ -88,9 +88,6 @@ export default function(options: PwaOptions): Rule {
       options.title = options.project;
     }
 
-    // Keep Bazel from failing due to deep import
-    const { getWorkspace, updateWorkspace } = require('@schematics/angular/utility/workspace');
-
     const workspace = await getWorkspace(host);
 
     if (!options.project) {
@@ -138,43 +135,38 @@ export default function(options: PwaOptions): Rule {
     // Find all index.html files in build targets
     const indexFiles = new Set<string>();
     for (const target of buildTargets) {
-      if (target.options && typeof target.options.index === 'string') {
+      if (typeof target.options?.index === 'string') {
         indexFiles.add(target.options.index);
       }
 
       if (!target.configurations) {
         continue;
       }
-      for (const configName in target.configurations) {
-        const configuration = target.configurations[configName];
-        if (configuration && typeof configuration.index === 'string') {
-          indexFiles.add(configuration.index);
+
+      for (const options of Object.values(target.configurations)) {
+        if (typeof options?.index === 'string') {
+          indexFiles.add(options.index);
         }
       }
     }
 
     // Setup sources for the assets files to add to the project
-    const sourcePath = join(normalize(project.root), 'src');
-    const assetsPath = join(sourcePath, 'assets');
-    const rootTemplateSource = apply(url('./files/root'), [
-      template({ ...options }),
-      move(getSystemPath(sourcePath)),
-    ]);
-    const assetsTemplateSource = apply(url('./files/assets'), [
-      template({ ...options }),
-      move(getSystemPath(assetsPath)),
-    ]);
+    const sourcePath = normalize(project.sourceRoot ?? 'src');
 
     // Setup service worker schematic options
-    const swOptions = { ...options };
-    delete swOptions.title;
+    const { title, ...swOptions } = options;
 
-    // Chain the rules and return
     return chain([
       updateWorkspace(workspace),
       externalSchematic('@schematics/angular', 'service-worker', swOptions),
-      mergeWith(rootTemplateSource),
-      mergeWith(assetsTemplateSource),
+      mergeWith(apply(url('./files/root'), [
+        template({ ...options }),
+        move(sourcePath),
+      ])),
+      mergeWith(apply(url('./files/assets'), [
+        template({ ...options }),
+        move(join(sourcePath, 'assets')),
+      ])),
       ...[...indexFiles].map(path => updateIndexFile(path)),
     ]);
   };
