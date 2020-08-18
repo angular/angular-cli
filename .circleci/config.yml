@@ -260,6 +260,7 @@ jobs:
     steps:
       - custom_attach_workspace
       - install_python
+      - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run: 
           command: yarn bazel:integration
           no_output_timeout: 20m
