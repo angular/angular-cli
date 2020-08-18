@@ -8,7 +8,7 @@
 import { virtualFs } from '@angular-devkit/core';
 import { HostTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import { map } from 'rxjs/operators';
+import { map } from 'rxjs/operators'; // tslint:disable-line: no-implicit-dependencies
 import { _coerceVersionNumber } from './index';
 
 

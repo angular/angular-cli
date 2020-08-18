@@ -10,8 +10,8 @@
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { HostTree, SchematicsException } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import { EMPTY } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { EMPTY } from 'rxjs'; // tslint:disable-line: no-implicit-dependencies
+import { catchError, map } from 'rxjs/operators'; // tslint:disable-line: no-implicit-dependencies
 import * as semver from 'semver';
 import { angularMajorCompatGuarantee } from './index';
 
