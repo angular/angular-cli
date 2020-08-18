@@ -15,8 +15,6 @@ import {
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
 import * as npa from 'npm-package-arg';
-import { Observable, from as observableFrom, of } from 'rxjs';
-import { map, mergeMap, reduce, switchMap } from 'rxjs/operators';
 import * as semver from 'semver';
 import { getNpmPackageJson } from './npm';
 import { NpmRepositoryPackageJson } from './npm-package-json';
@@ -240,7 +238,7 @@ function _performUpdate(
   logger: logging.LoggerApi,
   migrateOnly: boolean,
   migrateExternal: boolean,
-): Observable<void> {
+): void {
   const packageJsonContent = tree.read('/package.json');
   if (!packageJsonContent) {
     throw new SchematicsException('Could not find a package.json. Are you in a Node project?');
@@ -347,8 +345,6 @@ function _performUpdate(
       (global as any).externalMigrations = externalMigrations;
     }
   }
-
-  return of<void>(undefined);
 }
 
 function _migrateOnly(
@@ -358,12 +354,12 @@ function _migrateOnly(
   to?: string,
 ) {
   if (!info) {
-    return of<void>();
+    return;
   }
 
   const target = info.installed;
   if (!target || !target.updateMetadata.migrations) {
-    return of<void>(undefined);
+    return;
   }
 
   const collection = (
@@ -379,8 +375,6 @@ function _migrateOnly(
       to: to || target.version,
     }),
   );
-
-  return of<void>(undefined);
 }
 
 function _getUpdateMetadata(
@@ -508,7 +502,7 @@ function _usageMessage(
   if (packagesToUpdate.length == 0) {
     logger.info('We analyzed your package.json and everything seems to be in order. Good work!');
 
-    return of<void>(undefined);
+    return;
   }
 
   logger.info(
@@ -536,7 +530,7 @@ function _usageMessage(
     logger.info('  ' + fields.map((x, i) => x.padEnd(pads[i])).join(''));
   });
 
-  return of<void>(undefined);
+  return;
 }
 
 
@@ -860,7 +854,7 @@ export default function(options: UpdateSchema): Rule {
   options.to = _formatVersion(options.to);
   const usingYarn = options.packageManager === 'yarn';
 
-  return (tree: Tree, context: SchematicContext) => {
+  return async (tree: Tree, context: SchematicContext) => {
     const logger = context.logger;
     const npmDeps = new Map(_getAllDependencies(tree).filter(([name, specifier]) => {
       try {
@@ -874,95 +868,87 @@ export default function(options: UpdateSchema): Rule {
     }));
     const packages = _buildPackageList(options, npmDeps, logger);
 
-    return observableFrom(npmDeps.keys()).pipe(
-      // Grab all package.json from the npm repository. This requires a lot of HTTP calls so we
-      // try to parallelize as many as possible.
-      mergeMap(depName => getNpmPackageJson(
-        depName,
-        logger,
-        { registryUrl: options.registry, usingYarn, verbose: options.verbose },
-      )),
+    // Grab all package.json from the npm repository. This requires a lot of HTTP calls so we
+    // try to parallelize as many as possible.
+    const allPackageMetadata = await Promise.all(Array.from(npmDeps.keys()).map(depName => getNpmPackageJson(
+      depName,
+      logger,
+      { registryUrl: options.registry, usingYarn, verbose: options.verbose },
+    )));
 
-      // Build a map of all dependencies and their packageJson.
-      reduce<Partial<NpmRepositoryPackageJson>, Map<string, NpmRepositoryPackageJson>>(
-        (acc, npmPackageJson) => {
-          // If the package was not found on the registry. It could be private, so we will just
-          // ignore. If the package was part of the list, we will error out, but will simply ignore
-          // if it's either not requested (so just part of package.json. silently) or if it's a
-          // `--all` situation. There is an edge case here where a public package peer depends on a
-          // private one, but it's rare enough.
-          if (!npmPackageJson.name) {
-            if (npmPackageJson.requestedName && packages.has(npmPackageJson.requestedName)) {
-              if (options.all) {
-                logger.warn(`Package ${JSON.stringify(npmPackageJson.requestedName)} was not `
-                  + 'found on the registry. Skipping.');
-              } else {
-                throw new SchematicsException(
-                  `Package ${JSON.stringify(npmPackageJson.requestedName)} was not found on the `
-                  + 'registry. Cannot continue as this may be an error.');
-              }
+    // Build a map of all dependencies and their packageJson.
+    const npmPackageJsonMap = allPackageMetadata.reduce(
+      (acc, npmPackageJson) => {
+        // If the package was not found on the registry. It could be private, so we will just
+        // ignore. If the package was part of the list, we will error out, but will simply ignore
+        // if it's either not requested (so just part of package.json. silently) or if it's a
+        // `--all` situation. There is an edge case here where a public package peer depends on a
+        // private one, but it's rare enough.
+        if (!npmPackageJson.name) {
+          if (npmPackageJson.requestedName && packages.has(npmPackageJson.requestedName)) {
+            if (options.all) {
+              logger.warn(`Package ${JSON.stringify(npmPackageJson.requestedName)} was not `
+                + 'found on the registry. Skipping.');
+            } else {
+              throw new SchematicsException(
+                `Package ${JSON.stringify(npmPackageJson.requestedName)} was not found on the `
+                + 'registry. Cannot continue as this may be an error.');
             }
-          } else {
-            // If a name is present, it is assumed to be fully populated
-            acc.set(npmPackageJson.name, npmPackageJson as NpmRepositoryPackageJson);
           }
-
-          return acc;
-        },
-        new Map<string, NpmRepositoryPackageJson>(),
-      ),
-
-      map(npmPackageJsonMap => {
-        // Augment the command line package list with packageGroups and forward peer dependencies.
-        // Each added package may uncover new package groups and peer dependencies, so we must
-        // repeat this process until the package list stabilizes.
-        let lastPackagesSize;
-        do {
-          lastPackagesSize = packages.size;
-          npmPackageJsonMap.forEach((npmPackageJson) => {
-            _addPackageGroup(tree, packages, npmDeps, npmPackageJson, logger);
-            _addPeerDependencies(tree, packages, npmDeps, npmPackageJson, npmPackageJsonMap, logger);
-          });
-        } while (packages.size > lastPackagesSize);
-
-        // Build the PackageInfo for each module.
-        const packageInfoMap = new Map<string, PackageInfo>();
-        npmPackageJsonMap.forEach((npmPackageJson) => {
-          packageInfoMap.set(
-            npmPackageJson.name,
-            _buildPackageInfo(tree, packages, npmDeps, npmPackageJson, logger),
-          );
-        });
-
-        return packageInfoMap;
-      }),
-
-      switchMap(infoMap => {
-        // Now that we have all the information, check the flags.
-        if (packages.size > 0) {
-          if (options.migrateOnly && options.from && options.packages) {
-            return _migrateOnly(
-              infoMap.get(options.packages[0]),
-              context,
-              options.from,
-              options.to,
-            );
-          }
-
-          const sublog = new logging.LevelCapLogger(
-            'validation',
-            logger.createChild(''),
-            'warn',
-          );
-          _validateUpdatePackages(infoMap, !!options.force, !!options.next, sublog);
-
-          return _performUpdate(tree, context, infoMap, logger, !!options.migrateOnly, !!options.migrateExternal);
         } else {
-          return _usageMessage(options, infoMap, logger);
+          // If a name is present, it is assumed to be fully populated
+          acc.set(npmPackageJson.name, npmPackageJson as NpmRepositoryPackageJson);
         }
-      }),
 
-      switchMap(() => of(tree)),
+        return acc;
+      },
+      new Map<string, NpmRepositoryPackageJson>(),
     );
+
+    // Augment the command line package list with packageGroups and forward peer dependencies.
+    // Each added package may uncover new package groups and peer dependencies, so we must
+    // repeat this process until the package list stabilizes.
+    let lastPackagesSize;
+    do {
+      lastPackagesSize = packages.size;
+      npmPackageJsonMap.forEach((npmPackageJson) => {
+        _addPackageGroup(tree, packages, npmDeps, npmPackageJson, logger);
+        _addPeerDependencies(tree, packages, npmDeps, npmPackageJson, npmPackageJsonMap, logger);
+      });
+    } while (packages.size > lastPackagesSize);
+
+    // Build the PackageInfo for each module.
+    const packageInfoMap = new Map<string, PackageInfo>();
+    npmPackageJsonMap.forEach((npmPackageJson) => {
+      packageInfoMap.set(
+        npmPackageJson.name,
+        _buildPackageInfo(tree, packages, npmDeps, npmPackageJson, logger),
+      );
+    });
+
+    // Now that we have all the information, check the flags.
+    if (packages.size > 0) {
+      if (options.migrateOnly && options.from && options.packages) {
+        _migrateOnly(
+          packageInfoMap.get(options.packages[0]),
+          context,
+          options.from,
+          options.to,
+        );
+
+        return;
+      }
+
+      const sublog = new logging.LevelCapLogger(
+        'validation',
+        logger.createChild(''),
+        'warn',
+      );
+      _validateUpdatePackages(packageInfoMap, !!options.force, !!options.next, sublog);
+
+      _performUpdate(tree, context, packageInfoMap, logger, !!options.migrateOnly, !!options.migrateExternal);
+    } else {
+      _usageMessage(options, packageInfoMap, logger);
+    }
   };
 }
