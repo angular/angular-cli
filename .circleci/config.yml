@@ -244,7 +244,7 @@ jobs:
 
   test:
     executor: test-executor
-    resource_class: xlarge
+    resource_class: medium
     steps:
       - custom_attach_workspace
       - browser-tools/install-chrome
@@ -256,7 +256,7 @@ jobs:
 
   integration:
     executor: test-executor
-    resource_class: xlarge
+    resource_class: medium
     steps:
       - custom_attach_workspace
       - install_python
