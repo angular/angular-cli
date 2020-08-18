@@ -14,7 +14,8 @@ test --test_tag_filters=-manual
 # Bazel doesn't calculate the memory ceiling correctly when running under Docker.
 # Limit Bazel to consuming resources that fit in CircleCI "medium" class which is the default:
 # https://circleci.com/docs/2.0/configuration-reference/#resource_class
-build --local_resources=3072,2.0,1.0
+build --local_ram_resources=3072
+build --local_cpu_resources=2
 
 # More details on failures
 build --verbose_failures=true
