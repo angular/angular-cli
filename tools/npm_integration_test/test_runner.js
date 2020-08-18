@@ -17,6 +17,9 @@ const VERBOSE_LOGS = !!process.env['VERBOSE_LOGS'];
 // Set to true if you want the /tmp folder created to persist after running `bazel test`
 const KEEP_TMP = false;
 
+// bazelisk requires a $HOME environment variable for its cache
+process.env['HOME'] = tmp.dirSync({keep: KEEP_TMP, unsafeCleanup: !KEEP_TMP}).name;
+
 function fail(...m) {
   console.error();
   console.error(`[${path.basename(__filename)}]`);
@@ -132,6 +135,22 @@ function copyToTmp(files) {
 }
 
 /**
+ * Expands environment variables in a string of the form ${FOO_BAR}.
+ */
+function expandEnv(s) {
+  if (!s) return s;
+  const reg = /\$\{(\w+)\}/g;
+  return s.replace(reg, (matched) => {
+    const varName = matched.substring(2, matched.length - 1);
+    if (process.env.hasOwnProperty(varName)) {
+      return process.env[varName];
+    } else {
+      throw `Failed to expand unbound environment variable '${varName}' in '${s}'`;
+    }
+  });
+}
+
+/**
  * TestRunner handles setting up the integration test and executing
  * the test commands based on the config.
  */
@@ -153,14 +172,15 @@ class TestRunner {
       //       and quoted arguments that contain spaces
       const split = command.split(' ');
       let binary = split[0];
-      const args = split.slice(1);
+      const args = split.slice(1).map(a => expandEnv(a));
       switch (binary) {
         case 'patch-package-json': {
           let packageJsonFile = 'package.json';
           if (args.length > 0) {
             packageJsonFile = args[0];
           }
-          log(`running test command ${this.successful+1} of ${this.config.commands.length}: patching '${packageJsonFile}' in '${this.testRoot}'`);
+          log(`running test command ${this.successful + 1} of ${
+              this.config.commands.length}: patching '${packageJsonFile}' in '${this.testRoot}'`);
           this._patchPackageJson(packageJsonFile);
         } break;
 
@@ -168,16 +188,21 @@ class TestRunner {
           if (binary.startsWith('external/')) {
             binary = `../${binary.substring('external/'.length)}`;
           }
-          const runfilesBinary = runfiles.resolveWorkspaceRelative(binary);
-          binary = fs.existsSync(runfilesBinary) ? runfilesBinary : binary;
-          log(`running test command ${this.successful+1} of ${this.config.commands.length}: '${binary} ${args.join(' ')}' in '${this.testRoot}'`);
+          try {
+            const runfilesBinary = runfiles.resolveWorkspaceRelative(binary);
+            binary = (runfilesBinary && fs.existsSync(runfilesBinary)) ? runfilesBinary : binary;
+          } catch (e) {
+          }
+          log(`running test command ${this.successful + 1} of ${this.config.commands.length}: '${
+              binary} ${args.join(' ')}' in '${this.testRoot}'`);
           const spawnedProcess = spawnSync(binary, args, {cwd: this.testRoot, stdio: 'inherit'});
           if (spawnedProcess.error) {
-            fail(
-                `test command ${testRunner.successful+1} '${binary} ${args.join(' ')}' failed with ${spawnedProcess.error.code}`);
+            fail(`test command ${testRunner.successful + 1} '${binary} ${
+                args.join(' ')}' failed with ${spawnedProcess.error.code}`);
           }
           if (spawnedProcess.status) {
-            log(`test command ${testRunner.successful+1} '${binary} ${args.join(' ')}' failed with status code ${spawnedProcess.status}`);
+            log(`test command ${testRunner.successful + 1} '${binary} ${
+                args.join(' ')}' failed with status code ${spawnedProcess.status}`);
             return spawnedProcess.status;
           }
         }
@@ -206,17 +231,20 @@ class TestRunner {
       if (contents.dependencies && contents.dependencies[key]) {
         replacements++;
         contents.dependencies[key] = replacement;
-        log(`overriding dependencies['${key}'] npm package with 'file:${path}' in package.json file`);
+        log(`overriding dependencies['${key}'] npm package with 'file:${
+            path}' in package.json file`);
       }
       if (contents.devDependencies && contents.devDependencies[key]) {
         replacements++;
         contents.devDependencies[key] = replacement;
-        log(`overriding devDependencies['${key}'] npm package with 'file:${path}' in package.json file`);
+        log(`overriding devDependencies['${key}'] npm package with 'file:${
+            path}' in package.json file`);
       }
       if (contents.resolutions && contents.resolutions[key]) {
         replacements++;
         contents.resolutions[key] = replacement;
-        log(`overriding resolutions['${key}'] npm package with 'file:${path}' in package.json file`);
+        log(`overriding resolutions['${key}'] npm package with 'file:${
+            path}' in package.json file`);
       }
       // TODO: handle other formats for resolutions such as `some-package/${key}` or
       // `some-package/**/${key}`
@@ -224,7 +252,8 @@ class TestRunner {
       if (contents.resolutions && contents.resolutions[altKey]) {
         replacements++;
         contents.resolutions[altKey] = replacement;
-        log(`overriding resolutions['${altKey}'] npm package with 'file:${path}' in package.json file`);
+        log(`overriding resolutions['${altKey}'] npm package with 'file:${
+            path}' in package.json file`);
       }
     }
     // check packages that must be replaced
@@ -244,8 +273,8 @@ class TestRunner {
     const contentsEncoded = JSON.stringify(contents, null, 2);
     log(`package.json file:\n${contentsEncoded}`);
     if (failedPackages.length) {
-      fail(
-          `expected replacements of npm packages ${JSON.stringify(failedPackages)} not found; add these to the npm_packages attribute`);
+      fail(`expected replacements of npm packages ${
+          JSON.stringify(failedPackages)} not found; add these to the npm_packages attribute`);
     }
     if (replacements) {
       fs.writeFileSync(packageJson, contentsEncoded);
@@ -295,7 +324,8 @@ class TestRunner {
       log(`configuring test in-place under ${this.testRoot}`);
     } else {
       this.testRoot = copyToTmp(this.config.testFiles);
-      log(`test files from '${rootDirectory(this.config.testFiles)}' copied to tmp folder ${this.testRoot}`);
+      log(`test files from '${rootDirectory(this.config.testFiles)}' copied to tmp folder ${
+          this.testRoot}`);
     }
   }
 
@@ -333,6 +363,15 @@ for (const k of Object.keys(config.envVars)) {
 log_verbose(`env: ${JSON.stringify(process.env, null, 2)}`);
 log_verbose(`config: ${JSON.stringify(config, null, 2)}`);
 log(`running in ${process.cwd()}`);
+
+// remove --preserve-symlinks-main from node wrapper as it breaks node_modules/.bin files
+// run by yarn which must be resolved to their module location to work
+const isWindows = process.platform === 'win32';
+const nodePath = runfiles.resolve(
+    `build_bazel_rules_nodejs/internal/node/_node_bin/${isWindows ? 'node.bat' : 'node'}`);
+const nodeContents =
+    fs.readFileSync(nodePath, {encoding: 'utf-8'}).replace(' --preserve-symlinks-main ', ' ');
+fs.writeFileSync(nodePath, nodeContents, 'utf8');
 
 const testRunner = new TestRunner(config);
 const result = testRunner.run();
