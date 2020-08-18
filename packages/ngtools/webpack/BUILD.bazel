@@ -42,7 +42,6 @@ ts_library(
         "@npm//@types/webpack",
         "@npm//@types/webpack-sources",
         "@npm//enhanced-resolve",
-        "@npm//rxjs",
         "@npm//typescript",
         "@npm//webpack",
         "@npm//webpack-sources",

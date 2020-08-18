@@ -80,7 +80,7 @@ import {
   NodeWatchFileSystemInterface,
   NormalModuleFactoryRequest,
 } from './webpack';
-import { WebpackInputHost } from './webpack-input-host';
+import { createWebpackInputHost } from './webpack-input-host';
 
 export class AngularCompilerPlugin {
   private _options: AngularCompilerPluginOptions;
@@ -741,7 +741,7 @@ export class AngularCompilerPlugin {
         watchFileSystem: NodeWatchFileSystemInterface,
       };
 
-      let host: virtualFs.Host<fs.Stats> = this._options.host || new WebpackInputHost(
+      let host: virtualFs.Host<fs.Stats> = this._options.host || createWebpackInputHost(
         compilerWithFileSystems.inputFileSystem,
       );
 
