@@ -229,6 +229,8 @@ export declare class CoreSchemaRegistry implements SchemaRegistry {
     useXDeprecatedProvider(onUsage: (message: string) => void): void;
 }
 
+export declare function createSyncHost<StatsT extends object = {}>(handler: SyncHostHandler<StatsT>): Host<StatsT>;
+
 export declare function createWorkspaceHost(host: virtualFs.Host): WorkspaceHost;
 
 export interface CustomDimensionsAndMetricsOptions {
@@ -1045,6 +1047,18 @@ export declare class SyncDelegateHost<T extends object = {}> {
     rename(from: Path, to: Path): void;
     stat(path: Path): Stats<T> | null;
     watch(path: Path, options?: HostWatchOptions): Observable<HostWatchEvent> | null;
+    write(path: Path, content: FileBufferLike): void;
+}
+
+export interface SyncHostHandler<StatsT extends object = {}> {
+    delete(path: Path): void;
+    exists(path: Path): boolean;
+    isDirectory(path: Path): boolean;
+    isFile(path: Path): boolean;
+    list(path: Path): PathFragment[];
+    read(path: Path): FileBuffer;
+    rename(from: Path, to: Path): void;
+    stat(path: Path): Stats<StatsT> | null;
     write(path: Path, content: FileBufferLike): void;
 }
 
