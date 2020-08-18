@@ -7,6 +7,7 @@
  */
 import * as webpack from 'webpack';
 import { WebpackConfigOptions } from '../../utils/build-options';
+import { withWebpackFourOrFive } from '../../utils/webpack-version';
 import { CommonJsUsageWarnPlugin } from '../plugins';
 import { getSourceMapDevTool } from '../utils/helpers';
 
@@ -71,6 +72,7 @@ export function getBrowserConfig(wco: WebpackConfigOptions): webpack.Configurati
     resolve: {
       mainFields: ['es2015', 'browser', 'module', 'main'],
     },
+    ...withWebpackFourOrFive({}, { target: ['web', 'es5'] }),
     output: {
       crossOriginLoading,
     },
