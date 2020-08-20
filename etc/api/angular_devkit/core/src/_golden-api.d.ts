@@ -214,7 +214,7 @@ export interface CordHostRename {
 
 export declare class CoreSchemaRegistry implements SchemaRegistry {
     constructor(formats?: SchemaFormat[]);
-    protected _resolver(ref: string, validate: ajv.ValidateFunction): {
+    protected _resolver(ref: string, validate?: ajv.ValidateFunction): {
         context?: ajv.ValidateFunction;
         schema?: JsonObject;
     };
@@ -1133,7 +1133,7 @@ export declare namespace test {
     };
     class TestHost extends SimpleMemoryHost {
         protected _records: TestLogRecord[];
-        protected _sync: SyncDelegateHost<{}>;
+        protected _sync: SyncDelegateHost<{}> | null;
         get files(): Path[];
         get records(): TestLogRecord[];
         get sync(): SyncDelegateHost<{}>;
