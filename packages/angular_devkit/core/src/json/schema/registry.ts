@@ -58,6 +58,7 @@ export class SchemaValidationException extends BaseException {
   ) {
     if (!errors || errors.length === 0) {
       super('Schema validation failed.');
+      this.errors = [];
 
       return;
     }
@@ -194,7 +195,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
   protected _resolver(
     ref: string,
-    validate: ajv.ValidateFunction,
+    validate?: ajv.ValidateFunction,
   ): { context?: ajv.ValidateFunction, schema?: JsonObject } {
     if (!validate || !validate.refs || !validate.refVal || !ref) {
       return {};
@@ -396,10 +397,10 @@ export class CoreSchemaRegistry implements SchemaRegistry {
             switchMap(updatedData => {
               const result = validate.call(validationContext, updatedData);
 
-              return typeof result == 'boolean'
+              return typeof result === 'boolean'
                 ? of([updatedData, result])
                 : from((result as Promise<boolean>)
-                  .then(r => [updatedData, true])
+                  .then(() => [updatedData, true])
                   .catch((err: Error | AjvValidationError) => {
                     if ((err as AjvValidationError).ajv) {
                       validate.errors = (err as AjvValidationError).errors;
@@ -410,7 +411,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
                     return Promise.reject(err);
                   }));
             }),
-            switchMap(([data, valid]: [JsonValue, boolean]) => {
+            switchMap(([data, valid]) => {
               if (valid) {
                 let result = of(data);
 
@@ -430,7 +431,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
                 return of([data, valid]);
               }
             }),
-            map(([data, valid]: [JsonValue, boolean]) => {
+            map(([data, valid]) => {
               if (valid) {
                 return { data, success: true } as SchemaValidatorResult;
               }
@@ -519,7 +520,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     this._ajv.addKeyword('x-prompt', {
       errors: false,
       valid: true,
-      compile: (schema, parentSchema: JsonObject, it) => {
+      compile: (schema, parentSchema, it) => {
         const compilationSchemInfo = this._currentCompilationSchemaInfo;
         if (!compilationSchemInfo) {
           return () => true;
@@ -540,17 +541,17 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           items = schema.items;
         }
 
-        const propertyTypes = getTypesOfSchema(parentSchema);
+        const propertyTypes = getTypesOfSchema(parentSchema as JsonObject);
         if (!type) {
           if (propertyTypes.size === 1 && propertyTypes.has('boolean')) {
             type = 'confirmation';
-          } else if (Array.isArray(parentSchema.enum)) {
+          } else if (Array.isArray((parentSchema as JsonObject).enum)) {
             type = 'list';
           } else if (
             propertyTypes.size === 1 &&
             propertyTypes.has('array') &&
-            parentSchema.items &&
-            Array.isArray((parentSchema.items as JsonObject).enum)
+            (parentSchema as JsonObject).items &&
+            Array.isArray(((parentSchema as JsonObject).items as JsonObject).enum)
           ) {
             type = 'list';
           } else {
@@ -566,8 +567,8 @@ export class CoreSchemaRegistry implements SchemaRegistry {
               : schema.multiselect;
 
           const enumValues = multiselect
-            ? parentSchema.items && (parentSchema.items as JsonObject).enum
-            : parentSchema.enum;
+            ? (parentSchema as JsonObject).items && ((parentSchema as JsonObject).items as JsonObject).enum
+            : (parentSchema as JsonObject).enum;
           if (!items && Array.isArray(enumValues)) {
             items = [];
             for (const value of enumValues) {
@@ -590,11 +591,11 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           items,
           multiselect,
           default:
-            typeof parentSchema.default == 'object' &&
-            parentSchema.default !== null &&
-            !Array.isArray(parentSchema.default)
+            typeof (parentSchema as JsonObject).default == 'object' &&
+            (parentSchema as JsonObject).default !== null &&
+            !Array.isArray((parentSchema as JsonObject).default)
               ? undefined
-              : parentSchema.default as string[],
+              : (parentSchema as JsonObject).default as string[],
           async validator(data: JsonValue) {
             try {
               return await it.self.validate(parentSchema, data);
