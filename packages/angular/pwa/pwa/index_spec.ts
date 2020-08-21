@@ -23,15 +23,13 @@ describe('PWA Schematic', () => {
 
   let appTree: UnitTestTree;
 
-  // tslint:disable-next-line:no-any
-  const workspaceOptions: any = {
+  const workspaceOptions = {
     name: 'workspace',
     newProjectRoot: 'projects',
     version: '6.0.0',
   };
 
-  // tslint:disable-next-line:no-any
-  const appOptions: any = {
+  const appOptions = {
     name: 'bar',
     inlineStyle: false,
     inlineTemplate: false,
