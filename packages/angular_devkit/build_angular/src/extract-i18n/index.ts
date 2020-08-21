@@ -25,6 +25,7 @@ import {
 } from '../angular-cli-files/models/webpack-configs';
 import { statsErrorsToString, statsHasErrors, statsHasWarnings, statsWarningsToString } from '../angular-cli-files/utilities/stats';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
+import { ExecutionTransformer } from '../transforms';
 import { createI18nOptions } from '../utils/i18n-options';
 import { assertCompatibleAngularVersion } from '../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../utils/webpack-browser-config';
@@ -83,6 +84,9 @@ class InMemoryOutputPlugin {
 export async function execute(
   options: ExtractI18nBuilderOptions,
   context: BuilderContext,
+  transforms?: {
+    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
+  },
 ): Promise<BuildResult> {
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
@@ -226,10 +230,14 @@ export async function execute(
     }
   };
 
-  const webpackResult = await runWebpack(config, context, {
-    logging,
-    webpackFactory: await import('webpack'),
-  }).toPromise();
+  const webpackResult = await runWebpack(
+    (await transforms?.webpackConfiguration?.(config)) || config,
+    context,
+    {
+      logging,
+      webpackFactory: await import('webpack'),
+    },
+  ).toPromise();
 
   // Complete if using VE
   if (!usingIvy) {
