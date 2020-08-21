@@ -42,7 +42,7 @@ function _fromPackageJson(cwd = process.cwd()): SemVer | null {
 if (process.env['NG_CLI_PROFILING']) {
   let profiler: {
     startProfiling: (name?: string, recsamples?: boolean) => void;
-    stopProfiling: (name?: string) => any; // tslint:disable-line:no-any
+    stopProfiling: (name?: string) => unknown;
   };
   try {
     profiler = require('v8-profiler-node8'); // tslint:disable-line:no-implicit-dependencies

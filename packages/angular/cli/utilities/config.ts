@@ -93,16 +93,14 @@ export class AngularWorkspace {
 
   // tslint:disable-next-line: no-any
   getCli(): Record<string, any> {
-    // tslint:disable-next-line: no-any
-    return (this.workspace.extensions['cli'] as Record<string, any>) || {};
+    return (this.workspace.extensions['cli'] as Record<string, unknown>) || {};
   }
 
   // tslint:disable-next-line: no-any
   getProjectCli(projectName: string): Record<string, any> {
     const project = this.workspace.projects.get(projectName);
 
-    // tslint:disable-next-line: no-any
-    return (project?.extensions['cli'] as Record<string, any>) || {};
+    return (project?.extensions['cli'] as Record<string, unknown>) || {};
   }
 }
 
