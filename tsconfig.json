@@ -5,14 +5,12 @@
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
     "noUnusedParameters": false,
     "noUnusedLocals": false,
     "outDir": "./dist",
     "rootDir": ".",
     "skipLibCheck": true,
-    "strictNullChecks": true,
+    "strict": true,
     "target": "es2018",
     "lib": [
       "es2018"
