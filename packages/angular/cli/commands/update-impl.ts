@@ -220,8 +220,11 @@ export class UpdateCommand extends Command<UpdateCommandSchema> {
     return this.executePackageMigrations(migrations, packageName, commit);
   }
 
-  // tslint:disable-next-line: no-any
-  private async executePackageMigrations(migrations: any[], packageName: string, commit = false): Promise<boolean> {
+  private async executePackageMigrations(
+    migrations: Iterable<{ name: string; description: string; collection: { name: string }}>,
+    packageName: string,
+    commit = false,
+  ): Promise<boolean> {
     for (const migration of migrations) {
       this.logger.info(`${colors.symbols.pointer} ${migration.description.replace(/\. /g, '.\n  ')}`);
 

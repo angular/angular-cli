@@ -5,8 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-// tslint:disable:no-global-tslint-disable no-any
 import { analytics, logging, strings, tags } from '@angular-devkit/core';
 import * as path from 'path';
 import { colors } from '../utilities/color';

@@ -54,6 +54,7 @@ export interface PackageMetadata {
   name: string;
   tags: { [tag: string]: PackageManifest | undefined };
   versions: Record<string, PackageManifest>;
+  'dist-tags'?: unknown;
 }
 
 let npmrc: { [key: string]: string };
@@ -141,7 +142,7 @@ function readOptions(
   return options;
 }
 
-function normalizeManifest(rawManifest: {}): PackageManifest {
+function normalizeManifest(rawManifest: { name: string; version: string }): PackageManifest {
   // TODO: Fully normalize and sanitize
 
   return {
@@ -149,8 +150,7 @@ function normalizeManifest(rawManifest: {}): PackageManifest {
     devDependencies: {},
     peerDependencies: {},
     optionalDependencies: {},
-    // tslint:disable-next-line:no-any
-    ...(rawManifest as any),
+    ...rawManifest,
   };
 }
 
@@ -187,14 +187,13 @@ export async function fetchPackageMetadata(
 
   if (response.versions) {
     for (const [version, manifest] of Object.entries(response.versions)) {
-      metadata.versions[version] = normalizeManifest(manifest as {});
+      metadata.versions[version] = normalizeManifest(manifest as { name: string; version: string });
     }
   }
 
   if (response['dist-tags']) {
     // Store this for use with other npm utility packages
-    // tslint:disable-next-line: no-any
-    (metadata as any)['dist-tags'] = response['dist-tags'];
+    metadata['dist-tags'] = response['dist-tags'];
 
     for (const [tag, version] of Object.entries(response['dist-tags'])) {
       const manifest = metadata.versions[version as string];

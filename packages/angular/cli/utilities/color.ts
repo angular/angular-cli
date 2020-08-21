@@ -17,8 +17,9 @@ export function removeColor(text: string): string {
   return text.replace(new RegExp(ansiColors.ansiRegex), '');
 }
 
-// tslint:disable-next-line: no-any
-const colors = (ansiColors as any).create() as typeof ansiColors;
+// create a separate instance to prevent unintended global changes to the color configuration
+// create function is not defined in the typings
+const colors = (ansiColors as typeof ansiColors & { create: () => typeof ansiColors }).create();
 colors.enabled = supportsColor;
 
 export { colors };

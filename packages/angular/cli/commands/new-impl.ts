@@ -5,8 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
-// tslint:disable:no-global-tslint-disable no-any
 import { Arguments } from '../models/interface';
 import { SchematicCommand } from '../models/schematic-command';
 import { Schema as NewCommandSchema } from './new';
