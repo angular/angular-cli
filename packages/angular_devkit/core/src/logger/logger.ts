@@ -142,7 +142,10 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
   subscribe(_observerOrNext?: PartialObserver<LogEntry> | ((value: LogEntry) => void),
             _error?: (error: Error) => void,
             _complete?: () => void): Subscription {
-    return this._observable.subscribe.apply(this._observable, arguments as unknown);
+    return this._observable.subscribe.apply(
+      this._observable,
+      (arguments as unknown) as Parameters<Observable<LogEntry>['subscribe']>,
+    );
   }
   forEach(next: (value: LogEntry) => void, PromiseCtor?: typeof Promise): Promise<void> {
     return this._observable.forEach(next, PromiseCtor);
