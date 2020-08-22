@@ -339,7 +339,7 @@ export declare class InvalidUpdateRecordException extends BaseException {
     constructor();
 }
 
-export declare function isAction(action: any): action is Action;
+export declare function isAction(action: unknown): action is Action;
 
 export declare function isContentAction(action: Action): action is CreateFileAction | OverwriteFileAction;
 

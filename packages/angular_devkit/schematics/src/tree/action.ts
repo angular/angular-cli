@@ -157,13 +157,16 @@ export function isContentAction(action: Action): action is CreateFileAction | Ov
 }
 
 
-export function isAction(action: any): action is Action {  // tslint:disable-line:no-any
-  const kind = action && action.kind;
+export function isAction(action: unknown): action is Action {
+  const act = action as Action;
 
-  return action !== null
-      && typeof action.id == 'number'
-      && typeof action.path == 'string'
-      && (kind == 'c' || kind == 'o' || kind == 'r' || kind == 'd');
+  const kind = act && act.kind;
+
+  return typeof action === 'object'
+    && typeof act.hasOwnProperty('kind')
+    && typeof act.id == 'number'
+    && typeof act.path == 'string'
+    && (kind == 'c' || kind == 'o' || kind == 'r' || kind == 'd');
 }
 
 
