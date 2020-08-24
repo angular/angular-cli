@@ -53,7 +53,7 @@ describe('@ngtools/webpack transformers', () => {
       const { program, compilerHost } = createTypescriptContext(input, additionalFiles);
       const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
 
-      expect(tags.oneLine`${result}`).toEqual('');
+      expect(tags.oneLine`${result}`).toEqual('export {};');
     });
 
     it('should remove unused aliased imports', () => {
@@ -65,7 +65,7 @@ describe('@ngtools/webpack transformers', () => {
       const { program, compilerHost } = createTypescriptContext(input, additionalFiles);
       const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
 
-      expect(tags.oneLine`${result}`).toEqual('');
+      expect(tags.oneLine`${result}`).toEqual('export {};');
     });
 
     it('should retain used aliased imports', () => {
@@ -115,7 +115,7 @@ describe('@ngtools/webpack transformers', () => {
       const { program, compilerHost } = createTypescriptContext(input, additionalFiles);
       const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
 
-      expect(tags.oneLine`${result}`).toEqual('');
+      expect(tags.oneLine`${result}`).toEqual('export {};');
     });
 
     it('should drop unused imports in export specifier', () => {
@@ -127,7 +127,7 @@ describe('@ngtools/webpack transformers', () => {
       const { program, compilerHost } = createTypescriptContext(input, additionalFiles);
       const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
 
-      expect(tags.oneLine`${result}`).toEqual('');
+      expect(tags.oneLine`${result}`).toEqual('export {};');
     });
 
     it('should retain used imports in export specifier', () => {
@@ -158,7 +158,7 @@ describe('@ngtools/webpack transformers', () => {
       const { program, compilerHost } = createTypescriptContext(input, additionalFiles);
       const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
 
-      expect(tags.oneLine`${result}`).toEqual('');
+      expect(tags.oneLine`${result}`).toEqual('export {};');
     });
 
     it('should retain used imports in shorthand property assignment', () => {
@@ -189,7 +189,7 @@ describe('@ngtools/webpack transformers', () => {
       const { program, compilerHost } = createTypescriptContext(input, additionalFiles);
       const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
 
-      expect(tags.oneLine`${result}`).toEqual('');
+      expect(tags.oneLine`${result}`).toEqual('export {};');
     });
 
     it('should retain used default import', () => {
