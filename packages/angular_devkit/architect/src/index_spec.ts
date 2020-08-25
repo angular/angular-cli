@@ -70,6 +70,14 @@ describe('architect', () => {
     await run.stop();
   });
 
+  it('supports async generator builders', async () => {
+    testArchitectHost.addBuilder('package:test', createBuilder(async function*() { yield { success: true }; }));
+
+    const run = await architect.scheduleBuilder('package:test', {});
+    expect(await run.result).toEqual(jasmine.objectContaining({ success: true }));
+    await run.stop();
+  });
+
   it('runs builders parallel', async () => {
     const run = await architect.scheduleBuilder('package:test', {});
     const run2 = await architect.scheduleBuilder('package:test', {});
@@ -123,7 +131,7 @@ describe('architect', () => {
     }
   });
 
-  it('works with watching builders', async () => {
+  it('works with watching observable builders', async () => {
     let results = 0;
     testArchitectHost.addBuilder('package:test-watch', createBuilder((_, context) => {
       called++;
@@ -140,6 +148,29 @@ describe('architect', () => {
     }));
 
     const run = await architect.scheduleBuilder('package:test-watch', {});
+    await run.result;
+    expect(called).toBe(1);
+    expect(results).toBe(1);
+
+    const all = await run.output.pipe(toArray()).toPromise();
+    expect(called).toBe(1);
+    expect(results).toBe(10);
+    expect(all.length).toBe(10);
+  });
+
+  it('works with watching async generator builders', async () => {
+    let results = 0;
+    testArchitectHost.addBuilder('package:test-watch-gen', createBuilder(async function*(_, context) {
+      called++;
+
+      for (let x = 0; x < 10; x++) {
+        context.reportRunning();
+        yield { success: true };
+        results++;
+      }
+    }));
+
+    const run = await architect.scheduleBuilder('package:test-watch-gen', {});
     await run.result;
     expect(called).toBe(1);
     expect(results).toBe(1);
