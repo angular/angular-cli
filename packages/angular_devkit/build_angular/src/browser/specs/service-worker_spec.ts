@@ -235,7 +235,7 @@ describe('Browser Builder service worker', () => {
       hashTable: {
         '/foo/bar/favicon.ico': '84161b857f5c547e3699ddfbffc6d8d737542e01',
         '/foo/bar/assets/folder-asset.txt': '617f202968a6a81050aa617c2e28e1dca11ce8d4',
-        '/foo/bar/index.html': 'a5359e8e1a516683b32bbb2f9e8bf402dae4738e',
+        '/foo/bar/index.html': 'e92a780dba6f6099adafb72d7611f6660a91a70b',
       },
     }));
 

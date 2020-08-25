@@ -49,6 +49,24 @@ describe('augment-index-html', () => {
     `);
   });
 
+  it('should replace base href value', async () => {
+    const source = augmentIndexHtml({
+      ...indexGeneratorOptions,
+      inputContent: '<html><head><base href="/"></head><body></body></html>',
+      baseHref: '/Apps/',
+    });
+
+    const html = await source;
+    expect(html).toEqual(oneLineHtml`
+      <html>
+        <head><base href="/Apps/">
+      </head>
+        <body>
+        </body>
+      </html>
+    `);
+  });
+
   it(`should emit correct script tags when having 'module' and 'non-module' js`, async () => {
     const es2015JsFiles: FileInfo[] = [
       { file: 'runtime-es2015.js', extension: '.js', name: 'main' },

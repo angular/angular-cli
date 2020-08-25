@@ -179,7 +179,7 @@ export async function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise
       treeAdapter.setTemplateContent(baseFragment, baseElement);
       indexSource.replace(
         baseElement.sourceCodeLocation.startOffset,
-        baseElement.sourceCodeLocation.endOffset,
+        baseElement.sourceCodeLocation.endOffset - 1,
         parse5.serialize(baseFragment, { treeAdapter }),
       );
     }
