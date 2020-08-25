@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { analytics, experimental, json, logging } from '@angular-devkit/core';
-import { Observable, SubscribableOrPromise, from } from 'rxjs';
+import { Observable, SubscribableOrPromise, Subscriber, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { Schema as RealBuilderInput, Target as RealTarget } from './input-schema';
 import { Schema as RealBuilderOutput } from './output-schema';
@@ -258,7 +258,7 @@ export interface BuilderContext {
 /**
  * An accepted return value from a builder. Can be either an Observable, a Promise or a vector.
  */
-export type BuilderOutputLike = SubscribableOrPromise<BuilderOutput> | BuilderOutput;
+export type BuilderOutputLike = AsyncIterable<BuilderOutput> | SubscribableOrPromise<BuilderOutput> | BuilderOutput;
 
 // tslint:disable-next-line:no-any
 export function isBuilderOutput(obj: any): obj is BuilderOutput {
@@ -266,7 +266,40 @@ export function isBuilderOutput(obj: any): obj is BuilderOutput {
     return false;
   }
 
+  if (typeof obj[Symbol.asyncIterator] === 'function') {
+    return false;
+  }
+
   return typeof obj.success === 'boolean';
+}
+
+export function fromAsyncIterable<T>(iterable: AsyncIterable<T>): Observable<T> {
+  return new Observable((subscriber) => {
+    handleAsyncIterator(subscriber, iterable[Symbol.asyncIterator]()).then(
+      () => subscriber.complete(),
+      (error) => subscriber.error(error),
+    );
+  });
+}
+
+async function handleAsyncIterator<T>(
+  subscriber: Subscriber<T>,
+  iterator: AsyncIterator<T>,
+): Promise<void> {
+  const teardown = new Promise<void>((resolve) => subscriber.add(() => resolve()));
+
+  try {
+    while (!subscriber.closed) {
+      const result = await Promise.race([teardown, iterator.next()]);
+      if (!result || result.done) {
+        break;
+      }
+
+      subscriber.next(result.value);
+    }
+  } finally {
+    await iterator.return?.();
+  }
 }
 
 /**

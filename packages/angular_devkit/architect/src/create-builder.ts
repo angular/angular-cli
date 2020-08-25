@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { analytics, experimental, json, logging } from '@angular-devkit/core';
-import { Observable, Subscription, from, of, throwError } from 'rxjs';
+import { Observable, Subscription, from, isObservable, of, throwError } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import {
   BuilderContext,
@@ -18,6 +18,7 @@ import {
   ScheduleOptions,
   Target,
   TypedBuilderProgress,
+  fromAsyncIterable,
   isBuilderOutput,
   targetStringFromTarget,
 } from './api';
@@ -200,6 +201,8 @@ export function createBuilder<
           result = fn(i.options as OptT, context);
           if (isBuilderOutput(result)) {
             result = of(result);
+          } else if (!isObservable(result) && isAsyncIterable(result)) {
+            result = fromAsyncIterable(result);
           } else {
             result = from(result);
           }
@@ -233,4 +236,8 @@ export function createBuilder<
     [BuilderSymbol]: true,
     [BuilderVersionSymbol]: require('../package.json').version,
   };
+}
+
+function isAsyncIterable<T>(obj: unknown): obj is AsyncIterable<T> {
+  return !!obj && typeof (obj as AsyncIterable<T>)[Symbol.asyncIterator] === 'function';
 }

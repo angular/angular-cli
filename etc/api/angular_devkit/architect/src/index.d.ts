@@ -40,7 +40,7 @@ export declare type BuilderInput = json.JsonObject & RealBuilderInput;
 
 export declare type BuilderOutput = json.JsonObject & RealBuilderOutput;
 
-export declare type BuilderOutputLike = SubscribableOrPromise<BuilderOutput> | BuilderOutput;
+export declare type BuilderOutputLike = AsyncIterable<BuilderOutput> | SubscribableOrPromise<BuilderOutput> | BuilderOutput;
 
 export declare type BuilderProgress = json.JsonObject & RealBuilderProgress & TypedBuilderProgress;
 
@@ -61,6 +61,8 @@ export interface BuilderRun {
 }
 
 export declare function createBuilder<OptT extends json.JsonObject, OutT extends BuilderOutput = BuilderOutput>(fn: BuilderHandlerFn<OptT>): Builder<OptT>;
+
+export declare function fromAsyncIterable<T>(iterable: AsyncIterable<T>): Observable<T>;
 
 export declare function isBuilderOutput(obj: any): obj is BuilderOutput;
 
